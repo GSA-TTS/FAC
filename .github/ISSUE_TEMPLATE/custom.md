@@ -1,6 +1,6 @@
 ---
-name: Custom issue template
-about: Describe this issue template's purpose here.
+name: Basic task tracking issue
+about: Starting point for new issues tracking project tasks
 title: ''
 labels: ''
 assignees: ''
