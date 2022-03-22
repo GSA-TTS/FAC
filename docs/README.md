@@ -1,4 +1,11 @@
 # FAC documentation
 
 System-wide:
-* [Architectural Decision Records](./adr)
+* [Architectural Decision Records](./architecture/decisions)
+* [Diagrams](./architecture/diagrams/)
+
+
+
+
+confide low,
+avia
