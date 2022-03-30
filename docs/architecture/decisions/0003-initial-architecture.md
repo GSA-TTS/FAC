@@ -33,7 +33,7 @@ We will maintain separation between the frontend and backend as distinct systems
 * Serve as the first consumer of the backend API
 
 
-**We will use Python & Django for the backend. Using Django will allow us to;**
+**We will use Python & Django for the backend. Using Django will allow us to:**
 
 * Move quickly given the current engineering team's background
 * Leverage existing patterns from other TTS efforts such as civilrights.justice.gov
