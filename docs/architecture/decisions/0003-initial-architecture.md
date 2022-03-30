@@ -13,6 +13,8 @@ This is a greenfield build project, to evaluate options and settle on an initial
 * Surveyed and reviewed existing TTS projects and documentation such as https://engineering.18f.gov/
 * Reviewed and discussed proposals as an engineering team
 
+Proposed architecture which was reviewed by the engineering team:
+![Initial architecture](../diagrams/FAC_System.png)
 ## Decision
 
 Finding no immediate needs not met by TTS `default` choices for infrastructure and datastore, **we will build on a foundation of cloud.gov** and;
