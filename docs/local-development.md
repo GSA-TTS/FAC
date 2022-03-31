@@ -15,7 +15,7 @@
 ---
 **NOTE**
 
-Target python version is defined in [../.python-version](../.python-version)
+Target python version is defined in [../backend/runtime.txt](../backend/runtime.txt)
 
 ---
 
