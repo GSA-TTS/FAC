@@ -28,5 +28,6 @@ Target python version is defined in [../.python-version](../.python-version)
     ```
     pyenv virtualenv <python version> FAC
     pyenv activate FAC
-    pip install -r requirements.txt
+    pip install pip-tools
+    make install
     ```
