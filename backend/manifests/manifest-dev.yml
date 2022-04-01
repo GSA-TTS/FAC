@@ -1,0 +1,16 @@
+---
+applications:
+- name: gsa-fac-dev
+  buildpack: python_buildpack
+  memory: 512M
+  path: ../
+  stack: cflinuxfs3
+  timeout: 180
+  env:
+    DISABLE_COLLECTSTATIC: true
+  routes:
+  - route: fac-dev.app.cloud.gov
+  instances: 1
+  services:
+  - fac_dev_db
+  - fac_dev_s3

@@ -2,9 +2,14 @@
 
 System-wide:
 * [Architectural Decision Records](./architecture/decisions)
+* [Diagrams](./architecture/diagrams/)
 * [Local Development](./local-development.md)
 * [Dependency Management](./dependency-management.md)
-* [Diagrams](./architecture/diagrams/)
+* [Deploying](./deploying.md)
 
 Misc:
 * [Engineering Team Practices](./engineering-team-practices.md)
+
+
+
+
