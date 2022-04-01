@@ -3,7 +3,7 @@ FROM python:3.10.1-slim AS builder
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
-COPY requirements/requirements.txt /tmp/requirements.txt
+COPY requirements.txt /tmp/requirements.txt
 
 # RUN --mount=type=cache,target=/root/.cache \
 RUN set -ex && \
