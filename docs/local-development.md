@@ -53,6 +53,14 @@ eval "$(pyenv init --path)"
 
 should end up somewhere in `~/.bash_profile`, `~/.bashrc`, or whatever flavor of shell you're using.
 
+## Set link flags
+
+You *might* need to set link flags. Otherwise, when you `make install`, there could be failures in the building of `psycog2`. YMMV.
+
+```
+export LDFLAGS="-L/usr/local/opt/openssl/lib -L/usr/local/lib -L/usr/local/opt/expat/lib" && export CFLAGS="-I/usr/local/opt/openssl/include/ -I/usr/local/include -I/usr/local/opt/expat/include" && export CPPFLAGS="-I/usr/local/opt/openssl/include/ -I/usr/local/include -I/usr/local/opt/expat/include"
+```
+
 # Create a virtual environment
 
 You may need to install the Python version being used by the team. The following take place in the `backend` directory of the checked out repository.
