@@ -7,18 +7,16 @@ assignees: ''
 
 ---
 
-**Background**
-
-Welcome to the team!
+### Welcome to the team  {GH USERNAME}!
 
 Here's a few pointers to get you started as well as a checklist to make sure you've got access to :all-the-things:!
-
 
 **For you**
 - [ ] [Join](https://github.com/GSA/GitHub-Administration#joining-the-gsa-enterprise-organization) GSA’s Enterprise Github org
 - [ ] Review the [project README](https://docs.google.com/document/d/1g8nYqYS_ifFlZB-DBgfeSoJRMB__EqWsmLnacyk-bDI/) in drive
 - [ ] Join Slack channels in the project README
 
+{ONBOARDING BUDDY'S GH USERNAME} will be your onboarding buddy and will tackle the list below!
 
 **For your onboarding buddy**
 - [ ] Add to the FAC team folder in drive
