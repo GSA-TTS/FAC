@@ -5,7 +5,7 @@ Welcome to the FAC!  Below are a collection of useful resources about the projec
 System-wide:
 * [Architectural Decision Records](./architecture/decisions)
 * [Diagrams](./architecture/diagrams/)
-* [Local Development](./local-development.md)
+* [Development](./development.md)
 * [Dependency Management](./dependency-management.md)
 * [Deploying](./deploying.md)
 
