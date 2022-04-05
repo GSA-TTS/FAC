@@ -7,6 +7,12 @@ compile:
 	@rm requirements.txt
 	@pip-compile --generate-hashes ./requirements/requirements.in -o requirements.txt --allow-unsafe
 
-# Sync your local environment
+
+# Generate an updated dev-requirements.txt
+compile-dev:
+	@rm dev-requirements.txt
+	@pip-compile --generate-hashes ./requirements/dev-requirements.in -o dev-requirements.txt --allow-unsafe
+
+# Sync your dev environment
 sync:
-	@pip-sync requirements.txt
+	@pip-sync dev-requirements.txt
