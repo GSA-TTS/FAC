@@ -1,17 +1,23 @@
-# Local development
+# Development
 
+We use either Docker with `docker-compose` or local development when working on issues and shipping pull requests.
 ## Contents
 
 * [Tools](#tools)
-
-* [Setting up your python environment](#python)
+* [Setting up your dev environment](#python)
+  * [Docker]()
+  * [Local Development]()
 
 ## Tools
 
-* [Pyenv](https://github.com/pyenv) for managing Python versions
-* [pyenv-virtualenv](https://github.com/pyenv/pyenv-virtualenv) for managing virtual environments
+* Docker
+* Local dev
+  * [Pyenv](https://github.com/pyenv) for managing Python versions
+  * [pyenv-virtualenv](https://github.com/pyenv/pyenv-virtualenv) for managing virtual environments
+  * [Postgres](https://www.postgresql.org/)
 
-## Initial Setup
+## Setting up your dev environment
+
 ---
 **NOTE**
 
@@ -19,27 +25,32 @@ Target python version is defined in [../backend/runtime.txt](../backend/runtime.
 
 ---
 
+## Docker
 
-1. Install the tools listed above
-2. Use [pyenv-virtualenv](https://github.com/pyenv/pyenv-virtualenv) to create a virtual environment
-3. Activate your new virtual environment
-4. Install python dependencies
+An application and database are configured in [../backend/docker-compose.yml](../backend/docker-compose.yml), we create a volume to persist the development database, and we mount our `./backend` working directory to the `web` container so that changes made in development are reflected in the container without needing to re-build.
 
+1. Install Docker
+2. Build and start using [../backend/docker-compose.yml](../backend/docker-compose.yml)
+
+    ```shell
+    # with a working directory of ./backend
+    docker-compose build
+    docker-compose up
     ```
-    pyenv virtualenv <python version> FAC
-    pyenv activate FAC
-    pip install pip-tools
-    make install
-    ```
-## Install the tools
+
+3. The application will start and be accessible @ http://localhost:8000/
+
+
+## Local Development
+### Install the tools
 
 `brew install pyenv pyenv-virtualenv`
 
 If your tools are previously installed, you may need to
 
-`brew update && brew upgrade pyenv` 
+`brew update && brew upgrade pyenv`
 
-to have all of the most recent versions of Python available. This could be slow if you haven't updated in a while. Get a cup of ☕. 
+to have all of the most recent versions of Python available. This could be slow if you haven't updated in a while. Get a cup of ☕.
 
 (Your setup process on Windows/Linux will vary. Currently, we assume local development in a Linux-like environment.)
 
@@ -61,7 +72,7 @@ You *might* need to set link flags. Otherwise, when you `make install`, there co
 export LDFLAGS="-L/usr/local/opt/openssl/lib -L/usr/local/lib -L/usr/local/opt/expat/lib" && export CFLAGS="-I/usr/local/opt/openssl/include/ -I/usr/local/include -I/usr/local/opt/expat/include" && export CPPFLAGS="-I/usr/local/opt/openssl/include/ -I/usr/local/include -I/usr/local/opt/expat/include"
 ```
 
-## Create a virtual environment
+### Create a virtual environment
 
 You may need to install the Python version being used by the team. The following take place in the `backend` directory of the checked out repository.
 
@@ -74,7 +85,7 @@ Then, set up the virtualenv.
 
 `pyenv virtualenv $FAC_PYTHON_VERSION FAC`
 
-## Activate your new virtual environment
+### Activate your new virtual environment
 
 `pyenv activate FAC`
 
@@ -84,10 +95,16 @@ Depending on how you feel about seeing the virtualenv in your prompt:
 pyenv-virtualenv: prompt changing will be removed from future release. configure `export PYENV_VIRTUALENV_DISABLE_PROMPT=1' to simulate the behavior.
 ```
 
-## Install python dependencies
+### Install python dependencies
 
-```    
+```
 python -m pip install --upgrade pip
 pip install pip-tools
 ```
 
+### Set environment variables
+
+We use environment variables to configure much of how Django operates, at a minimum you'll need to configure the uri of your local database.
+
+Set a `DATABASE_URL` environment variable with the uri of your local database
+    *  `postgresql://[userspec@][hostspec][/dbname]`

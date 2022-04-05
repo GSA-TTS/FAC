@@ -1,0 +1,2 @@
+# used by cloud.gov
+web: python manage.py migrate && gunicorn config.wsgi -t 60
