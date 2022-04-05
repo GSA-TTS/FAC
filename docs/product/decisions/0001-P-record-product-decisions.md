@@ -1,4 +1,4 @@
-# 1. Record architecture decisions
+# 1. Record product decisions
 
 Introduced: 20220330
 
