@@ -1,9 +1,9 @@
-# 1. Record architecture decisions
+# 1. Record product decisions
 
-Date: 2022-03-30
+Introduced: 20220330
 
 ## Status
-For Discussion
+Accepted
 
 ## Context
 We need to record the product decisions made on this project.
