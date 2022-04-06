@@ -39,14 +39,14 @@ class SingleAuditChecklist(models.Model):
     audit_type = models.CharField(max_length=20, choices=AUDIT_TYPE)
     audit_period_covered = models.CharField(max_length=20, choices=AUDIT_PERIOD)
     ein = models.CharField(max_length=12, verbose_name=_('EIN'), help_text=_('Auditee Employer Identification Number'))
-    ein_not_an_ssn_attestation = models.BooleanField()
-    multiple_eins_covered = models.BooleanField()
-    multiple_ueis_covered = models.BooleanField()
+    ein_not_an_ssn_attestation = models.BooleanField(verbose_name=_('Attestation: EIN Not an SSN'))
+    multiple_eins_covered = models.BooleanField(verbose_name=_('Multiple EINs covered'))
+    multiple_ueis_covered = models.BooleanField(verbose_name=_('Multiple UEIs covered'))
 
     # Auditee Information
     auditee_name = models.CharField(max_length=100)
     auditee_address_line_1 = models.CharField(max_length=100)
-    auditee_address_line_2 = models.CharField(max_length=100)
+    auditee_address_line_2 = models.CharField(max_length=100, blank=True, null=True)
     auditee_city = models.CharField(max_length=100)
     auditee_zip = models.CharField(max_length=100)
     auditee_state = models.CharField(max_length=2)
@@ -57,10 +57,10 @@ class SingleAuditChecklist(models.Model):
 
     # Auditor Information
     auditor_name = models.CharField(max_length=100)
-    auditor_ein = models.CharField(max_length=12)
-    auditor_ein_not_an_ssn_attestation = models.BooleanField()
+    auditor_ein = models.CharField(max_length=12, verbose_name=_('Auditor EIN'))
+    auditor_ein_not_an_ssn_attestation = models.BooleanField(verbose_name=_('Attestation: Auditor EIN Not an SSN'))
     auditor_address_line_1 = models.CharField(max_length=100)
-    auditor_address_line_2 = models.CharField(max_length=100)
+    auditor_address_line_2 = models.CharField(max_length=100, blank=True, null=True)
     auditor_city = models.CharField(max_length=100)
     auditor_zip = models.CharField(max_length=100)
     auditor_state = models.CharField(max_length=100)
