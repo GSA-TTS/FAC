@@ -4,13 +4,14 @@ We use either Docker with `docker-compose` or local development when working on 
 ## Contents
 
 * [Tools](#tools)
-* [Setting up your dev environment](#python)
-  * [Docker]()
-  * [Local Development]()
+* [Setting up your dev environment](#setting-up-your-dev-environment)
+  * [Docker](#docker)
+  * [Local Development](#local-development)
+* [Django setup](#django-setup)
 
 ## Tools
 
-* Docker
+* [Docker](https://docker.com)
 * Local dev
   * [Pyenv](https://github.com/pyenv) for managing Python versions
   * [pyenv-virtualenv](https://github.com/pyenv/pyenv-virtualenv) for managing virtual environments
@@ -108,3 +109,41 @@ We use environment variables to configure much of how Django operates, at a mini
 
 Set a `DATABASE_URL` environment variable with the uri of your local database
     *  `postgresql://[userspec@][hostspec][/dbname]`
+
+
+### Django setup
+
+In development, you'll need to run Django's `manage.py` and specific commands like `makemigrations`, `createsuperuser`, and more.
+
+If developing with Docker, execute these commands from within the `web` container
+
+
+```shell
+docker-compose run web python manage.py $COMMAND $ARGS
+```
+
+As a convenience, you can create an alias in your shell following this or a similar pattern
+```shell
+fac ()
+{
+  docker-compose run web python manage.py $1 $2 $3 $4 $5
+}
+```
+
+**Example workflows**
+
+Let's use this workflow to create a `superuser` in our development environment so we can access the Admin interface!
+
+
+```shell
+# Start our docker containers w/ docker-compose
+docker-compose up
+
+# Django management command to create a new superuser
+docker-compose up run web python manage.py createsuperuser
+
+# Follow the prompts to enter username, password, etc.
+
+# Enter the user/pass @ the Admin login page
+open http://localhost:8000/admin
+```
