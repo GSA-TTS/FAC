@@ -44,11 +44,11 @@ INSTALLED_APPS = [
 
 # Third-party apps
 
-INSTALLED_APPS += []
+INSTALLED_APPS += ['rest_framework']
 
 # Our apps
 
-INSTALLED_APPS += ['audit']
+INSTALLED_APPS += ['audit', 'api']
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -133,3 +133,11 @@ ADMIN_URL = 'admin/'
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# REST FRAMEWORK
+API_VERSION = '0'
+
+REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 10,
+}
