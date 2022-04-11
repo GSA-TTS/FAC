@@ -1,6 +1,7 @@
 # Development
 
-We use either Docker with `docker-compose` or local development when working on issues and shipping pull requests.
+We use either [Docker with `docker-compose`](#docker) or [local development](#local-development) when working on issues and shipping pull requests.
+
 ## Contents
 
 * [Tools](#tools)
@@ -126,7 +127,7 @@ As a convenience, you can create an alias in your shell following this or a simi
 ```shell
 fac ()
 {
-  docker-compose run web python manage.py $1 $2 $3 $4 $5
+  docker-compose run web python manage.py ${@}
 }
 ```
 
@@ -140,7 +141,7 @@ Let's use this workflow to create a `superuser` in our development environment s
 docker-compose up
 
 # Django management command to create a new superuser
-docker-compose up run web python manage.py createsuperuser
+docker-compose run web python manage.py createsuperuser
 
 # Follow the prompts to enter username, password, etc.
 
