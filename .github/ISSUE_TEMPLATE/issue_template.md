@@ -1,3 +1,12 @@
+---
+name: Full-stack issue template.
+about: Starting point for new issues that describe one or more stories.
+title: ''
+labels: ''
+assignees: ''
+
+---
+
 **Background**
 
 <<background>>
