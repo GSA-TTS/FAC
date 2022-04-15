@@ -8,6 +8,8 @@ System-wide:
 * [Development](./development.md)
 * [Dependency Management](./dependency-management.md)
 * [Deploying](./deploying.md)
+* [Testing](./testing.md)
+* [Secrets](./secrets.md)
 
 Misc:
 * [Engineering Team Practices](./engineering-team-practices.md)

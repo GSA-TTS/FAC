@@ -2,22 +2,22 @@
 
 We use [Django's test execution framework](https://docs.djangoproject.com/en/4.0/topics/testing/) along with select 3rd party packages to implement and execute tests for our python code.
 
-
 ## Contents
 
-* [Packages](#packages)
-* [Running-the-tests](#running-the-tests)
-* [Coverage](#coverage)
-
+- [Development](#development)
+  - [Contents](#contents)
+  - [Packages](#packages)
+  - [Running the tests](#running-the-tests)
+  - [Writing new tests](#writing-new-tests)
+  - [Testing Actions Locally](#testing-actions-locally)
+  - [Coverage](#coverage)
 
 ## Packages
  - [model_bakery](https://model-bakery.readthedocs.io/en/latest/), to help create data and instances within our tests
 
-
 ## Running the tests
 
 The test suite is run with Django's `test` management command. A number of helpful arguments and options are available, [check the Django docs for details.](https://docs.djangoproject.com/en/4.0/topics/testing/overview/#running-tests-1)
-
 
 ```shell
 # Run the whole test suite
@@ -43,6 +43,14 @@ We **do** write tests for:
 We **don't** write tests for:
 * Asserting that `models.Charfield` checks the length of an incoming `string` against the `max_length` attribute
 
+## Testing Actions Locally
+
+[Act](https://github.com/nektos/act) can be used to run our Django testing workflow [test.yml](.github/workflows/test.yml) locally:
+
+```shell
+# Run act with the act_base platform
+act test --platform ubuntu-latest=lucasalt/act_base:latest
+```
 
 ## Coverage
 
