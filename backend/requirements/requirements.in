@@ -5,4 +5,3 @@ gunicorn
 djangorestframework
 pyyaml
 uritemplate
-django-formtools
