@@ -52,5 +52,3 @@ To test pushing to cloud.gov locally with the [deploy.yml](.github/workflows/dep
 1. `$ touch .secrets`
 2. Create a [space-deployer service account](https://cloud.gov/docs/services/cloud-gov-service-account/) and copy the username and password into `.secrets` under `CF_USERNAME=` and `CF_PASSWORD=`.
 3. Run act: `$ act`
-
-Make sure not to accidentally push `.secrets` :)
