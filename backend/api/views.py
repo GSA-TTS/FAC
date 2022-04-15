@@ -1,7 +1,9 @@
-from rest_framework import viewsets
-
 from audit.models import SingleAuditChecklist
-from .serializers import SingleAuditChecklistSerializer
+from rest_framework import viewsets
+from rest_framework.response import Response
+from rest_framework.views import APIView
+
+from .serializers import EligibilitySerializer, SingleAuditChecklistSerializer
 
 
 class SACViewSet(viewsets.ModelViewSet):
@@ -14,3 +16,15 @@ class SACViewSet(viewsets.ModelViewSet):
 
     def get_view_name(self):
         return 'SF-SAC'
+
+
+class EligibilityFormView(APIView):
+
+    def post(self, request):
+        serializer = EligibilitySerializer(data=request.data)
+        if serializer.is_valid():
+            # Store in user session
+            # request.session['sac'] = request.data
+            # return success
+            pass
+        return Response(serializer.errors)
