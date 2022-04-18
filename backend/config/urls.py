@@ -19,7 +19,8 @@ schema_view = get_schema_view(
 
 urlpatterns = [
     path('api/schema.json', schema_view),
-    path('sac/eligibility', views.EligibilityFormView.as_view()),
     path('api/', include(api_router.urls)),
+    path('sac/eligibility', views.EligibilityFormView.as_view(), name='eligibility'),
+    path('sac/generalinfo', views.GeneralInfoView.as_view(), name='general-info'),
     path(settings.ADMIN_URL, admin.site.urls),
 ]
