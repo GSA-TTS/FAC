@@ -140,3 +140,5 @@ cython_debug/
 
 #vscode config
 .vscode/
+.DS_Store
+.secrets
