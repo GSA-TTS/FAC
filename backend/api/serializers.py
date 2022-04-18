@@ -6,7 +6,7 @@ from audit.models import SingleAuditChecklist
 class EligibilitySerializer(serializers.ModelSerializer):
     class Meta:
         model = SingleAuditChecklist
-        fields = ['organization_type', 'met_spending_threshold', 'is_usa_based']
+        fields = ['user_provided_organization_type', 'met_spending_threshold', 'is_usa_based']
 
     def validate(self, data):
         if not (data['met_spending_threshold'] and data['is_usa_based']):

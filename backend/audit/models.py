@@ -4,8 +4,10 @@ from django.contrib.auth import get_user_model
 from django.utils.translation import gettext_lazy as _
 
 User = get_user_model()
+
+
 class SingleAuditChecklist(models.Model):
-    ORGANIZATION_TYPE = (
+    USER_PROVIDED_ORGANIZATION_TYPE = (
         ('state', _('State')),
         ('local', _('Local Government')),
         ('tribal', _('Indian Tribe or Tribal Organization')),
@@ -30,7 +32,7 @@ class SingleAuditChecklist(models.Model):
     date_created = models.DateTimeField(auto_now_add=True)
 
     # 1. Submission criteria check -- Eligibility
-    organization_type = models.CharField(max_length=12, choices=ORGANIZATION_TYPE)
+    user_provided_organization_type = models.CharField(max_length=12, choices=USER_PROVIDED_ORGANIZATION_TYPE)
     met_spending_threshold = models.BooleanField()
     is_usa_based = models.BooleanField(verbose_name=_('Is USA Based'))
 
