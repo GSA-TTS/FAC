@@ -44,7 +44,7 @@ INSTALLED_APPS = [
 
 # Third-party apps
 
-INSTALLED_APPS += ['rest_framework']
+INSTALLED_APPS += ['rest_framework', 'corsheaders']
 
 # Our apps
 
@@ -52,8 +52,9 @@ INSTALLED_APPS += ['audit', 'api']
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    "corsheaders.middleware.CorsMiddleware",
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -151,3 +152,7 @@ REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 10,
 }
+
+
+## CORS
+CORS_ALLOW_ALL_ORIGINS = True
