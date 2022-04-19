@@ -6,3 +6,4 @@ djangorestframework
 pyyaml
 uritemplate
 whitenoise
+django-cors-headers
