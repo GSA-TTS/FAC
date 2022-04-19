@@ -22,5 +22,6 @@ urlpatterns = [
     path('api/', include(api_router.urls)),
     path('sac/eligibility', views.EligibilityFormView.as_view(), name='eligibility'),
     path('sac/generalinfo', views.GeneralInfoView.as_view(), name='general-info'),
+    path('sac/orgtypes', views.OrgTypesView.as_view(), name='org-types'),
     path(settings.ADMIN_URL, admin.site.urls),
 ]

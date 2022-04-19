@@ -13,7 +13,7 @@ class SingleAuditChecklist(models.Model):
         ('tribal', _('Indian Tribe or Tribal Organization')),
         ('non-profit', _('Non-profit')),
         ('unknown', _('Unknown')),
-        ('none', _("None of these (for example, for-profit")),
+        ('none', _("None of these (for example, for-profit)")),
     )
 
     AUDIT_TYPE = (

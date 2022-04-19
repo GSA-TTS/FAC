@@ -37,3 +37,14 @@ class GeneralInfoView(APIView):
 
     def get(self, request):
         return Response({'ok': True})
+
+
+class OrgTypesView(APIView):
+    """
+    API endpoint that prints valid User Provided Organization Types and their descriptions.
+    """
+    allowed_methods = ['GET']
+    serializer_class = SingleAuditChecklistSerializer
+
+    def get(self, request):
+        return Response(SingleAuditChecklist.user_provided_organization_type.field.choices)
