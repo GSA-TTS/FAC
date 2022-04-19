@@ -3,7 +3,7 @@ from django.contrib.auth import get_user_model
 
 from django.utils.translation import gettext_lazy as _
 
-from backend.audit.validators import validate_uei_leading_char, validate_uei_nine_digit_sequences, validate_uei_valid_chars
+from .validators import validate_uei_leading_char, validate_uei_nine_digit_sequences, validate_uei_valid_chars
 
 User = get_user_model()
 
