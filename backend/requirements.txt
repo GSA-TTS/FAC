@@ -16,9 +16,9 @@ dj-email-url==1.0.5 \
     --hash=sha256:64257c4f9d8139a4af8e5267229d32260e433fbf257b0cf8fc855bb0cc39ca7d \
     --hash=sha256:ef36f8a324ec57cf3be5c7a7ef44ed6900ca0208624a918ab33adc1cf6427b39
     # via environs
-django==4.0.3 \
-    --hash=sha256:1239218849e922033a35d2a2f777cb8bee18bd725416744074f455f34ff50d0c \
-    --hash=sha256:77ff2e7050e3324c9b67e29b6707754566f58514112a9ac73310f60cd5261930
+django==4.0.4 \
+    --hash=sha256:07c8638e7a7f548dc0acaaa7825d84b7bd42b10e8d22268b3d572946f1e9b687 \
+    --hash=sha256:4e8177858524417563cc0430f29ea249946d831eacb0068a1455686587df40b5
     # via
     #   -r ./requirements/requirements.in
     #   djangorestframework
@@ -104,9 +104,9 @@ psycopg2-binary==2.9.3 \
     --hash=sha256:e847774f8ffd5b398a75bc1c18fbb56564cda3d629fe68fd81971fece2d3c67e \
     --hash=sha256:ffb7a888a047696e7f8240d649b43fb3644f14f0ee229077e7f6b9f9081635bd
     # via -r ./requirements/requirements.in
-pyparsing==3.0.7 \
-    --hash=sha256:18ee9022775d270c55187733956460083db60b37d0d0fb357445f3094eed3eea \
-    --hash=sha256:a6c06a88f252e6c322f65faf8f418b16213b51bdfaece0524c1c1bc30c63c484
+pyparsing==3.0.8 \
+    --hash=sha256:7bf433498c016c4314268d95df76c81b842a4cb2b276fa3312cfb1e1d85f6954 \
+    --hash=sha256:ef7b523f6356f763771559412c0d7134753f037822dad1b16945b7b846f7ad06
     # via packaging
 python-dotenv==0.20.0 \
     --hash=sha256:b7e3b04a59693c42c36f9ab1cc2acc46fa5df8c78e178fc33a8d4cd05c8d498f \
@@ -159,9 +159,13 @@ uritemplate==4.1.1 \
     --hash=sha256:4346edfc5c3b79f694bccd6d6099a322bbeb628dbf2cd86eea55a456ce5124f0 \
     --hash=sha256:830c08b8d99bdd312ea4ead05994a38e8936266f84b9a7878232db50b044e02e
     # via -r ./requirements/requirements.in
+whitenoise==6.0.0 \
+    --hash=sha256:08c42bc535f9777eea1a599289d9433f081921f97887eaf6f559446b2a080374 \
+    --hash=sha256:5a4aff543ee860fbe40d743e556adf92ccd41b7df45697cae074afdf657056b9
+    # via -r ./requirements/requirements.in
 
 # The following packages are considered to be unsafe in a requirements file:
-setuptools==62.0.0 \
-    --hash=sha256:7999cbd87f1b6e1f33bf47efa368b224bed5e27b5ef2c4d46580186cbcb1a86a \
-    --hash=sha256:a65e3802053e99fc64c6b3b29c11132943d5b8c8facbcc461157511546510967
+setuptools==62.1.0 \
+    --hash=sha256:26ead7d1f93efc0f8c804d9fafafbe4a44b179580a7105754b245155f9af05a8 \
+    --hash=sha256:47c7b0c0f8fc10eec4cf1e71c6fdadf8decaa74ffa087e68cd1c20db7ad6a592
     # via gunicorn

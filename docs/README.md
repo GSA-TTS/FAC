@@ -10,6 +10,7 @@ System-wide:
 * [Deploying](./deploying.md)
 * [Testing](./testing.md)
 * [Secrets](./secrets.md)
+* [User Management](./user-management.md)
 
 Misc:
 * [Engineering Team Practices](./engineering-team-practices.md)
