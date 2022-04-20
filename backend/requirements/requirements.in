@@ -2,3 +2,8 @@ Django==4.0.*
 psycopg2-binary
 environs[django]
 gunicorn
+djangorestframework
+pyyaml
+uritemplate
+whitenoise
+django-cors-headers
