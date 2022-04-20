@@ -1,4 +1,4 @@
-# 4. EIN or UEI before recording audits?
+# 3. Make `gsa-tts/fac` repository public
 
 Introduced: 20220420
 
