@@ -9,7 +9,7 @@ class UEIValidatorTests(SimpleTestCase):
     def test_uei(self):
         """UEI is valid using all tests"""
         # Invalid UEI
-        validate_uei("000000000000")
+        self.assertRaises(ValidationError, validate_uei, "000000000000")
         # Valid UEI
         validate_uei("ABC123DEF456")
 
