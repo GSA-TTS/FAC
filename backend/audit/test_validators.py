@@ -1,10 +1,17 @@
 from django.test import SimpleTestCase
 from django.core.exceptions import ValidationError
 
-from .validators import validate_uei_valid_chars, validate_uei_leading_char, validate_uei_nine_digit_sequences
+from .validators import validate_uei, validate_uei_valid_chars, validate_uei_leading_char, validate_uei_nine_digit_sequences
 
 # Create your tests here.
 class UEIValidatorTests(SimpleTestCase):
+
+    def test_uei(self):
+        """UEI is valid using all tests"""
+        # Invalid UEI
+        validate_uei("000000000000")
+        # Valid UEI
+        validate_uei("ABC123DEF456")
 
     def test_uei_does_not_contain_o_or_i(self):
         """UEI does not contain O or I"""

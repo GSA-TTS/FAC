@@ -1,6 +1,12 @@
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 
+def validate_uei(value):
+    """Validates the UEI using the UEI Spec"""
+    validate_uei_valid_chars(value)
+    validate_uei_leading_char(value)
+    validate_uei_nine_digit_sequences(value)
+
 def validate_uei_valid_chars(value):
     """The letters “O” and “I” are not used to avoid confusion with zero and one."""
     if "O" in value.upper() or "I" in value.upper():
