@@ -11,5 +11,6 @@ An essential function of this application is to validate inbound SF-SAC and Sing
 
 | Form Step | Validation | Fields | Implementation | Test coverage
 | --- | --- | --- | --- | --- |
-| Eligibility | Org type must be one of `audit.models.SingleAuditChecklist.USER_PROVIDED_ORGANIZATION_TYPES` | `USER_PROVIDED_ORGANIZATION_TYPE` | `api.serializers.EligibilitySerializer.validate` |  `api.test_serializers.EligibilityStepTests`
-| Eligibility | Must be USA based and have met spending threshold | `IS_USA_BASED`, `MET_SPENDING_THRESHOLD`| `api.serializers.EligibilitySerializer.validate` | `api.test_serializers.EligibilityStepTests`
+| Eligibility | Org type must be one of `audit.models.SingleAuditChecklist.USER_PROVIDED_ORGANIZATION_TYPES` | `USER_PROVIDED_ORGANIZATION_TYPE` | `api.serializers.EligibilitySerializer` |  `api.test_serializers.EligibilityStepTests`
+| Eligibility | Must be USA based | `IS_USA_BASED`| `api.serializers.EligibilitySerializer` | `api.test_serializers.EligibilityStepTests`
+| Eligibility | Must meet spending threshold| `MET_SPENDING_THRESHOLD`| `api.serializers.EligibilitySerializer` | `api.test_serializers.EligibilityStepTests`
