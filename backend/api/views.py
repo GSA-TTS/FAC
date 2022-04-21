@@ -4,7 +4,7 @@ from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .serializers import EligibilitySerializer, SingleAuditChecklistSerializer
+from .serializers import EligibilitySerializer, SingleAuditChecklistSerializer, UEISerializer
 
 
 class SACViewSet(viewsets.ModelViewSet):
@@ -31,6 +31,17 @@ class EligibilityFormView(APIView):
             request.session['sac'] = request.data
             return Response({'eligible': True, 'next': next_step})
         return Response({'eligible': False, 'errors': serializer.errors})
+
+
+class UEIValidationFormView(APIView):
+    """
+    Accepts UEI to validate and returns either a message describing the validation errors, or valid.
+    """
+    def post(self, request):
+        serializer = UEISerializer(data=request.data)
+        if serializer.is_valid():
+            return Response({'valid': True})
+        return Response({'valid': False, 'errors': serializer.errors})
 
 
 class GeneralInfoView(APIView):

@@ -14,6 +14,12 @@ class EligibilitySerializer(serializers.ModelSerializer):
         return data
 
 
+class UEISerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SingleAuditChecklist
+        fields = ['uei']
+
+
 class SingleAuditChecklistSerializer(serializers.ModelSerializer):
     class Meta:
         model = SingleAuditChecklist
