@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from django.utils.translation import gettext_lazy as _
 
-from audit.models import SingleAuditChecklist
+from audit.models import SingleAuditChecklist, Access
 
 
 SPENDING_THRESHOLD = _("The FAC only accepts submissions from non-Federal entities that spend $750,000 or more in federal awards during its audit period (fiscal period begin dates on or after 12/26/2014) in accordance with Uniform Guidance")
@@ -36,7 +36,21 @@ class UEISerializer(serializers.ModelSerializer):
         fields = ['uei']
 
 
+class AuditeeInfoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SingleAuditChecklist
+        fields = ['auditee_name', 'uei', 'auditee_fiscal_period_start', 'auditee_fiscal_period_end']
+
+
+class AccessSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Access
+        fields = ['role', 'email', 'user_id']
+
+
 class SingleAuditChecklistSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = SingleAuditChecklist
         fields = '__all__'
