@@ -23,5 +23,7 @@ urlpatterns = [
     path('sac/eligibility', views.EligibilityFormView.as_view(), name='eligibility'),
     path('sac/generalinfo', views.GeneralInfoView.as_view(), name='general-info'),
     path('sac/ueivalidation', views.UEIValidationFormView.as_view(), name='uei-validation'),
+    path('sac/auditee', views.AuditeeInfoView.as_view(), name='auditee-info'),
+    path('sac/access', views.AccessView.as_view(), name='access'),
     path(settings.ADMIN_URL, admin.site.urls),
 ]
