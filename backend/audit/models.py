@@ -86,4 +86,24 @@ class SingleAuditChecklist(models.Model):
         verbose_name_plural = "SF-SACs"
 
     def __str__(self):
-        return f'#{self.id} - EIN({self.ein})'
+        return f'#{self.id} - UEI({self.uei})'
+
+
+class Access(models.Model):
+    """
+    Email addresses which have been granted access to SAC instances.
+    An email address may be associated with a User ID if an FAC account exists.
+    """
+    ROLES = (
+        ('auditee_contact', _('Auditee Contact')),
+        ('auditee_cert', _('Auditee Certifying Official')),
+        ('auditor_contact', _('Auditor Contact')),
+        ('auditor_cert', _('Auditor Certifying Official')),
+    )
+    sac = models.ForeignKey(SingleAuditChecklist, related_name="users", on_delete=models.PROTECT)
+    role = models.CharField(choices=ROLES, help_text="Access type granted to this user", max_length=15)
+    email = models.EmailField()
+    user_id = models.ForeignKey(User, null=True, help_text="User ID associated with this email address, empty if no FAC account exists", on_delete=models.PROTECT)
+
+    def __str__(self):
+        return f'{self.email} as {self.role} for {self.sac}'
