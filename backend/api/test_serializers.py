@@ -1,5 +1,5 @@
 from django.test import SimpleTestCase
-from .serializers import EligibilitySerializer
+from .serializers import EligibilitySerializer, UEISerializer
 
 
 class EligibilityStepTests(SimpleTestCase):
@@ -20,3 +20,16 @@ class EligibilityStepTests(SimpleTestCase):
         self.assertFalse(EligibilitySerializer(data=wrong_choice).is_valid())
         self.assertFalse(EligibilitySerializer(data=did_not_meet_threshold).is_valid())
         self.assertTrue(EligibilitySerializer(data=valid).is_valid())
+
+
+class UEIValidatorStepTests(SimpleTestCase):
+
+    def test_serializer_validation(self):
+        """
+            UEI should meet UEI Technical Specifications defined in the UEI validator
+        """
+        valid = {'uei': 'ABC123DEF456'}
+        invalid = {'uei': '0000000000OI*'}
+
+        self.assertFalse(UEISerializer(data=invalid).is_valid())
+        self.assertTrue(UEISerializer(data=valid).is_valid())

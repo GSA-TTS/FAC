@@ -1,7 +1,10 @@
 from django.db import models
 from django.contrib.auth import get_user_model
+from django.core.validators import MinLengthValidator
 
 from django.utils.translation import gettext_lazy as _
+
+from .validators import validate_uei_alphanumeric, validate_uei_leading_char, validate_uei_nine_digit_sequences, validate_uei_valid_chars
 
 User = get_user_model()
 
@@ -38,7 +41,7 @@ class SingleAuditChecklist(models.Model):
     is_usa_based = models.BooleanField(verbose_name=_('Is USA Based'))
 
     # 2 Auditee Information
-    uei = models.CharField(max_length=12, verbose_name=_('UEI'), help_text=_('Unique Entity Identifier'))
+    uei = models.CharField(max_length=12, verbose_name=_('UEI'), help_text=_('Unique Entity Identifier'), validators=[MinLengthValidator(12), validate_uei_alphanumeric, validate_uei_valid_chars, validate_uei_leading_char, validate_uei_nine_digit_sequences])
 
     auditee_name = models.CharField(max_length=500)
     auditee_fiscal_period_start = models.DateField()
