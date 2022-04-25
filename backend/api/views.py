@@ -50,6 +50,7 @@ class UEIValidationFormView(APIView):
             return Response({'valid': True})
         return Response({'valid': False, 'errors': serializer.errors})
 
+
 class AuditeeInfoView(APIView):
     """
     Handle inbound requests for the `Auditee Information` step
@@ -83,7 +84,7 @@ class AccessView(APIView):
     def post(self, request):
         serializer = AccessSerializer(data=request.data, many=True)
 
-        # Need Eligibility and AuditeeInfo already collected to procede
+        # Need Eligibility and AuditeeInfo already collected to proceed
         entry_form_data = request.user.profile.entry_form_data
         missing_fields = [field for field in self.DATA_WE_NEED if field not in entry_form_data]
         if missing_fields:
