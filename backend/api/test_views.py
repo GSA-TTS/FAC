@@ -11,7 +11,7 @@ ELIGIBILITY_PATH = reverse('eligibility')
 AUDITEE_INFO_PATH = reverse('auditee-info')
 ACCESS_PATH = reverse('access')
 
-VALID_AUDITEE_INFO_DATA = {"uei": "NotARealUEI3", "auditee_fiscal_period_start": "2021-01-01", "auditee_fiscal_period_end": "2022-01-01", "auditee_name": "Tester"}
+VALID_AUDITEE_INFO_DATA = {"uei": "ABC123DEF456", "auditee_fiscal_period_start": "2021-01-01", "auditee_fiscal_period_end": "2022-01-01", "auditee_name": "Tester"}
 VALID_ELIGIBILITY_DATA = {'is_usa_based': True, 'met_spending_threshold': True, 'user_provided_organization_type': 'state'}
 VALID_ACCESS_DATA = [{"role": "auditee_contact", "email": "a@a.com"}, {"role": "auditor_contact", "email": "c@c.com"}]
 
@@ -164,4 +164,4 @@ class SACCreationTests(TestCase):
         data = response.json()
         sac = SingleAuditChecklist.objects.get(id=data['sac_id'])
         self.assertEqual(sac.submitted_by, self.user)
-        self.assertEqual(sac.uei, "NotARealUEI3")
+        self.assertEqual(sac.uei, "ABC123DEF456")
