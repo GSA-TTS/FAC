@@ -14,6 +14,7 @@ class SingleAuditChecklist(models.Model):
         ('state', _('State')),
         ('local', _('Local Government')),
         ('tribal', _('Indian Tribe or Tribal Organization')),
+        ('higher-ed', _('Institution of higher education (IHE)')),
         ('non-profit', _('Non-profit')),
         ('unknown', _('Unknown')),
         ('none', _("None of these (for example, for-profit")),
