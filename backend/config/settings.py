@@ -48,13 +48,13 @@ INSTALLED_APPS += ['rest_framework', 'corsheaders']
 
 # Our apps
 
-INSTALLED_APPS += ['audit', 'api']
+INSTALLED_APPS += ['audit', 'api', 'users']
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
     "corsheaders.middleware.CorsMiddleware",
     'whitenoise.middleware.WhiteNoiseMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -153,6 +153,5 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 10,
 }
 
-
-## CORS
+# CORS
 CORS_ALLOW_ALL_ORIGINS = True
