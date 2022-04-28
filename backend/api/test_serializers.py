@@ -4,7 +4,7 @@ from unittest.mock import patch
 from django.test import SimpleTestCase
 
 from api.test_utils import valid_uei_results
-from .serializers import EligibilitySerializer, UEISerializer
+from api.serializers import EligibilitySerializer, UEISerializer
 
 
 class EligibilityStepTests(SimpleTestCase):

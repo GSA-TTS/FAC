@@ -3,7 +3,7 @@ import json
 from unittest.mock import patch
 from django.test import TestCase
 
-from .utils import get_uei_info_from_sam_gov
+from api.utils import get_uei_info_from_sam_gov
 
 
 valid_uei_results_dict = {
