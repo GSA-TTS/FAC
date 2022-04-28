@@ -1,5 +1,12 @@
+import json
+
 from django.test import SimpleTestCase
+from unittest.mock import patch
+
 from .serializers import EligibilitySerializer, UEISerializer
+
+
+valid_uei_results = '{"totalRecords": 1, "entityData": [{"entityRegistration": {"samRegistered": "Yes", "ueiSAM": "ZQGGHJH74DW7", "entityEFTIndicator": null, "cageCode": "855J5", "dodaac": null, "legalBusinessName": "INTERNATIONAL BUSINESS MACHINES CORPORATION", "dbaName": null, "purposeOfRegistrationCode": "Z2", "purposeOfRegistrationDesc": "All Awards", "registrationStatus": "Inactive", "evsSource": "D&B", "registrationDate": "2018-07-24", "lastUpdateDate": "2022-03-29", "registrationExpirationDate": "2022-02-06", "activationDate": "2020-08-13", "ueiStatus": "Active", "ueiExpirationDate": null, "ueiCreationDate": "2020-05-01", "publicDisplayFlag": "Y", "exclusionStatusFlag": "N", "exclusionURL": null, "dnbOpenData": null}}], "links": {"selfLink": "https://api.sam.gov/entity-information/v3/entities?api_key=REPLACE_WITH_API_KEY&ueiSAM=ZQGGHJH74DW7&includeSections=entityRegistration&page=0&size=10"}}'
 
 
 class EligibilityStepTests(SimpleTestCase):
@@ -28,8 +35,15 @@ class UEIValidatorStepTests(SimpleTestCase):
         """
             UEI should meet UEI Technical Specifications defined in the UEI validator
         """
-        valid = {'uei': 'ABC123DEF456'}
+        valid = {'uei': 'ZQGGHJH74DW7'}
         invalid = {'uei': '0000000000OI*'}
 
+        # Invalid
         self.assertFalse(UEISerializer(data=invalid).is_valid())
-        self.assertTrue(UEISerializer(data=valid).is_valid())
+
+        # Valid
+        with patch('api.utils.requests.get') as mock_get:
+            mock_get.return_value.status_code = 200 # Mock the status code
+            mock_get.return_value.json.return_value = json.loads(valid_uei_results) # Mock the json
+            
+            self.assertTrue(UEISerializer(data=valid).is_valid())

@@ -1,9 +1,13 @@
+import json
+
 from audit.models import SingleAuditChecklist
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
 from model_bakery import baker
 from rest_framework.test import APIClient
+
+from unittest.mock import patch
 
 User = get_user_model()
 
@@ -14,6 +18,8 @@ ACCESS_PATH = reverse('access')
 VALID_AUDITEE_INFO_DATA = {"uei": "ABC123DEF456", "auditee_fiscal_period_start": "2021-01-01", "auditee_fiscal_period_end": "2022-01-01", "auditee_name": "Tester"}
 VALID_ELIGIBILITY_DATA = {'is_usa_based': True, 'met_spending_threshold': True, 'user_provided_organization_type': 'state'}
 VALID_ACCESS_DATA = [{"role": "auditee_contact", "email": "a@a.com"}, {"role": "auditor_contact", "email": "c@c.com"}]
+
+valid_uei_results = '{"totalRecords": 1, "entityData": [{"entityRegistration": {"samRegistered": "Yes", "ueiSAM": "ZQGGHJH74DW7", "entityEFTIndicator": null, "cageCode": "855J5", "dodaac": null, "legalBusinessName": "INTERNATIONAL BUSINESS MACHINES CORPORATION", "dbaName": null, "purposeOfRegistrationCode": "Z2", "purposeOfRegistrationDesc": "All Awards", "registrationStatus": "Inactive", "evsSource": "D&B", "registrationDate": "2018-07-24", "lastUpdateDate": "2022-03-29", "registrationExpirationDate": "2022-02-06", "activationDate": "2020-08-13", "ueiStatus": "Active", "ueiExpirationDate": null, "ueiCreationDate": "2020-05-01", "publicDisplayFlag": "Y", "exclusionStatusFlag": "N", "exclusionURL": null, "dnbOpenData": null}}], "links": {"selfLink": "https://api.sam.gov/entity-information/v3/entities?api_key=REPLACE_WITH_API_KEY&ueiSAM=ZQGGHJH74DW7&includeSections=entityRegistration&page=0&size=10"}}'
 
 
 class EligibilityViewTests(TestCase):
@@ -46,7 +52,7 @@ class EligibilityViewTests(TestCase):
 
 class UEIValidationViewTests(TestCase):
     PATH = reverse('uei-validation')
-    SUCCESS = {'uei': 'ABC123DEF456'}
+    SUCCESS = {'uei': 'ZQGGHJH74DW7'}
     INELIGIBLE = {'uei': '000000000OI*'}
 
     def test_auth_required(self):
@@ -63,10 +69,15 @@ class UEIValidationViewTests(TestCase):
         user = baker.make(User)
         client.force_authenticate(user=user)
 
-        response = client.post(self.PATH, self.SUCCESS, format='json')
-        data = response.json()
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(data['valid'], True)
+        # Valid
+        with patch('api.utils.requests.get') as mock_get:
+            mock_get.return_value.status_code = 200 # Mock the status code
+            mock_get.return_value.json.return_value = json.loads(valid_uei_results) # Mock the json
+
+            response = client.post(self.PATH, self.SUCCESS, format='json')
+            data = response.json()
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(data['valid'], True)
 
         response = client.post(self.PATH, self.INELIGIBLE, format='json')
         data = response.json()

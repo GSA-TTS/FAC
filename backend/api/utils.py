@@ -1,10 +1,6 @@
-import json
-import os
 import requests
 
-
-SAM_API_URL = "https://api.sam.gov/entity-information/v3/entities"
-SAM_API_KEY = os.environ.get('SAM_API_KEY')
+from config.settings import SAM_API_URL, SAM_API_KEY
 
 
 def get_uei_info_from_sam_gov(uei):
@@ -12,37 +8,62 @@ def get_uei_info_from_sam_gov(uei):
     This utility function will query sam.gov to determine the status and 
     return information about a provided UEI (or throws an Exception)
     """
-    response = {}
+    export = {
+        "valid": False
+    }
     errors = []
 
+    # SAM API Params
+    api_params = {
+        "api_key": SAM_API_KEY,
+        "ueiSAM": uei,
+        "samRegistered": "Yes",
+        "includeSections": "entityRegistration"
+    }
+
     # Call the SAM API
-    r = requests.get(SAM_API_URL, params={"api_key": SAM_API_KEY, "ueiSAM": uei, "includeSections": "entityRegistration"})
+    try:
+        r = requests.get(SAM_API_URL, params=api_params, verify=False)
 
-    # Get the status code
-    if r.status_code is 200:
-        # Load the response json data
-        response = json.loads(r.json)
+        # Get the status code
+        if r.status_code == 200:
+            # Load the response json data
+            response = r.json()
 
-        # Validate there's only one record (totalRecords is 1)
-        if response['totalRecords'] is not 1:
-            errors.append("Invalid number of records returned")
-        # UEI from Sam matches what we searched for
-        if response['entityData'][0]['entityRegistration']['ueiSAM'].upper() != uei.upper():
-            errors.append("Invalid result returned for search")
-        # That it's registered
-        if response['entityData'][0]['entityRegistration']['samRegistered'].upper() != "YES":
-            errors.append("UEI is listed as not registered")
-        # UEI status is active
-        if response['entityData'][0]['entityRegistration']['ueiStatus'].upper() != "ACTIVE":
-            errors.append("UEI is listed as not active")
+            # Ensure the UEI exists in SAM.gov
+            if response.get('totalRecords') != 1:
+                errors.append("UEI was not found in SAM.gov")
 
-    else:
-        # API call error
-        errors.append("API call did not return correctly")
+            # UEI status is active
+            if response.get('entityData') and response.get('entityData')[0].get('entityRegistration').get('ueiStatus').upper() != "ACTIVE":
+                errors.append("UEI is not listed as active from SAM.gov response data")
+
+        else:
+            # API call error
+            errors.append("SAM.gov API response status code invalid, status code: " + str(r.status_code))
+
+    except requests.exceptions.Timeout:
+        # Timeout error
+        errors.append("SAM.gov API timeout")
+    except requests.exceptions.TooManyRedirects:
+        # Too many redirects
+        errors.append("SAM.gov API error - too many redirects")
+    except requests.exceptions.RequestException as e:
+        # Catastrophic error
+        errors.append("Unable to make SAM.gov API request, error: " + str(e))
+    except KeyError:
+        errors.append("SAM.gov response key error, unable to validate entityData")
+    except Exception as e:
+        errors.append("Uncaught SAM.gov API request exception: " + str(e))
 
     # Verify error length < 1
-    if len(errors) > 0:
-        raise Exception(errors)
+    if errors:
+        export["errors"] = errors
+        return export
+
+    # Valid UEI and API response
+    export["valid"] = True
+    export["response"] = response['entityData'][0]
 
     # Return the entity data
-    return response['entityData'][0]
+    return export
