@@ -7,7 +7,7 @@ from django.urls import reverse
 from model_bakery import baker
 from rest_framework.test import APIClient
 
-from api.test_utils import valid_uei_results
+from api.test_uei import valid_uei_results
 from audit.models import SingleAuditChecklist
 
 User = get_user_model()
@@ -91,7 +91,7 @@ class UEIValidationViewTests(TestCase):
         client.force_authenticate(user=user)
 
         # Valid
-        with patch("api.utils.requests.get") as mock_get:
+        with patch("api.uei.requests.get") as mock_get:
             mock_get.return_value.status_code = 200  # Mock the status code
             mock_get.return_value.json.return_value = json.loads(
                 valid_uei_results

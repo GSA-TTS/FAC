@@ -3,7 +3,7 @@ import json
 from unittest.mock import patch
 from django.test import SimpleTestCase
 
-from api.test_utils import valid_uei_results
+from api.test_uei import valid_uei_results
 from api.serializers import EligibilitySerializer, UEISerializer
 
 
@@ -56,7 +56,7 @@ class UEIValidatorStepTests(SimpleTestCase):
         self.assertFalse(UEISerializer(data=invalid).is_valid())
 
         # Valid
-        with patch("api.utils.requests.get") as mock_get:
+        with patch("api.uei.requests.get") as mock_get:
             mock_get.return_value.status_code = 200  # Mock the status code
             mock_get.return_value.json.return_value = json.loads(
                 valid_uei_results

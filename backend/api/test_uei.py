@@ -3,7 +3,7 @@ import json
 from unittest.mock import patch
 from django.test import TestCase
 
-from api.utils import get_uei_info_from_sam_gov
+from api.uei import get_uei_info_from_sam_gov
 
 
 valid_uei_results_dict = {
@@ -107,7 +107,7 @@ class UtilsTesting(TestCase):
         test_uei = "ZQGGHJH74DW7"
 
         # Valid
-        with patch("api.utils.requests.get") as mock_get:
+        with patch("api.uei.requests.get") as mock_get:
             mock_get.return_value.status_code = 200  # Mock the status code
             mock_get.return_value.json.return_value = json.loads(
                 valid_uei_results
@@ -124,14 +124,14 @@ class UtilsTesting(TestCase):
             )
 
         # Invalid Status Code
-        with patch("api.utils.requests.get") as mock_get:
+        with patch("api.uei.requests.get") as mock_get:
             mock_get.return_value.status_code = 400  # Mock the status code
 
             self.assertFalse(get_uei_info_from_sam_gov(uei=test_uei)["valid"])
             self.assertTrue(get_uei_info_from_sam_gov(uei=test_uei)["errors"])
 
         # UEI registrationStatus not active
-        with patch("api.utils.requests.get") as mock_get:
+        with patch("api.uei.requests.get") as mock_get:
             mock_get.return_value.status_code = 200  # Mock the status code
             mock_get.return_value.json.return_value = json.loads(
                 invalid_uei_results
@@ -141,7 +141,7 @@ class UtilsTesting(TestCase):
             self.assertTrue(get_uei_info_from_sam_gov(uei=test_uei)["errors"])
 
         # No matching UEI's found
-        with patch("api.utils.requests.get") as mock_get:
+        with patch("api.uei.requests.get") as mock_get:
             mock_get.return_value.status_code = 200  # Mock the status code
             mock_get.return_value.json.return_value = json.loads(
                 missing_uei_results
