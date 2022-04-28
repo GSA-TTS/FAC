@@ -20,3 +20,9 @@ jobs:
           cf_org: gsa-10x-prototyping
           cf_space: dev
           push_arguments: "-f backend/manifests/manifest-dev.yml"
+
+      - name: Set environment variable
+        uses: 18f/cg-deploy-action@main
+        with:
+          SAM_API_KEY: ${{ secrets.SAM_API_KEY }}
+          full_command: "cf set-env gsa-fac-dev SAM_API_KEY $SAM_API_KEY"

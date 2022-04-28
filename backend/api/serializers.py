@@ -42,7 +42,7 @@ class UEISerializer(serializers.ModelSerializer):
         sam_response = get_uei_info_from_sam_gov(value)
         if sam_response.get('errors'):
             raise serializers.ValidationError(sam_response.get('errors'))
-        return json.dumps(sam_response.get('response'))
+        return json.dumps({'uei': value, 'auditee_name': sam_response.get('response').get('entityRegistration').get('legalBusinessName')})
 
 
 class AuditeeInfoSerializer(serializers.ModelSerializer):

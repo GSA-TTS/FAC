@@ -67,3 +67,30 @@ def get_uei_info_from_sam_gov(uei):
 
     # Return the entity data
     return export
+
+# sample_response = {
+#     "entityRegistration": {
+#         "samRegistered": "Yes",
+#         "ueiSAM": "ZQGGHJH74DW7",
+#         "entityEFTIndicator": null,
+#         "cageCode": "855J5",
+#         "dodaac": null,
+#         "legalBusinessName": "INTERNATIONAL BUSINESS MACHINES CORPORATION",
+#         "dbaName": null,
+#         "purposeOfRegistrationCode": "Z2",
+#         "purposeOfRegistrationDesc": "All Awards",
+#         "registrationStatus": "Inactive",
+#         "evsSource": "D&B",
+#         "registrationDate": "2018-07-24",
+#         "lastUpdateDate": "2022-03-29",
+#         "registrationExpirationDate": "2022-02-06",
+#         "activationDate": "2020-08-13",
+#         "ueiStatus": "Active",
+#         "ueiExpirationDate": null,
+#         "ueiCreationDate": "2020-05-01",
+#         "publicDisplayFlag": "Y",
+#         "exclusionStatusFlag": "N",
+#         "exclusionURL": null,
+#         "dnbOpenData": null
+#     }
+# }
