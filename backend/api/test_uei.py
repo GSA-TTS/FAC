@@ -180,7 +180,7 @@ class UtilsTesting(TestCase):
             self.assertTrue(results["errors"])
             self.assertEquals(
                 results["errors"],
-                ["SAM.gov API response status code invalid, status code: 400"],
+                ["SAM.gov API response status code invalid: 400"],
             )
 
         # Timeout
@@ -225,22 +225,6 @@ class UtilsTesting(TestCase):
             self.assertEquals(
                 results["errors"],
                 ["Unable to make SAM.gov API request, error: "],
-            )
-
-        # Exception
-        with patch("api.uei.requests.get") as mock_get:
-
-            def bad_exception(*args, **kwds):
-                raise Exception
-
-            mock_get.side_effect = bad_exception
-            results = get_uei_info_from_sam_gov(uei=test_uei)
-
-            self.assertFalse(results["valid"])
-            self.assertTrue(results["errors"])
-            self.assertEquals(
-                results["errors"],
-                ["Uncaught SAM.gov API request exception: "],
             )
 
         # UEI registrationStatus not active
