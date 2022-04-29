@@ -32,6 +32,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Test the backend using docker-compose
+      - name: Start services
+        working-directory: ./backend
+        run: docker-compose up -d
+      - name: Run Django test suite
         working-directory: ./backend
         run: docker-compose run web python manage.py test
+      - name: Install pa11y-ci
+        working-directory: ./pa11y_tests
+        run: npm install
+      - name: Run pa11y-ci against admin
+        working-directory: ./pa11y_tests
+        run: npm run test:admin
