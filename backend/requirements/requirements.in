@@ -7,3 +7,4 @@ pyyaml
 uritemplate
 whitenoise
 django-cors-headers
+requests

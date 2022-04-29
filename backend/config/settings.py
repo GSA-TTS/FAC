@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 
 import environs
+import os
 
 env = environs.Env()
 
@@ -155,3 +156,7 @@ REST_FRAMEWORK = {
 
 # CORS
 CORS_ALLOW_ALL_ORIGINS = True
+
+# SAM.gov API
+SAM_API_URL = "https://api.sam.gov/entity-information/v3/entities"
+SAM_API_KEY = os.environ.get('SAM_API_KEY')

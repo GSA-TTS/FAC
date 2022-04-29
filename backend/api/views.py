@@ -1,10 +1,12 @@
+import json
+
 from audit.models import Access, SingleAuditChecklist
 from django.urls import reverse
 from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .serializers import (AccessSerializer, AuditeeInfoSerializer,
+from api.serializers import (AccessSerializer, AuditeeInfoSerializer,
                           EligibilitySerializer,
                           SingleAuditChecklistSerializer, UEISerializer)
 
@@ -47,7 +49,7 @@ class UEIValidationFormView(APIView):
     def post(self, request):
         serializer = UEISerializer(data=request.data)
         if serializer.is_valid():
-            return Response({'valid': True})
+            return Response({'valid': True, 'response': json.loads(serializer.data.get('uei'))})
         return Response({'valid': False, 'errors': serializer.errors})
 
 
