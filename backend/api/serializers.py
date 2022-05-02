@@ -37,7 +37,7 @@ class UEISerializer(serializers.ModelSerializer):
     class Meta:
         model = SingleAuditChecklist
         fields = ['uei']
-    
+
     def validate_uei(self, value):
         sam_response = get_uei_info_from_sam_gov(value)
         if sam_response.get('errors'):

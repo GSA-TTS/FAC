@@ -1,11 +1,9 @@
-from operator import contains
 from django.test import SimpleTestCase
 from django.core.exceptions import ValidationError
-from pkg_resources import invalid_marker
 
 from .validators import validate_uei, validate_uei_alphanumeric, validate_uei_valid_chars, validate_uei_leading_char, validate_uei_nine_digit_sequences
 
-# Create your tests here.
+
 class UEIValidatorTests(SimpleTestCase):
 
     # Valid UEI
@@ -46,7 +44,7 @@ class UEIValidatorTests(SimpleTestCase):
         self.assertRaises(ValidationError, validate_uei_valid_chars, contains_I)
         # Valid UEI
         validate_uei_valid_chars(self.valid)
-        
+
     def test_uei_does_not_start_with_0(self):
         """UEI does not start with 0"""
         invalid = "012345678901"

@@ -6,9 +6,13 @@ from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from api.serializers import (AccessSerializer, AuditeeInfoSerializer,
-                          EligibilitySerializer,
-                          SingleAuditChecklistSerializer, UEISerializer)
+from .serializers import (
+    AccessSerializer,
+    AuditeeInfoSerializer,
+    EligibilitySerializer,
+    SingleAuditChecklistSerializer,
+    UEISerializer,
+)
 
 
 class SACViewSet(viewsets.ModelViewSet):
