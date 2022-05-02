@@ -3,6 +3,7 @@
 Welcome to the FAC!  Below are a collection of useful resources about the project, including architectural decision records, dependency management, diagrams, team practices, onboarding, and more.
 
 System-wide:
+* [Agile Process](./agile-process)
 * [Architectural Decision Records](./architecture/decisions)
 * [Diagrams](./architecture/diagrams/)
 * [Development](./development.md)
