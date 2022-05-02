@@ -8,7 +8,8 @@ We use [encrypted secrets](https://docs.github.com/en/actions/security-guides/en
   - [Contents](#contents)
   - [Tools](#tools)
   - [Repository Secrets](#repository-secrets)
-  - [Service Account](#service-account)
+  - [Cloud.gov Service Account](#cloudgov-service-account)
+  - [SAM.gov API System Account](#samgov-api-system-account)
   - [Rotating Credentials](#rotating-credentials)
   - [Local Testing](#local-testing)
 
@@ -22,7 +23,7 @@ Secrets are stored in repository secrets located in the repository settings on G
 
 *Note that only an admin can add or remove repository secrets.*
 
-## Service Account
+## Cloud.gov Service Account
 
 To deploy to cloud.gov automatically, we have a `space-deployer` [service account](https://cloud.gov/docs/services/cloud-gov-service-account/) that holds a service key with unique credentials.  
 
@@ -31,17 +32,27 @@ The service account credentials are stored in the repository secrets under:
 - `CF_USERNAME`
 - `CF_PASSWORD`
 
+## SAM.gov API System Account
+
+To use the SAM.gov API, we will have a `system account` [system account](https://www.fsd.gov/gsafsd_sp?id=gsafsd_kb_articles&sys_id=f8426db91b594d9006b09796bc4bcb52) that holds a system account API key.  
+
+The system account API key will be stored in the repository secrets under:
+
+- `SAM_API_KEY`
+
 ## Rotating Credentials
 
-The service account credentials should be rotated every 90 days. 
+The Cloud.gov service account and SAM.gov API Key credentials should be rotated every 90 days. 
 
-To rotate credentials associated with a service key, follow the steps [here](https://cloud.gov/docs/services/cloud-gov-service-account/) to delete and recreate the service key.
+To rotate credentials associated with a cloud.gov service key, follow the steps [here](https://cloud.gov/docs/services/cloud-gov-service-account/) to delete and recreate the service key.
 
 ```shell
 cf delete-service-key my-service-account my-service-key
 cf create-service-key my-service-account my-service-key
 cf service-key my-service-account my-service-key
 ```
+
+To rotate the API key associated with a SAM.gov system account, follow the steps [here](https://www.fsd.gov/sys_attachment.do?sys_id=5462e13d1b594d9006b09796bc4bcbd2) to delete and recreate the API key.
 
 ## Local Testing
 
@@ -51,4 +62,5 @@ To test pushing to cloud.gov locally with the [deploy.yml](.github/workflows/dep
 
 1. `$ touch .secrets`
 2. Create a [space-deployer service account](https://cloud.gov/docs/services/cloud-gov-service-account/) and copy the username and password into `.secrets` under `CF_USERNAME=` and `CF_PASSWORD=`.
-3. Run act: `$ act`
+3. Create a [system account API key](https://www.fsd.gov/sys_attachment.do?sys_id=5462e13d1b594d9006b09796bc4bcbd2) and copy the API key into `.secrets` under `SAM_API_KEY=`.
+4. Run act: `$ act`

@@ -6,6 +6,7 @@ We use either [Docker with `docker-compose`](#docker) or [local development](#lo
 
 * [Tools](#tools)
 * [Setting up your dev environment](#setting-up-your-dev-environment)
+  * [Environment Variables](#environment-variables)
   * [Docker](#docker)
   * [Local Development](#local-development)
 * [Django setup](#django-setup)
@@ -17,6 +18,7 @@ We use either [Docker with `docker-compose`](#docker) or [local development](#lo
   * [Pyenv](https://github.com/pyenv) for managing Python versions
   * [pyenv-virtualenv](https://github.com/pyenv/pyenv-virtualenv) for managing virtual environments
   * [Postgres](https://www.postgresql.org/)
+  * [SAM.gov](https://sam.gov/content/home) to validate UEI's
 
 ## Setting up your dev environment
 
@@ -26,6 +28,12 @@ We use either [Docker with `docker-compose`](#docker) or [local development](#lo
 Target python version is defined in [../backend/runtime.txt](../backend/runtime.txt)
 
 ---
+
+## Environment Variables
+
+Currently, the only environment variable is `SAM_API_KEY` to validate UEI's.  
+
+To test UEI validation locally, apply for a SAM.gov [System Account](https://www.fsd.gov/sys_attachment.do?sys_id=5462e13d1b594d9006b09796bc4bcbd2) and then copy the API key into your local environment (should end up somewhere in `~/.bash_profile`, `~/.bashrc`, `~/.zshrc`, or whatever flavor of shell you're using.)
 
 ## Docker
 

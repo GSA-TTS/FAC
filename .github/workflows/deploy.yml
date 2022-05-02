@@ -14,9 +14,11 @@ jobs:
 
       - name: Deploy to cloud.gov
         uses: 18f/cg-deploy-action@main
+        env: 
+          SAM_API_KEY: ${{ secrets.SAM_API_KEY }}
         with:
           cf_username: ${{ secrets.CF_USERNAME }}
           cf_password: ${{ secrets.CF_PASSWORD }}
           cf_org: gsa-10x-prototyping
           cf_space: dev
-          push_arguments: "-f backend/manifests/manifest-dev.yml"
+          push_arguments: "-f backend/manifests/manifest-dev.yml --var SAM_API_KEY=$SAM_API_KEY"

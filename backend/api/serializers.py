@@ -1,7 +1,10 @@
+import json
+
 from rest_framework import serializers
 from django.utils.translation import gettext_lazy as _
 
 from audit.models import SingleAuditChecklist, Access
+from api.uei import get_uei_info_from_sam_gov
 
 
 SPENDING_THRESHOLD = _("The FAC only accepts submissions from non-Federal entities that spend $750,000 or more in federal awards during its audit period (fiscal period begin dates on or after 12/26/2014) in accordance with Uniform Guidance")
@@ -34,6 +37,12 @@ class UEISerializer(serializers.ModelSerializer):
     class Meta:
         model = SingleAuditChecklist
         fields = ['uei']
+    
+    def validate_uei(self, value):
+        sam_response = get_uei_info_from_sam_gov(value)
+        if sam_response.get('errors'):
+            raise serializers.ValidationError(sam_response.get('errors'))
+        return json.dumps({'uei': value, 'auditee_name': sam_response.get('response').get('entityRegistration').get('legalBusinessName')})
 
 
 class AuditeeInfoSerializer(serializers.ModelSerializer):
