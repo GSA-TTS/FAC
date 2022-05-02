@@ -19,8 +19,6 @@ There is a [high-level roadmap](https://app.mural.co/t/gsa6/m/gsa6/1646336450605
 
 -   **Done (Sprint X)** - At the time of writing, "done" for a task means it passed code review and was merged/deployed. "Done" for a story means it's been deployed and has had its acceptance criteria created. Sprint-specific "done" columns are used to track exactly what was completed in a current sprint for velocity / reporting purposes.
 
--   This is a proposal to have multiple "Done" columns at the end.
-
 ### How we'll stay on track
 
 Time-based estimations are prone to inaccuracy and preconceived notions of "how long something should take" that often doesn't consider code review, qa, deployment and bug fixes. We'll keep it real about what we can deliver by tracking a velocity metric and considering that as we plan new sprints. That said, there are very real deadlines for this project! Here is how we can work together in an agile fashion to deliver on time:
