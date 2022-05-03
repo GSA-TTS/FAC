@@ -54,5 +54,5 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: pa11y-screenshots
-          path: pa11y_tests/pa11y-screenshots/*.png
+          path: ./pa11y_tests/pa11y-screenshots/*.png
 
