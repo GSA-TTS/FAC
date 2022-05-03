@@ -34,7 +34,7 @@ jobs:
       - name: Format with black
         working-directory: ./backend
         run: |
-          black .
+          black --check .
 
   test-backend:
     runs-on: ubuntu-latest
