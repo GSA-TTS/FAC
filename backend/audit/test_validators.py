@@ -1,7 +1,13 @@
 from django.test import SimpleTestCase
 from django.core.exceptions import ValidationError
 
-from .validators import validate_uei, validate_uei_alphanumeric, validate_uei_valid_chars, validate_uei_leading_char, validate_uei_nine_digit_sequences
+from .validators import (
+    validate_uei,
+    validate_uei_alphanumeric,
+    validate_uei_valid_chars,
+    validate_uei_leading_char,
+    validate_uei_nine_digit_sequences,
+)
 
 
 class UEIValidatorTests(SimpleTestCase):
@@ -35,13 +41,21 @@ class UEIValidatorTests(SimpleTestCase):
         contains_I = "ABC0I23"
 
         # UEI with o
-        self.assertRaises(ValidationError, validate_uei_valid_chars, contains_o)
+        self.assertRaises(
+            ValidationError, validate_uei_valid_chars, contains_o
+        )
         # UEI with O
-        self.assertRaises(ValidationError, validate_uei_valid_chars, contains_O)
+        self.assertRaises(
+            ValidationError, validate_uei_valid_chars, contains_O
+        )
         # UEI with i
-        self.assertRaises(ValidationError, validate_uei_valid_chars, contains_i)
+        self.assertRaises(
+            ValidationError, validate_uei_valid_chars, contains_i
+        )
         # UEI with I
-        self.assertRaises(ValidationError, validate_uei_valid_chars, contains_I)
+        self.assertRaises(
+            ValidationError, validate_uei_valid_chars, contains_I
+        )
         # Valid UEI
         validate_uei_valid_chars(self.valid)
 
@@ -59,6 +73,8 @@ class UEIValidatorTests(SimpleTestCase):
         invalid = "12345678901"
 
         # UEI contains 9 digit sequence
-        self.assertRaises(ValidationError, validate_uei_nine_digit_sequences, invalid)
+        self.assertRaises(
+            ValidationError, validate_uei_nine_digit_sequences, invalid
+        )
         # Valid UEI
         validate_uei_nine_digit_sequences(self.valid)
