@@ -50,9 +50,5 @@ jobs:
       - name: Run pa11y-ci against admin
         working-directory: ./pa11y_tests
         run: npm run test:admin
-      - name: Archive pa11y screenshots
-        uses: actions/upload-artifact@v3
-        with:
-          name: pa11y-screenshots
-          path: ./pa11y_tests/pa11y-screenshots/*.png
+
 

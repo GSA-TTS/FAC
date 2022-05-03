@@ -6,8 +6,7 @@
             "set field #id_username to a",
             "set field #id_password to a",
             "click element input[type='submit']"
-         ],
-         "screenCapture": "pa11y-screenshots/admin-landing.png"
+         ]
         }
     ]
 }

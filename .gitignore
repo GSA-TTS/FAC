@@ -144,4 +144,4 @@ cython_debug/
 .secrets
 
 node_modules/
-pa11y-screenshots/
+# pa11y_tests/screenshots/*.png
