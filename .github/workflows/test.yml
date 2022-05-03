@@ -31,7 +31,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install black
-      - name: Format with black
+      - name: Check formatting with black
         working-directory: ./backend
         run: |
           black --check .
