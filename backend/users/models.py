@@ -6,9 +6,7 @@ User = get_user_model()
 
 # Create your models here.
 class UserProfile(models.Model):
-    user = models.OneToOneField(
-        User, related_name="profile", on_delete=models.CASCADE
-    )
+    user = models.OneToOneField(User, related_name="profile", on_delete=models.CASCADE)
 
     entry_form_data = models.JSONField(
         null=True,

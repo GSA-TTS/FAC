@@ -82,9 +82,7 @@ class AuditeeInfoView(APIView):
         # Need Eligibility info to procede
         entry_form_data = request.user.profile.entry_form_data
         missing_fields = [
-            field
-            for field in self.DATA_WE_NEED
-            if field not in entry_form_data
+            field for field in self.DATA_WE_NEED if field not in entry_form_data
         ]
         if missing_fields:
             return Response(
@@ -122,9 +120,7 @@ class AccessView(APIView):
         # Need Eligibility and AuditeeInfo already collected to proceed
         entry_form_data = request.user.profile.entry_form_data
         missing_fields = [
-            field
-            for field in self.DATA_WE_NEED
-            if field not in entry_form_data
+            field for field in self.DATA_WE_NEED if field not in entry_form_data
         ]
         if missing_fields:
             return Response(
