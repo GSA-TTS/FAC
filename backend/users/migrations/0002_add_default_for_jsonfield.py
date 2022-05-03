@@ -6,13 +6,18 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('users', '0001_create_user_profile'),
+        ("users", "0001_create_user_profile"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='userprofile',
-            name='entry_form_data',
-            field=models.JSONField(blank=True, default=dict, help_text='Store of form data for Eligiblity, Info, and access steps prior to creation of an SF-SAC', null=True),
+            model_name="userprofile",
+            name="entry_form_data",
+            field=models.JSONField(
+                blank=True,
+                default=dict,
+                help_text="Store of form data for Eligiblity, Info, and access steps prior to creation of an SF-SAC",
+                null=True,
+            ),
         ),
     ]
