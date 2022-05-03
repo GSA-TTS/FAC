@@ -1,5 +1,5 @@
 -c ../requirements.txt
 
-model_bakery
+black
 flake8
-
+model_bakery
