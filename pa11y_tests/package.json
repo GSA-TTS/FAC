@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test:admin": "pa11y-ci --config admin_landing.json"
+    "test:admin": "pa11y-ci --config admin_landing.json --threshold 99"
   },
   "author": "",
   "license": "ISC",
