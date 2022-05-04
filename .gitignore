@@ -142,3 +142,6 @@ cython_debug/
 .vscode/
 .DS_Store
 .secrets
+
+node_modules/
+# pa11y_tests/screenshots/*.png

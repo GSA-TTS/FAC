@@ -1,0 +1,12 @@
+{
+    "urls": [
+        {
+          "url": "http://127.0.0.1:8000/admin/login",
+          "actions": [
+            "set field #id_username to a",
+            "set field #id_password to a",
+            "click element input[type='submit']"
+         ]
+        }
+    ]
+}

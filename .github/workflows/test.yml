@@ -40,6 +40,23 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Test the backend using docker-compose
+      - name: Start services
+        working-directory: ./backend
+        run: docker-compose up -d
+      - name: Run Django test suite
         working-directory: ./backend
         run: docker-compose run web python manage.py test
+      - name: Run Django migrations for pa11y tests
+        working-directory: ./backend
+        run: docker-compose run web python manage.py migrate
+      - name: Create superuser for admin access
+        working-directory: ./backend
+        run: echo "from django.contrib.auth import get_user_model; User = get_user_model(); User.objects.create_superuser('a', 'a@a.com', 'a')" | docker-compose run web python manage.py shell
+      - name: Install pa11y-ci
+        working-directory: ./pa11y_tests
+        run: npm install
+      - name: Run pa11y-ci against admin
+        working-directory: ./pa11y_tests
+        run: npm run test:admin
+
+
