@@ -5,13 +5,13 @@ from config.settings import SAM_API_URL, SAM_API_KEY
 
 
 def call_sam_api(
-    params: dict, headers: dict
+    sam_api_url: str, params: dict, headers: dict
 ) -> tuple[Optional[requests.Response], Optional[str]]:
     """
     Call the SAM.gov API and return the response and/or error string
     """
     try:
-        return requests.get(SAM_API_URL, params=params, headers=headers), None
+        return requests.get(sam_api_url, params=params, headers=headers), None
 
     except requests.exceptions.Timeout:
         error = "SAM.gov API timeout"
@@ -81,7 +81,7 @@ def get_uei_info_from_sam_gov(uei: str) -> dict:
     api_headers = {"X-Api-Key": SAM_API_KEY}
 
     # Call the SAM API
-    resp, error = call_sam_api(api_params, api_headers)
+    resp, error = call_sam_api(SAM_API_URL, api_params, api_headers)
     if resp is None:
         return {"valid": False, "errors": [error]}
 
