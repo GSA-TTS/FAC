@@ -1,5 +1,6 @@
 -c ../requirements.txt
 
+bandit
 black
 flake8
 model_bakery

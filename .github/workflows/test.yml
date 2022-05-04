@@ -22,7 +22,7 @@ jobs:
       - name: Install linters
         run: |
           python -m pip install --upgrade pip
-          pip install flake8 black
+          pip install bandit black flake8
       - name: Lint with flake8
         working-directory: ./backend
         run: |
@@ -31,6 +31,10 @@ jobs:
         working-directory: ./backend
         run: |
           black --check .
+      - name: Run bandit
+        working-directory: ./backend
+        run: |
+          bandit -r .
 
   test-backend:
     runs-on: ubuntu-latest
