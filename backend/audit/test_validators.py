@@ -1,7 +1,13 @@
 from django.test import SimpleTestCase
 from django.core.exceptions import ValidationError
 
-from .validators import validate_uei, validate_uei_alphanumeric, validate_uei_valid_chars, validate_uei_leading_char, validate_uei_nine_digit_sequences
+from .validators import (
+    validate_uei,
+    validate_uei_alphanumeric,
+    validate_uei_valid_chars,
+    validate_uei_leading_char,
+    validate_uei_nine_digit_sequences,
+)
 
 
 class UEIValidatorTests(SimpleTestCase):

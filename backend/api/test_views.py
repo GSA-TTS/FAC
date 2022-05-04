@@ -43,9 +43,7 @@ class EligibilityViewTests(TestCase):
     def test_auth_required(self):
         """Unauthenticated requests return unauthorized response"""
         client = APIClient()
-        response = client.post(
-            ELIGIBILITY_PATH, VALID_ELIGIBILITY_DATA, format="json"
-        )
+        response = client.post(ELIGIBILITY_PATH, VALID_ELIGIBILITY_DATA, format="json")
         self.assertEqual(response.status_code, 401)
 
     def test_success_and_failure(self):
@@ -56,16 +54,12 @@ class EligibilityViewTests(TestCase):
         user = baker.make(User)
         client.force_authenticate(user=user)
 
-        response = client.post(
-            ELIGIBILITY_PATH, VALID_ELIGIBILITY_DATA, format="json"
-        )
+        response = client.post(ELIGIBILITY_PATH, VALID_ELIGIBILITY_DATA, format="json")
         data = response.json()
         self.assertEqual(response.status_code, 200)
         self.assertEqual(data["eligible"], True)
 
-        response = client.post(
-            ELIGIBILITY_PATH, self.INELIGIBLE, format="json"
-        )
+        response = client.post(ELIGIBILITY_PATH, self.INELIGIBLE, format="json")
         data = response.json()
         self.assertEqual(response.status_code, 200)
         self.assertEqual(data["eligible"], False)
@@ -149,9 +143,7 @@ class AccessTests(TestCase):
     def test_missing_expected_form_data_from_prior_steps(self):
         """Return an error and point to Eligibility step if we're missing data from any prior step"""
         # Missing Eligibility data
-        response = self.client.post(
-            ACCESS_PATH, VALID_ACCESS_DATA, format="json"
-        )
+        response = self.client.post(ACCESS_PATH, VALID_ACCESS_DATA, format="json")
         data = response.json()
         self.assertEqual(data["next"], ELIGIBILITY_PATH)
         self.assertTrue(data["errors"])
@@ -160,9 +152,7 @@ class AccessTests(TestCase):
         self.user.profile.save()
 
         # Have eligibility, but missing auditee info data
-        response = self.client.post(
-            ACCESS_PATH, VALID_ACCESS_DATA, format="json"
-        )
+        response = self.client.post(ACCESS_PATH, VALID_ACCESS_DATA, format="json")
         data = response.json()
         self.assertEqual(data["next"], ELIGIBILITY_PATH)
         self.assertTrue(data["errors"])
@@ -175,18 +165,12 @@ class AccessTests(TestCase):
         )
         self.user.profile.save()
 
-        response = self.client.post(
-            ACCESS_PATH, VALID_ACCESS_DATA, format="json"
-        )
+        response = self.client.post(ACCESS_PATH, VALID_ACCESS_DATA, format="json")
         data = response.json()
 
         sac = SingleAuditChecklist.objects.get(id=data["sac_id"])
-        self.assertEqual(
-            sac.users.get(role="auditee_contact").email, "a@a.com"
-        )
-        self.assertEqual(
-            sac.users.get(role="auditor_contact").email, "c@c.com"
-        )
+        self.assertEqual(sac.users.get(role="auditee_contact").email, "a@a.com")
+        self.assertEqual(sac.users.get(role="auditor_contact").email, "c@c.com")
 
 
 class SACCreationTests(TestCase):
@@ -206,16 +190,12 @@ class SACCreationTests(TestCase):
             "met_spending_threshold": True,
             "user_provided_organization_type": "state",
         }
-        response = self.client.post(
-            ELIGIBILITY_PATH, eligibility_info, format="json"
-        )
+        response = self.client.post(ELIGIBILITY_PATH, eligibility_info, format="json")
         data = response.json()
         next_step = data["next"]
 
         # Submit auditee info
-        response = self.client.post(
-            next_step, VALID_AUDITEE_INFO_DATA, format="json"
-        )
+        response = self.client.post(next_step, VALID_AUDITEE_INFO_DATA, format="json")
         data = response.json()
         next_step = data["next"]
 

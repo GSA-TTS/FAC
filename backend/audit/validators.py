@@ -15,7 +15,7 @@ def validate_uei_alphanumeric(value):
     """The UEI should be alphanumeric"""
     if not value.isalnum():
         raise ValidationError(
-            _('The UEI should be alphanumeric'),
+            _("The UEI should be alphanumeric"),
         )
     return value
 
@@ -24,7 +24,9 @@ def validate_uei_valid_chars(value):
     """The letters “O” and “I” are not used to avoid confusion with zero and one."""
     if "O" in value.upper() or "I" in value.upper():
         raise ValidationError(
-            _('The letters “O” and “I” are not used to avoid confusion with zero and one.'),
+            _(
+                "The letters “O” and “I” are not used to avoid confusion with zero and one."
+            ),
         )
     return value
 
@@ -32,9 +34,11 @@ def validate_uei_valid_chars(value):
 def validate_uei_leading_char(value):
     """The first character is not zero to avoid cutting off digits that can occur during data imports,
     for example, when importing data into spreadsheet programs."""
-    if value.startswith('0'):
+    if value.startswith("0"):
         raise ValidationError(
-            _('The first character is not zero to avoid cutting off digits that can occur during data imports.'),
+            _(
+                "The first character is not zero to avoid cutting off digits that can occur during data imports."
+            ),
         )
     return value
 
@@ -51,6 +55,8 @@ def validate_uei_nine_digit_sequences(value):
 
         if count >= 9:
             raise ValidationError(
-                _('Nine-digit sequences are not used in the identifier to avoid collision with the nine-digit DUNS Number or Taxpayer Identification Number (TIN).'),
+                _(
+                    "Nine-digit sequences are not used in the identifier to avoid collision with the nine-digit DUNS Number or Taxpayer Identification Number (TIN)."
+                ),
             )
     return value
