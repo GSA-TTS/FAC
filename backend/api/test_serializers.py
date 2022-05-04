@@ -38,9 +38,7 @@ class EligibilityStepTests(SimpleTestCase):
         self.assertFalse(EligibilitySerializer(data=invalid).is_valid())
         self.assertFalse(EligibilitySerializer(data=empty).is_valid())
         self.assertFalse(EligibilitySerializer(data=wrong_choice).is_valid())
-        self.assertFalse(
-            EligibilitySerializer(data=did_not_meet_threshold).is_valid()
-        )
+        self.assertFalse(EligibilitySerializer(data=did_not_meet_threshold).is_valid())
         self.assertTrue(EligibilitySerializer(data=valid).is_valid())
 
 

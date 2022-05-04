@@ -47,9 +47,7 @@ def parse_sam_uei_json(response: dict) -> dict:
     # Get the ueiStatus and catch errors if the JSON shape is unexpected:
     entry = entries[0]
     try:
-        status = (
-            entry.get("entityRegistration", {}).get("ueiStatus", "").upper()
-        )
+        status = entry.get("entityRegistration", {}).get("ueiStatus", "").upper()
     except AttributeError:
         return {
             "valid": False,
@@ -60,9 +58,7 @@ def parse_sam_uei_json(response: dict) -> dict:
     if status != "ACTIVE":
         return {
             "valid": False,
-            "errors": [
-                "UEI is not listed as active from SAM.gov response data"
-            ],
+            "errors": ["UEI is not listed as active from SAM.gov response data"],
         }
 
     return {"valid": True, "response": response["entityData"][0]}

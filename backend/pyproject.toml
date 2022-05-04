@@ -1,0 +1,25 @@
+[tool.black]
+line-length=88
+
+[tool.pylint."MESSAGES CONTROL"]
+# Tadhg 2022-05-03: I added the below because I've found them unhelpful.
+#                   Anybody should feel free to alter these as needed.
+enable = [
+    "use-symbolic-message-instead",
+    "useless-supression",
+    "fixme",
+]
+disable = [
+    "attribute-defined-outside-init",
+    "duplicate-code",
+    "format",
+    "import-error",
+    "invalid-name",
+    "missing-module-docstring",
+    "no-value-for-parameter",
+    "pointless-string-statement",
+    "protected-access",
+    "too-few-public-methods",
+    "unnecessary-lambda",
+    "unsubscriptable-object",
+]
