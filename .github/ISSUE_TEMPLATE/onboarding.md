@@ -1,7 +1,7 @@
 ---
-name: Onboarding 
+name: Onboarding
 about: An onboarding checklist for folks joining the team!
-title: 'Onboarding checklist for {Github Username}'
+title: Onboarding checklist for {Github Username}
 labels: ''
 assignees: ''
 
