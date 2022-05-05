@@ -1,10 +1,12 @@
 import json
+import logging
 
 from audit.models import Access, SingleAuditChecklist
 from django.urls import reverse
 from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from samgov.client import SAMClient
 
 from .serializers import (
     AccessSerializer,
@@ -13,6 +15,8 @@ from .serializers import (
     SingleAuditChecklistSerializer,
     UEISerializer,
 )
+
+logger = logging.getLogger(__name__)
 
 
 class SACViewSet(viewsets.ModelViewSet):
@@ -48,20 +52,42 @@ class EligibilityFormView(APIView):
         return Response({"eligible": False, "errors": serializer.errors})
 
 
-class UEIValidationFormView(APIView):
+class UEIValidationView(APIView):
     """
     Accepts UEI to validate and returns either a message describing the validation errors, or valid.
     """
 
     def post(self, request):
         serializer = UEISerializer(data=request.data)
+
         if serializer.is_valid():
-            return Response(
-                {
-                    "valid": True,
-                    "response": json.loads(serializer.data.get("uei")),
-                }
-            )
+            # Local checks passed, reach out to SAM.gov for auditee Name
+            uei = serializer.data.get("uei")
+
+            try:
+                auditee_name = SAMClient().get_entity_legal_name(
+                    request.data.get("uei")
+                )
+            except ValueError as e:
+                # No UEI match reported by SAM.gov
+                return Response({"valid": False, "error": str(e)})
+            except Exception as e:  # noqa
+                # Any other exceptions raised during the request/response cycle to sam.gov means we can't retrieve auditee_name
+                logger.warn(f"Unexpected SAM.gov API response: {e}")
+                return Response(
+                    {
+                        "valid": False,
+                        "error": "We encountered an unexpected error while confirming this UEI.",
+                    }
+                )
+
+            # Store SAM.gov provided legal entity name in profile for later steps
+            request.user.profile.entry_form_data["uei"] = uei
+            request.user.profile.entry_form_data["auditee_name"] = auditee_name
+            request.user.profile.save()
+
+            return Response({"valid": True, "uei": uei, "auditee_name": auditee_name})
+
         return Response({"valid": False, "errors": serializer.errors})
 
 
@@ -93,8 +119,22 @@ class AuditeeInfoView(APIView):
             )
 
         if serializer.is_valid():
-            next_step = reverse("access")
+            profile_data = request.user.profile.entry_form_data
 
+            # Check that inbound UEI and Auditee match those stored in the user's profile as responses from SAM.gov
+            if (
+                profile_data["uei"] != serializer.data["uei"]
+                or profile_data["auditee_name"] != serializer.data["auditee_name"]
+            ):
+                return Response(
+                    {
+                        "errors": [
+                            f"The provided UEI: {serializer.data['uei']} has not been validated by SAM.gov"
+                        ]
+                    }
+                )
+
+            next_step = reverse("access")
             # combine with expected eligibility info from session
             request.user.profile.entry_form_data = (
                 request.user.profile.entry_form_data | request.data

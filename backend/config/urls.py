@@ -27,7 +27,7 @@ urlpatterns = [
     ),
     path(
         "sac/ueivalidation",
-        views.UEIValidationFormView.as_view(),
+        views.UEIValidationView.as_view(),
         name="uei-validation",
     ),
     path("sac/auditee", views.AuditeeInfoView.as_view(), name="auditee-info"),
