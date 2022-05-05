@@ -37,7 +37,6 @@ jobs:
           bandit -r .
       - name: Run type checking
         working-directory: ./backend
-        continue-on-error: true
         run: |
           mypy .
 

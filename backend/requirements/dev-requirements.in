@@ -4,3 +4,4 @@ bandit
 black
 flake8
 model_bakery
+types-requests
