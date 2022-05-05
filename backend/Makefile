@@ -20,3 +20,14 @@ install-dev:
 # Sync your dev environment
 sync:
 	@pip-sync dev-requirements.txt
+
+# Run the linters
+lint:
+	@echo "Flake8:"
+	@flake8
+	@echo "black:"
+	@black --check .
+	@echo "bandit:"
+	@bandit -r .
+	@echo "mypy:"
+	@mypy .
