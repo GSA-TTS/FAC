@@ -38,7 +38,7 @@ jobs:
       - name: Run type checking
         working-directory: ./backend
         run: |
-          mypy --config-file=pyproject.toml .
+          mypy --config-file=pyproject.toml --ignore-missing-imports .
 
   test-backend:
     runs-on: ubuntu-latest
