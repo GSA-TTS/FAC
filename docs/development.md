@@ -10,6 +10,7 @@ We use either [Docker with `docker-compose`](#docker) or [local development](#lo
   * [Docker](#docker)
   * [Local Development](#local-development)
 * [Django setup](#django-setup)
+* [Python code quality tooling](#python-code-quality-tooling) 
 
 ## Tools
 
@@ -156,3 +157,30 @@ docker-compose run web python manage.py createsuperuser
 # Enter the user/pass @ the Admin login page
 open http://localhost:8000/admin
 ```
+
+### Python code quality tooling
+
+#### Linting
+
+We use [Flake8](https://github.com/PyCQA/flake8) for linting. Because Flake8 runs `pylint` for us, configuration is effectively in two files: [backend/.flake8](https://github.com/GSA-TTS/FAC/blob/main/backend/.flake8) for Flake-specific settings and [backend/pyproject.toml](https://github.com/GSA-TTS/FAC/blob/main/backend/pyproject.toml) for `pylint`-specific settings.
+
+The settings are mostly default, with the main exception being line length. We depart from the PEP-8 standard and instead use the `black` [default of 88](https://black.readthedocs.io/en/stable/the_black_code_style/current_style.html#line-length), and have altered the Flake8 settings to match this.
+
+
+In addition, in using `black` we follow the [suggestion of disabling the `E203` error](https://black.readthedocs.io/en/stable/the_black_code_style/current_style.html#slices) because of inconsistencies around treatment of the slice operator.
+
+There are some opinionated enabled/disabled `pylint` messages in [backend/pyproject.toml](https://github.com/GSA-TTS/FAC/blob/main/backend/pyproject.toml) that we will revisit over time if they prove problematic.
+
+Linting is checked as a GitHub action, configured in [.github/workflows/test.yml](https://github.com/GSA-TTS/FAC/blob/main/.github/workflows/test.yml).
+
+#### Formatting
+
+As stated, we use [black](https://black.readthedocs.io/en/stable/index.html) with the default settings for formatting.
+
+Formatting is checked as a GitHub action, configured in [.github/workflows/test.yml](https://github.com/GSA-TTS/FAC/blob/main/.github/workflows/test.yml), and will fail if code is not formatted as `black`  expects it to be.
+
+#### Security scanning
+
+We use [bandit](https://bandit.readthedocs.io/en/latest/) for automated security scans, and run it with default settings.
+
+Security scanning is checked as a GitHub action, configured in [.github/workflows/test.yml](https://github.com/GSA-TTS/FAC/blob/main/.github/workflows/test.yml).
