@@ -28,8 +28,8 @@ It covers the following stories:
 - [ ] Meets acceptance criteria
 - [ ] PO approved
 - [ ] Usability tested
+- [ ] Automated accessibility tests pass
+- [ ] Manual accessibility tested
 - [ ] FE test suite updated to test the form
 - [ ] API test suite updated to demonstrate functionality, correctness.
 - [ ] Rough draft of support documentation ("exists" not "perfect").
-
-
