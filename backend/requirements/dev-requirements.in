@@ -4,3 +4,5 @@ bandit
 black
 flake8
 model_bakery
+mypy
+types-requests

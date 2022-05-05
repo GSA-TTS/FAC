@@ -13,6 +13,21 @@ compile-dev:
 	@rm dev-requirements.txt
 	@pip-compile --generate-hashes ./requirements/dev-requirements.in -o dev-requirements.txt --allow-unsafe
 
+# Install python dev dependencies
+install-dev:
+	@pip install -r dev-requirements.txt
+
 # Sync your dev environment
 sync:
 	@pip-sync dev-requirements.txt
+
+# Run the linters
+lint:
+	@echo "Flake8:"
+	@flake8
+	@echo "black:"
+	@black --check .
+	@echo "bandit:"
+	@bandit -r .
+	@echo "mypy:"
+	@mypy .

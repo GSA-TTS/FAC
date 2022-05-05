@@ -33,7 +33,7 @@ def parse_sam_uei_json(response: dict) -> dict:
     case-insensitively equal to "active".
     """
     # Ensure the UEI exists in SAM.gov
-    if response.get("totalRecords") < 1:
+    if response.get("totalRecords", 0) < 1:
         return {"valid": False, "errors": ["UEI was not found in SAM.gov"]}
 
     # Ensure there's only one entry:
