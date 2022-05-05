@@ -159,5 +159,5 @@ REST_FRAMEWORK = {
 CORS_ALLOW_ALL_ORIGINS = True
 
 # SAM.gov API
-SAM_API_URL = "https://api.sam.gov/entity-information/v3/entities"
+SAM_ENTITY_API_URL = "https://api.sam.gov/entity-information/v3/entities"
 SAM_API_KEY = os.environ.get("SAM_API_KEY")
