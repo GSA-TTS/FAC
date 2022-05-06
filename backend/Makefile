@@ -31,3 +31,7 @@ lint:
 	@bandit -r .
 	@echo "mypy:"
 	@mypy .
+
+# Run Django tests:
+test:
+	@coverage run --source="." manage.py test && coverage report -m --fail-under=99

@@ -2,6 +2,7 @@
 
 bandit
 black
+coverage
 flake8
 model_bakery
 mypy

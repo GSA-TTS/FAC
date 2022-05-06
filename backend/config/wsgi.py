@@ -7,10 +7,10 @@ For more information on this file, see
 https://docs.djangoproject.com/en/4.0/howto/deployment/wsgi/
 """
 
-import os
+import os  # pragma: no cover
 
-from django.core.wsgi import get_wsgi_application
+from django.core.wsgi import get_wsgi_application  # pragma: no cover
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")  # pragma: no cover
 
-application = get_wsgi_application()
+application = get_wsgi_application()  # pragma: no cover

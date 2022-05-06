@@ -160,6 +160,16 @@ open http://localhost:8000/admin
 
 ### Python code quality tooling
 
+The tests (plus coverage report) can be run locally with `make test`.
+
+The linting/formatting/security scanning/type checking can be run all together locally with `make lint`.
+
+#### Testing
+
+We use the Django native test framework plus [coverage.py](https://coverage.readthedocs.io/).
+
+The tests and the coverage report are run as a GitHub action, configured in [.github/workflows/test.yml](https://github.com/GSA-TTS/FAC/blob/main/.github/workflows/test.yml). Minimum test coverage is currently set at 99%, an arbitrarily-chosen value.
+
 #### Linting
 
 We use [Flake8](https://github.com/PyCQA/flake8) for linting. Because Flake8 runs `pylint` for us, configuration is effectively in two files: [backend/.flake8](https://github.com/GSA-TTS/FAC/blob/main/backend/.flake8) for Flake-specific settings and [backend/pyproject.toml](https://github.com/GSA-TTS/FAC/blob/main/backend/pyproject.toml) for `pylint`-specific settings.
