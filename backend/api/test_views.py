@@ -133,6 +133,19 @@ class AuditeeInfoTests(TestCase):
             VALID_ELIGIBILITY_DATA | VALID_AUDITEE_INFO_DATA,
         )
 
+    def test_invalid_eligibility_data(self):
+        """
+        Handle required field (in this case UEI) with no value.
+        """
+        self.user.profile.entry_form_data = VALID_ELIGIBILITY_DATA
+        self.user.profile.save()
+        invalid_data = VALID_ELIGIBILITY_DATA | {"uei": None}
+        response = self.client.post(AUDITEE_INFO_PATH, invalid_data, format="json")
+        data = response.json()
+        self.assertEqual(
+            data.get("errors", {}).get("uei"), ["This field may not be null."]
+        )
+
 
 class AccessTests(TestCase):
     def setUp(self):
@@ -171,6 +184,23 @@ class AccessTests(TestCase):
         sac = SingleAuditChecklist.objects.get(id=data["sac_id"])
         self.assertEqual(sac.users.get(role="auditee_contact").email, "a@a.com")
         self.assertEqual(sac.users.get(role="auditor_contact").email, "c@c.com")
+
+    def test_invalid_eligibility_data(self):
+        """
+        Handle missing data.
+        """
+        self.user.profile.entry_form_data = (
+            VALID_ELIGIBILITY_DATA | VALID_AUDITEE_INFO_DATA
+        )
+        self.user.profile.save()
+        response = self.client.post(ACCESS_PATH, [{}], format="json")
+        data = response.json()
+        self.assertEqual(
+            data.get("errors", [])[0]["role"][0], "This field is required."
+        )
+        self.assertEqual(
+            data.get("errors", [])[0]["email"][0], "This field is required."
+        )
 
 
 class SACCreationTests(TestCase):
