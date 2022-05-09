@@ -19,9 +19,9 @@ There is a [high-level roadmap](https://app.mural.co/t/gsa6/m/gsa6/1646336450605
 
 - **Done (Sprint X)** - The path to "Done" varies by issue type:
 
-    - **User Story** - Acceptance criteria for a task is verified by PM or QA lead on staging, then moved to done. 
+    - **User Story** - Acceptance criteria for a task is verified by PM or QA lead on the development instance, then moved to done. 
 
-    - **Engineering task** - Acceptance criteria is verified by an engineer on staging, then moved to done. 
+    - **Engineering task** - Acceptance criteria is verified by an engineer on the development instance, then moved to done. 
 
     - **Design task** - PM verifies the process for next steps / implementation is documented in another ticket, then moved to done. 
 
