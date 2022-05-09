@@ -3,7 +3,7 @@ Agile Process
 
 # Overview
 
-There is a [high-level roadmap](https://app.mural.co/t/gsa6/m/gsa6/1646336450605/6a77a27a287989f91e1c0dfbcf9be4dec6e49393?sender=ua4d37dfba3f1e69e09078790) that the product and design team distills down to actionable tasks at the beginning of each sprint. Design, engineering and product work is tracked on the [FAC Task Tracking board](https://github.com/GSA-TTS/FAC/projects/1) in Github. "Story" issues can be created to define a high-level piece of functionality, but linked subtasks should be created for discrete pieces of work across disciplines, each not exceeding one day in anticipated time. There is no estimation process for tickets, but they should be groomed to be in approximately comparable sizes. The team works in two-week sprints starting on Tuesdays.
+There is a [high-level roadmap](https://app.mural.co/t/gsa6/m/gsa6/1646336450605/6a77a27a287989f91e1c0dfbcf9be4dec6e49393?sender=ua4d37dfba3f1e69e09078790) that the product and design team distills down to actionable tasks at the beginning of each sprint. Design, engineering and product work is tracked on the [FAC Task Tracking board](https://github.com/GSA-TTS/FAC/projects/1) in Github. "Story" issues can be created to define a high-level piece of functionality, but linked subtasks should be created for discrete pieces of work across disciplines, each not exceeding one day in anticipated time. There is no estimation process for tickets, but they should be refined to be in approximately comparable sizes. The team works in two-week sprints starting on Tuesdays.
 
 ### Board workflow
 
@@ -43,7 +43,7 @@ Time-based estimations are prone to inaccuracy and preconceived notions of "how 
 
 ### Sprint planning (Backlog->Available)
 
-At the start of each sprint, we review the stories groomed for implementation and ensure they . We aim to take on work that can be completed within one sprint. If a story seems like it'll need to span more than one sprint, that may be a sign that it needs to be broken into a smaller chunk of work.
+At the start of each sprint, we review the stories refined for implementation and ensure they . We aim to take on work that can be completed within one sprint. If a story seems like it'll need to span more than one sprint, that may be a sign that it needs to be broken into a smaller chunk of work.
 
 ### Code Review (In Progress->Ready For Review->Done)
 
@@ -57,9 +57,9 @@ One reviewer required for any pull request (both test and staging).
 
 Anyone can review; ad-hoc. Prefer velocity. Signal to the team in slack if you've waited more than two hours for a review.
 
-### Backlog grooming
+### Backlog refinement
 
-At the middle of each sprint we groom the backlog. Risks and dependencies are evaluated, context provided, and stories are added/removed from the backlog based on learning from the previous sprint.
+At the middle of each sprint we refine the backlog. Risks and dependencies are evaluated, context provided, and stories are added/removed from the backlog based on learning from the previous sprint.
 
 Participants: PO/PM, Design Lead, and Engineering Lead
 
