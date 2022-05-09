@@ -17,7 +17,17 @@ There is a [high-level roadmap](https://app.mural.co/t/gsa6/m/gsa6/1646336450605
 
 - **In review** - There is code review or QA happening on this feature
 
-- **Done (Sprint X)** - At the time of writing, "done" for a task means it passed code review and was merged/deployed. "Done" for a story means it's been deployed and has had its acceptance criteria created. Sprint-specific "done" columns are used to track exactly what was completed in a current sprint for velocity / reporting purposes.
+- **Done (Sprint X)** - The path to "Done" varies by issue type:
+
+    - **User Story** - Acceptance criteria for a task is verified by PM or QA lead on staging, then moved to done. 
+
+    - **Engineering task** - Acceptance criteria is verified by an engineer on staging, then moved to done. 
+
+    - **Design task** - PM verifies the process for next steps / implementation is documented in another ticket, then moved to done. 
+
+    - **Product task** - PM asks relevant parties (design, engineering, etc) to review and move to done.  
+
+Note: Sprint-specific "done" columns are used to track exactly what was completed in a current sprint for velocity / reporting purposes.
 
 ### How we'll stay on track
 
