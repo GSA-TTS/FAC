@@ -17,7 +17,7 @@ Our architecture calls for an API to be the interface for both our initial front
 Considerations:
 * DRF is 18F's `default` choice for python APIs: https://engineering.18f.gov/python/
 * There is existing art across TTS projects which are successfully using DRF today
-  * Including  existing patterns for handling authentication
+  * Including existing patterns for handling authentication
 
 
 ## Consequences
