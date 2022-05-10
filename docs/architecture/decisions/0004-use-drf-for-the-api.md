@@ -3,9 +3,11 @@
 Date: 2022-03-30
 
 ## Status
+
 Accepted
 
 ## Context
+
 Our architecture calls for an API to be the interface for both our initial frontend as well as future FAC users. How will we build that API?
 
 **We will use [Django REST framework](https://www.django-rest-framework.org/) to implement the API**
