@@ -76,7 +76,7 @@ def parse_sam_uei_json(response: dict) -> dict:
 
     # Return valid response
     return {
-        "valid": True, 
+        "valid": True,
         "response": response["entityData"][0]
     }
 
@@ -101,7 +101,7 @@ def get_uei_info_from_sam_gov(uei: str) -> dict:
     resp, error = call_sam_api(SAM_API_URL, api_params, api_headers)
     if resp is None:
         return {
-            "valid": False, 
+            "valid": False,
             "errors": [error]
         }
 
@@ -109,7 +109,7 @@ def get_uei_info_from_sam_gov(uei: str) -> dict:
     if resp.status_code != 200:
         error = f"SAM.gov API response status code invalid: {resp.status_code}"
         return {
-            "valid": False, 
+            "valid": False,
             "errors": [error]
         }
 
