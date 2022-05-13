@@ -3,9 +3,11 @@
 Date: 2022-03-30
 
 ## Status
+
 Accepted
 
 ## Context
+
 This is a greenfield build project, to evaluate options and settle on an initial architecture we have:
 
 * Defined the functional scope of a MVP towards which we're building
@@ -15,6 +17,7 @@ This is a greenfield build project, to evaluate options and settle on an initial
 
 Proposed architecture which was reviewed by the engineering team:
 ![Initial architecture](../diagrams/FAC_System.png)
+
 ## Decision
 
 Finding no immediate needs not met by TTS `default` choices for infrastructure and datastore, **we will build on a foundation of cloud.gov** and;

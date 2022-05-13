@@ -36,7 +36,18 @@ The service account credentials are stored in the repository secrets under:
 
 To use the SAM.gov API, we will have a `system account` [system account](https://www.fsd.gov/gsafsd_sp?id=gsafsd_kb_articles&sys_id=f8426db91b594d9006b09796bc4bcb52) that holds a system account API key.  
 
-The system account API key will be stored in the repository secrets under:
+To generate a SAM.gov System Account API key, follow these steps:
+
+* Users registered with a non-government email address and associated with an entity OR users registered with a government email address may request a system account for public data access.
+* If a user satisfies the above registration criteria they will be able to access the System Accounts widget from their Workspace page after logging in.
+* The user can then select “Go to System Accounts” from the widget and fill out the required sections.
+* The requested system account will then need to be approved. After approval the user will be notified via email and they can also see the updated status in the System Account widget.
+* The user can select ‘Go to System Accounts’ again in the widget from their workspace and enter a new system account password.
+* After setting up the password the user will see a new section for retrieving a system account API Key.
+* The user must enter their password again to retrieve the key.
+* NOTE: To obtain access to the FOUO/Sensitive Entity API data with a system account the user must be registered with a government email address.
+
+The system account API key will be stored in the repository secrets (in Github) under:
 
 - `SAM_API_KEY`
 

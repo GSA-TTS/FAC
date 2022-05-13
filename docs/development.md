@@ -32,9 +32,16 @@ Target python version is defined in [../backend/runtime.txt](../backend/runtime.
 
 ## Environment Variables
 
-Currently, the only environment variable is `SAM_API_KEY` to validate UEI's.  
+We use the `SAM_API_KEY` environment variable to interact with the SAM.gov API. 
 
-To test UEI validation locally, apply for a SAM.gov [System Account](https://www.fsd.gov/sys_attachment.do?sys_id=5462e13d1b594d9006b09796bc4bcbd2) and then copy the API key into your local environment (should end up somewhere in `~/.bash_profile`, `~/.bashrc`, `~/.zshrc`, or whatever flavor of shell you're using.)
+To test UEI validation using the SAM.gov API with a personal API key, follow these steps on (https://SAM.gov):
+
+* Registered users can request for a public API on ‘Account Details’ page. This page can be accessed here: [Account Details page on SAM.gov](https://sam.gov/profile/details)
+* Users must enter their password on ‘Account Details’ page to view the API Key information. If an incorrect password is entered, an error will be returned.
+* After the API Key is generated on ‘Account Details’ page, the API Key can be viewed on the Account Details page immediately. The API Key is visible until users navigate to a different page.
+* If an error is encountered during the API Key generation/retrieval, then users will receive an error message and they can try again.
+
+After receiving a personal API key, copy the API key into your local environment (should end up in `~/.bash_profile`, `~/.bashrc`, `~/.zshrc`, or whatever flavor of shell you're using.)
 
 ## Docker
 
@@ -113,7 +120,7 @@ python -m pip install --upgrade pip
 pip install pip-tools
 ```
 
-### Set environment variables
+### Django environment variables
 
 We use environment variables to configure much of how Django operates, at a minimum you'll need to configure the uri of your local database.
 

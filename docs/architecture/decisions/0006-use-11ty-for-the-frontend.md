@@ -3,9 +3,11 @@
 Date: 2022-04-26
 
 ## Status
+
 Accepted
 
 ## Context
+
 Our architecture calls for an API to be the interface for both our initial frontend as well as future FAC users. We will build the API using Django. How will we build the frontend that consumes the API?
 
 ## Decision
