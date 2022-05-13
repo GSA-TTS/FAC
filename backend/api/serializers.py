@@ -56,6 +56,10 @@ class UEISerializer(serializers.ModelSerializer):
                 "auditee_name": sam_response.get("response")
                 .get("entityRegistration")
                 .get("legalBusinessName"),
+                "auditee_fiscal_year_end_date": sam_response.get("response")
+                .get("coreData")
+                .get("entityInformation")
+                .get("fiscalYearEndCloseDate"),
             }
         )
 

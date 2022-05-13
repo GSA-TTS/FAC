@@ -28,13 +28,17 @@ def parse_sam_uei_json(response: dict) -> dict:
     at the nested values we want to check.
 
     Primarily we want to know that the totalRecords value is one, that there's
-    only one item in entityData, and that item is a dictionary which can be
+    only one item in entityData, that item is a dictionary which can be
     queried for an item["entityRegistration"]["ueiStatus"] value
-    case-insensitively equal to "active".
+    case-insensitively equal to "active", and that entityData can be queried
+    for an item["coreData"]["entityInformation"]["fiscalYearEndCloseDate"] value.
     """
     # Ensure the UEI exists in SAM.gov
     if response.get("totalRecords", 0) < 1:
-        return {"valid": False, "errors": ["UEI was not found in SAM.gov"]}
+        return {
+            "valid": False,
+            "errors": ["UEI was not found in SAM.gov"]
+        }
 
     # Ensure there's only one entry:
     entries = response.get("entityData", [])
@@ -61,7 +65,20 @@ def parse_sam_uei_json(response: dict) -> dict:
             "errors": ["UEI is not listed as active from SAM.gov response data"],
         }
 
-    return {"valid": True, "response": response["entityData"][0]}
+    # Get the fiscalYearEndCloseDate and catch errors if the JSON shape is unexpected:
+    try:
+        status = entry.get("coreData", {}).get("entityInformation", {}).get("fiscalYearEndCloseDate", "")
+    except AttributeError:
+        return {
+            "valid": False,
+            "errors": ["SAM.gov unexpected JSON shape"],
+        }
+
+    # Return valid response
+    return {
+        "valid": True, 
+        "response": response["entityData"][0]
+    }
 
 
 def get_uei_info_from_sam_gov(uei: str) -> dict:
@@ -83,11 +100,17 @@ def get_uei_info_from_sam_gov(uei: str) -> dict:
     # Call the SAM API
     resp, error = call_sam_api(SAM_API_URL, api_params, api_headers)
     if resp is None:
-        return {"valid": False, "errors": [error]}
+        return {
+            "valid": False, 
+            "errors": [error]
+        }
 
     # Get the response status code
     if resp.status_code != 200:
         error = f"SAM.gov API response status code invalid: {resp.status_code}"
-        return {"valid": False, "errors": [error]}
+        return {
+            "valid": False, 
+            "errors": [error]
+        }
 
     return parse_sam_uei_json(resp.json())
