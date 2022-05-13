@@ -35,10 +35,7 @@ def parse_sam_uei_json(response: dict) -> dict:
     """
     # Ensure the UEI exists in SAM.gov
     if response.get("totalRecords", 0) < 1:
-        return {
-            "valid": False,
-            "errors": ["UEI was not found in SAM.gov"]
-        }
+        return {"valid": False, "errors": ["UEI was not found in SAM.gov"]}
 
     # Ensure there's only one entry:
     entries = response.get("entityData", [])
@@ -67,7 +64,11 @@ def parse_sam_uei_json(response: dict) -> dict:
 
     # Get the fiscalYearEndCloseDate and catch errors if the JSON shape is unexpected:
     try:
-        status = entry.get("coreData", {}).get("entityInformation", {}).get("fiscalYearEndCloseDate", "")
+        status = (
+            entry.get("coreData", {})
+            .get("entityInformation", {})
+            .get("fiscalYearEndCloseDate", "")
+        )
     except AttributeError:
         return {
             "valid": False,
@@ -75,10 +76,7 @@ def parse_sam_uei_json(response: dict) -> dict:
         }
 
     # Return valid response
-    return {
-        "valid": True,
-        "response": response["entityData"][0]
-    }
+    return {"valid": True, "response": response["entityData"][0]}
 
 
 def get_uei_info_from_sam_gov(uei: str) -> dict:
@@ -100,17 +98,11 @@ def get_uei_info_from_sam_gov(uei: str) -> dict:
     # Call the SAM API
     resp, error = call_sam_api(SAM_API_URL, api_params, api_headers)
     if resp is None:
-        return {
-            "valid": False,
-            "errors": [error]
-        }
+        return {"valid": False, "errors": [error]}
 
     # Get the response status code
     if resp.status_code != 200:
         error = f"SAM.gov API response status code invalid: {resp.status_code}"
-        return {
-            "valid": False,
-            "errors": [error]
-        }
+        return {"valid": False, "errors": [error]}
 
     return parse_sam_uei_json(resp.json())

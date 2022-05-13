@@ -35,7 +35,7 @@ valid_uei_results_dict = {
                 "publicDisplayFlag": "Y",
                 "exclusionStatusFlag": "N",
                 "exclusionURL": None,
-                "dnbOpenData": None
+                "dnbOpenData": None,
             },
             "coreData": {
                 "entityInformation": {
@@ -44,7 +44,7 @@ valid_uei_results_dict = {
                     "entityDivisionNumber": "16",
                     "entityStartDate": "1911-01-01",
                     "fiscalYearEndCloseDate": "12/31",
-                    "submissionDate": "2020-08-10"
+                    "submissionDate": "2020-08-10",
                 },
                 "physicalAddress": {
                     "addressLine1": "306 SENTINEL DR STE 450",
@@ -53,7 +53,7 @@ valid_uei_results_dict = {
                     "stateOrProvinceCode": "MD",
                     "zipCode": "20701",
                     "zipCodePlus4": "1007",
-                    "countryCode": "USA"
+                    "countryCode": "USA",
                 },
                 "mailingAddress": {
                     "addressLine1": "306 SENTINEL DR STE 450",
@@ -62,7 +62,7 @@ valid_uei_results_dict = {
                     "stateOrProvinceCode": "MD",
                     "zipCode": "20701",
                     "zipCodePlus4": "1007",
-                    "countryCode": "USA"
+                    "countryCode": "USA",
                 },
                 "congressionalDistrict": "02",
                 "generalInformation": {
@@ -77,33 +77,33 @@ valid_uei_results_dict = {
                     "stateOfIncorporationCode": "NY",
                     "stateOfIncorporationDesc": "NEW YORK",
                     "countryOfIncorporationCode": "USA",
-                    "countryOfIncorporationDesc": "UNITED STATES"
+                    "countryOfIncorporationDesc": "UNITED STATES",
                 },
                 "businessTypes": {
                     "businessTypeList": [
                         {
                             "businessTypeCode": "2X",
-                            "businessTypeDesc": "For Profit Organization"
+                            "businessTypeDesc": "For Profit Organization",
                         },
                         {
                             "businessTypeCode": "F",
-                            "businessTypeDesc": "Business or Organization"
-                        }
+                            "businessTypeDesc": "Business or Organization",
+                        },
                     ],
                     "sbaBusinessTypeList": [
                         {
                             "sbaBusinessTypeCode": None,
                             "sbaBusinessTypeDesc": None,
                             "certificationEntryDate": None,
-                            "certificationExitDate": None
+                            "certificationExitDate": None,
                         }
-                    ]
+                    ],
                 },
                 "financialInformation": {
                     "creditCardUsage": "N",
-                    "debtSubjectToOffset": "N"
-                }
-            }
+                    "debtSubjectToOffset": "N",
+                },
+            },
         }
     ],
     "links": {
@@ -196,7 +196,7 @@ inactive_uei_results_dict = {
                 "publicDisplayFlag": "Y",
                 "exclusionStatusFlag": "N",
                 "exclusionURL": None,
-                "dnbOpenData": None
+                "dnbOpenData": None,
             },
             "coreData": {
                 "entityInformation": {
@@ -205,7 +205,7 @@ inactive_uei_results_dict = {
                     "entityDivisionNumber": "16",
                     "entityStartDate": "1911-01-01",
                     "fiscalYearEndCloseDate": "12/31",
-                    "submissionDate": "2020-08-10"
+                    "submissionDate": "2020-08-10",
                 },
                 "physicalAddress": {
                     "addressLine1": "306 SENTINEL DR STE 450",
@@ -214,7 +214,7 @@ inactive_uei_results_dict = {
                     "stateOrProvinceCode": "MD",
                     "zipCode": "20701",
                     "zipCodePlus4": "1007",
-                    "countryCode": "USA"
+                    "countryCode": "USA",
                 },
                 "mailingAddress": {
                     "addressLine1": "306 SENTINEL DR STE 450",
@@ -223,7 +223,7 @@ inactive_uei_results_dict = {
                     "stateOrProvinceCode": "MD",
                     "zipCode": "20701",
                     "zipCodePlus4": "1007",
-                    "countryCode": "USA"
+                    "countryCode": "USA",
                 },
                 "congressionalDistrict": "02",
                 "generalInformation": {
@@ -238,33 +238,33 @@ inactive_uei_results_dict = {
                     "stateOfIncorporationCode": "NY",
                     "stateOfIncorporationDesc": "NEW YORK",
                     "countryOfIncorporationCode": "USA",
-                    "countryOfIncorporationDesc": "UNITED STATES"
+                    "countryOfIncorporationDesc": "UNITED STATES",
                 },
                 "businessTypes": {
                     "businessTypeList": [
                         {
                             "businessTypeCode": "2X",
-                            "businessTypeDesc": "For Profit Organization"
+                            "businessTypeDesc": "For Profit Organization",
                         },
                         {
                             "businessTypeCode": "F",
-                            "businessTypeDesc": "Business or Organization"
-                        }
+                            "businessTypeDesc": "Business or Organization",
+                        },
                     ],
                     "sbaBusinessTypeList": [
                         {
                             "sbaBusinessTypeCode": None,
                             "sbaBusinessTypeDesc": None,
                             "certificationEntryDate": None,
-                            "certificationExitDate": None
+                            "certificationExitDate": None,
                         }
-                    ]
+                    ],
                 },
                 "financialInformation": {
                     "creditCardUsage": "N",
-                    "debtSubjectToOffset": "N"
-                }
-            }
+                    "debtSubjectToOffset": "N",
+                },
+            },
         }
     ],
     "links": {
