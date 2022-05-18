@@ -11,7 +11,10 @@ def call_sam_api(
     Call the SAM.gov API and return the response and/or error string
     """
     try:
-        return requests.get(sam_api_url, params=params, headers=headers), None
+        return (
+            requests.get(sam_api_url, params=params, headers=headers),
+            None,
+        )
 
     except requests.exceptions.Timeout:
         error = "SAM.gov API timeout"
@@ -89,7 +92,7 @@ def get_uei_info_from_sam_gov(uei: str) -> dict:
     api_params = {
         "ueiSAM": uei,
         "samRegistered": "Yes",
-        "includeSections": "entityRegistration",
+        "includeSections": "entityRegistration,coreData",
     }
 
     # SAM API headers
