@@ -7,9 +7,9 @@ There is a [high-level roadmap](https://app.mural.co/t/gsa6/m/gsa6/1646336450605
 
 ### Creating issues
  
-**Story** - stories define high-level pieces of functionality that may require multiple team members to implement (design, front-end, back-end engineering, etc). These currently use the "Story template". The "story" label is added to this. Often sub tasks will be created and linked from stories. The person assigned the story is considered the "shepherd" of the issue who is tasked with tying it all together.
+**Story** - Issues of this type define high-level pieces of functionality that may require multiple team members to implement (design, front-end, back-end engineering, etc). These currently use the "Story template". The "story" label is added to this. Often sub tasks will be created and linked from stories. The person assigned the story is considered the "shepherd" of the issue who is tasked with tying it all together.
  
-**Task** - represents a discrete piece of functionality that should not require more than one day of work. It should use the "Basic task tracking" template that links back to the main story and has specific acceptance criteria. Tasks are given a "design" or "engineering" label.
+**Task** - Issues of this type represents a discrete piece of functionality that should not require more than one day of work. It should use the "Basic task tracking" template that links back to the main story and has specific acceptance criteria. Tasks are given a "design" or "engineering" label.
  
 **Ceremonies** - The goal is for new work from the backlog to enter the sprint at the start of the sprint and have agreement from the team that it's realistic to get the body of work done by the end of the sprint. In practice, items are sometimes removed and added to the sprint while it's ongoing. When this happens, team members are expected to communicate the up-scope or down-scope of the sprint to the rest of the team. Items that the team agrees to take on from the outset are currently given a sprint milestone, which communicates what the team anticipated was possible.
  
