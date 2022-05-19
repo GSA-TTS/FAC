@@ -3,7 +3,19 @@ Agile Process
 
 # Overview
 
-There is a [high-level roadmap](https://app.mural.co/t/gsa6/m/gsa6/1646336450605/6a77a27a287989f91e1c0dfbcf9be4dec6e49393?sender=ua4d37dfba3f1e69e09078790) that the product and design team distills down to actionable tasks at the beginning of each sprint. Design, engineering and product work is tracked on the [FAC Task Tracking board](https://github.com/GSA-TTS/FAC/projects/1) in Github. "Story" issues can be created to define a high-level piece of functionality, but linked subtasks should be created for discrete pieces of work across disciplines, each not exceeding one day in anticipated time. There is no estimation process for tickets, but they should be refined to be in approximately comparable sizes. The team works in two-week sprints starting on Tuesdays.
+There is a [high-level roadmap](https://app.mural.co/t/gsa6/m/gsa6/1646336450605/6a77a27a287989f91e1c0dfbcf9be4dec6e49393?sender=ua4d37dfba3f1e69e09078790) that the product and design team distills down to actionable tasks at the beginning of each sprint. Design, engineering and product work is tracked on the [FAC Task Tracking board](https://github.com/GSA-TTS/FAC/projects/1) in Github. 
+
+### Creating issues
+
+**Story** - stories define high-level pieces of functionality that may require mutliple team members to implement (design, front-end, back-end engineering, etc). These currently use the "Full-stack issue template" (suggest renaming to story template). The "story" label is added to this. Often sub tasks will be created and linked from stories. The person assigned the story is considered the "sheppard" of the issue who is tasked with tieing it all together. 
+
+**Task** - represents a discrete piece of functionality that should not require more than one day of work. It should use the "Basic task tracking" template that links back to the main story and has specific acceptance critiera. Tasks are given "design" or "engineering" label. 
+
+**Ceramonies** - The goal is for new work from the backlog to enter the sprint at the start of the sprint and have agreement from the team that it's realistic to get the body of work done by the end of the sprint. In practice, items are sometimes removed and added to sprint while it's ongoing. When this happens, team members are expected to communicate the upscope or downscope of the sprint to the rest of the team. Items that the team agrees to take on from the outset are currently given a sprint milestone, which communicates what the team anticipated was possible. 
+
+**Labeling issues** - In addition to the "story", "design" and "engineering" labels, the "needs refinement" label is a very important label to denote whether an issues needs to be better clarified. The goal is to never start a sprint with an issue labeled "needs refinement" in it. There are a bunch of other labels that are rarely used and could probably be deleted. 
+
+**Estimation / Velocity** - There is no estimation process for tickets, but they should be refined to be in approximately comparable sizes. The team works in two-week sprints starting on Tuesdays. As of right now, our two velocity metrics are number of tasks completed and number of stories completed in a sprint tracked
 
 ### Board workflow
 
