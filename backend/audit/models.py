@@ -66,7 +66,7 @@ class SingleAuditChecklist(models.Model):
     multiple_eins_covered = models.BooleanField(
         verbose_name=_("Multiple EINs covered"), null=True
     )
-    auditee_uei = models.CharField(
+    uei = models.CharField(
         max_length=12,
         verbose_name=_("UEI"),
         help_text=_("Unique Entity Identifier"),
@@ -121,7 +121,7 @@ class SingleAuditChecklist(models.Model):
         verbose_name_plural = "SF-SACs"
 
     def __str__(self):
-        return f"#{self.id} - UEI({self.auditee_uei})"
+        return f"#{self.id} - UEI({self.uei})"
 
 
 class Access(models.Model):
