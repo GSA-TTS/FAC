@@ -7,10 +7,11 @@ assignees: ''
 
 ---
 
+Breakout issue of <story>
+
 **Background**
 
-
-**We'll know we're done when...**
+**Acceptance Criteria (We'll know we're done when...)**
 - [ ] 
 - [ ] 
 
