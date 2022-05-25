@@ -33,11 +33,16 @@ class Migration(migrations.Migration):
             name="auditor_country",
             field=models.CharField(max_length=100, null=True),
         ),
+        migrations.RenameField(
+            model_name="singleauditchecklist",
+            old_name="uei",
+            new_name="auditee_uei",
+        ),
         migrations.AlterField(
             model_name="singleauditchecklist",
-            name="uei",
+            name="auditee_uei",
             field=models.CharField(
-                help_text="Unique Entity Identifier",
+                help_text="Auditee Unique Entity Identifier",
                 max_length=12,
                 validators=[
                     django.core.validators.MinLengthValidator(12),
@@ -46,7 +51,7 @@ class Migration(migrations.Migration):
                     audit.validators.validate_uei_leading_char,
                     audit.validators.validate_uei_nine_digit_sequences,
                 ],
-                verbose_name="UEI",
+                verbose_name="Auditee UEI",
             ),
         ),
     ]

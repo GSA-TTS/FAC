@@ -53,8 +53,8 @@ class UEIValidatorStepTests(SimpleTestCase):
         """
         UEI should meet UEI Technical Specifications defined in the UEI validator
         """
-        valid = {"uei": "ZQGGHJH74DW7"}
-        invalid = {"uei": "0000000000OI*"}
+        valid = {"auditee_uei": "ZQGGHJH74DW7"}
+        invalid = {"auditee_uei": "0000000000OI*"}
 
         # Invalid
         self.assertFalse(UEISerializer(data=invalid).is_valid())

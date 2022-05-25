@@ -59,7 +59,7 @@ class UEIValidationFormView(APIView):
             return Response(
                 {
                     "valid": True,
-                    "response": json.loads(serializer.data.get("uei")),
+                    "response": json.loads(serializer.data.get("auditee_uei")),
                 }
             )
         return Response({"valid": False, "errors": serializer.errors})
@@ -108,7 +108,7 @@ class AuditeeInfoView(APIView):
 
 class AccessView(APIView):
     DATA_WE_NEED = AuditeeInfoView.DATA_WE_NEED + [
-        "uei",
+        "auditee_uei",
         "auditee_fiscal_period_start",
         "auditee_fiscal_period_end",
         "auditee_name",

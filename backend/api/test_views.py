@@ -17,7 +17,7 @@ AUDITEE_INFO_PATH = reverse("auditee-info")
 ACCESS_PATH = reverse("access")
 
 VALID_AUDITEE_INFO_DATA = {
-    "uei": "ABC123DEF456",
+    "auditee_uei": "ABC123DEF456",
     "auditee_fiscal_period_start": "2021-01-01",
     "auditee_fiscal_period_end": "2022-01-01",
     "auditee_name": "Tester",
@@ -67,8 +67,8 @@ class EligibilityViewTests(TestCase):
 
 class UEIValidationViewTests(TestCase):
     PATH = reverse("uei-validation")
-    SUCCESS = {"uei": "ZQGGHJH74DW7"}
-    INELIGIBLE = {"uei": "000000000OI*"}
+    SUCCESS = {"auditee_uei": "ZQGGHJH74DW7"}
+    INELIGIBLE = {"auditee_uei": "000000000OI*"}
 
     def test_auth_required(self):
         """Unauthenticated requests return unauthorized response"""
@@ -139,11 +139,11 @@ class AuditeeInfoTests(TestCase):
         """
         self.user.profile.entry_form_data = VALID_ELIGIBILITY_DATA
         self.user.profile.save()
-        invalid_data = VALID_ELIGIBILITY_DATA | {"uei": None}
+        invalid_data = VALID_ELIGIBILITY_DATA | {"auditee_uei": None}
         response = self.client.post(AUDITEE_INFO_PATH, invalid_data, format="json")
         data = response.json()
         self.assertEqual(
-            data.get("errors", {}).get("uei"), ["This field may not be null."]
+            data.get("errors", {}).get("auditee_uei"), ["This field may not be null."]
         )
 
 
@@ -238,4 +238,4 @@ class SACCreationTests(TestCase):
         data = response.json()
         sac = SingleAuditChecklist.objects.get(id=data["sac_id"])
         self.assertEqual(sac.submitted_by, self.user)
-        self.assertEqual(sac.uei, "ABC123DEF456")
+        self.assertEqual(sac.auditee_uei, "ABC123DEF456")

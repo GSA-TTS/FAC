@@ -44,7 +44,7 @@ class EligibilitySerializer(serializers.ModelSerializer):
 class UEISerializer(serializers.ModelSerializer):
     class Meta:
         model = SingleAuditChecklist
-        fields = ["uei"]
+        fields = ["auditee_uei"]
 
     def validate_uei(self, value):
         sam_response = get_uei_info_from_sam_gov(value)
@@ -52,7 +52,7 @@ class UEISerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(sam_response.get("errors"))
         return json.dumps(
             {
-                "uei": value,
+                "auditee_uei": value,
                 "auditee_name": sam_response.get("response")
                 .get("entityRegistration")
                 .get("legalBusinessName"),
@@ -69,7 +69,7 @@ class AuditeeInfoSerializer(serializers.ModelSerializer):
         model = SingleAuditChecklist
         fields = [
             "auditee_name",
-            "uei",
+            "auditee_uei",
             "auditee_fiscal_period_start",
             "auditee_fiscal_period_end",
         ]
