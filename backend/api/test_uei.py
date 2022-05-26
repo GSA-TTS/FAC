@@ -36,7 +36,74 @@ valid_uei_results_dict = {
                 "exclusionStatusFlag": "N",
                 "exclusionURL": None,
                 "dnbOpenData": None,
-            }
+            },
+            "coreData": {
+                "entityInformation": {
+                    "entityURL": "http://www.ibm.com/us/en",
+                    "entityDivisionName": "IBM Global Business Services",
+                    "entityDivisionNumber": "16",
+                    "entityStartDate": "1911-01-01",
+                    "fiscalYearEndCloseDate": "12/31",
+                    "submissionDate": "2020-08-10",
+                },
+                "physicalAddress": {
+                    "addressLine1": "306 SENTINEL DR STE 450",
+                    "addressLine2": None,
+                    "city": "ANNAPOLIS JUNCTION",
+                    "stateOrProvinceCode": "MD",
+                    "zipCode": "20701",
+                    "zipCodePlus4": "1007",
+                    "countryCode": "USA",
+                },
+                "mailingAddress": {
+                    "addressLine1": "306 SENTINEL DR STE 450",
+                    "addressLine2": None,
+                    "city": "ANNAPOLIS JUNCTION",
+                    "stateOrProvinceCode": "MD",
+                    "zipCode": "20701",
+                    "zipCodePlus4": "1007",
+                    "countryCode": "USA",
+                },
+                "congressionalDistrict": "02",
+                "generalInformation": {
+                    "entityStructureCode": "2L",
+                    "entityStructureDesc": "Corporate Entity (Not Tax Exempt)",
+                    "entityTypeCode": "F",
+                    "entityTypeDesc": "Business or Organization",
+                    "profitStructureCode": "2X",
+                    "profitStructureDesc": "For Profit Organization",
+                    "organizationStructureCode": None,
+                    "organizationStructureDesc": None,
+                    "stateOfIncorporationCode": "NY",
+                    "stateOfIncorporationDesc": "NEW YORK",
+                    "countryOfIncorporationCode": "USA",
+                    "countryOfIncorporationDesc": "UNITED STATES",
+                },
+                "businessTypes": {
+                    "businessTypeList": [
+                        {
+                            "businessTypeCode": "2X",
+                            "businessTypeDesc": "For Profit Organization",
+                        },
+                        {
+                            "businessTypeCode": "F",
+                            "businessTypeDesc": "Business or Organization",
+                        },
+                    ],
+                    "sbaBusinessTypeList": [
+                        {
+                            "sbaBusinessTypeCode": None,
+                            "sbaBusinessTypeDesc": None,
+                            "certificationEntryDate": None,
+                            "certificationExitDate": None,
+                        }
+                    ],
+                },
+                "financialInformation": {
+                    "creditCardUsage": "N",
+                    "debtSubjectToOffset": "N",
+                },
+            },
         }
     ],
     "links": {
@@ -45,7 +112,7 @@ valid_uei_results_dict = {
                 "https://api.sam.gov/entity-information/v3/entities?",
                 "api_key=REPLACE_WITH_API_KEY&",
                 "ueiSAM=ZQGGHJH74DW7&",
-                "includeSections=entityRegistration&",
+                "includeSections=entityRegistration%2CcoreData&",
                 "page=0&",
                 "size=10",
             ]
@@ -130,7 +197,74 @@ inactive_uei_results_dict = {
                 "exclusionStatusFlag": "N",
                 "exclusionURL": None,
                 "dnbOpenData": None,
-            }
+            },
+            "coreData": {
+                "entityInformation": {
+                    "entityURL": "http://www.ibm.com/us/en",
+                    "entityDivisionName": "IBM Global Business Services",
+                    "entityDivisionNumber": "16",
+                    "entityStartDate": "1911-01-01",
+                    "fiscalYearEndCloseDate": "12/31",
+                    "submissionDate": "2020-08-10",
+                },
+                "physicalAddress": {
+                    "addressLine1": "306 SENTINEL DR STE 450",
+                    "addressLine2": None,
+                    "city": "ANNAPOLIS JUNCTION",
+                    "stateOrProvinceCode": "MD",
+                    "zipCode": "20701",
+                    "zipCodePlus4": "1007",
+                    "countryCode": "USA",
+                },
+                "mailingAddress": {
+                    "addressLine1": "306 SENTINEL DR STE 450",
+                    "addressLine2": None,
+                    "city": "ANNAPOLIS JUNCTION",
+                    "stateOrProvinceCode": "MD",
+                    "zipCode": "20701",
+                    "zipCodePlus4": "1007",
+                    "countryCode": "USA",
+                },
+                "congressionalDistrict": "02",
+                "generalInformation": {
+                    "entityStructureCode": "2L",
+                    "entityStructureDesc": "Corporate Entity (Not Tax Exempt)",
+                    "entityTypeCode": "F",
+                    "entityTypeDesc": "Business or Organization",
+                    "profitStructureCode": "2X",
+                    "profitStructureDesc": "For Profit Organization",
+                    "organizationStructureCode": None,
+                    "organizationStructureDesc": None,
+                    "stateOfIncorporationCode": "NY",
+                    "stateOfIncorporationDesc": "NEW YORK",
+                    "countryOfIncorporationCode": "USA",
+                    "countryOfIncorporationDesc": "UNITED STATES",
+                },
+                "businessTypes": {
+                    "businessTypeList": [
+                        {
+                            "businessTypeCode": "2X",
+                            "businessTypeDesc": "For Profit Organization",
+                        },
+                        {
+                            "businessTypeCode": "F",
+                            "businessTypeDesc": "Business or Organization",
+                        },
+                    ],
+                    "sbaBusinessTypeList": [
+                        {
+                            "sbaBusinessTypeCode": None,
+                            "sbaBusinessTypeDesc": None,
+                            "certificationEntryDate": None,
+                            "certificationExitDate": None,
+                        }
+                    ],
+                },
+                "financialInformation": {
+                    "creditCardUsage": "N",
+                    "debtSubjectToOffset": "N",
+                },
+            },
         }
     ],
     "links": {
@@ -139,7 +273,7 @@ inactive_uei_results_dict = {
                 "https://api.sam.gov/entity-information/v3/entities?",
                 "api_key=REPLACE_WITH_API_KEY&",
                 "ueiSAM=ZQGGHJH74DW7&",
-                "includeSections=entityRegistration&",
+                "includeSections=entityRegistration%2CcoreData&",
                 "page=0&",
                 "size=10",
             ]

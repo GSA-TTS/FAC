@@ -11,7 +11,10 @@ def call_sam_api(
     Call the SAM.gov API and return the response and/or error string
     """
     try:
-        return requests.get(sam_api_url, params=params, headers=headers), None
+        return (
+            requests.get(sam_api_url, params=params, headers=headers),
+            None,
+        )
 
     except requests.exceptions.Timeout:
         error = "SAM.gov API timeout"
@@ -28,9 +31,10 @@ def parse_sam_uei_json(response: dict) -> dict:
     at the nested values we want to check.
 
     Primarily we want to know that the totalRecords value is one, that there's
-    only one item in entityData, and that item is a dictionary which can be
+    only one item in entityData, that item is a dictionary which can be
     queried for an item["entityRegistration"]["ueiStatus"] value
-    case-insensitively equal to "active".
+    case-insensitively equal to "active", and that entityData can be queried
+    for an item["coreData"]["entityInformation"]["fiscalYearEndCloseDate"] value.
     """
     # Ensure the UEI exists in SAM.gov
     if response.get("totalRecords", 0) < 1:
@@ -61,6 +65,20 @@ def parse_sam_uei_json(response: dict) -> dict:
             "errors": ["UEI is not listed as active from SAM.gov response data"],
         }
 
+    # Get the fiscalYearEndCloseDate and catch errors if the JSON shape is unexpected:
+    try:
+        status = (
+            entry.get("coreData", {})
+            .get("entityInformation", {})
+            .get("fiscalYearEndCloseDate", "")
+        )
+    except AttributeError:
+        return {
+            "valid": False,
+            "errors": ["SAM.gov unexpected JSON shape"],
+        }
+
+    # Return valid response
     return {"valid": True, "response": response["entityData"][0]}
 
 
@@ -74,7 +92,7 @@ def get_uei_info_from_sam_gov(uei: str) -> dict:
     api_params = {
         "ueiSAM": uei,
         "samRegistered": "Yes",
-        "includeSections": "entityRegistration",
+        "includeSections": "entityRegistration,coreData",
     }
 
     # SAM API headers
