@@ -15,7 +15,7 @@ It covers the following stories:
 
 1. As an ...
 
-**We'll know we're done when...**
+**Acceptance criteria (We'll know we're done when...)**
 - [ ] When a user can ...
   
 **Tasks**
