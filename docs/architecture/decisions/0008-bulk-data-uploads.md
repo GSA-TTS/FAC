@@ -41,7 +41,8 @@ The final questions remaining from this issue:
 * The CSF is a common format supported by all major spreadsheet applications
 * The library works in-browser, so we can include a validator on the FAC site directly, without an Electron app download
 * We can still use the legacy Census spreadsheet template if we wish
-
+* @tadhg-ohiggins adds that making sure the Excel templates we create end up matching the output of SheetJS that we accept might not be as straightforward as we hope.
+ 
 ## Consequences
 
 * It will be extra time to work on a practice validator on the site (similar to @jadudm's spike), and possibly should be moved until after the 10/1/2022 launch
