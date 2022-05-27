@@ -10,7 +10,7 @@ class SingleAuditChecklistTests(TestCase):
     def test_str_is_id_and_uei(self):
         """String representation of SAC instance is #{ID} - UEI({UEI})"""
         sac = baker.make(SingleAuditChecklist)
-        self.assertEqual(str(sac), f"#{sac.id} - UEI({sac.uei})")
+        self.assertEqual(str(sac), f"#{sac.id} - UEI({sac.auditee_uei})")
 
 
 class AccessTests(TestCase):
