@@ -17,7 +17,7 @@ AUDITEE_INFO_PATH = reverse("auditee-info")
 ACCESS_PATH = reverse("access")
 
 VALID_AUDITEE_INFO_DATA = {
-    "auditee_uei": "ABC123DEF456",
+    "auditee_uei": "ZQGGHJH74DW7",
     "auditee_fiscal_period_start": "2021-01-01",
     "auditee_fiscal_period_end": "2022-01-01",
     "auditee_name": "Tester",
@@ -238,4 +238,4 @@ class SACCreationTests(TestCase):
         data = response.json()
         sac = SingleAuditChecklist.objects.get(id=data["sac_id"])
         self.assertEqual(sac.submitted_by, self.user)
-        self.assertEqual(sac.auditee_uei, "ABC123DEF456")
+        self.assertEqual(sac.auditee_uei, "ZQGGHJH74DW7")

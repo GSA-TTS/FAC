@@ -46,7 +46,7 @@ class UEISerializer(serializers.ModelSerializer):
         model = SingleAuditChecklist
         fields = ["auditee_uei"]
 
-    def validate_uei(self, value):
+    def validate_auditee_uei(self, value):
         sam_response = get_uei_info_from_sam_gov(value)
         if sam_response.get("errors"):
             raise serializers.ValidationError(sam_response.get("errors"))
