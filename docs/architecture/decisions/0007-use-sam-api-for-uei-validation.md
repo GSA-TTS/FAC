@@ -1,4 +1,4 @@
-# 6. Use the SAM.gov API for UEI validation
+# 7. Use the SAM.gov API for UEI validation
 
 Date: 2022-05-10
 
