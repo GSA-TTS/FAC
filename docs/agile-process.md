@@ -41,6 +41,15 @@ There is a [high-level roadmap](https://app.mural.co/t/gsa6/m/gsa6/1646336450605
 
 Note: Sprint-specific "done" columns are used to track exactly what was completed in a current sprint for velocity / reporting purposes.
 
+### Quality assurance
+
+As of the time of this writing, the product manager does the following QA on each story before moving to done: 
+
+- [ ] Meets acceptance criteria
+- [ ] Screen reader - Listen to the experience with a screen reader extension, ensure the information presented in order
+- [ ] Keyboard navigation - Run through acceptance criteria with keyboard tabs, ensure it works. 
+- [ ] Text scaling - Adjust viewport to 1280 pixels wide and zoom to 400%, ensure it works
+
 ### How we'll stay on track
 
 Time-based estimations are prone to inaccuracy and preconceived notions of "how long something should take" that often doesn't consider code review, qa, deployment and bug fixes. We'll keep it real about what we can deliver by tracking a velocity metric and considering that as we plan new sprints. That said, there are very real deadlines for this project! Here is how we can work together in an agile fashion to deliver on time:
