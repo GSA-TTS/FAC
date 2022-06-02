@@ -1,0 +1,414 @@
+{
+  "profile": {
+    "uuid": "9578eed1-ebbe-436a-8125-9ac58a4a132c",
+    "metadata": {
+      "title": "Lightweight Security Authorization Process: System Security and Privacy Plan",
+      "last-modified": "2022-02-22T13:27:52.374565-08:00",
+      "version": "2021.09.15",
+      "oscal-version": "1.0.0"
+    },
+    "imports": [
+      {
+        "href": "https://raw.githubusercontent.com/usnistgov/oscal-content/main/nist.gov/SP800-53/rev5/json/NIST_SP-800-53_rev5_MODERATE-baseline-resolved-profile_catalog.json",
+        "include-controls": [
+          {
+            "with-ids": [
+              "ac-2",
+              "ac-3",
+              "ac-6.5",
+              "ac-6.9",
+              "au-2",
+              "au-6.1",
+              "ca-7",
+              "cm-2.2",
+              "cm-7.5",
+              "cp-7.1",
+              "ia-2",
+              "ia-2.1",
+              "ia-2.2",
+              "pl-2",
+              "pl-8",
+              "ra-5",
+              "sa-11",
+              "sa-22",
+              "sc-7",
+              "sc-8.1",
+              "sc-28.1",
+              "si-2",
+              "si-4",
+              "si-4.2",
+              "si-4.4",
+              "si-4.5",
+              "si-7",
+              "si-10"
+            ]
+          }
+        ]
+      },
+      {
+        "href": "https://raw.githubusercontent.com/usnistgov/oscal-content/main/nist.gov/SP800-53/rev5/json/NIST_SP-800-53_rev5_HIGH-baseline-resolved-profile_catalog.json",
+        "include-controls": [
+          {
+            "with-ids": [
+              "ca-8",
+              "cm-3.1",
+              "cm-6.1",
+              "cm-8.2"
+            ]
+          }
+        ]
+      }
+    ],
+    "modify": {
+      "set-parameters": [
+        {
+          "param-id": "ac-02_odp.01",
+          "values": [
+            "GSA S/SO or Contractor recommended prerequisites and criteria (based on defined user role(s) matrix in GSA SSPP Template Section 9: Types of Users) as approved by the CISO and AO"
+          ]
+        },
+        {
+          "param-id": "ac-02_odp.02",
+          "values": [
+            "the following attributes as defined in the user role(s) matrix in GSA SSPP Template Section 9: Types of Users) Internal or External; Privileged (P), Non-Privileged (NP), or No Logical Access (NLA); Sensitivity Level; Authorized Privileges; Functions Performed; MFA Authentication Method"
+          ]
+        },
+        {
+          "param-id": "ac-02_odp.03",
+          "values": [
+            "designated account managers as specified in AC-2.b"
+          ]
+        },
+        {
+          "param-id": "ac-02_odp.04",
+          "values": [
+            "CIO-IT Security-01-01, Identification and Authentication, CIO-IT Security-01-07, Access Control, and GSA-defined procedures or conditions (as applicable)"
+          ]
+        },
+        {
+          "param-id": "ac-02_odp.05",
+          "values": [
+            "System Owner, System/Network Administrator, and/or ISSO"
+          ]
+        },
+        {
+          "param-id": "ac-02_odp.06",
+          "values": [
+            "14 days"
+          ]
+        },
+        {
+          "param-id": "ac-02_odp.07",
+          "values": [
+            "14 days"
+          ]
+        },
+        {
+          "param-id": "ac-02_odp.08",
+          "values": [
+            "14 days"
+          ]
+        },
+        {
+          "param-id": "ac-02_odp.09",
+          "values": [
+            "Role privileges identified in GSA SSPP Section 9: Types of Users"
+          ]
+        },
+        {
+          "param-id": "ac-02_odp.10",
+          "values": [
+            "annually"
+          ]
+        },
+        {
+          "param-id": "ac-06.05_odp",
+          "values": [
+            "GSA S/SO or Contractor recommended employees and contractors as approved by the GSA CISO and AO"
+          ]
+        },
+        {
+          "param-id": "au-02_odp.01",
+          "values": [
+            "(1) successful and unsuccessful account logon events, account management events, object access, policy change, privilege functions, process tracking, and system events (2) Web applications should log all administrator activity, authentication checks, authorization checks, data deletions, data access, data changes, and permission changes (3) for technologies with limited auditing features, the capabilities will be recommended by the GSA S/SO or Contractor, based on an industry source such as vendor guidance or Center for Internet Security benchmark, and approved by the GSA CISO and AO"
+          ]
+        },
+        {
+          "param-id": "au-2_prm_2",
+          "values": [
+            "(1) audit configuration requirements as documented in applicable GSA IT Security Technical Guides and Standards (i.e., hardening and technology implementation guides) (2) for web applications see GSA IT Security Procedural Guide 07-35, Section 2.8.10, What to Log (3) for technologies where a Technical Guide and Standard does not exist, events from an industry source such as vendor guidance or Center for Internet Security benchmark, recommended by the GSA S/SO or Contractor and approved by the GSA CISO and AO"
+          ]
+        },
+        {
+          "param-id": "au-02_odp.04",
+          "values": [
+            "annually or whenever there is a change in the system’s threat environment as communicated by the GSA S/SO AO or the GSA OCISO"
+          ]
+        },
+        {
+          "param-id": "au-06.01_odp",
+          "values": [
+            "the GSA Enterprise Logging Platform for systems integrated with it; GSA S/SO or Contractor recommended automated mechanisms as approved by the GSA CISO and AO"
+          ]
+        },
+        {
+          "param-id": "ca-07_odp.01",
+          "values": [
+            "as specified in Section 3 of CIO-IT Security-08-39, Management Implementation Plan and CIO-IT Security-12-66, ISCM Strategy and OA Program"
+          ]
+        },
+        {
+          "param-id": "ca-07_odp.02",
+          "values": [
+            "as specified in Section 3 of CIO-IT Security-08-39, Management Implementation Plan and CIO-IT Security-12-66, ISCM Strategy and OA Program"
+          ]
+        },
+        {
+          "param-id": "ca-07_odp.03",
+          "values": [
+            "as specified in Section 3 of CIO-IT Security-08-39, Management Implementation Plan and CIO-IT Security-12-66, ISCM Strategy and OA Program"
+          ]
+        },
+        {
+          "param-id": "ca-7_prm_4",
+          "values": [
+            "CISO, AOs, System Owners, ISSMs, ISSOs, Custodians"
+          ]
+        },
+        {
+          "param-id": "ca-7_prm_5",
+          "values": [
+            "as specified in Section 3 of CIO-IT Security-08-39, Management Implementation Plan and CIO-IT Security-12-66, ISCM Strategy and OA Program"
+          ]
+        },
+        {
+          "param-id": "cm-02.02_odp",
+          "values": [
+            "automated mechanisms as identified in the SSPP/CM Plan"
+          ]
+        },
+        {
+          "param-id": "cm-07.05_odp.01",
+          "values": [
+            "GSA S/SO or Contractor recommended software programs authorized to execute on the information system as approved by the GSA CISO and AO"
+          ]
+        },
+        {
+          "param-id": "cm-07.05_odp.02",
+          "values": [
+            "annually as part of SSPP update"
+          ]
+        },
+        {
+          "param-id": "pl-02_odp.01",
+          "values": [
+            "personnel with IT security responsibilities for the system as defined in GSA CIO Order 2100.1 and the GSA Privacy Office (for systems with Privacy Act data)"
+          ]
+        },
+        {
+          "param-id": "pl-02_odp.02",
+          "values": [
+            "defined in GSA CIO Order 2100.1"
+          ]
+        },
+        {
+          "param-id": "pl-02_odp.03",
+          "values": [
+            "annually"
+          ]
+        },
+        {
+          "param-id": "pl-08_odp",
+          "values": [
+            "as necessary, and at least annually in conjunction with SSPP reviews/updates"
+          ]
+        },
+        {
+          "param-id": "ra-5_prm_1",
+          "values": [
+            "weekly authenticated scans for operating systems (OS)-including databases, monthly unauthenticated scans for web application, annual authenticated scans for web applications"
+          ]
+        },
+        {
+          "param-id": "ra-05_odp.03",
+          "values": [
+            "(1) For Internet-accessible IP addresses (a) Any Critical (Very High) scan vulnerabilities must be remediated within 15 days. (b) Any High scan vulnerabilities must be remediated within 30 days. (c) Any Moderate scan vulnerabilities must be remediated within 90 days. (2) For all other assets (a) Any Critical (Very High) and High scan vulnerabilities must be remediated within 30 days. (b) Any Moderate scan vulnerabilities must be remediated within 90 days."          ]
+        },
+        {
+          "param-id": "ra-05_odp.04",
+          "values": [
+            "Information System Security Officers"
+          ]
+        },
+        {
+          "param-id": "sa-22_odp.01",
+          "values": [
+            "none (requires an approved Acceptance of Risk Letter)"
+          ]
+        },
+        {
+          "param-id": "sc-07_odp",
+          "values": [
+            "logically"
+          ]
+        },
+        {
+          "param-id": "sc-08.01_odp",
+          "values": [
+            "prevent unauthorized disclosure of information and detect changes to information"
+          ]
+        },
+        {
+          "param-id": "sc-28.01_odp.01",
+          "values": [
+            "(1) Personally identifiable information; (2) Payment Card Industry data; (3) Authenticators, including but not limited to passwords, keys, and tokens; (4) business sensitive data as determined by the data owner and approved by the GSA CISO and AO"
+          ]
+        },
+        {
+          "param-id": "sc-28.01_odp.02",
+          "values": [
+            "every asset of the system everywhere, including databases and applications"
+          ]
+        },
+        {
+          "param-id": "si-02_odp",
+          "values": [
+            "the timeframe(s) outlined within the system’s system security plan and as required by CIO 2100.1 and CIO-IT Security-06-30, Managing Enterprise Cybersecurity Risk"
+          ]
+        },
+        {
+          "param-id": "si-04_odp.01",
+          "values": [
+            "ensuring the proper functioning of internal processes and controls in furtherance of regulatory and compliance requirements; examining system records to confirm that the system is functioning in an optimal, resilient, and secure state; identifying irregularities or anomalies that are indicators of a system malfunction or compromise"
+          ]
+        },
+        {
+          "param-id": "si-04_odp.02",
+          "values": [
+            "a variety of sources including but not limited to continuous monitoring vulnerability scans, malicious code protection mechanisms, intrusion detection or prevention mechanisms, or boundary protection devices such as firewalls, gateways, and routers"
+          ]
+        },
+        {
+          "param-id": "si-04_odp.03",
+          "values": [
+            "the GSA S/SO or Contractor recommended and GSA CISO and AO approved information system monitoring information"
+          ]
+        },
+        {
+          "param-id": "si-04_odp.04",
+          "values": [
+            "ISSM, ISSO, and System Program Managers who distribute the information to other personnel with system administration, monitoring, and/or security responsibilities"
+          ]
+        },
+        {
+          "param-id": "si-04_odp.05",
+          "values": [
+            "within the timeframe(s) specified in the applicable system security and privacy plan"
+          ]
+        },
+        {
+          "param-id": "si-4.4_prm_1",
+          "values": [
+            "continuously"
+          ]
+        },
+        {
+          "param-id": "si-4.4_prm_2",
+          "values": [
+            "indicators of compromise (IOCs) including but not limited to known bad IP address(s), URI(s), hash(s) from trusted sources; suspicious DNS activity; large data uploads; and other unusual or unauthorized activities or conditions as determined by the GSA CISO and AO"
+          ]
+        },
+        {
+          "param-id": "si-04.05_odp.01",
+          "values": [
+            "all staff with system administration, monitoring, and/or security responsibilities including but not limited to ISSM, ISSO, System Program Managers, Sys/Net/App Admins, etc."
+          ]
+        },
+        {
+          "param-id": "si-04.05_odp.02",
+          "values": [
+            "compromise indicators may include but shall not be limited to the following: - Protected system files or directories have been modified without notification from the appropriate change/configuration management channels. - System performance indicates resource consumption that is inconsistent with expected operating conditions. - Auditing functionality has been disabled or modified to reduce audit visibility. - Audit or log records have been deleted or modified without explanation. - The system is raising alerts or faults in a manner that indicates the presence of an abnormal condition. - Resource or service requests are initiated from clients that are outside of the expected client membership set. - The system reports failed logins or password changes for administrative or key service accounts. - Processes and services are running that are outside of the baseline system profile. - Utilities, tools, or scripts have been saved or installed on production systems without clear indication of their use or purpose"
+          ]
+        },
+        {
+          "param-id": "si-7_prm_1",
+          "values": [
+            "GSA software, firmware, and information"
+          ]
+        },
+        {
+          "param-id": "si-7_prm_2",
+          "values": [
+            "notify the System Owner, ISSO, ISSM, and the GSA Incident Response team"
+          ]
+        },
+        {
+          "param-id": "si-10_odp",
+          "values": [
+            "character set, length, numerical range, and acceptable values; verifies that inputs match specified definitions for format and content as it relates to: (1) Username and password combinations. (2) Attributes used to validate a password reset request (e.g., security questions). (3) Personally identifiable information (excluding unique user name identifiers provided as a normal part of a transactional record). (4) Biometric data or personal characteristics used to authenticate identity. (5) Sensitive financial records (e.g., account numbers, access codes). (6) Content related to internal security functions: private encryption keys, whitelist or blacklist rules, object permission attributes and settings"
+          ]
+        },
+        {
+          "param-id": "cm-8.2_prm_1",
+          "values": [
+            "automated mechanisms as documented in the SSPP/CM Plan"
+          ]
+        },
+        {
+          "param-id": "ca-08_odp.01",
+          "values": [
+            "during A&A efforts and annually thereafter"
+          ]
+        },
+        {
+          "param-id": "ca-08_odp.02",
+          "values": [
+            "all Internet accessible, FIPS 199 High impact, and High Value Asset (HVA) information systems"
+          ]
+        },
+        {
+          "param-id": "cm-03.01_odp.01",
+          "values": [
+            "automated mechanisms as identified in the SSPP/CM Plan"
+          ]
+        },
+        {
+          "param-id": "cm-03.01_odp.02",
+          "values": [
+            "GSA S/SO or Contractor recommended approval authorities approved by the GSA CISO and AO"
+          ]
+        },
+        {
+          "param-id": "cm-03.01_odp.03",
+          "values": [
+            "GSA S/SO or Contractor recommended time period approved by the GSA CISO and AO"
+          ]
+        },
+        {
+          "param-id": "cm-03.01_odp.03",
+          "values": [
+            "Administrators (Application, System, Network, etc.), Information System Security Officer, Information System Security Manager, System Owner (e.g., System Program Manager, System Project Manager)"
+          ]
+        },
+        {
+          "param-id": "cm-07.05_odp.01",
+          "values": [
+            "GSA S/SO or Contractor recommended software programs authorized to execute on the information system as approved by the GSA CISO and AO"
+          ]
+        },
+        {
+          "param-id": "cm-06.01_odp.01",
+          "values": [
+            "all operating systems"
+          ]
+        },
+        {
+          "param-id": "cm-6.1_prm_2",
+          "values": [
+            "automated mechanisms as documented in the SSPP/CM Plan"
+          ]
+        }
+      ]
+    }
+  }
+}

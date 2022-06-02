@@ -16,7 +16,7 @@ The TTS Engineering Practices Guide to [Choosing a Web App Architecture](https:/
 
 **We will use [Eleventy](https://www.11ty.dev/) (sometimes styled as 11ty) to build the frontend**
 
-Considerations:
+## Considerations:
 
 * Eleventy is well-supported on Federalist/Cloud.gov Pages, with an [official new site template](https://github.com/cloud-gov/11ty-uswds-template/) in the works.
 * Eleventy is highly configurable, but can support workflows that will be familiar to Jekyll users, of which there are many at GSA.
