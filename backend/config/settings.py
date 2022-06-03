@@ -42,6 +42,7 @@ LOGGING = {
         "require_debug_false": {"()": "django.utils.log.RequireDebugFalse"},
         "require_debug_true": {"()": "django.utils.log.RequireDebugTrue"},
     },
+    "formatters": {"json": {"()": "pythonjsonlogger.jsonlogger.JsonFormatter"}},
     "handlers": {
         "local_debug_logger": {
             "level": "DEBUG",
@@ -51,6 +52,7 @@ LOGGING = {
         "prod_logger": {
             "level": "INFO",
             "filters": ["require_debug_false"],
+            "formatter": "json",
             "class": "logging.StreamHandler",
         },
     },

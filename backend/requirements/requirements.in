@@ -8,3 +8,4 @@ uritemplate
 whitenoise
 django-cors-headers
 requests
+python-json-logger
