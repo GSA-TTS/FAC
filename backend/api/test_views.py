@@ -239,3 +239,4 @@ class SACCreationTests(TestCase):
         sac = SingleAuditChecklist.objects.get(id=data["sac_id"])
         self.assertEqual(sac.submitted_by, self.user)
         self.assertEqual(sac.auditee_uei, "ZQGGHJH74DW7")
+        self.assertEqual(sac.submission_status, "in_progress")
