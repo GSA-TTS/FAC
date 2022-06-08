@@ -15,6 +15,10 @@ User = get_user_model()
 
 
 class SingleAuditChecklist(models.Model):
+    """
+    Monolithic Single Audit Checklist.
+    """
+
     USER_PROVIDED_ORGANIZATION_TYPE = (
         ("state", _("State")),
         ("local", _("Local Government")),
@@ -35,10 +39,19 @@ class SingleAuditChecklist(models.Model):
         ("biennial", _("Biennial")),
         ("other", _("Other")),
     )
+    STATUSES = (
+        ("in_progress", _("In progress")),
+        ("submitted", _("Submitted")),
+        ("received", _("Received")),
+        ("available", _("Available")),
+    )
 
     # 0. Meta data
     submitted_by = models.ForeignKey(User, on_delete=models.PROTECT)
     date_created = models.DateTimeField(auto_now_add=True)
+    submission_status = models.CharField(
+        max_length=16, choices=STATUSES, default=STATUSES[0][0]
+    )
 
     # Part 1: General Information
     # Q1 Fiscal Dates
@@ -68,8 +81,8 @@ class SingleAuditChecklist(models.Model):
     )
     auditee_uei = models.CharField(
         max_length=12,
-        verbose_name=_("UEI"),
-        help_text=_("Unique Entity Identifier"),
+        verbose_name=_("Auditee UEI"),
+        help_text=_("Auditee Unique Entity Identifier"),
         validators=[
             MinLengthValidator(12),
             validate_uei_alphanumeric,
