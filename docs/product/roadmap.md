@@ -7,6 +7,7 @@ This is a high-level overview. For more detail, see our [story map](https://www.
 ## Product Vision
 * Fully transition the FAC PMO from Census to TTS
 * Transition the [current Census FAC product](https://facweb.census.gov/) into something TTS can maintain
+* Modernize the product in a number of beneficial ways to the public and government users
 * Reduce risk and prove value by delivering incremental product updates 
 
 ## Release: MVP
