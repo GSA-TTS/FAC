@@ -33,6 +33,32 @@ DEBUG = env.bool("DJANGO_DEBUG", default=False)
 
 ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=["*"])
 
+# Logging
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "filters": {
+        "require_debug_false": {"()": "django.utils.log.RequireDebugFalse"},
+        "require_debug_true": {"()": "django.utils.log.RequireDebugTrue"},
+    },
+    "formatters": {"json": {"()": "pythonjsonlogger.jsonlogger.JsonFormatter"}},
+    "handlers": {
+        "local_debug_logger": {
+            "level": "DEBUG",
+            "filters": ["require_debug_true"],
+            "class": "logging.StreamHandler",
+        },
+        "prod_logger": {
+            "level": "INFO",
+            "filters": ["require_debug_false"],
+            "formatter": "json",
+            "class": "logging.StreamHandler",
+        },
+    },
+    "loggers": {"django": {"handlers": ["local_debug_logger", "prod_logger"]}},
+}
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -91,7 +117,9 @@ WSGI_APPLICATION = "config.wsgi.application"
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
 DATABASES = {
-    "default": env.dj_db_url("DATABASE_URL", default="postgres:///backend"),
+    "default": env.dj_db_url(
+        "DATABASE_URL", default="postgres://postgres:password@0.0.0.0/backend"
+    ),
 }
 
 

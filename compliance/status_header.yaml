@@ -1,0 +1,11 @@
+implementation-status:
+  - c-not-implemented
+  - c-partially-implemented
+  - c-planned
+  - c-alternative-implementation
+  - c-not-applicable
+control-origination:
+  - c-inherited
+  - c-common-control
+  - c-hybrid-control
+  - c-system-specific-control
