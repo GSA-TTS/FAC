@@ -51,7 +51,7 @@ This is a high-level overview. For more detail, see our [story map](https://www.
 **Goals:** Fully replace the Census FAC, which at this point can be taken off the internet. At this point the new TTS FAC will be the authoratative source for all historical FAC data. 
 
 **Success Metrics (proposed):** 
-* Number of successful FY2022 submissions compared to previous time frame
+* Amount of FAC data disseminated compared to previous time frame
 * Number of support inquiries compared to previous time frame
 
 **Key Features:**
