@@ -18,7 +18,7 @@ UEIs are [specifically structured](https://www.gsa.gov/about-us/organization/fed
 
 **We will use [SAM.gov's Entity API](https://open.gsa.gov/api/entity-api/) to fully validate UEIs and retrieve entity data**
 
-Considerations:
+## Considerations:
 
 * Fully offline verification of UEIs isn't possible
 * A verified System Account is required for SAM.gov
