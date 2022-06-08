@@ -24,6 +24,7 @@ This is a high-level overview. For more detail, see our [story map](https://www.
 * Login.gov integration
 * Homepage with nav linking to old FAC static pages + 
 * Minimal new content living on new site (Informational content for new system features)
+* Email notifications (status change notifications, etc)
 * “Frontend” user roles + UI 
     * These are the users who submit/certify audits
     * Let the person who creates an audit add other users with the same perms. 
@@ -31,6 +32,7 @@ This is a high-level overview. For more detail, see our [story map](https://www.
 * “Backend” user roles + UI 
     * These are admins and customer support roles
     * DJango admin for UI?
+* Have a path to transfer data from new FAC to current FAC, preferably in real time
 * ATO
 * Release (domain name, public launch, user relations)
     * Unknowns here for cross agency coordination
@@ -38,7 +40,6 @@ This is a high-level overview. For more detail, see our [story map](https://www.
 ## Possibly not MVP release
 
 **Key Features:**
-* Have a path to transfer data from new FAC to current FAC, preferably in real time
 * Automated post-submission verification
     * Very basic, like year in excel match year submitted? UEI’s match?
 * Non-xls input to audit packages
