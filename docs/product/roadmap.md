@@ -48,7 +48,7 @@ This is a high-level overview. For more detail, see our [story map](https://www.
 * Copying over FAQ’s and other pages
 * Submitting revisions to an audit package
 
-## Definitely not MVP release
+## Full FAC functionality release
 
 **Goals:** Fully replace the Census FAC, which at this point can be taken off the internet. At this point the new TTS FAC will be the authoratative source for all historical FAC data. 
 
