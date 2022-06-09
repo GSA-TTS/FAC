@@ -24,12 +24,7 @@ It covers the following stories:
 
 **Definition of Done**
 
-- [ ] Meets technical definition of done
 - [ ] Meets acceptance criteria
-- [ ] PO approved
-- [ ] Usability tested
-- [ ] Automated accessibility tests pass
-- [ ] Manual accessibility tested (screen reader, keyboard navigation)
-- [ ] FE test suite updated to test the form
-- [ ] API test suite updated to demonstrate functionality, correctness.
-- [ ] Rough draft of support documentation ("exists" not "perfect").
+- [ ] Screen reader - Listen to the experience with a screen reader extension, ensure the information presented in order
+- [ ] Keyboard navigation - Run through acceptance criteria with keyboard tabs, ensure it works. 
+- [ ] Text scaling - Adjust viewport to 1280 pixels wide and zoom to 200%, ensure everything renders as expected. Document 400% zoom issues with USWDS if appropriate.
