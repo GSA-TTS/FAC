@@ -5,6 +5,7 @@ Product roadmap
 This is a high-level overview. For more detail, see our [story map](https://www.google.com/url?q=https://app.mural.co/t/gsa6/m/gsa6/1647625636085/7825fa5ead63ebb1b65eefab5ea20d24a8ab7c59?wid%3D0-1647626493256%26sender%3Dua4d37dfba3f1e69e09078790&sa=D&source=docs&ust=1654713307298233&usg=AOvVaw2VRKptBGcaZgHol3V6vXpw) or [user flows chart](https://app.mural.co/t/gsa6/m/gsa6/1654109929324/5da173ea5f7ba75104e4e624451e58496a7164c8?sender=ua4d37dfba3f1e69e09078790). As with all agile product roadmaps, this is subject to change. The team revisits and adjusts the roadmap regularly. 
 
 ## Product Vision
+* The new grants clearinghouse will be a trusted, transparent and quickly actionable source of grants information to speed reporting, audit resolution, and risk mitigation.
 * Fully transition the FAC PMO from Census to TTS
 * Transition the [current Census FAC product](https://facweb.census.gov/) into something TTS can maintain
 * Modernize the product in a number of beneficial ways to the public and government users
