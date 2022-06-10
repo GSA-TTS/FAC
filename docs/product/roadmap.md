@@ -14,6 +14,8 @@ This is a high-level overview of the FAC **product** roadmap. We recognize that 
 ## Release: MVP
 **Goals:** Launch a new FAC intake experience for at least some of current FAC customers on or around 10/1 to begin accepting audits for FY2022. Per the discussed and approved [migration plan](https://github.com/GSA-TTS/FAC/blob/main/docs/product/decisions/0004-P-migration-plan.md), the idea is to keep the old Census FAC running and import FY2022 submissions into that for data dissemination. This will help limit scope and reduce risk of the MVP. 
 
+IMPORTANT NOTE: This system does not meet our full obligations as the Clearinghouse
+
 **Success Metrics (proposed):** 
 * We can accept single audits
 
