@@ -38,6 +38,7 @@ IMPORTANT NOTE: This system does not meet our full obligations as the Clearingho
 * “Frontend” user roles + UI 
 * Status notifications / state machine
 * Email notifications (user role invite, status change notifications, etc)
+* Invalid resubmission flow, resubmission workaround for user-generated revisions
 
 **Milestone 4:** Backend + Support
 * “Backend” user roles + UI 
