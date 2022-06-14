@@ -31,6 +31,7 @@ IMPORTANT NOTE: This system does not meet our full obligations as the Clearingho
 **Milestone 2:** SAC
 * (front + backend implementation) Submit an audit package (post SAC forms)
 * Excel file ingest
+* PDF Validation (text, searchable, unlocked)
 * (design/exploration) user roles
 
 **Milestone 3:** Status and user business logic
@@ -56,7 +57,6 @@ IMPORTANT NOTE: This system does not meet our full obligations as the Clearingho
     * Very basic, like year in excel match year submitted? UEI’s match?
 * Non-xls input to audit packages
 * Copying over FAQ’s and other pages
-* Submitting revisions to an audit package
 
 ## Full FAC functionality release
 
