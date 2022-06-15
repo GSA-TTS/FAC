@@ -23,20 +23,22 @@ IMPORTANT NOTE: This system does not meet our full obligations as the Clearingho
 
 **Milestone 1:** Pre-SAC
 * (80% ✅) Create a new audit (pre SAC forms)
-* (10% ✅) SAC forms
 * (design) Submit an audit package (post SAC forms)
 * Login.gov integration
 * Homepage with nav linking to old FAC static pages
 
 **Milestone 2:** SAC
+* (10% ✅) SAC forms
 * (front + backend implementation) Submit an audit package (post SAC forms)
 * Excel file ingest
+* PDF Validation (text, searchable, unlocked)
 * (design/exploration) user roles
 
 **Milestone 3:** Status and user business logic
 * “Frontend” user roles + UI 
 * Status notifications / state machine
 * Email notifications (user role invite, status change notifications, etc)
+* Invalid resubmission flow, resubmission workaround for user-generated revisions
 
 **Milestone 4:** Backend + Support
 * “Backend” user roles + UI 
@@ -56,7 +58,6 @@ IMPORTANT NOTE: This system does not meet our full obligations as the Clearingho
     * Very basic, like year in excel match year submitted? UEI’s match?
 * Non-xls input to audit packages
 * Copying over FAQ’s and other pages
-* Submitting revisions to an audit package
 
 ## Full FAC functionality release
 
@@ -73,3 +74,4 @@ IMPORTANT NOTE: This system does not meet our full obligations as the Clearingho
 * Data import from old FAC
 * Login for government users (via Max.gov)
 * Not handling changes to form over time/in future (it’s likely that in some future year the questions on * the form will change, and we’re not trying to design for that for MVP)
+* Submitting revisions to an audit package
