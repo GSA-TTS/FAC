@@ -23,12 +23,12 @@ IMPORTANT NOTE: This system does not meet our full obligations as the Clearingho
 
 **Milestone 1:** Pre-SAC
 * (80% ✅) Create a new audit (pre SAC forms)
-* (10% ✅) SAC forms
 * (design) Submit an audit package (post SAC forms)
 * Login.gov integration
 * Homepage with nav linking to old FAC static pages
 
 **Milestone 2:** SAC
+* (10% ✅) SAC forms
 * (front + backend implementation) Submit an audit package (post SAC forms)
 * Excel file ingest
 * PDF Validation (text, searchable, unlocked)
