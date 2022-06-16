@@ -21,33 +21,62 @@ IMPORTANT NOTE: This system does not meet our full obligations as the Clearingho
 
 **Assumptions** These milestones are sequenced and grouped thematically and are intended to be about equal size in effort, however they are not grounded in estimation. They are made under the assumption that the FAC is adequately staffed through the engagement. 
 
-**Milestone 1:** Pre-SAC
-* (80% ✅) Create a new audit (pre SAC forms)
-* (design) Submit an audit package (post SAC forms)
-* Login.gov integration
-* Homepage with nav linking to old FAC static pages
+### Milestone 1: Pre-SAC
 
-**Milestone 2:** SAC
+**Value delivered:**
+Guide auditees in their first steps to submitting a new audit. Present a homepage to them with a clear CTA, explain why they need to log in to submit a new audit, guide them through the "Pre-SAC" forms where they: 
+* Verify their entity meets single audit criterea
+* Submit basic information about the audit, including their UEI
+* Specify who needs access to an audit
+
+**Specific deliverables:**
+* (80% ✅) Homepage with nav linking to old FAC static pages
+* (80% ✅) Create a new audit (pre SAC forms)
+* (20% ✅) Login.gov integration
+* (design/exploration) SAC forms (Submit an audit package)
+
+### Milestone 2: SAC forms (Submit an audit package)
+
+**Value delivered:**
+Now that auditees have filled out basic information about their audit submission, they need to be able to submit the audit itself. While the current FAC allows users to submit form data and excel files, it's most valuable (and quite possibly sufficient for MVP release) to just allow them to upload templatized excel files for their audit. It's important for to validate excel files and PDF uploads to reduce the chance of audit rejection, which consumes time of both government staff and auditee staff. 
+
+**Specific deliverables:**
 * (10% ✅) SAC forms
-* (front + backend implementation) Submit an audit package (post SAC forms)
+* Submit an audit package (post SAC forms)
 * Excel file ingest
 * PDF Validation (text, searchable, unlocked)
-* (design/exploration) user roles
+* (design/exploration) Status and user business logic
 
-**Milestone 3:** Status and user business logic
+### Milestone 3: Status and user business logic
+
+**Value delivered:**
+Now that an auditee has submitted an audit, we need to communicate what's next for them. That includes a system to communicate audit status via confirmation and update emails as well as an audit status dashboard. If an audit is rejected, the auditee must be given clear instructions for how to re-submit. 
+
+**Specific deliverables:**
 * “Frontend” user roles + UI 
 * Status notifications / state machine
 * Email notifications (user role invite, status change notifications, etc)
 * Invalid resubmission flow, resubmission workaround for user-generated revisions
 
-**Milestone 4:** Backend + Support
+### Milestone 4: Backend + Support
+
+**Value delivered:**
+Audit data needs to be disseminated to auditors and the general public. The easiest way to do this is to provide a pathway to transfer data to the original FAC to have the data dissemination take place there. In order to avoid building a complicated and temporary two-way sync, we need to provide auditors access to a simple backend to the new FAC to update audit status. 
+
+**Specific deliverables:**
 * “Backend” user roles + UI 
 * Have a path to transfer data from new FAC to current FAC, preferably in real time
 * Minimal new content living on new site (Informational content for new system features)
 * Begin customer support and help documentation
 
-**Milestone 5:** Release
+### Milestone 5: Release
+
+**Value delivered:**
+The general public gets to use the new, more acessible FAC. The FAC product gets its first live feedback. 
+
+**Specific deliverables:**
 * ATO
+* Copy updates, potentially including multi-lingual copy
 * Release (domain name, public launch, user relations)
     * Unknowns here for cross agency coordination
 
