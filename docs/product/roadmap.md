@@ -22,9 +22,10 @@ Guide auditees in their first steps to submitting a new audit. Present a homepag
 * Verify their entity meets single audit criteria
 * Submit basic information about the audit, including their UEI
 * Specify who needs access to an audit
+Additional value here is preventing entities that don't meet the criteria from submitting erroneous audits and protects the FAC from publicizing data that should not be made public.
 
 **Specific deliverables:**
-* (80% ✅) Homepage with nav linking to old FAC static pages
+* (80% ✅) Homepage with linking to the old Census FAC where appropriate to provide a path to the full FAC experience
 * (80% ✅) Create a new audit (pre SAC forms)
 * (20% ✅) Login.gov integration
 * (design/exploration) SAC forms (Submit an audit package)
@@ -33,10 +34,10 @@ Guide auditees in their first steps to submitting a new audit. Present a homepag
 ### Milestone: Submit an audit package
 
 **Value delivered:**
-Now that auditees have filled out basic information about their audit submission, they need to be able to submit the audit itself. While the current FAC allows users to submit form data and excel files, it's most valuable (and quite possibly sufficient for MVP release) to just allow them to upload templatized excel files for their audit. It's important to validate excel files and PDF uploads to reduce the chance of audit rejection, which consumes time of both government staff and auditee staff. 
+Now that auditees have filled out basic information about their audit submission, they need to be able to submit the audit itself. While the current FAC allows users to submit form data and excel files, it's most valuable (and quite possibly sufficient for MVP release) to just allow them to upload templatized excel files for their audit. It's important to validate excel files and PDF uploads to reduce the chance of submitting an incomplete audit, which consumes time of both government staff and auditee staff. 
 
 **Specific deliverables:**
-* (10% ✅) SAC forms
+* (10% ✅) SF-SAC forms (OMB form)
 * Submit an audit package (post SAC forms)
 * Excel file ingest
 * PDF Validation (text, searchable, unlocked)
