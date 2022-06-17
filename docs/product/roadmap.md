@@ -177,7 +177,7 @@ Delivery options
 
 
 ## ~~Option 3: Integrate more closely with the current FAC~~
-NINA: Let's assume we don't have to consider this optionn
+NINA: Let's assume we don't have to consider this option
 
 **Goals:** Avoid the risks of big rewrite and deploy more modest updates incrementally. Avoid risk of Census being asked to maintain current system past a certain date. 
 
