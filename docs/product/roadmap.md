@@ -196,8 +196,6 @@ NOTE: This is currently just an idea from Peter to spark discussion, not a vette
 1. Public data dissemination
 1. [NEW] integrate and somehow release on current FAC system
 1. Accommodate and transfer old-FAC data
-1. [NEW] integrate and somehow release on current FAC system
+1. **[NEW] integrate and somehow release on NEW FAC system**
 1. Data integrity / flexibility (potentially optional)
-1. [NEW] integrate and somehow release on current FAC system
 1. Submission enhancements (potentially optional)
-1. [NEW] integrate and somehow release on current FAC system
