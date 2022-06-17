@@ -22,6 +22,7 @@ Guide auditees in their first steps to submitting a new audit. Present a homepag
 * Verify their entity meets single audit criteria
 * Submit basic information about the audit, including their UEI
 * Specify who needs access to an audit
+
 Additional value here is preventing entities that don't meet the criteria from submitting erroneous audits and protects the FAC from publicizing data that should not be made public.
 
 **Specific deliverables:**
