@@ -143,7 +143,7 @@ Delivery options
 
 **Drawbacks:** Two FAC websites at once is not ideal UX for public or agencies. We change the world on both agencies and the public twice instead of once. 
 
-**Milestone sequence**
+**Milestone sequence:**
 1. Pre-SAC
 1. Submit an audit package
 1. Status and user business logic
@@ -159,11 +159,13 @@ Delivery options
 
 ## Option 2: One major release
 
-**Goals:** Replace census FAC in a single release to minimize number of transitions. 
+**Overview:** Replace census FAC in a single release when it's ready to fully replace the Census FAC
+
+**Benefits:** Minimize number of transitions we put users through. 
 
 **Drawbacks:** More time before we deliver value to the public. We don't learn as quickly from the public. More risk in a single release. 
 
-**Milestone sequence**
+**Milestone sequence:**
 1. Pre-SAC
 1. Submit an audit package
 1. Status and user business logic
@@ -177,15 +179,18 @@ Delivery options
 
 
 ## ~~Option 3: Integrate more closely with the current FAC~~
-NINA: Let's assume we don't have to consider this option
 
-**Goals:** Avoid the risks of big rewrite and deploy more modest updates incrementally. Avoid risk of Census being asked to maintain current system past a certain date. 
+**Overview:** Bring on resources to own the legacy FAC, roll out more frequent incremental releases on top of it. 
+
+NINA: Let's assume we don't have to consider this option
 
 NOTE: This is currently just an idea from Peter to spark discussion, not a vetted proposal
 
+**Benefits:** Avoid the risks of big rewrite as we're always finding more stuff it does. Avoid risk of Census being asked to maintain current system past a certain date. 
+
 **Drawbacks:** Need to onboard specialized staff to maintain old system, likely to take longer, risks of code bloat with various integration layers. 
 
-**Milestone sequence**
+**Milestone sequence:**
 1. [NEW] hire and onboard legacy stack resources
 1. Submit an audit package
 1. Status and user business logic
