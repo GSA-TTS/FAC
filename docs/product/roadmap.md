@@ -176,9 +176,10 @@ Delivery options
 1. **Initial release**
 
 
-## Option 3: Integrate more closely with the current FAC
+## ~~Option 3: Integrate more closely with the current FAC~~
+NINA: Let's assume we don't have to consider this optionn
 
-**Goals:** Avoid the risks of big rewrite and deploy more modest updates incrementally. Solve issue of Census not being willing to maintain old system past a certain date. 
+**Goals:** Avoid the risks of big rewrite and deploy more modest updates incrementally. Avoid risk of Census being asked to maintain current system past a certain date. 
 
 NOTE: This is currently just an idea from Peter to spark discussion, not a vetted proposal
 
