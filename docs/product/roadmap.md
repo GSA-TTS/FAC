@@ -34,7 +34,7 @@ Additional value here is preventing entities that don't meet the criteria from s
 ### Milestone: Submit an audit package
 
 **Value delivered:**
-Now that auditees have filled out basic information about their audit submission, they need to be able to submit the audit itself. While the current FAC allows users to submit form data and excel files, it's most valuable (and quite possibly sufficient for MVP release) to just allow them to upload templatized excel files for their audit. It's important to validate excel files and PDF uploads to reduce the chance of submitting an incomplete audit, which consumes time of both government staff and auditee staff. 
+Now that auditees have filled out basic information about their audit submission, they need to be able to submit the audit itself. While the current FAC allows users to submit form data and excel files, it's most valuable (and quite possibly sufficient for MVP release) to just allow them to upload templatized excel files for their audit. It's important to validate excel files and PDF uploads to reduce the chance of submitting an incomplete audit, which consumes time of both government staff and auditee staff. This step also makes it possible for auditee and auditor certifying officials to certify that the audit can be made public.
 
 **Specific deliverables:**
 * (10% ✅) SF-SAC forms (OMB form)
@@ -47,7 +47,7 @@ Now that auditees have filled out basic information about their audit submission
 ### Milestone: Status and user business logic
 
 **Value delivered:**
-Now that an auditee has submitted an audit, we need to communicate what's next for them. That includes a system to communicate audit status via confirmation and update emails as well as an audit status dashboard. If an audit is rejected, the auditee must be given clear instructions for how to re-submit. 
+Now that an auditee has submitted an audit, we need to communicate what's next for them. That includes a system to communicate audit status via confirmation and update emails as well as an audit status dashboard. If an audit has errors or is incomplete, auditees and auditors need clear instructions on how to resubmit. Status is important because it it triggers when an audit submission is ready to be certified / changes how specific users who have the authority to "certify" can act on the audit. Notifications are also critical because they trigger other people who need to certify/do things with the audit submission in order for it to be submitted/made public to actually go in and do those things.
 
 **Specific deliverables:**
 * “Frontend” user roles + UI 
