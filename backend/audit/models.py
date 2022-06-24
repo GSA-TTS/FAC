@@ -112,22 +112,25 @@ class SingleAuditChecklist(models.Model):
     )
     met_spending_threshold = models.BooleanField()
     is_usa_based = models.BooleanField(verbose_name=_("Is USA Based"))
-    auditor_firm_name = models.CharField(max_length=100, null=True)
-    auditor_ein = models.CharField(
-        max_length=12, verbose_name=_("Auditor EIN"), null=True
-    )
-    auditor_ein_not_an_ssn_attestation = models.BooleanField(
-        verbose_name=_("Attestation: Auditor EIN Not an SSN"), null=True
-    )
-    auditor_country = models.CharField(max_length=100, null=True)
-    auditor_address_line_1 = models.CharField(max_length=100, null=True)
-    auditor_city = models.CharField(max_length=100, null=True)
-    auditor_state = models.CharField(max_length=100, null=True)
-    auditor_zip = models.CharField(max_length=100, null=True)
-    auditor_contact_name = models.CharField(max_length=100, null=True)
-    auditor_contact_title = models.CharField(max_length=100, null=True)
-    auditor_phone = models.CharField(max_length=100, null=True)
-    auditor_email = models.EmailField(max_length=100, null=True)
+
+    auditor_access = models.ManyToOneRel(Access, verbose_name="list of auditors with access")
+
+    # auditor_firm_name = models.CharField(max_length=100, null=True)
+    # auditor_ein = models.CharField(
+    #     max_length=12, verbose_name=_("Auditor EIN"), null=True
+    # )
+    # auditor_ein_not_an_ssn_attestation = models.BooleanField(
+    #     verbose_name=_("Attestation: Auditor EIN Not an SSN"), null=True
+    # )
+    # auditor_country = models.CharField(max_length=100, null=True)
+    # auditor_address_line_1 = models.CharField(max_length=100, null=True)
+    # auditor_city = models.CharField(max_length=100, null=True)
+    # auditor_state = models.CharField(max_length=100, null=True)
+    # auditor_zip = models.CharField(max_length=100, null=True)
+    # auditor_contact_name = models.CharField(max_length=100, null=True)
+    # auditor_contact_title = models.CharField(max_length=100, null=True)
+    # auditor_phone = models.CharField(max_length=100, null=True)
+    # auditor_email = models.EmailField(max_length=100, null=True)
 
     class Meta:
         verbose_name = "SF-SAC"
