@@ -21,6 +21,4 @@ class AuthToken(ObtainAuthToken):
             prior_token.delete()
 
         token = Token.objects.create(user=request.user)
-        return Response({
-            'token': token.key
-        })
+        return Response({"token": token.key})

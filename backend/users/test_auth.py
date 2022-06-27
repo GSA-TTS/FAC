@@ -31,9 +31,7 @@ class JwtUpsertAuthenticationTests(TestCase):
 
         login_id = str(uuid4())
 
-        token = {
-            "sub": login_id
-        }
+        token = {"sub": login_id}
 
         self.assertRaises(InvalidTokenError, auth.get_user, token)
 
@@ -42,10 +40,7 @@ class JwtUpsertAuthenticationTests(TestCase):
 
         login_id = str(uuid4())
 
-        token = {
-            "sub": login_id,
-            "email": "test-email@test.test"
-        }
+        token = {"sub": login_id, "email": "test-email@test.test"}
 
         user = auth.get_user(token)
 
@@ -69,10 +64,7 @@ class JwtUpsertAuthenticationTests(TestCase):
 
         auth = JWTUpsertAuthentication()
 
-        token = {
-            "sub": login_id,
-            "email": "existing-user@test.test"
-        }
+        token = {"sub": login_id, "email": "existing-user@test.test"}
 
         user = auth.get_user(token)
 
@@ -89,13 +81,13 @@ class ExpiringTokenAuthenticationTests(TestCase):
         token = baker.make(Token, user=user)
 
         factory = RequestFactory()
-        request = factory.get('/api', **{"HTTP_AUTHORIZATION": "Token " + token.key})
+        request = factory.get("/api", **{"HTTP_AUTHORIZATION": "Token " + token.key})
 
         auth.authenticate(request)
 
     def test_expired_token(self):
         auth = ExpiringTokenAuthentication()
-        ttl = settings.TOKEN_AUTH['TOKEN_TTL']
+        ttl = settings.TOKEN_AUTH["TOKEN_TTL"]
 
         created = timezone.now() - timedelta(seconds=ttl + 1)
 
@@ -106,6 +98,6 @@ class ExpiringTokenAuthenticationTests(TestCase):
         token.save()
 
         factory = RequestFactory()
-        request = factory.get('/api', **{"HTTP_AUTHORIZATION": "Token " + token.key})
+        request = factory.get("/api", **{"HTTP_AUTHORIZATION": "Token " + token.key})
 
         self.assertRaises(AuthenticationFailed, auth.authenticate, request)

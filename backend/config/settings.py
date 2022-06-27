@@ -192,20 +192,16 @@ REST_FRAMEWORK = {
 }
 
 SIMPLE_JWT = {
-    'ALGORITHM': 'RS256',
-    'AUDIENCE': None,
-    'ISSUER': 'https://idp.int.identitysandbox.gov/',
-    'JWK_URL': 'https://idp.int.identitysandbox.gov/api/openid_connect/certs',
-    'LEEWAY': 0,
-
-    'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.UntypedToken',),
-
-    'USER_ID_CLAIM': 'sub',
+    "ALGORITHM": "RS256",
+    "AUDIENCE": None,
+    "ISSUER": "https://idp.int.identitysandbox.gov/",
+    "JWK_URL": "https://idp.int.identitysandbox.gov/api/openid_connect/certs",
+    "LEEWAY": 0,
+    "AUTH_TOKEN_CLASSES": ("rest_framework_simplejwt.tokens.UntypedToken",),
+    "USER_ID_CLAIM": "sub",
 }
 
-TOKEN_AUTH = {
-    "TOKEN_TTL": 3600
-}
+TOKEN_AUTH = {"TOKEN_TTL": 3600}
 
 # CORS
 CORS_ALLOW_ALL_ORIGINS = True

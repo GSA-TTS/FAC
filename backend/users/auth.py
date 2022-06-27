@@ -17,12 +17,14 @@ import random
 class JWTUpsertAuthentication(JWTAuthentication):
     def get_user(self, validated_token):
         try:
-            user_id_claim = settings.SIMPLE_JWT['USER_ID_CLAIM']
+            user_id_claim = settings.SIMPLE_JWT["USER_ID_CLAIM"]
 
             user_id = validated_token[user_id_claim]
-            email = validated_token['email']
+            email = validated_token["email"]
         except KeyError:
-            raise InvalidTokenError(_("Token contained no recognizable user identification"))
+            raise InvalidTokenError(
+                _("Token contained no recognizable user identification")
+            )
 
         try:
             # find an existing user
@@ -32,16 +34,18 @@ class JWTUpsertAuthentication(JWTAuthentication):
             # didn't find one, create a new user
 
             # generate a random password
-            password = ''.join(random.SystemRandom().choice(string.ascii_letters + string.digits) for _ in range(32))
+            password = "".join(
+                random.SystemRandom().choice(string.ascii_letters + string.digits)
+                for _ in range(32)
+            )
 
             # create auth_user
             user = self.user_model.objects.create_user(email, email, password)
 
             # create and associate LoginGovUser instance
-            login_user = LoginGovUser.objects.create(**{
-                "user": user,
-                "login_id": user_id
-            })
+            login_user = LoginGovUser.objects.create(
+                **{"user": user, "login_id": user_id}
+            )
 
         user.last_login = timezone.now()
         user.save()
@@ -54,15 +58,15 @@ class ExpiringTokenAuthentication(TokenAuthentication):
         try:
             user, token = super().authenticate(request)
         except TypeError:
-            raise AuthenticationFailed('Authentication failed!')
+            raise AuthenticationFailed("Authentication failed!")
 
         # determine the age of this token
         now = timezone.now()
         created = token.created
         age = (now - created).total_seconds()
-        ttl = settings.TOKEN_AUTH['TOKEN_TTL']
+        ttl = settings.TOKEN_AUTH["TOKEN_TTL"]
 
-        if (age > ttl):
-            raise AuthenticationFailed('Token expired!')
+        if age > ttl:
+            raise AuthenticationFailed("Token expired!")
 
         return user, token
