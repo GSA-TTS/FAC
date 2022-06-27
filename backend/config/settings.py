@@ -72,7 +72,7 @@ INSTALLED_APPS = [
 
 # Third-party apps
 
-INSTALLED_APPS += ["rest_framework", "corsheaders"]
+INSTALLED_APPS += ["rest_framework", "rest_framework.authtoken", "corsheaders"]
 
 # Our apps
 
@@ -177,6 +177,7 @@ API_VERSION = "0"
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework.authentication.BasicAuthentication",
+        "users.auth.ExpiringTokenAuthentication",
     ],
     "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
@@ -188,6 +189,22 @@ REST_FRAMEWORK = {
         "rest_framework.renderers.BrowsableAPIRenderer",
     ],
     "TEST_REQUEST_DEFAULT_FORMAT": "api",
+}
+
+SIMPLE_JWT = {
+    'ALGORITHM': 'RS256',
+    'AUDIENCE': None,
+    'ISSUER': 'https://idp.int.identitysandbox.gov/',
+    'JWK_URL': 'https://idp.int.identitysandbox.gov/api/openid_connect/certs',
+    'LEEWAY': 0,
+
+    'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.UntypedToken',),
+
+    'USER_ID_CLAIM': 'sub',
+}
+
+TOKEN_AUTH = {
+    "TOKEN_TTL": 3600
 }
 
 # CORS
