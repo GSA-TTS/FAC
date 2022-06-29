@@ -6,7 +6,7 @@ User = get_user_model()
 
 class LoginGovUser(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    login_id = models.CharField(max_length=100, unique=True)
+    login_id = models.CharField(max_length=50, unique=True)
 
 
 class UserProfile(models.Model):
