@@ -41,9 +41,10 @@ Now that auditees have filled out basic information about their audit submission
 
 **Specific deliverables:**
 * (10% ✅) SF-SAC forms (OMB form)
-* Submit an audit package (post SAC forms)
 * Excel file ingest
 * PDF Validation (text, searchable, unlocked)
+* Basic implementation of other features for ATO (Admin, etc)
+* Submit an audit package (post SAC forms)
 * (design/exploration) Status and user business logic
 
 
@@ -53,7 +54,7 @@ Now that auditees have filled out basic information about their audit submission
 Now that an auditee has submitted an audit, we need to communicate what's next for them. That includes a system to communicate audit status via confirmation and update emails as well as an audit status dashboard. If an audit has errors or is incomplete, auditees and auditors need clear instructions on how to resubmit. Status is important because it it triggers when an audit submission is ready to be certified / changes how specific users who have the authority to "certify" can act on the audit. Notifications are also critical because they trigger other people who need to certify/do things with the audit submission in order for it to be submitted/made public to actually go in and do those things.
 
 **Specific deliverables:**
-* “Frontend” user roles + UI 
+* Invite collaborator flow (send / accept invites)
 * Status notifications / state machine
 * Email notifications (user role invite, status change notifications, etc)
 * Invalid resubmission flow, resubmission workaround for user-generated revisions
