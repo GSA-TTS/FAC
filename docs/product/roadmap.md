@@ -205,3 +205,21 @@ NOTE: This is currently just an idea from Peter to spark discussion, not a vette
 1. **[NEW] integrate and somehow release on NEW FAC system**
 1. Data integrity / flexibility (potentially optional)
 1. Submission enhancements (potentially optional)
+
+
+(L)ATO Strategy
+===================
+
+It is crucial for us to find ways to shorten the ATO process and reduce risk of delays in order to meet our timeline commitments. 
+
+* **Lightweight ATO (LATO)** - We believe we qualify for a "lightweight" ATO for our intial release. 
+* **Stack** - We believe the use of a widely known gov stack (Django, Cloud.gov, Login.gov, S3) will make our ATO process smoother
+* **Data** - We believe the public nature of federal audit data with limited PII will not present significant data privacy issues in ATO. We don't believe we'll need SORN. 
+* **Features** - We will pursue a "walking skeleton" approach to (L)ATO where we get a wide array of features in place at a basic level when we begin the (L)ATO process, then build them out while the process begins. The following list is a minimum of what we believe we need to implement to begin our (L)ATO process: 
+  * Login.gov - Authenticate via Login.gov
+  * Forms to collect audit data - Forms accept data and write to a database
+  * Upload PDFs - You can upload a PDF and store it on S3
+  * Excel Spreadsheets - You can upload an Excel spreaksheet and data is parsed from it
+  * Data export - You can export CSV data from the FAC. 
+  * Admin backend - You can log in to an admin interface to see a list of SAC submissions
+* **Subsequent releases** - We must be thoughtful about the ATO implications of subsequent releases. We understand we can do minor improvements and bug fix releases without updating our ATO, but launching major new features will require us to update it. For that reason, we'll likely batch major new features into major releases. 
