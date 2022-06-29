@@ -179,35 +179,6 @@ Delivery options
 1. **Initial release**
 
 
-## ~~Option 3: Integrate more closely with the current FAC~~
-
-**Overview:** Bring on resources to own the legacy FAC, roll out more frequent incremental releases on top of it. 
-
-NINA: Let's assume we don't have to consider this option
-
-NOTE: This is currently just an idea from Peter to spark discussion, not a vetted proposal
-
-**Benefits:** Avoid the risks of big rewrite as we're always finding more stuff it does. Avoid risk of Census being asked to maintain current system past a certain date. 
-
-**Drawbacks:** Need to onboard specialized staff to maintain old system, likely to take longer, risks of code bloat with various integration layers. 
-
-**Milestone sequence:**
-1. [NEW] hire and onboard legacy stack resources
-1. Submit an audit package
-1. Status and user business logic
-1. [NEW] integrate and somehow release on current FAC system
-1. Backend + Support + ~~Data Transfer~~ (avoid the last one)
-1. [NEW] integrate and somehow release on current FAC system
-1. Agency data dissemination
-1. [NEW] integrate and somehow release on current FAC system
-1. Public data dissemination
-1. [NEW] integrate and somehow release on current FAC system
-1. Accommodate and transfer old-FAC data
-1. **[NEW] integrate and somehow release on NEW FAC system**
-1. Data integrity / flexibility (potentially optional)
-1. Submission enhancements (potentially optional)
-
-
 (L)ATO Strategy
 ===================
 
