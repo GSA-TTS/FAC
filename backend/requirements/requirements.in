@@ -9,3 +9,5 @@ whitenoise
 django-cors-headers
 requests
 python-json-logger
+djangorestframework-simplejwt
+cryptography
