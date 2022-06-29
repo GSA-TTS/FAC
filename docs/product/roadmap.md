@@ -192,6 +192,6 @@ It is crucial for us to find ways to shorten the ATO process and reduce risk of 
   * Forms to collect audit data - Forms accept data and write to a database
   * Upload PDFs - You can upload a PDF and store it on S3
   * Excel Spreadsheets - You can upload an Excel spreaksheet and data is parsed from it
-  * Data export - You can export CSV data from the FAC. 
+  * API - There is a public API with SF-SAC data
   * Admin backend - You can log in to an admin interface to see a list of SAC submissions
 * **Subsequent releases** - We must be thoughtful about the ATO implications of subsequent releases. We understand we can do minor improvements and bug fix releases without updating our ATO, but launching major new features will require us to update it. For that reason, we'll likely batch major new features into major releases. 
