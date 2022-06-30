@@ -67,7 +67,8 @@ Audit data needs to be disseminated to auditors and the general public. The easi
 
 **Specific deliverables:**
 * “Backend” user roles + UI 
-* Have a path to transfer data from new FAC to current FAC, preferably in real time
+* Have a path to transfer data from new FAC to current FAC, preferably via API
+* Document new pathway, change management with Census
 * Minimal new content living on new site (Informational content for new system features)
 * Begin customer support and help documentation
 
