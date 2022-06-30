@@ -1,4 +1,4 @@
-from random import choices
+from secrets import choice
 from django.db import models
 from django.contrib.auth import get_user_model
 from django.core.validators import MinLengthValidator
@@ -33,7 +33,8 @@ class SingleAuditChecklistManager(models.Manager):
 
         """
         year = obj_data["auditee_fiscal_period_start"][:4]
-        trichar = "".join(choices("ABCDEFGHJKLMNPQRSTUVWXYZ1234567890", k=3))
+        chars = "ABCDEFGHJKLMNPQRSTUVWXYZ1234567890"
+        trichar = "".join(choice(chars) for i in range(3))
         count = SingleAuditChecklist.objects.count() + 1_000_001
         report_id = f"{year}{trichar}{str(count).zfill(10)}"
         updated = obj_data | {"report_id": report_id}
