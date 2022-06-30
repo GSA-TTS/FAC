@@ -43,7 +43,7 @@ Now that auditees have filled out basic information about their audit submission
 * (10% ✅) SF-SAC forms (OMB form)
 * Excel file ingest
 * PDF Validation (text, searchable, unlocked)
-* Basic implementation of other features for ATO (Admin, etc)
+* Basic implementation of other features for ATO (Admin, API, etc)
 * Submit an audit package (post SAC forms)
 * (design/exploration) Status and user business logic
 
@@ -56,7 +56,7 @@ Now that an auditee has submitted an audit, we need to communicate what's next f
 **Specific deliverables:**
 * Invite collaborator flow (send / accept invites)
 * Status notifications / state machine
-* Email notifications (user role invite, status change notifications, etc)
+* Email notifications (collaborator invite, status change notifications, etc)
 * Invalid resubmission flow, resubmission workaround for user-generated revisions
 
 
