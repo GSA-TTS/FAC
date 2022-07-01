@@ -28,10 +28,10 @@ Guide auditees in their first steps to submitting a new audit. Present a homepag
 Additional value here is preventing entities that don't meet the criteria from submitting erroneous audits and protects the FAC from publicizing data that should not be made public.
 
 **Specific deliverables:**
-* (80% ✅) Homepage with linking to the old Census FAC where appropriate to provide a path to the full FAC experience
+* (DONE ✅) Technical foundation
 * (80% ✅) Create a new audit (pre SAC forms)
-* (20% ✅) Login.gov integration
-* (design/exploration) SAC forms (Submit an audit package)
+* (80% ✅) Login.gov integration
+* (80% ✅) design/exploration - "Submit an audit package" milestone
 
 
 ## Milestone: Submit an audit package
@@ -58,6 +58,7 @@ Now that an auditee has submitted an audit, we need to communicate what's next f
 * Status notifications / state machine
 * Email notifications (collaborator invite, status change notifications, etc)
 * Invalid resubmission flow, resubmission workaround for user-generated revisions
+* (80% ✅) Homepage with linking to the old Census FAC where appropriate to provide a path to the full FAC experience
 
 
 ## Milestone: Backend + Support + Data Transfer
@@ -71,6 +72,7 @@ Audit data needs to be disseminated to auditors and the general public. The easi
 * Document new pathway, change management with Census
 * Minimal new content living on new site (Informational content for new system features)
 * Begin customer support and help documentation
+* Basic frontend analytics / DAP integration
 
 
 ## Milestone: Initial release
