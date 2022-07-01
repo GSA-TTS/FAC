@@ -64,6 +64,7 @@ Now that an auditee has submitted an audit, we need to communicate what's next f
 
 **Specific deliverables:**
 * Invite collaborator flow (send / accept invites)
+* Possible - roles for certification
 * Status notifications / state machine
 * Email notifications (collaborator invite, status change notifications, etc)
 * Invalid resubmission flow, resubmission workaround for user-generated revisions
