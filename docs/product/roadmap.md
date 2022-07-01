@@ -29,9 +29,9 @@ Additional value here is preventing entities that don't meet the criteria from s
 
 **Specific deliverables:**
 * (DONE ✅) Technical foundation
-* (80% ✅) Create a new audit (pre SAC forms)
-* (80% ✅) Login.gov integration
-* (80% ✅) design/exploration - "Submit an audit package" milestone
+* (90% ✅) Create a new audit (pre SAC forms)
+* (90% ✅) Login.gov integration
+* (60% ✅) design/exploration - "Submit an entire audit package" milestone
 
 ## Milestone: Submit general information end to end / De-risk
 
@@ -42,6 +42,7 @@ To de-risk our product plans, we will focus on an end-to-end solution that bridg
 * [API to transfer data to Census](https://github.com/GSA-TTS/FAC/issues/310)
 * [PDF Validation Spike](https://github.com/GSA-TTS/FAC/issues/307)
 * (We've already done a spike around Excel file ingestion)
+* (60% ✅) design/exploration - "Submit an entire audit package" milestone
 
 
 ## Milestone: Submit an entire audit package
