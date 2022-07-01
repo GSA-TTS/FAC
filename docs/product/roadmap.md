@@ -43,6 +43,7 @@ To de-risk our product plans, we will focus on an end-to-end solution that bridg
 * [PDF Validation Spike](https://github.com/GSA-TTS/FAC/issues/307)
 * (We've already done a spike around Excel file ingestion)
 * (60% ✅) design/exploration - "Submit an entire audit package" milestone
+* (design/exploration) Status and user business logic
 
 
 ## Milestone: Submit an entire audit package
