@@ -35,4 +35,8 @@ class Migration(migrations.Migration):
             name='certifying_auditor_contact',
             field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.PROTECT, related_name='certifying_auditor_contact', to='audit.access'),
         ),
+        migrations.AlterModelOptions(
+            name='access',
+            options={'verbose_name_plural': 'accesses'},
+        ),
     ]

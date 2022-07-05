@@ -9,12 +9,14 @@ assignees: ''
 
 Breakout issue of <story>
 
-**Background**
+### Background
 
-**Acceptance Criteria (We'll know we're done when...)**
+### Acceptance Criteria (We'll know we're done when...)
+
 - [ ] 
 - [ ] 
 
-**Tasks**
+### Tasks
+
 - [ ] 
 - [ ]

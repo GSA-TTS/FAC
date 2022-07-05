@@ -1,4 +1,5 @@
 import json
+from pprint import pprint
 
 from audit.models import Access, SingleAuditChecklist
 from django.urls import reverse
@@ -47,6 +48,33 @@ class EligibilityFormView(APIView):
 
         return Response({"eligible": False, "errors": serializer.errors})
 
+
+class SacSaveFormView(APIView):
+    """
+    Saves a form!
+    """
+    def put(self, request):
+        # sac = SingleAuditChecklist.objects.create(
+        #     submitted_by=request.user, **entry_form_data
+        # )
+        # access_grants = [Access(sac=sac, **acc) for acc in serializer.data]
+        # Access.objects.bulk_create(access_grants)
+        #
+        # # Clear entry form data from profile
+        # request.user.profile.entry_form_data = {}
+        # request.user.profile.save()
+
+        # 1. Get the SAC (or create it)
+        sac = SingleAuditChecklist.objects.filter(request.data.get("sac_id",None))
+
+        #2. Go through each field of request.data
+        pprint(request.data)
+        # 3. Apply it to SAC
+
+        # 4. Save SAC
+
+
+        return Response({})
 
 class UEIValidationFormView(APIView):
     """

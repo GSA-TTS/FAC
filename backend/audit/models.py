@@ -40,7 +40,10 @@ class Access(models.Model):
     )
 
     def __str__(self):
-        return f"{self.email} as {self.role} for {self.sac}"
+        return f"{self.email} as {self.get_role_display()}"
+
+    class Meta:
+        verbose_name_plural = "accesses"
 
 
 class SingleAuditChecklist(models.Model):
