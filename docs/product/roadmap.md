@@ -28,22 +28,32 @@ Guide auditees in their first steps to submitting a new audit. Present a homepag
 Additional value here is preventing entities that don't meet the criteria from submitting erroneous audits and protects the FAC from publicizing data that should not be made public.
 
 **Specific deliverables:**
-* (80% ✅) Homepage with linking to the old Census FAC where appropriate to provide a path to the full FAC experience
-* (80% ✅) Create a new audit (pre SAC forms)
-* (20% ✅) Login.gov integration
-* (design/exploration) SAC forms (Submit an audit package)
+* (DONE ✅) Technical foundation
+* (90% ✅) Create a new audit (pre SAC forms)
+* (90% ✅) Login.gov integration
+* (60% ✅) design/exploration - "Submit an entire audit package" milestone
+
+## Milestone: Submit general information end to end / De-risk
+
+**Value delivered:**
+To de-risk our product plans, we will focus on an end-to-end solution that bridges data input to dissemination to the current FAC. This will include a fully fleshed out SF-SAC general information page. We will also build out the API to de-risk unknows in end-to-end implementation and unblock our partners at Census by providing specifics of API format. 
+
+* (20% ✅) [General information - SF-SAC data entry](https://github.com/GSA-TTS/FAC/issues/185)
+* [API to transfer data to Census](https://github.com/GSA-TTS/FAC/issues/310)
+* [PDF Validation Spike](https://github.com/GSA-TTS/FAC/issues/307)
+* (We've already done a spike around Excel file ingestion)
+* (60% ✅) design/exploration - "Submit an entire audit package" milestone
+* (design/exploration) Status and user business logic
 
 
-## Milestone: Submit an audit package
+## Milestone: Submit an entire audit package
 
 **Value delivered:**
 Now that auditees have filled out basic information about their audit submission, they need to be able to submit the audit itself. While the current FAC allows users to submit form data and excel files, it's most valuable (and quite possibly sufficient for MVP release) to just allow them to upload templatized excel files for their audit. It's important to validate excel files and PDF uploads to reduce the chance of submitting an incomplete audit, which consumes time of both government staff and auditee staff. This step also makes it possible for auditee and auditor certifying officials to certify that the audit can be made public.
 
 **Specific deliverables:**
-* (10% ✅) SF-SAC forms (OMB form)
-* Excel file ingest
 * PDF Validation (text, searchable, unlocked)
-* Basic implementation of other features for ATO (Admin, API, etc)
+* Excel file ingest 
 * Submit an audit package (post SAC forms)
 * (design/exploration) Status and user business logic
 
@@ -55,22 +65,24 @@ Now that an auditee has submitted an audit, we need to communicate what's next f
 
 **Specific deliverables:**
 * Invite collaborator flow (send / accept invites)
+* Possible - roles for certification
 * Status notifications / state machine
 * Email notifications (collaborator invite, status change notifications, etc)
 * Invalid resubmission flow, resubmission workaround for user-generated revisions
+* (80% ✅) Homepage with linking to the old Census FAC where appropriate to provide a path to the full FAC experience
 
 
-## Milestone: Backend + Support + Data Transfer
+## Milestone: Backend + Support
 
 **Value delivered:**
 Audit data needs to be disseminated to auditors and the general public. The easiest way to do this is to provide a pathway to transfer data to the original FAC to have the data dissemination take place there. In order to avoid building a complicated and temporary two-way sync, we need to provide auditors access to a simple backend to the new FAC to update audit status. 
 
 **Specific deliverables:**
 * “Backend” user roles + UI 
-* Have a path to transfer data from new FAC to current FAC, preferably via API
-* Document new pathway, change management with Census
+  * This is very undefined at the moment
 * Minimal new content living on new site (Informational content for new system features)
 * Begin customer support and help documentation
+* Basic frontend analytics / DAP integration
 
 
 ## Milestone: Initial release
@@ -81,6 +93,7 @@ The general public gets to use the new, more accessible FAC. The FAC product get
 **Specific deliverables:**
 * ATO
 * Copy updates, potentially including multi-lingual copy
+* Update SAM.gov and Login.gov API credentials to production 
 * Release (domain name, public launch, user relations)
     * Unknowns here for cross agency coordination
 
@@ -188,11 +201,5 @@ It is crucial for us to find ways to shorten the ATO process and reduce risk of 
 * **Lightweight ATO (LATO)** - We believe we qualify for a "lightweight" ATO for our intial release, which will take less time. 
 * **Common Stack** - We believe the use of a widely known gov stack (Django, Cloud.gov, Login.gov, S3) will make our ATO process smoother
 * **Public Data** - We believe the public nature of federal audit data with limited PII will not present significant data privacy issues in ATO. We don't believe we'll need SORN. 
-* **Walking Skeleton** - We will pursue a "walking skeleton" approach to (L)ATO where we get a wide array of features in place at a basic level when we begin the (L)ATO process, then build them out while the process begins. The following list is a minimum of what we believe we need to implement to begin our (L)ATO process: 
-  * Login.gov - Authenticate via Login.gov
-  * Forms to collect audit data - Forms accept data and write to a database
-  * Upload PDFs - You can upload a PDF and store it on S3
-  * Excel Spreadsheets - You can upload an Excel spreaksheet and data is parsed from it
-  * API - There is a public API with SF-SAC data
-  * Admin backend - You can log in to an admin interface to see a list of SAC submissions
-* **Batched subsequent releases** - We must be thoughtful about the ATO implications of subsequent releases. We understand we can do minor improvements and bug fix releases without updating our ATO, but launching major new features will require us to update it. For that reason, we'll likely batch major new features into major releases. 
+* **Documentation Resources** - We have a security engineer coming onboard to help document security features in a SSP Template
+* **Batched subsequent releases** - We must be thoughtful about the ATO implications of subsequent releases. We understand we can do minor improvements and bug fix releases without updating our ATO, but launching major new features will require us to update it. For that reason, we'll likely batch major new features into major releases. We also may incorporate incorporate a "walking skeleton" approach in an initial release to cover subsequent releases. 
