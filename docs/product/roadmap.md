@@ -41,9 +41,10 @@ Now that auditees have filled out basic information about their audit submission
 
 **Specific deliverables:**
 * (10% ✅) SF-SAC forms (OMB form)
-* Submit an audit package (post SAC forms)
 * Excel file ingest
 * PDF Validation (text, searchable, unlocked)
+* Basic implementation of other features for ATO (Admin, API, etc)
+* Submit an audit package (post SAC forms)
 * (design/exploration) Status and user business logic
 
 
@@ -53,9 +54,9 @@ Now that auditees have filled out basic information about their audit submission
 Now that an auditee has submitted an audit, we need to communicate what's next for them. That includes a system to communicate audit status via confirmation and update emails as well as an audit status dashboard. If an audit has errors or is incomplete, auditees and auditors need clear instructions on how to resubmit. Status is important because it it triggers when an audit submission is ready to be certified / changes how specific users who have the authority to "certify" can act on the audit. Notifications are also critical because they trigger other people who need to certify/do things with the audit submission in order for it to be submitted/made public to actually go in and do those things.
 
 **Specific deliverables:**
-* “Frontend” user roles + UI 
+* Invite collaborator flow (send / accept invites)
 * Status notifications / state machine
-* Email notifications (user role invite, status change notifications, etc)
+* Email notifications (collaborator invite, status change notifications, etc)
 * Invalid resubmission flow, resubmission workaround for user-generated revisions
 
 
@@ -66,7 +67,8 @@ Audit data needs to be disseminated to auditors and the general public. The easi
 
 **Specific deliverables:**
 * “Backend” user roles + UI 
-* Have a path to transfer data from new FAC to current FAC, preferably in real time
+* Have a path to transfer data from new FAC to current FAC, preferably via API
+* Document new pathway, change management with Census
 * Minimal new content living on new site (Informational content for new system features)
 * Begin customer support and help documentation
 
@@ -178,30 +180,19 @@ Delivery options
 1. **Initial release**
 
 
-## ~~Option 3: Integrate more closely with the current FAC~~
+(L)ATO Strategy
+===================
 
-**Overview:** Bring on resources to own the legacy FAC, roll out more frequent incremental releases on top of it. 
+It is crucial for us to find ways to shorten the ATO process and reduce risk of delays in order to meet our timeline commitments. The following strategy will help us do this. 
 
-NINA: Let's assume we don't have to consider this option
-
-NOTE: This is currently just an idea from Peter to spark discussion, not a vetted proposal
-
-**Benefits:** Avoid the risks of big rewrite as we're always finding more stuff it does. Avoid risk of Census being asked to maintain current system past a certain date. 
-
-**Drawbacks:** Need to onboard specialized staff to maintain old system, likely to take longer, risks of code bloat with various integration layers. 
-
-**Milestone sequence:**
-1. [NEW] hire and onboard legacy stack resources
-1. Submit an audit package
-1. Status and user business logic
-1. [NEW] integrate and somehow release on current FAC system
-1. Backend + Support + ~~Data Transfer~~ (avoid the last one)
-1. [NEW] integrate and somehow release on current FAC system
-1. Agency data dissemination
-1. [NEW] integrate and somehow release on current FAC system
-1. Public data dissemination
-1. [NEW] integrate and somehow release on current FAC system
-1. Accommodate and transfer old-FAC data
-1. **[NEW] integrate and somehow release on NEW FAC system**
-1. Data integrity / flexibility (potentially optional)
-1. Submission enhancements (potentially optional)
+* **Lightweight ATO (LATO)** - We believe we qualify for a "lightweight" ATO for our intial release, which will take less time. 
+* **Common Stack** - We believe the use of a widely known gov stack (Django, Cloud.gov, Login.gov, S3) will make our ATO process smoother
+* **Public Data** - We believe the public nature of federal audit data with limited PII will not present significant data privacy issues in ATO. We don't believe we'll need SORN. 
+* **Walking Skeleton** - We will pursue a "walking skeleton" approach to (L)ATO where we get a wide array of features in place at a basic level when we begin the (L)ATO process, then build them out while the process begins. The following list is a minimum of what we believe we need to implement to begin our (L)ATO process: 
+  * Login.gov - Authenticate via Login.gov
+  * Forms to collect audit data - Forms accept data and write to a database
+  * Upload PDFs - You can upload a PDF and store it on S3
+  * Excel Spreadsheets - You can upload an Excel spreaksheet and data is parsed from it
+  * API - There is a public API with SF-SAC data
+  * Admin backend - You can log in to an admin interface to see a list of SAC submissions
+* **Batched subsequent releases** - We must be thoughtful about the ATO implications of subsequent releases. We understand we can do minor improvements and bug fix releases without updating our ATO, but launching major new features will require us to update it. For that reason, we'll likely batch major new features into major releases. 
