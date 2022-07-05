@@ -1,3 +1,4 @@
+from secrets import choice
 from django.db import models
 from django.contrib.auth import get_user_model
 from django.core.validators import MinLengthValidator
@@ -12,6 +13,32 @@ from .validators import (
 )
 
 User = get_user_model()
+
+
+class SingleAuditChecklistManager(models.Manager):
+    """Manager for SAC"""
+
+    def create(self, **obj_data):
+        """
+        Custom create method so that we can add derived fields.
+
+        Currently only used for report_id, a 17-character value consisting of:
+            -   Four-digit year of start of audit period.
+            -   Three-digit char (but without I or O) random.
+            -   10-digit numeric monotonically increasing, but starting from
+                0001000001 because the Census numbers are six-digit values. The
+                formula for creating this is basically "how many non-legacy
+                entries there are in the system plus one plus 1,000,000".
+
+
+        """
+        year = obj_data["auditee_fiscal_period_start"][:4]
+        chars = "ABCDEFGHJKLMNPQRSTUVWXYZ1234567890"
+        trichar = "".join(choice(chars) for i in range(3))
+        count = SingleAuditChecklist.objects.count() + 1_000_001
+        report_id = f"{year}{trichar}{str(count).zfill(10)}"
+        updated = obj_data | {"report_id": report_id}
+        return super().create(**updated)
 
 
 class SingleAuditChecklist(models.Model):
@@ -46,12 +73,15 @@ class SingleAuditChecklist(models.Model):
         ("available", _("Available")),
     )
 
+    objects = SingleAuditChecklistManager()
+
     # 0. Meta data
     submitted_by = models.ForeignKey(User, on_delete=models.PROTECT)
     date_created = models.DateTimeField(auto_now_add=True)
     submission_status = models.CharField(
         max_length=16, choices=STATUSES, default=STATUSES[0][0]
     )
+    report_id = models.CharField(max_length=17, unique=True)
 
     # Part 1: General Information
     # Q1 Fiscal Dates
