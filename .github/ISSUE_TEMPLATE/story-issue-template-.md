@@ -7,7 +7,7 @@ assignees: ''
 
 ---
 
-**Background**
+### Background
 
 <<background>>
 
@@ -15,14 +15,16 @@ It covers the following stories:
 
 1. As an ...
 
-**Acceptance criteria (We'll know we're done when...)**
+### Acceptance criteria (We'll know we're done when...)
+
 - [ ] When a user can ...
   
-**Tasks**
+### Tasks
+
 - [ ] Design designs all the things
 - [ ] Engineering engineers all the things
 
-**Definition of Done**
+### Definition of Done
 
 - [ ] Meets acceptance criteria
 - [ ] Screen reader - Listen to the experience with a screen reader extension, ensure the information presented in order
