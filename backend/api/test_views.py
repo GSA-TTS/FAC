@@ -133,18 +133,117 @@ class AuditeeInfoTests(TestCase):
             VALID_ELIGIBILITY_DATA | VALID_AUDITEE_INFO_DATA,
         )
 
-    def test_invalid_eligibility_data(self):
+    def test_null_auditee_uei(self):
         """
-        Handle required field (in this case UEI) with no value.
+        Auditee UEI can be null
         """
         self.user.profile.entry_form_data = VALID_ELIGIBILITY_DATA
         self.user.profile.save()
-        invalid_data = VALID_ELIGIBILITY_DATA | {"auditee_uei": None}
-        response = self.client.post(AUDITEE_INFO_PATH, invalid_data, format="json")
+        input_data = VALID_AUDITEE_INFO_DATA | {"auditee_uei": None}
+        response = self.client.post(AUDITEE_INFO_PATH, input_data, format="json")
         data = response.json()
+        self.assertEqual(data["next"], ACCESS_PATH)
         self.assertEqual(
-            data.get("errors", {}).get("auditee_uei"), ["This field may not be null."]
+            self.user.profile.entry_form_data,
+            VALID_ELIGIBILITY_DATA | input_data
         )
+
+    def test_blank_auditee_uei(self):
+        """
+        Auditee UEI can be blank
+        """
+        self.user.profile.entry_form_data = VALID_ELIGIBILITY_DATA
+        self.user.profile.save()
+        input_data = VALID_AUDITEE_INFO_DATA | {"auditee_uei": ""}
+        response = self.client.post(AUDITEE_INFO_PATH, input_data, format="json")
+        data = response.json()
+        self.assertEqual(data["next"], ACCESS_PATH)
+        self.assertEqual(
+            self.user.profile.entry_form_data,
+            VALID_ELIGIBILITY_DATA | input_data
+        )
+
+    def test_missing_auditee_uei(self):
+        """
+        Auditee UEI can be missing
+        """
+        self.user.profile.entry_form_data = VALID_ELIGIBILITY_DATA
+        self.user.profile.save()
+        input_data = VALID_AUDITEE_INFO_DATA.copy()
+        del input_data['auditee_uei']
+        response = self.client.post(AUDITEE_INFO_PATH, input_data, format="json")
+        data = response.json()
+        self.assertEqual(data["next"], ACCESS_PATH)
+        self.assertEqual(
+            self.user.profile.entry_form_data,
+            VALID_ELIGIBILITY_DATA | input_data
+        )
+
+    def test_blank_auditee_name(self):
+        """
+        Auditee name cannot be blank
+        """
+        self.user.profile.entry_form_data = VALID_ELIGIBILITY_DATA
+        self.user.profile.save()
+        input_data = VALID_AUDITEE_INFO_DATA | { "auditee_name": "" }
+        response = self.client.post(AUDITEE_INFO_PATH, input_data, format="json")
+        data = response.json()
+        self.assertTrue(data["errors"])
+
+    def test_null_auditee_name(self):
+        """
+        Auditee name can be null
+        """
+        self.user.profile.entry_form_data = VALID_ELIGIBILITY_DATA
+        self.user.profile.save()
+        input_data = VALID_AUDITEE_INFO_DATA | { "auditee_name": None }
+        response = self.client.post(AUDITEE_INFO_PATH, input_data, format="json")
+        data = response.json()
+        self.assertEqual(data["next"], ACCESS_PATH)
+        self.assertEqual(
+            self.user.profile.entry_form_data,
+            VALID_ELIGIBILITY_DATA | input_data
+        )
+
+    def test_missing_auditee_name(self):
+        """
+        Auditee name can be missing
+        """
+        self.user.profile.entry_form_data = VALID_ELIGIBILITY_DATA
+        self.user.profile.save()
+        input_data = VALID_AUDITEE_INFO_DATA.copy()
+        del input_data["auditee_name"]
+        response = self.client.post(AUDITEE_INFO_PATH, input_data, format="json")
+        data = response.json()
+        self.assertEqual(data["next"], ACCESS_PATH)
+        self.assertEqual(
+            self.user.profile.entry_form_data,
+            VALID_ELIGIBILITY_DATA | input_data
+        )
+
+    def test_missing_auditee_fiscal_period_start(self):
+        """
+        Auditee fiscal period start cannot be missing
+        """
+        self.user.profile.entry_form_data = VALID_ELIGIBILITY_DATA
+        self.user.profile.save()
+        input_data = VALID_AUDITEE_INFO_DATA.copy()
+        del input_data["auditee_fiscal_period_start"]
+        response = self.client.post(AUDITEE_INFO_PATH, input_data, format="json")
+        data = response.json()
+        self.assertTrue(data["errors"])
+
+    def test_missing_auditee_fiscal_period_end(self):
+        """
+        Auditee fiscal period end cannot be missing
+        """
+        self.user.profile.entry_form_data = VALID_ELIGIBILITY_DATA
+        self.user.profile.save()
+        input_data = VALID_AUDITEE_INFO_DATA.copy()
+        del input_data["auditee_fiscal_period_end"]
+        response = self.client.post(AUDITEE_INFO_PATH, input_data, format="json")
+        data = response.json()
+        self.assertTrue(data["errors"])
 
 
 class AccessTests(TestCase):

@@ -120,6 +120,8 @@ class SingleAuditChecklist(models.Model):
             validate_uei_leading_char,
             validate_uei_nine_digit_sequences,
         ],
+        blank=True,
+        null=True,
     )
     multiple_ueis_covered = models.BooleanField(
         verbose_name=_("Multiple UEIs covered"), null=True
