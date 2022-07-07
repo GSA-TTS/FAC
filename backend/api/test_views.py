@@ -144,8 +144,7 @@ class AuditeeInfoTests(TestCase):
         data = response.json()
         self.assertEqual(data["next"], ACCESS_PATH)
         self.assertEqual(
-            self.user.profile.entry_form_data,
-            VALID_ELIGIBILITY_DATA | input_data
+            self.user.profile.entry_form_data, VALID_ELIGIBILITY_DATA | input_data
         )
 
     def test_blank_auditee_uei(self):
@@ -159,8 +158,7 @@ class AuditeeInfoTests(TestCase):
         data = response.json()
         self.assertEqual(data["next"], ACCESS_PATH)
         self.assertEqual(
-            self.user.profile.entry_form_data,
-            VALID_ELIGIBILITY_DATA | input_data
+            self.user.profile.entry_form_data, VALID_ELIGIBILITY_DATA | input_data
         )
 
     def test_missing_auditee_uei(self):
@@ -170,13 +168,12 @@ class AuditeeInfoTests(TestCase):
         self.user.profile.entry_form_data = VALID_ELIGIBILITY_DATA
         self.user.profile.save()
         input_data = VALID_AUDITEE_INFO_DATA.copy()
-        del input_data['auditee_uei']
+        del input_data["auditee_uei"]
         response = self.client.post(AUDITEE_INFO_PATH, input_data, format="json")
         data = response.json()
         self.assertEqual(data["next"], ACCESS_PATH)
         self.assertEqual(
-            self.user.profile.entry_form_data,
-            VALID_ELIGIBILITY_DATA | input_data
+            self.user.profile.entry_form_data, VALID_ELIGIBILITY_DATA | input_data
         )
 
     def test_blank_auditee_name(self):
@@ -185,7 +182,7 @@ class AuditeeInfoTests(TestCase):
         """
         self.user.profile.entry_form_data = VALID_ELIGIBILITY_DATA
         self.user.profile.save()
-        input_data = VALID_AUDITEE_INFO_DATA | { "auditee_name": "" }
+        input_data = VALID_AUDITEE_INFO_DATA | {"auditee_name": ""}
         response = self.client.post(AUDITEE_INFO_PATH, input_data, format="json")
         data = response.json()
         self.assertTrue(data["errors"])
@@ -196,13 +193,12 @@ class AuditeeInfoTests(TestCase):
         """
         self.user.profile.entry_form_data = VALID_ELIGIBILITY_DATA
         self.user.profile.save()
-        input_data = VALID_AUDITEE_INFO_DATA | { "auditee_name": None }
+        input_data = VALID_AUDITEE_INFO_DATA | {"auditee_name": None}
         response = self.client.post(AUDITEE_INFO_PATH, input_data, format="json")
         data = response.json()
         self.assertEqual(data["next"], ACCESS_PATH)
         self.assertEqual(
-            self.user.profile.entry_form_data,
-            VALID_ELIGIBILITY_DATA | input_data
+            self.user.profile.entry_form_data, VALID_ELIGIBILITY_DATA | input_data
         )
 
     def test_missing_auditee_name(self):
@@ -217,8 +213,7 @@ class AuditeeInfoTests(TestCase):
         data = response.json()
         self.assertEqual(data["next"], ACCESS_PATH)
         self.assertEqual(
-            self.user.profile.entry_form_data,
-            VALID_ELIGIBILITY_DATA | input_data
+            self.user.profile.entry_form_data, VALID_ELIGIBILITY_DATA | input_data
         )
 
     def test_missing_auditee_fiscal_period_start(self):

@@ -8,13 +8,26 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('audit', '0006_alter_singleauditchecklist_report_id'),
+        ("audit", "0006_alter_singleauditchecklist_report_id"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='singleauditchecklist',
-            name='auditee_uei',
-            field=models.CharField(blank=True, help_text='Auditee Unique Entity Identifier', max_length=12, null=True, validators=[django.core.validators.MinLengthValidator(12), audit.validators.validate_uei_alphanumeric, audit.validators.validate_uei_valid_chars, audit.validators.validate_uei_leading_char, audit.validators.validate_uei_nine_digit_sequences], verbose_name='Auditee UEI'),
+            model_name="singleauditchecklist",
+            name="auditee_uei",
+            field=models.CharField(
+                blank=True,
+                help_text="Auditee Unique Entity Identifier",
+                max_length=12,
+                null=True,
+                validators=[
+                    django.core.validators.MinLengthValidator(12),
+                    audit.validators.validate_uei_alphanumeric,
+                    audit.validators.validate_uei_valid_chars,
+                    audit.validators.validate_uei_leading_char,
+                    audit.validators.validate_uei_nine_digit_sequences,
+                ],
+                verbose_name="Auditee UEI",
+            ),
         ),
     ]
