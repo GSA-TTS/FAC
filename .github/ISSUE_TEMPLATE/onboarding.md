@@ -19,8 +19,8 @@ Here's a few pointers to get you started as well as a checklist to make sure you
 {ONBOARDING BUDDY'S GH USERNAME} will be your onboarding buddy and will tackle the list below!
 
 **For your onboarding buddy**
-- [ ] Add to the FAC team folder in drive
-- [ ] Add to [FAC@GSA.gov](https://groups.google.com/a/gsa.gov/g/fac) google group
+- [ ] Add to the FAC team folder in drive (request of Dan R. or Maggie S. in 10x FO)
+- [ ] Add to [FAC-team@GSA.gov](https://groups.google.com/a/gsa.gov/g/fac-team) google group
 - [ ] <Engineering> Added to `gsa-10x-prototyping` Organization in cloud.gov
 - [ ] Add to the [FAC team](https://github.com/orgs/GSA-TTS/teams/fac-team) in github
-- [ ] Add to standing meeting invites
+- [ ] Add to standing meeting invites (should happen automatically via GGroup?)
