@@ -1,4 +1,3 @@
-from this import d
 from django.conf import settings
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -31,7 +30,6 @@ class JWTUpsertAuthentication(JWTAuthentication):
             user = self.user_model.objects.create_user(email, email, password)
 
         return user
-
 
     def get_user(self, validated_token):
         try:
