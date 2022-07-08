@@ -29,8 +29,8 @@ Additional value here is preventing entities that don't meet the criteria from s
 
 **Specific deliverables:**
 * (DONE ✅) Technical foundation
+* (DONE ✅) Login.gov integration
 * (90% ✅) Create a new audit (pre SAC forms)
-* (90% ✅) Login.gov integration
 * (60% ✅) design/exploration - "Submit an entire audit package" milestone
 
 ## Milestone: Submit general information end to end / De-risk
@@ -38,12 +38,31 @@ Additional value here is preventing entities that don't meet the criteria from s
 **Value delivered:**
 To de-risk our product plans, we will focus on an end-to-end solution that bridges data input to dissemination to the current FAC. This will include a fully fleshed out SF-SAC general information page. We will also build out the API to de-risk unknows in end-to-end implementation and unblock our partners at Census by providing specifics of API format. 
 
+Submit general information end to end:
 * (20% ✅) [General information - SF-SAC data entry](https://github.com/GSA-TTS/FAC/issues/185)
 * [API to transfer data to Census](https://github.com/GSA-TTS/FAC/issues/310)
-* [PDF Validation Spike](https://github.com/GSA-TTS/FAC/issues/307)
-* (We've already done a spike around Excel file ingestion)
-* (60% ✅) design/exploration - "Submit an entire audit package" milestone
-* (design/exploration) Status and user business logic
+
+De-risk and potentially de-scope audit package features: 
+* [PRD - Certify audit submission](https://github.com/GSA-TTS/FAC/issues/319)
+  * Option 1: Special roles/UX in the app to sign digitally (current, user-preferred solution)
+  * Option 2: Copy solve to ask people to sign the PDF (lightweight solution)
+    * Risk: Could lead to more audit churn if they are uploaded without signatures
+    * Risk: Could lead to more scanned PDFs being uploaded rather than searchable ones, slowing down auditors
+* [PRD - PDF Validation](https://github.com/GSA-TTS/FAC/issues/307)
+  * Option 1: Validate uploaded PDFs for being text, searchable and unlocked (current, user-preferred solution)
+  * Option 2: No validation / incomplete validation
+    * Risk: Could lead to more audit churn if they are uploaded in an unusable state
+* [PRD - Excel file ingest](https://github.com/GSA-TTS/FAC/issues/328)
+  * Option 1: Find a way to generate Excel file templates (current solution)
+  * Option 2: Static Excel file templates
+    * Risk: Potentially more confusing for the user to re-enter information
+    * Risk: CPAs working on multiple audits might upload the wrong sheet
+  * Option 3: Single Excel file templates
+    * Risk: Limited / no client side validation, which could lead to more audit churn
+    * Opportunity: More simple experience for users
+* [PRD - Audit processing](https://github.com/GSA-TTS/FAC/issues/329)
+  * Option 1: "Process" audits in the new FAC, send them to "dissemination pipeline" of Census FAC
+  * Option 2: "Process" audits in the old FAC, send them to "processing pipeline" of Census FAC
 
 
 ## Milestone: Submit an entire audit package
@@ -52,8 +71,9 @@ To de-risk our product plans, we will focus on an end-to-end solution that bridg
 Now that auditees have filled out basic information about their audit submission, they need to be able to submit the audit itself. While the current FAC allows users to submit form data and excel files, it's most valuable (and quite possibly sufficient for MVP release) to just allow them to upload templatized excel files for their audit. It's important to validate excel files and PDF uploads to reduce the chance of submitting an incomplete audit, which consumes time of both government staff and auditee staff. This step also makes it possible for auditee and auditor certifying officials to certify that the audit can be made public.
 
 **Specific deliverables:**
-* PDF Validation (text, searchable, unlocked)
-* Excel file ingest 
+* Certify audit submission
+* PDF Validation
+* Excel file ingest
 * Submit an audit package (post SAC forms)
 * (design/exploration) Status and user business logic
 
