@@ -21,12 +21,18 @@ User = get_user_model()
 
 class JwtUpsertAuthenticationTests(TestCase):
     def test_no_user_id_claim(self):
+        """
+        if token contains no user ID claim, an exception should be raised
+        """
         auth = JWTUpsertAuthentication()
         token = {}
 
         self.assertRaises(InvalidTokenError, auth.get_user, token)
 
     def test_no_email_claim(self):
+        """
+        if token contains no email claim, an exception should be raised
+        """
         auth = JWTUpsertAuthentication()
 
         login_id = str(uuid4())
@@ -36,6 +42,9 @@ class JwtUpsertAuthenticationTests(TestCase):
         self.assertRaises(InvalidTokenError, auth.get_user, token)
 
     def test_new_user(self):
+        """
+        if no internal user or LoginGovUser exist, new ones should be created
+        """
         auth = JWTUpsertAuthentication()
 
         login_id = str(uuid4())
@@ -57,6 +66,9 @@ class JwtUpsertAuthenticationTests(TestCase):
         self.assertEqual(login_user.login_id, login_id)
 
     def test_existing_user(self):
+        """
+        if internal user and LoginGovUser exist, existing user should be returned
+        """
         existing_user = baker.make(User)
         login_id = str(uuid4())
 
@@ -69,12 +81,34 @@ class JwtUpsertAuthenticationTests(TestCase):
         user = auth.get_user(token)
 
         self.assertIsNotNone(user)
+        self.assertEqual(user.id, existing_user.id)
+        self.assertEqual(user.username, existing_user.username)
+        self.assertEqual(user.email, existing_user.email)
+
+    def test_existing_auth_user(self):
+        """
+        if internal user exists, but has no associated LoginGovUser, LoginGovUser should be created
+        """
+        existing_user = baker.make(User)
+        login_id = str(uuid4())
+
+        auth = JWTUpsertAuthentication()
+
+        token = {"sub": login_id, "email": existing_user.email}
+
+        user = auth.get_user(token)
+
+        self.assertIsNotNone(user)
+        self.assertEqual(user.id, existing_user.id)
         self.assertEqual(user.username, existing_user.username)
         self.assertEqual(user.email, existing_user.email)
 
 
 class ExpiringTokenAuthenticationTests(TestCase):
     def test_valid_token(self):
+        """
+        a newly-created (not expired) token should be valid
+        """
         auth = ExpiringTokenAuthentication()
 
         user = baker.make(User)
@@ -86,6 +120,9 @@ class ExpiringTokenAuthenticationTests(TestCase):
         auth.authenticate(request)
 
     def test_expired_token(self):
+        """
+        an expired token should be invalid
+        """
         auth = ExpiringTokenAuthentication()
         ttl = settings.TOKEN_AUTH["TOKEN_TTL"]
 

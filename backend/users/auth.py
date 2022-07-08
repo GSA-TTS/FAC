@@ -1,3 +1,4 @@
+from this import d
 from django.conf import settings
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -15,6 +16,23 @@ import random
 
 
 class JWTUpsertAuthentication(JWTAuthentication):
+    def get_or_create_auth_user(self, email):
+        try:
+            user = self.user_model.objects.get(email=email)
+        except self.user_model.DoesNotExist:
+            # didn't fine an existing user, create one
+
+            # generate a random password
+            password = "".join(
+                random.SystemRandom().choice(string.ascii_letters + string.digits)
+                for _ in range(32)
+            )
+
+            user = self.user_model.objects.create_user(email, email, password)
+
+        return user
+
+
     def get_user(self, validated_token):
         try:
             user_id_claim = settings.SIMPLE_JWT["USER_ID_CLAIM"]
@@ -31,16 +49,7 @@ class JWTUpsertAuthentication(JWTAuthentication):
             login_user = LoginGovUser.objects.get(**{"login_id": user_id})
             user = login_user.user
         except LoginGovUser.DoesNotExist:
-            # didn't find one, create a new user
-
-            # generate a random password
-            password = "".join(
-                random.SystemRandom().choice(string.ascii_letters + string.digits)
-                for _ in range(32)
-            )
-
-            # create auth_user
-            user = self.user_model.objects.create_user(email, email, password)
+            user = self.get_or_create_auth_user(email)
 
             # create and associate LoginGovUser instance
             login_user = LoginGovUser.objects.create(
