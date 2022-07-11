@@ -43,12 +43,12 @@ Submit general information end to end:
 * [API to transfer general information data to Census](https://github.com/GSA-TTS/FAC/issues/310)
 
 De-risk and potentially de-scope audit package features: 
-* [PRD - Certify audit submission](https://github.com/GSA-TTS/FAC/issues/319)
+* [PDR - Certify audit submission](https://github.com/GSA-TTS/FAC/issues/319)
   * Option 1: Special roles/UX in the app to sign digitally (current, user-preferred solution)
   * Option 2: Copy solve to ask people to sign the PDF (lightweight solution)
     * Risk: Could lead to more audit churn if they are uploaded without signatures
     * Risk: Could lead to more scanned PDFs being uploaded rather than searchable ones, slowing down auditors
-* [PRD - Excel file ingest](https://github.com/GSA-TTS/FAC/issues/328)
+* [PDR - Excel file ingest](https://github.com/GSA-TTS/FAC/issues/328)
   * Option 1: Find a way to generate Excel file templates (current solution)
   * Option 2: Static Excel file templates
     * Risk: Potentially more confusing for the user to re-enter information
@@ -56,7 +56,7 @@ De-risk and potentially de-scope audit package features:
   * Option 3: Single Excel file templates
     * Risk: Limited / no client side validation, which could lead to more audit churn
     * Opportunity: More simple experience for users
-* [PRD - Audit processing](https://github.com/GSA-TTS/FAC/issues/329)
+* [PDR - Audit processing](https://github.com/GSA-TTS/FAC/issues/329)
   * Option 1: "Process" audits in the new FAC, send them to "dissemination pipeline" of Census FAC
   * Option 2: "Process" audits in the old FAC, send them to "processing pipeline" of Census FAC
 
