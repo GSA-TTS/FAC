@@ -40,7 +40,7 @@ To de-risk our product plans, we will focus on an end-to-end solution that bridg
 
 Submit general information end to end:
 * (20% ✅) [General information - SF-SAC data entry](https://github.com/GSA-TTS/FAC/issues/185)
-* [API to transfer data to Census](https://github.com/GSA-TTS/FAC/issues/310)
+* [API to transfer general information data to Census](https://github.com/GSA-TTS/FAC/issues/310)
 
 De-risk and potentially de-scope audit package features: 
 * [PRD - Certify audit submission](https://github.com/GSA-TTS/FAC/issues/319)
@@ -48,10 +48,6 @@ De-risk and potentially de-scope audit package features:
   * Option 2: Copy solve to ask people to sign the PDF (lightweight solution)
     * Risk: Could lead to more audit churn if they are uploaded without signatures
     * Risk: Could lead to more scanned PDFs being uploaded rather than searchable ones, slowing down auditors
-* [PRD - PDF Validation](https://github.com/GSA-TTS/FAC/issues/307)
-  * Option 1: Validate uploaded PDFs for being text, searchable and unlocked (current, user-preferred solution)
-  * Option 2: No validation / incomplete validation
-    * Risk: Could lead to more audit churn if they are uploaded in an unusable state
 * [PRD - Excel file ingest](https://github.com/GSA-TTS/FAC/issues/328)
   * Option 1: Find a way to generate Excel file templates (current solution)
   * Option 2: Static Excel file templates
@@ -76,6 +72,10 @@ Now that auditees have filled out basic information about their audit submission
 * Excel file ingest
 * Submit an audit package (post SAC forms)
 * (design/exploration) Status and user business logic
+* [PRD - PDF Validation](https://github.com/GSA-TTS/FAC/issues/307)
+  * Option 1: Validate uploaded PDFs for being text, searchable and unlocked (current, user-preferred solution)
+  * Option 2: No validation / incomplete validation
+    * Risk: Could lead to more audit churn if they are uploaded in an unusable state
 
 
 ## Milestone: Status and user business logic
