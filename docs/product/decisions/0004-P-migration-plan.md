@@ -31,4 +31,4 @@ Provide clarity for the migration plan from the old Census FAC to the new TTS FA
 
 #### Important considerations to reach these goals:
 
-* Document how every field from the old system will or will not be migrated to and from the old system using the (FAC Field Rosetta Stone)[https://docs.google.com/spreadsheets/d/1e-NQPeXk9pcQhA9PEbywkfoJa1bcTunKsVsBjqFYVK4/edit#gid=1955175057] document (internal, not public). 
+* Document how every field from the old system will or will not be migrated to and from the old system using the [FAC Field Rosetta Stone](https://docs.google.com/spreadsheets/d/1e-NQPeXk9pcQhA9PEbywkfoJa1bcTunKsVsBjqFYVK4/edit#gid=1955175057) document (internal, not public). 
