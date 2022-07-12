@@ -41,6 +41,7 @@ To de-risk our product plans, we will focus on an end-to-end solution that bridg
 Submit general information end to end:
 * (20% ✅) [General information - SF-SAC data entry](https://github.com/GSA-TTS/FAC/issues/185)
 * [API to transfer general information data to Census](https://github.com/GSA-TTS/FAC/issues/310)
+* [Audit permissions](https://github.com/GSA-TTS/FAC/issues/332) and [my audit submissions](https://github.com/GSA-TTS/FAC/issues/343) page
 
 De-risk and potentially de-scope audit package features: 
 * [PDR - Certify audit submission](https://github.com/GSA-TTS/FAC/issues/319)
