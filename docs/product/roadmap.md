@@ -56,10 +56,6 @@ De-risk and potentially de-scope audit package features:
   * Option 3: Single Excel file templates
     * Risk: Limited / no client side validation, which could lead to more audit churn
     * Opportunity: More simple experience for users
-* [PDR - Audit processing](https://github.com/GSA-TTS/FAC/issues/329)
-  * Option 1: "Process" audits in the new FAC, send them to "dissemination pipeline" of Census FAC
-  * Option 2: "Process" audits in the old FAC, send them to "processing pipeline" of Census FAC
-
 
 ## Milestone: Submit an entire audit package
 
@@ -72,6 +68,9 @@ Now that auditees have filled out basic information about their audit submission
 * Excel file ingest
 * Submit an audit package (post SAC forms)
 * (design/exploration) Status and user business logic
+* [PDR - Audit processing](https://github.com/GSA-TTS/FAC/issues/329)
+  * Option 1: "Process" audits in the new FAC, send them to "dissemination pipeline" of Census FAC
+  * Option 2: "Process" audits in the old FAC, send them to "processing pipeline" of Census FAC
 * [PRD - PDF Validation](https://github.com/GSA-TTS/FAC/issues/307)
   * Option 1: Validate uploaded PDFs for being text, searchable and unlocked (current, user-preferred solution)
   * Option 2: No validation / incomplete validation
