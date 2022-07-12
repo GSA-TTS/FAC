@@ -32,7 +32,7 @@ class Access(models.Model):
         max_length=15,
     )
     email = models.EmailField()
-    user_id = models.ForeignKey(
+    user = models.ForeignKey(
         User,
         null=True,
         help_text="User ID associated with this email address, empty if no FAC account exists",
