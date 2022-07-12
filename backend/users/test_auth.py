@@ -53,7 +53,7 @@ class JwtUpsertAuthenticationTests(TestCase):
         login_user = LoginGovUser.objects.get(user=user)
 
         self.assertIsNotNone(login_user)
-        self.assertEqual(login_user.user_id, user.id)
+        self.assertEqual(login_user.user, user.id)
         self.assertEqual(login_user.login_id, login_id)
 
     def test_existing_user(self):

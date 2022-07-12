@@ -13,7 +13,7 @@ class SACAdmin(admin.ModelAdmin):
 
 
 class AccessAdmin(admin.ModelAdmin):
-    list_display = ("role", "email", "user_id")
+    list_display = ("role", "email", "user")
     list_filter = ["role"]
 
 

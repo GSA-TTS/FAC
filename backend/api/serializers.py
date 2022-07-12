@@ -78,7 +78,7 @@ class AuditeeInfoSerializer(serializers.ModelSerializer):
 class AccessSerializer(serializers.ModelSerializer):
     class Meta:
         model = Access
-        fields = ["role", "email", "user_id"]
+        fields = ["role", "email", "user"]
 
 
 class SingleAuditChecklistSerializer(serializers.ModelSerializer):
