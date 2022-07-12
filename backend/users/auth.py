@@ -20,8 +20,12 @@ logger = logging.getLogger(__name__)
 
 
 def claim_audit_access(user, all_emails):
-    access_invites = Access.objects.filter(user_id=None).filter(email__in=all_emails).update(user_id=user.id)
-    logger.debug(f'{user.email} granted access to {access_invites} new audits')
+    access_invites = (
+        Access.objects.filter(user_id=None)
+        .filter(email__in=all_emails)
+        .update(user_id=user.id)
+    )
+    logger.debug(f"{user.email} granted access to {access_invites} new audits")
 
 
 class JWTUpsertAuthentication(JWTAuthentication):
@@ -58,11 +62,11 @@ class JWTUpsertAuthentication(JWTAuthentication):
             login_user = LoginGovUser.objects.get(**{"login_id": user_id})
             user = login_user.user
 
-            logger.debug(f'found existing user record for {user.email}')
+            logger.debug(f"found existing user record for {user.email}")
         except LoginGovUser.DoesNotExist:
             user = self.get_or_create_auth_user(email)
 
-            logger.debug(f'created new user record for {user.email}')
+            logger.debug(f"created new user record for {user.email}")
 
             # create and associate LoginGovUser instance
             login_user = LoginGovUser.objects.create(

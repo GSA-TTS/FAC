@@ -6,7 +6,6 @@ from django.utils import timezone
 from jwt import InvalidTokenError
 
 from model_bakery import baker
-from platformdirs import user_log_dir
 
 from rest_framework.authtoken.models import Token
 from rest_framework.exceptions import AuthenticationFailed
@@ -64,7 +63,11 @@ class JwtUpsertAuthenticationTests(TestCase):
 
         login_id = str(uuid4())
 
-        token = {"sub": login_id, "email": "test-email@test.test", "all_emails": ["test-email@test.test"]}
+        token = {
+            "sub": login_id,
+            "email": "test-email@test.test",
+            "all_emails": ["test-email@test.test"],
+        }
 
         user = auth.get_user(token)
 
@@ -91,7 +94,11 @@ class JwtUpsertAuthenticationTests(TestCase):
 
         auth = JWTUpsertAuthentication()
 
-        token = {"sub": login_id, "email": "existing-user@test.test", "all_emails": ["existing-user@test.test"]}
+        token = {
+            "sub": login_id,
+            "email": "existing-user@test.test",
+            "all_emails": ["existing-user@test.test"],
+        }
 
         user = auth.get_user(token)
 
@@ -109,7 +116,11 @@ class JwtUpsertAuthenticationTests(TestCase):
 
         auth = JWTUpsertAuthentication()
 
-        token = {"sub": login_id, "email": existing_user.email, "all_emails": [existing_user.email]}
+        token = {
+            "sub": login_id,
+            "email": existing_user.email,
+            "all_emails": [existing_user.email],
+        }
 
         user = auth.get_user(token)
 
@@ -130,7 +141,11 @@ class JwtUpsertAuthenticationTests(TestCase):
 
         auth = JWTUpsertAuthentication()
 
-        token = {"sub": login_id, "email": existing_user.email, "all_emails": [existing_user.email]}
+        token = {
+            "sub": login_id,
+            "email": existing_user.email,
+            "all_emails": [existing_user.email],
+        }
 
         self.assertFalse(Access.objects.filter(user_id=existing_user).exists())
 
@@ -151,7 +166,11 @@ class JwtUpsertAuthenticationTests(TestCase):
 
         auth = JWTUpsertAuthentication()
 
-        token = {"sub": login_id, "email": primary_email, "all_emails": [primary_email, backup_email]}
+        token = {
+            "sub": login_id,
+            "email": primary_email,
+            "all_emails": [primary_email, backup_email],
+        }
 
         # before logging in, the access object has no associated user, just an email
         invites = Access.objects.filter(email=backup_email)
@@ -184,7 +203,11 @@ class JwtUpsertAuthenticationTests(TestCase):
 
         auth = JWTUpsertAuthentication()
 
-        token = {"sub": login_id, "email": existing_user.email, "all_emails": [primary_email, backup_email_1, backup_email_2]}
+        token = {
+            "sub": login_id,
+            "email": existing_user.email,
+            "all_emails": [primary_email, backup_email_1, backup_email_2],
+        }
 
         self.assertFalse(Access.objects.filter(user_id=existing_user).exists())
 
