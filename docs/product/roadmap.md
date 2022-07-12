@@ -172,7 +172,7 @@ Delivery options
 
 ## Option 1: Two major releases: MVP and full functionality
 
-**Overview:** Launch a new FAC intake experience sooner for at least some of current customers on or around 10/1 to begin accepting audits for FY2022. Per the discussed and approved [migration plan](https://github.com/GSA-TTS/FAC/blob/main/docs/product/decisions/0004-P-migration-plan.md), the idea is to keep the old Census FAC running and import FY2022 submissions into that for data dissemination. 
+**Overview:** Launch a new FAC intake experience sooner for at least some of current customers on or around 1/1/2023 to begin accepting audits. Per the discussed and approved [migration plan](https://github.com/GSA-TTS/FAC/blob/main/docs/product/decisions/0004-P-migration-plan.md), the idea is to keep the old Census FAC running and import new submissions into that for data dissemination. 
 
 **Benefits:** Soonest path to an initial public release, which will help us learn more quickly and break up overall product risk into multiple releases
 
