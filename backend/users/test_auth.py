@@ -6,9 +6,12 @@ from django.utils import timezone
 from jwt import InvalidTokenError
 
 from model_bakery import baker
+from platformdirs import user_log_dir
 
 from rest_framework.authtoken.models import Token
 from rest_framework.exceptions import AuthenticationFailed
+
+from audit.models import Access
 
 from .auth import ExpiringTokenAuthentication, JWTUpsertAuthentication
 from .models import LoginGovUser
@@ -41,6 +44,18 @@ class JwtUpsertAuthenticationTests(TestCase):
 
         self.assertRaises(InvalidTokenError, auth.get_user, token)
 
+    def test_no_all_emails_claim(self):
+        """
+        if token contains no all_emails claim, an exception should be raised
+        """
+        auth = JWTUpsertAuthentication()
+
+        login_id = str(uuid4())
+
+        token = {"sub": login_id, "email": "test-email@test.test"}
+
+        self.assertRaises(InvalidTokenError, auth.get_user, token)
+
     def test_new_user(self):
         """
         if no internal user or LoginGovUser exist, new ones should be created
@@ -49,7 +64,7 @@ class JwtUpsertAuthenticationTests(TestCase):
 
         login_id = str(uuid4())
 
-        token = {"sub": login_id, "email": "test-email@test.test"}
+        token = {"sub": login_id, "email": "test-email@test.test", "all_emails": ["test-email@test.test"]}
 
         user = auth.get_user(token)
 
@@ -76,7 +91,7 @@ class JwtUpsertAuthenticationTests(TestCase):
 
         auth = JWTUpsertAuthentication()
 
-        token = {"sub": login_id, "email": "existing-user@test.test"}
+        token = {"sub": login_id, "email": "existing-user@test.test", "all_emails": ["existing-user@test.test"]}
 
         user = auth.get_user(token)
 
@@ -94,7 +109,7 @@ class JwtUpsertAuthenticationTests(TestCase):
 
         auth = JWTUpsertAuthentication()
 
-        token = {"sub": login_id, "email": existing_user.email}
+        token = {"sub": login_id, "email": existing_user.email, "all_emails": [existing_user.email]}
 
         user = auth.get_user(token)
 
@@ -102,6 +117,80 @@ class JwtUpsertAuthenticationTests(TestCase):
         self.assertEqual(user.id, existing_user.id)
         self.assertEqual(user.username, existing_user.username)
         self.assertEqual(user.email, existing_user.email)
+
+    def test_audit_access_granted_existing_user(self):
+        """
+        if there are pending access invitations (Access objects w/o user_id), the user_id should be
+        updated to that of the current user during the login process
+        """
+        existing_user = baker.make(User, email="existing-user@test.test")
+        login_id = str(uuid4())
+
+        baker.make(Access, email=existing_user.email, user_id=None)
+
+        auth = JWTUpsertAuthentication()
+
+        token = {"sub": login_id, "email": existing_user.email, "all_emails": [existing_user.email]}
+
+        self.assertFalse(Access.objects.filter(user_id=existing_user).exists())
+
+        auth.get_user(token)
+
+        self.assertTrue(Access.objects.filter(user_id=existing_user).exists())
+
+    def test_audit_access_granted_new_user(self):
+        """
+        if there are pending access invitations (Access objects w/o user_id), the user_id should be
+        updated to that of the newly created user during the login process
+        """
+        login_id = str(uuid4())
+        primary_email = "new-user@test.test"
+        backup_email = "new-user-2@test.test"
+
+        baker.make(Access, email=backup_email, user_id=None)
+
+        auth = JWTUpsertAuthentication()
+
+        token = {"sub": login_id, "email": primary_email, "all_emails": [primary_email, backup_email]}
+
+        # before logging in, the access object has no associated user, just an email
+        invites = Access.objects.filter(email=backup_email)
+        self.assertEqual(len(invites), 1)
+        self.assertIsNone(invites[0].user_id)
+
+        auth.get_user(token)
+
+        user = User.objects.get(email=primary_email)
+
+        # after logging in, the access object references the newly-created user
+        accesses = Access.objects.filter(email=backup_email)
+        self.assertEqual(len(accesses), 1)
+        self.assertEqual(accesses[0].user_id, user)
+
+    def test_multiple_audit_access_granted(self):
+        """
+        if there are multiple pending access invitations (Access objects w/o user_id), the user_id of all
+        should be updated to that of the current user during the login process
+        """
+        primary_email = "existing-user@test.test"
+        backup_email_1 = "existing-user-2@test.test"
+        backup_email_2 = "existing-user-3@test.test"
+
+        existing_user = baker.make(User, email=primary_email)
+        login_id = str(uuid4())
+
+        baker.make(Access, email=backup_email_1, user_id=None)
+        baker.make(Access, email=backup_email_2, user_id=None)
+
+        auth = JWTUpsertAuthentication()
+
+        token = {"sub": login_id, "email": existing_user.email, "all_emails": [primary_email, backup_email_1, backup_email_2]}
+
+        self.assertFalse(Access.objects.filter(user_id=existing_user).exists())
+
+        auth.get_user(token)
+
+        self.assertEqual(Access.objects.filter(user_id=existing_user).count(), 2)
 
 
 class ExpiringTokenAuthenticationTests(TestCase):
