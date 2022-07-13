@@ -33,7 +33,7 @@ class JWTUpsertAuthentication(JWTAuthentication):
         try:
             user = self.user_model.objects.get(email=email)
         except self.user_model.DoesNotExist:
-            # didn't fine an existing user, create one
+            # didn't find an existing user, create one
 
             # generate a random password
             password = "".join(
