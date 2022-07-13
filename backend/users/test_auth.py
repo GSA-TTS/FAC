@@ -223,7 +223,7 @@ class JwtUpsertAuthenticationTests(TestCase):
         primary_email = "existing-user@test.test"
         backup_email_1 = "existing-user-2@test.test"
         backup_email_2 = "existing-user-3@test.test"
-        
+
         login_id = str(uuid4())
 
         auth = JWTUpsertAuthentication()
@@ -249,7 +249,7 @@ class JwtUpsertAuthenticationTests(TestCase):
     def test_multiple_user_records_with_primary(self):
         """
         if a user presents a LoginGov token, where the all_emails collection
-        produces multiple User record matches, we should return the one that 
+        produces multiple User record matches, we should return the one that
         matches the LoginGov primary email
         """
         primary_email = "existing-user@test.test"
@@ -258,7 +258,7 @@ class JwtUpsertAuthenticationTests(TestCase):
 
         existing_user_primary = baker.make(User, email=primary_email)
         baker.make(User, email=backup_email_1)
-        
+
         login_id = str(uuid4())
 
         auth = JWTUpsertAuthentication()
@@ -277,7 +277,7 @@ class JwtUpsertAuthenticationTests(TestCase):
         """
         if a user presents a LoginGov token, where the all_emails collection
         produces multiple User record matches, and none of them match the LoginGov
-        primary email, we should return the first match 
+        primary email, we should return the first match
         """
         primary_email = "existing-user@test.test"
         backup_email_1 = "existing-user-2@test.test"
@@ -285,7 +285,7 @@ class JwtUpsertAuthenticationTests(TestCase):
 
         existing_user_backup_1 = baker.make(User, email=primary_email)
         baker.make(User, email=backup_email_1)
-        
+
         login_id = str(uuid4())
 
         auth = JWTUpsertAuthentication()

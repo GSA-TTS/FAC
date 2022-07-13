@@ -52,7 +52,7 @@ class JWTUpsertAuthentication(JWTAuthentication):
                 for _ in range(32)
             )
 
-            user = self.user_model.objects.create_user(email, email, password) 
+            user = self.user_model.objects.create_user(email, email, password)
 
         return user
 
