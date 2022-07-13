@@ -44,19 +44,8 @@ Submit general information end to end:
 * [Audit permissions](https://github.com/GSA-TTS/FAC/issues/332) and [my audit submissions](https://github.com/GSA-TTS/FAC/issues/343) page
 
 De-risk and potentially de-scope audit package features: 
-* [PDR/ADR - Certify audit submission](https://github.com/GSA-TTS/FAC/issues/319)
-  * Option 1: Special roles/UX in the app to sign digitally (current, user-preferred solution)
-  * Option 2: Copy solve to ask people to sign the PDF (lightweight solution)
-    * Risk: Could lead to more audit churn if they are uploaded without signatures
-    * Risk: Could lead to more scanned PDFs being uploaded rather than searchable ones, slowing down auditors
+* [PDR/ADR - Certify audit submission](https://github.com/GSA-TTS/FAC/issues/350)
 * [PDR/ADR - Excel file ingest](https://github.com/GSA-TTS/FAC/issues/328)
-  * Option 1: Find a way to generate Excel file templates (current solution)
-  * Option 2: Static Excel file templates
-    * Risk: Potentially more confusing for the user to re-enter information
-    * Risk: CPAs working on multiple audits might upload the wrong sheet
-  * Option 3: Single Excel file templates
-    * Risk: Limited / no client side validation, which could lead to more audit churn
-    * Opportunity: More simple experience for users
 * [PDR/ADR - File Upload storage](https://github.com/GSA-TTS/FAC/projects/1#card-84111928)
 
 ## Milestone: Submit an entire audit package
