@@ -31,7 +31,7 @@ Additional value here is preventing entities that don't meet the criteria from s
 * (DONE ✅) Technical foundation
 * (DONE ✅) Login.gov integration
 * (90% ✅) Create a new audit (pre SAC forms)
-* (60% ✅) design/exploration - "Submit an entire audit package" milestone
+* (80% ✅) design/exploration - "Submit an entire audit package" milestone
 
 ## Milestone: Submit general information end to end / De-risk
 
@@ -46,7 +46,7 @@ Submit general information end to end:
 De-risk and potentially de-scope audit package features: 
 * [PDR/ADR - Certify audit submission](https://github.com/GSA-TTS/FAC/issues/350)
 * [PDR/ADR - Excel file ingest](https://github.com/GSA-TTS/FAC/issues/328)
-* [PDR/ADR - File Upload storage](https://github.com/GSA-TTS/FAC/projects/1#card-84111928)
+* [PDR/ADR - File Upload storage](https://github.com/GSA-TTS/FAC/issues/328)
 
 ## Milestone: Submit an entire audit package
 
@@ -58,8 +58,8 @@ Now that auditees have filled out basic information about their audit submission
 * PDF Validation
 * Excel file ingest
 * Submit an audit package (post SAC forms)
-* (design/exploration) Status and user business logic
-* [PDR - Audit processing](https://github.com/GSA-TTS/FAC/issues/329)
+* (50% ✅) (design/exploration) Status and user business logic
+* [PDR - Automated audit processing](https://github.com/GSA-TTS/FAC/issues/329)
   * Option 1: "Process" audits in the new FAC, send them to "dissemination pipeline" of Census FAC
   * Option 2: "Process" audits in the old FAC, send them to "processing pipeline" of Census FAC
 * [PRD - PDF Validation](https://github.com/GSA-TTS/FAC/issues/307)
