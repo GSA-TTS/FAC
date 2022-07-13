@@ -29,11 +29,22 @@ def claim_audit_access(user, all_emails):
 
 
 class JWTUpsertAuthentication(JWTAuthentication):
-    def get_or_create_auth_user(self, email):
-        try:
-            user = self.user_model.objects.get(email=email)
-        except self.user_model.DoesNotExist:
-            # didn't find an existing user, create one
+    def get_or_create_auth_user(self, email, all_emails):
+        # find all Users where email is in LoginGov all_emails
+        users = self.user_model.objects.filter(email__in=all_emails)
+
+        if users.count() > 1:
+            # more than one found, take the one that matches the LoginGov primary email
+            try:
+                user = users.get(email=email)
+            except self.user_model.DoesNotExist:
+                # none of the Users use the LoginGov primary email, take the first one
+                user = users[0]
+        elif users.count() == 1:
+            # found a single User match
+            user = users[0]
+        else:
+            # didn't find an existing User, create one
 
             # generate a random password
             password = "".join(
@@ -41,7 +52,7 @@ class JWTUpsertAuthentication(JWTAuthentication):
                 for _ in range(32)
             )
 
-            user = self.user_model.objects.create_user(email, email, password)
+            user = self.user_model.objects.create_user(email, email, password) 
 
         return user
 
@@ -64,7 +75,7 @@ class JWTUpsertAuthentication(JWTAuthentication):
 
             logger.debug(f"found existing user record for {user.email}")
         except LoginGovUser.DoesNotExist:
-            user = self.get_or_create_auth_user(email)
+            user = self.get_or_create_auth_user(email, all_emails)
 
             logger.debug(f"created new user record for {user.email}")
 

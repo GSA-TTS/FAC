@@ -215,6 +215,91 @@ class JwtUpsertAuthenticationTests(TestCase):
 
         self.assertEqual(Access.objects.filter(user_id=existing_user).count(), 2)
 
+    def test_primary_email_change(self):
+        """
+        if a user changes their primary email on the LoginGov side, we should still
+        find their User record using the all_emails collection
+        """
+        primary_email = "existing-user@test.test"
+        backup_email_1 = "existing-user-2@test.test"
+        backup_email_2 = "existing-user-3@test.test"
+        
+        login_id = str(uuid4())
+
+        auth = JWTUpsertAuthentication()
+
+        token_1 = {
+            "sub": login_id,
+            "email": primary_email,
+            "all_emails": [primary_email, backup_email_1, backup_email_2],
+        }
+
+        user_1 = auth.get_user(token_1)
+
+        token_2 = {
+            "sub": login_id,
+            "email": backup_email_1,
+            "all_emails": [primary_email, backup_email_1, backup_email_2],
+        }
+
+        user_2 = auth.get_user(token_2)
+
+        self.assertEqual(user_1, user_2)
+
+    def test_multiple_user_records_with_primary(self):
+        """
+        if a user presents a LoginGov token, where the all_emails collection
+        produces multiple User record matches, we should return the one that 
+        matches the LoginGov primary email
+        """
+        primary_email = "existing-user@test.test"
+        backup_email_1 = "existing-user-2@test.test"
+        backup_email_2 = "existing-user-3@test.test"
+
+        existing_user_primary = baker.make(User, email=primary_email)
+        baker.make(User, email=backup_email_1)
+        
+        login_id = str(uuid4())
+
+        auth = JWTUpsertAuthentication()
+
+        token = {
+            "sub": login_id,
+            "email": primary_email,
+            "all_emails": [primary_email, backup_email_1, backup_email_2],
+        }
+
+        user = auth.get_user(token)
+
+        self.assertEqual(user, existing_user_primary)
+
+    def test_multiple_user_records_without_primary(self):
+        """
+        if a user presents a LoginGov token, where the all_emails collection
+        produces multiple User record matches, and none of them match the LoginGov
+        primary email, we should return the first match 
+        """
+        primary_email = "existing-user@test.test"
+        backup_email_1 = "existing-user-2@test.test"
+        backup_email_2 = "existing-user-3@test.test"
+
+        existing_user_backup_1 = baker.make(User, email=primary_email)
+        baker.make(User, email=backup_email_1)
+        
+        login_id = str(uuid4())
+
+        auth = JWTUpsertAuthentication()
+
+        token = {
+            "sub": login_id,
+            "email": primary_email,
+            "all_emails": [primary_email, backup_email_1, backup_email_2],
+        }
+
+        user = auth.get_user(token)
+
+        self.assertEqual(user, existing_user_backup_1)
+
 
 class ExpiringTokenAuthenticationTests(TestCase):
     def test_valid_token(self):
