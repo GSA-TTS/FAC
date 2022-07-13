@@ -34,4 +34,4 @@ lint:
 
 # Run Django tests:
 test:
-	@coverage run --source="." manage.py test && coverage report -m --fail-under=99
+	@python -m coverage run --source="." manage.py test && coverage report -m --fail-under=99
