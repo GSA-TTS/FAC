@@ -38,7 +38,7 @@ Additional value here is preventing entities that don't meet the criteria from s
 **Value delivered:**
 To de-risk our product plans, we will focus on an end-to-end solution that bridges data input to dissemination to the current FAC. This will include a fully fleshed out SF-SAC general information page. We will also build out the API to de-risk unknows in end-to-end implementation and unblock our partners at Census by providing specifics of API format. 
 
-Tasks:
+**Specific deliverables:**
 * (20% ✅) [General information - SF-SAC data entry](https://github.com/GSA-TTS/FAC/issues/185)
 * [API for accessing general SF-SAC Data](https://github.com/GSA-TTS/FAC/issues/355)
 * [Audit permissions](https://github.com/GSA-TTS/FAC/issues/332) and [my audit submissions](https://github.com/GSA-TTS/FAC/issues/343) page
@@ -198,6 +198,26 @@ Delivery options
 1. Data integrity / flexibility (potentially optional)
 1. Submission enhancements (potentially optional)
 1. **Initial release**
+
+
+Sequencing options
+===================
+
+## Option 1: End to end, gradual integration
+
+**Overview:** With each new form page we build (there are over 10) or set of form pages, build out an API that Census is prepared to integrate with. 
+
+**Benefits:** Surface risks and Census dependencies sooner, rather than at the end.
+
+**Drawbacks:** Possibility of being overly concerned about shaping data to Census' needs rather than our own long-term needs. Possibility of churn with Census if we have to change parts of our own model we already integrated with them. 
+
+## Option 2: Finish the app, then integrate end to end
+
+**Overview:** Complete the main part of the app (all forms) and have a complete picture of the data model before building out an API specifically for Census. 
+
+**Benefits:** Ensure our own data model makes sense first before census dependencies. 
+
+**Drawbacks:** Possibility of having to go back and re-evaluate forms or our data model if there are major disconnects with what Census needs. 
 
 
 (L)ATO Strategy
