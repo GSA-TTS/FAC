@@ -38,13 +38,10 @@ Additional value here is preventing entities that don't meet the criteria from s
 **Value delivered:**
 To de-risk our product plans, we will focus on an end-to-end solution that bridges data input to dissemination to the current FAC. This will include a fully fleshed out SF-SAC general information page. We will also build out the API to de-risk unknows in end-to-end implementation and unblock our partners at Census by providing specifics of API format. 
 
-Submit general information end to end:
+Tasks:
 * (20% ✅) [General information - SF-SAC data entry](https://github.com/GSA-TTS/FAC/issues/185)
-* [API to transfer general information data to Census](https://github.com/GSA-TTS/FAC/issues/310)
+* [API for accessing general SF-SAC Data](https://github.com/GSA-TTS/FAC/issues/355)
 * [Audit permissions](https://github.com/GSA-TTS/FAC/issues/332) and [my audit submissions](https://github.com/GSA-TTS/FAC/issues/343) page
-
-De-risk and potentially de-scope audit package features: 
-* [PDR/ADR - Certify audit submission](https://github.com/GSA-TTS/FAC/issues/350)
 * [PDR/ADR - Excel file ingest](https://github.com/GSA-TTS/FAC/issues/328)
 * [PDR/ADR - File Upload storage](https://github.com/GSA-TTS/FAC/issues/328)
 
