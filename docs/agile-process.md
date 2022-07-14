@@ -3,7 +3,7 @@ Agile Process
 
 ### Overview
 
-There is a [high-level roadmap](https://github.com/GSA-TTS/FAC/blob/main/docs/product/roadmap.md) that the product and design team distills down to actionable tasks at the beginning of each sprint. Design, engineering and product work is tracked on the [FAC Task Tracking board](https://github.com/GSA-TTS/FAC/projects/1) in Github. 
+There is a [high-level roadmap](https://github.com/GSA-TTS/FAC/blob/main/docs/product/roadmap.md) containing Milestones that the product and design team distills down to actionable tasks at the beginning of each sprint. Design, engineering and product work is tracked on the [FAC Task Tracking board](https://github.com/GSA-TTS/FAC/projects/1) in Github with corrosponding roadmap Milestones. 
 
 ### Creating issues
  
