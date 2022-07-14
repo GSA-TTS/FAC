@@ -14,9 +14,9 @@ Provide clarity for the migration plan from the old Census FAC to the new TTS FA
 
 ## Decision
 
-#### On or around 1/1/23, the following will happen:
+#### On or around 4/1/23, the following will happen:
 
-* The new TTS FAC is live and will begin accepting audits for FY2022
+* The new TTS FAC is live and will begin accepting audits for FY2023
 * The old Census FAC will continue to operate and disseminate data, but will no longer accept audits
 * The old Census FAC will pull in new SAC entries from new TTS FAC into the dissemination pipeline via the API, keeping existing systems attached to the old FAC (ATAS, etc) smoothly operating for a temporary period of time. 
 * Agencies will be told that they have nine months to transition to the new TTS FAC's API, which is documented with guidance on how to transition from the old data model to the new
