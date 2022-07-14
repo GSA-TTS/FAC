@@ -15,8 +15,8 @@ There is a [high-level roadmap](https://github.com/GSA-TTS/FAC/blob/main/docs/pr
  
 **Labeling issues** - In addition to the "story", "design" and "engineering" labels, the "needs refinement" label is a very important label to denote whether an issue needs to be better clarified. There are a bunch of other labels that are rarely used and could probably be deleted. These two carry special significance since we try not to actively work on an issue until these labels have been removed: 
 
-* “Needs refinement” - need requirements a group decision (design, engineering, product) to move forward
-* “Needs scoping” - needs division of tasks, will go through process of people pairing to shape an issue
+* “Needs refinement” - need a design, engineering or product decision to move forward
+* “Needs scoping” - needs people to pair up and review, then break down an issue into individual tasks.
 
  
 **Estimation / Velocity** - There is no estimation process for tickets, but they should be refined to be in approximately comparable sizes. The team works in two-week sprints starting on Tuesdays. As of right now, our two velocity metrics are number of tasks completed and number of stories completed in a sprint tracked
@@ -71,7 +71,7 @@ We do standups on video chat, but everyone has the option to do it in Slack inst
 
 ### Sprint planning (Backlog->Available)
 
-At the start of each sprint, we review the stories refined for implementation and ensure they . We aim to take on work that can be completed within one sprint. If a story seems like it'll need to span more than one sprint, that may be a sign that it needs to be broken into a smaller chunk of work. 
+At the start of each sprint, we review the stories refined for implementation and ensure they are of sufficient definition and priority. We aim to take on work that can be completed within one sprint. If a story seems like it'll need to span more than one sprint, that may be a sign that it needs to be broken into a smaller chunk of work. 
 
 All teams members to provide update in github issues in progress on Monday/early-Tues before sprint planning and backlog refinement. 
 
