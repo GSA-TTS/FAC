@@ -17,7 +17,7 @@ Milestones
 
 These milestones are sequenced and grouped thematically and are intended to be about equal size in effort, however they are not grounded in estimation. They are made under the assumption that the FAC is adequately staffed through the engagement. 
 
-## Milestone: Pre-SAC
+## Milestone 1: Pre-SAC
 
 **Value delivered:**
 Guide auditees in their first steps to submitting a new audit. Present a homepage to them with a clear CTA, explain why they need to log in to submit a new audit, guide them through the "Pre-SAC" forms where they: 
@@ -33,7 +33,7 @@ Additional value here is preventing entities that don't meet the criteria from s
 * (90% ✅) Create a new audit (pre SAC forms)
 * (80% ✅) design/exploration - "Submit an entire audit package" milestone
 
-## Milestone: Submit general information end to end / De-risk
+## Milestone 2: Submit general information end to end / De-risk
 
 **Value delivered:**
 To de-risk our product plans, we will focus on an end-to-end solution that bridges data input to dissemination to the current FAC. This will include a fully fleshed out SF-SAC general information page. We will also build out the API to de-risk unknows in end-to-end implementation and unblock our partners at Census by providing specifics of API format. 
