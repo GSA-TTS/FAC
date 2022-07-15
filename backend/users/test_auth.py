@@ -300,6 +300,30 @@ class JwtUpsertAuthenticationTests(TestCase):
 
         self.assertEqual(user, existing_user_backup_1)
 
+    def test_duplicate_user_email(self):
+        """
+        if there are multiple User records with the same email address
+        an InvalidTokenError should be raised, as this is an unexpected
+        scenario and is only possible if duplicate Users are created manually
+        via Django admin or directly added to the database
+        """
+        email = "existing-user@test.test"
+
+        baker.make(User, email=email)
+        baker.make(User, email=email)
+
+        login_id = str(uuid4())
+
+        auth = JWTUpsertAuthentication()
+
+        token = {
+            "sub": login_id,
+            "email": email,
+            "all_emails": [email],
+        }
+
+        self.assertRaises(InvalidTokenError, auth.get_user, token)
+
 
 class ExpiringTokenAuthenticationTests(TestCase):
     def test_valid_token(self):

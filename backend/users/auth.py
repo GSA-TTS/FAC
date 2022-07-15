@@ -40,6 +40,9 @@ class JWTUpsertAuthentication(JWTAuthentication):
             except self.user_model.DoesNotExist:
                 # none of the Users use the LoginGov primary email, take the first one
                 user = users[0]
+            except self.user_model.MultipleObjectsReturned:
+                logger.warn(f"multiple User records found with email: {email}")
+                raise
         elif users.count() == 1:
             # found a single User match
             user = users[0]
@@ -76,7 +79,10 @@ class JWTUpsertAuthentication(JWTAuthentication):
 
             logger.debug(f"found existing user record for {user.email}")
         except LoginGovUser.DoesNotExist:
-            user = self.get_or_create_auth_user(email, all_emails)
+            try:
+                user = self.get_or_create_auth_user(email, all_emails)
+            except Exception:
+                raise InvalidTokenError(_("There was an error retrieving account information"))
 
             logger.debug(f"created new user record for {user.email}")
 
