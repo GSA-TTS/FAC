@@ -82,7 +82,9 @@ class JWTUpsertAuthentication(JWTAuthentication):
             try:
                 user = self.get_or_create_auth_user(email, all_emails)
             except Exception:
-                raise InvalidTokenError(_("There was an error retrieving account information"))
+                raise InvalidTokenError(
+                    _("There was an error retrieving account information")
+                )
 
             logger.debug(f"created new user record for {user.email}")
 
