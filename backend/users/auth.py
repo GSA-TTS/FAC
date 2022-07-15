@@ -47,6 +47,7 @@ class JWTUpsertAuthentication(JWTAuthentication):
             # didn't find an existing User, create one
 
             # generate a random password
+            # all authentication comes through Login.gov, so this password will never be used
             password = "".join(
                 random.SystemRandom().choice(string.ascii_letters + string.digits)
                 for _ in range(32)
