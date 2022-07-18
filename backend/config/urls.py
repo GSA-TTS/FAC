@@ -39,6 +39,6 @@ urlpatterns = [
         name="uei-validation",
     ),
     path("sac/auditee", views.AuditeeInfoView.as_view(), name="auditee-info"),
-    path("sac/access", views.AccessView.as_view(), name="access"),
+    path("sac/accessandsubmission", views.AccessAndSubmissionView.as_view(), name="access"),
     path(settings.ADMIN_URL, admin.site.urls),
 ]
