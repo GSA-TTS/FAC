@@ -8,7 +8,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .serializers import (
-    AccessSerializer,
+    AccessAndSubmissionSerializer,
     AuditeeInfoSerializer,
     EligibilitySerializer,
     SingleAuditChecklistSerializer,
@@ -265,7 +265,7 @@ class AccessAndSubmissionView(APIView):
     ]
 
     def post(self, request):
-        serializer = AccessSerializer(data=request.data, many=True)
+        serializer = AccessAndSubmissionSerializer(data=request.data, many=True)
 
         # Need Eligibility and AuditeeInfo already collected to proceed
         entry_form_data = request.user.profile.entry_form_data
