@@ -31,8 +31,9 @@ class SACViewSet(viewsets.ModelViewSet):
 
 class EligibilityFormView(APIView):
     """
-    Accepts SF-SAC eligibility form responses, determines eligibility, and returns either
-    messages describing ineligibility or a reference to the next step in submitted an SF-SAC.
+    Accepts information from Step 1 (Submission criteria check) of the "Create New Audit"
+    pre-SAC checklist. It saves the information to the user profile and returns either
+    messages describing ineligibility or a reference to the next step to advance to.
     """
 
     def post(self, request):
@@ -47,156 +48,6 @@ class EligibilityFormView(APIView):
             return Response({"eligible": True, "next": next_step})
 
         return Response({"eligible": False, "errors": serializer.errors})
-
-
-class SacSaveFormView(APIView):
-    """
-    Saves a form!
-    """
-
-    missing_items = []
-
-    def field_check_and_save(
-            self, request, sac_object, request_field_name, sac_field_name
-    ):
-        value = request.data.get(request_field_name)
-        if value is None:
-            return request_field_name
-        else:
-            sac_object.__dict__[sac_field_name] = value
-
-    def add_user_access(self, email, role):
-        new_access = Access()
-        new_access.email = email
-        new_access.role = role
-        new_access.save()
-        return new_access
-
-    def post(self, request):
-
-        try:
-            sac = SingleAuditChecklist()
-            missing_items = []
-
-            # 1. Go through each field of request.data
-            # Page 1
-            missing_items.append(
-                self.field_check_and_save(
-                    request,
-                    sac,
-                    "user_provided_organization_type",
-                    "user_provided_organization_type",
-                )
-            )
-            missing_items.append(
-                self.field_check_and_save(
-                    request, sac, "met_spending_threshold", "met_spending_threshold"
-                )
-            )
-            missing_items.append(
-                self.field_check_and_save(request, sac, "is_usa_based", "is_usa_based")
-            )
-
-            # Page 2
-            missing_items.append(
-                self.field_check_and_save(request, sac, "auditee_ueid", "auditee_uei")
-            )
-            missing_items.append(
-                self.field_check_and_save(request, sac, "auditee_name", "auditee_name")
-            )
-            missing_items.append(
-                self.field_check_and_save(
-                    request,
-                    sac,
-                    "auditee_fy_start_date_start",
-                    "auditee_fiscal_period_start",
-                )
-            )
-            missing_items.append(
-                self.field_check_and_save(
-                    request, sac, "auditee_fy_start_date_end", "auditee_fiscal_period_end"
-                )
-            )
-
-            # Page 3
-            if request.data.get("auditee_certifying_official_name") is None:
-                missing_items.append("auditee_certifying_official_name")
-            if request.data.get("auditee_certifying_official_email") is None:
-                missing_items.append("auditee_certifying_official_email")
-            if request.data.get("auditor_certifying_official_name") is None:
-                missing_items.append("auditor_certifying_official_name")
-            if request.data.get("auditor_certifying_official_email") is None:
-                missing_items.append("auditor_certifying_official_email")
-
-            if request.data.getlist("auditee_contacts_name") is None:
-                missing_items.append("auditee_contacts_name")
-            if request.data.getlist("auditee_contacts_email") is None:
-                missing_items.append("auditee_contacts_email")
-            if request.data.getlist("auditee_contacts_name") is None:
-                missing_items.append("auditee_contacts_name")
-            if request.data.getlist("auditee_contacts_email") is None:
-                missing_items.append("auditee_contacts_email")
-
-            # 4. Missing fields?
-            # remove all Nones first since some of the checks could add that in
-
-            missing_items = list(filter(None, missing_items))
-
-            if len(missing_items) > 0:
-                return Response({
-                    "valid": False,
-                    "missing_items": missing_items
-                })
-
-            # all fields should exist at this point
-
-            # 5. Add users
-            # for each contact:
-            #    make user
-            #    make access
-            #    if errors:
-            #       rollback?
-            # make SAC with accesses
-            auditee_certifying_official_email_access = Access()
-            auditee_certifying_official_email_access.email = (
-                request.data.auditee_certifying_official_email
-            )
-            auditee_certifying_official_email_access.role = "auditee_cert"
-            auditee_certifying_official_email_access.save()
-            sac.certifying_auditee_contact = auditee_certifying_official_email_access
-
-            auditor_certifying_official_email_access = Access()
-            auditor_certifying_official_email_access.email = (
-                request.data.auditor_certifying_official_email
-            )
-            auditor_certifying_official_email_access.role = "auditor_cert"
-            auditor_certifying_official_email_access.save()
-            sac.certifying_auditor_contact = auditor_certifying_official_email_access
-
-            for email in request.data.getlist("auditee_contacts_email"):
-                sac.auditee_contacts.append(self.add_user_access(email, "auditee_contact"))
-
-            for email in request.data.getlist("auditor_contacts_email"):
-                sac.auditor_contacts.append(self.add_user_access(email, "auditor_contact"))
-
-            # 5. Apply it to SAC
-            sac.save()
-
-            # 7. Return finally
-            return Response(
-                {
-                    "valid": True,
-                    "response": sac.serializable_value(),
-                }
-            )
-
-        except Exception as e:
-            return Response(
-                {
-                    "valid": False,
-                    "error": str(e),
-                }
-            )
 
 
 class UEIValidationFormView(APIView):
@@ -218,13 +69,15 @@ class UEIValidationFormView(APIView):
 
 class AuditeeInfoView(APIView):
     """
-    Handle inbound requests for the `Auditee Information` step
+    Accepts information from Step 2 (Auditee information) of the "Create New Audit"
+    pre-SAC checklist. It saves the information to the user profile and returns either
+    messages describing missing info or a reference to the next step to advance to.
     """
 
-    DATA_WE_NEED = [
-        "is_usa_based",
+    PREVIOUS_STEP_DATA_WE_NEED = [
         "user_provided_organization_type",
         "met_spending_threshold",
+        "is_usa_based",
     ]
 
     def post(self, request):
@@ -233,7 +86,7 @@ class AuditeeInfoView(APIView):
         # Need Eligibility info to procede
         entry_form_data = request.user.profile.entry_form_data
         missing_fields = [
-            field for field in self.DATA_WE_NEED if field not in entry_form_data
+            field for field in self.PREVIOUS_STEP_DATA_WE_NEED if field not in entry_form_data
         ]
         if missing_fields:
             return Response(
@@ -258,7 +111,13 @@ class AuditeeInfoView(APIView):
 
 
 class AccessAndSubmissionView(APIView):
-    DATA_WE_NEED = AuditeeInfoView.DATA_WE_NEED + [
+    """
+    Accepts information from Step 3 (Audit submission access) of the "Create New Audit"
+    pre-SAC checklist. This is the last step. It saves the information to the user profile.
+    If it has all the information needed, it attempts to create user access permissions and
+    then returns success or error messages.
+    """
+    PREVIOUS_STEP_DATA_WE_NEED = AuditeeInfoView.PREVIOUS_STEP_DATA_WE_NEED + [
         "auditee_fiscal_period_start",
         "auditee_fiscal_period_end",
         "auditee_name",
@@ -270,7 +129,7 @@ class AccessAndSubmissionView(APIView):
         # Need Eligibility and AuditeeInfo already collected to proceed
         entry_form_data = request.user.profile.entry_form_data
         missing_fields = [
-            field for field in self.DATA_WE_NEED if field not in entry_form_data
+            field for field in self.PREVIOUS_STEP_DATA_WE_NEED if field not in entry_form_data
         ]
         if missing_fields:
             return Response(
@@ -281,12 +140,18 @@ class AccessAndSubmissionView(APIView):
             )
 
         if serializer.is_valid():
-            # Create SF-SAC instance and user provided access grants
+            # Create SF-SAC instance and add data from previous steps saved in the
+            # user profile
             sac = SingleAuditChecklist.objects.create(
                 submitted_by=request.user, **entry_form_data
             )
-            access_grants = [Access(sac=sac, **acc) for acc in serializer.data]
-            Access.objects.bulk_create(access_grants)
+
+            # Create user accounts
+            sac.certifying_auditee_contact = Access.objects.create(**serializer.data.get("certifying_auditee_contact"))
+            sac.certifying_auditor_contact = Access.objects.create(**serializer.data.get("certifying_auditor_contact"))
+            sac.auditee_contacts = [Access.objects.create(**access_item) for access_item in serializer.data.get("auditee_contacts")]
+            sac.auditor_contacts = [Access.objects.create(**access_item) for access_item in serializer.data.get("auditor_contacts")]
+            sac.save()
 
             # Clear entry form data from profile
             request.user.profile.entry_form_data = {}
