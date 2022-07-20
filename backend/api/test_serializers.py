@@ -4,7 +4,7 @@ from unittest.mock import patch
 from django.test import SimpleTestCase
 
 from api.test_uei import valid_uei_results
-from api.serializers import EligibilitySerializer, UEISerializer, AuditeeInfoSerializer
+from api.serializers import EligibilitySerializer, UEISerializer, AuditeeInfoSerializer, AccessAndSubmissionSerializer
 
 
 class EligibilityStepTests(SimpleTestCase):
@@ -107,21 +107,101 @@ class AuditeeInfoStepTests(SimpleTestCase):
         missing_start_and_end = {
             "auditee_name": "FacCo, Inc."
         }
-        missing_name = {
-            "auditee_uei": "ZQGGHJH74DW7",
-            "auditee_fiscal_period_start": "2021-01-01",
-            "auditee_fiscal_period_end": "2021-12-31",
-        }
 
         self.assertFalse(AuditeeInfoSerializer(data=empty).is_valid())
         self.assertFalse(AuditeeInfoSerializer(data=missing_start).is_valid())
         self.assertFalse(AuditeeInfoSerializer(data=missing_end).is_valid())
         self.assertFalse(AuditeeInfoSerializer(data=missing_start_and_end).is_valid())
-        self.assertFalse(AuditeeInfoSerializer(data=missing_name).is_valid())
         self.assertTrue(AuditeeInfoSerializer(data=valid_with_uei).is_valid())
         self.assertTrue(AuditeeInfoSerializer(data=valid_missing_uei).is_valid())
 
 
 class AccessAndSubmissionStepTests(SimpleTestCase):
-    pass
+    def test_serializer_validation(self):
+        """
+        Auditee Name, Fiscal Period start/end are all required
+        Auditee UEI is optional
+        """
+        valid1 = {
+            "certifying_auditee_contact": "a@a.com",
+            "certifying_auditor_contact": "b@b.com",
+            "auditor_contacts": ["c@c.com"],
+            "auditee_contacts": ["e@e.com"],
+        }
+        valid2 = {
+            "certifying_auditee_contact": "a@a.com",
+            "certifying_auditor_contact": "b@b.com",
+            "auditor_contacts": ["c@c.com", "d@d.com"],
+            "auditee_contacts": ["e@e.com", "f@f.com"],
+        }
 
+        empty = {}
+        missing_cert_auditee = {
+            "certifying_auditor_contact": "b@b.com",
+            "auditor_contacts": ["c@c.com", "d@d.com"],
+            "auditee_contacts": ["e@e.com", "f@f.com"],
+        }
+        missing_cert_auditor = {
+            "certifying_auditee_contact": "a@a.com",
+            "auditor_contacts": ["c@c.com", "d@d.com"],
+            "auditee_contacts": ["e@e.com", "f@f.com"],
+        }
+        missing_auditor_contacts = {
+            "certifying_auditee_contact": "a@a.com",
+            "certifying_auditor_contact": "b@b.com",
+            "auditee_contacts": ["e@e.com", "f@f.com"],
+        }
+        missing_auditee_contacts = {
+            "certifying_auditee_contact": "a@a.com",
+            "certifying_auditor_contact": "b@b.com",
+            "auditor_contacts": ["c@c.com", "d@d.com"],
+        }
+        auditee_contacts_not_list = {
+            "certifying_auditee_contact": "a@a.com",
+            "certifying_auditor_contact": "b@b.com",
+            "auditor_contacts": "c@c.com",
+            "auditee_contacts": ["e@e.com", "f@f.com"],
+        }
+        auditor_contacts_not_list = {
+            "certifying_auditee_contact": "a@a.com",
+            "certifying_auditor_contact": "b@b.com",
+            "auditor_contacts": ["c@c.com", "d@d.com"],
+            "auditee_contacts": "e@e.com"
+        }
+        cert_auditee_not_valid_email = {
+            "certifying_auditee_contact": "this is not an email",
+            "certifying_auditor_contact": "b@b.com",
+            "auditor_contacts": ["c@c.com", "d@d.com"],
+            "auditee_contacts": ["e@e.com", "f@f.com"],
+        }
+        cert_auditor_not_valid_email = {
+            "certifying_auditee_contact": "a@a.com",
+            "certifying_auditor_contact": "this is not an email",
+            "auditor_contacts": ["c@c.com", "d@d.com"],
+            "auditee_contacts": ["e@e.com", "f@f.com"],
+        }
+        auditor_not_all_valid_emails = {
+            "certifying_auditee_contact": "a@a.com",
+            "certifying_auditor_contact": "b@b.com",
+            "auditor_contacts": ["c@c.com", "this is not an email", "d@d.com"],
+            "auditee_contacts": ["e@e.com", "f@f.com"],
+        }
+        auditee_not_all_valid_emails = {
+            "certifying_auditee_contact": "a@a.com",
+            "certifying_auditor_contact": "b@b.com",
+            "auditor_contacts": ["c@c.com", "d@d.com"],
+            "auditee_contacts": ["e@e.com", "this is not an email", "f@f.com"],
+        }
+
+        self.assertFalse(AccessAndSubmissionSerializer(data=empty).is_valid())
+        self.assertFalse(AccessAndSubmissionSerializer(data=missing_cert_auditee).is_valid())
+        self.assertFalse(AccessAndSubmissionSerializer(data=missing_cert_auditor).is_valid())
+        self.assertFalse(AccessAndSubmissionSerializer(data=missing_auditor_contacts).is_valid())
+        self.assertFalse(AccessAndSubmissionSerializer(data=auditee_contacts_not_list).is_valid())
+        self.assertFalse(AccessAndSubmissionSerializer(data=auditor_contacts_not_list).is_valid())
+        self.assertFalse(AccessAndSubmissionSerializer(data=cert_auditee_not_valid_email).is_valid())
+        self.assertFalse(AccessAndSubmissionSerializer(data=cert_auditor_not_valid_email).is_valid())
+        self.assertFalse(AccessAndSubmissionSerializer(data=auditor_not_all_valid_emails).is_valid())
+        self.assertFalse(AccessAndSubmissionSerializer(data=auditee_not_all_valid_emails).is_valid())
+        self.assertTrue(AccessAndSubmissionSerializer(data=valid1).is_valid())
+        self.assertTrue(AccessAndSubmissionSerializer(data=valid2).is_valid())
