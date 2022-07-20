@@ -3,7 +3,7 @@ import json
 from rest_framework import serializers
 from django.utils.translation import gettext_lazy as _
 
-from audit.models import SingleAuditChecklist, Access
+from audit.models import SingleAuditChecklist
 from api.uei import get_uei_info_from_sam_gov
 
 # Eligibility step messages

@@ -210,6 +210,9 @@ class AccessAndSubmissionStepTests(SimpleTestCase):
             AccessAndSubmissionSerializer(data=missing_cert_auditor).is_valid()
         )
         self.assertFalse(
+            AccessAndSubmissionSerializer(data=missing_auditee_contacts).is_valid()
+        )
+        self.assertFalse(
             AccessAndSubmissionSerializer(data=missing_auditor_contacts).is_valid()
         )
         self.assertFalse(
