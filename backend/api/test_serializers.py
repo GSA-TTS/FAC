@@ -92,6 +92,11 @@ class AuditeeInfoStepTests(SimpleTestCase):
             "auditee_fiscal_period_end": "2021-12-31",
             "auditee_name": "FacCo, Inc."
         }
+        valid_missing_name = {
+            "auditee_uei": "ZQGGHJH74DW7",
+            "auditee_fiscal_period_start": "2021-01-01",
+            "auditee_fiscal_period_end": "2021-12-31"
+        }
 
         empty = {}
         missing_start = {
@@ -114,6 +119,7 @@ class AuditeeInfoStepTests(SimpleTestCase):
         self.assertFalse(AuditeeInfoSerializer(data=missing_start_and_end).is_valid())
         self.assertTrue(AuditeeInfoSerializer(data=valid_with_uei).is_valid())
         self.assertTrue(AuditeeInfoSerializer(data=valid_missing_uei).is_valid())
+        self.assertTrue(AuditeeInfoSerializer(data=valid_missing_name).is_valid())
 
 
 class AccessAndSubmissionStepTests(SimpleTestCase):

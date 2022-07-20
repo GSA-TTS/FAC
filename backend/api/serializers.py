@@ -16,9 +16,6 @@ USER_PROVIDED_ORG_TYPE = _(
 )
 
 # Auditee info step messages
-AUDITEE_NAME = _(
-    "The auditee name is a required field"
-)
 AUDITEE_FISCAL_PERIOD_START = _(
     "The fiscal period start date is required"
 )
@@ -95,12 +92,7 @@ class AuditeeInfoSerializer(serializers.ModelSerializer):
             "auditee_fiscal_period_end",
         ]
 
-    # auditee_uei optional, rest required
-    def validate_auditee_name(self, value):
-        if not value:
-            raise serializers.ValidationError(AUDITEE_NAME)
-        return value
-
+    # auditee_name and auditee_uei optional, fiscal start/end required
     def validate_auditee_fiscal_period_start(self, value):
         if not value:
             raise serializers.ValidationError(AUDITEE_FISCAL_PERIOD_START)
