@@ -3,7 +3,7 @@ import json
 from rest_framework import serializers
 from django.utils.translation import gettext_lazy as _
 
-from audit.models import SingleAuditChecklist
+from audit.models import SingleAuditChecklist, Access
 from api.uei import get_uei_info_from_sam_gov
 
 # Eligibility step messages
@@ -98,6 +98,12 @@ class AuditeeInfoSerializer(serializers.ModelSerializer):
         if not value:
             raise serializers.ValidationError(AUDITEE_FISCAL_PERIOD_END)
         return value
+
+
+class AccessSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Access
+        fields = ["role", "email", "user_id"]
 
 
 class AccessAndSubmissionSerializer(serializers.Serializer):
