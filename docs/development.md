@@ -99,6 +99,8 @@ FAC_PYTHON_VERSION=`cat .python-version`
 pyenv install $FAC_PYTHON_VERSION
 ```
 
+You may run into a `pyenv` mismatch between the version in `.python-version` and possible versions `pyenv` supports, for example, `.python-version` might contain `3.10` but `pyenv` only allows `3.10.0` or other minor versions of `3.10`. One approach to fixing this is to create a symlink in `~/.pyenv/versions` pointing a `3.10` symlink at whatever installed version you prefer. A command to do this might look like `ln -s ~/.pyenv/versions/3.10.1 ~/.pyenv/versions/3.10`.
+
 Then, set up the virtualenv.
 
 `pyenv virtualenv $FAC_PYTHON_VERSION FAC`
