@@ -6,7 +6,7 @@ from django.utils.translation import gettext_lazy as _
 from audit.models import SingleAuditChecklist, Access
 from api.uei import get_uei_info_from_sam_gov
 
-
+# Eligibility step messages
 SPENDING_THRESHOLD = _(
     "The FAC only accepts submissions from non-Federal entities that spend $750,000 or more in federal awards during its audit period (fiscal period begin dates on or after 12/26/2014) in accordance with Uniform Guidance"
 )
@@ -14,6 +14,19 @@ USA_BASED = _("The FAC only accepts submissions from U.S.-based entities")
 USER_PROVIDED_ORG_TYPE = _(
     "The FAC only accepts submissions from States, Local governments, Indian tribes or Tribal organizations, Institutions of higher education (IHEs), and Non-profits"
 )
+
+# Auditee info step messages
+AUDITEE_NAME = _(
+    "The auditee name is a required field"
+)
+AUDITEE_FISCAL_PERIOD_START = _(
+    "The fiscal period start date is required"
+)
+AUDITEE_FISCAL_PERIOD_END = _(
+    "The fiscal period end date is required"
+)
+
+# Access and submission step messages
 CERTIFYING_AUDITEE_CONTACT_EMAIL = _(
     "Certifying Auditee Contact email is a required field"
 )
@@ -81,6 +94,22 @@ class AuditeeInfoSerializer(serializers.ModelSerializer):
             "auditee_fiscal_period_start",
             "auditee_fiscal_period_end",
         ]
+
+    # auditee_uei optional, rest required
+    def validate_auditee_name(self, value):
+        if not value:
+            raise serializers.ValidationError(AUDITEE_NAME)
+        return value
+
+    def validate_auditee_fiscal_period_start(self, value):
+        if not value:
+            raise serializers.ValidationError(AUDITEE_FISCAL_PERIOD_START)
+        return value
+
+    def validate_auditee_fiscal_period_end(self, value):
+        if not value:
+            raise serializers.ValidationError(AUDITEE_FISCAL_PERIOD_END)
+        return value
 
 
 class AccessAndSubmissionSerializer(serializers.Serializer):

@@ -4,7 +4,7 @@ from unittest.mock import patch
 from django.test import SimpleTestCase
 
 from api.test_uei import valid_uei_results
-from api.serializers import EligibilitySerializer, UEISerializer
+from api.serializers import EligibilitySerializer, UEISerializer, AuditeeInfoSerializer
 
 
 class EligibilityStepTests(SimpleTestCase):
@@ -73,3 +73,55 @@ class UEIValidatorStepTests(SimpleTestCase):
             mock_get.return_value.status_code = 200  # Mock the status code
             mock_get.return_value.json.return_value = {"errors": [1, 2, 3]}
             self.assertFalse(UEISerializer(data=valid).is_valid())
+
+
+class AuditeeInfoStepTests(SimpleTestCase):
+    def test_serializer_validation(self):
+        """
+        Auditee Name, Fiscal Period start/end are all required
+        Auditee UEI is optional
+        """
+        valid_with_uei = {
+            "auditee_uei": "ZQGGHJH74DW7",
+            "auditee_fiscal_period_start": "2021-01-01",
+            "auditee_fiscal_period_end": "2021-12-31",
+            "auditee_name": "FacCo, Inc."
+        }
+        valid_missing_uei = {
+            "auditee_fiscal_period_start": "2021-01-01",
+            "auditee_fiscal_period_end": "2021-12-31",
+            "auditee_name": "FacCo, Inc."
+        }
+
+        empty = {}
+        missing_start = {
+            "auditee_uei": "ZQGGHJH74DW7",
+            "auditee_fiscal_period_end": "2021-12-31",
+            "auditee_name": "FacCo, Inc."
+        }
+        missing_end = {
+            "auditee_uei": "ZQGGHJH74DW7",
+            "auditee_fiscal_period_start": "2021-01-01",
+            "auditee_name": "FacCo, Inc."
+        }
+        missing_start_and_end = {
+            "auditee_name": "FacCo, Inc."
+        }
+        missing_name = {
+            "auditee_uei": "ZQGGHJH74DW7",
+            "auditee_fiscal_period_start": "2021-01-01",
+            "auditee_fiscal_period_end": "2021-12-31",
+        }
+
+        self.assertFalse(AuditeeInfoSerializer(data=empty).is_valid())
+        self.assertFalse(AuditeeInfoSerializer(data=missing_start).is_valid())
+        self.assertFalse(AuditeeInfoSerializer(data=missing_end).is_valid())
+        self.assertFalse(AuditeeInfoSerializer(data=missing_start_and_end).is_valid())
+        self.assertFalse(AuditeeInfoSerializer(data=missing_name).is_valid())
+        self.assertTrue(AuditeeInfoSerializer(data=valid_with_uei).is_valid())
+        self.assertTrue(AuditeeInfoSerializer(data=valid_missing_uei).is_valid())
+
+
+class AccessAndSubmissionStepTests(SimpleTestCase):
+    pass
+
