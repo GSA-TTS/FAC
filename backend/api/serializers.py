@@ -14,8 +14,11 @@ USA_BASED = _("The FAC only accepts submissions from U.S.-based entities")
 USER_PROVIDED_ORG_TYPE = _(
     "The FAC only accepts submissions from States, Local governments, Indian tribes or Tribal organizations, Institutions of higher education (IHEs), and Non-profits"
 )
-CERTIFYING_CONTACT_EMAIL = _(
-    "Certifying Auditee and Certifying Auditor Contact emails are required fields"
+CERTIFYING_AUDITEE_CONTACT_EMAIL = _(
+    "Certifying Auditee Contact email is a required field"
+)
+CERTIFYING_AUDITOR_CONTACT_EMAIL = _(
+    "Certifying Auditor Contact email is a required field"
 )
 AUDITEE_CONTACTS_LIST = _("Auditee Contacts needs to be a list of emails")
 AUDITOR_CONTACTS_LIST = _("Auditor Contacts needs to be a list of emails")
@@ -80,41 +83,36 @@ class AuditeeInfoSerializer(serializers.ModelSerializer):
         ]
 
 
-class AccessAndSubmissionSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Access
-        fields = ["role", "email", "user"]
+class AccessAndSubmissionSerializer(serializers.Serializer):
+    """
+    The data here should be a series of role/email pairs.
+    We want to verify that there is one and only one certifying_auditee_contact
+    and one and only one certifying_auditor_contact listed.
 
-    def validate(self, data):
-        """
-        The data here should be a series of role/email pairs.
-        We want to verify that there is one and only one certifying_auditee_contact
-        and one and only one certifying_auditor_contact listed.
+    We think the data will look like this:
 
-        We think the data will look like this:
+    {
+        "certifying_auditee_contact": "a@a.com",
+        "certifying_auditor_contact": "b@b.com",
+        "auditor_contacts": ["c@c.com",  "d@d.com"],
+        "auditee_contacts": ["e@e.com",  "f@f.com"],
+    }
+    """
 
-        {
-            "certifying_auditee_contact": "a@a.com",
-            "certifying_auditor_contact": "b@b.com",
-            "auditor_contacts": ["c@c.com",  "d@d.com"],
-            "auditee_contacts": ["e@e.com",  "f@f.com"],
-        }
+    # This serializer isn't tied to a model, so it's a Serializer with the below layout
+    certifying_auditee_contact = serializers.EmailField()
+    certifying_auditor_contact = serializers.EmailField()
+    auditor_contacts = serializers.ListField(
+        child=serializers.EmailField(),
+        allow_empty=True,
+        min_length=0
+    )
+    auditee_contacts = serializers.ListField(
+        child=serializers.EmailField(),
+        allow_empty=True,
+        min_length=0
+    )
 
-        """
-
-        # Are both required certifying email fields there?
-        if not data.get("certifying_auditee_contact") or not data.get("certifying_auditor_contact"):
-            raise serializers.ValidationError(CERTIFYING_CONTACT_EMAIL)
-
-        # (This may change pending advice from design)
-        # Are both required lists of contacts there?
-        if not data.get("auditor_contacts") or not isinstance(data.get("auditor_contacts"), list):
-            raise serializers.ValidationError(AUDITOR_CONTACTS_LIST)
-        if not data.get("auditee_contacts") or not isinstance(data.get("auditee_contacts"), list):
-            raise serializers.ValidationError(AUDITEE_CONTACTS_LIST)
-
-        # Passes
-        return data
 
 class SingleAuditChecklistSerializer(serializers.ModelSerializer):
     class Meta:

@@ -1,5 +1,4 @@
 import json
-from pprint import pprint
 
 from audit.models import Access, SingleAuditChecklist
 from django.urls import reverse
@@ -83,7 +82,7 @@ class AuditeeInfoView(APIView):
     def post(self, request):
         serializer = AuditeeInfoSerializer(data=request.data)
 
-        # Need Eligibility info to procede
+        # Need Eligibility info to proceed
         entry_form_data = request.user.profile.entry_form_data
         missing_fields = [
             field for field in self.PREVIOUS_STEP_DATA_WE_NEED if field not in entry_form_data
@@ -92,7 +91,8 @@ class AuditeeInfoView(APIView):
             return Response(
                 {
                     "next": reverse("eligibility"),
-                    "errors": "We're missing important data, please try again.",
+                    "errors": "We're missing required fields, please try again.",
+                    "missing_fields": missing_fields
                 }
             )
 
@@ -124,18 +124,19 @@ class AccessAndSubmissionView(APIView):
     ]
 
     def post(self, request):
-        serializer = AccessAndSubmissionSerializer(data=request.data, many=True)
+        serializer = AccessAndSubmissionSerializer(data=request.data)
 
         # Need Eligibility and AuditeeInfo already collected to proceed
-        entry_form_data = request.user.profile.entry_form_data
+        all_steps_user_form_data = request.user.profile.entry_form_data
         missing_fields = [
-            field for field in self.PREVIOUS_STEP_DATA_WE_NEED if field not in entry_form_data
+            field for field in self.PREVIOUS_STEP_DATA_WE_NEED if field not in all_steps_user_form_data
         ]
         if missing_fields:
             return Response(
                 {
                     "next": reverse("eligibility"),
-                    "errors": "We're missing important data, please try again.",
+                    "errors": "We're missing required fields, please try again.",
+                    "missing_fields": missing_fields
                 }
             )
 
@@ -143,14 +144,14 @@ class AccessAndSubmissionView(APIView):
             # Create SF-SAC instance and add data from previous steps saved in the
             # user profile
             sac = SingleAuditChecklist.objects.create(
-                submitted_by=request.user, **entry_form_data
+                submitted_by=request.user, **all_steps_user_form_data
             )
 
-            # Create user accounts
-            sac.certifying_auditee_contact = Access.objects.create(**serializer.data.get("certifying_auditee_contact"))
-            sac.certifying_auditor_contact = Access.objects.create(**serializer.data.get("certifying_auditor_contact"))
-            sac.auditee_contacts = [Access.objects.create(**access_item) for access_item in serializer.data.get("auditee_contacts")]
-            sac.auditor_contacts = [Access.objects.create(**access_item) for access_item in serializer.data.get("auditor_contacts")]
+            # Create all contact user accounts
+            sac.certifying_auditee_contact = Access.objects.create(role="auditee_cert", email=serializer.data.get("certifying_auditee_contact"))
+            sac.certifying_auditor_contact = Access.objects.create(role="auditor_cert", email=serializer.data.get("certifying_auditor_contact"))
+            sac.auditee_contacts.set([Access.objects.create(role="auditee_contact", email=access_item) for access_item in serializer.data.get("auditee_contacts")])
+            sac.auditor_contacts.set([Access.objects.create(role="auditor_contact", email=access_item) for access_item in serializer.data.get("auditor_contacts")])
             sac.save()
 
             # Clear entry form data from profile
