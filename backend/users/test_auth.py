@@ -80,7 +80,7 @@ class JwtUpsertAuthenticationTests(TestCase):
         login_user = LoginGovUser.objects.get(user=user)
 
         self.assertIsNotNone(login_user)
-        self.assertEqual(login_user.user, user.id)
+        self.assertEqual(login_user.user, user)
         self.assertEqual(login_user.login_id, login_id)
 
     def test_existing_user(self):
@@ -184,7 +184,7 @@ class JwtUpsertAuthenticationTests(TestCase):
         # after logging in, the access object references the newly-created user
         accesses = Access.objects.filter(email=backup_email)
         self.assertEqual(len(accesses), 1)
-        self.assertEqual(accesses[0].user_id, user)
+        self.assertEqual(accesses[0].user, user)
 
     def test_multiple_audit_access_granted(self):
         """
