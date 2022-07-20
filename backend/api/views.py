@@ -97,7 +97,7 @@ class AuditeeInfoView(APIView):
             )
 
         if serializer.is_valid():
-            next_step = reverse("access")
+            next_step = reverse("accessandsubmission")
 
             # combine with expected eligibility info from session
             request.user.profile.entry_form_data = (
