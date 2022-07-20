@@ -337,12 +337,14 @@ class SACCreationTests(TestCase):
         data = response.json()
         next_step = data["next"]
 
-        # Submit Access details
-        access_data = [
-            {"role": "auditee_contact", "email": "test@example.com"},
-            {"role": "auditor_contact", "email": "testerc@example.com"},
-        ]
-        response = self.client.post(next_step, access_data, format="json")
+        # Submit AccessAndSubmission details
+        access_and_submission_data = {
+            "certifying_auditee_contact": "a@a.com",
+            "certifying_auditor_contact": "b@b.com",
+            "auditor_contacts": ["c@c.com"],
+            "auditee_contacts": ["e@e.com"],
+        }
+        response = self.client.post(next_step, access_and_submission_data, format="json")
         data = response.json()
         sac = SingleAuditChecklist.objects.get(id=data["sac_id"])
         self.assertEqual(sac.submitted_by, self.user)
