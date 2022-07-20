@@ -16,12 +16,8 @@ USER_PROVIDED_ORG_TYPE = _(
 )
 
 # Auditee info step messages
-AUDITEE_FISCAL_PERIOD_START = _(
-    "The fiscal period start date is required"
-)
-AUDITEE_FISCAL_PERIOD_END = _(
-    "The fiscal period end date is required"
-)
+AUDITEE_FISCAL_PERIOD_START = _("The fiscal period start date is required")
+AUDITEE_FISCAL_PERIOD_END = _("The fiscal period end date is required")
 
 # Access and submission step messages
 CERTIFYING_AUDITEE_CONTACT_EMAIL = _(
@@ -124,14 +120,10 @@ class AccessAndSubmissionSerializer(serializers.Serializer):
     certifying_auditee_contact = serializers.EmailField()
     certifying_auditor_contact = serializers.EmailField()
     auditor_contacts = serializers.ListField(
-        child=serializers.EmailField(),
-        allow_empty=True,
-        min_length=0
+        child=serializers.EmailField(), allow_empty=True, min_length=0
     )
     auditee_contacts = serializers.ListField(
-        child=serializers.EmailField(),
-        allow_empty=True,
-        min_length=0
+        child=serializers.EmailField(), allow_empty=True, min_length=0
     )
 
 

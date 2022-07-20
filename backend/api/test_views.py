@@ -28,11 +28,11 @@ VALID_ELIGIBILITY_DATA = {
     "user_provided_organization_type": "state",
 }
 VALID_ACCESS_AND_SUBMISSION_DATA = {
-            "certifying_auditee_contact": "a@a.com",
-            "certifying_auditor_contact": "b@b.com",
-            "auditee_contacts": ["c@c.com"],
-            "auditor_contacts": ["d@d.com"],
-        }
+    "certifying_auditee_contact": "a@a.com",
+    "certifying_auditor_contact": "b@b.com",
+    "auditee_contacts": ["c@c.com"],
+    "auditor_contacts": ["d@d.com"],
+}
 
 
 class EligibilityViewTests(TestCase):
@@ -252,7 +252,9 @@ class AccessAndSubmissionTests(TestCase):
     def test_missing_expected_form_data_from_prior_steps(self):
         """Return an error and point to Eligibility step if we're missing data from any prior step"""
         # Missing Eligibility data
-        response = self.client.post(ACCESS_AND_SUBMISSION_PATH, VALID_ACCESS_AND_SUBMISSION_DATA, format="json")
+        response = self.client.post(
+            ACCESS_AND_SUBMISSION_PATH, VALID_ACCESS_AND_SUBMISSION_DATA, format="json"
+        )
         data = response.json()
         self.assertEqual(data["next"], ELIGIBILITY_PATH)
         self.assertTrue(data["errors"])
@@ -261,7 +263,9 @@ class AccessAndSubmissionTests(TestCase):
         self.user.profile.save()
 
         # Have eligibility, but missing auditee info data
-        response = self.client.post(ACCESS_AND_SUBMISSION_PATH, VALID_ACCESS_AND_SUBMISSION_DATA, format="json")
+        response = self.client.post(
+            ACCESS_AND_SUBMISSION_PATH, VALID_ACCESS_AND_SUBMISSION_DATA, format="json"
+        )
         data = response.json()
         self.assertEqual(data["next"], ELIGIBILITY_PATH)
         self.assertTrue(data["errors"])
@@ -274,7 +278,9 @@ class AccessAndSubmissionTests(TestCase):
         )
         self.user.profile.save()
 
-        response = self.client.post(ACCESS_AND_SUBMISSION_PATH, VALID_ACCESS_AND_SUBMISSION_DATA, format="json")
+        response = self.client.post(
+            ACCESS_AND_SUBMISSION_PATH, VALID_ACCESS_AND_SUBMISSION_DATA, format="json"
+        )
         data = response.json()
 
         sac = SingleAuditChecklist.objects.get(id=data["sac_id"])
@@ -298,10 +304,12 @@ class AccessAndSubmissionTests(TestCase):
         response = self.client.post(ACCESS_AND_SUBMISSION_PATH, {}, format="json")
         data = response.json()
         self.assertEqual(
-            data.get("errors", [])["certifying_auditee_contact"][0], "This field is required."
+            data.get("errors", [])["certifying_auditee_contact"][0],
+            "This field is required.",
         )
         self.assertEqual(
-            data.get("errors", [])["certifying_auditor_contact"][0], "This field is required."
+            data.get("errors", [])["certifying_auditor_contact"][0],
+            "This field is required.",
         )
         self.assertEqual(
             data.get("errors", [])["auditee_contacts"][0], "This field is required."
@@ -344,7 +352,9 @@ class SACCreationTests(TestCase):
             "auditor_contacts": ["c@c.com"],
             "auditee_contacts": ["e@e.com"],
         }
-        response = self.client.post(next_step, access_and_submission_data, format="json")
+        response = self.client.post(
+            next_step, access_and_submission_data, format="json"
+        )
         data = response.json()
         sac = SingleAuditChecklist.objects.get(id=data["sac_id"])
         self.assertEqual(sac.submitted_by, self.user)

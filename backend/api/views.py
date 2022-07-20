@@ -85,14 +85,16 @@ class AuditeeInfoView(APIView):
         # Need Eligibility info to proceed
         entry_form_data = request.user.profile.entry_form_data
         missing_fields = [
-            field for field in self.PREVIOUS_STEP_DATA_WE_NEED if field not in entry_form_data
+            field
+            for field in self.PREVIOUS_STEP_DATA_WE_NEED
+            if field not in entry_form_data
         ]
         if missing_fields:
             return Response(
                 {
                     "next": reverse("eligibility"),
                     "errors": "We're missing required fields, please try again.",
-                    "missing_fields": missing_fields
+                    "missing_fields": missing_fields,
                 }
             )
 
@@ -101,7 +103,7 @@ class AuditeeInfoView(APIView):
 
             # combine with expected eligibility info from session
             request.user.profile.entry_form_data = (
-                    request.user.profile.entry_form_data | request.data
+                request.user.profile.entry_form_data | request.data
             )
             request.user.profile.save()
 
@@ -117,6 +119,7 @@ class AccessAndSubmissionView(APIView):
     If it has all the information needed, it attempts to create user access permissions and
     then returns success or error messages.
     """
+
     PREVIOUS_STEP_DATA_WE_NEED = AuditeeInfoView.PREVIOUS_STEP_DATA_WE_NEED + [
         "auditee_fiscal_period_start",
         "auditee_fiscal_period_end",
@@ -129,14 +132,16 @@ class AccessAndSubmissionView(APIView):
         # Need Eligibility and AuditeeInfo already collected to proceed
         all_steps_user_form_data = request.user.profile.entry_form_data
         missing_fields = [
-            field for field in self.PREVIOUS_STEP_DATA_WE_NEED if field not in all_steps_user_form_data
+            field
+            for field in self.PREVIOUS_STEP_DATA_WE_NEED
+            if field not in all_steps_user_form_data
         ]
         if missing_fields:
             return Response(
                 {
                     "next": reverse("eligibility"),
                     "errors": "We're missing required fields, please try again.",
-                    "missing_fields": missing_fields
+                    "missing_fields": missing_fields,
                 }
             )
 
@@ -148,10 +153,26 @@ class AccessAndSubmissionView(APIView):
             )
 
             # Create all contact user accounts
-            sac.certifying_auditee_contact = Access.objects.create(role="auditee_cert", email=serializer.data.get("certifying_auditee_contact"))
-            sac.certifying_auditor_contact = Access.objects.create(role="auditor_cert", email=serializer.data.get("certifying_auditor_contact"))
-            sac.auditee_contacts.set([Access.objects.create(role="auditee_contact", email=access_item) for access_item in serializer.data.get("auditee_contacts")])
-            sac.auditor_contacts.set([Access.objects.create(role="auditor_contact", email=access_item) for access_item in serializer.data.get("auditor_contacts")])
+            sac.certifying_auditee_contact = Access.objects.create(
+                role="auditee_cert",
+                email=serializer.data.get("certifying_auditee_contact"),
+            )
+            sac.certifying_auditor_contact = Access.objects.create(
+                role="auditor_cert",
+                email=serializer.data.get("certifying_auditor_contact"),
+            )
+            sac.auditee_contacts.set(
+                [
+                    Access.objects.create(role="auditee_contact", email=access_item)
+                    for access_item in serializer.data.get("auditee_contacts")
+                ]
+            )
+            sac.auditor_contacts.set(
+                [
+                    Access.objects.create(role="auditor_contact", email=access_item)
+                    for access_item in serializer.data.get("auditor_contacts")
+                ]
+            )
             sac.save()
 
             # Clear entry form data from profile

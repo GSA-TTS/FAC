@@ -147,10 +147,30 @@ class SingleAuditChecklist(models.Model):
     met_spending_threshold = models.BooleanField()
     is_usa_based = models.BooleanField(verbose_name=_("Is USA Based"))
 
-    certifying_auditee_contact = models.ForeignKey(Access, related_name="certifying_auditee_contact", on_delete=models.PROTECT, null=True)
-    certifying_auditor_contact = models.ForeignKey(Access, related_name="certifying_auditor_contact", on_delete=models.PROTECT, null=True)
-    auditee_contacts = models.ManyToManyField(Access, related_name="auditee_contacts", verbose_name="list of auditees with access", null=True)
-    auditor_contacts = models.ManyToManyField(Access, related_name="auditor_contacts", verbose_name="list of auditors with access", null=True)
+    certifying_auditee_contact = models.ForeignKey(
+        Access,
+        related_name="certifying_auditee_contact",
+        on_delete=models.PROTECT,
+        null=True,
+    )
+    certifying_auditor_contact = models.ForeignKey(
+        Access,
+        related_name="certifying_auditor_contact",
+        on_delete=models.PROTECT,
+        null=True,
+    )
+    auditee_contacts = models.ManyToManyField(
+        Access,
+        related_name="auditee_contacts",
+        verbose_name="list of auditees with access",
+        null=True,
+    )
+    auditor_contacts = models.ManyToManyField(
+        Access,
+        related_name="auditor_contacts",
+        verbose_name="list of auditors with access",
+        null=True,
+    )
 
     auditor_firm_name = models.CharField(max_length=100, null=True)
     auditor_ein = models.CharField(
@@ -175,5 +195,3 @@ class SingleAuditChecklist(models.Model):
 
     def __str__(self):
         return f"#{self.id} - UEI({self.auditee_uei})"
-
-

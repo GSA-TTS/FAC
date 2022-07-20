@@ -4,7 +4,12 @@ from unittest.mock import patch
 from django.test import SimpleTestCase
 
 from api.test_uei import valid_uei_results
-from api.serializers import EligibilitySerializer, UEISerializer, AuditeeInfoSerializer, AccessAndSubmissionSerializer
+from api.serializers import (
+    EligibilitySerializer,
+    UEISerializer,
+    AuditeeInfoSerializer,
+    AccessAndSubmissionSerializer,
+)
 
 
 class EligibilityStepTests(SimpleTestCase):
@@ -85,33 +90,31 @@ class AuditeeInfoStepTests(SimpleTestCase):
             "auditee_uei": "ZQGGHJH74DW7",
             "auditee_fiscal_period_start": "2021-01-01",
             "auditee_fiscal_period_end": "2021-12-31",
-            "auditee_name": "FacCo, Inc."
+            "auditee_name": "FacCo, Inc.",
         }
         valid_missing_uei = {
             "auditee_fiscal_period_start": "2021-01-01",
             "auditee_fiscal_period_end": "2021-12-31",
-            "auditee_name": "FacCo, Inc."
+            "auditee_name": "FacCo, Inc.",
         }
         valid_missing_name = {
             "auditee_uei": "ZQGGHJH74DW7",
             "auditee_fiscal_period_start": "2021-01-01",
-            "auditee_fiscal_period_end": "2021-12-31"
+            "auditee_fiscal_period_end": "2021-12-31",
         }
 
         empty = {}
         missing_start = {
             "auditee_uei": "ZQGGHJH74DW7",
             "auditee_fiscal_period_end": "2021-12-31",
-            "auditee_name": "FacCo, Inc."
+            "auditee_name": "FacCo, Inc.",
         }
         missing_end = {
             "auditee_uei": "ZQGGHJH74DW7",
             "auditee_fiscal_period_start": "2021-01-01",
-            "auditee_name": "FacCo, Inc."
+            "auditee_name": "FacCo, Inc.",
         }
-        missing_start_and_end = {
-            "auditee_name": "FacCo, Inc."
-        }
+        missing_start_and_end = {"auditee_name": "FacCo, Inc."}
 
         self.assertFalse(AuditeeInfoSerializer(data=empty).is_valid())
         self.assertFalse(AuditeeInfoSerializer(data=missing_start).is_valid())
@@ -172,7 +175,7 @@ class AccessAndSubmissionStepTests(SimpleTestCase):
             "certifying_auditee_contact": "a@a.com",
             "certifying_auditor_contact": "b@b.com",
             "auditor_contacts": ["c@c.com", "d@d.com"],
-            "auditee_contacts": "e@e.com"
+            "auditee_contacts": "e@e.com",
         }
         cert_auditee_not_valid_email = {
             "certifying_auditee_contact": "this is not an email",
@@ -200,14 +203,32 @@ class AccessAndSubmissionStepTests(SimpleTestCase):
         }
 
         self.assertFalse(AccessAndSubmissionSerializer(data=empty).is_valid())
-        self.assertFalse(AccessAndSubmissionSerializer(data=missing_cert_auditee).is_valid())
-        self.assertFalse(AccessAndSubmissionSerializer(data=missing_cert_auditor).is_valid())
-        self.assertFalse(AccessAndSubmissionSerializer(data=missing_auditor_contacts).is_valid())
-        self.assertFalse(AccessAndSubmissionSerializer(data=auditee_contacts_not_list).is_valid())
-        self.assertFalse(AccessAndSubmissionSerializer(data=auditor_contacts_not_list).is_valid())
-        self.assertFalse(AccessAndSubmissionSerializer(data=cert_auditee_not_valid_email).is_valid())
-        self.assertFalse(AccessAndSubmissionSerializer(data=cert_auditor_not_valid_email).is_valid())
-        self.assertFalse(AccessAndSubmissionSerializer(data=auditor_not_all_valid_emails).is_valid())
-        self.assertFalse(AccessAndSubmissionSerializer(data=auditee_not_all_valid_emails).is_valid())
+        self.assertFalse(
+            AccessAndSubmissionSerializer(data=missing_cert_auditee).is_valid()
+        )
+        self.assertFalse(
+            AccessAndSubmissionSerializer(data=missing_cert_auditor).is_valid()
+        )
+        self.assertFalse(
+            AccessAndSubmissionSerializer(data=missing_auditor_contacts).is_valid()
+        )
+        self.assertFalse(
+            AccessAndSubmissionSerializer(data=auditee_contacts_not_list).is_valid()
+        )
+        self.assertFalse(
+            AccessAndSubmissionSerializer(data=auditor_contacts_not_list).is_valid()
+        )
+        self.assertFalse(
+            AccessAndSubmissionSerializer(data=cert_auditee_not_valid_email).is_valid()
+        )
+        self.assertFalse(
+            AccessAndSubmissionSerializer(data=cert_auditor_not_valid_email).is_valid()
+        )
+        self.assertFalse(
+            AccessAndSubmissionSerializer(data=auditor_not_all_valid_emails).is_valid()
+        )
+        self.assertFalse(
+            AccessAndSubmissionSerializer(data=auditee_not_all_valid_emails).is_valid()
+        )
         self.assertTrue(AccessAndSubmissionSerializer(data=valid1).is_valid())
         self.assertTrue(AccessAndSubmissionSerializer(data=valid2).is_valid())
