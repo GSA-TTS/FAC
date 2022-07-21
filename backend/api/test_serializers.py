@@ -12,6 +12,7 @@ from api.serializers import (
     AccessSerializer,
     AccessAndSubmissionSerializer,
 )
+from audit.models import User
 
 
 class EligibilityStepTests(SimpleTestCase):
@@ -143,12 +144,12 @@ class AuditeeInfoStepTests(SimpleTestCase):
         self.assertFalse(AuditeeInfoSerializer(data=missing_start_and_end).is_valid())
 
 
-class AccessSerializerTests(SimpleTestCase):
+class AccessSerializerTests(TestCase):
     def test_valid_access(self):
         data = {
             "role": "auditee_contact",
             "email": "firstname.lastname@gsa.gov",
-            "user": 1,
+            "user": User.objects.first(),
         }
         self.assertTrue(AccessSerializer(data=data).is_valid())
 
@@ -156,7 +157,7 @@ class AccessSerializerTests(SimpleTestCase):
         data = {
             "role": "this is a role that's not really a role",
             "email": "firstname.lastname@gsa.gov",
-            "user": 1,
+            "user": User.objects.first(),
         }
         self.assertFalse(AccessSerializer(data=data).is_valid())
 
@@ -164,7 +165,7 @@ class AccessSerializerTests(SimpleTestCase):
         data = {
             "role": "auditee_contact",
             "email": "this is not an email address",
-            "user": 1,
+            "user": User.objects.first(),
         }
         self.assertFalse(AccessSerializer(data=data).is_valid())
 
