@@ -13,8 +13,8 @@ class SACAdmin(admin.ModelAdmin):
 
 
 class AccessAdmin(admin.ModelAdmin):
-    list_display = ("sac", "role", "email", "user_id")
-    list_filter = ("sac", "role")
+    list_display = ("role", "email", "user")
+    list_filter = ["role"]
 
 
 admin.site.register(Access, AccessAdmin)

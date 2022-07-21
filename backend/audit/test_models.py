@@ -55,5 +55,5 @@ class AccessTests(TestCase):
             {email} as {role} for {sac}
         """
         access = baker.make(Access)
-        expected = f"{access.email} as {access.role} for {access.sac}"
+        expected = f"{access.email} as {access.get_role_display()}"
         self.assertEqual(str(access), expected)
