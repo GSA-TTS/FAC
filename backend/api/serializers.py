@@ -107,22 +107,7 @@ class AccessSerializer(serializers.ModelSerializer):
 
 
 class AccessAndSubmissionSerializer(serializers.Serializer):
-    """
-    The data here should be a series of role/email pairs.
-    We want to verify that there is one and only one certifying_auditee_contact
-    and one and only one certifying_auditor_contact listed.
-
-    We think the data will look like this:
-
-    {
-        "certifying_auditee_contact": "a@a.com",
-        "certifying_auditor_contact": "b@b.com",
-        "auditor_contacts": ["c@c.com",  "d@d.com"],
-        "auditee_contacts": ["e@e.com",  "f@f.com"],
-    }
-    """
-
-    # This serializer isn't tied to a model, so it's a Serializer with the below layout
+    # This serializer isn't tied to a model, so it's just input fields with the below layout
     certifying_auditee_contact = serializers.EmailField()
     certifying_auditor_contact = serializers.EmailField()
     auditor_contacts = serializers.ListField(
