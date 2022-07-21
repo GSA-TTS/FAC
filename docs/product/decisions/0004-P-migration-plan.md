@@ -30,5 +30,5 @@ Provide clarity for the migration plan from the old Census FAC to the new TTS FA
 
 #### Important considerations to reach these goals:
 
-* RISK: Will we be able to retain resources, either on Census side or GSA side, to facilitate transition in April. 
+* RISK: We need to retain resources, either on Census side or GSA side, to facilitate transition in April. We are exploring various ways we can keep them on to mitigate this risk.
 * Document how every field from the old system will or will not be migrated to and from the old system using the [FAC Field Rosetta Stone](https://docs.google.com/spreadsheets/d/1e-NQPeXk9pcQhA9PEbywkfoJa1bcTunKsVsBjqFYVK4/edit#gid=1955175057) document (internal, not public). 
