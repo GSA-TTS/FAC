@@ -92,7 +92,6 @@ class UEIValidatorStepTests(SimpleTestCase):
         self.assertFalse(UEISerializer(data=invalid).is_valid())
 
 
-
 class AuditeeInfoStepTests(SimpleTestCase):
     def test_valid_auditee_info_with_uei(self):
         valid_with_uei = {
@@ -149,7 +148,7 @@ class AccessSerializerTests(SimpleTestCase):
         data = {
             "role": "auditee_contact",
             "email": "firstname.lastname@gsa.gov",
-            "user": 1
+            "user": 1,
         }
         self.assertTrue(AccessSerializer(data=data).is_valid())
 
@@ -157,7 +156,7 @@ class AccessSerializerTests(SimpleTestCase):
         data = {
             "role": "this is a role that's not really a role",
             "email": "firstname.lastname@gsa.gov",
-            "user": 1
+            "user": 1,
         }
         self.assertFalse(AccessSerializer(data=data).is_valid())
 
@@ -165,7 +164,7 @@ class AccessSerializerTests(SimpleTestCase):
         data = {
             "role": "auditee_contact",
             "email": "this is not an email address",
-            "user": 1
+            "user": 1,
         }
         self.assertFalse(AccessSerializer(data=data).is_valid())
 
@@ -173,7 +172,7 @@ class AccessSerializerTests(SimpleTestCase):
         data = {
             "role": "auditee_contact",
             "email": "firstname.lastname@gsa.gov",
-            "user": "Robert McRobertson"
+            "user": "Robert McRobertson",
         }
         self.assertFalse(AccessSerializer(data=data).is_valid())
 
@@ -310,4 +309,3 @@ class AccessAndSubmissionStepTests(TestCase):
         self.assertFalse(
             AccessAndSubmissionSerializer(data=auditee_not_all_valid_emails).is_valid()
         )
-
