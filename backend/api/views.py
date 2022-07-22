@@ -123,7 +123,6 @@ class AccessAndSubmissionView(APIView):
     PREVIOUS_STEP_DATA_WE_NEED = AuditeeInfoView.PREVIOUS_STEP_DATA_WE_NEED + [
         "auditee_fiscal_period_start",
         "auditee_fiscal_period_end",
-        "auditee_name",
     ]
 
     def post(self, request):

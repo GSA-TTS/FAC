@@ -160,7 +160,7 @@ class SingleAuditChecklist(models.Model):
     )
 
     # Q5 Auditee Information
-    auditee_name = models.CharField(max_length=100, null=True)
+    auditee_name = models.CharField(max_length=100, blank=True, null=True)
     auditee_address_line_1 = models.CharField(max_length=100, null=True)
     auditee_city = models.CharField(max_length=100, null=True)
     auditee_state = models.CharField(max_length=2, null=True)

@@ -180,14 +180,17 @@ class AuditeeInfoTests(TestCase):
 
     def test_blank_auditee_name(self):
         """
-        Auditee name cannot be blank
+        Auditee name can be blank
         """
         self.user.profile.entry_form_data = VALID_ELIGIBILITY_DATA
         self.user.profile.save()
         input_data = VALID_AUDITEE_INFO_DATA | {"auditee_name": ""}
         response = self.client.post(AUDITEE_INFO_PATH, input_data, format="json")
         data = response.json()
-        self.assertTrue(data["errors"])
+        self.assertEqual(data["next"], ACCESS_AND_SUBMISSION_PATH)
+        self.assertEqual(
+            self.user.profile.entry_form_data, VALID_ELIGIBILITY_DATA | input_data
+        )
 
     def test_null_auditee_name(self):
         """
