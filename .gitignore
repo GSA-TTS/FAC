@@ -143,5 +143,9 @@ cython_debug/
 .DS_Store
 .secrets
 
+#JetBrains configs
+.idea/
+backend/.idea/
+
 node_modules/
 # pa11y_tests/screenshots/*.png

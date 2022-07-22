@@ -6,7 +6,7 @@ from django.utils.translation import gettext_lazy as _
 from audit.models import SingleAuditChecklist, Access
 from api.uei import get_uei_info_from_sam_gov
 
-
+# Eligibility step messages
 SPENDING_THRESHOLD = _(
     "The FAC only accepts submissions from non-Federal entities that spend $750,000 or more in federal awards during its audit period (fiscal period begin dates on or after 12/26/2014) in accordance with Uniform Guidance"
 )
@@ -14,6 +14,20 @@ USA_BASED = _("The FAC only accepts submissions from U.S.-based entities")
 USER_PROVIDED_ORG_TYPE = _(
     "The FAC only accepts submissions from States, Local governments, Indian tribes or Tribal organizations, Institutions of higher education (IHEs), and Non-profits"
 )
+
+# Auditee info step messages
+AUDITEE_FISCAL_PERIOD_START = _("The fiscal period start date is required")
+AUDITEE_FISCAL_PERIOD_END = _("The fiscal period end date is required")
+
+# Access and submission step messages
+CERTIFYING_AUDITEE_CONTACT_EMAIL = _(
+    "Certifying Auditee Contact email is a required field"
+)
+CERTIFYING_AUDITOR_CONTACT_EMAIL = _(
+    "Certifying Auditor Contact email is a required field"
+)
+AUDITEE_CONTACTS_LIST = _("Auditee Contacts needs to be a list of emails")
+AUDITOR_CONTACTS_LIST = _("Auditor Contacts needs to be a list of emails")
 
 
 class EligibilitySerializer(serializers.ModelSerializer):
@@ -74,11 +88,34 @@ class AuditeeInfoSerializer(serializers.ModelSerializer):
             "auditee_fiscal_period_end",
         ]
 
+    # auditee_name and auditee_uei optional, fiscal start/end required
+    def validate_auditee_fiscal_period_start(self, value):
+        if not value:
+            raise serializers.ValidationError(AUDITEE_FISCAL_PERIOD_START)
+        return value
+
+    def validate_auditee_fiscal_period_end(self, value):
+        if not value:
+            raise serializers.ValidationError(AUDITEE_FISCAL_PERIOD_END)
+        return value
+
 
 class AccessSerializer(serializers.ModelSerializer):
     class Meta:
         model = Access
-        fields = ["role", "email", "user_id"]
+        fields = ["role", "email", "user"]
+
+
+class AccessAndSubmissionSerializer(serializers.Serializer):
+    # This serializer isn't tied to a model, so it's just input fields with the below layout
+    certifying_auditee_contact = serializers.EmailField()
+    certifying_auditor_contact = serializers.EmailField()
+    auditor_contacts = serializers.ListField(
+        child=serializers.EmailField(), allow_empty=True, min_length=0
+    )
+    auditee_contacts = serializers.ListField(
+        child=serializers.EmailField(), allow_empty=True, min_length=0
+    )
 
 
 class SingleAuditChecklistSerializer(serializers.ModelSerializer):
