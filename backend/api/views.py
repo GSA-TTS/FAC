@@ -110,7 +110,6 @@ class AccessView(APIView):
     DATA_WE_NEED = AuditeeInfoView.DATA_WE_NEED + [
         "auditee_fiscal_period_start",
         "auditee_fiscal_period_end",
-        "auditee_name",
     ]
 
     def post(self, request):
