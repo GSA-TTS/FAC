@@ -39,5 +39,10 @@ urlpatterns = [
         views.AccessAndSubmissionView.as_view(),
         name="accessandsubmission",
     ),
+    path(
+        "submissions",
+        views.SubmissionsView.as_view(),
+        name="submissions",
+    ),
     path(settings.ADMIN_URL, admin.site.urls),
 ]

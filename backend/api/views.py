@@ -181,3 +181,10 @@ class AccessAndSubmissionView(APIView):
             return Response({"sac_id": sac.id, "next": "TBD"})
 
         return Response({"errors": serializer.errors})
+
+class SubmissionsView(APIView):
+    """
+    Accepts UEI to validate and returns either a message describing the validation errors, or valid.
+    """
+    def get(self, request):
+        return Response([])
