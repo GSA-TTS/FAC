@@ -23,7 +23,7 @@ class AuthTokenViewTests(TestCase):
         """
         view = AuthToken()
 
-        # AuthToken views should allow JWTUpsertAuthentication 
+        # AuthToken views should allow JWTUpsertAuthentication
         self.assertIn(JWTUpsertAuthentication, view.authentication_classes)
         # AuthToken views should allow ExpiringTokenAuthentication
         self.assertIn(ExpiringTokenAuthentication, view.authentication_classes)
@@ -82,6 +82,6 @@ class AuthTokenViewTests(TestCase):
 
         self.assertEqual(response.status_code, 200)
 
-        # there should no longer be a token associated with this user        
+        # there should no longer be a token associated with this user
         tokens = Token.objects.filter(user=user)
         self.assertEqual(tokens.count(), 0)
