@@ -5,6 +5,7 @@ from django.urls import reverse
 from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from django.core import serializers
 
 from .serializers import (
     AccessAndSubmissionSerializer,
@@ -186,5 +187,10 @@ class SubmissionsView(APIView):
     """
     Accepts UEI to validate and returns either a message describing the validation errors, or valid.
     """
+
     def get(self, request):
-        return Response([])
+        current_user = request.user
+
+        all_submissions = SingleAuditChecklist.objects.filter(submitted_by=current_user)
+
+        return Response(serializers.serialize("json", all_submissions))
