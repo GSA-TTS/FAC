@@ -193,22 +193,6 @@ class SubmissionsView(APIView):
     def get(self, request):
         current_user = request.user
 
-        # Report ID, Status, Auditee UEI, Fiscal Year End Date,Auditee Name
-        # all_submissions = SingleAuditChecklist.objects.filter(submitted_by=current_user)
-        #
-        # return Response(
-        #     serializers.serialize(
-        #         "json",
-        #         all_submissions,
-        #         fields=[
-        #             "report_id",
-        #             "submission_status",
-        #             "auditee_uei",
-        #             "auditee_fiscal_period_end",
-        #             "auditee_name",
-        #         ],
-        #     )
-        # )
         all_submissions = SingleAuditChecklist.objects.filter(
             submitted_by=current_user
         ).values(
@@ -218,4 +202,5 @@ class SubmissionsView(APIView):
             "auditee_fiscal_period_end",
             "auditee_name",
         )
+
         return JsonResponse(list(all_submissions), safe=False)
