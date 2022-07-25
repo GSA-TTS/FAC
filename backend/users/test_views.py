@@ -68,6 +68,9 @@ class AuthTokenViewTests(TestCase):
         self.assertIn("token", data)
         self.assertNotEqual(token.key, data["token"])
 
+        tokens = Token.objects.filter(user=user)
+        self.assertEqual(tokens.count(), 1)
+
     def test_delete_token(self):
         """
         if the delete endpoint is hit, the token associated with the authenticated user should be deleted
