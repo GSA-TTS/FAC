@@ -183,6 +183,7 @@ class AccessAndSubmissionView(APIView):
 
         return Response({"errors": serializer.errors})
 
+
 class SubmissionsView(APIView):
     """
     Accepts UEI to validate and returns either a message describing the validation errors, or valid.
@@ -191,6 +192,19 @@ class SubmissionsView(APIView):
     def get(self, request):
         current_user = request.user
 
+        # Report ID, Status, Auditee UEI, Fiscal Year End Date,Auditee Name
         all_submissions = SingleAuditChecklist.objects.filter(submitted_by=current_user)
 
-        return Response(serializers.serialize("json", all_submissions))
+        return Response(
+            serializers.serialize(
+                "json",
+                all_submissions,
+                fields=[
+                    "report_id",
+                    "submission_status",
+                    "auditee_uei",
+                    "auditee_fiscal_period_end",
+                    "auditee_name",
+                ],
+            )
+        )
