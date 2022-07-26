@@ -5,7 +5,6 @@ from django.urls import reverse
 from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from django.core import serializers
 from django.http import JsonResponse
 
 from .serializers import (
@@ -187,7 +186,7 @@ class AccessAndSubmissionView(APIView):
 
 class SubmissionsView(APIView):
     """
-    Accepts UEI to validate and returns either a message describing the validation errors, or valid.
+    Returns the list of SingleAuditChecklists the current user has submitted
     """
 
     def get(self, request):
