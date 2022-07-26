@@ -23,7 +23,7 @@ VALID_AUDITEE_INFO_DATA = {
     "auditee_fiscal_period_start": "2021-01-01",
     "auditee_fiscal_period_end": "2022-01-01",
     "auditee_name": "Tester",
-    "submission_status": "in_progress"
+    "submission_status": "in_progress",
 }
 
 VALID_ELIGIBILITY_DATA = {
@@ -393,9 +393,7 @@ class SubmissionsViewTests(TestCase):
         response = self.client.get(SUBMISSIONS_PATH, format="json")
 
         data = response.json()
-        self.assertTrue(
-            "report_id" in data[0]
-        )
+        self.assertTrue("report_id" in data[0])
         self.assertEqual(
             data[0]["submission_status"],
             VALID_AUDITEE_INFO_DATA["submission_status"],
