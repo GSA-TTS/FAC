@@ -412,3 +412,7 @@ class SubmissionsViewTests(TestCase):
             data[0]["auditee_name"],
             VALID_AUDITEE_INFO_DATA["auditee_name"],
         )
+        self.assertEqual(
+            len(data[0]),
+            5,
+        )
