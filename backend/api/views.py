@@ -5,6 +5,7 @@ from django.urls import reverse
 from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from django.http import JsonResponse
 
 from .serializers import (
     AccessAndSubmissionSerializer,
@@ -181,3 +182,24 @@ class AccessAndSubmissionView(APIView):
             return Response({"sac_id": sac.id, "next": "TBD"})
 
         return Response({"errors": serializer.errors})
+
+
+class SubmissionsView(APIView):
+    """
+    Returns the list of SingleAuditChecklists the current user has submitted
+    """
+
+    def get(self, request):
+        current_user = request.user
+
+        all_submissions = SingleAuditChecklist.objects.filter(
+            submitted_by=current_user
+        ).values(
+            "report_id",
+            "submission_status",
+            "auditee_uei",
+            "auditee_fiscal_period_end",
+            "auditee_name",
+        )
+
+        return JsonResponse(list(all_submissions), safe=False)

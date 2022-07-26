@@ -15,18 +15,23 @@ User = get_user_model()
 ELIGIBILITY_PATH = reverse("eligibility")
 AUDITEE_INFO_PATH = reverse("auditee-info")
 ACCESS_AND_SUBMISSION_PATH = reverse("accessandsubmission")
+SUBMISSIONS_PATH = reverse("submissions")
+
 
 VALID_AUDITEE_INFO_DATA = {
     "auditee_uei": "ZQGGHJH74DW7",
     "auditee_fiscal_period_start": "2021-01-01",
     "auditee_fiscal_period_end": "2022-01-01",
     "auditee_name": "Tester",
+    "submission_status": "in_progress",
 }
+
 VALID_ELIGIBILITY_DATA = {
     "is_usa_based": True,
     "met_spending_threshold": True,
     "user_provided_organization_type": "state",
 }
+
 VALID_ACCESS_AND_SUBMISSION_DATA = {
     "certifying_auditee_contact": "a@a.com",
     "certifying_auditor_contact": "b@b.com",
@@ -363,3 +368,49 @@ class SACCreationTests(TestCase):
         self.assertEqual(sac.submitted_by, self.user)
         self.assertEqual(sac.auditee_uei, "ZQGGHJH74DW7")
         self.assertEqual(sac.submission_status, "in_progress")
+
+
+class SubmissionsViewTests(TestCase):
+    def setUp(self):
+        self.user = baker.make(User)
+        self.client = APIClient()
+        self.client.force_authenticate(user=self.user)
+
+    def test_no_submissions_returns_empty_list(self):
+        response = self.client.get(SUBMISSIONS_PATH, format="json")
+        data = response.json()
+        self.assertEqual(data, [])
+
+    def test_user_with_submissions_should_return_expected_data_columns(self):
+        self.user.profile.entry_form_data = (
+            VALID_ELIGIBILITY_DATA | VALID_AUDITEE_INFO_DATA
+        )
+        self.user.profile.save()
+        self.client.post(
+            ACCESS_AND_SUBMISSION_PATH, VALID_ACCESS_AND_SUBMISSION_DATA, format="json"
+        )
+
+        response = self.client.get(SUBMISSIONS_PATH, format="json")
+
+        data = response.json()
+        self.assertTrue("report_id" in data[0])
+        self.assertEqual(
+            data[0]["submission_status"],
+            VALID_AUDITEE_INFO_DATA["submission_status"],
+        )
+        self.assertEqual(
+            data[0]["auditee_uei"],
+            VALID_AUDITEE_INFO_DATA["auditee_uei"],
+        )
+        self.assertEqual(
+            data[0]["auditee_fiscal_period_end"],
+            VALID_AUDITEE_INFO_DATA["auditee_fiscal_period_end"],
+        )
+        self.assertEqual(
+            data[0]["auditee_name"],
+            VALID_AUDITEE_INFO_DATA["auditee_name"],
+        )
+        self.assertEqual(
+            len(data[0]),
+            5,
+        )
