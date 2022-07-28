@@ -27,7 +27,7 @@ Milestones
 
 These milestones are sequenced and grouped thematically and are intended to be about equal size in effort, however they are not grounded in estimation. They are made under the assumption that the FAC is adequately staffed through the engagement. 
 
-## ✅Milestone 1: Pre-SAC
+## Milestone 1: Pre-SAC ✅
 
 **Value delivered:**
 Guide auditees in their first steps to submitting a new audit. Present a homepage to them with a clear CTA, explain why they need to log in to submit a new audit, guide them through the "Pre-SAC" forms where they: 
