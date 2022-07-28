@@ -6,18 +6,28 @@ This is a high-level overview of the FAC **product** roadmap. We recognize that 
 Product Vision
 ===================
 
-* The new grants clearinghouse will be a trusted, transparent and quickly actionable source of grants information to speed reporting, audit resolution, and risk mitigation.
-* Fully transition the FAC PMO from Census to TTS
-* Transition the [current Census FAC product](https://facweb.census.gov/) into something TTS can maintain
-* Modernize the product in a number of beneficial ways to the public and government users
-* Reduce risk and prove value by delivering incremental product updates 
+The Federal Audit Clearinghouse (FAC) is and must continue to be a trusted, transparent and quickly actionable source of grants information to speed reporting, audit resolution, and risk mitigation. The goal of the TTS FAC is to seamlessly transition auditee/auditor/agency users, make audit data more transparent, and deliver a system that is maintainable for TTS by October of 2023. 
+
+* **Seamlessly transition auditee/auditor/agency users:**
+  * Core aspects of auditee, auditor and agency workflows are carried over
+  * Improvements to design and accessibility
+  * Clear transition communication on what changes are happening and when
+* **Make audit data more accessible and transparent:**
+  * Single audit data is easily accessible to the public to increase transparency and accountability
+  * Single audit data is easily accessible to government agencies so that they can make informed decisions and prevent fraud
+  * Single audit data is flexible enough to connect to other data sets and systems
+* **Deliver a system that is maintainable for TTS:**
+  * Application is written in a modern and maintainable technology stack TTS can support
+  * Remove manual processing step to remove administrative burden
+  * Uncouple unmaintainable integrations (i.e. ATAS) by transitioning agency users the new API
+
 
 Milestones
 ===================
 
 These milestones are sequenced and grouped thematically and are intended to be about equal size in effort, however they are not grounded in estimation. They are made under the assumption that the FAC is adequately staffed through the engagement. 
 
-## Milestone 1: Pre-SAC
+## ✅Milestone 1: Pre-SAC
 
 **Value delivered:**
 Guide auditees in their first steps to submitting a new audit. Present a homepage to them with a clear CTA, explain why they need to log in to submit a new audit, guide them through the "Pre-SAC" forms where they: 
@@ -30,8 +40,8 @@ Additional value here is preventing entities that don't meet the criteria from s
 **Specific deliverables:**
 * (DONE ✅) Technical foundation
 * (DONE ✅) Login.gov integration
-* (90% ✅) Create a new audit (pre SAC forms)
-* (80% ✅) design/exploration - "Submit an entire audit package" milestone
+* (DONE ✅) Create a new audit (pre SAC forms)
+* (DONE ✅) design/exploration - "Submit general information end to end / De-risk" milestone
 
 ## Milestone 2: Submit general information end to end / De-risk
 
