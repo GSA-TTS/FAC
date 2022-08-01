@@ -8,7 +8,7 @@ Pending review
 
 ## Context
 
-The FAC will need to support file uploads and file storage. In order to support this, the FAC backend will need to validate the size and type of uploaded files, and scan each file with an antimalware tool.
+The FAC will need to support file uploads and file storage. In order to support this, the FAC backend will need to validate the size and type of uploaded files, and scan each file with an antimalware tool. The frontend will need to provide a file upload UI component, a success/failure indication, and client side validation.
 
 ## Decision
 
@@ -25,9 +25,17 @@ We will use the Boto3 library to interact with S3 from the Django application, a
 
 We will use ClamAV, a free and open source antimalware toolkit, to perform virus scans on uploaded files.
 
+For the frontend portion of this, we will:
+- use the USWDS file upload component
+- provide a success/fail indication for the file upload (Need to meet wtih UX on this.)
+- provide client side validation
+
 
 ## Consequences
 
  - Antimalware applications rely on very large and frequently-updated sets of virus definitions. This means that the cloud infrastructure supporting the ClamAV instance will require a significant memory allocation, which increases hosting costs.
  - The maximum allowed size for an uploaded file will need to be determined.
  - The set of allowed file types will need to be determined.
+ - The placement of the file upload component needs to be confirmed or designed. (Check with UX/Design teams)
+ - The success/failure indicator needs to be confirmed or designed. (Check with UX/Design teams)
+ - The destination on succcessful upload needs to be confirmed or designed. (Check with UX/Design teams)
