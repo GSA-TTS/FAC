@@ -12,7 +12,7 @@ The FAC will need to support file uploads and file storage. In order to support 
 
 ## Decision
 
-We will use the file upload and storage backend that was built for the DOJ Civil Rights Portal as a reference for our implementation. Because the Civil Rights Portal backend is built on the same technical stack as the FAC (Django, DRF, PostgreSQL, Cloud.gov), we expect few, if any, significant setbacks during implementation - we know that this approach works well for a similar use case on a similar system.
+We will use the file upload and storage backend that was built for the [DOJ Civil Rights Portal](https://github.com/usdoj-crt/crt-portal) as a reference for our implementation. Because the Civil Rights Portal backend is built on the same technical stack as the FAC (Django, DRF, PostgreSQL, Cloud.gov), we expect few, if any, significant setbacks during implementation - we know that this approach works well for a similar use case on a similar system.
 
 The Civil Rights Portal file attachment backend includes file type validation, file size validation, and antivirus scanning of uploaded files.
 
