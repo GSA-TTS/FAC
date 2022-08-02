@@ -16,7 +16,7 @@ There is a [high-level roadmap](https://github.com/GSA-TTS/FAC/blob/main/docs/pr
 **Labeling issues** - In addition to the "story", "design" and "engineering" labels, the "needs refinement" label is a very important label to denote whether an issue needs to be better clarified. There are a bunch of other labels that are rarely used and could probably be deleted. These two carry special significance since we try not to actively work on an issue until these labels have been removed: 
 
 * “Needs refinement” - need a design, engineering or product decision to move forward
-* “Needs scoping” - needs people to pair up and review, then break down an issue into individual tasks and estimate them using beverage sizes. Assuming this is an engineering story, the will put another beverage size on the story level which will be used to determine capacity though an eyeball, non-mathematical judgement. 
+* “Needs scoping” - needs people to pair up and review, then break down an issue into individual tasks and estimate them using beverage sizes. Assuming this is an engineering story, they will put another beverage size on the story level which will be used to determine capacity through an eyeball, non-mathematical judgement. 
 
  
 **Estimation / Velocity** - There is no estimation process for tickets, but they should be refined to be in approximately comparable sizes. The team works in two-week sprints starting on Tuesdays. As of right now, our two velocity metrics are number of tasks completed and number of stories completed in a sprint tracked
