@@ -11,3 +11,4 @@ requests
 python-json-logger
 djangorestframework-simplejwt
 cryptography
+cfenv
