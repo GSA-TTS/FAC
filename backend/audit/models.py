@@ -207,7 +207,17 @@ class Access(models.Model):
         constraints = [
             models.UniqueConstraint(
                 fields=["sac"],
+                condition=Q(role="creator"),
+                name="%(app_label)s_$(class)s_single_creator",
+            ),
+            models.UniqueConstraint(
+                fields=["sac"],
+                condition=Q(role="auditee_cert"),
+                name="%(app_label)s_$(class)s_single_certifying_auditee",
+            ),
+            models.UniqueConstraint(
+                fields=["sac"],
                 condition=Q(role="auditor_cert"),
                 name="%(app_label)s_%(class)s_single_certifying_auditor",
-            )
+            ),
         ]
