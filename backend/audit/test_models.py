@@ -1,3 +1,4 @@
+from django.db.utils import IntegrityError
 from django.test import TestCase
 
 from model_bakery import baker
@@ -57,3 +58,29 @@ class AccessTests(TestCase):
         access = baker.make(Access)
         expected = f"{access.email} as {access.get_role_display()}"
         self.assertEqual(str(access), expected)
+
+    def test_multiple_auditee_contacts_allowed(self):
+        """
+        There should be no constraint preventing multiple auditee contacts for a SAC
+        """
+        access_1 = baker.make(Access, role="auditee_contact")
+
+        baker.make(Access, sac=access_1.sac, role="auditee_contact")
+
+    def test_multiple_auditor_contacts_allowed(self):
+        """
+        There should be no constraint preventing multiple auditor contacts for a SAC
+        """
+        access_1 = baker.make(Access, role="auditor_contact")
+
+        baker.make(Access, sac=access_1.sac, role="auditor_contact")
+
+    def test_multiple_auditor_cert_not_allowed(self):
+        """
+        There should be a constraint preventing multiple auditor_certs for a SAC
+        """
+        access_1 = baker.make(Access, role="auditor_cert")
+
+        self.assertRaises(
+            IntegrityError, baker.make, Access, sac=access_1.sac, role="auditor_cert"
+        )

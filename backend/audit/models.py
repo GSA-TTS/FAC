@@ -1,5 +1,6 @@
 from secrets import choice
 from django.db import models
+from django.db.models import Q
 from django.contrib.auth import get_user_model
 from django.core.validators import MinLengthValidator
 
@@ -181,6 +182,7 @@ class Access(models.Model):
         ("auditee_cert", _("Auditee Certifying Official")),
         ("auditor_contact", _("Auditor Contact")),
         ("auditor_cert", _("Auditor Certifying Official")),
+        ("creator", _("Audit Creator")),
     )
     sac = models.ForeignKey(SingleAuditChecklist, on_delete=models.CASCADE)
     role = models.CharField(
@@ -201,3 +203,11 @@ class Access(models.Model):
 
     class Meta:
         verbose_name_plural = "accesses"
+
+        constraints = [
+            models.UniqueConstraint(
+                fields=["sac"],
+                condition=Q(role="auditor_cert"),
+                name="%(app_label)s_%(class)s_single_certifying_auditor",
+            )
+        ]
