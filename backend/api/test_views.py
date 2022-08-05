@@ -292,8 +292,12 @@ class AccessAndSubmissionTests(TestCase):
         data = response.json()
 
         sac = SingleAuditChecklist.objects.get(id=data["sac_id"])
-        certifying_auditee_contact_access = Access.objects.get(sac=sac, role="auditee_cert")
-        certifying_auditor_contact_access = Access.objects.get(sac=sac, role="auditor_cert")
+        certifying_auditee_contact_access = Access.objects.get(
+            sac=sac, role="auditee_cert"
+        )
+        certifying_auditor_contact_access = Access.objects.get(
+            sac=sac, role="auditor_cert"
+        )
         auditee_contacts_access = Access.objects.filter(sac=sac, role="auditee_contact")
         auditor_contacts_access = Access.objects.filter(sac=sac, role="auditor_contact")
 

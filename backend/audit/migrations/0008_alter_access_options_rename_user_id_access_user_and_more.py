@@ -7,27 +7,30 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('audit', '0007_alter_singleauditchecklist_auditee_uei'),
+        ("audit", "0007_alter_singleauditchecklist_auditee_uei"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='access',
-            options={'verbose_name_plural': 'accesses'},
+            name="access",
+            options={"verbose_name_plural": "accesses"},
         ),
         migrations.RenameField(
-            model_name='access',
-            old_name='user_id',
-            new_name='user',
+            model_name="access",
+            old_name="user_id",
+            new_name="user",
         ),
         migrations.AlterField(
-            model_name='access',
-            name='sac',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='audit.singleauditchecklist'),
+            model_name="access",
+            name="sac",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                to="audit.singleauditchecklist",
+            ),
         ),
         migrations.AlterField(
-            model_name='singleauditchecklist',
-            name='auditee_name',
+            model_name="singleauditchecklist",
+            name="auditee_name",
             field=models.CharField(blank=True, max_length=100, null=True),
         ),
     ]

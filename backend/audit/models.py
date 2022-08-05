@@ -182,10 +182,7 @@ class Access(models.Model):
         ("auditor_contact", _("Auditor Contact")),
         ("auditor_cert", _("Auditor Certifying Official")),
     )
-    sac = models.ForeignKey(
-        SingleAuditChecklist,
-        on_delete=models.CASCADE
-    )
+    sac = models.ForeignKey(SingleAuditChecklist, on_delete=models.CASCADE)
     role = models.CharField(
         choices=ROLES,
         help_text="Access type granted to this user",

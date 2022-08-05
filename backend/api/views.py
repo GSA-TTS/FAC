@@ -164,17 +164,9 @@ class AccessAndSubmissionView(APIView):
                 email=serializer.data.get("certifying_auditor_contact"),
             )
             for contact in serializer.data.get("auditee_contacts"):
-                Access.objects.create(
-                    sac=sac,
-                    role="auditee_contact",
-                    email=contact
-                )
+                Access.objects.create(sac=sac, role="auditee_contact", email=contact)
             for contact in serializer.data.get("auditor_contacts"):
-                Access.objects.create(
-                    sac=sac,
-                    role="auditor_contact",
-                    email=contact
-                )
+                Access.objects.create(sac=sac, role="auditor_contact", email=contact)
 
             sac.save()
 
