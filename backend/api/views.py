@@ -152,27 +152,30 @@ class AccessAndSubmissionView(APIView):
                 submitted_by=request.user, **all_steps_user_form_data
             )
 
-            # Create all contact user accounts
-            sac.certifying_auditee_contact = Access.objects.create(
+            # Create all contact Access objects
+            Access.objects.create(
+                sac=sac,
                 role="auditee_cert",
                 email=serializer.data.get("certifying_auditee_contact"),
             )
-            sac.certifying_auditor_contact = Access.objects.create(
+            Access.objects.create(
+                sac=sac,
                 role="auditor_cert",
                 email=serializer.data.get("certifying_auditor_contact"),
             )
-            sac.auditee_contacts.set(
-                [
-                    Access.objects.create(role="auditee_contact", email=access_item)
-                    for access_item in serializer.data.get("auditee_contacts")
-                ]
-            )
-            sac.auditor_contacts.set(
-                [
-                    Access.objects.create(role="auditor_contact", email=access_item)
-                    for access_item in serializer.data.get("auditor_contacts")
-                ]
-            )
+            for contact in serializer.data.get("auditee_contacts"):
+                Access.objects.create(
+                    sac=sac,
+                    role="auditee_contact",
+                    email=contact
+                )
+            for contact in serializer.data.get("auditor_contacts"):
+                Access.objects.create(
+                    sac=sac,
+                    role="auditor_contact",
+                    email=contact
+                )
+
             sac.save()
 
             # Clear entry form data from profile

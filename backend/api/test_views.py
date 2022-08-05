@@ -8,7 +8,7 @@ from model_bakery import baker
 from rest_framework.test import APIClient
 
 from api.test_uei import valid_uei_results
-from audit.models import SingleAuditChecklist
+from audit.models import Access, SingleAuditChecklist
 
 User = get_user_model()
 
@@ -292,14 +292,15 @@ class AccessAndSubmissionTests(TestCase):
         data = response.json()
 
         sac = SingleAuditChecklist.objects.get(id=data["sac_id"])
-        certifying_auditee_contact_access = sac.certifying_auditee_contact
-        certifying_auditor_contact_access = sac.certifying_auditor_contact
-        auditor_contacts_first_access = sac.auditor_contacts.first()
-        auditee_contacts_first_access = sac.auditee_contacts.first()
+        certifying_auditee_contact_access = Access.objects.get(sac=sac, role="auditee_cert")
+        certifying_auditor_contact_access = Access.objects.get(sac=sac, role="auditor_cert")
+        auditee_contacts_access = Access.objects.filter(sac=sac, role="auditee_contact")
+        auditor_contacts_access = Access.objects.filter(sac=sac, role="auditor_contact")
+
         self.assertEqual(certifying_auditee_contact_access.email, "a@a.com")
         self.assertEqual(certifying_auditor_contact_access.email, "b@b.com")
-        self.assertEqual(auditee_contacts_first_access.email, "c@c.com")
-        self.assertEqual(auditor_contacts_first_access.email, "d@d.com")
+        self.assertEqual(auditee_contacts_access.first().email, "c@c.com")
+        self.assertEqual(auditor_contacts_access.first().email, "d@d.com")
 
     def test_invalid_eligibility_data(self):
         """
