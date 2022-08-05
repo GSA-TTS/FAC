@@ -211,7 +211,7 @@ CORS_ALLOW_ALL_ORIGINS = True
 SAM_API_URL = "https://api.sam.gov/entity-information/v3/entities"
 # Get key from cloud.gov user provided service instance
 env = AppEnv()
-key_service = env.get_service(label="fac-key-service")
+key_service = env.get_service(name="fac-key-service")
 if key_service and key_service.credentials:
     SAM_API_KEY = key_service.credentials.get("SAM_API_KEY")
 else:
