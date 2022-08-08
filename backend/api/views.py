@@ -155,6 +155,12 @@ class AccessAndSubmissionView(APIView):
             # Create all contact Access objects
             Access.objects.create(
                 sac=sac,
+                role="creator",
+                email=request.user.email,
+                user=request.user
+            )
+            Access.objects.create(
+                sac=sac,
                 role="auditee_cert",
                 email=serializer.data.get("certifying_auditee_contact"),
             )
