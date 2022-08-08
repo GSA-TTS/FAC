@@ -293,9 +293,7 @@ class AccessAndSubmissionTests(TestCase):
 
         sac = SingleAuditChecklist.objects.get(id=data["sac_id"])
 
-        creator_access = Access.objects.get(
-            sac=sac, role="creator"
-        )
+        creator_access = Access.objects.get(sac=sac, role="creator")
         certifying_auditee_contact_access = Access.objects.get(
             sac=sac, role="auditee_cert"
         )
@@ -319,10 +317,10 @@ class AccessAndSubmissionTests(TestCase):
             VALID_ELIGIBILITY_DATA | VALID_AUDITEE_INFO_DATA
         )
         self.user.profile.save()
-        
+
         access_and_submission_data = VALID_ACCESS_AND_SUBMISSION_DATA.copy()
-        access_and_submission_data['auditee_contacts'].append('e@e.com')
-        access_and_submission_data['auditor_contacts'].append('f@f.com')
+        access_and_submission_data["auditee_contacts"].append("e@e.com")
+        access_and_submission_data["auditor_contacts"].append("f@f.com")
 
         response = self.client.post(
             ACCESS_AND_SUBMISSION_PATH, access_and_submission_data, format="json"
@@ -330,12 +328,24 @@ class AccessAndSubmissionTests(TestCase):
         data = response.json()
 
         sac = SingleAuditChecklist.objects.get(id=data["sac_id"])
-        
-        auditee_contacts = Access.objects.filter(sac=sac, role="auditee_contact").values_list('email', flat=True).order_by('email')
-        auditor_contacts = Access.objects.filter(sac=sac, role="auditor_contact").values_list('email', flat=True).order_by('email')
 
-        self.assertListEqual(list(auditee_contacts), access_and_submission_data['auditee_contacts'])
-        self.assertListEqual(list(auditor_contacts), access_and_submission_data['auditor_contacts'])
+        auditee_contacts = (
+            Access.objects.filter(sac=sac, role="auditee_contact")
+            .values_list("email", flat=True)
+            .order_by("email")
+        )
+        auditor_contacts = (
+            Access.objects.filter(sac=sac, role="auditor_contact")
+            .values_list("email", flat=True)
+            .order_by("email")
+        )
+
+        self.assertListEqual(
+            list(auditee_contacts), access_and_submission_data["auditee_contacts"]
+        )
+        self.assertListEqual(
+            list(auditor_contacts), access_and_submission_data["auditor_contacts"]
+        )
 
     def test_invalid_eligibility_data(self):
         """
