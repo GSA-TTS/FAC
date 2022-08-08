@@ -205,16 +205,19 @@ class Access(models.Model):
         verbose_name_plural = "accesses"
 
         constraints = [
+            # a SAC cannot have multiple creators
             models.UniqueConstraint(
                 fields=["sac"],
                 condition=Q(role="creator"),
                 name="%(app_label)s_$(class)s_single_creator",
             ),
+            # a SAC cannot have multiple certifying auditees
             models.UniqueConstraint(
                 fields=["sac"],
                 condition=Q(role="auditee_cert"),
                 name="%(app_label)s_$(class)s_single_certifying_auditee",
             ),
+            # a SAC cannot have multiple certifying auditors
             models.UniqueConstraint(
                 fields=["sac"],
                 condition=Q(role="auditor_cert"),
