@@ -24,6 +24,7 @@ Provide clarity for the migration plan from the old Census FAC to the new TTS FA
 
 #### By 10/1/23, the following will have happened:
 
+* We have a "moderate" ATO
 * All relevant data from every SAC entry in the old Census FAC will be migrated over to the new TTS FAC
 * The new TTS FAC will have undergone performance optimization to accomodate for the estimated 1.5TB in legacy data
 * The old Census FAC will be taken off the internet
