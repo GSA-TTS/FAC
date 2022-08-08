@@ -15,6 +15,38 @@ from .validators import (
 User = get_user_model()
 
 
+class Access(models.Model):
+    """
+    Email addresses which have been granted access to SAC instances.
+    An email address may be associated with a User ID if an FAC account exists.
+    """
+
+    ROLES = (
+        ("auditee_contact", _("Auditee Contact")),
+        ("auditee_cert", _("Auditee Certifying Official")),
+        ("auditor_contact", _("Auditor Contact")),
+        ("auditor_cert", _("Auditor Certifying Official")),
+    )
+    role = models.CharField(
+        choices=ROLES,
+        help_text="Access type granted to this user",
+        max_length=15,
+    )
+    email = models.EmailField()
+    user = models.ForeignKey(
+        User,
+        null=True,
+        help_text="User ID associated with this email address, empty if no FAC account exists",
+        on_delete=models.PROTECT,
+    )
+
+    def __str__(self):
+        return f"{self.email} as {self.get_role_display()}"
+
+    class Meta:
+        verbose_name_plural = "accesses"
+
+
 class SingleAuditChecklistManager(models.Manager):
     """Manager for SAC"""
 
@@ -128,7 +160,7 @@ class SingleAuditChecklist(models.Model):
     )
 
     # Q5 Auditee Information
-    auditee_name = models.CharField(max_length=100, null=True)
+    auditee_name = models.CharField(max_length=100, blank=True, null=True)
     auditee_address_line_1 = models.CharField(max_length=100, null=True)
     auditee_city = models.CharField(max_length=100, null=True)
     auditee_state = models.CharField(max_length=2, null=True)
@@ -144,6 +176,32 @@ class SingleAuditChecklist(models.Model):
     )
     met_spending_threshold = models.BooleanField()
     is_usa_based = models.BooleanField(verbose_name=_("Is USA Based"))
+
+    certifying_auditee_contact = models.ForeignKey(
+        Access,
+        related_name="certifying_auditee_contact",
+        on_delete=models.PROTECT,
+        null=True,
+    )
+    certifying_auditor_contact = models.ForeignKey(
+        Access,
+        related_name="certifying_auditor_contact",
+        on_delete=models.PROTECT,
+        null=True,
+    )
+    auditee_contacts = models.ManyToManyField(
+        Access,
+        related_name="auditee_contacts",
+        verbose_name="list of auditees with access",
+        null=True,
+    )
+    auditor_contacts = models.ManyToManyField(
+        Access,
+        related_name="auditor_contacts",
+        verbose_name="list of auditors with access",
+        null=True,
+    )
+
     auditor_firm_name = models.CharField(max_length=100, null=True)
     auditor_ein = models.CharField(
         max_length=12, verbose_name=_("Auditor EIN"), null=True
@@ -167,35 +225,3 @@ class SingleAuditChecklist(models.Model):
 
     def __str__(self):
         return f"#{self.id} - UEI({self.auditee_uei})"
-
-
-class Access(models.Model):
-    """
-    Email addresses which have been granted access to SAC instances.
-    An email address may be associated with a User ID if an FAC account exists.
-    """
-
-    ROLES = (
-        ("auditee_contact", _("Auditee Contact")),
-        ("auditee_cert", _("Auditee Certifying Official")),
-        ("auditor_contact", _("Auditor Contact")),
-        ("auditor_cert", _("Auditor Certifying Official")),
-    )
-    sac = models.ForeignKey(
-        SingleAuditChecklist, related_name="users", on_delete=models.PROTECT
-    )
-    role = models.CharField(
-        choices=ROLES,
-        help_text="Access type granted to this user",
-        max_length=15,
-    )
-    email = models.EmailField()
-    user_id = models.ForeignKey(
-        User,
-        null=True,
-        help_text="User ID associated with this email address, empty if no FAC account exists",
-        on_delete=models.PROTECT,
-    )
-
-    def __str__(self):
-        return f"{self.email} as {self.role} for {self.sac}"

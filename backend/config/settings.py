@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 
 import environs
 import os
+from cfenv import AppEnv
 
 env = environs.Env()
 
@@ -208,4 +209,10 @@ CORS_ALLOW_ALL_ORIGINS = True
 
 # SAM.gov API
 SAM_API_URL = "https://api.sam.gov/entity-information/v3/entities"
-SAM_API_KEY = os.environ.get("SAM_API_KEY")
+# Get key from cloud.gov user provided service instance
+env = AppEnv()
+key_service = env.get_service(name="fac-key-service")
+if key_service and key_service.credentials:
+    SAM_API_KEY = key_service.credentials.get("SAM_API_KEY")
+else:
+    SAM_API_KEY = os.environ.get("SAM_API_KEY")

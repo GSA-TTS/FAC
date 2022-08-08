@@ -14,23 +14,30 @@ User = get_user_model()
 
 ELIGIBILITY_PATH = reverse("eligibility")
 AUDITEE_INFO_PATH = reverse("auditee-info")
-ACCESS_PATH = reverse("access")
+ACCESS_AND_SUBMISSION_PATH = reverse("accessandsubmission")
+SUBMISSIONS_PATH = reverse("submissions")
+
 
 VALID_AUDITEE_INFO_DATA = {
     "auditee_uei": "ZQGGHJH74DW7",
     "auditee_fiscal_period_start": "2021-01-01",
     "auditee_fiscal_period_end": "2022-01-01",
     "auditee_name": "Tester",
+    "submission_status": "in_progress",
 }
+
 VALID_ELIGIBILITY_DATA = {
     "is_usa_based": True,
     "met_spending_threshold": True,
     "user_provided_organization_type": "state",
 }
-VALID_ACCESS_DATA = [
-    {"role": "auditee_contact", "email": "a@a.com"},
-    {"role": "auditor_contact", "email": "c@c.com"},
-]
+
+VALID_ACCESS_AND_SUBMISSION_DATA = {
+    "certifying_auditee_contact": "a@a.com",
+    "certifying_auditor_contact": "b@b.com",
+    "auditee_contacts": ["c@c.com"],
+    "auditor_contacts": ["d@d.com"],
+}
 
 
 class EligibilityViewTests(TestCase):
@@ -127,7 +134,7 @@ class AuditeeInfoTests(TestCase):
             AUDITEE_INFO_PATH, VALID_AUDITEE_INFO_DATA, format="json"
         )
         data = response.json()
-        self.assertEqual(data["next"], ACCESS_PATH)
+        self.assertEqual(data["next"], ACCESS_AND_SUBMISSION_PATH)
         self.assertEqual(
             self.user.profile.entry_form_data,
             VALID_ELIGIBILITY_DATA | VALID_AUDITEE_INFO_DATA,
@@ -142,7 +149,7 @@ class AuditeeInfoTests(TestCase):
         input_data = VALID_AUDITEE_INFO_DATA | {"auditee_uei": None}
         response = self.client.post(AUDITEE_INFO_PATH, input_data, format="json")
         data = response.json()
-        self.assertEqual(data["next"], ACCESS_PATH)
+        self.assertEqual(data["next"], ACCESS_AND_SUBMISSION_PATH)
         self.assertEqual(
             self.user.profile.entry_form_data, VALID_ELIGIBILITY_DATA | input_data
         )
@@ -156,7 +163,7 @@ class AuditeeInfoTests(TestCase):
         input_data = VALID_AUDITEE_INFO_DATA | {"auditee_uei": ""}
         response = self.client.post(AUDITEE_INFO_PATH, input_data, format="json")
         data = response.json()
-        self.assertEqual(data["next"], ACCESS_PATH)
+        self.assertEqual(data["next"], ACCESS_AND_SUBMISSION_PATH)
         self.assertEqual(
             self.user.profile.entry_form_data, VALID_ELIGIBILITY_DATA | input_data
         )
@@ -171,21 +178,24 @@ class AuditeeInfoTests(TestCase):
         del input_data["auditee_uei"]
         response = self.client.post(AUDITEE_INFO_PATH, input_data, format="json")
         data = response.json()
-        self.assertEqual(data["next"], ACCESS_PATH)
+        self.assertEqual(data["next"], ACCESS_AND_SUBMISSION_PATH)
         self.assertEqual(
             self.user.profile.entry_form_data, VALID_ELIGIBILITY_DATA | input_data
         )
 
     def test_blank_auditee_name(self):
         """
-        Auditee name cannot be blank
+        Auditee name can be blank
         """
         self.user.profile.entry_form_data = VALID_ELIGIBILITY_DATA
         self.user.profile.save()
         input_data = VALID_AUDITEE_INFO_DATA | {"auditee_name": ""}
         response = self.client.post(AUDITEE_INFO_PATH, input_data, format="json")
         data = response.json()
-        self.assertTrue(data["errors"])
+        self.assertEqual(data["next"], ACCESS_AND_SUBMISSION_PATH)
+        self.assertEqual(
+            self.user.profile.entry_form_data, VALID_ELIGIBILITY_DATA | input_data
+        )
 
     def test_null_auditee_name(self):
         """
@@ -196,7 +206,7 @@ class AuditeeInfoTests(TestCase):
         input_data = VALID_AUDITEE_INFO_DATA | {"auditee_name": None}
         response = self.client.post(AUDITEE_INFO_PATH, input_data, format="json")
         data = response.json()
-        self.assertEqual(data["next"], ACCESS_PATH)
+        self.assertEqual(data["next"], ACCESS_AND_SUBMISSION_PATH)
         self.assertEqual(
             self.user.profile.entry_form_data, VALID_ELIGIBILITY_DATA | input_data
         )
@@ -211,7 +221,7 @@ class AuditeeInfoTests(TestCase):
         del input_data["auditee_name"]
         response = self.client.post(AUDITEE_INFO_PATH, input_data, format="json")
         data = response.json()
-        self.assertEqual(data["next"], ACCESS_PATH)
+        self.assertEqual(data["next"], ACCESS_AND_SUBMISSION_PATH)
         self.assertEqual(
             self.user.profile.entry_form_data, VALID_ELIGIBILITY_DATA | input_data
         )
@@ -241,7 +251,7 @@ class AuditeeInfoTests(TestCase):
         self.assertTrue(data["errors"])
 
 
-class AccessTests(TestCase):
+class AccessAndSubmissionTests(TestCase):
     def setUp(self):
         self.user = baker.make(User)
         self.client = APIClient()
@@ -250,7 +260,9 @@ class AccessTests(TestCase):
     def test_missing_expected_form_data_from_prior_steps(self):
         """Return an error and point to Eligibility step if we're missing data from any prior step"""
         # Missing Eligibility data
-        response = self.client.post(ACCESS_PATH, VALID_ACCESS_DATA, format="json")
+        response = self.client.post(
+            ACCESS_AND_SUBMISSION_PATH, VALID_ACCESS_AND_SUBMISSION_DATA, format="json"
+        )
         data = response.json()
         self.assertEqual(data["next"], ELIGIBILITY_PATH)
         self.assertTrue(data["errors"])
@@ -259,7 +271,9 @@ class AccessTests(TestCase):
         self.user.profile.save()
 
         # Have eligibility, but missing auditee info data
-        response = self.client.post(ACCESS_PATH, VALID_ACCESS_DATA, format="json")
+        response = self.client.post(
+            ACCESS_AND_SUBMISSION_PATH, VALID_ACCESS_AND_SUBMISSION_DATA, format="json"
+        )
         data = response.json()
         self.assertEqual(data["next"], ELIGIBILITY_PATH)
         self.assertTrue(data["errors"])
@@ -272,12 +286,20 @@ class AccessTests(TestCase):
         )
         self.user.profile.save()
 
-        response = self.client.post(ACCESS_PATH, VALID_ACCESS_DATA, format="json")
+        response = self.client.post(
+            ACCESS_AND_SUBMISSION_PATH, VALID_ACCESS_AND_SUBMISSION_DATA, format="json"
+        )
         data = response.json()
 
         sac = SingleAuditChecklist.objects.get(id=data["sac_id"])
-        self.assertEqual(sac.users.get(role="auditee_contact").email, "a@a.com")
-        self.assertEqual(sac.users.get(role="auditor_contact").email, "c@c.com")
+        certifying_auditee_contact_access = sac.certifying_auditee_contact
+        certifying_auditor_contact_access = sac.certifying_auditor_contact
+        auditor_contacts_first_access = sac.auditor_contacts.first()
+        auditee_contacts_first_access = sac.auditee_contacts.first()
+        self.assertEqual(certifying_auditee_contact_access.email, "a@a.com")
+        self.assertEqual(certifying_auditor_contact_access.email, "b@b.com")
+        self.assertEqual(auditee_contacts_first_access.email, "c@c.com")
+        self.assertEqual(auditor_contacts_first_access.email, "d@d.com")
 
     def test_invalid_eligibility_data(self):
         """
@@ -287,13 +309,21 @@ class AccessTests(TestCase):
             VALID_ELIGIBILITY_DATA | VALID_AUDITEE_INFO_DATA
         )
         self.user.profile.save()
-        response = self.client.post(ACCESS_PATH, [{}], format="json")
+        response = self.client.post(ACCESS_AND_SUBMISSION_PATH, {}, format="json")
         data = response.json()
         self.assertEqual(
-            data.get("errors", [])[0]["role"][0], "This field is required."
+            data.get("errors", [])["certifying_auditee_contact"][0],
+            "This field is required.",
         )
         self.assertEqual(
-            data.get("errors", [])[0]["email"][0], "This field is required."
+            data.get("errors", [])["certifying_auditor_contact"][0],
+            "This field is required.",
+        )
+        self.assertEqual(
+            data.get("errors", [])["auditee_contacts"][0], "This field is required."
+        )
+        self.assertEqual(
+            data.get("errors", [])["auditor_contacts"][0], "This field is required."
         )
 
 
@@ -323,14 +353,64 @@ class SACCreationTests(TestCase):
         data = response.json()
         next_step = data["next"]
 
-        # Submit Access details
-        access_data = [
-            {"role": "auditee_contact", "email": "test@example.com"},
-            {"role": "auditor_contact", "email": "testerc@example.com"},
-        ]
-        response = self.client.post(next_step, access_data, format="json")
+        # Submit AccessAndSubmission details
+        access_and_submission_data = {
+            "certifying_auditee_contact": "a@a.com",
+            "certifying_auditor_contact": "b@b.com",
+            "auditor_contacts": ["c@c.com"],
+            "auditee_contacts": ["e@e.com"],
+        }
+        response = self.client.post(
+            next_step, access_and_submission_data, format="json"
+        )
         data = response.json()
         sac = SingleAuditChecklist.objects.get(id=data["sac_id"])
         self.assertEqual(sac.submitted_by, self.user)
         self.assertEqual(sac.auditee_uei, "ZQGGHJH74DW7")
         self.assertEqual(sac.submission_status, "in_progress")
+
+
+class SubmissionsViewTests(TestCase):
+    def setUp(self):
+        self.user = baker.make(User)
+        self.client = APIClient()
+        self.client.force_authenticate(user=self.user)
+
+    def test_no_submissions_returns_empty_list(self):
+        response = self.client.get(SUBMISSIONS_PATH, format="json")
+        data = response.json()
+        self.assertEqual(data, [])
+
+    def test_user_with_submissions_should_return_expected_data_columns(self):
+        self.user.profile.entry_form_data = (
+            VALID_ELIGIBILITY_DATA | VALID_AUDITEE_INFO_DATA
+        )
+        self.user.profile.save()
+        self.client.post(
+            ACCESS_AND_SUBMISSION_PATH, VALID_ACCESS_AND_SUBMISSION_DATA, format="json"
+        )
+
+        response = self.client.get(SUBMISSIONS_PATH, format="json")
+
+        data = response.json()
+        self.assertTrue("report_id" in data[0])
+        self.assertEqual(
+            data[0]["submission_status"],
+            VALID_AUDITEE_INFO_DATA["submission_status"],
+        )
+        self.assertEqual(
+            data[0]["auditee_uei"],
+            VALID_AUDITEE_INFO_DATA["auditee_uei"],
+        )
+        self.assertEqual(
+            data[0]["auditee_fiscal_period_end"],
+            VALID_AUDITEE_INFO_DATA["auditee_fiscal_period_end"],
+        )
+        self.assertEqual(
+            data[0]["auditee_name"],
+            VALID_AUDITEE_INFO_DATA["auditee_name"],
+        )
+        self.assertEqual(
+            len(data[0]),
+            5,
+        )
