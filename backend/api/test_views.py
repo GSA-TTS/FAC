@@ -547,3 +547,26 @@ class AccessListViewTests(TestCase):
         creator_accesses = list(filter(lambda a: a["role"] == "creator", data))
         self.assertEqual(len(creator_accesses), 1)
         self.assertEqual(creator_accesses[0]["report_id"], sac.report_id)
+
+    def test_deleted_access_not_returned(self):
+        """
+        If a user has their Access deleted, the associated SAC is no longer returned in their access list
+        """
+        access_1 = baker.make(Access, user=self.user)
+        access_2 = baker.make(Access, user=self.user)
+
+        response_1 = self.client.get(ACCESS_LIST_PATH, format="json")
+        data_1 = response_1.json()
+
+        # initially we see both in our access list
+        self.assertEqual(len(data_1), 2)
+
+        # now delete one access_2
+        access_2.delete()
+
+        response_2 = self.client.get(ACCESS_LIST_PATH, format="json")
+        data_2 = response_2.json()
+
+        # only the one remaining access should come back
+        self.assertEqual(len(data_2), 1)
+        self.assertEqual(data_2[0]["report_id"], access_1.sac.report_id)
