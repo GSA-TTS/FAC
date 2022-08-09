@@ -3,6 +3,7 @@ from unittest import TestCase
 
 from unittest.mock import patch
 from django.test import SimpleTestCase
+from model_bakery import baker
 
 from api.test_uei import valid_uei_results
 from api.serializers import (
@@ -10,9 +11,10 @@ from api.serializers import (
     UEISerializer,
     AuditeeInfoSerializer,
     AccessSerializer,
+    AccessListSerializer,
     AccessAndSubmissionSerializer,
 )
-from audit.models import User
+from audit.models import User, Access, SingleAuditChecklist
 
 
 class EligibilityStepTests(SimpleTestCase):
@@ -146,26 +148,29 @@ class AuditeeInfoStepTests(SimpleTestCase):
 
 class AccessSerializerTests(TestCase):
     def test_valid_access(self):
+        user = baker.make(User)
         data = {
             "role": "auditee_contact",
             "email": "firstname.lastname@gsa.gov",
-            "user": User.objects.first(),
+            "user": user.id,
         }
         self.assertTrue(AccessSerializer(data=data).is_valid())
 
     def test_invalid_role(self):
+        user = baker.make(User)
         data = {
             "role": "this is a role that's not really a role",
             "email": "firstname.lastname@gsa.gov",
-            "user": User.objects.first(),
+            "user": user.id,
         }
         self.assertFalse(AccessSerializer(data=data).is_valid())
 
     def test_invalid_email(self):
+        user = baker.make(User)
         data = {
             "role": "auditee_contact",
             "email": "this is not an email address",
-            "user": User.objects.first(),
+            "user": user.id,
         }
         self.assertFalse(AccessSerializer(data=data).is_valid())
 
@@ -310,3 +315,17 @@ class AccessAndSubmissionStepTests(TestCase):
         self.assertFalse(
             AccessAndSubmissionSerializer(data=auditee_not_all_valid_emails).is_valid()
         )
+
+
+class AccessListSerializerTests(TestCase):
+    def test_expected_fields_included(self):
+        access = baker.make(Access)
+
+        serializer = AccessListSerializer(access)
+
+        self.assertEquals(serializer.data["auditee_uei"], access.sac.auditee_uei)
+        self.assertEquals(serializer.data["auditee_fiscal_period_end"], access.sac.auditee_fiscal_period_end)
+        self.assertEquals(serializer.data["auditee_name"], access.sac.auditee_name)
+        self.assertEquals(serializer.data["report_id"], access.sac.report_id)
+        self.assertEquals(serializer.data["submission_status"], access.sac.submission_status)
+        self.assertEquals(serializer.data["role"], access.role)
