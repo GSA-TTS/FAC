@@ -572,7 +572,6 @@ class AccessListViewTests(TestCase):
         self.assertEqual(len(data_2), 1)
         self.assertEqual(data_2[0]["report_id"], access_1.sac.report_id)
 
-
     def test_deleted_access_not_returned(self):
         """
         If a user has their Access deleted, the associated SAC is no longer returned in their access list
