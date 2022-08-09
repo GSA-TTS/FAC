@@ -1,4 +1,5 @@
 import json
+from os import access
 
 from audit.models import Access, SingleAuditChecklist
 from django.urls import reverse
@@ -9,6 +10,7 @@ from django.http import JsonResponse
 
 from .serializers import (
     AccessAndSubmissionSerializer,
+    AccessListSerializer,
     AuditeeInfoSerializer,
     EligibilitySerializer,
     SingleAuditChecklistSerializer,
@@ -201,3 +203,16 @@ class SubmissionsView(APIView):
         )
 
         return JsonResponse(list(all_submissions), safe=False)
+
+
+class AccessListView(APIView):
+    """
+    Returns a summary list of SingleAuditChecklists that the user has Access to
+    """
+
+    def get(self, request):
+        accesses = Access.objects.select_related('sac').filter(user=request.user)
+        
+        serializer = AccessListSerializer(accesses, many=True)
+
+        return Response(serializer.data)

@@ -1,5 +1,7 @@
 import json
+from tokenize import Single
 from unittest.mock import patch
+from venv import create
 
 from django.contrib.auth import get_user_model
 from django.test import TestCase
@@ -16,6 +18,7 @@ ELIGIBILITY_PATH = reverse("eligibility")
 AUDITEE_INFO_PATH = reverse("auditee-info")
 ACCESS_AND_SUBMISSION_PATH = reverse("accessandsubmission")
 SUBMISSIONS_PATH = reverse("submissions")
+ACCESS_LIST_PATH = reverse("access-list")
 
 
 VALID_AUDITEE_INFO_DATA = {
@@ -460,3 +463,87 @@ class SubmissionsViewTests(TestCase):
             len(data[0]),
             5,
         )
+
+
+class AccessListViewTests(TestCase):
+    def setUp(self):
+        self.user = baker.make(User)
+        self.client = APIClient()
+        self.client.force_authenticate(user=self.user)
+
+    def test_authentication_required(self):
+        """
+        If a request is not authenticated, it should be rejected with a 401
+        """
+
+        # use a different client that doesn't authenticate
+        client = APIClient()
+
+        response = client.get(ACCESS_LIST_PATH, format="json")
+
+        self.assertEqual(response.status_code, 401)
+    
+    def test_no_access_returns_empty_list(self):
+        """
+        If a user does not have access to any audits, an empty list is returned
+        """
+        response = self.client.get(ACCESS_LIST_PATH, format="json")
+        data = response.json()
+
+        self.assertEqual(data, [])
+
+    def test_single_access_returns_expected(self):
+        """
+        If a user has acccess to a single audit, only that audit is returned
+        """
+        access = baker.make(Access, user=self.user)
+
+        response = self.client.get(ACCESS_LIST_PATH, format="json")
+        data = response.json()
+
+        self.assertEqual(len(data), 1)
+        self.assertEqual(data[0]["role"], access.role)
+        self.assertEqual(data[0]["report_id"], access.sac.report_id)
+
+    def test_multiple_access_returns_expected(self):
+        """
+        If a user has access to multiple audits, all are returned
+        """
+        access_1 = baker.make(Access, user=self.user)
+        access_2 = baker.make(Access, user=self.user)
+
+        response = self.client.get(ACCESS_LIST_PATH, format="json")
+        data = response.json()
+
+        self.assertEqual(len(data), 2)
+
+        data_1 = next((a for a in data if a["report_id"] == access_1.sac.report_id))
+
+        self.assertEqual(data_1["role"], access_1.role)
+        self.assertEqual(data_1["report_id"], access_1.sac.report_id)
+
+        data_2 = next((a for a in data if a["report_id"] == access_2.sac.report_id))
+
+        self.assertEqual(data_2["role"], access_2.role)
+        self.assertEqual(data_2["report_id"], access_2.sac.report_id)
+
+    def test_multiple_roles_returns_expected(self):
+        """
+        If a user has multiple roles for an audit, that audit is returned one time for each role
+        """
+        sac = baker.make(SingleAuditChecklist)
+        baker.make(Access, user=self.user, role="auditee_cert", sac=sac)
+        baker.make(Access, user=self.user, role="creator", sac=sac)
+
+        response = self.client.get(ACCESS_LIST_PATH, format="json")
+        data = response.json()
+
+        self.assertEqual(len(data), 2)
+
+        auditee_cert_accesses = list(filter(lambda a: a["role"] == "auditee_cert", data))
+        self.assertEqual(len(auditee_cert_accesses), 1)
+        self.assertEqual(auditee_cert_accesses[0]["report_id"], sac.report_id)
+
+        creator_accesses = list(filter(lambda a: a["role"] == "creator", data))
+        self.assertEqual(len(creator_accesses), 1)
+        self.assertEqual(creator_accesses[0]["report_id"], sac.report_id)
