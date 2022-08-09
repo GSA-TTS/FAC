@@ -8,7 +8,7 @@ from model_bakery import baker
 from rest_framework.test import APIClient
 
 from api.test_uei import valid_uei_results
-from audit.models import SingleAuditChecklist
+from audit.models import Access, SingleAuditChecklist
 
 User = get_user_model()
 
@@ -292,14 +292,60 @@ class AccessAndSubmissionTests(TestCase):
         data = response.json()
 
         sac = SingleAuditChecklist.objects.get(id=data["sac_id"])
-        certifying_auditee_contact_access = sac.certifying_auditee_contact
-        certifying_auditor_contact_access = sac.certifying_auditor_contact
-        auditor_contacts_first_access = sac.auditor_contacts.first()
-        auditee_contacts_first_access = sac.auditee_contacts.first()
+
+        creator_access = Access.objects.get(sac=sac, role="creator")
+        certifying_auditee_contact_access = Access.objects.get(
+            sac=sac, role="auditee_cert"
+        )
+        certifying_auditor_contact_access = Access.objects.get(
+            sac=sac, role="auditor_cert"
+        )
+        auditee_contacts_access = Access.objects.filter(sac=sac, role="auditee_contact")
+        auditor_contacts_access = Access.objects.filter(sac=sac, role="auditor_contact")
+
+        self.assertEqual(creator_access.user, self.user)
+        self.assertEqual(creator_access.email, self.user.email)
         self.assertEqual(certifying_auditee_contact_access.email, "a@a.com")
         self.assertEqual(certifying_auditor_contact_access.email, "b@b.com")
-        self.assertEqual(auditee_contacts_first_access.email, "c@c.com")
-        self.assertEqual(auditor_contacts_first_access.email, "d@d.com")
+        self.assertEqual(auditee_contacts_access.first().email, "c@c.com")
+        self.assertEqual(auditor_contacts_access.first().email, "d@d.com")
+
+    def test_multiple_auditee_auditor_contacts(self):
+        """A new SAC is created along with related Access instances"""
+        # Add eligibility and Auditee Info data to profile
+        self.user.profile.entry_form_data = (
+            VALID_ELIGIBILITY_DATA | VALID_AUDITEE_INFO_DATA
+        )
+        self.user.profile.save()
+
+        access_and_submission_data = VALID_ACCESS_AND_SUBMISSION_DATA.copy()
+        access_and_submission_data["auditee_contacts"].append("e@e.com")
+        access_and_submission_data["auditor_contacts"].append("f@f.com")
+
+        response = self.client.post(
+            ACCESS_AND_SUBMISSION_PATH, access_and_submission_data, format="json"
+        )
+        data = response.json()
+
+        sac = SingleAuditChecklist.objects.get(id=data["sac_id"])
+
+        auditee_contacts = (
+            Access.objects.filter(sac=sac, role="auditee_contact")
+            .values_list("email", flat=True)
+            .order_by("email")
+        )
+        auditor_contacts = (
+            Access.objects.filter(sac=sac, role="auditor_contact")
+            .values_list("email", flat=True)
+            .order_by("email")
+        )
+
+        self.assertListEqual(
+            list(auditee_contacts), access_and_submission_data["auditee_contacts"]
+        )
+        self.assertListEqual(
+            list(auditor_contacts), access_and_submission_data["auditor_contacts"]
+        )
 
     def test_invalid_eligibility_data(self):
         """
