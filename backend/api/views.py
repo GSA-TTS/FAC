@@ -1,5 +1,4 @@
 import json
-from os import access
 
 from audit.models import Access, SingleAuditChecklist
 from django.urls import reverse
@@ -211,8 +210,8 @@ class AccessListView(APIView):
     """
 
     def get(self, request):
-        accesses = Access.objects.select_related('sac').filter(user=request.user)
-        
+        accesses = Access.objects.select_related("sac").filter(user=request.user)
+
         serializer = AccessListSerializer(accesses, many=True)
 
         return Response(serializer.data)

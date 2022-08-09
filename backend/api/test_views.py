@@ -1,7 +1,5 @@
 import json
-from tokenize import Single
 from unittest.mock import patch
-from venv import create
 
 from django.contrib.auth import get_user_model
 from django.test import TestCase
@@ -482,7 +480,7 @@ class AccessListViewTests(TestCase):
         response = client.get(ACCESS_LIST_PATH, format="json")
 
         self.assertEqual(response.status_code, 401)
-    
+
     def test_no_access_returns_empty_list(self):
         """
         If a user does not have access to any audits, an empty list is returned
@@ -540,7 +538,9 @@ class AccessListViewTests(TestCase):
 
         self.assertEqual(len(data), 2)
 
-        auditee_cert_accesses = list(filter(lambda a: a["role"] == "auditee_cert", data))
+        auditee_cert_accesses = list(
+            filter(lambda a: a["role"] == "auditee_cert", data)
+        )
         self.assertEqual(len(auditee_cert_accesses), 1)
         self.assertEqual(auditee_cert_accesses[0]["report_id"], sac.report_id)
 

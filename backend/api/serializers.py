@@ -148,4 +148,11 @@ class AccessListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Access
-        fields = ["auditee_uei", "auditee_fiscal_period_end", "auditee_name", "role", "report_id", "submission_status"]
+        fields = [
+            "auditee_uei",
+            "auditee_fiscal_period_end",
+            "auditee_name",
+            "role",
+            "report_id",
+            "submission_status",
+        ]
