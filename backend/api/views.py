@@ -1,6 +1,8 @@
 import json
 
 from audit.models import Access, SingleAuditChecklist
+from audit.permissions import SingleAuditChecklistPermission
+from django.http import Http404
 from django.urls import reverse
 from rest_framework import viewsets
 from rest_framework.response import Response
@@ -181,6 +183,24 @@ class AccessAndSubmissionView(APIView):
             return Response({"sac_id": sac.id, "next": "TBD"})
 
         return Response({"errors": serializer.errors})
+
+
+class SingleAuditChecklistView(APIView):
+    """
+    Accepts and returns data for a SingleAuditChecklist
+    """
+
+    permission_classes = [SingleAuditChecklistPermission]
+
+    def get(self, request, report_id):
+        """ """
+        try:
+            sac = SingleAuditChecklist.objects.get(report_id=report_id)
+        except SingleAuditChecklist.DoesNotExist:
+            raise Http404()
+        self.check_object_permissions(request, sac)
+        serialized = SingleAuditChecklistSerializer(sac)
+        return JsonResponse(serialized.data)
 
 
 class SubmissionsView(APIView):

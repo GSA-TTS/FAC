@@ -417,6 +417,58 @@ class SACCreationTests(TestCase):
         self.assertEqual(sac.submission_status, "in_progress")
 
 
+class SingleAuditChecklistViewTests(TestCase):
+    def setUp(self):
+        self.user = baker.make(User)
+        self.client = APIClient()
+        self.client.force_authenticate(user=self.user)
+
+    def path(self, report_id):
+        return reverse("singleauditchecklist", kwargs={"report_id": report_id})
+
+    def test_authentication_required(self):
+        """
+        If a request is not authenticated, it should be rejected with a 401
+        """
+
+        # use a different client that doesn't authenticate
+        client = APIClient()
+
+        response = client.get(self.path("test-report-id"), format="json")
+
+        self.assertEqual(response.status_code, 401)
+
+    def test_no_audit_access(self):
+        sac = baker.make(SingleAuditChecklist)
+
+        response = self.client.get(self.path(sac.report_id))
+        self.assertEqual(response.status_code, 403)
+
+        # create a SAC
+
+        # hit endpoint with auth'd client
+        # expect 403
+
+    def test_audit_access(self):
+        access = baker.make(Access, user=self.user)
+        response = self.client.get(self.path(access.sac.report_id))
+
+        self.assertEqual(response.status_code, 200)
+
+        # create an Access with our user
+
+        # hit with auth'd client
+        # expect 200
+
+    def test_bad_report_id(self):
+        response = self.client.get(self.path("nonsensical_id"))
+
+        self.assertEqual(response.status_code, 404)
+
+        # hit with auth'd client, random report_id
+        # expect 404
+
+
 class SubmissionsViewTests(TestCase):
     def setUp(self):
         self.user = baker.make(User)
