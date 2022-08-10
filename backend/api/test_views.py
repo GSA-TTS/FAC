@@ -442,7 +442,7 @@ class SingleAuditChecklistViewTests(TestCase):
         sac = baker.make(SingleAuditChecklist)
 
         response = self.client.get(self.path(sac.report_id))
-        assert response.status_code == 403
+        self.assertEqual(response.status_code, 403)
 
         # create a SAC
 
@@ -453,7 +453,7 @@ class SingleAuditChecklistViewTests(TestCase):
         access = baker.make(Access, user=self.user)
         response = self.client.get(self.path(access.sac.report_id))
 
-        assert response.status_code == 200
+        self.assertEqual(response.status_code, 200)
 
         # create an Access with our user
 
@@ -463,7 +463,7 @@ class SingleAuditChecklistViewTests(TestCase):
     def test_bad_report_id(self):
         response = self.client.get(self.path("nonsensical_id"))
 
-        assert response.status_code == 404
+        self.assertEqual(response.status_code, 404)
 
         # hit with auth'd client, random report_id
         # expect 404
