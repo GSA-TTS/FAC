@@ -189,10 +189,15 @@ class SingleAuditChecklistView(APIView):
     """
     Accepts and returns data for a SingleAuditChecklist
     """
+
     permission_classes = [SingleAuditChecklistPermission]
 
     def get(self, request, report_id):
-        return "asiodfj"
+        """ """
+        sac = SingleAuditChecklist.objects.get(report_id=report_id)
+        self.check_object_permissions(request, sac)
+        serialized = SingleAuditChecklistSerializer(sac)
+        return JsonResponse(serialized.data)
 
 
 class SubmissionsView(APIView):

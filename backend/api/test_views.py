@@ -424,7 +424,7 @@ class SingleAuditChecklistViewTests(TestCase):
         self.client.force_authenticate(user=self.user)
 
     def path(self, report_id):
-        return reverse("singleauditchecklist", kwargs={ "report_id": report_id })        
+        return reverse("singleauditchecklist", kwargs={"report_id": report_id})
 
     def test_authentication_required(self):
         """
@@ -439,7 +439,10 @@ class SingleAuditChecklistViewTests(TestCase):
         self.assertEqual(response.status_code, 401)
 
     def test_no_audit_access(self):
-        pass
+        sac = baker.make(SingleAuditChecklist)
+
+        response = self.client.get(self.path(sac.report_id))
+        assert response.status_code == 403
 
         # create a SAC
 
@@ -447,7 +450,10 @@ class SingleAuditChecklistViewTests(TestCase):
         # expect 403
 
     def test_audit_access(self):
-        pass
+        access = baker.make(Access, user=self.user)
+        response = self.client.get(self.path(access.sac.report_id))
+
+        assert response.status_code == 200
 
         # create an Access with our user
 
@@ -458,7 +464,8 @@ class SingleAuditChecklistViewTests(TestCase):
         pass
 
         # hit with auth'd client, random report_id
-        #expect 404
+        # expect 404
+
 
 class SubmissionsViewTests(TestCase):
     def setUp(self):
