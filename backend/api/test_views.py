@@ -461,7 +461,6 @@ class SingleAuditChecklistViewTests(TestCase):
         # expect 200
 
     def test_bad_report_id(self):
-        access = baker.make(Access, user=self.user)
         response = self.client.get(self.path("nonsensical_id"))
 
         assert response.status_code == 404

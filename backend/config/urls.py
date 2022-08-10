@@ -42,7 +42,7 @@ urlpatterns = [
     path(
         "sac/edit/<str:report_id>",
         views.SingleAuditChecklistView.as_view(),
-        name="singleauditchecklist",  
+        name="singleauditchecklist",
     ),
     path(
         "submissions",
