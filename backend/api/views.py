@@ -194,7 +194,10 @@ class SingleAuditChecklistView(APIView):
 
     def get(self, request, report_id):
         """ """
-        sac = SingleAuditChecklist.objects.get(report_id=report_id)
+        try:
+            sac = SingleAuditChecklist.objects.get(report_id=report_id)
+        except SingleAuditChecklist.DoesNotExist:
+            raise Http404()
         self.check_object_permissions(request, sac)
         serialized = SingleAuditChecklistSerializer(sac)
         return JsonResponse(serialized.data)
