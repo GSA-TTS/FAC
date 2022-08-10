@@ -438,8 +438,27 @@ class SingleAuditChecklistViewTests(TestCase):
 
         self.assertEqual(response.status_code, 401)
 
+    def test_no_audit_access(self):
+        pass
 
+        # create a SAC
 
+        # hit endpoint with auth'd client
+        # expect 403
+
+    def test_audit_access(self):
+        pass
+
+        # create an Access with our user
+
+        # hit with auth'd client
+        # expect 200
+
+    def test_bad_report_id(self):
+        pass
+
+        # hit with auth'd client, random report_id
+        #expect 404
 
 class SubmissionsViewTests(TestCase):
     def setUp(self):
