@@ -9,6 +9,7 @@ from django.http import JsonResponse
 
 from .serializers import (
     AccessAndSubmissionSerializer,
+    AccessListSerializer,
     AuditeeInfoSerializer,
     EligibilitySerializer,
     SingleAuditChecklistSerializer,
@@ -201,3 +202,16 @@ class SubmissionsView(APIView):
         )
 
         return JsonResponse(list(all_submissions), safe=False)
+
+
+class AccessListView(APIView):
+    """
+    Returns a summary list of SingleAuditChecklists that the user has Access to
+    """
+
+    def get(self, request):
+        accesses = Access.objects.select_related("sac").filter(user=request.user)
+
+        serializer = AccessListSerializer(accesses, many=True)
+
+        return Response(serializer.data)
