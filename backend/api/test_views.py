@@ -418,12 +418,17 @@ class SACCreationTests(TestCase):
 
 
 class SingleAuditChecklistViewTests(TestCase):
+    """
+    Tests for /sac/edit/[report_id]
+    """
+
     def setUp(self):
         self.user = baker.make(User)
         self.client = APIClient()
         self.client.force_authenticate(user=self.user)
 
     def path(self, report_id):
+        """Convenience method to get the path for a report_id)"""
         return reverse("singleauditchecklist", kwargs={"report_id": report_id})
 
     def test_authentication_required(self):
@@ -439,6 +444,10 @@ class SingleAuditChecklistViewTests(TestCase):
         self.assertEqual(response.status_code, 401)
 
     def test_no_audit_access(self):
+        """
+        If a user doesn't have an Access object for the SAC, they should get a
+        403.
+        """
         sac = baker.make(SingleAuditChecklist)
 
         response = self.client.get(self.path(sac.report_id))
@@ -450,6 +459,9 @@ class SingleAuditChecklistViewTests(TestCase):
         # expect 403
 
     def test_audit_access(self):
+        """
+        If a user has an Access object for the SAC, they should get a 200.
+        """
         access = baker.make(Access, user=self.user)
         response = self.client.get(self.path(access.sac.report_id))
 
@@ -461,12 +473,30 @@ class SingleAuditChecklistViewTests(TestCase):
         # expect 200
 
     def test_bad_report_id(self):
+        """
+        If the user is logged in and the report ID doesn't match a SAC, return a 404.
+        """
         response = self.client.get(self.path("nonsensical_id"))
 
         self.assertEqual(response.status_code, 404)
 
-        # hit with auth'd client, random report_id
-        # expect 404
+    def test_edit_appropriate_field(self):
+        """
+        If we submit data for the appropriate fields, we succeed and also
+        update those fields.
+
+        If a field is absent we don't do anything to it.
+
+        TODO: finish this test, currently it just makes sure the phone number
+        isn't somehow coincidentally what we're going to send.
+        """
+
+        data = {
+            "auditee_phone": "5558675309",
+        }
+        access = baker.make(Access, user=self.user)
+        self.assertFalse(access.sac.auditee_phone == data["auditee_phone"])
+        # response = self.client.post(self.path(access.sac.report_id), data)
 
 
 class SubmissionsViewTests(TestCase):
