@@ -202,6 +202,11 @@ class SingleAuditChecklistView(APIView):
         serialized = SingleAuditChecklistSerializer(sac)
         return JsonResponse(serialized.data)
 
+    def post(self, request, report_id):
+        print("helllooooooooooo")
+
+        return Response("asdf")
+
 
 class SubmissionsView(APIView):
     """

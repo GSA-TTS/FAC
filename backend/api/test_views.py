@@ -486,17 +486,21 @@ class SingleAuditChecklistViewTests(TestCase):
         update those fields.
 
         If a field is absent we don't do anything to it.
-
-        TODO: finish this test, currently it just makes sure the phone number
-        isn't somehow coincidentally what we're going to send.
         """
+
+        sac = baker.make(SingleAuditChecklist, auditee_phone="5558675308")
+        access = baker.make(Access, user=self.user, sac=sac)
 
         data = {
             "auditee_phone": "5558675309",
         }
-        access = baker.make(Access, user=self.user)
-        self.assertFalse(access.sac.auditee_phone == data["auditee_phone"])
-        # response = self.client.post(self.path(access.sac.report_id), data)
+
+
+        response = self.client.post(self.path(access.sac.report_id), data, format="json")
+
+        updated_sac = SingleAuditChecklist.objects.get(pk=sac.id)
+
+        self.assertEqual(updated_sac.auditee_phone, data["auditee_phone"])
 
 
 class SubmissionsViewTests(TestCase):
