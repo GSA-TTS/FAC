@@ -1,6 +1,9 @@
 Agile Process
 ===================
 
+### About this document
+This document defines the workflow-level execution process for the team. The related [team charter document](https://app.mural.co/t/gsa6/m/gsa6/1657921027860/f6d15b9a5882fb0615078010bacc5dd4826c0130?invited=true&sender=ua4d37dfba3f1e69e09078790) is a more personal document that introduces the team members and what they do on the team, core values and group norms. 
+
 ### Overview
 
 There is a [high-level roadmap](https://github.com/GSA-TTS/FAC/blob/main/docs/product/roadmap.md) containing Milestones that the product and design team distills down to actionable tasks at the beginning of each sprint. Design, engineering and product work is tracked on the [FAC Task Tracking board](https://github.com/GSA-TTS/FAC/projects/1) in Github with corrosponding roadmap Milestones. 
@@ -77,15 +80,15 @@ All teams members to provide update in github issues in progress on Monday/early
 
 ### Code Review (In Progress->Ready For Review->Done)
 
-Pull requests are reviewed on a per-ticket basis for merge into test. Better to push to test more rather than less; we assume test will break.
+Pull requests are reviewed on a per-ticket basis and tests are automatically run on the CI server. One reviewer required to merge any pull request and anyone can review, relecting our preference for velocity. Signal to the team in slack if you've waited more than two hours for a review.
 
-Stories are reviewed against acceptance criteria (AC) with test coverage.
+### Quality Assurance
 
-Once stories are reviewed, stories are pushed to staging.
+Stories are QA'ed against acceptance criteria (AC) with test coverage, including our manual accessibility checklist: 
 
-One reviewer required for any pull request (both test and staging).
-
-Anyone can review; ad-hoc. Prefer velocity. Signal to the team in slack if you've waited more than two hours for a review.
+* Screen reader - Listen to the experience with a screen reader extension, ensure the information presented in order
+* Keyboard navigation - Run through acceptance criteria with keyboard tabs, ensure it works.
+* Text scaling - Adjust viewport to 1280 pixels wide and zoom to 200%, ensure everything renders as expected. Document 400% zoom issues with USWDS if appropriate.
 
 ### Backlog refinement
 
