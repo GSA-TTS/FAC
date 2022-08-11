@@ -202,10 +202,59 @@ class SingleAuditChecklistView(APIView):
         serialized = SingleAuditChecklistSerializer(sac)
         return JsonResponse(serialized.data)
 
-    def post(self, request, report_id):
-        print("helllooooooooooo")
+    def put(self, request, report_id):
+        try:
+            sac = SingleAuditChecklist.objects.get(report_id=report_id)
+        except SingleAuditChecklist.DoesNotExist:
+            raise Http404()
+        self.check_object_permissions(request, sac)
+        invalid_fields = [
+            "submitted_by",
+            "date_created",
+            "submission_status",
+            "report_id",
+            "auditee_fiscal_period_start",
+            "auditee_fiscal_period_end",
+            "auditee_uei",
+            "auditee_name",
+            "auditee_address_line_1",
+            "auditee_city",
+            "auditee_state",
+            "auditee_zip",
+        ]
 
-        return Response("asdf")
+        submitted = request.data
+        submitted_invalid_fields = [
+            field for field in invalid_fields if field in submitted
+        ]
+        if submitted_invalid_fields:
+            errors_str = ", ".join(sorted(submitted_invalid_fields))
+            error_msg = "".join(
+                [
+                    "The following fields cannot be modified ",
+                    "via this endpoint: ",
+                    errors_str,
+                    ".",
+                ]
+            )
+            return JsonResponse({"errors": error_msg}, status=400)
+
+        # Note that using the | operator below would result in errors.
+        updated = {**SingleAuditChecklistSerializer(sac).data, **submitted}
+
+        keep = {k: v for k, v in updated.items() if k not in invalid_fields}
+        """
+        SingleAuditChecklist.objects.filter(report_id=report_id).update(
+            **{"auditee_email": 123}
+        )
+        """
+        for attr, value in keep.items():
+            setattr(sac, attr, value)
+        # sac.clean_fields()
+        # sac.validate_unique()
+        sac.save()
+        # sac = SingleAuditChecklist.objects.get(report_id=report_id)
+        return JsonResponse(SingleAuditChecklistSerializer(sac).data)
 
 
 class SubmissionsView(APIView):
