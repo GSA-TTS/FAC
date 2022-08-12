@@ -560,8 +560,6 @@ class SingleAuditChecklistViewTests(TestCase):
         update those fields.
 
         If a field is absent we don't do anything to it.
-
-        TODO: add test cases above for all of the fields.
         """
         test_cases = [
             ({"auditee_phone": "5558675308"}, {"auditee_phone": "5558675309"}),
