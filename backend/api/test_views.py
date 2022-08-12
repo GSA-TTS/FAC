@@ -40,6 +40,54 @@ VALID_ACCESS_AND_SUBMISSION_DATA = {
     "auditor_contacts": ["d@d.com"],
 }
 
+SAMPLE_BASE_SAC_DATA = {
+    # 0. Meta data
+    "submitted_by": None,
+    "date_created": "2022-08-11",
+    "submission_status": "in_progress",
+    "report_id": "2022ABC1000023",
+    # Part 1: General Information
+    # Q1 Fiscal Dates
+    "auditee_fiscal_period_start": "2021-10-01",
+    "auditee_fiscal_period_end": "2022-10-01",
+    # Q2 Type of Uniform Guidance Audit
+    "audit_type": "single-audit",
+    # Q3 Audit Period Covered
+    "audit_period_covered": "annual",
+    # Q4 Auditee Identification Numbers
+    "ein": None,
+    "ein_not_an_ssn_attestation": None,
+    "multiple_eins_covered": None,
+    "auditee_uei": "ZQGGHJH74DW7",
+    "multiple_ueis_covered": None,
+    # Q5 Auditee Information
+    "auditee_name": "Auditee McAudited",
+    "auditee_address_line_1": "200 feet into left field",
+    "auditee_city": "New York",
+    "auditee_state": "NY",
+    "auditee_zip": "10451",
+    "auditee_contact_name": "Designate Representative",
+    "auditee_contact_title": "Lord of Doors",
+    "auditee_phone": "5558675309",
+    "auditee_email": "auditee.mcaudited@leftfield.com",
+    # Q6 Primary Auditor Information
+    "user_provided_organization_type": "local",
+    "met_spending_threshold": True,
+    "is_usa_based": True,
+    "auditor_firm_name": "Dollar Audit Store",
+    "auditor_ein": None,
+    "auditor_ein_not_an_ssn_attestation": None,
+    "auditor_country": "USA",
+    "auditor_address_line_1": "100 Percent Respectable St.",
+    "auditor_city": "Podunk",
+    "auditor_state": "NY",
+    "auditor_zip": "14886",
+    "auditor_contact_name": "Qualified Human Accountant",
+    "auditor_contact_title": "Just an ordinary person",
+    "auditor_phone": "0008675309",
+    "auditor_email": "qualified.human.accountant@dollarauditstore.com",
+}
+
 
 class EligibilityViewTests(TestCase):
     INELIGIBLE = {
