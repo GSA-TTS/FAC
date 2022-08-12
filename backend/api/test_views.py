@@ -8,6 +8,7 @@ from model_bakery import baker
 from rest_framework.test import APIClient
 
 from api.test_uei import valid_uei_results
+from api.views import SingleAuditChecklistView
 from audit.models import Access, SingleAuditChecklist
 
 User = get_user_model()
@@ -87,6 +88,11 @@ SAMPLE_BASE_SAC_DATA = {
     "auditor_phone": "0008675309",
     "auditor_email": "qualified.human.accountant@dollarauditstore.com",
 }
+
+
+def omit(remove, d) -> dict:
+    """omit(["a"], {"a":1, "b": 2}) => {"b": 2}"""
+    return {k: d[k] for k in d if k not in remove}
 
 
 class EligibilityViewTests(TestCase):
@@ -522,11 +528,11 @@ class SingleAuditChecklistViewTests(TestCase):
         """
         If a request is not authenticated, it should be rejected with a 401
         """
-        
+
         # use a different client that doesn't authenticate
         client = APIClient()
 
-        response = client.put(self.path("test-report-id"), data = {}, format="json")
+        response = client.put(self.path("test-report-id"), data={}, format="json")
 
         self.assertEqual(response.status_code, 401)
 
@@ -548,7 +554,7 @@ class SingleAuditChecklistViewTests(TestCase):
 
         self.assertEqual(response.status_code, 404)
 
-    def test_put_edit_appropriate_field(self):
+    def test_put_edit_appropriate_fields(self):
         """
         If we submit data for the appropriate fields, we succeed and also
         update those fields.
@@ -578,31 +584,48 @@ class SingleAuditChecklistViewTests(TestCase):
 
         for before, after in test_cases:
             with self.subTest():
-                sac = baker.make(SingleAuditChecklist, **before)
-                #sac = baker.make(SingleAuditChecklist)
-                print(str(sac))
+                to_remove = ["report_id", "submitted_by"]
+                prior = omit(to_remove, SAMPLE_BASE_SAC_DATA | before)
+
+                sac = baker.make(SingleAuditChecklist, submitted_by=self.user, **prior)
                 access = baker.make(Access, user=self.user, sac=sac)
 
-                data = after
-
-                response = self.client.put(
-                    self.path(access.sac.report_id), data, format="json"
-                )
-
+                path = self.path(access.sac.report_id)
+                response = self.client.put(path, after, format="json")
                 self.assertEqual(response.status_code, 200)
 
                 updated_sac = SingleAuditChecklist.objects.get(pk=sac.id)
 
-                for key in after:
-                    self.assertEqual(getattr(updated_sac, key), data[key])
-                    self.assertEqual(response.json()[key], data[key])
+                for key, value in after.items():
+                    self.assertEqual(getattr(updated_sac, key), value)
+                    self.assertEqual(response.json()[key], value)
 
-    def test_edit_inappropriate_field(self):
+        # Not testing auditee_uei here because baker doesn't know how to follow
+        # the rules for it and because we're not supposed to change it via this
+        # view anyway.
+        to_generate = [k for k in SAMPLE_BASE_SAC_DATA if k not in ["auditee_uei"]]
+        base = baker.make(
+            SingleAuditChecklist, submitted_by=self.user, _fill_optional=to_generate
+        )
+        access = baker.make(Access, user=self.user, sac=base)
+
+        data = omit(SingleAuditChecklistView.invalid_keys, SAMPLE_BASE_SAC_DATA)
+        path = self.path(access.sac.report_id)
+        response = self.client.put(path, data, format="json")
+        self.assertEqual(response.status_code, 200)
+
+        updated_sac = SingleAuditChecklist.objects.get(pk=base.id)
+
+        for key, value in data.items():
+            self.assertEqual(getattr(updated_sac, key), value)
+            self.assertEqual(response.json()[key], value)
+
+    def test_edit_inappropriate_fields(self):
         """
         If we submit data for fields that can't be edited, we reject the PUT
         and return errors.
         """
-        pass
+
         test_cases = [
             (
                 {"report_id": "5558675308"},
@@ -617,14 +640,21 @@ class SingleAuditChecklistViewTests(TestCase):
                 },
             ),
         ]
+        for invalid_key in SingleAuditChecklistView.invalid_keys:
+            test_case = (
+                {invalid_key: "whatever"},
+                {
+                    "errors": f"The following fields cannot be modified via this endpoint: {invalid_key}."
+                },
+            )
+            test_cases.append(test_case)
 
         for data, expected in test_cases:
             with self.subTest():
                 sac = baker.make(SingleAuditChecklist)
                 access = baker.make(Access, user=self.user, sac=sac)
-                response = self.client.put(
-                    self.path(access.sac.report_id), data, format="json"
-                )
+                path = self.path(access.sac.report_id)
+                response = self.client.put(path, data, format="json")
 
                 self.assertEqual(response.status_code, 400)
                 self.assertEqual(response.json(), expected)

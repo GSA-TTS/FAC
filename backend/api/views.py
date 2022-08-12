@@ -191,69 +191,61 @@ class SingleAuditChecklistView(APIView):
     """
 
     permission_classes = [SingleAuditChecklistPermission]
+    invalid_keys = [
+        "submitted_by",
+        "date_created",
+        "submission_status",
+        "report_id",
+        "auditee_fiscal_period_start",
+        "auditee_fiscal_period_end",
+        "auditee_uei",
+        "auditee_name",
+        "auditee_address_line_1",
+        "auditee_city",
+        "auditee_state",
+        "auditee_zip",
+    ]
 
     def get(self, request, report_id):
-        """ """
+        """
+        Get the SAC by report_id and return it in JSON format.
+        Return 404 if it doesn't exist.
+        """
         try:
             sac = SingleAuditChecklist.objects.get(report_id=report_id)
-        except SingleAuditChecklist.DoesNotExist:
-            raise Http404()
+        except SingleAuditChecklist.DoesNotExist as e:
+            raise Http404() from e
         self.check_object_permissions(request, sac)
         serialized = SingleAuditChecklistSerializer(sac)
         return JsonResponse(serialized.data)
 
     def put(self, request, report_id):
+        """
+        Retrieve the SAC by report_id.
+        Return 404 if it doesn't exist.
+        If it does, examine the submission for fields that cannot be updated
+        via this endpoint and return errors (and status 400) if they are
+        present.
+        Otherwise, update the database entry with the submitted values and
+        return the updated SAC in JSON format.
+        """
         try:
             sac = SingleAuditChecklist.objects.get(report_id=report_id)
-        except SingleAuditChecklist.DoesNotExist:
-            raise Http404()
+        except SingleAuditChecklist.DoesNotExist as e:
+            raise Http404() from e
         self.check_object_permissions(request, sac)
-        invalid_fields = [
-            "submitted_by",
-            "date_created",
-            "submission_status",
-            "report_id",
-            "auditee_fiscal_period_start",
-            "auditee_fiscal_period_end",
-            "auditee_uei",
-            "auditee_name",
-            "auditee_address_line_1",
-            "auditee_city",
-            "auditee_state",
-            "auditee_zip",
-        ]
 
-        submitted = request.data
-        submitted_invalid_fields = [
-            field for field in invalid_fields if field in submitted
-        ]
-        if submitted_invalid_fields:
-            errors_str = ", ".join(sorted(submitted_invalid_fields))
-            error_msg = "".join(
-                [
-                    "The following fields cannot be modified ",
-                    "via this endpoint: ",
-                    errors_str,
-                    ".",
-                ]
-            )
+        submitted_invalid_keys = [k for k in self.invalid_keys if k in request.data]
+        if submitted_invalid_keys:
+            base_msg = "The following fields cannot be modified via this endpoint: "
+            errors_str = ", ".join(sorted(submitted_invalid_keys))
+            error_msg = f"{base_msg}{errors_str}."
             return JsonResponse({"errors": error_msg}, status=400)
 
-        # Note that using the | operator below would result in errors.
-        updated = {**SingleAuditChecklistSerializer(sac).data, **submitted}
-
-        keep = {k: v for k, v in updated.items() if k not in invalid_fields}
-        """
-        SingleAuditChecklist.objects.filter(report_id=report_id).update(
-            **{"auditee_email": 123}
-        )
-        """
-        for attr, value in keep.items():
+        for attr, value in request.data.items():
             setattr(sac, attr, value)
-        # sac.clean_fields()
-        # sac.validate_unique()
+        sac.full_clean()
         sac.save()
-        # sac = SingleAuditChecklist.objects.get(report_id=report_id)
         return JsonResponse(SingleAuditChecklistSerializer(sac).data)
 
 
