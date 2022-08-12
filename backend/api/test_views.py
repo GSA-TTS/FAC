@@ -479,7 +479,7 @@ class SingleAuditChecklistViewTests(TestCase):
         """Convenience method to get the path for a report_id)"""
         return reverse("singleauditchecklist", kwargs={"report_id": report_id})
 
-    def test_authentication_required(self):
+    def test_get_authentication_required(self):
         """
         If a request is not authenticated, it should be rejected with a 401
         """
@@ -491,7 +491,7 @@ class SingleAuditChecklistViewTests(TestCase):
 
         self.assertEqual(response.status_code, 401)
 
-    def test_no_audit_access(self):
+    def test_get_no_audit_access(self):
         """
         If a user doesn't have an Access object for the SAC, they should get a
         403.
@@ -501,12 +501,7 @@ class SingleAuditChecklistViewTests(TestCase):
         response = self.client.get(self.path(sac.report_id))
         self.assertEqual(response.status_code, 403)
 
-        # create a SAC
-
-        # hit endpoint with auth'd client
-        # expect 403
-
-    def test_audit_access(self):
+    def test_get_audit_access(self):
         """
         If a user has an Access object for the SAC, they should get a 200.
         """
@@ -515,20 +510,45 @@ class SingleAuditChecklistViewTests(TestCase):
 
         self.assertEqual(response.status_code, 200)
 
-        # create an Access with our user
-
-        # hit with auth'd client
-        # expect 200
-
-    def test_bad_report_id(self):
+    def test_get_bad_report_id(self):
         """
-        If the user is logged in and the report ID doesn't match a SAC, return a 404.
+        If the user is logged in and the report ID doesn't match a SAC, they should get a 404.
         """
         response = self.client.get(self.path("nonsensical_id"))
 
         self.assertEqual(response.status_code, 404)
 
-    def test_edit_appropriate_field(self):
+    def test_put_authentication_required(self):
+        """
+        If a request is not authenticated, it should be rejected with a 401
+        """
+        
+        # use a different client that doesn't authenticate
+        client = APIClient()
+
+        response = client.put(self.path("test-report-id"), data = {}, format="json")
+
+        self.assertEqual(response.status_code, 401)
+
+    def test_put_no_audit_access(self):
+        """
+        If a user doesn't have an Access object for the SAC, they should get a 403
+        """
+        sac = baker.make(SingleAuditChecklist)
+
+        response = self.client.put(self.path(sac.report_id), data={}, format="json")
+
+        self.assertEqual(response.status_code, 403)
+
+    def test_put_bad_report_id(self):
+        """
+        If the user is logged in and the report ID doesn't match a SAC, they should get a 404
+        """
+        response = self.client.put(self.path("nonsensical_id"))
+
+        self.assertEqual(response.status_code, 404)
+
+    def test_put_edit_appropriate_field(self):
         """
         If we submit data for the appropriate fields, we succeed and also
         update those fields.
@@ -558,8 +578,8 @@ class SingleAuditChecklistViewTests(TestCase):
 
         for before, after in test_cases:
             with self.subTest():
-                # sac = baker.make(SingleAuditChecklist, **before)
-                sac = baker.make(SingleAuditChecklist)
+                sac = baker.make(SingleAuditChecklist, **before)
+                #sac = baker.make(SingleAuditChecklist)
                 print(str(sac))
                 access = baker.make(Access, user=self.user, sac=sac)
 
@@ -568,6 +588,8 @@ class SingleAuditChecklistViewTests(TestCase):
                 response = self.client.put(
                     self.path(access.sac.report_id), data, format="json"
                 )
+
+                self.assertEqual(response.status_code, 200)
 
                 updated_sac = SingleAuditChecklist.objects.get(pk=sac.id)
 
@@ -604,6 +626,7 @@ class SingleAuditChecklistViewTests(TestCase):
                     self.path(access.sac.report_id), data, format="json"
                 )
 
+                self.assertEqual(response.status_code, 400)
                 self.assertEqual(response.json(), expected)
 
 
