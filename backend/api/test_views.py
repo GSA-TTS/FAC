@@ -453,11 +453,6 @@ class SingleAuditChecklistViewTests(TestCase):
         response = self.client.get(self.path(sac.report_id))
         self.assertEqual(response.status_code, 403)
 
-        # create a SAC
-
-        # hit endpoint with auth'd client
-        # expect 403
-
     def test_audit_access(self):
         """
         If a user has an Access object for the SAC, they should get a 200.
@@ -466,11 +461,6 @@ class SingleAuditChecklistViewTests(TestCase):
         response = self.client.get(self.path(access.sac.report_id))
 
         self.assertEqual(response.status_code, 200)
-
-        # create an Access with our user
-
-        # hit with auth'd client
-        # expect 200
 
     def test_bad_report_id(self):
         """
