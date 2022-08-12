@@ -464,7 +464,7 @@ class SingleAuditChecklistViewTests(TestCase):
 
     def test_get_bad_report_id(self):
         """
-        If the user is logged in and the report ID doesn't match a SAC, return a 404.
+        If the user is logged in and the report ID doesn't match a SAC, they should get a 404.
         """
         response = self.client.get(self.path("nonsensical_id"))
 
@@ -491,6 +491,14 @@ class SingleAuditChecklistViewTests(TestCase):
         response = self.client.put(self.path(sac.report_id), data={}, format="json")
 
         self.assertEqual(response.status_code, 403)
+
+    def test_put_bad_report_id(self):
+        """
+        If the user is logged in and the report ID doesn't match a SAC, they should get a 404
+        """
+        response = self.client.put(self.path("nonsensical_id"))
+
+        self.assertEqual(response.status_code, 404)
 
     def test_put_edit_appropriate_field(self):
         """
