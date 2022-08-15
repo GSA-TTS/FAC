@@ -90,11 +90,13 @@ class SingleAuditChecklist(models.Model):
     auditee_fiscal_period_end = models.DateField()
 
     # Q2 Type of Uniform Guidance Audit
-    audit_type = models.CharField(max_length=20, choices=AUDIT_TYPE, null=True)
+    audit_type = models.CharField(
+        max_length=20, choices=AUDIT_TYPE, blank=True, null=True
+    )
 
     # Q3 Audit Period Covered
     audit_period_covered = models.CharField(
-        max_length=20, choices=AUDIT_PERIOD, null=True
+        max_length=20, choices=AUDIT_PERIOD, blank=True, null=True
     )
 
     # Q4 Auditee Identification Numbers
@@ -102,13 +104,14 @@ class SingleAuditChecklist(models.Model):
         max_length=12,
         verbose_name=_("EIN"),
         help_text=_("Auditee Employer Identification Number"),
+        blank=True,
         null=True,
     )
     ein_not_an_ssn_attestation = models.BooleanField(
-        verbose_name=_("Attestation: EIN Not an SSN"), null=True
+        verbose_name=_("Attestation: EIN Not an SSN"), blank=True, null=True
     )
     multiple_eins_covered = models.BooleanField(
-        verbose_name=_("Multiple EINs covered"), null=True
+        verbose_name=_("Multiple EINs covered"), blank=True, null=True
     )
     auditee_uei = models.CharField(
         max_length=12,
@@ -125,19 +128,19 @@ class SingleAuditChecklist(models.Model):
         null=True,
     )
     multiple_ueis_covered = models.BooleanField(
-        verbose_name=_("Multiple UEIs covered"), null=True
+        verbose_name=_("Multiple UEIs covered"), blank=True, null=True
     )
 
     # Q5 Auditee Information
     auditee_name = models.CharField(max_length=100, blank=True, null=True)
-    auditee_address_line_1 = models.CharField(max_length=100, null=True)
-    auditee_city = models.CharField(max_length=100, null=True)
-    auditee_state = models.CharField(max_length=2, null=True)
-    auditee_zip = models.CharField(max_length=100, null=True)
-    auditee_contact_name = models.CharField(max_length=100, null=True)
-    auditee_contact_title = models.CharField(max_length=100, null=True)
-    auditee_phone = models.CharField(max_length=100, null=True)
-    auditee_email = models.EmailField(max_length=100, null=True)
+    auditee_address_line_1 = models.CharField(max_length=100, blank=True, null=True)
+    auditee_city = models.CharField(max_length=100, blank=True, null=True)
+    auditee_state = models.CharField(max_length=2, blank=True, null=True)
+    auditee_zip = models.CharField(max_length=100, blank=True, null=True)
+    auditee_contact_name = models.CharField(max_length=100, blank=True, null=True)
+    auditee_contact_title = models.CharField(max_length=100, blank=True, null=True)
+    auditee_phone = models.CharField(max_length=100, blank=True, null=True)
+    auditee_email = models.EmailField(max_length=100, blank=True, null=True)
 
     # Q6 Primary Auditor Information
     user_provided_organization_type = models.CharField(
@@ -146,24 +149,26 @@ class SingleAuditChecklist(models.Model):
     met_spending_threshold = models.BooleanField()
     is_usa_based = models.BooleanField(verbose_name=_("Is USA Based"))
 
-    auditor_firm_name = models.CharField(max_length=100, null=True)
+    auditor_firm_name = models.CharField(max_length=100, blank=True, null=True)
     auditor_ein = models.CharField(
-        max_length=12, verbose_name=_("Auditor EIN"), null=True
+        max_length=12, verbose_name=_("Auditor EIN"), blank=True, null=True
     )
     auditor_ein_not_an_ssn_attestation = models.BooleanField(
-        verbose_name=_("Attestation: Auditor EIN Not an SSN"), null=True
+        verbose_name=_("Attestation: Auditor EIN Not an SSN"), blank=True, null=True
     )
-    auditor_country = models.CharField(max_length=100, null=True)
-    auditor_address_line_1 = models.CharField(max_length=100, null=True)
-    auditor_city = models.CharField(max_length=100, null=True)
-    auditor_state = models.CharField(max_length=100, null=True)
-    auditor_zip = models.CharField(max_length=100, null=True)
-    auditor_contact_name = models.CharField(max_length=100, null=True)
-    auditor_contact_title = models.CharField(max_length=100, null=True)
-    auditor_phone = models.CharField(max_length=100, null=True)
-    auditor_email = models.EmailField(max_length=100, null=True)
+    auditor_country = models.CharField(max_length=100, blank=True, null=True)
+    auditor_address_line_1 = models.CharField(max_length=100, blank=True, null=True)
+    auditor_city = models.CharField(max_length=100, blank=True, null=True)
+    auditor_state = models.CharField(max_length=100, blank=True, null=True)
+    auditor_zip = models.CharField(max_length=100, blank=True, null=True)
+    auditor_contact_name = models.CharField(max_length=100, blank=True, null=True)
+    auditor_contact_title = models.CharField(max_length=100, blank=True, null=True)
+    auditor_phone = models.CharField(max_length=100, blank=True, null=True)
+    auditor_email = models.EmailField(max_length=100, blank=True, null=True)
 
     class Meta:
+        """We need to set the name for the admin view."""
+
         verbose_name = "SF-SAC"
         verbose_name_plural = "SF-SACs"
 

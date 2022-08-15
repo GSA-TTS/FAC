@@ -8,6 +8,7 @@ from model_bakery import baker
 from rest_framework.test import APIClient
 
 from api.test_uei import valid_uei_results
+from api.views import SingleAuditChecklistView
 from audit.models import Access, SingleAuditChecklist
 
 User = get_user_model()
@@ -39,6 +40,59 @@ VALID_ACCESS_AND_SUBMISSION_DATA = {
     "auditee_contacts": ["c@c.com"],
     "auditor_contacts": ["d@d.com"],
 }
+
+SAMPLE_BASE_SAC_DATA = {
+    # 0. Meta data
+    "submitted_by": None,
+    "date_created": "2022-08-11",
+    "submission_status": "in_progress",
+    "report_id": "2022ABC1000023",
+    # Part 1: General Information
+    # Q1 Fiscal Dates
+    "auditee_fiscal_period_start": "2021-10-01",
+    "auditee_fiscal_period_end": "2022-10-01",
+    # Q2 Type of Uniform Guidance Audit
+    "audit_type": "single-audit",
+    # Q3 Audit Period Covered
+    "audit_period_covered": "annual",
+    # Q4 Auditee Identification Numbers
+    "ein": None,
+    "ein_not_an_ssn_attestation": None,
+    "multiple_eins_covered": None,
+    "auditee_uei": "ZQGGHJH74DW7",
+    "multiple_ueis_covered": None,
+    # Q5 Auditee Information
+    "auditee_name": "Auditee McAudited",
+    "auditee_address_line_1": "200 feet into left field",
+    "auditee_city": "New York",
+    "auditee_state": "NY",
+    "auditee_zip": "10451",
+    "auditee_contact_name": "Designate Representative",
+    "auditee_contact_title": "Lord of Doors",
+    "auditee_phone": "5558675309",
+    "auditee_email": "auditee.mcaudited@leftfield.com",
+    # Q6 Primary Auditor Information
+    "user_provided_organization_type": "local",
+    "met_spending_threshold": True,
+    "is_usa_based": True,
+    "auditor_firm_name": "Dollar Audit Store",
+    "auditor_ein": None,
+    "auditor_ein_not_an_ssn_attestation": None,
+    "auditor_country": "USA",
+    "auditor_address_line_1": "100 Percent Respectable St.",
+    "auditor_city": "Podunk",
+    "auditor_state": "NY",
+    "auditor_zip": "14886",
+    "auditor_contact_name": "Qualified Human Accountant",
+    "auditor_contact_title": "Just an ordinary person",
+    "auditor_phone": "0008675309",
+    "auditor_email": "qualified.human.accountant@dollarauditstore.com",
+}
+
+
+def omit(remove, d) -> dict:
+    """omit(["a"], {"a":1, "b": 2}) => {"b": 2}"""
+    return {k: d[k] for k in d if k not in remove}
 
 
 class EligibilityViewTests(TestCase):
@@ -418,15 +472,20 @@ class SACCreationTests(TestCase):
 
 
 class SingleAuditChecklistViewTests(TestCase):
+    """
+    Tests for /sac/edit/[report_id]
+    """
+
     def setUp(self):
         self.user = baker.make(User)
         self.client = APIClient()
         self.client.force_authenticate(user=self.user)
 
     def path(self, report_id):
+        """Convenience method to get the path for a report_id)"""
         return reverse("singleauditchecklist", kwargs={"report_id": report_id})
 
-    def test_authentication_required(self):
+    def test_get_authentication_required(self):
         """
         If a request is not authenticated, it should be rejected with a 401
         """
@@ -438,35 +497,165 @@ class SingleAuditChecklistViewTests(TestCase):
 
         self.assertEqual(response.status_code, 401)
 
-    def test_no_audit_access(self):
+    def test_get_no_audit_access(self):
+        """
+        If a user doesn't have an Access object for the SAC, they should get a
+        403.
+        """
         sac = baker.make(SingleAuditChecklist)
 
         response = self.client.get(self.path(sac.report_id))
         self.assertEqual(response.status_code, 403)
 
-        # create a SAC
-
-        # hit endpoint with auth'd client
-        # expect 403
-
-    def test_audit_access(self):
+    def test_get_audit_access(self):
+        """
+        If a user has an Access object for the SAC, they should get a 200.
+        """
         access = baker.make(Access, user=self.user)
         response = self.client.get(self.path(access.sac.report_id))
 
         self.assertEqual(response.status_code, 200)
 
-        # create an Access with our user
-
-        # hit with auth'd client
-        # expect 200
-
-    def test_bad_report_id(self):
+    def test_get_bad_report_id(self):
+        """
+        If the user is logged in and the report ID doesn't match a SAC, they should get a 404.
+        """
         response = self.client.get(self.path("nonsensical_id"))
 
         self.assertEqual(response.status_code, 404)
 
-        # hit with auth'd client, random report_id
-        # expect 404
+    def test_put_authentication_required(self):
+        """
+        If a request is not authenticated, it should be rejected with a 401
+        """
+
+        # use a different client that doesn't authenticate
+        client = APIClient()
+
+        response = client.put(self.path("test-report-id"), data={}, format="json")
+
+        self.assertEqual(response.status_code, 401)
+
+    def test_put_no_audit_access(self):
+        """
+        If a user doesn't have an Access object for the SAC, they should get a 403
+        """
+        sac = baker.make(SingleAuditChecklist)
+
+        response = self.client.put(self.path(sac.report_id), data={}, format="json")
+
+        self.assertEqual(response.status_code, 403)
+
+    def test_put_bad_report_id(self):
+        """
+        If the user is logged in and the report ID doesn't match a SAC, they should get a 404
+        """
+        response = self.client.put(self.path("nonsensical_id"))
+
+        self.assertEqual(response.status_code, 404)
+
+    def test_put_edit_appropriate_fields(self):
+        """
+        If we submit data for the appropriate fields, we succeed and also
+        update those fields.
+
+        If a field is absent we don't do anything to it.
+        """
+        test_cases = [
+            ({"auditee_phone": "5558675308"}, {"auditee_phone": "5558675309"}),
+            (
+                {"auditee_email": "before@param.com"},
+                {"auditee_email": "after@param.com"},
+            ),
+            (
+                {"auditee_email": "before@param.com"},
+                {"auditee_email": "after@param.com"},
+            ),
+            (
+                {
+                    "auditee_phone": "5558675308",
+                    "auditee_email": "before@param.com",
+                },
+                {"auditee_email": "after@param.com", "auditee_phone": "5558675309"},
+            ),
+        ]
+
+        for before, after in test_cases:
+            with self.subTest():
+                to_remove = ["report_id", "submitted_by"]
+                prior = omit(to_remove, SAMPLE_BASE_SAC_DATA | before)
+
+                sac = baker.make(SingleAuditChecklist, submitted_by=self.user, **prior)
+                access = baker.make(Access, user=self.user, sac=sac)
+
+                path = self.path(access.sac.report_id)
+                response = self.client.put(path, after, format="json")
+                self.assertEqual(response.status_code, 200)
+
+                updated_sac = SingleAuditChecklist.objects.get(pk=sac.id)
+
+                for key, value in after.items():
+                    self.assertEqual(getattr(updated_sac, key), value)
+                    self.assertEqual(response.json()[key], value)
+
+        # Not testing auditee_uei here because baker doesn't know how to follow
+        # the rules for it and because we're not supposed to change it via this
+        # view anyway.
+        to_generate = [k for k in SAMPLE_BASE_SAC_DATA if k not in ["auditee_uei"]]
+        base = baker.make(
+            SingleAuditChecklist, submitted_by=self.user, _fill_optional=to_generate
+        )
+        access = baker.make(Access, user=self.user, sac=base)
+
+        data = omit(SingleAuditChecklistView.invalid_keys, SAMPLE_BASE_SAC_DATA)
+        path = self.path(access.sac.report_id)
+        response = self.client.put(path, data, format="json")
+        self.assertEqual(response.status_code, 200)
+
+        updated_sac = SingleAuditChecklist.objects.get(pk=base.id)
+
+        for key, value in data.items():
+            self.assertEqual(getattr(updated_sac, key), value)
+            self.assertEqual(response.json()[key], value)
+
+    def test_edit_inappropriate_fields(self):
+        """
+        If we submit data for fields that can't be edited, we reject the PUT
+        and return errors.
+        """
+
+        test_cases = [
+            (
+                {"report_id": "5558675308"},
+                {
+                    "errors": "The following fields cannot be modified via this endpoint: report_id."
+                },
+            ),
+            (
+                {"report_id": "5558675308", "auditee_uei": "5558675308"},
+                {
+                    "errors": "The following fields cannot be modified via this endpoint: auditee_uei, report_id."
+                },
+            ),
+        ]
+        for invalid_key in SingleAuditChecklistView.invalid_keys:
+            test_case = (
+                {invalid_key: "whatever"},
+                {
+                    "errors": f"The following fields cannot be modified via this endpoint: {invalid_key}."
+                },
+            )
+            test_cases.append(test_case)
+
+        for data, expected in test_cases:
+            with self.subTest():
+                sac = baker.make(SingleAuditChecklist)
+                access = baker.make(Access, user=self.user, sac=sac)
+                path = self.path(access.sac.report_id)
+                response = self.client.put(path, data, format="json")
+
+                self.assertEqual(response.status_code, 400)
+                self.assertEqual(response.json(), expected)
 
 
 class SubmissionsViewTests(TestCase):
