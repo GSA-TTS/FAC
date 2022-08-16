@@ -554,6 +554,102 @@ class SingleAuditChecklistViewTests(TestCase):
 
         self.assertEqual(response.status_code, 404)
 
+    def test_put_bad_data(self):
+        """
+        If we have edit access and we're submitting to the allowed fields but
+        we're submitting bad data, we should get errors.
+        """
+
+        def check_response(bad_data, expected):
+            sac = baker.make(SingleAuditChecklist)
+            access = baker.make(Access, user=self.user, sac=sac)
+            path = self.path(access.sac.report_id)
+            response = self.client.put(path, bad_data, format="json")
+            self.assertEqual(response.status_code, 400)
+            self.assertEqual(response.json(), expected)
+
+        email_keys = ["auditee_email", "auditor_email"]
+
+        boolean_keys = ["met_spending_threshold", "is_usa_based"]
+
+        choice_keys = [
+            "audit_type",
+            "audit_period_covered",
+            "user_provided_organization_type",
+        ]
+
+        ternary_keys = [
+            "ein_not_an_ssn_attestation",
+            "multiple_eins_covered",
+            "multiple_ueis_covered",
+            "auditor_ein_not_an_ssn_attestation",
+        ]
+
+        length_100_keys = [
+            "auditee_contact_name",
+            "auditee_contact_title",
+            "auditee_phone",
+            "auditor_country",
+            "auditor_address_line_1",
+            "auditor_city",
+            "auditor_state",
+            "auditor_zip",
+            "auditor_contact_name",
+            "auditor_contact_title",
+            "auditor_phone",
+        ]
+
+        test_cases = [
+            (
+                {
+                    "auditee_email": "invalid_email",
+                    "auditor_email": "invalid_email",
+                },
+                {
+                    "errors": {
+                        "auditee_email": ["Enter a valid email address."],
+                        "auditor_email": ["Enter a valid email address."],
+                    }
+                },
+            ),
+        ]
+
+        for key in email_keys:
+            expected = {"errors": {key: ["Enter a valid email address."]}}
+            with self.subTest():
+                check_response({key: "invalid_email"}, expected)
+
+        for key in boolean_keys:
+            message = "“invalid_boolean” value must be either True or False."
+            expected = {"errors": {key: [message]}}
+            with self.subTest():
+                check_response({key: "invalid_boolean"}, expected)
+
+        for key in choice_keys:
+            message = "Value 'invalid_choice' is not a valid choice."
+            expected = {"errors": {key: [message]}}
+            with self.subTest():
+                check_response({key: "invalid_choice"}, expected)
+
+        for key in ternary_keys:
+            message = "“invalid_boolean” value must be either True, False, or None."
+            expected = {"errors": {key: [message]}}
+            with self.subTest():
+                check_response({key: "invalid_boolean"}, expected)
+
+        for key in length_100_keys:
+            one = "a value over one hundred characters long is annoying to enter "
+            two = "succinctly when your Python line length limit is eighty-eight"
+            value = f"{one}{two}"
+            message = "Ensure this value has at most 100 characters (it has 123)."
+            expected = {"errors": {key: [message]}}
+            with self.subTest():
+                check_response({key: value}, expected)
+
+        for bad_data, expected in test_cases:
+            with self.subTest():
+                check_response(bad_data, expected)
+
     def test_put_edit_appropriate_fields(self):
         """
         If we submit data for the appropriate fields, we succeed and also
