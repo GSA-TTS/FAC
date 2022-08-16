@@ -8,6 +8,7 @@ from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.http import JsonResponse
+from django.core.exceptions import ValidationError
 
 from .serializers import (
     AccessAndSubmissionSerializer,
@@ -244,8 +245,11 @@ class SingleAuditChecklistView(APIView):
 
         for attr, value in request.data.items():
             setattr(sac, attr, value)
-        sac.full_clean()
-        sac.save()
+        try:
+            sac.full_clean()
+            sac.save()
+        except ValidationError as err:
+            return JsonResponse({"errors": err.message_dict}, status=400)
         return JsonResponse(SingleAuditChecklistSerializer(sac).data)
 
 
