@@ -48,7 +48,7 @@ Additional value here is preventing entities that don't meet the criteria from s
 **Value delivered:**
 To de-risk our product plans, we will focus on an end-to-end solution that bridges data input to dissemination to the current FAC. This will include a fully fleshed out SF-SAC general information page. We will also build out the API to de-risk unknows in end-to-end implementation and unblock our partners at Census by providing specifics of API format. 
 
-**Specific deliverables:**
+**Specific deliverables (full list [here](https://github.com/GSA-TTS/FAC/milestone/11)):**
 * (20% ✅) [General information - SF-SAC data entry](https://github.com/GSA-TTS/FAC/issues/185)
 * [API for accessing general SF-SAC Data](https://github.com/GSA-TTS/FAC/issues/355)
 * [Audit permissions](https://github.com/GSA-TTS/FAC/issues/332) and [my audit submissions](https://github.com/GSA-TTS/FAC/issues/343) page
