@@ -80,7 +80,7 @@ All teams members to provide update in github issues in progress on Monday/early
 
 ### Code Review (In Progress->Ready For Review->Done)
 
-Pull requests are reviewed on a per-ticket basis and tests are automatically run on the CI server. One reviewer required to merge any pull request and anyone can review, reflecting our preference for velocity. Signal to the team in slack if you've waited more than two hours for a review.
+Pull requests are reviewed on a per-ticket basis and tests are automatically run on the CI server. Approval from one reviewer is required to merge a pull request. Reviewer is welcome to merge but responsibility to merge is with the submitter. Signal to the team in slack if you've waited more than two hours for a review.
 
 ### Quality Assurance
 
