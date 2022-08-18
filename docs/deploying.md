@@ -45,6 +45,9 @@ cf create-service aws-rds small-psql fac_dev_db
 
 # Provision an S3 bucket
 cf create-service s3 basic-sandbox fac_dev_s3
+
+# Create a User-Provided Service Instance to store credentials
+cf create-user-provided-service fac-key-service -p '{"SAM_API_KEY":"{your Sam.Gov API key}"}'
 ```
 
 ## Deploying Manually
@@ -61,3 +64,14 @@ cf push -f manifests/manifest-dev.yml
 When a new commit is pushed to `main`, Github Actions automatically deploys the latest code to [fac-dev](https://fac-dev.app.cloud.gov/).
 
 The workflow to deploy the latest code can be found in [deploy.yml](.github/workflows/deploy.yml) and uses the [cloud.gov deploy action](https://github.com/18F/cg-deploy-action).
+
+## Running a Django admin command
+
+You can SSH into a running instance of the app. Running Django apps is a little more complicated on Cloud Foundry than running locally.
+
+```shell
+cf ssh {APP NAME}
+cd app
+export LD_LIBRARY_PATH=~/deps/0/python/lib
+~/deps/0/python/bin/python manage.py {COMMAND WITH ARGS}
+```
