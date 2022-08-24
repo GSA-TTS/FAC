@@ -55,25 +55,42 @@ To de-risk our product plans, we will focus on an end-to-end solution that bridg
 * [PDR/ADR - Excel file ingest](https://github.com/GSA-TTS/FAC/issues/328)
 * [PDR/ADR - File Upload storage](https://github.com/GSA-TTS/FAC/issues/328)
 
-## Milestone: Submit an entire audit package
+## Milestone 3: Submit an entire SF-SAC
 
 **Value delivered:**
-Now that auditees have filled out basic information about their audit submission, they need to be able to submit the audit itself. While the current FAC allows users to submit form data and excel files, it's most valuable (and quite possibly sufficient for MVP release) to just allow them to upload templatized excel files for their audit. It's important to validate excel files and PDF uploads to reduce the chance of submitting an incomplete audit, which consumes time of both government staff and auditee staff. This step also makes it possible for auditee and auditor certifying officials to certify that the audit can be made public.
+Now that auditees have filled out basic information about their audit submission, they need to be able to submit the audit itself. While the current FAC allows users to submit form data and excel files, it's most valuable (and quite possibly sufficient for MVP release) to just allow them to upload templatized excel files for their audit. It's important to validate excel files and PDF uploads to reduce the chance of submitting an incomplete audit, which consumes time of both government staff and auditee staff. 
 
 **Specific deliverables:**
-* Certify audit submission
-* PDF Validation
-* Excel file ingest
-* Submit an audit package (post SAC forms)
-* (50% ✅) (design/exploration) Status and user business logic
+* [Excel Generation/Uploading functionality](https://github.com/GSA-TTS/FAC/issues/443)
+* [Federal Awards screen](https://github.com/GSA-TTS/FAC/issues/187) (Excel upload)
+* [Notes to SEFA screen](https://github.com/GSA-TTS/FAC/issues/406) (placeholder)
+* [Audit Information screen](https://github.com/GSA-TTS/FAC/issues/214) (form)
+* [Award Findings screen](https://github.com/GSA-TTS/FAC/issues/215) (Excel upload)
+* Findings Text screen (Excel upload)
+* CAP Text screen (Excel upload)
+* Additional EINs (Excel upload + form)
+* Secondary Auditors (placeholder)
+* Finalize / Check for errors
+
+
+## Milestone: Upload and Certify audit package
+
+**Value delivered:**
+The last steps for the auditee/auditor flow is to upload and certify the audit package for submission. 
+
+**Specific deliverables:**
+* [Audit Start page](https://github.com/GSA-TTS/FAC/issues/212)
+* ["Single audit reporting package upload" page](https://github.com/GSA-TTS/FAC/issues/360)
+* [Single audit reporting package upload](https://github.com/GSA-TTS/FAC/issues/404)
+* [Auditee/Auditor audit certification](https://github.com/GSA-TTS/FAC/issues/319)
 * [PDR - Automated audit processing](https://github.com/GSA-TTS/FAC/issues/329)
   * Option 1: "Process" audits in the new FAC, send them to "dissemination pipeline" of Census FAC
   * Option 2: "Process" audits in the old FAC, send them to "processing pipeline" of Census FAC
+* (50% ✅) (design/exploration) Status and user business logic
 * [PRD - PDF Validation](https://github.com/GSA-TTS/FAC/issues/307)
   * Option 1: Validate uploaded PDFs for being text, searchable and unlocked (current, user-preferred solution)
   * Option 2: No validation / incomplete validation
     * Risk: Could lead to more audit churn if they are uploaded in an unusable state
-
 
 ## Milestone: Status and user business logic
 
@@ -177,7 +194,9 @@ Delivery options
 
 **Milestone sequence:**
 1. Pre-SAC
-1. Submit an audit package
+1. Submit general information end to end / De-risk
+1. Submit an entire SF-SAC
+1. Upload and Certify audit package
 1. Status and user business logic
 1. Backend + Support + Data Transfer
 1. **Initial release** (MVP)
@@ -199,7 +218,9 @@ Delivery options
 
 **Milestone sequence:**
 1. Pre-SAC
-1. Submit an audit package
+1. Submit general information end to end / De-risk
+1. Submit an entire SF-SAC
+1. Upload and Certify audit package
 1. Status and user business logic
 1. Backend + Support + ~~Data Transfer~~ (avoid the last one)
 1. Agency data dissemination
