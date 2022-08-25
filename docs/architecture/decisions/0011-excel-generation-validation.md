@@ -28,11 +28,14 @@ The Excel process under discussion would have at least three levels of validatio
 
 ## Decisions
 
-1. We believe sticking with one library to do everything (for the frontend and/or backend) will reduce the overhead needed to learn and work with Excel files. We also think JSON Schema is a good approach to storing requirements for the data needed from Excel files to pass between frontend and backend.
-2. We believe [ExcelJS](https://www.npmjs.com/package/exceljs) to be the best JS library to work with Excel files. It offers the ability to open and save CSV and XLSX files, work with cell-level validation, conditional formatting, cell formatting, and has easily readable and usable code. It is also open source and has most recent activity merged in from Nov 2021.
-3. After reviewing some of the generated templates used on the old FAC system, we believe the cell validations they use are rather simplistic, and are easily carried over into the newer FAC. Also taking a template and customizing it by adding user/organization information to it is a simple process with ExcelJS. Therefore, integrating this type of Excel validation should be a low hurdle to be implemented on the new system.
-4. We are unable to really estimate various approaches right now as much of _how_ the FAC will be filled out, will be stored, and will be processed on the backend hasn't been determined yet. However, we believe once those have started to be determined, it should be a reasonably small burden to add Excel validation and/or file generation to those workflows.
-5. We have not met as a team to estimate user needs yet.
+1. We believe sticking with one library to do everything (for the frontend and/or backend) will reduce the overhead needed to learn and work with Excel files. 
+2. We believe that having one "source of truth" for all validation rules for exporting or importing data via Excel files will be best for the project. 
+3. We believe that finding a frontend/JavaScript library to deal with Excel files will be the better way to approach the problem of generation and validation. The frontend can get the data needed from the backend API, generate the file, and send it to the user. Similarly, a file can be uploaded and read via JS, parse out the data it needs from the validation rules, then send just the data to the backend API. (A file could still be saved on the backend if desired, but don't make Python process the file.) This results in one place to deal with the Excel files.
+4. We believe [ExcelJS](https://www.npmjs.com/package/exceljs) to be the best JS library to work with Excel files. It offers the ability to import and export CSV and XLSX files, work with cell-level validation, conditional formatting, cell formatting, and has easily readable and usable code. It is also open source and has most recent activity merged in from Nov 2021.
+5. After reviewing some of the generated templates used on the old FAC system, we believe the cell validations they use are rather simplistic, and are easily carried over into the newer FAC. Also taking a template and customizing it by adding user/organization information to it is a simple process with ExcelJS. Therefore, integrating this type of Excel validation should be a low hurdle to be implemented on the new system.
+6. We think there needs to be one method to store validation rules so it can be used by the frontend and backend to know what to insert into or export from Excel files. We believe JSON Schema _could_ be a way to store the rules. The format can be read by JS and Python, but we have not tested it enough to ensure it would meet our needs.
+7. We are unable to really estimate various approaches right now as much of _how_ the FAC will be filled out, will be stored, and will be processed on the backend hasn't been determined yet. However, we believe once those have started to be determined, it should be a reasonably small burden to add Excel validation and/or file generation to those workflows.
+8. We have not met as a team to estimate user needs yet.
 
 
 ## Consequences
@@ -43,4 +46,7 @@ The Excel process under discussion would have at least three levels of validatio
 4. Depending on how this is implemented along with the rest of the FAC workflow, it may require some user research to determine the best way to do it.
 5. We could reuse Census' old template, or we could make our own. If we make our own, it may also involve user research and/or policy revisions to make sure it's adequate for the needs of all users involved (like auditors, auditees, processors, etc.)
 6. Given the flow of processing Excel files on the frontend and sending the important data to the backend, Excel files won't ever get saved. This means the concerns of the File Upload ADR won't apply here.
-7. 
+7. If a validation rule system (like JSON Schema) was used, it would have to be independent of Django's ORM models. This means updates to one would have to also be applied to the other. If this is not done, they would be out of sync and/or invalid data could be passed back and forth.
+8. A validation rule system might also mean needing two schemas, one for a finalized submission and one for an in-progress submission, as we allow parts of the form to be filled out at a time.
+9. Testing this would probably mean writing unit tests along with a JSON Schema (or other library) along with example JSON structures that validate both working and not working examples.
+10. Testing Excel would probably mean providing some example files that pass and don't pass validation, then using the library and unit tests  to ensure the files extract data and match expected results.
