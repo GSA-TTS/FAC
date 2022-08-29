@@ -38,7 +38,7 @@ class SACViewSet(viewsets.ModelViewSet):
     serializer_class = SingleAuditChecklistSerializer
 
     def get_view_name(self):
-        return "SAC"
+        return "SF-SAC"
 
 
 class EligibilityFormView(APIView):
