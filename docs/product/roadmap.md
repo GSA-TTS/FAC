@@ -55,14 +55,26 @@ To de-risk our product plans, we will focus on an end-to-end solution that bridg
 * [PDR/ADR - Excel file ingest](https://github.com/GSA-TTS/FAC/issues/328)
 * [PDR/ADR - File Upload storage](https://github.com/GSA-TTS/FAC/issues/328)
 
-## Milestone 3: Submit an entire SF-SAC
+## Milestone 3: Excel generation / upload
 
 **Value delivered:**
-Now that auditees have filled out basic information about their audit submission, they need to be able to submit the audit itself. While the current FAC allows users to submit form data and excel files, it's most valuable (and quite possibly sufficient for MVP release) to just allow them to upload templatized excel files for their audit. It's important to validate excel files and PDF uploads to reduce the chance of submitting an incomplete audit, which consumes time of both government staff and auditee staff. 
+While the current FAC allows users to submit form data and excel files, it's most valuable (and quite possibly sufficient for MVP release) to just allow them to upload templatized excel files for their audit. This milestone will focus on the first excel uploading screen, "federal awards", and will provide a foundational pattern for subsequent excel upload screens in the SF-SAC. 
 
 **Specific deliverables:**
-* [Excel Generation/Uploading functionality](https://github.com/GSA-TTS/FAC/issues/443)
-* [Federal Awards screen](https://github.com/GSA-TTS/FAC/issues/187) (Excel upload)
+* [Implement Federal Awards screen](https://github.com/GSA-TTS/FAC/issues/187)
+* [Excel Generation functionality](https://github.com/GSA-TTS/FAC/issues/443)
+* [Excel Uploading functionality](https://github.com/GSA-TTS/FAC/issues/449)
+* [Federal awards validation](https://github.com/GSA-TTS/FAC/issues/450)
+* [Federal Awards API Endpoints](https://github.com/GSA-TTS/FAC/issues/448)
+
+
+## Milestone 4: Submit an entire SF-SAC
+
+**Value delivered:**
+Now that auditees have filled out basic information about their audit submission, they need to be able to submit the audit itself. It's important to validate excel files and PDF uploads to reduce the chance of submitting an incomplete audit, which consumes time of both government staff and auditee staff. 
+
+**Specific deliverables:**
+* [SF-FAC section page heading](https://github.com/GSA-TTS/FAC/issues/445)
 * [Notes to SEFA screen](https://github.com/GSA-TTS/FAC/issues/406) (placeholder)
 * [Audit Information screen](https://github.com/GSA-TTS/FAC/issues/214) (form)
 * [Award Findings screen](https://github.com/GSA-TTS/FAC/issues/215) (Excel upload)
@@ -195,6 +207,7 @@ Delivery options
 **Milestone sequence:**
 1. Pre-SAC
 1. Submit general information end to end / De-risk
+1. Excel generation / upload
 1. Submit an entire SF-SAC
 1. Upload and Certify audit package
 1. Status and user business logic
