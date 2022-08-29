@@ -58,7 +58,7 @@ To de-risk our product plans, we will focus on an end-to-end solution that bridg
 ## Milestone 3: Excel generation / upload
 
 **Value delivered:**
-While the current FAC allows users to submit form data and excel files, it's most valuable (and quite possibly sufficient for MVP release) to just allow them to upload templatized excel files for their audit. This milestone will focus on the first excel uploading screen, "federal awards", and will provide a foundational pattern for subsequent excel upload screens in the SF-SAC. 
+While the current FAC allows users to submit form data and excel files, it's most valuable (and quite possibly sufficient for MVP release) to just allow them to upload templatized excel files for their audit. This milestone will focus on an end to end solution (including API) for the first excel uploading screen, "federal awards", and will provide a foundational pattern for subsequent excel upload screens in the SF-SAC. 
 
 **Specific deliverables:**
 * [Implement Federal Awards screen](https://github.com/GSA-TTS/FAC/issues/187)
@@ -68,10 +68,12 @@ While the current FAC allows users to submit form data and excel files, it's mos
 * [Federal Awards API Endpoints](https://github.com/GSA-TTS/FAC/issues/448)
 
 
-## Milestone 4: Submit an entire SF-SAC
+## Milestone: Submit an entire SF-SAC
 
 **Value delivered:**
 Now that auditees have filled out basic information about their audit submission, they need to be able to submit the audit itself. It's important to validate excel files and PDF uploads to reduce the chance of submitting an incomplete audit, which consumes time of both government staff and auditee staff. 
+
+NOTE: This might be multiple milestones depending on how Milestone 3 goes. 
 
 **Specific deliverables:**
 * [SF-FAC section page heading](https://github.com/GSA-TTS/FAC/issues/445)
@@ -99,7 +101,7 @@ The last steps for the auditee/auditor flow is to upload and certify the audit p
   * Option 1: "Process" audits in the new FAC, send them to "dissemination pipeline" of Census FAC
   * Option 2: "Process" audits in the old FAC, send them to "processing pipeline" of Census FAC
 * (50% ✅) (design/exploration) Status and user business logic
-* [PRD - PDF Validation](https://github.com/GSA-TTS/FAC/issues/307)
+* [PDR - PDF Validation](https://github.com/GSA-TTS/FAC/issues/307)
   * Option 1: Validate uploaded PDFs for being text, searchable and unlocked (current, user-preferred solution)
   * Option 2: No validation / incomplete validation
     * Risk: Could lead to more audit churn if they are uploaded in an unusable state
