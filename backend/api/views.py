@@ -1,10 +1,13 @@
 import json
+from typing import List
 
 from audit.models import Access, SingleAuditChecklist
 from audit.permissions import SingleAuditChecklistPermission
 from django.http import Http404
 from django.urls import reverse
 from rest_framework import viewsets
+from rest_framework.authentication import BaseAuthentication
+from rest_framework.permissions import BasePermission
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.http import JsonResponse
@@ -26,8 +29,8 @@ class SACViewSet(viewsets.ModelViewSet):
     """
 
     # this is a public endpoint - no authentication or permission required
-    authentication_classes = []
-    permission_classes = []
+    authentication_classes: List[BaseAuthentication] = []
+    permission_classes: List[BasePermission] = []
 
     allowed_methods = ["GET"]
 
