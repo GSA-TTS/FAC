@@ -8,7 +8,7 @@ from model_bakery import baker
 from rest_framework.test import APIClient
 
 from api.test_uei import valid_uei_results
-from api.views import SingleAuditChecklistView
+from api.views import SingleAuditChecklistView, SACViewSet
 from audit.models import Access, SingleAuditChecklist
 
 User = get_user_model()
@@ -18,6 +18,7 @@ AUDITEE_INFO_PATH = reverse("auditee-info")
 ACCESS_AND_SUBMISSION_PATH = reverse("accessandsubmission")
 SUBMISSIONS_PATH = reverse("submissions")
 ACCESS_LIST_PATH = reverse("access-list")
+SAC_LIST_PATH = reverse("sac-list")
 
 
 VALID_AUDITEE_INFO_DATA = {
@@ -931,3 +932,103 @@ class AccessListViewTests(TestCase):
         # only the one remaining access should come back
         self.assertEqual(len(data_2), 1)
         self.assertEqual(data_2[0]["report_id"], access_1.sac.report_id)
+
+
+class SACViewSetTests(TestCase):
+    def setUp(self):
+        self.client = APIClient()
+
+    def test_list_no_auth_required(self):
+        """
+        The SACViewSet should not require authentication or permissions
+        """
+        self.assertEqual(SACViewSet.authentication_classes, [])
+        self.assertEqual(SACViewSet.permission_classes, [])
+
+    def test_list_no_audits_returns_empty_list(self):
+        """
+        If there are no SACs in the database, the list endpoint should return no results
+        """
+        response = self.client.get(SAC_LIST_PATH)
+        data = response.json()
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(data, [])
+
+    def test_list_none_submitted_returns_empty_list(self):
+        """
+        If there are SACs in the database, but none which have a status of subnmitted, the list endpoint shoul return no results
+        """
+        for status in SingleAuditChecklist.STATUSES:
+            if status[0] != "submitted":
+                baker.make(
+                    SingleAuditChecklist, _quantity=100, submission_status=status[0]
+                )
+
+        response = self.client.get(SAC_LIST_PATH)
+        data = response.json()
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(data, [])
+
+    def test_list_returns_only_submitted(self):
+        """
+        If there are SACs in the database, only those with a submission_status of "submitted" should be returned
+        """
+        for status in SingleAuditChecklist.STATUSES:
+            baker.make(SingleAuditChecklist, _quantity=100, submission_status=status[0])
+
+        response = self.client.get(SAC_LIST_PATH)
+        data = response.json()
+
+        self.assertEqual(len(data), 100)
+        self.assertTrue(
+            all(audit["submission_status"] == "submitted" for audit in data)
+        )
+
+    def test_detail_no_match_returns_404(self):
+        """
+        If there is no SAC matching the provided report_id, the detail endpoint should return 404
+        """
+        url = reverse("sac-detail", kwargs={"report_id": "not-a-real-report-id"})
+
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 404)
+
+    def test_detail_match_submitted_returns_sac(self):
+        """
+        If there is a SAC matching the provided report_id, and the SAC has a submission_status of submitted, the detail endpoint should return the SAC
+        """
+        report_id = "test-report-id"
+        sac = baker.make(
+            SingleAuditChecklist, report_id=report_id, submission_status="submitted"
+        )
+
+        url = reverse("sac-detail", kwargs={"report_id": report_id})
+
+        response = self.client.get(url)
+        data = response.json()
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(data, sac)
+
+    def test_detail_match_unsubmitted_returns_404(self):
+        """
+        If there is a SAC matching the provided report_id, and the SAC has a submission_status other than submitted, the detail endpoint should return a 404
+        """
+        for status in SingleAuditChecklist.STATUSES:
+            with self.subTest():
+                if status[0] != "submitted":
+                    report_id = f"id-{status[0]}"
+                    baker.make(
+                        SingleAuditChecklist,
+                        report_id=report_id,
+                        submission_status=status[0],
+                    )
+
+                    url = reverse("sac-detail", kwargs={"report_id": report_id})
+
+                    response = self.client.get(url)
+
+                    self.assertEqual(response.status_code, 404)

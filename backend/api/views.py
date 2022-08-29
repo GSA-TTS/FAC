@@ -25,12 +25,20 @@ class SACViewSet(viewsets.ModelViewSet):
     API endpoint that allows SACs to be viewed.
     """
 
+    # this is a public endpoint - no authentication or permission required
+    authentication_classes = []
+    permission_classes = []
+
     allowed_methods = ["GET"]
-    queryset = SingleAuditChecklist.objects.all()
+
+    # lookup SACs with report_id rather than the default pk
+    lookup_field = "report_id"
+
+    queryset = SingleAuditChecklist.objects.filter(submission_status="submitted")
     serializer_class = SingleAuditChecklistSerializer
 
     def get_view_name(self):
-        return "SF-SAC"
+        return "SAC"
 
 
 class EligibilityFormView(APIView):
