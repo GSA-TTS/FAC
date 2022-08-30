@@ -1,10 +1,13 @@
 import json
+from typing import List
 
 from audit.models import Access, SingleAuditChecklist
 from audit.permissions import SingleAuditChecklistPermission
 from django.http import Http404
 from django.urls import reverse
 from rest_framework import viewsets
+from rest_framework.authentication import BaseAuthentication
+from rest_framework.permissions import BasePermission
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.http import JsonResponse
@@ -25,8 +28,16 @@ class SACViewSet(viewsets.ModelViewSet):
     API endpoint that allows SACs to be viewed.
     """
 
+    # this is a public endpoint - no authentication or permission required
+    authentication_classes: List[BaseAuthentication] = []
+    permission_classes: List[BasePermission] = []
+
     allowed_methods = ["GET"]
-    queryset = SingleAuditChecklist.objects.all()
+
+    # lookup SACs with report_id rather than the default pk
+    lookup_field = "report_id"
+
+    queryset = SingleAuditChecklist.objects.filter(submission_status="submitted")
     serializer_class = SingleAuditChecklistSerializer
 
     def get_view_name(self):
