@@ -55,7 +55,7 @@ To de-risk our product plans, we will focus on an end-to-end solution that bridg
 * [PDR/ADR - Excel file ingest](https://github.com/GSA-TTS/FAC/issues/328)
 * [PDR/ADR - File Upload storage](https://github.com/GSA-TTS/FAC/issues/328)
 
-## Milestone 3: Excel generation / upload
+## Milestone 3: Federal awards, Excel upload patterns
 
 **Value delivered:**
 While the current FAC allows users to submit form data and excel files, it's most valuable (and quite possibly sufficient for MVP release) to just allow them to upload templatized excel files for their audit. This milestone will focus on an end to end solution (including API) for the first excel uploading screen, "federal awards", and will provide a foundational pattern for subsequent excel upload screens in the SF-SAC. 
@@ -211,7 +211,7 @@ Delivery options
 **Milestone sequence:**
 1. Pre-SAC
 1. Submit general information end to end / De-risk
-1. Excel generation / upload
+1. Federal awards, Excel upload patterns
 1. Submit an entire SF-SAC
 1. Upload and Certify audit package
 1. Status and user business logic
@@ -236,6 +236,7 @@ Delivery options
 **Milestone sequence:**
 1. Pre-SAC
 1. Submit general information end to end / De-risk
+1. Federal awards, Excel upload patterns
 1. Submit an entire SF-SAC
 1. Upload and Certify audit package
 1. Status and user business logic
