@@ -49,18 +49,18 @@ Additional value here is preventing entities that don't meet the criteria from s
 To de-risk our product plans, we will focus on an end-to-end solution that bridges data input to dissemination to the current FAC. This will include a fully fleshed out SF-SAC general information page. We will also build out the API to de-risk unknows in end-to-end implementation and unblock our partners at Census by providing specifics of API format. 
 
 **Specific deliverables (full list [here](https://github.com/GSA-TTS/FAC/milestone/11)):**
-* (20% ✅) [General information - SF-SAC data entry](https://github.com/GSA-TTS/FAC/issues/185)
-* [API for accessing general SF-SAC Data](https://github.com/GSA-TTS/FAC/issues/355)
-* [Audit permissions](https://github.com/GSA-TTS/FAC/issues/332) and [my audit submissions](https://github.com/GSA-TTS/FAC/issues/343) page
-* [PDR/ADR - Excel file ingest](https://github.com/GSA-TTS/FAC/issues/328)
-* [PDR/ADR - File Upload storage](https://github.com/GSA-TTS/FAC/issues/328)
+* (50% ✅) [General information - SF-SAC data entry](https://github.com/GSA-TTS/FAC/issues/185)
+* (DONE ✅) [API for accessing general SF-SAC Data](https://github.com/GSA-TTS/FAC/issues/355)
+* (50% ✅) [Audit permissions](https://github.com/GSA-TTS/FAC/issues/332) and [my audit submissions](https://github.com/GSA-TTS/FAC/issues/343) page
+* (50% ✅) [PDR/ADR - Excel file ingest](https://github.com/GSA-TTS/FAC/issues/328)
+* (DONE ✅) [PDR/ADR - File Upload storage](https://github.com/GSA-TTS/FAC/issues/328)
 
 ## Milestone 3: Federal awards, Excel upload patterns
 
 **Value delivered:**
 While the current FAC allows users to submit form data and excel files, it's most valuable (and quite possibly sufficient for MVP release) to just allow them to upload templatized excel files for their audit. This milestone will focus on an end to end solution (including API) for the first excel uploading screen, "federal awards", and will provide a foundational pattern for subsequent excel upload screens in the SF-SAC. 
 
-**Specific deliverables:**
+**Specific deliverables (full list [here](https://github.com/GSA-TTS/FAC/milestone/13)):**
 * [Implement Federal Awards screen](https://github.com/GSA-TTS/FAC/issues/187)
 * [Excel Generation functionality](https://github.com/GSA-TTS/FAC/issues/443)
 * [Excel Uploading functionality](https://github.com/GSA-TTS/FAC/issues/449)
