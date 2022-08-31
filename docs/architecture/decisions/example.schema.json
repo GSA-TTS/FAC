@@ -1,0 +1,201 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://fac.gov/sac-test.schema.json",
+  "title": "Federal Audit Clearinghouse Single Audit Checklist",
+  "description": "Schema for the single audit checklist",
+  "type": "object",
+  "properties": {
+    "submitted_by": {
+      "description": "",
+      "type": "object"
+    },
+    "date_created": {
+      "description": "",
+      "type": "string",
+      "format": "date-time"
+    },
+    "submission_status": {
+      "description": "",
+      "type": "string"
+    },
+    "report_id": {
+      "description": "",
+      "type": "string",
+      "minLength": 5,
+      "maxLength": 20
+    },
+    "auditee_fiscal_period_start": {
+      "description": "",
+      "type": "string",
+      "format": "date-time"
+    },
+    "auditee_fiscal_period_end": {
+      "description": "",
+      "type": "string",
+      "format": "date-time"
+    },
+    "audit_type": {
+      "description": "",
+      "type": "string",
+      "maxLength": 20
+    },
+    "audit_period_covered": {
+      "description": "",
+      "type": "string",
+      "maxLength": 20
+    },
+    "ein": {
+      "description": "",
+      "type": "string",
+      "format": "regex",
+      "pattern": "\d{2}-?\d{7}",
+      "minLength": 9,
+      "maxLength": 12
+    },
+    "ein_not_an_ssn_attestation": {
+      "description": "",
+      "type": "boolean"
+    },
+    "multiple_eins_covered": {
+      "description": "",
+      "type": "boolean"
+    },
+    "auditee_uei": {
+      "description": "",
+      "type": "string",
+      "format": "regex",
+      "pattern": "[a-hj-np-zA-HJ-NP-Z1-9][a-hj-np-zA-HJ-NP-Z0-9]{11}",
+      "minLength": 12,
+      "maxLength": 12
+    },
+    "multiple_ueis_covered": {
+      "description": "",
+      "type": "boolean"
+    },
+    "auditee_name": {
+      "description": "",
+      "type": "string",
+      "maxLength": 100
+    },
+    "auditee_address_line_1": {
+      "description": "",
+      "type": "string",
+      "maxLength": 100
+    },
+    "auditee_city": {
+      "description": "",
+      "type": "string",
+      "maxLength": 100
+    },
+    "auditee_state": {
+      "description": "",
+      "type": "string",
+      "maxLength": 2
+    },
+    "auditee_zip": {
+      "description": "",
+      "type": "string",
+      "maxLength": 100
+    },
+    "auditee_contact_name": {
+      "description": "",
+      "type": "string",
+      "maxLength": 100
+    },
+    "auditee_contact_title": {
+      "description": "",
+      "type": "string",
+      "maxLength": 100
+    },
+    "auditee_phone": {
+      "description": "",
+      "type": "string",
+      "maxLength": 100
+    },
+    "auditee_email": {
+      "description": "",
+      "type": "string",
+      "format": "email",
+      "maxLength": 100
+    },
+    "user_provided_organization_type": {
+      "description": "",
+      "type": "string",
+      "maxLength": 12
+    },
+    "met_spending_threshold": {
+      "description": "",
+      "type": "boolean"
+    },
+    "is_usa_based": {
+      "description": "",
+      "type": "boolean"
+    },
+    "auditor_firm_name": {
+      "description": "",
+      "type": "string",
+      "maxLength": 100
+    },
+    "auditor_ein": {
+      "description": "",
+      "type": "string",
+      "format": "regex",
+      "pattern": "\d{2}-?\d{7}",
+      "maxLength": 12
+    },
+    "auditor_ein_not_an_ssn_attestation": {
+      "description": "",
+      "type": "boolean"
+    },
+    "auditor_country": {
+      "description": "",
+      "type": "string",
+      "maxLength": 100
+    },
+    "auditor_address_line_1": {
+      "description": "",
+      "type": "string",
+      "maxLength": 100
+    },
+    "auditor_city": {
+      "description": "",
+      "type": "string",
+      "maxLength": 100
+    },
+    "auditor_state": {
+      "description": "",
+      "type": "string",
+      "maxLength": 100
+    },
+    "auditor_zip": {
+      "description": "",
+      "type": "string",
+      "maxLength": 100
+    },
+    "auditor_contact_name": {
+      "description": "",
+      "type": "string",
+      "maxLength": 100
+    },
+    "auditor_contact_title": {
+      "description": "",
+      "type": "string",
+      "maxLength": 100
+    },
+    "auditor_phone": {
+      "description": "",
+      "type": "string",
+      "maxLength": 100
+    },
+    "auditor_email": {
+      "description": "",
+      "type": "string",
+      "format": "email",
+      "maxLength": 100
+    }
+  },
+  "required": [
+    "submitted_by", "date_created", "submission_status", "report_id", "auditee_fiscal_period_start",
+    "auditee_fiscal_period_end", "user_provided_organization_type", "met_spending_threshold"
+  ]
+}
