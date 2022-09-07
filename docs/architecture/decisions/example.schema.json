@@ -16,13 +16,28 @@
     },
     "submission_status": {
       "description": "",
-      "type": "string"
+      "type": "string",
+      "anyOf": [
+        {
+          "const": "in_progress"
+        },
+        {
+          "const": "submitted"
+        },
+        {
+          "const": "received"
+        },
+        {
+          "const": "available"
+        }
+      ]
     },
     "report_id": {
       "description": "",
       "type": "string",
-      "minLength": 5,
-      "maxLength": 20
+      "pattern": "\\d{4}[a-hj-np-zA-HJ-NP-Z0-9]{3}\\d{10}",
+      "minLength": 17,
+      "maxLength": 17
     },
     "auditee_fiscal_period_start": {
       "description": "",
@@ -37,18 +52,35 @@
     "audit_type": {
       "description": "",
       "type": "string",
-      "maxLength": 20
+      "anyOf": [
+        {
+          "const": "single-audit"
+        },
+        {
+          "const": "program-specific"
+        }
+      ]
     },
     "audit_period_covered": {
       "description": "",
       "type": "string",
-      "maxLength": 20
+      "anyOf": [
+        {
+          "const": "annual"
+        },
+        {
+          "const": "biennial"
+        },
+        {
+          "const": "other"
+        }
+      ]
     },
     "ein": {
       "description": "",
       "type": "string",
       "format": "regex",
-      "pattern": "\d{2}-?\d{7}",
+      "pattern": "\\d{2}-?\\d{7}",
       "minLength": 9,
       "maxLength": 12
     },
@@ -121,7 +153,29 @@
     "user_provided_organization_type": {
       "description": "",
       "type": "string",
-      "maxLength": 12
+      "anyOf": [
+        {
+          "const": "state"
+        },
+        {
+          "const": "local"
+        },
+        {
+          "const": "tribal"
+        },
+        {
+          "const": "higher-ed"
+        },
+        {
+          "const": "non-profit"
+        },
+        {
+          "const": "unknown"
+        },
+        {
+          "const": "none"
+        }
+      ]
     },
     "met_spending_threshold": {
       "description": "",
@@ -140,7 +194,7 @@
       "description": "",
       "type": "string",
       "format": "regex",
-      "pattern": "\d{2}-?\d{7}",
+      "pattern": "\\d{2}-?\\d{7}",
       "maxLength": 12
     },
     "auditor_ein_not_an_ssn_attestation": {
@@ -195,7 +249,13 @@
     }
   },
   "required": [
-    "submitted_by", "date_created", "submission_status", "report_id", "auditee_fiscal_period_start",
-    "auditee_fiscal_period_end", "user_provided_organization_type", "met_spending_threshold"
+    "submitted_by",
+    "date_created",
+    "submission_status",
+    "report_id",
+    "auditee_fiscal_period_start",
+    "auditee_fiscal_period_end",
+    "user_provided_organization_type",
+    "met_spending_threshold"
   ]
 }
