@@ -19,7 +19,7 @@ Refactor the `SingleAuditChecklist` model so that SAC metadata (e.g. `report_id`
 | 1 | 2021 | 202100001 | ABC123XYZ | { ... } |
 | 2 | 2022 | 202200002 | DEF456XYZ | { ... } |
 
-Create a new model `SingleAuditChecklistTemplate` to hold the JSON Schema for each fiscal year, against which incoming submissions will be validated:
+Create a new model `SingleAuditChecklistTemplate` to hold the JSON Schema for each fiscal year, against which incoming submissions will be validated. The template can also hold the question copy for each field:
 
 ### `SingleAuditChecklistTemplate`
 | id | fiscal_year | template |
