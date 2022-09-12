@@ -6,24 +6,32 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('audit', '0011_alter_access_role'),
+        ("audit", "0011_alter_access_role"),
     ]
 
     operations = [
         migrations.RemoveConstraint(
-            model_name='access',
-            name='audit_$(class)s_single_certifying_auditee',
+            model_name="access",
+            name="audit_$(class)s_single_certifying_auditee",
         ),
         migrations.RemoveConstraint(
-            model_name='access',
-            name='audit_access_single_certifying_auditor',
+            model_name="access",
+            name="audit_access_single_certifying_auditor",
         ),
         migrations.AddConstraint(
-            model_name='access',
-            constraint=models.UniqueConstraint(condition=models.Q(('role', 'certifying_auditee_contact')), fields=('sac',), name='audit_$(class)s_single_certifying_auditee'),
+            model_name="access",
+            constraint=models.UniqueConstraint(
+                condition=models.Q(("role", "certifying_auditee_contact")),
+                fields=("sac",),
+                name="audit_$(class)s_single_certifying_auditee",
+            ),
         ),
         migrations.AddConstraint(
-            model_name='access',
-            constraint=models.UniqueConstraint(condition=models.Q(('role', 'certifying_auditor_contact')), fields=('sac',), name='audit_access_single_certifying_auditor'),
+            model_name="access",
+            constraint=models.UniqueConstraint(
+                condition=models.Q(("role", "certifying_auditor_contact")),
+                fields=("sac",),
+                name="audit_access_single_certifying_auditor",
+            ),
         ),
     ]
