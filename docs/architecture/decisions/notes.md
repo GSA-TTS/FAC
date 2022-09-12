@@ -14,7 +14,7 @@
 Refactor the `SingleAuditChecklist` model so that SAC metadata (e.g. `report_id`, `fiscal_period_start/end`, `ein`, etc) are part of the model, and all remaining data is stored as a JSON blob:
 
 ### `SingleAuditChecklist`
-| id | fiscal_year | report_id | ein | data |
+| id | fiscal_year | report_id | ein | data (JSON) |
 | -- | ----------- | --------- | --- | ---- |
 | 1 | 2021 | 202100001 | ABC123XYZ | { ... } |
 | 2 | 2022 | 202200002 | DEF456XYZ | { ... } |
@@ -22,7 +22,7 @@ Refactor the `SingleAuditChecklist` model so that SAC metadata (e.g. `report_id`
 Create a new model `SingleAuditChecklistTemplate` to hold the JSON Schema for each fiscal year, against which incoming submissions will be validated. The template can also hold the question copy for each field:
 
 ### `SingleAuditChecklistTemplate`
-| id | fiscal_year | template |
+| id | fiscal_year | template (JSON Schema) |
 | -- | ----------- | -------- |
 | 1 | 2021 | { ... } |
 | 2 | 2022 | { ... } |
