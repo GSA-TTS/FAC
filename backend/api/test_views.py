@@ -471,6 +471,10 @@ class SACCreationTests(TestCase):
         self.assertEqual(sac.auditee_uei, "ZQGGHJH74DW7")
         self.assertEqual(sac.submission_status, "in_progress")
 
+        # We also need to verify that the response from the POST includes all
+        # the fields we expect, including the data that’s actually stored in
+        # Access objects related to this SAC instance.
+
 
 class SingleAuditChecklistViewTests(TestCase):
     """
@@ -485,6 +489,45 @@ class SingleAuditChecklistViewTests(TestCase):
     def path(self, report_id):
         """Convenience method to get the path for a report_id)"""
         return reverse("singleauditchecklist", kwargs={"report_id": report_id})
+
+    def test_valid_data_across_steps_is_returned_in_get(self):
+        """
+        After submitting the valid data and creating an SAC object, we return
+        all of the relevant data on GET.
+        """
+        self.client.force_authenticate(user=self.user)
+
+        # Submit eligibility data
+        eligibility_info = {
+            "is_usa_based": True,
+            "met_spending_threshold": True,
+            "user_provided_organization_type": "state",
+        }
+        response = self.client.post(ELIGIBILITY_PATH, eligibility_info, format="json")
+        data = response.json()
+        next_step = data["next"]
+
+        # Submit auditee info
+        response = self.client.post(next_step, VALID_AUDITEE_INFO_DATA, format="json")
+        data = response.json()
+        next_step = data["next"]
+
+        # Submit AccessAndSubmission details
+        access_and_submission_data = {
+            "certifying_auditee_contact": "x@x.com",
+            "certifying_auditor_contact": "y@y.com",
+            "auditor_contacts": ["z@z.com"],
+            "auditee_contacts": ["w@w.com"],
+        }
+        response = self.client.post(
+            next_step, access_and_submission_data, format="json"
+        )
+        data = response.json()
+        sac = SingleAuditChecklist.objects.get(id=data["sac_id"])
+        response = self.client.get(self.path(sac.report_id))
+        full_data = response.json()
+        for key, value in access_and_submission_data.items():
+            self.assertEqual(full_data[key], value)
 
     def test_get_authentication_required(self):
         """
@@ -709,11 +752,12 @@ class SingleAuditChecklistViewTests(TestCase):
         response = self.client.put(path, data, format="json")
         self.assertEqual(response.status_code, 200)
 
+        sac_data = response.json()
         updated_sac = SingleAuditChecklist.objects.get(pk=base.id)
 
         for key, value in data.items():
             self.assertEqual(getattr(updated_sac, key), value)
-            self.assertEqual(response.json()[key], value)
+            self.assertEqual(sac_data[key], value)
 
     def test_edit_inappropriate_fields(self):
         """

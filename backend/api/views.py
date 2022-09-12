@@ -23,6 +23,28 @@ from .serializers import (
 )
 
 
+def only(iterable, default=None, too_long=None):
+    """
+    only from more-itertools
+    https://more-itertools.readthedocs.io/en/stable/_modules/more_itertools/more.html#only
+    """
+    it = iter(iterable)
+    first_value = next(it, default)
+
+    try:
+        second_value = next(it)
+    except StopIteration:
+        pass
+    else:
+        msg = (
+            "Expected exactly one item in iterable, but got {!r}, {!r}, "
+            "and perhaps more.".format(first_value, second_value)
+        )
+        raise too_long or ValueError(msg)
+
+    return first_value
+
+
 class SACViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows SACs to be viewed.
@@ -229,7 +251,24 @@ class SingleAuditChecklistView(APIView):
             raise Http404() from e
         self.check_object_permissions(request, sac)
         serialized = SingleAuditChecklistSerializer(sac)
-        return JsonResponse(serialized.data)
+        full_data = serialized.data
+
+        accesses = Access.objects.filter(sac=sac.id)
+        full_data["auditee_contacts"] = [
+            a.email for a in accesses if a.role == "auditee_contact"
+        ]
+        full_data["auditor_contacts"] = [
+            a.email for a in accesses if a.role == "auditor_contact"
+        ]
+
+        full_data["certifying_auditee_contact"] = only(
+            a.email for a in accesses if a.role == "auditee_cert"
+        )
+        full_data["certifying_auditor_contact"] = only(
+            a.email for a in accesses if a.role == "auditor_cert"
+        )
+
+        return JsonResponse(full_data)
 
     def put(self, request, report_id):
         """
@@ -261,7 +300,12 @@ class SingleAuditChecklistView(APIView):
             sac.save()
         except ValidationError as err:
             return JsonResponse({"errors": err.message_dict}, status=400)
-        return JsonResponse(SingleAuditChecklistSerializer(sac).data)
+        full_data = SingleAuditChecklistSerializer(sac).data
+        # return JsonResponse(SingleAuditChecklistSerializer(sac).data)
+        accesses = Access.objects.filter(sac=sac.id)
+        auditee_contacts = [a.email for a in accesses if a.role == "auditee_contact"]
+        full_data["auditee_contacts"] = auditee_contacts
+        return JsonResponse(full_data)
 
 
 class SubmissionsView(APIView):
