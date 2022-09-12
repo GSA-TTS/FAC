@@ -351,10 +351,10 @@ class AccessAndSubmissionTests(TestCase):
 
         creator_access = Access.objects.get(sac=sac, role="creator")
         certifying_auditee_contact_access = Access.objects.get(
-            sac=sac, role="auditee_cert"
+            sac=sac, role="certifying_auditee_contact"
         )
         certifying_auditor_contact_access = Access.objects.get(
-            sac=sac, role="auditor_cert"
+            sac=sac, role="certifying_auditor_contact"
         )
         auditee_contacts_access = Access.objects.filter(sac=sac, role="auditee_contact")
         auditor_contacts_access = Access.objects.filter(sac=sac, role="auditor_contact")
@@ -527,6 +527,10 @@ class SingleAuditChecklistViewTests(TestCase):
         response = self.client.get(self.path(sac.report_id))
         full_data = response.json()
         for key, value in access_and_submission_data.items():
+            self.assertEqual(full_data[key], value)
+        for key, value in eligibility_info.items():
+            self.assertEqual(full_data[key], value)
+        for key, value in VALID_AUDITEE_INFO_DATA.items():
             self.assertEqual(full_data[key], value)
 
     def test_get_authentication_required(self):
@@ -912,7 +916,7 @@ class AccessListViewTests(TestCase):
         If a user has multiple roles for an audit, that audit is returned one time for each role
         """
         sac = baker.make(SingleAuditChecklist)
-        baker.make(Access, user=self.user, role="auditee_cert", sac=sac)
+        baker.make(Access, user=self.user, role="certifying_auditee_contact", sac=sac)
         baker.make(Access, user=self.user, role="creator", sac=sac)
 
         response = self.client.get(ACCESS_LIST_PATH, format="json")
@@ -920,11 +924,13 @@ class AccessListViewTests(TestCase):
 
         self.assertEqual(len(data), 2)
 
-        auditee_cert_accesses = list(
-            filter(lambda a: a["role"] == "auditee_cert", data)
+        certifying_auditee_contact_accesses = list(
+            filter(lambda a: a["role"] == "certifying_auditee_contact", data)
         )
-        self.assertEqual(len(auditee_cert_accesses), 1)
-        self.assertEqual(auditee_cert_accesses[0]["report_id"], sac.report_id)
+        self.assertEqual(len(certifying_auditee_contact_accesses), 1)
+        self.assertEqual(
+            certifying_auditee_contact_accesses[0]["report_id"], sac.report_id
+        )
 
         creator_accesses = list(filter(lambda a: a["role"] == "creator", data))
         self.assertEqual(len(creator_accesses), 1)

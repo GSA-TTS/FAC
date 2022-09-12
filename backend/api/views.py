@@ -23,28 +23,6 @@ from .serializers import (
 )
 
 
-def only(iterable, default=None, too_long=None):
-    """
-    only from more-itertools
-    https://more-itertools.readthedocs.io/en/stable/_modules/more_itertools/more.html#only
-    """
-    it = iter(iterable)
-    first_value = next(it, default)
-
-    try:
-        second_value = next(it)
-    except StopIteration:
-        pass
-    else:
-        msg = (
-            "Expected exactly one item in iterable, but got {!r}, {!r}, "
-            "and perhaps more.".format(first_value, second_value)
-        )
-        raise too_long or ValueError(msg)
-
-    return first_value
-
-
 class SACViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows SACs to be viewed.
@@ -195,12 +173,12 @@ class AccessAndSubmissionView(APIView):
             )
             Access.objects.create(
                 sac=sac,
-                role="auditee_cert",
+                role="certifying_auditee_contact",
                 email=serializer.data.get("certifying_auditee_contact"),
             )
             Access.objects.create(
                 sac=sac,
-                role="auditor_cert",
+                role="certifying_auditor_contact",
                 email=serializer.data.get("certifying_auditor_contact"),
             )
             for contact in serializer.data.get("auditee_contacts"):
@@ -217,6 +195,38 @@ class AccessAndSubmissionView(APIView):
             return Response({"sac_id": sac.id, "next": "TBD"})
 
         return Response({"errors": serializer.errors})
+
+
+def get_role_emails_for_sac(sac_id) -> dict:
+    """
+    Given a SAC id, returns a dictionary containing the various email addresses
+    from Access objects associated with that SAC, grouped by role.
+
+    {
+        "auditee_contacts": ["a@a.com"],
+        "auditee_contacts": ["b@b.com"],
+        "certfying_auditor_contact": ["c@c.com"],
+        "certfying_auditee_contact": ["e@e.com"],
+        "creator": ["victor@frankenstein.com"],
+    }
+    """
+    accesses = Access.objects.filter(sac=sac_id)
+
+    # This is inelegant, but we have to change the name of the key for
+    # two of them, and turn lists into single items or None for the
+    # other two:
+    only_one = lambda x: x[0] if x else None
+    return {
+        "auditee_contacts": [a.email for a in accesses if a.role == "auditee_contact"],
+        "auditor_contacts": [a.email for a in accesses if a.role == "auditor_contact"],
+        "certifying_auditee_contact": only_one(
+            [a.email for a in accesses if a.role == "certifying_auditee_contact"]
+        ),
+        "certifying_auditor_contact": only_one(
+            [a.email for a in accesses if a.role == "certifying_auditor_contact"]
+        ),
+        "creator": only_one([a.email for a in accesses if a.role == "creator"]),
+    }
 
 
 class SingleAuditChecklistView(APIView):
@@ -250,23 +260,9 @@ class SingleAuditChecklistView(APIView):
         except SingleAuditChecklist.DoesNotExist as e:
             raise Http404() from e
         self.check_object_permissions(request, sac)
-        serialized = SingleAuditChecklistSerializer(sac)
-        full_data = serialized.data
 
-        accesses = Access.objects.filter(sac=sac.id)
-        full_data["auditee_contacts"] = [
-            a.email for a in accesses if a.role == "auditee_contact"
-        ]
-        full_data["auditor_contacts"] = [
-            a.email for a in accesses if a.role == "auditor_contact"
-        ]
-
-        full_data["certifying_auditee_contact"] = only(
-            a.email for a in accesses if a.role == "auditee_cert"
-        )
-        full_data["certifying_auditor_contact"] = only(
-            a.email for a in accesses if a.role == "auditor_cert"
-        )
+        base_data = dict(SingleAuditChecklistSerializer(sac).data.items())
+        full_data = base_data | get_role_emails_for_sac(sac.id)
 
         return JsonResponse(full_data)
 
@@ -300,11 +296,9 @@ class SingleAuditChecklistView(APIView):
             sac.save()
         except ValidationError as err:
             return JsonResponse({"errors": err.message_dict}, status=400)
-        full_data = SingleAuditChecklistSerializer(sac).data
-        # return JsonResponse(SingleAuditChecklistSerializer(sac).data)
-        accesses = Access.objects.filter(sac=sac.id)
-        auditee_contacts = [a.email for a in accesses if a.role == "auditee_contact"]
-        full_data["auditee_contacts"] = auditee_contacts
+
+        base_data = dict(SingleAuditChecklistSerializer(sac).data.items())
+        full_data = base_data | get_role_emails_for_sac(sac.id)
         return JsonResponse(full_data)
 
 
