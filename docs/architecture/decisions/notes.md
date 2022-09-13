@@ -15,7 +15,7 @@
 
 ## Proposal
 
-Refactor the `SingleAuditChecklist` model so that SAC metadata (e.g. `report_id`, `fiscal_period_start/end`, `ein`, etc) are part of the model, and all remaining data is stored as a JSON blob:
+Refactor the `SingleAuditChecklist` model so that SAC metadata (e.g. `report_id`, `fiscal_period_start/end`, `ein`, etc) are part of the model, and all remaining data (i.e. the fields that are more likely change over time) is stored as a JSON blob:
 
 ### `SingleAuditChecklist`
 | id | fiscal_year | report_id | ein | data (JSON) |
