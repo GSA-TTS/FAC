@@ -76,7 +76,7 @@ class UEIValidationFormView(APIView):
             return Response(
                 {
                     "valid": True,
-                    "response": json.loads(serializer.data.get("auditee_uei")),
+                    "response": json.loads(serializer.data),
                 }
             )
         return Response({"valid": False, "errors": serializer.errors})
