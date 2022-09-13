@@ -3,6 +3,7 @@
 - When a `SingleAuditChecklist` is submitted, it is translated into a `SingleAuditChecklistReport`
 - The `SingleAuditChecklistReport` model does not vary by fiscal year - it is the same across all years to facilitate consisent search and presentation of completed audits
 - `SingleAuditChecklists` are validated against a JSON Schema for that fiscal year
+- Question and validation error copy for a given year will be stored as part of the `SingleAuditChecklist` JSON Schema
 
 
 ## Questions
