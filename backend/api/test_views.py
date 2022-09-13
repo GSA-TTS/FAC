@@ -8,7 +8,7 @@ from model_bakery import baker
 from rest_framework.test import APIClient
 
 from api.test_uei import valid_uei_results
-from api.views import SingleAuditChecklistView
+from api.views import SingleAuditChecklistView, SACViewSet
 from audit.models import Access, SingleAuditChecklist
 
 User = get_user_model()
@@ -18,6 +18,7 @@ AUDITEE_INFO_PATH = reverse("auditee-info")
 ACCESS_AND_SUBMISSION_PATH = reverse("accessandsubmission")
 SUBMISSIONS_PATH = reverse("submissions")
 ACCESS_LIST_PATH = reverse("access-list")
+SAC_LIST_PATH = reverse("sac-list")
 
 
 VALID_AUDITEE_INFO_DATA = {
@@ -350,10 +351,10 @@ class AccessAndSubmissionTests(TestCase):
 
         creator_access = Access.objects.get(sac=sac, role="creator")
         certifying_auditee_contact_access = Access.objects.get(
-            sac=sac, role="auditee_cert"
+            sac=sac, role="certifying_auditee_contact"
         )
         certifying_auditor_contact_access = Access.objects.get(
-            sac=sac, role="auditor_cert"
+            sac=sac, role="certifying_auditor_contact"
         )
         auditee_contacts_access = Access.objects.filter(sac=sac, role="auditee_contact")
         auditor_contacts_access = Access.objects.filter(sac=sac, role="auditor_contact")
@@ -470,6 +471,10 @@ class SACCreationTests(TestCase):
         self.assertEqual(sac.auditee_uei, "ZQGGHJH74DW7")
         self.assertEqual(sac.submission_status, "in_progress")
 
+        # We also need to verify that the response from the POST includes all
+        # the fields we expect, including the data that’s actually stored in
+        # Access objects related to this SAC instance.
+
 
 class SingleAuditChecklistViewTests(TestCase):
     """
@@ -484,6 +489,49 @@ class SingleAuditChecklistViewTests(TestCase):
     def path(self, report_id):
         """Convenience method to get the path for a report_id)"""
         return reverse("singleauditchecklist", kwargs={"report_id": report_id})
+
+    def test_valid_data_across_steps_is_returned_in_get(self):
+        """
+        After submitting the valid data and creating an SAC object, we return
+        all of the relevant data on GET.
+        """
+        self.client.force_authenticate(user=self.user)
+
+        # Submit eligibility data
+        eligibility_info = {
+            "is_usa_based": True,
+            "met_spending_threshold": True,
+            "user_provided_organization_type": "state",
+        }
+        response = self.client.post(ELIGIBILITY_PATH, eligibility_info, format="json")
+        data = response.json()
+        next_step = data["next"]
+
+        # Submit auditee info
+        response = self.client.post(next_step, VALID_AUDITEE_INFO_DATA, format="json")
+        data = response.json()
+        next_step = data["next"]
+
+        # Submit AccessAndSubmission details
+        access_and_submission_data = {
+            "certifying_auditee_contact": "x@x.com",
+            "certifying_auditor_contact": "y@y.com",
+            "auditor_contacts": ["z@z.com"],
+            "auditee_contacts": ["w@w.com"],
+        }
+        response = self.client.post(
+            next_step, access_and_submission_data, format="json"
+        )
+        data = response.json()
+        sac = SingleAuditChecklist.objects.get(id=data["sac_id"])
+        response = self.client.get(self.path(sac.report_id))
+        full_data = response.json()
+        for key, value in access_and_submission_data.items():
+            self.assertEqual(full_data[key], value)
+        for key, value in eligibility_info.items():
+            self.assertEqual(full_data[key], value)
+        for key, value in VALID_AUDITEE_INFO_DATA.items():
+            self.assertEqual(full_data[key], value)
 
     def test_get_authentication_required(self):
         """
@@ -708,11 +756,12 @@ class SingleAuditChecklistViewTests(TestCase):
         response = self.client.put(path, data, format="json")
         self.assertEqual(response.status_code, 200)
 
+        sac_data = response.json()
         updated_sac = SingleAuditChecklist.objects.get(pk=base.id)
 
         for key, value in data.items():
             self.assertEqual(getattr(updated_sac, key), value)
-            self.assertEqual(response.json()[key], value)
+            self.assertEqual(sac_data[key], value)
 
     def test_edit_inappropriate_fields(self):
         """
@@ -867,7 +916,7 @@ class AccessListViewTests(TestCase):
         If a user has multiple roles for an audit, that audit is returned one time for each role
         """
         sac = baker.make(SingleAuditChecklist)
-        baker.make(Access, user=self.user, role="auditee_cert", sac=sac)
+        baker.make(Access, user=self.user, role="certifying_auditee_contact", sac=sac)
         baker.make(Access, user=self.user, role="creator", sac=sac)
 
         response = self.client.get(ACCESS_LIST_PATH, format="json")
@@ -875,11 +924,13 @@ class AccessListViewTests(TestCase):
 
         self.assertEqual(len(data), 2)
 
-        auditee_cert_accesses = list(
-            filter(lambda a: a["role"] == "auditee_cert", data)
+        certifying_auditee_contact_accesses = list(
+            filter(lambda a: a["role"] == "certifying_auditee_contact", data)
         )
-        self.assertEqual(len(auditee_cert_accesses), 1)
-        self.assertEqual(auditee_cert_accesses[0]["report_id"], sac.report_id)
+        self.assertEqual(len(certifying_auditee_contact_accesses), 1)
+        self.assertEqual(
+            certifying_auditee_contact_accesses[0]["report_id"], sac.report_id
+        )
 
         creator_accesses = list(filter(lambda a: a["role"] == "creator", data))
         self.assertEqual(len(creator_accesses), 1)
@@ -931,3 +982,103 @@ class AccessListViewTests(TestCase):
         # only the one remaining access should come back
         self.assertEqual(len(data_2), 1)
         self.assertEqual(data_2[0]["report_id"], access_1.sac.report_id)
+
+
+class SACViewSetTests(TestCase):
+    def setUp(self):
+        self.client = APIClient()
+
+    def test_list_no_auth_required(self):
+        """
+        The SACViewSet should not require authentication or permissions
+        """
+        self.assertEqual(SACViewSet.authentication_classes, [])
+        self.assertEqual(SACViewSet.permission_classes, [])
+
+    def test_list_no_audits_returns_empty_list(self):
+        """
+        If there are no SACs in the database, the list endpoint should return no results
+        """
+        response = self.client.get(SAC_LIST_PATH)
+        data = response.json()
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(data, [])
+
+    def test_list_none_submitted_returns_empty_list(self):
+        """
+        If there are SACs in the database, but none which have a status of subnmitted, the list endpoint shoul return no results
+        """
+        for status in SingleAuditChecklist.STATUSES:
+            if status[0] != "submitted":
+                baker.make(
+                    SingleAuditChecklist, _quantity=100, submission_status=status[0]
+                )
+
+        response = self.client.get(SAC_LIST_PATH)
+        data = response.json()
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(data, [])
+
+    def test_list_returns_only_submitted(self):
+        """
+        If there are SACs in the database, only those with a submission_status of "submitted" should be returned
+        """
+        for status in SingleAuditChecklist.STATUSES:
+            baker.make(SingleAuditChecklist, _quantity=100, submission_status=status[0])
+
+        response = self.client.get(SAC_LIST_PATH)
+        data = response.json()
+
+        self.assertEqual(len(data), 100)
+        self.assertTrue(
+            all(audit["submission_status"] == "submitted" for audit in data)
+        )
+
+    def test_detail_no_match_returns_404(self):
+        """
+        If there is no SAC matching the provided report_id, the detail endpoint should return 404
+        """
+        url = reverse("sac-detail", kwargs={"report_id": "not-a-real-report-id"})
+
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 404)
+
+    def test_detail_match_submitted_returns_sac(self):
+        """
+        If there is a SAC matching the provided report_id, and the SAC has a submission_status of submitted, the detail endpoint should return the SAC
+        """
+        report_id = "test-report-id"
+        sac = baker.make(
+            SingleAuditChecklist, report_id=report_id, submission_status="submitted"
+        )
+
+        url = reverse("sac-detail", kwargs={"report_id": report_id})
+
+        response = self.client.get(url)
+        data = response.json()
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(data, sac)
+
+    def test_detail_match_unsubmitted_returns_404(self):
+        """
+        If there is a SAC matching the provided report_id, and the SAC has a submission_status other than submitted, the detail endpoint should return a 404
+        """
+        for status in SingleAuditChecklist.STATUSES:
+            with self.subTest():
+                if status[0] != "submitted":
+                    report_id = f"id-{status[0]}"
+                    baker.make(
+                        SingleAuditChecklist,
+                        report_id=report_id,
+                        submission_status=status[0],
+                    )
+
+                    url = reverse("sac-detail", kwargs={"report_id": report_id})
+
+                    response = self.client.get(url)
+
+                    self.assertEqual(response.status_code, 404)
