@@ -184,16 +184,16 @@ class Access(models.Model):
 
     ROLES = (
         ("auditee_contact", _("Auditee Contact")),
-        ("auditee_cert", _("Auditee Certifying Official")),
         ("auditor_contact", _("Auditor Contact")),
-        ("auditor_cert", _("Auditor Certifying Official")),
+        ("certifying_auditee_contact ", _("Auditee Certifying Official")),
+        ("certifying_auditor_contact ", _("Auditor Certifying Official")),
         ("creator", _("Audit Creator")),
     )
     sac = models.ForeignKey(SingleAuditChecklist, on_delete=models.CASCADE)
     role = models.CharField(
         choices=ROLES,
         help_text="Access type granted to this user",
-        max_length=15,
+        max_length=50,
     )
     email = models.EmailField()
     user = models.ForeignKey(
@@ -219,13 +219,13 @@ class Access(models.Model):
             # a SAC cannot have multiple certifying auditees
             models.UniqueConstraint(
                 fields=["sac"],
-                condition=Q(role="auditee_cert"),
+                condition=Q(role="certifying_auditee_contact"),
                 name="%(app_label)s_$(class)s_single_certifying_auditee",
             ),
             # a SAC cannot have multiple certifying auditors
             models.UniqueConstraint(
                 fields=["sac"],
-                condition=Q(role="auditor_cert"),
+                condition=Q(role="certifying_auditor_contact"),
                 name="%(app_label)s_%(class)s_single_certifying_auditor",
             ),
         ]
