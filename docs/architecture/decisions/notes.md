@@ -11,6 +11,7 @@
   - Downsides to maintaining a database model alongside a JSON Schema:
     - Each time a new JSON Schema is created for a new fiscal year, a new database model will also need to created, leading to a continually growing collection of models/database tables (e.g., `SingleAuditChecklist_2019`, `SingleAuditChecklit_2020`, `SingleAuditChecklist_2021`, etc)
     - Maintaining field/validation parity between the JSON Schema and database model for each year will be difficult and tedious to manage without introducing bugs
+- What does the `SingleAuditChecklistReport` model look like initially? Do we base it on the current `SingleAuditChecklist`? Do we do user research to determine what the public access needs are?
 
 
 ## Proposal
