@@ -85,22 +85,30 @@ class AccessTests(TestCase):
             IntegrityError, baker.make, Access, sac=access_1.sac, role="creator"
         )
 
-    def test_multiple_auditee_cert_not_allowed(self):
+    def test_multiple_certifying_auditee_contact_not_allowed(self):
         """
-        There should be a constraint preventing multiple auditee_certs for a SAC
+        There should be a constraint preventing multiple certifying_auditee_contacts for a SAC
         """
-        access_1 = baker.make(Access, role="auditee_cert")
+        access_1 = baker.make(Access, role="certifying_auditee_contact")
 
         self.assertRaises(
-            IntegrityError, baker.make, Access, sac=access_1.sac, role="auditee_cert"
+            IntegrityError,
+            baker.make,
+            Access,
+            sac=access_1.sac,
+            role="certifying_auditee_contact",
         )
 
-    def test_multiple_auditor_cert_not_allowed(self):
+    def test_multiple_certifying_auditor_contact_not_allowed(self):
         """
-        There should be a constraint preventing multiple auditor_certs for a SAC
+        There should be a constraint preventing multiple certifying_auditor_contacts for a SAC
         """
-        access_1 = baker.make(Access, role="auditor_cert")
+        access_1 = baker.make(Access, role="certifying_auditor_contact")
 
         self.assertRaises(
-            IntegrityError, baker.make, Access, sac=access_1.sac, role="auditor_cert"
+            IntegrityError,
+            baker.make,
+            Access,
+            sac=access_1.sac,
+            role="certifying_auditor_contact",
         )
