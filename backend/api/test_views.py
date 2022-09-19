@@ -156,8 +156,26 @@ class UEIValidationViewTests(TestCase):
 
             response = client.post(self.PATH, self.SUCCESS, format="json")
             data = response.json()
+            valid_uei_results_json_entity = json.loads(valid_uei_results)["entityData"][
+                0
+            ]["entityRegistration"]
+            valid_uei_results_json_coredata = json.loads(valid_uei_results)[
+                "entityData"
+            ][0]["coreData"]["entityInformation"]
+
             self.assertEqual(response.status_code, 200)
             self.assertEqual(data["valid"], True)
+            self.assertEqual(
+                data["response"]["auditee_uei"], valid_uei_results_json_entity["ueiSAM"]
+            )
+            self.assertEqual(
+                data["response"]["auditee_name"],
+                valid_uei_results_json_entity["legalBusinessName"],
+            )
+            self.assertEqual(
+                data["response"]["auditee_fiscal_year_end_date"],
+                valid_uei_results_json_coredata["fiscalYearEndCloseDate"],
+            )
 
         response = client.post(self.PATH, self.INELIGIBLE, format="json")
         data = response.json()
