@@ -174,7 +174,9 @@ class UEIValidationViewTests(TestCase):
             )
             self.assertEqual(
                 data["response"]["auditee_fiscal_year_end_date"],
-                valid_uei_results_json_coredata["entityInformation"]["fiscalYearEndCloseDate"],
+                valid_uei_results_json_coredata["entityInformation"][
+                    "fiscalYearEndCloseDate"
+                ],
             )
             self.assertEqual(
                 data["response"]["auditee_address_line_1"],
@@ -186,7 +188,9 @@ class UEIValidationViewTests(TestCase):
             )
             self.assertEqual(
                 data["response"]["auditee_state"],
-                valid_uei_results_json_coredata["mailingAddress"]["stateOrProvinceCode"],
+                valid_uei_results_json_coredata["mailingAddress"][
+                    "stateOrProvinceCode"
+                ],
             )
             self.assertEqual(
                 data["response"]["auditee_zip"],

@@ -75,14 +75,21 @@ class UEISerializer(serializers.ModelSerializer):
                 .get("entityInformation")
                 .get("fiscalYearEndCloseDate"),
                 "auditee_address_line_1": sam_response.get("response")
-                .get("coreData").get("mailingAddress").get("addressLine1"),
+                .get("coreData")
+                .get("mailingAddress")
+                .get("addressLine1"),
                 "auditee_city": sam_response.get("response")
-                .get("coreData").get("mailingAddress").get("city"),
+                .get("coreData")
+                .get("mailingAddress")
+                .get("city"),
                 "auditee_state": sam_response.get("response")
-                .get("coreData").get("mailingAddress").get("stateOrProvinceCode"),
+                .get("coreData")
+                .get("mailingAddress")
+                .get("stateOrProvinceCode"),
                 "auditee_zip": sam_response.get("response")
-                .get("coreData").get("mailingAddress").get("zipCode"),
-
+                .get("coreData")
+                .get("mailingAddress")
+                .get("zipCode"),
             }
         )
 
