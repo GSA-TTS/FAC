@@ -161,7 +161,7 @@ class UEIValidationViewTests(TestCase):
             ]["entityRegistration"]
             valid_uei_results_json_coredata = json.loads(valid_uei_results)[
                 "entityData"
-            ][0]["coreData"]["entityInformation"]
+            ][0]["coreData"]
 
             self.assertEqual(response.status_code, 200)
             self.assertEqual(data["valid"], True)
@@ -174,7 +174,23 @@ class UEIValidationViewTests(TestCase):
             )
             self.assertEqual(
                 data["response"]["auditee_fiscal_year_end_date"],
-                valid_uei_results_json_coredata["fiscalYearEndCloseDate"],
+                valid_uei_results_json_coredata["entityInformation"]["fiscalYearEndCloseDate"],
+            )
+            self.assertEqual(
+                data["response"]["auditee_address_line_1"],
+                valid_uei_results_json_coredata["mailingAddress"]["addressLine1"],
+            )
+            self.assertEqual(
+                data["response"]["auditee_city"],
+                valid_uei_results_json_coredata["mailingAddress"]["city"],
+            )
+            self.assertEqual(
+                data["response"]["auditee_state"],
+                valid_uei_results_json_coredata["mailingAddress"]["stateOrProvinceCode"],
+            )
+            self.assertEqual(
+                data["response"]["auditee_zip"],
+                valid_uei_results_json_coredata["mailingAddress"]["zipCode"],
             )
 
         response = client.post(self.PATH, self.INELIGIBLE, format="json")
