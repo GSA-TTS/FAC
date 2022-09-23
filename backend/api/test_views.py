@@ -841,6 +841,55 @@ class SingleAuditChecklistViewTests(TestCase):
                 self.assertEqual(response.json(), expected)
 
 
+class SacFederalAwardsViewTests(TestCase):
+    """
+    Tests for /sac/edit/[report_id]/federal_awards
+    """
+
+    def setUp(self):
+        self.user = baker.make(User)
+        self.client = APIClient()
+        self.client.force_authenticate(user=self.user)
+
+        # Submit eligibility data
+        eligibility_info = {
+            "is_usa_based": True,
+            "met_spending_threshold": True,
+            "user_provided_organization_type": "state",
+        }
+        response = self.client.post(ELIGIBILITY_PATH, eligibility_info, format="json")
+        data = response.json()
+        next_step = data["next"]
+
+        # Submit auditee info
+        response = self.client.post(next_step, VALID_AUDITEE_INFO_DATA, format="json")
+        data = response.json()
+        next_step = data["next"]
+
+        # Submit AccessAndSubmission details
+        response = self.client.post(
+            next_step, VALID_ACCESS_AND_SUBMISSION_DATA, format="json"
+        )
+
+        # Report details to be used for tests
+        self.sac_data = response.json()
+        self.sac_report_id = self.sac_data["sac_id"]
+
+    def path(self, report_id):
+        """Convenience method to get the path for a report_id)"""
+        return reverse("sacfederalawards", kwargs={"report_id": self.sac_report_id})
+
+    def test_get_placeholder_data(self):
+        """
+        If the federal awards endpoint is hit, (for now) it should return an empty object
+        """
+
+        # SAC created in setUp().
+        response = self.client.get(self.path(self.sac_report_id))
+        data = response.json()
+        self.assertEqual(data, {})
+
+
 class SubmissionsViewTests(TestCase):
     def setUp(self):
         self.user = baker.make(User)
