@@ -108,7 +108,7 @@ The last steps for the auditee/auditor flow is to upload and finalize the audit 
   * Option 2: No validation / incomplete validation
     * Risk: Could lead to more audit churn if they are uploaded in an unusable state
 
-## Milestone 6: Auit certification and processing
+## Milestone 6: Audit certification and processing
 
 **Value delivered:**
 The last step in the process is for the auditor and auditee and communicate what's next for them. That includes a system to communicate audit status via confirmation and update emails as well as an audit status dashboard. If an audit has errors or is incomplete, auditees and auditors need clear instructions on how to resubmit. Status is important because it it triggers when an audit submission is ready to be certified / changes how specific users who have the authority to "certify" can act on the audit. Notifications are also critical because they trigger other people who need to certify/do things with the audit submission in order for it to be submitted/made public to actually go in and do those things.
@@ -213,7 +213,7 @@ Delivery options
 1. Submit general information end to end / De-risk
 1. Federal awards, Excel upload patterns
 1. Submit an entire SF-SAC
-1. Upload and Certify audit package
+1. Upload and finalize audit package
 1. Status and user business logic
 1. Backend + Support + Data Transfer
 1. **ATO/Launch for “data intake” MVP**
@@ -238,8 +238,8 @@ Delivery options
 1. Submit general information end to end / De-risk
 1. Federal awards, Excel upload patterns
 1. Submit an entire SF-SAC
-1. Upload and Certify audit package
-1. Status and user business logic
+1. Upload and finalize audit package
+1. Audit certification and processing
 1. Backend + Support + ~~Data Transfer~~ (avoid the last one)
 1. Agency data dissemination
 1. Public data dissemination
