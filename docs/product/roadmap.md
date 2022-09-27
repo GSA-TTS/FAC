@@ -52,7 +52,7 @@ To de-risk our product plans, we will focus on an end-to-end solution that bridg
 * (50% ✅) [General information - SF-SAC data entry](https://github.com/GSA-TTS/FAC/issues/185)
 * (DONE ✅) [API for accessing general SF-SAC Data](https://github.com/GSA-TTS/FAC/issues/355)
 * (50% ✅) [Audit permissions](https://github.com/GSA-TTS/FAC/issues/332) and [my audit submissions](https://github.com/GSA-TTS/FAC/issues/343) page
-* (50% ✅) [PDR/ADR - Excel file ingest](https://github.com/GSA-TTS/FAC/issues/328)
+* (DONE ✅) [PDR/ADR - Excel file generation](https://github.com/GSA-TTS/FAC/issues/328)
 * (DONE ✅) [PDR/ADR - File Upload storage](https://github.com/GSA-TTS/FAC/issues/328)
 
 ## Milestone 3: Federal awards, Excel upload patterns
@@ -70,14 +70,14 @@ While the current FAC allows users to submit form data and excel files, it's mos
 * [(design/research) webforms in addition to excel](https://github.com/GSA-TTS/FAC/issues/447)
 
 
-## Milestone: Submit an entire SF-SAC
+## Milestone 4: Submit an entire SF-SAC
 
 **Value delivered:**
 Now that auditees have filled out basic information about their audit submission, they need to be able to submit the audit itself. It's important to validate excel files and PDF uploads to reduce the chance of submitting an incomplete audit, which consumes time of both government staff and auditee staff. 
 
 NOTE: This might be multiple milestones depending on how Milestone 3 goes. 
 
-**Specific deliverables:**
+**Specific deliverables: (full list [here](https://github.com/GSA-TTS/FAC/milestone/14))**
 * [SF-FAC section page heading](https://github.com/GSA-TTS/FAC/issues/445)
 * [Notes to SEFA screen](https://github.com/GSA-TTS/FAC/issues/406) (placeholder)
 * [Audit Information screen](https://github.com/GSA-TTS/FAC/issues/214) (form)
@@ -89,16 +89,16 @@ NOTE: This might be multiple milestones depending on how Milestone 3 goes.
 * Finalize / Check for errors
 
 
-## Milestone: Upload and Certify audit package
+## Milestone 5: Upload and finalize audit package
 
 **Value delivered:**
-The last steps for the auditee/auditor flow is to upload and certify the audit package for submission. 
+The last steps for the auditee/auditor flow is to upload and finalize the audit package for submission. 
 
-**Specific deliverables:**
+**Specific deliverables: (full list [here](https://github.com/GSA-TTS/FAC/milestone/15)**
 * [Audit Start page](https://github.com/GSA-TTS/FAC/issues/212)
 * ["Single audit reporting package upload" page](https://github.com/GSA-TTS/FAC/issues/360)
 * [Single audit reporting package upload](https://github.com/GSA-TTS/FAC/issues/404)
-* [Auditee/Auditor audit certification](https://github.com/GSA-TTS/FAC/issues/319)
+* [Manage user access screen](https://github.com/GSA-TTS/FAC/issues/499)
 * [PDR - Automated audit processing](https://github.com/GSA-TTS/FAC/issues/329)
   * Option 1: "Process" audits in the new FAC, send them to "dissemination pipeline" of Census FAC
   * Option 2: "Process" audits in the old FAC, send them to "processing pipeline" of Census FAC
@@ -108,21 +108,21 @@ The last steps for the auditee/auditor flow is to upload and certify the audit p
   * Option 2: No validation / incomplete validation
     * Risk: Could lead to more audit churn if they are uploaded in an unusable state
 
-## Milestone: Status and user business logic
+## Milestone 6: Auit certification and processing
 
 **Value delivered:**
-Now that an auditee has submitted an audit, we need to communicate what's next for them. That includes a system to communicate audit status via confirmation and update emails as well as an audit status dashboard. If an audit has errors or is incomplete, auditees and auditors need clear instructions on how to resubmit. Status is important because it it triggers when an audit submission is ready to be certified / changes how specific users who have the authority to "certify" can act on the audit. Notifications are also critical because they trigger other people who need to certify/do things with the audit submission in order for it to be submitted/made public to actually go in and do those things.
+The last step in the process is for the auditor and auditee and communicate what's next for them. That includes a system to communicate audit status via confirmation and update emails as well as an audit status dashboard. If an audit has errors or is incomplete, auditees and auditors need clear instructions on how to resubmit. Status is important because it it triggers when an audit submission is ready to be certified / changes how specific users who have the authority to "certify" can act on the audit. Notifications are also critical because they trigger other people who need to certify/do things with the audit submission in order for it to be submitted/made public to actually go in and do those things.
 
-**Specific deliverables:**
-* Invite collaborator flow (send / accept invites)
-* Possible - roles for certification
+**Specific deliverables: (full list [here](https://github.com/GSA-TTS/FAC/milestone/16)**
+* [Auditee/Auditor audit certification](https://github.com/GSA-TTS/FAC/issues/319)
+* Audit processing, error messages
 * Status notifications / state machine
 * Email notifications (collaborator invite, status change notifications, etc)
 * Invalid resubmission flow, resubmission workaround for user-generated revisions
 * (80% ✅) Homepage with linking to the old Census FAC where appropriate to provide a path to the full FAC experience
 
 
-## Milestone: Backend + Support
+## Milestone 7: Backend + Support
 
 **Value delivered:**
 Audit data needs to be disseminated to auditors and the general public. The easiest way to do this is to provide a pathway to transfer data to the original FAC to have the data dissemination take place there. In order to avoid building a complicated and temporary two-way sync, we need to provide auditors access to a simple backend to the new FAC to update audit status. 
@@ -135,7 +135,7 @@ Audit data needs to be disseminated to auditors and the general public. The easi
 * Basic frontend analytics / DAP integration
 
 
-## Milestone: Initial release
+## Milestone 8: Initial release
 
 **Value delivered:**
 The general public gets to use the new, more accessible FAC. The FAC product gets its first live feedback. 
@@ -148,7 +148,7 @@ The general public gets to use the new, more accessible FAC. The FAC product get
     * Unknowns here for cross agency coordination
 
 
-## Milestone: Agency data dissemination
+## Milestone 9: Agency data dissemination
 
 **Value delivered:** In order for agencies to get information out of the FAC, they need a structured way to receive audits. The Census FAC has customized integrations for key agencies like HHS and ED, which we will no longer support. However, we will have an API that lets them build their own integration. 
 
@@ -158,7 +158,7 @@ The general public gets to use the new, more accessible FAC. The FAC product get
 * Advise on change management efforts with key agencies as needed
 
 
-## Milestone: Public data dissemination
+## Milestone 10: Public data dissemination
 
 **Value delivered:** In order for the general public to get information out of the FAC, they need to be able to be able to search/filter audits as well as export data via CSV
 
@@ -167,7 +167,7 @@ The general public gets to use the new, more accessible FAC. The FAC product get
 * Download lists of audits via CSV
 
 
-## Milestone: Accommodate and transfer old-FAC data
+## Milestone 11: Accommodate and transfer old-FAC data
 
 **Value delivered:** Needed in order to fully replace the Census FAC. Auditors only have to use one system. Auditees and interested members of the public are not confused by having two websites. 
 
@@ -178,7 +178,7 @@ The general public gets to use the new, more accessible FAC. The FAC product get
 * Copying over FAQ’s and other pages
 
 
-## Milestone: Data integrity / flexibility
+## Milestone 12: Data integrity / flexibility
 
 **Value delivered:** For auditors, we can help flag potential issues with automated-post submission verification and also allow for form changes over time. For auditees, we can allow them to correct specific things in their revision without needing to submit an entirely new one. 
 
@@ -188,7 +188,7 @@ The general public gets to use the new, more accessible FAC. The FAC product get
 * User-submitted revisions to an audit package
 
 
-## Milestone: Submission enhancements
+## Milestone 13: Submission enhancements
 
 **Value delivered:** Make it easier for government users to log in via Max. Make it easier for less complicated auditee use cases by letting them input data into forms. Potentially other enhancements prioritized by user research. 
 
@@ -202,7 +202,7 @@ Delivery options
 
 ## Option 1: Two major releases: MVP and full functionality
 
-**Overview:** Launch a new FAC intake experience sooner for at least some of current customers on or around 1/1/2023 to begin accepting audits. Per the discussed and approved [migration plan](https://github.com/GSA-TTS/FAC/blob/main/docs/product/decisions/0004-P-migration-plan.md), the idea is to keep the old Census FAC running and import new submissions into that for data dissemination. 
+**Overview:** Launch a new FAC intake experience sooner for at least some of current customers on or around 4/1/2023 to begin accepting audits. Per the discussed and approved [migration plan](https://github.com/GSA-TTS/FAC/blob/main/docs/product/decisions/0004-P-migration-plan.md), the idea is to keep the old Census FAC running and import new submissions into that for data dissemination. 
 
 **Benefits:** Soonest path to an initial public release, which will help us learn more quickly and break up overall product risk into multiple releases
 
@@ -216,7 +216,7 @@ Delivery options
 1. Upload and Certify audit package
 1. Status and user business logic
 1. Backend + Support + Data Transfer
-1. **Initial release** (MVP)
+1. **ATO/Launch for “data intake” MVP**
 1. Agency data dissemination
 1. Public data dissemination
 1. Accommodate and transfer old-FAC data
