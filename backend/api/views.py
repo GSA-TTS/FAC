@@ -192,7 +192,7 @@ class AccessAndSubmissionView(APIView):
             request.user.profile.entry_form_data = {}
             request.user.profile.save()
 
-            return Response({"sac_id": sac.id, "next": "TBD"})
+            return Response({"report_id": sac.report_id, "next": "TBD"})
 
         return Response({"errors": serializer.errors})
 

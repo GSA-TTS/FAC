@@ -385,7 +385,7 @@ class AccessAndSubmissionTests(TestCase):
         )
         data = response.json()
 
-        sac = SingleAuditChecklist.objects.get(id=data["sac_id"])
+        sac = SingleAuditChecklist.objects.get(report_id=data["report_id"])
 
         creator_access = Access.objects.get(sac=sac, role="creator")
         certifying_auditee_contact_access = Access.objects.get(
@@ -421,7 +421,7 @@ class AccessAndSubmissionTests(TestCase):
         )
         data = response.json()
 
-        sac = SingleAuditChecklist.objects.get(id=data["sac_id"])
+        sac = SingleAuditChecklist.objects.get(report_id=data["report_id"])
 
         auditee_contacts = (
             Access.objects.filter(sac=sac, role="auditee_contact")
@@ -504,7 +504,7 @@ class SACCreationTests(TestCase):
             next_step, access_and_submission_data, format="json"
         )
         data = response.json()
-        sac = SingleAuditChecklist.objects.get(id=data["sac_id"])
+        sac = SingleAuditChecklist.objects.get(report_id=data["report_id"])
         self.assertEqual(sac.submitted_by, self.user)
         self.assertEqual(sac.auditee_uei, "ZQGGHJH74DW7")
         self.assertEqual(sac.submission_status, "in_progress")
@@ -561,7 +561,7 @@ class SingleAuditChecklistViewTests(TestCase):
             next_step, access_and_submission_data, format="json"
         )
         data = response.json()
-        sac = SingleAuditChecklist.objects.get(id=data["sac_id"])
+        sac = SingleAuditChecklist.objects.get(report_id=data["report_id"])
         response = self.client.get(self.path(sac.report_id))
         full_data = response.json()
         for key, value in access_and_submission_data.items():
