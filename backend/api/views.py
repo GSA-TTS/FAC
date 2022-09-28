@@ -317,11 +317,12 @@ class SacFederalAwardsView(APIView):
 
         # Note this is a placeholder, so we're not returning anything yet.
 
-        # try:
-        #     sac = SingleAuditChecklist.objects.get(report_id=report_id)
-        # except SingleAuditChecklist.DoesNotExist as e:
-        #     raise Http404() from e
-        # self.check_object_permissions(request, sac)
+        try:
+            sac = SingleAuditChecklist.objects.get(report_id=report_id)
+        except SingleAuditChecklist.DoesNotExist as e:
+            raise Http404() from e
+            
+        self.check_object_permissions(request, sac)
 
         # To do: Get federal awards info here
 
