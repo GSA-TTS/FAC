@@ -873,11 +873,11 @@ class SacFederalAwardsViewTests(TestCase):
 
         # Report details to be used for tests
         self.sac_data = response.json()
-        self.sac_report_id = self.sac_data["sac_id"]
+        self.sac_report_id = self.sac_data["report_id"]
 
     def path(self, report_id):
         """Convenience method to get the path for a report_id)"""
-        return reverse("sacfederalawards", kwargs={"report_id": self.sac_report_id})
+        return reverse("sacfederalawards", kwargs={"report_id": report_id})
 
     def test_get_authentication_required(self):
         """
@@ -894,9 +894,8 @@ class SacFederalAwardsViewTests(TestCase):
         If a user doesn't have an Access object for the SAC, they should get a
         403.
         """
-        user = baker.make(User)
+        
         sac = baker.make(SingleAuditChecklist)
-        # sac.submitted_by = user
 
         response = self.client.get(self.path(sac.report_id))
         self.assertEqual(response.status_code, 403)
