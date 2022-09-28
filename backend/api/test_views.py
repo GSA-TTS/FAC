@@ -879,7 +879,29 @@ class SacFederalAwardsViewTests(TestCase):
         """Convenience method to get the path for a report_id)"""
         return reverse("sacfederalawards", kwargs={"report_id": self.sac_report_id})
 
-    def test_get_placeholder_data(self):
+    def test_get_authentication_required(self):
+        """
+        If a request is not authenticated, it should be rejected with a 401
+        """
+
+        # use a different client that doesn't authenticate
+        client = APIClient()
+        response = client.get(self.path(self.sac_report_id), format="json")
+        self.assertEqual(response.status_code, 401)
+
+    def test_get_no_audit_awards_access(self):
+        """
+        If a user doesn't have an Access object for the SAC, they should get a
+        403.
+        """
+        user = baker.make(User)
+        sac = baker.make(SingleAuditChecklist)
+        # sac.submitted_by = user
+
+        response = self.client.get(self.path(sac.report_id))
+        self.assertEqual(response.status_code, 403)
+
+    def test_get_valid_placeholder_data(self):
         """
         If the federal awards endpoint is hit, (for now) it should return an empty object
         """
