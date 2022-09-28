@@ -115,6 +115,7 @@ The last step in the process is for the auditor and auditee to communicate what'
 
 **Specific deliverables: (full list [here](https://github.com/GSA-TTS/FAC/milestone/16)**
 * [Auditee/Auditor audit certification](https://github.com/GSA-TTS/FAC/issues/319)
+* [Audit Submission](https://github.com/GSA-TTS/FAC/issues/503)
 * Audit processing, error messages
 * Status notifications / state machine
 * Email notifications (collaborator invite, status change notifications, etc)
