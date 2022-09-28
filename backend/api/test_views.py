@@ -894,7 +894,7 @@ class SacFederalAwardsViewTests(TestCase):
         If a user doesn't have an Access object for the SAC, they should get a
         403.
         """
-        
+
         sac = baker.make(SingleAuditChecklist)
 
         response = self.client.get(self.path(sac.report_id))
