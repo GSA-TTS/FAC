@@ -111,7 +111,7 @@ The last steps for the auditee/auditor flow is to upload and finalize the audit 
 ## Milestone 6: Audit certification and processing
 
 **Value delivered:**
-The last step in the process is for the auditor and auditee and communicate what's next for them. That includes a system to communicate audit status via confirmation and update emails as well as an audit status dashboard. If an audit has errors or is incomplete, auditees and auditors need clear instructions on how to resubmit. Status is important because it it triggers when an audit submission is ready to be certified / changes how specific users who have the authority to "certify" can act on the audit. Notifications are also critical because they trigger other people who need to certify/do things with the audit submission in order for it to be submitted/made public to actually go in and do those things.
+The last step in the process is for the auditor and auditee to communicate what's next for them. That includes a system to communicate audit status via confirmation and update emails as well as an audit status dashboard. If an audit has errors or is incomplete, auditees and auditors need clear instructions on how to resubmit. Status is important because it it triggers when an audit submission is ready to be certified / changes how specific users who have the authority to "certify" can act on the audit. Notifications are also critical because they trigger other people who need to certify/do things with the audit submission in order for it to be submitted/made public to actually go in and do those things.
 
 **Specific deliverables: (full list [here](https://github.com/GSA-TTS/FAC/milestone/16)**
 * [Auditee/Auditor audit certification](https://github.com/GSA-TTS/FAC/issues/319)
