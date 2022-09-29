@@ -192,7 +192,7 @@ class AccessAndSubmissionView(APIView):
             request.user.profile.entry_form_data = {}
             request.user.profile.save()
 
-            return Response({"sac_id": sac.id, "next": "TBD"})
+            return Response({"report_id": sac.report_id, "next": "TBD"})
 
         return Response({"errors": serializer.errors})
 
@@ -300,6 +300,33 @@ class SingleAuditChecklistView(APIView):
         base_data = dict(SingleAuditChecklistSerializer(sac).data.items())
         full_data = base_data | get_role_emails_for_sac(sac.id)
         return JsonResponse(full_data)
+
+
+class SacFederalAwardsView(APIView):
+    """
+    Accepts and returns data for a SAC's federal awards section
+    """
+
+    permission_classes = [SingleAuditChecklistPermission]
+
+    def get(self, request, report_id):
+        """
+        Get the SAC by report_id and return the federal award section in JSON format.
+        Return 404 if it doesn't exist.
+        """
+
+        # Note this is a placeholder, so we're not returning anything yet.
+
+        try:
+            sac = SingleAuditChecklist.objects.get(report_id=report_id)
+        except SingleAuditChecklist.DoesNotExist as e:
+            raise Http404() from e
+
+        self.check_object_permissions(request, sac)
+
+        # To do: Get federal awards info here
+
+        return JsonResponse({})
 
 
 class SubmissionsView(APIView):
