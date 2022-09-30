@@ -214,3 +214,5 @@ if key_service and key_service.credentials:
     SAM_API_KEY = key_service.credentials.get("SAM_API_KEY")
 else:
     SAM_API_KEY = os.environ.get("SAM_API_KEY")
+
+SCHEMAS_DIR = os.path.join("audit", "schemas")

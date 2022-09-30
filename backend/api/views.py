@@ -1,10 +1,12 @@
 import json
+import os
 from typing import List
 
 from audit.models import Access, SingleAuditChecklist
 from audit.permissions import SingleAuditChecklistPermission
 from django.http import Http404
 from django.urls import reverse
+from config.settings import SCHEMAS_DIR
 from rest_framework import viewsets
 from rest_framework.authentication import BaseAuthentication
 from rest_framework.permissions import BasePermission
@@ -334,3 +336,20 @@ class AccessListView(APIView):
         serializer = AccessListSerializer(accesses, many=True)
 
         return Response(serializer.data)
+
+
+class SchemaView(APIView):
+    """
+    Returns the JSON schema for the specified fiscal year
+    """
+
+    def get(self, _, fiscal_year, type):
+        filename = os.path.join(SCHEMAS_DIR, f"{fiscal_year}-{type}.json")
+
+        exists = os.path.exists(filename)
+        if not exists:
+            raise Http404()
+
+        with open(filename, "r") as file:
+            schema = json.load(file)
+            return JsonResponse(schema)

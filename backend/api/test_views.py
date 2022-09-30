@@ -1120,3 +1120,70 @@ class SACViewSetTests(TestCase):
                     response = self.client.get(url)
 
                     self.assertEqual(response.status_code, 404)
+
+
+class SchemaViewTests(TestCase):
+    def setUp(self):
+        self.fiscal_years = [
+            "2023",
+        ]
+
+        self.schema_types = [
+            "metadata",
+        ]
+
+        self.user = baker.make(User)
+        self.client = APIClient()
+        self.client.force_authenticate(user=self.user)
+
+    def path(self, fiscal_year, type):
+        """Convenience method to get the path for a particular year and schema type)"""
+        return reverse(
+            "schemas", kwargs={"fiscal_year": fiscal_year, "type": type}
+        )
+
+    def test_authentication_required(self):
+        """
+        If a request is not authenticated, it should be rejected with a 401
+        """
+
+        # use a different client that doesn't authenticate
+        client = APIClient()
+
+        response = client.get(self.path("2023", "metadata"), format="json")
+
+        self.assertEqual(response.status_code, 401)
+
+    def test_valid_fy_valid_type_returns_schema(self):
+        """
+        Requests for valid combinations of fiscal_year and type return a schema
+        """
+        for fiscal_year in self.fiscal_years:
+            for schema_type in self.schema_types:
+                with self.subTest():
+                    url = self.path(fiscal_year, schema_type)
+                    response = self.client.get(url)
+
+                    self.assertEqual(response.status_code, 200)
+
+    def test_invalid_fy_returns_404(self):
+        """
+        Requests for an invalid fiscal_year return a 404
+        """
+        for schema_type in self.schema_types:
+            with self.subTest():
+                url = self.path("1899", schema_type)
+                response = self.client.get(url)
+
+                self.assertEqual(response.status_code, 404)
+
+    def test_invalid_type_returns_404(self):
+        """
+        Requests for an invalid type return a 404
+        """
+        for fiscal_year in self.fiscal_years:
+            with self.subTest():
+                url = self.path(fiscal_year, "not-a-valid-type")
+                response = self.client.get(url)
+
+                self.assertEqual(response.status_code, 404)
