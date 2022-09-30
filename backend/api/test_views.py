@@ -1208,9 +1208,7 @@ class SchemaViewTests(TestCase):
 
     def path(self, fiscal_year, type):
         """Convenience method to get the path for a particular year and schema type)"""
-        return reverse(
-            "schemas", kwargs={"fiscal_year": fiscal_year, "type": type}
-        )
+        return reverse("schemas", kwargs={"fiscal_year": fiscal_year, "type": type})
 
     def test_authentication_required(self):
         """
