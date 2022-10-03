@@ -370,6 +370,10 @@ class SchemaView(APIView):
     Returns the JSON schema for the specified fiscal year
     """
 
+    # this is a public endpoint - no authentication or permission required
+    authentication_classes: List[BaseAuthentication] = []
+    permission_classes: List[BasePermission] = []
+
     def get(self, _, fiscal_year, type):
         filename = os.path.join(SCHEMAS_DIR, f"{fiscal_year}-{type}.json")
 

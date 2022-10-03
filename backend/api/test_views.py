@@ -1202,25 +1202,11 @@ class SchemaViewTests(TestCase):
             "metadata",
         ]
 
-        self.user = baker.make(User)
         self.client = APIClient()
-        self.client.force_authenticate(user=self.user)
 
     def path(self, fiscal_year, type):
         """Convenience method to get the path for a particular year and schema type)"""
         return reverse("schemas", kwargs={"fiscal_year": fiscal_year, "type": type})
-
-    def test_authentication_required(self):
-        """
-        If a request is not authenticated, it should be rejected with a 401
-        """
-
-        # use a different client that doesn't authenticate
-        client = APIClient()
-
-        response = client.get(self.path("2023", "metadata"), format="json")
-
-        self.assertEqual(response.status_code, 401)
 
     def test_valid_fy_valid_type_returns_schema(self):
         """
