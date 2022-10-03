@@ -1,0 +1,23 @@
+{
+  "FederalAwards": {
+    "auditee_ein": "whatever",
+    "total_amount_expended": "",
+    "federal_awards": [
+      {
+        "federal_agency_prefix": "a",
+        "cfda_three_digit_extension": "zxcv",
+        "federal_program_name": "GACC",
+        "amount_expended": "",
+        "cluster_name": "",
+        "loan_or_loan_guarantee": "N",
+        "loan_balance_at_audit_period_end": null,
+        "direct_award": "N",
+        "direct_award_pass_through_entity": "Bob",
+        "federal_award_passed_to_subrecipients": "Y",
+        "federal_award_passed_to_subrecipients_amount": "10",
+        "major_program": "N",
+        "number_of_audit_findings": 0
+      }
+    ]
+  }
+}

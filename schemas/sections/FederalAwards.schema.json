@@ -1,0 +1,255 @@
+{
+  "$defs": {
+    "AuditPeriod": {
+      "description": "",
+      "enum": ["annual", "biennial"],
+      "title": "AuditPeriod",
+      "type": "string"
+    },
+    "AuditType": {
+      "description": "",
+      "enum": ["single-audit", "program-specific", "acee"],
+      "title": "AuditType",
+      "type": "string"
+    },
+    "LoanBalanceNonAnswers": {
+      "description": "If loan_or_loan_guarantee is N, these are valid responses to loan_balance_at_audit_period_end.",
+      "enum": ["", 0, null],
+      "title": "LoanBalanceNonAnswers"
+    },
+    "DirectAwardPassThroughNonAnswers": {
+      "description": "If direct_award is Y, these are valid responses to direct_award_pass_through_entity and direct_award_pass_through_id_number.",
+      "enum": ["", null],
+      "title": "DirectAwardPassThroughNonAnswers"
+    },
+    "FederalAwardEntry": {
+      "additionalProperties": false,
+      "description": "",
+      "properties": {
+        "additional_award_identification": {
+          "type": "string"
+        },
+        "amount_expended": {
+          "type": "string"
+        },
+        "cfda_three_digit_extension": {
+          "type": "string"
+        },
+        "cluster_name": {
+          "type": "string"
+        },
+        "cluster_total": {
+          "type": "string"
+        },
+        "direct_award": {
+          "$ref": "#/$defs/YorN"
+        },
+        "direct_award_pass_through_entity": {},
+        "direct_award_pass_through_id_number": {},
+        "federal_agency_prefix": {
+          "type": "string"
+        },
+        "federal_award_passed_to_subrecipients": {
+          "$ref": "#/$defs/YorN"
+        },
+        "federal_award_passed_to_subrecipients_amount": {
+          "type": "string"
+        },
+        "federal_program_name": {
+          "type": "string"
+        },
+        "federal_program_total": {
+          "type": "string"
+        },
+        "loan_balance_at_audit_period_end": {},
+        "loan_or_loan_guarantee": {
+          "$ref": "#/$defs/YorN"
+        },
+        "major_program": {
+          "$ref": "#/$defs/YorN"
+        },
+        "major_program_audit_report_type": {
+          "$ref": "#/$defs/MajorProgramAuditReportType"
+        },
+        "number_of_audit_findings": {
+          "type": "integer"
+        },
+        "other_cluster_name": {
+          "type": "string"
+        },
+        "state_cluster_name": {
+          "type": "string"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": { "loan_or_loan_guarantee": { "const": "Y" } }
+          },
+          "then": {
+            "properties": {
+              "loan_balance_at_audit_period_end": {
+                "type": "integer",
+                "minLength": 1
+              }
+            },
+            "required": ["loan_balance_at_audit_period_end"]
+          }
+        },
+        {
+          "if": {
+            "properties": { "loan_or_loan_guarantee": { "const": "N" } }
+          },
+          "then": {
+            "properties": {
+              "loan_balance_at_audit_period_end": {
+                "$ref": "#/$defs/LoanBalanceNonAnswers"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": { "direct_award": { "const": "N" } }
+          },
+          "then": {
+            "required": ["direct_award_pass_through_entity"],
+            "properties": {
+              "direct_award_pass_through_entity": {
+                "type": "string"
+              },
+              "direct_award_pass_through_id_number": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": { "direct_award": { "const": "Y" } }
+          },
+          "then": {
+            "properties": {
+              "direct_award_pass_through_entity": {
+                "$ref": "#/$defs/DirectAwardPassThroughNonAnswers"
+              },
+              "direct_award_pass_through_id_number": {
+                "$ref": "#/$defs/DirectAwardPassThroughNonAnswers"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "federal_award_passed_to_subrecipients": { "const": "Y" }
+            }
+          },
+          "then": {
+            "required": ["federal_award_passed_to_subrecipients_amount"]
+          }
+        },
+        {
+          "if": {
+            "properties": { "major_program": { "const": "Y" } }
+          },
+          "then": {
+            "required": ["major_program_audit_report_type"]
+          }
+        }
+      ],
+      "required": [
+        "federal_agency_prefix",
+        "cfda_three_digit_extension",
+        "federal_program_name",
+        "amount_expended",
+        "cluster_name",
+        "loan_or_loan_guarantee",
+        "direct_award",
+        "federal_award_passed_to_subrecipients",
+        "major_program",
+        "number_of_audit_findings"
+      ],
+      "title": "FederalAwardEntry",
+      "type": "object"
+    },
+    "FederalAwards": {
+      "additionalProperties": false,
+      "description": "",
+      "properties": {
+        "auditee_ein": {
+          "type": "string"
+        },
+        "federal_awards": {
+          "items": {
+            "$ref": "#/$defs/FederalAwardEntry"
+          },
+          "type": "array"
+        },
+        "total_amount_expended": {
+          "type": "string"
+        }
+      },
+      "required": ["auditee_ein", "total_amount_expended"],
+      "title": "FederalAwards",
+      "type": "object"
+    },
+    "MajorProgramAuditReportType": {
+      "description": "",
+      "enum": ["U", "Q", "A", "D"],
+      "title": "MajorProgramAuditReportType",
+      "type": "string"
+    },
+    "OrganizationType": {
+      "description": "",
+      "enum": [
+        "state",
+        "local",
+        "tribal",
+        "higher-ed",
+        "non-profit",
+        "unknown",
+        "none"
+      ],
+      "title": "OrganizationType",
+      "type": "string"
+    },
+    "SubmissionStatus": {
+      "description": "",
+      "enum": ["in_progress", "submitted", "received", "available"],
+      "title": "SubmissionStatus",
+      "type": "string"
+    },
+    "TreeRoot": {
+      "additionalProperties": false,
+      "description": "Container thing",
+      "properties": {
+        "FederalAwards": {
+          "$ref": "#/$defs/FederalAwards"
+        }
+      },
+      "required": ["FederalAwards"],
+      "title": "TreeRoot",
+      "type": "object"
+    },
+    "YorN": {
+      "description": "",
+      "enum": ["Y", "N"],
+      "title": "YorN",
+      "type": "string"
+    }
+  },
+  "$id": "http://example.org/federalawards",
+  "$schema": "http://json-schema.org/draft/2019-09/schema#",
+  "additionalProperties": true,
+  "metamodel_version": "1.7.0",
+  "properties": {
+    "FederalAwards": {
+      "$ref": "#/$defs/FederalAwards"
+    }
+  },
+  "required": ["FederalAwards"],
+  "title": "federalawards",
+  "type": "object",
+  "version": null
+}
