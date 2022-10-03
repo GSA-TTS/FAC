@@ -59,5 +59,10 @@ urlpatterns = [
         views.AccessListView.as_view(),
         name="access-list",
     ),
+    path(
+        "schemas/<str:fiscal_year>/<str:type>",
+        views.SchemaView.as_view(),
+        name="schemas",
+    ),
     path(settings.ADMIN_URL, admin.site.urls),
 ]
