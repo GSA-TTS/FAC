@@ -35,3 +35,11 @@ lint:
 # Run Django tests:
 test:
 	@python -m coverage run --source="." manage.py test && coverage report -m --fail-under=99
+
+# Run Django tests with no coverage and with scoping
+# e.g. just the audit/test_models.py tests:
+#     make nctest fac.test.scope=audit.test_models"
+# or all tests with no coverage:
+#     make nctest
+nctest:
+	@python -m coverage run --source="." manage.py test ${fac.test.scope}
