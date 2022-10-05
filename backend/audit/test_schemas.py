@@ -71,3 +71,64 @@ class SchemaValidityTest(SimpleTestCase):
             "loan_balance_at_audit_period_end"
         ] = 10_000
         self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
+
+    def test_loan_dependents(self):
+        """
+        If loan_or_loan_guarantee is Y, loan_balance_at_audit_period_end must
+        have a value.
+        """
+        schema = self.FEDERAL_AWARDS_SCHEMA
+
+        simple_case = jsoncopy(self.SIMPLE_CASE)
+        award = jsoncopy(simple_case["FederalAwards"]["federal_awards"][0])
+
+        both_pass = award | {
+            "loan_or_loan_guarantee": "Y",
+            "loan_balance_at_audit_period_end": 10_000,
+        }
+        simple_case["FederalAwards"]["federal_awards"] = [both_pass]
+
+        validate(simple_case, schema)
+
+        no_dependent_fail = award | {"loan_or_loan_guarantee": "Y"}
+        simple_case["FederalAwards"]["federal_awards"] = [no_dependent_fail]
+
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
+
+        no_balance_fail = award | {"loan_balance_at_audit_period_end": 10_000}
+        simple_case["FederalAwards"]["federal_awards"] = [no_balance_fail]
+
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
+
+    def test_direct_award_dependents(self):
+        """
+        If direct_award is Y, loan_balance_at_audit_period_end must
+        have a value.
+        """
+        schema = self.FEDERAL_AWARDS_SCHEMA
+
+        simple_case = jsoncopy(self.SIMPLE_CASE)
+        award = jsoncopy(simple_case["FederalAwards"]["federal_awards"][0])
+
+        both_pass = award | {
+            "direct_award": "N",
+            "direct_award_pass_through_entity": "Bob",
+        }
+        simple_case["FederalAwards"]["federal_awards"] = [both_pass]
+
+        validate(simple_case, schema)
+
+        no_dependent_fail = award | {"direct_award": "N"}
+        simple_case["FederalAwards"]["federal_awards"] = [no_dependent_fail]
+
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
+
+        no_balance_fail = award | {"direct_award_pass_through_entity": 10_000}
+        simple_case["FederalAwards"]["federal_awards"] = [no_balance_fail]
+
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
+
+        no_balance_fail_id_number = award | {"direct_award_pass_through_id_number": "IDWITHLETTERS"}
+        simple_case["FederalAwards"]["federal_awards"] = [no_balance_fail_id_number]
+
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
