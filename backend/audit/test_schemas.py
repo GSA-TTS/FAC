@@ -95,8 +95,8 @@ class SchemaValidityTest(SimpleTestCase):
 
         self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
-        no_balance_fail = award | {"loan_balance_at_audit_period_end": 10_000}
-        simple_case["FederalAwards"]["federal_awards"] = [no_balance_fail]
+        only_dependent_fail = award | {"loan_balance_at_audit_period_end": 10_000}
+        simple_case["FederalAwards"]["federal_awards"] = [only_dependent_fail]
 
         self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
@@ -123,12 +123,76 @@ class SchemaValidityTest(SimpleTestCase):
 
         self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
-        no_balance_fail = award | {"direct_award_pass_through_entity": 10_000}
-        simple_case["FederalAwards"]["federal_awards"] = [no_balance_fail]
+        only_dependent_fail = award | {"direct_award_pass_through_entity": 10_000}
+        simple_case["FederalAwards"]["federal_awards"] = [only_dependent_fail]
 
         self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
-        no_balance_fail_id_number = award | {"direct_award_pass_through_id_number": "IDWITHLETTERS"}
-        simple_case["FederalAwards"]["federal_awards"] = [no_balance_fail_id_number]
+        only_dependent_fail_id_number = award | {"direct_award_pass_through_id_number": "IDWITHLETTERS"}
+        simple_case["FederalAwards"]["federal_awards"] = [only_dependent_fail_id_number]
+
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
+
+    def test_passthrough_dependents(self):
+        """
+        If federal_award_passed_to_subrecipients is Y,
+        federal_award_passed_to_subrecipients_amount must have a value.
+        """
+        schema = self.FEDERAL_AWARDS_SCHEMA
+
+        simple_case = jsoncopy(self.SIMPLE_CASE)
+        award = jsoncopy(simple_case["FederalAwards"]["federal_awards"][0])
+
+        both_pass = award | {
+            "federal_award_passed_to_subrecipients": "Y",
+            "federal_award_passed_to_subrecipients_amount": 10_000,
+        }
+        simple_case["FederalAwards"]["federal_awards"] = [both_pass]
+
+        validate(simple_case, schema)
+
+        no_dependent_fail = award | {"federal_award_passed_to_subrecipients": "Y"}
+        simple_case["FederalAwards"]["federal_awards"] = [no_dependent_fail]
+
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
+
+        only_dependent_fail = award | {"federal_award_passed_to_subrecipients_amount": 10_000}
+        simple_case["FederalAwards"]["federal_awards"] = [only_dependent_fail]
+
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
+
+    def test_major_program_dependents(self):
+        """
+        If major_program is Y,
+        major_program_audit_report_type must have a value.
+        """
+        schema = self.FEDERAL_AWARDS_SCHEMA
+
+        simple_case = jsoncopy(self.SIMPLE_CASE)
+        award = jsoncopy(simple_case["FederalAwards"]["federal_awards"][0])
+
+        both_pass = award | {
+            "major_program": "Y",
+            "major_program_audit_report_type": "U",
+        }
+        simple_case["FederalAwards"]["federal_awards"] = [both_pass]
+
+        validate(simple_case, schema)
+
+        invalid_fail = award | {
+            "major_program": "Y",
+            "major_program_audit_report_type": "Z",
+        }
+        simple_case["FederalAwards"]["federal_awards"] = [invalid_fail]
+
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
+
+        no_dependent_fail = award | {"major_program": "Y"}
+        simple_case["FederalAwards"]["federal_awards"] = [no_dependent_fail]
+
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
+
+        only_dependent_fail = award | {"major_program_audit_report_type": "U"}
+        simple_case["FederalAwards"]["federal_awards"] = [only_dependent_fail]
 
         self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)

@@ -17,10 +17,20 @@
       "enum": ["", 0, null],
       "title": "LoanBalanceNonAnswers"
     },
+    "FederalAwardPassThroughNonAnswers": {
+      "description": "If federal_award_passed_to_subrecipients is N, these are valid responses to federal_award_passed_to_subrecipients_amount.",
+      "enum": ["", 0, null],
+      "title": "LoanBalanceNonAnswers"
+    },
     "DirectAwardPassThroughNonAnswers": {
       "description": "If direct_award is Y, these are valid responses to direct_award_pass_through_entity and direct_award_pass_through_id_number.",
       "enum": ["", null],
       "title": "DirectAwardPassThroughNonAnswers"
+    },
+    "MajorProgramAuditTypeNonAnswers": {
+      "description": "If major_program is N, these are valid responses to major_program_audit_report_type.",
+      "enum": ["", null],
+      "title": "MajorProgramAuditTypeNonAnswers"
     },
     "FederalAwardEntry": {
       "additionalProperties": false,
@@ -52,9 +62,7 @@
         "federal_award_passed_to_subrecipients": {
           "$ref": "#/$defs/YorN"
         },
-        "federal_award_passed_to_subrecipients_amount": {
-          "type": "string"
-        },
+        "federal_award_passed_to_subrecipients_amount": {},
         "federal_program_name": {
           "type": "string"
         },
@@ -146,15 +154,55 @@
             }
           },
           "then": {
-            "required": ["federal_award_passed_to_subrecipients_amount"]
+            "required": ["federal_award_passed_to_subrecipients_amount"],
+            "properties": {
+              "federal_award_passed_to_subrecipients_amount": {
+                "type": "integer"
+              }
+            }
           }
         },
         {
           "if": {
-            "properties": { "major_program": { "const": "Y" } }
+            "properties": {
+              "federal_award_passed_to_subrecipients": { "const": "N" }
+            }
           },
           "then": {
-            "required": ["major_program_audit_report_type"]
+            "properties": {
+              "federal_award_passed_to_subrecipients_amount": {
+                "$ref": "#/$defs/FederalAwardPassThroughNonAnswers"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "major_program": { "const": "Y" }
+            }
+          },
+          "then": {
+            "required": ["major_program_audit_report_type"],
+            "properties": {
+              "major_program_audit_report_type": {
+                "$ref": "#/$defs/MajorProgramAuditReportType"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "major_program": { "const": "N" }
+            }
+          },
+          "then": {
+            "properties": {
+              "major_program_audit_report_type": {
+                "$ref": "#/$defs/MajorProgramAuditTypeNonAnswers"
+              }
+            }
           }
         }
       ],

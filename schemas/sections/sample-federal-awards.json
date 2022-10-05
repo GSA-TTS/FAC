@@ -13,8 +13,7 @@
         "loan_balance_at_audit_period_end": null,
         "direct_award": "N",
         "direct_award_pass_through_entity": "Bob",
-        "federal_award_passed_to_subrecipients": "Y",
-        "federal_award_passed_to_subrecipients_amount": "10",
+        "federal_award_passed_to_subrecipients": "N",
         "major_program": "N",
         "number_of_audit_findings": 0
       }
