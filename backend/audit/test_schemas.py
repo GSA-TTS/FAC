@@ -9,7 +9,7 @@ from jsonschema import exceptions, validate
 # references to things used by other tests:
 jsoncopy = lambda v: json.loads(json.dumps(v))
 
-SCHEMA_DIR = Path(__file__).parent.parent.parent / "schemas" / "sections"
+SCHEMA_DIR = Path(__file__).parent.parent / "schemas" / "sections"
 
 
 class SchemaValidityTest(SimpleTestCase):
