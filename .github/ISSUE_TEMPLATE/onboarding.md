@@ -24,8 +24,6 @@ Here's a few pointers to get you started as well as a checklist to make sure you
   - [ ] Practice deploying a [python application](https://github.com/cloud-gov/cf-hello-worlds/tree/main/python-flask) to Cloud.gov using the Cloud.gov command line interface (CLI): https://cloud.gov/docs/getting-started/your-first-deploy/.
   - [ ] Survey existing TTS projects which use Django+Cloud.gov like: [Tock](https://github.com/18F/tock) and the [DOJ CRT Portal](https://github.com/usdoj-crt/crt-portal).
 - [ ] (engineers) Get set up for [local development](https://github.com/GSA-TTS/FAC/blob/main/docs/development.md#local-development) so you can start contributing
-Work through the [engineering onboarding list](https://github.com/GSA-TTS/FAC#engineer-onboarding)
-
 
 {ONBOARDING BUDDY'S GH USERNAME} will be your onboarding buddy and will tackle the list below!
 
