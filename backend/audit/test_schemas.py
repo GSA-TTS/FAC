@@ -58,6 +58,28 @@ class SchemaValidityTest(SimpleTestCase):
 
         validate(self.SIMPLE_CASE, schema)
 
+    def test_missing_auditee_ein(self):
+        """
+        Test that validation fails if auditee_ein is missing
+        """
+        schema = self.FEDERAL_AWARDS_SCHEMA
+
+        simple_case = jsoncopy(self.SIMPLE_CASE)
+        del simple_case["FederalAwards"]["auditee_ein"]
+
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
+
+    def test_missing_total_amount_expended(self):
+        """
+        Test that validation fails if total_amount_expended is missing
+        """
+        schema = self.FEDERAL_AWARDS_SCHEMA
+
+        simple_case = jsoncopy(self.SIMPLE_CASE)
+        del simple_case["FederalAwards"]["total_amount_expended"]
+
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
+
     def test_simple_fail_with_extraneous(self):
         """
         Test the simplest Federal Award case; none of the conditional fields
