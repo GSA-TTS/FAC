@@ -1,7 +1,6 @@
 # Even though the schemas are not Django views or modules etc., we test them
 # here for CI/CD integration.
 import json
-from lib2to3.pgen2.literals import simple_escapes
 from pathlib import Path
 from django.test import SimpleTestCase
 from jsonschema import exceptions, validate
@@ -150,7 +149,9 @@ class SchemaValidityTest(SimpleTestCase):
 
         self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
-        only_dependent_fail_id_number = award | {"direct_award_pass_through_id_number": "IDWITHLETTERS"}
+        only_dependent_fail_id_number = award | {
+            "direct_award_pass_through_id_number": "IDWITHLETTERS"
+        }
         simple_case["FederalAwards"]["federal_awards"] = [only_dependent_fail_id_number]
 
         self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
@@ -178,7 +179,9 @@ class SchemaValidityTest(SimpleTestCase):
 
         self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
-        only_dependent_fail = award | {"federal_award_passed_to_subrecipients_amount": 10_000}
+        only_dependent_fail = award | {
+            "federal_award_passed_to_subrecipients_amount": 10_000
+        }
         simple_case["FederalAwards"]["federal_awards"] = [only_dependent_fail]
 
         self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
@@ -227,7 +230,9 @@ class SchemaValidityTest(SimpleTestCase):
         schema = self.FEDERAL_AWARDS_SCHEMA
 
         simple_case = jsoncopy(self.SIMPLE_CASE)
-        simple_case["FederalAwards"]["federal_awards"][0]["cluster_name"] = "State Cluster"
+        simple_case["FederalAwards"]["federal_awards"][0][
+            "cluster_name"
+        ] = "State Cluster"
 
         self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
@@ -239,7 +244,9 @@ class SchemaValidityTest(SimpleTestCase):
         schema = self.FEDERAL_AWARDS_SCHEMA
 
         simple_case = jsoncopy(self.SIMPLE_CASE)
-        simple_case["FederalAwards"]["federal_awards"][0]["state_cluster_name"] = "Not blank"
+        simple_case["FederalAwards"]["federal_awards"][0][
+            "state_cluster_name"
+        ] = "Not blank"
 
         self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
