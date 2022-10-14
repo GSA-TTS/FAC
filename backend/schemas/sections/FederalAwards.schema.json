@@ -2393,6 +2393,11 @@
       "enum": ["", null],
       "title": "MajorProgramAuditTypeNonAnswers"
     },
+    "StateClusterNameNonAnswers": {
+      "description": "If cluster_name is not 'State Cluster', these are valid responses to state_cluster_name.",
+      "enum": ["", null],
+      "title": "StateClusterNameNonAnswers"
+    },
     "FederalAwardEntry": {
       "additionalProperties": false,
       "description": "",
@@ -2559,6 +2564,23 @@
             "properties": {
               "major_program_audit_report_type": {
                 "$ref": "#/$defs/MajorProgramAuditTypeNonAnswers"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "cluster_name": { "const": "State Cluster" }
+            }
+          },
+          "then": {
+            "required": ["state_cluster_name"]
+          },
+          "else": {
+            "properties": {
+              "state_cluster_name": {
+                "$ref": "#/$defs/StateClusterNameNonAnswers"
               }
             }
           }
