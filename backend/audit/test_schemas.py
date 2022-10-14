@@ -27,8 +27,7 @@ class SchemaValidityTest(SimpleTestCase):
             "total_amount_expended": "",
             "federal_awards": [
                 {
-                    "federal_agency_prefix": "a",
-                    "cfda_three_digit_extension": "zxcv",
+                    "program_number": "10.001",
                     "federal_program_name": "GACC",
                     "amount_expended": "",
                     "cluster_name": "",
