@@ -30,7 +30,7 @@ class SchemaValidityTest(SimpleTestCase):
                     "program_number": "10.001",
                     "federal_program_name": "GACC",
                     "amount_expended": "",
-                    "cluster_name": "",
+                    "cluster_name": "N/A",
                     "loan_or_loan_guarantee": "N",
                     "direct_award": "Y",
                     "federal_award_passed_to_subrecipients": "N",
@@ -232,7 +232,7 @@ class SchemaValidityTest(SimpleTestCase):
         simple_case = jsoncopy(self.SIMPLE_CASE)
         simple_case["FederalAwards"]["federal_awards"][0][
             "cluster_name"
-        ] = "State Cluster"
+        ] = "STATE CLUSTER"
 
         self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 

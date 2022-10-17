@@ -2393,6 +2393,54 @@
       "enum": ["", null],
       "title": "MajorProgramAuditTypeNonAnswers"
     },
+    "ClusterName": {
+      "description": "Cluster Name",
+      "enum": [
+        "N/A",
+        "RESEARCH AND DEVELOPMENT",
+        "STUDENT FINANCIAL ASSISTANCE",
+        "STATE CLUSTER",
+        "477 CLUSTER",
+        "AGING CLUSTER",
+        "CCDF CLUSTER",
+        "CDBG - DISASTER RECOVERY GRANTS - PUB. L. NO. 113-2 CLUSTER",
+        "CDBG - ENTITLEMENT GRANTS CLUSTER",
+        "CDFI CLUSTER",
+        "CHILD NUTRITION CLUSTER",
+        "CLEAN WATER STATE REVOLVING FUND CLUSTER",
+        "COMMUNITY FACILITIES LOANS AND GRANTS CLUSTER",
+        "DISABILITY INSURANCE/SSI CLUSTER",
+        "DRINKING WATER STATE REVOLVING FUND CLUSTER",
+        "ECONOMIC DEVELOPMENT CLUSTER",
+        "EMPLOYMENT SERVICE CLUSTER",
+        "FEDERAL TRANSIT CLUSTER",
+        "FISH AND WILDLIFE CLUSTER",
+        "FOOD DISTRIBUTION CLUSTER",
+        "FOREIGN FOOD AID DONATION CLUSTER",
+        "FOREST SERVICE SCHOOLS AND ROADS CLUSTER",
+        "FOSTER GRANDPARENT/SENIOR COMPANION CLUSTER",
+        "HEAD START CLUSTER",
+        "HEALTH CENTER PROGRAM CLUSTER",
+        "HIGHWAY PLANNING AND CONSTRUCTION CLUSTER",
+        "HIGHWAY SAFETY CLUSTER",
+        "HOPE VI CLUSTER",
+        "HOUSING VOUCHER CLUSTER",
+        "HURRICANE SANDY RELIEF CLUSTER",
+        "MATERNAL, INFANT, AND EARLY CHILDHOOD HOME VISITING CLUSTER",
+        "MEDICAID CLUSTER",
+        "SCHOOL IMPROVEMENT GRANTS CLUSTER",
+        "SECTION 8 PROJECT-BASED CLUSTER",
+        "SNAP CLUSTER",
+        "SPECIAL EDUCATION CLUSTER (IDEA)",
+        "TANF CLUSTER",
+        "TRANSIT SERVICES PROGRAMS CLUSTER",
+        "TRIO CLUSTER",
+        "WATER AND WASTE PROGRAM CLUSTER",
+        "WIOA CLUSTER",
+        "OTHER CLUSTER NOT LISTED ABOVE"
+      ],
+      "title": "ClusterName"
+    },
     "StateClusterNameNonAnswers": {
       "description": "If cluster_name is not 'State Cluster', these are valid responses to state_cluster_name.",
       "enum": ["", null],
@@ -2409,7 +2457,7 @@
           "type": "string"
         },
         "cluster_name": {
-          "type": "string"
+          "$ref": "#/$defs/ClusterName"
         },
         "cluster_total": {
           "type": "string"
@@ -2571,7 +2619,7 @@
         {
           "if": {
             "properties": {
-              "cluster_name": { "const": "State Cluster" }
+              "cluster_name": { "const": "STATE CLUSTER" }
             }
           },
           "then": {
