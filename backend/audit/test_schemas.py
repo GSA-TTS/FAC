@@ -103,11 +103,19 @@ class SchemaValidityTest(SimpleTestCase):
         simple_case = jsoncopy(self.SIMPLE_CASE)
         award = jsoncopy(simple_case["FederalAwards"]["federal_awards"][0])
 
-        both_pass = award | {
+        both_int_pass = award | {
             "loan_or_loan_guarantee": "Y",
             "loan_balance_at_audit_period_end": 10_000,
         }
-        simple_case["FederalAwards"]["federal_awards"] = [both_pass]
+        simple_case["FederalAwards"]["federal_awards"] = [both_int_pass]
+
+        validate(simple_case, schema)
+
+        both_na_pass = award | {
+            "loan_or_loan_guarantee": "Y",
+            "loan_balance_at_audit_period_end": "N/A",
+        }
+        simple_case["FederalAwards"]["federal_awards"] = [both_na_pass]
 
         validate(simple_case, schema)
 
@@ -195,7 +203,7 @@ class SchemaValidityTest(SimpleTestCase):
 
         simple_case = jsoncopy(self.SIMPLE_CASE)
         award = jsoncopy(simple_case["FederalAwards"]["federal_awards"][0])
-
+ 
         both_pass = award | {
             "major_program": "Y",
             "major_program_audit_report_type": "U",

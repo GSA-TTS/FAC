@@ -2508,8 +2508,15 @@
           "then": {
             "properties": {
               "loan_balance_at_audit_period_end": {
-                "type": "integer",
-                "minLength": 1
+                "anyOf": [
+                  {
+                    "type": "integer",
+                    "minLength": 1
+                  },
+                  {
+                    "$ref": "#/$defs/NA"
+                  }
+                ]
               }
             },
             "required": ["loan_balance_at_audit_period_end"]
@@ -2711,6 +2718,12 @@
       "description": "",
       "enum": ["Y", "N"],
       "title": "YorN",
+      "type": "string"
+    },
+    "NA": {
+      "description": "",
+      "enum": ["N/A"],
+      "title": "N/A",
       "type": "string"
     }
   },
