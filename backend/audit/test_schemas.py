@@ -203,7 +203,7 @@ class SchemaValidityTest(SimpleTestCase):
 
         simple_case = jsoncopy(self.SIMPLE_CASE)
         award = jsoncopy(simple_case["FederalAwards"]["federal_awards"][0])
- 
+
         both_pass = award | {
             "major_program": "Y",
             "major_program_audit_report_type": "U",
