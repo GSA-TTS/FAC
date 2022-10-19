@@ -2384,9 +2384,19 @@
       "title": "LoanBalanceNonAnswers"
     },
     "DirectAwardPassThroughNonAnswers": {
-      "description": "If direct_award is Y, these are valid responses to direct_award_pass_through_entity and direct_award_pass_through_id_number.",
-      "enum": ["", null],
+      "description": "If direct_award is Y, these are valid responses to direct_award_pass_through_entities.",
+      "enum": ["", null, []],
       "title": "DirectAwardPassThroughNonAnswers"
+    },
+    "PassThroughEntity": {
+      "description": "If direct_award is N, the form must include a list of the pass-through entity by name and identifying number.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "identifying_number": { "type": "string", "minLength": 1 }
+      },
+      "required": ["name", "identifying_number"],
+      "title": "PassThroughEntity"
     },
     "MajorProgramAuditTypeNonAnswers": {
       "description": "If major_program is N, these are valid responses to major_program_audit_report_type.",
@@ -2465,8 +2475,12 @@
         "direct_award": {
           "$ref": "#/$defs/YorN"
         },
-        "direct_award_pass_through_entity": {},
-        "direct_award_pass_through_id_number": {},
+        "direct_award_pass_through_entities": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/PassThroughEntity"
+          }
+        },
         "federal_award_passed_to_subrecipients": {
           "$ref": "#/$defs/YorN"
         },
@@ -2511,7 +2525,7 @@
                 "anyOf": [
                   {
                     "type": "integer",
-                    "minLength": 1
+                    "minimum": 1
                   },
                   {
                     "$ref": "#/$defs/NA"
@@ -2539,13 +2553,13 @@
             "properties": { "direct_award": { "const": "N" } }
           },
           "then": {
-            "required": ["direct_award_pass_through_entity"],
+            "required": ["direct_award_pass_through_entities"],
             "properties": {
-              "direct_award_pass_through_entity": {
-                "type": "string"
-              },
-              "direct_award_pass_through_id_number": {
-                "type": "string"
+              "direct_award_pass_through_entities": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/PassThroughEntity"
+                }
               }
             }
           }
@@ -2556,10 +2570,7 @@
           },
           "then": {
             "properties": {
-              "direct_award_pass_through_entity": {
-                "$ref": "#/$defs/DirectAwardPassThroughNonAnswers"
-              },
-              "direct_award_pass_through_id_number": {
+              "direct_award_pass_through_entities": {
                 "$ref": "#/$defs/DirectAwardPassThroughNonAnswers"
               }
             }

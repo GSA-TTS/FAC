@@ -129,6 +129,22 @@ class SchemaValidityTest(SimpleTestCase):
 
         self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
+        bad_value_fail = award | {
+            "loan_or_loan_guarantee": "Y",
+            "loan_balance_at_audit_period_end": "",
+        }
+        simple_case["FederalAwards"]["federal_awards"] = [bad_value_fail]
+
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
+
+        zero_value_fail = award | {
+            "loan_or_loan_guarantee": "Y",
+            "loan_balance_at_audit_period_end": 0,
+        }
+        simple_case["FederalAwards"]["federal_awards"] = [zero_value_fail]
+
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
+
     def test_direct_award_dependents(self):
         """
         If direct_award is Y, loan_balance_at_audit_period_end must
@@ -141,7 +157,12 @@ class SchemaValidityTest(SimpleTestCase):
 
         both_pass = award | {
             "direct_award": "N",
-            "direct_award_pass_through_entity": "Bob",
+            "direct_award_pass_through_entities": [
+                {
+                    "name": "Bob",
+                    "identifying_number": "Bob-123"
+                }
+            ]
         }
         simple_case["FederalAwards"]["federal_awards"] = [both_pass]
 
@@ -152,16 +173,32 @@ class SchemaValidityTest(SimpleTestCase):
 
         self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
-        only_dependent_fail = award | {"direct_award_pass_through_entity": 10_000}
+        only_dependent_fail = award | {"direct_award_pass_through_entities": 10_000}
         simple_case["FederalAwards"]["federal_awards"] = [only_dependent_fail]
 
         self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
-        only_dependent_fail_id_number = award | {
-            "direct_award_pass_through_id_number": "IDWITHLETTERS"
+        bad_entity_fail = award | {
+            "direct_award": "N",
+            "direct_award_pass_through_entities": [
+                {
+                    "name": "Bob",
+                }
+            ]
         }
-        simple_case["FederalAwards"]["federal_awards"] = [only_dependent_fail_id_number]
+        simple_case["FederalAwards"]["federal_awards"] = [bad_entity_fail]
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
+        bad_entity_empty_fail = award | {
+            "direct_award": "N",
+            "direct_award_pass_through_entities": [
+                {
+                    "name": "Bob",
+                    "identifying_number": ""
+                }
+            ]
+        }
+        simple_case["FederalAwards"]["federal_awards"] = [bad_entity_empty_fail]
         self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
     def test_passthrough_dependents(self):
