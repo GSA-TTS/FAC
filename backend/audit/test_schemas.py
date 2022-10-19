@@ -158,11 +158,8 @@ class SchemaValidityTest(SimpleTestCase):
         both_pass = award | {
             "direct_award": "N",
             "direct_award_pass_through_entities": [
-                {
-                    "name": "Bob",
-                    "identifying_number": "Bob-123"
-                }
-            ]
+                {"name": "Bob", "identifying_number": "Bob-123"}
+            ],
         }
         simple_case["FederalAwards"]["federal_awards"] = [both_pass]
 
@@ -184,7 +181,7 @@ class SchemaValidityTest(SimpleTestCase):
                 {
                     "name": "Bob",
                 }
-            ]
+            ],
         }
         simple_case["FederalAwards"]["federal_awards"] = [bad_entity_fail]
         self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
@@ -192,11 +189,8 @@ class SchemaValidityTest(SimpleTestCase):
         bad_entity_empty_fail = award | {
             "direct_award": "N",
             "direct_award_pass_through_entities": [
-                {
-                    "name": "Bob",
-                    "identifying_number": ""
-                }
-            ]
+                {"name": "Bob", "identifying_number": ""}
+            ],
         }
         simple_case["FederalAwards"]["federal_awards"] = [bad_entity_empty_fail]
         self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
