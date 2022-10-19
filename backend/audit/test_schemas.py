@@ -177,11 +177,7 @@ class SchemaValidityTest(SimpleTestCase):
 
         bad_entity_fail = award | {
             "direct_award": "N",
-            "direct_award_pass_through_entities": [
-                {
-                    "name": "Bob",
-                }
-            ],
+            "direct_award_pass_through_entities": [{"name": "Bob"}],
         }
         simple_case["FederalAwards"]["federal_awards"] = [bad_entity_fail]
         self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
