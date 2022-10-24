@@ -2637,6 +2637,31 @@
         {
           "if": {
             "properties": {
+              "major_program": { "const": "Y"},
+              "major_program_audit_report_type": { "anyOf": [{"const": "A"}, {"const": "Q"}] }
+            }
+          },
+          "then": {
+            "properties": {
+              "number_of_audit_findings": {
+                "type": "integer",
+                "exclusiveMinimum": 0
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "number_of_audit_findings": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 0
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
               "cluster_name": { "const": "STATE CLUSTER" }
             }
           },

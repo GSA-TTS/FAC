@@ -292,3 +292,31 @@ class SchemaValidityTest(SimpleTestCase):
         # missing should be permissible
         del simple_case["FederalAwards"]["federal_awards"][0]["state_cluster_name"]
         validate(simple_case, schema)
+
+    def test_number_of_audit_findings(self):
+        """
+        If major_program_audit_report_type is A or Q,
+        number_of_audit_findings must be greater than 0
+        """
+        schema = self.FEDERAL_AWARDS_SCHEMA
+
+        simple_case = jsoncopy(self.SIMPLE_CASE)
+        simple_case["FederalAwards"]["federal_awards"][0]["major_program"] = "Y"
+
+        for report_type in ["A", "Q"]:
+            # major_audit_report_type of A or Q requires non-zero number_of_audit_findings
+            simple_case["FederalAwards"]["federal_awards"][0]["major_program_audit_report_type"] = report_type
+            simple_case["FederalAwards"]["federal_awards"][0]["number_of_audit_findings"] = 0
+            self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
+
+            simple_case["FederalAwards"]["federal_awards"][0]["number_of_audit_findings"] = 1
+            validate(simple_case, schema)
+
+        for report_type in ["U", "D"]:
+            # major_audit_report_type of U or D requires zero number_of_audit_findings
+            simple_case["FederalAwards"]["federal_awards"][0]["major_program_audit_report_type"] = report_type
+            simple_case["FederalAwards"]["federal_awards"][0]["number_of_audit_findings"] = 0
+            validate(simple_case, schema)
+
+            simple_case["FederalAwards"]["federal_awards"][0]["number_of_audit_findings"] = 1
+            self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
