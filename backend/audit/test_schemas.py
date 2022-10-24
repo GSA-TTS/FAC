@@ -305,18 +305,30 @@ class SchemaValidityTest(SimpleTestCase):
 
         for report_type in ["A", "Q"]:
             # major_audit_report_type of A or Q requires non-zero number_of_audit_findings
-            simple_case["FederalAwards"]["federal_awards"][0]["major_program_audit_report_type"] = report_type
-            simple_case["FederalAwards"]["federal_awards"][0]["number_of_audit_findings"] = 0
+            simple_case["FederalAwards"]["federal_awards"][0][
+                "major_program_audit_report_type"
+            ] = report_type
+            simple_case["FederalAwards"]["federal_awards"][0][
+                "number_of_audit_findings"
+            ] = 0
             self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
-            simple_case["FederalAwards"]["federal_awards"][0]["number_of_audit_findings"] = 1
+            simple_case["FederalAwards"]["federal_awards"][0][
+                "number_of_audit_findings"
+            ] = 1
             validate(simple_case, schema)
 
         for report_type in ["U", "D"]:
             # major_audit_report_type of U or D requires zero number_of_audit_findings
-            simple_case["FederalAwards"]["federal_awards"][0]["major_program_audit_report_type"] = report_type
-            simple_case["FederalAwards"]["federal_awards"][0]["number_of_audit_findings"] = 0
+            simple_case["FederalAwards"]["federal_awards"][0][
+                "major_program_audit_report_type"
+            ] = report_type
+            simple_case["FederalAwards"]["federal_awards"][0][
+                "number_of_audit_findings"
+            ] = 0
             validate(simple_case, schema)
 
-            simple_case["FederalAwards"]["federal_awards"][0]["number_of_audit_findings"] = 1
+            simple_case["FederalAwards"]["federal_awards"][0][
+                "number_of_audit_findings"
+            ] = 1
             self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
