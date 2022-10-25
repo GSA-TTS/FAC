@@ -32,6 +32,5 @@ Here's a few pointers to get you started as well as a checklist to make sure you
 
 **For your onboarding buddy**
 - [ ] Add to [FAC-team@GSA.gov](https://groups.google.com/a/gsa.gov/g/fac-team) Google Group
-- [ ] Add to standing meeting invites (should happen automatically via Google Group)
-- [ ] Add to the [FAC team](https://github.com/orgs/GSA-TTS/teams/fac-team/members) in GitHub
+- [ ] Add to standing meeting invites (should happen automatically via addition to the Google Group membership)
 - [ ] (engineers) Add to `gsa-10x-prototyping` Organization in cloud.gov
