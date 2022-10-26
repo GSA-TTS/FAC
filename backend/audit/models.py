@@ -7,6 +7,7 @@ from django.core.validators import MinLengthValidator
 from django.utils.translation import gettext_lazy as _
 
 from .validators import (
+    validate_federal_award_json,
     validate_uei_alphanumeric,
     validate_uei_leading_char,
     validate_uei_nine_digit_sequences,
@@ -165,6 +166,11 @@ class SingleAuditChecklist(models.Model):
     auditor_contact_title = models.CharField(max_length=100, blank=True, null=True)
     auditor_phone = models.CharField(max_length=100, blank=True, null=True)
     auditor_email = models.EmailField(max_length=100, blank=True, null=True)
+
+    # Federal Awards:
+    federal_awards = models.JSONField(
+        blank=True, null=True, validators=[validate_federal_award_json]
+    )
 
     class Meta:
         """We need to set the name for the admin view."""

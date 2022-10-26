@@ -14,7 +14,7 @@ SCHEMA_DIR = Path(__file__).parent.parent / "schemas" / "sections"
 
 class SchemaValidityTest(SimpleTestCase):
     """
-    Test the basic validiy of the JSON schemas.
+    Test the basic validity of the JSON schemas.
     """
 
     FEDERAL_AWARDS_SCHEMA = json.loads(
