@@ -1,0 +1,26 @@
+{
+  "FederalAwards": {
+    "auditee_ein": "whatever",
+    "total_amount_expended": "",
+    "federal_awards": [
+      {
+        "program_number": "10.001",
+        "federal_program_name": "GACC",
+        "amount_expended": "",
+        "cluster_name": "N/A",
+        "loan_or_loan_guarantee": "N",
+        "loan_balance_at_audit_period_end": null,
+        "direct_award": "N",
+        "direct_award_pass_through_entities": [
+          {
+            "name": "Bob",
+            "identifying_number": "Bob-123"
+          }
+        ],
+        "federal_award_passed_to_subrecipients": "N",
+        "major_program": "N",
+        "number_of_audit_findings": 0
+      }
+    ]
+  }
+}

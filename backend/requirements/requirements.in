@@ -12,3 +12,4 @@ python-json-logger
 djangorestframework-simplejwt
 cryptography
 cfenv
+jsonschema
