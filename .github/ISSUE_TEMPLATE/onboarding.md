@@ -32,3 +32,4 @@ Here's a few pointers to get you started as well as a checklist to make sure you
 - [ ] Add to [FAC-team@GSA.gov](https://groups.google.com/a/gsa.gov/g/fac-team) Google Group
 - [ ] Add to standing meeting invites (should happen automatically via addition to the Google Group membership)
 - [ ] (engineers) Add to `gsa-10x-prototyping` Organization in cloud.gov
+- [ ] (designers) Add as an editor to active Figma projects
