@@ -1,0 +1,34 @@
+name: federalawards
+
+description: Federal Awards section
+id: http://example.org/federalawards
+imports:
+  - linkml:types
+  - fac:enums
+  - facsections:FederalAwardEntry
+prefixes:
+  linkml:
+    prefix_prefix: linkml
+    prefix_reference: https://w3id.org/linkml/
+  fac: ../
+  facsections: ../sections/
+default_prefix: linkml
+
+classes:
+  FederalAwards:
+    attributes:
+      auditee_ein:
+        required: true
+      total_amount_expended:
+        required: true
+      federal_awards:
+        multivalued: true
+        range: FederalAwardEntry
+
+  TreeRoot:
+    tree_root: true
+    description: Container thing
+    attributes:
+      FederalAwards:
+        range: FederalAwards
+        required: true
