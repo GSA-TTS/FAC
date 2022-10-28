@@ -58,4 +58,3 @@ Note: If you're not able to do any of these yourself, you're still responsible f
 
 **For product leads/owners, also...**
 - [ ] Make them Owner of [the various Google Groups in the project README](https://docs.google.com/document/d/1g8nYqYS_ifFlZB-DBgfeSoJRMB__EqWsmLnacyk-bDI/edit#heading=h.81zynabayrrg)
-
