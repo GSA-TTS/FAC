@@ -42,7 +42,7 @@ We will move the current frontend into Django, use Django to manage state, add w
 
 ## Considerations
 
-*   We need to prioritize development speed, and therefore simplicity of development environment. When the frontend required less state management, the approach of having two separate environments, both relatively simple, was feasible. But once one or both of the hit a certain point, the difficulty of managing synchronization between the environments became an impediment.
+*   We need to prioritize development speed, and therefore simplicity of development environment. When the frontend required less state management, the approach of having two separate environments, both relatively simple, was feasible. But once one or both of them hit a certain point, the difficulty of managing synchronization between the environments became an impediment.
 *   Making the change sooner rather than later means less work to potentially re-do.
 *   Making the change sooner rather than later means a better chance of having the new architecture settled enough for ease of vendor onboarding, which may be happening soon.
 
@@ -50,6 +50,7 @@ We will move the current frontend into Django, use Django to manage state, add w
 
 *   Better long-term outlook.
 *   Redoing a lot of the frontend work to use Django templates and views.
+*   Revisiting authentication flow / Login.gov integration (will move from PKCE flow to private_key_jwt).
 *   Django learning for a lot of the team.
 *   Feature work delayed as we make the move.
 
