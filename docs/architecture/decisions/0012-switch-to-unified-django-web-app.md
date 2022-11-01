@@ -56,4 +56,4 @@ We will move the current frontend into Django, use Django to manage state, add w
 
 ## Updated system diagram
 
-![image](https://raw.githubusercontent.com/GSA-TTS/FAC/tadhg/monolithic-adr/docs/architecture/diagrams/FAC_System_Context_unified.png)
+![image](https://raw.githubusercontent.com/GSA-TTS/FAC/main/docs/architecture/diagrams/FAC_System_Context_unified.png)
