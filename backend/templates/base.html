@@ -1,0 +1,76 @@
+<!-- example text to be swapped out -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- will be replaced with meta content -->
+  {% block metatags %}{% endblock %}
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  
+  <style>
+html, body {
+  height: 100%;
+}
+  body {
+    font-family: sans-serif;
+    font-size: 18px;
+    background-color: #fdfdfd;
+display: flex;
+  flex-direction: column;
+  }
+  #nofooter {
+flex: 1 0 auto;
+}
+darkbtn {
+color: #66ff99; }
+ .dark-mode {
+    background-color: black;
+    color: white;
+  }
+  #foot {
+    flex-shrink: 0;
+    font-family: sans-serif;
+background-color: #BDFFD3; color: #00308F;
+    bottom: 0px;
+    width: 100%;
+}
+.card-group,.card,.card-footer,.card-body {
+border: none;
+}
+</style>
+</head>
+<body><div id="bodydiv"><div id="nofooter">
+  <nav class="navbar navbar-expand-lg navbar-light bg-light shadow" id="topnav">
+    <div class="container-fluid">
+
+      <div class="nav justify-content-end">
+        <div class="d-inline"><a class="nav-link text-black font-weight-bold" href="{% url 'posts'%}">Posts</a></div>
+        </div></div>
+</nav>
+   <!-- will be replaced with post content -->
+{% block content %}
+{% endblock content %}
+</div>
+<footer class="footer" id="foot">
+<div class="container"><h5 style="text-align:center;">Enjoy the Blog and Stay Updated</h5>
+<nav class="navbar navbar-expand-lg">
+<div class="container-fluid">
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+<div class="nav justify-content-center" id="navfooter">
+<span><a class="nav-link text-black font-weight-bold" href="/">Feed</a></span>
+</div>
+</div>
+  </nav>
+    </div>
+</footer></div>
+</body>
+</html>

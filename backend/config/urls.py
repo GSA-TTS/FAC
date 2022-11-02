@@ -1,7 +1,7 @@
 from api import views
 from django.conf import settings
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
 from rest_framework.renderers import JSONOpenAPIRenderer
 from rest_framework.schemas import get_schema_view
 
@@ -65,4 +65,9 @@ urlpatterns = [
         name="schemas",
     ),
     path(settings.ADMIN_URL, admin.site.urls),
+    # Keep last so we can use short urls for content pages like home page etc.
+    path(
+        '',
+        include('cms.urls')
+    ),
 ]
