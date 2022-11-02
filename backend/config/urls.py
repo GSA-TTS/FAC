@@ -1,10 +1,10 @@
+from api import views
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include
 from rest_framework.renderers import JSONOpenAPIRenderer
 from rest_framework.schemas import get_schema_view
-from api import views
 
 from users.views import AuthToken
 
@@ -16,6 +16,7 @@ schema_view = get_schema_view(
 )
 
 urlpatterns = [
+    # path("", IndexView.as_view(), name="index"),
     path("api/auth/token", AuthToken.as_view(), name="token"),
     path("api/schema.json", schema_view),
     path("public/api/sac", views.SACViewSet.as_view({"get": "list"}), name="sac-list"),
