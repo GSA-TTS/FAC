@@ -9,4 +9,3 @@ class PostAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Posts, PostAdmin)
-

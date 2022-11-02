@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # importing django models and users
 from django.db import models
 from django.contrib.auth.models import User
@@ -30,8 +29,3 @@ class Posts(models.Model):
     # used while managing models from terminal
     def __str__(self):  # pragma: no cover
         return str(self.title)
-=======
-from django.db import models
-
-# Create your models here.
->>>>>>> 6d2e3a1... Adding an app for front end content management
