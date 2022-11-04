@@ -4,16 +4,14 @@
 <head>
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"><!-- Grab title from the page data and dump it here -->
   <link rel="stylesheet" href="/assets/scss/main.css" media="all" type="text/css">
   <script src="/assets/js/libs.js" defer type="text/javascript"></script>
-  {% block metatags %}{% endblock %}
+  <title>Federal Audit Clearinghouse — Home</title>
 </head>
-
 
 <body >
   <a class="usa-skipnav" href="#main-content">Skip to main content</a>
-
 <section class="usa-banner" aria-label="Official government website">
   <div class="usa-accordion">
     <header class="usa-banner__header">
@@ -103,7 +101,7 @@
     </div>
   </div>
 </section>
-
+ 
   <div class="usa-overlay"></div>
 <header class="usa-header usa-header--basic">
   <div class="usa-nav-container">
@@ -111,7 +109,7 @@
       <div class="usa-logo" id="basic-logo">
         <em class="usa-logo__text">
           <a href="javascript:void(0)" title="FAC.gov">
-            <strong>FAC</strong>.gov
+            <strong>FAC</strong>.gov  
           </a>
         </em>
       </div>
@@ -123,8 +121,8 @@
       </button>
 
       <ul class="usa-nav__primary usa-accordion">
-
-
+        
+          
 
             <li class="usa-nav__primary-item">
               <button
@@ -136,20 +134,20 @@
               </button>
 
               <ul id="basic-nav-section-1" class="usa-nav__submenu">
-
+                
                   <li class="usa-nav__submenu-item">
                     <a href="https://example.com">Link 1</a>
                   </li>
-
+                
                   <li class="usa-nav__submenu-item">
                     <a href="https://example.com">Link 2</a>
                   </li>
-
+                
               </ul>
             </li>
-
-
-
+          
+        
+          
 
             <li class="usa-nav__primary-item">
               <button
@@ -161,39 +159,39 @@
               </button>
 
               <ul id="basic-nav-section-2" class="usa-nav__submenu">
-
+                
                   <li class="usa-nav__submenu-item">
                     <a href="https://example.com">Link 1</a>
                   </li>
-
+                
               </ul>
             </li>
-
-
-
+          
+        
+          
             <li class="usa-nav__primary-item">
               <a href="https://example.gov" class="usa-nav__link">
                 <span>FAQs</span>
               </a>
             </li>
-
-
-
+          
+        
+          
             <li class="usa-nav__primary-item">
               <a href="https://example.gov" class="usa-nav__link">
                 <span>Contact Us</span>
               </a>
             </li>
-
-
+          
+        
       </ul>
 
-
+      
         <div class="sign-in">
-          <a
-            class="sign-in-logo"
+          <a 
+            class="sign-in-logo" 
             aria-controls="login-modal"
-            href="#login-modal"
+            href="#login-modal" 
             data-open-modal
             tabindex="0"
             >
@@ -205,43 +203,78 @@
   aria-labelledby="login-modal-heading"
   aria-describedby="login-modal-description"
 >
-
-{% block content%}
-
-{% endblock content%}
-
+  <div class="usa-modal__content">
+    <div class="usa-modal__main">
+      <h2 class="usa-modal__heading" id="login-modal-heading">
+        Submitting information to the Federal Audit Clearinghouse requires authentication
+      </h2>
+      <div id="login-modal-description">
+        <p>General Services Administration Notice and Consent Warning</p>
+                            <p>You are accessing a United States government computer system. This United States government computer system is provided for the collection of the single audit reporting package and form SF-SAC as required under the Single Audit Act of 1984 (amended in 1996) and the Office of Management and Budget (OMB) Title 2 U.S. Code of Federal Regulations (CFR) Part 200, Uniform Administrative Requirements for Federal Awards (Uniform Guidance).</p>
+                            <p>Use of this system indicates your consent to collection, monitoring, recording, and use of the information you provide for any lawful government purpose. So that our network remains safe and available for its intended use, network traffic is monitored to identify unauthorized attempts to access, upload, change information, or otherwise cause damage to the web service. Use of a government computer network for unauthorized purposes is a violation of federal law and punishable by fines or imprisonment (Public Law 99-474).</p>
+                            <p>Collecting data on behalf of OMB. Version: 1.4.14.0   Last Modified: February 09, 2022 and expires February 28, 2025</p>
+      </div>
+      <div class="usa-modal__footer">
+        <ul class="usa-button-group">
+          <li class="usa-button-group__item">
+            <button type="button" class="usa-button sign-in-button" id="sign-in" data-close-modal>
+              Authenticate with Login.gov 
+            </button>
+          </li>
+          <li class="usa-button-group__item">
+            <button
+              type="button"
+              class="usa-button usa-button--unstyled padding-105 text-center"
+              data-close-modal
+            >
+              Go back
+            </button>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <button
+      class="usa-button usa-modal__close"
+      aria-label="Close this window"
+      data-close-modal
+    >
+      <svg class="usa-icon" aria-hidden="true" focusable="false" role="img">
+        <use xlink:href="assets/img/sprite.svg#close"></use>
+      </svg>
+    </button>
+  </div>
 </div>
         </div>
-
+      
     </nav>
   </div>
 </header>
 
   <main id="main-content">
-
+   
 
 <section class="usa-hero" aria-label="Introduction">
     <div class="grid-container">
-      <div class="usa-alert usa-alert--success usa-alert--slim"
-  role="alert"
+      <div class="usa-alert usa-alert--success usa-alert--slim" 
+  role="alert" 
   hidden
   id=logout-success
 >
   <div class="usa-alert__body">
-
+    
     <p class="usa-alert__text">
       You have successfully logged out
     </p>
   </div>
 </div>
 
-      <div class="usa-alert usa-alert--error usa-alert--slim"
-  role="alert"
+      <div class="usa-alert usa-alert--error usa-alert--slim" 
+  role="alert" 
   hidden
   id=unauthorized
 >
   <div class="usa-alert__body">
-
+    
     <p class="usa-alert__text">
       You do not have access to that page
     </p>
@@ -270,9 +303,9 @@
       </div>
     </div>
   </section>
+ 
 
-
-
+  
   </main>
   <footer class="usa-footer">
   <div class="usa-identifier">
@@ -335,6 +368,6 @@
   <script>const runningInCi = false</script>
   <script>const baseUrl = "/"</script>
   <script src="/assets/js/app.js" type="text/javascript"></script>
-  <script src="/assets/js/auth.js" type="text/javascript"></script>
+  <script src="/assets/js/auth.js" type="text/javascript"></script>  
 </body>
 </html>
