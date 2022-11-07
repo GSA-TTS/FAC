@@ -1,0 +1,16 @@
+{
+  "name": "fac-backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@uswds/uswds": "^3.2.0",
+    "esbuild": "^0.15.13",
+    "esbuild-sass-plugin": "^2.4.0"
+  }
+}
