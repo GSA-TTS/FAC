@@ -6,6 +6,21 @@ labels: ''
 assignees: ''
 ---
 
-- [ ] Has been removed from [the FAC-team Google Group](https://groups.google.com/a/gsa.gov/g/fac-team/members)
-- [ ] Has been removed from [the FAC team in GitHub](https://github.com/orgs/GSA-TTS/teams/fac-team/members)
-- [ ] Has been from the private channel #oros-fac-private in Slack (“/remove @[person]”)
+# For everyone
+
+- [ ] Remove from [the FAC-team Google Group](https://groups.google.com/a/gsa.gov/g/fac-team/members)
+- [ ] Remove from [the FAC team in GitHub](https://github.com/orgs/GSA-TTS/teams/fac-team/members)
+- [ ] Remove from the private channel #oros-fac-private in Slack (“/remove @[person]”)
+
+**For designers, also...**
+
+- [ ] Remove from active Figma projects
+
+**For engineers, also...**
+
+- [ ] Remove from cloud.gov orgs and spaces
+
+**For product leads/owners, also...**
+
+- [ ] Make someone else the owner of [the various Google Groups in the project README](https://docs.google.com/document/d/1g8nYqYS_ifFlZB-DBgfeSoJRMB__EqWsmLnacyk-bDI/edit#heading=h.81zynabayrrg) (and remove them)
+

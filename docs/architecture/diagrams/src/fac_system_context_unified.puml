@@ -1,0 +1,43 @@
+@startuml FAC_System_Context_monolithic
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+Person(User, "User", "Auditee/Auditor/Public")
+Person(Staff, "User", "FAC Staff")
+
+
+Boundary(cloudgov, "Cloud.gov Boundary") {
+    Boundary(atob, "ATO Boundary") {
+        Boundary(backend, "Django web application") {
+            System(api, "REST API", "DRF")
+            System(admin, "Django Admin interface")
+            System(submissions, "Django authenticated frontend")
+            System(publicinfo, "Django unauthenticated frontend")
+        }
+    }
+    System(db, "Database", "postgres")
+    System(s3, "PDF storage", "Brokered S3")
+}
+
+Boundary(gsaplatforms, "GSA Platforms Boundary") {
+    System(Login, "Login.gov", "ID provider")
+    System(Email, "GSA Email")
+}
+
+AddRelTag("authenticated", $lineColor="#008787", $textColor="#008787")
+Rel(User, submissions, "Submits/edits audits", "via Login.gov", $tags="authenticated")
+Rel(User, publicinfo, "Searches for/reads information")
+
+Rel(User, Login, "Authenticates with")
+Rel(Staff, Login, "Authenticates with")
+Rel(Email, User, "Sends emails to")
+Rel(Staff, admin, "Manages audits, roles, users", "via Login.gov", $tags="authenticated")
+
+Rel(Login, backend, "Provides identities", "email address")
+
+Rel_D(backend, Email, "Sends emails using")
+Rel(submissions, api, "GET/POST data")
+
+Rel(backend, db, "read/write")
+Rel(backend, s3, "Stores single audit packages")
+
+@enduml
