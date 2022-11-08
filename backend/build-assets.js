@@ -59,7 +59,7 @@ const runPostcss = (cssIn, cssOut) => {
 }
 
 require('esbuild').build(buildProps)
-  .then(() => { 
+  .then(() => {
     runPostcss('static/compiled/scss/main.css', 'static/compiled/scss/main-post.css');
     if (watch) {
       console.info('Watching assets…')

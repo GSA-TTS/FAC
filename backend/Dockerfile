@@ -23,7 +23,7 @@ RUN \
     apt-get install nodejs npm -yqq && \
     npm i -g npm@^8
 
-RUN \ 
+RUN \
     set -ex && \
     pip install --upgrade pip && \
     pip install -r /tmp/requirements.txt && \

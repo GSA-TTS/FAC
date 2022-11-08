@@ -16,6 +16,7 @@ services:
     command: >
       bash -c "python manage.py migrate
       && npm run dev
+      && node build-assets.js
       && python manage.py collectstatic --noinput
       & python manage.py runserver 0.0.0.0:8000"
     depends_on:
