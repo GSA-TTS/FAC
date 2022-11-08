@@ -1,7 +1,6 @@
 import argparse
 import csv
 import json
-import time
 
 from jsonpath_ng import parse
 
@@ -73,7 +72,7 @@ def main():
         program_data = extract(input_data)
 
     schema_def = transform(program_data)
-    
+
     with open(args.schema_filename) as schema_file:
         schema = json.load(schema_file)
         updated_schema = load(schema, schema_def)
