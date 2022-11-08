@@ -23,41 +23,46 @@ text-align: center; }
 <header style="background-color: #BDFFD3; color: #00308F;">
     <div class="container">
     <p class="h1"> Welcome </p>
+{% block content%}
+  <div class="usa-modal__content">
+    <div class="usa-modal__main">
+      <h2 class="usa-modal__heading" id="login-modal-heading">
+        Submitting information to the Federal Audit Clearinghouse requires authentication
+      </h2>
+      <div id="login-modal-description">
+        <p>General Services Administration Notice and Consent Warning</p>
+                            <p>You are accessing a United States government computer system. This United States government computer system is provided for the collection of the single audit reporting package and form SF-SAC as required under the Single Audit Act of 1984 (amended in 1996) and the Office of Management and Budget (OMB) Title 2 U.S. Code of Federal Regulations (CFR) Part 200, Uniform Administrative Requirements for Federal Awards (Uniform Guidance).</p>
+                            <p>Use of this system indicates your consent to collection, monitoring, recording, and use of the information you provide for any lawful government purpose. So that our network remains safe and available for its intended use, network traffic is monitored to identify unauthorized attempts to access, upload, change information, or otherwise cause damage to the web service. Use of a government computer network for unauthorized purposes is a violation of federal law and punishable by fines or imprisonment (Public Law 99-474).</p>
+                            <p>Collecting data on behalf of OMB. Version: 1.4.14.0   Last Modified: February 09, 2022 and expires February 28, 2025</p>
+      </div>
 
-
-
-
-
-                </div>
-</header>
-<div class="container">
-    <div class="row">
-        <div >
-            {% for post in posts_list %}
-            <div  id="newsfeed">
-                <div class="card-body">
-                    <h3 class="card-title">{{ post.title }}</h3>
-                    <p class="card-text text-muted h6"><span>{{ post.author.first_name }} {{ post.author.last_name }}</span> | {{ post.created_on}} </p>
-
-
-
-                    <span><a href="{% url 'post_detail' post.slug %}">Read More →</a></span>
-                </div>
-            </div>
-            {% endfor %}
-        </div>
-</div>
-</div>
-{% if is_paginated %}
-<nav aria-label="Page navigation container"></nav>
-<ul>
-    {% if page_obj.has_previous %}
-    <li><a href="?page={{ page_obj.previous_page_number }}" style="font-family: sans-serif;">« PREV </a></li>
-    {% endif %}
-    {% if page_obj.has_next %}
-    <li><a href="?page={{ page_obj.next_page_number }}" style="font-family: sans-serif;"> NEXT »</a></li>
-
-    {% endif %}
-</ul>
-{% endif %}
-{%endblock%}
+      <div class="usa-modal__footer">
+        <ul class="usa-button-group">
+          <li class="usa-button-group__item">
+            <button type="button" class="usa-button sign-in-button" id="sign-in" data-close-modal>
+              Authenticate with Login.gov
+            </button>
+          </li>
+          <li class="usa-button-group__item">
+            <button
+              type="button"
+              class="usa-button usa-button--unstyled padding-105 text-center"
+              data-close-modal
+            >
+              Go back
+            </button>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <button
+      class="usa-button usa-modal__close"
+      aria-label="Close this window"
+      data-close-modal
+    >
+      <svg class="usa-icon" aria-hidden="true" focusable="false" role="img">
+        <use xlink:href="static/img/sprite.svg#close"></use>
+      </svg>
+    </button>
+  </div>
+{% endblock content%}

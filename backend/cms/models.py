@@ -3,7 +3,6 @@ from django.db import models
 from django.contrib.auth.models import User
 
 
-# creating an django model class
 class Posts(models.Model):
     """Basic model for posts."""
 
