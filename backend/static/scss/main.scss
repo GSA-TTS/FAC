@@ -1,0 +1,8 @@
+@use 'uswds-core' as * with(
+  $theme-show-notifications: false,
+  $theme-font-path: '../fonts',
+  $theme-image-path: '../img',
+  $theme-font-type-sans: 'public-sans'
+);
+
+@forward 'uswds';
