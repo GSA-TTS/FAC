@@ -8,11 +8,33 @@ COPY dev-requirements.txt /tmp/dev-requirements.txt
 
 
 # RUN --mount=type=cache,target=/root/.cache \
-RUN set -ex && \
+
+WORKDIR ..
+
+RUN \
+  apt-get update && \
+  apt-get install -yqq apt-transport-https wget gnupg2
+
+RUN \
+    apt-get update -yq && \
+    echo "deb https://deb.nodesource.com/node_14.x buster main" > /etc/apt/sources.list.d/nodesource.list && \
+    wget -qO- https://deb.nodesource.com/gpgkey/nodesource.gpg.key | apt-key add - && \
+    apt-get -y install nodejs && \
+    apt-get install nodejs npm -yqq && \
+    npm i -g npm@^8
+
+RUN \ 
+    set -ex && \
     pip install --upgrade pip && \
     pip install -r /tmp/requirements.txt && \
     pip install -r /tmp/dev-requirements.txt && \
     rm -rf /root/.cache/
+
+COPY . /src/
+
+WORKDIR /src/
+
+RUN npm install
 
 # ------------------------------------------------------------
 # Dev/testing layer
@@ -22,7 +44,3 @@ FROM builder AS release
 
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
-
-COPY . /src/
-
-WORKDIR /src/

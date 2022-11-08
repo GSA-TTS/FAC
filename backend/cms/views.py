@@ -3,12 +3,10 @@ from .models import Posts
 
 
 # class based views for posts
-class postslist(generic.ListView):
-    """Basic list class"""
+class home(generic.TemplateView):
+    """Basic class for home."""
 
-    queryset = Posts.objects.order_by("-created_on")
     template_name = "home.html"
-    paginate_by = 4
 
 
 # class based view for each post
