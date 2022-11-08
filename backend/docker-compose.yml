@@ -16,7 +16,7 @@ services:
     command: >
       bash -c "python manage.py migrate 
       && node build-assets.js 
-      && python manage.py runserver 0.0.0.0:8000"
+      & python manage.py runserver 0.0.0.0:8000"
     depends_on:
       - db
     environment:
