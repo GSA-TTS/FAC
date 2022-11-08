@@ -25,10 +25,6 @@
       "description": "Program numbers",
       "anyOf": [
         {
-          "const": "Program Number",
-          "description": "Program Title"
-        },
-        {
           "const": "10.001",
           "description": "Agricultural Research Basic and Applied Research"
         },
@@ -142,7 +138,7 @@
         },
         {
           "const": "10.128",
-          "description": "Heirs\u2019 Property Relending Program"
+          "description": "Heirs\ufffd Property Relending Program"
         },
         {
           "const": "10.129",
@@ -342,7 +338,7 @@
         },
         {
           "const": "10.210",
-          "description": "Higher Education \u2013 Graduate Fellowships Grant Program"
+          "description": "Higher Education \ufffd Graduate Fellowships Grant Program"
         },
         {
           "const": "10.212",
@@ -442,7 +438,7 @@
         },
         {
           "const": "10.242",
-          "description": "WIC Workforce \u2013 WebNEERS Evaluation System Platform"
+          "description": "WIC Workforce \ufffd WebNEERS Evaluation System Platform"
         },
         {
           "const": "10.243",
@@ -834,7 +830,7 @@
         },
         {
           "const": "10.545",
-          "description": "Farmers\u2019 Market Supplemental Nutrition Assistance Program Support Grants"
+          "description": "Farmers\ufffd Market Supplemental Nutrition Assistance Program Support Grants"
         },
         {
           "const": "10.551",
@@ -1410,7 +1406,7 @@
         },
         {
           "const": "10.928",
-          "description": "Emergency Watershed Protection Program - Floodplain Easements \u2013 Disaster Relief Appropriations Act "
+          "description": "Emergency Watershed Protection Program - Floodplain Easements \ufffd Disaster Relief Appropriations Act "
         },
         {
           "const": "10.929",
@@ -1982,7 +1978,7 @@
         },
         {
           "const": "12.501",
-          "description": "Training and Support \u2013 Combating Weapons of Mass Destruction"
+          "description": "Training and Support \ufffd Combating Weapons of Mass Destruction"
         },
         {
           "const": "12.550",
@@ -3094,7 +3090,7 @@
         },
         {
           "const": "15.507",
-          "description": "WaterSMART (Sustain and Manage America\u2019s Resources for Tomorrow)"
+          "description": "WaterSMART (Sustain and Manage America\ufffds Resources for Tomorrow)"
         },
         {
           "const": "15.508",
@@ -3270,7 +3266,7 @@
         },
         {
           "const": "15.560",
-          "description": "SECURE Water Act \u2013 Research Agreements"
+          "description": "SECURE Water Act \ufffd Research Agreements"
         },
         {
           "const": "15.563",
@@ -3690,7 +3686,7 @@
         },
         {
           "const": "15.945",
-          "description": "Cooperative Research and Training Programs \u2013 Resources of the National Park System"
+          "description": "Cooperative Research and Training Programs \ufffd Resources of the National Park System"
         },
         {
           "const": "15.946",
@@ -4490,7 +4486,7 @@
         },
         {
           "const": "17.701",
-          "description": "Women in Apprenticeship and Nontraditional Occupations (\u201cWANTO\u201d) Technical Assistance Grant Program"
+          "description": "Women in Apprenticeship and Nontraditional Occupations (\ufffdWANTO\ufffd) Technical Assistance Grant Program"
         },
         {
           "const": "17.720",
@@ -4506,7 +4502,7 @@
         },
         {
           "const": "17.805",
-          "description": "Homeless Veterans\u2019 Reintegration Program "
+          "description": "Homeless Veterans\ufffd Reintegration Program "
         },
         {
           "const": "17.807",
@@ -4706,7 +4702,7 @@
         },
         {
           "const": "19.441",
-          "description": "ECA \u2013 American Spaces"
+          "description": "ECA \ufffd American Spaces"
         },
         {
           "const": "19.450",
@@ -5006,7 +5002,7 @@
         },
         {
           "const": "20.319",
-          "description": "High-Speed Rail Corridors and Intercity Passenger Rail Service \u2013 Capital Assistance Grants"
+          "description": "High-Speed Rail Corridors and Intercity Passenger Rail Service \ufffd Capital Assistance Grants"
         },
         {
           "const": "20.320",
@@ -5194,7 +5190,7 @@
         },
         {
           "const": "20.723",
-          "description": "PHMSA Pipeline Safety Research and Development \u201cOther Transaction Agreements\u201d"
+          "description": "PHMSA Pipeline Safety Research and Development \ufffdOther Transaction Agreements\ufffd"
         },
         {
           "const": "20.724",
@@ -5238,7 +5234,7 @@
         },
         {
           "const": "20.816",
-          "description": "America\u2019s Marine Highway Grants"
+          "description": "America\ufffds Marine Highway Grants"
         },
         {
           "const": "20.817",
@@ -5670,7 +5666,7 @@
         },
         {
           "const": "45.400",
-          "description": "Peace Corps\u2019 Global Health and PEPFAR Initiative Program"
+          "description": "Peace Corps\ufffd Global Health and PEPFAR Initiative Program"
         },
         {
           "const": "47.041",
@@ -5806,7 +5802,7 @@
         },
         {
           "const": "59.066",
-          "description": "Transition Assistance \u2013 Entrepreneurship Track (Boots to Business)"
+          "description": "Transition Assistance \ufffd Entrepreneurship Track (Boots to Business)"
         },
         {
           "const": "59.072",
@@ -5886,7 +5882,7 @@
         },
         {
           "const": "64.030",
-          "description": "Life Insurance for Veterans \u2013 Face Amount of New Life Insurance Policies Issued"
+          "description": "Life Insurance for Veterans \ufffd Face Amount of New Life Insurance Policies Issued"
         },
         {
           "const": "64.031",
@@ -6246,7 +6242,7 @@
         },
         {
           "const": "66.448",
-          "description": "Drinking Water System Infrastructure Resilience and Sustainability Program \u2013 SDWA 1459A(l)"
+          "description": "Drinking Water System Infrastructure Resilience and Sustainability Program \ufffd SDWA 1459A(l)"
         },
         {
           "const": "66.454",
@@ -7142,11 +7138,11 @@
         },
         {
           "const": "84.426",
-          "description": "Randolph-Sheppard \u2013 Financial Relief and Restoration Payments"
+          "description": "Randolph-Sheppard \ufffd Financial Relief and Restoration Payments"
         },
         {
           "const": "84.427",
-          "description": "Congressionally Directed Spending\u2014Rehabilitation Services and Disability Research"
+          "description": "Congressionally Directed Spending\ufffdRehabilitation Services and Disability Research"
         },
         {
           "const": "85.002",
@@ -7898,7 +7894,7 @@
         },
         {
           "const": "93.341",
-          "description": "Analyses, Research and Studies to Address the Impact of CMS\u2019 Programs on American Indian/Alaska Native (AI/AN) Beneficiaries and the Health Care System Serving these Beneficiaries\t"
+          "description": "Analyses, Research and Studies to Address the Impact of CMS\ufffd Programs on American Indian/Alaska Native (AI/AN) Beneficiaries and the Health Care System Serving these Beneficiaries\t"
         },
         {
           "const": "93.342",
@@ -7918,7 +7914,7 @@
         },
         {
           "const": "93.346",
-          "description": "Enhancing the Logical Observation Identifiers Names and Codes (LOINC\u00ae) Standard to meet U.S. Interoperability Needs"
+          "description": "Enhancing the Logical Observation Identifiers Names and Codes (LOINC\ufffd) Standard to meet U.S. Interoperability Needs"
         },
         {
           "const": "93.347",
@@ -8078,7 +8074,7 @@
         },
         {
           "const": "93.421",
-          "description": "Strengthening Public Health Systems and Services through National Partnerships to Improve and Protect the Nation\u2019s Health"
+          "description": "Strengthening Public Health Systems and Services through National Partnerships to Improve and Protect the Nation\ufffds Health"
         },
         {
           "const": "93.422",
@@ -8098,7 +8094,7 @@
         },
         {
           "const": "93.431",
-          "description": "Networking2Save\u201d:  CDC\u2019s National Network Approach to Preventing and Controlling Tobacco-related Cancers in Special Populations"
+          "description": "Networking2Save\ufffd:  CDC\ufffds National Network Approach to Preventing and Controlling Tobacco-related Cancers in Special Populations"
         },
         {
           "const": "93.432",
@@ -8162,7 +8158,7 @@
         },
         {
           "const": "93.470",
-          "description": "Alzheimer\u2019s Disease Program Initiative (ADPI)"
+          "description": "Alzheimer\ufffds Disease Program Initiative (ADPI)"
         },
         {
           "const": "93.471",
@@ -8230,7 +8226,7 @@
         },
         {
           "const": "93.525",
-          "description": "State Planning and Establishment Grants for the Affordable Care Act (ACA)\u2019s Exchanges"
+          "description": "State Planning and Establishment Grants for the Affordable Care Act (ACA)\ufffds Exchanges"
         },
         {
           "const": "93.526",
@@ -8278,7 +8274,7 @@
         },
         {
           "const": "93.560",
-          "description": "Payments to Territories \u2013 Adults"
+          "description": "Payments to Territories \ufffd Adults"
         },
         {
           "const": "93.563",
@@ -8482,11 +8478,11 @@
         },
         {
           "const": "93.662",
-          "description": "Extramural Research Facilities Restoration Program: Hurricanes Harvey, Maria, and Irma \u2013 Construction"
+          "description": "Extramural Research Facilities Restoration Program: Hurricanes Harvey, Maria, and Irma \ufffd Construction"
         },
         {
           "const": "93.663",
-          "description": "Extramural Research Restoration Program: Hurricanes Harvey, Maria, and Irma \u2013 non-construction"
+          "description": "Extramural Research Restoration Program: Hurricanes Harvey, Maria, and Irma \ufffd non-construction"
         },
         {
           "const": "93.664",
@@ -8530,7 +8526,7 @@
         },
         {
           "const": "93.686",
-          "description": "Ending the HIV Epidemic:  A Plan for America \u2014 Ryan White HIV/AIDS Program Parts A and B"
+          "description": "Ending the HIV Epidemic:  A Plan for America \ufffd Ryan White HIV/AIDS Program Parts A and B"
         },
         {
           "const": "93.687",
@@ -8554,7 +8550,7 @@
         },
         {
           "const": "93.714",
-          "description": "ARRA \u2013 Emergency Contingency Fund for Temporary Assistance for Needy Families (TANF) State Program"
+          "description": "ARRA \ufffd Emergency Contingency Fund for Temporary Assistance for Needy Families (TANF) State Program"
         },
         {
           "const": "93.732",
@@ -8562,7 +8558,7 @@
         },
         {
           "const": "93.734",
-          "description": "Empowering Older Adults and Adults with Disabilities through Chronic Disease Self-Management Education Programs \u2013 financed by Prevention and Public Health Funds (PPHF) "
+          "description": "Empowering Older Adults and Adults with Disabilities through Chronic Disease Self-Management Education Programs \ufffd financed by Prevention and Public Health Funds (PPHF) "
         },
         {
           "const": "93.738",
@@ -8578,11 +8574,11 @@
         },
         {
           "const": "93.762",
-          "description": "A Comprehensive Approach to Good Health and Wellness in Indian County \u2013 financed solely by Prevention and Public Health "
+          "description": "A Comprehensive Approach to Good Health and Wellness in Indian County \ufffd financed solely by Prevention and Public Health "
         },
         {
           "const": "93.763",
-          "description": "Alzheimer\u2019s Disease Initiative: Specialized Supportive Services Project (ADI-SSS) thru Prevention and Public Health Funds (PPHF)"
+          "description": "Alzheimer\ufffds Disease Initiative: Specialized Supportive Services Project (ADI-SSS) thru Prevention and Public Health Funds (PPHF)"
         },
         {
           "const": "93.767",
@@ -8638,7 +8634,7 @@
         },
         {
           "const": "93.799",
-          "description": "CARA Act \u2013 Comprehensive Addiction and Recovery Act of 2016"
+          "description": "CARA Act \ufffd Comprehensive Addiction and Recovery Act of 2016"
         },
         {
           "const": "93.800",

@@ -1,17 +1,22 @@
 import argparse
 import csv
 import json
+import time
 
 from jsonpath_ng import parse
 
 
-def extract(input_filename):
+def extract(input_data):
     data = []
-    with open(input_filename, encoding="cp1252") as csvfile:
-        reader = csv.reader(csvfile)
+    reader = csv.DictReader(input_data)
 
-        for row in reader:
-            data.append({"program_name": row[0], "program_number": row[1]})
+    for row in reader:
+        data.append(
+            {
+                "program_name": row["Program Title"],
+                "program_number": row["Program Number"],
+            }
+        )
 
     return data
 
@@ -32,14 +37,11 @@ def transform(program_data):
     return schema
 
 
-def load(schema_filename, schema_def):
-    with open(schema_filename) as schema_file:
-        schema = json.load(schema_file)
+def load(schema, schema_def):
+    jsonpath_expr = parse('$."$defs".ProgramNumber')
+    jsonpath_expr.update(schema, schema_def)
 
-        jsonpath_expr = parse('$."$defs".ProgramNumber')
-        jsonpath_expr.update(schema, schema_def)
-
-        return schema
+    return schema
 
 
 def main():
@@ -66,9 +68,15 @@ def main():
 
     args = parser.parse_args()
 
-    program_data = extract(args.input_filename)
+    with open(args.input_filename) as csvfile:
+        input_data = csvfile.readlines()
+        program_data = extract(input_data)
+
     schema_def = transform(program_data)
-    updated_schema = load(args.schema_filename, schema_def)
+    
+    with open(args.schema_filename) as schema_file:
+        schema = json.load(schema_file)
+        updated_schema = load(schema, schema_def)
 
     output_filename = args.output_filename or args.schema_filename
 
