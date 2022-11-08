@@ -1,14 +1,11 @@
-from django.shortcuts import render
 from .models import Posts
 from django.views import generic
-from django.views.decorators.http import require_GET
-from django.http import HttpResponse
+
 
 # class based views for posts
-class postslist(generic.ListView):
-    queryset = Posts.objects.order_by('-created_on')
+class home(generic.TemplateView):
     template_name = 'home.html'
-    paginate_by = 4
+
 
 # class based view for each post
 class postdetail(generic.DetailView):
