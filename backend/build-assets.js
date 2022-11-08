@@ -4,9 +4,8 @@ const { sassPlugin } = require('esbuild-sass-plugin');
 require('esbuild').build({
   entryPoints: ['static/scss/main.scss'],
   outdir: 'static/compiled',
-  // TODO: django env vars for environment
-  // minify: process.env.ELEVENTY_ENV === "production",
-  // sourcemap: process.env.ELEVENTY_ENV !== "production",
+  minify: process.env.NODE_ENV === "production",
+  sourcemap: process.env.NODE_ENV !== "production",
   target: ['chrome58', 'firefox57', 'safari11', 'edge18'],
   bundle: true,
   format: 'iife',
@@ -18,6 +17,12 @@ require('esbuild').build({
     '.woff': 'file',
     '.woff2': 'file',
   },
+  watch: {
+    onRebuild(error, result) {
+      if (error) console.error('watch build failed:', error)
+      else console.info('watch build succeeded:', result)
+    },
+  },
   plugins: [
     sassPlugin({
       loadPaths: [
@@ -26,4 +31,6 @@ require('esbuild').build({
       ],
     }),
   ]
-}).catch(() => process.exit(1))
+})
+  .then(() => console.info('Watching assets…'))
+  .catch(() => process.exit(1))
