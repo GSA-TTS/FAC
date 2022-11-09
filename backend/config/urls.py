@@ -66,8 +66,5 @@ urlpatterns = [
     ),
     path(settings.ADMIN_URL, admin.site.urls),
     # Keep last so we can use short urls for content pages like home page etc.
-    path(
-        '',
-        include('cms.urls')
-    ),
+    path("", include("cms.urls")),
 ]
