@@ -1,5 +1,3 @@
-from .models import Posts
-from django.views import generic
 from django.views import generic
 
 from .models import Posts
