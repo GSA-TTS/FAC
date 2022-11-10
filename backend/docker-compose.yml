@@ -15,7 +15,7 @@ services:
       dockerfile: ./Dockerfile
     command: >
       bash -c "python manage.py migrate 
-      && node build-assets.js 
+      && npm run build
       & python manage.py runserver 0.0.0.0:8000"
     depends_on:
       - db
@@ -28,6 +28,7 @@ services:
       - "8000:8000"
     volumes:
       - .:/src
+      - /src/node_modules
 
 volumes:
   postgres-data:
