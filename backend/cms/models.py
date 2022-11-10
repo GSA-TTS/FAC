@@ -20,11 +20,9 @@ class Posts(models.Model):
     # meta description for SEO benefits and accessibility
     meta_description = models.CharField(max_length=300, null=True)
 
-    # meta for the class
     class Meta:
         """Meta information"""
-
-        ordering = ["-created_on"]
+        ordering = ['-created_on']
 
     # used while managing models from terminal
     def __str__(self):  # pragma: no cover

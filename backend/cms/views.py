@@ -1,5 +1,5 @@
-from django.views import generic
 from .models import Posts
+from django.views import generic
 
 
 # class based views for posts
