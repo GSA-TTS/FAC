@@ -1,12 +1,16 @@
 # Install python dependencies
 install:
 	@pip install -r requirements.txt
+	@npm i
 
 # Generate an updated requirements.txt
 compile:
 	@rm requirements.txt
 	@pip-compile --generate-hashes ./requirements/requirements.in -o requirements.txt --allow-unsafe
 
+
+compile-assets:
+	@node build-assets.js
 
 # Generate an updated dev-requirements.txt
 compile-dev:
