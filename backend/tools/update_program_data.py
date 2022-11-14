@@ -67,7 +67,7 @@ def main():
 
     args = parser.parse_args()
 
-    with open(args.input_filename) as csvfile:
+    with open(args.input_filename, encoding="cp1252") as csvfile:
         input_data = csvfile.readlines()
         program_data = extract(input_data)
 
