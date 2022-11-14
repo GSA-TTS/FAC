@@ -1,6 +1,6 @@
 from django.test import SimpleTestCase
 
-from .update_program_data import extract, transform, load
+from .update_program_data import extract, transform, update_json, PROGRAM_EXPR
 
 
 class UpdateProgramDataTest(SimpleTestCase):
@@ -74,7 +74,7 @@ class UpdateProgramDataTest(SimpleTestCase):
         schema = {"$defs": {}}
         schema_def = {"type": "test"}
 
-        result = load(schema, schema_def)
+        result = update_json(schema, PROGRAM_EXPR, schema_def)
 
         self.assertEqual(result, schema)
 
@@ -86,6 +86,6 @@ class UpdateProgramDataTest(SimpleTestCase):
         schema_def = {"type": "new"}
         expected_result = {"$defs": {"ProgramNumber": schema_def}}
 
-        result = load(schema, schema_def)
+        result = update_json(schema, PROGRAM_EXPR, schema_def)
 
         self.assertEqual(result, expected_result)
