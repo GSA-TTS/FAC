@@ -153,3 +153,10 @@ backend/static/compiled
 staticfiles/
 
 # pa11y_tests/screenshots/*.png
+
+# Infrastructure
+terraform/*/backend.tfvars
+terraform/*/.terraform
+terraform/*/secrets.auto.tfvars
+terraform/*/terraform.tfstate
+terraform/*/terraform.tfstate.backup
