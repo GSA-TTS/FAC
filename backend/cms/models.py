@@ -22,7 +22,7 @@ class Posts(models.Model):
 
     class Meta:
         """Meta information"""
-        ordering = ['-created_on']
+        ordering = ["-created_on"]
 
     # used while managing models from terminal
     def __str__(self):  # pragma: no cover
