@@ -1,0 +1,95 @@
+@use 'uswds-core' as *;
+
+@media (min-width: 64em) {
+  .usa-logo {
+    margin: 0;
+  }
+
+  .usa-header--basic .usa-nav {
+    padding: 0;
+  }
+
+  .usa-header--basic .usa-nav-container {
+    align-items: center;
+  }
+}
+
+.sign-in,
+.sign-out {
+  background-color: color('primary-darker');
+  padding: 0.5em 1.5em 1.5em 1em;
+}
+
+.usa-menu-btn {
+  background-color: color('primary-darker');
+}
+
+.sign-in-logo,
+.sign-in-logo:active,
+.sign-in-logo:visited {
+  color: #fff;
+  font-weight: bold;
+  margin: 0;
+  display: inline-block;
+  white-space: nowrap;
+  padding: 0.85rem;
+  padding: 0.75rem 0.5rem;
+  text-decoration: none;
+}
+
+.sign-out {
+  padding: 1.8rem 2.8rem 1.8rem 1.4rem;
+
+  button {
+    color: #fff;
+    display: flex;
+    flex-flow: column wrap;
+    height: 2em;
+    text-decoration: none;
+
+    &:hover {
+      color: #fff;
+    }
+
+    span {
+      font-size: size('body', 'xs');
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      max-width: 10rem;
+    }
+
+    svg {
+      font-size: size('body', 9);
+      height: 2em;
+    }
+  }
+}
+
+.sign-out button:hover,
+.sign-in-logo:hover {
+  text-decoration: underline;
+}
+
+.sign-in-logo::before {
+  content: url('../../assets/img/login-logo.png');
+  position: relative;
+  top: 0.5em;
+}
+
+.usa-header {
+  background-color: #f3f9fe;
+
+  .usa-logo a {
+    color: color('primary-darker');
+    font-weight: 300;
+
+    & strong {
+      font-weight: bold;
+    }
+
+    &::before {
+      content: url('../../assets/img/fac-logo.svg');
+    }
+  }
+}

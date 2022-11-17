@@ -6,3 +6,6 @@
 );
 
 @forward 'uswds';
+
+@use '_home.scss';
+@use '_header.scss';
