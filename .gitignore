@@ -150,5 +150,6 @@ backend/.idea/
 # Assets
 node_modules/
 backend/static/compiled
+staticfiles/
 
 # pa11y_tests/screenshots/*.png

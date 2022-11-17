@@ -15,6 +15,7 @@ import environs
 from cfenv import AppEnv
 
 env = environs.Env()
+environment = env.str("ENV", "UNDEFINED")
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = environs.Path(__file__).resolve(strict=True).parent.parent
@@ -164,7 +165,23 @@ STATICFILES_DIRS = [
     BASE_DIR / "static",
     # '/var/www/static/',
 ]
-STATIC_URL = "static/"
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
+
+STATIC_URL = "/static/"
+# Need to add environment variables
+# if environment not in ['LOCAL', 'UNDEFINED']:
+#      for service in vcap['s3']:
+#         # need to confirm the name of the bucket and that it is public
+#         if service['instance_name'] == 'fac_dev_s3':
+#             # Public AWS S3 bucket for the app
+#             s3_creds = service["credentials"]
+
+#     AWS_STORAGE_BUCKET_NAME = s3_creds["bucket"]
+#     AWS_S3_REGION_NAME = s3_creds["region"]
+#     AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3-{AWS_S3_REGION_NAME}.amazonaws.com'
+#     AWS_LOCATION = 'static'
+#     STATIC_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{AWS_LOCATION}/'
+
 
 ADMIN_URL = "admin/"
 
