@@ -1,52 +1,63 @@
 {% extends "base.html" %}
+{% load static %}
 {% block metatags %}
-<title>Home | Title</title>
-<meta name="description" content="A destination for Learning">
-<meta property="og:title" content="title">
-<meta property="og:site_name" content="site_name">
-<meta property="og:description" content="{{ post.meta_description }}">
-<meta property="og:type" content="website">
+    <title>{{ post.title }}</title>
+    <meta name="description" content="{{ post.meta_description }}">
+    <meta property="og:title" content="{{ post.title }}">
+    <meta property="og:site_name" content="Federal Audit Clearinghouse">
+    <meta property="og:description" content="{{ post.meta_description }}">
+    <meta property="og:type" content="website">
 {% endblock %}
-{% block content %}
-  <div class="usa-modal__content">
-    <div class="usa-modal__main">
-      <h2 class="usa-modal__heading" id="login-modal-heading">
-        Submitting information to the Federal Audit Clearinghouse requires authentication
-      </h2>
-      <div id="login-modal-description">
-        <p>General Services Administration Notice and Consent Warning</p>
-                            <p>You are accessing a United States government computer system. This United States government computer system is provided for the collection of the single audit reporting package and form SF-SAC as required under the Single Audit Act of 1984 (amended in 1996) and the Office of Management and Budget (OMB) Title 2 U.S. Code of Federal Regulations (CFR) Part 200, Uniform Administrative Requirements for Federal Awards (Uniform Guidance).</p>
-                            <p>Use of this system indicates your consent to collection, monitoring, recording, and use of the information you provide for any lawful government purpose. So that our network remains safe and available for its intended use, network traffic is monitored to identify unauthorized attempts to access, upload, change information, or otherwise cause damage to the web service. Use of a government computer network for unauthorized purposes is a violation of federal law and punishable by fines or imprisonment (Public Law 99-474).</p>
-                            <p>Collecting data on behalf of OMB. Version: 1.4.14.0   Last Modified: February 09, 2022 and expires February 28, 2025</p>
-      </div>
 
-      <div class="usa-modal__footer">
-        <ul class="usa-button-group">
-          <li class="usa-button-group__item">
-            <button type="button" class="usa-button sign-in-button" id="sign-in" data-close-modal>
-              Authenticate with Login.gov
-            </button>
-          </li>
-          <li class="usa-button-group__item">
-            <button
-              type="button"
-              class="usa-button usa-button--unstyled padding-105 text-center"
-              data-close-modal
+{% block content%}
+    <section class="usa-hero" aria-label="Introduction">s
+        <div class="grid-container">
+            <div class="usa-alert usa-alert--success usa-alert--slim"
+                role="alert"
+                hidden
+                id=logout-success
             >
-              Go back
-            </button>
-          </li>
-        </ul>
-      </div>
-    </div>
-    <button
-      class="usa-button usa-modal__close"
-      aria-label="Close this window"
-      data-close-modal
-    >
-      <svg class="usa-icon" aria-hidden="true" focusable="false" role="img">
-        <use xlink:href="static/img/sprite.svg#close"></use>
-      </svg>
-    </button>
-  </div>
+                <div class="usa-alert__body">
+                    <p class="usa-alert__text">
+                        You have successfully logged out
+                    </p>
+                </div>
+            </div>
+
+            <div class="usa-alert usa-alert--error usa-alert--slim"
+                role="alert"
+                hidden
+                id=unauthorized
+            >
+                <div class="usa-alert__body">
+
+                    <p class="usa-alert__text">
+                        You do not have access to that page
+                    </p>
+                </div>
+            </div>
+
+            <script>
+                (function(){
+                    const params = new URLSearchParams(window.location.search);
+                    if (params.has('logout')) {
+                        document.getElementById('logout-success').hidden = false;
+                    } else if (params.has('authorized')) {
+                        document.getElementById('unauthorized').hidden = false;
+                    }
+                })()
+            </script>
+            <h1 class="usa-hero__heading">Search, upload, and download federal audit documents</h1>
+            <p>The FAC is transitioning to the General Services Administration to help the public  in oversight, transparency and assessment of Federal award audit requirements. Only audits from 2021 will be searchable on this site until we migrate systems, so please use the <a href="https://facides.census.gov/Account/Login.aspx">legacy FAC IMS</a> to search older records.</p>
+            <div class="usa-button-group">
+                <a class="usa-button sign-in-button" href="/#">
+                    Log in to submit an audit
+                </a>
+                <a class="usa-button usa-button--outline" href="/callout/">
+                    Find audit information on the legacy FAC IMS
+                </a>
+            </div>
+        </div>
+    </section>
+
 {% endblock content%}
