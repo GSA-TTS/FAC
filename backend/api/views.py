@@ -28,7 +28,7 @@ from .serializers import (
 
 class IndexView(View):
     def get(self, request, *args, **kwargs):
-        test_file = open(BASE_DIR.__str__() + "/static/index.html", 'r')
+        test_file = open(BASE_DIR.__str__() + "/static/index.html", "r")
         response = HttpResponse(content=test_file)
         return response
 

@@ -22,6 +22,7 @@ class Posts(models.Model):
 
     class Meta:
         """Meta information"""
+
         ordering = ["-created_on"]
 
     # used while managing models from terminal

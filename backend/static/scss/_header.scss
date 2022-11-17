@@ -72,7 +72,7 @@
 }
 
 .sign-in-logo::before {
-  content: url('../../assets/img/login-logo.png');
+  content: url('../img/login-logo.png');
   position: relative;
   top: 0.5em;
 }
@@ -89,7 +89,7 @@
     }
 
     &::before {
-      content: url('../../assets/img/fac-logo.svg');
+      content: url('../img/fac-logo.svg');
     }
   }
 }

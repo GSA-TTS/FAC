@@ -10,54 +10,18 @@
 {% endblock %}
 
 {% block content%}
-    <section class="usa-hero" aria-label="Introduction">s
-        <div class="grid-container">
-            <div class="usa-alert usa-alert--success usa-alert--slim"
-                role="alert"
-                hidden
-                id=logout-success
-            >
-                <div class="usa-alert__body">
-                    <p class="usa-alert__text">
-                        You have successfully logged out
-                    </p>
-                </div>
-            </div>
-
-            <div class="usa-alert usa-alert--error usa-alert--slim"
-                role="alert"
-                hidden
-                id=unauthorized
-            >
-                <div class="usa-alert__body">
-
-                    <p class="usa-alert__text">
-                        You do not have access to that page
-                    </p>
-                </div>
-            </div>
-
-            <script>
-                (function(){
-                    const params = new URLSearchParams(window.location.search);
-                    if (params.has('logout')) {
-                        document.getElementById('logout-success').hidden = false;
-                    } else if (params.has('authorized')) {
-                        document.getElementById('unauthorized').hidden = false;
-                    }
-                })()
-            </script>
-            <h1 class="usa-hero__heading">Search, upload, and download federal audit documents</h1>
-            <p>The FAC is transitioning to the General Services Administration to help the public  in oversight, transparency and assessment of Federal award audit requirements. Only audits from 2021 will be searchable on this site until we migrate systems, so please use the <a href="https://facides.census.gov/Account/Login.aspx">legacy FAC IMS</a> to search older records.</p>
-            <div class="usa-button-group">
-                <a class="usa-button sign-in-button" href="/#">
-                    Log in to submit an audit
-                </a>
-                <a class="usa-button usa-button--outline" href="/callout/">
-                    Find audit information on the legacy FAC IMS
-                </a>
-            </div>
-        </div>
-    </section>
-
+<section class="usa-hero" aria-label="Introduction">
+    <div class="grid-container">
+      <h1 class="usa-hero__heading">Search, upload, and download federal audit documents</h1>
+      <p>The FAC is transitioning to the General Services Administration to help the public  in oversight, transparency and assessment of Federal award audit requirements. Only audits from 2021 will be searchable on this site until we migrate systems, so please use the <a href="https://facides.census.gov/Account/Login.aspx">legacy FAC IMS</a> to search older records.</p>
+      <div class="usa-button-group">
+        <a class="usa-button sign-in-button" href="/#">
+          Log in to submit an audit
+        </a>
+        <a class="usa-button usa-button--outline" href="/callout/">
+          Find audit information on the legacy FAC IMS
+        </a>
+      </div>
+    </div>
+  </section>
 {% endblock content%}
