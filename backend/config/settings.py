@@ -15,7 +15,7 @@ import os
 from cfenv import AppEnv
 
 env = environs.Env()
-environment = env.str('ENV', 'UNDEFINED')
+environment = env.str("ENV", "UNDEFINED")
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = environs.Path(__file__).resolve(strict=True).parent.parent
@@ -99,7 +99,7 @@ ROOT_URLCONF = "config.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [os.path.join(BASE_DIR, 'templates')],
+        "DIRS": [os.path.join(BASE_DIR, "templates")],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
