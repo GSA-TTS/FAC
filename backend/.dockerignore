@@ -4,3 +4,4 @@
 .coverage
 docker-compose.yml
 Dockerfile
+staticfiles/
