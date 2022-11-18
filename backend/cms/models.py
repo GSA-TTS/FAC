@@ -27,5 +27,5 @@ class Posts(models.Model):
         ordering = ["-created_on"]
 
     # used while managing models from terminal
-    def __str__(self):
+    def __str__(self):  # pragma: no cover
         return str(self.title)

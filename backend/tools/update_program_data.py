@@ -49,7 +49,7 @@ def update_json(base, path_expr, json_fragment):
     return base
 
 
-def main(program_expr):
+def main(program_expr):  # pragma: no cover
     """
     Entry point for CLI invocation.
     """

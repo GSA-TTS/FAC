@@ -157,20 +157,17 @@ USE_L10N = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
-
-# STATIC_ROOT = str(BASE_DIR.joinpath("static"))
 STATICFILES_DIRS = [
     BASE_DIR / "static",
-    # '/var/www/static/',
 ]
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 
 STATIC_URL = "/static/"
 
-# Environment specific configurations
-if environment == "TESTING":
-    return
-elif environment != "LOCAL":
+"""Environment specific configurations"""
+if environment in ["LOCAL", "UNDEFINED"]:
+    DEBUG = env.bool("DJANGO_DEBUG", default=False)
+elif environment != "TESTING":
     vcap = json.loads(env.str("VCAP_SERVICES"))
     for service in vcap["s3"]:
         # need to confirm the name of the bucket and that it is public
@@ -185,9 +182,6 @@ elif environment != "LOCAL":
     )
     AWS_LOCATION = "static"
     STATIC_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/{AWS_LOCATION}/"
-else:
-    # SECURITY WARNING: don't run with debug turned on in production!
-    DEBUG = env.bool("DJANGO_DEBUG", default=False)
 
 ADMIN_URL = "admin/"
 
