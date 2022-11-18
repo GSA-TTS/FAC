@@ -7,7 +7,7 @@ applications:
   stack: cflinuxfs3
   timeout: 180
   env:
-    DISABLE_COLLECTSTATIC: true
+    ENV: DEVELOPMENT
   routes:
   - route: fac-dev.app.cloud.gov
   instances: 1

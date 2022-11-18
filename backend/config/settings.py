@@ -15,7 +15,7 @@ import os
 from cfenv import AppEnv
 
 env = environs.Env()
-environment = env.str("ENV", "UNDEFINED")
+environment = env.str("ENV", "UNDEFINED").upper()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = environs.Path(__file__).resolve(strict=True).parent.parent
@@ -29,9 +29,6 @@ SECRET_KEY = env(
     "SECRET_KEY",
     default="django-insecure-(jdhaxma6e-)uq=!a0*&z%#b_3-d#wnq0w51#^***5u%@z6thh",
 )
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = env.bool("DJANGO_DEBUG", default=False)
 
 ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=["*"])
 
@@ -168,20 +165,27 @@ STATICFILES_DIRS = [
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 
 STATIC_URL = "/static/"
-# Need to add environment variables
-# if environment not in ['LOCAL', 'UNDEFINED']:
-#      for service in vcap['s3']:
-#         # need to confirm the name of the bucket and that it is public
-#         if service['instance_name'] == 'fac_dev_s3':
-#             # Public AWS S3 bucket for the app
-#             s3_creds = service["credentials"]
 
-#     AWS_STORAGE_BUCKET_NAME = s3_creds["bucket"]
-#     AWS_S3_REGION_NAME = s3_creds["region"]
-#     AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3-{AWS_S3_REGION_NAME}.amazonaws.com'
-#     AWS_LOCATION = 'static'
-#     STATIC_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{AWS_LOCATION}/'
+# Environment specific configurations
+if environment == "TESTING":
+    continue
+elif environment != "LOCAL":
+    for service in vcap["s3"]:
+        # need to confirm the name of the bucket and that it is public
+        if service["instance_name"] == "fac_dev_s3":
+            # Public AWS S3 bucket for the app
+            s3_creds = service["credentials"]
 
+    AWS_STORAGE_BUCKET_NAME = s3_creds["bucket"]
+    AWS_S3_REGION_NAME = s3_creds["region"]
+    AWS_S3_CUSTOM_DOMAIN = (
+        f"{AWS_STORAGE_BUCKET_NAME}.s3-{AWS_S3_REGION_NAME}.amazonaws.com"
+    )
+    AWS_LOCATION = "static"
+    STATIC_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/{AWS_LOCATION}/"
+else:
+    # SECURITY WARNING: don't run with debug turned on in production!
+    DEBUG = env.bool("DJANGO_DEBUG", default=False)
 
 ADMIN_URL = "admin/"
 
