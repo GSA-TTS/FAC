@@ -32,7 +32,7 @@ Target python version is defined in [../backend/runtime.txt](../backend/runtime.
 
 ## Environment Variables
 
-We use the `SAM_API_KEY` environment variable to interact with the SAM.gov API. 
+Create a .env file in the `/backend` directory. Add `ENV = 'LOCAL'`. You will also need to add a `SAM_API_KEY` environment variable to interact with the SAM.gov API.
 
 To test UEI validation using the SAM.gov API with a personal API key, follow these steps on (https://SAM.gov):
 
