@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 
 import environs
 import os
+import json
 from cfenv import AppEnv
 
 env = environs.Env()
@@ -168,8 +169,9 @@ STATIC_URL = "/static/"
 
 # Environment specific configurations
 if environment == "TESTING":
-    continue
+    return
 elif environment != "LOCAL":
+    vcap = json.loads(env.str("VCAP_SERVICES"))
     for service in vcap["s3"]:
         # need to confirm the name of the bucket and that it is public
         if service["instance_name"] == "fac_dev_s3":
