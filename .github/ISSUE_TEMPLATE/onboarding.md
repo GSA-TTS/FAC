@@ -32,6 +32,7 @@ Here's a checklist to get you started and to make sure you've got access to :all
 **For designers, also...**
 - [ ] Review the [design onboarding document](https://docs.google.com/document/d/1EILl0nZr59T4PFJJMtFbmnQDJPksgzIFPuoFDN0bk0g/edit#heading=h.bhu3dgydlbvr)
 - [ ] Visit https://touchpoints.digital.gov/ and set up a touchpoints account
+- [ ] If you don't already have a Figma license, request one from your supervisor.  
 
 **For engineers, also...**
 - [ ] Familiarize yourself with Python, Django, and Cloud.gov—all tools used in this project.
