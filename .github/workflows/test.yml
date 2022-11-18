@@ -9,6 +9,9 @@ on:
     branches:
     - main
 
+env:
+  ENV: TESTING
+
 jobs:
   python-linting:
     runs-on: ubuntu-latest
