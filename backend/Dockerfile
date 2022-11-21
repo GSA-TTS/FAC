@@ -6,6 +6,8 @@ ENV PYTHONUNBUFFERED 1
 COPY requirements.txt /tmp/requirements.txt
 COPY dev-requirements.txt /tmp/dev-requirements.txt
 
+RUN apt-get -y update
+RUN apt-get -y install git
 
 # RUN --mount=type=cache,target=/root/.cache \
 

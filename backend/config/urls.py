@@ -6,8 +6,6 @@ from django.urls import path, include
 from rest_framework.renderers import JSONOpenAPIRenderer
 from rest_framework.schemas import get_schema_view
 
-from users.views import AuthToken
-
 schema_view = get_schema_view(
     title="Federal Audit Clearinghouse API",
     version=settings.API_VERSION,
@@ -17,7 +15,6 @@ schema_view = get_schema_view(
 
 urlpatterns = [
     # path("", IndexView.as_view(), name="index"),
-    path("api/auth/token", AuthToken.as_view(), name="token"),
     path("api/schema.json", schema_view),
     path("public/api/sac", views.SACViewSet.as_view({"get": "list"}), name="sac-list"),
     path(
@@ -67,6 +64,7 @@ urlpatterns = [
         name="schemas",
     ),
     path(settings.ADMIN_URL, admin.site.urls),
+    path("openid/", include("djangooidc.urls")),
     # Keep last so we can use short urls for content pages like home page etc.
     path("", include("cms.urls")),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
