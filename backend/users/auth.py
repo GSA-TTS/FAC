@@ -7,7 +7,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def claim_audit_access(user, all_emails):
+def claim_audit_access(user, all_emails):  # pragma: no cover
     access_invites = (
         Access.objects.filter(user_id=None)
         .filter(email__in=all_emails)
@@ -16,7 +16,7 @@ def claim_audit_access(user, all_emails):
     logger.debug(f"{user.email} granted access to {access_invites} new audits")
 
 
-class FACAuthenticationBackend(OpenIdConnectBackend):
+class FACAuthenticationBackend(OpenIdConnectBackend):  # pragma: no cover
     def authenticate(self, request, **user_info):
         user = super().authenticate(request, **user_info)
 
