@@ -1,12 +1,17 @@
 # Install python dependencies
 install:
 	@pip install -r requirements.txt
+	@pip install -r requirements-nohashes.txt
 	@npm i
 
 # Generate an updated requirements.txt
 compile:
+	@touch requirements.txt
 	@rm requirements.txt
 	@pip-compile --generate-hashes ./requirements/requirements.in -o requirements.txt --allow-unsafe
+	@touch requirements-nohashes.txt
+	@rm requirements-nohashes.txt
+	@pip-compile ./requirements/requirements-nohashes.in -o requirements-nohashes.txt --allow-unsafe
 
 
 compile-assets:
@@ -14,6 +19,7 @@ compile-assets:
 
 # Generate an updated dev-requirements.txt
 compile-dev:
+	@touch dev-requirements.txt
 	@rm dev-requirements.txt
 	@pip-compile --generate-hashes ./requirements/dev-requirements.in -o dev-requirements.txt --allow-unsafe
 
