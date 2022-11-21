@@ -1,5 +1,3 @@
-from django.utils.translation import gettext_lazy as _
-
 from djangooidc.backends import OpenIdConnectBackend
 
 from audit.models import Access

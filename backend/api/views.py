@@ -10,7 +10,7 @@ from django.views import View
 from config.settings import SCHEMAS_DIR, BASE_DIR
 from rest_framework import viewsets
 from rest_framework.authentication import BaseAuthentication
-from rest_framework.permissions import BasePermission
+from rest_framework.permissions import BasePermission, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.http import JsonResponse
@@ -244,7 +244,7 @@ class SingleAuditChecklistView(APIView):
     Accepts and returns data for a SingleAuditChecklist
     """
 
-    permission_classes = [SingleAuditChecklistPermission]
+    permission_classes = [IsAuthenticated, SingleAuditChecklistPermission]
     invalid_keys = [
         "submitted_by",
         "date_created",
@@ -317,7 +317,7 @@ class SacFederalAwardsView(APIView):
     Accepts and returns data for a SAC's federal awards section
     """
 
-    permission_classes = [SingleAuditChecklistPermission]
+    permission_classes = [IsAuthenticated, SingleAuditChecklistPermission]
 
     def get(self, request, report_id):
         """
