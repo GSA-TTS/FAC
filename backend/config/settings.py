@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 
+from base64 import b64decode
 import os
 import json
 import environs
@@ -18,6 +19,12 @@ from cfenv import AppEnv
 env = environs.Env()
 
 environment = env.str("ENV", "UNDEFINED").upper()
+
+key_service = AppEnv().get_service(name="fac-key-service")
+if key_service and key_service.credentials:
+    secret = key_service.credentials.get
+else:
+    secret = os.environ.get
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = environs.Path(__file__).resolve(strict=True).parent.parent
@@ -71,6 +78,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "report_submission",
     "cms",
+    "djangooidc",
 ]
 
 # Third-party apps
@@ -226,7 +234,6 @@ API_VERSION = "0"
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework.authentication.BasicAuthentication",
-        "users.auth.ExpiringTokenAuthentication",
     ],
     "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
     "TEST_REQUEST_RENDERER_CLASSES": [
@@ -238,30 +245,50 @@ REST_FRAMEWORK = {
     "TEST_REQUEST_DEFAULT_FORMAT": "api",
 }
 
-SIMPLE_JWT = {
-    "ALGORITHM": "RS256",
-    "AUDIENCE": None,
-    "ISSUER": "https://idp.int.identitysandbox.gov/",
-    "JWK_URL": "https://idp.int.identitysandbox.gov/api/openid_connect/certs",
-    "LEEWAY": 0,
-    "AUTH_TOKEN_CLASSES": ("rest_framework_simplejwt.tokens.UntypedToken",),
-    "USER_ID_CLAIM": "sub",
-}
-
-TOKEN_AUTH = {"TOKEN_TTL": 3600}
-
 # CORS
 CORS_ALLOW_ALL_ORIGINS = True
 
 # SAM.gov API
 SAM_API_URL = "https://api.sam.gov/entity-information/v3/entities"
-# Get key from cloud.gov user provided service instance
-env = AppEnv()
-key_service = env.get_service(name="fac-key-service")
-if key_service and key_service.credentials:
-    SAM_API_KEY = key_service.credentials.get("SAM_API_KEY")
-else:
-    SAM_API_KEY = os.environ.get("SAM_API_KEY")
+SAM_API_KEY = secret("SAM_API_KEY")
 
 SCHEMAS_DIR = os.path.join("audit", "schemas")
 SECTION_SCHEMA_DIR = os.path.join("schemas", "sections")
+
+AUTHENTICATION_BACKENDS = [
+    "django.contrib.auth.backends.ModelBackend",
+    "users.auth.FACAuthenticationBackend",
+]
+
+env_base_url = env.str("DJANGO_BASE_URL", "")
+secret_login_key = b64decode(secret("DJANGO_SECRET_LOGIN_KEY", ""))
+
+# which provider to use if multiple are available
+# (code does not currently support user selection)
+OIDC_ACTIVE_PROVIDER = "login.gov"
+
+OIDC_PROVIDERS = {
+    "login.gov": {
+        "srv_discovery_url": "https://idp.int.identitysandbox.gov",
+        "behaviour": {
+            # the 'code' workflow requires direct connectivity from us to Login.gov
+            "response_type": "code",
+            "scope": ["email", "profile:name", "phone", "all_emails"],
+            "user_info_request": [
+                "email",
+                "first_name",
+                "last_name",
+                "phone",
+                "all_emails",
+            ],
+            "acr_value": "http://idmanagement.gov/ns/assurance/ial/1",
+        },
+        "client_registration": {
+            "client_id": "urn:gov:gsa:openidconnect.profiles:sp:sso:gsa:gsa-fac-pk-jwt-01",
+            "redirect_uris": [f"{env_base_url}/openid/callback/login/"],
+            "post_logout_redirect_uris": [f"{env_base_url}/openid/callback/logout/"],
+            "token_endpoint_auth_method": ["private_key_jwt"],
+            "sp_private_key": secret_login_key,
+        },
+    }
+}
