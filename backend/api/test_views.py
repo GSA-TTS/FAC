@@ -104,10 +104,14 @@ class EligibilityViewTests(TestCase):
     }
 
     def test_auth_required(self):
-        """Unauthenticated requests return unauthorized response"""
+        """
+        Unauthenticated requests return a 403 response
+        DRF's IsAuthenticated permission class returns a 403 instead of a 401, see docs below
+        https://www.django-rest-framework.org/api-guide/permissions/#how-permissions-are-determined
+        """
         client = APIClient()
         response = client.post(ELIGIBILITY_PATH, VALID_ELIGIBILITY_DATA, format="json")
-        self.assertEqual(response.status_code, 401)
+        self.assertEqual(response.status_code, 403)
 
     def test_success_and_failure(self):
         """
@@ -134,10 +138,14 @@ class UEIValidationViewTests(TestCase):
     INELIGIBLE = {"auditee_uei": "000000000OI*"}
 
     def test_auth_required(self):
-        """Unauthenticated requests return unauthorized response"""
+        """
+        Unauthenticated requests return unauthorized response
+        DRF's IsAuthenticated permission class returns a 403 instead of a 401, see docs below
+        https://www.django-rest-framework.org/api-guide/permissions/#how-permissions-are-determined
+        """
         client = APIClient()
         response = client.post(self.PATH, self.SUCCESS, format="json")
-        self.assertEqual(response.status_code, 401)
+        self.assertEqual(response.status_code, 403)
 
     def test_success_and_failure(self):
         """
@@ -573,7 +581,9 @@ class SingleAuditChecklistViewTests(TestCase):
 
     def test_get_authentication_required(self):
         """
-        If a request is not authenticated, it should be rejected with a 401
+        If a request is not authenticated, it should be rejected with a 403
+        DRF's IsAuthenticated permission class returns a 403 instead of a 401, see docs below
+        https://www.django-rest-framework.org/api-guide/permissions/#how-permissions-are-determined
         """
 
         # use a different client that doesn't authenticate
@@ -581,7 +591,7 @@ class SingleAuditChecklistViewTests(TestCase):
 
         response = client.get(self.path("test-report-id"), format="json")
 
-        self.assertEqual(response.status_code, 401)
+        self.assertEqual(response.status_code, 403)
 
     def test_get_no_audit_access(self):
         """
@@ -612,7 +622,9 @@ class SingleAuditChecklistViewTests(TestCase):
 
     def test_put_authentication_required(self):
         """
-        If a request is not authenticated, it should be rejected with a 401
+        If a request is not authenticated, it should be rejected with a 403
+        DRF's IsAuthenticated permission class returns a 403 instead of a 401, see docs below
+        https://www.django-rest-framework.org/api-guide/permissions/#how-permissions-are-determined
         """
 
         # use a different client that doesn't authenticate
@@ -620,7 +632,7 @@ class SingleAuditChecklistViewTests(TestCase):
 
         response = client.put(self.path("test-report-id"), data={}, format="json")
 
-        self.assertEqual(response.status_code, 401)
+        self.assertEqual(response.status_code, 403)
 
     def test_put_no_audit_access(self):
         """
@@ -881,13 +893,15 @@ class SacFederalAwardsViewTests(TestCase):
 
     def test_get_authentication_required(self):
         """
-        If a request is not authenticated, it should be rejected with a 401
+        If a request is not authenticated, it should be rejected with a 403
+        DRF's IsAuthenticated permission class returns a 403 instead of a 401, see docs below
+        https://www.django-rest-framework.org/api-guide/permissions/#how-permissions-are-determined
         """
 
         # use a different client that doesn't authenticate
         client = APIClient()
         response = client.get(self.path(self.sac_report_id), format="json")
-        self.assertEqual(response.status_code, 401)
+        self.assertEqual(response.status_code, 403)
 
     def test_get_no_audit_awards_access(self):
         """
@@ -965,7 +979,9 @@ class AccessListViewTests(TestCase):
 
     def test_authentication_required(self):
         """
-        If a request is not authenticated, it should be rejected with a 401
+        If a request is not authenticated, it should be rejected with a 403
+        DRF's IsAuthenticated permission class returns a 403 instead of a 401, see docs below
+        https://www.django-rest-framework.org/api-guide/permissions/#how-permissions-are-determined
         """
 
         # use a different client that doesn't authenticate
@@ -973,7 +989,7 @@ class AccessListViewTests(TestCase):
 
         response = client.get(ACCESS_LIST_PATH, format="json")
 
-        self.assertEqual(response.status_code, 401)
+        self.assertEqual(response.status_code, 403)
 
     def test_no_access_returns_empty_list(self):
         """
