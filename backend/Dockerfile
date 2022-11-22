@@ -4,6 +4,7 @@ ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
 COPY requirements.txt /tmp/requirements.txt
+COPY requirements-nohashes.txt /tmp/requirements-nohashes.txt
 COPY dev-requirements.txt /tmp/dev-requirements.txt
 
 RUN apt-get -y update
@@ -29,6 +30,7 @@ RUN \
     set -ex && \
     pip install --upgrade pip && \
     pip install -r /tmp/requirements.txt && \
+    pip install -r /tmp/requirements-nohashes.txt && \
     pip install -r /tmp/dev-requirements.txt && \
     rm -rf /root/.cache/
 
