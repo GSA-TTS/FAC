@@ -1,7 +1,10 @@
+import json
 from django.test import SimpleTestCase
 from django.core.exceptions import ValidationError
 
+from .test_schemas import SchemaValidityTest
 from .validators import (
+    validate_federal_award_json,
     validate_uei,
     validate_uei_alphanumeric,
     validate_uei_valid_chars,
@@ -10,7 +13,32 @@ from .validators import (
 )
 
 
+class FederalAwardsValidatorTests(SimpleTestCase):
+    """
+    We want to make sure that SingleAuditChecklist.federal_awards is going
+    through JSON Schema validation, but the full set of JSON Schema tests is in
+    test_schemas.py
+    """
+
+    def test_validation_is_applied(self):
+        """
+        Empty Federal Awards should fail, simple case should pass.
+        """
+        invalid = json.loads("{}")
+        expected_msg = "[\"'Federal Awards' is a required property.\"]"
+        self.assertRaisesRegex(
+            ValidationError, expected_msg, validate_federal_award_json, invalid
+        )
+
+        simple = SchemaValidityTest.SIMPLE_CASE
+        validate_federal_award_json(simple)
+
+
 class UEIValidatorTests(SimpleTestCase):
+    """
+    This is for local and pattern-based validation only; this does not perform
+    any external queries to verify that given UEIs exist in the world.
+    """
 
     # Valid UEI
     valid = "ABC123DEF456"
