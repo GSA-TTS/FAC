@@ -4,11 +4,6 @@ from django.contrib.auth import get_user_model
 User = get_user_model()
 
 
-class LoginGovUser(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    login_id = models.CharField(max_length=50, unique=True)
-
-
 class UserProfile(models.Model):
     user = models.OneToOneField(User, related_name="profile", on_delete=models.CASCADE)
 
