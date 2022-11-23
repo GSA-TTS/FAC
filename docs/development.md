@@ -43,6 +43,11 @@ To test UEI validation using the SAM.gov API with a personal API key, follow the
 
 After receiving a personal API key, copy the API key into your local environment (should end up in `~/.bash_profile`, `~/.bashrc`, `~/.zshrc`, or whatever flavor of shell you're using.)
 
+The `DJANGO_SECRET_LOGIN_KEY` environment variable is used to interact with Login.gov. For local development, you have three options:
+*  (Recommended) If you wish to use the shared Login.gov sandbox client application and credentials, you can obtain a valid  `DJANGO_SECRET_LOGIN_KEY` from our shared [dev secrets document](https://docs.google.com/spreadsheets/d/1byrBp16jufbiEY_GP5MyR0Uqf6WvB_5tubSXN_mYyJY/edit#gid=0)
+*  If you wish to use the shared Login.gov sandbox client application, but create your own client credentials, you must first be granted access to the GSA-FAC Login.gov sandbox team. Once you can access the GSA-FAC client application, follow [Login.gov's documentation for creating a public certificate](https://developers.login.gov/testing/#creating-a-public-certificate). Once created, you can add the newly-generated public key to the GSA-FAC app, and set `DJANGO_SECRET_LOGIN_KEY` to the base64-encoded value of the corresponding private key.
+*  If you wish to use your own Login.gov sandbox client application, follow [Login.gov's documentation for setting up a test application](https://developers.login.gov/testing/). Once completed, open `settings.py` and set `OIDC_PROVIDERS.login.gov.client_registration.client_id` so that it matches the `issuer` string for your newly-created client application. NOTE: changes to the `client_id` should __not__ be checked into version control!
+
 ## Docker
 
 An application and database are configured in [../backend/docker-compose.yml](../backend/docker-compose.yml), we create a volume to persist the development database, and we mount our `./backend` working directory to the `web` container so that changes made in development are reflected in the container without needing to re-build.
