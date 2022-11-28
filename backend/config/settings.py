@@ -70,6 +70,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "report_submission",
+    "cms",
 ]
 
 # Third-party apps
@@ -97,9 +98,7 @@ ROOT_URLCONF = "config.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [
-            str(BASE_DIR.joinpath("templates")),
-        ],
+        "DIRS": [os.path.join(BASE_DIR, "templates")],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -160,8 +159,12 @@ USE_L10N = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
 
-STATIC_ROOT = str(BASE_DIR.joinpath("static"))
-STATIC_URL = "/static/"
+# STATIC_ROOT = str(BASE_DIR.joinpath("static"))
+STATICFILES_DIRS = [
+    BASE_DIR / "static",
+    # '/var/www/static/',
+]
+STATIC_URL = "static/"
 
 ADMIN_URL = "admin/"
 

@@ -4,9 +4,10 @@ from typing import List
 
 from audit.models import Access, SingleAuditChecklist
 from audit.permissions import SingleAuditChecklistPermission
-from django.http import Http404
+from django.http import Http404, HttpResponse
 from django.urls import reverse
-from config.settings import SCHEMAS_DIR
+from django.views import View
+from config.settings import SCHEMAS_DIR, BASE_DIR
 from rest_framework import viewsets
 from rest_framework.authentication import BaseAuthentication
 from rest_framework.permissions import BasePermission
@@ -23,6 +24,13 @@ from .serializers import (
     SingleAuditChecklistSerializer,
     UEISerializer,
 )
+
+
+class IndexView(View):
+    def get(self, request, *args, **kwargs):
+        test_file = open(BASE_DIR.__str__() + "/static/index.html", "r")
+        response = HttpResponse(content=test_file)
+        return response
 
 
 class SACViewSet(viewsets.ModelViewSet):
