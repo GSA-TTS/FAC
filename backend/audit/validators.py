@@ -1,5 +1,9 @@
+from pathlib import Path
+import json
+import jsonschema
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
+from django.conf import settings
 
 
 def validate_uei(value):
@@ -59,4 +63,21 @@ def validate_uei_nine_digit_sequences(value):
                     "Nine-digit sequences are not used in the identifier to avoid collision with the nine-digit DUNS Number or Taxpayer Identification Number (TIN)."
                 ),
             )
+    return value
+
+
+def validate_federal_award_json(value):
+    """
+    Apply JSON Schema for federal awards and report errors. Ideally.
+    """
+    root = Path(settings.SECTION_SCHEMA_DIR)
+    schema_path = root / "FederalAwards.schema.json"
+    schema = json.loads(schema_path.read_text(encoding="utf-8"))
+
+    try:
+        jsonschema.validate(value, schema)
+    except jsonschema.exceptions.ValidationError as err:
+        raise ValidationError(
+            _(err.message),
+        ) from err
     return value

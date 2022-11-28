@@ -13,3 +13,4 @@ djangorestframework-simplejwt
 cryptography
 cfenv
 jsonschema
+jsonpath-ng

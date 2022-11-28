@@ -10,8 +10,8 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 
-import environs
 import os
+import environs
 from cfenv import AppEnv
 
 env = environs.Env()
@@ -70,6 +70,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "cms",
+    "report_submission",
 ]
 
 # Third-party apps
@@ -219,3 +220,4 @@ else:
     SAM_API_KEY = os.environ.get("SAM_API_KEY")
 
 SCHEMAS_DIR = os.path.join("audit", "schemas")
+SECTION_SCHEMA_DIR = os.path.join("schemas", "sections")

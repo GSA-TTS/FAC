@@ -7,6 +7,7 @@ from django.core.validators import MinLengthValidator
 from django.utils.translation import gettext_lazy as _
 
 from .validators import (
+    validate_federal_award_json,
     validate_uei_alphanumeric,
     validate_uei_leading_char,
     validate_uei_nine_digit_sequences,
@@ -35,7 +36,7 @@ class SingleAuditChecklistManager(models.Manager):
         """
         year = obj_data["auditee_fiscal_period_start"][:4]
         chars = "ABCDEFGHJKLMNPQRSTUVWXYZ1234567890"
-        trichar = "".join(choice(chars) for i in range(3))
+        trichar = "".join(choice(chars) for _ in range(3))
         count = SingleAuditChecklist.objects.count() + 1_000_001
         report_id = f"{year}{trichar}{str(count).zfill(10)}"
         updated = obj_data | {"report_id": report_id}
@@ -47,7 +48,7 @@ class SingleAuditChecklist(models.Model):
     Monolithic Single Audit Checklist.
     """
 
-    USER_PROVIDED_ORGANIZATION_TYPE = (
+    USER_PROVIDED_ORGANIZATION_TYPE_CODE = (
         ("state", _("State")),
         ("local", _("Local Government")),
         ("tribal", _("Indian Tribe or Tribal Organization")),
@@ -57,7 +58,7 @@ class SingleAuditChecklist(models.Model):
         ("none", _("None of these (for example, for-profit")),
     )
 
-    AUDIT_TYPE = (
+    AUDIT_TYPE_CODES = (
         ("single-audit", _("Single Audit")),
         ("program-specific", _("Program-Specific Audit")),
     )
@@ -91,7 +92,7 @@ class SingleAuditChecklist(models.Model):
 
     # Q2 Type of Uniform Guidance Audit
     audit_type = models.CharField(
-        max_length=20, choices=AUDIT_TYPE, blank=True, null=True
+        max_length=20, choices=AUDIT_TYPE_CODES, blank=True, null=True
     )
 
     # Q3 Audit Period Covered
@@ -144,7 +145,7 @@ class SingleAuditChecklist(models.Model):
 
     # Q6 Primary Auditor Information
     user_provided_organization_type = models.CharField(
-        max_length=12, choices=USER_PROVIDED_ORGANIZATION_TYPE
+        max_length=12, choices=USER_PROVIDED_ORGANIZATION_TYPE_CODE
     )
     met_spending_threshold = models.BooleanField()
     is_usa_based = models.BooleanField(verbose_name=_("Is USA Based"))
@@ -165,6 +166,11 @@ class SingleAuditChecklist(models.Model):
     auditor_contact_title = models.CharField(max_length=100, blank=True, null=True)
     auditor_phone = models.CharField(max_length=100, blank=True, null=True)
     auditor_email = models.EmailField(max_length=100, blank=True, null=True)
+
+    # Federal Awards:
+    federal_awards = models.JSONField(
+        blank=True, null=True, validators=[validate_federal_award_json]
+    )
 
     class Meta:
         """We need to set the name for the admin view."""
