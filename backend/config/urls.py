@@ -2,9 +2,13 @@ from api import views
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
+from django.contrib.auth.decorators import login_required
 from django.urls import path, include
 from rest_framework.renderers import JSONOpenAPIRenderer
 from rest_framework.schemas import get_schema_view
+
+admin.autodiscover()
+admin.site.login = login_required(admin.site.login)
 
 schema_view = get_schema_view(
     title="Federal Audit Clearinghouse API",
