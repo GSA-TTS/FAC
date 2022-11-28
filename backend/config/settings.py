@@ -292,3 +292,5 @@ OIDC_PROVIDERS = {
         },
     }
 }
+
+LOGIN_URL = f"{env_base_url}/openid/login/"
