@@ -294,3 +294,5 @@ OIDC_PROVIDERS = {
 }
 
 LOGIN_URL = f"{env_base_url}/openid/login/"
+
+USER_PROMOTION_COMMANDS_ENABLED = environment in ["LOCAL", "TESTING", "UNDEFINED"]
