@@ -36,7 +36,7 @@ COPY . /src/
 
 WORKDIR /src/
 
-RUN npm install
+RUN NODE_ENV=development npm install
 
 # ------------------------------------------------------------
 # Dev/testing layer
