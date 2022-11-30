@@ -1,3 +1,3 @@
 # used by cloud.gov
-web: python manage.py migrate && python manage.py collectstatic --noinput && gunicorn config.wsgi -t 60
+web: python -m pip install -r requirements-nohashes.txt && python manage.py migrate && python manage.py collectstatic --noinput && gunicorn config.wsgi -t 60
 
