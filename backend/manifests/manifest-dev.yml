@@ -8,6 +8,7 @@ applications:
   timeout: 180
   env:
     ENV: DEVELOPMENT
+    DJANGO_BASE_URL: https://fac-dev.app.cloud.gov
   routes:
   - route: fac-dev.app.cloud.gov
   instances: 1
