@@ -1,3 +1,5 @@
+# dependencies are in ../requirements
+
 [tool.black]
 line-length=88
 
