@@ -9,8 +9,6 @@ applications:
   env:
     ENV: DEVELOPMENT
     DJANGO_BASE_URL: https://fac-dev.app.cloud.gov
-    # doing in procfile because of no-hash install
-    DISABLE_COLLECTSTATIC: true
   routes:
   - route: fac-dev.app.cloud.gov
   instances: 1
