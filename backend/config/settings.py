@@ -177,18 +177,17 @@ STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 if environment == "LOCAL":
     DEBUG = env.bool("DJANGO_DEBUG", default=True)
     STATIC_URL = "/static/"
-    # Whitenoise for serving static files -- Just the admin interface
+    # Whitenoise for serving static files
     STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 elif environment in ["TESTING", "UNDEFINED"]:
     DEBUG = env.bool("DJANGO_DEBUG", default=False)
     STATIC_URL = "/static/"
-    # Whitenoise for serving static files -- Just the admin interface
+    # Whitenoise for serving static files
     STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 else:
     STATICFILES_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
     vcap = json.loads(env.str("VCAP_SERVICES"))
     for service in vcap["s3"]:
-        # need to confirm the name of the bucket and that it is public
         if service["instance_name"] == "fac-public-s3":
             # Public AWS S3 bucket for the app
             s3_creds = service["credentials"]
