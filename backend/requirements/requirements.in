@@ -5,7 +5,6 @@ gunicorn
 djangorestframework
 pyyaml
 uritemplate
-whitenoise
 django-cors-headers
 requests
 python-json-logger
@@ -17,3 +16,5 @@ jsonpath-ng
 pycryptodome
 pyjwt
 oic
+django-storages
+boto3

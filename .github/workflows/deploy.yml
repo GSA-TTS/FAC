@@ -31,4 +31,4 @@ jobs:
           cf_password: ${{ secrets.CF_PASSWORD }}
           cf_org: gsa-10x-prototyping
           cf_space: dev
-          push_arguments: "-f backend/manifests/manifest-dev.yml"
+          push_arguments: "-f backend/manifests/manifest-dev.yml --strategy rolling"
