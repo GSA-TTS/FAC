@@ -17,3 +17,4 @@ jsonpath-ng
 pycryptodome
 pyjwt
 oic
+django-logingov-backend
