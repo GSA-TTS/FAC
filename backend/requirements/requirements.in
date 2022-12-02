@@ -19,3 +19,4 @@ oic
 django-storages
 boto3
 django-logingov-backend
+whitenoise
