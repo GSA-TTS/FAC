@@ -93,7 +93,6 @@ INSTALLED_APPS += ["audit", "api", "users"]
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "corsheaders.middleware.CorsMiddleware",
-    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -179,11 +178,13 @@ if environment == "LOCAL":
     STATIC_URL = "/static/"
     # Whitenoise for serving static files
     STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+    MIDDLEWARE.append("whitenoise.middleware.WhiteNoiseMiddleware")
 elif environment in ["TESTING", "UNDEFINED"]:
     DEBUG = env.bool("DJANGO_DEBUG", default=False)
     STATIC_URL = "/static/"
     # Whitenoise for serving static files
     STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+    MIDDLEWARE.append("whitenoise.middleware.WhiteNoiseMiddleware")
 else:
     STATICFILES_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
     vcap = json.loads(env.str("VCAP_SERVICES"))
