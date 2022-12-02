@@ -75,7 +75,7 @@
 
 
         <div class="sign-in">
-            <a class="sign-in-logo" aria-controls="login-modal" href="#login-modal" data-open-modal tabindex="0" role="button">
+            <a class="sign-in-logo" aria-controls="login-modal" href="/openid/login/" data-open-modal tabindex="0" role="button">
                 Submit an audit
             </a>
 
@@ -99,9 +99,11 @@
               <div class="usa-modal__footer">
                 <ul class="usa-button-group">
                   <li class="usa-button-group__item">
-                    <button type="button" class="usa-button sign-in-button" id="sign-in" data-close-modal>
-                      Authenticate with Login.gov 
-                    </button>
+                    <a href="/openid/login/">
+                      <button type="button" class="usa-button sign-in-button" id="sign-in" data-close-modal>
+                        Authenticate with Login.gov 
+                      </button>
+                    </a>
                   </li>
                   <li class="usa-button-group__item">
                     <button
