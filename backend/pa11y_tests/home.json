@@ -3,9 +3,7 @@
         {
           "useIncognitoBrowserContext": true,
           "url": "http://127.0.0.1:8000/",
-          "actions": [
-            "wait for url to be http://127.0.0.1:8000/",
-         ]
+          "actions": ["wait for url to be http://127.0.0.1:8000/"]
         }
     ]
 }
