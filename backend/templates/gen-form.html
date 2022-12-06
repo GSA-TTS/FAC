@@ -65,6 +65,7 @@
           Finalize</a></li></ul>
       </nav>
       <form class="desktop:grid-col-9 usa-form usa-form--large sf-sac" id="general-info">
+        {% csrf_token %}
         <fieldset class="usa-fieldset">
           <legend class="usa-legend usa-legend--large" id="general-information">General information</legend>
           <p>
@@ -94,7 +95,7 @@
     name="auditee_fiscal_period_start"
     
     
-      disabled="true"
+      disabled="false"
     
     
     
@@ -119,7 +120,7 @@
     name="auditee_fiscal_period_end"
     
     
-      disabled="true"
+      disabled="false"
     
     
     
@@ -377,7 +378,7 @@
     name="auditee_uei"
     
     
-      disabled="true"
+      disabled="false"
     
     
     
@@ -452,7 +453,7 @@
     name="auditee_name"
     
     
-      disabled="true"
+      disabled="false"
     
     
     
@@ -481,7 +482,7 @@
     name="auditee_address_line_1"
     
     
-      disabled="true"
+      disabled="false"
     
     
     
@@ -506,7 +507,7 @@
     name="auditee_city"
     
     
-      disabled="true"
+      disabled="false"
     
     
     
@@ -531,7 +532,7 @@
     name="auditee_state"
     
     
-      disabled="true"
+      disabled="false"
     
     
     
@@ -556,7 +557,7 @@
     name="auditee_zip"
     
     
-      disabled="true"
+      disabled="false"
     
     
     
@@ -586,7 +587,7 @@
     name="auditee_contact_name"
     
     
-      disabled="true"
+      disabled="false"
     
     
     
@@ -611,7 +612,7 @@
     name="auditee_contact_title"
     
     
-      disabled="true"
+      disabled="false"
     
     
     
@@ -637,7 +638,7 @@
     name="auditee_phone"
     
     
-      disabled="true"
+      disabled="false"
     
     
     
