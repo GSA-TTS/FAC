@@ -6,5 +6,5 @@ from django.views import generic
 class home2(generic.TemplateView):
     """Basic class for home."""
 
-    template_name = "home-copy.html"
+    template_name = "gen-form.html"
  
