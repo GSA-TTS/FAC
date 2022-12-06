@@ -1,3 +1,10 @@
 from django.shortcuts import render  # noqa: F401
+from django.views import generic
 
-# Create your views here.
+
+# class based views for ...
+class home2(generic.TemplateView):
+    """Basic class for home."""
+
+    template_name = "home-copy.html"
+ 
