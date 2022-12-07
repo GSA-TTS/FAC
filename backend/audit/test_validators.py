@@ -48,8 +48,8 @@ class FederalAwardsValidatorTests(SimpleTestCase):
 
         # pick a prefix between 00 and 09 (invalid)
         prefix = f"{randrange(10):02}"
-        # pick an extension beteween 100 and 999 (valid)
-        extension = f"{randrange(100, 1000):03}"
+        # pick an extension beteween 001 and 999 (valid)
+        extension = f"{randrange(1, 1000):03}"
 
         simple["FederalAwards"]["federal_awards"][0][
             "program_number"
@@ -65,8 +65,8 @@ class FederalAwardsValidatorTests(SimpleTestCase):
 
         # pick a prefix between 100 and 999 (invalid)
         prefix = f"{randrange(100, 1000):03}"
-        # pick an extension beteween 100 and 999 (valid)
-        extension = f"{randrange(100, 1000):03}"
+        # pick an extension beteween 001 and 999 (valid)
+        extension = f"{randrange(1, 1000):03}"
 
         simple["FederalAwards"]["federal_awards"][0][
             "program_number"
@@ -87,8 +87,8 @@ class FederalAwardsValidatorTests(SimpleTestCase):
             f"{choice(string.ascii_letters)}{choice(string.ascii_letters)}",  # e.g. AA
         ]
 
-        # pick an extension between 100 and 999 (valid)
-        extension = f"{randrange(100, 1000):03}"
+        # pick an extension between 001 and 999 (valid)
+        extension = f"{randrange(1, 1000):03}"
 
         for prefix in prefixes:
             with self.subTest():
@@ -174,8 +174,8 @@ class FederalAwardsValidatorTests(SimpleTestCase):
 
         # pick a prefix between 10 and 99 (valid)
         prefix = f"{randrange(10, 100):02}"
-        # pick an extension between 100 and 999 (valid)
-        extension = f"{randrange(100, 1000):03}"
+        # pick an extension between 001 and 999 (valid)
+        extension = f"{randrange(1, 1000):03}"
 
         simple["FederalAwards"]["federal_awards"][0][
             "program_number"
@@ -208,8 +208,8 @@ class FederalAwardsValidatorTests(SimpleTestCase):
 
         # pick a prefix between 10 and 99 (valid)
         prefix = f"{randrange(10, 100):02}"
-        # pick an extension between 100 and 999 with a trailing letter (valid)
-        extension = f"{randrange(100, 1000):03}{choice(string.ascii_letters)}"
+        # pick an extension between 001 and 999 with a trailing letter (valid)
+        extension = f"{randrange(1, 1000):03}{choice(string.ascii_letters)}"
 
         simple["FederalAwards"]["federal_awards"][0][
             "program_number"
@@ -225,8 +225,8 @@ class FederalAwardsValidatorTests(SimpleTestCase):
 
         # pick a prefix between 10 and 99 (valid)
         prefix = f"{randrange(10, 100):02}"
-        # pick an extension between 100 and 999 with 2 trailing letters (invalid)
-        extension = f"{randrange(100, 1000):03}{choice(string.ascii_letters)}{choice(string.ascii_letters)}"
+        # pick an extension between 001 and 999 with 2 trailing letters (invalid)
+        extension = f"{randrange(1, 1000):03}{choice(string.ascii_letters)}{choice(string.ascii_letters)}"
 
         simple["FederalAwards"]["federal_awards"][0][
             "program_number"
