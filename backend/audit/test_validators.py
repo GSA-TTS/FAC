@@ -1,6 +1,9 @@
 import json
+import string
 from django.test import SimpleTestCase
 from django.core.exceptions import ValidationError
+
+from random import choice, randrange
 
 from .test_schemas import SchemaValidityTest
 from .validators import (
@@ -11,6 +14,10 @@ from .validators import (
     validate_uei_leading_char,
     validate_uei_nine_digit_sequences,
 )
+
+# Simplest way to create a new copy of simple case rather than getting
+# references to things used by other tests:
+jsoncopy = lambda v: json.loads(json.dumps(v))
 
 
 class FederalAwardsValidatorTests(SimpleTestCase):
@@ -32,6 +39,229 @@ class FederalAwardsValidatorTests(SimpleTestCase):
 
         simple = SchemaValidityTest.SIMPLE_CASE
         validate_federal_award_json(simple)
+
+    def test_prefix_under_ten(self):
+        """
+        Prefixes between 00 and 09 should fail
+        """
+        simple = jsoncopy(SchemaValidityTest.SIMPLE_CASE)
+
+        # pick a prefix between 00 and 09 (invalid)
+        prefix = f"{randrange(10):02}"
+        # pick an extension beteween 100 and 999 (valid)
+        extension = f"{randrange(100, 1000):03}"
+
+        simple["FederalAwards"]["federal_awards"][0][
+            "program_number"
+        ] = f"{prefix}.{extension}"
+
+        self.assertRaises(ValidationError, validate_federal_award_json, simple)
+
+    def test_prefix_over_99(self):
+        """
+        Prefixes over 99 should fail
+        """
+        simple = jsoncopy(SchemaValidityTest.SIMPLE_CASE)
+
+        # pick a prefix between 100 and 999 (invalid)
+        prefix = f"{randrange(100, 1000):03}"
+        # pick an extension beteween 100 and 999 (valid)
+        extension = f"{randrange(100, 1000):03}"
+
+        simple["FederalAwards"]["federal_awards"][0][
+            "program_number"
+        ] = f"{prefix}.{extension}"
+
+        self.assertRaises(ValidationError, validate_federal_award_json, simple)
+
+    def test_prefix_non_numeric(self):
+        """
+        Prefixes with non-numeric characters should fail
+        """
+        simple = jsoncopy(SchemaValidityTest.SIMPLE_CASE)
+
+        # pick prefixes that contain one or two non-numeric characters
+        prefixes = [
+            f"{choice(string.ascii_letters)}{randrange(10):1}",  # e.g. A1
+            f"{randrange(10):1}{choice(string.ascii_letters)}",  # e.g. 1A
+            f"{choice(string.ascii_letters)}{choice(string.ascii_letters)}",  # e.g. AA
+        ]
+
+        # pick an extension between 100 and 999 (valid)
+        extension = f"{randrange(100, 1000):03}"
+
+        for prefix in prefixes:
+            with self.subTest():
+                simple["FederalAwards"]["federal_awards"][0][
+                    "program_number"
+                ] = f"{prefix}.{extension}"
+
+                self.assertRaises(ValidationError, validate_federal_award_json, simple)
+
+    def test_extension_RD(self):
+        """
+        A CFDA extension of RD should pass
+        """
+        simple = jsoncopy(SchemaValidityTest.SIMPLE_CASE)
+
+        # pick a prefix between 10 and 99 (valid)
+        prefix = f"{randrange(10, 100):02}"
+        # use RD as extension (valid)
+        extension = "RD"
+
+        simple["FederalAwards"]["federal_awards"][0][
+            "program_number"
+        ] = f"{prefix}.{extension}"
+
+        validate_federal_award_json(simple)
+
+    def test_extension_U(self):
+        """
+        A CFDA extension of U## should pass
+        """
+        simple = jsoncopy(SchemaValidityTest.SIMPLE_CASE)
+
+        # pick a prefix between 10 and 99 (valid)
+        prefix = f"{randrange(10, 100):02}"
+        # pick an extension between U10 and U99 (valid)
+        extension = f"U{randrange(10, 100):02}"
+
+        simple["FederalAwards"]["federal_awards"][0][
+            "program_number"
+        ] = f"{prefix}.{extension}"
+
+        validate_federal_award_json(simple)
+
+    def test_extension_U_single_digit(self):
+        """
+        A CFDA extension of U# should fail
+        """
+        simple = jsoncopy(SchemaValidityTest.SIMPLE_CASE)
+
+        # pick a prefix between 10 and 99 (valid)
+        prefix = f"{randrange(10, 100):02}"
+        # pick an extension between U0 and U9
+        extension = f"U{randrange(10):1}"
+
+        simple["FederalAwards"]["federal_awards"][0][
+            "program_number"
+        ] = f"{prefix}.{extension}"
+
+        self.assertRaises(ValidationError, validate_federal_award_json, simple)
+
+    def test_extension_U_three_digit(self):
+        """
+        A CFDA extension of U### should fail
+        """
+        simple = jsoncopy(SchemaValidityTest.SIMPLE_CASE)
+
+        # pick a prefix between 10 and 99 (valid)
+        prefix = f"{randrange(10, 100):02}"
+        # pick an extension between U001 and U999
+        extension = f"U{randrange(1000):03}"
+
+        simple["FederalAwards"]["federal_awards"][0][
+            "program_number"
+        ] = f"{prefix}.{extension}"
+
+        self.assertRaises(ValidationError, validate_federal_award_json, simple)
+
+    def test_three_digit_extension(self):
+        """
+        A three digit numeric CFDA extension should pass
+        """
+        simple = jsoncopy(SchemaValidityTest.SIMPLE_CASE)
+
+        # pick a prefix between 10 and 99 (valid)
+        prefix = f"{randrange(10, 100):02}"
+        # pick an extension between 100 and 999 (valid)
+        extension = f"{randrange(100, 1000):03}"
+
+        simple["FederalAwards"]["federal_awards"][0][
+            "program_number"
+        ] = f"{prefix}.{extension}"
+
+        validate_federal_award_json(simple)
+
+    def test_four_plus_extension(self):
+        """
+        A CFDA extension with four digits should fail
+        """
+        simple = jsoncopy(SchemaValidityTest.SIMPLE_CASE)
+
+        # pick a prefix between 10 and 99 (valid)
+        prefix = f"{randrange(10, 100):02}"
+        # pick an extension with four or more digits
+        extension = f"{randrange(1000):04}"
+
+        simple["FederalAwards"]["federal_awards"][0][
+            "program_number"
+        ] = f"{prefix}.{extension}"
+
+        self.assertRaises(ValidationError, validate_federal_award_json, simple)
+
+    def test_trailing_extension_letter(self):
+        """
+        A CFDA extension with 3 numeric digits and a trailing letter should pass
+        """
+        simple = jsoncopy(SchemaValidityTest.SIMPLE_CASE)
+
+        # pick a prefix between 10 and 99 (valid)
+        prefix = f"{randrange(10, 100):02}"
+        # pick an extension between 100 and 999 with a trailing letter (valid)
+        extension = f"{randrange(100, 1000):03}{choice(string.ascii_letters)}"
+
+        simple["FederalAwards"]["federal_awards"][0][
+            "program_number"
+        ] = f"{prefix}.{extension}"
+
+        validate_federal_award_json(simple)
+
+    def test_trailing_extension_letters(self):
+        """
+        A CFDA extension with 3 numeric digits and multiple trailing letters should fail
+        """
+        simple = jsoncopy(SchemaValidityTest.SIMPLE_CASE)
+
+        # pick a prefix between 10 and 99 (valid)
+        prefix = f"{randrange(10, 100):02}"
+        # pick an extension between 100 and 999 with 2 trailing letters (invalid)
+        extension = f"{randrange(100, 1000):03}{choice(string.ascii_letters)}{choice(string.ascii_letters)}"
+
+        simple["FederalAwards"]["federal_awards"][0][
+            "program_number"
+        ] = f"{prefix}.{extension}"
+
+        self.assertRaises(ValidationError, validate_federal_award_json, simple)
+
+    def test_extension_non_numeric(self):
+        """
+        Extensions with non-numeric characters (except RD, U##, and trailing letter) should fail
+        """
+        ascii_letters_omit_RD = string.ascii_letters.replace("D", "").replace("R", "")
+        ascii_letters_omit_U = string.ascii_letters.replace("U", "")
+
+        simple = jsoncopy(SchemaValidityTest.SIMPLE_CASE)
+
+        # pick a prefix between 10 and 99 (valid)
+        prefix = f"{randrange(10, 100):02}"
+
+        # pick extensions with one or more non-numeric characters
+        extensions = [
+            f"{choice(string.ascii_letters)}",  # e.g. A
+            f"{choice(ascii_letters_omit_RD)}{choice(ascii_letters_omit_RD)}",  # e.g. AB
+            f"{choice(string.ascii_letters)}{choice(string.ascii_letters)}{choice(string.ascii_letters)}",  # e.g. ABC
+            f"{choice(ascii_letters_omit_U)}{randrange(100):02}",  # e.g. A01
+            f"{choice(string.ascii_letters)}{choice(string.ascii_letters)}{randrange(10):1}",  # e.g. AB1
+        ]
+
+        for extension in extensions:
+            with self.subTest():
+                simple["FederalAwards"]["federal_awards"][0][
+                    "program_number"
+                ] = f"{prefix}.{extension}"
+
+                self.assertRaises(ValidationError, validate_federal_award_json, simple)
 
 
 class UEIValidatorTests(SimpleTestCase):

@@ -35,7 +35,7 @@ jobs:
         run: black --check .
       - name: Run bandit
         working-directory: ./backend
-        run: bandit -r .
+        run: bandit -c pyproject.toml -r .
       - name: Run type checking
         working-directory: ./backend
         run: mypy .

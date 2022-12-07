@@ -33,7 +33,7 @@ lint:
 	@echo "black:"
 	@black --check .
 	@echo "bandit:"
-	@bandit -r .
+	@bandit -c pyproject.toml -r .
 	@echo "mypy:"
 	@mypy .
 
