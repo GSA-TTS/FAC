@@ -7,13 +7,13 @@ applications:
   path: ../
   timeout: 180
   env:
-    ENV: DEVELOPMENT
-    DJANGO_BASE_URL: https://fac-dev.app.cloud.gov
+    ENV: PRODUCTION
+    DJANGO_BASE_URL: https://fac-prod.app.cloud.gov
   routes:
-  - route: fac-dev.app.cloud.gov
-  instances: 1
+  - route: fac-prod.app.cloud.gov
+  instances: 2
   services:
   - fac-db
   - fac-public-s3
   - fac-key-service
-  - dev-deployer
+  - production-deployer
