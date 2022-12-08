@@ -47,7 +47,7 @@ fi
 cf target -o $org -s $space
 
 # destroy service key
-cf delete-service-key $service service-account-key -f
+cf delete-service-key $service ${service}-key -f
 
 # destroy service
 cf delete-service $service -f

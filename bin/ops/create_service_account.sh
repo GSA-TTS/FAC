@@ -57,10 +57,10 @@ cf target -o $org -s $space 1>&2
 cf create-service cloud-gov-service-account $role $service 1>&2
 
 # create service key
-cf create-service-key $service service-account-key 1>&2
+cf create-service-key $service ${service}-key 1>&2
 
 # output service key to stdout in secrets.auto.tfvars format
-creds=`cf service-key $service service-account-key | tail -n 7`
+creds=`cf service-key $service ${service}-key | tail -n 7`
 username=`echo $creds | jq '.credentials.username'`
 password=`echo $creds | jq '.credentials.password'`
 
