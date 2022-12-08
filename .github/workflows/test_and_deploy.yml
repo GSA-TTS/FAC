@@ -22,7 +22,7 @@ jobs:
       ENV: TESTING
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/tests
+      - uses: ./.github/actions/tests
 
   deploy-dev:
     name: Deploy to dev
