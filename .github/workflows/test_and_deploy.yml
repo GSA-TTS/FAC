@@ -52,7 +52,6 @@ jobs:
 
   deploy-production:
     name: Deploy to produciton
-    needs: [deploy-staging]
     if: github.event.ref == 'refs/tag/v1.*'
     needs: linting_and_tests
     runs-on: ubuntu-latest
