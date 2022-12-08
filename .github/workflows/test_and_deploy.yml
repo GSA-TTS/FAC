@@ -32,7 +32,7 @@ jobs:
     envionment: dev
     steps:
       - uses: actions/checkout@v2
-      - uses: actions/deploy
+      - uses: actions/deploy.yml
         with:
           cf_username: ${{ secrets.CF_USERNAME }}
           cf_password: ${{ secrets.CF_PASSWORD }}
@@ -45,7 +45,7 @@ jobs:
     envionment: staging
     steps:
       - uses: actions/checkout@v2
-      - uses: actions/deploy
+      - uses: actions/deploy.yml
         with:
           cf_username: ${{ secrets.CF_USERNAME }}
           cf_password: ${{ secrets.CF_PASSWORD }}
@@ -58,7 +58,7 @@ jobs:
     envionment: production
     steps:
       - uses: actions/checkout@v2
-      - uses: actions/deploy
+      - uses: actions/deploy.yml
         with:
           cf_username: ${{ secrets.CF_USERNAME }}
           cf_password: ${{ secrets.CF_PASSWORD }}
