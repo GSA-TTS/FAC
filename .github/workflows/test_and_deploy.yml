@@ -18,8 +18,6 @@ jobs:
   linting_and_tests:
     name: Linting and tests
     runs-on: ubuntu-latest
-    env:
-      ENV: TESTING
     steps:
       - uses: actions/checkout@v3
       - uses: ./.github/actions/tests
@@ -29,36 +27,36 @@ jobs:
     if: github.event.ref == 'refs/heads/main'
     needs: linting_and_tests
     runs-on: ubuntu-latest
-    envionment: dev
     steps:
       - uses: actions/checkout@v2
       - uses: ./.github/actions/deploy
         with:
+          envionment: dev
           cf_username: ${{ secrets.CF_USERNAME }}
           cf_password: ${{ secrets.CF_PASSWORD }}
 
-  deploy-staging:
-    name: Deploy to staging
-    if: github.event.ref == 'refs/heads/prod'
-    needs: linting_and_tests
-    runs-on: ubuntu-latest
-    envionment: staging
-    steps:
-      - uses: actions/checkout@v2
-      - uses: ./.github/actions/deploy
-        with:
-          cf_username: ${{ secrets.CF_USERNAME }}
-          cf_password: ${{ secrets.CF_PASSWORD }}
+  # deploy-staging:
+  #   name: Deploy to staging
+  #   if: github.event.ref == 'refs/heads/prod'
+  #   needs: linting_and_tests
+  #   runs-on: ubuntu-latest
+  #   envionment: staging
+  #   steps:
+  #     - uses: actions/checkout@v2
+  #     - uses: ./.github/actions/deploy
+  #       with:
+  #         cf_username: ${{ secrets.CF_USERNAME }}
+  #         cf_password: ${{ secrets.CF_PASSWORD }}
 
-  deploy-production:
-    name: Deploy to produciton
-    if: github.event.ref == 'refs/tag/v1.*'
-    needs: linting_and_tests
-    runs-on: ubuntu-latest
-    envionment: production
-    steps:
-      - uses: actions/checkout@v2
-      - uses: ./.github/actions/deploy
-        with:
-          cf_username: ${{ secrets.CF_USERNAME }}
-          cf_password: ${{ secrets.CF_PASSWORD }}
+  # deploy-production:
+  #   name: Deploy to produciton
+  #   if: github.event.ref == 'refs/tag/v1.*'
+  #   needs: linting_and_tests
+  #   runs-on: ubuntu-latest
+  #   envionment: production
+  #   steps:
+  #     - uses: actions/checkout@v2
+  #     - uses: ./.github/actions/deploy
+  #       with:
+  #         cf_username: ${{ secrets.CF_USERNAME }}
+  #         cf_password: ${{ secrets.CF_PASSWORD }}
