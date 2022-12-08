@@ -20,7 +20,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: ./.github/actions/tests
+      - uses: ./.github/custom_actions/tests
 
   deploy-dev:
     name: Deploy to dev
@@ -29,7 +29,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: ./.github/actions/deploy
+      - uses: ./.github/custom_actions/deploy
         with:
           envionment: dev
           cf_username: ${{ secrets.CF_USERNAME }}
