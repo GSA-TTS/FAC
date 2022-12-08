@@ -22,12 +22,13 @@ The bootstrap module is used to create an s3 bucket for later terraform runs to 
 
 ### Bootstrapping the state storage s3 bucket for the first time
 
-1. Run `terraform init` in this directory.
-1. Run `./run.sh plan` to verify that the proposed changes are what you expect
-1. Run `./run.sh apply` to set up the bucket and retrieve those credentials
-1. Follow instructions under `Use bootstrap credentials` to save the access credentials and bucket names.
+1. Run `terraform init` in the `bootstrap` subdirectory.
+1. Run `./run.sh plan` to verify that the proposed changes are what you expect.
+1. Run `./run.sh apply` to set up the bucket and retrieve those credentials.
+1. Follow instructions under [Use bootstrap credentials](#use-bootstrap-credentials) to save the access credentials and bucket names.
 1. Ensure that `./import.sh` includes a line and correct IDs for any resources created. The IDs to use in `import.sh` are given in the Terraform output as `[id=....]`.
-1. Run `./teardown_creds.sh` to remove the space deployer account used to create the s3 bucket
+1. Run `./import.sh`. ("Importing" is how you [give Terraform control of something created elsewhere](https://developer.hashicorp.com/terraform/cli/import).)
+1. Run `./teardown_creds.sh` to remove the space deployer account used to create the s3 bucket.
 
 ### To make changes to the bootstrap module
 
