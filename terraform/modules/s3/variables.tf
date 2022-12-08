@@ -31,13 +31,14 @@ variable "recursive_delete" {
   default     = false
 }
 
-variable "s3_service_name" {
+variable "name" {
   type        = string
-  description = "name for the cloud.gov managed service"
+  description = "name of the cloud.gov service instance"
 }
 
 variable "s3_plan_name" {
   type        = string
-  description = "name of the service plan to create"
+  description = "service plan to use"
   default     = "basic"
+  # See options at https://cloud.gov/docs/services/s3/#plans
 }

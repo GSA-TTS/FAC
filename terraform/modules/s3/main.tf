@@ -16,7 +16,7 @@ data "cloudfoundry_service" "s3" {
 }
 
 resource "cloudfoundry_service_instance" "bucket" {
-  name             = var.s3_service_name
+  name             = var.name
   space            = data.cloudfoundry_space.space.id
   service_plan     = data.cloudfoundry_service.s3.service_plans[var.s3_plan_name]
   recursive_delete = var.recursive_delete
