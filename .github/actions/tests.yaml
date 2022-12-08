@@ -1,21 +1,13 @@
-# test.yml
-name: Testing
+name: Tests
 
 on:
-  push:
-    branches:
-    - main
-  pull_request:
-    branches:
-    - main
-
-env:
-  ENV: TESTING
+  workflow_call:
 
 jobs:
-  python-linting:
+  linting:
     runs-on: ubuntu-latest
-
+    env:
+      ENV: TESTING
     steps:
       - uses: actions/checkout@v3
       - name: Set up Python 3.10
@@ -40,8 +32,10 @@ jobs:
         working-directory: ./backend
         run: mypy .
 
-  test-backend:
+  test:
     runs-on: ubuntu-latest
+    env:
+      ENV: TESTING
     steps:
       - uses: actions/checkout@v2
       - name: Start services
@@ -62,5 +56,3 @@ jobs:
       - name: Run pa11y-ci against admin
         working-directory: ./pa11y_tests
         run: npm run test:admin
-
-
