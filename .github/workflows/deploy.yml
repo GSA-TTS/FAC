@@ -1,0 +1,50 @@
+---
+name: Deploy to cloud.gov
+on:
+  workflow_call:
+    inputs:
+      CF_USERNAME:
+        required: true
+        type: string
+      CF_PASSWORD:
+        required: true
+        type: string
+      SPACE:
+        required: true
+        type: string
+    secrets:
+      SAM_API_KEY:
+        required: true
+      DJANGO_SECRET_LOGIN_KEY:
+        required: true
+  jobs:
+    push-with-creds:
+      name: Deploy to cloud.gov with updated credentials
+      runs-on: ubuntu-latest
+      steps:
+        - uses: actions/checkout@v3
+        - name: Set up Python 3.10
+          uses: actions/setup-python@v3
+          with:
+            python-version: "3.10"
+        - name: Update service keys
+          uses: 18f/cg-deploy-action@main
+          env:
+            SAM_API_KEY: ${{ secrets.SAM_API_KEY }}
+            DJANGO_SECRET_LOGIN_KEY: $${{ secrets.DJANGO_SECRET_LOGIN_KEY }}
+          with:
+            cf_username: ${{ inputs.CF_USERNAME }}
+            cf_password: ${{ inputs.CF_PASSWORD }}
+            cf_org: gsa-tts-oros-fac
+            cf_space: ${{ inputs.SPACE }}
+            full_command: cf update-user-provided-service fac-key-service -p
+              "{\"SAM_API_KEY\":\"$SAM_API_KEY\",
+              \"DJANGO_SECRET_LOGIN_KEY\":\"$DJANGO_SECRET_LOGIN_KEY\"}"
+        - name: Deploy to cloud.gov
+          uses: 18f/cg-deploy-action@main
+          with:
+            cf_username: ${{ inputs.CF_USERNAME }}
+            cf_password: ${{ inputs.CF_PASSWORD }}
+            cf_org: gsa-tts-oros-fac
+            cf_space: ${{ inputs.SPACE }}
+            push_arguments: -f backend/manifests/manifest-${{ inputs.SPACE }}.yml --strategy rolling
