@@ -4,9 +4,13 @@ on:
   workflow_call:
   jobs:
     linting:
+  env:
+    ENV: TESTING
+
+  jobs:
+    python-linting:
       runs-on: ubuntu-latest
-      env:
-        ENV: TESTING
+
       steps:
         - uses: actions/checkout@v3
         - name: Set up Python 3.10
@@ -31,10 +35,8 @@ on:
           working-directory: ./backend
           run: mypy .
 
-    test:
+    test-backend:
       runs-on: ubuntu-latest
-      env:
-        ENV: TESTING
       steps:
         - uses: actions/checkout@v2
         - name: Start services
@@ -42,16 +44,13 @@ on:
           run: docker-compose up -d
         - name: Run Django test suite
           working-directory: ./backend
-          run: docker-compose run web bash -c 'coverage run --source="." manage.py test &&
-            coverage report -m --fail-under=99'
+          run: docker-compose run web bash -c 'coverage run --source="." manage.py test && coverage report -m --fail-under=99'
         - name: Run Django migrations for pa11y tests
           working-directory: ./backend
           run: docker-compose run web python manage.py migrate
         - name: Create superuser for admin access
           working-directory: ./backend
-          run: echo "from django.contrib.auth import get_user_model; User =
-            get_user_model(); User.objects.create_superuser('a', 'a@a.com', 'a')"
-            | docker-compose run web python manage.py shell
+          run: echo "from django.contrib.auth import get_user_model; User = get_user_model(); User.objects.create_superuser('a', 'a@a.com', 'a')" | docker-compose run web python manage.py shell
         - name: Install pa11y-ci
           working-directory: ./pa11y_tests
           run: npm install
