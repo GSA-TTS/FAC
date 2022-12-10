@@ -1,0 +1,18 @@
+---
+name: Apply management changes
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'terraform/management/**'
+
+jobs:
+  apply-management-changes:
+    uses: ./.github/workflows/terraform-apply-env.yml
+    with:
+      environment: "management"
+    secrets: inherit
+
+
