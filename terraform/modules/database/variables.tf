@@ -5,17 +5,12 @@ variable "cf_org_name" {
 
 variable "cf_space_name" {
   type        = string
-  description = "cloud.gov space name (staging or production)"
+  description = "cloud.gov space name"
 }
 
-variable "app_name" {
+variable "name" {
   type        = string
-  description = "Name of the application used to make the name of the database"
-}
-
-variable "env" {
-  type        = string
-  description = "deployment environment (staging, production)"
+  description = "Name of the database service instance"
 }
 
 variable "recursive_delete" {
@@ -26,5 +21,6 @@ variable "recursive_delete" {
 
 variable "rds_plan_name" {
   type        = string
-  description = "name of the service plan name to create"
+  description = "service plan to use"
+  # See options at https://cloud.gov/docs/services/relational-database/#plans
 }
