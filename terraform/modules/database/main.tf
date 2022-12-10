@@ -1,15 +1,7 @@
-###
-# Target space/org
-###
-
 data "cloudfoundry_space" "space" {
   org_name = var.cf_org_name
   name     = var.cf_space_name
 }
-
-###
-# RDS instance
-###
 
 data "cloudfoundry_service" "rds" {
   name = "aws-rds"
