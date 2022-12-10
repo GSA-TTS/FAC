@@ -13,7 +13,7 @@ module "s3" {
   cf_space_name   = "production"
   s3_service_name = local.s3_service_name
 
-  
+
 }
 
 resource "cloudfoundry_service_key" "bucket_creds" {

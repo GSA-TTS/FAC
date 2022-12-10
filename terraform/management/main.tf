@@ -21,14 +21,11 @@ resource "cloudfoundry_space" "space" {
   asgs = [for d in data.cloudfoundry_asg.asgs : d.id]
 }
 
+# Everyone has SpaceDeveloper permission in all spaces
 resource "cloudfoundry_space_users" "space_permissions" {
   for_each   = toset(local.spaces)
   space      = cloudfoundry_space.space[each.key].id
   developers = local.developers
   managers   = local.managers
-
-  # Remove any space roles not specified here
-  force = true
-
 }
 
