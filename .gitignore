@@ -157,6 +157,7 @@ staticfiles/
 # Infrastructure
 terraform/*/backend.tfvars
 terraform/*/.terraform
-terraform/*/secrets.auto.tfvars
 terraform/*/terraform.tfstate
 terraform/*/terraform.tfstate.backup
+terraform/*/deployer-creds.auto.tfvars
+terraform/shared/config/backend.tfvars

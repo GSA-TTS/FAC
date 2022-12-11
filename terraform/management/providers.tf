@@ -8,11 +8,16 @@ terraform {
   }
 
   backend "s3" {
-    bucket  = "cg-2f8babdc-0bd4-4281-b9ab-584a634566b1"
-    key     = "terraform.tfstate.management"
+    # We are using "partial configuration" here. The rest of the backend
+    # parameters are provided when you initialize terraform, eg run:
+    # 
+    #   terraform init \
+    #    --backend-config=../bootstrap/backend.tfvars \
+    #    --backend-config=key=terraform-state-$(basename $(pwd))
+    #
+    # For more info, see: 
+    # https://developer.hashicorp.com/terraform/language/settings/backends/configuration#partial-configuration
     encrypt = "true"
-    region  = "us-gov-west-1"
-    profile = "fac-terraform-backend"
   }
 }
 
