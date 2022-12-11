@@ -7,7 +7,8 @@ variable "cf_org_name" {
 variable "cf_space_name" {
   type        = string
   description = "name of the space to configure"
-  # No default... The calling module must supply this!
+  # No default... The calling module knows which env is for which space and we
+  # shouldn't assume it!
 }
 
 variable "database_plan" {
@@ -23,22 +24,3 @@ variable "recursive_delete" {
   default     = false
 }
 
-# module "database" {
-#   source = "../database"
-
-#   cf_org_name      = var.cf_org_name
-#   cf_space_name    = var.cf_space_name
-#   name             = "fac-db"
-#   recursive_delete = var.recursive_delete
-#   rds_plan_name    = var.database_plan
-# }
-
-# module "s3" {
-#   source = "../s3"
-
-#   cf_org_name      = var.cf_org_name
-#   cf_space_name    = var.cf_space_name
-#   name             = "fac-public-s3"
-#   recursive_delete = var.recursive_delete
-#   s3_plan_name     = "basic-public"
-# }
