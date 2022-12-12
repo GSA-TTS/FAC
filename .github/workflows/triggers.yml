@@ -21,7 +21,6 @@ jobs:
     name: Deploy to dev
     if: github.event.ref == 'refs/heads/main'
     needs: test_and_lint
-    runs-on: ubuntu-latest
     uses: ./.github/workflows/deploy.yml
     with:
       cf_username: ${{ secrets.CF_USERNAME }}
