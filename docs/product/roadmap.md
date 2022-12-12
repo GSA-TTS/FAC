@@ -29,6 +29,7 @@ Milestones
 
 Delivery options
 ===================
+**NOTE** We identified two options for delivery. We've decided to adopt Option 1, but below you will also find an overview of both options.
 
 ## Option 1: Two major releases: MVP and full functionality
 
@@ -38,22 +39,8 @@ Delivery options
 
 **Drawbacks:** Two FAC websites at once is not ideal UX for public or agencies. We change the world on both agencies and the public twice instead of once. 
 
-**Milestone sequence:**
-1. Pre-SAC
-1. Submit general information end to end / De-risk
-1. Federal awards, Excel upload patterns
-1. Submit an entire SF-SAC
-1. Upload and finalize audit package
-1. Status and user business logic
-1. Backend + Support + Data Transfer
-1. **ATO/Launch for “data intake” MVP**
-1. Agency data dissemination
-1. Public data dissemination
-1. Accommodate and transfer old-FAC data
-1. Data integrity / flexibility (potentially optional)
-1. Submission enhancements (potentially optional)
-1. **Full FAC functionality release**
-
+**Milestone sequence:** 
+[Milestones are listed in GitHub.](https://github.com/GSA-TTS/FAC/milestones?direction=asc&sort=title&state=open) 
 
 ## Option 2: One major release
 
