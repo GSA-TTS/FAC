@@ -3,6 +3,7 @@ applications:
 - name: gsa-fac
   buildpacks:
     - python_buildpack
+    - nodejs-buildpack
   memory: 512M
   path: ../
   timeout: 180
