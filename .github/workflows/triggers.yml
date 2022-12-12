@@ -21,6 +21,7 @@ jobs:
     name: Deploy to dev
     if: github.event.ref == 'refs/heads/main'
     needs: test_and_lint
+    runs-on: ubuntu-latest
     steps:
     - uses: ./.github/workflows/deploy.yml
       with:
@@ -29,29 +30,29 @@ jobs:
         cf_space: dev
       secrets: inherit
 
-  deploy-staging:
-    name: Deploy to staging
-    runs-on: ubuntu-latest
-    if: github.event.ref == 'refs/heads/prod'
-    needs: test_and_lint
-    environment: staging
-    steps:
-      - uses: ./.github/workflows/deploy.yml
-        with:
-          cf_username: ${{ secrets.CF_USERNAME }}
-          cf_password: ${{ secrets.CF_PASSWORD }}
-          cf_space: staging
+  # deploy-staging:
+  #   name: Deploy to staging
+  #   runs-on: ubuntu-latest
+  #   if: github.event.ref == 'refs/heads/prod'
+  #   needs: test_and_lint
+  #   environment: staging
+  #   steps:
+  #     - uses: ./.github/workflows/deploy.yml
+  #       with:
+  #         cf_username: ${{ secrets.CF_USERNAME }}
+  #         cf_password: ${{ secrets.CF_PASSWORD }}
+  #         cf_space: staging
 
-  deploy-production:
-    name: Deploy to production
-    runs-on: ubuntu-latest
-    if: github.event.ref == 'refs/tag/v*'
-    needs: test_and_lint
-    environment: production
-    steps:
-      - uses: ./.github/workflows/deploy.yml
-        with:
-          cf_username: ${{ secrets.CF_USERNAME }}
-          cf_password: ${{ secrets.CF_PASSWORD }}
-          cf_org: gsa-tts-oros-fac
-          cf_space: production
+  # deploy-production:
+  #   name: Deploy to production
+  #   runs-on: ubuntu-latest
+  #   if: github.event.ref == 'refs/tag/v*'
+  #   needs: test_and_lint
+  #   environment: production
+  #   steps:
+  #     - uses: ./.github/workflows/deploy.yml
+  #       with:
+  #         cf_username: ${{ secrets.CF_USERNAME }}
+  #         cf_password: ${{ secrets.CF_PASSWORD }}
+  #         cf_org: gsa-tts-oros-fac
+  #         cf_space: production
