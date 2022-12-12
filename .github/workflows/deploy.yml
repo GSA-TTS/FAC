@@ -9,7 +9,7 @@ on:
       CF_PASSWORD:
         required: true
         type: string
-      SPACE:
+      CF_SPACE:
         required: true
         type: string
     secrets:

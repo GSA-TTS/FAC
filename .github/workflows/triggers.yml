@@ -24,9 +24,9 @@ jobs:
     environment: develop
     uses: ./.github/workflows/deploy.yml
     with:
-      cf_username: ${{ secrets.CF_USERNAME }}
-      cf_password: ${{ secrets.CF_PASSWORD }}
-      cf_space: dev
+      CF_USERNAME: ${{ secrets.CF_USERNAME }}
+      CF_PASSWORD: ${{ secrets.CF_PASSWORD }}
+      CF_SPACE: dev
     secrets: inherit
 
   # deploy-staging:
