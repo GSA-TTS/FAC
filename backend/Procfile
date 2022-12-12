@@ -1,5 +1,4 @@
 # used by cloud.gov
 web: echo 'Starting procfile....' &&
     python manage.py migrate &&
-    npm run build &&
     gunicorn config.wsgi -t 60
