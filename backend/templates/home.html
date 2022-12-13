@@ -14,13 +14,13 @@
         <div class="grid-container">
             <h1 class="usa-hero__heading">The Federal Audit Clearinghouse (FAC) is the place to submit and review federal grant audits.</h1>
             <p class="intro-text">When an organization spends $750,000 or more in federal grant funds in a given year, they are required to submit an audit.</p>
-            <p>The FAC is moving to a new home at the General Services Administration (GSA). Only audits from 2022 will be searchable on fac.gov for now.  <a href="https://facides.census.gov/Account/Login.aspx">Please use the U.S. Census Bureau FAC site to search for older records.</a></p>
+            <p>The FAC is moving to a new home at the General Services Administration (GSA). Only audits from 2022 will be searchable on fac.gov for now.  <a href="https://facides.census.gov/Account/Login.aspx" aria-controls="legacy-fac-modal" data-open-modal>Please use the U.S. Census Bureau FAC site to search for older records.</a></p>
 
             <ul class="usa-card-group">
                 <li class="usa-card desktop:grid-col-6">
                     <div class="usa-card__container">
                         <div>
-                            <a class="usa-button sign-in-button" href="/openid/login/">Sign in</a>
+                            <a class="usa-button sign-in-button" aria-controls="login-modal" data-open-modal href="/openid/login/">Sign in</a>
                         </div>
                         <p class="usa-card__body">Sign in to submit and review your audits.</p>
                     </div>
@@ -28,7 +28,7 @@
                 <li class="usa-card desktop:grid-col-6">
                     <div class="usa-card__container">
                         <div>
-                            <a class="usa-button usa-button--outline" href="/callout/">Search older audit reports</a>
+                            <a class="usa-button usa-button--outline" href="https://facides.census.gov/Account/Login.aspx" aria-controls="legacy-fac-modal" data-open-modal>Search older audit reports</a>
                         </div>
                         <p class="usa-card__body">
                             Search audit report records from before 2022.
@@ -39,4 +39,37 @@
             </ul>
         </div>
     </section>
+
+    <div
+        class="usa-modal usa-modal--lg"
+        id="legacy-fac-modal"
+        aria-labelledby="legacy-fac-modal-heading"
+        aria-describedby="legacy-fac-modal-description"
+        data-force-action
+    >
+        <div class="usa-modal__content">
+            <div class="usa-modal__main">
+                <h2 class="usa-modal__heading" id="legacy-fac-modal-heading">You are leaving the fac.gov website</h2>
+                <div class="usa-prose">
+                    <p id="legacy-fac-modal-description">Search pre-2022 audit records on the U.S. Census Bureau FAC site. We’re working on moving all audit records to fac.gov. </p>
+                </div>
+                <div class="usa-modal__footer">
+                    <ul class="usa-button-group">
+                        <li class="usa-button-group__item">
+                            <a type="button" class="usa-button" data-close-modal href="https://facides.census.gov/Account/Login.aspx">
+                                Continue to the U.S. Census Bureau FAC site
+                            </a>
+                        </li>
+                        <li class="usa-button-group__item">
+                            <button
+                                type="button"
+                                class="usa-button usa-button--unstyled padding-105 text-center"
+                                data-close-modal
+                            >Cancel</button>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock content%}
