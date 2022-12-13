@@ -12,12 +12,16 @@
   .usa-header--basic .usa-nav-container {
     align-items: center;
   }
+
+  .usa-header--basic .usa-navbar {
+    width: 25%;
+  }
 }
 
 .sign-in,
 .sign-out {
   background-color: color('primary-darker');
-  padding: 0.5em 1.5em 1.5em 1em;
+  padding: 0.5em 2.5em 0.5em 1em;
 }
 
 .usa-menu-btn {
@@ -28,13 +32,22 @@
 .sign-in-logo:active,
 .sign-in-logo:visited {
   color: #fff;
+  font-size: .88rem;
   font-weight: bold;
+  line-height: 1.1rem;
   margin: 0;
   display: inline-block;
-  white-space: nowrap;
-  padding: 0.85rem;
-  padding: 0.75rem 0.5rem;
+  padding: 0.75rem 0rem 0.75rem 2.1rem;
   text-decoration: none;
+  background-image: url('../img/usa-icons/account_circle.svg');
+  background-position: 0 50%;
+  background-repeat: no-repeat;
+  background-size: 2rem;
+  
+  span {
+    font-weight: normal;
+    display: block;
+  }
 }
 
 .sign-out {
@@ -72,9 +85,9 @@
 }
 
 .sign-in-logo::before {
-  content: url('../img/login-logo.png');
-  position: relative;
-  top: 0.5em;
+  // content: url('../img/usa-icons/account_circle.svg');
+  display: block;
+  float: left;
 }
 
 .usa-header {

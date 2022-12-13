@@ -9,10 +9,3 @@
 
 @use '_home.scss';
 @use '_header.scss';
-
-.sign-in-logo::before {
-  content: url('../img/login-logo.png');
-  position: relative;
-  top: 0.5em;
-}
-
