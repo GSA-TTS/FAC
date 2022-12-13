@@ -1,12 +1,38 @@
 @use 'uswds-core' as *;
 
 .usa-hero {
-  background-color: color('base-lightest');
   background-image: none;
+
+  & > .grid-container {
+    padding-top: 5rem;
+    padding-bottom: 5rem;
+  }
+
+  .intro-text {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+    font-size: size('sans', 8);  /* stylelint-disable-line */
+    padding-bottom: units(3);
+  }
+
+  .usa-card {
+    text-align: center;
+
+    .usa-card__container {
+      padding: 2rem 0;
+    }
+
+    .usa-card__body {
+      padding-bottom: 0;
+    }
+
+    p {
+      margin-bottom: 0;
+    }
+  }
 }
 
 .usa-hero__heading {
-  font-size: size('sans', 14);  /* stylelint-disable-line */
+  font-size: size('sans', 13);  /* stylelint-disable-line */
 }
 
 .usa-hero__heading,
@@ -22,8 +48,7 @@
     .usa-hero__heading,
     p,
     .usa-button-group {
-      margin-bottom: 2rem;
-      width: 66%;
+      margin-bottom: 2.2rem;
     }  
   }
 }

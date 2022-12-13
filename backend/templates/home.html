@@ -10,18 +10,33 @@
 {% endblock %}
 
 {% block content%}
-<section class="usa-hero" aria-label="Introduction">
-    <div class="grid-container">
-      <h1 class="usa-hero__heading">Search, upload, and download federal audit documents</h1>
-      <p>The FAC is transitioning to the General Services Administration to help the public  in oversight, transparency and assessment of Federal award audit requirements. Only audits from 2021 will be searchable on this site until we migrate systems, so please use the <a href="https://facides.census.gov/Account/Login.aspx">legacy FAC IMS</a> to search older records.</p>
-      <div class="usa-button-group">
-        <a class="usa-button sign-in-button" href="/openid/login/">
-          Log in to submit an audit
-        </a>
-        <a class="usa-button usa-button--outline" href="/callout/">
-          Find audit information on the legacy FAC IMS
-        </a>
-      </div>
-    </div>
-  </section>
+    <section class="usa-hero" aria-label="Introduction">
+        <div class="grid-container">
+            <h1 class="usa-hero__heading">The Federal Audit Clearinghouse (FAC) is the place to submit and review federal grant audits.</h1>
+            <p class="intro-text">When an organization spends $750,000 or more in federal grant funds in a given year, they are required to submit an audit.</p>
+            <p>The FAC is moving to a new home at the General Services Administration (GSA). Only audits from 2022 will be searchable on fac.gov for now.  <a href="https://facides.census.gov/Account/Login.aspx">Please use the U.S. Census Bureau FAC site to search for older records.</a></p>
+
+            <ul class="usa-card-group">
+                <li class="usa-card desktop:grid-col-6">
+                    <div class="usa-card__container">
+                        <div>
+                            <a class="usa-button sign-in-button" href="/openid/login/">Sign in</a>
+                        </div>
+                        <p class="usa-card__body">Sign in to submit and review your audits.</p>
+                    </div>
+                </li>
+                <li class="usa-card desktop:grid-col-6">
+                    <div class="usa-card__container">
+                        <div>
+                            <a class="usa-button usa-button--outline" href="/callout/">Search older audit reports</a>
+                        </div>
+                        <p class="usa-card__body">
+                            Search audit report records from before 2022.
+                            You don’t need a FAC account to search.
+                        </p>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </section>
 {% endblock content%}
