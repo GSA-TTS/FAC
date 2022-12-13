@@ -26,6 +26,26 @@ from .serializers import (
 )
 
 
+def eligibility_check(user, data):
+    serializer = EligibilitySerializer(data=data)  #data = request.data
+    # self.eligibility_check(request)
+    if serializer.is_valid():
+        next_step = reverse("auditee-info")
+
+        # Store step 0 data in profile, overwriting any pre-existing.
+        user.profile.entry_form_data = data
+        user.profile.save()
+        return {
+            "eligible": True,
+            "next": next_step
+        }
+
+    return {
+        "eligible": False,
+        "errors": serializer.errors
+    }
+
+
 class IndexView(View):
     def get(self, request, *args, **kwargs):
         test_file = open(BASE_DIR.__str__() + "/static/index.html", "r")
@@ -62,17 +82,7 @@ class EligibilityFormView(APIView):
     """
 
     def post(self, request):
-        serializer = EligibilitySerializer(data=request.data)
-        if serializer.is_valid():
-            next_step = reverse("auditee-info")
-
-            # Store step 0 data in profile, overwriting any pre-existing.
-            request.user.profile.entry_form_data = request.data
-            request.user.profile.save()
-
-            return Response({"eligible": True, "next": next_step})
-
-        return Response({"eligible": False, "errors": serializer.errors})
+        return Response(eligibility_check(request.user, request.data))
 
 
 class UEIValidationFormView(APIView):

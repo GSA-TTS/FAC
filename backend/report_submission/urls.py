@@ -4,5 +4,6 @@ from . import views
 
 urlpatterns = [
     # test page
-    path("test/", views.home2.as_view(), name="report_submission"),
+    path("", views.step1.as_view(), name="report_submission"),
+    path("step2/", views.EligibilityFormView.as_view(), name="report_eligibility")
 ]
