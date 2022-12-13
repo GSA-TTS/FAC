@@ -1,18 +1,21 @@
 ---
 applications:
-- name: gsa-fac-dev
+- name: gsa-fac
   buildpacks:
     - python_buildpack
+    - https://github.com/cloudfoundry/nodejs-buildpack
   memory: 512M
   path: ../
   timeout: 180
   env:
     ENV: DEVELOPMENT
     DJANGO_BASE_URL: https://fac-dev.app.cloud.gov
+    DISABLE_COLLECTSTATIC: true
   routes:
   - route: fac-dev.app.cloud.gov
   instances: 1
   services:
-  - fac_dev_db
+  - fac-db
   - fac-public-s3
   - fac-key-service
+  - dev-deployer

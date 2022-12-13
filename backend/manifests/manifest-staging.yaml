@@ -1,0 +1,19 @@
+---
+applications:
+- name: gsa-fac
+  buildpacks:
+    - python_buildpack
+  memory: 512M
+  path: ../
+  timeout: 180
+  env:
+    ENV: STAGING
+    DJANGO_BASE_URL: https://fac-staging.app.cloud.gov
+  routes:
+  - route: fac-staging.app.cloud.gov
+  instances: 1
+  services:
+  - fac-db
+  - fac-public-s3
+  - fac-key-service
+  - staging-deployer
