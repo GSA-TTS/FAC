@@ -1,5 +1,4 @@
 # used by cloud.gov
-# Test comment 2022-12-14 to kick off deploy to make sure it's still broken
 web: echo 'Starting procfile....' &&
     python manage.py collectstatic --noinput &&
     echo "collectstatic finished" &&

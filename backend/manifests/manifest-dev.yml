@@ -3,7 +3,6 @@ applications:
 - name: gsa-fac
   buildpacks:
     - python_buildpack
-    - https://github.com/cloudfoundry/nodejs-buildpack
   memory: 512M
   path: ../
   timeout: 180
