@@ -5,7 +5,7 @@ from django.core.exceptions import ValidationError
 
 from random import choice, randrange
 
-from .test_schemas import SchemaValidityTest
+from .test_schemas import FederalAwardsSchemaValidityTest
 from .validators import (
     validate_federal_award_json,
     validate_uei,
@@ -37,14 +37,14 @@ class FederalAwardsValidatorTests(SimpleTestCase):
             ValidationError, expected_msg, validate_federal_award_json, invalid
         )
 
-        simple = SchemaValidityTest.SIMPLE_CASE
+        simple = FederalAwardsSchemaValidityTest.SIMPLE_CASE
         validate_federal_award_json(simple)
 
     def test_prefix_under_ten(self):
         """
         Prefixes between 00 and 09 should fail
         """
-        simple = jsoncopy(SchemaValidityTest.SIMPLE_CASE)
+        simple = jsoncopy(FederalAwardsSchemaValidityTest.SIMPLE_CASE)
 
         # pick a prefix between 00 and 09 (invalid)
         prefix = f"{randrange(10):02}"
@@ -61,7 +61,7 @@ class FederalAwardsValidatorTests(SimpleTestCase):
         """
         Prefixes over 99 should fail
         """
-        simple = jsoncopy(SchemaValidityTest.SIMPLE_CASE)
+        simple = jsoncopy(FederalAwardsSchemaValidityTest.SIMPLE_CASE)
 
         # pick a prefix between 100 and 999 (invalid)
         prefix = f"{randrange(100, 1000):03}"
@@ -78,7 +78,7 @@ class FederalAwardsValidatorTests(SimpleTestCase):
         """
         Prefixes with non-numeric characters should fail
         """
-        simple = jsoncopy(SchemaValidityTest.SIMPLE_CASE)
+        simple = jsoncopy(FederalAwardsSchemaValidityTest.SIMPLE_CASE)
 
         # pick prefixes that contain one or two non-numeric characters
         prefixes = [
@@ -102,7 +102,7 @@ class FederalAwardsValidatorTests(SimpleTestCase):
         """
         A CFDA extension of RD should pass
         """
-        simple = jsoncopy(SchemaValidityTest.SIMPLE_CASE)
+        simple = jsoncopy(FederalAwardsSchemaValidityTest.SIMPLE_CASE)
 
         # pick a prefix between 10 and 99 (valid)
         prefix = f"{randrange(10, 100):02}"
@@ -119,7 +119,7 @@ class FederalAwardsValidatorTests(SimpleTestCase):
         """
         A CFDA extension of U## should pass
         """
-        simple = jsoncopy(SchemaValidityTest.SIMPLE_CASE)
+        simple = jsoncopy(FederalAwardsSchemaValidityTest.SIMPLE_CASE)
 
         # pick a prefix between 10 and 99 (valid)
         prefix = f"{randrange(10, 100):02}"
@@ -136,7 +136,7 @@ class FederalAwardsValidatorTests(SimpleTestCase):
         """
         A CFDA extension of U# should fail
         """
-        simple = jsoncopy(SchemaValidityTest.SIMPLE_CASE)
+        simple = jsoncopy(FederalAwardsSchemaValidityTest.SIMPLE_CASE)
 
         # pick a prefix between 10 and 99 (valid)
         prefix = f"{randrange(10, 100):02}"
@@ -153,7 +153,7 @@ class FederalAwardsValidatorTests(SimpleTestCase):
         """
         A CFDA extension of U### should fail
         """
-        simple = jsoncopy(SchemaValidityTest.SIMPLE_CASE)
+        simple = jsoncopy(FederalAwardsSchemaValidityTest.SIMPLE_CASE)
 
         # pick a prefix between 10 and 99 (valid)
         prefix = f"{randrange(10, 100):02}"
@@ -170,7 +170,7 @@ class FederalAwardsValidatorTests(SimpleTestCase):
         """
         A three digit numeric CFDA extension should pass
         """
-        simple = jsoncopy(SchemaValidityTest.SIMPLE_CASE)
+        simple = jsoncopy(FederalAwardsSchemaValidityTest.SIMPLE_CASE)
 
         # pick a prefix between 10 and 99 (valid)
         prefix = f"{randrange(10, 100):02}"
@@ -187,7 +187,7 @@ class FederalAwardsValidatorTests(SimpleTestCase):
         """
         A CFDA extension with four digits should fail
         """
-        simple = jsoncopy(SchemaValidityTest.SIMPLE_CASE)
+        simple = jsoncopy(FederalAwardsSchemaValidityTest.SIMPLE_CASE)
 
         # pick a prefix between 10 and 99 (valid)
         prefix = f"{randrange(10, 100):02}"
@@ -204,7 +204,7 @@ class FederalAwardsValidatorTests(SimpleTestCase):
         """
         A CFDA extension with 3 numeric digits and a trailing letter should pass
         """
-        simple = jsoncopy(SchemaValidityTest.SIMPLE_CASE)
+        simple = jsoncopy(FederalAwardsSchemaValidityTest.SIMPLE_CASE)
 
         # pick a prefix between 10 and 99 (valid)
         prefix = f"{randrange(10, 100):02}"
@@ -221,7 +221,7 @@ class FederalAwardsValidatorTests(SimpleTestCase):
         """
         A CFDA extension with 3 numeric digits and multiple trailing letters should fail
         """
-        simple = jsoncopy(SchemaValidityTest.SIMPLE_CASE)
+        simple = jsoncopy(FederalAwardsSchemaValidityTest.SIMPLE_CASE)
 
         # pick a prefix between 10 and 99 (valid)
         prefix = f"{randrange(10, 100):02}"
@@ -241,7 +241,7 @@ class FederalAwardsValidatorTests(SimpleTestCase):
         ascii_letters_omit_RD = string.ascii_letters.replace("D", "").replace("R", "")
         ascii_letters_omit_U = string.ascii_letters.replace("U", "")
 
-        simple = jsoncopy(SchemaValidityTest.SIMPLE_CASE)
+        simple = jsoncopy(FederalAwardsSchemaValidityTest.SIMPLE_CASE)
 
         # pick a prefix between 10 and 99 (valid)
         prefix = f"{randrange(10, 100):02}"

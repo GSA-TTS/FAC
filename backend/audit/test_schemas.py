@@ -1,20 +1,264 @@
 # Even though the schemas are not Django views or modules etc., we test them
 # here for CI/CD integration.
 import json
+import string
+
 from pathlib import Path
 from django.test import SimpleTestCase
-from jsonschema import exceptions, validate
+from jsonschema import exceptions, validate as jsonschema_validate, FormatChecker
+from random import choice, randrange
 
 # Simplest way to create a new copy of simple case rather than getting
 # references to things used by other tests:
 jsoncopy = lambda v: json.loads(json.dumps(v))
 
+
+# wrap the validate function to include a format checker
+def validate(instance, schema):
+    return jsonschema_validate(instance, schema, format_checker=FormatChecker())
+
+
 SCHEMA_DIR = Path(__file__).parent.parent / "schemas" / "sections"
 
 
-class SchemaValidityTest(SimpleTestCase):
+class GeneralInformationSchemaValidityTest(SimpleTestCase):
     """
-    Test the basic validity of the JSON schemas.
+    Test the basic validity of the GeneralInformation JSON schema.
+    """
+
+    GENERAL_INFO_SCHEMA = json.loads(
+        (SCHEMA_DIR / "GeneralInformation.schema.json").read_text(encoding="utf-8")
+    )
+
+    SIMPLE_CASE = {
+        "GeneralInformation": {
+            "auditee_fiscal_period_start": "2022-01-01",
+            "auditee_fiscal_period_end": "2022-12-31",
+            "ein": "123456789",
+            "ein_not_an_ssn_attestation": True,
+            "multiple_eins_covered": False,
+            "auditee_name": "John",
+            "auditee_address_line_1": "123 Fake St.",
+            "auditee_city": "FakeCity",
+            "auditee_state": "AL",
+            "auditee_zip": "12345",
+            "auditee_contact_name": "John",
+            "auditee_contact_title": "A Title",
+            "auditee_phone": "555-555-5555",
+            "auditee_email": "john@test.test",
+            "user_provided_organization_type": "state",
+            "met_spending_threshold": True,
+            "is_usa_based": True,
+            "auditor_firm_name": "Firm LLC",
+            "auditor_ein": "123456789",
+            "auditor_ein_not_an_ssn_attestation": True,
+            "auditor_country": "USA",
+            "auditor_address_line_1": "456 Fake St.",
+            "auditor_city": "AnotherFakeCity",
+            "auditor_state": "WY",
+            "auditor_zip": "56789",
+            "auditor_contact_name": "Jane",
+            "auditor_contact_title": "Another Title",
+            "auditor_phone": "999-999-9999",
+            "auditor_email": "jane@test.test",
+        }
+    }
+
+    def test_simple_pass(self):
+        """
+        The simple case should be valid
+        """
+        schema = self.GENERAL_INFO_SCHEMA
+
+        validate(self.SIMPLE_CASE, schema)
+
+    def test_invalid_auditee_fiscal_period_start(self):
+        """
+        If auditee_fiscal_period_start is an invalid date format, validation should fail
+        """
+        schema = self.GENERAL_INFO_SCHEMA
+
+        simple_case = jsoncopy(self.SIMPLE_CASE)
+
+        bad_date = "not a date"
+        simple_case["GeneralInformation"]["auditee_fiscal_period_start"] = bad_date
+
+        self.assertRaisesRegex(
+            exceptions.ValidationError,
+            f"'{bad_date}' is not a 'date'",
+            validate,
+            simple_case,
+            schema,
+        )
+
+    def test_invalid_auditee_fiscal_period_end(self):
+        """
+        If auditee_fiscal_period_end is an invalid date format, validation should fail
+        """
+        schema = self.GENERAL_INFO_SCHEMA
+
+        simple_case = jsoncopy(self.SIMPLE_CASE)
+
+        bad_date = "not a date"
+        simple_case["GeneralInformation"]["auditee_fiscal_period_end"] = bad_date
+
+        self.assertRaisesRegex(
+            exceptions.ValidationError,
+            f"'{bad_date}' is not a 'date'",
+            validate,
+            simple_case,
+            schema,
+        )
+
+    def test_invalid_ein(self):
+        """
+        If the EIN is not in a valid format, validation should fail
+        """
+        schema = self.GENERAL_INFO_SCHEMA
+
+        bad_eins = [
+            f"{randrange(1000000000):010}",  # too long
+            f"{randrange(10000000):08}",  # too short
+            "".join(choice(string.ascii_letters) for i in range(9)),  # contains letters
+            "".join(choice(string.punctuation) for i in range(9)),  # contains symbols
+        ]
+
+        for bad_ein in bad_eins:
+            with self.subTest():
+                instance = jsoncopy(self.SIMPLE_CASE)
+
+                instance["GeneralInformation"]["ein"] = bad_ein
+
+                self.assertRaisesRegex(
+                    exceptions.ValidationError,
+                    "does not match",
+                    validate,
+                    instance,
+                    schema,
+                )
+
+    def test_invalid_zip(self):
+        """
+        If auditee_zip is not in a valid format, validation should fail
+        """
+        schema = self.GENERAL_INFO_SCHEMA
+
+        bad_zips = [
+            f"{randrange(1000000):06}",  # too long
+            f"{randrange(10000):04}",  # too short
+            "".join(choice(string.ascii_letters) for i in range(5)),  # contains letters
+            "".join(choice(string.punctuation) for i in range(5)),  # contains symbols
+        ]
+
+        for zip_field in ["auditee_zip", "auditor_zip"]:
+            for bad_zip in bad_zips:
+                with self.subTest():
+                    instance = jsoncopy(self.SIMPLE_CASE)
+
+                    instance["GeneralInformation"][zip_field] = bad_zip
+
+                    self.assertRaisesRegex(
+                        exceptions.ValidationError,
+                        "does not match",
+                        validate,
+                        instance,
+                        schema,
+                    )
+
+    def test_invalid_zip_plus_4(self):
+        """
+        If auditee_zip is not in a valid zip+4 format, validation should fail
+        """
+        schema = self.GENERAL_INFO_SCHEMA
+
+        # generate a valid 5 digit zip code
+        valid_zip = f"{randrange(100000):05}"
+
+        # append invalid +4 suffixes
+        bad_zips = [
+            f"{valid_zip}-{randrange(10000):05}",  # +4 too long
+            f"{valid_zip}-{randrange(1000):03}",  # +4 too short
+            f"{valid_zip}-{''.join(choice(string.ascii_letters) for i in range(4))}",  # contains letters
+            f"{valid_zip}-{''.join(choice(string.punctuation) for i in range(4))}",  # contains symbols
+        ]
+
+        for zip_field in ["auditee_zip", "auditor_zip"]:
+            for bad_zip in bad_zips:
+                with self.subTest():
+                    instance = jsoncopy(self.SIMPLE_CASE)
+
+                    instance["GeneralInformation"][zip_field] = bad_zip
+
+                    self.assertRaisesRegex(
+                        exceptions.ValidationError,
+                        "does not match",
+                        validate,
+                        instance,
+                        schema,
+                    )
+
+    def test_valid_phone(self):
+        """
+        If auditee_phone is in a valid format, validation should pass
+        """
+        schema = self.GENERAL_INFO_SCHEMA
+
+        good_phones_wo_country_code = [
+            f"{randrange(10000000000):010}",  # e.g. 5555555555
+            f"{randrange(1000):03}-{randrange(1000):03}-{randrange(10000):04}",  # e.g. 555-555-5555
+            f"{randrange(1000):03}.{randrange(1000):03}.{randrange(10000):04}",  # e.g. 555.555.5555
+            f"{randrange(1000):03} {randrange(1000):03} {randrange(10000):04}",  # e.g. 555 555 5555
+            f"({randrange(1000):03})-{randrange(1000):03}-{randrange(10000):04}",  # e.g. (555)-555-5555
+            f"({randrange(1000):03}).{randrange(1000):03}.{randrange(10000):04}",  # e.g. (555).555.5555
+            f"({randrange(1000):03}) {randrange(1000):03} {randrange(10000):04}",  # e.g. (555) 555 5555
+        ]
+
+        good_phones_w_country_code = [f"+1 {p}" for p in good_phones_wo_country_code]
+
+        good_phones = good_phones_wo_country_code + good_phones_w_country_code
+
+        for phone_field in ["auditee_phone", "auditor_phone"]:
+            for good_phone in good_phones:
+                with self.subTest():
+                    instance = jsoncopy(self.SIMPLE_CASE)
+
+                    instance["GeneralInformation"][phone_field] = good_phone
+
+                    validate(instance, schema)
+
+    def test_invalid_phone(self):
+        """
+        If auditee_phone is not in a valid format, validation should fail
+        """
+        schema = self.GENERAL_INFO_SCHEMA
+
+        bad_phones = [
+            f"{randrange(100000000):09}",  # too short
+            f"{randrange(10000000000):011}",  # too long
+            "".join(
+                choice(string.ascii_letters) for i in range(10)
+            ),  # contains letters
+        ]
+
+        for phone_field in ["auditee_phone", "auditor_phone"]:
+            for bad_phone in bad_phones:
+                with self.subTest():
+                    instance = jsoncopy(self.SIMPLE_CASE)
+
+                    instance["GeneralInformation"][phone_field] = bad_phone
+
+                    self.assertRaisesRegex(
+                        exceptions.ValidationError,
+                        "does not match",
+                        validate,
+                        instance,
+                        schema,
+                    )
+
+
+class FederalAwardsSchemaValidityTest(SimpleTestCase):
+    """
+    Test the basic validity of the FederalAwards JSON schema.
     """
 
     FEDERAL_AWARDS_SCHEMA = json.loads(
