@@ -51,7 +51,8 @@ jobs:
         run: docker-compose up -d
       - name: Run Django test suite
         working-directory: ./backend
-        run: docker-compose run web bash -c 'coverage run --source="." manage.py test &&
+        run:
+          docker-compose run web bash -c 'coverage run --source="." manage.py test &&
           coverage report -m --fail-under=99'
       - name: Run Django migrations for pa11y tests
         working-directory: ./backend
@@ -81,12 +82,12 @@ jobs:
         uses: actions/setup-python@v3
         with:
           python-version: "3.10"
-      - name: Install npm dependencies
-        working-directory: ./backend
-        run: npm install
-      - name: Compile JS/CSS assets
-        working-directory: ./backend
-        run: npm run build
+      # - name: Install npm dependencies
+      #   working-directory: ./backend
+      #   run: npm install
+      # - name: Compile JS/CSS assets
+      #   working-directory: ./backend
+      #   run: npm run build
       - name: Update service keys
         uses: 18f/cg-deploy-action@main
         env:

@@ -9,6 +9,7 @@ applications:
   env:
     ENV: DEVELOPMENT
     DJANGO_BASE_URL: https://fac-dev.app.cloud.gov
+    DISABLE_COLLECTSTATIC: true
   routes:
   - route: fac-dev.app.cloud.gov
   instances: 1
