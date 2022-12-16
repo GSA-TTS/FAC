@@ -34,6 +34,7 @@ class GeneralInformationSchemaValidityTest(SimpleTestCase):
         "GeneralInformation": {
             "auditee_fiscal_period_start": "2022-01-01",
             "auditee_fiscal_period_end": "2022-12-31",
+            "audit_period_covered": "annual",
             "ein": "123456789",
             "ein_not_an_ssn_attestation": True,
             "multiple_eins_covered": False,

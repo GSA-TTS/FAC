@@ -1,5 +1,19 @@
 {
   "$defs": {
+    "AuditPeriod": {
+      "description": "",
+      "enum": [
+        "annual",
+        "biennial",
+        "other"
+      ],
+      "title": "AuditPeriod",
+      "type": "string"
+    },
+    "EIN": {
+      "type": "string",
+      "pattern": "^[0-9]{9}$"
+    },
     "GeneralInformation": {
       "additionalProperties": false,
       "description": "",
@@ -11,6 +25,9 @@
         "auditee_fiscal_period_end": {
           "type": "string",
           "format": "date"
+        },
+        "audit_period_covered": {
+          "$ref": "#/$defs/AuditPeriod"
         },
         "ein": {
           "$ref": "#/$defs/EIN"
@@ -96,10 +113,6 @@
           "format": "email"
         }
       }
-    },
-    "EIN": {
-      "type": "string",
-      "pattern": "^[0-9]{9}$"
     },
     "Phone": {
       "type": "string",
