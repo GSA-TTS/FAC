@@ -38,6 +38,8 @@ class GeneralInformationSchemaValidityTest(SimpleTestCase):
             "ein": "123456789",
             "ein_not_an_ssn_attestation": True,
             "multiple_eins_covered": False,
+            "auditee_uei": "1A2B3C4D5E6F",
+            "multiple_ueis_covered": False,
             "auditee_name": "John",
             "auditee_address_line_1": "123 Fake St.",
             "auditee_city": "FakeCity",
@@ -137,6 +139,66 @@ class GeneralInformationSchemaValidityTest(SimpleTestCase):
                     instance,
                     schema,
                 )
+
+    def test_invalid_uei(self):
+        """
+        If the UEI is not in a valid format, validation should fail
+        """
+        schema = self.GENERAL_INFO_SCHEMA
+
+        alpha_omit_oi = (
+            string.ascii_letters.replace("i", "")
+            .replace("I", "")
+            .replace("o", "")
+            .replace("O", "")
+        )
+        good_uei = "".join(choice(alpha_omit_oi) for i in range(12))
+        idx = randrange(12)
+
+        with_punc = good_uei[:idx] + choice(string.punctuation) + good_uei[idx + 1 :]
+        with_ioIO = good_uei[:idx] + choice("ioIO") + good_uei[idx + 1 :]
+
+        bad_ueis = [
+            "".join(choice(alpha_omit_oi) for i in range(11)),  # too short
+            "".join(choice(alpha_omit_oi) for i in range(13)),  # too long
+            f"0{''.join(choice(alpha_omit_oi) for i in range(11))}",  # starts with 0
+            with_punc,  # contains a non-alphanum char
+            with_ioIO,  # contains one of i, o, I, O
+        ]
+
+        for bad_uei in bad_ueis:
+            with self.subTest():
+                instance = jsoncopy(self.SIMPLE_CASE)
+
+                instance["GeneralInformation"]["auditee_uei"] = bad_uei
+
+                self.assertRaisesRegex(
+                    exceptions.ValidationError,
+                    "does not match",
+                    validate,
+                    instance,
+                    schema,
+                )
+
+    def test_valid_uei(self):
+        """
+        If the UEI is in a valid format, validation should pass
+        """
+        schema = self.GENERAL_INFO_SCHEMA
+
+        alpha_omit_oi = (
+            string.ascii_letters.replace("i", "")
+            .replace("I", "")
+            .replace("o", "")
+            .replace("O", "")
+        )
+        good_uei = "".join(choice(alpha_omit_oi) for i in range(12))
+
+        instance = jsoncopy(self.SIMPLE_CASE)
+
+        instance["GeneralInformation"]["auditee_uei"] = good_uei
+
+        validate(instance, schema)
 
     def test_invalid_zip(self):
         """
