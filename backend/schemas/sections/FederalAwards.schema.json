@@ -1,14 +1,5 @@
 {
   "$defs": {
-    "AuditPeriod": {
-      "description": "",
-      "enum": [
-        "annual",
-        "biennial"
-      ],
-      "title": "AuditPeriod",
-      "type": "string"
-    },
     "AuditType": {
       "description": "",
       "enum": [
