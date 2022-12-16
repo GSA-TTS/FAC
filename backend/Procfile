@@ -1,9 +1,7 @@
 # used by cloud.gov
 web: echo 'Starting procfile....' &&
-    python manage.py collectstatic --noinput &&
-    echo "collectstatic finished" &&
-    python manage.py migrate &&
     npm install &&
     npm run build &&
+    python manage.py migrate &&
     python manage.py collectstatic --noinput &&
     gunicorn config.wsgi -t 60
