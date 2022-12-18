@@ -1,0 +1,5 @@
+module "${name}" {
+  source        = "../shared/modules/base"
+  cf_space_name = "${name}"
+}
+
