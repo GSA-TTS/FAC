@@ -9,7 +9,9 @@ applications:
     env:
       ENV: DEVELOPMENT
       DJANGO_BASE_URL: https://fac-dev.app.cloud.gov
-      DISABLE_COLLECTSTATIC: true
+      # The following is commented out because collectstatic in the buildpack phase does not seem to be working, so we're running it in .profile.
+      # If we find out what's broken, or it's fixed up stream, then we can decide whether or not we want to disable it.
+      # DISABLE_COLLECTSTATIC: true
     routes:
       - route: fac-dev.app.cloud.gov
     instances: 1
