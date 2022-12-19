@@ -5,6 +5,7 @@ applications:
       - python_buildpack
     memory: 512M
     path: ../
+    health-check-type: process
     timeout: 180
     env:
       ENV: DEVELOPMENT
