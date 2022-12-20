@@ -20,16 +20,34 @@ jobs:
     # is not from a fork
     if: startsWith(github.head_ref, 'auto/bpmn-patches') == false && github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
+    permissions:
+      contents: 'write'
+      actions: 'read'
+      pull-requests: 'write'
     steps:
       - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
       - uses: actions/setup-node@v3
       - name: Install bpmn-to-image
         run: npm install -g bpmn-to-image
 
-      - name: Get the set of changed files on the branch
+      # Deriving the `base_sha` this way specifically brackets the commits since
+      # this workflow last passed (if it exists) for our basis of comparison. We
+      # do this because otherwise added+removed events or removed+added events
+      # spread across commits since the start of the branch might not be noticed
+      # as changes, leaving images without source, or source without images.
+      #
+      # Derived from the `Get all changed files using the last successful commit
+      # of the base branch > Push event` example here:
+      # https://github.com/tj-actions/changed-files#examples
+      - uses: nrwl/nx-set-shas@v3
+        id: last_successful_commit_push
+      - name: Find BPMN files changed since images were last all in sync
         id: files
         uses: tj-actions/changed-files@v35
         with:
+          base_sha: ${{ steps.last_successful_commit_push.outputs.base }}
           files: docs/bpmn-workflow-models/*.bpmn    
 
       - name: Remove images for each removed BPMN file
