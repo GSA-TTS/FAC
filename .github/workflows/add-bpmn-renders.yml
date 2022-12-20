@@ -19,9 +19,6 @@ jobs:
     # Check that the PR is not raised by this workflow (avoiding recursion) and is not from a fork
     if: startsWith(github.head_ref, 'auto/bpmn-patches') == false && github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
-    # env:
-    #   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
@@ -54,23 +51,25 @@ jobs:
               fi
             fi
           done
-      - name: See if we need to make a patch branch
+      - name: Look for changes needed
         id: vars
         run: |
           branchname="bpmn-patches/${{ github.head_ref }}"
           echo "branchname=${branchname}" >> $GITHUB_OUTPUT
           imagesupdated=$(git status --porcelain | cut -d ' ' -f 2 | wc -l)
           echo "imagesupdated=${imagesupdated}" >> $GITHUB_OUTPUT
-      - name: Create PR with patch
+      - name: Create PR with changes
         if: steps.vars.outputs.imagesupdated != 0
         uses: peter-evans/create-pull-request@v4
         with:
-          commit-message: Adds/updates BPMN images for ${{ github.head_ref }}
-          title: Update BPMN images
-          body: This is an auto-generated PR to add/update BPMN images on ${{ github.head_ref }}.
+          commit-message: Update BPMN images for ${{ github.head_ref }}
+          title: Update BPMN images for ${{ github.head_ref }}
+          body: This is an auto-generated PR to sync BPMN images with their source on ${{ github.head_ref }}.
           labels: bpmn-to-image, automated pr
           branch: ${{ steps.vars.outputs.branchname }}
           base: ${{ github.head_ref }}
-      - name: Fail the workflow if bpmn-to-image made changes
+      - name: Fail if images are out of sync with source
         if: steps.vars.outputs.imagesupdated != 0
-        run: exit 1
+        run: |
+          echo "BPMN images are out of sync with their source. Merge PR #${PULL_REQUEST_NUMBER}"
+          exit 1
