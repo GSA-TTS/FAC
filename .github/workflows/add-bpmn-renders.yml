@@ -26,30 +26,13 @@ jobs:
       - name: Install bpmn-to-image
         run: npm install -g bpmn-to-image
 
-      - name: Get the set of changed files on the branch
-        id: files
-        uses: tj-actions/changed-files@v35
-        with:
-          files: docs/bpmn-workflow-models/*.bpmn    
-
-      - name: Remove images for each removed BPMN file
+      - name: Remove existing PNGs
+        run: rm docs/bpmn-workflow-models/*.png
+      - name: Generate a PNG for each BPMN file        
         run: |    
-          for changed_file in ${{ steps.files.outputs.deleted_files }} ; do
-            rendered_file=$(dirname $changed_file)/$(basename $changed_file .bpmn)
-            rm -f ${rendered_file}.png ${rendered_file}.svg
-          done
-
-      - name: Render image for each added/changed/renamed BPMN file
-        run: |    
-          for changed_file in ${{ steps.files.outputs.all_changed_files }} ; do
-            rendered_file=$(dirname $changed_file)/$(basename $changed_file .bpmn)
-            bpmn-to-image ${changed_file}:${rendered_file}.png
-            # For the same BPMN, SVG attribute names may differ, so we don't
-            # always update the SVG. However, if the PNG changed, then the SVG
-            # needs to be updated too!
-            if [ $(git status --porcelain ${rendered_file}.png | wc -c) != 0 ] ; then
-              bpmn-to-image ${changed_file}:${rendered_file}.svg
-            fi
+          for file in docs/bpmn-workflow-models/*.bpmn ; do
+            rendered_file=$(dirname $file)/$(basename $file .bpmn)
+            bpmn-to-image ${file}:${rendered_file}.png
           done
       - name: Did anything change?
         id: vars
