@@ -1,0 +1,68 @@
+---
+name: Lint BPMN
+# Whenever a PR contains changes to BPMN files, render (or remove) the
+# corresponding PNG and SVG output, then raise a new pull-request to add/remove
+# those files onto the branch. (Note that this will count as a "failing test", so
+# the base branch won't be merge-able until the PR with the images is merged
+# into it!)
+#
+# Cribs heavily from this example:
+# https://github.com/peter-evans/create-pull-request/blob/main/docs/examples.md#use-case-create-a-pull-request-to-modifyfix-pull-requests
+
+on:
+  pull_request:
+    paths:
+      - 'docs/bpmn-workflow-models/*.bpmn'
+
+jobs:
+  diagrams-up-to-date:
+    # Check that the PR is not raised by this workflow (avoiding recursion) and
+    # is not from a fork
+    if: startsWith(github.head_ref, 'auto/bpmn-patches') == false && github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+      - name: Install bpmn-to-image
+        run: npm install -g bpmn-to-image
+
+      - name: Remove existing PNGs
+        run: rm docs/bpmn-workflow-models/*.bpmn.png
+      - name: Generate a PNG for each BPMN file        
+        run: |    
+          for file in docs/bpmn-workflow-models/*.bpmn ; do
+            bpmn-to-image ${file}:${file}.png
+          done
+      - name: Did anything change?
+        id: vars
+        run: |
+          branchname="bpmn-patches/${{ github.head_ref }}"
+          echo "branchname=${branchname}" >> $GITHUB_OUTPUT
+          imagesupdated=$(git status --porcelain | cut -d ' ' -f 2 | wc -l)
+          echo "imagesupdated=${imagesupdated}" >> $GITHUB_OUTPUT
+      - name: Create PR with changes
+        if: steps.vars.outputs.imagesupdated != 0
+        uses: peter-evans/create-pull-request@v4
+        with:
+          commit-message: Update BPMN images for ${{ github.head_ref }}
+          title: Update BPMN images for ${{ github.head_ref }}
+          body: This is an auto-generated PR to sync BPMN images with their source on ${{ github.head_ref }}.
+          labels: bpmn-to-image, automated pr
+          branch: ${{ steps.vars.outputs.branchname }}
+          base: ${{ github.head_ref }}
+      - name: Let people know
+        if: steps.vars.outputs.imagesupdated != 0
+        uses: peter-evans/create-or-update-comment@v2
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          body: |
+            BPMN's not in sync!
+            But no need to fret...
+            I took care of that for you.
+
+            (...merge PR #${{ env.PULL_REQUEST_NUMBER }}...)
+      - name: Fail if images are not in sync with source
+        if: steps.vars.outputs.imagesupdated != 0
+        run: |
+          echo "BPMN images are out of sync with their source. Merge PR #${PULL_REQUEST_NUMBER}"
+          exit 1
