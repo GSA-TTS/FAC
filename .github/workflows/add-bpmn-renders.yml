@@ -16,7 +16,8 @@ on:
 
 jobs:
   diagrams-up-to-date:
-    # Check that the PR is not raised by this workflow (avoiding recursion) and is not from a fork
+    # Check that the PR is not raised by this workflow (avoiding recursion) and
+    # is not from a fork
     if: startsWith(github.head_ref, 'auto/bpmn-patches') == false && github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
     steps:
@@ -24,35 +25,33 @@ jobs:
       - uses: actions/setup-node@v3
       - name: Install bpmn-to-image
         run: npm install -g bpmn-to-image
-      - name: Get list of changed files
+
+      - name: Get the set of changed files on the branch
         id: files
-        uses: jitterbit/get-changed-files@v1
-          # Docs at https://github.com/marketplace/actions/get-all-changed-files
+        uses: tj-actions/changed-files@v35
+        with:
+          files: docs/bpmn-workflow-models/*.bpmn    
+
       - name: Remove images for each removed BPMN file
         run: |    
-          for changed_file in ${{ steps.files.outputs.removed }} ; do
-            extension=${changed_file##*.}
-            if [ $extension = "bpmn" ] ; then 
-              rendered_file=$(dirname $changed_file)/$(basename $changed_file .bpmn)
-              rm -f ${rendered_file}.png ${rendered_file}.svg
-            fi
+          for changed_file in ${{ steps.files.outputs.deleted_files }} ; do
+            rendered_file=$(dirname $changed_file)/$(basename $changed_file .bpmn)
+            rm -f ${rendered_file}.png ${rendered_file}.svg
           done
+
       - name: Render image for each added/changed/renamed BPMN file
         run: |    
-          for changed_file in ${{ steps.files.outputs.added_modified }} ; do
-            extension=${changed_file##*.}
-            if [ $extension = "bpmn" ] ; then 
-              rendered_file=$(dirname $changed_file)/$(basename $changed_file .bpmn)
-              bpmn-to-image ${changed_file}:${rendered_file}.png
-              # For the same BPMN, SVG attribute names may differ, so we don't
-              # always update the SVG. However, if the PNG changed, then the SVG
-              # needs to be updated too!
-              if [ $(git status --porcelain ${rendered_file}.png | wc -c) != 0 ] ; then
-                bpmn-to-image ${changed_file}:${rendered_file}.svg
-              fi
+          for changed_file in ${{ steps.files.outputs.all_changed_files }} ; do
+            rendered_file=$(dirname $changed_file)/$(basename $changed_file .bpmn)
+            bpmn-to-image ${changed_file}:${rendered_file}.png
+            # For the same BPMN, SVG attribute names may differ, so we don't
+            # always update the SVG. However, if the PNG changed, then the SVG
+            # needs to be updated too!
+            if [ $(git status --porcelain ${rendered_file}.png | wc -c) != 0 ] ; then
+              bpmn-to-image ${changed_file}:${rendered_file}.svg
             fi
           done
-      - name: Look for changes to the working directory
+      - name: Did anything change?
         id: vars
         run: |
           branchname="bpmn-patches/${{ github.head_ref }}"
@@ -80,7 +79,7 @@ jobs:
             I took care of that for you.
 
             (...merge PR #${{ env.PULL_REQUEST_NUMBER }}...)
-      - name: Fail if images are out of sync with source
+      - name: Fail if images are not in sync with source
         if: steps.vars.outputs.imagesupdated != 0
         run: |
           echo "BPMN images are out of sync with their source. Merge PR #${PULL_REQUEST_NUMBER}"
