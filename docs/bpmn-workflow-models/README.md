@@ -5,10 +5,9 @@ We’ve modeled single audit submission workflows using the [business process mo
  - To facilitate conversations and decisions regarding the design and development of single audit workflow by making workflow and process logic explicit
  - To bootstrap software development by helping developers outline and understand relationships among objects and information in the workflow. 
 
-## To edit or deploy a model
- - Download the the xml as a .txt file
- - Upload to a BPMN modeling tool. These models were created in [bpmn.io](https://bpmn.io/) and [Camunda](https://camunda.com/), but there are plenty of other tools you could use. 
-
+## To edit a model
+1. Open the `.bpmn` file in a BPMN modeling tool. ([bpmn.io](https://bpmn.io/) works in your web browser, and there are plenty of other BPMN modeling tools to choose from.)
+1. Make a pull-request with your changes
 
 ## Model inventory
 
@@ -21,7 +20,8 @@ We’ve modeled single audit submission workflows using the [business process mo
 
 **Primary actor(s):** This workflow can be completed by just about anyone. We know from user research that it’s frequently the auditor who creates a new submission, but there are no permission-based restrictions  on who can create a new submission. 
 
-
+![create_new_submission](./create_new_submission.png)
+[SVG](./create_new_submission.svg)
 
 
 ### complete_single_audit_data_entry
@@ -36,6 +36,8 @@ We’ve modeled single audit submission workflows using the [business process mo
 
 **Limitations:** We know from user research that data entry is most often handled by someone at the auditing firm, and that’s what this model depicts. However, we also know  that data are not always entered during a single session, and that different people may come in at different times and input different pieces of information. This model doesn’t reflect that complexity. 
 
+![complete_single_audit_data_entry](./complete_single_audit_data_entry.png)
+[SVG](./complete_single_audit_data_entry.svg)
 
 
 
@@ -50,6 +52,8 @@ We’ve modeled single audit submission workflows using the [business process mo
 **Primary actor(s):** Permissions for this workflow are restricted to the individuals named as auditor certifying official and auditee certifying official as part of the create_new_submission process. 
 
 
+![certify_audit_submission](./certify_audit_submission.png)
+[SVG](./certify_audit_submission.svg)
 
 
 
@@ -63,4 +67,6 @@ We’ve modeled single audit submission workflows using the [business process mo
 
 **Primary actor(s):** This workflow can be completed by just about anyone who’s been given access to the submission as part of the create_new_submission process. Beyond that, there are no permission-based restrictions governing which of the users who’ve been granted access to the submission can submit. 
 
+![submit_audit](./submit_audit.png)
+[SVG](./submit_audit.svg)
 
