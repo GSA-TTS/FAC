@@ -27,8 +27,8 @@ jobs:
       - name: Get list of changed files
         id: files
         uses: jitterbit/get-changed-files@v1
+          # Docs at https://github.com/marketplace/actions/get-all-changed-files
       - name: Remove images for each removed BPMN file
-        # Docs at https://github.com/marketplace/actions/get-all-changed-files
         run: |    
           for changed_file in ${{ steps.files.outputs.removed }} ; do
             extension=${changed_file##*.}
