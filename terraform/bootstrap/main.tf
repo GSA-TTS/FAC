@@ -4,7 +4,7 @@ locals {
 }
 
 module "s3" {
-  source = "../modules/s3"
+  source = "github.com/18f/terraform-cloudgov//s3"
 
   cf_api_url      = local.cf_api_url
   cf_user         = var.cf_user
