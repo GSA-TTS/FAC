@@ -1,6 +1,6 @@
-terraform/*/backend.tfvars
-terraform/*/.terraform
-terraform/*/terraform.tfstate
-terraform/*/terraform.tfstate.backup
-terraform/*/deployer-creds.auto.tfvars
-terraform/shared/config/backend.tfvars
+*/backend.tfvars
+*/.terraform
+*/terraform.tfstate
+*/terraform.tfstate.backup
+*/deployer-creds.auto.tfvars
+shared/config/backend.tfvars
