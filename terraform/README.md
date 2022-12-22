@@ -114,33 +114,25 @@ Each environment has its own module, which relies on a shared module for everyth
 - <env>/
   |- main.tf
   |- providers.tf
-  |- secrets.auto.tfvars
+  |- deployer-creds.auto.tfvars
   |- variables.tf
 - shared/
-  |- s3/
-     |- main.tf
-     |- providers.tf
-     |- variables.tf
-  |- database/
-     |- main.tf
-     |- providers.tf
-     |- variables.tf
-  |- domain/
-     |- main.tf
-     |- providers.tf
-     |- variables.tf
+  |- modules/
+     |- base/
+       |- base.tf
+       |- providers.tf
+       |- variables.tf
 ```
 
-In the shared modules:
-- `providers.tf` contains set up instructions for Terraform about Cloud Foundry and AWS
-- `main.tf` sets up the data and resources the application relies on
-- `variables.tf` lists the required variables and applicable default values
+In the shared `base` module:
+- `base.tf` sets up the common resources for all environments
+- `variables.tf` lists the per-env-configurable variables, and the production defaults
 
 In the environment-specific modules:
 - `providers.tf` lists the required providers
-- `main.tf` calls the shared Terraform code, but this is also a place where you can add any other services, resources, etc, which you would like to set up for that environment
+- `main.tf` calls the shared Terraform `base` module, but this is also a place where you can add any other services, resources, etc, which you would like to set up for that environment
 - `variables.tf` lists the variables that will be needed, either to pass through to the child module or for use in this module
-- `secrets.auto.tfvars` is a file which contains the information about the service-key and other secrets that should not be shared
+- `deployer-creds.auto.tfvars` is a file which contains the information about the service-key and other secrets that should not be shared
 
 In the bootstrap module:
 - `providers.tf` lists the required providers

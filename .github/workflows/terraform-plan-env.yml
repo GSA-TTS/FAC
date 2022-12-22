@@ -25,11 +25,19 @@ jobs:
     steps:
       - name: checkout
         uses: actions/checkout@v2
+        # Plan output will be posted as a comment on the PR to aid with review.
+        # The post includes a link to the workflow run where the plan was
+        # generated, and the same comment will be updated each time a new commit
+        # on the PR branch triggers a re-plan.
       - name: terraform plan ( ${{ inputs.environment }} )
         uses: dflook/terraform-plan@v1
         with:
           path: terraform/${{ inputs.environment }}
           label: ${{ inputs.environment }}
+          # These secrets grant access to the bucket with our remote Terraform
+          # state. They're located in the "Secrets > Actions > Repository
+          # Secrets" section of the repository settings, and are the same across
+          # all environments.
           backend_config: >
             access_key=${{ secrets.terraform_AWS_ACCESS_KEY_ID }},
             secret_key=${{ secrets.terraform_AWS_SECRET_ACCESS_KEY }}

@@ -17,11 +17,9 @@ resource "cloudfoundry_space" "space" {
   # Disallow SSH access in production
   allow_ssh = each.key != "production"
 
-  # All spaces have full public egress (for now)
   asgs = [for d in data.cloudfoundry_asg.asgs : d.id]
 }
 
-# Everyone has SpaceDeveloper permission in all spaces
 resource "cloudfoundry_space_users" "space_permissions" {
   for_each   = toset(local.spaces)
   space      = cloudfoundry_space.space[each.key].id
