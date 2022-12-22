@@ -1,0 +1,19 @@
+---
+name: Terraform plan
+
+on:
+  pull_request:
+    paths:
+      - 'terraform/**'
+
+jobs:
+  all-envs:
+    strategy: 
+      matrix:
+        target: ["management", "dev", "staging", "production"]
+    uses: ./.github/workflows/terraform-plan-env.yml
+    with:
+      environment: ${{ matrix.target }}
+    secrets: inherit
+
+
