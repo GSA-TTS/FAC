@@ -1,0 +1,43 @@
+---
+name: Terraform apply (single env)
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+  
+
+jobs:
+  apply:
+    name: apply ( ${{ inputs.environment }} )
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    env:
+      KEY: "terraform.tfstate.${{ inputs.environment }}"
+      TF_VAR_cf_user: ${{ secrets.CF_USERNAME }}
+      TF_VAR_cf_password: ${{ secrets.CF_PASSWORD }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      TERRAFORM_PRE_RUN: |
+          echo any precursor steps go here, eg installing CLIs
+
+    steps:
+      - name: checkout
+        uses: actions/checkout@v2
+      - name: terraform apply ( ${{ inputs.environment }} )
+        uses: dflook/terraform-apply@v1
+        with:
+          path: terraform/${{ inputs.environment }}
+          label: ${{ inputs.environment }}
+          # These secrets grant access to the bucket with our remote Terraform
+          # state. They're located in the "Secrets > Actions > Repository
+          # Secrets" section of the repository settings, and are the same across
+          # all environments.
+          backend_config: >
+            access_key=${{ secrets.terraform_AWS_ACCESS_KEY_ID }},
+            secret_key=${{ secrets.terraform_AWS_SECRET_ACCESS_KEY }}
+            endpoint=${{ secrets.terraform_ENDPOINT }},
+            bucket=${{ secrets.terraform_BUCKET }},
+            region=${{ secrets.terraform_REGION }},
+            key=${{ env.KEY }},

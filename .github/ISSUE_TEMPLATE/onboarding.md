@@ -40,9 +40,11 @@ Here's a checklist to get you started and to make sure you've got access to :all
   - [ ] If you need to catch up on the latest in Python development, check out the [Python developer's guide](https://devguide.python.org/).
   - [ ] Work through the [Django Tutorial](https://docs.djangoproject.com/en/4.0/intro/tutorial01/) and writing your first Django app.
   - [ ] If you're not already, get [setup with Cloud.gov](https://cloud.gov/docs/getting-started/setup/)
+  - [ ] Make a PR to [add yourself to the list of developers](https://github.com/GSA-TTS/FAC/tree/main/terraform/management/config.tf) with access to our spaces.
   - [ ] Practice deploying a [python application](https://github.com/cloud-gov/cf-hello-worlds/tree/main/python-flask) to Cloud.gov using the Cloud.gov command line interface (CLI): https://cloud.gov/docs/getting-started/your-first-deploy/.
   - [ ] Survey existing TTS projects which use Django+Cloud.gov like: [Tock](https://github.com/18F/tock) and the [DOJ CRT Portal](https://github.com/usdoj-crt/crt-portal).
 - [ ] Get set up for [local development](https://github.com/GSA-TTS/FAC/blob/main/docs/development.md#local-development) so you can start contributing
+
 
 
 
@@ -58,7 +60,8 @@ Note: If you're not able to do any of these yourself, you're still responsible f
 - [ ] [Add as a form manager to the touchpoints recruitment intercept](https://touchpoints.app.cloud.gov/admin/forms/9412c559/permissions)
 
 **For engineers, also...**
-- [ ] Add to the `gsa-10x-prototyping` Organization in cloud.gov
+- [ ] [...nothing currently...]
 
 **For product leads/owners, also...**
 - [ ] Make them Owner of [the various Google Groups in the project README](https://docs.google.com/document/d/1g8nYqYS_ifFlZB-DBgfeSoJRMB__EqWsmLnacyk-bDI/edit#heading=h.81zynabayrrg)
+- [ ] Add them to [the FAC-admins team in GitHub](https://github.com/orgs/GSA-TTS/teams/fac-admins/members) and make them a Maintainer.
