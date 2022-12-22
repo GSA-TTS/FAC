@@ -1,0 +1,81 @@
+---
+name: Deploy to cloud.gov
+on:
+  push:
+    branches:
+      - main
+      - prod
+    tags:
+      - v1.*
+  pull_request:
+    branches:
+      - main
+      - prod
+  workflow_dispatch: null
+
+jobs:
+  test_and_lint:
+    uses: ./.github/workflows/test.yml
+
+  deploy-infrastructure-dev:
+    name: Deploy infrastructure (dev)
+    if: github.event.ref == 'refs/heads/main'
+    needs:
+      - test_and_lint
+    uses: ./.github/workflows/terraform-apply-env.yml
+    with:
+      environment: "dev"
+    secrets: inherit
+
+  deploy-infrastructure-staging:
+    name: Deploy infrastructure (staging)
+    if: github.event.ref == 'refs/heads/prod'
+    needs:
+      - test_and_lint
+    uses: ./.github/workflows/terraform-apply-env.yml
+    with:
+      environment: "staging"
+    secrets: inherit
+
+  deploy-infrastructure-production:
+    name: Deploy infrastructure (production)
+    if: github.event.ref == 'refs/tag/v1.*'
+    needs:
+      - test_and_lint
+    uses: ./.github/workflows/terraform-apply-env.yml
+    with:
+      environment: "production"
+    secrets: inherit
+
+  deploy-dev:
+    name: Deploy dev app to cloud.gov
+    if: github.event.ref == 'refs/heads/main'
+    needs:
+      - test_and_lint
+      - deploy-infrastructure-dev
+    uses: ./.github/workflows/deploy_apps.yml
+    with:
+      environment: "dev"
+    secrets: inherit
+
+  deploy-staging:
+    name: Deploy staging app to cloud.gov
+    if: github.event.ref == 'refs/heads/prod'
+    needs:
+      - test_and_lint
+      - deploy-infrastructure-staging
+    uses: ./.github/workflows/deploy_apps.yml
+    with:
+      environment: "staging"
+    secrets: inherit
+
+  deploy-production:
+    name: Deploy production to cloud.gov
+    if: github.event.ref == 'refs/tag/v1.*'
+    needs:
+      - test_and_lint
+      - deploy-infrastructure-production
+    uses: ./.github/workflows/deploy_apps.yml
+    with:
+      environment: "production"
+    secrets: inherit
