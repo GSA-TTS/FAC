@@ -1,6 +1,7 @@
 ---
 name: Runs linting and tests
-workflow_call:
+on:
+  workflow_call:
 
 jobs:
   linting:
