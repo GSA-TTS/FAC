@@ -27,7 +27,6 @@ disable = [
     "duplicate-code",
     "format",
     "import-error",
-    "invalid-name",
     "missing-module-docstring",
     "no-value-for-parameter",
     "pointless-string-statement",
