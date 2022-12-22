@@ -56,9 +56,9 @@ jobs:
         with:
           issue-number: ${{ github.event.pull_request.number }}
           body: |
-            BPMN's not in sync!
-            But no need to fret...
-            I took care of that for you.
+            Source and image drift!
+            Much confusion might ensue
+            But I got you fam.
 
             (...merge PR #${{ env.PULL_REQUEST_NUMBER }}...)
       - name: Fail if images are not in sync with source
