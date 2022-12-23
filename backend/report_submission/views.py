@@ -11,10 +11,23 @@ from api.views import EligibilityFormView
 
 
 # class based views for ...
-class step1(LoginRequiredMixin, TemplateView):
-    """Basic class for home."""
+#class step1(LoginRequiredMixin, TemplateView):
+class step1(TemplateView):
+    """Basic class for pre-SAC step 1 form."""
 
-    template_name = "gen-form.html"
+    template_name = "report_submission/step-1.html"
+
+
+class step2(TemplateView):
+    """Basic class for pre-SAC step 2 form."""
+
+    template_name = "report_submission/step-2.html"
+
+
+class step3(TemplateView):
+    """Basic class for pre-SAC step 3 form."""
+
+    template_name = "report_submission/step-3.html"
 
 
 class EligibilityFormView(LoginRequiredMixin, View):

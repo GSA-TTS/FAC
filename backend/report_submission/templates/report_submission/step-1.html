@@ -1,0 +1,207 @@
+{% extends "base.html" %}
+{% load static %}
+{% block metatags %}
+    <title>{{ post.title }}</title>
+    <meta name="description" content="{{ post.meta_description }}">
+    <meta property="og:title" content="{{ post.title }}">
+    <meta property="og:site_name" content="Federal Audit Clearinghouse">
+    <meta property="og:description" content="{{ post.meta_description }}">
+    <meta property="og:type" content="website">
+{% endblock %}
+
+{% block content%}
+<main id="main-content">
+
+  <div class="grid-container">
+    <h1>Create new audit</h1>
+  </div>
+  <div class="grid-container">
+    <div class="usa-step-indicator usa-step-indicator--counters-sm" role="progressbar" aria-label="Form progress"
+      aria-valuemin="1" aria-valuemax=4 aria-valuenow=1>
+      <ol class="usa-step-indicator__segments">
+        <li class="usa-step-indicator__segmentusa-step-indicator__segment--current">
+          <span class="usa-step-indicator__segment-label">
+            Submission criteria check
+
+          </span>
+        </li>
+        <li class="usa-step-indicator__segment">
+          <span class="usa-step-indicator__segment-label">
+            Auditee information
+          </span>
+        </li>
+        <li class="usa-step-indicator__segment">
+          <span class="usa-step-indicator__segment-label">
+            Audit submission access
+          </span>
+        </li>
+        <li class="usa-step-indicator__segment">
+          <span class="usa-step-indicator__segment-label">
+            Create new audit
+          </span>
+        </li>
+
+      </ol>
+    </div>
+
+  </div>
+  <div class="grid-container">
+
+    <form class="usa-form usa-form--large" id="check-eligibility">
+      <fieldset class="usa-fieldset">
+        <legend class="usa-legend usa-legend--large">Does your entity meet the single audit criteria?</legend>
+        <p>
+          <abbr title="required" class="usa-hint usa-hint--required">*</abbr>Indicates a required field.
+        </p>
+
+        <fieldset class="usa-fieldset question">
+          <legend class="usa-legend">
+            Which organizational type best describes this entity?
+
+            <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
+
+          </legend>
+
+          <div class="usa-radio">
+            <input class="usa-radio__input" id="entity-state" name="user_provided_organization_type" value="state"
+              type="radio" aria-required="true" required />
+            <label class="usa-radio__label" for="entity-state">
+              State
+            </label>
+          </div>
+
+
+          <div class="usa-radio">
+            <input class="usa-radio__input" id="entity-local" name="user_provided_organization_type" value="local"
+              type="radio" aria-required="true" required />
+            <label class="usa-radio__label" for="entity-local">
+              Local Government
+            </label>
+          </div>
+
+
+          <div class="usa-radio">
+            <input class="usa-radio__input" id="entity-tribe" name="user_provided_organization_type" value="tribal"
+              type="radio" aria-required="true" required />
+            <label class="usa-radio__label" for="entity-tribe">
+              Indian tribe or tribal organization
+            </label>
+          </div>
+
+
+          <div class="usa-radio">
+            <input class="usa-radio__input" id="entity-ihe" name="user_provided_organization_type" value="higher-ed"
+              type="radio" aria-required="true" required />
+            <label class="usa-radio__label" for="entity-ihe">
+              Institution of Higher Education (IHE)
+            </label>
+          </div>
+
+
+          <div class="usa-radio">
+            <input class="usa-radio__input" id="entity-nonprofit" name="user_provided_organization_type"
+              value="non-profit" type="radio" aria-required="true" required />
+            <label class="usa-radio__label" for="entity-nonprofit">
+              Non-profit
+            </label>
+          </div>
+
+
+          <div class="usa-radio">
+            <input class="usa-radio__input" id="entity-unknown" name="user_provided_organization_type" value="unknown"
+              type="radio" aria-required="true" required />
+            <label class="usa-radio__label" for="entity-unknown">
+              Unknown
+            </label>
+          </div>
+
+
+          <div class="usa-radio">
+            <input class="usa-radio__input" id="entity-none" name="user_provided_organization_type" value="none"
+              type="radio" aria-required="true" required />
+            <label class="usa-radio__label" for="entity-none">
+              None of the these (for example, for-profit)
+            </label><span class="usa-error-message">We only accept submissions from state and local governments, Indian
+              tribes or tribal organizations, institutions of higher education (IHEs), and nonprofits.</span>
+          </div>
+
+
+
+        </fieldset>
+
+        <fieldset class="usa-fieldset question">
+          <legend class="usa-legend">
+            Did this entity spend $750,000 or more in federal awards during its audit period in accordance with Uniform
+            Guidance?
+
+            <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
+
+          </legend>
+
+          <div class="usa-radio">
+            <input class="usa-radio__input" id="spend-yes" name="met_spending_threshold" value="true" type="radio"
+              aria-required="true" required />
+            <label class="usa-radio__label" for="spend-yes">
+              Yes
+            </label>
+          </div>
+
+
+          <div class="usa-radio">
+            <input class="usa-radio__input" id="spend-no" name="met_spending_threshold" value="false" type="radio"
+              aria-required="true" required />
+            <label class="usa-radio__label" for="spend-no">
+              No
+            </label><span class="usa-error-message">You only need to submit a report for an entity that spent $750,000
+              or more in federal awards during its audit period (fiscal period beginning dates on or after
+              12/26/2014).</span>
+          </div>
+
+
+
+        </fieldset>
+
+        <fieldset class="usa-fieldset question">
+          <legend class="usa-legend">
+            Is this entity based in a US State, Territory, or Commonwealth?
+
+            <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
+
+          </legend>
+
+          <div class="usa-radio">
+            <input class="usa-radio__input" id="us-yes" name="is_usa_based" value="true" type="radio"
+              aria-required="true" required />
+            <label class="usa-radio__label" for="us-yes">
+              Yes
+            </label>
+          </div>
+
+
+          <div class="usa-radio">
+            <input class="usa-radio__input" id="us-no" name="is_usa_based" value="false" type="radio"
+              aria-required="true" required />
+            <label class="usa-radio__label" for="us-no">
+              No
+            </label><span class="usa-error-message">You only need to submit a report if the entity is based in the
+              U.S.</span>
+          </div>
+        </fieldset>
+
+        <ul class="usa-button-group">
+          <li class="usa-button-group__item">
+            <a href="javascript:void(0);" class="usa-button usa-button--outline">
+              Cancel
+            </a>
+          </li>
+          <li class="usa-button-group__item">
+            <button class="usa-button" id="continue">Continue</button>
+          </li>
+        </ul>
+    </form>
+  </div>
+  <script>const authToken = "aGV5bWF0dDpmYWNzYWMyMDIy"</script>
+  <script src="/assets/js/check-eligibility.js"></script>
+</main>
+
+{% endblock content%}
