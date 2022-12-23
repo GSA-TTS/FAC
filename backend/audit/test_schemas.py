@@ -31,40 +31,38 @@ class GeneralInformationSchemaValidityTest(SimpleTestCase):
     )
 
     SIMPLE_CASE = {
-        "GeneralInformation": {
-            "auditee_fiscal_period_start": "2022-01-01",
-            "auditee_fiscal_period_end": "2022-12-31",
-            "audit_period_covered": "annual",
-            "ein": "123456789",
-            "ein_not_an_ssn_attestation": True,
-            "multiple_eins_covered": False,
-            "auditee_uei": "1A2B3C4D5E6F",
-            "multiple_ueis_covered": False,
-            "auditee_name": "John",
-            "auditee_address_line_1": "123 Fake St.",
-            "auditee_city": "FakeCity",
-            "auditee_state": "AL",
-            "auditee_zip": "12345",
-            "auditee_contact_name": "John",
-            "auditee_contact_title": "A Title",
-            "auditee_phone": "555-555-5555",
-            "auditee_email": "john@test.test",
-            "user_provided_organization_type": "state",
-            "met_spending_threshold": True,
-            "is_usa_based": True,
-            "auditor_firm_name": "Firm LLC",
-            "auditor_ein": "123456789",
-            "auditor_ein_not_an_ssn_attestation": True,
-            "auditor_country": "USA",
-            "auditor_address_line_1": "456 Fake St.",
-            "auditor_city": "AnotherFakeCity",
-            "auditor_state": "WY",
-            "auditor_zip": "56789",
-            "auditor_contact_name": "Jane",
-            "auditor_contact_title": "Another Title",
-            "auditor_phone": "999-999-9999",
-            "auditor_email": "jane@test.test",
-        }
+        "auditee_fiscal_period_start": "2022-01-01",
+        "auditee_fiscal_period_end": "2022-12-31",
+        "audit_period_covered": "annual",
+        "ein": "123456789",
+        "ein_not_an_ssn_attestation": True,
+        "multiple_eins_covered": False,
+        "auditee_uei": "1A2B3C4D5E6F",
+        "multiple_ueis_covered": False,
+        "auditee_name": "John",
+        "auditee_address_line_1": "123 Fake St.",
+        "auditee_city": "FakeCity",
+        "auditee_state": "AL",
+        "auditee_zip": "12345",
+        "auditee_contact_name": "John",
+        "auditee_contact_title": "A Title",
+        "auditee_phone": "555-555-5555",
+        "auditee_email": "john@test.test",
+        "user_provided_organization_type": "state",
+        "met_spending_threshold": True,
+        "is_usa_based": True,
+        "auditor_firm_name": "Firm LLC",
+        "auditor_ein": "123456789",
+        "auditor_ein_not_an_ssn_attestation": True,
+        "auditor_country": "USA",
+        "auditor_address_line_1": "456 Fake St.",
+        "auditor_city": "AnotherFakeCity",
+        "auditor_state": "WY",
+        "auditor_zip": "56789",
+        "auditor_contact_name": "Jane",
+        "auditor_contact_title": "Another Title",
+        "auditor_phone": "999-999-9999",
+        "auditor_email": "jane@test.test",
     }
 
     def test_simple_pass(self):
@@ -84,7 +82,7 @@ class GeneralInformationSchemaValidityTest(SimpleTestCase):
         simple_case = jsoncopy(self.SIMPLE_CASE)
 
         bad_date = "not a date"
-        simple_case["GeneralInformation"]["auditee_fiscal_period_start"] = bad_date
+        simple_case["auditee_fiscal_period_start"] = bad_date
 
         self.assertRaisesRegex(
             exceptions.ValidationError,
@@ -103,7 +101,7 @@ class GeneralInformationSchemaValidityTest(SimpleTestCase):
         simple_case = jsoncopy(self.SIMPLE_CASE)
 
         bad_date = "not a date"
-        simple_case["GeneralInformation"]["auditee_fiscal_period_end"] = bad_date
+        simple_case["auditee_fiscal_period_end"] = bad_date
 
         self.assertRaisesRegex(
             exceptions.ValidationError,
@@ -112,6 +110,17 @@ class GeneralInformationSchemaValidityTest(SimpleTestCase):
             simple_case,
             schema,
         )
+
+    def test_null_auditee_name(self):
+        """
+        If the auditee_name is null, validation should pass
+        """
+        schema = self.GENERAL_INFO_SCHEMA
+        instance = jsoncopy(self.SIMPLE_CASE)
+
+        instance["auditee_name"] = None
+
+        validate(instance, schema)
 
     def test_invalid_ein(self):
         """
@@ -130,7 +139,7 @@ class GeneralInformationSchemaValidityTest(SimpleTestCase):
             with self.subTest():
                 instance = jsoncopy(self.SIMPLE_CASE)
 
-                instance["GeneralInformation"]["ein"] = bad_ein
+                instance["ein"] = bad_ein
 
                 self.assertRaisesRegex(
                     exceptions.ValidationError,
@@ -170,7 +179,7 @@ class GeneralInformationSchemaValidityTest(SimpleTestCase):
             with self.subTest():
                 instance = jsoncopy(self.SIMPLE_CASE)
 
-                instance["GeneralInformation"]["auditee_uei"] = bad_uei
+                instance["auditee_uei"] = bad_uei
 
                 self.assertRaisesRegex(
                     exceptions.ValidationError,
@@ -196,7 +205,29 @@ class GeneralInformationSchemaValidityTest(SimpleTestCase):
 
         instance = jsoncopy(self.SIMPLE_CASE)
 
-        instance["GeneralInformation"]["auditee_uei"] = good_uei
+        instance["auditee_uei"] = good_uei
+
+        validate(instance, schema)
+
+    def test_blank_uei(self):
+        """
+        If the UEI is an empty string, validation should pass
+        """
+        schema = self.GENERAL_INFO_SCHEMA
+        instance = jsoncopy(self.SIMPLE_CASE)
+
+        instance["auditee_uei"] = ""
+
+        validate(instance, schema)
+
+    def test_null_uei(self):
+        """
+        If the UEI is null, validation should pass
+        """
+        schema = self.GENERAL_INFO_SCHEMA
+        instance = jsoncopy(self.SIMPLE_CASE)
+
+        instance["auditee_uei"] = None
 
         validate(instance, schema)
 
@@ -218,7 +249,7 @@ class GeneralInformationSchemaValidityTest(SimpleTestCase):
                 with self.subTest():
                     instance = jsoncopy(self.SIMPLE_CASE)
 
-                    instance["GeneralInformation"][zip_field] = bad_zip
+                    instance[zip_field] = bad_zip
 
                     self.assertRaisesRegex(
                         exceptions.ValidationError,
@@ -250,7 +281,7 @@ class GeneralInformationSchemaValidityTest(SimpleTestCase):
                 with self.subTest():
                     instance = jsoncopy(self.SIMPLE_CASE)
 
-                    instance["GeneralInformation"][zip_field] = bad_zip
+                    instance[zip_field] = bad_zip
 
                     self.assertRaisesRegex(
                         exceptions.ValidationError,
@@ -285,7 +316,7 @@ class GeneralInformationSchemaValidityTest(SimpleTestCase):
                 with self.subTest():
                     instance = jsoncopy(self.SIMPLE_CASE)
 
-                    instance["GeneralInformation"][phone_field] = good_phone
+                    instance[phone_field] = good_phone
 
                     validate(instance, schema)
 
@@ -308,7 +339,7 @@ class GeneralInformationSchemaValidityTest(SimpleTestCase):
                 with self.subTest():
                     instance = jsoncopy(self.SIMPLE_CASE)
 
-                    instance["GeneralInformation"][phone_field] = bad_phone
+                    instance[phone_field] = bad_phone
 
                     self.assertRaisesRegex(
                         exceptions.ValidationError,
