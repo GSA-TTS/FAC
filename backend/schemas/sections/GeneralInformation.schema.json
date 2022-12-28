@@ -11,7 +11,7 @@
       "type": "string"
     },
     "EIN": {
-      "type": "string",
+      "type": ["string", "null"],
       "pattern": "^[0-9]{9}$"
     },
     "Phone": {
@@ -64,25 +64,27 @@
       "$ref": "#/$defs/EIN"
     },
     "ein_not_an_ssn_attestation": {
-      "type": "boolean"
+      "type": ["boolean", "null"]
     },
     "multiple_eins_covered": {
-      "type": "boolean"
+      "type": ["boolean", "null"]
     },
     "auditee_uei": {
       "$ref": "#/$defs/UEI"
     },
     "multiple_ueis_covered": {
-      "type": "boolean"
+      "type": ["boolean", "null"]
     },
     "auditee_name": {
       "type": ["string", "null"]
     },
     "auditee_address_line_1": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 100
     },
     "auditee_city": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 100
     },
     "auditee_state": {
       "$ref": "#/$defs/State"
@@ -91,10 +93,12 @@
       "$ref": "#/$defs/Zip"
     },
     "auditee_contact_name": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 100
     },
     "auditee_contact_title": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 100
     },
     "auditee_phone": {
       "$ref": "#/$defs/Phone"
@@ -119,16 +123,19 @@
       "$ref": "#/$defs/EIN"
     },
     "auditor_ein_not_an_ssn_attestation": {
-      "type": "boolean"
+      "type": ["boolean", "null"]
     },
     "auditor_country": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 100
     },
     "auditor_address_line_1": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 100
     },
     "auditor_city": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 100
     },
     "auditor_state": {
       "$ref": "#/$defs/State"
@@ -137,10 +144,12 @@
       "$ref": "#/$defs/Zip"
     },
     "auditor_contact_name": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 100
     },
     "auditor_contact_title": {
-      "type": "string"
+      "type": "string",
+      "maxLength": 100
     },
     "auditor_phone": {
       "$ref": "#/$defs/Phone"

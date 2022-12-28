@@ -2,16 +2,12 @@ from secrets import choice
 from django.db import models
 from django.db.models import Q
 from django.contrib.auth import get_user_model
-from django.core.validators import MinLengthValidator
 
 from django.utils.translation import gettext_lazy as _
 
 from .validators import (
     validate_federal_award_json,
-    validate_uei_alphanumeric,
-    validate_uei_leading_char,
-    validate_uei_nine_digit_sequences,
-    validate_uei_valid_chars,
+    validate_general_information_json,
 )
 
 User = get_user_model()
@@ -34,7 +30,7 @@ class SingleAuditChecklistManager(models.Manager):
 
 
         """
-        year = obj_data["auditee_fiscal_period_start"][:4]
+        year = obj_data["general_information"]["auditee_fiscal_period_start"][:4]
         chars = "ABCDEFGHJKLMNPQRSTUVWXYZ1234567890"
         trichar = "".join(choice(chars) for _ in range(3))
         count = SingleAuditChecklist.objects.count() + 1_000_001
@@ -85,92 +81,73 @@ class SingleAuditChecklist(models.Model):
     )
     report_id = models.CharField(max_length=17, unique=True)
 
-    # Part 1: General Information
-    # Q1 Fiscal Dates
-    auditee_fiscal_period_start = models.DateField()
-    auditee_fiscal_period_end = models.DateField()
-
     # Q2 Type of Uniform Guidance Audit
     audit_type = models.CharField(
         max_length=20, choices=AUDIT_TYPE_CODES, blank=True, null=True
     )
 
-    # Q3 Audit Period Covered
-    audit_period_covered = models.CharField(
-        max_length=20, choices=AUDIT_PERIOD, blank=True, null=True
+    # General Information
+    general_information = models.JSONField(
+        blank=True, null=True, validators=[validate_general_information_json]
     )
-
-    # Q4 Auditee Identification Numbers
-    ein = models.CharField(
-        max_length=12,
-        verbose_name=_("EIN"),
-        help_text=_("Auditee Employer Identification Number"),
-        blank=True,
-        null=True,
-    )
-    ein_not_an_ssn_attestation = models.BooleanField(
-        verbose_name=_("Attestation: EIN Not an SSN"), blank=True, null=True
-    )
-    multiple_eins_covered = models.BooleanField(
-        verbose_name=_("Multiple EINs covered"), blank=True, null=True
-    )
-    auditee_uei = models.CharField(
-        max_length=12,
-        verbose_name=_("Auditee UEI"),
-        help_text=_("Auditee Unique Entity Identifier"),
-        validators=[
-            MinLengthValidator(12),
-            validate_uei_alphanumeric,
-            validate_uei_valid_chars,
-            validate_uei_leading_char,
-            validate_uei_nine_digit_sequences,
-        ],
-        blank=True,
-        null=True,
-    )
-    multiple_ueis_covered = models.BooleanField(
-        verbose_name=_("Multiple UEIs covered"), blank=True, null=True
-    )
-
-    # Q5 Auditee Information
-    auditee_name = models.CharField(max_length=100, blank=True, null=True)
-    auditee_address_line_1 = models.CharField(max_length=100, blank=True, null=True)
-    auditee_city = models.CharField(max_length=100, blank=True, null=True)
-    auditee_state = models.CharField(max_length=2, blank=True, null=True)
-    auditee_zip = models.CharField(max_length=100, blank=True, null=True)
-    auditee_contact_name = models.CharField(max_length=100, blank=True, null=True)
-    auditee_contact_title = models.CharField(max_length=100, blank=True, null=True)
-    auditee_phone = models.CharField(max_length=100, blank=True, null=True)
-    auditee_email = models.EmailField(max_length=100, blank=True, null=True)
-
-    # Q6 Primary Auditor Information
-    user_provided_organization_type = models.CharField(
-        max_length=12, choices=USER_PROVIDED_ORGANIZATION_TYPE_CODE
-    )
-    met_spending_threshold = models.BooleanField()
-    is_usa_based = models.BooleanField(verbose_name=_("Is USA Based"))
-
-    auditor_firm_name = models.CharField(max_length=100, blank=True, null=True)
-    auditor_ein = models.CharField(
-        max_length=12, verbose_name=_("Auditor EIN"), blank=True, null=True
-    )
-    auditor_ein_not_an_ssn_attestation = models.BooleanField(
-        verbose_name=_("Attestation: Auditor EIN Not an SSN"), blank=True, null=True
-    )
-    auditor_country = models.CharField(max_length=100, blank=True, null=True)
-    auditor_address_line_1 = models.CharField(max_length=100, blank=True, null=True)
-    auditor_city = models.CharField(max_length=100, blank=True, null=True)
-    auditor_state = models.CharField(max_length=100, blank=True, null=True)
-    auditor_zip = models.CharField(max_length=100, blank=True, null=True)
-    auditor_contact_name = models.CharField(max_length=100, blank=True, null=True)
-    auditor_contact_title = models.CharField(max_length=100, blank=True, null=True)
-    auditor_phone = models.CharField(max_length=100, blank=True, null=True)
-    auditor_email = models.EmailField(max_length=100, blank=True, null=True)
 
     # Federal Awards:
     federal_awards = models.JSONField(
         blank=True, null=True, validators=[validate_federal_award_json]
     )
+
+    @property
+    def audit_period_covered(self):
+        return self._general_info_get("audit_period_covered")
+
+    @property
+    def auditee_uei(self):
+        return self._general_info_get("auditee_uei")
+
+    @property
+    def auditee_fiscal_period_end(self):
+        return self._general_info_get("auditee_fiscal_period_end")
+
+    @property
+    def auditee_fiscal_period_start(self):
+        return self._general_info_get("auditee_fiscal_period_start")
+
+    @property
+    def auditee_name(self):
+        return self._general_info_get("auditee_name")
+
+    @property
+    def auditee_email(self):
+        return self._general_info_get("auditee_email")
+
+    @property
+    def auditor_email(self):
+        return self._general_info_get("auditor_email")
+
+    @property
+    def auditee_phone(self):
+        return self._general_info_get("auditee_phone")
+
+    @property
+    def is_usa_based(self):
+        return self._general_info_get("is_usa_based")
+
+    @property
+    def met_spending_threshold(self):
+        return self._general_info_get("met_spending_threshold")
+
+    @property
+    def user_provided_organization_type(self):
+        return self._general_info_get("user_provided_organization_type")
+
+    def _general_info_get(self, key):
+        try:
+            return self.general_information[key]
+        except KeyError:
+            pass
+        except TypeError:
+            pass
+        return None
 
     class Meta:
         """We need to set the name for the admin view."""

@@ -28,13 +28,16 @@ class SingleAuditChecklistTests(TestCase):
                 entries there are in the system plus 1,000,000".
         """
         user = baker.make(User)
+        general_information = {
+            "auditee_fiscal_period_start": "2022-11-01",
+            "auditee_fiscal_period_end": "2023-11-01",
+            "met_spending_threshold": True,
+            "is_usa_based": True,
+        }
         sac = SingleAuditChecklist.objects.create(
-            auditee_fiscal_period_start="2022-11-01",
-            auditee_fiscal_period_end="2023-11-01",
-            met_spending_threshold=True,
-            is_usa_based=True,
             submitted_by=user,
             submission_status="in_progress",
+            general_information=general_information,
         )
         self.assertEqual(len(sac.report_id), 17)
         self.assertEqual(sac.report_id[:4], "2022")
