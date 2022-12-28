@@ -68,7 +68,7 @@ def validate_uei_nine_digit_sequences(value):
 
 def validate_federal_award_json(value):
     """
-    Apply JSON Schema for federal awards and report errors. Ideally.
+    Apply JSON Schema for federal awards and report errors.
     """
     root = Path(settings.SECTION_SCHEMA_DIR)
     schema_path = root / "FederalAwards.schema.json"
@@ -76,6 +76,23 @@ def validate_federal_award_json(value):
 
     try:
         jsonschema.validate(value, schema)
+    except jsonschema.exceptions.ValidationError as err:
+        raise ValidationError(
+            _(err.message),
+        ) from err
+    return value
+
+
+def validate_general_information_json(value):
+    """
+    Apply JSON Schema for general information and report errors.
+    """
+    root = Path(settings.SECTION_SCHEMA_DIR)
+    schema_path = root / "GeneralInformation.schema.json"
+    schema = json.loads(schema_path.read_text(encoding="utf-8"))
+
+    try:
+        jsonschema.validate(value, schema, format_checker=jsonschema.FormatChecker())
     except jsonschema.exceptions.ValidationError as err:
         raise ValidationError(
             _(err.message),
