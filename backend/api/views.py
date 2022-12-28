@@ -183,8 +183,11 @@ class AccessAndSubmissionView(APIView):
         if serializer.is_valid():
             # Create SF-SAC instance and add data from previous steps saved in the
             # user profile
+
             sac = SingleAuditChecklist.objects.create(
-                submitted_by=request.user, **all_steps_user_form_data
+                submitted_by=request.user,
+                submission_status="in_progress",
+                general_information=all_steps_user_form_data,
             )
 
             # Create all contact Access objects
@@ -255,19 +258,17 @@ class SingleAuditChecklistView(APIView):
     """
 
     permission_classes = [IsAuthenticated, SingleAuditChecklistPermission]
-    invalid_keys = [
+    invalid_metadata_keys = [
         "submitted_by",
         "date_created",
         "submission_status",
         "report_id",
+    ]
+
+    invalid_general_information_keys = [
         "auditee_fiscal_period_start",
         "auditee_fiscal_period_end",
         "auditee_uei",
-        "auditee_name",
-        "auditee_address_line_1",
-        "auditee_city",
-        "auditee_state",
-        "auditee_zip",
     ]
 
     def get(self, request, report_id):
@@ -302,7 +303,14 @@ class SingleAuditChecklistView(APIView):
             raise Http404() from e
         self.check_object_permissions(request, sac)
 
-        submitted_invalid_keys = [k for k in self.invalid_keys if k in request.data]
+        submitted_invalid_keys = [
+            k for k in self.invalid_metadata_keys if k in request.data
+        ] + [
+            k
+            for k in self.invalid_general_information_keys
+            if k in request.data.get("general_information", {})
+        ]
+
         if submitted_invalid_keys:
             base_msg = "The following fields cannot be modified via this endpoint: "
             errors_str = ", ".join(sorted(submitted_invalid_keys))
@@ -357,17 +365,19 @@ class SubmissionsView(APIView):
     def get(self, request):
         current_user = request.user
 
-        all_submissions = SingleAuditChecklist.objects.filter(
-            submitted_by=current_user
-        ).values(
+        all_submissions = SingleAuditChecklist.objects.filter(submitted_by=current_user)
+
+        fields = [
             "report_id",
             "submission_status",
             "auditee_uei",
             "auditee_fiscal_period_end",
             "auditee_name",
-        )
+        ]
 
-        return JsonResponse(list(all_submissions), safe=False)
+        results = map(lambda s: {k: getattr(s, k) for k in fields}, all_submissions)
+
+        return JsonResponse(list(results), safe=False)
 
 
 class AccessListView(APIView):

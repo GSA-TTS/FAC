@@ -26,7 +26,6 @@ VALID_AUDITEE_INFO_DATA = {
     "auditee_fiscal_period_start": "2021-01-01",
     "auditee_fiscal_period_end": "2022-01-01",
     "auditee_name": "Tester",
-    "submission_status": "in_progress",
 }
 
 VALID_ELIGIBILITY_DATA = {
@@ -48,46 +47,42 @@ SAMPLE_BASE_SAC_DATA = {
     "date_created": "2022-08-11",
     "submission_status": "in_progress",
     "report_id": "2022ABC1000023",
-    # Part 1: General Information
-    # Q1 Fiscal Dates
-    "auditee_fiscal_period_start": "2021-10-01",
-    "auditee_fiscal_period_end": "2022-10-01",
-    # Q2 Type of Uniform Guidance Audit
     "audit_type": "single-audit",
-    # Q3 Audit Period Covered
-    "audit_period_covered": "annual",
-    # Q4 Auditee Identification Numbers
-    "ein": None,
-    "ein_not_an_ssn_attestation": None,
-    "multiple_eins_covered": None,
-    "auditee_uei": "ZQGGHJH74DW7",
-    "multiple_ueis_covered": None,
-    # Q5 Auditee Information
-    "auditee_name": "Auditee McAudited",
-    "auditee_address_line_1": "200 feet into left field",
-    "auditee_city": "New York",
-    "auditee_state": "NY",
-    "auditee_zip": "10451",
-    "auditee_contact_name": "Designate Representative",
-    "auditee_contact_title": "Lord of Doors",
-    "auditee_phone": "5558675309",
-    "auditee_email": "auditee.mcaudited@leftfield.com",
-    # Q6 Primary Auditor Information
-    "user_provided_organization_type": "local",
-    "met_spending_threshold": True,
-    "is_usa_based": True,
-    "auditor_firm_name": "Dollar Audit Store",
-    "auditor_ein": None,
-    "auditor_ein_not_an_ssn_attestation": None,
-    "auditor_country": "USA",
-    "auditor_address_line_1": "100 Percent Respectable St.",
-    "auditor_city": "Podunk",
-    "auditor_state": "NY",
-    "auditor_zip": "14886",
-    "auditor_contact_name": "Qualified Human Accountant",
-    "auditor_contact_title": "Just an ordinary person",
-    "auditor_phone": "0008675309",
-    "auditor_email": "qualified.human.accountant@dollarauditstore.com",
+    # Part 1: General Information
+    "general_information": {
+        "auditee_fiscal_period_start": "2021-10-01",
+        "auditee_fiscal_period_end": "2022-10-01",
+        "audit_period_covered": "annual",
+        "ein": None,
+        "ein_not_an_ssn_attestation": None,
+        "multiple_eins_covered": None,
+        "auditee_uei": "ZQGGHJH74DW7",
+        "multiple_ueis_covered": None,
+        "auditee_name": "Auditee McAudited",
+        "auditee_address_line_1": "200 feet into left field",
+        "auditee_city": "New York",
+        "auditee_state": "NY",
+        "auditee_zip": "10451",
+        "auditee_contact_name": "Designate Representative",
+        "auditee_contact_title": "Lord of Doors",
+        "auditee_phone": "5558675309",
+        "auditee_email": "auditee.mcaudited@leftfield.com",
+        "user_provided_organization_type": "local",
+        "met_spending_threshold": True,
+        "is_usa_based": True,
+        "auditor_firm_name": "Dollar Audit Store",
+        "auditor_ein": None,
+        "auditor_ein_not_an_ssn_attestation": None,
+        "auditor_country": "USA",
+        "auditor_address_line_1": "100 Percent Respectable St.",
+        "auditor_city": "Podunk",
+        "auditor_state": "NY",
+        "auditor_zip": "14886",
+        "auditor_contact_name": "Qualified Human Accountant",
+        "auditor_contact_title": "Just an ordinary person",
+        "auditor_phone": "0008675309",
+        "auditor_email": "qualified.human.accountant@dollarauditstore.com",
+    },
 }
 
 
@@ -575,9 +570,9 @@ class SingleAuditChecklistViewTests(TestCase):
         for key, value in access_and_submission_data.items():
             self.assertEqual(full_data[key], value)
         for key, value in eligibility_info.items():
-            self.assertEqual(full_data[key], value)
+            self.assertEqual(full_data["general_information"][key], value)
         for key, value in VALID_AUDITEE_INFO_DATA.items():
-            self.assertEqual(full_data[key], value)
+            self.assertEqual(full_data["general_information"][key], value)
 
     def test_get_authentication_required(self):
         """
@@ -652,9 +647,31 @@ class SingleAuditChecklistViewTests(TestCase):
 
         self.assertEqual(response.status_code, 404)
 
-    def test_put_bad_data(self):
+    def test_put_bad_metadata(self):
         """
-        If we have edit access and we're submitting to the allowed fields but
+        If we have edit access and we're submitting to the allowed metadata fields but
+        we're submitting bad data, we should get errors.
+        """
+
+        def check_response(bad_data, expected):
+            sac = baker.make(SingleAuditChecklist)
+            access = baker.make(Access, user=self.user, sac=sac)
+            path = self.path(access.sac.report_id)
+            response = self.client.put(path, bad_data, format="json")
+            self.assertEqual(response.status_code, 400)
+            self.assertEqual(response.json(), expected)
+
+        choice_keys = ["audit_type"]
+
+        for key in choice_keys:
+            message = "Value 'invalid_choice' is not a valid choice."
+            expected = {"errors": {key: [message]}}
+            with self.subTest():
+                check_response({key: "invalid_choice"}, expected)
+
+    def test_put_bad_general_info_data(self):
+        """
+        If we have edit access and we're submitting to the allowed general information fields but
         we're submitting bad data, we should get errors.
         """
 
@@ -670,115 +687,96 @@ class SingleAuditChecklistViewTests(TestCase):
 
         boolean_keys = ["met_spending_threshold", "is_usa_based"]
 
-        choice_keys = [
-            "audit_type",
-            "audit_period_covered",
-            "user_provided_organization_type",
-        ]
-
-        ternary_keys = [
+        boolean_nullable_keys = [
             "ein_not_an_ssn_attestation",
             "multiple_eins_covered",
             "multiple_ueis_covered",
             "auditor_ein_not_an_ssn_attestation",
         ]
 
-        length_100_keys = [
-            "auditee_contact_name",
-            "auditee_contact_title",
-            "auditee_phone",
-            "auditor_country",
-            "auditor_address_line_1",
-            "auditor_city",
-            "auditor_state",
-            "auditor_zip",
-            "auditor_contact_name",
-            "auditor_contact_title",
-            "auditor_phone",
-        ]
-
-        test_cases = [
+        choice_keys = [
+            ("audit_period_covered", "['annual', 'biennial', 'other']"),
             (
-                {
-                    "auditee_email": "invalid_email",
-                    "auditor_email": "invalid_email",
-                },
-                {
-                    "errors": {
-                        "auditee_email": ["Enter a valid email address."],
-                        "auditor_email": ["Enter a valid email address."],
-                    }
-                },
+                "user_provided_organization_type",
+                "['higher-ed', 'local', 'non-profit', 'none', 'state', 'tribal', 'unknown']",
             ),
         ]
 
+        length_100_keys = [
+            "auditee_address_line_1",
+            "auditee_city",
+            "auditee_contact_name",
+            "auditee_contact_title",
+            "auditor_country",
+            "auditor_address_line_1",
+            "auditor_city",
+            "auditor_contact_name",
+            "auditor_contact_title",
+        ]
+
         for key in email_keys:
-            expected = {"errors": {key: ["Enter a valid email address."]}}
+            expected = {
+                "errors": {"general_information": ["'invalid_email' is not a 'email'"]}
+            }
             with self.subTest():
-                check_response({key: "invalid_email"}, expected)
+                nested = {"general_information": {key: "invalid_email"}}
+                check_response(nested, expected)
 
         for key in boolean_keys:
-            message = "“invalid_boolean” value must be either True or False."
-            expected = {"errors": {key: [message]}}
+            expected = {
+                "errors": {
+                    "general_information": [
+                        "'invalid_boolean' is not of type 'boolean'"
+                    ]
+                }
+            }
             with self.subTest():
-                check_response({key: "invalid_boolean"}, expected)
+                nested = {"general_information": {key: "invalid_boolean"}}
+                check_response(nested, expected)
 
-        for key in choice_keys:
-            message = "Value 'invalid_choice' is not a valid choice."
-            expected = {"errors": {key: [message]}}
+        for key in boolean_nullable_keys:
+            expected = {
+                "errors": {
+                    "general_information": [
+                        "'invalid_boolean' is not of type 'boolean', 'null'"
+                    ]
+                }
+            }
             with self.subTest():
-                check_response({key: "invalid_choice"}, expected)
+                nested = {"general_information": {key: "invalid_boolean"}}
+                check_response(nested, expected)
 
-        for key in ternary_keys:
-            message = "“invalid_boolean” value must be either True, False, or None."
-            expected = {"errors": {key: [message]}}
+        for key, choices in choice_keys:
+            message = f"'invalid_choice' is not one of {choices}"
+            expected = {"errors": {"general_information": [message]}}
             with self.subTest():
-                check_response({key: "invalid_boolean"}, expected)
+                nested = {"general_information": {key: "invalid_choice"}}
+                check_response(nested, expected)
 
         for key in length_100_keys:
             one = "a value over one hundred characters long is annoying to enter "
             two = "succinctly when your Python line length limit is eighty-eight"
             value = f"{one}{two}"
-            message = "Ensure this value has at most 100 characters (it has 123)."
-            expected = {"errors": {key: [message]}}
+            message = f"'{value}' is too long"
+            expected = {"errors": {"general_information": [message]}}
             with self.subTest():
-                check_response({key: value}, expected)
+                nested = {"general_information": {key: value}}
+                check_response(nested, expected)
 
-        for bad_data, expected in test_cases:
-            with self.subTest():
-                check_response(bad_data, expected)
-
-    def test_put_edit_appropriate_fields(self):
+    def test_put_edit_appropriate_metadata_fields(self):
         """
-        If we submit data for the appropriate fields, we succeed and also
-        update those fields.
-
-        If a field is absent we don't do anything to it.
+        If we submit data for appropriate metadata fields, we succeed and also update those fields
         """
+
         test_cases = [
-            ({"auditee_phone": "5558675308"}, {"auditee_phone": "5558675309"}),
-            (
-                {"auditee_email": "before@param.com"},
-                {"auditee_email": "after@param.com"},
-            ),
-            (
-                {"auditee_email": "before@param.com"},
-                {"auditee_email": "after@param.com"},
-            ),
-            (
-                {
-                    "auditee_phone": "5558675308",
-                    "auditee_email": "before@param.com",
-                },
-                {"auditee_email": "after@param.com", "auditee_phone": "5558675309"},
-            ),
+            ({"audit_type": "single-audit"}, {"audit_type": "program-specific"})
         ]
 
         for before, after in test_cases:
             with self.subTest():
-                to_remove = ["report_id", "submitted_by"]
-                prior = omit(to_remove, SAMPLE_BASE_SAC_DATA | before)
-
+                prior = omit(
+                    ["report_id", "submitted_by"], SAMPLE_BASE_SAC_DATA | before
+                )
                 sac = baker.make(SingleAuditChecklist, submitted_by=self.user, **prior)
                 access = baker.make(Access, user=self.user, sac=sac)
 
@@ -792,28 +790,103 @@ class SingleAuditChecklistViewTests(TestCase):
                     self.assertEqual(getattr(updated_sac, key), value)
                     self.assertEqual(response.json()[key], value)
 
-        # Not testing auditee_uei here because baker doesn't know how to follow
-        # the rules for it and because we're not supposed to change it via this
-        # view anyway.
-        to_generate = [k for k in SAMPLE_BASE_SAC_DATA if k not in ["auditee_uei"]]
-        base = baker.make(
-            SingleAuditChecklist, submitted_by=self.user, _fill_optional=to_generate
-        )
-        access = baker.make(Access, user=self.user, sac=base)
+    def test_put_edit_appropriate_general_information_fields(self):
+        """
+        If we submit data for appropriate general information fields, we succeed and also update those fields
+        """
 
-        data = omit(SingleAuditChecklistView.invalid_keys, SAMPLE_BASE_SAC_DATA)
-        path = self.path(access.sac.report_id)
-        response = self.client.put(path, data, format="json")
-        self.assertEqual(response.status_code, 200)
+        test_cases = [
+            ({"audit_period_covered": "annual"}, {"audit_period_covered": "biennial"}),
+            ({"ein": None}, {"ein": "123456789"}),
+            (
+                {"ein_not_an_ssn_attestation": None},
+                {"ein_not_an_ssn_attestation": True},
+            ),
+            ({"multiple_eins_covered": None}, {"multiple_eins_covered": True}),
+            ({"multiple_ueis_covered": None}, {"multiple_ueis_covered": True}),
+            (
+                {"auditee_name": "Auditee McAudited"},
+                {"auditee_name": "Auditee McAuditeddd"},
+            ),
+            (
+                {"auditee_address_line_1": "200 feet into left field"},
+                {"auditee_address_line_1": "300 feet into left field"},
+            ),
+            ({"auditee_city": "New York"}, {"auditee_city": "New Fork"}),
+            ({"auditee_state": "NY"}, {"auditee_state": "WY"}),
+            ({"auditee_zip": "10451"}, {"auditee_zip": "10452"}),
+            (
+                {"auditee_contact_name": "Designate Representative"},
+                {"auditee_contact_name": "Designate Representativer"},
+            ),
+            (
+                {"auditee_contact_title": "Lord of Doors"},
+                {"auditee_contact_title": "Lord of Moors"},
+            ),
+            ({"auditee_phone": "5558675309"}, {"auditee_phone": "5558675308"}),
+            (
+                {"auditee_email": "auditee.mcaudited@leftfield.com"},
+                {"auditee_email": "auditee.mcaudited@rightfield.com"},
+            ),
+            (
+                {"user_provided_organization_type": "local"},
+                {"user_provided_organization_type": "higher-ed"},
+            ),
+            ({"met_spending_threshold": True}, {"met_spending_threshold": False}),
+            ({"is_usa_based": True}, {"is_usa_based": False}),
+            (
+                {"auditor_firm_name": "Dollar Audit Store"},
+                {"auditor_firm_name": "Penny Audit Store"},
+            ),
+            ({"auditor_ein": None}, {"auditor_ein": "123456789"}),
+            (
+                {"auditor_ein_not_an_ssn_attestation": None},
+                {"auditor_ein_not_an_ssn_attestation": True},
+            ),
+            ({"auditor_country": "USA"}, {"auditor_country": "CAN"}),
+            (
+                {"auditor_address_line_1": "100 Percent Respectable St."},
+                {"auditor_address_line_1": "75 Percent Respectable St."},
+            ),
+            ({"auditor_city": "Podunk"}, {"auditor_city": "Pomunk"}),
+            ({"auditor_state": "NY"}, {"auditor_state": "WY"}),
+            ({"auditor_zip": "14886"}, {"auditor_zip": "14887"}),
+            (
+                {"auditor_contact_name": "Qualified Human Accountant"},
+                {"auditor_contact_name": "Qualified Robot Accountant"},
+            ),
+            (
+                {"auditor_contact_title": "Just an ordinary person"},
+                {"auditor_contact_title": "Just an extraordinary person"},
+            ),
+            ({"auditor_phone": "0008675309"}, {"auditor_phone": "0008675308"}),
+            (
+                {"auditor_email": "qualified.human.accountant@dollarauditstore.com"},
+                {"auditor_email": "qualified.robot.accountant@dollarauditstore.com"},
+            ),
+        ]
 
-        sac_data = response.json()
-        updated_sac = SingleAuditChecklist.objects.get(pk=base.id)
+        for before, after in test_cases:
+            with self.subTest():
+                prior = omit(["report_id", "submitted_by"], SAMPLE_BASE_SAC_DATA)
+                prior["general_information"] = prior["general_information"] | before
 
-        for key, value in data.items():
-            self.assertEqual(getattr(updated_sac, key), value)
-            self.assertEqual(sac_data[key], value)
+                sac = baker.make(SingleAuditChecklist, submitted_by=self.user, **prior)
+                access = baker.make(Access, user=self.user, sac=sac)
 
-    def test_edit_inappropriate_fields(self):
+                nested_after = {"general_information": after}
+
+                path = self.path(access.sac.report_id)
+                response = self.client.put(path, nested_after, format="json")
+                self.assertEqual(response.status_code, 200)
+
+                updated_sac = SingleAuditChecklist.objects.get(pk=sac.id)
+
+                for key, value in after.items():
+                    self.assertEqual(updated_sac.general_information[key], value)
+                    self.assertEqual(response.json()["general_information"][key], value)
+
+    def test_edit_inappropriate_metadata_fields(self):
         """
         If we submit data for fields that can't be edited, we reject the PUT
         and return errors.
@@ -825,15 +898,9 @@ class SingleAuditChecklistViewTests(TestCase):
                 {
                     "errors": "The following fields cannot be modified via this endpoint: report_id."
                 },
-            ),
-            (
-                {"report_id": "5558675308", "auditee_uei": "5558675308"},
-                {
-                    "errors": "The following fields cannot be modified via this endpoint: auditee_uei, report_id."
-                },
-            ),
+            )
         ]
-        for invalid_key in SingleAuditChecklistView.invalid_keys:
+        for invalid_key in SingleAuditChecklistView.invalid_metadata_keys:
             test_case = (
                 {invalid_key: "whatever"},
                 {
@@ -841,6 +908,30 @@ class SingleAuditChecklistViewTests(TestCase):
                 },
             )
             test_cases.append(test_case)
+
+        for data, expected in test_cases:
+            with self.subTest():
+                sac = baker.make(SingleAuditChecklist)
+                access = baker.make(Access, user=self.user, sac=sac)
+                path = self.path(access.sac.report_id)
+                response = self.client.put(path, data, format="json")
+
+                self.assertEqual(response.status_code, 400)
+                self.assertEqual(response.json(), expected)
+
+    def test_edit_inappropriate_general_information_fields(self):
+        """
+        If we submit data for general information fields that can't be edited, we reject the PUT and return errors
+        """
+        test_cases = [
+            (
+                {"general_information": {k: "whatever"}},
+                {
+                    "errors": f"The following fields cannot be modified via this endpoint: {k}."
+                },
+            )
+            for k in SingleAuditChecklistView.invalid_general_information_keys
+        ]
 
         for data, expected in test_cases:
             with self.subTest():
@@ -949,10 +1040,6 @@ class SubmissionsViewTests(TestCase):
 
         data = response.json()
         self.assertTrue("report_id" in data[0])
-        self.assertEqual(
-            data[0]["submission_status"],
-            VALID_AUDITEE_INFO_DATA["submission_status"],
-        )
         self.assertEqual(
             data[0]["auditee_uei"],
             VALID_AUDITEE_INFO_DATA["auditee_uei"],

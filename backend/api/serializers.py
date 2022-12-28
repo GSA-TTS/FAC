@@ -1,10 +1,15 @@
 import json
 
 from rest_framework import serializers
+from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 
 from audit.models import SingleAuditChecklist, Access
 from api.uei import get_uei_info_from_sam_gov
+
+from audit.validators import (
+    validate_general_information_json,
+)
 
 # Eligibility step messages
 SPENDING_THRESHOLD = _(
@@ -30,14 +35,17 @@ AUDITEE_CONTACTS_LIST = _("Auditee Contacts needs to be a list of emails")
 AUDITOR_CONTACTS_LIST = _("Auditor Contacts needs to be a list of emails")
 
 
-class EligibilitySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = SingleAuditChecklist
-        fields = [
-            "user_provided_organization_type",
-            "met_spending_threshold",
-            "is_usa_based",
-        ]
+class EligibilitySerializer(serializers.Serializer):
+    user_provided_organization_type = serializers.CharField()
+    met_spending_threshold = serializers.BooleanField()
+    is_usa_based = serializers.BooleanField()
+
+    def validate(self, data):
+        try:
+            validate_general_information_json(data)
+            return data
+        except ValidationError as err:
+            raise serializers.ValidationError(_(err.message)) from err
 
     def validate_is_usa_based(self, value):
         if not value:
@@ -55,10 +63,8 @@ class EligibilitySerializer(serializers.ModelSerializer):
         return value
 
 
-class UEISerializer(serializers.ModelSerializer):
-    class Meta:
-        model = SingleAuditChecklist
-        fields = ["auditee_uei"]
+class UEISerializer(serializers.Serializer):
+    auditee_uei = serializers.CharField()
 
     def validate_auditee_uei(self, value):
         sam_response = get_uei_info_from_sam_gov(value)
@@ -94,15 +100,22 @@ class UEISerializer(serializers.ModelSerializer):
         )
 
 
-class AuditeeInfoSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = SingleAuditChecklist
-        fields = [
-            "auditee_name",
-            "auditee_uei",
-            "auditee_fiscal_period_start",
-            "auditee_fiscal_period_end",
-        ]
+class AuditeeInfoSerializer(serializers.Serializer):
+    auditee_name = serializers.CharField(
+        required=False, allow_null=True, allow_blank=True
+    )
+    auditee_uei = serializers.CharField(
+        required=False, allow_null=True, allow_blank=True
+    )
+    auditee_fiscal_period_start = serializers.CharField()
+    auditee_fiscal_period_end = serializers.CharField()
+
+    def validate(self, data):
+        try:
+            validate_general_information_json(data)
+            return data
+        except ValidationError as err:
+            raise serializers.ValidationError(_(err.message)) from err
 
     # auditee_name and auditee_uei optional, fiscal start/end required
     def validate_auditee_fiscal_period_start(self, value):
