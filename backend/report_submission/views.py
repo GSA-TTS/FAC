@@ -1,5 +1,5 @@
 from django.contrib.auth.decorators import login_required
-from django.http import QueryDict
+from django.http import QueryDict, request
 from django.shortcuts import render  # noqa: F401
 from django.views import generic, View
 from django.views.generic import TemplateView
@@ -11,23 +11,16 @@ from api.views import EligibilityFormView
 
 
 # class based views for ...
-#class step1(LoginRequiredMixin, TemplateView):
-class step1(TemplateView):
-    """Basic class for pre-SAC step 1 form."""
-
-    template_name = "report_submission/step-1.html"
-
-
-class step2(TemplateView):
-    """Basic class for pre-SAC step 2 form."""
-
-    template_name = "report_submission/step-2.html"
+class Step(View):
+    def get(self, request: request):
+        step = request.GET.get('step', 1)
+        step = 1 if step not in (1, 2, 3) else step
+        extra_context = {'step': step}
+        template_name = f'report_submission/step-{step}.html'
+        return render(request, template_name, extra_context)
 
 
-class step3(TemplateView):
-    """Basic class for pre-SAC step 3 form."""
-
-    template_name = "report_submission/step-3.html"
+# class step1(LoginRequiredMixin, TemplateView):
 
 
 class EligibilityFormView(LoginRequiredMixin, View):
