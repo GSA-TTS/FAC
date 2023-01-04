@@ -37,6 +37,9 @@ jobs:
       ENV: TESTING
     steps:
       - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 16
       - name: Start services
         working-directory: ./backend
         run: docker-compose up -d
@@ -48,3 +51,7 @@ jobs:
       - name: Run Django migrations for pa11y tests
         working-directory: ./backend
         run: docker-compose run web python manage.py migrate
+      - name: run Lighthouse CI
+        run: |
+          npm install -g @lhci/cli@0.8.x
+          lhci autorun
