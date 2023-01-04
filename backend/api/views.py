@@ -30,7 +30,7 @@ def eligibility_check(user, data):
     serializer = EligibilitySerializer(data=data)  #data = request.data
     # self.eligibility_check(request)
     if serializer.is_valid():
-        next_step = reverse("auditee-info")
+        next_step = reverse("api-auditee-info")
 
         # Store step 0 data in profile, overwriting any pre-existing.
         user.profile.entry_form_data = data
@@ -128,14 +128,14 @@ class AuditeeInfoView(APIView):
         if missing_fields:
             return Response(
                 {
-                    "next": reverse("eligibility"),
+                    "next": reverse("api-eligibility"),
                     "errors": "We're missing required fields, please try again.",
                     "missing_fields": missing_fields,
                 }
             )
 
         if serializer.is_valid():
-            next_step = reverse("accessandsubmission")
+            next_step = reverse("api-accessandsubmission")
 
             # combine with expected eligibility info from session
             request.user.profile.entry_form_data = (
@@ -174,7 +174,7 @@ class AccessAndSubmissionView(APIView):
         if missing_fields:
             return Response(
                 {
-                    "next": reverse("eligibility"),
+                    "next": reverse("api-eligibility"),
                     "errors": "We're missing required fields, please try again.",
                     "missing_fields": missing_fields,
                 }
