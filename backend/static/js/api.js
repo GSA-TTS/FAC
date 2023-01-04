@@ -1,4 +1,4 @@
-import { getApiToken } from '/static/compiled/js/auth.js';
+//import { getApiToken } from '/static/compiled/js/auth.js';
 
 export const queryAPI = (
   endpoint,

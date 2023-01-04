@@ -11,7 +11,7 @@ from api.views import EligibilityFormView
 
 
 # class based views for ...
-class Step(View):
+class Step(LoginRequiredMixin, View):
     def get(self, request: request):
         step = request.GET.get('step', 1)
         step = 1 if step not in (1, 2, 3) else step

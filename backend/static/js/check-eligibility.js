@@ -1,4 +1,4 @@
-import { queryAPI } from './api';
+//import { queryAPI } from './api';
 
 (function () {
   const ENDPOINT = '/sac/eligibility';
