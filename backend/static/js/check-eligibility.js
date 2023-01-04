@@ -1,7 +1,7 @@
 //import { queryAPI } from './api';
 
 (function () {
-  const ENDPOINT = '/sac/eligibility';
+  const ENDPOINT = '/report_submission/eligibility';
   const FORM = document.forms[0];
 
   function submitForm() {
@@ -10,7 +10,14 @@
       formData.met_spending_threshold
     );
     formData.is_usa_based = stringToBoolean(formData.is_usa_based);
-
+    fetch(ENDPOINT, {
+      method: 'post',
+      body: JSON.stringify(formData),
+    })
+      .then((resp) => resp.json())
+      .then((data) => handleResponse(data))
+      .catch((e) => handleError(e));
+    /*
     queryAPI(
       ENDPOINT,
       formData,
@@ -19,6 +26,7 @@
       },
       [handleEligibilityResponse, handleErrorResponse]
     );
+    */
   }
 
   function handleEligibilityResponse(data) {
