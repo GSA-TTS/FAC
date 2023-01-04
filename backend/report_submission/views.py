@@ -26,15 +26,15 @@ from api.views import EligibilityFormView
 # class step1(LoginRequiredMixin, TemplateView):
 
 class ReportSubmissionRedirectView(View):
-    def get(self):
+    def get(self, request):
         return redirect(reverse("eligibility"))
 
 
 # Step 1
 class EligibilityFormView(LoginRequiredMixin, View):
 
-    def get(self):
-        return render(request, "step-1.html")
+    def get(self, request):
+        return render(request, "report_submission/step-1.html")
 
     # render eligibility form
 
@@ -57,8 +57,8 @@ class EligibilityFormView(LoginRequiredMixin, View):
 
 # Step 2
 class AuditeeInfoFormView(LoginRequiredMixin, View):
-    def get(self):
-        return render(request, "step-2.html")
+    def get(self, request):
+        return render(request, "report_submission/step-2.html")
 
     # render auditee info form
 
@@ -69,8 +69,8 @@ class AuditeeInfoFormView(LoginRequiredMixin, View):
 
 # Step 3
 class AccessAndSubmissionFormView(LoginRequiredMixin, View):
-    def get(self):
-        return render(request, "step-3.html")
+    def get(self, request):
+        return render(request, "report_submission/step-3.html")
 
     # render access-submission form
 
