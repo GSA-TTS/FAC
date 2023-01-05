@@ -231,10 +231,10 @@ function validateUEID() {
   resetModal();
 
   const auditee_uei = document.getElementById('auditee_uei').value;
-  const apiUrl = 'https://fac-dev.app.cloud.gov';
+  //const apiUrl = 'https://fac-dev.app.cloud.gov';
   const headers = new Headers();
   headers.append('Content-type', 'application/json');
-  fetch(apiUrl+'/sac/ueivalidation', {
+  fetch('/api/sac/ueivalidation', {
     method: 'POST',
     headers: headers,
     body: JSON.stringify({ auditee_uei}),
