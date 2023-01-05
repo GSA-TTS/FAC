@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load static %}
 {% block metatags %}
-    <title>{{ post.title }}</title>
+    <title>{{ post.title|default:'Federal Audit Clearinghouse' }}</title>
     <meta name="description" content="{{ post.meta_description }}">
     <meta property="og:title" content="{{ post.title }}">
     <meta property="og:site_name" content="Federal Audit Clearinghouse">
