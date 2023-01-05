@@ -1,5 +1,5 @@
 {% extends "report_submission/step-base.html" %}
-
+{% load static %}
 {% block step-content %}
 
 <div class="grid-container">
@@ -157,4 +157,5 @@
       </ul>
   </form>
 </div>
+<script src="{% static 'compiled/js/check-eligibility.js' %}" type="text/javascript"></script>
 {% endblock %}
