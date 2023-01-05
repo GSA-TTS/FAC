@@ -3,7 +3,7 @@ import { checkValidity } from './validate.js';
 const URL = './report_submission/auditeeinfo/';
 const nextStep = './report_submission/accessandsubmission';
 const FORM = document.forms[0];
-/*
+
 function submitForm() {
   const formData = serializeFormData(new FormData(FORM));
   formData.auditee_fiscal_period_start = new Date(
@@ -13,6 +13,7 @@ function submitForm() {
     formData.auditee_fiscal_period_end
   ).toLocaleDateString('en-CA');
 
+/*
   queryAPI(
     ENDPOINT,
     formData,
@@ -21,8 +22,9 @@ function submitForm() {
     },
     [handleAuditeeResponse, handleErrorResponse]
   );
+*/
 }
-*/ 
+
 function handleAuditeeResponse(data) {
   console.log(data);
   if (data.next == '/sac/accessandsubmission') {
@@ -229,9 +231,10 @@ function validateUEID() {
   resetModal();
 
   const auditee_uei = document.getElementById('auditee_uei').value;
+  const apiUrl = 'https://fac-dev.app.cloud.gov';
   const headers = new Headers();
   headers.append('Content-type', 'application/json');
-  fetch('/api/sac/ueivalidation', {
+  fetch(apiUrl+'/sac/ueivalidation', {
     method: 'POST',
     headers: headers,
     body: JSON.stringify({ auditee_uei}),
