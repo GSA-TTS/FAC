@@ -7,7 +7,7 @@ const { sassPlugin } = require('esbuild-sass-plugin');
 const watch = process.argv.includes('--watch');
 
 const buildProps = {
-  entryPoints: ['static/js/app.js', 'static/js/check-eligibility.js', 'static/scss/main.scss'],
+  entryPoints: ['static/js/app.js', 'static/js/check-eligibility.js', 'static/js/check-ueid.js', 'static/scss/main.scss'],
   outdir: 'static/compiled',
   minify: process.env.NODE_ENV === "production",
   sourcemap: process.env.NODE_ENV !== "production",
@@ -27,6 +27,7 @@ const buildProps = {
       loadPaths: [
         "./node_modules/@uswds",
         "./node_modules/@uswds/uswds/packages",
+        "./static/compiled/js",
       ],
     }),
   ]

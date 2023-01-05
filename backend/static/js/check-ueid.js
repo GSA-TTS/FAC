@@ -1,7 +1,7 @@
-import { checkValidity } from '/static/compiled/js/validate.js';
-import { queryAPI } from '/static/compiled/js/api.js';
+import { checkValidity } from './validate.js';
 
-const ENDPOINT = '/sac/auditee';
+const URL = './report_submission/auditeeinfo/';
+const nextStep = './report_submission/accessandsubmission';
 const FORM = document.forms[0];
 /*
 function submitForm() {
@@ -229,7 +229,17 @@ function validateUEID() {
   resetModal();
 
   const auditee_uei = document.getElementById('auditee_uei').value;
-
+  const headers = new Headers();
+  headers.append('Content-type', 'application/json');
+  fetch('/api/sac/ueivalidation', {
+    method: 'POST',
+    headers: headers,
+    body: JSON.stringify({ auditee_uei}),
+  })
+    .then((resp) => resp.json())
+    .then((data) => handleUEIDResponse(data))
+    .catch((e) => handleApiError(e));
+/*
   queryAPI(
     '/sac/ueivalidation',
     { auditee_uei },
@@ -238,6 +248,7 @@ function validateUEID() {
     },
     [handleUEIDResponse, handleApiError]
   );
+*/
 }
 
 function validateFyStartDate(fyInput) {
