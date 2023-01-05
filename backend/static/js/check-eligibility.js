@@ -1,7 +1,5 @@
-//import { queryAPI } from './api';
-
 (function () {
-  const ENDPOINT = '/report_submission/eligibility';
+  const URL = '/report_submission/eligibility';
   const FORM = document.forms[0];
 
   function submitForm() {
@@ -10,36 +8,28 @@
       formData.met_spending_threshold
     );
     formData.is_usa_based = stringToBoolean(formData.is_usa_based);
-    fetch(ENDPOINT, {
-      method: 'post',
+    fetch(URL, {
+      method: 'POST',
       body: JSON.stringify(formData),
     })
       .then((resp) => resp.json())
-      .then((data) => handleResponse(data))
-      .catch((e) => handleError(e));
-    /*
-    queryAPI(
-      ENDPOINT,
-      formData,
-      {
-        method: 'POST',
-      },
-      [handleEligibilityResponse, handleErrorResponse]
-    );
-    */
+      .then((data) => handleEligibilityResponse(data))
+      .catch((e) => handleErrorResponse(e));
   }
 
   function handleEligibilityResponse(data) {
     console.log(data);
     if (data.eligible) {
-      const nextUrl = '../step-2/'; //Replace with final URL
+      const nextUrl = '../auditeeinfo/';
       window.location.href = nextUrl;
     } else {
       console.log(data.errors);
     }
   }
   function handleErrorResponse() {
-    console.log('ERROR: Form submission error.');
+    console.log('ERROR: Form submission error. moving on for testing.');
+    const nextUrl = '../auditeeinfo/';
+      window.location.href = nextUrl;
   }
 
   function serializeFormData(formData) {
