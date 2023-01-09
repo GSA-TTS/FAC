@@ -32,8 +32,20 @@ Target python version is defined in [../backend/runtime.txt](../backend/runtime.
 
 ## Environment Variables
 
-Create a .env file in the `/backend` directory. Add `ENV = 'LOCAL'`. You will also need to add a `SAM_API_KEY` environment variable to interact with the SAM.gov API.
+Create a .env file in the `/backend` directory.
+Add and define the following environment variables using the instructions below.
 
+```
+ENV = 'LOCAL'
+SAM_API_KEY =
+SECRET_KEY =
+SECRET_LOGIN_KEY =
+```
+
+If you need to add these to your local environment (should end up in `~/.bash_profile`, `~/.bashrc`, `~/.zshrc`, or whatever flavor of shell you're using.)
+
+#### SAM_API_KEY
+We use the `SAM_API_KEY` environment variable to interact with the SAM.gov API.
 To test UEI validation using the SAM.gov API with a personal API key, follow these steps on (https://SAM.gov):
 
 * Registered users can request for a public API on ‘Account Details’ page. This page can be accessed here: [Account Details page on SAM.gov](https://sam.gov/profile/details)
@@ -41,8 +53,10 @@ To test UEI validation using the SAM.gov API with a personal API key, follow the
 * After the API Key is generated on ‘Account Details’ page, the API Key can be viewed on the Account Details page immediately. The API Key is visible until users navigate to a different page.
 * If an error is encountered during the API Key generation/retrieval, then users will receive an error message and they can try again.
 
-After receiving a personal API key, copy the API key into your local environment (should end up in `~/.bash_profile`, `~/.bashrc`, `~/.zshrc`, or whatever flavor of shell you're using.)
+#### SECRET_KEY
+Generate a random secret key for local development.
 
+#### SECRET_LOGIN_KEY
 The `DJANGO_SECRET_LOGIN_KEY` environment variable is used to interact with Login.gov. For local development, you have three options:
 *  (Recommended) If you wish to use the shared Login.gov sandbox client application and credentials, you can obtain a valid  `DJANGO_SECRET_LOGIN_KEY` from our shared [dev secrets document](https://docs.google.com/spreadsheets/d/1byrBp16jufbiEY_GP5MyR0Uqf6WvB_5tubSXN_mYyJY/edit#gid=0)
 *  If you wish to use the shared Login.gov sandbox client application, but create your own client credentials, you must first be granted access to the GSA-FAC Login.gov sandbox team. Once you can access the GSA-FAC client application, follow [Login.gov's documentation for creating a public certificate](https://developers.login.gov/testing/#creating-a-public-certificate). Once created, you can add the newly-generated public key to the GSA-FAC app, and set `DJANGO_SECRET_LOGIN_KEY` to the base64-encoded value of the corresponding private key.

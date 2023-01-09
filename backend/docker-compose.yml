@@ -25,8 +25,10 @@ services:
       - "DATABASE_URL=postgres://postgres@db/postgres"
       - "DJANGO_DEBUG=true"
       - "SAM_API_KEY=${SAM_API_KEY}"
-      - DJANGO_BASE_URL=http://localhost:8000
-      - DJANGO_SECRET_LOGIN_KEY=${DJANGO_SECRET_LOGIN_KEY}
+      - "DJANGO_BASE_URL=http://localhost:8000"
+      - "DJANGO_SECRET_LOGIN_KEY=${DJANGO_SECRET_LOGIN_KEY}"
+      - "ENV=${ENV}"
+      - "SECRET_KEY=${SECRET_KEY}"
     ports:
       - "8000:8000"
     volumes:

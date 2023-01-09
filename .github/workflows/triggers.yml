@@ -17,6 +17,7 @@ jobs:
   # testing
   test-and-lint:
     uses: ./.github/workflows/test.yml
+  secrets: inherit
 
   # deploy to dev
   deploy-infrastructure-dev:
