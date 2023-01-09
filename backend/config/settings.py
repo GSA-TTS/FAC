@@ -64,8 +64,7 @@ LOGGING = {
     "loggers": {"django": {"handlers": ["local_debug_logger", "prod_logger"]}},
 }
 
-# Application definition
-
+# Django application definition
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -73,19 +72,25 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "report_submission",
-    "cms",
-    "djangooidc",
-    "storages",
 ]
 
 # Third-party apps
-
-INSTALLED_APPS += ["rest_framework", "rest_framework.authtoken", "corsheaders"]
+INSTALLED_APPS += [
+    "rest_framework",
+    "rest_framework.authtoken",
+    "corsheaders",
+    "storages",
+    "djangooidc",
+]
 
 # Our apps
-
-INSTALLED_APPS += ["audit", "api", "users"]
+INSTALLED_APPS += [
+    "audit",
+    "api",
+    "users",
+    "report_submission",
+    "cms",
+]
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -168,6 +173,9 @@ STATICFILES_DIRS = [
 ]
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 
+# CORS base
+CORS_ALLOWED_ORIGINS = [env.str("DJANGO_BASE_URL")]
+
 
 """Environment specific configurations"""
 if environment == "LOCAL":
@@ -176,6 +184,7 @@ if environment == "LOCAL":
     # Whitenoise for serving static files
     STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
     MIDDLEWARE.append("whitenoise.middleware.WhiteNoiseMiddleware")
+    CORS_ALLOWED_ORIGINS += ["http://0.0.0.0:8000", "http://127.0.0.1:8000"]
 elif environment in ["TESTING", "UNDEFINED"]:
     DEBUG = env.bool("DJANGO_DEBUG", default=False)
     STATIC_URL = "/static/"
@@ -234,7 +243,7 @@ else:
     SESSION_COOKIE_SAMESITE = 'Lax'
     X_FRAME_OPTIONS = "DENY"
 
-
+    CORS_ALLOWED_ORIGINS += [ bucket ]
 
 ADMIN_URL = "admin/"
 
@@ -259,9 +268,6 @@ REST_FRAMEWORK = {
     ],
     "TEST_REQUEST_DEFAULT_FORMAT": "api",
 }
-
-# CORS
-CORS_ALLOW_ALL_ORIGINS = True
 
 # SAM.gov API
 SAM_API_URL = "https://api.sam.gov/entity-information/v3/entities"
