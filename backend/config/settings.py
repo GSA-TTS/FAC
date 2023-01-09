@@ -96,7 +96,6 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    "csp.middleware.CSPMiddleware",
 ]
 
 ROOT_URLCONF = "config.urls"
@@ -184,6 +183,7 @@ elif environment in ["TESTING", "UNDEFINED"]:
     STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
     MIDDLEWARE.append("whitenoise.middleware.WhiteNoiseMiddleware")
 else:
+    # static assets
     STATICFILES_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
     vcap = json.loads(env.str("VCAP_SERVICES"))
     for service in vcap["s3"]:
@@ -203,6 +203,38 @@ else:
     AWS_LOCATION = "static"
     AWS_DEFAULT_ACL = "public-read"
     STATIC_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/{AWS_LOCATION}/"
+
+    # secure headers
+    MIDDLEWARE.append('csp.middleware.CSPMiddleware')
+    # see settings options https://django-csp.readthedocs.io/en/latest/configuration.html#configuration-chapter
+    bucket = f"{STATIC_URL}"
+    allowed_sources = (
+        "'self'",
+        bucket,
+        # we may need this
+        # 'https://idp.int.identitysandbox.gov/',
+        'https://dap.digitalgov.gov',
+        'https://www.google-analytics.com',
+        'https://www.googletagmanager.com/',
+    )
+    CSP_DEFAULT_SRC = allowed_sources
+    CSP_SCRIPT_SRC = allowed_sources
+    CSP_CONNECT_SRC = allowed_sources
+    CSP_IMG_SRC = allowed_sources
+    CSP_MEDIA_SRC = allowed_sources
+    CSP_FRAME_SRC = allowed_sources
+    CSP_WORKER_SRC = allowed_sources
+    CSP_FRAME_ANCESTORS = allowed_sources
+    CSP_STYLE_SRC = allowed_sources
+    CSP_INCLUDE_NONCE_IN = ['script-src']
+    CSRF_COOKIE_SECURE = True
+    CSRF_COOKIE_HTTPONLY = True
+    SESSION_COOKIE_SECURE = True
+    SESSION_COOKIE_HTTPONLY = True
+    SESSION_COOKIE_SAMESITE = 'Lax'
+    X_FRAME_OPTIONS = "DENY"
+
+
 
 ADMIN_URL = "admin/"
 
