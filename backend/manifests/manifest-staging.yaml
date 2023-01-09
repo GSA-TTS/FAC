@@ -9,6 +9,7 @@ applications:
   env:
     ENV: STAGING
     DJANGO_BASE_URL: https://fac-staging.app.cloud.gov
+    ALLOWED_HOSTS: https://fac-staging.app.cloud.gov
   routes:
   - route: fac-staging.app.cloud.gov
   instances: 1

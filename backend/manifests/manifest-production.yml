@@ -9,6 +9,7 @@ applications:
   env:
     ENV: PRODUCTION
     DJANGO_BASE_URL: https://fac-prod.app.cloud.gov
+    ALLOWED_HOSTS: https://fac-prod.app.cloud.gov
   routes:
   - route: fac-prod.app.cloud.gov
   instances: 2

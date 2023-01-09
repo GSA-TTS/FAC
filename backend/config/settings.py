@@ -36,7 +36,7 @@ BASE_DIR = environs.Path(__file__).resolve(strict=True).parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = secret("SECRET_KEY")
 
-ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=["*"])
+ALLOWED_HOSTS = env("ALLOWED_HOSTS").split()
 
 # Logging
 
