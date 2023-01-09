@@ -5,6 +5,8 @@ on:
     branches:
       - main
       - prod
+      # for testing
+      - ly/owasp#712
     tags:
       - v1.*
   pull_request:
@@ -16,6 +18,11 @@ on:
 jobs:
   test_and_lint:
     uses: ./.github/workflows/test.yml
+
+  scan-dev:
+    uses: ./.github/workflows/zap-scan.yml
+    with:
+      url: "https://fac-dev.app.cloud.gov/"
 
   deploy-infrastructure-dev:
     name: Deploy infrastructure (dev)
@@ -53,7 +60,7 @@ jobs:
     needs:
       - test_and_lint
       - deploy-infrastructure-dev
-    uses: ./.github/workflows/deploy_apps.yml
+    uses: ./.github/workflows/deploy-apps.yml
     with:
       environment: "dev"
     secrets: inherit
@@ -64,7 +71,7 @@ jobs:
     needs:
       - test_and_lint
       - deploy-infrastructure-staging
-    uses: ./.github/workflows/deploy_apps.yml
+    uses: ./.github/workflows/deploy-apps.yml
     with:
       environment: "staging"
     secrets: inherit
@@ -75,7 +82,7 @@ jobs:
     needs:
       - test_and_lint
       - deploy-infrastructure-production
-    uses: ./.github/workflows/deploy_apps.yml
+    uses: ./.github/workflows/deploy-apps.yml
     with:
       environment: "production"
     secrets: inherit
