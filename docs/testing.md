@@ -54,17 +54,10 @@ act test --platform ubuntu-latest=lucasalt/act_base:latest
 
 ## Accessibility
 
-We're using [Pa11y](https://pa11y.org/) for accessibility testing of interfaces rendered by the backend. Those interfaces are currently limited to Django's Admin Interface.
+We're using [Lighthouse-ci](https://github.com/GoogleChrome/lighthouse-ci) for accessibility testing.
 
-pa11y tests are defined in and may be executed from: `../pa11y_tests`
 
-Accessibility tests are executed as part of our CI/CD pipeline on each commit to `main` and proposed merge into `main`. We're not currently _failing_ the build on reported errors but we will in the future.
-
-To execute the tests locally, follow the general workflow defined in our [Github Action definitions](../.github/workflows/test.yml).
-1. Start a development instance of the application
-2. Ensure there's an account created with admin access
-3. Install pa11y
-4. Execute the pa11y tests with `npm run`
+Accessibility tests are executed as part of our CI/CD pipeline on each PR to the `main` branch, commit to the `main` branch, and PR into the `prod` branch.
 
 ## Coverage
 
