@@ -36,7 +36,7 @@ BASE_DIR = environs.Path(__file__).resolve(strict=True).parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = secret("SECRET_KEY")
 
-ALLOWED_HOSTS = env("ALLOWED_HOSTS").split()
+ALLOWED_HOSTS = env("ALLOWED_HOSTS", "0.0.0.0 127.0.0.1 localhost").split()
 
 # Logging
 
@@ -174,8 +174,7 @@ STATICFILES_DIRS = [
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 
 # CORS base
-CORS_ALLOWED_ORIGINS = [env.str("DJANGO_BASE_URL")]
-
+CORS_ALLOWED_ORIGINS = [env.str("DJANGO_BASE_URL", "http://localhost:8000")]
 
 """Environment specific configurations"""
 if environment == "LOCAL":
@@ -185,12 +184,13 @@ if environment == "LOCAL":
     STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
     MIDDLEWARE.append("whitenoise.middleware.WhiteNoiseMiddleware")
     CORS_ALLOWED_ORIGINS += ["http://0.0.0.0:8000", "http://127.0.0.1:8000"]
-elif environment in ["TESTING", "UNDEFINED"]:
+elif environment not in ["DEVELOPMENT", "STAGING", "PRODUCTION"]:
     DEBUG = env.bool("DJANGO_DEBUG", default=False)
     STATIC_URL = "/static/"
     # Whitenoise for serving static files
     STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
     MIDDLEWARE.append("whitenoise.middleware.WhiteNoiseMiddleware")
+    CORS_ALLOWED_ORIGINS += ["http://0.0.0.0:8000", "http://127.0.0.1:8000"]
 else:
     # static assets
     STATICFILES_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
@@ -214,7 +214,7 @@ else:
     STATIC_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/{AWS_LOCATION}/"
 
     # secure headers
-    MIDDLEWARE.append('csp.middleware.CSPMiddleware')
+    MIDDLEWARE.append("csp.middleware.CSPMiddleware")
     # see settings options https://django-csp.readthedocs.io/en/latest/configuration.html#configuration-chapter
     bucket = f"{STATIC_URL}"
     allowed_sources = (
@@ -222,9 +222,9 @@ else:
         bucket,
         # we may need this
         # 'https://idp.int.identitysandbox.gov/',
-        'https://dap.digitalgov.gov',
-        'https://www.google-analytics.com',
-        'https://www.googletagmanager.com/',
+        "https://dap.digitalgov.gov",
+        "https://www.google-analytics.com",
+        "https://www.googletagmanager.com/",
     )
     CSP_DEFAULT_SRC = allowed_sources
     CSP_SCRIPT_SRC = allowed_sources
@@ -235,15 +235,15 @@ else:
     CSP_WORKER_SRC = allowed_sources
     CSP_FRAME_ANCESTORS = allowed_sources
     CSP_STYLE_SRC = allowed_sources
-    CSP_INCLUDE_NONCE_IN = ['script-src']
+    CSP_INCLUDE_NONCE_IN = ["script-src"]
     CSRF_COOKIE_SECURE = True
     CSRF_COOKIE_HTTPONLY = True
     SESSION_COOKIE_SECURE = True
     SESSION_COOKIE_HTTPONLY = True
-    SESSION_COOKIE_SAMESITE = 'Lax'
+    SESSION_COOKIE_SAMESITE = "Lax"
     X_FRAME_OPTIONS = "DENY"
 
-    CORS_ALLOWED_ORIGINS += [ bucket ]
+    CORS_ALLOWED_ORIGINS += [bucket]
 
 ADMIN_URL = "admin/"
 

@@ -21,7 +21,6 @@ services:
     depends_on:
       - db
     environment:
-      - "ALLOWED_HOSTS=*"
       - "DATABASE_URL=postgres://postgres@db/postgres"
       - "DJANGO_DEBUG=true"
       - "SAM_API_KEY=${SAM_API_KEY}"

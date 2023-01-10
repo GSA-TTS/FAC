@@ -36,6 +36,11 @@ jobs:
     runs-on: ubuntu-latest
     env:
       ENV: TESTING
+      SAM_API_KEY: ${{ secrets.SAM_API_KEY }}"
+      DJANGO_BASE_URL: 'http://localhost:8000'
+      DJANGO_SECRET_LOGIN_KEY: ${{ secrets.DJANGO_SECRET_LOGIN_KEY }}"
+      SECRET_KEY: ${{ secrets.SECRET_KEY }}
+      ALLOWED_HOSTS: '0.0.0.0 127.0.0.1 localhost'
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v1
