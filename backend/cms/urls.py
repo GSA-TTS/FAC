@@ -4,7 +4,7 @@ from . import views
 
 urlpatterns = [
     # home page
-    path("", views.home.as_view(), name="posts"),
+    path("", views.Home.as_view(), name="Home"),
     # route for posts
-    path("<slug:slug>/", views.postdetail.as_view(), name="post_detail"),
+    # path("<slug:slug>/", views.postdetail.as_view(), name="post_detail"),
 ]
