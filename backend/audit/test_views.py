@@ -44,9 +44,6 @@ class MySubmissionsViewTests(TestCase):
     def test_no_submissions_returns_empty_list(self):
         data = MySubmissions.fetch_my_subnissions(self.user)
         assert len(data) == 0
-        # response = self.client.get(SUBMISSIONS_PATH)
-        # data = response.json()
-        # self.assertEqual(data, [])
 
     def test_user_with_submissions_should_return_expected_data_columns(self):
         self.user.profile.entry_form_data = (
@@ -59,13 +56,12 @@ class MySubmissionsViewTests(TestCase):
         data = MySubmissions.fetch_my_subnissions(self.user)
         assert len(data) > 0
 
-        # response = self.client.get(SUBMISSIONS_PATH)
         keys = data[0].keys()
-        assert 'report_id' in keys
-        assert 'submission_status' in keys
-        assert 'auditee_uei' in keys
-        assert 'auditee_name' in keys
-        assert 'fiscal_year_end_date' in keys
+        assert "report_id" in keys
+        assert "submission_status" in keys
+        assert "auditee_uei" in keys
+        assert "auditee_name" in keys
+        assert "fiscal_year_end_date" in keys
 
     def test_user_with_no_submissions_should_return_no_data(self):
         self.user.profile.entry_form_data = (
