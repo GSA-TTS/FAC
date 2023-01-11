@@ -226,12 +226,13 @@ else:
         "https://www.googletagmanager.com/",
     )
     CSP_DEFAULT_SRC = allowed_sources
+    CSP_DATA_SRC = allowed_sources
     CSP_SCRIPT_SRC = allowed_sources
     CSP_CONNECT_SRC = allowed_sources
     CSP_IMG_SRC = allowed_sources
     CSP_MEDIA_SRC = allowed_sources
     CSP_FRAME_SRC = allowed_sources
-    CSP_FONT_SRC = allowed_sources
+    CSP_FONT_SRC = ("self", bucket)
     CSP_WORKER_SRC = allowed_sources
     CSP_FRAME_ANCESTORS = allowed_sources
     CSP_STYLE_SRC = allowed_sources
@@ -243,15 +244,8 @@ else:
     SESSION_COOKIE_SAMESITE = "Lax"
     X_FRAME_OPTIONS = "DENY"
 
-    CORS_ALLOWED_ORIGINS += [bucket]
-    CORS_ALLOW_METHODS = [
-        "DELETE",
-        "GET",
-        "OPTIONS",
-        "PATCH",
-        "POST",
-        "PUT",
-    ]
+    CORS_ALLOWED_ORIGINS = [bucket, env.str("DJANGO_BASE_URL")]
+    CORS_ALLOW_METHODS = ["GET", "OPTIONS"]
 
 ADMIN_URL = "admin/"
 

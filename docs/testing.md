@@ -86,3 +86,5 @@ Run this locally via docker:
 ```
  docker-compose run web bandit -r crt_portal/
 ```
+
+Bandit tests are executed as part of our CI/CD pipeline on each PR to the `main` branch, commit to the `main` branch, and PR into the `prod` branch.
