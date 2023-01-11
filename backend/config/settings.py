@@ -244,6 +244,14 @@ else:
     X_FRAME_OPTIONS = "DENY"
 
     CORS_ALLOWED_ORIGINS += [bucket]
+    CORS_ALLOW_METHODS = [
+        "DELETE",
+        "GET",
+        "OPTIONS",
+        "PATCH",
+        "POST",
+        "PUT",
+    ]
 
 ADMIN_URL = "admin/"
 

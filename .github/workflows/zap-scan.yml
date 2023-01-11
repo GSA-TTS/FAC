@@ -16,9 +16,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-        with:
-          ref: main
       - name: ZAP Scan
         uses: zaproxy/action-baseline@v0.7.0
         with:
           target: ${{ env.url }}
+          rules_file_name: 'zap.conf'
