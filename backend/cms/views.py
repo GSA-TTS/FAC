@@ -2,10 +2,10 @@ from .models import Posts
 from django.views import generic
 from django.shortcuts import render, redirect
 from django.urls import reverse
+from django.http import HttpResponse
+
 
 # class based views for posts
-
-
 class Home(generic.View):
     def get(self, request, *args, **kwargs):
         if request.user.is_authenticated:
@@ -22,3 +22,9 @@ class postdetail(generic.DetailView):
 
     model = Posts
     template_name = "post.html"
+
+
+# robots.txt
+def NoRobots(context):
+    content = "User-agent: *\nDisallow: /"
+    return HttpResponse(content, content_type="text/plain")
