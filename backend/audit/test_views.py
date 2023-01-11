@@ -43,7 +43,7 @@ class MySubmissionsViewTests(TestCase):
 
     def test_no_submissions_returns_empty_list(self):
         data = MySubmissions.fetch_my_subnissions(self.user)
-        assert len(data) == 0
+        self.assertEquals(len(data), 0)
 
     def test_user_with_submissions_should_return_expected_data_columns(self):
         self.user.profile.entry_form_data = (
@@ -54,14 +54,14 @@ class MySubmissionsViewTests(TestCase):
             ACCESS_AND_SUBMISSION_PATH, VALID_ACCESS_AND_SUBMISSION_DATA, format="json"
         )
         data = MySubmissions.fetch_my_subnissions(self.user)
-        assert len(data) > 0
+        self.assertGreater(len(data), 0)
 
         keys = data[0].keys()
-        assert "report_id" in keys
-        assert "submission_status" in keys
-        assert "auditee_uei" in keys
-        assert "auditee_name" in keys
-        assert "fiscal_year_end_date" in keys
+        self.assertTrue("report_id" in keys)
+        self.assertTrue("submission_status" in keys)
+        self.assertTrue("auditee_uei" in keys)
+        self.assertTrue("auditee_name" in keys)
+        self.assertTrue("fiscal_year_end_date" in keys)
 
     def test_user_with_no_submissions_should_return_no_data(self):
         self.user.profile.entry_form_data = (
@@ -72,4 +72,4 @@ class MySubmissionsViewTests(TestCase):
             ACCESS_AND_SUBMISSION_PATH, VALID_ACCESS_AND_SUBMISSION_DATA, format="json"
         )
         data = MySubmissions.fetch_my_subnissions(self.user2)
-        assert len(data) == 0
+        self.assertEquals(len(data), 0)
