@@ -73,10 +73,10 @@ To run locally, pull the container:
 ```
 docker pull owasp/zap2docker-stable
 ```
-Then you can run the scan. Here is an example running a basic scan against our dev instance.
+Then you can run the scan. Here is an example running a basic scan against our dev instance. This is being run from the top level folder.
 ```
 docker run -v $(pwd):/zap/wrk/:rw -t owasp/zap2docker-stable zap-baseline.py \
--t https://fac-dev.app.cloud.gov/
+-t https://fac-dev.app.cloud.gov/ -c zap.conf
 ```
 
 #### Bandit

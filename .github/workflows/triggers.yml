@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - prod
+      - ly/owasp#712
     tags:
       - v1.*
   pull_request:
