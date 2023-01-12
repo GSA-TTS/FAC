@@ -11,8 +11,8 @@ import api.views
 from api.views import EligibilityFormView
 
 
-def parse_body_data(self, request):
-    body_unicode = request.body.decode('utf-8')
+def parse_body_data(request_data):
+    body_unicode = request_data.body.decode('utf-8')
     body_data = json.loads(body_unicode)
     return body_data
 
@@ -47,24 +47,26 @@ class EligibilityFormView(LoginRequiredMixin, View):
     # render eligibility form
 
     # gather/save step 1 info, redirect to step 2
-    def post(self, request):
-        body_data = parse_body_data(request)
-        print(body_data)
+    def post(self, post_request):
+        body_data = parse_body_data(request_data=post_request)
+        print("body_data", body_data)
+        print("user", post_request.user)
+        # print()
 
-        # print("Is USA?", request.body["is_usa_based"])
-        # try:
+        try:
 
-        # data = dict(request.body.lists())
+            # data = dict(request.body.lists())
 
-        # response_data = {
-        #     "data": api.views.eligibility_check(request.user, data),
-        #     "user": request.user
-        # }
+            response_data = {
+                "data": api.views.eligibility_check(post_request.user, body_data),
+                "user": post_request.user
+            }
 
         # return render(request, "step-2.html", response_data)
-        return redirect(reverse("auditeeinfo"))
-        # except:
-        #     print("Error processing data")
+            return redirect(reverse("auditeeinfo"))
+        except:
+            print("Error processing data")
+            return redirect(reverse("eligibility"))
 
 
 # Step 2
