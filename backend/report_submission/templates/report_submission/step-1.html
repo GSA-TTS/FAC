@@ -5,6 +5,7 @@
 <div class="grid-container">
 
   <form class="usa-form usa-form--large" id="check-eligibility">
+    {% csrf_token %}
     <fieldset class="usa-fieldset">
       <legend class="usa-legend usa-legend--large">Does your entity meet the single audit criteria?</legend>
       <p>
