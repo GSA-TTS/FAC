@@ -64,8 +64,8 @@ class EligibilityFormView(LoginRequiredMixin, View):
 
         # return render(request, "step-2.html", response_data)
             return redirect(reverse("auditeeinfo"))
-        except:
-            print("Error processing data")
+        except Exception as ex:
+            print("Error processing data: ", ex)
             return redirect(reverse("eligibility"))
 
 
