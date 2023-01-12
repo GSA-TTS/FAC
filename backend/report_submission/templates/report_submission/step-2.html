@@ -5,6 +5,7 @@
 <div class="grid-container auditee-information">
   <div class="grid-row">
     <form class="usa-form usa-form--large tablet:grid-col" id="check-eligibility" data-fy-end-date="">
+      {% csrf_token %}
       <fieldset class="usa-fieldset">
         <legend class="usa-legend usa-legend--large">Auditee information</legend>
         <p>

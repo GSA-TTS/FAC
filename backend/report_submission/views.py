@@ -11,6 +11,12 @@ import api.views
 from api.views import EligibilityFormView
 
 
+def parse_body_data(self, request):
+    body_unicode = request.body.decode('utf-8')
+    body_data = json.loads(body_unicode)
+    return body_data
+
+
 # class based views for ...
 # class Step(View):
 #     def get(self, request):
@@ -27,7 +33,7 @@ from api.views import EligibilityFormView
 
 class ReportSubmissionRedirectView(View):
     def get(self, request):
-        print(request.GET)
+        print(request.body)
         return redirect(reverse("eligibility"))
 
 
@@ -35,26 +41,27 @@ class ReportSubmissionRedirectView(View):
 class EligibilityFormView(LoginRequiredMixin, View):
 
     def get(self, request):
-        print(request.GET)
+        print(request.body)
         return render(request, "report_submission/step-1.html")
 
     # render eligibility form
 
     # gather/save step 1 info, redirect to step 2
     def post(self, request):
-        print("It's a POST!!!!!!!!!!!!!")
-        print(json.dumps(request.POST))
-        print("Is USA?", request.POST["is_usa_based"])
+        body_data = parse_body_data(request)
+        print(body_data)
+
+        # print("Is USA?", request.body["is_usa_based"])
         # try:
 
-            # data = dict(request.POST.lists())
+        # data = dict(request.body.lists())
 
-            # response_data = {
-            #     "data": api.views.eligibility_check(request.user, data),
-            #     "user": request.user
-            # }
+        # response_data = {
+        #     "data": api.views.eligibility_check(request.user, data),
+        #     "user": request.user
+        # }
 
-            # return render(request, "step-2.html", response_data)
+        # return render(request, "step-2.html", response_data)
         return redirect(reverse("auditeeinfo"))
         # except:
         #     print("Error processing data")
@@ -63,26 +70,26 @@ class EligibilityFormView(LoginRequiredMixin, View):
 # Step 2
 class AuditeeInfoFormView(LoginRequiredMixin, View):
     def get(self, request):
-        print(request.GET)
+        print(request.body)
         return render(request, "report_submission/step-2.html")
 
     # render auditee info form
 
     # gather/save step 2 info, redirect to step 3
     def post(self, request):
-        print(request.POST)
+        print(request.body)
         return redirect(reverse("accessandsubmissioninfo"))
 
 
 # Step 3
 class AccessAndSubmissionFormView(LoginRequiredMixin, View):
     def get(self, request):
-        print(request.GET)
+        print(request.body)
         return render(request, "report_submission/step-3.html")
 
     # render access-submission form
 
     # gather/save step 3 info, redirect to step ...4?
     def post(self, request):
-        print(request.POST)
+        print(request.body)
         redirect(reverse("report_submission"))

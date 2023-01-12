@@ -5,6 +5,7 @@
 <div class="grid-container audit-submission-access">
   <div class="grid-row">
     <form class="usa-form usa-form--large" id="grant-access">
+      {% csrf_token %}
       <fieldset class="usa-fieldset">
         <legend class="usa-legend usa-legend--large">Who will need access to this audit?</legend>
         <div class="usa-summary-box" role="region"

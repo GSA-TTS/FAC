@@ -234,6 +234,7 @@ function validateUEID() {
   //const apiUrl = 'https://fac-dev.app.cloud.gov';
   const headers = new Headers();
   headers.append('Content-type', 'application/json');
+  headers.append('X-CSRFToken', csrftoken)
   fetch('/api/sac/ueivalidation', {
     method: 'POST',
     headers: headers,
