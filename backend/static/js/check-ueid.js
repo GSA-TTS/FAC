@@ -1,7 +1,10 @@
 import { checkValidity } from './validate.js';
+import { queryAPI } from "./api";
 
-const URL = './report_submission/auditeeinfo/';
-const nextStep = './report_submission/accessandsubmission';
+const SUPPRESS_ERROR_FOR_TEST = true; // REMOVE after submission error fixed.
+
+const SUBMISSION_URL = '/report_submission/auditeeinfo/';
+const NEXT_URL = '../accessandsubmission';
 const FORM = document.forms[0];
 
 function submitForm() {
@@ -13,29 +16,31 @@ function submitForm() {
     formData.auditee_fiscal_period_end
   ).toLocaleDateString('en-CA');
 
-/*
   queryAPI(
-    ENDPOINT,
+    SUBMISSION_URL,
     formData,
     {
       method: 'POST',
     },
     [handleAuditeeResponse, handleErrorResponse]
   );
-*/
 }
 
 function handleAuditeeResponse(data) {
   console.log(data);
   if (data.next == '/sac/accessandsubmission') {
-    const nextUrl = '../step-3/';
-    window.location.href = nextUrl;
+    window.location.href = NEXT_URL;
   } else {
     console.log(data.errors);
   }
 }
-function handleErrorResponse() {
-  console.log('ERROR: Form submission error.');
+function handleErrorResponse(e) {
+  console.log('ERROR: Form submission error. ' + e);
+    // REMOVE below after reposnse error is fixed.
+    if (SUPPRESS_ERROR_FOR_TEST) {
+      window.location.href = NEXT_URL;
+    }
+    // END REMOVE
 }
 
 function handleUEIDResponse({ valid, response, errors }) {
@@ -231,6 +236,7 @@ function validateUEID() {
   resetModal();
 
   const auditee_uei = document.getElementById('auditee_uei').value;
+<<<<<<< Updated upstream
   //const apiUrl = 'https://fac-dev.app.cloud.gov';
   const headers = new Headers();
   headers.append('Content-type', 'application/json');
@@ -244,15 +250,17 @@ function validateUEID() {
     .then((data) => handleUEIDResponse(data))
     .catch((e) => handleApiError(e));
 /*
+=======
+
+>>>>>>> Stashed changes
   queryAPI(
-    '/sac/ueivalidation',
+    '/api/sac/ueivalidation',
     { auditee_uei },
     {
       method: 'POST',
     },
     [handleUEIDResponse, handleApiError]
   );
-*/
 }
 
 function validateFyStartDate(fyInput) {

@@ -1,5 +1,5 @@
 {% extends "report_submission/step-base.html" %}
-
+{% load static %}
 {% block step-content %}
 
 <div class="grid-container audit-submission-access">
@@ -446,7 +446,6 @@
         </ul>
     </form>
   </div>
-  <script>const authToken = "aGV5bWF0dDpmYWNzYWMyMDIy"</script>
-  <script src="/assets/js/check-access.js"></script>
+  <script src="{% static 'compiled/js/check-access.js' %}" type="text/javascript"></script>
 </div>
 {% endblock %}
