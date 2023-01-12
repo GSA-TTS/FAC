@@ -27,6 +27,7 @@ from api.views import EligibilityFormView
 
 class ReportSubmissionRedirectView(View):
     def get(self, request):
+        print(request.GET)
         return redirect(reverse("eligibility"))
 
 
@@ -34,12 +35,16 @@ class ReportSubmissionRedirectView(View):
 class EligibilityFormView(LoginRequiredMixin, View):
 
     def get(self, request):
+        print(request.GET)
         return render(request, "report_submission/step-1.html")
 
     # render eligibility form
 
     # gather/save step 1 info, redirect to step 2
     def post(self, request):
+        print("It's a POST!!!!!!!!!!!!!")
+        print(json.dumps(request.POST))
+        print("Is USA?", request.POST["is_usa_based"])
         # try:
 
             # data = dict(request.POST.lists())
@@ -58,22 +63,26 @@ class EligibilityFormView(LoginRequiredMixin, View):
 # Step 2
 class AuditeeInfoFormView(LoginRequiredMixin, View):
     def get(self, request):
+        print(request.GET)
         return render(request, "report_submission/step-2.html")
 
     # render auditee info form
 
     # gather/save step 2 info, redirect to step 3
     def post(self, request):
+        print(request.POST)
         return redirect(reverse("accessandsubmissioninfo"))
 
 
 # Step 3
 class AccessAndSubmissionFormView(LoginRequiredMixin, View):
     def get(self, request):
+        print(request.GET)
         return render(request, "report_submission/step-3.html")
 
     # render access-submission form
 
     # gather/save step 3 info, redirect to step ...4?
     def post(self, request):
+        print(request.POST)
         redirect(reverse("report_submission"))
