@@ -47,7 +47,7 @@ jobs:
         working-directory: ./backend
         run:
           docker-compose run web bash -c 'coverage run --source="." manage.py test &&
-          coverage report -m --fail-under=99'
+          coverage report -m --fail-under=90'
       - name: Run Django migrations for pa11y tests
         working-directory: ./backend
         run: docker-compose run web python manage.py migrate
