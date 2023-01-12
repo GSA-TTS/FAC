@@ -16,6 +16,7 @@ services:
       dockerfile: ./Dockerfile
     command: >
       bash -c "python manage.py migrate
+      & npm run dev
       & python manage.py runserver 0.0.0.0:8000"
     depends_on:
       - db
