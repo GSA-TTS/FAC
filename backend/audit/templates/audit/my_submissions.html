@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+
+{% block content%}
+<section class="usa-hero" aria-label="Introduction">
+    <div class="grid-container">
+        <h1 class="usa-hero__heading">My audit submissions</h1>
+        <p class="intro-text">My unpublished sybmissions list</p>
+        {% if data.len == 0 %}
+        <p>
+            No submissions found
+        </p>
+        {% else %}
+        <div class="usa-table-container--scrollable" tabindex="0">
+
+            <table class="usa-table">
+                <caption>Table Contents</caption>
+                <thead>
+
+                    <tr>
+                        <th data-sortable scope="col" role="columnheader">Report ID</th>
+                        <th data-sortable scope="col" role="columnheader">Status</th>
+                        <th data-sortable scope="col" role="columnheader">Auditee UEI</th>
+                        <th data-sortable scope="col" role="columnheader">Auditee Name</th>
+                        <th data-sortable scope="col" role="columnheader">Fiscal year end date</th>
+                    </tr>
+                </thead>
+                <tbody> {% for item in data %}
+                    <tr>
+                        <td><a href="{% url next_page %}?report_id={{item.report_id}}">{{item.report_id}}</a></td>
+                        <td>{{ item.submission_status }}</td>
+                        <td>{{ item.auditee_uei }}</td>
+                        <td>{{ item.auditee_name }}</td>
+                        <td>{{ item.fiscal_year_end_date }}</td>
+
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% endif %}
+        </div>
+        <div>
+            <h1 class="usa-hero__heading">Start a new submission</h1>
+            <p class="intro-text">Before you start a new submission, double check to make sure that you already don't
+                have one
+                in progress</p>
+            <div class="usa-checkbox">
+                <input class="usa-checkbox__input" id="check-agree" type="checkbox" onchange="
+                    document.getElementById('button-next').disabled = !this.checked;
+                " />
+                <label class="usa-checkbox__label" for="check-agree">I agree to the above terms and consitions</label>
+            </div>
+            <p></p>
+
+            <div>
+                <button type="button" disabled class="usa-button" id="button-next" onclick="
+                        window.location.href=' {% url next_page%}'
+                    ">
+                    Start a new submission </button>
+            </div>
+
+
+        </div>
+</section>
+
+
+{% endblock content%}

@@ -1,26 +1,63 @@
-{% load static %}
 <!DOCTYPE html>
+{% load static %}
+
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="stylesheet" href="{% static 'compiled/scss/main-post.css' %}" media="all" type="text/css">
-        {% block metatags %}{% endblock %}
-    </head>
 
-    <body >
-        {% include 'includes/header.html' %}
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'compiled/scss/main-post.css' %}" media="all" type="text/css">
+    {% block metatags %}
+    <title>{{ post.title }}</title>
+    <meta name="description" content="{{ post.meta_description }}">
+    <meta property="og:title" content="{{ post.title }}">
+    <meta property="og:site_name" content="Federal Audit Clearinghouse">
+    <meta property="og:description" content="{{ post.meta_description }}">
+    <meta property="og:type" content="website">
+    {% endblock %}
+</head>
 
-        <a class="usa-skipnav" href="#main-content">Skip to main content</a>
+<body>
+    {% include 'includes/header.html' %}
 
-        <main id="main-content">
-            {% block content %}{% endblock %}
-        </main>
+    <a class="usa-skipnav" href="#main-content">Skip to main content</a>
 
-        {% include 'includes/footer.html' %}
+    <main id="main-content">
+        {% block content %}{% endblock %}
+        <div class="usa-modal usa-modal--lg" id="legacy-fac-modal" aria-labelledby="legacy-fac-modal-heading"
+            aria-describedby="legacy-fac-modal-description" data-force-action>
+            <div class="usa-modal__content">
+                <div class="usa-modal__main">
+                    <h2 class="usa-modal__heading" id="legacy-fac-modal-heading">You are leaving the fac.gov website
+                    </h2>
+                    <div class="usa-prose">
+                        <p id="legacy-fac-modal-description">Search pre-2022 audit records on the U.S. Census Bureau FAC
+                            site.
+                            We’re working on moving all audit records to fac.gov. </p>
+                    </div>
+                    <div class="usa-modal__footer">
+                        <ul class="usa-button-group">
+                            <li class="usa-button-group__item">
+                                <a type="button" class="usa-button" data-close-modal
+                                    href="https://facides.census.gov/Account/Login.aspx">
+                                    Continue to the U.S. Census Bureau FAC site
+                                </a>
+                            </li>
+                            <li class="usa-button-group__item">
+                                <button type="button" class="usa-button usa-button--unstyled padding-105 text-center"
+                                    data-close-modal>Cancel</button>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
 
-        <script src="{% static 'compiled/js/app.js' %}" type="text/javascript"></script>
-    </body>
+    {% include 'includes/footer.html' %}
+
+    <script src="{% static 'compiled/js/app.js' %}" type="text/javascript"></script>
+</body>
+
 </html>
-

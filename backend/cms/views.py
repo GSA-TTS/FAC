@@ -1,12 +1,19 @@
 from .models import Posts
 from django.views import generic
-
+from django.shortcuts import render, redirect
+from django.urls import reverse
 
 # class based views for posts
-class home(generic.TemplateView):
-    """Basic class for home."""
 
-    template_name = "home.html"
+
+class Home(generic.View):
+    def get(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            url = reverse("MySubmissions")
+            return redirect(url)
+        template_name = "home.html"
+        extra_context = {}
+        return render(request, template_name, extra_context)
 
 
 # class based view for each post
