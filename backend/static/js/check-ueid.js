@@ -1,7 +1,7 @@
 import { checkValidity } from './validate.js';
 import { queryAPI } from "./api";
 
-const SUPPRESS_ERROR_FOR_TEST = true; // REMOVE after submission error fixed.
+// const SUPPRESS_ERROR_FOR_TEST = true; // REMOVE after submission error fixed.
 
 const SUBMISSION_URL = '/report_submission/auditeeinfo/';
 const NEXT_URL = '../accessandsubmission';
@@ -236,8 +236,6 @@ function validateUEID() {
   resetModal();
 
   const auditee_uei = document.getElementById('auditee_uei').value;
-<<<<<<< Updated upstream
-  //const apiUrl = 'https://fac-dev.app.cloud.gov';
   const headers = new Headers();
   headers.append('Content-type', 'application/json');
   headers.append('X-CSRFToken', csrftoken)
@@ -249,18 +247,15 @@ function validateUEID() {
     .then((resp) => resp.json())
     .then((data) => handleUEIDResponse(data))
     .catch((e) => handleApiError(e));
-/*
-=======
 
->>>>>>> Stashed changes
-  queryAPI(
-    '/api/sac/ueivalidation',
-    { auditee_uei },
-    {
-      method: 'POST',
-    },
-    [handleUEIDResponse, handleApiError]
-  );
+  // queryAPI(
+  //   '/api/sac/ueivalidation',
+  //   { auditee_uei },
+  //   {
+  //     method: 'POST',
+  //   },
+  //   [handleUEIDResponse, handleApiError]
+  // );
 }
 
 function validateFyStartDate(fyInput) {
