@@ -1,5 +1,7 @@
 /*
 I am creating tables Rick suggested and then making models out of them. I think I will then delete the original tables. I will use the models to generate the tables and then we can have them as managed tables by Django going forward.
+
+I added "data_distro_" so when I use django inspect I can grab all the related models in a way that is easy to identify.
 */
 
 /*
@@ -136,6 +138,33 @@ CREATE TABLE data_distro_pdf_metadata
 );
 
 /*
+    This table represents refactored version of ELECAUDITS
+
+    Captext for FINDINGREFNUMS?
+    CFDA Clustername, Findings, Pass through total and amount form
+*/
+
+CREATE TABLE data_distro_awards
+(
+    id SERIAL NOT NULL PRIMARY KEY,
+    auditid BIGINT NOT NULL,
+    cfda text NOT NULL,
+    award_identification text null,
+    loan_balance text null,
+    federal_program_name text not null,
+    amount money not null,
+    clustername text null,
+    stateclustername text null,
+    progam_total MONEY null,
+    cluster_total MONEY null,
+    passthrough_award text null,
+    passthrough_amount MONEY null,
+    findingrefnums text null,
+    findings_count smallint,
+    CONSTRAINT fk_audits_awards FOREIGN KEY (auditid) REFERENCES data_distro_audits(auditid)
+);
+
+/*
     This table represents refactored version of ELECPASSTHROUGHS
 */
 
@@ -171,11 +200,11 @@ CREATE TABLE data_distro_notes
     content text not null,
     note_index smallint not null default 1,
     title text not null,
-    CONSTRAINT fk_notes_audits FOREIGN KEY (auditid) REFERENCES audits(auditid),
-    CONSTRAINT fk_notes_type FOREIGN KEY (typeid) REFERENCES notes_type(id)
+    CONSTRAINT fk_notes_audits FOREIGN KEY (auditid) REFERENCES data_distro_audits(auditid),
+    CONSTRAINT fk_notes_type FOREIGN KEY (typeid) REFERENCES data_distro_notes_type(id)
 );
 
-
+-- Did not load this for now
 INSERT INTO notes_type(NAME) VALUES ('ACOUNTING STANDARDS');
 INSERT INTO notes_type(NAME) VALUES ('10% RULE');
 INSERT INTO notes_type(NAME) VALUES ('ADDITIONAL');
@@ -192,27 +221,9 @@ CREATE TABLE data_distro_findings_text
     charts_tables boolean default false,
     text_value text,
     finding_ref_numbers text,
-    CONSTRAINT fk_findtxt_audits FOREIGN KEY (auditid) REFERENCES audits(auditid)
-)
-
-
-/*
-    New table to normalize entity types
-
-    INSERT INTO entity_types(identifier, name) VALUES (0,'State-Wide');
-    INSERT INTO entity_types(identifier, name) VALUES (1,'State-Dependent Airport Authority');
-    INSERT INTO entity_types(identifier, name) VALUES (2,'State-Dependent Hospital');
-    INSERT INTO entity_types(identifier, name) VALUES (3,'State-Dependent Housing Authority');
-    ...
-
-*/
-
-CREATE TABLE data_distro_entity_types
-(
-    id SERIAL NOT NULL PRIMARY KEY,
-    identifier SMALLINT NOT NULL,
-    name text NOT NULL
+    CONSTRAINT fk_findtxt_audits FOREIGN KEY (auditid) REFERENCES data_distro_audits(auditid)
 );
+
 
 /*
     This table represents refactored version of ELECDUNS
@@ -236,35 +247,9 @@ CREATE TABLE cdata_distro_ap_text
     text_value text,
     finding_ref_numbers text,
     CONSTRAINT fk_captxt_audits FOREIGN KEY (auditid) REFERENCES data_distro_audits(auditid)
-)
-
-/*
-    This table represents refactored version of ELECAUDITS
-
-    Captext for FINDINGREFNUMS?
-    CFDA Clustername, Findings, Pass through total and amount form
-*/
-
-
-CREATE TABLE data_distro_awards
-(
-    id SERIAL NOT NULL PRIMARY KEY,
-    auditid BIGINT NOT NULL,
-    cfda text NOT NULL,
-    award_identification text null,
-    loan_balance text null,
-    federal_program_name text not null,
-    amount money not null,
-    clustername text null,
-    stateclustername text null,
-    progam_total MONEY null,
-    cluster_total MONEY null,
-    passthrough_award text null,
-    passthrough_amount MONEY null,
-    findingrefnums text null,
-    findings_count smallint,
-    CONSTRAINT fk_audits_awards FOREIGN KEY (auditid) REFERENCES data_distro_audits(auditid)
 );
+
+
 
 /*
     This table represents indicator fields extracted from the ELECAUDITS TABLE to further
@@ -289,26 +274,6 @@ CREATE TABLE data_distro_award_indicators
     CONSTRAINT fk_indicators_award FOREIGN KEY (awardid) REFERENCES data_distro_awards(id)
 );
 
-/*
-    This table represents indicator fields extracted from the ELECAUDITS TABLE to further
-    normalize the indicator structure for awards
-    Booleans not defaulted to null due to "not answered" indication
-*/
-
-CREATE TABLE data_distro_award_indicators
-(
-    id SERIAL NOT NULL PRIMARY KEY,
-    awardid BIGINT NOT NULL,
-    rd boolean null,
-    loans boolean null,
-    direct boolean null,
-    arra boolean null,
-    major_program boolean null,
-    findings text,
-    typereport_major_program text null,
-    type_requirement text null,
-    CONSTRAINT fk_indicators_award FOREIGN KEY (awardid) REFERENCES data_distro_awards(id)
-);
 
 /*
     This table represents refactored version of ELECAUDITFINDINGS
@@ -335,6 +300,15 @@ CREATE TABLE data_distro_award_findings
     CONSTRAINT fk_award_findings FOREIGN KEY (awardid) REFERENCES data_distro_awards(id)
 );
 
+/*
+    This table represents refactored version of ELECEINS
+*/
+
+CREATE TABLE data_distro_eins
+(
+    id SERIAL NOT NULL PRIMARY KEY,
+    ein text NOT NULL
+);
 
 
 /*
@@ -452,7 +426,7 @@ CREATE TABLE data_distro_audit_revisions
     other text,
     other_explain text,
     CONSTRAINT fk_revisions_audits FOREIGN KEY (auditid) REFERENCES data_distro_audits(auditid)
-)
+);
 
 
 
@@ -509,4 +483,4 @@ CREATE TABLE data_distro_audit_components
     gasreport_internal_control text,
     report_on_compliance text,
     CONSTRAINT fk_compp_audits FOREIGN KEY (auditid) REFERENCES data_distro_audits(auditid)
-)
+);
