@@ -41,6 +41,11 @@ function handleEligibilityResponse(data) {
   }
 }
 
+function handleErrorResponse(e) {
+  console.error(e);
+  console.log('ERROR: Form submission error.');
+}
+
 function serializeFormData(formData) {
   return Object.fromEntries(formData);
 }
@@ -55,13 +60,13 @@ function isValidEntity({name, id}) {
   return !INVALID_ENTITY_TYPES[name].includes(id);
 }
 
-// function stringToBoolean(value) {
-//   if (value && typeof value === "string") {
-//     if (value.toLowerCase() === "true") return true;
-//     if (value.toLowerCase() === "false") return false;
-//   }
-//   return value;
-// }
+function stringToBoolean(value) {
+  if (value && typeof value === "string") {
+    if (value.toLowerCase() === "true") return true;
+    if (value.toLowerCase() === "false") return false;
+  }
+  return value;
+}
 
 function setFormDisabled(shouldDisable) {
   const continueBtn = document.getElementById("continue");
