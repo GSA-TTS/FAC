@@ -1,8 +1,12 @@
 # data distro naming can go away
 
+verbose_name
+
 class DataDistroAgencies(models.Model):
     auditid = models.ForeignKey('DataDistroAudits', models.DO_NOTHING, db_column='auditid')
-    agency_cfda = models.TextField(blank=True, null=True)
+    # may want to update this to be a SmallIntegerField
+    # agencies, AGENCYCFDA
+    agency_cfda = models.TextField('2-digit prefix of Federal Agency requiring copy of audit report', blank=True, null=True)
     prior_agency = models.TextField(blank=True, null=True)
     prior_finding = models.BooleanField(blank=True, null=True)
     current_finding = models.BooleanField(blank=True, null=True)
@@ -11,8 +15,10 @@ class DataDistroAgencies(models.Model):
         managed = False
         db_table = 'data_distro_agencies'
 
-
+?
+# would it be simpler to move this to the audit
 class DataDistroAuditAuditors(models.Model):
+    # general, DBKEY?
     auditid = models.ForeignKey('DataDistroAudits', models.DO_NOTHING, db_column='auditid')
     auditorid = models.ForeignKey('DataDistroAuditors', models.DO_NOTHING, db_column='auditorid')
     is_primary = models.BooleanField()
