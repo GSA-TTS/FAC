@@ -1,7 +1,8 @@
 import { checkValidity } from './validate.js';
 import { queryAPI } from "./api";
+import { getCookie } from "./csrft";
 
-// const SUPPRESS_ERROR_FOR_TEST = true; // REMOVE after submission error fixed.
+const csrftoken = getCookie('csrftoken');
 
 const SUBMISSION_URL = '/report_submission/auditeeinfo/';
 const NEXT_URL = '../accessandsubmission';
@@ -36,11 +37,7 @@ function handleAuditeeResponse(data) {
 }
 function handleErrorResponse(e) {
   console.log('ERROR: Form submission error. ' + e);
-    // REMOVE below after reposnse error is fixed.
-    if (SUPPRESS_ERROR_FOR_TEST) {
-      window.location.href = NEXT_URL;
-    }
-    // END REMOVE
+  window.location.href = NEXT_URL;
 }
 
 function handleUEIDResponse({ valid, response, errors }) {
