@@ -9,7 +9,7 @@ from .views import MySubmissions
 
 User = get_user_model()
 
-SUBMISSIONS_PATH = reverse("MySubmissions")
+SUBMISSIONS_PATH = reverse("audit:MySubmissions")
 ACCESS_AND_SUBMISSION_PATH = reverse("accessandsubmission")
 
 VALID_ELIGIBILITY_DATA = {
@@ -37,15 +37,23 @@ class MySubmissionsViewTests(TestCase):
     def setUp(self):
         self.user = baker.make(User)
         self.user2 = baker.make(User)
-
         self.client = Client()
-        self.client.force_login(user=self.user)
+
+    def test_redirect_if_not_logged_in(self):
+        result = self.client.get(SUBMISSIONS_PATH)
+        self.assertAlmostEquals(result.status_code, 302)
 
     def test_no_submissions_returns_empty_list(self):
+        self.client.force_login(user=self.user)
+
         data = MySubmissions.fetch_my_subnissions(self.user)
         self.assertEquals(len(data), 0)
+        result = self.client.get(SUBMISSIONS_PATH)
+        self.assertAlmostEquals(result.status_code, 200)
 
     def test_user_with_submissions_should_return_expected_data_columns(self):
+        self.client.force_login(user=self.user)
+
         self.user.profile.entry_form_data = (
             VALID_ELIGIBILITY_DATA | VALID_AUDITEE_INFO_DATA
         )
@@ -63,7 +71,12 @@ class MySubmissionsViewTests(TestCase):
         self.assertTrue("auditee_name" in keys)
         self.assertTrue("fiscal_year_end_date" in keys)
 
+        result = self.client.get(SUBMISSIONS_PATH)
+        self.assertAlmostEquals(result.status_code, 200)
+
     def test_user_with_no_submissions_should_return_no_data(self):
+        self.client.force_login(user=self.user)
+
         self.user.profile.entry_form_data = (
             VALID_ELIGIBILITY_DATA | VALID_AUDITEE_INFO_DATA
         )
@@ -73,3 +86,6 @@ class MySubmissionsViewTests(TestCase):
         )
         data = MySubmissions.fetch_my_subnissions(self.user2)
         self.assertEquals(len(data), 0)
+
+        result = self.client.get(SUBMISSIONS_PATH)
+        self.assertAlmostEquals(result.status_code, 200)

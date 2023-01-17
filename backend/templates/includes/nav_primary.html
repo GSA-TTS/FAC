@@ -65,8 +65,9 @@
         {% if request.user.is_authenticated %}
         <div class="usa-card__container">
             <div>
+                <span>Logged in as {{ request.user.username }} | </span>
                 <a class="usa-button sign-in-button" aria-controls="login-modal" data-open-modal
-                    href="/openid/logout/">Sign off {{ request.user.username }} </a>
+                    href="/openid/logout/">logout </a>
             </div>
         </div>
         {% else %}

@@ -1,20 +1,31 @@
 from django.views import generic
-from django.shortcuts import render, redirect
+from django.shortcuts import render
 from django.db.models import F
-from django.urls import reverse
+from django.contrib.auth.mixins import LoginRequiredMixin
 
-from audit.models import SingleAuditChecklist
+from .models import SingleAuditChecklist
+
+UEI_TOOLTIP = """
+Unique Entity Identifuer (UEI)
+The Unique Entity Identifier (UEI) for an awardee
+or recipent is an alphanumeric code created in
+the System for Award Management (SAM.gov)
+that is used to uniquely identify specific
+commenrcial, nonprofit or business entities
+registered to do business with the federal
+givernment
+"""
 
 
-class MySubmissions(generic.View):
+class MySubmissions(LoginRequiredMixin, generic.View):
+    redirect_field_name = "Home"
+
     def get(self, request, *args, **kwargs):
-        if not request.user.is_authenticated:
-            url = reverse("Home")
-            return redirect(url)
+
         template_name = "audit/my_submissions.html"
-        next_page = "MySubmissions"  # TO DO Replace with ReportSubmissions alias
+        next_page = "audit:MySubmissions"  # TO DO Replace with ReportSubmissions alias
         data = MySubmissions.fetch_my_subnissions(request.user)
-        extra_context = {"data": data, "next_page": next_page}
+        extra_context = {"data": data, "uei_tip": UEI_TOOLTIP, "next_page": next_page}
         return render(request, template_name, extra_context)
 
     @classmethod
