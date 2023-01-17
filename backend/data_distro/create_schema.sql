@@ -239,7 +239,7 @@ CREATE TABLE data_distro_duns
     This table represents refactored version of ELECCAPTEXT
 */
 
-CREATE TABLE cdata_distro_ap_text
+CREATE TABLE data_distro_cap_text
 (
     id SERIAL NOT NULL PRIMARY KEY,
     auditid BIGINT NOT NULL,
