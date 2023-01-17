@@ -2,12 +2,16 @@ const esbuild = require('esbuild');
 const postcss = require('postcss');
 const autoprefixer = require('autoprefixer');
 const fs = require('fs');
+const glob = require('glob');
+const path = require('path');
 const { sassPlugin } = require('esbuild-sass-plugin');
 
 const watch = process.argv.includes('--watch');
 
+const jsPath = glob.sync(path.join('.','static','js','*.js'));
+
 const buildProps = {
-  entryPoints: ['static/js/app.js', 'static/js/check-eligibility.js', 'static/js/check-ueid.js', 'static/js/check-access.js', 'static/scss/main.scss'],
+  entryPoints: [...jsPath, 'static/scss/main.scss'],
   outdir: 'static/compiled',
   minify: process.env.NODE_ENV === "production",
   sourcemap: process.env.NODE_ENV !== "production",
