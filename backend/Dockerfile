@@ -31,12 +31,14 @@ RUN \
     pip install -r /tmp/dev-requirements.txt && \
     rm -rf /root/.cache/
 
-COPY . /src/
-
+COPY package.* /src/
 WORKDIR /src/
 
 RUN npm install
 RUN chown -R 1001:123 "/root/.npm"
+
+COPY . /src/
+
 RUN npm run build && python manage.py collectstatic
 
 # ------------------------------------------------------------
