@@ -177,13 +177,13 @@ if environment == "LOCAL":
     DEBUG = env.bool("DJANGO_DEBUG", default=True)
     STATIC_URL = "/static/"
     # Whitenoise for serving static files
-    STATICFILES_STORAGE = "whitenoise.storage.CompressedStaticFilesStorage"
+    STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
     MIDDLEWARE.append("whitenoise.middleware.WhiteNoiseMiddleware")
 elif environment in ["TESTING", "UNDEFINED"]:
     DEBUG = env.bool("DJANGO_DEBUG", default=False)
     STATIC_URL = "/static/"
     # Whitenoise for serving static files
-    STATICFILES_STORAGE = "whitenoise.storage.CompressedStaticFilesStorage"
+    STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
     MIDDLEWARE.append("whitenoise.middleware.WhiteNoiseMiddleware")
 else:
     STATICFILES_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
