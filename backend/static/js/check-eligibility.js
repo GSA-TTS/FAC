@@ -1,23 +1,9 @@
-const URL = '/report_submission/eligibility/';
-const FORM = document.forms[0];
-
-function getCookie(name) {
-  let cookieValue = null;
-  if (document.cookie && document.cookie !== '') {
-    const cookies = document.cookie.split(';');
-    for (let i = 0; i < cookies.length; i++) {
-      const cookie = cookies[i].trim();
-      // Does this cookie string begin with the name we want?
-      if (cookie.substring(0, name.length + 1) === (name + '=')) {
-        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-        break;
-      }
-    }
-  }
-  return cookieValue;
-}
+import { getCookie } from "./csrft";
 
 const csrftoken = getCookie('csrftoken');
+const SUBMISSION_URL = '/report_submission/eligibility/';
+const NEXT_URL = '../auditeeinfo';
+const FORM = document.forms[0];
 
 function submitForm() {
   const formData = serializeFormData(new FormData(FORM));
@@ -25,7 +11,7 @@ function submitForm() {
       formData.met_spending_threshold
   );
   formData.is_usa_based = stringToBoolean(formData.is_usa_based);
-  fetch(URL, {
+  fetch(SUBMISSION_URL, {
     method: "POST",
     headers: {'X-CSRFToken': csrftoken},
     body: JSON.stringify(formData)
@@ -33,17 +19,13 @@ function submitForm() {
 }
 
 function handleEligibilityResponse(data) {
-  if (data.eligible) {
-    const nextUrl = '../auditeeinfo/';
-    window.location.href = nextUrl;
-  } else {
     console.log(data.errors);
-  }
+    window.location.href = NEXT_URL;
 }
 
 function handleErrorResponse(e) {
-  console.error(e);
-  console.log('ERROR: Form submission error.');
+  console.log('ERROR: Form submission error. ' + e);
+  window.location.href = NEXT_URL;
 }
 
 function serializeFormData(formData) {

@@ -3,7 +3,6 @@ import { queryAPI } from "./api";
 import { getCookie } from "./csrft";
 
 const csrftoken = getCookie('csrftoken');
-
 const SUBMISSION_URL = '/report_submission/auditeeinfo/';
 const NEXT_URL = '../accessandsubmission';
 const FORM = document.forms[0];
