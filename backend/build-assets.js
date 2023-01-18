@@ -11,7 +11,11 @@ const watch = process.argv.includes('--watch');
 const jsPath = glob.sync(path.join('.','static','js','*.js'));
 
 const buildProps = {
+<<<<<<< Updated upstream
   entryPoints: [...jsPath, 'static/scss/main.scss'],
+=======
+  entryPoints: ['static/js/app.js', 'static/js/check-eligibility.js', 'static/js/check-ueid.js', 'static/js/check-access.js', 'static/scss/main.scss'],
+>>>>>>> Stashed changes
   outdir: 'static/compiled',
   minify: process.env.NODE_ENV === "production",
   sourcemap: process.env.NODE_ENV !== "production",
