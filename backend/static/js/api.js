@@ -1,3 +1,6 @@
+import { getCookie } from "./csrft";
+const csrftoken = getCookie('csrftoken');
+
 export const queryAPI = (
   endpoint,
   data,
@@ -6,6 +9,7 @@ export const queryAPI = (
 ) => {
   const headers = new Headers();
   headers.append('Content-type', 'application/json');
+  headers.append('X-CSRFToken', csrftoken);
   fetch(endpoint, {
     method: config.method,
     headers: headers,

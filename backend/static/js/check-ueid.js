@@ -1,8 +1,6 @@
 import { checkValidity } from './validate.js';
 import { queryAPI } from "./api";
-import { getCookie } from "./csrft";
 
-const csrftoken = getCookie('csrftoken');
 const SUBMISSION_URL = '/report_submission/auditeeinfo/';
 const NEXT_URL = '../accessandsubmission';
 const FORM = document.forms[0];
@@ -232,26 +230,15 @@ function validateUEID() {
   resetModal();
 
   const auditee_uei = document.getElementById('auditee_uei').value;
-  const headers = new Headers();
-  headers.append('Content-type', 'application/json');
-  headers.append('X-CSRFToken', csrftoken)
-  fetch('/api/sac/ueivalidation', {
-    method: 'POST',
-    headers: headers,
-    body: JSON.stringify({ auditee_uei}),
-  })
-    .then((resp) => resp.json())
-    .then((data) => handleUEIDResponse(data))
-    .catch((e) => handleApiError(e));
 
-  // queryAPI(
-  //   '/api/sac/ueivalidation',
-  //   { auditee_uei },
-  //   {
-  //     method: 'POST',
-  //   },
-  //   [handleUEIDResponse, handleApiError]
-  // );
+   queryAPI(
+     '/api/sac/ueivalidation',
+     { auditee_uei },
+     {
+       method: 'POST',
+     },
+     [handleUEIDResponse, handleApiError]
+   );
 }
 
 function validateFyStartDate(fyInput) {
