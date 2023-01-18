@@ -1,353 +1,231 @@
-# data distro naming can go away
-
-verbose_name
-
-class DataDistroAgencies(models.Model):
-    auditid = models.ForeignKey('DataDistroAudits', models.DO_NOTHING, db_column='auditid')
-    # may want to update this to be a SmallIntegerField
-    # agencies, AGENCYCFDA
-    agency_cfda = models.TextField('2-digit prefix of Federal Agency requiring copy of audit report', blank=True, null=True)
-    prior_agency = models.TextField(blank=True, null=True)
-    prior_finding = models.BooleanField(blank=True, null=True)
-    current_finding = models.BooleanField(blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = 'data_distro_agencies'
-
-?
-# would it be simpler to move this to the audit
-class DataDistroAuditAuditors(models.Model):
-    # general, DBKEY?
-    auditid = models.ForeignKey('DataDistroAudits', models.DO_NOTHING, db_column='auditid')
-    auditorid = models.ForeignKey('DataDistroAuditors', models.DO_NOTHING, db_column='auditorid')
-    is_primary = models.BooleanField()
-
-    class Meta:
-        managed = False
-        db_table = 'data_distro_audit_auditors'
-
-
-class DataDistroAuditComponents(models.Model):
-    auditid = models.ForeignKey('DataDistroAudits', models.DO_NOTHING, db_column='auditid')
-    cap = models.TextField(blank=True, null=True)
-    financial_statements = models.TextField(blank=True, null=True)
-    sefa = models.TextField(blank=True, null=True)
-    schedule_prior_audit_findings = models.TextField(blank=True, null=True)
-    opinion_on_financial_statements = models.TextField(blank=True, null=True)
-    report_internal_control = models.TextField(blank=True, null=True)
-    gasreport_on_compliance = models.TextField(blank=True, null=True)
-    sfqc = models.TextField(blank=True, null=True)
-    opinion_or_disclaimer_sfa = models.TextField(blank=True, null=True)
-    gasreport_internal_control = models.TextField(blank=True, null=True)
-    report_on_compliance = models.TextField(blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = 'data_distro_audit_components'
-
-
-class DataDistroAuditDuns(models.Model):
-    auditid = models.ForeignKey('DataDistroAudits', models.DO_NOTHING, db_column='auditid')
-    dunid = models.ForeignKey('DataDistroDuns', models.DO_NOTHING, db_column='dunid')
-    is_primary = models.BooleanField()
-
-    class Meta:
-        managed = False
-        db_table = 'data_distro_audit_duns'
-
-
-class DataDistroAuditEins(models.Model):
-    auditid = models.ForeignKey('DataDistroAudits', models.DO_NOTHING, db_column='auditid')
-    einid = models.ForeignKey('DataDistroEins', models.DO_NOTHING, db_column='einid')
-    is_primary = models.BooleanField()
-
-    class Meta:
-        managed = False
-        db_table = 'data_distro_audit_eins'
-
-
-class DataDistroAuditIndicators(models.Model):
-    auditid = models.ForeignKey('DataDistroAudits', models.DO_NOTHING, db_column='auditid')
-    type_report_financial_statements = models.TextField(blank=True, null=True)
-    special_framework = models.TextField(blank=True, null=True)
-    special_framework_required = models.BooleanField(blank=True, null=True)
-    typereport_special_framework = models.TextField(blank=True, null=True)
-    going_concern = models.BooleanField(blank=True, null=True)
-    material_weakness = models.BooleanField(blank=True, null=True)
-    material_non_compliance = models.BooleanField(blank=True, null=True)
-    type_report_major_program = models.TextField(blank=True, null=True)
-    lowrisk = models.BooleanField(blank=True, null=True)
-    material_weakness_major_program = models.BooleanField(blank=True, null=True)
-    qcosts = models.BooleanField(blank=True, null=True)
-    reportable_condition = models.BooleanField(blank=True, null=True)
-    reportable_condition_major_program = models.BooleanField(blank=True, null=True)
-    significant_deficiency = models.BooleanField(blank=True, null=True)
-    significant_deficiency_material_weakness = models.BooleanField(blank=True, null=True)
-    significant_deficiency_major_program = models.BooleanField(blank=True, null=True)
-    cyfindings = models.BooleanField(blank=True, null=True)
-    pyschedule = models.BooleanField(blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = 'data_distro_audit_indicators'
-
-
-class DataDistroAuditRevisions(models.Model):
-    auditid = models.ForeignKey('DataDistroAudits', models.DO_NOTHING, db_column='auditid')
-    general_info = models.TextField(blank=True, null=True)
-    general_info_explain = models.TextField(blank=True, null=True)
-    federal_awards = models.TextField(blank=True, null=True)
-    federal_awards_explain = models.TextField(blank=True, null=True)
-    findings = models.TextField(blank=True, null=True)
-    findings_explain = models.TextField(blank=True, null=True)
-    findings_text = models.TextField(blank=True, null=True)
-    findings_text_explain = models.TextField(blank=True, null=True)
-    audit_info = models.TextField(blank=True, null=True)
-    audit_info_explain = models.TextField(blank=True, null=True)
-    cap = models.TextField(blank=True, null=True)
-    cap_explain = models.TextField(blank=True, null=True)
-    notes_to_sefa = models.TextField(blank=True, null=True)
-    notes_to_sefa_explain = models.TextField(blank=True, null=True)
-    other = models.TextField(blank=True, null=True)
-    other_explain = models.TextField(blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = 'data_distro_audit_revisions'
-
-
-class DataDistroAuditStatus(models.Model):
-    auditid = models.ForeignKey('DataDistroAudits', models.DO_NOTHING, db_column='auditid')
-    final = models.BooleanField(blank=True, null=True)
-    audit_uploaded = models.BooleanField(blank=True, null=True)
-    audit_upload_date = models.DateTimeField(blank=True, null=True)
-    auditee_submitted = models.BooleanField(blank=True, null=True)
-    auditee_submit_date = models.DateTimeField(blank=True, null=True)
-    auditor_submitted = models.BooleanField(blank=True, null=True)
-    auditor_submit_date = models.DateTimeField(blank=True, null=True)
-    fac_submit = models.BooleanField(blank=True, null=True)
-    fac_submit_date = models.DateTimeField(blank=True, null=True)
-    created = models.DateTimeField(blank=True, null=True)
-    modified = models.DateTimeField(blank=True, null=True)
-    submitted = models.BooleanField(blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = 'data_distro_audit_status'
-
-
-class DataDistroAuditees(models.Model):
-    name = models.TextField(blank=True, null=True)
-    street1 = models.TextField(blank=True, null=True)
-    street2 = models.TextField(blank=True, null=True)
-    city = models.TextField(blank=True, null=True)
-    state = models.TextField(blank=True, null=True)
-    zipcode = models.TextField(blank=True, null=True)
-    contact = models.TextField(blank=True, null=True)
-    title = models.TextField(blank=True, null=True)
-    phone = models.TextField(blank=True, null=True)
-    fax = models.TextField(blank=True, null=True)
-    email = models.TextField(blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = 'data_distro_auditees'
-
-
-class DataDistroAuditors(models.Model):
-    seqnum = models.SmallIntegerField(blank=True, null=True)
-    firmname = models.TextField()
-    ein = models.TextField(blank=True, null=True)
-    street1 = models.TextField(blank=True, null=True)
-    street2 = models.TextField(blank=True, null=True)
-    city = models.TextField(blank=True, null=True)
-    state = models.TextField(blank=True, null=True)
-    zipcode = models.TextField(blank=True, null=True)
-    contact = models.TextField(blank=True, null=True)
-    title = models.TextField(blank=True, null=True)
-    phone = models.TextField(blank=True, null=True)
-    fax = models.TextField(blank=True, null=True)
-    email = models.TextField(blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = 'data_distro_auditors'
-
-
-class DataDistroAudits(models.Model):
-    auditid = models.AutoField(primary_key=True)
-    auditeeid = models.ForeignKey(DataDistroAuditees, models.DO_NOTHING, db_column='auditeeid')
-    audit_year = models.SmallIntegerField()
-    reportid = models.IntegerField()
-    version = models.SmallIntegerField()
-    entity_type = models.ForeignKey('DataDistroEntityTypes', models.DO_NOTHING, blank=True, null=True)
-    fyenddate = models.DateField(blank=True, null=True)
-    audittype = models.TextField()
-    periodcovered = models.TextField(blank=True, null=True)
-    numberofmonths = models.SmallIntegerField(blank=True, null=True)
-    auditee_date_signed = models.DateField(blank=True, null=True)
-    cpa_date_signed = models.DateField(blank=True, null=True)
-    cog_agency = models.TextField(blank=True, null=True)
-    oversight_agency = models.TextField(blank=True, null=True)
-    completed_on = models.DateField(blank=True, null=True)
-    previously_completed_on = models.DateField(blank=True, null=True)
-    fac_accepted_date = models.DateField(blank=True, null=True)
-    dollar_threshhold = models.TextField(blank=True, null=True)  # This field type is a guess.
-    total_federal_expenditure = models.TextField(blank=True, null=True)  # This field type is a guess.
-
-    class Meta:
-        managed = False
-        db_table = 'data_distro_audits'
-
-
-class DataDistroAwardFindings(models.Model):
-    awardid = models.ForeignKey('DataDistroAwards', models.DO_NOTHING, db_column='awardid')
-    fac_audit_id = models.BigIntegerField()
-    findingrefnums = models.TextField(blank=True, null=True)
-    type_requirement = models.TextField(blank=True, null=True)
-    modified_opinion = models.TextField(blank=True, null=True)
-    other_noncompliance = models.TextField(blank=True, null=True)
-    material_weakness = models.TextField(blank=True, null=True)
-    significant_deficiency = models.TextField(blank=True, null=True)
-    other_findings = models.TextField(blank=True, null=True)
-    qcosts = models.TextField(blank=True, null=True)
-    repeat_finding = models.TextField(blank=True, null=True)
-    priorfindingrefnums = models.TextField(blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = 'data_distro_award_findings'
-
-
-class DataDistroAwardIndicators(models.Model):
-    awardid = models.ForeignKey('DataDistroAwards', models.DO_NOTHING, db_column='awardid')
-    rd = models.BooleanField(blank=True, null=True)
-    loans = models.BooleanField(blank=True, null=True)
-    direct = models.BooleanField(blank=True, null=True)
-    arra = models.BooleanField(blank=True, null=True)
-    major_program = models.BooleanField(blank=True, null=True)
-    findings = models.TextField(blank=True, null=True)
-    typereport_major_program = models.TextField(blank=True, null=True)
-    type_requirement = models.TextField(blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = 'data_distro_award_indicators'
-
-
-class DataDistroAwards(models.Model):
-    auditid = models.ForeignKey(DataDistroAudits, models.DO_NOTHING, db_column='auditid')
-    cfda = models.TextField()
-    award_identification = models.TextField(blank=True, null=True)
-    loan_balance = models.TextField(blank=True, null=True)
-    federal_program_name = models.TextField()
-    amount = models.TextField()  # This field type is a guess.
-    clustername = models.TextField(blank=True, null=True)
-    stateclustername = models.TextField(blank=True, null=True)
-    progam_total = models.TextField(blank=True, null=True)  # This field type is a guess.
-    cluster_total = models.TextField(blank=True, null=True)  # This field type is a guess.
-    passthrough_award = models.TextField(blank=True, null=True)
-    passthrough_amount = models.TextField(blank=True, null=True)  # This field type is a guess.
-    findingrefnums = models.TextField(blank=True, null=True)
-    findings_count = models.SmallIntegerField(blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = 'data_distro_awards'
-
-
-class DataDistroDuns(models.Model):
-    dun = models.TextField()
-
-    class Meta:
-        managed = False
-        db_table = 'data_distro_duns'
-
-
-class DataDistroEins(models.Model):
-    ein = models.TextField()
-
-    class Meta:
-        managed = False
-        db_table = 'data_distro_eins'
-
-
-class DataDistroEntityTypes(models.Model):
-    identifier = models.SmallIntegerField()
-    name = models.TextField()
-
-    class Meta:
-        managed = False
-        db_table = 'data_distro_entity_types'
-
-
-class DataDistroFindingsText(models.Model):
-    auditid = models.ForeignKey(DataDistroAudits, models.DO_NOTHING, db_column='auditid')
-    charts_tables = models.BooleanField(blank=True, null=True)
-    text_value = models.TextField(blank=True, null=True)
-    finding_ref_numbers = models.TextField(blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = 'data_distro_findings_text'
-
-
-class DataDistroNotes(models.Model):
-    typeid = models.ForeignKey('DataDistroNotesType', models.DO_NOTHING, db_column='typeid')
-    auditid = models.ForeignKey(DataDistroAudits, models.DO_NOTHING, db_column='auditid')
-    content = models.TextField()
-    note_index = models.SmallIntegerField()
-    title = models.TextField()
-
-    class Meta:
-        managed = False
-        db_table = 'data_distro_notes'
-
-
-class DataDistroNotesType(models.Model):
-    name = models.TextField()
-
-    class Meta:
-        managed = False
-        db_table = 'data_distro_notes_type'
-
-
-class DataDistroPassthroughs(models.Model):
-    awardid = models.ForeignKey(DataDistroAwards, models.DO_NOTHING, db_column='awardid')
-    name = models.TextField(blank=True, null=True)
-    passid = models.TextField(blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = 'data_distro_passthroughs'
-
-
-class DataDistroPdfMetadata(models.Model):
-    auditid = models.ForeignKey(DataDistroAudits, models.DO_NOTHING, db_column='auditid')
-    filename = models.TextField()
-    searchable_threshold = models.SmallIntegerField(blank=True, null=True)
-    searchable_type = models.TextField(blank=True, null=True)
-    searchable_percentage = models.SmallIntegerField(blank=True, null=True)
-    image_only_page_numbers = models.TextField(blank=True, null=True)
-    processing_time_milliseconds = models.IntegerField(blank=True, null=True)
-    upload_attempts = models.SmallIntegerField(blank=True, null=True)
-    upload_status = models.TextField(blank=True, null=True)
-    upload_date = models.DateTimeField()
-    title = models.TextField(blank=True, null=True)
-    author = models.TextField(blank=True, null=True)
-    subject = models.TextField(blank=True, null=True)
-    keywords = models.TextField(blank=True, null=True)
-    create_date = models.DateTimeField()
-    modification_date = models.DateTimeField(blank=True, null=True)
-    producer = models.TextField(blank=True, null=True)
-    page_count = models.SmallIntegerField(blank=True, null=True)
-    file_size = models.IntegerField(blank=True, null=True)
-    printable = models.BooleanField(blank=True, null=True)
-    printable_high_quality = models.BooleanField(blank=True, null=True)
-    modifiable = models.BooleanField(blank=True, null=True)
-    err_code = models.TextField(blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = 'data_distro_pdf_metadata'
+# importing django models and users
+from django.db import models
+from django.contrib.auth.models import User
+
+# Models that mimic the downloads
+class General(models.Model):
+    dollarthreshold = models.FloatField("Dollar Threshold to distinguish between Type A and Type B programs.")
+    multipleeins = models.BooleanField("Identifies if the Submission Contains Multiple EINs")
+    multipleduns = models.BooleanField("Identifies if the Submission Contains Multiple DUNS")
+    multiple_cpas = models.BooleanField("Identifies if the Submission Contains Multiple CPAs")
+    sp_framework_required = models.BooleanField("Indicate whether or not the special purpose framework used as basis of accounting by state law or tribal law")
+    goingconcern = models.BooleanField("Whether or not the audit contained a going concern paragraph  on financial statements")
+    reportablecondition/significantdeficiency = models.BooleanField("Whether or not the audit disclosed a reportable condition/significant deficiency on financial statements")
+    materialweakness = models.BooleanField("Whether or not the audit disclosed any reportable condition/significant deficiency as a material weakness on financial statements")
+    materialnoncompliance = models.BooleanField("Whether or not the audit disclosed a material noncompliance on financial statements")
+    dup_reports = models.BooleanField("Whether or not the financial statements include departments that have separate expenditures not included in this audit")
+    lowrisk = models.BooleanField("Indicate whether or not the auditee qualified as a low-risk auditee")
+    reportablecondition/significantdeficiency_mp = models.BooleanField("Whether or not the audit disclosed a reportable condition/significant deficiency for any major program in the Schedule of Findings and Questioned Costs")
+    materialweakness_mp = models.BooleanField("Indicate whether any reportable condition/signficant deficiency was disclosed as a material weakness for a major program in the Schedule of Findings and Questioned Costs")
+    qcosts = models.BooleanField("Indicate whether or not the audit disclosed any known questioned costs.")
+    cyfindings = models.BooleanField("Indicate whether or not current year findings or prior year findings affecting direct funds were reported")
+    pyschedule = models.BooleanField("Indicate whether or not the report includes a Summary Schedule of Prior Year Audit Findings")
+    reportrequired = models.BooleanField("Distribution to Federal Agency required?")
+    multipleueis = models.BooleanField("Identifies if the Submission Contains Multiple UEIs")
+    auditeephone = models.IntegerField("Auditee Phone Number", max_length=10)
+    auditeefax = models.IntegerField("Auditee Fax Number (optional)", max_length=10)
+    cpaphone = models.IntegerField("CPA phone number", max_length=10)
+    cpafax = models.IntegerField("CPA fax number (optional)", max_length=10)
+    uei = models.CharField("Unique Entity ID", max_length=12)
+    totfedexpend = models.IntegerField("Total Federal Expenditures", max_length=12)
+    state = models.CharField("Auditee State", max_length=2)
+    cpastate = models.CharField("CPA State", max_length=2)
+    cogagency = models.IntegerField("Two digit Federal agency prefix of the cognizant agency", max_length=2)
+    oversightagency = models.IntegerField("Two digit Federal agency prefix of the oversight agency", max_length=2)
+    cpaforeign = models.CharField("CPA Address (if international)", max_length=200)
+    einsubcode = models.IntegerField("Subcode assigned to the EIN", max_length=3)
+    city = models.CharField("Auditee City", max_length=30)
+    cpacity = models.CharField("CPA City", max_length=30)
+    auditeetitle = models.CharField("Title of Auditee Contact", max_length=40)
+    cpatitle = models.CharField("Title of CPA Contact", max_length=40)
+    street1 = models.CharField("Auditee Street Address", max_length=45)
+    street2 = models.CharField("Auditee Street Address", max_length=45)
+    cpastreet1 = models.CharField("CPA Street Address", max_length=45)
+    cpastreet2 = models.CharField("CPA Street Address", max_length=45)
+    zipcode = models.IntegerField("Auditee Zipcode", max_length=9)
+    cpazipcode = models.IntegerField("CPA Zip Code", max_length=9)
+    auditeecontact = models.CharField("Name of Auditee Contact", max_length=50)
+    auditeecertifyname = models.CharField("Name of Auditee Certifying Official", max_length=50)
+    auditeecertifytitle = models.CharField("Title of Auditee Certifying Official", max_length=50)
+    cpacontact = models.CharField("Name of CPA Contact", max_length=50)
+    entity_type = models.CharField("Self reported type of entity (i.e., States, Local Governments, Indian Tribes, Institutions of Higher Education, NonProfit)", max_length=50)
+    cpacountry = models.CharField("CPA Country", max_length=6)
+    auditeeemail = models.CharField("Auditee Email address", max_length=60)
+    cpaemail = models.CharField("CPA email address", max_length=60)
+    cpafirmname = models.CharField("CPA Firm Name", max_length=64)
+    auditeename = models.CharField("Name of the Auditee", max_length=70)
+    auditeenametitle = models.CharField("Title of Auditee Certifying Official", max_length=70)
+    ein = models.IntegerField("Primary Employer Identification Number", max_length=9)
+    duns = models.IntegerField("Primary Data Universal Numbering System Number", max_length=9)
+    auditor_ein = models.IntegerField("CPA Firm EIN (only available for audit years 2013 and beyond)", max_length=9)
+    periodcovered = models.CharField("Audit Period Covered by Audit")
+    sp_framework = models.CharField("Special Purpose Framework that was used as the basis of accounting")
+    typeofentity = models.CharField("Contact FAC for information")
+    fystartdate = models.DateField("Fiscal Year Start Date")
+    fyenddate = models.DateField("Fiscal Year End Date")
+    auditeedatesigned = models.DateField("Date of auditee signature")
+    cpadatesigned = models.DateField("Date of CPA signature")
+    initialdatereceived = models.DateField("The first date an audit component or Form SF-SAC was received by the Federal audit Clearinghouse (FAC).")
+    formdatereceived = models.DateField("The most Recent Date the Form SF-SAC was received by the FAC. This field was not populated before 2001.")
+    componentdatereceived = models.DateField("The most recent date an audit component was received by the FAC. This field was not populated before 2004. Receipt of Financial statements only are not processed until the rest of the audit or a Form SF-SAC is also received.")
+    completed_on = models.DateField("Date the Audit was Posted to the Internet as Complete")
+    previous_completed_on = models.DateField("Date the Audit was Previously Posted to the Internet as Complete")
+    facaccepteddate = models.DateField("The most recent date an audit report was submitted to the FAC that passed FAC screening and was accepted as a valid OMB Circular A-133 report submission.")
+    numbermonths = models.IntegerField("Number of Months Covered by the 'Other' Audit Period")
+    audittype = models.CharField("Type of Audit")
+    typereport_fs = models.CharField("Type of Report Issued on the Financial Statements")
+    typereport_sp_framework = models.CharField("The auditor's opinion on the special purpose framework")
+    typereport_mp = models.CharField("Type of Report Issued on the Major Program Compliance")
+    dbkey = models.CharField("Audit Year and DBKEY (database key) combined make up the primary key.")
+    audityear = models.CharField("Audit Year and DBKEY (database key) combined make up the primary key.")
+
+
+class CfdaInfo(models.Model):
+    r&d = models.BooleanField("Indicate whether or not the program is a Research and Development program")
+    loans = models.BooleanField("Indicate whether or not the program is a Loan or Loan Guarantee (only available for audit years 2013 and beyond)")
+    arra = models.BooleanField("American Recovery and Reinvestment Act Funded Program")
+    direct = models.BooleanField("Indicate whether or not the award was received directly from a Federal awarding agency")
+    passthroughaward = models.BooleanField("Indicates whether or not funds were passed through to any subrecipients for the Federal program")
+    majorprogram = models.BooleanField("Indicate whether or not the Federal program is a major program")
+    findingrefnums = models.CharField("Findings Reference Numbers", max_length=100)
+    amount = models.IntegerField("Amount Expended for the Federal Program", max_length=12)
+    programtotal = models.IntegerField("Total Federal awards expended for each individual Federal program is auto-generated by summing the amount expended for all line items with the same CFDA Prefix and Extension", max_length=12)
+    clustertotal = models.IntegerField("Total Federal awards expended for each individual Federal program is auto-generated by summing the amount expended for all line items with the same Cluster Name", max_length=12)
+    passthroughamount = models.IntegerField("Amount passed through to subrecipients", max_length=12)
+    loanbalance = models.CharField("The loan or loan guarantee (loan) balance outstanding at the end of the audit period.  A response of ‘N/A’ is acceptable.")
+    federalprogramname = models.CharField("Name of Federal Program", max_length=300)
+    cfdaprogramname = models.CharField("Name of Federal Program (auto-generated by FAC from the CFDA catalog)", max_length=300)
+    awardidentification = models.CharField("Other data used to identify the award which is not a CFDA number (e.g., program year, contract number)", max_length=50)
+    cfda = models.IntegerField("Federal Agency Prefix and Extension", max_length=52)
+    clustername = models.CharField("The name of the cluster", max_length=75)
+    stateclustername = models.CharField("The name of the state cluster", max_length=75)
+    otherclustername = models.CharField("The name of the cluster (if not listed in the Compliance Supplement)", max_length=75)
+    typerequirement = models.CharField("Type Requirement Failure")
+    typereport_mp = models.CharField("Type of Report Issued on the Major Program Compliance")
+    findingscount = models.IntegerField("Number of findings for the federal program (only available for audit years 2013 and beyond)")
+    elecauditsid = models.IntegerField("FAC system generated sequence number used to link to Findings data between CFDA Info and Findings")
+    dbkey = models.CharField("Audit Year and DBKEY (database key) combined make up the primary key.")
+    audityear = models.CharField("Audit Year and DBKEY (database key) combined make up the primary key.")
+
+
+class Findings(models.Model):
+    modifiedopinion = models.BooleanField("Modified Opinion finding")
+    othernoncompliance = models.BooleanField("Other Noncompliance finding")
+    materialweakness = models.BooleanField("Material Weakness finding")
+    significantdeficiency = models.BooleanField("Significant Deficiency finding")
+    otherfindings = models.BooleanField("Other findings")
+    qcosts = models.BooleanField("Questioned Costs")
+    repeatfinding = models.BooleanField("Indicates whether or not the audit finding was a repeat of an audit finding in the immediate prior audit")
+    findingrefnums = models.CharField("Findings Reference Numbers", max_length=100)
+    priorfindingrefnums = models.CharField("Audit finding reference numbers from the immediate prior audit", max_length=100)
+    typerequirement = models.CharField("Type Requirement Failure")
+    elecauditsid = models.IntegerField("FAC system generated sequence number used to link to Findings data between CFDA Info and Findings")
+    elecauditfindingsid = models.IntegerField("FAC system generated sequence number for finding")
+    audityear = models.CharField("Audit Year and DBKEY (database key) combined make up the primary key.")
+    dbkey = models.CharField("Audit Year and DBKEY (database key) combined make up the primary key.")
+
+
+class Findingstext(models.Model):
+    chartstables = models.CharField("Indicates whether or not the text contained charts or tables that could not be entered due to formatting restrictions", max_length=1)
+    findingrefnums = models.CharField("Audit Finding Reference Number", max_length=100)
+    seq_number = models.IntegerField("Order that the findings text was reported", max_length=4)
+    text = models.TextField("Content of the finding text")
+    dbkey = models.CharField("Audit Year and DBKEY (database key) combined make up the primary key.")
+    audityear = models.CharField("Audit Year and DBKEY (database key) combined make up the primary key.")
+
+
+class Captext(models.Model):
+    chartstables = models.CharField("Indicates whether or not the text contained charts or tables that could not be entered due to formatting restrictions", max_length=1)
+    findingrefnums = models.CharField("Audit Finding Reference Number", max_length=100)
+    seq_number = models.IntegerField("Order that the CAP text was reported", max_length=4)
+    text = models.TextField("Content of the Corrective Action Plan (CAP)")
+    dbkey = models.CharField("Audit Year and DBKEY (database key) combined make up the primary key.")
+    audityear = models.CharField("Audit Year and DBKEY (database key) combined make up the primary key.")
+
+
+class Notes(models.Model):
+    type_id = models.CharField("Note Type", max_length=1)
+    id = models.IntegerField("Internal Unique Identifier for the record", max_length=12)
+    reportid = models.IntegerField("Internal Audit Report Id", max_length=12)
+    version = models.IntegerField("Internal Version", max_length=4)
+    seq_number = models.IntegerField("Order that the Note was reported", max_length=4)
+    note_index = models.IntegerField("Display Index for the Note", max_length=4)
+    content = models.TextField("Content of the Note")
+    title = models.CharField("Note Title", max_length=75)
+    dbkey = models.CharField("Audit Year and DBKEY (database key) combined make up the primary key.")
+    audityear = models.CharField("Audit Year and DBKEY (database key) combined make up the primary key.")
+
+
+class MultipleCpasInfo(models.Model):
+    cpaphone = models.IntegerField("CPA phone number", max_length=10)
+    cpafax = models.IntegerField("CPA fax number (optional)", max_length=10)
+    cpastate = models.CharField("CPA State", max_length=2)
+    cpacity = models.CharField("CPA City", max_length=30)
+    cpatitle = models.CharField("Title of CPA Contact", max_length=40)
+    cpastreet1 = models.CharField("CPA Street Address", max_length=45)
+    cpazipcode = models.IntegerField("CPA Zip Code", max_length=9)
+    cpacontact = models.CharField("Name of CPA Contact", max_length=50)
+    cpaemail = models.CharField("CPA email address (optional)", max_length=60)
+    cpafirmname = models.CharField("CPA Firm Name", max_length=64)
+    cpaein = models.IntegerField("CPA Firm EIN (only available for audit years 2013 and beyond)", max_length=9)
+    dbkey = models.CharField("Audit Year and DBKEY (database key) combined make up the primary key.")
+    audityear = models.CharField("Audit Year and DBKEY (database key) combined make up the primary key.")
+    seqnum = models.IntegerField("Order that Auditors were reported on page 5 of SF-SAC")
+
+
+class Revisions(models.Model):
+    findings = models.CharField("Indicates what items on the Findings page were edited during the revision", max_length=110)
+    elecrptrevisionid = models.IntegerField("Internal Unique Identifier for the record", max_length=12)
+    federalawards = models.CharField("Indicates what items on the Federal Awards page were edited during the revision", max_length=140)
+    geninfo_explain = models.CharField("Explanation of what items on the General Info page were edited during the revision", max_length=150)
+    federalawards_explain = models.CharField("Explanation of what items on the Federal Awards page were edited during the revision", max_length=150)
+    notestosefa_explain = models.CharField("Explanation of what items on the Notes to SEFA page were edited during the revision", max_length=150)
+    auditinfo_explain = models.CharField("Explanation of what items on the Audit Info page were edited during the revision", max_length=150)
+    findings_explain = models.CharField("Explanation of what items on the Findings page were edited during the revision", max_length=150)
+    findingstext_explain = models.CharField("Explanation of what items on the Text of the Audit Findings page were edited during the revision", max_length=150)
+    cap_explain = models.CharField("Explanation of what items on the CAP Text page were edited during the revision", max_length=150)
+    other_explain = models.CharField("Explanation of what other miscellaneous items were edited during the revision", max_length=150)
+    auditinfo = models.CharField("Indicates what items on the Audit Info page were edited during the revision", max_length=200)
+    notestosefa = models.CharField("Indicates what items on the Notes to SEFA page were edited during the revision", max_length=50)
+    findingstext = models.CharField("Indicates what items on the Text of the Audit Findings page were edited during the revision", max_length=6)
+    cap = models.CharField("Indicates what items on the CAP Text page were edited during the revision", max_length=6)
+    other = models.CharField("Indicates what other miscellaneous items were edited during the revision", max_length=65)
+    geninfo = models.CharField("Indicates what items on the General Info page were edited during the revision", max_length=75)
+    audityear = models.CharField("Audit Year and DBKEY (database key) combined make up the primary key.")
+    dbkey = models.CharField("Audit Year and DBKEY (database key) combined make up the primary key.")
+
+
+class UeiInfo(models.Model):
+    uei = models.CharField("Multiple Unique Entity Identifier Numbers", max_length=12)
+    ueiseqnum = models.IntegerField("Order that UEI was reported on page 4 of SF-SAC")
+    dbkey = models.CharField("Audit Year and DBKEY (database key) combined make up the primary key.")
+    audityear = models.CharField("Audit Year and DBKEY (database key) combined make up the primary key.")
+
+
+class Agencies(models.Model):
+    agencycfda = models.IntegerField("2-digit prefix of Federal Agency requiring copy of audit report", max_length=2)
+    ein = models.IntegerField("Employer Identification Number (EIN) of primary grantee", max_length=9)
+    dbkey = models.CharField("Audit Year and DBKEY (database key) combined make up the primary key.")
+    audityear = models.CharField("Audit Year and DBKEY (database key) combined make up the primary key.")
+
+
+class Passthrough(models.Model):
+    passthroughname = models.CharField("Name of Pass-through Entity", max_length=70)
+    passthroughid = models.CharField("Identifying Number Assigned by the Pass-through Entity", max_length=70)
+    elecauditsid = models.IntegerField("FAC system generated sequence number used to link to Passthrough data between CFDA Info and Passthrough")
+    audityear = models.CharField("Audit Year and DBKEY (database key) combined make up the primary key")
+    dbkey = models.CharField("Audit Year and DBKEY (database key) combined make up the primary key")
+
+
+class EinInfo(models.Model):
+    ein = models.IntegerField("Multiple Employer Identification Numbers", max_length=9)
+    einseqnum = models.IntegerField("Order that EINs were reported on page 4 of SF-SAC")
+    dbkey = models.CharField("Audit Year and DBKEY (database key) combined make up the primary key.")
+    audityear = models.CharField("Audit Year and DBKEY (database key) combined make up the primary key.")
+
+
+class DunInfo(models.Model):
+    duns = models.IntegerField("Multiple Data Universal Numbering System Numbers", max_length=9)
+    dunseqnum = models.IntegerField("Order that DUNS was reported on page 4 of SF-SAC")
+    dbkey = models.CharField("Audit Year and DBKEY (database key) combined make up the primary key.")
+    audityear = models.CharField("Audit Year and DBKEY (database key) combined make up the primary key.")
