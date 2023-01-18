@@ -1,13 +1,8 @@
 import { checkValidity } from './validate.js';
 import { queryAPI } from "./api";
-<<<<<<< Updated upstream
 import { getCookie } from "./csrft";
 
 const csrftoken = getCookie('csrftoken');
-=======
-
-const SUPPRESS_ERROR_FOR_TEST = true; // REMOVE after submission error fixed.
->>>>>>> Stashed changes
 
 const SUBMISSION_URL = '/report_submission/auditeeinfo/';
 const NEXT_URL = '../accessandsubmission';
@@ -42,15 +37,7 @@ function handleAuditeeResponse(data) {
 }
 function handleErrorResponse(e) {
   console.log('ERROR: Form submission error. ' + e);
-<<<<<<< Updated upstream
   window.location.href = NEXT_URL;
-=======
-    // REMOVE below after reposnse error is fixed.
-    if (SUPPRESS_ERROR_FOR_TEST) {
-      window.location.href = NEXT_URL;
-    }
-    // END REMOVE
->>>>>>> Stashed changes
 }
 
 function handleUEIDResponse({ valid, response, errors }) {
@@ -246,7 +233,6 @@ function validateUEID() {
   resetModal();
 
   const auditee_uei = document.getElementById('auditee_uei').value;
-<<<<<<< Updated upstream
   const headers = new Headers();
   headers.append('Content-type', 'application/json');
   headers.append('X-CSRFToken', csrftoken)
@@ -267,17 +253,6 @@ function validateUEID() {
   //   },
   //   [handleUEIDResponse, handleApiError]
   // );
-=======
-
-  queryAPI(
-    '/api/sac/ueivalidation',
-    { auditee_uei },
-    {
-      method: 'POST',
-    },
-    [handleUEIDResponse, handleApiError]
-  );
->>>>>>> Stashed changes
 }
 
 function validateFyStartDate(fyInput) {
