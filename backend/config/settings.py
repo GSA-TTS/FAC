@@ -186,7 +186,7 @@ elif environment in ["TESTING", "UNDEFINED"]:
     STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
     MIDDLEWARE.append("whitenoise.middleware.WhiteNoiseMiddleware")
 else:
-    STATICFILES_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
+    STATICFILES_STORAGE = "storages.backends.s3boto3.S3ManifestStaticStorage"
     vcap = json.loads(env.str("VCAP_SERVICES"))
     for service in vcap["s3"]:
         if service["instance_name"] == "fac-public-s3":
