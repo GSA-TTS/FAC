@@ -29,6 +29,8 @@ services:
       - "ENV=${ENV}"
       - "SECRET_KEY=${SECRET_KEY}"
       - "ALLOWED_HOSTS=0.0.0.0 127.0.0.1 localhost"
+    env_file:
+      - ".env"
     ports:
       - "8000:8000"
     volumes:

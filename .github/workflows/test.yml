@@ -48,7 +48,7 @@ jobs:
           node-version: 16
       - name: Start services
         working-directory: ./backend
-        run: docker-compose up -d
+        run: touch .env && docker-compose up -d
       - name: Run Django test suite
         working-directory: ./backend
         run:
