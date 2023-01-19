@@ -1,14 +1,10 @@
-from django.contrib.auth.decorators import login_required
-from django.http import QueryDict, request
 from django.shortcuts import render, redirect  # noqa: F401
 from django.urls import reverse
-from django.views import generic, View
-from django.views.generic import TemplateView
+from django.views import View
 from django.contrib.auth.mixins import LoginRequiredMixin
 import json
 
 import api.views
-from api.views import EligibilityFormView
 
 
 def parse_body_data(request_data):
@@ -75,11 +71,14 @@ class AccessAndSubmissionFormView(LoginRequiredMixin, View):
     def post(self, post_request):
         body_data = parse_body_data(request_data=post_request)
 
-        try:
-            result = api.views.access_and_submission_check(post_request.user, body_data)
-            new_sac = result.get("report_id")
+        result = api.views.access_and_submission_check(post_request.user, body_data)
+        report_id = result.get("report_id")
 
-            return redirect("/audit/")  # + new_sac)
-        except Exception as ex:
-            print("Error processing data: ", ex)
+        if report_id:
+            # This should redirect to the following line without the
+            # hash, but we're doing this until we stand up the next form
+            # page:
+            return redirect(f"/audit/#{report_id}")
+        else:
+            print("Error processing data: ", result)
             return redirect(reverse("accessandsubmissioninfo"))
