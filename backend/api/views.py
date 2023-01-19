@@ -69,10 +69,10 @@ def auditee_info_check(user, data):
     ]
     if missing_fields:
         return {
-                "next": reverse("api-eligibility"),
-                "errors": "We're missing required fields, please try again.",
-                "missing_fields": missing_fields,
-            }
+            "next": reverse("api-eligibility"),
+            "errors": "We're missing required fields, please try again.",
+            "missing_fields": missing_fields,
+        }
 
     if serializer.is_valid():
         next_step = reverse("api-accessandsubmission")
@@ -84,6 +84,63 @@ def auditee_info_check(user, data):
         user.profile.save()
 
         return {"next": next_step}
+
+    return {"errors": serializer.errors}
+
+
+def access_and_submission_check(user, data):
+    serializer = AccessAndSubmissionSerializer(data=data)
+
+    # Need Eligibility and AuditeeInfo already collected to proceed
+    all_steps_user_form_data = user.profile.entry_form_data
+    missing_fields = [
+        field
+        for field in ACCESS_SUBMISSION_PREVIOUS_STEP_DATA_WE_NEED
+        if field not in all_steps_user_form_data
+    ]
+    if missing_fields:
+        return {
+            "next": reverse("api-eligibility"),
+            "errors": "We're missing required fields, please try again.",
+            "missing_fields": missing_fields,
+        }
+
+    if serializer.is_valid():
+        # Create SF-SAC instance and add data from previous steps saved in the
+        # user profile
+
+        sac = SingleAuditChecklist.objects.create(
+            submitted_by=user,
+            submission_status="in_progress",
+            general_information=all_steps_user_form_data,
+        )
+
+        # Create all contact Access objects
+        Access.objects.create(
+            sac=sac, role="creator", email=user.email, user=user
+        )
+        Access.objects.create(
+            sac=sac,
+            role="certifying_auditee_contact",
+            email=serializer.data.get("certifying_auditee_contact"),
+        )
+        Access.objects.create(
+            sac=sac,
+            role="certifying_auditor_contact",
+            email=serializer.data.get("certifying_auditor_contact"),
+        )
+        for contact in serializer.data.get("auditee_contacts"):
+            Access.objects.create(sac=sac, role="auditee_contact", email=contact)
+        for contact in serializer.data.get("auditor_contacts"):
+            Access.objects.create(sac=sac, role="auditor_contact", email=contact)
+
+        sac.save()
+
+        # Clear entry form data from profile
+        user.profile.entry_form_data = {}
+        user.profile.save()
+
+        return {"report_id": sac.report_id, "next": "TBD"}
 
     return {"errors": serializer.errors}
 
@@ -154,6 +211,7 @@ class AuditeeInfoView(APIView):
     def post(self, request):
         return Response(auditee_info_check(request.user, request.data))
 
+
 class AccessAndSubmissionView(APIView):
     """
     Accepts information from Step 3 (Audit submission access) of the "Create New Audit"
@@ -162,68 +220,8 @@ class AccessAndSubmissionView(APIView):
     then returns success or error messages.
     """
 
-    PREVIOUS_STEP_DATA_WE_NEED = AuditeeInfoView.PREVIOUS_STEP_DATA_WE_NEED + [
-        "auditee_fiscal_period_start",
-        "auditee_fiscal_period_end",
-    ]
-
     def post(self, request):
-        serializer = AccessAndSubmissionSerializer(data=request.data)
-
-        # Need Eligibility and AuditeeInfo already collected to proceed
-        all_steps_user_form_data = request.user.profile.entry_form_data
-        missing_fields = [
-            field
-            for field in self.PREVIOUS_STEP_DATA_WE_NEED
-            if field not in all_steps_user_form_data
-        ]
-        if missing_fields:
-            return Response(
-                {
-                    "next": reverse("api-eligibility"),
-                    "errors": "We're missing required fields, please try again.",
-                    "missing_fields": missing_fields,
-                }
-            )
-
-        if serializer.is_valid():
-            # Create SF-SAC instance and add data from previous steps saved in the
-            # user profile
-
-            sac = SingleAuditChecklist.objects.create(
-                submitted_by=request.user,
-                submission_status="in_progress",
-                general_information=all_steps_user_form_data,
-            )
-
-            # Create all contact Access objects
-            Access.objects.create(
-                sac=sac, role="creator", email=request.user.email, user=request.user
-            )
-            Access.objects.create(
-                sac=sac,
-                role="certifying_auditee_contact",
-                email=serializer.data.get("certifying_auditee_contact"),
-            )
-            Access.objects.create(
-                sac=sac,
-                role="certifying_auditor_contact",
-                email=serializer.data.get("certifying_auditor_contact"),
-            )
-            for contact in serializer.data.get("auditee_contacts"):
-                Access.objects.create(sac=sac, role="auditee_contact", email=contact)
-            for contact in serializer.data.get("auditor_contacts"):
-                Access.objects.create(sac=sac, role="auditor_contact", email=contact)
-
-            sac.save()
-
-            # Clear entry form data from profile
-            request.user.profile.entry_form_data = {}
-            request.user.profile.save()
-
-            return Response({"report_id": sac.report_id, "next": "TBD"})
-
-        return Response({"errors": serializer.errors})
+        return Response(access_and_submission_check(request.user, request.data))
 
 
 def get_role_emails_for_sac(sac_id) -> dict:
@@ -310,12 +308,12 @@ class SingleAuditChecklistView(APIView):
         self.check_object_permissions(request, sac)
 
         submitted_invalid_keys = [
-            k for k in self.invalid_metadata_keys if k in request.data
-        ] + [
-            k
-            for k in self.invalid_general_information_keys
-            if k in request.data.get("general_information", {})
-        ]
+                                     k for k in self.invalid_metadata_keys if k in request.data
+                                 ] + [
+                                     k
+                                     for k in self.invalid_general_information_keys
+                                     if k in request.data.get("general_information", {})
+                                 ]
 
         if submitted_invalid_keys:
             base_msg = "The following fields cannot be modified via this endpoint: "

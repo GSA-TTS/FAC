@@ -91,7 +91,8 @@ class AccessAndSubmissionFormView(LoginRequiredMixin, View):
         body_data = parse_body_data(request_data=post_request)
 
         try:
-            api.views.eligibility_check(post_request.user, body_data)
+            result = api.views.access_and_submission_check(post_request.user, body_data)
+            new_sac = result.get("report_id")
 
             return redirect(reverse("auditeeinfo"))
         except Exception as ex:
