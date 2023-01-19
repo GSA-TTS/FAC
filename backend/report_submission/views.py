@@ -94,7 +94,7 @@ class AccessAndSubmissionFormView(LoginRequiredMixin, View):
             result = api.views.access_and_submission_check(post_request.user, body_data)
             new_sac = result.get("report_id")
 
-            return redirect(reverse("auditeeinfo"))
+            return redirect("/audit/")   #+ new_sac)
         except Exception as ex:
             print("Error processing data: ", ex)
-            return redirect(reverse("eligibility"))
+            return redirect(reverse("accessandsubmissioninfo"))
