@@ -12,24 +12,10 @@ from api.views import EligibilityFormView
 
 
 def parse_body_data(request_data):
-    body_unicode = request_data.body.decode('utf-8')
+    body_unicode = request_data.body.decode("utf-8")
     body_data = json.loads(body_unicode)
     return body_data
 
-
-# class based views for ...
-# class Step(View):
-#     def get(self, request):
-#         step = request.GET.get('step', 1)
-#         step = 1 if step not in (1, 2, 3) else step
-#         extra_context = {'step': step}
-#         template_name = f'report_submission/step-{step}.html'
-#         return render(request, template_name, extra_context)
-#
-#     def post(self, request):
-#         pass
-
-# class step1(LoginRequiredMixin, TemplateView):
 
 class ReportSubmissionRedirectView(View):
     def get(self, request):
@@ -38,7 +24,6 @@ class ReportSubmissionRedirectView(View):
 
 # Step 1
 class EligibilityFormView(LoginRequiredMixin, View):
-
     def get(self, request):
         return render(request, "report_submission/step-1.html")
 
@@ -94,7 +79,7 @@ class AccessAndSubmissionFormView(LoginRequiredMixin, View):
             result = api.views.access_and_submission_check(post_request.user, body_data)
             new_sac = result.get("report_id")
 
-            return redirect("/audit/")   #+ new_sac)
+            return redirect("/audit/")  # + new_sac)
         except Exception as ex:
             print("Error processing data: ", ex)
             return redirect(reverse("accessandsubmissioninfo"))

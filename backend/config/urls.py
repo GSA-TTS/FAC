@@ -69,7 +69,7 @@ urlpatterns = [
     ),
     path(settings.ADMIN_URL, admin.site.urls),
     path("openid/", include("djangooidc.urls")),
-    path("report_submission/", include('report_submission.urls')),
+    path("report_submission/", include("report_submission.urls")),
     # Keep last so we can use short urls for content pages like home page etc.
     path("", include("cms.urls")),
     path("audit/", include("audit.urls")),

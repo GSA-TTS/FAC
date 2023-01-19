@@ -31,10 +31,13 @@ AUDITEE_INFO_PREVIOUS_STEP_DATA_WE_NEED = [
     "is_usa_based",
 ]
 
-ACCESS_SUBMISSION_PREVIOUS_STEP_DATA_WE_NEED = AUDITEE_INFO_PREVIOUS_STEP_DATA_WE_NEED + [
-    "auditee_fiscal_period_start",
-    "auditee_fiscal_period_end",
-]
+ACCESS_SUBMISSION_PREVIOUS_STEP_DATA_WE_NEED = (
+    AUDITEE_INFO_PREVIOUS_STEP_DATA_WE_NEED
+    + [
+        "auditee_fiscal_period_start",
+        "auditee_fiscal_period_end",
+    ]
+)
 
 
 def eligibility_check(user, data):
@@ -46,15 +49,9 @@ def eligibility_check(user, data):
         # Store step 0 data in profile, overwriting any pre-existing.
         user.profile.entry_form_data = data
         user.profile.save()
-        return {
-            "eligible": True,
-            "next": next_step
-        }
+        return {"eligible": True, "next": next_step}
 
-    return {
-        "eligible": False,
-        "errors": serializer.errors
-    }
+    return {"eligible": False, "errors": serializer.errors}
 
 
 def auditee_info_check(user, data):
@@ -78,9 +75,7 @@ def auditee_info_check(user, data):
         next_step = reverse("api-accessandsubmission")
 
         # combine with expected eligibility info from session
-        user.profile.entry_form_data = (
-           user.profile.entry_form_data | data
-        )
+        user.profile.entry_form_data = user.profile.entry_form_data | data
         user.profile.save()
 
         return {"next": next_step}
@@ -116,9 +111,7 @@ def access_and_submission_check(user, data):
         )
 
         # Create all contact Access objects
-        Access.objects.create(
-            sac=sac, role="creator", email=user.email, user=user
-        )
+        Access.objects.create(sac=sac, role="creator", email=user.email, user=user)
         Access.objects.create(
             sac=sac,
             role="certifying_auditee_contact",
@@ -308,12 +301,12 @@ class SingleAuditChecklistView(APIView):
         self.check_object_permissions(request, sac)
 
         submitted_invalid_keys = [
-                                     k for k in self.invalid_metadata_keys if k in request.data
-                                 ] + [
-                                     k
-                                     for k in self.invalid_general_information_keys
-                                     if k in request.data.get("general_information", {})
-                                 ]
+            k for k in self.invalid_metadata_keys if k in request.data
+        ] + [
+            k
+            for k in self.invalid_general_information_keys
+            if k in request.data.get("general_information", {})
+        ]
 
         if submitted_invalid_keys:
             base_msg = "The following fields cannot be modified via this endpoint: "
