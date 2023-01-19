@@ -25,9 +25,20 @@ from .serializers import (
     UEISerializer,
 )
 
+AUDITEE_INFO_PREVIOUS_STEP_DATA_WE_NEED = [
+    "user_provided_organization_type",
+    "met_spending_threshold",
+    "is_usa_based",
+]
+
+ACCESS_SUBMISSION_PREVIOUS_STEP_DATA_WE_NEED = AUDITEE_INFO_PREVIOUS_STEP_DATA_WE_NEED + [
+    "auditee_fiscal_period_start",
+    "auditee_fiscal_period_end",
+]
+
 
 def eligibility_check(user, data):
-    serializer = EligibilitySerializer(data=data)  #data = request.data
+    serializer = EligibilitySerializer(data=data)  # data = request.data
     # self.eligibility_check(request)
     if serializer.is_valid():
         next_step = reverse("api-auditee-info")
@@ -44,6 +55,37 @@ def eligibility_check(user, data):
         "eligible": False,
         "errors": serializer.errors
     }
+
+
+def auditee_info_check(user, data):
+    serializer = AuditeeInfoSerializer(data=data)
+
+    # Need Eligibility info to proceed
+    entry_form_data = user.profile.entry_form_data
+    missing_fields = [
+        field
+        for field in AUDITEE_INFO_PREVIOUS_STEP_DATA_WE_NEED
+        if field not in entry_form_data
+    ]
+    if missing_fields:
+        return {
+                "next": reverse("api-eligibility"),
+                "errors": "We're missing required fields, please try again.",
+                "missing_fields": missing_fields,
+            }
+
+    if serializer.is_valid():
+        next_step = reverse("api-accessandsubmission")
+
+        # combine with expected eligibility info from session
+        user.profile.entry_form_data = (
+           user.profile.entry_form_data | data
+        )
+        user.profile.save()
+
+        return {"next": next_step}
+
+    return {"errors": serializer.errors}
 
 
 class IndexView(View):
@@ -109,44 +151,8 @@ class AuditeeInfoView(APIView):
     messages describing missing info or a reference to the next step to advance to.
     """
 
-    PREVIOUS_STEP_DATA_WE_NEED = [
-        "user_provided_organization_type",
-        "met_spending_threshold",
-        "is_usa_based",
-    ]
-
     def post(self, request):
-        serializer = AuditeeInfoSerializer(data=request.data)
-
-        # Need Eligibility info to proceed
-        entry_form_data = request.user.profile.entry_form_data
-        missing_fields = [
-            field
-            for field in self.PREVIOUS_STEP_DATA_WE_NEED
-            if field not in entry_form_data
-        ]
-        if missing_fields:
-            return Response(
-                {
-                    "next": reverse("api-eligibility"),
-                    "errors": "We're missing required fields, please try again.",
-                    "missing_fields": missing_fields,
-                }
-            )
-
-        if serializer.is_valid():
-            next_step = reverse("api-accessandsubmission")
-
-            # combine with expected eligibility info from session
-            request.user.profile.entry_form_data = (
-                request.user.profile.entry_form_data | request.data
-            )
-            request.user.profile.save()
-
-            return Response({"next": next_step})
-
-        return Response({"errors": serializer.errors})
-
+        return Response(auditee_info_check(request.user, request.data))
 
 class AccessAndSubmissionView(APIView):
     """

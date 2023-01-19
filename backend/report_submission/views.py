@@ -33,7 +33,6 @@ def parse_body_data(request_data):
 
 class ReportSubmissionRedirectView(View):
     def get(self, request):
-        print(request.body)
         return redirect(reverse("eligibility"))
 
 
@@ -41,7 +40,6 @@ class ReportSubmissionRedirectView(View):
 class EligibilityFormView(LoginRequiredMixin, View):
 
     def get(self, request):
-        print(request.body)
         return render(request, "report_submission/step-1.html")
 
     # render eligibility form
@@ -49,20 +47,10 @@ class EligibilityFormView(LoginRequiredMixin, View):
     # gather/save step 1 info, redirect to step 2
     def post(self, post_request):
         body_data = parse_body_data(request_data=post_request)
-        print("body_data", body_data)
-        print("user", post_request.user)
-        # print()
 
         try:
+            api.views.eligibility_check(post_request.user, body_data)
 
-            # data = dict(request.body.lists())
-
-            response_data = {
-                "data": api.views.eligibility_check(post_request.user, body_data),
-                "user": post_request.user
-            }
-
-        # return render(request, "step-2.html", response_data)
             return redirect(reverse("auditeeinfo"))
         except Exception as ex:
             print("Error processing data: ", ex)
@@ -78,20 +66,34 @@ class AuditeeInfoFormView(LoginRequiredMixin, View):
     # render auditee info form
 
     # gather/save step 2 info, redirect to step 3
-    def post(self, request):
-        print(request.body)
+    def post(self, post_request):
+        body_data = parse_body_data(request_data=post_request)
+
+        try:
+            api.views.auditee_info_check(post_request.user, body_data)
+
+            return redirect(reverse("accessandsubmission"))
+        except Exception as ex:
+            print("Error processing data: ", ex)
+            return redirect(reverse("auditeeinfo"))
         return redirect(reverse("accessandsubmissioninfo"))
 
 
 # Step 3
 class AccessAndSubmissionFormView(LoginRequiredMixin, View):
     def get(self, request):
-        print(request.body)
         return render(request, "report_submission/step-3.html")
 
     # render access-submission form
 
     # gather/save step 3 info, redirect to step ...4?
-    def post(self, request):
-        print(request.body)
-        redirect(reverse("report_submission"))
+    def post(self, post_request):
+        body_data = parse_body_data(request_data=post_request)
+
+        try:
+            api.views.eligibility_check(post_request.user, body_data)
+
+            return redirect(reverse("auditeeinfo"))
+        except Exception as ex:
+            print("Error processing data: ", ex)
+            return redirect(reverse("eligibility"))
