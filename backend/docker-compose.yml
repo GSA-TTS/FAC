@@ -32,6 +32,7 @@ services:
     volumes:
       - .:/src
       - /src/node_modules
+      - /src/staticfiles
 
 volumes:
   postgres-data:
