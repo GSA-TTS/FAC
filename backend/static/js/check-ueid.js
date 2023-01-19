@@ -26,11 +26,7 @@ function submitForm() {
 
 function handleAuditeeResponse(data) {
   console.log(data);
-  if (data.next == '/sac/accessandsubmission') {
-    window.location.href = NEXT_URL;
-  } else {
-    console.log(data.errors);
-  }
+  window.location.href = NEXT_URL;
 }
 function handleErrorResponse(e) {
   console.log('ERROR: Form submission error. ' + e);
