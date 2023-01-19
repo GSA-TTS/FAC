@@ -1,7 +1,5 @@
 import { queryAPI } from "./api";
-//import { getCookie } from "./csrft";
 
-//const csrftoken = getCookie('csrftoken');
 const SUBMISSION_URL = '/report_submission/eligibility/';
 const NEXT_URL = '../auditeeinfo';
 const FORM = document.forms[0];
@@ -12,13 +10,7 @@ function submitForm() {
       formData.met_spending_threshold
   );
   formData.is_usa_based = stringToBoolean(formData.is_usa_based);
-  /*
-  fetch(SUBMISSION_URL, {
-    method: "POST",
-    headers: {'X-CSRFToken': csrftoken},
-    body: JSON.stringify(formData)
-  }).then((resp) => resp.json()).then((data) => handleEligibilityResponse(data)).catch((e) => handleErrorResponse(e));
-  */
+
   queryAPI(
     SUBMISSION_URL,
     formData,

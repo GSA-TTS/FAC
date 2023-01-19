@@ -2,7 +2,7 @@ import { checkValidity } from './validate';
 import { queryAPI } from './api';
 
 const SUBMISSION_URL = '/report_submission/accessandsubmission/';
-const NEXT_URL = '../../submission/?reportId=';
+const NEXT_URL = '../../audit/';
 const FORM = document.forms[0];
 let addedContactNum = 1; // Counter for added contacts
 
@@ -36,13 +36,14 @@ function submitForm() {
 function handleAccessResponse(data) {
   if (data.report_id) {
     const nextUrlWithID = NEXT_URL + `${data.report_id}`;
-    window.location.href = nextUrlWithID;
+    window.location.href = NEXT_URL;
   } else {
     console.log(data);
   }
 }
 function handleErrorResponse(e) {
   console.log('ERROR: Form submission error. ' + e);
+  window.location.href = NEXT_URL;
 }
 
 function serializeFormData(formData) {
