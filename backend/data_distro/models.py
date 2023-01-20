@@ -166,6 +166,13 @@ class General(models.Model):
         max_length=40,
     )
 
+    # Not in key
+    # DATEFIREWALL
+    # PREVIOUSDATEFIREWALL
+    date_firewall = models.DateField(null=True)
+    previous_date_firewall = models.DateField(null=True)
+
+
 
 class CfdaInfo(models.Model):
     research_and_development = models.BooleanField(
@@ -511,7 +518,7 @@ class EinInfo(models.Model):
     )
 
 
-class DunInfo(models.Model):
+class DunsInfo(models.Model):
     duns = models.IntegerField(
         "Multiple Data Universal Numbering System Numbers"
     )  # , max_length=9)
