@@ -88,7 +88,7 @@ INSTALLED_APPS += ["rest_framework", "rest_framework.authtoken", "corsheaders"]
 
 # Our apps
 
-INSTALLED_APPS += ["audit", "api", "users"]
+INSTALLED_APPS += ["audit", "api", "users", "data_distro"]
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
