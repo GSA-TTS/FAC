@@ -7,8 +7,8 @@ import json
 import api.views
 
 
-def parse_body_data(request_data):
-    body_unicode = request_data.body.decode("utf-8")
+def parse_body_data(request_body):
+    body_unicode = request_body.decode("utf-8")
     body_data = json.loads(body_unicode)
     return body_data
 
@@ -27,7 +27,10 @@ class EligibilityFormView(LoginRequiredMixin, View):
 
     # gather/save step 1 info, redirect to step 2
     def post(self, post_request):
-        body_data = parse_body_data(request_data=post_request)
+        body_data = parse_body_data(request_data=post_request.body)
+
+        debuggable = post_request.body
+        print ("\n", debuggable, "\n")
 
         try:
             api.views.eligibility_check(post_request.user, body_data)
@@ -48,7 +51,7 @@ class AuditeeInfoFormView(LoginRequiredMixin, View):
 
     # gather/save step 2 info, redirect to step 3
     def post(self, post_request):
-        body_data = parse_body_data(request_data=post_request)
+        body_data = parse_body_data(request_data=post_request.body)
 
         try:
             api.views.auditee_info_check(post_request.user, body_data)
@@ -69,7 +72,7 @@ class AccessAndSubmissionFormView(LoginRequiredMixin, View):
 
     # gather/save step 3 info, redirect to step ...4?
     def post(self, post_request):
-        body_data = parse_body_data(request_data=post_request)
+        body_data = parse_body_data(request_data=post_request.body)
 
         result = api.views.access_and_submission_check(post_request.user, body_data)
         report_id = result.get("report_id")
