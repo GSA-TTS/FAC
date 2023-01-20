@@ -90,6 +90,7 @@ INSTALLED_APPS += [
     "users",
     "report_submission",
     "cms",
+    "data_distro"
 ]
 
 MIDDLEWARE = [
