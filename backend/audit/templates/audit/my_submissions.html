@@ -27,7 +27,8 @@
                 </thead>
                 <tbody> {% for item in data %}
                     <tr>
-                        <td><a href="{% url next_page %}?report_id={{item.report_id}}">{{item.report_id}}</a></td>
+                        <!--<td><a href="{% url next_page %}?report_id={{item.report_id}}">{{item.report_id}}</a></td>-->
+                        <td><a href="/sac/edit/{{item.report_id}}">{{item.report_id}}</a></td>
                         <td>{{ item.submission_status }}</td>
                         <td>{{ item.auditee_uei }}</td>
                         <td>{{ item.auditee_name }}</td>

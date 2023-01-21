@@ -60,6 +60,7 @@ def auditee_info_check(user, data):
 
     # Need Eligibility info to proceed
     entry_form_data = user.profile.entry_form_data
+
     missing_fields = [
         field
         for field in AUDITEE_INFO_PREVIOUS_STEP_DATA_WE_NEED
@@ -87,8 +88,14 @@ def auditee_info_check(user, data):
 def access_and_submission_check(user, data):
     serializer = AccessAndSubmissionSerializer(data=data)
 
-    # Need Eligibility and AuditeeInfo already collected to proceed
-    all_steps_user_form_data = user.profile.entry_form_data
+    # Need Eligibility and AuditeeInfo already collected to proceed.
+    # We probably need to exclude more than just csrfmiddlewaretoken from
+    # stray properties that might end up present in the submitted data:
+    all_steps_user_form_data = {
+        k: user.profile.entry_form_data[k]
+        for k in user.profile.entry_form_data
+        if k != "csrfmiddlewaretoken"
+    }
     missing_fields = [
         field
         for field in ACCESS_SUBMISSION_PREVIOUS_STEP_DATA_WE_NEED
