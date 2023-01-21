@@ -968,7 +968,7 @@ field_mappings = {
     "CLUSTERTOTAL": "cluster_total",
     "COGAGENCY": "cognizant_agency",
     # not in key check
-    "COG_OVER": "cognizant_agency",
+    "COG_OVER": "cognizant_agency_over",
     "COMPLETED_ON": "completed_on",
     "COMPONENT DATE RECEIVED": "component_date_received",
     "CONTENT": "content",
@@ -1056,9 +1056,9 @@ field_mappings = {
     "PRIORFINDINGREFNUMS": "prior_finding_refnums",
     "PROGRAMTOTAL": "program_total",
     "PYSCHEDULE": "prior_year_schedule",
-    "QCOSTS": "questoned_costs",
+    "QCOSTS": "questioned_costs",
     # not in key at all double check this (cfda table)
-    "QCOSTS2": "questoned_costs",
+    "QCOSTS2": "questioned_costs",
     # not like it is in the key and &
     "RD": "research_and_development",
     "REPEATFINDING": "repeat_finding",
