@@ -8,53 +8,53 @@ class General(models.Model):
         "Dollar Threshold to distinguish between Type A and Type B programs."
     )
     multiple_eins = models.BooleanField(
-        "Identifies if the Submission Contains Multiple EINs"
+        "Identifies if the Submission Contains Multiple EINs", null=True
     )
     multiple_duns = models.BooleanField(
-        "Identifies if the Submission Contains Multiple DUNS"
+        "Identifies if the Submission Contains Multiple DUNS", null=True
     )
     multiple_cpas = models.BooleanField(
-        "Identifies if the Submission Contains Multiple CPAs"
+        "Identifies if the Submission Contains Multiple CPAs", null=True
     )
     sp_framework_required = models.BooleanField(
-        "Indicate whether or not the special purpose framework used as basis of accounting by state law or tribal law"
+        "Indicate whether or not the special purpose framework used as basis of accounting by state law or tribal law", null=True
     )
     going_concern = models.BooleanField(
-        "Whether or not the audit contained a going concern paragraph  on financial statements"
+        "Whether or not the audit contained a going concern paragraph  on financial statements", null=True
     )
     condition_or_deficiency = models.BooleanField(
-        "Whether or not the audit disclosed a reportable condition/significant deficiency on financial statements"
+        "Whether or not the audit disclosed a reportable condition/significant deficiency on financial statements", null=True
     )
     material_weakness = models.BooleanField(
-        "Whether or not the audit disclosed any reportable condition/significant deficiency as a material weakness on financial statements"
+        "Whether or not the audit disclosed any reportable condition/significant deficiency as a material weakness on financial statements", null=True
     )
     material_noncompliance = models.BooleanField(
-        "Whether or not the audit disclosed a material noncompliance on financial statements"
+        "Whether or not the audit disclosed a material noncompliance on financial statements", null=True
     )
     dup_reports = models.BooleanField(
-        "Whether or not the financial statements include departments that have separate expenditures not included in this audit"
+        "Whether or not the financial statements include departments that have separate expenditures not included in this audit", null=True
     )
     low_risk = models.BooleanField(
-        "Indicate whether or not the auditee qualified as a low-risk auditee"
+        "Indicate whether or not the auditee qualified as a low-risk auditee", null=True
     )
     condition_or_deficiency_major_program = models.BooleanField(
-        "Whether or not the audit disclosed a reportable condition/significant deficiency for any major program in the Schedule of Findings and Questioned Costs"
+        "Whether or not the audit disclosed a reportable condition/significant deficiency for any major program in the Schedule of Findings and Questioned Costs", null=True
     )
     material_weakness_major_program = models.BooleanField(
-        "Indicate whether any reportable condition/signficant deficiency was disclosed as a material weakness for a major program in the Schedule of Findings and Questioned Costs"
+        "Indicate whether any reportable condition/signficant deficiency was disclosed as a material weakness for a major program in the Schedule of Findings and Questioned Costs", null=True
     )
     questoned_costs = models.BooleanField(
-        "Indicate whether or not the audit disclosed any known questioned costs."
+        "Indicate whether or not the audit disclosed any known questioned costs.", null=True
     )
     current_or_former_findings = models.BooleanField(
-        "Indicate whether or not current year findings or prior year findings affecting direct funds were reported"
+        "Indicate whether or not current year findings or prior year findings affecting direct funds were reported", null=True
     )
     prior_year_schedule = models.BooleanField(
-        "Indicate whether or not the report includes a Summary Schedule of Prior Year Audit Findings"
+        "Indicate whether or not the report includes a Summary Schedule of Prior Year Audit Findings", null=True
     )
-    report_required = models.BooleanField("Distribution to Federal Agency required?")
+    report_required = models.BooleanField("Distribution to Federal Agency required?", null=True)
     multiple_ueis = models.BooleanField(
-        "Identifies if the Submission Contains Multiple UEIs"
+        "Identifies if the Submission Contains Multiple UEIs", null=True
     )
     auditee_phone = models.IntegerField("Auditee Phone Number")  # , max_length=10)
     auditee_fax = models.IntegerField(
@@ -176,20 +176,20 @@ class General(models.Model):
 
 class CfdaInfo(models.Model):
     research_and_development = models.BooleanField(
-        "Indicate whether or not the program is a Research and Development program"
+        "Indicate whether or not the program is a Research and Development program", null=True
     )
     loans = models.BooleanField(
-        "Indicate whether or not the program is a Loan or Loan Guarantee (only available for audit years 2013 and beyond)"
+        "Indicate whether or not the program is a Loan or Loan Guarantee (only available for audit years 2013 and beyond)", null=True
     )
-    arra = models.BooleanField("American Recovery and Reinvestment Act Funded Program")
+    arra = models.BooleanField("American Recovery and Reinvestment Act Funded Program", null=True)
     direct = models.BooleanField(
-        "Indicate whether or not the award was received directly from a Federal awarding agency"
+        "Indicate whether or not the award was received directly from a Federal awarding agency", null=True
     )
     passthrough_award = models.BooleanField(
-        "Indicates whether or not funds were passed through to any subrecipients for the Federal program"
+        "Indicates whether or not funds were passed through to any subrecipients for the Federal program", null=True
     )
     major_program = models.BooleanField(
-        "Indicate whether or not the Federal program is a major program"
+        "Indicate whether or not the Federal program is a major program", null=True
     )
     finding_ref_nums = models.CharField("Findings Reference Numbers", max_length=100)
     amount = models.IntegerField(
@@ -217,7 +217,7 @@ class CfdaInfo(models.Model):
         "Other data used to identify the award which is not a CFDA number (e.g., program year, contract number)",
         max_length=50,
     )
-    cfda = models.IntegerField(
+    cfda = models.FloatField(
         "Federal Agency Prefix and Extension"
     )  # , max_length=52)
     cluster_name = models.CharField("The name of the cluster", max_length=75)
@@ -249,14 +249,14 @@ class CfdaInfo(models.Model):
 
 
 class Findings(models.Model):
-    modified_opinion = models.BooleanField("Modified Opinion finding")
-    other_non_compliance = models.BooleanField("Other Noncompliance finding")
-    material_weakness = models.BooleanField("Material Weakness finding")
-    significant_deficiency = models.BooleanField("Significant Deficiency finding")
-    other_findings = models.BooleanField("Other findings")
-    questioned_costs = models.BooleanField("Questioned Costs")
+    modified_opinion = models.BooleanField("Modified Opinion finding", null=True)
+    other_non_compliance = models.BooleanField("Other Noncompliance finding", null=True)
+    material_weakness = models.BooleanField("Material Weakness finding", null=True)
+    significant_deficiency = models.BooleanField("Significant Deficiency finding", null=True)
+    other_findings = models.BooleanField("Other findings", null=True)
+    questioned_costs = models.BooleanField("Questioned Costs", null=True)
     repeat_finding = models.BooleanField(
-        "Indicates whether or not the audit finding was a repeat of an audit finding in the immediate prior audit"
+        "Indicates whether or not the audit finding was a repeat of an audit finding in the immediate prior audit", null=True
     )
     finding_ref_nums = models.CharField("Findings Reference Numbers", max_length=100)
     prior_finding_ref_nums = models.CharField(
@@ -280,9 +280,9 @@ class Findings(models.Model):
 
 
 class Findingstext(models.Model):
-    charts_tables = models.CharField(
+    charts_tables = models.BooleanField(
         "Indicates whether or not the text contained charts or tables that could not be entered due to formatting restrictions",
-        max_length=1,
+        max_length=1, null=True
     )
     finding_ref_nums = models.CharField(
         "Audit Finding Reference Number", max_length=100
@@ -302,9 +302,9 @@ class Findingstext(models.Model):
 
 
 class Captext(models.Model):
-    charts_tables = models.CharField(
+    charts_tables = models.BooleanField(
         "Indicates whether or not the text contained charts or tables that could not be entered due to formatting restrictions",
-        max_length=1,
+        max_length=1, null=True
     )
     finding_ref_nums = models.CharField(
         "Audit Finding Reference Number", max_length=100

@@ -793,7 +793,7 @@ model_title_transforms = [
 
 
 field_transforms = [
-    {"AGENCY": "agency"}
+    {"AGENCY": "agency"},
     {"AGENCYCFDA": "agency_cfda"},
     {"AMOUNT": "amount"},
     {"ARRA": "arra"},
@@ -812,7 +812,7 @@ field_transforms = [
     {"AUDITOR_EIN": "auditor_ein"},
     {"AUDITTYPE": "audit_type"},
     {"AUDITYEAR": "audit_year"},
-    {"AWARDIDENTIFICATION": "awardidentification"},
+    {"AWARDIDENTIFICATION": "award_identification"},
     {"CAP_EXPLAIN": "cap_explain"},
     {"CAP": "cap"},
     {"CFDA": "cfda"},
@@ -938,13 +938,13 @@ field_transforms = [
 ]
 
 field_mappings = {
-    "AGENCY": "agency",
+    "AGENCY": "agency_cfda",
     "AGENCYCFDA": "agency_cfda",
     "AMOUNT": "amount",
     "ARRA": "arra",
-    "AUDITEECERTIFYNAME": "auditeecertifyname",
-    "AUDITEECERTIFYTITLE": "auditeecertifytitle",
-    "AUDITEECONTACT": "auditeecontact",
+    "AUDITEECERTIFYNAME": "auditee_certify_name",
+    "AUDITEECERTIFYTITLE": "auditee_certify_title",
+    "AUDITEECONTACT": "auditee_contact",
     "AUDITEEDATESIGNED": "auditee_date_signed",
     "AUDITEEEMAIL": "auditee_email",
     "AUDITEEFAX": "auditee_fax",
@@ -957,7 +957,7 @@ field_mappings = {
     "AUDITOR_EIN": "auditor_ein",
     "AUDITTYPE": "audit_type",
     "AUDITYEAR": "audit_year",
-    "AWARDIDENTIFICATION": "awardidentification",
+    "AWARDIDENTIFICATION": "award_identification",
     "CAP": "cap",
     "CAP_EXPLAIN": "cap_explain",
     "CFDA": "cfda",
@@ -986,7 +986,7 @@ field_mappings = {
     "CPASTREET1": "cpa_street1",
     "CPASTREET2": "cpa_street2",
     "CPATITLE": "cpa_title",
-    "CPAZIPCODE": "cpazipcode",
+    "CPAZIPCODE": "cpa_zip_code",
     "CYFINDINGS": "current_or_former_findings",
     "DATEFIREWALL": "date_firewall",
     "DBKEY": "dbkey",
@@ -1005,7 +1005,7 @@ field_mappings = {
     "FAC ACCEPTED DATE": "fac_accepted_date",
     # not in key but not worried
     "FACACCEPTEDDATE": "fac_accepted_date",
-    "FEDERALAWARDS": "federalawards",
+    "FEDERALAWARDS": "federal_awards",
     "FEDERALAWARDS_EXPLAIN": "federal_awards_explain",
     "FEDERALPROGRAMNAME": "federal_program_name",
     "FINDINGREFNUMS": "finding_ref_nums",
@@ -1092,7 +1092,7 @@ field_mappings = {
     "UEI": "uei",
     "UEISEQNUM": "uei_seq_num",
     "VERSION": "version",
-    "ZIPCODE": "zipcode",
+    "ZIPCODE": "zip_code",
 }
 
 table_mappings = {
@@ -1110,3 +1110,5 @@ table_mappings = {
     "eins": "EinInfo",
     "duns": "DunsInfo",
 }
+
+boolen_fields = ["arra", "direct", "loans", "major_program", "passthrough_award", "research_and_development", "material_weakness", "modified_opinion", "other_findings", "other_non_compliance", "questioned_cost", "repeat_finding", "significant_deficiency", "condition_or_deficiency", "condition_or_deficiency_major_program", "current_or_former_findings", "dup_reports", "going_concern", "low_risk", "material_noncompliance", "material_weakness", "material_weakness_major_program", "multiple_cpas", "multiple_duns", "multiple_eins", "multiple_ueis", "prior_year_schedule", "questoned_costs", "report_required", "sp_framework_required", "charts_tables"]
