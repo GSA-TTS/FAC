@@ -232,6 +232,8 @@ class CfdaInfo(models.Model):
     type_report_major_program = models.CharField(
         "Type of Report Issued on the Major Program Compliance", max_length=40
     )
+    # not in key for this table check descriptions
+    findings = models.TextField("Items on the Findings page")
     findings_count = models.IntegerField(
         "Number of findings for the federal program (only available for audit years 2013 and beyond)"
     )
@@ -246,6 +248,11 @@ class CfdaInfo(models.Model):
         "Audit Year and DBKEY (database key) combined make up the primary key.",
         max_length=40,
     )
+    ein = models.IntegerField(
+        "Primary Employer Identification Number"
+    )  # , max_length=9)
+    # check this- it is QCOSTS2
+    questioned_costs = models.CharField("Questioned Costs", null=True, max_length=40,)
 
 
 class Findings(models.Model):
@@ -471,7 +478,7 @@ class Agencies(models.Model):
         "2-digit prefix of Federal Agency requiring copy of audit report"
     )  # , max_length=2)
     ein = models.IntegerField(
-        "Employer Identification Number (EIN) of primary grantee"
+        "Employer Identification Number (EIN) of primary grantee", null=True
     )  # , max_length=9)
     dbkey = models.CharField(
         "Audit Year and DBKEY (database key) combined make up the primary key.",
