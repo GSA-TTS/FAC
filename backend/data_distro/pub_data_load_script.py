@@ -33,8 +33,8 @@ def file_clean(all_file_names):
             file_names.append(f)
     return file_names
 
-# agency22.txt, captext_formatted22.txt works
-# agency22.txt, captext_formatted22.txt works
+# agency22.txt, captext_formatted22.txt an 'cfda22.txt' work
+
 # load_file_names = ['cfda22.txt', 'cpas22.txt', 'duns22.txt', 'eins22.txt', 'findings22.txt', 'findingstext_formatted22.txt', 'gen22.txt', 'notes22.txt', 'passthrough22.txt', 'revisions22.txt', 'ueis22.txt']
 
 
@@ -42,7 +42,7 @@ def file_clean(all_file_names):
 def load_files(load_file_names):
     # for file_path in temp_files:
 
-
+load_file_names=['duns22.txt']
 for f in load_file_names:
     file_path = "data_distro/data_to_load/{}".format(f)
     file_name = file_path.replace("data_distro/data_to_load/", "")
@@ -64,14 +64,18 @@ for f in load_file_names:
                 # break cleaning logic into a separate function
                 if field_name in boolen_fields:
                     payload = boolean_conversion.get(payload, None)
+                # CfdaInfo
                 if field_name == "cfda":
                     payload = str(payload)
+                # CfdaInfo
+                if field_name == "cluster_total" and payload == 'nan':
+                    payload == None
                 instance_dict[field_name] = payload
-            print(instance_dict)
             p, created = fac_model.objects.get_or_create(**instance_dict)
-            # p.save()
-            # print("~~~~~~~~~~~~~~~~~~worked~~~~~~~~~~~~~~~~~~~~~~~~~~~")
 
+
+                # p.save()
+                # print("~~~~~~~~~~~~~~~~~~worked~~~~~~~~~~~~~~~~~~~~~~~~~~~")
             except Exception:
                 print("---------------------PROBLEM---------------------")
                 print(table, file_path)
@@ -81,6 +85,7 @@ for f in load_file_names:
                 traceback.print_exc()
                 print("-------------------------------------------------")
                 continue
+        print("finished chunk")
     print("Finished {0}".format(file_name))
 
 def load_data():

@@ -266,15 +266,15 @@ class Notes(models.Model):
 
 
 class MultipleCpasInfo(models.Model):
-    cpa_phone = models.IntegerField("CPA phone number")  # , max_length=10)
+    cpa_phone = models.IntegerField("CPA phone number", null=True,)  # , max_length=10)
     cpa_fax = models.IntegerField("CPA fax number (optional)", null=True,)  # , max_length=10)
     cpa_state = models.CharField("CPA State", max_length=2)
     cpa_city = models.CharField("CPA City", max_length=30)
     cpa_title = models.CharField("Title of CPA Contact", max_length=40)
     cpa_street1 = models.CharField("CPA Street Address", max_length=45)
-    cpa_zip_code = models.IntegerField("CPA Zip Code")  # , max_length=9)
+    cpa_zip_code = models.IntegerField("CPA Zip Code", null=True,)  # , max_length=9)
     cpa_contact = models.CharField("Name of CPA Contact", max_length=50)
-    cpa_mail = models.CharField("CPA email address (optional)", max_length=60, null=True,)
+    cpa_email = models.CharField("CPA mail address (optional)", max_length=60, null=True,)
     cpa_firm_name = models.CharField("CPA Firm Name", max_length=64)
     cpa_ein = models.IntegerField(
         "CPA Firm EIN (only available for audit years 2013 and beyond)", null=True,
@@ -288,7 +288,7 @@ class MultipleCpasInfo(models.Model):
         max_length=40,
     )
     seqnum = models.IntegerField(
-        "Order that Auditors were reported on page 5 of SF-SAC"
+        "Order that Auditors were reported on page 5 of SF-SAC", null=True
     )
 
 
