@@ -36,10 +36,47 @@ def file_clean(all_file_names):
             file_names.append(f)
     return file_names
 
+def rename_headers(df):
+    """Replaces headers with new field names that match the models"""
+    headers_list = df.columns
+    new_headers = []
+    for header in headers_list:
+        new_headers.append(field_mappings[header])
+    df.columns = new_headers
+    return df
+
+def handle_exceptions(table, file_path, instance_dict, fac_model_name, error_trace, exceptions_list):
+    """Add detailed explanations to the logs and keep track of each type of error"""
+    logger.warn("""
+        ---------------------PROBLEM---------------------
+        {table}, {file_path}
+        ----
+        {instance_dict}
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        {trace}
+        -------------------------------------------------
+        """.format(
+            table = table,
+            file_path = file_path,
+            instance_dict = instance_dict,
+            trace = error_trace,
+        )
+    )
+    problem_text = "Error loading {file_path} into {fac_model_name}: \n \
+        {trace}".format(
+            file_path = file_path,
+            fac_model_name= fac_model_name,
+            instance_dict = instance_dict,
+            trace = error_trace,
+        )
+    if problem_text not in exceptions_list:
+        exceptions_list.append(problem_text)
+
 
 def load_files(load_file_names):
     """Load files into django models"""
-    print
+    exceptions_list = []
+    exceptions_count = 0
     for f in load_file_names:
         file_path = "data_distro/data_to_load/{}".format(f)
         file_name = file_path.replace("data_distro/data_to_load/", "")
@@ -49,15 +86,14 @@ def load_files(load_file_names):
         logger.warn("Starting to load {0} into {1}...".format(file_name, fac_model_name))
         
         for i, chunk in enumerate(read_csv(file_path, chunksize=35000, sep="|", encoding="mac-roman")):
-            csv_dict = chunk.to_dict(orient='records')
+            chunk_with_headers = rename_headers(chunk)
+            csv_dict = chunk_with_headers.to_dict(orient='records')
             for row in csv_dict:
                 try:
                     fields = list(row.keys())
                     instance_dict = {}
-                    # should do this with the header instead
-                    for key in fields:
-                        field_name = field_mappings[key]
-                        payload = row[key]
+                    for field_name in fields:
+                        payload = row[field_name]
                         # break cleaning logic into a separate function
                         if field_name in boolen_fields:
                             payload = boolean_conversion.get(payload, None)
@@ -71,23 +107,13 @@ def load_files(load_file_names):
                     p, created = fac_model.objects.get_or_create(**instance_dict)
 
                 except Exception:
-                    logger.warn("""
-                        ---------------------PROBLEM---------------------
-                        {table}, {file_path}
-                        ----
-                        {instance_dict}
-                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                        {trace}
-                        -------------------------------------------------
-                        """.format(
-                            table = table,
-                            file_path = file_path,
-                            instance_dict = instance_dict,
-                            trace = traceback.print_exc(),
-                        )
-                    )
-            print("finished chunk")
-        print("Finished {0}".format(file_name))
+                    handle_exceptions(table, file_path, instance_dict, fac_model_name, traceback.format_exc(), exceptions_list)
+                    exceptions_count += 1
+
+            logger.warn("finished chunk")
+        logger.warn("Finished {0}".format(file_name))
+        return exceptions_list, exceptions_count
+
 
 class Command(BaseCommand):
     help = """
@@ -111,4 +137,17 @@ class Command(BaseCommand):
             file_names = next(walk("data_distro/data_to_load"), (None, None, []))[2]
             load_file_names = file_clean(file_names)
 
-        load_files(load_file_names)
+        errors, exceptions_count = load_files(load_file_names)
+
+        if exceptions_count > 0:
+            message = "{0} error types in {1} records:".format(len(errors), exceptions_count)
+            for err in errors:
+                message += """
+                {0}
+                """.format(err)
+            logger.error(message)
+        else:
+            logger.warn("Successful upload")
+
+
+

@@ -308,33 +308,26 @@ class Revisions(models.Model):
         "Explanation of what items on the General Info page were edited during the revision",
         max_length=150,
     )
-    federal_awards_explain = models.CharField(
+    federal_awards_explain = models.TextField(
         "Explanation of what items on the Federal Awards page were edited during the revision",
-        max_length=150,
     )
-    notes_to_sefa_explain = models.CharField(
+    notes_to_sefa_explain = models.TextField(
         "Explanation of what items on the Notes to SEFA page were edited during the revision",
-        max_length=150,
     )
-    auditinfo_explain = models.CharField(
+    auditinfo_explain = models.TextField(
         "Explanation of what items on the Audit Info page were edited during the revision",
-        max_length=150,
     )
-    findings_explain = models.CharField(
+    findings_explain = models.TextField(
         "Explanation of what items on the Findings page were edited during the revision",
-        max_length=150,
     )
-    findings_text_explain = models.CharField(
+    findings_text_explain = models.TextField(
         "Explanation of what items on the Text of the Audit Findings page were edited during the revision",
-        max_length=150,
     )
-    cap_explain = models.CharField(
+    cap_explain = models.TextField(
         "Explanation of what items on the CAP Text page were edited during the revision",
-        max_length=150,
     )
-    other_explain = models.CharField(
+    other_explain = models.TextField(
         "Explanation of what other miscellaneous items were edited during the revision",
-        max_length=150,
     )
     audit_info = models.CharField(
         "Indicates what items on the Audit Info page were edited during the revision",
