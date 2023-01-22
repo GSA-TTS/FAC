@@ -900,10 +900,10 @@ field_transforms = [
     {"PASSTHROUGHNAME": "passthrough_name"},
     {"PERIODCOVERED": "period_covered"},
     {"PREVIOUS_COMPLETED_ON": "previous_completed_on"},
-    {"PRIORFINDINGREFNUMS": "prior_finding_refnums"},
+    {"PRIORFINDINGREFNUMS": "prior_finding_ref_nums"},
     {"PROGRAMTOTAL": "program_total"},
     {"PYSCHEDULE": "prior_year_schedule"},
-    {"QCOSTS": "questoned_costs"},
+    {"QCOSTS": "questioned_costs"},
     {"R&D": "research_and_development"},
     {"REPEATFINDING": "repeat_finding"},
     {"REPORTABLECONDITION/SIGNIFICANTDEFICIENCY": "condition_or_deficiency"},
@@ -1053,7 +1053,7 @@ field_mappings = {
     "PERIODCOVERED": "period_covered",
     "PREVIOUS_COMPLETED_ON": "previous_completed_on",
     "PREVIOUSDATEFIREWALL": "previous_date_firewall",
-    "PRIORFINDINGREFNUMS": "prior_finding_refnums",
+    "PRIORFINDINGREFNUMS": "prior_finding_ref_nums",
     "PROGRAMTOTAL": "program_total",
     "PYSCHEDULE": "prior_year_schedule",
     "QCOSTS": "questioned_costs",
@@ -1111,4 +1111,4 @@ table_mappings = {
     "duns": "DunsInfo",
 }
 
-boolen_fields = ["arra", "direct", "loans", "major_program", "passthrough_award", "research_and_development", "material_weakness", "modified_opinion", "other_findings", "other_non_compliance", "questioned_cost", "repeat_finding", "significant_deficiency", "condition_or_deficiency", "condition_or_deficiency_major_program", "current_or_former_findings", "dup_reports", "going_concern", "low_risk", "material_noncompliance", "material_weakness", "material_weakness_major_program", "multiple_cpas", "multiple_duns", "multiple_eins", "multiple_ueis", "prior_year_schedule", "questoned_costs", "report_required", "sp_framework_required", "charts_tables"]
+boolen_fields = ["arra", "direct", "loans", "major_program", "passthrough_award", "research_and_development", "material_weakness", "modified_opinion", "other_findings", "other_non_compliance", "questioned_cost", "repeat_finding", "significant_deficiency", "condition_or_deficiency", "condition_or_deficiency_major_program", "current_or_former_findings", "dup_reports", "going_concern", "low_risk", "material_noncompliance", "material_weakness", "material_weakness_major_program", "multiple_cpas", "multiple_duns", "multiple_eins", "multiple_ueis", "prior_year_schedule", "questioned_costs", "report_required", "sp_framework_required", "charts_tables"]
