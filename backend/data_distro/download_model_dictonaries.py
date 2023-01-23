@@ -1059,7 +1059,9 @@ field_mappings = {
     "QCOSTS": "questioned_costs",
     # not in key at all double check this (cfda table)
     "QCOSTS2": "questioned_costs",
-    # not like it is in the key and &
+    # only in the key
+    "R&D": "research_and_development",
+    # only in the data columns
     "RD": "research_and_development",
     "REPEATFINDING": "repeat_finding",
     "REPORTABLECONDITION/SIGNIFICANTDEFICIENCY": "condition_or_deficiency",
@@ -1109,6 +1111,22 @@ table_mappings = {
     "passthrough": "Passthrough",
     "eins": "EinInfo",
     "duns": "DunsInfo",
+}
+
+table_mappings_from_key = {
+    "GENERAL": "General",
+    "CFDA INFO": "CfdaInfo",
+    "FINDINGS": "Findings",
+    "FINDINGSTEXT": "Findingstext",
+    "CAPTEXT": "Captext",
+    "NOTES": "Notes",
+    "MULTIPLE CPAS INFO": "MultipleCpasInfo",
+    "REVISIONS": "Revisions",
+    "UEI INFO": "UeiInfo",
+    "AGENCIES": "Agencies",
+    "PASSTHROUGH": "Passthrough",
+    "EIN INFO": "EinInfo",
+    "DUN INFO": "DunsInfo",
 }
 
 boolen_fields = [

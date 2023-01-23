@@ -16,8 +16,6 @@ from django.core.management.base import BaseCommand
 
 from data_distro import models as mods
 from data_distro.download_model_dictonaries import (
-    model_title_transforms,
-    field_transforms,
     table_mappings,
     field_mappings,
     boolen_fields,
@@ -89,7 +87,7 @@ def data_transform(field_name, payload):
     if str(payload) == "nan":
         payload = None
 
-    #     #debug which column is triggering an int out of range error
+    ## debug which column is triggering an int out of range error
     # if type(payload) == int:
     #     if payload > 2147483647:
     #         print("PROBLEM int~~~~~~~~~~~~~~~", field_name, payload)
@@ -178,6 +176,27 @@ def load_files(load_file_names):
         return exceptions_list, exceptions_count
 
 
+def log_results(errors, exceptions_count):
+    if exceptions_count > 0:
+        message = """###############################
+
+            """
+        for err in errors:
+            message += """
+            {0}
+            """.format(
+                err
+            )
+        message += """###############################
+            {0} error types in {1} records:
+            ###############################""".format(
+            len(errors), exceptions_count
+        )
+        logger.error(message)
+    else:
+        logger.warn("Successful upload")
+
+
 class Command(BaseCommand):
     help = """
         Loads data from public download files into Django models. It will automatically \
@@ -201,19 +220,4 @@ class Command(BaseCommand):
             load_file_names = file_clean(file_names)
 
         errors, exceptions_count = load_files(load_file_names)
-
-        if exceptions_count > 0:
-            message = """###############################
-                {0} error types in {1} records:
-                ###############################""".format(
-                len(errors), exceptions_count
-            )
-            for err in errors:
-                message += """
-                {0}
-                """.format(
-                    err
-                )
-            logger.error(message)
-        else:
-            logger.warn("Successful upload")
+        log_results(errors, exceptions_count)
