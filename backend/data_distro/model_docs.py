@@ -8,7 +8,6 @@ The field name is going to be a short name, the long name is going to be a short
 API_DESCRIPTION = """Data from the Federal Audit Clearinghouse"""
 
 
-
 """ Model choices """
 
 
@@ -22,7 +21,13 @@ type_reports_choices = ("U", "Q", "A", "D")
 # SP_FRAMEWORK
 #     Cash basis, Tax basis, Regulatory basis, Contractual basis Other basis
 
-sp_framework_choices = ("Cash basis", "Tax basis", "Regulatory basis", "Contractual basis", "Other basis")
+sp_framework_choices = (
+    "Cash basis",
+    "Tax basis",
+    "Regulatory basis",
+    "Contractual basis",
+    "Other basis",
+)
 
 
 # TYPEREQUIREMENT
@@ -42,7 +47,24 @@ sp_framework_choices = ("Cash basis", "Tax basis", "Regulatory basis", "Contract
 #     N=Special tests and provisions
 #     O=None
 #     P=Other
-type_requirement_choices = ('A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P')
+type_requirement_choices = (
+    "A",
+    "B",
+    "C",
+    "D",
+    "E",
+    "F",
+    "G",
+    "H",
+    "I",
+    "J",
+    "K",
+    "L",
+    "M",
+    "N",
+    "O",
+    "P",
+)
 
 
 # TYPE_ID
@@ -50,8 +72,7 @@ type_requirement_choices = ('A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K
 #     2=10% RULE
 #     3=ADDITIONAL
 #     4=SPECIAL
-type_id_choices = ('1', '2', '3', '4')
-
+type_id_choices = ("1", "2", "3", "4")
 
 
 """Advanced explanation docs"""
@@ -195,7 +216,9 @@ material_weakness_major_program_doc = "Data sources: SF-SAC 2001-2003: III/6;SF-
 multiple_cpas_doc = "Data sources: SF-SAC 2008-2009: I/7/a;SF-SAC 2010-2012: I/7/a;SF-SAC 2013-2015: I/7;SF-SAC 2016-2018: I/7;SF-SAC 2019-2021: I/6/g;SF-SAC 2022: I/6/g Census mapping: GENERAL, MULTIPLE_CPAS"
 multiple_duns_doc = "Data sources: SF-SAC 2004-2007: I/5/e;SF-SAC 2008-2009: I/4/e;SF-SAC 2010-2012: I/4/e;SF-SAC 2013-2015: I/4/e;SF-SAC 2016-2018: I/4/e;SF-SAC 2019-2021: I/4/e;SF-SAC 2022: I/4/e Census mapping: GENERAL, MULTIPLEDUNS"
 multiple_eins_doc = "Data sources: SF-SAC 1997-2000: I/5/b;SF-SAC 2001-2003: I/5/b;SF-SAC 2004-2007: I/5/b;SF-SAC 2008-2009: I/4/b;SF-SAC 2010-2012: I/4/b;SF-SAC 2013-2015: I/4/b;SF-SAC 2016-2018: I/4/b;SF-SAC 2019-2021: I/4/b;SF-SAC 2022: I/4/b Census mapping: GENERAL, MULTIPLEEINS"
-multiple_ueis_doc = "Data sources: SF-SAC 2022: I/4/h Census mapping: GENERAL, MULTIPLEUEIS"
+multiple_ueis_doc = (
+    "Data sources: SF-SAC 2022: I/4/h Census mapping: GENERAL, MULTIPLEUEIS"
+)
 number_months_doc = "Data sources: SF-SAC 1997-2000: I/3;SF-SAC 2001-2003: I/3;SF-SAC 2004-2007: I/3;SF-SAC 2008-2009: I/3;SF-SAC 2010-2012: I/3;SF-SAC 2013-2015: I/3;SF-SAC 2016-2018: I/3;SF-SAC 2019-2021: I/3;SF-SAC 2022: I/3 Census mapping: GENERAL, NUMBERMONTHS"
 oversight_agency_doc = "Data sources: SF-SAC 1997-2000: I/9;SF-SAC 2001-2003: I/9 Census mapping: GENERAL, OVERSIGHTAGENCY"
 period_covered_doc = "Data sources: SF-SAC 1997-2000: I/3;SF-SAC 2001-2003: I/3;SF-SAC 2004-2007: I/3;SF-SAC 2008-2009: I/3;SF-SAC 2010-2012: I/3;SF-SAC 2013-2015: I/3;SF-SAC 2016-2018: I/3;SF-SAC 2019-2021: I/3;SF-SAC 2022: I/3 Census mapping: GENERAL, PERIODCOVERED"

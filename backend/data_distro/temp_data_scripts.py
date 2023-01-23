@@ -74,8 +74,8 @@ for field in doc_metadata.keys():
     for model in doc_metadata[field]["models"]:
         data = doc_metadata[field]
         table_key = "original_table_{}".format(model)
-        table = data[table_key],
-        original_name = data["original_name"],
+        table = (data[table_key],)
+        original_name = (data["original_name"],)
         if len(data["models"]) > 1:
             differentiator = "_{0}".format(model.lower())
         else:
@@ -90,8 +90,8 @@ for field in doc_metadata.keys():
             field_name=field,
             differentiator=differentiator,
             sources=sources,
-            table=table,
-            original_name=original_name,
+            table=table[0],
+            original_name=original_name[0],
         )
         print(docstring)
 
