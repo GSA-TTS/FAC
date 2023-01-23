@@ -44,9 +44,7 @@ class AuditeeInfoFormView(LoginRequiredMixin, View):
 
     # gather/save step 2 info, redirect to step 3
     def post(self, post_request):
-        body_data = parse_body_data(post_request.body)
-
-        info_check = api.views.auditee_info_check(post_request.user, body_data)
+        info_check = api.views.auditee_info_check(post_request.user, post_request.POST)
         if info_check.get("errors"):
             return redirect(reverse("auditeeinfo"))
             print("Auditee info data error: ", info_check)
