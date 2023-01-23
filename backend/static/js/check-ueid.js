@@ -1,37 +1,7 @@
 import { checkValidity } from './validate.js';
 import { queryAPI } from "./api";
 
-// const SUBMISSION_URL = '/report_submission/auditeeinfo/';
-// const NEXT_URL = '../accessandsubmission';
 const FORM = document.forms[0];
-
-// function submitForm() {
-//   const formData = serializeFormData(new FormData(FORM));
-//   formData.auditee_fiscal_period_start = new Date(
-//     formData.auditee_fiscal_period_start
-//   ).toLocaleDateString('en-CA');
-//   formData.auditee_fiscal_period_end = new Date(
-//     formData.auditee_fiscal_period_end
-//   ).toLocaleDateString('en-CA');
-//
-//   queryAPI(
-//     SUBMISSION_URL,
-//     formData,
-//     {
-//       method: 'POST',
-//     },
-//     [handleAuditeeResponse, handleErrorResponse]
-//   );
-// }
-
-// function handleAuditeeResponse(data) {
-//   console.log(data);
-//   window.location.href = NEXT_URL;
-// }
-// function handleErrorResponse(e) {
-//   console.log('ERROR: Form submission error. ' + e);
-//   window.location.href = NEXT_URL;
-// }
 
 function handleUEIDResponse({ valid, response, errors }) {
   if (valid) {
@@ -262,10 +232,6 @@ function validateFyStartDate(fyInput) {
   setFormDisabled(!allResponsesValid());
 }
 
-// function serializeFormData(formData) {
-//   return Object.fromEntries(formData);
-// }
-
 function setFormDisabled(shouldDisable) {
   const continueBtn = document.getElementById('continue');
   continueBtn.disabled = shouldDisable;
@@ -291,7 +257,6 @@ function attachEventHandlers() {
   FORM.addEventListener('submit', (e) => {
     e.preventDefault();
     if (!allResponsesValid()) return;
-    // submitForm();
     FORM.submit();
   });
 

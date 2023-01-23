@@ -1,7 +1,7 @@
 import { checkValidity } from './validate';
 
 const FORM = document.forms[0];
-let addedContactNum = 1; // Counter for added contacts
+let addedContactNum = 1;
 
 function setFormDisabled(shouldDisable) {
   const continueBtn = document.getElementById('create');
@@ -26,7 +26,6 @@ function appendContactField(btnEl) {
   const newInputs = newRow.querySelectorAll('input');
   newInputs.forEach(function (input) {
     input.id = input.id + '-' + addedContactNum;
-    input.name = input.name; // + '-' + addedContactNum;
   });
 
   const newLabels = newRow.querySelectorAll('label');
