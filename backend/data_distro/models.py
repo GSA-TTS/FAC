@@ -5,80 +5,203 @@ from django.contrib.auth.models import User
 # Models that mimic the downloads
 class General(models.Model):
     audit_type = models.CharField("Type of Audit", max_length=40)
-    audit_year = models.CharField("Audit Year and DBKEY (database key) combined make up the primary key.",max_length=40,)
-    auditee_certify_name = models.CharField("Name of Auditee Certifying Official", max_length=50, null=True)
-    auditee_certify_title = models.CharField("Title of Auditee Certifying Official", max_length=50, null=True)
+    audit_year = models.CharField(
+        "Audit Year and DBKEY (database key) combined make up the primary key.",
+        max_length=40,
+    )
+    auditee_certify_name = models.CharField(
+        "Name of Auditee Certifying Official", max_length=50, null=True
+    )
+    auditee_certify_title = models.CharField(
+        "Title of Auditee Certifying Official", max_length=50, null=True
+    )
     auditee_contact = models.CharField("Name of Auditee Contact", max_length=50)
     auditee_date_signed = models.DateField("Date of auditee signature")
-    auditee_email = models.CharField("Auditee Email address", max_length=60)
-    auditee_fax = models.IntegerField("Auditee Fax Number (optional)", null=True,)  # , max_length=10)
+    auditee_email = models.CharField(
+        "Auditee Email address",
+        max_length=60,
+        null=True,
+    )
+    auditee_fax = models.PositiveBigIntegerField(
+        "Auditee Fax Number (optional)",
+        null=True,
+    )  # , max_length=10)
     auditee_name = models.CharField("Name of the Auditee", max_length=70)
-    auditee_name_title = models.CharField("Title of Auditee Certifying Official", max_length=70)
-    auditee_phone = models.IntegerField("Auditee Phone Number")  # , max_length=10)
+    auditee_name_title = models.CharField(
+        "Title of Auditee Certifying Official", max_length=70
+    )
+    auditee_phone = models.PositiveBigIntegerField(
+        "Auditee Phone Number"
+    )  # , max_length=10)
     auditee_title = models.CharField("Title of Auditee Contact", max_length=40)
-    auditor_ein = models.IntegerField("CPA Firm EIN (only available for audit years 2013 and beyond)")  # , max_length=9)
+    auditor_ein = models.IntegerField(
+        "CPA Firm EIN (only available for audit years 2013 and beyond)"
+    )  # , max_length=9)
     city = models.CharField("Auditee City", max_length=30)
-    cognizant_agency = models.IntegerField("Two digit Federal agency prefix of the cognizant agency")  # , max_length=2)
-    cognizant_agency_over = models.IntegerField()
-    completed_on = models.DateField("Date the Audit was Posted to the Internet as Complete", null=True)
-    component_date_received = models.DateField("The most recent date an audit component was received by the FAC. This field was not populated before 2004. Receipt of Financial statements only are not processed until the rest of the audit or a Form SF-SAC is also received.", null=True)
-    condition_or_deficiency = models.BooleanField("Whether or not the audit disclosed a reportable condition/significant deficiency on financial statements", null=True)
-    condition_or_deficiency_major_program = models.BooleanField("Whether or not the audit disclosed a reportable condition/significant deficiency for any major program in the Schedule of Findings and Questioned Costs", null=True)
+    # not actually digits in data
+    cognizant_agency = models.CharField(
+        "Two digit Federal agency prefix of the cognizant agency",
+        max_length=2,
+        null=True,
+    )
+    cognizant_agency_over = models.CharField(max_length=2, null=True)
+    completed_on = models.DateField(
+        "Date the Audit was Posted to the Internet as Complete", null=True
+    )
+    component_date_received = models.DateField(
+        "The most recent date an audit component was received by the FAC. This field was not populated before 2004. Receipt of Financial statements only are not processed until the rest of the audit or a Form SF-SAC is also received.",
+        null=True,
+    )
+    condition_or_deficiency = models.BooleanField(
+        "Whether or not the audit disclosed a reportable condition/significant deficiency on financial statements",
+        null=True,
+    )
+    condition_or_deficiency_major_program = models.BooleanField(
+        "Whether or not the audit disclosed a reportable condition/significant deficiency for any major program in the Schedule of Findings and Questioned Costs",
+        null=True,
+    )
     cpa_city = models.CharField("CPA City", max_length=30)
     cpa_contact = models.CharField("Name of CPA Contact", max_length=50)
-    cpa_country = models.CharField("CPA Country", max_length=6)
+    cpa_country = models.CharField("CPA Country", max_length=6, null=True)
     cpa_date_signed = models.DateField("Date of CPA signature")
-    cpa_email = models.CharField("CPA email address", max_length=60)
-    cpa_fax = models.IntegerField("CPA fax number (optional)", null=True,)  # , max_length=10)
+    cpa_email = models.CharField("CPA email address", max_length=60, null=True)
+    cpa_fax = models.PositiveBigIntegerField(
+        "CPA fax number (optional)", null=True
+    )  # , max_length=10)
     cpa_firm_name = models.CharField("CPA Firm Name", max_length=64)
-    cpa_foreign = models.CharField("CPA Address - if international", max_length=200)
-    cpa_phone = models.IntegerField("CPA phone number")  # , max_length=10)
+    cpa_foreign = models.CharField(
+        "CPA Address - if international", max_length=200, null=True
+    )
+    cpa_phone = models.PositiveBigIntegerField("CPA phone number")  # , max_length=10)
     cpa_state = models.CharField("CPA State", max_length=2)
     cpa_street1 = models.CharField("CPA Street Address", max_length=45)
-    cpa_street2 = models.CharField("CPA Street Address", max_length=45)
+    cpa_street2 = models.CharField("CPA Street Address", max_length=45, null=True)
     cpa_title = models.CharField("Title of CPA Contact", max_length=40)
     cpa_zip_code = models.IntegerField("CPA Zip Code")  # , max_length=9)
-    current_or_former_findings = models.BooleanField("Indicate whether or not current year findings or prior year findings affecting direct funds were reported", null=True)
+    current_or_former_findings = models.BooleanField(
+        "Indicate whether or not current year findings or prior year findings affecting direct funds were reported",
+        null=True,
+    )
     date_firewall = models.DateField(null=True)
-    dbkey = models.CharField("Audit Year and DBKEY (database key) combined make up the primary key.",max_length=40,)
-    dollar_threshold = models.FloatField("Dollar Threshold to distinguish between Type A and Type B programs.")
-    duns = models.IntegerField("Primary Data Universal Numbering System Number")  # , max_length=9)
-    dup_reports = models.BooleanField("Whether or not the financial statements include departments that have separate expenditures not included in this audit", null=True)
-    ein = models.IntegerField("Primary Employer Identification Number")  # , max_length=9)
-    ein_subcode = models.IntegerField("Subcode assigned to the EIN")  # , max_length=3)
-    entity_type = models.CharField("Self reported type of entity (i.e., States, Local Governments, Indian Tribes, Institutions of Higher Education, NonProfit)", max_length=50,)
-    fac_accepted_date = models.DateField("The most recent date an audit report was submitted to the FAC that passed FAC screening and was accepted as a valid OMB Circular A-133 report submission.")
-    form_date_received = models.DateField("The most Recent Date the Form SF-SAC was received by the FAC. This field was not populated before 2001.")
+    dbkey = models.CharField(
+        "Audit Year and DBKEY (database key) combined make up the primary key.",
+        max_length=40,
+    )
+    dollar_threshold = models.FloatField(
+        "Dollar Threshold to distinguish between Type A and Type B programs.", null=True
+    )
+    duns = models.IntegerField(
+        "Primary Data Universal Numbering System Number", null=True
+    )  # , max_length=9)
+    dup_reports = models.BooleanField(
+        "Whether or not the financial statements include departments that have separate expenditures not included in this audit",
+        null=True,
+    )
+    ein = models.IntegerField(
+        "Primary Employer Identification Number"
+    )  # , max_length=9)
+    ein_subcode = models.IntegerField(
+        "Subcode assigned to the EIN", null=True
+    )  # , max_length=3)
+    entity_type = models.CharField(
+        "Self reported type of entity (i.e., States, Local Governments, Indian Tribes, Institutions of Higher Education, NonProfit)",
+        max_length=50,
+    )
+    fac_accepted_date = models.DateField(
+        "The most recent date an audit report was submitted to the FAC that passed FAC screening and was accepted as a valid OMB Circular A-133 report submission."
+    )
+    form_date_received = models.DateField(
+        "The most Recent Date the Form SF-SAC was received by the FAC. This field was not populated before 2001.",
+        null=True,
+    )
     fy_end_date = models.DateField("Fiscal Year End Date")
     fy_start_date = models.DateField("Fiscal Year Start Date", null=True)
-    going_concern = models.BooleanField("Whether or not the audit contained a going concern paragraph  on financial statements", null=True)
-    initial_date_received = models.DateField("The first date an audit component or Form SF-SAC was received by the Federal audit Clearinghouse (FAC).", null=True)
-    low_risk = models.BooleanField("Indicate whether or not the auditee qualified as a low-risk auditee", null=True)
-    material_noncompliance = models.BooleanField("Whether or not the audit disclosed a material noncompliance on financial statements", null=True)
-    material_weakness = models.BooleanField("Whether or not the audit disclosed any reportable condition/significant deficiency as a material weakness on financial statements", null=True)
-    material_weakness_major_program = models.BooleanField("Indicate whether any reportable condition/signficant deficiency was disclosed as a material weakness for a major program in the Schedule of Findings and Questioned Costs", null=True)
-    multiple_cpas = models.BooleanField("Identifies if the Submission Contains Multiple CPAs", null=True)
-    multiple_duns = models.BooleanField("Identifies if the Submission Contains Multiple DUNS", null=True)
-    multiple_eins = models.BooleanField("Identifies if the Submission Contains Multiple EINs", null=True)
-    multiple_ueis = models.BooleanField("Identifies if the Submission Contains Multiple UEIs", null=True)
-    number_months = models.IntegerField("Number of Months Covered by the 'Other' Audit Period")
-    oversight_agency = models.IntegerField("Two digit Federal agency prefix of the oversight agency")  # , max_length=2)
+    going_concern = models.BooleanField(
+        "Whether or not the audit contained a going concern paragraph  on financial statements",
+        null=True,
+    )
+    initial_date_received = models.DateField(
+        "The first date an audit component or Form SF-SAC was received by the Federal audit Clearinghouse (FAC).",
+        null=True,
+    )
+    low_risk = models.BooleanField(
+        "Indicate whether or not the auditee qualified as a low-risk auditee", null=True
+    )
+    material_noncompliance = models.BooleanField(
+        "Whether or not the audit disclosed a material noncompliance on financial statements",
+        null=True,
+    )
+    material_weakness = models.BooleanField(
+        "Whether or not the audit disclosed any reportable condition/significant deficiency as a material weakness on financial statements",
+        null=True,
+    )
+    material_weakness_major_program = models.BooleanField(
+        "Indicate whether any reportable condition/signficant deficiency was disclosed as a material weakness for a major program in the Schedule of Findings and Questioned Costs",
+        null=True,
+    )
+    multiple_cpas = models.BooleanField(
+        "Identifies if the Submission Contains Multiple CPAs", null=True
+    )
+    multiple_duns = models.BooleanField(
+        "Identifies if the Submission Contains Multiple DUNS", null=True
+    )
+    multiple_eins = models.BooleanField(
+        "Identifies if the Submission Contains Multiple EINs", null=True
+    )
+    multiple_ueis = models.BooleanField(
+        "Identifies if the Submission Contains Multiple UEIs", null=True
+    )
+    number_months = models.IntegerField(
+        "Number of Months Covered by the 'Other' Audit Period", null=True
+    )
+    oversight_agency = models.IntegerField(
+        "Two digit Federal agency prefix of the oversight agency", null=True
+    )  # , max_length=2)
     period_covered = models.CharField("Audit Period Covered by Audit", max_length=40)
-    previous_completed_on = models.DateField("Date the Audit was Previously Posted to the Internet as Complete")
+    previous_completed_on = models.DateField(
+        "Date the Audit was Previously Posted to the Internet as Complete", null=True
+    )
     previous_date_firewall = models.DateField(null=True)
-    prior_year_schedule = models.BooleanField("Indicate whether or not the report includes a Summary Schedule of Prior Year Audit Findings", null=True)
-    questioned_costs = models.BooleanField("Indicate whether or not the audit disclosed any known questioned costs.", null=True)
-    report_required = models.BooleanField("Distribution to Federal Agency required?", null=True)
-    sp_framework = models.CharField("Special Purpose Framework that was used as the basis of accounting",max_length=40,)
-    sp_framework_required = models.BooleanField("Indicate whether or not the special purpose framework used as basis of accounting by state law or tribal law", null=True)
+    prior_year_schedule = models.BooleanField(
+        "Indicate whether or not the report includes a Summary Schedule of Prior Year Audit Findings",
+        null=True,
+    )
+    questioned_costs = models.BooleanField(
+        "Indicate whether or not the audit disclosed any known questioned costs.",
+        null=True,
+    )
+    report_required = models.BooleanField(
+        "Distribution to Federal Agency required?", null=True
+    )
+    sp_framework = models.CharField(
+        "Special Purpose Framework that was used as the basis of accounting",
+        max_length=40,
+        null=True,
+    )
+    sp_framework_required = models.BooleanField(
+        "Indicate whether or not the special purpose framework used as basis of accounting by state law or tribal law",
+        null=True,
+    )
     state = models.CharField("Auditee State", max_length=2)
     street1 = models.CharField("Auditee Street Address", max_length=45)
-    street2 = models.CharField("Auditee Street Address", max_length=45)
-    total_fed_expenditures = models.IntegerField("Total Federal Expenditures")  # , max_length=12)
+    street2 = models.CharField("Auditee Street Address", max_length=45, null=True)
+    total_fed_expenditures = models.BigIntegerField(
+        "Total Federal Expenditures"
+    )  # , max_length=12)
     type_of_entity = models.CharField("Contact FAC for information", max_length=40)
-    type_report_financial_statements = models.CharField("Type of Report Issued on the Financial Statements", max_length=40)
-    type_report_major_program = models.CharField("Type of Report Issued on the Major Program Compliance", max_length=40)
-    type_report_special_purpose_framework = models.CharField("The auditor's opinion on the special purpose framework", max_length=40)
+    type_report_financial_statements = models.CharField(
+        "Type of Report Issued on the Financial Statements", max_length=40, null=True
+    )
+    type_report_major_program = models.CharField(
+        "Type of Report Issued on the Major Program Compliance",
+        max_length=40,
+        null=True,
+    )
+    type_report_special_purpose_framework = models.CharField(
+        "The auditor's opinion on the special purpose framework",
+        max_length=40,
+        null=True,
+    )
     uei = models.CharField("Unique Entity ID", max_length=12)
     zip_code = models.IntegerField("Auditee Zipcode")  # , max_length=9)
     # Not in key
@@ -88,22 +211,30 @@ class General(models.Model):
 
 class CfdaInfo(models.Model):
     research_and_development = models.BooleanField(
-        "Indicate whether or not the program is a Research and Development program", null=True
+        "Indicate whether or not the program is a Research and Development program",
+        null=True,
     )
     loans = models.BooleanField(
-        "Indicate whether or not the program is a Loan or Loan Guarantee (only available for audit years 2013 and beyond)", null=True
+        "Indicate whether or not the program is a Loan or Loan Guarantee (only available for audit years 2013 and beyond)",
+        null=True,
     )
-    arra = models.BooleanField("American Recovery and Reinvestment Act Funded Program", null=True)
+    arra = models.BooleanField(
+        "American Recovery and Reinvestment Act Funded Program", null=True
+    )
     direct = models.BooleanField(
-        "Indicate whether or not the award was received directly from a Federal awarding agency", null=True
+        "Indicate whether or not the award was received directly from a Federal awarding agency",
+        null=True,
     )
     passthrough_award = models.BooleanField(
-        "Indicates whether or not funds were passed through to any subrecipients for the Federal program", null=True
+        "Indicates whether or not funds were passed through to any subrecipients for the Federal program",
+        null=True,
     )
     major_program = models.BooleanField(
         "Indicate whether or not the Federal program is a major program", null=True
     )
-    finding_ref_nums = models.CharField("Findings Reference Numbers", max_length=100, null=True)
+    finding_ref_nums = models.CharField(
+        "Findings Reference Numbers", max_length=100, null=True
+    )
     amount = models.BigIntegerField(
         "Amount Expended for the Federal Program"
     )  # , max_length=12)
@@ -118,7 +249,8 @@ class CfdaInfo(models.Model):
     )  # , max_length=12)
     loan_balance = models.CharField(
         "The loan or loan guarantee (loan) balance outstanding at the end of the audit period.  A response of ‘N/A’ is acceptable.",
-        max_length=40, null=True
+        max_length=40,
+        null=True,
     )
     federal_program_name = models.CharField("Name of Federal Program", max_length=300)
     cfda_program_name = models.CharField(
@@ -130,17 +262,19 @@ class CfdaInfo(models.Model):
         max_length=50,
     )
     # can have letters
-    cfda = models.CharField(
-        "Federal Agency Prefix and Extension", max_length=52)
+    cfda = models.CharField("Federal Agency Prefix and Extension", max_length=52)
     cluster_name = models.CharField("The name of the cluster", max_length=75, null=True)
     state_cluster_name = models.CharField(
         "The name of the state cluster", max_length=75, null=True
     )
     other_cluster_name = models.CharField(
         "The name of the cluster (if not listed in the Compliance Supplement)",
-        max_length=75, null=True
+        max_length=75,
+        null=True,
     )
-    type_requirement = models.CharField("Type Requirement Failure", max_length=40, null=True)
+    type_requirement = models.CharField(
+        "Type Requirement Failure", max_length=40, null=True
+    )
     type_report_major_program = models.CharField(
         "Type of Report Issued on the Major Program Compliance", max_length=40
     )
@@ -164,18 +298,25 @@ class CfdaInfo(models.Model):
         "Primary Employer Identification Number"
     )  # , max_length=9)
     # check this- it is QCOSTS2
-    questioned_costs = models.CharField("Questioned Costs", null=True, max_length=40,)
+    questioned_costs = models.CharField(
+        "Questioned Costs",
+        null=True,
+        max_length=40,
+    )
 
 
 class Findings(models.Model):
     modified_opinion = models.BooleanField("Modified Opinion finding", null=True)
     other_non_compliance = models.BooleanField("Other Noncompliance finding", null=True)
     material_weakness = models.BooleanField("Material Weakness finding", null=True)
-    significant_deficiency = models.BooleanField("Significant Deficiency finding", null=True)
+    significant_deficiency = models.BooleanField(
+        "Significant Deficiency finding", null=True
+    )
     other_findings = models.BooleanField("Other findings", null=True)
     questioned_costs = models.BooleanField("Questioned Costs", null=True)
     repeat_finding = models.BooleanField(
-        "Indicates whether or not the audit finding was a repeat of an audit finding in the immediate prior audit", null=True
+        "Indicates whether or not the audit finding was a repeat of an audit finding in the immediate prior audit",
+        null=True,
     )
     finding_ref_nums = models.CharField("Findings Reference Numbers", max_length=100)
     prior_finding_ref_nums = models.CharField(
@@ -201,7 +342,8 @@ class Findings(models.Model):
 class Findingstext(models.Model):
     charts_tables = models.BooleanField(
         "Indicates whether or not the text contained charts or tables that could not be entered due to formatting restrictions",
-        max_length=1, null=True
+        max_length=1,
+        null=True,
     )
     finding_ref_nums = models.CharField(
         "Audit Finding Reference Number", max_length=100
@@ -223,7 +365,8 @@ class Findingstext(models.Model):
 class Captext(models.Model):
     charts_tables = models.BooleanField(
         "Indicates whether or not the text contained charts or tables that could not be entered due to formatting restrictions",
-        max_length=1, null=True
+        max_length=1,
+        null=True,
     )
     finding_ref_nums = models.CharField(
         "Audit Finding Reference Number", max_length=100
@@ -266,18 +409,32 @@ class Notes(models.Model):
 
 
 class MultipleCpasInfo(models.Model):
-    cpa_phone = models.IntegerField("CPA phone number", null=True,)  # , max_length=10)
-    cpa_fax = models.IntegerField("CPA fax number (optional)", null=True,)  # , max_length=10)
+    cpa_phone = models.PositiveBigIntegerField(
+        "CPA phone number",
+        null=True,
+    )  # , max_length=10)
+    cpa_fax = models.PositiveBigIntegerField(
+        "CPA fax number (optional)",
+        null=True,
+    )  # , max_length=10)
     cpa_state = models.CharField("CPA State", max_length=2)
     cpa_city = models.CharField("CPA City", max_length=30)
     cpa_title = models.CharField("Title of CPA Contact", max_length=40)
     cpa_street1 = models.CharField("CPA Street Address", max_length=45)
-    cpa_zip_code = models.IntegerField("CPA Zip Code", null=True,)  # , max_length=9)
+    cpa_zip_code = models.IntegerField(
+        "CPA Zip Code",
+        null=True,
+    )  # , max_length=9)
     cpa_contact = models.CharField("Name of CPA Contact", max_length=50)
-    cpa_email = models.CharField("CPA mail address (optional)", max_length=60, null=True,)
+    cpa_email = models.CharField(
+        "CPA mail address (optional)",
+        max_length=60,
+        null=True,
+    )
     cpa_firm_name = models.CharField("CPA Firm Name", max_length=64)
     cpa_ein = models.IntegerField(
-        "CPA Firm EIN (only available for audit years 2013 and beyond)", null=True,
+        "CPA Firm EIN (only available for audit years 2013 and beyond)",
+        null=True,
     )  # , max_length=9)
     dbkey = models.CharField(
         "Audit Year and DBKEY (database key) combined make up the primary key.",
