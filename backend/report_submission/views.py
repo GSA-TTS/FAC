@@ -1,3 +1,4 @@
+import datetime
 import json
 from django.shortcuts import render, redirect  # noqa: F401
 from django.urls import reverse
@@ -44,7 +45,18 @@ class AuditeeInfoFormView(LoginRequiredMixin, View):
 
     # gather/save step 2 info, redirect to step 3
     def post(self, post_request):
-        info_check = api.views.auditee_info_check(post_request.user, post_request.POST)
+        # TODO: Wrap in better error-checking
+        start = datetime.datetime.strptime(post_request.POST.get("auditee_fiscal_period_start", "01/01/1970"), "%m/%d/%Y")
+        end = datetime.datetime.strptime(post_request.POST.get("auditee_fiscal_period_start", "01/01/1970"), "%m/%d/%Y")
+
+        formatted_post = {
+            'csrfmiddlewaretoken': post_request.POST.get("csrfmiddlewaretoken"),
+            'auditee_uei': post_request.POST.get("auditee_uei"),
+            "auditee_fiscal_period_start": start.strftime("%Y-%m-%d"),
+            "auditee_fiscal_period_end":  end.strftime("%Y-%m-%d"),
+        }
+
+        info_check = api.views.auditee_info_check(post_request.user, formatted_post)
         if info_check.get("errors"):
             return redirect(reverse("auditeeinfo"))
             print("Auditee info data error: ", info_check)
