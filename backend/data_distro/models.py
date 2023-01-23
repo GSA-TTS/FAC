@@ -16,7 +16,7 @@ class General(models.Model):
         "Title of Auditee Certifying Official", max_length=50, null=True
     )
     auditee_contact = models.CharField("Name of Auditee Contact", max_length=50)
-    auditee_date_signed = models.DateField("Date of auditee signature")
+    auditee_date_signed = models.DateField("Date of Auditee signature")
     auditee_email = models.CharField(
         "Auditee Email address",
         max_length=60,
