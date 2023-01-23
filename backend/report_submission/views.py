@@ -46,14 +46,20 @@ class AuditeeInfoFormView(LoginRequiredMixin, View):
     # gather/save step 2 info, redirect to step 3
     def post(self, post_request):
         # TODO: Wrap in better error-checking
-        start = datetime.datetime.strptime(post_request.POST.get("auditee_fiscal_period_start", "01/01/1970"), "%m/%d/%Y")
-        end = datetime.datetime.strptime(post_request.POST.get("auditee_fiscal_period_start", "01/01/1970"), "%m/%d/%Y")
+        start = datetime.datetime.strptime(
+            post_request.POST.get("auditee_fiscal_period_start", "01/01/1970"),
+            "%m/%d/%Y",
+        )
+        end = datetime.datetime.strptime(
+            post_request.POST.get("auditee_fiscal_period_start", "01/01/1970"),
+            "%m/%d/%Y",
+        )
 
         formatted_post = {
-            'csrfmiddlewaretoken': post_request.POST.get("csrfmiddlewaretoken"),
-            'auditee_uei': post_request.POST.get("auditee_uei"),
+            "csrfmiddlewaretoken": post_request.POST.get("csrfmiddlewaretoken"),
+            "auditee_uei": post_request.POST.get("auditee_uei"),
             "auditee_fiscal_period_start": start.strftime("%Y-%m-%d"),
-            "auditee_fiscal_period_end":  end.strftime("%Y-%m-%d"),
+            "auditee_fiscal_period_end": end.strftime("%Y-%m-%d"),
         }
 
         info_check = api.views.auditee_info_check(post_request.user, formatted_post)
@@ -73,9 +79,20 @@ class AccessAndSubmissionFormView(LoginRequiredMixin, View):
 
     # gather/save step 3 info, redirect to step ...4?
     def post(self, post_request):
-        body_data = parse_body_data(post_request.body)
+        formatted_post = {
+            "certifying_auditee_contact": post_request.POST.get(
+                "auditee_certifying_official_email", ""
+            ),
+            "certifying_auditor_contact": post_request.POST.get(
+                "auditor_certifying_official_email", ""
+            ),
+            "auditee_contacts": post_request.POST.getlist("auditee_contacts_email", []),
+            "auditor_contacts": post_request.POST.getlist("auditor_contacts_email", []),
+        }
 
-        result = api.views.access_and_submission_check(post_request.user, body_data)
+        result = api.views.access_and_submission_check(
+            post_request.user, formatted_post
+        )
         report_id = result.get("report_id")
 
         if report_id:
