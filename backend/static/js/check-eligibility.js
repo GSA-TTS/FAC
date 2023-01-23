@@ -1,39 +1,4 @@
-import { queryAPI } from "./api";
-
-const SUBMISSION_URL = '/report_submission/eligibility/';
-const NEXT_URL = '../auditeeinfo';
 const FORM = document.forms[0];
-
-function submitForm() {
-  const formData = serializeFormData(new FormData(FORM));
-  formData.met_spending_threshold = stringToBoolean(
-      formData.met_spending_threshold
-  );
-  formData.is_usa_based = stringToBoolean(formData.is_usa_based);
-
-  queryAPI(
-    SUBMISSION_URL,
-    formData,
-    {
-      method: 'POST',
-    },
-    [handleEligibilityResponse, handleErrorResponse]
-  );
-}
-
-function handleEligibilityResponse(data) {
-    console.log(data.errors);
-    window.location.href = NEXT_URL;
-}
-
-function handleErrorResponse(e) {
-  console.log('ERROR: Form submission error. ' + e);
-  window.location.href = NEXT_URL;
-}
-
-function serializeFormData(formData) {
-  return Object.fromEntries(formData);
-}
 
 function isValidEntity({name, id}) {
   const INVALID_ENTITY_TYPES = {
@@ -43,14 +8,6 @@ function isValidEntity({name, id}) {
   };
 
   return !INVALID_ENTITY_TYPES[name].includes(id);
-}
-
-function stringToBoolean(value) {
-  if (value && typeof value === "string") {
-    if (value.toLowerCase() === "true") return true;
-    if (value.toLowerCase() === "false") return false;
-  }
-  return value;
 }
 
 function setFormDisabled(shouldDisable) {
@@ -94,7 +51,7 @@ function attachEventHandlers() {
   FORM.addEventListener("submit", (e) => {
     e.preventDefault();
     if (!allResponsesValid()) return;
-    submitForm();
+    FORM.submit();
   });
 
   const questions = Array.from(document.querySelectorAll(".question"));

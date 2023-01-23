@@ -4,7 +4,7 @@
 
 <div class="grid-container">
 
-  <form class="usa-form usa-form--large" id="check-eligibility">
+  <form class="usa-form usa-form--large" id="check-eligibility" method="post">
     {% csrf_token %}
     <fieldset class="usa-fieldset">
       <legend class="usa-legend usa-legend--large">Does your entity meet the single audit criteria?</legend>
@@ -156,6 +156,7 @@
           <button class="usa-button" id="continue">Continue</button>
         </li>
       </ul>
+    </fieldset>
   </form>
 </div>
 <script src="{% static 'compiled/js/check-eligibility.js' %}" type="text/javascript"></script>

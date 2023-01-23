@@ -27,9 +27,7 @@ class EligibilityFormView(LoginRequiredMixin, View):
 
     # gather/save step 1 info, redirect to step 2
     def post(self, post_request):
-        body_data = parse_body_data(post_request.body)
-
-        eligibility = api.views.eligibility_check(post_request.user, body_data)
+        eligibility = api.views.eligibility_check(post_request.user, post_request.POST)
         if eligibility.get("eligible"):
             return redirect(reverse("auditeeinfo"))
 
