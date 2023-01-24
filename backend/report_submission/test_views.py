@@ -187,6 +187,27 @@ class TestPreliminaryViews(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, "/report_submission/auditeeinfo/")
 
+    def test_step_three_accessandsubmission_submission_fail(self):
+        """
+        /report_submissions/accessandsubmission
+        Check that the correct templates are loaded on GET.
+        Check that the POST succeeds with appropriate data.
+        """
+        user = baker.make(User)
+        self.client.force_login(user)
+        url = reverse("accessandsubmission")
+
+        get_response = self.client.get(url)
+        self.assertTrue(user.is_authenticated)
+        self.assertEqual(get_response.status_code, 200)
+        self.assertTemplateUsed(get_response, "report_submission/step-base.html")
+        self.assertTemplateUsed(get_response, "report_submission/step-3.html")
+
+        data = {}
+        response = self.client.post(url, data=data)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, "/report_submission/accessandsubmission/")
+
     def test_reportsubmissionredirectview_get_redirects(self):
         url = reverse("report_submission")
 
@@ -201,6 +222,22 @@ class TestPreliminaryViews(TestCase):
 
     def test_eligibilityformview_get_requires_login(self):
         url = reverse("eligibility")
+        response = self.client.get(url)
+
+        # Should redirect to login page
+        self.assertIsInstance(response, HttpResponseRedirect)
+        self.assertTrue("openid/login" in response.url)
+
+    def test_auditeeinfoformview_get_requires_login(self):
+        url = reverse("auditeeinfo")
+        response = self.client.get(url)
+
+        # Should redirect to login page
+        self.assertIsInstance(response, HttpResponseRedirect)
+        self.assertTrue("openid/login" in response.url)
+
+    def test_accessandsubmissionformview_get_requires_login(self):
+        url = reverse("accessandsubmission")
         response = self.client.get(url)
 
         # Should redirect to login page
