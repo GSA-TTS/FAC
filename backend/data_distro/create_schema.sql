@@ -1,4 +1,6 @@
 /*
+I am using this as a reference
+
 I am creating tables Rick suggested and then making models out of them. I think I will then delete the original tables. I will use the models to generate the tables and then we can have them as managed tables by Django going forward.
 
 I added "data_distro_" so when I use django inspect I can grab all the related models in a way that is easy to identify.

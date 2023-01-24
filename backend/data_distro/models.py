@@ -1,20 +1,143 @@
 # importing django models and users
 from django.db import models
 from django.contrib.auth.models import User
+from django.contrib.postgres.fields import  ArrayField
 
 from data_distro import docs # noqa
+
+# # New models
+# class Auditee:
+#     auditee_certify_name = models.CharField(
+#         "Name of Auditee Certifying Official",
+#         max_length=50,
+#         null=True,
+#         help_text=docs.auditee_certify_name,
+#     )
+#     auditee_certify_title = models.CharField(
+#         "Title of Auditee Certifying Official",
+#         max_length=50,
+#         null=True,
+#         help_text=docs.auditee_certify_title,
+#     )
+#     auditee_contact = models.CharField(
+#         "Name of Auditee Contact", max_length=50, help_text=docs.auditee_contact
+#     )
+#     auditee_email = models.CharField(
+#         "Auditee Email address",
+#         max_length=60,
+#         null=True,
+#         help_text=docs.auditee_email,
+#     )
+#     auditee_fax = models.PositiveBigIntegerField(
+#         "Auditee Fax Number (optional)", null=True, help_text=docs.auditee_fax
+#     )
+#     auditee_name = models.CharField(
+#         "Name of the Auditee", max_length=70, help_text=docs.auditee_name
+#     )
+#     auditee_name_title = models.CharField(
+#         "Title of Auditee Certifying Official",
+#         max_length=70,
+#         help_text=docs.auditee_name_title,
+#     )
+#     auditee_phone = models.PositiveBigIntegerField(
+#         "Auditee Phone Number", help_text=docs.auditee_phone
+#     )
+#     auditee_title = models.CharField(
+#         "Title of Auditee Contact", max_length=40, help_text=docs.auditee_title
+#     )
+#     street1 = models.CharField(
+#         "Auditee Street Address", max_length=45, help_text=docs.street1
+#     )
+#     street2 = models.CharField(
+#         "Auditee Street Address", max_length=45, null=True, help_text=docs.street2
+#     )
+#     city = models.CharField("Auditee City", max_length=30, help_text=docs.city)
+#     state = models.CharField("Auditee State", max_length=2, help_text=docs.state)
+#     # updating to create
+#     zip_code = models.CharField(
+#         "Auditee Zipcode", help_text=docs.zip_code
+#     )  # , max_length=9
+#     duns_list = ArrayField(
+#         "Multiple Data Universal Numbering System Numbers, an array of DUNS numbers of the Auditee.",
+#         models.IntegerField(),
+#         help_text=docs.duns_general,
+#     )
+#     uei_list = ArrayField(
+#         "Unique Entity ID", max_length=12,
+#         CharField(max_length=12),
+#         help_text=docs.uei_general,
+#     )
+
+
+# class Auditor(models.Model):
+#     cpa_phone = models.PositiveBigIntegerField(
+#         "CPA phone number", null=True, help_text=docs.cpa_phone_multiplecpasinfo
+#     )  # , max_length=10
+#     cpa_fax = models.PositiveBigIntegerField(
+#         "CPA fax number (optional)",
+#         null=True,
+#         help_text=docs.cpa_fax_multiplecpasinfo,
+#     )  # , max_length=10
+#     cpa_state = models.CharField(
+#         "CPA State", max_length=2, help_text=docs.cpa_state_multiplecpasinfo
+#     )
+#     cpa_city = models.CharField(
+#         "CPA City", max_length=30, help_text=docs.cpa_city_multiplecpasinfo
+#     )
+#     cpa_title = models.CharField(
+#         "Title of CPA Contact",
+#         max_length=40,
+#         help_text=docs.cpa_title_multiplecpasinfo,
+#     )
+#     cpa_street1 = models.CharField(
+#         "CPA Street Address",
+#         max_length=45,
+#         help_text=docs.cpa_street1_multiplecpasinfo,
+#     )
+#     # no cpa_street2 ?
+#     cpa_zip_code = models.IntegerField(
+#         "CPA Zip Code", null=True, help_text=docs.cpa_zip_code_multiplecpasinfo
+#     )  # , max_length=9
+#     cpa_contact = models.CharField(
+#         "Name of CPA Contact",
+#         max_length=50,
+#         help_text=docs.cpa_contact_multiplecpasinfo,
+#     )
+#     cpa_email = models.CharField(
+#         "CPA mail address (optional)",
+#         max_length=60,
+#         null=True,
+#         help_text=docs.cpa_email_multiplecpasinfo,
+#     )
+#     cpa_firm_name = models.CharField(
+#         "CPA Firm Name", max_length=64, help_text=docs.cpa_firm_name_multiplecpasinfo
+#     )
+#     cpa_ein = models.IntegerField(
+#         "CPA Firm EIN (only available for audit years 2013 and beyond)",
+#         null=True,
+#         help_text=docs.cpa_ein,
+#     )  # , max_length=9
+#     dbkey = models.CharField(
+#         "Audit Year and DBKEY (database key) combined make up the primary key.",
+#         max_length=40,
+#         help_text=docs.dbkey_multiplecpasinfo,
+#     )
+#     audit_year = models.CharField(
+#         "Audit Year and DBKEY (database key) combined make up the primary key.",
+#         max_length=40,
+#         help_text=docs.audit_year_multiplecpasinfo,
+#     )
+#     seqnum = models.IntegerField(
+#         "Order that Auditors were reported on page 5 of SF-SAC",
+#         null=True,
+#         help_text=docs.seqnum,
+#     )
 
 
 # Models that mimic the downloads
 class General(models.Model):
-    audit_type = models.CharField(
-        "Type of Audit", max_length=40, help_text=docs.audit_type,
-    )
-    audit_year = models.CharField(
-        "Audit Year and DBKEY (database key) combined make up the primary key.",
-        max_length=40,
-        help_text=docs.audit_year_general,
-    )
+    # auditee = models.ForeignKey(Auditee, on_delete=models.CASCADE)
+    # ~~~~~ moving these
     auditee_certify_name = models.CharField(
         "Name of Auditee Certifying Official",
         max_length=50,
@@ -29,9 +152,6 @@ class General(models.Model):
     )
     auditee_contact = models.CharField(
         "Name of Auditee Contact", max_length=50, help_text=docs.auditee_contact
-    )
-    auditee_date_signed = models.DateField(
-        "Date of Auditee signature", help_text=docs.auditee_date_signed
     )
     auditee_email = models.CharField(
         "Auditee Email address",
@@ -56,40 +176,40 @@ class General(models.Model):
     auditee_title = models.CharField(
         "Title of Auditee Contact", max_length=40, help_text=docs.auditee_title
     )
-    auditor_ein = models.IntegerField(
-        "CPA Firm EIN (only available for audit years 2013 and beyond)",
-        help_text=docs.auditor_ein,
-    )  # , max_length=9
+    street1 = models.CharField(
+        "Auditee Street Address", max_length=45, help_text=docs.street1
+    )
+    street2 = models.CharField(
+        "Auditee Street Address", max_length=45, null=True, help_text=docs.street2
+    )
     city = models.CharField("Auditee City", max_length=30, help_text=docs.city)
-    # not actually digits in data
-    cognizant_agency = models.CharField(
-        "Two digit Federal agency prefix of the cognizant agency",
-        max_length=2,
+    state = models.CharField("Auditee State", max_length=2, help_text=docs.state)
+    duns = models.IntegerField(
+        "Primary Data Universal Numbering System Number",
         null=True,
-        help_text=docs.cognizant_agency,
+        help_text=docs.duns_general,
     )
-    ## needs documentation ##
-    cognizant_agency_over = models.CharField(max_length=2, null=True)
-    completed_on = models.DateField(
-        "Date the Audit was Posted to the Internet as Complete",
+    uei = models.CharField(
+        "Unique Entity ID", max_length=12, help_text=docs.uei_general
+    )
+    zip_code = models.IntegerField(
+        "Auditee Zipcode", help_text=docs.zip_code
+    )  # , max_length=9
+
+    multiple_duns = models.BooleanField(
+        "Identifies if the Submission Contains Multiple DUNS",
         null=True,
-        help_text=docs.completed_on,
+        help_text=docs.multiple_duns,
     )
-    component_date_received = models.DateField(
-        "The most recent date an audit component was received by the FAC. This field was not populated before 2004. Receipt of Financial statements only are not processed until the rest of the audit or a Form SF-SAC is also received.",
+    multiple_ueis = models.BooleanField(
+        "Identifies if the Submission Contains Multiple UEIs",
         null=True,
-        help_text=docs.component_date_received,
+        help_text=docs.multiple_ueis,
     )
-    condition_or_deficiency = models.BooleanField(
-        "Whether or not the audit disclosed a reportable condition/significant deficiency on financial statements",
-        null=True,
-        help_text=docs.condition_or_deficiency,
-    )
-    condition_or_deficiency_major_program = models.BooleanField(
-        "Whether or not the audit disclosed a reportable condition/significant deficiency for any major program in the Schedule of Findings and Questioned Costs",
-        null=True,
-        help_text=docs.condition_or_deficiency_major_program,
-    )
+
+
+    # ~~~~~ moving to Auditor
+    # auditor = models.ForeignKey(CpasInfo, on_delete=models.CASCADE)
     cpa_city = models.CharField(
         "CPA City", max_length=30, help_text=docs.cpa_city_general
     )
@@ -138,6 +258,70 @@ class General(models.Model):
     cpa_zip_code = models.IntegerField(
         "CPA Zip Code", help_text=docs.cpa_zip_code_general
     )  # , max_length=9
+    auditor_ein = models.IntegerField(
+        "CPA Firm EIN (only available for audit years 2013 and beyond)",
+        help_text=docs.auditor_ein,
+    )  # , max_length=9
+    ein = models.IntegerField(
+        "Primary Employer Identification Number", help_text=docs.ein_general
+    )  # , max_length=9
+    ein_subcode = models.IntegerField(
+        "Subcode assigned to the EIN", null=True, help_text=docs.ein_subcode
+    )  # , max_length=3
+    ## is this for autidor or auditee?
+    multiple_eins = models.BooleanField(
+        "Identifies if the Submission Contains Multiple EINs",
+        null=True,
+        help_text=docs.multiple_eins,
+    )
+    multiple_cpas = models.BooleanField(
+        "Identifies if the Submission Contains Multiple CPAs",
+        null=True,
+        help_text=docs.multiple_cpas,
+    )
+
+
+    # ~~~~~ original below
+    auditee_date_signed = models.DateField(
+        "Date of Auditee signature", help_text=docs.auditee_date_signed
+    )
+    audit_type = models.CharField(
+        "Type of Audit", max_length=40, help_text=docs.audit_type,
+    )
+    audit_year = models.CharField(
+        "Audit Year and DBKEY (database key) combined make up the primary key.",
+        max_length=40,
+        help_text=docs.audit_year_general,
+    )
+    # not actually digits in data
+    cognizant_agency = models.CharField(
+        "Two digit Federal agency prefix of the cognizant agency",
+        max_length=2,
+        null=True,
+        help_text=docs.cognizant_agency,
+    )
+    ## needs documentation ##
+    cognizant_agency_over = models.CharField(max_length=2, null=True)
+    completed_on = models.DateField(
+        "Date the Audit was Posted to the Internet as Complete",
+        null=True,
+        help_text=docs.completed_on,
+    )
+    component_date_received = models.DateField(
+        "The most recent date an audit component was received by the FAC. This field was not populated before 2004. Receipt of Financial statements only are not processed until the rest of the audit or a Form SF-SAC is also received.",
+        null=True,
+        help_text=docs.component_date_received,
+    )
+    condition_or_deficiency = models.BooleanField(
+        "Whether or not the audit disclosed a reportable condition/significant deficiency on financial statements",
+        null=True,
+        help_text=docs.condition_or_deficiency,
+    )
+    condition_or_deficiency_major_program = models.BooleanField(
+        "Whether or not the audit disclosed a reportable condition/significant deficiency for any major program in the Schedule of Findings and Questioned Costs",
+        null=True,
+        help_text=docs.condition_or_deficiency_major_program,
+    )
     current_or_former_findings = models.BooleanField(
         "Indicate whether or not current year findings or prior year findings affecting direct funds were reported",
         null=True,
@@ -155,22 +339,12 @@ class General(models.Model):
         null=True,
         help_text=docs.dollar_threshold,
     )
-    duns = models.IntegerField(
-        "Primary Data Universal Numbering System Number",
-        null=True,
-        help_text=docs.duns_general,
-    )  # , max_length=9
     dup_reports = models.BooleanField(
         "Whether or not the financial statements include departments that have separate expenditures not included in this audit",
         null=True,
         help_text=docs.dup_reports,
     )
-    ein = models.IntegerField(
-        "Primary Employer Identification Number", help_text=docs.ein_general
-    )  # , max_length=9
-    ein_subcode = models.IntegerField(
-        "Subcode assigned to the EIN", null=True, help_text=docs.ein_subcode
-    )  # , max_length=3
+
     entity_type = models.CharField(
         "Self reported type of entity (i.e., States, Local Governments, Indian Tribes, Institutions of Higher Education, NonProfit)",
         max_length=50,
@@ -219,26 +393,6 @@ class General(models.Model):
         null=True,
         help_text=docs.material_weakness_major_program,
     )
-    multiple_cpas = models.BooleanField(
-        "Identifies if the Submission Contains Multiple CPAs",
-        null=True,
-        help_text=docs.multiple_cpas,
-    )
-    multiple_duns = models.BooleanField(
-        "Identifies if the Submission Contains Multiple DUNS",
-        null=True,
-        help_text=docs.multiple_duns,
-    )
-    multiple_eins = models.BooleanField(
-        "Identifies if the Submission Contains Multiple EINs",
-        null=True,
-        help_text=docs.multiple_eins,
-    )
-    multiple_ueis = models.BooleanField(
-        "Identifies if the Submission Contains Multiple UEIs",
-        null=True,
-        help_text=docs.multiple_ueis,
-    )
     number_months = models.IntegerField(
         "Number of Months Covered by the 'Other' Audit Period",
         null=True,
@@ -285,13 +439,6 @@ class General(models.Model):
         null=True,
         help_text=docs.sp_framework_required,
     )
-    state = models.CharField("Auditee State", max_length=2, help_text=docs.state)
-    street1 = models.CharField(
-        "Auditee Street Address", max_length=45, help_text=docs.street1
-    )
-    street2 = models.CharField(
-        "Auditee Street Address", max_length=45, null=True, help_text=docs.street2
-    )
     total_fed_expenditures = models.BigIntegerField(
         "Total Federal Expenditures", help_text=docs.total_fed_expenditures
     )  # , max_length=12
@@ -316,12 +463,6 @@ class General(models.Model):
         null=True,
         help_text=docs.type_report_special_purpose_framework,
     )
-    uei = models.CharField(
-        "Unique Entity ID", max_length=12, help_text=docs.uei_general
-    )
-    zip_code = models.IntegerField(
-        "Auditee Zipcode", help_text=docs.zip_code
-    )  # , max_length=9
 
 
 class CfdaInfo(models.Model):
