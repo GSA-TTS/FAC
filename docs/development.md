@@ -172,6 +172,7 @@ docker-compose up
 
 # Django management command to promote a user to be a superuser
 docker-compose run web python manage.py make_super email@address
+docker-compose run web python manage.py make_staff email@address
 
 # Enter the user/pass @ the Admin login page
 open http://localhost:8000/admin
