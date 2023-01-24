@@ -158,15 +158,20 @@ fac ()
 
 Let's use this workflow to create a `superuser` in our development environment so we can access the Admin interface!
 
+First create an account in the Login.gov test environment, The best way to do that is to run [http://localhost:8000](http://localhost:8000) click on the log in link from your app running locally. (It needs to be localhost and not http://0.0.0.0:8000 to work with how we configured out Login.gov test account.) 
+
+Follow the instructions on the Login.gov test site to set up an account.
+
+Then, log into the site using login.gov. This will create a user but that user won't have privlages.
+
+You can promote your user account to have superuser status by using our custom management command:
 
 ```shell
 # Start our docker containers w/ docker-compose
 docker-compose up
 
-# Django management command to create a new superuser
-docker-compose run web python manage.py createsuperuser
-
-# Follow the prompts to enter username, password, etc.
+# Django management command to promote a user to be a superuser
+docker-compose run web python manage.py make_super email@address
 
 # Enter the user/pass @ the Admin login page
 open http://localhost:8000/admin
