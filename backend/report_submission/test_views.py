@@ -2,12 +2,11 @@ import json
 from datetime import datetime
 
 from django.contrib.auth.models import User
-from django.http import HttpRequest, HttpResponseRedirect
-from django.test import RequestFactory, TestCase  # noqa: F401
+from django.http import HttpResponseRedirect
+from django.test import TestCase
 from django.urls import reverse
 from model_bakery import baker
 
-import report_submission.views
 from audit.models import Access, SingleAuditChecklist
 
 
@@ -50,10 +49,10 @@ class TestPreliminaryViews(TestCase):
     step3_data = {
         "certifying_auditee_contact": "a@a.com",
         "certifying_auditor_contact": "b@b.com",
-        "auditee_contacts": "c@c.com",
-        "auditee_contacts": "d@d.com",
-        "auditor_contacts": "e@e.com",
-        "auditor_contacts": "f@f.com",
+        "auditee_contacts": "c@c.com",  # noqa: F601
+        "auditee_contacts": "d@d.com",  # noqa: F601
+        "auditor_contacts": "e@e.com",  # noqa: F601
+        "auditor_contacts": "f@f.com",  # noqa: F601
     }
 
     def test_step_one_eligibility_submission_pass(self):

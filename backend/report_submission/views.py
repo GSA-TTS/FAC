@@ -1,6 +1,5 @@
 import datetime
-import json
-from django.shortcuts import render, redirect  # noqa: F401
+from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.views import View
 from django.contrib.auth.mixins import LoginRequiredMixin
