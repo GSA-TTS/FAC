@@ -10,7 +10,7 @@ from .views import MySubmissions
 User = get_user_model()
 
 SUBMISSIONS_PATH = reverse("MySubmissions")
-ACCESS_AND_SUBMISSION_PATH = reverse("accessandsubmission")
+ACCESS_AND_SUBMISSION_PATH = reverse("api-accessandsubmission")
 
 VALID_ELIGIBILITY_DATA = {
     "is_usa_based": True,

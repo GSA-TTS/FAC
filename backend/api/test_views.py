@@ -13,9 +13,9 @@ from audit.models import Access, SingleAuditChecklist
 
 User = get_user_model()
 
-ELIGIBILITY_PATH = reverse("eligibility")
-AUDITEE_INFO_PATH = reverse("auditee-info")
-ACCESS_AND_SUBMISSION_PATH = reverse("accessandsubmission")
+ELIGIBILITY_PATH = reverse("api-eligibility")
+AUDITEE_INFO_PATH = reverse("api-auditee-info")
+ACCESS_AND_SUBMISSION_PATH = reverse("api-accessandsubmission")
 SUBMISSIONS_PATH = reverse("submissions")
 ACCESS_LIST_PATH = reverse("access-list")
 SAC_LIST_PATH = reverse("sac-list")
@@ -128,7 +128,7 @@ class EligibilityViewTests(TestCase):
 
 
 class UEIValidationViewTests(TestCase):
-    PATH = reverse("uei-validation")
+    PATH = reverse("api-uei-validation")
     SUCCESS = {"auditee_uei": "ZQGGHJH74DW7"}
     INELIGIBLE = {"auditee_uei": "000000000OI*"}
 

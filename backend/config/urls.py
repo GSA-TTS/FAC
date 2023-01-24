@@ -27,20 +27,20 @@ urlpatterns = [
         name="sac-detail",
     ),
     path(
-        "sac/eligibility",
+        "api/sac/eligibility",
         views.EligibilityFormView.as_view(),
-        name="eligibility",
+        name="api-eligibility",
     ),
     path(
-        "sac/ueivalidation",
+        "api/sac/ueivalidation",
         views.UEIValidationFormView.as_view(),
-        name="uei-validation",
+        name="api-uei-validation",
     ),
-    path("sac/auditee", views.AuditeeInfoView.as_view(), name="auditee-info"),
+    path("api/sac/auditee", views.AuditeeInfoView.as_view(), name="api-auditee-info"),
     path(
-        "sac/accessandsubmission",
+        "api/sac/accessandsubmission",
         views.AccessAndSubmissionView.as_view(),
-        name="accessandsubmission",
+        name="api-accessandsubmission",
     ),
     path(
         "sac/edit/<str:report_id>",
@@ -69,6 +69,7 @@ urlpatterns = [
     ),
     path(settings.ADMIN_URL, admin.site.urls),
     path("openid/", include("djangooidc.urls")),
+    path("report_submission/", include("report_submission.urls")),
     # Keep last so we can use short urls for content pages like home page etc.
     path("", include("cms.urls")),
     path("audit/", include("audit.urls")),

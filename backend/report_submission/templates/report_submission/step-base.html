@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% load static %}
+{% block metatags %}
+<title>{{ post.title }}</title>
+<meta name="description" content="{{ post.meta_description }}">
+<meta property="og:title" content="{{ post.title }}">
+<meta property="og:site_name" content="Federal Audit Clearinghouse">
+<meta property="og:description" content="{{ post.meta_description }}">
+<meta property="og:type" content="website">
+{% endblock %}
+
+{% block content%}
+<main id="main-content">
+
+    <div class="grid-container">
+        <h1>Create new audit </h1>
+    </div>
+    <div class="grid-container">
+        <div class="usa-step-indicator usa-step-indicator--counters-sm" role="progressbar" aria-label="Form progress"
+            aria-valuemin="1" aria-valuemax=4 aria-valuenow=2>
+            <ol class="usa-step-indicator__segments">
+                <li class="usa-step-indicator__segment
+                {% if step|add:'0' == 1 %} usa-step-indicator__segment--current {% endif %}
+                {% if step|add:'0' > 1 %} usa-step-indicator__segment--complete {% endif %}
+                ">
+                    <span class="usa-step-indicator__segment-label">
+                        Submission criteria check
+
+                        <span class="usa-sr-only">completed</span>
+
+                    </span>
+                </li>
+
+                <li class="usa-step-indicator__segment
+    {% if step|add:'0' == 2 %} usa-step-indicator__segment--current {% endif %}
+    {% if step|add:'0' > 2 %} usa-step-indicator__segment--complete {% endif %}
+    ">
+                    <span class="usa-step-indicator__segment-label">
+                        Auditee information
+
+                    </span>
+                </li>
+
+                <li class="usa-step-indicator__segment
+    
+    ">
+                    <span class="usa-step-indicator__segment-label">
+                        Audit submission access
+
+                    </span>
+                </li>
+
+                <li class="usa-step-indicator__segment
+                {% if step|add:'0' == 3 %} usa-step-indicator__segment--current {% endif %}
+                {% if step|add:'0' > 3 %} usa-step-indicator__segment--complete {% endif %}
+            
+    ">
+                    <span class="usa-step-indicator__segment-label">
+                        Create new audit
+
+                    </span>
+                </li>
+
+            </ol>
+        </div>
+
+    </div>
+</main>
+{% block step-content %}
+{% endblock %}
+{% endblock content%}
+<script>//const authToken = "aGV5bWF0dDpmYWNzYWMyMDIy"</script>
