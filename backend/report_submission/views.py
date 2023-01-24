@@ -51,7 +51,7 @@ class AuditeeInfoFormView(LoginRequiredMixin, View):
             "%m/%d/%Y",
         )
         end = datetime.datetime.strptime(
-            post_request.POST.get("auditee_fiscal_period_start", "01/01/1970"),
+            post_request.POST.get("auditee_fiscal_period_end", "01/01/1970"),
             "%m/%d/%Y",
         )
 
