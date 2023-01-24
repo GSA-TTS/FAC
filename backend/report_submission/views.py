@@ -8,12 +8,6 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 import api.views
 
 
-def parse_body_data(request_body):
-    body_unicode = request_body.decode("utf-8")
-    body_data = json.loads(body_unicode)
-    return body_data
-
-
 class ReportSubmissionRedirectView(View):
     def get(self, request):
         return redirect(reverse("eligibility"))
@@ -79,19 +73,8 @@ class AccessAndSubmissionFormView(LoginRequiredMixin, View):
 
     # gather/save step 3 info, redirect to step ...4?
     def post(self, post_request):
-        formatted_post = {
-            "certifying_auditee_contact": post_request.POST.get(
-                "auditee_certifying_official_email", ""
-            ),
-            "certifying_auditor_contact": post_request.POST.get(
-                "auditor_certifying_official_email", ""
-            ),
-            "auditee_contacts": post_request.POST.getlist("auditee_contacts_email", []),
-            "auditor_contacts": post_request.POST.getlist("auditor_contacts_email", []),
-        }
-
         result = api.views.access_and_submission_check(
-            post_request.user, formatted_post
+            post_request.user, post_request.POST
         )
         report_id = result.get("report_id")
 
