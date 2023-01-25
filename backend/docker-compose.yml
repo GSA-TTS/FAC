@@ -21,12 +21,16 @@ services:
     depends_on:
       - db
     environment:
-      - "ALLOWED_HOSTS=*"
       - "DATABASE_URL=postgres://postgres@db/postgres"
       - "DJANGO_DEBUG=true"
       - "SAM_API_KEY=${SAM_API_KEY}"
-      - DJANGO_BASE_URL=http://localhost:8000
-      - DJANGO_SECRET_LOGIN_KEY=${DJANGO_SECRET_LOGIN_KEY}
+      - "DJANGO_BASE_URL=http://localhost:8000"
+      - "DJANGO_SECRET_LOGIN_KEY=${DJANGO_SECRET_LOGIN_KEY}"
+      - "ENV=${ENV}"
+      - "SECRET_KEY=${SECRET_KEY}"
+      - "ALLOWED_HOSTS=0.0.0.0 127.0.0.1 localhost"
+    env_file:
+      - ".env"
     ports:
       - "8000:8000"
     volumes:

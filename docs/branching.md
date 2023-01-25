@@ -46,6 +46,7 @@ Tips:
 - You can add follow-tags to your git config to make it easier to push tags.
 `git config --global push.followTags true`
 
+See [testing.md](https://github.com/GSA-TTS/FAC/blob/main/docs/testing.md) for details about what tests are run when.
 
 ## Hotfix contingency flow
 Solve the problem quickly, and methodologically

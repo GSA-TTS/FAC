@@ -7,4 +7,5 @@ urlpatterns = [
     path("", views.Home.as_view(), name="Home"),
     # route for posts
     # path("<slug:slug>/", views.postdetail.as_view(), name="post_detail"),
+    path("robots.txt", views.NoRobots, name="no_robots"),
 ]

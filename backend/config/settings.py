@@ -34,12 +34,9 @@ BASE_DIR = environs.Path(__file__).resolve(strict=True).parent.parent
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = env(
-    "SECRET_KEY",
-    default="django-insecure-(jdhaxma6e-)uq=!a0*&z%#b_3-d#wnq0w51#^***5u%@z6thh",
-)
+SECRET_KEY = secret("SECRET_KEY")
 
-ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=["*"])
+ALLOWED_HOSTS = env("ALLOWED_HOSTS", "0.0.0.0 127.0.0.1 localhost").split()
 
 # Logging
 
@@ -67,8 +64,7 @@ LOGGING = {
     "loggers": {"django": {"handlers": ["local_debug_logger", "prod_logger"]}},
 }
 
-# Application definition
-
+# Django application definition
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -76,19 +72,25 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "report_submission",
-    "cms",
-    "djangooidc",
-    "storages",
 ]
 
 # Third-party apps
-
-INSTALLED_APPS += ["rest_framework", "rest_framework.authtoken", "corsheaders"]
+INSTALLED_APPS += [
+    "rest_framework",
+    "rest_framework.authtoken",
+    "corsheaders",
+    "storages",
+    "djangooidc",
+]
 
 # Our apps
-
-INSTALLED_APPS += ["audit", "api", "users"]
+INSTALLED_APPS += [
+    "audit",
+    "api",
+    "users",
+    "report_submission",
+    "cms",
+]
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -171,6 +173,8 @@ STATICFILES_DIRS = [
 ]
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 
+# CORS base
+CORS_ALLOWED_ORIGINS = [env.str("DJANGO_BASE_URL", "http://localhost:8000")]
 
 """Environment specific configurations"""
 if environment == "LOCAL":
@@ -179,13 +183,16 @@ if environment == "LOCAL":
     # Whitenoise for serving static files
     STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
     MIDDLEWARE.append("whitenoise.middleware.WhiteNoiseMiddleware")
-elif environment in ["TESTING", "UNDEFINED"]:
+    CORS_ALLOWED_ORIGINS += ["http://0.0.0.0:8000", "http://127.0.0.1:8000"]
+elif environment not in ["DEVELOPMENT", "STAGING", "PRODUCTION"]:
     DEBUG = env.bool("DJANGO_DEBUG", default=False)
     STATIC_URL = "/static/"
     # Whitenoise for serving static files
     STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
     MIDDLEWARE.append("whitenoise.middleware.WhiteNoiseMiddleware")
+    CORS_ALLOWED_ORIGINS += ["http://0.0.0.0:8000", "http://127.0.0.1:8000"]
 else:
+    # static assets
     STATICFILES_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
     vcap = json.loads(env.str("VCAP_SERVICES"))
     for service in vcap["s3"]:
@@ -205,6 +212,40 @@ else:
     AWS_LOCATION = "static"
     AWS_DEFAULT_ACL = "public-read"
     STATIC_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/{AWS_LOCATION}/"
+
+    # secure headers
+    MIDDLEWARE.append("csp.middleware.CSPMiddleware")
+    # see settings options https://django-csp.readthedocs.io/en/latest/configuration.html#configuration-chapter
+    bucket = f"{STATIC_URL}"
+    allowed_sources = (
+        "self",
+        bucket,
+        "https://idp.int.identitysandbox.gov/",
+        "https://dap.digitalgov.gov",
+        "https://www.google-analytics.com",
+        "https://www.googletagmanager.com/",
+    )
+    CSP_DEFAULT_SRC = allowed_sources
+    CSP_DATA_SRC = allowed_sources
+    CSP_SCRIPT_SRC = allowed_sources
+    CSP_CONNECT_SRC = allowed_sources
+    CSP_IMG_SRC = allowed_sources
+    CSP_MEDIA_SRC = allowed_sources
+    CSP_FRAME_SRC = allowed_sources
+    CSP_FONT_SRC = ("self", bucket)
+    CSP_WORKER_SRC = allowed_sources
+    CSP_FRAME_ANCESTORS = allowed_sources
+    CSP_STYLE_SRC = allowed_sources
+    CSP_INCLUDE_NONCE_IN = ["script-src"]
+    CSRF_COOKIE_SECURE = True
+    CSRF_COOKIE_HTTPONLY = True
+    SESSION_COOKIE_SECURE = True
+    SESSION_COOKIE_HTTPONLY = True
+    SESSION_COOKIE_SAMESITE = "Lax"
+    X_FRAME_OPTIONS = "DENY"
+
+    CORS_ALLOWED_ORIGINS = [bucket, env.str("DJANGO_BASE_URL")]
+    CORS_ALLOW_METHODS = ["GET", "OPTIONS"]
 
 ADMIN_URL = "admin/"
 
@@ -229,9 +270,6 @@ REST_FRAMEWORK = {
     ],
     "TEST_REQUEST_DEFAULT_FORMAT": "api",
 }
-
-# CORS
-CORS_ALLOW_ALL_ORIGINS = True
 
 # SAM.gov API
 SAM_API_URL = "https://api.sam.gov/entity-information/v3/entities"
