@@ -1,0 +1,22 @@
+---
+name: Runs OWASP-ZAP scans
+on:
+  workflow_call:
+    inputs:
+      url:
+        required: true
+        type: string
+
+jobs:
+  zap_scan:
+    name: Scan site with OWASP-ZAP
+    runs-on: ubuntu-latest
+    env:
+      url: ${{ inputs.url }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: grab docker container
+        run: docker pull owasp/zap2docker-stable
+      - name: run command
+        run: docker run -v $(pwd):/zap/wrk/:rw -t owasp/zap2docker-stable zap-baseline.py -t https://fac-dev.app.cloud.gov/ -c zap.conf
