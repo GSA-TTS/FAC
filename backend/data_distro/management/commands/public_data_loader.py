@@ -3,6 +3,8 @@ Download data from https://facdissem.census.gov/PublicDataDownloads.aspx
 Then unzip the files and place the them in data_distro/data_to_load/
 
 Load them with: manage.py public_data_loader
+
+Needs Pandas, it's a dev-only requirement
 """
 import csv
 import re

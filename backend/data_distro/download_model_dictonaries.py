@@ -228,6 +228,23 @@ table_mappings_from_key = {
     "DUN INFO": "DunsInfo",
 }
 
+# the doc strings have the descriptive table names from the docs, this decodes to get the table file name
+file_to_table_name_mapping = {
+    "GENERAL": "gen",
+    "CFDAINFO": "cfda",
+    "FINDINGS": "findings",
+    "FINDINGSTEXT": "findingstext_formatted",
+    "CAPTEXT": "captext_formatted",
+    "NOTES": "notes",
+    "MULTIPLECPASINFO": "cpas",
+    "REVISIONS": "revisions",
+    "UEIINFO": "ueis",
+    "AGENCIES": "agency",
+    "PASSTHROUGH": "passthrough",
+    "EININFO": "eins",
+    "DUNINFO": "duns",
+}
+
 boolen_fields = [
     "arra",
     "direct",

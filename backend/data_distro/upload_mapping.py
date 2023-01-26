@@ -1,82 +1,66 @@
-# inspect the models to create a script that uploads the data
-
+# inspect the models to create a script that crates a key we can use to upload the data
 from django.apps import apps
 
 from data_distro.download_model_dictonaries import (
     table_mappings,
+    file_to_table_name_mapping,
 )
 
-# From a given table, look at the column name and know where to load the data
-sample_data_structure = {
-    "table file name": {
-        "column_name": ["model_name", "django_field_name"],
-        "column_name2": ["model_name", "django_field_name2"],
+
+def make_table_structure():
+    # From a given table, look at the column name and know where to load the data
+    sample_data_structure = {
+        "table file name": {
+            "column_name": ["model_name", "django_field_name"],
+            "column_name2": ["model_name", "django_field_name2"],
+        }
     }
-}
 
-no_help = []
+    no_help = []
+    blank_help = []
 
-# preload tables
-upload_mapping = {}
-# the doc strings have the descriptive table names from the docs, this decodes to get the table file name
-file_to_table_name_mapping = {}
-
-for table_title in table_mappings.keys():
-    upload_mapping[table_title] = {}
-    table_file = table_mappings[table_title]
-    file_to_table_name_mapping[table_file.upper()] = table_title
-
-# output
-file_to_table_name_mapping = {
-    "GENERAL": "gen",
-    "CFDAINFO": "cfda",
-    "FINDINGS": "findings",
-    "FINDINGSTEXT": "findingstext_formatted",
-    "CAPTEXT": "captext_formatted",
-    "NOTES": "notes",
-    "MULTIPLECPASINFO": "cpas",
-    "REVISIONS": "revisions",
-    "UEIINFO": "ueis",
-    "AGENCIES": "agency",
-    "PASSTHROUGH": "passthrough",
-    "EININFO": "eins",
-    "DUNINFO": "duns",
-}
-
-distro_classes = apps.all_models["data_distro"]
-# this should be enough to make a key
-for model in distro_classes:
-    mod_class = distro_classes[model]
-    mod_name = mod_class.__name__
-    fields = mod_class._meta.get_fields()
-    for field in fields:
-        f_name = field.name
-        try:
-            help_text = field.help_text
-        except:
-            # relational fields won't have this, we can't load them directly anyway
-            no_help.append([f_name, model])
-        if "help_text" in locals() and help_text != "":
-            if help_text != "":
-                # print(mapping)
-                source = help_text.split("Census mapping: ", 1)[1]
-                table_doc_name = source.split(", ", 1)[0]
-                column_name = source.split(", ", 1)[1]
-                # print(table_doc_name, column_name) GENERAL TYPEREPORT_SP_FRAMEWORK
-                table_file_name = file_to_table_name_mapping[
-                    table_doc_name.upper().replace(" ", "")
-                ]
-                upload_mapping[table_file_name][column_name] = [mod_name, f_name]
-                # print(f_name, table_file_name, column_name, mod_name)
-            else:
-                pass
-                # print([f_name, model])
-print(no_help)
-print(file_to_table_name_mapping)
-print(upload_mapping)
+    # preload tables into a dict
+    upload_mapping = {}
+    for table_title in table_mappings.keys():
+        upload_mapping[table_title] = {}
+        table_file = table_mappings[table_title]
 
 
-# last run's results, this won't be accurate until I de-dupe
+    distro_classes = apps.all_models["data_distro"]
+    # this should be enough to make a key
+    for model in distro_classes:
+        mod_class = distro_classes[model]
+        mod_name = mod_class.__name__
+        fields = mod_class._meta.get_fields()
+        for field in fields:
+            f_name = field.name
+            try:
+                help_text = field.help_text
+            except:
+                # relational fields won't have this, we can't load them directly anyway
+                no_help.append([f_name, model])
+            if "help_text" in locals() and help_text != "":
+                if help_text != "":
+                    source = help_text.split("Census mapping: ", 1)[1]
+                    table_doc_name = source.split(", ", 1)[0]
+                    column_name = source.split(", ", 1)[1]
+                    table_file_name = file_to_table_name_mapping[
+                        table_doc_name.upper().replace(" ", "")
+                    ]
+                    upload_mapping[table_file_name][column_name] = [mod_name, f_name]
+                else:
+                    blank_help.append([f_name, model])
+
+    if len(blank_help) > 0:
+        print("~ WARNING Check fields: {0} ~".format(blank_help))
+
+    # this should relational fields
+    print("Fields with no help: {0}".format(no_help))
+
+    return(upload_mapping)
+
+
+# last run's results
 upload_mapping = {
     "gen": {
         "AUDITEECERTIFYNAME": ["General", "auditee_certify_name"],

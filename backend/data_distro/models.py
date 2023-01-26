@@ -110,7 +110,10 @@ class Auditor(models.Model):
         help_text=docs.cpa_street1_multiplecpasinfo,
     )
     cpa_zip_code = models.CharField(
-        "CPA Zip Code", null=True, max_length=12, help_text=docs.cpa_zip_code_multiplecpasinfo
+        "CPA Zip Code",
+        null=True,
+        max_length=12,
+        help_text=docs.cpa_zip_code_multiplecpasinfo,
     )
     cpa_country = models.CharField(
         "CPA Country", max_length=6, null=True, help_text=docs.cpa_country

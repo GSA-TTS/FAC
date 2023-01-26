@@ -19,9 +19,11 @@ data_dict = data_key.to_dict(orient="records")
 
 # want to create
 sample_data = {
-    new_name: {
+    "new_name": {
         "models": ["Model1", "Model2"],
-        "original_name": "ORIGINALNAME",
+        # There are more than one original names that can map to a new name
+        # The model order and the original name order should be the same
+        "original_name": ["ORIGINALNAME", "ORIGINALNAME2"],
         "descriptions": ["description1", "description2"],
         "description_model1": "description1",
         "description_model2": "description2",
@@ -34,16 +36,17 @@ sample_data = {
 
 doc_metadata = {}
 
-for field_data in data_dict.keys():
-    row = doc_metadata[field_data]
+for field_data in field_mappings.keys():
+    data = doc_metadata[field_data]
     new_name = field_data
     new_model = table_mappings_from_key[row["TABLE"]]
     forms_per_model = "forms_{0}".format(new_model)
+    print(new_name, field_data, data)
     if new_name not in doc_metadata:
         doc_metadata[new_name] = {}
         d = doc_metadata[new_name]
         d["models"] = [new_model]
-        d["original_name"] = row["FIELD NAME"]
+        d["original_name"] = [row["FIELD NAME"]]
         # populate values below
         d["forms"] = []
         d[forms_per_model] = []
@@ -51,7 +54,8 @@ for field_data in data_dict.keys():
     else:
         d = doc_metadata[new_name]
         d["models"].append(new_model)
-        d[forms_per_model] = []
+        d["original_name"].append(row["FIELD NAME"])
+        d[forms_per_model] = [row["FIELD NAME"]]
     for header in row.keys():
         value = row[header]
         # float catches the nans
