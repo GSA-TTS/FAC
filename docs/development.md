@@ -158,7 +158,7 @@ fac ()
 
 Let's use this workflow to create a `superuser` in our development environment so we can access the Admin interface!
 
-First create an account in the Login.gov test environment, The best way to do that is to run [http://localhost:8000](http://localhost:8000) click on the log in link from your app running locally. (It needs to be localhost and not http://0.0.0.0:8000 to work with how we configured out Login.gov test account.) 
+First create an account in the Login.gov test environment, The best way to do that is to run [http://localhost:8000](http://localhost:8000) click on the log in link from your app running locally. (It needs to be localhost and not http://0.0.0.0:8000 to work with how we configured our Login.gov test account.) 
 
 Follow the instructions on the Login.gov test site to set up an account.
 
