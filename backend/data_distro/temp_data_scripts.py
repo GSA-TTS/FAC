@@ -1,6 +1,5 @@
 # Doing this in console for a one-time data grab and mapping using the data download key.
 # Then, I can use the mappings to evolve the import script.
-
 from pandas import read_csv
 
 from data_distro.download_model_dictonaries import (
@@ -8,6 +7,7 @@ from data_distro.download_model_dictonaries import (
     field_mappings,
 )
 from data_distro.v1_crosswalk_for_docs import doc_metadata
+
 
 """ getting docs """
 # detailed description generator
@@ -82,7 +82,7 @@ for field in doc_metadata.keys():
             differentiator = ""
         if len(data["forms_{}".format(model)]) > 0:
             form_list = data["forms_{}".format(model)]
-            form_text = ";".join(form_list)
+            form_text = "; ".join(form_list)
             sources = "Data sources: {0} ".format(form_text)
         else:
             sources = ""

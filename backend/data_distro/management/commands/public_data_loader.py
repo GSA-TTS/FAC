@@ -202,6 +202,8 @@ class Command(BaseCommand):
         Loads data from public download files into Django models. It will automatically \
         crawl "/backend/data_distro/data_to_load". \
         If you just want one file, you can pass the name of the file with -p.
+
+        This only works in non-production environments for now, it requires pandas.
     """
 
     def add_arguments(self, parser):
