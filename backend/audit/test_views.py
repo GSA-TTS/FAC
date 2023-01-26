@@ -9,8 +9,9 @@ from .views import MySubmissions
 
 User = get_user_model()
 
-SUBMISSIONS_PATH = reverse("MySubmissions")
-ACCESS_AND_SUBMISSION_PATH = reverse("api-accessandsubmission")
+SUBMISSIONS_PATH = reverse("audit:MySubmissions")
+EDIT_PATH = "audit:EditSubmission"
+ACCESS_AND_SUBMISSION_PATH = reverse("accessandsubmission")
 
 VALID_ELIGIBILITY_DATA = {
     "is_usa_based": True,
@@ -39,13 +40,18 @@ class MySubmissionsViewTests(TestCase):
         self.user2 = baker.make(User)
 
         self.client = Client()
-        self.client.force_login(user=self.user)
+
+    def test_redirect_if_not_logged_in(self):
+        result = self.client.get(SUBMISSIONS_PATH)
+        self.assertAlmostEquals(result.status_code, 302)
 
     def test_no_submissions_returns_empty_list(self):
+        self.client.force_login(user=self.user)
         data = MySubmissions.fetch_my_subnissions(self.user)
         self.assertEquals(len(data), 0)
 
     def test_user_with_submissions_should_return_expected_data_columns(self):
+        self.client.force_login(user=self.user)
         self.user.profile.entry_form_data = (
             VALID_ELIGIBILITY_DATA | VALID_AUDITEE_INFO_DATA
         )
@@ -64,6 +70,7 @@ class MySubmissionsViewTests(TestCase):
         self.assertTrue("fiscal_year_end_date" in keys)
 
     def test_user_with_no_submissions_should_return_no_data(self):
+        self.client.force_login(user=self.user)
         self.user.profile.entry_form_data = (
             VALID_ELIGIBILITY_DATA | VALID_AUDITEE_INFO_DATA
         )

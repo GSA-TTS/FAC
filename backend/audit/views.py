@@ -1,21 +1,28 @@
 from django.views import generic
-from django.shortcuts import render, redirect
+from django.shortcuts import render
 from django.db.models import F
-from django.urls import reverse
-
-from audit.models import SingleAuditChecklist
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 
-class MySubmissions(generic.View):
+from .models import SingleAuditChecklist
+from .forms import SubmissionForm
+
+
+class MySubmissions(LoginRequiredMixin, generic.View):
+    redirect_field_name = "Home"
+
     def get(self, request, *args, **kwargs):
-        if not request.user.is_authenticated:
-            url = reverse("Home")
-            return redirect(url)
         template_name = "audit/my_submissions.html"
-        next_page = "MySubmissions"  # TO DO Replace with ReportSubmissions alias
+        new_link = "report_submission"
+        edit_link = "audit:EditSubmission"
+
         data = MySubmissions.fetch_my_subnissions(request.user)
-        extra_context = {"data": data, "next_page": next_page}
-        return render(request, template_name, extra_context)
+        context = {
+            "data": data,
+            "new_link": new_link,
+            "edit_link": edit_link,
+        }
+        return render(request, template_name, context)
 
     @classmethod
     def fetch_my_subnissions(cls, user):
@@ -33,3 +40,17 @@ class MySubmissions(generic.View):
             .filter(submitted_by=user)
         )
         return data
+
+
+class EditSubmission(LoginRequiredMixin, generic.View):
+    redirect_field_name = "Home"
+
+    def get(self, request, *args, **kwargs):
+
+        template_name = "audit/edit_submission.html"
+        report_id = kwargs["report_id"]
+        sac = SingleAuditChecklist.objects.get(report_id=report_id)
+        form = SubmissionForm(instance=sac)
+        next_link = "Home"
+        context = {"report_id": report_id, "form": form, "next_link": next_link}
+        return render(request, template_name, context)

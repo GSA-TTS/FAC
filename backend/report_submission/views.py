@@ -78,10 +78,7 @@ class AccessAndSubmissionFormView(LoginRequiredMixin, View):
         report_id = result.get("report_id")
 
         if report_id:
-            # This should redirect to the commented-out line, but we'll just
-            # redirect to the JSON representation of the data until the correct
-            # page is up:
-            # return redirect(f"/audit/{report_id}")
-            return redirect(f"/sac/edit/{report_id}")
+            edit_link = "audit:EditSubmission"
+            return redirect(reverse(edit_link, args=[report_id]))
         print("Error processing data: ", result)
         return redirect(reverse("accessandsubmission"))
