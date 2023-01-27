@@ -100,9 +100,9 @@ field_mappings = {
     "ELECAUDITSID": "elec_audits_id",
     "ELECRPTREVISIONID": "elec_report_revision_id",
     "ENTITY_TYPE": "entity_type",
-    #
+    # only in key
     "FAC ACCEPTED DATE": "fac_accepted_date",
-    # not in key but not worried
+    # not in key but not worried FAC ACCEPTED DATE was not
     "FACACCEPTEDDATE": "fac_accepted_date",
     "FEDERALAWARDS": "federal_awards",
     "FEDERALAWARDS_EXPLAIN": "federal_awards_explain",
@@ -163,7 +163,7 @@ field_mappings = {
     # only in the data columns
     "RD": "research_and_development",
     "REPEATFINDING": "repeat_finding",
-    "REPORTABLECONDITION/SIGNIFICANTDEFICIENCY": "condition_or_deficiency",
+    # "REPORTABLECONDITION/SIGNIFICANTDEFICIENCY": "condition_or_deficiency",
     # these are together in the key buy separate in the fy 22 data probably want to break them out in the models
     "REPORTABLECONDITION": "condition_or_deficiency",
     "SIGNIFICANTDEFICIENCY_MP": "condition_or_deficiency",

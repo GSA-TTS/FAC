@@ -7,17 +7,19 @@ from data_distro.download_model_dictonaries import (
 )
 
 
-def make_table_structure():
-    # From a given table, look at the column name and know where to load the data
-    sample_data_structure = {
-        "table file name": {
-            "column_name": ["model_name", "django_field_name"],
-            "column_name2": ["model_name", "django_field_name2"],
-        }
+# From a given table, look at the column name and know where to load the data
+sample_upload_mapping_structure = {
+    "table file name": {
+        "column_name": ["model_name", "django_field_name"],
+        "column_name2": ["model_name", "django_field_name2"],
     }
+}
 
-    no_help = []
+
+def make_table_structure():
+    add_realtional = []
     blank_help = []
+    leftovers = []
 
     # preload tables into a dict
     upload_mapping = {}
@@ -25,6 +27,20 @@ def make_table_structure():
         upload_mapping[table_title] = {}
         table_file = table_mappings[table_title]
 
+    new_fields = [
+        # django generates
+        "id",
+        # I added
+        "is_public",
+        "data_source",
+        "create_date",
+        "modified_date",
+        # relational links these will change if you move fields around
+        "general",
+        "findings_text",
+    ]
+
+    leftovers = []
 
     distro_classes = apps.all_models["data_distro"]
     # this should be enough to make a key
@@ -36,85 +52,153 @@ def make_table_structure():
             f_name = field.name
             try:
                 help_text = field.help_text
-            except:
-                # relational fields won't have this, we can't load them directly anyway
-                no_help.append([f_name, model])
-            if "help_text" in locals() and help_text != "":
-                if help_text != "":
-                    source = help_text.split("Census mapping: ", 1)[1]
-                    table_doc_name = source.split(", ", 1)[0]
-                    column_name = source.split(", ", 1)[1]
-                    table_file_name = file_to_table_name_mapping[
-                        table_doc_name.upper().replace(" ", "")
-                    ]
-                    upload_mapping[table_file_name][column_name] = [mod_name, f_name]
+            except AttributeError:
+                help_text = ""
+                add_realtional.append([f_name, model])
+                new_fields.append(f_name)
+            if help_text != "":
+                help_text = field.help_text
+                source = help_text.split("Census mapping: ", 1)[1]
+                table_doc_name = source.split(", ", 1)[0]
+                column_name = source.split(", ", 1)[1]
+                table_file_name = file_to_table_name_mapping[
+                    table_doc_name.upper().replace(" ", "")
+                ]
+                upload_mapping[table_file_name][column_name] = [mod_name, f_name]
+            else:
+                if f_name not in new_fields:
+                    blank_help.append(f_name)
                 else:
-                    blank_help.append([f_name, model])
+                    # just a check
+                    leftovers.append(f_name)
 
     if len(blank_help) > 0:
-        print("~ WARNING Check fields: {0} ~".format(blank_help))
+        print("~ WARNING ~ Check blank fields: blank_help={0}".format(blank_help))
 
     # this should relational fields
-    print("Fields with no help: {0}".format(no_help))
+    print(
+        "Fields with no help (relational and array models that need some custom logic for loading): add_realtional={0}".format(
+            add_realtional
+        )
+    )
 
-    return(upload_mapping)
+    return upload_mapping
 
 
 # last run's results
-upload_mapping = {
+add_realtional = [
+    ["general", "auditee"],
+    ["general", "auditor"],
+    ["general", "cfdainfo"],
+    ["findings", "findingstext"],
+    ["general", "findings"],
+    ["general", "captext"],
+    ["general", "notes"],
+    ["general", "revisions"],
+    ["general", "agencies"],
+    ["general", "passthrough"],
+]
+
+# these should be relational fields and list fields
+blank_help = [
+    "duns_list",
+    "uei_list",
+    "auditor",
+    "agencies",
+    "auditee",
+    "cfda",
+    "cap_text",
+    "notes",
+    "revisions",
+    "passthrough",
+    "auditor",
+    "agency",
+]
+
+# just to confirm all data is accounted for as expected
+leftovers = [
+    "general",
+    "id",
+    "is_public",
+    "general",
+    "id",
+    "is_public",
+    "general",
+    "id",
+    "is_public",
+    "findings",
+    "id",
+    "is_public",
+    "general",
+    "id",
+    "findings_text",
+    "is_public",
+    "general",
+    "id",
+    "is_public",
+    "general",
+    "id",
+    "is_public",
+    "general",
+    "id",
+    "is_public",
+    "general",
+    "id",
+    "is_public",
+    "general",
+    "id",
+    "is_public",
+    "id",
+    "general",
+    "id",
+    "general",
+    "id",
+    "findings",
+    "is_public",
+    "modified_date",
+    "create_date",
+    "data_source",
+]
+
+# mapping for upload
+upload_mapping = print(upload_mapping)
+{
     "gen": {
-        "AUDITEECERTIFYNAME": ["General", "auditee_certify_name"],
-        "AUDITEECERTIFYTITLE": ["General", "auditee_certify_title"],
-        "AUDITEECONTACT": ["General", "auditee_contact"],
-        "AUDITEEEMAIL": ["General", "auditee_email"],
-        "AUDITEEFAX": ["General", "auditee_fax"],
-        "AUDITEENAME": ["General", "auditee_name"],
-        "AUDITEENAMETITLE": ["General", "auditee_name_title"],
-        "AUDITEEPHONE": ["General", "auditee_phone"],
-        "AUDITEETITLE": ["General", "auditee_title"],
-        "STREET1": ["General", "street1"],
-        "STREET2": ["General", "street2"],
-        "CITY": ["General", "city"],
-        "STATE": ["General", "state"],
-        "ZIPCODE": ["General", "zip_code"],
+        "AUDITEECERTIFYNAME": ["Auditee", "auditee_certify_name"],
+        "AUDITEECERTIFYTITLE": ["Auditee", "auditee_certify_title"],
+        "AUDITEECONTACT": ["Auditee", "auditee_contact"],
+        "AUDITEEEMAIL": ["Auditee", "auditee_email"],
+        "AUDITEEFAX": ["Auditee", "auditee_fax"],
+        "AUDITEENAME": ["Auditee", "auditee_name"],
+        "AUDITEENAMETITLE": ["Auditee", "auditee_name_title"],
+        "AUDITEEPHONE": ["Auditee", "auditee_phone"],
+        "AUDITEETITLE": ["Auditee", "auditee_title"],
+        "STREET1": ["Auditee", "street1"],
+        "STREET2": ["Auditee", "street2"],
+        "CITY": ["Auditee", "city"],
+        "STATE": ["Auditee", "state"],
+        "EIN": ["Auditee", "ein"],
+        "EINSUBCODE": ["Auditee", "ein_subcode"],
+        "ZIPCODE": ["Auditee", "zip_code"],
+        "CPACOUNTRY": ["Auditor", "cpa_country"],
+        "CPAFOREIGN": ["Auditor", "cpa_foreign"],
+        "AUDITOR_EIN": ["CfdaInfo", "auditor_ein"],
         "COGAGENCY": ["General", "cognizant_agency"],
-        "DUNS": ["General", "duns"],
-        "UEI": ["General", "uei"],
-        "MULTIPLEDUNS": ["General", "multiple_duns"],
-        "MULTIPLEUEIS": ["General", "multiple_ueis"],
-        "CPACITY": ["General", "cpa_city"],
-        "CPACONTACT": ["General", "cpa_contact"],
-        "CPACOUNTRY": ["General", "cpa_country"],
-        "CPADATESIGNED": ["General", "cpa_date_signed"],
-        "CPAEMAIL": ["General", "cpa_email"],
-        "CPAFAX": ["General", "cpa_fax"],
-        "CPAFIRMNAME": ["General", "cpa_firm_name"],
-        "CPAFOREIGN": ["General", "cpa_foreign"],
-        "CPAPHONE": ["General", "cpa_phone"],
-        "CPASTATE": ["General", "cpa_state"],
-        "CPASTREET1": ["General", "cpa_street1"],
-        "CPASTREET2": ["General", "cpa_street2"],
-        "CPATITLE": ["General", "cpa_title"],
-        "CPAZIPCODE": ["General", "cpa_zip_code"],
-        "AUDITOR_EIN": ["General", "auditor_ein"],
-        "EIN": ["General", "ein"],
-        "EINSUBCODE": ["General", "ein_subcode"],
-        "MULTIPLEEINS": ["General", "multiple_eins"],
-        "MULTIPLE_CPAS": ["General", "multiple_cpas"],
+        "COG_OVER": ["General", "cognizant_agency_over"],
         "AUDITEEDATESIGNED": ["General", "auditee_date_signed"],
+        "CPADATESIGNED": ["General", "cpa_date_signed"],
         "AUDITTYPE": ["General", "audit_type"],
         "AUDITYEAR": ["General", "audit_year"],
         "COMPLETED_ON": ["General", "completed_on"],
         "COMPONENT DATE RECEIVED": ["General", "component_date_received"],
-        "REPORTABLECONDITION/SIGNIFICANTDEFICIENCY": [
-            "General",
-            "condition_or_deficiency",
-        ],
+        "REPORTABLECONDITION": ["General", "reportable_condition"],
+        "SIGNIFICANTDEFICIENCY": ["General", "significant_deficiency"],
         "REPORTABLECONDITION/SIGNIFICANTDEFICIENCY_MP": [
             "General",
             "condition_or_deficiency_major_program",
         ],
         "CYFINDINGS": ["General", "current_or_former_findings"],
+        "DATEFIREWALL": ["General", "date_firewall"],
         "DBKEY": ["General", "dbkey"],
         "DOLLARTHRESHOLD": ["General", "dollar_threshold"],
         "DUP_REPORTS": ["General", "dup_reports"],
@@ -133,6 +217,7 @@ upload_mapping = {
         "OVERSIGHTAGENCY": ["General", "oversight_agency"],
         "PERIODCOVERED": ["General", "period_covered"],
         "PREVIOUS_COMPLETED_ON": ["General", "previous_completed_on"],
+        "PREVIOUSDATEFIREWALL": ["General", "previous_date_firewall"],
         "PYSCHEDULE": ["General", "prior_year_schedule"],
         "QCOSTS": ["General", "questioned_costs"],
         "REPORTREQUIRED": ["General", "report_required"],
@@ -170,6 +255,7 @@ upload_mapping = {
         "ELECAUDITSID": ["CfdaInfo", "elec_audits_id"],
         "DBKEY": ["CfdaInfo", "dbkey"],
         "AUDITYEAR": ["CfdaInfo", "audit_year"],
+        "QCOSTS2": ["CfdaInfo", "questioned_costs"],
     },
     "findings": {
         "MODIFIEDOPINION": ["Findings", "modified_opinion"],
@@ -216,20 +302,19 @@ upload_mapping = {
         "AUDITYEAR": ["Notes", "audit_year"],
     },
     "cpas": {
-        "CPAPHONE": ["MultipleCpasInfo", "cpa_phone"],
-        "CPAFAX": ["MultipleCpasInfo", "cpa_fax"],
-        "CPASTATE": ["MultipleCpasInfo", "cpa_state"],
-        "CPACITY": ["MultipleCpasInfo", "cpa_city"],
-        "CPATITLE": ["MultipleCpasInfo", "cpa_title"],
-        "CPASTREET1": ["MultipleCpasInfo", "cpa_street1"],
-        "CPAZIPCODE": ["MultipleCpasInfo", "cpa_zip_code"],
-        "CPACONTACT": ["MultipleCpasInfo", "cpa_contact"],
-        "CPAEMAIL": ["MultipleCpasInfo", "cpa_email"],
-        "CPAFIRMNAME": ["MultipleCpasInfo", "cpa_firm_name"],
-        "CPAEIN": ["MultipleCpasInfo", "cpa_ein"],
-        "DBKEY": ["MultipleCpasInfo", "dbkey"],
-        "AUDITYEAR": ["MultipleCpasInfo", "audit_year"],
-        "SEQNUM": ["Revisions", "general"],
+        "CPAPHONE": ["Auditor", "cpa_phone"],
+        "CPAFAX": ["Auditor", "cpa_fax"],
+        "CPASTATE": ["Auditor", "cpa_state"],
+        "CPACITY": ["Auditor", "cpa_city"],
+        "CPATITLE": ["Auditor", "cpa_title"],
+        "CPASTREET1": ["Auditor", "cpa_street2"],
+        "CPAZIPCODE": ["Auditor", "cpa_zip_code"],
+        "CPACONTACT": ["Auditor", "cpa_contact"],
+        "CPAEMAIL": ["Auditor", "cpa_email"],
+        "CPAFIRMNAME": ["Auditor", "cpa_firm_name"],
+        "CPAEIN": ["Auditor", "cpa_ein"],
+        "DBKEY": ["Auditor", "dbkey"],
+        "SEQNUM": ["Auditor", "seqnum"],
     },
     "revisions": {
         "FINDINGS": ["Revisions", "findings"],
@@ -252,12 +337,7 @@ upload_mapping = {
         "AUDITYEAR": ["Revisions", "audit_year"],
         "DBKEY": ["Revisions", "dbkey"],
     },
-    "ueis": {
-        "UEI": ["UeiInfo", "uei"],
-        "UEISEQNUM": ["UeiInfo", "uei_seq_num"],
-        "DBKEY": ["UeiInfo", "dbkey"],
-        "AUDITYEAR": ["Agencies", "general"],
-    },
+    "ueis": {},
     "agency": {
         "AGENCYCFDA": ["Agencies", "agency_cfda"],
         "EIN": ["Agencies", "ein"],
@@ -271,16 +351,6 @@ upload_mapping = {
         "AUDITYEAR": ["Passthrough", "audit_year"],
         "DBKEY": ["Passthrough", "dbkey"],
     },
-    "eins": {
-        "EIN": ["EinInfo", "ein"],
-        "EINSEQNUM": ["EinInfo", "ein_seq_num"],
-        "DBKEY": ["EinInfo", "dbkey"],
-        "AUDITYEAR": ["EinInfo", "audit_year"],
-    },
-    "duns": {
-        "DUNS": ["DunsInfo", "duns"],
-        "DUNSEQNUM": ["DunsInfo", "duns_seq_num"],
-        "DBKEY": ["DunsInfo", "dbkey"],
-        "AUDITYEAR": ["DunsInfo", "audit_year"],
-    },
+    "eins": {},
+    "duns": {},
 }

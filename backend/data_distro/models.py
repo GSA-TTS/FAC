@@ -266,6 +266,7 @@ class CfdaInfo(models.Model):
         max_length=40,
         help_text=docs.type_report_major_program_cfdainfo,
     )
+    # not in mapping
     # not in key for this table check descriptions
     findings = models.TextField(
         "Items on the Findings page", null=True, help_text=docs.findings
@@ -288,16 +289,16 @@ class CfdaInfo(models.Model):
         max_length=40,
         help_text=docs.audit_year_cfdainfo,
     )
-    ## needs sources ##
-    ein = models.IntegerField(
+    auditor_ein = models.IntegerField(
         "Primary Employer Identification Number",
+        help_text=docs.auditor_ein,
     )  # , max_length=9
     ## needs documentation ##
-    # check this- it is QCOSTS2
     questioned_costs = models.CharField(
         "Questioned Costs",
         null=True,
         max_length=40,
+        help_text=docs.questioned_costs_CfdaInfo,
     )
     is_public = models.BooleanField(
         "True for public records, False for non-public records"
@@ -354,7 +355,7 @@ class Findings(models.Model):
     significant_deficiency = models.BooleanField(
         "Significant Deficiency finding",
         null=True,
-        help_text=docs.significant_deficiency,
+        help_text=docs.significant_deficiency_findings,
     )
     other_findings = models.BooleanField(
         "Other findings", null=True, help_text=docs.other_findings
@@ -639,7 +640,11 @@ class General(models.Model):
         help_text=docs.cognizant_agency,
     )
     ## needs documentation ##
-    cognizant_agency_over = models.CharField(max_length=2, null=True)
+    cognizant_agency_over = models.CharField(
+        max_length=2,
+        null=True,
+        help_text=docs.cognizant_agency_over,
+    )
     auditee_date_signed = models.DateField(
         "Date of Auditee signature", help_text=docs.auditee_date_signed
     )
@@ -666,10 +671,15 @@ class General(models.Model):
         null=True,
         help_text=docs.component_date_received,
     )
-    condition_or_deficiency = models.BooleanField(
-        "Whether or not the audit disclosed a reportable condition/significant deficiency on financial statements",
+    reportable_condition = models.BooleanField(
+        "Whether or not the audit disclosed a reportable condition on financial statements",
         null=True,
-        help_text=docs.condition_or_deficiency,
+        help_text=docs.reportable_condition,
+    )
+    significant_deficiency = models.BooleanField(
+        "Whether or not the audit disclosed a significant deficiency on financial statements",
+        null=True,
+        help_text=docs.significant_deficiency_general,
     )
     condition_or_deficiency_major_program = models.BooleanField(
         "Whether or not the audit disclosed a reportable condition/significant deficiency for any major program in the Schedule of Findings and Questioned Costs",
@@ -681,8 +691,7 @@ class General(models.Model):
         null=True,
         help_text=docs.current_or_former_findings,
     )
-    ## needs documentation ##
-    date_firewall = models.DateField(null=True)
+    date_firewall = models.DateField(null=True, help_text=docs.date_firewall)
     dbkey = models.CharField(
         "Audit Year and DBKEY (database key) combined make up the primary key. Only on records created by census.",
         max_length=40,
@@ -765,8 +774,10 @@ class General(models.Model):
         null=True,
         help_text=docs.previous_completed_on,
     )
-    ### needs documentation ###
-    previous_date_firewall = models.DateField(null=True)
+    previous_date_firewall = models.DateField(
+        null=True,
+        help_text=docs.previous_date_firewall,
+    )
     prior_year_schedule = models.BooleanField(
         "Indicate whether or not the report includes a Summary Schedule of Prior Year Audit Findings",
         null=True,
