@@ -1,68 +1,134 @@
 {% extends "base.html" %}
-
+{% load static %}
 
 {% block content%}
-<section class="usa-hero" aria-label="Introduction">
-    <div class="grid-container">
-        <h1 class="usa-hero__heading">My audit submissions</h1>
-        <p class="intro-text">My unpublished sybmissions list</p>
-        {% if data.len == 0 %}
-        <p>
-            No submissions found
-        </p>
-        {% else %}
-        <div class="usa-table-container--scrollable" tabindex="0">
-
-            <table class="usa-table">
-                <caption>Table Contents</caption>
-                <thead>
-
-                    <tr>
-                        <th data-sortable scope="col" role="columnheader">Report ID</th>
-                        <th data-sortable scope="col" role="columnheader">Status</th>
-                        <th data-sortable scope="col" role="columnheader">Auditee UEI</th>
-                        <th data-sortable scope="col" role="columnheader">Auditee Name</th>
-                        <th data-sortable scope="col" role="columnheader">Fiscal year end date</th>
-                    </tr>
-                </thead>
-                <tbody> {% for item in data %}
-                    <tr>
-                        <!--<td><a href="{% url next_page %}?report_id={{item.report_id}}">{{item.report_id}}</a></td>-->
-                        <td><a href="/sac/edit/{{item.report_id}}">{{item.report_id}}</a></td>
-                        <td>{{ item.submission_status }}</td>
-                        <td>{{ item.auditee_uei }}</td>
-                        <td>{{ item.auditee_name }}</td>
-                        <td>{{ item.fiscal_year_end_date }}</td>
-
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-            {% endif %}
-        </div>
-        <div>
-            <h1 class="usa-hero__heading">Start a new submission</h1>
-            <p class="intro-text">Before you start a new submission, double check to make sure that you already don't
-                have one
-                in progress</p>
+<div class="grid-container">
+    <h1>My audit submissions</h1>
+    {% if data.len == 0 %}
+    <p>
+        No submissions found
+    </p>
+    {% else %}
+    <div class="grid-row" tabindex="0">
+        <table class="usa-table margin-top-0">
+            <caption>My unpublished sybmissions list</caption>
+            <thead>
+                <tr>
+                    <th data-sortable scope="col" role="columnheader">Report ID</th>
+                    <th data-sortable scope="col" role="columnheader">Status</th>
+                    <th data-sortable scope="col" role="columnheader">Auditee
+                        <button
+                            class="usa-button--unstyled margin-top-0"
+                            aria-controls="modal-uei-info"
+                            data-open-modal
+                        >UEI</button>
+                    </th>
+                    <th data-sortable scope="col" role="columnheader">Auditee Name</th>
+                    <th data-sortable scope="col" role="columnheader">Fiscal year end date</th>
+                </tr>
+            </thead>
+            <tbody> {% for item in data %}
+                <tr>
+                    <td><a href="/sac/edit/{{item.report_id}}">{{item.report_id}}</a></td>
+                    <td>{{ item.submission_status }}</td>
+                    <td>{{ item.auditee_uei }}</td>
+                    <td>{{ item.auditee_name }}</td>
+                    <td>{{ item.fiscal_year_end_date }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% endif %}
+    </div>
+    <div class="grid-row">
+        <h2>Start a new submission</h2>
+        <p class="margin-top-0">Before you start a new submission, double check to make sure that you don't already have
+            one in progress.</p>
+        <form id="start-new-submission" class="usa-form usa-form--large">
             <div class="usa-checkbox">
-                <input class="usa-checkbox__input" id="check-agree" type="checkbox" onchange="
-                    document.getElementById('button-next').disabled = !this.checked;
-                " />
-                <label class="usa-checkbox__label" for="check-agree">I agree to the above terms and consitions</label>
+                <input id="check-start-new-submission" class="usa-checkbox__input" type="checkbox" />
+                <label class="usa-checkbox__label" for="check-start-new-submission">
+                    I agree to the above
+                    <button
+                        id="terms-conditions-trigger"
+                        class="usa-button--unstyled margin-top-0"
+                        aria-controls="modal-terms-conditions"
+                        data-open-modal
+                    >terms and
+                        conditions</button>.
+                    <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
+                </label>
             </div>
-            <p></p>
-
-            <div>
-                <button type="button" disabled class="usa-button" id="button-next" onclick="
-                        window.location.href=' {% url next_page%}'
-                    ">
-                    Start a new submission </button>
+            <div class="usa-button-group">
+                <input type="submit" id="start-submission" class="usa-button" value="Start a new submission" disabled />
             </div>
+        </form> 
+    </div>
 
-
+    <div
+        class="usa-modal flex-justify-start"
+        id="modal-uei-info"
+        aria-labelledby="modal-uei-info-heading"
+        aria-describedby="modal-uei-info-description"
+    >
+        <div class="usa-modal__content">
+            <div class="usa-modal__main">
+                <h2 class="usa-modal__heading" id="modal-uei-info-heading">What is a Unique Entity Identifier (UEI)?</h2>
+                <div class="usa-prose" id="modal-uei-info-description">
+                    <p>The Unique Entity Identifier (UEI) for an awardee or recipient is an alphanumeric code created in the System for Award Management (SAM.gov) that is used to uniquely identify specific commercial, nonprofit, or business entities registered to do business with the federal government.</p>
+                </div>
+            </div>
+            <button class="usa-button usa-modal__close" aria-label="Close this window" data-close-modal>
+                <svg class="usa-icon" aria-hidden="true" focusable="false" role="img">
+                    <use xlink:href="/static/img/sprite.svg#close"></use>
+                </svg>
+            </button>
         </div>
-</section>
+    </div>
 
+    <div
+        class="usa-modal usa-modal--lg flex-justify-start"
+        id="modal-terms-conditions"
+        aria-labelledby="modal-terms-conditions-heading"
+        aria-describedby="modal-terms-conditions-description"
+    >
+        <div class="usa-modal__content">
+            <div class="usa-modal__main">
+                <h2 class="usa-modal__heading" id="modal-terms-conditions-heading">Federal Audit Clearinghouse terms and conditions</h2>
+                <div class="usa-prose" id="modal-terms-conditions-description">
+                    <p>FAC.gov is a U.S. General Services Administration federal government service. This site collects required documentation from organizations that spend $750,000 or more in federal grant funds in a given year.</p>
+                    <p>All use of FAC.gov will be monitored, recorded, and subject to audit by GSA staff and other federal government authorities. By using this system, you consent to your use being monitored and recorded.</p>
+                    <p>Unauthorized use is prohibited, and individuals found performing unauthorized activities are subject to disciplinary action including criminal prosecution.</p>
+                    <p>If you have questions about these conditions, please email <a class="usa-link" href="mailto:fac-support@gsa.gov">fac-support@gsa.gov</a>.</p>
+                </div>
+
+                <div class="usa-modal__footer">
+                    <ul class="usa-button-group">
+                    <li class="usa-button-group__item">
+                        <button id="modal-terms-continue" type="button" class="usa-button" data-close-modal>
+                            Accept and start a new submission
+                        </button>
+                    </li>
+                    <li class="usa-button-group__item">
+                        <button
+                        type="button"
+                        class="usa-button usa-button--unstyled padding-105 text-center"
+                        data-close-modal
+                        >
+                        Go back
+                        </button>
+                    </li>
+                    </ul>
+                </div>
+            </div>
+            <button class="usa-button usa-modal__close" aria-label="Close this window" data-close-modal>
+                <svg class="usa-icon" aria-hidden="true" focusable="false" role="img">
+                    <use xlink:href="/static/img/sprite.svg#close"></use>
+                </svg>
+            </button>
+        </div>
+    </div>
+</div>
+<script src="{% static 'compiled/js/my_submissions.js' %}" type="text/javascript"></script>
 
 {% endblock content%}
