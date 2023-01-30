@@ -1,5 +1,3 @@
-import sys, inspect
-
 from django.apps import apps
 from django.contrib import admin
 

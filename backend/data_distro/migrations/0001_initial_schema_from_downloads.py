@@ -5,62 +5,6 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    replaces = [
-        ("data_distro", "0001_initial"),
-        ("data_distro", "0002_rename_duninfo_dunsinfo_general_date_firewall_and_more"),
-        ("data_distro", "0003_alter_cfdainfo_arra_alter_cfdainfo_direct_and_more"),
-        ("data_distro", "0004_alter_findingstext_charts_tables"),
-        ("data_distro", "0005_alter_captext_charts_tables"),
-        ("data_distro", "0006_alter_cfdainfo_cfda"),
-        ("data_distro", "0007_cfdainfo_ein_alter_agencies_ein"),
-        ("data_distro", "0008_cfdainfo_findings"),
-        ("data_distro", "0009_cfdainfo_questioned_costs"),
-        ("data_distro", "0010_rename_questoned_costs_general_questioned_costs"),
-        ("data_distro", "0011_alter_cfdainfo_cfda"),
-        ("data_distro", "0012_alter_multiplecpasinfo_cpa_ein_and_more"),
-        (
-            "data_distro",
-            "0013_alter_general_auditee_fax_alter_general_cpa_fax_and_more",
-        ),
-        ("data_distro", "0014_alter_cfdainfo_cluster_name_and_more"),
-        ("data_distro", "0015_general_cognizant_agency_over_and_more"),
-        ("data_distro", "0016_alter_cfdainfo_amount"),
-        ("data_distro", "0017_alter_cfdainfo_cluster_total_and_more"),
-        ("data_distro", "0018_remove_multiplecpasinfo_cpa_mail_and_more"),
-        ("data_distro", "0019_alter_multiplecpasinfo_cpa_phone"),
-        ("data_distro", "0020_alter_multiplecpasinfo_cpa_zip_code"),
-        ("data_distro", "0021_alter_multiplecpasinfo_seqnum"),
-        ("data_distro", "0022_alter_revisions_other_explain"),
-        ("data_distro", "0023_alter_revisions_auditinfo_explain_and_more"),
-        ("data_distro", "0024_alter_revisions_cap_explain_and_more"),
-        ("data_distro", "0025_alter_general_cognizant_agency_and_more"),
-        ("data_distro", "0026_alter_general_cognizant_agency"),
-        ("data_distro", "0027_alter_general_cognizant_agency_over"),
-        ("data_distro", "0028_alter_general_ein_subcode"),
-        (
-            "data_distro",
-            "0029_alter_general_auditee_phone_alter_general_cpa_phone_and_more",
-        ),
-        (
-            "data_distro",
-            "0030_alter_general_auditee_fax_alter_general_cpa_fax_and_more",
-        ),
-        ("data_distro", "0031_alter_general_cpa_foreign"),
-        ("data_distro", "0032_alter_general_street2"),
-        ("data_distro", "0033_alter_general_cpa_street2"),
-        ("data_distro", "0034_alter_general_sp_framework"),
-        ("data_distro", "0035_alter_general_form_date_received"),
-        ("data_distro", "0036_alter_general_type_report_financial_statements_and_more"),
-        ("data_distro", "0037_alter_general_auditee_email_and_more"),
-        ("data_distro", "0038_alter_general_cpa_country_alter_general_cpa_email"),
-        ("data_distro", "0039_alter_general_dollar_threshold"),
-        ("data_distro", "0040_alter_general_total_fed_expenditures"),
-        (
-            "data_distro",
-            "0041_alter_agencies_agency_cfda_alter_agencies_audit_year_and_more",
-        ),
-    ]
-
     dependencies = []
 
     operations = [
