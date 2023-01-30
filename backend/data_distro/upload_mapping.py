@@ -20,12 +20,10 @@ def make_table_structure():
     add_realtional = []
     blank_help = []
     leftovers = []
-
     # preload tables into a dict
     upload_mapping = {}
     for table_title in table_mappings.keys():
         upload_mapping[table_title] = {}
-        table_file = table_mappings[table_title]
 
     new_fields = [
         # django generates
@@ -82,7 +80,7 @@ def make_table_structure():
         )
     )
 
-    return upload_mapping
+    return upload_mapping, add_realtional
 
 
 # last run's results
@@ -161,8 +159,7 @@ leftovers = [
 ]
 
 # mapping for upload
-upload_mapping = print(upload_mapping)
-{
+upload_mapping = {
     "gen": {
         "AUDITEECERTIFYNAME": ["Auditee", "auditee_certify_name"],
         "AUDITEECERTIFYTITLE": ["Auditee", "auditee_certify_title"],
@@ -181,8 +178,24 @@ upload_mapping = print(upload_mapping)
         "EINSUBCODE": ["Auditee", "ein_subcode"],
         "ZIPCODE": ["Auditee", "zip_code"],
         "CPACOUNTRY": ["Auditor", "cpa_country"],
+        "CPAPHONE": ["Auditor", "cpa_phone"],
+        "CPAFAX": ["Auditor", "cpa_fax"],
+        "CPASTATE": ["Auditor", "cpa_state"],
+        "CPACITY": ["Auditor", "cpa_city"],
+        "CPATITLE": ["Auditor", "cpa_title"],
+        "CPASTREET1": ["Auditor", "cpa_street1"],
+        "CPASTREET2": ["Auditor", "cpa_street2"],
+        "CPAZIPCODE": ["Auditor", "cpa_zip_code"],
+        "CPACONTACT": ["Auditor", "cpa_contact"],
+        "CPAEMAIL": ["Auditor", "cpa_email"],
+        "CPAFIRMNAME": ["Auditor", "cpa_firm_name"],
+        "CPAEIN": ["Auditor", "cpa_ein"],
+        # this needs to go 2 places will handle manually
+        # "DBKEY": ["Auditor", "dbkey"],
+        "SEQNUM": ["Auditor", "seqnum"],
         "CPAFOREIGN": ["Auditor", "cpa_foreign"],
-        "AUDITOR_EIN": ["CfdaInfo", "auditor_ein"],
+        # This is the same as CDFA auditor EIN. Ignore here and load from CDFA table
+        # "AUDITOR_EIN": ["CfdaInfo", "auditor_ein"],
         "COGAGENCY": ["General", "cognizant_agency"],
         "COG_OVER": ["General", "cognizant_agency_over"],
         "AUDITEEDATESIGNED": ["General", "auditee_date_signed"],
@@ -193,17 +206,18 @@ upload_mapping = print(upload_mapping)
         "COMPONENT DATE RECEIVED": ["General", "component_date_received"],
         "REPORTABLECONDITION": ["General", "reportable_condition"],
         "SIGNIFICANTDEFICIENCY": ["General", "significant_deficiency"],
-        "REPORTABLECONDITION/SIGNIFICANTDEFICIENCY_MP": [
+        "REPORTABLECONDITION_MP": [
             "General",
             "condition_or_deficiency_major_program",
         ],
         "CYFINDINGS": ["General", "current_or_former_findings"],
         "DATEFIREWALL": ["General", "date_firewall"],
+        # this needs to go 2 places
         "DBKEY": ["General", "dbkey"],
         "DOLLARTHRESHOLD": ["General", "dollar_threshold"],
         "DUP_REPORTS": ["General", "dup_reports"],
         "ENTITY_TYPE": ["General", "entity_type"],
-        "FAC ACCEPTED DATE": ["General", "fac_accepted_date"],
+        "FACACCEPTEDDATE": ["General", "fac_accepted_date"],
         "FORM DATE RECEIVED": ["General", "form_date_received"],
         "FYENDDATE": ["General", "fy_end_date"],
         "FYSTARTDATE": ["General", "fy_start_date"],
@@ -230,7 +244,7 @@ upload_mapping = print(upload_mapping)
         "TYPEREPORT_SP_FRAMEWORK": ["General", "type_report_special_purpose_framework"],
     },
     "cfda": {
-        "R&D": ["CfdaInfo", "research_and_development"],
+        "RD": ["CfdaInfo", "research_and_development"],
         "LOANS": ["CfdaInfo", "loans"],
         "ARRA": ["CfdaInfo", "arra"],
         "DIRECT": ["CfdaInfo", "direct"],
@@ -256,6 +270,8 @@ upload_mapping = print(upload_mapping)
         "DBKEY": ["CfdaInfo", "dbkey"],
         "AUDITYEAR": ["CfdaInfo", "audit_year"],
         "QCOSTS2": ["CfdaInfo", "questioned_costs"],
+        "FINDINGS": ["CfdaInfo", "findings"],
+        "EIN": ["CfdaInfo", "auditor_ein"],
     },
     "findings": {
         "MODIFIEDOPINION": ["Findings", "modified_opinion"],
@@ -265,7 +281,7 @@ upload_mapping = print(upload_mapping)
         "OTHERFINDINGS": ["Findings", "other_findings"],
         "QCOSTS": ["Findings", "questioned_costs"],
         "REPEATFINDING": ["Findings", "repeat_finding"],
-        "FINDINGREFNUMS": ["Findings", "finding_ref_nums"],
+        "FINDINGSREFNUMS": ["Findings", "finding_ref_nums"],
         "PRIORFINDINGREFNUMS": ["Findings", "prior_finding_ref_nums"],
         "TYPEREQUIREMENT": ["Findings", "type_requirement"],
         "ELECAUDITSID": ["Findings", "elec_audits_id"],
@@ -307,7 +323,7 @@ upload_mapping = print(upload_mapping)
         "CPASTATE": ["Auditor", "cpa_state"],
         "CPACITY": ["Auditor", "cpa_city"],
         "CPATITLE": ["Auditor", "cpa_title"],
-        "CPASTREET1": ["Auditor", "cpa_street2"],
+        "CPASTREET1": ["Auditor", "cpa_street1"],
         "CPAZIPCODE": ["Auditor", "cpa_zip_code"],
         "CPACONTACT": ["Auditor", "cpa_contact"],
         "CPAEMAIL": ["Auditor", "cpa_email"],
@@ -339,7 +355,7 @@ upload_mapping = print(upload_mapping)
     },
     "ueis": {},
     "agency": {
-        "AGENCYCFDA": ["Agencies", "agency_cfda"],
+        "AGENCY": ["Agencies", "agency_cfda"],
         "EIN": ["Agencies", "ein"],
         "DBKEY": ["Agencies", "dbkey"],
         "AUDITYEAR": ["Agencies", "audit_year"],

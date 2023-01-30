@@ -36,41 +36,44 @@ sample_data = {
 
 doc_metadata = {}
 
-for field_data in field_mappings.keys():
-    data = doc_metadata[field_data]
-    new_name = field_data
-    new_model = table_mappings_from_key[row["TABLE"]]
-    forms_per_model = "forms_{0}".format(new_model)
-    print(new_name, field_data, data)
-    if new_name not in doc_metadata:
-        doc_metadata[new_name] = {}
-        d = doc_metadata[new_name]
-        d["models"] = [new_model]
-        d["original_name"] = [row["FIELD NAME"]]
-        # populate values below
-        d["forms"] = []
-        d[forms_per_model] = []
-        d["descriptions"] = []
-    else:
-        d = doc_metadata[new_name]
-        d["models"].append(new_model)
-        d["original_name"].append(row["FIELD NAME"])
-        d[forms_per_model] = [row["FIELD NAME"]]
-    for header in row.keys():
-        value = row[header]
-        # float catches the nans
-        if header.startswith("SF-SAC") and type(value) != float:
-            form_location = "{}: {}".format(header, value)
-            d["forms"].append(form_location)
-            d[forms_per_model].append(form_location)
-    d["descriptions"].append(row["DESCRIPTION"])
-    d["description_{0}".format(new_model)] = row["DESCRIPTION"]
-    d["original_table_{0}".format(new_model)] = row["TABLE"]
-    # If I need to check if something can be null later
-    if len(d["descriptions"]) < 9:
-        d["all_years"] = True
-    if len(d["descriptions"]) == 9:
-        d["all_years"] = False
+
+# I don't think this is working as-is but I don't think I will need it again. I am keeping it a bit longer in case I am wrong about not needing it.
+for row in data_dict:
+    for field_data in field_mappings.keys():
+        data = doc_metadata[field_data]
+        new_name = field_data
+        new_model = table_mappings_from_key[row["TABLE"]]
+        forms_per_model = "forms_{0}".format(new_model)
+        print(new_name, field_data, data)
+        if new_name not in doc_metadata:
+            doc_metadata[new_name] = {}
+            d = doc_metadata[new_name]
+            d["models"] = [new_model]
+            d["original_name"] = [row["FIELD NAME"]]
+            # populate values below
+            d["forms"] = []
+            d[forms_per_model] = []
+            d["descriptions"] = []
+        else:
+            d = doc_metadata[new_name]
+            d["models"].append(new_model)
+            d["original_name"].append(row["FIELD NAME"])
+            d[forms_per_model] = [row["FIELD NAME"]]
+        for header in row.keys():
+            value = row[header]
+            # float catches the nans
+            if header.startswith("SF-SAC") and type(value) != float:
+                form_location = "{}: {}".format(header, value)
+                d["forms"].append(form_location)
+                d[forms_per_model].append(form_location)
+        d["descriptions"].append(row["DESCRIPTION"])
+        d["description_{0}".format(new_model)] = row["DESCRIPTION"]
+        d["original_table_{0}".format(new_model)] = row["TABLE"]
+        # If I need to check if something can be null later
+        if len(d["descriptions"]) < 9:
+            d["all_years"] = True
+        if len(d["descriptions"]) == 9:
+            d["all_years"] = False
 
 """Use doc metadata to generate doc string documentation"""
 

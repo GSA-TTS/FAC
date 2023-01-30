@@ -166,7 +166,6 @@ field_mappings = {
     # "REPORTABLECONDITION/SIGNIFICANTDEFICIENCY": "condition_or_deficiency",
     # these are together in the key buy separate in the fy 22 data probably want to break them out in the models
     "REPORTABLECONDITION": "condition_or_deficiency",
-    "SIGNIFICANTDEFICIENCY_MP": "condition_or_deficiency",
     "REPORTABLECONDITION_MP": "condition_or_deficiency_major_program",
     "SIGNIFICANTDEFICIENCY_MP": "condition_or_deficiency_major_program",
     "REPORTABLECONDITION/SIGNIFICANTDEFICIENCY_MP": "condition_or_deficiency_major_program",
@@ -274,6 +273,7 @@ boolen_fields = [
     "multiple_ueis",
     "prior_year_schedule",
     "questioned_costs",
+    "reportable_condition",
     "report_required",
     "sp_framework_required",
     "charts_tables",
