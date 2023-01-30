@@ -245,7 +245,7 @@ else:
     SESSION_COOKIE_SAMESITE = "Lax"
     X_FRAME_OPTIONS = "DENY"
 
-    CORS_ALLOWED_ORIGINS = [bucket, env.str("DJANGO_BASE_URL")]
+    CORS_ALLOWED_ORIGINS = [f"https://{AWS_S3_CUSTOM_DOMAIN}", env.str("DJANGO_BASE_URL")]
     CORS_ALLOW_METHODS = ["GET", "OPTIONS"]
 
 ADMIN_URL = "admin/"
