@@ -11,7 +11,9 @@
     {% else %}
     <div class="grid-row" tabindex="0">
         <table class="usa-table margin-top-0">
-            <caption>The following audit submissions are only for 2022. You can find older audit submissions on the <a class="usa-link" href="https://facweb.census.gov/uploadpdf.aspx">U.S. Census Bureau’s FAC website.</a></caption>
+            <caption class="text-normal">The following audit submissions are only for 2022. You can find older audit
+                submissions on the <a class="usa-link" href="https://facweb.census.gov/uploadpdf.aspx">U.S. Census
+                    Bureau’s FAC website.</a></caption>
             <thead>
                 <tr>
                     <th data-sortable scope="col" role="columnheader">Status</th>
@@ -35,19 +37,21 @@
                 {% endfor %}
             </tbody>
         </table>
+        <div class="usa-sr-only usa-table__announcement-region" aria-live="polite"></div>
         {% endif %}
     </div>
     <div class="grid-row">
         <h2>Create a new audit</h2>
-        <p class="margin-top-0">Before you create a new audit submission, double check to make sure that you don't already have one in progress.</p>
+        <p class="margin-top-0">Before you create a new audit submission, double check to make sure that you don't
+            already have one in progress.</p>
         <form id="start-new-submission" class="usa-form usa-form--large">
             <div class="usa-checkbox">
                 <input id="check-start-new-submission" class="usa-checkbox__input" type="checkbox" />
                 <label class="usa-checkbox__label" for="check-start-new-submission">
-                    I agree to the 
+                    I agree to the
                     <button id="terms-conditions-trigger" class="usa-button--unstyled margin-top-0"
                         aria-controls="modal-terms-conditions" data-open-modal>terms and
-                        conditions</button>.
+                        conditions.</button>
                     <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
                 </label>
             </div>
