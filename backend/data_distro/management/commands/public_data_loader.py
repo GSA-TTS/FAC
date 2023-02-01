@@ -6,7 +6,6 @@ Load them with: manage.py public_data_loader
 
 Needs Pandas, it's a dev-only requirement
 """
-from os import walk
 import traceback
 from pandas import read_csv
 import logging
@@ -100,6 +99,7 @@ def handle_exceptions(
 
 
 def create_model_dict():
+    """creates {"model_name": < model_object >} """
     model_dict = {}
     distro_classes = apps.all_models["data_distro"]
 
@@ -112,7 +112,7 @@ def create_model_dict():
 
 
 def transform_payload(row, table, column, instances_dict):
-    # decode data
+    """Map out new names from the download names"""
     model_name = upload_mapping[table][column][0]
     field_name = upload_mapping[table][column][1]
     field_data = row[column]
@@ -129,6 +129,15 @@ def transform_payload(row, table, column, instances_dict):
 
 
 def add_metadata(instances_dict, model_name):
+    """Adding a data source and prepping the list fields"""
+    for model_name in instances_dict.keys():
+        instances_dict[model_name]["is_public"] = True
+
+    return instances_dict
+
+
+def add_metadata_general(instances_dict, model_name):
+    """Add relevant metadata for what we extract from the General table"""
     for model_name in instances_dict.keys():
         instances_dict[model_name]["is_public"] = True
         if model_name == "General":
@@ -144,29 +153,19 @@ def add_metadata(instances_dict, model_name):
 def transform_and_save(
     row, csv_dict, table, file_path, fac_model_name, exceptions_count, exceptions_list
 ):
+    """
+    For each row in the download, it looks at the data element and skips, or passes on  the data for cleaning.
+    Then, it adds metadata and calls the save function for the created objects.
+    """
     model_dict = create_model_dict()
     try:
         columns = [str(key) for key in row]
         instances_dict = {}
-        # skip fields only for general
-        skip_list = [
-            # removed
-            "genMULTIPLEEINS",
-            "genMULTIPLEDUNS",
-            "genMULTIPLE_CPAS",
-            "genMULTIPLEUEIS",
-            # processed later
-            "genDUNS",
-            "genEIN",
-            "genUEI",
-        ]
         for column in columns:
-            mapping = table + column
-            if mapping not in skip_list:
-                instances_dict = transform_payload(row, table, column, instances_dict)
+            instances_dict = transform_payload(row, table, column, instances_dict)
 
-                # save each model instance
-                objects_dict = {}
+            # save each model instance
+            objects_dict = {}
 
         for model_name in instances_dict.keys():
             fac_model = model_dict[model_name]
@@ -188,63 +187,131 @@ def transform_and_save(
         )
 
 
-# ToDo: multiple audit years require checking year and dbkey
-def link_objects(objects_dict):
-    for model_name in objects_dict.keys():
-        if model_name == "Findings":
-            instance = objects_dict[model_name]
-            dbkey = instance.dbkey
-            findings_text = mods.FindingsText.objects.filter(dbkey=dbkey)
-            for finding_text in findings_text:
-                instance.findings_text = finding_text
-            instance.save()
+def transform_and_save_general(
+    row, csv_dict, table, file_path, fac_model_name, exceptions_count, exceptions_list
+):
+    """
+    For each row in the download, it looks at the data element and skips, or passes on  the data for cleaning.
+    Then, it adds metadata and calls the save function for the created objects.
 
-        # from the general file upload
-        if model_name == "General":
-            instance = objects_dict[model_name]
-            dbkey = instance.dbkey
+    This has additional checks and links relevant for loading the general table.
+    """
+    model_dict = create_model_dict()
+    try:
+        columns = [str(key) for key in row]
+        instances_dict = {}
+        # skip fields only for general
+        skip_list = [
+            # removed
+            "genMULTIPLEEINS",
+            "genMULTIPLEDUNS",
+            "genMULTIPLE_CPAS",
+            "genMULTIPLEUEIS",
+            # stored in 2 places
+            "genAUDITOR_EIN",
+            # processed later
+            "genDUNS",
+            "genEIN",
+            "genUEI",
+        ]
+        for column in columns:
+            mapping = table + column
+            if mapping not in skip_list:
+                instances_dict = transform_payload(row, table, column, instances_dict)
 
-            auditees = mods.Auditee.objects.filter(dbkey=dbkey)
-            for auditee in auditees:
-                instance.auditee = auditee
+                # save each model instance
+                objects_dict = {}
 
-            cfdas = mods.CfdaInfo.objects.filter(dbkey=dbkey)
-            for cfda in cfdas:
-                instance.cfda = cfda
+        for model_name in instances_dict.keys():
+            fac_model = model_dict[model_name]
+            instances_dict = add_metadata_general(instances_dict, model_name)
+            p, created = fac_model.objects.get_or_create(**instances_dict[model_name])
 
-            findings = mods.Findings.objects.filter(dbkey=dbkey)
-            for finding in findings:
-                instance.findings = finding
+            objects_dict[model_name] = p
 
-            cap_texts = mods.CapText.objects.filter(dbkey=dbkey)
-            for cap_text in cap_texts:
-                instance.cap_text = cap_text
+        return objects_dict
 
-            notes = mods.Notes.objects.filter(dbkey=dbkey)
-            for note in notes:
-                instance.notes = note
+    except Exception:
+        handle_exceptions(
+            table,
+            file_path,
+            instances_dict,
+            fac_model_name,
+            traceback.format_exc(),
+            exceptions_list,
+        )
 
-            revisions = mods.Revisions.objects.filter(dbkey=dbkey)
-            for revision in revisions:
-                instance.revidions = revision
 
-            passthroughs = mods.Passthrough.objects.filter(dbkey=dbkey)
-            for passthrough in passthroughs:
-                instance.passthrough = passthrough
+def link_objects_findings(objects_dict):
+    """Adds relationships between finding and finding text"""
+    instance = objects_dict[model_name]
+    dbkey = instance.dbkey
+    audit_year = instance.audit_year
+    findings_text = mods.FindingsText.objects.filter(dbkey=dbkey, audit_year=audit_year)
+    for finding_text in findings_text:
+        instance.findings_text = finding_text
+        instance.save()
 
-            auditors = mods.Auditor.objects.filter(dbkey=dbkey)
-            for auditor in auditors:
-                instance.auditor = auditor
 
-            agencys = mods.Agencies.objects.filter(dbkey=dbkey)
-            for agency in agencys:
-                instance.agency = agency
+def link_objects_cpas(objects_dict, row):
+    """Adds relationships between the general table and auditors for the cpas table"""
+    dbkey = row["DBKEY"]
+    audit_year = row ["AUDITYEAR"]
+    instance = objects_dict["Auditor"]
+    general_instance = mods.Auditor.objects.filter(dbkey=dbkey, audit_year=audit_year)
 
-            instance.save()
+
+def link_objects_general(objects_dict):
+    """Adds relationships between the General model and other models"""
+    # General model instance
+    instance = objects_dict["General"]
+    dbkey = instance.dbkey
+    audit_year = instance.audit_year
+
+    # Models that link to general
+
+    auditee = objects_dict["Auditee"]
+    instance.auditee = auditee
+
+    # there can be multiple but only one from the gen form
+    auditors = mods.Auditor.objects.filter(id=objects_dict["Auditor"].id)
+    instance.auditor.set(auditors)
+
+    cfdas = mods.CfdaInfo.objects.filter(dbkey=dbkey, audit_year=audit_year)
+    for cfda in cfdas:
+        instance.cfda = cfda
+
+    findings = mods.Findings.objects.filter(dbkey=dbkey, audit_year=audit_year)
+    for finding in findings:
+        instance.findings = finding
+
+    cap_texts = mods.CapText.objects.filter(dbkey=dbkey, audit_year=audit_year)
+    for cap_text in cap_texts:
+        instance.cap_text = cap_text
+
+    notes = mods.Notes.objects.filter(dbkey=dbkey, audit_year=audit_year)
+    for note in notes:
+        instance.notes = note
+
+    revisions = mods.Revisions.objects.filter(dbkey=dbkey, audit_year=audit_year)
+    for revision in revisions:
+        instance.revidions = revision
+
+    passthroughs = mods.Passthrough.objects.filter(dbkey=dbkey, audit_year=audit_year)
+    for passthrough in passthroughs:
+        instance.passthrough = passthrough
+
+    agencies = mods.Agencies.objects.filter(dbkey=dbkey, audit_year=audit_year)
+    instance.agency.set(agencies)
+
+    instance.save()
 
 
 def add_eins_duns():
-    """These were their own data model but we are going to use an array field"""
+    """
+    These were their own data model but we are going to use an array field.
+    This adds the fields in the right order.
+    """
     load_file_names = ["eins22.txt", "duns22.txt"]
     for file_path in load_file_names:
         # can't do chunks because we want to order the dataframe
@@ -287,8 +354,8 @@ def load_files(load_file_names):
     exceptions_list = []
     exceptions_count = 0
 
-    for f in load_file_names:
-        file_path = "data_distro/data_to_load/{}".format(f)
+    for file in load_file_names:
+        file_path = "data_distro/data_to_load/{}".format(file)
         file_name = file_path.replace("data_distro/data_to_load/", "")
         # remove numbers, there are years in the file names, remove file extension
         table = "".join([i for i in file_name if not i.isdigit()])[:-4]
@@ -302,24 +369,44 @@ def load_files(load_file_names):
             # chunk_with_headers = rename_headers(chunk)
             csv_dict = chunk.to_dict(orient="records")
 
-            for row in csv_dict:
-                objects_dict = transform_and_save(
-                    row,
-                    csv_dict,
-                    table,
-                    file_path,
-                    fac_model_name,
-                    exceptions_count,
-                    exceptions_list,
-                )
-                link_objects(objects_dict)
+            # just to speed things up
+            logger.warn("------------Table: {0}--------------".format(table))
+            if table != "gen":
+                for row in csv_dict:
+                    objects_dict = transform_and_save(
+                        row,
+                        csv_dict,
+                        table,
+                        file_path,
+                        fac_model_name,
+                        exceptions_count,
+                        exceptions_list,
+                    )
+                    if table == "findings":
+                        link_objects_findings(objects_dict)
+                    if table == "cpas":
+                        link_objects_cpas(objects_dict, table)
+            else:
+                logger.warn("~~~~ GENERAL ~~~~~")
+                for row in csv_dict:
+                    objects_dict = transform_and_save_general(
+                        row,
+                        csv_dict,
+                        table,
+                        file_path,
+                        fac_model_name,
+                        exceptions_count,
+                        exceptions_list,
+                    )
+                    link_objects_general(objects_dict)
 
             logger.warn("finished chunk")
         logger.warn("Finished {0}".format(file_name))
-        return exceptions_list, exceptions_count
+    return exceptions_list, exceptions_count
 
 
 def log_results(errors, exceptions_count):
+    """This is helpful for debugging"""
     if exceptions_count > 0:
         message = """###############################
 
@@ -342,8 +429,7 @@ def log_results(errors, exceptions_count):
 
 class Command(BaseCommand):
     help = """
-        Loads data from public download files into Django models. It will automatically \
-        crawl "/backend/data_distro/data_to_load". \
+        Loads data from public download files into Django models. Add the data to "/backend/data_distro/data_to_load". \
         If you just want one file, you can pass the name of the file with -p.
 
         This only works in non-production environments for now, it requires pandas.
@@ -357,26 +443,25 @@ class Command(BaseCommand):
         1) Find the files for upload
         2) Grab just the files we want
         3) Load data into Django models
+        4) Add DUNS and EIN relationships
         """
         if kwargs["file"] is not None:
             load_file_names = [kwargs["file"]]
         else:
-            file_names = next(walk("data_distro/data_to_load"), (None, None, []))[2]
-            # to do: create order for file names so we can link as we go
-            # order = [
-            #     "findingstext_formatted",
-            #     "findings",
-            #     "captext_formatted",
-            #     "cfda",
-            #     "notes",
-            #     "revisions",
-            #     "agency",
-            #     "passthrough",
-            #     "cpas",
-            #     "gen",
-            # ]
-            load_file_names = file_clean(file_names)
+            # dependent objects are created first
+            load_file_names = [
+                "findingstext_formatted22.txt",
+                "findings22.txt",
+                "captext_formatted22.txt",
+                "cfda22.txt",
+                "notes22.txt",
+                "revisions22.txt",
+                "agency22.txt",
+                "passthrough22.txt",
+                "gen22.txt",
+                "cpas22.txt",
+            ]
+
         errors, exceptions_count = load_files(load_file_names)
         add_eins_duns()
         log_results(errors, exceptions_count)
-        # add relations

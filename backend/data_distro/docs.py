@@ -68,6 +68,8 @@ type_requirement_choices = (
     "P",
 )
 
+# A value of 'C' means the entity was assigned a Cognizant agency (which means the entity had over $50 million in total expenses).  The Federal agency assigned cognizant agency is identified in COGAGENCY.  A value of 'O' means the entity was assigned a Oversight agency (which means the entity had <= $50 million in total expenses).  The Federal agency assigned oversight agency is identified in OVERSIGHTAGENCY.
+cognizant_agency_over_choices = ["C", "O"]
 
 # TYPE_ID
 #     1=ACCOUNTING STANDARDS
