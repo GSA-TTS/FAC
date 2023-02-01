@@ -44,7 +44,10 @@ class Auditee(models.Model):
         "Auditee Phone Number", help_text=docs.auditee_phone
     )
     auditee_title = models.CharField(
-        "Title of Auditee Contact", max_length=40, null=True, help_text=docs.auditee_title
+        "Title of Auditee Contact",
+        max_length=40,
+        null=True,
+        help_text=docs.auditee_title,
     )
     street1 = models.CharField(
         "Auditee Street Address", max_length=45, help_text=docs.street1
@@ -77,7 +80,9 @@ class Auditee(models.Model):
         ),
     )
     uei_list = ArrayField(
-        models.CharField("Unique Entity ID", max_length=12, null=True, help_text=docs.uei_general),
+        models.CharField(
+            "Unique Entity ID", max_length=12, null=True, help_text=docs.uei_general
+        ),
     )
     is_public = models.BooleanField("True if appears in a public record")
 
@@ -159,7 +164,6 @@ class Auditor(models.Model):
         help_text=docs.seqnum,
     )
     is_public = models.BooleanField("True if appears in a public record")
-
 
 
 class CfdaInfo(models.Model):
@@ -299,7 +303,6 @@ class CfdaInfo(models.Model):
         null=True,
         help_text=docs.auditor_ein_cfda,
     )  # , max_length=9
-    ## needs documentation ##
     questioned_costs = models.CharField(
         "Dollar amount of questioned costs (Depricated since 2002)",
         null=True,
@@ -347,6 +350,7 @@ class FindingsText(models.Model):
 
 
 class Findings(models.Model):
+    # check that this isn't many to many
     findings_text = models.ForeignKey(FindingsText, on_delete=models.CASCADE, null=True)
     modified_opinion = models.BooleanField(
         "Modified Opinion finding", null=True, help_text=docs.modified_opinion
@@ -730,7 +734,7 @@ class General(models.Model):
     date_firewall = models.DateField(
         "The date the audit information was made available on the dissemination site",
         null=True,
-        help_text=docs.date_firewall
+        help_text=docs.date_firewall,
     )
     dbkey = models.CharField(
         "Audit Year and DBKEY (database key) combined make up the primary key. Only on records created by census.",

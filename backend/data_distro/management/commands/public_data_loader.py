@@ -97,7 +97,7 @@ def handle_exceptions(
 
 
 def create_model_dict():
-    """creates {"model_name": < model_object >} """
+    """creates {"model_name": < model_object >}"""
     model_dict = {}
     distro_classes = apps.all_models["data_distro"]
 
@@ -242,7 +242,7 @@ def transform_and_save_general(
 
 def link_objects_findings(objects_dict):
     """Adds relationships between finding and finding text"""
-    instance = objects_dict[model_name]
+    instance = objects_dict["Findings"]
     dbkey = instance.dbkey
     audit_year = instance.audit_year
     findings_text = mods.FindingsText.objects.filter(dbkey=dbkey, audit_year=audit_year)
@@ -253,10 +253,12 @@ def link_objects_findings(objects_dict):
 
 def link_objects_cpas(objects_dict, row):
     """Adds relationships between the general table and auditors for the cpas table"""
-    dbkey = row["DBKEY"]
-    audit_year = row ["AUDITYEAR"]
-    instance = objects_dict["Auditor"]
-    general_instance = mods.Auditor.objects.filter(dbkey=dbkey, audit_year=audit_year)
+    gen_instance = objects_dict["GeneralInformation"]
+    dbkey = gen_instance.dbkey
+    audit_year = gen_instance.audit_year
+    auditors = mods.Auditor.objects.filter(dbkey=dbkey, audit_year=audit_year)
+    gen_instance.auditors.set(auditors)
+    gen_instance.save()
 
 
 def link_objects_general(objects_dict):
