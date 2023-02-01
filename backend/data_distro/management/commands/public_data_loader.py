@@ -3,8 +3,6 @@ Download data from https://facdissem.census.gov/PublicDataDownloads.aspx
 Then unzip the files and place the them in data_distro/data_to_load/
 
 Load them with: manage.py public_data_loader
-
-Needs Pandas, it's a dev-only requirement
 """
 import traceback
 from pandas import read_csv
@@ -447,6 +445,9 @@ class Command(BaseCommand):
         """
         if kwargs["file"] is not None:
             load_file_names = [kwargs["file"]]
+            if "ein" in load_file_names or "duns" in load_file_names:
+                add_eins_duns()
+                exit()
         else:
             # dependent objects are created first
             load_file_names = [
@@ -461,7 +462,7 @@ class Command(BaseCommand):
                 "gen22.txt",
                 "cpas22.txt",
             ]
+            add_eins_duns()
 
         errors, exceptions_count = load_files(load_file_names)
-        add_eins_duns()
         log_results(errors, exceptions_count)
