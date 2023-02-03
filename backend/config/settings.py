@@ -319,3 +319,14 @@ OIDC_PROVIDERS = {
 LOGIN_URL = f"{env_base_url}/openid/login/"
 
 USER_PROMOTION_COMMANDS_ENABLED = environment in ["LOCAL", "TESTING", "UNDEFINED"]
+
+DISABLE_AUTH = env.bool("DISABLE_AUTH", default=False)
+if DISABLE_AUTH:
+    TEST_USERNAME = "test_user@test.test"
+    MIDDLEWARE.append(
+        "users.middleware.authenticate_test_user",
+    )
+
+    AUTHENTICATION_BACKENDS = [
+        "users.auth.FACTestAuthenticationBackend",
+    ]
