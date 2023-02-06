@@ -1,4 +1,6 @@
-""" We can store the final version in json, but this is nice for quick iteration """
+"""
+This is for reference, I am not keeping it up to date, you can use or modify the create_create_upload_mapping command to get this kind of data.
+"""
 
 # Data structure
 sample_data_structure = {

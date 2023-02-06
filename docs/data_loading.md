@@ -15,8 +15,9 @@ We are doing an initial data load in February 2022. There will be another round 
 The upload script should be flexible enough to handle changes in the models that may happen between data loads.
 
 To refresh the data loading script:
-1) Look at the `make_table_structure` function in uploadmapping.py. Make sure things like new_fields are up to date.
-2) Rerun the `make_table_structure` function to get a new `upload_mapping`. You can run this using `manage.py shell` and just grab the contents that it prints to console.
-3) Check the outputs to make sure that things make sense. You will need to do a manual check on the upload mapping, If a data column needs to go to more than one model, that needs to be addressed in the upload script. For example, AUDITOR_EIN has the same info reported on two of the upload tables, so you only need to upload it once.
+1) Look at the `make_table_structure` command. Make sure things like new_fields are up to date.
+2) Rerun the `make_table_structure` management command to produce `new_upload_mapping.json`.
+3) Check the outputs to make sure that things make sense. You will need to do a manual check on the upload mapping, If a data column needs to go to more than one model, that needs to be addressed in the upload script. For example, AUDITOR_EIN has the same info reported on two of the upload tables, so you only need to upload it once. Then, replace `mappings/upload_mappings.json` with the new mapping.
 4) Check the `public_data_loader` script. Renaming should mostly be handled by `upload_mapping` but changing relationships need to be accounted for in the script. Make sure the relationships that are in the `add_relational` output of `make_table_structure` are added in the script.
+5) Run the script. Each phase should tell you the number of expected objects, for tables like general that should be 1:1 relationship for auditors, auditees and things that can be consolidated because of foreign to and many to many relationships, there will be fewer objects.
 
