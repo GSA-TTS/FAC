@@ -1,11 +1,9 @@
-# importing django models and users
 from django.db import models
 from django.contrib.postgres.fields import ArrayField
 
 from data_distro import docs  # noqa
 
 
-# New models
 class Auditee(models.Model):
     auditee_certify_name = models.CharField(
         "Name of Auditee Certifying Official",
@@ -314,7 +312,6 @@ class CfdaInfo(models.Model):
     )
 
 
-# maybe move to findings?
 class FindingsText(models.Model):
     charts_tables = models.BooleanField(
         "Indicates whether or not the text contained charts or tables that could not be entered due to formatting restrictions",
@@ -330,7 +327,7 @@ class FindingsText(models.Model):
     seq_number = models.IntegerField(
         "Order that the findings text was reported",
         help_text=docs.seq_number_findingstext,
-    )  # , max_length=4
+    )
     text = models.TextField(
         "Content of the finding text", help_text=docs.text_findingstext
     )
@@ -433,7 +430,7 @@ class CapText(models.Model):
     )
     seq_number = models.IntegerField(
         "Order that the CAP text was reported", help_text=docs.seq_number_captext
-    )  # , max_length=4
+    )
     text = models.TextField(
         "Content of the Corrective Action Plan (CAP)", help_text=docs.text_captext
     )
@@ -456,21 +453,19 @@ class Notes(models.Model):
     type_id = models.CharField("Note Type", max_length=1, help_text=docs.type_id)
     fac_id = models.IntegerField(
         "Internal Unique Identifier for the record", help_text=docs.fac_id
-    )  # , max_length=12
+    )
     report_id = models.IntegerField(
         "Internal Audit Report Id", help_text=docs.report_id
-    )  # , max_length=12
-    version = models.IntegerField(
-        "Internal Version", help_text=docs.version
-    )  # , max_length=4
+    )
+    version = models.IntegerField("Internal Version", help_text=docs.version)
     seq_number = models.IntegerField(
         "Order that the Note was reported", help_text=docs.seq_number_notes
-    )  # , max_length=4
+    )
     note_index = models.IntegerField(
         "Display Index for the Note",
         null=True,
         help_text=docs.note_index,
-    )  # , max_length=4
+    )
     content = models.TextField("Content of the Note", help_text=docs.content)
     title = models.CharField("Note Title", max_length=75, help_text=docs.title)
     dbkey = models.CharField(
@@ -500,7 +495,7 @@ class Revisions(models.Model):
         "Internal Unique Identifier for the record",
         null=True,
         help_text=docs.elec_report_revision_id,
-    )  # , max_length=12
+    )
     federal_awards = models.CharField(
         "Indicates what items on the Federal Awards page were edited during the revision",
         max_length=140,
@@ -603,13 +598,18 @@ class Agencies(models.Model):
     agency_cfda = models.IntegerField(
         "2-digit prefix of Federal Agency requiring copy of audit report",
         help_text=docs.agency,
-    )  # , max_length=2
+    )
     ein = models.IntegerField(
         "Employer Identification Number (EIN) of primary grantee",
         null=True,
         help_text=docs.ein_agencies,
-    )  # , max_length=9
-
+    )
+    agency_name = models.CharField(
+        "Name of the Federal Agency requiring copy of audit report",
+        null=True,
+        max_length=125,
+    )
+    # would like to drop this
     dbkey = models.CharField(
         "Audit Year and DBKEY (database key) combined make up the primary key.",
         max_length=40,
@@ -660,7 +660,7 @@ class Passthrough(models.Model):
 
 
 class General(models.Model):
-    # we may need null = True for these so we can load in phases
+    # null = True for these so we can load in phases, may want to tighten validation later
     auditee = models.ForeignKey(Auditee, on_delete=models.CASCADE, null=True)
     auditor = models.ManyToManyField(Auditor)
     cfda = models.ForeignKey(CfdaInfo, on_delete=models.CASCADE, null=True)
@@ -671,7 +671,6 @@ class General(models.Model):
     passthrough = models.ForeignKey(Passthrough, on_delete=models.CASCADE, null=True)
     agency = models.ManyToManyField(Agencies)
 
-    # need to verify what going on with agency fields
     cognizant_agency = models.CharField(
         "Two digit Federal agency prefix of the cognizant agency",
         max_length=2,
@@ -755,6 +754,7 @@ class General(models.Model):
     entity_type = models.CharField(
         "Self reported type of entity (i.e., States, Local Governments, Indian Tribes, Institutions of Higher Education, NonProfit)",
         max_length=50,
+        null=True,
         help_text=docs.entity_type,
     )
     fac_accepted_date = models.DateField(
@@ -811,7 +811,7 @@ class General(models.Model):
         "Two digit Federal agency prefix of the oversight agency",
         null=True,
         help_text=docs.oversight_agency,
-    )  # , max_length=2
+    )
     period_covered = models.CharField(
         "Audit Period Covered by Audit", max_length=40, help_text=docs.period_covered
     )
@@ -857,7 +857,10 @@ class General(models.Model):
         help_text=docs.total_fed_expenditures,
     )
     type_of_entity = models.CharField(
-        "Contact FAC for information", max_length=40, help_text=docs.type_of_entity
+        "Contact FAC for information",
+        max_length=40,
+        null=True,
+        help_text=docs.type_of_entity,
     )
     type_report_financial_statements = models.CharField(
         "Type of Report Issued on the Financial Statements",
@@ -880,7 +883,7 @@ class General(models.Model):
     is_public = models.BooleanField(
         "True for public records, False for non-public records"
     )
-    # might want to add meta data to other models too, but everything eventually links back here, so this is good enough for now
+    # Might want to add meta data to other models too, but everything eventually links back here, so this is good enough for now
     modified_date = models.DateTimeField(auto_now=True)
     create_date = models.DateTimeField(auto_now_add=True)
     data_source = models.CharField("Origin of the upload", max_length=25)
