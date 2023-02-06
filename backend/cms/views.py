@@ -9,7 +9,7 @@ from django.http import HttpResponse
 class Home(generic.View):
     def get(self, request, *args, **kwargs):
         if request.user.is_authenticated:
-            url = reverse("MySubmissions")
+            url = reverse("audit:MySubmissions")
             return redirect(url)
         template_name = "home.html"
         extra_context = {}
