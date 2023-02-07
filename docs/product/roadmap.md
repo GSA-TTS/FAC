@@ -29,28 +29,28 @@ Milestones
 
 Delivery options
 ===================
-**NOTE** We identified two options for delivery. We've decided to adopt Option 1, but below you will also find an overview of both options.
+**NOTE** We identified two options for delivery. We've decided to adopt Option 2, but below you will also find an overview of both options.
 
 ## Option 1: Two major releases: MVP and full functionality
 
-**Overview:** Launch a new FAC intake experience sooner for at least some of current customers on or around 4/1/2023 to begin accepting audits. Per the discussed and approved [migration plan](https://github.com/GSA-TTS/FAC/blob/main/docs/product/decisions/0004-P-migration-plan.md), the idea is to keep the old Census FAC running and import new submissions into that for data dissemination. 
+**Overview:** Launch a new FAC intake experience sooner for at least some of current customers in Spring 2023 to begin accepting audits. Per the discussed and approved [migration plan](https://github.com/GSA-TTS/FAC/blob/main/docs/product/decisions/0004-P-migration-plan.md), the idea is to keep the old Census FAC running and import new submissions into that for data dissemination. 
 
 **Benefits:** Soonest path to an initial public release, which will help us learn more quickly and break up overall product risk into multiple releases
 
-**Drawbacks:** Two FAC websites at once is not ideal UX for public or agencies. We change the world on both agencies and the public twice instead of once. 
+**Drawbacks:** Two FAC websites at once is not ideal UX for public or agencies. Additionally, there were increasing requests from our uses to address data dissemination before October 2023.
+
+
+## Option 2: One major release
+
+**Overview:** Replace Census FAC in a single release when it's ready to fully replace the Census FAC.
+
+**Benefits:** Minimize the number of transitions we put users through. 
+
+**Drawbacks:** More time before we deliver value to the public. We don't learn as quickly from the public. More risk in a single release. However, we do plan on a delivering a beta release in Summer 2023 for testing purposes. 
 
 **Milestone sequence:** 
 [Milestones are listed in GitHub.](https://github.com/GSA-TTS/FAC/milestones?direction=asc&sort=title&state=open) 
 
-## Option 2: One major release
-
-**Overview:** Replace census FAC in a single release when it's ready to fully replace the Census FAC
-
-**Benefits:** Minimize number of transitions we put users through. 
-
-**Drawbacks:** More time before we deliver value to the public. We don't learn as quickly from the public. More risk in a single release. 
-
-**Milestone sequence:**
 1. Pre-SAC
 1. Submit general information end to end / De-risk
 1. Federal awards, Excel upload patterns
