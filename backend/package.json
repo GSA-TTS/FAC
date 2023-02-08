@@ -17,13 +17,13 @@
   "devDependencies": {
     "@uswds/uswds": "^3.2.0",
     "autoprefixer": "^10.4.13",
+    "cypress": "^12.5.1",
     "esbuild-postcss": "^0.0.4",
     "esbuild-sass-plugin": "^2.4.0",
     "glob": "^8.1.0"
   },
   "dependencies": {
     "esbuild": "^0.15.18",
-    "cypress": "^12.3.0",
     "npm-run-all": "^4.1.5",
     "postcss": "^8.4.18",
     "postcss-cli": "9.1.0"
