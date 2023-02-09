@@ -173,6 +173,18 @@ def transform_and_save_w_exceptions(
             mapping = table + column
             if mapping not in skip_list:
                 instances_dict = transform_payload(row, table, column, instances_dict)
+            elif mapping == "genDUNS":
+                instances_dict.setdefault("Auditee", {})
+                if str(row["DUNS"]) == "nan":
+                    instances_dict["Auditee"]["duns_list"] = []
+                else:
+                    instances_dict["Auditee"]["duns_list"] = [int(row["DUNS"])]
+            elif mapping == "genEIN":
+                instances_dict.setdefault("Auditee", {})
+                if str(row["EIN"]) == "nan":
+                    instances_dict["Auditee"]["ein_list"] = []
+                else:
+                    instances_dict["Auditee"]["ein_list"] = [int(row["EIN"])]
 
         # save each model instance
         objects_dict = {}

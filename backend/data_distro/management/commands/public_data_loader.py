@@ -18,7 +18,8 @@ from data_distro.management.commands.link_data import (
     link_objects_findings,
     link_objects_cpas,
     link_objects_general,
-    add_duns,
+    add_duns_eins,
+    add_agency,
 )
 
 
@@ -47,8 +48,10 @@ class Command(BaseCommand):
         """
         if kwargs["file"] is not None:
             load_file_names = [kwargs["file"]]
-            if "duns" in load_file_names:
-                add_duns()
+            if "duns" in load_file_names or "ein" in load_file_names:
+                add_duns_eins(load_file_names)
+            elif "agency" in load_file_names:
+                add_agency(load_file_names)
             else:
                 exceptions_list = load_files(load_file_names)
 
@@ -60,16 +63,16 @@ class Command(BaseCommand):
                 "captext_formatted.txt",  # 19 errors no text
                 "cfda.txt",
                 "notes.txt",  # 64 content, probably should migrate
-                "revisions.txt",
-                "agency.txt",
-                "passthrough.txt",
+                "revisions.txt",  # having issues with data
+                "passthrough.txt",  # choked on bad data
                 "gen.txt",
                 "cpas.txt",
             ]
 
             exceptions_list = load_files(load_file_names)
-            # Doesn't seem to be multiple eins, but need to confirm
-            add_duns()
+            add_duns_eins("duns.txt")
+            add_duns_eins("eins.txt")
+            add_agency("agency.txt")
 
         log_results(exceptions_list)
 
@@ -97,7 +100,7 @@ def load_files(load_file_names):
 
             # Just to speed things up check things per table and not per row or element
             logger.info(f"------------Table: {table}--------------")
-            if table not in ["gen", "general", "cpas"]:
+            if table not in ["gen", "general", "cpas", "agency"]:
                 for row in csv_dict:
                     objects_dict, exceptions_list, = transform_and_save(
                         row,
@@ -128,9 +131,14 @@ def load_files(load_file_names):
                         file_path,
                         exceptions_list,
                     )
+
                     link_objects_general(objects_dict)
 
-            logger.info("finished chunk")
+            logger.info(
+                "finished chunk - last row {0}, objects count = {1}".format(
+                    row["DBKEY"], expected_object_count
+                )
+            )
         logger.info(f"Finished {file_name}, {expected_object_count} expected objects")
 
     return exceptions_list
