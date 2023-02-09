@@ -67,35 +67,74 @@ def link_objects_general(objects_dict):
     for passthrough in passthroughs:
         instance.passthrough = passthrough
 
-    agencies = mods.Agencies.objects.filter(dbkey=dbkey, audit_year=audit_year)
-    instance.agency.set(agencies)
-
     instance.save()
 
 
-def add_duns():
+def add_duns_eins(file):
     """
     These were their own data model but we are going to use an array field.
-    This adds the fields in the right order.
+    This adds the fields in the right order. It should run after general.
     """
-    file_path = "data_distro/data_to_load/duns.txt"
+    file_path = f"data_distro/data_to_load/{file}"
+    if "duns" in file:
+        sort_by = "DUNSEQNUM"
+        payload_name = "DUNS"
+    else:
+        sort_by = "EINSEQNUM"
+        payload_name = "EIN"
 
     # Can't do chunks because we want to order the dataframe
     data_frame = read_csv(file_path, sep="|", encoding="mac-roman")
     # This will make sure we load the lists in the right order
-    data_frame = data_frame.sort_values(by="DUNSEQNUM")
+    data_frame = data_frame.sort_values(by=sort_by, na_position="first")
     csv_dict = data_frame.to_dict(orient="records")
 
     for row in csv_dict:
         dbkey = row["DBKEY"]
         audit_year = row["AUDITYEAR"]
-        duns = row["DUNS"]
+        payload = row[payload_name]
         general_instance = mods.General.objects.filter(
             dbkey=dbkey, audit_year=audit_year
         )[0]
         auditee_instance = general_instance.auditee
-        duns_list = auditee_instance.duns_list
-        if duns not in duns_list:
-            duns_list.append(int(duns))
-            auditee_instance.duns_list = duns_list
-            auditee_instance.save()
+
+        if payload_name == "DUNS":
+            existing_list = auditee_instance.duns_list
+            if payload not in existing_list:
+                existing_list.append(int(payload))
+                print(existing_list)
+                auditee_instance.duns_list = existing_list
+                auditee_instance.save()
+        else:
+            existing_list = auditee_instance.ein_list
+            if payload not in existing_list:
+                existing_list.append(int(payload))
+                auditee_instance.ein_list = existing_list
+                auditee_instance.save()
+
+
+def add_agency(file_name):
+    """
+    De-duping agency and adding as relationships
+    """
+    file_path = f"data_distro/data_to_load/{file_name}"
+    data_frame = read_csv(file_path, sep="|", encoding="mac-roman")
+    csv_dict = data_frame.to_dict(orient="records")
+
+    for row in csv_dict:
+        dbkey = row["DBKEY"]
+        audit_year = row["AUDITYEAR"]
+        agency = row["AGENCY"]
+
+        agency_instance = mods.Agencies.objects.get_or_create(
+            agency_cfda=agency, is_public=True
+        )[0]
+
+        general_instance = mods.General.objects.filter(
+            dbkey=dbkey, audit_year=audit_year
+        )[0]
+        general_instance.agency.add(agency_instance)
+
+        auditee_instance = general_instance.auditee
+        auditee_instance.agency.add(agency_instance)
+        auditee_instance.save()
