@@ -216,7 +216,7 @@ class Access(models.Model):
 
 class ExcelFile(models.Model):
     """
-    Data model for uploaded Excel files
+    Data model to track uploaded Excel files and associate them with SingleAuditChecklists
     """
 
     file = models.FileField(upload_to="excel")
