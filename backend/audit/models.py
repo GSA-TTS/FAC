@@ -212,3 +212,15 @@ class Access(models.Model):
                 name="%(app_label)s_%(class)s_single_certifying_auditor",
             ),
         ]
+
+
+class ExcelFile(models.Model):
+    """
+    Data model for uploaded Excel files
+    """
+
+    file = models.FileField(upload_to="excel")
+    filename = models.CharField(max_length=255)
+    sac = models.ForeignKey(SingleAuditChecklist, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, blank=True, null=True, on_delete=models.SET_NULL)
+    date_created = models.DateTimeField(auto_now_add=True)
