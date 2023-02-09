@@ -15,13 +15,14 @@ We use [encrypted secrets](https://docs.github.com/en/actions/security-guides/en
 
 ## Tools
 
-* [Github Actions](https://github.com/features/actions)
+* [Github Actions Site](https://github.com/features/actions)
+* [FAC's actions](https://github.com/GSA-TTS/FAC/tree/main/.github/workflows)
 
 ## Repository Secrets
 
-Secrets are stored in repository secrets located in the repository settings on Github.
+Locally, you should store all secrets in a `.env` file within the `/backend` directory. These will get added in to the Docker containers when they're built and launched.
 
-*Note that only an admin can add or remove repository secrets.*
+Deployed secrets are stored in repository secrets located in the repository settings on Github. *Note that only an admin can add or remove repository secrets.*
 
 ## Cloud.gov Service Account
 
@@ -34,22 +35,32 @@ The service account credentials are stored in the repository secrets under:
 
 ## SAM.gov API System Account
 
-To use the SAM.gov API, we will have a `system account` [system account](https://www.fsd.gov/gsafsd_sp?id=gsafsd_kb_articles&sys_id=f8426db91b594d9006b09796bc4bcb52) that holds a system account API key.  
+We use SAM.gov to look up information about the organizations that use the FAC. 
+
+To use the SAM.gov API, you will need a key. A user API key can be created for local testing, but a [system account](https://www.fsd.gov/gsafsd_sp?id=gsafsd_kb_articles&sys_id=f8426db91b594d9006b09796bc4bcb52) system API key will be needed for the site when it's in production. 
+
+To generate a SAM.gov user key, follow these steps:
+
+1. Head to [SAM.gov](https://www.sam.gov/), then click "Sign In" in the top right corner.
+1. You will be passed to Login.gov to authenticate. 
+1. When you return, you may need to answer a few questions, but then you should have a basic account created.
+1. Head to your [profile page](https://sam.gov/profile/details), and then under Public API Key, click the eyeball to reveal it or the rectangles icon to copy it.
+1. Add `SAM_API_KEY = '<key>'` to your `.env` file (where `<key>` is your actual key from the page).
+1. Rebuild/restart any open Docker containers you have going.
 
 To generate a SAM.gov System Account API key, follow these steps:
 
-* Users registered with a non-government email address and associated with an entity OR users registered with a government email address may request a system account for public data access.
-* If a user satisfies the above registration criteria they will be able to access the System Accounts widget from their Workspace page after logging in.
-* The user can then select “Go to System Accounts” from the widget and fill out the required sections.
-* The requested system account will then need to be approved. After approval the user will be notified via email and they can also see the updated status in the System Account widget.
-* The user can select ‘Go to System Accounts’ again in the widget from their workspace and enter a new system account password.
-* After setting up the password the user will see a new section for retrieving a system account API Key.
-* The user must enter their password again to retrieve the key.
-* NOTE: To obtain access to the FOUO/Sensitive Entity API data with a system account the user must be registered with a government email address.
+1. Users registered with a non-government email address and associated with an entity OR users registered with a government email address may request a system account for public data access.
+1. If a user satisfies the above registration criteria they will be able to access the System Accounts widget from their Workspace page after logging in.
+1. The user can then select “Go to System Accounts” from the widget and fill out the required sections.
+1. The requested system account will then need to be approved. After approval the user will be notified via email and they can also see the updated status in the System Account widget.
+1. The user can select ‘Go to System Accounts’ again in the widget from their workspace and enter a new system account password.
+1. After setting up the password the user will see a new section for retrieving a system account API Key.
+1. The user must enter their password again to retrieve the key.
 
-The system account API key will be stored in the repository secrets (in Github) under:
+NOTE: To obtain access to the FOUO/Sensitive Entity API data with a system account the user must be registered with a government email address.
 
-- `SAM_API_KEY`
+The system account API key will be stored as `SAM_API_KEY` in the repository secrets in Github.
 
 ## Rotating Credentials
 
@@ -63,7 +74,7 @@ cf create-service-key my-service-account my-service-key
 cf service-key my-service-account my-service-key
 ```
 
-To rotate the API key associated with a SAM.gov system account, follow the steps [here](https://www.fsd.gov/sys_attachment.do?sys_id=5462e13d1b594d9006b09796bc4bcbd2) to delete and recreate the API key.
+To rotate the API key associated with a SAM.gov system account, follow the steps [here](https://www.fsd.gov/sys_attachment.do?sys_id=5462e13d1b594d9006b09796bc4bcbd2) to delete and recreate the API key. You will need to update it in GitHub after this. Once updated, a new deploy will automatically replace it on the instance.
 
 ## Local Testing
 

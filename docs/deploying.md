@@ -1,6 +1,6 @@
 # Deploying
 
-We use cloud.gov as our PaaS to provide application hosting as well as broker for Postgres and S3 instances from AWS.
+We use [cloud.gov](https://cloud.gov/) as our PaaS to provide application hosting as well as broker for Postgres and S3 instances from AWS.
 
 We use [manifests](https://docs.cloudfoundry.org/devguide/deploy-apps/manifest.html) to configure our environments and push our applications to cloud.gov
 
@@ -17,16 +17,17 @@ We use [manifests](https://docs.cloudfoundry.org/devguide/deploy-apps/manifest.h
 ## Tools
 
 * [cf-cli](https://docs.cloudfoundry.org/cf-cli/) Cloudfoundry's CLI
+  * Mac install ov v8 needed for Cloud.gov: `brew install cloudfoundry/tap/cf-cli@8`
 * [cloud.gov dashboard](https://www.cloud.gov)
 * [cloud.gov deploy action](https://github.com/18F/cg-deploy-action)
 
 ## Cloud.gov
 
-- Organization: `gsa-10x-prototyping`
-- Spaces: `dev`
+- Organization: `gsa-tts-oros-fac`
+- Spaces: `dev`, `staging`, `production`
 
-- Apps: fac-dev
-    - Manifest: [manifest-dev.yml](../backend/manifests/manifest-dev.yml)
+- Apps: gsa-fac
+    - Manifests: [/backend/manifests](../backend/manifests)
     - route: [fac-dev.app.cloud.gov](https://fac-dev.app.cloud.gov)
 
 ## Initial Setup
@@ -61,13 +62,15 @@ cf push -f manifests/manifest-dev.yml
 
 ## Deploying Automatically
 
-When a new commit is pushed to `main`, Github Actions automatically deploys the latest code to [fac-dev](https://fac-dev.app.cloud.gov/).
+The simple answer is that when code is pushed to `main` it's deployed to the development instance. When code is pushed to `prod` it's pushed to staging. 
 
-The workflow to deploy the latest code can be found in [deploy.yml](.github/workflows/deploy.yml) and uses the [cloud.gov deploy action](https://github.com/18F/cg-deploy-action).
+To see more about branching and the deployment steps, see the [Branching](branching.md) page.
 
 ## Running a Django admin command
 
 You can SSH into a running instance of the app. Running Django apps is a little more complicated on Cloud Foundry than running locally.
+
+Don't forget to change the organization or space you need first with `cf target -o your_org_name` or `cf target -s your_space_name`
 
 ```shell
 cf ssh {APP NAME}

@@ -32,7 +32,7 @@ docker-compose run web python manage.py test audit.test_models
 # Run only the tests within the `audit.test_models.SingleAuditChecklistTests` class
 docker-compose run web python manage.py test audit.test_models.SingleAuditChecklistTests
 ```
-We are configured to require 99% test coverage. If a file should not be counted for test coverage, it can be added to the `.coveragerc` file with an explanation. For example, we don't need tests for environment specific settings so that is added there.
+We are configured to require 90% test coverage. If a file should not be counted for test coverage, it can be added to the `.coveragerc` file with an explanation. For example, we don't need tests for environment specific settings so that is added there.
 
 ## Writing new tests
 
@@ -42,7 +42,7 @@ We **do** write tests for:
 * Classmethods on Django models implemented by us, like `__str__`
 
 We **don't** write tests for:
-* Asserting that `models.Charfield` checks the length of an incoming `string` against the `max_length` attribute
+* Asserting that the built-in `models.Charfield` checks the length of an incoming `string` against the `max_length` attribute
 
 ## Testing Actions Locally
 
@@ -55,7 +55,7 @@ act test --platform ubuntu-latest=lucasalt/act_base:latest
 
 ## Accessibility
 
-We're using [Lighthouse-ci](https://github.com/GoogleChrome/lighthouse-ci) for accessibility testing.
+We use a combination of [Lighthouse-ci](https://github.com/GoogleChrome/lighthouse-ci) and [Pa11y](https://pa11y.org/) for accessibility testing.
 
 Accessibility tests are executed as part of our CI/CD pipeline on each PR to the `main` branch, commit to the `main` branch, and PR into the `prod` branch.
 
