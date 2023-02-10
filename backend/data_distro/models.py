@@ -73,13 +73,13 @@ class Auditee(models.Model):
     state = models.CharField("Auditee State", max_length=2, help_text=docs.state)
     ein_list = ArrayField(
         models.IntegerField(
-            "Primary Employer Identification Number",
+            "Primary Employer Identification Number, in the order that they were listed.",
             null=True,
-            help_text=docs.ein_general,
+            help_text=docs.ein_list,
         )
     )
     ein_subcode = models.IntegerField(
-        "Subcode assigned to the EIN", null=True, help_text=docs.ein_subcode
+        "Subcode assigned to the EIN.", null=True, help_text=docs.ein_subcode
     )
     zip_code = models.CharField(
         "Auditee Zip Code",
@@ -89,9 +89,9 @@ class Auditee(models.Model):
     )
     duns_list = ArrayField(
         models.IntegerField(
-            "Multiple Data Universal Numbering System Numbers, an array of DUNS numbers of the Auditee.",
+            "Multiple Data Universal Numbering System Numbers (DUNS) of the Auditee, in the order they were listed.",
             null=True,
-            help_text=docs.duns_general,
+            help_text=docs.duns_list,
         ),
     )
     uei_list = ArrayField(
@@ -104,41 +104,37 @@ class Auditee(models.Model):
 
 class Auditor(models.Model):
     cpa_phone = models.PositiveBigIntegerField(
-        "CPA phone number", null=True, help_text=docs.cpa_phone_multiplecpasinfo
+        "CPA phone number", null=True, help_text=docs.cpa_phone
     )
     cpa_fax = models.PositiveBigIntegerField(
         "CPA fax number (optional)",
         null=True,
-        help_text=docs.cpa_fax_multiplecpasinfo,
+        help_text=docs.cpa_fax,
     )
-    cpa_state = models.CharField(
-        "CPA State", max_length=2, help_text=docs.cpa_state_multiplecpasinfo
-    )
-    cpa_city = models.CharField(
-        "CPA City", max_length=30, help_text=docs.cpa_city_multiplecpasinfo
-    )
+    cpa_state = models.CharField("CPA State", max_length=2, help_text=docs.cpa_state)
+    cpa_city = models.CharField("CPA City", max_length=30, help_text=docs.cpa_city)
     cpa_title = models.CharField(
         "Title of CPA Contact",
         max_length=40,
         null=True,
-        help_text=docs.cpa_title_multiplecpasinfo,
+        help_text=docs.cpa_title,
     )
     cpa_street1 = models.CharField(
         "CPA Street Address",
         max_length=45,
-        help_text=docs.cpa_street1_multiplecpasinfo,
+        help_text=docs.cpa_street1,
     )
     cpa_street2 = models.CharField(
-        "CPA Street Address",
+        "CPA Street Address, line 2",
         max_length=45,
         null=True,
-        help_text=docs.cpa_street1_multiplecpasinfo,
+        help_text=docs.cpa_street2,
     )
     cpa_zip_code = models.CharField(
         "CPA Zip Code",
         null=True,
         max_length=12,
-        help_text=docs.cpa_zip_code_multiplecpasinfo,
+        help_text=docs.cpa_zip_code,
     )
     cpa_country = models.CharField(
         "CPA Country", max_length=6, null=True, help_text=docs.cpa_country
@@ -146,16 +142,16 @@ class Auditor(models.Model):
     cpa_contact = models.CharField(
         "Name of CPA Contact",
         max_length=50,
-        help_text=docs.cpa_contact_multiplecpasinfo,
+        help_text=docs.cpa_contact,
     )
     cpa_email = models.CharField(
         "CPA mail address (optional)",
         max_length=60,
         null=True,
-        help_text=docs.cpa_email_multiplecpasinfo,
+        help_text=docs.cpa_email,
     )
     cpa_firm_name = models.CharField(
-        "CPA Firm Name", max_length=64, help_text=docs.cpa_firm_name_multiplecpasinfo
+        "CPA Firm Name", max_length=64, help_text=docs.cpa_firm_name
     )
     cpa_foreign = models.CharField(
         "CPA Address - if international",
@@ -708,7 +704,7 @@ class General(models.Model):
     condition_or_deficiency_major_program = models.BooleanField(
         "Whether or not the audit disclosed a reportable condition/significant deficiency for any major program in the Schedule of Findings and Questioned Costs",
         null=True,
-        help_text=docs.condition_or_deficiency_major_program,
+        help_text=docs.reportable_condition_major_program,
     )
     current_or_former_findings = models.BooleanField(
         "Indicate whether or not current year findings or prior year findings affecting direct funds were reported",

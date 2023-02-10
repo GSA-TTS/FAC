@@ -78,13 +78,18 @@ class Command(BaseCommand):
                     new_fields.append(f_name)
                 if help_text != "":
                     help_text = field.help_text
-                    source = help_text.split("Census mapping: ", 1)[1]
-                    table_doc_name = source.split(", ", 1)[0]
-                    column_name = source.split(", ", 1)[1]
-                    table_file_name = file_to_table_name_mapping[
-                        table_doc_name.upper().replace(" ", "")
-                    ]
-                    upload_mapping[table_file_name][column_name] = [mod_name, f_name]
+                    sources = help_text.split(" (AND) ")
+                    for source in sources:
+                        cen_source = source.split("Census mapping: ", 1)[1]
+                        table_doc_name = cen_source.split(", ", 1)[0]
+                        column_name = cen_source.split(", ", 1)[1]
+                        table_file_name = file_to_table_name_mapping[
+                            table_doc_name.upper().replace(" ", "")
+                        ]
+                        upload_mapping[table_file_name][column_name] = [
+                            mod_name,
+                            f_name,
+                        ]
                 else:
                     if f_name not in new_fields:
                         blank_help.append(f_name)

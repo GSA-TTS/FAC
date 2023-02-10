@@ -100,24 +100,48 @@ class TestExceptions(TestCase):
             self.assertTrue("2 errors" in log_check.output[-1])
 
 
-# class TestDataMapping(TestCase):
-#     """Make sure that as we update our models, we update our mapping for out upload script"""
+class TestDataMapping(TestCase):
+    """Make sure that as we update our models, we update our mapping for out upload script"""
 
-#     def test_upload_mapping(self):
-#         out = StringIO()
-#         call_command(
-#             "create_upload_mapping",
-#             stdout=out,
-#             stderr=StringIO(),
-#         )
+    def test_upload_mapping(self):
+        out = StringIO()
+        call_command(
+            "create_upload_mapping",
+            stdout=out,
+            stderr=StringIO(),
+        )
 
-#         current_mapping = upload_mapping
-#         new_mapping_file = open("data_distro/mappings/new_upload_mapping.json")
-#         new_mapping = json.load(new_mapping_file)
+        known_discrepencies_in_new = {
+            # We use these to link the data but we don't store them to reduce redundancy
+            "agency": {"DBKEY", "AUDITYEAR", "EIN"},
+            # The same data is covered in general and cfda
+            "cfda": {"EIN"},
+            # We use these to link the data but we don't store them to reduce redundancy
+            "cpas": {"DBKEY"},
+            "gen": {"CPAEIN", "EIN"},
+        }
 
-#         # compare here
+        current_mapping = upload_mapping
+        new_mapping_file = open("data_distro/mappings/new_upload_mapping.json")
+        new_mapping = json.load(new_mapping_file)
 
-#     @classmethod
-#     def tearDownClass(cls):
-#         super(TestDataMapping, cls).tearDownClass()
-#         os.remove("data_distro/mappings/new_upload_mapping.json")
+        for table in current_mapping:
+            current_table_set = set(current_mapping[table])
+            new_table_set = set(new_mapping[table])
+
+            missing_from_new = current_table_set - new_table_set
+            missing_from_current = new_table_set - current_table_set
+
+            # Missing from the new mapping
+            if len(missing_from_new) > 0:
+                self.assertEqual(
+                    set(known_discrepencies_in_new[table]), missing_from_new
+                )
+
+            # Missing from the current mapping, nothing should be there now
+            self.assertEqual(len(missing_from_current), 0)
+
+    @classmethod
+    def tearDownClass(cls):
+        super(TestDataMapping, cls).tearDownClass()
+        os.remove("data_distro/mappings/new_upload_mapping.json")
