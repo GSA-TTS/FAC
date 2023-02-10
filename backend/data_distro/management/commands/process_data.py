@@ -3,7 +3,7 @@ Functions that the public data loader uses to process and transform data.
 These functions look at one row of data at a time and save results.
 """
 import traceback
-from dateutil import parser
+from dateutil import parser  # type: ignore
 
 from django.apps import apps
 from data_distro.mappings.upload_mapping import upload_mapping

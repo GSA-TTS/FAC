@@ -20,4 +20,3 @@ applications:
   # cf push -f manifests/task-manifest-staging.yaml
   #
   # This is an example task, you can modify the command to run other tasks
-

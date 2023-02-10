@@ -38,8 +38,7 @@ upload_mapping = {
         # "DBKEY": ["Auditor", "dbkey"],
         "SEQNUM": ["Auditor", "seqnum"],
         "CPAFOREIGN": ["Auditor", "cpa_foreign"],
-        # This is the same as CDFA auditor EIN. Ignore here and load from CDFA table
-        # "AUDITOR_EIN": ["CfdaInfo", "auditor_ein"],
+        "AUDITOR_EIN": ["CfdaInfo", "auditor_ein"],
         "COGAGENCY": ["General", "cognizant_agency"],
         "COG_OVER": ["General", "cognizant_agency_over"],
         "AUDITEEDATESIGNED": ["General", "auditee_date_signed"],
