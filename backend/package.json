@@ -19,7 +19,7 @@
     "autoprefixer": "^10.4.13",
     "cypress": "^12.5.1",
     "esbuild-postcss": "^0.0.4",
-    "esbuild-sass-plugin": "^2.5.0",
+    "esbuild-sass-plugin": "2.4.5",
     "glob": "^8.1.0"
   },
   "dependencies": {

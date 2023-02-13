@@ -34,7 +34,7 @@ RUN \
 COPY package.* /src/
 WORKDIR /src/
 
-RUN npm install --legacy-peer-deps
+RUN npm install
 RUN chown -R 1001:123 "/root/.npm"
 
 COPY . /src/
