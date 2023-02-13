@@ -14,6 +14,7 @@ from data_distro.management.commands.process_data import (
     transform_and_save_w_exceptions,
 )
 from data_distro.management.commands.handle_errors import log_results
+from data_distro.models import General
 from data_distro.management.commands.link_data import (
     link_objects_findings,
     link_objects_cpas,
@@ -77,6 +78,75 @@ class Command(BaseCommand):
         log_results(exceptions_list)
 
 
+def load_generic(
+    row,
+    csv_dict,
+    table,
+    file_path,
+    exceptions_list,
+):
+
+    objects_dict, exceptions_list, = transform_and_save(
+        row,
+        csv_dict,
+        table,
+        file_path,
+        exceptions_list,
+    )
+    if table == "findings":
+        link_objects_findings(objects_dict)
+
+    return exceptions_list
+
+
+def load_cpas(
+    row,
+    csv_dict,
+    table,
+    file_path,
+    exceptions_list,
+):
+    objects_dict, exceptions_list, = transform_and_save_w_exceptions(
+        row,
+        csv_dict,
+        table,
+        file_path,
+        exceptions_list,
+    )
+    link_objects_cpas(objects_dict, row)
+
+    return exceptions_list
+
+
+def load_general(
+    row,
+    csv_dict,
+    table,
+    file_path,
+    exceptions_list,
+):
+    # Since we can add additional information later, like additional eins, agencies, and auditors, we don't want to do a find or create call on this data. I am adding an upfront check.
+    try:
+        General.objects.get(dbkey=row["DBKEY"], audit_year=row["AUDITYEAR"])
+        loaded = True
+    except General.DoesNotExist:
+        loaded = False
+
+    if loaded is False:
+        for row in csv_dict:
+            objects_dict, exceptions_list = transform_and_save_w_exceptions(
+                row,
+                csv_dict,
+                "gen",
+                file_path,
+                exceptions_list,
+            )
+
+            link_objects_general(objects_dict)
+
+    return exceptions_list
+
+
 def load_files(load_file_names):
     """Load files into django models"""
 
@@ -100,39 +170,34 @@ def load_files(load_file_names):
 
             # Just to speed things up check things per table and not per row or element
             logger.info(f"------------Table: {table}--------------")
-            if table not in ["gen", "general", "cpas", "agency"]:
+            if table not in ["gen", "general", "cpas"]:
                 for row in csv_dict:
-                    objects_dict, exceptions_list, = transform_and_save(
+                    exceptions_list = load_generic(
                         row,
                         csv_dict,
                         table,
                         file_path,
                         exceptions_list,
                     )
-                    if table == "findings":
-                        link_objects_findings(objects_dict)
             elif table == "cpas":
                 for row in csv_dict:
-                    objects_dict, exceptions_list, = transform_and_save_w_exceptions(
+                    exceptions_list = load_cpas(
                         row,
                         csv_dict,
                         table,
                         file_path,
                         exceptions_list,
                     )
-                    link_objects_cpas(objects_dict, row)
             else:
                 # Some years the table is called gen and sometimes general
                 for row in csv_dict:
-                    objects_dict, exceptions_list, = transform_and_save_w_exceptions(
+                    exceptions_list = load_general(
                         row,
                         csv_dict,
                         "gen",
                         file_path,
                         exceptions_list,
                     )
-
-                    link_objects_general(objects_dict)
 
             logger.info(
                 "finished chunk - last row {0}, objects count = {1}".format(

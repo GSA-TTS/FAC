@@ -63,14 +63,16 @@ class Auditee(models.Model):
         null=True,
         help_text=docs.auditee_title,
     )
-    street1 = models.CharField(
+    auditee_street1 = models.CharField(
         "Auditee Street Address", max_length=45, help_text=docs.street1
     )
-    street2 = models.CharField(
+    auditee_street2 = models.CharField(
         "Auditee Street Address", max_length=45, null=True, help_text=docs.street2
     )
-    city = models.CharField("Auditee City", max_length=30, help_text=docs.city)
-    state = models.CharField("Auditee State", max_length=2, help_text=docs.state)
+    auditee_city = models.CharField("Auditee City", max_length=30, help_text=docs.city)
+    auditee_state = models.CharField(
+        "Auditee State", max_length=2, help_text=docs.state
+    )
     ein_list = ArrayField(
         models.IntegerField(
             "Primary Employer Identification Number, in the order that they were listed.",
@@ -81,7 +83,7 @@ class Auditee(models.Model):
     ein_subcode = models.IntegerField(
         "Subcode assigned to the EIN.", null=True, help_text=docs.ein_subcode
     )
-    zip_code = models.CharField(
+    auditee_zip_code = models.CharField(
         "Auditee Zip Code",
         max_length=12,
         null=True,
@@ -162,7 +164,7 @@ class Auditor(models.Model):
     cpa_ein = models.IntegerField(
         "CPA Firm EIN (only available for audit years 2013 and beyond)",
         null=True,
-        help_text=docs.cpa_ein,
+        help_text=docs.auditor_ein,
     )
     auditor_ein = models.IntegerField(
         "CPA Firm EIN (only available for audit years 2013 and beyond)",
@@ -312,7 +314,7 @@ class CfdaInfo(models.Model):
     auditor_ein = models.IntegerField(
         "Primary Employer Identification Number",
         null=True,
-        help_text=docs.auditor_ein_cfda,
+        help_text=docs.auditor_ein,
     )
     questioned_costs = models.CharField(
         "Dollar amount of questioned costs (Depricated since 2002)",

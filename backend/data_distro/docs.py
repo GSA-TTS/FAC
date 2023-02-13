@@ -16,67 +16,55 @@ API_DESCRIPTION = """Data from the Federal Audit Clearinghouse"""
 # TYPEREPORT_FS
 # TYPEREPORT_SP_FRAMEWORK
 # TYPEREPORT_MP
-#     U=Unqualifed, Q=Qualified, A=Adverse, D=Disclaimer
-
-type_reports_choices = ("U", "Q", "A", "D")
+type_reports_choices = [
+    ("U", "Unqualifed"),
+    ("Q", "Qualified"),
+    ("A", "Adverse"),
+    ("D", "Disclaimer"),
+]
 
 # SP_FRAMEWORK
-#     Cash basis, Tax basis, Regulatory basis, Contractual basis Other basis
-
-sp_framework_choices = (
-    "Cash basis",
-    "Tax basis",
-    "Regulatory basis",
-    "Contractual basis",
-    "Other basis",
-)
-
+sp_framework_choices = [
+    ("Cash basis", "Cash basis"),
+    ("Tax basis", "Tax basis"),
+    ("Regulatory basis", "Regulatory basis"),
+    ("Contractual basis", "Contractual basis"),
+    ("Other basis", "Other basis"),
+]
 
 # TYPEREQUIREMENT
-#     A=Activities allowed or unallowed
-#     B=Allowable costs/cost principles
-#     C=Cash management
-#     D=Davis-Bacon Act
-#     E=Eligibility
-#     F=Equipment and real property management
-#     G=Matching, level of effort, earmarking
-#     H=Period of availability of Federal funds
-#     I=Procurement and suspension and debarment
-#     J=Program income
-#     K=Real prperty acquisition and relocation assistance
-#     L=Reporting
-#     M=Subrecipient monitoring
-#     N=Special tests and provisions
-#     O=None
-#     P=Other
-type_requirement_choices = (
-    "A",
-    "B",
-    "C",
-    "D",
-    "E",
-    "F",
-    "G",
-    "H",
-    "I",
-    "J",
-    "K",
-    "L",
-    "M",
-    "N",
-    "O",
-    "P",
-)
+type_requirement_choices = [
+    ("A", "Activities allowed or unallowed"),
+    ("B", "Allowable costs/cost principles"),
+    ("C", "Cash management"),
+    ("D", "Davis-Bacon Act"),
+    ("E", "Eligibility"),
+    ("F", "Equipment and real property management"),
+    ("G", "Matching, level of effort, earmarking"),
+    ("H", "Period of availability of Federal funds"),
+    ("I", "Procurement and suspension and debarment"),
+    ("J", "Program income"),
+    ("K", "Real property acquisition and relocation assistance"),
+    ("L", "Reporting"),
+    ("M", "Subrecipient monitoring"),
+    ("N", "Special tests and provisions"),
+    ("O", "None"),
+    ("P", "Other"),
+]
 
-# A value of 'C' means the entity was assigned a Cognizant agency (which means the entity had over $50 million in total expenses).  The Federal agency assigned cognizant agency is identified in COGAGENCY.  A value of 'O' means the entity was assigned a Oversight agency (which means the entity had <= $50 million in total expenses).  The Federal agency assigned oversight agency is identified in OVERSIGHTAGENCY.
-cognizant_agency_over_choices = ["C", "O"]
+# OVERSIGHTAGENCY.
+cognizant_agency_over_choices = [
+    ("C", "Cognizant agency"),
+    ("O", "Oversight agency"),
+]
 
 # TYPE_ID
-#     1=ACCOUNTING STANDARDS
-#     2=10% RULE
-#     3=ADDITIONAL
-#     4=SPECIAL
-type_id_choices = ("1", "2", "3", "4")
+type_id_choices = [
+    ("1", "Accounting Standards"),
+    ("2", "10% Rule"),
+    ("3", "Additional"),
+    ("4", "Special"),
+]
 
 
 """
@@ -165,9 +153,6 @@ auditee_name = "Data sources: SF-SAC 1997-2000: I/6/a; SF-SAC 2001-2003: I/6/a; 
 auditee_name_title = "Data sources: SF-SAC 1997-2000: I/6/g; SF-SAC 2001-2003: I/6/g; SF-SAC 2004-2007: I/6/g; SF-SAC 2008-2009: I/5/g; SF-SAC 2010-2012: I/5/g; SF-SAC 2013-2015: certifications; SF-SAC 2016-2018: certifications; SF-SAC 2019-2021: certifications; SF-SAC 2022: certifications Census mapping: GENERAL, AUDITEENAMETITLE"
 auditee_phone = "Data sources: SF-SAC 1997-2000: I/6/d; SF-SAC 2001-2003: I/6/d; SF-SAC 2004-2007: I/6/d; SF-SAC 2008-2009: I/5/d; SF-SAC 2010-2012: I/5/d; SF-SAC 2013-2015: I/5/d; SF-SAC 2016-2018: I/5/d; SF-SAC 2019-2021: I/5/d; SF-SAC 2022: I/5/d Census mapping: GENERAL, AUDITEEPHONE"
 auditee_title = "Data sources: SF-SAC 1997-2000: I/6/c; SF-SAC 2001-2003: I/6/c; SF-SAC 2004-2007: I/6/c; SF-SAC 2008-2009: I/5/c; SF-SAC 2010-2012: I/5/c; SF-SAC 2013-2015: I/5/c; SF-SAC 2016-2018: I/5/c; SF-SAC 2019-2021: I/5/c; SF-SAC 2022: I/5/c Census mapping: GENERAL, AUDITEETITLE"
-auditor_ein = "Data sources: SF-SAC 2013-2015: I/6/b; SF-SAC 2016-2018: I/6/b; SF-SAC 2019-2021: I/6/b; SF-SAC 2022: I/6/b Census mapping: GENERAL, AUDITOR_EIN (AND) Data sources: SF-SAC 2013-2015: I/8/b; SF-SAC 2016-2018: I/8/b; SF-SAC 2019-2021: I/6/h/ii; SF-SAC 2022: I/6/h/ii Census mapping: MULTIPLE CPAS INFO, CPAEIN"
-# check data source
-auditor_ein_cfda = "Census mapping: GENERAL, AUDITOR_EIN"
 audit_type = "Data sources: SF-SAC 1997-2000: I/2; SF-SAC 2001-2003: I/2; SF-SAC 2004-2007: I/2; SF-SAC 2008-2009: I/2; SF-SAC 2010-2012: I/2; SF-SAC 2013-2015: I/2; SF-SAC 2016-2018: I/2; SF-SAC 2019-2021: I/2; SF-SAC 2022: I/2 Census mapping: GENERAL, AUDITTYPE"
 city = "Data sources: SF-SAC 1997-2000: I/6/b; SF-SAC 2001-2003: I/6/b; SF-SAC 2004-2007: I/6/b; SF-SAC 2008-2009: I/5/b; SF-SAC 2010-2012: I/5/b; SF-SAC 2013-2015: I/5/b; SF-SAC 2016-2018: I/5/b; SF-SAC 2019-2021: I/5/b; SF-SAC 2022: I/5/b Census mapping: GENERAL, CITY"
 cognizant_agency = "Data sources: SF-SAC 1997-2000: I/9; SF-SAC 2001-2003: I/9 Census mapping: GENERAL, COGAGENCY"
@@ -227,7 +212,7 @@ type_report_special_purpose_framework = "Data sources: SF-SAC 2016-2018: III/2/a
 uei_general = "Data sources: SF-SAC 2022: I/4/g Census mapping: GENERAL, UEI"
 uei_ueiinfo = "Data sources: SF-SAC 2004-2007: I/5/f; SF-SAC 2008-2009: I/4/f; SF-SAC 2010-2012: I/4/f; SF-SAC 2013-2015: I/4/f; SF-SAC 2016-2018: I/4/f; SF-SAC 2019-2021: I/4/f; SF-SAC 2022: I/4/i Census mapping: UEI INFO, UEI"
 zip_code = "Data sources: SF-SAC 1997-2000: I/6/b; SF-SAC 2001-2003: I/6/b; SF-SAC 2004-2007: I/6/b; SF-SAC 2008-2009: I/5/b; SF-SAC 2010-2012: I/5/b; SF-SAC 2013-2015: I/5/b; SF-SAC 2016-2018: I/5/b; SF-SAC 2019-2021: I/5/b; SF-SAC 2022: I/5/b Census mapping: GENERAL, ZIPCODE"
-cpa_ein = "Data sources: SF-SAC 2013-2015: I/8/b; SF-SAC 2016-2018: I/8/b; SF-SAC 2019-2021: I/6/h/ii; SF-SAC 2022: I/6/h/ii Census mapping: MULTIPLE CPAS INFO, CPAEIN"
+auditor_ein = "Data sources: SF-SAC 2013-2015: I/6/b; SF-SAC 2016-2018: I/6/b; SF-SAC 2019-2021: I/6/b; SF-SAC 2022: I/6/b Census mapping: GENERAL, AUDITOR_EIN (AND) Data sources: SF-SAC 2013-2015: I/8/b; SF-SAC 2016-2018: I/8/b; SF-SAC 2019-2021: I/6/h/ii; SF-SAC 2022: I/6/h/ii Census mapping: MULTIPLE CPAS INFO, CPAEIN"
 seqnum = (
     "Census mapping: GENERAL, SEQNUM (AND) Census mapping: MULTIPLE CPAS INFO, SEQNUM"
 )
