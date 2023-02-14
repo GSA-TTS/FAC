@@ -52,8 +52,8 @@ coverage.xml
 .pytest_cache/
 cover/
 .lighthouseci/
-cypress/screenshots/
-cypress/videos/
+backend/cypress/screenshots/
+backend/cypress/videos/
 
 # Translations
 *.mo

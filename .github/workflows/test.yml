@@ -43,9 +43,10 @@ jobs:
       ALLOWED_HOSTS: '0.0.0.0 127.0.0.1 localhost'
     steps:
       - uses: actions/checkout@v2
-      - uses: actions/setup-node@v1
+      - name: Use Node
+        uses: actions/setup-node@v3
         with:
-          node-version: 16
+          node-version: '17.x'
       - name: Start services
         working-directory: ./backend
         run: touch .env && docker-compose up -d
@@ -61,3 +62,6 @@ jobs:
         run: |
           npm install -g @lhci/cli@0.8.x
           lhci autorun
+      - name: Run Cypress
+        working-directory: ./backend
+        run: npm run test:e2e:ci
