@@ -44,4 +44,4 @@ def log_results(exceptions_list):
 
         logger.warning(message)
     else:
-        logger.info("Successful upload")
+        logger.warning("Successful upload")

@@ -14,7 +14,7 @@ applications:
   - fac-db
   - fac-public-s3
   - fac-key-service
-  command: (python manage.py public_data_loader -f passthrough.txt && echo SUCCESS || echo TASK_FAIL) && sleep infinity
+  command: (python manage.py public_data_loader && echo SUCCESS || echo TASK_FAIL) && sleep infinity
 
   # run with
   # cf push -f manifests/task-manifest-staging.yaml

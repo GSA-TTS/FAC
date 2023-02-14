@@ -39,6 +39,7 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument("-f", "--file", type=str, help="file name")
+        parser.add_argument("-y", "--year", type=str, help="Two digit year of downloads, as they appear in the file names. Leave blank for all years. Not needed if using file name kwarg.")
 
     def handle(self, *args, **kwargs):
         """
@@ -57,23 +58,28 @@ class Command(BaseCommand):
                 exceptions_list = load_files(load_file_names)
 
         else:
+            year = kwargs["year"]
+            if year == None:
+                year = ""
+
             # Dependent objects are created first
             load_file_names = [
-                "findingstext_formatted.txt",  # 12 errors, no text
-                "findings.txt",  # 10 errors, no finding ref num
-                "captext_formatted.txt",  # 19 errors no text
-                "cfda.txt",
-                "notes.txt",  # 64 content, probably should migrate
-                "revisions.txt",  # having issues with data
-                "passthrough.txt",  # choked on bad data
-                "gen.txt",
-                "cpas.txt",
+                f"findingstext_formatted{year}.txt",
+                f"findings{year}.txt",
+                f"captext_formatted{year}.txt",
+                f"cfda{year}.txt",
+                f"notes{year}.txt",
+                f"revisions{year}.txt",
+                f"passthrough{year}.txt",
+                f"gen{year}.txt",
+                f"cpas{year}.txt",
             ]
 
             exceptions_list = load_files(load_file_names)
-            add_duns_eins("duns.txt")
-            add_duns_eins("eins.txt")
-            add_agency("agency.txt")
+            # doing manually for this pass
+            add_duns_eins(f"duns{year}.txt")
+            add_duns_eins(f"eins{year}.txt")
+            add_agency(f"agency{year}.txt")
 
         log_results(exceptions_list)
 
@@ -152,15 +158,15 @@ def load_files(load_file_names):
 
     for file in load_file_names:
         exceptions_list = []
-
         file_path = f"data_distro/data_to_load/{file}"
         file_name = file_path.replace("data_distro/data_to_load/", "")
         # Remove numbers, there are years in the file names, remove file extension
         table = "".join([i for i in file_name if not i.isdigit()])[:-4]
         # Remove for testing
         table = table.replace("test_data/", "")
-        logger.info(f"Starting to load {file_name}...")
+        logger.warning(f"Starting to load {file_name}...")
         expected_object_count = 0
+
 
         for i, chunk in enumerate(
             read_csv(file_path, chunksize=35000, sep="|", encoding="mac-roman")
@@ -169,7 +175,7 @@ def load_files(load_file_names):
             expected_object_count += len(csv_dict)
 
             # Just to speed things up check things per table and not per row or element
-            logger.info(f"------------Table: {table}--------------")
+            logger.warning(f"------------Table: {table}--------------")
             if table not in ["gen", "general", "cpas"]:
                 for row in csv_dict:
                     exceptions_list = load_generic(
@@ -199,11 +205,11 @@ def load_files(load_file_names):
                         exceptions_list,
                     )
 
-            logger.info(
+            logger.warning(
                 "finished chunk - last row {0}, objects count = {1}".format(
                     row["DBKEY"], expected_object_count
                 )
             )
-        logger.info(f"Finished {file_name}, {expected_object_count} expected objects")
+        logger.warning(f"Finished {file_name}, {expected_object_count} expected objects")
 
     return exceptions_list
