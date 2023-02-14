@@ -13,7 +13,7 @@
     "dev": "node build-assets.js --watch",
     "cy:open": "npx cypress open",
     "cy:run": "npx cypress run",
-    "test:e2e:ci": "npx start-server-and-test start 8080 cy:run"
+    "test:e2e:ci": "npm run cy:run"
   },
   "author": "",
   "license": "ISC",
