@@ -22,7 +22,7 @@ RUN \
     apt install curl -y && \
     curl -fsSL https://deb.nodesource.com/setup_14.x | bash - && \
     apt-get install -y nodejs && \
-    npm i -g npm@^8
+    npm i -g npm@^9
 
 RUN \
     set -ex && \
@@ -40,8 +40,6 @@ RUN chown -R 1001:123 "/root/.npm"
 COPY . /src/
 
 RUN npm run build && python manage.py collectstatic
-RUN touch "/root/.npm/_logs/"
-RUN chown -R 1001:123 "/root/.npm"
 
 # ------------------------------------------------------------
 # Dev/testing layer
