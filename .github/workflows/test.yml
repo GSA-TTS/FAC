@@ -64,4 +64,4 @@ jobs:
           lhci autorun
       - name: Run Cypress
         working-directory: ./backend
-        run: docker-compose run web bash -c 'npm rn test:e2e:ci'
+        run: docker-compose run web bash -c 'npm run test:e2e:ci'
