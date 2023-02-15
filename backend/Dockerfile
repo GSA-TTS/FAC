@@ -40,6 +40,7 @@ RUN chown -R 1001:123 "/root/.npm"
 COPY . /src/
 
 RUN npm run build && python manage.py collectstatic
+RUN chown -R 1001:123 "/src/.npm"
 
 # ------------------------------------------------------------
 # Dev/testing layer
