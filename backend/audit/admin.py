@@ -14,6 +14,7 @@ class AccessAdmin(admin.ModelAdmin):
 
 class ExcelFileAdmin(admin.ModelAdmin):
     list_display = ("filename", "user", "date_created")
+    exclude = ("filename",)
 
 
 admin.site.register(Access, AccessAdmin)

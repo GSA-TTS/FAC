@@ -6,6 +6,8 @@ from django.contrib.auth import get_user_model
 from django.utils.translation import gettext_lazy as _
 
 from .validators import (
+    validate_excel_file,
+    validate_excel_filename,
     validate_federal_award_json,
     validate_general_information_json,
 )
@@ -219,8 +221,12 @@ class ExcelFile(models.Model):
     Data model to track uploaded Excel files and associate them with SingleAuditChecklists
     """
 
-    file = models.FileField(upload_to="excel")
+    file = models.FileField(upload_to="excel", validators=[validate_excel_file])
     filename = models.CharField(max_length=255)
     sac = models.ForeignKey(SingleAuditChecklist, on_delete=models.CASCADE)
     user = models.ForeignKey(User, blank=True, null=True, on_delete=models.SET_NULL)
     date_created = models.DateTimeField(auto_now_add=True)
+
+    def save(self, *args, **kwargs):
+        self.filename = validate_excel_filename(self.file)
+        super(ExcelFile, self).save(*args, **kwargs)

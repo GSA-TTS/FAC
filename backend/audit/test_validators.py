@@ -338,15 +338,23 @@ class ExcelFileValidatorTests(SimpleTestCase):
         """
         test_cases = [
             ("this one just has spaces.xlsx", "this-one-just-has-spaces.xlsx"),
-            ("this_one\ has some? other things!.xlsx", "this-one-has-some-other-things.xlsx"),
+            (
+                "this_one\\ has some? other things!.xlsx",
+                "this-one-has-some-other-things.xlsx",
+            ),
             ("this/one/has/forward/slashes.xlsx", "slashes.xlsx"),
-            ("this.one.has.multiple.extensions.xlsx", "this-one-has-multiple-extensions.xlsx"),
+            (
+                "this.one.has.multiple.extensions.xlsx",
+                "this-one-has-multiple-extensions.xlsx",
+            ),
         ]
 
         for test_case in test_cases:
             with self.subTest():
                 before, after = test_case
-                valid_file = TemporaryUploadedFile(before, ALLOWED_EXCEL_CONTENT_TYPES[0], 10000, "utf-8")
+                valid_file = TemporaryUploadedFile(
+                    before, ALLOWED_EXCEL_CONTENT_TYPES[0], 10000, "utf-8"
+                )
 
                 validated_filename = validate_excel_filename(valid_file)
 
@@ -360,11 +368,13 @@ class ExcelFileValidatorTests(SimpleTestCase):
             "no-extension",
             ".xlsx",
             "".join(choice(string.punctuation) for i in range(1, 9)),
-            "".join(choice(string.punctuation) for i in range(1, 9)) + ".xlsx"
+            "".join(choice(string.punctuation) for i in range(1, 9)) + ".xlsx",
         ]
 
         for test_case in test_cases:
             with self.subTest():
-                file = TemporaryUploadedFile(test_case, ALLOWED_EXCEL_CONTENT_TYPES[0], 10000, "utf-8")
-                
+                file = TemporaryUploadedFile(
+                    test_case, ALLOWED_EXCEL_CONTENT_TYPES[0], 10000, "utf-8"
+                )
+
                 self.assertRaises(ValidationError, validate_excel_filename, file)

@@ -2,16 +2,15 @@ import os
 from pathlib import Path
 import json
 import jsonschema
-import re
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 from django.conf import settings
 from slugify import slugify
 
 ALLOWED_EXCEL_CONTENT_TYPES = [
-    'application/vnd.ms-excel',
-    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    "application/vnd.ms-excel",
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
 ]
 
 
@@ -116,15 +115,15 @@ def validate_excel_filename(file):
     filename, extension = os.path.splitext(file.name)
 
     if len(filename) == 0:
-        raise ValidationError("Invalid filename")
-    
+        raise ValidationError("Invalid filename - must have a name and extension")
+
     if len(extension) == 0:
-        raise ValidationError("Invalid filename")
+        raise ValidationError("Invalid filename - must have a name and extension")
 
     slugified = slugify(filename)
 
     if len(slugified) == 0:
-        raise ValidationError("Invalid filename")
+        raise ValidationError("Invalid filename - must contain letters and/or numbers")
 
     return f"{slugified}{extension}"
 
