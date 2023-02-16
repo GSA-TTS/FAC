@@ -2,11 +2,14 @@ import json
 import string
 from django.test import SimpleTestCase
 from django.core.exceptions import ValidationError
+from django.core.files.uploadedfile import TemporaryUploadedFile
 
 from random import choice, randrange
 
 from .test_schemas import FederalAwardsSchemaValidityTest
 from .validators import (
+    ALLOWED_EXCEL_CONTENT_TYPES,
+    validate_excel_filename,
     validate_federal_award_json,
     validate_uei,
     validate_uei_alphanumeric,
@@ -326,3 +329,42 @@ class UEIValidatorTests(SimpleTestCase):
         self.assertRaises(ValidationError, validate_uei_nine_digit_sequences, invalid)
         # Valid UEI
         validate_uei_nine_digit_sequences(self.valid)
+
+
+class ExcelFileValidatorTests(SimpleTestCase):
+    def test_valid_filename_slug(self):
+        """
+        Filenames that can be slugified are valid
+        """
+        test_cases = [
+            ("this one just has spaces.xlsx", "this-one-just-has-spaces.xlsx"),
+            ("this_one\ has some? other things!.xlsx", "this-one-has-some-other-things.xlsx"),
+            ("this/one/has/forward/slashes.xlsx", "slashes.xlsx"),
+            ("this.one.has.multiple.extensions.xlsx", "this-one-has-multiple-extensions.xlsx"),
+        ]
+
+        for test_case in test_cases:
+            with self.subTest():
+                before, after = test_case
+                valid_file = TemporaryUploadedFile(before, ALLOWED_EXCEL_CONTENT_TYPES[0], 10000, "utf-8")
+
+                validated_filename = validate_excel_filename(valid_file)
+
+                self.assertEqual(validated_filename, after)
+
+    def test_invalid_filename_slug(self):
+        """
+        Filenames that cannot be slugified are not valid
+        """
+        test_cases = [
+            "no-extension",
+            ".xlsx",
+            "".join(choice(string.punctuation) for i in range(1, 9)),
+            "".join(choice(string.punctuation) for i in range(1, 9)) + ".xlsx"
+        ]
+
+        for test_case in test_cases:
+            with self.subTest():
+                file = TemporaryUploadedFile(test_case, ALLOWED_EXCEL_CONTENT_TYPES[0], 10000, "utf-8")
+                
+                self.assertRaises(ValidationError, validate_excel_filename, file)
