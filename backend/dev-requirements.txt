@@ -273,6 +273,10 @@ tomli==2.0.1 \
     #   build
     #   mypy
     #   pep517
+types-python-slugify==8.0.0.0 \
+    --hash=sha256:0e81e016ee34ab1b772d2475d939e1a06519cd371dfd3319c4b2c2c99e6367f9 \
+    --hash=sha256:3a12e806cbd9dd7be2425781078a5186c7393b309eae02a9eef2bafd54941e83
+    # via -r ./requirements/dev-requirements.in
 types-requests==2.28.11.5 \
     --hash=sha256:091d4a5a33c1b4f20d8b1b952aa8fa27a6e767c44c3cf65e56580df0b05fd8a9 \
     --hash=sha256:a7df37cc6fb6187a84097da951f8e21d335448aa2501a6b0a39cbd1d7ca9ee2a

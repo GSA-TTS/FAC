@@ -10,3 +10,4 @@ types-requests
 pip-tools
 whitenoise
 toml
+types-python-slugify
