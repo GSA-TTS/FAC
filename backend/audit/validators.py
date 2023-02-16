@@ -1,9 +1,18 @@
+import os
 from pathlib import Path
 import json
 import jsonschema
+import re
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 from django.conf import settings
+from slugify import slugify
+
+ALLOWED_EXCEL_CONTENT_TYPES = [
+    'application/vnd.ms-excel',
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+]
 
 
 def validate_uei(value):
@@ -98,3 +107,27 @@ def validate_general_information_json(value):
             _(err.message),
         ) from err
     return value
+
+
+def validate_excel_filename(file):
+    """
+    User-provided filenames are slugified during validation
+    """
+    filename, extension = os.path.splitext(file.name)
+
+    if len(filename) == 0:
+        raise ValidationError("Invalid filename")
+    
+    if len(extension) == 0:
+        raise ValidationError("Invalid filename")
+
+    slugified = slugify(filename)
+
+    if len(slugified) == 0:
+        raise ValidationError("Invalid filename")
+
+    return f"{slugified}{extension}"
+
+
+def validate_excel_file(file):
+    validate_excel_filename(file)
