@@ -11,3 +11,4 @@ pip-tools
 whitenoise
 toml
 pandas
+types-python-slugify
