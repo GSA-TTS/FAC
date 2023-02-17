@@ -58,15 +58,9 @@ def add_to_file(file_name, paylod):
 
 
 def handle_badlines(bad_line: list[str]) -> list[str] | None:
-    """With parsing improvements, these are rare, but want to make sure all data is accounted for"""
-    file_path = "data_distro/data_to_load/run_logs/Lines_in_progress.json"
-    with open(file_path, "r+") as outfile:
-        data = []
-        if os.path.getsize(file_path) != 0:
-            data = json.loads(outfile.read())
-
-        data.append(bad_line)
-        json.dump(data, outfile)
+    """Making sure all data is accounted for"""
+    line_file = "data_distro/data_to_load/run_logs/Lines_in_progress.json"
+    add_to_file(line_file, bad_line)
 
     logger.warn(
         f"""
@@ -79,7 +73,7 @@ def handle_badlines(bad_line: list[str]) -> list[str] | None:
     return None
 
 
-def handle_exceptions(table, file_path, instance_dict, error_trace, exceptions_list):
+def handle_exceptions(table, file_path, instance_dict, error_trace):
     """Add detailed explanations to the logs and keep track of each type of error"""
     error_file = "data_distro/data_to_load/run_logs/Errors_in_progress.json"
     add_to_file(error_file, {table: instance_dict})
@@ -98,24 +92,16 @@ def handle_exceptions(table, file_path, instance_dict, error_trace, exceptions_l
         -------------------------------------------------
         """
     )
-    problem_text = f"Error loading {file_path}: \n \
-        {error_trace}"
-
-    if problem_text not in exceptions_list:
-        exceptions_list.append(problem_text)
-
-    return exceptions_list
 
 
-def log_results(exceptions_list, expected_objects_dict):
+def log_results(expected_objects_dict):
     """This is helpful for debugging"""
     date_stamp = str(datetime.now())[:-7]
     errors = finish_error_files(date_stamp)
-    exceptions_count = len(exceptions_list)
 
     payload = {
         "expected_objects_dict": expected_objects_dict,
-        "exceptions_list": exceptions_list,
+        "error_logs": errors,
     }
 
     with open(
@@ -129,7 +115,7 @@ def log_results(exceptions_list, expected_objects_dict):
             ###############################
             Expected Objects: {expected_objects_dict}
             ###############################
-            Error count: {exceptions_count}
+            See error logs: {errors}
             ###############################
             ❌ Check run_logs for error details"""
         )

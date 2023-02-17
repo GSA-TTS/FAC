@@ -41,18 +41,18 @@ class Command(BaseCommand):
         1) Find the files for upload
         2) Grab just the files we want
         3) Load data into Django models
-        4) Add DUNS relationships
+        4) Add relationships
         """
         set_up_error_files()
 
         if kwargs["file"] is not None:
-            load_file_names = [kwargs["file"]]
+            load_file_names = kwargs["file"]
             if "duns" in load_file_names or "ein" in load_file_names:
-                add_duns_eins(load_file_names)
+                expected_objects_dict = add_duns_eins(load_file_names)
             elif "agency" in load_file_names:
-                add_agency(load_file_names)
+                expected_objects_dict = add_agency(load_file_names)
             else:
-                exceptions_list, expected_objects_dict = load_files(load_file_names)
+                expected_objects_dict = load_files([load_file_names])
 
         else:
             year = kwargs["year"]
@@ -72,11 +72,13 @@ class Command(BaseCommand):
                 f"cpas{year}.txt",
             ]
 
-            exceptions_list, expected_objects_dict = load_files(load_file_names)
+            objects_dict = load_files(load_file_names)
             # doing manually for this pass
-            add_duns_eins(f"duns{year}.txt")
-            add_duns_eins(f"eins{year}.txt")
-            add_agency(f"agency{year}.txt")
+            duns_objects_dict = add_duns_eins(f"duns{year}.txt")
+            eins_objects_dict = add_duns_eins(f"eins{year}.txt")
+            agency_objects_dict = add_agency(f"agency{year}.txt")
 
-        timestamp = log_results(exceptions_list, expected_objects_dict)
+            expected_objects_dict = objects_dict | duns_objects_dict | eins_objects_dict | agency_objects_dict
+
+        timestamp = log_results(expected_objects_dict)
         return str(timestamp)

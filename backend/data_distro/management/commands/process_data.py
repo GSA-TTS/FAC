@@ -99,7 +99,6 @@ def transform_and_save(
     csv_dict,
     table,
     file_path,
-    exceptions_list,
 ):
     """
     For each row in the download, it looks at the data element and skips, or passes on  the data for cleaning.
@@ -122,18 +121,17 @@ def transform_and_save(
 
             objects_dict[model_name] = p
 
-        return objects_dict, exceptions_list
+        return objects_dict
 
     except Exception:
-        exceptions_list = handle_exceptions(
+        handle_exceptions(
             table,
             file_path,
             instances_dict,
             traceback.format_exc(),
-            exceptions_list,
         )
 
-        return None, exceptions_list
+        return None
 
 
 def transform_and_save_w_exceptions(
@@ -141,7 +139,6 @@ def transform_and_save_w_exceptions(
     csv_dict,
     table,
     file_path,
-    exceptions_list,
 ):
     """
     For each row in the download, it looks at the data element and skips, or passes on  the data for cleaning.
@@ -195,21 +192,14 @@ def transform_and_save_w_exceptions(
 
             objects_dict[model_name] = p
 
-        return (
-            objects_dict,
-            exceptions_list,
-        )
+        return objects_dict
 
     except Exception:
-        (exceptions_list,) = handle_exceptions(
+        handle_exceptions(
             table,
             file_path,
             instances_dict,
             traceback.format_exc(),
-            exceptions_list,
         )
 
-        return (
-            None,
-            exceptions_list,
-        )
+        return None

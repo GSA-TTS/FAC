@@ -1,5 +1,3 @@
-import csv
-
 from pandas import read_csv
 import logging
 
@@ -7,13 +5,13 @@ from data_distro.management.commands.process_data import (
     transform_and_save,
     transform_and_save_w_exceptions,
 )
-from data_distro.management.commands.handle_errors import handle_badlines
 from data_distro.models import General
 from data_distro.management.commands.link_data import (
     link_objects_findings,
     link_objects_cpas,
     link_objects_general,
 )
+from data_distro.management.commands.parse_config import panda_config, panda_config_formatted
 
 
 logger = logging.getLogger(__name__)
@@ -24,20 +22,16 @@ def load_generic(
     csv_dict,
     table,
     file_path,
-    exceptions_list,
 ):
 
-    objects_dict, exceptions_list, = transform_and_save(
+    objects_dict = transform_and_save(
         row,
         csv_dict,
         table,
         file_path,
-        exceptions_list,
     )
     if table == "findings":
         link_objects_findings(objects_dict)
-
-    return exceptions_list
 
 
 def load_cpas(
@@ -45,18 +39,14 @@ def load_cpas(
     csv_dict,
     table,
     file_path,
-    exceptions_list,
 ):
-    objects_dict, exceptions_list, = transform_and_save_w_exceptions(
+    objects_dict = transform_and_save_w_exceptions(
         row,
         csv_dict,
         table,
         file_path,
-        exceptions_list,
     )
     link_objects_cpas(objects_dict, row)
-
-    return exceptions_list
 
 
 def load_general(
@@ -64,7 +54,6 @@ def load_general(
     csv_dict,
     table,
     file_path,
-    exceptions_list,
 ):
     # Since we can add additional information later, like additional eins, agencies, and auditors, we don't want to do a find or create call on this data. I am adding an upfront check.
     try:
@@ -75,17 +64,14 @@ def load_general(
 
     if loaded is False:
         for row in csv_dict:
-            objects_dict, exceptions_list = transform_and_save_w_exceptions(
+            objects_dict = transform_and_save_w_exceptions(
                 row,
                 csv_dict,
                 "gen",
                 file_path,
-                exceptions_list,
             )
 
             link_objects_general(objects_dict)
-
-    return exceptions_list
 
 
 def load_files(load_file_names):
@@ -93,7 +79,6 @@ def load_files(load_file_names):
     expected_objects_dict = {}
 
     for file in load_file_names:
-        exceptions_list = []
         file_path = f"data_distro/data_to_load/{file}"
         file_name = file_path.replace("data_distro/data_to_load/", "")
         # Remove numbers, there are years in the file names, remove file extension
@@ -103,17 +88,14 @@ def load_files(load_file_names):
         logger.warning(f"Starting to load {file_name}...")
         expected_object_count = 0
 
-        for i, chunk in enumerate(
-            read_csv(
-                file_path,
-                chunksize=30000,
-                sep="|",
-                encoding="mac-roman",
-                on_bad_lines=handle_badlines,
-                engine="python",
-                quoting=csv.QUOTE_NONE,
-            )
-        ):
+        if "formatted" in file_path:
+            # These need a quote char
+            config = panda_config_formatted
+        else:
+            # These do better ignoring the quote char
+            config = panda_config
+
+        for i, chunk in enumerate(read_csv(file_path, **config)):
             csv_dict = chunk.to_dict(orient="records")
             expected_object_count += len(csv_dict)
 
@@ -121,31 +103,28 @@ def load_files(load_file_names):
             logger.warning(f"------------Table: {table}--------------")
             if table not in ["gen", "general", "cpas"]:
                 for row in csv_dict:
-                    exceptions_list = load_generic(
+                    load_generic(
                         row,
                         csv_dict,
                         table,
                         file_path,
-                        exceptions_list,
                     )
             elif table == "cpas":
                 for row in csv_dict:
-                    exceptions_list = load_cpas(
+                    load_cpas(
                         row,
                         csv_dict,
                         table,
                         file_path,
-                        exceptions_list,
                     )
             else:
                 # Some years the table is called gen and sometimes general
                 for row in csv_dict:
-                    exceptions_list = load_general(
+                    load_general(
                         row,
                         csv_dict,
                         "gen",
                         file_path,
-                        exceptions_list,
                     )
 
             logger.warning(
@@ -158,4 +137,4 @@ def load_files(load_file_names):
             f"Finished {file_name}, {expected_object_count} expected objects"
         )
 
-    return exceptions_list, expected_objects_dict
+    return expected_objects_dict

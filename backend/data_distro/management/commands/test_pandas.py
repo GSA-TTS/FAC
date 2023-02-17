@@ -1,14 +1,10 @@
 from pandas import read_csv
-import csv
 import logging
 
 from django.core.management.base import BaseCommand
 
-from data_distro.management.commands.handle_errors import (
-    handle_badlines,
-    set_up_error_files,
-)
-
+from data_distro.management.commands.handle_errors import set_up_error_files
+from data_distro.management.commands.load_files import panda_config, panda_config_formatted
 
 logger = logging.getLogger(__name__)
 
@@ -64,17 +60,14 @@ def test_panda_parsing(load_file_names):
         logger.warning(f"Starting to load {file_name}...")
         expected_object_count = 0
 
-        for i, chunk in enumerate(
-            read_csv(
-                file_path,
-                chunksize=30000,
-                sep="|",
-                encoding="mac-roman",
-                on_bad_lines=handle_badlines,
-                engine="python",
-                quoting=csv.QUOTE_NONE,
-            )
-        ):
+        if "formatted" in file_path:
+            # These need a quote char
+            config = panda_config_formatted
+        else:
+            # These do better ignoring the quote char
+            config = panda_config
+
+        for i, chunk in enumerate(read_csv(file_path, **panda_config)):
             csv_dict = chunk.to_dict(orient="records")
             expected_object_count += len(csv_dict)
 

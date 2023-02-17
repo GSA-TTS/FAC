@@ -1,6 +1,6 @@
 ---
 applications:
-- name: task-runner
+- name: task-runner-21
   buildpacks:
     - python_buildpack
   memory: 2G
@@ -14,7 +14,7 @@ applications:
   - fac-db
   - fac-public-s3
   - fac-key-service
-  command: (python manage.py public_data_loader && echo SUCCESS || echo TASK_FAIL) && sleep infinity
+  command: (python manage.py public_data_loader -y 21 && echo SUCCESS || echo TASK_FAIL) && sleep infinity
 
   # run with
   # cf push -f manifests/task-manifest-staging.yaml

@@ -2,6 +2,8 @@
 from pandas import read_csv
 from data_distro import models as mods
 
+from data_distro.management.commands.parse_config import panda_config_base
+
 
 def link_objects_findings(objects_dict):
     """Adds relationships between finding and finding text"""
@@ -84,10 +86,11 @@ def add_duns_eins(file):
         payload_name = "EIN"
 
     # Can't do chunks because we want to order the dataframe
-    data_frame = read_csv(file_path, sep="|", encoding="mac-roman")
+    data_frame = read_csv(file_path, **panda_config_base)
     # This will make sure we load the lists in the right order
     data_frame = data_frame.sort_values(by=sort_by, na_position="first")
     csv_dict = data_frame.to_dict(orient="records")
+    expected_object_count = len(csv_dict)
 
     for row in csv_dict:
         dbkey = row["DBKEY"]
@@ -102,7 +105,6 @@ def add_duns_eins(file):
             existing_list = auditee_instance.duns_list
             if payload not in existing_list:
                 existing_list.append(int(payload))
-                print(existing_list)
                 auditee_instance.duns_list = existing_list
                 auditee_instance.save()
         else:
@@ -112,14 +114,17 @@ def add_duns_eins(file):
                 auditee_instance.ein_list = existing_list
                 auditee_instance.save()
 
+    return expected_object_count
+
 
 def add_agency(file_name):
     """
     De-duping agency and adding as relationships
     """
     file_path = f"data_distro/data_to_load/{file_name}"
-    data_frame = read_csv(file_path, sep="|", encoding="mac-roman")
+    data_frame = read_csv(file_path, **panda_config_base)
     csv_dict = data_frame.to_dict(orient="records")
+    expected_object_count = len(csv_dict)
 
     for row in csv_dict:
         dbkey = row["DBKEY"]
@@ -138,3 +143,5 @@ def add_agency(file_name):
         auditee_instance = general_instance.auditee
         auditee_instance.agency.add(agency_instance)
         auditee_instance.save()
+
+    return expected_object_count

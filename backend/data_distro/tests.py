@@ -9,12 +9,14 @@ from django.test import TestCase
 from data_distro.models import General
 from data_distro.management.commands.link_data import add_agency, add_duns_eins
 from data_distro.mappings.upload_mapping import upload_mapping
+from data_distro.management.commands.load_files import load_files
 
 
 def delete_files(date_stamp):
     os.remove(f"data_distro/data_to_load/run_logs/Results_{date_stamp}.json")
     os.remove(f"data_distro/data_to_load/run_logs/Exceptions_{date_stamp}.json")
     os.remove(f"data_distro/data_to_load/run_logs/Lines_{date_stamp}.json")
+    os.remove(f"data_distro/data_to_load/run_logs/Errors_{date_stamp}.json")
 
 
 def return_json(file):
@@ -31,6 +33,7 @@ class TestDataProcessing(TestCase):
 
     @classmethod
     def setUpClass(cls):
+        """Sets up data and calls both kinds of file options using the management command """
         super(TestDataProcessing, cls).setUpClass()
         out = StringIO()
         TestDataProcessing.date_stamp1 = call_command(
@@ -39,20 +42,27 @@ class TestDataProcessing(TestCase):
             stderr=StringIO(),
             **{"file": "test_data/gen.txt"},
         )
+        load_files(["test_data/cpas.txt"])
         TestDataProcessing.date_stamp2 = call_command(
             "public_data_loader",
             stdout=out,
             stderr=StringIO(),
-            **{"file": "test_data/cpas.txt"},
+            **{"file": "test_data/eins.txt"},
         )
-        add_duns_eins("test_data/eins.txt")
         add_agency("test_data/agency.txt")
 
     @classmethod
     def tearDownClass(cls):
         super(TestDataProcessing, cls).tearDownClass()
-        delete_files(TestDataProcessing.date_stamp1)
-        delete_files(TestDataProcessing.date_stamp2)
+        os.remove(
+            f"data_distro/data_to_load/run_logs/Results_{TestDataProcessing.date_stamp1}.json"
+        )
+
+        # If both logs are run in the same second, they will have the same file name
+        if TestDataProcessing.date_stamp1 != TestDataProcessing.date_stamp2:
+            os.remove(
+                f"data_distro/data_to_load/run_logs/Results_{TestDataProcessing.date_stamp2}.json"
+            )
 
     def test_general(self):
         """Confirm all objects loaded"""
@@ -119,6 +129,7 @@ class TestExceptions(TestCase):
     @classmethod
     def setUpTestData(cls):
         TestExceptions.out = StringIO()
+        load_files(["test_data/findingstext_formatted.txt"])
         TestExceptions.date_stamp = call_command(
             "public_data_loader",
             stdout=TestExceptions.out,
@@ -129,8 +140,7 @@ class TestExceptions(TestCase):
     @classmethod
     def tearDownClass(cls):
         super(TestExceptions, cls).tearDownClass()
-        delete_files(TestExceptions.date_stamp)
-        os.remove(f"data_distro/data_to_load/run_logs/Errors_{TestExceptions.date_stamp}.json")
+        # delete_files(TestExceptions.date_stamp)
 
     def run_with_logging(self):
         with self.assertLogs(level="WARNING") as log_check:
@@ -143,7 +153,6 @@ class TestExceptions(TestCase):
             )
         self.assertTrue("2 errors" in log_check.output[-1])
         delete_files(date_stamp)
-        os.remove(f"data_distro/data_to_load/run_logs/Errors_{date_stamp}.json")
 
     def test_result_logs(self):
         result_file = (
