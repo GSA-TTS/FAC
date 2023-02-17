@@ -9,6 +9,8 @@ from random import choice, randrange
 from .test_schemas import FederalAwardsSchemaValidityTest
 from .validators import (
     ALLOWED_EXCEL_CONTENT_TYPES,
+    ALLOWED_EXCEL_FILE_EXTENSIONS,
+    validate_excel_file_extension,
     validate_excel_filename,
     validate_federal_award_json,
     validate_uei,
@@ -367,8 +369,8 @@ class ExcelFileValidatorTests(SimpleTestCase):
         test_cases = [
             "no-extension",
             ".xlsx",
-            "".join(choice(string.punctuation) for i in range(1, 9)),
-            "".join(choice(string.punctuation) for i in range(1, 9)) + ".xlsx",
+            "".join(choice(string.punctuation) for i in range(9)),
+            "".join(choice(string.punctuation) for i in range(9)) + ".xlsx",
         ]
 
         for test_case in test_cases:
@@ -378,3 +380,54 @@ class ExcelFileValidatorTests(SimpleTestCase):
                 )
 
                 self.assertRaises(ValidationError, validate_excel_filename, file)
+
+    def test_invalid_file_extensions(self):
+        """
+        Filenames that have disallowed extensions are not valid
+        """
+
+        def random_extension(len):
+            return "." + "".join(choice(string.ascii_lowercase) for _ in range(len))
+
+        # generate a random length-3 file extension not listed as being allowed
+        while (random_ext_3 := random_extension(3)) in ALLOWED_EXCEL_FILE_EXTENSIONS:
+            pass
+
+        # generate a random length-4 file extension not listed as being allowed
+        while (random_ext_4 := random_extension(4)) in ALLOWED_EXCEL_FILE_EXTENSIONS:
+            pass
+
+        test_cases = [
+            "file.pdf",
+            "file.doc",
+            "file.docx",
+            "file.png",
+            "file.jpeg",
+            f"file.{random_ext_3}",
+            f"file.{random_ext_4}",
+            "file",
+            "file.",
+        ]
+
+        for test_case in test_cases:
+            with self.subTest():
+                file = TemporaryUploadedFile(
+                    test_case, ALLOWED_EXCEL_CONTENT_TYPES[0], 10000, "utf-8"
+                )
+
+                self.assertRaises(ValidationError, validate_excel_file_extension, file)
+
+    def test_valid_file_extensions(self):
+        """Filenames that have allowed extensions are valid"""
+        test_cases = [e.lower() for e in ALLOWED_EXCEL_FILE_EXTENSIONS] + [
+            e.upper() for e in ALLOWED_EXCEL_FILE_EXTENSIONS
+        ]
+
+        for test_case in test_cases:
+            with self.subTest():
+                filename = f"file.{test_case}"
+                file = TemporaryUploadedFile(
+                    filename, ALLOWED_EXCEL_CONTENT_TYPES[0], 10000, "utf-8"
+                )
+
+                validate_excel_file_extension(file)
