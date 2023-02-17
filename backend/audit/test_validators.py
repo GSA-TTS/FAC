@@ -10,6 +10,7 @@ from .test_schemas import FederalAwardsSchemaValidityTest
 from .validators import (
     ALLOWED_EXCEL_CONTENT_TYPES,
     ALLOWED_EXCEL_FILE_EXTENSIONS,
+    validate_excel_file_content_type,
     validate_excel_file_extension,
     validate_excel_filename,
     validate_federal_award_json,
@@ -431,3 +432,39 @@ class ExcelFileValidatorTests(SimpleTestCase):
                 )
 
                 validate_excel_file_extension(file)
+
+    def test_invalid_file_content_types(self):
+        """Files that have disallowed content types are invalid"""
+        test_cases = [
+            "application/msword",
+            "application/octet-stream",
+            "application/pdf",
+            "application/vnd.ms-outlook",
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            "audio/mpeg",
+            "audio/wav",
+            "audio/x-aiff",
+            "image/bmp",
+            "image/jpeg",
+            "image/gif",
+            "image/png",
+            "image/tiff",
+            "text/csv",
+            "text/plain",
+        ]
+
+        for test_case in test_cases:
+            with self.subTest():
+                file = TemporaryUploadedFile("file.ext", test_case, 10000, "utf-8")
+
+                self.assertRaises(
+                    ValidationError, validate_excel_file_content_type, file
+                )
+
+    def test_valid_file_content_types(self):
+        """Files that have allowed content types are valid"""
+        for content_type in ALLOWED_EXCEL_CONTENT_TYPES:
+            with self.subTest():
+                file = TemporaryUploadedFile("file.ext", content_type, 10000, "utf-8")
+
+                validate_excel_file_content_type(file)

@@ -12,7 +12,6 @@ ALLOWED_EXCEL_FILE_EXTENSIONS = [".xls", ".xlsx"]
 ALLOWED_EXCEL_CONTENT_TYPES = [
     "application/vnd.ms-excel",
     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
 ]
 
 
@@ -144,6 +143,19 @@ def validate_excel_file_extension(file):
     return extension
 
 
+def validate_excel_file_content_type(file):
+    """
+    Files must have an allowed content (MIME) type
+    """
+    if file.file.content_type not in ALLOWED_EXCEL_CONTENT_TYPES:
+        raise ValidationError(
+            f"Invalid content type - allowed types are {', '.join(ALLOWED_EXCEL_CONTENT_TYPES)}"
+        )
+
+    return file.file.content_type
+
+
 def validate_excel_file(file):
     validate_excel_filename(file)
     validate_excel_file_extension(file)
+    validate_excel_file_content_type(file)
