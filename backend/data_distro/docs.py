@@ -2,7 +2,13 @@
 Using the OpenAPI structure to add docs for data
 The field name is going to be a short name, the long name is going to be a short explanation and the description is going to be for the data source.
 
-This is where the model docs descriptions come from.
+This is where the model docs descriptions come from. Keep formatting consistent so we can automatically create upload mappings and documentation.
+
+These strings are formatted:
+"Data sources: <form with year>: <line number>; <form with year>: <line number> Census mapping: <table name as it appears on the Data Key>, <field name from download>"
+
+If more than one table populates that field:
+"Data sources: <form with year>: <line number>; <form with year>: <line number> Census mapping: <table name as it appears on the Data Key>, <field name from download> (AND) Data sources: <form with year>: <line number>; <form with year>: <line number> Census mapping: <table name as it appears on the Data Key>, <field name from download>"
 
 """
 
@@ -11,7 +17,7 @@ API_DESCRIPTION = """Data from the Federal Audit Clearinghouse"""
 
 
 """ Model choices """
-
+# These have not been implemented yet, we will see if the data allows for it
 
 # TYPEREPORT_FS
 # TYPEREPORT_SP_FRAMEWORK

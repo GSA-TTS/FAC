@@ -141,14 +141,20 @@ dmypy.json
 # Cython debug symbols
 cython_debug/
 
-#vscode config
+# vscode config
 .vscode/
 .DS_Store
 .secrets
 
-#JetBrains configs
+# JetBrains configs
 .idea/
 backend/.idea/
+
+# Data loading artifacts
+backend/data_distro/data_to_load/run_logs/Results_*
+backend/data_distro/data_to_load/run_logs/Lines_*
+backend/data_distro/data_to_load/run_logs/Errors_*
+backend/data_distro/data_to_load/run_logs/Exceptions_*
 
 # Assets
 node_modules/

@@ -17,10 +17,20 @@ The upload script should be flexible enough to handle changes in the models that
 
 1) Look at the `make_table_structure` command. Make sure things like new_fields are up to date.
 2) Rerun the `make_table_structure` management command to produce `new_upload_mapping.json`.
-3) Check the outputs to make sure that things make sense. You will need to do a manual check on the upload mapping, If a data column needs to go to more than one model, that needs to be addressed in the upload script. For example, AUDITOR_EIN has the same info reported on two of the upload tables, so you only need to upload it once. Then, replace `mappings/upload_mappings.json` with the new mapping.
+3) Check the outputs to make sure that things make sense. You will need to do a manual check on the upload mapping, If a data column needs to go to more than one model, that needs to be addressed in the upload script. For example, AUDITOR_EIN has the same info reported on two of the upload tables, so you only need to upload it once. Then, replace `data_distro/mappings/upload_mappings.json` with the new mapping.
 4) Check the `public_data_loader` script. Renaming should mostly be handled by `upload_mapping` but changing relationships need to be accounted for in the script. Make sure the relationships that are in the `add_relational` output of `make_table_structure` are added in the script.
-5) Run the script. Each phase should tell you the number of expected objects, for tables like general that should be 1:1 relationship for auditors, auditees and things that can be consolidated because of foreign to and many to many relationships, there will be fewer objects.
+5) Run the `manage.py test_pandas` command to see if there are errors in the file that you need to manually fix.
+6) Run the `manage.py public_data_loader` script. Each phase should tell you the number of expected objects from the table. For tables like general that should be 1:1 relationship for auditors, auditees and things that can be consolidated because of foreign to and many to many relationships, there will be fewer objects.
 
 ### To run the data loading script
 
 I have been running the data loaders as tasks in cloud.gov. Loading from the all years download doesn't seem effectual. On some tables, Pandas gets parsing errors after running for a few hours. Instead, I have been running the downloads by year. So far, I am running two tasks at a time, each running a year's worth of downloads.
+
+Check the `data_distro/data_to_load/run_logs` folder for error logs. This should tell you how many objects are expected and any errors in parsing or loading the data.
+
+
+# Updating Models for data_distro
+
+If you update the name of a name or model in data_distro, you need to reflect that change over to the `mappings/upload_mappings.json` file. If you change model relationships, that will need to be reflected in the upload code, probably changing `link_data.py` and potentially `public_data_loader.py`. If you don't do these steps the data_distro tests should fail. Keeping mappings up to date should make it easier on ourselves later when we need to load more data.
+
+Create an updated csv data dictionary and add comments to the fields in postgres. Do that by running `manage.py create_docs`.

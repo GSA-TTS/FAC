@@ -11,18 +11,35 @@ from data_distro.management.commands.link_data import add_agency, add_duns_eins
 from data_distro.mappings.upload_mapping import upload_mapping
 
 
+def delete_files(date_stamp):
+    os.remove(f"data_distro/data_to_load/run_logs/Results_{date_stamp}.json")
+    os.remove(f"data_distro/data_to_load/run_logs/Exceptions_{date_stamp}.json")
+    os.remove(f"data_distro/data_to_load/run_logs/Lines_{date_stamp}.json")
+
+
+def return_json(file):
+    with open(file, "r") as results_raw:
+        results = json.load(results_raw)
+        return results
+
+
 class TestDataProcessing(TestCase):
+    """Testing mapping and transformations"""
+
+    date_stamp1 = ""
+    date_stamp2 = ""
+
     @classmethod
     def setUpClass(cls):
         super(TestDataProcessing, cls).setUpClass()
         out = StringIO()
-        call_command(
+        TestDataProcessing.date_stamp1 = call_command(
             "public_data_loader",
             stdout=out,
             stderr=StringIO(),
             **{"file": "test_data/gen.txt"},
         )
-        call_command(
+        TestDataProcessing.date_stamp2 = call_command(
             "public_data_loader",
             stdout=out,
             stderr=StringIO(),
@@ -31,20 +48,26 @@ class TestDataProcessing(TestCase):
         add_duns_eins("test_data/eins.txt")
         add_agency("test_data/agency.txt")
 
+    @classmethod
+    def tearDownClass(cls):
+        super(TestDataProcessing, cls).tearDownClass()
+        delete_files(TestDataProcessing.date_stamp1)
+        delete_files(TestDataProcessing.date_stamp2)
+
     def test_general(self):
-        # confirm all objects loaded
+        """Confirm all objects loaded"""
         loaded_generals = General.objects.all()
         self.assertEqual(25, len(loaded_generals))
 
     def test_values_general(self):
-        """Look for sample expected values in general (depends on test_general)"""
+        """Look for sample expected values in general"""
         test_value = General.objects.filter(dbkey=100000, audit_year=2013)[0]
         self.assertEqual(True, test_value.going_concern)
         self.assertEqual(False, test_value.reportable_condition)
         self.assertEqual(datetime.date(2014, 6, 30), test_value.fac_accepted_date)
 
     def test_values_auditee(self):
-        """Look for expected values in linked auditee from general load (depends on test_general)"""
+        """Look for expected values in linked auditee from general load"""
         test_value = General.objects.filter(dbkey=100000, audit_year=2013)[0]
         auditee_value = test_value.auditee
         self.assertEqual(
@@ -53,7 +76,7 @@ class TestDataProcessing(TestCase):
         self.assertEqual("Leslie Knope", auditee_value.auditee_contact)
 
     def test_linked_auditor(self):
-        """Look for expected values in linked auditor from general load (depends on test_general)"""
+        """Look for expected values in linked auditor from general load"""
         test_value = General.objects.filter(dbkey=100000, audit_year=2013)[0]
         auditor_value = test_value.auditor.all()[0]
         self.assertEqual("CONES OF DUNSHIRE INC.", auditor_value.cpa_firm_name)
@@ -68,7 +91,7 @@ class TestDataProcessing(TestCase):
         self.assertEqual("Paul Bunyan, CPA", cpa_values[1].cpa_firm_name)
 
     def test_ein_list(self):
-        """load EIN in correct order"""
+        """Load EIN in correct order"""
         test_value = General.objects.filter(dbkey=100000, audit_year=2014)[0]
         test_agency = test_value.auditee
         # order matters
@@ -77,6 +100,7 @@ class TestDataProcessing(TestCase):
         )
 
     def test_agency_linkage(self):
+        """Load agency in correct order"""
         test_value = General.objects.filter(dbkey=100000, audit_year=2014)[0]
         agencies = test_value.agency
         self.assertEqual(
@@ -85,19 +109,68 @@ class TestDataProcessing(TestCase):
 
 
 class TestExceptions(TestCase):
-    """Make sure we are keeping track of exceptions throughout the process"""
+    """
+    Make sure we are keeping track of exceptions throughout the process, so all data is accounted for.
+    """
 
-    def test_end_to_end_exception_handling(self):
-        """Loads findings table with 2 dbkeys null, those should not save"""
+    out = ""
+    date_stamp = ""
+
+    @classmethod
+    def setUpTestData(cls):
+        TestExceptions.out = StringIO()
+        TestExceptions.date_stamp = call_command(
+            "public_data_loader",
+            stdout=TestExceptions.out,
+            stderr=StringIO(),
+            **{"file": "test_data/findings.txt"},
+        )
+
+    @classmethod
+    def tearDownClass(cls):
+        super(TestExceptions, cls).tearDownClass()
+        delete_files(TestExceptions.date_stamp)
+        os.remove(f"data_distro/data_to_load/run_logs/Errors_{TestExceptions.date_stamp}.json")
+
+    def run_with_logging(self):
         with self.assertLogs(level="WARNING") as log_check:
             out = StringIO()
-            call_command(
+            date_stamp = call_command(
                 "public_data_loader",
                 stdout=out,
                 stderr=StringIO(),
                 **{"file": "test_data/findings.txt"},
             )
-            self.assertTrue("2 errors" in log_check.output[-1])
+        self.assertTrue("2 errors" in log_check.output[-1])
+        delete_files(date_stamp)
+        os.remove(f"data_distro/data_to_load/run_logs/Errors_{date_stamp}.json")
+
+    def test_result_logs(self):
+        result_file = (
+            f"data_distro/data_to_load/run_logs/Results_{self.date_stamp}.json"
+        )
+        results = return_json(result_file)
+
+        expected_objects_dict = {"test_data/findings.txt": 4}
+        self.assertEqual(results["expected_objects_dict"], expected_objects_dict)
+
+    def test_error_logs(self):
+        error_file = f"data_distro/data_to_load/run_logs/Errors_{self.date_stamp}.json"
+        results = return_json(error_file)
+        db_error = results[0]["findings"]["Findings"]["elec_audits_id"]
+        self.assertEqual(db_error, 14012297)
+
+    def test_exception_logs(self):
+        exeception_file = (
+            f"data_distro/data_to_load/run_logs/Exceptions_{self.date_stamp}.json"
+        )
+        results = return_json(exeception_file)
+        self.assertEqual(len(results), 2)
+
+    def test_line_logs(self):
+        line_file = f"data_distro/data_to_load/run_logs/Lines_{self.date_stamp}.json"
+        results = return_json(line_file)
+        self.assertEqual(len(results), 1)
 
 
 class TestDataMapping(TestCase):
