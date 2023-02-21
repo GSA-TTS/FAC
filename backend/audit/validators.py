@@ -7,6 +7,8 @@ from django.utils.translation import gettext_lazy as _
 from django.conf import settings
 from slugify import slugify
 
+MAX_EXCEL_FILE_SIZE_MB = 25
+
 ALLOWED_EXCEL_FILE_EXTENSIONS = [".xls", ".xlsx"]
 
 ALLOWED_EXCEL_CONTENT_TYPES = [
@@ -155,7 +157,20 @@ def validate_excel_file_content_type(file):
     return file.file.content_type
 
 
+def validate_excel_file_size(file):
+    max_file_size = MAX_EXCEL_FILE_SIZE_MB * 1024 * 1024
+
+    if file.size > max_file_size:
+        file_size_mb = round(file.size / 1024 / 1024, 2)
+        raise ValidationError(
+            f"This file size is: {file_size_mb} MB this cannot be uploaded, maximum allowed: {MAX_EXCEL_FILE_SIZE_MB} MB"
+        )
+
+    return file.size
+
+
 def validate_excel_file(file):
     validate_excel_filename(file)
     validate_excel_file_extension(file)
     validate_excel_file_content_type(file)
+    validate_excel_file_size(file)
