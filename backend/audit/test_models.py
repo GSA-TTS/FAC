@@ -1,9 +1,10 @@
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db.utils import IntegrityError
 from django.test import TestCase
 
 from model_bakery import baker
 
-from .models import Access, SingleAuditChecklist, User
+from .models import Access, ExcelFile, SingleAuditChecklist, User
 
 
 class SingleAuditChecklistTests(TestCase):
@@ -115,3 +116,17 @@ class AccessTests(TestCase):
             sac=access_1.sac,
             role="certifying_auditor_contact",
         )
+
+
+class ExcelFileTests(TestCase):
+    """Model tests"""
+
+    def test_filename_generated(self):
+        """
+        The filename field should be generated based on the FileField filename
+        """
+        file = SimpleUploadedFile("this is a file.xlsx", b"this is a file")
+
+        excel_file = baker.make(ExcelFile, file=file)
+
+        self.assertEqual("this-is-a-file.xlsx", excel_file.filename)
