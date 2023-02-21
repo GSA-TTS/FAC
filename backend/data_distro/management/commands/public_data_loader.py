@@ -6,15 +6,47 @@ Load them with: manage.py public_data_loader
 """
 from django.core.management.base import BaseCommand
 
-from data_distro.management.commands.load_files import load_files
+from data_distro.management.commands.load_files import (
+    load_files,
+    load_duns_eins,
+    load_agency,
+)
 from data_distro.management.commands.handle_errors import (
     set_up_error_files,
     log_results,
 )
-from data_distro.management.commands.link_data import (
-    add_duns_eins,
-    add_agency,
-)
+
+
+def lookup_files(year):
+    """Different years have different files. Dependent objects are created first."""
+    all_files = [
+        f"findingstext_formatted{year}.txt",
+        f"findings{year}.txt",
+        f"captext_formatted{year}.txt",
+        f"cfda{year}.txt",
+        f"notes{year}.txt",
+        f"revisions{year}.txt",
+        f"passthrough{year}.txt",
+        f"gen{year}.txt",
+        f"cpas{year}.txt",
+    ]
+    files_18 = [
+        f"findings{year}.txt",
+        f"cfda{year}.txt",
+        f"passthrough{year}.txt",
+        f"gen{year}.txt",
+        f"cpas{year}.txt",
+    ]
+
+    if year is None:
+        year = ""
+        load_file_names = all_files
+    elif int(year) <= 18:
+        load_file_names = files_18
+    else:
+        load_file_names = all_files
+
+    return load_file_names
 
 
 class Command(BaseCommand):
@@ -48,37 +80,23 @@ class Command(BaseCommand):
         if kwargs["file"] is not None:
             load_file_names = kwargs["file"]
             if "duns" in load_file_names or "ein" in load_file_names:
-                expected_objects_dict = add_duns_eins(load_file_names)
+                expected_objects_dict = load_duns_eins(load_file_names)
             elif "agency" in load_file_names:
-                expected_objects_dict = add_agency(load_file_names)
+                expected_objects_dict = load_agency(load_file_names)
             else:
                 expected_objects_dict = load_files([load_file_names])
 
         else:
             year = kwargs["year"]
-            if year is None:
-                year = ""
-
-            # Dependent objects are created first
-            load_file_names = [
-                f"findingstext_formatted{year}.txt",
-                f"findings{year}.txt",
-                f"captext_formatted{year}.txt",
-                f"cfda{year}.txt",
-                f"notes{year}.txt",
-                f"revisions{year}.txt",
-                f"passthrough{year}.txt",
-                f"gen{year}.txt",
-                f"cpas{year}.txt",
-            ]
-
+            load_file_names = lookup_files(year)
             objects_dict = load_files(load_file_names)
-            # doing manually for this pass
-            duns_objects_dict = add_duns_eins(f"duns{year}.txt")
-            eins_objects_dict = add_duns_eins(f"eins{year}.txt")
-            agency_objects_dict = add_agency(f"agency{year}.txt")
+            duns_objects_dict = load_duns_eins(f"duns{year}.txt")
+            eins_objects_dict = load_duns_eins(f"eins{year}.txt")
+            agency_objects_dict = load_agency(f"agency{year}.txt")
 
-            expected_objects_dict = objects_dict | duns_objects_dict | eins_objects_dict | agency_objects_dict
+            expected_objects_dict = (
+                objects_dict | duns_objects_dict | eins_objects_dict | agency_objects_dict  # fmt: skip
+            )
 
         timestamp = log_results(expected_objects_dict)
         return str(timestamp)

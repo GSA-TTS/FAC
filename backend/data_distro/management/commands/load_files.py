@@ -10,8 +10,14 @@ from data_distro.management.commands.link_data import (
     link_objects_findings,
     link_objects_cpas,
     link_objects_general,
+    link_duns_eins,
+    link_agency,
 )
-from data_distro.management.commands.parse_config import panda_config, panda_config_formatted
+from data_distro.management.commands.parse_config import (
+    panda_config,
+    panda_config_formatted,
+    panda_config_base,
+)
 
 
 logger = logging.getLogger(__name__)
@@ -138,3 +144,42 @@ def load_files(load_file_names):
         )
 
     return expected_objects_dict
+
+
+def load_duns_eins(file):
+    """
+    These were their own data model but we are going to use an array field.
+    This adds the fields in the right order. It should run after general.
+    """
+    file_path = f"data_distro/data_to_load/{file}"
+    if "duns" in file:
+        sort_by = "DUNSEQNUM"
+        payload_name = "DUNS"
+    else:
+        sort_by = "EINSEQNUM"
+        payload_name = "EIN"
+
+    # Can't do chunks because we want to order the dataframe
+    data_frame = read_csv(file_path, **panda_config_base)
+    # This will make sure we load the lists in the right order
+    data_frame = data_frame.sort_values(by=sort_by, na_position="first")
+    csv_dict = data_frame.to_dict(orient="records")
+    expected_object_count = len(csv_dict)
+
+    link_duns_eins(csv_dict, payload_name)
+
+    return expected_object_count
+
+
+def load_agency(file_name):
+    """
+    De-duping agency and adding as relationships
+    """
+    file_path = f"data_distro/data_to_load/{file_name}"
+    data_frame = read_csv(file_path, **panda_config_base)
+    csv_dict = data_frame.to_dict(orient="records")
+    expected_object_count = len(csv_dict)
+
+    link_agency(csv_dict, file_name)
+
+    return expected_object_count

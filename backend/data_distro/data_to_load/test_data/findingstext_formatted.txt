@@ -1,0 +1,289 @@
+SEQ_NUMBER|DBKEY|AUDITYEAR|FINDINGREFNUMS|TEXT|CHARTSTABLES
+"24994"|"234207"|"2021"|"2021-002"|"2021-002 – Filing of Single Audit Report Federal Program – HUD insured mortgage under Section 213 of the National Housing Act
+CFDA# – 14.126
+Significant Deficiency
+Category of Finding - Other
+Criteria - Pursuant to 2 CFR section 200.512(a), the reporting package shall be submitted within
+the earlier of 30 days after receipt of the auditor’s report(s), or nine months after the end of
+the audit period.
+Condition - The Cooperative did not submit the Single Audit Reporting Package for the period
+ended March 31, 2020 within nine months after the end of the audit period (December 31, 2020).
+Cause - The Cooperative submitted a Single Audit Report prior to the required deadline, but it
+was rejected due to the omission of the Corrective Action Plan, a component of the report
+required by the OMB Uniform Guidance. The Corrective Action Plan was submitted in January
+2021, and final approval of the Single Audit was received, but it was after the December 31,
+2020 deadline.
+Effect - Failure to submit the required Single Audit Reporting Package timely automatically results
+in the Cooperative not qualifying for low-risk auditee status for the subsequent year’s single audit.
+Recommendation - We recommend the Cooperative develop, document, and implement
+policies and procedures for timely submission of the Single Audit Reporting Package.
+Auditee’s comment - The Board of Directors will designate an individual to document financial
+statement preparation processes to ensure timely submission of the Single Audit Reporting
+Package.
+Status - Resolved
+Auditor’s non-compliance code - Z -Other
+Responsible party for correction action - Craig Brinkman, CFO of REE Development (Management
+Agent)"|"N"
+"25100"|"128980"|"2021"|"2021-001"|"Finding reference number:2021-001
+CFDA title and number (Federal award identification number and year): Capital Advance, CFDA 14.157 and 2007)
+
+Auditor non-compliance code:B - Failure to make required residual receipts deposit
+
+Finding resolution status:Resolved 
+
+Universe population size:The universe population is not applicable to the finding.
+
+Sample size information:The sample size information is not applicable to the finding.
+
+Noncompliance information:See statement of condition 2021-001 for noncompliance information.
+
+Statistically valid sample:N/A
+
+Name of Federal agency:U.S. Department of Housing and Urban Development
+
+Pass-through entity:N/A
+
+Questioned costs:$8,402
+
+Statement of Condition 2021-001 (CFDA 14.157):The Corporation did not make the required residual receipts deposit computed at March 31, 2020, in the amount of $8,402 within 60 days of fiscal year end.
+
+Criteria:Pursuant to paragraph 5(c) of the Regulatory Agreement, the residual receipts deposit due to the residual receipts reserve must be deposited within 60 days of fiscal year end.
+
+Effect:The Corporation was not in compliance with the Regulatory Agreement.
+
+Cause:The Corporation did not make the required deposit within 60 days of fiscal year end.
+
+Recommendation:Management should implement a system to ensure the required deposit to the residual receipts is made within 60 days of fiscal year end.
+
+Completion date:July 15, 2020
+
+Management's response:Agree. Management made the required residual receipts deposit on July 15, 2020."|"N"
+"25139"|"194597"|"2021"|"2021-001"|"SECTION II – FINANCIAL STATEMENT FINDINGS None Reported.
+SECTION III – FEDERAL AWARD FINDINGS AND QUESTIONED COSTS
+Finding 2021-001:
+Information on the Federal Program: CFDA 14.181 – Section 811 Capital Advance.
+Compliance Requirements: All disbursements from the reserve must be approved by HUD.
+Type of Finding: Noncompliance (Special Tests and Provisions).
+Criteria: 24 CFR 891.405(d) Funds may be drawn from the reserve and used only in accordance with HUD guidelines and with the approval of, or as directed by, HUD.
+Condition: For the year ending March 31, 2021, we reviewed the withdrawals from the
+replacement reserve and noted one withdrawal exceeded the approved amount.
+Context: Of the $18,110 withdrawn from the account during the year ended March 31, 2021, $242.58 was not approved. Subsequent to the audit, the Organization deposited $242.58 to the reserve account.
+Effect: Organization used reserve funds that were intended for specific purposes risking availability at time of need.
+Cause: No cause could be determined.
+Recommendation: We recommend management review and revise controls over replacement reserves to ensure required withdrawals are approved.
+Responsible Official's Response and Corrective Action Planned: The Organization agrees with the finding and recommendation, as it was human error. On June 14, 2021 a deposit was made into the replacement reserve account for $242.58.
+Planned Implementation Date of Corrective Action: June 14, 2021.
+Person Responsible for Corrective Action: Melanie Moe, Managing Agent."|"N"
+"25140"|"194599"|"2021"|"2021-001"|"SECTION II – FINANCIAL STATEMENT FINDINGS None Reported.
+SECTION III – FEDERAL AWARD FINDINGS AND QUESTIONED COSTS
+Finding 2021-001:
+Information on the Federal Program: CFDA 14.181 – Supportive Housing for Persons with Disabilities.
+Compliance Requirements: PRAC project funds must be used only for expenses that are reasonable and necessary to the operation of the project as provided for in the Regulatory Agreement between HUD and the project owner (24 CFR section 891.400(e)).
+Criteria: 24 CFR 891.400(e) Project funds must be used for the operation of the project.
+Condition: For the year ending March 31, 2021, we reviewed project fund expenditures and found one instance where the organization’s records were unable to support the use of the project funds.
+Context: We tested twenty-six (26) disbursements totaling $113,938 from a population of $371,091 and found one instance of noncompliance in the amount of $1,989.
+Effect: Funds that were to be used for the operations of the HUD property may not be available at the time of need.
+Cause: No cause could be determined.
+Recommendation: We recommend management review and revise controls over credit card transactions to ensure disbursements are allowed for the operation of the project.
+Responsible Official's Response and Corrective Action Planned: The Organization agrees with the finding and recommendations. Management closed the credit card account and has established a purchasing card as of April 27, 2021 (purchasing cards act like a debit card whereas the funds must be available at the time of purchase). Management has full access and control of the card.
+Planned Implementation Date of Corrective Action: April 27, 2021.
+Person Responsible for Corrective Action: Melanie Moe, Managing Agent."|"N"
+"198165"|"230559"|"2021"|"2021-001"|"Finding 2021-001
+Criteria:
+Generally, a system of internal control contemplates segregation of duties such that no individual has responsibility to execute a transaction, have physical access to the related assets, and have responsibility or authority to record the transactions.
+
+Condition:
+Due to the limited size of the Cooperative’s business staff, the Cooperative has limited segregation of duties.
+
+Questioned Costs:
+None.
+
+Context:
+The Cooperative has informed us that the small size of its business office staff precludes proper segregation of duties at this time.
+
+Effect:
+The Cooperative is unable to maintain segregation of incompatible duties.
+
+Cause:
+Limited number of staff in the business office.
+
+Repeat Finding: 
+The finding was reported in the prior year as finding 2020-001.
+
+Recommendation:
+We recommend that the Cooperative continue to segregate incompatible duties as best it can within the limits of what the Cooperative considers to be cost beneficial.
+
+Current Status:
+Unresolved, the Cooperative still has a limited number of staff in the business office. 
+
+Action Taken:
+The Cooperative reviews and makes improvements to its internal controls on an ongoing basis, and attempts to maximize the segregation of duties in all areas within the limits of the staff available.
+
+Views of Responsible Officials and Planned Corrective Actions:
+The Cooperative agrees with this finding and will adhere to the corrective action plan.
+"|"N"
+"25156"|"212942"|"2021"|"2021-002"|"Finding 2021-002
+Criteria:
+Generally, a system of internal control includes the ability to understand and prepare the Cooperative’s financial statements and related disclosures in accordance with accounting principles generally accepted in the United States of America (GAAP).
+
+Condition:
+Due to the limited size of the Cooperative’s business staff and related resources available, the Cooperative has utilized the auditor to post adjusting journal entries and prepare the financial statements and related disclosures in accordance with accounting principles generally accepted in the United States of America.
+
+Questioned Costs:
+None.
+
+Context:
+The Cooperative has informed us that the small size and qualifications of its business office staff precludes the Cooperative from posting adjusting journal entries and preparing its own financial statements.
+
+Effect:
+The Cooperative is unable to prepare GAAP based financial statements.
+
+Cause:
+Limited number of staff and hours available preclude the Cooperative from preparing the GAAP based financial statements. The Cooperative will continue to review auditor prepared financial statements.
+
+Repeat Finding:
+This finding was reported in the prior year as finding 2020-002.
+
+Recommendation:
+We recommend that the Cooperative continue to review the auditor prepared adjusting journal entries and financial statements with the intention of understanding and acceptance of responsibility for reporting under generally accepted accounting principles.
+
+Current Status:
+Unresolved, the number of staff and qualifications of staff have not changed. The Cooperative is continuing to review the auditor prepared adjusting journal entries and financial statements.
+
+Action Taken:
+The Cooperative will continue to review the auditor prepared adjusting journal entries and financial statements with the intention of understanding and acceptance of responsibility for reporting under generally accepted accounting principles.
+
+Views of Responsible Officials and Planned Corrective Actions:
+The Cooperative agrees with this finding and will adhere to the corrective action plan.
+"|"N"
+"25245"|"231115"|"2021"|"2021-001"|"Supportive Housing for Elderly Persons, CFDA #14.157 Condition:It was determined during the year ended March 31, 2021 that due to an incorrect income calculation, a current tenant’s income exceeded HUD income requirements for the Supportive Housing for Elderly Persons, CFDA #14.157.
+Criteria:In order to qualify for residency, a tenant’s income must not exceed HUD regulated income limits.
+Cause:The tenant’s income was incorrectly calculated at the time of move-in.
+Effect:The Project was out of compliance with the requirement of Supportive Housing for Elderly Persons, CFDA #14.157
+Recommendation: It is recommended that procedures be put into place to ensure that tenant income is calculated in accordance with HUD regulations at the time of move in.
+"|"N"
+"25278"|"191128"|"2021"|"2021-001"|"S3800-010 – Finding Reference Number: 2021-001
+
+Program Information
+S3800-011: Federal Program
+Mortgage Insurance for the Purchase or Refinancing of Existing Multifamily Housing Projects Section 207/223f (CFDA # 14.155)
+Federal Agency: U.S. Department of Housing and Urban Development 
+Pass-through Entity: None
+Type of Compliance Finding: N - Special Tests and Provisions
+
+S3800-015: Type of Finding
+Federal Awards and Financial Reporting Finding
+
+S3800-016: Finding Resolution Status
+In-process
+
+S3800-017: Information on Universe Population Size
+N/A
+
+S3800-018: Sample Size Information
+N/A
+
+S3800-019: Repeat Finding Number
+N/A
+
+S3800-020: Criteria
+The regulatory agreement requires that the Organization’s books and records are maintained in accordance with GAAP. 
+
+S3800-030: Statement of Condition
+During our audit of the Organization’s fiscal year ended March 31, 2021 federal award program, we noted that management was not reconciling the aged tenant accounts receivable subsidiary ledger to the general ledger. Also, escrow accounts including reserve for replacement were not reconciled to lender statement. The liabilities were also not completely recorded at the year end.
+ 
+S3800-032: Cause
+The Organization books are maintained in QuickBooks, whereas tenant rental transactions are recorded at a detail level in a different software and the detail information is not reconciled to the general ledger. Management was not reconciling the financial statements to source documents.
+
+S3800-033: Effect or Potential Effect
+The Organization is not in compliance with requirement to maintain books and records according to GAAP. 
+
+S3800-035: Auditor Non-Compliance Code
+S – Internal Control Deficiencies 
+
+S3800-040: Questioned Costs
+None
+
+S3800-045: Reporting Views of Responsible Officials
+Management agreed with auditor’s finding. 
+
+S3800-050: Context
+Management was not reconciling the financial statements to source documents including reports from the software used to process tenant rental activities. 
+
+S3800-080: Recommendation
+As part of the month-end closing process, management should ensure that the accounts reconcile to source documents including reports from the software used to process tenant rental activities.
+
+S3800-090: Auditor’s Summary of the Auditee’s Comments on the Findings and Recommendations
+Concur 
+
+S3800-130: Response Indicator
+Agree
+
+S3800-140: Completion Date
+September 30, 2021
+
+S3800-150:Response
+See Corrective Action Plan
+"|"N"
+"25279"|"191128"|"2021"|"2021-002"|"S3800-010 – Finding Reference Number: 2021-002
+
+Program Information
+S3800-011: Federal Program
+Mortgage Insurance for the Purchase or Refinancing of Existing Multifamily Housing Projects Section 207/223f (CFDA # 14.155)
+Federal Agency: U.S. Department of Housing and Urban Development 
+Pass-through Entity: None
+Type of Compliance Finding: N – Special Tests and Provisions
+
+S3800-015: Type of Finding
+Federal Awards Finding
+
+S3800-016: Finding Resolution Status
+In-progress
+
+S3800-017: Information on Universe Population Size
+N/A
+
+S3800-018: Sample Size Information
+N/A
+
+S3800-019: Repeat Finding Number
+2020-001
+
+S3800-020: Criteria
+The regulatory agreement allow the Organization to pay a bookkeeping fee that was approved by HUD on HUD Form 9839-B, Project Owner’s & Management Agent’s Certification for Multifamily Housing Projects for Identity-of-Interest or Independent Management Agents (HUD Form 9839-B).
+
+S3800-030: Statement of Condition
+During our audit of the Organization’s fiscal year ended March 31, 2021 federal award program, we noted that the Organization was charged the bookkeeping fee of $150 per month by the management company. HUD Form 9839-B allowed $100 per month as the bookkeeping fee.
+
+S3800-032: Cause
+The Organization was inadvertently charged a bookkeeping fee of $150 per month instead of $100 per month. 
+
+S3800-033: Effect or Potential Effect
+The Organization was not in compliance with the regulatory agreement requirement related to bookkeeping fees allowed to be charged by the management company.
+S3800-035: Auditor Non-Compliance Code
+Z – Other
+
+S3800-040: Questioned Costs
+$600
+
+S3800-045: Reporting Views of Responsible Officials
+The Organization agreed with auditors’ finding.
+
+S3800-050: Context
+The Organization paid $150 per month for bookkeeping services during the year ended March 31, 2021 instead of $100 allowed by HUD Form 9839-B. 
+ 
+S3800-080: Recommendation
+The management company should reimburse the Organization for $3,000, the cumulative overpaid bookkeeping fees as of March 31, 2021. The Organization should pay no more than the approved bookkeeping fee going forward. 
+
+S3800-090: Auditor’s Summary of the Auditee’s Comments on the Findings and Recommendations
+Concur
+
+S3800-130: Response Indicator
+Agree
+
+S3800-140: Completion Date
+September 30, 2021
+
+S3800-150:Response
+See Corrective Action Plan
+"|"N"

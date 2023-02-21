@@ -6,9 +6,9 @@ import traceback
 from dateutil import parser  # type: ignore
 
 from django.apps import apps
+
 from data_distro.mappings.upload_mapping import upload_mapping
 from data_distro.mappings.upload_dictonaries import boolen_fields
-
 from data_distro.management.commands.handle_errors import handle_exceptions
 
 

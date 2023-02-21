@@ -1,8 +1,8 @@
 """Functions that the public data loader uses to build relationships between models """
-from pandas import read_csv
-from data_distro import models as mods
+import traceback
 
-from data_distro.management.commands.parse_config import panda_config_base
+from data_distro import models as mods
+from data_distro.management.commands.handle_errors import handle_exceptions
 
 
 def link_objects_findings(objects_dict):
@@ -72,76 +72,68 @@ def link_objects_general(objects_dict):
     instance.save()
 
 
-def add_duns_eins(file):
+def link_duns_eins(csv_dict, payload_name):
     """
     These were their own data model but we are going to use an array field.
     This adds the fields in the right order. It should run after general.
     """
-    file_path = f"data_distro/data_to_load/{file}"
-    if "duns" in file:
-        sort_by = "DUNSEQNUM"
-        payload_name = "DUNS"
-    else:
-        sort_by = "EINSEQNUM"
-        payload_name = "EIN"
-
-    # Can't do chunks because we want to order the dataframe
-    data_frame = read_csv(file_path, **panda_config_base)
-    # This will make sure we load the lists in the right order
-    data_frame = data_frame.sort_values(by=sort_by, na_position="first")
-    csv_dict = data_frame.to_dict(orient="records")
-    expected_object_count = len(csv_dict)
-
     for row in csv_dict:
-        dbkey = row["DBKEY"]
-        audit_year = row["AUDITYEAR"]
-        payload = row[payload_name]
-        general_instance = mods.General.objects.filter(
-            dbkey=dbkey, audit_year=audit_year
-        )[0]
-        auditee_instance = general_instance.auditee
+        try:
+            dbkey = row["DBKEY"]
+            audit_year = row["AUDITYEAR"]
+            payload = row[payload_name]
+            general_instance = mods.General.objects.filter(
+                dbkey=dbkey, audit_year=audit_year
+            )[0]
+            auditee_instance = general_instance.auditee
 
-        if payload_name == "DUNS":
-            existing_list = auditee_instance.duns_list
-            if payload not in existing_list:
-                existing_list.append(int(payload))
-                auditee_instance.duns_list = existing_list
-                auditee_instance.save()
-        else:
-            existing_list = auditee_instance.ein_list
-            if payload not in existing_list:
-                existing_list.append(int(payload))
-                auditee_instance.ein_list = existing_list
-                auditee_instance.save()
+            if payload_name == "DUNS":
+                existing_list = auditee_instance.duns_list
+                if payload not in existing_list:
+                    existing_list.append(int(payload))
+                    auditee_instance.duns_list = existing_list
+                    auditee_instance.save()
+            else:
+                existing_list = auditee_instance.ein_list
+                if payload not in existing_list:
+                    existing_list.append(int(payload))
+                    auditee_instance.ein_list = existing_list
+                    auditee_instance.save()
+        except Exception:
+            handle_exceptions(
+                payload_name,
+                None,
+                row,
+                traceback.format_exc(),
+            )
 
-    return expected_object_count
 
-
-def add_agency(file_name):
+def link_agency(csv_dict, file_name):
     """
     De-duping agency and adding as relationships
     """
-    file_path = f"data_distro/data_to_load/{file_name}"
-    data_frame = read_csv(file_path, **panda_config_base)
-    csv_dict = data_frame.to_dict(orient="records")
-    expected_object_count = len(csv_dict)
-
     for row in csv_dict:
-        dbkey = row["DBKEY"]
-        audit_year = row["AUDITYEAR"]
-        agency = row["AGENCY"]
+        try:
+            dbkey = row["DBKEY"]
+            audit_year = row["AUDITYEAR"]
+            agency = row["AGENCY"]
 
-        agency_instance = mods.Agencies.objects.get_or_create(
-            agency_cfda=agency, is_public=True
-        )[0]
+            agency_instance = mods.Agencies.objects.get_or_create(
+                agency_cfda=agency, is_public=True
+            )[0]
 
-        general_instance = mods.General.objects.filter(
-            dbkey=dbkey, audit_year=audit_year
-        )[0]
-        general_instance.agency.add(agency_instance)
+            general_instance = mods.General.objects.filter(
+                dbkey=dbkey, audit_year=audit_year
+            )[0]
+            general_instance.agency.add(agency_instance)
 
-        auditee_instance = general_instance.auditee
-        auditee_instance.agency.add(agency_instance)
-        auditee_instance.save()
-
-    return expected_object_count
+            auditee_instance = general_instance.auditee
+            auditee_instance.agency.add(agency_instance)
+            auditee_instance.save()
+        except Exception:
+            handle_exceptions(
+                "agency",
+                None,
+                row,
+                traceback.format_exc(),
+            )

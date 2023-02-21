@@ -3,8 +3,12 @@ import logging
 
 from django.core.management.base import BaseCommand
 
+from data_distro.management.commands.public_data_loader import lookup_files
 from data_distro.management.commands.handle_errors import set_up_error_files
-from data_distro.management.commands.load_files import panda_config, panda_config_formatted
+from data_distro.management.commands.load_files import (
+    panda_config,
+    panda_config_formatted,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -29,21 +33,7 @@ class Command(BaseCommand):
 
         else:
             year = kwargs["year"]
-            if year is None:
-                year = ""
-
-            # Dependent objects are created first
-            load_file_names = [
-                f"findingstext_formatted{year}.txt",
-                f"findings{year}.txt",
-                f"captext_formatted{year}.txt",
-                f"cfda{year}.txt",
-                f"notes{year}.txt",
-                f"revisions{year}.txt",
-                f"passthrough{year}.txt",
-                f"gen{year}.txt",
-                f"cpas{year}.txt",
-            ]
+            load_file_names = lookup_files(year)
 
         test_panda_parsing(load_file_names)
 
@@ -67,7 +57,7 @@ def test_panda_parsing(load_file_names):
             # These do better ignoring the quote char
             config = panda_config
 
-        for i, chunk in enumerate(read_csv(file_path, **panda_config)):
+        for i, chunk in enumerate(read_csv(file_path, **config)):
             csv_dict = chunk.to_dict(orient="records")
             expected_object_count += len(csv_dict)
 

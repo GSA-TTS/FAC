@@ -7,9 +7,8 @@ from django.core.management import call_command
 from django.test import TestCase
 
 from data_distro.models import General
-from data_distro.management.commands.link_data import add_agency, add_duns_eins
 from data_distro.mappings.upload_mapping import upload_mapping
-from data_distro.management.commands.load_files import load_files
+from data_distro.management.commands.load_files import load_files, load_agency
 
 
 def delete_files(date_stamp):
@@ -33,7 +32,7 @@ class TestDataProcessing(TestCase):
 
     @classmethod
     def setUpClass(cls):
-        """Sets up data and calls both kinds of file options using the management command """
+        """Sets up data and calls both kinds of file options using the management command"""
         super(TestDataProcessing, cls).setUpClass()
         out = StringIO()
         TestDataProcessing.date_stamp1 = call_command(
@@ -49,7 +48,7 @@ class TestDataProcessing(TestCase):
             stderr=StringIO(),
             **{"file": "test_data/eins.txt"},
         )
-        add_agency("test_data/agency.txt")
+        load_agency("test_data/agency.txt")
 
     @classmethod
     def tearDownClass(cls):
@@ -140,7 +139,7 @@ class TestExceptions(TestCase):
     @classmethod
     def tearDownClass(cls):
         super(TestExceptions, cls).tearDownClass()
-        # delete_files(TestExceptions.date_stamp)
+        delete_files(TestExceptions.date_stamp)
 
     def run_with_logging(self):
         with self.assertLogs(level="WARNING") as log_check:
