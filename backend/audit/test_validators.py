@@ -26,6 +26,12 @@ from .validators import (
 jsoncopy = lambda v: json.loads(json.dumps(v))
 
 
+# use this to match the class signature expected in validate_excel_file_content_type, file.file.content_type
+class FileWrapper:
+    def __init__(self, file):
+        self.file = file
+
+
 class FederalAwardsValidatorTests(SimpleTestCase):
     """
     We want to make sure that SingleAuditChecklist.federal_awards is going
@@ -455,7 +461,9 @@ class ExcelFileValidatorTests(SimpleTestCase):
 
         for test_case in test_cases:
             with self.subTest():
-                file = TemporaryUploadedFile("file.ext", test_case, 10000, "utf-8")
+                file = FileWrapper(
+                    TemporaryUploadedFile("file.ext", test_case, 10000, "utf-8")
+                )
 
                 self.assertRaises(
                     ValidationError, validate_excel_file_content_type, file
@@ -465,6 +473,8 @@ class ExcelFileValidatorTests(SimpleTestCase):
         """Files that have allowed content types are valid"""
         for content_type in ALLOWED_EXCEL_CONTENT_TYPES:
             with self.subTest():
-                file = TemporaryUploadedFile("file.ext", content_type, 10000, "utf-8")
+                file = FileWrapper(
+                    TemporaryUploadedFile("file.ext", content_type, 10000, "utf-8")
+                )
 
                 validate_excel_file_content_type(file)
