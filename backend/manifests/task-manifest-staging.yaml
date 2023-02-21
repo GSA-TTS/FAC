@@ -17,6 +17,6 @@ applications:
   command: (python manage.py public_data_loader -y 21 && echo SUCCESS || echo TASK_FAIL) && sleep infinity
 
   # run with
-  # cf push -f manifests/task-manifest-staging.yaml
+  # cf push -f manifests/task-manifest-staging.yaml --no-route
   #
   # This is an example task, you can modify the command to run other tasks

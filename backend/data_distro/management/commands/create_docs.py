@@ -1,9 +1,11 @@
 import csv
 
-from django.apps import apps
-from django.core.management.base import BaseCommand
-
 from psycopg2 import sql
+from psycopg2._psycopg import connection
+
+from django.apps import apps
+from django.conf import settings
+from django.core.management.base import BaseCommand
 
 
 class Command(BaseCommand):
@@ -74,21 +76,34 @@ def create_csv(definations):
 
 
 def create_sql_comments(definations):
+    if settings.ENVIRONMENT not in ["DEVELOPMENT", "STAGING", "PRODUCTION"]:
+        conn_string = "dbname='postgres' user='postgres' port='5432' host='db'"
+    else:
+        conn_string = settings.CONNECTION_STRING
+
     for define_txt in definations:
         model_name = define_txt["Model name"]
         if define_txt["Description"] is not None:
-            full_defination = str(define_txt["Description"])
-            if define_txt["Data Source"] is not None:
-                full_defination = "   ".join(
-                    [
-                        full_defination,
-                        str(define_txt["Data Source"]),
-                    ]
-                )
-            table_field = "data_distro_{0}.{1}".format(
-                model_name.lower(), define_txt["Field name"]
-            )
-            # These should be safe strings, but I am going to treat them with caution anyway.
-            sql.SQL("COMMENT ON COLUMN {} is %s;").format(
-                sql.Identifier(table_field), full_defination
-            )
+            field_type = define_txt["Validation"]
+            if field_type not in ["ForeignKey", "ManyToManyField"]:
+                full_defination = str(define_txt["Description"])
+                if define_txt["Data Source"] is not None:
+                    full_defination = "   ".join(
+                        [
+                            full_defination,
+                            str(define_txt["Data Source"]),
+                        ]
+                    )
+                conn = connection(conn_string)
+                conn.autocommit = True
+                with conn.cursor() as curs:
+                    curs.execute(
+                        # These should be safe strings, but I am going to treat them with caution anyway.
+                        sql.SQL("COMMENT ON COLUMN {}.{} is %s;").format(
+                            sql.Identifier(
+                                "data_distro_{0}".format(model_name.lower())
+                            ),
+                            sql.Identifier(define_txt["Field name"]),
+                        ),
+                        (full_defination,),
+                    )

@@ -1,6 +1,7 @@
 import os
 import datetime
 import json
+import csv
 from io import StringIO
 
 from django.core.management import call_command
@@ -203,8 +204,8 @@ class TestDataMapping(TestCase):
         }
 
         current_mapping = upload_mapping
-        new_mapping_file = open("data_distro/mappings/new_upload_mapping.json")
-        new_mapping = json.load(new_mapping_file)
+        with open("data_distro/mappings/new_upload_mapping.json") as new_mapping_file:
+            new_mapping = json.load(new_mapping_file)
 
         for table in current_mapping:
             current_table_set = set(current_mapping[table])
@@ -222,7 +223,28 @@ class TestDataMapping(TestCase):
             # Missing from the current mapping, nothing should be there now
             self.assertEqual(len(missing_from_current), 0)
 
+    def test_create_docs(self):
+        out = StringIO()
+        call_command(
+            "create_docs",
+            stdout=out,
+            stderr=StringIO(),
+        )
+
+        headers = []
+        with open("data_distro/mappings/FAC_data_dict.csv", newline="") as doc_file:
+            csv_reader = csv.reader(doc_file)
+            for row in csv_reader:
+                headers = row
+                break
+
+        self.assertEqual(
+            headers,
+            ["Model name", "Field name", "Description", "Data Source", "Validation"],
+        )
+
     @classmethod
     def tearDownClass(cls):
         super(TestDataMapping, cls).tearDownClass()
         os.remove("data_distro/mappings/new_upload_mapping.json")
+        os.remove("data_distro/mappings/FAC_data_dict.csv")
