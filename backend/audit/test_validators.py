@@ -10,9 +10,11 @@ from .test_schemas import FederalAwardsSchemaValidityTest
 from .validators import (
     ALLOWED_EXCEL_CONTENT_TYPES,
     ALLOWED_EXCEL_FILE_EXTENSIONS,
+    MAX_EXCEL_FILE_SIZE_MB,
     validate_excel_file_content_type,
     validate_excel_file_extension,
     validate_excel_filename,
+    validate_excel_file_size,
     validate_federal_award_json,
     validate_uei,
     validate_uei_alphanumeric,
@@ -474,7 +476,39 @@ class ExcelFileValidatorTests(SimpleTestCase):
         for content_type in ALLOWED_EXCEL_CONTENT_TYPES:
             with self.subTest():
                 file = FileWrapper(
-                    TemporaryUploadedFile("file.ext", content_type, 10000, "utf-8")
+                    TemporaryUploadedFile("file.xlsx", content_type, 10000, "utf-8")
                 )
 
                 validate_excel_file_content_type(file)
+
+    def test_valid_file_size(self):
+        max_file_size = MAX_EXCEL_FILE_SIZE_MB * 1024 * 1024
+
+        test_cases = [
+            max_file_size / 2,
+            max_file_size,
+        ]
+
+        for test_case in test_cases:
+            with self.subTest():
+                file = TemporaryUploadedFile(
+                    "file.xlsx", b"this is a file", test_case, "utf-8"
+                )
+
+                validate_excel_file_size(file)
+
+    def test_invalid_file_size(self):
+        max_file_size = MAX_EXCEL_FILE_SIZE_MB * 1024 * 1024
+
+        test_cases = [
+            max_file_size + 1,
+            max_file_size * 2,
+        ]
+
+        for test_case in test_cases:
+            with self.subTest():
+                file = TemporaryUploadedFile(
+                    "file.xlsx", b"this is a file", test_case, "utf-8"
+                )
+
+                self.assertRaises(ValidationError, validate_excel_file_size, file)
