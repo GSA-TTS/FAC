@@ -482,6 +482,7 @@ class ExcelFileValidatorTests(SimpleTestCase):
                 validate_excel_file_content_type(file)
 
     def test_valid_file_size(self):
+        """Files that are under (or equal to) the maximum file size are valid"""
         max_file_size = MAX_EXCEL_FILE_SIZE_MB * 1024 * 1024
 
         test_cases = [
@@ -498,6 +499,7 @@ class ExcelFileValidatorTests(SimpleTestCase):
                 validate_excel_file_size(file)
 
     def test_invalid_file_size(self):
+        """Files that are over the maximum file size are invalid"""
         max_file_size = MAX_EXCEL_FILE_SIZE_MB * 1024 * 1024
 
         test_cases = [

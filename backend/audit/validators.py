@@ -158,6 +158,7 @@ def validate_excel_file_content_type(file):
 
 
 def validate_excel_file_size(file):
+    """Files must be under the maximum allowed file size"""
     max_file_size = MAX_EXCEL_FILE_SIZE_MB * 1024 * 1024
 
     if file.size > max_file_size:
