@@ -211,7 +211,7 @@ def validate_file_infection(file):
     if res.status_code not in AV_SCAN_CODES["CLEAN"]:
         logger.info(f"Scan of {file} revealed potential infection - rejecting!")
         raise ValidationError(
-            "The file you uploaded did not pass our security inspection, attachment failed!"
+            "The file you uploaded did not pass our security inspection, upload failed!"
         )
 
     logger.info(f"Scanning of file {file} complete.")
