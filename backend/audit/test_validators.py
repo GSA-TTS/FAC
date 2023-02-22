@@ -539,6 +539,7 @@ class ExcelFileInfectionValidatorTests(TestCase):
 
     @patch("requests.post")
     def test_av_service_unavailable(self, mock_post):
+        """If the AV service is unavailable, the file should not pass validation"""
         mock_post.side_effect = requests.exceptions.ConnectionError(
             "service unavailable"
         )
@@ -548,6 +549,7 @@ class ExcelFileInfectionValidatorTests(TestCase):
 
     @patch("audit.validators._scan_file")
     def test_validation_fails_on_av_service_error(self, mock_scan_file):
+        """If the AV service returns an internal error, the file should not pass validation"""
         mock_scan_file.return_value = MockHttpResponse(500, "error text")
 
         with self.assertRaises(ValidationError):
@@ -555,6 +557,7 @@ class ExcelFileInfectionValidatorTests(TestCase):
 
     @patch("audit.validators._scan_file")
     def test_validation_fails_on_non_success_response(self, mock_scan_file):
+        """If the AV service indicates that the file is infected, the file should not pass validation"""
         mock_scan_file.return_value = MockHttpResponse(406, "infected!")
 
         with self.assertRaises(ValidationError):
@@ -562,6 +565,7 @@ class ExcelFileInfectionValidatorTests(TestCase):
 
     @patch("audit.validators._scan_file")
     def test_validation_succeeds_on_success_response(self, mock_scan_file):
+        """If the AV service indicates that the file is clean, the file should pass validation"""
         mock_scan_file.return_value = MockHttpResponse(200, "clean!")
 
         try:
