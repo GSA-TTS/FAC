@@ -383,8 +383,8 @@ class ExcelFileFilenameValidatorTests(SimpleTestCase):
         test_cases = [
             "no-extension",
             ".xlsx",
-            "".join(choice(string.punctuation) for i in range(9)),
-            "".join(choice(string.punctuation) for i in range(9)) + ".xlsx",
+            "".join(choice("!?#$%^&*") for _ in range(9)),
+            "".join(choice("!?#$%^&*") for _ in range(9)) + ".xlsx",
         ]
 
         for test_case in test_cases:
