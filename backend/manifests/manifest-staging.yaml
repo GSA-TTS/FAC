@@ -10,6 +10,7 @@ applications:
     ENV: STAGING
     DJANGO_BASE_URL: https://fac-staging.app.cloud.gov
     ALLOWED_HOSTS: fac-staging.app.cloud.gov
+    AV_SCAN_URL: http://clamav-rest-staging.apps.internal:9000/scan
   routes:
   - route: fac-staging.app.cloud.gov
   instances: 1
