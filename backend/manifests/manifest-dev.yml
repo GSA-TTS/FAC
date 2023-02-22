@@ -22,3 +22,13 @@ applications:
       - fac-public-s3
       - fac-key-service
       - dev-deployer
+  - name: clamav-rest
+    instances: 1
+    memory: 2G
+    env:
+      MAX_FILE_SIZE: 25M
+      SIGNATURE_CHECKS: 1  # number of checks per day for a new database signature
+    docker:
+      image: ajilaag/clamav-rest:20230220
+    routes:
+      - route: clamav-rest-dev.apps.internal
