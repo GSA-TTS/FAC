@@ -16,6 +16,10 @@ autonumber
 Grantee -> FAC : Grantee Accesses FAC
 FAC -> LoginGov : Redirects for authentication
 LoginGov -> FAC : Redirects to FAC
+Grantee -> FAC : Fetches Submission
+DB -> FAC : Fetches previously saved structured data
+S3 -> FAC : Fetches previously saved xlsx docs
+FAC -> Grantee : Mahed previous submission available for editing
 Grantee -> FAC : Makes Submission
 FAC -> DB : Persists structured data
 FAC -> S3 : Persists xlxs documents
@@ -43,8 +47,8 @@ FAC -> S3 : Retrieves pdfs associated with audits
 FAC -> Public : Makes info available for viewing and downloading
 
 autonumber
-== Agebcy Access ==
-Agebcy -> FAC : Agebcy Accesses FAC
+== Agency Access ==
+Agency -> FAC :  Accesses FAC
 FAC -> DataGov : Redirects for authentication and authorization
 DataGov -> FAC : Redirects authorized API to FAC
 FAC -> DB : Retrieves searched audits

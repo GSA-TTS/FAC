@@ -22,6 +22,10 @@ Boundary(cloudgov, "Cloud.gov Boundary") {
 Boundary(gsaplatforms, "GSA Platforms Boundary") {
     System(Login, "Login.gov", "ID provider")
     System(datagov, "api.data.gov", "Access Provider")
+<<<<<<< HEAD
+=======
+    System(samgov, "SAM.gov", "UEI Source")
+>>>>>>> a634408 (Add SAM.gov and archive unused files)
     System(Email, "GSA Email")
 }
 
@@ -41,6 +45,10 @@ Rel(Login, backend, "Provides identities", "email address")
 Rel(datagov, backend, "Provides access", "API Tokens")
 
 Rel(backend, Email, "Sends emails using")
+<<<<<<< HEAD
+=======
+Rel(submissions, samgov, "Looks up UEI info")
+>>>>>>> a634408 (Add SAM.gov and archive unused files)
 
 Rel(backend, db, "read/write")
 Rel(backend, s3, "Stores single audit packages/Excel files")
