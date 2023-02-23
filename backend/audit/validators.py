@@ -2,10 +2,15 @@ import os
 from pathlib import Path
 import json
 import jsonschema
+import logging
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 from django.conf import settings
+import requests
 from slugify import slugify
+
+logger = logging.getLogger(__name__)
+
 
 MAX_EXCEL_FILE_SIZE_MB = 25
 
@@ -15,6 +20,13 @@ ALLOWED_EXCEL_CONTENT_TYPES = [
     "application/vnd.ms-excel",
     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
 ]
+
+# https://github.com/ajilaag/clamav-rest#status-codes
+AV_SCAN_CODES = {
+    "CLEAN": [200],
+    "INFECTED": [406],
+    "ERROR": [400, 412, 500, 501],
+}
 
 
 def validate_uei(value):
@@ -170,8 +182,44 @@ def validate_excel_file_size(file):
     return file.size
 
 
+def _scan_file(file):
+    try:
+        return requests.post(
+            settings.AV_SCAN_URL, files={"file": file}, data={"name": file.name}
+        )
+    except requests.exceptions.ConnectionError:
+        raise ValidationError(
+            "We were unable to complete a security inspection of the file, please try again or contact support for assistance."
+        )
+
+
+def validate_file_infection(file):
+    logger.info(f"Attempting to scan file: {file}.")
+
+    attempt = 1
+
+    # on large(ish) files (>10mb), the clamav-rest API sometimes times out
+    # on the first couple of attempts. We retry the scan up to our maximum
+    # in these cases
+    while (res := _scan_file(file)).status_code in AV_SCAN_CODES["ERROR"]:
+        if (attempt := attempt + 1) > settings.AV_SCAN_MAX_ATTEMPTS:
+            break
+
+        logger.info(f"Scan attempt {attempt} failed, trying again...")
+        file.seek(0)
+
+    if res.status_code not in AV_SCAN_CODES["CLEAN"]:
+        logger.info(f"Scan of {file} revealed potential infection - rejecting!")
+        raise ValidationError(
+            "The file you uploaded did not pass our security inspection, upload failed!"
+        )
+
+    logger.info(f"Scanning of file {file} complete.")
+
+
 def validate_excel_file(file):
     validate_excel_filename(file)
     validate_excel_file_extension(file)
     validate_excel_file_content_type(file)
     validate_excel_file_size(file)
+    validate_file_infection(file)

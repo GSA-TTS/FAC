@@ -1,10 +1,14 @@
 import json
 import string
+from unittest import TestCase
+from unittest.mock import patch
 from django.test import SimpleTestCase
 from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import TemporaryUploadedFile
 
 from random import choice, randrange
+
+import requests
 
 from .test_schemas import FederalAwardsSchemaValidityTest
 from .validators import (
@@ -16,6 +20,7 @@ from .validators import (
     validate_excel_filename,
     validate_excel_file_size,
     validate_federal_award_json,
+    validate_file_infection,
     validate_uei,
     validate_uei_alphanumeric,
     validate_uei_valid_chars,
@@ -342,7 +347,7 @@ class UEIValidatorTests(SimpleTestCase):
         validate_uei_nine_digit_sequences(self.valid)
 
 
-class ExcelFileValidatorTests(SimpleTestCase):
+class ExcelFileFilenameValidatorTests(SimpleTestCase):
     def test_valid_filename_slug(self):
         """
         Filenames that can be slugified are valid
@@ -378,8 +383,8 @@ class ExcelFileValidatorTests(SimpleTestCase):
         test_cases = [
             "no-extension",
             ".xlsx",
-            "".join(choice(string.punctuation) for i in range(9)),
-            "".join(choice(string.punctuation) for i in range(9)) + ".xlsx",
+            "".join(choice("!?#$%^&*") for _ in range(9)),
+            "".join(choice("!?#$%^&*") for _ in range(9)) + ".xlsx",
         ]
 
         for test_case in test_cases:
@@ -390,6 +395,8 @@ class ExcelFileValidatorTests(SimpleTestCase):
 
                 self.assertRaises(ValidationError, validate_excel_filename, file)
 
+
+class ExcelFileExtensionValidatorTests(SimpleTestCase):
     def test_invalid_file_extensions(self):
         """
         Filenames that have disallowed extensions are not valid
@@ -441,6 +448,8 @@ class ExcelFileValidatorTests(SimpleTestCase):
 
                 validate_excel_file_extension(file)
 
+
+class ExcelFileContentTypeValidatorTests(SimpleTestCase):
     def test_invalid_file_content_types(self):
         """Files that have disallowed content types are invalid"""
         test_cases = [
@@ -481,6 +490,8 @@ class ExcelFileValidatorTests(SimpleTestCase):
 
                 validate_excel_file_content_type(file)
 
+
+class ExcelFileFileSizeValidatorTests(SimpleTestCase):
     def test_valid_file_size(self):
         """Files that are under (or equal to) the maximum file size are valid"""
         max_file_size = MAX_EXCEL_FILE_SIZE_MB * 1024 * 1024
@@ -514,3 +525,50 @@ class ExcelFileValidatorTests(SimpleTestCase):
                 )
 
                 self.assertRaises(ValidationError, validate_excel_file_size, file)
+
+
+class MockHttpResponse:
+    def __init__(self, status_code, text):
+        self.status_code = status_code
+        self.text = text
+
+
+class ExcelFileInfectionValidatorTests(TestCase):
+    def setUp(self):
+        self.fake_file = TemporaryUploadedFile("file.txt", "text/plain", 10000, "utf-8")
+
+    @patch("requests.post")
+    def test_av_service_unavailable(self, mock_post):
+        """If the AV service is unavailable, the file should not pass validation"""
+        mock_post.side_effect = requests.exceptions.ConnectionError(
+            "service unavailable"
+        )
+
+        with self.assertRaises(ValidationError):
+            validate_file_infection(self.fake_file)
+
+    @patch("audit.validators._scan_file")
+    def test_validation_fails_on_av_service_error(self, mock_scan_file):
+        """If the AV service returns an internal error, the file should not pass validation"""
+        mock_scan_file.return_value = MockHttpResponse(500, "error text")
+
+        with self.assertRaises(ValidationError):
+            validate_file_infection(self.fake_file)
+
+    @patch("audit.validators._scan_file")
+    def test_validation_fails_on_non_success_response(self, mock_scan_file):
+        """If the AV service indicates that the file is infected, the file should not pass validation"""
+        mock_scan_file.return_value = MockHttpResponse(406, "infected!")
+
+        with self.assertRaises(ValidationError):
+            validate_file_infection(self.fake_file)
+
+    @patch("audit.validators._scan_file")
+    def test_validation_succeeds_on_success_response(self, mock_scan_file):
+        """If the AV service indicates that the file is clean, the file should pass validation"""
+        mock_scan_file.return_value = MockHttpResponse(200, "clean!")
+
+        try:
+            validate_file_infection(self.fake_file)
+        except ValidationError:
+            self.fail("validate_file_infection unexpectedly raised ValidationError!")

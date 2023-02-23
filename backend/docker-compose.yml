@@ -29,6 +29,7 @@ services:
       - "ENV=${ENV}"
       - "SECRET_KEY=${SECRET_KEY}"
       - "ALLOWED_HOSTS=0.0.0.0 127.0.0.1 localhost"
+      - "AV_SCAN_URL=http://clamav-rest:9000/scan"
     env_file:
       - ".env"
     ports:
@@ -37,6 +38,13 @@ services:
       - .:/src
       - /src/node_modules
       - /src/staticfiles
+  clamav-rest:
+    image: ajilaag/clamav-rest:20230220
+    environment:
+      - MAX_FILE_SIZE=25M
+      - SIGNATURE_CHECKS=1
+    ports:
+      - "9000:9000"
 
 volumes:
   postgres-data:

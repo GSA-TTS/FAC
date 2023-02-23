@@ -1,3 +1,16 @@
+module "clamav" {
+  source = "github.com/18f/terraform-cloudgov//clamav?ref=v0.2.1"
+
+  # This generates eg "fac-av-staging.apps.internal", avoiding collisions with routes for other projects and spaces
+  name           = "fac-av-${var.cf_space_name}"
+  app_name_or_id = "gsa-fac"
+
+  cf_org_name   = var.cf_org_name
+  cf_space_name = var.cf_space_name
+  clamav_image  = "ajilaag/clamav-rest:20230220"
+  max_file_size = "30M"
+}
+
 # module "database" {
 #   source = ""github.com/18f/terraform-cloudgov//database""
 
