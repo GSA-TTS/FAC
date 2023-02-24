@@ -8,6 +8,7 @@ from django.utils.translation import gettext_lazy as _
 from django.conf import settings
 import requests
 from slugify import slugify
+from openpyxl import load_workbook
 
 logger = logging.getLogger(__name__)
 
@@ -137,6 +138,8 @@ def validate_excel_filename(file):
 
     slugified = slugify(filename)
 
+    logger.info(f"Uploaded file {file.name} slugified filename: {slugified}")
+
     if len(slugified) == 0:
         raise ValidationError("Invalid filename")
 
@@ -148,6 +151,8 @@ def validate_excel_file_extension(file):
     User-provided filenames must be have an allowed extension
     """
     _, extension = os.path.splitext(file.name)
+
+    logger.info(f"Uploaded file {file.name} extension: {extension}")
 
     if not extension.lower() in ALLOWED_EXCEL_FILE_EXTENSIONS:
         raise ValidationError(
@@ -161,6 +166,8 @@ def validate_excel_file_content_type(file):
     """
     Files must have an allowed content (MIME) type
     """
+    logger.info(f"Uploaded file {file.name} content-type: {file.file.content_type}")
+
     if file.file.content_type not in ALLOWED_EXCEL_CONTENT_TYPES:
         raise ValidationError(
             f"Invalid content type - allowed types are {', '.join(ALLOWED_EXCEL_CONTENT_TYPES)}"
@@ -172,6 +179,10 @@ def validate_excel_file_content_type(file):
 def validate_excel_file_size(file):
     """Files must be under the maximum allowed file size"""
     max_file_size = MAX_EXCEL_FILE_SIZE_MB * 1024 * 1024
+
+    logger.info(
+        f"Uploaded file {file.name} size: {file.size} (max allowed: {max_file_size})"
+    )
 
     if file.size > max_file_size:
         file_size_mb = round(file.size / 1024 / 1024, 2)
@@ -217,9 +228,19 @@ def validate_file_infection(file):
     logger.info(f"Scanning of file {file} complete.")
 
 
+def validate_excel_file_integrity(file):
+    try:
+        logger.info(f"Attempting to load workbook from {file.name}")
+        load_workbook(filename=file)
+        logger.info(f"Successfully loaded workbook from {file.name}")
+    except Exception:
+        raise ValidationError("We were unable to process the file you uploaded.")
+
+
 def validate_excel_file(file):
     validate_excel_filename(file)
     validate_excel_file_extension(file)
     validate_excel_file_content_type(file)
     validate_excel_file_size(file)
     validate_file_infection(file)
+    validate_excel_file_integrity(file)
