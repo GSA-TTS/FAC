@@ -113,7 +113,7 @@ upload_mapping = {
         "DBKEY": ["CfdaInfo", "dbkey"],
         "AUDITYEAR": ["CfdaInfo", "audit_year"],
         "QCOSTS2": ["CfdaInfo", "questioned_costs"],
-        "FINDINGS": ["CfdaInfo", "findings"],
+        "FINDINGS": ["CfdaInfo", "findings_page"],
         "EIN": ["CfdaInfo", "auditor_ein"],
     },
     "findings": {
@@ -197,11 +197,15 @@ upload_mapping = {
         "DBKEY": ["Revisions", "dbkey"],
     },
     "ueis": {},
+    # Not in mapping. We handle the agency table in it's own function
     "agency": {
-        "AGENCY": ["Agencies", "agency_cfda"],
-        "EIN": ["Agencies", "ein"],
-        "DBKEY": ["Agencies", "dbkey"],
-        "AUDITYEAR": ["Agencies", "audit_year"],
+        ### ToDo: refactor Agency
+        "AGENCYCFDA": ['Agency', 'agency_cdfa'],
+        # "AGENCY": ["CfdaInfo", "agency_prior_findings"],
+        # EIN, DBKEY, and AUDITYEAT are used to make the relationship with awards data and are not uploaded
+        "EIN": ["CfdaInfo", "auditor_ein"],
+        "DBKEY": ["CfdaInfo", "dbkey"],
+        "AUDITYEAR": ["CfdaInfo", "audit_year"],
     },
     "passthrough": {
         "PASSTHROUGHNAME": ["Passthrough", "passthrough_name"],
@@ -210,6 +214,7 @@ upload_mapping = {
         "AUDITYEAR": ["Passthrough", "audit_year"],
         "DBKEY": ["Passthrough", "dbkey"],
     },
+    # Not in mapping. We handle EINS and DUNS in their own functions
     "eins": {},
     "duns": {},
 }

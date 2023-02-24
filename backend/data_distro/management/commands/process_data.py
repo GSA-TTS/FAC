@@ -2,6 +2,7 @@
 Functions that the public data loader uses to process and transform data.
 These functions look at one row of data at a time and save results.
 """
+import re
 import traceback
 from dateutil import parser  # type: ignore
 
@@ -30,16 +31,21 @@ def data_transform(field_name, payload):
     if field_name in boolen_fields:
         boolean_conversion = {"Y": True, "N": False}
         return boolean_conversion.get(payload, None)
-    if str(payload) == "nan":
+    elif str(payload) == "nan":
         return None
     # CfdaInfo
-    if field_name == "cfda":
+    elif field_name == "cfda":
         return str(payload)
     # Dates are only in the gen table
-    if "date" in field_name:
+    elif "date" in field_name:
         return parser.parse(payload)
+    elif "phone" in field_name or "fax" in field_name:
+        payload = int(re.sub("[^0-9]", "", str(payload)))
+    # Some of these were getting converted to decimals
+    elif field_name == "dbkey":
+        payload = str(int(payload))
     # These should be integers, but Pandas can think they are floats
-    if field_name == "cognizant_agency":
+    elif field_name == "cognizant_agency":
         if type(payload) is float:
             if payload.is_integer():
                 payload = str(int(payload))
@@ -86,10 +92,6 @@ def add_metadata_general(instances_dict, model_name):
         instances_dict[model_name]["is_public"] = True
         if model_name == "General":
             instances_dict[model_name]["data_source"] = "public downloads"
-        if model_name == "Auditee":
-            # easier if these exist so that we can just append when we add them, we might want to replace empty lists with nulls after all data is loaded
-            instances_dict[model_name]["duns_list"] = []
-            instances_dict[model_name]["uei_list"] = []
 
     return instances_dict
 
@@ -111,22 +113,24 @@ def transform_and_save(
         for column in columns:
             instances_dict = transform_payload(row, table, column, instances_dict)
 
-            # save each model instance
-            objects_dict = {}
+        # save each model instance
+        objects_dict = {}
 
-        for model_name in instances_dict.keys():
+        for model_name in instances_dict:
             fac_model = model_dict[model_name]
             instances_dict = add_metadata(instances_dict, model_name)
-            p, created = fac_model.objects.get_or_create(**instances_dict[model_name])
+            new_instance, _created = fac_model.objects.get_or_create(
+                **instances_dict[model_name]
+            )
 
-            objects_dict[model_name] = p
+            objects_dict[model_name] = new_instance
 
         return objects_dict
 
     except Exception:
         handle_exceptions(
-            table,
-            file_path,
+            str(table),
+            str(file_path),
             instances_dict,
             traceback.format_exc(),
         )
@@ -182,22 +186,34 @@ def transform_and_save_w_exceptions(
                     instances_dict["Auditee"]["ein_list"] = []
                 else:
                     instances_dict["Auditee"]["ein_list"] = [int(row["EIN"])]
+            elif mapping == "genUEI":
+                instances_dict.setdefault("Auditee", {})
+                if str(row["UEI"]) == "nan":
+                    instances_dict["Auditee"]["uei_list"] = []
+                else:
+                    instances_dict["Auditee"]["uei_list"] = [int(row["UEI"])]
+
+        # This will get populated by the Agency table upload
+        if table == "cfda":
+            instances_dict["CfdaInfo"]["agency_prior_findings"] = []
 
         # save each model instance
         objects_dict = {}
         for model_name in instances_dict.keys():
             instances_dict = add_metadata_general(instances_dict, model_name)
             fac_model = model_dict[model_name]
-            p, created = fac_model.objects.get_or_create(**instances_dict[model_name])
+            new_instance, _created = fac_model.objects.get_or_create(
+                **instances_dict[model_name]
+            )
 
-            objects_dict[model_name] = p
+            objects_dict[model_name] = new_instance
 
         return objects_dict
 
     except Exception:
         handle_exceptions(
-            table,
-            file_path,
+            str(table),
+            str(file_path),
             instances_dict,
             traceback.format_exc(),
         )

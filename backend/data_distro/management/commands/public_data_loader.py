@@ -20,10 +20,10 @@ from data_distro.management.commands.handle_errors import (
 def lookup_files(year):
     """Different years have different files. Dependent objects are created first."""
     all_files = [
+        f"cfda{year}.txt",
         f"findingstext_formatted{year}.txt",
         f"findings{year}.txt",
         f"captext_formatted{year}.txt",
-        f"cfda{year}.txt",
         f"notes{year}.txt",
         f"revisions{year}.txt",
         f"passthrough{year}.txt",
@@ -31,9 +31,21 @@ def lookup_files(year):
         f"cpas{year}.txt",
     ]
     files_18 = [
-        f"findings{year}.txt",
         f"cfda{year}.txt",
+        f"findings{year}.txt",
         f"passthrough{year}.txt",
+        f"gen{year}.txt",
+        f"cpas{year}.txt",
+    ]
+    files_13 = [
+        f"cfda{year}.txt",
+        f"findings{year}.txt",
+        f"gen{year}.txt",
+        f"cpas{year}.txt",
+    ]
+    # I am going to see if I can save time by doing 97-09 as one task
+    files_09 = [
+        f"cfda{year}.txt",
         f"gen{year}.txt",
         f"cpas{year}.txt",
     ]
@@ -41,8 +53,12 @@ def lookup_files(year):
     if year is None:
         year = ""
         load_file_names = all_files
-    elif int(year) <= 18:
+    elif int(year) >= 18:
         load_file_names = files_18
+    elif int(year) >= 13:
+        load_file_names = files_13
+    elif int(year) >= 9:
+        load_file_names = files_09
     else:
         load_file_names = all_files
 

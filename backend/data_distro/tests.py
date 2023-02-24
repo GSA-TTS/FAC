@@ -7,7 +7,7 @@ from io import StringIO
 from django.core.management import call_command
 from django.test import TestCase
 
-from data_distro.models import General
+from data_distro.models import General, CfdaInfo
 from data_distro.mappings.upload_mapping import upload_mapping
 from data_distro.management.commands.load_files import load_files, load_agency
 
@@ -35,6 +35,7 @@ class TestDataProcessing(TestCase):
     def setUpClass(cls):
         """Sets up data and calls both kinds of file options using the management command"""
         super(TestDataProcessing, cls).setUpClass()
+        load_files(["test_data/cfda.txt"])
         out = StringIO()
         TestDataProcessing.date_stamp1 = call_command(
             "public_data_loader",
@@ -65,7 +66,7 @@ class TestDataProcessing(TestCase):
             )
 
     def test_general(self):
-        """Confirm all objects loaded"""
+        """Confirm all gen objects loaded"""
         loaded_generals = General.objects.all()
         self.assertEqual(25, len(loaded_generals))
 
@@ -88,17 +89,18 @@ class TestDataProcessing(TestCase):
     def test_linked_auditor(self):
         """Look for expected values in linked auditor from general load"""
         test_value = General.objects.filter(dbkey=100000, audit_year=2013)[0]
-        auditor_value = test_value.auditor.all()[0]
+        auditor_value = test_value.primary_auditor
         self.assertEqual("CONES OF DUNSHIRE INC.", auditor_value.cpa_firm_name)
 
     def test_cpas(self):
         """Load and test CPA load"""
         test_value = General.objects.filter(dbkey=100000, audit_year=2014)[0]
-        cpa_values = test_value.auditor.all()
+        primary_value = test_value.primary_auditor
+        secondary_values = test_value.secondary_auditors.all()[0]
         # loaded from gen.txt
-        self.assertEqual("Unique CPA Name", cpa_values[0].cpa_firm_name)
+        self.assertEqual("Unique CPA Name", primary_value.cpa_firm_name)
         # loaded from cpas.txt
-        self.assertEqual("Paul Bunyan, CPA", cpa_values[1].cpa_firm_name)
+        self.assertEqual("Paul Bunyan, CPA", secondary_values.cpa_firm_name)
 
     def test_ein_list(self):
         """Load EIN in correct order"""
@@ -111,10 +113,13 @@ class TestDataProcessing(TestCase):
 
     def test_agency_linkage(self):
         """Load agency in correct order"""
-        test_value = General.objects.filter(dbkey=100000, audit_year=2014)[0]
-        agencies = test_value.agency
+        test_value = CfdaInfo.objects.filter(
+            dbkey=100000, audit_year=2014, auditor_ein=8675309
+        )[0]
+        agency_prior_findings = test_value.agency_prior_findings
         self.assertEqual(
-            [10, 77, 2], list(agencies.values_list("agency_cfda", flat=True))
+            [2, 77, 10],
+            agency_prior_findings,
         )
 
 
@@ -160,7 +165,8 @@ class TestExceptions(TestCase):
         )
         results = return_json(result_file)
 
-        expected_objects_dict = {"test_data/findings.txt": 4}
+        # bad lines won't be included in the expected objects count
+        expected_objects_dict = {"test_data/findings.txt": 5}
         self.assertEqual(results["expected_objects_dict"], expected_objects_dict)
 
     def test_error_logs(self):
@@ -203,6 +209,8 @@ class TestDataMapping(TestCase):
             "gen": {"CPAEIN", "EIN"},
         }
 
+        known_discrepencies_in_current= {}
+
         current_mapping = upload_mapping
         with open("data_distro/mappings/new_upload_mapping.json") as new_mapping_file:
             new_mapping = json.load(new_mapping_file)
@@ -220,8 +228,9 @@ class TestDataMapping(TestCase):
                     set(known_discrepencies_in_new[table]), missing_from_new
                 )
 
-            # Missing from the current mapping, nothing should be there now
-            self.assertEqual(len(missing_from_current), 0)
+            # Missing from the current mapping
+            if len(missing_from_current)> 0:
+                self.assertEqual(known_discrepencies_in_current[table], missing_from_current)
 
     def test_create_docs(self):
         out = StringIO()

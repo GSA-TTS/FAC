@@ -8,15 +8,31 @@ from data_distro.management.commands.handle_errors import handle_exceptions
 def link_objects_findings(objects_dict):
     """Adds relationships between finding and finding text"""
     if objects_dict is not None and "Findings" in objects_dict:
-        instance = objects_dict["Findings"]
-        dbkey = instance.dbkey
-        audit_year = instance.audit_year
+        findings_instance = objects_dict["Findings"]
+        finding_ref_nums = findings_instance.finding_ref_nums
+        dbkey = str(findings_instance.dbkey)
+        audit_year = findings_instance.audit_year
+
+        # findings text to finding
         findings_text = mods.FindingsText.objects.filter(
-            dbkey=dbkey, audit_year=audit_year
+            finding_ref_nums=finding_ref_nums
         )
         for finding_text in findings_text:
-            instance.findings_text = finding_text
-            instance.save()
+            findings_instance.findings_text = finding_text
+            findings_instance.save()
+
+        # finding to award
+        awards_instance = mods.CfdaInfo.objects.filter(
+            dbkey=dbkey,
+            audit_year=audit_year,
+        )
+
+        # If there is no award I want it to skip
+        for award in awards_instance:
+            awards_instance.findings.add(findings_instance)
+            awards_instance.save()
+
+        # finding to general is taken care of in general processing
 
 
 def link_objects_cpas(objects_dict, row):
@@ -25,7 +41,7 @@ def link_objects_cpas(objects_dict, row):
     dbkey = row["DBKEY"]
     audit_year = row["AUDITYEAR"]
     gen_instance = mods.General.objects.filter(dbkey=dbkey, audit_year=audit_year)[0]
-    gen_instance.auditor.add(auditor_instance)
+    gen_instance.secondary_auditors.add(auditor_instance)
     gen_instance.save()
 
 
@@ -42,8 +58,8 @@ def link_objects_general(objects_dict):
     instance.auditee = auditee
 
     # There can be multiple but only one from the gen form, cpas run next
-    auditors = mods.Auditor.objects.filter(id=objects_dict["Auditor"].id)
-    instance.auditor.set(auditors)
+    auditor = mods.Auditor.objects.get(id=objects_dict["Auditor"].id)
+    instance.primary_auditor = auditor
 
     cfdas = mods.CfdaInfo.objects.filter(dbkey=dbkey, audit_year=audit_year)
     for cfda in cfdas:
@@ -101,39 +117,40 @@ def link_duns_eins(csv_dict, payload_name):
                     auditee_instance.save()
         except Exception:
             handle_exceptions(
-                payload_name,
+                str(payload_name),
                 None,
-                row,
+                str(row),
                 traceback.format_exc(),
             )
 
 
 def link_agency(csv_dict, file_name):
     """
-    De-duping agency and adding as relationships
+    The agency table
     """
     for row in csv_dict:
         try:
             dbkey = row["DBKEY"]
             audit_year = row["AUDITYEAR"]
             agency = row["AGENCY"]
+            ein = row["EIN"]
+            award_instance = mods.CfdaInfo.objects.get(
+                dbkey=dbkey,
+                audit_year=audit_year,
+                auditor_ein=ein,
+            )
+            agency_list = award_instance.agency_prior_findings
 
-            agency_instance = mods.Agencies.objects.get_or_create(
-                agency_cfda=agency, is_public=True
-            )[0]
+            # 00 had been representing none, we can just use an empty list instead
+            if agency not in agency_list and agency != "00":
+                agency_list.append(agency)
+                award_instance.agency_prior_findings = agency_list
+                award_instance.save()
 
-            general_instance = mods.General.objects.filter(
-                dbkey=dbkey, audit_year=audit_year
-            )[0]
-            general_instance.agency.add(agency_instance)
-
-            auditee_instance = general_instance.auditee
-            auditee_instance.agency.add(agency_instance)
-            auditee_instance.save()
         except Exception:
             handle_exceptions(
                 "agency",
                 None,
-                row,
+                str(row),
                 traceback.format_exc(),
             )

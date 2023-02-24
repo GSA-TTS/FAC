@@ -40,6 +40,20 @@ def load_generic(
         link_objects_findings(objects_dict)
 
 
+def load_cfda(
+    row,
+    csv_dict,
+    table,
+    file_path,
+):
+    transform_and_save_w_exceptions(
+        row,
+        csv_dict,
+        table,
+        file_path,
+    )
+
+
 def load_cpas(
     row,
     csv_dict,
@@ -107,7 +121,7 @@ def load_files(load_file_names):
 
             # Just to speed things up check things per table and not per row or element
             logger.warning(f"------------Table: {table}--------------")
-            if table not in ["gen", "general", "cpas"]:
+            if table not in ["gen", "general", "cpas", "cfda"]:
                 for row in csv_dict:
                     load_generic(
                         row,
@@ -118,6 +132,14 @@ def load_files(load_file_names):
             elif table == "cpas":
                 for row in csv_dict:
                     load_cpas(
+                        row,
+                        csv_dict,
+                        table,
+                        file_path,
+                    )
+            elif table == "cfda":
+                for row in csv_dict:
+                    load_cfda(
                         row,
                         csv_dict,
                         table,
