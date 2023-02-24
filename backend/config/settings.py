@@ -47,11 +47,18 @@ LOGGING = {
         "require_debug_false": {"()": "django.utils.log.RequireDebugFalse"},
         "require_debug_true": {"()": "django.utils.log.RequireDebugTrue"},
     },
-    "formatters": {"json": {"()": "pythonjsonlogger.jsonlogger.JsonFormatter"}},
+    "formatters": {
+        "json": {"()": "pythonjsonlogger.jsonlogger.JsonFormatter"},
+        "simple": {
+            "format": "{levelname} {message}",
+            "style": "{",
+        },
+    },
     "handlers": {
         "local_debug_logger": {
             "level": "DEBUG",
             "filters": ["require_debug_true"],
+            "formatter": "simple",
             "class": "logging.StreamHandler",
         },
         "prod_logger": {
@@ -61,7 +68,13 @@ LOGGING = {
             "class": "logging.StreamHandler",
         },
     },
-    "loggers": {"django": {"handlers": ["local_debug_logger", "prod_logger"]}},
+    "root": {
+        "handlers": ["local_debug_logger", "prod_logger"],
+        "level": "DEBUG",
+    },
+    "loggers": {
+        "django": {"handlers": ["local_debug_logger", "prod_logger"]},
+    },
 }
 
 # Django application definition

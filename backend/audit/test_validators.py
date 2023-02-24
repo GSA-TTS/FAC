@@ -5,8 +5,9 @@ from unittest.mock import patch
 from django.test import SimpleTestCase
 from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import TemporaryUploadedFile
-
 from random import choice, randrange
+from openpyxl import Workbook
+from tempfile import NamedTemporaryFile
 
 import requests
 
@@ -17,6 +18,7 @@ from .validators import (
     MAX_EXCEL_FILE_SIZE_MB,
     validate_excel_file_content_type,
     validate_excel_file_extension,
+    validate_excel_file_integrity,
     validate_excel_filename,
     validate_excel_file_size,
     validate_federal_award_json,
@@ -37,6 +39,7 @@ jsoncopy = lambda v: json.loads(json.dumps(v))
 class FileWrapper:
     def __init__(self, file):
         self.file = file
+        self.name = file.name
 
 
 class FederalAwardsValidatorTests(SimpleTestCase):
@@ -572,3 +575,22 @@ class ExcelFileInfectionValidatorTests(TestCase):
             validate_file_infection(self.fake_file)
         except ValidationError:
             self.fail("validate_file_infection unexpectedly raised ValidationError!")
+
+
+class ExcelFileIntegrityValidatorTests(TestCase):
+    def test_broken_excel_file(self):
+        """XLS/X files that are not readable by openpyxl are invalid"""
+        file = TemporaryUploadedFile(
+            "file.xlsx", b"this is not really an excel file", 10000, "utf-8"
+        )
+
+        self.assertRaises(ValidationError, validate_excel_file_integrity, file)
+
+    def test_valid_excel_file(self):
+        """XLS/X files that are readable by openpyxl are valid"""
+        wb = Workbook()
+        with NamedTemporaryFile() as file:
+            wb.save(file.name)
+            file.seek(0)
+
+            validate_excel_file_integrity(file)
