@@ -205,6 +205,7 @@ def _scan_file(file):
 
 
 def validate_file_infection(file):
+    """Files must pass an AV scan"""
     logger.info(f"Attempting to scan file: {file}.")
 
     attempt = 1
@@ -229,6 +230,7 @@ def validate_file_infection(file):
 
 
 def validate_excel_file_integrity(file):
+    """Files must be readable by openpyxl"""
     try:
         logger.info(f"Attempting to load workbook from {file.name}")
         load_workbook(filename=file)
