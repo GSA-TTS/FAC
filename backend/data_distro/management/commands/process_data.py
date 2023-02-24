@@ -195,7 +195,7 @@ def transform_and_save_w_exceptions(
 
         # This will get populated by the Agency table upload
         if table == "cfda":
-            instances_dict["CfdaInfo"]["agency_prior_findings"] = []
+            instances_dict["CfdaInfo"]["agency_prior_findings_list"] = []
 
         # save each model instance
         objects_dict = {}

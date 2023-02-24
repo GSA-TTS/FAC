@@ -111,15 +111,17 @@ class TestDataProcessing(TestCase):
             [730776899, 8675309, 8675310, 8675311], list(test_agency.ein_list)
         )
 
+    # test uei
+
     def test_agency_linkage(self):
         """Load agency in correct order"""
         test_value = CfdaInfo.objects.filter(
-            dbkey=100000, audit_year=2014, auditor_ein=8675309
+            dbkey=100000, audit_year=2014, cpa_ein=8675309
         )[0]
-        agency_prior_findings = test_value.agency_prior_findings
+        agency_prior_findings_list = test_value.agency_prior_findings_list
         self.assertEqual(
             [2, 77, 10],
-            agency_prior_findings,
+            agency_prior_findings_list,
         )
 
 
@@ -172,7 +174,7 @@ class TestExceptions(TestCase):
     def test_error_logs(self):
         error_file = f"data_distro/data_to_load/run_logs/Errors_{self.date_stamp}.json"
         results = return_json(error_file)
-        db_error = results[0]["findings"]["Findings"]["elec_audits_id"]
+        db_error = results[0]["findings"]["Findings"]["audit_id"]
         self.assertEqual(db_error, 14012297)
 
     def test_exception_logs(self):
@@ -209,7 +211,7 @@ class TestDataMapping(TestCase):
             "gen": {"CPAEIN", "EIN"},
         }
 
-        known_discrepencies_in_current= {}
+        known_discrepencies_in_current = {}
 
         current_mapping = upload_mapping
         with open("data_distro/mappings/new_upload_mapping.json") as new_mapping_file:
@@ -229,8 +231,10 @@ class TestDataMapping(TestCase):
                 )
 
             # Missing from the current mapping
-            if len(missing_from_current)> 0:
-                self.assertEqual(known_discrepencies_in_current[table], missing_from_current)
+            if len(missing_from_current) > 0:
+                self.assertEqual(
+                    known_discrepencies_in_current[table], missing_from_current
+                )
 
     def test_create_docs(self):
         out = StringIO()

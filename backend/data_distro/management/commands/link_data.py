@@ -9,16 +9,16 @@ def link_objects_findings(objects_dict):
     """Adds relationships between finding and finding text"""
     if objects_dict is not None and "Findings" in objects_dict:
         findings_instance = objects_dict["Findings"]
-        finding_ref_nums = findings_instance.finding_ref_nums
+        finding_ref_nums = findings_instance.finding_ref_number
         dbkey = str(findings_instance.dbkey)
         audit_year = findings_instance.audit_year
 
         # findings text to finding
         findings_text = mods.FindingsText.objects.filter(
-            finding_ref_nums=finding_ref_nums
+            finding_ref_number=finding_ref_nums
         )
         for finding_text in findings_text:
-            findings_instance.findings_text = finding_text
+            findings_instance.findings_text.add(finding_text)
             findings_instance.save()
 
         # finding to award
@@ -137,14 +137,14 @@ def link_agency(csv_dict, file_name):
             award_instance = mods.CfdaInfo.objects.get(
                 dbkey=dbkey,
                 audit_year=audit_year,
-                auditor_ein=ein,
+                cpa_ein=ein,
             )
-            agency_list = award_instance.agency_prior_findings
+            agency_list = award_instance.agency_prior_findings_list
 
             # 00 had been representing none, we can just use an empty list instead
             if agency not in agency_list and agency != "00":
                 agency_list.append(agency)
-                award_instance.agency_prior_findings = agency_list
+                award_instance.agency_prior_findings_list = agency_list
                 award_instance.save()
 
         except Exception:

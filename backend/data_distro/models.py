@@ -1,13 +1,21 @@
 from django.db import models
 from django.contrib.postgres.fields import ArrayField
 
-from data_distro import docs  # noqa
+from data_distro import docs
 
 
-# not in use at the moment
+# Will refactor
 class Agencies(models.Model):
+    # can we separate extensions?
+    agency_aln = models.CharField(
+        "Assistance Listing Number (ALN), a 2-digit prefix of Federal Agency",
+        null=True,
+        max_length=40,
+    )
     agency_cfda = models.IntegerField(
-        "2-digit prefix of Federal Agency requiring copy of audit report",
+        "Catalog of Federal Domestic Assistance (CFDA) code, a 2-digit prefix of Federal Agency requiring copy of audit.",
+        null=True,
+        # need to update docs
         help_text=docs.agency_cfda,
     )
     agency_name = models.CharField(
@@ -15,7 +23,12 @@ class Agencies(models.Model):
         null=True,
         max_length=125,
     )
-    # federal_program_name
+    federal_program_name = models.CharField(
+        "Name of Federal Program",
+        max_length=300,
+        null=True,
+        help_text=docs.federal_program_name,
+    )
     is_public = models.BooleanField(
         "True for public records, False for non-public records"
     )
@@ -157,6 +170,7 @@ class Auditor(models.Model):
     cpa_firm_name = models.CharField(
         "CPA Firm Name", max_length=64, help_text=docs.cpa_firm_name
     )
+    # Once loaded, would like to add these as regular addresses and just change this to a country field
     cpa_foreign = models.CharField(
         "CPA Address - if international",
         max_length=200,
@@ -168,8 +182,8 @@ class Auditor(models.Model):
         null=True,
         help_text=docs.auditor_ein,
     )
-    seqnum = models.IntegerField(
-        "Order that Auditors were reported on page 5 of SF-SAC",
+    seqence_number = models.IntegerField(
+        "Order that Auditors were reported on page 5 of SF-SAC (only for secondary_auditors)",
         null=True,
         help_text=docs.seqnum,
     )
@@ -183,13 +197,13 @@ class FindingsText(models.Model):
         null=True,
         help_text=docs.charts_tables_findingstext,
     )
-    finding_ref_nums = models.CharField(
+    finding_ref_number = models.CharField(
         "Audit Finding Reference Number",
         max_length=100,
         null=True,
         help_text=docs.finding_ref_nums_findingstext,
     )
-    seq_number = models.IntegerField(
+    seqence_number = models.IntegerField(
         "Order that the findings text was reported",
         null=True,
         help_text=docs.seq_number_findingstext,
@@ -215,8 +229,27 @@ class FindingsText(models.Model):
 
 
 class Findings(models.Model):
-    # check that this isn't many to many
-    findings_text = models.ForeignKey(FindingsText, on_delete=models.CASCADE, null=True)
+    # update linkage
+    findings_text = models.ManyToManyField(FindingsText)
+    finding_ref_number = models.CharField(
+        "Findings Reference Numbers",
+        max_length=100,
+        help_text=docs.finding_ref_nums_findings,
+    )
+    audit_id = models.IntegerField(
+        "FAC system generated sequence number used to link to Findings data between CFDA Info and Findings",
+        help_text=docs.elec_audits_id_findings,
+    )
+    audit_findings_id = models.IntegerField(
+        "FAC system generated sequence number for finding",
+        help_text=docs.elec_audit_findings_id,
+    )
+    prior_finding_ref_numbers = models.CharField(
+        "Audit finding reference numbers from the immediate prior audit",
+        max_length=100,
+        help_text=docs.prior_finding_ref_nums,
+        null=True,
+    )
     modified_opinion = models.BooleanField(
         "Modified Opinion finding", null=True, help_text=docs.modified_opinion
     )
@@ -244,30 +277,11 @@ class Findings(models.Model):
         null=True,
         help_text=docs.repeat_finding,
     )
-    finding_ref_nums = models.CharField(
-        "Findings Reference Numbers",
-        max_length=100,
-        help_text=docs.finding_ref_nums_findings,
-    )
-    prior_finding_ref_nums = models.CharField(
-        "Audit finding reference numbers from the immediate prior audit",
-        max_length=100,
-        help_text=docs.prior_finding_ref_nums,
-        null=True,
-    )
     type_requirement = models.CharField(
         "Type Requirement Failure",
         max_length=40,
         null=True,
         help_text=docs.type_requirement_findings,
-    )
-    elec_audits_id = models.IntegerField(
-        "FAC system generated sequence number used to link to Findings data between CFDA Info and Findings",
-        help_text=docs.elec_audits_id_findings,
-    )
-    elec_audit_findings_id = models.IntegerField(
-        "FAC system generated sequence number for finding",
-        help_text=docs.elec_audit_findings_id,
     )
     audit_year = models.CharField(
         "Audit Year and DBKEY (database key) combined make up the primary key.",
@@ -284,10 +298,21 @@ class Findings(models.Model):
     )
 
 
-# Rename FederalAwards
+# Rename FederalAward
 class CfdaInfo(models.Model):
     findings = models.ManyToManyField(Findings)
-    agency_prior_findings = ArrayField(
+    audit_id = models.IntegerField(
+        "FAC system generated sequence number used to link to Findings data between CFDA Info and Findings",
+        help_text=docs.elec_audits_id_cfdainfo,
+    )
+    # this would be better as a list
+    finding_ref_numbers = models.CharField(
+        "Findings Reference Numbers",
+        max_length=100,
+        null=True,
+        help_text=docs.finding_ref_nums_cfdainfo,
+    )
+    agency_prior_findings_list = ArrayField(
         models.IntegerField(
             "Federal Agencies with Current or Prior Year Audit Findings on Direct Awards. An empty list means None.",
             null=True,
@@ -302,15 +327,28 @@ class CfdaInfo(models.Model):
         null=True,
         help_text=docs.federal_program_name,
     )
-    cfda_program_name = models.CharField(
+    agency_name = models.CharField(
         "Name of Federal Program (auto-generated by FAC from the CFDA catalog)",
         max_length=300,
         null=True,
         help_text=docs.cfda_program_name,
     )
     # can have letters
-    cfda = models.CharField(
+    agency_cfda = models.CharField(
         "Federal Agency Prefix and Extension", max_length=52, help_text=docs.cfda
+    )
+    award_identification = models.CharField(
+        "Other data used to identify the award which is not a CFDA number (e.g., program year, contract number)",
+        max_length=50,
+        null=True,
+        help_text=docs.award_identification,
+    )
+
+    # this is redundant, we could remove in the future
+    cpa_ein = models.IntegerField(
+        "Primary Employer Identification Number",
+        null=True,
+        help_text=docs.auditor_ein,
     )
     research_and_development = models.BooleanField(
         "Indicate whether or not the program is a Research and Development program",
@@ -342,13 +380,6 @@ class CfdaInfo(models.Model):
         null=True,
         help_text=docs.major_program,
     )
-    # this would be better as a list
-    finding_ref_nums = models.CharField(
-        "Findings Reference Numbers",
-        max_length=100,
-        null=True,
-        help_text=docs.finding_ref_nums_cfdainfo,
-    )
     amount = models.BigIntegerField(
         "Amount Expended for the Federal Program", help_text=docs.amount
     )
@@ -372,12 +403,6 @@ class CfdaInfo(models.Model):
         max_length=40,
         null=True,
         help_text=docs.loan_balance,
-    )
-    award_identification = models.CharField(
-        "Other data used to identify the award which is not a CFDA number (e.g., program year, contract number)",
-        max_length=50,
-        null=True,
-        help_text=docs.award_identification,
     )
     cluster_name = models.CharField(
         "The name of the cluster",
@@ -417,10 +442,14 @@ class CfdaInfo(models.Model):
         null=True,
         help_text=docs.findings_count,
     )
-    elec_audits_id = models.IntegerField(
-        "FAC system generated sequence number used to link to Findings data between CFDA Info and Findings",
-        help_text=docs.elec_audits_id_cfdainfo,
+    questioned_costs = models.CharField(
+        "Dollar amount of questioned costs (Deprecated since 2002)",
+        null=True,
+        max_length=40,
+        help_text=docs.questioned_costs_CfdaInfo,
     )
+
+    # metadata
     dbkey = models.CharField(
         "Audit Year and DBKEY (database key) combined make up the primary key.",
         max_length=40,
@@ -431,19 +460,6 @@ class CfdaInfo(models.Model):
         max_length=40,
         help_text=docs.audit_year_cfdainfo,
     )
-    # this is redundant, we could remove in the future
-    #  rename cpa_ein to match
-    auditor_ein = models.IntegerField(
-        "Primary Employer Identification Number",
-        null=True,
-        help_text=docs.auditor_ein,
-    )
-    questioned_costs = models.CharField(
-        "Dollar amount of questioned costs (Deprecated since 2002)",
-        null=True,
-        max_length=40,
-        help_text=docs.questioned_costs_CfdaInfo,
-    )
     is_public = models.BooleanField(
         "True for public records, False for non-public records"
     )
@@ -452,18 +468,18 @@ class CfdaInfo(models.Model):
 class CapText(models.Model):
     """Corrective action plan text"""
 
+    finding_ref_number = models.CharField(
+        "Audit Finding Reference Number",
+        max_length=100,
+        help_text=docs.finding_ref_nums_captext,
+    )
     charts_tables = models.BooleanField(
         "Indicates whether or not the text contained charts or tables that could not be entered due to formatting restrictions",
         max_length=1,
         null=True,
         help_text=docs.charts_tables_captext,
     )
-    finding_ref_nums = models.CharField(
-        "Audit Finding Reference Number",
-        max_length=100,
-        help_text=docs.finding_ref_nums_captext,
-    )
-    seq_number = models.IntegerField(
+    sequence_number = models.IntegerField(
         "Order that the CAP text was reported", help_text=docs.seq_number_captext
     )
     text = models.TextField(
@@ -493,7 +509,7 @@ class Notes(models.Model):
         "Internal Audit Report Id", help_text=docs.report_id
     )
     version = models.IntegerField("Internal Version", help_text=docs.version)
-    seq_number = models.IntegerField(
+    sequence_number = models.IntegerField(
         "Order that the Note was reported", help_text=docs.seq_number_notes
     )
     note_index = models.IntegerField(
@@ -529,8 +545,7 @@ class Revisions(models.Model):
         null=True,
         help_text=docs.findings_revisions,
     )
-    # rename revision_id
-    elec_report_revision_id = models.IntegerField(
+    revision_id = models.IntegerField(
         "Internal Unique Identifier for the record",
         null=True,
         help_text=docs.elec_report_revision_id,
@@ -553,11 +568,11 @@ class Revisions(models.Model):
         help_text=docs.federal_awards_explain,
     )
     notes_to_sefa_explain = models.TextField(
-        "Explanation of what items on the Notes to SEFA page were edited during the revision",
+        "Explanation of what items on the Notes to Schedule of Expenditures of Federal Awards (SEFA) page were edited during the revision",
         null=True,
         help_text=docs.notes_to_sefa_explain,
     )
-    auditinfo_explain = models.TextField(
+    audit_info_explain = models.TextField(
         "Explanation of what items on the Audit Info page were edited during the revision",
         null=True,
         help_text=docs.auditinfo_explain,
@@ -589,7 +604,7 @@ class Revisions(models.Model):
         help_text=docs.audit_info,
     )
     notes_to_sefa = models.CharField(
-        "Indicates what items on the Notes to SEFA page were edited during the revision",
+        "Indicates what items on the Notes to Schedule of Expenditures of Federal Awards (SEFA) page were edited during the revision",
         max_length=50,
         null=True,
         help_text=docs.notes_to_sefa,
@@ -640,14 +655,14 @@ class Passthrough(models.Model):
         null=True,
         help_text=docs.passthrough_name,
     )
-    # This doesn't seem like it should be null
+    # This doesn't seem like it should be null but it is sometimes
     passthrough_id = models.CharField(
         "Identifying Number Assigned by the Pass-through Entity",
         max_length=70,
         null=True,
         help_text=docs.passthrough_id,
     )
-    elec_audits_id = models.IntegerField(
+    audit_id = models.IntegerField(
         "FAC system generated sequence number used to link to Passthrough data between CFDA Info and Passthrough",
         help_text=docs.elec_audits_id_passthrough,
     )
@@ -716,8 +731,7 @@ class General(models.Model):
     cpa_date_signed = models.DateField(
         "Date of CPA signature", null=True, help_text=docs.cpa_date_signed
     )
-    # rename date_published
-    date_firewall = models.DateField(
+    date_published = models.DateField(
         "The date the audit information was made available on the dissemination site",
         null=True,
         help_text=docs.date_firewall,
@@ -748,11 +762,11 @@ class General(models.Model):
         help_text=docs.previous_completed_on,
     )
     # This may all be nulls and we can get rid of it
-    previous_date_firewall = models.DateField(
+    previous_date_published = models.DateField(
         null=True,
         help_text=docs.previous_date_firewall,
     )
-    completed_on = models.DateField(
+    completed_date = models.DateField(
         "Date the Audit was Posted to the Internet as Complete",
         null=True,
         help_text=docs.completed_on,
@@ -832,7 +846,7 @@ class General(models.Model):
         help_text=docs.material_weakness_general,
     )
     material_weakness_major_program = models.BooleanField(
-        "Indicate whether any reportable condition/signficant deficiency was disclosed as a material weakness for a major program in the Schedule of Findings and Questioned Costs",
+        "Indicate whether any reportable condition/significant deficiency was disclosed as a material weakness for a major program in the Schedule of Findings and Questioned Costs",
         null=True,
         help_text=docs.material_weakness_major_program,
     )
@@ -860,13 +874,13 @@ class General(models.Model):
         null=True,
         help_text=docs.report_required,
     )
-    sp_framework = models.CharField(
+    special_framework = models.CharField(
         "Special Purpose Framework that was used as the basis of accounting",
         max_length=40,
         null=True,
         help_text=docs.sp_framework,
     )
-    sp_framework_required = models.BooleanField(
+    special_framework_required = models.BooleanField(
         "Indicate whether or not the special purpose framework used as basis of accounting by state law or tribal law",
         null=True,
         help_text=docs.sp_framework_required,
