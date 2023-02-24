@@ -5,7 +5,9 @@ from data_distro import docs
 
 
 # Will refactor
-class Agencies(models.Model):
+class Agency(models.Model):
+    """Information about the Agency requiring a copy of the audit"""
+
     # can we separate extensions?
     agency_aln = models.CharField(
         "Assistance Listing Number (ALN), a 2-digit prefix of Federal Agency",
@@ -35,7 +37,8 @@ class Agencies(models.Model):
 
 
 class Auditee(models.Model):
-    agency = models.ManyToManyField(Agencies)
+    """Information about the entity undergoing the audit"""
+
     auditee_certify_name = models.CharField(
         "Name of Auditee Certifying Official",
         max_length=50,
@@ -120,6 +123,8 @@ class Auditee(models.Model):
 
 
 class Auditor(models.Model):
+    """Information about the Auditing CPA firm conducting the audit"""
+
     cpa_phone = models.PositiveBigIntegerField(
         "CPA phone number", null=True, help_text=docs.cpa_phone
     )
@@ -190,7 +195,9 @@ class Auditor(models.Model):
     is_public = models.BooleanField("True if appears in a public record")
 
 
-class FindingsText(models.Model):
+class FindingText(models.Model):
+    """Specific findings details"""
+
     charts_tables = models.BooleanField(
         "Indicates whether or not the text contained charts or tables that could not be entered due to formatting restrictions",
         max_length=1,
@@ -228,9 +235,10 @@ class FindingsText(models.Model):
     )
 
 
-class Findings(models.Model):
-    # update linkage
-    findings_text = models.ManyToManyField(FindingsText)
+class Finding(models.Model):
+    """A finding from the audit"""
+
+    findings_text = models.ManyToManyField(FindingText)
     finding_ref_number = models.CharField(
         "Findings Reference Numbers",
         max_length=100,
@@ -298,9 +306,10 @@ class Findings(models.Model):
     )
 
 
-# Rename FederalAward
-class CfdaInfo(models.Model):
-    findings = models.ManyToManyField(Findings)
+class FederalAward(models.Model):
+    """Information about the federal award section of the form"""
+
+    findings = models.ManyToManyField(Finding)
     audit_id = models.IntegerField(
         "FAC system generated sequence number used to link to Findings data between CFDA Info and Findings",
         help_text=docs.elec_audits_id_cfdainfo,
@@ -343,8 +352,7 @@ class CfdaInfo(models.Model):
         null=True,
         help_text=docs.award_identification,
     )
-
-    # this is redundant, we could remove in the future
+    # this is redundant, we could remove in the future, keeping for now so relationships can be verified
     cpa_ein = models.IntegerField(
         "Primary Employer Identification Number",
         null=True,
@@ -446,7 +454,7 @@ class CfdaInfo(models.Model):
         "Dollar amount of questioned costs (Deprecated since 2002)",
         null=True,
         max_length=40,
-        help_text=docs.questioned_costs_CfdaInfo,
+        help_text=docs.questioned_costs_FederalAward,
     )
 
     # metadata
@@ -500,7 +508,9 @@ class CapText(models.Model):
     )
 
 
-class Notes(models.Model):
+class Note(models.Model):
+    """Note to Schedule of Expenditures of Federal Awards (SEFA)"""
+
     type_id = models.CharField("Note Type", max_length=1, help_text=docs.type_id)
     fac_id = models.IntegerField(
         "Internal Unique Identifier for the record", help_text=docs.fac_id
@@ -536,8 +546,8 @@ class Notes(models.Model):
     )
 
 
-class Revisions(models.Model):
-    """What was revised on a record"""
+class Revision(models.Model):
+    """Documents what was revised on the associated form from the previous version"""
 
     findings = models.CharField(
         "Indicates what items on the Findings page were edited during the revision",
@@ -649,6 +659,8 @@ class Revisions(models.Model):
 
 
 class Passthrough(models.Model):
+    """The pass-through entity information, when it is not a direct federal award"""
+
     passthrough_name = models.CharField(
         "Name of Pass-through Entity",
         max_length=150,
@@ -697,13 +709,14 @@ class General(models.Model):
         Auditor,
         related_name="secondary_auditor",
     )
-    cfda = models.ForeignKey(CfdaInfo, on_delete=models.CASCADE, null=True)
-    findings = models.ManyToManyField(Findings)
-    findings_text = models.ManyToManyField(FindingsText)
-    cap_text = models.ForeignKey(CapText, on_delete=models.CASCADE, null=True)
-    notes = models.ForeignKey(Notes, on_delete=models.CASCADE, null=True)
-    revisions = models.ForeignKey(Revisions, on_delete=models.CASCADE, null=True)
-    passthrough = models.ForeignKey(Passthrough, on_delete=models.CASCADE, null=True)
+    federal_awards = models.ManyToManyField(FederalAward)
+    findings = models.ManyToManyField(Finding)
+    findings_text = models.ManyToManyField(FindingText)
+    cap_text = models.ManyToManyField(CapText)
+    notes = models.ManyToManyField(Note)
+    passthrough = models.ManyToManyField(Passthrough)
+    # We only have the most recent, so we only have one revision
+    revision = models.ForeignKey(Revision, on_delete=models.CASCADE, null=True)
 
     # Agency
     cognizant_agency = models.CharField(

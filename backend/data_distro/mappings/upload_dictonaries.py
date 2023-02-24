@@ -33,7 +33,7 @@ file_to_table_name_mapping = {
 }
 
 # Boolean fields
-boolen_fields = [
+boolean_fields = [
     "arra",
     "direct",
     "loans",

@@ -19,17 +19,28 @@ def set_up_error_files():
         file.close()
 
 
-def finish_error_files(date_stamp):
+def make_option_string(**kwargs):
+    if kwargs["file"] is not None:
+        options = kwargs["file"][:-4].replace("/", "_")
+    elif kwargs["year"] is not None:
+        options = kwargs["year"]
+    else:
+        options = "all"
+    return options
+
+
+def finish_error_files(date_stamp, options):
     """Rename with date stamp or delete if empty"""
+
     progress_files = (
         "data_distro/data_to_load/run_logs/Lines_in_progress.json",
         "data_distro/data_to_load/run_logs/Errors_in_progress.json",
         "data_distro/data_to_load/run_logs/Exceptions_in_progress.json",
     )
     new_names = (
-        f"data_distro/data_to_load/run_logs/Lines_{date_stamp}.json",
-        f"data_distro/data_to_load/run_logs/Errors_{date_stamp}.json",
-        f"data_distro/data_to_load/run_logs/Exceptions_{date_stamp}.json",
+        f"data_distro/data_to_load/run_logs/Lines_{options}_{date_stamp}.json",
+        f"data_distro/data_to_load/run_logs/Errors_{options}_{date_stamp}.json",
+        f"data_distro/data_to_load/run_logs/Exceptions_{options}_{date_stamp}.json",
     )
 
     error_files = []
@@ -94,10 +105,11 @@ def handle_exceptions(table, file_path, instance_dict, error_trace):
     )
 
 
-def log_results(expected_objects_dict):
+def log_results(expected_objects_dict, kwargs):
     """This is helpful for debugging"""
     date_stamp = str(datetime.now())[:-7]
-    errors = finish_error_files(date_stamp)
+    options = make_option_string(**kwargs)
+    errors = finish_error_files(date_stamp, options)
 
     payload = {
         "expected_objects_dict": expected_objects_dict,
@@ -105,7 +117,7 @@ def log_results(expected_objects_dict):
     }
 
     with open(
-        f"data_distro/data_to_load/run_logs/Results_{date_stamp}.json", "w"
+        f"data_distro/data_to_load/run_logs/Results_{options}_{date_stamp}.json", "w"
     ) as outfile:
         json.dump(payload, outfile)
 

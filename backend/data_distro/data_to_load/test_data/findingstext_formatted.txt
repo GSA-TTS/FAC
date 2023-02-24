@@ -1,5 +1,5 @@
 SEQ_NUMBER|DBKEY|AUDITYEAR|FINDINGREFNUMS|TEXT|CHARTSTABLES
-"24994"|"234207"|"2021"|"2021-002"|"2021-002 – Filing of Single Audit Report Federal Program – HUD insured mortgage under Section 213 of the National Housing Act
+"1"|"100000"|"2014"|"2021-002"|"2021-002 – Filing of Single Audit Report Federal Program – HUD insured mortgage under Section 213 of the National Housing Act
 CFDA# – 14.126
 Significant Deficiency
 Category of Finding - Other
@@ -24,7 +24,7 @@ Status - Resolved
 Auditor’s non-compliance code - Z -Other
 Responsible party for correction action - Craig Brinkman, CFO of REE Development (Management
 Agent)"|"N"
-"25100"|"128980"|"2021"|"2021-001"|"Finding reference number:2021-001
+"2"|"100000"|"2014"|"2021-002"|"Finding reference number:2021-001
 CFDA title and number (Federal award identification number and year): Capital Advance, CFDA 14.157 and 2007)
 
 Auditor non-compliance code:B - Failure to make required residual receipts deposit
@@ -58,7 +58,7 @@ Recommendation:Management should implement a system to ensure the required depos
 Completion date:July 15, 2020
 
 Management's response:Agree. Management made the required residual receipts deposit on July 15, 2020."|"N"
-"25139"|"194597"|"2021"|"2021-001"|"SECTION II – FINANCIAL STATEMENT FINDINGS None Reported.
+"2"|"10000"|"2014"|"2021-001"|"SECTION II – FINANCIAL STATEMENT FINDINGS None Reported.
 SECTION III – FEDERAL AWARD FINDINGS AND QUESTIONED COSTS
 Finding 2021-001:
 Information on the Federal Program: CFDA 14.181 – Section 811 Capital Advance.
@@ -88,7 +88,7 @@ Recommendation: We recommend management review and revise controls over credit c
 Responsible Official's Response and Corrective Action Planned: The Organization agrees with the finding and recommendations. Management closed the credit card account and has established a purchasing card as of April 27, 2021 (purchasing cards act like a debit card whereas the funds must be available at the time of purchase). Management has full access and control of the card.
 Planned Implementation Date of Corrective Action: April 27, 2021.
 Person Responsible for Corrective Action: Melanie Moe, Managing Agent."|"N"
-"198165"|"230559"|"2021"|"2021-001"|"Finding 2021-001
+"3"|"100000"|"2014"|"2021-001"|"Finding 2021-001
 Criteria:
 Generally, a system of internal control contemplates segregation of duties such that no individual has responsibility to execute a transaction, have physical access to the related assets, and have responsibility or authority to record the transactions.
 
@@ -122,7 +122,7 @@ The Cooperative reviews and makes improvements to its internal controls on an on
 Views of Responsible Officials and Planned Corrective Actions:
 The Cooperative agrees with this finding and will adhere to the corrective action plan.
 "|"N"
-"25156"|"212942"|"2021"|"2021-002"|"Finding 2021-002
+"25156"|"100000"|"2021"|"2021-002"|"Finding 2021-002
 Criteria:
 Generally, a system of internal control includes the ability to understand and prepare the Cooperative’s financial statements and related disclosures in accordance with accounting principles generally accepted in the United States of America (GAAP).
 
@@ -156,7 +156,7 @@ The Cooperative will continue to review the auditor prepared adjusting journal e
 Views of Responsible Officials and Planned Corrective Actions:
 The Cooperative agrees with this finding and will adhere to the corrective action plan.
 "|"N"
-"25245"|"231115"|"2021"|"2021-001"|"Supportive Housing for Elderly Persons, CFDA #14.157 Condition:It was determined during the year ended March 31, 2021 that due to an incorrect income calculation, a current tenant’s income exceeded HUD income requirements for the Supportive Housing for Elderly Persons, CFDA #14.157.
+"25245"|"100000"|"2021"|"2021-001"|"Supportive Housing for Elderly Persons, CFDA #14.157 Condition:It was determined during the year ended March 31, 2021 that due to an incorrect income calculation, a current tenant’s income exceeded HUD income requirements for the Supportive Housing for Elderly Persons, CFDA #14.157.
 Criteria:In order to qualify for residency, a tenant’s income must not exceed HUD regulated income limits.
 Cause:The tenant’s income was incorrectly calculated at the time of move-in.
 Effect:The Project was out of compliance with the requirement of Supportive Housing for Elderly Persons, CFDA #14.157
@@ -225,7 +225,7 @@ September 30, 2021
 S3800-150:Response
 See Corrective Action Plan
 "|"N"
-"25279"|"191128"|"2021"|"2021-002"|"S3800-010 – Finding Reference Number: 2021-002
+"25279"|"100000"|"2021"|"2021-002"|"S3800-010 – Finding Reference Number: 2021-002
 
 Program Information
 S3800-011: Federal Program

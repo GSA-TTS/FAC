@@ -114,5 +114,5 @@ class Command(BaseCommand):
                 objects_dict | duns_objects_dict | eins_objects_dict | agency_objects_dict  # fmt: skip
             )
 
-        timestamp = log_results(expected_objects_dict)
+        timestamp = log_results(expected_objects_dict, kwargs)
         return str(timestamp)

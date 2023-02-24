@@ -94,6 +94,50 @@ def load_general(
             link_objects_general(objects_dict)
 
 
+def process_table(table, csv_dict, file_path, expected_object_count):
+    """Just to speed things up check things per table and not per row or element"""
+    logger.warning(f"------------Table: {table}--------------")
+    if table not in ["gen", "general", "cpas", "cfda"]:
+        for row in csv_dict:
+            load_generic(
+                row,
+                csv_dict,
+                table,
+                file_path,
+            )
+    elif table == "cpas":
+        for row in csv_dict:
+            load_cpas(
+                row,
+                csv_dict,
+                table,
+                file_path,
+            )
+    elif table == "cfda":
+        for row in csv_dict:
+            load_cfda(
+                row,
+                csv_dict,
+                table,
+                file_path,
+            )
+    else:
+        # Some years the table is called gen and sometimes general
+        for row in csv_dict:
+            load_general(
+                row,
+                csv_dict,
+                "gen",
+                file_path,
+            )
+
+    logger.warning(
+        "finished {0} chunk - last row DBKEY {1}, objects count = {2}".format(
+            table, row["DBKEY"], expected_object_count
+        )
+    )
+
+
 def load_files(load_file_names):
     """Load files into django models"""
     expected_objects_dict = {}
@@ -118,48 +162,8 @@ def load_files(load_file_names):
         for i, chunk in enumerate(read_csv(file_path, **config)):
             csv_dict = chunk.to_dict(orient="records")
             expected_object_count += len(csv_dict)
+            process_table(table, csv_dict, file_path, expected_object_count)
 
-            # Just to speed things up check things per table and not per row or element
-            logger.warning(f"------------Table: {table}--------------")
-            if table not in ["gen", "general", "cpas", "cfda"]:
-                for row in csv_dict:
-                    load_generic(
-                        row,
-                        csv_dict,
-                        table,
-                        file_path,
-                    )
-            elif table == "cpas":
-                for row in csv_dict:
-                    load_cpas(
-                        row,
-                        csv_dict,
-                        table,
-                        file_path,
-                    )
-            elif table == "cfda":
-                for row in csv_dict:
-                    load_cfda(
-                        row,
-                        csv_dict,
-                        table,
-                        file_path,
-                    )
-            else:
-                # Some years the table is called gen and sometimes general
-                for row in csv_dict:
-                    load_general(
-                        row,
-                        csv_dict,
-                        "gen",
-                        file_path,
-                    )
-
-            logger.warning(
-                "finished {0} chunk - last row DBKEY {1}, objects count = {2}".format(
-                    table, row["DBKEY"], expected_object_count
-                )
-            )
         expected_objects_dict[file_name] = expected_object_count
         logger.warning(
             f"Finished {file_name}, {expected_object_count} expected objects"
