@@ -1,0 +1,14 @@
+services:
+  e2e:
+    image: cypress/included:3.4.0
+    build: .
+    container_name: cypress
+    depends_on:
+      - web
+    environment:
+      - CYPRESS_baseUrl=http://localhost:8000
+    command: |
+      npm install
+      npx cypress run
+    volumes:
+      - /src/node_modules
