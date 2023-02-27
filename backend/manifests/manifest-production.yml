@@ -10,7 +10,7 @@ applications:
     ENV: PRODUCTION
     DJANGO_BASE_URL: https://fac-prod.app.cloud.gov
     ALLOWED_HOSTS: fac-prod.app.cloud.gov
-    AV_SCAN_URL: https://fac-av-production.apps.internal:91443/scan
+    AV_SCAN_URL: https://fac-av-production.apps.internal:61443/scan
   routes:
   - route: fac-prod.app.cloud.gov
   instances: 2
