@@ -4,7 +4,7 @@ Date: 2022-06-02
 
 ## Status
 
-Accepted
+Superseded by [ADR 16](https://github.com/GSA-TTS/FAC/blob/main/docs/architecture/decisions/0016-compliance-documentation.md)
 
 ## Context
 
