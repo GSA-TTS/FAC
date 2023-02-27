@@ -85,3 +85,14 @@ class AccessAndSubmissionFormView(LoginRequiredMixin, View):
             return redirect(f"/sac/edit/{report_id}")
         print("Error processing data: ", result)
         return redirect(reverse("accessandsubmission"))
+
+
+class GeneralInformationFormView(LoginRequiredMixin, View):
+    def get(self, request):
+        return render(request, "report_submission/gen-form.html")
+    
+    def post(self, post_request):
+        
+        # Backend to fill in this functionality 
+        #print("Error processing data: ", result)
+        return redirect(reverse("MySubmissions"))
