@@ -21,7 +21,7 @@ We will continue to [generate diagrams with PlantUML](https://github.com/GSA-TTS
 ## Considerations:
 
 *   Lack of familiarity of team personnel with OSCAL/Trestle.
-*   Reduction of technical maintenance—compliance code was generating `dependabot` issues.
+*   Reduction of technical maintenance—existing code in `compliance` was generating `dependabot` issues.
 *   Concerns that OSCAL/Trestle does not fully match GSA’s ATO processes.
 
 ## Consequences
