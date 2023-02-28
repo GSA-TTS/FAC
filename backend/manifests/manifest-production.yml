@@ -11,7 +11,6 @@ applications:
       DJANGO_BASE_URL: https://fac-prod.app.cloud.gov
       ALLOWED_HOSTS: fac-prod.app.cloud.gov
       AV_SCAN_URL: https://fac-av-production.apps.internal:61443/scan
-      REQUESTS_CA_BUNDLE: /etc/ssl/certs/ca-certificates.crt
     routes:
       - route: fac-prod.app.cloud.gov
     instances: 2
