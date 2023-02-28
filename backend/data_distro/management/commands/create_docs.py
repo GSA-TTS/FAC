@@ -1,4 +1,5 @@
 import csv
+import inspect
 
 from psycopg2 import sql
 from psycopg2._psycopg import connection
@@ -15,13 +16,13 @@ class Command(BaseCommand):
     """
 
     def handle(self, *args, **kwargs):
-        definations = map_models()
+        distro_classes = apps.all_models["data_distro"]
+        definations = map_models(distro_classes)
         create_csv(definations)
-        create_sql_comments(definations)
+        create_sql_comments(distro_classes, definations)
 
 
-def map_models():
-    distro_classes = apps.all_models["data_distro"]
+def map_models(distro_classes):
     definations = []
     for model in distro_classes:
         mod_class = distro_classes[model]
@@ -75,12 +76,30 @@ def create_csv(definations):
             writer.writerow(line)
 
 
-def create_sql_comments(definations):
+def create_sql_comments(distro_classes, definations):
     if settings.ENVIRONMENT not in ["DEVELOPMENT", "STAGING", "PRODUCTION"]:
         conn_string = "dbname='postgres' user='postgres' port='5432' host='db'"
     else:
         conn_string = settings.CONNECTION_STRING
 
+    # Add docs to tables
+    for model in distro_classes:
+        mod_class = distro_classes[model]
+        model_name = mod_class.__name__
+        doc = inspect.getdoc(mod_class)
+
+        conn = connection(conn_string)
+        conn.autocommit = True
+        with conn.cursor() as curs:
+            curs.execute(
+                # These should be safe strings, but I am going to treat them with caution anyway.
+                sql.SQL("COMMENT ON TABLE {} is %s;").format(
+                    sql.Identifier("data_distro_{0}".format(model_name.lower())),
+                ),
+                (doc,),
+            )
+
+    # Add docs to fields
     for define_txt in definations:
         model_name = define_txt["Model name"]
         if define_txt["Description"] is not None:
