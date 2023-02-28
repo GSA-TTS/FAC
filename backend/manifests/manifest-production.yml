@@ -1,21 +1,21 @@
 ---
 applications:
-- name: gsa-fac
-  buildpacks:
-    - python_buildpack
-  memory: 512M
-  path: ../
-  timeout: 180
-  env:
-    ENV: PRODUCTION
-    DJANGO_BASE_URL: https://fac-prod.app.cloud.gov
-    ALLOWED_HOSTS: fac-prod.app.cloud.gov
-    AV_SCAN_URL: https://fac-av-production.apps.internal:61443/scan
-  routes:
-  - route: fac-prod.app.cloud.gov
-  instances: 2
-  services:
-  - fac-db
-  - fac-public-s3
-  - fac-key-service
-  - production-deployer
+  - name: gsa-fac
+    buildpacks:
+      - python_buildpack
+    memory: 512M
+    path: ../
+    timeout: 180
+    env:
+      ENV: PRODUCTION
+      DJANGO_BASE_URL: https://fac-prod.app.cloud.gov
+      ALLOWED_HOSTS: fac-prod.app.cloud.gov
+      AV_SCAN_URL: https://fac-av-production.apps.internal:61443/scan
+    routes:
+      - route: fac-prod.app.cloud.gov
+    instances: 2
+    services:
+      - fac-db
+      - fac-public-s3
+      - fac-key-service
+      - production-deployer
