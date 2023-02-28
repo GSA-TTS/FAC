@@ -1,4 +1,10 @@
-CPA bad records removed:
+CPA records removed:
 
 203222|2009|N/A||||||||||
 195404|2009|N/A||||||||||
+223464|2009|NA||NA|NA|MN|00000|NA|NA|0000000000|0000000000|NA
+
+
+EIN records removed:
+
+2009|203222|n/a|1

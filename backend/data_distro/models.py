@@ -566,9 +566,8 @@ class Revision(models.Model):
         null=True,
         help_text=docs.federal_awards,
     )
-    general_info_explain = models.CharField(
+    general_info_explain = models.TextField(
         "Explanation of what items on the General Info page were edited during the revision",
-        max_length=150,
         null=True,
         help_text=docs.general_info_explain,
     )

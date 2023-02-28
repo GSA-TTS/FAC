@@ -185,6 +185,8 @@ def load_duns_eins(file):
         sort_by = "EINSEQNUM"
         payload_name = "EIN"
 
+    logger.warning(f"------------Table: {payload_name}--------------")
+
     # Can't do chunks because we want to order the dataframe
     data_frame = read_csv(file_path, **panda_config_base)
     # This will make sure we load the lists in the right order
@@ -194,13 +196,14 @@ def load_duns_eins(file):
 
     link_duns_eins(csv_dict, payload_name)
 
-    return expected_object_count
+    return {payload_name: expected_object_count}
 
 
 def load_agency(file_name):
     """
     De-duping agency and adding as relationships
     """
+    logger.warning("------------Table: agency--------------")
     file_path = f"data_distro/data_to_load/{file_name}"
     data_frame = read_csv(file_path, **panda_config_base)
     csv_dict = data_frame.to_dict(orient="records")
@@ -208,4 +211,4 @@ def load_agency(file_name):
 
     link_agency(csv_dict, file_name)
 
-    return expected_object_count
+    return {"agency": expected_object_count}
