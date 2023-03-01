@@ -64,4 +64,4 @@ jobs:
           lhci autorun
       - name: Run Cypress
         working-directory: ./backend
-        run: docker-compose run cypress bash -c 'npx cypress install && npm run test:e2e:ci'
+        run: docker-compose run cypress bash -c 'chown -R $(whoami) .npm/_logs && npx cypress install && npm run test:e2e:ci'
