@@ -38,5 +38,21 @@ services:
       - /src/node_modules
       - /src/staticfiles
 
+  cypress:
+    image: "cypress/included:12.3.0"
+    depends_on:
+      - web
+    environment:
+      - CYPRESS_baseUrl=http://127.0.0.1:8000
+    entrypoint: [""]
+    command: > 
+      bash -c "npm install 
+      && npx wait-on http://127.0.0.1:8000 
+      && npm run test:e2e:ci"
+    working_dir: /src/
+    volumes:
+      - .:/src
+      - /src/node_modules
+
 volumes:
   postgres-data:

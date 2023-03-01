@@ -34,6 +34,8 @@ RUN \
 COPY package.* /src/
 WORKDIR /src/
 
+ENV CYPRESS_CACHE_FOLDER /src/cypress
+
 RUN npm install
 RUN chown -R 1001:123 "/root/.npm"
 

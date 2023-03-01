@@ -20,7 +20,7 @@
   "devDependencies": {
     "@uswds/uswds": "^3.3.0",
     "autoprefixer": "^10.4.13",
-    "cypress": "^12.5.1",
+    "cypress": "^12.7.0",
     "esbuild-postcss": "^0.0.4",
     "esbuild-sass-plugin": "2.4.5",
     "glob": "^8.1.0"
@@ -29,7 +29,10 @@
     "esbuild": "^0.15.18",
     "npm": "^9.4.2",
     "npm-run-all": "^4.1.5",
+    "npx": "^10.2.2",
     "postcss": "^8.4.21",
-    "postcss-cli": "9.1.0"
+    "postcss-cli": "9.1.0",
+    "run": "^1.4.0",
+    "wait-on": "^7.0.1"
   }
 }
