@@ -47,11 +47,18 @@ LOGGING = {
         "require_debug_false": {"()": "django.utils.log.RequireDebugFalse"},
         "require_debug_true": {"()": "django.utils.log.RequireDebugTrue"},
     },
-    "formatters": {"json": {"()": "pythonjsonlogger.jsonlogger.JsonFormatter"}},
+    "formatters": {
+        "json": {"()": "pythonjsonlogger.jsonlogger.JsonFormatter"},
+        "simple": {
+            "format": "{levelname} {message}",
+            "style": "{",
+        },
+    },
     "handlers": {
         "local_debug_logger": {
             "level": "DEBUG",
             "filters": ["require_debug_true"],
+            "formatter": "simple",
             "class": "logging.StreamHandler",
         },
         "prod_logger": {
@@ -61,7 +68,13 @@ LOGGING = {
             "class": "logging.StreamHandler",
         },
     },
-    "loggers": {"django": {"handlers": ["local_debug_logger", "prod_logger"]}},
+    "root": {
+        "handlers": ["local_debug_logger", "prod_logger"],
+        "level": "DEBUG",
+    },
+    "loggers": {
+        "django": {"handlers": ["local_debug_logger", "prod_logger"]},
+    },
 }
 
 # Django application definition
@@ -84,13 +97,7 @@ INSTALLED_APPS += [
 ]
 
 # Our apps
-INSTALLED_APPS += [
-    "audit",
-    "api",
-    "users",
-    "report_submission",
-    "cms",
-]
+INSTALLED_APPS += ["audit", "api", "users", "report_submission", "cms", "data_distro"]
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -192,8 +199,7 @@ elif environment not in ["DEVELOPMENT", "STAGING", "PRODUCTION"]:
     MIDDLEWARE.append("whitenoise.middleware.WhiteNoiseMiddleware")
     CORS_ALLOWED_ORIGINS += ["http://0.0.0.0:8000", "http://127.0.0.1:8000"]
 else:
-    # static assets
-    STATICFILES_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
+    STATICFILES_STORAGE = "storages.backends.s3boto3.S3ManifestStaticStorage"
     vcap = json.loads(env.str("VCAP_SERVICES"))
     for service in vcap["s3"]:
         if service["instance_name"] == "fac-public-s3":
@@ -244,7 +250,10 @@ else:
     SESSION_COOKIE_SAMESITE = "Lax"
     X_FRAME_OPTIONS = "DENY"
 
-    CORS_ALLOWED_ORIGINS = [bucket, env.str("DJANGO_BASE_URL")]
+    CORS_ALLOWED_ORIGINS = [
+        f"https://{AWS_S3_CUSTOM_DOMAIN}",
+        env.str("DJANGO_BASE_URL"),
+    ]
     CORS_ALLOW_METHODS = ["GET", "OPTIONS"]
 
 ADMIN_URL = "admin/"
@@ -277,6 +286,9 @@ SAM_API_KEY = secret("SAM_API_KEY")
 
 SCHEMAS_DIR = os.path.join("audit", "schemas")
 SECTION_SCHEMA_DIR = os.path.join("schemas", "sections")
+
+AV_SCAN_URL = env.str("AV_SCAN_URL", "")
+AV_SCAN_MAX_ATTEMPTS = 10
 
 AUTHENTICATION_BACKENDS = [
     "django.contrib.auth.backends.ModelBackend",

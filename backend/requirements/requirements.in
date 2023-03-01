@@ -20,3 +20,6 @@ django-storages
 boto3
 django-logingov-backend
 django-csp
+pandas
+python-slugify
+openpyxl

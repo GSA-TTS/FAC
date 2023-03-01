@@ -1,13 +1,28 @@
 import json
 import string
+from unittest import TestCase
+from unittest.mock import patch
 from django.test import SimpleTestCase
 from django.core.exceptions import ValidationError
-
+from django.core.files.uploadedfile import TemporaryUploadedFile
 from random import choice, randrange
+from openpyxl import Workbook
+from tempfile import NamedTemporaryFile
+
+import requests
 
 from .test_schemas import FederalAwardsSchemaValidityTest
 from .validators import (
+    ALLOWED_EXCEL_CONTENT_TYPES,
+    ALLOWED_EXCEL_FILE_EXTENSIONS,
+    MAX_EXCEL_FILE_SIZE_MB,
+    validate_excel_file_content_type,
+    validate_excel_file_extension,
+    validate_excel_file_integrity,
+    validate_excel_filename,
+    validate_excel_file_size,
     validate_federal_award_json,
+    validate_file_infection,
     validate_uei,
     validate_uei_alphanumeric,
     validate_uei_valid_chars,
@@ -18,6 +33,13 @@ from .validators import (
 # Simplest way to create a new copy of simple case rather than getting
 # references to things used by other tests:
 jsoncopy = lambda v: json.loads(json.dumps(v))
+
+
+# use this to match the class signature expected in validate_excel_file_content_type, file.file.content_type
+class FileWrapper:
+    def __init__(self, file):
+        self.file = file
+        self.name = file.name
 
 
 class FederalAwardsValidatorTests(SimpleTestCase):
@@ -326,3 +348,249 @@ class UEIValidatorTests(SimpleTestCase):
         self.assertRaises(ValidationError, validate_uei_nine_digit_sequences, invalid)
         # Valid UEI
         validate_uei_nine_digit_sequences(self.valid)
+
+
+class ExcelFileFilenameValidatorTests(SimpleTestCase):
+    def test_valid_filename_slug(self):
+        """
+        Filenames that can be slugified are valid
+        """
+        test_cases = [
+            ("this one just has spaces.xlsx", "this-one-just-has-spaces.xlsx"),
+            (
+                "this_one\\ has some? other things!.xlsx",
+                "this-one-has-some-other-things.xlsx",
+            ),
+            ("this/one/has/forward/slashes.xlsx", "slashes.xlsx"),
+            (
+                "this.one.has.multiple.extensions.xlsx",
+                "this-one-has-multiple-extensions.xlsx",
+            ),
+        ]
+
+        for test_case in test_cases:
+            with self.subTest():
+                before, after = test_case
+                valid_file = TemporaryUploadedFile(
+                    before, ALLOWED_EXCEL_CONTENT_TYPES[0], 10000, "utf-8"
+                )
+
+                validated_filename = validate_excel_filename(valid_file)
+
+                self.assertEqual(validated_filename, after)
+
+    def test_invalid_filename_slug(self):
+        """
+        Filenames that cannot be slugified are not valid
+        """
+        test_cases = [
+            "no-extension",
+            ".xlsx",
+            "".join(choice("!?#$%^&*") for _ in range(9)),
+            "".join(choice("!?#$%^&*") for _ in range(9)) + ".xlsx",
+        ]
+
+        for test_case in test_cases:
+            with self.subTest():
+                file = TemporaryUploadedFile(
+                    test_case, ALLOWED_EXCEL_CONTENT_TYPES[0], 10000, "utf-8"
+                )
+
+                self.assertRaises(ValidationError, validate_excel_filename, file)
+
+
+class ExcelFileExtensionValidatorTests(SimpleTestCase):
+    def test_invalid_file_extensions(self):
+        """
+        Filenames that have disallowed extensions are not valid
+        """
+
+        def random_extension(len):
+            return "." + "".join(choice(string.ascii_lowercase) for _ in range(len))
+
+        # generate a random length-3 file extension not listed as being allowed
+        while (random_ext_3 := random_extension(3)) in ALLOWED_EXCEL_FILE_EXTENSIONS:
+            pass
+
+        # generate a random length-4 file extension not listed as being allowed
+        while (random_ext_4 := random_extension(4)) in ALLOWED_EXCEL_FILE_EXTENSIONS:
+            pass
+
+        test_cases = [
+            "file.pdf",
+            "file.doc",
+            "file.docx",
+            "file.png",
+            "file.jpeg",
+            f"file.{random_ext_3}",
+            f"file.{random_ext_4}",
+            "file",
+            "file.",
+        ]
+
+        for test_case in test_cases:
+            with self.subTest():
+                file = TemporaryUploadedFile(
+                    test_case, ALLOWED_EXCEL_CONTENT_TYPES[0], 10000, "utf-8"
+                )
+
+                self.assertRaises(ValidationError, validate_excel_file_extension, file)
+
+    def test_valid_file_extensions(self):
+        """Filenames that have allowed extensions are valid"""
+        test_cases = [e.lower() for e in ALLOWED_EXCEL_FILE_EXTENSIONS] + [
+            e.upper() for e in ALLOWED_EXCEL_FILE_EXTENSIONS
+        ]
+
+        for test_case in test_cases:
+            with self.subTest():
+                filename = f"file.{test_case}"
+                file = TemporaryUploadedFile(
+                    filename, ALLOWED_EXCEL_CONTENT_TYPES[0], 10000, "utf-8"
+                )
+
+                validate_excel_file_extension(file)
+
+
+class ExcelFileContentTypeValidatorTests(SimpleTestCase):
+    def test_invalid_file_content_types(self):
+        """Files that have disallowed content types are invalid"""
+        test_cases = [
+            "application/msword",
+            "application/octet-stream",
+            "application/pdf",
+            "application/vnd.ms-outlook",
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            "audio/mpeg",
+            "audio/wav",
+            "audio/x-aiff",
+            "image/bmp",
+            "image/jpeg",
+            "image/gif",
+            "image/png",
+            "image/tiff",
+            "text/csv",
+            "text/plain",
+        ]
+
+        for test_case in test_cases:
+            with self.subTest():
+                file = FileWrapper(
+                    TemporaryUploadedFile("file.ext", test_case, 10000, "utf-8")
+                )
+
+                self.assertRaises(
+                    ValidationError, validate_excel_file_content_type, file
+                )
+
+    def test_valid_file_content_types(self):
+        """Files that have allowed content types are valid"""
+        for content_type in ALLOWED_EXCEL_CONTENT_TYPES:
+            with self.subTest():
+                file = FileWrapper(
+                    TemporaryUploadedFile("file.xlsx", content_type, 10000, "utf-8")
+                )
+
+                validate_excel_file_content_type(file)
+
+
+class ExcelFileFileSizeValidatorTests(SimpleTestCase):
+    def test_valid_file_size(self):
+        """Files that are under (or equal to) the maximum file size are valid"""
+        max_file_size = MAX_EXCEL_FILE_SIZE_MB * 1024 * 1024
+
+        test_cases = [
+            max_file_size / 2,
+            max_file_size,
+        ]
+
+        for test_case in test_cases:
+            with self.subTest():
+                file = TemporaryUploadedFile(
+                    "file.xlsx", b"this is a file", test_case, "utf-8"
+                )
+
+                validate_excel_file_size(file)
+
+    def test_invalid_file_size(self):
+        """Files that are over the maximum file size are invalid"""
+        max_file_size = MAX_EXCEL_FILE_SIZE_MB * 1024 * 1024
+
+        test_cases = [
+            max_file_size + 1,
+            max_file_size * 2,
+        ]
+
+        for test_case in test_cases:
+            with self.subTest():
+                file = TemporaryUploadedFile(
+                    "file.xlsx", b"this is a file", test_case, "utf-8"
+                )
+
+                self.assertRaises(ValidationError, validate_excel_file_size, file)
+
+
+class MockHttpResponse:
+    def __init__(self, status_code, text):
+        self.status_code = status_code
+        self.text = text
+
+
+class ExcelFileInfectionValidatorTests(TestCase):
+    def setUp(self):
+        self.fake_file = TemporaryUploadedFile("file.txt", "text/plain", 10000, "utf-8")
+
+    @patch("requests.post")
+    def test_av_service_unavailable(self, mock_post):
+        """If the AV service is unavailable, the file should not pass validation"""
+        mock_post.side_effect = requests.exceptions.ConnectionError(
+            "service unavailable"
+        )
+
+        with self.assertRaises(ValidationError):
+            validate_file_infection(self.fake_file)
+
+    @patch("audit.validators._scan_file")
+    def test_validation_fails_on_av_service_error(self, mock_scan_file):
+        """If the AV service returns an internal error, the file should not pass validation"""
+        mock_scan_file.return_value = MockHttpResponse(500, "error text")
+
+        with self.assertRaises(ValidationError):
+            validate_file_infection(self.fake_file)
+
+    @patch("audit.validators._scan_file")
+    def test_validation_fails_on_non_success_response(self, mock_scan_file):
+        """If the AV service indicates that the file is infected, the file should not pass validation"""
+        mock_scan_file.return_value = MockHttpResponse(406, "infected!")
+
+        with self.assertRaises(ValidationError):
+            validate_file_infection(self.fake_file)
+
+    @patch("audit.validators._scan_file")
+    def test_validation_succeeds_on_success_response(self, mock_scan_file):
+        """If the AV service indicates that the file is clean, the file should pass validation"""
+        mock_scan_file.return_value = MockHttpResponse(200, "clean!")
+
+        try:
+            validate_file_infection(self.fake_file)
+        except ValidationError:
+            self.fail("validate_file_infection unexpectedly raised ValidationError!")
+
+
+class ExcelFileIntegrityValidatorTests(TestCase):
+    def test_broken_excel_file(self):
+        """XLS/X files that are not readable by openpyxl are invalid"""
+        file = TemporaryUploadedFile(
+            "file.xlsx", b"this is not really an excel file", 10000, "utf-8"
+        )
+
+        self.assertRaises(ValidationError, validate_excel_file_integrity, file)
+
+    def test_valid_excel_file(self):
+        """XLS/X files that are readable by openpyxl are valid"""
+        wb = Workbook()
+        with NamedTemporaryFile() as file:
+            wb.save(file.name)
+            file.seek(0)
+
+            validate_excel_file_integrity(file)

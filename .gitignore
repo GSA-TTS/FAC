@@ -156,3 +156,5 @@ backend/static/compiled
 staticfiles/
 
 # pa11y_tests/screenshots/*.png
+
+excel/
