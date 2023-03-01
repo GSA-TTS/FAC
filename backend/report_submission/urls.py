@@ -11,5 +11,5 @@ urlpatterns = [
         views.AccessAndSubmissionFormView.as_view(),
         name="accessandsubmission",
     ),
-    path("general-information/", views.GeneralInformationFormView.as_view(), name="general-information"),
+    path("general-information/", views.GeneralInformationFormView.as_view(), name="general_information"),
 ]
