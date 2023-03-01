@@ -1,11 +1,15 @@
 services:
-  e2e:
-    build: cypress
-    container_name: cypress
-    # depends_on:
-    #   - web
+  cypress:
+    image: "cypress/included:12.3.0"
     environment:
-      - CYPRESS_baseUrl=http://localhost:8000
+      - CYPRESS_baseUrl=http://web:8000
+    entrypoint: [""]
+    command: > 
+      bash -c "npm install
+      && npx cypress install
+      && npx wait-on http://web:8000
+      && npm run test:e2e:ci"
+    working_dir: /src/
     volumes:
+      - .:/src
       - /src/node_modules
-      - /src/cypress

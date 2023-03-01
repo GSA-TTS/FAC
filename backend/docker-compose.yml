@@ -46,19 +46,6 @@ services:
     ports:
       - "9000:9000"
 
-  cypress:
-    image: "cypress/included:12.3.0"
-    depends_on:
-      - web
-    environment:
-      - CYPRESS_baseUrl=http://web:8000
-    entrypoint: [""]
-    command: > 
-      bash -c "npm install"
-    working_dir: /src/
-    volumes:
-      - .:/src
-      - /src/node_modules
 
 volumes:
   postgres-data:
