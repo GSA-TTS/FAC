@@ -57,7 +57,7 @@ doc_metadata = {
         "models": [
             "Agencies",
             "Captext",
-            "CfdaInfo",
+            "FederalAward",
             "DunsInfo",
             "EinInfo",
             "Findings",
@@ -93,9 +93,9 @@ doc_metadata = {
         "forms_Captext": [],
         "description_Captext": "Audit Year and DBKEY (database key) combined make up the primary key.",
         "original_table_Captext": "CAPTEXT",
-        "forms_CfdaInfo": [],
-        "description_CfdaInfo": "Audit Year and DBKEY (database key) combined make up the primary key.",
-        "original_table_CfdaInfo": "CFDA INFO",
+        "forms_FederalAward": [],
+        "description_FederalAward": "Audit Year and DBKEY (database key) combined make up the primary key.",
+        "original_table_FederalAward": "CFDA INFO",
         "forms_DunsInfo": [],
         "description_DunsInfo": "Audit Year and DBKEY (database key) combined make up the primary key.",
         "original_table_DunsInfo": "DUN INFO",
@@ -131,7 +131,7 @@ doc_metadata = {
         "models": [
             "Agencies",
             "Captext",
-            "CfdaInfo",
+            "FederalAward",
             "DunsInfo",
             "EinInfo",
             "Findings",
@@ -167,9 +167,9 @@ doc_metadata = {
         "forms_Captext": [],
         "description_Captext": "Audit Year and DBKEY (database key) combined make up the primary key.",
         "original_table_Captext": "CAPTEXT",
-        "forms_CfdaInfo": [],
-        "description_CfdaInfo": "Audit Year and DBKEY (database key) combined make up the primary key.",
-        "original_table_CfdaInfo": "CFDA INFO",
+        "forms_FederalAward": [],
+        "description_FederalAward": "Audit Year and DBKEY (database key) combined make up the primary key.",
+        "original_table_FederalAward": "CFDA INFO",
         "forms_DunsInfo": [],
         "description_DunsInfo": "Audit Year and DBKEY (database key) combined make up the primary key.",
         "original_table_DunsInfo": "DUN INFO",
@@ -294,7 +294,7 @@ doc_metadata = {
         "original_table_Findingstext": "FINDINGSTEXT",
     },
     "finding_ref_nums": {
-        "models": ["Captext", "CfdaInfo", "Findings", "Findingstext"],
+        "models": ["Captext", "FederalAward", "Findings", "Findingstext"],
         "original_name": "FINDINGREFNUMS",
         "forms": [
             "SF-SAC 2019-2021: IV/1",
@@ -325,7 +325,7 @@ doc_metadata = {
         "description_Captext": "Audit Finding Reference Number",
         "original_table_Captext": "CAPTEXT",
         "all_years": True,
-        "forms_CfdaInfo": [
+        "forms_FederalAward": [
             "SF-SAC 1997-2000: III/7/e",
             "SF-SAC 2001-2003: III/11/b",
             "SF-SAC 2004-2007: III/10/b",
@@ -336,8 +336,8 @@ doc_metadata = {
             "SF-SAC 2019-2021: III/4/e",
             "SF-SAC 2022: III/4/e",
         ],
-        "description_CfdaInfo": "Findings Reference Numbers",
-        "original_table_CfdaInfo": "CFDA INFO",
+        "description_FederalAward": "Findings Reference Numbers",
+        "original_table_FederalAward": "CFDA INFO",
         "forms_Findings": [
             "SF-SAC 2013-2015: III/7/d",
             "SF-SAC 2016-2018: III/4/e",
@@ -392,7 +392,7 @@ doc_metadata = {
         "original_table_Findingstext": "FINDINGSTEXT",
     },
     "amount": {
-        "models": ["CfdaInfo"],
+        "models": ["FederalAward"],
         "original_name": "AMOUNT",
         "forms": [
             "SF-SAC 1997-2000: III/6/c",
@@ -405,7 +405,7 @@ doc_metadata = {
             "SF-SAC 2019-2021: II/1/e",
             "SF-SAC 2022: II/1/e",
         ],
-        "forms_CfdaInfo": [
+        "forms_FederalAward": [
             "SF-SAC 1997-2000: III/6/c",
             "SF-SAC 2001-2003: III/10/d",
             "SF-SAC 2004-2007: III/9/e",
@@ -417,29 +417,32 @@ doc_metadata = {
             "SF-SAC 2022: II/1/e",
         ],
         "descriptions": ["Amount Expended for the Federal Program"],
-        "description_CfdaInfo": "Amount Expended for the Federal Program",
-        "original_table_CfdaInfo": "CFDA INFO",
+        "description_FederalAward": "Amount Expended for the Federal Program",
+        "original_table_FederalAward": "CFDA INFO",
         "all_years": True,
     },
     "arra": {
-        "models": ["CfdaInfo"],
+        "models": ["FederalAward"],
         "original_name": "ARRA",
         "forms": ["SF-SAC 2010-2012: III/9/d", "SF-SAC 2013-2015: III/6/g"],
-        "forms_CfdaInfo": ["SF-SAC 2010-2012: III/9/d", "SF-SAC 2013-2015: III/6/g"],
+        "forms_FederalAward": [
+            "SF-SAC 2010-2012: III/9/d",
+            "SF-SAC 2013-2015: III/6/g",
+        ],
         "descriptions": ["American Recovery and Reinvestment Act Funded Program"],
-        "description_CfdaInfo": "American Recovery and Reinvestment Act Funded Program",
-        "original_table_CfdaInfo": "CFDA INFO",
+        "description_FederalAward": "American Recovery and Reinvestment Act Funded Program",
+        "original_table_FederalAward": "CFDA INFO",
         "all_years": True,
     },
     "award_identification": {
-        "models": ["CfdaInfo"],
+        "models": ["FederalAward"],
         "original_name": "AWARDIDENTIFICATION",
         "forms": [
             "SF-SAC 2016-2018: II/1/c",
             "SF-SAC 2019-2021: II/1/c",
             "SF-SAC 2022: II/1/c",
         ],
-        "forms_CfdaInfo": [
+        "forms_FederalAward": [
             "SF-SAC 2016-2018: II/1/c",
             "SF-SAC 2019-2021: II/1/c",
             "SF-SAC 2022: II/1/c",
@@ -447,12 +450,12 @@ doc_metadata = {
         "descriptions": [
             "Other data used to identify the award which is not a CFDA number (e.g., program year, contract number)"
         ],
-        "description_CfdaInfo": "Other data used to identify the award which is not a CFDA number (e.g., program year, contract number)",
-        "original_table_CfdaInfo": "CFDA INFO",
+        "description_FederalAward": "Other data used to identify the award which is not a CFDA number (e.g., program year, contract number)",
+        "original_table_FederalAward": "CFDA INFO",
         "all_years": True,
     },
     "cfda": {
-        "models": ["CfdaInfo"],
+        "models": ["FederalAward"],
         "original_name": "CFDA",
         "forms": [
             "SF-SAC 1997-2000: III/6/a",
@@ -465,7 +468,7 @@ doc_metadata = {
             "SF-SAC 2019-2021: II/1/a & II/1/b combined",
             "SF-SAC 2022: II/1/a & II/1/b combined",
         ],
-        "forms_CfdaInfo": [
+        "forms_FederalAward": [
             "SF-SAC 1997-2000: III/6/a",
             "SF-SAC 2001-2003: III/10/a",
             "SF-SAC 2004-2007: III/9/a & III/9/b combined",
@@ -477,49 +480,49 @@ doc_metadata = {
             "SF-SAC 2022: II/1/a & II/1/b combined",
         ],
         "descriptions": ["Federal Agency Prefix and Extension"],
-        "description_CfdaInfo": "Federal Agency Prefix and Extension",
-        "original_table_CfdaInfo": "CFDA INFO",
+        "description_FederalAward": "Federal Agency Prefix and Extension",
+        "original_table_FederalAward": "CFDA INFO",
         "all_years": True,
     },
     "cfda_program_name": {
-        "models": ["CfdaInfo"],
+        "models": ["FederalAward"],
         "original_name": "CFDAPROGRAMNAME",
         "forms": [],
-        "forms_CfdaInfo": [],
+        "forms_FederalAward": [],
         "descriptions": [
             "Name of Federal Program (auto-generated by FAC from the CFDA catalog)"
         ],
-        "description_CfdaInfo": "Name of Federal Program (auto-generated by FAC from the CFDA catalog)",
-        "original_table_CfdaInfo": "CFDA INFO",
+        "description_FederalAward": "Name of Federal Program (auto-generated by FAC from the CFDA catalog)",
+        "original_table_FederalAward": "CFDA INFO",
         "all_years": True,
     },
     "cluster_name": {
-        "models": ["CfdaInfo"],
+        "models": ["FederalAward"],
         "original_name": "CLUSTERNAME",
         "forms": [
             "SF-SAC 2016-2018: II/1/f",
             "SF-SAC 2019-2021: II/1/f",
             "SF-SAC 2022: II/1/f",
         ],
-        "forms_CfdaInfo": [
+        "forms_FederalAward": [
             "SF-SAC 2016-2018: II/1/f",
             "SF-SAC 2019-2021: II/1/f",
             "SF-SAC 2022: II/1/f",
         ],
         "descriptions": ["The name of the cluster"],
-        "description_CfdaInfo": "The name of the cluster",
-        "original_table_CfdaInfo": "CFDA INFO",
+        "description_FederalAward": "The name of the cluster",
+        "original_table_FederalAward": "CFDA INFO",
         "all_years": True,
     },
     "cluster_total": {
-        "models": ["CfdaInfo"],
+        "models": ["FederalAward"],
         "original_name": "CLUSTERTOTAL",
         "forms": [
             "SF-SAC 2016-2018: II/1/h",
             "SF-SAC 2019-2021: II/1/h",
             "SF-SAC 2022: II/1/h",
         ],
-        "forms_CfdaInfo": [
+        "forms_FederalAward": [
             "SF-SAC 2016-2018: II/1/h",
             "SF-SAC 2019-2021: II/1/h",
             "SF-SAC 2022: II/1/h",
@@ -527,12 +530,12 @@ doc_metadata = {
         "descriptions": [
             "Total Federal awards expended for each individual Federal program is auto-generated by summing the amount expended for all line items with the same Cluster Name"
         ],
-        "description_CfdaInfo": "Total Federal awards expended for each individual Federal program is auto-generated by summing the amount expended for all line items with the same Cluster Name",
-        "original_table_CfdaInfo": "CFDA INFO",
+        "description_FederalAward": "Total Federal awards expended for each individual Federal program is auto-generated by summing the amount expended for all line items with the same Cluster Name",
+        "original_table_FederalAward": "CFDA INFO",
         "all_years": True,
     },
     "direct": {
-        "models": ["CfdaInfo"],
+        "models": ["FederalAward"],
         "original_name": "DIRECT",
         "forms": [
             "SF-SAC 2001-2003: III/10/e",
@@ -544,7 +547,7 @@ doc_metadata = {
             "SF-SAC 2019-2021: II/1/k",
             "SF-SAC 2022: II/1/k",
         ],
-        "forms_CfdaInfo": [
+        "forms_FederalAward": [
             "SF-SAC 2001-2003: III/10/e",
             "SF-SAC 2004-2007: III/9/f",
             "SF-SAC 2008-2009: III/9/f",
@@ -557,22 +560,22 @@ doc_metadata = {
         "descriptions": [
             "Indicate whether or not the award was received directly from a Federal awarding agency"
         ],
-        "description_CfdaInfo": "Indicate whether or not the award was received directly from a Federal awarding agency",
-        "original_table_CfdaInfo": "CFDA INFO",
+        "description_FederalAward": "Indicate whether or not the award was received directly from a Federal awarding agency",
+        "original_table_FederalAward": "CFDA INFO",
         "all_years": True,
     },
     "elec_audits_id": {
-        "models": ["CfdaInfo", "Findings", "Passthrough"],
+        "models": ["FederalAward", "Findings", "Passthrough"],
         "original_name": "ELECAUDITSID",
         "forms": [],
-        "forms_CfdaInfo": [],
+        "forms_FederalAward": [],
         "descriptions": [
             "FAC system generated sequence number used to link to Findings data between CFDA Info and Findings",
             "FAC system generated sequence number used to link to Findings data between CFDA Info and Findings",
             "FAC system generated sequence number used to link to Passthrough data between CFDA Info and Passthrough",
         ],
-        "description_CfdaInfo": "FAC system generated sequence number used to link to Findings data between CFDA Info and Findings",
-        "original_table_CfdaInfo": "CFDA INFO",
+        "description_FederalAward": "FAC system generated sequence number used to link to Findings data between CFDA Info and Findings",
+        "original_table_FederalAward": "CFDA INFO",
         "all_years": True,
         "forms_Findings": [],
         "description_Findings": "FAC system generated sequence number used to link to Findings data between CFDA Info and Findings",
@@ -582,7 +585,7 @@ doc_metadata = {
         "original_table_Passthrough": "PASSTHROUGH",
     },
     "federal_program_name": {
-        "models": ["CfdaInfo"],
+        "models": ["FederalAward"],
         "original_name": "FEDERALPROGRAMNAME",
         "forms": [
             "SF-SAC 1997-2000: III/6/b",
@@ -595,7 +598,7 @@ doc_metadata = {
             "SF-SAC 2019-2021: II/1/d",
             "SF-SAC 2022: II/1/d",
         ],
-        "forms_CfdaInfo": [
+        "forms_FederalAward": [
             "SF-SAC 1997-2000: III/6/b",
             "SF-SAC 2001-2003: III/10/c",
             "SF-SAC 2004-2007: III/9/d",
@@ -607,12 +610,12 @@ doc_metadata = {
             "SF-SAC 2022: II/1/d",
         ],
         "descriptions": ["Name of Federal Program"],
-        "description_CfdaInfo": "Name of Federal Program",
-        "original_table_CfdaInfo": "CFDA INFO",
+        "description_FederalAward": "Name of Federal Program",
+        "original_table_FederalAward": "CFDA INFO",
         "all_years": True,
     },
     "findings_count": {
-        "models": ["CfdaInfo"],
+        "models": ["FederalAward"],
         "original_name": "FINDINGSCOUNT",
         "forms": [
             "SF-SAC 2013-2015: III/6/k",
@@ -620,7 +623,7 @@ doc_metadata = {
             "SF-SAC 2019-2021: III/1/c",
             "SF-SAC 2022: III/1/c",
         ],
-        "forms_CfdaInfo": [
+        "forms_FederalAward": [
             "SF-SAC 2013-2015: III/6/k",
             "SF-SAC 2016-2018: III/1/c",
             "SF-SAC 2019-2021: III/1/c",
@@ -629,19 +632,19 @@ doc_metadata = {
         "descriptions": [
             "Number of findings for the federal program (only available for audit years 2013 and beyond)"
         ],
-        "description_CfdaInfo": "Number of findings for the federal program (only available for audit years 2013 and beyond)",
-        "original_table_CfdaInfo": "CFDA INFO",
+        "description_FederalAward": "Number of findings for the federal program (only available for audit years 2013 and beyond)",
+        "original_table_FederalAward": "CFDA INFO",
         "all_years": True,
     },
     "loan_balance": {
-        "models": ["CfdaInfo"],
+        "models": ["FederalAward"],
         "original_name": "LOANBALANCE",
         "forms": [
             "SF-SAC 2016-2018: II/1/j",
             "SF-SAC 2019-2021: II/1/j",
             "SF-SAC 2022: II/1/j",
         ],
-        "forms_CfdaInfo": [
+        "forms_FederalAward": [
             "SF-SAC 2016-2018: II/1/j",
             "SF-SAC 2019-2021: II/1/j",
             "SF-SAC 2022: II/1/j",
@@ -649,12 +652,12 @@ doc_metadata = {
         "descriptions": [
             "The loan or loan guarantee (loan) balance outstanding at the end of the audit period.  A response of ‚ÄòN/A‚Äô is acceptable."
         ],
-        "description_CfdaInfo": "The loan or loan guarantee (loan) balance outstanding at the end of the audit period.  A response of ‚ÄòN/A‚Äô is acceptable.",
-        "original_table_CfdaInfo": "CFDA INFO",
+        "description_FederalAward": "The loan or loan guarantee (loan) balance outstanding at the end of the audit period.  A response of ‚ÄòN/A‚Äô is acceptable.",
+        "original_table_FederalAward": "CFDA INFO",
         "all_years": True,
     },
     "loans": {
-        "models": ["CfdaInfo"],
+        "models": ["FederalAward"],
         "original_name": "LOANS",
         "forms": [
             "SF-SAC 2013-2015: III/6/f",
@@ -662,7 +665,7 @@ doc_metadata = {
             "SF-SAC 2019-2021: II/1/i",
             "SF-SAC 2022: II/1/i",
         ],
-        "forms_CfdaInfo": [
+        "forms_FederalAward": [
             "SF-SAC 2013-2015: III/6/f",
             "SF-SAC 2016-2018: II/1/i",
             "SF-SAC 2019-2021: II/1/i",
@@ -671,12 +674,12 @@ doc_metadata = {
         "descriptions": [
             "Indicate whether or not the program is a Loan or Loan Guarantee (only available for audit years 2013 and beyond)"
         ],
-        "description_CfdaInfo": "Indicate whether or not the program is a Loan or Loan Guarantee (only available for audit years 2013 and beyond)",
-        "original_table_CfdaInfo": "CFDA INFO",
+        "description_FederalAward": "Indicate whether or not the program is a Loan or Loan Guarantee (only available for audit years 2013 and beyond)",
+        "original_table_FederalAward": "CFDA INFO",
         "all_years": True,
     },
     "major_program": {
-        "models": ["CfdaInfo"],
+        "models": ["FederalAward"],
         "original_name": "MAJORPROGRAM",
         "forms": [
             "SF-SAC 1997-2000: III/7/a",
@@ -689,7 +692,7 @@ doc_metadata = {
             "SF-SAC 2019-2021: III/1/a",
             "SF-SAC 2022: III/1/a",
         ],
-        "forms_CfdaInfo": [
+        "forms_FederalAward": [
             "SF-SAC 1997-2000: III/7/a",
             "SF-SAC 2001-2003: III/10/f",
             "SF-SAC 2004-2007: III/9/g",
@@ -703,49 +706,49 @@ doc_metadata = {
         "descriptions": [
             "Indicate whether or not the Federal program is a major program"
         ],
-        "description_CfdaInfo": "Indicate whether or not the Federal program is a major program",
-        "original_table_CfdaInfo": "CFDA INFO",
+        "description_FederalAward": "Indicate whether or not the Federal program is a major program",
+        "original_table_FederalAward": "CFDA INFO",
         "all_years": True,
     },
     "other_cluster_name": {
-        "models": ["CfdaInfo"],
+        "models": ["FederalAward"],
         "original_name": "OTHERCLUSTERNAME",
         "forms": [],
-        "forms_CfdaInfo": [],
+        "forms_FederalAward": [],
         "descriptions": [
             "The name of the cluster (if not listed in the Compliance Supplement)"
         ],
-        "description_CfdaInfo": "The name of the cluster (if not listed in the Compliance Supplement)",
-        "original_table_CfdaInfo": "CFDA INFO",
+        "description_FederalAward": "The name of the cluster (if not listed in the Compliance Supplement)",
+        "original_table_FederalAward": "CFDA INFO",
         "all_years": True,
     },
     "passthrough_amount": {
-        "models": ["CfdaInfo"],
+        "models": ["FederalAward"],
         "original_name": "PASSTHROUGHAMOUNT",
         "forms": [
             "SF-SAC 2016-2018: II/1/o",
             "SF-SAC 2019-2021: II/1/o",
             "SF-SAC 2022: II/1/o",
         ],
-        "forms_CfdaInfo": [
+        "forms_FederalAward": [
             "SF-SAC 2016-2018: II/1/o",
             "SF-SAC 2019-2021: II/1/o",
             "SF-SAC 2022: II/1/o",
         ],
         "descriptions": ["Amount passed through to subrecipients"],
-        "description_CfdaInfo": "Amount passed through to subrecipients",
-        "original_table_CfdaInfo": "CFDA INFO",
+        "description_FederalAward": "Amount passed through to subrecipients",
+        "original_table_FederalAward": "CFDA INFO",
         "all_years": True,
     },
     "passthrough_award": {
-        "models": ["CfdaInfo"],
+        "models": ["FederalAward"],
         "original_name": "PASSTHROUGHAWARD",
         "forms": [
             "SF-SAC 2016-2018: II/1/n",
             "SF-SAC 2019-2021: II/1/n",
             "SF-SAC 2022: II/1/n",
         ],
-        "forms_CfdaInfo": [
+        "forms_FederalAward": [
             "SF-SAC 2016-2018: II/1/n",
             "SF-SAC 2019-2021: II/1/n",
             "SF-SAC 2022: II/1/n",
@@ -753,19 +756,19 @@ doc_metadata = {
         "descriptions": [
             "Indicates whether or not funds were passed through to any subrecipients for the Federal program"
         ],
-        "description_CfdaInfo": "Indicates whether or not funds were passed through to any subrecipients for the Federal program",
-        "original_table_CfdaInfo": "CFDA INFO",
+        "description_FederalAward": "Indicates whether or not funds were passed through to any subrecipients for the Federal program",
+        "original_table_FederalAward": "CFDA INFO",
         "all_years": True,
     },
     "program_total": {
-        "models": ["CfdaInfo"],
+        "models": ["FederalAward"],
         "original_name": "PROGRAMTOTAL",
         "forms": [
             "SF-SAC 2016-2018: II/1/g",
             "SF-SAC 2019-2021: II/1/g",
             "SF-SAC 2022: II/1/g",
         ],
-        "forms_CfdaInfo": [
+        "forms_FederalAward": [
             "SF-SAC 2016-2018: II/1/g",
             "SF-SAC 2019-2021: II/1/g",
             "SF-SAC 2022: II/1/g",
@@ -773,12 +776,12 @@ doc_metadata = {
         "descriptions": [
             "Total Federal awards expended for each individual Federal program is auto-generated by summing the amount expended for all line items with the same CFDA Prefix and Extension"
         ],
-        "description_CfdaInfo": "Total Federal awards expended for each individual Federal program is auto-generated by summing the amount expended for all line items with the same CFDA Prefix and Extension",
-        "original_table_CfdaInfo": "CFDA INFO",
+        "description_FederalAward": "Total Federal awards expended for each individual Federal program is auto-generated by summing the amount expended for all line items with the same CFDA Prefix and Extension",
+        "original_table_FederalAward": "CFDA INFO",
         "all_years": True,
     },
     "research_and_development": {
-        "models": ["CfdaInfo"],
+        "models": ["FederalAward"],
         "original_name": "R&D",
         "forms": [
             "SF-SAC 2001-2003: III/10/b",
@@ -787,7 +790,7 @@ doc_metadata = {
             "SF-SAC 2010-2012: III/9/c",
             "SF-SAC 2013-2015: III/6/e",
         ],
-        "forms_CfdaInfo": [
+        "forms_FederalAward": [
             "SF-SAC 2001-2003: III/10/b",
             "SF-SAC 2004-2007: III/9/c",
             "SF-SAC 2008-2009: III/9/c",
@@ -797,22 +800,22 @@ doc_metadata = {
         "descriptions": [
             "Indicate whether or not the program is a Research and Development program"
         ],
-        "description_CfdaInfo": "Indicate whether or not the program is a Research and Development program",
-        "original_table_CfdaInfo": "CFDA INFO",
+        "description_FederalAward": "Indicate whether or not the program is a Research and Development program",
+        "original_table_FederalAward": "CFDA INFO",
         "all_years": True,
     },
     "state_cluster_name": {
-        "models": ["CfdaInfo"],
+        "models": ["FederalAward"],
         "original_name": "STATECLUSTERNAME",
         "forms": [],
-        "forms_CfdaInfo": [],
+        "forms_FederalAward": [],
         "descriptions": ["The name of the state cluster"],
-        "description_CfdaInfo": "The name of the state cluster",
-        "original_table_CfdaInfo": "CFDA INFO",
+        "description_FederalAward": "The name of the state cluster",
+        "original_table_FederalAward": "CFDA INFO",
         "all_years": True,
     },
     "type_report_major_program": {
-        "models": ["CfdaInfo", "General"],
+        "models": ["FederalAward", "General"],
         "original_name": "TYPEREPORT_MP",
         "forms": [
             "SF-SAC 2004-2007: III/9/h",
@@ -825,7 +828,7 @@ doc_metadata = {
             "SF-SAC 1997-2000: III/1",
             "SF-SAC 2001-2003: III/1",
         ],
-        "forms_CfdaInfo": [
+        "forms_FederalAward": [
             "SF-SAC 2004-2007: III/9/h",
             "SF-SAC 2008-2009: III/9/h",
             "SF-SAC 2010-2012: III/9/i",
@@ -838,15 +841,15 @@ doc_metadata = {
             "Type of Report Issued on the Major Program Compliance",
             "Type of Report Issued on the Major Program Compliance",
         ],
-        "description_CfdaInfo": "Type of Report Issued on the Major Program Compliance",
-        "original_table_CfdaInfo": "CFDA INFO",
+        "description_FederalAward": "Type of Report Issued on the Major Program Compliance",
+        "original_table_FederalAward": "CFDA INFO",
         "all_years": True,
         "forms_General": ["SF-SAC 1997-2000: III/1", "SF-SAC 2001-2003: III/1"],
         "description_General": "Type of Report Issued on the Major Program Compliance",
         "original_table_General": "GENERAL",
     },
     "type_requirement": {
-        "models": ["CfdaInfo", "Findings"],
+        "models": ["FederalAward", "Findings"],
         "original_name": "TYPEREQUIREMENT",
         "forms": [
             "SF-SAC 1997-2000: III/7/b",
@@ -863,7 +866,7 @@ doc_metadata = {
             "SF-SAC 2019-2021: III/4/f",
             "SF-SAC 2022: III/4/f",
         ],
-        "forms_CfdaInfo": [
+        "forms_FederalAward": [
             "SF-SAC 1997-2000: III/7/b",
             "SF-SAC 2001-2003: III/11/a",
             "SF-SAC 2004-2007: III/10/a",
@@ -875,8 +878,8 @@ doc_metadata = {
             "SF-SAC 2022: III/4/f",
         ],
         "descriptions": ["Type Requirement Failure", "Type Requirement Failure"],
-        "description_CfdaInfo": "Type Requirement Failure",
-        "original_table_CfdaInfo": "CFDA INFO",
+        "description_FederalAward": "Type Requirement Failure",
+        "original_table_FederalAward": "CFDA INFO",
         "all_years": True,
         "forms_Findings": [
             "SF-SAC 2013-2015: III/7/e",

@@ -2,7 +2,13 @@
 Using the OpenAPI structure to add docs for data
 The field name is going to be a short name, the long name is going to be a short explanation and the description is going to be for the data source.
 
-This is where the model docs descriptions come from.
+This is where the model docs descriptions come from. Keep formatting consistent so we can automatically create upload mappings and documentation.
+
+These strings are formatted:
+"Data sources: <form with year>: <line number>; <form with year>: <line number> Census mapping: <table name as it appears on the Data Key>, <field name from download>"
+
+If more than one table populates that field:
+"Data sources: <form with year>: <line number>; <form with year>: <line number> Census mapping: <table name as it appears on the Data Key>, <field name from download> (AND) Data sources: <form with year>: <line number>; <form with year>: <line number> Census mapping: <table name as it appears on the Data Key>, <field name from download>"
 
 """
 
@@ -11,7 +17,7 @@ API_DESCRIPTION = """Data from the Federal Audit Clearinghouse"""
 
 
 """ Model choices """
-
+# These have not been implemented yet, we will see if the data allows for it
 
 # TYPEREPORT_FS
 # TYPEREPORT_SP_FRAMEWORK
@@ -74,7 +80,7 @@ These have special formatting so we can map data models to the public downloads.
 """
 
 # check data source
-agency = "Data sources: SF-SAC 1997-2000: III/5; SF-SAC 2001-2003: III/9; SF-SAC 2004-2007: III/8; SF-SAC 2008-2009: III/8; SF-SAC 2010-2012: III/8; SF-SAC 2013-2015: III/5; SF-SAC 2016-2018: III/3/d; SF-SAC 2019-2021: III/3/d; SF-SAC 2022: III/3/d Census mapping: AGENCIES, AGENCY"
+agency_prior_findings = "Data sources: SF-SAC 1997-2000: III/5; SF-SAC 2001-2003: III/9; SF-SAC 2004-2007: III/8; SF-SAC 2008-2009: III/8; SF-SAC 2010-2012: III/8; SF-SAC 2013-2015: III/5; SF-SAC 2016-2018: III/3/d; SF-SAC 2019-2021: III/3/d; SF-SAC 2022: III/3/d Census mapping: AGENCIES, AGENCY"
 agency_cfda = "Data sources: SF-SAC 1997-2000: III/5; SF-SAC 2001-2003: III/9; SF-SAC 2004-2007: III/8; SF-SAC 2008-2009: III/8; SF-SAC 2010-2012: III/8; SF-SAC 2013-2015: III/5; SF-SAC 2016-2018: III/3/d; SF-SAC 2019-2021: III/3/d; SF-SAC 2022: III/3/d Census mapping: AGENCIES, AGENCYCFDA"
 audit_year_captext = "Census mapping: CAPTEXT, AUDITYEAR"
 audit_year_cfdainfo = "Census mapping: CFDA INFO, AUDITYEAR"
@@ -248,4 +254,4 @@ uei_seq_num = "Census mapping: UEI INFO, UEISEQNUM"
 cognizant_agency_over = "Census mapping: GENERAL, COG_OVER"
 date_firewall = "Census mapping: GENERAL, DATEFIREWALL"
 previous_date_firewall = "Census mapping: GENERAL, PREVIOUSDATEFIREWALL"
-questioned_costs_CfdaInfo = "Census mapping: CFDA INFO, QCOSTS2"
+questioned_costs_FederalAward = "Census mapping: CFDA INFO, QCOSTS2"

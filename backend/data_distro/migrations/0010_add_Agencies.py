@@ -2,8 +2,6 @@
 
 from django.db import migrations
 
-from data_distro.models import Agencies
-
 
 agency_name_dict = {
     "01": "AFRICAN DEVELOPMENT FOUNDATION",
@@ -77,9 +75,11 @@ agency_name_dict = {
 
 def add_agency_names(apps, schema_editor):
     for code in agency_name_dict:
-        agency = Agencies.objects.get_or_create(agency_cfda=int(code), is_public=True)[
-            0
-        ]
+        # This is more resilient to later database changes
+        agency_model = apps.get_model("data_distro", "Agencies")
+        agency = agency_model.objects.get_or_create(
+            agency_cfda=int(code), is_public=True
+        )[0]
         agency.agency_name = agency_name_dict[code]
 
 
