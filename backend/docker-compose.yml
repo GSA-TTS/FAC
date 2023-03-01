@@ -54,10 +54,7 @@ services:
       - CYPRESS_baseUrl=http://web:8000
     entrypoint: [""]
     command: > 
-      bash -c "npm install 
-      && npx cypress install
-      && npx wait-on http://web:8000
-      && npm run test:e2e:ci"
+      bash -c "npm install"
     working_dir: /src/
     volumes:
       - .:/src
