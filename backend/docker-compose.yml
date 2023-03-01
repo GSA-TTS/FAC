@@ -28,7 +28,7 @@ services:
       - "DJANGO_SECRET_LOGIN_KEY=${DJANGO_SECRET_LOGIN_KEY}"
       - "ENV=${ENV}"
       - "SECRET_KEY=${SECRET_KEY}"
-      - "ALLOWED_HOSTS=0.0.0.0 127.0.0.1 localhost"
+      - "ALLOWED_HOSTS=0.0.0.0 127.0.0.1 localhost web"
     env_file:
       - ".env"
     ports:
@@ -43,11 +43,12 @@ services:
     depends_on:
       - web
     environment:
-      - CYPRESS_baseUrl=http://127.0.0.1:8000
+      - CYPRESS_baseUrl=http://web:8000
     entrypoint: [""]
     command: > 
       bash -c "npm install 
-      && npx wait-on http://127.0.0.1:8000 
+      && npx cypress install
+      && npx wait-on http://web:8000
       && npm run test:e2e:ci"
     working_dir: /src/
     volumes:
