@@ -12,7 +12,7 @@ describe('Create New Audit', () => {
 
   describe('A Blank Form', () => {
     it('marks empty responses as invalid', () => {
-      cy.get('#grant-access input:invalid').should('have.length', 100); //was 8
+      cy.get('#grant-access input:invalid').should('have.length', 8);
     });
 
     it('will not submit', () => {
