@@ -62,6 +62,9 @@ jobs:
         run: |
           npm install -g @lhci/cli@0.8.x
           lhci autorun
+      - name: Install dependencies
+        working-directory: ./backend
+        run: npm ci
       - name: Run Cypress
         working-directory: ./backend
-        run: docker-compose -f docker-compose.cypress.yml up --build
+        run: npm run test:e2e:ci
