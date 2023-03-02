@@ -46,7 +46,7 @@ jobs:
       - name: Use Node
         uses: actions/setup-node@v3
         with:
-          node-version: '18.x'
+          node-version: '17.x'
       - name: Start services
         working-directory: ./backend
         run: touch .env && docker-compose up -d
@@ -62,20 +62,13 @@ jobs:
         run: |
           npm install -g @lhci/cli@0.8.x
           lhci autorun
-  e2e:
+  cypress-run:
     runs-on: ubuntu-latest
-    container:
-      image: cypress/included:12.3.0
-      options: --user 1001
     steps:
-      - uses: actions/checkout@v3
-      - name: Use Node
-        uses: actions/setup-node@v3
-        with:
-          node-version: '18.x'
-      - name: Install dependencies
+      - name: Checkout
+        uses: actions/checkout@v3
+      # Install NPM dependencies, cache them correctly
+      # and run all Cypress tests
+      - name: Cypress run
         working-directory: ./backend
-        run: npm install
-      - name: Run Cypress
-        working-directory: ./backend
-        run: npm run test:e2e:ci
+        uses: cypress-io/github-action@v5
