@@ -66,3 +66,10 @@ jobs:
         uses: cypress-io/github-action@v5
         with:
           working-directory: ./backend
+          config-file: cypress.config.js
+        run: |           
+          mkdir ~/.npm-global
+          npm config set prefix '~/.npm-global'
+          export PATH=~/.npm-global/bin:$PATH
+          npm install
+          npm run test:e2e:ci
