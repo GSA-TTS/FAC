@@ -34,9 +34,6 @@ jobs:
         run: mypy .
   test:
     runs-on: ubuntu-latest
-    container:
-      image: cypress/included:12.3.0
-      options: --user 1001 
     env:
       ENV: TESTING
       SAM_API_KEY: ${{ secrets.SAM_API_KEY }}"
@@ -65,9 +62,20 @@ jobs:
         run: |
           npm install -g @lhci/cli@0.8.x
           lhci autorun
+  e2e:
+    runs-on: ubuntu-latest
+    container:
+      image: cypress/included:12.3.0
+      options: --user 1001
+    steps:
+      - uses: actions/checkout@v3
+      - name: Use Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18.x'
       - name: Install dependencies
         working-directory: ./backend
-        run: npm ci
+        run: npm install
       - name: Run Cypress
         working-directory: ./backend
         run: npm run test:e2e:ci
