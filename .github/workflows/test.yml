@@ -62,11 +62,6 @@ jobs:
         run: |
           npm install -g @lhci/cli@0.8.x
           lhci autorun
-  cypress-run:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
       - name: Cypress run
         uses: cypress-io/github-action@v5
         with:
