@@ -64,4 +64,4 @@ jobs:
           lhci autorun
       - name: Run Cypress
         working-directory: ./backend
-        run: docker-compose -f docker-compose.cypress.yml up -d
+        run: docker-compose -f docker-compose.cypress.yml up
