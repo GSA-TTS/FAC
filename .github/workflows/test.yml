@@ -34,6 +34,9 @@ jobs:
         run: mypy .
   test:
     runs-on: ubuntu-latest
+    container:
+      image: cypress/included:12.3.0
+      options: --user 1001 
     env:
       ENV: TESTING
       SAM_API_KEY: ${{ secrets.SAM_API_KEY }}"
