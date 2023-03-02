@@ -63,7 +63,11 @@ jobs:
           npm install -g @lhci/cli@0.8.x
           lhci autorun
       - name: Cypress run
+        container:
+          image: cypress/included:12.3.0
+          options: --user 1001
         working-directory: ./backend
         run: |           
+          rm -rf node_modules
           npm install
           npm run test:e2e:ci
