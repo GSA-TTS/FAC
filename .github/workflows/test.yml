@@ -63,10 +63,7 @@ jobs:
           npm install -g @lhci/cli@0.8.x
           lhci autorun
       - name: Cypress run
-        uses: cypress-io/github-action@v5
-        with:
-          working-directory: ./backend
-          config-file: cypress.config.js
+        working-directory: ./backend
         run: |           
           mkdir ~/.npm-global
           npm config set prefix '~/.npm-global'
