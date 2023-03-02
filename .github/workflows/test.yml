@@ -46,7 +46,7 @@ jobs:
       - name: Use Node
         uses: actions/setup-node@v3
         with:
-          node-version: '17.x'
+          node-version: '18.x'
       - name: Start services
         working-directory: ./backend
         run: touch .env && docker-compose up -d
@@ -65,8 +65,5 @@ jobs:
       - name: Cypress run
         working-directory: ./backend
         run: |           
-          mkdir ~/.npm-global
-          npm config set prefix '~/.npm-global'
-          export PATH=~/.npm-global/bin:$PATH
           npm install
           npm run test:e2e:ci
