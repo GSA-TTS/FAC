@@ -206,18 +206,39 @@ else:
             # Public AWS S3 bucket for the app
             s3_creds = service["credentials"]
 
-    AWS_ACCESS_KEY_ID = s3_creds["access_key_id"]
-    AWS_SECRET_ACCESS_KEY = s3_creds["secret_access_key"]
-    AWS_STORAGE_BUCKET_NAME = s3_creds["bucket"]
-    AWS_S3_REGION_NAME = s3_creds["region"]
-    AWS_S3_CUSTOM_DOMAIN = (
-        f"{AWS_STORAGE_BUCKET_NAME}.s3-{AWS_S3_REGION_NAME}.amazonaws.com"
-    )
-    AWS_S3_OBJECT_PARAMETERS = {"CacheControl": "max-age=86400"}
+            AWS_ACCESS_KEY_ID = s3_creds["access_key_id"]
+            AWS_SECRET_ACCESS_KEY = s3_creds["secret_access_key"]
+            AWS_STORAGE_BUCKET_NAME = s3_creds["bucket"]
 
-    AWS_LOCATION = "static"
-    AWS_DEFAULT_ACL = "public-read"
-    STATIC_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/{AWS_LOCATION}/"
+            AWS_S3_REGION_NAME = s3_creds["region"]
+            AWS_S3_CUSTOM_DOMAIN = (
+                f"{AWS_STORAGE_BUCKET_NAME}.s3-{AWS_S3_REGION_NAME}.amazonaws.com"
+            )
+            AWS_S3_OBJECT_PARAMETERS = {"CacheControl": "max-age=86400"}
+
+            AWS_LOCATION = "static"
+            AWS_DEFAULT_ACL = "public-read"
+            STATIC_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/{AWS_LOCATION}/"
+
+        if service["instance_name"] == "fac-private-s3":
+            # Private AWS S3 bucket for the app's Excel (or other file) uploads
+            s3_creds = service["credentials"]
+
+            AWS_PRIVATE_ACCESS_KEY_ID = s3_creds["access_key_id"]
+            AWS_PRIVATE_SECRET_ACCESS_KEY = s3_creds["secret_access_key"]
+            AWS_PRIVATE_STORAGE_BUCKET_NAME = s3_creds["bucket"]
+
+            AWS_S3_PRIVATE_REGION_NAME = s3_creds["region"]
+            AWS_S3_PRIVATE_CUSTOM_DOMAIN = (
+                f"{AWS_STORAGE_BUCKET_NAME}.s3-{AWS_S3_REGION_NAME}.amazonaws.com"
+            )
+            AWS_S3_PRIVATE_OBJECT_PARAMETERS = {"CacheControl": "max-age=86400"}
+
+            AWS_PRIVATE_LOCATION = "static"
+            AWS_PRIVATE_DEFAULT_ACL = "private"
+            # If wrong, https://docs.aws.amazon.com/AmazonS3/latest/userguide/acl-overview.html#canned-acl
+
+            MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/{AWS_LOCATION}/"
 
     # secure headers
     MIDDLEWARE.append("csp.middleware.CSPMiddleware")
