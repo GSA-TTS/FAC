@@ -183,7 +183,25 @@ STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 # CORS base
 CORS_ALLOWED_ORIGINS = [env.str("DJANGO_BASE_URL", "http://localhost:8000")]
 
-"""Environment specific configurations"""
+# Set some storage defaults so Python doesn't crash if a setting isn't set for that environment
+AWS_ACCESS_KEY_ID = ""
+AWS_SECRET_ACCESS_KEY = ""
+AWS_STORAGE_BUCKET_NAME = ""
+AWS_S3_REGION_NAME = ""
+AWS_S3_CUSTOM_DOMAIN = ""
+AWS_S3_OBJECT_PARAMETERS = ""
+AWS_LOCATION = ""
+AWS_DEFAULT_ACL = ""
+AWS_PRIVATE_ACCESS_KEY_ID = ""
+AWS_PRIVATE_SECRET_ACCESS_KEY = ""
+AWS_PRIVATE_STORAGE_BUCKET_NAME = ""
+AWS_S3_PRIVATE_REGION_NAME = ""
+AWS_S3_PRIVATE_CUSTOM_DOMAIN = ""
+AWS_S3_PRIVATE_OBJECT_PARAMETERS = ""
+AWS_PRIVATE_LOCATION = ""
+AWS_PRIVATE_DEFAULT_ACL = ""
+
+# Environment specific configurations
 if ENVIRONMENT == "LOCAL":
     DEBUG = env.bool("DJANGO_DEBUG", default=True)
     STATIC_URL = "/static/"
@@ -220,7 +238,7 @@ else:
             AWS_DEFAULT_ACL = "public-read"
             STATIC_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/{AWS_LOCATION}/"
 
-        if service["instance_name"] == "fac-private-s3":
+        elif service["instance_name"] == "fac-private-s3":
             # Private AWS S3 bucket for the app's Excel (or other file) uploads
             s3_creds = service["credentials"]
 
@@ -229,9 +247,7 @@ else:
             AWS_PRIVATE_STORAGE_BUCKET_NAME = s3_creds["bucket"]
 
             AWS_S3_PRIVATE_REGION_NAME = s3_creds["region"]
-            AWS_S3_PRIVATE_CUSTOM_DOMAIN = (
-                f"{AWS_STORAGE_BUCKET_NAME}.s3-{AWS_S3_REGION_NAME}.amazonaws.com"
-            )
+            AWS_S3_PRIVATE_CUSTOM_DOMAIN = f"{AWS_PRIVATE_STORAGE_BUCKET_NAME}.s3-{AWS_S3_PRIVATE_REGION_NAME}.amazonaws.com"
             AWS_S3_PRIVATE_OBJECT_PARAMETERS = {"CacheControl": "max-age=86400"}
 
             AWS_PRIVATE_LOCATION = "static"
