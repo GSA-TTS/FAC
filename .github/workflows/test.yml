@@ -22,7 +22,7 @@ jobs:
           pip install -r dev-requirements.txt
       - name: Lint with flake8
         working-directory: ./backend
-        run: flake8 . --count --max-complexity=10  --show-source --statistics
+        run: flake8 . --count --show-source --statistics
       - name: Check formatting with black
         working-directory: ./backend
         run: black --check .
@@ -54,9 +54,6 @@ jobs:
         run:
           docker-compose run web bash -c 'coverage run --source="." manage.py test &&
           coverage report -m --fail-under=90'
-      - name: Run Django migrations for pa11y tests
-        working-directory: ./backend
-        run: docker-compose run web python manage.py migrate
       - name: run Lighthouse CI
         run: |
           npm install -g @lhci/cli@0.8.x

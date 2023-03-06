@@ -1,6 +1,6 @@
 ---
 applications:
-- name: task-runner
+- name: task-runner-97-09
   buildpacks:
     - python_buildpack
   memory: 2G
@@ -14,9 +14,9 @@ applications:
   - fac-db
   - fac-public-s3
   - fac-key-service
-  command: (python manage.py public_data_loader -f passthrough.txt && echo SUCCESS || echo TASK_FAIL) && sleep infinity
+  command: (python manage.py public_data_loader -y 9 && echo SUCCESS || echo TASK_FAIL) && sleep infinity
 
   # run with
-  # cf push -f manifests/task-manifest-staging.yaml
+  # cf push -f manifests/task-manifest-staging.yaml --no-route
   #
   # This is an example task, you can modify the command to run other tasks

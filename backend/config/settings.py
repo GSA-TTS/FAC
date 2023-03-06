@@ -18,7 +18,7 @@ from cfenv import AppEnv
 
 env = environs.Env()
 
-environment = env.str("ENV", "UNDEFINED").upper()
+ENVIRONMENT = env.str("ENV", "UNDEFINED").upper()
 
 key_service = AppEnv().get_service(name="fac-key-service")
 if key_service and key_service.credentials:
@@ -184,14 +184,14 @@ STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 CORS_ALLOWED_ORIGINS = [env.str("DJANGO_BASE_URL", "http://localhost:8000")]
 
 """Environment specific configurations"""
-if environment == "LOCAL":
+if ENVIRONMENT == "LOCAL":
     DEBUG = env.bool("DJANGO_DEBUG", default=True)
     STATIC_URL = "/static/"
     # Whitenoise for serving static files
     STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
     MIDDLEWARE.append("whitenoise.middleware.WhiteNoiseMiddleware")
     CORS_ALLOWED_ORIGINS += ["http://0.0.0.0:8000", "http://127.0.0.1:8000"]
-elif environment not in ["DEVELOPMENT", "STAGING", "PRODUCTION"]:
+elif ENVIRONMENT not in ["DEVELOPMENT", "STAGING", "PRODUCTION"]:
     DEBUG = env.bool("DJANGO_DEBUG", default=False)
     STATIC_URL = "/static/"
     # Whitenoise for serving static files
@@ -277,6 +277,21 @@ else:
     ]
     CORS_ALLOW_METHODS = ["GET", "OPTIONS"]
 
+    for service in vcap["aws-rds"]:
+        if service["instance_name"] == "fac-db":
+            rds_creds = service["credentials"]
+
+    # used for psycopg2 cursor connection
+    CONNECTION_STRING = (
+        "dbname='{}' user='{}' port='{}' host='{}' password='{}'".format(
+            rds_creds["db_name"],
+            rds_creds["username"],
+            rds_creds["port"],
+            rds_creds["host"],
+            rds_creds["password"],
+        )
+    )
+
 ADMIN_URL = "admin/"
 
 # Default primary key field type
@@ -308,7 +323,7 @@ SAM_API_KEY = secret("SAM_API_KEY")
 SCHEMAS_DIR = os.path.join("audit", "schemas")
 SECTION_SCHEMA_DIR = os.path.join("schemas", "sections")
 
-AV_SCAN_URL = os.getenv("AV_SCAN_URL")
+AV_SCAN_URL = env.str("AV_SCAN_URL", "")
 AV_SCAN_MAX_ATTEMPTS = 10
 
 AUTHENTICATION_BACKENDS = [
@@ -351,7 +366,7 @@ OIDC_PROVIDERS = {
 
 LOGIN_URL = f"{env_base_url}/openid/login/"
 
-USER_PROMOTION_COMMANDS_ENABLED = environment in ["LOCAL", "TESTING", "UNDEFINED"]
+USER_PROMOTION_COMMANDS_ENABLED = ENVIRONMENT in ["LOCAL", "TESTING", "UNDEFINED"]
 
 DISABLE_AUTH = env.bool("DISABLE_AUTH", default=False)
 if DISABLE_AUTH:

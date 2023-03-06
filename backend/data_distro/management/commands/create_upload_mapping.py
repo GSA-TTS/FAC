@@ -108,4 +108,4 @@ class Command(BaseCommand):
         logger.warn(f"Data not in mapping: {leftovers}")
 
         with open("data_distro/mappings/new_upload_mapping.json", "w") as outfile:
-            json.dump(upload_mapping, outfile)
+            json.dump(upload_mapping, outfile, indent=2)
