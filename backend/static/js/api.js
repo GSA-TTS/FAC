@@ -1,4 +1,4 @@
-import { getCookie } from "./csrft";
+import { getCookie } from './csrft';
 const csrftoken = getCookie('csrftoken');
 
 export const queryAPI = (
@@ -18,4 +18,4 @@ export const queryAPI = (
     .then((resp) => resp.json())
     .then((data) => handleResponse(data))
     .catch((e) => handleError(e));
-}; 
+};

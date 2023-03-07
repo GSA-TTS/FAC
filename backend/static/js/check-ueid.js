@@ -1,5 +1,5 @@
 import { checkValidity } from './validate.js';
-import { queryAPI } from "./api";
+import { queryAPI } from './api';
 
 const FORM = document.forms[0];
 
@@ -197,14 +197,14 @@ function validateUEID() {
 
   const auditee_uei = document.getElementById('auditee_uei').value;
 
-   queryAPI(
-     '/api/sac/ueivalidation',
-     { auditee_uei },
-     {
-       method: 'POST',
-     },
-     [handleUEIDResponse, handleApiError]
-   );
+  queryAPI(
+    '/api/sac/ueivalidation',
+    { auditee_uei },
+    {
+      method: 'POST',
+    },
+    [handleUEIDResponse, handleApiError]
+  );
 }
 
 function validateFyStartDate(fyInput) {

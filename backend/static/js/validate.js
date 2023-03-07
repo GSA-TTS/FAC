@@ -7,7 +7,7 @@ export const checkValidity = (field) => {
     const result = validations[operation](field, constraint);
 
     if (result.error) {
-      toggleErrorClass(field, true); 
+      toggleErrorClass(field, true);
       toggleErrorMessageContainer(identifier, true, field);
       toggleErrorMessages(identifier, result, true);
       toggleAriaDescribedBy(field, identifier, true);

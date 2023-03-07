@@ -12,9 +12,9 @@
   }
 }
 
-.usa-legend abbr[title=required] {
+.usa-legend abbr[title='required'] {
   position: absolute;
-  padding-left: .2rem;
+  padding-left: 0.2rem;
 }
 
 .usa-radio .usa-error-message {
@@ -61,7 +61,8 @@ ul.usa-error-message {
   }
 
   .usa-search {
-    input, button {
+    input,
+    button {
       height: 2.5rem;
     }
 
@@ -226,7 +227,7 @@ ul.usa-error-message {
   }
 
   .add-contact {
-    margin-top: .5em;
+    margin-top: 0.5em;
   }
 
   #email-notice {
@@ -356,11 +357,12 @@ ul.usa-error-message {
 
   .usa-process-list__item.complete::before {
     border-color: #00a91c;
+
     // TODO: Fix this path & possibly move the image over from FAC-Frontend
     // content: url('../../assets/img/usa-icons/green-check.svg');
   }
 
-  [type="submit"] {
+  [type='submit'] {
     margin-top: 1rem;
   }
 }
