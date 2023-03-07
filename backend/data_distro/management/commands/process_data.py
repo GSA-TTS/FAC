@@ -138,7 +138,7 @@ def create_instances_dict_w_exceptions(row, table, skip_list):
             if str(row["UEI"]) == "nan":
                 instances_dict["Auditee"]["uei_list"] = []
             else:
-                instances_dict["Auditee"]["uei_list"] = [int(row["UEI"])]
+                instances_dict["Auditee"]["uei_list"] = [str(row["UEI"])]
 
     return instances_dict
 

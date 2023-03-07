@@ -52,7 +52,7 @@ class Auditee(models.Model):
         help_text=docs.auditee_certify_title,
     )
     auditee_contact = models.CharField(
-        "Name of Auditee Contact", max_length=50, help_text=docs.auditee_contact
+        "Name of Auditee Contact", max_length=50, null=True, help_text=docs.auditee_contact
     )
     auditee_email = models.CharField(
         "Auditee Email address",
@@ -133,8 +133,12 @@ class Auditor(models.Model):
         null=True,
         help_text=docs.cpa_fax,
     )
-    cpa_state = models.CharField("CPA State", max_length=2, help_text=docs.cpa_state)
-    cpa_city = models.CharField("CPA City", max_length=30, help_text=docs.cpa_city)
+    cpa_state = models.CharField(
+        "CPA State", max_length=2, null=True, help_text=docs.cpa_state
+    )
+    cpa_city = models.CharField(
+        "CPA City", max_length=30, null=True, help_text=docs.cpa_city
+    )
     cpa_title = models.CharField(
         "Title of CPA Contact",
         max_length=40,
@@ -144,6 +148,7 @@ class Auditor(models.Model):
     cpa_street1 = models.CharField(
         "CPA Street Address",
         max_length=45,
+        null=True,
         help_text=docs.cpa_street1,
     )
     cpa_street2 = models.CharField(
@@ -164,6 +169,7 @@ class Auditor(models.Model):
     cpa_contact = models.CharField(
         "Name of CPA Contact",
         max_length=50,
+        null=True,
         help_text=docs.cpa_contact,
     )
     cpa_email = models.CharField(

@@ -8,7 +8,7 @@ from django.core.management.base import BaseCommand
 
 from data_distro.management.commands.load_files import (
     load_files,
-    load_duns_eins,
+    load_lists,
     load_agency,
 )
 from data_distro.management.commands.handle_errors import (
@@ -53,6 +53,8 @@ def lookup_files(year):
     if year is None:
         year = ""
         load_file_names = all_files
+    elif int(year) >= 19:
+        load_file_names = all_files
     elif int(year) >= 18:
         load_file_names = files_18
     elif int(year) >= 13:
@@ -95,8 +97,9 @@ class Command(BaseCommand):
 
         if kwargs["file"] is not None:
             load_file_names = kwargs["file"]
-            if "duns" in load_file_names or "ein" in load_file_names:
-                expected_objects_dict = load_duns_eins(load_file_names)
+            # add uei
+            if "duns" in load_file_names or "ein" in load_file_names or "ueis" in load_file_names:
+                expected_objects_dict = load_lists(load_file_names)
             elif "agency" in load_file_names:
                 expected_objects_dict = load_agency(load_file_names)
             else:
@@ -106,12 +109,17 @@ class Command(BaseCommand):
             year = kwargs["year"]
             load_file_names = lookup_files(year)
             objects_dict = load_files(load_file_names)
-            duns_objects_dict = load_duns_eins(f"duns{year}.txt")
-            eins_objects_dict = load_duns_eins(f"eins{year}.txt")
+            duns_objects_dict = load_lists(f"duns{year}.txt")
+            eins_objects_dict = load_lists(f"eins{year}.txt")
+            uei_objects_dict = load_lists(f"ueis{year}.txt")
             agency_objects_dict = load_agency(f"agency{year}.txt")
 
             expected_objects_dict = (
-                objects_dict | duns_objects_dict | eins_objects_dict | agency_objects_dict  # fmt: skip
+                objects_dict
+                | duns_objects_dict
+                | eins_objects_dict
+                | agency_objects_dict
+                | uei_objects_dict
             )
 
         timestamp = log_results(expected_objects_dict, kwargs)

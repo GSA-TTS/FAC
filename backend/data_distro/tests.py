@@ -9,7 +9,7 @@ from django.test import TestCase
 
 from data_distro.models import General, FederalAward, Finding
 from data_distro.mappings.upload_mapping import upload_mapping
-from data_distro.management.commands.load_files import load_files, load_agency
+from data_distro.management.commands.load_files import load_files, load_agency, load_lists
 from data_distro.management.commands.handle_errors import make_option_string
 
 
@@ -131,7 +131,7 @@ class TestDataProcessing(TestCase):
 
     def test_uei(self):
         test_value = General.objects.get(dbkey=100001, audit_year=1997).auditee
-        self.assertEqual(["888888889"], test_value.uei_list)
+        self.assertEqual(["A88888889"], test_value.uei_list)
 
     def test_captext_linkage(self):
         test_value = General.objects.get(dbkey=100001, audit_year=1997).cap_text
@@ -171,6 +171,19 @@ class TestDataProcessing(TestCase):
             [2, 77, 10],
             list(agency_prior_findings_list),
         )
+
+    def test_uei_linkage(self):
+        load_lists('test_data/ueis.txt')
+        test_value = General.objects.get(dbkey=100000, audit_year=2013)
+        auditee_obj = test_value.auditee
+        uei_list = auditee_obj.uei_list
+        ueis = [
+            "AAAFQYLGJZS7",
+            "LLCFQYLGJZS7",
+            "NJWKWGVY9898",
+            "GPQ2K36AJHG3",
+        ]
+        self.assertEqual(ueis, uei_list)
 
 
 class TestExceptions(TestCase):
