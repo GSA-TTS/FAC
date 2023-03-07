@@ -234,3 +234,11 @@ Security scanning is checked as a GitHub action, configured in [.github/workflow
 We use [mypy](https://mypy.readthedocs.io/en/stable/) for static type checking. We currently configure it (in  [backend/pyproject.toml](https://github.com/GSA-TTS/FAC/blob/main/backend/pyproject.toml)) to [ignore missing imports](https://mypy.readthedocs.io/en/stable/running_mypy.html#missing-imports) because type annotation support for Django isn't yet mature.
 
 Type checking is done as a GitHub action, configured in [.github/workflows/test.yml](https://github.com/GSA-TTS/FAC/blob/main/.github/workflows/test.yml).
+
+### Front end code quality
+
+We use [stylelint](https://stylelint.io/) to lint and format CSS/SCSS. Configuration is located in [backend/.stylelintrc.json](https://github.com/GSA-TTS/FAC/blob/main/backend/.stylelintrc.json), but mostly just imports the standard configs: `stylelint-config-standard` and `stylelint-config-standard-scss`.
+
+To lint and format JavaScript, we use [eslint](https://eslint.org/). eslint configuration lives in [backend/.eslintrc](https://github.com/GSA-TTS/FAC/blob/main/backend/.eslintrc).
+
+To run these tools locally to check formatting or automatically fix formatting errors, just run: `npm run check-all` or `npm run fix-all`, respectively.
