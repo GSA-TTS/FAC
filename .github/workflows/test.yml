@@ -32,6 +32,17 @@ jobs:
       - name: Run type checking
         working-directory: ./backend
         run: mypy .
+  frontend-linting:
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+      - name: Lint JS & SCSS
+        working-directory: ./backend
+        run: |
+          npm ci
+          npm run check-all
   test:
     runs-on: ubuntu-latest
     env:
@@ -58,8 +69,3 @@ jobs:
         run: |
           npm install -g @lhci/cli@0.8.x
           lhci autorun
-      - name: Lint JS & SCSS
-        working-directory: ./backend
-        run: |
-          npm ci
-          npm run check-all
