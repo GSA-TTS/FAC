@@ -141,6 +141,91 @@ class SingleAuditChecklist(models.Model):
     @property
     def user_provided_organization_type(self):
         return self._general_info_get("user_provided_organization_type")
+    
+    @property
+    def ein(self):
+        return self._general_info_get("ein")
+
+    @property
+    def ein_not_an_ssn_attestation(self):
+        return self._general_info_get("ein_not_an_ssn_attestation")
+
+    @property
+    def multiple_eins_covered(self):
+        return self._general_info_get("multiple_eins_covered")
+
+    @property
+    def multiple_ueis_covered(self):
+        return self._general_info_get("multiple_ueis_covered")
+
+    @property
+    def auditee_address_line_1(self):
+        return self._general_info_get("auditee_address_line_1")
+
+    @property
+    def auditee_city(self):
+        return self._general_info_get("auditee_city")
+
+    @property
+    def auditee_state(self):
+        return self._general_info_get("auditee_state")
+
+    @property
+    def auditee_zip(self):
+        return self._general_info_get("auditee_zip")
+
+    @property
+    def auditee_contact_name(self):
+        return self._general_info_get("auditee_contact_name")
+
+    @property
+    def auditee_contact_title(self):
+        return self._general_info_get("auditee_contact_title")
+
+    @property
+    def auditor_firm_name(self):
+        return self._general_info_get("auditor_firm_name")
+
+    @property
+    def auditor_ein(self):
+        return self._general_info_get("auditor_ein")
+
+    @property
+    def auditor_ein_not_an_ssn_attestation(self):
+        return self._general_info_get("auditor_ein_not_an_ssn_attestation")
+
+    @property
+    def auditor_country(self):
+        return self._general_info_get("auditor_country")
+
+    @property
+    def auditor_address_line_1(self):
+        return self._general_info_get("auditor_address_line_1")
+
+    @property
+    def auditor_city(self):
+        return self._general_info_get("auditor_city")
+
+    @property
+    def auditor_state(self):
+        return self._general_info_get("auditor_state")
+
+    @property
+    def auditor_zip(self):
+        return self._general_info_get("auditor_zip")
+
+    @property
+    def auditor_contact_name(self):
+        return self._general_info_get("auditor_contact_name")
+
+    @property
+    def auditor_contact_title(self):
+        return self._general_info_get("auditor_contact_title")
+
+    @property
+    def auditor_phone(self):
+        return self._general_info_get("auditor_phone")
+
 
     def _general_info_get(self, key):
         try:
