@@ -1,0 +1,9 @@
+SEQ_NUMBER|DBKEY|AUDITYEAR|FINDINGREFNUMS|TEXT|CHARTSTABLES
+"21035"|"100001"|"1997"|"2021-002"|"
+In Finding 2021-002, a condition was noted that the Organization did not follow its policy governing procurement requirements for the purchase of goods or services.
+Management recognizes the importance of complying with grant guidelines procurement.In response to Finding 2021-002, Management will review the procurement policy and will educate staff to ensure the policy is being followed.This review will be performed by the Chief Executive Officer and completed by April 30, 2021.
+"|"N"
+"21143"|"100001"|"1997"|"2021-001"|" In Finding 2021-001, a condition was noted in which the Organization is not to currently ensuring purchased services expected to equal or exceed $25,000 are not purchased from parties listed on the government-wide System for Award Management (SAM) in accordance with the OMB guidelines.
+
+Management recognizes the importance of complying with grant guidelines regarding procurement and suspension and debarment.In response to Finding 2021-001, procedures will be established to ensure that purchases of goods or services under non-procurement transactions equal to or exceeding $25,000 will not include ineligible parties as listed on SAM.This review will be performed by the Chief Executive Officer and completed by April 30, 2021.
+"|"N"

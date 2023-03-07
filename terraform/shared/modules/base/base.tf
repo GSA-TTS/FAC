@@ -7,7 +7,7 @@ module "clamav" {
 
   cf_org_name   = var.cf_org_name
   cf_space_name = var.cf_space_name
-  clamav_image  = "ajilaag/clamav-rest:20230224"
+  clamav_image  = "ajilaag/clamav-rest:20230228"
   max_file_size = "30M"
 }
 
