@@ -217,6 +217,11 @@ There are some opinionated enabled/disabled `pylint` messages in [backend/pyproj
 
 Linting is checked as a GitHub action, configured in [.github/workflows/test.yml](https://github.com/GSA-TTS/FAC/blob/main/.github/workflows/test.yml).
 
+##### Additional linters
+We use `djlint` to lint html template files. When developing locally:
+* Use `djlint --reformat <path_to_html_files>` to format the files. 
+* Use the `--lint` option to get a list of linter errors.
+
 #### Formatting
 
 As stated, we use [black](https://black.readthedocs.io/en/stable/index.html) with the default settings for formatting.
