@@ -6,7 +6,6 @@ from data_distro.management.commands.create_docs import Command
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("data_distro", "0023_make_linkages_many_to_many"),
     ]

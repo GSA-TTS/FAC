@@ -5,7 +5,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("data_distro", "0012_update_docs_with_multiple_sources"),
     ]

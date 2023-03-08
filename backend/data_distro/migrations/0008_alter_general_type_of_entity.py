@@ -4,7 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("data_distro", "0007_agencies_agency_name_alter_general_entity_type"),
     ]

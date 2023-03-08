@@ -4,7 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("data_distro", "0016_rename_zip_code_auditee_auditee_zip_code"),
     ]
