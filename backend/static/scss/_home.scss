@@ -10,8 +10,8 @@
   }
 
   .intro-text {
-    border-bottom: 1px solid rgba(0, 0, 0, 0.2);
-    font-size: size('sans', 8);  /* stylelint-disable-line */
+    border-bottom: 1px solid rgb(0 0 0 / 20%);
+    font-size: size('sans', 8); /* stylelint-disable-line */
     padding-bottom: units(3);
   }
 
@@ -33,7 +33,7 @@
 }
 
 .usa-hero__heading {
-  font-size: size('sans', 13);  /* stylelint-disable-line */
+  font-size: size('sans', 13); /* stylelint-disable-line */
 }
 
 .usa-hero__heading,
@@ -50,11 +50,11 @@
     p,
     .usa-button-group {
       margin-bottom: 2.2rem;
-    }  
+    }
   }
 }
 
-.usa-modal--lg { 
+.usa-modal--lg {
   max-width: 60rem;
 
   .usa-modal__heading {
