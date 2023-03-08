@@ -44,7 +44,7 @@ def finish_error_files(date_stamp, options):
     )
 
     error_files = []
-    for (progress, new) in zip(progress_files, new_names):
+    for progress, new in zip(progress_files, new_names):
         if os.path.getsize(progress) == 0:
             os.remove(progress)
         else:
