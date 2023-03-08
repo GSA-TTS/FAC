@@ -1,23 +1,23 @@
 const FORM = document.forms[0];
 
-function isValidEntity({name, id}) {
+function isValidEntity({ name, id }) {
   const INVALID_ENTITY_TYPES = {
-    user_provided_organization_type: ["entity-none"],
-    met_spending_threshold: ["spend-no"],
-    is_usa_based: ["us-no"],
+    user_provided_organization_type: ['entity-none'],
+    met_spending_threshold: ['spend-no'],
+    is_usa_based: ['us-no'],
   };
 
   return !INVALID_ENTITY_TYPES[name].includes(id);
 }
 
 function setFormDisabled(shouldDisable) {
-  const continueBtn = document.getElementById("continue");
+  const continueBtn = document.getElementById('continue');
   continueBtn.disabled = shouldDisable;
 }
 
 function resetErrorStates(el) {
-  const inputsWithErrors = Array.from(el.querySelectorAll(".usa-radio--error"));
-  inputsWithErrors.forEach((i) => i.classList.remove("usa-radio--error"));
+  const inputsWithErrors = Array.from(el.querySelectorAll('.usa-radio--error'));
+  inputsWithErrors.forEach((i) => i.classList.remove('usa-radio--error'));
 }
 
 function validateEntity(entity) {
@@ -26,12 +26,12 @@ function validateEntity(entity) {
   resetErrorStates(fieldsetEl);
 
   if (!isValidEntity(entity) && entity.checked) {
-    radioEl.classList.add("usa-radio--error");
+    radioEl.classList.add('usa-radio--error');
   }
 }
 
 function runAllValidations() {
-  const inputs = Array.from(document.querySelectorAll(".question input"));
+  const inputs = Array.from(document.querySelectorAll('.question input'));
   const validations = [validateEntity];
 
   inputs.forEach((input) => {
@@ -48,15 +48,15 @@ function allResponsesValid() {
 }
 
 function attachEventHandlers() {
-  FORM.addEventListener("submit", (e) => {
+  FORM.addEventListener('submit', (e) => {
     e.preventDefault();
     if (!allResponsesValid()) return;
     FORM.submit();
   });
 
-  const questions = Array.from(document.querySelectorAll(".question"));
+  const questions = Array.from(document.querySelectorAll('.question'));
   questions.forEach((q) => {
-    q.addEventListener("change", (e) => {
+    q.addEventListener('change', (e) => {
       validateEntity(e.target);
       runAllValidations();
     });
