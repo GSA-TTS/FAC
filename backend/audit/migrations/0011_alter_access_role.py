@@ -4,7 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("audit", "0010_alter_singleauditchecklist_audit_period_covered_and_more"),
     ]

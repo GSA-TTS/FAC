@@ -52,10 +52,13 @@ click==8.1.3 \
     #   black
     #   djlint
     #   pip-tools
+<<<<<<< HEAD
 colorama==0.4.6 \
     --hash=sha256:08695f5cb7ed6e0531a20572697297273c47b8cae5a63ffc6d6ed5c201be6e44 \
     --hash=sha256:4f1d9991f5acc0ca119f9d443620b77f9d6b33703e51011c16baf57afb285fc6
     # via djlint
+=======
+>>>>>>> e6aa12f (Update dev-requirements.txt, including black. Also run new version of black. (#842))
 coverage==7.2.1 \
     --hash=sha256:0339dc3237c0d31c3b574f19c57985fcbe494280153bbcad33f2cdf469f4ac3e \
     --hash=sha256:09643fb0df8e29f7417adc3f40aaf379d071ee8f0350ab290517c7004f05360b \
@@ -109,9 +112,12 @@ coverage==7.2.1 \
     --hash=sha256:f3d07edb912a978915576a776756069dede66d012baa503022d3a0adba1b6afa \
     --hash=sha256:fac6343bae03b176e9b58104a9810df3cdccd5cfed19f99adfa807ffbf43cf9b
     # via -r ./requirements/dev-requirements.in
+<<<<<<< HEAD
 cssbeautifier==1.14.7 \
     --hash=sha256:be7f1ea7a7b009f0172c2c0d0bebb2d136346e786f7182185ea944affb52135a
     # via djlint
+=======
+>>>>>>> e6aa12f (Update dev-requirements.txt, including black. Also run new version of black. (#842))
 django==4.1.7 \
     --hash=sha256:44f714b81c5f190d9d2ddad01a532fe502fa01c4cb8faf1d081f4264ed15dcd8 \
     --hash=sha256:f2f431e75adc40039ace496ad3b9f17227022e8b11566f4b363da44c7e44761e
@@ -161,6 +167,7 @@ model-bakery==1.10.1 \
     --hash=sha256:1b74ada5e33f824bb267adf8a9f81fefd193ecaa53902b0af377c385ab04ad5e \
     --hash=sha256:fba6f903d1de4bd2cf62b8654306875fa6c3772467044952f1bde76a5ed6300e
     # via -r ./requirements/dev-requirements.in
+<<<<<<< HEAD
 mypy==1.0.1 \
     --hash=sha256:0af4f0e20706aadf4e6f8f8dc5ab739089146b83fd53cb4a7e0e850ef3de0bb6 \
     --hash=sha256:15b5a824b58c7c822c51bc66308e759243c32631896743f030daf449fe3677f3 \
@@ -188,6 +195,35 @@ mypy==1.0.1 \
     --hash=sha256:e64f48c6176e243ad015e995de05af7f22bbe370dbb5b32bd6988438ec873919 \
     --hash=sha256:e831662208055b006eef68392a768ff83596035ffd6d846786578ba1714ba8f6 \
     --hash=sha256:eda5c8b9949ed411ff752b9a01adda31afe7eae1e53e946dbdf9db23865e66c4
+=======
+mypy==1.1.1 \
+    --hash=sha256:0a28a76785bf57655a8ea5eb0540a15b0e781c807b5aa798bd463779988fa1d5 \
+    --hash=sha256:19ba15f9627a5723e522d007fe708007bae52b93faab00f95d72f03e1afa9598 \
+    --hash=sha256:21b437be1c02712a605591e1ed1d858aba681757a1e55fe678a15c2244cd68a5 \
+    --hash=sha256:26cdd6a22b9b40b2fd71881a8a4f34b4d7914c679f154f43385ca878a8297389 \
+    --hash=sha256:2888ce4fe5aae5a673386fa232473014056967f3904f5abfcf6367b5af1f612a \
+    --hash=sha256:2b0c373d071593deefbcdd87ec8db91ea13bd8f1328d44947e88beae21e8d5e9 \
+    --hash=sha256:315ac73cc1cce4771c27d426b7ea558fb4e2836f89cb0296cbe056894e3a1f78 \
+    --hash=sha256:39c7119335be05630611ee798cc982623b9e8f0cff04a0b48dfc26100e0b97af \
+    --hash=sha256:4b398d8b1f4fba0e3c6463e02f8ad3346f71956b92287af22c9b12c3ec965a9f \
+    --hash=sha256:4e4e8b362cdf99ba00c2b218036002bdcdf1e0de085cdb296a49df03fb31dfc4 \
+    --hash=sha256:59bbd71e5c58eed2e992ce6523180e03c221dcd92b52f0e792f291d67b15a71c \
+    --hash=sha256:5b5f81b40d94c785f288948c16e1f2da37203c6006546c5d947aab6f90aefef2 \
+    --hash=sha256:5cb14ff9919b7df3538590fc4d4c49a0f84392237cbf5f7a816b4161c061829e \
+    --hash=sha256:61bf08362e93b6b12fad3eab68c4ea903a077b87c90ac06c11e3d7a09b56b9c1 \
+    --hash=sha256:64cc3afb3e9e71a79d06e3ed24bb508a6d66f782aff7e56f628bf35ba2e0ba51 \
+    --hash=sha256:69b35d1dcb5707382810765ed34da9db47e7f95b3528334a3c999b0c90fe523f \
+    --hash=sha256:9401e33814cec6aec8c03a9548e9385e0e228fc1b8b0a37b9ea21038e64cdd8a \
+    --hash=sha256:a380c041db500e1410bb5b16b3c1c35e61e773a5c3517926b81dfdab7582be54 \
+    --hash=sha256:ae9ceae0f5b9059f33dbc62dea087e942c0ccab4b7a003719cb70f9b8abfa32f \
+    --hash=sha256:b7c7b708fe9a871a96626d61912e3f4ddd365bf7f39128362bc50cbd74a634d5 \
+    --hash=sha256:c1c10fa12df1232c936830839e2e935d090fc9ee315744ac33b8a32216b93707 \
+    --hash=sha256:ce61663faf7a8e5ec6f456857bfbcec2901fbdb3ad958b778403f63b9e606a1b \
+    --hash=sha256:d64c28e03ce40d5303450f547e07418c64c241669ab20610f273c9e6290b4b0b \
+    --hash=sha256:d809f88734f44a0d44959d795b1e6f64b2bbe0ea4d9cc4776aa588bb4229fc1c \
+    --hash=sha256:dbb19c9f662e41e474e0cff502b7064a7edc6764f5262b6cd91d698163196799 \
+    --hash=sha256:ef6a01e563ec6a4940784c574d33f6ac1943864634517984471642908b30b6f7
+>>>>>>> e6aa12f (Update dev-requirements.txt, including black. Also run new version of black. (#842))
     # via -r ./requirements/dev-requirements.in
 mypy-extensions==1.0.0 \
     --hash=sha256:4392f6c0eb8a5668a69e23d168ffa70f0be9ccfd32b5cc2d26a34ae5b844552d \
@@ -268,9 +304,13 @@ pandas==1.5.3 \
 pathspec==0.11.0 \
     --hash=sha256:3a66eb970cbac598f9e5ccb5b2cf58930cd8e3ed86d393d541eaf2d8b1705229 \
     --hash=sha256:64d338d4e0914e91c1792321e6907b5a593f1ab1851de7fc269557a21b30ebbc
+<<<<<<< HEAD
     # via
     #   black
     #   djlint
+=======
+    # via black
+>>>>>>> e6aa12f (Update dev-requirements.txt, including black. Also run new version of black. (#842))
 pbr==5.11.1 \
     --hash=sha256:567f09558bae2b3ab53cb3c1e2e33e726ff3338e7bae3db5dc954b3a44eef12b \
     --hash=sha256:aefc51675b0b533d56bb5fd1c8c6c0522fe31896679882e1c4c63d5e4a0fccb3
@@ -477,10 +517,13 @@ tomli==2.0.1 \
     #   djlint
     #   mypy
     #   pyproject-hooks
+<<<<<<< HEAD
 tqdm==4.65.0 \
     --hash=sha256:1871fb68a86b8fb3b59ca4cdd3dcccbc7e6d613eeed31f4c332531977b89beb5 \
     --hash=sha256:c4f53a17fe37e132815abceec022631be8ffe1b9381c2e6e30aa70edc99e9671
     # via djlint
+=======
+>>>>>>> e6aa12f (Update dev-requirements.txt, including black. Also run new version of black. (#842))
 types-python-slugify==8.0.0.1 \
     --hash=sha256:1de288ce45c85627ef632c2b5098dedccfc7ebedb241d181ba69402f03704449 \
     --hash=sha256:f2177d2e65ecf2eca742d28fbf236a8d919a72e68272d1d748c3fe965e5ea3ab
