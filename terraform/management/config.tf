@@ -15,6 +15,7 @@ locals {
     "bret.mogilefsky@gsa.gov",
     "lindsayn.young@gsa.gov",
     "jason.nakai@gsa.gov",
+    "james.person@gsa.gov",
     "jeanmarie.mariadassou@gsa.gov",
     "matt.henry@gsa.gov",
     "sarah.withee@gsa.gov",
