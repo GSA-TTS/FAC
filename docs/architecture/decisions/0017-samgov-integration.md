@@ -1,4 +1,4 @@
-# 1. Record architecture decisions
+# 17. SAM.gov integration for MVP
 
 Date: 2023-03-09
 
@@ -25,13 +25,11 @@ User enters UEI       │               │
                              └────────►  Mark UEI as not validated.
                              Not found
 
-UEIs will always be validated. This means we will determine that they have the correct shape.
+When a submitter enters their UEI, we will check it with the SAM.gov API. If we can, we will pre-populate the entity name with the information returned. We will also record that the UEI was checked at time of submission.
 
-When a submitter enters their UEI, we will attempt to validate it with the SAM.gov API. If we can, we will pre-populate the entity name with the information returned. We will also record that the UEI was validated at time of submission.
+If we cannot check the UEI, we will record the UEI entered and the fact that we could not check it at the time of submission.
 
-If we cannot validate the UEI, we will record the UEI and the fact that we could not validate it at the time of submission.
-
-In the submission process, there is a later point where the UEI might be edited. If it is, we will (at that point) allow the edit to take place, but we will mark the UEI as non-validated.
+Once the UEI is submitted, users will not have an opportunity to change it later in the process. The submission process will indicate this to the user.
 
 ## Consequences
 
