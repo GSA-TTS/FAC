@@ -3,7 +3,7 @@ psycopg2-binary
 environs[django]
 gunicorn
 djangorestframework
-pyyaml
+pyyaml<=5.5
 uritemplate
 django-cors-headers
 requests
@@ -23,3 +23,4 @@ django-csp
 pandas
 python-slugify
 openpyxl
+botocore==1.29.87 # To satisfy aws cli

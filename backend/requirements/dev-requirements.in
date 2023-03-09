@@ -12,3 +12,7 @@ whitenoise
 toml
 pandas
 types-python-slugify
+localstack
+awscli
+botocore==1.29.87 # To satisfy aws cli
+boto3

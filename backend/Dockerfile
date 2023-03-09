@@ -3,9 +3,6 @@ FROM python:3.10-slim AS builder
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
-COPY requirements.txt /tmp/requirements.txt
-COPY dev-requirements.txt /tmp/dev-requirements.txt
-
 RUN apt-get -y update
 RUN apt-get -y install git
 
@@ -23,6 +20,9 @@ RUN \
     curl -fsSL https://deb.nodesource.com/setup_14.x | bash - && \
     apt-get install -y nodejs && \
     npm i -g npm@^8
+
+COPY requirements.txt /tmp/requirements.txt
+COPY dev-requirements.txt /tmp/dev-requirements.txt
 
 RUN \
     set -ex && \
