@@ -32,6 +32,9 @@ jobs:
       - name: Run type checking
         working-directory: ./backend
         run: mypy .
+      - name: Run HTML template linting
+        working-directory: ./backend
+        run: djlint --lint .
   frontend-linting:
     runs-on: ubuntu-latest
     steps:
