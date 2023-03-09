@@ -29,6 +29,8 @@ When a submitter enters their UEI, we will check it with the SAM.gov API. If we 
 
 If we cannot check the UEI, we will record the UEI entered and the fact that we could not check it at the time of submission.
 
+We are able to guarantee, in either case, that the UEI is either 1) the correct shape (correct number of characters, meets other static checks appropriate to the UEI) OR 2) is an empty string. 
+
 Once the UEI is submitted, users will not have an opportunity to change it later in the process. The submission process will indicate this to the user.
 
 ## Consequences
