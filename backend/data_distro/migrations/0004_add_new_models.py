@@ -14,7 +14,6 @@ import django.utils.timezone
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("data_distro", "0003_add_relationships_between_models"),
     ]

@@ -4,7 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("data_distro", "0014_alter_auditor_auditor_ein_alter_auditor_seqnum_and_more"),
     ]

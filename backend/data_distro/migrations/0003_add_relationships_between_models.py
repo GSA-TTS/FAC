@@ -5,7 +5,6 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("data_distro", "0002_alter_cfdainfo_ein"),
     ]

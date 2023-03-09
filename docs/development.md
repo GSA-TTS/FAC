@@ -11,6 +11,7 @@ We use either [Docker with `docker-compose`](#docker) or [local development](#lo
   * [Local Development](#local-development)
 * [Django setup](#django-setup)
 * [Python code quality tooling](#python-code-quality-tooling) 
+* [Frontend code quality tooling](#frontend-code-quality-tooling) 
 
 ## Tools
 
@@ -217,6 +218,11 @@ There are some opinionated enabled/disabled `pylint` messages in [backend/pyproj
 
 Linting is checked as a GitHub action, configured in [.github/workflows/test.yml](https://github.com/GSA-TTS/FAC/blob/main/.github/workflows/test.yml).
 
+##### Additional linters
+We use `djlint` to lint html template files. When developing locally:
+* Use `djlint --reformat <path_to_html_files>` to format the files. 
+* Use the `--lint` option to get a list of linter errors.
+
 #### Formatting
 
 As stated, we use [black](https://black.readthedocs.io/en/stable/index.html) with the default settings for formatting.
@@ -234,3 +240,11 @@ Security scanning is checked as a GitHub action, configured in [.github/workflow
 We use [mypy](https://mypy.readthedocs.io/en/stable/) for static type checking. We currently configure it (in  [backend/pyproject.toml](https://github.com/GSA-TTS/FAC/blob/main/backend/pyproject.toml)) to [ignore missing imports](https://mypy.readthedocs.io/en/stable/running_mypy.html#missing-imports) because type annotation support for Django isn't yet mature.
 
 Type checking is done as a GitHub action, configured in [.github/workflows/test.yml](https://github.com/GSA-TTS/FAC/blob/main/.github/workflows/test.yml).
+
+### Frontend code quality tooling
+
+We use [stylelint](https://stylelint.io/) to lint and format CSS/SCSS. Configuration is located in [backend/.stylelintrc.json](https://github.com/GSA-TTS/FAC/blob/main/backend/.stylelintrc.json), but mostly just imports the standard configs: `stylelint-config-standard` and `stylelint-config-standard-scss`.
+
+To lint and format JavaScript, we use [eslint](https://eslint.org/). eslint configuration lives in [backend/.eslintrc](https://github.com/GSA-TTS/FAC/blob/main/backend/.eslintrc).
+
+These tools run automatically as a part of our CI workflow in GitHub actions, but to run these tools locally to check formatting or automatically fix formatting errors before committing, just run: `npm run check-all` or `npm run fix-all`, respectively.
