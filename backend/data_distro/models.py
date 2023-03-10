@@ -725,6 +725,10 @@ class General(models.Model):
     passthrough = models.ManyToManyField(Passthrough)
     # We only have the most recent, so we only have one revision
     revision = models.ForeignKey(Revision, on_delete=models.CASCADE, null=True)
+    pdf_urls = ArrayField(
+        models.CharField("PDFs associated with the report", max_length=400, null=True),
+        null=True,
+    )
 
     # Agency
     cognizant_agency = models.CharField(
