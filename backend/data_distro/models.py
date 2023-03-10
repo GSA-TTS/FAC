@@ -52,7 +52,10 @@ class Auditee(models.Model):
         help_text=docs.auditee_certify_title,
     )
     auditee_contact = models.CharField(
-        "Name of Auditee Contact", max_length=50, null=True, help_text=docs.auditee_contact
+        "Name of Auditee Contact",
+        max_length=50,
+        null=True,
+        help_text=docs.auditee_contact,
     )
     auditee_email = models.CharField(
         "Auditee Email address",

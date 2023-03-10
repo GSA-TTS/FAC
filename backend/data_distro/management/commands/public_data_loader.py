@@ -98,7 +98,11 @@ class Command(BaseCommand):
         if kwargs["file"] is not None:
             load_file_names = kwargs["file"]
             # add uei
-            if "duns" in load_file_names or "ein" in load_file_names or "ueis" in load_file_names:
+            if (
+                "duns" in load_file_names
+                or "ein" in load_file_names
+                or "ueis" in load_file_names
+            ):
                 expected_objects_dict = load_lists(load_file_names)
             elif "agency" in load_file_names:
                 expected_objects_dict = load_agency(load_file_names)

@@ -9,7 +9,11 @@ from django.test import TestCase
 
 from data_distro.models import General, FederalAward, Finding
 from data_distro.mappings.upload_mapping import upload_mapping
-from data_distro.management.commands.load_files import load_files, load_agency, load_lists
+from data_distro.management.commands.load_files import (
+    load_files,
+    load_agency,
+    load_lists,
+)
 from data_distro.management.commands.handle_errors import make_option_string
 
 
@@ -173,7 +177,7 @@ class TestDataProcessing(TestCase):
         )
 
     def test_uei_linkage(self):
-        load_lists('test_data/ueis.txt')
+        load_lists("test_data/ueis.txt")
         test_value = General.objects.get(dbkey=100000, audit_year=2013)
         auditee_obj = test_value.auditee
         uei_list = auditee_obj.uei_list
