@@ -19,10 +19,10 @@ LoginGov -> FAC : Redirects to FAC
 Grantee -> FAC : Fetches Submission
 DB -> FAC : Fetches previously saved structured data
 S3 -> FAC : Fetches previously saved xlsx docs
-FAC -> Grantee : Mahed previous submission available for editing
+FAC -> Grantee : Makes previous submission available for editing
 Grantee -> FAC : Makes Submission
 FAC -> DB : Persists structured data
-FAC -> S3 : Persists xlxs documents
+FAC -> S3 : Persists xlxs docs
 
 autonumber
 == Audit ==
