@@ -1,0 +1,61 @@
+@startuml
+Actor User as Grantee
+Actor User as Auditor
+Actor User as Public
+Actor User as Agency
+
+Participant “FAC.gov” as FAC
+Participant “Login.gov” as LoginGov
+Participant “Data.gov” as DataGov
+
+Database “DataStore” as DB
+Database "S3" as S3
+
+autonumber 
+== Submission ==
+Grantee -> FAC : Grantee Accesses FAC
+FAC -> LoginGov : Redirects for authentication
+LoginGov -> FAC : Redirects to FAC
+Grantee -> FAC : Fetches Submission
+DB -> FAC : Fetches previously saved structured data
+S3 -> FAC : Fetches previously saved xlsx docs
+FAC -> Grantee : Makes previous submission available for editing
+Grantee -> FAC : Makes Submission
+FAC -> DB : Persists structured data
+FAC -> S3 : Persists xlxs docs
+
+autonumber
+== Audit ==
+Auditor -> FAC : Auditor Accesses FAC
+FAC -> LoginGov : Redirects for authentication
+LoginGov -> FAC : Redirects to FAC
+Auditor -> FAC : Submits Findings
+FAC -> DB : Persists structured data
+FAC -> S3 : Persists pdf documents
+
+autonumber
+== Certification ==
+Grantee -> FAC : Authenticated grantee views audit reports
+Grantee -> FAC : Authenticated grantee certifies audit reports
+FAC -> DB : Updates DB to make submissions final
+
+autonumber
+== Public Access ==
+Public -> FAC : Unauthenticated public searches for audit reports
+FAC -> DB : Retrieves searched audits
+FAC -> S3 : Retrieves pdfs associated with audits
+FAC -> Public : Makes info available for viewing and downloading
+
+autonumber
+== Agency Access ==
+Agency -> FAC :  Accesses FAC
+FAC -> DataGov : Redirects for authentication and authorization
+DataGov -> FAC : Redirects authorized API to FAC
+FAC -> DB : Retrieves searched audits
+FAC -> S3 : Retrieves pdfs associated with audits
+FAC -> DataGov : Makes info available
+DataGov -> Agency : Returns API results
+
+
+
+@enduml
