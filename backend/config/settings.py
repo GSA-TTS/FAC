@@ -183,41 +183,91 @@ STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 # CORS base
 CORS_ALLOWED_ORIGINS = [env.str("DJANGO_BASE_URL", "http://localhost:8000")]
 
-# Set some storage defaults so Python doesn't crash if a setting isn't set for that environment
-AWS_ACCESS_KEY_ID = ""
-AWS_SECRET_ACCESS_KEY = ""  # nosec B105
-AWS_STORAGE_BUCKET_NAME = ""
-AWS_S3_REGION_NAME = ""
-AWS_S3_CUSTOM_DOMAIN = ""
-AWS_S3_OBJECT_PARAMETERS = {}
-AWS_LOCATION = ""
-AWS_DEFAULT_ACL = ""
-AWS_PRIVATE_ACCESS_KEY_ID = ""
-AWS_PRIVATE_SECRET_ACCESS_KEY = ""  # nosec B105
-AWS_PRIVATE_STORAGE_BUCKET_NAME = ""
-AWS_S3_PRIVATE_REGION_NAME = ""
-AWS_S3_PRIVATE_CUSTOM_DOMAIN = ""
-AWS_S3_PRIVATE_OBJECT_PARAMETERS = {}
-AWS_PRIVATE_LOCATION = ""
-AWS_PRIVATE_DEFAULT_ACL = ""
-
 # Environment specific configurations
 if ENVIRONMENT == "LOCAL":
+    # Local development environment
+    STATICFILES_STORAGE = "report_submission.storages.S3PublicStorage"
+    DEFAULT_FILE_STORAGE = "report_submission.storages.S3PrivateStorage"
     DEBUG = env.bool("DJANGO_DEBUG", default=True)
     STATIC_URL = "/static/"
+
     # Whitenoise for serving static files
-    STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
     MIDDLEWARE.append("whitenoise.middleware.WhiteNoiseMiddleware")
     CORS_ALLOWED_ORIGINS += ["http://0.0.0.0:8000", "http://127.0.0.1:8000"]
+
+    # Configure to use LocalStack's S3
+    AWS_ACCESS_KEY_ID = os.environ.get("AWS_ACCESS_KEY_ID", "test")
+    AWS_SECRET_ACCESS_KEY = os.environ.get("AWS_SECRET_ACCESS_KEY", "test")
+    AWS_STORAGE_BUCKET_NAME = os.environ.get("AWS_STORAGE_BUCKET_NAME", "gsa-fac-public-s3")
+
+    AWS_S3_REGION_NAME = os.environ.get("AWS_S3_REGION_NAME", "us-east-1")
+    AWS_S3_OBJECT_PARAMETERS = os.environ.get(
+        "AWS_S3_OBJECT_PARAMETERS", {"CacheControl": "max-age=86400"}
+    )
+    AWS_S3_ENDPOINT_URL = os.environ.get("AWS_S3_ENDPOINT_URL", "http://localstack:4566")
+
+    AWS_LOCATION = "static"
+    AWS_DEFAULT_ACL = "public-read"
+
+    AWS_PRIVATE_ACCESS_KEY_ID = os.environ.get("AWS_PRIVATE_ACCESS_KEY_ID", "test")
+    AWS_PRIVATE_SECRET_ACCESS_KEY = os.environ.get(
+        "AWS_PRIVATE_SECRET_ACCESS_KEY", "test"
+    )
+    AWS_PRIVATE_STORAGE_BUCKET_NAME = os.environ.get(
+        "AWS_PRIVATE_STORAGE_BUCKET_NAME", "gsa-fac-private-s3"
+    )
+    AWS_S3_PRIVATE_REGION_NAME = os.environ.get("AWS_S3_PRIVATE_REGION_NAME", "")
+    AWS_S3_PRIVATE_CUSTOM_DOMAIN = os.environ.get("AWS_S3_PRIVATE_CUSTOM_DOMAIN", "")
+    AWS_S3_PRIVATE_OBJECT_PARAMETERS = os.environ.get(
+        "AWS_S3_PRIVATE_OBJECT_PARAMETERS", {"CacheControl": "max-age=86400"}
+    )
+    AWS_PRIVATE_LOCATION = os.environ.get("AWS_PRIVATE_LOCATION", "")
+    AWS_PRIVATE_DEFAULT_ACL = os.environ.get("AWS_PRIVATE_DEFAULT_ACL", "")
+
+    MEDIA_URL = f"{AWS_S3_ENDPOINT_URL}/{AWS_LOCATION}/"
+
 elif ENVIRONMENT not in ["DEVELOPMENT", "STAGING", "PRODUCTION"]:
+    # Testing environment (CI/CD)
     DEBUG = env.bool("DJANGO_DEBUG", default=False)
     STATIC_URL = "/static/"
     # Whitenoise for serving static files
     STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
     MIDDLEWARE.append("whitenoise.middleware.WhiteNoiseMiddleware")
     CORS_ALLOWED_ORIGINS += ["http://0.0.0.0:8000", "http://127.0.0.1:8000"]
+    AWS_ACCESS_KEY_ID = os.environ.get("AWS_ACCESS_KEY_ID", "")
+    AWS_SECRET_ACCESS_KEY = os.environ.get("AWS_SECRET_ACCESS_KEY", "")  # nosec B105
+    AWS_STORAGE_BUCKET_NAME = os.environ.get("AWS_STORAGE_BUCKET_NAME", "")
+
+    AWS_S3_REGION_NAME = os.environ.get("AWS_S3_REGION_NAME", "")
+    AWS_S3_CUSTOM_DOMAIN = os.environ.get("AWS_S3_CUSTOM_DOMAIN", "")
+    AWS_S3_OBJECT_PARAMETERS = os.environ.get(
+        "AWS_S3_OBJECT_PARAMETERS", {"CacheControl": "max-age=86400"}
+    )
+
+    AWS_LOCATION = "static"
+    AWS_DEFAULT_ACL = "public-read"
+
+    AWS_PRIVATE_ACCESS_KEY_ID = os.environ.get("AWS_PRIVATE_ACCESS_KEY_ID", "")
+    AWS_PRIVATE_SECRET_ACCESS_KEY = os.environ.get(
+        "AWS_PRIVATE_SECRET_ACCESS_KEY", ""
+    )  # nosec B105
+    AWS_PRIVATE_STORAGE_BUCKET_NAME = os.environ.get(
+        "AWS_PRIVATE_STORAGE_BUCKET_NAME", ""
+    )
+    AWS_S3_PRIVATE_REGION_NAME = os.environ.get("AWS_S3_PRIVATE_REGION_NAME", "")
+    AWS_S3_PRIVATE_CUSTOM_DOMAIN = os.environ.get("AWS_S3_PRIVATE_CUSTOM_DOMAIN", "")
+    AWS_S3_PRIVATE_OBJECT_PARAMETERS = os.environ.get(
+        "AWS_S3_PRIVATE_OBJECT_PARAMETERS", {"CacheControl": "max-age=86400"}
+    )
+    AWS_PRIVATE_LOCATION = os.environ.get("AWS_PRIVATE_LOCATION", "")
+    AWS_PRIVATE_DEFAULT_ACL = os.environ.get("AWS_PRIVATE_DEFAULT_ACL", "")
+
+    MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/{AWS_LOCATION}/"
+
+
 else:
-    STATICFILES_STORAGE = "storages.backends.s3boto3.S3ManifestStaticStorage"
+    # One of the Cloud.gov environments
+    STATICFILES_STORAGE = "report_submission.storages.S3PublicStorage"
     DEFAULT_FILE_STORAGE = "report_submission.storages.S3PrivateStorage"
     vcap = json.loads(env.str("VCAP_SERVICES"))
     for service in vcap["s3"]:
@@ -255,7 +305,7 @@ else:
             AWS_PRIVATE_DEFAULT_ACL = "private"
             # If wrong, https://docs.aws.amazon.com/AmazonS3/latest/userguide/acl-overview.html#canned-acl
 
-            MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/{AWS_LOCATION}/"
+            MEDIA_URL = f"https://{AWS_S3_PRIVATE_CUSTOM_DOMAIN}/{AWS_LOCATION}/"
 
     # secure headers
     MIDDLEWARE.append("csp.middleware.CSPMiddleware")
