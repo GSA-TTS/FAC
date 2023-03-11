@@ -35,3 +35,7 @@ disable = [
     "unnecessary-lambda",
     "unsubscriptable-object",
 ]
+
+[tool.djlint]
+ignore="H006,H022,H023,H019,H031"
+# img_height, https,entity,javascript,lang

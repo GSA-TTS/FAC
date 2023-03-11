@@ -36,6 +36,8 @@ lint:
 	@bandit -c pyproject.toml -r .
 	@echo "mypy:"
 	@mypy .
+	@echo "djlint:"
+	@djlint .
 
 # Run Django tests:
 test:

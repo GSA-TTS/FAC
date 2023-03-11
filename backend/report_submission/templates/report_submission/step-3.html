@@ -1,451 +1,378 @@
 {% extends "report_submission/step-base.html" %}
 {% load static %}
 {% block step-content %}
-
-<div class="grid-container audit-submission-access">
-  <div class="grid-row">
-    <form class="usa-form usa-form--large" id="grant-access" method="post">
-      {% csrf_token %}
-      <fieldset class="usa-fieldset">
-        <legend class="usa-legend usa-legend--large">Who will need access to this audit?</legend>
-        <div class="usa-summary-box" role="region"
-          aria-labelledby="audit_submission_access-summary-box-key-information">
-          <div class="usa-summary-box__body">
-            <h2 class="usa-summary-box__heading" id="audit_submission_access-summary-box-key-information">
-              Key information
-            </h2>
-            <div class="usa-summary-box__text">
-              <ul class="usa-list">
-
-                <li>
-                  In this section, list anyone who needs access to the audit submission.
-                </li>
-
-                <li>
-                  If you’ll need access to the audit submission, list yourself.
-                </li>
-
-                <li>
-                  You can make changes later using the <a class="usa-link" href="javascript:void(0);">Account
-                    Tools</a> option on the <a class="usa-link" href="javascript:void(0);">account homepage.</a>
-                </li>
-
-              </ul>
+    <div class="grid-container audit-submission-access">
+        <div class="grid-row">
+            <form class="usa-form usa-form--large" id="grant-access" method="post">
+                {% csrf_token %}
+                <fieldset class="usa-fieldset">
+                    <legend class="usa-legend usa-legend--large">
+                        Who will need access to this audit?
+                    </legend>
+                    <div class="usa-summary-box"
+                        role="region"
+                        aria-labelledby="audit_submission_access-summary-box-key-information">
+                        <div class="usa-summary-box__body">
+                            <h2 class="usa-summary-box__heading"
+                                id="audit_submission_access-summary-box-key-information">Key information</h2>
+                            <div class="usa-summary-box__text">
+                                <ul class="usa-list">
+                                    <li>In this section, list anyone who needs access to the audit submission.</li>
+                                    <li>If you’ll need access to the audit submission, list yourself.</li>
+                                    <li>
+                                        You can make changes later using the <a class="usa-link" href="javascript:void(0);">Account
+                                            Tools</a> option on the <a class="usa-link" href="javascript:void(0);">account homepage.</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="required-explanation">
+                        <abbr title="required" class="usa-hint usa-hint--required">*</abbr>Indicates a required field.
+                    </p>
+                    <fieldset class="usa-fieldset question"
+                        aria-labelledby="certifying_auditee_contact_legend certifying_auditee_contact_instruction">
+                        <legend id="certifying_auditee_contact_legend" class="usa-legend">
+                            Auditee certifying official
+                        </legend>
+                        <div class="grid-container">
+                            <p id="certifying_auditee_contact_instruction">
+                                This individual will electronically certify (sign) the
+                                audit submission on behalf of the auditee.
+                            </p>
+                            <div class="grid-row grid-gap">
+                                <div class="tablet:grid-col-fill">
+                                    <div class="usa-form-group">
+                                        <label class="usa-label" for="certifying_auditee_contact_email">
+                                            Email address
+                                            <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
+                                        </label>
+                                        <ul class="usa-error-message"
+                                            id="certifying_auditee_contact_email-error-message"
+                                            role="alert">
+                                            <li id="certifying_auditee_contact_email-not-null" hidden>Please enter a valid email address</li>
+                                            <li id="certifying_auditee_contact_email-email" hidden>
+                                                An email address should have a username, an &#39;@&#39; symbol, and a domain name
+                                            </li>
+                                        </ul>
+                                        <input class="usa-input"
+                                            id="certifying_auditee_contact_email"
+                                            name="certifying_auditee_contact"
+                                            aria-required="true"
+                                            required
+                                            data-validate-not-null=""
+                                            data-validate-email=""/>
+                                    </div>
+                                </div>
+                                <div class="tablet:grid-col-fill">
+                                    <div class="usa-form-group">
+                                        <label class="usa-label" for="certifying_auditee_contact_re_email">
+                                            Re-enter email address
+                                            <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
+                                        </label>
+                                        <ul class="usa-error-message"
+                                            id="certifying_auditee_contact_re_email-error-message"
+                                            role="alert">
+                                            <li id="certifying_auditee_contact_re_email-must-match" hidden>This field should match the one before it</li>
+                                        </ul>
+                                        <input class="usa-input"
+                                            id="certifying_auditee_contact_re_email"
+                                            name="certifying_auditee_contact_re_email"
+                                            aria-required="true"
+                                            required
+                                            data-validate-must-match="certifying_auditee_contact_email"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </fieldset>
+                    <fieldset class="usa-fieldset question"
+                        aria-labelledby="certifying_auditor_contact_legend certifying_auditor_contact_instruction">
+                        <legend id="certifying_auditor_contact_legend" class="usa-legend">
+                            Auditor certifying official
+                        </legend>
+                        <div class="grid-container">
+                            <p id="certifying_auditor_contact_instruction">
+                                This individual will electronically certify (sign) the
+                                audit submission on behalf of the auditor.
+                            </p>
+                            <div class="grid-row grid-gap">
+                                <div class="tablet:grid-col-fill">
+                                    <div class="usa-form-group">
+                                        <label class="usa-label" for="certifying_auditor_contact_email">
+                                            Email address
+                                            <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
+                                        </label>
+                                        <ul class="usa-error-message"
+                                            id="certifying_auditor_contact_email-error-message"
+                                            role="alert">
+                                            <li id="certifying_auditor_contact_email-not-null" hidden>Please enter a valid email address</li>
+                                            <li id="certifying_auditor_contact_email-email" hidden>
+                                                An email address should have a username, an &#39;@&#39; symbol, and a domain name
+                                            </li>
+                                        </ul>
+                                        <input class="usa-input"
+                                            id="certifying_auditor_contact_email"
+                                            name="certifying_auditor_contact"
+                                            aria-required="true"
+                                            required
+                                            data-validate-not-null=""
+                                            data-validate-email=""/>
+                                    </div>
+                                </div>
+                                <div class="tablet:grid-col-fill">
+                                    <div class="usa-form-group">
+                                        <label class="usa-label" for="certifying_auditor_contact_re_email">
+                                            Re-enter email address
+                                            <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
+                                        </label>
+                                        <ul class="usa-error-message"
+                                            id="certifying_auditor_contact_re_email-error-message"
+                                            role="alert">
+                                            <li id="certifying_auditor_contact_re_email-must-match" hidden>This field should match the one before it</li>
+                                        </ul>
+                                        <input class="usa-input"
+                                            id="certifying_auditor_contact_re_email"
+                                            name="certifying_auditor_contact_re_email"
+                                            aria-required="true"
+                                            required
+                                            data-validate-must-match="certifying_auditor_contact_email"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </fieldset>
+                    <p id="dynamic_fieldset_instruction">
+                        These individuals will have access to the single audit submission but
+                        will not have the ability to certify the submission.
+                    </p>
+                    <fieldset class="usa-fieldset question"
+                        aria-labelledby="auditee_contacts_legend dynamic_fieldset_instruction">
+                        <legend id="auditee_contacts_legend" class="usa-legend">
+                            Auditee contacts
+                        </legend>
+                        <div class="grid-container auditee_contacts">
+                            <div class="grid-row grid-gap">
+                                <div class="tablet:grid-col-fill">
+                                    <div class="usa-form-group">
+                                        <label class="usa-label" for="auditee_contacts_email">
+                                            Email address
+                                            <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
+                                        </label>
+                                        <ul class="usa-error-message"
+                                            id="auditee_contacts_email-error-message"
+                                            role="alert">
+                                            <li id="auditee_contacts_email-not-null" hidden>Please enter a valid email address</li>
+                                            <li id="auditee_contacts_email-email" hidden>
+                                                An email address should have a username, an &#39;@&#39; symbol, and a domain name
+                                            </li>
+                                        </ul>
+                                        <input class="usa-input"
+                                            id="auditee_contacts_email"
+                                            name="auditee_contacts"
+                                            aria-required="true"
+                                            required
+                                            data-validate-not-null=""
+                                            data-validate-email=""/>
+                                    </div>
+                                </div>
+                                <div class="tablet:grid-col-fill">
+                                    <div class="usa-form-group">
+                                        <label class="usa-label" for="auditee_contacts_re_email">
+                                            Re-enter email address
+                                            <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
+                                        </label>
+                                        <ul class="usa-error-message"
+                                            id="auditee_contacts_re_email-error-message"
+                                            role="alert">
+                                            <li id="auditee_contacts_re_email-must-match" hidden>This field should match the one before it</li>
+                                        </ul>
+                                        <input class="usa-input"
+                                            id="auditee_contacts_re_email"
+                                            name="auditee_contacts_re_email"
+                                            aria-required="true"
+                                            required
+                                            data-validate-must-match="auditee_contacts_email"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <template id="auditee_contacts-template">
+                                <div class="grid-row grid-gap">
+                                    <div class="tablet:grid-col-fill">
+                                        <div class="usa-form-group">
+                                            <label class="usa-label" for="auditee_contacts_email">
+                                                Email address
+                                                <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
+                                            </label>
+                                            <ul class="usa-error-message"
+                                                id="auditee_contacts_email-error-message"
+                                                role="alert">
+                                                <li id="auditee_contacts_email-not-null" hidden>Please enter a valid email address</li>
+                                                <li id="auditee_contacts_email-email" hidden>
+                                                    An email address should have a username, an &#39;@&#39; symbol, and a domain name
+                                                </li>
+                                            </ul>
+                                            <input class="usa-input"
+                                                id="auditee_contacts_email"
+                                                name="auditee_contacts"
+                                                aria-required="true"
+                                                required
+                                                data-validate-not-null=""
+                                                data-validate-email=""/>
+                                        </div>
+                                    </div>
+                                    <div class="tablet:grid-col-fill">
+                                        <div class="usa-form-group">
+                                            <label class="usa-label" for="auditee_contacts_re_email">
+                                                Re-enter email address
+                                                <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
+                                            </label>
+                                            <ul class="usa-error-message"
+                                                id="auditee_contacts_re_email-error-message"
+                                                role="alert">
+                                                <li id="auditee_contacts_re_email-must-match" hidden>This field should match the one before it</li>
+                                            </ul>
+                                            <input class="usa-input"
+                                                id="auditee_contacts_re_email"
+                                                name="auditee_contacts_re_email"
+                                                aria-required="true"
+                                                required
+                                                data-validate-must-match="auditee_contacts_email"/>
+                                        </div>
+                                    </div>
+                                    <button class="usa-button usa-button--unstyled delete-contact"
+                                        aria-label="Delete contact"
+                                        title="Delete contact">
+                                        <svg class="usa-icon" aria-hidden="true" focusable="false" role="img">
+                                            <use xlink:href="/static/img/sprite.svg#cancel"></use>
+                                        </svg>
+                                    </button>
+                                </template>
+                                <button class="usa-button usa-button--unstyled add-contact">Add another contact</button>
+                            </div>
+                        </fieldset>
+                        <fieldset class="usa-fieldset question"
+                            aria-labelledby="auditor_contacts_legend dynamic_fieldset_instruction">
+                            <legend id="auditor_contacts_legend" class="usa-legend">
+                                Auditor contacts
+                            </legend>
+                            <div class="grid-container auditor_contacts">
+                                <div class="grid-row grid-gap">
+                                    <div class="tablet:grid-col-fill">
+                                        <div class="usa-form-group">
+                                            <label class="usa-label" for="auditor_contacts_email">
+                                                Email address
+                                                <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
+                                            </label>
+                                            <ul class="usa-error-message"
+                                                id="auditor_contacts_email-error-message"
+                                                role="alert">
+                                                <li id="auditor_contacts_email-not-null" hidden>Please enter a valid email address</li>
+                                                <li id="auditor_contacts_email-email" hidden>
+                                                    An email address should have a username, an &#39;@&#39; symbol, and a domain name
+                                                </li>
+                                            </ul>
+                                            <input class="usa-input"
+                                                id="auditor_contacts_email"
+                                                name="auditor_contacts"
+                                                aria-required="true"
+                                                required
+                                                data-validate-not-null=""
+                                                data-validate-email=""/>
+                                        </div>
+                                    </div>
+                                    <div class="tablet:grid-col-fill">
+                                        <div class="usa-form-group">
+                                            <label class="usa-label" for="auditor_contacts_re_email">
+                                                Re-enter email address
+                                                <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
+                                            </label>
+                                            <ul class="usa-error-message"
+                                                id="auditor_contacts_re_email-error-message"
+                                                role="alert">
+                                                <li id="auditor_contacts_re_email-must-match" hidden>This field should match the one before it</li>
+                                            </ul>
+                                            <input class="usa-input"
+                                                id="auditor_contacts_re_email"
+                                                name="auditor_contacts_re_email"
+                                                aria-required="true"
+                                                required
+                                                data-validate-must-match="auditor_contacts_email"/>
+                                        </div>
+                                    </div>
+                                </div>
+                                <template id="auditor_contacts-template">
+                                    <div class="grid-row grid-gap">
+                                        <div class="tablet:grid-col-fill">
+                                            <div class="usa-form-group">
+                                                <label class="usa-label" for="auditor_contacts_email">
+                                                    Email address
+                                                    <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
+                                                </label>
+                                                <ul class="usa-error-message"
+                                                    id="auditor_contacts_email-error-message"
+                                                    role="alert">
+                                                    <li id="auditor_contacts_email-not-null" hidden>Please enter a valid email address</li>
+                                                    <li id="auditor_contacts_email-email" hidden>
+                                                        An email address should have a username, an &#39;@&#39; symbol, and a domain name
+                                                    </li>
+                                                </ul>
+                                                <input class="usa-input"
+                                                    id="auditor_contacts_email"
+                                                    name="auditor_contacts"
+                                                    aria-required="true"
+                                                    required
+                                                    data-validate-not-null=""
+                                                    data-validate-email=""/>
+                                            </div>
+                                        </div>
+                                        <div class="tablet:grid-col-fill">
+                                            <div class="usa-form-group">
+                                                <label class="usa-label" for="auditor_contacts_re_email">
+                                                    Re-enter email address
+                                                    <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
+                                                </label>
+                                                <ul class="usa-error-message"
+                                                    id="auditor_contacts_re_email-error-message"
+                                                    role="alert">
+                                                    <li id="auditor_contacts_re_email-must-match" hidden>This field should match the one before it</li>
+                                                </ul>
+                                                <input class="usa-input"
+                                                    id="auditor_contacts_re_email"
+                                                    name="auditor_contacts_re_email"
+                                                    aria-required="true"
+                                                    required
+                                                    data-validate-must-match="auditor_contacts_email"/>
+                                            </div>
+                                        </div>
+                                        <button class="usa-button usa-button--unstyled delete-contact"
+                                            aria-label="Delete contact"
+                                            title="Delete contact">
+                                            <svg class="usa-icon" aria-hidden="true" focusable="false" role="img">
+                                                <use xlink:href="/static/img/sprite.svg#cancel"></use>
+                                            </svg>
+                                        </button>
+                                    </template>
+                                    <button class="usa-button usa-button--unstyled add-contact">Add another contact</button>
+                                </div>
+                            </fieldset>
+                            <p id="email-notice">The above contacts will receive an e-mail once this audit is created.</p>
+                            <ul class="usa-button-group">
+                                <li class="usa-button-group__item">
+                                    <a href="javascript:void(0);" class="usa-button usa-button--outline">Cancel</a>
+                                </li>
+                                <li class="usa-button-group__item">
+                                    <button class="usa-button" id="create">
+                                        Create
+                                    </button>
+                                </li>
+                            </ul>
+                        </fieldset>
+                    </form>
+                </div>
             </div>
-          </div>
         </div>
-        <p class="required-explanation">
-          <abbr title="required" class="usa-hint usa-hint--required">*</abbr>Indicates a required field.
-        </p>
-
-        <fieldset class="usa-fieldset question"
-          aria-labelledby="certifying_auditee_contact_legend certifying_auditee_contact_instruction">
-          <legend id="certifying_auditee_contact_legend" class="usa-legend">Auditee certifying official</legend>
-          <div class="grid-container">
-            <p id="certifying_auditee_contact_instruction">This individual will electronically certify (sign) the
-              audit submission on behalf of the auditee.</p>
-            <div class="grid-row grid-gap">
-
-
-              <div class="tablet:grid-col-fill">
-                <div class="usa-form-group">
-                  <label class="usa-label" for="certifying_auditee_contact_email">
-                    Email address
-
-                    <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
-
-                  </label>
-
-
-                  <ul class="usa-error-message" id="certifying_auditee_contact_email-error-message" role="alert">
-
-                    <li id="certifying_auditee_contact_email-not-null" hidden>
-                      Please enter a valid email address
-                    </li>
-
-                    <li id="certifying_auditee_contact_email-email" hidden>
-                      An email address should have a username, an &#39;@&#39; symbol, and a domain name
-                    </li>
-
-                  </ul>
-
-                  <input class="usa-input" id="certifying_auditee_contact_email"
-                    name="certifying_auditee_contact" aria-required="true" required data-validate-not-null=""
-                    data-validate-email="" />
-                </div>
-
-              </div>
-
-
-              <div class="tablet:grid-col-fill">
-                <div class="usa-form-group">
-                  <label class="usa-label" for="certifying_auditee_contact_re_email">
-                    Re-enter email address
-
-                    <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
-
-                  </label>
-
-
-                  <ul class="usa-error-message" id="certifying_auditee_contact_re_email-error-message" role="alert">
-
-                    <li id="certifying_auditee_contact_re_email-must-match" hidden>
-                      This field should match the one before it
-                    </li>
-
-                  </ul>
-
-                  <input class="usa-input" id="certifying_auditee_contact_re_email"
-                    name="certifying_auditee_contact_re_email" aria-required="true" required
-                    data-validate-must-match="certifying_auditee_contact_email" />
-                </div>
-
-              </div>
-
-            </div>
-          </div>
-        </fieldset>
-
-        <fieldset class="usa-fieldset question"
-          aria-labelledby="certifying_auditor_contact_legend certifying_auditor_contact_instruction">
-          <legend id="certifying_auditor_contact_legend" class="usa-legend">Auditor certifying official</legend>
-          <div class="grid-container">
-            <p id="certifying_auditor_contact_instruction">This individual will electronically certify (sign) the
-              audit submission on behalf of the auditor.</p>
-            <div class="grid-row grid-gap">
-
-
-              <div class="tablet:grid-col-fill">
-                <div class="usa-form-group">
-                  <label class="usa-label" for="certifying_auditor_contact_email">
-                    Email address
-
-                    <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
-
-                  </label>
-
-
-                  <ul class="usa-error-message" id="certifying_auditor_contact_email-error-message" role="alert">
-
-                    <li id="certifying_auditor_contact_email-not-null" hidden>
-                      Please enter a valid email address
-                    </li>
-
-                    <li id="certifying_auditor_contact_email-email" hidden>
-                      An email address should have a username, an &#39;@&#39; symbol, and a domain name
-                    </li>
-
-                  </ul>
-
-                  <input class="usa-input" id="certifying_auditor_contact_email"
-                    name="certifying_auditor_contact" aria-required="true" required data-validate-not-null=""
-                    data-validate-email="" />
-                </div>
-
-              </div>
-
-
-              <div class="tablet:grid-col-fill">
-                <div class="usa-form-group">
-                  <label class="usa-label" for="certifying_auditor_contact_re_email">
-                    Re-enter email address
-
-                    <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
-
-                  </label>
-
-
-                  <ul class="usa-error-message" id="certifying_auditor_contact_re_email-error-message" role="alert">
-
-                    <li id="certifying_auditor_contact_re_email-must-match" hidden>
-                      This field should match the one before it
-                    </li>
-
-                  </ul>
-
-                  <input class="usa-input" id="certifying_auditor_contact_re_email"
-                    name="certifying_auditor_contact_re_email" aria-required="true" required
-                    data-validate-must-match="certifying_auditor_contact_email" />
-                </div>
-
-              </div>
-
-            </div>
-          </div>
-        </fieldset>
-
-        <p id="dynamic_fieldset_instruction">These individuals will have access to the single audit submission but
-          will not have the ability to certify the submission.</p>
-
-        <fieldset class="usa-fieldset question" aria-labelledby="auditee_contacts_legend dynamic_fieldset_instruction">
-          <legend id="auditee_contacts_legend" class="usa-legend">Auditee contacts</legend>
-          <div class="grid-container auditee_contacts">
-            <div class="grid-row grid-gap">
-
-
-              <div class="tablet:grid-col-fill">
-                <div class="usa-form-group">
-                  <label class="usa-label" for="auditee_contacts_email">
-                    Email address
-
-                    <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
-
-                  </label>
-
-
-                  <ul class="usa-error-message" id="auditee_contacts_email-error-message" role="alert">
-
-                    <li id="auditee_contacts_email-not-null" hidden>
-                      Please enter a valid email address
-                    </li>
-
-                    <li id="auditee_contacts_email-email" hidden>
-                      An email address should have a username, an &#39;@&#39; symbol, and a domain name
-                    </li>
-
-                  </ul>
-
-                  <input class="usa-input" id="auditee_contacts_email" name="auditee_contacts"
-                    aria-required="true" required data-validate-not-null="" data-validate-email="" />
-                </div>
-
-              </div>
-
-
-              <div class="tablet:grid-col-fill">
-                <div class="usa-form-group">
-                  <label class="usa-label" for="auditee_contacts_re_email">
-                    Re-enter email address
-
-                    <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
-
-                  </label>
-
-
-                  <ul class="usa-error-message" id="auditee_contacts_re_email-error-message" role="alert">
-
-                    <li id="auditee_contacts_re_email-must-match" hidden>
-                      This field should match the one before it
-                    </li>
-
-                  </ul>
-
-                  <input class="usa-input" id="auditee_contacts_re_email" name="auditee_contacts_re_email"
-                    aria-required="true" required data-validate-must-match="auditee_contacts_email" />
-                </div>
-
-              </div>
-
-            </div>
-            <template id="auditee_contacts-template">
-              <div class="grid-row grid-gap">
-
-
-                <div class="tablet:grid-col-fill">
-                  <div class="usa-form-group">
-                    <label class="usa-label" for="auditee_contacts_email">
-                      Email address
-
-                      <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
-
-                    </label>
-
-
-                    <ul class="usa-error-message" id="auditee_contacts_email-error-message" role="alert">
-
-                      <li id="auditee_contacts_email-not-null" hidden>
-                        Please enter a valid email address
-                      </li>
-
-                      <li id="auditee_contacts_email-email" hidden>
-                        An email address should have a username, an &#39;@&#39; symbol, and a domain name
-                      </li>
-
-                    </ul>
-
-                    <input class="usa-input" id="auditee_contacts_email" name="auditee_contacts"
-                      aria-required="true" required data-validate-not-null="" data-validate-email="" />
-                  </div>
-
-                </div>
-
-
-                <div class="tablet:grid-col-fill">
-                  <div class="usa-form-group">
-                    <label class="usa-label" for="auditee_contacts_re_email">
-                      Re-enter email address
-
-                      <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
-
-                    </label>
-
-
-                    <ul class="usa-error-message" id="auditee_contacts_re_email-error-message" role="alert">
-
-                      <li id="auditee_contacts_re_email-must-match" hidden>
-                        This field should match the one before it
-                      </li>
-
-                    </ul>
-
-                    <input class="usa-input" id="auditee_contacts_re_email" name="auditee_contacts_re_email"
-                      aria-required="true" required data-validate-must-match="auditee_contacts_email" />
-                  </div>
-
-                </div>
-
-                <button class="usa-button usa-button--unstyled delete-contact" aria-label="Delete contact"
-                  title="Delete contact">
-                  <svg class="usa-icon" aria-hidden="true" focusable="false" role="img">
-                    <use xlink:href="/static/img/sprite.svg#cancel"></use>
-                  </svg>
-                </button>
-            </template>
-            <button class="usa-button usa-button--unstyled add-contact">Add another contact</button>
-          </div>
-        </fieldset>
-
-        <fieldset class="usa-fieldset question" aria-labelledby="auditor_contacts_legend dynamic_fieldset_instruction">
-          <legend id="auditor_contacts_legend" class="usa-legend">Auditor contacts</legend>
-          <div class="grid-container auditor_contacts">
-            <div class="grid-row grid-gap">
-
-
-              <div class="tablet:grid-col-fill">
-                <div class="usa-form-group">
-                  <label class="usa-label" for="auditor_contacts_email">
-                    Email address
-
-                    <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
-
-                  </label>
-
-
-                  <ul class="usa-error-message" id="auditor_contacts_email-error-message" role="alert">
-
-                    <li id="auditor_contacts_email-not-null" hidden>
-                      Please enter a valid email address
-                    </li>
-
-                    <li id="auditor_contacts_email-email" hidden>
-                      An email address should have a username, an &#39;@&#39; symbol, and a domain name
-                    </li>
-
-                  </ul>
-
-                  <input class="usa-input" id="auditor_contacts_email" name="auditor_contacts"
-                    aria-required="true" required data-validate-not-null="" data-validate-email="" />
-                </div>
-
-              </div>
-
-
-              <div class="tablet:grid-col-fill">
-                <div class="usa-form-group">
-                  <label class="usa-label" for="auditor_contacts_re_email">
-                    Re-enter email address
-
-                    <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
-
-                  </label>
-
-
-                  <ul class="usa-error-message" id="auditor_contacts_re_email-error-message" role="alert">
-
-                    <li id="auditor_contacts_re_email-must-match" hidden>
-                      This field should match the one before it
-                    </li>
-
-                  </ul>
-
-                  <input class="usa-input" id="auditor_contacts_re_email" name="auditor_contacts_re_email"
-                    aria-required="true" required data-validate-must-match="auditor_contacts_email" />
-                </div>
-
-              </div>
-
-            </div>
-            <template id="auditor_contacts-template">
-              <div class="grid-row grid-gap">
-
-
-                <div class="tablet:grid-col-fill">
-                  <div class="usa-form-group">
-                    <label class="usa-label" for="auditor_contacts_email">
-                      Email address
-
-                      <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
-
-                    </label>
-
-
-                    <ul class="usa-error-message" id="auditor_contacts_email-error-message" role="alert">
-
-                      <li id="auditor_contacts_email-not-null" hidden>
-                        Please enter a valid email address
-                      </li>
-
-                      <li id="auditor_contacts_email-email" hidden>
-                        An email address should have a username, an &#39;@&#39; symbol, and a domain name
-                      </li>
-
-                    </ul>
-
-                    <input class="usa-input" id="auditor_contacts_email" name="auditor_contacts"
-                      aria-required="true" required data-validate-not-null="" data-validate-email="" />
-                  </div>
-
-                </div>
-
-
-                <div class="tablet:grid-col-fill">
-                  <div class="usa-form-group">
-                    <label class="usa-label" for="auditor_contacts_re_email">
-                      Re-enter email address
-
-                      <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
-
-                    </label>
-
-
-                    <ul class="usa-error-message" id="auditor_contacts_re_email-error-message" role="alert">
-
-                      <li id="auditor_contacts_re_email-must-match" hidden>
-                        This field should match the one before it
-                      </li>
-
-                    </ul>
-
-                    <input class="usa-input" id="auditor_contacts_re_email" name="auditor_contacts_re_email"
-                      aria-required="true" required data-validate-must-match="auditor_contacts_email" />
-                  </div>
-
-                </div>
-
-                <button class="usa-button usa-button--unstyled delete-contact" aria-label="Delete contact"
-                  title="Delete contact">
-                  <svg class="usa-icon" aria-hidden="true" focusable="false" role="img">
-                    <use xlink:href="/static/img/sprite.svg#cancel"></use>
-                  </svg>
-                </button>
-            </template>
-            <button class="usa-button usa-button--unstyled add-contact">Add another contact</button>
-          </div>
-        </fieldset>
-
-        <p id="email-notice">The above contacts will receive an e-mail once this audit is created.</p>
-        <ul class="usa-button-group">
-          <li class="usa-button-group__item">
-            <a href="javascript:void(0);" class="usa-button usa-button--outline">
-              Cancel
-            </a>
-          </li>
-          <li class="usa-button-group__item">
-            <button class="usa-button" id="create">Create</button>
-          </li>
-        </ul>
-    </form>
-  </div>
-  <script src="{% static 'compiled/js/check-access.js' %}" type="text/javascript"></script>
-</div>
+    </div>
+    <script src="{% static 'compiled/js/check-access.js' %}"
+        type="text/javascript"></script>
 {% endblock %}
