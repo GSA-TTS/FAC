@@ -9,10 +9,13 @@ Person(Agency, "User", "Agency User")
 Boundary(cloudgov, "Cloud.gov Boundary") {
     Boundary(atob, "ATO Boundary") {
         Boundary(backend, "Django web application") {
-            System(api, "REST API", "DRF")
             System(admin, "Django Admin interface")
             System(submissions, "Django authenticated frontend")
             System(publicinfo, "Django unauthenticated frontend")
+        }
+        Boundary(services, "FAC Services") {
+            System(api, "REST API", "PostgREST")
+            System(scan, "Virus Scanner", "ClamAV")
         }
     }
     System(db, "Database", "postgres")
@@ -29,21 +32,23 @@ Boundary(gsaplatforms, "GSA Platforms Boundary") {
 AddRelTag("authenticated", $lineColor="#008787", $textColor="#008787")
 Rel(User, submissions, "Submits/edits audits", "via Login.gov", $tags="authenticated")
 Rel(User, publicinfo, "Searches for/reads information")
+Rel(Staff, admin, "Manages audits, roles, users", "via Login.gov", $tags="authenticated")
+Rel(Agency, api, "Retrieves audits")
 
 Rel(User, Login, "Authenticates with")
 Rel(Agency, datagov, "Authenticates with")
-
 Rel(Staff, Login, "Authenticates with")
-Rel(Email, User, "Sends emails to")
-Rel(Staff, admin, "Manages audits, roles, users", "via Login.gov", $tags="authenticated")
-Rel(Agency, api, "Searches, filters, requests audit", "via api.data.gov", $tags="authenticated")
-
-Rel(Login, backend, "Provides identities", "email address")
-Rel(datagov, backend, "Provides access", "API Tokens")
 
 Rel(backend, Email, "Sends emails using")
-Rel(submissions, samgov, "Looks up UEI info")
+Rel(Email, User, "Sends emails to")
 
+Rel(datagov, api, "Searches, filters, requests audit", "via api.data.gov", $tags="authenticated")
+Rel(Login, backend, "Provides identities", "email address")
+Rel(api, db, "Fetches Audits")
+Rel(api, s3, "Fetches Audit Attachments")
+
+Rel(backend, samgov, "Looks up UEI info")
+Rel(backend, scan, "Scans attachments")
 Rel(backend, db, "read/write")
 Rel(backend, s3, "Stores single audit packages/Excel files")
 
