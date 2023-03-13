@@ -3,7 +3,7 @@ psycopg2-binary
 environs[django]
 gunicorn
 djangorestframework
-pyyaml<=5.5
+pyyaml
 uritemplate
 django-cors-headers
 requests

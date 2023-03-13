@@ -198,13 +198,17 @@ if ENVIRONMENT == "LOCAL":
     # Configure to use LocalStack's S3
     AWS_ACCESS_KEY_ID = os.environ.get("AWS_ACCESS_KEY_ID", "test")
     AWS_SECRET_ACCESS_KEY = os.environ.get("AWS_SECRET_ACCESS_KEY", "test")
-    AWS_STORAGE_BUCKET_NAME = os.environ.get("AWS_STORAGE_BUCKET_NAME", "gsa-fac-public-s3")
+    AWS_STORAGE_BUCKET_NAME = os.environ.get(
+        "AWS_STORAGE_BUCKET_NAME", "gsa-fac-public-s3"
+    )
 
     AWS_S3_REGION_NAME = os.environ.get("AWS_S3_REGION_NAME", "us-east-1")
     AWS_S3_OBJECT_PARAMETERS = os.environ.get(
         "AWS_S3_OBJECT_PARAMETERS", {"CacheControl": "max-age=86400"}
     )
-    AWS_S3_ENDPOINT_URL = os.environ.get("AWS_S3_ENDPOINT_URL", "http://localstack:4566")
+    AWS_S3_ENDPOINT_URL = os.environ.get(
+        "AWS_S3_ENDPOINT_URL", "http://localstack:4566"
+    )
 
     AWS_LOCATION = "static"
     AWS_DEFAULT_ACL = "public-read"

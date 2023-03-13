@@ -6,7 +6,7 @@ coverage
 flake8
 model_bakery
 mypy
-djlint
+#djlint # Temporarily removing as it conflicts with the needs of LocalStack
 types-requests
 pip-tools
 whitenoise
