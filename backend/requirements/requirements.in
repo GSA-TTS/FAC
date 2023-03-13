@@ -23,4 +23,4 @@ django-csp
 pandas
 python-slugify
 openpyxl
-botocore==1.29.87 # To satisfy aws cli
+botocore

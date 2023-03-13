@@ -21,6 +21,13 @@ RUN \
     apt-get install -y nodejs && \
     npm i -g npm@^8
 
+RUN \
+    apt-get install -yqq groff && \
+    apt-get install -yqq zip && \
+    curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" && \
+    unzip awscliv2.zip && \
+    ./aws/install
+
 COPY requirements.txt /tmp/requirements.txt
 COPY dev-requirements.txt /tmp/dev-requirements.txt
 

@@ -6,7 +6,7 @@ coverage
 flake8
 model_bakery
 mypy
-#djlint # Temporarily removing as it conflicts with the needs of LocalStack
+djlint
 types-requests
 pip-tools
 whitenoise
@@ -14,6 +14,5 @@ toml
 pandas
 types-python-slugify
 localstack
-awscli
-botocore==1.29.87 # To satisfy aws cli
+botocore
 boto3
