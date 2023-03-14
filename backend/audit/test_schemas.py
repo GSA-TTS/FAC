@@ -362,12 +362,12 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
     SIMPLE_CASE = {
         "FederalAwards": {
             "auditee_ein": "whatever",
-            "total_amount_expended": "",
+            "total_amount_expended": 0,
             "federal_awards": [
                 {
                     "program_number": "10.001",
                     "federal_program_name": "GACC",
-                    "amount_expended": "",
+                    "amount_expended": 0,
                     "cluster_name": "N/A",
                     "loan_or_loan_guarantee": "N",
                     "direct_award": "Y",
