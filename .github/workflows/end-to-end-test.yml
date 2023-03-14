@@ -1,0 +1,27 @@
+name: Runs end to end tests
+on:
+  workflow_call:
+
+jobs:
+  e2e-testing:
+    runs-on: ubuntu-latest
+    env:
+      ENV: TESTING
+      SAM_API_KEY: ${{ secrets.SAM_API_KEY }}"
+      DJANGO_BASE_URL: 'http://localhost:8000'
+      DJANGO_SECRET_LOGIN_KEY: ${{ secrets.DJANGO_SECRET_LOGIN_KEY }}"
+      SECRET_KEY: ${{ secrets.SECRET_KEY }}
+      ALLOWED_HOSTS: '0.0.0.0 127.0.0.1 localhost'
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+      - name: Start services
+        working-directory: ./backend
+        run: touch .env && docker-compose up -d
+      - name: Run Cypress
+        working-directory: ./backend
+        run: |
+          npm ci
+          npm run test:e2e:ci
