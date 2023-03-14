@@ -12,6 +12,7 @@ jobs:
       DJANGO_SECRET_LOGIN_KEY: ${{ secrets.DJANGO_SECRET_LOGIN_KEY }}"
       SECRET_KEY: ${{ secrets.SECRET_KEY }}
       ALLOWED_HOSTS: '0.0.0.0 127.0.0.1 localhost'
+      DISABLE_AUTH: true
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
