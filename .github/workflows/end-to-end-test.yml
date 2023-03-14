@@ -13,6 +13,8 @@ jobs:
       SECRET_KEY: ${{ secrets.SECRET_KEY }}
       ALLOWED_HOSTS: '0.0.0.0 127.0.0.1 localhost'
     steps:
+      - name: Clean the workspace
+        run: rm -rf $GITHUB_WORKSPACE/*
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
@@ -23,6 +25,5 @@ jobs:
       - name: Run Cypress
         working-directory: ./backend
         run: |
-          sudo usermod -a -G root $(whoami)
           npm ci
           npm run test:e2e:ci
