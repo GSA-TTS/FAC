@@ -23,5 +23,6 @@ jobs:
       - name: Run Cypress
         working-directory: ./backend
         run: |
+          sudo usermod -a -G root $(whoami)
           npm ci
           npm run test:e2e:ci
