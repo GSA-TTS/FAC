@@ -17,6 +17,7 @@ services:
     command: /src/run.sh
     depends_on:
       - db
+      - localstack
     environment:
       - "DATABASE_URL=postgres://postgres@db/postgres"
       - "DJANGO_DEBUG=true"
