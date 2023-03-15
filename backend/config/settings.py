@@ -191,6 +191,7 @@ if ENVIRONMENT == "LOCAL":
     STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
     MIDDLEWARE.append("whitenoise.middleware.WhiteNoiseMiddleware")
     CORS_ALLOWED_ORIGINS += ["http://0.0.0.0:8000", "http://127.0.0.1:8000"]
+    DISABLE_AUTH = env.bool("DISABLE_AUTH", default=False)
 elif ENVIRONMENT not in ["DEVELOPMENT", "STAGING", "PRODUCTION"]:
     DEBUG = env.bool("DJANGO_DEBUG", default=False)
     STATIC_URL = "/static/"
@@ -198,6 +199,7 @@ elif ENVIRONMENT not in ["DEVELOPMENT", "STAGING", "PRODUCTION"]:
     STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
     MIDDLEWARE.append("whitenoise.middleware.WhiteNoiseMiddleware")
     CORS_ALLOWED_ORIGINS += ["http://0.0.0.0:8000", "http://127.0.0.1:8000"]
+    DISABLE_AUTH = env.bool("DISABLE_AUTH", default=False)
 else:
     STATICFILES_STORAGE = "storages.backends.s3boto3.S3ManifestStaticStorage"
     vcap = json.loads(env.str("VCAP_SERVICES"))
@@ -270,6 +272,8 @@ else:
             rds_creds["password"],
         )
     )
+    # Will not be enabled in cloud environments
+    DISABLE_AUTH = False
 
 ADMIN_URL = "admin/"
 
@@ -347,7 +351,7 @@ LOGIN_URL = f"{env_base_url}/openid/login/"
 
 USER_PROMOTION_COMMANDS_ENABLED = ENVIRONMENT in ["LOCAL", "TESTING", "UNDEFINED"]
 
-DISABLE_AUTH = env.bool("DISABLE_AUTH", default=False)
+
 if DISABLE_AUTH:
     TEST_USERNAME = "test_user@test.test"
     MIDDLEWARE.append(
