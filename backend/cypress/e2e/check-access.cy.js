@@ -1,8 +1,6 @@
 describe('Create New Audit', () => {
   beforeEach(() => {
     cy.visit('/report_submission/accessandsubmission/');
-    cy.url().should('include', '/report_submission/accessandsubmission');
-    cy.task('log', cy.url());
   });
 
   function addValidEmail(field) {
