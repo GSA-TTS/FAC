@@ -143,8 +143,17 @@ class GeneralInformationFormView(LoginRequiredMixin, View):
 
         return render(request, "report_submission/gen-form.html", context)
     
-    def post(self, post_request):
-        
-        # Backend to fill in this functionality 
-        #print("Error processing data: ", result)
-        return redirect(reverse("MySubmissions"))
+    def post(self, request, *args, **kwargs):
+        report_id = kwargs["report_id"]
+
+        sac = SingleAuditChecklist.objects.get(report_id=report_id)
+
+        accesses = Access.objects.filter(sac=sac, user=request.user)
+        if not accesses:
+            raise Exception("you don't have access to this audit")
+
+        SingleAuditChecklist.objects.filter(pk=sac.id).update(**request.POST)
+        print("###########")
+        print(request.POST)
+
+        return redirect(reverse("audit:MySubmissions"))
