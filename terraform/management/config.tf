@@ -22,6 +22,7 @@ locals {
     "tadhg.ohiggins@gsa.gov",
     "timothy.ballard@gsa.gov",
     "matthew.jadud@gsa.gov",
+    "edward.zapata@gsa.gov",
   ]
 
   # All spaces have the same SpaceManagers for now

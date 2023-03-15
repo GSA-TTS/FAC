@@ -225,6 +225,8 @@ if ENVIRONMENT == "LOCAL":
     )
     AWS_S3_ENDPOINT_URL = f"http://{AWS_S3_PRIVATE_ENDPOINT}"
 
+    DISABLE_AUTH = env.bool("DISABLE_AUTH", default=False)
+
 elif ENVIRONMENT not in ["DEVELOPMENT", "STAGING", "PRODUCTION"]:
     # Testing environment (CI/CD/GitHub Actions)
     DEBUG = env.bool("DJANGO_DEBUG", default=False)
@@ -259,6 +261,8 @@ elif ENVIRONMENT not in ["DEVELOPMENT", "STAGING", "PRODUCTION"]:
         "AWS_S3_PRIVATE_ENDPOINT", "localstack:4566"
     )
     AWS_S3_ENDPOINT_URL = f"http://{AWS_S3_PRIVATE_ENDPOINT}"
+
+    DISABLE_AUTH = env.bool("DISABLE_AUTH", default=False)
 
 else:
     # One of the Cloud.gov environments
@@ -363,6 +367,8 @@ else:
             rds_creds["password"],
         )
     )
+    # Will not be enabled in cloud environments
+    DISABLE_AUTH = False
 
 ADMIN_URL = "admin/"
 
@@ -440,7 +446,7 @@ LOGIN_URL = f"{env_base_url}/openid/login/"
 
 USER_PROMOTION_COMMANDS_ENABLED = ENVIRONMENT in ["LOCAL", "TESTING", "UNDEFINED"]
 
-DISABLE_AUTH = env.bool("DISABLE_AUTH", default=False)
+
 if DISABLE_AUTH:
     TEST_USERNAME = "test_user@test.test"
     MIDDLEWARE.append(
