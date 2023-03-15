@@ -1,3 +1,6 @@
+import json
+
+from django.core.exceptions import ValidationError
 from django.test import SimpleTestCase
 from openpyxl import load_workbook
 from openpyxl.cell import Cell
@@ -9,6 +12,9 @@ from audit.excel import (
 )
 from audit.validators import validate_federal_award_json
 
+# Simplest way to create a new copy of simple case rather than getting
+# references to things used by other tests:
+jsoncopy = lambda v: json.loads(json.dumps(v))
 
 FEDERAL_AWARDS_TEMPLATE = "excel_templates/FederalAwardsExpendedTemplateUG2019.xlsx"
 
@@ -86,8 +92,8 @@ class FederalAwardsExcelTests(SimpleTestCase):
 
         validate_federal_award_json(federal_awards)
 
-    def test_with_single_federal_awards_entry(self):
-        """Test that extraction and validaiton succeed when there is a single federal awards entry"""
+    def test_single_federal_awards_entry(self):
+        """Test that extraction and validation succeed when there is a single federal awards entry"""
         workbook = load_workbook(FEDERAL_AWARDS_TEMPLATE, data_only=True)
 
         _set_by_name(workbook, "auditee_ein", "123456789")
@@ -98,8 +104,8 @@ class FederalAwardsExcelTests(SimpleTestCase):
 
         validate_federal_award_json(federal_awards)
 
-    def test_with_multiple_federal_awards_entries(self):
-        """Test that extraction and validaiton succeed when there are multiple federal awards entries"""
+    def test_multiple_federal_awards_entries(self):
+        """Test that extraction and validation succeed when there are multiple federal awards entries"""
         workbook = load_workbook(FEDERAL_AWARDS_TEMPLATE, data_only=True)
 
         _set_by_name(workbook, "auditee_ein", "123456789")
@@ -110,3 +116,19 @@ class FederalAwardsExcelTests(SimpleTestCase):
         federal_awards = extract_federal_awards(workbook)
 
         validate_federal_award_json(federal_awards)
+
+    def test_partial_federal_awards_entry(self):
+        """Test that extraction succeeds and validation fails when there are partial federal awards entries"""
+        workbook = load_workbook(FEDERAL_AWARDS_TEMPLATE, data_only=True)
+
+        _set_by_name(workbook, "auditee_ein", "123456789")
+        _set_by_name(workbook, "total_amount_expended", 200)
+        
+        entry = jsoncopy(FEDERAL_AWARDS_ENTRY_FIXTURES[0])
+        del entry["cluster_name"]
+
+        _add_federal_award_entry(workbook, 0, entry)
+
+        federal_awards = extract_federal_awards(workbook)
+
+        self.assertRaises(ValidationError, validate_federal_award_json, federal_awards)
