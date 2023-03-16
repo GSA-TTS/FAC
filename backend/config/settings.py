@@ -191,25 +191,12 @@ MIDDLEWARE.append("whitenoise.middleware.WhiteNoiseMiddleware")
 # Environment specific configurations
 if ENVIRONMENT == "LOCAL":
     # Local development environment
-    STATICFILES_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
+    STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
     DEFAULT_FILE_STORAGE = "report_submission.storages.S3PrivateStorage"
     DEBUG = env.bool("DJANGO_DEBUG", default=True)
     ENABLE_LOCAL_ATTACHMENT_STORAGE = True
 
     CORS_ALLOWED_ORIGINS += ["http://0.0.0.0:8000", "http://127.0.0.1:8000"]
-
-    # Public bucket
-    AWS_ACCESS_KEY_ID = os.environ.get("AWS_ACCESS_KEY_ID", "test")
-    AWS_SECRET_ACCESS_KEY = os.environ.get("AWS_SECRET_ACCESS_KEY", "test")
-    AWS_S3_ENDPOINT_URL = "http://localhost:4566"
-    AWS_S3_PROXIES = {"http": "localstack:4566"}
-    AWS_STORAGE_BUCKET_NAME = "gsa-fac-public-s3"
-    AWS_S3_OBJECT_PARAMETERS = os.environ.get(
-        "AWS_S3_OBJECT_PARAMETERS", {"CacheControl": "max-age=86400"}
-    )
-    AWS_LOCATION = "static"
-    AWS_DEFAULT_ACL = "public-read"
-    AWS_IS_GZIPPED = True
 
     # Private bucket
     AWS_PRIVATE_STORAGE_BUCKET_NAME = "gsa-fac-private-s3"
@@ -232,21 +219,8 @@ elif ENVIRONMENT not in ["DEVELOPMENT", "STAGING", "PRODUCTION"]:
     DEBUG = env.bool("DJANGO_DEBUG", default=False)
     CORS_ALLOWED_ORIGINS += ["http://0.0.0.0:8000", "http://127.0.0.1:8000"]
 
-    STATICFILES_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
+    STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
     DEFAULT_FILE_STORAGE = "report_submission.storages.S3PrivateStorage"
-
-    # Public bucket
-    AWS_ACCESS_KEY_ID = os.environ.get("AWS_ACCESS_KEY_ID", "test")
-    AWS_SECRET_ACCESS_KEY = os.environ.get("AWS_SECRET_ACCESS_KEY", "test")
-    AWS_S3_ENDPOINT_URL = "http://localhost:4566"
-    AWS_S3_PROXIES = {"http": "localstack:4566"}
-    AWS_STORAGE_BUCKET_NAME = "gsa-fac-public-s3"
-    AWS_S3_OBJECT_PARAMETERS = os.environ.get(
-        "AWS_S3_OBJECT_PARAMETERS", {"CacheControl": "max-age=86400"}
-    )
-    AWS_LOCATION = "static"
-    AWS_DEFAULT_ACL = "public-read"
-    AWS_IS_GZIPPED = True
 
     # Private bucket
     AWS_PRIVATE_STORAGE_BUCKET_NAME = "gsa-fac-private-s3"

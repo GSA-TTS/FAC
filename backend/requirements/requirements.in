@@ -23,4 +23,3 @@ django-csp
 pandas
 python-slugify
 openpyxl
-botocore
