@@ -113,5 +113,7 @@ jobs:
         run: |
           npm install -g @lhci/cli@0.8.x
           lhci autorun
+      - name: run pa11y
+        run: npx pa11y-ci
   validate-terraform:
      uses: ./.github/workflows/terraform-lint.yml
