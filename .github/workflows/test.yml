@@ -64,6 +64,10 @@ jobs:
       - name: Start services
         working-directory: ./backend
         run: touch .env && docker-compose up -d
+      - name: Create LocalStack emulated S3 bucket
+        working-directory: ./backend
+        run:
+          docker-compose run web bash -c 'aws --endpoint-url=http://localstack:4566 s3 mb s3://gsa-fac-private-s3'
       - name: Run Django test suite
         working-directory: ./backend
         run:
