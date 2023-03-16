@@ -10,7 +10,12 @@
             media="all"
             type="text/css"/>
         {% block metatags %}
-            <title>{{ post.title }}</title>
+            <!--
+                TODO: populate this dynamically. For now it 
+                needs to have some content in it for a11y purposes
+                <title>{{ post.title }}</title> 
+            -->
+            <title>Federal Audit Clearinghouse</title>
             <meta name="description" content="{{ post.meta_description }}" />
             <meta property="og:title" content="{{ post.title }}" />
             <meta property="og:site_name" content="Federal Audit Clearinghouse" />
