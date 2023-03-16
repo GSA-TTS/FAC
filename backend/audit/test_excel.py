@@ -6,9 +6,10 @@ from openpyxl import load_workbook
 from openpyxl.cell import Cell
 
 from audit.excel import (
+    ExcelExtractionError,
     extract_federal_awards,
-    federal_awards_mapping_single,
-    federal_awards_mapping_column,
+    federal_awards_field_mapping,
+    federal_awards_column_mapping,
 )
 from audit.validators import validate_federal_award_json
 
@@ -80,10 +81,10 @@ class FederalAwardsExcelTests(SimpleTestCase):
         """Test that the FederalAwardsExpended Excel template contains the expected named ranges"""
         workbook = load_workbook(FEDERAL_AWARDS_TEMPLATE, data_only=True)
 
-        for name in federal_awards_mapping_single.keys():
+        for name in federal_awards_field_mapping.keys():
             self.assertIsNotNone(workbook.defined_names[name])
 
-        for name in federal_awards_mapping_column:
+        for name in federal_awards_column_mapping:
             self.assertIsNotNone(workbook.defined_names[name])
 
     def test_empty_template(self):
@@ -123,7 +124,7 @@ class FederalAwardsExcelTests(SimpleTestCase):
 
         _set_by_name(workbook, "auditee_ein", "123456789")
         _set_by_name(workbook, "total_amount_expended", 200)
-        
+
         entry = jsoncopy(FEDERAL_AWARDS_ENTRY_FIXTURES[0])
         del entry["cluster_name"]
 
@@ -132,3 +133,63 @@ class FederalAwardsExcelTests(SimpleTestCase):
         federal_awards = extract_federal_awards(workbook)
 
         self.assertRaises(ValidationError, validate_federal_award_json, federal_awards)
+
+    def test_federal_awards_type_checking(self):
+        """Test that extraction succeeds and validation fails when fields are of the wrong data type"""
+        workbook = load_workbook(FEDERAL_AWARDS_TEMPLATE, data_only=True)
+
+        # add valid data to the workbook
+        _set_by_name(workbook, "auditee_ein", "123456789")
+        _set_by_name(workbook, "total_amount_expended", 200)
+        _add_federal_award_entry(workbook, 0, FEDERAL_AWARDS_ENTRY_FIXTURES[0])
+
+        test_cases = [
+            ("auditee_ein", 123456789),
+            ("total_amount_expended", "not a number"),
+            ("amount_expended", "not a  number"),
+            ("cluster_name", 123),
+            ("direct_award", 123),
+            ("federal_award_passed_to_subrecipients", 123),
+            ("federal_award_passed_to_subrecipients_amount", "not a number"),
+            ("federal_program_name", 123),
+            ("loan_balance_at_audit_period_end", "not a number"),
+            ("loan_or_loan_guarantee", 123),
+            ("major_program", 123),
+            ("major_program_audit_report_type", 123),
+            ("number_of_audit_findings", "not a number"),
+            ("program_number", 10.001),
+            ("state_cluster_name", 123),
+        ]
+
+        # validate that each test_case appropriately checks the data type
+        for field_name, value in test_cases:
+            with self.subTest():
+                _set_by_name(workbook, field_name, value)
+
+                federal_awards = extract_federal_awards(workbook)
+
+                self.assertRaises(
+                    ValidationError, validate_federal_award_json, federal_awards
+                )
+
+    def test_federal_awards_custom_formatters(self):
+        """Test that custom federal awards field formatters raise the expected error type when data is malformed"""
+        workbook = load_workbook(FEDERAL_AWARDS_TEMPLATE, data_only=True)
+
+        # add valid data to the workbook
+        _set_by_name(workbook, "auditee_ein", "123456789")
+        _set_by_name(workbook, "total_amount_expended", 200)
+        _add_federal_award_entry(workbook, 0, FEDERAL_AWARDS_ENTRY_FIXTURES[0])
+
+        test_cases = [
+            ("direct_award_pass_through_entity_name", 0),
+            ("direct_award_pass_through_entity_id", 0),
+        ]
+
+        for field_name, value in test_cases:
+            with self.subTest():
+                _set_by_name(workbook, field_name, value)
+
+                self.assertRaises(
+                    ExcelExtractionError, extract_federal_awards, workbook
+                )
