@@ -1,3 +1,4 @@
+import os
 from pandas import read_csv
 import logging
 
@@ -186,6 +187,10 @@ def load_lists(file):
     else:
         sort_by = "EINSEQNUM"
         payload_name = "EIN"
+
+    if os.path.isfile(file_path) is False:
+        # Most years don't have UEI. This will gracefully fail if the file is not there.
+        return {payload_name: {file_path: "not_found"}}
 
     logger.warning(f"------------Table: {payload_name}--------------")
 
