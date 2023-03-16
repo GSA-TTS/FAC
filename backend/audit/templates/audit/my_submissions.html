@@ -19,8 +19,8 @@
                             <th data-sortable scope="col" role="columnheader">
                                 Auditee
                                 <button class="usa-button--unstyled margin-top-0"
-                                        aria-controls="modal-uei-info"
-                                        data-open-modal>UEI</button>
+                                    aria-controls="modal-uei-info"
+                                    data-open-modal>UEI</button>
                             </th>
                             <th data-sortable scope="col" role="columnheader">Fiscal period end date</th>
                         </tr>
@@ -96,64 +96,96 @@
                     </svg>
                 </button>
             </div>
-        </div>
-        <div class="usa-modal usa-modal--lg flex-justify-start"
-             id="modal-terms-conditions"
-             aria-labelledby="modal-terms-conditions-heading"
-             aria-describedby="modal-terms-conditions-description">
-            <div class="usa-modal__content">
-                <div class="usa-modal__main">
-                    <h2 class="usa-modal__heading" id="modal-terms-conditions-heading">
-                        Federal Audit Clearinghouse terms and
-                        conditions
-                    </h2>
-                    <div class="usa-prose" id="modal-terms-conditions-description">
-                        <p>
-                            FAC.gov is a U.S. General Services Administration federal government service. This site collects
-                            required documentation from organizations that spend $750,000 or more in federal grant funds in
-                            a given year.
-                        </p>
-                        <p>
-                            All use of FAC.gov will be monitored, recorded, and subject to audit by GSA staff and other
-                            federal government authorities. By using this system, you consent to your use being monitored
-                            and recorded.
-                        </p>
-                        <p>
-                            Unauthorized use is prohibited, and individuals found performing unauthorized activities are
-                            subject to disciplinary action including criminal prosecution.
-                        </p>
-                        <p>
-                            If you have questions about these conditions, please email <a class="usa-link" href="mailto:fac-support@gsa.gov">fac-support@gsa.gov</a>.
-                        </p>
-                    </div>
-                    <div class="usa-modal__footer">
-                        <ul class="usa-button-group">
-                            <li class="usa-button-group__item">
-                                <button id="modal-terms-continue"
-                                        type="button"
-                                        class="usa-button"
-                                        data-close-modal>
-                                    Accept and start a new submission
-                                </button>
-                            </li>
-                            <li class="usa-button-group__item">
-                                <button type="button"
-                                        class="usa-button usa-button--unstyled padding-105 text-center"
-                                        data-close-modal>Go back</button>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-                <button class="usa-button usa-modal__close"
-                        aria-label="Close this window"
-                        data-close-modal>
-                    <svg class="usa-icon" aria-hidden="true" focusable="false" role="img">
-                        <use xlink:href="/static/img/sprite.svg#close"></use>
-                    </svg>
-                </button>
+            <div class="usa-button-group">
+                <input type="submit"
+                    id="start-submission"
+                    class="usa-button"
+                    value="Start a new submission"
+                    disabled/>
             </div>
+        </form>
+    </div>
+    <div class="usa-modal flex-justify-start"
+        id="modal-uei-info"
+        aria-labelledby="modal-uei-info-heading"
+        aria-describedby="modal-uei-info-description">
+        <div class="usa-modal__content">
+            <div class="usa-modal__main">
+                <h2 class="usa-modal__heading" id="modal-uei-info-heading">What is a Unique Entity Identifier (UEI)?</h2>
+                <div class="usa-prose" id="modal-uei-info-description">
+                    <p>
+                        The Unique Entity Identifier (UEI) for an awardee or recipient is an alphanumeric code created in
+                        the System for Award Management (SAM.gov) that is used to uniquely identify specific commercial,
+                        nonprofit, or business entities registered to do business with the federal government.
+                    </p>
+                </div>
+            </div>
+            <button class="usa-button usa-modal__close"
+                aria-label="Close this window"
+                data-close-modal>
+                <svg class="usa-icon" aria-hidden="true" focusable="false" role="img">
+                    <use xlink:href="/static/img/sprite.svg#close"></use>
+                </svg>
+            </button>
         </div>
     </div>
+    <div class="usa-modal usa-modal--lg flex-justify-start"
+        id="modal-terms-conditions"
+        aria-labelledby="modal-terms-conditions-heading"
+        aria-describedby="modal-terms-conditions-description">
+        <div class="usa-modal__content">
+            <div class="usa-modal__main">
+                <h2 class="usa-modal__heading" id="modal-terms-conditions-heading">
+                    Federal Audit Clearinghouse terms and
+                    conditions
+                </h2>
+                <div class="usa-prose" id="modal-terms-conditions-description">
+                    <p>
+                        FAC.gov is a U.S. General Services Administration federal government service. This site collects
+                        required documentation from organizations that spend $750,000 or more in federal grant funds in
+                        a given year.
+                    </p>
+                    <p>
+                        All use of FAC.gov will be monitored, recorded, and subject to audit by GSA staff and other
+                        federal government authorities. By using this system, you consent to your use being monitored
+                        and recorded.
+                    </p>
+                    <p>
+                        Unauthorized use is prohibited, and individuals found performing unauthorized activities are
+                        subject to disciplinary action including criminal prosecution.
+                    </p>
+                    <p>
+                        If you have questions about these conditions, please email <a class="usa-link" href="mailto:fac-support@gsa.gov">fac-support@gsa.gov</a>.
+                    </p>
+                </div>
+                <div class="usa-modal__footer">
+                    <ul class="usa-button-group">
+                        <li class="usa-button-group__item">
+                            <button id="modal-terms-continue"
+                                type="button"
+                                class="usa-button"
+                                data-close-modal>
+                                Accept and start a new submission
+                            </button>
+                        </li>
+                        <li class="usa-button-group__item">
+                            <button type="button"
+                                class="usa-button usa-button--unstyled padding-105 text-center"
+                                data-close-modal>Go back</button>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <button class="usa-button usa-modal__close"
+                aria-label="Close this window"
+                data-close-modal>
+                <svg class="usa-icon" aria-hidden="true" focusable="false" role="img">
+                    <use xlink:href="/static/img/sprite.svg#close"></use>
+                </svg>
+            </button>
+        </div>
+    </div>
+    </div>
     <script src="{% static 'compiled/js/my_submissions.js' %}"
-            type="text/javascript"></script>
+        type="text/javascript"></script>
 {% endblock content %}
