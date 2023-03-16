@@ -6,9 +6,9 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link rel="stylesheet"
-              href="{% static 'compiled/scss/main-post.css' %}"
-              media="all"
-              type="text/css"/>
+            href="{% static 'compiled/scss/main-post.css' %}"
+            media="all"
+            type="text/css"/>
         {% block metatags %}
             <title>{{ post.title }}</title>
             <meta name="description" content="{{ post.meta_description }}" />
@@ -23,10 +23,10 @@
         <main id="main-content">
             {% block content %}{% endblock %}
             <div class="usa-modal usa-modal--lg"
-                 id="legacy-fac-modal"
-                 aria-labelledby="legacy-fac-modal-heading"
-                 aria-describedby="legacy-fac-modal-description"
-                 data-force-action>
+                id="legacy-fac-modal"
+                aria-labelledby="legacy-fac-modal-heading"
+                aria-describedby="legacy-fac-modal-description"
+                data-force-action>
                 <div class="usa-modal__content">
                     <div class="usa-modal__main">
                         <h2 class="usa-modal__heading" id="legacy-fac-modal-heading">You are leaving the fac.gov website</h2>
@@ -41,16 +41,16 @@
                             <ul class="usa-button-group">
                                 <li class="usa-button-group__item">
                                     <a type="button"
-                                       class="usa-button"
-                                       data-close-modal
-                                       href="https://facides.census.gov/Account/Login.aspx">
+                                        class="usa-button"
+                                        data-close-modal
+                                        href="https://facides.census.gov/Account/Login.aspx">
                                         Continue to the U.S. Census Bureau FAC site
                                     </a>
                                 </li>
                                 <li class="usa-button-group__item">
                                     <button type="button"
-                                            class="usa-button usa-button--unstyled padding-105 text-center"
-                                            data-close-modal>Cancel</button>
+                                        class="usa-button usa-button--unstyled padding-105 text-center"
+                                        data-close-modal>Cancel</button>
                                 </li>
                             </ul>
                         </div>
