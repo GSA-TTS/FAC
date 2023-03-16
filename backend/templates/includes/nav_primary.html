@@ -22,8 +22,8 @@
             </li>
             <li class="usa-nav__primary-item">
                 <button class="usa-accordion__button usa-nav__link"
-                        aria-expanded="false"
-                        aria-controls="basic-nav-section-2">
+                    aria-expanded="false"
+                    aria-controls="basic-nav-section-2">
                     <span>Resources</span>
                 </button>
                 <ul id="basic-nav-section-2" class="usa-nav__submenu" hidden="">
@@ -60,15 +60,15 @@
         {% else %}
             <div class="sign-in">
                 <a class="sign-in-logo"
-                   aria-controls="login-modal"
-                   href="/openid/login/"
-                   data-open-modal
-                   tabindex="0"
-                   role="button"><span>Sign in</span> Submit and review your audits</a>
+                    aria-controls="login-modal"
+                    href="/openid/login/"
+                    data-open-modal
+                    tabindex="0"
+                    role="button"><span>Sign in</span> Submit and review your audits</a>
                 <div class="usa-modal usa-modal--lg"
-                     id="login-modal"
-                     aria-labelledby="login-modal-heading"
-                     aria-describedby="login-modal-description">
+                    id="login-modal"
+                    aria-labelledby="login-modal-heading"
+                    aria-describedby="login-modal-description">
                     <div class="usa-modal__content">
                         <div class="usa-modal__main">
                             <h2 class="usa-modal__heading" id="login-modal-heading">You must log in to continue</h2>
@@ -78,39 +78,39 @@
                                     which will now be handled by <a href="http://login.gov">Login.gov</a>.
                                     <strong>You cannot use your old Census FAC credentials to access the new GSA
                                         system.</strong> On the next screen you can use an existing Login.gov
-                                        account or create a new one to securely sign in.
-                                    </p>
-                                </div>
-                                <div class="usa-modal__footer">
-                                    <ul class="usa-button-group">
-                                        <li class="usa-button-group__item">
-                                            <a href="/openid/login/">
-                                                <button type="button"
-                                                        class="usa-button sign-in-button"
-                                                        id="sign-in"
-                                                        data-close-modal>
-                                                    Authenticate with Login.gov
-                                                </button>
-                                            </a>
-                                        </li>
-                                        <li class="usa-button-group__item">
-                                            <button type="button"
-                                                    class="usa-button usa-button--unstyled padding-105 text-center"
-                                                    data-close-modal>Cancel</button>
-                                        </li>
-                                    </ul>
-                                </div>
+                                    account or create a new one to securely sign in.
+                                </p>
                             </div>
-                            <button class="usa-button usa-modal__close"
-                                    aria-label="Close this window"
-                                    data-close-modal>
-                                <svg class="usa-icon" aria-hidden="true" focusable="false" role="img">
-                                    <use xlink:href="{% static 'img/sprite.svg#close' %}"></use>
-                                </svg>
-                            </button>
+                            <div class="usa-modal__footer">
+                                <ul class="usa-button-group">
+                                    <li class="usa-button-group__item">
+                                        <a href="/openid/login/">
+                                            <button type="button"
+                                                class="usa-button sign-in-button"
+                                                id="sign-in"
+                                                data-close-modal>
+                                                Authenticate with Login.gov
+                                            </button>
+                                        </a>
+                                    </li>
+                                    <li class="usa-button-group__item">
+                                        <button type="button"
+                                            class="usa-button usa-button--unstyled padding-105 text-center"
+                                            data-close-modal>Cancel</button>
+                                    </li>
+                                </ul>
+                            </div>
                         </div>
+                        <button class="usa-button usa-modal__close"
+                            aria-label="Close this window"
+                            data-close-modal>
+                            <svg class="usa-icon" aria-hidden="true" focusable="false" role="img">
+                                <use xlink:href="{% static 'img/sprite.svg#close' %}"></use>
+                            </svg>
+                        </button>
                     </div>
                 </div>
-            {% endif %}
-        </nav>
-    </div>
+            </div>
+        {% endif %}
+    </nav>
+</div>
