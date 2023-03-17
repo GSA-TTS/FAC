@@ -4,7 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("data_distro", "0006_modify_models_to_work_with_2022_data"),
     ]

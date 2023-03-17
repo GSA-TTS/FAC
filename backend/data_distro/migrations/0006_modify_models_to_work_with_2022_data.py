@@ -5,7 +5,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     replaces = [
         ("data_distro", "0006_modify_models_to_work_with_data"),
         (

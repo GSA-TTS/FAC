@@ -84,7 +84,6 @@ def add_agency_names(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("data_distro", "0009_refactor_Agency"),
     ]

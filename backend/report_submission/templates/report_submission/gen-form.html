@@ -1,12 +1,12 @@
 {% extends "base.html" %}
 {% load static %}
 {% block metatags %}
-<title>{{ post.title }}</title>
-<meta name="description" content="{{ post.meta_description }}">
-<meta property="og:title" content="{{ post.title }}">
-<meta property="og:site_name" content="Federal Audit Clearinghouse">
-<meta property="og:description" content="{{ post.meta_description }}">
-<meta property="og:type" content="website">
+  <title>{{ post.title }}</title>
+  <meta name="description" content="{{ post.meta_description }}">
+  <meta property="og:title" content="{{ post.title }}">
+  <meta property="og:site_name" content="Federal Audit Clearinghouse">
+  <meta property="og:description" content="{{ post.meta_description }}">
+  <meta property="og:type" content="website">
 {% endblock %}
 
 {% block content%}
@@ -34,7 +34,7 @@
     <nav class="desktop:grid-col-3 sticky-nav" aria-label="Secondary navigation">
       <ul class="usa-sidenav">
         <li class="usa-sidenav__item">
-          <a href=#general-information class=usa-current>
+          <a href="#general-information" class="usa-current">
             General information</a>
           <ul class="usa-sidenav__sublist">
             <li class="usa-sidenav__item"><a href="#audit-type">Type of audit</a></li>

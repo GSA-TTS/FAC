@@ -10,7 +10,13 @@
   "scripts": {
     "build": "run-p build:*",
     "build:esbuild": "node build-assets.js",
-    "dev": "node build-assets.js --watch"
+    "dev": "node build-assets.js --watch",
+    "check:eslint": "npx eslint --ignore-path ../.gitignore static/js",
+    "fix:eslint": "npx eslint --fix --ignore-path ../.gitignore static/js",
+    "check:stylelint": "npx stylelint --ignore-pattern uswds static/scss",
+    "fix:stylelint": "npx stylelint --fix --ignore-pattern uswds static/scss",
+    "check-all": "run-p check:*",
+    "fix-all": "run-p fix:*"
   },
   "author": "",
   "license": "ISC",
@@ -20,7 +26,17 @@
     "cypress": "^12.5.1",
     "esbuild-postcss": "^0.0.4",
     "esbuild-sass-plugin": "2.4.5",
-    "glob": "^8.1.0"
+    "eslint": "^8.35.0",
+    "eslint-config-prettier": "^8.7.0",
+    "eslint-plugin-cypress": "^2.12.1",
+    "eslint-plugin-prettier": "^4.2.1",
+    "glob": "^8.1.0",
+    "prettier": "^2.8.4",
+    "stylelint": "^14.16.1",
+    "stylelint-config-prettier": "^9.0.5",
+    "stylelint-config-scss": "^1.0.0-security",
+    "stylelint-config-standard": "^29.0.0",
+    "stylelint-config-standard-scss": "^6.1.0"
   },
   "dependencies": {
     "djlint": "^1.19.16",

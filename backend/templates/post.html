@@ -1,15 +1,12 @@
 {% extends "base.html" %}
 {% block metatags %}
-<title>{{ object.title }}</title>
-<meta name="description" content="{{ object.meta_description}" />
-<meta property="og:title" content="{{ object.title }}">
-<meta property="og:url" content="{% url 'post_detail' object.slug %}">
-<meta property="og:type" content="article">
+    <title>{{ object.title }}</title>
+    <meta name="description" content="{{ object.meta_description}" />
+    <meta property="og:title" content="{{ object.title }}" />
+    <meta property="og:url" content="{% url 'post_detail' object.slug %}" />
+    <meta property="og:type" content="article" />
 {% endblock %}
-
 {% block content %}
- <h1>{{ object.title }}</h1>
- <div>
- {{ object.content | safe }}
- </div>
+    <h1>{{ object.title }}</h1>
+    <div>{{ object.content | safe }}</div>
 {% endblock content %}

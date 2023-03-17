@@ -14,7 +14,7 @@ jobs:
       - name: Set up Python 3.10
         uses: actions/setup-python@v3
         with:
-          python-version: "3.10"
+          python-version: '3.10'
       - name: Install linters
         working-directory: ./backend
         run: |
@@ -32,6 +32,21 @@ jobs:
       - name: Run type checking
         working-directory: ./backend
         run: mypy .
+      - name: Run HTML template linting
+        working-directory: ./backend
+        run: djlint --lint .
+  frontend-linting:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+      - name: Lint JS & SCSS
+        working-directory: ./backend
+        run: |
+          npm ci
+          npm run check-all
   test:
     runs-on: ubuntu-latest
     env:
