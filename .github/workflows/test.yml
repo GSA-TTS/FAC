@@ -64,6 +64,9 @@ jobs:
       - name: Start services
         working-directory: ./backend
         run: touch .env && docker-compose up -d
+      - name: Sleep to wait for LocalStack to run
+        run: sleep 30s
+        shell: bash
       - name: Create LocalStack emulated S3 bucket
         working-directory: ./backend
         run:
