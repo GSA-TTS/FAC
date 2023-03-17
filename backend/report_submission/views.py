@@ -138,11 +138,12 @@ class GeneralInformationFormView(LoginRequiredMixin, View):
             "auditor_phone": sac.auditor_phone,
             "auditor_email": sac.auditor_email,
             "auditee_contacts": sac.auditee_contacts,
+            "report_id": report_id,
 
         }
 
         return render(request, "report_submission/gen-form.html", context)
-    
+
     def post(self, request, *args, **kwargs):
         report_id = kwargs["report_id"]
         sac = SingleAuditChecklist.objects.get(report_id=report_id)
@@ -159,10 +160,12 @@ class GeneralInformationFormView(LoginRequiredMixin, View):
         accesses = Access.objects.filter(sac=sac, user=request.user)
         if not accesses:
             raise Exception("you don't have access to this audit")
-        
-        # print("###########")
-        # print(formatted_post)
+
+        print("###########")
+        print(formatted_post)
+
         # SingleAuditChecklist.objects.filter(pk=sac.id).update(**request.POST)
+
         # print("###########")
         # print(request.POST)
 

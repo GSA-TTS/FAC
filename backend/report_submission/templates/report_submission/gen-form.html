@@ -2,11 +2,11 @@
 {% load static %}
 {% block metatags %}
   <title>{{ post.title }}</title>
-  <meta name="description" content="{{ post.meta_description }}">
-  <meta property="og:title" content="{{ post.title }}">
-  <meta property="og:site_name" content="Federal Audit Clearinghouse">
-  <meta property="og:description" content="{{ post.meta_description }}">
-  <meta property="og:type" content="website">
+  <meta name="description" content="{{ post.meta_description }}" />
+  <meta property="og:title" content="{{ post.title }}" />
+  <meta property="og:site_name" content="Federal Audit Clearinghouse" />
+  <meta property="og:description" content="{{ post.meta_description }}" />
+  <meta property="og:type" content="website" />
 {% endblock %}
 
 {% block content%}
@@ -14,22 +14,6 @@
   <h1>Submission Form</h1>
 </div>
 <div class="grid-container">
-  <!--
-    <dl class="grid-row grid-gap audit-metadata">
-      <div class="tablet:grid-col">
-        <dt>Auditee entity name</dt>
-        <dd data-test-id="auditeeName"></dd>
-      </div>
-      <div class="tablet:grid-col">
-        <dt>Report ID</dt>
-        <dd data-test-id="reportId"></dd>
-      </div>
-      <div class="tablet:grid-col">
-        <dt>Version</dt>
-        <dd>1</dd>
-      </div>
-    </dl>
--->
   <div class="grid-row grid-gap">
     <nav class="desktop:grid-col-3 sticky-nav" aria-label="Secondary navigation">
       <ul class="usa-sidenav">
@@ -122,6 +106,8 @@
             <label class="usa-radio__label" for="audit-period-other">
               Other
             </label>
+            <input class="usa-input usa-input--small" type="text" id="audit_period_covered-other_months" name="audit_period_covered" />
+            <label class="usa-label usa-input--small__label" for="audit_period_covered-other_months">months</label>
           </div>
         </fieldset>
 
@@ -163,7 +149,9 @@
 
         <fieldset class="usa-fieldset" id="auditee-information">
           <legend class="usa-legend text-bold">
-            Auditee information</legend>
+            Auditee information
+          </legend>
+          <p class="usa-hint margin-0">Some auditee information is pulled from <a>SAM.gov</a> and is not editable here.</p>
           <fieldset class="usa-fieldset">
             <legend class="usa-legend">
               Auditee details
@@ -293,7 +281,9 @@
             <fieldset class="usa-fieldset radio">
               <legend class="usa-legend">
                 Are multiple UEIs covered in this report?<abbr title="required"
-                  class="usa-hint usa-hint--required">*</abbr></legend>
+                  class="usa-hint usa-hint--required">*</abbr>
+              </legend>
+              <p class="usa-hint margin-0">You'll be able to add additional UEIs later.</p>
               <ul class="usa-error-message" id="multiple_ueis_covered-error-message" role="alert">
                 <li id="multiple_ueis_covered-not-null" hidden>
                   This field is required
@@ -319,10 +309,10 @@
 
           <fieldset class="usa-fieldset" id="auditee-identification-numbers">
             <legend class="usa-legend">
-              Auditee Employer Identification Number</legend>
+              Auditee Employer Identification Number (EIN)</legend>
             <div class="usa-form-group">
               <label class="usa-label" for="ein">
-                Auditee Employer Identification Number (EIN)
+                What is your Auditee EIN?
                 <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
               </label>
               <ul class="usa-error-message" id="ein-error-message" role="alert">
@@ -336,7 +326,7 @@
               <input class="usa-checkbox__input" id="ein_not_an_ssn_attestation" type="checkbox"
                 name="ein_not_an_ssn_attestation" value="" />
               <label class="usa-checkbox__label" for="ein_not_an_ssn_attestation">
-                By checking this box, I verify that the Auditee EIN is NOT a social security number.
+                By checking this box, I verify that the Auditee EIN is not a Social Security Number.
               </label>
               <ul class="usa-error-message" id="ein_not_an_ssn_attestation-error-message" role="alert">
                 <li id="ein_not_an_ssn_attestation-not-null" hidden>
@@ -347,7 +337,9 @@
             <fieldset class="usa-fieldset radio">
               <legend class="usa-legend">
                 Are multiple EINs covered in this report?<abbr title="required"
-                  class="usa-hint usa-hint--required">*</abbr></legend>
+                  class="usa-hint usa-hint--required">*</abbr>
+              </legend>
+              <p class="usa-hint margin-0">You'll be able to add additional EINs later.</p>
               <ul class="usa-error-message" id="multiple_eins_covered-error-message" role="alert">
                 <li id="multiple_eins_covered-not-null" hidden>
                   This field is required
@@ -378,7 +370,7 @@
             </legend>
             <div class="usa-form-group">
               <label class="usa-label" for="auditee_contact_name">
-                Name
+                Auditee contact's name
                 <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
               </label>
               <ul class="usa-error-message" id="auditee_contact_name-error-message" role="alert">
@@ -398,7 +390,7 @@
 
             <div class="usa-form-group">
               <label class="usa-label" for="auditee_contact_title">
-                Title
+                Auditee contact's title
                 <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
               </label>
               <ul class="usa-error-message" id="auditee_contact_title-error-message" role="alert">
@@ -418,7 +410,7 @@
 
             <div class="usa-form-group">
               <label class="usa-label" for="auditee_phone">
-                Auditee telephone
+                Auditee phone number
                 <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
               </label>
               <ul class="usa-error-message" id="auditee_phone-error-message" role="alert">
@@ -437,7 +429,7 @@
             </div>
             <div class="usa-form-group">
               <label class="usa-label" for="auditee_email">
-                Auditee e-mail
+                Auditee email
                 <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
               </label>
               <ul class="usa-error-message" id="auditee_email-error-message" role="alert">
@@ -454,87 +446,126 @@
                 data-validate-not-null="" 
                 value="{{ auditee_email | default_if_none:'' }}" />
             </div>
+          </fieldset>
         </fieldset>
 
         <fieldset class="usa-fieldset" id="primary-auditor-information">
           <legend class="usa-legend text-bold">
-            Primary Auditor Information</legend>
-          <div class="usa-form-group">
-            <label class="usa-label" for="auditor_firm_name">
-              Audit firm/organization name
-              <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
-            </label>
-            <ul class="usa-error-message" id="auditor_firm_name-error-message" role="alert">
-              <li id="auditor_firm_name-not-null" hidden>
-                This field is required
-              </li>
-            </ul>
-            <input class="usa-input" id="auditor_firm_name" name="auditor_firm_name" aria-required="true" required
-              data-validate-not-null="" value="{{ auditor_firm_name | default_if_none:'' }}" />
-          </div>
+            Primary auditor information
+          </legend>
+          <p class="usa-hint" id="auditee_fiscal_period_start-hint">
+            If multiple audit organizations worked on this audit, only include the lead or coordinating auditor's information.
+          </p>
 
           <fieldset class="usa-fieldset">
             <legend class="usa-legend">
-              Audit firm/organization address
+              Auditor details
+            </legend>
+
+            <div class="usa-form-group">
+              <label class="usa-label" for="auditor_firm_name">
+                Audit firm/organization name
+                <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
+              </label>
+              <ul class="usa-error-message" id="auditor_firm_name-error-message" role="alert">
+                <li id="auditor_firm_name-not-null" hidden>
+                  This field is required
+                </li>
+              </ul>
+              <input class="usa-input" id="auditor_firm_name" name="auditor_firm_name" aria-required="true" required
+                data-validate-not-null="" value="{{ auditor_firm_name | default_if_none:'' }}" />
+            </div>
+
+            <fieldset class="usa-fieldset" id="audit-firm-organization-address">
+              <legend class="usa-legend">
+                Audit firm/organization address
+              </legend>
+              
+              <div class="usa-form-group">
+                <label class="usa-label" for="auditor_country">
+                  Country
+                  <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
+                </label>
+                <ul class="usa-error-message" id="auditor_country-error-message" role="alert">
+                  <li id="auditor_country-not-null" hidden>
+                    This field is required
+                  </li>
+                </ul>
+                <input 
+                  class="usa-input" 
+                  id="auditor_country" 
+                  name="auditor_country" 
+                  aria-required="true" 
+                  required
+                  data-validate-not-null="" 
+                  value="{{ auditor_country | default_if_none:'' }}" />
+              </div>
+
+              <div class="usa-form-group">
+                <label class="usa-label" for="auditor_address_line_1">
+                  Street
+                  <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
+                </label>
+                <ul class="usa-error-message" id="auditor_address_line_1-error-message" role="alert">
+                  <li id="auditor_address_line_1-not-null" hidden>
+                    This field is required
+                  </li>
+                </ul>
+                <input class="usa-input" id="auditor_address_line_1" name="auditor_address_line_1" aria-required="true"
+                  required data-validate-not-null="" value="{{ auditor_address_line_1 | default_if_none:'' }}" />
+              </div>
+
+              <div class="usa-form-group">
+                <label class="usa-label" for="auditor_city">
+                  City
+                  <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
+                </label>
+                <ul class="usa-error-message" id="auditor_city-error-message" role="alert">
+                  <li id="auditor_city-not-null" hidden>
+                    This field is required
+                  </li>
+                </ul>
+                <input class="usa-input" id="auditor_city" name="auditor_city" aria-required="true" required
+                  data-validate-not-null="" value="{{ auditor_city | default_if_none:'' }}" />
+              </div>
+
+              <div class="usa-form-group">
+                <label class="usa-label" for="auditor_state">
+                  State
+                  <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
+                </label>
+                <ul class="usa-error-message" id="auditor_state-error-message" role="alert">
+                  <li id="auditor_state-not-null" hidden>
+                    This field is required
+                  </li>
+                </ul>
+                <input class="usa-input" id="auditor_state" name="auditor_state" aria-required="true" required
+                  data-validate-not-null="" value="{{ auditor_state | default_if_none:'' }}" />
+              </div>
+
+              <div class="usa-form-group">
+                <label class="usa-label" for="auditor_zip">
+                  ZIP code
+                  <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
+                </label>
+                <ul class="usa-error-message" id="auditor_zip-error-message" role="alert">
+                  <li id="auditor_zip-not-null" hidden>
+                    This field is required
+                  </li>
+                </ul>
+                <input class="usa-input" id="auditor_zip" name="auditor_zip" aria-required="true" required
+                  data-validate-not-null="" value="{{ auditor_zip | default_if_none:'' }}" />
+              </div>
+            </fieldset>
+          </fieldset>
+
+          <fieldset class="usa-fieldset">
+            <legend class="usa-legend">
+              Auditor EIN
             </legend>
             <div class="usa-form-group">
-              <label class="usa-label" for="auditor_address_line_1">
-                Street
-                <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
-              </label>
-              <ul class="usa-error-message" id="auditor_address_line_1-error-message" role="alert">
-                <li id="auditor_address_line_1-not-null" hidden>
-                  This field is required
-                </li>
-              </ul>
-              <input class="usa-input" id="auditor_address_line_1" name="auditor_address_line_1" aria-required="true"
-                required data-validate-not-null="" value="{{ auditor_address_line_1 | default_if_none:'' }}" />
-            </div>
-
-            <div class="usa-form-group">
-              <label class="usa-label" for="auditor_city">
-                City
-                <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
-              </label>
-              <ul class="usa-error-message" id="auditor_city-error-message" role="alert">
-                <li id="auditor_city-not-null" hidden>
-                  This field is required
-                </li>
-              </ul>
-              <input class="usa-input" id="auditor_city" name="auditor_city" aria-required="true" required
-                data-validate-not-null="" value="{{ auditor_city | default_if_none:'' }}" />
-            </div>
-            <div class="usa-form-group">
-              <label class="usa-label" for="auditor_state">
-                State
-                <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
-              </label>
-              <ul class="usa-error-message" id="auditor_state-error-message" role="alert">
-                <li id="auditor_state-not-null" hidden>
-                  This field is required
-                </li>
-              </ul>
-              <input class="usa-input" id="auditor_state" name="auditor_state" aria-required="true" required
-                data-validate-not-null="" value="{{ auditor_state | default_if_none:'' }}" />
-            </div>
-
-            <div class="usa-form-group">
-              <label class="usa-label" for="auditor_zip">
-                ZIP code
-                <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
-              </label>
-              <ul class="usa-error-message" id="auditor_zip-error-message" role="alert">
-                <li id="auditor_zip-not-null" hidden>
-                  This field is required
-                </li>
-              </ul>
-              <input class="usa-input" id="auditor_zip" name="auditor_zip" aria-required="true" required
-                data-validate-not-null="" value="{{ auditor_zip | default_if_none:'' }}" />
-            </div>
-
-            <div class="usa-form-group">
               <label class="usa-label" for="auditor_ein">
-                Audit firm/organization EIN
+                What is your audit firm/organization's EIN?
                 <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
               </label>
               <ul class="usa-error-message" id="auditor_ein-error-message" role="alert">
@@ -549,7 +580,7 @@
               <input class="usa-checkbox__input" id="auditor_ein_not_an_ssn_attestation" type="checkbox"
                 name="auditor_ein_not_an_ssn_attestation" value="" data-validate-not-null="" />
               <label class="usa-checkbox__label" for="auditor_ein_not_an_ssn_attestation">
-                By checking this box, I verify that the Auditor EIN is NOT a social security number.
+                By checking this box, I verify that the Auditor EIN is not a Social Security Number.
               </label>
               <ul class="usa-error-message" id="auditor_ein_not_an_ssn_attestation-error-message" role="alert">
                 <li id="auditor_ein_not_an_ssn_attestation-not-null" hidden>
@@ -557,42 +588,44 @@
                 </li>
               </ul>
             </div>
+          </fieldset>
 
-            <fieldset class="usa-fieldset">
-              <legend class="usa-legend">
-                Auditor contact information</legend>
-              <div class="usa-form-group">
-                <label class="usa-label" for="auditor_contact_name">
-                  Name
-                  <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
-                </label>
-                <ul class="usa-error-message" id="auditor_contact_name-error-message" role="alert">
-                  <li id="auditor_contact_name-not-null" hidden>
-                    This field is required
-                  </li>
-                </ul>
-                <input class="usa-input" id="auditor_contact_name" name="auditor_contact_name" aria-required="true"
-                  required data-validate-not-null="" value="{{ auditor_contact_name | default_if_none:'' }}" />
-              </div>
+          <fieldset class="usa-fieldset">
+            <legend class="usa-legend">
+              Auditor contact information
+            </legend>
 
-              <div class="usa-form-group">
-                <label class="usa-label" for="auditor_contact_title">
-                  Title
-                  <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
-                </label>
-                <ul class="usa-error-message" id="auditor_contact_title-error-message" role="alert">
-                  <li id="auditor_contact_title-not-null" hidden>
-                    This field is required
-                  </li>
-                </ul>
-                <input class="usa-input" id="auditor_contact_title" name="auditor_contact_title" aria-required="true"
-                  required data-validate-not-null="" value="{{ auditor_contact_title | default_if_none:'' }}" />
-              </div>
-            </fieldset>
+            <div class="usa-form-group">
+              <label class="usa-label" for="auditor_contact_name">
+                Auditor name
+                <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
+              </label>
+              <ul class="usa-error-message" id="auditor_contact_name-error-message" role="alert">
+                <li id="auditor_contact_name-not-null" hidden>
+                  This field is required
+                </li>
+              </ul>
+              <input class="usa-input" id="auditor_contact_name" name="auditor_contact_name" aria-required="true"
+                required data-validate-not-null="" value="{{ auditor_contact_name | default_if_none:'' }}" />
+            </div>
+
+            <div class="usa-form-group">
+              <label class="usa-label" for="auditor_contact_title">
+                Auditor title
+                <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
+              </label>
+              <ul class="usa-error-message" id="auditor_contact_title-error-message" role="alert">
+                <li id="auditor_contact_title-not-null" hidden>
+                  This field is required
+                </li>
+              </ul>
+              <input class="usa-input" id="auditor_contact_title" name="auditor_contact_title" aria-required="true"
+                required data-validate-not-null="" value="{{ auditor_contact_title | default_if_none:'' }}" />
+            </div>
 
             <div class="usa-form-group">
               <label class="usa-label" for="auditor_phone">
-                Primary auditor telephone
+                Auditor phone number
                 <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
               </label>
               <ul class="usa-error-message" id="auditor_phone-error-message" role="alert">
@@ -603,9 +636,10 @@
               <input class="usa-input" id="auditor_phone" name="auditor_phone" aria-required="true" required
                 data-validate-not-null="" value="{{ auditor_phone | default_if_none:'' }}" />
             </div>
+
             <div class="usa-form-group">
               <label class="usa-label" for="auditor_email">
-                Primary auditor e-mail<abbr title="required" class="usa-hint usa-hint--required">*</abbr>
+                Auditor email<abbr title="required" class="usa-hint usa-hint--required">*</abbr>
               </label>
               <ul class="usa-error-message" id="auditor_email-error-message" role="alert">
                 <li id="auditor_email-not-null" hidden>
@@ -613,16 +647,43 @@
                 </li>
               </ul>
               <input class="usa-input" id="auditor_email" name="auditor_email" aria-required="true" required
-                data-validate-not-null="" value="{{ auditee_email | default_if_none:'' }}" />
+                data-validate-not-null="" value="{{ auditor_email | default_if_none:'' }}" />
             </div>
           </fieldset>
         </fieldset>
         <button class="usa-button" id="continue">
-          Save &amp; continue to next section
+          Save and continue to next section
         </button>
       </fieldset>
     </form>
   </div>
   <script src="{% static 'compiled/js/sf-sac.js' %}"></script>
+</div>
+
+<div class="audit-metadata">
+  <div class="grid-container">
+    <dl>
+      <div class="grid-row grid-gap">
+        <div class="tablet:grid-col">
+          <dt>Entity name</dt>
+          <dd>{{ auditee_name | default_if_none:'' }}</dd>
+        </div>
+        <div class="tablet:grid-col">
+          <dt>Report ID</dt>
+          <dd>{{ report_id | default_if_none:'' }}</dd>
+        </div>
+      </div>
+      <div class="grid-row grid-gap">
+        <div class="tablet:grid-col">
+          <dt>UEI</dt>
+          <dd>{{ auditee_uei | default_if_none:'' }}</dd>
+        </div>
+        <div class="tablet:grid-col">
+          <dt>Type of entity</dt>
+          <dd>{{ user_provided_organization_type | default_if_none:'' }}</dd>
+        </div>
+      </div>
+    </dl>
+  </div>
 </div>
 {% endblock content%}
