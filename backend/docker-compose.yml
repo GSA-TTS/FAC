@@ -14,12 +14,10 @@ services:
     build:
       context: .
       dockerfile: ./Dockerfile
-    command: >
-      bash -c "python manage.py migrate
-      & npm run dev
-      & python manage.py runserver 0.0.0.0:8000"
+    command: /src/run.sh
     depends_on:
       - db
+      - localstack
     environment:
       - "DATABASE_URL=postgres://postgres@db/postgres"
       - "DJANGO_DEBUG=true"
@@ -31,6 +29,7 @@ services:
       - "ALLOWED_HOSTS=0.0.0.0 127.0.0.1 localhost"
       - "AV_SCAN_URL=http://clamav-rest:9000/scan"
       - "DISABLE_AUTH=${DISABLE_AUTH}"
+      - "LOCALSTACK_HOST=localstack"
     env_file:
       - ".env"
     ports:
@@ -46,6 +45,15 @@ services:
       - SIGNATURE_CHECKS=1
     ports:
       - "9000:9000"
-
+  localstack:
+    container_name: "localstack_main"
+    image: localstack/localstack
+    ports:
+      - "4566:4566"
+    environment:
+      - SERVICES=s3
+    volumes:
+      - "localstack-vol:/tmp/localstack"
 volumes:
   postgres-data:
+  localstack-vol:
