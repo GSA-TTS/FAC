@@ -24,9 +24,9 @@ RUN \
 RUN \
     apt-get install -yqq groff && \
     apt-get install -yqq zip && \
-    curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" && \
-    unzip awscliv2.zip && \
-    ./aws/install
+    curl "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "awscli-bundle.zip" \
+    unzip awscli-bundle.zip \
+    ./awscli-bundle/install -b ~/bin/aws
 
 COPY requirements.txt /tmp/requirements.txt
 COPY dev-requirements.txt /tmp/dev-requirements.txt

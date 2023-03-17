@@ -48,7 +48,7 @@ jobs:
           npm ci
           npm run check-all
   test:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     env:
       ENV: TESTING
       SAM_API_KEY: ${{ secrets.SAM_API_KEY }}"
@@ -64,21 +64,10 @@ jobs:
       - name: Start services
         working-directory: ./backend
         run: touch .env && docker-compose up -d
-      - name: S3 mb
-        uses: ItsKarma/aws-cli@v1.70.0
-        with:
-          args: --endpoint-url=http://localstack:4566 s3 mb s3://gsa-fac-private-s3
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_DEFAULT_REGION: "us-east-1"
-#      - name: Sleep to wait for LocalStack to run
-#        run: sleep 30s
-#        shell: bash
-#      - name: Create LocalStack emulated S3 bucket
-#        working-directory: ./backend
-#        run:
-#          docker-compose run web bash -c 'AWS_SECRET_ACCESS_ID="test" AWS_ACCESS_KEY_ID="test" aws --endpoint-url=http://localstack:4566 s3 mb s3://gsa-fac-private-s3'
+      - name: Create LocalStack emulated S3 bucket
+        working-directory: ./backend
+        run:
+          docker-compose run web bash -c 'AWS_SECRET_ACCESS_ID="test" AWS_ACCESS_KEY_ID="test" aws --endpoint-url=http://localstack:4566 s3 mb s3://gsa-fac-private-s3'
       - name: Run Django test suite
         working-directory: ./backend
         run: coverage run --source="." manage.py test && coverage report -m --fail-under=90'
