@@ -11,7 +11,7 @@
         <p>
           <abbr title="required" class="usa-hint usa-hint--required">*</abbr>Indicates a required field.
         </p>
-        
+
         <input type="hidden" id="auditee_address_line_1" name="auditee_address_line_1" />
         <input type="hidden" id="auditee_city" name="auditee_city" />
         <input type="hidden" id="auditee_state" name="auditee_state" />
@@ -35,7 +35,7 @@
           <ul class="usa-error-message" id="auditee_uei-error-message" role="alert">
 
             <li id="auditee_uei-not-null" hidden>
-              Can&#39;t be null
+              This field is required
             </li>
 
             <li id="auditee_uei-length" hidden>
@@ -55,61 +55,45 @@
               </span>
             </button>
           </div>
-
-        </div>
-
+      </div>
 
         <p class="uei-explanation">Don’t know your UEI? You can find your UEI or register for a new UEI by visiting <a
             href="https://sam.gov/">SAM.gov</a>.</p>
 
-
-
         <div class="usa-form-group">
           <label class="usa-label" for="auditee_name">
             Auditee name
-
+            <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
           </label>
-
-          <span class="usa-error-message" id="auditee_name-error-message" role="alert">
-            Auditee Name is required if proceeding without a valid UEI
-          </span>
-
-
-          <input class="usa-input" id="auditee_name" name="auditee_name" disabled="true" />
+          <ul class="usa-error-message" id="auditee_name-error-message" role="alert">
+            <li id="auditee_name-not-null" hidden>
+              This field is required
+            </li>
+          </ul>
+          <input class="usa-input" id="auditee_name" name="auditee_name" aria-required="true" required
+            data-validate-not-null="" disabled="true" />
         </div>
 
-
-
-
         <div class="usa-form-group validate-fy">
-
           <ul class="usa-error-message" id="fy-error-message" role="alert" tabindex="-1">
           </ul>
-
           <div class="usa-form-group">
             <label class="usa-label" id="auditee_fiscal_period_start-label" for="auditee_fiscal_period_start">
               Auditee fiscal period <strong>start</strong> date for this submission<abbr title="required"
                 class="usa-hint usa-hint--required">*</abbr></label>
             <div class="usa-hint" id="auditee_fiscal_period_start-hint">mm/dd/yyyy</div>
             <div class="usa-date-picker">
-
               <ul class="usa-error-message" id="auditee_fiscal_period_start-error-message" role="alert">
-
                 <li id="auditee_fiscal_period_start-not-null" hidden>
-                  Can&#39;t be null
+                  This field is required
                 </li>
-
               </ul>
-
               <input class="usa-input" id="auditee_fiscal_period_start" name="auditee_fiscal_period_start"
                 aria-labelledby="auditee_fiscal_period_start-label" aria-describedby="auditee_fiscal_period_start-hint"
                 aria-required="true" required data-validate-not-null="" />
             </div>
           </div>
-
         </div>
-
-
 
         <div class="usa-form-group validate-fy">
 
@@ -123,7 +107,7 @@
               <ul class="usa-error-message" id="auditee_fiscal_period_end-error-message" role="alert">
 
                 <li id="auditee_fiscal_period_end-not-null" hidden>
-                  Can&#39;t be null
+                  This field is required
                 </li>
 
               </ul>
@@ -133,9 +117,7 @@
                 aria-required="true" required data-validate-not-null="" />
             </div>
           </div>
-
         </div>
-
 
       </fieldset>
       <ul class="usa-button-group">
@@ -173,7 +155,7 @@
     aria-labelledby="uei-search-result-heading" aria-describedby="uei-search-result-description">
     <div class="usa-modal__content">
       <div class="usa-modal__main">
-        <img src="/static/img/loader.svg" alt="loading">
+        <img src="/static/img/loader.svg" alt="loading"/>
         <h2 class="usa-modal__heading" id="uei-search-result-heading">
         </h2>
         <div class="usa-prose" id="uei-search-result-description">

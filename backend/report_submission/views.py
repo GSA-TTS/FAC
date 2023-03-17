@@ -145,15 +145,25 @@ class GeneralInformationFormView(LoginRequiredMixin, View):
     
     def post(self, request, *args, **kwargs):
         report_id = kwargs["report_id"]
-
         sac = SingleAuditChecklist.objects.get(report_id=report_id)
+
+        formatted_post = {
+            "auditee_uei": request.POST.get("auditee_uei"),
+            "auditee_name": request.POST.get("auditee_name"),
+            "auditee_address_line_1": request.POST.get("auditee_address_line_1"),
+            "auditee_city": request.POST.get("auditee_city"),
+            "auditee_state": request.POST.get("auditee_state"),
+            "auditee_zip": request.POST.get("auditee_zip"),
+        }
 
         accesses = Access.objects.filter(sac=sac, user=request.user)
         if not accesses:
             raise Exception("you don't have access to this audit")
-
-        SingleAuditChecklist.objects.filter(pk=sac.id).update(**request.POST)
-        print("###########")
-        print(request.POST)
+        
+        # print("###########")
+        # print(formatted_post)
+        # SingleAuditChecklist.objects.filter(pk=sac.id).update(**request.POST)
+        # print("###########")
+        # print(request.POST)
 
         return redirect(reverse("audit:MySubmissions"))

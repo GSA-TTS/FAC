@@ -32,18 +32,8 @@ function handleApiError(e) {
 }
 
 function proceedWithoutUei() {
-  const nameInputEl = document.getElementById('auditee_name');
-  const requiredStar = document.createElement('abbr');
-
-  requiredStar.setAttribute('title', 'required');
-  requiredStar.setAttribute('class', 'usa-hint usa-hint--required');
-  requiredStar.textContent = '*';
-
-  nameInputEl.removeAttribute('disabled');
-  nameInputEl.setAttribute('required', 'true');
-  document.querySelector('[for=auditee_name]').appendChild(requiredStar);
+  document.getElementById('auditee_name').removeAttribute('disabled');
   document.getElementById('no-uei-warning').hidden = false;
-
   hideUeiStuff();
 }
 
