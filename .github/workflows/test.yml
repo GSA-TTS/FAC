@@ -56,7 +56,6 @@ jobs:
       DJANGO_SECRET_LOGIN_KEY: ${{ secrets.DJANGO_SECRET_LOGIN_KEY }}"
       SECRET_KEY: ${{ secrets.SECRET_KEY }}
       ALLOWED_HOSTS: '0.0.0.0 127.0.0.1 localhost'
-      LOCALSTACK_HOST: 'http://localstack:4566'
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v1
@@ -71,7 +70,9 @@ jobs:
           docker-compose run web bash -c 'AWS_SECRET_ACCESS_ID="test" AWS_ACCESS_KEY_ID="test" awslocal s3 mb s3://gsa-fac-private-s3'
       - name: Run Django test suite
         working-directory: ./backend
-        run: coverage run --source="." manage.py test && coverage report -m --fail-under=90'
+        run: 
+          docker-compose run web bash -c 'coverage run --source="." manage.py test &&
+          coverage report -m --fail-under=90'
       - name: run Lighthouse CI
         run: |
           npm install -g @lhci/cli@0.8.x
