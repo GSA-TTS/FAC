@@ -17,16 +17,10 @@ RUN \
 RUN \
     apt-get update -yq && \
     apt install curl -y && \
+    apt-get install -y gcc && \
     curl -fsSL https://deb.nodesource.com/setup_14.x | bash - && \
     apt-get install -y nodejs && \
     npm i -g npm@^8
-
-RUN \
-    apt-get install -yqq groff && \
-    apt-get install -yqq zip && \
-    curl "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "awscli-bundle.zip" && \
-    unzip awscli-bundle.zip && \
-    ./awscli-bundle/install -b ~/bin/aws
 
 COPY requirements.txt /tmp/requirements.txt
 COPY dev-requirements.txt /tmp/dev-requirements.txt

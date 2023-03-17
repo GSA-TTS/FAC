@@ -14,6 +14,9 @@ asgiref==3.6.0 \
     # via
     #   -c ./requirements/../requirements.txt
     #   django
+awscli-local==0.20 \
+    --hash=sha256:8694445f4fcf11e1ed15c0cf47150b85f5904cc6f27ae8157043b89cf9f4b16a
+    # via -r ./requirements/dev-requirements.in
 bandit==1.7.5 \
     --hash=sha256:75665181dc1e0096369112541a056c59d1c5f66f9bb74a8d686c3c362b83f549 \
     --hash=sha256:bdfc739baa03b880c2d15d0431b31c658ffc348e907fe197e54e0389dd59e11e
@@ -393,7 +396,9 @@ localstack==1.4.0 \
     #   localstack-ext
 localstack-client==1.39 \
     --hash=sha256:71124983d15418c90ec9a82c4bde0460b29c62896cd44527b4b3346f8d5f8a89
-    # via localstack
+    # via
+    #   awscli-local
+    #   localstack
 localstack-ext==1.4.0 \
     --hash=sha256:fee7ac1e207fe78c047dc59fe1ef415b566f7157c08000fbc860257d8c6ffba8
     # via localstack
