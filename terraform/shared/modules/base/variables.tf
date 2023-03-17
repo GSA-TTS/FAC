@@ -43,4 +43,3 @@ variable "recursive_delete" {
   description = "when true, deletes service bindings attached to the resource (not recommended for production)"
   default     = false
 }
-
