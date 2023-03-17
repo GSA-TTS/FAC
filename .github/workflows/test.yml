@@ -74,7 +74,8 @@ jobs:
       - name: Run Django test suite
         working-directory: ./backend
         run:
-          docker-compose run web bash -c 'coverage run --source="." manage.py test &&
+          docker-compose run web bash -c 'aws --endpoint-url=http://localstack:4566 s3 mb s3://gsa-fac-private-s3 &&
+          coverage run --source="." manage.py test &&
           coverage report -m --fail-under=90'
       - name: run Lighthouse CI
         run: |
