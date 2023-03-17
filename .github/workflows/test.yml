@@ -48,7 +48,7 @@ jobs:
           npm ci
           npm run check-all
   test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
     env:
       ENV: TESTING
       SAM_API_KEY: ${{ secrets.SAM_API_KEY }}"
