@@ -1,16 +1,18 @@
-# Development
+# Testing
 
 We use [Django's test execution framework](https://docs.djangoproject.com/en/4.0/topics/testing/) along with select 3rd party packages to implement and execute tests for our python code.
 
 ## Contents
 
-- [Development](#development)
+- [Testing](#testing)
   - [Contents](#contents)
   - [Packages](#packages)
   - [Running the tests](#running-the-tests)
   - [Writing new tests](#writing-new-tests)
   - [Testing Actions Locally](#testing-actions-locally)
-  - [Coverage](#coverage)
+  - [Accessibility](#accessibility)
+  - [Security Scans](#security-scans)
+  - [Linting](#linting)
 
 ## Packages
  - [model_bakery](https://model-bakery.readthedocs.io/en/latest/), to help create data and instances within our tests
@@ -39,7 +41,7 @@ We are configured to require 90% test coverage. If a file should not be counted 
 We write tests for new and modified functionality specific to this project. A few examples:
 
 We **do** write tests for:
-* Classmethods on Django models implemented by us, like `__str__`
+* Class methods on Django models implemented by us, like `__str__`
 
 We **don't** write tests for:
 * Asserting that the built-in `models.Charfield` checks the length of an incoming `string` against the `max_length` attribute
@@ -88,3 +90,21 @@ Run this locally via docker:
 ```
 
 Bandit tests are executed as part of our CI/CD pipeline on each PR to the `main` branch, commit to the `main` branch, and PR into the `prod` branch.
+
+## Linting
+
+We use a variety of linters on the project:
+
+* flake8 - error and style checker
+* Black - code formatter
+* mypy - type annotation checker
+* djlint - HTML formatter and linter
+* eslint - JS static code analysis and linter
+* stylelint - CSS linter
+
+You can run most of them directly after installing the app's dependencies (i.e. `black .`).
+
+You can also run most of them as one command with `make lint`.
+
+Like with Bandit, new code will need to pass all of these to be merged into the `main` branch.
+
