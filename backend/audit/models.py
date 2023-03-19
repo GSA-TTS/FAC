@@ -141,7 +141,7 @@ class SingleAuditChecklist(models.Model):
     @property
     def user_provided_organization_type(self):
         return self._general_info_get("user_provided_organization_type")
-    
+
     @property
     def ein(self):
         return self._general_info_get("ein")
@@ -225,11 +225,10 @@ class SingleAuditChecklist(models.Model):
     @property
     def auditor_phone(self):
         return self._general_info_get("auditor_phone")
-    
+
     @property
     def auditee_contacts(self):
         return self._general_info_get("auditee_contacts")
-
 
     def _general_info_get(self, key):
         try:

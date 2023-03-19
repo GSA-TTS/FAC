@@ -330,7 +330,8 @@ ul.usa-error-message {
       }
 
       fieldset {
-        &.radio {
+        &.radio,
+        &#audit-firm-organization-address {
           legend {
             font-size: size('sans', 'md');
           }

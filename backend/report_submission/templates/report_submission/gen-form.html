@@ -51,7 +51,12 @@
             </li>
           </ul>
           <div class="usa-radio">
-            <input class="usa-radio__input" id="single-audit" name="audit_type" value="single-audit" type="radio"
+            <input class="usa-radio__input" 
+              type="radio"
+              id="single-audit" 
+              name="audit_type" 
+              value="single-audit" 
+              
               data-validate-not-null="" />
             <label class="usa-radio__label" for="single-audit">
               Single Audit
@@ -85,8 +90,13 @@
             </li>
           </ul>
           <div class="usa-radio">
-            <input class="usa-radio__input" id="audit-period-annual" name="audit_period_covered" value="annual"
-              type="radio" data-validate-not-null="" />
+            <input class="usa-radio__input" 
+              type="radio" 
+              id="audit-period-annual" 
+              name="audit_period_covered" 
+              value="annual"
+              required
+              data-validate-not-null="" />
             <label class="usa-radio__label" for="audit-period-annual">
               Annual
             </label>
@@ -106,7 +116,11 @@
             <label class="usa-radio__label" for="audit-period-other">
               Other
             </label>
-            <input class="usa-input usa-input--small" type="text" id="audit_period_covered-other_months" name="audit_period_covered" />
+            <input class="usa-input usa-input--small" 
+              type="text" 
+              id="audit_period_covered-other_months" 
+              name="audit_period_covered" 
+              disabled />
             <label class="usa-label usa-input--small__label" for="audit_period_covered-other_months">months</label>
           </div>
         </fieldset>
@@ -114,7 +128,7 @@
         <fieldset class="usa-fieldset question" id="fiscal-period-dates">
           <legend class="usa-legend">
             Fiscal Period</legend>
-          <div class="usa-form-group">
+          <div class="usa-form-group" id="TEST">
             <label class="usa-label" for="auditee_fiscal_period_start">
               What is your fiscal period start date?
               <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
@@ -125,8 +139,12 @@
                 This field is required
               </li>
             </ul>
-            <input class="usa-input" id="auditee_fiscal_period_start" name="auditee_fiscal_period_start"
-              aria-required="true" required data-validate-not-null=""
+            <input class="usa-input" 
+              id="auditee_fiscal_period_start" 
+              name="auditee_fiscal_period_start"
+              aria-required="true" 
+              required 
+              data-validate-not-null=""
               value="{{ auditee_fiscal_period_start | default_if_none:'' }}" />
           </div>
 
@@ -141,8 +159,12 @@
                 This field is required
               </li>
             </ul>
-            <input class="usa-input" id="auditee_fiscal_period_end" name="auditee_fiscal_period_end"
-              aria-required="true" required data-validate-not-null=""
+            <input class="usa-input" 
+              id="auditee_fiscal_period_end" 
+              name="auditee_fiscal_period_end"
+              aria-required="true" 
+              required 
+              data-validate-not-null=""
               value="{{ auditee_fiscal_period_end | default_if_none:'' }}" />
           </div>
         </fieldset>
@@ -290,16 +312,22 @@
                 </li>
               </ul>
               <div class="usa-radio">
-                <input class="usa-radio__input" id="multiple-ueis-yes" name="multiple_ueis_covered" value="true"
-                  type="radio" data-validate-not-null="" />
+                <input class="usa-radio__input" 
+                  type="radio"
+                  id="multiple-ueis-yes" 
+                  name="multiple_ueis_covered" 
+                  value="true" />
                 <label class="usa-radio__label" for="multiple-ueis-yes">
                   Yes
                 </label>
               </div>
 
               <div class="usa-radio">
-                <input class="usa-radio__input" id="multiple-ueis-no" name="multiple_ueis_covered" value="false"
-                  type="radio" data-validate-not-null="" />
+                <input class="usa-radio__input" 
+                  type="radio" 
+                  id="multiple-ueis-no" 
+                  name="multiple_ueis_covered" 
+                  value="false" />
                 <label class="usa-radio__label" for="multiple-ueis-no">
                   No
                 </label>
@@ -322,9 +350,14 @@
               </ul>
               <input class="usa-input" id="ein" name="ein" aria-required="true" required data-validate-not-null="" />
             </div>
+
             <div class="usa-checkbox">
-              <input class="usa-checkbox__input" id="ein_not_an_ssn_attestation" type="checkbox"
-                name="ein_not_an_ssn_attestation" value="" />
+              <input class="usa-checkbox__input" 
+                id="ein_not_an_ssn_attestation" 
+                type="checkbox"
+                name="ein_not_an_ssn_attestation" 
+                data-validate-not-null="" 
+                value="" />
               <label class="usa-checkbox__label" for="ein_not_an_ssn_attestation">
                 By checking this box, I verify that the Auditee EIN is not a Social Security Number.
               </label>
@@ -334,6 +367,7 @@
                 </li>
               </ul>
             </div>
+
             <fieldset class="usa-fieldset radio">
               <legend class="usa-legend">
                 Are multiple EINs covered in this report?<abbr title="required"
@@ -346,16 +380,22 @@
                 </li>
               </ul>
               <div class="usa-radio">
-                <input class="usa-radio__input" id="multiple-eins-yes" name="multiple_eins_covered" value="true"
-                  type="radio" data-validate-not-null="" />
+                <input class="usa-radio__input" 
+                  type="radio" 
+                  id="multiple-eins-yes" 
+                  name="multiple_eins_covered" 
+                  value="true"/>
                 <label class="usa-radio__label" for="multiple-eins-yes">
                   Yes
                 </label>
               </div>
 
               <div class="usa-radio">
-                <input class="usa-radio__input" id="multiple-eins-no" name="multiple_eins_covered" value="false"
-                  type="radio" data-validate-not-null="" />
+                <input class="usa-radio__input" 
+                type="radio" 
+                id="multiple-eins-no" 
+                name="multiple_eins_covered" v
+                alue="false" />
                 <label class="usa-radio__label" for="multiple-eins-no">
                   No
                 </label>
@@ -577,8 +617,12 @@
                 data-validate-not-null="" value="{{ auditor_ein | default_if_none:'' }}" />
             </div>
             <div class="usa-checkbox">
-              <input class="usa-checkbox__input" id="auditor_ein_not_an_ssn_attestation" type="checkbox"
-                name="auditor_ein_not_an_ssn_attestation" value="" data-validate-not-null="" />
+              <input class="usa-checkbox__input" 
+                id="auditor_ein_not_an_ssn_attestation" 
+                type="checkbox"
+                name="auditor_ein_not_an_ssn_attestation" 
+                value="" 
+                data-validate-not-null="" />
               <label class="usa-checkbox__label" for="auditor_ein_not_an_ssn_attestation">
                 By checking this box, I verify that the Auditor EIN is not a Social Security Number.
               </label>

@@ -47,24 +47,15 @@ function attachEventHandlers() {
   );
 
   FORM.addEventListener('submit', (e) => {
+    
     e.preventDefault();
-    console.log(fieldsNeedingValidation);
-
-    performValidations(e.target);
     if (!allResponsesValid()) return;
-    // submitForm();
+    FORM.submit();
   });
 
   fieldsNeedingValidation.forEach((q) => {
     q.addEventListener('blur', (e) => {
       performValidations(e.target);
-    });
-  });
-
-  const submitBtn = document.getElementById('continue');
-  submitBtn.addEventListener('click', () => {
-    fieldsNeedingValidation.forEach((q) => {
-      performValidations(q);
     });
   });
 
