@@ -2,10 +2,7 @@
 -- Possible improvements: add Federal Program Name from Federal Award
 
 
--- just in case there are any existing views
-drop view if exists vw_general;
-
-create view vw_general as
+create or replace view vw_general as
 with gen as (
     select *
     from data_distro_general
@@ -62,3 +59,5 @@ left join notes on notes.general_id=gen.id
 left join cap_text on cap_text.general_id=gen.id
 left join passthrough on passthrough.general_id=gen.id
 ;
+
+grant select on vw_general to anon;

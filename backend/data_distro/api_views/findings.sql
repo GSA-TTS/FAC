@@ -3,10 +3,8 @@
 
 -- TODO fix seqence_number spelling
 
-drop view if exists vw_findings;
-
 -- Findings with list of associated findings text records
-create view vw_findings as
+create or replace view view vw_findings as
 with findings as (
     select *
     from data_distro_finding
@@ -23,10 +21,12 @@ from findings
 left join findings_text on findings.id=findings_text.finding_id
 ;
 
+grant select on vw_findings to anon;
 
 -- Findings text
-drop view if exists vw_findings_text;
-
-create view vw_findings_text as
+create or replace view vw_findings_text as
  select * from data_distro_findingtext
- where data_distro_findingtext.is_public=True;
+ where data_distro_findingtext.is_public=True
+;
+
+grant select on vw_findings_text to anon;
