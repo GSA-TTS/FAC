@@ -15,12 +15,14 @@ locals {
     "bret.mogilefsky@gsa.gov",
     "lindsayn.young@gsa.gov",
     "jason.nakai@gsa.gov",
+    "james.person@gsa.gov",
     "jeanmarie.mariadassou@gsa.gov",
     "matt.henry@gsa.gov",
     "sarah.withee@gsa.gov",
     "tadhg.ohiggins@gsa.gov",
     "timothy.ballard@gsa.gov",
     "matthew.jadud@gsa.gov",
+    "edward.zapata@gsa.gov",
   ]
 
   # All spaces have the same SpaceManagers for now
