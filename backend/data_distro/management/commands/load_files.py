@@ -1,3 +1,4 @@
+import os
 from pandas import read_csv
 import logging
 
@@ -10,7 +11,7 @@ from data_distro.management.commands.link_data import (
     link_objects_findings,
     link_objects_cpas,
     link_objects_general,
-    link_duns_eins,
+    link_lists,
     link_agency,
 )
 from data_distro.management.commands.parse_config import (
@@ -171,7 +172,7 @@ def load_files(load_file_names):
     return expected_objects_dict
 
 
-def load_duns_eins(file):
+def load_lists(file):
     """
     These were their own data model but we are going to use an array field.
     This adds the fields in the right order. It should run after general.
@@ -180,9 +181,16 @@ def load_duns_eins(file):
     if "duns" in file:
         sort_by = "DUNSEQNUM"
         payload_name = "DUNS"
+    elif "ueis" in file:
+        sort_by = "UEISEQNUM"
+        payload_name = "UEI"
     else:
         sort_by = "EINSEQNUM"
         payload_name = "EIN"
+
+    if os.path.isfile(file_path) is False:
+        # Most years don't have UEI. This will gracefully fail if the file is not there.
+        return {payload_name: {file_path: "not_found"}}
 
     logger.warning(f"------------Table: {payload_name}--------------")
 
@@ -193,7 +201,7 @@ def load_duns_eins(file):
     csv_dict = data_frame.to_dict(orient="records")
     expected_object_count = len(csv_dict)
 
-    link_duns_eins(csv_dict, payload_name)
+    link_lists(csv_dict, payload_name)
 
     return {payload_name: expected_object_count}
 

@@ -55,6 +55,7 @@ class Command(BaseCommand):
             "data_source",
             "create_date",
             "modified_date",
+            "pdf_urls"
             # relational links. These will change if you move fields around
             "general",
             "findings_text",
