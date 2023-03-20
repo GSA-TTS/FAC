@@ -40,7 +40,11 @@ federal_awards_field_mapping: FieldMapping = {
 }
 
 federal_awards_column_mapping: ColumnMapping = {
-    "amount_expended": ("FederalAwards.federal_awards", "amount_expended", _set_by_path),
+    "amount_expended": (
+        "FederalAwards.federal_awards",
+        "amount_expended",
+        _set_by_path,
+    ),
     "cluster_name": ("FederalAwards.federal_awards", "cluster_name", _set_by_path),
     "direct_award": ("FederalAwards.federal_awards", "direct_award", _set_by_path),
     "direct_award_pass_through_entity_name": (
