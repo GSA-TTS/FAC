@@ -15,7 +15,6 @@ class MySubmissions(LoginRequiredMixin, generic.View):
     redirect_field_name = "Home"
 
     def get(self, request, *args, **kwargs):
-
         template_name = "audit/my_submissions.html"
         new_link = "report_submission"
         edit_link = "audit:EditSubmission"
@@ -50,11 +49,7 @@ class EditSubmission(LoginRequiredMixin, generic.View):
     redirect_field_name = "Home"
 
     def get(self, request, *args, **kwargs):
-
-        # template_name = "audit/edit_submission.html"
         report_id = kwargs["report_id"]
-        # sac = SingleAuditChecklist.objects.get(report_id=report_id)
-        # return render(request, template_name, context)
         return redirect(reverse("singleauditchecklist", args=[report_id]))
 
 

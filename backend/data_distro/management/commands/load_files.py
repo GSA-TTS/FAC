@@ -29,7 +29,6 @@ def load_generic(
     table,
     file_path,
 ):
-
     objects_dict = transform_and_save(
         row,
         csv_dict,

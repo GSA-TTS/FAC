@@ -4,7 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("audit", "0008_alter_access_options_rename_user_id_access_user_and_more"),
     ]
