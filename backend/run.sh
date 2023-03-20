@@ -6,9 +6,6 @@ else
   echo "No environment variable `ENV` is set!"
 fi;
 
-export AWS_ACCESS_KEY_ID=test
-export AWS_SECRET_ACCESS_KEY=test
-
 if [[ "${ENV}" == "LOCAL" ]]; then
   aws --endpoint-url=http://localstack:4566 s3 mb s3://gsa-fac-private-s3
 fi;

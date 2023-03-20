@@ -50,3 +50,20 @@ test:
 #     make nctest
 nctest:
 	@python -m coverage run --source="." manage.py test ${fac.test.scope}
+
+# Run Django tests with docker
+docker-test:
+	docker-compose build
+	docker-compose run web bash -c 'awslocal s3 mb s3://gsa-fac-private-s3'
+	docker-compose run web python -m coverage run --source="." manage.py test
+	docker-compose run web python -m coverage report -m --fail-under=90
+
+# Run Django tests with docker with no coverage and with scoping
+# e.g. just the audit/test_models.py tests:
+#     make nctest fac.test.scope=audit.test_models"
+# or all tests with no coverage:
+#     make nctest
+docker-nctest:
+	docker-compose build
+	docker-compose run web bash -c 'awslocal s3 mb s3://gsa-fac-private-s3'
+	docker-compose run web python manage.py test ${fac.test.scope}
