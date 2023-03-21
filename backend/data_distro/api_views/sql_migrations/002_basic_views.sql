@@ -1,3 +1,6 @@
+-- run by data/distro/migrations/0030_add_api_views.py
+-- rerun in data/distro/migrations/0032_update_API.py (needed to recreate view but no new SQL was needed)
+
 -- Current script to recreate views
 
 begin;
@@ -140,6 +143,5 @@ select pass.*, gen.general_id
 from pass
 left join gen on pass.id=gen.passthrough_id
 ;
-
 
 commit;

@@ -16,10 +16,11 @@ We use [manifests](https://docs.cloudfoundry.org/devguide/deploy-apps/manifest.h
 
 ## Tools
 
-* [cf-cli](https://docs.cloudfoundry.org/cf-cli/) Cloudfoundry's CLI
-  * Mac install ov v8 needed for Cloud.gov: `brew install cloudfoundry/tap/cf-cli@8`
-* [cloud.gov dashboard](https://www.cloud.gov)
-* [cloud.gov deploy action](https://github.com/18F/cg-deploy-action)
+- [cf-cli](https://docs.cloudfoundry.org/cf-cli/) Cloudfoundry's CLI
+  - Mac install ov v8 needed for Cloud.gov: `brew install cloudfoundry/tap/cf-cli@8`
+- [cloud.gov dashboard](https://www.cloud.gov)
+- [cloud.gov deploy action](https://github.com/18F/cg-deploy-action)
+- [application logs](https://logs.fr.cloud.gov/) with search and dashboard
 
 ## Cloud.gov
 

@@ -1,6 +1,6 @@
--- Current script to recreate views
+-- run by data/distro/migrations/0030_add_api_views.py
+
 -- Takes the General model and adds Auditor and Auditee information for easy searching
--- Possible improvements: add Federal Program Name from Federal Award
 
 begin;
 
@@ -70,4 +70,3 @@ left join passthrough on passthrough.general_id=gen.id
 ;
 
 commit;
-
