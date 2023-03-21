@@ -15,15 +15,15 @@ module "clamav" {
   max_file_size = "30M"
 }
 
-# module "database" {
-#   source = ""github.com/18f/terraform-cloudgov//database""
+module "database" {
+  source = "github.com/18f/terraform-cloudgov//database"
 
-#   cf_org_name      = var.cf_org_name
-#   cf_space_name    = var.cf_space_name
-#   name             = "${var.app_name}-db"
-#   recursive_delete = var.recursive_delete
-#   rds_plan_name    = var.database_plan
-# }
+  cf_org_name      = var.cf_org_name
+  cf_space_name    = var.cf_space_name
+  name             = "fac-db"
+  recursive_delete = var.recursive_delete
+  rds_plan_name    = var.database_plan
+}
 
 module "s3-public" {
   source = "github.com/18f/terraform-cloudgov//s3"
