@@ -584,6 +584,10 @@ pycryptodomex==3.17 \
     # via
     #   oic
     #   pyjwkest
+pydash==6.0.2 \
+    --hash=sha256:35caa588e01d293713655e0870544d25128cd414c5e19477a0d63adc2b2ca03e \
+    --hash=sha256:6d3ce5cbbc8ca3533c12782ac201c2ec756d1e1703ec3efc88f2b95d1ed2bb31
+    # via -r ./requirements/requirements.in
 pyjwkest==1.4.2 \
     --hash=sha256:5560fd5ba08655f29ff6ad1df1e15dc05abc9d976fcbcec8d2b5167f49b70222
     # via oic

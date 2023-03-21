@@ -133,7 +133,8 @@
           "type": "string"
         },
         "amount_expended": {
-          "type": "string"
+          "type": "number",
+          "minimum": 0
         },
         "cluster_name": {
           "$ref": "#/$defs/ClusterName"
@@ -180,7 +181,7 @@
           "$ref": "#/$defs/ProgramNumber"
         },
         "state_cluster_name": {
-          "type": "string"
+          "type": ["string", "null"]
         }
       },
       "allOf": [
@@ -412,7 +413,7 @@
       "description": "",
       "properties": {
         "auditee_ein": {
-          "type": "string"
+          "type": ["string", "null"]
         },
         "federal_awards": {
           "items": {
@@ -421,7 +422,8 @@
           "type": "array"
         },
         "total_amount_expended": {
-          "type": "string"
+          "type": "number",
+          "minimum": 0
         }
       },
       "required": [
