@@ -1,6 +1,5 @@
 from django.core.management.base import BaseCommand
 
-from psycopg2 import sql
 from psycopg2._psycopg import connection
 
 from django.conf import settings
@@ -8,14 +7,14 @@ from django.conf import settings
 
 class Command(BaseCommand):
     help = """
-    Runs sql scripts in data_distro/api_views to create views for the postgrest API.
+    Runs sql scripts in data_distro/api_views to recreate views for the postgrest API.
 
     Use -f to specify one file to recreate views in that file.
 
     """
+
     def add_arguments(self, parser):
         parser.add_argument("-f", "--file", type=str, help="file name")
-
 
     def handle(self, *args, **kwargs):
         if kwargs["file"] is not None:
@@ -33,4 +32,5 @@ class Command(BaseCommand):
             conn.autocommit = True
             with conn.cursor() as curs:
                 filename = f"data_distro/api_views/{filename}"
-                curs.execute(open(filename, "r").read())
+                sql = open(filename, "r").read()
+                curs.execute(sql)

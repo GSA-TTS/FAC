@@ -1,6 +1,5 @@
--- Current script to recreate views
--- uniting findings and findings text
--- may want to add auditee name, agency, fed program name, cap text and cpa name
+-- run by data/distro/migrations/0030_add_api_views.py
+-- rerun in data/distro/migrations/0032_update_API.py (needed to recreate view but no new SQL was needed)
 
 begin;
 
@@ -31,8 +30,8 @@ left join gen on findings.id=gen.finding_id
 
 
 -- Findings text
-drop view if exists api.vw_findings_text
-create or replace view api.vw_findings_text as
+drop view if exists api.vw_findings_text;
+create view api.vw_findings_text as
 with findings_text as (
  select *
  from data_distro_findingtext

@@ -182,6 +182,10 @@ Set a `DATABASE_URL` environment variable with the uri of your local database
     *  `postgresql://[userspec@][hostspec][/dbname]`
 
 
+### Test data
+
+For the historical data and public data API we are using the data_distro app. You can set up a modest amount of test data by running `manage.py load_test_data` (That will give an error message while it loads, but only because we are reusing the data from tests, where we test errors.) If the data loading is successful, it will say "Test data loading complete"
+
 ### Django setup
 
 In development, you'll need to run Django's `manage.py` and specific commands like `makemigrations`, `createsuperuser`, and more.
