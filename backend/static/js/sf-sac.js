@@ -13,13 +13,18 @@ function allResponsesValid() {
 }
 
 function performValidations(field) {
+  const inputType = field.type; 
+  if(inputType == 'radio'){
+    const inputFieldset = field.parentElement.parentElement;
+    const rgInputs = inputFieldset.querySelectorAll('input[name="'+field.name+'"]');
+    rgInputs.forEach((i) => i.classList.remove('usa-input--error'));
+  }
   const errors = checkValidity(field);
   setFormDisabled(errors.length > 0);
 }
 
 function highlightActiveNavSection() {
   let currentFieldsetId;
-
   const fieldsets = document.querySelectorAll('fieldset[id]');
   const navLinks = document.querySelectorAll('li .usa-sidenav__item a');
 
@@ -47,7 +52,6 @@ function attachEventHandlers() {
   );
 
   FORM.addEventListener('submit', (e) => {
-    
     e.preventDefault();
     if (!allResponsesValid()) return;
     FORM.submit();

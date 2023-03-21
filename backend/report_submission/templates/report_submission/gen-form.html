@@ -56,7 +56,7 @@
               id="single-audit" 
               name="audit_type" 
               value="single-audit" 
-              
+              required
               data-validate-not-null="" />
             <label class="usa-radio__label" for="single-audit">
               Single Audit
@@ -153,7 +153,7 @@
               What is your fiscal period end date?
               <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
             </label>
-            <p class="usa-hint margin-0" id="auditee_fiscal_period_start-hint">mm/dd/yyyy</p>
+            <p class="usa-hint margin-0" id="auditee_fiscal_period_end-hint">mm/dd/yyyy</p>
             <ul class="usa-error-message" id="auditee_fiscal_period_end-error-message" role="alert">
               <li id="auditee_fiscal_period_end-not-null" hidden>
                 This field is required
@@ -316,7 +316,9 @@
                   type="radio"
                   id="multiple-ueis-yes" 
                   name="multiple_ueis_covered" 
-                  value="true" />
+                  value="true" 
+                  required
+                  data-validate-not-null="" />
                 <label class="usa-radio__label" for="multiple-ueis-yes">
                   Yes
                 </label>
@@ -327,7 +329,8 @@
                   type="radio" 
                   id="multiple-ueis-no" 
                   name="multiple_ueis_covered" 
-                  value="false" />
+                  value="false" 
+                  data-validate-not-null="" />
                 <label class="usa-radio__label" for="multiple-ueis-no">
                   No
                 </label>
@@ -384,7 +387,9 @@
                   type="radio" 
                   id="multiple-eins-yes" 
                   name="multiple_eins_covered" 
-                  value="true"/>
+                  value="true"
+                  required
+                  data-validate-not-null="" />
                 <label class="usa-radio__label" for="multiple-eins-yes">
                   Yes
                 </label>
@@ -394,8 +399,9 @@
                 <input class="usa-radio__input" 
                 type="radio" 
                 id="multiple-eins-no" 
-                name="multiple_eins_covered" v
-                alue="false" />
+                name="multiple_eins_covered"
+                value="false" 
+                data-validate-not-null="" />
                 <label class="usa-radio__label" for="multiple-eins-no">
                   No
                 </label>
@@ -493,7 +499,7 @@
           <legend class="usa-legend text-bold">
             Primary auditor information
           </legend>
-          <p class="usa-hint" id="auditee_fiscal_period_start-hint">
+          <p class="usa-hint">
             If multiple audit organizations worked on this audit, only include the lead or coordinating auditor's information.
           </p>
 
@@ -706,27 +712,23 @@
 
 <div class="audit-metadata">
   <div class="grid-container">
-    <dl>
-      <div class="grid-row grid-gap">
-        <div class="tablet:grid-col">
+    <dl class="grid-row grid-gap">
+        <div class="tablet:grid-col-6">
           <dt>Entity name</dt>
           <dd>{{ auditee_name | default_if_none:'' }}</dd>
         </div>
-        <div class="tablet:grid-col">
+        <div class="tablet:grid-col-6">
           <dt>Report ID</dt>
           <dd>{{ report_id | default_if_none:'' }}</dd>
         </div>
-      </div>
-      <div class="grid-row grid-gap">
-        <div class="tablet:grid-col">
+        <div class="tablet:grid-col-6">
           <dt>UEI</dt>
           <dd>{{ auditee_uei | default_if_none:'' }}</dd>
         </div>
-        <div class="tablet:grid-col">
+        <div class="tablet:grid-col-6">
           <dt>Type of entity</dt>
           <dd>{{ user_provided_organization_type | default_if_none:'' }}</dd>
         </div>
-      </div>
     </dl>
   </div>
 </div>
