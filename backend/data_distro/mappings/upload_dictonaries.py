@@ -64,6 +64,6 @@ boolean_fields = [
     "questioned_costs",
     "reportable_condition",
     "report_required",
-    "sp_framework_required",
+    "special_framework_required",
     "charts_tables",
 ]

@@ -64,14 +64,12 @@ def add_to_file(file_name, paylod):
                 data = []
         data.append(paylod)
         outfile.seek(0)
-        json.dump(data, outfile, indent=2)
+        json.dump(data, outfile, indent=2, default=str)
         outfile.truncate()
 
 
 def handle_badlines(bad_line: list[str]) -> list[str] | None:
     """Making sure all data is accounted for"""
-    line_file = "data_distro/data_to_load/run_logs/Lines_in_progress.json"
-    add_to_file(line_file, bad_line)
 
     logger.warn(
         f"""
@@ -81,16 +79,14 @@ def handle_badlines(bad_line: list[str]) -> list[str] | None:
         """
     )
 
+    line_file = "data_distro/data_to_load/run_logs/Lines_in_progress.json"
+    add_to_file(line_file, bad_line)
+
     return None
 
 
 def handle_exceptions(table, file_path, instance_dict, error_trace):
     """Add detailed explanations to the logs and keep track of each type of error"""
-    error_file = "data_distro/data_to_load/run_logs/Errors_in_progress.json"
-    add_to_file(error_file, {table: instance_dict})
-
-    exception_file = "data_distro/data_to_load/run_logs/Exceptions_in_progress.json"
-    add_to_file(exception_file, error_trace)
 
     logger.warn(
         f"""
@@ -104,6 +100,12 @@ def handle_exceptions(table, file_path, instance_dict, error_trace):
         """
     )
 
+    error_file = "data_distro/data_to_load/run_logs/Errors_in_progress.json"
+    add_to_file(error_file, {table: instance_dict})
+
+    exception_file = "data_distro/data_to_load/run_logs/Exceptions_in_progress.json"
+    add_to_file(exception_file, error_trace)
+
 
 def log_results(expected_objects_dict, kwargs):
     """This is helpful for debugging"""
@@ -115,11 +117,6 @@ def log_results(expected_objects_dict, kwargs):
         "expected_objects_dict": expected_objects_dict,
         "error_logs": errors,
     }
-
-    with open(
-        f"data_distro/data_to_load/run_logs/Results_{options}_{date_stamp}.json", "w"
-    ) as outfile:
-        json.dump(payload, outfile)
 
     if len(errors) > 0:
         logger.warning(
@@ -140,5 +137,10 @@ def log_results(expected_objects_dict, kwargs):
             ###############################
             Successful upload 🏆"""
         )
+
+    with open(
+        f"data_distro/data_to_load/run_logs/Results_{options}_{date_stamp}.json", "w"
+    ) as outfile:
+        json.dump(payload, outfile)
 
     return date_stamp

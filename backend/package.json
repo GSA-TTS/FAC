@@ -16,7 +16,8 @@
     "check:stylelint": "npx stylelint --ignore-pattern uswds static/scss",
     "fix:stylelint": "npx stylelint --fix --ignore-pattern uswds static/scss",
     "check-all": "run-p check:*",
-    "fix-all": "run-p fix:*"
+    "fix-all": "run-p fix:*",
+    "test:e2e:ci": "npx cypress run"
   },
   "author": "",
   "license": "ISC",

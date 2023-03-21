@@ -1,6 +1,6 @@
 ---
 applications:
-- name: task-runner-97-09
+- name: task-runner-20
   buildpacks:
     - python_buildpack
   memory: 2G
@@ -11,10 +11,10 @@ applications:
     ENV: STAGING
     DJANGO_BASE_URL: https://fac-staging.app.cloud.gov
   services:
-  - fac-db
+  - fac-db-new
   - fac-public-s3
   - fac-key-service
-  command: (python manage.py public_data_loader -y 9 && echo SUCCESS || echo TASK_FAIL) && sleep infinity
+  command: (python manage.py public_data_loader -y 20 && echo SUCCESS || echo TASK_FAIL) && sleep infinity
 
   # run with
   # cf push -f manifests/task-manifest-staging.yaml --no-route
