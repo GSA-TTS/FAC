@@ -13,7 +13,8 @@ function handleUEIDResponse({ valid, response, errors }) {
 
 function handleValidUei(response) {
   document.getElementById('auditee_name').value = response.auditee_name;
-  document.getElementById('auditee_address_line_1').value = response.auditee_address_line_1;
+  document.getElementById('auditee_address_line_1').value =
+    response.auditee_address_line_1;
   document.getElementById('auditee_city').value = response.auditee_city;
   document.getElementById('auditee_state').value = response.auditee_state;
   document.getElementById('auditee_zip').value = response.auditee_zip;

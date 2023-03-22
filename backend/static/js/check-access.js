@@ -18,14 +18,14 @@ function performValidations(field) {
   setFormDisabled(errors.length > 0);
 }
 
-function insertInc(elements, attr, splitter, inc){
+function insertInc(elements, attr, splitter, inc) {
   elements.forEach(function (el) {
-    newVal = el[attr].replace(splitter,'');
+    newVal = el[attr].replace(splitter, '');
     newVal = newVal + '_' + inc + splitter;
     el.setAttribute(attr, newVal);
   });
 }
-function appendInc(elements, attr, inc){
+function appendInc(elements, attr, inc) {
   elements.forEach(function (el) {
     newVal = el.getAttribute(attr) + '_' + inc;
     el.setAttribute(attr, newVal);
@@ -41,8 +41,8 @@ function appendContactField(btnEl) {
     q.addEventListener('blur', (e) => {
       performValidations(e.target);
     });
-    if(key === arr.length - 1){
-      const newMatchVal = newInputs[key-1].id + '_' + addedContactNum;
+    if (key === arr.length - 1) {
+      const newMatchVal = newInputs[key - 1].id + '_' + addedContactNum;
       q.setAttribute('data-validate-must-match', newMatchVal);
     }
   });

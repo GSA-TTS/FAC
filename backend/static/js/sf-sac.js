@@ -13,9 +13,11 @@ function allResponsesValid() {
 }
 
 function performValidations(field) {
-  const inputType = field.type; 
-  if(inputType == 'radio'){
-    const rgInputs = document.querySelectorAll('input[name="'+field.name+'"]');
+  const inputType = field.type;
+  if (inputType == 'radio') {
+    const rgInputs = document.querySelectorAll(
+      'input[name="' + field.name + '"]'
+    );
     rgInputs.forEach((i) => i.classList.remove('usa-input--error'));
   }
   const errors = checkValidity(field);
@@ -63,10 +65,12 @@ function attachEventHandlers() {
   });
 
   const rbInputs = document.querySelectorAll('[name="audit_period_covered"]');
-  const monthsInput = document.querySelector('#audit_period_covered-other_months');
+  const monthsInput = document.querySelector(
+    '#audit_period_covered-other_months'
+  );
   rbInputs.forEach((input) => {
-    input.addEventListener('change', (e) => {
-      if( input.id =='audit-period-other'){
+    input.addEventListener('change', () => {
+      if (input.id == 'audit-period-other') {
         monthsInput.removeAttribute('disabled');
       } else {
         monthsInput.setAttribute('disabled', true);
