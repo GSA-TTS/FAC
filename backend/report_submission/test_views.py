@@ -136,7 +136,7 @@ class TestPreliminaryViews(TestCase):
         step3_post = self.client.post(step3, data=self.step3_data)
 
         self.assertEqual(step3_post.status_code, 302)
-        self.assertEqual(step3_post.url[:10], "/sac/edit/")
+        self.assertEqual(step3_post.url[:10], "report_submission/general-information")
         report_id = step3_post.url[10:]
 
         sac = SingleAuditChecklist.objects.get(report_id=report_id)
