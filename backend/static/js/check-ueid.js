@@ -44,7 +44,7 @@ function hideUeiStuff() {
     document.querySelectorAll('.uei-explanation')
   );
   [...ueiExplanations, ueiFormGroup].forEach((node) =>
-    node.setAttribute('hidden', 'true')
+    node.setAttribute('hidden', 'hidden')
   );
 }
 
@@ -63,7 +63,7 @@ function showValidUeiInfo() {
   `;
 
   auditeeName.removeAttribute('disabled');
-  auditeeName.parentNode.setAttribute('hidden', 'true');
+  auditeeName.parentNode.setAttribute('hidden', 'hidden');
   document.getElementById('no-uei-warning').replaceWith(ueiInfoEl);
 }
 

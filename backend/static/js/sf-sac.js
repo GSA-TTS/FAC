@@ -62,14 +62,14 @@ function attachEventHandlers() {
     });
   });
 
-  const monthsInput = document.querySelector('#audit_period_covered-other_months');
   const rbInputs = document.querySelectorAll('[name="audit_period_covered"]');
+  const monthsInput = document.querySelector('#audit_period_covered-other_months');
   rbInputs.forEach((input) => {
     input.addEventListener('change', (e) => {
       if( input.id =='audit-period-other'){
         monthsInput.removeAttribute('disabled');
       } else {
-        if(!monthsInput.hasAttribute('disabled')) monthsInput.setAttribute('disabled', true);
+        monthsInput.setAttribute('disabled', true);
       }
     });
   });
