@@ -91,7 +91,7 @@ def link_objects_general(objects_dict):
     instance.save()
 
 
-def link_duns_eins(csv_dict, payload_name):
+def link_lists(csv_dict, payload_name):
     """
     These were their own data model but we are going to use an array field.
     This adds the fields in the right order. It should run after general.
@@ -111,6 +111,12 @@ def link_duns_eins(csv_dict, payload_name):
                 if payload not in existing_list:
                     existing_list.append(int(payload))
                     auditee_instance.duns_list = existing_list
+                    auditee_instance.save()
+            elif payload_name == "UEI":
+                existing_list = auditee_instance.uei_list
+                if payload not in existing_list:
+                    existing_list.append(str(payload))
+                    auditee_instance.uei_list = existing_list
                     auditee_instance.save()
             else:
                 existing_list = auditee_instance.ein_list

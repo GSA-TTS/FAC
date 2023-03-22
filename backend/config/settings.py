@@ -183,43 +183,112 @@ STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 # CORS base
 CORS_ALLOWED_ORIGINS = [env.str("DJANGO_BASE_URL", "http://localhost:8000")]
 
-"""Environment specific configurations"""
+STATIC_URL = "/static/"
+# Whitenoise for serving static files
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+MIDDLEWARE.append("whitenoise.middleware.WhiteNoiseMiddleware")
+
+# Environment specific configurations
 if ENVIRONMENT == "LOCAL":
+    # Local development environment
+    STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+    DEFAULT_FILE_STORAGE = "report_submission.storages.S3PrivateStorage"
     DEBUG = env.bool("DJANGO_DEBUG", default=True)
-    STATIC_URL = "/static/"
-    # Whitenoise for serving static files
-    STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
-    MIDDLEWARE.append("whitenoise.middleware.WhiteNoiseMiddleware")
+    ENABLE_LOCAL_ATTACHMENT_STORAGE = True
+
     CORS_ALLOWED_ORIGINS += ["http://0.0.0.0:8000", "http://127.0.0.1:8000"]
+
+    # Private bucket
+    AWS_PRIVATE_STORAGE_BUCKET_NAME = "gsa-fac-private-s3"
+    AWS_S3_PRIVATE_REGION_NAME = os.environ.get(
+        "AWS_S3_PRIVATE_REGION_NAME", "us-east-1"
+    )
+    AWS_PRIVATE_ACCESS_KEY_ID = os.environ.get("AWS_PRIVATE_ACCESS_KEY_ID", "test")
+    AWS_PRIVATE_SECRET_ACCESS_KEY = os.environ.get(
+        "AWS_PRIVATE_SECRET_ACCESS_KEY", "test"
+    )
+    AWS_S3_PRIVATE_ENDPOINT = os.environ.get(
+        "AWS_S3_PRIVATE_ENDPOINT", "localstack:4566"
+    )
+    AWS_S3_ENDPOINT_URL = f"http://{AWS_S3_PRIVATE_ENDPOINT}"
+
     DISABLE_AUTH = env.bool("DISABLE_AUTH", default=False)
+
 elif ENVIRONMENT not in ["DEVELOPMENT", "STAGING", "PRODUCTION"]:
+    # Testing environment (CI/CD/GitHub Actions)
     DEBUG = env.bool("DJANGO_DEBUG", default=False)
-    STATIC_URL = "/static/"
-    # Whitenoise for serving static files
-    STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
-    MIDDLEWARE.append("whitenoise.middleware.WhiteNoiseMiddleware")
     CORS_ALLOWED_ORIGINS += ["http://0.0.0.0:8000", "http://127.0.0.1:8000"]
+
+    STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+    DEFAULT_FILE_STORAGE = "report_submission.storages.S3PrivateStorage"
+
+    # Private bucket
+    AWS_PRIVATE_STORAGE_BUCKET_NAME = "gsa-fac-private-s3"
+    AWS_S3_PRIVATE_REGION_NAME = os.environ.get(
+        "AWS_S3_PRIVATE_REGION_NAME", "us-east-1"
+    )
+    AWS_PRIVATE_ACCESS_KEY_ID = os.environ.get("AWS_PRIVATE_ACCESS_KEY_ID", "test")
+    AWS_PRIVATE_SECRET_ACCESS_KEY = os.environ.get(
+        "AWS_PRIVATE_SECRET_ACCESS_KEY", "test"
+    )
+    AWS_S3_PRIVATE_ENDPOINT = os.environ.get(
+        "AWS_S3_PRIVATE_ENDPOINT", "localstack:4566"
+    )
+    AWS_S3_ENDPOINT_URL = f"http://{AWS_S3_PRIVATE_ENDPOINT}"
+
     DISABLE_AUTH = env.bool("DISABLE_AUTH", default=False)
+
 else:
+    # One of the Cloud.gov environments
     STATICFILES_STORAGE = "storages.backends.s3boto3.S3ManifestStaticStorage"
+    DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
     vcap = json.loads(env.str("VCAP_SERVICES"))
     for service in vcap["s3"]:
         if service["instance_name"] == "fac-public-s3":
             # Public AWS S3 bucket for the app
             s3_creds = service["credentials"]
 
-    AWS_ACCESS_KEY_ID = s3_creds["access_key_id"]
-    AWS_SECRET_ACCESS_KEY = s3_creds["secret_access_key"]
-    AWS_STORAGE_BUCKET_NAME = s3_creds["bucket"]
-    AWS_S3_REGION_NAME = s3_creds["region"]
-    AWS_S3_CUSTOM_DOMAIN = (
-        f"{AWS_STORAGE_BUCKET_NAME}.s3-{AWS_S3_REGION_NAME}.amazonaws.com"
-    )
-    AWS_S3_OBJECT_PARAMETERS = {"CacheControl": "max-age=86400"}
+            AWS_ACCESS_KEY_ID = s3_creds["access_key_id"]
+            AWS_SECRET_ACCESS_KEY = s3_creds["secret_access_key"]
+            AWS_STORAGE_BUCKET_NAME = s3_creds["bucket"]
 
-    AWS_LOCATION = "static"
-    AWS_DEFAULT_ACL = "public-read"
-    STATIC_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/{AWS_LOCATION}/"
+            AWS_S3_REGION_NAME = s3_creds["region"]
+            AWS_DEFAULT_REGION = s3_creds["region"]
+
+            AWS_S3_CUSTOM_DOMAIN = (
+                f"{AWS_STORAGE_BUCKET_NAME}.s3-{AWS_S3_REGION_NAME}.amazonaws.com"
+            )
+            AWS_S3_OBJECT_PARAMETERS = {"CacheControl": "max-age=86400"}
+
+            AWS_LOCATION = "static"
+            AWS_QUERYSTRING_AUTH = False
+            AWS_DEFAULT_ACL = "public-read"
+            STATIC_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/{AWS_LOCATION}/"
+
+            STATICFILES_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
+            DEFAULT_FILE_STORAGE = "cts_forms.storages.PrivateS3Storage"
+            AWS_IS_GZIPPED = True
+
+        elif service["instance_name"] == "fac-private-s3":
+            # Private AWS S3 bucket for the app's Excel (or other file) uploads
+            s3_creds = service["credentials"]
+
+            AWS_PRIVATE_ACCESS_KEY_ID = s3_creds["access_key_id"]
+            AWS_PRIVATE_SECRET_ACCESS_KEY = s3_creds["secret_access_key"]
+            AWS_PRIVATE_STORAGE_BUCKET_NAME = s3_creds["bucket"]
+
+            AWS_S3_PRIVATE_REGION_NAME = s3_creds["region"]
+            AWS_S3_PRIVATE_CUSTOM_DOMAIN = f"{AWS_PRIVATE_STORAGE_BUCKET_NAME}.s3-{AWS_S3_PRIVATE_REGION_NAME}.amazonaws.com"
+            AWS_S3_PRIVATE_OBJECT_PARAMETERS = {"CacheControl": "max-age=86400"}
+
+            AWS_S3_PRIVATE_ENDPOINT = s3_creds["endpoint"]
+            AWS_S3_ENDPOINT_URL = f"https://{AWS_S3_PRIVATE_ENDPOINT}"
+
+            AWS_PRIVATE_LOCATION = "static"
+            AWS_PRIVATE_DEFAULT_ACL = "private"
+            # If wrong, https://docs.aws.amazon.com/AmazonS3/latest/userguide/acl-overview.html#canned-acl
+
+            MEDIA_URL = f"https://{AWS_S3_PRIVATE_CUSTOM_DOMAIN}/{AWS_LOCATION}/"
 
     # secure headers
     MIDDLEWARE.append("csp.middleware.CSPMiddleware")

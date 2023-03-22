@@ -196,7 +196,10 @@ def validate_excel_file_size(file):
 def _scan_file(file):
     try:
         return requests.post(
-            settings.AV_SCAN_URL, files={"file": file}, data={"name": file.name}
+            settings.AV_SCAN_URL,
+            files={"file": file},
+            data={"name": file.name},
+            timeout=15,
         )
     except requests.exceptions.ConnectionError:
         raise ValidationError(

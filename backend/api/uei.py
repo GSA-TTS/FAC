@@ -12,7 +12,7 @@ def call_sam_api(
     """
     try:
         return (
-            requests.get(sam_api_url, params=params, headers=headers),
+            requests.get(sam_api_url, params=params, headers=headers, timeout=15),
             None,
         )
 

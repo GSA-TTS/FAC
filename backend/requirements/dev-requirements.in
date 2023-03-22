@@ -13,3 +13,5 @@ whitenoise
 toml
 pandas
 types-python-slugify
+localstack
+awscli-local
