@@ -1,12 +1,12 @@
 {% extends "base.html" %}
 {% load static %}
 {% block metatags %}
-  <title>{{ post.title }}</title>
-  <meta name="description" content="{{ post.meta_description }}" />
-  <meta property="og:title" content="{{ post.title }}" />
-  <meta property="og:site_name" content="Federal Audit Clearinghouse" />
-  <meta property="og:description" content="{{ post.meta_description }}" />
-  <meta property="og:type" content="website" />
+<title>{{ post.title }}</title>
+<meta name="description" content="{{ post.meta_description }}" />
+<meta property="og:title" content="{{ post.title }}" />
+<meta property="og:site_name" content="Federal Audit Clearinghouse" />
+<meta property="og:description" content="{{ post.meta_description }}" />
+<meta property="og:type" content="website" />
 {% endblock %}
 
 {% block content%}
@@ -51,13 +51,8 @@
             </li>
           </ul>
           <div class="usa-radio">
-            <input class="usa-radio__input" 
-              type="radio"
-              id="single-audit" 
-              name="audit_type" 
-              value="single-audit" 
-              required
-              data-validate-not-null="" />
+            <input class="usa-radio__input" type="radio" id="single-audit" name="audit_type" value="single-audit"
+              required data-validate-not-null="" />
             <label class="usa-radio__label" for="single-audit">
               Single Audit
             </label>
@@ -90,13 +85,8 @@
             </li>
           </ul>
           <div class="usa-radio">
-            <input class="usa-radio__input" 
-              type="radio" 
-              id="audit-period-annual" 
-              name="audit_period_covered" 
-              value="annual"
-              required
-              data-validate-not-null="" />
+            <input class="usa-radio__input" type="radio" id="audit-period-annual" name="audit_period_covered"
+              value="annual" required data-validate-not-null="" />
             <label class="usa-radio__label" for="audit-period-annual">
               Annual
             </label>
@@ -116,10 +106,7 @@
             <label class="usa-radio__label" for="audit-period-other">
               Other
             </label>
-            <input class="usa-input usa-input--small" 
-              type="text" 
-              id="audit_period_covered-other_months" 
-              name="audit_period_covered" 
+            <input class="usa-input usa-input--small" type="text" id="audit_period_covered-other_months"
               disabled />
             <label class="usa-label usa-input--small__label" for="audit_period_covered-other_months">months</label>
           </div>
@@ -139,12 +126,8 @@
                 This field is required
               </li>
             </ul>
-            <input class="usa-input" 
-              id="auditee_fiscal_period_start" 
-              name="auditee_fiscal_period_start"
-              aria-required="true" 
-              required 
-              data-validate-not-null=""
+            <input class="usa-input" id="auditee_fiscal_period_start" name="auditee_fiscal_period_start"
+              aria-required="true" required data-validate-not-null=""
               value="{{ auditee_fiscal_period_start | default_if_none:'' }}" />
           </div>
 
@@ -159,12 +142,8 @@
                 This field is required
               </li>
             </ul>
-            <input class="usa-input" 
-              id="auditee_fiscal_period_end" 
-              name="auditee_fiscal_period_end"
-              aria-required="true" 
-              required 
-              data-validate-not-null=""
+            <input class="usa-input" id="auditee_fiscal_period_end" name="auditee_fiscal_period_end"
+              aria-required="true" required data-validate-not-null=""
               value="{{ auditee_fiscal_period_end | default_if_none:'' }}" />
           </div>
         </fieldset>
@@ -173,7 +152,8 @@
           <legend class="usa-legend text-bold">
             Auditee information
           </legend>
-          <p class="usa-hint margin-0">Some auditee information is pulled from <a>SAM.gov</a> and is not editable here.</p>
+          <p class="usa-hint margin-0">Some auditee information is pulled from <a>SAM.gov</a> and is not editable here.
+          </p>
           <fieldset class="usa-fieldset">
             <legend class="usa-legend">
               Auditee details
@@ -188,14 +168,8 @@
                   This field is required
                 </li>
               </ul>
-              <input 
-                class="usa-input" 
-                id="auditee_name" 
-                name="auditee_name" 
-                aria-required="true" 
-                required
-                data-validate-not-null="" 
-                value="{{ auditee_name | default_if_none:'' }}" />
+              <input class="usa-input" id="auditee_name" name="auditee_name" aria-required="true" required
+                data-validate-not-null="" value="{{ auditee_name | default_if_none:'' }}" />
             </div>
             <div class="usa-form-group">
               <label class="usa-label" for="auditee_address_line_1">
@@ -207,14 +181,8 @@
                   This field is required
                 </li>
               </ul>
-              <input 
-                class="usa-input" 
-                id="auditee_address_line_1" 
-                name="auditee_address_line_1" 
-                aria-required="true" 
-                required
-                data-validate-not-null="" 
-                value="{{ auditee_address_line_1 | default_if_none:'' }}" />
+              <input class="usa-input" id="auditee_address_line_1" name="auditee_address_line_1" aria-required="true"
+                required data-validate-not-null="" value="{{ auditee_address_line_1 | default_if_none:'' }}" />
             </div>
 
             <div class="usa-form-group">
@@ -227,14 +195,8 @@
                   This field is required
                 </li>
               </ul>
-              <input 
-                class="usa-input" 
-                id="auditee_city" 
-                name="auditee_city" 
-                aria-required="true" 
-                required
-                data-validate-not-null="" 
-                value="{{ auditee_city | default_if_none:'' }}" />
+              <input class="usa-input" id="auditee_city" name="auditee_city" aria-required="true" required
+                data-validate-not-null="" value="{{ auditee_city | default_if_none:'' }}" />
             </div>
 
             <div class="usa-form-group">
@@ -247,14 +209,8 @@
                   This field is required
                 </li>
               </ul>
-              <input 
-                class="usa-input" 
-                id="auditee_state" 
-                name="auditee_state" 
-                aria-required="true" 
-                required
-                data-validate-not-null="" 
-                value="{{ auditee_state | default_if_none:'' }}" />
+              <input class="usa-input" id="auditee_state" name="auditee_state" aria-required="true" required
+                data-validate-not-null="" value="{{ auditee_state | default_if_none:'' }}" />
             </div>
 
             <div class="usa-form-group">
@@ -267,14 +223,8 @@
                   This field is required
                 </li>
               </ul>
-              <input 
-                class="usa-input" 
-                id="auditee_zip" 
-                name="auditee_zip" 
-                aria-required="true" 
-                required
-                data-validate-not-null="" 
-                value="{{ auditee_zip | default_if_none:'' }}" />
+              <input class="usa-input" id="auditee_zip" name="auditee_zip" aria-required="true" required
+                data-validate-not-null="" value="{{ auditee_zip | default_if_none:'' }}" />
             </div>
           </fieldset>
           <fieldset class="usa-fieldset">
@@ -291,14 +241,8 @@
                   This field is required
                 </li>
               </ul>
-              <input 
-                class="usa-input" 
-                id="auditee_uei" 
-                name="auditee_uei" 
-                aria-required="true" 
-                required
-                data-validate-not-null="" 
-                value="{{ auditee_uei | default_if_none:'' }}" />
+              <input class="usa-input" id="auditee_uei" name="auditee_uei" aria-required="true" required
+                data-validate-not-null="" value="{{ auditee_uei | default_if_none:'' }}" />
             </div>
             <fieldset class="usa-fieldset radio">
               <legend class="usa-legend">
@@ -312,25 +256,16 @@
                 </li>
               </ul>
               <div class="usa-radio">
-                <input class="usa-radio__input" 
-                  type="radio"
-                  id="multiple-ueis-yes" 
-                  name="multiple_ueis_covered" 
-                  value="true" 
-                  required
-                  data-validate-not-null="" />
+                <input class="usa-radio__input" type="radio" id="multiple-ueis-yes" name="multiple_ueis_covered"
+                  value="true" required data-validate-not-null="" />
                 <label class="usa-radio__label" for="multiple-ueis-yes">
                   Yes
                 </label>
               </div>
 
               <div class="usa-radio">
-                <input class="usa-radio__input" 
-                  type="radio" 
-                  id="multiple-ueis-no" 
-                  name="multiple_ueis_covered" 
-                  value="false" 
-                  data-validate-not-null="" />
+                <input class="usa-radio__input" type="radio" id="multiple-ueis-no" name="multiple_ueis_covered"
+                  value="false" data-validate-not-null="" />
                 <label class="usa-radio__label" for="multiple-ueis-no">
                   No
                 </label>
@@ -355,12 +290,8 @@
             </div>
 
             <div class="usa-checkbox">
-              <input class="usa-checkbox__input" 
-                id="ein_not_an_ssn_attestation" 
-                type="checkbox"
-                name="ein_not_an_ssn_attestation" 
-                data-validate-not-null="" 
-                value="" />
+              <input class="usa-checkbox__input" id="ein_not_an_ssn_attestation" type="checkbox"
+                name="ein_not_an_ssn_attestation" data-validate-not-null="" value="" />
               <label class="usa-checkbox__label" for="ein_not_an_ssn_attestation">
                 By checking this box, I verify that the Auditee EIN is not a Social Security Number.
               </label>
@@ -383,25 +314,16 @@
                 </li>
               </ul>
               <div class="usa-radio">
-                <input class="usa-radio__input" 
-                  type="radio" 
-                  id="multiple-eins-yes" 
-                  name="multiple_eins_covered" 
-                  value="true"
-                  required
-                  data-validate-not-null="" />
+                <input class="usa-radio__input" type="radio" id="multiple-eins-yes" name="multiple_eins_covered"
+                  value="true" required data-validate-not-null="" />
                 <label class="usa-radio__label" for="multiple-eins-yes">
                   Yes
                 </label>
               </div>
 
               <div class="usa-radio">
-                <input class="usa-radio__input" 
-                type="radio" 
-                id="multiple-eins-no" 
-                name="multiple_eins_covered"
-                value="false" 
-                data-validate-not-null="" />
+                <input class="usa-radio__input" type="radio" id="multiple-eins-no" name="multiple_eins_covered"
+                  value="false" data-validate-not-null="" />
                 <label class="usa-radio__label" for="multiple-eins-no">
                   No
                 </label>
@@ -424,14 +346,8 @@
                   This field is required
                 </li>
               </ul>
-              <input 
-                class="usa-input" 
-                id="auditee_contact_name" 
-                name="auditee_contact_name" 
-                aria-required="true" 
-                required
-                data-validate-not-null="" 
-                value="{{ auditee_contact_name | default_if_none:'' }}" />
+              <input class="usa-input" id="auditee_contact_name" name="auditee_contact_name" aria-required="true"
+                required data-validate-not-null="" value="{{ auditee_contact_name | default_if_none:'' }}" />
             </div>
 
             <div class="usa-form-group">
@@ -444,14 +360,8 @@
                   This field is required
                 </li>
               </ul>
-              <input 
-                class="usa-input" 
-                id="auditee_contact_title" 
-                name="auditee_contact_title" 
-                aria-required="true" 
-                required
-                data-validate-not-null="" 
-                value="{{ auditee_contact_title | default_if_none:'' }}" />
+              <input class="usa-input" id="auditee_contact_title" name="auditee_contact_title" aria-required="true"
+                required data-validate-not-null="" value="{{ auditee_contact_title | default_if_none:'' }}" />
             </div>
 
             <div class="usa-form-group">
@@ -464,14 +374,8 @@
                   This field is required
                 </li>
               </ul>
-              <input 
-                class="usa-input" 
-                id="auditee_phone" 
-                name="auditee_phone" 
-                aria-required="true" 
-                required
-                data-validate-not-null="" 
-                value="{{ auditee_phone | default_if_none:'' }}" />
+              <input class="usa-input" id="auditee_phone" name="auditee_phone" aria-required="true" required
+                data-validate-not-null="" value="{{ auditee_phone | default_if_none:'' }}" />
             </div>
             <div class="usa-form-group">
               <label class="usa-label" for="auditee_email">
@@ -483,14 +387,8 @@
                   This field is required
                 </li>
               </ul>
-              <input 
-                class="usa-input" 
-                id="auditee_email" 
-                name="auditee_email" 
-                aria-required="true" 
-                required
-                data-validate-not-null="" 
-                value="{{ auditee_email | default_if_none:'' }}" />
+              <input class="usa-input" id="auditee_email" name="auditee_email" aria-required="true" required
+                data-validate-not-null="" value="{{ auditee_email | default_if_none:'' }}" />
             </div>
           </fieldset>
         </fieldset>
@@ -500,7 +398,8 @@
             Primary auditor information
           </legend>
           <p class="usa-hint">
-            If multiple audit organizations worked on this audit, only include the lead or coordinating auditor's information.
+            If multiple audit organizations worked on this audit, only include the lead or coordinating auditor's
+            information.
           </p>
 
           <fieldset class="usa-fieldset">
@@ -526,7 +425,7 @@
               <legend class="usa-legend">
                 Audit firm/organization address
               </legend>
-              
+
               <div class="usa-form-group">
                 <label class="usa-label" for="auditor_country">
                   Country
@@ -537,14 +436,8 @@
                     This field is required
                   </li>
                 </ul>
-                <input 
-                  class="usa-input" 
-                  id="auditor_country" 
-                  name="auditor_country" 
-                  aria-required="true" 
-                  required
-                  data-validate-not-null="" 
-                  value="{{ auditor_country | default_if_none:'' }}" />
+                <input class="usa-input" id="auditor_country" name="auditor_country" aria-required="true" required
+                  data-validate-not-null="" value="{{ auditor_country | default_if_none:'' }}" />
               </div>
 
               <div class="usa-form-group">
@@ -623,12 +516,8 @@
                 data-validate-not-null="" value="{{ auditor_ein | default_if_none:'' }}" />
             </div>
             <div class="usa-checkbox">
-              <input class="usa-checkbox__input" 
-                id="auditor_ein_not_an_ssn_attestation" 
-                type="checkbox"
-                name="auditor_ein_not_an_ssn_attestation" 
-                value="" 
-                data-validate-not-null="" />
+              <input class="usa-checkbox__input" id="auditor_ein_not_an_ssn_attestation" type="checkbox"
+                name="auditor_ein_not_an_ssn_attestation" value="" data-validate-not-null="" />
               <label class="usa-checkbox__label" for="auditor_ein_not_an_ssn_attestation">
                 By checking this box, I verify that the Auditor EIN is not a Social Security Number.
               </label>
@@ -713,22 +602,22 @@
 <div class="audit-metadata">
   <div class="grid-container">
     <dl class="grid-row grid-gap">
-        <div class="tablet:grid-col-6">
-          <dt>Entity name</dt>
-          <dd>{{ auditee_name | default_if_none:'' }}</dd>
-        </div>
-        <div class="tablet:grid-col-6">
-          <dt>Report ID</dt>
-          <dd>{{ report_id | default_if_none:'' }}</dd>
-        </div>
-        <div class="tablet:grid-col-6">
-          <dt>UEI</dt>
-          <dd>{{ auditee_uei | default_if_none:'' }}</dd>
-        </div>
-        <div class="tablet:grid-col-6">
-          <dt>Type of entity</dt>
-          <dd>{{ user_provided_organization_type | default_if_none:'' }}</dd>
-        </div>
+      <div class="tablet:grid-col-6">
+        <dt>Entity name</dt>
+        <dd>{{ auditee_name | default_if_none:'' }}</dd>
+      </div>
+      <div class="tablet:grid-col-6">
+        <dt>Report ID</dt>
+        <dd>{{ report_id | default_if_none:'' }}</dd>
+      </div>
+      <div class="tablet:grid-col-6">
+        <dt>UEI</dt>
+        <dd>{{ auditee_uei | default_if_none:'' }}</dd>
+      </div>
+      <div class="tablet:grid-col-6">
+        <dt>Type of entity</dt>
+        <dd>{{ user_provided_organization_type | default_if_none:'' }}</dd>
+      </div>
     </dl>
   </div>
 </div>
