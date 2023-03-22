@@ -20,14 +20,14 @@ function performValidations(field) {
 
 function insertInc(elements, attr, splitter, inc) {
   elements.forEach(function (el) {
-    newVal = el[attr].replace(splitter, '');
+    let newVal = el[attr].replace(splitter, '');
     newVal = newVal + '_' + inc + splitter;
     el.setAttribute(attr, newVal);
   });
 }
 function appendInc(elements, attr, inc) {
   elements.forEach(function (el) {
-    newVal = el.getAttribute(attr) + '_' + inc;
+    const newVal = el.getAttribute(attr) + '_' + inc;
     el.setAttribute(attr, newVal);
   });
 }
