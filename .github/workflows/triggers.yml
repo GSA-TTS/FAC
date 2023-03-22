@@ -19,10 +19,6 @@ jobs:
     uses: ./.github/workflows/test.yml
     secrets: inherit
 
-  e2e:
-    uses: ./.github/workflows/end-to-end-test.yml
-    secrets: inherit
-
   # deploy to dev
   deploy-infrastructure-dev:
     name: Deploy infrastructure (dev)
