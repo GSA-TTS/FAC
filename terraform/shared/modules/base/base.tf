@@ -1,7 +1,3 @@
-locals {
-  app_name = "gsa-fac"
-}
-
 module "clamav" {
   source = "github.com/18f/terraform-cloudgov//clamav?ref=v0.3.0"
 
@@ -30,7 +26,7 @@ module "s3-public" {
 
   cf_org_name      = var.cf_org_name
   cf_space_name    = var.cf_space_name
-  name             = "${local.app_name}-public-s3"
+  name             = "fac-public-s3"
   recursive_delete = var.recursive_delete
   s3_plan_name     = "basic-public"
 }
@@ -40,7 +36,7 @@ module "s3-private" {
 
   cf_org_name      = var.cf_org_name
   cf_space_name    = var.cf_space_name
-  name             = "${local.app_name}-private-s3"
+  name             = "fac-private-s3"
   recursive_delete = var.recursive_delete
   s3_plan_name     = "basic"
 }
