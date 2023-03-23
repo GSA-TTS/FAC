@@ -2,6 +2,7 @@
 
 [tool.black]
 line-length=88
+exclude = "node_modules/"
 
 [tool.mypy]
 ignore_missing_imports = true
