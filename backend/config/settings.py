@@ -186,13 +186,15 @@ CORS_ALLOWED_ORIGINS = [env.str("DJANGO_BASE_URL", "http://localhost:8000")]
 STATIC_URL = "/static/"
 
 # Environment specific configurations
-if ENVIRONMENT == "LOCAL":
-    # Local development environment
-    DEBUG = env.bool("DJANGO_DEBUG", default=True)
 
 if ENVIRONMENT not in ["DEVELOPMENT", "STAGING", "PRODUCTION"]:
-    # Testing environment (CI/CD/GitHub Actions)
-    DEBUG = env.bool("DJANGO_DEBUG", default=False)
+    # Local environment and Testing environment (CI/CD/GitHub Actions)
+
+    if ENVIRONMENT == "LOCAL":
+        DEBUG = env.bool("DJANGO_DEBUG", default=True)
+    else:
+        DEBUG = env.bool("DJANGO_DEBUG", default=False)
+
     CORS_ALLOWED_ORIGINS += ["http://0.0.0.0:8000", "http://127.0.0.1:8000"]
 
     STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
