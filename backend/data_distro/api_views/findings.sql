@@ -1,6 +1,7 @@
 -- Current script to recreate views
--- uniting findings and findings text
--- may want to add auditee name, agency, fed program name, cap text and cpa name
+-- Run create docs to update view comment
+-- Uniting findings and findings text
+-- (May want to add auditee name, agency, fed program name, cap text and cpa name)
 
 begin;
 
@@ -31,8 +32,8 @@ left join gen on findings.id=gen.finding_id
 
 
 -- Findings text
-drop view if exists api.vw_findings_text
-create or replace view api.vw_findings_text as
+drop view if exists api.vw_findings_text;
+create view api.vw_findings_text as
 with findings_text as (
  select *
  from data_distro_findingtext

@@ -6,27 +6,58 @@
 -- As the models change later, we don't want
 -- our migration to reference fields that don't exist yet or already exist.
 
+--This will be used by the postgrest API
+
 begin;
 
---This will be used by the postgrest API
-drop role if exists anon;
-create role anon nologin;
-create schema api;
+-- These need to be if statements because the schema and rolls already exist when you run tests
+do
+$$
+begin
+    if not exists (select * from pg_catalog.pg_roles where rolname = 'anon') then
+        create role anon;
+    end if;
+end
+$$
+;
 
--- Grant access to tables and views
-alter default privileges
-    in schema api
-    grant select
--- this includes views
-on tables
-to anon;
+do
+$$
+begin
+    if not exists (select schema_name from information_schema.schemata where schema_name = 'api') then
+        create schema api;
+        -- Grant access to tables and views
+        alter default privileges
+            in schema api
+            grant select
+        -- this includes views
+        on tables
+        to postgres;
 
--- Grant access to sequences, if we have them
-grant select, usage on all sequences in schema api to anon;
-alter default privileges
-    in schema api
-    grant select, usage
-on sequences
-to anon;
+        alter default privileges
+            in schema api
+            grant select
+        -- this includes views
+        on tables
+        to anon;
+
+        -- Grant access to sequences, if we have them
+        grant select, usage on all sequences in schema api to anon;
+        alter default privileges
+            in schema api
+            grant select, usage
+        on sequences
+        to postgres;
+
+        grant select, usage on all sequences in schema api to anon;
+        alter default privileges
+            in schema api
+            grant select, usage
+        on sequences
+        to anon;
+    end if;
+end
+$$
+;
 
 commit;
