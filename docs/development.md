@@ -42,9 +42,19 @@ ENV = 'LOCAL'
 SAM_API_KEY =
 SECRET_KEY =
 DJANGO_LOGIN_SECRET_KEY =
+DISABLE_AUTH = 
 ```
 
 If you need to add these to your local environment (should end up in `~/.bash_profile`, `~/.bashrc`, `~/.zshrc`, or whatever flavor of shell you're using.)
+
+#### ENV
+The `ENV` environment variable specifies the set of configuration settings to use while running. For local development, it should be `LOCAL`, which will enable settings that should work on your local machine with Docker.
+
+On our Dev/Staging/Production environments, it will be set to `DEVELOPMENT`/`STAGING`/`PRODUCTION` respectively. Setting it to one of these will turn on configuration it's expecting while deployed to Cloud.gov.
+
+In GitHub Actions and our CI/CD pipeline, it is set to `TESTING`.  It will enable settings expected to make unit tests complete properly while still trying to emulate a Cloud.gov situation.
+
+While you can change this, you generally shouldn't need to.
 
 #### SAM_API_KEY
 We use the `SAM_API_KEY` environment variable to interact with the SAM.gov API.
@@ -64,7 +74,17 @@ The `DJANGO_SECRET_LOGIN_KEY` environment variable is used to interact with Logi
 *  If you wish to use the shared Login.gov sandbox client application, but create your own client credentials, you must first be granted access to the GSA-FAC Login.gov sandbox team. Once you can access the GSA-FAC client application, follow [Login.gov's documentation for creating a public certificate](https://developers.login.gov/testing/#creating-a-public-certificate). Once created, you can add the newly-generated public key to the GSA-FAC app, and set `DJANGO_SECRET_LOGIN_KEY` to the base64-encoded value of the corresponding private key.
 *  If you wish to use your own Login.gov sandbox client application, follow [Login.gov's documentation for setting up a test application](https://developers.login.gov/testing/). Once completed, open `settings.py` and set `OIDC_PROVIDERS.login.gov.client_registration.client_id` so that it matches the `issuer` string for your newly-created client application. NOTE: changes to the `client_id` should __not__ be checked into version control!
 
+#### DISABLE_AUTH
+The `DISABLE_AUTH` variable tells Django to disable the Login.gov authorization. This should almost always be `False` unless you need to temporarily disable it for your local development. 
+
+In the Dev/Staging/Production environments, it will be set to `False` and require all users to go to Login.gov to log in.
+
+In GitHub Actions (the CI/CD pipeline), it will be set to `True` to complete unit testing and frontend testing properly.
+
+
 ## Docker
+
+We **STRONGLY** recommend you use Docker for development and testing as it enables the fastest and easiest set up of all of the components you need to get up and running quickly.
 
 An application and database are configured in [../backend/docker-compose.yml](../backend/docker-compose.yml), we create a volume to persist the development database, and we mount our `./backend` working directory to the `web` container so that changes made in development are reflected in the container without needing to re-build.
 
@@ -81,6 +101,9 @@ An application and database are configured in [../backend/docker-compose.yml](..
 
 
 ## Local Development
+
+You _can_ run the application locally, however, we **STRONGLY** recommend using the Docker method above instead. It will work locally, but you will need to manually install and configure the components. Not every scenario may be covered. Be warned!
+
 ### Install the tools
 
 `brew install pyenv pyenv-virtualenv`
