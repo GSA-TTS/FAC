@@ -1,6 +1,7 @@
 -- Current script to recreate views
+-- Run create docs to update view comment
 -- Takes the General model and adds Auditor and Auditee information for easy searching
--- Possible improvements: add Federal Program Name from Federal Award
+-- (Possible improvements: add Federal Program Name from Federal Award)
 
 begin;
 

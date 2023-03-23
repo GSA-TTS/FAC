@@ -1,4 +1,5 @@
 -- Current script to recreate views
+-- Run create docs to update view comment
 
 begin;
 

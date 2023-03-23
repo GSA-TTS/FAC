@@ -82,7 +82,20 @@ def create_sql_comments(distro_classes, definations):
     else:
         conn_string = settings.CONNECTION_STRING
 
-    # Add docs to tables
+    api_views = {
+        "Auditee": "api.vw_auditee",
+        "Auditor": "api.vw_auditor",
+        "CapText": "api.vw_cap_text",
+        "FederalAward": "api.vw_federal_award",
+        "Finding": "api.vw_findings",
+        "FindingText": "api.vw_findings_text",
+        "General": "api.vw_general",
+        "Note": "api.vw_note",
+        "Pass-though": "api.vw_passthrough",
+        "Revision": "api.vw_revision",
+    }
+
+    # Add docs to tables and views
     for model in distro_classes:
         mod_class = distro_classes[model]
         model_name = mod_class.__name__
@@ -92,12 +105,17 @@ def create_sql_comments(distro_classes, definations):
         conn.autocommit = True
         with conn.cursor() as curs:
             curs.execute(
-                # These should be safe strings, but I am going to treat them with caution anyway.
                 sql.SQL("COMMENT ON TABLE {} is %s;").format(
                     sql.Identifier("data_distro_{0}".format(model_name.lower())),
                 ),
                 (doc,),
             )
+            if model_name in api_views:
+                view = api_views[model_name]
+                curs.execute(
+                    sql.SQL("COMMENT ON VIEW {} is %s;".format(view)),
+                    (doc,),
+                )
 
     # Add docs to fields
     for define_txt in definations:
