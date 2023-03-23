@@ -184,42 +184,21 @@ STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 CORS_ALLOWED_ORIGINS = [env.str("DJANGO_BASE_URL", "http://localhost:8000")]
 
 STATIC_URL = "/static/"
-# Whitenoise for serving static files
-STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
-MIDDLEWARE.append("whitenoise.middleware.WhiteNoiseMiddleware")
 
 # Environment specific configurations
-if ENVIRONMENT == "LOCAL":
-    # Local development environment
-    STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
-    DEFAULT_FILE_STORAGE = "report_submission.storages.S3PrivateStorage"
-    DEBUG = env.bool("DJANGO_DEBUG", default=True)
-    ENABLE_LOCAL_ATTACHMENT_STORAGE = True
+
+if ENVIRONMENT not in ["DEVELOPMENT", "STAGING", "PRODUCTION"]:
+    # Local environment and Testing environment (CI/CD/GitHub Actions)
+
+    if ENVIRONMENT == "LOCAL":
+        DEBUG = env.bool("DJANGO_DEBUG", default=True)
+    else:
+        DEBUG = env.bool("DJANGO_DEBUG", default=False)
 
     CORS_ALLOWED_ORIGINS += ["http://0.0.0.0:8000", "http://127.0.0.1:8000"]
 
-    # Private bucket
-    AWS_PRIVATE_STORAGE_BUCKET_NAME = "gsa-fac-private-s3"
-    AWS_S3_PRIVATE_REGION_NAME = os.environ.get(
-        "AWS_S3_PRIVATE_REGION_NAME", "us-east-1"
-    )
-    AWS_PRIVATE_ACCESS_KEY_ID = os.environ.get("AWS_PRIVATE_ACCESS_KEY_ID", "test")
-    AWS_PRIVATE_SECRET_ACCESS_KEY = os.environ.get(
-        "AWS_PRIVATE_SECRET_ACCESS_KEY", "test"
-    )
-    AWS_S3_PRIVATE_ENDPOINT = os.environ.get(
-        "AWS_S3_PRIVATE_ENDPOINT", "localstack:4566"
-    )
-    AWS_S3_ENDPOINT_URL = f"http://{AWS_S3_PRIVATE_ENDPOINT}"
-
-    DISABLE_AUTH = env.bool("DISABLE_AUTH", default=False)
-
-elif ENVIRONMENT not in ["DEVELOPMENT", "STAGING", "PRODUCTION"]:
-    # Testing environment (CI/CD/GitHub Actions)
-    DEBUG = env.bool("DJANGO_DEBUG", default=False)
-    CORS_ALLOWED_ORIGINS += ["http://0.0.0.0:8000", "http://127.0.0.1:8000"]
-
     STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+    MIDDLEWARE.append("whitenoise.middleware.WhiteNoiseMiddleware")
     DEFAULT_FILE_STORAGE = "report_submission.storages.S3PrivateStorage"
 
     # Private bucket
