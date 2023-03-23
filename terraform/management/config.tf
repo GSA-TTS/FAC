@@ -14,11 +14,9 @@ locals {
     # TODO: Automate updates via GitHub's GraphQL API
     "bret.mogilefsky@gsa.gov",
     "lindsayn.young@gsa.gov",
-    "jason.nakai@gsa.gov",
     "james.person@gsa.gov",
     "jeanmarie.mariadassou@gsa.gov",
     "matt.henry@gsa.gov",
-    "sarah.withee@gsa.gov",
     "tadhg.ohiggins@gsa.gov",
     "timothy.ballard@gsa.gov",
     "matthew.jadud@gsa.gov",
