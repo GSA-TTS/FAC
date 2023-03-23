@@ -1,5 +1,6 @@
 import datetime
 from django.shortcuts import render, redirect
+from django.core.exceptions import PermissionDenied
 from django.urls import reverse
 from django.views import View
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -98,50 +99,53 @@ class GeneralInformationFormView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         report_id = kwargs["report_id"]
 
-        sac = SingleAuditChecklist.objects.get(report_id=report_id)
+        try:
+            sac = SingleAuditChecklist.objects.get(report_id=report_id)
 
-        # this should probably be a permission mixin
-        accesses = Access.objects.filter(sac=sac, user=request.user)
-        if not accesses:
-            raise Exception("you don't have access to this audit")
+            # this should probably be a permission mixin
+            accesses = Access.objects.filter(sac=sac, user=request.user)
+            if not accesses:
+                raise PermissionDenied("You do not have access to this audit.")
 
-        context = {
-            "auditee_fiscal_period_end": sac.auditee_fiscal_period_end,
-            "auditee_fiscal_period_start": sac.auditee_fiscal_period_start,
-            "audit_period_covered": sac.audit_period_covered,
-            "ein": sac.ein,
-            "ein_not_an_ssn_attestation": sac.ein_not_an_ssn_attestation,
-            "multiple_eins_covered": sac.multiple_eins_covered,
-            "auditee_uei": sac.auditee_uei,
-            "multiple_ueis_covered": sac.multiple_ueis_covered,
-            "auditee_name": sac.auditee_name,
-            "auditee_address_line_1": sac.auditee_address_line_1,
-            "auditee_city": sac.auditee_city,
-            "auditee_state": sac.auditee_state,
-            "auditee_zip": sac.auditee_zip,
-            "auditee_contact_name": sac.auditee_contact_name,
-            "auditee_contact_title": sac.auditee_contact_title,
-            "auditee_phone": sac.auditee_phone,
-            "auditee_email": sac.auditee_email,
-            "user_provided_organization_type": sac.user_provided_organization_type,
-            "is_usa_based": sac.is_usa_based,
-            "auditor_firm_name": sac.auditor_firm_name,
-            "auditor_ein": sac.auditor_ein,
-            "auditor_ein_not_an_ssn_attestation": sac.auditor_ein_not_an_ssn_attestation,
-            "auditor_country": sac.auditor_country,
-            "auditor_address_line_1": sac.auditor_address_line_1,
-            "auditor_city": sac.auditor_city,
-            "auditor_state": sac.auditor_state,
-            "auditor_zip": sac.auditor_zip,
-            "auditor_contact_name": sac.auditor_contact_name,
-            "auditor_contact_title": sac.auditor_contact_title,
-            "auditor_phone": sac.auditor_phone,
-            "auditor_email": sac.auditor_email,
-            "auditee_contacts": sac.auditee_contacts,
-            "report_id": report_id,
-        }
+            context = {
+                "auditee_fiscal_period_end": sac.auditee_fiscal_period_end,
+                "auditee_fiscal_period_start": sac.auditee_fiscal_period_start,
+                "audit_period_covered": sac.audit_period_covered,
+                "ein": sac.ein,
+                "ein_not_an_ssn_attestation": sac.ein_not_an_ssn_attestation,
+                "multiple_eins_covered": sac.multiple_eins_covered,
+                "auditee_uei": sac.auditee_uei,
+                "multiple_ueis_covered": sac.multiple_ueis_covered,
+                "auditee_name": sac.auditee_name,
+                "auditee_address_line_1": sac.auditee_address_line_1,
+                "auditee_city": sac.auditee_city,
+                "auditee_state": sac.auditee_state,
+                "auditee_zip": sac.auditee_zip,
+                "auditee_contact_name": sac.auditee_contact_name,
+                "auditee_contact_title": sac.auditee_contact_title,
+                "auditee_phone": sac.auditee_phone,
+                "auditee_email": sac.auditee_email,
+                "user_provided_organization_type": sac.user_provided_organization_type,
+                "is_usa_based": sac.is_usa_based,
+                "auditor_firm_name": sac.auditor_firm_name,
+                "auditor_ein": sac.auditor_ein,
+                "auditor_ein_not_an_ssn_attestation": sac.auditor_ein_not_an_ssn_attestation,
+                "auditor_country": sac.auditor_country,
+                "auditor_address_line_1": sac.auditor_address_line_1,
+                "auditor_city": sac.auditor_city,
+                "auditor_state": sac.auditor_state,
+                "auditor_zip": sac.auditor_zip,
+                "auditor_contact_name": sac.auditor_contact_name,
+                "auditor_contact_title": sac.auditor_contact_title,
+                "auditor_phone": sac.auditor_phone,
+                "auditor_email": sac.auditor_email,
+                "auditee_contacts": sac.auditee_contacts,
+                "report_id": report_id,
+            }
 
-        return render(request, "report_submission/gen-form.html", context)
+            return render(request, "report_submission/gen-form.html", context)
+        except SingleAuditChecklist.DoesNotExist:
+            raise PermissionDenied("You do not have access to this audit.")
 
     def post(self, request, *args, **kwargs):
         report_id = kwargs["report_id"]

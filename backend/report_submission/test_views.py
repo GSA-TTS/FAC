@@ -10,6 +10,56 @@ from model_bakery import baker
 from audit.models import Access, SingleAuditChecklist
 
 
+SAMPLE_BASE_SAC_DATA = {
+    # 0. Meta data
+    "submitted_by": None,
+    "date_created": "2022-08-11",
+    "submission_status": "in_progress",
+    "report_id": "2022ABC1000023",
+    "audit_type": "single-audit",
+    # Part 1: General Information
+    "general_information": {
+        "auditee_fiscal_period_start": "2021-10-01",
+        "auditee_fiscal_period_end": "2022-10-01",
+        "audit_period_covered": "annual",
+        "ein": None,
+        "ein_not_an_ssn_attestation": None,
+        "multiple_eins_covered": None,
+        "auditee_uei": "ZQGGHJH74DW7",
+        "multiple_ueis_covered": None,
+        "auditee_name": "Auditee McAudited",
+        "auditee_address_line_1": "200 feet into left field",
+        "auditee_city": "New York",
+        "auditee_state": "NY",
+        "auditee_zip": "10451",
+        "auditee_contact_name": "Designate Representative",
+        "auditee_contact_title": "Lord of Doors",
+        "auditee_phone": "5558675309",
+        "auditee_email": "auditee.mcaudited@leftfield.com",
+        "user_provided_organization_type": "local",
+        "met_spending_threshold": True,
+        "is_usa_based": True,
+        "auditor_firm_name": "Dollar Audit Store",
+        "auditor_ein": None,
+        "auditor_ein_not_an_ssn_attestation": None,
+        "auditor_country": "USA",
+        "auditor_address_line_1": "100 Percent Respectable St.",
+        "auditor_city": "Podunk",
+        "auditor_state": "NY",
+        "auditor_zip": "14886",
+        "auditor_contact_name": "Qualified Human Accountant",
+        "auditor_contact_title": "Just an ordinary person",
+        "auditor_phone": "0008675309",
+        "auditor_email": "qualified.human.accountant@dollarauditstore.com",
+    },
+}
+
+
+def omit(remove, d) -> dict:
+    """omit(["a"], {"a":1, "b": 2}) => {"b": 2}"""
+    return {k: d[k] for k in d if k not in remove}
+
+
 class TestPreliminaryViews(TestCase):
     """
     Pre-SAC URLs are:
@@ -242,3 +292,87 @@ class TestPreliminaryViews(TestCase):
         # Should redirect to login page
         self.assertIsInstance(response, HttpResponseRedirect)
         self.assertTrue("openid/login" in response.url)
+
+
+class GeneralInformationFormViewTests(TestCase):
+    def test_get_requires_login(self):
+        sac = baker.make(SingleAuditChecklist)
+
+        url = reverse("general_information", kwargs={"report_id": sac.report_id})
+
+        response = self.client.get(url)
+
+        self.assertIsInstance(response, HttpResponseRedirect)
+        self.assertTrue("openid/login" in response.url)
+
+    def test_get_bad_report_id_returns_403(self):
+        """When a request is made for a malformed or nonexistent report_id, a 403 error should be returned"""
+        user = baker.make(User)
+        self.client.force_login(user)
+
+        url = reverse(
+            "general_information", kwargs={"report_id": "this is not a report id"}
+        )
+
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 403)
+
+    def test_get_inaccessible_audit_returns_403(self):
+        """When a request is made for an audit that is inaccessible for this user, a 403 error should be returned"""
+        user = baker.make(User)
+        sac = baker.make(SingleAuditChecklist)
+
+        self.client.force_login(user)
+
+        url = reverse("general_information", kwargs={"report_id": sac.report_id})
+
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 403)
+
+    def test_get_valid_audit_returns_populated_form(self):
+        """When a request is made for an audit that is accessible for this user, a populated general information form should be returned"""
+        user = baker.make(User)
+
+        sac_data = omit(["submitted_by"], SAMPLE_BASE_SAC_DATA)
+        sac = baker.make(SingleAuditChecklist, submitted_by=user, **sac_data)
+        baker.make(Access, user=user, sac=sac)
+
+        self.client.force_login(user)
+
+        url = reverse("general_information", kwargs={"report_id": sac.report_id})
+
+        response = self.client.get(url)
+
+        text_fields = [
+            "auditee_fiscal_period_start",
+            "auditee_fiscal_period_end",
+            "audit_period_covered",
+            "auditee_uei",
+            "auditee_name",
+            "auditee_address_line_1",
+            "auditee_city",
+            "auditee_state",
+            "auditee_zip",
+            "auditee_contact_name",
+            "auditee_contact_title",
+            "auditee_phone",
+            "auditee_email",
+            "auditor_firm_name",
+            "auditor_country",
+            "auditor_address_line_1",
+            "auditor_city",
+            "auditor_state",
+            "auditor_zip",
+            "auditor_contact_name",
+            "auditor_contact_title",
+            "auditor_phone",
+            "auditor_email",
+        ]
+
+        # assert that the text fields are populated in the returned form
+        for field in text_fields:
+            value = sac.general_information[field]
+
+            self.assertContains(response, f'value="{value}"')
