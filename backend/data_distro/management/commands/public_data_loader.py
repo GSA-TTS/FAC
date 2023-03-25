@@ -97,7 +97,6 @@ class Command(BaseCommand):
 
         if kwargs["file"] is not None:
             load_file_names = kwargs["file"]
-            # add uei
             if (
                 "duns" in load_file_names
                 or "ein" in load_file_names
