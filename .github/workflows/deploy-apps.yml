@@ -17,10 +17,31 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+      - name: Restore npm cache
+        uses: actions/cache@v3
+        id: cache-npm
+        with:
+          path: ~/.npm
+          key: fac-build-npm-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            fac-build-npm-
+            fac-build-
       - name: Set up Python 3.10
         uses: actions/setup-python@v3
         with:
           python-version: "3.10"
+      - name: Restore pip cache
+        uses: actions/cache@v3
+        id: cache-pip
+        with:
+          path: |
+            ~/.cache/pip
+            /opt/hostedtoolcache/Python/
+          key: fac-build-pip-${{ hashFiles('**/requirements.txt') }}-${{ hashFiles('**/dev-requirements.txt') }}
+          restore-keys: |
+            fac-build-pip-${{ hashFiles('**/requirements.txt') }}-
+            fac-build-pip-
+            fac-build-
       - name: Install npm dependencies
         working-directory: ./backend
         run: npm install
