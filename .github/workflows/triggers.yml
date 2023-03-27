@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - prod
+      - tadhg/switch-deploy-action
     tags:
       - v1.*
   pull_request:
