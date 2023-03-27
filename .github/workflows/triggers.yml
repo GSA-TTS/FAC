@@ -23,7 +23,7 @@ jobs:
   # deploy to dev
   deploy-infrastructure-dev:
     name: Deploy infrastructure (dev)
-    if: github.event.ref == 'refs/heads/main'
+    if: github.event.ref == 'refs/heads/tadhg/switch-deploy-action'
     needs:
       - test-and-lint
     uses: ./.github/workflows/terraform-apply-env.yml
