@@ -23,9 +23,10 @@ jobs:
   # deploy to dev
   deploy-infrastructure-dev:
     name: Deploy infrastructure (dev)
-    if: github.event.ref == 'refs/heads/tadhg/switch-deploy-action'
-    needs:
-      - test-and-lint
+    if:
+      github.event.ref == 'refs/heads/tadhg/switch-deploy-action'
+      # needs:
+      # - test-and-lint
     uses: ./.github/workflows/terraform-apply-env.yml
     with:
       environment: "dev"
@@ -33,9 +34,10 @@ jobs:
 
   deploy-dev:
     name: Deploy dev app to cloud.gov
-    if: github.event.ref == 'refs/heads/tadhg/switch-deploy-action'
-    needs:
-      - deploy-infrastructure-dev
+    if:
+      github.event.ref == 'refs/heads/tadhg/switch-deploy-action'
+      # needs:
+      # - deploy-infrastructure-dev
     uses: ./.github/workflows/deploy-apps.yml
     with:
       environment: "dev"
