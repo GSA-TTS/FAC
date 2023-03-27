@@ -26,14 +26,8 @@ $$
 begin
     if not exists (select schema_name from information_schema.schemata where schema_name = 'api') then
         create schema api;
-        -- Grant access to tables and views
-        alter default privileges
-            in schema api
-            grant select
-        -- this includes views
-        on tables
-        to postgres;
 
+        -- Grant access to tables and views
         alter default privileges
             in schema api
             grant select
@@ -42,13 +36,6 @@ begin
         to anon;
 
         -- Grant access to sequences, if we have them
-        grant select, usage on all sequences in schema api to anon;
-        alter default privileges
-            in schema api
-            grant select, usage
-        on sequences
-        to postgres;
-
         grant select, usage on all sequences in schema api to anon;
         alter default privileges
             in schema api
