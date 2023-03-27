@@ -11,6 +11,7 @@ on:
     branches:
       - main
       - prod
+      - tadhg/switch-deploy-action
   workflow_dispatch: null
 
 jobs:
