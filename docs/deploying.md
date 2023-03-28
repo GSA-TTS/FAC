@@ -49,8 +49,8 @@ cf push -f manifests/manifest-dev.yml
 
 ## Deploying Automatically
 
-* When code is pushed to `main`,it's deployed to the development space
-* When code is pushed to `prod`,it's pushed to the staging space
+* When code is pushed to `main`, it's deployed to the development space
+* When code is pushed to `prod`, it's pushed to the staging space
 * When code is [tagged with a tag starting with `v`](https://github.com/GSA-TTS/FAC/blob/main/docs/branching.md#steps), it's pushed to the production space
 
 To see more about branching and the deployment steps, see the [Branching](branching.md) page.
