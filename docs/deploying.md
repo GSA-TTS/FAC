@@ -2,7 +2,7 @@
 
 We use [cloud.gov](https://cloud.gov/) as our PaaS to provide application hosting as well as broker for Postgres and S3 instances from AWS.
 
-We use [Terraform](https://github.com/GSA-TTS/FAC/tree/main/terraform) to configure the services and confguration for our cloud.gov environments.
+We use [Terraform](https://github.com/GSA-TTS/FAC/tree/main/terraform) to configure the services and permissions for our cloud.gov environments.
 
 We use [manifests](https://docs.cloudfoundry.org/devguide/deploy-apps/manifest.html) to configure and push our applications to cloud.gov
 
