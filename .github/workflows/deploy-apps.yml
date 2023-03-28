@@ -28,7 +28,7 @@ jobs:
         working-directory: ./backend
         run: npm run build
       - name: Update service keys
-        uses: 18f/cg-deploy-action@main
+        uses: gsa/cg-cli-tools@key-not-accessible
         env:
           SAM_API_KEY: ${{ secrets.SAM_API_KEY }}
           DJANGO_SECRET_LOGIN_KEY: $${{ secrets.DJANGO_SECRET_LOGIN_KEY }}
@@ -38,12 +38,12 @@ jobs:
           cf_password: ${{ secrets.CF_PASSWORD }}
           cf_org: gsa-tts-oros-fac
           cf_space: ${{ env.space }}
-          full_command: cf update-user-provided-service fac-key-service -p '"{\"SAM_API_KEY\":\"${{ secrets.SAM_API_KEY }}\", \"DJANGO_SECRET_LOGIN_KEY\":\"${{ secrets.DJANGO_SECRET_LOGIN_KEY }}\", \"SECRET_KEY\":\"${{ secrets.SECRET_KEY}}\"}"'
+          cf_command: update-user-provided-service fac-key-service -p '"{\"SAM_API_KEY\":\"${{ secrets.SAM_API_KEY }}\", \"DJANGO_SECRET_LOGIN_KEY\":\"${{ secrets.DJANGO_SECRET_LOGIN_KEY }}\", \"SECRET_KEY\":\"${{ secrets.SECRET_KEY}}\"}"'
       - name: Deploy to cloud.gov
-        uses: 18f/cg-deploy-action@main
+        uses: gsa/cg-cli-tools@key-not-accessible
         with:
           cf_username: ${{ secrets.CF_USERNAME }}
           cf_password: ${{ secrets.CF_PASSWORD }}
           cf_org: gsa-tts-oros-fac
           cf_space: ${{ env.space }}
-          push_arguments: -f backend/manifests/manifest-${{ env.space }}.yml
+          cf_manifest: backend/manifests/manifest-${{ env.space }}.yml
