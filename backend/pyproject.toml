@@ -14,7 +14,8 @@ ignore_missing_imports = true
 # TDB 2022-12-07 - test_schemas and test_validators use random number generation, which bandit doesn't like
 exclude_dirs = [
     "audit/test_schemas.py",
-    "audit/test_validators.py"
+    "audit/test_validators.py",
+    "node_modules", 
 ]
 
 enable = [
