@@ -81,14 +81,14 @@ jobs:
   # deploy to production
   scan-staging:
     name: Zap scan of the staging site
-    if: github.event.ref == 'refs/tag/v1.*'
+    if: github.event.ref == 'refs/tags/v1.*'
     uses: ./.github/workflows/zap-scan.yml
     with:
       url: "https://fac-staging.app.cloud.gov/"
 
   deploy-infrastructure-production:
     name: Deploy infrastructure (production)
-    if: github.event.ref == 'refs/tag/v1.*'
+    if: github.event.ref == 'refs/tags/v1.*'
     needs:
       - test-and-lint
       - scan-staging
@@ -99,7 +99,7 @@ jobs:
 
   deploy-production:
     name: Deploy production to cloud.gov
-    if: github.event.ref == 'refs/tag/v1.*'
+    if: github.event.ref == 'refs/tags/v1.*'
     needs:
       - deploy-infrastructure-production
     uses: ./.github/workflows/deploy-apps.yml
@@ -109,7 +109,7 @@ jobs:
 
   scan-production-post-deploy:
     name: Zap scan of the production site
-    if: github.event.ref == 'refs/tag/v1.*'
+    if: github.event.ref == 'refs/tags/v1.*'
     needs:
       - deploy-production
     uses: ./.github/workflows/zap-scan.yml
