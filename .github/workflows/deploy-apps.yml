@@ -17,10 +17,31 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+      - name: Restore npm cache
+        uses: actions/cache@v3
+        id: cache-npm
+        with:
+          path: ~/.npm
+          key: fac-build-npm-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            fac-build-npm-
+            fac-build-
       - name: Set up Python 3.10
         uses: actions/setup-python@v3
         with:
           python-version: "3.10"
+      - name: Restore pip cache
+        uses: actions/cache@v3
+        id: cache-pip
+        with:
+          path: |
+            ~/.cache/pip
+            /opt/hostedtoolcache/Python/
+          key: fac-build-pip-${{ hashFiles('**/requirements.txt') }}-${{ hashFiles('**/dev-requirements.txt') }}
+          restore-keys: |
+            fac-build-pip-${{ hashFiles('**/requirements.txt') }}-
+            fac-build-pip-
+            fac-build-
       - name: Install npm dependencies
         working-directory: ./backend
         run: npm install
@@ -28,7 +49,7 @@ jobs:
         working-directory: ./backend
         run: npm run build
       - name: Update service keys
-        uses: 18f/cg-deploy-action@main
+        uses: gsa/cg-cli-tools@key-not-accessible
         env:
           SAM_API_KEY: ${{ secrets.SAM_API_KEY }}
           DJANGO_SECRET_LOGIN_KEY: $${{ secrets.DJANGO_SECRET_LOGIN_KEY }}
@@ -38,12 +59,12 @@ jobs:
           cf_password: ${{ secrets.CF_PASSWORD }}
           cf_org: gsa-tts-oros-fac
           cf_space: ${{ env.space }}
-          full_command: cf update-user-provided-service fac-key-service -p '"{\"SAM_API_KEY\":\"${{ secrets.SAM_API_KEY }}\", \"DJANGO_SECRET_LOGIN_KEY\":\"${{ secrets.DJANGO_SECRET_LOGIN_KEY }}\", \"SECRET_KEY\":\"${{ secrets.SECRET_KEY}}\"}"'
+          cf_command: update-user-provided-service fac-key-service -p '"{\"SAM_API_KEY\":\"${{ secrets.SAM_API_KEY }}\", \"DJANGO_SECRET_LOGIN_KEY\":\"${{ secrets.DJANGO_SECRET_LOGIN_KEY }}\", \"SECRET_KEY\":\"${{ secrets.SECRET_KEY}}\"}"'
       - name: Deploy to cloud.gov
-        uses: 18f/cg-deploy-action@main
+        uses: gsa/cg-cli-tools@key-not-accessible
         with:
           cf_username: ${{ secrets.CF_USERNAME }}
           cf_password: ${{ secrets.CF_PASSWORD }}
           cf_org: gsa-tts-oros-fac
           cf_space: ${{ env.space }}
-          push_arguments: -f backend/manifests/manifest-${{ env.space }}.yml
+          cf_manifest: backend/manifests/manifest-${{ env.space }}.yml

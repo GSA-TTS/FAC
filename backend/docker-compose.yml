@@ -28,7 +28,7 @@ services:
       - "SECRET_KEY=${SECRET_KEY}"
       - "ALLOWED_HOSTS=0.0.0.0 127.0.0.1 localhost"
       - "AV_SCAN_URL=http://clamav-rest:9000/scan"
-      - "DISABLE_AUTH=${DISABLE_AUTH}"
+      - "DISABLE_AUTH=${DISABLE_AUTH:-False}"
       - "LOCALSTACK_HOST=localstack"
     env_file:
       - ".env"
