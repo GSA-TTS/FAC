@@ -19,6 +19,8 @@ jobs:
   # dump GitHub context
   dump-context:
     uses: ./.github/workflows/dump-context.yml
+    with:
+      environment: "dev"
 
   # testing
   test-and-lint:
