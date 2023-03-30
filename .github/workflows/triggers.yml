@@ -5,15 +5,21 @@ on:
     branches:
       - main
       - prod
+      - tadhg/*
     tags:
       - v1.*
   pull_request:
     branches:
       - main
       - prod
+      - tadhg/*
   workflow_dispatch: null
 
 jobs:
+  # dump GitHub context
+  dump-context:
+    uses: crazy-max/ghaction-dump-context@v2
+
   # testing
   test-and-lint:
     uses: ./.github/workflows/test.yml
