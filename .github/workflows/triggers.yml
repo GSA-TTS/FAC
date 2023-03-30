@@ -18,7 +18,7 @@ on:
 jobs:
   # dump GitHub context
   dump-context:
-    uses: crazy-max/ghaction-dump-context@v2
+    uses: ./.github/workflows/dump-context.yml
 
   # testing
   test-and-lint:
