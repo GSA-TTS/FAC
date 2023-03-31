@@ -116,9 +116,4 @@ jobs:
           npm install -g @lhci/cli@0.8.x
           lhci autorun
   validate-terraform:
-    with:
-      filters: |
-        workflows:
-          - 'terraform/workflows/**' 
-    runs-on: ubuntu-latest
-    uses: ./.github/workflows/test.yml
+     uses: ./.github/workflows/terraform-lint.yml

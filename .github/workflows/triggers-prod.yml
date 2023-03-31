@@ -10,7 +10,7 @@ jobs:
     uses: ./.github/workflows/test.yml
     secrets: inherit
 
-  # deploy to production
+  # up to date scan of the staging instance
   scan-staging:
     name: Zap scan of the staging site
     uses: ./.github/workflows/zap-scan.yml

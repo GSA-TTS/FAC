@@ -1,7 +1,8 @@
 name: Deploy to the dev and management cloud.gov environments
 on:
   push:
-    - main
+    branches:
+      - main
 
 jobs:
   # testing

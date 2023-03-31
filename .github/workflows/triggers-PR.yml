@@ -1,5 +1,5 @@
 ---
-name: Deploy to cloud.gov
+name: Tests for PRs
 on:
   pull_request:
     branches:
@@ -10,33 +10,31 @@ on:
   workflow_dispatch: null
 
 jobs:
-  # testing for all main and prod PRs
+  # Testing for all main and prod PRs
   test-and-lint:
     uses: ./.github/workflows/test.yml
     secrets: inherit
 
-  # testing for PRs with BPMN
-  lint-BPMN:
-    with:
-      filters: |
-        workflows:
-          - 'docs/bpmn-workflow-models/**' 
+  # Update BPMN diagram
+  sync-BPMN:
     uses: ./.github/workflows/add-bpmn-renders.yml
     secrets: inherit
+
+  # Create terraform plan as part of the PR review process
 
   # PR to main bafore dev deploy
   plan-terraform-dev:
     if: github.event.pull_request.base.ref == 'main'
     uses: ./.github/workflows/terraform-plan-env.yml
     with:
-      envionment: "dev"
+      environment: "dev"
     secrets: inherit
 
   plan-terraform-management:
     if: github.event.pull_request.base.ref == 'main'
     uses: ./.github/workflows/terraform-plan-env.yml
     with:
-      envionment: "management"
+      environment: "management"
     secrets: inherit
 
   # PR for release before staging deploy
@@ -44,7 +42,7 @@ jobs:
     if: github.event.pull_request.base.ref == 'prod'
     uses: ./.github/workflows/terraform-plan-env.yml
     with:
-      envionment: "staging"
+      environment: "staging"
     secrets: inherit
 
   # PR for release before prod deploy
@@ -53,15 +51,6 @@ jobs:
     if: github.event.pull_request.base.ref == 'prod'
     uses: ./.github/workflows/terraform-plan-env.yml
     with:
-      envionment: "production"
+      environment: "production"
     secrets: inherit
 
-# Can consolidate dev, staging and prod (management still has to be seperate) as a next step; keeping it explicit for now
-  # plan-terraform:
-  #   strategy: 
-  #     matrix:
-  #       target: ["management", "dev", "staging", "production"]
-  #   uses: ./.github/workflows/terraform-plan-env.yml
-  #   with:
-  #     environment: ${{ matrix.target }}
-  #   secrets: inherit
