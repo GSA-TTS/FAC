@@ -94,8 +94,6 @@ jobs:
       - uses: actions/setup-node@v1
         with:
           node-version: 16
-#      - name: Set up Docker buildx
-#        uses: docker/setup-buildx-action@v2
       - name: Enable Docker Layer Caching
         uses: jpribyl/action-docker-layer-caching@v0.1.1
       - name: Pull Docker Hub images
@@ -117,3 +115,10 @@ jobs:
         run: |
           npm install -g @lhci/cli@0.8.x
           lhci autorun
+  validate-terraform:
+    with:
+      filters: |
+        workflows:
+          - 'terraform/workflows/**' 
+    runs-on: ubuntu-latest
+    uses: ./.github/workflows/test.yml

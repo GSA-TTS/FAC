@@ -1,0 +1,46 @@
+name: Deploy to the production cloud.gov environment
+on:
+  push:
+    tags:
+      - v1.*
+
+jobs:
+  # testing
+  test-and-lint:
+    uses: ./.github/workflows/test.yml
+    secrets: inherit
+
+  # deploy to production
+  scan-staging:
+    name: Zap scan of the staging site
+    uses: ./.github/workflows/zap-scan.yml
+    with:
+      url: "https://fac-staging.app.cloud.gov/"
+
+  deploy-infrastructure-production:
+    name: Deploy infrastructure (production)
+    needs:
+      - test-and-lint
+      - scan-staging
+    uses: ./.github/workflows/terraform-apply-env.yml
+    with:
+      environment: "production"
+    secrets: inherit
+
+  deploy-production:
+    name: Deploy production to cloud.gov
+    needs:
+      - deploy-infrastructure-production
+    uses: ./.github/workflows/deploy-apps.yml
+    with:
+      environment: "production"
+    secrets: inherit
+
+  scan-production-post-deploy:
+    name: Zap scan of the production site
+    needs:
+      - deploy-production
+    uses: ./.github/workflows/zap-scan.yml
+    with:
+      url: "https://fac-prod.app.cloud.gov/"
+      

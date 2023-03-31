@@ -1,10 +1,7 @@
 ---
 name: terraform fmt+validate
-
-on: 
-  push:
-    paths:
-      - 'terraform/**'
+on:
+  workflow_call:
 
 jobs:
   test:

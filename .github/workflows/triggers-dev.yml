@@ -1,0 +1,47 @@
+name: Deploy to the dev and management cloud.gov environments
+on:
+  push:
+    - main
+
+jobs:
+  # testing
+  test-and-lint:
+    uses: ./.github/workflows/test.yml
+    secrets: inherit
+
+  # deploy to Dev & Management spaces
+  deploy-infrastructure-dev:
+    name: Deploy infrastructure (dev)
+    needs:
+      - test-and-lint
+    uses: ./.github/workflows/terraform-apply-env.yml
+    with:
+      environment: "dev"
+    secrets: inherit
+
+  deploy-infastructure-management:
+    name: Deploy infrastructure (dev)
+    needs:
+      - test-and-lint
+    uses: ./.github/workflows/terraform-apply-env.yml
+    with:
+      environment: "management"
+    secrets: inherit
+
+  deploy-dev:
+    name: Deploy dev app to cloud.gov
+    needs:
+      - deploy-infrastructure-dev
+    uses: ./.github/workflows/deploy-apps.yml
+    with:
+      environment: "dev"
+    secrets: inherit
+
+  scan-dev-post-deploy:
+    name: Zap scan of the dev site
+    needs:
+      - deploy-dev
+    uses: ./.github/workflows/zap-scan.yml
+    with:
+      url: "https://fac-dev.app.cloud.gov/"
+
