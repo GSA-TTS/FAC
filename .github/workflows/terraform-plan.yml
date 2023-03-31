@@ -1,10 +1,11 @@
 ---
 name: Terraform plan
-
 on:
   pull_request:
-    paths:
-      - 'terraform/**'
+    # These two branches are deployment-sensitive
+    branches:
+      - main
+      - prod
 
 jobs:
   all-envs:
