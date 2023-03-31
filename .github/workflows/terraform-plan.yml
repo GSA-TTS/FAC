@@ -1,7 +1,7 @@
 ---
 name: Terraform plan
 on:
-  pull_request:
+  pull_request_target:
     # These two branches are deployment-sensitive
     branches:
       - main
