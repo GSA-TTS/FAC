@@ -1,38 +1,65 @@
 ---
 name: Story issue template
 about: Starting point for new stories
-title: '[distinguishable summary]'
+title: 'clear, concise summary'
 labels: ''
 assignees: ''
 ---
-# User Story
 
-In order to [goal], [stakeholder] wants [change].
+# At a glance
+
+[comment]: # "Begin with a short summary of this ticket, so its intent can be understood at a glance."
+
 
 # Acceptance Criteria
 
-[ACs should be clearly demoable/verifiable whenever possible. Try specifying them using [BDD](https://en.wikipedia.org/wiki/Behavior-driven_development#Behavioral_specifications).]
+We use [behavior-driven development](https://en.wikipedia.org/wiki/Behavior-driven_development#Behavioral_specifications) wherever possible.
 
-- [ ] GIVEN [a contextual precondition] \
-  [AND optionally another precondition] \
-  WHEN [a triggering event] happens \
-  THEN [a verifiable outcome] \
-  [AND optionally another verifiable outcome]
+[comment]: # "ACs should be clearly demoable/verifiable whenever possible. Try specifying them using behavior driven development."
+[comment]: # "**Given** **when** **then**"
+[comment]: # "Given: the initial context at the beginning of the scenario"
+[comment]: # "when: the event that triggers the scenario"
+[comment]: # "then: the expected outcome(s)"
+[comment]: # "Repeat scenarios as needed, or repeat behaviors and lists within a scenario as needed."
+
+### Scenario: 
+
+**Given**   
+**when**  
+...
+
+```[tasklist]
+### then... 
+- [ ] 
+```
+
+### Shepherd
+
+[comment]: # "@ mention shepherds as we move across the board."
+
+* Design shepherd: 
+* Engineering shepherd: 
 
 # Background
 
-[Any helpful contextual notes or links to artifacts/evidence, if needed]
+[comment]: # "Any helpful contextual notes or links to artifacts/evidence, if needed"
 
----
+# Security Considerations
 
-# Security Considerations ([required](https://nvd.nist.gov/800-53/Rev4/control/CM-4))
+Required per [CM-4](https://nvd.nist.gov/800-53/Rev4/control/CM-4).
 
 [comment]: # "Our SSP says 'The Data.gov team ensures security implications are considered as part of the agile requirements refinement process by including a section in the issue template used as a basis for new work.' so please don't remove this section without care."
 [Any security concerns that might be implicated in the change. "None" is OK, just be explicit here!]
 
+
+---
+
+<details>
+  <summary>Process checklist</summary>
+  
 # Sketch
 
-[Notes or a checklist reflecting our understanding of the selected approach]
+[comment]: #"Notes or a checklist reflecting our understanding of the selected approach"
 
 - [ ] Design designs all the things
 - [ ] Engineering engineers all the things
@@ -53,6 +80,7 @@ In order to [goal], [stakeholder] wants [change].
 
 - [ ] Has clearly stated/testable acceptance criteria
 - [ ] Meets the design Definition of Ready [citation needed]
+- [ ] A design shepherd has been identified
 
 ## Design In Progress
 
@@ -80,6 +108,7 @@ In order to [goal], [stakeholder] wants [change].
 ## Engineering Available
 
 - [ ] There's capacity in the `In Progress` column
+- [ ] An engineering shepherd has been identified
 
 ## Engineering In Progress
 
@@ -106,3 +135,4 @@ In order to [goal], [stakeholder] wants [change].
 - [ ] Tagged with the sprint where it was finished
 - [ ] Archived
 
+</details>
