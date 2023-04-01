@@ -8,19 +8,28 @@ assignees: ''
 
 # At a glance
 
-[comment]: # "Begin with a short summary of this ticket, so its intent can be understood at a glance."
+[comment]: # "Begin with a short summary so intent can be understood at a glance."
 
+[comment]: # "As: a person or role"
+[comment]: # "I want: a feature or some capability"
+[comment]: # "so that: the benefit for value; the why"
+
+**As** 
+**I want**
+**so that**
 
 # Acceptance Criteria
 
-We use [behavior-driven development](https://en.wikipedia.org/wiki/Behavior-driven_development#Behavioral_specifications) wherever possible.
+We use [DRY](https://docs.behat.org/en/latest/user_guide/writing_scenarios.html#backgrounds) [behavior-driven development](https://en.wikipedia.org/wiki/Behavior-driven_development#Behavioral_specifications) wherever possible.
 
-[comment]: # "ACs should be clearly demoable/verifiable whenever possible. Try specifying them using behavior driven development."
-[comment]: # "**Given** **when** **then**"
+[comment]: # "ACs should be clearly demoable/verifiable whenever possible."
 [comment]: # "Given: the initial context at the beginning of the scenario"
 [comment]: # "when: the event that triggers the scenario"
 [comment]: # "then: the expected outcome(s)"
 [comment]: # "Repeat scenarios as needed, or repeat behaviors and lists within a scenario as needed."
+
+[comment]: # "The scenario should be a short, plain language description."
+[comment]: # "Feeling repetative? Apply the DRY (Don't Repeat Yourself) principle!"
 
 ### Scenario: 
 
@@ -28,6 +37,7 @@ We use [behavior-driven development](https://en.wikipedia.org/wiki/Behavior-driv
 **when**  
 ...
 
+[comment]: # "Each task should be a verifiable outcome"
 ```[tasklist]
 ### then... 
 - [ ] 
@@ -48,8 +58,9 @@ We use [behavior-driven development](https://en.wikipedia.org/wiki/Behavior-driv
 
 Required per [CM-4](https://nvd.nist.gov/800-53/Rev4/control/CM-4).
 
-[comment]: # "Our SSP says 'The Data.gov team ensures security implications are considered as part of the agile requirements refinement process by including a section in the issue template used as a basis for new work.' so please don't remove this section without care."
-[Any security concerns that might be implicated in the change. "None" is OK, just be explicit here!]
+[comment]: # "Our SSP says 'The team ensures security implications are considered as part of the agile requirements refinement process by including a section in the issue template used as a basis for new work.'"
+[comment]: # "Please do not remove this section without care."
+[comment]: # "Note any security concerns that might be implicated in the change. 'None' is OK, but we must be explicit here."
 
 
 ---
