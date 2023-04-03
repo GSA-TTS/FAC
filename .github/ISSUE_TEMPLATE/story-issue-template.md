@@ -10,13 +10,13 @@ assignees: ''
 
 [comment]: # "Begin with a short summary so intent can be understood at a glance."
 
-[comment]: # "As: a person or role"
-[comment]: # "I want: a feature or some capability"
-[comment]: # "so that: the benefit for value; the why"
+[comment]: # "In order to: some objective or value to be achieved"
+[comment]: # "as a: stakeholder"
+[comment]: # "I want: some new feature"
 
-**As** 
+**In order to** 
+**as a **
 **I want**
-**so that**
 
 # Acceptance Criteria
 
