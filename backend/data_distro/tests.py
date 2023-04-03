@@ -2,10 +2,14 @@ import os
 import datetime
 import json
 import csv
+
 from io import StringIO
+from psycopg2 import sql
+from psycopg2._psycopg import connection
 
 from django.core.management import call_command
 from django.test import TestCase
+from django.conf import settings
 
 from data_distro.models import General, FederalAward, Finding
 from data_distro.mappings.upload_mapping import upload_mapping
@@ -271,7 +275,7 @@ class TestExceptions(TestCase):
 
     def test_gen_findingtext_linkage(self):
         test_value = General.objects.get(dbkey=100000, audit_year=2014).findings_text
-        sequence_numbers = test_value.values_list("seqence_number", flat=True)
+        sequence_numbers = test_value.values_list("sequence_number", flat=True)
         self.assertEqual(
             [1, 2, 3],
             list(sequence_numbers),
@@ -281,7 +285,7 @@ class TestExceptions(TestCase):
         test_value = Finding.objects.get(
             dbkey=100000, audit_year=2014, finding_ref_number="2021-002"
         ).findings_text
-        sequence_numbers = test_value.values_list("seqence_number", flat=True)
+        sequence_numbers = test_value.values_list("sequence_number", flat=True)
         self.assertEqual(
             [1, 2],
             list(sequence_numbers),
@@ -359,3 +363,68 @@ class TestDataMapping(TestCase):
         super(TestDataMapping, cls).tearDownClass()
         os.remove("data_distro/mappings/new_upload_mapping.json")
         os.remove("data_distro/mappings/FAC_data_dict.csv")
+
+
+class TestAPIViews(TestCase):
+    """The /api_views folder creates and maintains the views used by the postgrest API"""
+
+    # sql.Identifier uses double quotes but we need single quotes here so just writing the query
+    view_list = [
+        ["select * from information_schema.views where table_name='vw_auditee';", ""],
+        ["select * from information_schema.views where table_name='vw_auditor';", ""],
+        ["select * from information_schema.views where table_name='vw_cap_text';", ""],
+        [
+            "select * from information_schema.views where table_name='vw_federal_award';",
+            "",
+        ],
+        ["select * from information_schema.views where table_name='vw_findings';", ""],
+        [
+            "select * from information_schema.views where table_name='vw_findings_text';",
+            "",
+        ],
+        ["select * from information_schema.views where table_name='vw_general';", ""],
+        ["select * from information_schema.views where table_name='vw_note';", ""],
+        [
+            "select * from information_schema.views where table_name='vw_passthrough';",
+            "",
+        ],
+        ["select * from information_schema.views where table_name='vw_revision';", ""],
+    ]
+
+    def grab_discription(self, view):
+        if settings.ENVIRONMENT not in ["DEVELOPMENT", "STAGING", "PRODUCTION"]:
+            conn_string = "dbname='postgres' user='postgres' port='5432' host='db'"
+        else:
+            conn_string = settings.CONNECTION_STRING
+
+        conn = connection(conn_string)
+        conn.autocommit = True
+        with conn.cursor() as curs:
+            curs.execute(sql.SQL(view))
+            results = curs.fetchall()
+            return results
+
+    def test_view_recreation(self):
+        """
+        The scripts in /data_distro/api_views/sql_migrations are run in order and need to stay the same.
+        The scripts in /data_distro/api_views/ can be called by a management command to recreate views.
+        This checks the metadata from both processes to make sure that the two processes don't diverge.
+        """
+        # views exist from initial migration
+        for view_entry in self.view_list:
+            view = view_entry[0]
+            view_entry[1] = self.grab_discription(view)
+
+        # recreate views
+        out = StringIO()
+        call_command(
+            "create_distro_api",
+            stdout=out,
+            stderr=StringIO(),
+        )
+
+        # describe views
+        for view in self.view_list:
+            new_def = self.grab_discription(view[0])
+            # check that the recreated view is the same as the original migration
+            self.assertEqual(view[1], new_def)

@@ -11,10 +11,31 @@ jobs:
       SECRET_KEY: secrets.SECRET_KEY
     steps:
       - uses: actions/checkout@v3
+      - name: Restore npm cache
+        uses: actions/cache@v3
+        id: cache-npm
+        with:
+          path: ~/.npm
+          key: fac-build-npm-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            fac-build-npm-
+            fac-build-
       - name: Set up Python 3.10
         uses: actions/setup-python@v3
         with:
           python-version: '3.10'
+      - name: Restore pip cache
+        uses: actions/cache@v3
+        id: cache-pip
+        with:
+          path: |
+            ~/.cache/pip
+            /opt/hostedtoolcache/Python/
+          key: fac-build-pip-${{ hashFiles('**/requirements.txt') }}-${{ hashFiles('**/dev-requirements.txt') }}
+          restore-keys: |
+            fac-build-pip-${{ hashFiles('**/requirements.txt') }}-
+            fac-build-pip-
+            fac-build-
       - name: Install linters
         working-directory: ./backend
         run: |
@@ -39,14 +60,25 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+
+      - name: Restore npm cache
+        uses: actions/cache@v3
+        id: cache-npm
+        with:
+          path: ~/.npm
+          key: fac-build-npm-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            fac-build-npm-
+            fac-build-
       - uses: actions/setup-node@v3
         with:
           node-version: 18
+      - name: Install npm packages
+        working-directory: ./backend
+        run: npm ci
       - name: Lint JS & SCSS
         working-directory: ./backend
-        run: |
-          npm ci
-          npm run check-all
+        run: npm run check-all
   test:
     runs-on: ubuntu-latest
     env:
@@ -62,13 +94,26 @@ jobs:
       - uses: actions/setup-node@v1
         with:
           node-version: 16
+      - name: Enable Docker Layer Caching
+        uses: jpribyl/action-docker-layer-caching@v0.1.1
+      - name: Pull Docker Hub images
+        working-directory: ./backend
+        run: touch .env && docker-compose pull
       - name: Start services
         working-directory: ./backend
-        run: touch .env && docker-compose up -d
+        run: docker-compose up -d
+      - name: Create LocalStack emulated S3 bucket
+        working-directory: ./backend
+        run:
+          docker-compose run web bash -c 'AWS_SECRET_ACCESS_ID="test" AWS_ACCESS_KEY_ID="test" awslocal s3 mb s3://gsa-fac-private-s3'
       - name: Run Django test suite
         working-directory: ./backend
-        run: make docker-test
+        run:
+          docker-compose run web bash -c 'coverage run --source="." manage.py test &&
+          coverage report -m --fail-under=90'
       - name: run Lighthouse CI
         run: |
           npm install -g @lhci/cli@0.8.x
           lhci autorun
+  validate-terraform:
+     uses: ./.github/workflows/terraform-lint.yml

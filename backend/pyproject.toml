@@ -16,7 +16,7 @@ ignore_missing_imports = true
 exclude_dirs = [
     "audit/test_schemas.py",
     "audit/test_validators.py",
-    "node_modules/",
+    "node_modules", 
 ]
 
 enable = [

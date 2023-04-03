@@ -2,14 +2,14 @@
 {% load static %}
 {% block content %}
     <div class="grid-container">
-        <h1>Create or modify an audit</h1>
+        <h1>In-progress Audit Submissions</h1>
         {% if data.len == 0 %}
             <p>No submissions found</p>
         {% else %}
             <div class="grid-row" tabindex="0">
                 <table class="usa-table margin-top-0">
-                    <caption class="text-normal">The following audit submissions are only for 2022. You can find older audit
-                        submissions on the <a class="usa-link" href="https://facweb.census.gov/uploadpdf.aspx">U.S. Census
+                    <caption class="text-normal">
+                        The audit submissions below are in progress and assigned to your email address. These are for 2023 only. Completed audits from 2022 and earlier can be found on the <a class="usa-link" href="https://facweb.census.gov/uploadpdf.aspx">U.S. Census
                     Bureau’s FAC website.</a></caption>
                     <thead>
                         <tr>
@@ -45,8 +45,7 @@
         <div class="grid-row">
             <h2>Create a new audit</h2>
             <p class="margin-top-0">
-                Before you create a new audit submission, double check to make sure that you don't
-                already have one in progress.
+                Before you begin a new audit submission, check the list above to make sure one isn't currently in progress and assigned to your email address.
             </p>
             <form id="start-new-submission" class="usa-form usa-form--large">
                 <div class="usa-checkbox">

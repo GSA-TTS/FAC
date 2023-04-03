@@ -44,14 +44,19 @@
             </li>
         </ul>
         {% if request.user.is_authenticated %}
-            <div class="usa-card__container">
-                <div>
-                    <a class="usa-button sign-in-button"
-                       aria-controls="login-modal"
-                       data-open-modal
-                       href="/openid/logout/">Sign off {{ request.user.username }} </a>
-                </div>
-            </div>
+            <form action="/openid/logout" class="sign-out">
+                <button class="usa-button usa-button--unstyled">
+                    <svg class="usa-icon" aria-hidden="true" focusable="false" role="img">
+                        <use xlink:href="/static/img/sprite.svg#logout"></use>
+                    </svg>
+                    <span>Sign out</span>
+                    {% if request.user.first_name == '' %}
+                        <span>{{ request.user.email }}</span>
+                    {% else %}
+                        <span>{{ request.user.first_name }} {{ request.user.last_name }}</span>
+                    {% endif %}
+                </button>
+            </form>
         {% else %}
             <div class="sign-in">
                 <a class="sign-in-logo"
