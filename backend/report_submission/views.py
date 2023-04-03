@@ -1,6 +1,7 @@
 import datetime
+import logging
 from django.shortcuts import render, redirect
-from django.core.exceptions import PermissionDenied
+from django.core.exceptions import BadRequest, PermissionDenied, ValidationError
 from django.urls import reverse
 from django.views import View
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -12,6 +13,7 @@ from report_submission.forms import GeneralInformationForm
 
 import api.views
 
+logger = logging.getLogger(__name__)
 
 
 class ReportSubmissionRedirectView(View):
@@ -147,18 +149,17 @@ class GeneralInformationFormView(LoginRequiredMixin, View):
 
     def post(self, request, *args, **kwargs):
         report_id = kwargs["report_id"]
-        
+
         try:
             sac = SingleAuditChecklist.objects.get(report_id=report_id)
 
             accesses = Access.objects.filter(sac=sac, user=request.user)
             if not accesses:
                 raise PermissionDenied("You do not have access to this audit.")
-            
+
             form = GeneralInformationForm(request.POST)
 
             if form.is_valid():
-
                 general_information = sac.general_information
 
                 general_information.update(form.cleaned_data)
@@ -170,7 +171,9 @@ class GeneralInformationFormView(LoginRequiredMixin, View):
                 )
 
                 return redirect(reverse("audit:MySubmissions"))
-            
-            return render(request, "report_submission/gen-form.html", { "form": form })
         except SingleAuditChecklist.DoesNotExist:
             raise PermissionDenied("You do not have access to this audit.")
+        except ValidationError as e:
+            logger.info(f"ValidationError for report ID {report_id}: {e.message}")
+
+        raise BadRequest()

@@ -467,7 +467,9 @@ class GeneralInformationFormViewTests(TestCase):
         updated_sac = SingleAuditChecklist.objects.get(pk=sac.id)
 
         for field in data:
-            self.assertEqual(getattr(updated_sac, field), data[field], f"mismatch for field: {field}")
+            self.assertEqual(
+                getattr(updated_sac, field), data[field], f"mismatch for field: {field}"
+            )
 
     def test_post_validates_general_information(self):
         """When the general information form is submitted, the data should be validated against the general information schema"""
@@ -481,8 +483,9 @@ class GeneralInformationFormViewTests(TestCase):
 
         url = reverse("general_information", kwargs={"report_id": sac.report_id})
 
+        # submit a bad date format for auditee_fiscal_period_start to verify that the input is being validated
         data = {
-            "auditee_fiscal_period_start": "2022-01-01",
+            "auditee_fiscal_period_start": "not a date",
             "auditee_fiscal_period_end": "2022-11-01",
             "audit_period_covered": "biennial",
             "ein": "123456780",
@@ -516,4 +519,4 @@ class GeneralInformationFormViewTests(TestCase):
 
         response = self.client.post(url, data=data)
 
-        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.status_code, 400)
