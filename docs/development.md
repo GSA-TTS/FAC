@@ -99,99 +99,13 @@ An application and database are configured in [../backend/docker-compose.yml](..
 
 3. The application will start and be accessible @ http://localhost:8000/
 
+## Setting up the stack
 
-## Local Development
+Once you have the stack running, you will want to run commands against it to further configure your environment for development and testing. Specifically, you'll need to run Django's `manage.py` and specific commands like `makemigrations`, `createsuperuser`, and more.
 
-You _can_ run the application locally, however, we **STRONGLY** recommend using the Docker method above instead. It will work locally, but you will need to manually install and configure the components. Not every scenario may be covered. Be warned!
+You'll need to run your commands *inside* the container, which you can either do with `docker compose`, or you can do by `exec`ing into the container and running them directly. Each has benefits and tradeoffs, and your specific needs will dictate which you do.
 
-### Install the tools
-
-`brew install pyenv pyenv-virtualenv`
-
-If your tools are previously installed, you may need to
-
-`brew update && brew upgrade pyenv`
-
-to have all of the most recent versions of Python available. This could be slow if you haven't updated in a while. Get a cup of ☕.
-
-(Your setup process on Windows/Linux will vary. Currently, we assume local development in a Linux-like environment.)
-
-### Update your environment
-
-You will likely need to [update your shell](https://stackoverflow.com/questions/33321312/cannot-switch-python-with-pyenv).
-
-```
-eval "$(pyenv init --path)"
-```
-
-should end up somewhere in `~/.bash_profile`, `~/.bashrc`, or whatever flavor of shell you're using.
-
-### Set link flags
-
-You *might* need to set link flags. Otherwise, when you `make install`, there could be failures in the building of `psycog2`. YMMV.
-
-```
-export LDFLAGS="-L/usr/local/opt/openssl/lib -L/usr/local/lib -L/usr/local/opt/expat/lib" && export CFLAGS="-I/usr/local/opt/openssl/include/ -I/usr/local/include -I/usr/local/opt/expat/include" && export CPPFLAGS="-I/usr/local/opt/openssl/include/ -I/usr/local/include -I/usr/local/opt/expat/include"
-```
-
-### Create a virtual environment
-
-You may need to install the Python version being used by the team. The following take place in the `backend` directory of the checked out repository.
-
-```
-FAC_PYTHON_VERSION=`cat .python-version`
-pyenv install $FAC_PYTHON_VERSION
-```
-
-You may run into a `pyenv` mismatch between the version in `.python-version` and possible versions `pyenv` supports, for example, `.python-version` might contain `3.10` but `pyenv` only allows `3.10.0` or other minor versions of `3.10`. One approach to fixing this is to create a symlink in `~/.pyenv/versions` pointing a `3.10` symlink at whatever installed version you prefer. A command to do this might look like `ln -s ~/.pyenv/versions/3.10.1 ~/.pyenv/versions/3.10`.
-
-Then, set up the virtualenv.
-
-`pyenv virtualenv $FAC_PYTHON_VERSION FAC`
-
-### Activate your new virtual environment
-
-`pyenv activate FAC`
-
-Depending on how you feel about seeing the virtualenv in your prompt:
-
-```
-pyenv-virtualenv: prompt changing will be removed from future release. configure `export PYENV_VIRTUALENV_DISABLE_PROMPT=1' to simulate the behavior.
-```
-
-### Install python dependencies
-
-```
-python -m pip install --upgrade pip
-pip install pip-tools
-```
-
-### LocalStack
-
-LocalStack is an AWS emulator. We use it to emulate S3 for storing files that users upload.
-
-It will set itself up correctly if you run the app with `docker compose up`. 
-
-If you wish to run the app locally, you'll need to install this locally as well. You can find [installation instructions](https://docs.localstack.cloud/getting-started/installation/) on their website.
-
-### Django environment variables
-
-We use environment variables to configure much of how Django operates, at a minimum you'll need to configure the uri of your local database.
-
-Set a `DATABASE_URL` environment variable with the uri of your local database
-    *  `postgresql://[userspec@][hostspec][/dbname]`
-
-
-### Test data
-
-For the historical data and public data API we are using the data_distro app. You can set up a modest amount of test data by running `manage.py load_test_data` (That will give an error message while it loads, but only because we are reusing the data from tests, where we test errors.) If the data loading is successful, it will say "Test data loading complete"
-
-### Django setup
-
-In development, you'll need to run Django's `manage.py` and specific commands like `makemigrations`, `createsuperuser`, and more.
-
-If developing with Docker, execute these commands from within the `web` container
-
+To run via `compose`:
 
 ```shell
 docker compose run web python manage.py $COMMAND $ARGS
@@ -216,6 +130,116 @@ That gives you a shell from which you can run, for example:
 ```shell
 python manage.py test
 ```
+
+Now, you're ready to start doing some work.
+
+### Running migrations
+
+Although the migrations are run automatically, try running the migrations. This should not fail on a clean build. You will need to do this before you do anything else.
+
+
+```shell
+docker compose run web python manage.py makemigrations
+```
+
+```shell
+docker compose run web python manage.py migrate
+```
+
+
+
+
+### Load test data
+
+It would be nice to run tests, but in order to do so, we need test data. 
+
+
+```shell
+docker compose run web python manage.py load_test_data
+```
+
+If you want to load more data, see the section on loading previous years.
+
+### Run tests
+
+If everything is set up correctly, you should now be able to run tests. You will want to make sure that your `.env` is set so that auth is not diabled.
+
+```
+DISABLE_AUTH = False
+```
+
+Once you do that, run the stack in one shell:
+
+```shell
+docker compose up
+```
+
+and in another shell, run the tests:
+
+```shell
+docker-compose run web python manage.py test
+```
+
+### Doing a clean set of tests
+
+If you want to take everything back to a squeaky-clean start, you'll need to get rid of some things.
+
+First, bring everything down.
+
+```
+docker-compose down
+```
+
+Then, remove the containers.
+
+```
+docker rm -f $(docker ps -a -q)
+```
+
+
+Then, the volumes.
+
+```
+docker volume rm $(docker volume ls -q)
+```
+
+Now, you'll need to rebuild.
+
+```
+docker compose build
+````
+
+and then up.
+
+```
+docker compose up
+```
+
+At this point, you'll need to re-run migrations and load test data before you can run tests.
+
+
+### Loading previous years
+
+The documentation on [data loading](data_loading.md) has much more detail. In short, you need to download all the data from a given year from Census (say, 2020), and then run
+
+
+```shell
+docker-compose run web python manage.py public_data_loader -y 20
+```
+
+which will load the data from 2020 into your database. This is slow. Grab a cup of coffee, sit back, and watch the blinkenlights.
+
+## Local Development
+
+You _can_ run the application locally, however, we **STRONGLY** recommend using the Docker method above instead. It will work locally, but you will need to manually install and configure the components. Not every scenario may be covered. Be warned!
+
+See [local-development.md](local-development.md) for additional warnings and details.
+
+### Test data
+
+For the historical data and public data API we are using the data_distro app. You can set up a modest amount of test data by running `manage.py load_test_data` (That will give an error message while it loads, but only because we are reusing the data from tests, where we test errors.) If the data loading is successful, it will say "Test data loading complete"
+
+### Django setup
 
 
 **Example workflows**
