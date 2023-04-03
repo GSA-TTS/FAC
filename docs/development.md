@@ -180,6 +180,38 @@ and in another shell, run the tests:
 docker-compose run web python manage.py test
 ```
 
+### Loading previous years
+
+The documentation on [data loading](data_loading.md) has much more detail. In short, you need to download all the data from a given year from Census (say, 2020), and then run
+
+
+```shell
+docker-compose run web python manage.py public_data_loader -y 20
+```
+
+which will load the data from 2020 into your database. This is slow. Grab a cup of coffee, sit back, and watch the blinkenlights.
+
+### Adding users
+
+Let's use this workflow to create a `superuser` in our development environment so we can access the Admin interface! However, you will need to first log in to the local environment using your sandbox login.gov account; if the user does not exist in the system, it cannot be promoted to a superuser or staff user.
+
+The best way to create a login.gov user is to run [http://localhost:8000](http://localhost:8000) click on the log in link from your app running locally. (It needs to be localhost and not http://0.0.0.0:8000 to work with how we configured our Login.gov test account.) 
+
+Follow the instructions on the Login.gov test site to set up an account.
+
+Then, log into the site using login.gov. This will create a user but that user won't have privlages.
+
+You can promote your user account to have superuser status by using our custom management command. While the stack is running (it had to be, in order to login and create your user):
+
+```shell
+# Django management command to promote a user to be a superuser
+docker compose run web python manage.py make_super email@address
+docker compose run web python manage.py make_staff email@address
+```
+
+Now, you can open [http://localhost:8000/admin](http://localhost:8000/admin) in your browser.
+
+
 ### Doing a clean set of tests
 
 If you want to take everything back to a squeaky-clean start, you'll need to get rid of some things.
@@ -196,75 +228,31 @@ Then, remove the containers.
 docker rm -f $(docker ps -a -q)
 ```
 
-
 Then, the volumes.
 
-```
+```shell
 docker volume rm $(docker volume ls -q)
 ```
 
 Now, you'll need to rebuild.
 
-```
+```shell
 docker compose build
-````
+```
 
 and then up.
 
-```
+```shell
 docker compose up
 ```
 
 At this point, you'll need to re-run migrations and load test data before you can run tests.
 
+## Development, in principle
 
-### Loading previous years
+We're working against a [QASP](https://derisking-guide.18f.gov/qasp/) (which does *not* look like the linked document, but it serves as an example), and therefore we have a variety of practices we are holding ourselves to.
 
-The documentation on [data loading](data_loading.md) has much more detail. In short, you need to download all the data from a given year from Census (say, 2020), and then run
-
-
-```shell
-docker-compose run web python manage.py public_data_loader -y 20
-```
-
-which will load the data from 2020 into your database. This is slow. Grab a cup of coffee, sit back, and watch the blinkenlights.
-
-## Local Development
-
-You _can_ run the application locally, however, we **STRONGLY** recommend using the Docker method above instead. It will work locally, but you will need to manually install and configure the components. Not every scenario may be covered. Be warned!
-
-See [local-development.md](local-development.md) for additional warnings and details.
-
-### Test data
-
-For the historical data and public data API we are using the data_distro app. You can set up a modest amount of test data by running `manage.py load_test_data` (That will give an error message while it loads, but only because we are reusing the data from tests, where we test errors.) If the data loading is successful, it will say "Test data loading complete"
-
-### Django setup
-
-
-**Example workflows**
-
-Let's use this workflow to create a `superuser` in our development environment so we can access the Admin interface!
-
-First create an account in the Login.gov test environment, The best way to do that is to run [http://localhost:8000](http://localhost:8000) click on the log in link from your app running locally. (It needs to be localhost and not http://0.0.0.0:8000 to work with how we configured our Login.gov test account.) 
-
-Follow the instructions on the Login.gov test site to set up an account.
-
-Then, log into the site using login.gov. This will create a user but that user won't have privlages.
-
-You can promote your user account to have superuser status by using our custom management command:
-
-```shell
-# Start our docker containers w/ docker compose
-docker compose up
-
-# Django management command to promote a user to be a superuser
-docker compose run web python manage.py make_super email@address
-docker compose run web python manage.py make_staff email@address
-
-# Enter the user/pass @ the Admin login page
-open http://localhost:8000/admin
-```
+Many of these run on every commit as part of our Github actions workflows.
 
 ### Python code quality tooling
 
@@ -272,13 +260,13 @@ The tests (plus coverage report) can be run locally with `make test`.
 
 The linting/formatting/security scanning/type checking can be run all together locally with `make lint`.
 
-#### Testing
+### Testing
 
 We use the Django native test framework plus [coverage.py](https://coverage.readthedocs.io/).
 
 The tests and the coverage report are run as a GitHub action, configured in [.github/workflows/test.yml](https://github.com/GSA-TTS/FAC/blob/main/.github/workflows/test.yml). Minimum test coverage is currently set at 90%.
 
-#### Linting
+### Linting
 
 We use [Flake8](https://github.com/PyCQA/flake8) for linting. Because Flake8 runs `pylint` for us, configuration is effectively in two files: [backend/.flake8](https://github.com/GSA-TTS/FAC/blob/main/backend/.flake8) for Flake-specific settings and [backend/pyproject.toml](https://github.com/GSA-TTS/FAC/blob/main/backend/pyproject.toml) for `pylint`-specific settings.
 
@@ -291,24 +279,24 @@ There are some opinionated enabled/disabled `pylint` messages in [backend/pyproj
 
 Linting is checked as a GitHub action, configured in [.github/workflows/test.yml](https://github.com/GSA-TTS/FAC/blob/main/.github/workflows/test.yml).
 
-##### Additional linters
+#### Additional linters
 We use `djlint` to lint html template files. When developing locally:
 * Use `djlint --reformat <path_to_html_files>` to format the files. 
 * Use the `--lint` option to get a list of linter errors.
 
-#### Formatting
+### Formatting
 
 As stated, we use [black](https://black.readthedocs.io/en/stable/index.html) with the default settings for formatting.
 
 Formatting is checked as a GitHub action, configured in [.github/workflows/test.yml](https://github.com/GSA-TTS/FAC/blob/main/.github/workflows/test.yml), and will fail if code is not formatted as `black`  expects it to be.
 
-#### Security scanning
+### Security scanning
 
 We use [bandit](https://bandit.readthedocs.io/en/latest/) for automated security scans, and run it with default settings.
 
 Security scanning is checked as a GitHub action, configured in [.github/workflows/test.yml](https://github.com/GSA-TTS/FAC/blob/main/.github/workflows/test.yml).
 
-#### Type checking
+### Type checking
 
 We use [mypy](https://mypy.readthedocs.io/en/stable/) for static type checking. We currently configure it (in  [backend/pyproject.toml](https://github.com/GSA-TTS/FAC/blob/main/backend/pyproject.toml)) to [ignore missing imports](https://mypy.readthedocs.io/en/stable/running_mypy.html#missing-imports) because type annotation support for Django isn't yet mature.
 
@@ -321,3 +309,10 @@ We use [stylelint](https://stylelint.io/) to lint and format CSS/SCSS. Configura
 To lint and format JavaScript, we use [eslint](https://eslint.org/). eslint configuration lives in [backend/.eslintrc](https://github.com/GSA-TTS/FAC/blob/main/backend/.eslintrc).
 
 These tools run automatically as a part of our CI workflow in GitHub actions, but to run these tools locally to check formatting or automatically fix formatting errors before committing, just run: `npm run check-all` or `npm run fix-all`, respectively.
+
+
+## Local Development
+
+You _can_ run the application locally, however, we **STRONGLY** recommend using the Docker method above instead. It will work locally, but you will need to manually install and configure the components. Not every scenario may be covered. Be warned!
+
+See [local-development.md](local-development.md) for additional warnings and details. 
