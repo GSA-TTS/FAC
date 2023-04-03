@@ -76,7 +76,7 @@ cf push -f manifests/manifest-dev.yml
 2.  Request reviewers.
 3.  Wait for the checks to pass.
 4.  If checks fail, or if reviewers request changes, something has gone awry. Investigation and/or starting over from a branch and making a PR against `main` may be required.
-5.  Either the reviewer or the submitter can merge the approved pull request.
+5.  A member of the [FAC admins team](https://github.com/orgs/GSA-TTS/teams/fac-admins) has to merge the pull request.
     *   Only use “merge pull request” here—_do not use “squash and merge” or “rebase and merge”_ as that will cause `main` and `prod` diverge in Git history terms.
 5.  Verify that the deploy steps all passed.
 6.  After deployment, the changes should be on https://fac-staging.app.cloud.gov/.
