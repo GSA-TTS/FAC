@@ -57,7 +57,7 @@ cf push -f manifests/manifest-dev.yml
 
 ### Standard deployment process
 
-#### Deploying to `main`
+#### Deploying to `dev`
 
 1.  Create your branch; we often use `[name-or-initials]/[issue-number]-[description]` as the naming convention, for example `tadhg/docs-deployment-tweaks`.
 2.  Create a pull request and add any notes a reviewer might need. Anyone on the development team can review, but you may wish to request review from specific team members.
