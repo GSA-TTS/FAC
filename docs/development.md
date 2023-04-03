@@ -139,7 +139,7 @@ Although the migrations are run automatically, try running the migrations. This 
 
 
 ```shell
-docker compose run web python manage.py makemigrations
+  docker compose run web python manage.py makemigrations
 ```
 
 ```shell
@@ -159,6 +159,14 @@ docker compose run web python manage.py load_test_data
 ```
 
 If you want to load more data, see the section on loading previous years.
+
+### Create a test bucket
+
+We need a mocked S3 bucket for testing.
+
+```
+docker compose run web bash -c 'awslocal s3 mb s3://gsa-fac-private-s3'
+```
 
 ### Run tests
 
@@ -180,6 +188,22 @@ and in another shell, run the tests:
 docker-compose run web python manage.py test
 ```
 
+## The short version
+
+The above steps are the bare minimum. To reduce the likelihood of errors, you can also do the following in the `backend` directory:
+
+```
+make docker-first-run
+make docker-test
+```
+
+The `Makefile` makes clear what these do. In short, the first command builds the container (in case there are changes), runs migrations, loads test data, and creates the S3 mock bucket. The second runs tests.
+
+
+## Adding data and users
+
+If you want to move past the test data, it is possible to download previous years' data and load it locally. This is important for dissemination API development and dissemination API testing.
+
 ### Loading previous years
 
 The documentation on [data loading](data_loading.md) has much more detail. In short, you need to download all the data from a given year from Census (say, 2020), and then run
@@ -191,6 +215,7 @@ docker-compose run web python manage.py public_data_loader -y 20
 
 which will load the data from 2020 into your database. This is slow. Grab a cup of coffee, sit back, and watch the blinkenlights.
 
+See full documentation for loading data and keeping script up to date in [data_loading.md](https://github.com/GSA-TTS/FAC/blob/main/docs/data_loading.md). 
 ### Adding users
 
 Let's use this workflow to create a `superuser` in our development environment so we can access the Admin interface! However, you will need to first log in to the local environment using your sandbox login.gov account; if the user does not exist in the system, it cannot be promoted to a superuser or staff user.
@@ -209,7 +234,7 @@ docker compose run web python manage.py make_super email@address
 docker compose run web python manage.py make_staff email@address
 ```
 
-Now, you can open [http://localhost:8000/admin](http://localhost:8000/admin) in your browser.
+Now, you can open [http://localhost:8000/admin](http://localhost:8000/admin) in your browser. (Use local host and not 0.0.0.0, to work with local login.gov auth.)
 
 
 ### Doing a clean set of tests
@@ -219,7 +244,7 @@ If you want to take everything back to a squeaky-clean start, you'll need to get
 First, bring everything down.
 
 ```
-docker-compose down
+docker compose down
 ```
 
 Then, remove the containers.
@@ -246,7 +271,18 @@ and then up.
 docker compose up
 ```
 
-At this point, you'll need to re-run migrations and load test data before you can run tests.
+These are also available as 
+
+```
+make docker-clean
+```
+
+At this point, you'll need to re-run migrations, load test, and recreate your test bucket before you can run tests. Or, you can re-run
+
+```
+make docker-first-run
+make docker-test
+```
 
 ## Development, in principle
 
