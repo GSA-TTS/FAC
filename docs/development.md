@@ -1,6 +1,6 @@
 # Development
 
-We use either [Docker with `docker-compose`](#docker) or [local development](#local-development) when working on issues and shipping pull requests.
+We use either [Docker with `docker compose`](#docker) or [local development](#local-development) when working on issues and shipping pull requests.
 
 ## Contents
 
@@ -93,8 +93,8 @@ An application and database are configured in [../backend/docker-compose.yml](..
 
     ```shell
     # with a working directory of ./backend
-    docker-compose build
-    docker-compose up
+    docker compose build
+    docker compose up
     ```
 
 3. The application will start and be accessible @ http://localhost:8000/
@@ -170,7 +170,7 @@ pip install pip-tools
 
 LocalStack is an AWS emulator. We use it to emulate S3 for storing files that users upload.
 
-It will set itself up correctly if you run the app with `docker-compose up`. 
+It will set itself up correctly if you run the app with `docker compose up`. 
 
 If you wish to run the app locally, you'll need to install this locally as well. You can find [installation instructions](https://docs.localstack.cloud/getting-started/installation/) on their website.
 
@@ -194,16 +194,29 @@ If developing with Docker, execute these commands from within the `web` containe
 
 
 ```shell
-docker-compose run web python manage.py $COMMAND $ARGS
+docker compose run web python manage.py $COMMAND $ARGS
 ```
 
 As a convenience, you can create an alias in your shell following this or a similar pattern
 ```shell
 fac ()
 {
-  docker-compose run web python manage.py ${@}
+  docker compose run web python manage.py ${@}
 }
 ```
+
+Alternatively, you can connect to the running instance and run the tests from it, which has significantly less overhead:
+
+```shell
+docker compose exec web /bin/sh
+```
+
+That gives you a shell from which you can run, for example:
+
+```shell
+python manage.py test
+```
+
 
 **Example workflows**
 
@@ -218,12 +231,12 @@ Then, log into the site using login.gov. This will create a user but that user w
 You can promote your user account to have superuser status by using our custom management command:
 
 ```shell
-# Start our docker containers w/ docker-compose
-docker-compose up
+# Start our docker containers w/ docker compose
+docker compose up
 
 # Django management command to promote a user to be a superuser
-docker-compose run web python manage.py make_super email@address
-docker-compose run web python manage.py make_staff email@address
+docker compose run web python manage.py make_super email@address
+docker compose run web python manage.py make_staff email@address
 
 # Enter the user/pass @ the Admin login page
 open http://localhost:8000/admin
@@ -239,7 +252,7 @@ The linting/formatting/security scanning/type checking can be run all together l
 
 We use the Django native test framework plus [coverage.py](https://coverage.readthedocs.io/).
 
-The tests and the coverage report are run as a GitHub action, configured in [.github/workflows/test.yml](https://github.com/GSA-TTS/FAC/blob/main/.github/workflows/test.yml). Minimum test coverage is currently set at 99%, an arbitrarily-chosen value.
+The tests and the coverage report are run as a GitHub action, configured in [.github/workflows/test.yml](https://github.com/GSA-TTS/FAC/blob/main/.github/workflows/test.yml). Minimum test coverage is currently set at 90%.
 
 #### Linting
 

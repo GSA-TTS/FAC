@@ -10,9 +10,7 @@ name: Lint BPMN
 # https://github.com/peter-evans/create-pull-request/blob/main/docs/examples.md#use-case-create-a-pull-request-to-modifyfix-pull-requests
 
 on:
-  pull_request:
-    paths:
-      - 'docs/bpmn-workflow-models/*.bpmn'
+  workflow_call:
 
 jobs:
   diagrams-up-to-date:
