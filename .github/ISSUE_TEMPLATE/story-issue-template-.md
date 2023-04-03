@@ -70,7 +70,7 @@ Required per [CM-4](https://nvd.nist.gov/800-53/Rev4/control/CM-4).
   
 # Sketch
 
-[comment]: #"Notes or a checklist reflecting our understanding of the selected approach"
+[comment]: # "Notes or a checklist reflecting our understanding of the selected approach"
 
 - [ ] Design designs all the things
 - [ ] Engineering engineers all the things
