@@ -10,6 +10,11 @@ from model_bakery import baker
 from audit.models import Access, SingleAuditChecklist
 
 
+def omit(remove, d) -> dict:
+    """omit(["a"], {"a":1, "b": 2}) => {"b": 2}"""
+    return {k: d[k] for k in d if k not in remove}
+
+
 SAMPLE_BASE_SAC_DATA = {
     # 0. Meta data
     "submitted_by": None,
@@ -53,11 +58,6 @@ SAMPLE_BASE_SAC_DATA = {
         "auditor_email": "qualified.human.accountant@dollarauditstore.com",
     },
 }
-
-
-def omit(remove, d) -> dict:
-    """omit(["a"], {"a":1, "b": 2}) => {"b": 2}"""
-    return {k: d[k] for k in d if k not in remove}
 
 
 class TestPreliminaryViews(TestCase):
@@ -433,38 +433,87 @@ class GeneralInformationFormViewTests(TestCase):
             "audit_period_covered": "biennial",
             "ein": "123456780",
             "ein_not_an_ssn_attestation": True,
-            "multiple_eins_covered": False,
-            "auditee_uei": "ZQGGHJH74DW7",
-            "multiple_ueis_covered": False,
-            "auditee_name": "Auditee McAudited",
-            "auditee_address_line_1": "200 feet into left field",
-            "auditee_city": "New York",
-            "auditee_state": "NY",
-            "auditee_zip": "10451",
-            "auditee_contact_name": "Designate Representative",
-            "auditee_contact_title": "Lord of Doors",
-            "auditee_phone": "5558675309",
-            "auditee_email": "auditee.mcaudited@leftfield.com",
-            "user_provided_organization_type": "local",
-            "met_spending_threshold": True,
-            "is_usa_based": True,
-            "auditor_firm_name": "Dollar Audit Store",
-            "auditor_ein": "123456789",
+            "multiple_eins_covered": True,
+            "auditee_uei": "ZQGGHJH74DW8",
+            "multiple_ueis_covered": True,
+            "auditee_name": "Auditee McAudited again",
+            "auditee_address_line_1": "500 feet into left field",
+            "auditee_city": "Chicago",
+            "auditee_state": "IL",
+            "auditee_zip": "60640",
+            "auditee_contact_name": "Updated Designated Representative",
+            "auditee_contact_title": "Lord of Windows",
+            "auditee_phone": "5558675310",
+            "auditee_email": "auditee.mcaudited.again@leftfield.com",
+            "user_provided_organization_type": "state",
+            "auditor_firm_name": "Penny Audit Store",
+            "auditor_ein": "123456780",
             "auditor_ein_not_an_ssn_attestation": True,
-            "auditor_country": "USA",
-            "auditor_address_line_1": "100 Percent Respectable St.",
-            "auditor_city": "Podunk",
-            "auditor_state": "NY",
-            "auditor_zip": "14886",
-            "auditor_contact_name": "Qualified Human Accountant",
-            "auditor_contact_title": "Just an ordinary person",
-            "auditor_phone": "0008675309",
-            "auditor_email": "qualified.human.accountant@dollarauditstore.com",
+            "auditor_country": "UK",
+            "auditor_address_line_1": "100 Percent Respectable Rd.",
+            "auditor_city": "Not Podunk",
+            "auditor_state": "IL",
+            "auditor_zip": "60604",
+            "auditor_contact_name": "Qualified Robot Accountant",
+            "auditor_contact_title": "Just an extraordinary person",
+            "auditor_phone": "0008675310",
+            "auditor_email": "qualified.robot.accountant@dollarauditstore.com",
         }
 
         response = self.client.post(url, data=data)
+
+        self.assertEqual(response.status_code, 302)
 
         updated_sac = SingleAuditChecklist.objects.get(pk=sac.id)
 
         for field in data:
             self.assertEqual(getattr(updated_sac, field), data[field], f"mismatch for field: {field}")
+
+    def test_post_validates_general_information(self):
+        """When the general information form is submitted, the data should be validated against the general information schema"""
+        user = baker.make(User)
+
+        sac_data = omit(["submitted_by"], SAMPLE_BASE_SAC_DATA)
+        sac = baker.make(SingleAuditChecklist, submitted_by=user, **sac_data)
+        baker.make(Access, user=user, sac=sac)
+
+        self.client.force_login(user)
+
+        url = reverse("general_information", kwargs={"report_id": sac.report_id})
+
+        data = {
+            "auditee_fiscal_period_start": "2022-01-01",
+            "auditee_fiscal_period_end": "2022-11-01",
+            "audit_period_covered": "biennial",
+            "ein": "123456780",
+            "ein_not_an_ssn_attestation": True,
+            "multiple_eins_covered": False,
+            "auditee_uei": "ZQGGHJH74DW8",
+            "multiple_ueis_covered": False,
+            "auditee_name": "Auditee McAudited again",
+            "auditee_address_line_1": "500 feet into left field",
+            "auditee_city": "Chicago",
+            "auditee_state": "IL",
+            "auditee_zip": "60640",
+            "auditee_contact_name": "Updated Designated Representative",
+            "auditee_contact_title": "Lord of Windows",
+            "auditee_phone": "5558675310",
+            "auditee_email": "auditee.mcaudited.again@leftfield.com",
+            "user_provided_organization_type": "state",
+            "auditor_firm_name": "Penny Audit Store",
+            "auditor_ein": "123456780",
+            "auditor_ein_not_an_ssn_attestation": True,
+            "auditor_country": "UK",
+            "auditor_address_line_1": "100 Percent Respectable Rd.",
+            "auditor_city": "Not Podunk",
+            "auditor_state": "IL",
+            "auditor_zip": "60604",
+            "auditor_contact_name": "Qualified Robot Accountant",
+            "auditor_contact_title": "Just an extraordinary person",
+            "auditor_phone": "0008675310",
+            "auditor_email": "qualified.robot.accountant@dollarauditstore.com",
+        }
+
+        response = self.client.post(url, data=data)
+
+        self.assertEqual(response.status_code, 302)

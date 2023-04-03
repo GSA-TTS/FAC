@@ -6,8 +6,12 @@ from django.views import View
 from django.contrib.auth.mixins import LoginRequiredMixin
 
 from audit.models import Access, SingleAuditChecklist
+from audit.validators import validate_general_information_json
+
+from report_submission.forms import GeneralInformationForm
 
 import api.views
+
 
 
 class ReportSubmissionRedirectView(View):
@@ -85,10 +89,6 @@ class AccessAndSubmissionFormView(LoginRequiredMixin, View):
         report_id = result.get("report_id")
 
         if report_id:
-            # This should redirect to the commented-out line, but we'll just
-            # redirect to the JSON representation of the data until the correct
-            # page is up:
-            # return redirect(f"/audit/{report_id}")
             return redirect(f"/report_submission/general-information/{report_id}")
         print("Error processing data: ", result)
         return redirect(reverse("accessandsubmission"))
@@ -138,7 +138,6 @@ class GeneralInformationFormView(LoginRequiredMixin, View):
                 "auditor_contact_title": sac.auditor_contact_title,
                 "auditor_phone": sac.auditor_phone,
                 "auditor_email": sac.auditor_email,
-                "auditee_contacts": sac.auditee_contacts,
                 "report_id": report_id,
             }
 
@@ -155,58 +154,23 @@ class GeneralInformationFormView(LoginRequiredMixin, View):
             accesses = Access.objects.filter(sac=sac, user=request.user)
             if not accesses:
                 raise PermissionDenied("You do not have access to this audit.")
+            
+            form = GeneralInformationForm(request.POST)
 
-            general_information = sac.general_information
+            if form.is_valid():
 
-            general_information_updates = {
-                "auditee_fiscal_period_end": request.POST.get("auditee_fiscal_period_end"),
-                "auditee_fiscal_period_start": request.POST.get(
-                    "auditee_fiscal_period_start"
-                ),
-                "audit_period_covered": request.POST.get("audit_period_covered"),
-                "ein": request.POST.get("ein"),
-                "ein_not_an_ssn_attestation": eval(request.POST.get(
-                    "ein_not_an_ssn_attestation"
-                )),
-                "multiple_eins_covered": eval(request.POST.get("multiple_eins_covered")),
-                "auditee_uei": request.POST.get("auditee_uei"),
-                "multiple_ueis_covered": eval(request.POST.get("multiple_ueis_covered")),
-                "auditee_name": request.POST.get("auditee_name"),
-                "auditee_address_line_1": request.POST.get("auditee_address_line_1"),
-                "auditee_city": request.POST.get("auditee_city"),
-                "auditee_state": request.POST.get("auditee_state"),
-                "auditee_zip": request.POST.get("auditee_zip"),
-                "auditee_contact_name": request.POST.get("auditee_contact_name"),
-                "auditee_contact_title": request.POST.get("auditee_contact_title"),
-                "auditee_phone": request.POST.get("auditee_phone"),
-                "auditee_email": request.POST.get("auditee_email"),
-                "user_provided_organization_type": request.POST.get(
-                    "user_provided_organization_type"
-                ),
-                "is_usa_based": eval(request.POST.get("is_usa_based")),
-                "auditor_firm_name": request.POST.get("auditor_firm_name"),
-                "auditor_ein": request.POST.get("auditor_ein"),
-                "auditor_ein_not_an_ssn_attestation": eval(request.POST.get(
-                    "auditor_ein_not_an_ssn_attestation"
-                )),
-                "auditor_country": request.POST.get("auditor_country"),
-                "auditor_address_line_1": request.POST.get("auditor_address_line_1"),
-                "auditor_city": request.POST.get("auditor_city"),
-                "auditor_state": request.POST.get("auditor_state"),
-                "auditor_zip": request.POST.get("auditor_zip"),
-                "auditor_contact_name": request.POST.get("auditor_contact_name"),
-                "auditor_contact_title": request.POST.get("auditor_contact_title"),
-                "auditor_phone": request.POST.get("auditor_phone"),
-                "auditor_email": request.POST.get("auditor_email"),
-                "auditee_contacts": request.POST.get("auditee_contacts"),
-            }
+                general_information = sac.general_information
 
-            general_information.update(general_information_updates)
+                general_information.update(form.cleaned_data)
 
-            SingleAuditChecklist.objects.filter(pk=sac.id).update(
-                general_information=general_information
-            )
+                validate_general_information_json(general_information)
 
-            return redirect(reverse("audit:MySubmissions"))
+                SingleAuditChecklist.objects.filter(pk=sac.id).update(
+                    general_information=general_information
+                )
+
+                return redirect(reverse("audit:MySubmissions"))
+            
+            return render(request, "report_submission/gen-form.html", { "form": form })
         except SingleAuditChecklist.DoesNotExist:
             raise PermissionDenied("You do not have access to this audit.")
