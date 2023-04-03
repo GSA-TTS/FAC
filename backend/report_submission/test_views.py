@@ -471,6 +471,27 @@ class GeneralInformationFormViewTests(TestCase):
                 getattr(updated_sac, field), data[field], f"mismatch for field: {field}"
             )
 
+    def test_post_requires_fields(self):
+        """If there are fields missing from the submitted form, the submission should be rejected"""
+        user = baker.make(User)
+
+        sac_data = omit(["submitted_by"], SAMPLE_BASE_SAC_DATA)
+        sac = baker.make(SingleAuditChecklist, submitted_by=user, **sac_data)
+        baker.make(Access, user=user, sac=sac)
+
+        self.client.force_login(user)
+
+        url = reverse("general_information", kwargs={"report_id": sac.report_id})
+
+        # submit a bad date format for auditee_fiscal_period_start to verify that the input is being validated
+        data = {
+            "auditee_fiscal_period_start": "2023-01-01",
+        }
+
+        response = self.client.post(url, data=data)
+
+        self.assertEqual(response.status_code, 400)
+
     def test_post_validates_general_information(self):
         """When the general information form is submitted, the data should be validated against the general information schema"""
         user = baker.make(User)

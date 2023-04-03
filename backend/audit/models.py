@@ -226,10 +226,6 @@ class SingleAuditChecklist(models.Model):
     def auditor_phone(self):
         return self._general_info_get("auditor_phone")
 
-    @property
-    def auditee_contacts(self):
-        return self._general_info_get("auditee_contacts")
-
     def _general_info_get(self, key):
         try:
             return self.general_information[key]
