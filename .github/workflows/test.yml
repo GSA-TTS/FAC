@@ -94,8 +94,6 @@ jobs:
       - uses: actions/setup-node@v1
         with:
           node-version: 16
-      - name: Enable Docker Layer Caching
-        uses: jpribyl/action-docker-layer-caching@v0.1.1
       - name: Pull Docker Hub images
         working-directory: ./backend
         run: touch .env && docker-compose pull
