@@ -359,7 +359,9 @@
                             <p id="email-notice">The above contacts will receive an e-mail once this audit is created.</p>
                             <ul class="usa-button-group">
                                 <li class="usa-button-group__item">
-                                    <a href="javascript:void(0);" class="usa-button usa-button--outline">Cancel</a>
+                                    <a class="usa-button usa-button--outline"
+                                       aria-controls="modal-cancel"
+                                       data-open-modal>Cancel</a>
                                 </li>
                                 <li class="usa-button-group__item">
                                     <button class="usa-button" id="create">
@@ -369,6 +371,46 @@
                             </ul>
                         </fieldset>
                     </form>
+                    <div class="usa-modal flex-justify-start"
+                         id="modal-cancel"
+                         aria-labelledby="modal-cancel-heading"
+                         aria-describedby="modal-cancel-description">
+                        <div class="usa-modal__content">
+                            <div class="usa-modal__main">
+                                <h2 class="usa-modal__heading" id="legacy-fac-modal-heading">
+                                    Cancel audit submission?
+                                </h2>
+                                <div class="usa-prose">
+                                    <p id="cancel-modal-description">
+                                        Cancelling will result in losing all progress.
+                                    </p>
+                                </div>
+                                <div class="usa-modal__footer">
+                                    <ul class="usa-button-group">
+                                        <li class="usa-button-group__item">
+                                            <a type="button" class="usa-button" data-close-modal href="/">
+                                                OK
+                                            </a>
+                                        </li>
+                                        <li class="usa-button-group__item">
+                                            <button type="button"
+                                                    class="usa-button usa-button--outline padding-105 text-center"
+                                                    data-close-modal>
+                                                I want to keep going
+                                            </button>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <button class="usa-button usa-modal__close"
+                                    aria-label="Close this window"
+                                    data-close-modal>
+                                <svg class="usa-icon" aria-hidden="true" focusable="false" role="img">
+                                    <use xlink:href="/static/img/sprite.svg#close"></use>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
