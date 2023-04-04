@@ -89,6 +89,9 @@ class SingleAuditChecklist(models.Model):
     )
 
     # General Information
+    # The general information fields are currently specified in two places:
+    #   - report_submission.forms.GeneralInformationForm
+    #   - schemas.sections.GeneralInformation.schema.json
     general_information = models.JSONField(
         blank=True, null=True, validators=[validate_general_information_json]
     )

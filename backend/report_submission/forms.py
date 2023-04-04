@@ -1,6 +1,9 @@
 from django import forms
 
 
+# The general information fields are currently specified in two places:
+#   - report_submission.forms.GeneralInformationForm
+#   - schemas.sections.GeneralInformation.schema.json
 class GeneralInformationForm(forms.Form):
     auditee_fiscal_period_end = forms.CharField()
     auditee_fiscal_period_start = forms.CharField()
