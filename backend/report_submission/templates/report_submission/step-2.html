@@ -160,51 +160,6 @@
             </div>
         </div>
 
-        <p class="uei-explanation">Search by Unique Entity Identifier (UEI) for your entity name in the SAM.gov
-          database.</p>
-        <div class="usa-form-group">
-
-          <ul class="usa-error-message" id="auditee_uei-error-message" role="alert">
-
-            <li id="auditee_uei-not-null" hidden>
-              This field is required
-            </li>
-
-            <li id="auditee_uei-length" hidden>
-              UEI is twelve characters long
-            </li>
-
-          </ul>
-          <div class="usa-search" role="search">
-            <label class="usa-sr-only" for="auditee_uei">Search</label>
-            <input class="usa-input" id="auditee_uei" type="search" name="auditee_uei" required
-              data-validate-not-null="" data-validate-length="== 12" />
-            <button class="usa-button" id="auditee_uei-btn" type="submit" aria-controls=uei-search-result
-              data-open-modal>
-              <span class="usa-search__submit-text">
-                <img src="/static/img/usa-icons-bg/search--white.svg" class="usa-search__submit-icon" alt="Search" />
-                Search
-              </span>
-            </button>
-          </div>
-      </div>
-
-        <p class="uei-explanation">Don’t know your UEI? You can find your UEI or register for a new UEI by visiting <a
-            href="https://sam.gov/">SAM.gov</a>.</p>
-
-        <div class="usa-form-group">
-          <label class="usa-label" for="auditee_name">
-            Auditee name
-            <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
-          </label>
-          <ul class="usa-error-message" id="auditee_name-error-message" role="alert">
-            <li id="auditee_name-not-null" hidden>
-              This field is required
-            </li>
-          </ul>
-          <input class="usa-input" id="auditee_name" name="auditee_name" aria-required="true" required
-            data-validate-not-null="" disabled="disabled" />
-        </div>
         <div class="usa-modal flex-justify-start"
              id="modal-cancel"
              aria-labelledby="modal-cancel-heading"
