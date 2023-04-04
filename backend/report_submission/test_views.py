@@ -416,7 +416,7 @@ class GeneralInformationFormViewTests(TestCase):
         self.assertEqual(response.status_code, 403)
 
     def test_post_updates_fields(self):
-        """When the general information form is submitted, the general information fields for the target audit are updated in the database"""
+        """When the general information form is submitted, the general information fields for the target audit are updated in the database - non-functional change"""
         user = baker.make(User)
 
         sac_data = omit(["submitted_by"], SAMPLE_BASE_SAC_DATA)
