@@ -6,10 +6,13 @@ There are two long-lived branches:
  - `main` this is where work starts and this branch is automatically deployed to develop
  - `prod` this branch auto-deploys to staging
 
- There are three environments:
+ There are four environments. Three app environments and a management environment for things like storing shared configs for the app spaces.
+
+ Three app environments:
  - dev [https://fac-dev.app.cloud.gov/](https://fac-dev.app.cloud.gov/)
  - staging [https://fac-staging.app.cloud.gov/](https://fac-staging.app.cloud.gov/)
  - production [https://fac-prod.app.cloud.gov/](https://fac-prod.app.cloud.gov/) production is auto-deployed by using version tags
+ 
 
 ## Timeline
 Week |Monday |Tuesday |Wednesday |Thursday |Friday
@@ -25,24 +28,30 @@ graph TD
     B[branch 2] --> PA
     C[branch 3] --> PA
     PA( code review & automated tests) --> BA[main]
-    BA --> EA{fac-dev}
+    BA --> CA{management}
+    BA --> EA{dev}
     BA --> PB(release review & automated tests)
     PB --> BB[branch prod]
-    BB --> EB{fac-staging}
+    BB --> EB{staging}
     BB --> PC(stakeholder review & automated tests)
     PC --> BC[version tag on prod branch]
-    BC --> EC{fac-prod}
+    BC --> EC{prod}
 ```
 
 ### Steps:
-1. Start a branch from `main` for new work commit changes. When your work is ready, rebase to `main` and clean your commit history. When acceptance criteria is met and tests pass, create a pull request that targets `main`. Tag one or more relevant people for review.
-2. Branch is ready for review. The reviewer will test locally for acceptance criteria, readability, security considerations, and good testing practices. Don't review your own PR. Once the PR is merged into`main`, the code will deploy to the dev environment after tests pass.
-3. When its time to create a release for review, we will add those changes to `prod`. Pushing to the prod branch will deploy the code to staging after tests pass.
-4. The release is reviewed by stakeholders. When it is ready for production, an OROS approver will add a version tag starting with "v". Any changes that were directly on the `prod` branch need to be merged back into the `main` branch with a PR. The tag will trigger an automated deploy to production. There is a GitHub rule to enforce that only `maintainer` role are allowed to add tags starting with "v."
+1. Start a branch from `main` for new work commit changes. When your work is ready, rebase to `main` and clean your commit history. When acceptance criteria is met and tests pass, create a pull request that targets the `main` branch. The terraform plan for the dev environmnet will be created as part of the PR. Tag one or more relevant people for review.
+2. Branch is ready for review. The reviewer will test locally for acceptance criteria, readability, security considerations, and good testing practices. Don't review your own PR. Once the PR is merged into the `main` branch, after tests pass, any changes to the management or dev spaces via terraform will be applied, and the code will deployed to the dev environment.
+3. When its time to create a release for review, we will add those changes to `prod` via PR. Merging to the `prod` branch will deploy the code to staging after tests pass.
+4. The release is reviewed by stakeholders. When it is ready for production, an OROS approver will add a version tag starting with "v". The tag will trigger an automated deploy to production. There is a GitHub rule to enforce that only "maintainer" role are allowed to add tags starting with "v." 
+5. Any changes that are made directly on the `prod` branch will need to be merged back into the `main` branch with a PR. 
 
-Tips:
-- Add initials to your branch name so you can tell where a branch started.
-- Add the ticket number to the branch name.
+### Mechanics
+Our tests and deploys are kicked off from trigger files in [.github/workflows](https://github.com/GSA-TTS/FAC/blob/main/.github/workflows) that then call out the appropriate scripts.
+
+### Tips
+- To help other know who to talk to about a branch, add initials to your branch name.
+- To help other understand the context for a branch, include the ticket number in the branch name.
+- To minimize conflicts, DO NOT squash merge PRs to the `prod` branch or PRs from the `prod` branch back into `main`.
 - You can add follow-tags to your git config to make it easier to push tags.
 `git config --global push.followTags true`
 
@@ -54,10 +63,10 @@ Solve the problem quickly, and methodologically
 graph TD
     A[hotfix branch targets prod] --> PA
     PA(code review & automated tests) --> BA[main]
-    BA --> EA{fac-staging}
+    BA --> EA{staging}
     BA --> PB(release review& version tag & automated tests)
     PB --> BB[branch prod]
-    PB --> EB{fac-prod}
+    PB --> EB{prod}
 ```
 Make sure changes are added to `main`
 ```mermaid

@@ -159,37 +159,51 @@
                 </p>
             </div>
         </div>
-        <div class="usa-modal usa-modal--lg uei-search-result loading"
-             id="uei-search-result"
-             aria-labelledby="uei-search-result-heading"
-             aria-describedby="uei-search-result-description">
-            <div class="usa-modal__content">
-                <div class="usa-modal__main">
-                    <img src="/static/img/loader.svg" alt="loading" />
-                    <h2 class="usa-modal__heading" id="uei-search-result-heading"></h2>
-                    <div class="usa-prose" id="uei-search-result-description"></div>
-                    <div class="usa-modal__footer">
-                        <ul class="usa-button-group">
-                            <li class="usa-button-group__item">
-                                <button type="button" class="usa-button primary" data-close-modal></button>
-                            </li>
-                            <li class="usa-button-group__item">
-                                <button type="button"
-                                        class="usa-button usa-button--unstyled padding-105 text-center secondary"
-                                        data-close-modal>
-                                </button>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-                <button class="usa-button usa-modal__close"
-                        aria-label="Close this window"
-                        data-close-modal>
-                    <svg class="usa-icon" aria-hidden="true" focusable="false" role="img">
-                        <use xlink:href="/static/img/sprite.svg#close"></use>
-                    </svg>
-                </button>
-            </div>
+
+        <p class="uei-explanation">Search by Unique Entity Identifier (UEI) for your entity name in the SAM.gov
+          database.</p>
+        <div class="usa-form-group">
+
+          <ul class="usa-error-message" id="auditee_uei-error-message" role="alert">
+
+            <li id="auditee_uei-not-null" hidden>
+              This field is required
+            </li>
+
+            <li id="auditee_uei-length" hidden>
+              UEI is twelve characters long
+            </li>
+
+          </ul>
+          <div class="usa-search" role="search">
+            <label class="usa-sr-only" for="auditee_uei">Search</label>
+            <input class="usa-input" id="auditee_uei" type="search" name="auditee_uei" required
+              data-validate-not-null="" data-validate-length="== 12" />
+            <button class="usa-button" id="auditee_uei-btn" type="submit" aria-controls=uei-search-result
+              data-open-modal>
+              <span class="usa-search__submit-text">
+                <img src="/static/img/usa-icons-bg/search--white.svg" class="usa-search__submit-icon" alt="Search" />
+                Search
+              </span>
+            </button>
+          </div>
+      </div>
+
+        <p class="uei-explanation">Don’t know your UEI? You can find your UEI or register for a new UEI by visiting <a
+            href="https://sam.gov/">SAM.gov</a>.</p>
+
+        <div class="usa-form-group">
+          <label class="usa-label" for="auditee_name">
+            Auditee name
+            <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
+          </label>
+          <ul class="usa-error-message" id="auditee_name-error-message" role="alert">
+            <li id="auditee_name-not-null" hidden>
+              This field is required
+            </li>
+          </ul>
+          <input class="usa-input" id="auditee_name" name="auditee_name" aria-required="true" required
+            data-validate-not-null="" disabled="disabled" />
         </div>
         <div class="usa-modal flex-justify-start"
              id="modal-cancel"
@@ -226,5 +240,39 @@
             </div>
         </div>
     </div>
-    <script src="{% static 'compiled/js/check-ueid.js' %}" type="text/javascript"></script>
+  </div>
+
+  <div class="usa-modal usa-modal--lg uei-search-result loading" id="uei-search-result"
+    aria-labelledby="uei-search-result-heading" aria-describedby="uei-search-result-description">
+    <div class="usa-modal__content">
+      <div class="usa-modal__main">
+        <img src="/static/img/loader.svg" alt="loading"/>
+        <h2 class="usa-modal__heading" id="uei-search-result-heading">
+        </h2>
+        <div class="usa-prose" id="uei-search-result-description">
+        </div>
+        <div class="usa-modal__footer">
+          <ul class="usa-button-group">
+            <li class="usa-button-group__item">
+              <button type="button" class="usa-button primary" data-close-modal>
+              </button>
+            </li>
+            <li class="usa-button-group__item">
+              <button type="button" class="usa-button usa-button--unstyled padding-105 text-center secondary"
+                data-close-modal>
+              </button>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <button class="usa-button usa-modal__close" aria-label="Close this window" data-close-modal>
+        <svg class="usa-icon" aria-hidden="true" focusable="false" role="img">
+          <use xlink:href="/static/img/sprite.svg#close"></use>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+</div>
+<script src="{% static 'compiled/js/check-ueid.js' %}"></script>
 {% endblock %}

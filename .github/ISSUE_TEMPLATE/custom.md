@@ -1,22 +1,14 @@
 ---
 name: Basic task tracking issue
-about: Starting point for new issues tracking project tasks
+about: Starting point for new issues tracking general tasks
 title: ''
 labels: ''
 assignees: ''
 
 ---
-
-Breakout issue of <story>
-
-### Background
-
-### Acceptance Criteria (We'll know we're done when...)
-
-- [ ] 
-- [ ] 
-
 ### Tasks
 
-- [ ] 
-- [ ]
+```[tasklist]
+- [ ] A thing
+- [ ] Antoher thing
+```

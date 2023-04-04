@@ -1,0 +1,56 @@
+---
+name: Tests for PRs
+on:
+  pull_request:
+    branches:
+      - main
+      - prod
+    paths-ignore:
+      - 'docs/**'
+  workflow_dispatch: null
+
+jobs:
+  # Testing for all main and prod PRs
+  test-and-lint:
+    uses: ./.github/workflows/test.yml
+    secrets: inherit
+
+  # Update BPMN diagram
+  sync-BPMN:
+    uses: ./.github/workflows/add-bpmn-renders.yml
+    secrets: inherit
+
+  # Create terraform plan as part of the PR review process
+
+  # PR to main bafore dev deploy
+  plan-terraform-dev:
+    if: github.event.pull_request.base.ref == 'main'
+    uses: ./.github/workflows/terraform-plan-env.yml
+    with:
+      environment: "dev"
+    secrets: inherit
+
+  plan-terraform-management:
+    if: github.event.pull_request.base.ref == 'main'
+    uses: ./.github/workflows/terraform-plan-env.yml
+    with:
+      environment: "management"
+    secrets: inherit
+
+  # PR for release before staging deploy
+  plan-terraform-stage:
+    if: github.event.pull_request.base.ref == 'prod'
+    uses: ./.github/workflows/terraform-plan-env.yml
+    with:
+      environment: "staging"
+    secrets: inherit
+
+  # PR for release before prod deploy
+  plan-terraform-prod:
+    # This uses the same trigger as staging because prod deploy is tied to tags
+    if: github.event.pull_request.base.ref == 'prod'
+    uses: ./.github/workflows/terraform-plan-env.yml
+    with:
+      environment: "production"
+    secrets: inherit
+

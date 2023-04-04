@@ -40,6 +40,8 @@ To provision services in an otherwise empty space within cloud.gov, [add a new m
 
 ## Deploying Manually
 
+This should not be necessary, and should only be done as part of troubleshooting or in case of issues with our GitHub deployment process.
+
 After you've authenticated and targeted the desired org/space, push the application with
 
 ```shell
@@ -52,6 +54,44 @@ cf push -f manifests/manifest-dev.yml
 * When code is pushed to `main`, it's deployed to the development space
 * When code is pushed to `prod`, it's pushed to the staging space
 * When code is [tagged with a tag starting with `v`](https://github.com/GSA-TTS/FAC/blob/main/docs/branching.md#steps), it's pushed to the production space
+
+### Standard deployment process
+
+#### Deploying to `dev`
+
+1.  Create your branch; we often use `[name-or-initials]/[issue-number]-[description]` as the naming convention, for example `tadhg/docs-deployment-tweaks`.
+2.  Create a pull request and add any notes a reviewer might need. Anyone on the development team can review, but you may wish to request review from specific team members.
+3.  If any of the checks fail, resolve those problems.
+3.  Make any requested changes/resolve any discussion.
+4.  Either the reviewer or the submitter can merge the approved pull request.
+    *   On merging **to `main` only**, we tend to use “squash and merge” to keep the history of `main` relatively clean.
+5.  Verify that the deploy steps all passed.
+6.  After deployment, the changes should be on https://fac-dev.app.cloud.gov/.
+
+#### Deploying to `staging`
+
+1.  Create a pull request using `main` targeting `prod`
+    *   In the GitHub interface, this will mean setting **base** to `prod` and **compare** to `main`.
+    *   The title of the pull request should start with `[YYYY-MM-DD]` and indicate that it’s a merge from `main` to `prod`, for example `2023-04-03 main -> prod`.
+2.  Request reviewers.
+3.  Wait for the checks to pass.
+4.  If checks fail, or if reviewers request changes, something has gone awry. Investigation and/or starting over from a branch and making a PR against `main` may be required.
+5.  A member of the [FAC admins team](https://github.com/orgs/GSA-TTS/teams/fac-admins) has to merge the pull request.
+    *   Only use “merge pull request” here—_do not use “squash and merge” or “rebase and merge”_ as that will cause `main` and `prod` diverge in Git history terms.
+5.  Verify that the deploy steps all passed.
+6.  After deployment, the changes should be on https://fac-staging.app.cloud.gov/.
+
+#### Deploying to `production`
+
+1.  Create a [new release](https://github.com/GSA-TTS/FAC/releases/new).
+    *   Create a new tag in the form `v1.[YYYYMMDD]` with the current date, such as `v1.20230329`, and use that as the tag for the release.
+    *   **_Remember to set the target to `prod`_**.
+    *   For the moment, check the “Set as a re-release” checkbox. We may change this close to or after MVP.
+3.  Wait for the checks to pass.
+4.  If checks fail, or if reviewers request changes, something has gone awry. Investigation and/or starting over from a branch and making a PR against `main` may be required.
+5.  Verify that the deploy steps all passed.
+6.  After deployment, the changes should be on https://fac-prod.app.cloud.gov/.
+7.  If anything was merged directly into the `prod` branch, such as a hotfix, merge `prod` back into `main`.
 
 To see more about branching and the deployment steps, see the [Branching](branching.md) page.
 
