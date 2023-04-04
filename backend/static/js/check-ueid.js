@@ -11,9 +11,14 @@ function handleUEIDResponse({ valid, response, errors }) {
   }
 }
 
-function handleValidUei({ auditee_name }) {
-  document.getElementById('auditee_name').value = auditee_name;
-  populateModal('success', auditee_name);
+function handleValidUei(response) {
+  document.getElementById('auditee_name').value = response.auditee_name;
+  document.getElementById('auditee_address_line_1').value =
+    response.auditee_address_line_1;
+  document.getElementById('auditee_city').value = response.auditee_city;
+  document.getElementById('auditee_state').value = response.auditee_state;
+  document.getElementById('auditee_zip').value = response.auditee_zip;
+  populateModal('success', response.auditee_name);
 }
 
 function handleInvalidUei(errors) {
@@ -28,18 +33,8 @@ function handleApiError(e) {
 }
 
 function proceedWithoutUei() {
-  const nameInputEl = document.getElementById('auditee_name');
-  const requiredStar = document.createElement('abbr');
-
-  requiredStar.setAttribute('title', 'required');
-  requiredStar.setAttribute('class', 'usa-hint usa-hint--required');
-  requiredStar.textContent = '*';
-
-  nameInputEl.removeAttribute('disabled');
-  nameInputEl.setAttribute('required', 'true');
-  document.querySelector('[for=auditee_name]').appendChild(requiredStar);
+  document.getElementById('auditee_name').removeAttribute('disabled');
   document.getElementById('no-uei-warning').hidden = false;
-
   hideUeiStuff();
 }
 
@@ -50,13 +45,13 @@ function hideUeiStuff() {
     document.querySelectorAll('.uei-explanation')
   );
   [...ueiExplanations, ueiFormGroup].forEach((node) =>
-    node.setAttribute('hidden', 'true')
+    node.setAttribute('hidden', 'hidden')
   );
 }
 
 function showValidUeiInfo() {
   const auditeeUei = document.getElementById('auditee_uei').value;
-  const auditeeName = document.getElementById('auditee_name').value;
+  const auditeeName = document.getElementById('auditee_name');
   const ueiInfoEl = document.createElement('div');
 
   ueiInfoEl.innerHTML = `
@@ -64,13 +59,12 @@ function showValidUeiInfo() {
       <dt>Unique Entity ID</dt>
       <dd>${auditeeUei}</dd>
       <dt>Auditee name</dt>
-      <dd>${auditeeName}</dd>
+      <dd>${auditeeName.value}</dd>
     </dl>
   `;
 
-  document
-    .getElementById('auditee_name')
-    .parentNode.setAttribute('hidden', 'true');
+  auditeeName.removeAttribute('disabled');
+  auditeeName.parentNode.setAttribute('hidden', 'hidden');
   document.getElementById('no-uei-warning').replaceWith(ueiInfoEl);
 }
 
