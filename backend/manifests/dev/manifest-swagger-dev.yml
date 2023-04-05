@@ -1,4 +1,4 @@
- ---
+---
 applications:
   - name: swagger
     instances: 1

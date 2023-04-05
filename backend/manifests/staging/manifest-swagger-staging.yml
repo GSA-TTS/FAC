@@ -1,0 +1,16 @@
+---
+applications:
+  - name: swagger
+    instances: 1
+    disk_quota: 256M
+    memory: 256M
+    timeout: 20
+    health-check-type: process
+    docker:
+      image: swaggerapi/swagger-ui
+    routes:
+      - route: fac-staging-swagger.app.cloud.gov
+    env:
+      API_URL: https://fac-staging-postgrest.app.cloud.gov
+      SWAGGER_JSON_URL: https://fac-staging-postgrest.app.cloud.gov/
+    port: 8080
