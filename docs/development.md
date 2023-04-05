@@ -41,7 +41,7 @@ Add and define the following environment variables using the instructions below.
 ENV = 'LOCAL'
 SAM_API_KEY =
 SECRET_KEY =
-DJANGO_LOGIN_SECRET_KEY =
+DJANGO_SECRET_LOGIN_KEY =
 DISABLE_AUTH = 
 ```
 
