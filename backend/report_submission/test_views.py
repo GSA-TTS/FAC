@@ -127,8 +127,8 @@ class TestPreliminaryViews(TestCase):
         user.refresh_from_db()
         saved = user.profile.entry_form_data
         self.assertEqual(saved["user_provided_organization_type"], "state")
-        self.assertEqual(saved["met_spending_threshold"], "True")
-        self.assertEqual(saved["is_usa_based"], "True")
+        self.assertEqual(saved["met_spending_threshold"], True)
+        self.assertEqual(saved["is_usa_based"], True)
 
     def test_step_one_eligibility_submission_fail(self):
         """
@@ -445,7 +445,6 @@ class GeneralInformationFormViewTests(TestCase):
             "auditee_contact_title": "Lord of Windows",
             "auditee_phone": "5558675310",
             "auditee_email": "auditee.mcaudited.again@leftfield.com",
-            "user_provided_organization_type": "state",
             "auditor_firm_name": "Penny Audit Store",
             "auditor_ein": "123456780",
             "auditor_ein_not_an_ssn_attestation": True,

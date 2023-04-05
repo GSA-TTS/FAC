@@ -48,7 +48,7 @@ def eligibility_check(user, data):
         next_step = reverse("api-auditee-info")
 
         # Store step 0 data in profile, overwriting any pre-existing.
-        user.profile.entry_form_data = data
+        user.profile.entry_form_data = serializer.data
         user.profile.save()
         return {"eligible": True, "next": next_step}
 
