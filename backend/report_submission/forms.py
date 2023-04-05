@@ -22,7 +22,6 @@ class GeneralInformationForm(forms.Form):
     auditee_contact_title = forms.CharField()
     auditee_phone = forms.CharField()
     auditee_email = forms.CharField()
-    user_provided_organization_type = forms.CharField()
     auditor_firm_name = forms.CharField()
     auditor_ein = forms.CharField()
     auditor_ein_not_an_ssn_attestation = forms.BooleanField(required=False)

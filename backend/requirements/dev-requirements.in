@@ -1,17 +1,17 @@
 -c ../requirements.txt
 
+awscli-local
 bandit
 black
 coverage
+djlint
 flake8
+localstack
 model_bakery
 mypy
-djlint
-types-requests
-pip-tools
-whitenoise
-toml
 pandas
+pip-tools
+toml
 types-python-slugify
-localstack
-awscli-local
+types-requests
+whitenoise
