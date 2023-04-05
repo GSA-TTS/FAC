@@ -68,4 +68,5 @@ jobs:
           cf_password: ${{ secrets.CF_PASSWORD }}
           cf_org: gsa-tts-oros-fac
           cf_space: ${{ env.space }}
-          cf_manifest: backend/manifests/manifest-${{ env.space }}.yml
+          cf_manifest: backend/manifests/manifest-${{ env.space }}.yml --var DB_URI=${{ secrets.DB_URI }}
+ 
