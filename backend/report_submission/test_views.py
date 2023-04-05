@@ -10,6 +10,56 @@ from model_bakery import baker
 from audit.models import Access, SingleAuditChecklist
 
 
+def omit(remove, d) -> dict:
+    """omit(["a"], {"a":1, "b": 2}) => {"b": 2}"""
+    return {k: d[k] for k in d if k not in remove}
+
+
+SAMPLE_BASE_SAC_DATA = {
+    # 0. Meta data
+    "submitted_by": None,
+    "date_created": "2022-08-11",
+    "submission_status": "in_progress",
+    "report_id": "2022ABC1000023",
+    "audit_type": "single-audit",
+    # Part 1: General Information
+    "general_information": {
+        "auditee_fiscal_period_start": "2021-10-01",
+        "auditee_fiscal_period_end": "2022-10-01",
+        "audit_period_covered": "annual",
+        "ein": "123456789",
+        "ein_not_an_ssn_attestation": True,
+        "multiple_eins_covered": False,
+        "auditee_uei": "ZQGGHJH74DW7",
+        "multiple_ueis_covered": False,
+        "auditee_name": "Auditee McAudited",
+        "auditee_address_line_1": "200 feet into left field",
+        "auditee_city": "New York",
+        "auditee_state": "NY",
+        "auditee_zip": "10451",
+        "auditee_contact_name": "Designate Representative",
+        "auditee_contact_title": "Lord of Doors",
+        "auditee_phone": "5558675309",
+        "auditee_email": "auditee.mcaudited@leftfield.com",
+        "user_provided_organization_type": "local",
+        "met_spending_threshold": True,
+        "is_usa_based": True,
+        "auditor_firm_name": "Dollar Audit Store",
+        "auditor_ein": "123456789",
+        "auditor_ein_not_an_ssn_attestation": True,
+        "auditor_country": "USA",
+        "auditor_address_line_1": "100 Percent Respectable St.",
+        "auditor_city": "Podunk",
+        "auditor_state": "NY",
+        "auditor_zip": "14886",
+        "auditor_contact_name": "Qualified Human Accountant",
+        "auditor_contact_title": "Just an ordinary person",
+        "auditor_phone": "0008675309",
+        "auditor_email": "qualified.human.accountant@dollarauditstore.com",
+    },
+}
+
+
 class TestPreliminaryViews(TestCase):
     """
     Pre-SAC URLs are:
@@ -77,8 +127,8 @@ class TestPreliminaryViews(TestCase):
         user.refresh_from_db()
         saved = user.profile.entry_form_data
         self.assertEqual(saved["user_provided_organization_type"], "state")
-        self.assertEqual(saved["met_spending_threshold"], "True")
-        self.assertEqual(saved["is_usa_based"], "True")
+        self.assertEqual(saved["met_spending_threshold"], True)
+        self.assertEqual(saved["is_usa_based"], True)
 
     def test_step_one_eligibility_submission_fail(self):
         """
@@ -136,8 +186,8 @@ class TestPreliminaryViews(TestCase):
         step3_post = self.client.post(step3, data=self.step3_data)
 
         self.assertEqual(step3_post.status_code, 302)
-        self.assertEqual(step3_post.url[:10], "/sac/edit/")
-        report_id = step3_post.url[10:]
+        self.assertEqual(step3_post.url[:39], "/report_submission/general-information/")
+        report_id = step3_post.url[-17:]
 
         sac = SingleAuditChecklist.objects.get(report_id=report_id)
         combined = self.step1_data | step2_data
@@ -242,3 +292,251 @@ class TestPreliminaryViews(TestCase):
         # Should redirect to login page
         self.assertIsInstance(response, HttpResponseRedirect)
         self.assertTrue("openid/login" in response.url)
+
+
+class GeneralInformationFormViewTests(TestCase):
+    def test_get_requires_login(self):
+        """Requests to the GET endpoint require the user to be authenticated"""
+        sac = baker.make(SingleAuditChecklist)
+
+        url = reverse("general_information", kwargs={"report_id": sac.report_id})
+
+        response = self.client.get(url)
+
+        self.assertIsInstance(response, HttpResponseRedirect)
+        self.assertTrue("openid/login" in response.url)
+
+    def test_get_bad_report_id_returns_403(self):
+        """When a request is made for a malformed or nonexistent report_id, a 403 error should be returned"""
+        user = baker.make(User)
+        self.client.force_login(user)
+
+        url = reverse(
+            "general_information", kwargs={"report_id": "this is not a report id"}
+        )
+
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 403)
+
+    def test_get_inaccessible_audit_returns_403(self):
+        """When a request is made for an audit that is inaccessible for this user, a 403 error should be returned"""
+        user = baker.make(User)
+        sac = baker.make(SingleAuditChecklist)
+
+        self.client.force_login(user)
+
+        url = reverse("general_information", kwargs={"report_id": sac.report_id})
+
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 403)
+
+    def test_get_valid_audit_returns_populated_form(self):
+        """When a request is made for an audit that is accessible for this user, a populated general information form should be returned"""
+        user = baker.make(User)
+
+        sac_data = omit(["submitted_by"], SAMPLE_BASE_SAC_DATA)
+        sac = baker.make(SingleAuditChecklist, submitted_by=user, **sac_data)
+        baker.make(Access, user=user, sac=sac)
+
+        self.client.force_login(user)
+
+        url = reverse("general_information", kwargs={"report_id": sac.report_id})
+
+        response = self.client.get(url)
+
+        text_fields = [
+            "auditee_fiscal_period_start",
+            "auditee_fiscal_period_end",
+            "audit_period_covered",
+            "auditee_uei",
+            "auditee_name",
+            "auditee_address_line_1",
+            "auditee_city",
+            "auditee_state",
+            "auditee_zip",
+            "auditee_contact_name",
+            "auditee_contact_title",
+            "auditee_phone",
+            "auditee_email",
+            "auditor_firm_name",
+            "auditor_country",
+            "auditor_address_line_1",
+            "auditor_city",
+            "auditor_state",
+            "auditor_zip",
+            "auditor_contact_name",
+            "auditor_contact_title",
+            "auditor_phone",
+            "auditor_email",
+        ]
+
+        # assert that the text fields are populated in the returned form
+        for field in text_fields:
+            value = sac.general_information[field]
+
+            self.assertContains(response, f'value="{value}"')
+
+    def test_post_requires_login(self):
+        """Requests to the POST endpoint require the user to be authenticated"""
+        sac = baker.make(SingleAuditChecklist)
+
+        url = reverse("general_information", kwargs={"report_id": sac.report_id})
+
+        response = self.client.post(url)
+
+        self.assertIsInstance(response, HttpResponseRedirect)
+        self.assertTrue("openid/login" in response.url)
+
+    def test_post_bad_report_id_returns_403(self):
+        """When a request is made to update for a malformed or nonexistent report_id, a 403 error should be returned"""
+        user = baker.make(User)
+        self.client.force_login(user)
+
+        url = reverse(
+            "general_information", kwargs={"report_id": "this is not a report id"}
+        )
+
+        response = self.client.post(url)
+
+        self.assertEqual(response.status_code, 403)
+
+    def test_post_inaccessible_audit_returns_403(self):
+        """When a request is made for an audit that is inaccessible for this user, a 403 error should be returned"""
+        user = baker.make(User)
+        sac = baker.make(SingleAuditChecklist)
+
+        self.client.force_login(user)
+
+        url = reverse("general_information", kwargs={"report_id": sac.report_id})
+
+        response = self.client.post(url)
+
+        self.assertEqual(response.status_code, 403)
+
+    def test_post_updates_fields(self):
+        """When the general information form is submitted, the general information fields for the target audit are updated in the database"""
+        user = baker.make(User)
+
+        sac_data = omit(["submitted_by"], SAMPLE_BASE_SAC_DATA)
+        sac = baker.make(SingleAuditChecklist, submitted_by=user, **sac_data)
+        baker.make(Access, user=user, sac=sac)
+
+        self.client.force_login(user)
+
+        url = reverse("general_information", kwargs={"report_id": sac.report_id})
+
+        data = {
+            "auditee_fiscal_period_start": "2021-11-01",
+            "auditee_fiscal_period_end": "2022-11-01",
+            "audit_period_covered": "biennial",
+            "ein": "123456780",
+            "ein_not_an_ssn_attestation": True,
+            "multiple_eins_covered": True,
+            "auditee_uei": "ZQGGHJH74DW8",
+            "multiple_ueis_covered": True,
+            "auditee_name": "Auditee McAudited again",
+            "auditee_address_line_1": "500 feet into left field",
+            "auditee_city": "Chicago",
+            "auditee_state": "IL",
+            "auditee_zip": "60640",
+            "auditee_contact_name": "Updated Designated Representative",
+            "auditee_contact_title": "Lord of Windows",
+            "auditee_phone": "5558675310",
+            "auditee_email": "auditee.mcaudited.again@leftfield.com",
+            "auditor_firm_name": "Penny Audit Store",
+            "auditor_ein": "123456780",
+            "auditor_ein_not_an_ssn_attestation": True,
+            "auditor_country": "UK",
+            "auditor_address_line_1": "100 Percent Respectable Rd.",
+            "auditor_city": "Not Podunk",
+            "auditor_state": "IL",
+            "auditor_zip": "60604",
+            "auditor_contact_name": "Qualified Robot Accountant",
+            "auditor_contact_title": "Just an extraordinary person",
+            "auditor_phone": "0008675310",
+            "auditor_email": "qualified.robot.accountant@dollarauditstore.com",
+        }
+
+        response = self.client.post(url, data=data)
+
+        self.assertEqual(response.status_code, 302)
+
+        updated_sac = SingleAuditChecklist.objects.get(pk=sac.id)
+
+        for field in data:
+            self.assertEqual(
+                getattr(updated_sac, field), data[field], f"mismatch for field: {field}"
+            )
+
+    def test_post_requires_fields(self):
+        """If there are fields missing from the submitted form, the submission should be rejected"""
+        user = baker.make(User)
+
+        sac_data = omit(["submitted_by"], SAMPLE_BASE_SAC_DATA)
+        sac = baker.make(SingleAuditChecklist, submitted_by=user, **sac_data)
+        baker.make(Access, user=user, sac=sac)
+
+        self.client.force_login(user)
+
+        url = reverse("general_information", kwargs={"report_id": sac.report_id})
+
+        # submit a bad date format for auditee_fiscal_period_start to verify that the input is being validated
+        data = {
+            "auditee_fiscal_period_start": "2023-01-01",
+        }
+
+        response = self.client.post(url, data=data)
+
+        self.assertEqual(response.status_code, 400)
+
+    def test_post_validates_general_information(self):
+        """When the general information form is submitted, the data should be validated against the general information schema"""
+        user = baker.make(User)
+
+        sac_data = omit(["submitted_by"], SAMPLE_BASE_SAC_DATA)
+        sac = baker.make(SingleAuditChecklist, submitted_by=user, **sac_data)
+        baker.make(Access, user=user, sac=sac)
+
+        self.client.force_login(user)
+
+        url = reverse("general_information", kwargs={"report_id": sac.report_id})
+
+        # submit a bad date format for auditee_fiscal_period_start to verify that the input is being validated
+        data = {
+            "auditee_fiscal_period_start": "not a date",
+            "auditee_fiscal_period_end": "2022-11-01",
+            "audit_period_covered": "biennial",
+            "ein": "123456780",
+            "ein_not_an_ssn_attestation": True,
+            "multiple_eins_covered": False,
+            "auditee_uei": "ZQGGHJH74DW8",
+            "multiple_ueis_covered": False,
+            "auditee_name": "Auditee McAudited again",
+            "auditee_address_line_1": "500 feet into left field",
+            "auditee_city": "Chicago",
+            "auditee_state": "IL",
+            "auditee_zip": "60640",
+            "auditee_contact_name": "Updated Designated Representative",
+            "auditee_contact_title": "Lord of Windows",
+            "auditee_phone": "5558675310",
+            "auditee_email": "auditee.mcaudited.again@leftfield.com",
+            "user_provided_organization_type": "state",
+            "auditor_firm_name": "Penny Audit Store",
+            "auditor_ein": "123456780",
+            "auditor_ein_not_an_ssn_attestation": True,
+            "auditor_country": "UK",
+            "auditor_address_line_1": "100 Percent Respectable Rd.",
+            "auditor_city": "Not Podunk",
+            "auditor_state": "IL",
+            "auditor_zip": "60604",
+            "auditor_contact_name": "Qualified Robot Accountant",
+            "auditor_contact_title": "Just an extraordinary person",
+            "auditor_phone": "0008675310",
+            "auditor_email": "qualified.robot.accountant@dollarauditstore.com",
+        }
+
+        response = self.client.post(url, data=data)
+
+        self.assertEqual(response.status_code, 400)
