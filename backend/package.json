@@ -17,11 +17,15 @@
     "fix:stylelint": "npx stylelint --fix --ignore-pattern uswds static/scss",
     "check-all": "run-p check:*",
     "fix-all": "run-p fix:*",
-    "test:e2e:ci": "npx cypress run"
+    "test:e2e:ci": "npx cypress run",
+    "test:a11y:pa11y": "pa11y-ci -c ../.pa11yci",
+    "test:a11y:lighthouse": "npx lhci autorun --config='../lighthouserc.js'",
+    "test:a11y-all": "run-p test:a11y:*"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@lhci/cli": "^0.11.0",
     "@uswds/uswds": "^3.3.0",
     "autoprefixer": "^10.4.13",
     "cypress": "^12.5.1",
@@ -32,6 +36,8 @@
     "eslint-plugin-cypress": "^2.12.1",
     "eslint-plugin-prettier": "^4.2.1",
     "glob": "^8.1.0",
+    "lighthouse-ci": "^1.13.1",
+    "pa11y-ci": "^3.0.1",
     "prettier": "^2.8.4",
     "stylelint": "^14.16.1",
     "stylelint-config-prettier": "^9.0.5",
