@@ -1,14 +1,20 @@
+import logging
+
 from django.views import generic
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import render, redirect
 from django.db.models import F
+from django.core.exceptions import BadRequest, PermissionDenied, ValidationError
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse
+from django.utils.datastructures import MultiValueDictKeyError
 from django.utils.decorators import method_decorator
 
 from audit.excel import extract_federal_awards
-from audit.models import ExcelFile, SingleAuditChecklist
+from audit.models import Access, ExcelFile, SingleAuditChecklist
 from audit.validators import validate_federal_award_json
+
+logger = logging.getLogger(__name__)
 
 
 class MySubmissions(LoginRequiredMixin, generic.View):
@@ -19,7 +25,7 @@ class MySubmissions(LoginRequiredMixin, generic.View):
         new_link = "report_submission"
         edit_link = "audit:EditSubmission"
 
-        data = MySubmissions.fetch_my_subnissions(request.user)
+        data = MySubmissions.fetch_my_submissions(request.user)
         context = {
             "data": data,
             "new_link": new_link,
@@ -28,7 +34,7 @@ class MySubmissions(LoginRequiredMixin, generic.View):
         return render(request, template_name, context)
 
     @classmethod
-    def fetch_my_subnissions(cls, user):
+    def fetch_my_submissions(cls, user):
         data = (
             SingleAuditChecklist.objects.all()
             .values(
@@ -53,26 +59,44 @@ class EditSubmission(LoginRequiredMixin, generic.View):
         return redirect(reverse("singleauditchecklist", args=[report_id]))
 
 
-class FederalAwardsExcelFileView(generic.View):
+class FederalAwardsExcelFileView(LoginRequiredMixin, generic.View):
+    # this is marked as csrf_exempt to enable by-hand testing via tools like Postman. Should be removed when the frontend form is implemented!
     @method_decorator(csrf_exempt)
     def dispatch(self, *args, **kwargs):
         return super(FederalAwardsExcelFileView, self).dispatch(*args, **kwargs)
 
     def post(self, request, *args, **kwargs):
-        report_id = kwargs["report_id"]
+        try:
+            report_id = kwargs["report_id"]
 
-        sac = SingleAuditChecklist.objects.get(report_id=report_id)
+            sac = SingleAuditChecklist.objects.get(report_id=report_id)
 
-        excel_file = ExcelFile(
-            **{"file": request.FILES["FILES"], "filename": "temp", "sac_id": sac.id}
-        )
+            accesses = Access.objects.filter(sac=sac, user=request.user)
+            if not accesses:
+                raise PermissionDenied("You do not have access to this audit.")
 
-        excel_file.full_clean()
+            file = request.FILES["FILES"]
 
-        federal_awards = extract_federal_awards(excel_file.file)
+            excel_file = ExcelFile(
+                **{"file": file, "filename": "temp", "sac_id": sac.id}
+            )
 
-        validate_federal_award_json(federal_awards)
+            excel_file.full_clean()
+            excel_file.save()
 
-        excel_file.save()
+            federal_awards = extract_federal_awards(excel_file.file)
+            validate_federal_award_json(federal_awards)
+            SingleAuditChecklist.objects.filter(pk=sac.id).update(
+                federal_awards=federal_awards
+            )
 
-        return redirect("/")
+            return redirect("/")
+        except SingleAuditChecklist.DoesNotExist:
+            logger.warn(f"no SingleAuditChecklist found with report ID {report_id}")
+            raise PermissionDenied()
+        except ValidationError as e:
+            logger.warn(f"Federal Awards Excel upload failed validation: {e}")
+            raise BadRequest()
+        except MultiValueDictKeyError:
+            logger.warn("no file found in request")
+            raise BadRequest()

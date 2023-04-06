@@ -167,3 +167,7 @@ staticfiles/
 # pa11y_tests/screenshots/*.png
 
 excel/
+
+# Things that folks might want to have in their local directories
+# that don't need to be checked in
+.local/
