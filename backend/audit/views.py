@@ -60,6 +60,7 @@ class EditSubmission(LoginRequiredMixin, generic.View):
 
 
 class FederalAwardsExcelFileView(LoginRequiredMixin, generic.View):
+    # this is marked as csrf_exempt to enable by-hand testing via tools like Postman. Should be removed when the frontend form is implemented!
     @method_decorator(csrf_exempt)
     def dispatch(self, *args, **kwargs):
         return super(FederalAwardsExcelFileView, self).dispatch(*args, **kwargs)
