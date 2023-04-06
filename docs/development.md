@@ -185,7 +185,7 @@ docker compose up
 and in another shell, run the tests:
 
 ```shell
-docker-compose run web python manage.py test
+docker compose run web python manage.py test
 ```
 
 ## The short version
@@ -210,7 +210,7 @@ The documentation on [data loading](data_loading.md) has much more detail. In sh
 
 
 ```shell
-docker-compose run web python manage.py public_data_loader -y 20
+docker compose run web python manage.py public_data_loader -y 20
 ```
 
 which will load the data from 2020 into your database. This is slow. Grab a cup of coffee, sit back, and watch the blinkenlights.
