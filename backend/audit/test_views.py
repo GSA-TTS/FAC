@@ -57,7 +57,7 @@ class MySubmissionsViewTests(TestCase):
 
     def test_no_submissions_returns_empty_list(self):
         self.client.force_login(user=self.user)
-        data = MySubmissions.fetch_my_subnissions(self.user)
+        data = MySubmissions.fetch_my_submissions(self.user)
         self.assertEquals(len(data), 0)
 
     def test_user_with_submissions_should_return_expected_data_columns(self):
@@ -69,7 +69,7 @@ class MySubmissionsViewTests(TestCase):
         self.client.post(
             ACCESS_AND_SUBMISSION_PATH, VALID_ACCESS_AND_SUBMISSION_DATA, format="json"
         )
-        data = MySubmissions.fetch_my_subnissions(self.user)
+        data = MySubmissions.fetch_my_submissions(self.user)
         self.assertGreater(len(data), 0)
 
         keys = data[0].keys()
@@ -88,7 +88,7 @@ class MySubmissionsViewTests(TestCase):
         self.client.post(
             ACCESS_AND_SUBMISSION_PATH, VALID_ACCESS_AND_SUBMISSION_DATA, format="json"
         )
-        data = MySubmissions.fetch_my_subnissions(self.user2)
+        data = MySubmissions.fetch_my_submissions(self.user2)
         self.assertEquals(len(data), 0)
 
 

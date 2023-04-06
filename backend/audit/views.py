@@ -11,7 +11,7 @@ from django.utils.datastructures import MultiValueDictKeyError
 from django.utils.decorators import method_decorator
 
 from audit.excel import extract_federal_awards
-from audit.models import ExcelFile, SingleAuditChecklist
+from audit.models import Access, ExcelFile, SingleAuditChecklist
 from audit.validators import validate_federal_award_json
 
 logger = logging.getLogger(__name__)
@@ -25,7 +25,7 @@ class MySubmissions(LoginRequiredMixin, generic.View):
         new_link = "report_submission"
         edit_link = "audit:EditSubmission"
 
-        data = MySubmissions.fetch_my_subnissions(request.user)
+        data = MySubmissions.fetch_my_submissions(request.user)
         context = {
             "data": data,
             "new_link": new_link,
@@ -34,7 +34,7 @@ class MySubmissions(LoginRequiredMixin, generic.View):
         return render(request, template_name, context)
 
     @classmethod
-    def fetch_my_subnissions(cls, user):
+    def fetch_my_submissions(cls, user):
         data = (
             SingleAuditChecklist.objects.all()
             .values(
@@ -69,6 +69,11 @@ class FederalAwardsExcelFileView(LoginRequiredMixin, generic.View):
             report_id = kwargs["report_id"]
 
             sac = SingleAuditChecklist.objects.get(report_id=report_id)
+
+            accesses = Access.objects.filter(sac=sac, user=request.user)
+            if not accesses:
+                raise PermissionDenied("You do not have access to this audit.")
+
             file = request.FILES["FILES"]
 
             excel_file = ExcelFile(
