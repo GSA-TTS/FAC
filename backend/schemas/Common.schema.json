@@ -1,0 +1,115 @@
+{
+    "$comment": "$id: https://fac.gov/schemas/common",
+    "$schema": "https://json-schema.org/draft/2019-09/schema#",
+    "additionalProperties": false,
+    "metamodel_version": "1.7.0",
+    "$defs": {
+        "AuditType": {
+            "description": "",
+            "enum": [
+              "single-audit",
+              "program-specific",
+              "acee"
+            ],
+            "title": "AuditType",
+            "type": "string"
+          },
+          "FederalAgencyPrefix": {
+            "title": "FederalAgencyPrefix",
+            "type": "string",
+            "description": "ALN Federal agency prefix number",
+            "pattern": "^[1-9]{1}[0-9]{1}$"
+          },
+          "ALNExtension": {
+            "title": "ALNExtension",
+            "type": "string",
+            "description": "Mostly three-digit extension for the ALN",
+            "pattern": "^([0-9]{3}[a-zA-Z]{0,1}|U[0-9]{2}|RD)$"
+          },
+          "ProgramNumber": {
+            "title": "ProgramNumber",
+            "type": "string",
+            "description": "Program number",
+            "pattern": "^[1-9]{1}[0-9]{1}\\.([0-9]{3}[a-zA-Z]{0,1}|U[0-9]{2}|RD)$"
+          },
+
+          "ClusterName": {
+            "description": "Cluster Name",
+            "enum": [
+              "N/A",
+              "RESEARCH AND DEVELOPMENT",
+              "STUDENT FINANCIAL ASSISTANCE",
+              "STATE CLUSTER",
+              "477 CLUSTER",
+              "AGING CLUSTER",
+              "CCDF CLUSTER",
+              "CDBG - DISASTER RECOVERY GRANTS - PUB. L. NO. 113-2 CLUSTER",
+              "CDBG - ENTITLEMENT GRANTS CLUSTER",
+              "CDFI CLUSTER",
+              "CHILD NUTRITION CLUSTER",
+              "CLEAN WATER STATE REVOLVING FUND CLUSTER",
+              "COMMUNITY FACILITIES LOANS AND GRANTS CLUSTER",
+              "DISABILITY INSURANCE/SSI CLUSTER",
+              "DRINKING WATER STATE REVOLVING FUND CLUSTER",
+              "ECONOMIC DEVELOPMENT CLUSTER",
+              "EMPLOYMENT SERVICE CLUSTER",
+              "FEDERAL TRANSIT CLUSTER",
+              "FISH AND WILDLIFE CLUSTER",
+              "FOOD DISTRIBUTION CLUSTER",
+              "FOREIGN FOOD AID DONATION CLUSTER",
+              "FOREST SERVICE SCHOOLS AND ROADS CLUSTER",
+              "FOSTER GRANDPARENT/SENIOR COMPANION CLUSTER",
+              "HEAD START CLUSTER",
+              "HEALTH CENTER PROGRAM CLUSTER",
+              "HIGHWAY PLANNING AND CONSTRUCTION CLUSTER",
+              "HIGHWAY SAFETY CLUSTER",
+              "HOPE VI CLUSTER",
+              "HOUSING VOUCHER CLUSTER",
+              "HURRICANE SANDY RELIEF CLUSTER",
+              "MATERNAL, INFANT, AND EARLY CHILDHOOD HOME VISITING CLUSTER",
+              "MEDICAID CLUSTER",
+              "SCHOOL IMPROVEMENT GRANTS CLUSTER",
+              "SECTION 8 PROJECT-BASED CLUSTER",
+              "SNAP CLUSTER",
+              "SPECIAL EDUCATION CLUSTER (IDEA)",
+              "TANF CLUSTER",
+              "TRANSIT SERVICES PROGRAMS CLUSTER",
+              "TRIO CLUSTER",
+              "WATER AND WASTE PROGRAM CLUSTER",
+              "WIOA CLUSTER",
+              "OTHER CLUSTER NOT LISTED ABOVE"
+            ],
+            "title": "ClusterName"
+          },
+          "StateClusterNameNonAnswers": {
+            "description": "If cluster_name is not 'State Cluster', these are valid responses to state_cluster_name.",
+            "enum": [
+              "",
+              null
+            ],
+            "title": "StateClusterNameNonAnswers"
+          },
+          "YorN": {
+            "description": "",
+            "enum": [
+              "Y",
+              "N"
+            ],
+            "title": "YorN",
+            "type": "string"
+          },
+          "NA": {
+            "description": "",
+            "enum": [
+              "N/A"
+            ],
+            "title": "N/A",
+            "type": "string"
+          }
+    },
+    "properties": {},
+    "required": [],
+    "title": "common",
+    "type": "object",
+    "version": null
+}
