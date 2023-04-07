@@ -61,7 +61,7 @@ We use a combination of [Lighthouse-ci](https://github.com/GoogleChrome/lighthou
 
 Accessibility tests are executed as part of our CI/CD pipeline on each PR to the `main` branch, commit to the `main` branch, and PR into the `prod` branch.
 
-To run Lighthouse or pa11y locally, just run:
+To run Lighthouse or pa11y locally, install the dependencies on your machine and outside the docker container, run the following commands.
 
 ```shell
 npm run test:a11y:lighthouse # to run lighthouse
