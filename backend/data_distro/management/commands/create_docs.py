@@ -91,7 +91,7 @@ def create_sql_comments(distro_classes, definations):
         "FindingText": "api.vw_findings_text",
         "General": "api.vw_general",
         "Note": "api.vw_note",
-        "Pass-though": "api.vw_passthrough",
+        "Passthrough": "api.vw_passthrough",
         "Revision": "api.vw_revision",
     }
 
