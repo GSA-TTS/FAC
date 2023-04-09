@@ -10,7 +10,8 @@
         "type": "array",
         "items": {
           "$ref": "#/properties/Award"
-        }
+        },
+        "minItems": 1
       },
       "Award": {
         "type": "object",

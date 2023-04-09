@@ -171,20 +171,14 @@ def extract_data(file, field_mapping: FieldMapping, column_mapping: ColumnMappin
     workbook = _open_workbook(file)
 
     try:
-        [
-            set_fn(result, target, _extract_single_value(workbook, name))
-            for name, (target, set_fn) in field_mapping.items()
-        ]
 
-        for name, (
-            parent_target,
-            field_target,
-            set_fn,
-        ) in column_mapping.items():
-            [
+        for name, (target, set_fn) in field_mapping.items():
+            set_fn(result, target, _extract_single_value(workbook, name))
+            
+        for name, (parent_target, field_target, set_fn) in column_mapping.items():
+            for index, value in enumerate(_extract_column(workbook, name)):
                 set_fn(result, f"{parent_target}[{index}].{field_target}", value)
-                for index, value in enumerate(_extract_column(workbook, name))
-            ]
+                
     except AttributeError as e:
         raise ExcelExtractionError(e)
 

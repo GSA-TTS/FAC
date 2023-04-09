@@ -1,12 +1,16 @@
 {
     "Awards": [
         {
+            "excel_row": 32,
+            "excel_column": 3,
             "federal_agency_prefix": "43",
-            "aln_extension": "123"
+            "aln_extension": "123",
+            "federal_program_name": "Bob's Discount College"
         },
         {
             "federal_agency_prefix": "43",
-            "aln_extension": "U99"
+            "aln_extension": "U99",
+            "federal_program_name": "Virginia, State Of"
         }
     ]
 }

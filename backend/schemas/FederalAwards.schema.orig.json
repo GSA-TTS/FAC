@@ -1,0 +1,433 @@
+{
+  "$comment": "https://stackoverflow.com/questions/34477082/jsonschema-error-when-resolving-schema-reference",
+  "$schema": "http://json-schema.org/draft/2019-12/schema#",
+  "additionalProperties": true,
+  "metamodel_version": "1.7.0",
+  "properties": {
+    "FederalAwards": {
+      "$ref": "#/$defs/FederalAwards" 
+    }
+  },
+  "required": [
+    "FederalAwards"
+  ],
+  "title": "federalawards",
+  "type": "object",
+  "version": null,
+  "$defs": {
+    "LoanBalanceNonAnswers": {
+      "description": "If loan_or_loan_guarantee is N, these are valid responses to loan_balance_at_audit_period_end.",
+      "enum": [
+        "",
+        0,
+        null
+      ],
+      "title": "LoanBalanceNonAnswers"
+    },
+    "FederalAwardPassThroughNonAnswers": {
+      "description": "If federal_award_passed_to_subrecipients is N, these are valid responses to federal_award_passed_to_subrecipients_amount.",
+      "enum": [
+        "",
+        0,
+        null
+      ],
+      "title": "LoanBalanceNonAnswers"
+    },
+    "DirectAwardPassThroughNonAnswers": {
+      "description": "If direct_award is Y, these are valid responses to direct_award_pass_through_entities.",
+      "enum": [
+        "",
+        null,
+        []
+      ],
+      "title": "DirectAwardPassThroughNonAnswers"
+    },
+    "PassThroughEntity": {
+      "description": "If direct_award is N, the form must include a list of the pass-through entity by name and identifying number.",
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "identifying_number": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "name",
+        "identifying_number"
+      ],
+      "title": "PassThroughEntity"
+    },
+    "MajorProgramAuditTypeNonAnswers": {
+      "description": "If major_program is N, these are valid responses to major_program_audit_report_type.",
+      "enum": [
+        "",
+        null
+      ],
+      "title": "MajorProgramAuditTypeNonAnswers"
+    },
+    "FederalAwardEntry": {
+      "additionalProperties": false,
+      "description": "",
+      "properties": {
+
+        "additional_award_identification": {
+          "type": "string"
+        },
+        "amount_expended": {
+          "type": "number",
+          "minimum": 0
+        },
+        "cluster_name": {
+          "$ref": "Common.schema.json#/$defs/ClusterName"
+        },
+        "cluster_total": {
+          "type": "string"
+        },
+        "direct_award": {
+          "$ref": "Common.schema.json#/$defs/YorN"
+        },
+        "direct_award_pass_through_entities": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/PassThroughEntity"
+          }
+        },
+        "federal_award_passed_to_subrecipients": {
+          "$ref": "Common.schema.json#/$defs/YorN"
+        },
+        "federal_award_passed_to_subrecipients_amount": {},
+        "federal_program_name": {
+          "type": "string"
+        },
+        "federal_program_total": {
+          "type": "string"
+        },
+        "loan_balance_at_audit_period_end": {},
+        "loan_or_loan_guarantee": {
+          "$ref": "Common.schema.json#/$defs/YorN"
+        },
+        "major_program": {
+          "$comment": "#/$defs/YorN",
+          "$ref": "Common.schema.json#/$defs/YorN"
+        },
+        "major_program_audit_report_type": {
+          "$ref": "#/$defs/MajorProgramAuditReportType"
+        },
+        "number_of_audit_findings": {
+          "type": "integer"
+        },
+        "other_cluster_name": {
+          "type": "string"
+        },
+        "program_number": {
+          "$comment": "20230405 CHANGED - was #/$defs/ProgramNumber",
+          "$ref": "Common.schema.json#/$defs/ProgramNumber"
+        },
+        "state_cluster_name": {
+          "type": ["string", "null"]
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "loan_or_loan_guarantee": {
+                "const": "Y"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "loan_balance_at_audit_period_end": {
+                "anyOf": [
+                  {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  {
+                    "$ref": "Common.schema.json#/$defs/NA"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "loan_balance_at_audit_period_end"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "loan_or_loan_guarantee": {
+                "const": "N"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "loan_balance_at_audit_period_end": {
+                "$ref": "#/$defs/LoanBalanceNonAnswers"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "direct_award": {
+                "const": "N"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "direct_award_pass_through_entities"
+            ],
+            "properties": {
+              "direct_award_pass_through_entities": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/PassThroughEntity"
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "direct_award": {
+                "const": "Y"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "direct_award_pass_through_entities": {
+                "$ref": "#/$defs/DirectAwardPassThroughNonAnswers"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "federal_award_passed_to_subrecipients": {
+                "const": "Y"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "federal_award_passed_to_subrecipients_amount"
+            ],
+            "properties": {
+              "federal_award_passed_to_subrecipients_amount": {
+                "type": "integer"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "federal_award_passed_to_subrecipients": {
+                "const": "N"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "federal_award_passed_to_subrecipients_amount": {
+                "$ref": "#/$defs/FederalAwardPassThroughNonAnswers"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "major_program": {
+                "const": "Y"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "major_program_audit_report_type"
+            ],
+            "properties": {
+              "major_program_audit_report_type": {
+                "$ref": "#/$defs/MajorProgramAuditReportType"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "major_program": {
+                "const": "N"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "major_program_audit_report_type": {
+                "$ref": "#/$defs/MajorProgramAuditTypeNonAnswers"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "major_program": {
+                "const": "Y"
+              },
+              "major_program_audit_report_type": {
+                "anyOf": [
+                  {
+                    "const": "A"
+                  },
+                  {
+                    "const": "Q"
+                  }
+                ]
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "number_of_audit_findings": {
+                "type": "integer",
+                "exclusiveMinimum": 0
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "number_of_audit_findings": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 0
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "cluster_name": {
+                "const": "STATE CLUSTER"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "state_cluster_name"
+            ]
+          },
+          "else": {
+            "properties": {
+              "state_cluster_name": {
+                "$ref": "#/$defs/StateClusterNameNonAnswers"
+              }
+            }
+          }
+        }
+      ],
+      "required": [
+        "program_number",
+        "federal_program_name",
+        "amount_expended",
+        "cluster_name",
+        "loan_or_loan_guarantee",
+        "direct_award",
+        "federal_award_passed_to_subrecipients",
+        "major_program",
+        "number_of_audit_findings"
+      ],
+      "title": "FederalAwardEntry",
+      "type": "object"
+    },
+    "FederalAwards": {
+      "additionalProperties": false,
+      "description": "",
+      "properties": {
+        "auditee_ein": {
+          "type": ["string", "null"]
+        },
+        "federal_awards": {
+          "items": {
+            "$ref": "#/$defs/FederalAwardEntry"
+          },
+          "type": "array"
+        },
+        "total_amount_expended": {
+          "type": "number",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "auditee_ein",
+        "total_amount_expended"
+      ],
+      "title": "FederalAwards",
+      "type": "object"
+    },
+    "MajorProgramAuditReportType": {
+      "description": "",
+      "enum": [
+        "U",
+        "Q",
+        "A",
+        "D"
+      ],
+      "title": "MajorProgramAuditReportType",
+      "type": "string"
+    },
+    "OrganizationType": {
+      "description": "",
+      "enum": [
+        "state",
+        "local",
+        "tribal",
+        "higher-ed",
+        "non-profit",
+        "unknown",
+        "none"
+      ],
+      "title": "OrganizationType",
+      "type": "string"
+    },
+    "SubmissionStatus": {
+      "description": "",
+      "enum": [
+        "in_progress",
+        "submitted",
+        "received",
+        "available"
+      ],
+      "title": "SubmissionStatus",
+      "type": "string"
+    },
+    "TreeRoot": {
+      "additionalProperties": false,
+      "description": "Container thing",
+      "properties": {
+        "FederalAwards": {
+          "$ref": "#/$defs/FederalAwards"
+        }
+      },
+      "required": [
+        "FederalAwards"
+      ],
+      "title": "TreeRoot",
+      "type": "object"
+    }
+  }
+}
