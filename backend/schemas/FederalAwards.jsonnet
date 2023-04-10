@@ -292,7 +292,7 @@ local FederalAwardEntry = Types.object {
   title: 'FederalAwardEntry',
 };
 
-local Root = Types.object {
+local FederalAward = Types.object {
   additionalProperties: false,
   properties: {
     auditee_uei: Func.compound_type([Types.string, Types.NULL]),
@@ -308,12 +308,12 @@ local Root = Types.object {
   version: 20230408,
 };
 
-local FederalAward = Types.object {
+local Root = Types.object {
   additionalProperties: false,
   properties: {
-    FederalAward: Root,
+    FederalAward: FederalAward,
   },
   version: 20230408,
 };
 
-Base.SchemaBase + FederalAward
+Base.SchemaBase + Root
