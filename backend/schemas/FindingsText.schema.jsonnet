@@ -14,9 +14,10 @@ local FindingsTextEntry = {
 local FindingsText = Types.object {
   additionalProperties: false,
   properties: {
-    auditee_uei: Func.compound_type([Types.string, Types.NULL]),
+    auditee_uei: Types.string,
     findings_text_entries: Types.array {
       items: FindingsTextEntry,
+      minItems: 0
     },
   },
   required: ['auditee_uei', 'findings_text_entries'],

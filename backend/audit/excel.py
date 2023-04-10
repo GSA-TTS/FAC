@@ -48,13 +48,13 @@ federal_awards_column_mapping: ColumnMapping = {
     "cluster_name": ("FederalAwards.federal_awards", "cluster_name", _set_by_path),
     "direct_award": ("FederalAwards.federal_awards", "direct_award", _set_by_path),
     "direct_award_pass_through_entity_name": (
-        "FederalAwards.federal_awards",
-        "direct_award_pass_through_entities",
+        "FederalAwards.federal_awards.direct_or_indirect_award",
+        "entities",
         _set_pass_through_entity_name,
     ),
     "direct_award_pass_through_entity_id": (
-        "FederalAwards.federal_awards",
-        "direct_award_pass_through_entities",
+        "FederalAwards.federal_awards.direct_or_indirect_award",
+        "entities",
         _set_pass_through_entity_id,
     ),
     "federal_award_passed_to_subrecipients": (

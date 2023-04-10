@@ -18,10 +18,12 @@
                 },
                 "direct_or_indirect_award": {
                     "is_direct": "N",
-                    "entity": {
-                        "name": "Bob's Granting House",
-                        "identifying_number": "12345"
-                    }
+                    "entities": [
+                        {
+                            "name": "Bob's Granting House",
+                            "identifying_number": "12345"
+                        }
+                    ]
                 },
                 "cluster": {
                     "name": "N/A",
@@ -79,10 +81,10 @@
                 },
                 "direct_or_indirect_award": {
                     "is_direct": "N",
-                    "entity": {
+                    "entities": [{
                         "name": "Bob's Granting House",
                         "identifying_number": "12345"
-                    }
+                    }]
                 },
                 "subrecipients": {
                     "is_passed": "Y",

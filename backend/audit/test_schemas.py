@@ -402,12 +402,14 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
                         "loan_balance_at_audit_period_end": 0
                     },
                     "direct_or_indirect_award": {
-                        "is_direct": "N",
-                        "entity": {
+                    "is_direct": "N",
+                    "entities": [
+                        {
                             "name": "Bob's Granting House",
                             "identifying_number": "12345"
                         }
-                    },
+                    ]
+                },
                     "cluster": {
                         "name": "N/A",
                         "total": 123
@@ -443,7 +445,8 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
                         "loan_balance_at_audit_period_end": 42
                     },
                     "direct_or_indirect_award": {
-                        "is_direct": "Y"
+                        "is_direct": "Y",
+                        "entities": []
                     },
                     "subrecipients": {
                         "is_passed": "Y",
@@ -601,7 +604,7 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
         both_pass = award | {
             "direct_or_indirect_award": {
                 "is_direct": "N",
-                "entity": {"name": "Bob", "identifying_number": "Bob-123"}
+                "entities": [{"name": "Bob", "identifying_number": "Bob-123"}]
             }
         }
         simple_case["FederalAward"]["federal_awards"] = [both_pass]
@@ -619,7 +622,7 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
 
         only_dependent_fail = award | {
             "direct_or_indirect_award": {
-                "entity": {"name": "Bob", "identifying_number": "Bob-123"}
+                "entities": [{"name": "Bob", "identifying_number": "Bob-123"}]
             }
         }
         simple_case["FederalAward"]["federal_awards"] = [only_dependent_fail]
@@ -629,7 +632,7 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
         bad_entity_fail = award | {
             "direct_or_indirect_award": {
                 "is_direct": "N",
-                "entity": {"name": "Bob"}
+                "entities": [{"name": "Bob"}]
             }
         }
         simple_case["FederalAward"]["federal_awards"] = [bad_entity_fail]
@@ -638,7 +641,7 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
         bad_entity_empty_fail = award | {
             "direct_or_indirect_award": {
                 "is_direct": "N",
-                "entity": {"name": "Bob", "identifying_number": ""}
+                "entities": [{"name": "Bob", "identifying_number": ""}]
             }
         }
         simple_case["FederalAward"]["federal_awards"] = [bad_entity_empty_fail]
