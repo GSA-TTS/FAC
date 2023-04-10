@@ -11,43 +11,7 @@
 {% block content %}
 <div class="grid-container margin-top-6">
   <div class="grid-row grid-gap">
-    <nav class="desktop:grid-col-3 sticky-nav" aria-label="Secondary navigation">
-      <ul class="usa-sidenav margin-bottom-6">
-        <li class="usa-sidenav__item">
-          <a href="#" class="">General information</a>
-        </li>
-        <li class="usa-sidenav__item">
-          <a href="#federal-awards" class="usa-current">Federal Awards</a>
-        </li>
-        <li class="usa-sidenav__item">
-          <a href="#" class="">Notes to SEFA</a>
-        </li>
-        <li class="usa-sidenav__item">
-          <a href="#" class="">Audit information</a>
-        </li>
-        <li class="usa-sidenav__item">
-          <a href="#" class="">Audit findings</a>
-        </li>
-        <li class="usa-sidenav__item">
-          <a href="#" class="">Findings text</a>
-        </li>
-        <li class="usa-sidenav__item">
-          <a href="#" class="">CAP text</a>
-        </li>
-        <li class="usa-sidenav__item">
-          <a href="#" class="">Additional EINs</a>
-        </li>
-        <li class="usa-sidenav__item">
-          <a href="#" class="">Additional UEIs</a>
-        </li>
-        <li class="usa-sidenav__item">
-          <a href="#" class="">Secondary auditors</a>
-        </li>
-        <li class="usa-sidenav__item">
-          <a href="#" class="">Finalize</a>
-        </li>
-      </ul>
-    </nav>
+    {% include "../sidenav.html" %}
     <form class="usa-form usa-form--large" id="federal-awards" method="post">
       {% csrf_token %}
       <fieldset class="usa-fieldset">
