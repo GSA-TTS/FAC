@@ -1,10 +1,10 @@
 // Awards
-local base = import 'Base.schema.libsonnet';
+local base = import 'Base.libsonnet';
 
 // Repetative bits
 local meta_rc = { row: 'integer', column: 'integer' };
 
-local Awards = {
+local Award = {
   '$schema': 'https://json-schema.org/draft/2019-09/schema#',
   additionalProperties: true,
   metamodel_version: '1.7.0',
@@ -59,4 +59,4 @@ local Awards = {
   },
 };
 
-base.Base + Awards
+base.SchemaBase + Awards

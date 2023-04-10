@@ -1,9 +1,6 @@
 local Base = import 'Base.libsonnet';
+local Func = import 'Functions.libsonnet';
 local Types = Base.Types;
-
-local compound_type(arr) = {
-  type: std.map(function(t) t.type, arr),
-};
 
 // ██╗   ██╗ █████╗ ██╗     ██╗██████╗  █████╗ ████████╗██╗ ██████╗ ███╗   ██╗███████╗
 // ██║   ██║██╔══██╗██║     ██║██╔══██╗██╔══██╗╚══██╔══╝██║██╔═══██╗████╗  ██║██╔════╝
@@ -246,7 +243,7 @@ local Parts = {
     description: 'A loan or loan guarantee and balance',
     properties: {
       is_guaranteed: Base.Enum.YorN,
-      loan_balance_at_audit_period_end: compound_type([Types.number, Types.string]),
+      loan_balance_at_audit_period_end: Func.compound_type([Types.number, Types.string]),
     },
     required: [
       'is_guaranteed',
@@ -257,7 +254,7 @@ local Parts = {
     additionalProperties: false,
     properties: {
       is_passed: Base.Enum.YorN,
-      amount: compound_type([Types.number, Types.string]),
+      amount: Func.compound_type([Types.number, Types.string]),
     },
     allOf: Validations.SubrecipientValidations,
   },
@@ -327,7 +324,7 @@ local FederalAwardEntry = Types.object {
 local Root = Types.object {
   additionalProperties: false,
   properties: {
-    auditee_uei: compound_type([Types.string, Types.NULL]),
+    auditee_uei: Func.compound_type([Types.string, Types.NULL]),
     federal_awards: Types.array {
       items: FederalAwardEntry,
     },
