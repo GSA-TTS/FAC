@@ -10,10 +10,7 @@
 {% endblock %}
 
 {% block content%}
-<div class="grid-container">
-  <h1>Submission Form</h1>
-</div>
-<div class="grid-container">
+<div class="grid-container margin-top-6">
   <div class="grid-row grid-gap">
     <nav class="desktop:grid-col-3 sticky-nav" aria-label="Secondary navigation">
       <ul class="usa-sidenav">
@@ -607,7 +604,7 @@
       </div>
       <div class="tablet:grid-col-6">
         <dt>Report ID</dt>
-        <dd>{{ report_id | default_if_none:'' }}</dd>
+        <dd>#{{ report_id | default_if_none:'' }}</dd>
       </div>
       <div class="tablet:grid-col-6">
         <dt>UEI</dt>

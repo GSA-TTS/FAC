@@ -1,13 +1,16 @@
 import datetime
 import logging
-from django.shortcuts import render, redirect
-from django.core.exceptions import BadRequest, PermissionDenied, ValidationError
-from django.urls import reverse
-from django.views import View
-from django.contrib.auth.mixins import LoginRequiredMixin
 
-from audit.models import Access, SingleAuditChecklist
-from audit.validators import validate_general_information_json
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.exceptions import BadRequest, PermissionDenied, ValidationError
+from django.shortcuts import render, redirect
+from django.urls import reverse
+from django.utils.datastructures import MultiValueDictKeyError
+from django.views import View
+
+from audit.excel import extract_federal_awards
+from audit.models import Access, ExcelFile, SingleAuditChecklist
+from audit.validators import validate_general_information_json, validate_federal_award_json
 
 from report_submission.forms import GeneralInformationForm
 
@@ -177,3 +180,63 @@ class GeneralInformationFormView(LoginRequiredMixin, View):
             logger.info(f"ValidationError for report ID {report_id}: {e.message}")
 
         raise BadRequest()
+
+class FederalAwards(LoginRequiredMixin, View):
+    def get(self, request, *args, **kwargs):
+        report_id = kwargs["report_id"]
+
+        try:
+            sac = SingleAuditChecklist.objects.get(report_id=report_id)
+
+            # this should probably be a permission mixin
+            accesses = Access.objects.filter(sac=sac, user=request.user)
+            if not accesses:
+                raise PermissionDenied("You do not have access to this audit.")
+
+            context = {
+                "auditee_name": sac.auditee_name,
+                "report_id": report_id,
+                "auditee_uei": sac.auditee_uei,
+                "user_provided_organization_type": sac.user_provided_organization_type,
+            }
+
+            return render(request, "report_submission/federal-awards.html", context)
+        except SingleAuditChecklist.DoesNotExist:
+            raise PermissionDenied("You do not have access to this audit.")
+
+    def post(self, request, *args, **kwargs):
+        print("sample text")
+        try:
+            report_id = kwargs["report_id"]
+
+            sac = SingleAuditChecklist.objects.get(report_id=report_id)
+
+            accesses = Access.objects.filter(sac=sac, user=request.user)
+            if not accesses:
+                raise PermissionDenied("You do not have access to this audit.")
+
+            file = request.FILES["FILES"]
+
+            excel_file = ExcelFile(
+                **{"file": file, "filename": "temp", "sac_id": sac.id}
+            )
+
+            excel_file.full_clean()
+            excel_file.save()
+
+            federal_awards = extract_federal_awards(excel_file.file)
+            validate_federal_award_json(federal_awards)
+            SingleAuditChecklist.objects.filter(pk=sac.id).update(
+                federal_awards=federal_awards
+            )
+
+            return redirect("/")
+        except SingleAuditChecklist.DoesNotExist:
+            logger.warn(f"no SingleAuditChecklist found with report ID {report_id}")
+            raise PermissionDenied()
+        except ValidationError as e:
+            logger.warn(f"Federal Awards Excel upload failed validation: {e}")
+            raise BadRequest()
+        except MultiValueDictKeyError:
+            logger.warn("no file found in request")
+            raise BadRequest()
