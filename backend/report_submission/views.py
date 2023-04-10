@@ -173,7 +173,7 @@ class GeneralInformationFormView(LoginRequiredMixin, View):
                     general_information=general_information
                 )
 
-                return redirect(reverse("audit:MySubmissions"))
+                return redirect("/report_submission/federal-awards/{}".format(report_id))
         except SingleAuditChecklist.DoesNotExist:
             raise PermissionDenied("You do not have access to this audit.")
         except ValidationError as e:
@@ -204,39 +204,12 @@ class FederalAwards(LoginRequiredMixin, View):
         except SingleAuditChecklist.DoesNotExist:
             raise PermissionDenied("You do not have access to this audit.")
 
+    # Unimplemented
     def post(self, request, *args, **kwargs):
-        print("sample text")
         try:
-            report_id = kwargs["report_id"]
+            return redirect(reverse("/"))
 
-            sac = SingleAuditChecklist.objects.get(report_id=report_id)
+        except Exception as e:
+            logger.info(f"Unexpected error in FederalAwards post.")
 
-            accesses = Access.objects.filter(sac=sac, user=request.user)
-            if not accesses:
-                raise PermissionDenied("You do not have access to this audit.")
-
-            file = request.FILES["FILES"]
-
-            excel_file = ExcelFile(
-                **{"file": file, "filename": "temp", "sac_id": sac.id}
-            )
-
-            excel_file.full_clean()
-            excel_file.save()
-
-            federal_awards = extract_federal_awards(excel_file.file)
-            validate_federal_award_json(federal_awards)
-            SingleAuditChecklist.objects.filter(pk=sac.id).update(
-                federal_awards=federal_awards
-            )
-
-            return redirect("/")
-        except SingleAuditChecklist.DoesNotExist:
-            logger.warn(f"no SingleAuditChecklist found with report ID {report_id}")
-            raise PermissionDenied()
-        except ValidationError as e:
-            logger.warn(f"Federal Awards Excel upload failed validation: {e}")
-            raise BadRequest()
-        except MultiValueDictKeyError:
-            logger.warn("no file found in request")
-            raise BadRequest()
+        raise BadRequest()

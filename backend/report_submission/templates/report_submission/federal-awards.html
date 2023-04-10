@@ -1,125 +1,112 @@
 {% extends "base.html" %}
 {% load static %}
 {% block metatags %}
-    <title>{{ post.title }}</title>
-    <meta name="description" content="{{ post.meta_description }}" />
-    <meta property="og:title" content="{{ post.title }}" />
-    <meta property="og:site_name" content="Federal Audit Clearinghouse" />
-    <meta property="og:description" content="{{ post.meta_description }}" />
-    <meta property="og:type" content="website" />
+<title>{{ post.title }}</title>
+<meta name="description" content="{{ post.meta_description }}" />
+<meta property="og:title" content="{{ post.title }}" />
+<meta property="og:site_name" content="Federal Audit Clearinghouse" />
+<meta property="og:description" content="{{ post.meta_description }}" />
+<meta property="og:type" content="website" />
 {% endblock %}
 {% block content %}
-    <div class="grid-container margin-top-6">
-        <div class="grid-row grid-gap">
-            <nav class="desktop:grid-col-3 sticky-nav"
-                 aria-label="Secondary navigation">
-                <ul class="usa-sidenav">
-                    <li class="usa-sidenav__item">
-                        <a href="#" class="">General information</a>
-                    </li>
-                    <li class="usa-sidenav__item">
-                        <a href="#federal-awards" class="usa-current">Federal Awards</a>
-                    </li>
-                    <li class="usa-sidenav__item">
-                        <a href="#" class="">Notes to SEFA</a>
-                    </li>
-                    <li class="usa-sidenav__item">
-                        <a href="#" class="">Audit information</a>
-                    </li>
-                    <li class="usa-sidenav__item">
-                        <a href="#" class="">Audit findings</a>
-                    </li>
-                    <li class="usa-sidenav__item">
-                        <a href="#" class="">Findings text</a>
-                    </li>
-                    <li class="usa-sidenav__item">
-                        <a href="#" class="">CAP text</a>
-                    </li>
-                    <li class="usa-sidenav__item">
-                        <a href="#" class="">Additional EINs</a>
-                    </li>
-                    <li class="usa-sidenav__item">
-                        <a href="#" class="">Additional UEIs</a>
-                    </li>
-                    <li class="usa-sidenav__item">
-                        <a href="#" class="">Secondary auditors</a>
-                    </li>
-                    <li class="usa-sidenav__item">
-                        <a href="#" class="">Finalize</a>
-                    </li>
-                </ul>
-            </nav>
-            <form class="usa-form usa-form--large"
-                  id="federal-awards"
-                  method="post">
-                {% csrf_token %}
-                <fieldset class="usa-fieldset">
-                    <legend class="usa-legend usa-legend--large" id="federal-awards">
-                        Federal awards
-                    </legend>
-                    <p>Enter the federal awards you recieved in the last audit year using the provided worksheet.</p>
-                    <ol class="usa-process-list connector-color-black">
-                        <li class="usa-process-list__item">
-                            <h4 class="usa-process-list__heading">Download worksheet</h4>
-                            <p class="">
-                                This worksheet is a spreadsheet file (XLSX).
-                                <a href="javascript:void(0);" class="usa-button usa-button--outline">Download worksheet</a>
-                            </p>
-                        </li>
-                        <li class="usa-process-list__item">
-                            <h4 class="usa-process-list__heading">Upload completed worksheet</h4>
-                            <p>Save your completed worksheet as an XLSX file and upload it below.</p>
-                            <div class="usa-form-group">
-                                    <input id="file-input-federal-awards-xlsx"
-                                           class="usa-file-input"
-                                           type="file"
-                                           name="file-input-federal-awards-xlsx"
-                                           aria-describedby="file-input-federal-awards-xlsx"
-                                           accept=".xlsx"/>
-                            </div>
-                        </ol>
-                        <button class="usa-button" id="continue" disabled="disabled">Save and continue to next section</button>
-                    </fieldset>
-                </form>
-            </div>
+<div class="grid-container margin-top-6">
+  <div class="grid-row grid-gap">
+    <nav class="desktop:grid-col-3 sticky-nav" aria-label="Secondary navigation">
+      <ul class="usa-sidenav margin-bottom-6">
+        <li class="usa-sidenav__item">
+          <a href="#" class="">General information</a>
+        </li>
+        <li class="usa-sidenav__item">
+          <a href="#federal-awards" class="usa-current">Federal Awards</a>
+        </li>
+        <li class="usa-sidenav__item">
+          <a href="#" class="">Notes to SEFA</a>
+        </li>
+        <li class="usa-sidenav__item">
+          <a href="#" class="">Audit information</a>
+        </li>
+        <li class="usa-sidenav__item">
+          <a href="#" class="">Audit findings</a>
+        </li>
+        <li class="usa-sidenav__item">
+          <a href="#" class="">Findings text</a>
+        </li>
+        <li class="usa-sidenav__item">
+          <a href="#" class="">CAP text</a>
+        </li>
+        <li class="usa-sidenav__item">
+          <a href="#" class="">Additional EINs</a>
+        </li>
+        <li class="usa-sidenav__item">
+          <a href="#" class="">Additional UEIs</a>
+        </li>
+        <li class="usa-sidenav__item">
+          <a href="#" class="">Secondary auditors</a>
+        </li>
+        <li class="usa-sidenav__item">
+          <a href="#" class="">Finalize</a>
+        </li>
+      </ul>
+    </nav>
+    <form class="usa-form usa-form--large" id="federal-awards" method="post">
+      {% csrf_token %}
+      <fieldset class="usa-fieldset">
+        <legend class="usa-legend usa-legend--large" id="federal-awards">
+          Federal awards
+        </legend>
+        <p>Enter the federal awards you recieved in the last audit year using the provided worksheet.</p>
+        <h4 class="usa-process-list__heading">Upload completed worksheet</h4>
+        <p>Save your completed worksheet as an XLSX file and upload it below.</p>
+        <div class="usa-form-group">
+          <input id="file-input-federal-awards-xlsx" class="usa-file-input" type="file"
+            name="file-input-federal-awards-xlsx" aria-describedby="file-input-federal-awards-xlsx" accept=".xlsx" />
         </div>
-        <div class="audit-metadata">
-            <div class="grid-container">
-                <dl class="grid-row grid-gap">
-                    <div class="tablet:grid-col-6">
-                        <dt>
-                            Entity name
-                        </dt>
-                        <dd>
-                            {{ auditee_name | default_if_none:'' }}
-                        </dd>
-                    </div>
-                    <div class="tablet:grid-col-6">
-                        <dt>
-                            Report ID
-                        </dt>
-                        <dd>
-                            #{{ report_id | default_if_none:'' }}
-                        </dd>
-                    </div>
-                    <div class="tablet:grid-col-6">
-                        <dt>
-                            UEI
-                        </dt>
-                        <dd>
-                            {{ auditee_uei | default_if_none:'' }}
-                        </dd>
-                    </div>
-                    <div class="tablet:grid-col-6">
-                        <dt>
-                            Type of entity
-                        </dt>
-                        <dd>
-                            {{ user_provided_organization_type | default_if_none:'' }}
-                        </dd>
-                    </div>
-                </dl>
-            </div>
-        </div>
-        <script src="{% static 'compiled/js/federal-awards.js' %}"></script>
-    {% endblock content %}
+        <button class="usa-button" id="continue" disabled="disabled">Save and continue to next section</button>
+      </fieldset>
+    </form>
+
+
+  </div>
+</div>
+
+<div class="audit-metadata">
+  <div class="grid-container">
+    <dl class="grid-row grid-gap">
+      <div class="tablet:grid-col-6">
+        <dt>
+          Entity name
+        </dt>
+        <dd>
+          {{ auditee_name | default_if_none:'' }}
+        </dd>
+      </div>
+      <div class="tablet:grid-col-6">
+        <dt>
+          Report ID
+        </dt>
+        <dd>
+          <!-- Adding the 'json_script' alias allows this variable to be accessed by its alias in javascript. -->
+          #{{ report_id | default_if_none:'' | json_script:'sac_id' }}
+        </dd>
+      </div>
+      <div class="tablet:grid-col-6">
+        <dt>
+          UEI
+        </dt>
+        <dd>
+          {{ auditee_uei | default_if_none:'' }}
+        </dd>
+      </div>
+      <div class="tablet:grid-col-6">
+        <dt>
+          Type of entity
+        </dt>
+        <dd>
+          {{ user_provided_organization_type | default_if_none:'' }}
+        </dd>
+      </div>
+    </dl>
+  </div>
+</div>
+<script src="{% static 'compiled/js/federal-awards.js' %}"></script>
+{% endblock content %}
