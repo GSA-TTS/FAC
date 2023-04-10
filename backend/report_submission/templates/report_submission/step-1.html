@@ -84,14 +84,18 @@
                                type="radio"
                                aria-required="true"
                                required/>
-                        <label class="usa-radio__label" for="entity-none">None of the these (for example, for-profit)</label>
+                        <label class="usa-radio__label" for="entity-none">
+                            None of the these (for example,
+                            for-profit)
+                        </label>
                         <span class="usa-error-message">We only accept submissions from state and local governments, Indian
                         tribes or tribal organizations, institutions of higher education (IHEs), and nonprofits.</span>
                     </div>
                 </fieldset>
                 <fieldset class="usa-fieldset question">
                     <legend class="usa-legend">
-                        Did this entity spend $750,000 or more in federal awards during its audit period in accordance with Uniform
+                        Did this entity spend $750,000 or more in federal awards during its audit period in accordance with
+                        Uniform
                         Guidance?
                         <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
                     </legend>
@@ -148,9 +152,7 @@
                     </div>
                 </fieldset>
                 <ul class="usa-button-group">
-                    <li class="usa-button-group__item">
-                        <a href="javascript:void(0);" class="usa-button usa-button--outline">Cancel</a>
-                    </li>
+                    <li class="usa-button-group__item">{% include "../cancel-button.html" %}</li>
                     <li class="usa-button-group__item">
                         <button class="usa-button" id="continue">Continue</button>
                     </li>
