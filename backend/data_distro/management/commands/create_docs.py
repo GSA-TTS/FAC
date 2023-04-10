@@ -91,7 +91,7 @@ def create_sql_comments(distro_classes, definations):
         "FindingText": "api.vw_findings_text",
         "General": "api.vw_general",
         "Note": "api.vw_note",
-        "Pass-though": "api.vw_passthrough",
+        "Passthrough": "api.vw_passthrough",
         "Revision": "api.vw_revision",
     }
 
@@ -131,6 +131,7 @@ def create_sql_comments(distro_classes, definations):
                             str(define_txt["Data Source"]),
                         ]
                     )
+                # add def to table
                 conn = connection(conn_string)
                 conn.autocommit = True
                 with conn.cursor() as curs:
@@ -144,3 +145,17 @@ def create_sql_comments(distro_classes, definations):
                         ),
                         (full_defination,),
                     )
+                # add def to view
+                if model_name in api_views:
+                    view = api_views[model_name]
+                    conn = connection(conn_string)
+                    conn.autocommit = True
+                    with conn.cursor() as curs:
+                        curs.execute(
+                            # These should be safe strings, but I am going to treat them with caution anyway.
+                            sql.SQL("COMMENT ON COLUMN {}.{} is %s;").format(
+                                sql.SQL(view),
+                                sql.Identifier(define_txt["Field name"]),
+                            ),
+                            (full_defination,),
+                        )
