@@ -11,7 +11,7 @@ local FindingsTextEntry = {
     },
 };
 
-local Root = Types.object {
+local FindingsText = Types.object {
   additionalProperties: false,
   properties: {
     auditee_uei: Func.compound_type([Types.string, Types.NULL]),
@@ -24,10 +24,10 @@ local Root = Types.object {
   version: 20230408,
 };
 
-local FederalAward = Types.object {
+local Root = Types.object {
   additionalProperties: false,
   properties: {
-    FindingsText: Root,
+    FindingsText: FindingsText,
   },
   version: 20230408,
 };
