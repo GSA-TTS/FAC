@@ -1,0 +1,41 @@
+{
+   "$schema": "https://json-schema.org/draft/2019-09/schema#",
+   "additionalProperties": false,
+   "metamodel_version": "1.7.0",
+   "properties": {
+      "auditee_uei": {
+         "type": [
+            "string",
+            "null"
+         ]
+      },
+      "entries": {
+         "items": {
+            "additionalProperties": false,
+            "properties": {
+               "contains_chart_or_table": {
+                  "enum": [
+                     "Y",
+                     "N"
+                  ],
+                  "type": "string"
+               },
+               "reference_number": {
+                  "type": "string"
+               },
+               "text_of_finding": {
+                  "type": "string"
+               }
+            }
+         },
+         "type": "array"
+      }
+   },
+   "required": [
+      "auditee_uei",
+      "findings_text_entries"
+   ],
+   "title": "FindingsText",
+   "type": "object",
+   "version": 20230408
+}
