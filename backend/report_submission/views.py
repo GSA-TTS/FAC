@@ -210,6 +210,6 @@ class FederalAwards(LoginRequiredMixin, View):
             return redirect(reverse("/"))
 
         except Exception as e:
-            logger.info(f"Unexpected error in FederalAwards post.")
+            logger.info("Unexpected error in FederalAwards post.\n", e)
 
         raise BadRequest()
