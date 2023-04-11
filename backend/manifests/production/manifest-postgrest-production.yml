@@ -1,0 +1,15 @@
+---
+applications:
+  - name: postgrest
+    instances: 2
+    disk_quota: 256M
+    memory: 128M
+    timeout: 180
+    docker:
+      image: postgrest/postgrest:v10.1.2
+    routes:
+      - route: fac-prod-postgrest.app.cloud.gov
+    env:
+      PGRST_DB_URI: ((DB_URI))
+      PGRST_DB_SCHEMAS: api
+      PGRST_DB_ANON_ROLE: anon

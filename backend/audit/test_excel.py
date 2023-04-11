@@ -12,49 +12,11 @@ from audit.excel import (
     federal_awards_column_mapping,
 )
 from audit.validators import validate_federal_award_json
+from audit.fixtures.excel import FEDERAL_AWARDS_TEMPLATE, FEDERAL_AWARDS_ENTRY_FIXTURES
 
 # Simplest way to create a new copy of simple case rather than getting
 # references to things used by other tests:
 jsoncopy = lambda v: json.loads(json.dumps(v))
-
-FEDERAL_AWARDS_TEMPLATE = "excel_templates/FederalAwardsExpendedTemplateUG2019.xlsx"
-
-FEDERAL_AWARDS_ENTRY_FIXTURES = [
-    {
-        "amount_expended": 100,
-        "cluster_name": "N/A",
-        "direct_award": "N",
-        "direct_award_pass_through_entity_name": "A|B",
-        "direct_award_pass_through_entity_id": "1|2",
-        "federal_award_passed_to_subrecipients": "N",
-        "federal_award_passed_to_subrecipients_amount": 0,
-        "federal_program_name": "program name",
-        "loan_balance_at_audit_period_end": 0,
-        "loan_or_loan_guarantee": "N",
-        "major_program": "Y",
-        "major_program_audit_report_type": "U",
-        "number_of_audit_findings": 0,
-        "program_number": "10.001",
-        "state_cluster_name": "",
-    },
-    {
-        "amount_expended": 100,
-        "cluster_name": "N/A",
-        "direct_award": "N",
-        "direct_award_pass_through_entity_name": "C|D",
-        "direct_award_pass_through_entity_id": "3|4",
-        "federal_award_passed_to_subrecipients": "N",
-        "federal_award_passed_to_subrecipients_amount": 0,
-        "federal_program_name": "program name",
-        "loan_balance_at_audit_period_end": 0,
-        "loan_or_loan_guarantee": "N",
-        "major_program": "Y",
-        "major_program_audit_report_type": "U",
-        "number_of_audit_findings": 0,
-        "program_number": "10.002",
-        "state_cluster_name": "",
-    },
-]
 
 
 def _set_by_name(workbook, name, value, row_offset=0):

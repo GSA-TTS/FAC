@@ -3,20 +3,7 @@ local Func = import 'Functions.libsonnet';
 local Types = Base.Types;
 
 local Validations = {
-  PassThroughEntity: Types.object {
-    properties: {
-      name: Types.string,
-      // 20230409 MCJ FIXME: Should the identifying number have a regex?
-      identifying_number: Types.string {
-        minLength: 1,
-      },
-    },
-    required: [
-      'name',
-      'identifying_number',
-    ],
-    title: 'PassThroughEntity',
-  },
+  
   DirectAwardValidations: [
     {
       'if': {
@@ -28,7 +15,7 @@ local Validations = {
       },
       'then': {
         properties: {
-          entity: Base.Enum.EmptyString_EmptyArray_Null,
+          entities: Base.Enum.EmptyString_EmptyArray_Null,
         },
       },
     },
@@ -42,14 +29,11 @@ local Validations = {
       },
       'then': {
         required: [
-          'entity',
+          'entities',
         ],
-        properties: {
-          entity: Validations.PassThroughEntity,
-        },
       },
     },
-  ],
+      ],
   LoanOrLoanGuaranteeValidations: [
     {
       'if': {
@@ -213,13 +197,26 @@ local Parts = {
     name: Base.Compound.ClusterName,
     total: Types.number,
   },
+  PassThroughEntity: Types.object {
+    additionalProperties: false,
+    properties: {
+      name: Types.string,
+      identifying_number: {
+        type: 'string',
+        minLength: 1,
+      },
+    },
+    required: ['name', 'identifying_number']
+  },
   DirectOrIndirectAward: Types.object {
     // 20230409 MCJ FIXME: I think this needs the amount...
     additionalProperties: false,
     description: 'If direct_award is N, the form must include a list of the pass-through entity by name and identifying number',
     properties: {
       is_direct: Base.Enum.YorN,
-      entity: Types.object,
+      entities: Types.array {
+        items: Parts.PassThroughEntity,
+      },
     },
     allOf: Validations.DirectAwardValidations,
   },
@@ -262,7 +259,11 @@ local Parts = {
       is_cluster: Base.Enum.YorN,
       name: Types.string,
     },
-    required: ['is_cluster', 'name'],
+    // 20230410 MCJ FIXME: A side-effect of not requiring a 
+    // value in every cell of the sheet is "is_cluster" can be
+    // empty. Or, we don't have a named range for it. Either way,
+    // something we should fix.
+    required: ['name'],
     allOf: Validations.StateClusterValidations,
   },
 };
@@ -292,10 +293,10 @@ local FederalAwardEntry = Types.object {
   title: 'FederalAwardEntry',
 };
 
-local FederalAward = Types.object {
+local FederalAwards = Types.object {
   additionalProperties: false,
   properties: {
-    auditee_uei: Func.compound_type([Types.string, Types.NULL]),
+    auditee_ein: Func.compound_type([Types.string, Types.NULL]),
     federal_awards: Types.array {
       items: FederalAwardEntry,
     },
@@ -303,7 +304,7 @@ local FederalAward = Types.object {
       minimum: 0,
     },
   },
-  required: ['auditee_uei', 'total_amount_expended', 'federal_awards'],
+  required: ['auditee_ein', 'total_amount_expended'],
   title: 'FederalAward',
   version: 20230408,
 };
@@ -311,7 +312,7 @@ local FederalAward = Types.object {
 local Root = Types.object {
   additionalProperties: false,
   properties: {
-    FederalAward: FederalAward,
+    FederalAwards: FederalAwards,
   },
   version: 20230408,
 };

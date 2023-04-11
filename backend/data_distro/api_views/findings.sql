@@ -50,3 +50,7 @@ left join gen on gen.findingtext_id=findings_text.id
 ;
 
 commit;
+
+notify pgrst,
+       'reload schema';
+
