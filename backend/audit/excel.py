@@ -3,9 +3,6 @@ from openpyxl import load_workbook, Workbook
 from openpyxl.cell import Cell
 import pydash
 
-def _get_by_path(target_obj, target_path, default=False):
-    pydash.get_(target_obj, target_path, default=default)
-
 def _set_by_path(target_obj, target_path, value):
     """Set a (potentially nested) field in target_obj using JSONPath-esque dot notation, e.g. parent.child[0].field"""
     pydash.set_(target_obj, target_path, value)
