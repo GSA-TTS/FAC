@@ -171,7 +171,9 @@ class GeneralInformationFormView(LoginRequiredMixin, View):
                     general_information=general_information
                 )
 
-                return redirect("/report_submission/federal-awards/{}".format(report_id))
+                return redirect(
+                    "/report_submission/federal-awards/{}".format(report_id)
+                )
         except SingleAuditChecklist.DoesNotExist:
             raise PermissionDenied("You do not have access to this audit.")
         except ValidationError as e:
