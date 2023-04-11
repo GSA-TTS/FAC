@@ -179,6 +179,7 @@ class GeneralInformationFormView(LoginRequiredMixin, View):
 
         raise BadRequest()
 
+
 class FederalAwards(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         report_id = kwargs["report_id"]
