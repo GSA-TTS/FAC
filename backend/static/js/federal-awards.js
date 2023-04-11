@@ -1,4 +1,3 @@
-const FORM = document.forms[0];
 const fileupload = document.getElementById('file-input-federal-awards-xlsx');
 
 function setFormEnabled(shouldEnable) {
