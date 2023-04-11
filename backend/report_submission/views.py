@@ -7,7 +7,6 @@ from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.views import View
 
-from audit.excel import extract_federal_awards
 from audit.models import Access, SingleAuditChecklist
 from audit.validators import validate_general_information_json
 
