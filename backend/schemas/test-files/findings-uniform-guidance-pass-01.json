@@ -1,0 +1,45 @@
+{
+    "FindingsUniformGuidance": {
+        "auditee_uei": null,
+           "findings_uniform_guidance_entries": [
+            {
+                "program": {
+                    "compliance_requirement": ["A", "B", "C"],
+                    "name": "PROGRAM_NAME",
+                    "number": "42.123"
+                },
+                "questioned_costs": "N",
+                "significiant_deficiency": "N",
+                "other_matters": "N",
+                "other_findings": "N",
+                "modified_opinion": "N",
+                "material_weakness": "N",
+                "findings": {
+                    "is_valid": "Y",
+                    "repeat_prior_reference": "Y",
+                    "prior_references": ["2020-001", "2021-002"],
+                    "reference": "2022-003"
+                }
+            },
+            {
+                "program": {
+                    "compliance_requirement": ["E"],
+                    "name": "PROGRAM_NAME",
+                    "number": "24.321"
+                },
+                "questioned_costs": "Y",
+                "significiant_deficiency": "N",
+                "other_matters": "N",
+                "other_findings": "N",
+                "modified_opinion": "N",
+                "material_weakness": "N",
+                "findings": {
+                    "is_valid": "N",
+                    "repeat_prior_reference": "Y",
+                    "prior_references": ["2022-033"],
+                    "reference": "2023-001"
+                }
+            }            
+        ]
+    }
+}
