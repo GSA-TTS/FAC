@@ -3,10 +3,10 @@
    "additionalProperties": false,
    "metamodel_version": "1.7.0",
    "properties": {
-      "FederalAward": {
+      "FederalAwards": {
          "additionalProperties": false,
          "properties": {
-            "auditee_uei": {
+            "auditee_ein": {
                "type": [
                   "string",
                   "null"
@@ -380,7 +380,6 @@
                            }
                         },
                         "required": [
-                           "is_cluster",
                            "name"
                         ],
                         "type": "object"
@@ -467,9 +466,8 @@
             }
          },
          "required": [
-            "auditee_uei",
-            "total_amount_expended",
-            "federal_awards"
+            "auditee_ein",
+            "total_amount_expended"
          ],
          "title": "FederalAward",
          "type": "object",

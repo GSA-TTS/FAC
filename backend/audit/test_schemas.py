@@ -364,7 +364,7 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
     )
 
     # SIMPLE_CASE = {
-    #     "FederalAward": {
+    #     "FederalAwards": {
     #         "auditee_ein": "12345678",
     #         "total_amount_expended": 0,
     #         "federal_awards": [
@@ -384,8 +384,8 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
     # }
 
     SIMPLE_CASE = {
-        "FederalAward": {
-            "auditee_uei": None,
+        "FederalAwards": {
+            "auditee_ein": None,
             "total_amount_expended": 12345,
             "federal_awards": [
                 {
@@ -427,8 +427,8 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
     }
 
     M1 = {
-        "FederalAward": {
-            "auditee_uei": None,
+        "FederalAwards": {
+            "auditee_ein": None,
             "total_amount_expended": 12345,
             "federal_awards": [
                 {
@@ -485,14 +485,14 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
 
         validate(self.SIMPLE_CASE, schema)
 
-    def test_missing_auditee_uei(self):
+    def test_missing_auditee_ein(self):
         """
-        Test that validation fails if auditee_uei is missing
+        Test that validation fails if auditee_ein is missing
         """
         schema = self.FEDERAL_AWARDS_SCHEMA
 
         simple_case = jsoncopy(self.SIMPLE_CASE)
-        del simple_case["FederalAward"]["auditee_uei"]
+        del simple_case["FederalAwards"]["auditee_ein"]
 
         self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
@@ -503,7 +503,7 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
         schema = self.FEDERAL_AWARDS_SCHEMA
 
         simple_case = jsoncopy(self.SIMPLE_CASE)
-        del simple_case["FederalAward"]["total_amount_expended"]
+        del simple_case["FederalAwards"]["total_amount_expended"]
 
         self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
@@ -516,7 +516,7 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
 
         simple_case = jsoncopy(self.SIMPLE_CASE)
 
-        simple_case["FederalAward"]["federal_awards"][0][
+        simple_case["FederalAwards"]["federal_awards"][0][
             "loan_balance_at_audit_period_end"
         ] = 10_000
         self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
@@ -528,7 +528,7 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
         schema = self.FEDERAL_AWARDS_SCHEMA
 
         simple_case = jsoncopy(self.M1)
-        award = jsoncopy(simple_case["FederalAward"]["federal_awards"][0])
+        award = jsoncopy(simple_case["FederalAwards"]["federal_awards"][0])
 
         both_int_pass = award | {
             "loan_or_loan_guarantee": {
@@ -536,7 +536,7 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
                 "loan_balance_at_audit_period_end": 10_000
             }
         }
-        simple_case["FederalAward"]["federal_awards"] = [both_int_pass]
+        simple_case["FederalAwards"]["federal_awards"] = [both_int_pass]
 
         validate(simple_case, schema)
 
@@ -547,7 +547,7 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
                     "loan_balance_at_audit_period_end": valid
                 }
             }
-            simple_case["FederalAward"]["federal_awards"] = [both_na_pass]
+            simple_case["FederalAwards"]["federal_awards"] = [both_na_pass]
 
             validate(simple_case, schema)
 
@@ -556,7 +556,7 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
                 "is_guaranteed": "Y"
             }
         }
-        simple_case["FederalAward"]["federal_awards"] = [no_dependent_fail]
+        simple_case["FederalAwards"]["federal_awards"] = [no_dependent_fail]
 
         self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
@@ -565,7 +565,7 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
                 "loan_balance_at_audit_period_end": 10_000
             }
         }
-        simple_case["FederalAward"]["federal_awards"] = [only_dependent_fail]
+        simple_case["FederalAwards"]["federal_awards"] = [only_dependent_fail]
 
         self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
@@ -575,7 +575,7 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
                 "loan_balance_at_audit_period_end": "not applicable"
             }
         }
-        simple_case["FederalAward"]["federal_awards"] = [bad_value_fail]
+        simple_case["FederalAwards"]["federal_awards"] = [bad_value_fail]
 
         self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
@@ -585,7 +585,7 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
                 "loan_balance_at_audit_period_end": 0
             }
         }
-        simple_case["FederalAward"]["federal_awards"] = [zero_value_fail]
+        simple_case["FederalAwards"]["federal_awards"] = [zero_value_fail]
 
         self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
@@ -596,7 +596,7 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
         schema = self.FEDERAL_AWARDS_SCHEMA
 
         simple_case = jsoncopy(self.SIMPLE_CASE)
-        award = jsoncopy(simple_case["FederalAward"]["federal_awards"][0])
+        award = jsoncopy(simple_case["FederalAwards"]["federal_awards"][0])
 
         # 20230408 MCJ
         # In Python, the `|` is a dictionary union operator. Python 3.9
@@ -607,7 +607,7 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
                 "entities": [{"name": "Bob", "identifying_number": "Bob-123"}]
             }
         }
-        simple_case["FederalAward"]["federal_awards"] = [both_pass]
+        simple_case["FederalAwards"]["federal_awards"] = [both_pass]
 
         validate(simple_case, schema)
 
@@ -616,7 +616,7 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
                 "is_direct": "N"
             }
         }
-        simple_case["FederalAward"]["federal_awards"] = [no_dependent_fail]
+        simple_case["FederalAwards"]["federal_awards"] = [no_dependent_fail]
 
         self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
@@ -625,7 +625,7 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
                 "entities": [{"name": "Bob", "identifying_number": "Bob-123"}]
             }
         }
-        simple_case["FederalAward"]["federal_awards"] = [only_dependent_fail]
+        simple_case["FederalAwards"]["federal_awards"] = [only_dependent_fail]
 
         self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
@@ -635,7 +635,7 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
                 "entities": [{"name": "Bob"}]
             }
         }
-        simple_case["FederalAward"]["federal_awards"] = [bad_entity_fail]
+        simple_case["FederalAwards"]["federal_awards"] = [bad_entity_fail]
         self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
         bad_entity_empty_fail = award | {
@@ -644,7 +644,7 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
                 "entities": [{"name": "Bob", "identifying_number": ""}]
             }
         }
-        simple_case["FederalAward"]["federal_awards"] = [bad_entity_empty_fail]
+        simple_case["FederalAwards"]["federal_awards"] = [bad_entity_empty_fail]
         self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
     def test_passthrough_dependents(self):
@@ -655,7 +655,7 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
         schema = self.FEDERAL_AWARDS_SCHEMA
 
         simple_case = jsoncopy(self.SIMPLE_CASE)
-        award = jsoncopy(simple_case["FederalAward"]["federal_awards"][0])
+        award = jsoncopy(simple_case["FederalAwards"]["federal_awards"][0])
 
         both_pass = award | {
             "subrecipients": {
@@ -663,7 +663,7 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
                 "amount": 10_000
             }
         }
-        simple_case["FederalAward"]["federal_awards"] = [both_pass]
+        simple_case["FederalAwards"]["federal_awards"] = [both_pass]
 
         validate(simple_case, schema)
 
@@ -672,7 +672,7 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
                 "is_passed": "Y"
             }
         }
-        simple_case["FederalAward"]["federal_awards"] = [no_dependent_fail]
+        simple_case["FederalAwards"]["federal_awards"] = [no_dependent_fail]
 
         self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
@@ -681,7 +681,7 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
                 "amount": 10_000
             }
         }
-        simple_case["FederalAward"]["federal_awards"] = [only_dependent_fail]
+        simple_case["FederalAwards"]["federal_awards"] = [only_dependent_fail]
 
         self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
@@ -692,7 +692,7 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
         schema = self.FEDERAL_AWARDS_SCHEMA
 
         simple_case = jsoncopy(self.SIMPLE_CASE)
-        award = jsoncopy(simple_case["FederalAward"]["federal_awards"][0])
+        award = jsoncopy(simple_case["FederalAwards"]["federal_awards"][0])
 
         both_pass = award | {
             "program": {
@@ -704,7 +704,7 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
                     "amount_expended": 42            
                 }
             }
-        simple_case["FederalAward"]["federal_awards"] = [both_pass]
+        simple_case["FederalAwards"]["federal_awards"] = [both_pass]
 
         validate(simple_case, schema)
 
@@ -718,21 +718,21 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
                     "amount_expended": 42        
                 }
             }
-        simple_case["FederalAward"]["federal_awards"] = [invalid_fail]
+        simple_case["FederalAwards"]["federal_awards"] = [invalid_fail]
 
         self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
         no_dependent_fail = award | {
                     "is_major": "Y"
             }
-        simple_case["FederalAward"]["federal_awards"] = [no_dependent_fail]
+        simple_case["FederalAwards"]["federal_awards"] = [no_dependent_fail]
 
         self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
         only_dependent_fail = award |{
                     "audit_report_type": "U",
             }
-        simple_case["FederalAward"]["federal_awards"] = [only_dependent_fail]
+        simple_case["FederalAwards"]["federal_awards"] = [only_dependent_fail]
 
         self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
@@ -744,7 +744,7 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
 
         simple_case = jsoncopy(self.SIMPLE_CASE)
         # Lacks a cluster name if "is_cluster" is Y
-        simple_case["FederalAward"]["federal_awards"][0]["state_cluster"] = {
+        simple_case["FederalAwards"]["federal_awards"][0]["state_cluster"] = {
             "is_cluster": "Y"
         }
         self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
@@ -756,7 +756,7 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
         schema = self.FEDERAL_AWARDS_SCHEMA
 
         simple_case = jsoncopy(self.SIMPLE_CASE)
-        simple_case["FederalAward"]["federal_awards"][0]["state_cluster"] = {
+        simple_case["FederalAwards"]["federal_awards"][0]["state_cluster"] = {
             "is_cluster": "N",
             "name": "not valid as a N response"
         }
@@ -765,7 +765,7 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
         # Test "N" valid responses
         for valid in ["", 'null']:
             simple_case = jsoncopy(self.SIMPLE_CASE)
-            simple_case["FederalAward"]["federal_awards"][0]["state_cluster"] = {
+            simple_case["FederalAwards"]["federal_awards"][0]["state_cluster"] = {
                 "is_cluster": "N",
                 "name": valid
             }
@@ -778,34 +778,34 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
         schema = self.FEDERAL_AWARDS_SCHEMA
 
         simple_case = jsoncopy(self.SIMPLE_CASE)
-        simple_case["FederalAward"]["federal_awards"][0]["program"]["is_major"] = "Y"
+        simple_case["FederalAwards"]["federal_awards"][0]["program"]["is_major"] = "Y"
 
         for report_type in ["A", "Q"]:
             # major_audit_report_type of A or Q requires non-zero number_of_audit_findings
-            simple_case["FederalAward"]["federal_awards"][0]["program"][
+            simple_case["FederalAwards"]["federal_awards"][0]["program"][
                 "audit_report_type"
             ] = report_type
-            simple_case["FederalAward"]["federal_awards"][0]["program"][
+            simple_case["FederalAwards"]["federal_awards"][0]["program"][
                 "number_of_audit_findings"
             ] = 0
             self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
-            simple_case["FederalAward"]["federal_awards"][0]["program"][
+            simple_case["FederalAwards"]["federal_awards"][0]["program"][
                 "number_of_audit_findings"
             ] = 1
             validate(simple_case, schema)
 
         for report_type in ["U", "D"]:
             # major_audit_report_type of U or D requires zero number_of_audit_findings
-            simple_case["FederalAward"]["federal_awards"][0]["program"][
+            simple_case["FederalAwards"]["federal_awards"][0]["program"][
                 "audit_report_type"
             ] = report_type
-            simple_case["FederalAward"]["federal_awards"][0]["program"][
+            simple_case["FederalAwards"]["federal_awards"][0]["program"][
                 "number_of_audit_findings"
             ] = 0
             validate(simple_case, schema)
 
-            simple_case["FederalAward"]["federal_awards"][0]["program"][
+            simple_case["FederalAwards"]["federal_awards"][0]["program"][
                 "number_of_audit_findings"
             ] = 1
             self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
