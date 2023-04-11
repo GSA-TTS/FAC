@@ -6,7 +6,7 @@
       "FindingsUniformGuidance": {
          "additionalProperties": false,
          "properties": {
-            "auditee_uei": {
+            "auditee_ein": {
                "type": [
                   "string",
                   "null"
@@ -385,7 +385,7 @@
             }
          },
          "required": [
-            "auditee_uei",
+            "auditee_ein",
             "findings_uniform_guidance_entries"
          ],
          "title": "FindingsUniformGuidance",

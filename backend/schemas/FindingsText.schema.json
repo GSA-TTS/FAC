@@ -6,11 +6,8 @@
       "FindingsText": {
          "additionalProperties": false,
          "properties": {
-            "auditee_uei": {
-               "type": [
-                  "string",
-                  "null"
-               ]
+            "auditee_ein": {
+               "type": "string"
             },
             "findings_text_entries": {
                "items": {
@@ -31,11 +28,12 @@
                      }
                   }
                },
+               "minItems": 0,
                "type": "array"
             }
          },
          "required": [
-            "auditee_uei",
+            "auditee_ein",
             "findings_text_entries"
          ],
          "title": "FindingsText",

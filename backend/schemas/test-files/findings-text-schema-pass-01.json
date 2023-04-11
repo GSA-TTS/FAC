@@ -1,6 +1,6 @@
 {
     "FindingsText": {
-        "auditee_uei": "ANY",
+        "auditee_ein": "ANY",
         "findings_text_entries": [
             {
                 "contains_chart_or_table": "N",

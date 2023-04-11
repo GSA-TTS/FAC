@@ -1,6 +1,6 @@
 {
     "CorrectiveActionPlan": {
-        "auditee_uei": null,
+        "auditee_ein": null,
         "corrective_action_plan_entries": [
             {
                 "contains_chart_or_table": "N",

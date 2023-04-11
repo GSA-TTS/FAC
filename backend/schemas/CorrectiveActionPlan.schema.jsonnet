@@ -14,12 +14,12 @@ local CorrectiveActionPlanEntry = {
 local CorrectiveActionPlan = Types.object {
   additionalProperties: false,
   properties: {
-    auditee_uei: Func.compound_type([Types.string, Types.NULL]),
+    auditee_ein: Func.compound_type([Types.string, Types.NULL]),
     corrective_action_plan_entries: Types.array {
       items: CorrectiveActionPlanEntry,
     },
   },
-  required: ['auditee_uei', 'corrective_action_plan_entries'],
+  required: ['auditee_ein', 'corrective_action_plan_entries'],
   title: 'CorrectiveActionPlan',
   version: 20230410,
 };

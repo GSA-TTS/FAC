@@ -6,7 +6,7 @@
       "CorrectiveActionPlan": {
          "additionalProperties": false,
          "properties": {
-            "auditee_uei": {
+            "auditee_ein": {
                "type": [
                   "string",
                   "null"
@@ -35,7 +35,7 @@
             }
          },
          "required": [
-            "auditee_uei",
+            "auditee_ein",
             "corrective_action_plan_entries"
          ],
          "title": "CorrectiveActionPlan",
