@@ -1,15 +1,21 @@
 local Base = import 'Base.libsonnet';
 local Func = import 'Functions.libsonnet';
+local Additional = import 'FindingsUniformGuidance.validation.libsonnet';
 local Types = Base.Types;
-
+local Validations = Additional.Validations; 
 
 local Parts = {
-   Program: Types.object {
+  ReferenceNumber: Types.string {
+    title: 'ReferenceNumber',
+    description: 'Reference Number',
+    pattern: '^20[2-9]{1}[0-9]{1}-[0-9]{3}$',
+  },
+  Program: Types.object {
     additionalProperties: false,
     properties: {
       name: Types.string,
-      number: Types.string,
-      compliance_requirement:  Types.array {
+      number: Base.Compound.ProgramNumber,
+      compliance_requirement:Types.array {
         description: 'Compliance requirement',
         contains: {
           enum: [
@@ -34,16 +40,20 @@ local Parts = {
       'compliance_requirement'
     ],
   },
-  Findings:Types.object { 
-    reference: Types.string,
-    is_valid: Base.Enum.YorN,
-    repeat_prior_reference: Base.Enum.YorN,
-    prior_references: Types.array {
-      items: Types.string,
-    },
+  Findings:Types.object {
+    additionalProperties: false,
+    properties: {
+      reference: Parts.ReferenceNumber,
+      is_valid: Base.Enum.YorN,
+      repeat_prior_reference: Base.Enum.YorN,
+      prior_references: Types.array {
+        items: Parts.ReferenceNumber,
+      }      
+    },     
     required: [
-      'reference','repeat_prior_reference','prior_references'
+      'reference','repeat_prior_reference'
     ],
+    oneOf: Validations.PriorReferences,
   }, 
 };
 
@@ -60,6 +70,7 @@ local FindingsUniformGuidanceEntry = {
         questioned_costs: Base.Enum.YorN,
 
     },
+    allOf: Validations.Combinations,
 };
 
 local FindingsUniformGuidance = Types.object {

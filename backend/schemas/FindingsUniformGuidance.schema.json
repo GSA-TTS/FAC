@@ -15,35 +15,286 @@
             "findings_uniform_guidance_entries": {
                "items": {
                   "additionalProperties": false,
+                  "allOf": [
+                     {
+                        "if": {
+                           "properties": {
+                              "material_weakness": {
+                                 "const": "N"
+                              },
+                              "modified_opinion": {
+                                 "const": "Y"
+                              },
+                              "other_matters": {
+                                 "const": "N"
+                              },
+                              "significiant_deficiency": {
+                                 "const": "N"
+                              }
+                           }
+                        },
+                        "then": {
+                           "properties": {
+                              "other_findings": {
+                                 "const": "N"
+                              }
+                           }
+                        }
+                     },
+                     {
+                        "if": {
+                           "properties": {
+                              "material_weakness": {
+                                 "const": "Y"
+                              },
+                              "modified_opinion": {
+                                 "const": "Y"
+                              },
+                              "other_matters": {
+                                 "const": "N"
+                              },
+                              "significiant_deficiency": {
+                                 "const": "N"
+                              }
+                           }
+                        },
+                        "then": {
+                           "properties": {
+                              "other_findings": {
+                                 "const": "N"
+                              }
+                           }
+                        }
+                     },
+                     {
+                        "if": {
+                           "properties": {
+                              "material_weakness": {
+                                 "const": "N"
+                              },
+                              "modified_opinion": {
+                                 "const": "Y"
+                              },
+                              "other_matters": {
+                                 "const": "N"
+                              },
+                              "significiant_deficiency": {
+                                 "const": "Y"
+                              }
+                           }
+                        },
+                        "then": {
+                           "properties": {
+                              "other_findings": {
+                                 "const": "N"
+                              }
+                           }
+                        }
+                     },
+                     {
+                        "if": {
+                           "properties": {
+                              "material_weakness": {
+                                 "const": "N"
+                              },
+                              "modified_opinion": {
+                                 "const": "N"
+                              },
+                              "other_matters": {
+                                 "const": "Y"
+                              },
+                              "significiant_deficiency": {
+                                 "const": "N"
+                              }
+                           }
+                        },
+                        "then": {
+                           "properties": {
+                              "other_findings": {
+                                 "const": "N"
+                              }
+                           }
+                        }
+                     },
+                     {
+                        "if": {
+                           "properties": {
+                              "material_weakness": {
+                                 "const": "Y"
+                              },
+                              "modified_opinion": {
+                                 "const": "N"
+                              },
+                              "other_matters": {
+                                 "const": "Y"
+                              },
+                              "significiant_deficiency": {
+                                 "const": "N"
+                              }
+                           }
+                        },
+                        "then": {
+                           "properties": {
+                              "other_findings": {
+                                 "const": "N"
+                              }
+                           }
+                        }
+                     },
+                     {
+                        "if": {
+                           "properties": {
+                              "material_weakness": {
+                                 "const": "N"
+                              },
+                              "modified_opinion": {
+                                 "const": "N"
+                              },
+                              "other_matters": {
+                                 "const": "Y"
+                              },
+                              "significiant_deficiency": {
+                                 "const": "Y"
+                              }
+                           }
+                        },
+                        "then": {
+                           "properties": {
+                              "other_findings": {
+                                 "const": "N"
+                              }
+                           }
+                        }
+                     },
+                     {
+                        "if": {
+                           "properties": {
+                              "material_weakness": {
+                                 "const": "Y"
+                              },
+                              "modified_opinion": {
+                                 "const": "N"
+                              },
+                              "other_matters": {
+                                 "const": "N"
+                              },
+                              "significiant_deficiency": {
+                                 "const": "N"
+                              }
+                           }
+                        },
+                        "then": {
+                           "properties": {
+                              "other_findings": {
+                                 "const": "N"
+                              }
+                           }
+                        }
+                     },
+                     {
+                        "if": {
+                           "properties": {
+                              "material_weakness": {
+                                 "const": "N"
+                              },
+                              "modified_opinion": {
+                                 "const": "N"
+                              },
+                              "other_matters": {
+                                 "const": "N"
+                              },
+                              "significiant_deficiency": {
+                                 "const": "Y"
+                              }
+                           }
+                        },
+                        "then": {
+                           "properties": {
+                              "other_findings": {
+                                 "const": "N"
+                              }
+                           }
+                        }
+                     },
+                     {
+                        "if": {
+                           "properties": {
+                              "material_weakness": {
+                                 "const": "N"
+                              },
+                              "modified_opinion": {
+                                 "const": "N"
+                              },
+                              "other_matters": {
+                                 "const": "N"
+                              },
+                              "significiant_deficiency": {
+                                 "const": "N"
+                              }
+                           }
+                        },
+                        "then": {
+                           "properties": {
+                              "other_findings": {
+                                 "const": "Y"
+                              }
+                           }
+                        }
+                     }
+                  ],
                   "properties": {
                      "findings": {
-                        "is_valid": {
-                           "enum": [
-                              "Y",
-                              "N"
-                           ],
-                           "type": "string"
-                        },
-                        "prior_references": {
-                           "items": {
+                        "additionalProperties": false,
+                        "oneOf": [
+                           {
+                              "if": {
+                                 "properties": {
+                                    "repeat_prior_reference": {
+                                       "const": "Y"
+                                    }
+                                 }
+                              },
+                              "then": {
+                                 "required": [
+                                    "prior_references"
+                                 ]
+                              }
+                           }
+                        ],
+                        "properties": {
+                           "is_valid": {
+                              "enum": [
+                                 "Y",
+                                 "N"
+                              ],
                               "type": "string"
                            },
-                           "type": "array"
-                        },
-                        "reference": {
-                           "type": "string"
-                        },
-                        "repeat_prior_reference": {
-                           "enum": [
-                              "Y",
-                              "N"
-                           ],
-                           "type": "string"
+                           "prior_references": {
+                              "items": {
+                                 "description": "Reference Number",
+                                 "pattern": "^20[2-9]{1}[0-9]{1}-[0-9]{3}$",
+                                 "title": "ReferenceNumber",
+                                 "type": "string"
+                              },
+                              "type": "array"
+                           },
+                           "reference": {
+                              "description": "Reference Number",
+                              "pattern": "^20[2-9]{1}[0-9]{1}-[0-9]{3}$",
+                              "title": "ReferenceNumber",
+                              "type": "string"
+                           },
+                           "repeat_prior_reference": {
+                              "enum": [
+                                 "Y",
+                                 "N"
+                              ],
+                              "type": "string"
+                           }
                         },
                         "required": [
                            "reference",
-                           "repeat_prior_reference",
-                           "prior_references"
+                           "repeat_prior_reference"
                         ],
                         "type": "object"
                      },
@@ -103,6 +354,9 @@
                               "type": "string"
                            },
                            "number": {
+                              "description": "Program number",
+                              "pattern": "^[1-9]{1}[0-9]{1}\\.([0-9]{3}[a-zA-Z]{0,1}|U[0-9]{2}|RD)$",
+                              "title": "ProgramNumber",
                               "type": "string"
                            }
                         },

@@ -12,13 +12,13 @@
                 "significiant_deficiency": "N",
                 "other_matters": "N",
                 "other_findings": "N",
-                "modified_opinion": "N",
+                "modified_opinion": "Y",
                 "material_weakness": "N",
                 "findings": {
                     "is_valid": "Y",
                     "repeat_prior_reference": "Y",
                     "prior_references": ["2020-001", "2021-002"],
-                    "reference": "2022-003"
+                    "reference": "2023-100"
                 }
             },
             {
@@ -29,10 +29,10 @@
                 },
                 "questioned_costs": "Y",
                 "significiant_deficiency": "N",
-                "other_matters": "N",
+                "other_matters": "Y",
                 "other_findings": "N",
                 "modified_opinion": "N",
-                "material_weakness": "N",
+                "material_weakness": "Y",
                 "findings": {
                     "is_valid": "N",
                     "repeat_prior_reference": "Y",
