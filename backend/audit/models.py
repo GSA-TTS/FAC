@@ -5,6 +5,8 @@ from django.contrib.auth import get_user_model
 
 from django.utils.translation import gettext_lazy as _
 
+from django_fsm import FSMField
+
 from .validators import (
     validate_excel_file,
     validate_excel_filename,
@@ -66,11 +68,22 @@ class SingleAuditChecklist(models.Model):
         ("biennial", _("Biennial")),
         ("other", _("Other")),
     )
-    STATUSES = (
-        ("in_progress", _("In progress")),
-        ("submitted", _("Submitted")),
-        ("received", _("Received")),
-        ("available", _("Available")),
+
+    class STATUS:
+        IN_PROGRESS = "in_progress"
+        READY_FOR_CERTIFICATION = "ready_for_certification"
+        AUDITOR_CERTIFIED = "auditor_certified"
+        AUDITEE_CERTIFIED = "auditee_certified"
+        CERTIFIED = "certified"
+        SUBMITTED = "submitted"
+
+    STATUS_CHOICES = (
+        (STATUS.IN_PROGRESS, "In Progress"),
+        (STATUS.READY_FOR_CERTIFICATION, "Ready for Certification"),
+        (STATUS.AUDITOR_CERTIFIED, "Auditor Certified"),
+        (STATUS.AUDITEE_CERTIFIED, "Auditee Certified"),
+        (STATUS.CERTIFIED, "Certified"),
+        (STATUS.SUBMITTED, "Submitted"),
     )
 
     objects = SingleAuditChecklistManager()
@@ -78,9 +91,8 @@ class SingleAuditChecklist(models.Model):
     # 0. Meta data
     submitted_by = models.ForeignKey(User, on_delete=models.PROTECT)
     date_created = models.DateTimeField(auto_now_add=True)
-    submission_status = models.CharField(
-        max_length=16, choices=STATUSES, default=STATUSES[0][0]
-    )
+    submission_status = FSMField(default=STATUS.IN_PROGRESS, choices=STATUS_CHOICES)
+
     report_id = models.CharField(max_length=17, unique=True)
 
     # Q2 Type of Uniform Guidance Audit

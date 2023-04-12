@@ -1218,10 +1218,10 @@ class SACViewSetTests(TestCase):
 
     def test_list_none_submitted_returns_empty_list(self):
         """
-        If there are SACs in the database, but none which have a status of subnmitted, the list endpoint shoul return no results
+        If there are SACs in the database, but none which have a status of submitted, the list endpoint shoul return no results
         """
-        for status in SingleAuditChecklist.STATUSES:
-            if status[0] != "submitted":
+        for status in SingleAuditChecklist.STATUS_CHOICES:
+            if status[0] != SingleAuditChecklist.STATUS.SUBMITTED:
                 baker.make(
                     SingleAuditChecklist, _quantity=100, submission_status=status[0]
                 )
@@ -1236,7 +1236,7 @@ class SACViewSetTests(TestCase):
         """
         If there are SACs in the database, only those with a submission_status of "submitted" should be returned
         """
-        for status in SingleAuditChecklist.STATUSES:
+        for status in SingleAuditChecklist.STATUS_CHOICES:
             baker.make(SingleAuditChecklist, _quantity=100, submission_status=status[0])
 
         response = self.client.get(SAC_LIST_PATH)
@@ -1278,10 +1278,10 @@ class SACViewSetTests(TestCase):
         """
         If there is a SAC matching the provided report_id, and the SAC has a submission_status other than submitted, the detail endpoint should return a 404
         """
-        for status in SingleAuditChecklist.STATUSES:
+        for status in SingleAuditChecklist.STATUS_CHOICES:
             with self.subTest():
-                if status[0] != "submitted":
-                    report_id = f"id-{status[0]}"
+                if status[0] != SingleAuditChecklist.STATUS.SUBMITTED:
+                    report_id = f"id-{status[0]}"[:17]
                     baker.make(
                         SingleAuditChecklist,
                         report_id=report_id,
