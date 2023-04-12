@@ -21,4 +21,9 @@ urlpatterns = [
         views.FederalAwards.as_view(),
         name="federal_awards",
     ),
+    path(
+        "audit-findings/<str:report_id>",
+        views.AuditFindings.as_view(),
+        name="audit_findings",
+    ),
 ]

@@ -9,7 +9,7 @@
             {% if 'federal-awards' in request.path %}
                 <a href="#federal-awards" class="usa-current">Federal Awards</a>
             {% else %}
-                <a href="#federal-awards" class="">Federal Awards</a>
+                <a href="/report_submission/federal-awards/{{ report_id | default_if_none:'' }}" class="">Federal Awards</a>
             {% endif %}
         </li>
         <li class="usa-sidenav__item">
@@ -19,7 +19,11 @@
             <a href="#" class="">Audit information</a>
         </li>
         <li class="usa-sidenav__item">
-            <a href="#" class="">Audit findings</a>
+            {% if 'audit-findings' in request.path %}
+                <a href="#audit-findings" class="usa-current">Audit findings</a>
+            {% else %}
+                <a href="/report_submission/audit-findings/{{ report_id | default_if_none:'' }}" class="">Audit findings</a>
+            {% endif %}
         </li>
         <li class="usa-sidenav__item">
             <a href="#" class="">Findings text</a>

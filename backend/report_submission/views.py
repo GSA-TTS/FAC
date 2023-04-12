@@ -214,3 +214,36 @@ class FederalAwards(LoginRequiredMixin, View):
             logger.info("Unexpected error in FederalAwards post.\n", e)
 
         raise BadRequest()
+
+class AuditFindings(LoginRequiredMixin, View):
+    def get(self, request, *args, **kwargs):
+        report_id = kwargs["report_id"]
+
+        try:
+            sac = SingleAuditChecklist.objects.get(report_id=report_id)
+
+            # this should probably be a permission mixin
+            accesses = Access.objects.filter(sac=sac, user=request.user)
+            if not accesses:
+                raise PermissionDenied("You do not have access to this audit.")
+
+            context = {
+                "auditee_name": sac.auditee_name,
+                "report_id": report_id,
+                "auditee_uei": sac.auditee_uei,
+                "user_provided_organization_type": sac.user_provided_organization_type,
+            }
+
+            return render(request, "report_submission/audit-findings.html", context)
+        except SingleAuditChecklist.DoesNotExist:
+            raise PermissionDenied("You do not have access to this audit.")
+
+    # Unimplemented
+    def post(self, request, *args, **kwargs):
+        try:
+            return redirect(reverse("/"))
+
+        except Exception as e:
+            logger.info("Unexpected error in AuditFindings post.\n", e)
+
+        raise BadRequest()

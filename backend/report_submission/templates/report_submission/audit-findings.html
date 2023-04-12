@@ -12,21 +12,21 @@
     <div class="grid-container margin-top-6">
         <div class="grid-row grid-gap">
             {% include "../sidenav.html" %}
-            <form class="usa-form usa-form--large" id="federal-awards" method="post">
+            <form class="usa-form usa-form--large" id="audit-findings" method="post">
                 {% csrf_token %}
                 <fieldset class="usa-fieldset">
-                    <legend class="usa-legend usa-legend--large" id="federal-awards">
-                        Federal awards
+                    <legend class="usa-legend usa-legend--large" id="audit-findings">
+                        Audit findings
                     </legend>
-                    <p>Enter the federal awards you recieved in the last audit year using the provided worksheet.</p>
+                    <p>Enter the audit findings for your federal awards using the provided worksheet.</p>
                     <h4 class="usa-process-list__heading">Upload completed worksheet</h4>
                     <p>Save your completed worksheet as an XLSX file and upload it below.</p>
                     <div class="usa-form-group">
-                        <input id="file-input-federal-awards-xlsx"
+                        <input id="file-input-audit-findings-xlsx"
                                class="usa-file-input"
                                type="file"
-                               name="file-input-federal-awards-xlsx"
-                               aria-describedby="file-input-federal-awards-xlsx"
+                               name="file-input-audit-findings-xlsx"
+                               aria-describedby="file-input-audit-findings-xlsx"
                                accept=".xlsx"/>
                     </div>
                     <button class="usa-button" id="continue" disabled="disabled">Save and continue to next section</button>
@@ -74,5 +74,5 @@
             </dl>
         </div>
     </div>
-    <script src="{% static 'compiled/js/federal-awards.js' %}"></script>
+    <script src="{% static 'compiled/js/audit-findings.js' %}"></script>
 {% endblock content %}
