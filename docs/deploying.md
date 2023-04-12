@@ -86,7 +86,7 @@ cf push -f manifests/manifest-dev.yml
 1.  Create a [new release](https://github.com/GSA-TTS/FAC/releases/new).
     *   Create a new tag in the form `v1.[YYYYMMDD]` with the current date, such as `v1.20230329`, and use that as the tag for the release.
     *   **_Remember to set the target to `prod`_**.
-    *   For the moment, check the “Set as a re-release” checkbox. We may change this close to or after MVP.
+    *   For the moment, check the “Set as a pre-release” checkbox. We may change this close to or after MVP.
 3.  Wait for the checks to pass.
 4.  If checks fail, or if reviewers request changes, something has gone awry. Investigation and/or starting over from a branch and making a PR against `main` may be required.
 5.  Verify that the deploy steps all passed.
