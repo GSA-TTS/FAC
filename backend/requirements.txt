@@ -20,7 +20,6 @@ botocore==1.29.90 \
     --hash=sha256:1b8c1b8c366875e65d39237a296842b9c0ea33af2ba4a2771db2ba6aefa663ef \
     --hash=sha256:2dbbc2c7d93ddefcf9896268597212d446e5d416fbceb1b12c793660fa9f83f3
     # via
-    #   -r ./requirements/requirements.in
     #   boto3
     #   s3transfer
 certifi==2022.12.7 \
@@ -239,6 +238,10 @@ django-cors-headers==3.14.0 \
 django-csp==3.7 \
     --hash=sha256:01443a07723f9a479d498bd7bb63571aaa771e690f64bde515db6cdb76e8041a \
     --hash=sha256:01eda02ad3f10261c74131cdc0b5a6a62b7c7ad4fd017fbefb7a14776e0a9727
+    # via -r ./requirements/requirements.in
+django-fsm==2.8.1 \
+    --hash=sha256:e2c02cbf273fb9691aa9a907c29990afdd21a4adea09c5640344c93fbe03f8d9 \
+    --hash=sha256:fd9f8de9f33188e50f876ce53908fbd7289e5031a44ffdb97d43909e56699ef8
     # via -r ./requirements/requirements.in
 django-logingov-backend==0.0.3 \
     --hash=sha256:a65e40fdf2dab1c6f8b9a0cf9b1135626ac2a333ac3c283c51f03f37924e4a17 \

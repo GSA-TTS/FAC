@@ -24,3 +24,4 @@ python-slugify
 pyyaml
 requests
 uritemplate
+django-fsm
