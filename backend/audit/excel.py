@@ -32,6 +32,9 @@ federal_awards_field_mapping: FieldMapping = {
     "auditee_ein": ("FederalAwards.auditee_ein", _set_by_path),
     "total_amount_expended": ("FederalAwards.total_amount_expended", _set_by_path),
 }
+corrective_action_field_mapping: FieldMapping = {
+    "auditee_ein": ("CorrectiveActionPlan.auditee_ein", _set_by_path),
+}
 
 federal_awards_column_mapping: ColumnMapping = {
     "amount_expended": (
@@ -97,7 +100,23 @@ federal_awards_column_mapping: ColumnMapping = {
         _set_by_path,
     ),
 }
-
+corrective_action_column_mapping: ColumnMapping = {
+    "contains_chart_or_table": (
+        "CorrectiveActionPlan.corrective_action_plan_entries",
+        "contains_chart_or_table",
+        _set_by_path,
+    ),
+    "planned_action": (
+        "CorrectiveActionPlan.corrective_action_plan_entries",
+        "planned_action",
+        _set_by_path,
+    ),
+    "reference_number": (
+        "CorrectiveActionPlan.corrective_action_plan_entries",
+        "reference_number",
+        _set_by_path,
+    ),
+}
 
 class ExcelExtractionError(Exception):
     pass
@@ -185,4 +204,10 @@ def extract_data(file, field_mapping: FieldMapping, column_mapping: ColumnMappin
 def extract_federal_awards(file):
     return extract_data(
         file, federal_awards_field_mapping, federal_awards_column_mapping
+    )
+
+
+def extract_corrective_action_plan(file):
+    return extract_data(
+        file, corrective_action_field_mapping, corrective_action_column_mapping
     )

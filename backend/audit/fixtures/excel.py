@@ -1,4 +1,18 @@
 FEDERAL_AWARDS_TEMPLATE = "excel_templates/FederalAwardsExpendedTemplateUG2019.xlsx"
+CORRECTIVE_ACTION_PLAN_TEMPLATE = "excel_templates/CorrectiveActionPlanTemplate2019-2022.xlsx"
+
+CORRECTIVE_ACTION_PLAN_ENTRY_FIXTURES = [
+    {
+        "contains_chart_or_table": "Y",
+        "planned_action": "corrective action 1",
+        "reference_number": "2023-001",
+    },
+    {
+        "contains_chart_or_table": "N",
+        "planned_action": "corrective action 2",
+        "reference_number": "2023-002",
+    },
+]
 
 FEDERAL_AWARDS_ENTRY_FIXTURES = [
     {
