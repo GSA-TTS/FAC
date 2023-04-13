@@ -2,6 +2,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db.utils import IntegrityError
 from django.test import TestCase
 
+from django_fsm import TransitionNotAllowed
 from model_bakery import baker
 
 from .models import Access, ExcelFile, SingleAuditChecklist, User
@@ -48,6 +49,30 @@ class SingleAuditChecklistTests(TestCase):
         # This one is a little dubious because it assumes this will always be
         # the first entry in the test database:
         self.assertEqual(sac.report_id[7:], "0001000001")
+
+    def test_transition_finish(self):
+        """After the finish transition is called, submission_status should be READY_FOR_CERTIFICATION"""
+        sac = baker.make(SingleAuditChecklist)
+        sac.finish()
+
+        self.assertEqual(
+            sac.submission_status, SingleAuditChecklist.STATUS.READY_FOR_CERTIFICATION
+        )
+
+    def test_transition_finish_bad_source_status(self):
+        """The finish transition should only be allowed from the IN_PROGRESS submission_status"""
+        bad_statuses = [
+            status[0]
+            for status in SingleAuditChecklist.STATUS_CHOICES
+            if status[0] is not SingleAuditChecklist.STATUS.IN_PROGRESS
+        ]
+
+        for bad_status in bad_statuses:
+            with self.subTest():
+                sac = baker.make(SingleAuditChecklist)
+                sac.submission_status = bad_status
+
+                self.assertRaises(TransitionNotAllowed, sac.finish)
 
 
 class AccessTests(TestCase):

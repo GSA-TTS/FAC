@@ -1,3 +1,5 @@
+import logging
+
 from secrets import choice
 from django.db import models
 from django.db.models import Q
@@ -5,7 +7,7 @@ from django.contrib.auth import get_user_model
 
 from django.utils.translation import gettext_lazy as _
 
-from django_fsm import FSMField
+from django_fsm import FSMField, transition
 
 from .validators import (
     validate_excel_file,
@@ -15,6 +17,8 @@ from .validators import (
 )
 
 User = get_user_model()
+
+logger = logging.getLogger(__name__)
 
 
 class SingleAuditChecklistManager(models.Manager):
@@ -112,6 +116,19 @@ class SingleAuditChecklist(models.Model):
     federal_awards = models.JSONField(
         blank=True, null=True, validators=[validate_federal_award_json]
     )
+
+    @transition(
+        field=submission_status,
+        source=STATUS.IN_PROGRESS,
+        target=STATUS.READY_FOR_CERTIFICATION,
+    )
+    def finish(self):
+        """
+        Invoked when an auditee has indicated that they have finished editing the SAC and it is ready for auditor certification
+        """
+        logger.info(
+            f"finish called for SAC {self.report_id} - updating submission_status to {SingleAuditChecklist.STATUS.READY_FOR_CERTIFICATION}"
+        )
 
     @property
     def audit_period_covered(self):
