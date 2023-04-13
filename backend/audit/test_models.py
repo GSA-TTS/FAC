@@ -50,29 +50,57 @@ class SingleAuditChecklistTests(TestCase):
         # the first entry in the test database:
         self.assertEqual(sac.report_id[7:], "0001000001")
 
-    def test_transition_finish(self):
-        """After the finish transition is called, submission_status should be READY_FOR_CERTIFICATION"""
-        sac = baker.make(SingleAuditChecklist)
-        sac.finish()
-
-        self.assertEqual(
-            sac.submission_status, SingleAuditChecklist.STATUS.READY_FOR_CERTIFICATION
+    def test_submission_status_transitions(self):
+        """
+        Test that only the expected state transitions are allowed for submission_status
+        """
+        cases = (
+            (
+                SingleAuditChecklist.STATUS.IN_PROGRESS,
+                SingleAuditChecklist.STATUS.READY_FOR_CERTIFICATION,
+                "transition_to_ready_for_certification",
+            ),
+            (
+                SingleAuditChecklist.STATUS.READY_FOR_CERTIFICATION,
+                SingleAuditChecklist.STATUS.AUDITOR_CERTIFIED,
+                "transition_to_auditor_certified",
+            ),
+            (
+                SingleAuditChecklist.STATUS.AUDITOR_CERTIFIED,
+                SingleAuditChecklist.STATUS.AUDITEE_CERTIFIED,
+                "transition_to_auditee_certified",
+            ),
+            (
+                SingleAuditChecklist.STATUS.AUDITEE_CERTIFIED,
+                SingleAuditChecklist.STATUS.CERTIFIED,
+                "transition_to_certified",
+            ),
+            (
+                SingleAuditChecklist.STATUS.CERTIFIED,
+                SingleAuditChecklist.STATUS.SUBMITTED,
+                "transition_to_submitted",
+            ),
         )
 
-    def test_transition_finish_bad_source_status(self):
-        """The finish transition should only be allowed from the IN_PROGRESS submission_status"""
-        bad_statuses = [
-            status[0]
-            for status in SingleAuditChecklist.STATUS_CHOICES
-            if status[0] is not SingleAuditChecklist.STATUS.IN_PROGRESS
-        ]
+        for status_from, status_to, transition_name in cases:
+            sac = baker.make(SingleAuditChecklist, submission_status=status_from)
 
-        for bad_status in bad_statuses:
-            with self.subTest():
-                sac = baker.make(SingleAuditChecklist)
-                sac.submission_status = bad_status
+            transition_method = getattr(sac, transition_name)
+            transition_method()
 
-                self.assertRaises(TransitionNotAllowed, sac.finish)
+            self.assertEqual(sac.submission_status, status_to)
+
+            bad_statuses = [
+                status[0]
+                for status in SingleAuditChecklist.STATUS_CHOICES
+                if status[0] is not status_from
+            ]
+
+            for bad_status in bad_statuses:
+                with self.subTest():
+                    sac.submission_status = bad_status
+
+                    self.assertRaises(TransitionNotAllowed, transition_method)
 
 
 class AccessTests(TestCase):

@@ -7,7 +7,7 @@ from django.contrib.auth import get_user_model
 
 from django.utils.translation import gettext_lazy as _
 
-from django_fsm import FSMField, transition
+from django_fsm import FSMField, RETURN_VALUE, transition
 
 from .validators import (
     validate_excel_file,
@@ -117,18 +117,98 @@ class SingleAuditChecklist(models.Model):
         blank=True, null=True, validators=[validate_federal_award_json]
     )
 
+    def validate_full(self):
+        """
+        A stub method to represent the cross-sheet, “full” validation that we
+        do once all the individual sections are complete and valid in
+        themselves.
+        """
+        return True
+
     @transition(
-        field=submission_status,
+        field="submission_status",
         source=STATUS.IN_PROGRESS,
-        target=STATUS.READY_FOR_CERTIFICATION,
+        target=RETURN_VALUE(STATUS.IN_PROGRESS, STATUS.READY_FOR_CERTIFICATION),
     )
-    def finish(self):
+    def transition_to_ready_for_certification(self):
         """
-        Invoked when an auditee has indicated that they have finished editing the SAC and it is ready for auditor certification
+        Pretend we're doing multi-sheet validation here.
+        This probably won't be the first time this validation is done;
+        there's likely to be a step in one of the views that does cross-sheet
+        validation and reports back to the user.
         """
-        logger.info(
-            f"finish called for SAC {self.report_id} - updating submission_status to {SingleAuditChecklist.STATUS.READY_FOR_CERTIFICATION}"
-        )
+        if self.validate_full():
+            return "ready_for_certification"
+        return "in_progress"
+
+    @transition(
+        field="submission_status",
+        source=STATUS.READY_FOR_CERTIFICATION,
+        target=STATUS.AUDITOR_CERTIFIED,
+    )
+    def transition_to_auditor_certified(self):
+        """
+        The permission checks verifying that the user attempting to do this has
+        the appropriate privileges will done at the view level.
+        """
+
+    @transition(
+        field="submission_status",
+        source=STATUS.AUDITOR_CERTIFIED,
+        target=STATUS.AUDITEE_CERTIFIED,
+    )
+    def transition_to_auditee_certified(self):
+        """
+        The permission checks verifying that the user attempting to do this has
+        the appropriate privileges will done at the view level.
+        """
+
+    @transition(
+        field="submission_status",
+        source=STATUS.AUDITEE_CERTIFIED,
+        target=STATUS.CERTIFIED,
+    )
+    def transition_to_certified(self):
+        """
+        The permission checks verifying that the user attempting to do this has
+        the appropriate privileges will done at the view level.
+        """
+
+    @transition(
+        field="submission_status",
+        source=STATUS.CERTIFIED,
+        target=STATUS.SUBMITTED,
+    )
+    def transition_to_submitted(self):
+        """
+        The permission checks verifying that the user attempting to do this has
+        the appropriate privileges will done at the view level.
+        """
+
+    @transition(
+        field="submission_status",
+        source=[
+            STATUS.READY_FOR_CERTIFICATION,
+            STATUS.AUDITOR_CERTIFIED,
+            STATUS.AUDITEE_CERTIFIED,
+            STATUS.CERTIFIED,
+        ],
+        target=STATUS.SUBMITTED,
+    )
+    def transition_to_in_progress(self):
+        """
+        Any edit to a submission in the following states should result in it
+        moving back to STATUS.IN_PROGRESS:
+
+        +   STATUS.READY_FOR_CERTIFICATION
+        +   STATUS.AUDITOR_CERTIFIED
+        +   STATUS.AUDITEE_CERTIFIED
+        +   STATUS.CERTIFIED
+
+        For the moment we're not trying anything fancy like catching changes at
+        the model level, and will again leave it up to the views to track that
+        changes have been made at that point.
+        """
 
     @property
     def audit_period_covered(self):
