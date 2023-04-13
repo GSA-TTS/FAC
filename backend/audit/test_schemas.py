@@ -8,6 +8,8 @@ from django.test import SimpleTestCase
 from jsonschema import exceptions, validate as jsonschema_validate, FormatChecker
 from random import choice, randrange
 
+from audit.fixtures.excel import CORRECTIVE_ACTION_PLAN_TEST_FILE
+
 # Simplest way to create a new copy of simple case rather than getting
 # references to things used by other tests:
 jsoncopy = lambda v: json.loads(json.dumps(v))
@@ -809,3 +811,116 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
                 "number_of_audit_findings"
             ] = 1
             self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
+
+
+class CorrectiveActionPlanSchemaValidityTest(SimpleTestCase):
+    """
+    Test the basic validity of the CorrectiveActionPlan JSON schema.
+    """
+
+    CORRECTIVE_ACTION_PLAN_SCHEMA = json.loads(
+        (SCHEMA_DIR / "CorrectiveActionPlan.schema.json").read_text(encoding="utf-8")
+    )
+
+    SIMPLE_CASE = {
+        "CorrectiveActionPlan": {
+            "auditee_ein": None,
+            "corrective_action_plan_entries": [
+                {
+                    "contains_chart_or_table": "N",
+                    "planned_action": "Action 11",
+                    "reference_number": "2023-111"
+                }
+            ]
+        }
+    }
+
+    # test_schema might seem redundant, but it's a good to have a check on the schema itself
+    def test_schema(self):
+        """Try to test CorrectiveActionPlan first."""
+        schema = self.CORRECTIVE_ACTION_PLAN_SCHEMA
+
+        in_flight_file = SCHEMA_DIR / CORRECTIVE_ACTION_PLAN_TEST_FILE
+        in_flight = json.loads(in_flight_file.read_text(encoding="utf-8"))
+        validate(in_flight, schema)
+
+    def test_simple_pass(self):
+        """
+        Test the simplest Corrective Action Plan case; none of the conditional fields
+        apply.
+        """
+        schema = self.CORRECTIVE_ACTION_PLAN_SCHEMA
+
+        validate(self.SIMPLE_CASE, schema)
+
+    def test_missing_auditee_ein(self):
+        """
+        Test that validation fails if auditee_ein is missing
+        """
+        schema = self.CORRECTIVE_ACTION_PLAN_SCHEMA
+
+        simple_case = jsoncopy(self.SIMPLE_CASE)
+        del simple_case["CorrectiveActionPlan"]["auditee_ein"]
+
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
+
+    def test_missing_entry_fields(self):
+        """
+        Test that validation fails if any entry field is missing
+        """
+        schema = self.CORRECTIVE_ACTION_PLAN_SCHEMA
+
+        simple_case = jsoncopy(self.SIMPLE_CASE)
+        del simple_case["CorrectiveActionPlan"]["corrective_action_plan_entries"][0][
+            "contains_chart_or_table"
+        ]
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
+
+        simple_case = jsoncopy(self.SIMPLE_CASE)
+        del simple_case["CorrectiveActionPlan"]["corrective_action_plan_entries"][0][
+            "planned_action"
+        ]
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
+
+        simple_case = jsoncopy(self.SIMPLE_CASE)
+        del simple_case["CorrectiveActionPlan"]["corrective_action_plan_entries"][0][
+            "reference_number"
+        ]
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
+
+    def test_empty_entry_fields(self):
+        """
+        Test that validation fails if any entry field is empty
+        """
+        schema = self.CORRECTIVE_ACTION_PLAN_SCHEMA
+
+        simple_case = jsoncopy(self.SIMPLE_CASE)
+        simple_case["CorrectiveActionPlan"]["corrective_action_plan_entries"][0][
+            "contains_chart_or_table"
+        ]=None
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
+
+        simple_case = jsoncopy(self.SIMPLE_CASE)
+        simple_case["CorrectiveActionPlan"]["corrective_action_plan_entries"][0][
+            "planned_action"
+        ] = None
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
+
+        simple_case = jsoncopy(self.SIMPLE_CASE)
+        simple_case["CorrectiveActionPlan"]["corrective_action_plan_entries"][0][
+            "reference_number"
+        ] = None
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
+
+    def test_for_invalid_entry(self):
+        """
+        Test that validation fails if invalid value is provided for entry field
+        """
+        schema = self.CORRECTIVE_ACTION_PLAN_SCHEMA
+
+        simple_case = jsoncopy(self.SIMPLE_CASE)
+        simple_case["CorrectiveActionPlan"]["corrective_action_plan_entries"][0][
+            "contains_chart_or_table"
+        ] = 0
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
+
