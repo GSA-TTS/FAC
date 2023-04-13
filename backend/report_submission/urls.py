@@ -16,4 +16,9 @@ urlpatterns = [
         views.GeneralInformationFormView.as_view(),
         name="general_information",
     ),
+    path(
+        "federal-awards/<str:report_id>",
+        views.FederalAwards.as_view(),
+        name="federal_awards",
+    ),
 ]

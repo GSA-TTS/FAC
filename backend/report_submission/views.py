@@ -1,10 +1,11 @@
 import datetime
 import logging
-from django.shortcuts import render, redirect
+
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import BadRequest, PermissionDenied, ValidationError
+from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.views import View
-from django.contrib.auth.mixins import LoginRequiredMixin
 
 from audit.models import Access, SingleAuditChecklist
 from audit.validators import validate_general_information_json
@@ -170,10 +171,46 @@ class GeneralInformationFormView(LoginRequiredMixin, View):
                     general_information=general_information
                 )
 
-                return redirect(reverse("audit:MySubmissions"))
+                return redirect(
+                    "/report_submission/federal-awards/{}".format(report_id)
+                )
         except SingleAuditChecklist.DoesNotExist:
             raise PermissionDenied("You do not have access to this audit.")
         except ValidationError as e:
             logger.info(f"ValidationError for report ID {report_id}: {e.message}")
+
+        raise BadRequest()
+
+
+class FederalAwards(LoginRequiredMixin, View):
+    def get(self, request, *args, **kwargs):
+        report_id = kwargs["report_id"]
+
+        try:
+            sac = SingleAuditChecklist.objects.get(report_id=report_id)
+
+            # this should probably be a permission mixin
+            accesses = Access.objects.filter(sac=sac, user=request.user)
+            if not accesses:
+                raise PermissionDenied("You do not have access to this audit.")
+
+            context = {
+                "auditee_name": sac.auditee_name,
+                "report_id": report_id,
+                "auditee_uei": sac.auditee_uei,
+                "user_provided_organization_type": sac.user_provided_organization_type,
+            }
+
+            return render(request, "report_submission/federal-awards.html", context)
+        except SingleAuditChecklist.DoesNotExist:
+            raise PermissionDenied("You do not have access to this audit.")
+
+    # Unimplemented
+    def post(self, request, *args, **kwargs):
+        try:
+            return redirect(reverse("/"))
+
+        except Exception as e:
+            logger.info("Unexpected error in FederalAwards post.\n", e)
 
         raise BadRequest()

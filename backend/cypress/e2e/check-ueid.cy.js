@@ -388,4 +388,10 @@ describe('Create New Audit', () => {
       cy.url().should('include', '/report_submission/accessandsubmission');
     });
   });
+
+  it('Canceling an audit submission returns to the home page', () => {
+    cy.get('.usa-button').contains('Cancel').click();
+    cy.get('.usa-button').contains('OK').click();
+    cy.url().should('include', '/audit/');
+  });
 });
