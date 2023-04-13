@@ -9,6 +9,8 @@ local CorrectiveActionPlanEntry = {
         planned_action: Types.string,
         contains_chart_or_table: Base.Enum.YorN
     },
+    required: ['reference_number', 'planned_action','contains_chart_or_table'],
+    title: 'CorrectiveActionPlanEntry',
 };
 
 local CorrectiveActionPlan = Types.object {
@@ -19,7 +21,7 @@ local CorrectiveActionPlan = Types.object {
       items: CorrectiveActionPlanEntry,
     },
   },
-  required: ['auditee_ein', 'corrective_action_plan_entries'],
+  required: ['auditee_ein'],
   title: 'CorrectiveActionPlan',
   version: 20230410,
 };
