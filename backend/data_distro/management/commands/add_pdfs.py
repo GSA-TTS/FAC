@@ -13,6 +13,8 @@ logger = logging.getLogger(__name__)
 
 class Command(BaseCommand):
     help = """
+    This only works for 2007 or earlier.
+
     Moves PDFs from source bucket to the bucket in the env.
 
     To run the script, add the Census AWS values to the environment.
@@ -29,7 +31,7 @@ class Command(BaseCommand):
     def handle(self, *args, **kwargs):
         public_doc_records = public_doc_query()
         for doc in public_doc_records:
-            pdf_name = doc["pdf_name"]
+            pdf_name = create_name(doc)
             # We don't want to delete the original so we are not moving and we can't rename and copy at the same time
             try:
                 temp_name = grab_doc(pdf_name)
@@ -45,21 +47,55 @@ class Command(BaseCommand):
                 add_to_model(doc["id"], url)
 
 
-def public_doc_query():
-    # UPDATE THIS to mapping of PDF url
-    # Filter out records that already have pdfs
-    # records = mods.General.objects.filter(is_public=True).values('audit_year', 'dbkey', 'id')
+def create_name(doc):
+    if "report_id" in doc:
+        pdf_name = "{0}{1}.pdf".format(doc["version_number"], doc["version_number"])
+    else:
+        pdf_name = "{0}{1}.pdf".format(doc["dbkey"], doc["audit_year"])
 
-    # Bogus Test record
-    test_records = [
-        {
-            "audit_year": "2022",
-            "dbkey": "101786",
-            "pdf_name": "1002792007.pdf",
-            "id": 1,
-        }
-    ]
-    return test_records
+    return pdf_name
+
+
+def public_doc_query():
+    """This only works for 2007 or earlier"""
+    kwargs = {
+        "years": [
+            "1997",
+            "1998",
+            "1999",
+            "2000",
+            "2001",
+            "2002",
+            "2003",
+            "2004",
+            "2005",
+            "2006",
+            "2007",
+        ],
+        "is_public": True,
+        "pdf_urls": [None, []],
+    }
+    older_records = (
+        mods.General.objects.filter(**kwargs).values("audit_year", "dbkey", "id").dict()
+    )
+
+    """This should work for 2008 or later, but we don't have the data"""
+    # kwargs = {
+    #     "years":[
+    #         "2008", "2009","2010","2011","2012",
+    #         "2013","2014","2015", "2016", "2017",
+    #         "2018", "2019", "2020","2021", "2022",
+    #         "2023",
+    #     ],
+    #     "is_public": True,
+    #     "pdf_urls": [None, []]
+    # }
+    # newer_records = mods.General.objects.filter(**kwargs).values('audit_year', 'dbkey', 'id', 'version', 'report_id').dict()
+    # records = older_records | newer_records
+    #
+    # return records.dict()
+
+    return older_records.dict()
 
 
 def grab_doc(pdf_name):
