@@ -10,20 +10,27 @@ Person(AgencyApp, "App", "Agency App")
 
 Boundary(cloudgov, "Cloud.gov Boundary") {
     Boundary(atob, "ATO Boundary") {
-        Boundary(backend, "Django web application") {
-            System(admin, "Django Admin interface")
-            System(submissions, "Django authenticated frontend")
-            System(publicinfo, "Django unauthenticated frontend")
-            System(pvtinfo, "Django authenticated frontend")
-
+        Boundary(backend, "FAC application", "egress-controlled-space") {
+            Boundary(django, "FAC Web App", "port 8080") {
+                System(admin, "Django Admin interface")
+                System(submissions, "Django authenticated frontend")
+                System(publicinfo, "Django unauthenticated frontend")
+                System(pvtinfo, "Django authenticated frontend")
+            }
+            Boundary(services, "FAC Services") {
+                System(api, "REST API", "PostgREST")
+                System(scan, "Virus Scanner", "ClamAV")
+            }
         }
-        Boundary(services, "FAC Services") {
-            System(api, "REST API", "PostgREST")
-            System(scan, "Virus Scanner", "ClamAV")
+        Boundary(proxy, "Proxy services", "egress-permitted-space"){
+            System(https_proxy, "web egress proxy", "proxy for HTTP/S connections")
+            System(mail_proxy, "mail egress proxy", "proxy for SMTPS connections")
         }
     }
-    System(db, "Database", "postgres")
-    System(s3, "PDF/XLS storage", "Brokered S3")
+    Boundary(cloudgov-services,"Cloud.gov services") {
+        System(db, "Database", "postgres, port 5432")
+        System(s3, "PDF/XLS storage", "Brokered S3")
+    }
 }
 
     System(Login, "Login.gov", "ID provider")
@@ -33,10 +40,10 @@ Boundary(cloudgov, "Cloud.gov Boundary") {
 
 
 AddRelTag("authenticated", $lineColor="#008787", $textColor="#008787")
-Rel(User, backend, "Submits/edits audits")
-Rel(Public, backend, "Searches for/reads information")
-Rel(Agency, backend, "Searches for/reads non-public information")
-Rel(Staff, backend, "Manages audits, roles, content")
+Rel(User, django, "Submits/edits audits")
+Rel(Public, django, "Searches for/reads information")
+Rel(Agency, django, "Searches for/reads non-public information")
+Rel(Staff, django, "Manages audits, roles, content")
 
 Rel(User, Login, "Authenticates with")
 Rel(Staff, Login, "Authenticates with")
@@ -51,10 +58,12 @@ Rel(Login, backend, "Provides identities", "email address")
 Rel(api, db, "Fetches (read-only) Audits")
 Rel(api, s3, "Fetches (read-only) Audit Attachments")
 
-Rel(backend, samgov, "Looks up UEI info")
-Rel(backend, Email, "Sends emails using")
-Rel(backend, scan, "Scans attachments")
-Rel(backend, db, "read/write")
+Rel(django, https_proxy, "Looks up UEI info")
+Rel(https_proxy, samgov, "Looks up UEI info")
+Rel(django, mail_proxy, "Sends emails using")
+Rel(mail_proxy, Email, "Sends emails using")
+Rel(django, scan, "Scans attachments")
+Rel(django, db, "read/write")
 Rel(backend, s3, "Stores single audit packages/Excel files")
 
 @enduml
