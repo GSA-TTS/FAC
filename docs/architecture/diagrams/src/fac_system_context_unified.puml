@@ -14,7 +14,7 @@ Boundary(cloudgov, "Cloud.gov Boundary") {
             System(admin, "Django Admin interface")
             System(submissions, "Django authenticated frontend")
             System(publicinfo, "Django unauthenticated frontend")
-            System(pvtinfo, "Django unauthenticated frontend")
+            System(pvtinfo, "Django authenticated frontend")
 
         }
         Boundary(services, "FAC Services") {
