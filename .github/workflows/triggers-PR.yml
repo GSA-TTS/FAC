@@ -5,8 +5,10 @@ on:
     branches:
       - main
       - prod
-    paths-ignore:
-      - 'docs/**'
+    paths:
+      - '**'
+      - '!docs/**'
+      - 'docs/bpmn-workflow-models/**'
   workflow_dispatch: null
 
 jobs:
