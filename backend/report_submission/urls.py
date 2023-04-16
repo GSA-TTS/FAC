@@ -18,12 +18,37 @@ urlpatterns = [
     ),
     path(
         "federal-awards/<str:report_id>",
-        views.FederalAwards.as_view(),
+        views.FederalAwardsUploadView.as_view(),
         name="federal_awards",
     ),
     path(
         "audit-findings/<str:report_id>",
-        views.AuditFindings.as_view(),
+        views.AuditFindingsUploadView.as_view(),
         name="audit_findings",
+    ),
+    path(
+        "audit-findings-text/<str:report_id>",
+        views.AuditFindingsTextUploadView.as_view(),
+        name="audit_findings_text",
+    ),
+    path(
+        "CAP/<str:report_id>",
+        views.CAPUploadView.as_view(),
+        name="CAP",
+    ),
+    path(
+        "additional-EINs/<str:report_id>",
+        views.AdditionalEINsUploadView.as_view(),
+        name="additional_EINs",
+    ),
+    path(
+        "additional-UEIs/<str:report_id>",
+        views.AdditionalUEIsUploadView.as_view(),
+        name="additional_UEIs",
+    ),
+    path(
+        "secondary-auditors/<str:report_id>",
+        views.SecondaryAuditorsUploadView.as_view(),
+        name="secondary_auditors",
     ),
 ]
