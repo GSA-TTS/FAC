@@ -42,28 +42,33 @@
       %% The following line is not understood by Mermaid;
       %% Try uncommenting it in the online Mermaid editor (https://mermaid.live/edit)
       %% AddRelTag("authenticated", $lineColor="#008787", $textColor="#008787")
-      Rel(User, django, "Submits/edits audits")
+      Rel(User, Login, "Authenticates with", "foo")
+      Rel(Staff, Login, "Authenticates with")
+      Rel(Agency, Login, "Authenticates with")
+      Rel(AgencyApp, datagov, "Routes requests through")
+      Rel(datagov, api, "Searches, filters, requests audit", "via api.data.gov", $tags="authenticated")
+
+      Rel(api, db, "Fetches read-only Audits")
+      Rel(api, s3, "Fetches read-only Audit Attachments")
+      Rel(https_proxy, samgov, "Looks up UEI info")
+      Rel(mail_proxy, Email, "Sends emails using")
+
+      %% Mermaid is barfing on these lines
+      %% Possibly because it doesn't (or the C4-PlantUML spec isn't supposed
+      %% to) support relationships between systems and boundaries, only across boundaries.
+      %% Try copying this diagram into the Mermaid editor, then comment out the 
+      %% following lines and the diagram will appear.
+      Rel(django, https_proxy, "Looks up UEI info")
+      Rel(django, mail_proxy, "Sends emails using")
+      Rel(django, scan, "Scans attachments")
+      Rel(django, db, "read/write")
+      Rel(backend, s3, "Stores single audit packages/Excel files")
+      Rel(Login, backend, "Provides identities", "email address")
+      Rel(User, django, "Submits/edits audits", "foo")
       Rel(Public, django, "Searches for/reads information")
       Rel(Agency, django, "Searches for/reads non-public information")
       Rel(Staff, django, "Manages audits, roles, content")
 
-      Rel(User, Login, "Authenticates with")
-      Rel(Staff, Login, "Authenticates with")
-      Rel(Agency, Login, "Authenticates with")
-      Rel(AgencyApp, datagov, "Routes requests through")
 
-      Rel(datagov, api, "Searches, filters, requests audit", "via api.data.gov", $tags="authenticated")
-      Rel(Login, backend, "Provides identities", "email address")
-
-      Rel(api, db, "Fetches (read-only) Audits")
-      Rel(api, s3, "Fetches (read-only) Audit Attachments")
-
-      Rel(django, https_proxy, "Looks up UEI info")
-      Rel(https_proxy, samgov, "Looks up UEI info")
-      Rel(django, mail_proxy, "Sends emails using")
-      Rel(mail_proxy, Email, "Sends emails using")
-      Rel(django, scan, "Scans attachments")
-      Rel(django, db, "read/write")
-      Rel(backend, s3, "Stores single audit packages/Excel files")
 
 ```
