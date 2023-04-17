@@ -205,7 +205,7 @@ class FederalAwardsUploadView(LoginRequiredMixin, View):
                 "auditee_uei": sac.auditee_uei,
                 "user_provided_organization_type": sac.user_provided_organization_type,
                 "view_id": "federal-awards",
-                "view_name": "Federal awards"
+                "view_name": "Federal awards",
             }
 
             return render(request, "report_submission/upload-page.html", context)
@@ -217,9 +217,7 @@ class FederalAwardsUploadView(LoginRequiredMixin, View):
         report_id = kwargs["report_id"]
 
         try:
-            return redirect(
-                    "/report_submission/audit-findings/{}".format(report_id)
-                )
+            return redirect("/report_submission/audit-findings/{}".format(report_id))
 
         except Exception as e:
             logger.info("Unexpected error in FederalAwardsUploadView post.\n", e)
@@ -244,7 +242,7 @@ class AuditFindingsUploadView(LoginRequiredMixin, View):
                 "auditee_uei": sac.auditee_uei,
                 "user_provided_organization_type": sac.user_provided_organization_type,
                 "view_id": "audit-findings",
-                "view_name": "Audit findings"
+                "view_name": "Audit findings",
             }
 
             return render(request, "report_submission/upload-page.html", context)
@@ -257,8 +255,8 @@ class AuditFindingsUploadView(LoginRequiredMixin, View):
 
         try:
             return redirect(
-                    "/report_submission/audit-findings-text/{}".format(report_id)
-                )
+                "/report_submission/audit-findings-text/{}".format(report_id)
+            )
 
         except Exception as e:
             logger.info("Unexpected error in AuditFindingsUploadView post.\n", e)
@@ -283,7 +281,7 @@ class AuditFindingsTextUploadView(LoginRequiredMixin, View):
                 "auditee_uei": sac.auditee_uei,
                 "user_provided_organization_type": sac.user_provided_organization_type,
                 "view_id": "audit-findings-text",
-                "view_name": "Audit findings text"
+                "view_name": "Audit findings text",
             }
 
             return render(request, "report_submission/upload-page.html", context)
@@ -291,13 +289,12 @@ class AuditFindingsTextUploadView(LoginRequiredMixin, View):
             raise PermissionDenied("You do not have access to this audit.")
 
             # Unimplemented
+
     def post(self, request, *args, **kwargs):
         report_id = kwargs["report_id"]
 
         try:
-            return redirect(
-                    "/report_submission/CAP/{}".format(report_id)
-                )
+            return redirect("/report_submission/CAP/{}".format(report_id))
 
         except Exception as e:
             logger.info("Unexpected error in AuditFindingsTextUploadView post.\n", e)
@@ -322,7 +319,7 @@ class CAPUploadView(LoginRequiredMixin, View):
                 "auditee_uei": sac.auditee_uei,
                 "user_provided_organization_type": sac.user_provided_organization_type,
                 "view_id": "CAP",
-                "view_name": "Corrective Action Plan (CAP)"
+                "view_name": "Corrective Action Plan (CAP)",
             }
 
             return render(request, "report_submission/upload-page.html", context)
@@ -330,18 +327,18 @@ class CAPUploadView(LoginRequiredMixin, View):
             raise PermissionDenied("You do not have access to this audit.")
 
             # Unimplemented
+
     def post(self, request, *args, **kwargs):
         report_id = kwargs["report_id"]
 
         try:
-            return redirect(
-                    "/report_submission/additional-EINs/{}".format(report_id)
-                )
+            return redirect("/report_submission/additional-EINs/{}".format(report_id))
 
         except Exception as e:
             logger.info("Unexpected error in CAPUploadView post.\n", e)
 
         raise BadRequest()
+
 
 class AdditionalEINsUploadView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
@@ -360,7 +357,7 @@ class AdditionalEINsUploadView(LoginRequiredMixin, View):
                 "auditee_uei": sac.auditee_uei,
                 "user_provided_organization_type": sac.user_provided_organization_type,
                 "view_id": "additional-EINs",
-                "view_name": "Additional EINs"
+                "view_name": "Additional EINs",
             }
 
             return render(request, "report_submission/upload-page.html", context)
@@ -368,13 +365,12 @@ class AdditionalEINsUploadView(LoginRequiredMixin, View):
             raise PermissionDenied("You do not have access to this audit.")
 
             # Unimplemented
+
     def post(self, request, *args, **kwargs):
         report_id = kwargs["report_id"]
 
         try:
-            return redirect(
-                    "/report_submission/additional-UEIs/{}".format(report_id)
-                )
+            return redirect("/report_submission/additional-UEIs/{}".format(report_id))
 
         except Exception as e:
             logger.info("Unexpected error in AdditionalEINsUploadView post.\n", e)
@@ -399,7 +395,7 @@ class AdditionalUEIsUploadView(LoginRequiredMixin, View):
                 "auditee_uei": sac.auditee_uei,
                 "user_provided_organization_type": sac.user_provided_organization_type,
                 "view_id": "additional-UEIs",
-                "view_name": "Additional UEIs"
+                "view_name": "Additional UEIs",
             }
 
             return render(request, "report_submission/upload-page.html", context)
@@ -407,18 +403,20 @@ class AdditionalUEIsUploadView(LoginRequiredMixin, View):
             raise PermissionDenied("You do not have access to this audit.")
 
             # Unimplemented
+
     def post(self, request, *args, **kwargs):
         report_id = kwargs["report_id"]
 
         try:
             return redirect(
-                    "/report_submission/secondary-auditors/{}".format(report_id)
-                )
+                "/report_submission/secondary-auditors/{}".format(report_id)
+            )
 
         except Exception as e:
             logger.info("Unexpected error in AdditionalUEIsUploadView post.\n", e)
 
         raise BadRequest()
+
 
 class SecondaryAuditorsUploadView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
@@ -437,7 +435,7 @@ class SecondaryAuditorsUploadView(LoginRequiredMixin, View):
                 "auditee_uei": sac.auditee_uei,
                 "user_provided_organization_type": sac.user_provided_organization_type,
                 "view_id": "secondary-auditors",
-                "view_name": "Secondary auditors"
+                "view_name": "Secondary auditors",
             }
 
             return render(request, "report_submission/upload-page.html", context)
@@ -445,6 +443,7 @@ class SecondaryAuditorsUploadView(LoginRequiredMixin, View):
             raise PermissionDenied("You do not have access to this audit.")
 
             # Unimplemented
+
     def post(self, request, *args, **kwargs):
         try:
             return redirect(reverse("/"))
