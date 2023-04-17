@@ -247,8 +247,12 @@ class AuditFindingsUploadView(LoginRequiredMixin, View):
 
     # Unimplemented
     def post(self, request, *args, **kwargs):
+        report_id = kwargs["report_id"]
+
         try:
-            return redirect(reverse("/"))
+            return redirect(
+                    "/report_submission/audit-findings-text/{}".format(report_id)
+                )
 
         except Exception as e:
             logger.info("Unexpected error in AuditFindingsUploadView post.\n", e)
@@ -282,8 +286,12 @@ class AuditFindingsTextUploadView(LoginRequiredMixin, View):
 
             # Unimplemented
     def post(self, request, *args, **kwargs):
+        report_id = kwargs["report_id"]
+
         try:
-            return redirect(reverse("/"))
+            return redirect(
+                    "/report_submission/CAP/{}".format(report_id)
+                )
 
         except Exception as e:
             logger.info("Unexpected error in AuditFindingsTextUploadView post.\n", e)
@@ -317,8 +325,12 @@ class CAPUploadView(LoginRequiredMixin, View):
 
             # Unimplemented
     def post(self, request, *args, **kwargs):
+        report_id = kwargs["report_id"]
+
         try:
-            return redirect(reverse("/"))
+            return redirect(
+                    "/report_submission/additional-EINs/{}".format(report_id)
+                )
 
         except Exception as e:
             logger.info("Unexpected error in CAPUploadView post.\n", e)
@@ -351,8 +363,12 @@ class AdditionalEINsUploadView(LoginRequiredMixin, View):
 
             # Unimplemented
     def post(self, request, *args, **kwargs):
+        report_id = kwargs["report_id"]
+
         try:
-            return redirect(reverse("/"))
+            return redirect(
+                    "/report_submission/additional-UEIs/{}".format(report_id)
+                )
 
         except Exception as e:
             logger.info("Unexpected error in AdditionalEINsUploadView post.\n", e)
@@ -386,8 +402,12 @@ class AdditionalUEIsUploadView(LoginRequiredMixin, View):
 
             # Unimplemented
     def post(self, request, *args, **kwargs):
+        report_id = kwargs["report_id"]
+
         try:
-            return redirect(reverse("/"))
+            return redirect(
+                    "/report_submission/secondary-auditors/{}".format(report_id)
+                )
 
         except Exception as e:
             logger.info("Unexpected error in AdditionalUEIsUploadView post.\n", e)
