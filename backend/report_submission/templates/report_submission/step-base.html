@@ -18,7 +18,7 @@
                  aria-label="Form progress"
                  aria-valuemin="1"
                  aria-valuemax="4"
-                 aria-valuenow="2">
+                 aria-valuenow="{{ step }}">
                 <ol class="usa-step-indicator__segments">
                     <li class="usa-step-indicator__segment {% if step|add:'0' == 1 %} usa-step-indicator__segment--current {% endif %} {% if step|add:'0' > 1 %} usa-step-indicator__segment--complete {% endif %} ">
                         <span class="usa-step-indicator__segment-label">

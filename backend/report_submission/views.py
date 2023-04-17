@@ -25,7 +25,9 @@ class ReportSubmissionRedirectView(View):
 # Step 1
 class EligibilityFormView(LoginRequiredMixin, View):
     def get(self, request):
-        return render(request, "report_submission/step-1.html")
+        args = {}
+        args['step'] = 1
+        return render(request, "report_submission/step-1.html", args)
 
     # render eligibility form
 
@@ -42,7 +44,9 @@ class EligibilityFormView(LoginRequiredMixin, View):
 # Step 2
 class AuditeeInfoFormView(LoginRequiredMixin, View):
     def get(self, request):
-        return render(request, "report_submission/step-2.html")
+        args = {}
+        args['step'] = 2
+        return render(request, "report_submission/step-2.html", args)
 
     # render auditee info form
 
@@ -80,7 +84,9 @@ class AuditeeInfoFormView(LoginRequiredMixin, View):
 # Step 3
 class AccessAndSubmissionFormView(LoginRequiredMixin, View):
     def get(self, request):
-        return render(request, "report_submission/step-3.html")
+        args = {}
+        args['step'] = 3
+        return render(request, "report_submission/step-3.html", args)
 
     # render access-submission form
 
