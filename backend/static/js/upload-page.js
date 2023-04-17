@@ -15,7 +15,6 @@ function attachEventHandlers() {
 
   // On file upload, send it off for validation
   fileupload.addEventListener('change', (e) => {
-
     var data = new FormData();
     data.append('FILES', e.target.files[0]);
     data.append('filename', e.target.files[0].name);
