@@ -39,7 +39,9 @@
       System(samgov, "SAM.gov", "UEI Source")
       System(Email, "GSA Email")
 
-      AddRelTag("authenticated", $lineColor="#008787", $textColor="#008787")
+      %% The following line is not understood by Mermaid;
+      %% Try uncommenting it in the online Mermaid editor (https://mermaid.live/edit)
+      %% AddRelTag("authenticated", $lineColor="#008787", $textColor="#008787")
       Rel(User, django, "Submits/edits audits")
       Rel(Public, django, "Searches for/reads information")
       Rel(Agency, django, "Searches for/reads non-public information")
