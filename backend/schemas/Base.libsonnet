@@ -141,6 +141,11 @@ local Compound = {
     description: 'Program number',
     pattern: '^[1-9]{1}[0-9]{1}\\.([0-9]{3}[a-zA-Z]{0,1}|U[0-9]{2}|RD)$',
   },
+  ReferenceNumber: Types.string {
+    title: 'ReferenceNumber',
+    description: 'Reference Number',
+    pattern: '^20[2-9]{1}[0-9]{1}-[0-9]{3}$',
+  },  
   ClusterName: Types.string {
     description: 'Cluster Name',
     enum: [

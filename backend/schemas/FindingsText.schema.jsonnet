@@ -5,7 +5,7 @@ local Types = Base.Types;
 local FindingsTextEntry = {
     additionalProperties: false,
     properties: {
-        reference_number: Types.string,
+        reference_number: Base.Compound.ReferenceNumber,
         text_of_finding: Types.string,
         contains_chart_or_table: Base.Enum.YorN
     },

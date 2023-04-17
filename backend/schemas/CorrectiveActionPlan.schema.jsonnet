@@ -5,7 +5,7 @@ local Types = Base.Types;
 local CorrectiveActionPlanEntry = {
     additionalProperties: false,
     properties: {
-        reference_number: Types.string,
+        reference_number: Base.Compound.ReferenceNumber,
         planned_action: Types.string,
         contains_chart_or_table: Base.Enum.YorN
     },

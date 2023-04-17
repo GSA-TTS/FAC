@@ -5,11 +5,6 @@ local Types = Base.Types;
 local Validations = Additional.Validations; 
 
 local Parts = {
-  ReferenceNumber: Types.string {
-    title: 'ReferenceNumber',
-    description: 'Reference Number',
-    pattern: '^20[2-9]{1}[0-9]{1}-[0-9]{3}$',
-  },
   Program: Types.object {
     additionalProperties: false,
     properties: {
@@ -43,11 +38,11 @@ local Parts = {
   Findings:Types.object {
     additionalProperties: false,
     properties: {
-      reference: Parts.ReferenceNumber,
+      reference: Base.Compound.ReferenceNumber,
       is_valid: Base.Enum.YorN,
       repeat_prior_reference: Base.Enum.YorN,
       prior_references: Types.array {
-        items: Parts.ReferenceNumber,
+        items: Base.Compound.ReferenceNumber,
       }      
     },     
     required: [
