@@ -411,14 +411,10 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
                             "identifying_number": "12345"
                         }
                     ]
-                },
+                    },
                     "cluster": {
                         "name": "N/A",
                         "total": 123
-                    },
-                    "state_cluster": {
-                        "is_cluster": "N",
-                        "name": ""
                     },
                     "subrecipients": {
                         "is_passed": "N"
@@ -455,12 +451,9 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
                         "amount": 32
                     },
                     "cluster": {
-                        "name": "N/A",
-                        "total": 123
-                    },
-                    "state_cluster": {
-                        "is_cluster": "Y",
-                        "name": "Maine"
+                        "name": "STATE CLUSTER",
+                        "total": 123,
+                        "state_cluster_name": "Maine"
                     }
                 }
             ]
@@ -740,37 +733,32 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
 
     def test_missing_state_cluster_name(self):
         """
-        If cluster_name is 'State Cluster' state_cluster must have a value
+        If cluster name is 'STATE CLUSTER' state_cluster_name must have a value
         """
         schema = self.FEDERAL_AWARDS_SCHEMA
 
         simple_case = jsoncopy(self.SIMPLE_CASE)
-        # Lacks a cluster name if "is_cluster" is Y
-        simple_case["FederalAwards"]["federal_awards"][0]["state_cluster"] = {
-            "is_cluster": "Y"
-        }
+
+        simple_case["FederalAwards"]["federal_awards"][0]["cluster"]["name"] = "STATE CLUSTER"
         self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
     def test_disallowed_state_cluster_name(self):
         """
-        If is_cluster, must be a valid name
+        If cluster name is not 'STATE CLUSTER', state_cluster_name must be empty or null
         """
         schema = self.FEDERAL_AWARDS_SCHEMA
 
         simple_case = jsoncopy(self.SIMPLE_CASE)
-        simple_case["FederalAwards"]["federal_awards"][0]["state_cluster"] = {
-            "is_cluster": "N",
-            "name": "not valid as a N response"
-        }
+        simple_case["FederalAwards"]["federal_awards"][0]["cluster"]["state_cluster_name"] = "ANYTHING"
+        
+        # Test for errors when state_cluster_name is not empty or null
         self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
-        # Test "N" valid responses
+        # Test for successful validation when state_cluster_name is empty or null
         for valid in ["", 'null']:
             simple_case = jsoncopy(self.SIMPLE_CASE)
-            simple_case["FederalAwards"]["federal_awards"][0]["state_cluster"] = {
-                "is_cluster": "N",
-                "name": valid
-            }
+            simple_case["FederalAwards"]["federal_awards"][0]["cluster"]["state_cluster_name"] =  valid
+
             validate(simple_case, schema)
 
     def test_number_of_audit_findings(self):

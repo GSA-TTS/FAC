@@ -151,9 +151,6 @@ local Validations = {
       },
     },
     {
-
-    }
-    {
       // 20230409 MCJ FIXME: Should we require all fields always,
       // and make sure thet ype checking is correct in each conditional branch?
       // FIXME: Should we ALWAYS require a value in EVERY field, and disallow
@@ -173,29 +170,73 @@ local Validations = {
 
       },
     },
-  ],
-  StateClusterValidations: [
-    {
-      'if': {
-        properties: {
-          is_cluster: {
-            const: Base.Const.N,
-          },
-        },
-      },
-      'then': {
-        properties: {
-          name: Base.Enum.EmptyString_Null,
-        },
-      },
-    },
-  ],
+  ] 
 };
 
 local Parts = {
   Cluster: Types.object {
-    name: Base.Compound.ClusterName,
-    total: Types.number,
+    properties: {
+      name: Base.Compound.ClusterName,
+      total: Types.number,
+    },
+    allOf: [
+      {
+        "if": {
+          "not": {
+            properties: {
+                name: {
+                  enum: [Base.Const.OTHER_CLUSTER,Base.Const.STATE_CLUSTER]
+              },                                   
+            },
+          }
+        },
+        "then": {
+          "allOf": [
+            {
+                properties: {
+                  other_cluster_name: Base.Enum.EmptyString_Null,
+                },
+              },
+              {
+                properties: {
+                  state_cluster_name: Base.Enum.EmptyString_Null,
+                },
+              }
+          ]
+        },
+      },        
+      {
+        "if": {
+          properties: {
+            name: {
+              const: Base.Const.STATE_CLUSTER,
+            },
+           },
+        },
+        "then": {
+          properties: {
+            state_cluster_name: Base.Compound.NonEmptyString,
+          },
+          required: ['state_cluster_name'] 
+        },
+      },  
+      {
+        "if": {
+          properties: {
+            name: {
+              const: Base.Const.OTHER_CLUSTER,
+            },
+          },
+        },
+        "then": {
+          properties: {
+            other_cluster_name: Base.Compound.NonEmptyString,
+          },
+          required: ['other_cluster_name'] 
+        }
+      },         
+    ],    
+    required: ['name']       
   },
   PassThroughEntity: Types.object {
     additionalProperties: false,
@@ -253,19 +294,6 @@ local Parts = {
     required: ['name', 'number', 'is_major', 'audit_report_type', 'number_of_audit_findings'],
     allOf: Validations.ProgramValidations,
   },
-  StateCluster: Types.object {
-    additionalProperties: false,
-    properties: {
-      is_cluster: Base.Enum.YorN,
-      name: Types.string,
-    },
-    // 20230410 MCJ FIXME: A side-effect of not requiring a 
-    // value in every cell of the sheet is "is_cluster" can be
-    // empty. Or, we don't have a named range for it. Either way,
-    // something we should fix.
-    required: ['name'],
-    allOf: Validations.StateClusterValidations,
-  },
 };
 
 local FederalAwardEntry = Types.object {
@@ -276,7 +304,6 @@ local FederalAwardEntry = Types.object {
       minimum: 0,
     },
     cluster: Parts.Cluster,
-    state_cluster: Parts.StateCluster,
     direct_or_indirect_award: Parts.DirectOrIndirectAward,
     loan_or_loan_guarantee: Parts.LoanOrLoanGuarantee,
     program: Parts.Program,
@@ -284,7 +311,6 @@ local FederalAwardEntry = Types.object {
   },
   required: [
     'cluster',
-    'state_cluster',
     'direct_or_indirect_award',
     'loan_or_loan_guarantee',
     'program',

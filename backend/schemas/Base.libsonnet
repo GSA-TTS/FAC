@@ -7,6 +7,8 @@ local Const = {
   empty_array: [],
   empty_object: {},
   NULL: 'null',
+  STATE_CLUSTER: 'STATE CLUSTER',
+  OTHER_CLUSTER: 'OTHER CLUSTER NOT LISTED ABOVE',
 };
 
 local Types = {
@@ -152,7 +154,7 @@ local Compound = {
       'N/A',
       'RESEARCH AND DEVELOPMENT',
       'STUDENT FINANCIAL ASSISTANCE',
-      'STATE CLUSTER',
+      Const.STATE_CLUSTER,
       '477 CLUSTER',
       'AGING CLUSTER',
       'CCDF CLUSTER',
@@ -190,9 +192,13 @@ local Compound = {
       'TRIO CLUSTER',
       'WATER AND WASTE PROGRAM CLUSTER',
       'WIOA CLUSTER',
-      'OTHER CLUSTER NOT LISTED ABOVE',
+      Const.OTHER_CLUSTER,
     ],
     title: 'ClusterName',
+  },
+ 
+  NonEmptyString: Types.string {
+      minLength: 1
   },
   StateClusterNameNonAnswers: Enum.EmptyString_Null,
 

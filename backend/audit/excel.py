@@ -96,7 +96,12 @@ federal_awards_column_mapping: ColumnMapping = {
     "program_number": ("FederalAwards.federal_awards", "program.number", _set_by_path),
     "state_cluster_name": (
         "FederalAwards.federal_awards",
-        "state_cluster.name",
+        "cluster.state_cluster_name",
+        _set_by_path,
+    ),
+    "other_cluster_name": (
+        "FederalAwards.federal_awards",
+        "cluster.other_cluster_name",
         _set_by_path,
     ),
 }

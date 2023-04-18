@@ -29,10 +29,6 @@
                     "name": "N/A",
                     "total": 123
                 },
-                "state_cluster": {
-                    "is_cluster": "N",
-                    "name": ""
-                },
                 "subrecipients": {
                     "is_passed": "N"
                 }
@@ -58,12 +54,9 @@
                     "amount": 32
                 },
                 "cluster": {
-                    "name": "N/A",
+                    "name": "OTHER CLUSTER NOT LISTED ABOVE",
+                    "other_cluster_name": "Some name",
                     "total": 123
-                },
-                "state_cluster": {
-                    "is_cluster": "Y",
-                    "name": "Maine"
                 }
             },
             {
@@ -91,12 +84,9 @@
                     "amount": 32
                 },
                 "cluster": {
-                    "name": "N/A",
+                    "name": "STATE CLUSTER",
+                    "state_cluster_name": "Maine",
                     "total": 123
-                },
-                "state_cluster": {
-                    "is_cluster": "Y",
-                    "name": "Maine"
                 }
             }
         ]

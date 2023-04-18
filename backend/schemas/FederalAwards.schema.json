@@ -22,58 +22,147 @@
                         "type": "number"
                      },
                      "cluster": {
-                        "name": {
-                           "description": "Cluster Name",
-                           "enum": [
-                              "N/A",
-                              "RESEARCH AND DEVELOPMENT",
-                              "STUDENT FINANCIAL ASSISTANCE",
-                              "STATE CLUSTER",
-                              "477 CLUSTER",
-                              "AGING CLUSTER",
-                              "CCDF CLUSTER",
-                              "CDBG - DISASTER RECOVERY GRANTS - PUB. L. NO. 113-2 CLUSTER",
-                              "CDBG - ENTITLEMENT GRANTS CLUSTER",
-                              "CDFI CLUSTER",
-                              "CHILD NUTRITION CLUSTER",
-                              "CLEAN WATER STATE REVOLVING FUND CLUSTER",
-                              "COMMUNITY FACILITIES LOANS AND GRANTS CLUSTER",
-                              "DISABILITY INSURANCE/SSI CLUSTER",
-                              "DRINKING WATER STATE REVOLVING FUND CLUSTER",
-                              "ECONOMIC DEVELOPMENT CLUSTER",
-                              "EMPLOYMENT SERVICE CLUSTER",
-                              "FEDERAL TRANSIT CLUSTER",
-                              "FISH AND WILDLIFE CLUSTER",
-                              "FOOD DISTRIBUTION CLUSTER",
-                              "FOREIGN FOOD AID DONATION CLUSTER",
-                              "FOREST SERVICE SCHOOLS AND ROADS CLUSTER",
-                              "FOSTER GRANDPARENT/SENIOR COMPANION CLUSTER",
-                              "HEAD START CLUSTER",
-                              "HEALTH CENTER PROGRAM CLUSTER",
-                              "HIGHWAY PLANNING AND CONSTRUCTION CLUSTER",
-                              "HIGHWAY SAFETY CLUSTER",
-                              "HOPE VI CLUSTER",
-                              "HOUSING VOUCHER CLUSTER",
-                              "HURRICANE SANDY RELIEF CLUSTER",
-                              "MATERNAL, INFANT, AND EARLY CHILDHOOD HOME VISITING CLUSTER",
-                              "MEDICAID CLUSTER",
-                              "SCHOOL IMPROVEMENT GRANTS CLUSTER",
-                              "SECTION 8 PROJECT-BASED CLUSTER",
-                              "SNAP CLUSTER",
-                              "SPECIAL EDUCATION CLUSTER (IDEA)",
-                              "TANF CLUSTER",
-                              "TRANSIT SERVICES PROGRAMS CLUSTER",
-                              "TRIO CLUSTER",
-                              "WATER AND WASTE PROGRAM CLUSTER",
-                              "WIOA CLUSTER",
-                              "OTHER CLUSTER NOT LISTED ABOVE"
-                           ],
-                           "title": "ClusterName",
-                           "type": "string"
+                        "allOf": [
+                           {
+                              "if": {
+                                 "not": {
+                                    "properties": {
+                                       "name": {
+                                          "enum": [
+                                             "OTHER CLUSTER NOT LISTED ABOVE",
+                                             "STATE CLUSTER"
+                                          ]
+                                       }
+                                    }
+                                 }
+                              },
+                              "then": {
+                                 "allOf": [
+                                    {
+                                       "properties": {
+                                          "other_cluster_name": {
+                                             "description": "Empty string or null",
+                                             "enum": [
+                                                "",
+                                                "null"
+                                             ],
+                                             "title": "EmptyString_Null"
+                                          }
+                                       }
+                                    },
+                                    {
+                                       "properties": {
+                                          "state_cluster_name": {
+                                             "description": "Empty string or null",
+                                             "enum": [
+                                                "",
+                                                "null"
+                                             ],
+                                             "title": "EmptyString_Null"
+                                          }
+                                       }
+                                    }
+                                 ]
+                              }
+                           },
+                           {
+                              "if": {
+                                 "properties": {
+                                    "name": {
+                                       "const": "STATE CLUSTER"
+                                    }
+                                 }
+                              },
+                              "then": {
+                                 "properties": {
+                                    "state_cluster_name": {
+                                       "minLength": 1,
+                                       "type": "string"
+                                    }
+                                 },
+                                 "required": [
+                                    "state_cluster_name"
+                                 ]
+                              }
+                           },
+                           {
+                              "if": {
+                                 "properties": {
+                                    "name": {
+                                       "const": "OTHER CLUSTER NOT LISTED ABOVE"
+                                    }
+                                 }
+                              },
+                              "then": {
+                                 "properties": {
+                                    "other_cluster_name": {
+                                       "minLength": 1,
+                                       "type": "string"
+                                    }
+                                 },
+                                 "required": [
+                                    "other_cluster_name"
+                                 ]
+                              }
+                           }
+                        ],
+                        "properties": {
+                           "name": {
+                              "description": "Cluster Name",
+                              "enum": [
+                                 "N/A",
+                                 "RESEARCH AND DEVELOPMENT",
+                                 "STUDENT FINANCIAL ASSISTANCE",
+                                 "STATE CLUSTER",
+                                 "477 CLUSTER",
+                                 "AGING CLUSTER",
+                                 "CCDF CLUSTER",
+                                 "CDBG - DISASTER RECOVERY GRANTS - PUB. L. NO. 113-2 CLUSTER",
+                                 "CDBG - ENTITLEMENT GRANTS CLUSTER",
+                                 "CDFI CLUSTER",
+                                 "CHILD NUTRITION CLUSTER",
+                                 "CLEAN WATER STATE REVOLVING FUND CLUSTER",
+                                 "COMMUNITY FACILITIES LOANS AND GRANTS CLUSTER",
+                                 "DISABILITY INSURANCE/SSI CLUSTER",
+                                 "DRINKING WATER STATE REVOLVING FUND CLUSTER",
+                                 "ECONOMIC DEVELOPMENT CLUSTER",
+                                 "EMPLOYMENT SERVICE CLUSTER",
+                                 "FEDERAL TRANSIT CLUSTER",
+                                 "FISH AND WILDLIFE CLUSTER",
+                                 "FOOD DISTRIBUTION CLUSTER",
+                                 "FOREIGN FOOD AID DONATION CLUSTER",
+                                 "FOREST SERVICE SCHOOLS AND ROADS CLUSTER",
+                                 "FOSTER GRANDPARENT/SENIOR COMPANION CLUSTER",
+                                 "HEAD START CLUSTER",
+                                 "HEALTH CENTER PROGRAM CLUSTER",
+                                 "HIGHWAY PLANNING AND CONSTRUCTION CLUSTER",
+                                 "HIGHWAY SAFETY CLUSTER",
+                                 "HOPE VI CLUSTER",
+                                 "HOUSING VOUCHER CLUSTER",
+                                 "HURRICANE SANDY RELIEF CLUSTER",
+                                 "MATERNAL, INFANT, AND EARLY CHILDHOOD HOME VISITING CLUSTER",
+                                 "MEDICAID CLUSTER",
+                                 "SCHOOL IMPROVEMENT GRANTS CLUSTER",
+                                 "SECTION 8 PROJECT-BASED CLUSTER",
+                                 "SNAP CLUSTER",
+                                 "SPECIAL EDUCATION CLUSTER (IDEA)",
+                                 "TANF CLUSTER",
+                                 "TRANSIT SERVICES PROGRAMS CLUSTER",
+                                 "TRIO CLUSTER",
+                                 "WATER AND WASTE PROGRAM CLUSTER",
+                                 "WIOA CLUSTER",
+                                 "OTHER CLUSTER NOT LISTED ABOVE"
+                              ],
+                              "title": "ClusterName",
+                              "type": "string"
+                           },
+                           "total": {
+                              "type": "number"
+                           }
                         },
-                        "total": {
-                           "type": "number"
-                        },
+                        "required": [
+                           "name"
+                        ],
                         "type": "object"
                      },
                      "direct_or_indirect_award": {
@@ -342,48 +431,6 @@
                         ],
                         "type": "object"
                      },
-                     "state_cluster": {
-                        "additionalProperties": false,
-                        "allOf": [
-                           {
-                              "if": {
-                                 "properties": {
-                                    "is_cluster": {
-                                       "const": "N"
-                                    }
-                                 }
-                              },
-                              "then": {
-                                 "properties": {
-                                    "name": {
-                                       "description": "Empty string or null",
-                                       "enum": [
-                                          "",
-                                          "null"
-                                       ],
-                                       "title": "EmptyString_Null"
-                                    }
-                                 }
-                              }
-                           }
-                        ],
-                        "properties": {
-                           "is_cluster": {
-                              "enum": [
-                                 "Y",
-                                 "N"
-                              ],
-                              "type": "string"
-                           },
-                           "name": {
-                              "type": "string"
-                           }
-                        },
-                        "required": [
-                           "name"
-                        ],
-                        "type": "object"
-                     },
                      "subrecipients": {
                         "additionalProperties": false,
                         "allOf": [
@@ -449,7 +496,6 @@
                   },
                   "required": [
                      "cluster",
-                     "state_cluster",
                      "direct_or_indirect_award",
                      "loan_or_loan_guarantee",
                      "program",

@@ -240,31 +240,89 @@ class FederalAwardsExcelFileViewTests(TestCase):
                     "federal_awards"
                 ][0]
 
-                simple_cases = [
-                    "cluster_name",
-                    "direct_award",
-                    "major_program",
-                    "program_number",
-                    "amount_expended",
-                    "federal_program_name",
-                    "loan_or_loan_guarantee",
-                    "number_of_audit_findings",
-                    "major_program_audit_report_type",
-                    "loan_balance_at_audit_period_end",
-                    "federal_award_passed_to_subrecipients",
-                    "federal_award_passed_to_subrecipients_amount",
-                ]
+                # 20230418 HDMS FIXME: For some reason, the test below start failing so I commented it out and replaced it with the logic below
+                # Kipping this here for now until I revisit the code to see if the failure was justified or not.
+                # simple_cases = [
+                #     "cluster_name",
+                #     "direct_award",
+                #     "major_program",
+                #     "program_number",
+                #     "amount_expended",
+                #     "federal_program_name",
+                #     "loan_or_loan_guarantee",
+                #     "number_of_audit_findings",
+                #     "major_program_audit_report_type",
+                #     "loan_balance_at_audit_period_end",
+                #     "federal_award_passed_to_subrecipients",
+                #     "federal_award_passed_to_subrecipients_amount",
+                # ]
 
-                for case in simple_cases:
-                    self.assertEqual(
-                        federal_awards_entry[case],
-                        FEDERAL_AWARDS_ENTRY_FIXTURES[0][case],
-                    )
+                # for case in simple_cases:
+                #     self.assertEqual(
+                #         federal_awards_entry[case],
+                #         FEDERAL_AWARDS_ENTRY_FIXTURES[0][case],
+                #     )
+
+                # self.assertEqual(
+                #     federal_awards_entry["direct_award_pass_through_entities"],
+                #     [
+                #         {"name": "A", "identifying_number": "1"},
+                #         {"name": "B", "identifying_number": "2"},
+                #     ],
+                # )
 
                 self.assertEqual(
-                    federal_awards_entry["direct_award_pass_through_entities"],
-                    [
-                        {"name": "A", "identifying_number": "1"},
-                        {"name": "B", "identifying_number": "2"},
-                    ],
+                    federal_awards_entry["cluster"]["name"],
+                    FEDERAL_AWARDS_ENTRY_FIXTURES[0]["cluster_name"]
+                )
+                self.assertEqual(
+                    federal_awards_entry["direct_or_indirect_award"]["is_direct"],
+                    FEDERAL_AWARDS_ENTRY_FIXTURES[0]["direct_award"]
+                )
+                self.assertEqual(
+                    federal_awards_entry["program"]["is_major"],
+                    FEDERAL_AWARDS_ENTRY_FIXTURES[0]["major_program"]
+                )
+                self.assertEqual(
+                    federal_awards_entry["program"]["number"],
+                    FEDERAL_AWARDS_ENTRY_FIXTURES[0]["program_number"]
+                )
+                self.assertEqual(
+                    federal_awards_entry["amount_expended"],
+                    FEDERAL_AWARDS_ENTRY_FIXTURES[0]["amount_expended"]
+                )
+                self.assertEqual(
+                    federal_awards_entry["program"]["name"],
+                    FEDERAL_AWARDS_ENTRY_FIXTURES[0]["federal_program_name"]
+                )
+                self.assertEqual(
+                    federal_awards_entry["loan_or_loan_guarantee"]["is_guaranteed"],
+                    FEDERAL_AWARDS_ENTRY_FIXTURES[0]["loan_or_loan_guarantee"]
+                )
+                self.assertEqual(
+                    federal_awards_entry["program"]["number_of_audit_findings"],
+                    FEDERAL_AWARDS_ENTRY_FIXTURES[0]["number_of_audit_findings"]
+                )
+                self.assertEqual(
+                    federal_awards_entry["program"]["audit_report_type"],
+                    FEDERAL_AWARDS_ENTRY_FIXTURES[0]["major_program_audit_report_type"]
+                )
+                self.assertEqual(
+                    federal_awards_entry["loan_or_loan_guarantee"]["loan_balance_at_audit_period_end"],
+                    FEDERAL_AWARDS_ENTRY_FIXTURES[0]["loan_balance_at_audit_period_end"]
+                )
+                self.assertEqual(
+                    federal_awards_entry["subrecipients"]["is_passed"],
+                    FEDERAL_AWARDS_ENTRY_FIXTURES[0]["federal_award_passed_to_subrecipients"]
+                )
+                self.assertEqual(
+                    federal_awards_entry["subrecipients"]["amount"],
+                    FEDERAL_AWARDS_ENTRY_FIXTURES[0]["federal_award_passed_to_subrecipients_amount"]
+                )
+                self.assertEqual(
+                    federal_awards_entry["direct_or_indirect_award"]["entities"],
+                        [
+                            {"name": "A", "identifying_number": "1"},
+                            {"name": "B", "identifying_number": "2"},
+                        ],
                 )
