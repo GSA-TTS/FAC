@@ -16,4 +16,24 @@ urlpatterns = [
         views.ReadyForCertificationView.as_view(),
         name="ReadyForCertification",
     ),
+    path(
+        "auditor-certification/<str:report_id>",
+        views.AuditorCertificationView.as_view(),
+        name="AuditorCertification",
+    ),
+    path(
+        "auditee-certification/<str:report_id>",
+        views.AuditeeCertificationView.as_view(),
+        name="AuditeeCertification",
+    ),
+    path(
+        "certification/<str:report_id>",
+        views.CertificationView.as_view(),
+        name="Certification",
+    ),
+    path(
+        "submission/<str:report_id>",
+        views.SubmissionView.as_view(),
+        name="Submission",
+    ),
 ]

@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load static %}
 {% block content %}
-<form class="usa-form usa-form--large" id="ready-for-certification" method="post">
+<form class="usa-form usa-form--large" id="certification" method="post">
   {% csrf_token %}
   <input type="submit" value="Ready" />
 </form>
