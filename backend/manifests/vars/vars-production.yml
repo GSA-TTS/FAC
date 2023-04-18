@@ -1,0 +1,21 @@
+# gsa-fac manifest
+app_name: gsa-fac
+mem_amount: 512M
+cf_env_name: PRODUCTION
+env_name: prod
+service_name: production
+instances: 2
+
+# postgrest manifest
+pgrst_app_name: postgrest
+pgrst_disk_quota: 256M
+pgrst_mem_amount: 128M
+pgrst_image: postgrest/postgrest:v10.1.2
+pgrst_instances: 2
+
+# swagger manifest
+swagger_app_name: swagger
+swagger_disk_quota: 256M
+swagger_mem_amount: 256M
+swagger_image: swaggerapi/swagger-ui
+swagger_instances: 2
