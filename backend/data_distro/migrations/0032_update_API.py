@@ -10,13 +10,6 @@ from django.core.management import call_command
 
 
 def update_docs_and_views(apps, schema_editor):
-    """Runs our management command to add documentation to sql"""
-    call_command(
-        "create_docs",
-        stdout="",
-        stderr=StringIO(),
-    )
-
     # Recreating the API views where the names were updated
     call_command(
         "create_distro_api",
@@ -30,6 +23,13 @@ def update_docs_and_views(apps, schema_editor):
         stdout="",
         stderr=StringIO(),
         **{"file": "sql_migrations/003_findings.sql"},
+    )
+
+    """Runs our management command to add documentation to sql"""
+    call_command(
+        "create_docs",
+        stdout="",
+        stderr=StringIO(),
     )
 
     # Adding high-level docs for the views
