@@ -13,7 +13,8 @@ from tempfile import NamedTemporaryFile
 from openpyxl import load_workbook
 from openpyxl.cell import Cell
 
-from .fixtures.excel import FEDERAL_AWARDS_TEMPLATE, FEDERAL_AWARDS_ENTRY_FIXTURES
+from .fixtures.excel import (FEDERAL_AWARDS_TEMPLATE, FEDERAL_AWARDS_ENTRY_FIXTURES, FEDERAL_AWARDS_EXPENDED,
+                             CORRECTIVE_ACTION_PLAN, FINDINGS_TEXT, FINDINGS_UNIFORM_GUIDANCE)
 from .models import Access, SingleAuditChecklist
 from .views import MySubmissions
 
@@ -43,6 +44,7 @@ VALID_ACCESS_AND_SUBMISSION_DATA = {
     "auditor_contacts": ["d@d.com"],
 }
 
+EXCEL_FILES = [CORRECTIVE_ACTION_PLAN, FEDERAL_AWARDS_EXPENDED]
 
 class MySubmissionsViewTests(TestCase):
     def setUp(self):
@@ -123,15 +125,17 @@ def _add_federal_award_entry(workbook, row_offset, entry):
         _set_by_name(workbook, key, value, row_offset)
 
 
-class FederalAwardsExcelFileViewTests(TestCase):
+class ExcelFileHandlerViewTests(TestCase):
     def test_login_required(self):
         """When an unauthenticated request is made"""
-        response = self.client.post(
-            reverse("audit:FederalAwardsExcelFile", args=["12345"])
-        )
 
-        self.assertIsInstance(response, HttpResponseRedirect)
-        self.assertTrue("openid/login" in response.url)
+        for file_type in EXCEL_FILES:
+            response = self.client.post(
+                reverse("audit:ExcelFileHandler", kwargs={"report_id": "12345", "file_type": file_type})
+            )
+
+            self.assertIsInstance(response, HttpResponseRedirect)
+            self.assertTrue("openid/login" in response.url)
 
     def test_bad_report_id_returns_403(self):
         """When a request is made for a malformed or nonexistent report_id, a 403 error should be returned"""
@@ -139,11 +143,12 @@ class FederalAwardsExcelFileViewTests(TestCase):
 
         self.client.force_login(user)
 
-        response = self.client.post(
-            reverse("audit:FederalAwardsExcelFile", args=["this is not a report id"])
-        )
+        for file_type in EXCEL_FILES:
+            response = self.client.post(
+                reverse("audit:ExcelFileHandler", kwargs={"report_id": "this is not a report id", "file_type": file_type})
+            )
 
-        self.assertEqual(response.status_code, 403)
+            self.assertEqual(response.status_code, 403)
 
     def test_inaccessible_audit_returns_403(self):
         """When a request is made for an audit that is inaccessible for this user, a 403 error should be returned"""
@@ -151,12 +156,13 @@ class FederalAwardsExcelFileViewTests(TestCase):
         sac = baker.make(SingleAuditChecklist)
 
         self.client.force_login(user)
+        for file_type in EXCEL_FILES:
+            response = self.client.post(
+                reverse("audit:ExcelFileHandler", kwargs={"report_id": sac.report_id, "file_type": file_type})
+            )
 
-        response = self.client.post(
-            reverse("audit:FederalAwardsExcelFile", args=[sac.report_id])
-        )
+            self.assertEqual(response.status_code, 403)
 
-        self.assertEqual(response.status_code, 403)
 
     def test_no_file_attached_returns_400(self):
         """When a request is made with no file attached, a 400 error should be returned"""
@@ -166,11 +172,14 @@ class FederalAwardsExcelFileViewTests(TestCase):
 
         self.client.force_login(user)
 
-        response = self.client.post(
-            reverse("audit:FederalAwardsExcelFile", args=[sac.report_id])
-        )
 
-        self.assertEqual(response.status_code, 400)
+        for file_type in EXCEL_FILES:
+            response = self.client.post(
+                reverse("audit:ExcelFileHandler", kwargs={"report_id": sac.report_id, "file_type": file_type})
+            )
+
+            self.assertEqual(response.status_code, 400) 
+
 
     def test_invalid_file_upload_returns_400(self):
         """When an invalid Excel file is uploaded, a 400 error should be returned"""
@@ -182,12 +191,14 @@ class FederalAwardsExcelFileViewTests(TestCase):
 
         file = SimpleUploadedFile("not-excel.txt", b"asdf", "text/plain")
 
-        response = self.client.post(
-            reverse("audit:FederalAwardsExcelFile", args=[sac.report_id]),
-            data={"FILES": file},
-        )
+        for file_type in EXCEL_FILES:
+            response = self.client.post(
+                reverse("audit:ExcelFileHandler", kwargs={"report_id": sac.report_id, "file_type": file_type}),
+                data={"FILES": file},
+            )
+            
+            self.assertEqual(response.status_code, 400)
 
-        self.assertEqual(response.status_code, 400)
 
     @patch("audit.validators._scan_file")
     def test_valid_file_upload(self, mock_scan_file):
@@ -213,7 +224,7 @@ class FederalAwardsExcelFileViewTests(TestCase):
 
             with open(tmp.name, "rb") as excel_file:
                 response = self.client.post(
-                    reverse("audit:FederalAwardsExcelFile", args=[sac.report_id]),
+                    reverse("audit:ExcelFileHandler", kwargs={"report_id": sac.report_id, "file_type": EXCEL_FILES[1]}),
                     data={"FILES": excel_file},
                 )
 
@@ -321,8 +332,8 @@ class FederalAwardsExcelFileViewTests(TestCase):
                 )
                 self.assertEqual(
                     federal_awards_entry["direct_or_indirect_award"]["entities"],
-                        [
-                            {"name": "A", "identifying_number": "1"},
-                            {"name": "B", "identifying_number": "2"},
-                        ],
+                    [
+                        {"name": "A", "identifying_number": "1"},
+                        {"name": "B", "identifying_number": "2"},
+                    ],
                 )

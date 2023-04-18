@@ -51,3 +51,8 @@ FEDERAL_AWARDS_ENTRY_FIXTURES = [
         "state_cluster_name": "",
     },
 ]
+
+FEDERAL_AWARDS_EXPENDED="FederalAwardsExpended"
+CORRECTIVE_ACTION_PLAN="CorrectiveActionPlan"
+FINDINGS_TEXT="FindingsText"
+FINDINGS_UNIFORM_GUIDANCE="FindingsUniformGuidance"
