@@ -138,8 +138,8 @@ class SingleAuditChecklist(models.Model):
         validation and reports back to the user.
         """
         if self.validate_full():
-            return "ready_for_certification"
-        return "in_progress"
+            return SingleAuditChecklist.STATUS.READY_FOR_CERTIFICATION
+        return SingleAuditChecklist.STATUS.IN_PROGRESS
 
     @transition(
         field="submission_status",

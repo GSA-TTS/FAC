@@ -11,4 +11,9 @@ urlpatterns = [
         views.FederalAwardsExcelFileView.as_view(),
         name="FederalAwardsExcelFile",
     ),
+    path(
+        "ready-for-certification/<str:report_id>",
+        views.ReadyForCertificationView.as_view(),
+        name="ReadyForCertification",
+    ),
 ]

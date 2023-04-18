@@ -86,6 +86,7 @@ class FederalAwardsExcelFileView(LoginRequiredMixin, generic.View):
 
             federal_awards = extract_federal_awards(excel_file.file)
             validate_federal_award_json(federal_awards)
+
             SingleAuditChecklist.objects.filter(pk=sac.id).update(
                 federal_awards=federal_awards
             )
@@ -100,3 +101,39 @@ class FederalAwardsExcelFileView(LoginRequiredMixin, generic.View):
         except MultiValueDictKeyError:
             logger.warn("no file found in request")
             raise BadRequest()
+
+
+class ReadyForCertificationView(LoginRequiredMixin, generic.View):
+    def get(self, request, *args, **kwargs):
+        report_id = kwargs["report_id"]
+
+        try:
+            sac = SingleAuditChecklist.objects.get(report_id=report_id)
+
+            # this should probably be a permission mixin
+            accesses = Access.objects.filter(sac=sac, user=request.user)
+            if not accesses:
+                raise PermissionDenied("You do not have access to this audit.")
+
+            return render(request, "audit/ready-for-certification.html")
+        except SingleAuditChecklist.DoesNotExist:
+            raise PermissionDenied("You do not have access to this audit.")
+
+    def post(self, request, *args, **kwargs):
+        report_id = kwargs["report_id"]
+
+        try:
+            sac = SingleAuditChecklist.objects.get(report_id=report_id)
+
+            # this should probably be a permission mixin
+            accesses = Access.objects.filter(sac=sac, user=request.user)
+            if not accesses:
+                raise PermissionDenied("You do not have access to this audit.")
+
+            sac.transition_to_ready_for_certification()
+            sac.save()
+
+            return render(request, "audit/ready-for-certification.html")
+
+        except SingleAuditChecklist.DoesNotExist:
+            raise PermissionDenied("You do not have access to this audit.")

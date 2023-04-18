@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+<form class="usa-form usa-form--large" id="federal-awards" method="post">
+  {% csrf_token %}
+  <input type="submit" value="Ready" />
+</form>
+{% endblock content %}
