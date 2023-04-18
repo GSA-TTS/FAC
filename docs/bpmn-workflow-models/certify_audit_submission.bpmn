@@ -89,7 +89,7 @@
         <bpmn:incoming>Flow_11zvqtp</bpmn:incoming>
         <bpmn:outgoing>Flow_09p52j5</bpmn:outgoing>
       </bpmn:userTask>
-      <bpmn:exclusiveGateway id="Gateway_1c6wrq9" name="Has loging.gov account?">
+      <bpmn:exclusiveGateway id="Gateway_1c6wrq9" name="Has login.gov account?">
         <bpmn:incoming>Flow_09p52j5</bpmn:incoming>
         <bpmn:outgoing>Flow_0hbu8hi</bpmn:outgoing>
         <bpmn:outgoing>Flow_0xv93zd</bpmn:outgoing>
@@ -202,7 +202,7 @@
         <bpmn:incoming>Flow_04352d7</bpmn:incoming>
         <bpmn:outgoing>Flow_0kz8a08</bpmn:outgoing>
       </bpmn:userTask>
-      <bpmn:exclusiveGateway id="Gateway_1slqjc8" name="Has loging.gov account?">
+      <bpmn:exclusiveGateway id="Gateway_1slqjc8" name="Has login.gov account?">
         <bpmn:incoming>Flow_0kz8a08</bpmn:incoming>
         <bpmn:outgoing>Flow_02j5gmq</bpmn:outgoing>
         <bpmn:outgoing>Flow_1783qgl</bpmn:outgoing>
