@@ -2,38 +2,37 @@ name: Deploy to the dev and management cloud.gov environments
 on:
   push:
     branches:
-    #  - main
-      - asteel/manifest-file-fix
+      - main
 
 jobs:
   # testing
-  # test-and-lint:
-  #   uses: ./.github/workflows/test.yml
-  #   secrets: inherit
+  test-and-lint:
+    uses: ./.github/workflows/test.yml
+    secrets: inherit
 
-  # # deploy to Dev & Management spaces
-  # deploy-infrastructure-dev:
-  #   name: Deploy infrastructure (dev)
-  #   needs:
-  #     - test-and-lint
-  #   uses: ./.github/workflows/terraform-apply-env.yml
-  #   with:
-  #     environment: "dev"
-  #   secrets: inherit
+  # deploy to Dev & Management spaces
+  deploy-infrastructure-dev:
+    name: Deploy infrastructure (dev)
+    needs:
+      - test-and-lint
+    uses: ./.github/workflows/terraform-apply-env.yml
+    with:
+      environment: "dev"
+    secrets: inherit
 
-  # deploy-infastructure-management:
-  #   name: Deploy infrastructure (dev)
-  #   needs:
-  #     - test-and-lint
-  #   uses: ./.github/workflows/terraform-apply-env.yml
-  #   with:
-  #     environment: "management"
-  #   secrets: inherit
+  deploy-infastructure-management:
+    name: Deploy infrastructure (dev)
+    needs:
+      - test-and-lint
+    uses: ./.github/workflows/terraform-apply-env.yml
+    with:
+      environment: "management"
+    secrets: inherit
 
   deploy-dev:
     name: Deploy dev app to cloud.gov
-    # needs:
-    #   - deploy-infrastructure-dev
+    needs:
+      - deploy-infrastructure-dev
     uses: ./.github/workflows/deploy-apps.yml
     with:
       environment: "dev"
