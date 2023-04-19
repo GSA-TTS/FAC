@@ -61,22 +61,22 @@ jobs:
           cf_org: gsa-tts-oros-fac
           cf_space: ${{ env.space }}
           cf_command: update-user-provided-service fac-key-service -p '"{\"SAM_API_KEY\":\"${{ secrets.SAM_API_KEY }}\", \"DJANGO_SECRET_LOGIN_KEY\":\"${{ secrets.DJANGO_SECRET_LOGIN_KEY }}\", \"SECRET_KEY\":\"${{ secrets.SECRET_KEY}}\"}"'
-      - name: Deploy fac to cloud.gov
-        uses: gsa/cg-cli-tools@key-not-accessible
-        with:
-          cf_username: ${{ secrets.CF_USERNAME }}
-          cf_password: ${{ secrets.CF_PASSWORD }}
-          cf_org: gsa-tts-oros-fac
-          cf_space: ${{ env.space }}
-          cf_manifest: backend/manifests/manifest-fac.yml --vars-file backend/manifests/vars/vars-${{ env.space }}.yml
-      - name: Deploy postgrest to cloud.gov
-        uses: gsa/cg-cli-tools@key-not-accessible
-        with:
-          cf_username: ${{ secrets.CF_USERNAME }}
-          cf_password: ${{ secrets.CF_PASSWORD }}
-          cf_org: gsa-tts-oros-fac
-          cf_space: ${{ env.space }}
-          cf_command: push -f backend/manifests/manifest-postgrest.yml --vars-file backend/manifests/vars/vars-${{ env.space }}.yml --var db_uri=${{ secrets.DB_URI }}
+      # - name: Deploy fac to cloud.gov
+      #   uses: gsa/cg-cli-tools@key-not-accessible
+      #   with:
+      #     cf_username: ${{ secrets.CF_USERNAME }}
+      #     cf_password: ${{ secrets.CF_PASSWORD }}
+      #     cf_org: gsa-tts-oros-fac
+      #     cf_space: ${{ env.space }}
+      #     cf_manifest: backend/manifests/manifest-fac.yml --vars-file backend/manifests/vars/vars-${{ env.space }}.yml
+      # - name: Deploy postgrest to cloud.gov
+      #   uses: gsa/cg-cli-tools@key-not-accessible
+      #   with:
+      #     cf_username: ${{ secrets.CF_USERNAME }}
+      #     cf_password: ${{ secrets.CF_PASSWORD }}
+      #     cf_org: gsa-tts-oros-fac
+      #     cf_space: ${{ env.space }}
+      #     cf_command: push -f backend/manifests/manifest-postgrest.yml --vars-file backend/manifests/vars/vars-${{ env.space }}.yml --var db_uri=${{ secrets.DB_URI }}
       - name: Deploy swagger to cloud.gov
         uses: gsa/cg-cli-tools@key-not-accessible
         with:
