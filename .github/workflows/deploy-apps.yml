@@ -84,4 +84,5 @@ jobs:
           cf_password: ${{ secrets.CF_PASSWORD }}
           cf_org: gsa-tts-oros-fac
           cf_space: ${{ env.space }}
-          cf_manifest: backend/manifests/manifest-swagger.yml --vars-file backend/manifests/vars/vars-${{ env.space }}.yml
+          cf_manifest: backend/manifests/manifest-swagger.yml
+          cf_vars_file: backend/manifests/vars/vars-${{ env.space }}.yml
