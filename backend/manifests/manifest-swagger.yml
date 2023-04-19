@@ -11,6 +11,6 @@ applications:
     routes:
       - route: fac-((env_name))-swagger.app.cloud.gov
     env:
-      API_URL: https://fac-((env_name))-swagger.app.cloud.gov
-      SWAGGER_JSON_URL: https://fac-((env_name))-swagger.app.cloud.gov/
+      API_URL: https://fac-((env_name))-postgrest.app.cloud.gov
+      SWAGGER_JSON_URL: https://fac-((env_name))-postgrest.app.cloud.gov/
     port: 8080
