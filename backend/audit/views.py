@@ -10,12 +10,12 @@ from django.urls import reverse
 from django.utils.datastructures import MultiValueDictKeyError
 from django.utils.decorators import method_decorator
 
-from .fixtures.excel import (FEDERAL_AWARDS_EXPENDED, CORRECTIVE_ACTION_PLAN, 
+from .fixtures.excel import (FEDERAL_AWARDS_EXPENDED, CORRECTIVE_ACTION_PLAN,
                              FINDINGS_TEXT, FINDINGS_UNIFORM_GUIDANCE)
 
-from audit.excel import extract_federal_awards, extract_corrective_action_plan
+from audit.excel import extract_federal_awards, extract_corrective_action_plan, extract_findings_uniform_guidance
 from audit.models import Access, ExcelFile, SingleAuditChecklist
-from audit.validators import validate_federal_award_json
+from audit.validators import validate_federal_award_json, validate_corrective_action_plan_json, validate_findings_uniform_guidance_json
 
 logger = logging.getLogger(__name__)
 
@@ -72,7 +72,7 @@ class ExcelFileHandlerView(LoginRequiredMixin, generic.View):
         try:
             report_id = kwargs["report_id"]
 
-            file_type = kwargs["file_type"]
+            form_section = kwargs["form_section"]
 
             sac = SingleAuditChecklist.objects.get(report_id=report_id)
 
@@ -89,27 +89,31 @@ class ExcelFileHandlerView(LoginRequiredMixin, generic.View):
             excel_file.full_clean()
             excel_file.save()
 
-
-            if file_type == FEDERAL_AWARDS_EXPENDED:
+            if form_section == FEDERAL_AWARDS_EXPENDED:
                 audit_data = extract_federal_awards(excel_file.file)
                 validate_federal_award_json(audit_data)
                 SingleAuditChecklist.objects.filter(pk=sac.id).update(
                     federal_awards=audit_data
                 )
-            elif file_type == CORRECTIVE_ACTION_PLAN:
+            elif form_section == CORRECTIVE_ACTION_PLAN:
                 audit_data = extract_corrective_action_plan(excel_file.file)
-                validate_federal_award_json(audit_data)
-                # SingleAuditChecklist.objects.filter(pk=sac.id).update(
-                #     corrective_action_plan=audit_data
-                # )
-
+                validate_corrective_action_plan_json(audit_data)
+                SingleAuditChecklist.objects.filter(pk=sac.id).update(
+                    corrective_action_plan=audit_data
+                )
+            elif form_section == FINDINGS_UNIFORM_GUIDANCE:
+                audit_data = extract_findings_uniform_guidance(excel_file.file)
+                validate_findings_uniform_guidance_json(audit_data)
+                SingleAuditChecklist.objects.filter(pk=sac.id).update(
+                    findings_uniform_guidance=audit_data
+                )
 
             return redirect("/")
         except SingleAuditChecklist.DoesNotExist:
             logger.warn(f"no SingleAuditChecklist found with report ID {report_id}")
             raise PermissionDenied()
         except ValidationError as e:
-            logger.warn(f"{file_type} Excel upload failed validation: {e}")
+            logger.warn(f"{form_section} Excel upload failed validation: {e}")
             raise BadRequest()
         except MultiValueDictKeyError:
             logger.warn("no file found in request")

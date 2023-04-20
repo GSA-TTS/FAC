@@ -8,7 +8,7 @@ from django.test import SimpleTestCase
 from jsonschema import exceptions, validate as jsonschema_validate, FormatChecker
 from random import choice, randrange
 
-from audit.fixtures.excel import CORRECTIVE_ACTION_PLAN_TEST_FILE
+from audit.fixtures.excel import CORRECTIVE_ACTION_PLAN_TEST_FILE, FINDINGS_UNIFORM_GUIDANCE_TEST_FILE
 
 # Simplest way to create a new copy of simple case rather than getting
 # references to things used by other tests:
@@ -823,7 +823,6 @@ class CorrectiveActionPlanSchemaValidityTest(SimpleTestCase):
         }
     }
 
-    # test_schema might seem redundant, but it's a good to have a check on the schema itself
     def test_schema(self):
         """Try to test CorrectiveActionPlan first."""
         schema = self.CORRECTIVE_ACTION_PLAN_SCHEMA
@@ -885,7 +884,7 @@ class CorrectiveActionPlanSchemaValidityTest(SimpleTestCase):
         simple_case = jsoncopy(self.SIMPLE_CASE)
         simple_case["CorrectiveActionPlan"]["corrective_action_plan_entries"][0][
             "contains_chart_or_table"
-        ]=None
+        ] = None
         self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
         simple_case = jsoncopy(self.SIMPLE_CASE)
@@ -912,3 +911,218 @@ class CorrectiveActionPlanSchemaValidityTest(SimpleTestCase):
         ] = 0
         self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
+
+class FindingsUniformGuidanceSchemaValidityTest(SimpleTestCase):
+    """
+    Test the basic validity of the FindingsUniformGuidance JSON schema.
+    """
+
+    FINDINGS_UNIFORM_GUIDANCE_SCHEMA = json.loads(
+        (SCHEMA_DIR / "FindingsUniformGuidance.schema.json").read_text(encoding="utf-8")
+    )
+
+    SIMPLE_CASE = {
+        "FindingsUniformGuidance": {
+            "auditee_ein": None,
+            "findings_uniform_guidance_entries": [
+                {
+                    "program": {
+                        "compliance_requirement": "A",
+                        "name": "program name",
+                        "number": "42.123"
+                    },
+                    "questioned_costs": "N",
+                    "significiant_deficiency": "N",
+                    "other_matters": "N",
+                    "other_findings": "Y",
+                    "modified_opinion": "N",
+                    "material_weakness": "N",
+                    "findings": {
+                        "is_valid": "Y",
+                        "repeat_prior_reference": "Y",
+                        "prior_references": "2022-001",
+                        "reference": "2023-001"
+                    }
+                }
+            ]
+        }
+    }
+
+    def test_schema(self):
+        """Try to test FindingsUniformGuidance first."""
+        schema = self.FINDINGS_UNIFORM_GUIDANCE_SCHEMA
+
+        in_flight_file = SCHEMA_DIR / FINDINGS_UNIFORM_GUIDANCE_TEST_FILE
+        in_flight = json.loads(in_flight_file.read_text(encoding="utf-8"))
+        
+        validate(in_flight, schema)
+
+    def test_simple_pass(self):
+        """
+        Test the simplest FindingsUniformGuidance case; none of the conditional fields
+        apply.
+        """
+        schema = self.FINDINGS_UNIFORM_GUIDANCE_SCHEMA
+
+        validate(self.SIMPLE_CASE, schema)
+
+    def test_missing_auditee_ein(self):
+        """
+        Test that validation fails if auditee_ein is missing
+        """
+        schema = self.FINDINGS_UNIFORM_GUIDANCE_SCHEMA
+
+        simple_case = jsoncopy(self.SIMPLE_CASE)
+        del simple_case["FindingsUniformGuidance"]["auditee_ein"]
+
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
+
+    def test_missing_entry_fields(self):
+        """
+        Test that validation fails if any entry field is missing
+        """
+        schema = self.FINDINGS_UNIFORM_GUIDANCE_SCHEMA
+
+        simple_case = jsoncopy(self.SIMPLE_CASE)
+        del simple_case["FindingsUniformGuidance"]["findings_uniform_guidance_entries"][0][
+            "program"
+        ]
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
+
+        simple_case = jsoncopy(self.SIMPLE_CASE)
+        del simple_case["FindingsUniformGuidance"]["findings_uniform_guidance_entries"][0][
+            "findings"
+        ]["prior_references"]
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
+
+        simple_case = jsoncopy(self.SIMPLE_CASE)
+        del simple_case["FindingsUniformGuidance"]["findings_uniform_guidance_entries"][0][
+            "significiant_deficiency"
+        ]
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
+
+        simple_case = jsoncopy(self.SIMPLE_CASE)
+        del simple_case["FindingsUniformGuidance"]["findings_uniform_guidance_entries"][0][
+            "other_matters"
+        ]
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
+
+        simple_case = jsoncopy(self.SIMPLE_CASE)
+        del simple_case["FindingsUniformGuidance"]["findings_uniform_guidance_entries"][0][
+            "other_findings"
+        ]
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
+
+        simple_case = jsoncopy(self.SIMPLE_CASE)
+        del simple_case["FindingsUniformGuidance"]["findings_uniform_guidance_entries"][0][
+            "modified_opinion"
+        ]
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
+
+        simple_case = jsoncopy(self.SIMPLE_CASE)
+        del simple_case["FindingsUniformGuidance"]["findings_uniform_guidance_entries"][0][
+            "material_weakness"
+        ]
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
+
+        simple_case = jsoncopy(self.SIMPLE_CASE)
+        del simple_case["FindingsUniformGuidance"]["findings_uniform_guidance_entries"][0][
+            "findings"
+        ]
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
+
+    def test_empty_entry_fields(self):
+        """
+        Test that validation fails if any entry field is empty
+        """
+        schema = self.FINDINGS_UNIFORM_GUIDANCE_SCHEMA
+
+        simple_case = jsoncopy(self.SIMPLE_CASE)
+        simple_case["FindingsUniformGuidance"]["findings_uniform_guidance_entries"][0][
+            "program"
+        ] = None
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
+
+        simple_case = jsoncopy(self.SIMPLE_CASE)
+        simple_case["FindingsUniformGuidance"]["findings_uniform_guidance_entries"][0][
+            "findings"
+        ] = None
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
+
+        simple_case = jsoncopy(self.SIMPLE_CASE)
+        simple_case["FindingsUniformGuidance"]["findings_uniform_guidance_entries"][0][
+            "significiant_deficiency"
+        ] = None
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
+
+        simple_case = jsoncopy(self.SIMPLE_CASE)
+        simple_case["FindingsUniformGuidance"]["findings_uniform_guidance_entries"][0][
+            "other_matters"
+        ] = None
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
+
+        simple_case = jsoncopy(self.SIMPLE_CASE)
+        simple_case["FindingsUniformGuidance"]["findings_uniform_guidance_entries"][0][
+            "other_findings"
+        ] = None
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
+
+        simple_case = jsoncopy(self.SIMPLE_CASE)
+        simple_case["FindingsUniformGuidance"]["findings_uniform_guidance_entries"][0][
+            "modified_opinion"
+        ] = None
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
+
+        simple_case = jsoncopy(self.SIMPLE_CASE)
+        simple_case["FindingsUniformGuidance"]["findings_uniform_guidance_entries"][0][
+            "material_weakness"
+        ] = None
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
+
+        simple_case = jsoncopy(self.SIMPLE_CASE)
+        simple_case["FindingsUniformGuidance"]["findings_uniform_guidance_entries"][0][
+            "findings"
+        ]["prior_references"] = None
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)   
+
+    def test_for_invalid_entry(self):
+        """
+        Test that validation fails if any entry field is invalid
+        """
+        schema = self.FINDINGS_UNIFORM_GUIDANCE_SCHEMA
+
+        simple_case = jsoncopy(self.SIMPLE_CASE)
+        simple_case["FindingsUniformGuidance"]["findings_uniform_guidance_entries"][0][
+            "significiant_deficiency"
+        ] = 0
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
+
+        simple_case = jsoncopy(self.SIMPLE_CASE)
+        simple_case["FindingsUniformGuidance"]["findings_uniform_guidance_entries"][0][
+            "other_matters"
+        ] = 0
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
+
+        simple_case = jsoncopy(self.SIMPLE_CASE)
+        simple_case["FindingsUniformGuidance"]["findings_uniform_guidance_entries"][0][
+            "other_findings"
+        ] = "invalid"
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
+
+        simple_case = jsoncopy(self.SIMPLE_CASE)
+        simple_case["FindingsUniformGuidance"]["findings_uniform_guidance_entries"][0][
+            "modified_opinion"
+        ] = "invalid"
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
+
+        simple_case = jsoncopy(self.SIMPLE_CASE)
+        simple_case["FindingsUniformGuidance"]["findings_uniform_guidance_entries"][0][
+            "material_weakness"
+        ] = "invalid"
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
+
+        simple_case = jsoncopy(self.SIMPLE_CASE)
+        simple_case["FindingsUniformGuidance"]["findings_uniform_guidance_entries"][0][
+            "findings"
+        ]["is_valid"] = 0
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)

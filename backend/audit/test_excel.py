@@ -8,14 +8,28 @@ from openpyxl.cell import Cell
 from audit.excel import (
     ExcelExtractionError,
     extract_federal_awards,
+    extract_findings_uniform_guidance,
     extract_corrective_action_plan,
     federal_awards_field_mapping,
+    findings_uniform_guidance_field_mapping,
     corrective_action_field_mapping,
     federal_awards_column_mapping,
+    findings_uniform_guidance_column_mapping,
     corrective_action_column_mapping,
 )
-from audit.validators import (validate_federal_award_json, validate_corrective_action_plan_json)
-from audit.fixtures.excel import (FEDERAL_AWARDS_TEMPLATE, FEDERAL_AWARDS_ENTRY_FIXTURES, CORRECTIVE_ACTION_PLAN_TEMPLATE, CORRECTIVE_ACTION_PLAN_ENTRY_FIXTURES)
+from audit.validators import (
+    validate_federal_award_json, 
+    validate_corrective_action_plan_json,
+    validate_findings_uniform_guidance_json
+)
+from audit.fixtures.excel import (
+    FEDERAL_AWARDS_TEMPLATE, 
+    FEDERAL_AWARDS_ENTRY_FIXTURES, 
+    CORRECTIVE_ACTION_PLAN_TEMPLATE, 
+    CORRECTIVE_ACTION_PLAN_ENTRY_FIXTURES,
+    FINDINGS_UNIFORM_GUIDANCE_TEMPLATE,
+    FINDINGS_UNIFORM_GUIDANCE_ENTRY_FIXTURES,
+)
 
 # Simplest way to create a new copy of simple case rather than getting
 # references to things used by other tests:
@@ -241,23 +255,86 @@ class CorrectiveActionPlanExcelTests(SimpleTestCase):
                     ValidationError, validate_corrective_action_plan_json, corrective_action_plan
                 )
 
-    # def test_corrective_action_plan_custom_formatters(self):
-    #     """Test that custom corrective action plan field formatters raise the expected error type when data is malformed"""
-    #     workbook = load_workbook(CORRECTIVE_ACTION_PLAN_TEMPLATE, data_only=True)
 
-    #     # add valid data to the workbook
-    #     _set_by_name(workbook, "auditee_ein", "123456789")
-    #     _add_entry(workbook, 0, CORRECTIVE_ACTION_PLAN_ENTRY_FIXTURES[0])
+class FindingsUniformGuidanceExcelTests(SimpleTestCase):
+    def test_template_has_named_ranges(self):
+        """Test that the FindingsUniformGuidance Excel template contains the expected named ranges"""
+        workbook = load_workbook(FINDINGS_UNIFORM_GUIDANCE_TEMPLATE, data_only=True)
 
-    #     test_cases = [
-    #         ("planned_action", 0),
-    #         ("contains_chart_or_table", 0)
-    #     ]
+        for name in findings_uniform_guidance_field_mapping.keys():
+            self.assertIsNotNone(workbook.defined_names[name])
 
-    #     for field_name, value in test_cases:
-    #         with self.subTest():
-    #             _set_by_name(workbook, field_name, value)
+        for name in findings_uniform_guidance_column_mapping:
+            self.assertIsNotNone(workbook.defined_names[name])
 
-    #             self.assertRaises(
-    #                 ExcelExtractionError, extract_corrective_action_plan, workbook
-    #             )
+    def test_empty_template(self):
+        """Test that extraction and validation succeed against the blank template"""
+        findings = extract_findings_uniform_guidance(FINDINGS_UNIFORM_GUIDANCE_TEMPLATE)
+
+        validate_findings_uniform_guidance_json(findings)
+
+    def test_single_findings_uniform_guidance_entry(self):
+        """Test that extraction and validation succeed when there is a single findings uniform guidance entry"""
+        workbook = load_workbook(FINDINGS_UNIFORM_GUIDANCE_TEMPLATE, data_only=True)
+
+        _set_by_name(workbook, "auditee_ein", "123456789")
+        _add_entry(workbook, 0, FINDINGS_UNIFORM_GUIDANCE_ENTRY_FIXTURES[0])
+
+        findings = extract_findings_uniform_guidance(workbook)
+
+        validate_findings_uniform_guidance_json(findings)
+
+    def test_multiple_findings_uniform_guidance_entries(self):
+        """Test that extraction and validation succeed when there are multiple findings uniform guidance entries"""
+        workbook = load_workbook(FINDINGS_UNIFORM_GUIDANCE_TEMPLATE, data_only=True)
+
+        _set_by_name(workbook, "auditee_ein", "123456789")
+        for index, entry in enumerate(FINDINGS_UNIFORM_GUIDANCE_ENTRY_FIXTURES):
+            _add_entry(workbook, index, entry)
+
+        findings = extract_findings_uniform_guidance(workbook)
+
+        validate_findings_uniform_guidance_json(findings)
+
+    def test_partial_findings_uniform_guidance_entry(self):
+        """Test that extraction succeeds and validation fails when there are partial findings uniform guidance entries"""
+        workbook = load_workbook(FINDINGS_UNIFORM_GUIDANCE_TEMPLATE, data_only=True)
+
+        _set_by_name(workbook, "auditee_ein", "123456789")
+
+        entry = jsoncopy(FINDINGS_UNIFORM_GUIDANCE_ENTRY_FIXTURES[0])
+        del entry["finding_reference_number"]
+
+        _add_entry(workbook, 0, entry)
+
+        findings = extract_findings_uniform_guidance(workbook)
+
+        self.assertRaises(ValidationError, validate_findings_uniform_guidance_json, findings)
+
+    def test_findings_uniform_guidance_checking(self):
+        """Test that extraction succeeds and validation fails when fields are of the wrong data type"""
+        workbook = load_workbook(FINDINGS_UNIFORM_GUIDANCE_TEMPLATE, data_only=True)
+
+        # add valid data to the workbook
+        _set_by_name(workbook, "auditee_ein", "123456789")
+        _add_entry(workbook, 0, FINDINGS_UNIFORM_GUIDANCE_ENTRY_FIXTURES[0])
+
+        test_cases = [
+            ("auditee_ein", 123456789),
+            ("finding_reference_number", 0),
+            ("program_name", 123),
+            ("program_number", 10.001),
+            ("prior_references", 123),
+        ]
+
+        # validate that each test_case appropriately checks the data type
+        for field_name, value in test_cases:
+            with self.subTest():
+                _set_by_name(workbook, field_name, value)
+
+                findings = extract_findings_uniform_guidance(workbook)
+
+                self.assertRaises(
+                    ValidationError, validate_findings_uniform_guidance_json, findings
+                )   
+

@@ -7,7 +7,7 @@ urlpatterns = [
     path("", views.MySubmissions.as_view(), name="MySubmissions"),
     path("<str:report_id>", views.EditSubmission.as_view(), name="EditSubmission"),
     path(
-        "excel/<str:file_type>/<str:report_id>",
+        "excel/<str:form_section>/<str:report_id>",
         views.ExcelFileHandlerView.as_view(),
         name="ExcelFileHandler",
     ),
