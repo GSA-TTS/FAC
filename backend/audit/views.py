@@ -166,7 +166,7 @@ class AuditorCertificationView(LoginRequiredMixin, generic.View):
             if not accesses:
                 raise PermissionDenied("You do not have access to this audit.")
 
-            sac.transition_to_auditee_certified()
+            sac.transition_to_auditor_certified()
             sac.save()
 
             return render(request, "audit/auditor-certification.html")
