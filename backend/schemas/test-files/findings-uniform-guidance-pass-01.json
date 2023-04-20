@@ -4,7 +4,7 @@
            "findings_uniform_guidance_entries": [
             {
                 "program": {
-                    "compliance_requirement": ["A", "B", "C"],
+                    "compliance_requirement": "ABC",
                     "name": "PROGRAM_NAME",
                     "number": "42.123"
                 },
@@ -17,13 +17,13 @@
                 "findings": {
                     "is_valid": "Y",
                     "repeat_prior_reference": "Y",
-                    "prior_references": ["2020-001", "2021-002"],
+                    "prior_references": "2020-001,2021-002",
                     "reference": "2023-100"
                 }
             },
             {
                 "program": {
-                    "compliance_requirement": ["E"],
+                    "compliance_requirement": "E",
                     "name": "PROGRAM_NAME",
                     "number": "24.321"
                 },
@@ -36,7 +36,7 @@
                 "findings": {
                     "is_valid": "N",
                     "repeat_prior_reference": "Y",
-                    "prior_references": ["2022-033"],
+                    "prior_references": "2022-033",
                     "reference": "2023-001"
                 }
             }            

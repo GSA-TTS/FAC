@@ -10,30 +10,9 @@ local Parts = {
     properties: {
       name: Types.string,
       number: Base.Compound.ProgramNumber,
-      compliance_requirement:Types.array {
-        description: 'Compliance requirement',
-        contains: {
-          enum: [
-            'A',
-            'B',
-            'C',
-            'E',
-            'F',
-            'G',
-            'H',
-            'I',
-            'J',
-            'L',
-            'M',
-            'N',
-            'P'
-          ],
-        },
-      },
+      compliance_requirement: Base.Compound.ComplianceRequirement,
     },
-    required: [
-      'compliance_requirement'
-    ],
+    required: ['name', 'number', 'compliance_requirement'],
   },
   Findings:Types.object {
     additionalProperties: false,
@@ -41,9 +20,7 @@ local Parts = {
       reference: Base.Compound.ReferenceNumber,
       is_valid: Base.Enum.YorN,
       repeat_prior_reference: Base.Enum.YorN,
-      prior_references: Types.array {
-        items: Base.Compound.ReferenceNumber,
-      }      
+      prior_references: Base.Compound.PriorReferences,      
     },     
     required: [
       'reference','repeat_prior_reference'
@@ -65,6 +42,7 @@ local FindingsUniformGuidanceEntry = {
         questioned_costs: Base.Enum.YorN,
 
     },
+    required: ['program','findings','other_matters', 'material_weakness','significiant_deficiency','other_findings'],
     allOf: Validations.Combinations,
 };
 
@@ -76,7 +54,7 @@ local FindingsUniformGuidance = Types.object {
       items: FindingsUniformGuidanceEntry,
     },
   },
-  required: ['auditee_ein', 'findings_uniform_guidance_entries'],
+  required: ['auditee_ein'],
   title: 'FindingsUniformGuidance',
   version: 20230410,
 };

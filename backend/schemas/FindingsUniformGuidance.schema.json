@@ -270,13 +270,10 @@
                               "type": "string"
                            },
                            "prior_references": {
-                              "items": {
-                                 "description": "Reference Number",
-                                 "pattern": "^20[2-9]{1}[0-9]{1}-[0-9]{3}$",
-                                 "title": "ReferenceNumber",
-                                 "type": "string"
-                              },
-                              "type": "array"
+                              "description": "Prior references",
+                              "pattern": "^(20[2-9]{1}[0-9]{1}-[0-9]{3},?)+$",
+                              "title": "PriorReferences",
+                              "type": "string"
                            },
                            "reference": {
                               "description": "Reference Number",
@@ -330,25 +327,10 @@
                         "additionalProperties": false,
                         "properties": {
                            "compliance_requirement": {
-                              "contains": {
-                                 "enum": [
-                                    "A",
-                                    "B",
-                                    "C",
-                                    "E",
-                                    "F",
-                                    "G",
-                                    "H",
-                                    "I",
-                                    "J",
-                                    "L",
-                                    "M",
-                                    "N",
-                                    "P"
-                                 ]
-                              },
-                              "description": "Compliance requirement",
-                              "type": "array"
+                              "description": "Compliance requirement type",
+                              "pattern": "^(([ABCEFGHIJLMNP])(?!.*\\2))+$",
+                              "title": "ComplianceRequirement",
+                              "type": "string"
                            },
                            "name": {
                               "type": "string"
@@ -361,6 +343,8 @@
                            }
                         },
                         "required": [
+                           "name",
+                           "number",
                            "compliance_requirement"
                         ],
                         "type": "object"
@@ -379,14 +363,21 @@
                         ],
                         "type": "string"
                      }
-                  }
+                  },
+                  "required": [
+                     "program",
+                     "findings",
+                     "other_matters",
+                     "material_weakness",
+                     "significiant_deficiency",
+                     "other_findings"
+                  ]
                },
                "type": "array"
             }
          },
          "required": [
-            "auditee_ein",
-            "findings_uniform_guidance_entries"
+            "auditee_ein"
          ],
          "title": "FindingsUniformGuidance",
          "type": "object",

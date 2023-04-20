@@ -35,6 +35,10 @@ federal_awards_field_mapping: FieldMapping = {
 corrective_action_field_mapping: FieldMapping = {
     "auditee_ein": ("CorrectiveActionPlan.auditee_ein", _set_by_path),
 }
+findings_uniform_guidance_field_mapping: FieldMapping = {
+    "auditee_ein": ("FindingsUniformGuidance.auditee_ein", _set_by_path),
+}
+
 
 federal_awards_column_mapping: ColumnMapping = {
     "amount_expended": (
@@ -122,6 +126,46 @@ corrective_action_column_mapping: ColumnMapping = {
         _set_by_path,
     ),
 }
+findings_uniform_guidance_column_mapping: ColumnMapping = {
+    "program_number": ("FindingsUniformGuidance.findings_uniform_guidance_entries", "program.number", _set_by_path),
+    "program_name": ("FindingsUniformGuidance.findings_uniform_guidance_entries", "program.name", _set_by_path),
+    "compliance_requirement": ("FindingsUniformGuidance.findings_uniform_guidance_entries", "program.compliance_requirement", _set_by_path),
+    "finding_reference_number": ("FindingsUniformGuidance.findings_uniform_guidance_entries", "findings.reference", _set_by_path),
+    "repeat_prior_reference": ("FindingsUniformGuidance.findings_uniform_guidance_entries", "findings.repeat_prior_reference", _set_by_path),
+    "prior_references": ("FindingsUniformGuidance.findings_uniform_guidance_entries", "findings.prior_references", _set_by_path),
+    "is_valid": ("FindingsUniformGuidance.findings_uniform_guidance_entries", "findings.is_valid", _set_by_path),
+    "questioned_costs": (
+        "FindingsUniformGuidance.findings_uniform_guidance_entries",
+        "questioned_costs",
+        _set_by_path,
+    ),
+    "significiant_deficiency": (
+        "FindingsUniformGuidance.findings_uniform_guidance_entries",
+        "significiant_deficiency",
+        _set_by_path,
+    ),
+    "other_matters": (
+        "FindingsUniformGuidance.findings_uniform_guidance_entries",
+        "other_matters",
+        _set_by_path,
+    ),
+    "other_findings": (
+        "FindingsUniformGuidance.findings_uniform_guidance_entries",
+        "other_findings",
+        _set_by_path,
+    ),
+    "modified_opinion": (
+        "FindingsUniformGuidance.findings_uniform_guidance_entries",
+        "modified_opinion",
+        _set_by_path,
+    ),
+    "material_weakness": (
+        "FindingsUniformGuidance.findings_uniform_guidance_entries",
+        "material_weakness",
+        _set_by_path,
+    ),
+}
+
 
 class ExcelExtractionError(Exception):
     pass
@@ -215,4 +259,10 @@ def extract_federal_awards(file):
 def extract_corrective_action_plan(file):
     return extract_data(
         file, corrective_action_field_mapping, corrective_action_column_mapping
+    )
+
+
+def extract_findings_uniform_guidance(file):
+    return extract_data(
+        file, findings_uniform_guidance_field_mapping, findings_uniform_guidance_column_mapping
     )
