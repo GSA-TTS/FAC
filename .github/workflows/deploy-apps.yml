@@ -68,7 +68,8 @@ jobs:
           cf_password: ${{ secrets.CF_PASSWORD }}
           cf_org: gsa-tts-oros-fac
           cf_space: ${{ env.space }}
-          cf_manifest: backend/manifests/${{ env.space }}/manifest-fac-${{ env.space }}.yml
+          cf_manifest: backend/manifests/manifest-fac.yml
+          cf_vars_file: backend/manifests/vars/vars-${{ env.space }}.yml
       - name: Deploy postgrest to cloud.gov
         uses: gsa/cg-cli-tools@key-not-accessible
         with:
@@ -76,7 +77,7 @@ jobs:
           cf_password: ${{ secrets.CF_PASSWORD }}
           cf_org: gsa-tts-oros-fac
           cf_space: ${{ env.space }}
-          cf_command: push -f backend/manifests/${{ env.space }}/manifest-postgrest-${{ env.space }}.yml --var DB_URI=${{ secrets.DB_URI }}
+          cf_command: push -f backend/manifests/manifest-postgrest.yml --vars-file backend/manifests/vars/vars-${{ env.space }}.yml --var db_uri=${{ secrets.DB_URI }}
       - name: Deploy swagger to cloud.gov
         uses: gsa/cg-cli-tools@key-not-accessible
         with:
@@ -84,4 +85,5 @@ jobs:
           cf_password: ${{ secrets.CF_PASSWORD }}
           cf_org: gsa-tts-oros-fac
           cf_space: ${{ env.space }}
-          cf_manifest: backend/manifests/${{ env.space }}/manifest-swagger-${{ env.space }}.yml
+          cf_manifest: backend/manifests/manifest-swagger.yml
+          cf_vars_file: backend/manifests/vars/vars-${{ env.space }}.yml
