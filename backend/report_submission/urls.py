@@ -1,6 +1,15 @@
 from django.urls import path
 from . import views
 
+upload_page_ids = [
+    "federal_awards",
+    "audit-findings",
+    "audit-findings-text",
+    "CAP",
+    "additional-EINs",
+    "additional-UEIs",
+    "secondary-auditors",
+]
 
 urlpatterns = [
     path("", views.ReportSubmissionRedirectView.as_view(), name="report_submission"),
@@ -16,39 +25,13 @@ urlpatterns = [
         views.GeneralInformationFormView.as_view(),
         name="general_information",
     ),
-    path(
-        "federal-awards/<str:report_id>",
-        views.FederalAwardsUploadView.as_view(),
-        name="federal_awards",
-    ),
-    path(
-        "audit-findings/<str:report_id>",
-        views.AuditFindingsUploadView.as_view(),
-        name="audit_findings",
-    ),
-    path(
-        "audit-findings-text/<str:report_id>",
-        views.AuditFindingsTextUploadView.as_view(),
-        name="audit_findings_text",
-    ),
-    path(
-        "CAP/<str:report_id>",
-        views.CAPUploadView.as_view(),
-        name="CAP",
-    ),
-    path(
-        "additional-EINs/<str:report_id>",
-        views.AdditionalEINsUploadView.as_view(),
-        name="additional_EINs",
-    ),
-    path(
-        "additional-UEIs/<str:report_id>",
-        views.AdditionalUEIsUploadView.as_view(),
-        name="additional_UEIs",
-    ),
-    path(
-        "secondary-auditors/<str:report_id>",
-        views.SecondaryAuditorsUploadView.as_view(),
-        name="secondary_auditors",
-    ),
 ]
+
+for page_id in upload_page_ids:
+    urlpatterns.append(
+        path(
+            "{}/<str:report_id>".format(page_id),
+            views.UploadPageView.as_view(),
+            name="secondary_auditors",
+        )
+    )

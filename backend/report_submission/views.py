@@ -188,267 +188,88 @@ class GeneralInformationFormView(LoginRequiredMixin, View):
         raise BadRequest()
 
 
-class FederalAwardsUploadView(LoginRequiredMixin, View):
+class UploadPageView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         report_id = kwargs["report_id"]
 
-        try:
-            sac = SingleAuditChecklist.objects.get(report_id=report_id)
-
-            accesses = Access.objects.filter(sac=sac, user=request.user)
-            if not accesses:
-                raise PermissionDenied("You do not have access to this audit.")
-
-            context = {
-                "auditee_name": sac.auditee_name,
-                "report_id": report_id,
-                "auditee_uei": sac.auditee_uei,
-                "user_provided_organization_type": sac.user_provided_organization_type,
+        # Organized by URL name, page specific constants are defined here
+        # Data can then be accessed by checking the current URL
+        additional_context = {
+            "federal-awards": {
                 "view_id": "federal-awards",
                 "view_name": "Federal awards",
-            }
-
-            return render(request, "report_submission/upload-page.html", context)
-        except SingleAuditChecklist.DoesNotExist:
-            raise PermissionDenied("You do not have access to this audit.")
-
-    # Unimplemented
-    def post(self, request, *args, **kwargs):
-        report_id = kwargs["report_id"]
-
-        try:
-            return redirect("/report_submission/audit-findings/{}".format(report_id))
-
-        except Exception as e:
-            logger.info("Unexpected error in FederalAwardsUploadView post.\n", e)
-
-        raise BadRequest()
-
-
-class AuditFindingsUploadView(LoginRequiredMixin, View):
-    def get(self, request, *args, **kwargs):
-        report_id = kwargs["report_id"]
-
-        try:
-            sac = SingleAuditChecklist.objects.get(report_id=report_id)
-
-            accesses = Access.objects.filter(sac=sac, user=request.user)
-            if not accesses:
-                raise PermissionDenied("You do not have access to this audit.")
-
-            context = {
-                "auditee_name": sac.auditee_name,
-                "report_id": report_id,
-                "auditee_uei": sac.auditee_uei,
-                "user_provided_organization_type": sac.user_provided_organization_type,
+            },
+            "audit-findings": {
                 "view_id": "audit-findings",
                 "view_name": "Audit findings",
-            }
-
-            return render(request, "report_submission/upload-page.html", context)
-        except SingleAuditChecklist.DoesNotExist:
-            raise PermissionDenied("You do not have access to this audit.")
-
-    # Unimplemented
-    def post(self, request, *args, **kwargs):
-        report_id = kwargs["report_id"]
-
-        try:
-            return redirect(
-                "/report_submission/audit-findings-text/{}".format(report_id)
-            )
-
-        except Exception as e:
-            logger.info("Unexpected error in AuditFindingsUploadView post.\n", e)
-
-        raise BadRequest()
-
-
-class AuditFindingsTextUploadView(LoginRequiredMixin, View):
-    def get(self, request, *args, **kwargs):
-        report_id = kwargs["report_id"]
-
-        try:
-            sac = SingleAuditChecklist.objects.get(report_id=report_id)
-
-            accesses = Access.objects.filter(sac=sac, user=request.user)
-            if not accesses:
-                raise PermissionDenied("You do not have access to this audit.")
-
-            context = {
-                "auditee_name": sac.auditee_name,
-                "report_id": report_id,
-                "auditee_uei": sac.auditee_uei,
-                "user_provided_organization_type": sac.user_provided_organization_type,
+            },
+            "audit-findings-text": {
                 "view_id": "audit-findings-text",
                 "view_name": "Audit findings text",
-            }
-
-            return render(request, "report_submission/upload-page.html", context)
-        except SingleAuditChecklist.DoesNotExist:
-            raise PermissionDenied("You do not have access to this audit.")
-
-            # Unimplemented
-
-    def post(self, request, *args, **kwargs):
-        report_id = kwargs["report_id"]
-
-        try:
-            return redirect("/report_submission/CAP/{}".format(report_id))
-
-        except Exception as e:
-            logger.info("Unexpected error in AuditFindingsTextUploadView post.\n", e)
-
-        raise BadRequest()
-
-
-class CAPUploadView(LoginRequiredMixin, View):
-    def get(self, request, *args, **kwargs):
-        report_id = kwargs["report_id"]
-
-        try:
-            sac = SingleAuditChecklist.objects.get(report_id=report_id)
-
-            accesses = Access.objects.filter(sac=sac, user=request.user)
-            if not accesses:
-                raise PermissionDenied("You do not have access to this audit.")
-
-            context = {
-                "auditee_name": sac.auditee_name,
-                "report_id": report_id,
-                "auditee_uei": sac.auditee_uei,
-                "user_provided_organization_type": sac.user_provided_organization_type,
+            },
+            "CAP": {
                 "view_id": "CAP",
                 "view_name": "Corrective Action Plan (CAP)",
-            }
-
-            return render(request, "report_submission/upload-page.html", context)
-        except SingleAuditChecklist.DoesNotExist:
-            raise PermissionDenied("You do not have access to this audit.")
-
-            # Unimplemented
-
-    def post(self, request, *args, **kwargs):
-        report_id = kwargs["report_id"]
-
-        try:
-            return redirect("/report_submission/additional-EINs/{}".format(report_id))
-
-        except Exception as e:
-            logger.info("Unexpected error in CAPUploadView post.\n", e)
-
-        raise BadRequest()
-
-
-class AdditionalEINsUploadView(LoginRequiredMixin, View):
-    def get(self, request, *args, **kwargs):
-        report_id = kwargs["report_id"]
-
-        try:
-            sac = SingleAuditChecklist.objects.get(report_id=report_id)
-
-            accesses = Access.objects.filter(sac=sac, user=request.user)
-            if not accesses:
-                raise PermissionDenied("You do not have access to this audit.")
-
-            context = {
-                "auditee_name": sac.auditee_name,
-                "report_id": report_id,
-                "auditee_uei": sac.auditee_uei,
-                "user_provided_organization_type": sac.user_provided_organization_type,
+            },
+            "additional-EINs": {
                 "view_id": "additional-EINs",
-                "view_name": "Additional EINs",
-            }
-
-            return render(request, "report_submission/upload-page.html", context)
-        except SingleAuditChecklist.DoesNotExist:
-            raise PermissionDenied("You do not have access to this audit.")
-
-            # Unimplemented
-
-    def post(self, request, *args, **kwargs):
-        report_id = kwargs["report_id"]
-
-        try:
-            return redirect("/report_submission/additional-UEIs/{}".format(report_id))
-
-        except Exception as e:
-            logger.info("Unexpected error in AdditionalEINsUploadView post.\n", e)
-
-        raise BadRequest()
-
-
-class AdditionalUEIsUploadView(LoginRequiredMixin, View):
-    def get(self, request, *args, **kwargs):
-        report_id = kwargs["report_id"]
-
-        try:
-            sac = SingleAuditChecklist.objects.get(report_id=report_id)
-
-            accesses = Access.objects.filter(sac=sac, user=request.user)
-            if not accesses:
-                raise PermissionDenied("You do not have access to this audit.")
-
-            context = {
-                "auditee_name": sac.auditee_name,
-                "report_id": report_id,
-                "auditee_uei": sac.auditee_uei,
-                "user_provided_organization_type": sac.user_provided_organization_type,
+                "view_name": "Secondary auditors",
+            },
+            "additional-UEIs": {
                 "view_id": "additional-UEIs",
                 "view_name": "Additional UEIs",
+            },
+            "secondary-auditors": {
+                "view_id": "secondary-auditors",
+                "view_name": "Secondary auditors",
+            },
+        }
+
+        try:
+            sac = SingleAuditChecklist.objects.get(report_id=report_id)
+
+            accesses = Access.objects.filter(sac=sac, user=request.user)
+            if not accesses:
+                raise PermissionDenied("You do not have access to this audit.")
+
+            # Context for every upload page
+            context = {
+                "auditee_name": sac.auditee_name,
+                "report_id": report_id,
+                "auditee_uei": sac.auditee_uei,
+                "user_provided_organization_type": sac.user_provided_organization_type,
             }
+            # Using the current URL, append page specific context
+            path_name = request.path.split("/")[2]
+            for item in additional_context[path_name]:
+                context[item] = additional_context[path_name][item]
 
             return render(request, "report_submission/upload-page.html", context)
         except SingleAuditChecklist.DoesNotExist:
             raise PermissionDenied("You do not have access to this audit.")
 
-            # Unimplemented
-
+    # Partially implemented (redirects, does no further action)
     def post(self, request, *args, **kwargs):
         report_id = kwargs["report_id"]
+        nextURLs = {
+            "federal-awards": "audit-findings",
+            "audit-findings": "audit-findings-text",
+            "audit-findings-text": "CAP",
+            "CAP": "additional-EINs",
+            "additional-EINs": "additional-UEIs",
+            "additional-UEIs": "secondary-auditors",
+            "secondary-auditors": "/",
+        }
+        path_name = request.path.split("/")[2]
 
         try:
             return redirect(
-                "/report_submission/secondary-auditors/{}".format(report_id)
+                "/report_submission/{nextURL}/{report_id}".format(
+                    nextURL=nextURLs[path_name], report_id=report_id
+                )
             )
 
         except Exception as e:
-            logger.info("Unexpected error in AdditionalUEIsUploadView post.\n", e)
-
-        raise BadRequest()
-
-
-class SecondaryAuditorsUploadView(LoginRequiredMixin, View):
-    def get(self, request, *args, **kwargs):
-        report_id = kwargs["report_id"]
-
-        try:
-            sac = SingleAuditChecklist.objects.get(report_id=report_id)
-
-            accesses = Access.objects.filter(sac=sac, user=request.user)
-            if not accesses:
-                raise PermissionDenied("You do not have access to this audit.")
-
-            context = {
-                "auditee_name": sac.auditee_name,
-                "report_id": report_id,
-                "auditee_uei": sac.auditee_uei,
-                "user_provided_organization_type": sac.user_provided_organization_type,
-                "view_id": "secondary-auditors",
-                "view_name": "Secondary auditors",
-            }
-
-            return render(request, "report_submission/upload-page.html", context)
-        except SingleAuditChecklist.DoesNotExist:
-            raise PermissionDenied("You do not have access to this audit.")
-
-            # Unimplemented
-
-    def post(self, request, *args, **kwargs):
-        try:
-            return redirect(reverse("/"))
-
-        except Exception as e:
-            logger.info("Unexpected error in SecondaryAuditorsUploadView post.\n", e)
+            logger.info("Unexpected error in UploadPageView post.\n", e)
 
         raise BadRequest()
