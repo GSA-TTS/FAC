@@ -2,7 +2,7 @@ from django.urls import path
 from . import views
 
 upload_page_ids = [
-    "federal_awards",
+    "federal-awards",
     "audit-findings",
     "audit-findings-text",
     "CAP",
