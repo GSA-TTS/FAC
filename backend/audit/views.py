@@ -133,7 +133,7 @@ class ReadyForCertificationView(LoginRequiredMixin, generic.View):
             sac.transition_to_ready_for_certification()
             sac.save()
 
-            return render(request, "audit/ready-for-certification.html")
+            return redirect(reverse("audit:AuditorCertification", args=[report_id]))
 
         except SingleAuditChecklist.DoesNotExist:
             raise PermissionDenied("You do not have access to this audit.")
@@ -169,7 +169,7 @@ class AuditorCertificationView(LoginRequiredMixin, generic.View):
             sac.transition_to_auditor_certified()
             sac.save()
 
-            return render(request, "audit/auditor-certification.html")
+            return redirect(reverse("audit:AuditeeCertification", args=[report_id]))
 
         except SingleAuditChecklist.DoesNotExist:
             raise PermissionDenied("You do not have access to this audit.")
@@ -205,7 +205,7 @@ class AuditeeCertificationView(LoginRequiredMixin, generic.View):
             sac.transition_to_auditee_certified()
             sac.save()
 
-            return render(request, "audit/auditee-certification.html")
+            return redirect(reverse("audit:Certification", args=[report_id]))
 
         except SingleAuditChecklist.DoesNotExist:
             raise PermissionDenied("You do not have access to this audit.")
@@ -241,7 +241,7 @@ class CertificationView(LoginRequiredMixin, generic.View):
             sac.transition_to_certified()
             sac.save()
 
-            return render(request, "audit/certification.html")
+            return redirect(reverse("audit:Submission", args=[report_id]))
 
         except SingleAuditChecklist.DoesNotExist:
             raise PermissionDenied("You do not have access to this audit.")

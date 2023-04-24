@@ -1,8 +1,18 @@
 {% extends "base.html" %}
 {% load static %}
 {% block content %}
-<form class="usa-form usa-form--large" id="certification" method="post">
-  {% csrf_token %}
-  <input type="submit" value="Ready" />
-</form>
+<div class="grid-container margin-top-6">
+  <div class="grid-row grid-gap">
+      <form class="usa-form usa-form--large" id="certification" method="post">
+          {% csrf_token %}
+          <fieldset class="usa-fieldset">
+              <legend class="usa-legend usa-legend--large" id="certification">
+                  Certification
+              </legend>
+              <p>This is some text explaining that clicking the button below will certify this audit.</p>
+              <button class="usa-button" id="continue">Complete Certification</button>
+          </fieldset>
+      </form>
+  </div>
+</div>
 {% endblock content %}
