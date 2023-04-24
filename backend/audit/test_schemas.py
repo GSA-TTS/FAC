@@ -22,9 +22,8 @@ def validate(instance, schema):
 
 # 20230408 MCJ FIXME: This path is encoded in multiple places.
 # Why isn't it encoded once in settings.py?
-# SCHEMA_DIR = Path(__file__).parent.parent / "schemas" / "sections"
 SCHEMA_DIR = Path(__file__).parent.parent / "schemas"
-
+SECTION_SCHEMA_DIR = Path(__file__).parent.parent / "schemas" / "sections"
 
 
 class GeneralInformationSchemaValidityTest(SimpleTestCase):
@@ -33,7 +32,7 @@ class GeneralInformationSchemaValidityTest(SimpleTestCase):
     """
 
     GENERAL_INFO_SCHEMA = json.loads(
-        (SCHEMA_DIR / "GeneralInformation.schema.json").read_text(encoding="utf-8")
+        (SECTION_SCHEMA_DIR / "GeneralInformation.schema.json").read_text(encoding="utf-8")
     )
 
     SIMPLE_CASE = {
@@ -362,7 +361,7 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
     """
 
     FEDERAL_AWARDS_SCHEMA = json.loads(
-        (SCHEMA_DIR / "FederalAwards.schema.json").read_text(encoding="utf-8")
+        (SECTION_SCHEMA_DIR / "FederalAwards.schema.json").read_text(encoding="utf-8")
     )
 
     # SIMPLE_CASE = {
@@ -807,7 +806,7 @@ class CorrectiveActionPlanSchemaValidityTest(SimpleTestCase):
     """
 
     CORRECTIVE_ACTION_PLAN_SCHEMA = json.loads(
-        (SCHEMA_DIR / "CorrectiveActionPlan.schema.json").read_text(encoding="utf-8")
+        (SECTION_SCHEMA_DIR / "CorrectiveActionPlan.schema.json").read_text(encoding="utf-8")
     )
 
     SIMPLE_CASE = {
@@ -918,7 +917,7 @@ class FindingsUniformGuidanceSchemaValidityTest(SimpleTestCase):
     """
 
     FINDINGS_UNIFORM_GUIDANCE_SCHEMA = json.loads(
-        (SCHEMA_DIR / "FindingsUniformGuidance.schema.json").read_text(encoding="utf-8")
+        (SECTION_SCHEMA_DIR / "FindingsUniformGuidance.schema.json").read_text(encoding="utf-8")
     )
 
     SIMPLE_CASE = {

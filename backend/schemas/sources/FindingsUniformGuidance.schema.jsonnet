@@ -1,8 +1,10 @@
 local Base = import 'Base.libsonnet';
+local Requirement = import 'FindingsUniformGuidance.libsonnet';
 local Func = import 'Functions.libsonnet';
 local Additional = import 'FindingsUniformGuidance.validation.libsonnet';
 local Types = Base.Types;
 local Validations = Additional.Validations; 
+local ComplianceRequirement = Requirement.ComplianceRequirement;
 
 local Parts = {
   Program: Types.object {
@@ -10,7 +12,7 @@ local Parts = {
     properties: {
       name: Types.string,
       number: Base.Compound.ProgramNumber,
-      compliance_requirement: Base.Compound.ComplianceRequirement,
+      compliance_requirement: ComplianceRequirement.ComplianceRequirement,
     },
     required: ['name', 'number', 'compliance_requirement'],
   },
