@@ -115,7 +115,11 @@ class ReadyForCertificationView(LoginRequiredMixin, generic.View):
             if not accesses:
                 raise PermissionDenied("You do not have access to this audit.")
 
-            return render(request, "audit/ready-for-certification.html")
+            context = {
+                "report_id": report_id,
+                "submission_status": sac.submission_status,
+            }
+            return render(request, "audit/ready-for-certification.html", context)
         except SingleAuditChecklist.DoesNotExist:
             raise PermissionDenied("You do not have access to this audit.")
 
@@ -151,7 +155,12 @@ class AuditorCertificationView(LoginRequiredMixin, generic.View):
             if not accesses:
                 raise PermissionDenied("You do not have access to this audit.")
 
-            return render(request, "audit/auditor-certification.html")
+            context = {
+                "report_id": report_id,
+                "submission_status": sac.submission_status,
+            }
+
+            return render(request, "audit/auditor-certification.html", context)
         except SingleAuditChecklist.DoesNotExist:
             raise PermissionDenied("You do not have access to this audit.")
 
@@ -187,7 +196,12 @@ class AuditeeCertificationView(LoginRequiredMixin, generic.View):
             if not accesses:
                 raise PermissionDenied("You do not have access to this audit.")
 
-            return render(request, "audit/auditee-certification.html")
+            context = {
+                "report_id": report_id,
+                "submission_status": sac.submission_status,
+            }
+
+            return render(request, "audit/auditee-certification.html", context)
         except SingleAuditChecklist.DoesNotExist:
             raise PermissionDenied("You do not have access to this audit.")
 
@@ -223,7 +237,12 @@ class CertificationView(LoginRequiredMixin, generic.View):
             if not accesses:
                 raise PermissionDenied("You do not have access to this audit.")
 
-            return render(request, "audit/certification.html")
+            context = {
+                "report_id": report_id,
+                "submission_status": sac.submission_status,
+            }
+
+            return render(request, "audit/certification.html", context)
         except SingleAuditChecklist.DoesNotExist:
             raise PermissionDenied("You do not have access to this audit.")
 
@@ -259,7 +278,12 @@ class SubmissionView(LoginRequiredMixin, generic.View):
             if not accesses:
                 raise PermissionDenied("You do not have access to this audit.")
 
-            return render(request, "audit/submission.html")
+            context = {
+                "report_id": report_id,
+                "submission_status": sac.submission_status,
+            }
+
+            return render(request, "audit/submission.html", context)
         except SingleAuditChecklist.DoesNotExist:
             raise PermissionDenied("You do not have access to this audit.")
 
@@ -277,7 +301,7 @@ class SubmissionView(LoginRequiredMixin, generic.View):
             sac.transition_to_submitted()
             sac.save()
 
-            return render(request, "audit/submission.html")
+            return redirect(reverse("audit:Submission", args=[report_id]))
 
         except SingleAuditChecklist.DoesNotExist:
             raise PermissionDenied("You do not have access to this audit.")
