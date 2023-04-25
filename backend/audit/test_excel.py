@@ -18,14 +18,14 @@ from audit.excel import (
     corrective_action_column_mapping,
 )
 from audit.validators import (
-    validate_federal_award_json, 
+    validate_federal_award_json,
     validate_corrective_action_plan_json,
     validate_findings_uniform_guidance_json
 )
 from audit.fixtures.excel import (
-    FEDERAL_AWARDS_TEMPLATE, 
-    FEDERAL_AWARDS_ENTRY_FIXTURES, 
-    CORRECTIVE_ACTION_PLAN_TEMPLATE, 
+    FEDERAL_AWARDS_TEMPLATE,
+    FEDERAL_AWARDS_ENTRY_FIXTURES,
+    CORRECTIVE_ACTION_PLAN_TEMPLATE,
     CORRECTIVE_ACTION_PLAN_ENTRY_FIXTURES,
     FINDINGS_UNIFORM_GUIDANCE_TEMPLATE,
     FINDINGS_UNIFORM_GUIDANCE_ENTRY_FIXTURES,
@@ -336,5 +336,4 @@ class FindingsUniformGuidanceExcelTests(SimpleTestCase):
 
                 self.assertRaises(
                     ValidationError, validate_findings_uniform_guidance_json, findings
-                )   
-
+                )

@@ -11,7 +11,7 @@ from django.utils.datastructures import MultiValueDictKeyError
 from django.utils.decorators import method_decorator
 
 from .fixtures.excel import (FEDERAL_AWARDS_EXPENDED, CORRECTIVE_ACTION_PLAN,
-                             FINDINGS_TEXT, FINDINGS_UNIFORM_GUIDANCE)
+                             FINDINGS_UNIFORM_GUIDANCE)
 
 from audit.excel import extract_federal_awards, extract_corrective_action_plan, extract_findings_uniform_guidance
 from audit.models import Access, ExcelFile, SingleAuditChecklist

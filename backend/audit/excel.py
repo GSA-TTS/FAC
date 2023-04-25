@@ -3,6 +3,7 @@ from openpyxl import load_workbook, Workbook
 from openpyxl.cell import Cell
 import pydash
 
+
 def _set_by_path(target_obj, target_path, value):
     """Set a (potentially nested) field in target_obj using JSONPath-esque dot notation, e.g. parent.child[0].field"""
     pydash.set_(target_obj, target_path, value)
@@ -27,6 +28,7 @@ def _set_pass_through_entity_name(obj, target, value):
 def _set_pass_through_entity_id(obj, target, value):
     for index, v in enumerate(value.split("|")):
         _set_by_path(obj, f"{target}[{index}].identifying_number", v)
+
 
 federal_awards_field_mapping: FieldMapping = {
     "auditee_ein": ("FederalAwards.auditee_ein", _set_by_path),
@@ -239,11 +241,11 @@ def extract_data(file, field_mapping: FieldMapping, column_mapping: ColumnMappin
 
         for name, (target, set_fn) in field_mapping.items():
             set_fn(result, target, _extract_single_value(workbook, name))
-            
+
         for name, (parent_target, field_target, set_fn) in column_mapping.items():
             for index, value in enumerate(_extract_column(workbook, name)):
                 set_fn(result, f"{parent_target}[{index}].{field_target}", value)
-                
+
     except AttributeError as e:
         raise ExcelExtractionError(e)
 

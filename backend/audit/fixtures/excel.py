@@ -86,7 +86,7 @@ FEDERAL_AWARDS_ENTRY_FIXTURES = [
     },
 ]
 
-FEDERAL_AWARDS_EXPENDED="FederalAwardsExpended"
-CORRECTIVE_ACTION_PLAN="CorrectiveActionPlan"
-FINDINGS_TEXT="FindingsText"
-FINDINGS_UNIFORM_GUIDANCE="FindingsUniformGuidance"
+FEDERAL_AWARDS_EXPENDED = "FederalAwardsExpended"
+CORRECTIVE_ACTION_PLAN = "CorrectiveActionPlan"
+FINDINGS_TEXT = "FindingsText"
+FINDINGS_UNIFORM_GUIDANCE = "FindingsUniformGuidance"

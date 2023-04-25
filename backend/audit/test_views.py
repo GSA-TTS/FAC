@@ -13,9 +13,9 @@ from tempfile import NamedTemporaryFile
 from openpyxl import load_workbook
 from openpyxl.cell import Cell
 
-from .fixtures.excel import (FEDERAL_AWARDS_TEMPLATE, CORRECTIVE_ACTION_PLAN_TEMPLATE, 
+from .fixtures.excel import (FEDERAL_AWARDS_TEMPLATE, CORRECTIVE_ACTION_PLAN_TEMPLATE,
                              FINDINGS_UNIFORM_GUIDANCE_TEMPLATE, CORRECTIVE_ACTION_PLAN_ENTRY_FIXTURES,
-                             FINDINGS_UNIFORM_GUIDANCE_ENTRY_FIXTURES, 
+                             FINDINGS_UNIFORM_GUIDANCE_ENTRY_FIXTURES,
                              FEDERAL_AWARDS_ENTRY_FIXTURES, FEDERAL_AWARDS_EXPENDED,
                              CORRECTIVE_ACTION_PLAN, FINDINGS_UNIFORM_GUIDANCE)
 from .models import Access, SingleAuditChecklist
@@ -49,6 +49,7 @@ VALID_ACCESS_AND_SUBMISSION_DATA = {
 
 EXCEL_FILES = [CORRECTIVE_ACTION_PLAN, FEDERAL_AWARDS_EXPENDED, FINDINGS_UNIFORM_GUIDANCE]
 
+
 # Mocking the user login and file scan functions
 def _mock_login_and_scan(self, mock_scan_file):
     """Helper function to mock the login and file scan functions"""
@@ -64,6 +65,7 @@ def _mock_login_and_scan(self, mock_scan_file):
     mock_scan_file.return_value = MockHttpResponse(200, "clean!")
 
     return sac
+
 
 class MySubmissionsViewTests(TestCase):
     def setUp(self):
@@ -150,7 +152,7 @@ class ExcelFileHandlerViewTests(TestCase):
 
         for form_section in EXCEL_FILES:
             response = self.client.post(
-                reverse("audit:ExcelFileHandler", kwargs={"report_id": "12345", "form_section": form_section})
+                reverse(f"audit:{form_section}", kwargs={"report_id": "12345", "form_section": form_section})
             )
 
             self.assertIsInstance(response, HttpResponseRedirect)
@@ -164,7 +166,7 @@ class ExcelFileHandlerViewTests(TestCase):
 
         for form_section in EXCEL_FILES:
             response = self.client.post(
-                reverse("audit:ExcelFileHandler", kwargs={"report_id": "this is not a report id", "form_section": form_section})
+                reverse(f"audit:{form_section}", kwargs={"report_id": "this is not a report id", "form_section": form_section})
             )
 
             self.assertEqual(response.status_code, 403)
@@ -177,7 +179,7 @@ class ExcelFileHandlerViewTests(TestCase):
         self.client.force_login(user)
         for form_section in EXCEL_FILES:
             response = self.client.post(
-                reverse("audit:ExcelFileHandler", kwargs={"report_id": sac.report_id, "form_section": form_section})
+                reverse(f"audit:{form_section}", kwargs={"report_id": sac.report_id, "form_section": form_section})
             )
 
             self.assertEqual(response.status_code, 403)
@@ -192,7 +194,7 @@ class ExcelFileHandlerViewTests(TestCase):
 
         for form_section in EXCEL_FILES:
             response = self.client.post(
-                reverse("audit:ExcelFileHandler", kwargs={"report_id": sac.report_id, "form_section": form_section})
+                reverse(f"audit:{form_section}", kwargs={"report_id": sac.report_id, "form_section": form_section})
             )
 
             self.assertEqual(response.status_code, 400)
@@ -209,7 +211,7 @@ class ExcelFileHandlerViewTests(TestCase):
 
         for form_section in EXCEL_FILES:
             response = self.client.post(
-                reverse("audit:ExcelFileHandler", kwargs={"report_id": sac.report_id, "form_section": form_section}),
+                reverse(f"audit:{form_section}", kwargs={"report_id": sac.report_id, "form_section": form_section}),
                 data={"FILES": file},
             )
 
@@ -218,7 +220,7 @@ class ExcelFileHandlerViewTests(TestCase):
     @patch("audit.validators._scan_file")
     def test_valid_file_upload_for_federal_awards(self, mock_scan_file):
         """When a valid Excel file is uploaded, the file should be stored and the SingleAuditChecklist should be updated to include the uploaded federal awards data"""
-        
+
         sac = _mock_login_and_scan(self, mock_scan_file)
 
         # add valid data to the workbook
@@ -233,7 +235,7 @@ class ExcelFileHandlerViewTests(TestCase):
 
             with open(tmp.name, "rb") as excel_file:
                 response = self.client.post(
-                    reverse("audit:ExcelFileHandler", kwargs={"report_id": sac.report_id, "form_section": EXCEL_FILES[1]}),
+                    reverse(f"audit:{EXCEL_FILES[1]}", kwargs={"report_id": sac.report_id, "form_section": EXCEL_FILES[1]}),
                     data={"FILES": excel_file},
                 )
 
@@ -319,7 +321,7 @@ class ExcelFileHandlerViewTests(TestCase):
     @patch("audit.validators._scan_file")
     def test_valid_file_upload_for_corrective_action_plan(self, mock_scan_file):
         """When a valid Excel file is uploaded, the file should be stored and the SingleAuditChecklist should be updated to include the uploaded corrective action plan data"""
-        
+
         sac = _mock_login_and_scan(self, mock_scan_file)
 
         # add valid data to the workbook
@@ -334,7 +336,7 @@ class ExcelFileHandlerViewTests(TestCase):
 
             with open(tmp.name, "rb") as excel_file:
                 response = self.client.post(
-                    reverse("audit:ExcelFileHandler", kwargs={"report_id": sac.report_id, "form_section": EXCEL_FILES[0]}),
+                    reverse(f"audit:{EXCEL_FILES[0]}", kwargs={"report_id": sac.report_id, "form_section": EXCEL_FILES[0]}),
                     data={"FILES": excel_file},
                 )
 
@@ -366,7 +368,7 @@ class ExcelFileHandlerViewTests(TestCase):
                 )
 
     @patch("audit.validators._scan_file")
-    def test_valid_file_upload_for_findings_uniform_guidance(self, mock_scan_file): 
+    def test_valid_file_upload_for_findings_uniform_guidance(self, mock_scan_file):
         """When a valid Excel file is uploaded, the file should be stored and the SingleAuditChecklist should be updated to include the uploaded findings data"""
 
         sac = _mock_login_and_scan(self, mock_scan_file)
@@ -383,7 +385,7 @@ class ExcelFileHandlerViewTests(TestCase):
 
             with open(tmp.name, "rb") as excel_file:
                 response = self.client.post(
-                    reverse("audit:ExcelFileHandler", kwargs={"report_id": sac.report_id, "form_section": EXCEL_FILES[2]}),
+                    reverse(f"audit:{EXCEL_FILES[2]}", kwargs={"report_id": sac.report_id, "form_section": EXCEL_FILES[2]}),
                     data={"FILES": excel_file},
                 )
 
@@ -425,4 +427,3 @@ class ExcelFileHandlerViewTests(TestCase):
                     findings_entries["modified_opinion"],
                     FINDINGS_UNIFORM_GUIDANCE_ENTRY_FIXTURES[0]["modified_opinion"]
                 )
-
