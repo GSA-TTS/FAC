@@ -8,7 +8,10 @@ from django.test import SimpleTestCase
 from jsonschema import exceptions, validate as jsonschema_validate, FormatChecker
 from random import choice, randrange
 
-from audit.fixtures.excel import CORRECTIVE_ACTION_PLAN_TEST_FILE, FINDINGS_UNIFORM_GUIDANCE_TEST_FILE
+from audit.fixtures.excel import (
+    CORRECTIVE_ACTION_PLAN_TEST_FILE,
+    FINDINGS_UNIFORM_GUIDANCE_TEST_FILE,
+)
 
 # Simplest way to create a new copy of simple case rather than getting
 # references to things used by other tests:
@@ -32,7 +35,9 @@ class GeneralInformationSchemaValidityTest(SimpleTestCase):
     """
 
     GENERAL_INFO_SCHEMA = json.loads(
-        (SECTION_SCHEMA_DIR / "GeneralInformation.schema.json").read_text(encoding="utf-8")
+        (SECTION_SCHEMA_DIR / "GeneralInformation.schema.json").read_text(
+            encoding="utf-8"
+        )
     )
 
     SIMPLE_CASE = {
@@ -169,8 +174,8 @@ class GeneralInformationSchemaValidityTest(SimpleTestCase):
         good_uei = "".join(choice(alpha_omit_oi) for i in range(12))
         idx = randrange(12)
 
-        with_punc = good_uei[:idx] + choice(string.punctuation) + good_uei[idx + 1:]
-        with_ioIO = good_uei[:idx] + choice("ioIO") + good_uei[idx + 1:]
+        with_punc = good_uei[:idx] + choice(string.punctuation) + good_uei[idx + 1 :]
+        with_ioIO = good_uei[:idx] + choice("ioIO") + good_uei[idx + 1 :]
 
         bad_ueis = [
             "".join(choice(alpha_omit_oi) for i in range(11)),  # too short
@@ -396,30 +401,25 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
                         "is_major": "N",
                         "audit_report_type": "",
                         "number_of_audit_findings": 0,
-                        "amount_expended": 42
+                        "amount_expended": 42,
                     },
                     "loan_or_loan_guarantee": {
                         "is_guaranteed": "N",
-                        "loan_balance_at_audit_period_end": 0
+                        "loan_balance_at_audit_period_end": 0,
                     },
                     "direct_or_indirect_award": {
                         "is_direct": "N",
                         "entities": [
                             {
                                 "name": "Bob's Granting House",
-                                "identifying_number": "12345"
+                                "identifying_number": "12345",
                             }
-                        ]
+                        ],
                     },
-                    "cluster": {
-                        "name": "N/A",
-                        "total": 123
-                    },
-                    "subrecipients": {
-                        "is_passed": "N"
-                    },
+                    "cluster": {"name": "N/A", "total": 123},
+                    "subrecipients": {"is_passed": "N"},
                 }
-            ]
+            ],
         }
     }
 
@@ -435,27 +435,21 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
                         "is_major": "Y",
                         "audit_report_type": "U",
                         "number_of_audit_findings": 0,
-                        "amount_expended": 42
+                        "amount_expended": 42,
                     },
                     "loan_or_loan_guarantee": {
                         "is_guaranteed": "Y",
-                        "loan_balance_at_audit_period_end": 42
+                        "loan_balance_at_audit_period_end": 42,
                     },
-                    "direct_or_indirect_award": {
-                        "is_direct": "Y",
-                        "entities": []
-                    },
-                    "subrecipients": {
-                        "is_passed": "Y",
-                        "amount": 32
-                    },
+                    "direct_or_indirect_award": {"is_direct": "Y", "entities": []},
+                    "subrecipients": {"is_passed": "Y", "amount": 32},
                     "cluster": {
                         "name": "STATE CLUSTER",
                         "total": 123,
-                        "state_cluster_name": "Maine"
-                    }
+                        "state_cluster_name": "Maine",
+                    },
                 }
-            ]
+            ],
         }
     }
 
@@ -463,9 +457,7 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
         """Try to test FederalAwards first."""
         schema = self.FEDERAL_AWARDS_SCHEMA
         # 20230408 MCJ FIXME : Paths!
-        for f in [
-            "federalawards-pass-01.json"
-        ]:
+        for f in ["federalawards-pass-01.json"]:
             in_flight_file = SCHEMA_DIR / "test-files" / f
             in_flight = json.loads(in_flight_file.read_text(encoding="utf-8"))
             validate(in_flight, schema)
@@ -527,37 +519,31 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
         both_int_pass = award | {
             "loan_or_loan_guarantee": {
                 "is_guaranteed": "Y",
-                "loan_balance_at_audit_period_end": 10_000
+                "loan_balance_at_audit_period_end": 10_000,
             }
         }
         simple_case["FederalAwards"]["federal_awards"] = [both_int_pass]
 
         validate(simple_case, schema)
 
-        for valid in ["", 'null', 0]:
+        for valid in ["", "null", 0]:
             both_na_pass = award | {
                 "loan_or_loan_guarantee": {
                     "is_guaranteed": "N",
-                    "loan_balance_at_audit_period_end": valid
+                    "loan_balance_at_audit_period_end": valid,
                 }
             }
             simple_case["FederalAwards"]["federal_awards"] = [both_na_pass]
 
             validate(simple_case, schema)
 
-        no_dependent_fail = award | {
-            "loan_or_loan_guarantee": {
-                "is_guaranteed": "Y"
-            }
-        }
+        no_dependent_fail = award | {"loan_or_loan_guarantee": {"is_guaranteed": "Y"}}
         simple_case["FederalAwards"]["federal_awards"] = [no_dependent_fail]
 
         self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
         only_dependent_fail = award | {
-            "loan_or_loan_guarantee": {
-                "loan_balance_at_audit_period_end": 10_000
-            }
+            "loan_or_loan_guarantee": {"loan_balance_at_audit_period_end": 10_000}
         }
         simple_case["FederalAwards"]["federal_awards"] = [only_dependent_fail]
 
@@ -566,7 +552,7 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
         bad_value_fail = award | {
             "loan_or_loan_guarantee": {
                 "is_guaranteed": "Y",
-                "loan_balance_at_audit_period_end": "not applicable"
+                "loan_balance_at_audit_period_end": "not applicable",
             }
         }
         simple_case["FederalAwards"]["federal_awards"] = [bad_value_fail]
@@ -576,7 +562,7 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
         zero_value_fail = award | {
             "loan_or_loan_guarantee": {
                 "is_guaranteed": "Y",
-                "loan_balance_at_audit_period_end": 0
+                "loan_balance_at_audit_period_end": 0,
             }
         }
         simple_case["FederalAwards"]["federal_awards"] = [zero_value_fail]
@@ -598,18 +584,14 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
         both_pass = award | {
             "direct_or_indirect_award": {
                 "is_direct": "N",
-                "entities": [{"name": "Bob", "identifying_number": "Bob-123"}]
+                "entities": [{"name": "Bob", "identifying_number": "Bob-123"}],
             }
         }
         simple_case["FederalAwards"]["federal_awards"] = [both_pass]
 
         validate(simple_case, schema)
 
-        no_dependent_fail = award | {
-            "direct_or_indirect_award": {
-                "is_direct": "N"
-            }
-        }
+        no_dependent_fail = award | {"direct_or_indirect_award": {"is_direct": "N"}}
         simple_case["FederalAwards"]["federal_awards"] = [no_dependent_fail]
 
         self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
@@ -626,7 +608,7 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
         bad_entity_fail = award | {
             "direct_or_indirect_award": {
                 "is_direct": "N",
-                "entities": [{"name": "Bob"}]
+                "entities": [{"name": "Bob"}],
             }
         }
         simple_case["FederalAwards"]["federal_awards"] = [bad_entity_fail]
@@ -635,7 +617,7 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
         bad_entity_empty_fail = award | {
             "direct_or_indirect_award": {
                 "is_direct": "N",
-                "entities": [{"name": "Bob", "identifying_number": ""}]
+                "entities": [{"name": "Bob", "identifying_number": ""}],
             }
         }
         simple_case["FederalAwards"]["federal_awards"] = [bad_entity_empty_fail]
@@ -651,30 +633,17 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
         simple_case = jsoncopy(self.SIMPLE_CASE)
         award = jsoncopy(simple_case["FederalAwards"]["federal_awards"][0])
 
-        both_pass = award | {
-            "subrecipients": {
-                "is_passed": "Y",
-                "amount": 10_000
-            }
-        }
+        both_pass = award | {"subrecipients": {"is_passed": "Y", "amount": 10_000}}
         simple_case["FederalAwards"]["federal_awards"] = [both_pass]
 
         validate(simple_case, schema)
 
-        no_dependent_fail = award | {
-            "subrecipients": {
-                "is_passed": "Y"
-            }
-        }
+        no_dependent_fail = award | {"subrecipients": {"is_passed": "Y"}}
         simple_case["FederalAwards"]["federal_awards"] = [no_dependent_fail]
 
         self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
-        only_dependent_fail = award | {
-            "subrecipients": {
-                "amount": 10_000
-            }
-        }
+        only_dependent_fail = award | {"subrecipients": {"amount": 10_000}}
         simple_case["FederalAwards"]["federal_awards"] = [only_dependent_fail]
 
         self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
@@ -695,7 +664,7 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
                 "is_major": "Y",
                 "audit_report_type": "U",
                 "number_of_audit_findings": 0,
-                "amount_expended": 42
+                "amount_expended": 42,
             }
         }
         simple_case["FederalAwards"]["federal_awards"] = [both_pass]
@@ -709,16 +678,14 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
                 "is_major": "Y",
                 "audit_report_type": "Z",
                 "number_of_audit_findings": 0,
-                "amount_expended": 42
+                "amount_expended": 42,
             }
         }
         simple_case["FederalAwards"]["federal_awards"] = [invalid_fail]
 
         self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
-        no_dependent_fail = award | {
-            "is_major": "Y"
-        }
+        no_dependent_fail = award | {"is_major": "Y"}
         simple_case["FederalAwards"]["federal_awards"] = [no_dependent_fail]
 
         self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
@@ -738,7 +705,9 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
 
         simple_case = jsoncopy(self.SIMPLE_CASE)
 
-        simple_case["FederalAwards"]["federal_awards"][0]["cluster"]["name"] = "STATE CLUSTER"
+        simple_case["FederalAwards"]["federal_awards"][0]["cluster"][
+            "name"
+        ] = "STATE CLUSTER"
         self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
     def test_disallowed_state_cluster_name(self):
@@ -748,15 +717,19 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
         schema = self.FEDERAL_AWARDS_SCHEMA
 
         simple_case = jsoncopy(self.SIMPLE_CASE)
-        simple_case["FederalAwards"]["federal_awards"][0]["cluster"]["state_cluster_name"] = "ANYTHING"
+        simple_case["FederalAwards"]["federal_awards"][0]["cluster"][
+            "state_cluster_name"
+        ] = "ANYTHING"
 
         # Test for errors when state_cluster_name is not empty or null
         self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
         # Test for successful validation when state_cluster_name is empty or null
-        for valid in ["", 'null']:
+        for valid in ["", "null"]:
             simple_case = jsoncopy(self.SIMPLE_CASE)
-            simple_case["FederalAwards"]["federal_awards"][0]["cluster"]["state_cluster_name"] = valid
+            simple_case["FederalAwards"]["federal_awards"][0]["cluster"][
+                "state_cluster_name"
+            ] = valid
 
             validate(simple_case, schema)
 
@@ -806,7 +779,9 @@ class CorrectiveActionPlanSchemaValidityTest(SimpleTestCase):
     """
 
     CORRECTIVE_ACTION_PLAN_SCHEMA = json.loads(
-        (SECTION_SCHEMA_DIR / "CorrectiveActionPlan.schema.json").read_text(encoding="utf-8")
+        (SECTION_SCHEMA_DIR / "CorrectiveActionPlan.schema.json").read_text(
+            encoding="utf-8"
+        )
     )
 
     SIMPLE_CASE = {
@@ -816,9 +791,9 @@ class CorrectiveActionPlanSchemaValidityTest(SimpleTestCase):
                 {
                     "contains_chart_or_table": "N",
                     "planned_action": "Action 11",
-                    "reference_number": "2023-111"
+                    "reference_number": "2023-111",
                 }
-            ]
+            ],
         }
     }
 
@@ -917,7 +892,9 @@ class FindingsUniformGuidanceSchemaValidityTest(SimpleTestCase):
     """
 
     FINDINGS_UNIFORM_GUIDANCE_SCHEMA = json.loads(
-        (SECTION_SCHEMA_DIR / "FindingsUniformGuidance.schema.json").read_text(encoding="utf-8")
+        (SECTION_SCHEMA_DIR / "FindingsUniformGuidance.schema.json").read_text(
+            encoding="utf-8"
+        )
     )
 
     SIMPLE_CASE = {
@@ -928,7 +905,7 @@ class FindingsUniformGuidanceSchemaValidityTest(SimpleTestCase):
                     "program": {
                         "compliance_requirement": "A",
                         "name": "program name",
-                        "number": "42.123"
+                        "number": "42.123",
                     },
                     "questioned_costs": "N",
                     "significiant_deficiency": "N",
@@ -940,10 +917,10 @@ class FindingsUniformGuidanceSchemaValidityTest(SimpleTestCase):
                         "is_valid": "Y",
                         "repeat_prior_reference": "Y",
                         "prior_references": "2022-001",
-                        "reference": "2023-001"
-                    }
+                        "reference": "2023-001",
+                    },
                 }
-            ]
+            ],
         }
     }
 
@@ -983,51 +960,51 @@ class FindingsUniformGuidanceSchemaValidityTest(SimpleTestCase):
         schema = self.FINDINGS_UNIFORM_GUIDANCE_SCHEMA
 
         simple_case = jsoncopy(self.SIMPLE_CASE)
-        del simple_case["FindingsUniformGuidance"]["findings_uniform_guidance_entries"][0][
-            "program"
-        ]
+        del simple_case["FindingsUniformGuidance"]["findings_uniform_guidance_entries"][
+            0
+        ]["program"]
         self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
         simple_case = jsoncopy(self.SIMPLE_CASE)
-        del simple_case["FindingsUniformGuidance"]["findings_uniform_guidance_entries"][0][
-            "findings"
-        ]["prior_references"]
+        del simple_case["FindingsUniformGuidance"]["findings_uniform_guidance_entries"][
+            0
+        ]["findings"]["prior_references"]
         self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
         simple_case = jsoncopy(self.SIMPLE_CASE)
-        del simple_case["FindingsUniformGuidance"]["findings_uniform_guidance_entries"][0][
-            "significiant_deficiency"
-        ]
+        del simple_case["FindingsUniformGuidance"]["findings_uniform_guidance_entries"][
+            0
+        ]["significiant_deficiency"]
         self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
         simple_case = jsoncopy(self.SIMPLE_CASE)
-        del simple_case["FindingsUniformGuidance"]["findings_uniform_guidance_entries"][0][
-            "other_matters"
-        ]
+        del simple_case["FindingsUniformGuidance"]["findings_uniform_guidance_entries"][
+            0
+        ]["other_matters"]
         self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
         simple_case = jsoncopy(self.SIMPLE_CASE)
-        del simple_case["FindingsUniformGuidance"]["findings_uniform_guidance_entries"][0][
-            "other_findings"
-        ]
+        del simple_case["FindingsUniformGuidance"]["findings_uniform_guidance_entries"][
+            0
+        ]["other_findings"]
         self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
         simple_case = jsoncopy(self.SIMPLE_CASE)
-        del simple_case["FindingsUniformGuidance"]["findings_uniform_guidance_entries"][0][
-            "modified_opinion"
-        ]
+        del simple_case["FindingsUniformGuidance"]["findings_uniform_guidance_entries"][
+            0
+        ]["modified_opinion"]
         self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
         simple_case = jsoncopy(self.SIMPLE_CASE)
-        del simple_case["FindingsUniformGuidance"]["findings_uniform_guidance_entries"][0][
-            "material_weakness"
-        ]
+        del simple_case["FindingsUniformGuidance"]["findings_uniform_guidance_entries"][
+            0
+        ]["material_weakness"]
         self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
         simple_case = jsoncopy(self.SIMPLE_CASE)
-        del simple_case["FindingsUniformGuidance"]["findings_uniform_guidance_entries"][0][
-            "findings"
-        ]
+        del simple_case["FindingsUniformGuidance"]["findings_uniform_guidance_entries"][
+            0
+        ]["findings"]
         self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
     def test_empty_entry_fields(self):

@@ -10,12 +10,23 @@ from django.urls import reverse
 from django.utils.datastructures import MultiValueDictKeyError
 from django.utils.decorators import method_decorator
 
-from .fixtures.excel import (FEDERAL_AWARDS_EXPENDED, CORRECTIVE_ACTION_PLAN,
-                             FINDINGS_UNIFORM_GUIDANCE)
+from .fixtures.excel import (
+    FEDERAL_AWARDS_EXPENDED,
+    CORRECTIVE_ACTION_PLAN,
+    FINDINGS_UNIFORM_GUIDANCE,
+)
 
-from audit.excel import extract_federal_awards, extract_corrective_action_plan, extract_findings_uniform_guidance
+from audit.excel import (
+    extract_federal_awards,
+    extract_corrective_action_plan,
+    extract_findings_uniform_guidance,
+)
 from audit.models import Access, ExcelFile, SingleAuditChecklist
-from audit.validators import validate_federal_award_json, validate_corrective_action_plan_json, validate_findings_uniform_guidance_json
+from audit.validators import (
+    validate_federal_award_json,
+    validate_corrective_action_plan_json,
+    validate_findings_uniform_guidance_json,
+)
 
 logger = logging.getLogger(__name__)
 

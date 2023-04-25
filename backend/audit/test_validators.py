@@ -11,7 +11,10 @@ from tempfile import NamedTemporaryFile
 
 import requests
 
-from .test_schemas import CorrectiveActionPlanSchemaValidityTest, FederalAwardsSchemaValidityTest
+from .test_schemas import (
+    CorrectiveActionPlanSchemaValidityTest,
+    FederalAwardsSchemaValidityTest,
+)
 from .validators import (
     ALLOWED_EXCEL_CONTENT_TYPES,
     ALLOWED_EXCEL_FILE_EXTENSIONS,
@@ -54,7 +57,7 @@ class FederalAwardsValidatorTests(SimpleTestCase):
         """
         Empty Federal Awards should fail, simple case should pass.
         """
-        invalid = json.loads("{\"FederalAwards\":{}}")
+        invalid = json.loads('{"FederalAwards":{}}')
         expected_msg = "[\"'Federal Awards' is a required property.\"]"
         self.assertRaisesRegex(
             ValidationError, expected_msg, validate_federal_award_json, invalid
@@ -74,7 +77,9 @@ class FederalAwardsValidatorTests(SimpleTestCase):
         # pick an extension beteween 001 and 999 (valid)
         extension = f"{randrange(1, 1000):03}"
 
-        simple["FederalAwards"]["federal_awards"][0]["program"]["number"] = f"{prefix}.{extension}"
+        simple["FederalAwards"]["federal_awards"][0]["program"][
+            "number"
+        ] = f"{prefix}.{extension}"
 
         self.assertRaises(ValidationError, validate_federal_award_json, simple)
 
@@ -89,7 +94,9 @@ class FederalAwardsValidatorTests(SimpleTestCase):
         # pick an extension beteween 001 and 999 (valid)
         extension = f"{randrange(1, 1000):03}"
 
-        simple["FederalAwards"]["federal_awards"][0]["program"]["number"] = f"{prefix}.{extension}"
+        simple["FederalAwards"]["federal_awards"][0]["program"][
+            "number"
+        ] = f"{prefix}.{extension}"
 
         self.assertRaises(ValidationError, validate_federal_award_json, simple)
 
@@ -111,7 +118,9 @@ class FederalAwardsValidatorTests(SimpleTestCase):
 
         for prefix in prefixes:
             with self.subTest():
-                simple["FederalAwards"]["federal_awards"][0]["program"]["number"] = f"{prefix}.{extension}"
+                simple["FederalAwards"]["federal_awards"][0]["program"][
+                    "number"
+                ] = f"{prefix}.{extension}"
 
                 self.assertRaises(ValidationError, validate_federal_award_json, simple)
 
@@ -126,7 +135,9 @@ class FederalAwardsValidatorTests(SimpleTestCase):
         # use RD as extension (valid)
         extension = "RD"
 
-        simple["FederalAwards"]["federal_awards"][0]["program"]["number"] = f"{prefix}.{extension}"
+        simple["FederalAwards"]["federal_awards"][0]["program"][
+            "number"
+        ] = f"{prefix}.{extension}"
 
         validate_federal_award_json(simple)
 
@@ -141,7 +152,9 @@ class FederalAwardsValidatorTests(SimpleTestCase):
         # pick an extension between U10 and U99 (valid)
         extension = f"U{randrange(10, 100):02}"
 
-        simple["FederalAwards"]["federal_awards"][0]["program"]["number"] = f"{prefix}.{extension}"
+        simple["FederalAwards"]["federal_awards"][0]["program"][
+            "number"
+        ] = f"{prefix}.{extension}"
 
         validate_federal_award_json(simple)
 
@@ -156,7 +169,9 @@ class FederalAwardsValidatorTests(SimpleTestCase):
         # pick an extension between U0 and U9
         extension = f"U{randrange(10):1}"
 
-        simple["FederalAwards"]["federal_awards"][0]["program"]["number"] = f"{prefix}.{extension}"
+        simple["FederalAwards"]["federal_awards"][0]["program"][
+            "number"
+        ] = f"{prefix}.{extension}"
 
         self.assertRaises(ValidationError, validate_federal_award_json, simple)
 
@@ -171,8 +186,9 @@ class FederalAwardsValidatorTests(SimpleTestCase):
         # pick an extension between U001 and U999
         extension = f"U{randrange(1000):03}"
 
-        simple["FederalAwards"]["federal_awards"][0][
-            "program"]["number"] = f"{prefix}.{extension}"
+        simple["FederalAwards"]["federal_awards"][0]["program"][
+            "number"
+        ] = f"{prefix}.{extension}"
 
         self.assertRaises(ValidationError, validate_federal_award_json, simple)
 
@@ -187,8 +203,9 @@ class FederalAwardsValidatorTests(SimpleTestCase):
         # pick an extension between 001 and 999 (valid)
         extension = f"{randrange(1, 1000):03}"
 
-        simple["FederalAwards"]["federal_awards"][0][
-            "program"]["number"] = f"{prefix}.{extension}"
+        simple["FederalAwards"]["federal_awards"][0]["program"][
+            "number"
+        ] = f"{prefix}.{extension}"
 
         validate_federal_award_json(simple)
 
@@ -203,7 +220,9 @@ class FederalAwardsValidatorTests(SimpleTestCase):
         # pick an extension with four or more digits
         extension = f"{randrange(1000):04}"
 
-        simple["FederalAwards"]["federal_awards"][0]["program"]["number"] = f"{prefix}.{extension}"
+        simple["FederalAwards"]["federal_awards"][0]["program"][
+            "number"
+        ] = f"{prefix}.{extension}"
 
         self.assertRaises(ValidationError, validate_federal_award_json, simple)
 
@@ -218,7 +237,9 @@ class FederalAwardsValidatorTests(SimpleTestCase):
         # pick an extension between 001 and 999 with a trailing letter (valid)
         extension = f"{randrange(1, 1000):03}{choice(string.ascii_letters)}"
 
-        simple["FederalAwards"]["federal_awards"][0]["program"]["number"] = f"{prefix}.{extension}"
+        simple["FederalAwards"]["federal_awards"][0]["program"][
+            "number"
+        ] = f"{prefix}.{extension}"
 
         validate_federal_award_json(simple)
 
@@ -233,7 +254,9 @@ class FederalAwardsValidatorTests(SimpleTestCase):
         # pick an extension between 001 and 999 with 2 trailing letters (invalid)
         extension = f"{randrange(1, 1000):03}{choice(string.ascii_letters)}{choice(string.ascii_letters)}"
 
-        simple["FederalAwards"]["federal_awards"][0]["program"]["number"] = f"{prefix}.{extension}"
+        simple["FederalAwards"]["federal_awards"][0]["program"][
+            "number"
+        ] = f"{prefix}.{extension}"
 
         self.assertRaises(ValidationError, validate_federal_award_json, simple)
 
@@ -260,7 +283,9 @@ class FederalAwardsValidatorTests(SimpleTestCase):
 
         for extension in extensions:
             with self.subTest():
-                simple["FederalAwards"]["federal_awards"][0]["program"]["number"] = f"{prefix}.{extension}"
+                simple["FederalAwards"]["federal_awards"][0]["program"][
+                    "number"
+                ] = f"{prefix}.{extension}"
 
                 self.assertRaises(ValidationError, validate_federal_award_json, simple)
 
@@ -576,12 +601,11 @@ class ExcelFileIntegrityValidatorTests(TestCase):
 
 
 class CorrectiveActionPlanValidatorTests(SimpleTestCase):
-
     def test_validation_is_applied(self):
         """
         Empty Corrective Action Plan should fail, simple case should pass.
         """
-        invalid = json.loads("{\"CorrectiveActionPlan\":{}}")
+        invalid = json.loads('{"CorrectiveActionPlan":{}}')
         # 20230413 HDMS FIXME: The expected_msg is not properly asserted below.
         expected_msg = "[\"'auditee_ein' is a required property.\"]"
         self.assertRaisesRegex(

@@ -20,7 +20,7 @@ from audit.excel import (
 from audit.validators import (
     validate_federal_award_json,
     validate_corrective_action_plan_json,
-    validate_findings_uniform_guidance_json
+    validate_findings_uniform_guidance_json,
 )
 from audit.fixtures.excel import (
     FEDERAL_AWARDS_TEMPLATE,
@@ -187,7 +187,9 @@ class CorrectiveActionPlanExcelTests(SimpleTestCase):
 
     def test_empty_template(self):
         """Test that extraction and validation succeed against the blank template"""
-        corrective_action_plan = extract_corrective_action_plan(CORRECTIVE_ACTION_PLAN_TEMPLATE)
+        corrective_action_plan = extract_corrective_action_plan(
+            CORRECTIVE_ACTION_PLAN_TEMPLATE
+        )
 
         validate_corrective_action_plan_json(corrective_action_plan)
 
@@ -227,7 +229,11 @@ class CorrectiveActionPlanExcelTests(SimpleTestCase):
 
         corrective_action_plan = extract_corrective_action_plan(workbook)
 
-        self.assertRaises(ValidationError, validate_corrective_action_plan_json, corrective_action_plan)
+        self.assertRaises(
+            ValidationError,
+            validate_corrective_action_plan_json,
+            corrective_action_plan,
+        )
 
     def test_corrective_action_plan_checking(self):
         """Test that extraction succeeds and validation fails when fields are of the wrong data type"""
@@ -241,7 +247,7 @@ class CorrectiveActionPlanExcelTests(SimpleTestCase):
             ("auditee_ein", 123456789),
             ("contains_chart_or_table", "not a boolean"),
             ("planned_action", 0),
-            ("reference_number", 0)
+            ("reference_number", 0),
         ]
 
         # validate that each test_case appropriately checks the data type
@@ -252,7 +258,9 @@ class CorrectiveActionPlanExcelTests(SimpleTestCase):
                 corrective_action_plan = extract_corrective_action_plan(workbook)
 
                 self.assertRaises(
-                    ValidationError, validate_corrective_action_plan_json, corrective_action_plan
+                    ValidationError,
+                    validate_corrective_action_plan_json,
+                    corrective_action_plan,
                 )
 
 
@@ -309,7 +317,9 @@ class FindingsUniformGuidanceExcelTests(SimpleTestCase):
 
         findings = extract_findings_uniform_guidance(workbook)
 
-        self.assertRaises(ValidationError, validate_findings_uniform_guidance_json, findings)
+        self.assertRaises(
+            ValidationError, validate_findings_uniform_guidance_json, findings
+        )
 
     def test_findings_uniform_guidance_checking(self):
         """Test that extraction succeeds and validation fails when fields are of the wrong data type"""

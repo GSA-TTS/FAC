@@ -52,7 +52,11 @@ federal_awards_column_mapping: ColumnMapping = {
     # 20230410 MCJ FIXME: I don't think we extract the cluster total?
     # Perhaps it is lacking a named range?
     # "cluster_total": ("FederalAwards.federal_awards", "cluster.total", _set_by_path),
-    "direct_award": ("FederalAwards.federal_awards", "direct_or_indirect_award.is_direct", _set_by_path),
+    "direct_award": (
+        "FederalAwards.federal_awards",
+        "direct_or_indirect_award.is_direct",
+        _set_by_path,
+    ),
     "direct_award_pass_through_entity_name": (
         "FederalAwards.federal_awards",
         "direct_or_indirect_award.entities",
@@ -129,13 +133,41 @@ corrective_action_column_mapping: ColumnMapping = {
     ),
 }
 findings_uniform_guidance_column_mapping: ColumnMapping = {
-    "program_number": ("FindingsUniformGuidance.findings_uniform_guidance_entries", "program.number", _set_by_path),
-    "program_name": ("FindingsUniformGuidance.findings_uniform_guidance_entries", "program.name", _set_by_path),
-    "compliance_requirement": ("FindingsUniformGuidance.findings_uniform_guidance_entries", "program.compliance_requirement", _set_by_path),
-    "finding_reference_number": ("FindingsUniformGuidance.findings_uniform_guidance_entries", "findings.reference", _set_by_path),
-    "repeat_prior_reference": ("FindingsUniformGuidance.findings_uniform_guidance_entries", "findings.repeat_prior_reference", _set_by_path),
-    "prior_references": ("FindingsUniformGuidance.findings_uniform_guidance_entries", "findings.prior_references", _set_by_path),
-    "is_valid": ("FindingsUniformGuidance.findings_uniform_guidance_entries", "findings.is_valid", _set_by_path),
+    "program_number": (
+        "FindingsUniformGuidance.findings_uniform_guidance_entries",
+        "program.number",
+        _set_by_path,
+    ),
+    "program_name": (
+        "FindingsUniformGuidance.findings_uniform_guidance_entries",
+        "program.name",
+        _set_by_path,
+    ),
+    "compliance_requirement": (
+        "FindingsUniformGuidance.findings_uniform_guidance_entries",
+        "program.compliance_requirement",
+        _set_by_path,
+    ),
+    "finding_reference_number": (
+        "FindingsUniformGuidance.findings_uniform_guidance_entries",
+        "findings.reference",
+        _set_by_path,
+    ),
+    "repeat_prior_reference": (
+        "FindingsUniformGuidance.findings_uniform_guidance_entries",
+        "findings.repeat_prior_reference",
+        _set_by_path,
+    ),
+    "prior_references": (
+        "FindingsUniformGuidance.findings_uniform_guidance_entries",
+        "findings.prior_references",
+        _set_by_path,
+    ),
+    "is_valid": (
+        "FindingsUniformGuidance.findings_uniform_guidance_entries",
+        "findings.is_valid",
+        _set_by_path,
+    ),
     "questioned_costs": (
         "FindingsUniformGuidance.findings_uniform_guidance_entries",
         "questioned_costs",
@@ -238,7 +270,6 @@ def extract_data(file, field_mapping: FieldMapping, column_mapping: ColumnMappin
     workbook = _open_workbook(file)
 
     try:
-
         for name, (target, set_fn) in field_mapping.items():
             set_fn(result, target, _extract_single_value(workbook, name))
 
@@ -266,5 +297,7 @@ def extract_corrective_action_plan(file):
 
 def extract_findings_uniform_guidance(file):
     return extract_data(
-        file, findings_uniform_guidance_field_mapping, findings_uniform_guidance_column_mapping
+        file,
+        findings_uniform_guidance_field_mapping,
+        findings_uniform_guidance_column_mapping,
     )

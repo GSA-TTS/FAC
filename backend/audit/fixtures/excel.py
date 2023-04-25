@@ -1,8 +1,14 @@
 FEDERAL_AWARDS_TEMPLATE = "excel_templates/FederalAwardsExpendedTemplateUG2019.xlsx"
-CORRECTIVE_ACTION_PLAN_TEMPLATE = "excel_templates/CorrectiveActionPlanTemplate2019-2022.xlsx"
-FINDINGS_UNIFORM_GUIDANCE_TEMPLATE = "excel_templates/FindingsUniformGuidanceTemplate2019-2022.xlsx"
+CORRECTIVE_ACTION_PLAN_TEMPLATE = (
+    "excel_templates/CorrectiveActionPlanTemplate2019-2022.xlsx"
+)
+FINDINGS_UNIFORM_GUIDANCE_TEMPLATE = (
+    "excel_templates/FindingsUniformGuidanceTemplate2019-2022.xlsx"
+)
 CORRECTIVE_ACTION_PLAN_TEST_FILE = "test-files/corrective-action-plan-pass-01.json"
-FINDINGS_UNIFORM_GUIDANCE_TEST_FILE = "test-files/findings-uniform-guidance-pass-01.json"
+FINDINGS_UNIFORM_GUIDANCE_TEST_FILE = (
+    "test-files/findings-uniform-guidance-pass-01.json"
+)
 
 CORRECTIVE_ACTION_PLAN_ENTRY_FIXTURES = [
     {
@@ -46,7 +52,7 @@ FINDINGS_UNIFORM_GUIDANCE_ENTRY_FIXTURES = [
         "modified_opinion": "N",
         "material_weakness": "Y",
         "program_number": "10.002",
-    }
+    },
 ]
 
 FEDERAL_AWARDS_ENTRY_FIXTURES = [

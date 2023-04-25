@@ -13,11 +13,17 @@ from tempfile import NamedTemporaryFile
 from openpyxl import load_workbook
 from openpyxl.cell import Cell
 
-from .fixtures.excel import (FEDERAL_AWARDS_TEMPLATE, CORRECTIVE_ACTION_PLAN_TEMPLATE,
-                             FINDINGS_UNIFORM_GUIDANCE_TEMPLATE, CORRECTIVE_ACTION_PLAN_ENTRY_FIXTURES,
-                             FINDINGS_UNIFORM_GUIDANCE_ENTRY_FIXTURES,
-                             FEDERAL_AWARDS_ENTRY_FIXTURES, FEDERAL_AWARDS_EXPENDED,
-                             CORRECTIVE_ACTION_PLAN, FINDINGS_UNIFORM_GUIDANCE)
+from .fixtures.excel import (
+    FEDERAL_AWARDS_TEMPLATE,
+    CORRECTIVE_ACTION_PLAN_TEMPLATE,
+    FINDINGS_UNIFORM_GUIDANCE_TEMPLATE,
+    CORRECTIVE_ACTION_PLAN_ENTRY_FIXTURES,
+    FINDINGS_UNIFORM_GUIDANCE_ENTRY_FIXTURES,
+    FEDERAL_AWARDS_ENTRY_FIXTURES,
+    FEDERAL_AWARDS_EXPENDED,
+    CORRECTIVE_ACTION_PLAN,
+    FINDINGS_UNIFORM_GUIDANCE,
+)
 from .models import Access, SingleAuditChecklist
 from .views import MySubmissions
 
@@ -47,7 +53,11 @@ VALID_ACCESS_AND_SUBMISSION_DATA = {
     "auditor_contacts": ["d@d.com"],
 }
 
-EXCEL_FILES = [CORRECTIVE_ACTION_PLAN, FEDERAL_AWARDS_EXPENDED, FINDINGS_UNIFORM_GUIDANCE]
+EXCEL_FILES = [
+    CORRECTIVE_ACTION_PLAN,
+    FEDERAL_AWARDS_EXPENDED,
+    FINDINGS_UNIFORM_GUIDANCE,
+]
 
 
 # Mocking the user login and file scan functions
@@ -152,7 +162,10 @@ class ExcelFileHandlerViewTests(TestCase):
 
         for form_section in EXCEL_FILES:
             response = self.client.post(
-                reverse(f"audit:{form_section}", kwargs={"report_id": "12345", "form_section": form_section})
+                reverse(
+                    f"audit:{form_section}",
+                    kwargs={"report_id": "12345", "form_section": form_section},
+                )
             )
 
             self.assertIsInstance(response, HttpResponseRedirect)
@@ -166,7 +179,13 @@ class ExcelFileHandlerViewTests(TestCase):
 
         for form_section in EXCEL_FILES:
             response = self.client.post(
-                reverse(f"audit:{form_section}", kwargs={"report_id": "this is not a report id", "form_section": form_section})
+                reverse(
+                    f"audit:{form_section}",
+                    kwargs={
+                        "report_id": "this is not a report id",
+                        "form_section": form_section,
+                    },
+                )
             )
 
             self.assertEqual(response.status_code, 403)
@@ -179,7 +198,10 @@ class ExcelFileHandlerViewTests(TestCase):
         self.client.force_login(user)
         for form_section in EXCEL_FILES:
             response = self.client.post(
-                reverse(f"audit:{form_section}", kwargs={"report_id": sac.report_id, "form_section": form_section})
+                reverse(
+                    f"audit:{form_section}",
+                    kwargs={"report_id": sac.report_id, "form_section": form_section},
+                )
             )
 
             self.assertEqual(response.status_code, 403)
@@ -194,7 +216,10 @@ class ExcelFileHandlerViewTests(TestCase):
 
         for form_section in EXCEL_FILES:
             response = self.client.post(
-                reverse(f"audit:{form_section}", kwargs={"report_id": sac.report_id, "form_section": form_section})
+                reverse(
+                    f"audit:{form_section}",
+                    kwargs={"report_id": sac.report_id, "form_section": form_section},
+                )
             )
 
             self.assertEqual(response.status_code, 400)
@@ -211,7 +236,10 @@ class ExcelFileHandlerViewTests(TestCase):
 
         for form_section in EXCEL_FILES:
             response = self.client.post(
-                reverse(f"audit:{form_section}", kwargs={"report_id": sac.report_id, "form_section": form_section}),
+                reverse(
+                    f"audit:{form_section}",
+                    kwargs={"report_id": sac.report_id, "form_section": form_section},
+                ),
                 data={"FILES": file},
             )
 
@@ -235,7 +263,13 @@ class ExcelFileHandlerViewTests(TestCase):
 
             with open(tmp.name, "rb") as excel_file:
                 response = self.client.post(
-                    reverse(f"audit:{EXCEL_FILES[1]}", kwargs={"report_id": sac.report_id, "form_section": EXCEL_FILES[1]}),
+                    reverse(
+                        f"audit:{EXCEL_FILES[1]}",
+                        kwargs={
+                            "report_id": sac.report_id,
+                            "form_section": EXCEL_FILES[1],
+                        },
+                    ),
                     data={"FILES": excel_file},
                 )
 
@@ -264,51 +298,59 @@ class ExcelFileHandlerViewTests(TestCase):
 
                 self.assertEqual(
                     federal_awards_entry["cluster"]["name"],
-                    FEDERAL_AWARDS_ENTRY_FIXTURES[0]["cluster_name"]
+                    FEDERAL_AWARDS_ENTRY_FIXTURES[0]["cluster_name"],
                 )
                 self.assertEqual(
                     federal_awards_entry["direct_or_indirect_award"]["is_direct"],
-                    FEDERAL_AWARDS_ENTRY_FIXTURES[0]["direct_award"]
+                    FEDERAL_AWARDS_ENTRY_FIXTURES[0]["direct_award"],
                 )
                 self.assertEqual(
                     federal_awards_entry["program"]["is_major"],
-                    FEDERAL_AWARDS_ENTRY_FIXTURES[0]["major_program"]
+                    FEDERAL_AWARDS_ENTRY_FIXTURES[0]["major_program"],
                 )
                 self.assertEqual(
                     federal_awards_entry["program"]["number"],
-                    FEDERAL_AWARDS_ENTRY_FIXTURES[0]["program_number"]
+                    FEDERAL_AWARDS_ENTRY_FIXTURES[0]["program_number"],
                 )
                 self.assertEqual(
                     federal_awards_entry["amount_expended"],
-                    FEDERAL_AWARDS_ENTRY_FIXTURES[0]["amount_expended"]
+                    FEDERAL_AWARDS_ENTRY_FIXTURES[0]["amount_expended"],
                 )
                 self.assertEqual(
                     federal_awards_entry["program"]["name"],
-                    FEDERAL_AWARDS_ENTRY_FIXTURES[0]["federal_program_name"]
+                    FEDERAL_AWARDS_ENTRY_FIXTURES[0]["federal_program_name"],
                 )
                 self.assertEqual(
                     federal_awards_entry["loan_or_loan_guarantee"]["is_guaranteed"],
-                    FEDERAL_AWARDS_ENTRY_FIXTURES[0]["loan_or_loan_guarantee"]
+                    FEDERAL_AWARDS_ENTRY_FIXTURES[0]["loan_or_loan_guarantee"],
                 )
                 self.assertEqual(
                     federal_awards_entry["program"]["number_of_audit_findings"],
-                    FEDERAL_AWARDS_ENTRY_FIXTURES[0]["number_of_audit_findings"]
+                    FEDERAL_AWARDS_ENTRY_FIXTURES[0]["number_of_audit_findings"],
                 )
                 self.assertEqual(
                     federal_awards_entry["program"]["audit_report_type"],
-                    FEDERAL_AWARDS_ENTRY_FIXTURES[0]["major_program_audit_report_type"]
+                    FEDERAL_AWARDS_ENTRY_FIXTURES[0]["major_program_audit_report_type"],
                 )
                 self.assertEqual(
-                    federal_awards_entry["loan_or_loan_guarantee"]["loan_balance_at_audit_period_end"],
-                    FEDERAL_AWARDS_ENTRY_FIXTURES[0]["loan_balance_at_audit_period_end"]
+                    federal_awards_entry["loan_or_loan_guarantee"][
+                        "loan_balance_at_audit_period_end"
+                    ],
+                    FEDERAL_AWARDS_ENTRY_FIXTURES[0][
+                        "loan_balance_at_audit_period_end"
+                    ],
                 )
                 self.assertEqual(
                     federal_awards_entry["subrecipients"]["is_passed"],
-                    FEDERAL_AWARDS_ENTRY_FIXTURES[0]["federal_award_passed_to_subrecipients"]
+                    FEDERAL_AWARDS_ENTRY_FIXTURES[0][
+                        "federal_award_passed_to_subrecipients"
+                    ],
                 )
                 self.assertEqual(
                     federal_awards_entry["subrecipients"]["amount"],
-                    FEDERAL_AWARDS_ENTRY_FIXTURES[0]["federal_award_passed_to_subrecipients_amount"]
+                    FEDERAL_AWARDS_ENTRY_FIXTURES[0][
+                        "federal_award_passed_to_subrecipients_amount"
+                    ],
                 )
                 self.assertEqual(
                     federal_awards_entry["direct_or_indirect_award"]["entities"],
@@ -336,7 +378,13 @@ class ExcelFileHandlerViewTests(TestCase):
 
             with open(tmp.name, "rb") as excel_file:
                 response = self.client.post(
-                    reverse(f"audit:{EXCEL_FILES[0]}", kwargs={"report_id": sac.report_id, "form_section": EXCEL_FILES[0]}),
+                    reverse(
+                        f"audit:{EXCEL_FILES[0]}",
+                        kwargs={
+                            "report_id": sac.report_id,
+                            "form_section": EXCEL_FILES[0],
+                        },
+                    ),
                     data={"FILES": excel_file},
                 )
 
@@ -345,26 +393,32 @@ class ExcelFileHandlerViewTests(TestCase):
                 updated_sac = SingleAuditChecklist.objects.get(pk=sac.id)
 
                 self.assertEqual(
-                    updated_sac.corrective_action_plan["CorrectiveActionPlan"]["auditee_ein"],
+                    updated_sac.corrective_action_plan["CorrectiveActionPlan"][
+                        "auditee_ein"
+                    ],
                     "123456789",
                 )
 
                 self.assertEqual(
-                    len(updated_sac.corrective_action_plan["CorrectiveActionPlan"]["corrective_action_plan_entries"]),
+                    len(
+                        updated_sac.corrective_action_plan["CorrectiveActionPlan"][
+                            "corrective_action_plan_entries"
+                        ]
+                    ),
                     1,
                 )
 
-                corrective_action_plan_entry = updated_sac.corrective_action_plan["CorrectiveActionPlan"][
-                    "corrective_action_plan_entries"
-                ][0]
+                corrective_action_plan_entry = updated_sac.corrective_action_plan[
+                    "CorrectiveActionPlan"
+                ]["corrective_action_plan_entries"][0]
 
                 self.assertEqual(
                     corrective_action_plan_entry["planned_action"],
-                    CORRECTIVE_ACTION_PLAN_ENTRY_FIXTURES[0]["planned_action"]
+                    CORRECTIVE_ACTION_PLAN_ENTRY_FIXTURES[0]["planned_action"],
                 )
                 self.assertEqual(
                     corrective_action_plan_entry["reference_number"],
-                    CORRECTIVE_ACTION_PLAN_ENTRY_FIXTURES[0]["reference_number"]
+                    CORRECTIVE_ACTION_PLAN_ENTRY_FIXTURES[0]["reference_number"],
                 )
 
     @patch("audit.validators._scan_file")
@@ -385,7 +439,13 @@ class ExcelFileHandlerViewTests(TestCase):
 
             with open(tmp.name, "rb") as excel_file:
                 response = self.client.post(
-                    reverse(f"audit:{EXCEL_FILES[2]}", kwargs={"report_id": sac.report_id, "form_section": EXCEL_FILES[2]}),
+                    reverse(
+                        f"audit:{EXCEL_FILES[2]}",
+                        kwargs={
+                            "report_id": sac.report_id,
+                            "form_section": EXCEL_FILES[2],
+                        },
+                    ),
                     data={"FILES": excel_file},
                 )
 
@@ -394,36 +454,48 @@ class ExcelFileHandlerViewTests(TestCase):
                 updated_sac = SingleAuditChecklist.objects.get(pk=sac.id)
 
                 self.assertEqual(
-                    updated_sac.findings_uniform_guidance["FindingsUniformGuidance"]["auditee_ein"],
+                    updated_sac.findings_uniform_guidance["FindingsUniformGuidance"][
+                        "auditee_ein"
+                    ],
                     "123456789",
                 )
 
                 self.assertEqual(
-                    len(updated_sac.findings_uniform_guidance["FindingsUniformGuidance"]["findings_uniform_guidance_entries"]),
+                    len(
+                        updated_sac.findings_uniform_guidance[
+                            "FindingsUniformGuidance"
+                        ]["findings_uniform_guidance_entries"]
+                    ),
                     1,
                 )
 
-                findings_entries = updated_sac.findings_uniform_guidance["FindingsUniformGuidance"][
-                    "findings_uniform_guidance_entries"
-                ][0]
+                findings_entries = updated_sac.findings_uniform_guidance[
+                    "FindingsUniformGuidance"
+                ]["findings_uniform_guidance_entries"][0]
 
                 self.assertEqual(
                     findings_entries["program"]["number"],
-                    FINDINGS_UNIFORM_GUIDANCE_ENTRY_FIXTURES[0]["program_number"]
+                    FINDINGS_UNIFORM_GUIDANCE_ENTRY_FIXTURES[0]["program_number"],
                 )
                 self.assertEqual(
                     findings_entries["program"]["compliance_requirement"],
-                    FINDINGS_UNIFORM_GUIDANCE_ENTRY_FIXTURES[0]["compliance_requirement"]
+                    FINDINGS_UNIFORM_GUIDANCE_ENTRY_FIXTURES[0][
+                        "compliance_requirement"
+                    ],
                 )
                 self.assertEqual(
                     findings_entries["findings"]["repeat_prior_reference"],
-                    FINDINGS_UNIFORM_GUIDANCE_ENTRY_FIXTURES[0]["repeat_prior_reference"]
+                    FINDINGS_UNIFORM_GUIDANCE_ENTRY_FIXTURES[0][
+                        "repeat_prior_reference"
+                    ],
                 )
                 self.assertEqual(
                     findings_entries["findings"]["reference"],
-                    FINDINGS_UNIFORM_GUIDANCE_ENTRY_FIXTURES[0]["finding_reference_number"]
+                    FINDINGS_UNIFORM_GUIDANCE_ENTRY_FIXTURES[0][
+                        "finding_reference_number"
+                    ],
                 )
                 self.assertEqual(
                     findings_entries["modified_opinion"],
-                    FINDINGS_UNIFORM_GUIDANCE_ENTRY_FIXTURES[0]["modified_opinion"]
+                    FINDINGS_UNIFORM_GUIDANCE_ENTRY_FIXTURES[0]["modified_opinion"],
                 )
