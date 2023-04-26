@@ -10,9 +10,26 @@ from django.urls import reverse
 from django.utils.datastructures import MultiValueDictKeyError
 from django.utils.decorators import method_decorator
 
-from audit.excel import extract_federal_awards
+from .fixtures.excel import (
+    FEDERAL_AWARDS_EXPENDED,
+    CORRECTIVE_ACTION_PLAN,
+    FINDINGS_TEXT,
+    FINDINGS_UNIFORM_GUIDANCE,
+)
+
+from audit.excel import (
+    extract_federal_awards,
+    extract_corrective_action_plan,
+    extract_findings_text,
+    extract_findings_uniform_guidance,
+)
 from audit.models import Access, ExcelFile, SingleAuditChecklist
-from audit.validators import validate_federal_award_json
+from audit.validators import (
+    validate_federal_award_json,
+    validate_corrective_action_plan_json,
+    validate_findings_text_json,
+    validate_findings_uniform_guidance_json,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -59,15 +76,17 @@ class EditSubmission(LoginRequiredMixin, generic.View):
         return redirect(reverse("singleauditchecklist", args=[report_id]))
 
 
-class FederalAwardsExcelFileView(LoginRequiredMixin, generic.View):
+class ExcelFileHandlerView(LoginRequiredMixin, generic.View):
     # this is marked as csrf_exempt to enable by-hand testing via tools like Postman. Should be removed when the frontend form is implemented!
     @method_decorator(csrf_exempt)
     def dispatch(self, *args, **kwargs):
-        return super(FederalAwardsExcelFileView, self).dispatch(*args, **kwargs)
+        return super(ExcelFileHandlerView, self).dispatch(*args, **kwargs)
 
     def post(self, request, *args, **kwargs):
         try:
             report_id = kwargs["report_id"]
+
+            form_section = kwargs["form_section"]
 
             sac = SingleAuditChecklist.objects.get(report_id=report_id)
 
@@ -84,18 +103,40 @@ class FederalAwardsExcelFileView(LoginRequiredMixin, generic.View):
             excel_file.full_clean()
             excel_file.save()
 
-            federal_awards = extract_federal_awards(excel_file.file)
-            validate_federal_award_json(federal_awards)
-            SingleAuditChecklist.objects.filter(pk=sac.id).update(
-                federal_awards=federal_awards
-            )
+            if form_section == FEDERAL_AWARDS_EXPENDED:
+                audit_data = extract_federal_awards(excel_file.file)
+                validate_federal_award_json(audit_data)
+                SingleAuditChecklist.objects.filter(pk=sac.id).update(
+                    federal_awards=audit_data
+                )
+            elif form_section == CORRECTIVE_ACTION_PLAN:
+                audit_data = extract_corrective_action_plan(excel_file.file)
+                validate_corrective_action_plan_json(audit_data)
+                SingleAuditChecklist.objects.filter(pk=sac.id).update(
+                    corrective_action_plan=audit_data
+                )
+            elif form_section == FINDINGS_UNIFORM_GUIDANCE:
+                audit_data = extract_findings_uniform_guidance(excel_file.file)
+                validate_findings_uniform_guidance_json(audit_data)
+                SingleAuditChecklist.objects.filter(pk=sac.id).update(
+                    findings_uniform_guidance=audit_data
+                )
+            elif form_section == FINDINGS_TEXT:
+                audit_data = extract_findings_text(excel_file.file)
+                validate_findings_text_json(audit_data)
+                SingleAuditChecklist.objects.filter(pk=sac.id).update(
+                    findings_text=audit_data
+                )
+            else:
+                logger.warn(f"no form section found with name {form_section}")
+                raise BadRequest()
 
             return redirect("/")
         except SingleAuditChecklist.DoesNotExist:
             logger.warn(f"no SingleAuditChecklist found with report ID {report_id}")
             raise PermissionDenied()
         except ValidationError as e:
-            logger.warn(f"Federal Awards Excel upload failed validation: {e}")
+            logger.warn(f"{form_section} Excel upload failed validation: {e}")
             raise BadRequest()
         except MultiValueDictKeyError:
             logger.warn("no file found in request")

@@ -360,7 +360,9 @@ SAM_API_URL = "https://api.sam.gov/entity-information/v3/entities"
 SAM_API_KEY = secret("SAM_API_KEY")
 
 SCHEMAS_DIR = os.path.join("audit", "schemas")
+# 20230408 MCJ FIXME: Why are there "sections?"
 SECTION_SCHEMA_DIR = os.path.join("schemas", "sections")
+
 
 AV_SCAN_URL = env.str("AV_SCAN_URL", "")
 AV_SCAN_MAX_ATTEMPTS = 10
