@@ -11,7 +11,7 @@ const upload_urls = {
 const sac_id = JSON.parse(document.getElementById('sac_id').textContent);
 const view_id = JSON.parse(document.getElementById('view_id').textContent);
 const file_input = document.getElementById(`file-input-${view_id}-xlsx`);
-const info_box = document.getElementById(`test`);
+const info_box = document.getElementById(`info_box`);
 
 // Set disabled status of the "Save and continue" button
 function setSubmitButtonDisabled(disabled) {
