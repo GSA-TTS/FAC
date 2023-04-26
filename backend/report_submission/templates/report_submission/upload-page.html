@@ -12,21 +12,27 @@
     <div class="grid-container margin-top-6">
         <div class="grid-row grid-gap">
             {% include "../sidenav.html" %}
-            <form class="usa-form usa-form--large" id="federal-awards" method="post">
+            <form class="usa-form usa-form--large"
+                  id="{{ view_id }}"
+                  testid="upload-page__form"
+                  method="post">
                 {% csrf_token %}
                 <fieldset class="usa-fieldset">
-                    <legend class="usa-legend usa-legend--large" id="federal-awards">
-                        Federal awards
+                    <legend class="usa-legend usa-legend--large"
+                            id="{{ view_id }}"
+                            testid="upload-page__legend">
+                        {{ view_name }}
                     </legend>
-                    <p>Enter the federal awards you recieved in the last audit year using the provided worksheet.</p>
+                    <p>Enter the audit findings for your federal awards using the provided worksheet.</p>
                     <h4 class="usa-process-list__heading">Upload completed worksheet</h4>
                     <p>Save your completed worksheet as an XLSX file and upload it below.</p>
                     <div class="usa-form-group">
-                        <input id="file-input-federal-awards-xlsx"
+                        <input id="file-input-{{ view_id }}-xlsx"
                                class="usa-file-input"
+                               testid="upload-page__file-input"
                                type="file"
-                               name="file-input-federal-awards-xlsx"
-                               aria-describedby="file-input-federal-awards-xlsx"
+                               name="file-input-{{ view_id }}-xlsx"
+                               aria-describedby="file-input-{{ view_id }}-xlsx"
                                accept=".xlsx"/>
                     </div>
                     <button class="usa-button" id="continue" disabled="disabled">Save and continue to next section</button>
@@ -50,8 +56,7 @@
                         Report ID
                     </dt>
                     <dd>
-                        <!-- Adding the 'json_script' alias allows this variable to be accessed by its alias in javascript. -->
-                        #{{ report_id | default_if_none:'' | json_script:'sac_id' }}
+                        #{{ report_id | default_if_none:'' }}
                     </dd>
                 </div>
                 <div class="tablet:grid-col-6">
@@ -73,5 +78,8 @@
             </dl>
         </div>
     </div>
-    <script src="{% static 'compiled/js/federal-awards.js' %}"></script>
+    <!-- Pass variables to JS as given alias -->
+    {{ report_id | json_script:'sac_id' }}
+    {{ view_id | json_script:'view_id' }}
+    <script src="{% static 'compiled/js/upload-page.js' %}"></script>
 {% endblock content %}
