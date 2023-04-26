@@ -7,7 +7,10 @@
          "additionalProperties": false,
          "properties": {
             "auditee_ein": {
-               "type": "string"
+               "type": [
+                  "string",
+                  "null"
+               ]
             },
             "findings_text_entries": {
                "items": {
@@ -29,15 +32,19 @@
                      "text_of_finding": {
                         "type": "string"
                      }
-                  }
+                  },
+                  "required": [
+                     "reference_number",
+                     "text_of_finding",
+                     "contains_chart_or_table"
+                  ],
+                  "title": "FindingsTextEntry"
                },
-               "minItems": 0,
                "type": "array"
             }
          },
          "required": [
-            "auditee_ein",
-            "findings_text_entries"
+            "auditee_ein"
          ],
          "title": "FindingsText",
          "type": "object",

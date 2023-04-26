@@ -10,6 +10,7 @@ from random import choice, randrange
 
 from audit.fixtures.excel import (
     CORRECTIVE_ACTION_PLAN_TEST_FILE,
+    FINDINGS_TEXT_TEST_FILE,
     FINDINGS_UNIFORM_GUIDANCE_TEST_FILE,
 )
 
@@ -881,6 +882,112 @@ class CorrectiveActionPlanSchemaValidityTest(SimpleTestCase):
 
         simple_case = jsoncopy(self.SIMPLE_CASE)
         simple_case["CorrectiveActionPlan"]["corrective_action_plan_entries"][0][
+            "contains_chart_or_table"
+        ] = 0
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
+
+
+class FindingsTextSchemaValidityTest(SimpleTestCase):
+    """
+    Test the basic validity of the FindingsText JSON schema.
+    """
+
+    FINDINGS_TEXT_SCHEMA = json.loads(
+        (SECTION_SCHEMA_DIR / "FindingsText.schema.json").read_text(encoding="utf-8")
+    )
+
+    SIMPLE_CASE = {
+        "FindingsText": {
+            "auditee_ein": None,
+            "findings_text_entries": [
+                {
+                    "contains_chart_or_table": "N",
+                    "text_of_finding": "Audit finding 11",
+                    "reference_number": "2023-001",
+                }
+            ],
+        }
+    }
+
+    def test_schema(self):
+        """Try to test FindingsText first."""
+        schema = self.FINDINGS_TEXT_SCHEMA
+
+        in_flight_file = SCHEMA_DIR / FINDINGS_TEXT_TEST_FILE
+        in_flight = json.loads(in_flight_file.read_text(encoding="utf-8"))
+        validate(in_flight, schema)
+
+    def test_simple_pass(self):
+        """
+        Test the simplest FindingsText case; none of the conditional fields apply.
+        """
+        schema = self.FINDINGS_TEXT_SCHEMA
+
+        validate(self.SIMPLE_CASE, schema)
+
+    def test_missing_auditee_ein(self):
+        """
+        Test that validation fails if auditee_ein is missing
+        """
+        schema = self.FINDINGS_TEXT_SCHEMA
+
+        simple_case = jsoncopy(self.SIMPLE_CASE)
+        del simple_case["FindingsText"]["auditee_ein"]
+
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
+
+    def test_missing_entry_fields(self):
+        """
+        Test that validation fails if any entry field is missing
+        """
+        schema = self.FINDINGS_TEXT_SCHEMA
+
+        simple_case = jsoncopy(self.SIMPLE_CASE)
+        del simple_case["FindingsText"]["findings_text_entries"][0][
+            "contains_chart_or_table"
+        ]
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
+
+        simple_case = jsoncopy(self.SIMPLE_CASE)
+        del simple_case["FindingsText"]["findings_text_entries"][0]["text_of_finding"]
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
+
+        simple_case = jsoncopy(self.SIMPLE_CASE)
+        del simple_case["FindingsText"]["findings_text_entries"][0]["reference_number"]
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
+
+    def test_empty_entry_fields(self):
+        """
+        Test that validation fails if any entry field is empty
+        """
+        schema = self.FINDINGS_TEXT_SCHEMA
+
+        simple_case = jsoncopy(self.SIMPLE_CASE)
+        simple_case["FindingsText"]["findings_text_entries"][0][
+            "contains_chart_or_table"
+        ] = None
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
+
+        simple_case = jsoncopy(self.SIMPLE_CASE)
+        simple_case["FindingsText"]["findings_text_entries"][0][
+            "text_of_finding"
+        ] = None
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
+
+        simple_case = jsoncopy(self.SIMPLE_CASE)
+        simple_case["FindingsText"]["findings_text_entries"][0][
+            "reference_number"
+        ] = None
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
+
+    def test_for_invalid_entry(self):
+        """
+        Test that validation fails if invalid value is provided for entry field
+        """
+        schema = self.FINDINGS_TEXT_SCHEMA
+
+        simple_case = jsoncopy(self.SIMPLE_CASE)
+        simple_case["FindingsText"]["findings_text_entries"][0][
             "contains_chart_or_table"
         ] = 0
         self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)

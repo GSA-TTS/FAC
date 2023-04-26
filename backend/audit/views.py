@@ -13,18 +13,21 @@ from django.utils.decorators import method_decorator
 from .fixtures.excel import (
     FEDERAL_AWARDS_EXPENDED,
     CORRECTIVE_ACTION_PLAN,
+    FINDINGS_TEXT,
     FINDINGS_UNIFORM_GUIDANCE,
 )
 
 from audit.excel import (
     extract_federal_awards,
     extract_corrective_action_plan,
+    extract_findings_text,
     extract_findings_uniform_guidance,
 )
 from audit.models import Access, ExcelFile, SingleAuditChecklist
 from audit.validators import (
     validate_federal_award_json,
     validate_corrective_action_plan_json,
+    validate_findings_text_json,
     validate_findings_uniform_guidance_json,
 )
 
@@ -118,6 +121,15 @@ class ExcelFileHandlerView(LoginRequiredMixin, generic.View):
                 SingleAuditChecklist.objects.filter(pk=sac.id).update(
                     findings_uniform_guidance=audit_data
                 )
+            elif form_section == FINDINGS_TEXT:
+                audit_data = extract_findings_text(excel_file.file)
+                validate_findings_text_json(audit_data)
+                SingleAuditChecklist.objects.filter(pk=sac.id).update(
+                    findings_text=audit_data
+                )
+            else:
+                logger.warn(f"no form section found with name {form_section}")
+                raise BadRequest()
 
             return redirect("/")
         except SingleAuditChecklist.DoesNotExist:

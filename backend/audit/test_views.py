@@ -16,12 +16,15 @@ from openpyxl.cell import Cell
 from .fixtures.excel import (
     FEDERAL_AWARDS_TEMPLATE,
     CORRECTIVE_ACTION_PLAN_TEMPLATE,
+    FINDINGS_TEXT_TEMPLATE,
     FINDINGS_UNIFORM_GUIDANCE_TEMPLATE,
     CORRECTIVE_ACTION_PLAN_ENTRY_FIXTURES,
+    FINDINGS_TEXT_ENTRY_FIXTURES,
     FINDINGS_UNIFORM_GUIDANCE_ENTRY_FIXTURES,
     FEDERAL_AWARDS_ENTRY_FIXTURES,
     FEDERAL_AWARDS_EXPENDED,
     CORRECTIVE_ACTION_PLAN,
+    FINDINGS_TEXT,
     FINDINGS_UNIFORM_GUIDANCE,
 )
 from .models import Access, SingleAuditChecklist
@@ -57,6 +60,7 @@ EXCEL_FILES = [
     CORRECTIVE_ACTION_PLAN,
     FEDERAL_AWARDS_EXPENDED,
     FINDINGS_UNIFORM_GUIDANCE,
+    FINDINGS_TEXT,
 ]
 
 
@@ -247,7 +251,7 @@ class ExcelFileHandlerViewTests(TestCase):
 
     @patch("audit.validators._scan_file")
     def test_valid_file_upload_for_federal_awards(self, mock_scan_file):
-        """When a valid Excel file is uploaded, the file should be stored and the SingleAuditChecklist should be updated to include the uploaded federal awards data"""
+        """When a valid Excel file is uploaded, the file should be stored and the SingleAuditChecklist should be updated to include the uploaded Federal Awards data"""
 
         sac = _mock_login_and_scan(self, mock_scan_file)
 
@@ -362,7 +366,7 @@ class ExcelFileHandlerViewTests(TestCase):
 
     @patch("audit.validators._scan_file")
     def test_valid_file_upload_for_corrective_action_plan(self, mock_scan_file):
-        """When a valid Excel file is uploaded, the file should be stored and the SingleAuditChecklist should be updated to include the uploaded corrective action plan data"""
+        """When a valid Excel file is uploaded, the file should be stored and the SingleAuditChecklist should be updated to include the uploaded Corrective Action Plan data"""
 
         sac = _mock_login_and_scan(self, mock_scan_file)
 
@@ -423,7 +427,7 @@ class ExcelFileHandlerViewTests(TestCase):
 
     @patch("audit.validators._scan_file")
     def test_valid_file_upload_for_findings_uniform_guidance(self, mock_scan_file):
-        """When a valid Excel file is uploaded, the file should be stored and the SingleAuditChecklist should be updated to include the uploaded findings data"""
+        """When a valid Excel file is uploaded, the file should be stored and the SingleAuditChecklist should be updated to include the uploaded Findings Uniform Guidance data"""
 
         sac = _mock_login_and_scan(self, mock_scan_file)
 
@@ -498,4 +502,67 @@ class ExcelFileHandlerViewTests(TestCase):
                 self.assertEqual(
                     findings_entries["modified_opinion"],
                     FINDINGS_UNIFORM_GUIDANCE_ENTRY_FIXTURES[0]["modified_opinion"],
+                )
+
+    @patch("audit.validators._scan_file")
+    def test_valid_file_upload_for_findings_text(self, mock_scan_file):
+        """When a valid Excel file is uploaded, the file should be stored and the SingleAuditChecklist should be updated to include the uploaded Findings Text data"""
+
+        sac = _mock_login_and_scan(self, mock_scan_file)
+
+        # add valid data to the workbook
+        workbook = load_workbook(FINDINGS_TEXT_TEMPLATE, data_only=True)
+        _set_by_name(workbook, "auditee_ein", "123456789")
+
+        _add_entry(workbook, 0, FINDINGS_TEXT_ENTRY_FIXTURES[0])
+
+        with NamedTemporaryFile(suffix=".xlsx") as tmp:
+            workbook.save(tmp.name)
+            tmp.seek(0)
+
+            with open(tmp.name, "rb") as excel_file:
+                response = self.client.post(
+                    reverse(
+                        f"audit:{EXCEL_FILES[3]}",
+                        kwargs={
+                            "report_id": sac.report_id,
+                            "form_section": EXCEL_FILES[3],
+                        },
+                    ),
+                    data={"FILES": excel_file},
+                )
+
+                self.assertEqual(response.status_code, 302)
+
+                updated_sac = SingleAuditChecklist.objects.get(pk=sac.id)
+
+                self.assertEqual(
+                    updated_sac.findings_text["FindingsText"]["auditee_ein"],
+                    "123456789",
+                )
+
+                self.assertEqual(
+                    len(
+                        updated_sac.findings_text["FindingsText"][
+                            "findings_text_entries"
+                        ]
+                    ),
+                    1,
+                )
+
+                findings_entries = updated_sac.findings_text["FindingsText"][
+                    "findings_text_entries"
+                ][0]
+
+                self.assertEqual(
+                    findings_entries["contains_chart_or_table"],
+                    FINDINGS_TEXT_ENTRY_FIXTURES[0]["contains_chart_or_table"],
+                )
+                self.assertEqual(
+                    findings_entries["text_of_finding"],
+                    FINDINGS_TEXT_ENTRY_FIXTURES[0]["text_of_finding"],
+                )
+                self.assertEqual(
+                    findings_entries["reference_number"],
+                    FINDINGS_TEXT_ENTRY_FIXTURES[0]["reference_number"],
                 )

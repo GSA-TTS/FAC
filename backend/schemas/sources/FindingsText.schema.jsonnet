@@ -9,18 +9,19 @@ local FindingsTextEntry = {
         text_of_finding: Types.string,
         contains_chart_or_table: Base.Enum.YorN
     },
+    required: ['reference_number', 'text_of_finding','contains_chart_or_table'],
+    title: 'FindingsTextEntry',    
 };
 
 local FindingsText = Types.object {
   additionalProperties: false,
   properties: {
-    auditee_ein: Types.string,
+    auditee_ein: Func.compound_type([Types.string, Types.NULL]),
     findings_text_entries: Types.array {
       items: FindingsTextEntry,
-      minItems: 0
     },
   },
-  required: ['auditee_ein', 'findings_text_entries'],
+  required: ['auditee_ein'],
   title: 'FindingsText',
   version: 20230408,
 };

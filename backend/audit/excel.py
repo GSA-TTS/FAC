@@ -40,7 +40,9 @@ corrective_action_field_mapping: FieldMapping = {
 findings_uniform_guidance_field_mapping: FieldMapping = {
     "auditee_ein": ("FindingsUniformGuidance.auditee_ein", _set_by_path),
 }
-
+findings_text_field_mapping: FieldMapping = {
+    "auditee_ein": ("FindingsText.auditee_ein", _set_by_path),
+}
 
 federal_awards_column_mapping: ColumnMapping = {
     "amount_expended": (
@@ -199,6 +201,23 @@ findings_uniform_guidance_column_mapping: ColumnMapping = {
         _set_by_path,
     ),
 }
+findings_text_column_mapping: ColumnMapping = {
+    "reference_number": (
+        "FindingsText.findings_text_entries",
+        "reference_number",
+        _set_by_path,
+    ),
+    "contains_chart_or_table": (
+        "FindingsText.findings_text_entries",
+        "contains_chart_or_table",
+        _set_by_path,
+    ),
+    "text_of_finding": (
+        "FindingsText.findings_text_entries",
+        "text_of_finding",
+        _set_by_path,
+    ),
+}
 
 
 class ExcelExtractionError(Exception):
@@ -301,3 +320,7 @@ def extract_findings_uniform_guidance(file):
         findings_uniform_guidance_field_mapping,
         findings_uniform_guidance_column_mapping,
     )
+
+
+def extract_findings_text(file):
+    return extract_data(file, findings_text_field_mapping, findings_text_column_mapping)

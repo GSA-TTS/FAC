@@ -107,6 +107,23 @@ def validate_findings_uniform_guidance_json(value):
     return value
 
 
+def validate_findings_text_json(value):
+    """
+    Apply JSON Schema for findings text and report errors.
+    """
+    root = Path(settings.SECTION_SCHEMA_DIR)
+    schema_path = root / "FindingsText.schema.json"
+    schema = json.loads(schema_path.read_text(encoding="utf-8"))
+
+    try:
+        jsonschema.validate(value, schema)
+    except jsonschema.exceptions.ValidationError as err:
+        raise ValidationError(
+            _(err.message),
+        ) from err
+    return value
+
+
 def validate_corrective_action_plan_json(value):
     """
     Apply JSON Schema for corrective action plan and report errors.
