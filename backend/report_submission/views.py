@@ -198,30 +198,37 @@ class UploadPageView(LoginRequiredMixin, View):
             "federal-awards": {
                 "view_id": "federal-awards",
                 "view_name": "Federal awards",
+                "instructions": "Enter the federal awards you received in the last audit year using the provided worksheet.",
             },
             "audit-findings": {
                 "view_id": "audit-findings",
                 "view_name": "Audit findings",
+                "instructions": "Enter the audit findings for your federal awards using the provided worksheet.",
             },
             "audit-findings-text": {
                 "view_id": "audit-findings-text",
                 "view_name": "Audit findings text",
+                "instructions": "Enter the text for your audit findings using the provided worksheet.",
             },
             "CAP": {
                 "view_id": "CAP",
                 "view_name": "Corrective Action Plan (CAP)",
+                "instructions": "Enter your CAP text using the provided worksheet.",
             },
             "additional-EINs": {
                 "view_id": "additional-EINs",
                 "view_name": "Secondary auditors",
+                "instructions": "Enter any additional EINs using the provided worksheet.",
             },
             "additional-UEIs": {
                 "view_id": "additional-UEIs",
                 "view_name": "Additional UEIs",
+                "instructions": "Enter any additional UEIs using the provided worksheet.",
             },
             "secondary-auditors": {
                 "view_id": "secondary-auditors",
                 "view_name": "Secondary auditors",
+                "instructions": "Enter any additional auditors using the provided worksheet.",
             },
         }
 
