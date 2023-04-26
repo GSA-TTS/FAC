@@ -30,6 +30,10 @@ This also provides a layer of validation on our schema; a valid Jsonnet file wil
 
 We will author our schema (which validate forms and spreadsheets in the project) in Jsonnet.
 
+We will keep the rendered JSON schemas in the repository, even though they are "build products." This gives us some stability (and makes testing easier). Changes to schema should not happen often.
+
+We will organize the soure .jsonnet/libsonnet files and rendered JSON schemas in a sensible way, and create a `Makefile` or similar to aid with schema development.
+
 ## Consequences
 
 This adds another tool to our backend pipeline, and a dependancy that could break in the future. However, Jsonnet is not new, and has broad community support. If support for the tool ends, we can always continue with our JSON Schema "as-is," and maintain them the hard way. (And, there are ways to achieve composability within JSON Schema, but we lose things like comments and variables.)
