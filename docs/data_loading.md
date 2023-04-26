@@ -52,3 +52,6 @@ Example commits where we updated names for [fields](https://github.com/GSA-TTS/F
 ## Update docs
 
 Create an updated csv data dictionary and add comments to the fields in postgres. Do that by running `manage.py create_docs`.
+
+# Upload PDFs
+Once we confirm we have all the PDFs and have data to link PDFs to their record, we can load PDFs to their respective public and private buckets. I created a management command that does the loading. You will need to update the logic to query for the id of the general record and the name of the PDF file. 
