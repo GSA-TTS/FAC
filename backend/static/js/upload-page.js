@@ -31,7 +31,9 @@ function attachEventHandlers() {
       const report_submission_url =
         upload_urls[currentURL.pathname.split('/')[2]];
 
-      if (!e.target.files[0]) {throw "No file chosen"}
+      if (!e.target.files[0]) {
+        throw 'No file chosen';
+      }
       var data = new FormData();
       data.append('FILES', e.target.files[0]);
       data.append('filename', e.target.files[0].name);
@@ -48,7 +50,8 @@ function attachEventHandlers() {
           info_box.innerHTML = 'File successfully validated!';
           setSubmitButtonDisabled(false);
         } else {
-          info_box.innerHTML = 'Error on validation. See console for more information.';
+          info_box.innerHTML =
+            'Error on validation. See console for more information.';
           console.error('Error when validating excel file.\n', response);
         }
       });
