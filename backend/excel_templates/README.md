@@ -11,3 +11,9 @@ make all
 To get rid of the XLSX outputs
 
 make clean
+
+It should be the case you can run
+
+`pytest`
+
+in the `excel_templates` folder and it will "just work." Meaning it will run a test to try and walk the schemas and sheets, and determine if they all have the same named ranges.
