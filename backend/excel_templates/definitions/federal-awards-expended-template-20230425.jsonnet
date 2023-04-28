@@ -39,7 +39,7 @@ local open_ranges_defns = [
         "passthrough_identifying_number"],
     [Sheets.YorNRange, SV.YoNValidation, "Federal Award Passed Through to Subrecipients", "passed_through_to_recipients"],
     [Sheets.OpenRange, {}, "If yes (Passed Through), Amount Passed Through to Subrecipients", "amount_passed_to_subrecipients"],
-    [Sheets.YorNRange, SV.YoNValidation, "Major Program (MP)", "is_major_program"],
+    [Sheets.YorNRange, SV.YoNValidation, "Major Program (MP)", "is_major"],
     [Sheets.OpenRange, {}, "If yes (MP), Type of Audit Report", "type_of_audit_report"],
     [Sheets.OpenRange, SV.PositiveNumberValidation, "Number of Audit Findings", "number_of_audit_findings"],
 ];
