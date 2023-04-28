@@ -287,11 +287,11 @@ local Parts = {
       amount_expended: Types.number,
       name: Types.string,
       number: Base.Compound.ProgramNumber,
-      is_major: Base.Enum.YorN,
+      is_major_program: Base.Enum.YorN,
       audit_report_type: Types.string,
       number_of_audit_findings: Types.integer,
     },
-    required: ['name', 'number', 'is_major', 'audit_report_type', 'number_of_audit_findings'],
+    required: ['name', 'number', 'is_major_program', 'audit_report_type', 'number_of_audit_findings'],
     allOf: Validations.ProgramValidations,
   },
 };
@@ -300,6 +300,8 @@ local FederalAwardEntry = Types.object {
   additionalProperties: false,
   description: 'Award entry rows',
   properties: {
+    // FIXME MCJ 20230428: Is this in here twice?
+    // See the 'Program' object...
     amount_expended: Types.number {
       minimum: 0,
     },
