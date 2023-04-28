@@ -38,22 +38,23 @@ def extract_ranges_from_excel_def(filename) -> set:
             range_names.add(r["range_name"])
     return range_names
 
-def recursively_find_properties(obj, found : set):
+def recursively_find_properties(obj):
+    found = set()
     if isinstance(obj, dict):
         for k, v in obj.items():
             if k == "properties":
                 for p, v in obj[k].items():
                     found.add(p)
-                    recursively_find_properties(v, found)
-            recursively_find_properties(v, found)
+                    found.update(recursively_find_properties(v))
+            found.update(recursively_find_properties(v))
     elif isinstance(obj, list):
         for item in obj:
-            recursively_find_properties(item, found)
+            found.update(recursively_find_properties(item))
+    return found
 
 def extract_ranges_from_schema(root, filename) -> set:
     jobj = jsonnet_sheet_spec_to_json(filename)
-    found = set()
-    recursively_find_properties(jobj["properties"][root]["properties"], found)
+    found = recursively_find_properties(jobj["properties"][root]["properties"])
     return found
         
 def test_federal_awards_named_ranges():
