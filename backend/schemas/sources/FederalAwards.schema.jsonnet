@@ -85,10 +85,10 @@ local Validations = {
       },
       'then': {
         required: [
-          'amount',
+          'subrecipient_amount',
         ],
         properties: {
-          amount: Types.integer,
+          subrecipient_amount: Types.integer,
         },
       },
     },
@@ -102,7 +102,7 @@ local Validations = {
       },
       'then': {
         properties: {
-          amount: Base.Enum.EmptyString_Zero_Null,
+          subrecipient_amount: Base.Enum.EmptyString_Zero_Null,
         },
       },
     },
@@ -176,15 +176,15 @@ local Validations = {
 local Parts = {
   Cluster: Types.object {
     properties: {
-      name: Base.Compound.ClusterName,
-      total: Types.number,
+      cluster_name: Base.Compound.ClusterName,
+      cluster_total: Types.number,
     },
     allOf: [
       {
         "if": {
           "not": {
             properties: {
-                name: {
+                cluster_name: {
                   enum: [Base.Const.OTHER_CLUSTER,Base.Const.STATE_CLUSTER]
               },                                   
             },
@@ -208,7 +208,7 @@ local Parts = {
       {
         "if": {
           properties: {
-            name: {
+            cluster_name: {
               const: Base.Const.STATE_CLUSTER,
             },
            },
@@ -223,7 +223,7 @@ local Parts = {
       {
         "if": {
           properties: {
-            name: {
+            cluster_name: {
               const: Base.Const.OTHER_CLUSTER,
             },
           },
@@ -236,18 +236,18 @@ local Parts = {
         }
       },         
     ],    
-    required: ['name']       
+    required: ['cluster_name', 'cluster_total']       
   },
   PassThroughEntity: Types.object {
     additionalProperties: false,
     properties: {
-      name: Types.string,
-      identifying_number: {
+      passthrough_name: Types.string,
+      passthrough_identifying_number: {
         type: 'string',
         minLength: 1,
       },
     },
-    required: ['name', 'identifying_number']
+    required: ['passthrough_name', 'passthrough_identifying_number']
   },
   DirectOrIndirectAward: Types.object {
     // 20230409 MCJ FIXME: I think this needs the amount...
@@ -277,7 +277,7 @@ local Parts = {
     additionalProperties: false,
     properties: {
       is_passed: Base.Enum.YorN,
-      amount: Func.compound_type([Types.number, Types.string]),
+      subrecipient_amount: Func.compound_type([Types.number, Types.string]),
     },
     allOf: Validations.SubrecipientValidations,
   },
@@ -285,13 +285,16 @@ local Parts = {
     additionalProperties: false,
     properties: {
       amount_expended: Types.number,
-      name: Types.string,
-      number: Base.Compound.ProgramNumber,
+      program_name: Types.string,
+      // FIXME MCJ 20230428: We should split this up, to match the spreadsheet.
+      // program_number: Base.Compound.ProgramNumber,
+      federal_agency_prefix: Types.string,
+      three_digit_extension: Types.string,
       is_major: Base.Enum.YorN,
       audit_report_type: Types.string,
       number_of_audit_findings: Types.integer,
     },
-    required: ['name', 'number', 'is_major', 'audit_report_type', 'number_of_audit_findings'],
+    required: ['program_name', 'federal_agency_prefix', 'three_digit_extension', 'is_major', 'audit_report_type', 'number_of_audit_findings'],
     allOf: Validations.ProgramValidations,
   },
 };

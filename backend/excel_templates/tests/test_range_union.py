@@ -14,7 +14,8 @@ test_table = [
             "direct_or_indirect_award", 
             "loan_or_loan_guarantee",
             "program",
-            "subrecipients"
+            "subrecipients",
+            "entities"
             ])
     },
 ]
