@@ -25,7 +25,6 @@ all:
 	done
 
 clean:
-	rm -rf .venv
 	for f in $(xlsx); do \
 		rm $$f; \
 	done
