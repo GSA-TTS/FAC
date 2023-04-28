@@ -20,8 +20,7 @@ jobs:
       TF_VAR_cf_password: ${{ secrets.CF_PASSWORD }}
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       TERRAFORM_PRE_RUN: |
-          apt-get update
-          apt-get install -y zip
+          echo any precursor steps go here, eg installing CLIs
 
     steps:
       - name: checkout
