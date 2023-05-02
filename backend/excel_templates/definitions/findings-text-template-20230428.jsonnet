@@ -4,7 +4,7 @@ local Sheets = import 'libs/Sheets.libsonnet';
 
 
 local single_cells = [
-  Sheets.SingleCell {
+  Sheets.single_cell {
     title: 'Auditee UEI',
     range_name: 'auditee_ein',
     title_cell: 'A2',
@@ -12,25 +12,10 @@ local single_cells = [
   },
 ];
 
-local open_range_w36 = Sheets.OpenRange {
-  title_cell: 'A3',
-  width: 36,
-};
-
-local open_range_w100 = Sheets.OpenRange {
-  title_cell: 'C3',
-  width: 100,
-};
-
-local y_or_n_range_w36 = Sheets.YorNRange {
-  title_cell: 'G3',
-  width: 36,
-};
-
 local open_ranges_defns = [
-  [open_range_w36, {}, 'Audit Finding Reference Number', 'reference_number'],
-  [open_range_w100, {}, 'Text of the Audit Finding', 'text_of_finding'],
-  [y_or_n_range_w36, {}, 'Did Text Contain a Chart or Table?', 'contains_chart_or_table'],
+  [Sheets.open_range_a3_w36, {}, 'Audit Finding Reference Number', 'reference_number'],
+  [Sheets.open_range_c3_w100, {}, 'Text of the Audit Finding', 'text_of_finding'],
+  [Sheets.y_or_n_range_g3_w36, {}, 'Did Text Contain a Chart or Table?', 'contains_chart_or_table'],
 ];
 
 local sheets = [

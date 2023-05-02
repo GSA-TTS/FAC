@@ -4,7 +4,7 @@ local Sheets = import 'libs/Sheets.libsonnet';
 
 
 local single_cells = [
-  Sheets.SingleCell {
+  Sheets.single_cell {
     title: 'Auditee UEI',
     range_name: 'auditee_ein',
     title_cell: 'A2',
@@ -13,36 +13,28 @@ local single_cells = [
 ];
 
 
-local open_range_w12 = Sheets.OpenRange {
-  width: 12,
-};
-
-local open_range_w24 = Sheets.OpenRange {
+local open_range_w24 = Sheets.open_range {
   width: 24,
 };
 
-local open_range_w20 = Sheets.OpenRange {
+local open_range_w20 = Sheets.open_range {
   width: 20,
 };
 
-local open_range_w48 = Sheets.OpenRange {
-  width: 48,
-};
-
-local y_or_n_range_w16 = Sheets.YorNRange {
+local y_or_n_range_w16 = Sheets.y_or_n_range {
   width: 16,
 };
 
-local y_or_n_range_w12 = Sheets.OpenRange {
+local y_or_n_range_w12 = Sheets.open_range {
   width: 12,
 };
 
 local open_ranges_defns = [
-  [open_range_w12, SV.FAPPrefixValidation, 'Federal Agency Prefix', 'federal_agency_prefix'],
-  [open_range_w12, SV.StringOfLengthThree, 'CFDA Three Digit Extension', 'three_digit_extension'],
-  [Sheets.OpenRange, {}, 'Additional Award Identification', 'additional_award_identification'],
-  [open_range_w48, {}, 'Federal Program Name', 'program_name'],
-  [Sheets.OpenRange, {}, 'Audit Finding Reference Number', 'finding_reference_number'],
+  [Sheets.open_range_w12, SV.FAPPrefixValidation, 'Federal Agency Prefix', 'federal_agency_prefix'],
+  [Sheets.open_range_w12, SV.StringOfLengthThree, 'CFDA Three Digit Extension', 'three_digit_extension'],
+  [Sheets.open_range, {}, 'Additional Award Identification', 'additional_award_identification'],
+  [Sheets.open_range_w48, {}, 'Federal Program Name', 'program_name'],
+  [Sheets.open_range, {}, 'Audit Finding Reference Number', 'finding_reference_number'],
   [open_range_w20, {}, 'Type(s) of Compliance Requirement(s)', 'compliance_requirement'],
   [y_or_n_range_w12, SV.YoNValidation, 'Modified Opinion', 'modified_opinion'],
   [y_or_n_range_w12, SV.YoNValidation, 'Other Matters', 'other_matters'],

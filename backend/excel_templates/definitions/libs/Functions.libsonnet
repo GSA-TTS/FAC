@@ -10,7 +10,7 @@ local columns = [
 ];
 
 {
-// base is the base object; e.g. Sheets.OpenRange
+// base is the base object; e.g. Sheets.open_range
 // row is the cell row; e.g. 3
 // arrs is the array-of-arrays that the objects are built from.
 make_open_ranges(row, arrs)::
