@@ -23,9 +23,12 @@ local YorNRange = OpenRange + {
         range_name: "Example YorN range"
 };
 
+# MAX_ROWS here is equal to MAX_ROWS in render.py plus 1
+local MAX_ROWS = 3001;
 
 {
     SingleCell: SingleCell,
     OpenRange: OpenRange,
-    YorNRange: YorNRange
+    YorNRange: YorNRange,
+    MAX_ROWS: MAX_ROWS
 }

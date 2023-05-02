@@ -21,10 +21,17 @@ make_open_ranges(row, arrs)::
         validation: a[1],
     }, arrs),
 
+make_open_ranges_with_column(row, arrs)::
+    std.mapWithIndex(function(ndx, a) a[0] + {
+        title: a[2],
+        range_name: a[3],
+        title_cell: a[0].title_cell[0] + std.toString(row),
+        validation: a[1],
+    }, arrs),
+
 make_aln_prefixes(lon)::
     std.join(
         ",",
         std.map(function(num) std.toString(num), lon)
     ),
 }
-
