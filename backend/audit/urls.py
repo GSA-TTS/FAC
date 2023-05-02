@@ -36,4 +36,9 @@ urlpatterns = [
         views.SubmissionView.as_view(),
         name="Submission",
     ),
+    path(
+        "submission-progress/<str:report_id>",
+        views.SubmissionProgressView.as_view(),
+        name="SubmissionProgress",
+    ),
 ]

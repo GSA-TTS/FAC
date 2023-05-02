@@ -305,3 +305,41 @@ class SubmissionView(LoginRequiredMixin, generic.View):
 
         except SingleAuditChecklist.DoesNotExist:
             raise PermissionDenied("You do not have access to this audit.")
+
+
+class SubmissionProgressView(LoginRequiredMixin, generic.View):
+    def get(self, request, *args, **kwargs):
+        report_id = kwargs["report_id"]
+
+        try:
+            sac = SingleAuditChecklist.objects.get(report_id=report_id)
+
+            context = {
+                "report_id": report_id,
+                "single_audit_checklist": {
+                    "created": True,
+                    "created_date": sac.date_created,
+                    "created_by": sac.submitted_by,
+                    "completed": False,
+                    "completed_date": None,
+                    "completed_by": None,
+                },
+                "audit_report": {
+                    "completed": False,
+                    "completed_date": None,
+                    "completed_by": None,
+                },
+                "certification": {
+                    "auditee_certified": sac.is_auditee_certified,
+                    "auditor_certified": sac.is_auditor_certified,
+                },
+                "submission": {
+                    "completed": sac.is_submitted,
+                    "completed_date": None,
+                    "completed_by": None,
+                },
+            }
+
+            return render(request, "audit/submission-progress.html", context)
+        except SingleAuditChecklist.DoesNotExist:
+            raise PermissionDenied("You do not have access to this audit.")

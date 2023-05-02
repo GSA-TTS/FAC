@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+<div class="grid-container margin-top-6">
+  <div class="grid-row grid-gap">
+    <div class="usa-checkbox">
+      <input type="checkbox" disabled {% if single_audit_checklist.created is True %}checked{% endif %}>Create an audit submission</input>
+    </div>
+    {% if single_audit_checklist.created is True %}
+    <small>created by {{ single_audit_checklist.created_by.email }} at {{ single_audit_checklist.created_date }}</small>
+    {% endif %}
+  </div>
+  <div class="grid-row grid-gap">
+    <div class="usa-checkbox">
+      <input type="checkbox" disabled {% if single_audit_checklist.completed is True %}checked{% endif %}>
+        <a href="{% url 'report_submission:general_information' report_id=report_id %}">Complete form SF-SAC</a>
+      </input>
+    </div>
+  </div>
+  <div class="grid-row grid-gap">
+    <div class="usa-checkbox">
+      <input type="checkbox" disabled>Upload the audit report PDF</input>
+    </div>
+    {% if single_audit_checklist.completed is True %}
+    <small>completed by {{ single_audit_checklist.completed_by.email }} at {{ single_audit_checklist.completed_date }}</small>
+    {% endif %}
+  </div>
+  <div class="grid-row grid-gap">
+    <a href="{% url 'audit:ReadyForCertification' report_id=report_id %}">
+      <div class="usa-button">
+        Ready for Certification
+      </div>
+    </a>
+  </div>
+  <div class="grid-row grid-gap">
+    <div class="usa-checkbox">
+      <input type="checkbox" disabled {% if certification.auditee_certified is True %}checked{% endif %}>
+        <a href="{% url 'audit:AuditeeCertification' report_id=report_id %}">Auditee Certification</a>
+      </input>
+    </div>
+  </div>
+  <div class="grid-row grid-gap">
+    <div class="usa-checkbox">
+      <input type="checkbox" disabled {% if certification.auditor_certified is True %}checked{% endif %}>
+        <a href="{% url 'audit:AuditorCertification' report_id=report_id %}">Auditor Certification</a>
+      </input>
+    </div>
+  </div>
+  <div class="grid-row grid-gap">
+    <div class="usa-checkbox">
+      <input type="checkbox" disabled {% if submission.completed is True %}checked{% endif %}>
+        <a href="{% url 'audit:Submission' report_id=report_id %}">Submit to the FAC for processing</a>
+      </input>
+    </div>
+  </div>
+</div>
+{% endblock content %}

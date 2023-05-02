@@ -1,6 +1,7 @@
 from django.urls import path
 from . import views
 
+app_name = "report_submission"
 
 urlpatterns = [
     path("", views.ReportSubmissionRedirectView.as_view(), name="report_submission"),
