@@ -239,7 +239,6 @@ def set_column_widths(wb, ws, spec):
     for r in spec["open_ranges"]:
         column = r["title_cell"][0]
         if "width" in r:
-            print(f"Setting width for {column} to {r['width']}")
             ws.column_dimensions[column].width = r["width"]
 
 
@@ -274,8 +273,8 @@ def process_spec(spec):
         unlock_data_entry_cells(wb, ws, sheet)
         set_column_widths(wb, ws, sheet)
         process_single_cells(wb, ws, sheet)
-        if "need_header_cell_style" in sheet:
-            apply_header_cell_style(ws, sheet["need_header_cell_style"])
+        if "include_in_header" in sheet:
+            apply_header_cell_style(ws, sheet["include_in_header"])
 
     set_wb_security(wb, password)
     return wb

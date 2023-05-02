@@ -45,7 +45,7 @@ local sheets = [
       [3, Sheets.MAX_ROWS, 'C', 'F'],
       [3, Sheets.MAX_ROWS, 'G', 'H'],
     ],
-    need_header_cell_style: ['A1', 'C2'],
+    include_in_header: ['A1', 'C2'],
   },
 ];
 
