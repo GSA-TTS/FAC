@@ -2,6 +2,7 @@
 # .coveragerc to control coverage.py
 [run]
 branch = True
+parallel = True
 
 [report]
 # Regexes for lines to exclude from consideration
