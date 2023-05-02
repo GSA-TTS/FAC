@@ -40,3 +40,14 @@ module "s3-private" {
   recursive_delete = var.recursive_delete
   s3_plan_name     = "basic"
 }
+
+# Stuff used for apps in this space
+data "cloudfoundry_space" "apps" {
+  org_name = var.cf_org_name
+  name     = var.cf_space_name
+}
+
+data "cloudfoundry_domain" "public" {
+  name = "app.cloud.gov"
+}
+
