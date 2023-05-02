@@ -47,6 +47,17 @@ RUN chown -R 1001:123 "/root/.npm"
 
 COPY . /src/
 
+ENTRYPOINT ["newrelic-admin", "run-program"]
+RUN apt-get -y install rsyslog-gnutls ca-certificates
+COPY newrelic.conf /etc/rsyslog.d/
+RUN sed -i '/imklog/s/^/#/' /etc/rsyslog.conf
+# RUN \
+#     service rsyslog restart && \
+#     logger "hello world"
+# RUN curl -s https://packagecloud.io/install/repositories/kentik/ktranslate/script.deb.sh | sudo bash && \
+#     sudo apt-get install ktranslate
+
+
 RUN npm run build && python manage.py collectstatic
 
 # ------------------------------------------------------------
