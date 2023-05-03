@@ -36,3 +36,9 @@ variable "recursive_delete" {
   description = "when true, deletes service bindings attached to the resource (not recommended for production)"
   default     = false
 }
+
+variable "https_proxy_instances" {
+  type        = number
+  description = "the number of instances of the https proxy application to run (default: 2)"
+  default     = 2
+}
