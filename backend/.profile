@@ -1,6 +1,6 @@
 export REQUESTS_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt
 
-newrelic-admin generate-config $YOUR_LICENSE_KEY newrelic.ini
+newrelic-admin generate-config $NEWRELIC_LICENSE_KEY newrelic.ini
 
 # We only want to run migrate and collecstatic for the first app instance, not
 # for additional app instances, so we gate all of this behind CF_INSTANCE_INDEX
