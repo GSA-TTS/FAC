@@ -1,0 +1,74 @@
+<!-- Side navigation menu. Highlights based on current URL should be added as URLs are determined. -->
+<nav class="desktop:grid-col-3 sticky-nav"
+     aria-label="Secondary navigation">
+    <ul class="usa-sidenav margin-bottom-6">
+        <li class="usa-sidenav__item">
+            <a href="#" class="">General information</a>
+        </li>
+        <li class="usa-sidenav__item">
+            {% if '/federal-awards/' in request.path %}
+                <a href="#federal-awards" class="usa-current">Federal Awards</a>
+            {% else %}
+                <a href="/report_submission/federal-awards/{{ report_id | default_if_none:'' }}"
+                   class="">Federal Awards</a>
+            {% endif %}
+        </li>
+        <li class="usa-sidenav__item">
+            <a href="#" class="">Notes to SEFA</a>
+        </li>
+        <li class="usa-sidenav__item">
+            <a href="#" class="">Audit information</a>
+        </li>
+        <li class="usa-sidenav__item">
+            {% if '/audit-findings/' in request.path %}
+                <a href="#audit-findings" class="usa-current">Audit findings</a>
+            {% else %}
+                <a href="/report_submission/audit-findings/{{ report_id | default_if_none:'' }}"
+                   class="">Audit findings</a>
+            {% endif %}
+        </li>
+        <li class="usa-sidenav__item">
+            {% if '/audit-findings-text/' in request.path %}
+                <a href="#audit-findings-text" class="usa-current">Audit findings text</a>
+            {% else %}
+                <a href="/report_submission/audit-findings-text/{{ report_id | default_if_none:'' }}"
+                   class="">Audit findings text</a>
+            {% endif %}
+        </li>
+        <li class="usa-sidenav__item">
+            {% if '/CAP/' in request.path %}
+                <a href="#CAP" class="usa-current">Corrective Action Plan (CAP)</a>
+            {% else %}
+                <a href="/report_submission/CAP/{{ report_id | default_if_none:'' }}"
+                   class="">Corrective Action Plan (CAP)</a>
+            {% endif %}
+        </li>
+        <li class="usa-sidenav__item">
+            {% if '/additional-EINs/' in request.path %}
+                <a href="#additional-EINs" class="usa-current">Additional EINs</a>
+            {% else %}
+                <a href="/report_submission/additional-EINs/{{ report_id | default_if_none:'' }}"
+                   class="">Additional EINs</a>
+            {% endif %}
+        </li>
+        <li class="usa-sidenav__item">
+            {% if '/additional-UEIs/' in request.path %}
+                <a href="#additional-UEIs" class="usa-current">Additional UEIs</a>
+            {% else %}
+                <a href="/report_submission/additional-UEIs/{{ report_id | default_if_none:'' }}"
+                   class="">Additional UEIs</a>
+            {% endif %}
+        </li>
+        <li class="usa-sidenav__item">
+            {% if '/secondary-auditors/' in request.path %}
+                <a href="#secondary-auditors" class="usa-current">Secondary auditors</a>
+            {% else %}
+                <a href="/report_submission/secondary-auditors/{{ report_id | default_if_none:'' }}"
+                   class="">Secondary auditors</a>
+            {% endif %}
+        </li>
+        <li class="usa-sidenav__item">
+            <a href="#" class="">Finalize</a>
+        </li>
+    </ul>
+</nav>

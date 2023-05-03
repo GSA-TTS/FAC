@@ -1,0 +1,6 @@
+app_name: gsa-fac
+mem_amount: 512M
+cf_env_name: PRODUCTION
+env_name: prod
+service_name: production
+instances: 2

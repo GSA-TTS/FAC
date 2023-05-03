@@ -151,3 +151,7 @@ left join gen on pass.id=gen.passthrough_id
 
 
 commit;
+
+notify pgrst,
+       'reload schema';
+

@@ -8,7 +8,10 @@ from django.utils.translation import gettext_lazy as _
 from .validators import (
     validate_excel_file,
     validate_excel_filename,
+    validate_corrective_action_plan_json,
     validate_federal_award_json,
+    validate_findings_text_json,
+    validate_findings_uniform_guidance_json,
     validate_general_information_json,
 )
 
@@ -99,6 +102,21 @@ class SingleAuditChecklist(models.Model):
     # Federal Awards:
     federal_awards = models.JSONField(
         blank=True, null=True, validators=[validate_federal_award_json]
+    )
+
+    # Corrective Action Plan:
+    corrective_action_plan = models.JSONField(
+        blank=True, null=True, validators=[validate_corrective_action_plan_json]
+    )
+
+    # Findings Text:
+    findings_text = models.JSONField(
+        blank=True, null=True, validators=[validate_findings_text_json]
+    )
+
+    # Findings Uniform Guidance:
+    findings_uniform_guidance = models.JSONField(
+        blank=True, null=True, validators=[validate_findings_uniform_guidance_json]
     )
 
     @property

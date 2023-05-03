@@ -1,0 +1,6 @@
+app_name: gsa-fac
+mem_amount: 512M
+cf_env_name: STAGING
+env_name: staging
+service_name: staging
+instances: 1

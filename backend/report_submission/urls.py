@@ -1,6 +1,15 @@
 from django.urls import path
 from . import views
 
+upload_page_ids = [
+    "federal-awards",
+    "audit-findings",
+    "audit-findings-text",
+    "CAP",
+    "additional-EINs",
+    "additional-UEIs",
+    "secondary-auditors",
+]
 
 urlpatterns = [
     path("", views.ReportSubmissionRedirectView.as_view(), name="report_submission"),
@@ -17,3 +26,12 @@ urlpatterns = [
         name="general_information",
     ),
 ]
+
+for page_id in upload_page_ids:
+    urlpatterns.append(
+        path(
+            "{}/<str:report_id>".format(page_id),
+            views.UploadPageView.as_view(),
+            name="secondary_auditors",
+        )
+    )

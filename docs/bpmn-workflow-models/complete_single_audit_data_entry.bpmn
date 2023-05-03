@@ -471,7 +471,7 @@
         <bpmn:incoming>Flow_06s8gf3</bpmn:incoming>
         <bpmn:outgoing>Flow_1iuss5j</bpmn:outgoing>
       </bpmn:userTask>
-      <bpmn:exclusiveGateway id="Gateway_0hlu9k9" name="Has loging.gov account?">
+      <bpmn:exclusiveGateway id="Gateway_0hlu9k9" name="Has login.gov account?">
         <bpmn:incoming>Flow_1iuss5j</bpmn:incoming>
         <bpmn:outgoing>Flow_15cjzvr</bpmn:outgoing>
         <bpmn:outgoing>Flow_12g111t</bpmn:outgoing>

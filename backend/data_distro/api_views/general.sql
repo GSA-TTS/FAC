@@ -72,3 +72,6 @@ left join passthrough on passthrough.general_id=gen.id
 
 commit;
 
+notify pgrst,
+       'reload schema';
+
