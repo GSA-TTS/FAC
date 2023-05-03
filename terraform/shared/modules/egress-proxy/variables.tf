@@ -50,3 +50,9 @@ variable "denylist" {
     # appname    = [ "bad.example.com:443" ]
   }
 }
+
+variable "https_proxy_instances" {
+  type        = number
+  description = "the number of instances of the egress application to run (default: 2)"
+  default     = 2
+}

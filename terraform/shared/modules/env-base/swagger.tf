@@ -16,6 +16,7 @@ resource "cloudfoundry_app" "swagger" {
   timeout           = 20
   memory            = 256
   disk_quota        = 256
+  instances         = var.swagger_instances
   strategy          = "blue-green"
   routes {
     route = cloudfoundry_route.swagger.id

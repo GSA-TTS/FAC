@@ -21,7 +21,7 @@ resource "cloudfoundry_app" "postgrest" {
   timeout      = 180
   memory       = 128
   disk_quota   = 256
-  instances    = 2
+  instances    = var.postgrest_instances
   strategy     = "blue-green"
   routes {
     route = cloudfoundry_route.postgrest.id
