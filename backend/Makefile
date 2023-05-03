@@ -64,8 +64,8 @@ docker-test:
 	docker compose build
 	docker compose run web python manage.py migrate
 	docker compose run web bash -c 'awslocal s3 mb s3://gsa-fac-private-s3'
-	docker compose run web python -m coverage run --source="." manage.py test --parallel
-	docker compose run web python -m coverage report -m --fail-under=90
+	docker-compose run web bash -c 'coverage run --parallel-mode --concurrency=multiprocessing manage.py test && \
+          coverage combine && coverage report -m --fail-under=90'
 
 # Run Django tests with docker with no coverage and with scoping
 # e.g. just the audit/test_models.py tests:
