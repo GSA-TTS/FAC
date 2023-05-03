@@ -5,7 +5,7 @@
 # 
 # For production:
 #   module "production" {
-#     source        = "../shared/modules/base"
+#     source        = "../shared/modules/public-egress"
 #     cf_space_name = "production"
 #     # No further customization needed
 #   }
@@ -31,15 +31,14 @@ variable "cf_space_name" {
   # shouldn't assume it!
 }
 
-variable "database_plan" {
-  type        = string
-  description = "name of the cloud.gov RDS service plan name to create"
-  # See https://cloud.gov/docs/services/relational-database/#plans
-  default = "medium-gp-psql-redundant"
-}
-
 variable "recursive_delete" {
   type        = bool
   description = "when true, deletes service bindings attached to the resource (not recommended for production)"
   default     = false
+}
+
+variable "https_proxy_instances" {
+  type        = number
+  description = "the number of instances of the https proxy application to run (default: 2)"
+  default     = 2
 }

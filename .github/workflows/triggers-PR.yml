@@ -26,14 +26,15 @@ jobs:
 
   # PR to main bafore dev deploy
   plan-terraform-dev:
-    if: github.event.pull_request.base.ref == 'main'
+
+    if: ${{ github.base_ref == 'main' }}
     uses: ./.github/workflows/terraform-plan-env.yml
     with:
       environment: "dev"
     secrets: inherit
 
   plan-terraform-management:
-    if: github.event.pull_request.base.ref == 'main'
+    if: ${{ github.base_ref == 'main' }}
     uses: ./.github/workflows/terraform-plan-env.yml
     with:
       environment: "management"
@@ -41,7 +42,7 @@ jobs:
 
   # PR for release before staging deploy
   plan-terraform-stage:
-    if: github.event.pull_request.base.ref == 'prod'
+    if: ${{ github.base_ref == 'prod' }}
     uses: ./.github/workflows/terraform-plan-env.yml
     with:
       environment: "staging"
@@ -50,7 +51,7 @@ jobs:
   # PR for release before prod deploy
   plan-terraform-prod:
     # This uses the same trigger as staging because prod deploy is tied to tags
-    if: github.event.pull_request.base.ref == 'prod'
+    if: ${{ github.base_ref == 'prod' }}
     uses: ./.github/workflows/terraform-plan-env.yml
     with:
       environment: "production"

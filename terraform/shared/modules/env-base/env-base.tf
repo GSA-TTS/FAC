@@ -40,3 +40,31 @@ module "s3-private" {
   recursive_delete = var.recursive_delete
   s3_plan_name     = "basic"
 }
+
+# Stuff used for apps in this space
+data "cloudfoundry_space" "apps" {
+  org_name = var.cf_org_name
+  name     = var.cf_space_name
+}
+
+data "cloudfoundry_domain" "public" {
+  name = "app.cloud.gov"
+}
+
+# Find the database service instance, so we can get keys for it and give the
+# resulting creds to the docker apps as environment variables
+#
+# TODO: Use an output from the database module to get the database instance id
+# and just use that directly. Can do that once this PR is merged!
+# https://github.com/18F/terraform-cloudgov/pull/10
+data "cloudfoundry_service" "rds" {
+  name = "aws-rds"
+}
+data "cloudfoundry_service_instance" "database" {
+  name_or_id = "fac-db"
+  space      = data.cloudfoundry_space.apps.id
+  depends_on = [
+    module.database
+  ]
+}
+

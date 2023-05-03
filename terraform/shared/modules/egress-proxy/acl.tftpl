@@ -1,0 +1,5 @@
+%{ for app, dests in list ~}
+%{   for dest in dests ~}
+${     split(":", dest)[0] }
+%{   endfor ~}
+%{ endfor ~}
