@@ -364,11 +364,9 @@ class Access(models.Model):
     """
 
     ROLES = (
-        ("auditee_contact", _("Auditee Contact")),
-        ("auditor_contact", _("Auditor Contact")),
         ("certifying_auditee_contact ", _("Auditee Certifying Official")),
         ("certifying_auditor_contact ", _("Auditor Certifying Official")),
-        ("creator", _("Audit Creator")),
+        ("editor", _("Audit Editor")),
     )
     sac = models.ForeignKey(SingleAuditChecklist, on_delete=models.CASCADE)
     role = models.CharField(
@@ -391,12 +389,6 @@ class Access(models.Model):
         verbose_name_plural = "accesses"
 
         constraints = [
-            # a SAC cannot have multiple creators
-            models.UniqueConstraint(
-                fields=["sac"],
-                condition=Q(role="creator"),
-                name="%(app_label)s_$(class)s_single_creator",
-            ),
             # a SAC cannot have multiple certifying auditees
             models.UniqueConstraint(
                 fields=["sac"],

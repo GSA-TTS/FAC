@@ -150,7 +150,7 @@ class AccessSerializerTests(TestCase):
     def test_valid_access(self):
         user = baker.make(User)
         data = {
-            "role": "auditee_contact",
+            "role": "editor",
             "email": "firstname.lastname@gsa.gov",
             "user": user.id,
         }
@@ -168,7 +168,7 @@ class AccessSerializerTests(TestCase):
     def test_invalid_email(self):
         user = baker.make(User)
         data = {
-            "role": "auditee_contact",
+            "role": "editor",
             "email": "this is not an email address",
             "user": user.id,
         }
@@ -176,7 +176,7 @@ class AccessSerializerTests(TestCase):
 
     def test_invalid_user(self):
         data = {
-            "role": "auditee_contact",
+            "role": "editor",
             "email": "firstname.lastname@gsa.gov",
             "user": "Robert McRobertson",
         }
