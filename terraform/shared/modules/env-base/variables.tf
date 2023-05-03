@@ -55,3 +55,8 @@ variable "swagger_instances" {
   description = "the number of instances of the swagger application to run (default: 2)"
   default     = 2
 }
+
+variable "new_relic_license_key" {
+  type        = string
+  description = "the license key to use when setting up the New Relic agent"
+}

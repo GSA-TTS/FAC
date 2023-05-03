@@ -1,6 +1,7 @@
 module "dev" {
-  source        = "../shared/modules/env-base"
-  cf_space_name = "dev"
+  source                = "../shared/modules/env-base"
+  cf_space_name         = "dev"
+  new_relic_license_key = var.new_relic_license_key
 
   database_plan       = "micro-psql"
   postgrest_instances = 1
