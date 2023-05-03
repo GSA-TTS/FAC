@@ -271,13 +271,13 @@
                            },
                            "prior_references": {
                               "description": "Prior references",
-                              "pattern": "^(20[2-9]{1}[0-9]{1}-[0-9]{3},?)+$",
+                              "pattern": "^20[2-9][0-9]-[0-9]{3}(,\\s*20[2-9][0-9]-[0-9]{3})*$",
                               "title": "PriorReferences",
                               "type": "string"
                            },
                            "reference": {
                               "description": "Reference Number",
-                              "pattern": "^20[2-9]{1}[0-9]{1}-[0-9]{3}$",
+                              "pattern": "^20[2-9][0-9]-[0-9]{3}$",
                               "title": "ReferenceNumber",
                               "type": "string"
                            },

@@ -1,5 +1,6 @@
 local Fun = import 'Functions.libsonnet';
 local Base = import '../../../schemas/sources/Base.libsonnet';
+local Requiremnt = import '../../../schemas/sources/FindingsUniformGuidance.libsonnet';
 
 local FAPPrefixValidation = {
     type: "list",
@@ -38,9 +39,18 @@ local StringOfLengthThree = {
     custom_title: "Must be length of 3"
 };
 
+// local ComplianceRequirementValidation = {
+//     type: "list",
+//     allow_blank: "False",
+//     enum: Requiremnt.ComplianceRequirement.ComplianceRequirement.enum,
+//     custom_error: "Expecting a valid combination of the letters: A,B,C,E,F,G,H,I,J,L,M,N,P",
+//     custom_title: "Compliance requirement"
+// };
+
 {
     FAPPrefixValidation: FAPPrefixValidation,
     PositiveNumberValidation: PositiveNumberValidation,
     StringOfLengthThree: StringOfLengthThree,
-    YoNValidation: YoNValidation
+    YoNValidation: YoNValidation,
+//    ComplianceRequirementValidation: ComplianceRequirementValidation
 }

@@ -215,20 +215,15 @@ local Compound = {
     description: 'Program number',
     pattern: '^[1-9]{1}[0-9]{1}\\.([0-9]{3}[a-zA-Z]{0,1}|U[0-9]{2}|RD)$',
   },
-  ComplianceRequirement: Types.string {
-    title: 'ComplianceRequirement',
-    description: 'Compliance requirement type',
-    pattern: '^(([ABCEFGHIJLMNP])(?!.*\\2))+$',
-  },
   PriorReferences: Types.string {
     title: 'PriorReferences',
     description: 'Prior references',
-    pattern: '^(20[2-9]{1}[0-9]{1}-[0-9]{3},?)+$',
+    pattern: '^20[2-9][0-9]-[0-9]{3}(,\\s*20[2-9][0-9]-[0-9]{3})*$',
   },
   ReferenceNumber: Types.string {
     title: 'ReferenceNumber',
     description: 'Reference Number',
-    pattern: '^20[2-9]{1}[0-9]{1}-[0-9]{3}$',
+    pattern: '^20[2-9][0-9]-[0-9]{3}$',
   },
   ClusterName: Types.string {
     description: 'Cluster Name',

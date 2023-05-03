@@ -190,6 +190,9 @@ def configure_validation(ws, coords: Range, r):
             dv.formula1 = dv.formula1.replace(
                 "FIRSTCELLREF", f"${coords.column}{coords.range_start_row}"
             )
+        # elif "enum" in v:
+        #     valid_values = v["enum"]
+        #     dv.formula1 = f'"IF(ISNA(MATCH({coords.column}{coords.range_start_row}, {{{",".join([f"{chr(34)}{x}{chr(34)}" for x in valid_values])}}}, 0)),FALSE,TRUE)"'
         if "operator" in v:
             dv.operator = v["operator"]
         if "allow_blank" in v:
