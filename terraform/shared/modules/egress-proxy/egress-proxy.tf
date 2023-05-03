@@ -60,7 +60,7 @@ resource "cloudfoundry_app" "egress_app" {
   buildpack        = "binary_buildpack"
   command          = "./caddy run --config Caddyfile"
   memory           = var.egress_memory
-  instances        = 2
+  instances        = var.https_proxy_instances
   strategy         = "blue-green"
 
   routes {
