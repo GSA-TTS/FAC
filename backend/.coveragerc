@@ -12,6 +12,3 @@ exclude_lines =
 omit =
     # Skip settings, these are environment specific
     config/settings.py
-
-source =
-    .
