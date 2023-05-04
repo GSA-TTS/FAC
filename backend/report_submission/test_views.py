@@ -207,9 +207,9 @@ class TestPreliminaryViews(TestCase):
 
         accesses = Access.objects.filter(sac=sac)
         for key, val in self.step3_data.items():
+            # Fields come in as auditee/auditor contacts, become editor:
             if key in ("auditee_contacts", "auditor_contacts"):
-                # Role is singular even though field is plural:
-                key = key[:-1]
+                key = "editor"
             matches = [acc for acc in accesses if acc.email == val]
             self.assertEqual(matches[0].role, key)
 
