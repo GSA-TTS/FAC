@@ -16,7 +16,12 @@ module "egress-proxy" {
       "api.sam.gov:443",
 
       # New Relic telemetry (https://docs.newrelic.com/docs/new-relic-solutions/get-started/networks/#data-ingest)
-      "collector*.newrelic.com:443", "*-api.newrelic.com:443"
+      # 
+      # Note: New Relic says that APM agent data ingests via `collector*.newrelic.com`, but we can't specify that
+      # to the Caddy forwardproxy (https://github.com/caddyserver/forwardproxy/blob/caddy2/README.md#access-control)
+      # because it only allows subdomain wildcards in `*.` as a prefix. So this wildcard is a little broader than
+      # we would prefer, but realistically the tightest domain mask we can specify given our current solution.
+      "*.newrelic.com:443",
     ],
   }
   denylist = {}
