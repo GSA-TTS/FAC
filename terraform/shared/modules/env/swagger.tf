@@ -22,6 +22,7 @@ resource "cloudfoundry_app" "swagger" {
     route = cloudfoundry_route.swagger.id
   }
   environment = {
+    https_proxy : module.egress-proxy.https_proxy
     API_URL : "https://${cloudfoundry_route.postgrest.endpoint}"
     SWAGGER_JSON_URL : "https://${cloudfoundry_route.postgrest.endpoint}"
   }

@@ -22,6 +22,7 @@ module "egress-proxy" {
       # we would prefer, but realistically the tightest domain mask we can specify given our current solution.
       "*.newrelic.com:443",
     ],
+    swagger = ["fac-${var.cf_space_name}-postgrest.app.cloud.gov:443"],
   }
   denylist = {}
 }
