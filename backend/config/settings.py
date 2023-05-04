@@ -9,12 +9,14 @@ https://docs.djangoproject.com/en/4.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.0/ref/settings/
 """
-
+import newrelic.agent
 from base64 import b64decode
 import os
 import json
 import environs
 from cfenv import AppEnv
+
+newrelic.agent.initialize()
 
 env = environs.Env()
 

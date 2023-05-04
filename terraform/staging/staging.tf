@@ -1,6 +1,7 @@
 module "staging" {
-  source        = "../shared/modules/env-base"
-  cf_space_name = "staging"
+  source                = "../shared/modules/env-base"
+  cf_space_name         = "staging"
+  new_relic_license_key = var.new_relic_license_key
 
   database_plan       = "medium-gp-psql"
   postgrest_instances = 1
