@@ -83,3 +83,7 @@ docker-clean:
 	docker rm -f $(shell docker ps -a -q)
 	docker volume rm $(shell docker volume ls -q)
 	docker compose build
+
+docker-lint:
+	docker compose build
+	docker-compose run web bash -c 'flake8 && black --check . && bandit -c pyproject.toml -r . && mypy . && djlint .'
