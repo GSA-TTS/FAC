@@ -1,0 +1,35 @@
+{
+    "id": 9848,
+    "auditee_certify_name": "PAUL ROTH",
+    "auditee_certify_title": "SIR",
+    "auditee_contact": "PAUL ROTH",
+    "auditee_email": "PROTH@MANVILLESD.ORG",
+    "auditee_fax": null,
+    "auditee_name": "BOROUGH OF MANVILLE SCHOOL DISTRICT",
+    "auditee_name_title": "PAUL ROTH-INTERIM BUSINESS ADMINISTRATOR",
+    "auditee_phone": 9082318500,
+    "auditee_title": "ACTING BUSINESS ADMINISTRATOR",
+    "auditee_street1": "1100 BROOKS BOULEVARD",
+    "auditee_street2": null,
+    "auditee_city": "MANVILLE",
+    "auditee_state": "NJ",
+    "auditee_zip_code": "08835",
+    "duns_list": [
+        87616330
+    ],
+    "uei_list": [
+        "CNKJSNYMMDF5",
+        "AA11222333AA"
+    ],
+    "is_public": true,
+    "ein_subcode": null,
+    "ein_list": [
+        226002064
+    ],
+    "general_id": [
+        9848
+    ],
+    "dbkey": [
+        "200882"
+    ]
+}
