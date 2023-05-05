@@ -21,7 +21,7 @@ User = get_user_model()
 
 SUBMISSIONS_PATH = reverse("audit:MySubmissions")
 EDIT_PATH = "audit:EditSubmission"
-ACCESS_AND_SUBMISSION_PATH = reverse("accessandsubmission")
+ACCESS_AND_SUBMISSION_PATH = reverse("report_submission:accessandsubmission")
 
 VALID_ELIGIBILITY_DATA = {
     "is_usa_based": True,
