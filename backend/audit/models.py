@@ -12,7 +12,10 @@ from django_fsm import FSMField, RETURN_VALUE, transition
 from .validators import (
     validate_excel_file,
     validate_excel_filename,
+    validate_corrective_action_plan_json,
     validate_federal_award_json,
+    validate_findings_text_json,
+    validate_findings_uniform_guidance_json,
     validate_general_information_json,
 )
 
@@ -117,14 +120,6 @@ class SingleAuditChecklist(models.Model):
         blank=True, null=True, validators=[validate_federal_award_json]
     )
 
-    def validate_full(self):
-        """
-        A stub method to represent the cross-sheet, “full” validation that we
-        do once all the individual sections are complete and valid in
-        themselves.
-        """
-        return True
-
     @transition(
         field="submission_status",
         source=STATUS.IN_PROGRESS,
@@ -209,6 +204,21 @@ class SingleAuditChecklist(models.Model):
         the model level, and will again leave it up to the views to track that
         changes have been made at that point.
         """
+
+    # Corrective Action Plan:
+    corrective_action_plan = models.JSONField(
+        blank=True, null=True, validators=[validate_corrective_action_plan_json]
+    )
+
+    # Findings Text:
+    findings_text = models.JSONField(
+        blank=True, null=True, validators=[validate_findings_text_json]
+    )
+
+    # Findings Uniform Guidance:
+    findings_uniform_guidance = models.JSONField(
+        blank=True, null=True, validators=[validate_findings_uniform_guidance_json]
+    )
 
     @property
     def audit_period_covered(self):
