@@ -1,9 +1,9 @@
 name: Docker Images
 
 on:
-  push:
-    branches:
-      - '1027*'
+  workflow_dispatch:
+  schedule:
+    - cron: '0 */1 * * *' # Run every 6 hours
 
 jobs:
   trivy-scan-and-upload:
