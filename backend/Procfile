@@ -1,2 +1,2 @@
 # used by cloud.gov
-web: gunicorn config.wsgi -t 60
+web: newrelic-admin run-program gunicorn config.wsgi -t 60

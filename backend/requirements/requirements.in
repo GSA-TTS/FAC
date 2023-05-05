@@ -12,6 +12,7 @@ environs[django]
 gunicorn
 jsonpath-ng
 jsonschema
+newrelic
 oic
 openpyxl
 pandas
