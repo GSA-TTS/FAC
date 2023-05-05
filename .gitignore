@@ -171,3 +171,8 @@ excel/
 # Things that folks might want to have in their local directories
 # that don't need to be checked in
 .local/
+terraform/**/.terraform/*
+terraform/**/*.tfstate*
+terraform/**/*.tfvars
+terraform/shared/modules/egress-proxy/proxy.zip
+terraform/shared/modules/egress-proxy/test/client.zip

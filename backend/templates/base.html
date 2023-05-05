@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 {% load static %}
+
 <html lang="en">
     <head>
         <meta charset="UTF-8" />
@@ -20,6 +21,7 @@
     </head>
     <body>
         {% include 'includes/header.html' %}
+        {% include 'includes/DAP.html' %}
         <main id="main-content">
             {% block content %}{% endblock %}
             <div class="usa-modal usa-modal--lg"
