@@ -120,6 +120,14 @@ class SingleAuditChecklist(models.Model):
         blank=True, null=True, validators=[validate_federal_award_json]
     )
 
+    def validate_full(self):
+        """
+        A stub method to represent the cross-sheet, “full” validation that we
+        do once all the individual sections are complete and valid in
+        themselves.
+        """
+        return True
+
     @transition(
         field="submission_status",
         source=STATUS.IN_PROGRESS,
