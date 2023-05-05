@@ -113,7 +113,7 @@ class TestPreliminaryViews(TestCase):
         """
         user = baker.make(User)
         self.client.force_login(user)
-        url = reverse("eligibility")
+        url = reverse("report_submission:eligibility")
 
         get_response = self.client.get(url)
         self.assertTrue(user.is_authenticated)
@@ -137,7 +137,7 @@ class TestPreliminaryViews(TestCase):
         """
         user = baker.make(User)
         self.client.force_login(user)
-        url = reverse("eligibility")
+        url = reverse("report_submission:eligibility")
         data = {}
         response = self.client.post(url, data=data)
         self.assertEqual(response.status_code, 302)
@@ -149,7 +149,7 @@ class TestPreliminaryViews(TestCase):
         """
         user = baker.make(User)
         self.client.force_login(user)
-        step1 = reverse("eligibility")
+        step1 = reverse("report_submission:eligibility")
 
         get_response = self.client.get(step1)
         self.assertTrue(user.is_authenticated)
@@ -161,7 +161,7 @@ class TestPreliminaryViews(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, "/report_submission/auditeeinfo/")
 
-        step2 = reverse("auditeeinfo")
+        step2 = reverse("report_submission:auditeeinfo")
         step2_get = self.client.get(step2)
         self.assertEqual(step2_get.status_code, 200)
         self.assertTemplateUsed(step2_get, "report_submission/step-base.html")
@@ -177,7 +177,7 @@ class TestPreliminaryViews(TestCase):
         self.assertEqual(step2_post.status_code, 302)
         self.assertEqual(step2_post.url, "/report_submission/accessandsubmission/")
 
-        step3 = reverse("accessandsubmission")
+        step3 = reverse("report_submission:accessandsubmission")
         step3_get = self.client.get(step3)
         self.assertEqual(step3_get.status_code, 200)
         self.assertTemplateUsed(step3_get, "report_submission/step-base.html")
@@ -221,7 +221,7 @@ class TestPreliminaryViews(TestCase):
         """
         user = baker.make(User)
         self.client.force_login(user)
-        url = reverse("auditeeinfo")
+        url = reverse("report_submission:auditeeinfo")
 
         get_response = self.client.get(url)
         self.assertTrue(user.is_authenticated)
@@ -244,7 +244,7 @@ class TestPreliminaryViews(TestCase):
         """
         user = baker.make(User)
         self.client.force_login(user)
-        url = reverse("accessandsubmission")
+        url = reverse("report_submission:accessandsubmission")
 
         get_response = self.client.get(url)
         self.assertTrue(user.is_authenticated)
@@ -258,19 +258,19 @@ class TestPreliminaryViews(TestCase):
         self.assertEqual(response.url, "/report_submission/accessandsubmission/")
 
     def test_reportsubmissionredirectview_get_redirects(self):
-        url = reverse("report_submission")
+        url = reverse("report_submission:report_submission")
 
         response = self.client.get(url)
         # Expect /report_submission/ to redirect to /report_submission/eligibility/
         self.assertRedirects(
             response,
-            reverse("eligibility"),
+            reverse("report_submission:eligibility"),
             target_status_code=302,
             fetch_redirect_response=False,
         )
 
     def test_eligibilityformview_get_requires_login(self):
-        url = reverse("eligibility")
+        url = reverse("report_submission:eligibility")
         response = self.client.get(url)
 
         # Should redirect to login page
@@ -278,7 +278,7 @@ class TestPreliminaryViews(TestCase):
         self.assertTrue("openid/login" in response.url)
 
     def test_auditeeinfoformview_get_requires_login(self):
-        url = reverse("auditeeinfo")
+        url = reverse("report_submission:auditeeinfo")
         response = self.client.get(url)
 
         # Should redirect to login page
@@ -286,7 +286,7 @@ class TestPreliminaryViews(TestCase):
         self.assertTrue("openid/login" in response.url)
 
     def test_accessandsubmissionformview_get_requires_login(self):
-        url = reverse("accessandsubmission")
+        url = reverse("report_submission:accessandsubmission")
         response = self.client.get(url)
 
         # Should redirect to login page
@@ -299,7 +299,9 @@ class GeneralInformationFormViewTests(TestCase):
         """Requests to the GET endpoint require the user to be authenticated"""
         sac = baker.make(SingleAuditChecklist)
 
-        url = reverse("general_information", kwargs={"report_id": sac.report_id})
+        url = reverse(
+            "report_submission:general_information", kwargs={"report_id": sac.report_id}
+        )
 
         response = self.client.get(url)
 
@@ -312,7 +314,8 @@ class GeneralInformationFormViewTests(TestCase):
         self.client.force_login(user)
 
         url = reverse(
-            "general_information", kwargs={"report_id": "this is not a report id"}
+            "report_submission:general_information",
+            kwargs={"report_id": "this is not a report id"},
         )
 
         response = self.client.get(url)
@@ -326,7 +329,9 @@ class GeneralInformationFormViewTests(TestCase):
 
         self.client.force_login(user)
 
-        url = reverse("general_information", kwargs={"report_id": sac.report_id})
+        url = reverse(
+            "report_submission:general_information", kwargs={"report_id": sac.report_id}
+        )
 
         response = self.client.get(url)
 
@@ -342,7 +347,9 @@ class GeneralInformationFormViewTests(TestCase):
 
         self.client.force_login(user)
 
-        url = reverse("general_information", kwargs={"report_id": sac.report_id})
+        url = reverse(
+            "report_submission:general_information", kwargs={"report_id": sac.report_id}
+        )
 
         response = self.client.get(url)
 
@@ -382,7 +389,9 @@ class GeneralInformationFormViewTests(TestCase):
         """Requests to the POST endpoint require the user to be authenticated"""
         sac = baker.make(SingleAuditChecklist)
 
-        url = reverse("general_information", kwargs={"report_id": sac.report_id})
+        url = reverse(
+            "report_submission:general_information", kwargs={"report_id": sac.report_id}
+        )
 
         response = self.client.post(url)
 
@@ -395,7 +404,8 @@ class GeneralInformationFormViewTests(TestCase):
         self.client.force_login(user)
 
         url = reverse(
-            "general_information", kwargs={"report_id": "this is not a report id"}
+            "report_submission:general_information",
+            kwargs={"report_id": "this is not a report id"},
         )
 
         response = self.client.post(url)
@@ -409,7 +419,9 @@ class GeneralInformationFormViewTests(TestCase):
 
         self.client.force_login(user)
 
-        url = reverse("general_information", kwargs={"report_id": sac.report_id})
+        url = reverse(
+            "report_submission:general_information", kwargs={"report_id": sac.report_id}
+        )
 
         response = self.client.post(url)
 
@@ -425,7 +437,9 @@ class GeneralInformationFormViewTests(TestCase):
 
         self.client.force_login(user)
 
-        url = reverse("general_information", kwargs={"report_id": sac.report_id})
+        url = reverse(
+            "report_submission:general_information", kwargs={"report_id": sac.report_id}
+        )
 
         data = {
             "auditee_fiscal_period_start": "2021-11-01",
@@ -480,7 +494,9 @@ class GeneralInformationFormViewTests(TestCase):
 
         self.client.force_login(user)
 
-        url = reverse("general_information", kwargs={"report_id": sac.report_id})
+        url = reverse(
+            "report_submission:general_information", kwargs={"report_id": sac.report_id}
+        )
 
         # submit a bad date format for auditee_fiscal_period_start to verify that the input is being validated
         data = {
@@ -501,7 +517,9 @@ class GeneralInformationFormViewTests(TestCase):
 
         self.client.force_login(user)
 
-        url = reverse("general_information", kwargs={"report_id": sac.report_id})
+        url = reverse(
+            "report_submission:general_information", kwargs={"report_id": sac.report_id}
+        )
 
         # submit a bad date format for auditee_fiscal_period_start to verify that the input is being validated
         data = {
