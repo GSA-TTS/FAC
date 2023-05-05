@@ -3,6 +3,8 @@ local SV = import 'libs/SheetValidations.libsonnet';
 local Sheets = import 'libs/Sheets.libsonnet';
 
 
+local title_row = 3;
+
 local single_cells = [
   Sheets.single_cell {
     title: 'Auditee UEI',
@@ -22,7 +24,7 @@ local sheets = [
   {
     name: 'Form',
     single_cells: single_cells,
-    open_ranges: Fun.make_open_ranges_with_column(3, open_ranges_defns),
+    open_ranges: Fun.make_open_ranges_with_column(title_row, open_ranges_defns),
     cells_to_merge: [
       [1, 2, 'A', 'H'],
       [2, 3, 'C', 'H'],
@@ -39,4 +41,4 @@ local workbook = {
   sheets: sheets,
 };
 
-{} + workbook
+{title_row:title_row} + workbook
