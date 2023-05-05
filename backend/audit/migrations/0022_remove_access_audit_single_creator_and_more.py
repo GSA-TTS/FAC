@@ -5,7 +5,7 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("audit", "0019_alter_singleauditchecklist_submission_status"),
+        ("audit", "0021_alter_singleauditchecklist_submission_status"),
     ]
 
     operations = [

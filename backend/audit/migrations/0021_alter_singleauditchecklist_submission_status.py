@@ -6,7 +6,7 @@ import django_fsm
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("audit", "0018_alter_excelfile_file"),
+        ("audit", "0020_singleauditchecklist_findings_text"),
     ]
 
     operations = [
