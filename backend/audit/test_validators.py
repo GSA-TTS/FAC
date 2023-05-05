@@ -18,6 +18,7 @@ from .test_schemas import (
 from .validators import (
     ALLOWED_EXCEL_CONTENT_TYPES,
     ALLOWED_EXCEL_FILE_EXTENSIONS,
+    ERROR_MESSAGE,
     MAX_EXCEL_FILE_SIZE_MB,
     validate_corrective_action_plan_json,
     validate_excel_file_content_type,
@@ -606,8 +607,7 @@ class CorrectiveActionPlanValidatorTests(SimpleTestCase):
         Empty Corrective Action Plan should fail, simple case should pass.
         """
         invalid = json.loads('{"CorrectiveActionPlan":{}}')
-        # 20230413 HDMS FIXME: The expected_msg is not properly asserted below.
-        expected_msg = "[\"'auditee_ein' is a required property.\"]"
+        expected_msg = str(("B", "2", "Auditee UEI", ERROR_MESSAGE))
         self.assertRaisesRegex(
             ValidationError, expected_msg, validate_corrective_action_plan_json, invalid
         )

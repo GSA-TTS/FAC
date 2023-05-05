@@ -1,7 +1,8 @@
 import os
 from pathlib import Path
 import json
-import jsonschema
+from jsonschema import Draft7Validator, FormatChecker, validate
+from jsonschema.exceptions import ValidationError as JSONSchemaValidationError
 import logging
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
@@ -10,10 +11,20 @@ import requests
 from slugify import slugify
 from openpyxl import load_workbook
 
+from audit.excel import (
+    corrective_action_plan_named_ranges,
+    federal_awards_named_ranges,
+    findings_text_named_ranges,
+    findings_uniform_guidance_named_ranges,
+)
+
+
 logger = logging.getLogger(__name__)
 
 
 MAX_EXCEL_FILE_SIZE_MB = 25
+
+ERROR_MESSAGE = "No input found or invalid input provided."
 
 ALLOWED_EXCEL_FILE_EXTENSIONS = [".xls", ".xlsx"]
 
@@ -28,6 +39,10 @@ AV_SCAN_CODES = {
     "INFECTED": [406],
     "ERROR": [400, 412, 500, 501],
 }
+
+XLSX_TEMPLATE_DEFINITION_DIR = Path(settings.XLSX_TEMPLATE_DIR)
+
+ErrorDetails = list[tuple[str, str, str, str]]
 
 
 def validate_uei(value):
@@ -98,13 +113,10 @@ def validate_findings_uniform_guidance_json(value):
     schema_path = root / "FindingsUniformGuidance.schema.json"
     schema = json.loads(schema_path.read_text(encoding="utf-8"))
 
-    try:
-        jsonschema.validate(value, schema)
-    except jsonschema.exceptions.ValidationError as err:
-        raise ValidationError(
-            _(err.message),
-        ) from err
-    return value
+    validator = Draft7Validator(schema)
+    errors = list(validator.iter_errors(value))
+    if len(errors) > 0:
+        raise ValidationError(message=_findings_uniform_guidance_json_error(errors))
 
 
 def validate_findings_text_json(value):
@@ -115,13 +127,10 @@ def validate_findings_text_json(value):
     schema_path = root / "FindingsText.schema.json"
     schema = json.loads(schema_path.read_text(encoding="utf-8"))
 
-    try:
-        jsonschema.validate(value, schema)
-    except jsonschema.exceptions.ValidationError as err:
-        raise ValidationError(
-            _(err.message),
-        ) from err
-    return value
+    validator = Draft7Validator(schema)
+    errors = list(validator.iter_errors(value))
+    if len(errors) > 0:
+        raise ValidationError(message=_findings_text_json_error(errors))
 
 
 def validate_corrective_action_plan_json(value):
@@ -131,14 +140,10 @@ def validate_corrective_action_plan_json(value):
     root = Path(settings.SECTION_SCHEMA_DIR)
     schema_path = root / "CorrectiveActionPlan.schema.json"
     schema = json.loads(schema_path.read_text(encoding="utf-8"))
-
-    try:
-        jsonschema.validate(value, schema)
-    except jsonschema.exceptions.ValidationError as err:
-        raise ValidationError(
-            _(err.message),
-        ) from err
-    return value
+    validator = Draft7Validator(schema)
+    errors = list(validator.iter_errors(value))
+    if len(errors) > 0:
+        raise ValidationError(message=_corrective_action_json_error(errors))
 
 
 def validate_federal_award_json(value):
@@ -148,10 +153,9 @@ def validate_federal_award_json(value):
     root = Path(settings.SECTION_SCHEMA_DIR)
     schema_path = root / "FederalAwards.schema.json"
     schema = json.loads(schema_path.read_text(encoding="utf-8"))
-
     try:
-        jsonschema.validate(value, schema)
-    except jsonschema.exceptions.ValidationError as err:
+        validate(value, schema)
+    except JSONSchemaValidationError as err:
         raise ValidationError(
             _(err.message),
         ) from err
@@ -167,8 +171,8 @@ def validate_general_information_json(value):
     schema = json.loads(schema_path.read_text(encoding="utf-8"))
 
     try:
-        jsonschema.validate(value, schema, format_checker=jsonschema.FormatChecker())
-    except jsonschema.exceptions.ValidationError as err:
+        validate(value, schema, format_checker=FormatChecker())
+    except JSONSchemaValidationError as err:
         raise ValidationError(
             _(err.message),
         ) from err
@@ -300,3 +304,68 @@ def validate_excel_file(file):
     validate_excel_file_size(file)
     validate_file_infection(file)
     validate_excel_file_integrity(file)
+
+
+def _get_error_details(xlsx_definition_template, named_ranges_row_indices):
+    """Retrieve error details givenn an XLSX template definition and a list of JSONSchemaValidationError"""
+    error_details: ErrorDetails = []
+    for named_range, row_index in named_ranges_row_indices:
+        for open_range in xlsx_definition_template["sheets"][0]["open_ranges"]:
+            if open_range["range_name"] == named_range:
+                error_details.append(
+                    (
+                        open_range["title_cell"][0],
+                        xlsx_definition_template["title_row"] + row_index + 1,
+                        open_range["title"],
+                        ERROR_MESSAGE,
+                    )
+                )
+                break
+        for single_cell in xlsx_definition_template["sheets"][0]["single_cells"]:
+            if single_cell["range_name"] == named_range:
+                error_details.append(
+                    (
+                        single_cell["range_cell"][0],
+                        single_cell["range_cell"][1],
+                        single_cell["title"],
+                        ERROR_MESSAGE,
+                    )
+                )
+                break
+    return error_details
+
+
+def _corrective_action_json_error(errors):
+    """Process JSON Schema errors for corrective actions"""
+    template_definition_path = (
+        XLSX_TEMPLATE_DEFINITION_DIR / "corrective-action-plan-template.json"
+    )
+    template = json.loads(template_definition_path.read_text(encoding="utf-8"))
+    return _get_error_details(template, corrective_action_plan_named_ranges(errors))
+
+
+def _federal_awards_json_error(errors):
+    """Process JSON Schema errors for federal actions"""
+    template_definition_path = (
+        XLSX_TEMPLATE_DEFINITION_DIR / "federal-action-template.json"
+    )
+    template = json.loads(template_definition_path.read_text(encoding="utf-8"))
+    return _get_error_details(template, federal_awards_named_ranges(errors))
+
+
+def _findings_text_json_error(errors):
+    """Process JSON Schema errors for findings text"""
+    template_definition_path = (
+        XLSX_TEMPLATE_DEFINITION_DIR / "findings-text-template.json"
+    )
+    template = json.loads(template_definition_path.read_text(encoding="utf-8"))
+    return _get_error_details(template, findings_text_named_ranges(errors))
+
+
+def _findings_uniform_guidance_json_error(errors):
+    """Process JSON Schema errors for findings uniform guidance"""
+    template_definition_path = (
+        XLSX_TEMPLATE_DEFINITION_DIR / "findings-uniform-guidance-template.json"
+    )
+    template = json.loads(template_definition_path.read_text(encoding="utf-8"))
+    return _get_error_details(template, findings_uniform_guidance_named_ranges(errors))

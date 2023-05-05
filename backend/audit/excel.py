@@ -1,3 +1,4 @@
+import re
 from typing import Any, Callable
 from openpyxl import load_workbook, Workbook
 from openpyxl.cell import Cell
@@ -324,3 +325,61 @@ def extract_findings_uniform_guidance(file):
 
 def extract_findings_text(file):
     return extract_data(file, findings_text_field_mapping, findings_text_column_mapping)
+
+
+def _extract_named_ranges(errors, column_mapping, field_mapping):
+    """Extract named ranges from column mapping and errors"""
+    named_ranges = []
+    for error in errors:
+        if bool(error.path):
+            # This works because we only expecting a single index in error.path for all column mappings except for two egde cases
+            row_index = next(
+                (item for item in error.path if isinstance(item, int)), None
+            )
+            path = ".".join([item for item in error.path if not isinstance(item, int)])
+
+            # Extract named ranges from column mapping
+            for key, value in column_mapping.items():
+                if len(value) > 2 and value[0] + "." + value[1] == path:
+                    named_ranges.append((key, row_index))
+                    break
+            # Extract named ranges from field mapping
+            for key, value in field_mapping.items():
+                if (
+                    len(value) == 2
+                    and error.message
+                    and value[0]
+                    == ".".join([path, re.search(r"'(\w+)'", error.message).group(1)])
+                ):
+                    named_ranges.append((key, None))
+                    break
+
+        else:
+            print("No path found in error object")
+    return named_ranges
+
+
+def corrective_action_plan_named_ranges(errors):
+    return _extract_named_ranges(
+        errors, corrective_action_column_mapping, corrective_action_field_mapping
+    )
+
+
+def federal_awards_named_ranges(errors):
+    return _extract_named_ranges(
+        errors, federal_awards_column_mapping, federal_awards_field_mapping
+    )
+
+
+def findings_uniform_guidance_named_ranges(errors):
+    return _extract_named_ranges(
+        errors,
+        findings_uniform_guidance_column_mapping,
+        findings_uniform_guidance_field_mapping,
+    )
+
+
+def findings_text_named_ranges(errors):
+    return _extract_named_ranges(
+        errors, findings_text_column_mapping, findings_text_field_mapping
+    )
