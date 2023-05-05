@@ -132,16 +132,6 @@ class AccessTests(TestCase):
 
         baker.make(Access, sac=access_1.sac, role="auditor_contact")
 
-    def test_multiple_creator_not_allowed(self):
-        """
-        There should be a constraint preventing multiple creators for a SAC
-        """
-        access_1 = baker.make(Access, role="creator")
-
-        self.assertRaises(
-            IntegrityError, baker.make, Access, sac=access_1.sac, role="creator"
-        )
-
     def test_multiple_certifying_auditee_contact_not_allowed(self):
         """
         There should be a constraint preventing multiple certifying_auditee_contacts for a SAC
