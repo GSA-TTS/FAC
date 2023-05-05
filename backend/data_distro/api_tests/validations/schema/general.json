@@ -1,0 +1,270 @@
+{
+   "properties": {
+      "audit_type": {
+         "type": "string"
+      },
+      "audit_year": {
+         "type": "string"
+      },
+      "auditee_date_signed": {
+         "type": "string"
+      },
+      "auditee_id": {
+         "type": "integer"
+      },
+      "auditee_name": {
+         "type": "string"
+      },
+      "cognizant_agency": {
+         "oneOf": [
+            {
+               "type": "null"
+            },
+            {
+               "type": "string"
+            }
+         ]
+      },
+      "cognizant_agency_over": {
+         "type": "string"
+      },
+      "completed_date": {
+         "oneOf": [
+            {
+               "type": "null"
+            },
+            {
+               "type": "string"
+            }
+         ]
+      },
+      "component_date_received": {
+         "oneOf": [
+            {
+               "type": "null"
+            },
+            {
+               "type": "string"
+            }
+         ]
+      },
+      "condition_or_deficiency_major_program": {
+         "type": "boolean"
+      },
+      "cpa_date_signed": {
+         "type": "string"
+      },
+      "cpa_firm_name": {
+         "type": "string"
+      },
+      "create_date": {
+         "type": "string"
+      },
+      "current_or_former_findings": {
+         "type": "boolean"
+      },
+      "data_source": {
+         "type": "string"
+      },
+      "date_published": {
+         "type": "string"
+      },
+      "dbkey": {
+         "pattern": "[1-9][0-9]+",
+         "type": "string"
+      },
+      "dollar_threshold": {
+         "type": "integer"
+      },
+      "dup_reports": {
+         "type": "boolean"
+      },
+      "entity_type": {
+         "type": "string"
+      },
+      "fac_accepted_date": {
+         "type": "string"
+      },
+      "form_date_received": {
+         "oneOf": [
+            {
+               "type": "null"
+            },
+            {
+               "type": "string"
+            }
+         ]
+      },
+      "fy_end_date": {
+         "type": "string"
+      },
+      "fy_start_date": {
+         "oneOf": [
+            {
+               "type": "null"
+            },
+            {
+               "type": "string"
+            }
+         ]
+      },
+      "going_concern": {
+         "type": "boolean"
+      },
+      "id": {
+         "type": "integer"
+      },
+      "initial_date_received": {
+         "oneOf": [
+            {
+               "type": "null"
+            },
+            {
+               "type": "string"
+            }
+         ]
+      },
+      "is_public": {
+         "type": "boolean"
+      },
+      "low_risk": {
+         "type": "boolean"
+      },
+      "material_noncompliance": {
+         "type": "boolean"
+      },
+      "material_weakness": {
+         "type": "boolean"
+      },
+      "material_weakness_major_program": {
+         "type": "boolean"
+      },
+      "modified_date": {
+         "type": "string"
+      },
+      "number_months": {
+         "type": [
+            "integer",
+            "null"
+         ]
+      },
+      "oversight_agency": {
+         "type": "integer"
+      },
+      "pdf_urls": {
+         "oneOf": [
+            {
+               "type": "null"
+            },
+            {
+               "items": {
+                  "type": [
+                     "string",
+                     "null"
+                  ]
+               },
+               "type": "array"
+            }
+         ]
+      },
+      "period_covered": {
+         "type": "string"
+      },
+      "previous_completed_on": {
+         "oneOf": [
+            {
+               "type": "null"
+            },
+            {
+               "type": "string"
+            }
+         ]
+      },
+      "previous_date_published": {
+         "oneOf": [
+            {
+               "type": "null"
+            },
+            {
+               "type": "string"
+            }
+         ]
+      },
+      "primary_auditor_id": {
+         "type": "integer"
+      },
+      "prior_year_schedule": {
+         "type": [
+            "boolean",
+            "null"
+         ]
+      },
+      "questioned_costs": {
+         "type": "boolean"
+      },
+      "report_required": {
+         "type": [
+            "boolean",
+            "null"
+         ]
+      },
+      "reportable_condition": {
+         "type": "boolean"
+      },
+      "revision_id": {
+         "type": [
+            "integer",
+            "null"
+         ]
+      },
+      "significant_deficiency": {
+         "type": [
+            "boolean",
+            "null"
+         ]
+      },
+      "special_framework": {
+         "oneOf": [
+            {
+               "type": "null"
+            },
+            {
+               "type": "string"
+            }
+         ]
+      },
+      "special_framework_required": {
+         "oneOf": [
+            {
+               "type": "null"
+            },
+            {
+               "type": "string"
+            }
+         ]
+      },
+      "total_fed_expenditures": {
+         "type": "integer"
+      },
+      "type_of_entity": {
+         "type": "string"
+      },
+      "type_report_financial_statements": {
+         "type": "string"
+      },
+      "type_report_major_program": {
+         "type": "string"
+      },
+      "type_report_special_purpose_framework": {
+         "oneOf": [
+            {
+               "type": "null"
+            },
+            {
+               "type": "string"
+            }
+         ]
+      }
+   },
+   "type": "object"
+}
