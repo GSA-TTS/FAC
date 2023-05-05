@@ -229,6 +229,27 @@ class SingleAuditChecklist(models.Model):
     )
 
     @property
+    def is_auditee_certified(self):
+        return self.submission_status in [
+            SingleAuditChecklist.STATUS.AUDITEE_CERTIFIED,
+            SingleAuditChecklist.STATUS.CERTIFIED,
+            SingleAuditChecklist.STATUS.SUBMITTED,
+        ]
+
+    @property
+    def is_auditor_certified(self):
+        return self.submission_status in [
+            SingleAuditChecklist.STATUS.AUDITEE_CERTIFIED,
+            SingleAuditChecklist.STATUS.AUDITOR_CERTIFIED,
+            SingleAuditChecklist.STATUS.CERTIFIED,
+            SingleAuditChecklist.STATUS.SUBMITTED,
+        ]
+
+    @property
+    def is_submitted(self):
+        return self.submission_status in [SingleAuditChecklist.STATUS.SUBMITTED]
+
+    @property
     def audit_period_covered(self):
         return self._general_info_get("audit_period_covered")
 
