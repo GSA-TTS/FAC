@@ -1,0 +1,84 @@
+name: Docker Images
+
+on:
+  push:
+    branches:
+      - '1027*'
+
+jobs:
+  trivy-scan-and-upload:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Pull PostGREST Docker Image
+        run: docker pull postgrest/postgrest:latest
+
+      - name: Save PostGREST Docker Image as Tar File
+        run: docker save postgrest/postgrest:latest -o postgrest-image.tar
+
+      - name: Trivy Scan PostGREST Docker Image
+        uses: docker://aquasec/trivy:latest
+        with:
+          args: image postgrest/postgrest:latest
+
+      - name: Check PostGREST Trivy Scan Result
+        run: echo ${{ job.status }}
+
+      - name: Upload PostGREST Docker Image Tar File as Artifact
+        uses: actions/upload-artifact@v2
+        if: job.status == 'success'
+        with:
+          name: postgrest-image
+          path: postgrest-image.tar
+
+      - name: Remove PostGREST Docker Image Tar File
+        run: rm postgrest-image.tar
+
+
+      - name: Pull swagger Docker Image
+        run: docker pull swaggerapi/swagger-ui:latest
+
+      - name: Save swagger Docker Image as Tar File
+        run: docker save swaggerapi/swagger-ui:latest -o swagger-image.tar
+
+      - name: Trivy Scan swagger Docker Image
+        uses: docker://aquasec/trivy:latest
+        with:
+          args: image swaggerapi/swagger-ui:latest
+
+      - name: Check swagger Trivy Scan Result
+        run: echo ${{ job.status }}
+
+      - name: Upload swagger Docker Image Tar File as Artifact
+        uses: actions/upload-artifact@v2
+        if: job.status == 'success'
+        with:
+          name: swagger-image
+          path: swagger-image.tar
+
+      - name: Remove swagger Docker Image Tar File
+        run: rm swagger-image.tar
+
+
+      - name: Pull ClamAV Docker Image
+        run: docker pull clamav/clamav:latest
+
+      - name: Save ClamAV Docker Image as Tar File
+        run: docker save clamav/clamav:latest -o clamav-image.tar
+
+      - name: Trivy Scan ClamAV Docker Image
+        uses: docker://aquasec/trivy:latest
+        with:
+          args: --timeout 30m --scanners vuln image clamav/clamav:latest
+
+      - name: Check ClamAV Trivy Scan Result
+        run: echo ${{ job.status }}
+
+      - name: Upload ClamAV Docker Image Tar File as Artifact
+        uses: actions/upload-artifact@v2
+        if: job.status == 'success'
+        with:
+          name: clamav-image
+          path: clamav-image.tar
