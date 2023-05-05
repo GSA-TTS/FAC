@@ -9,9 +9,8 @@ resource "cloudfoundry_route" "postgrest" {
 }
 
 resource "cloudfoundry_service_key" "postgrest" {
-  name = "postgrest"
-  #   service_instance = module.database.instance_id
-  service_instance = data.cloudfoundry_service_instance.database.id
+  name             = "postgrest"
+  service_instance = module.database.instance_id
 }
 
 resource "cloudfoundry_app" "postgrest" {

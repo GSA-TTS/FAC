@@ -19,3 +19,5 @@ applications:
       - fac-db
       - fac-public-s3
       - fac-key-service
+      - newrelic-creds
+      - egress-creds
