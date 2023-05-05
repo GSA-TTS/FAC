@@ -50,7 +50,7 @@ local type_uei = Types.string {
   ],
 };
 
-local phone_regex = "[1-9]{1}[0-9]{9}+";
+local phone_regex = '[1-9]{1}[0-9]{9}+';
 
 // Extend the Base.Types object.
 // Lets us transparently use the additional types in the
@@ -59,16 +59,18 @@ local phone_regex = "[1-9]{1}[0-9]{9}+";
 Base {
   Types: Base.Types {
     boolean: { type: 'boolean' },
+    BooleanOrNull: { type: ['boolean', Base.Const.NULL] },
     StringOrNull: type_string_or_null,
     UEI: type_uei,
+    IntegerOrNull: { type: ['integer', Base.Const.NULL] },
     UEIArray: {
       type: 'array',
       items: type_uei,
     },
-    PhoneNumber: { 
-        type: "integer",
-        minimum: 1000000000,
-        maximum: 9999999999
+    PhoneNumber: {
+      type: 'integer',
+      minimum: 1000000000,
+      maximum: 9999999999,
     },
     ZIP: type_zipcode,
     DBKEY: Base.Types.string {

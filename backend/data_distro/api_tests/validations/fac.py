@@ -45,6 +45,10 @@ class FAC:
         self._headers["Range"] = f"{start}-{end}"
         return self
 
+    def debug(self):
+        self._debug = True
+        return self
+
     def compose(self):
         url = ""
         if self._table is not None:
@@ -88,7 +92,6 @@ class FAC:
             else:
                 if self._debug:
                     print(f'\t\tlen({len(json)})')
-                    print(json)
                 results += json
         return results
 

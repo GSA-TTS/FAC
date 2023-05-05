@@ -159,8 +159,7 @@
             {
                "items": {
                   "type": [
-                     "string",
-                     "null"
+                     "string"
                   ]
                },
                "type": "array"

@@ -1,104 +1,59 @@
-local Base = import '../../../../schemas/sources/Base.libsonnet';
+local Base = import 'APITestBase.libsonnet';
 local Types = Base.Types;
 
-local REGEX_ZIPCODE = '^[0-9]{5}([0-9]{4})?$';
-local REGEX_DBKEY = '[1-9][0-9]+';
-
-local type_zipcode = Types.string {
-  pattern: REGEX_ZIPCODE,
-};
-
-
-local type_string_or_null = {
-  oneOf: [
-    Types.NULL,
-    Types.string,
-  ],
-};
-
-local REGEX_UEI_ALPHA = 'A-H,J-N,P-Z,a-h,j-n,p-z';
-local REGEX_UEI_LEADING = '[' + REGEX_UEI_ALPHA + ',1-9]';
-local REGEX_UEI_BODY = '[' + REGEX_UEI_ALPHA + ',0-9]';
-
-local type_uei = {
-  type: 'array',
-  allOf: [
-    // Is a string
-    {
-      items: {
-        type: 'string',
-        minLength: 12,
-        maxLength: 12,
-      },
-    },
-    // Is alphanumeric, but no I or O
-    {
-      items: {
-        pattern: '^' + REGEX_UEI_LEADING + REGEX_UEI_BODY + '+$',
-      },
-    },
-    // Does not have 9 digits in a row
-    {
-      items: {
-        pattern: '^(?!' + REGEX_UEI_LEADING + '+' + REGEX_UEI_BODY + '*?[0-9]{9})' + REGEX_UEI_BODY + '*$',
-      },
-    },
-  ],
-};
-
-local auditee = Types.object {
+Types.object {
   properties: {
     id: Types.integer,
-    auditee_certify_name: type_string_or_null,
-    auditee_certify_title: type_string_or_null,
-    auditee_contact: type_string_or_null,
+    auditee_certify_name: Types.StringOrNull,
+    auditee_certify_title: Types.StringOrNull,
+    auditee_contact: Types.StringOrNull,
     auditee_email: Types.string,
-    auditee_fax: type_string_or_null,
+    auditee_fax: Types.StringOrNull,
     auditee_name: Types.string,
     auditee_name_title: Types.string,
-    auditee_phone: Types.integer,
+    auditee_phone: Types.PhoneNumber,
     auditee_title: Types.string,
-    auditee_street1: Types.string,
-    auditee_street2: type_string_or_null,
+    auditee_street1: Types.StringOrNull,
+    auditee_street2: Types.StringOrNull,
     auditee_city: Types.string,
     auditee_state: Types.string,
-    auditee_zip_code: Types.string {
-      pattern: REGEX_ZIPCODE,
-    },
-    duns_list: {
+    auditee_zip_code: Types.ZIP,
+    duns_list: Types.IntegerArray,
+    uei_list: {
       type: 'array',
-      items: {
-        type: 'integer',
-      },
+      items: Types.UEI,
     },
-    uei_list: type_uei,
-    is_public: { type: 'boolean' },
-    ein_subcode: type_string_or_null,
-    ein_list: {
-      type: 'array',
-      items: {
-        type: 'integer',
-      },
-    },
-    general_id: {
-      type: 'array',
-      items: {
-        type: 'integer',
-      },
-    },
+    is_public: Types.boolean,
+    ein_subcode: Types.StringOrNull,
+    ein_list: Types.IntegerArray,
+    general_id: Types.IntegerArray,
     dbkey: {
       type: 'array',
-      items: {
-        type: 'string',
-        pattern: REGEX_DBKEY,
-      },
+      items: Types.DBKEY,
     },
   },
-
+  oneOf: [
+    {
+      properties: {
+        auditee_street1: Types.string,
+        auditee_street2: Types.NULL
+      },
+    },
+    {
+      properties: {
+        auditee_street1: Types.NULL,
+        auditee_street2: Types.string
+      },
+    },
+    {
+      properties: {
+        auditee_street1: Types.string,
+        auditee_street2: Types.string
+      },
+    },
+  ],
   required: [
     'id',
     'auditee_zip_code',
   ],
-};
-
-auditee
+}

@@ -1,4 +1,36 @@
 {
+   "oneOf": [
+      {
+         "properties": {
+            "auditee_street1": {
+               "type": "string"
+            },
+            "auditee_street2": {
+               "type": "null"
+            }
+         }
+      },
+      {
+         "properties": {
+            "auditee_street1": {
+               "type": "null"
+            },
+            "auditee_street2": {
+               "type": "string"
+            }
+         }
+      },
+      {
+         "properties": {
+            "auditee_street1": {
+               "type": "string"
+            },
+            "auditee_street2": {
+               "type": "string"
+            }
+         }
+      }
+   ],
    "properties": {
       "auditee_certify_name": {
          "oneOf": [
@@ -53,13 +85,22 @@
          "type": "string"
       },
       "auditee_phone": {
+         "maximum": 9999999999,
+         "minimum": 1000000000,
          "type": "integer"
       },
       "auditee_state": {
          "type": "string"
       },
       "auditee_street1": {
-         "type": "string"
+         "oneOf": [
+            {
+               "type": "null"
+            },
+            {
+               "type": "string"
+            }
+         ]
       },
       "auditee_street2": {
          "oneOf": [
@@ -120,25 +161,21 @@
          "type": "boolean"
       },
       "uei_list": {
-         "allOf": [
-            {
-               "items": {
+         "items": {
+            "allOf": [
+               {
                   "maxLength": 12,
-                  "minLength": 12,
-                  "type": "string"
-               }
-            },
-            {
-               "items": {
+                  "minLength": 12
+               },
+               {
                   "pattern": "^[A-H,J-N,P-Z,a-h,j-n,p-z,1-9][A-H,J-N,P-Z,a-h,j-n,p-z,0-9]+$"
-               }
-            },
-            {
-               "items": {
+               },
+               {
                   "pattern": "^(?![A-H,J-N,P-Z,a-h,j-n,p-z,1-9]+[A-H,J-N,P-Z,a-h,j-n,p-z,0-9]*?[0-9]{9})[A-H,J-N,P-Z,a-h,j-n,p-z,0-9]*$"
                }
-            }
-         ],
+            ],
+            "type": "string"
+         },
          "type": "array"
       }
    },
