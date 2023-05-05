@@ -188,35 +188,88 @@ class GeneralInformationFormView(LoginRequiredMixin, View):
         raise BadRequest()
 
 
-class FederalAwards(LoginRequiredMixin, View):
+class UploadPageView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         report_id = kwargs["report_id"]
+
+        # Organized by URL name, page specific constants are defined here
+        # Data can then be accessed by checking the current URL
+        additional_context = {
+            "federal-awards": {
+                "view_id": "federal-awards",
+                "view_name": "Federal awards",
+            },
+            "audit-findings": {
+                "view_id": "audit-findings",
+                "view_name": "Audit findings",
+            },
+            "audit-findings-text": {
+                "view_id": "audit-findings-text",
+                "view_name": "Audit findings text",
+            },
+            "CAP": {
+                "view_id": "CAP",
+                "view_name": "Corrective Action Plan (CAP)",
+            },
+            "additional-EINs": {
+                "view_id": "additional-EINs",
+                "view_name": "Secondary auditors",
+            },
+            "additional-UEIs": {
+                "view_id": "additional-UEIs",
+                "view_name": "Additional UEIs",
+            },
+            "secondary-auditors": {
+                "view_id": "secondary-auditors",
+                "view_name": "Secondary auditors",
+            },
+        }
 
         try:
             sac = SingleAuditChecklist.objects.get(report_id=report_id)
 
-            # this should probably be a permission mixin
             accesses = Access.objects.filter(sac=sac, user=request.user)
             if not accesses:
                 raise PermissionDenied("You do not have access to this audit.")
 
+            # Context for every upload page
             context = {
                 "auditee_name": sac.auditee_name,
                 "report_id": report_id,
                 "auditee_uei": sac.auditee_uei,
                 "user_provided_organization_type": sac.user_provided_organization_type,
             }
+            # Using the current URL, append page specific context
+            path_name = request.path.split("/")[2]
+            for item in additional_context[path_name]:
+                context[item] = additional_context[path_name][item]
 
-            return render(request, "report_submission/federal-awards.html", context)
+            return render(request, "report_submission/upload-page.html", context)
         except SingleAuditChecklist.DoesNotExist:
             raise PermissionDenied("You do not have access to this audit.")
 
-    # Unimplemented
+    # Partially implemented (redirects, does no further action)
     def post(self, request, *args, **kwargs):
+        report_id = kwargs["report_id"]
+        nextURLs = {
+            "federal-awards": "audit-findings",
+            "audit-findings": "audit-findings-text",
+            "audit-findings-text": "CAP",
+            "CAP": "additional-EINs",
+            "additional-EINs": "additional-UEIs",
+            "additional-UEIs": "secondary-auditors",
+            "secondary-auditors": "/",
+        }
+        path_name = request.path.split("/")[2]
+
         try:
-            return redirect(reverse("/"))
+            return redirect(
+                "/report_submission/{nextURL}/{report_id}".format(
+                    nextURL=nextURLs[path_name], report_id=report_id
+                )
+            )
 
         except Exception as e:
-            logger.info("Unexpected error in FederalAwards post.\n", e)
+            logger.info("Unexpected error in UploadPageView post.\n", e)
 
         raise BadRequest()

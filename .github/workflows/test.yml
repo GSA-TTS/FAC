@@ -107,8 +107,8 @@ jobs:
       - name: Run Django test suite
         working-directory: ./backend
         run:
-          docker-compose run web bash -c 'coverage run --source="." manage.py test &&
-          coverage report -m --fail-under=90'
+          docker-compose run web bash -c 'coverage run --parallel-mode --concurrency=multiprocessing manage.py test --parallel &&
+          coverage combine && coverage report -m --fail-under=90'
       - name: run Lighthouse CI
         run: |
           npm install -g @lhci/cli@0.8.x

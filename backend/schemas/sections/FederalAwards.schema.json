@@ -1,519 +1,526 @@
 {
-  "$defs": {
-    "AuditType": {
-      "description": "",
-      "enum": [
-        "single-audit",
-        "program-specific",
-        "acee"
-      ],
-      "title": "AuditType",
-      "type": "string"
-    },
-    "ProgramNumber": {
-      "title": "ProgramNumber",
-      "type": "string",
-      "description": "Program number",
-      "pattern": "^[1-9]{1}[0-9]{1}\\.([0-9]{3}[a-zA-Z]{0,1}|U[0-9]{2}|RD)$"
-    },
-    "LoanBalanceNonAnswers": {
-      "description": "If loan_or_loan_guarantee is N, these are valid responses to loan_balance_at_audit_period_end.",
-      "enum": [
-        "",
-        0,
-        null
-      ],
-      "title": "LoanBalanceNonAnswers"
-    },
-    "FederalAwardPassThroughNonAnswers": {
-      "description": "If federal_award_passed_to_subrecipients is N, these are valid responses to federal_award_passed_to_subrecipients_amount.",
-      "enum": [
-        "",
-        0,
-        null
-      ],
-      "title": "LoanBalanceNonAnswers"
-    },
-    "DirectAwardPassThroughNonAnswers": {
-      "description": "If direct_award is Y, these are valid responses to direct_award_pass_through_entities.",
-      "enum": [
-        "",
-        null,
-        []
-      ],
-      "title": "DirectAwardPassThroughNonAnswers"
-    },
-    "PassThroughEntity": {
-      "description": "If direct_award is N, the form must include a list of the pass-through entity by name and identifying number.",
-      "type": "object",
-      "properties": {
-        "name": {
-          "type": "string"
-        },
-        "identifying_number": {
-          "type": "string",
-          "minLength": 1
-        }
-      },
-      "required": [
-        "name",
-        "identifying_number"
-      ],
-      "title": "PassThroughEntity"
-    },
-    "MajorProgramAuditTypeNonAnswers": {
-      "description": "If major_program is N, these are valid responses to major_program_audit_report_type.",
-      "enum": [
-        "",
-        null
-      ],
-      "title": "MajorProgramAuditTypeNonAnswers"
-    },
-    "ClusterName": {
-      "description": "Cluster Name",
-      "enum": [
-        "N/A",
-        "RESEARCH AND DEVELOPMENT",
-        "STUDENT FINANCIAL ASSISTANCE",
-        "STATE CLUSTER",
-        "477 CLUSTER",
-        "AGING CLUSTER",
-        "CCDF CLUSTER",
-        "CDBG - DISASTER RECOVERY GRANTS - PUB. L. NO. 113-2 CLUSTER",
-        "CDBG - ENTITLEMENT GRANTS CLUSTER",
-        "CDFI CLUSTER",
-        "CHILD NUTRITION CLUSTER",
-        "CLEAN WATER STATE REVOLVING FUND CLUSTER",
-        "COMMUNITY FACILITIES LOANS AND GRANTS CLUSTER",
-        "DISABILITY INSURANCE/SSI CLUSTER",
-        "DRINKING WATER STATE REVOLVING FUND CLUSTER",
-        "ECONOMIC DEVELOPMENT CLUSTER",
-        "EMPLOYMENT SERVICE CLUSTER",
-        "FEDERAL TRANSIT CLUSTER",
-        "FISH AND WILDLIFE CLUSTER",
-        "FOOD DISTRIBUTION CLUSTER",
-        "FOREIGN FOOD AID DONATION CLUSTER",
-        "FOREST SERVICE SCHOOLS AND ROADS CLUSTER",
-        "FOSTER GRANDPARENT/SENIOR COMPANION CLUSTER",
-        "HEAD START CLUSTER",
-        "HEALTH CENTER PROGRAM CLUSTER",
-        "HIGHWAY PLANNING AND CONSTRUCTION CLUSTER",
-        "HIGHWAY SAFETY CLUSTER",
-        "HOPE VI CLUSTER",
-        "HOUSING VOUCHER CLUSTER",
-        "HURRICANE SANDY RELIEF CLUSTER",
-        "MATERNAL, INFANT, AND EARLY CHILDHOOD HOME VISITING CLUSTER",
-        "MEDICAID CLUSTER",
-        "SCHOOL IMPROVEMENT GRANTS CLUSTER",
-        "SECTION 8 PROJECT-BASED CLUSTER",
-        "SNAP CLUSTER",
-        "SPECIAL EDUCATION CLUSTER (IDEA)",
-        "TANF CLUSTER",
-        "TRANSIT SERVICES PROGRAMS CLUSTER",
-        "TRIO CLUSTER",
-        "WATER AND WASTE PROGRAM CLUSTER",
-        "WIOA CLUSTER",
-        "OTHER CLUSTER NOT LISTED ABOVE"
-      ],
-      "title": "ClusterName"
-    },
-    "StateClusterNameNonAnswers": {
-      "description": "If cluster_name is not 'State Cluster', these are valid responses to state_cluster_name.",
-      "enum": [
-        "",
-        null
-      ],
-      "title": "StateClusterNameNonAnswers"
-    },
-    "FederalAwardEntry": {
-      "additionalProperties": false,
-      "description": "",
-      "properties": {
-        "additional_award_identification": {
-          "type": "string"
-        },
-        "amount_expended": {
-          "type": "number",
-          "minimum": 0
-        },
-        "cluster_name": {
-          "$ref": "#/$defs/ClusterName"
-        },
-        "cluster_total": {
-          "type": "string"
-        },
-        "direct_award": {
-          "$ref": "#/$defs/YorN"
-        },
-        "direct_award_pass_through_entities": {
-          "type": "array",
-          "items": {
-            "$ref": "#/$defs/PassThroughEntity"
-          }
-        },
-        "federal_award_passed_to_subrecipients": {
-          "$ref": "#/$defs/YorN"
-        },
-        "federal_award_passed_to_subrecipients_amount": {},
-        "federal_program_name": {
-          "type": "string"
-        },
-        "federal_program_total": {
-          "type": "string"
-        },
-        "loan_balance_at_audit_period_end": {},
-        "loan_or_loan_guarantee": {
-          "$ref": "#/$defs/YorN"
-        },
-        "major_program": {
-          "$ref": "#/$defs/YorN"
-        },
-        "major_program_audit_report_type": {
-          "$ref": "#/$defs/MajorProgramAuditReportType"
-        },
-        "number_of_audit_findings": {
-          "type": "integer"
-        },
-        "other_cluster_name": {
-          "type": "string"
-        },
-        "program_number": {
-          "$ref": "#/$defs/ProgramNumber"
-        },
-        "state_cluster_name": {
-          "type": ["string", "null"]
-        }
-      },
-      "allOf": [
-        {
-          "if": {
-            "properties": {
-              "loan_or_loan_guarantee": {
-                "const": "Y"
-              }
-            }
-          },
-          "then": {
-            "properties": {
-              "loan_balance_at_audit_period_end": {
-                "anyOf": [
-                  {
-                    "type": "integer",
-                    "minimum": 1
-                  },
-                  {
-                    "$ref": "#/$defs/NA"
-                  }
-                ]
-              }
+   "$schema": "https://json-schema.org/draft/2019-09/schema#",
+   "additionalProperties": false,
+   "metamodel_version": "1.7.0",
+   "properties": {
+      "FederalAwards": {
+         "additionalProperties": false,
+         "properties": {
+            "auditee_ein": {
+               "type": [
+                  "string",
+                  "null"
+               ]
             },
-            "required": [
-              "loan_balance_at_audit_period_end"
-            ]
-          }
-        },
-        {
-          "if": {
-            "properties": {
-              "loan_or_loan_guarantee": {
-                "const": "N"
-              }
-            }
-          },
-          "then": {
-            "properties": {
-              "loan_balance_at_audit_period_end": {
-                "$ref": "#/$defs/LoanBalanceNonAnswers"
-              }
-            }
-          }
-        },
-        {
-          "if": {
-            "properties": {
-              "direct_award": {
-                "const": "N"
-              }
-            }
-          },
-          "then": {
-            "required": [
-              "direct_award_pass_through_entities"
-            ],
-            "properties": {
-              "direct_award_pass_through_entities": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/$defs/PassThroughEntity"
-                }
-              }
-            }
-          }
-        },
-        {
-          "if": {
-            "properties": {
-              "direct_award": {
-                "const": "Y"
-              }
-            }
-          },
-          "then": {
-            "properties": {
-              "direct_award_pass_through_entities": {
-                "$ref": "#/$defs/DirectAwardPassThroughNonAnswers"
-              }
-            }
-          }
-        },
-        {
-          "if": {
-            "properties": {
-              "federal_award_passed_to_subrecipients": {
-                "const": "Y"
-              }
-            }
-          },
-          "then": {
-            "required": [
-              "federal_award_passed_to_subrecipients_amount"
-            ],
-            "properties": {
-              "federal_award_passed_to_subrecipients_amount": {
-                "type": "integer"
-              }
-            }
-          }
-        },
-        {
-          "if": {
-            "properties": {
-              "federal_award_passed_to_subrecipients": {
-                "const": "N"
-              }
-            }
-          },
-          "then": {
-            "properties": {
-              "federal_award_passed_to_subrecipients_amount": {
-                "$ref": "#/$defs/FederalAwardPassThroughNonAnswers"
-              }
-            }
-          }
-        },
-        {
-          "if": {
-            "properties": {
-              "major_program": {
-                "const": "Y"
-              }
-            }
-          },
-          "then": {
-            "required": [
-              "major_program_audit_report_type"
-            ],
-            "properties": {
-              "major_program_audit_report_type": {
-                "$ref": "#/$defs/MajorProgramAuditReportType"
-              }
-            }
-          }
-        },
-        {
-          "if": {
-            "properties": {
-              "major_program": {
-                "const": "N"
-              }
-            }
-          },
-          "then": {
-            "properties": {
-              "major_program_audit_report_type": {
-                "$ref": "#/$defs/MajorProgramAuditTypeNonAnswers"
-              }
-            }
-          }
-        },
-        {
-          "if": {
-            "properties": {
-              "major_program": {
-                "const": "Y"
-              },
-              "major_program_audit_report_type": {
-                "anyOf": [
-                  {
-                    "const": "A"
+            "federal_awards": {
+               "items": {
+                  "additionalProperties": false,
+                  "description": "Award entry rows",
+                  "properties": {
+                     "amount_expended": {
+                        "minimum": 0,
+                        "type": "number"
+                     },
+                     "cluster": {
+                        "allOf": [
+                           {
+                              "if": {
+                                 "not": {
+                                    "properties": {
+                                       "name": {
+                                          "enum": [
+                                             "OTHER CLUSTER NOT LISTED ABOVE",
+                                             "STATE CLUSTER"
+                                          ]
+                                       }
+                                    }
+                                 }
+                              },
+                              "then": {
+                                 "allOf": [
+                                    {
+                                       "properties": {
+                                          "other_cluster_name": {
+                                             "description": "Empty string or null",
+                                             "enum": [
+                                                "",
+                                                "null"
+                                             ],
+                                             "title": "EmptyString_Null"
+                                          }
+                                       }
+                                    },
+                                    {
+                                       "properties": {
+                                          "state_cluster_name": {
+                                             "description": "Empty string or null",
+                                             "enum": [
+                                                "",
+                                                "null"
+                                             ],
+                                             "title": "EmptyString_Null"
+                                          }
+                                       }
+                                    }
+                                 ]
+                              }
+                           },
+                           {
+                              "if": {
+                                 "properties": {
+                                    "name": {
+                                       "const": "STATE CLUSTER"
+                                    }
+                                 }
+                              },
+                              "then": {
+                                 "properties": {
+                                    "state_cluster_name": {
+                                       "minLength": 1,
+                                       "type": "string"
+                                    }
+                                 },
+                                 "required": [
+                                    "state_cluster_name"
+                                 ]
+                              }
+                           },
+                           {
+                              "if": {
+                                 "properties": {
+                                    "name": {
+                                       "const": "OTHER CLUSTER NOT LISTED ABOVE"
+                                    }
+                                 }
+                              },
+                              "then": {
+                                 "properties": {
+                                    "other_cluster_name": {
+                                       "minLength": 1,
+                                       "type": "string"
+                                    }
+                                 },
+                                 "required": [
+                                    "other_cluster_name"
+                                 ]
+                              }
+                           }
+                        ],
+                        "properties": {
+                           "name": {
+                              "description": "Cluster Name",
+                              "enum": [
+                                 "N/A",
+                                 "RESEARCH AND DEVELOPMENT",
+                                 "STUDENT FINANCIAL ASSISTANCE",
+                                 "STATE CLUSTER",
+                                 "477 CLUSTER",
+                                 "AGING CLUSTER",
+                                 "CCDF CLUSTER",
+                                 "CDBG - DISASTER RECOVERY GRANTS - PUB. L. NO. 113-2 CLUSTER",
+                                 "CDBG - ENTITLEMENT GRANTS CLUSTER",
+                                 "CDFI CLUSTER",
+                                 "CHILD NUTRITION CLUSTER",
+                                 "CLEAN WATER STATE REVOLVING FUND CLUSTER",
+                                 "COMMUNITY FACILITIES LOANS AND GRANTS CLUSTER",
+                                 "DISABILITY INSURANCE/SSI CLUSTER",
+                                 "DRINKING WATER STATE REVOLVING FUND CLUSTER",
+                                 "ECONOMIC DEVELOPMENT CLUSTER",
+                                 "EMPLOYMENT SERVICE CLUSTER",
+                                 "FEDERAL TRANSIT CLUSTER",
+                                 "FISH AND WILDLIFE CLUSTER",
+                                 "FOOD DISTRIBUTION CLUSTER",
+                                 "FOREIGN FOOD AID DONATION CLUSTER",
+                                 "FOREST SERVICE SCHOOLS AND ROADS CLUSTER",
+                                 "FOSTER GRANDPARENT/SENIOR COMPANION CLUSTER",
+                                 "HEAD START CLUSTER",
+                                 "HEALTH CENTER PROGRAM CLUSTER",
+                                 "HIGHWAY PLANNING AND CONSTRUCTION CLUSTER",
+                                 "HIGHWAY SAFETY CLUSTER",
+                                 "HOPE VI CLUSTER",
+                                 "HOUSING VOUCHER CLUSTER",
+                                 "HURRICANE SANDY RELIEF CLUSTER",
+                                 "MATERNAL, INFANT, AND EARLY CHILDHOOD HOME VISITING CLUSTER",
+                                 "MEDICAID CLUSTER",
+                                 "SCHOOL IMPROVEMENT GRANTS CLUSTER",
+                                 "SECTION 8 PROJECT-BASED CLUSTER",
+                                 "SNAP CLUSTER",
+                                 "SPECIAL EDUCATION CLUSTER (IDEA)",
+                                 "TANF CLUSTER",
+                                 "TRANSIT SERVICES PROGRAMS CLUSTER",
+                                 "TRIO CLUSTER",
+                                 "WATER AND WASTE PROGRAM CLUSTER",
+                                 "WIOA CLUSTER",
+                                 "OTHER CLUSTER NOT LISTED ABOVE"
+                              ],
+                              "title": "ClusterName",
+                              "type": "string"
+                           },
+                           "total": {
+                              "type": "number"
+                           }
+                        },
+                        "required": [
+                           "name"
+                        ],
+                        "type": "object"
+                     },
+                     "direct_or_indirect_award": {
+                        "additionalProperties": false,
+                        "allOf": [
+                           {
+                              "if": {
+                                 "properties": {
+                                    "is_direct": {
+                                       "const": "Y"
+                                    }
+                                 }
+                              },
+                              "then": {
+                                 "properties": {
+                                    "entities": {
+                                       "description": "Empty string, empty array, or null",
+                                       "enum": [
+                                          "",
+                                          [ ],
+                                          "null"
+                                       ],
+                                       "title": "EmptyString_Null"
+                                    }
+                                 }
+                              }
+                           },
+                           {
+                              "if": {
+                                 "properties": {
+                                    "is_direct": {
+                                       "const": "N"
+                                    }
+                                 }
+                              },
+                              "then": {
+                                 "required": [
+                                    "entities"
+                                 ]
+                              }
+                           }
+                        ],
+                        "description": "If direct_award is N, the form must include a list of the pass-through entity by name and identifying number",
+                        "properties": {
+                           "entities": {
+                              "items": {
+                                 "additionalProperties": false,
+                                 "properties": {
+                                    "identifying_number": {
+                                       "minLength": 1,
+                                       "type": "string"
+                                    },
+                                    "name": {
+                                       "type": "string"
+                                    }
+                                 },
+                                 "required": [
+                                    "name",
+                                    "identifying_number"
+                                 ],
+                                 "type": "object"
+                              },
+                              "type": "array"
+                           },
+                           "is_direct": {
+                              "enum": [
+                                 "Y",
+                                 "N"
+                              ],
+                              "type": "string"
+                           }
+                        },
+                        "type": "object"
+                     },
+                     "loan_or_loan_guarantee": {
+                        "additionalProperties": false,
+                        "allOf": [
+                           {
+                              "if": {
+                                 "properties": {
+                                    "is_guaranteed": {
+                                       "const": "Y"
+                                    }
+                                 }
+                              },
+                              "then": {
+                                 "properties": {
+                                    "loan_balance_at_audit_period_end": {
+                                       "anyOf": [
+                                          {
+                                             "minimum": 1,
+                                             "type": "integer"
+                                          },
+                                          {
+                                             "enum": [
+                                                "N/A"
+                                             ],
+                                             "title": "N/A",
+                                             "type": "string"
+                                          }
+                                       ]
+                                    }
+                                 },
+                                 "required": [
+                                    "loan_balance_at_audit_period_end"
+                                 ]
+                              }
+                           },
+                           {
+                              "if": {
+                                 "properties": {
+                                    "is_guaranteed": {
+                                       "const": "N"
+                                    }
+                                 }
+                              },
+                              "then": {
+                                 "properties": {
+                                    "loan_balance_at_audit_period_end": {
+                                       "description": "Empty string, zero, or null expected.",
+                                       "enum": [
+                                          "",
+                                          0,
+                                          "null"
+                                       ],
+                                       "title": "EmptyString_Zero_Null"
+                                    }
+                                 }
+                              }
+                           }
+                        ],
+                        "description": "A loan or loan guarantee and balance",
+                        "properties": {
+                           "is_guaranteed": {
+                              "enum": [
+                                 "Y",
+                                 "N"
+                              ],
+                              "type": "string"
+                           },
+                           "loan_balance_at_audit_period_end": {
+                              "type": [
+                                 "number",
+                                 "string"
+                              ]
+                           }
+                        },
+                        "required": [
+                           "is_guaranteed"
+                        ],
+                        "type": "object"
+                     },
+                     "program": {
+                        "additionalProperties": false,
+                        "allOf": [
+                           {
+                              "if": {
+                                 "properties": {
+                                    "is_major": {
+                                       "const": "Y"
+                                    }
+                                 }
+                              },
+                              "then": {
+                                 "else": {
+                                    "properties": {
+                                       "audit_report_type": {
+                                          "description": "Major program report types",
+                                          "enum": [
+                                             "U",
+                                             "Q",
+                                             "A",
+                                             "D"
+                                          ],
+                                          "title": "MajorProgramAuditReportType",
+                                          "type": "string"
+                                       },
+                                       "number_of_audit_findings": {
+                                          "const": 0,
+                                          "type": "integer"
+                                       }
+                                    }
+                                 },
+                                 "if": {
+                                    "properties": {
+                                       "audit_report_type": {
+                                          "anyOf": [
+                                             {
+                                                "const": "A"
+                                             },
+                                             {
+                                                "const": "Q"
+                                             }
+                                          ]
+                                       }
+                                    }
+                                 },
+                                 "then": {
+                                    "properties": {
+                                       "number_of_audit_findings": {
+                                          "exclusiveMinimum": 0,
+                                          "type": "integer"
+                                       }
+                                    }
+                                 }
+                              }
+                           },
+                           {
+                              "if": {
+                                 "properties": {
+                                    "is_major": {
+                                       "const": "N"
+                                    }
+                                 }
+                              },
+                              "then": {
+                                 "properties": {
+                                    "audit_report_type": {
+                                       "description": "Empty string or null",
+                                       "enum": [
+                                          "",
+                                          "null"
+                                       ],
+                                       "title": "EmptyString_Null"
+                                    },
+                                    "number_of_audit_findings": {
+                                       "const": 0
+                                    }
+                                 }
+                              }
+                           }
+                        ],
+                        "properties": {
+                           "amount_expended": {
+                              "type": "number"
+                           },
+                           "audit_report_type": {
+                              "type": "string"
+                           },
+                           "is_major": {
+                              "enum": [
+                                 "Y",
+                                 "N"
+                              ],
+                              "type": "string"
+                           },
+                           "name": {
+                              "type": "string"
+                           },
+                           "number": {
+                              "description": "Program number",
+                              "pattern": "^[1-9]{1}[0-9]{1}\\.([0-9]{3}[a-zA-Z]{0,1}|U[0-9]{2}|RD)$",
+                              "title": "ProgramNumber",
+                              "type": "string"
+                           },
+                           "number_of_audit_findings": {
+                              "type": "integer"
+                           }
+                        },
+                        "required": [
+                           "name",
+                           "number",
+                           "is_major",
+                           "audit_report_type",
+                           "number_of_audit_findings"
+                        ],
+                        "type": "object"
+                     },
+                     "subrecipients": {
+                        "additionalProperties": false,
+                        "allOf": [
+                           {
+                              "if": {
+                                 "properties": {
+                                    "is_passed": {
+                                       "const": "Y"
+                                    }
+                                 }
+                              },
+                              "then": {
+                                 "properties": {
+                                    "amount": {
+                                       "type": "integer"
+                                    }
+                                 },
+                                 "required": [
+                                    "amount"
+                                 ]
+                              }
+                           },
+                           {
+                              "if": {
+                                 "properties": {
+                                    "is_passed": {
+                                       "const": "N"
+                                    }
+                                 }
+                              },
+                              "then": {
+                                 "properties": {
+                                    "amount": {
+                                       "description": "Empty string, zero, or null expected.",
+                                       "enum": [
+                                          "",
+                                          0,
+                                          "null"
+                                       ],
+                                       "title": "EmptyString_Zero_Null"
+                                    }
+                                 }
+                              }
+                           }
+                        ],
+                        "properties": {
+                           "amount": {
+                              "type": [
+                                 "number",
+                                 "string"
+                              ]
+                           },
+                           "is_passed": {
+                              "enum": [
+                                 "Y",
+                                 "N"
+                              ],
+                              "type": "string"
+                           }
+                        },
+                        "type": "object"
+                     }
                   },
-                  {
-                    "const": "Q"
-                  }
-                ]
-              }
+                  "required": [
+                     "cluster",
+                     "direct_or_indirect_award",
+                     "loan_or_loan_guarantee",
+                     "program",
+                     "subrecipients"
+                  ],
+                  "title": "FederalAwardEntry",
+                  "type": "object"
+               },
+               "type": "array"
+            },
+            "total_amount_expended": {
+               "minimum": 0,
+               "type": "number"
             }
-          },
-          "then": {
-            "properties": {
-              "number_of_audit_findings": {
-                "type": "integer",
-                "exclusiveMinimum": 0
-              }
-            }
-          },
-          "else": {
-            "properties": {
-              "number_of_audit_findings": {
-                "type": "integer",
-                "minimum": 0,
-                "maximum": 0
-              }
-            }
-          }
-        },
-        {
-          "if": {
-            "properties": {
-              "cluster_name": {
-                "const": "STATE CLUSTER"
-              }
-            }
-          },
-          "then": {
-            "required": [
-              "state_cluster_name"
-            ]
-          },
-          "else": {
-            "properties": {
-              "state_cluster_name": {
-                "$ref": "#/$defs/StateClusterNameNonAnswers"
-              }
-            }
-          }
-        }
-      ],
-      "required": [
-        "program_number",
-        "federal_program_name",
-        "amount_expended",
-        "cluster_name",
-        "loan_or_loan_guarantee",
-        "direct_award",
-        "federal_award_passed_to_subrecipients",
-        "major_program",
-        "number_of_audit_findings"
-      ],
-      "title": "FederalAwardEntry",
-      "type": "object"
-    },
-    "FederalAwards": {
-      "additionalProperties": false,
-      "description": "",
-      "properties": {
-        "auditee_ein": {
-          "type": ["string", "null"]
-        },
-        "federal_awards": {
-          "items": {
-            "$ref": "#/$defs/FederalAwardEntry"
-          },
-          "type": "array"
-        },
-        "total_amount_expended": {
-          "type": "number",
-          "minimum": 0
-        }
-      },
-      "required": [
-        "auditee_ein",
-        "total_amount_expended"
-      ],
-      "title": "FederalAwards",
-      "type": "object"
-    },
-    "MajorProgramAuditReportType": {
-      "description": "",
-      "enum": [
-        "U",
-        "Q",
-        "A",
-        "D"
-      ],
-      "title": "MajorProgramAuditReportType",
-      "type": "string"
-    },
-    "OrganizationType": {
-      "description": "",
-      "enum": [
-        "state",
-        "local",
-        "tribal",
-        "higher-ed",
-        "non-profit",
-        "unknown",
-        "none"
-      ],
-      "title": "OrganizationType",
-      "type": "string"
-    },
-    "SubmissionStatus": {
-      "description": "",
-      "enum": [
-        "in_progress",
-        "submitted",
-        "received",
-        "available"
-      ],
-      "title": "SubmissionStatus",
-      "type": "string"
-    },
-    "TreeRoot": {
-      "additionalProperties": false,
-      "description": "Container thing",
-      "properties": {
-        "FederalAwards": {
-          "$ref": "#/$defs/FederalAwards"
-        }
-      },
-      "required": [
-        "FederalAwards"
-      ],
-      "title": "TreeRoot",
-      "type": "object"
-    },
-    "YorN": {
-      "description": "",
-      "enum": [
-        "Y",
-        "N"
-      ],
-      "title": "YorN",
-      "type": "string"
-    },
-    "NA": {
-      "description": "",
-      "enum": [
-        "N/A"
-      ],
-      "title": "N/A",
-      "type": "string"
-    }
-  },
-  "$id": "http://example.org/federalawards",
-  "$schema": "http://json-schema.org/draft/2019-09/schema#",
-  "additionalProperties": true,
-  "metamodel_version": "1.7.0",
-  "properties": {
-    "FederalAwards": {
-      "$ref": "#/$defs/FederalAwards"
-    }
-  },
-  "required": [
-    "FederalAwards"
-  ],
-  "title": "federalawards",
-  "type": "object",
-  "version": null
+         },
+         "required": [
+            "auditee_ein",
+            "total_amount_expended"
+         ],
+         "title": "FederalAward",
+         "type": "object",
+         "version": 20230408
+      }
+   },
+   "title": "UNNAMED",
+   "type": "object",
+   "version": 20230408
 }

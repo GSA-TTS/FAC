@@ -19,6 +19,9 @@ assignees: ''
 **For engineers, also...**
 
 - [ ] Make a PR to [remove the departing team member from the list of developers and managers](https://github.com/GSA-TTS/FAC/tree/main/terraform/management/config.tf) with access to our spaces.
+- [ ] [Remove the departing team member as a member of the FAC group in New Relic.](https://one.newrelic.com/admin-portal/organizations/users-list) (@GSA-TTS/fac-admins can do this)
+    - [ ] If they're leaving TTS altogether, also delete their account. 
+
 
 **For product leads/owners, also...**
 

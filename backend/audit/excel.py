@@ -21,22 +21,27 @@ ColumnMapping = dict[str, tuple[str, str, Callable[[Any, Any, Any], Any]]]
 
 
 def _set_pass_through_entity_name(obj, target, value):
-    [
+    for index, v in enumerate(value.split("|")):
         _set_by_path(obj, f"{target}[{index}].name", v)
-        for index, v in enumerate(value.split("|"))
-    ]
 
 
 def _set_pass_through_entity_id(obj, target, value):
-    [
+    for index, v in enumerate(value.split("|")):
         _set_by_path(obj, f"{target}[{index}].identifying_number", v)
-        for index, v in enumerate(value.split("|"))
-    ]
 
 
 federal_awards_field_mapping: FieldMapping = {
     "auditee_ein": ("FederalAwards.auditee_ein", _set_by_path),
     "total_amount_expended": ("FederalAwards.total_amount_expended", _set_by_path),
+}
+corrective_action_field_mapping: FieldMapping = {
+    "auditee_ein": ("CorrectiveActionPlan.auditee_ein", _set_by_path),
+}
+findings_uniform_guidance_field_mapping: FieldMapping = {
+    "auditee_ein": ("FindingsUniformGuidance.auditee_ein", _set_by_path),
+}
+findings_text_field_mapping: FieldMapping = {
+    "auditee_ein": ("FindingsText.auditee_ein", _set_by_path),
 }
 
 federal_awards_column_mapping: ColumnMapping = {
@@ -45,58 +50,171 @@ federal_awards_column_mapping: ColumnMapping = {
         "amount_expended",
         _set_by_path,
     ),
-    "cluster_name": ("FederalAwards.federal_awards", "cluster_name", _set_by_path),
-    "direct_award": ("FederalAwards.federal_awards", "direct_award", _set_by_path),
+    "cluster_name": ("FederalAwards.federal_awards", "cluster.name", _set_by_path),
+    # 20230410 MCJ FIXME: I don't think we extract the cluster total?
+    # Perhaps it is lacking a named range?
+    # "cluster_total": ("FederalAwards.federal_awards", "cluster.total", _set_by_path),
+    "direct_award": (
+        "FederalAwards.federal_awards",
+        "direct_or_indirect_award.is_direct",
+        _set_by_path,
+    ),
     "direct_award_pass_through_entity_name": (
         "FederalAwards.federal_awards",
-        "direct_award_pass_through_entities",
+        "direct_or_indirect_award.entities",
         _set_pass_through_entity_name,
     ),
     "direct_award_pass_through_entity_id": (
         "FederalAwards.federal_awards",
-        "direct_award_pass_through_entities",
+        "direct_or_indirect_award.entities",
         _set_pass_through_entity_id,
     ),
     "federal_award_passed_to_subrecipients": (
         "FederalAwards.federal_awards",
-        "federal_award_passed_to_subrecipients",
+        "subrecipients.is_passed",
         _set_by_path,
     ),
     "federal_award_passed_to_subrecipients_amount": (
         "FederalAwards.federal_awards",
-        "federal_award_passed_to_subrecipients_amount",
+        "subrecipients.amount",
         _set_by_path,
     ),
     "federal_program_name": (
         "FederalAwards.federal_awards",
-        "federal_program_name",
+        "program.name",
         _set_by_path,
     ),
     "loan_balance_at_audit_period_end": (
         "FederalAwards.federal_awards",
-        "loan_balance_at_audit_period_end",
+        "loan_or_loan_guarantee.loan_balance_at_audit_period_end",
         _set_by_path,
     ),
     "loan_or_loan_guarantee": (
         "FederalAwards.federal_awards",
-        "loan_or_loan_guarantee",
+        "loan_or_loan_guarantee.is_guaranteed",
         _set_by_path,
     ),
-    "major_program": ("FederalAwards.federal_awards", "major_program", _set_by_path),
+    "major_program": ("FederalAwards.federal_awards", "program.is_major", _set_by_path),
     "major_program_audit_report_type": (
         "FederalAwards.federal_awards",
-        "major_program_audit_report_type",
+        "program.audit_report_type",
         _set_by_path,
     ),
     "number_of_audit_findings": (
         "FederalAwards.federal_awards",
-        "number_of_audit_findings",
+        "program.number_of_audit_findings",
         _set_by_path,
     ),
-    "program_number": ("FederalAwards.federal_awards", "program_number", _set_by_path),
+    "program_number": ("FederalAwards.federal_awards", "program.number", _set_by_path),
     "state_cluster_name": (
         "FederalAwards.federal_awards",
-        "state_cluster_name",
+        "cluster.state_cluster_name",
+        _set_by_path,
+    ),
+    "other_cluster_name": (
+        "FederalAwards.federal_awards",
+        "cluster.other_cluster_name",
+        _set_by_path,
+    ),
+}
+corrective_action_column_mapping: ColumnMapping = {
+    "contains_chart_or_table": (
+        "CorrectiveActionPlan.corrective_action_plan_entries",
+        "contains_chart_or_table",
+        _set_by_path,
+    ),
+    "planned_action": (
+        "CorrectiveActionPlan.corrective_action_plan_entries",
+        "planned_action",
+        _set_by_path,
+    ),
+    "reference_number": (
+        "CorrectiveActionPlan.corrective_action_plan_entries",
+        "reference_number",
+        _set_by_path,
+    ),
+}
+findings_uniform_guidance_column_mapping: ColumnMapping = {
+    "program_number": (
+        "FindingsUniformGuidance.findings_uniform_guidance_entries",
+        "program.number",
+        _set_by_path,
+    ),
+    "program_name": (
+        "FindingsUniformGuidance.findings_uniform_guidance_entries",
+        "program.name",
+        _set_by_path,
+    ),
+    "compliance_requirement": (
+        "FindingsUniformGuidance.findings_uniform_guidance_entries",
+        "program.compliance_requirement",
+        _set_by_path,
+    ),
+    "finding_reference_number": (
+        "FindingsUniformGuidance.findings_uniform_guidance_entries",
+        "findings.reference",
+        _set_by_path,
+    ),
+    "repeat_prior_reference": (
+        "FindingsUniformGuidance.findings_uniform_guidance_entries",
+        "findings.repeat_prior_reference",
+        _set_by_path,
+    ),
+    "prior_references": (
+        "FindingsUniformGuidance.findings_uniform_guidance_entries",
+        "findings.prior_references",
+        _set_by_path,
+    ),
+    "is_valid": (
+        "FindingsUniformGuidance.findings_uniform_guidance_entries",
+        "findings.is_valid",
+        _set_by_path,
+    ),
+    "questioned_costs": (
+        "FindingsUniformGuidance.findings_uniform_guidance_entries",
+        "questioned_costs",
+        _set_by_path,
+    ),
+    "significiant_deficiency": (
+        "FindingsUniformGuidance.findings_uniform_guidance_entries",
+        "significiant_deficiency",
+        _set_by_path,
+    ),
+    "other_matters": (
+        "FindingsUniformGuidance.findings_uniform_guidance_entries",
+        "other_matters",
+        _set_by_path,
+    ),
+    "other_findings": (
+        "FindingsUniformGuidance.findings_uniform_guidance_entries",
+        "other_findings",
+        _set_by_path,
+    ),
+    "modified_opinion": (
+        "FindingsUniformGuidance.findings_uniform_guidance_entries",
+        "modified_opinion",
+        _set_by_path,
+    ),
+    "material_weakness": (
+        "FindingsUniformGuidance.findings_uniform_guidance_entries",
+        "material_weakness",
+        _set_by_path,
+    ),
+}
+findings_text_column_mapping: ColumnMapping = {
+    "reference_number": (
+        "FindingsText.findings_text_entries",
+        "reference_number",
+        _set_by_path,
+    ),
+    "contains_chart_or_table": (
+        "FindingsText.findings_text_entries",
+        "contains_chart_or_table",
+        _set_by_path,
+    ),
+    "text_of_finding": (
+        "FindingsText.findings_text_entries",
+        "text_of_finding",
         _set_by_path,
     ),
 }
@@ -171,20 +289,13 @@ def extract_data(file, field_mapping: FieldMapping, column_mapping: ColumnMappin
     workbook = _open_workbook(file)
 
     try:
-        [
+        for name, (target, set_fn) in field_mapping.items():
             set_fn(result, target, _extract_single_value(workbook, name))
-            for name, (target, set_fn) in field_mapping.items()
-        ]
 
-        for name, (
-            parent_target,
-            field_target,
-            set_fn,
-        ) in column_mapping.items():
-            [
+        for name, (parent_target, field_target, set_fn) in column_mapping.items():
+            for index, value in enumerate(_extract_column(workbook, name)):
                 set_fn(result, f"{parent_target}[{index}].{field_target}", value)
-                for index, value in enumerate(_extract_column(workbook, name))
-            ]
+
     except AttributeError as e:
         raise ExcelExtractionError(e)
 
@@ -195,3 +306,21 @@ def extract_federal_awards(file):
     return extract_data(
         file, federal_awards_field_mapping, federal_awards_column_mapping
     )
+
+
+def extract_corrective_action_plan(file):
+    return extract_data(
+        file, corrective_action_field_mapping, corrective_action_column_mapping
+    )
+
+
+def extract_findings_uniform_guidance(file):
+    return extract_data(
+        file,
+        findings_uniform_guidance_field_mapping,
+        findings_uniform_guidance_column_mapping,
+    )
+
+
+def extract_findings_text(file):
+    return extract_data(file, findings_text_field_mapping, findings_text_column_mapping)

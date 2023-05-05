@@ -545,6 +545,7 @@ class Note(models.Model):
         max_length=40,
         help_text=docs.dbkey_notes,
     )
+    # consider changing these to numeric
     audit_year = models.CharField(
         "Audit Year and DBKEY (database key) combined make up the primary key.",
         max_length=40,

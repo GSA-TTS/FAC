@@ -41,7 +41,7 @@ lint:
 
 # Run Django tests:
 test:
-	@python -m coverage run --source="." manage.py test && coverage report -m --fail-under=90
+	@python -m coverage run --source="." manage.py test --parallel && coverage report -m --fail-under=90
 
 # Run Django tests with no coverage and with scoping
 # e.g. just the audit/test_models.py tests:
@@ -49,7 +49,7 @@ test:
 # or all tests with no coverage:
 #     make nctest
 nctest:
-	@python -m coverage run --source="." manage.py test ${fac.test.scope}
+	@python -m coverage run --source="." manage.py test --parallel ${fac.test.scope}
 
 docker-first-run:
 	docker compose build
@@ -64,8 +64,8 @@ docker-test:
 	docker compose build
 	docker compose run web python manage.py migrate
 	docker compose run web bash -c 'awslocal s3 mb s3://gsa-fac-private-s3'
-	docker compose run web python -m coverage run --source="." manage.py test
-	docker compose run web python -m coverage report -m --fail-under=90
+	docker-compose run web bash -c 'coverage run --parallel-mode --concurrency=multiprocessing manage.py test --parallel && \
+          coverage combine && coverage report -m --fail-under=90'
 
 # Run Django tests with docker with no coverage and with scoping
 # e.g. just the audit/test_models.py tests:
@@ -76,10 +76,14 @@ docker-nctest:
 	docker compose build
 	docker compose run web python manage.py migrate
 	docker compose run web bash -c 'awslocal s3 mb s3://gsa-fac-private-s3'
-	docker compose run web python manage.py test ${fac.test.scope}
+	docker compose run web python manage.py test --parallel ${fac.test.scope}
 
 docker-clean:
 	docker compose down
 	docker rm -f $(shell docker ps -a -q)
 	docker volume rm $(shell docker volume ls -q)
 	docker compose build
+
+docker-lint:
+	docker compose build
+	docker-compose run web bash -c 'flake8 && black --check . && bandit -c pyproject.toml -r . && mypy . && djlint .'

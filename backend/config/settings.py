@@ -9,12 +9,14 @@ https://docs.djangoproject.com/en/4.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.0/ref/settings/
 """
-
+import newrelic.agent
 from base64 import b64decode
 import os
 import json
 import environs
 from cfenv import AppEnv
+
+newrelic.agent.initialize()
 
 env = environs.Env()
 
@@ -186,7 +188,7 @@ CORS_ALLOWED_ORIGINS = [env.str("DJANGO_BASE_URL", "http://localhost:8000")]
 STATIC_URL = "/static/"
 
 # Environment specific configurations
-
+DEBUG = False
 if ENVIRONMENT not in ["DEVELOPMENT", "STAGING", "PRODUCTION"]:
     # Local environment and Testing environment (CI/CD/GitHub Actions)
 
@@ -323,6 +325,14 @@ else:
     # Will not be enabled in cloud environments
     DISABLE_AUTH = False
 
+# Remove once all Census data has been migrated
+# Add these as env vars, look at the bucket for values
+AWS_CENSUS_ACCESS_KEY_ID = secret("AWS_CENSUS_ACCESS_KEY_ID", "")
+AWS_CENSUS_SECRET_ACCESS_KEY = secret("AWS_CENSUS_SECRET_ACCESS_KEY", "")
+AWS_CENSUS_STORAGE_BUCKET_NAME = secret("AWS_CENSUS_STORAGE_BUCKET_NAME", "")
+AWS_S3_CENSUS_REGION_NAME = secret("AWS_S3_CENSUS_REGION_NAME", "")
+
+
 ADMIN_URL = "admin/"
 
 # Default primary key field type
@@ -352,7 +362,9 @@ SAM_API_URL = "https://api.sam.gov/entity-information/v3/entities"
 SAM_API_KEY = secret("SAM_API_KEY")
 
 SCHEMAS_DIR = os.path.join("audit", "schemas")
+# 20230408 MCJ FIXME: Why are there "sections?"
 SECTION_SCHEMA_DIR = os.path.join("schemas", "sections")
+
 
 AV_SCAN_URL = env.str("AV_SCAN_URL", "")
 AV_SCAN_MAX_ATTEMPTS = 10
