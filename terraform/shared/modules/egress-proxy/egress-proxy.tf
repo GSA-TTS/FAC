@@ -101,12 +101,15 @@ resource "cloudfoundry_network_policy" "client_routing" {
 ### 
 ### Create a credential service for bound clients to use when make requests of the proxy
 ###
+locals {
+  https_proxy = "https://${random_uuid.username.result}:${random_password.password.result}@${cloudfoundry_route.egress_route.endpoint}:61443"
+}
 
 resource "cloudfoundry_user_provided_service" "credentials" {
   name  = "${var.name}-creds"
   space = data.cloudfoundry_space.client_space.id
   credentials = {
-    "uri"      = "https://${random_uuid.username.result}:${random_password.password.result}@${cloudfoundry_route.egress_route.endpoint}:61443"
+    "uri"      = local.https_proxy
     "domain"   = cloudfoundry_route.egress_route.endpoint
     "username" = random_uuid.username.result
     "password" = random_password.password.result
