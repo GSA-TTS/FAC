@@ -27,27 +27,20 @@ class Command(BaseCommand):
     """
 
     def add_arguments(self, parser):
-        parser.add_argument("--view", type=str, help="API view")
+        parser.add_argument("--view", type=str, help="API view", default="vw_general")
         parser.add_argument(
             "-y",
             "--year",
             type=int,
             help="Four digit year to be validated",
-        )
-        parser.add_argument("--start", type=int, help="Result set start location")
-        parser.add_argument("--end", type=int, help="Result end location")
+            default=2022
+            )
+        parser.add_argument("--start", type=int, help="Result set start location", default=0)
+        parser.add_argument("--end", type=int, help="Result end location", default=100)
         parser.add_argument("--step", type=int, help="Result set step size")
 
     def handle(self, *args, **kwargs):
         print(kwargs)
-        if kwargs["year"] == None:
-            kwargs["year"] = 2022
-        if kwargs["view"] == None:
-            kwargs["view"] = "vw_general"
-        if kwargs["start"] == None:
-            kwargs["start"] = 0
-        if kwargs["end"] == None:
-            kwargs["end"] = 10000
         if kwargs["step"] == None:
             kwargs["step"] = (kwargs["end"] - kwargs["start"]) // 2
          
