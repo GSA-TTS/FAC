@@ -37,7 +37,7 @@ class Command(BaseCommand):
             )
         parser.add_argument("--start", type=int, help="Result set start location", default=0)
         parser.add_argument("--end", type=int, help="Result end location", default=100)
-        parser.add_argument("--step", type=int, help="Result set step size")
+        parser.add_argument("--step", type=int, help="Result set step size", default=None)
 
     def handle(self, *args, **kwargs):
         print(kwargs)
@@ -49,8 +49,7 @@ class Command(BaseCommand):
         result_set = (fac.FAC()
                         .table(kwargs["view"])
                         .limits(kwargs["start"], kwargs["end"], kwargs["step"])
-                        .query("eq", "audit_year", kwargs["year"])
-                        .debug()
+                        #.query("eq", "audit_year", kwargs["year"])
                         ).run()
         if len(result_set) == 0:
             print(f"No results: {result_set}")

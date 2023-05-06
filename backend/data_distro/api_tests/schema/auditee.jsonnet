@@ -7,7 +7,7 @@ Types.object {
     auditee_certify_name: Types.StringOrNull,
     auditee_certify_title: Types.StringOrNull,
     auditee_contact: Types.StringOrNull,
-    auditee_email: Types.string,
+    auditee_email: Types.EmailOrNull,
     auditee_fax: Types.StringOrNull,
     auditee_name: Types.string,
     auditee_name_title: Types.string,

@@ -52,6 +52,8 @@ local type_uei = Types.string {
 };
 
 local phone_regex = '[1-9]{1}[0-9]{9}+';
+local e164_regex = '^\\+[0-9]{1,3}[ ]*[0-9]{2,3}[ ]*[0-9]{2,3}[ ]*[0-9]{4}|^\\+[0-9]{1,3}[ ]*[0-9]{1,14}([ ]*[0-9]{1,13})?|^\\([0-9]{3}\\)[ ]*[0-9]{3}[ ]*[0-9]{4}?';
+local email_regex = '^[a-zA-Z0-9!#$%&\'*+/=?^_`{|}~-]+(?:\\.[a-zA-Z0-9!#$%&\'*+/=?^_`{|}~-]+)*@(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?\\.)+[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?$';
 
 // Extend the Base.Types object.
 // Lets us transparently use the additional types in the
@@ -68,10 +70,28 @@ Base {
       type: 'array',
       items: type_uei,
     },
+    // PhoneNumber: {
+    //   type: 'integer',
+    //   minimum: 1000000000,
+    //   maximum: 9999999999,
+    // },
     PhoneNumber: {
-      type: 'integer',
-      minimum: 1000000000,
-      maximum: 9999999999,
+      type: 'string',
+      pattern: e164_regex
+    },
+    Email: {
+      type: 'string',
+      pattern: email_regex
+    },
+    EmailOrNull: {
+      type: ['string', Base.Const.NULL],
+      oneOf: [
+        {
+          type: "string",
+          pattern: email_regex
+        },
+        Types.NULL
+      ],
     },
     ZIP: type_zipcode,
     DBKEY: Base.Types.string {
