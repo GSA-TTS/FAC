@@ -28,7 +28,7 @@ def _test_framing(view_name, schema_file):
     schema = json.load(open(schema_file))
     failure_count = 0
     loop_step = 10000
-    for id_range in map(lambda ndx: (ndx*loop_step, (ndx*loop_step)+loop_step), range(0, 5)):
+    for id_range in map(lambda ndx: (ndx*loop_step, (ndx*loop_step)+loop_step), range(0, 10)):
         print(id_range)
         start = time()
         result_set = (FAC()

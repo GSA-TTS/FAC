@@ -16,7 +16,8 @@ local type_string_or_null = {
   ],
 };
 
-local REGEX_UEI_ALPHA = 'A-H,J-N,P-Z,a-h,j-n,p-z';
+// No capital I or O, but lowercase is fine? FIXME check...
+local REGEX_UEI_ALPHA = 'A-H,J-N,P-Z,a-z';
 local REGEX_UEI_LEADING_CLOISTER = '[' + REGEX_UEI_ALPHA + ',1-9]';
 local REGEX_UEI_BODY_CLOISTER = '[' + REGEX_UEI_ALPHA + ',0-9]';
 
