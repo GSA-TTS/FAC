@@ -67,16 +67,11 @@ class FAC:
 
     def get_results(self):
         qurl = self.api_uri + self._url
-        if self._debug:
-            print(qurl)
-        # print(f'[ {qurl} ]')
         results = []
         for start_point in range(self._start, self._end, self._step):
             step_end = start_point + self._step
             if step_end > self._end:
                 step_end = self._end - 1
-            if self._debug:
-                print(f'\t-- start[{start_point}] end[{step_end}] query_url[{qurl}]')
             res = requests.get(qurl, headers={'Range-Unit': "items", 
                                             "Range": f'{start_point}-{step_end}',
                                             'X-Api-Key': self.api_key
@@ -87,11 +82,8 @@ class FAC:
             # FIXME: There could be a list of length four when we have
             # an error... look more closely.
             if 'code' in json:
-                print(f"code: {json['code']}, msg: {json['message']}")
                 break
             else:
-                if self._debug:
-                    print(f'\t\tlen({len(json)})')
                 results += json
         return results
 
@@ -111,8 +103,5 @@ class FAC:
 
 if __name__ == "__main__":
     fac = FAC()
-    fac.table("vw_general").select(["id", "audit_year"]).limits(0, 1000, 1000).query("lt", "id", "50")
-    print(fac.path())
-    print(fac.url())
+    fac.table("vw_general").select(["id", "audit_year"]).limits(0, 1000, 500).query("lt", "id", "50")
     res = fac.run()
-    print(res)

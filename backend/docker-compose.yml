@@ -30,6 +30,7 @@ services:
       - "AV_SCAN_URL=http://clamav-rest:9000/scan"
       - "DISABLE_AUTH=${DISABLE_AUTH:-False}"
       - "LOCALSTACK_HOST=localstack"
+      - "API_GOV_KEY=${API_GOV_KEY}"
     env_file:
       - ".env"
     ports:

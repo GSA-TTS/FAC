@@ -1,6 +1,6 @@
 import json
 from jsonschema import validate
-from fac import FAC
+from data_distro.api_tests.fac import FAC
 from time import time
 from multiprocessing import Pool
 

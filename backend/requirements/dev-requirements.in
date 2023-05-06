@@ -6,6 +6,8 @@ black
 coverage
 djlint
 flake8
+jsonnet
+jsonschema
 localstack
 model_bakery
 mypy

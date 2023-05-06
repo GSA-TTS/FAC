@@ -1,4 +1,0 @@
-jsonnet
-requests
-jsonschema
-pytest

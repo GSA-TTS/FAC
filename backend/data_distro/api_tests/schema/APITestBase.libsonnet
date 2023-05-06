@@ -1,4 +1,4 @@
-local Base = import '../../../../schemas/sources/Base.libsonnet';
+local Base = import '../../../schemas/sources/Base.libsonnet';
 local Types = Base.Types;
 
 local REGEX_ZIPCODE = '^[0-9]{5}([0-9]{4})?$';

@@ -2,6 +2,7 @@ FROM python:3.10-slim AS builder
 
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
+ENV PIP_ROOT_USER_ACTION=ignore
 
 RUN apt-get -y update
 RUN apt-get -y install git
@@ -26,6 +27,10 @@ COPY requirements.txt /tmp/requirements.txt
 COPY dev-requirements.txt /tmp/dev-requirements.txt
 
 RUN \
+    apt-get update -yq && \
+    # We need build-essential for jsonnet
+    # https://github.com/google/jsonnet/issues/756
+    apt install build-essential -y && \
     set -ex && \
     pip install --upgrade pip && \
     pip install -r /tmp/requirements.txt && \

@@ -10,6 +10,7 @@ djangorestframework
 djangorestframework-simplejwt
 environs[django]
 gunicorn
+jsonnet
 jsonpath-ng
 jsonschema
 oic
