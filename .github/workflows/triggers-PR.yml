@@ -17,6 +17,10 @@ jobs:
     uses: ./.github/workflows/test.yml
     secrets: inherit
 
+  # download and scan docker images
+  download-and-scan:
+    uses: ./.github/workflows/download-image.yml
+
   # Update BPMN diagram
   sync-BPMN:
     uses: ./.github/workflows/add-bpmn-renders.yml
