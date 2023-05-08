@@ -39,10 +39,7 @@ function handleUploadErrors(error) {
         'Error when uploading file. See the console for more information.';
     });
   } else if (error.name === 'AbortError') {
-    console.error(
-      `Timeout - Response took longer than expected.\n`,
-      error
-    );
+    console.error(`Timeout - Response took longer than expected.\n`, error);
     info_box.innerHTML = `Timeout - Response took longer than expected.`;
   } else console.error(`Unexpected error.\n`, error);
 }
