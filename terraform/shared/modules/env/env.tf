@@ -29,7 +29,6 @@ module "egress-proxy" {
       # Login.gov sanbox
       "idp.int.identitysandbox.gov:443",
     ],
-    swagger = ["fac-${var.cf_space_name}-postgrest.app.cloud.gov:443"],
     # The parens here make Terraform understand that the key below is a reference
     # Solution from https://stackoverflow.com/a/57401750
     (local.clam_name) = ["database.clamav.net:443"],
