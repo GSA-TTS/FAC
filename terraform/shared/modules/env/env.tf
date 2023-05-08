@@ -25,6 +25,9 @@ module "egress-proxy" {
       # because it only allows subdomain wildcards in `*.` as a prefix. So this wildcard is a little broader than
       # we would prefer, but realistically the tightest domain mask we can specify given our current solution.
       "*.newrelic.com:443",
+
+      # Login.gov sanbox
+      "idp.int.identitysandbox.gov:443",
     ],
     swagger = ["fac-${var.cf_space_name}-postgrest.app.cloud.gov:443"],
     # The parens here make Terraform understand that the key below is a reference
