@@ -56,51 +56,55 @@ class SingleAuditChecklistTests(TestCase):
         """
         cases = (
             (
-                SingleAuditChecklist.STATUS.IN_PROGRESS,
+                [SingleAuditChecklist.STATUS.IN_PROGRESS],
                 SingleAuditChecklist.STATUS.READY_FOR_CERTIFICATION,
                 "transition_to_ready_for_certification",
             ),
             (
-                SingleAuditChecklist.STATUS.READY_FOR_CERTIFICATION,
+                [SingleAuditChecklist.STATUS.READY_FOR_CERTIFICATION],
                 SingleAuditChecklist.STATUS.AUDITOR_CERTIFIED,
                 "transition_to_auditor_certified",
             ),
             (
-                SingleAuditChecklist.STATUS.AUDITOR_CERTIFIED,
+                [SingleAuditChecklist.STATUS.AUDITOR_CERTIFIED],
                 SingleAuditChecklist.STATUS.AUDITEE_CERTIFIED,
                 "transition_to_auditee_certified",
             ),
             (
-                SingleAuditChecklist.STATUS.AUDITEE_CERTIFIED,
+                [SingleAuditChecklist.STATUS.AUDITEE_CERTIFIED],
                 SingleAuditChecklist.STATUS.CERTIFIED,
                 "transition_to_certified",
             ),
             (
-                SingleAuditChecklist.STATUS.CERTIFIED,
+                [
+                    SingleAuditChecklist.STATUS.AUDITEE_CERTIFIED,
+                    SingleAuditChecklist.STATUS.CERTIFIED,
+                ],
                 SingleAuditChecklist.STATUS.SUBMITTED,
                 "transition_to_submitted",
             ),
         )
 
-        for status_from, status_to, transition_name in cases:
-            sac = baker.make(SingleAuditChecklist, submission_status=status_from)
+        for statuses_from, status_to, transition_name in cases:
+            for status_from in statuses_from:
+                sac = baker.make(SingleAuditChecklist, submission_status=status_from)
 
-            transition_method = getattr(sac, transition_name)
-            transition_method()
+                transition_method = getattr(sac, transition_name)
+                transition_method()
 
-            self.assertEqual(sac.submission_status, status_to)
+                self.assertEqual(sac.submission_status, status_to)
 
-            bad_statuses = [
-                status[0]
-                for status in SingleAuditChecklist.STATUS_CHOICES
-                if status[0] is not status_from
-            ]
+                bad_statuses = [
+                    status[0]
+                    for status in SingleAuditChecklist.STATUS_CHOICES
+                    if status[0] not in statuses_from
+                ]
 
-            for bad_status in bad_statuses:
-                with self.subTest():
-                    sac.submission_status = bad_status
+                for bad_status in bad_statuses:
+                    with self.subTest():
+                        sac.submission_status = bad_status
 
-                    self.assertRaises(TransitionNotAllowed, transition_method)
+                        self.assertRaises(TransitionNotAllowed, transition_method)
 
 
 class AccessTests(TestCase):

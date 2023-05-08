@@ -179,7 +179,7 @@ class SingleAuditChecklist(models.Model):
 
     @transition(
         field="submission_status",
-        source=STATUS.CERTIFIED,
+        source=[STATUS.AUDITEE_CERTIFIED, STATUS.CERTIFIED],
         target=STATUS.SUBMITTED,
     )
     def transition_to_submitted(self):

@@ -35,14 +35,14 @@
   </div>
   <div class="grid-row grid-gap">
     <div class="usa-checkbox">
-      <input type="checkbox" disabled {% if certification.auditee_certified is True %}checked{% endif %} />
-      <a href="{% url 'audit:AuditeeCertification' report_id=report_id %}">Auditee Certification</a>
+      <input type="checkbox" disabled {% if certification.auditor_certified is True %}checked{% endif %} />
+      <a href="{% url 'audit:AuditorCertification' report_id=report_id %}">Auditor Certification</a>
     </div>
   </div>
   <div class="grid-row grid-gap">
     <div class="usa-checkbox">
-      <input type="checkbox" disabled {% if certification.auditor_certified is True %}checked{% endif %} />
-      <a href="{% url 'audit:AuditorCertification' report_id=report_id %}">Auditor Certification</a>
+      <input type="checkbox" disabled {% if certification.auditee_certified is True %}checked{% endif %} />
+      <a href="{% url 'audit:AuditeeCertification' report_id=report_id %}">Auditee Certification</a>
     </div>
   </div>
   <div class="grid-row grid-gap">
