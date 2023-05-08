@@ -48,7 +48,10 @@ module "clamav" {
   cf_space_name = var.cf_space_name
   clamav_image  = "ajilaag/clamav-rest:20230228"
   max_file_size = "30M"
-  https_proxy   = module.egress-proxy.https_proxy
+
+  # The following line is commented out until we have a way to pass the value of
+  # the variable to to docker image without it interfering with staging.
+  # https_proxy   = module.egress-proxy.https_proxy
 }
 
 module "database" {
