@@ -63,20 +63,21 @@ setTimeout(() => {
 function attachFileUploadHandler() {
   file_input.addEventListener('change', (e) => {
     try {
+      info_box.hidden = false;
+      info_box.innerHTML = 'Validating your file...';
+
       const currentURL = new URL(window.location.href);
       const report_submission_url =
         UPLOAD_URLS[currentURL.pathname.split('/')[2]];
-      if (!e.target.files[0]) {
-        throw 'No file chosen';
-      }
+      if (!report_submission_url) throw 'No upload URL available.';
+      if (!e.target.files[0]) throw 'No file selected.';
+      if (e.target.files[0].name.split('.').pop() !== 'xlsx')
+        throw 'File type not accepted.';
 
       var data = new FormData();
       data.append('FILES', e.target.files[0]);
       data.append('filename', e.target.files[0].name);
       data.append('sac_id', sac_id);
-
-      info_box.hidden = false;
-      info_box.innerHTML = 'Validating your file...';
 
       fetch(`/audit/excel/${report_submission_url}/${sac_id}`, {
         method: 'POST',
@@ -98,6 +99,7 @@ function attachFileUploadHandler() {
           handleUploadErrors(error);
         });
     } catch (error) {
+      info_box.innerHTML = `Error when sending excel file.\n ${error}`;
       console.error('Error when sending excel file.\n', error);
     }
   });
