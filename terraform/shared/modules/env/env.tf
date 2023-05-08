@@ -25,8 +25,10 @@ module "egress-proxy" {
       # because it only allows subdomain wildcards in `*.` as a prefix. So this wildcard is a little broader than
       # we would prefer, but realistically the tightest domain mask we can specify given our current solution.
       "*.newrelic.com:443",
+
+      # Login.gov sanbox
+      "idp.int.identitysandbox.gov:443",
     ],
-    swagger = ["fac-${var.cf_space_name}-postgrest.app.cloud.gov:443"],
     # The parens here make Terraform understand that the key below is a reference
     # Solution from https://stackoverflow.com/a/57401750
     (local.clam_name) = ["database.clamav.net:443"],
@@ -45,7 +47,10 @@ module "clamav" {
   cf_space_name = var.cf_space_name
   clamav_image  = "ajilaag/clamav-rest:20230228"
   max_file_size = "30M"
-  https_proxy   = module.egress-proxy.https_proxy
+
+  # The following line is commented out until we have a way to pass the value of
+  # the variable to to docker image without it interfering with staging.
+  # https_proxy   = module.egress-proxy.https_proxy
 }
 
 module "database" {
