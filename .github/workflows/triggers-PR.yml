@@ -18,8 +18,8 @@ jobs:
     secrets: inherit
 
   # download and scan docker images
-  download-and-scan:
-    uses: ./.github/workflows/download-image.yml
+  # docker-update:
+  #   uses: ./.github/workflows/download-image.yml
 
   # Update BPMN diagram
   sync-BPMN:
