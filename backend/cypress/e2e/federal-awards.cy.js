@@ -8,15 +8,6 @@ describe('Federal awards page', () => {
       cy.url().should('include','/report_submission/federal-awards/2022XB40001000002');
     });
 
-    // it('Page fails to loads unsuccessfully', () => {
-    //     cy.request({
-    //         url:'/report_submission/federal-awards/',
-    //     }).then((reponse) => {
-    //         expect(response.status).to.eq(404);
-    //     });
-    // });
-  // });
-
   describe('File upload successful', () => {
       it('Successfully uploads Federal Awards', () => {
         cy.intercept('/audit/excel/FederalAwardsExpended/*', {

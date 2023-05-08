@@ -85,22 +85,5 @@ describe('File upload successful', () => {
         cy.wait(2000).get('#info_box').should('have.text','Error on validation. See console for more information.');
       })
     })
-    // it('Federal Awards drag and drop upload', () => {
-    //   cy.visit('report_submission/federal-awards/20225DZ0001000001');
-    //   const source = cy.get('#file-input-federal-awards-xlsx');
-    //   const target = cy.get('#drop-target');
-    //   // trigger the drag-and-drop event sequence
-    //   source.trigger('dragstart');
-    //   target.trigger('dragenter');
-    //   target.trigger('dragover');
-    //   target.trigger('drop');
-    //   source.trigger('dragend');
-    //   // wait for the file to be processed
-    //   cy.wait(10000);
-    //   // assert that the file was uploaded successfully
-    //   cy.get('#file-input-federal-awards-xlsx').contains('FederalAwardsExpendedTemplateUG2019.xlsx');
-    //   cy.get('#continue').click();
-    //   cy.wait(10000);
-    //   cy.get('#info_box').should('have.text','File successfully validated!');
-    // });
+    
   })
