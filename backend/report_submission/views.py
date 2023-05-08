@@ -221,7 +221,7 @@ class UploadPageView(LoginRequiredMixin, View):
             },
             "additional-EINs": {
                 "view_id": "additional-EINs",
-                "view_name": "Secondary auditors",
+                "view_name": "Additional EINs",
                 "instructions": "Enter any additional EINs using the provided worksheet.",
             },
             "additional-UEIs": {
@@ -254,7 +254,10 @@ class UploadPageView(LoginRequiredMixin, View):
             path_name = request.path.split("/")[2]
             for item in additional_context[path_name]:
                 context[item] = additional_context[path_name][item]
-            context["already_submitted"] = getattr(sac, additional_context[path_name]["DB_id"])
+            try:
+                context["already_submitted"] = getattr(sac, additional_context[path_name]["DB_id"])
+            except:
+                context["already_submitted"] = None
 
             return render(request, "report_submission/upload-page.html", context)
         except SingleAuditChecklist.DoesNotExist:
