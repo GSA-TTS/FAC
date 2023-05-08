@@ -40,12 +40,10 @@ function handleUploadErrors(error) {
     });
   } else if (error.name === 'AbortError') {
     console.error(
-      `Timeout - Response took longer than ${UPLOAD_TIMEOUT / 1000} seconds.\n`,
+      `Timeout - Response took longer than expected.\n`,
       error
     );
-    info_box.innerHTML = `Timeout - Response took longer than ${
-      UPLOAD_TIMEOUT / 1000
-    } seconds.`;
+    info_box.innerHTML = `Timeout - Response took longer than expected.`;
   } else console.error(`Unexpected error.\n`, error);
 }
 
