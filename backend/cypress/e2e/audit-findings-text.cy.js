@@ -8,14 +8,6 @@ describe('Audit findings text page', () => {
       cy.url().should('include','/report_submission/audit-findings-text/2022XB40001000002');
     });
 
-    // it('Page fails to loads unsuccessfully', () => {
-    //     cy.request({
-    //         url:'/report_submission/audit-findings/',
-    //     }).then((reponse) => {
-    //         expect(response.status).to.eq(404);
-    //     });
-    // });
-
   });
 
   describe('File upload successful', () => {
