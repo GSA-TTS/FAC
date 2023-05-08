@@ -88,3 +88,7 @@ data "cloudfoundry_domain" "public" {
   name = "app.cloud.gov"
 }
 
+data "cloudfoundry_domain" "private" {
+  name = "apps.internal"
+}
+
