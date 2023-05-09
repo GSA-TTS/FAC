@@ -1,8 +1,29 @@
 import re
+from pathlib import Path
+import json
+from django.conf import settings
 from typing import Any, Callable
 from openpyxl import load_workbook, Workbook
 from openpyxl.cell import Cell
+from audit.fixtures.excel import (
+    CORRECTIVE_ACTION_TEMPLATE_DEFINITION,
+    FEDERAL_AWARDS_TEMPLATE_DEFINITION,
+    FINDINGS_TEXT_TEMPLATE_DEFINITION,
+    FINDINGS_UNIFORM_TEMPLATE_DEFINITION,
+)
 import pydash
+
+
+AWARD_ENTITY_NAME_PATH = (
+    "FederalAwards.federal_awards.direct_or_indirect_award.entities.name"
+)
+AWARD_ENTITY_ID_PATH = (
+    "FederalAwards.federal_awards.direct_or_indirect_award.entities.identifying_number"
+)
+AWARD_ENTITY_NAME_KEY = "direct_award_pass_through_entity_name"
+AWARD_ENTITY_ID_KEY = "direct_award_pass_through_entity_id"
+
+XLSX_TEMPLATE_DEFINITION_DIR = Path(settings.XLSX_TEMPLATE_DIR)
 
 
 def _set_by_path(target_obj, target_path, value):
@@ -60,12 +81,12 @@ federal_awards_column_mapping: ColumnMapping = {
         "direct_or_indirect_award.is_direct",
         _set_by_path,
     ),
-    "direct_award_pass_through_entity_name": (
+    AWARD_ENTITY_NAME_KEY: (
         "FederalAwards.federal_awards",
         "direct_or_indirect_award.entities",
         _set_pass_through_entity_name,
     ),
-    "direct_award_pass_through_entity_id": (
+    AWARD_ENTITY_ID_KEY: (
         "FederalAwards.federal_awards",
         "direct_or_indirect_award.entities",
         _set_pass_through_entity_id,
@@ -271,7 +292,8 @@ def _extract_column(workbook, name):
                 )
 
             if cell[0].value is not None:
-                yield cell[0].value
+                # Return row number and value
+                yield cell[0].row, cell[0].value
 
 
 def _open_workbook(file):
@@ -281,7 +303,23 @@ def _open_workbook(file):
         return load_workbook(filename=file, data_only=True)
 
 
-def extract_data(file, field_mapping: FieldMapping, column_mapping: ColumnMapping):
+def _get_entries_by_path(dictionary, path):
+    keys = path.split(".")
+    val = dictionary
+    for key in keys:
+        try:
+            val = val[key]
+        except KeyError:
+            return []
+    return val
+
+
+def _extract_data(
+    file,
+    field_mapping: FieldMapping,
+    column_mapping: ColumnMapping,
+    data_row_start: int = 3,
+):
     """
     Extracts data from an Excel file using provided field and column mappings
     """
@@ -293,9 +331,22 @@ def extract_data(file, field_mapping: FieldMapping, column_mapping: ColumnMappin
         for name, (target, set_fn) in field_mapping.items():
             set_fn(result, target, _extract_single_value(workbook, name))
 
-        for name, (parent_target, field_target, set_fn) in column_mapping.items():
-            for index, value in enumerate(_extract_column(workbook, name)):
+        for i, (name, (parent_target, field_target, set_fn)) in enumerate(
+            column_mapping.items()
+        ):
+            row_value_pairs = list(_extract_column(workbook, name))
+            for row, value in row_value_pairs:
+                index = (row - data_row_start) - 1  # Subtract 1 to make it zero-indexed
                 set_fn(result, f"{parent_target}[{index}].{field_target}", value)
+
+            # Necessary to prevent null entries when index/row is skipped in first column
+            if i == 0:
+                entries = [
+                    entry if entry is not None else {}
+                    for entry in _get_entries_by_path(result, parent_target)
+                ]
+                if entries:
+                    set_fn(result, f"{parent_target}", entries)
 
     except AttributeError as e:
         raise ExcelExtractionError(e)
@@ -304,58 +355,118 @@ def extract_data(file, field_mapping: FieldMapping, column_mapping: ColumnMappin
 
 
 def extract_federal_awards(file):
-    return extract_data(
-        file, federal_awards_field_mapping, federal_awards_column_mapping
+    template_definition_path = (
+        XLSX_TEMPLATE_DEFINITION_DIR / FEDERAL_AWARDS_TEMPLATE_DEFINITION
+    )
+    template = json.loads(template_definition_path.read_text(encoding="utf-8"))
+    return _extract_data(
+        file,
+        federal_awards_field_mapping,
+        federal_awards_column_mapping,
+        template["title_row"],
     )
 
 
 def extract_corrective_action_plan(file):
-    return extract_data(
-        file, corrective_action_field_mapping, corrective_action_column_mapping
+    template_definition_path = (
+        XLSX_TEMPLATE_DEFINITION_DIR / CORRECTIVE_ACTION_TEMPLATE_DEFINITION
+    )
+    template = json.loads(template_definition_path.read_text(encoding="utf-8"))
+    return _extract_data(
+        file,
+        corrective_action_field_mapping,
+        corrective_action_column_mapping,
+        template["title_row"],
     )
 
 
 def extract_findings_uniform_guidance(file):
-    return extract_data(
+    template_definition_path = (
+        XLSX_TEMPLATE_DEFINITION_DIR / FINDINGS_UNIFORM_TEMPLATE_DEFINITION
+    )
+    template = json.loads(template_definition_path.read_text(encoding="utf-8"))
+    return _extract_data(
         file,
         findings_uniform_guidance_field_mapping,
         findings_uniform_guidance_column_mapping,
+        template["title_row"],
     )
 
 
 def extract_findings_text(file):
-    return extract_data(file, findings_text_field_mapping, findings_text_column_mapping)
+    template_definition_path = (
+        XLSX_TEMPLATE_DEFINITION_DIR / FINDINGS_TEXT_TEMPLATE_DEFINITION
+    )
+    template = json.loads(template_definition_path.read_text(encoding="utf-8"))
+    return _extract_data(
+        file,
+        findings_text_field_mapping,
+        findings_text_column_mapping,
+        template["title_row"],
+    )
+
+
+def _extract_from_column_mapping(path, row_index, column_mapping, match=None):
+    """Extract named ranges from column mapping"""
+    for key, value in column_mapping.items():
+        if len(value) > 2 and (
+            value[0] + "." + value[1] == path
+            or (match and value[0] + "." + value[1] == path + "." + match.group(1))
+        ):
+            return key, row_index
+    return None, None
+
+
+def _extract_from_field_mapping(path, field_mapping, match=None):
+    """Extract named ranges from field mapping"""
+    for key, value in field_mapping.items():
+        if len(value) == 2 and (
+            value[0] == path or (match and value[0] == ".".join([path, match.group(1)]))
+        ):
+            return key, None
+    return None, None
 
 
 def _extract_named_ranges(errors, column_mapping, field_mapping):
     """Extract named ranges from column mapping and errors"""
     named_ranges = []
     for error in errors:
-        if bool(error.path):
-            # This works because we only expecting a single index in error.path for all column mappings except for two egde cases
-            row_index = next(
-                (item for item in error.path if isinstance(item, int)), None
-            )
-            path = ".".join([item for item in error.path if not isinstance(item, int)])
-
-            # Extract named ranges from column mapping
-            for key, value in column_mapping.items():
-                if len(value) > 2 and value[0] + "." + value[1] == path:
-                    named_ranges.append((key, row_index))
-                    break
-            # Extract named ranges from field mapping
-            for key, value in field_mapping.items():
-                if (
-                    len(value) == 2
-                    and error.message
-                    and value[0]
-                    == ".".join([path, re.search(r"'(\w+)'", error.message).group(1)])
-                ):
-                    named_ranges.append((key, None))
-                    break
-
-        else:
+        if not bool(error.path):
             print("No path found in error object")
+            continue
+
+        keyFound = None
+        match = None
+        row_index = next((item for item in error.path if isinstance(item, int)), None)
+        path = ".".join([item for item in error.path if not isinstance(item, int)])
+        if error.message:
+            match = re.search(r"'(\w+)'", error.message)
+
+        # Extract named ranges from column mapping for award entities
+        if path in [AWARD_ENTITY_NAME_PATH, AWARD_ENTITY_ID_PATH]:
+            key = (
+                AWARD_ENTITY_NAME_KEY
+                if path == AWARD_ENTITY_NAME_PATH
+                else AWARD_ENTITY_ID_KEY
+            )
+            named_ranges.append((key, row_index))
+            keyFound = key
+
+        if not keyFound:
+            keyFound, row_index = _extract_from_column_mapping(
+                path, row_index, column_mapping, match
+            )
+            if keyFound:
+                named_ranges.append((keyFound, row_index))
+
+        if not keyFound:
+            keyFound, _ = _extract_from_field_mapping(path, field_mapping, match)
+            if keyFound:
+                named_ranges.append((keyFound, None))
+
+        if not keyFound:
+            print(f"No named range matches this error path: {error.path}")
+
     return named_ranges
 
 
