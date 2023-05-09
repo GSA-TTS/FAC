@@ -17,7 +17,7 @@ resource "cloudfoundry_app" "swagger" {
   memory            = 256
   disk_quota        = 256
   instances         = var.swagger_instances
-  strategy          = "blue-green"
+  strategy          = "rolling"
   routes {
     route = cloudfoundry_route.swagger.id
   }
