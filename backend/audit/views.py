@@ -137,7 +137,7 @@ class ExcelFileHandlerView(LoginRequiredMixin, generic.View):
             raise PermissionDenied()
         except ValidationError as e:
             logger.warn(f"{form_section} Excel upload failed validation: {e}")
-            raise BadRequest()
+            raise BadRequest(e)
         except MultiValueDictKeyError:
             logger.warn("no file found in request")
             raise BadRequest()
