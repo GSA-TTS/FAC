@@ -17,6 +17,12 @@ from audit.excel import (
     findings_text_named_ranges,
     findings_uniform_guidance_named_ranges,
 )
+from audit.fixtures.excel import (
+    CORRECTIVE_ACTION_TEMPLATE_DEFINITION,
+    FEDERAL_AWARDS_TEMPLATE_DEFINITION,
+    FINDINGS_TEXT_TEMPLATE_DEFINITION,
+    FINDINGS_UNIFORM_TEMPLATE_DEFINITION,
+)
 
 
 logger = logging.getLogger(__name__)
@@ -140,6 +146,7 @@ def validate_corrective_action_plan_json(value):
     root = Path(settings.SECTION_SCHEMA_DIR)
     schema_path = root / "CorrectiveActionPlan.schema.json"
     schema = json.loads(schema_path.read_text(encoding="utf-8"))
+
     validator = Draft7Validator(schema)
     errors = list(validator.iter_errors(value))
     if len(errors) > 0:
@@ -153,13 +160,11 @@ def validate_federal_award_json(value):
     root = Path(settings.SECTION_SCHEMA_DIR)
     schema_path = root / "FederalAwards.schema.json"
     schema = json.loads(schema_path.read_text(encoding="utf-8"))
-    try:
-        validate(value, schema)
-    except JSONSchemaValidationError as err:
-        raise ValidationError(
-            _(err.message),
-        ) from err
-    return value
+
+    validator = Draft7Validator(schema)
+    errors = list(validator.iter_errors(value))
+    if len(errors) > 0:
+        raise ValidationError(message=_federal_awards_json_error(errors))
 
 
 def validate_general_information_json(value):
@@ -338,7 +343,7 @@ def _get_error_details(xlsx_definition_template, named_ranges_row_indices):
 def _corrective_action_json_error(errors):
     """Process JSON Schema errors for corrective actions"""
     template_definition_path = (
-        XLSX_TEMPLATE_DEFINITION_DIR / "corrective-action-plan-template.json"
+        XLSX_TEMPLATE_DEFINITION_DIR / CORRECTIVE_ACTION_TEMPLATE_DEFINITION
     )
     template = json.loads(template_definition_path.read_text(encoding="utf-8"))
     return _get_error_details(template, corrective_action_plan_named_ranges(errors))
@@ -347,7 +352,7 @@ def _corrective_action_json_error(errors):
 def _federal_awards_json_error(errors):
     """Process JSON Schema errors for federal actions"""
     template_definition_path = (
-        XLSX_TEMPLATE_DEFINITION_DIR / "federal-action-template.json"
+        XLSX_TEMPLATE_DEFINITION_DIR / FEDERAL_AWARDS_TEMPLATE_DEFINITION
     )
     template = json.loads(template_definition_path.read_text(encoding="utf-8"))
     return _get_error_details(template, federal_awards_named_ranges(errors))
@@ -356,7 +361,7 @@ def _federal_awards_json_error(errors):
 def _findings_text_json_error(errors):
     """Process JSON Schema errors for findings text"""
     template_definition_path = (
-        XLSX_TEMPLATE_DEFINITION_DIR / "findings-text-template.json"
+        XLSX_TEMPLATE_DEFINITION_DIR / FINDINGS_TEXT_TEMPLATE_DEFINITION
     )
     template = json.loads(template_definition_path.read_text(encoding="utf-8"))
     return _get_error_details(template, findings_text_named_ranges(errors))
@@ -365,7 +370,7 @@ def _findings_text_json_error(errors):
 def _findings_uniform_guidance_json_error(errors):
     """Process JSON Schema errors for findings uniform guidance"""
     template_definition_path = (
-        XLSX_TEMPLATE_DEFINITION_DIR / "findings-uniform-guidance-template.json"
+        XLSX_TEMPLATE_DEFINITION_DIR / FINDINGS_UNIFORM_TEMPLATE_DEFINITION
     )
     template = json.loads(template_definition_path.read_text(encoding="utf-8"))
     return _get_error_details(template, findings_uniform_guidance_named_ranges(errors))
