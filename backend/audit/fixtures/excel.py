@@ -1,5 +1,11 @@
 FEDERAL_AWARDS_TEMPLATE = "excel_templates/FederalAwardsExpendedTemplateUG2019.xlsx"
 FINDINGS_TEXT_TEMPLATE = "excel_templates/FindingsText2019-2022.xlsx"
+
+FEDERAL_AWARDS_TEMPLATE_DEFINITION = "federal-awards-expended-template.json"
+CORRECTIVE_ACTION_TEMPLATE_DEFINITION = "corrective-action-plan-template.json"
+FINDINGS_UNIFORM_TEMPLATE_DEFINITION = "findings-uniform-guidance-template.json"
+FINDINGS_TEXT_TEMPLATE_DEFINITION = "findings-text-template.json"
+
 CORRECTIVE_ACTION_PLAN_TEMPLATE = (
     "excel_templates/CorrectiveActionPlanTemplate2019-2022.xlsx"
 )
