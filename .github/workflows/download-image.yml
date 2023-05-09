@@ -9,7 +9,7 @@ jobs:
   docker-update:
     runs-on: ubuntu-latest
     env:
-      GCR_PAT: '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'
+      GCR_PAT: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - name: Checkout
         uses: actions/checkout@v2
