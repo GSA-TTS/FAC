@@ -1,5 +1,5 @@
 ---
-name: Docker Images
+name: Scan Images
 # on:
 #   schedule:
 #     - cron: "*/15 * * * *"
