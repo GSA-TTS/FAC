@@ -1,0 +1,59 @@
+---
+name: Scan Images
+# on:
+#   schedule:
+#     - cron: "*/15 * * * *"
+#   workflow_dispatch:
+on:
+  push:
+    paths:
+      - '.github/workflows/**'
+jobs:
+  docker-update:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    env:
+      GH_REPO: gsa-tts/fac
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Pull PostGREST Docker Image
+        run: docker pull postgrest/postgrest:latest
+      - name: Pull swagger Docker Image
+        run: docker pull swaggerapi/swagger-ui:latest
+      - name: Pull ClamAV Docker Image
+        run: docker pull clamav/clamav:latest
+
+      - name: grab trivy container
+        run: docker pull aquasec/trivy:latest
+      - name: Scan PostGREST
+        run: docker run  aquasec/trivy:latest image postgrest/postgrest:latest
+      - name: Scan swagger
+        run: docker run  aquasec/trivy:latest image swaggerapi/swagger-ui:latest
+      - name: Scan ClamAV
+        run: docker run  aquasec/trivy:latest image  --scanners vuln clamav/clamav:latest
+
+      - name: Tag PostGREST
+        run: docker tag postgrest/postgrest:latest ghcr.io/${{ env.GH_REPO }}/postgrest/postgrest:latest
+      - name: Tag swagger
+        run: docker tag swaggerapi/swagger-ui:latest ghcr.io/${{ env.GH_REPO }}/swaggerapi/swagger-ui:latest
+      - name: Tag ClamAV
+        run: docker tag clamav/clamav:latest ghcr.io/${{ env.GH_REPO }}/clamav/clamav:latest
+
+      - name: Login to GitHub Container Registry
+        # run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u $ --password-stdin
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Push PostGREST
+        run: docker push  ghcr.io/${{ env.GH_REPO }}/postgrest/postgrest:latest
+      - name: Push swagger
+        run: docker push  ghcr.io/${{ env.GH_REPO }}/swaggerapi/swagger-ui:latest
+      - name: Push ClamAV
+        run: docker push  ghcr.io/${{ env.GH_REPO }}/clamav/clamav:latest
