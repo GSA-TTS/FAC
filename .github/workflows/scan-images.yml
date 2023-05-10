@@ -15,7 +15,7 @@ jobs:
       contents: read
       packages: write
     env:
-      GCR_PAT: ${{ secrets.GITHUB_TOKEN }}
+      GH_REPO: gsa-tts/fac
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -37,11 +37,11 @@ jobs:
         run: docker run  aquasec/trivy:latest image  --scanners vuln clamav/clamav:latest
 
       - name: Tag PostGREST
-        run: docker tag postgrest/postgrest:latest ghcr.io/gsa-tts/fac/postgrest/postgrest:latest
+        run: docker tag postgrest/postgrest:latest ghcr.io/${{ env.GH_REPO }}/postgrest/postgrest:latest
       - name: Tag swagger
-        run: docker tag swaggerapi/swagger-ui:latest ghcr.io/gsa-tts/fac/swaggerapi/swagger-ui:latest
+        run: docker tag swaggerapi/swagger-ui:latest ghcr.io/${{ env.GH_REPO }}/swaggerapi/swagger-ui:latest
       - name: Tag ClamAV
-        run: docker tag clamav/clamav:latest ghcr.io/gsa-tts/fac/clamav/clamav:latest
+        run: docker tag clamav/clamav:latest ghcr.io/${{ env.GH_REPO }}/clamav/clamav:latest
 
       - name: Login to GitHub Container Registry
         # run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u $ --password-stdin
@@ -49,11 +49,11 @@ jobs:
         with:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
-          password: ${{ env.GCR_PAT }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Push PostGREST
-        run: docker push  ghcr.io/gsa-tts/fac/postgrest/postgrest:latest
+        run: docker push  ghcr.io/${{ env.GH_REPO }}/postgrest/postgrest:latest
       - name: Push swagger
-        run: docker push  ghcr.io/gsa-tts/fac/swaggerapi/swagger-ui:latest
+        run: docker push  ghcr.io/${{ env.GH_REPO }}/swaggerapi/swagger-ui:latest
       - name: Push ClamAV
-        run: docker push  ghcr.io/gsa-tts/fac/clamav/clamav:latest
+        run: docker push  ghcr.io/${{ env.GH_REPO }}/clamav/clamav:latest
