@@ -22,16 +22,7 @@ resource "cloudfoundry_app" "swagger" {
     route = cloudfoundry_route.swagger.id
   }
   environment = {
-    API_URL : "https://${cloudfoundry_route.postgrest-private.endpoint}"
-    SWAGGER_JSON_URL : "https://${cloudfoundry_route.postgrest-private.endpoint}"
+    API_URL : "https://${cloudfoundry_route.postgrest.endpoint}"
+    SWAGGER_JSON_URL : "https://${cloudfoundry_route.postgrest.endpoint}"
   }
 }
-
-resource "cloudfoundry_network_policy" "swagger_to_postgrest" {
-  policy {
-    source_app      = cloudfoundry_app.swagger.id_bg
-    destination_app = cloudfoundry_app.postgrest.id_bg
-    port            = "61443"
-  }
-}
-
