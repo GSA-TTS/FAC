@@ -11,6 +11,12 @@ export NEW_RELIC_APP_NAME="$(echo "$VCAP_APPLICATION" | jq -r .application_name)
 # Set the environment name for New Relic telemetry.
 export NEW_RELIC_ENVIRONMENT="$(echo "$VCAP_APPLICATION" | jq -r .space_name)"
 
+# Set Agent logging to stdout to be captured by CF Logs
+export NEW_RELIC_LOG=stdout
+
+# Logging level, (critical, error, warning, info and debug). Default to info
+#export NEW_RELIC_LOG_LEVEL=
+
 # export https_proxy="$(echo "$VCAP_SERVICES" | jq --raw-output --arg service_name "egress-creds" ".[][] | select(.name == \$service_name) | .credentials.uri")"
 
 # We only want to run migrate and collecstatic for the first app instance, not
