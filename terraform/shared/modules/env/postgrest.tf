@@ -9,9 +9,8 @@ resource "cloudfoundry_route" "postgrest" {
 }
 
 resource "cloudfoundry_service_key" "postgrest" {
-  name = "postgrest"
-  #   service_instance = module.database.instance_id
-  service_instance = data.cloudfoundry_service_instance.database.id
+  name             = "postgrest"
+  service_instance = module.database.instance_id
 }
 
 resource "cloudfoundry_app" "postgrest" {
@@ -22,10 +21,11 @@ resource "cloudfoundry_app" "postgrest" {
   memory       = 128
   disk_quota   = 256
   instances    = var.postgrest_instances
-  strategy     = "blue-green"
+  strategy     = "rolling"
   routes {
     route = cloudfoundry_route.postgrest.id
   }
+
   environment = {
     PGRST_DB_URI : cloudfoundry_service_key.postgrest.credentials.uri
     PGRST_DB_SCHEMAS : "api"

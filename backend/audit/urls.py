@@ -18,6 +18,36 @@ form_sections = [
 urlpatterns = [
     path("", views.MySubmissions.as_view(), name="MySubmissions"),
     path("<str:report_id>", views.EditSubmission.as_view(), name="EditSubmission"),
+    path(
+        "ready-for-certification/<str:report_id>",
+        views.ReadyForCertificationView.as_view(),
+        name="ReadyForCertification",
+    ),
+    path(
+        "auditor-certification/<str:report_id>",
+        views.AuditorCertificationView.as_view(),
+        name="AuditorCertification",
+    ),
+    path(
+        "auditee-certification/<str:report_id>",
+        views.AuditeeCertificationView.as_view(),
+        name="AuditeeCertification",
+    ),
+    path(
+        "certification/<str:report_id>",
+        views.CertificationView.as_view(),
+        name="Certification",
+    ),
+    path(
+        "submission/<str:report_id>",
+        views.SubmissionView.as_view(),
+        name="Submission",
+    ),
+    path(
+        "submission-progress/<str:report_id>",
+        views.SubmissionProgressView.as_view(),
+        name="SubmissionProgress",
+    ),
 ]
 
 for form_section in form_sections:

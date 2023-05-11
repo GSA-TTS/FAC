@@ -9,12 +9,14 @@ https://docs.djangoproject.com/en/4.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.0/ref/settings/
 """
-
+import newrelic.agent
 from base64 import b64decode
 import os
 import json
 import environs
 from cfenv import AppEnv
+
+newrelic.agent.initialize()
 
 env = environs.Env()
 
@@ -186,7 +188,7 @@ CORS_ALLOWED_ORIGINS = [env.str("DJANGO_BASE_URL", "http://localhost:8000")]
 STATIC_URL = "/static/"
 
 # Environment specific configurations
-
+DEBUG = False
 if ENVIRONMENT not in ["DEVELOPMENT", "STAGING", "PRODUCTION"]:
     # Local environment and Testing environment (CI/CD/GitHub Actions)
 

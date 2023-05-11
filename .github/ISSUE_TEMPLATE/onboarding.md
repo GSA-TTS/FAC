@@ -77,7 +77,7 @@ Note: If you're not able to do any of these yourself, you're still responsible f
 - [ ] [Add as a form manager to the touchpoints recruitment intercept](https://touchpoints.app.cloud.gov/admin/forms/9412c559/permissions)
 
 **For engineers, also...**
-- [ ] [...nothing currently...]
+- [ ] [Add as a member of the FAC group in New Relic](https://one.newrelic.com/admin-portal/organizations/users-list) (@GSA-TTS/fac-admins can do this)
 
 **For product leads/owners, also...**
 - [ ] Make them Owner of [the various Google Groups in the project README](https://docs.google.com/document/d/1g8nYqYS_ifFlZB-DBgfeSoJRMB__EqWsmLnacyk-bDI/edit#heading=h.81zynabayrrg)

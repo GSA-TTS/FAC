@@ -12,6 +12,7 @@ environs[django]
 gunicorn
 jsonpath-ng
 jsonschema
+newrelic
 oic
 openpyxl
 pandas
@@ -24,3 +25,4 @@ python-slugify
 pyyaml
 requests
 uritemplate
+django-fsm
