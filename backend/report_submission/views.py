@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 
 class ReportSubmissionRedirectView(View):
     def get(self, request):
-        return redirect(reverse("eligibility"))
+        return redirect(reverse("report_submission:eligibility"))
 
 
 # Step 1
@@ -35,10 +35,10 @@ class EligibilityFormView(LoginRequiredMixin, View):
     def post(self, post_request):
         eligibility = api.views.eligibility_check(post_request.user, post_request.POST)
         if eligibility.get("eligible"):
-            return redirect(reverse("auditeeinfo"))
+            return redirect(reverse("report_submission:auditeeinfo"))
 
         print("Eligibility data error: ", eligibility)
-        return redirect(reverse("eligibility"))
+        return redirect(reverse("report_submission:eligibility"))
 
 
 # Step 2
@@ -76,9 +76,9 @@ class AuditeeInfoFormView(LoginRequiredMixin, View):
 
         info_check = api.views.auditee_info_check(post_request.user, formatted_post)
         if info_check.get("errors"):
-            return redirect(reverse("auditeeinfo"))
+            return redirect(reverse("report_submission:auditeeinfo"))
 
-        return redirect(reverse("accessandsubmission"))
+        return redirect(reverse("report_submission:accessandsubmission"))
 
 
 # Step 3
@@ -100,7 +100,7 @@ class AccessAndSubmissionFormView(LoginRequiredMixin, View):
         if report_id:
             return redirect(f"/report_submission/general-information/{report_id}")
         print("Error processing data: ", result)
-        return redirect(reverse("accessandsubmission"))
+        return redirect(reverse("report_submission:accessandsubmission"))
 
 
 class GeneralInformationFormView(LoginRequiredMixin, View):
@@ -199,25 +199,29 @@ class UploadPageView(LoginRequiredMixin, View):
                 "view_id": "federal-awards",
                 "view_name": "Federal awards",
                 "instructions": "Enter the federal awards you received in the last audit year using the provided worksheet.",
+                "DB_id": "federal_awards",
             },
             "audit-findings": {
                 "view_id": "audit-findings",
                 "view_name": "Audit findings",
                 "instructions": "Enter the audit findings for your federal awards using the provided worksheet.",
+                "DB_id": "findings_uniform_guidance",
             },
             "audit-findings-text": {
                 "view_id": "audit-findings-text",
                 "view_name": "Audit findings text",
                 "instructions": "Enter the text for your audit findings using the provided worksheet.",
+                "DB_id": "findings_text",
             },
             "CAP": {
                 "view_id": "CAP",
                 "view_name": "Corrective Action Plan (CAP)",
                 "instructions": "Enter your CAP text using the provided worksheet.",
+                "DB_id": "corrective_action_plan",
             },
             "additional-EINs": {
                 "view_id": "additional-EINs",
-                "view_name": "Secondary auditors",
+                "view_name": "Additional EINs",
                 "instructions": "Enter any additional EINs using the provided worksheet.",
             },
             "additional-UEIs": {
@@ -250,6 +254,12 @@ class UploadPageView(LoginRequiredMixin, View):
             path_name = request.path.split("/")[2]
             for item in additional_context[path_name]:
                 context[item] = additional_context[path_name][item]
+            try:
+                context["already_submitted"] = getattr(
+                    sac, additional_context[path_name]["DB_id"]
+                )
+            except Exception:
+                context["already_submitted"] = None
 
             return render(request, "report_submission/upload-page.html", context)
         except SingleAuditChecklist.DoesNotExist:
@@ -270,6 +280,8 @@ class UploadPageView(LoginRequiredMixin, View):
         path_name = request.path.split("/")[2]
 
         try:
+            if "secondary-auditors" in path_name:
+                return redirect("/")
             return redirect(
                 "/report_submission/{nextURL}/{report_id}".format(
                     nextURL=nextURLs[path_name], report_id=report_id

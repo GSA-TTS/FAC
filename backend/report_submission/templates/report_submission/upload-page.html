@@ -35,8 +35,11 @@
                                aria-describedby="file-input-{{ view_id }}-xlsx"
                                accept=".xlsx"/>
                     </div>
+                    {% if already_submitted %}
+                        <p class="text-green" id="already-submitted">A file has already been uploaded for this section. A successful reupload will overwrite your previous submission.</p>
+                    {% endif %}
                     <p hidden id="info_box"></p>
-                    <button class="usa-button" id="continue" disabled="disabled">Save and continue to next section</button>
+                    <button class="usa-button" id="continue" disabled="disabled">Continue to next section</button>
                 </fieldset>
             </form>
         </div>

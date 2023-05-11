@@ -34,7 +34,7 @@ User = get_user_model()
 
 SUBMISSIONS_PATH = reverse("audit:MySubmissions")
 EDIT_PATH = "audit:EditSubmission"
-ACCESS_AND_SUBMISSION_PATH = reverse("accessandsubmission")
+ACCESS_AND_SUBMISSION_PATH = reverse("report_submission:accessandsubmission")
 
 VALID_ELIGIBILITY_DATA = {
     "is_usa_based": True,
@@ -133,6 +133,59 @@ class EditSubmissionViewTests(TestCase):
     def test_redirect_if_not_logged_in(self):
         result = self.client.get(reverse(EDIT_PATH, args=["SOME_REPORT_ID"]))
         self.assertAlmostEquals(result.status_code, 302)
+
+
+class SubmissionStatusTests(TestCase):
+    """
+    Tests the expected order of progression for submission_status.
+
+    Does not yet test that only users with the appropriate permissions can
+    access the relevant pages.
+
+    Does not test attempts at incorrect progressions, as these are handled by
+    tests in test_models.py.
+    """
+
+    def setUp(self):
+        self.user = baker.make(User)
+        self.client = Client()
+
+    def test_valid_steps(self):
+        """
+        Test the expected order of progression for submission_status.
+        """
+        self.client.force_login(user=self.user)
+        self.user.profile.entry_form_data = (
+            VALID_ELIGIBILITY_DATA | VALID_AUDITEE_INFO_DATA
+        )
+        self.user.profile.save()
+        self.client.post(
+            ACCESS_AND_SUBMISSION_PATH, VALID_ACCESS_AND_SUBMISSION_DATA, format="json"
+        )
+        data = MySubmissions.fetch_my_submissions(self.user)
+        self.assertGreater(len(data), 0)
+        self.assertEqual(data[0]["submission_status"], "in_progress")
+        report_id = data[0]["report_id"]
+
+        self.client.post(f"/audit/ready-for-certification/{report_id}", data={})
+        data = MySubmissions.fetch_my_submissions(self.user)
+        self.assertEqual(data[0]["submission_status"], "ready_for_certification")
+
+        self.client.post(f"/audit/auditor-certification/{report_id}", data={})
+        data = MySubmissions.fetch_my_submissions(self.user)
+        self.assertEqual(data[0]["submission_status"], "auditor_certified")
+
+        self.client.post(f"/audit/auditee-certification/{report_id}", data={})
+        data = MySubmissions.fetch_my_submissions(self.user)
+        self.assertEqual(data[0]["submission_status"], "auditee_certified")
+
+        self.client.post(f"/audit/certification/{report_id}", data={})
+        data = MySubmissions.fetch_my_submissions(self.user)
+        self.assertEqual(data[0]["submission_status"], "certified")
+
+        self.client.post(f"/audit/submission/{report_id}", data={})
+        data = MySubmissions.fetch_my_submissions(self.user)
+        self.assertEqual(data[0]["submission_status"], "submitted")
 
 
 class MockHttpResponse:
