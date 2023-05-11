@@ -119,7 +119,7 @@ def access_and_submission_check(user, data):
         )
 
         # Create all contact Access objects
-        Access.objects.create(sac=sac, role="creator", email=user.email, user=user)
+        Access.objects.create(sac=sac, role="editor", email=user.email, user=user)
         Access.objects.create(
             sac=sac,
             role="certifying_auditee_contact",
@@ -131,9 +131,9 @@ def access_and_submission_check(user, data):
             email=serializer.data.get("certifying_auditor_contact"),
         )
         for contact in serializer.data.get("auditee_contacts"):
-            Access.objects.create(sac=sac, role="auditee_contact", email=contact)
+            Access.objects.create(sac=sac, role="editor", email=contact)
         for contact in serializer.data.get("auditor_contacts"):
-            Access.objects.create(sac=sac, role="auditor_contact", email=contact)
+            Access.objects.create(sac=sac, role="editor", email=contact)
 
         sac.save()
 
@@ -231,29 +231,23 @@ def get_role_emails_for_sac(sac_id) -> dict:
     from Access objects associated with that SAC, grouped by role.
 
     {
-        "auditee_contacts": ["a@a.com"],
-        "auditee_contacts": ["b@b.com"],
+        "editors": ["a@a.com", "b@b.com", "victor@frankenstein.com"]
         "certfying_auditor_contact": ["c@c.com"],
         "certfying_auditee_contact": ["e@e.com"],
-        "creator": ["victor@frankenstein.com"],
     }
     """
     accesses = Access.objects.filter(sac=sac_id)
 
-    # This is inelegant, but we have to change the name of the key for
-    # two of them, and turn lists into single items or None for the
-    # other two:
+    # Turn lists into single items or None for the certifier roles:
     only_one = lambda x: x[0] if x else None
     return {
-        "auditee_contacts": [a.email for a in accesses if a.role == "auditee_contact"],
-        "auditor_contacts": [a.email for a in accesses if a.role == "auditor_contact"],
+        "editors": [a.email for a in accesses if a.role == "editor"],
         "certifying_auditee_contact": only_one(
             [a.email for a in accesses if a.role == "certifying_auditee_contact"]
         ),
         "certifying_auditor_contact": only_one(
             [a.email for a in accesses if a.role == "certifying_auditor_contact"]
         ),
-        "creator": only_one([a.email for a in accesses if a.role == "creator"]),
     }
 
 

@@ -61,7 +61,7 @@ resource "cloudfoundry_app" "egress_app" {
   command          = "./caddy run --config Caddyfile"
   memory           = var.egress_memory
   instances        = var.https_proxy_instances
-  strategy         = "blue-green"
+  strategy         = "rolling"
 
   routes {
     route = cloudfoundry_route.egress_route.id

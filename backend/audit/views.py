@@ -141,3 +141,245 @@ class ExcelFileHandlerView(LoginRequiredMixin, generic.View):
         except MultiValueDictKeyError:
             logger.warn("no file found in request")
             raise BadRequest()
+
+
+class ReadyForCertificationView(LoginRequiredMixin, generic.View):
+    def get(self, request, *args, **kwargs):
+        report_id = kwargs["report_id"]
+
+        try:
+            sac = SingleAuditChecklist.objects.get(report_id=report_id)
+
+            # this should probably be a permission mixin
+            accesses = Access.objects.filter(sac=sac, user=request.user)
+            if not accesses:
+                raise PermissionDenied("You do not have access to this audit.")
+
+            context = {
+                "report_id": report_id,
+                "submission_status": sac.submission_status,
+            }
+            return render(request, "audit/ready-for-certification.html", context)
+        except SingleAuditChecklist.DoesNotExist:
+            raise PermissionDenied("You do not have access to this audit.")
+
+    def post(self, request, *args, **kwargs):
+        report_id = kwargs["report_id"]
+
+        try:
+            sac = SingleAuditChecklist.objects.get(report_id=report_id)
+
+            # this should probably be a permission mixin
+            accesses = Access.objects.filter(sac=sac, user=request.user)
+            if not accesses:
+                raise PermissionDenied("You do not have access to this audit.")
+
+            sac.transition_to_ready_for_certification()
+            sac.save()
+
+            return redirect(reverse("audit:SubmissionProgress", args=[report_id]))
+
+        except SingleAuditChecklist.DoesNotExist:
+            raise PermissionDenied("You do not have access to this audit.")
+
+
+class AuditorCertificationView(LoginRequiredMixin, generic.View):
+    def get(self, request, *args, **kwargs):
+        report_id = kwargs["report_id"]
+
+        try:
+            sac = SingleAuditChecklist.objects.get(report_id=report_id)
+
+            # this should probably be a permission mixin
+            accesses = Access.objects.filter(sac=sac, user=request.user)
+            if not accesses:
+                raise PermissionDenied("You do not have access to this audit.")
+
+            context = {
+                "report_id": report_id,
+                "submission_status": sac.submission_status,
+            }
+
+            return render(request, "audit/auditor-certification.html", context)
+        except SingleAuditChecklist.DoesNotExist:
+            raise PermissionDenied("You do not have access to this audit.")
+
+    def post(self, request, *args, **kwargs):
+        report_id = kwargs["report_id"]
+
+        try:
+            sac = SingleAuditChecklist.objects.get(report_id=report_id)
+
+            # this should probably be a permission mixin
+            accesses = Access.objects.filter(sac=sac, user=request.user)
+            if not accesses:
+                raise PermissionDenied("You do not have access to this audit.")
+
+            sac.transition_to_auditor_certified()
+            sac.save()
+
+            return redirect(reverse("audit:SubmissionProgress", args=[report_id]))
+
+        except SingleAuditChecklist.DoesNotExist:
+            raise PermissionDenied("You do not have access to this audit.")
+
+
+class AuditeeCertificationView(LoginRequiredMixin, generic.View):
+    def get(self, request, *args, **kwargs):
+        report_id = kwargs["report_id"]
+
+        try:
+            sac = SingleAuditChecklist.objects.get(report_id=report_id)
+
+            # this should probably be a permission mixin
+            accesses = Access.objects.filter(sac=sac, user=request.user)
+            if not accesses:
+                raise PermissionDenied("You do not have access to this audit.")
+
+            context = {
+                "report_id": report_id,
+                "submission_status": sac.submission_status,
+            }
+
+            return render(request, "audit/auditee-certification.html", context)
+        except SingleAuditChecklist.DoesNotExist:
+            raise PermissionDenied("You do not have access to this audit.")
+
+    def post(self, request, *args, **kwargs):
+        report_id = kwargs["report_id"]
+
+        try:
+            sac = SingleAuditChecklist.objects.get(report_id=report_id)
+
+            # this should probably be a permission mixin
+            accesses = Access.objects.filter(sac=sac, user=request.user)
+            if not accesses:
+                raise PermissionDenied("You do not have access to this audit.")
+
+            sac.transition_to_auditee_certified()
+            sac.save()
+
+            return redirect(reverse("audit:SubmissionProgress", args=[report_id]))
+
+        except SingleAuditChecklist.DoesNotExist:
+            raise PermissionDenied("You do not have access to this audit.")
+
+
+class CertificationView(LoginRequiredMixin, generic.View):
+    def get(self, request, *args, **kwargs):
+        report_id = kwargs["report_id"]
+
+        try:
+            sac = SingleAuditChecklist.objects.get(report_id=report_id)
+
+            # this should probably be a permission mixin
+            accesses = Access.objects.filter(sac=sac, user=request.user)
+            if not accesses:
+                raise PermissionDenied("You do not have access to this audit.")
+
+            context = {
+                "report_id": report_id,
+                "submission_status": sac.submission_status,
+            }
+
+            return render(request, "audit/certification.html", context)
+        except SingleAuditChecklist.DoesNotExist:
+            raise PermissionDenied("You do not have access to this audit.")
+
+    def post(self, request, *args, **kwargs):
+        report_id = kwargs["report_id"]
+
+        try:
+            sac = SingleAuditChecklist.objects.get(report_id=report_id)
+
+            # this should probably be a permission mixin
+            accesses = Access.objects.filter(sac=sac, user=request.user)
+            if not accesses:
+                raise PermissionDenied("You do not have access to this audit.")
+
+            sac.transition_to_certified()
+            sac.save()
+
+            return redirect(reverse("audit:SubmissionProgress", args=[report_id]))
+
+        except SingleAuditChecklist.DoesNotExist:
+            raise PermissionDenied("You do not have access to this audit.")
+
+
+class SubmissionView(LoginRequiredMixin, generic.View):
+    def get(self, request, *args, **kwargs):
+        report_id = kwargs["report_id"]
+
+        try:
+            sac = SingleAuditChecklist.objects.get(report_id=report_id)
+
+            # this should probably be a permission mixin
+            accesses = Access.objects.filter(sac=sac, user=request.user)
+            if not accesses:
+                raise PermissionDenied("You do not have access to this audit.")
+
+            context = {
+                "report_id": report_id,
+                "submission_status": sac.submission_status,
+            }
+
+            return render(request, "audit/submission.html", context)
+        except SingleAuditChecklist.DoesNotExist:
+            raise PermissionDenied("You do not have access to this audit.")
+
+    def post(self, request, *args, **kwargs):
+        report_id = kwargs["report_id"]
+
+        try:
+            sac = SingleAuditChecklist.objects.get(report_id=report_id)
+
+            # this should probably be a permission mixin
+            accesses = Access.objects.filter(sac=sac, user=request.user)
+            if not accesses:
+                raise PermissionDenied("You do not have access to this audit.")
+
+            sac.transition_to_submitted()
+            sac.save()
+
+            return redirect(reverse("audit:SubmissionProgress", args=[report_id]))
+
+        except SingleAuditChecklist.DoesNotExist:
+            raise PermissionDenied("You do not have access to this audit.")
+
+
+class SubmissionProgressView(LoginRequiredMixin, generic.View):
+    def get(self, request, *args, **kwargs):
+        report_id = kwargs["report_id"]
+
+        try:
+            sac = SingleAuditChecklist.objects.get(report_id=report_id)
+
+            context = {
+                "report_id": report_id,
+                "single_audit_checklist": {
+                    "created": True,
+                    "created_date": sac.date_created,
+                    "created_by": sac.submitted_by,
+                    "completed": False,
+                    "completed_date": None,
+                    "completed_by": None,
+                },
+                "audit_report": {
+                    "completed": False,
+                    "completed_date": None,
+                    "completed_by": None,
+                },
+                "certification": {
+                    "auditee_certified": sac.is_auditee_certified,
+                    "auditor_certified": sac.is_auditor_certified,
+                },
+                "submission": {
+                    "completed": sac.is_submitted,
+                    "completed_date": None,
+                    "completed_by": None,
+                },
+            }
+
+            return render(request, "audit/submission-progress.html", context)
+        except SingleAuditChecklist.DoesNotExist:
+            raise PermissionDenied("You do not have access to this audit.")

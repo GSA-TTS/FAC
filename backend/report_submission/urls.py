@@ -1,6 +1,8 @@
 from django.urls import path
 from . import views
 
+app_name = "report_submission"
+
 upload_page_ids = [
     "federal-awards",
     "audit-findings",

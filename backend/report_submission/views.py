@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 
 class ReportSubmissionRedirectView(View):
     def get(self, request):
-        return redirect(reverse("eligibility"))
+        return redirect(reverse("report_submission:eligibility"))
 
 
 # Step 1
@@ -35,10 +35,10 @@ class EligibilityFormView(LoginRequiredMixin, View):
     def post(self, post_request):
         eligibility = api.views.eligibility_check(post_request.user, post_request.POST)
         if eligibility.get("eligible"):
-            return redirect(reverse("auditeeinfo"))
+            return redirect(reverse("report_submission:auditeeinfo"))
 
         print("Eligibility data error: ", eligibility)
-        return redirect(reverse("eligibility"))
+        return redirect(reverse("report_submission:eligibility"))
 
 
 # Step 2
@@ -76,9 +76,9 @@ class AuditeeInfoFormView(LoginRequiredMixin, View):
 
         info_check = api.views.auditee_info_check(post_request.user, formatted_post)
         if info_check.get("errors"):
-            return redirect(reverse("auditeeinfo"))
+            return redirect(reverse("report_submission:auditeeinfo"))
 
-        return redirect(reverse("accessandsubmission"))
+        return redirect(reverse("report_submission:accessandsubmission"))
 
 
 # Step 3
@@ -100,7 +100,7 @@ class AccessAndSubmissionFormView(LoginRequiredMixin, View):
         if report_id:
             return redirect(f"/report_submission/general-information/{report_id}")
         print("Error processing data: ", result)
-        return redirect(reverse("accessandsubmission"))
+        return redirect(reverse("report_submission:accessandsubmission"))
 
 
 class GeneralInformationFormView(LoginRequiredMixin, View):

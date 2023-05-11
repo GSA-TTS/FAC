@@ -2,6 +2,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db.utils import IntegrityError
 from django.test import TestCase
 
+from django_fsm import TransitionNotAllowed
 from model_bakery import baker
 
 from .models import Access, ExcelFile, SingleAuditChecklist, User
@@ -49,6 +50,62 @@ class SingleAuditChecklistTests(TestCase):
         # the first entry in the test database:
         self.assertEqual(sac.report_id[7:], "0001000001")
 
+    def test_submission_status_transitions(self):
+        """
+        Test that only the expected state transitions are allowed for submission_status
+        """
+        cases = (
+            (
+                [SingleAuditChecklist.STATUS.IN_PROGRESS],
+                SingleAuditChecklist.STATUS.READY_FOR_CERTIFICATION,
+                "transition_to_ready_for_certification",
+            ),
+            (
+                [SingleAuditChecklist.STATUS.READY_FOR_CERTIFICATION],
+                SingleAuditChecklist.STATUS.AUDITOR_CERTIFIED,
+                "transition_to_auditor_certified",
+            ),
+            (
+                [SingleAuditChecklist.STATUS.AUDITOR_CERTIFIED],
+                SingleAuditChecklist.STATUS.AUDITEE_CERTIFIED,
+                "transition_to_auditee_certified",
+            ),
+            (
+                [SingleAuditChecklist.STATUS.AUDITEE_CERTIFIED],
+                SingleAuditChecklist.STATUS.CERTIFIED,
+                "transition_to_certified",
+            ),
+            (
+                [
+                    SingleAuditChecklist.STATUS.AUDITEE_CERTIFIED,
+                    SingleAuditChecklist.STATUS.CERTIFIED,
+                ],
+                SingleAuditChecklist.STATUS.SUBMITTED,
+                "transition_to_submitted",
+            ),
+        )
+
+        for statuses_from, status_to, transition_name in cases:
+            for status_from in statuses_from:
+                sac = baker.make(SingleAuditChecklist, submission_status=status_from)
+
+                transition_method = getattr(sac, transition_name)
+                transition_method()
+
+                self.assertEqual(sac.submission_status, status_to)
+
+                bad_statuses = [
+                    status[0]
+                    for status in SingleAuditChecklist.STATUS_CHOICES
+                    if status[0] not in statuses_from
+                ]
+
+                for bad_status in bad_statuses:
+                    with self.subTest():
+                        sac.submission_status = bad_status
+
+                        self.assertRaises(TransitionNotAllowed, transition_method)
+
 
 class AccessTests(TestCase):
     """Model tests"""
@@ -78,16 +135,6 @@ class AccessTests(TestCase):
         access_1 = baker.make(Access, role="auditor_contact")
 
         baker.make(Access, sac=access_1.sac, role="auditor_contact")
-
-    def test_multiple_creator_not_allowed(self):
-        """
-        There should be a constraint preventing multiple creators for a SAC
-        """
-        access_1 = baker.make(Access, role="creator")
-
-        self.assertRaises(
-            IntegrityError, baker.make, Access, sac=access_1.sac, role="creator"
-        )
 
     def test_multiple_certifying_auditee_contact_not_allowed(self):
         """

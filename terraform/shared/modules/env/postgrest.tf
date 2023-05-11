@@ -21,10 +21,11 @@ resource "cloudfoundry_app" "postgrest" {
   memory       = 128
   disk_quota   = 256
   instances    = var.postgrest_instances
-  strategy     = "blue-green"
+  strategy     = "rolling"
   routes {
     route = cloudfoundry_route.postgrest.id
   }
+
   environment = {
     PGRST_DB_URI : cloudfoundry_service_key.postgrest.credentials.uri
     PGRST_DB_SCHEMAS : "api"
