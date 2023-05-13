@@ -21,6 +21,10 @@ local single_cells = [
   },
 ];
 
+local open_range_w16 = Sheets.open_range + {
+  width: 16,
+};
+
 local open_ranges_defns = [
   [Sheets.open_range_w12, SV.FAPPrefixValidation, 'Federal Agency Prefix', 'federal_agency_prefix'],
   [Sheets.open_range_w12, SV.StringOfLengthThree, 'CFDA Three Digit Extension', 'three_digit_extension'],
@@ -30,13 +34,14 @@ local open_ranges_defns = [
   [Sheets.open_range, {}, 'Cluster Name', 'cluster_name'],
   [Sheets.open_range, {}, 'If State Cluster, Enter State Cluster Name', 'state_cluster_name'],
   [Sheets.open_range, {}, 'If Other Cluster, Enter Other Cluster Name', 'other_cluster_name'],
-  [Sheets.open_range, {}, 'Federal Program Total', 'federal_program_total'],
-  [Sheets.open_range, {}, 'Cluster Total', 'cluster_total'],
+  [Sheets.open_range, SV.PositiveNumberValidation, 'Federal Program Total', 'federal_program_total'],
+  [Sheets.open_range, SV.PositiveNumberValidation, 'Cluster Total', 'cluster_total'],
   [Sheets.y_or_n_range, SV.YoNValidation, 'Loan / Loan Guarantee', 'is_guaranteed'],
   [Sheets.open_range, {}, 'If yes (Loan/Loan Guarantee, End of Audit Period Outstanding Loan Balance)', 'loan_balance_at_audit_period_end'],
-  [Sheets.y_or_n_range, {}, 'If no (Direct Award), Name of Passthrough Entity', 'is_direct'],
+  [Sheets.y_or_n_range, SV.YoNValidation, 'Direct Award', 'is_direct'],
+  [Sheets.y_or_n_range, SV.YoNValidation, 'If no (Direct Award), Name of Passthrough Entity', 'passthrough_name'],
   [
-    Sheets.open_range,
+    open_range_w16,
     {},
     'If no (Direct Award), Identifying Number Assigned by the Pass-through Entity, if assigned',
     'passthrough_identifying_number',
@@ -44,8 +49,8 @@ local open_ranges_defns = [
   [Sheets.y_or_n_range, SV.YoNValidation, 'Federal Award Passed Through to Subrecipients', 'is_passed'],
   [Sheets.open_range, {}, 'If yes (Passed Through), Amount Passed Through to Subrecipients', 'subrecipient_amount'],
   [Sheets.y_or_n_range, SV.YoNValidation, 'Major Program (MP)', 'is_major'],
-  [Sheets.open_range, {}, 'If yes (MP), Type of Audit Report', 'audit_report_type'],
-  [Sheets.open_range, SV.PositiveNumberValidation, 'Number of Audit Findings', 'number_of_audit_findings'],
+  [Sheets.open_range_w12, {}, 'If yes (MP), Type of Audit Report', 'audit_report_type'],
+  [Sheets.open_range_w12, SV.PositiveNumberValidation, 'Number of Audit Findings', 'number_of_audit_findings'],
 ];
 
 local sheets = [

@@ -35,7 +35,7 @@ local open_ranges_defns = [
   [Sheets.open_range_w12, SV.StringOfLengthThree, 'CFDA Three Digit Extension', 'three_digit_extension'],
   [Sheets.open_range, {}, 'Additional Award Identification', 'additional_award_identification'],
   [Sheets.open_range_w48, {}, 'Federal Program Name', 'program_name'],
-  [Sheets.open_range, {}, 'Audit Finding Reference Number', 'finding_reference_number'],
+  [Sheets.open_range, SV.ReferenceNumberValidation, 'Audit Finding Reference Number', 'reference_number'],
   [open_range_w20, {}, 'Type(s) of Compliance Requirement(s)', 'compliance_requirement'],
   [y_or_n_range_w12, SV.YoNValidation, 'Modified Opinion', 'modified_opinion'],
   [y_or_n_range_w12, SV.YoNValidation, 'Other Matters', 'other_matters'],
@@ -64,6 +64,7 @@ local sheets = [
 local workbook = {
   filename: 'findings-uniform-guidance-template-20230428.xlsx',
   sheets: sheets,
+  title_row: title_row
 };
 
-{title_row:title_row} + workbook
+{} + workbook
