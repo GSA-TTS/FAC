@@ -1,0 +1,91 @@
+{
+   "filename": "corrective-action-plan-template-20230428.xlsx",
+   "sheets": [
+      {
+         "cells_to_merge": [
+            [
+               1,
+               2,
+               "A",
+               "H"
+            ],
+            [
+               2,
+               3,
+               "C",
+               "H"
+            ],
+            [
+               3,
+               3001,
+               "A",
+               "B"
+            ],
+            [
+               3,
+               3001,
+               "C",
+               "F"
+            ],
+            [
+               3,
+               3001,
+               "G",
+               "H"
+            ]
+         ],
+         "include_in_header": [
+            "A1",
+            "C2"
+         ],
+         "name": "Form",
+         "open_ranges": [
+            {
+               "range_name": "reference_number",
+               "title": "Audit Finding Reference Number",
+               "title_cell": "A3",
+               "type": "open_range",
+               "validation": {
+                  "custom_error": "Expecting a value in the format YYYY-NNN, where YYYY is a year and NNN a three digit number (e.g. 2023-001)",
+                  "custom_title": "Reference number",
+                  "formula1": "=OR(ISBLANK(FIRSTCELLREF), AND(LEN(FIRSTCELLREF) = 8, LEFT(FIRSTCELLREF, 2) = \"20\", ISNUMBER(MID(FIRSTCELLREF, 3, 2) * 1), MID(FIRSTCELLREF, 5, 1) = \"-\", ISNUMBER(RIGHT(FIRSTCELLREF, 3) * 1)))",
+                  "type": "custom"
+               },
+               "width": 36
+            },
+            {
+               "range_name": "planned_action",
+               "title": "Planned Corrective Action",
+               "title_cell": "C3",
+               "type": "open_range",
+               "validation": { },
+               "width": 100
+            },
+            {
+               "range_name": "contains_chart_or_table",
+               "title": "Did Text Contain a Chart or Table?",
+               "title_cell": "G3",
+               "type": "yorn_range",
+               "validation": {
+                  "allow_blank": "False",
+                  "custom_error": "Must be 'Y' or 'N'",
+                  "custom_title": "Y/N",
+                  "formula1": "\"Y,N\"",
+                  "type": "list"
+               },
+               "width": 36
+            }
+         ],
+         "single_cells": [
+            {
+               "range_cell": "B2",
+               "range_name": "auditee_ein",
+               "title": "Auditee UEI",
+               "title_cell": "A2",
+               "type": "single_cell"
+            }
+         ]
+      }
+   ],
+   "title_row": 3
+}
