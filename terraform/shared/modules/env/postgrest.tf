@@ -8,12 +8,6 @@ resource "cloudfoundry_route" "postgrest" {
   hostname = "fac-${var.cf_space_name}-${local.postgrest_name}"
 }
 
-resource "cloudfoundry_route" "postgrest-private" {
-  space    = data.cloudfoundry_space.apps.id
-  domain   = data.cloudfoundry_domain.private.id
-  hostname = "fac-${var.cf_space_name}-${local.postgrest_name}"
-}
-
 resource "cloudfoundry_service_key" "postgrest" {
   name             = "postgrest"
   service_instance = module.database.instance_id
@@ -30,9 +24,6 @@ resource "cloudfoundry_app" "postgrest" {
   strategy     = "rolling"
   routes {
     route = cloudfoundry_route.postgrest.id
-  }
-  routes {
-    route = cloudfoundry_route.postgrest-private.id
   }
 
   environment = {
