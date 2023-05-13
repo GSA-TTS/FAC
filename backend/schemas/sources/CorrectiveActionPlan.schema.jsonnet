@@ -3,14 +3,14 @@ local Func = import 'Functions.libsonnet';
 local Types = Base.Types;
 
 local CorrectiveActionPlanEntry = {
-    additionalProperties: false,
-    properties: {
-        reference_number: Base.Compound.ReferenceNumber,
-        planned_action: Types.string,
-        contains_chart_or_table: Base.Enum.YorN
-    },
-    required: ['reference_number', 'planned_action','contains_chart_or_table'],
-    title: 'CorrectiveActionPlanEntry',
+  additionalProperties: false,
+  properties: {
+    reference_number: Base.Compound.ReferenceNumber,
+    planned_action: Types.string,
+    contains_chart_or_table: Base.Enum.YorN,
+  },
+  required: ['reference_number', 'planned_action', 'contains_chart_or_table'],
+  title: 'CorrectiveActionPlanEntry',
 };
 
 local CorrectiveActionPlan = Types.object {
@@ -21,6 +21,7 @@ local CorrectiveActionPlan = Types.object {
       items: CorrectiveActionPlanEntry,
     },
   },
+  // 20230511 HDMS FIXME: Because auditee_ein is of type string or NULL, the required condition is ignored.
   required: ['auditee_ein'],
   title: 'CorrectiveActionPlan',
   version: 20230410,

@@ -3,7 +3,7 @@ local Func = import 'Functions.libsonnet';
 local Types = Base.Types;
 
 local Validations = {
-  
+
   DirectAwardValidations: [
     {
       'if': {
@@ -33,7 +33,7 @@ local Validations = {
         ],
       },
     },
-      ],
+  ],
   LoanOrLoanGuaranteeValidations: [
     {
       'if': {
@@ -170,7 +170,8 @@ local Validations = {
 
       },
     },
-  ] 
+    Base.Validation.AdditionalAwardIdentificationValidation[0],
+  ],
 };
 
 local Parts = {
@@ -181,62 +182,62 @@ local Parts = {
     },
     allOf: [
       {
-        "if": {
-          "not": {
+        'if': {
+          not: {
             properties: {
-                cluster_name: {
-                  enum: [Base.Const.OTHER_CLUSTER,Base.Const.STATE_CLUSTER]
-              },                                   
-            },
-          }
-        },
-        "then": {
-          "allOf": [
-            {
-                properties: {
-                  other_cluster_name: Base.Enum.EmptyString_Null,
-                },
+              cluster_name: {
+                enum: [Base.Const.OTHER_CLUSTER, Base.Const.STATE_CLUSTER],
               },
-              {
-                properties: {
-                  state_cluster_name: Base.Enum.EmptyString_Null,
-                },
-              }
-          ]
+            },
+          },
         },
-      },        
+        'then': {
+          allOf: [
+            {
+              properties: {
+                other_cluster_name: Base.Enum.EmptyString_Null,
+              },
+            },
+            {
+              properties: {
+                state_cluster_name: Base.Enum.EmptyString_Null,
+              },
+            },
+          ],
+        },
+      },
       {
-        "if": {
+        'if': {
           properties: {
             cluster_name: {
               const: Base.Const.STATE_CLUSTER,
             },
-           },
+          },
         },
-        "then": {
+        'then': {
           properties: {
             state_cluster_name: Base.Compound.NonEmptyString,
           },
-          required: ['state_cluster_name'] 
+          required: ['state_cluster_name'],
         },
-      },  
+      },
       {
-        "if": {
+        'if': {
           properties: {
             cluster_name: {
               const: Base.Const.OTHER_CLUSTER,
             },
           },
         },
-        "then": {
+        'then': {
           properties: {
             other_cluster_name: Base.Compound.NonEmptyString,
           },
-          required: ['other_cluster_name'] 
-        }
-      },         
-    ],    
-    required: ['cluster_name', 'cluster_total']       
+          required: ['other_cluster_name'],
+        },
+      },
+    ],
+    required: ['cluster_name', 'cluster_total'],
   },
   PassThroughEntity: Types.object {
     additionalProperties: false,
@@ -247,7 +248,7 @@ local Parts = {
         minLength: 1,
       },
     },
-    required: ['passthrough_name', 'passthrough_identifying_number']
+    required: ['passthrough_name', 'passthrough_identifying_number'],
   },
   DirectOrIndirectAward: Types.object {
     // 20230409 MCJ FIXME: I think this needs the amount...
@@ -284,12 +285,12 @@ local Parts = {
   Program: Types.object {
     additionalProperties: false,
     properties: {
-      amount_expended: Types.number,
+      federal_agency_prefix: Base.Enum.ALNPrefixes,
+      three_digit_extension: Base.Compound.ThreeDigitExtension,
+      additional_award_identification: Func.compound_type([Types.string, Types.NULL]),
       program_name: Types.string,
-      // FIXME MCJ 20230428: We should split this up, to match the spreadsheet.
-      // program_number: Base.Compound.ProgramNumber,
-      federal_agency_prefix: Types.string,
-      three_digit_extension: Types.string,
+      amount_expended: Types.number,
+      federal_program_total: Types.number,
       is_major: Base.Enum.YorN,
       audit_report_type: Types.string,
       number_of_audit_findings: Types.integer,
@@ -303,11 +304,6 @@ local FederalAwardEntry = Types.object {
   additionalProperties: false,
   description: 'Award entry rows',
   properties: {
-    // FIXME MCJ 20230428: Is this in here twice?
-    // See the 'Program' object...
-    amount_expended: Types.number {
-      minimum: 0,
-    },
     cluster: Parts.Cluster,
     direct_or_indirect_award: Parts.DirectOrIndirectAward,
     loan_or_loan_guarantee: Parts.LoanOrLoanGuarantee,
@@ -331,9 +327,9 @@ local FederalAwards = Types.object {
     federal_awards: Types.array {
       items: FederalAwardEntry,
     },
-    total_amount_expended: Types.number {
+    total_amount_expended: Func.compound_type([Types.number {
       minimum: 0,
-    },
+    }, Types.NULL]),
   },
   required: ['auditee_ein', 'total_amount_expended'],
   title: 'FederalAward',

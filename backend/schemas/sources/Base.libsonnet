@@ -55,6 +55,27 @@ local Meta = {
   },
 };
 
+local Validation = {
+  AdditionalAwardIdentificationValidation: [
+    {
+      "if": {
+        properties: {
+          three_digit_extension: {
+            pattern: '^(RD|U[0-9]{2})$',
+          },
+          },
+      },
+      "then": {
+        properties: {
+          additional_award_identification: Types.string{
+            minLength: 1,
+          },
+        },
+        required: ['additional_award_identification'] 
+      },
+    },   
+  ],
+};
 
 local Atoms = {
 
@@ -210,11 +231,11 @@ local Enum = {
 };
 
 local Compound = {
-  ProgramNumber: Types.string {
-    title: 'ProgramNumber',
-    description: 'Program number',
-    pattern: '^[1-9]{1}[0-9]{1}\\.([0-9]{3}[a-zA-Z]{0,1}|U[0-9]{2}|RD)$',
-  },
+  ThreeDigitExtension: Types.string {
+    title: 'ThreeDigitExtension',
+    description: 'Three Digit Extension',
+    pattern: '^(RD|[0-9]{3}[A-Za-z]{0,1}|U[0-9]{2})$',
+  },  
   PriorReferences: Types.string {
     title: 'PriorReferences',
     description: 'Prior references',
@@ -297,5 +318,6 @@ local SchemaBase = Types.object {
   Meta: Meta,
   Enum: Enum,
   Compound: Compound,
+  Validation: Validation,
   SchemaBase: SchemaBase,
 }

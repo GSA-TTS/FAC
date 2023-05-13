@@ -3,14 +3,14 @@ local Func = import 'Functions.libsonnet';
 local Types = Base.Types;
 
 local FindingsTextEntry = {
-    additionalProperties: false,
-    properties: {
-        reference_number: Base.Compound.ReferenceNumber,
-        text_of_finding: Types.string,
-        contains_chart_or_table: Base.Enum.YorN
-    },
-    required: ['reference_number', 'text_of_finding','contains_chart_or_table'],
-    title: 'FindingsTextEntry',    
+  additionalProperties: false,
+  properties: {
+    reference_number: Base.Compound.ReferenceNumber,
+    text_of_finding: Types.string,
+    contains_chart_or_table: Base.Enum.YorN,
+  },
+  required: ['reference_number', 'text_of_finding', 'contains_chart_or_table'],
+  title: 'FindingsTextEntry',
 };
 
 local FindingsText = Types.object {
@@ -21,6 +21,7 @@ local FindingsText = Types.object {
       items: FindingsTextEntry,
     },
   },
+  // 20230511 HDMS FIXME: Because auditee_ein is of type string or NULL, the required condition is ignored.
   required: ['auditee_ein'],
   title: 'FindingsText',
   version: 20230408,
