@@ -28,7 +28,7 @@
                               "other_matters": {
                                  "const": "N"
                               },
-                              "significiant_deficiency": {
+                              "significant_deficiency": {
                                  "const": "N"
                               }
                            }
@@ -53,7 +53,7 @@
                               "other_matters": {
                                  "const": "N"
                               },
-                              "significiant_deficiency": {
+                              "significant_deficiency": {
                                  "const": "N"
                               }
                            }
@@ -78,7 +78,7 @@
                               "other_matters": {
                                  "const": "N"
                               },
-                              "significiant_deficiency": {
+                              "significant_deficiency": {
                                  "const": "Y"
                               }
                            }
@@ -103,7 +103,7 @@
                               "other_matters": {
                                  "const": "Y"
                               },
-                              "significiant_deficiency": {
+                              "significant_deficiency": {
                                  "const": "N"
                               }
                            }
@@ -128,7 +128,7 @@
                               "other_matters": {
                                  "const": "Y"
                               },
-                              "significiant_deficiency": {
+                              "significant_deficiency": {
                                  "const": "N"
                               }
                            }
@@ -153,7 +153,7 @@
                               "other_matters": {
                                  "const": "Y"
                               },
-                              "significiant_deficiency": {
+                              "significant_deficiency": {
                                  "const": "Y"
                               }
                            }
@@ -178,7 +178,7 @@
                               "other_matters": {
                                  "const": "N"
                               },
-                              "significiant_deficiency": {
+                              "significant_deficiency": {
                                  "const": "N"
                               }
                            }
@@ -203,7 +203,7 @@
                               "other_matters": {
                                  "const": "N"
                               },
-                              "significiant_deficiency": {
+                              "significant_deficiency": {
                                  "const": "Y"
                               }
                            }
@@ -228,7 +228,7 @@
                               "other_matters": {
                                  "const": "N"
                               },
-                              "significiant_deficiency": {
+                              "significant_deficiency": {
                                  "const": "N"
                               }
                            }
@@ -275,7 +275,7 @@
                               "title": "PriorReferences",
                               "type": "string"
                            },
-                           "reference": {
+                           "reference_number": {
                               "description": "Reference Number",
                               "pattern": "^20[2-9][0-9]-[0-9]{3}$",
                               "title": "ReferenceNumber",
@@ -290,7 +290,7 @@
                            }
                         },
                         "required": [
-                           "reference",
+                           "reference_number",
                            "repeat_prior_reference"
                         ],
                         "type": "object"
@@ -325,7 +325,32 @@
                      },
                      "program": {
                         "additionalProperties": false,
+                        "allOf": [
+                           {
+                              "if": {
+                                 "properties": {
+                                    "three_digit_extension": {
+                                       "pattern": "^(RD|U[0-9]{2})$"
+                                    }
+                                 }
+                              },
+                              "then": {
+                                 "properties": {
+                                    "additional_award_identification": {
+                                       "minLength": 1,
+                                       "type": "string"
+                                    }
+                                 },
+                                 "required": [
+                                    "additional_award_identification"
+                                 ]
+                              }
+                           }
+                        ],
                         "properties": {
+                           "additional_award_identification": {
+                              "type": "string"
+                           },
                            "compliance_requirement": {
                               "description": "Compliance requirement type",
                               "enum": [
@@ -8523,19 +8548,93 @@
                               ],
                               "title": "ComplianceRequirement"
                            },
-                           "name": {
+                           "federal_agency_prefix": {
+                              "description": "Valid two-digit program numbers; part of the CFDA/ALN",
+                              "enum": [
+                                 "1",
+                                 "2",
+                                 "3",
+                                 "4",
+                                 "7",
+                                 "8",
+                                 "9",
+                                 "10",
+                                 "11",
+                                 "12",
+                                 "13",
+                                 "14",
+                                 "15",
+                                 "16",
+                                 "17",
+                                 "18",
+                                 "19",
+                                 "20",
+                                 "21",
+                                 "22",
+                                 "23",
+                                 "27",
+                                 "29",
+                                 "30",
+                                 "32",
+                                 "33",
+                                 "34",
+                                 "36",
+                                 "39",
+                                 "40",
+                                 "41",
+                                 "42",
+                                 "43",
+                                 "44",
+                                 "45",
+                                 "46",
+                                 "47",
+                                 "53",
+                                 "57",
+                                 "58",
+                                 "59",
+                                 "60",
+                                 "61",
+                                 "62",
+                                 "64",
+                                 "66",
+                                 "68",
+                                 "70",
+                                 "77",
+                                 "78",
+                                 "81",
+                                 "82",
+                                 "83",
+                                 "84",
+                                 "85",
+                                 "86",
+                                 "87",
+                                 "88",
+                                 "89",
+                                 "90",
+                                 "91",
+                                 "92",
+                                 "93",
+                                 "94",
+                                 "96",
+                                 "97",
+                                 "98"
+                              ],
                               "type": "string"
                            },
-                           "number": {
-                              "description": "Program number",
-                              "pattern": "^[1-9]{1}[0-9]{1}\\.([0-9]{3}[a-zA-Z]{0,1}|U[0-9]{2}|RD)$",
-                              "title": "ProgramNumber",
+                           "program_name": {
+                              "type": "string"
+                           },
+                           "three_digit_extension": {
+                              "description": "Three Digit Extension",
+                              "pattern": "^(RD|[0-9]{3}[A-TV-Za-tv-z]?|U[0-9]{2})$",
+                              "title": "ThreeDigitExtension",
                               "type": "string"
                            }
                         },
                         "required": [
-                           "name",
-                           "number",
+                           "program_name",
+                           "federal_agency_prefix",
+                           "three_digit_extension",
                            "compliance_requirement"
                         ],
                         "type": "object"
@@ -8547,7 +8646,7 @@
                         ],
                         "type": "string"
                      },
-                     "significiant_deficiency": {
+                     "significant_deficiency": {
                         "enum": [
                            "Y",
                            "N"
@@ -8560,7 +8659,7 @@
                      "findings",
                      "other_matters",
                      "material_weakness",
-                     "significiant_deficiency",
+                     "significant_deficiency",
                      "other_findings"
                   ]
                },
