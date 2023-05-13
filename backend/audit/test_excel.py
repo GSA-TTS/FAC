@@ -72,6 +72,7 @@ class FederalAwardsExcelTests(SimpleTestCase):
         for name in federal_awards_column_mapping:
             self.assertIsNotNone(workbook.defined_names[name])
 
+    # 20230512 HDMS FIXME: Do we want to allow empty xlsx? If the answer is no, then we need to update this test.
     def test_empty_template(self):
         """Test that extraction and validation succeed against the blank template"""
         federal_awards = extract_federal_awards(FEDERAL_AWARDS_TEMPLATE)
@@ -133,16 +134,17 @@ class FederalAwardsExcelTests(SimpleTestCase):
             ("total_amount_expended", "not a number"),
             ("amount_expended", "not a  number"),
             ("cluster_name", 123),
-            ("direct_award", 123),
-            ("federal_award_passed_to_subrecipients", 123),
-            ("federal_award_passed_to_subrecipients_amount", "not a number"),
-            ("federal_program_name", 123),
+            ("is_direct", 123),
+            ("is_passed", 123),
+            ("subrecipient_amount", "not a number"),
+            ("program_name", 123),
             ("loan_balance_at_audit_period_end", "not a number"),
-            ("loan_or_loan_guarantee", 123),
-            ("major_program", 123),
-            ("major_program_audit_report_type", 123),
+            ("is_guaranteed", 123),
+            ("is_major", 123),
+            ("audit_report_type", 123),
             ("number_of_audit_findings", "not a number"),
-            ("program_number", 10.001),
+            ("federal_agency_prefix", 10),
+            ("three_digit_extension", "001"),
             ("state_cluster_name", 123),
         ]
 
@@ -163,12 +165,12 @@ class FederalAwardsExcelTests(SimpleTestCase):
 
         # add valid data to the workbook
         _set_by_name(workbook, "auditee_ein", "123456789")
-        _set_by_name(workbook, "total_amount_expended", 200)
+        _set_by_name(workbook, "amount_expended", 200)
         _add_entry(workbook, 0, FEDERAL_AWARDS_ENTRY_FIXTURES[0])
 
         test_cases = [
-            ("direct_award_pass_through_entity_name", 0),
-            ("direct_award_pass_through_entity_id", 0),
+            ("passthrough_name", 0),
+            ("passthrough_identifying_number", 0),
         ]
 
         for field_name, value in test_cases:
@@ -317,7 +319,7 @@ class FindingsUniformGuidanceExcelTests(SimpleTestCase):
         _set_by_name(workbook, "auditee_ein", "123456789")
 
         entry = jsoncopy(FINDINGS_UNIFORM_GUIDANCE_ENTRY_FIXTURES[0])
-        del entry["finding_reference_number"]
+        del entry["reference_number"]
 
         _add_entry(workbook, 0, entry)
 
@@ -337,9 +339,10 @@ class FindingsUniformGuidanceExcelTests(SimpleTestCase):
 
         test_cases = [
             ("auditee_ein", 123456789),
-            ("finding_reference_number", 0),
+            ("reference_number", 0),
             ("program_name", 123),
-            ("program_number", 10.001),
+            ("federal_agency_prefix", 10),
+            ("three_digit_extension", "001"),
             ("prior_references", 123),
         ]
 
