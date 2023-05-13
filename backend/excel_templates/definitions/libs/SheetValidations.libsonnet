@@ -31,6 +31,14 @@ local PositiveNumberValidation = {
     custom_title: "Positive numbers"
 };
 
+local ReferenceNumberValidation = {
+    type: "custom",
+    //It is neccessary to allow blank otherwise user cannot delete the value
+    formula1: "=OR(ISBLANK(FIRSTCELLREF), AND(LEN(FIRSTCELLREF) = 8, LEFT(FIRSTCELLREF, 2) = \"20\", ISNUMBER(MID(FIRSTCELLREF, 3, 2) * 1), MID(FIRSTCELLREF, 5, 1) = \"-\", ISNUMBER(RIGHT(FIRSTCELLREF, 3) * 1)))",
+    custom_error: "Expecting a value in the format YYYY-NNN, where YYYY is a year and NNN a three digit number (e.g. 2023-001)",
+    custom_title: "Reference number"
+};
+
 local StringOfLengthThree = {
     type: "textLength",
     operator: "equal",
@@ -52,5 +60,6 @@ local StringOfLengthThree = {
     PositiveNumberValidation: PositiveNumberValidation,
     StringOfLengthThree: StringOfLengthThree,
     YoNValidation: YoNValidation,
+    ReferenceNumberValidation: ReferenceNumberValidation
 //    ComplianceRequirementValidation: ComplianceRequirementValidation
 }
