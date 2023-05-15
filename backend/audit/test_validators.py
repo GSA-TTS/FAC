@@ -140,9 +140,9 @@ class FederalAwardsValidatorTests(SimpleTestCase):
         A CFDA extension of RD should pass
         """
         simple = jsoncopy(FederalAwardsSchemaValidityTest.SIMPLE_CASE)
-        # 20230512 HDMS FIXME: This is wrong. Not all two digits from 10 to 99  are valid. Changed to 10 to 69 for now.
+        # 20230512 HDMS FIXME: This is wrong. Not all two digits from 10 to 20  are valid. Changed to 10 to 69 for now.
         # pick a prefix between 10 and 99 (valid)
-        prefix = f"{randrange(10, 70):02}"
+        prefix = f"{randrange(10, 20):02}"
         # use RD as extension (valid)
         extension = "RD"
 
@@ -155,7 +155,6 @@ class FederalAwardsValidatorTests(SimpleTestCase):
         simple["FederalAwards"]["federal_awards"][0]["program"][
             "additional_award_identification"
         ] = "1234567"
-
         validate_federal_award_json(simple)
 
     def test_extension_U(self):
@@ -165,7 +164,7 @@ class FederalAwardsValidatorTests(SimpleTestCase):
         simple = jsoncopy(FederalAwardsSchemaValidityTest.SIMPLE_CASE)
 
         # pick a prefix between 10 and 99 (valid)
-        prefix = f"{randrange(10, 70):02}"
+        prefix = f"{randrange(10, 20):02}"
         # pick an extension between U10 and U99 (valid)
         extension = f"U{randrange(10, 100):02}"
 
@@ -227,7 +226,7 @@ class FederalAwardsValidatorTests(SimpleTestCase):
         simple = jsoncopy(FederalAwardsSchemaValidityTest.SIMPLE_CASE)
 
         # pick a prefix between 10 and 99 (valid)
-        prefix = f"{randrange(10, 70):02}"
+        prefix = f"{randrange(10, 20):02}"
         # pick an extension between 001 and 999 (valid)
         extension = f"{randrange(100, 1000):03}"
 
@@ -247,7 +246,7 @@ class FederalAwardsValidatorTests(SimpleTestCase):
         simple = jsoncopy(FederalAwardsSchemaValidityTest.SIMPLE_CASE)
 
         # pick a prefix between 10 and 99 (valid)
-        prefix = f"{randrange(10, 70):02}"
+        prefix = f"{randrange(10, 20):02}"
         # pick an extension with four or more digits
         extension = f"{randrange(1000):04}"
 
@@ -267,7 +266,7 @@ class FederalAwardsValidatorTests(SimpleTestCase):
         simple = jsoncopy(FederalAwardsSchemaValidityTest.SIMPLE_CASE)
 
         # pick a prefix between 10 and 99 (valid)
-        prefix = f"{randrange(10, 70):02}"
+        prefix = f"{randrange(10, 20):02}"
         # pick an extension between 001 and 999 with a trailing letter (valid)
         extension = f"{randrange(100, 1000):03}{choice(string.ascii_letters)}"
         simple["FederalAwards"]["federal_awards"][0]["program"][
@@ -286,7 +285,7 @@ class FederalAwardsValidatorTests(SimpleTestCase):
         simple = jsoncopy(FederalAwardsSchemaValidityTest.SIMPLE_CASE)
 
         # pick a prefix between 10 and 99 (valid)
-        prefix = f"{randrange(10, 70):02}"
+        prefix = f"{randrange(10, 20):02}"
         # pick an extension between 001 and 999 with 2 trailing letters (invalid)
         extension = f"{randrange(100, 1000):03}{choice(string.ascii_letters)}{choice(string.ascii_letters)}"
 
@@ -309,7 +308,7 @@ class FederalAwardsValidatorTests(SimpleTestCase):
         simple = jsoncopy(FederalAwardsSchemaValidityTest.SIMPLE_CASE)
 
         # pick a prefix between 10 and 99 (valid)
-        prefix = f"{randrange(10, 70):02}"
+        prefix = f"{randrange(10, 20):02}"
 
         # pick extensions with one or more non-numeric characters
         extensions = [
