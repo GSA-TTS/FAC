@@ -785,7 +785,7 @@ class CorrectiveActionPlanSchemaValidityTest(SimpleTestCase):
 
     SIMPLE_CASE = {
         "CorrectiveActionPlan": {
-            "auditee_uei": "123456789123",
+            "auditee_uei": "AAA123456BBB",
             "corrective_action_plan_entries": [
                 {
                     "contains_chart_or_table": "N",
