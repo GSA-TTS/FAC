@@ -55,12 +55,12 @@ local FindingsUniformGuidanceEntry = {
 local FindingsUniformGuidance = Types.object {
   additionalProperties: false,
   properties: {
-    auditee_ein: Func.compound_type([Types.string, Types.NULL]),
+    auditee_uei: Base.Compound.UEI,
     findings_uniform_guidance_entries: Types.array {
       items: FindingsUniformGuidanceEntry,
     },
   },
-  required: ['auditee_ein'],
+  required: ['auditee_uei'],
   title: 'FindingsUniformGuidance',
   version: 20230410,
 };

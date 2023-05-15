@@ -323,7 +323,7 @@ local FederalAwardEntry = Types.object {
 local FederalAwards = Types.object {
   additionalProperties: false,
   properties: {
-    auditee_ein: Func.compound_type([Types.string, Types.NULL]),
+    auditee_uei: Base.Compound.UEI,
     federal_awards: Types.array {
       items: FederalAwardEntry,
     },
@@ -331,7 +331,7 @@ local FederalAwards = Types.object {
       minimum: 0,
     }, Types.NULL]),
   },
-  required: ['auditee_ein', 'total_amount_expended'],
+  required: ['auditee_uei', 'total_amount_expended'],
   title: 'FederalAward',
   version: 20230408,
 };
