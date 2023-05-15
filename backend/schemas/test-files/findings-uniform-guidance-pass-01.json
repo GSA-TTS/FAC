@@ -1,6 +1,6 @@
 {
     "FindingsUniformGuidance": {
-        "auditee_ein": null,
+        "auditee_uei": "AAA123456BBB",
            "findings_uniform_guidance_entries": [
             {
                 "program": {
