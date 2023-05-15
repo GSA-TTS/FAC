@@ -372,7 +372,7 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
 
     SIMPLE_CASE = {
         "FederalAwards": {
-            "auditee_ein": None,
+            "auditee_uei": "AAA123456BBB",
             "total_amount_expended": 12345,
             "federal_awards": [
                 {
@@ -407,7 +407,7 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
 
     M1 = {
         "FederalAwards": {
-            "auditee_ein": None,
+            "auditee_uei": "AAA123456BBB",
             "total_amount_expended": 12345,
             "federal_awards": [
                 {
@@ -456,12 +456,12 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
 
     def test_missing_auditee_ein(self):
         """
-        Test that validation fails if auditee_ein is missing
+        Test that validation fails if auditee_uei is missing
         """
         schema = self.FEDERAL_AWARDS_SCHEMA
 
         simple_case = jsoncopy(self.SIMPLE_CASE)
-        del simple_case["FederalAwards"]["auditee_ein"]
+        del simple_case["FederalAwards"]["auditee_uei"]
 
         self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
@@ -896,7 +896,7 @@ class FindingsTextSchemaValidityTest(SimpleTestCase):
 
     SIMPLE_CASE = {
         "FindingsText": {
-            "auditee_ein": None,
+            "auditee_uei": "AAA123456BBB",
             "findings_text_entries": [
                 {
                     "contains_chart_or_table": "N",
@@ -925,12 +925,12 @@ class FindingsTextSchemaValidityTest(SimpleTestCase):
 
     def test_missing_auditee_ein(self):
         """
-        Test that validation fails if auditee_ein is missing
+        Test that validation fails if auditee_uei is missing
         """
         schema = self.FINDINGS_TEXT_SCHEMA
 
         simple_case = jsoncopy(self.SIMPLE_CASE)
-        del simple_case["FindingsText"]["auditee_ein"]
+        del simple_case["FindingsText"]["auditee_uei"]
 
         self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
@@ -1004,7 +1004,7 @@ class FindingsUniformGuidanceSchemaValidityTest(SimpleTestCase):
 
     SIMPLE_CASE = {
         "FindingsUniformGuidance": {
-            "auditee_ein": None,
+            "auditee_uei": "AAA123456BBB",
             "findings_uniform_guidance_entries": [
                 {
                     "program": {
@@ -1050,12 +1050,12 @@ class FindingsUniformGuidanceSchemaValidityTest(SimpleTestCase):
 
     def test_missing_auditee_ein(self):
         """
-        Test that validation fails if auditee_ein is missing
+        Test that validation fails if auditee_uei is missing
         """
         schema = self.FINDINGS_UNIFORM_GUIDANCE_SCHEMA
 
         simple_case = jsoncopy(self.SIMPLE_CASE)
-        del simple_case["FindingsUniformGuidance"]["auditee_ein"]
+        del simple_case["FindingsUniformGuidance"]["auditee_uei"]
 
         self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 

@@ -51,17 +51,17 @@ def _set_pass_through_entity_id(obj, target, value):
 
 
 federal_awards_field_mapping: FieldMapping = {
-    "auditee_ein": ("FederalAwards.auditee_ein", _set_by_path),
+    "auditee_uei": ("FederalAwards.auditee_uei", _set_by_path),
     "total_amount_expended": ("FederalAwards.total_amount_expended", _set_by_path),
 }
 corrective_action_field_mapping: FieldMapping = {
     "auditee_uei": ("CorrectiveActionPlan.auditee_uei", _set_by_path),
 }
 findings_uniform_guidance_field_mapping: FieldMapping = {
-    "auditee_ein": ("FindingsUniformGuidance.auditee_ein", _set_by_path),
+    "auditee_uei": ("FindingsUniformGuidance.auditee_uei", _set_by_path),
 }
 findings_text_field_mapping: FieldMapping = {
-    "auditee_ein": ("FindingsText.auditee_ein", _set_by_path),
+    "auditee_uei": ("FindingsText.auditee_uei", _set_by_path),
 }
 
 federal_awards_column_mapping: ColumnMapping = {
@@ -498,7 +498,6 @@ def _extract_named_ranges(errors, column_mapping, field_mapping):
                 named_ranges.append((keyFound, None))
 
         if not keyFound:
-            print(f"No named range matches this error path: {error}")
             print(f"No named range matches this error path: {error.path}")
 
     return named_ranges

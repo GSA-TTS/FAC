@@ -214,6 +214,8 @@ def _add_entry(workbook, row_offset, entry):
 
 
 class ExcelFileHandlerViewTests(TestCase):
+    GOOD_UEI = "AAA123456BBB"
+
     def test_login_required(self):
         """When an unauthenticated request is made"""
 
@@ -310,7 +312,7 @@ class ExcelFileHandlerViewTests(TestCase):
 
         # add valid data to the workbook
         workbook = load_workbook(FEDERAL_AWARDS_TEMPLATE, data_only=True)
-        _set_by_name(workbook, "auditee_ein", "123456789")
+        _set_by_name(workbook, "auditee_uei", ExcelFileHandlerViewTests.GOOD_UEI)
         _set_by_name(workbook, "total_amount_expended", 200)
         _add_entry(workbook, 0, FEDERAL_AWARDS_ENTRY_FIXTURES[0])
 
@@ -335,8 +337,8 @@ class ExcelFileHandlerViewTests(TestCase):
                 updated_sac = SingleAuditChecklist.objects.get(pk=sac.id)
 
                 self.assertEqual(
-                    updated_sac.federal_awards["FederalAwards"]["auditee_ein"],
-                    "123456789",
+                    updated_sac.federal_awards["FederalAwards"]["auditee_uei"],
+                    ExcelFileHandlerViewTests.GOOD_UEI,
                 )
                 self.assertEqual(
                     updated_sac.federal_awards["FederalAwards"][
@@ -494,7 +496,7 @@ class ExcelFileHandlerViewTests(TestCase):
 
         # add valid data to the workbook
         workbook = load_workbook(FINDINGS_UNIFORM_GUIDANCE_TEMPLATE, data_only=True)
-        _set_by_name(workbook, "auditee_ein", "123456789")
+        _set_by_name(workbook, "auditee_uei", ExcelFileHandlerViewTests.GOOD_UEI)
 
         _add_entry(workbook, 0, FINDINGS_UNIFORM_GUIDANCE_ENTRY_FIXTURES[0])
 
@@ -520,9 +522,9 @@ class ExcelFileHandlerViewTests(TestCase):
 
                 self.assertEqual(
                     updated_sac.findings_uniform_guidance["FindingsUniformGuidance"][
-                        "auditee_ein"
+                        "auditee_uei"
                     ],
-                    "123456789",
+                    ExcelFileHandlerViewTests.GOOD_UEI,
                 )
 
                 self.assertEqual(
@@ -579,7 +581,7 @@ class ExcelFileHandlerViewTests(TestCase):
 
         # add valid data to the workbook
         workbook = load_workbook(FINDINGS_TEXT_TEMPLATE, data_only=True)
-        _set_by_name(workbook, "auditee_ein", "123456789")
+        _set_by_name(workbook, "auditee_uei", ExcelFileHandlerViewTests.GOOD_UEI)
 
         _add_entry(workbook, 0, FINDINGS_TEXT_ENTRY_FIXTURES[0])
 
@@ -604,8 +606,8 @@ class ExcelFileHandlerViewTests(TestCase):
                 updated_sac = SingleAuditChecklist.objects.get(pk=sac.id)
 
                 self.assertEqual(
-                    updated_sac.findings_text["FindingsText"]["auditee_ein"],
-                    "123456789",
+                    updated_sac.findings_text["FindingsText"]["auditee_uei"],
+                    ExcelFileHandlerViewTests.GOOD_UEI,
                 )
 
                 self.assertEqual(
