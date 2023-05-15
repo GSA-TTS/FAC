@@ -26,9 +26,7 @@ all:
 	done
 	for jsonnet_file in $(specs); do \
 		base_name=$$(basename "$$jsonnet_file" .jsonnet); \
-		destination_name=$${base_name%-*}.json; \
-		echo "Processing $$base_name -> $$destination_name"; \
-		jsonnet -o definitions/json/"$$destination_name" "$$jsonnet_file"; \
+		jsonnet -o definitions/json/"$$base_name.json" "$$jsonnet_file"; \
 	done
 
 clean:
@@ -47,7 +45,5 @@ build-xlsx:
 build-json:
 	for jsonnet_file in $(specs); do \
 		base_name=$$(basename "$$jsonnet_file" .jsonnet); \
-		destination_name=$${base_name%-*}.json; \
-		echo "Processing $$base_name -> $$destination_name"; \
-		jsonnet -o definitions/json/"$$destination_name" "$$jsonnet_file"; \
+		jsonnet -o definitions/json/"$$base_name.json" "$$jsonnet_file"; \
 	done

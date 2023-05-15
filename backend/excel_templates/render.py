@@ -12,7 +12,7 @@ import json
 # from json import JSONEncoder
 import _jsonnet
 
-import sys
+import os, sys
 
 from xkcdpass import xkcd_password as xp
 from openpyxl.workbook.protection import WorkbookProtection
@@ -260,8 +260,8 @@ def set_wb_security(wb, password):
     print(f"To unlock: {password}")
 
 
-def save_workbook(wb, spec):
-    wb.save(spec["filename"])
+def save_workbook(wb, basename):
+    wb.save(f"{basename}.xlsx")
 
 
 def process_spec(spec):
@@ -289,4 +289,4 @@ if __name__ == "__main__":
         if maybe_filename.endswith("jsonnet"):
             spec = jsonnet_sheet_spec_to_json(maybe_filename)
             wb = process_spec(spec)
-            save_workbook(wb, spec)
+            save_workbook(wb, os.path.splitext(os.path.basename(sys.argv[1]))[0])

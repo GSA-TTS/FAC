@@ -55,6 +55,27 @@ local Meta = {
   },
 };
 
+local Validation = {
+  AdditionalAwardIdentificationValidation: [
+    {
+      "if": {
+        properties: {
+          three_digit_extension: {
+            pattern: '^(RD|U[0-9]{2})$',
+          },
+          },
+      },
+      "then": {
+        properties: {
+          additional_award_identification: Types.string{
+            minLength: 1,
+          },
+        },
+        required: ['additional_award_identification'] 
+      },
+    },   
+  ],
+};
 
 local Atoms = {
 
@@ -210,11 +231,11 @@ local Enum = {
 };
 
 local Compound = {
-  ProgramNumber: Types.string {
-    title: 'ProgramNumber',
-    description: 'Program number',
-    pattern: '^[1-9]{1}[0-9]{1}\\.([0-9]{3}[a-zA-Z]{0,1}|U[0-9]{2}|RD)$',
-  },
+  ThreeDigitExtension: Types.string {
+    title: 'ThreeDigitExtension',
+    description: 'Three Digit Extension',
+    pattern: '^(RD|[0-9]{3}[A-Za-z]{0,1}|U[0-9]{2})$',
+  },  
   PriorReferences: Types.string {
     title: 'PriorReferences',
     description: 'Prior references',
@@ -281,6 +302,61 @@ local Compound = {
 
 };
 
+local REGEX_ZIPCODE = '^[0-9]{5}([0-9]{4})?$';
+local REGEX_DBKEY = '[1-9][0-9]+';
+
+local type_zipcode = Types.string {
+  pattern: REGEX_ZIPCODE,
+};
+
+
+local type_string_or_null = {
+  oneOf: [
+    Types.NULL,
+    Types.string,
+  ],
+};
+
+// No capital I or O, but lowercase is fine? FIXME check...
+local REGEX_UEI_ALPHA = 'A-H,J-N,P-Z,a-z';
+local REGEX_UEI_LEADING_CLOISTER = '[' + REGEX_UEI_ALPHA + ',1-9]';
+local REGEX_UEI_BODY_CLOISTER = '[' + REGEX_UEI_ALPHA + ',0-9]';
+
+// This may not be a *complete* UEI validator.
+// However, it is a start of one. The UEI rules are broken
+// out so that all of the rules must apply.
+local type_uei = Types.string {
+  allOf: [
+    // Is a string
+    {
+      minLength: 12,
+      maxLength: 12,
+    },
+    // Is alphanumeric, but no I or O
+    {
+      pattern: '^'
+               + REGEX_UEI_LEADING_CLOISTER
+               + REGEX_UEI_BODY_CLOISTER
+               + '+$',
+    },
+    // Does not have 9 digits in a row
+    {
+      pattern: '^(?!'
+               + REGEX_UEI_LEADING_CLOISTER
+               + '+'
+               + REGEX_UEI_BODY_CLOISTER
+               + '*?[0-9]{9})'
+               + REGEX_UEI_BODY_CLOISTER
+               + '*$',
+    },
+  ],
+};
+
+local phone_regex = '[1-9]{1}[0-9]{9}+';
+local e164_regex = '^\\+[0-9]{1,3}[ ]*[0-9]{2,3}[ ]*[0-9]{2,3}[ ]*[0-9]{4}|^\\+[0-9]{1,3}[ ]*[0-9]{1,14}([ ]*[0-9]{1,13})?|^\\([0-9]{3}\\)[ ]*[0-9]{3}[ ]*[0-9]{4}?';
+local email_regex = '^[a-zA-Z0-9!#$%&\'*+/=?^_`{|}~-]+(?:\\.[a-zA-Z0-9!#$%&\'*+/=?^_`{|}~-]+)*@(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?\\.)+[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?$';
+
+
 local SchemaBase = Types.object {
   '$schema': Const.SCHEMA_VERSION,
   additionalProperties: false,
@@ -296,6 +372,9 @@ local SchemaBase = Types.object {
   Atoms: Atoms,
   Meta: Meta,
   Enum: Enum,
-  Compound: Compound,
+  Compound: Compound + {
+    UEI: type_uei
+  },
+  Validation: Validation,
   SchemaBase: SchemaBase,
 }

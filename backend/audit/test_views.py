@@ -354,32 +354,36 @@ class ExcelFileHandlerViewTests(TestCase):
                 ][0]
 
                 self.assertEqual(
-                    federal_awards_entry["cluster"]["name"],
+                    federal_awards_entry["cluster"]["cluster_name"],
                     FEDERAL_AWARDS_ENTRY_FIXTURES[0]["cluster_name"],
                 )
                 self.assertEqual(
                     federal_awards_entry["direct_or_indirect_award"]["is_direct"],
-                    FEDERAL_AWARDS_ENTRY_FIXTURES[0]["direct_award"],
+                    FEDERAL_AWARDS_ENTRY_FIXTURES[0]["is_direct"],
                 )
                 self.assertEqual(
                     federal_awards_entry["program"]["is_major"],
-                    FEDERAL_AWARDS_ENTRY_FIXTURES[0]["major_program"],
+                    FEDERAL_AWARDS_ENTRY_FIXTURES[0]["is_major"],
                 )
                 self.assertEqual(
-                    federal_awards_entry["program"]["number"],
-                    FEDERAL_AWARDS_ENTRY_FIXTURES[0]["program_number"],
+                    federal_awards_entry["program"]["federal_agency_prefix"],
+                    FEDERAL_AWARDS_ENTRY_FIXTURES[0]["federal_agency_prefix"],
                 )
                 self.assertEqual(
-                    federal_awards_entry["amount_expended"],
+                    federal_awards_entry["program"]["three_digit_extension"],
+                    FEDERAL_AWARDS_ENTRY_FIXTURES[0]["three_digit_extension"],
+                )
+                self.assertEqual(
+                    federal_awards_entry["program"]["amount_expended"],
                     FEDERAL_AWARDS_ENTRY_FIXTURES[0]["amount_expended"],
                 )
                 self.assertEqual(
-                    federal_awards_entry["program"]["name"],
-                    FEDERAL_AWARDS_ENTRY_FIXTURES[0]["federal_program_name"],
+                    federal_awards_entry["program"]["program_name"],
+                    FEDERAL_AWARDS_ENTRY_FIXTURES[0]["program_name"],
                 )
                 self.assertEqual(
                     federal_awards_entry["loan_or_loan_guarantee"]["is_guaranteed"],
-                    FEDERAL_AWARDS_ENTRY_FIXTURES[0]["loan_or_loan_guarantee"],
+                    FEDERAL_AWARDS_ENTRY_FIXTURES[0]["is_guaranteed"],
                 )
                 self.assertEqual(
                     federal_awards_entry["program"]["number_of_audit_findings"],
@@ -387,7 +391,7 @@ class ExcelFileHandlerViewTests(TestCase):
                 )
                 self.assertEqual(
                     federal_awards_entry["program"]["audit_report_type"],
-                    FEDERAL_AWARDS_ENTRY_FIXTURES[0]["major_program_audit_report_type"],
+                    FEDERAL_AWARDS_ENTRY_FIXTURES[0]["audit_report_type"],
                 )
                 self.assertEqual(
                     federal_awards_entry["loan_or_loan_guarantee"][
@@ -399,33 +403,35 @@ class ExcelFileHandlerViewTests(TestCase):
                 )
                 self.assertEqual(
                     federal_awards_entry["subrecipients"]["is_passed"],
-                    FEDERAL_AWARDS_ENTRY_FIXTURES[0][
-                        "federal_award_passed_to_subrecipients"
-                    ],
+                    FEDERAL_AWARDS_ENTRY_FIXTURES[0]["is_passed"],
                 )
                 self.assertEqual(
-                    federal_awards_entry["subrecipients"]["amount"],
-                    FEDERAL_AWARDS_ENTRY_FIXTURES[0][
-                        "federal_award_passed_to_subrecipients_amount"
-                    ],
+                    federal_awards_entry["subrecipients"]["subrecipient_amount"],
+                    FEDERAL_AWARDS_ENTRY_FIXTURES[0]["subrecipient_amount"],
                 )
                 self.assertEqual(
                     federal_awards_entry["direct_or_indirect_award"]["entities"],
                     [
-                        {"name": "A", "identifying_number": "1"},
-                        {"name": "B", "identifying_number": "2"},
+                        {
+                            "passthrough_name": "A",
+                            "passthrough_identifying_number": "1",
+                        },
+                        {
+                            "passthrough_name": "B",
+                            "passthrough_identifying_number": "2",
+                        },
                     ],
                 )
 
     @patch("audit.validators._scan_file")
     def test_valid_file_upload_for_corrective_action_plan(self, mock_scan_file):
         """When a valid Excel file is uploaded, the file should be stored and the SingleAuditChecklist should be updated to include the uploaded Corrective Action Plan data"""
-
+        test_uei = "AAA12345678X"
         sac = _mock_login_and_scan(self, mock_scan_file)
 
         # add valid data to the workbook
         workbook = load_workbook(CORRECTIVE_ACTION_PLAN_TEMPLATE, data_only=True)
-        _set_by_name(workbook, "auditee_ein", "123456789")
+        _set_by_name(workbook, "auditee_uei", test_uei)
 
         _add_entry(workbook, 0, CORRECTIVE_ACTION_PLAN_ENTRY_FIXTURES[0])
 
@@ -445,15 +451,17 @@ class ExcelFileHandlerViewTests(TestCase):
                     data={"FILES": excel_file},
                 )
 
+                print(response.content)
+
                 self.assertEqual(response.status_code, 302)
 
                 updated_sac = SingleAuditChecklist.objects.get(pk=sac.id)
 
                 self.assertEqual(
                     updated_sac.corrective_action_plan["CorrectiveActionPlan"][
-                        "auditee_ein"
+                        "auditee_uei"
                     ],
-                    "123456789",
+                    test_uei,
                 )
 
                 self.assertEqual(
@@ -531,8 +539,16 @@ class ExcelFileHandlerViewTests(TestCase):
                 ]["findings_uniform_guidance_entries"][0]
 
                 self.assertEqual(
-                    findings_entries["program"]["number"],
-                    FINDINGS_UNIFORM_GUIDANCE_ENTRY_FIXTURES[0]["program_number"],
+                    findings_entries["program"]["federal_agency_prefix"],
+                    FINDINGS_UNIFORM_GUIDANCE_ENTRY_FIXTURES[0][
+                        "federal_agency_prefix"
+                    ],
+                )
+                self.assertEqual(
+                    findings_entries["program"]["three_digit_extension"],
+                    FINDINGS_UNIFORM_GUIDANCE_ENTRY_FIXTURES[0][
+                        "three_digit_extension"
+                    ],
                 )
                 self.assertEqual(
                     findings_entries["program"]["compliance_requirement"],
@@ -547,10 +563,8 @@ class ExcelFileHandlerViewTests(TestCase):
                     ],
                 )
                 self.assertEqual(
-                    findings_entries["findings"]["reference"],
-                    FINDINGS_UNIFORM_GUIDANCE_ENTRY_FIXTURES[0][
-                        "finding_reference_number"
-                    ],
+                    findings_entries["findings"]["reference_number"],
+                    FINDINGS_UNIFORM_GUIDANCE_ENTRY_FIXTURES[0]["reference_number"],
                 )
                 self.assertEqual(
                     findings_entries["modified_opinion"],

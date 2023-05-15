@@ -14,7 +14,7 @@ local Validations = {
           material_weakness: {
             const: Base.Const.N,
           },
-          significiant_deficiency: {
+          significant_deficiency: {
             const: Base.Const.N,
           },          
         },
@@ -39,7 +39,7 @@ local Validations = {
           material_weakness: {
             const: Base.Const.Y,
           },
-          significiant_deficiency: {
+          significant_deficiency: {
             const: Base.Const.N,
           },          
         },
@@ -64,7 +64,7 @@ local Validations = {
           material_weakness: {
             const: Base.Const.N,
           },
-          significiant_deficiency: {
+          significant_deficiency: {
             const: Base.Const.Y,
           },          
         },
@@ -89,7 +89,7 @@ local Validations = {
           material_weakness: {
             const: Base.Const.N,
           },
-          significiant_deficiency: {
+          significant_deficiency: {
             const: Base.Const.N,
           },          
         },
@@ -114,7 +114,7 @@ local Validations = {
           material_weakness: {
             const: Base.Const.Y,
           },
-          significiant_deficiency: {
+          significant_deficiency: {
             const: Base.Const.N,
           },          
         },
@@ -139,7 +139,7 @@ local Validations = {
           material_weakness: {
             const: Base.Const.N,
           },
-          significiant_deficiency: {
+          significant_deficiency: {
             const: Base.Const.Y,
           },          
         },
@@ -164,7 +164,7 @@ local Validations = {
           material_weakness: {
             const: Base.Const.Y,
           },
-          significiant_deficiency: {
+          significant_deficiency: {
             const: Base.Const.N,
           },          
         },
@@ -189,7 +189,7 @@ local Validations = {
           material_weakness: {
             const: Base.Const.N,
           },
-          significiant_deficiency: {
+          significant_deficiency: {
             const: Base.Const.Y,
           },          
         },
@@ -214,7 +214,7 @@ local Validations = {
           material_weakness: {
             const: Base.Const.N,
           },
-          significiant_deficiency: {
+          significant_deficiency: {
             const: Base.Const.N,
           },          
         },
@@ -241,7 +241,7 @@ local Validations = {
         required:['prior_references'] 
       },
     },
-  ],
+  ],   
 };
 
 {
