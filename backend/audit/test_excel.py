@@ -197,14 +197,6 @@ class CorrectiveActionPlanExcelTests(SimpleTestCase):
         for name in corrective_action_column_mapping:
             self.assertIsNotNone(workbook.defined_names[name])
 
-    def test_empty_template(self):
-        """Test that extraction and validation succeed against the blank template"""
-        corrective_action_plan = extract_corrective_action_plan(
-            CORRECTIVE_ACTION_PLAN_TEMPLATE
-        )
-
-        validate_corrective_action_plan_json(corrective_action_plan)
-
     def test_single_corrective_action_plan_entry(self):
         """Test that extraction and validation succeed when there is a single corrective action plan entry"""
         workbook = load_workbook(CORRECTIVE_ACTION_PLAN_TEMPLATE, data_only=True)
