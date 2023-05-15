@@ -55,7 +55,7 @@ federal_awards_field_mapping: FieldMapping = {
     "total_amount_expended": ("FederalAwards.total_amount_expended", _set_by_path),
 }
 corrective_action_field_mapping: FieldMapping = {
-    "auditee_ein": ("CorrectiveActionPlan.auditee_ein", _set_by_path),
+    "auditee_uei": ("CorrectiveActionPlan.auditee_uei", _set_by_path),
 }
 findings_uniform_guidance_field_mapping: FieldMapping = {
     "auditee_ein": ("FindingsUniformGuidance.auditee_ein", _set_by_path),
@@ -498,6 +498,7 @@ def _extract_named_ranges(errors, column_mapping, field_mapping):
                 named_ranges.append((keyFound, None))
 
         if not keyFound:
+            print(f"No named range matches this error path: {error}")
             print(f"No named range matches this error path: {error.path}")
 
     return named_ranges

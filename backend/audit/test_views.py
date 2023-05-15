@@ -426,12 +426,12 @@ class ExcelFileHandlerViewTests(TestCase):
     @patch("audit.validators._scan_file")
     def test_valid_file_upload_for_corrective_action_plan(self, mock_scan_file):
         """When a valid Excel file is uploaded, the file should be stored and the SingleAuditChecklist should be updated to include the uploaded Corrective Action Plan data"""
-
+        test_uei = "AAA12345678X"
         sac = _mock_login_and_scan(self, mock_scan_file)
 
         # add valid data to the workbook
         workbook = load_workbook(CORRECTIVE_ACTION_PLAN_TEMPLATE, data_only=True)
-        _set_by_name(workbook, "auditee_ein", "123456789")
+        _set_by_name(workbook, "auditee_uei", test_uei)
 
         _add_entry(workbook, 0, CORRECTIVE_ACTION_PLAN_ENTRY_FIXTURES[0])
 
@@ -450,6 +450,8 @@ class ExcelFileHandlerViewTests(TestCase):
                     ),
                     data={"FILES": excel_file},
                 )
+                
+                print(response.content)
 
                 self.assertEqual(response.status_code, 302)
 
@@ -457,9 +459,9 @@ class ExcelFileHandlerViewTests(TestCase):
 
                 self.assertEqual(
                     updated_sac.corrective_action_plan["CorrectiveActionPlan"][
-                        "auditee_ein"
+                        "auditee_uei"
                     ],
-                    "123456789",
+                    test_uei,
                 )
 
                 self.assertEqual(

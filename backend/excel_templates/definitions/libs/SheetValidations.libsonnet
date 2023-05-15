@@ -47,6 +47,14 @@ local StringOfLengthThree = {
     custom_title: "Must be length of 3"
 };
 
+local StringOfLengthTwelve = {
+    type: "textLength",
+    operator: "equal",
+    formula1: 12,
+    custom_error: "Expecting something with only twelve characters",
+    custom_title: "Must be length of 12"
+};
+
 // local ComplianceRequirementValidation = {
 //     type: "list",
 //     allow_blank: "False",
@@ -59,7 +67,8 @@ local StringOfLengthThree = {
     FAPPrefixValidation: FAPPrefixValidation,
     PositiveNumberValidation: PositiveNumberValidation,
     StringOfLengthThree: StringOfLengthThree,
+    StringOfLengthTwelve: StringOfLengthTwelve,
     YoNValidation: YoNValidation,
-    ReferenceNumberValidation: ReferenceNumberValidation
+    ReferenceNumberValidation: ReferenceNumberValidation,
 //    ComplianceRequirementValidation: ComplianceRequirementValidation
 }

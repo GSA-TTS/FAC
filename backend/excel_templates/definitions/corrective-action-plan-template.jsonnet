@@ -7,9 +7,10 @@ local title_row = 3;
 local single_cells = [
   Sheets.single_cell {
     title: 'Auditee UEI',
-    range_name: 'auditee_ein',
+    range_name: 'auditee_uei',
     title_cell: 'A2',
     range_cell: 'B2',
+    validation: SV.StringOfLengthTwelve,
   },
 ];
 
@@ -36,7 +37,7 @@ local sheets = [
 ];
 
 local workbook = {
-  filename: 'corrective-action-plan-template-20230428.xlsx',
+  filename: 'corrective-action-plan-template.xlsx',
   sheets: sheets,
   title_row:title_row,
 };

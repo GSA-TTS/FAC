@@ -16,13 +16,12 @@ local CorrectiveActionPlanEntry = {
 local CorrectiveActionPlan = Types.object {
   additionalProperties: false,
   properties: {
-    auditee_ein: Func.compound_type([Types.string, Types.NULL]),
+    auditee_uei: Base.Compound.UEI,
     corrective_action_plan_entries: Types.array {
       items: CorrectiveActionPlanEntry,
     },
   },
-  // 20230511 HDMS FIXME: Because auditee_ein is of type string or NULL, the required condition is ignored.
-  required: ['auditee_ein'],
+  required: ['auditee_uei'],
   title: 'CorrectiveActionPlan',
   version: 20230410,
 };

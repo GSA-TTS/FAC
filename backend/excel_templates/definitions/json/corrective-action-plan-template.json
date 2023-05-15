@@ -1,5 +1,5 @@
 {
-   "filename": "corrective-action-plan-template-20230428.xlsx",
+   "filename": "corrective-action-plan-template.xlsx",
    "sheets": [
       {
          "cells_to_merge": [
@@ -79,10 +79,17 @@
          "single_cells": [
             {
                "range_cell": "B2",
-               "range_name": "auditee_ein",
+               "range_name": "auditee_uei",
                "title": "Auditee UEI",
                "title_cell": "A2",
-               "type": "single_cell"
+               "type": "single_cell",
+               "validation": {
+                  "custom_error": "Expecting something with only twelve characters",
+                  "custom_title": "Must be length of 12",
+                  "formula1": 12,
+                  "operator": "equal",
+                  "type": "textLength"
+               }
             }
          ]
       }

@@ -785,7 +785,7 @@ class CorrectiveActionPlanSchemaValidityTest(SimpleTestCase):
 
     SIMPLE_CASE = {
         "CorrectiveActionPlan": {
-            "auditee_ein": None,
+            "auditee_uei": "123456789123",
             "corrective_action_plan_entries": [
                 {
                     "contains_chart_or_table": "N",
@@ -813,14 +813,14 @@ class CorrectiveActionPlanSchemaValidityTest(SimpleTestCase):
 
         validate(self.SIMPLE_CASE, schema)
 
-    def test_missing_auditee_ein(self):
+    def test_missing_auditee_uei(self):
         """
-        Test that validation fails if auditee_ein is missing
+        Test that validation fails if auditee_uei is missing
         """
         schema = self.CORRECTIVE_ACTION_PLAN_SCHEMA
 
         simple_case = jsoncopy(self.SIMPLE_CASE)
-        del simple_case["CorrectiveActionPlan"]["auditee_ein"]
+        del simple_case["CorrectiveActionPlan"]["auditee_uei"]
 
         self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
