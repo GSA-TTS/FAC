@@ -1,0 +1,8 @@
+{
+    "status":"error",
+    "message":"File upload failed",
+    "error":{
+        "code":400,
+        "description": "The file uuload request was invalid"
+    }
+}
