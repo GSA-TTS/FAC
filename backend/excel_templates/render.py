@@ -12,7 +12,8 @@ import json
 # from json import JSONEncoder
 import _jsonnet
 
-import os, sys
+import os
+import sys
 
 from xkcdpass import xkcd_password as xp
 from openpyxl.workbook.protection import WorkbookProtection
