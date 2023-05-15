@@ -209,10 +209,8 @@ class CorrectiveActionPlanExcelTests(SimpleTestCase):
         """Test that extraction and validation succeed when there is a single corrective action plan entry"""
         workbook = load_workbook(CORRECTIVE_ACTION_PLAN_TEMPLATE, data_only=True)
 
-        _set_by_name(workbook, 
-                     "auditee_uei", 
-                     CorrectiveActionPlanExcelTests.GOOD_UEI)
-        
+        _set_by_name(workbook, "auditee_uei", CorrectiveActionPlanExcelTests.GOOD_UEI)
+
         _add_entry(workbook, 0, CORRECTIVE_ACTION_PLAN_ENTRY_FIXTURES[0])
 
         corrective_action_plan = extract_corrective_action_plan(workbook)
@@ -223,10 +221,8 @@ class CorrectiveActionPlanExcelTests(SimpleTestCase):
         """Test that extraction and validation succeed when there are multiple corrective action plan entries"""
         workbook = load_workbook(CORRECTIVE_ACTION_PLAN_TEMPLATE, data_only=True)
 
-        _set_by_name(workbook, 
-                     "auditee_uei", 
-                     CorrectiveActionPlanExcelTests.GOOD_UEI)
-        
+        _set_by_name(workbook, "auditee_uei", CorrectiveActionPlanExcelTests.GOOD_UEI)
+
         for index, entry in enumerate(CORRECTIVE_ACTION_PLAN_ENTRY_FIXTURES):
             _add_entry(workbook, index, entry)
 
@@ -238,9 +234,7 @@ class CorrectiveActionPlanExcelTests(SimpleTestCase):
         """Test that extraction succeeds and validation fails when there are partial corrective action plan entries"""
         workbook = load_workbook(CORRECTIVE_ACTION_PLAN_TEMPLATE, data_only=True)
 
-        _set_by_name(workbook, 
-                     "auditee_uei", 
-                     CorrectiveActionPlanExcelTests.GOOD_UEI)
+        _set_by_name(workbook, "auditee_uei", CorrectiveActionPlanExcelTests.GOOD_UEI)
 
         entry = jsoncopy(CORRECTIVE_ACTION_PLAN_ENTRY_FIXTURES[0])
         del entry["planned_action"]
@@ -260,13 +254,11 @@ class CorrectiveActionPlanExcelTests(SimpleTestCase):
         workbook = load_workbook(CORRECTIVE_ACTION_PLAN_TEMPLATE, data_only=True)
 
         # add valid data to the workbook
-        _set_by_name(workbook, 
-                     "auditee_uei", 
-                     CorrectiveActionPlanExcelTests.GOOD_UEI)
+        _set_by_name(workbook, "auditee_uei", CorrectiveActionPlanExcelTests.GOOD_UEI)
         _add_entry(workbook, 0, CORRECTIVE_ACTION_PLAN_ENTRY_FIXTURES[0])
 
         test_cases = [
-            ("auditee_uei", CorrectiveActionPlanExcelTests.TOO_SHORT_UEI), 
+            ("auditee_uei", CorrectiveActionPlanExcelTests.TOO_SHORT_UEI),
             ("contains_chart_or_table", "not a boolean"),
             ("planned_action", 0),
             ("reference_number", 0),

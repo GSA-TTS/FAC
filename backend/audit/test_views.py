@@ -450,7 +450,7 @@ class ExcelFileHandlerViewTests(TestCase):
                     ),
                     data={"FILES": excel_file},
                 )
-                
+
                 print(response.content)
 
                 self.assertEqual(response.status_code, 302)
