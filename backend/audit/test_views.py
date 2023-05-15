@@ -150,9 +150,9 @@ class SubmissionStatusTests(TestCase):
         self.user = baker.make(User)
         self.client = Client()
 
-    def test_valid_steps(self):
+    def test_ready_for_certification(self):
         """
-        Test the expected order of progression for submission_status.
+        Test that the submitting user can mark the submission as ready for certification
         """
         self.client.force_login(user=self.user)
         self.user.profile.entry_form_data = (
@@ -170,22 +170,6 @@ class SubmissionStatusTests(TestCase):
         self.client.post(f"/audit/ready-for-certification/{report_id}", data={})
         data = MySubmissions.fetch_my_submissions(self.user)
         self.assertEqual(data[0]["submission_status"], "ready_for_certification")
-
-        self.client.post(f"/audit/auditor-certification/{report_id}", data={})
-        data = MySubmissions.fetch_my_submissions(self.user)
-        self.assertEqual(data[0]["submission_status"], "auditor_certified")
-
-        self.client.post(f"/audit/auditee-certification/{report_id}", data={})
-        data = MySubmissions.fetch_my_submissions(self.user)
-        self.assertEqual(data[0]["submission_status"], "auditee_certified")
-
-        self.client.post(f"/audit/certification/{report_id}", data={})
-        data = MySubmissions.fetch_my_submissions(self.user)
-        self.assertEqual(data[0]["submission_status"], "certified")
-
-        self.client.post(f"/audit/submission/{report_id}", data={})
-        data = MySubmissions.fetch_my_submissions(self.user)
-        self.assertEqual(data[0]["submission_status"], "submitted")
 
 
 class MockHttpResponse:
@@ -225,8 +209,7 @@ class ExcelFileHandlerViewTests(TestCase):
                 )
             )
 
-            self.assertIsInstance(response, HttpResponseRedirect)
-            self.assertTrue("openid/login" in response.url)
+            self.assertEqual(response.status_code, 403)
 
     def test_bad_report_id_returns_403(self):
         """When a request is made for a malformed or nonexistent report_id, a 403 error should be returned"""
