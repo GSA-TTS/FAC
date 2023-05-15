@@ -374,7 +374,7 @@ class ExcelFileHandlerViewTests(TestCase):
                     FEDERAL_AWARDS_ENTRY_FIXTURES[0]["three_digit_extension"],
                 )
                 self.assertEqual(
-                    federal_awards_entry["amount_expended"],
+                    federal_awards_entry["program"]["amount_expended"],
                     FEDERAL_AWARDS_ENTRY_FIXTURES[0]["amount_expended"],
                 )
                 self.assertEqual(
