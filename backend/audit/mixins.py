@@ -49,9 +49,8 @@ class SingleAuditChecklistAccessRequiredMixin(LoginRequiredMixin):
 
 
 class CertifyingAuditeeRequiredMixin(LoginRequiredMixin):
-    role = "certifying_auditee_contact"
-
     def dispatch(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
+        role = "certifying_auditee_contact"
         try:
             report_id = kwargs["report_id"]
             sac = SingleAuditChecklist.objects.get(report_id=report_id)
