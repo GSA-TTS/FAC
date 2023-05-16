@@ -64,7 +64,7 @@ EXCEL_FILES = [
 
 
 # Mocking the user login and file scan functions
-def _mock_login_and_scan(self, mock_scan_file):
+def _mock_login_and_scan(client, mock_scan_file):
     """Helper function to mock the login and file scan functions"""
     user = baker.make(User)
 
@@ -72,12 +72,25 @@ def _mock_login_and_scan(self, mock_scan_file):
 
     baker.make(Access, user=user, sac=sac)
 
-    self.client.force_login(user)
+    client.force_login(user)
 
     # mock the call to the external AV service
     mock_scan_file.return_value = MockHttpResponse(200, "clean!")
 
     return sac
+
+
+def _client_post(client, view_str, kwargs=None, data=None):
+    """Helper function for POST requests (does not force auth)"""
+    kwargs, data = kwargs or {}, data or {}
+    url = reverse(view_str, kwargs=kwargs)
+    return client.post(url, data=data)
+
+
+def _authed_post(client, user, view_str, kwargs=None, data=None):
+    """Helper function for POST requests (forces auth)"""
+    client.force_login(user=user)
+    return _client_post(client, view_str, kwargs, data)
 
 
 class MySubmissionsViewTests(TestCase):
@@ -180,9 +193,8 @@ class SubmissionStatusTests(TestCase):
         )
         baker.make(Access, sac=sac, user=user, role="certifying_auditor_contact")
 
-        self.client.force_login(user=user)
-        url = reverse("audit:AuditorCertification", kwargs={"report_id": sac.report_id})
-        self.client.post(url, data={})
+        kwargs = {"report_id": sac.report_id}
+        _authed_post(self.client, user, "audit:AuditorCertification", kwargs=kwargs)
 
         updated_sac = SingleAuditChecklist.objects.get(report_id=sac.report_id)
 
@@ -196,9 +208,8 @@ class SubmissionStatusTests(TestCase):
         sac = baker.make(SingleAuditChecklist, submission_status="auditor_certified")
         baker.make(Access, sac=sac, user=user, role="certifying_auditee_contact")
 
-        self.client.force_login(user=user)
-        url = reverse("audit:AuditeeCertification", kwargs={"report_id": sac.report_id})
-        self.client.post(url, data={})
+        kwargs = {"report_id": sac.report_id}
+        _authed_post(self.client, user, "audit:AuditeeCertification", kwargs=kwargs)
 
         updated_sac = SingleAuditChecklist.objects.get(report_id=sac.report_id)
 
@@ -212,9 +223,8 @@ class SubmissionStatusTests(TestCase):
         sac = baker.make(SingleAuditChecklist, submission_status="auditee_certified")
         baker.make(Access, sac=sac, user=user, role="certifying_auditee_contact")
 
-        self.client.force_login(user=user)
-        url = reverse("audit:Submission", kwargs={"report_id": sac.report_id})
-        self.client.post(url, data={})
+        kwargs = {"report_id": sac.report_id}
+        _authed_post(self.client, user, "audit:Submission", kwargs=kwargs)
 
         updated_sac = SingleAuditChecklist.objects.get(report_id=sac.report_id)
 
@@ -338,7 +348,7 @@ class ExcelFileHandlerViewTests(TestCase):
     def test_valid_file_upload_for_federal_awards(self, mock_scan_file):
         """When a valid Excel file is uploaded, the file should be stored and the SingleAuditChecklist should be updated to include the uploaded Federal Awards data"""
 
-        sac = _mock_login_and_scan(self, mock_scan_file)
+        sac = _mock_login_and_scan(self.client, mock_scan_file)
 
         # add valid data to the workbook
         workbook = load_workbook(FEDERAL_AWARDS_TEMPLATE, data_only=True)
@@ -453,7 +463,7 @@ class ExcelFileHandlerViewTests(TestCase):
     def test_valid_file_upload_for_corrective_action_plan(self, mock_scan_file):
         """When a valid Excel file is uploaded, the file should be stored and the SingleAuditChecklist should be updated to include the uploaded Corrective Action Plan data"""
 
-        sac = _mock_login_and_scan(self, mock_scan_file)
+        sac = _mock_login_and_scan(self.client, mock_scan_file)
 
         # add valid data to the workbook
         workbook = load_workbook(CORRECTIVE_ACTION_PLAN_TEMPLATE, data_only=True)
@@ -514,7 +524,7 @@ class ExcelFileHandlerViewTests(TestCase):
     def test_valid_file_upload_for_findings_uniform_guidance(self, mock_scan_file):
         """When a valid Excel file is uploaded, the file should be stored and the SingleAuditChecklist should be updated to include the uploaded Findings Uniform Guidance data"""
 
-        sac = _mock_login_and_scan(self, mock_scan_file)
+        sac = _mock_login_and_scan(self.client, mock_scan_file)
 
         # add valid data to the workbook
         workbook = load_workbook(FINDINGS_UNIFORM_GUIDANCE_TEMPLATE, data_only=True)
@@ -593,7 +603,7 @@ class ExcelFileHandlerViewTests(TestCase):
     def test_valid_file_upload_for_findings_text(self, mock_scan_file):
         """When a valid Excel file is uploaded, the file should be stored and the SingleAuditChecklist should be updated to include the uploaded Findings Text data"""
 
-        sac = _mock_login_and_scan(self, mock_scan_file)
+        sac = _mock_login_and_scan(self.client, mock_scan_file)
 
         # add valid data to the workbook
         workbook = load_workbook(FINDINGS_TEXT_TEMPLATE, data_only=True)
