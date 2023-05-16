@@ -10,6 +10,7 @@ from .models import Access, SingleAuditChecklist
 
 User = get_user_model()
 
+
 class CertificationPermissionDenied(PermissionDenied):
     def __init__(self, message, eligible_users):
         super().__init__(message)
@@ -24,11 +25,12 @@ def has_access(sac, user):
 
     return True
 
+
 def has_role(sac, user, role):
     accesses = Access.objects.filter(sac=sac, user=user, role=role)
     if not accesses:
         return False
-    
+
     return True
 
 
@@ -42,11 +44,13 @@ class SingleAuditChecklistAccessRequiredMixin(LoginRequiredMixin):
                 raise PermissionDenied("You do not have access to this audit.")
         except SingleAuditChecklist.DoesNotExist:
             raise PermissionDenied("You do not have access to this audit.")
-        
+
         return super().dispatch(request, *args, **kwargs)
-            
+
 
 class CertifyingAuditeeRequiredMixin(LoginRequiredMixin):
+    role = "certifying_auditee_contact"
+
     def dispatch(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
         try:
             report_id = kwargs["report_id"]
@@ -55,9 +59,15 @@ class CertifyingAuditeeRequiredMixin(LoginRequiredMixin):
             if not has_access(sac, request.user):
                 raise PermissionDenied("You do not have access to this audit")
 
-            if not has_role(sac, request.user, "certifying_auditee_contact"):
-                eligible_users = Access.objects.select_related("user").filter(sac=sac, role="certifying_auditee_contact")
-                raise CertificationPermissionDenied("bad role", eligible_users=[])
+            if not has_role(sac, request.user, role):
+                eligible_accesses = Access.objects.select_related("user").filter(
+                    sac=sac, role=role
+                )
+                eligible_users = [acc.user for acc in eligible_accesses]
+
+                raise CertificationPermissionDenied(
+                    "bad role", eligible_users=eligible_users
+                )
         except SingleAuditChecklist.DoesNotExist:
             raise PermissionDenied("You do not have access to this audit.")
 
@@ -66,6 +76,7 @@ class CertifyingAuditeeRequiredMixin(LoginRequiredMixin):
 
 class CertifyingAuditorRequiredMixin(LoginRequiredMixin):
     def dispatch(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
+        role = "certifying_auditor_contact"
         try:
             report_id = kwargs["report_id"]
             sac = SingleAuditChecklist.objects.get(report_id=report_id)
@@ -73,9 +84,14 @@ class CertifyingAuditorRequiredMixin(LoginRequiredMixin):
             if not has_access(sac, request.user):
                 raise PermissionDenied("You do not have access to this audit")
 
-            if not has_role(sac, request.user, "certifying_auditor_contact"):
-                eligible_access = Access.objects.select_related("user").filter(sac=sac, role="certifying_auditor_contact")
-                raise CertificationPermissionDenied("bad role", eligible_users=[])
+            if not has_role(sac, request.user, role):
+                eligible_accesses = Access.objects.select_related("user").filter(
+                    sac=sac, role=role
+                )
+                eligible_users = [acc.user for acc in eligible_accesses]
+                raise CertificationPermissionDenied(
+                    "bad role", eligible_users=eligible_users
+                )
         except SingleAuditChecklist.DoesNotExist:
             raise PermissionDenied("You do not have access to this audit.")
 
