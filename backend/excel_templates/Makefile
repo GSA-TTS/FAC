@@ -1,7 +1,9 @@
 VENV           = .venv
 VENV_PYTHON    = $(VENV)/bin/python
-SYSTEM_PYTHON  = $(or $(shell which python3), $(shell which python))
-PYTHON         = $(or $(wildcard $(VENV_PYTHON)), $(SYSTEM_PYTHON))
+#SYSTEM_PYTHON  = $(or $(shell which python3), $(shell which python))
+#PYTHON         = $(or $(wildcard $(VENV_PYTHON)), $(SYSTEM_PYTHON))
+SYSTEM_PYTHON  =python
+PYTHON         =python
 
 $(VENV_PYTHON):
 	rm -rf $(VENV)
@@ -17,7 +19,7 @@ deps:
 
 specs = $(wildcard definitions/*.jsonnet)
 # xlsx = $(patsubst definitions/%.jsonnet,%.xlsx,$(wildcard definitions/*.jsonnet))
-xlsx = $(wildcard *-template-*.xlsx)
+xlsx = $(wildcard *-template*.xlsx)
 json = $(wildcard definitions/json/*.json)
 
 all:
