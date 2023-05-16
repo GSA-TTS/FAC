@@ -1,8 +1,13 @@
 {
-   "filename": "federal-awards-expended-template-20230425.xlsx",
+   "filename": "federal-awards-expended-template.xlsx",
    "sheets": [
       {
-         "cells_to_merge": [
+         "header_inclusion": [
+            "A1",
+            "C2",
+            "F2"
+         ],
+         "mergeable_cells": [
             [
                1,
                2,
@@ -15,11 +20,6 @@
                "F",
                "S"
             ]
-         ],
-         "include_in_header": [
-            "A1",
-            "C2",
-            "F2"
          ],
          "name": "Form",
          "open_ranges": [

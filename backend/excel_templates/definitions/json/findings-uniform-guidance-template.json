@@ -1,8 +1,12 @@
 {
-   "filename": "findings-uniform-guidance-template-20230428.xlsx",
+   "filename": "findings-uniform-guidance-template.xlsx",
    "sheets": [
       {
-         "cells_to_merge": [
+         "header_inclusion": [
+            "A1",
+            "C2"
+         ],
+         "mergeable_cells": [
             [
                1,
                2,
@@ -15,10 +19,6 @@
                "C",
                "O"
             ]
-         ],
-         "include_in_header": [
-            "A1",
-            "C2"
          ],
          "name": "Form",
          "open_ranges": [
