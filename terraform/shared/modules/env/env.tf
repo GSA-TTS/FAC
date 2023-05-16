@@ -24,6 +24,7 @@ module "egress-proxy" {
       # to the Caddy forwardproxy (https://github.com/caddyserver/forwardproxy/blob/caddy2/README.md#access-control)
       # because it only allows subdomain wildcards in `*.` as a prefix. So this wildcard is a little broader than
       # we would prefer, but realistically the tightest domain mask we can specify given our current solution.
+      # We put in an upstream issue about this: https://github.com/caddyserver/forwardproxy/issues/102
       "*.newrelic.com:443",
 
       # Login.gov sanbox
