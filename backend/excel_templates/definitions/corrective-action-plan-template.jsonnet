@@ -25,14 +25,15 @@ local sheets = [
     name: 'Form',
     single_cells: single_cells,
     open_ranges: Fun.make_open_ranges_with_column(title_row, open_ranges_defns),
-    cells_to_merge: [
+    mergeable_cells: [
       [1, 2, 'A', 'H'],
       [2, 3, 'C', 'H'],
       [3, Sheets.MAX_ROWS, 'A', 'B'],
       [3, Sheets.MAX_ROWS, 'C', 'F'],
       [3, Sheets.MAX_ROWS, 'G', 'H'],
     ],
-    include_in_header: ['A1', 'C2'],
+    merged_unreachable: ['B', 'D', 'E', 'F', 'H'],
+    header_inclusion: ['A1', 'C2'],
   },
 ];
 

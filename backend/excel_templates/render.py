@@ -213,15 +213,20 @@ def add_validations(wb, ws, spec):
         configure_validation(ws, coords, r)
 
 
-def unlock_data_entry_cells(wb, ws, spec):
+def unlock_data_entry_cells(header_row, ws, spec):
     for r in spec["open_ranges"]:
-        # abs_start_col = r['title_cell'][0]
-        # abs_start_row = int(r['title_cell'][1]) + 1
         coords = make_range(r)
         for rowndx in range(coords.range_start_row, MAX_ROWS):
             cell_reference = f"${coords.column}${rowndx}"
             cell = ws[cell_reference]
             cell.protection = Protection(locked=False)
+    if "merged_unreachable" in spec:
+        data_row_index = header_row + 1
+        for column in spec["merged_unreachable"]:
+            for rowndx in range(data_row_index, MAX_ROWS):
+                cell_reference = f"${column}${rowndx}"
+                cell = ws[cell_reference]
+                cell.protection = Protection(locked=False)
 
 
 def set_column_widths(wb, ws, spec):
@@ -270,15 +275,15 @@ def process_spec(spec):
     password = generate_password()
     for ndx, sheet in enumerate(spec["sheets"]):
         ws = create_protected_sheet(wb, sheet, password, ndx)
-        if "cells_to_merge" in sheet:
-            merge_adjacent_columns(ws, sheet["cells_to_merge"])
+        if "mergeable_cells" in sheet:
+            merge_adjacent_columns(ws, sheet["mergeable_cells"])
         process_open_ranges(wb, ws, sheet)
         add_validations(wb, ws, sheet)
-        unlock_data_entry_cells(wb, ws, sheet)
+        unlock_data_entry_cells(spec["title_row"], ws, sheet)
         set_column_widths(wb, ws, sheet)
         process_single_cells(wb, ws, sheet)
-        if "include_in_header" in sheet:
-            apply_header_cell_style(ws, sheet["include_in_header"])
+        if "header_inclusion" in sheet:
+            apply_header_cell_style(ws, sheet["header_inclusion"])
 
     set_wb_security(wb, password)
     return wb

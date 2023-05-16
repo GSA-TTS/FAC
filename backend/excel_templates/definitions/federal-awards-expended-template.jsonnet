@@ -59,17 +59,18 @@ local sheets = [
     name: 'Form',
     single_cells: single_cells,
     open_ranges: Fun.make_open_ranges(title_row, open_ranges_defns),
-    cells_to_merge: [
+    mergeable_cells: [
       [1, 2, 'A', 'S'],
       [2, 3, 'F', 'S'],
     ],
-    include_in_header: ['A1', 'C2', 'F2'],
+    header_inclusion: ['A1', 'C2', 'F2'],
   },
 ];
 
 local workbook = {
-  filename: 'federal-awards-expended-template-20230425.xlsx',
+  filename: 'federal-awards-expended-template.xlsx',
   sheets: sheets,
+  title_row:title_row
 };
 
-{title_row:title_row} + workbook
+{} + workbook
