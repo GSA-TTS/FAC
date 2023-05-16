@@ -170,6 +170,56 @@ class SubmissionStatusTests(TestCase):
         data = MySubmissions.fetch_my_submissions(self.user)
         self.assertEqual(data[0]["submission_status"], "ready_for_certification")
 
+    def test_auditor_certification(self):
+        """
+        Test that certifying auditor contacts can provide auditor certification
+        """
+        user = baker.make(User)
+        sac = baker.make(
+            SingleAuditChecklist, submission_status="ready_for_certification"
+        )
+        baker.make(Access, sac=sac, user=user, role="certifying_auditor_contact")
+
+        self.client.force_login(user=user)
+        url = reverse("audit:AuditorCertification", kwargs={"report_id": sac.report_id})
+        self.client.post(url, data={})
+
+        updated_sac = SingleAuditChecklist.objects.get(report_id=sac.report_id)
+
+        self.assertEqual(updated_sac.submission_status, "auditor_certified")
+
+    def test_auditee_certification(self):
+        """
+        Test that certifying auditee contacts can provide auditee certification
+        """
+        user = baker.make(User)
+        sac = baker.make(SingleAuditChecklist, submission_status="auditor_certified")
+        baker.make(Access, sac=sac, user=user, role="certifying_auditee_contact")
+
+        self.client.force_login(user=user)
+        url = reverse("audit:AuditeeCertification", kwargs={"report_id": sac.report_id})
+        self.client.post(url, data={})
+
+        updated_sac = SingleAuditChecklist.objects.get(report_id=sac.report_id)
+
+        self.assertEqual(updated_sac.submission_status, "auditee_certified")
+
+    def test_submission(self):
+        """
+        Test that certifying auditee contacts can perform submission
+        """
+        user = baker.make(User)
+        sac = baker.make(SingleAuditChecklist, submission_status="auditee_certified")
+        baker.make(Access, sac=sac, user=user, role="certifying_auditee_contact")
+
+        self.client.force_login(user=user)
+        url = reverse("audit:Submission", kwargs={"report_id": sac.report_id})
+        self.client.post(url, data={})
+
+        updated_sac = SingleAuditChecklist.objects.get(report_id=sac.report_id)
+
+        self.assertEqual(updated_sac.submission_status, "submitted")
+
 
 class MockHttpResponse:
     def __init__(self, status_code, text):
