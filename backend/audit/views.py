@@ -354,8 +354,8 @@ class SubmissionProgressView(SingleAuditChecklistAccessRequiredMixin, generic.Vi
                 "auditee_uei": sac.auditee_uei,
                 "user_provided_organization_type": sac.user_provided_organization_type,
             }
+            # Add all SF-SAC uploads to determine if it is complete or not
             context['SF_SAC_completed'] = context['federal_awards_workbook']['completed'] and True
-            print('ligma', context['SF_SAC_completed'])
 
             return render(request, "audit/submission-progress.html", context)
         except SingleAuditChecklist.DoesNotExist:
