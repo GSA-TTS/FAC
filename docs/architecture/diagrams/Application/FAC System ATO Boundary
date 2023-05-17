@@ -59,9 +59,10 @@ Rel(Agency, django, "Searches for/reads non-public information, using https 443"
 Rel(Staff, django, "Manages audits, roles, content, using https 443")
 
 Rel(User, Login, "Verifies identity & authenticates with", "https 443")
+Rel(User2, Login, "Verifies identity & authenticates with", "https 443")
 Rel(Staff, Login, "Verifies identity & authenticates with", "https 443"")
 Rel(Agency, Login, "Verifies identity & authenticates with", "https 443"")
-Rel(AgencyApp, datagov, "Routes requests through")
+Rel(AgencyApp, datagov, "Routes API pull requests through")
 
 
 
