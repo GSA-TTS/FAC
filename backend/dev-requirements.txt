@@ -14,6 +14,12 @@ asgiref==3.6.0 \
     # via
     #   -c ./requirements/../requirements.txt
     #   django
+attrs==22.2.0 \
+    --hash=sha256:29e95c7f6778868dbd49170f98f8818f78f3dc5e0e37c0b1f474e3561b240836 \
+    --hash=sha256:c9227bfc2f01993c03f68db37d1d15c9690188323c067c641f1a35ca58185f99
+    # via
+    #   -c ./requirements/../requirements.txt
+    #   jsonschema
 awscli-local==0.20 \
     --hash=sha256:8694445f4fcf11e1ed15c0cf47150b85f5904cc6f27ae8157043b89cf9f4b16a
     # via -r ./requirements/dev-requirements.in
@@ -326,7 +332,16 @@ django==4.1.7 \
     --hash=sha256:f2f431e75adc40039ace496ad3b9f17227022e8b11566f4b363da44c7e44761e
     # via
     #   -c ./requirements/../requirements.txt
+    #   djangorestframework
+    #   drf-spectacular
+    #   drf-spectacular-sidecar
     #   model-bakery
+djangorestframework==3.14.0 \
+    --hash=sha256:579a333e6256b09489cbe0a067e66abe55c6595d8926be6b99423786334350c8 \
+    --hash=sha256:eb63f58c9f218e1a7d064d17a70751f528ed4e1d35547fdade9aaf4cd103fd08
+    # via
+    #   -c ./requirements/../requirements.txt
+    #   drf-spectacular
 djlint==1.19.16 \
     --hash=sha256:0817bbc69df234a4a6208685c6ff2d521f64a330eb1f7c0a052025233a21971c \
     --hash=sha256:bed6fa1c97aa88d4be23d9234de0c5eba71a908871d34eb9704f1df286a80335
@@ -340,6 +355,14 @@ dnspython==2.3.0 \
     --hash=sha256:224e32b03eb46be70e12ef6d64e0be123a64e621ab4c0822ff6d450d52a540b9 \
     --hash=sha256:89141536394f909066cabd112e3e1a37e4e654db00a25308b0f130bc3152eb46
     # via localstack-ext
+drf-spectacular[sidecar]==0.26.2 \
+    --hash=sha256:005623d6bb9de37d2d0ec24ccd59c636e4a42f9af252f1470129ac32ccab38cb \
+    --hash=sha256:e80eba58d9579bf6c3380ffd6d6a9b466c4bc35b23da0ba76dfcc96de1e907d7
+    # via -r ./requirements/dev-requirements.in
+drf-spectacular-sidecar==2023.5.1 \
+    --hash=sha256:10ab069a3475f763acbae76414ee80fc67a42c00394918777996bbfa9239f155 \
+    --hash=sha256:58358215fee6c4634d77335d4c341b8132dc0847b282fb2fe4b22530dc2a56ca
+    # via drf-spectacular
 ecdsa==0.18.0 \
     --hash=sha256:190348041559e21b22a1d65cee485282ca11a6f81d503fddb84d5017e9ed1e49 \
     --hash=sha256:80600258e7ed2f16b9aa1d7c295bd70194109ad5a30fdee0eaeefef1d4c559dd
@@ -376,6 +399,10 @@ idna==3.4 \
     # via
     #   -c ./requirements/../requirements.txt
     #   requests
+inflection==0.5.1 \
+    --hash=sha256:1a29730d366e996aaacffb2f1f1cb9593dc38e2ddd30c91250c6dde09ea9b417 \
+    --hash=sha256:f38b2b640938a4f35ade69ac3d053042959b62a0f1076a5bbaa1b9526605a8a2
+    # via drf-spectacular
 jmespath==1.0.1 \
     --hash=sha256:02e2e4cc71b5bcab88332eebf907519190dd9e6e82107fa7f83b1003a6252980 \
     --hash=sha256:90261b206d6defd58fdd5e85f478bf633a2901798906be2ad389150c5c60edbe
@@ -388,6 +415,18 @@ jsbeautifier==1.14.7 \
     # via
     #   cssbeautifier
     #   djlint
+jsonnet==0.20.0 \
+    --hash=sha256:7e770c7bf3a366b97b650a39430450f77612e74406731eb75c5bd59f3f104d4f
+    # via
+    #   -c ./requirements/../requirements.txt
+    #   -r ./requirements/dev-requirements.in
+jsonschema==4.17.3 \
+    --hash=sha256:0f864437ab8b6076ba6707453ef8f98a6a0d512a80e93f8abdb676f737ecb60d \
+    --hash=sha256:a870ad254da1a8ca84b6a2905cac29d265f805acc57af304784962a2aa6508f6
+    # via
+    #   -c ./requirements/../requirements.txt
+    #   -r ./requirements/dev-requirements.in
+    #   drf-spectacular
 localstack==1.4.0 \
     --hash=sha256:d841044cfd5579f10431316ae30de9633b9e4a8fdd6eb6006eba6d7f4f1a3298 \
     --hash=sha256:e1ebbef831450151f94c8d76b7c40bf4e336a2698ff4ac6a7634c210d458e6e5
@@ -594,6 +633,37 @@ pyproject-hooks==1.0.0 \
     --hash=sha256:283c11acd6b928d2f6a7c73fa0d01cb2bdc5f07c57a2eeb6e83d5e56b97976f8 \
     --hash=sha256:f271b298b97f5955d53fb12b72c1fb1948c22c1a6b70b315c54cedaca0264ef5
     # via build
+pyrsistent==0.19.3 \
+    --hash=sha256:016ad1afadf318eb7911baa24b049909f7f3bb2c5b1ed7b6a8f21db21ea3faa8 \
+    --hash=sha256:1a2994773706bbb4995c31a97bc94f1418314923bd1048c6d964837040376440 \
+    --hash=sha256:20460ac0ea439a3e79caa1dbd560344b64ed75e85d8703943e0b66c2a6150e4a \
+    --hash=sha256:3311cb4237a341aa52ab8448c27e3a9931e2ee09561ad150ba94e4cfd3fc888c \
+    --hash=sha256:3a8cb235fa6d3fd7aae6a4f1429bbb1fec1577d978098da1252f0489937786f3 \
+    --hash=sha256:3ab2204234c0ecd8b9368dbd6a53e83c3d4f3cab10ecaf6d0e772f456c442393 \
+    --hash=sha256:42ac0b2f44607eb92ae88609eda931a4f0dfa03038c44c772e07f43e738bcac9 \
+    --hash=sha256:49c32f216c17148695ca0e02a5c521e28a4ee6c5089f97e34fe24163113722da \
+    --hash=sha256:4b774f9288dda8d425adb6544e5903f1fb6c273ab3128a355c6b972b7df39dcf \
+    --hash=sha256:4c18264cb84b5e68e7085a43723f9e4c1fd1d935ab240ce02c0324a8e01ccb64 \
+    --hash=sha256:5a474fb80f5e0d6c9394d8db0fc19e90fa540b82ee52dba7d246a7791712f74a \
+    --hash=sha256:64220c429e42a7150f4bfd280f6f4bb2850f95956bde93c6fda1b70507af6ef3 \
+    --hash=sha256:878433581fc23e906d947a6814336eee031a00e6defba224234169ae3d3d6a98 \
+    --hash=sha256:99abb85579e2165bd8522f0c0138864da97847875ecbd45f3e7e2af569bfc6f2 \
+    --hash=sha256:a2471f3f8693101975b1ff85ffd19bb7ca7dd7c38f8a81701f67d6b4f97b87d8 \
+    --hash=sha256:aeda827381f5e5d65cced3024126529ddc4289d944f75e090572c77ceb19adbf \
+    --hash=sha256:b735e538f74ec31378f5a1e3886a26d2ca6351106b4dfde376a26fc32a044edc \
+    --hash=sha256:c147257a92374fde8498491f53ffa8f4822cd70c0d85037e09028e478cababb7 \
+    --hash=sha256:c4db1bd596fefd66b296a3d5d943c94f4fac5bcd13e99bffe2ba6a759d959a28 \
+    --hash=sha256:c74bed51f9b41c48366a286395c67f4e894374306b197e62810e0fdaf2364da2 \
+    --hash=sha256:c9bb60a40a0ab9aba40a59f68214eed5a29c6274c83b2cc206a359c4a89fa41b \
+    --hash=sha256:cc5d149f31706762c1f8bda2e8c4f8fead6e80312e3692619a75301d3dbb819a \
+    --hash=sha256:ccf0d6bd208f8111179f0c26fdf84ed7c3891982f2edaeae7422575f47e66b64 \
+    --hash=sha256:e42296a09e83028b3476f7073fcb69ffebac0e66dbbfd1bd847d61f74db30f19 \
+    --hash=sha256:e8f2b814a3dc6225964fa03d8582c6e0b6650d68a232df41e3cc1b66a5d2f8d1 \
+    --hash=sha256:f0774bf48631f3a20471dd7c5989657b639fd2d285b861237ea9e82c36a415a9 \
+    --hash=sha256:f0e7c4b2f77593871e918be000b96c8107da48444d57005b6a6bc61fb4331b2c
+    # via
+    #   -c ./requirements/../requirements.txt
+    #   jsonschema
 python-dateutil==2.8.2 \
     --hash=sha256:0123cacc1627ae19ddf3c27a5de5bd67ee4586fbdd6440d9748f8abb483d3e86 \
     --hash=sha256:961d03dc3453ebbc59dbdea9e4e11c5651520a876d0f4db161e8674aae935da9
@@ -616,6 +686,7 @@ pytz==2022.7.1 \
     --hash=sha256:78f4f37d8198e0627c5f1143240bb0206b8691d8d7ac6d78fee88b78733f8c4a
     # via
     #   -c ./requirements/../requirements.txt
+    #   djangorestframework
     #   pandas
 pyyaml==6.0 \
     --hash=sha256:01b45c0191e6d66c470b6cf1b9531a771a83c1c4208272ead47a3ae4f2f603bf \
@@ -662,6 +733,7 @@ pyyaml==6.0 \
     #   -c ./requirements/../requirements.txt
     #   bandit
     #   djlint
+    #   drf-spectacular
     #   localstack
 regex==2022.10.31 \
     --hash=sha256:052b670fafbe30966bbe5d025e90b2a491f85dfe5b2583a163b5e60a85a321ad \
@@ -848,6 +920,12 @@ typing-extensions==4.5.0 \
     # via
     #   -c ./requirements/../requirements.txt
     #   mypy
+uritemplate==4.1.1 \
+    --hash=sha256:4346edfc5c3b79f694bccd6d6099a322bbeb628dbf2cd86eea55a456ce5124f0 \
+    --hash=sha256:830c08b8d99bdd312ea4ead05994a38e8936266f84b9a7878232db50b044e02e
+    # via
+    #   -c ./requirements/../requirements.txt
+    #   drf-spectacular
 urllib3==1.26.15 \
     --hash=sha256:8a388717b9476f934a21484e8c8e61875ab60644d29b9b39e11e4b9dc1c6b305 \
     --hash=sha256:aa751d169e23c7479ce47a0cb0da579e3ede798f994f5816a74e4f4500dcea42
@@ -862,6 +940,9 @@ wheel==0.38.4 \
 whitenoise==6.4.0 \
     --hash=sha256:599dc6ca57e48929dfeffb2e8e187879bfe2aed0d49ca419577005b7f2cc930b \
     --hash=sha256:a02d6660ad161ff17e3042653c8e3f5ecbb2a2481a006bde125b9efb9a30113a
+    # via -r ./requirements/dev-requirements.in
+yattag==1.15.1 \
+    --hash=sha256:960fa54be1229d96f43178133e0b195c003391fdc49ecdb6b69b7374db6be416
     # via -r ./requirements/dev-requirements.in
 
 # The following packages are considered to be unsafe in a requirements file:

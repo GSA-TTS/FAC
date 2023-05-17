@@ -5,6 +5,8 @@ bandit
 black
 coverage
 djlint
+drf-spectacular
+drf-spectacular[sidecar]
 flake8
 jsonnet
 jsonschema
@@ -17,3 +19,4 @@ toml
 types-python-slugify
 types-requests
 whitenoise
+yattag

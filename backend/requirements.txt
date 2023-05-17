@@ -20,7 +20,6 @@ botocore==1.29.90 \
     --hash=sha256:1b8c1b8c366875e65d39237a296842b9c0ea33af2ba4a2771db2ba6aefa663ef \
     --hash=sha256:2dbbc2c7d93ddefcf9896268597212d446e5d416fbceb1b12c793660fa9f83f3
     # via
-    #   -r ./requirements/requirements.in
     #   boto3
     #   s3transfer
 certifi==2022.12.7 \
@@ -228,6 +227,8 @@ django==4.1.7 \
     #   django-storages
     #   djangorestframework
     #   djangorestframework-simplejwt
+    #   drf-spectacular
+    #   drf-spectacular-sidecar
 django-cache-url==3.4.4 \
     --hash=sha256:5ca4760b4580b80e41279bc60d1e5c16a822e4e462265faab0a330701bb0ef9a \
     --hash=sha256:ef2cfacea361ee22e9b67d6ca941db22e0a9eaf892b67ca71cad52c62a17fd36
@@ -254,10 +255,19 @@ djangorestframework==3.14.0 \
     # via
     #   -r ./requirements/requirements.in
     #   djangorestframework-simplejwt
+    #   drf-spectacular
 djangorestframework-simplejwt==5.2.2 \
     --hash=sha256:4c0d2e2513e12587d93501ac091781684a216c3ee614eb3b5a10586aef5ca845 \
     --hash=sha256:d27d4bcac2c6394f678dea8b4d0d511c6e18a7f2eb8aaeeb8a7de601aeb77c42
     # via -r ./requirements/requirements.in
+drf-spectacular[sidecar]==0.26.2 \
+    --hash=sha256:005623d6bb9de37d2d0ec24ccd59c636e4a42f9af252f1470129ac32ccab38cb \
+    --hash=sha256:e80eba58d9579bf6c3380ffd6d6a9b466c4bc35b23da0ba76dfcc96de1e907d7
+    # via -r ./requirements/requirements.in
+drf-spectacular-sidecar==2023.5.1 \
+    --hash=sha256:10ab069a3475f763acbae76414ee80fc67a42c00394918777996bbfa9239f155 \
+    --hash=sha256:58358215fee6c4634d77335d4c341b8132dc0847b282fb2fe4b22530dc2a56ca
+    # via drf-spectacular
 environs[django]==9.5.0 \
     --hash=sha256:1e549569a3de49c05f856f40bce86979e7d5ffbbc4398e7f338574c220189124 \
     --hash=sha256:a76307b36fbe856bdca7ee9161e6c466fd7fcffc297109a118c59b54e27e30c9
@@ -281,12 +291,19 @@ idna==3.4 \
     --hash=sha256:814f528e8dead7d329833b91c5faa87d60bf71824cd12a7530b5526063d02cb4 \
     --hash=sha256:90b77e79eaa3eba6de819a0c442c0b4ceefc341a7a2ab77d7562bf49f425c5c2
     # via requests
+inflection==0.5.1 \
+    --hash=sha256:1a29730d366e996aaacffb2f1f1cb9593dc38e2ddd30c91250c6dde09ea9b417 \
+    --hash=sha256:f38b2b640938a4f35ade69ac3d053042959b62a0f1076a5bbaa1b9526605a8a2
+    # via drf-spectacular
 jmespath==1.0.1 \
     --hash=sha256:02e2e4cc71b5bcab88332eebf907519190dd9e6e82107fa7f83b1003a6252980 \
     --hash=sha256:90261b206d6defd58fdd5e85f478bf633a2901798906be2ad389150c5c60edbe
     # via
     #   boto3
     #   botocore
+jsonnet==0.20.0 \
+    --hash=sha256:7e770c7bf3a366b97b650a39430450f77612e74406731eb75c5bd59f3f104d4f
+    # via -r ./requirements/requirements.in
 jsonpath-ng==1.5.3 \
     --hash=sha256:292a93569d74029ba75ac2dc3d3630fc0e17b2df26119a165fa1d498ca47bf65 \
     --hash=sha256:a273b182a82c1256daab86a313b937059261b5c5f8c4fa3fc38b882b344dd567 \
@@ -295,7 +312,9 @@ jsonpath-ng==1.5.3 \
 jsonschema==4.17.3 \
     --hash=sha256:0f864437ab8b6076ba6707453ef8f98a6a0d512a80e93f8abdb676f737ecb60d \
     --hash=sha256:a870ad254da1a8ca84b6a2905cac29d265f805acc57af304784962a2aa6508f6
-    # via -r ./requirements/requirements.in
+    # via
+    #   -r ./requirements/requirements.in
+    #   drf-spectacular
 mako==1.2.4 \
     --hash=sha256:c97c79c018b9165ac9922ae4f32da095ffd3c4e6872b45eded42926deea46818 \
     --hash=sha256:d60a3903dc3bb01a18ad6a89cdbe2e4eadc69c0bc8ef1e3773ba53d44c3f7a34
@@ -691,7 +710,9 @@ pyyaml==6.0 \
     --hash=sha256:dbad0e9d368bb989f4515da330b88a057617d16b6a8245084f1b05400f24609f \
     --hash=sha256:e61ceaab6f49fb8bdfaa0f92c4b57bcfbea54c09277b1b4f7ac376bfb7a7c174 \
     --hash=sha256:f84fbc98b019fef2ee9a1cb3ce93e3187a6df0b2538a651bfb890254ba9f90b5
-    # via -r ./requirements/requirements.in
+    # via
+    #   -r ./requirements/requirements.in
+    #   drf-spectacular
 requests==2.28.2 \
     --hash=sha256:64299f4909223da747622c030b781c0d7811e359c37124b4bd368fb8c6518baa \
     --hash=sha256:98b1b2782e3c6c4904938b84c0eb932721069dfdb9134313beff7c83c2df24bf
@@ -726,13 +747,18 @@ typing-extensions==4.5.0 \
 uritemplate==4.1.1 \
     --hash=sha256:4346edfc5c3b79f694bccd6d6099a322bbeb628dbf2cd86eea55a456ce5124f0 \
     --hash=sha256:830c08b8d99bdd312ea4ead05994a38e8936266f84b9a7878232db50b044e02e
-    # via -r ./requirements/requirements.in
+    # via
+    #   -r ./requirements/requirements.in
+    #   drf-spectacular
 urllib3==1.26.15 \
     --hash=sha256:8a388717b9476f934a21484e8c8e61875ab60644d29b9b39e11e4b9dc1c6b305 \
     --hash=sha256:aa751d169e23c7479ce47a0cb0da579e3ede798f994f5816a74e4f4500dcea42
     # via
     #   botocore
     #   requests
+yattag==1.15.1 \
+    --hash=sha256:960fa54be1229d96f43178133e0b195c003391fdc49ecdb6b69b7374db6be416
+    # via -r ./requirements/requirements.in
 
 # The following packages are considered to be unsafe in a requirements file:
 setuptools==67.6.0 \

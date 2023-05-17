@@ -4,6 +4,8 @@ cryptography
 django-cors-headers
 django-csp
 django-logingov-backend
+drf-spectacular
+drf-spectacular[sidecar]
 django-storages
 Django>=4.0.8
 djangorestframework
@@ -25,3 +27,4 @@ python-slugify
 pyyaml
 requests
 uritemplate
+yattag
