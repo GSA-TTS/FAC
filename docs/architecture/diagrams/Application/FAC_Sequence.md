@@ -1,3 +1,6 @@
+FAC System User Interaction view
+![FAC.gov  User Interaction view]
+```plantuml
 @startuml User Interaction Diagram
 Actor GranteeOrAuditor
 Actor Public
@@ -55,3 +58,4 @@ Staff -> FAC : Makes Content changes
 FAC -> DB : Persists content data
 
 @enduml
+```

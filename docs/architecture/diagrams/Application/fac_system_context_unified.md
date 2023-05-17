@@ -1,3 +1,6 @@
+FAC System Cloud boundary view
+![FAC.gov  Cloud ATO boundary view]
+```plantuml
 @startuml Context Diagram
 !include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
 
@@ -5,6 +8,10 @@ Person(User, "User", "GranteeOrAuditor")
 Person(Public, "User", "Public")
 Person(Staff, "User", "FAC Staff")
 Person(AgencyApp, "App", "Agency App")
+
+note as EncryptionNote
+All connections depicted are encrypted with TLS 1.2 unless otherwise noted.
+end note
 
 
 Boundary(cloudgov, "Cloud.gov Boundary") {
@@ -60,3 +67,4 @@ Rel(django, db, "read/write")
 Rel(backend, s3, "Stores single audit packages/Excel files")
 
 @enduml
+```
