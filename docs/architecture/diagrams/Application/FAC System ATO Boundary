@@ -40,7 +40,7 @@ Boundary(cloudgov, "Cloud.gov Boundary") {
     Boundary(cloudgov-services,"Cloud.gov services") {
         System(db, "Database", "postgres, port 5432")
         System(s3, "Public S3 Bucket-PDF/XLS Blob storage", "Brokered S3, Https 443")
-        System(s3, "Private S3 Bucket-PDF/XLS Blob storage", "Brokered S3, Https 443")
+        System(s3_x, "Private S3 Bucket-PDF/XLS Blob storage", "Brokered S3, Https 443")
     }
  }
 }
@@ -71,6 +71,7 @@ Rel(Login, backend, "Provides identities", "email address")
 
 Rel(api, db, "Fetches (read-only) Audits")
 Rel(api, s3, "Fetches (read-only) Audit Attachments")
+Rel(api, s3_x, "Fetches (read-only) Audit Attachments")
 
 Rel(django, https_proxy, "Looks up UEI info")
 Rel(https_proxy, samgov, "Looks up UEI info")
@@ -79,6 +80,7 @@ Rel(mail_proxy, Email, "Sends emails using")
 Rel(django, scan, "Scans attachments")
 Rel(django, db, "read/write")
 Rel(backend, s3, "Stores single audit packages/Excel files")
+Rel(backend, s3_x, "Stores single audit packages/Excel files")
 
 Boundary(gsa_saas, "GSA-authorized SaaS") {
     System_Ext(dap, "DAP", "Analytics collection")
