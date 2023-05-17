@@ -45,7 +45,7 @@ local open_ranges_defns = [
   [Sheets.y_or_n_range, SV.YoNValidation, 'If no (Direct Award), Name of Passthrough Entity', 'passthrough_name'],
   [
     Sheets.open_range {
-      width: 16,
+      width: 18,
     },
     {},
     'If no (Direct Award), Identifying Number Assigned by the Pass-through Entity, if assigned',
@@ -68,8 +68,8 @@ local sheets = [
     single_cells: single_cells,
     open_ranges: Fun.make_open_ranges(title_row, open_ranges_defns),
     mergeable_cells: [
-      [1, 2, 'A', 'S'],
-      [2, 3, 'F', 'S'],
+      [1, 2, 'A', 'T'],
+      [2, 3, 'F', 'T'],
     ],
     header_inclusion: ['A1', 'C2', 'F2'],
   },
