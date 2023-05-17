@@ -66,9 +66,7 @@ EXCEL_FILES = [
 # Mocking the user login and file scan functions
 def _mock_login_and_scan(client, mock_scan_file):
     """Helper function to mock the login and file scan functions"""
-    user = baker.make(User)
-
-    sac = baker.make(SingleAuditChecklist)
+    user, sac = _make_user_and_sac()
 
     baker.make(Access, user=user, sac=sac)
 
@@ -91,6 +89,12 @@ def _authed_post(client, user, view_str, kwargs=None, data=None):
     """Helper function for POST requests (forces auth)"""
     client.force_login(user=user)
     return _client_post(client, view_str, kwargs, data)
+
+
+def _make_user_and_sac(**kwargs):
+    user = baker.make(User)
+    sac = baker.make(SingleAuditChecklist, **kwargs)
+    return user, sac
 
 
 class MySubmissionsViewTests(TestCase):
@@ -187,10 +191,7 @@ class SubmissionStatusTests(TestCase):
         """
         Test that certifying auditor contacts can provide auditor certification
         """
-        user = baker.make(User)
-        sac = baker.make(
-            SingleAuditChecklist, submission_status="ready_for_certification"
-        )
+        user, sac = _make_user_and_sac(submission_status="ready_for_certification")
         baker.make(Access, sac=sac, user=user, role="certifying_auditor_contact")
 
         kwargs = {"report_id": sac.report_id}
@@ -204,8 +205,7 @@ class SubmissionStatusTests(TestCase):
         """
         Test that certifying auditee contacts can provide auditee certification
         """
-        user = baker.make(User)
-        sac = baker.make(SingleAuditChecklist, submission_status="auditor_certified")
+        user, sac = _make_user_and_sac(submission_status="auditor_certified")
         baker.make(Access, sac=sac, user=user, role="certifying_auditee_contact")
 
         kwargs = {"report_id": sac.report_id}
@@ -219,8 +219,7 @@ class SubmissionStatusTests(TestCase):
         """
         Test that certifying auditee contacts can perform submission
         """
-        user = baker.make(User)
-        sac = baker.make(SingleAuditChecklist, submission_status="auditee_certified")
+        user, sac = _make_user_and_sac(submission_status="auditee_certified")
         baker.make(Access, sac=sac, user=user, role="certifying_auditee_contact")
 
         kwargs = {"report_id": sac.report_id}
@@ -291,8 +290,7 @@ class ExcelFileHandlerViewTests(TestCase):
 
     def test_inaccessible_audit_returns_403(self):
         """When a request is made for an audit that is inaccessible for this user, a 403 error should be returned"""
-        user = baker.make(User)
-        sac = baker.make(SingleAuditChecklist)
+        user, sac = _make_user_and_sac()
 
         self.client.force_login(user)
         for form_section in EXCEL_FILES:
@@ -307,8 +305,7 @@ class ExcelFileHandlerViewTests(TestCase):
 
     def test_no_file_attached_returns_400(self):
         """When a request is made with no file attached, a 400 error should be returned"""
-        user = baker.make(User)
-        sac = baker.make(SingleAuditChecklist)
+        user, sac = _make_user_and_sac()
         baker.make(Access, user=user, sac=sac)
 
         self.client.force_login(user)
@@ -325,8 +322,7 @@ class ExcelFileHandlerViewTests(TestCase):
 
     def test_invalid_file_upload_returns_400(self):
         """When an invalid Excel file is uploaded, a 400 error should be returned"""
-        user = baker.make(User)
-        sac = baker.make(SingleAuditChecklist)
+        user, sac = _make_user_and_sac()
         baker.make(Access, user=user, sac=sac)
 
         self.client.force_login(user)

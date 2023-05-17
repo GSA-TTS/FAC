@@ -18,26 +18,23 @@ class CertificationPermissionDenied(PermissionDenied):
 
 
 def has_access(sac, user):
-    accesses = Access.objects.filter(sac=sac, user=user)
-    if not accesses:
-        return False
-
-    return True
+    """Does a user have permission to access a submission?"""
+    return bool(Access.objects.filter(sac=sac, user=user))
 
 
 def has_role(sac, user, role):
-    accesses = Access.objects.filter(sac=sac, user=user, role=role)
-    if not accesses:
-        return False
-
-    return True
+    """Does a user have a specific role on a submission?"""
+    return bool(Access.objects.filter(sac=sac, user=user, role=role))
 
 
 class SingleAuditChecklistAccessRequiredMixin(LoginRequiredMixin):
+    """
+    View mixin to require that a user is logged in and has access to the submission.
+    """
+
     def dispatch(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
         try:
-            report_id = kwargs["report_id"]
-            sac = SingleAuditChecklist.objects.get(report_id=report_id)
+            sac = SingleAuditChecklist.objects.get(report_id=kwargs["report_id"])
 
             if not has_access(sac, request.user):
                 raise PermissionDenied("You do not have access to this audit.")
@@ -48,11 +45,15 @@ class SingleAuditChecklistAccessRequiredMixin(LoginRequiredMixin):
 
 
 class CertifyingAuditeeRequiredMixin(LoginRequiredMixin):
+    """
+    View mixin to require that a user is logged in, has access to the submission, and has
+    the ``certifying_auditee_contact`` role.
+    """
+
     def dispatch(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
         role = "certifying_auditee_contact"
         try:
-            report_id = kwargs["report_id"]
-            sac = SingleAuditChecklist.objects.get(report_id=report_id)
+            sac = SingleAuditChecklist.objects.get(report_id=kwargs["report_id"])
 
             if not has_access(sac, request.user):
                 raise PermissionDenied("You do not have access to this audit")
@@ -73,11 +74,15 @@ class CertifyingAuditeeRequiredMixin(LoginRequiredMixin):
 
 
 class CertifyingAuditorRequiredMixin(LoginRequiredMixin):
+    """
+    View mixin to require that a user is logged in, has access to the submission, and has
+    the ``certifying_auditor_contact`` role.
+    """
+
     def dispatch(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
         role = "certifying_auditor_contact"
         try:
-            report_id = kwargs["report_id"]
-            sac = SingleAuditChecklist.objects.get(report_id=report_id)
+            sac = SingleAuditChecklist.objects.get(report_id=kwargs["report_id"])
 
             if not has_access(sac, request.user):
                 raise PermissionDenied("You do not have access to this audit")
