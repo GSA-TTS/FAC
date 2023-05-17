@@ -2,6 +2,22 @@
 {% load static %}
 {% block content %}
 <div class="grid-container margin-top-6">
+	<div class="usa-alert usa-alert--success margin-bottom-6">
+		{% comment %} 
+			Need several of these in various language, depending on which checklist item was 
+			most recently completed. 
+		{% endcomment %}
+		<div class="usa-alert__body">
+			<h4 class="usa-alert__heading">Audit submission created!</h4>
+			<p class="usa-alert__text">
+				he audit submisssion for {{auditee_name | default_if_none:''}} has been successfully created. 
+				It may be accessed at any time by users with 
+				<a class="usa-link" href="javascript:void(0);">report access</a>.
+				To finish this audit submission package, please complete the tasks below. 
+			</p>
+		</div>
+	</div>
+
 	<div class="tablet:grid-col">
 		<div class="grid-row margin-bottom-6">
 			<div class="tablet:grid-col">
@@ -30,7 +46,7 @@
 					</svg>
 				</div>
 				<div class="usa-icon-list__content {% if single_audit_checklist.created is True %}text-green{% endif %}">
-					<a class="usa-link text-bold" href="javascript:void(0);">Create a single audit submission</a>
+					<a class="usa-link text-bold" href="/report_submission/general-information/{{report_id}}">Create a single audit submission</a>
 					<p class="margin-0">
 						Begin your single audit submission by entering basic information about the auditee
 						organization.
@@ -102,7 +118,7 @@
 				</div>
 				<div class="usa-icon-list__content {% if findings_text_workbook.created is True %} text-green {% else %} text-base-dark {% endif %}">
 					{% if federal_awards_workbook.completed == True %}
-						<a class="usa-link text-bold" href="javascript:void(0);">Upload the Findings Text workbook</a>
+						<a class="usa-link text-bold" href="/report_submission/audit-findings-text/{{ report_id | default_if_none:'' }}">Upload the Findings Text workbook</a>
 					{% else %}
 					<svg class="usa-icon margin-right-05" aria-hidden="true" role="img">
 						<use xlink:href="/static/img/sprite.svg#lock_outline"></use>
@@ -128,7 +144,7 @@
 				</div>
 				<div class="usa-icon-list__content {% if audit_findings_workbook.created is True %} text-green {% else %} text-base-dark {% endif %}">
 					{% if federal_awards_workbook.completed == True %}
-						<a class="usa-link text-bold" href="javascript:void(0);">Upload the Audit Findings workbook</a>
+						<a class="usa-link text-bold" href="/report_submission/audit-findings/{{ report_id | default_if_none:'' }}">Upload the Audit Findings workbook</a>
 					{% else %}
 						<svg class="usa-icon margin-right-05" aria-hidden="true" role="img">
 							<use xlink:href="/static/img/sprite.svg#lock_outline"></use>
@@ -177,7 +193,7 @@
 				</div>
 				<div class="usa-icon-list__content {% if certification.auditor_certified is True %} text-green {% else %} text-base-dark {% endif %}">
 					{% if SF_SAC_completed == True and audit_report.completed == True %}
-						<a class="usa-link text-bold" href="javascript:void(0);">Auditor Certification</a>
+						<a class="usa-link text-bold" href="{% url 'audit:AuditorCertification' report_id=report_id %}">Auditor Certification</a>
 					{% else %}
 						<svg class="usa-icon margin-right-05" aria-hidden="true" role="img">
 							<use xlink:href="/static/img/sprite.svg#lock_outline"></use>
@@ -203,7 +219,7 @@
 				</div>
 				<div class="usa-icon-list__content {% if certification.auditee_certified is True %} text-green {% else %} text-base-dark {% endif %}">
 					{% if SF_SAC_completed == True and audit_report.completed == True and certification.auditor_certified == True %}
-						<a class="usa-link text-bold" href="javascript:void(0);">Auditee Certification</a>
+						<a class="usa-link text-bold" href="{% url 'audit:AuditeeCertification' report_id=report_id %}">Auditee Certification</a>
 					{% else %}
 						<svg class="usa-icon margin-right-05" aria-hidden="true" role="img">
 							<use xlink:href="/static/img/sprite.svg#lock_outline"></use>
@@ -229,7 +245,7 @@
 				</div>
 				<div class="usa-icon-list__content {% if certification.auditee_certified is True %} text-green {% else %} text-base-dark {% endif %}">
 					{% if SF_SAC_completed == True and audit_report.completed == True and certification.auditor_certified == True and certification.auditee_certified == True %}
-						<a class="usa-link text-bold" href="javascript:void(0);">Submit to FAC for processing</a>
+						<a class="usa-link text-bold" href="{% url 'audit:Submission' report_id=report_id %}">Submit to FAC for processing</a>
 					{% else %}
 						<svg class="usa-icon margin-right-05" aria-hidden="true" role="img">
 							<use xlink:href="/static/img/sprite.svg#lock_outline"></use>
