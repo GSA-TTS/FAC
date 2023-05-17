@@ -265,27 +265,12 @@ class UploadPageView(LoginRequiredMixin, View):
         except SingleAuditChecklist.DoesNotExist:
             raise PermissionDenied("You do not have access to this audit.")
 
-    # Partially implemented (redirects, does no further action)
     def post(self, request, *args, **kwargs):
         report_id = kwargs["report_id"]
-        nextURLs = {
-            "federal-awards": "audit-findings",
-            "audit-findings": "audit-findings-text",
-            "audit-findings-text": "CAP",
-            "CAP": "additional-EINs",
-            "additional-EINs": "additional-UEIs",
-            "additional-UEIs": "secondary-auditors",
-            "secondary-auditors": "/",
-        }
-        path_name = request.path.split("/")[2]
 
         try:
-            if "secondary-auditors" in path_name:
-                return redirect("/")
             return redirect(
-                "/report_submission/{nextURL}/{report_id}".format(
-                    nextURL=nextURLs[path_name], report_id=report_id
-                )
+                "/audit/submission-progress/{report_id}".format(report_id=report_id)
             )
 
         except Exception as e:

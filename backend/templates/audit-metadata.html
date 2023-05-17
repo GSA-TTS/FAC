@@ -1,0 +1,39 @@
+<!-- Audit metadata. Included at the bottom of several screens. -->
+<div class="audit-metadata">
+    <div class="grid-container">
+        <dl class="grid-row grid-gap">
+            <div class="tablet:grid-col-6">
+                <dt>
+                    Entity name
+                </dt>
+                <dd>
+                    {{ auditee_name | default_if_none:'' }}
+                </dd>
+            </div>
+            <div class="tablet:grid-col-6">
+                <dt>
+                    Report ID
+                </dt>
+                <dd>
+                    #{{ report_id | default_if_none:'' }}
+                </dd>
+            </div>
+            <div class="tablet:grid-col-6">
+                <dt>
+                    UEI
+                </dt>
+                <dd>
+                    {{ auditee_uei | default_if_none:'' }}
+                </dd>
+            </div>
+            <div class="tablet:grid-col-6">
+                <dt>
+                    Type of entity
+                </dt>
+                <dd>
+                    {{ user_provided_organization_type | default_if_none:'' }}
+                </dd>
+            </div>
+        </dl>
+    </div>
+</div>
