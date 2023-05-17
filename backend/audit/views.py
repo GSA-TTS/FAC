@@ -306,7 +306,6 @@ class SubmissionProgressView(SingleAuditChecklistAccessRequiredMixin, generic.Vi
             sac = SingleAuditChecklist.objects.get(report_id=report_id)
 
             context = {
-                "report_id": report_id,
                 "single_audit_checklist": {
                     "created": True,
                     "created_date": sac.date_created,
@@ -315,6 +314,27 @@ class SubmissionProgressView(SingleAuditChecklistAccessRequiredMixin, generic.Vi
                     "completed_date": None,
                     "completed_by": None,
                 },
+                "federal_awards_workbook": {
+                    "completed": True if (sac.federal_awards) else False,
+                    "completed_date": None,
+                    "completed_by": None,
+                },
+                "audit_information_workbook": {
+                    "completed": False,
+                    "completed_date": None,
+                    "completed_by": None,
+                },
+                "findings_text_workbook": {
+                    "completed": True if (sac.findings_text) else False,
+                    "completed_date": None,
+                    "completed_by": None,
+                },
+                "audit_findings_workbook": {
+                    "completed": True if (sac.findings_uniform_guidance) else False,
+                    "completed_date": None,
+                    "completed_by": None,
+                },
+                
                 "audit_report": {
                     "completed": False,
                     "completed_date": None,
@@ -329,7 +349,13 @@ class SubmissionProgressView(SingleAuditChecklistAccessRequiredMixin, generic.Vi
                     "completed_date": None,
                     "completed_by": None,
                 },
+                "report_id": report_id,
+                "auditee_name": sac.auditee_name,
+                "auditee_uei": sac.auditee_uei,
+                "user_provided_organization_type": sac.user_provided_organization_type,
             }
+            context['SF_SAC_completed'] = context['federal_awards_workbook']['completed'] and True
+            print('ligma', context['SF_SAC_completed'])
 
             return render(request, "audit/submission-progress.html", context)
         except SingleAuditChecklist.DoesNotExist:
