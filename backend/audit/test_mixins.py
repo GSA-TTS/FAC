@@ -22,17 +22,15 @@ class SingleAuditChecklistAccessRequiredMixinTests(TestCase):
             pass
 
     def test_missing_report_id_raises(self):
-        factory = RequestFactory()
-        request = factory.get("/")
-
+        request = RequestFactory().get("/")
         view = self.ViewStub()
+
         self.assertRaises(KeyError, view.dispatch, request)
 
     def test_nonexistent_sac_raises(self):
-        factory = RequestFactory()
-        request = factory.get("/")
-
+        request = RequestFactory().get("/")
         view = self.ViewStub()
+
         self.assertRaises(
             PermissionDenied, view.dispatch, request, report_id="not-a-real-report-id"
         )
@@ -41,9 +39,7 @@ class SingleAuditChecklistAccessRequiredMixinTests(TestCase):
         user = baker.make(User)
         sac = baker.make(SingleAuditChecklist)
 
-        factory = RequestFactory()
-        request = factory.get("/")
-
+        request = RequestFactory().get("/")
         request.user = user
 
         view = self.ViewStub()
@@ -56,9 +52,7 @@ class SingleAuditChecklistAccessRequiredMixinTests(TestCase):
         sac = baker.make(SingleAuditChecklist)
         baker.make(Access, sac=sac, user=user)
 
-        factory = RequestFactory()
-        request = factory.get("/")
-
+        request = RequestFactory().get("/")
         request.user = user
 
         view = self.ViewStub()
@@ -71,17 +65,15 @@ class CertifyingAuditeeRequiredMixinTests(TestCase):
             pass
 
     def test_missing_report_id_raises(self):
-        factory = RequestFactory()
-        request = factory.get("/")
-
+        request = RequestFactory().get("/")
         view = self.ViewStub()
+
         self.assertRaises(KeyError, view.dispatch, request)
 
     def test_nonexistent_sac_raises(self):
-        factory = RequestFactory()
-        request = factory.get("/")
-
+        request = RequestFactory().get("/")
         view = self.ViewStub()
+
         self.assertRaises(
             PermissionDenied, view.dispatch, request, report_id="not-a-real-report-id"
         )
@@ -90,12 +82,10 @@ class CertifyingAuditeeRequiredMixinTests(TestCase):
         user = baker.make(User)
         sac = baker.make(SingleAuditChecklist)
 
-        factory = RequestFactory()
-        request = factory.get("/")
-
+        request = RequestFactory().get("/")
         request.user = user
-
         view = self.ViewStub()
+
         self.assertRaises(
             PermissionDenied, view.dispatch, request, report_id=sac.report_id
         )
@@ -134,9 +124,7 @@ class CertifyingAuditeeRequiredMixinTests(TestCase):
 
         baker.make(Access, sac=sac, user=user, role="certifying_auditee_contact")
 
-        factory = RequestFactory()
-        request = factory.get("/")
-
+        request = RequestFactory().get("/")
         request.user = user
 
         view = self.ViewStub()
@@ -149,17 +137,15 @@ class CertifyingAuditorRequiredMixinTests(TestCase):
             pass
 
     def test_missing_report_id_raises(self):
-        factory = RequestFactory()
-        request = factory.get("/")
-
+        request = RequestFactory().get("/")
         view = self.ViewStub()
+
         self.assertRaises(KeyError, view.dispatch, request)
 
     def test_nonexistent_sac_raises(self):
-        factory = RequestFactory()
-        request = factory.get("/")
-
+        request = RequestFactory().get("/")
         view = self.ViewStub()
+
         self.assertRaises(
             PermissionDenied, view.dispatch, request, report_id="not-a-real-report-id"
         )
@@ -168,12 +154,10 @@ class CertifyingAuditorRequiredMixinTests(TestCase):
         user = baker.make(User)
         sac = baker.make(SingleAuditChecklist)
 
-        factory = RequestFactory()
-        request = factory.get("/")
-
+        request = RequestFactory().get("/")
         request.user = user
-
         view = self.ViewStub()
+
         self.assertRaises(
             PermissionDenied, view.dispatch, request, report_id=sac.report_id
         )
@@ -212,9 +196,7 @@ class CertifyingAuditorRequiredMixinTests(TestCase):
 
         baker.make(Access, sac=sac, user=user, role="certifying_auditor_contact")
 
-        factory = RequestFactory()
-        request = factory.get("/")
-
+        request = RequestFactory().get("/")
         request.user = user
 
         view = self.ViewStub()
