@@ -2,9 +2,9 @@ locals {
   clam_name = "fac-av-${var.cf_space_name}"
 }
 
-module "egress-proxy" {
-  source                = "../egress-proxy"
-  name                  = "egress"
+module "https-proxy" {
+  source                = "../https-proxy"
+  name                  = "https-proxy"
   cf_org_name           = var.cf_org_name               # gsa-tts-oros-fac
   cf_space_name         = "${var.cf_space_name}-egress" # eg prod-egress
   client_space          = var.cf_space_name             # eg prod
@@ -51,7 +51,7 @@ module "clamav" {
 
   # The following line is commented out until we have a way to pass the value of
   # the variable to to docker image without it interfering with staging.
-  # https_proxy   = module.egress-proxy.https_proxy
+  # https_proxy   = module.https-proxy.https_proxy
 }
 
 module "database" {

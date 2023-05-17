@@ -3,7 +3,7 @@
 ## Usage
 
 ```
-module "egress-proxy" {
+module "https-proxy" {
   source = "<path to module>"
 
   name          = "egress"

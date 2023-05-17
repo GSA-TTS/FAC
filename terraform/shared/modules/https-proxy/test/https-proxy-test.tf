@@ -48,10 +48,10 @@ resource "cloudfoundry_app" "test" {
 }
 
 # Exercise the module under test
-module "egress-proxy" {
+module "https-proxy" {
   source = "./.."
 
-  name          = "egress"
+  name          = "https-egress"
   cf_org_name   = var.cf_org_name
   cf_space_name = var.cf_space_name
   client_space  = var.cf_space_name
@@ -73,11 +73,11 @@ module "egress-proxy" {
 
 data "external" "validate" {
   depends_on = [
-    module.egress-proxy
+    module.https-proxy
   ]
   program = ["/bin/sh", "${path.module}/validate.sh"]
   query = {
-    APPNAME   = "egress"
+    APPNAME   = "https-egress"
     ORGNAME   = var.cf_org_name
     SPACENAME = var.cf_space_name
   }

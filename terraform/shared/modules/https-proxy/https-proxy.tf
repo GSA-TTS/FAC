@@ -1,4 +1,5 @@
 locals {
+
   # Make a clean list of the client apps for iteration purposes
   clients = toset(keys(merge(var.allowlist, var.denylist)))
 
