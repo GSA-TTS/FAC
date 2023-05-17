@@ -10,10 +10,13 @@ local single_cells = [
     range_name: 'auditee_uei',
     title_cell: 'A2',
     range_cell: 'B2',
-    validation: SV.StringOfLengthTwelve,    
+    validation: SV.StringOfLengthTwelve,
   },
 ];
 
+local open_range_w12 = Sheets.open_range {
+  width: 12,
+};
 
 local open_range_w24 = Sheets.open_range {
   width: 24,
@@ -23,19 +26,23 @@ local open_range_w20 = Sheets.open_range {
   width: 20,
 };
 
+local open_range_w48 = Sheets.open_range {
+  width: 48,
+};
+
 local y_or_n_range_w16 = Sheets.y_or_n_range {
   width: 16,
 };
 
-local y_or_n_range_w12 = Sheets.open_range {
+local y_or_n_range_w12 = Sheets.y_or_n_range {
   width: 12,
 };
 
 local open_ranges_defns = [
-  [Sheets.open_range_w12, SV.FAPPrefixValidation, 'Federal Agency Prefix', 'federal_agency_prefix'],
-  [Sheets.open_range_w12, SV.StringOfLengthThree, 'CFDA Three Digit Extension', 'three_digit_extension'],
+  [open_range_w12, SV.FAPPrefixValidation, 'Federal Agency Prefix', 'federal_agency_prefix'],
+  [open_range_w12, SV.StringOfLengthThree, 'CFDA Three Digit Extension', 'three_digit_extension'],
   [Sheets.open_range, {}, 'Additional Award Identification', 'additional_award_identification'],
-  [Sheets.open_range_w48, {}, 'Federal Program Name', 'program_name'],
+  [open_range_w48, {}, 'Federal Program Name', 'program_name'],
   [Sheets.open_range, SV.ReferenceNumberValidation, 'Audit Finding Reference Number', 'reference_number'],
   [open_range_w20, {}, 'Type(s) of Compliance Requirement(s)', 'compliance_requirement'],
   [y_or_n_range_w12, SV.YoNValidation, 'Modified Opinion', 'modified_opinion'],
@@ -65,7 +72,7 @@ local sheets = [
 local workbook = {
   filename: 'findings-uniform-guidance-template.xlsx',
   sheets: sheets,
-  title_row: title_row
+  title_row: title_row,
 };
 
 {} + workbook

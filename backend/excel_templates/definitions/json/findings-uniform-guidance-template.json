@@ -89,7 +89,7 @@
                "range_name": "modified_opinion",
                "title": "Modified Opinion",
                "title_cell": "G3",
-               "type": "open_range",
+               "type": "yorn_range",
                "validation": {
                   "allow_blank": "False",
                   "custom_error": "Must be 'Y' or 'N'",
@@ -103,7 +103,7 @@
                "range_name": "other_matters",
                "title": "Other Matters",
                "title_cell": "H3",
-               "type": "open_range",
+               "type": "yorn_range",
                "validation": {
                   "allow_blank": "False",
                   "custom_error": "Must be 'Y' or 'N'",
@@ -117,7 +117,7 @@
                "range_name": "material_weakness",
                "title": "Material Weakness",
                "title_cell": "I3",
-               "type": "open_range",
+               "type": "yorn_range",
                "validation": {
                   "allow_blank": "False",
                   "custom_error": "Must be 'Y' or 'N'",
@@ -131,7 +131,7 @@
                "range_name": "significant_deficiency",
                "title": "Significant Deficiency",
                "title_cell": "J3",
-               "type": "open_range",
+               "type": "yorn_range",
                "validation": {
                   "allow_blank": "False",
                   "custom_error": "Must be 'Y' or 'N'",
@@ -145,7 +145,7 @@
                "range_name": "other_findings",
                "title": "Other Findings",
                "title_cell": "K3",
-               "type": "open_range",
+               "type": "yorn_range",
                "validation": {
                   "allow_blank": "False",
                   "custom_error": "Must be 'Y' or 'N'",
@@ -159,7 +159,7 @@
                "range_name": "questioned_costs",
                "title": "Questioned Costs",
                "title_cell": "L3",
-               "type": "open_range",
+               "type": "yorn_range",
                "validation": {
                   "allow_blank": "False",
                   "custom_error": "Must be 'Y' or 'N'",
@@ -173,7 +173,7 @@
                "range_name": "repeat_prior_reference",
                "title": "Repeat Findings from Prior Year",
                "title_cell": "M3",
-               "type": "open_range",
+               "type": "yorn_range",
                "validation": {
                   "allow_blank": "False",
                   "custom_error": "Must be 'Y' or 'N'",

@@ -15,9 +15,18 @@ local single_cells = [
 ];
 
 local open_ranges_defns = [
-  [Sheets.open_range_a3_w36, SV.ReferenceNumberValidation, 'Audit Finding Reference Number', 'reference_number'],
-  [Sheets.open_range_c3_w100, {}, 'Planned Corrective Action', 'planned_action'],
-  [Sheets.y_or_n_range_g3_w36, SV.YoNValidation, 'Did Text Contain a Chart or Table?', 'contains_chart_or_table'],
+  [Sheets.open_range {
+    title_cell: 'A3',
+    width: 36,
+  }, SV.ReferenceNumberValidation, 'Audit Finding Reference Number', 'reference_number'],
+  [Sheets.open_range {
+    title_cell: 'C3',
+    width: 100,
+  }, {}, 'Planned Corrective Action', 'planned_action'],
+  [Sheets.y_or_n_range {
+    title_cell: 'G3',
+    width: 36,
+  }, SV.YoNValidation, 'Did Text Contain a Chart or Table?', 'contains_chart_or_table'],
 ];
 
 local sheets = [
@@ -40,7 +49,7 @@ local sheets = [
 local workbook = {
   filename: 'corrective-action-plan-template.xlsx',
   sheets: sheets,
-  title_row:title_row,
+  title_row: title_row,
 };
 
 {} + workbook
