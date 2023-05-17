@@ -38,6 +38,8 @@ Boundary(cloudgov, "Cloud.gov Boundary") {
     System(datagov, "api.data.gov", "Access Provider")
     System(samgov, "SAM.gov", "UEI Source")
     System(Email, "GSA Email")
+    System(relic, "New Relic", "Telemetry site")
+    System(clamav, "ClamAv Provider", "Vulnerability data provider")
 
 
 AddRelTag("authenticated", $lineColor="#008787", $textColor="#008787")
@@ -65,6 +67,8 @@ Rel(mail_proxy, Email, "Sends emails using")
 Rel(django, scan, "Scans attachments")
 Rel(django, db, "read/write")
 Rel(backend, s3, "Stores single audit packages/Excel files")
+Rel(django, relic, "logs telemetry data")
+Rel(scan, clamav, "retrievesvulnerability checke")
 
 @enduml
 ```
