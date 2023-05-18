@@ -18,13 +18,6 @@ const file_input = document.getElementById(`file-input-${view_id}-xlsx`);
 const info_box = document.getElementById(`info_box`);
 const already_submitted = document.getElementById(`already-submitted`);
 
-const test = [
-  ('A', 1, "Sample text"),
-  ('B', 2, "Sample text"),
-  ('C', 3, "Sample text"),
-  ('D', 4, "Sample text")
-]
-
 /* 
   Function definitions
 */
