@@ -15,7 +15,7 @@ assignees: ''
 [comment]: # "I want: some new feature"
 
 **In order to** 
-**as a **
+**as a**
 **I want**
 
 # Acceptance Criteria
@@ -62,6 +62,14 @@ Required per [CM-4](https://nvd.nist.gov/800-53/Rev4/control/CM-4).
 [comment]: # "Please do not remove this section without care."
 [comment]: # "Note any security concerns that might be implicated in the change. 'None' is OK, but we must be explicit here."
 
+# Sketch
+
+We're thinking we'll try implementing A and then changing B.
+
+```[tasklist]
+# Tasks
+- [ ] 
+```
 
 ---
 

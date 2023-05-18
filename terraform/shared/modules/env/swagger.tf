@@ -11,7 +11,7 @@ resource "cloudfoundry_route" "swagger" {
 resource "cloudfoundry_app" "swagger" {
   name              = local.swagger_name
   space             = data.cloudfoundry_space.apps.id
-  docker_image      = "swaggerapi/swagger-ui"
+  docker_image      = "swaggerapi/swagger-ui:latest"
   health_check_type = "process"
   timeout           = 20
   memory            = 256
