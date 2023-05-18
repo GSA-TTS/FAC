@@ -20,6 +20,9 @@ export NEW_RELIC_LOG=stdout
 # Logging level, (critical, error, warning, info and debug). Default to info
 #export NEW_RELIC_LOG_LEVEL=
 
+# https://docs.newrelic.com/docs/security/security-privacy/compliance/fedramp-compliant-endpoints/
+export NEW_RELIC_HOST="gov-collector.newrelic.com"
+
 # We only want to run migrate and collecstatic for the first app instance, not
 # for additional app instances, so we gate all of this behind CF_INSTANCE_INDEX
 # being 0.
