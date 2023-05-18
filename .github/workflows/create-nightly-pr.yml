@@ -1,0 +1,56 @@
+---
+name: Create a Pull Request to Staging every night if there has been a merge into main within 24 hours
+on:
+    schedule:
+    - cron: "30 15 * * *"
+
+jobs:
+  scan-dev-pre-deploy:
+    name: Zap scan of the dev site
+    uses: ./.github/workflows/zap-scan.yml
+    with:
+        url: "https://fac-dev.app.cloud.gov/"
+
+  check_date:
+    runs-on: ubuntu-latest
+    name: Check latest commit
+    outputs:
+        should_run: ${{ steps.should_run.outputs.should_run }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: print latest commit
+        run: echo ${{ github.sha }}
+
+      - id: should_run
+        continue-on-error: true
+        name: check if latest commit is less than a day
+        if: ${{ github.event_name == 'schedule' }}
+        run: |
+            test -z $(git rev-list  --after="24 hours" ${{ github.sha }})
+            echo "should_run=false" >> $GITHUB_OUTPUT
+
+  pull-request:
+    needs: check_date
+    if: ${{ needs.check_date.outputs.should_run != 'false' }}
+    runs-on: ubuntu-latest
+    outputs:
+        pr_number: ${{ steps.open-pr.outputs.pr_number }}
+    steps:
+      - name: Get current date
+        id: date
+        run: |
+          echo "{date}={$(date +'%Y-%m-%d')}" >> $GITHUB_OUTPUT
+      
+      - uses: actions/checkout@v3
+      - name: Open pull request
+        uses: repo-sync/pull-request@v2
+        id: open-pr
+        with:
+          source_branch: "asteel/create-cron-job"
+          destination_branch: "main"
+          pr_title: "${{ steps.date.outputs.date }} TEST PR"
+          pr_body: |
+            This is an auto-generated PR to merge main into prod for a staging release for ${{ steps.date.outputs.date }}
+          pr_reviewer: "fac-admins"
+          pr_allow_empty: false
+          github_token: ${{ secrets.GITHUB_TOKEN }}
