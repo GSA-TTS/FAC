@@ -85,4 +85,4 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           pull-request-number: ${{ needs.pull-request.outputs.pr_number }}
-          merge-method: squash
+          merge-method: merge
