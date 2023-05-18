@@ -334,7 +334,26 @@ class SubmissionProgressView(SingleAuditChecklistAccessRequiredMixin, generic.Vi
                     "completed_date": None,
                     "completed_by": None,
                 },
-                
+                "CAP_workbook":{
+                    "completed": True if (sac.corrective_action_plan) else False,
+                    "completed_date": None,
+                    "completed_by": None,
+                },
+                "additional_EINs_workbook":{
+                    "completed": False,
+                    "completed_date": None,
+                    "completed_by": None,
+                },
+                "additional_UEIs_workbook":{
+                    "completed": False,
+                    "completed_date": None,
+                    "completed_by": None,
+                },
+                "secondary_auditors_workbook":{
+                    "completed": False,
+                    "completed_date": None,
+                    "completed_by": None,
+                },
                 "audit_report": {
                     "completed": False,
                     "completed_date": None,

@@ -1,42 +1,58 @@
 {% extends "base.html" %}
 {% load static %}
 {% block content %}
+<!-- 
+Submission progress/audit checklist/audit landing page.
+TODO: Include the "Completed at X by Y", after timestamps are included in the data model. 
+-->
 <div class="grid-container margin-top-6">
 	<div class="usa-alert usa-alert--success margin-bottom-6">
-		{% comment %} 
-			Need several of these in various language, depending on which checklist item was 
-			most recently completed. 
-		{% endcomment %}
 		<div class="usa-alert__body">
-			<h4 class="usa-alert__heading">Audit submission created!</h4>
-			<p class="usa-alert__text">
-				he audit submisssion for {{auditee_name | default_if_none:''}} has been successfully created. 
-				It may be accessed at any time by users with 
-				<a class="usa-link" href="javascript:void(0);">report access</a>.
-				To finish this audit submission package, please complete the tasks below. 
-			</p>
+			<!-- Success alert is NOT determined by most recently completed step.
+			Instead, it is determined by the furthest completed step down the checklist.
+			It can be changed to time-dependence after timestamp changes. -->
+			{% if audit_report.completed is True %}
+				<h4 class="usa-alert__heading">The audit report PDF has been uploaded!</h4>
+				<p class="usa-alert__text">
+					The audit report PDF has been uploaded and is attached to this report. If there is an issue with this PDF, you can
+					<a class="usa-link" href="javascript:void(0);">re-upload the document</a>.
+				</p>
+			{% elif SF_SAC_completed is True %}
+				<h4 class="usa-alert__heading">The SF-SAC has been finalized!</h4>
+				<p class="usa-alert__text">
+					The SF-SAC has been finalized and is attached to this report. To complete this audit submission package, please complete the task list below and finalize the certification steps.
+				</p>
+			{% elif single_audit_checklist.created is True %}
+				<h4 class="usa-alert__heading">Audit submission created!</h4>
+				<p class="usa-alert__text">
+					The audit submisssion for {{ auditee_name | default_if_none:'' }} has been successfully created.
+					It may be accessed at any time by users with
+					<a class="usa-link" href="javascript:void(0);">report access</a>.
+					To finish this audit submission package, please complete the tasks below.
+				</p>
+			{% endif %}
 		</div>
 	</div>
-
 	<div class="tablet:grid-col">
 		<div class="grid-row margin-bottom-6">
 			<div class="tablet:grid-col">
 				<h1 class="border-base-light margin-top-0">{{ auditee_name | default_if_none:'' }}</h1>
-				<p class="text-base-dark">Track your progress to complete a single audit submission. Some steps are locked after completion and cannot be edited once they are finalized. Once steps are unlocked, they may be completed in any order.</p> 
+				<p class="text-base-dark">
+					Track your progress to complete a single audit submission. Some steps are locked after completion and cannot be edited once they are finalized. Once steps are unlocked, they may be completed in any order.
+				</p>
 			</div>
 			<div class="tablet:grid-col-auto">
-				<button class="usa-button usa-button--outline">
-						<!-- Temporary SVG solution to an icon not included with USWDS -->
-						<svg class="usa-icon usa-icon--size-4" style="vertical-align: middle;" aria-hidden="true" focusable="false" role="img">
-							<use xlink:href="/static/img/sprite.svg#person"></use>
-							<circle id="plusBackground" cx="25" cy="25" r="11" color="white" />
-							<use x=15 y=15 width=15 height=15  xlink:href="/static/img/sprite.svg#add_circle"></use>
-						</svg>
-						<span>Manage report access</span>
+				<button class="usa-button usa-button--outline grid-row">
+					<svg class="usa-icon usa-icon--size-3 margin-right-1"
+							aria-hidden="true"
+							focusable="false"
+							role="img">
+						<use xlink:href="/static/img/sprite.svg#person_add"></use>
+					</svg>
+					<span class="padding-top-05">Manage report access</span>
 				</button>
 			</div>
 		</div>
-
 		<ul class="usa-icon-list gap-sm">
 			<!-- Single audit submission -->
 			<li class="usa-icon-list__item padding-bottom-2">
@@ -46,50 +62,50 @@
 					</svg>
 				</div>
 				<div class="usa-icon-list__content {% if single_audit_checklist.created is True %}text-green{% endif %}">
-					<a class="usa-link text-bold" href="/report_submission/general-information/{{report_id}}">Create a single audit submission</a>
+					<a class="usa-link text-bold"
+						href="/report_submission/general-information/{{ report_id }}">Create a single audit submission</a>
 					<p class="margin-0">
 						Begin your single audit submission by entering basic information about the auditee
 						organization.
 					</p>
 					{% if single_audit_checklist.created is True %}
-					<small class="text-base-dark">
-						Completed {{ single_audit_checklist.created_date }} by
-						<a href="javascript:void(0);" class="text-bold">
-							{% if single_audit_checklist.created_by.first_name == '' %}
-								{{ single_audit_checklist.created_by.email }}
-							{% else %}
-								{{ single_audit_checklist.created_by.first_name }} {{ single_audit_checklist.created_by.last_name }}
-							{% endif %}
-						</a>
-						.
-					</small>
+						<small class="text-base-dark">
+							Completed {{ single_audit_checklist.created_date }} by
+							<a href="javascript:void(0);" class="text-bold">
+								{% if single_audit_checklist.created_by.first_name == '' %}
+									{{ single_audit_checklist.created_by.email }}
+								{% else %}
+									{{ single_audit_checklist.created_by.first_name }} {{ single_audit_checklist.created_by.last_name }}
+								{% endif %}
+							</a>
+							.
+						</small>
 					{% endif %}
 				</div>
 			</li>
-
 			<!-- Federal awards workbook -->
 			<li class="usa-icon-list__item padding-bottom-2">
 				{% if federal_awards_workbook.completed == True %}
-				<div class="usa-icon-list__icon text-green">
-					<svg class="usa-icon margin-right-2" aria-hidden="true" role="img">
-						<use xlink:href="/static/img/sprite.svg#check_circle"></use>
-					</svg>
-				</div>
+					<div class="usa-icon-list__icon text-green">
+						<svg class="usa-icon margin-right-2" aria-hidden="true" role="img">
+							<use xlink:href="/static/img/sprite.svg#check_circle"></use>
+						</svg>
+					</div>
 				{% else %}
-				<div class="usa-icon-list__icon text-base">
-					<svg class="usa-icon margin-right-2" aria-hidden="true" role="img">
-						<use xlink:href="/static/img/sprite.svg#radio_button_unchecked"></use>
-					</svg>
-				</div>
+					<div class="usa-icon-list__icon text-base">
+						<svg class="usa-icon margin-right-2" aria-hidden="true" role="img">
+							<use xlink:href="/static/img/sprite.svg#radio_button_unchecked"></use>
+						</svg>
+					</div>
 				{% endif %}
 				<div class="usa-icon-list__content {% if federal_awards_workbook.completed is True %}text-green {% else %} text-base-dark {% endif %}">
-					<a class="usa-link text-bold" href="/report_submission/federal-awards/{{report_id}}">Upload the Federal Awards workbook</a>
+					<a class="usa-link text-bold"
+						href="/report_submission/federal-awards/{{ report_id }}">Upload the Federal Awards workbook</a>
 					<p class="margin-0">
-						Provide general information on the auditee and auditor, financial statements for the auditee entity, and information on the entity's federal program compliance. 
+						Provide general information on the auditee and auditor, financial statements for the auditee entity, and information on the entity's federal program compliance.
 					</p>
 				</div>
 			</li>
-
 			<!-- Audit information workbook -->
 			<li class="usa-icon-list__item padding-bottom-2">
 				<div class="usa-icon-list__icon text-base">
@@ -99,12 +115,9 @@
 				</div>
 				<div class="usa-icon-list__content {% if single_audit_checklist.completed is True %} text-green {% else %} text-base-dark {% endif %}">
 					<a class="usa-link text-bold" href="javascript:void(0);">Upload the Audit Information workbook</a>
-					<p class="margin-0">
-						Sample description text, lorem ipsum, various questionably accurate latin phrases.
-					</p>
+					<p class="margin-0">Sample description text, lorem ipsum, various questionably accurate latin phrases.</p>
 				</div>
 			</li>
-
 			<!-- Findings text workbook -->
 			<li class="usa-icon-list__item padding-bottom-2">
 				<div class="usa-icon-list__icon {% if findings_text_workbook.completed == True %}text-green{% else %}text-base{% endif %}">
@@ -118,19 +131,17 @@
 				</div>
 				<div class="usa-icon-list__content {% if findings_text_workbook.created is True %} text-green {% else %} text-base-dark {% endif %}">
 					{% if federal_awards_workbook.completed == True %}
-						<a class="usa-link text-bold" href="/report_submission/audit-findings-text/{{ report_id | default_if_none:'' }}">Upload the Findings Text workbook</a>
+						<a class="usa-link text-bold"
+							href="/report_submission/audit-findings-text/{{ report_id | default_if_none:'' }}">Upload the Findings Text workbook</a>
 					{% else %}
-					<svg class="usa-icon margin-right-05" aria-hidden="true" role="img">
-						<use xlink:href="/static/img/sprite.svg#lock_outline"></use>
-					</svg>
-					<span class="text-base">Upload the Findings Text workbook</span>
+						<svg class="usa-icon margin-right-05" aria-hidden="true" role="img">
+							<use xlink:href="/static/img/sprite.svg#lock_outline"></use>
+						</svg>
+						<span class="text-base">Upload the Findings Text workbook</span>
 					{% endif %}
-					<p class="margin-0">
-						Sample description text, lorem ipsum, various questionably accurate latin phrases.
-					</p>
+					<p class="margin-0">Sample description text, lorem ipsum, various questionably accurate latin phrases.</p>
 				</div>
 			</li>
-
 			<!-- Audit findings workbook -->
 			<li class="usa-icon-list__item padding-bottom-2">
 				<div class="usa-icon-list__icon {% if audit_findings_workbook.completed == True %}text-green{% else %}text-base{% endif %}">
@@ -144,25 +155,79 @@
 				</div>
 				<div class="usa-icon-list__content {% if audit_findings_workbook.created is True %} text-green {% else %} text-base-dark {% endif %}">
 					{% if federal_awards_workbook.completed == True %}
-						<a class="usa-link text-bold" href="/report_submission/audit-findings/{{ report_id | default_if_none:'' }}">Upload the Audit Findings workbook</a>
+						<a class="usa-link text-bold"
+							href="/report_submission/audit-findings/{{ report_id | default_if_none:'' }}">Upload the Audit Findings workbook</a>
 					{% else %}
 						<svg class="usa-icon margin-right-05" aria-hidden="true" role="img">
 							<use xlink:href="/static/img/sprite.svg#lock_outline"></use>
 						</svg>
 						<span class="text-base">Upload the Audit Findings workbook</span>
 					{% endif %}
+					<p class="margin-0">Sample description text, lorem ipsum, various questionably accurate latin phrases.</p>
+				</div>
+			</li>
+			<!-- CAP -->
+			<li class="usa-icon-list__item padding-bottom-2">
+				<div class="usa-icon-list__icon {% if CAP_workbook.completed == True %}text-green{% else %}text-base{% endif %}">
+					<svg class="usa-icon margin-right-2" aria-hidden="true" role="img">
+						{% if CAP_workbook.completed == True %}
+							<use xlink:href="/static/img/sprite.svg#check_circle"></use>
+						{% else %}
+							<use xlink:href="/static/img/sprite.svg#radio_button_unchecked"></use>
+						{% endif %}
+					</svg>
+				</div>
+				<div class="usa-icon-list__content {% if CAP_workbook.created is True %} text-green {% else %} text-base-dark {% endif %}">
+					{% if federal_awards_workbook.completed == True %}
+						<a class="usa-link text-bold"
+							href="/report_submission/CAP/{{ report_id | default_if_none:'' }}">Upload the Corrective Action Plan (CAP) workbook</a>
+					{% else %}
+						<svg class="usa-icon margin-right-05" aria-hidden="true" role="img">
+							<use xlink:href="/static/img/sprite.svg#lock_outline"></use>
+						</svg>
+						<span class="text-base">Upload the Corrective Action Plan (CAP) workbook</span>
+					{% endif %}
+					<p class="margin-0">Sample description text, lorem ipsum, various questionably accurate latin phrases.</p>
+				</div>
+			</li>
+			<!-- Additional UEIs -->
+			<li class="usa-icon-list__item padding-bottom-2">
+				<div class="usa-icon-list__icon {% if additional_UEIs_workbook.completed == True %}text-green{% else %}text-base{% endif %}">
+					<svg class="usa-icon margin-right-2" aria-hidden="true" role="img">
+						{% if additional_UEIs_workbook.completed == True %}
+							<use xlink:href="/static/img/sprite.svg#check_circle"></use>
+						{% else %}
+							<use xlink:href="/static/img/sprite.svg#radio_button_unchecked"></use>
+						{% endif %}
+					</svg>
+				</div>
+				<div class="usa-icon-list__content {% if additional_UEIs_workbook.created is True %} text-green {% else %} text-base-dark {% endif %}">
+					<a class="usa-link text-bold"
+						href="/report_submission/additional-UEIs/{{ report_id | default_if_none:'' }}">Upload the Additional UEIs workbook</a>
+					<p class="margin-0">Sample description text, lorem ipsum, various questionably accurate latin phrases.</p>
+				</div>
+			</li>
+			<!-- Secondary Auditors -->
+			<li class="usa-icon-list__item padding-bottom-2">
+				<div class="usa-icon-list__icon {% if secondary_auditors_workbook.completed == True %}text-green{% else %}text-base{% endif %}">
+					<svg class="usa-icon margin-right-2" aria-hidden="true" role="img">
+						{% if secondary_auditors_workbook.completed == True %}
+							<use xlink:href="/static/img/sprite.svg#check_circle"></use>
+						{% else %}
+							<use xlink:href="/static/img/sprite.svg#radio_button_unchecked"></use>
+						{% endif %}
+					</svg>
+				</div>
+				<div class="usa-icon-list__content {% if secondary_auditors_workbook.created is True %} text-green {% else %} text-base-dark {% endif %}">
+					<a class="usa-link text-bold"
+						href="/report_submission/secondary-auditors/{{ report_id | default_if_none:'' }}">Upload the Secondary Auditors workbook</a>
 					<p class="margin-0">
 						Sample description text, lorem ipsum, various questionably accurate latin phrases.
 					</p>
 				</div>
 			</li>
-
-			<li class="margin-top-4">
-				Insert like, a bunch more of these upload pages.
-			</li>
-
-			<!-- Audit report PDF -->
-			<li class="usa-icon-list__item padding-bottom-2 margin-top-6">
+			<!-- Audit report PDF - margin on top for a gap -->
+			<li class="usa-icon-list__item padding-bottom-2 margin-top-8">
 				<div class="usa-icon-list__icon {% if audit_report.completed == True %} text-green {% else %} text-base {% endif %}">
 					<svg class="usa-icon margin-right-2" aria-hidden="true" role="img">
 						{% if audit_report.completed == True %}
@@ -179,7 +244,6 @@
 					</p>
 				</div>
 			</li>
-
 			<!-- Auditor certification -->
 			<li class="usa-icon-list__item padding-bottom-2">
 				<div class="usa-icon-list__icon {% if certification.auditor_certified == True %} text-green {% else %} text-base {% endif %}">
@@ -193,7 +257,8 @@
 				</div>
 				<div class="usa-icon-list__content {% if certification.auditor_certified is True %} text-green {% else %} text-base-dark {% endif %}">
 					{% if SF_SAC_completed == True and audit_report.completed == True %}
-						<a class="usa-link text-bold" href="{% url 'audit:AuditorCertification' report_id=report_id %}">Auditor Certification</a>
+						<a class="usa-link text-bold"
+							href="{% url 'audit:AuditorCertification' report_id=report_id %}">Auditor Certification</a>
 					{% else %}
 						<svg class="usa-icon margin-right-05" aria-hidden="true" role="img">
 							<use xlink:href="/static/img/sprite.svg#lock_outline"></use>
@@ -205,7 +270,6 @@
 					</p>
 				</div>
 			</li>
-
 			<!-- Auditee certification -->
 			<li class="usa-icon-list__item padding-bottom-2">
 				<div class="usa-icon-list__icon {% if certification.auditee_certified == True %} text-green {% else %} text-base {% endif %}">
@@ -219,7 +283,8 @@
 				</div>
 				<div class="usa-icon-list__content {% if certification.auditee_certified is True %} text-green {% else %} text-base-dark {% endif %}">
 					{% if SF_SAC_completed == True and audit_report.completed == True and certification.auditor_certified == True %}
-						<a class="usa-link text-bold" href="{% url 'audit:AuditeeCertification' report_id=report_id %}">Auditee Certification</a>
+						<a class="usa-link text-bold"
+							href="{% url 'audit:AuditeeCertification' report_id=report_id %}">Auditee Certification</a>
 					{% else %}
 						<svg class="usa-icon margin-right-05" aria-hidden="true" role="img">
 							<use xlink:href="/static/img/sprite.svg#lock_outline"></use>
@@ -231,7 +296,6 @@
 					</p>
 				</div>
 			</li>
-
 			<!-- Submit to FAC for processing -->
 			<li class="usa-icon-list__item padding-bottom-2">
 				<div class="usa-icon-list__icon {% if submission.completed == True %}text-green{% else %}text-base{% endif %}">
@@ -245,7 +309,8 @@
 				</div>
 				<div class="usa-icon-list__content {% if certification.auditee_certified is True %} text-green {% else %} text-base-dark {% endif %}">
 					{% if SF_SAC_completed == True and audit_report.completed == True and certification.auditor_certified == True and certification.auditee_certified == True %}
-						<a class="usa-link text-bold" href="{% url 'audit:Submission' report_id=report_id %}">Submit to FAC for processing</a>
+						<a class="usa-link text-bold"
+							href="{% url 'audit:Submission' report_id=report_id %}">Submit to FAC for processing</a>
 					{% else %}
 						<svg class="usa-icon margin-right-05" aria-hidden="true" role="img">
 							<use xlink:href="/static/img/sprite.svg#lock_outline"></use>
@@ -258,60 +323,6 @@
 				</div>
 			</li>
 		</ul>
-	</div>
-
-
-
-
-
-	<div class="grid-row grid-gap margin-top-10">
-		<div class="usa-checkbox">
-			<input type="checkbox" disabled {% if single_audit_checklist.created is True %}checked{% endif %} />
-			<span>Create a single audit submission</span>
-			{% if single_audit_checklist.created is True %}
-			<small>created by {{ single_audit_checklist.created_by.email }} at {{ single_audit_checklist.created_date
-				}}</small>
-			{% endif %}
-		</div>
-	</div>
-	<div class="grid-row grid-gap">
-		<div class="usa-checkbox">
-			<input type="checkbox" disabled {% if single_audit_checklist.completed is True %}checked{% endif %} />
-			<a href="{% url 'report_submission:general_information' report_id=report_id %}">Complete form SF-SAC</a>
-		</div>
-	</div>
-	<div class="grid-row grid-gap">
-		<div class="usa-checkbox">
-			<input type="checkbox" disabled />
-			<span>Upload the audit report PDF</span>
-		</div>
-		{% if single_audit_checklist.completed is True %}
-		<small>completed by {{ single_audit_checklist.completed_by.email }} at {{ single_audit_checklist.completed_date
-			}}</small>
-		{% endif %}
-	</div>
-	<div class="grid-row grid-gap">
-		<a href="{% url 'audit:ReadyForCertification' report_id=report_id %}">
-			<div class="usa-button">Ready for Certification</div>
-		</a>
-	</div>
-	<div class="grid-row grid-gap">
-		<div class="usa-checkbox">
-			<input type="checkbox" disabled {% if certification.auditor_certified is True %}checked{% endif %} />
-			<a href="{% url 'audit:AuditorCertification' report_id=report_id %}">Auditor Certification</a>
-		</div>
-	</div>
-	<div class="grid-row grid-gap">
-		<div class="usa-checkbox">
-			<input type="checkbox" disabled {% if certification.auditee_certified is True %}checked{% endif %} />
-			<a href="{% url 'audit:AuditeeCertification' report_id=report_id %}">Auditee Certification</a>
-		</div>
-	</div>
-	<div class="grid-row grid-gap">
-		<div class="usa-checkbox">
-			<input type="checkbox" disabled {% if submission.completed is True %}checked{% endif %} />
-			<a href="{% url 'audit:Submission' report_id=report_id %}">Submit to the FAC for processing</a>
-		</div>
 	</div>
 </div>
 {% include "audit-metadata.html" %}
