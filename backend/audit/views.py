@@ -23,7 +23,12 @@ from audit.excel import (
     extract_findings_text,
     extract_findings_uniform_guidance,
 )
-from audit.models import Access, ExcelFile, SingleAuditChecklist
+from audit.mixins import (
+    CertifyingAuditeeRequiredMixin,
+    CertifyingAuditorRequiredMixin,
+    SingleAuditChecklistAccessRequiredMixin,
+)
+from audit.models import ExcelFile, SingleAuditChecklist
 from audit.validators import (
     validate_federal_award_json,
     validate_corrective_action_plan_json,
@@ -76,7 +81,7 @@ class EditSubmission(LoginRequiredMixin, generic.View):
         return redirect(reverse("singleauditchecklist", args=[report_id]))
 
 
-class ExcelFileHandlerView(LoginRequiredMixin, generic.View):
+class ExcelFileHandlerView(SingleAuditChecklistAccessRequiredMixin, generic.View):
     # this is marked as csrf_exempt to enable by-hand testing via tools like Postman. Should be removed when the frontend form is implemented!
     @method_decorator(csrf_exempt)
     def dispatch(self, *args, **kwargs):
@@ -89,10 +94,6 @@ class ExcelFileHandlerView(LoginRequiredMixin, generic.View):
             form_section = kwargs["form_section"]
 
             sac = SingleAuditChecklist.objects.get(report_id=report_id)
-
-            accesses = Access.objects.filter(sac=sac, user=request.user)
-            if not accesses:
-                raise PermissionDenied("You do not have access to this audit.")
 
             file = request.FILES["FILES"]
 
@@ -143,17 +144,12 @@ class ExcelFileHandlerView(LoginRequiredMixin, generic.View):
             raise BadRequest()
 
 
-class ReadyForCertificationView(LoginRequiredMixin, generic.View):
+class ReadyForCertificationView(SingleAuditChecklistAccessRequiredMixin, generic.View):
     def get(self, request, *args, **kwargs):
         report_id = kwargs["report_id"]
 
         try:
             sac = SingleAuditChecklist.objects.get(report_id=report_id)
-
-            # this should probably be a permission mixin
-            accesses = Access.objects.filter(sac=sac, user=request.user)
-            if not accesses:
-                raise PermissionDenied("You do not have access to this audit.")
 
             context = {
                 "report_id": report_id,
@@ -169,11 +165,6 @@ class ReadyForCertificationView(LoginRequiredMixin, generic.View):
         try:
             sac = SingleAuditChecklist.objects.get(report_id=report_id)
 
-            # this should probably be a permission mixin
-            accesses = Access.objects.filter(sac=sac, user=request.user)
-            if not accesses:
-                raise PermissionDenied("You do not have access to this audit.")
-
             sac.transition_to_ready_for_certification()
             sac.save()
 
@@ -183,17 +174,12 @@ class ReadyForCertificationView(LoginRequiredMixin, generic.View):
             raise PermissionDenied("You do not have access to this audit.")
 
 
-class AuditorCertificationView(LoginRequiredMixin, generic.View):
+class AuditorCertificationView(CertifyingAuditorRequiredMixin, generic.View):
     def get(self, request, *args, **kwargs):
         report_id = kwargs["report_id"]
 
         try:
             sac = SingleAuditChecklist.objects.get(report_id=report_id)
-
-            # this should probably be a permission mixin
-            accesses = Access.objects.filter(sac=sac, user=request.user)
-            if not accesses:
-                raise PermissionDenied("You do not have access to this audit.")
 
             context = {
                 "report_id": report_id,
@@ -210,11 +196,6 @@ class AuditorCertificationView(LoginRequiredMixin, generic.View):
         try:
             sac = SingleAuditChecklist.objects.get(report_id=report_id)
 
-            # this should probably be a permission mixin
-            accesses = Access.objects.filter(sac=sac, user=request.user)
-            if not accesses:
-                raise PermissionDenied("You do not have access to this audit.")
-
             sac.transition_to_auditor_certified()
             sac.save()
 
@@ -224,17 +205,12 @@ class AuditorCertificationView(LoginRequiredMixin, generic.View):
             raise PermissionDenied("You do not have access to this audit.")
 
 
-class AuditeeCertificationView(LoginRequiredMixin, generic.View):
+class AuditeeCertificationView(CertifyingAuditeeRequiredMixin, generic.View):
     def get(self, request, *args, **kwargs):
         report_id = kwargs["report_id"]
 
         try:
             sac = SingleAuditChecklist.objects.get(report_id=report_id)
-
-            # this should probably be a permission mixin
-            accesses = Access.objects.filter(sac=sac, user=request.user)
-            if not accesses:
-                raise PermissionDenied("You do not have access to this audit.")
 
             context = {
                 "report_id": report_id,
@@ -251,11 +227,6 @@ class AuditeeCertificationView(LoginRequiredMixin, generic.View):
         try:
             sac = SingleAuditChecklist.objects.get(report_id=report_id)
 
-            # this should probably be a permission mixin
-            accesses = Access.objects.filter(sac=sac, user=request.user)
-            if not accesses:
-                raise PermissionDenied("You do not have access to this audit.")
-
             sac.transition_to_auditee_certified()
             sac.save()
 
@@ -265,17 +236,12 @@ class AuditeeCertificationView(LoginRequiredMixin, generic.View):
             raise PermissionDenied("You do not have access to this audit.")
 
 
-class CertificationView(LoginRequiredMixin, generic.View):
+class CertificationView(CertifyingAuditeeRequiredMixin, generic.View):
     def get(self, request, *args, **kwargs):
         report_id = kwargs["report_id"]
 
         try:
             sac = SingleAuditChecklist.objects.get(report_id=report_id)
-
-            # this should probably be a permission mixin
-            accesses = Access.objects.filter(sac=sac, user=request.user)
-            if not accesses:
-                raise PermissionDenied("You do not have access to this audit.")
 
             context = {
                 "report_id": report_id,
@@ -292,11 +258,6 @@ class CertificationView(LoginRequiredMixin, generic.View):
         try:
             sac = SingleAuditChecklist.objects.get(report_id=report_id)
 
-            # this should probably be a permission mixin
-            accesses = Access.objects.filter(sac=sac, user=request.user)
-            if not accesses:
-                raise PermissionDenied("You do not have access to this audit.")
-
             sac.transition_to_certified()
             sac.save()
 
@@ -306,17 +267,12 @@ class CertificationView(LoginRequiredMixin, generic.View):
             raise PermissionDenied("You do not have access to this audit.")
 
 
-class SubmissionView(LoginRequiredMixin, generic.View):
+class SubmissionView(CertifyingAuditeeRequiredMixin, generic.View):
     def get(self, request, *args, **kwargs):
         report_id = kwargs["report_id"]
 
         try:
             sac = SingleAuditChecklist.objects.get(report_id=report_id)
-
-            # this should probably be a permission mixin
-            accesses = Access.objects.filter(sac=sac, user=request.user)
-            if not accesses:
-                raise PermissionDenied("You do not have access to this audit.")
 
             context = {
                 "report_id": report_id,
@@ -333,11 +289,6 @@ class SubmissionView(LoginRequiredMixin, generic.View):
         try:
             sac = SingleAuditChecklist.objects.get(report_id=report_id)
 
-            # this should probably be a permission mixin
-            accesses = Access.objects.filter(sac=sac, user=request.user)
-            if not accesses:
-                raise PermissionDenied("You do not have access to this audit.")
-
             sac.transition_to_submitted()
             sac.save()
 
@@ -347,7 +298,7 @@ class SubmissionView(LoginRequiredMixin, generic.View):
             raise PermissionDenied("You do not have access to this audit.")
 
 
-class SubmissionProgressView(LoginRequiredMixin, generic.View):
+class SubmissionProgressView(SingleAuditChecklistAccessRequiredMixin, generic.View):
     def get(self, request, *args, **kwargs):
         report_id = kwargs["report_id"]
 
