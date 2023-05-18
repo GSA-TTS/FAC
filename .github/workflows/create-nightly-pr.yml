@@ -2,7 +2,7 @@
 name: Create a Pull Request to Staging every night if there has been a merge into main within 24 hours
 on:
     schedule:
-    - cron: "30 15 * * *"
+    - cron: "40 15 * * *"
 
 jobs:
   scan-dev-pre-deploy:
@@ -18,6 +18,8 @@ jobs:
         should_run: ${{ steps.should_run.outputs.should_run }}
     steps:
       - uses: actions/checkout@v3
+        with:
+          ref: asteel/create-cron-job
       - name: print latest commit
         run: echo ${{ github.sha }}
 
@@ -42,6 +44,8 @@ jobs:
           echo "{date}={$(date +'%Y-%m-%d')}" >> $GITHUB_OUTPUT
       
       - uses: actions/checkout@v3
+        with:
+          ref: asteel/create-cron-job
       - name: Open pull request
         uses: repo-sync/pull-request@v2
         id: open-pr
