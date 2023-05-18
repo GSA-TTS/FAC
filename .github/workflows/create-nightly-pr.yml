@@ -1,10 +1,11 @@
 ---
-name: Create a Pull Request to Staging every night if there has been a merge into main within 24 hours
+name: Auto Generated PR From Main to Staging
 on:
     schedule:
-    - cron: "40 15 * * *"
+    - cron: "30 4 * * *"
 
 jobs:
+  # TODO: Replace with Smoke Tests CC: JMM
   scan-dev-pre-deploy:
     name: Zap scan of the dev site
     uses: ./.github/workflows/zap-scan.yml
@@ -13,48 +14,68 @@ jobs:
 
   check_date:
     runs-on: ubuntu-latest
-    name: Check latest commit
+    name: Check For a Commit
     outputs:
         should_run: ${{ steps.should_run.outputs.should_run }}
     steps:
       - uses: actions/checkout@v3
-        with:
-          ref: asteel/create-cron-job
-      - name: print latest commit
+      - name: Print Latest Commit
         run: echo ${{ github.sha }}
 
       - id: should_run
         continue-on-error: true
-        name: check if latest commit is less than a day
+        name: Check If Latest Commit Is Within 1 Day
         if: ${{ github.event_name == 'schedule' }}
         run: |
             test -z $(git rev-list  --after="24 hours" ${{ github.sha }})
             echo "should_run=false" >> $GITHUB_OUTPUT
 
   pull-request:
+    name: Create Pull Request
     needs: check_date
     if: ${{ needs.check_date.outputs.should_run != 'false' }}
     runs-on: ubuntu-latest
     outputs:
         pr_number: ${{ steps.open-pr.outputs.pr_number }}
     steps:
-      - name: Get current date
+      - name: Get Current Date
         id: date
         run: |
-          echo "{date}={$(date +'%Y-%m-%d')}" >> $GITHUB_OUTPUT
+          echo "date=$(date +%Y-%m-%d)" >> $GITHUB_OUTPUT
       
       - uses: actions/checkout@v3
-        with:
-          ref: asteel/create-cron-job
-      - name: Open pull request
+      - name: Open Pull Request
         uses: repo-sync/pull-request@v2
         id: open-pr
         with:
-          source_branch: "asteel/create-cron-job"
-          destination_branch: "main"
-          pr_title: "${{ steps.date.outputs.date }} TEST PR"
+          source_branch: "main"
+          destination_branch: "prod"
+          pr_title: "${{ steps.date.outputs.date }} main -> prod"
           pr_body: |
             This is an auto-generated PR to merge main into prod for a staging release for ${{ steps.date.outputs.date }}
           pr_reviewer: "fac-admins"
           pr_allow_empty: false
           github_token: ${{ secrets.GITHUB_TOKEN }}
+
+  auto-approve:
+    name: Auto Approve Created PR
+    needs: pull-request
+    runs-on: ubuntu-latest
+    permissions:
+        pull-requests: write
+    steps:
+      - uses: hmarr/auto-approve-action@v3
+        with:
+          pull-request-number: ${{ needs.pull-request.outputs.pr_number }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+  auto-merge:
+    name: Auto Merge The Approved PR
+    needs: [auto-approve, pull-request]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: peter-evans/enable-pull-request-automerge@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          pull-request-number: ${{ needs.pull-request.outputs.pr_number }}
+          merge-method: squash
