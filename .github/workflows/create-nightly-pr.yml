@@ -5,14 +5,14 @@ on:
     - cron: "30 4 * * *"
 
 jobs:
-  # TODO: Replace with Smoke Tests CC: JMM
+  # TODO: Replace with Smoke Tests cc: JMM
   scan-dev-pre-deploy:
     name: Zap scan of the dev site
     uses: ./.github/workflows/zap-scan.yml
     with:
         url: "https://fac-dev.app.cloud.gov/"
 
-  check_date:
+  check-commit:
     runs-on: ubuntu-latest
     name: Check For a Commit
     outputs:
@@ -22,18 +22,23 @@ jobs:
       - name: Print Latest Commit
         run: echo ${{ github.sha }}
 
-      - id: should_run
-        continue-on-error: true
-        name: Check If Latest Commit Is Within 1 Day
+      - name: Check if There Has Been A Commit
+        id: should_run
+        continue-on-error: false
         if: ${{ github.event_name == 'schedule' }}
         run: |
-            test -z $(git rev-list  --after="24 hours" ${{ github.sha }})
+          sha=$(git rev-list --after="24 hours" ${{ github.sha }})
+          if test -z $sha
+          then
             echo "should_run=false" >> $GITHUB_OUTPUT
+          else
+            echo "should_run=true" >> $GITHUB_OUTPUT
+          fi
 
   pull-request:
     name: Create Pull Request
-    needs: check_date
-    if: ${{ needs.check_date.outputs.should_run != 'false' }}
+    needs: [check-commit]
+    if: ${{ needs.check-commit.outputs.should_run != 'false' }}
     runs-on: ubuntu-latest
     outputs:
         pr_number: ${{ steps.open-pr.outputs.pr_number }}
@@ -42,7 +47,7 @@ jobs:
         id: date
         run: |
           echo "date=$(date +%Y-%m-%d)" >> $GITHUB_OUTPUT
-      
+
       - uses: actions/checkout@v3
       - name: Open Pull Request
         uses: repo-sync/pull-request@v2
@@ -59,7 +64,8 @@ jobs:
 
   auto-approve:
     name: Auto Approve Created PR
-    needs: pull-request
+    needs: [pull-request]
+    if: ${{ needs.pull-request.outputs.pr_number != null }}
     runs-on: ubuntu-latest
     permissions:
         pull-requests: write
@@ -72,6 +78,7 @@ jobs:
   auto-merge:
     name: Auto Merge The Approved PR
     needs: [auto-approve, pull-request]
+    if: ${{ needs.pull-request.outputs.pr_number != null }}
     runs-on: ubuntu-latest
     steps:
       - uses: peter-evans/enable-pull-request-automerge@v3
