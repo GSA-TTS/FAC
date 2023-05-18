@@ -334,22 +334,17 @@ class SubmissionProgressView(SingleAuditChecklistAccessRequiredMixin, generic.Vi
                     "completed_date": None,
                     "completed_by": None,
                 },
-                "CAP_workbook":{
+                "CAP_workbook": {
                     "completed": True if (sac.corrective_action_plan) else False,
                     "completed_date": None,
                     "completed_by": None,
                 },
-                "additional_EINs_workbook":{
+                "additional_UEIs_workbook": {
                     "completed": False,
                     "completed_date": None,
                     "completed_by": None,
                 },
-                "additional_UEIs_workbook":{
-                    "completed": False,
-                    "completed_date": None,
-                    "completed_by": None,
-                },
-                "secondary_auditors_workbook":{
+                "secondary_auditors_workbook": {
                     "completed": False,
                     "completed_date": None,
                     "completed_by": None,
@@ -373,8 +368,15 @@ class SubmissionProgressView(SingleAuditChecklistAccessRequiredMixin, generic.Vi
                 "auditee_uei": sac.auditee_uei,
                 "user_provided_organization_type": sac.user_provided_organization_type,
             }
-            # Add all SF-SAC uploads to determine if it is complete or not
-            context['SF_SAC_completed'] = context['federal_awards_workbook']['completed'] and True
+            # Add all SF-SAC uploads to determine if the process is complete or not
+            context["SF_SAC_completed"] = (
+                context["federal_awards_workbook"]["completed"]
+                and context["audit_information_workbook"]["completed"]
+                and context["findings_text_workbook"]["completed"]
+                and context["CAP_workbook"]["completed"]
+                and context["additional_UEIs_workbook"]["completed"]
+                and context["secondary_auditors_workbook"]["completed"]
+            )
 
             return render(request, "audit/submission-progress.html", context)
         except SingleAuditChecklist.DoesNotExist:
