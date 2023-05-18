@@ -1,0 +1,166 @@
+{
+  "$defs": {
+    "AuditPeriod": {
+      "description": "",
+      "enum": [
+        "annual",
+        "biennial",
+        "other"
+      ],
+      "title": "AuditPeriod",
+      "type": "string"
+    },
+    "EIN": {
+      "type": ["string", "null"],
+      "pattern": "^[0-9]{9}$"
+    },
+    "Phone": {
+      "type": "string",
+      "pattern": "^^(\\+0?1\\s)?\\(?\\d{3}\\)?[\\s.-]?\\d{3}[\\s.-]?\\d{4}$"
+    },
+    "State": {
+      "type": "string",
+      "title": "State",
+      "enum": ["AL","AK","AZ","AR","CA","CO","CT","DE","FL","GA","HI","ID","IL","IN","IA","KS","KY","LA","ME","MD","MA","MI","MN","MS","MO","MT","NE","NV","NH","NJ","NM","NY","NC","ND","OH","OK","OR","PA","RI","SC","SD","TN","TX","UT","VT","VA","WA","WV","WI","WY"]
+    },
+    "UEI": {
+      "type": ["string", "null"],
+      "pattern": "^$|^[a-hj-np-zA-HJ-NP-Z1-9][a-hj-np-zA-HJ-NP-Z0-9]{11}$"
+    },
+    "UserProvidedOrganizationType": {
+      "type": "string",
+      "enum": [
+        "higher-ed",
+        "local",
+        "non-profit",
+        "none",
+        "state",
+        "tribal",
+        "unknown"
+      ]
+    },
+    "Zip": {
+      "type": "string",
+      "pattern": "^[0-9]{5}(?:-[0-9]{4})?$"
+    }
+  },
+  "$id": "http://example.org/generalinformation",
+  "$schema": "http://json-schema.org/draft/2019-09/schema#",
+  "additionalProperties": false,
+  "metamodel_version": "1.7.0",
+  "properties": {
+    "auditee_fiscal_period_start": {
+      "type": "string",
+      "format": "date"
+    },
+    "auditee_fiscal_period_end": {
+      "type": "string",
+      "format": "date"
+    },
+    "audit_period_covered": {
+      "$ref": "#/$defs/AuditPeriod"
+    },
+    "ein": {
+      "$ref": "#/$defs/EIN"
+    },
+    "ein_not_an_ssn_attestation": {
+      "type": ["boolean", "null"]
+    },
+    "multiple_eins_covered": {
+      "type": ["boolean", "null"]
+    },
+    "auditee_uei": {
+      "$ref": "#/$defs/UEI"
+    },
+    "multiple_ueis_covered": {
+      "type": ["boolean", "null"]
+    },
+    "auditee_name": {
+      "type": ["string", "null"]
+    },
+    "auditee_address_line_1": {
+      "type": "string",
+      "maxLength": 100
+    },
+    "auditee_city": {
+      "type": "string",
+      "maxLength": 100
+    },
+    "auditee_state": {
+      "$ref": "#/$defs/State"
+    },
+    "auditee_zip": {
+      "$ref": "#/$defs/Zip"
+    },
+    "auditee_contact_name": {
+      "type": "string",
+      "maxLength": 100
+    },
+    "auditee_contact_title": {
+      "type": "string",
+      "maxLength": 100
+    },
+    "auditee_phone": {
+      "$ref": "#/$defs/Phone"
+    },
+    "auditee_email": {
+      "type": "string",
+      "format": "email"
+    },
+    "user_provided_organization_type": {
+      "$ref": "#/$defs/UserProvidedOrganizationType"
+    },
+    "met_spending_threshold": {
+      "type": "boolean"
+    },
+    "is_usa_based": {
+      "type": "boolean"
+    },
+    "auditor_firm_name": {
+      "type": "string"
+    },
+    "auditor_ein": {
+      "$ref": "#/$defs/EIN"
+    },
+    "auditor_ein_not_an_ssn_attestation": {
+      "type": ["boolean", "null"]
+    },
+    "auditor_country": {
+      "type": "string",
+      "maxLength": 100
+    },
+    "auditor_address_line_1": {
+      "type": "string",
+      "maxLength": 100
+    },
+    "auditor_city": {
+      "type": "string",
+      "maxLength": 100
+    },
+    "auditor_state": {
+      "$ref": "#/$defs/State"
+    },
+    "auditor_zip": {
+      "$ref": "#/$defs/Zip"
+    },
+    "auditor_contact_name": {
+      "type": "string",
+      "maxLength": 100
+    },
+    "auditor_contact_title": {
+      "type": "string",
+      "maxLength": 100
+    },
+    "auditor_phone": {
+      "$ref": "#/$defs/Phone"
+    },
+    "auditor_email": {
+      "type": "string",
+      "format": "email"
+    }
+  },
+  "required": [],
+  "title": "GeneralInformation",
+  "type": "object",
+  "version": null
+}
