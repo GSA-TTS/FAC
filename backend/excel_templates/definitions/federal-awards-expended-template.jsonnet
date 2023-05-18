@@ -7,9 +7,10 @@ local title_row = 3;
 local single_cells = [
   Sheets.single_cell {
     title: 'Auditee UEI',
-    range_name: 'auditee_ein',
+    range_name: 'auditee_uei',
     title_cell: 'A2',
     range_cell: 'B2',
+    validation: SV.StringOfLengthTwelve,
   },
   Sheets.single_cell {
     title: 'Total amount expended',

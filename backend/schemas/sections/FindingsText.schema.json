@@ -6,11 +6,20 @@
       "FindingsText": {
          "additionalProperties": false,
          "properties": {
-            "auditee_ein": {
-               "type": [
-                  "string",
-                  "null"
-               ]
+            "auditee_uei": {
+               "allOf": [
+                  {
+                     "maxLength": 12,
+                     "minLength": 12
+                  },
+                  {
+                     "pattern": "^[A-H,J-N,P-Z,a-z,1-9][A-H,J-N,P-Z,a-z,0-9]+$"
+                  },
+                  {
+                     "pattern": "^(?![A-H,J-N,P-Z,a-z,1-9]+[A-H,J-N,P-Z,a-z,0-9]*?[0-9]{9})[A-H,J-N,P-Z,a-z,0-9]*$"
+                  }
+               ],
+               "type": "string"
             },
             "findings_text_entries": {
                "items": {
@@ -44,7 +53,7 @@
             }
          },
          "required": [
-            "auditee_ein"
+            "auditee_uei"
          ],
          "title": "FindingsText",
          "type": "object",
