@@ -63,6 +63,7 @@
                                    id="single-audit"
                                    name="audit_type"
                                    value="single-audit"
+                                   {% if audit_type == "single-audit" %} checked {% endif %}
                                    required
                                    data-validate-not-null=""/>
                             <label class="usa-radio__label" for="single-audit">Single Audit</label>
@@ -73,6 +74,7 @@
                                    name="audit_type"
                                    value="program-specific-audit"
                                    type="radio"
+                                   {% if audit_type == "program-specific" %} checked {% endif %}
                                    data-validate-not-null=""/>
                             <label class="usa-radio__label" for="program-specific-audit">Program-Specific Audit</label>
                         </div>
@@ -319,6 +321,7 @@
                                            name="multiple_ueis_covered"
                                            value="true"
                                            required
+                                           {% if multiple_ueis_covered == True %} checked {% endif %}
                                            data-validate-not-null=""/>
                                     <label class="usa-radio__label" for="multiple-ueis-yes">
                                         Yes
@@ -330,6 +333,7 @@
                                            id="multiple-ueis-no"
                                            name="multiple_ueis_covered"
                                            value="false"
+                                           {% if multiple_ueis_covered == False %} checked {% endif %}
                                            data-validate-not-null=""/>
                                     <label class="usa-radio__label" for="multiple-ueis-no">
                                         No
@@ -356,7 +360,8 @@
                                        name="ein"
                                        aria-required="true"
                                        required
-                                       data-validate-not-null=""/>
+                                       data-validate-not-null=""
+                                       value="{{ ein | default_if_none:'' }}"/>
                             </div>
                             <div class="usa-checkbox">
                                 <input class="usa-checkbox__input"
@@ -364,7 +369,8 @@
                                        type="checkbox"
                                        name="ein_not_an_ssn_attestation"
                                        data-validate-not-null=""
-                                       value=""/>
+                                       {% if ein_not_an_ssn_attestation == True %} checked {% endif %}
+                                       />
                                 <label class="usa-checkbox__label" for="ein_not_an_ssn_attestation">
                                     By checking this box, I verify that the Auditee EIN is not a Social Security Number.
                                 </label>
@@ -397,6 +403,7 @@
                                            name="multiple_eins_covered"
                                            value="true"
                                            required
+                                           {% if multiple_eins_covered == True %} checked {% endif %}
                                            data-validate-not-null=""/>
                                     <label class="usa-radio__label" for="multiple-eins-yes">
                                         Yes
@@ -408,6 +415,7 @@
                                            id="multiple-eins-no"
                                            name="multiple_eins_covered"
                                            value="false"
+                                           {% if multiple_eins_covered == False %} checked {% endif %}
                                            data-validate-not-null=""/>
                                     <label class="usa-radio__label" for="multiple-eins-no">
                                         No
