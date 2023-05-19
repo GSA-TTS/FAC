@@ -1,8 +1,9 @@
 ---
 name: Auto Generated PR From Main to Staging
 on:
-    schedule:
-    - cron: "30 4 * * *"
+    # schedule:
+    # - cron: "30 4 * * *"
+  workflow_dispatch:
 
 jobs:
   # TODO: Replace with Smoke Tests cc: JMM
@@ -25,7 +26,7 @@ jobs:
       - name: Check if There Has Been A Commit
         id: should_run
         continue-on-error: false
-        if: ${{ github.event_name == 'schedule' }}
+        if: ${{ github.event_name == 'workflow_dispatch' }}
         run: |
           sha=$(git rev-list --after="24 hours" ${{ github.sha }})
           if test -z $sha
