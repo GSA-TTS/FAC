@@ -403,8 +403,8 @@ class Access(models.Model):
     """
 
     ROLES = (
-        ("certifying_auditee_contact ", _("Auditee Certifying Official")),
-        ("certifying_auditor_contact ", _("Auditor Certifying Official")),
+        ("certifying_auditee_contact", _("Auditee Certifying Official")),
+        ("certifying_auditor_contact", _("Auditor Certifying Official")),
         ("editor", _("Audit Editor")),
     )
     sac = models.ForeignKey(SingleAuditChecklist, on_delete=models.CASCADE)

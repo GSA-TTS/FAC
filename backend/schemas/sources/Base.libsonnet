@@ -18,6 +18,9 @@ local Types = {
   array: { type: 'array' },
   number: { type: 'number' },
   NULL: { type: Const.NULL },
+  boolean: { type: 'boolean' },
+  boolean_or_null: { type: ['boolean', 'null'] },
+  string_or_null: { type: ['string', 'null'] },
 };
 
 // Support components for the Meta object.
@@ -91,7 +94,7 @@ local Enum = {
     //title: 'YorN'
   },
   NA: Types.string {
-    //description: 'A "not applicable" answer',
+    //description: 'A 'not applicable' answer',
     enum: [
       Const.NA,
     ],
@@ -122,6 +125,77 @@ local Enum = {
       Const.NULL,
     ],
     title: 'EmptyString_Null',
+  },
+  UnitedStatesStateAbbr: Types.string {
+     'enum': [
+        'AL',
+        'AK',
+        'AZ',
+        'AR',
+        'CA',
+        'CO',
+        'CT',
+        'DE',
+        'FL',
+        'GA',
+        'HI',
+        'ID',
+        'IL',
+        'IN',
+        'IA',
+        'KS',
+        'KY',
+        'LA',
+        'ME',
+        'MD',
+        'MA',
+        'MI',
+        'MN',
+        'MS',
+        'MO',
+        'MT',
+        'NE',
+        'NV',
+        'NH',
+        'NJ',
+        'NM',
+        'NY',
+        'NC',
+        'ND',
+        'OH',
+        'OK',
+        'OR',
+        'PA',
+        'RI',
+        'SC',
+        'SD',
+        'TN',
+        'TX',
+        'UT',
+        'VT',
+        'VA',
+        'WA',
+        'WV',
+        'WI',
+        'WY'
+     ],
+  },
+  AuditPeriod: Types.string {
+     description: 'Period type of audit being submitted',
+     enum: [
+        'annual',
+        'biennial',
+        'other'
+     ],
+     title: 'AuditPeriod',
+  },
+  AuditType: Types.string {
+      description: 'Type of audit being submitted',
+      enum: [
+          'program-specific',
+          'single-audit',
+      ],
+      title: 'AuditType',
   },
   MajorProgramAuditReportType: Types.string {
     description: 'Major program report types',
@@ -299,6 +373,12 @@ local Compound = {
     minLength: 1,
   },
   StateClusterNameNonAnswers: Enum.EmptyString_Null,
+  EmployerIdentificationNumber: Types.string {
+      pattern: "^[0-9]{9}$",
+  },
+  UniqueEntityIdentifier: Types.string {
+      pattern: "^$|^[a-hj-np-zA-HJ-NP-Z1-9][a-hj-np-zA-HJ-NP-Z0-9]{11}$",
+  }
 
 };
 
