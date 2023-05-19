@@ -20,6 +20,8 @@ AWARD_ENTITY_NAME_PATH = (
 AWARD_ENTITY_ID_PATH = "FederalAwards.federal_awards.direct_or_indirect_award.entities.passthrough_identifying_number"
 AWARD_ENTITY_NAME_KEY = "passthrough_name"
 AWARD_ENTITY_ID_KEY = "passthrough_identifying_number"
+FEDERAL_AGENCY_PREFIX = "federal_agency_prefix"
+THREE_DIGIT_EXTENSION = "three_digit_extension"
 
 XLSX_TEMPLATE_DEFINITION_DIR = Path(settings.XLSX_TEMPLATE_DIR)
 
@@ -67,12 +69,12 @@ findings_text_field_mapping: FieldMapping = {
 federal_awards_column_mapping: ColumnMapping = {
     "federal_agency_prefix": (
         "FederalAwards.federal_awards",
-        "program.federal_agency_prefix",
+        f"program.{FEDERAL_AGENCY_PREFIX}",
         _set_by_path,
     ),
     "three_digit_extension": (
         "FederalAwards.federal_awards",
-        "program.three_digit_extension",
+        f"program.{THREE_DIGIT_EXTENSION}",
         _set_by_path,
     ),
     "additional_award_identification": (
@@ -182,12 +184,12 @@ corrective_action_column_mapping: ColumnMapping = {
 findings_uniform_guidance_column_mapping: ColumnMapping = {
     "federal_agency_prefix": (
         "FindingsUniformGuidance.findings_uniform_guidance_entries",
-        "program.federal_agency_prefix",
+        f"program.{FEDERAL_AGENCY_PREFIX}",
         _set_by_path,
     ),
     "three_digit_extension": (
         "FindingsUniformGuidance.findings_uniform_guidance_entries",
-        "program.three_digit_extension",
+        f"program.{THREE_DIGIT_EXTENSION}",
         _set_by_path,
     ),
     "additional_award_identification": (
@@ -347,11 +349,21 @@ def _get_entries_by_path(dictionary, path):
     return val
 
 
+def _ensure_string_conversion(path, value):
+    """
+    This function checks whether the input path ends with certain specified suffixes,
+    and if it does, it ensures the corresponding value is format as string.
+    """
+    if path.endswith(FEDERAL_AGENCY_PREFIX) or path.endswith(THREE_DIGIT_EXTENSION):
+        return str(value)
+    return value
+
+
 def _extract_data(
     file,
     field_mapping: FieldMapping,
     column_mapping: ColumnMapping,
-    data_row_start: int = 3,
+    header_row: int,
 ):
     """
     Extracts data from an Excel file using provided field and column mappings
@@ -369,8 +381,12 @@ def _extract_data(
         ):
             row_value_pairs = list(_extract_column(workbook, name))
             for row, value in row_value_pairs:
-                index = (row - data_row_start) - 1  # Subtract 1 to make it zero-indexed
-                set_fn(result, f"{parent_target}[{index}].{field_target}", value)
+                index = (row - header_row) - 1  # Subtract 1 to make it zero-indexed
+                set_fn(
+                    result,
+                    f"{parent_target}[{index}].{field_target}",
+                    _ensure_string_conversion(field_target, value),
+                )
 
             # Necessary to prevent null entries when index/row is skipped in first column
             if i == 0:
@@ -467,7 +483,7 @@ def _extract_named_ranges(errors, column_mapping, field_mapping):
         if not bool(error.path):
             print("No path found in error object")
             continue
-
+        print(error)
         keyFound = None
         match = None
         row_index = next((item for item in error.path if isinstance(item, int)), None)
