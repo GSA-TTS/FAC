@@ -1,104 +1,21 @@
+local Base = import 'Base.libsonnet';
+local Func = import 'Functions.libsonnet';
+local Types = Base.Types;
+
 {
    "$defs": {
-      "AuditPeriod": {
-         "description": "",
-         "enum": [
-            "annual",
-            "biennial",
-            "other"
-         ],
-         "title": "AuditPeriod",
-         "type": "string"
-      },
-      "EIN": {
-         "pattern": "^[0-9]{9}$",
-         "type": [
-            "string",
-            "null"
-         ]
-      },
-      "Phone": {
+      "AuditPeriod": Base.Enum.AuditPeriod,
+      "EIN": Base.Compound.EmployerIdentificationNumber + Types.string_or_null,
+      "Phone": Types.string {
          "pattern": "^^(\\+0?1\\s)?\\(?\\d{3}\\)?[\\s.-]?\\d{3}[\\s.-]?\\d{4}$",
-         "type": "string"
       },
-      "State": {
-         "enum": [
-            "AL",
-            "AK",
-            "AZ",
-            "AR",
-            "CA",
-            "CO",
-            "CT",
-            "DE",
-            "FL",
-            "GA",
-            "HI",
-            "ID",
-            "IL",
-            "IN",
-            "IA",
-            "KS",
-            "KY",
-            "LA",
-            "ME",
-            "MD",
-            "MA",
-            "MI",
-            "MN",
-            "MS",
-            "MO",
-            "MT",
-            "NE",
-            "NV",
-            "NH",
-            "NJ",
-            "NM",
-            "NY",
-            "NC",
-            "ND",
-            "OH",
-            "OK",
-            "OR",
-            "PA",
-            "RI",
-            "SC",
-            "SD",
-            "TN",
-            "TX",
-            "UT",
-            "VT",
-            "VA",
-            "WA",
-            "WV",
-            "WI",
-            "WY"
-         ],
+      "State": Base.Enum.UnitedStatesStateAbbr {
          "title": "State",
-         "type": "string"
       },
-      "UEI": {
-         "pattern": "^$|^[a-hj-np-zA-HJ-NP-Z1-9][a-hj-np-zA-HJ-NP-Z0-9]{11}$",
-         "type": [
-            "string",
-            "null"
-         ]
-      },
-      "UserProvidedOrganizationType": {
-         "enum": [
-            "higher-ed",
-            "local",
-            "non-profit",
-            "none",
-            "state",
-            "tribal",
-            "unknown"
-         ],
-         "type": "string"
-      },
-      "Zip": {
+      "UEI": Base.Compound.UniqueEntityIdentifier + Types.string_or_null,
+      "UserProvidedOrganizationType": Base.Enum.OrganizationType,
+      "Zip": Types.string {
          "pattern": "^[0-9]{5}(?:-[0-9]{4})?$",
-         "type": "string"
       }
    },
    "$id": "http://example.org/generalinformation",
@@ -106,43 +23,32 @@
    "additionalProperties": false,
    "metamodel_version": "1.7.0",
    "properties": {
+      "audit_type": Base.Enum.AuditType,
       "audit_period_covered": {
          "$ref": "#/$defs/AuditPeriod"
       },
-      "auditee_address_line_1": {
+      "auditee_address_line_1": Types.string {
          "maxLength": 100,
-         "type": "string"
       },
-      "auditee_city": {
+      "auditee_city": Types.string {
          "maxLength": 100,
-         "type": "string"
       },
-      "auditee_contact_name": {
+      "auditee_contact_name": Types.string {
          "maxLength": 100,
-         "type": "string"
       },
-      "auditee_contact_title": {
+      "auditee_contact_title": Types.string {
          "maxLength": 100,
-         "type": "string"
       },
-      "auditee_email": {
+      "auditee_email": Types.string {
          "format": "email",
-         "type": "string"
       },
-      "auditee_fiscal_period_end": {
+      "auditee_fiscal_period_end": Types.string {
          "format": "date",
-         "type": "string"
       },
-      "auditee_fiscal_period_start": {
+      "auditee_fiscal_period_start": Types.string {
          "format": "date",
-         "type": "string"
       },
-      "auditee_name": {
-         "type": [
-            "string",
-            "null"
-         ]
-      },
+      "auditee_name": Types.string_or_null,
       "auditee_phone": {
          "$ref": "#/$defs/Phone"
       },
@@ -155,42 +61,29 @@
       "auditee_zip": {
          "$ref": "#/$defs/Zip"
       },
-      "auditor_address_line_1": {
+      "auditor_address_line_1": Types.string {
          "maxLength": 100,
-         "type": "string"
       },
-      "auditor_city": {
+      "auditor_city": Types.string {
          "maxLength": 100,
-         "type": "string"
       },
-      "auditor_contact_name": {
+      "auditor_contact_name": Types.string {
          "maxLength": 100,
-         "type": "string"
       },
-      "auditor_contact_title": {
+      "auditor_contact_title": Types.string {
          "maxLength": 100,
-         "type": "string"
       },
-      "auditor_country": {
+      "auditor_country": Types.string {
          "maxLength": 100,
-         "type": "string"
       },
       "auditor_ein": {
          "$ref": "#/$defs/EIN"
       },
-      "auditor_ein_not_an_ssn_attestation": {
-         "type": [
-            "boolean",
-            "null"
-         ]
-      },
-      "auditor_email": {
+      "auditor_ein_not_an_ssn_attestation": Types.boolean_or_null,
+      "auditor_email": Types.string {
          "format": "email",
-         "type": "string"
       },
-      "auditor_firm_name": {
-         "type": "string"
-      },
+      "auditor_firm_name": Types.string,
       "auditor_phone": {
          "$ref": "#/$defs/Phone"
       },
@@ -203,30 +96,11 @@
       "ein": {
          "$ref": "#/$defs/EIN"
       },
-      "ein_not_an_ssn_attestation": {
-         "type": [
-            "boolean",
-            "null"
-         ]
-      },
-      "is_usa_based": {
-         "type": "boolean"
-      },
-      "met_spending_threshold": {
-         "type": "boolean"
-      },
-      "multiple_eins_covered": {
-         "type": [
-            "boolean",
-            "null"
-         ]
-      },
-      "multiple_ueis_covered": {
-         "type": [
-            "boolean",
-            "null"
-         ]
-      },
+      "ein_not_an_ssn_attestation": Types.boolean_or_null,
+      "is_usa_based": Types.boolean,
+      "met_spending_threshold": Types.boolean,
+      "multiple_eins_covered": Types.boolean_or_null,
+      "multiple_ueis_covered": Types.boolean_or_null,
       "user_provided_organization_type": {
          "$ref": "#/$defs/UserProvidedOrganizationType"
       }

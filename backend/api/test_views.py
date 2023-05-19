@@ -697,7 +697,7 @@ class SingleAuditChecklistViewTests(TestCase):
             ("audit_period_covered", "['annual', 'biennial', 'other']"),
             (
                 "user_provided_organization_type",
-                "['higher-ed', 'local', 'non-profit', 'none', 'state', 'tribal', 'unknown']",
+                "['state', 'local', 'tribal', 'higher-ed', 'non-profit', 'unknown', 'none']",
             ),
         ]
 
