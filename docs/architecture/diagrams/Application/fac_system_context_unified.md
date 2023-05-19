@@ -10,7 +10,10 @@ Person(Staff, "User", "FAC Staff")
 Person(AgencyApp, "App", "Agency App")
 
 note as EncryptionNote
-All connections depicted are encrypted with TLS 1.2 unless otherwise noted.
+All connections depicted are encrypted with TLS 1.2 unless otherwise noted. 
+end note
+note as PortsNote
+All connextions are on port 443 and use https unles otherwise noted.
 end note
 
 
@@ -39,6 +42,7 @@ Boundary(cloudgov, "Cloud.gov Boundary") {
     System(samgov, "SAM.gov", "UEI Source")
     System(Email, "GSA Email")
     System(relic, "New Relic", "Telemetry site")
+    System(dap, "DAP", "Access abalytics")
     System(clamav, "ClamAv Provider", "Vulnerability data provider")
 
 
@@ -68,6 +72,7 @@ Rel(django, scan, "Scans attachments")
 Rel(django, db, "read/write")
 Rel(backend, s3, "Stores single audit packages/Excel files")
 Rel(django, relic, "logs telemetry data")
+Rel(django, dap, "logs user visits data")
 Rel(scan, clamav, "retrievesvulnerability checke")
 
 @enduml
