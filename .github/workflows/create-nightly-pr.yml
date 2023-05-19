@@ -1,18 +1,10 @@
 ---
 name: Auto Generated PR From Main to Staging
 on:
-    # schedule:
-    # - cron: "30 4 * * *"
+  workflow_call:
   workflow_dispatch:
 
 jobs:
-  # TODO: Replace with Smoke Tests cc: JMM
-  scan-dev-pre-deploy:
-    name: Zap scan of the dev site
-    uses: ./.github/workflows/zap-scan.yml
-    with:
-        url: "https://fac-dev.app.cloud.gov/"
-
   check-commit:
     runs-on: ubuntu-latest
     name: Check For a Commit
@@ -26,7 +18,6 @@ jobs:
       - name: Check if There Has Been A Commit
         id: should_run
         continue-on-error: false
-        if: ${{ github.event_name == 'workflow_dispatch' }}
         run: |
           sha=$(git rev-list --after="24 hours" ${{ github.sha }})
           if test -z $sha
@@ -62,12 +53,13 @@ jobs:
           source_branch: "main"
           destination_branch: "prod"
           pr_title: "${{ steps.date.outputs.date }} ${{ steps.git-short.outputs.short_sha }} main -> prod"
+          pr_label: "automerge"
           pr_body: |
             This is an auto-generated PR to merge main into prod for a staging release for ${{ steps.date.outputs.date }}
             Last commit being merged: ${{ steps.git-short.outputs.short_sha }}
           pr_reviewer: "fac-admins"
           pr_allow_empty: false
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          github_token: ${{ secrets.PR_CREATOR_TOKEN }}
 
   auto-approve:
     name: Auto Approve Created PR
@@ -88,8 +80,10 @@ jobs:
     if: ${{ needs.pull-request.outputs.pr_number != null }}
     runs-on: ubuntu-latest
     steps:
-      - uses: peter-evans/enable-pull-request-automerge@v3
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          pull-request-number: ${{ needs.pull-request.outputs.pr_number }}
-          merge-method: merge
+      - id: automerge
+        name: automerge
+        uses: "pascalgn/automerge-action@v0.15.6"
+        env:
+          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+          MERGE_RETRIES: 50
+          MERGE_RETRY_SLEEP: 30000
