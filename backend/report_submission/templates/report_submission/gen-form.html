@@ -107,6 +107,7 @@
                                    name="audit_period_covered"
                                    value="annual"
                                    required
+                                   {% if audit_period_covered == "annual" %} checked {% endif %}
                                    data-validate-not-null=""/>
                             <label class="usa-radio__label" for="audit-period-annual">Annual</label>
                         </div>
@@ -116,6 +117,7 @@
                                    name="audit_period_covered"
                                    value="biennial"
                                    type="radio"
+                                   {% if audit_period_covered == "biennial" %} checked {% endif %}
                                    data-validate-not-null=""/>
                             <label class="usa-radio__label" for="audit-period-biennial">Biennial</label>
                         </div>
@@ -125,6 +127,7 @@
                                    name="audit_period_covered"
                                    value="other"
                                    type="radio"
+                                   {% if audit_period_covered == "other" %} checked {% endif %}
                                    data-validate-not-null=""/>
                             <label class="usa-radio__label" for="audit-period-other">Other</label>
                             <input class="usa-input usa-input--small"
@@ -672,7 +675,7 @@
                                        id="auditor_ein_not_an_ssn_attestation"
                                        type="checkbox"
                                        name="auditor_ein_not_an_ssn_attestation"
-                                       value=""
+                                       {% if auditor_ein_not_an_ssn_attestation == True %} checked {% endif %}
                                        data-validate-not-null=""/>
                                 <label class="usa-checkbox__label" for="auditor_ein_not_an_ssn_attestation">
                                     By checking this box, I verify that the Auditor EIN is not a Social Security Number.
