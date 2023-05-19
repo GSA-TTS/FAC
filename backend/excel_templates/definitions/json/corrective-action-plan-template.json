@@ -2,7 +2,11 @@
    "filename": "corrective-action-plan-template.xlsx",
    "sheets": [
       {
-         "cells_to_merge": [
+         "header_inclusion": [
+            "A1",
+            "C2"
+         ],
+         "mergeable_cells": [
             [
                1,
                2,
@@ -34,9 +38,12 @@
                "H"
             ]
          ],
-         "include_in_header": [
-            "A1",
-            "C2"
+         "merged_unreachable": [
+            "B",
+            "D",
+            "E",
+            "F",
+            "H"
          ],
          "name": "Form",
          "open_ranges": [
