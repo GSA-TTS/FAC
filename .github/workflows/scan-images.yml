@@ -64,10 +64,12 @@ jobs:
           fi
 
       - name: Scan Image
-        run: docker run aquasec/trivy:latest image --scanners vuln ${{ matrix.image.name }}:${{ matrix.image.tag }}
-
+        run: docker run aquasec/trivy:latest  image --timeout 5m --scanners vuln --exit-code 1 --severity CRITICAL,HIGH  ${{ matrix.image.name }}:${{ matrix.image.tag }}
       - name: Tag Image
-        run: docker tag ${{ matrix.image.name }}:${{ matrix.image.tag }} ghcr.io/${{ env.GH_REPO }}/${{ matrix.image.name }}:${{ matrix.image.tag }}
+        run: |
+          image_creation_date=$(date -d "$(docker inspect -f '{{ .Created }}' ${{ matrix.image.name }}:${{ matrix.image.tag }})" +%s)
+          docker tag ${{ matrix.image.name }}:${{ matrix.image.tag }} ghcr.io/${{ env.GH_REPO }}/${{ matrix.image.name }}:${{ matrix.image.tag }}
+          docker tag ${{ matrix.image.name }}:${{ matrix.image.tag }} ghcr.io/${{ env.GH_REPO }}/${{ matrix.image.name }}:$image_creation_date
 
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v2
@@ -77,7 +79,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Push Image
-        run: docker push ghcr.io/${{ env.GH_REPO }}/${{ matrix.image.name }}:${{ matrix.image.tag }}
+        run: docker push --all-tags ghcr.io/${{ env.GH_REPO }}/${{ matrix.image.name }}
 
       - name: Upload refresh token
         uses: actions/upload-artifact@v3
