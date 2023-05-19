@@ -17,7 +17,7 @@ local single_cells = [
     range_name: 'total_amount_expended',
     title_cell: 'D2',
     range_cell: 'E2',
-    validation: SV.PositiveNumberValidation,
+    formula: '=SUM(FIRSTCELLREF:LASTCELLREF)',
     width: 36,
   },
 ];

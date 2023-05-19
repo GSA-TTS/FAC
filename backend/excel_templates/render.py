@@ -178,6 +178,23 @@ def add_yorn_validation(ws):
     return yorn_dv
 
 
+def apply_formula(ws, data_row, spec):
+    # Apply formulas to the open ranges
+    for r in spec["open_ranges"]:
+        coords = make_range(r)
+        if "formula" in r:
+            for row in range(coords.range_start_row, MAX_ROWS + 1):
+                ws[f"{coords.column}{row}"] = r["formula"].format(row)
+
+    # Apply formulas to the single cells
+    for r in spec["single_cells"]:
+        if "formula" in r:
+            formula = r["formula"]
+            formula = formula.replace("FIRSTCELLREF", f"{r['range_cell'][0]}{data_row}")
+            formula = formula.replace("LASTCELLREF", f"{r['range_cell'][0]}{MAX_ROWS}")
+            ws[r["range_cell"]] = formula
+
+
 def configure_validation(ws, coords: Range, r):
     dv = None
     if r["type"] == "yorn_range":
@@ -191,9 +208,9 @@ def configure_validation(ws, coords: Range, r):
             dv.formula1 = dv.formula1.replace(
                 "FIRSTCELLREF", f"${coords.column}{coords.range_start_row}"
             )
-        # elif "enum" in v:
-        #     valid_values = v["enum"]
-        #     dv.formula1 = f'"IF(ISNA(MATCH({coords.column}{coords.range_start_row}, {{{",".join([f"{chr(34)}{x}{chr(34)}" for x in valid_values])}}}, 0)),FALSE,TRUE)"'
+            dv.formula1 = dv.formula1.replace(
+                "LASTCELLREF", f"${coords.column}${MAX_ROWS}"
+            )
         if "operator" in v:
             dv.operator = v["operator"]
         if "allow_blank" in v:
@@ -279,6 +296,7 @@ def process_spec(spec):
             merge_adjacent_columns(ws, sheet["mergeable_cells"])
         process_open_ranges(wb, ws, sheet)
         add_validations(wb, ws, sheet)
+        apply_formula(ws, spec["title_row"] + 1, sheet)
         unlock_data_entry_cells(spec["title_row"], ws, sheet)
         set_column_widths(wb, ws, sheet)
         process_single_cells(wb, ws, sheet)

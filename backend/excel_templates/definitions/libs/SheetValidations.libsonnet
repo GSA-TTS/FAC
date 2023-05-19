@@ -1,6 +1,6 @@
 local Fun = import 'Functions.libsonnet';
 local Base = import '../../../schemas/sources/Base.libsonnet';
-local Requiremnt = import '../../../schemas/sources/FindingsUniformGuidance.libsonnet';
+local Requirement = import '../../../schemas/sources/FindingsUniformGuidance.libsonnet';
 
 local FAPPrefixValidation = {
     type: "list",
@@ -55,13 +55,14 @@ local StringOfLengthTwelve = {
     custom_title: "Must be length of 12"
 };
 
-// local ComplianceRequirementValidation = {
-//     type: "list",
-//     allow_blank: "False",
-//     enum: Requiremnt.ComplianceRequirement.ComplianceRequirement.enum,
-//     custom_error: "Expecting a valid combination of the letters: A,B,C,E,F,G,H,I,J,L,M,N,P",
-//     custom_title: "Compliance requirement"
-// };
+local ComplianceRequirementValidation = {
+    type: "custom",
+    formula1: "=IF(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(FIRSTCELLREF, \"A\", \"\"), \"B\", \"\"), \"C\", \"\"), \"E\", \"\"), \"F\", \"\"), \"G\", \"\"), \"H\", \"\"), \"I\", \"\"), \"J\", \"\"), \"L\", \"\"), \"M\", \"\"), \"N\", \"\"), \"P\", \"\")<>\"\", \"Invalid\", \"Valid\")",
+    //20230519 HDMS FIXME: formula2 is not used as it relays on dynamic array that are only supported in excel 2019 and later.  
+    formula2: "=IF(TEXTJOIN(\"\",TRUE,SORT(MID(FIRSTCELLREF,ROW(INDIRECT(\"1:\"&LEN(FIRSTCELLREF))),1)))<>FIRSTCELLREF,\"Invalid\",\"Valid\")",
+    custom_error: "Expecting a valid combination of the letters: A,B,C,E,F,G,H,I,J,L,M,N,P",
+    custom_title: "Compliance requirement"
+};
 
 {
     FAPPrefixValidation: FAPPrefixValidation,
@@ -70,5 +71,5 @@ local StringOfLengthTwelve = {
     StringOfLengthTwelve: StringOfLengthTwelve,
     YoNValidation: YoNValidation,
     ReferenceNumberValidation: ReferenceNumberValidation,
-//    ComplianceRequirementValidation: ComplianceRequirementValidation
+    ComplianceRequirementValidation: ComplianceRequirementValidation,
 }
