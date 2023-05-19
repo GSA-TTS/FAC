@@ -5,18 +5,14 @@ local Types = Base.Types;
 {
    "$defs": {
       "AuditPeriod": Base.Enum.AuditPeriod,
-      "EIN": Types.string_or_null {
-         "pattern": "^[0-9]{9}$",
-      },
+      "EIN": Base.Compound.EmployerIdentificationNumber + Types.string_or_null,
       "Phone": Types.string {
          "pattern": "^^(\\+0?1\\s)?\\(?\\d{3}\\)?[\\s.-]?\\d{3}[\\s.-]?\\d{4}$",
       },
       "State": Base.Enum.UnitedStatesStateAbbr {
          "title": "State",
       },
-      "UEI": Types.string_or_null {
-         "pattern": "^$|^[a-hj-np-zA-HJ-NP-Z1-9][a-hj-np-zA-HJ-NP-Z0-9]{11}$",
-      },
+      "UEI": Base.Compound.UniqueEntityIdentifier + Types.string_or_null,
       "UserProvidedOrganizationType": Base.Enum.OrganizationType,
       "Zip": Types.string {
          "pattern": "^[0-9]{5}(?:-[0-9]{4})?$",
@@ -52,7 +48,7 @@ local Types = Base.Types;
       "auditee_fiscal_period_start": Types.string {
          "format": "date",
       },
-      "auditee_name": Types.string {},
+      "auditee_name": Types.string_or_null,
       "auditee_phone": {
          "$ref": "#/$defs/Phone"
       },
@@ -103,8 +99,8 @@ local Types = Base.Types;
       "ein_not_an_ssn_attestation": Types.boolean_or_null,
       "is_usa_based": Types.boolean,
       "met_spending_threshold": Types.boolean,
-      "multiple_eins_covered": Types.boolean,
-      "multiple_ueis_covered": Types.boolean,
+      "multiple_eins_covered": Types.boolean_or_null,
+      "multiple_ueis_covered": Types.boolean_or_null,
       "user_provided_organization_type": {
          "$ref": "#/$defs/UserProvidedOrganizationType"
       }

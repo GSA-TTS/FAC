@@ -285,6 +285,12 @@ local Compound = {
       minLength: 1
   },
   StateClusterNameNonAnswers: Enum.EmptyString_Null,
+  EmployerIdentificationNumber: Types.string {
+      pattern: "^[0-9]{9}$",
+  },
+  UniqueEntityIdentifier: Types.string {
+      pattern: "^$|^[a-hj-np-zA-HJ-NP-Z1-9][a-hj-np-zA-HJ-NP-Z0-9]{11}$",
+  }
 
 };
 
