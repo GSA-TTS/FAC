@@ -57,9 +57,9 @@ local StringOfLengthTwelve = {
 
 local ComplianceRequirementValidation = {
     type: "custom",
+    //This formula only checks if valid characters are used, it does not validate alphabetical order
+    //The json schema validation checks both valid characters and alphabetical order
     formula1: "=IF(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(FIRSTCELLREF, \"A\", \"\"), \"B\", \"\"), \"C\", \"\"), \"E\", \"\"), \"F\", \"\"), \"G\", \"\"), \"H\", \"\"), \"I\", \"\"), \"J\", \"\"), \"L\", \"\"), \"M\", \"\"), \"N\", \"\"), \"P\", \"\")<>\"\", \"Invalid\", \"Valid\")",
-    //20230519 HDMS FIXME: formula2 is not used as it relays on dynamic array that are only supported in excel 2019 and later.  
-    formula2: "=IF(TEXTJOIN(\"\",TRUE,SORT(MID(FIRSTCELLREF,ROW(INDIRECT(\"1:\"&LEN(FIRSTCELLREF))),1)))<>FIRSTCELLREF,\"Invalid\",\"Valid\")",
     custom_error: "Expecting a valid combination of the letters: A,B,C,E,F,G,H,I,J,L,M,N,P",
     custom_title: "Compliance requirement"
 };
