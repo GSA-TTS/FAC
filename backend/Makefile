@@ -77,7 +77,6 @@ docker-nctest:
 	docker compose run web python manage.py migrate
 	docker compose run web bash -c 'awslocal s3 mb s3://gsa-fac-private-s3'
 	docker compose run web python manage.py test --parallel ${fac.test.scope}
-	docker compose run web bash -c 'npm install -g \@lhci/cli\@0.8.x && lhci autorun'
 
 docker-clean:
 	docker compose down

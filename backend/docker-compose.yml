@@ -39,8 +39,8 @@ services:
       - /src/node_modules
       - /src/staticfiles
   clamav-rest:
-    # image: ajilaag/clamav-rest:20230220
-    image: ghcr.io/gsa-tts/fac/clamav/clamav:latest
+    image: ajilaag/clamav-rest:20230220
+    # image: ghcr.io/gsa-tts/fac/clamav:latest
     environment:
       - MAX_FILE_SIZE=25M
       - SIGNATURE_CHECKS=1
