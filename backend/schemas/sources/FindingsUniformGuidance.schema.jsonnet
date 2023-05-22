@@ -4,7 +4,6 @@ local Additional = import 'FindingsUniformGuidance.validation.libsonnet';
 local Func = import 'Functions.libsonnet';
 local Types = Base.Types;
 local Validations = Additional.Validations;
-local ComplianceRequirement = Requirement.ComplianceRequirement;
 
 local Parts = {
   Program: Types.object {
@@ -14,7 +13,7 @@ local Parts = {
       federal_agency_prefix: Base.Enum.ALNPrefixes,
       three_digit_extension: Base.Compound.ThreeDigitExtension,
       additional_award_identification: Types.string,
-      compliance_requirement: ComplianceRequirement.ComplianceRequirement,
+      compliance_requirement: Base.Compound.ComplianceRequirement,
     },
     required: ['program_name', 'federal_agency_prefix', 'three_digit_extension', 'compliance_requirement'],
     allOf: Base.Validation.AdditionalAwardIdentificationValidation,

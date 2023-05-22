@@ -320,6 +320,11 @@ local Compound = {
     description: 'Reference Number',
     pattern: '^20[2-9][0-9]-[0-9]{3}$',
   },
+  ComplianceRequirement: {
+    title: 'ComplianceRequirement',
+    description: 'Compliance requirement type',
+    pattern: '^A?B?C?E?F?G?H?I?J?L?M?N?P?$',
+  },  
   ClusterName: Types.string {
     description: 'Cluster Name',
     enum: [
