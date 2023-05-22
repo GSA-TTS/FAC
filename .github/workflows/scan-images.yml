@@ -30,20 +30,18 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Fetch refresh token artifact
+      - name: Fetch version number artifact
         uses: dawidd6/action-download-artifact@v2
         with:
           name: ${{ matrix.image.tname }}
         continue-on-error: true
 
-      - name: Initialize refresh token
+      - name: Initialize version number
         shell: bash
         run: |
           current_date=$(date +%s)
           start_date=$((current_date - 31536000))
-          echo The default is $start_date
           value=`cat ${{ matrix.image.tname }}.txt || echo $start_date`
-          echo The result is $value
           touch  ${{ matrix.image.tname }}.txt
           echo $value > ${{ matrix.image.tname }}.txt
 
@@ -65,11 +63,12 @@ jobs:
 
       - name: Scan Image
         run: docker run aquasec/trivy:latest  image --timeout 5m --scanners vuln --exit-code 1 --severity CRITICAL,HIGH  ${{ matrix.image.name }}:${{ matrix.image.tag }}
+
       - name: Tag Image
         run: |
           image_creation_date=$(date -d "$(docker inspect -f '{{ .Created }}' ${{ matrix.image.name }}:${{ matrix.image.tag }})" +%s)
-          docker tag ${{ matrix.image.name }}:${{ matrix.image.tag }} ghcr.io/${{ env.GH_REPO }}/${{ matrix.image.name }}:${{ matrix.image.tag }}
-          docker tag ${{ matrix.image.name }}:${{ matrix.image.tag }} ghcr.io/${{ env.GH_REPO }}/${{ matrix.image.name }}:$image_creation_date
+          docker tag ${{ matrix.image.name }}:${{ matrix.image.tag }} ghcr.io/${{ env.GH_REPO }}/${{ matrix.image.tname }}:${{ matrix.image.tag }}
+          docker tag ${{ matrix.image.name }}:${{ matrix.image.tag }} ghcr.io/${{ env.GH_REPO }}/${{ matrix.image.tname }}:$image_creation_date
 
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v2
@@ -81,7 +80,7 @@ jobs:
       - name: Push Image
         run: docker push --all-tags ghcr.io/${{ env.GH_REPO }}/${{ matrix.image.name }}
 
-      - name: Upload refresh token
+      - name: Upload version number
         uses: actions/upload-artifact@v3
         with:
           name: ${{ matrix.image.tname }}
