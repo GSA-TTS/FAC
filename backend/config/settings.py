@@ -363,7 +363,7 @@ SAM_API_KEY = secret("SAM_API_KEY")
 
 SCHEMAS_DIR = os.path.join("audit", "schemas")
 
-SECTION_SCHEMA_DIR = os.path.join("schemas","output", "sections")
+SECTION_SCHEMA_DIR = os.path.join("schemas", "output", "sections")
 
 XLSX_TEMPLATE_DIR = os.path.join("schemas", "output", "excel", "json")
 
