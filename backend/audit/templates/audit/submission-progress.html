@@ -1,10 +1,21 @@
 {% extends "base.html" %}
 {% load static %}
+
 {% block content %}
 <!-- 
 Submission progress/audit checklist/audit landing page.
 TODO: Include the "Completed at X by Y", after timestamps are included in the data model. 
 -->
+<header class="usa-header usa-header-basic bg-primary-darker">
+	<div class="usa-nav-container">
+		<div class="usa-navbar bg-primary-darker text-white width-full flex">
+			<p class="margin-left-2">
+				<a href="/" class="text-gray-10">My audit submissions</a> » 
+				<span class="text-bold">{{ auditee_name | default_if_none:'' }}</span>
+			</p>
+		</div>
+	</div>
+</header>
 <div class="grid-container margin-top-6">
 	<div class="usa-alert usa-alert--success margin-bottom-6">
 		<div class="usa-alert__body">
@@ -226,8 +237,14 @@ TODO: Include the "Completed at X by Y", after timestamps are included in the da
 					</p>
 				</div>
 			</li>
-			<!-- Audit report PDF - margin on top for a gap -->
-			<li class="usa-icon-list__item padding-bottom-2 margin-top-8">
+			<!-- Ready for certification -->
+			<a href="{% url 'audit:ReadyForCertification' report_id=report_id %}">
+				<button class="usa-button">
+					Ready for SF-SAC Certification
+				</button>
+			</a>
+			<!-- Audit report PDF -->
+			<li class="usa-icon-list__item padding-bottom-2 padding-top-2">
 				<div class="usa-icon-list__icon {% if audit_report.completed == True %} text-green {% else %} text-base {% endif %}">
 					<svg class="usa-icon margin-right-2" aria-hidden="true" role="img">
 						{% if audit_report.completed == True %}
