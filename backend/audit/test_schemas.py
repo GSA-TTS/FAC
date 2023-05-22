@@ -10,6 +10,7 @@ from random import choice, randrange
 
 from audit.fixtures.excel import (
     CORRECTIVE_ACTION_PLAN_TEST_FILE,
+    FEDERAL_AWARDS_TEST_FILE,
     FINDINGS_TEXT_TEST_FILE,
     FINDINGS_UNIFORM_GUIDANCE_TEST_FILE,
 )
@@ -26,8 +27,8 @@ def validate(instance, schema):
 
 # 20230408 MCJ FIXME: This path is encoded in multiple places.
 # Why isn't it encoded once in settings.py?
-SCHEMA_DIR = Path(__file__).parent.parent / "schemas"
-SECTION_SCHEMA_DIR = Path(__file__).parent.parent / "schemas" / "sections"
+DATA_FIXTURES = Path(__file__).parent.parent / "data_fixtures"
+SECTION_SCHEMA_DIR = Path(__file__).parent.parent / "schemas" / "output" / "sections"
 
 
 class GeneralInformationSchemaValidityTest(SimpleTestCase):
@@ -439,11 +440,10 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
     def test_schema(self):
         """Try to test FederalAwards first."""
         schema = self.FEDERAL_AWARDS_SCHEMA
-        # 20230408 MCJ FIXME : Paths!
-        for f in ["federalawards-pass-01.json"]:
-            in_flight_file = SCHEMA_DIR / "test-files" / f
-            in_flight = json.loads(in_flight_file.read_text(encoding="utf-8"))
-            validate(in_flight, schema)
+
+        in_flight_file = DATA_FIXTURES / FEDERAL_AWARDS_TEST_FILE
+        in_flight = json.loads(in_flight_file.read_text(encoding="utf-8"))
+        validate(in_flight, schema)
 
     def test_simple_pass(self):
         """
@@ -800,7 +800,7 @@ class CorrectiveActionPlanSchemaValidityTest(SimpleTestCase):
         """Try to test CorrectiveActionPlan first."""
         schema = self.CORRECTIVE_ACTION_PLAN_SCHEMA
 
-        in_flight_file = SCHEMA_DIR / CORRECTIVE_ACTION_PLAN_TEST_FILE
+        in_flight_file = DATA_FIXTURES / CORRECTIVE_ACTION_PLAN_TEST_FILE
         in_flight = json.loads(in_flight_file.read_text(encoding="utf-8"))
         validate(in_flight, schema)
 
@@ -911,7 +911,7 @@ class FindingsTextSchemaValidityTest(SimpleTestCase):
         """Try to test FindingsText first."""
         schema = self.FINDINGS_TEXT_SCHEMA
 
-        in_flight_file = SCHEMA_DIR / FINDINGS_TEXT_TEST_FILE
+        in_flight_file = DATA_FIXTURES / FINDINGS_TEXT_TEST_FILE
         in_flight = json.loads(in_flight_file.read_text(encoding="utf-8"))
         validate(in_flight, schema)
 
@@ -1034,7 +1034,7 @@ class FindingsUniformGuidanceSchemaValidityTest(SimpleTestCase):
         """Try to test FindingsUniformGuidance first."""
         schema = self.FINDINGS_UNIFORM_GUIDANCE_SCHEMA
 
-        in_flight_file = SCHEMA_DIR / FINDINGS_UNIFORM_GUIDANCE_TEST_FILE
+        in_flight_file = DATA_FIXTURES / FINDINGS_UNIFORM_GUIDANCE_TEST_FILE
         in_flight = json.loads(in_flight_file.read_text(encoding="utf-8"))
 
         validate(in_flight, schema)
