@@ -78,7 +78,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Push Image
-        run: docker push --all-tags ghcr.io/${{ env.GH_REPO }}/${{ matrix.image.name }}
+        run: docker push --all-tags ghcr.io/${{ env.GH_REPO }}/${{ matrix.image.tname }}
 
       - name: Upload version number
         uses: actions/upload-artifact@v3
