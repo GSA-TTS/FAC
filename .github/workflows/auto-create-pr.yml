@@ -59,7 +59,7 @@ jobs:
             Last commit being merged: ${{ steps.git-short.outputs.short_sha }}
           pr_reviewer: "fac-admins"
           pr_allow_empty: false
-          github_token: ${{ secrets.PR_CREATOR_TOKEN }}
+          github_token: ${{ secrets.FAC_BOT_TOKEN }}
 
   auto-approve:
     name: Auto Approve Created PR
@@ -82,8 +82,9 @@ jobs:
     steps:
       - id: automerge
         name: automerge
-        uses: "pascalgn/automerge-action@v0.15.6"
+        uses: pascalgn/automerge-action@v0.15.6
         env:
-          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           MERGE_RETRIES: 50
           MERGE_RETRY_SLEEP: 30000
+          MERGE_METHOD: merge
