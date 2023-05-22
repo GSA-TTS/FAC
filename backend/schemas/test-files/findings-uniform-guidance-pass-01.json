@@ -1,15 +1,17 @@
 {
     "FindingsUniformGuidance": {
-        "auditee_ein": null,
+        "auditee_uei": "AAA123456BBB",
            "findings_uniform_guidance_entries": [
             {
                 "program": {
-                    "compliance_requirement": "ABC",
-                    "name": "PROGRAM_NAME",
-                    "number": "42.123"
+                  "federal_agency_prefix": "12",
+                  "three_digit_extension": "123",
+                  "additional_award_identification": "1234567",
+                  "program_name": "FRIST PROGRAM",
+                  "compliance_requirement": "ABC"
                 },
                 "questioned_costs": "N",
-                "significiant_deficiency": "N",
+                "significant_deficiency": "N",
                 "other_matters": "N",
                 "other_findings": "N",
                 "modified_opinion": "Y",
@@ -18,17 +20,19 @@
                     "is_valid": "Y",
                     "repeat_prior_reference": "Y",
                     "prior_references": "2020-001,2021-002",
-                    "reference": "2023-100"
+                    "reference_number": "2023-100"
                 }
             },
             {
                 "program": {
-                    "compliance_requirement": "E",
-                    "name": "PROGRAM_NAME",
-                    "number": "24.321"
+                  "federal_agency_prefix": "12",
+                  "three_digit_extension": "U12",
+                  "additional_award_identification": "ANYTHING",
+                  "program_name": "ANOTHER PROGRAM",
+                  "compliance_requirement": "BC"
                 },
                 "questioned_costs": "Y",
-                "significiant_deficiency": "N",
+                "significant_deficiency": "N",
                 "other_matters": "Y",
                 "other_findings": "N",
                 "modified_opinion": "N",
@@ -37,7 +41,7 @@
                     "is_valid": "N",
                     "repeat_prior_reference": "Y",
                     "prior_references": "2022-033",
-                    "reference": "2023-001"
+                    "reference_number": "2023-001"
                 }
             }            
         ]

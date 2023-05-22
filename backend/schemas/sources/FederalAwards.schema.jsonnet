@@ -3,7 +3,7 @@ local Func = import 'Functions.libsonnet';
 local Types = Base.Types;
 
 local Validations = {
-  
+
   DirectAwardValidations: [
     {
       'if': {
@@ -33,7 +33,7 @@ local Validations = {
         ],
       },
     },
-      ],
+  ],
   LoanOrLoanGuaranteeValidations: [
     {
       'if': {
@@ -85,10 +85,10 @@ local Validations = {
       },
       'then': {
         required: [
-          'amount',
+          'subrecipient_amount',
         ],
         properties: {
-          amount: Types.integer,
+          subrecipient_amount: Types.integer,
         },
       },
     },
@@ -102,7 +102,7 @@ local Validations = {
       },
       'then': {
         properties: {
-          amount: Base.Enum.EmptyString_Zero_Null,
+          subrecipient_amount: Base.Enum.EmptyString_Zero_Null,
         },
       },
     },
@@ -170,84 +170,85 @@ local Validations = {
 
       },
     },
-  ] 
+    Base.Validation.AdditionalAwardIdentificationValidation[0],
+  ],
 };
 
 local Parts = {
   Cluster: Types.object {
     properties: {
-      name: Base.Compound.ClusterName,
-      total: Types.number,
+      cluster_name: Base.Compound.ClusterName,
+      cluster_total: Types.number,
     },
     allOf: [
       {
-        "if": {
-          "not": {
+        'if': {
+          not: {
             properties: {
-                name: {
-                  enum: [Base.Const.OTHER_CLUSTER,Base.Const.STATE_CLUSTER]
-              },                                   
-            },
-          }
-        },
-        "then": {
-          "allOf": [
-            {
-                properties: {
-                  other_cluster_name: Base.Enum.EmptyString_Null,
-                },
+              cluster_name: {
+                enum: [Base.Const.OTHER_CLUSTER, Base.Const.STATE_CLUSTER],
               },
-              {
-                properties: {
-                  state_cluster_name: Base.Enum.EmptyString_Null,
-                },
-              }
-          ]
+            },
+          },
         },
-      },        
+        'then': {
+          allOf: [
+            {
+              properties: {
+                other_cluster_name: Base.Enum.EmptyString_Null,
+              },
+            },
+            {
+              properties: {
+                state_cluster_name: Base.Enum.EmptyString_Null,
+              },
+            },
+          ],
+        },
+      },
       {
-        "if": {
+        'if': {
           properties: {
-            name: {
+            cluster_name: {
               const: Base.Const.STATE_CLUSTER,
             },
-           },
+          },
         },
-        "then": {
+        'then': {
           properties: {
             state_cluster_name: Base.Compound.NonEmptyString,
           },
-          required: ['state_cluster_name'] 
+          required: ['state_cluster_name'],
         },
-      },  
+      },
       {
-        "if": {
+        'if': {
           properties: {
-            name: {
+            cluster_name: {
               const: Base.Const.OTHER_CLUSTER,
             },
           },
         },
-        "then": {
+        'then': {
           properties: {
             other_cluster_name: Base.Compound.NonEmptyString,
           },
-          required: ['other_cluster_name'] 
-        }
-      },         
-    ],    
-    required: ['name']       
+          required: ['other_cluster_name'],
+        },
+      },
+    ],
+    required: ['cluster_name', 'cluster_total'],
   },
   PassThroughEntity: Types.object {
     additionalProperties: false,
     properties: {
-      name: Types.string,
-      identifying_number: {
+      passthrough_name: Types.string,
+      passthrough_identifying_number: {
         type: 'string',
         minLength: 1,
       },
     },
-    required: ['name', 'identifying_number']
+    required: ['passthrough_name', 'passthrough_identifying_number'],
   },
   DirectOrIndirectAward: Types.object {
     // 20230409 MCJ FIXME: I think this needs the amount...
@@ -277,21 +278,24 @@ local Parts = {
     additionalProperties: false,
     properties: {
       is_passed: Base.Enum.YorN,
-      amount: Func.compound_type([Types.number, Types.string]),
+      subrecipient_amount: Func.compound_type([Types.number, Types.string]),
     },
     allOf: Validations.SubrecipientValidations,
   },
   Program: Types.object {
     additionalProperties: false,
     properties: {
+      federal_agency_prefix: Base.Enum.ALNPrefixes,
+      three_digit_extension: Base.Compound.ThreeDigitExtension,
+      additional_award_identification: Func.compound_type([Types.string, Types.NULL]),
+      program_name: Types.string,
       amount_expended: Types.number,
-      name: Types.string,
-      number: Base.Compound.ProgramNumber,
+      federal_program_total: Types.number,
       is_major: Base.Enum.YorN,
       audit_report_type: Types.string,
       number_of_audit_findings: Types.integer,
     },
-    required: ['name', 'number', 'is_major', 'audit_report_type', 'number_of_audit_findings'],
+    required: ['program_name', 'federal_agency_prefix', 'three_digit_extension', 'is_major', 'audit_report_type', 'number_of_audit_findings'],
     allOf: Validations.ProgramValidations,
   },
 };
@@ -300,9 +304,6 @@ local FederalAwardEntry = Types.object {
   additionalProperties: false,
   description: 'Award entry rows',
   properties: {
-    amount_expended: Types.number {
-      minimum: 0,
-    },
     cluster: Parts.Cluster,
     direct_or_indirect_award: Parts.DirectOrIndirectAward,
     loan_or_loan_guarantee: Parts.LoanOrLoanGuarantee,
@@ -322,15 +323,15 @@ local FederalAwardEntry = Types.object {
 local FederalAwards = Types.object {
   additionalProperties: false,
   properties: {
-    auditee_ein: Func.compound_type([Types.string, Types.NULL]),
+    auditee_uei: Base.Compound.UEI,
     federal_awards: Types.array {
       items: FederalAwardEntry,
     },
-    total_amount_expended: Types.number {
+    total_amount_expended: Func.compound_type([Types.number {
       minimum: 0,
-    },
+    }, Types.NULL]),
   },
-  required: ['auditee_ein', 'total_amount_expended'],
+  required: ['auditee_uei', 'total_amount_expended'],
   title: 'FederalAward',
   version: 20230408,
 };
