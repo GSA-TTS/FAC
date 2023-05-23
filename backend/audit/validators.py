@@ -1,9 +1,8 @@
 import os
-from pathlib import Path
 import json
+import logging
 from jsonschema import Draft7Validator, FormatChecker, validate
 from jsonschema.exceptions import ValidationError as JSONSchemaValidationError
-import logging
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 from django.conf import settings
