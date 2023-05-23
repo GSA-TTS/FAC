@@ -1,0 +1,29 @@
+---
+name: get image versions
+on:
+  workflow_call:
+
+
+jobs:
+  fetch-versions:
+    runs-on: ubuntu-latest
+    outputs:
+      postgrest: ${{ steps.read-postgres.outputs.TF_VAR_postgrest }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Fetch refresh token artifact
+        uses: dawidd6/action-download-artifact@v2
+        with:
+          name: postgrest
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          workflow: scan-image.yml
+
+      - name: read postgrest version
+        id: read-postgres
+        run: |
+          echo "TF_VAR_postgrest=$(cat postgrest.txt)"
+          echo "TF_VAR_postgrest=$(cat postgrest.txt)" >> "$GITHUB_OUTPUT"
+

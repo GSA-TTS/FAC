@@ -10,9 +10,32 @@ on:
   
 
 jobs:
+  fetch-versions:
+    runs-on: ubuntu-latest
+    outputs:
+      postgrest: ${{ steps.read-postgres.outputs.TF_VAR_postgrest }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Fetch refresh token artifact
+        uses: dawidd6/action-download-artifact@v2
+        with:
+          name: postgrest
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          workflow: scan-images.yml
+
+      - name: read postgrest version
+        id: read-postgres
+        run: |
+          echo "TF_VAR_postgrest=$(cat postgrest.txt)"
+          echo "TF_VAR_postgrest=$(cat postgrest.txt)" >> "$GITHUB_OUTPUT"
+
   plan:
     name: plan ( ${{ inputs.environment }} )
     runs-on: ubuntu-latest
+    needs: fetch-versions
     environment: ${{ inputs.environment }}
     env:
       KEY: "terraform.tfstate.${{ inputs.environment }}"
@@ -23,6 +46,7 @@ jobs:
       TERRAFORM_PRE_RUN: |
           apt-get update
           apt-get install -y zip
+      TF_VAR_postgrest: ${{ needs.fetch-versions.outputs.postgrest }}
 
     steps:
       - name: checkout
@@ -31,11 +55,15 @@ jobs:
         # The post includes a link to the workflow run where the plan was
         # generated, and the same comment will be updated each time a new commit
         # on the PR branch triggers a re-plan.
+      - name: show versions
+        run: |
+          echo "TF_VAR_postgrest=$TF_VAR_postgrest"
       - name: terraform plan ( ${{ inputs.environment }} )
         uses: dflook/terraform-plan@v1
         with:
           path: terraform/${{ inputs.environment }}
           label: ${{ inputs.environment }}
+
           # These secrets grant access to the bucket with our remote Terraform
           # state. They're located in the "Secrets > Actions > Repository
           # Secrets" section of the repository settings, and are the same across

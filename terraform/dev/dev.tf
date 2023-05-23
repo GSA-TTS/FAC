@@ -2,6 +2,7 @@ module "dev" {
   source                = "../shared/modules/env"
   cf_space_name         = "dev"
   new_relic_license_key = var.new_relic_license_key
+  postgrest             = var.postgrest
 
   database_plan         = "micro-psql"
   postgrest_instances   = 1
