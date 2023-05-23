@@ -364,7 +364,7 @@ SAM_API_KEY = secret("SAM_API_KEY")
 
 # Data/schema directories
 DATA_FIXTURES = BASE_DIR / "data_fixtures"
-SCHEMAS_DIR = BASE_DIR / "schemas" / "output" / "audit"
+AUDIT_SCHEMA_DIR = BASE_DIR / "schemas" / "output" / "audit"
 SECTION_SCHEMA_DIR = BASE_DIR / "schemas" / "output" / "sections"
 XLSX_TEMPLATE_JSON_DIR = BASE_DIR / "schemas" / "output" / "excel" / "json"
 XLSX_TEMPLATE_SHEET_DIR = BASE_DIR / "schemas" / "output" / "excel" / "xlsx"
