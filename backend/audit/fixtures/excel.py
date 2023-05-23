@@ -23,30 +23,19 @@ FINDINGS_UNIFORM_GUIDANCE_TEST_FILE = (
 )
 
 CORRECTIVE_ACTION_PLAN_ENTRY_FIXTURES = (
-    settings.DATA_FIXTURES
-    / "audit"
-    / "entry_test_data"
-    / "corrective-action-plan-entries.json"
+    settings.AUDIT_TEST_DATA_ENTRY_DIR / "corrective-action-plan-entries.json"
 )
 FINDINGS_TEXT_ENTRY_FIXTURES = (
-    settings.DATA_FIXTURES / "audit" / "entry_test_data" / "findings-text-entries.json"
+    settings.AUDIT_TEST_DATA_ENTRY_DIR / "findings-text-entries.json"
 )
 FINDINGS_UNIFORM_GUIDANCE_ENTRY_FIXTURES = (
-    settings.DATA_FIXTURES
-    / "audit"
-    / "entry_test_data"
-    / "findings-uniform-guidance-entries.json"
+    settings.AUDIT_TEST_DATA_ENTRY_DIR / "findings-uniform-guidance-entries.json"
 )
 FEDERAL_AWARDS_ENTRY_FIXTURES = (
-    settings.DATA_FIXTURES
-    / "audit"
-    / "entry_test_data"
-    / "federal-awards-expended-entries.json"
+    settings.AUDIT_TEST_DATA_ENTRY_DIR / "federal-awards-expended-entries.json"
 )
 
-SIMPLE_CASES_TEST_FILE = (
-    settings.DATA_FIXTURES / "audit" / "entry_test_data" / "simple-cases.json"
-)
+SIMPLE_CASES_TEST_FILE = settings.AUDIT_TEST_DATA_ENTRY_DIR / "simple-cases.json"
 
 FEDERAL_AWARDS_EXPENDED = "FederalAwardsExpended"
 CORRECTIVE_ACTION_PLAN = "CorrectiveActionPlan"
