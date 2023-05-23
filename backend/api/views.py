@@ -1,5 +1,4 @@
 import json
-import os
 from typing import List
 
 from audit.models import Access, SingleAuditChecklist
@@ -7,7 +6,7 @@ from audit.permissions import SingleAuditChecklistPermission
 from django.http import Http404, HttpResponse
 from django.urls import reverse
 from django.views import View
-from config.settings import SCHEMAS_DIR, BASE_DIR
+from config.settings import AUDIT_SCHEMA_DIR, BASE_DIR
 from rest_framework import viewsets
 from rest_framework.authentication import BaseAuthentication
 from rest_framework.permissions import BasePermission, IsAuthenticated
@@ -402,7 +401,7 @@ class SchemaView(APIView):
 
     def get(self, _, fiscal_year, schema_type):
         """GET JSON schema for the specified fiscal year"""
-        fpath = SCHEMAS_DIR / f"{fiscal_year}-{schema_type}.json"
+        fpath = AUDIT_SCHEMA_DIR / f"{fiscal_year}-{schema_type}.json"
 
         if not fpath.exists():
             raise Http404()
