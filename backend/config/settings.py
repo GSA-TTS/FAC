@@ -81,10 +81,9 @@ LOGGING = {
         "django": {"handlers": ["local_debug_logger", "prod_logger"]},
     },
 }
-
-# Explore uncommenting the following lines to reduce display while testing
-# if len(sys.argv) > 1 and sys.argv[1] == "test":
-#     logging.disable(logging.ERROR)
+# this shold reduce the volume of message displayed when running tests
+if len(sys.argv) > 1 and sys.argv[1] == "test":
+    logging.disable(logging.ERROR)
 
 
 # Django application definition
