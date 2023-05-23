@@ -63,6 +63,7 @@ def _add_entry(workbook, row_offset, entry):
 
 class FederalAwardsExcelTests(SimpleTestCase):
     GOOD_UEI = "AAA123456BBB"
+    TEST_DATA = json.loads(FEDERAL_AWARDS_ENTRY_FIXTURES.read_text(encoding="utf-8"))
 
     def test_template_has_named_ranges(self):
         """Test that the FederalAwardsExpended Excel template contains the expected named ranges"""
@@ -80,7 +81,7 @@ class FederalAwardsExcelTests(SimpleTestCase):
 
         _set_by_name(workbook, "auditee_uei", FederalAwardsExcelTests.GOOD_UEI)
         _set_by_name(workbook, "total_amount_expended", 100)
-        _add_entry(workbook, 0, FEDERAL_AWARDS_ENTRY_FIXTURES[0])
+        _add_entry(workbook, 0, FederalAwardsExcelTests.TEST_DATA[0])
 
         federal_awards = extract_federal_awards(workbook)
 
@@ -92,7 +93,7 @@ class FederalAwardsExcelTests(SimpleTestCase):
 
         _set_by_name(workbook, "auditee_uei", FederalAwardsExcelTests.GOOD_UEI)
         _set_by_name(workbook, "total_amount_expended", 200)
-        for index, entry in enumerate(FEDERAL_AWARDS_ENTRY_FIXTURES):
+        for index, entry in enumerate(FederalAwardsExcelTests.TEST_DATA):
             _add_entry(workbook, index, entry)
 
         federal_awards = extract_federal_awards(workbook)
@@ -106,7 +107,7 @@ class FederalAwardsExcelTests(SimpleTestCase):
         _set_by_name(workbook, "auditee_uei", FederalAwardsExcelTests.GOOD_UEI)
         _set_by_name(workbook, "total_amount_expended", 200)
 
-        entry = jsoncopy(FEDERAL_AWARDS_ENTRY_FIXTURES[0])
+        entry = jsoncopy(FederalAwardsExcelTests.TEST_DATA[0])
         del entry["cluster_name"]
 
         _add_entry(workbook, 0, entry)
@@ -122,7 +123,7 @@ class FederalAwardsExcelTests(SimpleTestCase):
         # add valid data to the workbook
         _set_by_name(workbook, "auditee_uei", FederalAwardsExcelTests.GOOD_UEI)
         _set_by_name(workbook, "total_amount_expended", 200)
-        _add_entry(workbook, 0, FEDERAL_AWARDS_ENTRY_FIXTURES[0])
+        _add_entry(workbook, 0, FederalAwardsExcelTests.TEST_DATA[0])
 
         test_cases = [
             ("auditee_uei", 123456789123),
@@ -161,7 +162,7 @@ class FederalAwardsExcelTests(SimpleTestCase):
         # add valid data to the workbook
         _set_by_name(workbook, "auditee_uei", FederalAwardsExcelTests.GOOD_UEI)
         _set_by_name(workbook, "amount_expended", 200)
-        _add_entry(workbook, 0, FEDERAL_AWARDS_ENTRY_FIXTURES[0])
+        _add_entry(workbook, 0, FederalAwardsExcelTests.TEST_DATA[0])
 
         test_cases = [
             ("passthrough_name", 0),
@@ -180,6 +181,9 @@ class FederalAwardsExcelTests(SimpleTestCase):
 class CorrectiveActionPlanExcelTests(SimpleTestCase):
     GOOD_UEI = "AAA123456BBB"
     TOO_SHORT_UEI = "AAA123456"
+    TEST_DATA = json.loads(
+        CORRECTIVE_ACTION_PLAN_ENTRY_FIXTURES.read_text(encoding="utf-8")
+    )
 
     def test_template_has_named_ranges(self):
         """Test that the CorrectiveActionPlan Excel template contains the expected named ranges"""
@@ -197,7 +201,7 @@ class CorrectiveActionPlanExcelTests(SimpleTestCase):
 
         _set_by_name(workbook, "auditee_uei", CorrectiveActionPlanExcelTests.GOOD_UEI)
 
-        _add_entry(workbook, 0, CORRECTIVE_ACTION_PLAN_ENTRY_FIXTURES[0])
+        _add_entry(workbook, 0, CorrectiveActionPlanExcelTests.TEST_DATA[0])
 
         corrective_action_plan = extract_corrective_action_plan(workbook)
 
@@ -209,7 +213,7 @@ class CorrectiveActionPlanExcelTests(SimpleTestCase):
 
         _set_by_name(workbook, "auditee_uei", CorrectiveActionPlanExcelTests.GOOD_UEI)
 
-        for index, entry in enumerate(CORRECTIVE_ACTION_PLAN_ENTRY_FIXTURES):
+        for index, entry in enumerate(CorrectiveActionPlanExcelTests.TEST_DATA):
             _add_entry(workbook, index, entry)
 
         corrective_action_plan = extract_corrective_action_plan(workbook)
@@ -222,7 +226,7 @@ class CorrectiveActionPlanExcelTests(SimpleTestCase):
 
         _set_by_name(workbook, "auditee_uei", CorrectiveActionPlanExcelTests.GOOD_UEI)
 
-        entry = jsoncopy(CORRECTIVE_ACTION_PLAN_ENTRY_FIXTURES[0])
+        entry = jsoncopy(CorrectiveActionPlanExcelTests.TEST_DATA[0])
         del entry["planned_action"]
 
         _add_entry(workbook, 0, entry)
@@ -241,7 +245,7 @@ class CorrectiveActionPlanExcelTests(SimpleTestCase):
 
         # add valid data to the workbook
         _set_by_name(workbook, "auditee_uei", CorrectiveActionPlanExcelTests.GOOD_UEI)
-        _add_entry(workbook, 0, CORRECTIVE_ACTION_PLAN_ENTRY_FIXTURES[0])
+        _add_entry(workbook, 0, CorrectiveActionPlanExcelTests.TEST_DATA[0])
 
         test_cases = [
             ("auditee_uei", CorrectiveActionPlanExcelTests.TOO_SHORT_UEI),
@@ -266,6 +270,9 @@ class CorrectiveActionPlanExcelTests(SimpleTestCase):
 
 class FindingsUniformGuidanceExcelTests(SimpleTestCase):
     GOOD_UEI = "AAA123456BBB"
+    TEST_DATA = json.loads(
+        FINDINGS_UNIFORM_GUIDANCE_ENTRY_FIXTURES.read_text(encoding="utf-8")
+    )
 
     def test_template_has_named_ranges(self):
         """Test that the FindingsUniformGuidance Excel template contains the expected named ranges"""
@@ -284,7 +291,7 @@ class FindingsUniformGuidanceExcelTests(SimpleTestCase):
         _set_by_name(
             workbook, "auditee_uei", FindingsUniformGuidanceExcelTests.GOOD_UEI
         )
-        _add_entry(workbook, 0, FINDINGS_UNIFORM_GUIDANCE_ENTRY_FIXTURES[0])
+        _add_entry(workbook, 0, FindingsUniformGuidanceExcelTests.TEST_DATA[0])
 
         findings = extract_findings_uniform_guidance(workbook)
 
@@ -297,7 +304,7 @@ class FindingsUniformGuidanceExcelTests(SimpleTestCase):
         _set_by_name(
             workbook, "auditee_uei", FindingsUniformGuidanceExcelTests.GOOD_UEI
         )
-        for index, entry in enumerate(FINDINGS_UNIFORM_GUIDANCE_ENTRY_FIXTURES):
+        for index, entry in enumerate(FindingsUniformGuidanceExcelTests.TEST_DATA):
             _add_entry(workbook, index, entry)
 
         findings = extract_findings_uniform_guidance(workbook)
@@ -312,7 +319,7 @@ class FindingsUniformGuidanceExcelTests(SimpleTestCase):
             workbook, "auditee_uei", FindingsUniformGuidanceExcelTests.GOOD_UEI
         )
 
-        entry = jsoncopy(FINDINGS_UNIFORM_GUIDANCE_ENTRY_FIXTURES[0])
+        entry = jsoncopy(FindingsUniformGuidanceExcelTests.TEST_DATA[0])
         del entry["reference_number"]
 
         _add_entry(workbook, 0, entry)
@@ -331,7 +338,7 @@ class FindingsUniformGuidanceExcelTests(SimpleTestCase):
         _set_by_name(
             workbook, "auditee_uei", FindingsUniformGuidanceExcelTests.GOOD_UEI
         )
-        _add_entry(workbook, 0, FINDINGS_UNIFORM_GUIDANCE_ENTRY_FIXTURES[0])
+        _add_entry(workbook, 0, FindingsUniformGuidanceExcelTests.TEST_DATA[0])
 
         test_cases = [
             ("auditee_uei", 123456789123),
@@ -356,6 +363,7 @@ class FindingsUniformGuidanceExcelTests(SimpleTestCase):
 
 class FindingsTextExcelTests(SimpleTestCase):
     GOOD_UEI = "AAA123456BBB"
+    TEST_DATA = json.loads(FINDINGS_TEXT_ENTRY_FIXTURES.read_text(encoding="utf-8"))
 
     def test_template_has_named_ranges(self):
         """Test that the FindingsText Excel template contains the expected named ranges"""
@@ -372,7 +380,7 @@ class FindingsTextExcelTests(SimpleTestCase):
         workbook = load_workbook(FINDINGS_TEXT_TEMPLATE, data_only=True)
 
         _set_by_name(workbook, "auditee_uei", FindingsTextExcelTests.GOOD_UEI)
-        _add_entry(workbook, 0, FINDINGS_TEXT_ENTRY_FIXTURES[0])
+        _add_entry(workbook, 0, FindingsTextExcelTests.TEST_DATA[0])
 
         findings = extract_findings_text(workbook)
 
@@ -383,7 +391,7 @@ class FindingsTextExcelTests(SimpleTestCase):
         workbook = load_workbook(FINDINGS_TEXT_TEMPLATE, data_only=True)
 
         _set_by_name(workbook, "auditee_uei", FindingsTextExcelTests.GOOD_UEI)
-        for index, entry in enumerate(FINDINGS_TEXT_ENTRY_FIXTURES):
+        for index, entry in enumerate(FindingsTextExcelTests.TEST_DATA):
             _add_entry(workbook, index, entry)
 
         findings = extract_findings_text(workbook)
@@ -396,7 +404,7 @@ class FindingsTextExcelTests(SimpleTestCase):
 
         _set_by_name(workbook, "auditee_uei", FindingsTextExcelTests.GOOD_UEI)
 
-        entry = jsoncopy(FINDINGS_TEXT_ENTRY_FIXTURES[0])
+        entry = jsoncopy(FindingsTextExcelTests.TEST_DATA[0])
         del entry["text_of_finding"]
 
         _add_entry(workbook, 0, entry)
@@ -411,7 +419,7 @@ class FindingsTextExcelTests(SimpleTestCase):
 
         # add valid data to the workbook
         _set_by_name(workbook, "auditee_uei", FindingsTextExcelTests.GOOD_UEI)
-        _add_entry(workbook, 0, FINDINGS_TEXT_ENTRY_FIXTURES[0])
+        _add_entry(workbook, 0, FindingsTextExcelTests.TEST_DATA[0])
 
         test_cases = [
             ("auditee_uei", 123456789123),

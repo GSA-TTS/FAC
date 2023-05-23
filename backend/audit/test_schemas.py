@@ -13,6 +13,7 @@ from audit.fixtures.excel import (
     FEDERAL_AWARDS_TEST_FILE,
     FINDINGS_TEXT_TEST_FILE,
     FINDINGS_UNIFORM_GUIDANCE_TEST_FILE,
+    SIMPLE_CASES_TEST_FILE,
 )
 
 SECTION_SCHEMA_DIR = settings.SECTION_SCHEMA_DIR
@@ -38,40 +39,9 @@ class GeneralInformationSchemaValidityTest(SimpleTestCase):
         )
     )
 
-    SIMPLE_CASE = {
-        "auditee_fiscal_period_start": "2022-01-01",
-        "auditee_fiscal_period_end": "2022-12-31",
-        "audit_period_covered": "annual",
-        "ein": "123456789",
-        "ein_not_an_ssn_attestation": True,
-        "multiple_eins_covered": False,
-        "auditee_uei": "1A2B3C4D5E6F",
-        "multiple_ueis_covered": False,
-        "auditee_name": "John",
-        "auditee_address_line_1": "123 Fake St.",
-        "auditee_city": "FakeCity",
-        "auditee_state": "AL",
-        "auditee_zip": "12345",
-        "auditee_contact_name": "John",
-        "auditee_contact_title": "A Title",
-        "auditee_phone": "555-555-5555",
-        "auditee_email": "john@test.test",
-        "user_provided_organization_type": "state",
-        "met_spending_threshold": True,
-        "is_usa_based": True,
-        "auditor_firm_name": "Firm LLC",
-        "auditor_ein": "123456789",
-        "auditor_ein_not_an_ssn_attestation": True,
-        "auditor_country": "USA",
-        "auditor_address_line_1": "456 Fake St.",
-        "auditor_city": "AnotherFakeCity",
-        "auditor_state": "WY",
-        "auditor_zip": "56789",
-        "auditor_contact_name": "Jane",
-        "auditor_contact_title": "Another Title",
-        "auditor_phone": "999-999-9999",
-        "auditor_email": "jane@test.test",
-    }
+    SIMPLE_CASE = json.loads(SIMPLE_CASES_TEST_FILE.read_text(encoding="utf-8"))[
+        "GeneralInformationCase"
+    ]
 
     def test_simple_pass(self):
         """
@@ -367,71 +337,9 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
         (SECTION_SCHEMA_DIR / "FederalAwards.schema.json").read_text(encoding="utf-8")
     )
 
-    SIMPLE_CASE = {
-        "FederalAwards": {
-            "auditee_uei": "AAA123456BBB",
-            "total_amount_expended": 12345,
-            "federal_awards": [
-                {
-                    "program": {
-                        "federal_agency_prefix": "42",
-                        "three_digit_extension": "123",
-                        "program_name": "Bob",
-                        "is_major": "N",
-                        "audit_report_type": "",
-                        "number_of_audit_findings": 0,
-                        "amount_expended": 42,
-                    },
-                    "loan_or_loan_guarantee": {
-                        "is_guaranteed": "N",
-                        "loan_balance_at_audit_period_end": 0,
-                    },
-                    "direct_or_indirect_award": {
-                        "is_direct": "N",
-                        "entities": [
-                            {
-                                "passthrough_name": "Bob's Granting House",
-                                "passthrough_identifying_number": "12345",
-                            }
-                        ],
-                    },
-                    "cluster": {"cluster_name": "N/A", "cluster_total": 123},
-                    "subrecipients": {"is_passed": "N"},
-                }
-            ],
-        }
-    }
-
-    M1 = {
-        "FederalAwards": {
-            "auditee_uei": "AAA123456BBB",
-            "total_amount_expended": 12345,
-            "federal_awards": [
-                {
-                    "program": {
-                        "federal_agency_prefix": "42",
-                        "three_digit_extension": "123",
-                        "program_name": "Bob",
-                        "is_major": "Y",
-                        "audit_report_type": "U",
-                        "number_of_audit_findings": 0,
-                        "amount_expended": 42,
-                    },
-                    "loan_or_loan_guarantee": {
-                        "is_guaranteed": "Y",
-                        "loan_balance_at_audit_period_end": 42,
-                    },
-                    "direct_or_indirect_award": {"is_direct": "Y", "entities": []},
-                    "subrecipients": {"is_passed": "Y", "subrecipient_amount": 32},
-                    "cluster": {
-                        "cluster_name": "STATE CLUSTER",
-                        "cluster_total": 123,
-                        "state_cluster_name": "Maine",
-                    },
-                }
-            ],
-        }
-    }
+    SIMPLE_CASES = json.loads(SIMPLE_CASES_TEST_FILE.read_text(encoding="utf-8"))[
+        "FederalAwardsCases"
+    ]
 
     def test_schema(self):
         """Try to test FederalAwards first."""
@@ -448,7 +356,7 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
         """
         schema = self.FEDERAL_AWARDS_SCHEMA
 
-        validate(self.SIMPLE_CASE, schema)
+        validate(self.SIMPLE_CASES[0], schema)
 
     def test_missing_auditee_ein(self):
         """
@@ -456,7 +364,7 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
         """
         schema = self.FEDERAL_AWARDS_SCHEMA
 
-        simple_case = jsoncopy(self.SIMPLE_CASE)
+        simple_case = jsoncopy(self.SIMPLE_CASES[0])
         del simple_case["FederalAwards"]["auditee_uei"]
 
         self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
@@ -467,7 +375,7 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
         """
         schema = self.FEDERAL_AWARDS_SCHEMA
 
-        simple_case = jsoncopy(self.SIMPLE_CASE)
+        simple_case = jsoncopy(self.SIMPLE_CASES[0])
         del simple_case["FederalAwards"]["total_amount_expended"]
 
         self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
@@ -479,7 +387,7 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
         """
         schema = self.FEDERAL_AWARDS_SCHEMA
 
-        simple_case = jsoncopy(self.SIMPLE_CASE)
+        simple_case = jsoncopy(self.SIMPLE_CASES[0])
 
         simple_case["FederalAwards"]["federal_awards"][0][
             "loan_balance_at_audit_period_end"
@@ -492,7 +400,7 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
         """
         schema = self.FEDERAL_AWARDS_SCHEMA
 
-        simple_case = jsoncopy(self.M1)
+        simple_case = jsoncopy(self.SIMPLE_CASES[1])
         award = jsoncopy(simple_case["FederalAwards"]["federal_awards"][0])
 
         both_int_pass = award | {
@@ -554,7 +462,7 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
         """
         schema = self.FEDERAL_AWARDS_SCHEMA
 
-        simple_case = jsoncopy(self.SIMPLE_CASE)
+        simple_case = jsoncopy(self.SIMPLE_CASES[1])
         award = jsoncopy(simple_case["FederalAwards"]["federal_awards"][0])
 
         # 20230408 MCJ
@@ -621,7 +529,7 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
         """
         schema = self.FEDERAL_AWARDS_SCHEMA
 
-        simple_case = jsoncopy(self.SIMPLE_CASE)
+        simple_case = jsoncopy(self.SIMPLE_CASES[0])
         award = jsoncopy(simple_case["FederalAwards"]["federal_awards"][0])
 
         both_pass = award | {
@@ -647,7 +555,7 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
         """
         schema = self.FEDERAL_AWARDS_SCHEMA
 
-        simple_case = jsoncopy(self.SIMPLE_CASE)
+        simple_case = jsoncopy(self.SIMPLE_CASES[0])
         award = jsoncopy(simple_case["FederalAwards"]["federal_awards"][0])
 
         both_pass = award | {
@@ -698,7 +606,7 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
         """
         schema = self.FEDERAL_AWARDS_SCHEMA
 
-        simple_case = jsoncopy(self.SIMPLE_CASE)
+        simple_case = jsoncopy(self.SIMPLE_CASES[0])
 
         simple_case["FederalAwards"]["federal_awards"][0]["cluster"][
             "cluster_name"
@@ -711,7 +619,7 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
         """
         schema = self.FEDERAL_AWARDS_SCHEMA
 
-        simple_case = jsoncopy(self.SIMPLE_CASE)
+        simple_case = jsoncopy(self.SIMPLE_CASES[0])
         simple_case["FederalAwards"]["federal_awards"][0]["cluster"][
             "state_cluster_name"
         ] = "ANYTHING"
@@ -721,7 +629,7 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
 
         # Test for successful validation when state_cluster_name is empty or null
         for valid in ["", "null"]:
-            simple_case = jsoncopy(self.SIMPLE_CASE)
+            simple_case = jsoncopy(self.SIMPLE_CASES[0])
             simple_case["FederalAwards"]["federal_awards"][0]["cluster"][
                 "state_cluster_name"
             ] = valid
@@ -734,7 +642,7 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
         """
         schema = self.FEDERAL_AWARDS_SCHEMA
 
-        simple_case = jsoncopy(self.SIMPLE_CASE)
+        simple_case = jsoncopy(self.SIMPLE_CASES[0])
         simple_case["FederalAwards"]["federal_awards"][0]["program"]["is_major"] = "Y"
 
         for report_type in ["A", "Q"]:
@@ -779,18 +687,9 @@ class CorrectiveActionPlanSchemaValidityTest(SimpleTestCase):
         )
     )
 
-    SIMPLE_CASE = {
-        "CorrectiveActionPlan": {
-            "auditee_uei": "AAA123456BBB",
-            "corrective_action_plan_entries": [
-                {
-                    "contains_chart_or_table": "N",
-                    "planned_action": "Action 11",
-                    "reference_number": "2023-111",
-                }
-            ],
-        }
-    }
+    SIMPLE_CASE = json.loads(SIMPLE_CASES_TEST_FILE.read_text(encoding="utf-8"))[
+        "CorrectiveActionPlanCase"
+    ]
 
     def test_schema(self):
         """Try to test CorrectiveActionPlan first."""
@@ -890,18 +789,9 @@ class FindingsTextSchemaValidityTest(SimpleTestCase):
         (SECTION_SCHEMA_DIR / "FindingsText.schema.json").read_text(encoding="utf-8")
     )
 
-    SIMPLE_CASE = {
-        "FindingsText": {
-            "auditee_uei": "AAA123456BBB",
-            "findings_text_entries": [
-                {
-                    "contains_chart_or_table": "N",
-                    "text_of_finding": "Audit finding 11",
-                    "reference_number": "2023-001",
-                }
-            ],
-        }
-    }
+    SIMPLE_CASE = json.loads(SIMPLE_CASES_TEST_FILE.read_text(encoding="utf-8"))[
+        "FindingsTextCase"
+    ]
 
     def test_schema(self):
         """Try to test FindingsText first."""
@@ -998,33 +888,9 @@ class FindingsUniformGuidanceSchemaValidityTest(SimpleTestCase):
         )
     )
 
-    SIMPLE_CASE = {
-        "FindingsUniformGuidance": {
-            "auditee_uei": "AAA123456BBB",
-            "findings_uniform_guidance_entries": [
-                {
-                    "program": {
-                        "federal_agency_prefix": "42",
-                        "three_digit_extension": "123",
-                        "program_name": "program name",
-                        "compliance_requirement": "A",
-                    },
-                    "questioned_costs": "N",
-                    "significant_deficiency": "N",
-                    "other_matters": "N",
-                    "other_findings": "Y",
-                    "modified_opinion": "N",
-                    "material_weakness": "N",
-                    "findings": {
-                        "is_valid": "Y",
-                        "repeat_prior_reference": "Y",
-                        "prior_references": "2022-001",
-                        "reference_number": "2023-001",
-                    },
-                }
-            ],
-        }
-    }
+    SIMPLE_CASE = json.loads(SIMPLE_CASES_TEST_FILE.read_text(encoding="utf-8"))[
+        "FindingsUniformGuidanceCase"
+    ]
 
     def test_schema(self):
         """Try to test FindingsUniformGuidance first."""
