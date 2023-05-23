@@ -2,11 +2,11 @@
 # here for CI/CD integration.
 import json
 import string
+from random import choice, randrange
 
-from pathlib import Path
+from django.conf import settings
 from django.test import SimpleTestCase
 from jsonschema import exceptions, validate as jsonschema_validate, FormatChecker
-from random import choice, randrange
 
 from audit.fixtures.excel import (
     CORRECTIVE_ACTION_PLAN_TEST_FILE,
@@ -15,20 +15,16 @@ from audit.fixtures.excel import (
     FINDINGS_UNIFORM_GUIDANCE_TEST_FILE,
 )
 
+SECTION_SCHEMA_DIR = settings.SECTION_SCHEMA_DIR
+
 # Simplest way to create a new copy of simple case rather than getting
 # references to things used by other tests:
 jsoncopy = lambda v: json.loads(json.dumps(v))
 
 
-# wrap the validate function to include a format checker
 def validate(instance, schema):
+    """Wrap the validate function to include a format checker"""
     return jsonschema_validate(instance, schema, format_checker=FormatChecker())
-
-
-# 20230408 MCJ FIXME: This path is encoded in multiple places.
-# Why isn't it encoded once in settings.py?
-DATA_FIXTURES = Path(__file__).parent.parent / "data_fixtures"
-SECTION_SCHEMA_DIR = Path(__file__).parent.parent / "schemas" / "output" / "sections"
 
 
 class GeneralInformationSchemaValidityTest(SimpleTestCase):
@@ -441,7 +437,7 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
         """Try to test FederalAwards first."""
         schema = self.FEDERAL_AWARDS_SCHEMA
 
-        in_flight_file = DATA_FIXTURES / FEDERAL_AWARDS_TEST_FILE
+        in_flight_file = FEDERAL_AWARDS_TEST_FILE
         in_flight = json.loads(in_flight_file.read_text(encoding="utf-8"))
         validate(in_flight, schema)
 
@@ -800,7 +796,7 @@ class CorrectiveActionPlanSchemaValidityTest(SimpleTestCase):
         """Try to test CorrectiveActionPlan first."""
         schema = self.CORRECTIVE_ACTION_PLAN_SCHEMA
 
-        in_flight_file = DATA_FIXTURES / CORRECTIVE_ACTION_PLAN_TEST_FILE
+        in_flight_file = CORRECTIVE_ACTION_PLAN_TEST_FILE
         in_flight = json.loads(in_flight_file.read_text(encoding="utf-8"))
         validate(in_flight, schema)
 
@@ -911,7 +907,7 @@ class FindingsTextSchemaValidityTest(SimpleTestCase):
         """Try to test FindingsText first."""
         schema = self.FINDINGS_TEXT_SCHEMA
 
-        in_flight_file = DATA_FIXTURES / FINDINGS_TEXT_TEST_FILE
+        in_flight_file = FINDINGS_TEXT_TEST_FILE
         in_flight = json.loads(in_flight_file.read_text(encoding="utf-8"))
         validate(in_flight, schema)
 
@@ -1034,7 +1030,7 @@ class FindingsUniformGuidanceSchemaValidityTest(SimpleTestCase):
         """Try to test FindingsUniformGuidance first."""
         schema = self.FINDINGS_UNIFORM_GUIDANCE_SCHEMA
 
-        in_flight_file = DATA_FIXTURES / FINDINGS_UNIFORM_GUIDANCE_TEST_FILE
+        in_flight_file = FINDINGS_UNIFORM_GUIDANCE_TEST_FILE
         in_flight = json.loads(in_flight_file.read_text(encoding="utf-8"))
 
         validate(in_flight, schema)

@@ -46,7 +46,7 @@ AV_SCAN_CODES = {
     "ERROR": [400, 412, 500, 501],
 }
 
-XLSX_TEMPLATE_DEFINITION_DIR = Path(settings.XLSX_TEMPLATE_DIR)
+XLSX_TEMPLATE_DEFINITION_DIR = settings.XLSX_TEMPLATE_JSON_DIR
 
 ErrorDetails = list[tuple[str, str, str, str]]
 
@@ -115,7 +115,7 @@ def validate_findings_uniform_guidance_json(value):
     """
     Apply JSON Schema for findings uniform guidance and report errors.
     """
-    root = Path(settings.SECTION_SCHEMA_DIR)
+    root = settings.SECTION_SCHEMA_DIR
     schema_path = root / "FindingsUniformGuidance.schema.json"
     schema = json.loads(schema_path.read_text(encoding="utf-8"))
 
@@ -129,7 +129,7 @@ def validate_findings_text_json(value):
     """
     Apply JSON Schema for findings text and report errors.
     """
-    root = Path(settings.SECTION_SCHEMA_DIR)
+    root = settings.SECTION_SCHEMA_DIR
     schema_path = root / "FindingsText.schema.json"
     schema = json.loads(schema_path.read_text(encoding="utf-8"))
 
@@ -143,7 +143,7 @@ def validate_corrective_action_plan_json(value):
     """
     Apply JSON Schema for corrective action plan and report errors.
     """
-    root = Path(settings.SECTION_SCHEMA_DIR)
+    root = settings.SECTION_SCHEMA_DIR
     schema_path = root / "CorrectiveActionPlan.schema.json"
     schema = json.loads(schema_path.read_text(encoding="utf-8"))
 
@@ -157,7 +157,7 @@ def validate_federal_award_json(value):
     """
     Apply JSON Schema for federal awards and report errors.
     """
-    root = Path(settings.SECTION_SCHEMA_DIR)
+    root = settings.SECTION_SCHEMA_DIR
     schema_path = root / "FederalAwards.schema.json"
     schema = json.loads(schema_path.read_text(encoding="utf-8"))
 
@@ -171,7 +171,7 @@ def validate_general_information_json(value):
     """
     Apply JSON Schema for general information and report errors.
     """
-    root = Path(settings.SECTION_SCHEMA_DIR)
+    root = settings.SECTION_SCHEMA_DIR
     schema_path = root / "GeneralInformation.schema.json"
     schema = json.loads(schema_path.read_text(encoding="utf-8"))
 

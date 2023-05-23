@@ -148,9 +148,8 @@ def access_and_submission_check(user, data):
 
 class IndexView(View):
     def get(self, request, *args, **kwargs):
-        test_file = open(BASE_DIR.__str__() + "/static/index.html", "r")
-        response = HttpResponse(content=test_file)
-        return response
+        fpath = BASE_DIR / "static" / "index.html"
+        return HttpResponse(content=fpath.read_text(encoding="utf-8"))
 
 
 class SACViewSet(viewsets.ModelViewSet):
@@ -401,13 +400,11 @@ class SchemaView(APIView):
     authentication_classes: List[BaseAuthentication] = []
     permission_classes: List[BasePermission] = []
 
-    def get(self, _, fiscal_year, type):
-        filename = os.path.join(SCHEMAS_DIR, f"{fiscal_year}-{type}.json")
+    def get(self, _, fiscal_year, schema_type):
+        """GET JSON schema for the specified fiscal year"""
+        fpath = SCHEMAS_DIR / f"{fiscal_year}-{schema_type}.json"
 
-        exists = os.path.exists(filename)
-        if not exists:
+        if not fpath.exists():
             raise Http404()
 
-        with open(filename, "r") as file:
-            schema = json.load(file)
-            return JsonResponse(schema)
+        return JsonResponse(json.loads(fpath.read_text(encoding="utf-8")))

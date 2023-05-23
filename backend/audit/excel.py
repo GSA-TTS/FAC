@@ -1,5 +1,4 @@
 import re
-from pathlib import Path
 import json
 from django.conf import settings
 from typing import Any, Callable
@@ -23,7 +22,7 @@ AWARD_ENTITY_ID_KEY = "passthrough_identifying_number"
 FEDERAL_AGENCY_PREFIX = "federal_agency_prefix"
 THREE_DIGIT_EXTENSION = "three_digit_extension"
 
-XLSX_TEMPLATE_DEFINITION_DIR = Path(settings.XLSX_TEMPLATE_DIR)
+XLSX_TEMPLATE_DEFINITION_DIR = settings.XLSX_TEMPLATE_JSON_DIR
 
 
 def _set_by_path(target_obj, target_path, value):
