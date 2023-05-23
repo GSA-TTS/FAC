@@ -13,24 +13,27 @@ jobs:
   fetch-versions:
     runs-on: ubuntu-latest
     outputs:
-      postgrest: ${{ steps.read-postgres.outputs.TF_VAR_postgrest }}
+      postgrest: ${{ steps.read-version.outputs.TF_VAR_postgrest }}
+      clamav: ${{ steps.read-version.outputs.TF_VAR_clamav }}
 
     steps:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Fetch refresh token artifact
+      - name: Fetch all artifacta
         uses: dawidd6/action-download-artifact@v2
         with:
-          name: postgrest
+          # name: postgrest
           github_token: ${{ secrets.GITHUB_TOKEN }}
           workflow: scan-images.yml
 
-      - name: read postgrest version
-        id: read-postgres
+      - name: read image versions
+        id: read-version
         run: |
-          echo "TF_VAR_postgrest=$(cat postgrest.txt)"
-          echo "TF_VAR_postgrest=$(cat postgrest.txt)" >> "$GITHUB_OUTPUT"
+          echo "TF_VAR_postgrest=$(cat postgrest/postgrest.txt)"
+          echo "TF_VAR_postgrest=$(cat postgrest/postgrest.txt)" >> "$GITHUB_OUTPUT"
+          echo "TF_VAR_clamav=$(cat clamav/clamav.txt)"
+          echo "TF_VAR_clamav=$(cat clamav/clamav.txt)" >> "$GITHUB_OUTPUT"
 
   plan:
     name: plan ( ${{ inputs.environment }} )
@@ -47,6 +50,7 @@ jobs:
           apt-get update
           apt-get install -y zip
       TF_VAR_postgrest: ${{ needs.fetch-versions.outputs.postgrest }}
+      TF_VAR_clamav: ${{ needs.fetch-versions.outputs.clamav }}
 
     steps:
       - name: checkout
@@ -58,6 +62,7 @@ jobs:
       - name: show versions
         run: |
           echo "TF_VAR_postgrest=$TF_VAR_postgrest"
+          echo "TF_VAR_clamav=$TF_VAR_clamav"
       - name: terraform plan ( ${{ inputs.environment }} )
         uses: dflook/terraform-plan@v1
         with:

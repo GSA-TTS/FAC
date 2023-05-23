@@ -77,3 +77,8 @@ variable "postgrest" {
   type        = string
   description = "the tag for the docker image"
 }
+
+variable "clamav" {
+  type        = string
+  description = "the tag for the docker image"
+}
