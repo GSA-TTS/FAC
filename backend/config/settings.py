@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 from base64 import b64decode
 import os
+import sys
+import logging
 import json
 import environs
 from cfenv import AppEnv
@@ -79,6 +81,11 @@ LOGGING = {
         "django": {"handlers": ["local_debug_logger", "prod_logger"]},
     },
 }
+
+# Explore uncommenting the following lines to reduce display while testing
+# if len(sys.argv) > 1 and sys.argv[1] == "test":
+#     logging.disable(logging.ERROR)
+
 
 # Django application definition
 INSTALLED_APPS = [
