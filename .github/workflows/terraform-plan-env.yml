@@ -69,7 +69,6 @@ jobs:
         with:
           path: terraform/${{ inputs.environment }}
           label: ${{ inputs.environment }}
-
           # These secrets grant access to the bucket with our remote Terraform
           # state. They're located in the "Secrets > Actions > Repository
           # Secrets" section of the repository settings, and are the same across
