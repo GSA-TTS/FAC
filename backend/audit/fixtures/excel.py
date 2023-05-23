@@ -1,12 +1,13 @@
-FEDERAL_AWARDS_TEMPLATE = (
-    "schemas/output/excel/xlsx/federal-awards-expended-template.xlsx"
-)
-FINDINGS_TEXT_TEMPLATE = "schemas/output/excel/xlsx/findings-text-template.xlsx"
-CORRECTIVE_ACTION_PLAN_TEMPLATE = (
-    "schemas/output/excel/xlsx/corrective-action-plan-template.xlsx"
-)
+from django.conf import settings
+
+SHEETS_DIR = settings.XLSX_TEMPLATE_SHEET_DIR
+TESTFILES_DIR = settings.DATA_FIXTURES / "audit" / "excel_schema_test_files"
+
+FEDERAL_AWARDS_TEMPLATE = SHEETS_DIR / "federal-awards-expended-template.xlsx"
+FINDINGS_TEXT_TEMPLATE = SHEETS_DIR / "findings-text-template.xlsx"
+CORRECTIVE_ACTION_PLAN_TEMPLATE = SHEETS_DIR / "corrective-action-plan-template.xlsx"
 FINDINGS_UNIFORM_GUIDANCE_TEMPLATE = (
-    "schemas/output/excel/xlsx/findings-uniform-guidance-template.xlsx"
+    SHEETS_DIR / "findings-uniform-guidance-template.xlsx"
 )
 
 FEDERAL_AWARDS_TEMPLATE_DEFINITION = "federal-awards-expended-template.json"
@@ -14,13 +15,11 @@ CORRECTIVE_ACTION_TEMPLATE_DEFINITION = "corrective-action-plan-template.json"
 FINDINGS_UNIFORM_TEMPLATE_DEFINITION = "findings-uniform-guidance-template.json"
 FINDINGS_TEXT_TEMPLATE_DEFINITION = "findings-text-template.json"
 
-FEDERAL_AWARDS_TEST_FILE = "audit/excel_schema_test_files/federalawards-pass-01.json"
-CORRECTIVE_ACTION_PLAN_TEST_FILE = (
-    "audit/excel_schema_test_files/corrective-action-plan-pass-01.json"
-)
-FINDINGS_TEXT_TEST_FILE = "audit/excel_schema_test_files/findings-text-pass-01.json"
+FEDERAL_AWARDS_TEST_FILE = TESTFILES_DIR / "federalawards-pass-01.json"
+CORRECTIVE_ACTION_PLAN_TEST_FILE = TESTFILES_DIR / "corrective-action-plan-pass-01.json"
+FINDINGS_TEXT_TEST_FILE = TESTFILES_DIR / "findings-text-pass-01.json"
 FINDINGS_UNIFORM_GUIDANCE_TEST_FILE = (
-    "audit/excel_schema_test_files/findings-uniform-guidance-pass-01.json"
+    TESTFILES_DIR / "findings-uniform-guidance-pass-01.json"
 )
 
 
