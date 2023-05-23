@@ -1,3 +1,4 @@
+import json
 from django.test import TestCase
 from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -347,12 +348,15 @@ class ExcelFileHandlerViewTests(TestCase):
         """When a valid Excel file is uploaded, the file should be stored and the SingleAuditChecklist should be updated to include the uploaded Federal Awards data"""
 
         sac = _mock_login_and_scan(self.client, mock_scan_file)
+        test_data = json.loads(
+            FEDERAL_AWARDS_ENTRY_FIXTURES.read_text(encoding="utf-8")
+        )
 
         # add valid data to the workbook
         workbook = load_workbook(FEDERAL_AWARDS_TEMPLATE, data_only=True)
         _set_by_name(workbook, "auditee_uei", ExcelFileHandlerViewTests.GOOD_UEI)
         _set_by_name(workbook, "total_amount_expended", 200)
-        _add_entry(workbook, 0, FEDERAL_AWARDS_ENTRY_FIXTURES[0])
+        _add_entry(workbook, 0, test_data[0])
 
         with NamedTemporaryFile(suffix=".xlsx") as tmp:
             workbook.save(tmp.name)
@@ -395,59 +399,57 @@ class ExcelFileHandlerViewTests(TestCase):
 
                 self.assertEqual(
                     federal_awards_entry["cluster"]["cluster_name"],
-                    FEDERAL_AWARDS_ENTRY_FIXTURES[0]["cluster_name"],
+                    test_data[0]["cluster_name"],
                 )
                 self.assertEqual(
                     federal_awards_entry["direct_or_indirect_award"]["is_direct"],
-                    FEDERAL_AWARDS_ENTRY_FIXTURES[0]["is_direct"],
+                    test_data[0]["is_direct"],
                 )
                 self.assertEqual(
                     federal_awards_entry["program"]["is_major"],
-                    FEDERAL_AWARDS_ENTRY_FIXTURES[0]["is_major"],
+                    test_data[0]["is_major"],
                 )
                 self.assertEqual(
                     federal_awards_entry["program"]["federal_agency_prefix"],
-                    FEDERAL_AWARDS_ENTRY_FIXTURES[0]["federal_agency_prefix"],
+                    test_data[0]["federal_agency_prefix"],
                 )
                 self.assertEqual(
                     federal_awards_entry["program"]["three_digit_extension"],
-                    FEDERAL_AWARDS_ENTRY_FIXTURES[0]["three_digit_extension"],
+                    test_data[0]["three_digit_extension"],
                 )
                 self.assertEqual(
                     federal_awards_entry["program"]["amount_expended"],
-                    FEDERAL_AWARDS_ENTRY_FIXTURES[0]["amount_expended"],
+                    test_data[0]["amount_expended"],
                 )
                 self.assertEqual(
                     federal_awards_entry["program"]["program_name"],
-                    FEDERAL_AWARDS_ENTRY_FIXTURES[0]["program_name"],
+                    test_data[0]["program_name"],
                 )
                 self.assertEqual(
                     federal_awards_entry["loan_or_loan_guarantee"]["is_guaranteed"],
-                    FEDERAL_AWARDS_ENTRY_FIXTURES[0]["is_guaranteed"],
+                    test_data[0]["is_guaranteed"],
                 )
                 self.assertEqual(
                     federal_awards_entry["program"]["number_of_audit_findings"],
-                    FEDERAL_AWARDS_ENTRY_FIXTURES[0]["number_of_audit_findings"],
+                    test_data[0]["number_of_audit_findings"],
                 )
                 self.assertEqual(
                     federal_awards_entry["program"]["audit_report_type"],
-                    FEDERAL_AWARDS_ENTRY_FIXTURES[0]["audit_report_type"],
+                    test_data[0]["audit_report_type"],
                 )
                 self.assertEqual(
                     federal_awards_entry["loan_or_loan_guarantee"][
                         "loan_balance_at_audit_period_end"
                     ],
-                    FEDERAL_AWARDS_ENTRY_FIXTURES[0][
-                        "loan_balance_at_audit_period_end"
-                    ],
+                    test_data[0]["loan_balance_at_audit_period_end"],
                 )
                 self.assertEqual(
                     federal_awards_entry["subrecipients"]["is_passed"],
-                    FEDERAL_AWARDS_ENTRY_FIXTURES[0]["is_passed"],
+                    test_data[0]["is_passed"],
                 )
                 self.assertEqual(
                     federal_awards_entry["subrecipients"]["subrecipient_amount"],
-                    FEDERAL_AWARDS_ENTRY_FIXTURES[0]["subrecipient_amount"],
+                    test_data[0]["subrecipient_amount"],
                 )
                 self.assertEqual(
                     federal_awards_entry["direct_or_indirect_award"]["entities"],
@@ -469,12 +471,15 @@ class ExcelFileHandlerViewTests(TestCase):
 
         test_uei = "AAA12345678X"
         sac = _mock_login_and_scan(self.client, mock_scan_file)
+        test_data = json.loads(
+            CORRECTIVE_ACTION_PLAN_ENTRY_FIXTURES.read_text(encoding="utf-8")
+        )
 
         # add valid data to the workbook
         workbook = load_workbook(CORRECTIVE_ACTION_PLAN_TEMPLATE, data_only=True)
         _set_by_name(workbook, "auditee_uei", test_uei)
 
-        _add_entry(workbook, 0, CORRECTIVE_ACTION_PLAN_ENTRY_FIXTURES[0])
+        _add_entry(workbook, 0, test_data[0])
 
         with NamedTemporaryFile(suffix=".xlsx") as tmp:
             workbook.save(tmp.name)
@@ -520,11 +525,11 @@ class ExcelFileHandlerViewTests(TestCase):
 
                 self.assertEqual(
                     corrective_action_plan_entry["planned_action"],
-                    CORRECTIVE_ACTION_PLAN_ENTRY_FIXTURES[0]["planned_action"],
+                    test_data[0]["planned_action"],
                 )
                 self.assertEqual(
                     corrective_action_plan_entry["reference_number"],
-                    CORRECTIVE_ACTION_PLAN_ENTRY_FIXTURES[0]["reference_number"],
+                    test_data[0]["reference_number"],
                 )
 
     @patch("audit.validators._scan_file")
@@ -532,12 +537,15 @@ class ExcelFileHandlerViewTests(TestCase):
         """When a valid Excel file is uploaded, the file should be stored and the SingleAuditChecklist should be updated to include the uploaded Findings Uniform Guidance data"""
 
         sac = _mock_login_and_scan(self.client, mock_scan_file)
+        test_data = json.loads(
+            FINDINGS_UNIFORM_GUIDANCE_ENTRY_FIXTURES.read_text(encoding="utf-8")
+        )
 
         # add valid data to the workbook
         workbook = load_workbook(FINDINGS_UNIFORM_GUIDANCE_TEMPLATE, data_only=True)
         _set_by_name(workbook, "auditee_uei", ExcelFileHandlerViewTests.GOOD_UEI)
 
-        _add_entry(workbook, 0, FINDINGS_UNIFORM_GUIDANCE_ENTRY_FIXTURES[0])
+        _add_entry(workbook, 0, test_data[0])
 
         with NamedTemporaryFile(suffix=".xlsx") as tmp:
             workbook.save(tmp.name)
@@ -581,35 +589,27 @@ class ExcelFileHandlerViewTests(TestCase):
 
                 self.assertEqual(
                     findings_entries["program"]["federal_agency_prefix"],
-                    FINDINGS_UNIFORM_GUIDANCE_ENTRY_FIXTURES[0][
-                        "federal_agency_prefix"
-                    ],
+                    test_data[0]["federal_agency_prefix"],
                 )
                 self.assertEqual(
                     findings_entries["program"]["three_digit_extension"],
-                    FINDINGS_UNIFORM_GUIDANCE_ENTRY_FIXTURES[0][
-                        "three_digit_extension"
-                    ],
+                    test_data[0]["three_digit_extension"],
                 )
                 self.assertEqual(
                     findings_entries["program"]["compliance_requirement"],
-                    FINDINGS_UNIFORM_GUIDANCE_ENTRY_FIXTURES[0][
-                        "compliance_requirement"
-                    ],
+                    test_data[0]["compliance_requirement"],
                 )
                 self.assertEqual(
                     findings_entries["findings"]["repeat_prior_reference"],
-                    FINDINGS_UNIFORM_GUIDANCE_ENTRY_FIXTURES[0][
-                        "repeat_prior_reference"
-                    ],
+                    test_data[0]["repeat_prior_reference"],
                 )
                 self.assertEqual(
                     findings_entries["findings"]["reference_number"],
-                    FINDINGS_UNIFORM_GUIDANCE_ENTRY_FIXTURES[0]["reference_number"],
+                    test_data[0]["reference_number"],
                 )
                 self.assertEqual(
                     findings_entries["modified_opinion"],
-                    FINDINGS_UNIFORM_GUIDANCE_ENTRY_FIXTURES[0]["modified_opinion"],
+                    test_data[0]["modified_opinion"],
                 )
 
     @patch("audit.validators._scan_file")
@@ -617,12 +617,13 @@ class ExcelFileHandlerViewTests(TestCase):
         """When a valid Excel file is uploaded, the file should be stored and the SingleAuditChecklist should be updated to include the uploaded Findings Text data"""
 
         sac = _mock_login_and_scan(self.client, mock_scan_file)
+        test_data = json.loads(FINDINGS_TEXT_ENTRY_FIXTURES.read_text(encoding="utf-8"))
 
         # add valid data to the workbook
         workbook = load_workbook(FINDINGS_TEXT_TEMPLATE, data_only=True)
         _set_by_name(workbook, "auditee_uei", ExcelFileHandlerViewTests.GOOD_UEI)
 
-        _add_entry(workbook, 0, FINDINGS_TEXT_ENTRY_FIXTURES[0])
+        _add_entry(workbook, 0, test_data[0])
 
         with NamedTemporaryFile(suffix=".xlsx") as tmp:
             workbook.save(tmp.name)
@@ -664,13 +665,13 @@ class ExcelFileHandlerViewTests(TestCase):
 
                 self.assertEqual(
                     findings_entries["contains_chart_or_table"],
-                    FINDINGS_TEXT_ENTRY_FIXTURES[0]["contains_chart_or_table"],
+                    test_data[0]["contains_chart_or_table"],
                 )
                 self.assertEqual(
                     findings_entries["text_of_finding"],
-                    FINDINGS_TEXT_ENTRY_FIXTURES[0]["text_of_finding"],
+                    test_data[0]["text_of_finding"],
                 )
                 self.assertEqual(
                     findings_entries["reference_number"],
-                    FINDINGS_TEXT_ENTRY_FIXTURES[0]["reference_number"],
+                    test_data[0]["reference_number"],
                 )

@@ -1,0 +1,12 @@
+[
+  {
+    "contains_chart_or_table": "Y",
+    "planned_action": "corrective action 1",
+    "reference_number": "2023-001"
+  },
+  {
+    "contains_chart_or_table": "N",
+    "planned_action": "corrective action 2",
+    "reference_number": "2023-002"
+  }
+]

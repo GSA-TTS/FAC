@@ -11,10 +11,8 @@ from tempfile import NamedTemporaryFile
 
 import requests
 
-from .test_schemas import (
-    CorrectiveActionPlanSchemaValidityTest,
-    FederalAwardsSchemaValidityTest,
-)
+from audit.fixtures.excel import SIMPLE_CASES_TEST_FILE
+
 from .validators import (
     ALLOWED_EXCEL_CONTENT_TYPES,
     ALLOWED_EXCEL_FILE_EXTENSIONS,
@@ -54,6 +52,10 @@ class FederalAwardsValidatorTests(SimpleTestCase):
     test_schemas.py
     """
 
+    SIMPLE_CASE = json.loads(SIMPLE_CASES_TEST_FILE.read_text(encoding="utf-8"))[
+        "FederalAwardsCases"
+    ][0]
+
     def test_validation_is_applied(self):
         """
         Empty Federal Awards should fail, simple case should pass.
@@ -64,14 +66,14 @@ class FederalAwardsValidatorTests(SimpleTestCase):
             ValidationError, expected_msg, validate_federal_award_json, invalid
         )
 
-        simple = FederalAwardsSchemaValidityTest.SIMPLE_CASE
+        simple = FederalAwardsValidatorTests.SIMPLE_CASE
         validate_federal_award_json(simple)
 
     def test_prefix_under_ten(self):
         """
         Prefixes between 00 and 09 should fail
         """
-        simple = jsoncopy(FederalAwardsSchemaValidityTest.SIMPLE_CASE)
+        simple = jsoncopy(FederalAwardsValidatorTests.SIMPLE_CASE)
 
         # pick a prefix between 00 and 09 (invalid)
         prefix = f"{randrange(10):02}"
@@ -92,7 +94,7 @@ class FederalAwardsValidatorTests(SimpleTestCase):
         """
         Prefixes over 99 should fail
         """
-        simple = jsoncopy(FederalAwardsSchemaValidityTest.SIMPLE_CASE)
+        simple = jsoncopy(FederalAwardsValidatorTests.SIMPLE_CASE)
 
         # pick a prefix between 100 and 999 (invalid)
         prefix = f"{randrange(100, 1000):03}"
@@ -112,7 +114,7 @@ class FederalAwardsValidatorTests(SimpleTestCase):
         """
         Prefixes with non-numeric characters should fail
         """
-        simple = jsoncopy(FederalAwardsSchemaValidityTest.SIMPLE_CASE)
+        simple = jsoncopy(FederalAwardsValidatorTests.SIMPLE_CASE)
 
         # pick prefixes that contain one or two non-numeric characters
         prefixes = [
@@ -139,7 +141,7 @@ class FederalAwardsValidatorTests(SimpleTestCase):
         """
         A CFDA extension of RD should pass
         """
-        simple = jsoncopy(FederalAwardsSchemaValidityTest.SIMPLE_CASE)
+        simple = jsoncopy(FederalAwardsValidatorTests.SIMPLE_CASE)
         # 20230512 HDMS FIXME: This is wrong. Not all two digits from 10 to 20  are valid. Changed to 10 to 69 for now.
         # pick a prefix between 10 and 99 (valid)
         prefix = f"{randrange(10, 20):02}"
@@ -161,7 +163,7 @@ class FederalAwardsValidatorTests(SimpleTestCase):
         """
         A CFDA extension of U## should pass
         """
-        simple = jsoncopy(FederalAwardsSchemaValidityTest.SIMPLE_CASE)
+        simple = jsoncopy(FederalAwardsValidatorTests.SIMPLE_CASE)
 
         # pick a prefix between 10 and 99 (valid)
         prefix = f"{randrange(10, 20):02}"
@@ -184,7 +186,7 @@ class FederalAwardsValidatorTests(SimpleTestCase):
         """
         A CFDA extension of U# should fail
         """
-        simple = jsoncopy(FederalAwardsSchemaValidityTest.SIMPLE_CASE)
+        simple = jsoncopy(FederalAwardsValidatorTests.SIMPLE_CASE)
 
         # pick a prefix between 10 and 99 (valid)
         prefix = f"{randrange(10, 70):02}"
@@ -204,7 +206,7 @@ class FederalAwardsValidatorTests(SimpleTestCase):
         """
         A CFDA extension of U### should fail
         """
-        simple = jsoncopy(FederalAwardsSchemaValidityTest.SIMPLE_CASE)
+        simple = jsoncopy(FederalAwardsValidatorTests.SIMPLE_CASE)
 
         prefix = f"{randrange(10, 70):02}"
         # pick an extension between U001 and U999
@@ -223,7 +225,7 @@ class FederalAwardsValidatorTests(SimpleTestCase):
         """
         A three digit numeric CFDA extension should pass
         """
-        simple = jsoncopy(FederalAwardsSchemaValidityTest.SIMPLE_CASE)
+        simple = jsoncopy(FederalAwardsValidatorTests.SIMPLE_CASE)
 
         # pick a prefix between 10 and 99 (valid)
         prefix = f"{randrange(10, 20):02}"
@@ -243,7 +245,7 @@ class FederalAwardsValidatorTests(SimpleTestCase):
         """
         A CFDA extension with four digits should fail
         """
-        simple = jsoncopy(FederalAwardsSchemaValidityTest.SIMPLE_CASE)
+        simple = jsoncopy(FederalAwardsValidatorTests.SIMPLE_CASE)
 
         # pick a prefix between 10 and 99 (valid)
         prefix = f"{randrange(10, 20):02}"
@@ -263,7 +265,7 @@ class FederalAwardsValidatorTests(SimpleTestCase):
         """
         A CFDA extension with 3 numeric digits and a trailing letter should pass
         """
-        simple = jsoncopy(FederalAwardsSchemaValidityTest.SIMPLE_CASE)
+        simple = jsoncopy(FederalAwardsValidatorTests.SIMPLE_CASE)
 
         # pick a prefix between 10 and 99 (valid)
         prefix = f"{randrange(10, 20):02}"
@@ -282,7 +284,7 @@ class FederalAwardsValidatorTests(SimpleTestCase):
         """
         A CFDA extension with 3 numeric digits and multiple trailing letters should fail
         """
-        simple = jsoncopy(FederalAwardsSchemaValidityTest.SIMPLE_CASE)
+        simple = jsoncopy(FederalAwardsValidatorTests.SIMPLE_CASE)
 
         # pick a prefix between 10 and 99 (valid)
         prefix = f"{randrange(10, 20):02}"
@@ -305,7 +307,7 @@ class FederalAwardsValidatorTests(SimpleTestCase):
         ascii_letters_omit_RD = string.ascii_letters.replace("D", "").replace("R", "")
         ascii_letters_omit_U = string.ascii_letters.replace("U", "")
 
-        simple = jsoncopy(FederalAwardsSchemaValidityTest.SIMPLE_CASE)
+        simple = jsoncopy(FederalAwardsValidatorTests.SIMPLE_CASE)
 
         # pick a prefix between 10 and 99 (valid)
         prefix = f"{randrange(10, 20):02}"
@@ -642,6 +644,10 @@ class ExcelFileIntegrityValidatorTests(TestCase):
 
 
 class CorrectiveActionPlanValidatorTests(SimpleTestCase):
+    SIMPLE_CASE = json.loads(SIMPLE_CASES_TEST_FILE.read_text(encoding="utf-8"))[
+        "CorrectiveActionPlanCase"
+    ]
+
     def test_validation_is_applied(self):
         """
         Empty Corrective Action Plan should fail, simple case should pass.
@@ -652,5 +658,6 @@ class CorrectiveActionPlanValidatorTests(SimpleTestCase):
             ValidationError, expected_msg, validate_corrective_action_plan_json, invalid
         )
 
-        simple = CorrectiveActionPlanSchemaValidityTest.SIMPLE_CASE
-        validate_corrective_action_plan_json(simple)
+        validate_corrective_action_plan_json(
+            CorrectiveActionPlanValidatorTests.SIMPLE_CASE
+        )

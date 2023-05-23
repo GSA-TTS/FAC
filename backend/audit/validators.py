@@ -114,8 +114,7 @@ def validate_findings_uniform_guidance_json(value):
     """
     Apply JSON Schema for findings uniform guidance and report errors.
     """
-    root = settings.SECTION_SCHEMA_DIR
-    schema_path = root / "FindingsUniformGuidance.schema.json"
+    schema_path = settings.SECTION_SCHEMA_DIR / "FindingsUniformGuidance.schema.json"
     schema = json.loads(schema_path.read_text(encoding="utf-8"))
 
     validator = Draft7Validator(schema)
@@ -128,8 +127,7 @@ def validate_findings_text_json(value):
     """
     Apply JSON Schema for findings text and report errors.
     """
-    root = settings.SECTION_SCHEMA_DIR
-    schema_path = root / "FindingsText.schema.json"
+    schema_path = settings.SECTION_SCHEMA_DIR / "FindingsText.schema.json"
     schema = json.loads(schema_path.read_text(encoding="utf-8"))
 
     validator = Draft7Validator(schema)
@@ -142,8 +140,7 @@ def validate_corrective_action_plan_json(value):
     """
     Apply JSON Schema for corrective action plan and report errors.
     """
-    root = settings.SECTION_SCHEMA_DIR
-    schema_path = root / "CorrectiveActionPlan.schema.json"
+    schema_path = settings.SECTION_SCHEMA_DIR / "CorrectiveActionPlan.schema.json"
     schema = json.loads(schema_path.read_text(encoding="utf-8"))
 
     validator = Draft7Validator(schema)
@@ -156,8 +153,7 @@ def validate_federal_award_json(value):
     """
     Apply JSON Schema for federal awards and report errors.
     """
-    root = settings.SECTION_SCHEMA_DIR
-    schema_path = root / "FederalAwards.schema.json"
+    schema_path = settings.SECTION_SCHEMA_DIR / "FederalAwards.schema.json"
     schema = json.loads(schema_path.read_text(encoding="utf-8"))
 
     validator = Draft7Validator(schema)
@@ -170,8 +166,7 @@ def validate_general_information_json(value):
     """
     Apply JSON Schema for general information and report errors.
     """
-    root = settings.SECTION_SCHEMA_DIR
-    schema_path = root / "GeneralInformation.schema.json"
+    schema_path = settings.SECTION_SCHEMA_DIR / "GeneralInformation.schema.json"
     schema = json.loads(schema_path.read_text(encoding="utf-8"))
 
     try:
