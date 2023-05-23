@@ -1,6 +1,5 @@
 locals {
   postgrest_name = "postgrest"
-  postgrest_image = "ghcr.io/gsa-tts/fac/postgrest:${var.postgrest}"
 }
 
 resource "cloudfoundry_route" "postgrest" {
@@ -17,7 +16,7 @@ resource "cloudfoundry_service_key" "postgrest" {
 resource "cloudfoundry_app" "postgrest" {
   name         = local.postgrest_name
   space        = data.cloudfoundry_space.apps.id
-  docker_image = local.postgrest_image
+  docker_image = var.postgrest_image
   timeout      = 180
   memory       = 128
   disk_quota   = 256

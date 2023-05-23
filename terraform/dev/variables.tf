@@ -14,12 +14,12 @@ variable "new_relic_license_key" {
   description = "the license key to use when setting up the New Relic agent"
 }
 
-variable "postgrest" {
+variable "postgrest_image" {
   type        = string
   description = "the tag for the docker image"
 }
 
-variable "clamav" {
+variable "clamav_image" {
   type        = string
   description = "the tag for the docker image"
 }

@@ -13,8 +13,11 @@ jobs:
   fetch-versions:
     runs-on: ubuntu-latest
     outputs:
-      postgrest: ${{ steps.read-version.outputs.TF_VAR_postgrest }}
-      clamav: ${{ steps.read-version.outputs.TF_VAR_clamav }}
+      postgrest: ${{ steps.read-version.outputs.TF_VAR_postgrest_image }}
+      clamav: ${{ steps.read-version.outputs.TF_VAR_clamav_image }}
+    env:
+      GH_REPO: gsa-tts/fac
+
 
     steps:
       - name: Checkout
@@ -30,10 +33,8 @@ jobs:
       - name: read image versions
         id: read-version
         run: |
-          echo "TF_VAR_postgrest=$(cat postgrest/postgrest.txt)"
-          echo "TF_VAR_postgrest=$(cat postgrest/postgrest.txt)" >> "$GITHUB_OUTPUT"
-          echo "TF_VAR_clamav=$(cat clamav/clamav.txt)"
-          echo "TF_VAR_clamav=$(cat clamav/clamav.txt)" >> "$GITHUB_OUTPUT"
+          echo "TF_VAR_postgrest_image=$GH_REPO/postgrest:$(cat postgrest/postgrest.txt)" >> "$GITHUB_OUTPUT"
+          echo "TF_VAR_clamav_image=$GH_REPO/clamav:$(cat clamav/clamav.txt)" >> "$GITHUB_OUTPUT"
 
   plan:
     name: plan ( ${{ inputs.environment }} )
@@ -49,8 +50,8 @@ jobs:
       TERRAFORM_PRE_RUN: |
           apt-get update
           apt-get install -y zip
-      TF_VAR_postgrest: ${{ needs.fetch-versions.outputs.postgrest }}
-      TF_VAR_clamav: ${{ needs.fetch-versions.outputs.clamav }}
+      TF_VAR_postgrest_image: ${{ needs.fetch-versions.outputs.postgrest }}
+      TF_VAR_clamav_image: ${{ needs.fetch-versions.outputs.clamav }}
 
     steps:
       - name: checkout
@@ -61,8 +62,8 @@ jobs:
         # on the PR branch triggers a re-plan.
       - name: show versions
         run: |
-          echo "TF_VAR_postgrest=$TF_VAR_postgrest"
-          echo "TF_VAR_clamav=$TF_VAR_clamav"
+          echo "TF_VAR_postgrest=$TF_VAR_postgrest_image"
+          echo "TF_VAR_clamav=$TF_VAR_clamav_image"
       - name: terraform plan ( ${{ inputs.environment }} )
         uses: dflook/terraform-plan@v1
         with:

@@ -1,6 +1,6 @@
 locals {
-  clam_name = "fac-av-${var.cf_space_name}"
-  clamav_image = "ghcr.io/gsa-tts/fac/clamav:${var.clamav}"
+  clam_name    = "fac-av-${var.cf_space_name}"
+  clamav_image = var.clamav_image
 
 }
 
