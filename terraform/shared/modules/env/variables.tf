@@ -58,7 +58,7 @@ variable "swagger_instances" {
 
 variable "https_proxy_instances" {
   type        = number
-  description = "the number of instances of the https proxy application to run (default: 2)"
+  description = "the number of instances of the HTTPS proxy application to run (default: 2)"
   default     = 2
 }
 
