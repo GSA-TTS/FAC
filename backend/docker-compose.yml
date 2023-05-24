@@ -55,6 +55,28 @@ services:
       - SERVICES=s3
     volumes:
       - "localstack-vol:/tmp/localstack"
+  api:
+    image: postgrest/postgrest:v10.1.2
+    ports:
+      - "3000:3000"
+    expose:
+      - "3000"
+    environment:
+      PGRST_DB_URI: postgres://postgres:${SECRET_KEY}@db:5432/postgres
+      PGRST_OPENAPI_SERVER_PROXY_URI: http://127.0.0.1:3000
+      PGRST_DB_ANON_ROLE: anon
+    depends_on:
+      - db
+  swagger:
+    image: swaggerapi/swagger-ui
+    ports:
+      - "8080:8080"
+    expose:
+      - "8080"
+    environment:
+      API_URL: http://localhost:3000/
+    depends_on:
+      - db
 volumes:
   postgres-data:
   localstack-vol:
