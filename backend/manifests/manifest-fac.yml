@@ -21,3 +21,4 @@ applications:
       - fac-key-service
       - newrelic-creds
       - https-proxy-creds
+      - smtp-proxy-creds
