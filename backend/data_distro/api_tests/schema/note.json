@@ -1,0 +1,47 @@
+{
+   "properties": {
+      "audit_year": {
+         "type": "integer"
+      },
+      "content": {
+         "type": "string"
+      },
+      "dbkey": {
+         "pattern": "[1-9][0-9]+",
+         "type": "string"
+      },
+      "fac_id": {
+         "type": "integer"
+      },
+      "general_id": [
+         {
+            "type": "integer"
+         }
+      ],
+      "id": {
+         "type": "integer"
+      },
+      "is_public": {
+         "type": "boolean"
+      },
+      "note_index": {
+         "type": "integer"
+      },
+      "report_id": {
+         "type": "integer"
+      },
+      "sequence_number": {
+         "type": "integer"
+      },
+      "title": {
+         "type": "string"
+      },
+      "type_id": {
+         "type": "integer"
+      },
+      "version": {
+         "type": "integer"
+      }
+   },
+   "type": "object"
+}

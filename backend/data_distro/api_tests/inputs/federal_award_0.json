@@ -1,0 +1,38 @@
+{
+    "id": 0,
+    "research_and_development": true,
+    "loans": true,
+    "arra": true,
+    "direct": true,
+    "passthrough_award": true,
+    "major_program": true,
+    "finding_ref_numbers": "string",
+    "amount": 0,
+    "program_total": 0,
+    "cluster_total": 0,
+    "passthrough_amount": 0,
+    "loan_balance": "string",
+    "federal_program_name": "string",
+    "agency_name": "string",
+    "award_identification": "string",
+    "agency_cfda": "string",
+    "cluster_name": "string",
+    "state_cluster_name": "string",
+    "other_cluster_name": "string",
+    "type_requirement": "string",
+    "type_report_major_program": "string",
+    "findings_count": 0,
+    "audit_id": 0,
+    "dbkey": "string",
+    "audit_year": "string",
+    "findings_page": "string",
+    "questioned_costs": "string",
+    "is_public": true,
+    "cpa_ein": 0,
+    "agency_prior_findings_list": [
+        0
+    ],
+    "general_id": [
+        0
+    ]
+}

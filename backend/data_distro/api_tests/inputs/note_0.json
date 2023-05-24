@@ -1,0 +1,17 @@
+{
+    "id": 1,
+    "type_id": "2",
+    "fac_id": 371599,
+    "report_id": 947758,
+    "version": 1,
+    "sequence_number": 2,
+    "note_index": 2,
+    "content": "The auditee did not use the de minimis cost rate.",
+    "title": "10% De Minimis Cost Rate",
+    "dbkey": "98727",
+    "audit_year": "2022",
+    "is_public": true,
+    "general_id": [
+        21906
+    ]
+}
