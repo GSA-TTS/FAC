@@ -1,9 +1,13 @@
+import logging
+
 from secrets import choice
 from django.db import models
 from django.db.models import Q
 from django.contrib.auth import get_user_model
 
 from django.utils.translation import gettext_lazy as _
+
+from django_fsm import FSMField, RETURN_VALUE, transition
 
 from .validators import (
     validate_excel_file,
@@ -16,6 +20,8 @@ from .validators import (
 )
 
 User = get_user_model()
+
+logger = logging.getLogger(__name__)
 
 
 class SingleAuditChecklistManager(models.Manager):
@@ -69,11 +75,22 @@ class SingleAuditChecklist(models.Model):
         ("biennial", _("Biennial")),
         ("other", _("Other")),
     )
-    STATUSES = (
-        ("in_progress", _("In progress")),
-        ("submitted", _("Submitted")),
-        ("received", _("Received")),
-        ("available", _("Available")),
+
+    class STATUS:
+        IN_PROGRESS = "in_progress"
+        READY_FOR_CERTIFICATION = "ready_for_certification"
+        AUDITOR_CERTIFIED = "auditor_certified"
+        AUDITEE_CERTIFIED = "auditee_certified"
+        CERTIFIED = "certified"
+        SUBMITTED = "submitted"
+
+    STATUS_CHOICES = (
+        (STATUS.IN_PROGRESS, "In Progress"),
+        (STATUS.READY_FOR_CERTIFICATION, "Ready for Certification"),
+        (STATUS.AUDITOR_CERTIFIED, "Auditor Certified"),
+        (STATUS.AUDITEE_CERTIFIED, "Auditee Certified"),
+        (STATUS.CERTIFIED, "Certified"),
+        (STATUS.SUBMITTED, "Submitted"),
     )
 
     objects = SingleAuditChecklistManager()
@@ -81,9 +98,8 @@ class SingleAuditChecklist(models.Model):
     # 0. Meta data
     submitted_by = models.ForeignKey(User, on_delete=models.PROTECT)
     date_created = models.DateTimeField(auto_now_add=True)
-    submission_status = models.CharField(
-        max_length=16, choices=STATUSES, default=STATUSES[0][0]
-    )
+    submission_status = FSMField(default=STATUS.IN_PROGRESS, choices=STATUS_CHOICES)
+
     report_id = models.CharField(max_length=17, unique=True)
 
     # Q2 Type of Uniform Guidance Audit
@@ -104,6 +120,99 @@ class SingleAuditChecklist(models.Model):
         blank=True, null=True, validators=[validate_federal_award_json]
     )
 
+    def validate_full(self):
+        """
+        A stub method to represent the cross-sheet, “full” validation that we
+        do once all the individual sections are complete and valid in
+        themselves.
+        """
+        return True
+
+    @transition(
+        field="submission_status",
+        source=STATUS.IN_PROGRESS,
+        target=RETURN_VALUE(STATUS.IN_PROGRESS, STATUS.READY_FOR_CERTIFICATION),
+    )
+    def transition_to_ready_for_certification(self):
+        """
+        Pretend we're doing multi-sheet validation here.
+        This probably won't be the first time this validation is done;
+        there's likely to be a step in one of the views that does cross-sheet
+        validation and reports back to the user.
+        """
+        if self.validate_full():
+            return SingleAuditChecklist.STATUS.READY_FOR_CERTIFICATION
+        return SingleAuditChecklist.STATUS.IN_PROGRESS
+
+    @transition(
+        field="submission_status",
+        source=STATUS.READY_FOR_CERTIFICATION,
+        target=STATUS.AUDITOR_CERTIFIED,
+    )
+    def transition_to_auditor_certified(self):
+        """
+        The permission checks verifying that the user attempting to do this has
+        the appropriate privileges will done at the view level.
+        """
+
+    @transition(
+        field="submission_status",
+        source=STATUS.AUDITOR_CERTIFIED,
+        target=STATUS.AUDITEE_CERTIFIED,
+    )
+    def transition_to_auditee_certified(self):
+        """
+        The permission checks verifying that the user attempting to do this has
+        the appropriate privileges will done at the view level.
+        """
+
+    @transition(
+        field="submission_status",
+        source=STATUS.AUDITEE_CERTIFIED,
+        target=STATUS.CERTIFIED,
+    )
+    def transition_to_certified(self):
+        """
+        The permission checks verifying that the user attempting to do this has
+        the appropriate privileges will done at the view level.
+        """
+
+    @transition(
+        field="submission_status",
+        source=[STATUS.AUDITEE_CERTIFIED, STATUS.CERTIFIED],
+        target=STATUS.SUBMITTED,
+    )
+    def transition_to_submitted(self):
+        """
+        The permission checks verifying that the user attempting to do this has
+        the appropriate privileges will done at the view level.
+        """
+
+    @transition(
+        field="submission_status",
+        source=[
+            STATUS.READY_FOR_CERTIFICATION,
+            STATUS.AUDITOR_CERTIFIED,
+            STATUS.AUDITEE_CERTIFIED,
+            STATUS.CERTIFIED,
+        ],
+        target=STATUS.SUBMITTED,
+    )
+    def transition_to_in_progress(self):
+        """
+        Any edit to a submission in the following states should result in it
+        moving back to STATUS.IN_PROGRESS:
+
+        +   STATUS.READY_FOR_CERTIFICATION
+        +   STATUS.AUDITOR_CERTIFIED
+        +   STATUS.AUDITEE_CERTIFIED
+        +   STATUS.CERTIFIED
+
+        For the moment we're not trying anything fancy like catching changes at
+        the model level, and will again leave it up to the views to track that
+        changes have been made at that point.
+        """
+
     # Corrective Action Plan:
     corrective_action_plan = models.JSONField(
         blank=True, null=True, validators=[validate_corrective_action_plan_json]
@@ -118,6 +227,27 @@ class SingleAuditChecklist(models.Model):
     findings_uniform_guidance = models.JSONField(
         blank=True, null=True, validators=[validate_findings_uniform_guidance_json]
     )
+
+    @property
+    def is_auditee_certified(self):
+        return self.submission_status in [
+            SingleAuditChecklist.STATUS.AUDITEE_CERTIFIED,
+            SingleAuditChecklist.STATUS.CERTIFIED,
+            SingleAuditChecklist.STATUS.SUBMITTED,
+        ]
+
+    @property
+    def is_auditor_certified(self):
+        return self.submission_status in [
+            SingleAuditChecklist.STATUS.AUDITEE_CERTIFIED,
+            SingleAuditChecklist.STATUS.AUDITOR_CERTIFIED,
+            SingleAuditChecklist.STATUS.CERTIFIED,
+            SingleAuditChecklist.STATUS.SUBMITTED,
+        ]
+
+    @property
+    def is_submitted(self):
+        return self.submission_status in [SingleAuditChecklist.STATUS.SUBMITTED]
 
     @property
     def audit_period_covered(self):
@@ -273,11 +403,9 @@ class Access(models.Model):
     """
 
     ROLES = (
-        ("auditee_contact", _("Auditee Contact")),
-        ("auditor_contact", _("Auditor Contact")),
-        ("certifying_auditee_contact ", _("Auditee Certifying Official")),
-        ("certifying_auditor_contact ", _("Auditor Certifying Official")),
-        ("creator", _("Audit Creator")),
+        ("certifying_auditee_contact", _("Auditee Certifying Official")),
+        ("certifying_auditor_contact", _("Auditor Certifying Official")),
+        ("editor", _("Audit Editor")),
     )
     sac = models.ForeignKey(SingleAuditChecklist, on_delete=models.CASCADE)
     role = models.CharField(
@@ -300,12 +428,6 @@ class Access(models.Model):
         verbose_name_plural = "accesses"
 
         constraints = [
-            # a SAC cannot have multiple creators
-            models.UniqueConstraint(
-                fields=["sac"],
-                condition=Q(role="creator"),
-                name="%(app_label)s_$(class)s_single_creator",
-            ),
             # a SAC cannot have multiple certifying auditees
             models.UniqueConstraint(
                 fields=["sac"],

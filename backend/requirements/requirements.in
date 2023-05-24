@@ -15,6 +15,7 @@ gunicorn
 jsonnet
 jsonpath-ng
 jsonschema
+newrelic
 oic
 openpyxl
 pandas
@@ -28,3 +29,4 @@ pyyaml
 requests
 uritemplate
 yattag
+django-fsm

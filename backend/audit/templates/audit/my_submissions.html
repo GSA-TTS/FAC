@@ -28,7 +28,9 @@
                     <tbody>
                         {% for item in data %}
                             <tr>
-                                <td>{{ item.submission_status }}</td>
+                                <td>
+                                    <a class="usa-link" href="/audit/submission-progress/{{ item.report_id }}">{{ item.submission_status }}</a>
+                                </td>
                                 <td>{{ item.auditee_name }}</td>
                                 <td>{{ item.report_id }}</td>
                                 <td>{{ item.auditee_uei }}</td>

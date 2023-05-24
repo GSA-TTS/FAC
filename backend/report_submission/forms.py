@@ -5,6 +5,7 @@ from django import forms
 #   - report_submission.forms.GeneralInformationForm
 #   - schemas.sections.GeneralInformation.schema.json
 class GeneralInformationForm(forms.Form):
+    audit_type = forms.CharField()
     auditee_fiscal_period_end = forms.CharField()
     auditee_fiscal_period_start = forms.CharField()
     audit_period_covered = forms.CharField()

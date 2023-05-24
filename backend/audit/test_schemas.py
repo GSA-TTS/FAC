@@ -2,32 +2,30 @@
 # here for CI/CD integration.
 import json
 import string
+from random import choice, randrange
 
-from pathlib import Path
+from django.conf import settings
 from django.test import SimpleTestCase
 from jsonschema import exceptions, validate as jsonschema_validate, FormatChecker
-from random import choice, randrange
 
 from audit.fixtures.excel import (
     CORRECTIVE_ACTION_PLAN_TEST_FILE,
+    FEDERAL_AWARDS_TEST_FILE,
     FINDINGS_TEXT_TEST_FILE,
     FINDINGS_UNIFORM_GUIDANCE_TEST_FILE,
+    SIMPLE_CASES_TEST_FILE,
 )
+
+SECTION_SCHEMA_DIR = settings.SECTION_SCHEMA_DIR
 
 # Simplest way to create a new copy of simple case rather than getting
 # references to things used by other tests:
 jsoncopy = lambda v: json.loads(json.dumps(v))
 
 
-# wrap the validate function to include a format checker
 def validate(instance, schema):
+    """Wrap the validate function to include a format checker"""
     return jsonschema_validate(instance, schema, format_checker=FormatChecker())
-
-
-# 20230408 MCJ FIXME: This path is encoded in multiple places.
-# Why isn't it encoded once in settings.py?
-SCHEMA_DIR = Path(__file__).parent.parent / "schemas"
-SECTION_SCHEMA_DIR = Path(__file__).parent.parent / "schemas" / "sections"
 
 
 class GeneralInformationSchemaValidityTest(SimpleTestCase):
@@ -41,40 +39,9 @@ class GeneralInformationSchemaValidityTest(SimpleTestCase):
         )
     )
 
-    SIMPLE_CASE = {
-        "auditee_fiscal_period_start": "2022-01-01",
-        "auditee_fiscal_period_end": "2022-12-31",
-        "audit_period_covered": "annual",
-        "ein": "123456789",
-        "ein_not_an_ssn_attestation": True,
-        "multiple_eins_covered": False,
-        "auditee_uei": "1A2B3C4D5E6F",
-        "multiple_ueis_covered": False,
-        "auditee_name": "John",
-        "auditee_address_line_1": "123 Fake St.",
-        "auditee_city": "FakeCity",
-        "auditee_state": "AL",
-        "auditee_zip": "12345",
-        "auditee_contact_name": "John",
-        "auditee_contact_title": "A Title",
-        "auditee_phone": "555-555-5555",
-        "auditee_email": "john@test.test",
-        "user_provided_organization_type": "state",
-        "met_spending_threshold": True,
-        "is_usa_based": True,
-        "auditor_firm_name": "Firm LLC",
-        "auditor_ein": "123456789",
-        "auditor_ein_not_an_ssn_attestation": True,
-        "auditor_country": "USA",
-        "auditor_address_line_1": "456 Fake St.",
-        "auditor_city": "AnotherFakeCity",
-        "auditor_state": "WY",
-        "auditor_zip": "56789",
-        "auditor_contact_name": "Jane",
-        "auditor_contact_title": "Another Title",
-        "auditor_phone": "999-999-9999",
-        "auditor_email": "jane@test.test",
-    }
+    SIMPLE_CASE = json.loads(SIMPLE_CASES_TEST_FILE.read_text(encoding="utf-8"))[
+        "GeneralInformationCase"
+    ]
 
     def test_simple_pass(self):
         """
@@ -370,98 +337,17 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
         (SECTION_SCHEMA_DIR / "FederalAwards.schema.json").read_text(encoding="utf-8")
     )
 
-    # SIMPLE_CASE = {
-    #     "FederalAwards": {
-    #         "auditee_ein": "12345678",
-    #         "total_amount_expended": 0,
-    #         "federal_awards": [
-    #             {
-    #                 "program_number": "10.001",
-    #                 "federal_program_name": "GACC",
-    #                 "amount_expended": 0,
-    #                 "cluster_name": "N/A",
-    #                 "loan_or_loan_guarantee": "N",
-    #                 "direct_award": "Y",
-    #                 "federal_award_passed_to_subrecipients": "N",
-    #                 "major_program": "N",
-    #                 "number_of_audit_findings": 0,
-    #             }
-    #         ],
-    #     }
-    # }
-
-    SIMPLE_CASE = {
-        "FederalAwards": {
-            "auditee_ein": None,
-            "total_amount_expended": 12345,
-            "federal_awards": [
-                {
-                    "program": {
-                        "name": "Bob",
-                        "number": "42.123",
-                        "is_major": "N",
-                        "audit_report_type": "",
-                        "number_of_audit_findings": 0,
-                        "amount_expended": 42,
-                    },
-                    "loan_or_loan_guarantee": {
-                        "is_guaranteed": "N",
-                        "loan_balance_at_audit_period_end": 0,
-                    },
-                    "direct_or_indirect_award": {
-                        "is_direct": "N",
-                        "entities": [
-                            {
-                                "name": "Bob's Granting House",
-                                "identifying_number": "12345",
-                            }
-                        ],
-                    },
-                    "cluster": {"name": "N/A", "total": 123},
-                    "subrecipients": {"is_passed": "N"},
-                }
-            ],
-        }
-    }
-
-    M1 = {
-        "FederalAwards": {
-            "auditee_ein": None,
-            "total_amount_expended": 12345,
-            "federal_awards": [
-                {
-                    "program": {
-                        "name": "Bob",
-                        "number": "42.123",
-                        "is_major": "Y",
-                        "audit_report_type": "U",
-                        "number_of_audit_findings": 0,
-                        "amount_expended": 42,
-                    },
-                    "loan_or_loan_guarantee": {
-                        "is_guaranteed": "Y",
-                        "loan_balance_at_audit_period_end": 42,
-                    },
-                    "direct_or_indirect_award": {"is_direct": "Y", "entities": []},
-                    "subrecipients": {"is_passed": "Y", "amount": 32},
-                    "cluster": {
-                        "name": "STATE CLUSTER",
-                        "total": 123,
-                        "state_cluster_name": "Maine",
-                    },
-                }
-            ],
-        }
-    }
+    SIMPLE_CASES = json.loads(SIMPLE_CASES_TEST_FILE.read_text(encoding="utf-8"))[
+        "FederalAwardsCases"
+    ]
 
     def test_schema(self):
         """Try to test FederalAwards first."""
         schema = self.FEDERAL_AWARDS_SCHEMA
-        # 20230408 MCJ FIXME : Paths!
-        for f in ["federalawards-pass-01.json"]:
-            in_flight_file = SCHEMA_DIR / "test-files" / f
-            in_flight = json.loads(in_flight_file.read_text(encoding="utf-8"))
-            validate(in_flight, schema)
+
+        in_flight_file = FEDERAL_AWARDS_TEST_FILE
+        in_flight = json.loads(in_flight_file.read_text(encoding="utf-8"))
+        validate(in_flight, schema)
 
     def test_simple_pass(self):
         """
@@ -470,16 +356,16 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
         """
         schema = self.FEDERAL_AWARDS_SCHEMA
 
-        validate(self.SIMPLE_CASE, schema)
+        validate(self.SIMPLE_CASES[0], schema)
 
     def test_missing_auditee_ein(self):
         """
-        Test that validation fails if auditee_ein is missing
+        Test that validation fails if auditee_uei is missing
         """
         schema = self.FEDERAL_AWARDS_SCHEMA
 
-        simple_case = jsoncopy(self.SIMPLE_CASE)
-        del simple_case["FederalAwards"]["auditee_ein"]
+        simple_case = jsoncopy(self.SIMPLE_CASES[0])
+        del simple_case["FederalAwards"]["auditee_uei"]
 
         self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
@@ -489,7 +375,7 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
         """
         schema = self.FEDERAL_AWARDS_SCHEMA
 
-        simple_case = jsoncopy(self.SIMPLE_CASE)
+        simple_case = jsoncopy(self.SIMPLE_CASES[0])
         del simple_case["FederalAwards"]["total_amount_expended"]
 
         self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
@@ -501,7 +387,7 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
         """
         schema = self.FEDERAL_AWARDS_SCHEMA
 
-        simple_case = jsoncopy(self.SIMPLE_CASE)
+        simple_case = jsoncopy(self.SIMPLE_CASES[0])
 
         simple_case["FederalAwards"]["federal_awards"][0][
             "loan_balance_at_audit_period_end"
@@ -514,7 +400,7 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
         """
         schema = self.FEDERAL_AWARDS_SCHEMA
 
-        simple_case = jsoncopy(self.M1)
+        simple_case = jsoncopy(self.SIMPLE_CASES[1])
         award = jsoncopy(simple_case["FederalAwards"]["federal_awards"][0])
 
         both_int_pass = award | {
@@ -576,7 +462,7 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
         """
         schema = self.FEDERAL_AWARDS_SCHEMA
 
-        simple_case = jsoncopy(self.SIMPLE_CASE)
+        simple_case = jsoncopy(self.SIMPLE_CASES[1])
         award = jsoncopy(simple_case["FederalAwards"]["federal_awards"][0])
 
         # 20230408 MCJ
@@ -585,7 +471,12 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
         both_pass = award | {
             "direct_or_indirect_award": {
                 "is_direct": "N",
-                "entities": [{"name": "Bob", "identifying_number": "Bob-123"}],
+                "entities": [
+                    {
+                        "passthrough_name": "Bob",
+                        "passthrough_identifying_number": "Bob-123",
+                    }
+                ],
             }
         }
         simple_case["FederalAwards"]["federal_awards"] = [both_pass]
@@ -599,7 +490,12 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
 
         only_dependent_fail = award | {
             "direct_or_indirect_award": {
-                "entities": [{"name": "Bob", "identifying_number": "Bob-123"}]
+                "entities": [
+                    {
+                        "passthrough_name": "Bob",
+                        "passthrough_identifying_number": "Bob-123",
+                    }
+                ]
             }
         }
         simple_case["FederalAwards"]["federal_awards"] = [only_dependent_fail]
@@ -609,7 +505,7 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
         bad_entity_fail = award | {
             "direct_or_indirect_award": {
                 "is_direct": "N",
-                "entities": [{"name": "Bob"}],
+                "entities": [{"passthrough_name": "Bob"}],
             }
         }
         simple_case["FederalAwards"]["federal_awards"] = [bad_entity_fail]
@@ -618,7 +514,9 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
         bad_entity_empty_fail = award | {
             "direct_or_indirect_award": {
                 "is_direct": "N",
-                "entities": [{"name": "Bob", "identifying_number": ""}],
+                "entities": [
+                    {"passthrough_name": "Bob", "passthrough_identifying_number": ""}
+                ],
             }
         }
         simple_case["FederalAwards"]["federal_awards"] = [bad_entity_empty_fail]
@@ -631,10 +529,12 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
         """
         schema = self.FEDERAL_AWARDS_SCHEMA
 
-        simple_case = jsoncopy(self.SIMPLE_CASE)
+        simple_case = jsoncopy(self.SIMPLE_CASES[0])
         award = jsoncopy(simple_case["FederalAwards"]["federal_awards"][0])
 
-        both_pass = award | {"subrecipients": {"is_passed": "Y", "amount": 10_000}}
+        both_pass = award | {
+            "subrecipients": {"is_passed": "Y", "subrecipient_amount": 10_000}
+        }
         simple_case["FederalAwards"]["federal_awards"] = [both_pass]
 
         validate(simple_case, schema)
@@ -644,7 +544,7 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
 
         self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
-        only_dependent_fail = award | {"subrecipients": {"amount": 10_000}}
+        only_dependent_fail = award | {"subrecipients": {"subrecipient_amount": 10_000}}
         simple_case["FederalAwards"]["federal_awards"] = [only_dependent_fail]
 
         self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
@@ -655,13 +555,14 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
         """
         schema = self.FEDERAL_AWARDS_SCHEMA
 
-        simple_case = jsoncopy(self.SIMPLE_CASE)
+        simple_case = jsoncopy(self.SIMPLE_CASES[0])
         award = jsoncopy(simple_case["FederalAwards"]["federal_awards"][0])
 
         both_pass = award | {
             "program": {
-                "name": "Bob",
-                "number": "42.123",
+                "federal_agency_prefix": "42",
+                "three_digit_extension": "123",
+                "program_name": "Bob",
                 "is_major": "Y",
                 "audit_report_type": "U",
                 "number_of_audit_findings": 0,
@@ -674,8 +575,9 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
 
         invalid_fail = award | {
             "program": {
-                "name": "Bob",
-                "number": "42.123",
+                "federal_agency_prefix": "42",
+                "three_digit_extension": "123",
+                "program_name": "Bob",
                 "is_major": "Y",
                 "audit_report_type": "Z",
                 "number_of_audit_findings": 0,
@@ -704,10 +606,10 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
         """
         schema = self.FEDERAL_AWARDS_SCHEMA
 
-        simple_case = jsoncopy(self.SIMPLE_CASE)
+        simple_case = jsoncopy(self.SIMPLE_CASES[0])
 
         simple_case["FederalAwards"]["federal_awards"][0]["cluster"][
-            "name"
+            "cluster_name"
         ] = "STATE CLUSTER"
         self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
@@ -717,7 +619,7 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
         """
         schema = self.FEDERAL_AWARDS_SCHEMA
 
-        simple_case = jsoncopy(self.SIMPLE_CASE)
+        simple_case = jsoncopy(self.SIMPLE_CASES[0])
         simple_case["FederalAwards"]["federal_awards"][0]["cluster"][
             "state_cluster_name"
         ] = "ANYTHING"
@@ -727,7 +629,7 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
 
         # Test for successful validation when state_cluster_name is empty or null
         for valid in ["", "null"]:
-            simple_case = jsoncopy(self.SIMPLE_CASE)
+            simple_case = jsoncopy(self.SIMPLE_CASES[0])
             simple_case["FederalAwards"]["federal_awards"][0]["cluster"][
                 "state_cluster_name"
             ] = valid
@@ -740,7 +642,7 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
         """
         schema = self.FEDERAL_AWARDS_SCHEMA
 
-        simple_case = jsoncopy(self.SIMPLE_CASE)
+        simple_case = jsoncopy(self.SIMPLE_CASES[0])
         simple_case["FederalAwards"]["federal_awards"][0]["program"]["is_major"] = "Y"
 
         for report_type in ["A", "Q"]:
@@ -785,24 +687,15 @@ class CorrectiveActionPlanSchemaValidityTest(SimpleTestCase):
         )
     )
 
-    SIMPLE_CASE = {
-        "CorrectiveActionPlan": {
-            "auditee_ein": None,
-            "corrective_action_plan_entries": [
-                {
-                    "contains_chart_or_table": "N",
-                    "planned_action": "Action 11",
-                    "reference_number": "2023-111",
-                }
-            ],
-        }
-    }
+    SIMPLE_CASE = json.loads(SIMPLE_CASES_TEST_FILE.read_text(encoding="utf-8"))[
+        "CorrectiveActionPlanCase"
+    ]
 
     def test_schema(self):
         """Try to test CorrectiveActionPlan first."""
         schema = self.CORRECTIVE_ACTION_PLAN_SCHEMA
 
-        in_flight_file = SCHEMA_DIR / CORRECTIVE_ACTION_PLAN_TEST_FILE
+        in_flight_file = CORRECTIVE_ACTION_PLAN_TEST_FILE
         in_flight = json.loads(in_flight_file.read_text(encoding="utf-8"))
         validate(in_flight, schema)
 
@@ -815,14 +708,14 @@ class CorrectiveActionPlanSchemaValidityTest(SimpleTestCase):
 
         validate(self.SIMPLE_CASE, schema)
 
-    def test_missing_auditee_ein(self):
+    def test_missing_auditee_uei(self):
         """
-        Test that validation fails if auditee_ein is missing
+        Test that validation fails if auditee_uei is missing
         """
         schema = self.CORRECTIVE_ACTION_PLAN_SCHEMA
 
         simple_case = jsoncopy(self.SIMPLE_CASE)
-        del simple_case["CorrectiveActionPlan"]["auditee_ein"]
+        del simple_case["CorrectiveActionPlan"]["auditee_uei"]
 
         self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
@@ -896,24 +789,15 @@ class FindingsTextSchemaValidityTest(SimpleTestCase):
         (SECTION_SCHEMA_DIR / "FindingsText.schema.json").read_text(encoding="utf-8")
     )
 
-    SIMPLE_CASE = {
-        "FindingsText": {
-            "auditee_ein": None,
-            "findings_text_entries": [
-                {
-                    "contains_chart_or_table": "N",
-                    "text_of_finding": "Audit finding 11",
-                    "reference_number": "2023-001",
-                }
-            ],
-        }
-    }
+    SIMPLE_CASE = json.loads(SIMPLE_CASES_TEST_FILE.read_text(encoding="utf-8"))[
+        "FindingsTextCase"
+    ]
 
     def test_schema(self):
         """Try to test FindingsText first."""
         schema = self.FINDINGS_TEXT_SCHEMA
 
-        in_flight_file = SCHEMA_DIR / FINDINGS_TEXT_TEST_FILE
+        in_flight_file = FINDINGS_TEXT_TEST_FILE
         in_flight = json.loads(in_flight_file.read_text(encoding="utf-8"))
         validate(in_flight, schema)
 
@@ -927,12 +811,12 @@ class FindingsTextSchemaValidityTest(SimpleTestCase):
 
     def test_missing_auditee_ein(self):
         """
-        Test that validation fails if auditee_ein is missing
+        Test that validation fails if auditee_uei is missing
         """
         schema = self.FINDINGS_TEXT_SCHEMA
 
         simple_case = jsoncopy(self.SIMPLE_CASE)
-        del simple_case["FindingsText"]["auditee_ein"]
+        del simple_case["FindingsText"]["auditee_uei"]
 
         self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
@@ -1004,38 +888,15 @@ class FindingsUniformGuidanceSchemaValidityTest(SimpleTestCase):
         )
     )
 
-    SIMPLE_CASE = {
-        "FindingsUniformGuidance": {
-            "auditee_ein": None,
-            "findings_uniform_guidance_entries": [
-                {
-                    "program": {
-                        "compliance_requirement": "A",
-                        "name": "program name",
-                        "number": "42.123",
-                    },
-                    "questioned_costs": "N",
-                    "significiant_deficiency": "N",
-                    "other_matters": "N",
-                    "other_findings": "Y",
-                    "modified_opinion": "N",
-                    "material_weakness": "N",
-                    "findings": {
-                        "is_valid": "Y",
-                        "repeat_prior_reference": "Y",
-                        "prior_references": "2022-001",
-                        "reference": "2023-001",
-                    },
-                }
-            ],
-        }
-    }
+    SIMPLE_CASE = json.loads(SIMPLE_CASES_TEST_FILE.read_text(encoding="utf-8"))[
+        "FindingsUniformGuidanceCase"
+    ]
 
     def test_schema(self):
         """Try to test FindingsUniformGuidance first."""
         schema = self.FINDINGS_UNIFORM_GUIDANCE_SCHEMA
 
-        in_flight_file = SCHEMA_DIR / FINDINGS_UNIFORM_GUIDANCE_TEST_FILE
+        in_flight_file = FINDINGS_UNIFORM_GUIDANCE_TEST_FILE
         in_flight = json.loads(in_flight_file.read_text(encoding="utf-8"))
 
         validate(in_flight, schema)
@@ -1051,12 +912,12 @@ class FindingsUniformGuidanceSchemaValidityTest(SimpleTestCase):
 
     def test_missing_auditee_ein(self):
         """
-        Test that validation fails if auditee_ein is missing
+        Test that validation fails if auditee_uei is missing
         """
         schema = self.FINDINGS_UNIFORM_GUIDANCE_SCHEMA
 
         simple_case = jsoncopy(self.SIMPLE_CASE)
-        del simple_case["FindingsUniformGuidance"]["auditee_ein"]
+        del simple_case["FindingsUniformGuidance"]["auditee_uei"]
 
         self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
@@ -1081,7 +942,7 @@ class FindingsUniformGuidanceSchemaValidityTest(SimpleTestCase):
         simple_case = jsoncopy(self.SIMPLE_CASE)
         del simple_case["FindingsUniformGuidance"]["findings_uniform_guidance_entries"][
             0
-        ]["significiant_deficiency"]
+        ]["significant_deficiency"]
         self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
         simple_case = jsoncopy(self.SIMPLE_CASE)
@@ -1134,7 +995,7 @@ class FindingsUniformGuidanceSchemaValidityTest(SimpleTestCase):
 
         simple_case = jsoncopy(self.SIMPLE_CASE)
         simple_case["FindingsUniformGuidance"]["findings_uniform_guidance_entries"][0][
-            "significiant_deficiency"
+            "significant_deficiency"
         ] = None
         self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
@@ -1176,7 +1037,7 @@ class FindingsUniformGuidanceSchemaValidityTest(SimpleTestCase):
 
         simple_case = jsoncopy(self.SIMPLE_CASE)
         simple_case["FindingsUniformGuidance"]["findings_uniform_guidance_entries"][0][
-            "significiant_deficiency"
+            "significant_deficiency"
         ] = 0
         self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 

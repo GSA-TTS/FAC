@@ -1,5 +1,4 @@
 import json
-import os
 from typing import List
 
 from audit.models import Access, SingleAuditChecklist
@@ -7,7 +6,7 @@ from audit.permissions import SingleAuditChecklistPermission
 from django.http import Http404, HttpResponse
 from django.urls import reverse
 from django.views import View
-from config.settings import SCHEMAS_DIR, BASE_DIR
+from config.settings import AUDIT_SCHEMA_DIR, BASE_DIR
 from rest_framework import viewsets
 from rest_framework.authentication import BaseAuthentication
 from rest_framework.permissions import BasePermission, IsAuthenticated
@@ -119,7 +118,7 @@ def access_and_submission_check(user, data):
         )
 
         # Create all contact Access objects
-        Access.objects.create(sac=sac, role="creator", email=user.email, user=user)
+        Access.objects.create(sac=sac, role="editor", email=user.email, user=user)
         Access.objects.create(
             sac=sac,
             role="certifying_auditee_contact",
@@ -131,9 +130,9 @@ def access_and_submission_check(user, data):
             email=serializer.data.get("certifying_auditor_contact"),
         )
         for contact in serializer.data.get("auditee_contacts"):
-            Access.objects.create(sac=sac, role="auditee_contact", email=contact)
+            Access.objects.create(sac=sac, role="editor", email=contact)
         for contact in serializer.data.get("auditor_contacts"):
-            Access.objects.create(sac=sac, role="auditor_contact", email=contact)
+            Access.objects.create(sac=sac, role="editor", email=contact)
 
         sac.save()
 
@@ -148,9 +147,8 @@ def access_and_submission_check(user, data):
 
 class IndexView(View):
     def get(self, request, *args, **kwargs):
-        test_file = open(BASE_DIR.__str__() + "/static/index.html", "r")
-        response = HttpResponse(content=test_file)
-        return response
+        fpath = BASE_DIR / "static" / "index.html"
+        return HttpResponse(content=fpath.read_text(encoding="utf-8"))
 
 
 class SACViewSet(viewsets.ModelViewSet):
@@ -231,29 +229,23 @@ def get_role_emails_for_sac(sac_id) -> dict:
     from Access objects associated with that SAC, grouped by role.
 
     {
-        "auditee_contacts": ["a@a.com"],
-        "auditee_contacts": ["b@b.com"],
+        "editors": ["a@a.com", "b@b.com", "victor@frankenstein.com"]
         "certfying_auditor_contact": ["c@c.com"],
         "certfying_auditee_contact": ["e@e.com"],
-        "creator": ["victor@frankenstein.com"],
     }
     """
     accesses = Access.objects.filter(sac=sac_id)
 
-    # This is inelegant, but we have to change the name of the key for
-    # two of them, and turn lists into single items or None for the
-    # other two:
+    # Turn lists into single items or None for the certifier roles:
     only_one = lambda x: x[0] if x else None
     return {
-        "auditee_contacts": [a.email for a in accesses if a.role == "auditee_contact"],
-        "auditor_contacts": [a.email for a in accesses if a.role == "auditor_contact"],
+        "editors": [a.email for a in accesses if a.role == "editor"],
         "certifying_auditee_contact": only_one(
             [a.email for a in accesses if a.role == "certifying_auditee_contact"]
         ),
         "certifying_auditor_contact": only_one(
             [a.email for a in accesses if a.role == "certifying_auditor_contact"]
         ),
-        "creator": only_one([a.email for a in accesses if a.role == "creator"]),
     }
 
 
@@ -407,13 +399,11 @@ class SchemaView(APIView):
     authentication_classes: List[BaseAuthentication] = []
     permission_classes: List[BasePermission] = []
 
-    def get(self, _, fiscal_year, type):
-        filename = os.path.join(SCHEMAS_DIR, f"{fiscal_year}-{type}.json")
+    def get(self, _, fiscal_year, schema_type):
+        """GET JSON schema for the specified fiscal year"""
+        fpath = AUDIT_SCHEMA_DIR / f"{fiscal_year}-{schema_type}.json"
 
-        exists = os.path.exists(filename)
-        if not exists:
+        if not fpath.exists():
             raise Http404()
 
-        with open(filename, "r") as file:
-            schema = json.load(file)
-            return JsonResponse(schema)
+        return JsonResponse(json.loads(fpath.read_text(encoding="utf-8")))

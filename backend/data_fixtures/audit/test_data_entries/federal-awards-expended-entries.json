@@ -1,0 +1,41 @@
+[
+  {
+    "federal_agency_prefix": "10",
+    "three_digit_extension": "001",
+    "amount_expended": 100,
+    "cluster_name": "N/A",
+    "is_direct": "N",
+    "passthrough_name": "A|B",
+    "passthrough_identifying_number": "1|2",
+    "is_passed": "N",
+    "subrecipient_amount": 0,
+    "program_name": "program name",
+    "loan_balance_at_audit_period_end": 0,
+    "is_guaranteed": "N",
+    "is_major": "Y",
+    "audit_report_type": "U",
+    "number_of_audit_findings": 0,
+    "state_cluster_name": "",
+    "cluster_total": 123
+  },
+  {
+    "federal_agency_prefix": "10",
+    "three_digit_extension": "U12",
+    "additional_award_identification": "1234",
+    "amount_expended": 100,
+    "cluster_name": "N/A",
+    "is_direct": "N",
+    "passthrough_name": "C|D",
+    "passthrough_identifying_number": "3|4",
+    "is_passed": "N",
+    "subrecipient_amount": 0,
+    "program_name": "program name",
+    "loan_balance_at_audit_period_end": 0,
+    "is_guaranteed": "N",
+    "is_major": "Y",
+    "audit_report_type": "U",
+    "number_of_audit_findings": 0,
+    "state_cluster_name": "",
+    "cluster_total": 123
+  }
+]

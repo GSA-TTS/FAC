@@ -390,22 +390,20 @@ class AccessAndSubmissionTests(TestCase):
 
         sac = SingleAuditChecklist.objects.get(report_id=data["report_id"])
 
-        creator_access = Access.objects.get(sac=sac, role="creator")
         certifying_auditee_contact_access = Access.objects.get(
             sac=sac, role="certifying_auditee_contact"
         )
         certifying_auditor_contact_access = Access.objects.get(
             sac=sac, role="certifying_auditor_contact"
         )
-        auditee_contacts_access = Access.objects.filter(sac=sac, role="auditee_contact")
-        auditor_contacts_access = Access.objects.filter(sac=sac, role="auditor_contact")
+        editors = [acc.email for acc in Access.objects.filter(sac=sac, role="editor")]
 
-        self.assertEqual(creator_access.user, self.user)
-        self.assertEqual(creator_access.email, self.user.email)
+        self.assertEqual(sac.submitted_by, self.user)
+        self.assertTrue(self.user.email in editors)
+        self.assertTrue("c@c.com" in editors)
+        self.assertTrue("d@d.com" in editors)
         self.assertEqual(certifying_auditee_contact_access.email, "a@a.com")
         self.assertEqual(certifying_auditor_contact_access.email, "b@b.com")
-        self.assertEqual(auditee_contacts_access.first().email, "c@c.com")
-        self.assertEqual(auditor_contacts_access.first().email, "d@d.com")
 
     def test_multiple_auditee_auditor_contacts(self):
         """A new SAC is created along with related Access instances"""
@@ -426,23 +424,20 @@ class AccessAndSubmissionTests(TestCase):
 
         sac = SingleAuditChecklist.objects.get(report_id=data["report_id"])
 
-        auditee_contacts = (
-            Access.objects.filter(sac=sac, role="auditee_contact")
-            .values_list("email", flat=True)
-            .order_by("email")
-        )
-        auditor_contacts = (
-            Access.objects.filter(sac=sac, role="auditor_contact")
+        editors = (
+            Access.objects.filter(sac=sac, role="editor")
             .values_list("email", flat=True)
             .order_by("email")
         )
 
-        self.assertListEqual(
-            list(auditee_contacts), access_and_submission_data["auditee_contacts"]
+        submitted_contacts = (
+            access_and_submission_data["auditee_contacts"]
+            + access_and_submission_data["auditor_contacts"]
         )
-        self.assertListEqual(
-            list(auditor_contacts), access_and_submission_data["auditor_contacts"]
-        )
+
+        for db_addr, form_addr in zip(filter(None, editors), submitted_contacts):
+            self.assertTrue(db_addr in submitted_contacts)
+            self.assertTrue(form_addr in list(editors))
 
     def test_invalid_eligibility_data(self):
         """
@@ -568,7 +563,11 @@ class SingleAuditChecklistViewTests(TestCase):
         response = self.client.get(self.path(sac.report_id))
         full_data = response.json()
         for key, value in access_and_submission_data.items():
-            self.assertEqual(full_data[key], value)
+            if key in ["auditee_contacts", "auditor_contacts"]:
+                for item in value:
+                    self.assertTrue(item in full_data["editors"])
+            else:
+                self.assertEqual(full_data[key], value)
         for key, value in eligibility_info.items():
             self.assertEqual(full_data["general_information"][key], value)
         for key, value in VALID_AUDITEE_INFO_DATA.items():
@@ -698,7 +697,7 @@ class SingleAuditChecklistViewTests(TestCase):
             ("audit_period_covered", "['annual', 'biennial', 'other']"),
             (
                 "user_provided_organization_type",
-                "['higher-ed', 'local', 'non-profit', 'none', 'state', 'tribal', 'unknown']",
+                "['state', 'local', 'tribal', 'higher-ed', 'non-profit', 'unknown', 'none']",
             ),
         ]
 
@@ -1128,7 +1127,7 @@ class AccessListViewTests(TestCase):
         """
         sac = baker.make(SingleAuditChecklist)
         baker.make(Access, user=self.user, role="certifying_auditee_contact", sac=sac)
-        baker.make(Access, user=self.user, role="creator", sac=sac)
+        baker.make(Access, user=self.user, role="editor", sac=sac)
 
         response = self.client.get(ACCESS_LIST_PATH, format="json")
         data = response.json()
@@ -1143,9 +1142,9 @@ class AccessListViewTests(TestCase):
             certifying_auditee_contact_accesses[0]["report_id"], sac.report_id
         )
 
-        creator_accesses = list(filter(lambda a: a["role"] == "creator", data))
-        self.assertEqual(len(creator_accesses), 1)
-        self.assertEqual(creator_accesses[0]["report_id"], sac.report_id)
+        editor_accesses = list(filter(lambda a: a["role"] == "editor", data))
+        self.assertEqual(len(editor_accesses), 1)
+        self.assertEqual(editor_accesses[0]["report_id"], sac.report_id)
 
     def test_deleted_sac_not_returned(self):
         """
@@ -1218,10 +1217,10 @@ class SACViewSetTests(TestCase):
 
     def test_list_none_submitted_returns_empty_list(self):
         """
-        If there are SACs in the database, but none which have a status of subnmitted, the list endpoint shoul return no results
+        If there are SACs in the database, but none which have a status of submitted, the list endpoint shoul return no results
         """
-        for status in SingleAuditChecklist.STATUSES:
-            if status[0] != "submitted":
+        for status in SingleAuditChecklist.STATUS_CHOICES:
+            if status[0] != SingleAuditChecklist.STATUS.SUBMITTED:
                 baker.make(
                     SingleAuditChecklist, _quantity=100, submission_status=status[0]
                 )
@@ -1236,7 +1235,7 @@ class SACViewSetTests(TestCase):
         """
         If there are SACs in the database, only those with a submission_status of "submitted" should be returned
         """
-        for status in SingleAuditChecklist.STATUSES:
+        for status in SingleAuditChecklist.STATUS_CHOICES:
             baker.make(SingleAuditChecklist, _quantity=100, submission_status=status[0])
 
         response = self.client.get(SAC_LIST_PATH)
@@ -1278,10 +1277,10 @@ class SACViewSetTests(TestCase):
         """
         If there is a SAC matching the provided report_id, and the SAC has a submission_status other than submitted, the detail endpoint should return a 404
         """
-        for status in SingleAuditChecklist.STATUSES:
+        for status in SingleAuditChecklist.STATUS_CHOICES:
             with self.subTest():
-                if status[0] != "submitted":
-                    report_id = f"id-{status[0]}"
+                if status[0] != SingleAuditChecklist.STATUS.SUBMITTED:
+                    report_id = f"id-{status[0]}"[:17]
                     baker.make(
                         SingleAuditChecklist,
                         report_id=report_id,
@@ -1307,9 +1306,11 @@ class SchemaViewTests(TestCase):
 
         self.client = APIClient()
 
-    def path(self, fiscal_year, type):
+    def path(self, fiscal_year, schema_type):
         """Convenience method to get the path for a particular year and schema type)"""
-        return reverse("schemas", kwargs={"fiscal_year": fiscal_year, "type": type})
+        return reverse(
+            "schemas", kwargs={"fiscal_year": fiscal_year, "schema_type": schema_type}
+        )
 
     def test_valid_fy_valid_type_returns_schema(self):
         """
