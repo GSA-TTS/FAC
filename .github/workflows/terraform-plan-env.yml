@@ -62,8 +62,8 @@ jobs:
         # on the PR branch triggers a re-plan.
       - name: show versions
         run: |
-          echo "TF_VAR_postgrest=$TF_VAR_postgrest_image"
-          echo "TF_VAR_clamav=$TF_VAR_clamav_image"
+          echo "TF_VAR_postgrest_image=$TF_VAR_postgrest_image"
+          echo "TF_VAR_clamav_image=$TF_VAR_clamav_image"
       - name: terraform plan ( ${{ inputs.environment }} )
         uses: dflook/terraform-plan@v1
         with:

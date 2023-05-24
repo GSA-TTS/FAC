@@ -1,6 +1,5 @@
 locals {
   clam_name    = "fac-av-${var.cf_space_name}"
-  clamav_image = var.clamav_image
 
 }
 
@@ -47,7 +46,7 @@ module "clamav" {
 
   cf_org_name   = var.cf_org_name
   cf_space_name = var.cf_space_name
-  clamav_image  = local.clamav_image
+  clamav_image  = var.clamav_image
   max_file_size = "30M"
 
   # The following line is commented out until we have a way to pass the value of
