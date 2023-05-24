@@ -1,5 +1,5 @@
 locals {
-  clam_name    = "fac-av-${var.cf_space_name}"
+  clam_name = "fac-av-${var.cf_space_name}"
 
 }
 
