@@ -1,0 +1,165 @@
+{
+   "properties": {
+      "agency_cfda": {
+         "type": "string"
+      },
+      "agency_name": {
+         "oneOf": [
+            {
+               "type": "null"
+            },
+            {
+               "type": "string"
+            }
+         ]
+      },
+      "agency_prior_findings_list": {
+         "items": {
+            "type": "integer"
+         },
+         "type": "array"
+      },
+      "amount": {
+         "type": "integer"
+      },
+      "arra": {
+         "type": [
+            "boolean",
+            "null"
+         ]
+      },
+      "audit_id": {
+         "type": "integer"
+      },
+      "audit_year": {
+         "type": "string"
+      },
+      "award_identification": {
+         "type": "string"
+      },
+      "cluster_name": {
+         "type": "string"
+      },
+      "cluster_total": {
+         "type": "integer"
+      },
+      "cpa_ein": {
+         "type": "integer"
+      },
+      "dbkey": {
+         "type": "string"
+      },
+      "direct": {
+         "type": "boolean"
+      },
+      "federal_program_name": {
+         "type": "string"
+      },
+      "finding_ref_numbers": {
+         "oneOf": [
+            {
+               "type": "null"
+            },
+            {
+               "type": "string"
+            }
+         ]
+      },
+      "findings_count": {
+         "type": "integer"
+      },
+      "findings_page": {
+         "oneOf": [
+            {
+               "type": "null"
+            },
+            {
+               "type": "string"
+            }
+         ]
+      },
+      "general_id": {
+         "items": {
+            "type": "integer"
+         },
+         "type": "array"
+      },
+      "id": {
+         "type": "integer"
+      },
+      "is_public": {
+         "type": "boolean"
+      },
+      "loan_balance": {
+         "oneOf": [
+            {
+               "type": "null"
+            },
+            {
+               "type": "string"
+            }
+         ]
+      },
+      "loans": {
+         "type": [
+            "boolean",
+            "null"
+         ]
+      },
+      "major_program": {
+         "type": "boolean"
+      },
+      "other_cluster_name": {
+         "type": "string"
+      },
+      "passthrough_amount": {
+         "type": "integer"
+      },
+      "passthrough_award": {
+         "type": "boolean"
+      },
+      "program_total": {
+         "type": "integer"
+      },
+      "questioned_costs": {
+         "oneOf": [
+            {
+               "type": "null"
+            },
+            {
+               "type": "string"
+            }
+         ]
+      },
+      "research_and_development": {
+         "type": [
+            "boolean",
+            "null"
+         ]
+      },
+      "state_cluster_name": {
+         "oneOf": [
+            {
+               "type": "null"
+            },
+            {
+               "type": "string"
+            }
+         ]
+      },
+      "type_report_major_program": {
+         "type": "string"
+      },
+      "type_requirement": {
+         "oneOf": [
+            {
+               "type": "null"
+            },
+            {
+               "type": "string"
+            }
+         ]
+      }
+   },
+   "type": "object"
+}

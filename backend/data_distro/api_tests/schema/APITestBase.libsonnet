@@ -1,4 +1,4 @@
-local Base = import '../../../schemas/sources/Base.libsonnet';
+local Base = import '../../../schemas/source/base/Base.libsonnet';
 local Types = Base.Types;
 
 local REGEX_ZIPCODE = '^[0-9]{5}([0-9]{4})?$';
@@ -99,9 +99,18 @@ Base {
     },
     IntegerArray: {
       type: 'array',
-      items: {
-        type: 'integer',
-      },
+      items: Types.integer
     },
+    IntegerArrayOrNull: {
+      oneOf: [
+        {
+          type: 'array',
+          items: Types.integer
+        },
+        {
+          type: Base.Const.NULL
+        }
+      ]
+    }
   },
 }

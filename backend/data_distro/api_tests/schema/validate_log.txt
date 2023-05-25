@@ -1,0 +1,1456 @@
+{'verbosity': 1, 'settings': None, 'pythonpath': None, 'traceback': True, 'no_color': False, 'force_color': False, 'skip_checks': False, 'view': 'vw_findings', 'year': 2022, 'start': 0, 'end': 100, 'step': None}
+
+-------------
+OBJECT id: 5
+-------------
+{'id': 5, 'modified_opinion': False, 'other_non_compliance': False, 'material_weakness': False, 'significant_deficiency': True, 'other_findings': False, 'questioned_costs': False, 'repeat_finding': False, 'finding_ref_number': '2022-002', 'prior_finding_ref_numbers': None, 'type_requirement': 'I', 'audit_id': 35602245, 'audit_findings_id': 3073265, 'audit_year': '2022', 'dbkey': '213973', 'is_public': True, 'findings_text_id': [426], 'general_id': [11646]}
+
+------
+ERRORS
+------
+1. None is not of type 'string'
+
+Failed validating 'type' in schema['properties']['prior_finding_ref_numbers']:
+    {'type': 'string'}
+
+On instance['prior_finding_ref_numbers']:
+    None
+
+
+
+
+-------------
+OBJECT id: 6
+-------------
+{'id': 6, 'modified_opinion': False, 'other_non_compliance': False, 'material_weakness': False, 'significant_deficiency': True, 'other_findings': False, 'questioned_costs': False, 'repeat_finding': False, 'finding_ref_number': '2022-002', 'prior_finding_ref_numbers': None, 'type_requirement': 'I', 'audit_id': 35602179, 'audit_findings_id': 3073257, 'audit_year': '2022', 'dbkey': '213973', 'is_public': True, 'findings_text_id': [426], 'general_id': [11646]}
+
+------
+ERRORS
+------
+1. None is not of type 'string'
+
+Failed validating 'type' in schema['properties']['prior_finding_ref_numbers']:
+    {'type': 'string'}
+
+On instance['prior_finding_ref_numbers']:
+    None
+
+
+
+
+-------------
+OBJECT id: 7
+-------------
+{'id': 7, 'modified_opinion': False, 'other_non_compliance': False, 'material_weakness': False, 'significant_deficiency': True, 'other_findings': False, 'questioned_costs': False, 'repeat_finding': False, 'finding_ref_number': '2022-002', 'prior_finding_ref_numbers': None, 'type_requirement': 'I', 'audit_id': 35602192, 'audit_findings_id': 3073259, 'audit_year': '2022', 'dbkey': '213973', 'is_public': True, 'findings_text_id': [426], 'general_id': [11646]}
+
+------
+ERRORS
+------
+1. None is not of type 'string'
+
+Failed validating 'type' in schema['properties']['prior_finding_ref_numbers']:
+    {'type': 'string'}
+
+On instance['prior_finding_ref_numbers']:
+    None
+
+
+
+
+-------------
+OBJECT id: 9
+-------------
+{'id': 9, 'modified_opinion': False, 'other_non_compliance': False, 'material_weakness': False, 'significant_deficiency': False, 'other_findings': True, 'questioned_costs': False, 'repeat_finding': False, 'finding_ref_number': '2022-001', 'prior_finding_ref_numbers': None, 'type_requirement': 'P', 'audit_id': 35680889, 'audit_findings_id': 3079355, 'audit_year': '2022', 'dbkey': '147730', 'is_public': True, 'findings_text_id': [814], 'general_id': [2735]}
+
+------
+ERRORS
+------
+1. None is not of type 'string'
+
+Failed validating 'type' in schema['properties']['prior_finding_ref_numbers']:
+    {'type': 'string'}
+
+On instance['prior_finding_ref_numbers']:
+    None
+
+
+
+
+-------------
+OBJECT id: 10
+-------------
+{'id': 10, 'modified_opinion': False, 'other_non_compliance': False, 'material_weakness': False, 'significant_deficiency': False, 'other_findings': True, 'questioned_costs': False, 'repeat_finding': False, 'finding_ref_number': '2022-002', 'prior_finding_ref_numbers': None, 'type_requirement': 'P', 'audit_id': 35680889, 'audit_findings_id': 3079356, 'audit_year': '2022', 'dbkey': '147730', 'is_public': True, 'findings_text_id': [815], 'general_id': [2735]}
+
+------
+ERRORS
+------
+1. None is not of type 'string'
+
+Failed validating 'type' in schema['properties']['prior_finding_ref_numbers']:
+    {'type': 'string'}
+
+On instance['prior_finding_ref_numbers']:
+    None
+
+
+
+
+-------------
+OBJECT id: 11
+-------------
+{'id': 11, 'modified_opinion': False, 'other_non_compliance': True, 'material_weakness': False, 'significant_deficiency': True, 'other_findings': False, 'questioned_costs': False, 'repeat_finding': False, 'finding_ref_number': '2022-003', 'prior_finding_ref_numbers': None, 'type_requirement': 'B', 'audit_id': 35598736, 'audit_findings_id': 3073044, 'audit_year': '2022', 'dbkey': '161114', 'is_public': True, 'findings_text_id': [818], 'general_id': [4568]}
+
+------
+ERRORS
+------
+1. None is not of type 'string'
+
+Failed validating 'type' in schema['properties']['prior_finding_ref_numbers']:
+    {'type': 'string'}
+
+On instance['prior_finding_ref_numbers']:
+    None
+
+
+
+
+-------------
+OBJECT id: 12
+-------------
+{'id': 12, 'modified_opinion': False, 'other_non_compliance': True, 'material_weakness': False, 'significant_deficiency': True, 'other_findings': False, 'questioned_costs': False, 'repeat_finding': False, 'finding_ref_number': '2022-003', 'prior_finding_ref_numbers': None, 'type_requirement': 'B', 'audit_id': 35598743, 'audit_findings_id': 3073045, 'audit_year': '2022', 'dbkey': '161114', 'is_public': True, 'findings_text_id': [818], 'general_id': [4568]}
+
+------
+ERRORS
+------
+1. None is not of type 'string'
+
+Failed validating 'type' in schema['properties']['prior_finding_ref_numbers']:
+    {'type': 'string'}
+
+On instance['prior_finding_ref_numbers']:
+    None
+
+
+
+
+-------------
+OBJECT id: 13
+-------------
+{'id': 13, 'modified_opinion': False, 'other_non_compliance': True, 'material_weakness': False, 'significant_deficiency': True, 'other_findings': False, 'questioned_costs': False, 'repeat_finding': False, 'finding_ref_number': '2022-003', 'prior_finding_ref_numbers': None, 'type_requirement': 'B', 'audit_id': 35598649, 'audit_findings_id': 3073030, 'audit_year': '2022', 'dbkey': '161114', 'is_public': True, 'findings_text_id': [818], 'general_id': [4568]}
+
+------
+ERRORS
+------
+1. None is not of type 'string'
+
+Failed validating 'type' in schema['properties']['prior_finding_ref_numbers']:
+    {'type': 'string'}
+
+On instance['prior_finding_ref_numbers']:
+    None
+
+
+
+
+-------------
+OBJECT id: 14
+-------------
+{'id': 14, 'modified_opinion': False, 'other_non_compliance': True, 'material_weakness': False, 'significant_deficiency': True, 'other_findings': False, 'questioned_costs': False, 'repeat_finding': False, 'finding_ref_number': '2022-003', 'prior_finding_ref_numbers': None, 'type_requirement': 'B', 'audit_id': 35598650, 'audit_findings_id': 3073031, 'audit_year': '2022', 'dbkey': '161114', 'is_public': True, 'findings_text_id': [818], 'general_id': [4568]}
+
+------
+ERRORS
+------
+1. None is not of type 'string'
+
+Failed validating 'type' in schema['properties']['prior_finding_ref_numbers']:
+    {'type': 'string'}
+
+On instance['prior_finding_ref_numbers']:
+    None
+
+
+
+
+-------------
+OBJECT id: 15
+-------------
+{'id': 15, 'modified_opinion': False, 'other_non_compliance': True, 'material_weakness': False, 'significant_deficiency': True, 'other_findings': False, 'questioned_costs': False, 'repeat_finding': False, 'finding_ref_number': '2022-003', 'prior_finding_ref_numbers': None, 'type_requirement': 'B', 'audit_id': 35598651, 'audit_findings_id': 3073032, 'audit_year': '2022', 'dbkey': '161114', 'is_public': True, 'findings_text_id': [818], 'general_id': [4568]}
+
+------
+ERRORS
+------
+1. None is not of type 'string'
+
+Failed validating 'type' in schema['properties']['prior_finding_ref_numbers']:
+    {'type': 'string'}
+
+On instance['prior_finding_ref_numbers']:
+    None
+
+
+
+
+-------------
+OBJECT id: 16
+-------------
+{'id': 16, 'modified_opinion': False, 'other_non_compliance': True, 'material_weakness': False, 'significant_deficiency': True, 'other_findings': False, 'questioned_costs': False, 'repeat_finding': False, 'finding_ref_number': '2022-003', 'prior_finding_ref_numbers': None, 'type_requirement': 'B', 'audit_id': 35598646, 'audit_findings_id': 3073027, 'audit_year': '2022', 'dbkey': '161114', 'is_public': True, 'findings_text_id': [818], 'general_id': [4568]}
+
+------
+ERRORS
+------
+1. None is not of type 'string'
+
+Failed validating 'type' in schema['properties']['prior_finding_ref_numbers']:
+    {'type': 'string'}
+
+On instance['prior_finding_ref_numbers']:
+    None
+
+
+
+
+-------------
+OBJECT id: 17
+-------------
+{'id': 17, 'modified_opinion': False, 'other_non_compliance': True, 'material_weakness': False, 'significant_deficiency': True, 'other_findings': False, 'questioned_costs': False, 'repeat_finding': False, 'finding_ref_number': '2022-003', 'prior_finding_ref_numbers': None, 'type_requirement': 'B', 'audit_id': 35598647, 'audit_findings_id': 3073028, 'audit_year': '2022', 'dbkey': '161114', 'is_public': True, 'findings_text_id': [818], 'general_id': [4568]}
+
+------
+ERRORS
+------
+1. None is not of type 'string'
+
+Failed validating 'type' in schema['properties']['prior_finding_ref_numbers']:
+    {'type': 'string'}
+
+On instance['prior_finding_ref_numbers']:
+    None
+
+
+
+
+-------------
+OBJECT id: 18
+-------------
+{'id': 18, 'modified_opinion': False, 'other_non_compliance': True, 'material_weakness': False, 'significant_deficiency': True, 'other_findings': False, 'questioned_costs': False, 'repeat_finding': False, 'finding_ref_number': '2022-003', 'prior_finding_ref_numbers': None, 'type_requirement': 'B', 'audit_id': 35598648, 'audit_findings_id': 3073029, 'audit_year': '2022', 'dbkey': '161114', 'is_public': True, 'findings_text_id': [818], 'general_id': [4568]}
+
+------
+ERRORS
+------
+1. None is not of type 'string'
+
+Failed validating 'type' in schema['properties']['prior_finding_ref_numbers']:
+    {'type': 'string'}
+
+On instance['prior_finding_ref_numbers']:
+    None
+
+
+
+
+-------------
+OBJECT id: 19
+-------------
+{'id': 19, 'modified_opinion': False, 'other_non_compliance': True, 'material_weakness': False, 'significant_deficiency': True, 'other_findings': False, 'questioned_costs': False, 'repeat_finding': False, 'finding_ref_number': '2022-003', 'prior_finding_ref_numbers': None, 'type_requirement': 'B', 'audit_id': 35598653, 'audit_findings_id': 3073034, 'audit_year': '2022', 'dbkey': '161114', 'is_public': True, 'findings_text_id': [818], 'general_id': [4568]}
+
+------
+ERRORS
+------
+1. None is not of type 'string'
+
+Failed validating 'type' in schema['properties']['prior_finding_ref_numbers']:
+    {'type': 'string'}
+
+On instance['prior_finding_ref_numbers']:
+    None
+
+
+
+
+-------------
+OBJECT id: 20
+-------------
+{'id': 20, 'modified_opinion': False, 'other_non_compliance': True, 'material_weakness': False, 'significant_deficiency': True, 'other_findings': False, 'questioned_costs': False, 'repeat_finding': False, 'finding_ref_number': '2022-003', 'prior_finding_ref_numbers': None, 'type_requirement': 'B', 'audit_id': 35595835, 'audit_findings_id': 3072647, 'audit_year': '2022', 'dbkey': '161114', 'is_public': True, 'findings_text_id': [818], 'general_id': [4568]}
+
+------
+ERRORS
+------
+1. None is not of type 'string'
+
+Failed validating 'type' in schema['properties']['prior_finding_ref_numbers']:
+    {'type': 'string'}
+
+On instance['prior_finding_ref_numbers']:
+    None
+
+
+
+
+-------------
+OBJECT id: 21
+-------------
+{'id': 21, 'modified_opinion': False, 'other_non_compliance': True, 'material_weakness': False, 'significant_deficiency': True, 'other_findings': False, 'questioned_costs': False, 'repeat_finding': False, 'finding_ref_number': '2022-003', 'prior_finding_ref_numbers': None, 'type_requirement': 'B', 'audit_id': 35598652, 'audit_findings_id': 3073033, 'audit_year': '2022', 'dbkey': '161114', 'is_public': True, 'findings_text_id': [818], 'general_id': [4568]}
+
+------
+ERRORS
+------
+1. None is not of type 'string'
+
+Failed validating 'type' in schema['properties']['prior_finding_ref_numbers']:
+    {'type': 'string'}
+
+On instance['prior_finding_ref_numbers']:
+    None
+
+
+
+
+-------------
+OBJECT id: 22
+-------------
+{'id': 22, 'modified_opinion': False, 'other_non_compliance': True, 'material_weakness': False, 'significant_deficiency': True, 'other_findings': False, 'questioned_costs': False, 'repeat_finding': False, 'finding_ref_number': '2022-003', 'prior_finding_ref_numbers': None, 'type_requirement': 'B', 'audit_id': 35598644, 'audit_findings_id': 3073026, 'audit_year': '2022', 'dbkey': '161114', 'is_public': True, 'findings_text_id': [818], 'general_id': [4568]}
+
+------
+ERRORS
+------
+1. None is not of type 'string'
+
+Failed validating 'type' in schema['properties']['prior_finding_ref_numbers']:
+    {'type': 'string'}
+
+On instance['prior_finding_ref_numbers']:
+    None
+
+
+
+
+-------------
+OBJECT id: 23
+-------------
+{'id': 23, 'modified_opinion': False, 'other_non_compliance': True, 'material_weakness': False, 'significant_deficiency': True, 'other_findings': False, 'questioned_costs': False, 'repeat_finding': False, 'finding_ref_number': '2022-003', 'prior_finding_ref_numbers': None, 'type_requirement': 'B', 'audit_id': 35598654, 'audit_findings_id': 3073035, 'audit_year': '2022', 'dbkey': '161114', 'is_public': True, 'findings_text_id': [818], 'general_id': [4568]}
+
+------
+ERRORS
+------
+1. None is not of type 'string'
+
+Failed validating 'type' in schema['properties']['prior_finding_ref_numbers']:
+    {'type': 'string'}
+
+On instance['prior_finding_ref_numbers']:
+    None
+
+
+
+
+-------------
+OBJECT id: 24
+-------------
+{'id': 24, 'modified_opinion': False, 'other_non_compliance': True, 'material_weakness': False, 'significant_deficiency': True, 'other_findings': False, 'questioned_costs': False, 'repeat_finding': False, 'finding_ref_number': '2022-003', 'prior_finding_ref_numbers': None, 'type_requirement': 'B', 'audit_id': 35598749, 'audit_findings_id': 3073046, 'audit_year': '2022', 'dbkey': '161114', 'is_public': True, 'findings_text_id': [818], 'general_id': [4568]}
+
+------
+ERRORS
+------
+1. None is not of type 'string'
+
+Failed validating 'type' in schema['properties']['prior_finding_ref_numbers']:
+    {'type': 'string'}
+
+On instance['prior_finding_ref_numbers']:
+    None
+
+
+
+
+-------------
+OBJECT id: 25
+-------------
+{'id': 25, 'modified_opinion': False, 'other_non_compliance': True, 'material_weakness': False, 'significant_deficiency': True, 'other_findings': False, 'questioned_costs': False, 'repeat_finding': False, 'finding_ref_number': '2022-003', 'prior_finding_ref_numbers': None, 'type_requirement': 'B', 'audit_id': 35598754, 'audit_findings_id': 3073047, 'audit_year': '2022', 'dbkey': '161114', 'is_public': True, 'findings_text_id': [818], 'general_id': [4568]}
+
+------
+ERRORS
+------
+1. None is not of type 'string'
+
+Failed validating 'type' in schema['properties']['prior_finding_ref_numbers']:
+    {'type': 'string'}
+
+On instance['prior_finding_ref_numbers']:
+    None
+
+
+
+
+-------------
+OBJECT id: 26
+-------------
+{'id': 26, 'modified_opinion': False, 'other_non_compliance': True, 'material_weakness': False, 'significant_deficiency': True, 'other_findings': False, 'questioned_costs': False, 'repeat_finding': False, 'finding_ref_number': '2022-003', 'prior_finding_ref_numbers': None, 'type_requirement': 'B', 'audit_id': 35647491, 'audit_findings_id': 3076660, 'audit_year': '2022', 'dbkey': '161114', 'is_public': True, 'findings_text_id': [818], 'general_id': [4568]}
+
+------
+ERRORS
+------
+1. None is not of type 'string'
+
+Failed validating 'type' in schema['properties']['prior_finding_ref_numbers']:
+    {'type': 'string'}
+
+On instance['prior_finding_ref_numbers']:
+    None
+
+
+
+
+-------------
+OBJECT id: 27
+-------------
+{'id': 27, 'modified_opinion': False, 'other_non_compliance': True, 'material_weakness': False, 'significant_deficiency': True, 'other_findings': False, 'questioned_costs': False, 'repeat_finding': False, 'finding_ref_number': '2022-001', 'prior_finding_ref_numbers': None, 'type_requirement': 'N', 'audit_id': 35650466, 'audit_findings_id': 3076832, 'audit_year': '2022', 'dbkey': '61393', 'is_public': True, 'findings_text_id': [827], 'general_id': [20682]}
+
+------
+ERRORS
+------
+1. None is not of type 'string'
+
+Failed validating 'type' in schema['properties']['prior_finding_ref_numbers']:
+    {'type': 'string'}
+
+On instance['prior_finding_ref_numbers']:
+    None
+
+
+
+
+-------------
+OBJECT id: 28
+-------------
+{'id': 28, 'modified_opinion': False, 'other_non_compliance': True, 'material_weakness': False, 'significant_deficiency': True, 'other_findings': False, 'questioned_costs': False, 'repeat_finding': False, 'finding_ref_number': '2022-001', 'prior_finding_ref_numbers': None, 'type_requirement': 'N', 'audit_id': 35650468, 'audit_findings_id': 3076834, 'audit_year': '2022', 'dbkey': '61393', 'is_public': True, 'findings_text_id': [827], 'general_id': [20682]}
+
+------
+ERRORS
+------
+1. None is not of type 'string'
+
+Failed validating 'type' in schema['properties']['prior_finding_ref_numbers']:
+    {'type': 'string'}
+
+On instance['prior_finding_ref_numbers']:
+    None
+
+
+
+
+-------------
+OBJECT id: 29
+-------------
+{'id': 29, 'modified_opinion': False, 'other_non_compliance': True, 'material_weakness': False, 'significant_deficiency': True, 'other_findings': False, 'questioned_costs': False, 'repeat_finding': False, 'finding_ref_number': '2022-001', 'prior_finding_ref_numbers': None, 'type_requirement': 'N', 'audit_id': 35650465, 'audit_findings_id': 3076831, 'audit_year': '2022', 'dbkey': '61393', 'is_public': True, 'findings_text_id': [827], 'general_id': [20682]}
+
+------
+ERRORS
+------
+1. None is not of type 'string'
+
+Failed validating 'type' in schema['properties']['prior_finding_ref_numbers']:
+    {'type': 'string'}
+
+On instance['prior_finding_ref_numbers']:
+    None
+
+
+
+
+-------------
+OBJECT id: 30
+-------------
+{'id': 30, 'modified_opinion': False, 'other_non_compliance': True, 'material_weakness': False, 'significant_deficiency': True, 'other_findings': False, 'questioned_costs': False, 'repeat_finding': False, 'finding_ref_number': '2022-001', 'prior_finding_ref_numbers': None, 'type_requirement': 'N', 'audit_id': 35650469, 'audit_findings_id': 3076835, 'audit_year': '2022', 'dbkey': '61393', 'is_public': True, 'findings_text_id': [827], 'general_id': [20682]}
+
+------
+ERRORS
+------
+1. None is not of type 'string'
+
+Failed validating 'type' in schema['properties']['prior_finding_ref_numbers']:
+    {'type': 'string'}
+
+On instance['prior_finding_ref_numbers']:
+    None
+
+
+
+
+-------------
+OBJECT id: 31
+-------------
+{'id': 31, 'modified_opinion': False, 'other_non_compliance': True, 'material_weakness': False, 'significant_deficiency': True, 'other_findings': False, 'questioned_costs': False, 'repeat_finding': False, 'finding_ref_number': '2022-001', 'prior_finding_ref_numbers': None, 'type_requirement': 'N', 'audit_id': 35650470, 'audit_findings_id': 3076836, 'audit_year': '2022', 'dbkey': '61393', 'is_public': True, 'findings_text_id': [827], 'general_id': [20682]}
+
+------
+ERRORS
+------
+1. None is not of type 'string'
+
+Failed validating 'type' in schema['properties']['prior_finding_ref_numbers']:
+    {'type': 'string'}
+
+On instance['prior_finding_ref_numbers']:
+    None
+
+
+
+
+-------------
+OBJECT id: 32
+-------------
+{'id': 32, 'modified_opinion': False, 'other_non_compliance': True, 'material_weakness': False, 'significant_deficiency': True, 'other_findings': False, 'questioned_costs': False, 'repeat_finding': False, 'finding_ref_number': '2022-001', 'prior_finding_ref_numbers': None, 'type_requirement': 'N', 'audit_id': 35650464, 'audit_findings_id': 3076830, 'audit_year': '2022', 'dbkey': '61393', 'is_public': True, 'findings_text_id': [827], 'general_id': [20682]}
+
+------
+ERRORS
+------
+1. None is not of type 'string'
+
+Failed validating 'type' in schema['properties']['prior_finding_ref_numbers']:
+    {'type': 'string'}
+
+On instance['prior_finding_ref_numbers']:
+    None
+
+
+
+
+-------------
+OBJECT id: 33
+-------------
+{'id': 33, 'modified_opinion': False, 'other_non_compliance': True, 'material_weakness': False, 'significant_deficiency': True, 'other_findings': False, 'questioned_costs': False, 'repeat_finding': False, 'finding_ref_number': '2022-001', 'prior_finding_ref_numbers': None, 'type_requirement': 'N', 'audit_id': 35650467, 'audit_findings_id': 3076833, 'audit_year': '2022', 'dbkey': '61393', 'is_public': True, 'findings_text_id': [827], 'general_id': [20682]}
+
+------
+ERRORS
+------
+1. None is not of type 'string'
+
+Failed validating 'type' in schema['properties']['prior_finding_ref_numbers']:
+    {'type': 'string'}
+
+On instance['prior_finding_ref_numbers']:
+    None
+
+
+
+
+-------------
+OBJECT id: 34
+-------------
+{'id': 34, 'modified_opinion': False, 'other_non_compliance': False, 'material_weakness': False, 'significant_deficiency': True, 'other_findings': False, 'questioned_costs': False, 'repeat_finding': False, 'finding_ref_number': '2022-002', 'prior_finding_ref_numbers': None, 'type_requirement': 'B', 'audit_id': 35546661, 'audit_findings_id': 3069686, 'audit_year': '2022', 'dbkey': '138350', 'is_public': True, 'findings_text_id': [830], 'general_id': [1909]}
+
+------
+ERRORS
+------
+1. None is not of type 'string'
+
+Failed validating 'type' in schema['properties']['prior_finding_ref_numbers']:
+    {'type': 'string'}
+
+On instance['prior_finding_ref_numbers']:
+    None
+
+
+
+
+-------------
+OBJECT id: 35
+-------------
+{'id': 35, 'modified_opinion': False, 'other_non_compliance': False, 'material_weakness': False, 'significant_deficiency': True, 'other_findings': False, 'questioned_costs': False, 'repeat_finding': False, 'finding_ref_number': '2022-001', 'prior_finding_ref_numbers': None, 'type_requirement': 'N', 'audit_id': 35646301, 'audit_findings_id': 3076641, 'audit_year': '2022', 'dbkey': '256085', 'is_public': True, 'findings_text_id': [843], 'general_id': [18489]}
+
+------
+ERRORS
+------
+1. None is not of type 'string'
+
+Failed validating 'type' in schema['properties']['prior_finding_ref_numbers']:
+    {'type': 'string'}
+
+On instance['prior_finding_ref_numbers']:
+    None
+
+
+
+
+-------------
+OBJECT id: 36
+-------------
+{'id': 36, 'modified_opinion': False, 'other_non_compliance': False, 'material_weakness': False, 'significant_deficiency': True, 'other_findings': False, 'questioned_costs': False, 'repeat_finding': False, 'finding_ref_number': '2022-001', 'prior_finding_ref_numbers': None, 'type_requirement': 'N', 'audit_id': 35646302, 'audit_findings_id': 3076642, 'audit_year': '2022', 'dbkey': '256085', 'is_public': True, 'findings_text_id': [843], 'general_id': [18489]}
+
+------
+ERRORS
+------
+1. None is not of type 'string'
+
+Failed validating 'type' in schema['properties']['prior_finding_ref_numbers']:
+    {'type': 'string'}
+
+On instance['prior_finding_ref_numbers']:
+    None
+
+
+
+
+-------------
+OBJECT id: 37
+-------------
+{'id': 37, 'modified_opinion': False, 'other_non_compliance': False, 'material_weakness': False, 'significant_deficiency': True, 'other_findings': False, 'questioned_costs': False, 'repeat_finding': False, 'finding_ref_number': '2022-001', 'prior_finding_ref_numbers': None, 'type_requirement': 'N', 'audit_id': 35646303, 'audit_findings_id': 3076643, 'audit_year': '2022', 'dbkey': '256085', 'is_public': True, 'findings_text_id': [843], 'general_id': [18489]}
+
+------
+ERRORS
+------
+1. None is not of type 'string'
+
+Failed validating 'type' in schema['properties']['prior_finding_ref_numbers']:
+    {'type': 'string'}
+
+On instance['prior_finding_ref_numbers']:
+    None
+
+
+
+
+-------------
+OBJECT id: 38
+-------------
+{'id': 38, 'modified_opinion': False, 'other_non_compliance': False, 'material_weakness': False, 'significant_deficiency': True, 'other_findings': False, 'questioned_costs': False, 'repeat_finding': False, 'finding_ref_number': '2022-001', 'prior_finding_ref_numbers': None, 'type_requirement': 'N', 'audit_id': 35646304, 'audit_findings_id': 3076644, 'audit_year': '2022', 'dbkey': '256085', 'is_public': True, 'findings_text_id': [843], 'general_id': [18489]}
+
+------
+ERRORS
+------
+1. None is not of type 'string'
+
+Failed validating 'type' in schema['properties']['prior_finding_ref_numbers']:
+    {'type': 'string'}
+
+On instance['prior_finding_ref_numbers']:
+    None
+
+
+
+
+-------------
+OBJECT id: 39
+-------------
+{'id': 39, 'modified_opinion': False, 'other_non_compliance': True, 'material_weakness': False, 'significant_deficiency': False, 'other_findings': False, 'questioned_costs': False, 'repeat_finding': False, 'finding_ref_number': '2022-001', 'prior_finding_ref_numbers': None, 'type_requirement': 'N', 'audit_id': 35647465, 'audit_findings_id': 3076658, 'audit_year': '2022', 'dbkey': '45500', 'is_public': True, 'findings_text_id': [853], 'general_id': [20279]}
+
+------
+ERRORS
+------
+1. None is not of type 'string'
+
+Failed validating 'type' in schema['properties']['prior_finding_ref_numbers']:
+    {'type': 'string'}
+
+On instance['prior_finding_ref_numbers']:
+    None
+
+
+
+
+-------------
+OBJECT id: 40
+-------------
+{'id': 40, 'modified_opinion': False, 'other_non_compliance': True, 'material_weakness': True, 'significant_deficiency': False, 'other_findings': False, 'questioned_costs': False, 'repeat_finding': False, 'finding_ref_number': '2022-002', 'prior_finding_ref_numbers': None, 'type_requirement': 'L', 'audit_id': 35685921, 'audit_findings_id': 3079572, 'audit_year': '2022', 'dbkey': '256087', 'is_public': True, 'findings_text_id': [854], 'general_id': [18491]}
+
+------
+ERRORS
+------
+1. None is not of type 'string'
+
+Failed validating 'type' in schema['properties']['prior_finding_ref_numbers']:
+    {'type': 'string'}
+
+On instance['prior_finding_ref_numbers']:
+    None
+
+
+
+
+-------------
+OBJECT id: 59
+-------------
+{'id': 59, 'modified_opinion': False, 'other_non_compliance': False, 'material_weakness': False, 'significant_deficiency': True, 'other_findings': False, 'questioned_costs': False, 'repeat_finding': False, 'finding_ref_number': '2022-003', 'prior_finding_ref_numbers': None, 'type_requirement': 'I', 'audit_id': 35640068, 'audit_findings_id': 3077181, 'audit_year': '2022', 'dbkey': '115111', 'is_public': True, 'findings_text_id': [864], 'general_id': [447]}
+
+------
+ERRORS
+------
+1. None is not of type 'string'
+
+Failed validating 'type' in schema['properties']['prior_finding_ref_numbers']:
+    {'type': 'string'}
+
+On instance['prior_finding_ref_numbers']:
+    None
+
+
+
+
+-------------
+OBJECT id: 60
+-------------
+{'id': 60, 'modified_opinion': False, 'other_non_compliance': False, 'material_weakness': False, 'significant_deficiency': True, 'other_findings': False, 'questioned_costs': False, 'repeat_finding': False, 'finding_ref_number': '2022-003', 'prior_finding_ref_numbers': None, 'type_requirement': 'I', 'audit_id': 35640069, 'audit_findings_id': 3077182, 'audit_year': '2022', 'dbkey': '115111', 'is_public': True, 'findings_text_id': [864], 'general_id': [447]}
+
+------
+ERRORS
+------
+1. None is not of type 'string'
+
+Failed validating 'type' in schema['properties']['prior_finding_ref_numbers']:
+    {'type': 'string'}
+
+On instance['prior_finding_ref_numbers']:
+    None
+
+
+
+
+-------------
+OBJECT id: 61
+-------------
+{'id': 61, 'modified_opinion': False, 'other_non_compliance': False, 'material_weakness': False, 'significant_deficiency': True, 'other_findings': False, 'questioned_costs': False, 'repeat_finding': False, 'finding_ref_number': '2022-003', 'prior_finding_ref_numbers': None, 'type_requirement': 'I', 'audit_id': 35640067, 'audit_findings_id': 3077180, 'audit_year': '2022', 'dbkey': '115111', 'is_public': True, 'findings_text_id': [864], 'general_id': [447]}
+
+------
+ERRORS
+------
+1. None is not of type 'string'
+
+Failed validating 'type' in schema['properties']['prior_finding_ref_numbers']:
+    {'type': 'string'}
+
+On instance['prior_finding_ref_numbers']:
+    None
+
+
+
+
+-------------
+OBJECT id: 62
+-------------
+{'id': 62, 'modified_opinion': False, 'other_non_compliance': False, 'material_weakness': False, 'significant_deficiency': True, 'other_findings': False, 'questioned_costs': False, 'repeat_finding': False, 'finding_ref_number': '2022-001', 'prior_finding_ref_numbers': None, 'type_requirement': 'L', 'audit_id': 35636288, 'audit_findings_id': 3075420, 'audit_year': '2022', 'dbkey': '123631', 'is_public': True, 'findings_text_id': [865], 'general_id': [737]}
+
+------
+ERRORS
+------
+1. None is not of type 'string'
+
+Failed validating 'type' in schema['properties']['prior_finding_ref_numbers']:
+    {'type': 'string'}
+
+On instance['prior_finding_ref_numbers']:
+    None
+
+
+
+
+-------------
+OBJECT id: 63
+-------------
+{'id': 63, 'modified_opinion': False, 'other_non_compliance': False, 'material_weakness': False, 'significant_deficiency': True, 'other_findings': False, 'questioned_costs': False, 'repeat_finding': False, 'finding_ref_number': '2022-001', 'prior_finding_ref_numbers': None, 'type_requirement': 'L', 'audit_id': 35636289, 'audit_findings_id': 3075421, 'audit_year': '2022', 'dbkey': '123631', 'is_public': True, 'findings_text_id': [865], 'general_id': [737]}
+
+------
+ERRORS
+------
+1. None is not of type 'string'
+
+Failed validating 'type' in schema['properties']['prior_finding_ref_numbers']:
+    {'type': 'string'}
+
+On instance['prior_finding_ref_numbers']:
+    None
+
+
+
+
+-------------
+OBJECT id: 64
+-------------
+{'id': 64, 'modified_opinion': False, 'other_non_compliance': False, 'material_weakness': False, 'significant_deficiency': True, 'other_findings': False, 'questioned_costs': False, 'repeat_finding': False, 'finding_ref_number': '2022-001', 'prior_finding_ref_numbers': None, 'type_requirement': 'L', 'audit_id': 35695286, 'audit_findings_id': 3080073, 'audit_year': '2022', 'dbkey': '129801', 'is_public': True, 'findings_text_id': [866], 'general_id': [977]}
+
+------
+ERRORS
+------
+1. None is not of type 'string'
+
+Failed validating 'type' in schema['properties']['prior_finding_ref_numbers']:
+    {'type': 'string'}
+
+On instance['prior_finding_ref_numbers']:
+    None
+
+
+
+
+-------------
+OBJECT id: 65
+-------------
+{'id': 65, 'modified_opinion': False, 'other_non_compliance': False, 'material_weakness': False, 'significant_deficiency': True, 'other_findings': False, 'questioned_costs': False, 'repeat_finding': False, 'finding_ref_number': '2022-001', 'prior_finding_ref_numbers': None, 'type_requirement': 'L', 'audit_id': 35695287, 'audit_findings_id': 3080074, 'audit_year': '2022', 'dbkey': '129801', 'is_public': True, 'findings_text_id': [866], 'general_id': [977]}
+
+------
+ERRORS
+------
+1. None is not of type 'string'
+
+Failed validating 'type' in schema['properties']['prior_finding_ref_numbers']:
+    {'type': 'string'}
+
+On instance['prior_finding_ref_numbers']:
+    None
+
+
+
+
+-------------
+OBJECT id: 66
+-------------
+{'id': 66, 'modified_opinion': False, 'other_non_compliance': False, 'material_weakness': False, 'significant_deficiency': True, 'other_findings': False, 'questioned_costs': False, 'repeat_finding': False, 'finding_ref_number': '2022-001', 'prior_finding_ref_numbers': None, 'type_requirement': 'L', 'audit_id': 35695288, 'audit_findings_id': 3080075, 'audit_year': '2022', 'dbkey': '129801', 'is_public': True, 'findings_text_id': [866], 'general_id': [977]}
+
+------
+ERRORS
+------
+1. None is not of type 'string'
+
+Failed validating 'type' in schema['properties']['prior_finding_ref_numbers']:
+    {'type': 'string'}
+
+On instance['prior_finding_ref_numbers']:
+    None
+
+
+
+
+-------------
+OBJECT id: 67
+-------------
+{'id': 67, 'modified_opinion': False, 'other_non_compliance': True, 'material_weakness': False, 'significant_deficiency': True, 'other_findings': False, 'questioned_costs': False, 'repeat_finding': False, 'finding_ref_number': '2022-001', 'prior_finding_ref_numbers': None, 'type_requirement': 'L', 'audit_id': 35721520, 'audit_findings_id': 3080564, 'audit_year': '2022', 'dbkey': '132185', 'is_public': True, 'findings_text_id': [869], 'general_id': [1220]}
+
+------
+ERRORS
+------
+1. None is not of type 'string'
+
+Failed validating 'type' in schema['properties']['prior_finding_ref_numbers']:
+    {'type': 'string'}
+
+On instance['prior_finding_ref_numbers']:
+    None
+
+
+
+
+-------------
+OBJECT id: 68
+-------------
+{'id': 68, 'modified_opinion': False, 'other_non_compliance': False, 'material_weakness': True, 'significant_deficiency': False, 'other_findings': False, 'questioned_costs': False, 'repeat_finding': False, 'finding_ref_number': '2022-002', 'prior_finding_ref_numbers': None, 'type_requirement': 'P', 'audit_id': 35715012, 'audit_findings_id': 3080380, 'audit_year': '2022', 'dbkey': '79872', 'is_public': True, 'findings_text_id': [871], 'general_id': [21223]}
+
+------
+ERRORS
+------
+1. None is not of type 'string'
+
+Failed validating 'type' in schema['properties']['prior_finding_ref_numbers']:
+    {'type': 'string'}
+
+On instance['prior_finding_ref_numbers']:
+    None
+
+
+
+
+-------------
+OBJECT id: 69
+-------------
+{'id': 69, 'modified_opinion': False, 'other_non_compliance': False, 'material_weakness': True, 'significant_deficiency': False, 'other_findings': False, 'questioned_costs': False, 'repeat_finding': False, 'finding_ref_number': '2022-001', 'prior_finding_ref_numbers': None, 'type_requirement': 'P', 'audit_id': 35715012, 'audit_findings_id': 3080382, 'audit_year': '2022', 'dbkey': '79872', 'is_public': True, 'findings_text_id': [870], 'general_id': [21223]}
+
+------
+ERRORS
+------
+1. None is not of type 'string'
+
+Failed validating 'type' in schema['properties']['prior_finding_ref_numbers']:
+    {'type': 'string'}
+
+On instance['prior_finding_ref_numbers']:
+    None
+
+
+
+
+-------------
+OBJECT id: 70
+-------------
+{'id': 70, 'modified_opinion': False, 'other_non_compliance': True, 'material_weakness': False, 'significant_deficiency': True, 'other_findings': False, 'questioned_costs': False, 'repeat_finding': False, 'finding_ref_number': '2022-001', 'prior_finding_ref_numbers': None, 'type_requirement': 'N', 'audit_id': 35717388, 'audit_findings_id': 3080467, 'audit_year': '2022', 'dbkey': '215447', 'is_public': True, 'findings_text_id': [875], 'general_id': [11947]}
+
+------
+ERRORS
+------
+1. None is not of type 'string'
+
+Failed validating 'type' in schema['properties']['prior_finding_ref_numbers']:
+    {'type': 'string'}
+
+On instance['prior_finding_ref_numbers']:
+    None
+
+
+
+
+-------------
+OBJECT id: 74
+-------------
+{'id': 74, 'modified_opinion': False, 'other_non_compliance': True, 'material_weakness': False, 'significant_deficiency': True, 'other_findings': False, 'questioned_costs': False, 'repeat_finding': False, 'finding_ref_number': '2022-003', 'prior_finding_ref_numbers': None, 'type_requirement': 'L', 'audit_id': 35473455, 'audit_findings_id': 3065760, 'audit_year': '2022', 'dbkey': '152747', 'is_public': True, 'findings_text_id': [43], 'general_id': [3498]}
+
+------
+ERRORS
+------
+1. None is not of type 'string'
+
+Failed validating 'type' in schema['properties']['prior_finding_ref_numbers']:
+    {'type': 'string'}
+
+On instance['prior_finding_ref_numbers']:
+    None
+
+
+
+
+-------------
+OBJECT id: 76
+-------------
+{'id': 76, 'modified_opinion': False, 'other_non_compliance': False, 'material_weakness': False, 'significant_deficiency': True, 'other_findings': False, 'questioned_costs': False, 'repeat_finding': False, 'finding_ref_number': '2022-001', 'prior_finding_ref_numbers': None, 'type_requirement': None, 'audit_id': 35488752, 'audit_findings_id': 3066515, 'audit_year': '2022', 'dbkey': '160439', 'is_public': True, 'findings_text_id': [59], 'general_id': [4218]}
+
+------
+ERRORS
+------
+1. None is not of type 'string'
+
+Failed validating 'type' in schema['properties']['prior_finding_ref_numbers']:
+    {'type': 'string'}
+
+On instance['prior_finding_ref_numbers']:
+    None
+
+2. None is not of type 'string'
+
+Failed validating 'type' in schema['properties']['type_requirement']:
+    {'type': 'string'}
+
+On instance['type_requirement']:
+    None
+
+
+
+
+-------------
+OBJECT id: 77
+-------------
+{'id': 77, 'modified_opinion': False, 'other_non_compliance': False, 'material_weakness': False, 'significant_deficiency': True, 'other_findings': False, 'questioned_costs': False, 'repeat_finding': False, 'finding_ref_number': '2022-001', 'prior_finding_ref_numbers': None, 'type_requirement': None, 'audit_id': 35488766, 'audit_findings_id': 3066518, 'audit_year': '2022', 'dbkey': '160439', 'is_public': True, 'findings_text_id': [59], 'general_id': [4218]}
+
+------
+ERRORS
+------
+1. None is not of type 'string'
+
+Failed validating 'type' in schema['properties']['prior_finding_ref_numbers']:
+    {'type': 'string'}
+
+On instance['prior_finding_ref_numbers']:
+    None
+
+2. None is not of type 'string'
+
+Failed validating 'type' in schema['properties']['type_requirement']:
+    {'type': 'string'}
+
+On instance['type_requirement']:
+    None
+
+
+
+
+-------------
+OBJECT id: 78
+-------------
+{'id': 78, 'modified_opinion': False, 'other_non_compliance': False, 'material_weakness': False, 'significant_deficiency': True, 'other_findings': False, 'questioned_costs': False, 'repeat_finding': False, 'finding_ref_number': '2022-001', 'prior_finding_ref_numbers': None, 'type_requirement': None, 'audit_id': 35488747, 'audit_findings_id': 3066514, 'audit_year': '2022', 'dbkey': '160439', 'is_public': True, 'findings_text_id': [59], 'general_id': [4218]}
+
+------
+ERRORS
+------
+1. None is not of type 'string'
+
+Failed validating 'type' in schema['properties']['prior_finding_ref_numbers']:
+    {'type': 'string'}
+
+On instance['prior_finding_ref_numbers']:
+    None
+
+2. None is not of type 'string'
+
+Failed validating 'type' in schema['properties']['type_requirement']:
+    {'type': 'string'}
+
+On instance['type_requirement']:
+    None
+
+
+
+
+-------------
+OBJECT id: 79
+-------------
+{'id': 79, 'modified_opinion': False, 'other_non_compliance': False, 'material_weakness': False, 'significant_deficiency': True, 'other_findings': False, 'questioned_costs': False, 'repeat_finding': False, 'finding_ref_number': '2022-001', 'prior_finding_ref_numbers': None, 'type_requirement': None, 'audit_id': 35481759, 'audit_findings_id': 3066182, 'audit_year': '2022', 'dbkey': '160439', 'is_public': True, 'findings_text_id': [59], 'general_id': [4218]}
+
+------
+ERRORS
+------
+1. None is not of type 'string'
+
+Failed validating 'type' in schema['properties']['prior_finding_ref_numbers']:
+    {'type': 'string'}
+
+On instance['prior_finding_ref_numbers']:
+    None
+
+2. None is not of type 'string'
+
+Failed validating 'type' in schema['properties']['type_requirement']:
+    {'type': 'string'}
+
+On instance['type_requirement']:
+    None
+
+
+
+
+-------------
+OBJECT id: 80
+-------------
+{'id': 80, 'modified_opinion': False, 'other_non_compliance': False, 'material_weakness': False, 'significant_deficiency': True, 'other_findings': False, 'questioned_costs': False, 'repeat_finding': False, 'finding_ref_number': '2022-001', 'prior_finding_ref_numbers': None, 'type_requirement': None, 'audit_id': 35488764, 'audit_findings_id': 3066517, 'audit_year': '2022', 'dbkey': '160439', 'is_public': True, 'findings_text_id': [59], 'general_id': [4218]}
+
+------
+ERRORS
+------
+1. None is not of type 'string'
+
+Failed validating 'type' in schema['properties']['prior_finding_ref_numbers']:
+    {'type': 'string'}
+
+On instance['prior_finding_ref_numbers']:
+    None
+
+2. None is not of type 'string'
+
+Failed validating 'type' in schema['properties']['type_requirement']:
+    {'type': 'string'}
+
+On instance['type_requirement']:
+    None
+
+
+
+
+-------------
+OBJECT id: 81
+-------------
+{'id': 81, 'modified_opinion': False, 'other_non_compliance': False, 'material_weakness': False, 'significant_deficiency': True, 'other_findings': False, 'questioned_costs': False, 'repeat_finding': False, 'finding_ref_number': '2022-001', 'prior_finding_ref_numbers': None, 'type_requirement': None, 'audit_id': 35488753, 'audit_findings_id': 3066516, 'audit_year': '2022', 'dbkey': '160439', 'is_public': True, 'findings_text_id': [59], 'general_id': [4218]}
+
+------
+ERRORS
+------
+1. None is not of type 'string'
+
+Failed validating 'type' in schema['properties']['prior_finding_ref_numbers']:
+    {'type': 'string'}
+
+On instance['prior_finding_ref_numbers']:
+    None
+
+2. None is not of type 'string'
+
+Failed validating 'type' in schema['properties']['type_requirement']:
+    {'type': 'string'}
+
+On instance['type_requirement']:
+    None
+
+
+
+
+-------------
+OBJECT id: 82
+-------------
+{'id': 82, 'modified_opinion': True, 'other_non_compliance': False, 'material_weakness': True, 'significant_deficiency': False, 'other_findings': False, 'questioned_costs': True, 'repeat_finding': False, 'finding_ref_number': '2022-001', 'prior_finding_ref_numbers': None, 'type_requirement': 'N', 'audit_id': 35462956, 'audit_findings_id': 3065102, 'audit_year': '2022', 'dbkey': '231001', 'is_public': True, 'findings_text_id': [69], 'general_id': [14116]}
+
+------
+ERRORS
+------
+1. None is not of type 'string'
+
+Failed validating 'type' in schema['properties']['prior_finding_ref_numbers']:
+    {'type': 'string'}
+
+On instance['prior_finding_ref_numbers']:
+    None
+
+
+
+
+-------------
+OBJECT id: 83
+-------------
+{'id': 83, 'modified_opinion': False, 'other_non_compliance': True, 'material_weakness': False, 'significant_deficiency': False, 'other_findings': False, 'questioned_costs': False, 'repeat_finding': False, 'finding_ref_number': '2022-004', 'prior_finding_ref_numbers': None, 'type_requirement': 'E', 'audit_id': 35462956, 'audit_findings_id': 3066221, 'audit_year': '2022', 'dbkey': '231001', 'is_public': True, 'findings_text_id': [70], 'general_id': [14116]}
+
+------
+ERRORS
+------
+1. None is not of type 'string'
+
+Failed validating 'type' in schema['properties']['prior_finding_ref_numbers']:
+    {'type': 'string'}
+
+On instance['prior_finding_ref_numbers']:
+    None
+
+
+
+
+-------------
+OBJECT id: 84
+-------------
+{'id': 84, 'modified_opinion': False, 'other_non_compliance': True, 'material_weakness': False, 'significant_deficiency': False, 'other_findings': False, 'questioned_costs': True, 'repeat_finding': False, 'finding_ref_number': '2022-002', 'prior_finding_ref_numbers': None, 'type_requirement': 'N', 'audit_id': 35462956, 'audit_findings_id': 3066219, 'audit_year': '2022', 'dbkey': '231001', 'is_public': True, 'findings_text_id': [68], 'general_id': [14116]}
+
+------
+ERRORS
+------
+1. None is not of type 'string'
+
+Failed validating 'type' in schema['properties']['prior_finding_ref_numbers']:
+    {'type': 'string'}
+
+On instance['prior_finding_ref_numbers']:
+    None
+
+
+
+
+-------------
+OBJECT id: 85
+-------------
+{'id': 85, 'modified_opinion': False, 'other_non_compliance': True, 'material_weakness': False, 'significant_deficiency': False, 'other_findings': False, 'questioned_costs': False, 'repeat_finding': False, 'finding_ref_number': '2022-003', 'prior_finding_ref_numbers': None, 'type_requirement': 'E', 'audit_id': 35462956, 'audit_findings_id': 3066220, 'audit_year': '2022', 'dbkey': '231001', 'is_public': True, 'findings_text_id': [67], 'general_id': [14116]}
+
+------
+ERRORS
+------
+1. None is not of type 'string'
+
+Failed validating 'type' in schema['properties']['prior_finding_ref_numbers']:
+    {'type': 'string'}
+
+On instance['prior_finding_ref_numbers']:
+    None
+
+
+
+
+-------------
+OBJECT id: 86
+-------------
+{'id': 86, 'modified_opinion': False, 'other_non_compliance': True, 'material_weakness': False, 'significant_deficiency': False, 'other_findings': False, 'questioned_costs': True, 'repeat_finding': False, 'finding_ref_number': '2022-004', 'prior_finding_ref_numbers': None, 'type_requirement': 'N', 'audit_id': 35469982, 'audit_findings_id': 3066231, 'audit_year': '2022', 'dbkey': '227114', 'is_public': True, 'findings_text_id': [73], 'general_id': [13361]}
+
+------
+ERRORS
+------
+1. None is not of type 'string'
+
+Failed validating 'type' in schema['properties']['prior_finding_ref_numbers']:
+    {'type': 'string'}
+
+On instance['prior_finding_ref_numbers']:
+    None
+
+
+
+
+-------------
+OBJECT id: 87
+-------------
+{'id': 87, 'modified_opinion': True, 'other_non_compliance': False, 'material_weakness': True, 'significant_deficiency': False, 'other_findings': False, 'questioned_costs': True, 'repeat_finding': False, 'finding_ref_number': '2022-001', 'prior_finding_ref_numbers': None, 'type_requirement': 'N', 'audit_id': 35469982, 'audit_findings_id': 3065498, 'audit_year': '2022', 'dbkey': '227114', 'is_public': True, 'findings_text_id': [75], 'general_id': [13361]}
+
+------
+ERRORS
+------
+1. None is not of type 'string'
+
+Failed validating 'type' in schema['properties']['prior_finding_ref_numbers']:
+    {'type': 'string'}
+
+On instance['prior_finding_ref_numbers']:
+    None
+
+
+
+
+-------------
+OBJECT id: 88
+-------------
+{'id': 88, 'modified_opinion': False, 'other_non_compliance': True, 'material_weakness': False, 'significant_deficiency': False, 'other_findings': False, 'questioned_costs': True, 'repeat_finding': False, 'finding_ref_number': '2022-003', 'prior_finding_ref_numbers': None, 'type_requirement': 'N', 'audit_id': 35469982, 'audit_findings_id': 3066230, 'audit_year': '2022', 'dbkey': '227114', 'is_public': True, 'findings_text_id': [74], 'general_id': [13361]}
+
+------
+ERRORS
+------
+1. None is not of type 'string'
+
+Failed validating 'type' in schema['properties']['prior_finding_ref_numbers']:
+    {'type': 'string'}
+
+On instance['prior_finding_ref_numbers']:
+    None
+
+
+
+
+-------------
+OBJECT id: 89
+-------------
+{'id': 89, 'modified_opinion': False, 'other_non_compliance': True, 'material_weakness': False, 'significant_deficiency': False, 'other_findings': False, 'questioned_costs': False, 'repeat_finding': False, 'finding_ref_number': '2022-002', 'prior_finding_ref_numbers': None, 'type_requirement': 'E', 'audit_id': 35469982, 'audit_findings_id': 3066229, 'audit_year': '2022', 'dbkey': '227114', 'is_public': True, 'findings_text_id': [76], 'general_id': [13361]}
+
+------
+ERRORS
+------
+1. None is not of type 'string'
+
+Failed validating 'type' in schema['properties']['prior_finding_ref_numbers']:
+    {'type': 'string'}
+
+On instance['prior_finding_ref_numbers']:
+    None
+
+
+
+
+-------------
+OBJECT id: 90
+-------------
+{'id': 90, 'modified_opinion': True, 'other_non_compliance': False, 'material_weakness': False, 'significant_deficiency': False, 'other_findings': False, 'questioned_costs': False, 'repeat_finding': False, 'finding_ref_number': '2022-001', 'prior_finding_ref_numbers': None, 'type_requirement': 'N', 'audit_id': 35481900, 'audit_findings_id': 3066201, 'audit_year': '2022', 'dbkey': '39286', 'is_public': True, 'findings_text_id': [117], 'general_id': [20090]}
+
+------
+ERRORS
+------
+1. None is not of type 'string'
+
+Failed validating 'type' in schema['properties']['prior_finding_ref_numbers']:
+    {'type': 'string'}
+
+On instance['prior_finding_ref_numbers']:
+    None
+
+
+
+
+-------------
+OBJECT id: 91
+-------------
+{'id': 91, 'modified_opinion': False, 'other_non_compliance': True, 'material_weakness': False, 'significant_deficiency': False, 'other_findings': False, 'questioned_costs': False, 'repeat_finding': False, 'finding_ref_number': '2022-001', 'prior_finding_ref_numbers': None, 'type_requirement': 'N', 'audit_id': 35481268, 'audit_findings_id': 3066125, 'audit_year': '2022', 'dbkey': '61398', 'is_public': True, 'findings_text_id': [126], 'general_id': [20686]}
+
+------
+ERRORS
+------
+1. None is not of type 'string'
+
+Failed validating 'type' in schema['properties']['prior_finding_ref_numbers']:
+    {'type': 'string'}
+
+On instance['prior_finding_ref_numbers']:
+    None
+
+
+
+
+-------------
+OBJECT id: 92
+-------------
+{'id': 92, 'modified_opinion': False, 'other_non_compliance': True, 'material_weakness': False, 'significant_deficiency': False, 'other_findings': False, 'questioned_costs': False, 'repeat_finding': False, 'finding_ref_number': '2022-002', 'prior_finding_ref_numbers': None, 'type_requirement': 'I', 'audit_id': 35481361, 'audit_findings_id': 3066127, 'audit_year': '2022', 'dbkey': '61398', 'is_public': True, 'findings_text_id': [125], 'general_id': [20686]}
+
+------
+ERRORS
+------
+1. None is not of type 'string'
+
+Failed validating 'type' in schema['properties']['prior_finding_ref_numbers']:
+    {'type': 'string'}
+
+On instance['prior_finding_ref_numbers']:
+    None
+
+
+
+
+-------------
+OBJECT id: 93
+-------------
+{'id': 93, 'modified_opinion': False, 'other_non_compliance': False, 'material_weakness': False, 'significant_deficiency': True, 'other_findings': False, 'questioned_costs': False, 'repeat_finding': False, 'finding_ref_number': '2022-001', 'prior_finding_ref_numbers': None, 'type_requirement': 'I', 'audit_id': 35470562, 'audit_findings_id': 3065516, 'audit_year': '2022', 'dbkey': '68359', 'is_public': True, 'findings_text_id': [156], 'general_id': [20873]}
+
+------
+ERRORS
+------
+1. None is not of type 'string'
+
+Failed validating 'type' in schema['properties']['prior_finding_ref_numbers']:
+    {'type': 'string'}
+
+On instance['prior_finding_ref_numbers']:
+    None
+
+
+
+
+-------------
+OBJECT id: 94
+-------------
+{'id': 94, 'modified_opinion': False, 'other_non_compliance': False, 'material_weakness': False, 'significant_deficiency': True, 'other_findings': False, 'questioned_costs': False, 'repeat_finding': False, 'finding_ref_number': '2022-001', 'prior_finding_ref_numbers': None, 'type_requirement': 'N', 'audit_id': 35472746, 'audit_findings_id': 3065685, 'audit_year': '2022', 'dbkey': '193671', 'is_public': True, 'findings_text_id': [177], 'general_id': [8883]}
+
+------
+ERRORS
+------
+1. None is not of type 'string'
+
+Failed validating 'type' in schema['properties']['prior_finding_ref_numbers']:
+    {'type': 'string'}
+
+On instance['prior_finding_ref_numbers']:
+    None
+
+
+
+
+-------------
+OBJECT id: 95
+-------------
+{'id': 95, 'modified_opinion': False, 'other_non_compliance': False, 'material_weakness': False, 'significant_deficiency': True, 'other_findings': False, 'questioned_costs': False, 'repeat_finding': False, 'finding_ref_number': '2022-001', 'prior_finding_ref_numbers': None, 'type_requirement': 'L', 'audit_id': 35684851, 'audit_findings_id': 3079512, 'audit_year': '2022', 'dbkey': '129822', 'is_public': True, 'findings_text_id': [772], 'general_id': [992]}
+
+------
+ERRORS
+------
+1. None is not of type 'string'
+
+Failed validating 'type' in schema['properties']['prior_finding_ref_numbers']:
+    {'type': 'string'}
+
+On instance['prior_finding_ref_numbers']:
+    None
+
+
+
+
+-------------
+OBJECT id: 96
+-------------
+{'id': 96, 'modified_opinion': False, 'other_non_compliance': False, 'material_weakness': False, 'significant_deficiency': True, 'other_findings': False, 'questioned_costs': False, 'repeat_finding': False, 'finding_ref_number': '2022-001', 'prior_finding_ref_numbers': None, 'type_requirement': 'L', 'audit_id': 35684850, 'audit_findings_id': 3079511, 'audit_year': '2022', 'dbkey': '129822', 'is_public': True, 'findings_text_id': [772], 'general_id': [992]}
+
+------
+ERRORS
+------
+1. None is not of type 'string'
+
+Failed validating 'type' in schema['properties']['prior_finding_ref_numbers']:
+    {'type': 'string'}
+
+On instance['prior_finding_ref_numbers']:
+    None
+
+
+
+
+-------------
+OBJECT id: 97
+-------------
+{'id': 97, 'modified_opinion': False, 'other_non_compliance': False, 'material_weakness': False, 'significant_deficiency': True, 'other_findings': False, 'questioned_costs': False, 'repeat_finding': False, 'finding_ref_number': '2022-001', 'prior_finding_ref_numbers': None, 'type_requirement': 'L', 'audit_id': 35684852, 'audit_findings_id': 3079513, 'audit_year': '2022', 'dbkey': '129822', 'is_public': True, 'findings_text_id': [772], 'general_id': [992]}
+
+------
+ERRORS
+------
+1. None is not of type 'string'
+
+Failed validating 'type' in schema['properties']['prior_finding_ref_numbers']:
+    {'type': 'string'}
+
+On instance['prior_finding_ref_numbers']:
+    None
+
+
+
+
+-------------
+OBJECT id: 98
+-------------
+{'id': 98, 'modified_opinion': False, 'other_non_compliance': False, 'material_weakness': False, 'significant_deficiency': True, 'other_findings': False, 'questioned_costs': False, 'repeat_finding': False, 'finding_ref_number': '2022-001', 'prior_finding_ref_numbers': None, 'type_requirement': 'L', 'audit_id': 35684853, 'audit_findings_id': 3079514, 'audit_year': '2022', 'dbkey': '129822', 'is_public': True, 'findings_text_id': [772], 'general_id': [992]}
+
+------
+ERRORS
+------
+1. None is not of type 'string'
+
+Failed validating 'type' in schema['properties']['prior_finding_ref_numbers']:
+    {'type': 'string'}
+
+On instance['prior_finding_ref_numbers']:
+    None
+
+
+
+
+-------------
+OBJECT id: 99
+-------------
+{'id': 99, 'modified_opinion': False, 'other_non_compliance': False, 'material_weakness': False, 'significant_deficiency': True, 'other_findings': False, 'questioned_costs': False, 'repeat_finding': False, 'finding_ref_number': '2022-001', 'prior_finding_ref_numbers': None, 'type_requirement': 'A', 'audit_id': 35696023, 'audit_findings_id': 3080131, 'audit_year': '2022', 'dbkey': '256049', 'is_public': True, 'findings_text_id': [778], 'general_id': [18463]}
+
+------
+ERRORS
+------
+1. None is not of type 'string'
+
+Failed validating 'type' in schema['properties']['prior_finding_ref_numbers']:
+    {'type': 'string'}
+
+On instance['prior_finding_ref_numbers']:
+    None
+
+
+
+
+-------------
+OBJECT id: 100
+-------------
+{'id': 100, 'modified_opinion': False, 'other_non_compliance': False, 'material_weakness': False, 'significant_deficiency': True, 'other_findings': False, 'questioned_costs': False, 'repeat_finding': False, 'finding_ref_number': '2022-001', 'prior_finding_ref_numbers': None, 'type_requirement': 'A', 'audit_id': 35696026, 'audit_findings_id': 3080132, 'audit_year': '2022', 'dbkey': '256049', 'is_public': True, 'findings_text_id': [778], 'general_id': [18463]}
+
+------
+ERRORS
+------
+1. None is not of type 'string'
+
+Failed validating 'type' in schema['properties']['prior_finding_ref_numbers']:
+    {'type': 'string'}
+
+On instance['prior_finding_ref_numbers']:
+    None
+
+
+
+
+-------------
+OBJECT id: 101
+-------------
+{'id': 101, 'modified_opinion': False, 'other_non_compliance': False, 'material_weakness': False, 'significant_deficiency': True, 'other_findings': False, 'questioned_costs': False, 'repeat_finding': False, 'finding_ref_number': '2022-001', 'prior_finding_ref_numbers': None, 'type_requirement': 'A', 'audit_id': 35696029, 'audit_findings_id': 3080133, 'audit_year': '2022', 'dbkey': '256049', 'is_public': True, 'findings_text_id': [778], 'general_id': [18463]}
+
+------
+ERRORS
+------
+1. None is not of type 'string'
+
+Failed validating 'type' in schema['properties']['prior_finding_ref_numbers']:
+    {'type': 'string'}
+
+On instance['prior_finding_ref_numbers']:
+    None
+
+
+
+failure_count: 80
