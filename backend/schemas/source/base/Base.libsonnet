@@ -1,3 +1,5 @@
+local Func = import 'Functions.libsonnet';
+
 local Const = {
   Y: 'Y',
   N: 'N',
@@ -70,7 +72,7 @@ local Validation = {
       },
       "then": {
         properties: {
-          additional_award_identification: Types.string{
+          additional_award_identification: Func.compound_type([Types.integer, Types.string]){
             minLength: 1,
           },
         },
@@ -124,7 +126,7 @@ local Enum = {
       Const.empty_array,
       Const.NULL,
     ],
-    title: 'EmptyString_Null',
+    title: 'EmptyString_EmptyArray_Null',
   },
   UnitedStatesStateAbbr: Types.string {
      'enum': [
@@ -233,13 +235,13 @@ local Enum = {
   ALNPrefixes: Types.string {
     description: 'Valid two-digit program numbers; part of the CFDA/ALN',
     enum: [
-      '1',
-      '2',
-      '3',
-      '4',
-      '7',
-      '8',
-      '9',
+      '01',
+      '02',
+      '03',
+      '04',
+      '07',
+      '08',
+      '09',
       '10',
       '11',
       '12',
@@ -300,6 +302,7 @@ local Enum = {
       '96',
       '97',
       '98',
+      '99',
     ],
   },
 };
@@ -377,7 +380,6 @@ local Compound = {
   NonEmptyString: Types.string {
     minLength: 1,
   },
-  StateClusterNameNonAnswers: Enum.EmptyString_Null,
   EmployerIdentificationNumber: Types.string {
       pattern: "^[0-9]{9}$",
   },
@@ -394,13 +396,6 @@ local type_zipcode = Types.string {
   pattern: REGEX_ZIPCODE,
 };
 
-
-local type_string_or_null = {
-  oneOf: [
-    Types.NULL,
-    Types.string,
-  ],
-};
 
 // No capital I or O, but lowercase is fine? FIXME check...
 local REGEX_UEI_ALPHA = 'A-H,J-N,P-Z,a-z';

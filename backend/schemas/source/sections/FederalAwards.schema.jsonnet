@@ -142,8 +142,6 @@ local Validations = {
           properties: {
             audit_report_type: Base.Enum.MajorProgramAuditReportType,
             number_of_audit_findings: Types.integer {
-              // minimum: 0,
-              // maximum: 0,
               const: 0,
             },
           },
@@ -215,10 +213,18 @@ local Parts = {
           },
         },
         'then': {
-          properties: {
-            state_cluster_name: Base.Compound.NonEmptyString,
-          },
-          required: ['state_cluster_name'],
+          allOf: [
+            {
+              properties: {
+                other_cluster_name: Base.Enum.EmptyString_Null,
+              },
+            },
+            {
+              properties: {
+                state_cluster_name: Base.Compound.NonEmptyString,
+              },
+            },
+          ],
         },
       },
       {
@@ -230,10 +236,18 @@ local Parts = {
           },
         },
         'then': {
-          properties: {
-            other_cluster_name: Base.Compound.NonEmptyString,
-          },
-          required: ['other_cluster_name'],
+          allOf: [
+            {
+              properties: {
+                other_cluster_name: Base.Compound.NonEmptyString,
+              },
+            },
+            {
+              properties: {
+                state_cluster_name: Base.Enum.EmptyString_Null,
+              },
+            },
+          ],
         },
       },
     ],
@@ -287,7 +301,8 @@ local Parts = {
     properties: {
       federal_agency_prefix: Base.Enum.ALNPrefixes,
       three_digit_extension: Base.Compound.ThreeDigitExtension,
-      additional_award_identification: Func.compound_type([Types.string, Types.NULL]),
+      additional_award_identification: Func.compound_type([Types.string, Types.NULL, Types.integer]),
+      // 20230525 HDMS FIXME: It seems this should be both a drop down and a free text field  (see details in  census xlsx)!!!
       program_name: Types.string,
       amount_expended: Types.number,
       federal_program_total: Types.number,
