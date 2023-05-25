@@ -213,6 +213,9 @@ local Parts = {
           },
         },
         'then': {
+          required: [
+          'state_cluster_name',
+          ],
           allOf: [
             {
               properties: {
@@ -236,6 +239,9 @@ local Parts = {
           },
         },
         'then': {
+          required: [
+          'other_cluster_name',
+          ],          
           allOf: [
             {
               properties: {

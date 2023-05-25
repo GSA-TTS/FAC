@@ -90,9 +90,9 @@
                     "subrecipient_amount": 32
                 },
                 "cluster": {
-                    "cluster_name": "STATE CLUSTER",
-                    "state_cluster_name": "Maine",
-                    "cluster_total": 123
+                  "cluster_name": "STATE CLUSTER",
+                  "state_cluster_name": "Maine",
+                  "cluster_total": 123
                 }
             }
         ]
