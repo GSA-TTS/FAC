@@ -79,14 +79,27 @@
                                  }
                               },
                               "then": {
-                                 "properties": {
-                                    "state_cluster_name": {
-                                       "minLength": 1,
-                                       "type": "string"
+                                 "allOf": [
+                                    {
+                                       "properties": {
+                                          "other_cluster_name": {
+                                             "description": "Empty string or null",
+                                             "enum": [
+                                                "",
+                                                "null"
+                                             ],
+                                             "title": "EmptyString_Null"
+                                          }
+                                       }
+                                    },
+                                    {
+                                       "properties": {
+                                          "state_cluster_name": {
+                                             "minLength": 1,
+                                             "type": "string"
+                                          }
+                                       }
                                     }
-                                 },
-                                 "required": [
-                                    "state_cluster_name"
                                  ]
                               }
                            },
@@ -99,14 +112,27 @@
                                  }
                               },
                               "then": {
-                                 "properties": {
-                                    "other_cluster_name": {
-                                       "minLength": 1,
-                                       "type": "string"
+                                 "allOf": [
+                                    {
+                                       "properties": {
+                                          "other_cluster_name": {
+                                             "minLength": 1,
+                                             "type": "string"
+                                          }
+                                       }
+                                    },
+                                    {
+                                       "properties": {
+                                          "state_cluster_name": {
+                                             "description": "Empty string or null",
+                                             "enum": [
+                                                "",
+                                                "null"
+                                             ],
+                                             "title": "EmptyString_Null"
+                                          }
+                                       }
                                     }
-                                 },
-                                 "required": [
-                                    "other_cluster_name"
                                  ]
                               }
                            }
@@ -191,7 +217,7 @@
                                           [ ],
                                           "null"
                                        ],
-                                       "title": "EmptyString_Null"
+                                       "title": "EmptyString_EmptyArray_Null"
                                     }
                                  }
                               }
@@ -412,7 +438,10 @@
                                  "properties": {
                                     "additional_award_identification": {
                                        "minLength": 1,
-                                       "type": "string"
+                                       "type": [
+                                          "integer",
+                                          "string"
+                                       ]
                                     }
                                  },
                                  "required": [
@@ -425,7 +454,8 @@
                            "additional_award_identification": {
                               "type": [
                                  "string",
-                                 "null"
+                                 "null",
+                                 "integer"
                               ]
                            },
                            "amount_expended": {
@@ -437,13 +467,13 @@
                            "federal_agency_prefix": {
                               "description": "Valid two-digit program numbers; part of the CFDA/ALN",
                               "enum": [
-                                 "1",
-                                 "2",
-                                 "3",
-                                 "4",
-                                 "7",
-                                 "8",
-                                 "9",
+                                 "01",
+                                 "02",
+                                 "03",
+                                 "04",
+                                 "07",
+                                 "08",
+                                 "09",
                                  "10",
                                  "11",
                                  "12",
@@ -503,7 +533,8 @@
                                  "94",
                                  "96",
                                  "97",
-                                 "98"
+                                 "98",
+                                 "99"
                               ],
                               "type": "string"
                            },
