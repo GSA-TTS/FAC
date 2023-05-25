@@ -48,8 +48,8 @@ Boundary(cloudgov, "Cloud.gov Boundary") {
 
 AddRelTag("authenticated", $lineColor="#008787", $textColor="#008787")
 Rel(User, django, "Submits/edits audits", $tags="authenticated")
+Rel(User, dap, "logs user visits data")
 Rel(Public, django, "Searches for/reads information")
-Rel(Agency, django, "Searches for/reads non-public information")
 Rel(Staff, django, "Manages audits, roles, content", $tags="authenticated")
 
 Rel(User, Login, "Authenticates with")
@@ -59,21 +59,21 @@ Rel(AgencyApp, datagov, "Routes requests through")
 
 
 Rel(datagov, api, "Searches, filters, requests audit", "via api.data.gov", $tags="authenticated")
-Rel(Login, backend, "Provides identities", "email address")
+Rel(Login, django, "Autheniticated", "email address")
 
 Rel(api, db, "Fetches (read-only) Audits")
 Rel(api, s3, "Fetches (read-only) Audit Attachments")
 
-Rel(django, https_proxy, "Looks up UEI info")
+Rel(django, https_proxy, "Uses external services (Clam DB, SAM.gov, New Relic)")
 Rel(https_proxy, samgov, "Looks up UEI info")
+Rel(https_proxy, clamav, "retrievesvulnerability data")
+Rel(https_proxy, relic, "logs telemetry data")
 Rel(django, mail_proxy, "Sends emails using")
 Rel(mail_proxy, Email, "Sends emails using")
 Rel(django, scan, "Scans attachments")
 Rel(django, db, "read/write")
-Rel(backend, s3, "Stores single audit packages/Excel files")
-Rel(django, relic, "logs telemetry data")
-Rel(django, dap, "logs user visits data")
-Rel(scan, clamav, "retrievesvulnerability checke")
+Rel(django, s3, "Stores single audit packages/Excel files")
+Rel(django, api, "Handles search requests")
 
 @enduml
 ```
