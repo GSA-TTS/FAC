@@ -36,6 +36,7 @@ begin
         to anon;
 
         -- Grant access to sequences, if we have them
+        grant usage on schema api to anon;
         grant select, usage on all sequences in schema api to anon;
         alter default privileges
             in schema api
