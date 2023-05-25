@@ -1,0 +1,25 @@
+{
+    "id": 0,
+    "cpa_phone": 0,
+    "cpa_fax": 0,
+    "cpa_state": "st",
+    "cpa_city": "string",
+    "cpa_title": "string",
+    "cpa_street1": "string",
+    "cpa_street2": "string",
+    "cpa_zip_code": "string",
+    "cpa_contact": "string",
+    "cpa_email": "string",
+    "cpa_firm_name": "string",
+    "cpa_ein": 0,
+    "sequence_number": 0,
+    "is_public": true,
+    "cpa_country": "string",
+    "cpa_foreign": "string",
+    "general_id": [
+        0
+    ],
+    "secondary_auditor_general_id": [
+        0
+    ]
+}

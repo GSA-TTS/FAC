@@ -5,6 +5,7 @@ Then unzip the files and place the them in data_distro/data_to_load/
 
 Load them with: manage.py public_data_loader
 """
+import json 
 from django.core.management.base import BaseCommand
 
 from data_distro.api_tests import (
@@ -53,16 +54,35 @@ class Command(BaseCommand):
                         ).run()
         if len(result_set) == 0:
             print(f"No results: {result_set}")
+
         for obj in result_set:
             validation_result = schemas.validate_api_object(kwargs["view"], obj)
-            if validation_result is not None:
-                validation_errors.append({"object": obj, "error": validation_result})
-                failure_count += 1
+            
+            item_errors = []
+            for e in validation_result:
+                    item_errors.append(e)
+                    failure_count += 1
+
+            if any(item_errors):
+                validation_errors.append({"object": obj, "error": item_errors})
 
         for oe in validation_errors:
-            print(f"OBJECT\n------")
-            print(oe["object"])
-            print(f"\nERROR\n-----")
-            print(oe["error"])
-            print()
+            oe_id = oe["object"]["id"]
+            messages = ""
+            for k, error in enumerate(oe["error"]):
+                messages += f"{k+1}. {error}\n\n"
+            
+            content = """
+-------------
+OBJECT id: {oe_id}
+-------------
+{oe_object}
+
+------
+ERRORS
+------
+{messages}
+"""
+
+            print(content.format( oe_id=oe_id, oe_object=oe["object"], messages=messages))
         return f"failure_count: {failure_count}"

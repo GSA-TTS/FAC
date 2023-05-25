@@ -1,0 +1,13 @@
+{
+    "id": 0,
+    "charts_tables": true,
+    "finding_ref_number": "string",
+    "sequence_number": 0,
+    "text": "string",
+    "dbkey": "string",
+    "audit_year": "string",
+    "is_public": true,
+    "general_id": [
+        0
+    ]
+}

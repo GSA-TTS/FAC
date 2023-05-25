@@ -1,0 +1,26 @@
+{
+    "id": 0,
+    "findings": "string",
+    "revision_id": 0,
+    "federal_awards": "string",
+    "general_info_explain": "string",
+    "federal_awards_explain": "string",
+    "notes_to_sefa_explain": "string",
+    "audit_info_explain": "string",
+    "findings_explain": "string",
+    "findings_text_explain": "string",
+    "cap_explain": "string",
+    "other_explain": "string",
+    "audit_info": "string",
+    "notes_to_sefa": "string",
+    "findings_text": "string",
+    "cap": "string",
+    "other": "string",
+    "general_info": "string",
+    "audit_year": "string",
+    "dbkey": "string",
+    "is_public": true,
+    "general_id": [
+        0
+    ]
+}

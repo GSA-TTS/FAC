@@ -1,0 +1,24 @@
+{
+    "id": 0,
+    "modified_opinion": true,
+    "other_non_compliance": true,
+    "material_weakness": true,
+    "significant_deficiency": true,
+    "other_findings": true,
+    "questioned_costs": true,
+    "repeat_finding": true,
+    "finding_ref_number": "string",
+    "prior_finding_ref_numbers": "string",
+    "type_requirement": "string",
+    "audit_id": 0,
+    "audit_findings_id": 0,
+    "audit_year": "string",
+    "dbkey": "string",
+    "is_public": true,
+    "findings_text_id": [
+        0
+    ],
+    "general_id": [
+        0
+    ]
+}
