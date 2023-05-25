@@ -235,13 +235,6 @@ local Enum = {
   ALNPrefixes: Types.string {
     description: 'Valid two-digit program numbers; part of the CFDA/ALN',
     enum: [
-      '01',
-      '02',
-      '03',
-      '04',
-      '07',
-      '08',
-      '09',
       '10',
       '11',
       '12',
