@@ -51,8 +51,8 @@ variable "denylist" {
   }
 }
 
-variable "https_proxy_instances" {
+variable "instances" {
   type        = number
-  description = "the number of instances of the egress application to run (default: 2)"
+  description = "the number of instances of the HTTPS proxy application to run (default: 2)"
   default     = 2
 }

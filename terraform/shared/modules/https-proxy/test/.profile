@@ -2,7 +2,7 @@
 
 set -e
 
-# Configure vars for egress-proxy
+# Configure vars for https-proxy
 export SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt
 export REQUESTS_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt
 

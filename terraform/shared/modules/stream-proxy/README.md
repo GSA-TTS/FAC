@@ -1,32 +1,28 @@
-# Egress proxy Terraform module
+# stream egress proxy Terraform module
 
 ## Usage
 
+This example proxies connections to an upstream SMTP relay
+
 ```
-module "egress-proxy" {
+module "smtp-proxy" {
   source = "<path to module>"
 
-  name          = "egress"
+  name          = "smtp-proxy"
   cf_org_name   = local.cf_org_name
   cf_space_name = local.cf_space_name
   client_space  = local.cf_space_name
 
-  allowlist = {
-    client1 = ["*.sam.gov:443", "*.login.gov:443"],
-    client2 = ["gsa.gov:443"],
-  }
-  denylist = {
-    client1 = ["bad.sam.gov:443", "verybad.login.gov:443"],
-    client2 = ["sobad.gsa.gov:443"]
-  }
+  upstream = "smtp-relay.gmail.com:587"
+  clients = [ "app1" ]
 }
 ```
 
-Credentials and route for the proxy are stored in the `egress-creds` service in the client space.
+Credentials and route for the proxy are stored in the `${name}-creds` user-provided service instance in the client space.
 
 > **Note**
 > 
-> It's up to you to bind the `egress-creds` service to the clients, read the credentials from `VCAP_SERVICES`, and configure your app appropriately to use the proxy!
+> It's up to you to bind the `${name}-creds` service to the clients, read the credentials from `VCAP_SERVICES`, and configure your app appropriately to use the proxy!
 
 ## Deployment architecture
 
@@ -40,19 +36,18 @@ Credentials and route for the proxy are stored in the `egress-creds` service in 
           }
 
           Boundary(public_egress, "egress-permitted space", "public-egress ASG") {
-            System(https_proxy, "web egress proxy", "proxy for HTTP/S connections")
+            System(stream_proxy, "stream proxy", "proxy for TCP connections")
           }
       }
       
       Boundary(external_boundary, "external boundary") {
-        System_Ext(external_service, "external service", "service that the application relies on")
+        System_Ext(external_relay, "external relay", "TCP service that the application relies on")
       }
 
       Rel(credentials, client1, "delivers credentials", "VCAP_SERVICES")
-      Rel(client1, https_proxy, "makes request", "HTTP/S")
-      Rel(https_proxy, external_service, "proxies request", "HTTP/S")
+      Rel(client1, stream_proxy, "makes connection", "TCP")
+      Rel(stream_proxy, external_relay, "proxies connection", "TCP")
 ```
-
 
 1. Creates an egress proxy in the designated space
 2. Adds network-policies so that clients can reach the proxy
@@ -61,6 +56,4 @@ Credentials and route for the proxy are stored in the `egress-creds` service in 
 ## TODO
 
 * Once it's possible, [create the UPSI in the egress space and share it to the client space](https://github.com/cloudfoundry-community/terraform-provider-cloudfoundry/issues/481)
-* Support multiple client spaces (maybe a map of allowlist and denylist entries per space?)
-* Pay attention to the port number; right now it's ignored (the proxy has a fixed set of ports in the config file)
-* Pay attention to the client ID; right now allow/deny are a union across all client apps
+* Require use of a username/password (currently network policies prevent unwanted access)
