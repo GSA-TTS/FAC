@@ -5,18 +5,14 @@ local Types = Base.Types;
 {
   '$defs': {
     AuditPeriod: Base.Enum.AuditPeriod,
-    EIN: Base.Compound.EmployerIdentificationNumber + Types.string_or_null,
-    Phone: Types.string {
-      pattern: '^^(\\+0?1\\s)?\\(?\\d{3}\\)?[\\s.-]?\\d{3}[\\s.-]?\\d{4}$',
-    },
+    EIN: Func.join_types(Base.Compound.EmployerIdentificationNumber, [Types.NULL]),
+    Phone: Base.Compound.UnitedStatesPhone,
     State: Base.Enum.UnitedStatesStateAbbr {
       title: 'State',
     },
-    UEI: Base.Compound.UniqueEntityIdentifier + Types.string_or_null,
+    UEI: Func.join_types(Base.Compound.UniqueEntityIdentifier, [Types.NULL]),
     UserProvidedOrganizationType: Base.Enum.OrganizationType,
-    Zip: Types.string {
-      pattern: '^[0-9]{5}(?:-[0-9]{4})?$',
-    },
+    Zip: Base.Compound.Zip,
   },
   '$id': 'http://example.org/generalinformation',
   '$schema': 'http://json-schema.org/draft/2019-09/schema#',
@@ -48,7 +44,7 @@ local Types = Base.Types;
     auditee_fiscal_period_start: Types.string {
       format: 'date',
     },
-    auditee_name: Types.string_or_null,
+    auditee_name: Func.compound_type([Types.string, Types.NULL]),
     auditee_phone: {
       '$ref': '#/$defs/Phone',
     },
@@ -79,7 +75,7 @@ local Types = Base.Types;
     auditor_ein: {
       '$ref': '#/$defs/EIN',
     },
-    auditor_ein_not_an_ssn_attestation: Types.boolean_or_null,
+    auditor_ein_not_an_ssn_attestation: Func.compound_type([Types.boolean, Types.NULL]),
     auditor_email: Types.string {
       format: 'email',
     },
@@ -96,11 +92,11 @@ local Types = Base.Types;
     ein: {
       '$ref': '#/$defs/EIN',
     },
-    ein_not_an_ssn_attestation: Types.boolean_or_null,
+    ein_not_an_ssn_attestation: Func.compound_type([Types.boolean, Types.NULL]),
     is_usa_based: Types.boolean,
     met_spending_threshold: Types.boolean,
-    multiple_eins_covered: Types.boolean_or_null,
-    multiple_ueis_covered: Types.boolean_or_null,
+    multiple_eins_covered: Func.compound_type([Types.boolean, Types.NULL]),
+    multiple_ueis_covered: Func.compound_type([Types.boolean, Types.NULL]),
     user_provided_organization_type: {
       '$ref': '#/$defs/UserProvidedOrganizationType',
     },

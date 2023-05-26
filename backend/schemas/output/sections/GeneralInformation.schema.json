@@ -13,8 +13,8 @@
       "EIN": {
          "pattern": "^[0-9]{9}$",
          "type": [
-            "string",
-            "null"
+            "null",
+            "string"
          ]
       },
       "Phone": {
@@ -80,8 +80,8 @@
       "UEI": {
          "pattern": "^$|^[a-hj-np-zA-HJ-NP-Z1-9][a-hj-np-zA-HJ-NP-Z0-9]{11}$",
          "type": [
-            "string",
-            "null"
+            "null",
+            "string"
          ]
       },
       "UserProvidedOrganizationType": {

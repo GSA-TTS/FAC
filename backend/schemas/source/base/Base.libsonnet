@@ -21,8 +21,6 @@ local Types = {
   number: { type: 'number' },
   NULL: { type: Const.NULL },
   boolean: { type: 'boolean' },
-  boolean_or_null: { type: ['boolean', 'null'] },
-  string_or_null: { type: ['string', 'null'] },
 };
 
 // Support components for the Meta object.
@@ -63,22 +61,22 @@ local Meta = {
 local Validation = {
   AdditionalAwardIdentificationValidation: [
     {
-      "if": {
+      'if': {
         properties: {
           three_digit_extension: {
             pattern: '^(RD|U[0-9]{2})$',
           },
-          },
+        },
       },
-      "then": {
+      'then': {
         properties: {
-          additional_award_identification: Func.compound_type([Types.integer, Types.string]){
+          additional_award_identification: Func.compound_type([Types.integer, Types.string]) {
             minLength: 1,
           },
         },
-        required: ['additional_award_identification'] 
+        required: ['additional_award_identification'],
       },
-    },   
+    },
   ],
 };
 
@@ -129,75 +127,75 @@ local Enum = {
     title: 'EmptyString_EmptyArray_Null',
   },
   UnitedStatesStateAbbr: Types.string {
-     'enum': [
-        'AL',
-        'AK',
-        'AZ',
-        'AR',
-        'CA',
-        'CO',
-        'CT',
-        'DE',
-        'FL',
-        'GA',
-        'HI',
-        'ID',
-        'IL',
-        'IN',
-        'IA',
-        'KS',
-        'KY',
-        'LA',
-        'ME',
-        'MD',
-        'MA',
-        'MI',
-        'MN',
-        'MS',
-        'MO',
-        'MT',
-        'NE',
-        'NV',
-        'NH',
-        'NJ',
-        'NM',
-        'NY',
-        'NC',
-        'ND',
-        'OH',
-        'OK',
-        'OR',
-        'PA',
-        'RI',
-        'SC',
-        'SD',
-        'TN',
-        'TX',
-        'UT',
-        'VT',
-        'VA',
-        'WA',
-        'WV',
-        'WI',
-        'WY'
-     ],
+    enum: [
+      'AL',
+      'AK',
+      'AZ',
+      'AR',
+      'CA',
+      'CO',
+      'CT',
+      'DE',
+      'FL',
+      'GA',
+      'HI',
+      'ID',
+      'IL',
+      'IN',
+      'IA',
+      'KS',
+      'KY',
+      'LA',
+      'ME',
+      'MD',
+      'MA',
+      'MI',
+      'MN',
+      'MS',
+      'MO',
+      'MT',
+      'NE',
+      'NV',
+      'NH',
+      'NJ',
+      'NM',
+      'NY',
+      'NC',
+      'ND',
+      'OH',
+      'OK',
+      'OR',
+      'PA',
+      'RI',
+      'SC',
+      'SD',
+      'TN',
+      'TX',
+      'UT',
+      'VT',
+      'VA',
+      'WA',
+      'WV',
+      'WI',
+      'WY',
+    ],
   },
   AuditPeriod: Types.string {
-     description: 'Period type of audit being submitted',
-     enum: [
-        'annual',
-        'biennial',
-        'other'
-     ],
-     title: 'AuditPeriod',
+    description: 'Period type of audit being submitted',
+    enum: [
+      'annual',
+      'biennial',
+      'other',
+    ],
+    title: 'AuditPeriod',
   },
   AuditType: Types.string {
-      description: 'Type of audit being submitted',
-      enum: [
-          'program-specific',
-          'single-audit',
-      ],
-      title: 'AuditType',
+    description: 'Type of audit being submitted',
+    enum: [
+      'program-specific',
+      'single-audit',
+    ],
+    title: 'AuditType',
   },
   MajorProgramAuditReportType: Types.string {
     description: 'Major program report types',
@@ -300,12 +298,24 @@ local Enum = {
   },
 };
 
+local simple_phone_regex = '[1-9]{1}[0-9]{9}+';
+local phone_regex = '^^(\\+0?1\\s)?\\(?\\d{3}\\)?[\\s.-]?\\d{3}[\\s.-]?\\d{4}$';
+local e164_regex = '^\\+[0-9]{1,3}[ ]*[0-9]{2,3}[ ]*[0-9]{2,3}[ ]*[0-9]{4}|^\\+[0-9]{1,3}[ ]*[0-9]{1,14}([ ]*[0-9]{1,13})?|^\\([0-9]{3}\\)[ ]*[0-9]{3}[ ]*[0-9]{4}?';
+local email_regex = "^[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?\\.)+[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?$";
+
+
+local REGEX_ZIPCODE = '^[0-9]{5}(?:-[0-9]{4})?$';
+local REGEX_DBKEY = '[1-9][0-9]+';
+local type_zipcode = Types.string {
+  pattern: REGEX_ZIPCODE,
+};
+
 local Compound = {
   ThreeDigitExtension: Types.string {
     title: 'ThreeDigitExtension',
     description: 'Three Digit Extension',
     pattern: '^(RD|[0-9]{3}[A-Za-z]{0,1}|U[0-9]{2})$',
-  },  
+  },
   PriorReferences: Types.string {
     title: 'PriorReferences',
     description: 'Prior references',
@@ -320,7 +330,7 @@ local Compound = {
     title: 'ComplianceRequirement',
     description: 'Compliance requirement type',
     pattern: '^A?B?C?E?F?G?H?I?J?L?M?N?P?$',
-  },  
+  },
   ClusterName: Types.string {
     description: 'Cluster Name',
     enum: [
@@ -374,19 +384,16 @@ local Compound = {
     minLength: 1,
   },
   EmployerIdentificationNumber: Types.string {
-      pattern: "^[0-9]{9}$",
+    pattern: '^[0-9]{9}$',
   },
   UniqueEntityIdentifier: Types.string {
-      pattern: "^$|^[a-hj-np-zA-HJ-NP-Z1-9][a-hj-np-zA-HJ-NP-Z0-9]{11}$",
-  }
+    pattern: '^$|^[a-hj-np-zA-HJ-NP-Z1-9][a-hj-np-zA-HJ-NP-Z0-9]{11}$',
+  },
+  UnitedStatesPhone: Types.string {
+    pattern: phone_regex,
+  },
+  Zip: type_zipcode,
 
-};
-
-local REGEX_ZIPCODE = '^[0-9]{5}([0-9]{4})?$';
-local REGEX_DBKEY = '[1-9][0-9]+';
-
-local type_zipcode = Types.string {
-  pattern: REGEX_ZIPCODE,
 };
 
 
@@ -445,8 +452,8 @@ local SchemaBase = Types.object {
   Atoms: Atoms,
   Meta: Meta,
   Enum: Enum,
-  Compound: Compound + {
-    UEI: type_uei
+  Compound: Compound {
+    UEI: type_uei,
   },
   Validation: Validation,
   SchemaBase: SchemaBase,
