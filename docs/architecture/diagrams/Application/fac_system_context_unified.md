@@ -10,10 +10,12 @@ Person(Staff, "User", "FAC Staff")
 Person(AgencyApp, "App", "Agency App")
 
 note as EncryptionNote
-All connections depicted are encrypted with TLS 1.2 unless otherwise noted. 
+All connections depicted are encrypted with TLS 1.2. 
 end note
 note as PortsNote
-All connextions are on port 443 and use https unles otherwise noted.
+All connextions are on port 443 and use https except the following
+which use different ports as noted in the diagram:
+FAC Web App, PostgREST, ClamAV and PostgreSQL.
 end note
 
 
@@ -22,8 +24,8 @@ Boundary(cloudgov, "Cloud.gov Boundary") {
         Boundary(backend, "FAC application", "egress-controlled-space") {
             System(django, "FAC Web App", "port 8080") 
             Boundary(services, "FAC Services") {
-                System(api, "REST API", "PostgREST")
-                System(scan, "Virus Scanner", "ClamAV")
+                System(api, "REST API", "PostgREST, port 3000")
+                System(scan, "Virus Scanner", "ClamAV, port 8080")
             }
         }
         Boundary(proxy, "Proxy services", "egress-permitted-space"){
@@ -40,7 +42,7 @@ Boundary(cloudgov, "Cloud.gov Boundary") {
     System(Login, "Login.gov", "ID provider")
     System(datagov, "api.data.gov", "Access Provider")
     System(samgov, "SAM.gov", "UEI Source")
-    System(Email, "GSA Email")
+    System(Email, "GSA Email, port 587")
     System(relic, "New Relic", "Telemetry site")
     System(dap, "DAP", "Access abalytics")
     System(clamav, "ClamAv Provider", "Vulnerability data provider")
