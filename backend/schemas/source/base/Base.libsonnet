@@ -310,6 +310,43 @@ local type_zipcode = Types.string {
   pattern: REGEX_ZIPCODE,
 };
 
+// UEIs are not case-sensitive, but we will upper-case all UEIs and store them
+// as uppercase-only, so we're only dealing with uppercase letters in these patterns.
+// This is not a *complete* UEI validator.
+// However, it is a start of one.
+// The UEI rules we know of are broken out so that all of the rules must apply.
+
+// No I or O allowed.
+local REGEX_UEI_ALPHA = 'A-H,J-N,P-Z';
+local REGEX_UEI_LEADING_CLOISTER = '[' + REGEX_UEI_ALPHA + ',1-9]';
+local REGEX_UEI_BODY_CLOISTER = '[' + REGEX_UEI_ALPHA + ',0-9]';
+
+local type_uei = Types.string {
+  allOf: [
+    // Is a string
+    {
+      minLength: 12,
+      maxLength: 12,
+    },
+    {
+      pattern: '^'
+               + REGEX_UEI_LEADING_CLOISTER
+               + REGEX_UEI_BODY_CLOISTER
+               + '+$',
+    },
+    // Does not have 9 digits in a row
+    {
+      pattern: '^(?!'
+               + REGEX_UEI_LEADING_CLOISTER
+               + '+'
+               + REGEX_UEI_BODY_CLOISTER
+               + '*?[0-9]{9})'
+               + REGEX_UEI_BODY_CLOISTER
+               + '*$',
+    },
+  ],
+};
+
 local Compound = {
   ThreeDigitExtension: Types.string {
     title: 'ThreeDigitExtension',
@@ -386,55 +423,13 @@ local Compound = {
   EmployerIdentificationNumber: Types.string {
     pattern: '^[0-9]{9}$',
   },
-  UniqueEntityIdentifier: Types.string {
-    pattern: '^$|^[a-hj-np-zA-HJ-NP-Z1-9][a-hj-np-zA-HJ-NP-Z0-9]{11}$',
-  },
+  UniqueEntityIdentifier: type_uei,
   UnitedStatesPhone: Types.string {
     pattern: phone_regex,
   },
   Zip: type_zipcode,
 
 };
-
-
-// No capital I or O, but lowercase is fine? FIXME check...
-local REGEX_UEI_ALPHA = 'A-H,J-N,P-Z,a-z';
-local REGEX_UEI_LEADING_CLOISTER = '[' + REGEX_UEI_ALPHA + ',1-9]';
-local REGEX_UEI_BODY_CLOISTER = '[' + REGEX_UEI_ALPHA + ',0-9]';
-
-// This may not be a *complete* UEI validator.
-// However, it is a start of one. The UEI rules are broken
-// out so that all of the rules must apply.
-local type_uei = Types.string {
-  allOf: [
-    // Is a string
-    {
-      minLength: 12,
-      maxLength: 12,
-    },
-    // Is alphanumeric, but no I or O
-    {
-      pattern: '^'
-               + REGEX_UEI_LEADING_CLOISTER
-               + REGEX_UEI_BODY_CLOISTER
-               + '+$',
-    },
-    // Does not have 9 digits in a row
-    {
-      pattern: '^(?!'
-               + REGEX_UEI_LEADING_CLOISTER
-               + '+'
-               + REGEX_UEI_BODY_CLOISTER
-               + '*?[0-9]{9})'
-               + REGEX_UEI_BODY_CLOISTER
-               + '*$',
-    },
-  ],
-};
-
-local phone_regex = '[1-9]{1}[0-9]{9}+';
-local e164_regex = '^\\+[0-9]{1,3}[ ]*[0-9]{2,3}[ ]*[0-9]{2,3}[ ]*[0-9]{4}|^\\+[0-9]{1,3}[ ]*[0-9]{1,14}([ ]*[0-9]{1,13})?|^\\([0-9]{3}\\)[ ]*[0-9]{3}[ ]*[0-9]{4}?';
-local email_regex = '^[a-zA-Z0-9!#$%&\'*+/=?^_`{|}~-]+(?:\\.[a-zA-Z0-9!#$%&\'*+/=?^_`{|}~-]+)*@(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?\\.)+[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?$';
 
 
 local SchemaBase = Types.object {

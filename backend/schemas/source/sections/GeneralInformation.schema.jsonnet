@@ -10,7 +10,7 @@ local Types = Base.Types;
     State: Base.Enum.UnitedStatesStateAbbr {
       title: 'State',
     },
-    UEI: Func.join_types(Base.Compound.UniqueEntityIdentifier, [Types.NULL]),
+    UEI: Base.Compound.UniqueEntityIdentifier,
     UserProvidedOrganizationType: Base.Enum.OrganizationType,
     Zip: Base.Compound.Zip,
   },
