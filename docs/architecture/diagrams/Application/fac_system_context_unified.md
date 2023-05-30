@@ -64,7 +64,7 @@ Rel(datagov, api, "Searches, filters, requests audit", "via api.data.gov", $tags
 Rel(Login, django, "Autheniticated", "email address")
 
 Rel(api, db, "Fetches (read-only) Audits")
-Rel(api, s3, "Fetches (read-only) Audit Attachments")
+Rel(AgencyApp, s3, "Fetches (read-only) PDF Docs")
 
 Rel(django, https_proxy, "Uses external services (Clam DB, SAM.gov, New Relic)")
 Rel(https_proxy, samgov, "Looks up UEI info")
