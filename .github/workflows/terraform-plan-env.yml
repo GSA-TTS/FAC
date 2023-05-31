@@ -16,7 +16,7 @@ jobs:
       postgrest: ${{ steps.read-version.outputs.TF_VAR_postgrest_image }}
       clamav: ${{ steps.read-version.outputs.TF_VAR_clamav_image }}
     env:
-      GH_REPO: gsa-tts/fac
+      GH_REPO: ghcr.io/gsa-tts/fac
 
 
     steps:
