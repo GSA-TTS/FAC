@@ -344,6 +344,10 @@ local type_uei = Types.string {
                + REGEX_UEI_BODY_CLOISTER
                + '*$',
     },
+    // Does not start with 9 digits in a row
+    {
+      pattern: "^(?![0-9]{9})"
+    }
   ],
 };
 

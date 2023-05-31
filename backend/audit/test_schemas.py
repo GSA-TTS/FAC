@@ -148,6 +148,9 @@ class GeneralInformationSchemaValidityTest(SimpleTestCase):
         zero_start = f"0{''.join(choice(alpha_omit_oi) for i in range(11))}"
         with_punc = good_uei[:idx] + choice(string.punctuation) + good_uei[idx + 1 :]
         with_numlike = good_uei[:idx] + choice("ioIO") + good_uei[idx + 1 :]
+        digits_start = "123456789DEF"
+        digits_middle = "E123456789DE"
+        digits_end = "DEF123456789"
 
         bad_ueis_and_messages = [
             (too_short, f"'{too_short}' is too short"),
@@ -155,6 +158,9 @@ class GeneralInformationSchemaValidityTest(SimpleTestCase):
             (zero_start, "does not match"),
             (with_punc, "does not match"),
             (with_numlike, "does not match"),
+            (digits_start, "does not match"),
+            (digits_middle, "does not match"),
+            (digits_end, "does not match"),
         ]
 
         for bad_uei, message in bad_ueis_and_messages:
