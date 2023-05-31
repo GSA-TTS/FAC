@@ -2,6 +2,7 @@
 # here for CI/CD integration.
 import json
 import string
+from collections import deque
 from random import choice, randrange
 
 from django.conf import settings
@@ -148,9 +149,17 @@ class GeneralInformationSchemaValidityTest(SimpleTestCase):
         zero_start = f"0{''.join(choice(alpha_omit_oi) for i in range(11))}"
         with_punc = good_uei[:idx] + choice(string.punctuation) + good_uei[idx + 1 :]
         with_numlike = good_uei[:idx] + choice("ioIO") + good_uei[idx + 1 :]
-        digits_start = "123456789DEF"
-        digits_middle = "E123456789DE"
-        digits_end = "DEF123456789"
+
+        digits = "".join(choice(string.digits) for i in range(9))
+        three_chars = "".join(choice(string.ascii_uppercase) for i in range(3))
+        consecutive_base = deque(digits + three_chars)
+        digits_start = "".join(consecutive_base)
+        consecutive_base.rotate(1)
+        digits_middle1 = "".join(consecutive_base)
+        consecutive_base.rotate(1)
+        digits_middle2 = "".join(consecutive_base)
+        consecutive_base.rotate(1)
+        digits_end = "".join(consecutive_base)
 
         bad_ueis_and_messages = [
             (too_short, f"'{too_short}' is too short"),
@@ -159,7 +168,8 @@ class GeneralInformationSchemaValidityTest(SimpleTestCase):
             (with_punc, "does not match"),
             (with_numlike, "does not match"),
             (digits_start, "does not match"),
-            (digits_middle, "does not match"),
+            (digits_middle1, "does not match"),
+            (digits_middle2, "does not match"),
             (digits_end, "does not match"),
         ]
 
