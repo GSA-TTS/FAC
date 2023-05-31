@@ -1,8 +1,3 @@
-locals {
-  clam_name = "fac-av-${var.cf_space_name}"
-
-}
-
 module "database" {
   source = "github.com/18f/terraform-cloudgov//database?ref=v0.5.1"
 
