@@ -448,7 +448,7 @@ local SchemaBase = Types.object {
   Meta: Meta,
   Enum: Enum,
   Compound: Compound {
-    UEI: type_uei,
+    //UEI: type_uei,
   },
   Validation: Validation,
   SchemaBase: SchemaBase,

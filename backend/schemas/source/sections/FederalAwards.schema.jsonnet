@@ -344,7 +344,7 @@ local FederalAwardEntry = Types.object {
 local FederalAwards = Types.object {
   additionalProperties: false,
   properties: {
-    auditee_uei: Base.Compound.UEI,
+    auditee_uei: Base.Compound.UniqueEntityIdentifier,
     federal_awards: Types.array {
       items: FederalAwardEntry,
     },
