@@ -13,7 +13,7 @@ function vcap_get_service () {
   path="$2"
   echo $VCAP_SERVICES | jq --raw-output --arg service_name "$name" ".[][] | select(.name == \$service_name) | $path"
 }
-export https_proxy=$(vcap_get_service egress-creds .credentials.uri)
+export https_proxy=$(vcap_get_service https-egress-creds .credentials.uri)
 
 # Should fail via deny-all
 echo www.yahoo.com: $(curl -s -o /dev/null -I -L  -w "%{http_connect}" https://www.yahoo.com)
