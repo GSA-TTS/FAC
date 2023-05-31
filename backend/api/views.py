@@ -189,7 +189,10 @@ class UEIValidationFormView(APIView):
     """
 
     def post(self, request):
-        serializer = UEISerializer(data=request.data)
+        data = request.data
+        data["auditee_uei"] = data["auditee_uei"].upper()
+        serializer = UEISerializer(data=data)
+
         if serializer.is_valid():
             return Response(
                 {

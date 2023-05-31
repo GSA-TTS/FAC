@@ -54,7 +54,7 @@ local FindingsUniformGuidanceEntry = {
 local FindingsUniformGuidance = Types.object {
   additionalProperties: false,
   properties: {
-    auditee_uei: Base.Compound.UEI,
+    auditee_uei: Base.Compound.UniqueEntityIdentifier,
     findings_uniform_guidance_entries: Types.array {
       items: FindingsUniformGuidanceEntry,
     },
