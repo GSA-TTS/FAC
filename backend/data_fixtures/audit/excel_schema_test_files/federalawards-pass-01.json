@@ -7,7 +7,7 @@
                 "program": {
                     "federal_agency_prefix": "42",
                     "three_digit_extension": "RD",
-                    "additional_award_identification": "ANYTHING",
+                    "additional_award_identification": 1234,
                     "program_name": "MAIN PROGRAM",
                     "is_major": "N",
                     "audit_report_type": "",
@@ -59,9 +59,9 @@
                     "subrecipient_amount": 32
                 },
                 "cluster": {
-                    "cluster_name": "OTHER CLUSTER NOT LISTED ABOVE",
-                    "other_cluster_name": "Some name",
-                    "cluster_total": 123
+                  "cluster_name": "OTHER CLUSTER NOT LISTED ABOVE",
+                  "other_cluster_name": "Some name",
+                  "cluster_total": 123
                 }
             },
             {
@@ -90,9 +90,9 @@
                     "subrecipient_amount": 32
                 },
                 "cluster": {
-                    "cluster_name": "STATE CLUSTER",
-                    "state_cluster_name": "Maine",
-                    "cluster_total": 123
+                  "cluster_name": "STATE CLUSTER",
+                  "state_cluster_name": "Maine",
+                  "cluster_total": 123
                 }
             }
         ]
