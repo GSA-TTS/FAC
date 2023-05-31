@@ -49,7 +49,7 @@ jobs:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       TERRAFORM_PRE_RUN: |
           apt-get update
-          apt-get install -y zip
+          apt-get install -y zip python
       TF_VAR_postgrest_image: ${{ needs.fetch-versions.outputs.postgrest }}
       TF_VAR_clamav_image: ${{ needs.fetch-versions.outputs.clamav }}
 
