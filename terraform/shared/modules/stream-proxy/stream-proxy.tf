@@ -30,11 +30,19 @@ data "external" "proxyzip" {
   working_dir = path.module
 }
 
+# We use this module to ensure the hash we associate with our .zip file isn't
+# tainted by changing file modification times (eg when the code was last checked
+# out of git)
+module "path_hash" {
+  source = "github.com/claranet/terraform-path-hash?ref=v1.0.0"
+  path   = "${path.module}/app"
+}
+
 resource "cloudfoundry_app" "egress_app" {
   name             = var.name
   space            = data.cloudfoundry_space.egress_space.id
   path             = "${path.module}/${data.external.proxyzip.result.path}"
-  source_code_hash = filesha256("${path.module}/${data.external.proxyzip.result.path}")
+  source_code_hash = module.path_hash.result
   buildpack        = "nginx_buildpack"
   memory           = var.memory
   instances        = var.instances
