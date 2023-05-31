@@ -442,6 +442,7 @@ class GeneralInformationFormViewTests(TestCase):
         )
 
         data = {
+            "audit_type": "single-audit",
             "auditee_fiscal_period_start": "2021-11-01",
             "auditee_fiscal_period_end": "2022-11-01",
             "audit_period_covered": "biennial",

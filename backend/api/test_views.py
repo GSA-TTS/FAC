@@ -697,7 +697,7 @@ class SingleAuditChecklistViewTests(TestCase):
             ("audit_period_covered", "['annual', 'biennial', 'other']"),
             (
                 "user_provided_organization_type",
-                "['higher-ed', 'local', 'non-profit', 'none', 'state', 'tribal', 'unknown']",
+                "['state', 'local', 'tribal', 'higher-ed', 'non-profit', 'unknown', 'none']",
             ),
         ]
 
@@ -1306,9 +1306,11 @@ class SchemaViewTests(TestCase):
 
         self.client = APIClient()
 
-    def path(self, fiscal_year, type):
+    def path(self, fiscal_year, schema_type):
         """Convenience method to get the path for a particular year and schema type)"""
-        return reverse("schemas", kwargs={"fiscal_year": fiscal_year, "type": type})
+        return reverse(
+            "schemas", kwargs={"fiscal_year": fiscal_year, "schema_type": schema_type}
+        )
 
     def test_valid_fy_valid_type_returns_schema(self):
         """

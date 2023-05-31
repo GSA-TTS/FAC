@@ -39,7 +39,7 @@ services:
       - /src/node_modules
       - /src/staticfiles
   clamav-rest:
-    image: ajilaag/clamav-rest:20230220
+    image: ghcr.io/gsa-tts/fac/clamav:latest
     environment:
       - MAX_FILE_SIZE=25M
       - SIGNATURE_CHECKS=1
@@ -54,6 +54,19 @@ services:
       - SERVICES=s3
     volumes:
       - "localstack-vol:/tmp/localstack"
+  api:
+    image: ghcr.io/gsa-tts/fac/postgrest:latest
+    ports:
+      - "3000:3000"
+    expose:
+      - "3000"
+    environment:
+      PGRST_DB_URI: postgres://postgres@db:5432/postgres
+      PGRST_OPENAPI_SERVER_PROXY_URI: http://127.0.0.1:3000
+      PGRST_DB_ANON_ROLE: anon
+      PGRST_DB_SCHEMAS: api
+    depends_on:
+      - db
 volumes:
   postgres-data:
   localstack-vol:

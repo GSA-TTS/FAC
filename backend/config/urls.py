@@ -63,7 +63,7 @@ urlpatterns = [
         name="access-list",
     ),
     path(
-        "schemas/<str:fiscal_year>/<str:type>",
+        "schemas/<str:fiscal_year>/<str:schema_type>",
         views.SchemaView.as_view(),
         name="schemas",
     ),

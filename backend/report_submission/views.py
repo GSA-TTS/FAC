@@ -116,6 +116,7 @@ class GeneralInformationFormView(LoginRequiredMixin, View):
                 raise PermissionDenied("You do not have access to this audit.")
 
             context = {
+                "audit_type": sac.audit_type,
                 "auditee_fiscal_period_end": sac.auditee_fiscal_period_end,
                 "auditee_fiscal_period_start": sac.auditee_fiscal_period_start,
                 "audit_period_covered": sac.audit_period_covered,
@@ -168,14 +169,17 @@ class GeneralInformationFormView(LoginRequiredMixin, View):
 
             if form.is_valid():
                 general_information = sac.general_information
-
                 general_information.update(form.cleaned_data)
 
                 validate_general_information_json(general_information)
+                update = {"general_information": general_information}
 
-                SingleAuditChecklist.objects.filter(pk=sac.id).update(
-                    general_information=general_information
-                )
+                # audit_type is stored at the model root, not in the
+                # general_information JSON, so:
+                if general_information.get("audit_type"):
+                    update["audit_type"] = general_information["audit_type"]
+
+                SingleAuditChecklist.objects.filter(pk=sac.id).update(**update)
 
                 return redirect(
                     "/report_submission/federal-awards/{}".format(report_id)

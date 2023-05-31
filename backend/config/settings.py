@@ -9,12 +9,13 @@ https://docs.djangoproject.com/en/4.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.0/ref/settings/
 """
-import newrelic.agent
 from base64 import b64decode
 import os
 import json
 import environs
 from cfenv import AppEnv
+
+import newrelic.agent
 
 newrelic.agent.initialize()
 
@@ -117,7 +118,7 @@ ROOT_URLCONF = "config.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [os.path.join(BASE_DIR, "templates")],
+        "DIRS": [BASE_DIR / "templates"],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -180,7 +181,7 @@ STATICFILES_DIRS = [
     BASE_DIR / "static",
     # '/var/www/static/',
 ]
-STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
+STATIC_ROOT = BASE_DIR / "staticfiles"
 
 # CORS base
 CORS_ALLOWED_ORIGINS = [env.str("DJANGO_BASE_URL", "http://localhost:8000")]
@@ -361,10 +362,13 @@ REST_FRAMEWORK = {
 SAM_API_URL = "https://api.sam.gov/entity-information/v3/entities"
 SAM_API_KEY = secret("SAM_API_KEY")
 
-SCHEMAS_DIR = os.path.join("audit", "schemas")
-# 20230408 MCJ FIXME: Why are there "sections?"
-SECTION_SCHEMA_DIR = os.path.join("schemas", "sections")
-
+# Data/schema directories
+DATA_FIXTURES = BASE_DIR / "data_fixtures"
+AUDIT_TEST_DATA_ENTRY_DIR = DATA_FIXTURES / "audit" / "test_data_entries"
+AUDIT_SCHEMA_DIR = BASE_DIR / "schemas" / "output" / "audit"
+SECTION_SCHEMA_DIR = BASE_DIR / "schemas" / "output" / "sections"
+XLSX_TEMPLATE_JSON_DIR = BASE_DIR / "schemas" / "output" / "excel" / "json"
+XLSX_TEMPLATE_SHEET_DIR = BASE_DIR / "schemas" / "output" / "excel" / "xlsx"
 
 AV_SCAN_URL = env.str("AV_SCAN_URL", "")
 AV_SCAN_MAX_ATTEMPTS = 10
