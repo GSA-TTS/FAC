@@ -28,6 +28,45 @@ left join db on db.auditee_id=auditee.id
 ;
 
 
+-- vw_auditee_singleauditchecklist
+drop view if exists api.vw_auditee_singleauditchecklist;
+create view api.vw_auditee_singleauditchecklist as
+select
+    id,
+    --20230601 HDMS FIXME: Bellow is the list of missing fields from the original view
+    -- auditee_certify_name,
+    -- auditee_certify_title,
+    -- auditee_fax,
+    -- auditee_name_title,
+    -- auditee_street2,
+    -- duns_list,
+    -- uei_list,
+    -- is_public,
+    -- ein_subcode,
+    -- ein_list,
+    -- general_id,
+    -- dbkey,
+
+    (general_information ->> 'auditee_contact_name') as auditee_contact,
+    (general_information ->> 'auditee_email') as auditee_email,
+    (general_information ->> 'auditee_name') as auditee_name,
+    (general_information ->> 'auditee_phone') as auditee_phone,
+    (general_information ->> 'auditee_contact_title') as auditee_title,
+    (general_information ->> 'auditee_address_line_1') as auditee_street1,
+    (general_information ->> 'auditee_city') as auditee_city,
+    (general_information ->> 'auditee_state') as auditee_state,
+    (general_information ->> 'auditee_zip') as auditee_zip_code
+from audit_singleauditchecklist;
+
+
+-- drop view if exists api.vw_unified_auditee;
+-- create view api.vw_unified as
+-- select * from api.vw_auditee
+-- union all
+-- select * from api.vw_auditee_singleauditchecklist
+-- ;
+
+
 -- auditor
 drop view if exists api.vw_auditor;
 create view api.vw_auditor as
