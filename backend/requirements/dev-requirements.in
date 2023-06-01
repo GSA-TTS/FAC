@@ -1,6 +1,5 @@
 -c ../requirements.txt
 
-awscli-local
 bandit
 black
 coverage

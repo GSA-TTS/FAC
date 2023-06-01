@@ -10,9 +10,6 @@ asgiref==3.6.0 \
     # via
     #   -c ./requirements/../requirements.txt
     #   django
-awscli-local==0.20 \
-    --hash=sha256:8694445f4fcf11e1ed15c0cf47150b85f5904cc6f27ae8157043b89cf9f4b16a
-    # via -r ./requirements/dev-requirements.in
 bandit==1.7.5 \
     --hash=sha256:75665181dc1e0096369112541a056c59d1c5f66f9bb74a8d686c3c362b83f549 \
     --hash=sha256:bdfc739baa03b880c2d15d0431b31c658ffc348e907fe197e54e0389dd59e11e
@@ -44,19 +41,6 @@ black==23.3.0 \
     --hash=sha256:ec751418022185b0c1bb7d7736e6933d40bbb14c14a0abcf9123d1b159f98dd4 \
     --hash=sha256:f0bd2f4a58d6666500542b26354978218a9babcdc972722f4bf90779524515f3
     # via -r ./requirements/dev-requirements.in
-boto3==1.26.90 \
-    --hash=sha256:1d33abca60643d14f90a9e77d94085ebfd8f8bf8f157f582466f6b3a141bab8c \
-    --hash=sha256:f1123076445f93fa85bf7ee956ae33041f2e077a6824e31929cc56ad31aeffc1
-    # via
-    #   -c ./requirements/../requirements.txt
-    #   localstack-client
-botocore==1.29.90 \
-    --hash=sha256:1b8c1b8c366875e65d39237a296842b9c0ea33af2ba4a2771db2ba6aefa663ef \
-    --hash=sha256:2dbbc2c7d93ddefcf9896268597212d446e5d416fbceb1b12c793660fa9f83f3
-    # via
-    #   -c ./requirements/../requirements.txt
-    #   boto3
-    #   s3transfer
 build==0.10.0 \
     --hash=sha256:af266720050a66c893a6096a2f410989eeac74ff9a68ba194b3f6473e8e26171 \
     --hash=sha256:d5b71264afdb5951d6704482aac78de887c80691c52b88a9ad195983ca2c9269
@@ -173,13 +157,6 @@ html-void-elements==0.1.0 \
     --hash=sha256:784cf39db03cdeb017320d9301009f8f3480f9d7b254d0974272e80e0cb5e0d2 \
     --hash=sha256:931b88f84cd606fee0b582c28fcd00e41d7149421fb673e1e1abd2f0c4f231f0
     # via djlint
-jmespath==1.0.1 \
-    --hash=sha256:02e2e4cc71b5bcab88332eebf907519190dd9e6e82107fa7f83b1003a6252980 \
-    --hash=sha256:90261b206d6defd58fdd5e85f478bf633a2901798906be2ad389150c5c60edbe
-    # via
-    #   -c ./requirements/../requirements.txt
-    #   boto3
-    #   botocore
 jsbeautifier==1.14.8 \
     --hash=sha256:d4c4e263a42dd6194afb9dbe54710be3c5604492cbec3e89c92dd98513f98b9f
     # via
@@ -189,9 +166,6 @@ json5==0.9.14 \
     --hash=sha256:740c7f1b9e584a468dbb2939d8d458db3427f2c93ae2139d05f47e453eae964f \
     --hash=sha256:9ed66c3a6ca3510a976a9ef9b8c0787de24802724ab1860bc0153c7fdd589b02
     # via djlint
-localstack-client==2.1 \
-    --hash=sha256:10cb5a5aba5bbe2e56f3373476523346cb7c3c6ea46373ffb4709a839e3bac6c
-    # via awscli-local
 markdown-it-py==2.2.0 \
     --hash=sha256:5a35f8d1870171d9acc47b99612dc146129b631baf04970128b568f190d0cc30 \
     --hash=sha256:7c9a5e412688bc771c67432cbfebcdd686c93ce6484913dccf06cb5a0bea35a1
@@ -351,7 +325,6 @@ python-dateutil==2.8.2 \
     --hash=sha256:961d03dc3453ebbc59dbdea9e4e11c5651520a876d0f4db161e8674aae935da9
     # via
     #   -c ./requirements/../requirements.txt
-    #   botocore
     #   pandas
 pytz==2022.7.1 \
     --hash=sha256:01a0681c4b9684a28304615eba55d1ab31ae00bf68ec157ec3708a8182dbbcd0 \
@@ -498,12 +471,6 @@ rich==13.4.1 \
     --hash=sha256:76f6b65ea7e5c5d924ba80e322231d7cb5b5981aa60bfc1e694f1bc097fe6fe1 \
     --hash=sha256:d204aadb50b936bf6b1a695385429d192bc1fdaf3e8b907e8e26f4c4e4b5bf75
     # via bandit
-s3transfer==0.6.0 \
-    --hash=sha256:06176b74f3a15f61f1b4f25a1fc29a4429040b7647133a463da8fa5bd28d5ecd \
-    --hash=sha256:2ed07d3866f523cc561bf4a00fc5535827981b117dd7876f036b0c1aca42c947
-    # via
-    #   -c ./requirements/../requirements.txt
-    #   boto3
 six==1.16.0 \
     --hash=sha256:1e61c37477a1626458e36f7b1d82aa5c9b094fa4802892072e49de9c60c4c926 \
     --hash=sha256:8abb2f1d86890a2dfb989f9a77cfcfd3e47c2a354b01111771326f8aa26e0254
@@ -561,12 +528,6 @@ typing-extensions==4.5.0 \
     # via
     #   -c ./requirements/../requirements.txt
     #   mypy
-urllib3==1.26.15 \
-    --hash=sha256:8a388717b9476f934a21484e8c8e61875ab60644d29b9b39e11e4b9dc1c6b305 \
-    --hash=sha256:aa751d169e23c7479ce47a0cb0da579e3ede798f994f5816a74e4f4500dcea42
-    # via
-    #   -c ./requirements/../requirements.txt
-    #   botocore
 wheel==0.40.0 \
     --hash=sha256:cd1196f3faee2b31968d626e1731c94f99cbdb67cf5a46e4f5656cbee7738873 \
     --hash=sha256:d236b20e7cb522daf2390fa84c55eea81c5c30190f90f29ae2ca1ad8355bf247
