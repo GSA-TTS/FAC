@@ -37,6 +37,7 @@ local open_ranges_defns = [
   [Sheets.open_range, {}, 'Cluster Name', 'cluster_name'],
   [Sheets.open_range, {}, 'If State Cluster, Enter State Cluster Name', 'state_cluster_name'],
   [Sheets.open_range, {}, 'If Other Cluster, Enter Other Cluster Name', 'other_cluster_name'],
+  // 20230525 HDMS FIXME: A formula to auto calculate federal_program_total in the excel is missing (see instructions in census template)!!!
   [Sheets.open_range, SV.PositiveNumberValidation, 'Federal Program Total', 'federal_program_total'],
   [Sheets.open_range, SV.PositiveNumberValidation, 'Cluster Total', 'cluster_total'],
   [Sheets.y_or_n_range, SV.YoNValidation, 'Loan / Loan Guarantee', 'is_guaranteed'],

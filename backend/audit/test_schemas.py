@@ -2,6 +2,7 @@
 # here for CI/CD integration.
 import json
 import string
+from collections import deque
 from random import choice, randrange
 
 from django.conf import settings
@@ -138,30 +139,48 @@ class GeneralInformationSchemaValidityTest(SimpleTestCase):
             .replace("I", "")
             .replace("o", "")
             .replace("O", "")
+            .upper()  # We convert to uppercase in UEIValidationFormView.
         )
         good_uei = "".join(choice(alpha_omit_oi) for i in range(12))
         idx = randrange(12)
 
+        too_short = "".join(choice(alpha_omit_oi) for i in range(11))
+        too_long = "".join(choice(alpha_omit_oi) for i in range(13))
+        zero_start = f"0{''.join(choice(alpha_omit_oi) for i in range(11))}"
         with_punc = good_uei[:idx] + choice(string.punctuation) + good_uei[idx + 1 :]
-        with_ioIO = good_uei[:idx] + choice("ioIO") + good_uei[idx + 1 :]
+        with_numlike = good_uei[:idx] + choice("ioIO") + good_uei[idx + 1 :]
 
-        bad_ueis = [
-            "".join(choice(alpha_omit_oi) for i in range(11)),  # too short
-            "".join(choice(alpha_omit_oi) for i in range(13)),  # too long
-            f"0{''.join(choice(alpha_omit_oi) for i in range(11))}",  # starts with 0
-            with_punc,  # contains a non-alphanum char
-            with_ioIO,  # contains one of i, o, I, O
+        digits = "".join(choice(string.digits) for i in range(9))
+        three_chars = "".join(choice(string.ascii_uppercase) for i in range(3))
+        consecutive_base = deque(digits + three_chars)
+        digits_start = "".join(consecutive_base)
+        consecutive_base.rotate(1)
+        digits_middle1 = "".join(consecutive_base)
+        consecutive_base.rotate(1)
+        digits_middle2 = "".join(consecutive_base)
+        consecutive_base.rotate(1)
+        digits_end = "".join(consecutive_base)
+
+        bad_ueis_and_messages = [
+            (too_short, f"'{too_short}' is too short"),
+            (too_long, f"'{too_long}' is too long"),
+            (zero_start, "does not match"),
+            (with_punc, "does not match"),
+            (with_numlike, "does not match"),
+            (digits_start, "does not match"),
+            (digits_middle1, "does not match"),
+            (digits_middle2, "does not match"),
+            (digits_end, "does not match"),
         ]
 
-        for bad_uei in bad_ueis:
+        for bad_uei, message in bad_ueis_and_messages:
+            instance = jsoncopy(self.SIMPLE_CASE)
+            instance["auditee_uei"] = bad_uei
+
             with self.subTest():
-                instance = jsoncopy(self.SIMPLE_CASE)
-
-                instance["auditee_uei"] = bad_uei
-
                 self.assertRaisesRegex(
                     exceptions.ValidationError,
-                    "does not match",
+                    message,
                     validate,
                     instance,
                     schema,
@@ -178,6 +197,7 @@ class GeneralInformationSchemaValidityTest(SimpleTestCase):
             .replace("I", "")
             .replace("o", "")
             .replace("O", "")
+            .upper()  # We convert to uppercase in UEIValidationFormView.
         )
         good_uei = "".join(choice(alpha_omit_oi) for i in range(12))
 
@@ -187,27 +207,30 @@ class GeneralInformationSchemaValidityTest(SimpleTestCase):
 
         validate(instance, schema)
 
-    def test_blank_uei(self):
-        """
-        If the UEI is an empty string, validation should pass
-        """
-        schema = self.GENERAL_INFO_SCHEMA
-        instance = jsoncopy(self.SIMPLE_CASE)
-
-        instance["auditee_uei"] = ""
-
-        validate(instance, schema)
-
-    def test_null_uei(self):
-        """
-        If the UEI is null, validation should pass
-        """
-        schema = self.GENERAL_INFO_SCHEMA
-        instance = jsoncopy(self.SIMPLE_CASE)
-
-        instance["auditee_uei"] = None
-
-        validate(instance, schema)
+    # 2023-05-30: We're proceeding with the assumption that as a matter of
+    # policy we can reject audits without UEIs. If that turns out to be untrue,
+    # we'll uncomment these two tests.
+    # def test_blank_uei(self):
+    #     """
+    #     If the UEI is an empty string, validation should pass
+    #     """
+    #     schema = self.GENERAL_INFO_SCHEMA
+    #     instance = jsoncopy(self.SIMPLE_CASE)
+    #
+    #     instance["auditee_uei"] = ""
+    #
+    #     validate(instance, schema)
+    #
+    # def test_null_uei(self):
+    #     """
+    #     If the UEI is null, validation should pass
+    #     """
+    #     schema = self.GENERAL_INFO_SCHEMA
+    #     instance = jsoncopy(self.SIMPLE_CASE)
+    #
+    #     instance["auditee_uei"] = None
+    #
+    #     validate(instance, schema)
 
     def test_invalid_zip(self):
         """

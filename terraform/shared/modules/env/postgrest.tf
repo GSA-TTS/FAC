@@ -16,7 +16,7 @@ resource "cloudfoundry_service_key" "postgrest" {
 resource "cloudfoundry_app" "postgrest" {
   name         = local.postgrest_name
   space        = data.cloudfoundry_space.apps.id
-  docker_image = "postgrest/postgrest:v10.1.2"
+  docker_image = var.postgrest_image
   timeout      = 180
   memory       = 128
   disk_quota   = 256
