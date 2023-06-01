@@ -11,7 +11,7 @@ jobs:
       contents: read
       packages: write
     env:
-      GH_REPO: gsa-tts/fac
+      GH_REPO: ghcr.io/gsa-tts/fac
     strategy:
       fail-fast: false
       matrix:
@@ -65,8 +65,8 @@ jobs:
       - name: Tag Image
         run: |
           image_creation_date=$(date -d "$(docker inspect -f '{{ .Created }}' ${{ matrix.image.name }})" +%s)
-          docker tag ${{ matrix.image.name }} ghcr.io/${{ env.GH_REPO }}/${{ matrix.image.tname }}:latest
-          docker tag ${{ matrix.image.name }} ghcr.io/${{ env.GH_REPO }}/${{ matrix.image.tname }}:$image_creation_date
+          docker tag ${{ matrix.image.name }} ${{ env.GH_REPO }}/${{ matrix.image.tname }}:latest
+          docker tag ${{ matrix.image.name }} ${{ env.GH_REPO }}/${{ matrix.image.tname }}:$image_creation_date
 
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v2
@@ -76,7 +76,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Push Image
-        run: docker push --all-tags ghcr.io/${{ env.GH_REPO }}/${{ matrix.image.tname }}
+        run: docker push --all-tags ${{ env.GH_REPO }}/${{ matrix.image.tname }}
 
       - name: Upload version number
         uses: actions/upload-artifact@v3
