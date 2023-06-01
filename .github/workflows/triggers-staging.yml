@@ -2,7 +2,7 @@ name: Deploy to the staging cloud.gov environment
 on:
   push:
     branches:
-    - prod
+      - prod
 
 jobs:
   # testing
