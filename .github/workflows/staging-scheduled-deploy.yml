@@ -5,6 +5,6 @@
         - cron: '30 4 * * *'
     jobs:
       create-pr:
-        name: Auto Create PR at 4am UTC Daily
+        name: Auto Create PR at 430am UTC Daily
         uses: ./.github/workflows/auto-create-pr.yml
         secrets: inherit
