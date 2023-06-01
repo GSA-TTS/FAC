@@ -215,13 +215,15 @@ if ENVIRONMENT not in ["DEVELOPMENT", "STAGING", "PRODUCTION"]:
     AWS_S3_PRIVATE_REGION_NAME = os.environ.get(
         "AWS_S3_PRIVATE_REGION_NAME", "us-east-1"
     )
-    AWS_PRIVATE_ACCESS_KEY_ID = os.environ.get("AWS_PRIVATE_ACCESS_KEY_ID", "test")
+
+    # MinIO only matters for local development and GitHub action environments.
+    # These should match what we're setting in backend/run.sh
+    AWS_PRIVATE_ACCESS_KEY_ID = os.environ.get("AWS_PRIVATE_ACCESS_KEY_ID", "longtest")
     AWS_PRIVATE_SECRET_ACCESS_KEY = os.environ.get(
-        "AWS_PRIVATE_SECRET_ACCESS_KEY", "test"
+        "AWS_PRIVATE_SECRET_ACCESS_KEY", "longtest"
     )
-    AWS_S3_PRIVATE_ENDPOINT = os.environ.get(
-        "AWS_S3_PRIVATE_ENDPOINT", "localstack:4566"
-    )
+    AWS_S3_PRIVATE_ENDPOINT = os.environ.get("AWS_S3_PRIVATE_ENDPOINT", "minio:9000")
+
     AWS_S3_ENDPOINT_URL = f"http://{AWS_S3_PRIVATE_ENDPOINT}"
 
     DISABLE_AUTH = env.bool("DISABLE_AUTH", default=False)
