@@ -63,6 +63,7 @@
                                    id="single-audit"
                                    name="audit_type"
                                    value="single-audit"
+                                   {% if audit_type == "single-audit" %} checked {% endif %}
                                    required
                                    data-validate-not-null=""/>
                             <label class="usa-radio__label" for="single-audit">Single Audit</label>
@@ -73,6 +74,7 @@
                                    name="audit_type"
                                    value="program-specific-audit"
                                    type="radio"
+                                   {% if audit_type == "program-specific" %} checked {% endif %}
                                    data-validate-not-null=""/>
                             <label class="usa-radio__label" for="program-specific-audit">Program-Specific Audit</label>
                         </div>
@@ -105,6 +107,7 @@
                                    name="audit_period_covered"
                                    value="annual"
                                    required
+                                   {% if audit_period_covered == "annual" %} checked {% endif %}
                                    data-validate-not-null=""/>
                             <label class="usa-radio__label" for="audit-period-annual">Annual</label>
                         </div>
@@ -114,6 +117,7 @@
                                    name="audit_period_covered"
                                    value="biennial"
                                    type="radio"
+                                   {% if audit_period_covered == "biennial" %} checked {% endif %}
                                    data-validate-not-null=""/>
                             <label class="usa-radio__label" for="audit-period-biennial">Biennial</label>
                         </div>
@@ -123,6 +127,7 @@
                                    name="audit_period_covered"
                                    value="other"
                                    type="radio"
+                                   {% if audit_period_covered == "other" %} checked {% endif %}
                                    data-validate-not-null=""/>
                             <label class="usa-radio__label" for="audit-period-other">Other</label>
                             <input class="usa-input usa-input--small"
@@ -319,6 +324,7 @@
                                            name="multiple_ueis_covered"
                                            value="true"
                                            required
+                                           {% if multiple_ueis_covered == True %} checked {% endif %}
                                            data-validate-not-null=""/>
                                     <label class="usa-radio__label" for="multiple-ueis-yes">
                                         Yes
@@ -330,6 +336,7 @@
                                            id="multiple-ueis-no"
                                            name="multiple_ueis_covered"
                                            value="false"
+                                           {% if multiple_ueis_covered == False %} checked {% endif %}
                                            data-validate-not-null=""/>
                                     <label class="usa-radio__label" for="multiple-ueis-no">
                                         No
@@ -356,7 +363,8 @@
                                        name="ein"
                                        aria-required="true"
                                        required
-                                       data-validate-not-null=""/>
+                                       data-validate-not-null=""
+                                       value="{{ ein | default_if_none:'' }}"/>
                             </div>
                             <div class="usa-checkbox">
                                 <input class="usa-checkbox__input"
@@ -364,7 +372,8 @@
                                        type="checkbox"
                                        name="ein_not_an_ssn_attestation"
                                        data-validate-not-null=""
-                                       value=""/>
+                                       {% if ein_not_an_ssn_attestation == True %} checked {% endif %}
+                                       />
                                 <label class="usa-checkbox__label" for="ein_not_an_ssn_attestation">
                                     By checking this box, I verify that the Auditee EIN is not a Social Security Number.
                                 </label>
@@ -397,6 +406,7 @@
                                            name="multiple_eins_covered"
                                            value="true"
                                            required
+                                           {% if multiple_eins_covered == True %} checked {% endif %}
                                            data-validate-not-null=""/>
                                     <label class="usa-radio__label" for="multiple-eins-yes">
                                         Yes
@@ -408,6 +418,7 @@
                                            id="multiple-eins-no"
                                            name="multiple_eins_covered"
                                            value="false"
+                                           {% if multiple_eins_covered == False %} checked {% endif %}
                                            data-validate-not-null=""/>
                                     <label class="usa-radio__label" for="multiple-eins-no">
                                         No
@@ -664,7 +675,7 @@
                                        id="auditor_ein_not_an_ssn_attestation"
                                        type="checkbox"
                                        name="auditor_ein_not_an_ssn_attestation"
-                                       value=""
+                                       {% if auditor_ein_not_an_ssn_attestation == True %} checked {% endif %}
                                        data-validate-not-null=""/>
                                 <label class="usa-checkbox__label" for="auditor_ein_not_an_ssn_attestation">
                                     By checking this box, I verify that the Auditor EIN is not a Social Security Number.
@@ -770,43 +781,6 @@
             </form>
         </div>
     </div>
-    <div class="audit-metadata">
-        <div class="grid-container">
-            <dl class="grid-row grid-gap">
-                <div class="tablet:grid-col-6">
-                    <dt>
-                        Entity name
-                    </dt>
-                    <dd>
-                        {{ auditee_name | default_if_none:'' }}
-                    </dd>
-                </div>
-                <div class="tablet:grid-col-6">
-                    <dt>
-                        Report ID
-                    </dt>
-                    <dd>
-                        #{{ report_id | default_if_none:'' }}
-                    </dd>
-                </div>
-                <div class="tablet:grid-col-6">
-                    <dt>
-                        UEI
-                    </dt>
-                    <dd>
-                        {{ auditee_uei | default_if_none:'' }}
-                    </dd>
-                </div>
-                <div class="tablet:grid-col-6">
-                    <dt>
-                        Type of entity
-                    </dt>
-                    <dd>
-                        {{ user_provided_organization_type | default_if_none:'' }}
-                    </dd>
-                </div>
-            </dl>
-        </div>
-    </div>
+    {% include "audit-metadata.html" %}
     <script src="{% static 'compiled/js/sf-sac.js' %}"></script>
 {% endblock content %}

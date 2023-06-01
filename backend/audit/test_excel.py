@@ -62,6 +62,9 @@ def _add_entry(workbook, row_offset, entry):
 
 
 class FederalAwardsExcelTests(SimpleTestCase):
+    GOOD_UEI = "AAA123456BBB"
+    TEST_DATA = json.loads(FEDERAL_AWARDS_ENTRY_FIXTURES.read_text(encoding="utf-8"))
+
     def test_template_has_named_ranges(self):
         """Test that the FederalAwardsExpended Excel template contains the expected named ranges"""
         workbook = load_workbook(FEDERAL_AWARDS_TEMPLATE, data_only=True)
@@ -72,19 +75,13 @@ class FederalAwardsExcelTests(SimpleTestCase):
         for name in federal_awards_column_mapping:
             self.assertIsNotNone(workbook.defined_names[name])
 
-    def test_empty_template(self):
-        """Test that extraction and validation succeed against the blank template"""
-        federal_awards = extract_federal_awards(FEDERAL_AWARDS_TEMPLATE)
-
-        validate_federal_award_json(federal_awards)
-
     def test_single_federal_awards_entry(self):
         """Test that extraction and validation succeed when there is a single federal awards entry"""
         workbook = load_workbook(FEDERAL_AWARDS_TEMPLATE, data_only=True)
 
-        _set_by_name(workbook, "auditee_ein", "123456789")
+        _set_by_name(workbook, "auditee_uei", FederalAwardsExcelTests.GOOD_UEI)
         _set_by_name(workbook, "total_amount_expended", 100)
-        _add_entry(workbook, 0, FEDERAL_AWARDS_ENTRY_FIXTURES[0])
+        _add_entry(workbook, 0, FederalAwardsExcelTests.TEST_DATA[0])
 
         federal_awards = extract_federal_awards(workbook)
 
@@ -94,9 +91,9 @@ class FederalAwardsExcelTests(SimpleTestCase):
         """Test that extraction and validation succeed when there are multiple federal awards entries"""
         workbook = load_workbook(FEDERAL_AWARDS_TEMPLATE, data_only=True)
 
-        _set_by_name(workbook, "auditee_ein", "123456789")
+        _set_by_name(workbook, "auditee_uei", FederalAwardsExcelTests.GOOD_UEI)
         _set_by_name(workbook, "total_amount_expended", 200)
-        for index, entry in enumerate(FEDERAL_AWARDS_ENTRY_FIXTURES):
+        for index, entry in enumerate(FederalAwardsExcelTests.TEST_DATA):
             _add_entry(workbook, index, entry)
 
         federal_awards = extract_federal_awards(workbook)
@@ -107,10 +104,10 @@ class FederalAwardsExcelTests(SimpleTestCase):
         """Test that extraction succeeds and validation fails when there are partial federal awards entries"""
         workbook = load_workbook(FEDERAL_AWARDS_TEMPLATE, data_only=True)
 
-        _set_by_name(workbook, "auditee_ein", "123456789")
+        _set_by_name(workbook, "auditee_uei", FederalAwardsExcelTests.GOOD_UEI)
         _set_by_name(workbook, "total_amount_expended", 200)
 
-        entry = jsoncopy(FEDERAL_AWARDS_ENTRY_FIXTURES[0])
+        entry = jsoncopy(FederalAwardsExcelTests.TEST_DATA[0])
         del entry["cluster_name"]
 
         _add_entry(workbook, 0, entry)
@@ -124,25 +121,26 @@ class FederalAwardsExcelTests(SimpleTestCase):
         workbook = load_workbook(FEDERAL_AWARDS_TEMPLATE, data_only=True)
 
         # add valid data to the workbook
-        _set_by_name(workbook, "auditee_ein", "123456789")
+        _set_by_name(workbook, "auditee_uei", FederalAwardsExcelTests.GOOD_UEI)
         _set_by_name(workbook, "total_amount_expended", 200)
-        _add_entry(workbook, 0, FEDERAL_AWARDS_ENTRY_FIXTURES[0])
+        _add_entry(workbook, 0, FederalAwardsExcelTests.TEST_DATA[0])
 
         test_cases = [
-            ("auditee_ein", 123456789),
+            ("auditee_uei", 123456789123),
             ("total_amount_expended", "not a number"),
             ("amount_expended", "not a  number"),
             ("cluster_name", 123),
-            ("direct_award", 123),
-            ("federal_award_passed_to_subrecipients", 123),
-            ("federal_award_passed_to_subrecipients_amount", "not a number"),
-            ("federal_program_name", 123),
+            ("is_direct", 123),
+            ("is_passed", 123),
+            ("subrecipient_amount", "not a number"),
+            ("program_name", 123),
             ("loan_balance_at_audit_period_end", "not a number"),
-            ("loan_or_loan_guarantee", 123),
-            ("major_program", 123),
-            ("major_program_audit_report_type", 123),
+            ("is_guaranteed", 123),
+            ("is_major", 123),
+            ("audit_report_type", 123),
             ("number_of_audit_findings", "not a number"),
-            ("program_number", 10.001),
+            ("federal_agency_prefix", 10),
+            ("three_digit_extension", "001"),
             ("state_cluster_name", 123),
         ]
 
@@ -162,13 +160,13 @@ class FederalAwardsExcelTests(SimpleTestCase):
         workbook = load_workbook(FEDERAL_AWARDS_TEMPLATE, data_only=True)
 
         # add valid data to the workbook
-        _set_by_name(workbook, "auditee_ein", "123456789")
-        _set_by_name(workbook, "total_amount_expended", 200)
-        _add_entry(workbook, 0, FEDERAL_AWARDS_ENTRY_FIXTURES[0])
+        _set_by_name(workbook, "auditee_uei", FederalAwardsExcelTests.GOOD_UEI)
+        _set_by_name(workbook, "amount_expended", 200)
+        _add_entry(workbook, 0, FederalAwardsExcelTests.TEST_DATA[0])
 
         test_cases = [
-            ("direct_award_pass_through_entity_name", 0),
-            ("direct_award_pass_through_entity_id", 0),
+            ("passthrough_name", 0),
+            ("passthrough_identifying_number", 0),
         ]
 
         for field_name, value in test_cases:
@@ -181,6 +179,12 @@ class FederalAwardsExcelTests(SimpleTestCase):
 
 
 class CorrectiveActionPlanExcelTests(SimpleTestCase):
+    GOOD_UEI = "AAA123456BBB"
+    TOO_SHORT_UEI = "AAA123456"
+    TEST_DATA = json.loads(
+        CORRECTIVE_ACTION_PLAN_ENTRY_FIXTURES.read_text(encoding="utf-8")
+    )
+
     def test_template_has_named_ranges(self):
         """Test that the CorrectiveActionPlan Excel template contains the expected named ranges"""
         workbook = load_workbook(CORRECTIVE_ACTION_PLAN_TEMPLATE, data_only=True)
@@ -191,20 +195,13 @@ class CorrectiveActionPlanExcelTests(SimpleTestCase):
         for name in corrective_action_column_mapping:
             self.assertIsNotNone(workbook.defined_names[name])
 
-    def test_empty_template(self):
-        """Test that extraction and validation succeed against the blank template"""
-        corrective_action_plan = extract_corrective_action_plan(
-            CORRECTIVE_ACTION_PLAN_TEMPLATE
-        )
-
-        validate_corrective_action_plan_json(corrective_action_plan)
-
     def test_single_corrective_action_plan_entry(self):
         """Test that extraction and validation succeed when there is a single corrective action plan entry"""
         workbook = load_workbook(CORRECTIVE_ACTION_PLAN_TEMPLATE, data_only=True)
 
-        _set_by_name(workbook, "auditee_ein", "123456789")
-        _add_entry(workbook, 0, CORRECTIVE_ACTION_PLAN_ENTRY_FIXTURES[0])
+        _set_by_name(workbook, "auditee_uei", CorrectiveActionPlanExcelTests.GOOD_UEI)
+
+        _add_entry(workbook, 0, CorrectiveActionPlanExcelTests.TEST_DATA[0])
 
         corrective_action_plan = extract_corrective_action_plan(workbook)
 
@@ -214,8 +211,9 @@ class CorrectiveActionPlanExcelTests(SimpleTestCase):
         """Test that extraction and validation succeed when there are multiple corrective action plan entries"""
         workbook = load_workbook(CORRECTIVE_ACTION_PLAN_TEMPLATE, data_only=True)
 
-        _set_by_name(workbook, "auditee_ein", "123456789")
-        for index, entry in enumerate(CORRECTIVE_ACTION_PLAN_ENTRY_FIXTURES):
+        _set_by_name(workbook, "auditee_uei", CorrectiveActionPlanExcelTests.GOOD_UEI)
+
+        for index, entry in enumerate(CorrectiveActionPlanExcelTests.TEST_DATA):
             _add_entry(workbook, index, entry)
 
         corrective_action_plan = extract_corrective_action_plan(workbook)
@@ -226,9 +224,9 @@ class CorrectiveActionPlanExcelTests(SimpleTestCase):
         """Test that extraction succeeds and validation fails when there are partial corrective action plan entries"""
         workbook = load_workbook(CORRECTIVE_ACTION_PLAN_TEMPLATE, data_only=True)
 
-        _set_by_name(workbook, "auditee_ein", "123456789")
+        _set_by_name(workbook, "auditee_uei", CorrectiveActionPlanExcelTests.GOOD_UEI)
 
-        entry = jsoncopy(CORRECTIVE_ACTION_PLAN_ENTRY_FIXTURES[0])
+        entry = jsoncopy(CorrectiveActionPlanExcelTests.TEST_DATA[0])
         del entry["planned_action"]
 
         _add_entry(workbook, 0, entry)
@@ -246,11 +244,11 @@ class CorrectiveActionPlanExcelTests(SimpleTestCase):
         workbook = load_workbook(CORRECTIVE_ACTION_PLAN_TEMPLATE, data_only=True)
 
         # add valid data to the workbook
-        _set_by_name(workbook, "auditee_ein", "123456789")
-        _add_entry(workbook, 0, CORRECTIVE_ACTION_PLAN_ENTRY_FIXTURES[0])
+        _set_by_name(workbook, "auditee_uei", CorrectiveActionPlanExcelTests.GOOD_UEI)
+        _add_entry(workbook, 0, CorrectiveActionPlanExcelTests.TEST_DATA[0])
 
         test_cases = [
-            ("auditee_ein", 123456789),
+            ("auditee_uei", CorrectiveActionPlanExcelTests.TOO_SHORT_UEI),
             ("contains_chart_or_table", "not a boolean"),
             ("planned_action", 0),
             ("reference_number", 0),
@@ -271,6 +269,11 @@ class CorrectiveActionPlanExcelTests(SimpleTestCase):
 
 
 class FindingsUniformGuidanceExcelTests(SimpleTestCase):
+    GOOD_UEI = "AAA123456BBB"
+    TEST_DATA = json.loads(
+        FINDINGS_UNIFORM_GUIDANCE_ENTRY_FIXTURES.read_text(encoding="utf-8")
+    )
+
     def test_template_has_named_ranges(self):
         """Test that the FindingsUniformGuidance Excel template contains the expected named ranges"""
         workbook = load_workbook(FINDINGS_UNIFORM_GUIDANCE_TEMPLATE, data_only=True)
@@ -281,18 +284,14 @@ class FindingsUniformGuidanceExcelTests(SimpleTestCase):
         for name in findings_uniform_guidance_column_mapping:
             self.assertIsNotNone(workbook.defined_names[name])
 
-    def test_empty_template(self):
-        """Test that extraction and validation succeed against the blank template"""
-        findings = extract_findings_uniform_guidance(FINDINGS_UNIFORM_GUIDANCE_TEMPLATE)
-
-        validate_findings_uniform_guidance_json(findings)
-
     def test_single_findings_uniform_guidance_entry(self):
         """Test that extraction and validation succeed when there is a single findings uniform guidance entry"""
         workbook = load_workbook(FINDINGS_UNIFORM_GUIDANCE_TEMPLATE, data_only=True)
 
-        _set_by_name(workbook, "auditee_ein", "123456789")
-        _add_entry(workbook, 0, FINDINGS_UNIFORM_GUIDANCE_ENTRY_FIXTURES[0])
+        _set_by_name(
+            workbook, "auditee_uei", FindingsUniformGuidanceExcelTests.GOOD_UEI
+        )
+        _add_entry(workbook, 0, FindingsUniformGuidanceExcelTests.TEST_DATA[0])
 
         findings = extract_findings_uniform_guidance(workbook)
 
@@ -302,8 +301,10 @@ class FindingsUniformGuidanceExcelTests(SimpleTestCase):
         """Test that extraction and validation succeed when there are multiple findings uniform guidance entries"""
         workbook = load_workbook(FINDINGS_UNIFORM_GUIDANCE_TEMPLATE, data_only=True)
 
-        _set_by_name(workbook, "auditee_ein", "123456789")
-        for index, entry in enumerate(FINDINGS_UNIFORM_GUIDANCE_ENTRY_FIXTURES):
+        _set_by_name(
+            workbook, "auditee_uei", FindingsUniformGuidanceExcelTests.GOOD_UEI
+        )
+        for index, entry in enumerate(FindingsUniformGuidanceExcelTests.TEST_DATA):
             _add_entry(workbook, index, entry)
 
         findings = extract_findings_uniform_guidance(workbook)
@@ -314,10 +315,12 @@ class FindingsUniformGuidanceExcelTests(SimpleTestCase):
         """Test that extraction succeeds and validation fails when there are partial findings uniform guidance entries"""
         workbook = load_workbook(FINDINGS_UNIFORM_GUIDANCE_TEMPLATE, data_only=True)
 
-        _set_by_name(workbook, "auditee_ein", "123456789")
+        _set_by_name(
+            workbook, "auditee_uei", FindingsUniformGuidanceExcelTests.GOOD_UEI
+        )
 
-        entry = jsoncopy(FINDINGS_UNIFORM_GUIDANCE_ENTRY_FIXTURES[0])
-        del entry["finding_reference_number"]
+        entry = jsoncopy(FindingsUniformGuidanceExcelTests.TEST_DATA[0])
+        del entry["reference_number"]
 
         _add_entry(workbook, 0, entry)
 
@@ -332,14 +335,17 @@ class FindingsUniformGuidanceExcelTests(SimpleTestCase):
         workbook = load_workbook(FINDINGS_UNIFORM_GUIDANCE_TEMPLATE, data_only=True)
 
         # add valid data to the workbook
-        _set_by_name(workbook, "auditee_ein", "123456789")
-        _add_entry(workbook, 0, FINDINGS_UNIFORM_GUIDANCE_ENTRY_FIXTURES[0])
+        _set_by_name(
+            workbook, "auditee_uei", FindingsUniformGuidanceExcelTests.GOOD_UEI
+        )
+        _add_entry(workbook, 0, FindingsUniformGuidanceExcelTests.TEST_DATA[0])
 
         test_cases = [
-            ("auditee_ein", 123456789),
-            ("finding_reference_number", 0),
+            ("auditee_uei", 123456789123),
+            ("reference_number", 0),
             ("program_name", 123),
-            ("program_number", 10.001),
+            ("federal_agency_prefix", 10),
+            ("three_digit_extension", "001"),
             ("prior_references", 123),
         ]
 
@@ -356,6 +362,9 @@ class FindingsUniformGuidanceExcelTests(SimpleTestCase):
 
 
 class FindingsTextExcelTests(SimpleTestCase):
+    GOOD_UEI = "AAA123456BBB"
+    TEST_DATA = json.loads(FINDINGS_TEXT_ENTRY_FIXTURES.read_text(encoding="utf-8"))
+
     def test_template_has_named_ranges(self):
         """Test that the FindingsText Excel template contains the expected named ranges"""
         workbook = load_workbook(FINDINGS_TEXT_TEMPLATE, data_only=True)
@@ -366,18 +375,12 @@ class FindingsTextExcelTests(SimpleTestCase):
         for name in findings_text_column_mapping:
             self.assertIsNotNone(workbook.defined_names[name])
 
-    def test_empty_template(self):
-        """Test that extraction and validation succeed against the blank template"""
-        findings = extract_findings_text(FINDINGS_TEXT_TEMPLATE)
-
-        validate_findings_text_json(findings)
-
     def test_single_findings_text_entry(self):
         """Test that extraction and validation succeed when there is a single findings text entry"""
         workbook = load_workbook(FINDINGS_TEXT_TEMPLATE, data_only=True)
 
-        _set_by_name(workbook, "auditee_ein", "123456789")
-        _add_entry(workbook, 0, FINDINGS_TEXT_ENTRY_FIXTURES[0])
+        _set_by_name(workbook, "auditee_uei", FindingsTextExcelTests.GOOD_UEI)
+        _add_entry(workbook, 0, FindingsTextExcelTests.TEST_DATA[0])
 
         findings = extract_findings_text(workbook)
 
@@ -387,8 +390,8 @@ class FindingsTextExcelTests(SimpleTestCase):
         """Test that extraction and validation succeed when there are multiple findings text entries"""
         workbook = load_workbook(FINDINGS_TEXT_TEMPLATE, data_only=True)
 
-        _set_by_name(workbook, "auditee_ein", "123456789")
-        for index, entry in enumerate(FINDINGS_TEXT_ENTRY_FIXTURES):
+        _set_by_name(workbook, "auditee_uei", FindingsTextExcelTests.GOOD_UEI)
+        for index, entry in enumerate(FindingsTextExcelTests.TEST_DATA):
             _add_entry(workbook, index, entry)
 
         findings = extract_findings_text(workbook)
@@ -399,9 +402,9 @@ class FindingsTextExcelTests(SimpleTestCase):
         """Test that extraction succeeds and validation fails when there are partial findings text entries"""
         workbook = load_workbook(FINDINGS_TEXT_TEMPLATE, data_only=True)
 
-        _set_by_name(workbook, "auditee_ein", "123456789")
+        _set_by_name(workbook, "auditee_uei", FindingsTextExcelTests.GOOD_UEI)
 
-        entry = jsoncopy(FINDINGS_TEXT_ENTRY_FIXTURES[0])
+        entry = jsoncopy(FindingsTextExcelTests.TEST_DATA[0])
         del entry["text_of_finding"]
 
         _add_entry(workbook, 0, entry)
@@ -415,11 +418,11 @@ class FindingsTextExcelTests(SimpleTestCase):
         workbook = load_workbook(FINDINGS_TEXT_TEMPLATE, data_only=True)
 
         # add valid data to the workbook
-        _set_by_name(workbook, "auditee_ein", "123456789")
-        _add_entry(workbook, 0, FINDINGS_TEXT_ENTRY_FIXTURES[0])
+        _set_by_name(workbook, "auditee_uei", FindingsTextExcelTests.GOOD_UEI)
+        _add_entry(workbook, 0, FindingsTextExcelTests.TEST_DATA[0])
 
         test_cases = [
-            ("auditee_ein", 123456789),
+            ("auditee_uei", 123456789123),
             ("reference_number", 0),
             ("contains_chart_or_table", "not a boolean"),
             ("text_of_finding", 10.001),

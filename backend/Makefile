@@ -82,7 +82,6 @@ docker-clean:
 	docker compose down
 	docker rm -f $(shell docker ps -a -q)
 	docker volume rm $(shell docker volume ls -q)
-	docker compose build
 
 docker-lint:
 	docker compose build

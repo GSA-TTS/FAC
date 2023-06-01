@@ -20,4 +20,5 @@ applications:
       - fac-public-s3
       - fac-key-service
       - newrelic-creds
-      - egress-creds
+      - https-proxy-creds
+      - smtp-proxy-creds

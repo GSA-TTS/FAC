@@ -237,48 +237,51 @@ class AuditeeInfoTests(TestCase):
             VALID_ELIGIBILITY_DATA | VALID_AUDITEE_INFO_DATA,
         )
 
-    def test_null_auditee_uei(self):
-        """
-        Auditee UEI can be null
-        """
-        self.user.profile.entry_form_data = VALID_ELIGIBILITY_DATA
-        self.user.profile.save()
-        input_data = VALID_AUDITEE_INFO_DATA | {"auditee_uei": None}
-        response = self.client.post(AUDITEE_INFO_PATH, input_data, format="json")
-        data = response.json()
-        self.assertEqual(data["next"], ACCESS_AND_SUBMISSION_PATH)
-        self.assertEqual(
-            self.user.profile.entry_form_data, VALID_ELIGIBILITY_DATA | input_data
-        )
+    # 2023-05-30: We're proceeding with the assumption that as a matter of
+    # policy we can reject audits without UEIs. If that turns out to be untrue,
+    # we'll uncomment these three tests.
+    # def test_null_auditee_uei(self):
+    #     """
+    #     Auditee UEI can be null
+    #     """
+    #     self.user.profile.entry_form_data = VALID_ELIGIBILITY_DATA
+    #     self.user.profile.save()
+    #     input_data = VALID_AUDITEE_INFO_DATA | {"auditee_uei": None}
+    #     response = self.client.post(AUDITEE_INFO_PATH, input_data, format="json")
+    #     data = response.json()
+    #     self.assertEqual(data["next"], ACCESS_AND_SUBMISSION_PATH)
+    #     self.assertEqual(
+    #         self.user.profile.entry_form_data, VALID_ELIGIBILITY_DATA | input_data
+    #     )
 
-    def test_blank_auditee_uei(self):
-        """
-        Auditee UEI can be blank
-        """
-        self.user.profile.entry_form_data = VALID_ELIGIBILITY_DATA
-        self.user.profile.save()
-        input_data = VALID_AUDITEE_INFO_DATA | {"auditee_uei": ""}
-        response = self.client.post(AUDITEE_INFO_PATH, input_data, format="json")
-        data = response.json()
-        self.assertEqual(data["next"], ACCESS_AND_SUBMISSION_PATH)
-        self.assertEqual(
-            self.user.profile.entry_form_data, VALID_ELIGIBILITY_DATA | input_data
-        )
+    # def test_blank_auditee_uei(self):
+    #     """
+    #     Auditee UEI can be blank
+    #     """
+    #     self.user.profile.entry_form_data = VALID_ELIGIBILITY_DATA
+    #     self.user.profile.save()
+    #     input_data = VALID_AUDITEE_INFO_DATA | {"auditee_uei": ""}
+    #     response = self.client.post(AUDITEE_INFO_PATH, input_data, format="json")
+    #     data = response.json()
+    #     self.assertEqual(data["next"], ACCESS_AND_SUBMISSION_PATH)
+    #     self.assertEqual(
+    #         self.user.profile.entry_form_data, VALID_ELIGIBILITY_DATA | input_data
+    #     )
 
-    def test_missing_auditee_uei(self):
-        """
-        Auditee UEI can be missing
-        """
-        self.user.profile.entry_form_data = VALID_ELIGIBILITY_DATA
-        self.user.profile.save()
-        input_data = VALID_AUDITEE_INFO_DATA.copy()
-        del input_data["auditee_uei"]
-        response = self.client.post(AUDITEE_INFO_PATH, input_data, format="json")
-        data = response.json()
-        self.assertEqual(data["next"], ACCESS_AND_SUBMISSION_PATH)
-        self.assertEqual(
-            self.user.profile.entry_form_data, VALID_ELIGIBILITY_DATA | input_data
-        )
+    # def test_missing_auditee_uei(self):
+    #     """
+    #     Auditee UEI can be missing
+    #     """
+    #     self.user.profile.entry_form_data = VALID_ELIGIBILITY_DATA
+    #     self.user.profile.save()
+    #     input_data = VALID_AUDITEE_INFO_DATA.copy()
+    #     del input_data["auditee_uei"]
+    #     response = self.client.post(AUDITEE_INFO_PATH, input_data, format="json")
+    #     data = response.json()
+    #     self.assertEqual(data["next"], ACCESS_AND_SUBMISSION_PATH)
+    #     self.assertEqual(
+    #         self.user.profile.entry_form_data, VALID_ELIGIBILITY_DATA | input_data
+    #     )
 
     def test_blank_auditee_name(self):
         """
@@ -697,7 +700,7 @@ class SingleAuditChecklistViewTests(TestCase):
             ("audit_period_covered", "['annual', 'biennial', 'other']"),
             (
                 "user_provided_organization_type",
-                "['higher-ed', 'local', 'non-profit', 'none', 'state', 'tribal', 'unknown']",
+                "['state', 'local', 'tribal', 'higher-ed', 'non-profit', 'unknown', 'none']",
             ),
         ]
 
@@ -1306,9 +1309,11 @@ class SchemaViewTests(TestCase):
 
         self.client = APIClient()
 
-    def path(self, fiscal_year, type):
+    def path(self, fiscal_year, schema_type):
         """Convenience method to get the path for a particular year and schema type)"""
-        return reverse("schemas", kwargs={"fiscal_year": fiscal_year, "type": type})
+        return reverse(
+            "schemas", kwargs={"fiscal_year": fiscal_year, "schema_type": schema_type}
+        )
 
     def test_valid_fy_valid_type_returns_schema(self):
         """
