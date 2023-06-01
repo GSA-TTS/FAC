@@ -5,9 +5,10 @@ django-cors-headers
 django-csp
 django-logingov-backend
 django-storages
-Django>=4.0.8
+Django>=4.1.9
 djangorestframework
 djangorestframework-simplejwt
+django-fsm
 environs[django]
 gunicorn
 jsonpath-ng
@@ -23,6 +24,6 @@ pyjwt
 python-json-logger
 python-slugify
 pyyaml
-requests
+requests>=2.31.0
+sqlparse>=0.4.4
 uritemplate
-django-fsm
