@@ -39,6 +39,10 @@ RUN \
     unzip awscli-bundle.zip && \
     ./awscli-bundle/install -b /usr/local/bin/aws
 
+RUN \
+    curl "https://dl.min.io/client/mc/release/linux-amd64/mc" -o "/usr/local/bin/mc" && \
+    chmod +x /usr/local/bin/mc
+
 COPY package.* /src/
 WORKDIR /src/
 

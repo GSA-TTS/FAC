@@ -17,13 +17,13 @@
             {% comment %} {% include "../sidenav.html" %} {% endcomment %}
             <form class="usa-form usa-form--large"
                   id="{{ view_id }}"
-                  testid="upload-page__form"
+                  id_test="upload-page__form"
                   method="post">
                 {% csrf_token %}
                 <fieldset class="usa-fieldset">
                     <legend class="usa-legend usa-legend--large"
                             id="{{ view_id }}"
-                            testid="upload-page__legend">
+                            id_test="upload-page__legend">
                         {{ view_name }}
                     </legend>
                     <p>{{ instructions }}</p>
@@ -32,7 +32,7 @@
                     <div class="usa-form-group">
                         <input id="file-input-{{ view_id }}-xlsx"
                                class="usa-file-input"
-                               testid="upload-page__file-input"
+                               id_test="upload-page__file-input"
                                type="file"
                                name="file-input-{{ view_id }}-xlsx"
                                aria-describedby="file-input-{{ view_id }}-xlsx"
