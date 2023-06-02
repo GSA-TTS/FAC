@@ -28,12 +28,12 @@ left join db on db.auditee_id=auditee.id
 ;
 
 
--- vw_auditee_singleauditchecklist
-drop view if exists api.vw_auditee_singleauditchecklist;
-create view api.vw_auditee_singleauditchecklist as
+-- vw_revised_auditee
+drop view if exists api.vw_revised_auditee;
+create view api.vw_revised_auditee as
 select
     id,
-    --20230601 HDMS FIXME: Bellow is the list of missing fields from the original view
+    --20230601 HDMS FIXME: Below is the list of missing fields from the original view
     -- auditee_certify_name,
     -- auditee_certify_title,
     -- auditee_fax,
@@ -58,12 +58,12 @@ select
     (general_information ->> 'auditee_zip') as auditee_zip_code
 from audit_singleauditchecklist;
 
-
+-- 20230602 HDMS FIXME: Uncomment unified view below once the above view is fixed
 -- drop view if exists api.vw_unified_auditee;
 -- create view api.vw_unified as
 -- select * from api.vw_auditee
 -- union all
--- select * from api.vw_auditee_singleauditchecklist
+-- select * from api.vw_revised_auditee
 -- ;
 
 
