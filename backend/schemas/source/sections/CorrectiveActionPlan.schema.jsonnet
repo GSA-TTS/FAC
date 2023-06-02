@@ -16,7 +16,7 @@ local CorrectiveActionPlanEntry = {
 local CorrectiveActionPlan = Types.object {
   additionalProperties: false,
   properties: {
-    auditee_uei: Base.Compound.UEI,
+    auditee_uei: Base.Compound.UniqueEntityIdentifier,
     corrective_action_plan_entries: Types.array {
       items: CorrectiveActionPlanEntry,
     },

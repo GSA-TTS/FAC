@@ -1,12 +1,10 @@
 -c ../requirements.txt
 
-awscli-local
 bandit
 black
 coverage
 djlint
 flake8
-localstack
 model_bakery
 mypy
 pandas

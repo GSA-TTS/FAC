@@ -13,7 +13,6 @@ locals {
     # https://github.com/orgs/GSA-TTS/teams/fac-team/members
     # TODO: Automate updates via GitHub's GraphQL API
     "bret.mogilefsky@gsa.gov",
-    "lindsayn.young@gsa.gov",
     "james.person@gsa.gov",
     "jeanmarie.mariadassou@gsa.gov",
     "matt.henry@gsa.gov",

@@ -11,19 +11,16 @@ jobs:
       contents: read
       packages: write
     env:
-      GH_REPO: gsa-tts/fac
+      GH_REPO: ghcr.io/gsa-tts/fac
     strategy:
       fail-fast: false
       matrix:
         image:
-          - name: postgrest/postgrest
-            tag: latest
+          - name: postgrest/postgrest:latest
             tname: postgrest
-          - name: swaggerapi/swagger-ui
-            tag: latest
+          - name: swaggerapi/swagger-ui:latest
             tname: swagger
-          - name: clamav/clamav
-            tag: latest
+          - name: ghcr.io/gsa-tts/clamav-rest/clamav:latest
             tname: clamav
 
     steps:
@@ -46,11 +43,12 @@ jobs:
           echo $value > ${{ matrix.image.tname }}.txt
 
       - name: Pull Docker Image
-        run: docker pull ${{ matrix.image.name }}:${{ matrix.image.tag }}
+        run: docker pull ${{ matrix.image.name }}
       - name: Check Image Creation Date
         run: |
           last_image_date=`cat ${{ matrix.image.tname }}.txt`
-          image_creation_date=$(date -d "$(docker inspect -f '{{ .Created }}' ${{ matrix.image.name }}:${{ matrix.image.tag }})" +%s)
+          image_creation_date=$(date -d "$(docker inspect -f '{{ .Created }}' ${{ matrix.image.name }})" +%s)
+   
           echo $last_image_date
           echo $image_creation_date
           if [[ $image_creation_date -le $last_image_date ]]; then
@@ -62,13 +60,13 @@ jobs:
           fi
 
       - name: Scan Image
-        run: docker run aquasec/trivy:latest  image --timeout 5m --scanners vuln --exit-code 1 --severity CRITICAL,HIGH  ${{ matrix.image.name }}:${{ matrix.image.tag }}
+        run: docker run aquasec/trivy:latest  image --timeout 5m --scanners vuln --exit-code 1 --severity CRITICAL,HIGH  ${{ matrix.image.name }}
 
       - name: Tag Image
         run: |
-          image_creation_date=$(date -d "$(docker inspect -f '{{ .Created }}' ${{ matrix.image.name }}:${{ matrix.image.tag }})" +%s)
-          docker tag ${{ matrix.image.name }}:${{ matrix.image.tag }} ghcr.io/${{ env.GH_REPO }}/${{ matrix.image.tname }}:${{ matrix.image.tag }}
-          docker tag ${{ matrix.image.name }}:${{ matrix.image.tag }} ghcr.io/${{ env.GH_REPO }}/${{ matrix.image.tname }}:$image_creation_date
+          image_creation_date=$(date -d "$(docker inspect -f '{{ .Created }}' ${{ matrix.image.name }})" +%s)
+          docker tag ${{ matrix.image.name }} ${{ env.GH_REPO }}/${{ matrix.image.tname }}:latest
+          docker tag ${{ matrix.image.name }} ${{ env.GH_REPO }}/${{ matrix.image.tname }}:$image_creation_date
 
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v2
@@ -78,7 +76,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Push Image
-        run: docker push --all-tags ghcr.io/${{ env.GH_REPO }}/${{ matrix.image.tname }}
+        run: docker push --all-tags ${{ env.GH_REPO }}/${{ matrix.image.tname }}
 
       - name: Upload version number
         uses: actions/upload-artifact@v3

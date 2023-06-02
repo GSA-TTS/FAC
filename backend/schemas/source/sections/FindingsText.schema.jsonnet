@@ -16,7 +16,7 @@ local FindingsTextEntry = {
 local FindingsText = Types.object {
   additionalProperties: false,
   properties: {
-    auditee_uei: Base.Compound.UEI,
+    auditee_uei: Base.Compound.UniqueEntityIdentifier,
     findings_text_entries: Types.array {
       items: FindingsTextEntry,
     },
