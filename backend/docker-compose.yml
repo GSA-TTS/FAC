@@ -18,6 +18,7 @@ services:
     depends_on:
       - db
       - minio
+      - minio_startup
     environment:
       - "DATABASE_URL=postgres://postgres@db/postgres"
       - "DJANGO_DEBUG=true"
@@ -54,6 +55,13 @@ services:
       - "9002:9002"
     volumes:
       - "minio-vol:/tmp/minio"
+  minio_startup:
+    build:
+      context: .
+      dockerfile: ./Dockerfile.minio
+    command: /src/minio_run.sh
+    depends_on:
+      - minio
   api:
     image: ghcr.io/gsa-tts/fac/postgrest:latest
     ports:

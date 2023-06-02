@@ -62,7 +62,7 @@ docker-first-run:
 docker-test:
 	docker compose build
 	docker compose run web python manage.py migrate
-	docker-compose run web bash -c 'coverage run --parallel-mode --concurrency=multiprocessing manage.py test --parallel && \
+	docker-compose run web bash -c 'coverage run manage.py test && \
           coverage combine && coverage report -m --fail-under=90'
 
 # Run Django tests with docker with no coverage and with scoping

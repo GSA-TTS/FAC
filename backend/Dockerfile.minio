@@ -1,0 +1,14 @@
+FROM ubuntu:20.04
+
+RUN apt-get update
+RUN apt-get install -y \
+        curl \
+        unzip
+
+RUN \
+    curl "https://dl.min.io/client/mc/release/linux-amd64/mc" -o "/usr/local/bin/mc" && \
+    chmod +x /usr/local/bin/mc
+
+COPY ./minio_run.sh /src/minio_run.sh
+
+RUN chmod +x /src/minio_run.sh
