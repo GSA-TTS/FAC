@@ -317,9 +317,9 @@ local type_zipcode = Types.string {
 // The UEI rules we know of are broken out so that all of the rules must apply.
 
 // No I or O allowed.
-local REGEX_UEI_ALPHA = 'A-H,J-N,P-Z';
-local REGEX_UEI_LEADING_CLOISTER = '[' + REGEX_UEI_ALPHA + ',1-9]';
-local REGEX_UEI_BODY_CLOISTER = '[' + REGEX_UEI_ALPHA + ',0-9]';
+local REGEX_UEI_ALPHA = 'A-HJ-NP-Z';
+local REGEX_UEI_LEADING_CLOISTER = '[' + REGEX_UEI_ALPHA + '1-9]';
+local REGEX_UEI_BODY_CLOISTER = '[' + REGEX_UEI_ALPHA + '0-9]';
 
 local type_uei = Types.string {
   allOf: [

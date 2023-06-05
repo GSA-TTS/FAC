@@ -149,6 +149,7 @@ class GeneralInformationSchemaValidityTest(SimpleTestCase):
         zero_start = f"0{''.join(choice(alpha_omit_oi) for i in range(11))}"
         with_punc = good_uei[:idx] + choice(string.punctuation) + good_uei[idx + 1 :]
         with_numlike = good_uei[:idx] + choice("ioIO") + good_uei[idx + 1 :]
+        with_commas = good_uei[:idx] + "," + good_uei[idx + 1 :]
 
         digits = "".join(choice(string.digits) for i in range(9))
         three_chars = "".join(choice(string.ascii_uppercase) for i in range(3))
@@ -166,6 +167,7 @@ class GeneralInformationSchemaValidityTest(SimpleTestCase):
             (too_long, f"'{too_long}' is too long"),
             (zero_start, "does not match"),
             (with_punc, "does not match"),
+            (with_commas, "does not match"),
             (with_numlike, "does not match"),
             (digits_start, "does not match"),
             (digits_middle1, "does not match"),
