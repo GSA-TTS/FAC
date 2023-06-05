@@ -88,7 +88,11 @@ class FederalAwardsValidatorTests(SimpleTestCase):
             "three_digit_extension"
         ] = f"{extension}"
 
-        self.assertRaises(ValidationError, validate_federal_award_json, simple)
+        with self.assertRaises(
+            ValidationError,
+            msg=f"ValidationError not raised with prefix = {prefix}, extension = {extension}",
+        ):
+            validate_federal_award_json(simple)
 
     def test_prefix_over_99(self):
         """
@@ -108,7 +112,11 @@ class FederalAwardsValidatorTests(SimpleTestCase):
             "three_digit_extension"
         ] = f"{extension}"
 
-        self.assertRaises(ValidationError, validate_federal_award_json, simple)
+        with self.assertRaises(
+            ValidationError,
+            msg=f"ValidationError not raised with prefix = {prefix}, extension = {extension}",
+        ):
+            validate_federal_award_json(simple)
 
     def test_prefix_non_numeric(self):
         """
@@ -135,7 +143,11 @@ class FederalAwardsValidatorTests(SimpleTestCase):
                     "three_digit_extension"
                 ] = f"{extension}"
 
-                self.assertRaises(ValidationError, validate_federal_award_json, simple)
+                with self.assertRaises(
+                    ValidationError,
+                    msg=f"ValidationError not raised with prefix = {prefix}, extension = {extension}",
+                ):
+                    validate_federal_award_json(simple)
 
     def test_extension_RD(self):
         """
@@ -200,7 +212,11 @@ class FederalAwardsValidatorTests(SimpleTestCase):
             "three_digit_extension"
         ] = f"{extension}"
 
-        self.assertRaises(ValidationError, validate_federal_award_json, simple)
+        with self.assertRaises(
+            ValidationError,
+            msg=f"ValidationError not raised with prefix = {prefix}, extension = {extension}",
+        ):
+            validate_federal_award_json(simple)
 
     def test_extension_U_three_digit(self):
         """
@@ -219,7 +235,11 @@ class FederalAwardsValidatorTests(SimpleTestCase):
             "three_digit_extension"
         ] = f"{extension}"
 
-        self.assertRaises(ValidationError, validate_federal_award_json, simple)
+        with self.assertRaises(
+            ValidationError,
+            msg=f"ValidationError not raised with prefix = {prefix}, extension = {extension}",
+        ):
+            validate_federal_award_json(simple)
 
     def test_three_digit_extension(self):
         """
@@ -259,7 +279,11 @@ class FederalAwardsValidatorTests(SimpleTestCase):
             "three_digit_extension"
         ] = f"{extension}"
 
-        self.assertRaises(ValidationError, validate_federal_award_json, simple)
+        with self.assertRaises(
+            ValidationError,
+            msg=f"ValidationError not raised with prefix = {prefix}, extension = {extension}",
+        ):
+            validate_federal_award_json(simple)
 
     def test_trailing_extension_letter(self):
         """
@@ -298,7 +322,11 @@ class FederalAwardsValidatorTests(SimpleTestCase):
             "three_digit_extension"
         ] = f"{extension}"
 
-        self.assertRaises(ValidationError, validate_federal_award_json, simple)
+        with self.assertRaises(
+            ValidationError,
+            msg=f"ValidationError not raised with prefix = {prefix}, extension = {extension}",
+        ):
+            validate_federal_award_json(simple)
 
     def test_extension_non_numeric(self):
         """
@@ -330,7 +358,11 @@ class FederalAwardsValidatorTests(SimpleTestCase):
                     "three_digit_extension"
                 ] = f"{extension}"
 
-                self.assertRaises(ValidationError, validate_federal_award_json, simple)
+                with self.assertRaises(
+                    ValidationError,
+                    msg=f"ValidationError not raised with prefix = {prefix}, extension = {extension}",
+                ):
+                    validate_federal_award_json(simple)
 
 
 class UEIValidatorTests(SimpleTestCase):
@@ -443,7 +475,11 @@ class ExcelFileFilenameValidatorTests(SimpleTestCase):
                     test_case, ALLOWED_EXCEL_CONTENT_TYPES[0], 10000, "utf-8"
                 )
 
-                self.assertRaises(ValidationError, validate_excel_filename, file)
+                with self.assertRaises(
+                    ValidationError,
+                    msg=f"ValidationError not raised with filename = {test_case}",
+                ):
+                    validate_excel_filename(file)
 
 
 class ExcelFileExtensionValidatorTests(SimpleTestCase):
@@ -481,7 +517,11 @@ class ExcelFileExtensionValidatorTests(SimpleTestCase):
                     test_case, ALLOWED_EXCEL_CONTENT_TYPES[0], 10000, "utf-8"
                 )
 
-                self.assertRaises(ValidationError, validate_excel_file_extension, file)
+                with self.assertRaises(
+                    ValidationError,
+                    msg=f"ValidationError not raised with filename = {test_case}",
+                ):
+                    validate_excel_file_extension(file)
 
     def test_valid_file_extensions(self):
         """Filenames that have allowed extensions are valid"""
