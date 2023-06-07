@@ -1,9 +1,9 @@
 from django.shortcuts import render, redirect
 from django.core.exceptions import BadRequest
 from django.views import generic
-from django.http.request import HttpRequest
 
 from .forms import SearchForm
+from .utils import cross_reference_federal_award, cross_reference_general
 
 import os
 import json
@@ -33,7 +33,7 @@ class SearchHome(generic.View):
                     case "EIN":
                         search_query = "vw_auditee?ein_list=cd.{{ {} }}".format(query)
                     case "FY":
-                        search_query = "vw_federal_award?audit_year=eq.{}".format(query)
+                        search_query = "vw_general?audit_year=eq.{}".format(query)
                     case "ALN":
                         search_query = "vw_federal_award?agency_cfda=eq.{}".format(
                             query
@@ -56,14 +56,12 @@ class SearchResults(generic.View):
     def get(self, request, *args, **kwargs):
         search_path = kwargs.get("search_path", "")
         try:
-            SEARCH_URL = (
-                "https://api.data.gov/TEST/audit-clearinghouse/v0/dissemination/"
-            )
+            SEARCH_URL = os.getenv("API_GOV_URL")
             API_KEY = os.getenv("API_GOV_KEY")
             params = request.GET.dict()
             params["api_key"] = API_KEY
             # Artificial hard limit, to avoid too-long requests or potential API crashes
-            if params.get("limit", None) == None or int(params["limit"]) > 1000:
+            if params.get("limit") is None or int(params["limit"]) > 1000:
                 params["limit"] = "1000"
 
             initial_response = requests.get(SEARCH_URL + search_path, params=params)
@@ -81,55 +79,11 @@ class SearchResults(generic.View):
 
             # Cross vw_general.auditee_id with vw_auditee.id
             if search_path == "vw_general":
-                cross_search_path = "vw_auditee"
-                cross_search_params = {"limit": 100, "api_key": API_KEY}
-                cross_id_list = []
-                for x in initial_results:
-                    if x.get("auditee_id"):
-                        cross_id_list.append(x["auditee_id"])
-                temp = "in.("
-                for y in cross_id_list:
-                    temp += str(y) + ","
-                temp = temp[:-1]
-                temp += ")"
-                cross_search_params["id"] = str(temp)
-                cross_results = requests.get(
-                    SEARCH_URL + cross_search_path, params=cross_search_params
-                )
-                for x in initial_results:
-                    for y in json.loads(cross_results.text):
-                        if x.get("auditee_id") == y.get("id"):
-                            x["uei_list"] = y.get("uei_list")
-                            x["auditee_city"] = y.get("auditee_city")
-                            x["auditee_state"] = y.get("auditee_state")
-                            x["duns_list"] = y.get("duns_list")
+                initial_results = cross_reference_general(initial_results)
 
             # Cross vw_federal_award.cpa_ein with vw_auditee.ein_list[0]
             elif search_path == "vw_federal_award":
-                cross_search_path = "vw_auditee"
-                cross_search_params = {"limit": 100, "api_key": API_KEY}
-                cross_id_list = []
-                for x in initial_results:
-                    if x.get("cpa_ein"):
-                        cross_id_list.append(x["cpa_ein"])
-                temp = "cd.{"
-                for y in cross_id_list:
-                    temp += str(y) + ","
-                temp = temp[:-1]
-                temp += "}"
-                cross_search_params["ein_list"] = str(temp)
-                cross_response = requests.get(
-                    SEARCH_URL + cross_search_path, params=cross_search_params
-                )
-                cross_results = json.loads(cross_response.text)
-                for x in initial_results:
-                    for y in cross_results:
-                        if x.get("cpa_ein") == y.get("ein_list")[0]:
-                            x["uei_list"] = y.get("uei_list")
-                            x["auditee_name"] = y.get("auditee_name")
-                            x["auditee_city"] = y.get("auditee_city")
-                            x["auditee_state"] = y.get("auditee_state")
-                            x["duns_list"] = y.get("duns_list")
+                initial_results = cross_reference_federal_award(initial_results)
 
             context["results"] = initial_results
 
