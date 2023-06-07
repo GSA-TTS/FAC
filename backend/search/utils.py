@@ -22,7 +22,7 @@ def cross_reference_federal_award(initial_results):
     temp += "}"
     cross_search_params["ein_list"] = str(temp)
     cross_response = requests.get(
-        SEARCH_URL + cross_search_path, params=cross_search_params
+        SEARCH_URL + cross_search_path, params=cross_search_params, timeout=10
     )
     cross_results = json.loads(cross_response.text)
     for x in initial_results:
@@ -55,11 +55,12 @@ def cross_reference_general(initial_results):
     temp = temp[:-1]
     temp += ")"
     cross_search_params["id"] = str(temp)
-    cross_results = requests.get(
-        SEARCH_URL + cross_search_path, params=cross_search_params
+    cross_response = requests.get(
+        SEARCH_URL + cross_search_path, params=cross_search_params, timeout=10
     )
+    cross_results = json.loads(cross_response.text)
     for x in initial_results:
-        for y in json.loads(cross_results.text):
+        for y in cross_results:
             if x.get("auditee_id") == y.get("id"):
                 x["uei_list"] = y.get("uei_list")
                 x["auditee_city"] = y.get("auditee_city")

@@ -64,7 +64,9 @@ class SearchResults(generic.View):
             if params.get("limit") is None or int(params["limit"]) > 1000:
                 params["limit"] = "1000"
 
-            initial_response = requests.get(SEARCH_URL + search_path, params=params)
+            initial_response = requests.get(
+                SEARCH_URL + search_path, params=params, timeout=10
+            )
             initial_results = json.loads(initial_response.text)
             context = {
                 "search_path": search_path,
