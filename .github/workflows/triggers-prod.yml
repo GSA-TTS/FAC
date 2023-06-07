@@ -42,5 +42,5 @@ jobs:
       - deploy-production
     uses: ./.github/workflows/zap-scan.yml
     with:
-      url: "https://fac-prod.app.cloud.gov/"
+      url: "https://app.fac.gov/"
       
