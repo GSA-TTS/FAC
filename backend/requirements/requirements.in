@@ -1,6 +1,6 @@
 boto3
 cfenv
-cryptography
+cryptography>=41.0.0
 django-cors-headers
 django-csp
 django-logingov-backend
