@@ -16,7 +16,7 @@ module "clamav" {
 
   # The following line is commented out until we have a way to pass the value of
   # the variable to to docker image without it interfering with staging.
-  proxy_server    = module.https-proxy.domain
+  proxy_server   = module.https-proxy.domain
   proxy_port     = module.https-proxy.port
   proxy_username = module.https-proxy.username
   proxy_password = module.https-proxy.password
