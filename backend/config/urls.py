@@ -73,4 +73,5 @@ urlpatterns = [
     # Keep last so we can use short urls for content pages like home page etc.
     path("", include("cms.urls")),
     path("audit/", include("audit.urls")),
+    path("search/", include("search.urls")),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

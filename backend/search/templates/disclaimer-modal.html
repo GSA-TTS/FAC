@@ -1,0 +1,43 @@
+<div class="usa-modal usa-modal--lg"
+     id="modal-disclaimer"
+     aria-labelledby="modal-terms-conditions-heading"
+     aria-describedby="modal-terms-conditions-description"
+     data-force-action>
+    <form id="disclaimer-submit" method="post">
+        <div class="usa-modal__content">
+            <div class="usa-modal__main">
+                {% csrf_token %}
+                <h2 class="usa-modal__heading" id="modal-terms-conditions-heading">Uniform Guidance Acknowledgement</h2>
+                <div class="font-sans-2xs" id="modal-terms-conditions-description">
+                    <p>
+                        The Uniform Guidance (2 CFR 200.512) requires the FAC to make the reporting packages publicly available on a Web site. A senior level representative of the auditee (e.g., state controller, director of finance, chief executive officer, or chief financial officer) has signed a statement that the Form SF-SAC and reporting package does not include protected personally identifiable information (protected PII) or business identifiable information (BII), or if it does, the FAC is authorized to publicly post all information contained in the Form SF-SAC and the reporting package (audit report).
+                    </p>
+                    <p>
+                        The Uniform Guidance (2 CFR 200.512 (b)(2)) allows auditees who qualify as an Indian Tribe or Tribal Organization (as defined in the Indian Self-Determination, Education and Assistance Act (ISDEAA), 25 U.S.C 5304 (formerly 25 U.S.C 450b(l))) to opt out of making their reporting packages publicly available on this site. If this option is exercised, the auditee becomes responsible for submitting the reporting package directly to any pass-through entities through which it has received a Federal award. The auditee would also be responsible for submitting the reporting package directly to any pass-through entities for which the summary schedule of prior audit findings reported the status of any findings related to Federal awards that the pass-through entity provided. Unless restricted by Federal statute or regulation, if the auditee opts not to authorize publication, it must make copies of the reporting package available for public inspection. For these exempted auditees, the text entered in Part II, Item 2, Part III, Item 5, and Part IV, Item 2 will not be publicly displayed on the Form SF-SAC for fiscal periods ending in 2019 or later.
+                    </p>
+                </div>
+                <div class="usa-modal__footer">
+                    <ul class="usa-button-group">
+                        <li class="usa-button-group__item">
+                            <button id="modal-terms-continue"
+                                    type="button"
+                                    class="usa-button"
+                                    onClick="submit()"
+                                    data-close-modal>
+                                I acknowledge that I have read and understand the above statments
+                            </button>
+                        </li>
+                        <li class="usa-button-group__item">
+                            <button type="button"
+                                    class="usa-button usa-button--unstyled padding-105 text-center"
+                                    data-close-modal
+                                    id="continue">
+                                <a href="/">Return to FAC home</a>
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>

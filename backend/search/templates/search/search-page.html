@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+    <div class="grid-container margin-top-6">
+        <div class="grid-row grid-gap">
+            <form class="desktop:grid-col-9 usa-search margin-bottom-8"
+                  id="search"
+                  method="post">
+                {% csrf_token %}
+                <div class="margin-bottom-6">
+                    <label class="usa-label text-italic text-base" for="search_by">Search by...</label>
+                    <select class="usa-select" id="state" name="search_by">
+                        <option value="UEI">
+                            UEI
+                        </option>
+                        <option value="EIN">
+                            EIN
+                        </option>
+                        <option value="FY">
+                            Fiscal Year
+                        </option>
+                        <option value="ALN">
+                            ALN
+                        </option>
+                    </select>
+                </div>
+                <div class="margin-bottom-6">
+                    <label class="usa-sr-only" for="search-field">Search</label>
+                    <input class="usa-input" id="search-field" type="search" name="query" />
+                    <button class="usa-button" type="submit">
+                        <span class="usa-search__submit-text">Search</span>
+                    </button>
+                </div>
+                <div class="margin-bottom-6">
+                    <input class="usa-button--unstyled" type="reset" value="Clear Search">
+                </input>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock content %}
