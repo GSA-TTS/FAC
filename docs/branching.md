@@ -11,7 +11,7 @@ There are two long-lived branches:
  Three app environments:
  - dev [https://fac-dev.app.cloud.gov/](https://fac-dev.app.cloud.gov/)
  - staging [https://fac-staging.app.cloud.gov/](https://fac-staging.app.cloud.gov/)
- - production [https://fac-prod.app.cloud.gov/](https://fac-prod.app.cloud.gov/) production is auto-deployed by using version tags
+ - production [https://app.fac.gov/](https://app.fac.gov/) production is auto-deployed by using version tags
  
 
 ## Timeline
