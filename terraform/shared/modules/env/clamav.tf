@@ -3,7 +3,7 @@ locals {
 }
 
 module "clamav" {
-  source = "github.com/18f/terraform-cloudgov//clamav?ref=v0.5.1"
+  source = "github.com/18f/terraform-cloudgov//clamav?ref=v0.6.0"
 
   # This generates eg "fac-av-staging.apps.internal", avoiding collisions with routes for other projects and spaces
   name           = local.clam_name
@@ -16,6 +16,9 @@ module "clamav" {
 
   # The following line is commented out until we have a way to pass the value of
   # the variable to to docker image without it interfering with staging.
-  # https_proxy   = module.https-proxy.https_proxy
+  proxy_server   = module.https-proxy.domain
+  proxy_port     = module.https-proxy.port
+  proxy_username = module.https-proxy.username
+  proxy_password = module.https-proxy.password
 }
 
