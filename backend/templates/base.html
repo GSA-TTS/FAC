@@ -10,8 +10,14 @@
               href="{% static 'compiled/scss/main-post.css' %}"
               media="all"
               type="text/css"/>
+        {% block title %}
+            {% if post.title %}
+                <title>{{ post.title }}</title>
+            {% else %}
+                <title>Federal Audit Clearinghouse</title>
+            {% endif %}
+        {% endblock %}
         {% block metatags %}
-            <title>{{ post.title }}</title>
             <meta name="description" content="{{ post.meta_description }}" />
             <meta property="og:title" content="{{ post.title }}" />
             <meta property="og:site_name" content="Federal Audit Clearinghouse" />

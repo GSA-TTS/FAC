@@ -1,0 +1,17 @@
+{
+  "urls": [
+    "http://localhost:8000/",
+    "http://localhost:8000/report_submission/eligibility",
+    "http://localhost:8000/report_submission/auditeeinfo",
+    "http://localhost:8000/report_submission/accessandsubmission",
+    "http://localhost:8000/audit"
+  ],
+  "defaults": {
+    "standard": "WCAG2AA",
+    "runners": [
+      "htmlcs",
+      "axe"
+    ],
+    "hideElements": ".pa11y-ignore, .usa-select, .usa-step-indicator__segment-label, .is-hidden, #upload-worksheet, .usa-file-input__instructions, #my-submissions"
+  }
+}
