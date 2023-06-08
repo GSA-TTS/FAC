@@ -1,4 +1,6 @@
-@startuml
+FAC Data Dissemination Data Model
+```plantuml
+@startuml Data Model
 
 !define TABLE(name,desc) class name as "desc" << (T,#FFAAAA) >>
 !define PRIMARY_KEY(x) <color:red>x</color>
@@ -9,11 +11,41 @@ hide empty attributes
 TABLE(General, "General") {
   + PRIMARY_KEY(id)
   report_id
-  uei
-  _auditee_info_
-  auditor_ein
-  _auditor_info_
   audit_year
+  + FOREIGN_KEY(Auditee.id)
+  + FOREIGN_KEY(Auditor.id)
+
+}
+
+TABLE(Auditee, "Auditee") {
+  + PRIMARY_KEY(id)
+  uei [unique]
+  ein [unique]
+  email
+  contact_name
+  contact_title
+  phone
+  address_line_1
+  city
+  state
+  zip
+}
+
+TABLE(Auditor, "Auditor") {
+  + PRIMARY_KEY(id)
+  firm_name
+  ein [unique]
+  email
+  contact_name
+  contact_title
+  phone
+  address_line_1
+  city
+  state
+  zip
+
+
+
 }
 
 TABLE(Award, "FederalAward") {
@@ -61,5 +93,7 @@ Finding "1" -- "*" FindingText : contains
 Finding "1" -- "*" CAPText : contains
 Finding "1" -- "0,1" Finding : refers-to
 General "1" -- "*" Note : contains
+Auditee "1" -- "*" General : submits
+Auditor "1" -- "*" General : audits
 
 @enduml
