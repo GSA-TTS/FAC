@@ -3,4 +3,5 @@ mem_amount: 512M
 cf_env_name: STAGING
 env_name: staging
 service_name: staging
+endpoint: fac-staging.app.cloud.gov
 instances: 1

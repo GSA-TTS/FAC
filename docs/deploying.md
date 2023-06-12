@@ -90,7 +90,7 @@ cf push -f manifests/manifest-dev.yml
 3.  Wait for the checks to pass.
 4.  If checks fail, or if reviewers request changes, something has gone awry. Investigation and/or starting over from a branch and making a PR against `main` may be required.
 5.  Verify that the deploy steps all passed.
-6.  After deployment, the changes should be on https://fac-prod.app.cloud.gov/.
+6.  After deployment, the changes should be on https://app.fac.gov/.
 7.  If anything was merged directly into the `prod` branch, such as a hotfix, merge `prod` back into `main`.
 
 To see more about branching and the deployment steps, see the [Branching](branching.md) page.

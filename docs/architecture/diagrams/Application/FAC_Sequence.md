@@ -39,11 +39,13 @@ FAC -> Public : Makes info available for viewing and downloading
 autonumber
 == Agency Access ==
 AgencyApp -> DataGov :  Rewquests data via REST from FAC
-DataGov -> FACREST : Redirects token-authorized API to FAC
+DataGov -> FACREST : Forwards token-authorized API to FAC
 FACREST <-> DB : Retrieves searched audits
-FACREST <-> S3 : Retrieves pdfs associated with audits
 FACREST -> DataGov : Makes info available
 DataGov -> AgencyApp : Returns API results
+AgencyApp <-> FAC : Retrieves pdfs associated with audits
+FAC <-> S3 : Retrieves pdfs associated with audits
+
 
 autonumber
 == Staff Access (Future) ==
