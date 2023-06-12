@@ -61,6 +61,13 @@ We use a combination of [Lighthouse-ci](https://github.com/GoogleChrome/lighthou
 
 Accessibility tests are executed as part of our CI/CD pipeline on each PR to the `main` branch, commit to the `main` branch, and PR into the `prod` branch.
 
+To run Lighthouse or pa11y locally, install the dependencies on your machine and outside the docker container, run the following commands.
+
+```shell
+npm run test:a11y:lighthouse # to run lighthouse
+npm run test:a11y:pa11y      # to run pa11y
+```
+
 ## Security scans
 #### OWASP ZAP
 We're using the [OWASP ZAP baseline scan](https://github.com/marketplace/actions/owasp-zap-baseline-scan) in GitHub actions. We have a config file in the workflows folder that governs pass or fail for each test.

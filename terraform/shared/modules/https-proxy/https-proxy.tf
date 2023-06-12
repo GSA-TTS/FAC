@@ -4,7 +4,7 @@ locals {
   clients = toset(keys(merge(var.allowlist, var.denylist)))
 
   # Generate Caddy-compatible allow and deny ACLs, one target per line.
-  # 
+  #
   # For now, there's just one consolidated allowlist and denylist, no matter
   # what apps they were specified for. Future improvments could improve this,
   # but it would mean also changing the proxy to be both more complex (in terms
@@ -75,7 +75,7 @@ resource "cloudfoundry_app" "egress_app" {
   }
 }
 
-### 
+###
 ### Set up network policies so that the clients can reach the proxy
 ###
 
@@ -99,11 +99,16 @@ resource "cloudfoundry_network_policy" "client_routing" {
   }
 }
 
-### 
+###
 ### Create a credential service for bound clients to use when make requests of the proxy
 ###
 locals {
   https_proxy = "https://${random_uuid.username.result}:${random_password.password.result}@${cloudfoundry_route.egress_route.endpoint}:61443"
+  domain      = cloudfoundry_route.egress_route.endpoint
+  username    = random_uuid.username.result
+  password    = random_password.password.result
+  protocol    = "https"
+  port        = 61443
 }
 
 resource "cloudfoundry_user_provided_service" "credentials" {
@@ -111,10 +116,10 @@ resource "cloudfoundry_user_provided_service" "credentials" {
   space = data.cloudfoundry_space.client_space.id
   credentials = {
     "uri"      = local.https_proxy
-    "domain"   = cloudfoundry_route.egress_route.endpoint
-    "username" = random_uuid.username.result
-    "password" = random_password.password.result
-    "protocol" = "https"
-    "port"     = 61443
+    "domain"   = local.domain
+    "username" = local.username
+    "password" = local.password
+    "protocol" = local.protocol
+    "port"     = local.port
   }
 }
