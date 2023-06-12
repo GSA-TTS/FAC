@@ -52,4 +52,4 @@ jobs:
       - name: Open pull request
         id: open-pr
         run: |
-          gh pr create --title "${{ steps.date.outputs.date }} ${{ steps.git-short.outputs.short_sha }} main -> prod" --body "This is an auto-generated PR to merge main into prod for a staging release on ${{ steps.date.outputs.date }} with the last commit being merged of ${{ steps.git-short.outputs.short_sha }}" --reviewer "fac-team" --base prod --head main
+          gh pr create --title "${{ steps.date.outputs.date }} ${{ steps.git-short.outputs.short_sha }} main -> prod" --body "This is an auto-generated PR to merge main into prod for a staging release on ${{ steps.date.outputs.date }} with the last commit being merged of ${{ steps.git-short.outputs.short_sha }}" --reviewer "GSA-TTS/FAC-team" --base prod --head main
