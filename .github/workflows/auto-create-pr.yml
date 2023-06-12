@@ -57,6 +57,6 @@ jobs:
           pr_body: |
             This is an auto-generated PR to merge main into prod for a staging release for ${{ steps.date.outputs.date }}
             Last commit being merged: ${{ steps.git-short.outputs.short_sha }}
-          pr_reviewer: "fac-admins"
+          pr_reviewer: "fac-team"
           pr_allow_empty: false
           github_token: ${{ secrets.GITHUB_TOKEN }}
