@@ -7,13 +7,14 @@ module "production" {
 }
 
 module "domain" {
-  source = "github.com/18f/terraform-cloudgov//domain?ref=v0.6.0"
+  source = "github.com/18f/terraform-cloudgov//domain?ref=v0.7.0"
 
   cf_org_name    = "gsa-tts-oros-fac"
   cf_space_name  = "production"
   app_name_or_id = "gsa-fac"
   cdn_plan_name  = "domain"
-  domain_name    = "app.fac.gov"
+  domain_name    = "fac.gov"
+  host_name      = "app"
   depends_on = [
     module.production
   ]
