@@ -14,7 +14,7 @@ module "domain" {
   app_name_or_id = "gsa-fac"
   cdn_plan_name  = "domain"
   domain_name    = "fac.gov"
-  host_name      = "app
+  host_name      = "app"
   depends_on = [
     module.production
   ]
