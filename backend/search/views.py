@@ -11,9 +11,14 @@ import requests
 
 
 class SearchHome(generic.View):
+    base_context = {
+        # Change here as we load more years. Also update in forms.py
+        "fiscal_years": range(2022, 2023),
+    }
+
     def get(self, request, *args, **kwargs):
         try:
-            context = {"test": "sample text"}
+            context = self.base_context
 
             return render(request, "search/search-page.html", context)
         except Exception as e:
@@ -22,29 +27,22 @@ class SearchHome(generic.View):
     def post(self, request, *args, **kwargs):
         try:
             form = SearchForm(request.POST)
+            context = self.base_context
+
             if form.is_valid():
-                query = form.cleaned_data["query"]
-                search_by = form.cleaned_data["search_by"]
-                search_query = ""
+                UEI_EIN = form.cleaned_data["UEI_EIN"]
+                ALN = form.cleaned_data["ALN"]
+                fiscal_year = form.cleaned_data["fiscal_year"]
+                acceptance_start_date = form.cleaned_data["acceptance_start_date"]
+                acceptance_end_date = form.cleaned_data["acceptance_end_date"]
 
-                match search_by:
-                    case "UEI":
-                        search_query = "vw_auditee?uei_list=cd.{{ {} }}".format(query)
-                    case "EIN":
-                        search_query = "vw_auditee?ein_list=cd.{{ {} }}".format(query)
-                    case "FY":
-                        search_query = "vw_general?audit_year=eq.{}".format(query)
-                    case "ALN":
-                        search_query = "vw_federal_award?agency_cfda=eq.{}".format(
-                            query
-                        )
-                    case _:
-                        raise BadRequest()
+                # TODO: Build search query and redirect to it.
 
-                search_query += "&limit=100"
-                return redirect(str(request.build_absolute_uri() + search_query))
+                # return redirect(str(request.build_absolute_uri() + search_query))
+                return redirect(request.build_absolute_uri())
             else:
-                return render(request, "search/search-page.html")
+                print("form machine broke")
+                return redirect(request.build_absolute_uri())
 
         except Exception as e:
             raise BadRequest(e)

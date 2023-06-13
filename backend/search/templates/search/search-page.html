@@ -1,41 +1,91 @@
 {% extends "base.html" %}
 {% load static %}
 {% block content %}
-    <div class="grid-container margin-top-6">
-        <div class="grid-row grid-gap">
-            <form class="desktop:grid-col-9 usa-search margin-bottom-8"
-                  id="search"
-                  method="post">
-                {% csrf_token %}
-                <div class="margin-bottom-6">
-                    <label class="usa-label text-italic text-base" for="search_by">Search by...</label>
-                    <select class="usa-select" id="state" name="search_by">
-                        <option value="UEI">
-                            UEI
-                        </option>
-                        <option value="EIN">
-                            EIN
-                        </option>
-                        <option value="FY">
-                            Fiscal Year
-                        </option>
-                        <option value="ALN">
-                            ALN
-                        </option>
-                    </select>
-                </div>
-                <div class="margin-bottom-6">
-                    <label class="usa-sr-only" for="search-field">Search</label>
-                    <input class="usa-input" id="search-field" type="search" name="query" />
-                    <button class="usa-button" type="submit">
-                        <span class="usa-search__submit-text">Search</span>
-                    </button>
-                </div>
-                <div class="margin-bottom-6">
-                    <input class="usa-button--unstyled" type="reset" value="Clear Search">
-                </input>
+    <header class="usa-header usa-header-basic bg-primary-darker">
+        <div class="usa-nav-container">
+            <div class="usa-navbar bg-primary-darker text-white width-full flex">
+                <p class="margin-left-2">
+                    <span class="text-bold">Search single audit reports</span>
+                </p>
             </div>
+        </div>
+    </header>
+    <div class="grid-container">
+        <form class="usa-form usa-form--large" id="search" method="post">
+            {% csrf_token %}
+            <div class="grid-row">
+                <legend class="usa-legend usa-legend--large">
+                    Search single audit reports
+                </legend>
+                <div class="tablet:grid-col-6 tablet:padding-right-2">
+                    <label class="usa-label text-underline text-bold" for="uei_ein_input">UEI or EIN</label>
+                    <textarea class="usa-textarea usa-input-sm input-tile-border-radius-sm"
+                              id="UEI_EIN"
+                              name="UEI_EIN"
+                              placeholder="A1AB2C34EFGH5, 123456789"></textarea>
+                </div>
+                <div class="tablet:grid-col-6">
+                    <label class="usa-label text-underline text-bold" for="ALN_input">ALN or CFDA Number</label>
+                    <textarea class="usa-textarea"
+                              id="ALN"
+                              name="ALN"
+                              placeholder="01.0001, 01.0002..."></textarea>
+                </div>
+                <div class="tablet:grid-col-12">
+                    <label class="usa-label text-underline text-bold" for="fiscal_year_input">Fiscal Year</label>
+                    <div class="grid-row">
+                        {% for i in fiscal_years %}
+                            <div class="usa-checkbox grid-col-6 tablet:grid-col-4 padding-1">
+                                <input class="usa-checkbox__input"
+                                       id="fiscal_year_{{i}}"
+                                       type="checkbox"
+                                       name="fiscal_year"
+                                       value="{{i}}"/>
+                                <label class="usa-checkbox__label" for="fiscal_year_{{i}}">
+                                    {{i}}
+                                </label
+                                >
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                <label class="usa-label text-underline text-bold tablet:grid-col-12"
+                       for="acceptance_date_input">
+                    Acceptance Date
+                </label>
+                <div class="tablet:grid-col-6 tablet:padding-right-2">
+                    <div class="text-italic">Start Date</div>
+                    <div class="text-base">mm/dd/yyyy</div>
+                    <div class="usa-date-picker">
+                        <input class="usa-input"
+                               id="acceptance_start_date_input"
+                               name="acceptance_start_date_input"
+                               type="text"
+                               aria-labelledby="acceptance_end_date_label"
+                               aria-describedby="acceptance_end_date_hint"/>
+                    </div>
+                </div>
+                <div class="tablet:grid-col-6">
+                    <div class="text-italic">End Date</div>
+                    <div class="text-base">mm/dd/yyyy</div>
+                    <div class="usa-date-picker">
+                        <input class="usa-input"
+                               id="acceptance_end_date_input"
+                               name="acceptance_end_date_input"
+                               type="text"
+                               aria-labelledby="acceptance_start_date-label"
+                               aria-describedby="acceptance_start_date-hint"/>
+                    </div>
+                </div>
+                <div class="tablet:grid-col-12">
+                    <input class="usa-button--unstyled margin-top-2"
+                           type="reset"
+                           value="Clear all Search Filters"/>
+                </div>
+            </div>
+            <button class="usa-button" type="submit">
+                <span class="usa-search__submit-text">Search</span>
+            </button>
         </form>
     </div>
-</div>
 {% endblock content %}

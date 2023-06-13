@@ -1,6 +1,16 @@
 {% extends "base.html" %}
 {% load static %}
 {% block content %}
+    <header class="usa-header usa-header-basic bg-primary-darker">
+        <div class="usa-nav-container">
+            <div class="usa-navbar bg-primary-darker text-white width-full flex">
+                <p class="margin-left-2">
+                    <a href="/search/" class="text-gray-10">Search single audit reports</a> »
+                    <span class="text-bold">Search results</span>
+                </p>
+            </div>
+        </div>
+    </header>
     <div class="grid-container margin-top-6 margin-bottom-6">
         {% if results %}
             <div class="usa-table-container" tabindex="0">
@@ -10,21 +20,29 @@
                     </caption>
                     <thead class="table-header-background-color-primary-darker">
                         <tr>
-                            <th data-sortable scope="col" role="columnheader">Auditee UEI</th>
+                            <th data-sortable scope="col" role="columnheader">PDF</th>
+                            <th data-sortable scope="col" role="columnheader">Summary</th>
+                            <th data-sortable scope="col" role="columnheader">UEI</th>
+                            <th data-sortable scope="col" role="columnheader">Cognizant Agency</th>
                             <th data-sortable scope="col" role="columnheader">Auditee Name</th>
-                            <th data-sortable scope="col" role="columnheader">City</th>
                             <th data-sortable scope="col" role="columnheader">State</th>
-                            <th data-sortable scope="col" role="columnheader">Auditee DUNS</th>
+                            <th data-sortable scope="col" role="columnheader">Accepted Date</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for result in results %}
                             <tr>
-                                <th scope="row" role="rowheader">{{ result.uei_list.0 | default:"N/A" }}</th>
+                                <th scope="row" role="rowheader">
+                                    <a href="javascript:void(0);">PDF</a>
+                                </th>
+                                <th>
+                                    <a href="javascript:void(0);">Summary</a>
+                                </th>
+                                <th>{{ result.uei_list.0 | default:"N/A" }}</th>
+                                <th>{{ result.cognizant_agency | default:"N/A" }}</th>
                                 <td>{{ result.auditee_name | default:"N/A" }}</td>
-                                <td>{{ result.auditee_city | default:"N/A" }}</td>
                                 <td>{{ result.auditee_state | default:"N/A" }}</td>
-                                <td>{{ result.duns_list.0 | default:"N/A" }}</td>
+                                <td>{{ result.fac_accepted_date | default:"N/A" }}</td>
                             </tr>
                         {% endfor %}
                     </tbody>
