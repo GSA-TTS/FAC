@@ -13,6 +13,7 @@ System-wide How-tos:
 * [Deploying](./deploying.md)
 * [Testing](./testing.md)
 * [Secrets](./secrets.md)
+* [Scanning](./scanning.md)
 * [User Management](./user-management.md)
 * [Validations](./validations.md)
 
