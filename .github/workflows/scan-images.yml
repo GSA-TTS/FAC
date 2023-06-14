@@ -1,8 +1,8 @@
 ---
 name: Scan Images
 on:
-  # schedule:
-  #   - cron: "*/15 * * * *"
+  schedule:
+    - cron: "0 8 * * *"
   workflow_dispatch:
 jobs:
   docker-update:
@@ -18,8 +18,6 @@ jobs:
         image:
           - name: postgrest/postgrest:latest
             tname: postgrest
-          - name: swaggerapi/swagger-ui:latest
-            tname: swagger
           - name: ghcr.io/gsa-tts/clamav-rest/clamav:latest
             tname: clamav
 
@@ -44,11 +42,12 @@ jobs:
 
       - name: Pull Docker Image
         run: docker pull ${{ matrix.image.name }}
+
       - name: Check Image Creation Date
         run: |
           last_image_date=`cat ${{ matrix.image.tname }}.txt`
           image_creation_date=$(date -d "$(docker inspect -f '{{ .Created }}' ${{ matrix.image.name }})" +%s)
-   
+
           echo $last_image_date
           echo $image_creation_date
           if [[ $image_creation_date -le $last_image_date ]]; then
