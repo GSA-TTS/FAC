@@ -15,7 +15,6 @@ applications:
       # DISABLE_COLLECTSTATIC: true
     routes:
       - route: fac-((env_name)).app.cloud.gov
-      - route: ((endpoint))
     instances: ((instances))
     services:
       - fac-db
