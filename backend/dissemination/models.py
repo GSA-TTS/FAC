@@ -29,19 +29,14 @@ class FindingText(models.Model):
         null=True,
         help_text=docs.text_findingstext,
     )
-    dbkey = models.CharField(
-        "Audit Year and DBKEY (database key) combined make up the primary key.",
-        max_length=40,
-        help_text=docs.dbkey_findingstext,
+
+    report_id = models.CharField(
+        "G-FAC generated identifier. FK refers to General"
+        max_length=40
     )
-    audit_year = models.CharField(
-        "Audit Year and DBKEY (database key) combined make up the primary key.",
-        max_length=40,
-        help_text=docs.audit_year_findingstext,
-    )
-    is_public = models.BooleanField(
-        "True for public records, False for non-public records"
-    )
+    class Meta:
+        unique_together = (('report_id', 'finding_ref_number', 'sequence_number'),)
+
 
 
 class Finding(models.Model):
@@ -51,14 +46,6 @@ class Finding(models.Model):
         "Findings Reference Numbers",
         max_length=100,
         help_text=docs.finding_ref_nums_findings,
-    )
-    audit_id = models.IntegerField(
-        "FAC system generated sequence number used to link to Findings data between CFDA Info and Findings",
-        help_text=docs.elec_audits_id_findings,
-    )
-    audit_findings_id = models.IntegerField(
-        "FAC system generated sequence number for finding",
-        help_text=docs.elec_audit_findings_id,
     )
     prior_finding_ref_numbers = models.CharField(
         "Audit finding reference numbers from the immediate prior audit",
@@ -99,19 +86,12 @@ class Finding(models.Model):
         null=True,
         help_text=docs.type_requirement_findings,
     )
-    audit_year = models.CharField(
-        "Audit Year and DBKEY (database key) combined make up the primary key.",
-        max_length=40,
-        help_text=docs.audit_year_findings,
+    report_id = models.CharField(
+        "G-FAC generated identifier. FK refers to General"
+        max_length=40
     )
-    dbkey = models.CharField(
-        "Audit Year and DBKEY (database key) combined make up the primary key.",
-        max_length=40,
-        help_text=docs.dbkey_findings,
-    )
-    is_public = models.BooleanField(
-        "True for public records, False for non-public records"
-    )
+    class Meta:
+        unique_together = (('report_id', 'finding_ref_number'),)
 
 
 class FederalAward(models.Model):
@@ -300,19 +280,14 @@ class CapText(models.Model):
     text = models.TextField(
         "Content of the Corrective Action Plan (CAP)", help_text=docs.text_captext
     )
-    dbkey = models.CharField(
-        "Audit Year and DBKEY (database key) combined make up the primary key.",
-        max_length=40,
-        help_text=docs.dbkey_captext,
+    report_id = models.CharField(
+        "G-FAC generated identifier. FK refers to General"
+        max_length=40
     )
-    audit_year = models.CharField(
-        "Audit Year and DBKEY (database key) combined make up the primary key.",
-        max_length=40,
-        help_text=docs.audit_year_captext,
-    )
-    is_public = models.BooleanField(
-        "True for public records, False for non-public records"
-    )
+    class Meta:
+        unique_together = (('report_id', 'finding_ref_number', 'sequence_number'),)
+
+
 
 
 class Note(models.Model):
@@ -337,20 +312,6 @@ class Note(models.Model):
     content = models.TextField("Content of the Note", null=True, help_text=docs.content)
     title = models.CharField(
         "Note Title", max_length=75, null=True, help_text=docs.title
-    )
-    dbkey = models.CharField(
-        "Audit Year and DBKEY (database key) combined make up the primary key.",
-        max_length=40,
-        help_text=docs.dbkey_notes,
-    )
-    # consider changing these to numeric
-    audit_year = models.CharField(
-        "Audit Year and DBKEY (database key) combined make up the primary key.",
-        max_length=40,
-        help_text=docs.audit_year_notes,
-    )
-    is_public = models.BooleanField(
-        "True for public records, False for non-public records"
     )
 
 
@@ -455,13 +416,9 @@ class Revision(models.Model):
         max_length=40,
         help_text=docs.audit_year_revisions,
     )
-    dbkey = models.CharField(
-        "Audit Year and DBKEY (database key) combined make up the primary key.",
-        max_length=40,
-        help_text=docs.dbkey_revisions,
-    )
-    is_public = models.BooleanField(
-        "True for public records, False for non-public records"
+    report_id = models.CharField(
+        "G-FAC generated identifier. FK refers to General"
+        max_length=40
     )
 
 
@@ -490,19 +447,21 @@ class Passthrough(models.Model):
         max_length=40,
         help_text=docs.audit_year_passthrough,
     )
-    dbkey = models.CharField(
-        "Audit Year and DBKEY (database key) combined make up the primary key",
-        max_length=40,
-        help_text=docs.dbkey_passthrough,
-    )
-    is_public = models.BooleanField(
-        "True for public records, False for non-public records"
+    report_id = models.CharField(
+        "G-FAC generated identifier. FK refers to General"
+        max_length=40
     )
 
 
 class General(models.Model):
     # Relational fields
     # null = True for these so we can load in phases, may want to tighten validation later
+    
+    report_id = models.CharField(
+        "G-FAC generated identifier. "
+        max_length=40,
+        primary_key=True
+    )
     auditee_certify_name = models.CharField(
         "Name of Auditee Certifying Official",
         max_length=50,
@@ -574,19 +533,6 @@ class General(models.Model):
         null=True,
         help_text=docs.zip_code,
     )
-    duns_list = ArrayField(
-        models.IntegerField(
-            "Multiple Data Universal Numbering System Numbers (DUNS) of the Auditee, in the order they were listed.",
-            null=True,
-            help_text=docs.duns_list,
-        ),
-    )
-    uei_list = ArrayField(
-        models.CharField(
-            "Unique Entity ID", max_length=12, null=True, help_text=docs.uei_general
-        ),
-    )
-
     auditor_phone = models.PositiveBigIntegerField(
         "CPA phone number", null=True, help_text=docs.auditor_phone
     )
@@ -889,4 +835,6 @@ class General(models.Model):
     # Might want to add meta data to other models too, but everything eventually links back here, so this is good enough for now
     modified_date = models.DateTimeField(auto_now=True)
     create_date = models.DateTimeField(auto_now_add=True)
+
+    # Choices are: C-FAC and G-FAC
     data_source = models.CharField("Origin of the upload", max_length=25)
