@@ -61,7 +61,7 @@ The easiest place to start scanning files with ClamAV is to follow the [Developm
 docker compose build
 docker compose up
 ```
-Once a the localstack has been build successfully, clamav will be available on `0.0.0.0:9000` for http connections and `0.0.0.0:9443` for https connections. When building the localstack, the scans will occur on port `9000`. Once we have a the clamav image running, we can then submit files for scans. *Note that this will not be covering scanning xls submissions through the FAC app.*
+Once the localstack has been built successfully, clamav will be available on `0.0.0.0:9000` for http connections and `0.0.0.0:9443` for https connections. When building the localstack, the scans will occur on port `9000`. Once we have the clamav image running, we can then submit files for scans.
 
 Once the localstack has been built successfully, a scan, in a new terminal can be run with
 ```bash
