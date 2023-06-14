@@ -9,6 +9,7 @@ model_bakery
 mypy
 pandas
 pip-tools
+tblib
 toml
 types-python-slugify
 types-requests
