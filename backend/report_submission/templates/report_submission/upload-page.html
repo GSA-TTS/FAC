@@ -5,8 +5,9 @@
         <div class="usa-nav-container">
             <div class="usa-navbar bg-primary-darker text-white width-full flex">
                 <p class="margin-left-2">
-                    <a href="/" class="text-gray-10">My audit submissions</a> » 
-                    <a href="/audit/submission-progress/{{ report_id }}" class="text-gray-10">{{ auditee_name | default_if_none:'' }}</a> » 
+                    <a href="/" class="text-gray-10">My audit submissions</a> »
+                    <a href="/audit/submission-progress/{{ report_id }}"
+                       class="text-gray-10">{{ auditee_name | default_if_none:'' }}</a> »
                     <span class="text-bold">{{ view_name }}</span>
                 </p>
             </div>
@@ -16,9 +17,9 @@
         <div class="grid-row grid-gap">
             {% comment %} {% include "../sidenav.html" %} {% endcomment %}
             <form class="usa-form usa-form--large"
-                    id="{{ view_id }}"
-                    id_test="upload-page__form"
-                    method="post">
+                  id="{{ view_id }}"
+                  id_test="upload-page__form"
+                  method="post">
                 {% csrf_token %}
                 <fieldset class="usa-fieldset">
                     <legend class="usa-legend usa-legend--large"
@@ -31,15 +32,17 @@
                     <p>Save your completed worksheet as an XLSX file and upload it below.</p>
                     <div class="usa-form-group">
                         <input id="file-input-{{ view_id }}-xlsx"
-                                class="usa-file-input"
-                                id_test="upload-page__file-input"
-                                type="file"
-                                name="file-input-{{ view_id }}-xlsx"
-                                aria-describedby="file-input-{{ view_id }}-xlsx"
-                                accept=".xlsx"/>
+                               class="usa-file-input"
+                               id_test="upload-page__file-input"
+                               type="file"
+                               name="file-input-{{ view_id }}-xlsx"
+                               aria-describedby="file-input-{{ view_id }}-xlsx"
+                               accept=".xlsx"/>
                     </div>
                     {% if already_submitted %}
-                        <p class="text-green" id="already-submitted">A file has already been uploaded for this section. A successful reupload will overwrite your previous submission.</p>
+                        <p class="text-green" id="already-submitted">
+                            A file has already been uploaded for this section. A successful reupload will overwrite your previous submission.
+                        </p>
                     {% endif %}
                     <div hidden id="info_box" class="grid-row margin-top-2"></div>
                     <button class="usa-button" id="continue" disabled="disabled">Continue to next section</button>
