@@ -8,8 +8,3 @@
         name: Auto Create PR at 430am UTC Daily
         uses: ./.github/workflows/auto-create-pr.yml
         secrets: inherit
-
-      test-pr:
-        name: Invoke PR Triggers
-        uses: ./.github/workflows/triggers-PR.yml
-        secrets: inherit
