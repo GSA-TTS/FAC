@@ -71,10 +71,10 @@ TABLE(CAPText, "CAPText") {
 
 General "1" -- "*" Award : covers
 General "1" -- "0.*" Passthrough : may-contain
-General "1" -- "*" Finding : contains
+Award "1" -- "*" Finding : contains
 Finding "1" -- "*" FindingText : contains
 Finding "1" -- "*" CAPText : contains
-General "1" -- "*" Note : contains
+Award "1" -- "*" Note : contains
 
 @enduml
 ```
