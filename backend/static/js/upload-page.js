@@ -36,12 +36,45 @@ function handleUploadErrors(error) {
         JSON.parse(errorMessage)
       );
       info_box.innerHTML =
-        'Error when uploading file. See the console for more information.';
+        'Error when uploading file. See the console for more information, or contact an administrator.';
     });
   } else if (error.name === 'AbortError') {
     console.error(`Timeout - Response took longer than expected.\n`, error);
-    info_box.innerHTML = `Timeout - Response took longer than expected.`;
-  } else console.error(`Unexpected error.\n`, error);
+    info_box.innerHTML = `Timeout - Response took longer than expected. Try again later.`;
+  } else {
+    info_box.innerHTML =
+        'Error when uploading file. Ensure you have upload the correct template, or contact an administrator.';
+    console.error(`Unexpected error.\n`, error);
+  }
+}
+
+function getValidationErrorsTable(res){
+  var error_rows = ""
+  for (let i = 0; i < res.errors.length; i++) {
+    row_array = res.errors[i].replaceAll(/[\(\)']/g, ` `).split(',')
+    error_rows += `
+    <tr>
+      <td class="text-center">${row_array[0]}</p>
+      <td class="text-center">${row_array[1]}</p>
+      <td>${row_array[2]}</p>
+    </tr>`;
+  }
+  const validationTable =
+  `<p>Error on validation. Check the following cells for errors, and re-upload. 
+  Common errors include incorrect data types or missing information.</p>
+  <table class="usa-table usa-table--striped">
+    <thead>
+      <tr>
+        <th scope="col">Row</th>
+        <th scope="col">Column</th>
+        <th scope="col">Field</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${error_rows}
+    </tbody>
+  </table>`
+  return validationTable
 }
 
 // On file upload, send it off for verification.
@@ -78,16 +111,14 @@ function attachFileUploadHandler() {
         method: 'POST',
         body: data,
       })
-        .then((response) => {
-          if (response.status == 200) {
+        .then((res) => res.json())
+        .then((res) => {
+          if (res.status == 200) {
             info_box.innerHTML =
               'File successfully validated! Your work has been saved.';
             setContinueButtonDisabled(false);
           } else {
-            // TODO: Handle helpful validation errors here
-            console.error('Error when validating excel file.\n', response);
-            info_box.innerHTML =
-              'Error on validation. See the console for more information.';
+            info_box.innerHTML = getValidationErrorsTable(res)
           }
         })
         .catch((error) => {

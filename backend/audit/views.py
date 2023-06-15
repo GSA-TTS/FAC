@@ -9,6 +9,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse
 from django.utils.datastructures import MultiValueDictKeyError
 from django.utils.decorators import method_decorator
+from django.http import JsonResponse
 
 from .fixtures.excel import (
     FEDERAL_AWARDS_EXPENDED,
@@ -137,11 +138,15 @@ class ExcelFileHandlerView(SingleAuditChecklistAccessRequiredMixin, generic.View
             logger.warn(f"no SingleAuditChecklist found with report ID {report_id}")
             raise PermissionDenied()
         except ValidationError as e:
+            # The good error, where bad rows/columns are sent back in the request.
             logger.warn(f"{form_section} Excel upload failed validation: {e}")
-            raise BadRequest(e)
+            return JsonResponse({"errors": list(e)}, status=400)
         except MultiValueDictKeyError:
-            logger.warn("no file found in request")
+            logger.warn(f"no file found in request")
             raise BadRequest()
+        except KeyError as e:
+            logger.warn(f"Field error. Field: {e}")
+            raise BadRequest(e)
 
 
 class ReadyForCertificationView(SingleAuditChecklistAccessRequiredMixin, generic.View):
