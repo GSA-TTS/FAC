@@ -26,7 +26,6 @@ jobs:
 
   # PR to main bafore dev deploy
   plan-terraform-dev:
-
     if: ${{ github.base_ref == 'main' }}
     uses: ./.github/workflows/terraform-plan-env.yml
     with:

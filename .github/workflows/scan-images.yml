@@ -64,9 +64,9 @@ jobs:
 
       - name: Tag Image
         run: |
-          image_creation_date=$(date -d "$(docker inspect -f '{{ .Created }}' ${{ matrix.image.name }})" +%s)
+          date=$(date +%Y%m%d)
           docker tag ${{ matrix.image.name }} ${{ env.GH_REPO }}/${{ matrix.image.tname }}:latest
-          docker tag ${{ matrix.image.name }} ${{ env.GH_REPO }}/${{ matrix.image.tname }}:$image_creation_date
+          docker tag ${{ matrix.image.name }} ${{ env.GH_REPO }}/${{ matrix.image.tname }}:$date
 
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v2
