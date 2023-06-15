@@ -10,7 +10,6 @@ on:
       - '!docs/**'
       - 'docs/bpmn-workflow-models/**'
   workflow_dispatch: null
-  workflow_call:
 
 jobs:
   # Testing for all main and prod PRs
