@@ -457,3 +457,15 @@ class ExcelFile(models.Model):
     def save(self, *args, **kwargs):
         self.filename = validate_excel_filename(self.file)
         super(ExcelFile, self).save(*args, **kwargs)
+
+
+class SingleAuditReportPackage(models.Model):
+    """
+    Data model to track uploaded Single Audit report PDFs and associate them with SingleAuditChecklists
+    """
+
+    file = models.FileField(upload_to="singleauditreportpackages")
+    filename = models.CharField(max_length=255)
+    sac = models.ForeignKey(SingleAuditChecklist, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, blank=True, null=True, on_delete=models.SET_NULL)
+    date_created = models.DateTimeField(auto_now_add=True)
