@@ -142,7 +142,7 @@ class ExcelFileHandlerView(SingleAuditChecklistAccessRequiredMixin, generic.View
             logger.warn(f"{form_section} Excel upload failed validation: {e}")
             return JsonResponse({"errors": list(e)}, status=400)
         except MultiValueDictKeyError:
-            logger.warn(f"no file found in request")
+            logger.warn("No file found in request")
             raise BadRequest()
         except KeyError as e:
             logger.warn(f"Field error. Field: {e}")
