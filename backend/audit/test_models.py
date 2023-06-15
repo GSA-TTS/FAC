@@ -23,8 +23,8 @@ class SingleAuditChecklistTests(TestCase):
         -   There is a report_id value
         -   The report_id value consists of:
             -   Four-digit year of start of audit period.
-            -   Three-digit char (but without I or O) random.
-            -   10-digit numeric (monotonically increasing, but starting from
+            -   Three-character all-caps month abbrevation (start of audit period)
+            -   10-digit numeric monotonically increasing, but starting from
                 0001000001 because the Census numbers are six-digit values. The
                 formula for creating this is basically "how many non-legacy
                 entries there are in the system plus 1,000,000".
@@ -43,9 +43,7 @@ class SingleAuditChecklistTests(TestCase):
         )
         self.assertEqual(len(sac.report_id), 17)
         self.assertEqual(sac.report_id[:4], "2022")
-        self.assertIn(sac.report_id[4], "ABCDEFGHJKLMNPQRSTUVWXYZ1234567890")
-        self.assertIn(sac.report_id[5], "ABCDEFGHJKLMNPQRSTUVWXYZ1234567890")
-        self.assertIn(sac.report_id[6], "ABCDEFGHJKLMNPQRSTUVWXYZ1234567890")
+        self.assertEqual(sac.report_id[4:7], "NOV")
         # This one is a little dubious because it assumes this will always be
         # the first entry in the test database:
         self.assertEqual(sac.report_id[7:], "0001000001")
