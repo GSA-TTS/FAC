@@ -5,7 +5,7 @@ from . import docs
 
 
 class FindingText(models.Model):
-    """Specific findings details"""
+    """Specific findings details. References Finding"""
 
     charts_tables = models.BooleanField(
         "Indicates whether or not the text contained charts or tables that could not be entered due to formatting restrictions",
@@ -14,7 +14,7 @@ class FindingText(models.Model):
         help_text=docs.charts_tables_findingstext,
     )
     finding_ref_number = models.CharField(
-        "Audit Finding Reference Number",
+        "Finding Reference Number - FK",
         max_length=100,
         null=True,
         help_text=docs.finding_ref_nums_findingstext,
@@ -30,23 +30,21 @@ class FindingText(models.Model):
         help_text=docs.text_findingstext,
     )
 
-    report_id = models.CharField(
-        "G-FAC generated identifier. FK refers to General"
-        max_length=40
-    )
     class Meta:
-        unique_together = (('report_id', 'finding_ref_number', 'sequence_number'),)
-
+        unique_together = (("finding_ref_number", "sequence_number"),)
 
 
 class Finding(models.Model):
-    """A finding from the audit"""
+    """A finding from the audit. References FederalAward"""
 
     finding_ref_number = models.CharField(
         "Findings Reference Numbers",
         max_length=100,
+        unique=True,
         help_text=docs.finding_ref_nums_findings,
     )
+
+    # each element is the list is a FK to Finding
     prior_finding_ref_numbers = models.CharField(
         "Audit finding reference numbers from the immediate prior audit",
         max_length=100,
@@ -86,36 +84,27 @@ class Finding(models.Model):
         null=True,
         help_text=docs.type_requirement_findings,
     )
+
+    # report_id + audit_id is a FK to FederalAwards
     report_id = models.CharField(
-        "G-FAC generated identifier. FK refers to General"
-        max_length=40
+        "G-FAC generated identifier. FK refers to General",
+        max_length=40,
     )
-    class Meta:
-        unique_together = (('report_id', 'finding_ref_number'),)
-
-
-class FederalAward(models.Model):
-    """Information about the federal award section of the form"""
-
-    audit_id = models.IntegerField(
+    award_id = models.IntegerField(
         "FAC system generated sequence number used to link to Findings data between CFDA Info and Findings",
         help_text=docs.elec_audits_id_cfdainfo,
     )
-    # this would be better as a list
-    finding_ref_numbers = models.CharField(
-        "Findings Reference Numbers",
-        max_length=100,
-        null=True,
-        help_text=docs.finding_ref_nums_cfdainfo,
+
+
+class FederalAward(models.Model):
+    """Information about the federal award section of the form. References General"""
+
+    # a better name would be award_seq_number
+    award_id = models.IntegerField(
+        "FAC system generated sequence number used to link to Findings data between CFDA Info and Findings",
+        help_text=docs.elec_audits_id_cfdainfo,
     )
-    agency_prior_findings_list = ArrayField(
-        models.IntegerField(
-            "Federal Agencies with Current or Prior Year Audit Findings on Direct Awards. An empty list means None.",
-            null=True,
-            help_text=docs.agency_prior_findings,
-        ),
-        null=True,
-    )
+
     # Agency
     federal_program_name = models.CharField(
         "Name of Federal Program",
@@ -138,12 +127,6 @@ class FederalAward(models.Model):
         max_length=50,
         null=True,
         help_text=docs.award_identification,
-    )
-    # this is redundant, we could remove in the future, keeping for now so relationships can be verified
-    auditor_ein = models.IntegerField(
-        "Primary Employer Identification Number",
-        null=True,
-        help_text=docs.auditor_ein,
     )
     research_and_development = models.BooleanField(
         "Indicate whether or not the program is a Research and Development program",
@@ -232,6 +215,8 @@ class FederalAward(models.Model):
     findings_page = models.TextField(
         "Items on the Findings page", null=True, help_text=docs.findings
     )
+
+    # can this be computed?
     findings_count = models.IntegerField(
         "Number of findings for the federal program (only available for audit years 2013 and beyond)",
         null=True,
@@ -243,25 +228,17 @@ class FederalAward(models.Model):
         max_length=40,
         help_text=docs.questioned_costs_FederalAward,
     )
+    report_id = models.CharField(
+        "G-FAC generated identifier. FK refers to General",
+        max_length=40,
+    )
 
-    # metadata
-    dbkey = models.CharField(
-        "Audit Year and DBKEY (database key) combined make up the primary key.",
-        max_length=40,
-        help_text=docs.dbkey_cfdainfo,
-    )
-    audit_year = models.CharField(
-        "Audit Year and DBKEY (database key) combined make up the primary key.",
-        max_length=40,
-        help_text=docs.audit_year_cfdainfo,
-    )
-    is_public = models.BooleanField(
-        "True for public records, False for non-public records"
-    )
+    class Meta:
+        unique_together = (("report_id", "award_id"),)
 
 
 class CapText(models.Model):
-    """Corrective action plan text"""
+    """Corrective action plan text. Referebces Finding"""
 
     finding_ref_number = models.CharField(
         "Audit Finding Reference Number",
@@ -280,23 +257,20 @@ class CapText(models.Model):
     text = models.TextField(
         "Content of the Corrective Action Plan (CAP)", help_text=docs.text_captext
     )
-    report_id = models.CharField(
-        "G-FAC generated identifier. FK refers to General"
-        max_length=40
-    )
+
     class Meta:
-        unique_together = (('report_id', 'finding_ref_number', 'sequence_number'),)
-
-
+        unique_together = (("finding_ref_number", "sequence_number"),)
 
 
 class Note(models.Model):
     """Note to Schedule of Expenditures of Federal Awards (SEFA)"""
 
     type_id = models.CharField("Note Type", max_length=1, help_text=docs.type_id)
-    fac_id = models.IntegerField(
-        "Internal Unique Identifier for the record", help_text=docs.fac_id
-    )
+
+    # fac_id = models.IntegerField(
+    #     unique=True
+    #     "Internal Unique Identifier for the record", help_text=docs.fac_id
+    # )
     report_id = models.IntegerField(
         "Internal Audit Report Id", help_text=docs.report_id
     )
@@ -313,6 +287,9 @@ class Note(models.Model):
     title = models.CharField(
         "Note Title", max_length=75, null=True, help_text=docs.title
     )
+
+    class Meta:
+        unique_together = (("report_id", "sequence_number"),)
 
 
 class Revision(models.Model):
@@ -417,8 +394,8 @@ class Revision(models.Model):
         help_text=docs.audit_year_revisions,
     )
     report_id = models.CharField(
-        "G-FAC generated identifier. FK refers to General"
-        max_length=40
+        "G-FAC generated identifier. FK refers to General",
+        max_length=40,
     )
 
 
@@ -448,19 +425,19 @@ class Passthrough(models.Model):
         help_text=docs.audit_year_passthrough,
     )
     report_id = models.CharField(
-        "G-FAC generated identifier. FK refers to General"
-        max_length=40
+        "G-FAC generated identifier. FK refers to General",
+        max_length=40,
     )
 
 
 class General(models.Model):
     # Relational fields
     # null = True for these so we can load in phases, may want to tighten validation later
-    
+
     report_id = models.CharField(
-        "G-FAC generated identifier. "
+        "G-FAC generated identifier. ",
         max_length=40,
-        primary_key=True
+        unique=True,
     )
     auditee_certify_name = models.CharField(
         "Name of Auditee Certifying Official",
