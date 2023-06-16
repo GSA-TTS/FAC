@@ -12,8 +12,10 @@ from tempfile import NamedTemporaryFile
 
 import requests
 
-from audit.fixtures.excel import SIMPLE_CASES_TEST_FILE
-from audit.fixtures.excel import CORRECTIVE_ACTION_TEMPLATE_DEFINITION
+from audit.fixtures.excel import (
+    SIMPLE_CASES_TEST_FILE,
+    CORRECTIVE_ACTION_TEMPLATE_DEFINITION,
+)
 
 from .validators import (
     ALLOWED_EXCEL_CONTENT_TYPES,
