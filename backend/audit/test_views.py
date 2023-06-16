@@ -22,10 +22,7 @@ from .fixtures.excel import (
     FINDINGS_TEXT_ENTRY_FIXTURES,
     FINDINGS_UNIFORM_GUIDANCE_ENTRY_FIXTURES,
     FEDERAL_AWARDS_ENTRY_FIXTURES,
-    FEDERAL_AWARDS_EXPENDED,
-    CORRECTIVE_ACTION_PLAN,
-    FINDINGS_TEXT,
-    FINDINGS_UNIFORM_GUIDANCE,
+    FORM_SECTIONS,
 )
 from .models import Access, SingleAuditChecklist
 from .views import MySubmissions
@@ -55,13 +52,6 @@ VALID_ACCESS_AND_SUBMISSION_DATA = {
     "auditee_contacts": ["c@c.com"],
     "auditor_contacts": ["d@d.com"],
 }
-
-EXCEL_FILES = [
-    CORRECTIVE_ACTION_PLAN,
-    FEDERAL_AWARDS_EXPENDED,
-    FINDINGS_UNIFORM_GUIDANCE,
-    FINDINGS_TEXT,
-]
 
 
 # Mocking the user login and file scan functions
@@ -262,7 +252,7 @@ class ExcelFileHandlerViewTests(TestCase):
     def test_login_required(self):
         """When an unauthenticated request is made"""
 
-        for form_section in EXCEL_FILES:
+        for form_section in FORM_SECTIONS:
             response = self.client.post(
                 reverse(
                     f"audit:{form_section}",
@@ -278,7 +268,7 @@ class ExcelFileHandlerViewTests(TestCase):
 
         self.client.force_login(user)
 
-        for form_section in EXCEL_FILES:
+        for form_section in FORM_SECTIONS:
             response = self.client.post(
                 reverse(
                     f"audit:{form_section}",
@@ -296,7 +286,7 @@ class ExcelFileHandlerViewTests(TestCase):
         user, sac = _make_user_and_sac()
 
         self.client.force_login(user)
-        for form_section in EXCEL_FILES:
+        for form_section in FORM_SECTIONS:
             response = self.client.post(
                 reverse(
                     f"audit:{form_section}",
@@ -313,7 +303,7 @@ class ExcelFileHandlerViewTests(TestCase):
 
         self.client.force_login(user)
 
-        for form_section in EXCEL_FILES:
+        for form_section in FORM_SECTIONS:
             response = self.client.post(
                 reverse(
                     f"audit:{form_section}",
@@ -332,7 +322,7 @@ class ExcelFileHandlerViewTests(TestCase):
 
         file = SimpleUploadedFile("not-excel.txt", b"asdf", "text/plain")
 
-        for form_section in EXCEL_FILES:
+        for form_section in FORM_SECTIONS:
             response = self.client.post(
                 reverse(
                     f"audit:{form_section}",
@@ -365,10 +355,10 @@ class ExcelFileHandlerViewTests(TestCase):
             with open(tmp.name, "rb") as excel_file:
                 response = self.client.post(
                     reverse(
-                        f"audit:{EXCEL_FILES[1]}",
+                        f"audit:{FORM_SECTIONS.FEDERAL_AWARDS_EXPENDED}",
                         kwargs={
                             "report_id": sac.report_id,
-                            "form_section": EXCEL_FILES[1],
+                            "form_section": FORM_SECTIONS.FEDERAL_AWARDS_EXPENDED,
                         },
                     ),
                     data={"FILES": excel_file},
@@ -488,10 +478,10 @@ class ExcelFileHandlerViewTests(TestCase):
             with open(tmp.name, "rb") as excel_file:
                 response = self.client.post(
                     reverse(
-                        f"audit:{EXCEL_FILES[0]}",
+                        f"audit:{FORM_SECTIONS.CORRECTIVE_ACTION_PLAN}",
                         kwargs={
                             "report_id": sac.report_id,
-                            "form_section": EXCEL_FILES[0],
+                            "form_section": FORM_SECTIONS.CORRECTIVE_ACTION_PLAN,
                         },
                     ),
                     data={"FILES": excel_file},
@@ -554,10 +544,10 @@ class ExcelFileHandlerViewTests(TestCase):
             with open(tmp.name, "rb") as excel_file:
                 response = self.client.post(
                     reverse(
-                        f"audit:{EXCEL_FILES[2]}",
+                        f"audit:{FORM_SECTIONS.FINDINGS_UNIFORM_GUIDANCE}",
                         kwargs={
                             "report_id": sac.report_id,
-                            "form_section": EXCEL_FILES[2],
+                            "form_section": FORM_SECTIONS.FINDINGS_UNIFORM_GUIDANCE,
                         },
                     ),
                     data={"FILES": excel_file},
@@ -632,10 +622,10 @@ class ExcelFileHandlerViewTests(TestCase):
             with open(tmp.name, "rb") as excel_file:
                 response = self.client.post(
                     reverse(
-                        f"audit:{EXCEL_FILES[3]}",
+                        f"audit:{FORM_SECTIONS.FINDINGS_TEXT}",
                         kwargs={
                             "report_id": sac.report_id,
-                            "form_section": EXCEL_FILES[3],
+                            "form_section": FORM_SECTIONS.FINDINGS_TEXT,
                         },
                     ),
                     data={"FILES": excel_file},
