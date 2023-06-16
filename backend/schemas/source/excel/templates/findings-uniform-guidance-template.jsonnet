@@ -80,7 +80,7 @@ local open_ranges_defns = [
   ],
   [
     Sheets.open_range {
-      help: Help.reference_number
+      help: Help.reference_number,
     },
     SV.ReferenceNumberValidation,
     'Audit Finding Reference Number',
@@ -88,7 +88,7 @@ local open_ranges_defns = [
   ],
   [
     open_range_w20 {
-      help: Help.unknown
+      help: Help.unknown,
     },
     SV.ComplianceRequirementValidation,
     'Type(s) of Compliance Requirement(s)',
@@ -96,7 +96,7 @@ local open_ranges_defns = [
   ],
   [
     y_or_n_range_w12 {
-      help: Help.yorn
+      help: Help.yorn,
     },
     SV.YoNValidation,
     'Modified Opinion',
@@ -104,7 +104,7 @@ local open_ranges_defns = [
   ],
   [
     y_or_n_range_w12 {
-      help: Help.unknown
+      help: Help.unknown,
     },
     SV.YoNValidation,
     'Other Matters',
@@ -112,7 +112,7 @@ local open_ranges_defns = [
   ],
   [
     y_or_n_range_w12 {
-      help: Help.unknown
+      help: Help.unknown,
     },
     SV.YoNValidation,
     'Material Weakness',
@@ -120,7 +120,7 @@ local open_ranges_defns = [
   ],
   [
     y_or_n_range_w12 {
-      help: Help.yorn
+      help: Help.yorn,
     },
     SV.YoNValidation,
     'Significant Deficiency',
@@ -128,7 +128,7 @@ local open_ranges_defns = [
   ],
   [
     y_or_n_range_w12 {
-      help: Help.yorn
+      help: Help.yorn,
     },
     SV.YoNValidation,
     'Other Findings',
@@ -136,7 +136,7 @@ local open_ranges_defns = [
   ],
   [
     y_or_n_range_w12 {
-      help: Help.yorn
+      help: Help.yorn,
     },
     SV.YoNValidation,
     'Questioned Costs',
@@ -144,7 +144,7 @@ local open_ranges_defns = [
   ],
   [
     y_or_n_range_w12 {
-      help: Help.yorn
+      help: Help.yorn,
     },
     SV.YoNValidation,
     'Repeat Findings from Prior Year',
@@ -152,7 +152,7 @@ local open_ranges_defns = [
   ],
   [
     open_range_w24 {
-      help: Help.yorn
+      help: Help.yorn,
     },
     SV.NoValidation,
     'If Repeat Finding, provide Prior Year Audit Finding Reference Number(s)',
@@ -160,7 +160,7 @@ local open_ranges_defns = [
   ],
   [
     y_or_n_range_w16_with_formula {
-      help: Help.yorn
+      help: Help.yorn,
     },
     SV.YoNValidation,
     'Is Findings Combination Valid? (Read Only - Please See Instructions tab)',
