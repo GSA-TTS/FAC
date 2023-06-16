@@ -1,4 +1,5 @@
 local Fun = import '../libs/Functions.libsonnet';
+local Help = import '../libs/Help.libsonnet';
 local SV = import '../libs/SheetValidations.libsonnet';
 local Sheets = import '../libs/Sheets.libsonnet';
 
@@ -11,6 +12,7 @@ local single_cells = [
     title_cell: 'A2',
     range_cell: 'B2',
     validation: SV.StringOfLengthTwelve,
+    help: Help.uei,
   },
 ];
 
@@ -44,21 +46,126 @@ local y_or_n_range_w12 = Sheets.y_or_n_range {
 };
 
 local open_ranges_defns = [
-  [open_range_w12, SV.FAPPrefixValidation, 'Federal Agency Prefix', 'federal_agency_prefix'],
-  [open_range_w12, SV.StringOfLengthThree, 'CFDA Three Digit Extension', 'three_digit_extension'],
-  [Sheets.open_range, {}, 'Additional Award Identification', 'additional_award_identification'],
-  [open_range_w48, {}, 'Federal Program Name', 'program_name'],
-  [Sheets.open_range, SV.ReferenceNumberValidation, 'Audit Finding Reference Number', 'reference_number'],
-  [open_range_w20, SV.ComplianceRequirementValidation, 'Type(s) of Compliance Requirement(s)', 'compliance_requirement'],
-  [y_or_n_range_w12, SV.YoNValidation, 'Modified Opinion', 'modified_opinion'],
-  [y_or_n_range_w12, SV.YoNValidation, 'Other Matters', 'other_matters'],
-  [y_or_n_range_w12, SV.YoNValidation, 'Material Weakness', 'material_weakness'],
-  [y_or_n_range_w12, SV.YoNValidation, 'Significant Deficiency', 'significant_deficiency'],
-  [y_or_n_range_w12, SV.YoNValidation, 'Other Findings', 'other_findings'],
-  [y_or_n_range_w12, SV.YoNValidation, 'Questioned Costs', 'questioned_costs'],
-  [y_or_n_range_w12, SV.YoNValidation, 'Repeat Findings from Prior Year', 'repeat_prior_reference'],
-  [open_range_w24, {}, 'If Repeat Finding, provide Prior Year Audit Finding Reference Number(s)', 'prior_references'],
-  [y_or_n_range_w16_with_formula, SV.YoNValidation, 'Is Findings Combination Valid? (Read Only - Please See Instructions tab)', 'is_valid'],
+  [
+    open_range_w12 {
+      help: Help.aln_prefix,
+    },
+    SV.FAPPrefixValidation,
+    'Federal Agency Prefix',
+    'federal_agency_prefix',
+  ],
+  [
+    open_range_w12 {
+      help: Help.aln_extension,
+    },
+    SV.StringOfLengthThree,
+    'CFDA Three Digit Extension',
+    'three_digit_extension',
+  ],
+  [
+    Sheets.open_range {
+      help: Help.unknown,
+    },
+    SV.NoValidation,
+    'Additional Award Identification',
+    'additional_award_identification',
+  ],
+  [
+    open_range_w48 {
+      help: Help.plain_text,
+    },
+    SV.NoValidation,
+    'Federal Program Name',
+    'program_name',
+  ],
+  [
+    Sheets.open_range {
+      help: Help.reference_number
+    },
+    SV.ReferenceNumberValidation,
+    'Audit Finding Reference Number',
+    'reference_number',
+  ],
+  [
+    open_range_w20 {
+      help: Help.unknown
+    },
+    SV.ComplianceRequirementValidation,
+    'Type(s) of Compliance Requirement(s)',
+    'compliance_requirement',
+  ],
+  [
+    y_or_n_range_w12 {
+      help: Help.yorn
+    },
+    SV.YoNValidation,
+    'Modified Opinion',
+    'modified_opinion',
+  ],
+  [
+    y_or_n_range_w12 {
+      help: Help.unknown
+    },
+    SV.YoNValidation,
+    'Other Matters',
+    'other_matters',
+  ],
+  [
+    y_or_n_range_w12 {
+      help: Help.unknown
+    },
+    SV.YoNValidation,
+    'Material Weakness',
+    'material_weakness',
+  ],
+  [
+    y_or_n_range_w12 {
+      help: Help.yorn
+    },
+    SV.YoNValidation,
+    'Significant Deficiency',
+    'significant_deficiency',
+  ],
+  [
+    y_or_n_range_w12 {
+      help: Help.yorn
+    },
+    SV.YoNValidation,
+    'Other Findings',
+    'other_findings',
+  ],
+  [
+    y_or_n_range_w12 {
+      help: Help.yorn
+    },
+    SV.YoNValidation,
+    'Questioned Costs',
+    'questioned_costs',
+  ],
+  [
+    y_or_n_range_w12 {
+      help: Help.yorn
+    },
+    SV.YoNValidation,
+    'Repeat Findings from Prior Year',
+    'repeat_prior_reference',
+  ],
+  [
+    open_range_w24 {
+      help: Help.yorn
+    },
+    SV.NoValidation,
+    'If Repeat Finding, provide Prior Year Audit Finding Reference Number(s)',
+    'prior_references',
+  ],
+  [
+    y_or_n_range_w16_with_formula {
+      help: Help.yorn
+    },
+    SV.YoNValidation,
+    'Is Findings Combination Valid? (Read Only - Please See Instructions tab)',
+    'is_valid',
+  ],
 ];
 
 local sheets = [

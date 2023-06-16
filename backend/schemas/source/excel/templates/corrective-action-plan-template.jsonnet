@@ -1,4 +1,5 @@
 local Fun = import '../libs/Functions.libsonnet';
+local Help = import '../libs/Help.libsonnet';
 local SV = import '../libs/SheetValidations.libsonnet';
 local Sheets = import '../libs/Sheets.libsonnet';
 
@@ -11,22 +12,41 @@ local single_cells = [
     title_cell: 'A2',
     range_cell: 'B2',
     validation: SV.StringOfLengthTwelve,
+    help: Help.uei,
   },
 ];
 
 local open_ranges_defns = [
-  [Sheets.open_range {
-    title_cell: 'A3',
-    width: 36,
-  }, SV.ReferenceNumberValidation, 'Audit Finding Reference Number', 'reference_number'],
-  [Sheets.open_range {
-    title_cell: 'C3',
-    width: 100,
-  }, {}, 'Planned Corrective Action', 'planned_action'],
-  [Sheets.y_or_n_range {
-    title_cell: 'G3',
-    width: 36,
-  }, SV.YoNValidation, 'Did Text Contain a Chart or Table?', 'contains_chart_or_table'],
+  [
+    Sheets.open_range {
+      title_cell: 'A3',
+      width: 36,
+      help: Help.reference_number,
+    },
+    SV.ReferenceNumberValidation,
+    'Audit Finding Reference Number',
+    'reference_number',
+  ],
+  [
+    Sheets.open_range {
+      title_cell: 'C3',
+      width: 100,
+      help: Help.plain_text,
+    },
+    SV.NoValidation,
+    'Planned Corrective Action',
+    'planned_action',
+  ],
+  [
+    Sheets.y_or_n_range {
+      title_cell: 'G3',
+      width: 36,
+      help: Help.yorn,
+    },
+    SV.YoNValidation,
+    'Did Text Contain a Chart or Table?',
+    'contains_chart_or_table',
+  ],
 ];
 
 local sheets = [

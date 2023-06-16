@@ -65,6 +65,7 @@ local ComplianceRequirementValidation = {
 };
 
 {
+    NoValidation: {},
     FAPPrefixValidation: FAPPrefixValidation,
     PositiveNumberValidation: PositiveNumberValidation,
     StringOfLengthThree: StringOfLengthThree,
