@@ -20,6 +20,7 @@ RUN \
     apt-get install -y gcc && \
     curl -fsSL https://deb.nodesource.com/setup_14.x | bash - && \
     apt-get install -y nodejs && \
+    apt-get install -y npm && \
     npm i -g npm@^8
 
 COPY requirements.txt /tmp/requirements.txt
