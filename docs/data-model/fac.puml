@@ -1,0 +1,65 @@
+@startuml
+
+!define TABLE(name,desc) class name as "desc" << (T,#FFAAAA) >>
+!define PRIMARY_KEY(x) <color:red>x</color>
+!define FOREIGN_KEY(x) <color:blue>x</color>
+
+hide empty attributes
+
+TABLE(General, "General") {
+  + PRIMARY_KEY(id)
+  report_id
+  uei
+  _auditee_info_
+  auditor_ein
+  _auditor_info_
+  audit_year
+}
+
+TABLE(Award, "FederalAward") {
+  + PRIMARY_KEY(id)
+  + FOREIGN_KEY(General.id)
+  _program_info_
+}
+
+TABLE(Passthrough, "Passthrough") {
+  + PRIMARY_KEY(id)
+  + FOREIGN_KEY(General.id)
+  entity_name
+  uei?
+}
+
+
+TABLE(Finding, "Finding") {
+  + PRIMARY_KEY(id)
+  + FOREIGN_KEY(General.id)
+  + FOREIGN_KEY(Finding.id)
+}
+TABLE(Note, "Note") {
+  + PRIMARY_KEY(id)
+  + FOREIGN_KEY(General.id)
+}
+
+
+TABLE(FindingText, "FindingText") {
+  + PRIMARY_KEY(id)
+  + FOREIGN_KEY(Finding.id)
+  seq_number
+}
+
+TABLE(CAPText, "CAPText") {
+  + PRIMARY_KEY(id)
+  + FOREIGN_KEY(Finding.id)
+  seq_number
+}
+
+
+General "1" -- "*" Award : contains
+General "1" -- "0.*" Passthrough : may-contain
+General "1" -- "*" Finding : contains
+Finding "1" -- "*" FindingText : contains
+Finding "1" -- "*" CAPText : contains
+Finding "1" -- "0,1" Finding : refers-to
+General "1" -- "*" Note : contains
+
+@enduml
