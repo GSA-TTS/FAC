@@ -22,7 +22,6 @@ from .validators import (
     validate_excel_file_content_type,
     validate_excel_file_extension,
     validate_excel_file_integrity,
-    validate_excel_filename,
     validate_excel_file_size,
     validate_federal_award_json,
     validate_file_infection,
@@ -427,59 +426,6 @@ class UEIValidatorTests(SimpleTestCase):
         self.assertRaises(ValidationError, validate_uei_nine_digit_sequences, invalid)
         # Valid UEI
         validate_uei_nine_digit_sequences(self.valid)
-
-
-class ExcelFileFilenameValidatorTests(SimpleTestCase):
-    def test_valid_filename_slug(self):
-        """
-        Filenames that can be slugified are valid
-        """
-        test_cases = [
-            ("this one just has spaces.xlsx", "this-one-just-has-spaces.xlsx"),
-            (
-                "this_one\\ has some? other things!.xlsx",
-                "this-one-has-some-other-things.xlsx",
-            ),
-            ("this/one/has/forward/slashes.xlsx", "slashes.xlsx"),
-            (
-                "this.one.has.multiple.extensions.xlsx",
-                "this-one-has-multiple-extensions.xlsx",
-            ),
-        ]
-
-        for test_case in test_cases:
-            with self.subTest():
-                before, after = test_case
-                valid_file = TemporaryUploadedFile(
-                    before, ALLOWED_EXCEL_CONTENT_TYPES[0], 10000, "utf-8"
-                )
-
-                validated_filename = validate_excel_filename(valid_file)
-
-                self.assertEqual(validated_filename, after)
-
-    def test_invalid_filename_slug(self):
-        """
-        Filenames that cannot be slugified are not valid
-        """
-        test_cases = [
-            "no-extension",
-            ".xlsx",
-            "".join(choice("!?#$%^&*") for _ in range(9)),
-            "".join(choice("!?#$%^&*") for _ in range(9)) + ".xlsx",
-        ]
-
-        for test_case in test_cases:
-            with self.subTest():
-                file = TemporaryUploadedFile(
-                    test_case, ALLOWED_EXCEL_CONTENT_TYPES[0], 10000, "utf-8"
-                )
-
-                with self.assertRaises(
-                    ValidationError,
-                    msg=f"ValidationError not raised with filename = {test_case}",
-                ):
-                    validate_excel_filename(file)
 
 
 class ExcelFileExtensionValidatorTests(SimpleTestCase):

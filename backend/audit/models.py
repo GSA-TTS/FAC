@@ -11,7 +11,6 @@ from django_fsm import FSMField, RETURN_VALUE, transition
 
 from .validators import (
     validate_excel_file,
-    validate_excel_filename,
     validate_corrective_action_plan_json,
     validate_federal_award_json,
     validate_findings_text_json,
@@ -448,10 +447,12 @@ class ExcelFile(models.Model):
 
     file = models.FileField(upload_to="excel", validators=[validate_excel_file])
     filename = models.CharField(max_length=255)
+    form_section = models.CharField(max_length=255)
     sac = models.ForeignKey(SingleAuditChecklist, on_delete=models.CASCADE)
     user = models.ForeignKey(User, blank=True, null=True, on_delete=models.SET_NULL)
     date_created = models.DateTimeField(auto_now_add=True)
 
     def save(self, *args, **kwargs):
-        self.filename = validate_excel_filename(self.file)
+        report_id = SingleAuditChecklist.objects.get(id=self.sac.id).report_id
+        self.filename = f"{report_id}--{self.form_section}.xlsx"
         super(ExcelFile, self).save(*args, **kwargs)
