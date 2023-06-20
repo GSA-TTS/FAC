@@ -29,8 +29,6 @@ logger = logging.getLogger(__name__)
 
 MAX_EXCEL_FILE_SIZE_MB = 25
 
-ERROR_MESSAGE = "No input found or invalid input provided."
-
 ALLOWED_EXCEL_FILE_EXTENSIONS = [".xls", ".xlsx"]
 
 ALLOWED_EXCEL_CONTENT_TYPES = [
@@ -316,7 +314,7 @@ def _get_error_details(xlsx_definition_template, named_ranges_row_indices):
                         open_range["title_cell"][0],
                         xlsx_definition_template["title_row"] + row_index + 1,
                         open_range["title"],
-                        ERROR_MESSAGE,
+                        open_range["help"],
                     )
                 )
                 break
@@ -327,7 +325,7 @@ def _get_error_details(xlsx_definition_template, named_ranges_row_indices):
                         single_cell["range_cell"][0],
                         single_cell["range_cell"][1],
                         single_cell["title"],
-                        ERROR_MESSAGE,
+                        single_cell["help"],
                     )
                 )
                 break
