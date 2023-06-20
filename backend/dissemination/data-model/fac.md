@@ -150,7 +150,7 @@ TABLE(General, "General") {
 
 TABLE(Award, "FederalAward") {
   + General.report_id
-  + seq_number
+  + award_seq_number
   cfda_prefix
   cfda_ext
   award_identification
@@ -191,42 +191,48 @@ TABLE(Award, "FederalAward") {
 }
 
 TABLE(Passthrough, "Passthrough") {
-  + FOREIGN_KEY(General.report_id)
-  + uei
+  + Award.report_id
+  + Award.award_seq_number
+  + passthrough_seq_number
   passthrough [JSON]
 }
 
 
 TABLE(Finding, "Finding") {
-  + FOREIGN_KEY(General.report_id)
-  + ref_number
+  + Award.report_id
+  + Award.award_seq_number
+  + finding_seq_number
+  ref_number
   finding [JSON]
 }
 
 TABLE(Note, "Note") {
-  + FOREIGN_KEY(General.id)
-  + seq_number
+  + Award.report_id
+  + Award.award_seq_number
+  + note_seq_number
   note [JSON]
 }
 
 
 TABLE(FindingText, "FindingText") {
-  + FOREIGN_KEY(General.report_id)
-  + ref_number
-  + seq_number
+  + Finding.report_id
+  + Finding.award_seq_number
+  + Finding.finding_seq_number
+  + finding_text_seq_number
   finding_text [JSON]
 }
 
 TABLE(CAPText, "CAPText") {
-  + FOREIGN_KEY(General.report_id)
-  + FOREIGN_KEY(Finding.ref_number)
-  + seq_number
+  + Finding.report_id
+  + Finding.award_seq_number
+  + Finding.finding_seq_number
+  + cap_text_seq_number
   cap_text [JSON]
 }
 
 
 General "1" -- "*" Award : covers
-General "1" -- "0.*" Passthrough : may-contain
+Award "1" -- "0.*" Passthrough : may-contain
 Award "1" -- "*" Finding : contains
 Finding "1" -- "*" FindingText : contains
 Finding "1" -- "*" CAPText : contains
