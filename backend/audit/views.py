@@ -93,7 +93,12 @@ class ExcelFileHandlerView(SingleAuditChecklistAccessRequiredMixin, generic.View
             file = request.FILES["FILES"]
 
             excel_file = ExcelFile(
-                **{"file": file, "filename": "temp", "sac_id": sac.id}
+                **{
+                    "file": file,
+                    "filename": "temp",
+                    "sac_id": sac.id,
+                    "form_section": form_section,
+                }
             )
 
             excel_file.full_clean()
