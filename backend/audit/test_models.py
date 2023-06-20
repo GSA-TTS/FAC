@@ -172,6 +172,7 @@ class ExcelFileTests(TestCase):
         """
         file = SimpleUploadedFile("this is a file.xlsx", b"this is a file")
 
-        excel_file = baker.make(ExcelFile, file=file)
+        excel_file = baker.make(ExcelFile, file=file, form_section="sectionname")
+        report_id = SingleAuditChecklist.objects.get(id=excel_file.sac.id).report_id
 
-        self.assertEqual("this-is-a-file.xlsx", excel_file.filename)
+        self.assertEqual(f"{report_id}--sectionname.xlsx", excel_file.filename)

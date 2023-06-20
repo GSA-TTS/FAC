@@ -24,6 +24,10 @@
          "name": "Form",
          "open_ranges": [
             {
+               "help": {
+                  "link": "https://fac.gov/documentation/validation/#aln_prefix",
+                  "text": "Not a valid agency ALN (CFDA) prefix"
+               },
                "range_name": "federal_agency_prefix",
                "title": "Federal Agency Prefix",
                "title_cell": "A3",
@@ -32,14 +36,18 @@
                   "allow_blank": "False",
                   "custom_error": "The Federal Agency Prefix you entered is not recognized",
                   "custom_title": "Unknown ALN Prefix",
-                  "formula1": "\"01,02,03,04,07,08,09,10,11,12,13,14,15,16,17,18,19,20,21,22,23,27,29,30,32,33,34,36,39,40,41,42,43,44,45,46,47,53,57,58,59,60,61,62,64,66,68,70,77,78,81,82,83,84,85,86,87,88,89,90,91,92,93,94,96,97,98,99\"",
+                  "formula1": "\"10,11,12,13,14,15,16,17,18,19,20,21,22,23,27,29,30,32,33,34,36,39,40,41,42,43,44,45,46,47,53,57,58,59,60,61,62,64,66,68,70,77,78,81,82,83,84,85,86,87,88,89,90,91,92,93,94,96,97,98,99\"",
                   "type": "list"
                },
                "width": 12
             },
             {
+               "help": {
+                  "link": "https://fac.gov/documentation/validation/#aln_extension",
+                  "text": "An ALN (CFDA) extension is typically three digits, with some exceptions"
+               },
                "range_name": "three_digit_extension",
-               "title": "CFDA Three Digit Extension",
+               "title": "ALN (CFDA) Three Digit Extension",
                "title_cell": "B3",
                "type": "open_range",
                "validation": {
@@ -59,6 +67,10 @@
                "validation": { }
             },
             {
+               "help": {
+                  "link": "https://fac.gov/documentation/validation/#federal_program_name",
+                  "text": "Not one of the allowed federal program names"
+               },
                "range_name": "program_name",
                "title": "Federal Program Name",
                "title_cell": "D3",
@@ -67,6 +79,10 @@
                "width": 48
             },
             {
+               "help": {
+                  "link": "https://fac.gov/documentation/validation/#positive_number",
+                  "text": "The number in this field must be zero or greater"
+               },
                "range_name": "amount_expended",
                "title": "Amount Expended",
                "title_cell": "E3",
@@ -79,6 +95,10 @@
                }
             },
             {
+               "help": {
+                  "link": "https://fac.gov/documentation/validation/#yorn",
+                  "text": "This field must be either `Y` or `N`"
+               },
                "range_name": "cluster_name",
                "title": "Cluster Name",
                "title_cell": "F3",
@@ -86,6 +106,10 @@
                "validation": { }
             },
             {
+               "help": {
+                  "link": "https://fac.gov/documentation/validation/#cluster_name",
+                  "text": "Not one of the allowed cluster names"
+               },
                "range_name": "state_cluster_name",
                "title": "If State Cluster, Enter State Cluster Name",
                "title_cell": "G3",
@@ -93,6 +117,10 @@
                "validation": { }
             },
             {
+               "help": {
+                  "link": "https://fac.gov/documentation/validation/#other_cluster_name",
+                  "text": "Not one of the alternative (other) cluster names"
+               },
                "range_name": "other_cluster_name",
                "title": "If Other Cluster, Enter Other Cluster Name",
                "title_cell": "H3",
@@ -100,6 +128,10 @@
                "validation": { }
             },
             {
+               "help": {
+                  "link": "https://fac.gov/documentation/validation/#positive_number",
+                  "text": "The number in this field must be zero or greater"
+               },
                "range_name": "federal_program_total",
                "title": "Federal Program Total",
                "title_cell": "I3",
@@ -112,6 +144,10 @@
                }
             },
             {
+               "help": {
+                  "link": "https://fac.gov/documentation/validation/#positive_number",
+                  "text": "The number in this field must be zero or greater"
+               },
                "range_name": "cluster_total",
                "title": "Cluster Total",
                "title_cell": "J3",
@@ -124,6 +160,10 @@
                }
             },
             {
+               "help": {
+                  "link": "https://fac.gov/documentation/validation/#yorn",
+                  "text": "This field must be either `Y` or `N`"
+               },
                "range_name": "is_guaranteed",
                "title": "Loan / Loan Guarantee",
                "title_cell": "K3",
@@ -137,6 +177,10 @@
                }
             },
             {
+               "help": {
+                  "link": "https://fac.gov/documentation/validation/#positive_number",
+                  "text": "The number in this field must be zero or greater"
+               },
                "range_name": "loan_balance_at_audit_period_end",
                "title": "If yes (Loan/Loan Guarantee, End of Audit Period Outstanding Loan Balance)",
                "title_cell": "L3",
@@ -144,6 +188,10 @@
                "validation": { }
             },
             {
+               "help": {
+                  "link": "https://fac.gov/documentation/validation/#yorn",
+                  "text": "This field must be either `Y` or `N`"
+               },
                "range_name": "is_direct",
                "title": "Direct Award",
                "title_cell": "M3",
@@ -157,6 +205,10 @@
                }
             },
             {
+               "help": {
+                  "link": "https://fac.gov/documentation/validation/#plain_text",
+                  "text": "Only plain text is allowed in this field, no emoji or other special additions"
+               },
                "range_name": "passthrough_name",
                "title": "If no (Direct Award), Name of Passthrough Entity",
                "title_cell": "N3",
@@ -170,14 +222,28 @@
                }
             },
             {
+               "help": {
+                  "link": "https://fac.gov/documentation/validation/#unknown",
+                  "text": "If you see this error, please contact support."
+               },
                "range_name": "passthrough_identifying_number",
                "title": "If no (Direct Award), Identifying Number Assigned by the Pass-through Entity, if assigned",
                "title_cell": "O3",
                "type": "open_range",
-               "validation": { },
+               "validation": {
+                  "allow_blank": "False",
+                  "custom_error": "Must be 'Y' or 'N'",
+                  "custom_title": "Y/N",
+                  "formula1": "\"Y,N\"",
+                  "type": "list"
+               },
                "width": 18
             },
             {
+               "help": {
+                  "link": "https://fac.gov/documentation/validation/#yorn",
+                  "text": "This field must be either `Y` or `N`"
+               },
                "range_name": "is_passed",
                "title": "Federal Award Passed Through to Subrecipients",
                "title_cell": "P3",
@@ -191,6 +257,10 @@
                }
             },
             {
+               "help": {
+                  "link": "https://fac.gov/documentation/validation/#positive_number",
+                  "text": "The number in this field must be zero or greater"
+               },
                "range_name": "subrecipient_amount",
                "title": "If yes (Passed Through), Amount Passed Through to Subrecipients",
                "title_cell": "Q3",
@@ -198,6 +268,10 @@
                "validation": { }
             },
             {
+               "help": {
+                  "link": "https://fac.gov/documentation/validation/#yorn",
+                  "text": "This field must be either `Y` or `N`"
+               },
                "range_name": "is_major",
                "title": "Major Program (MP)",
                "title_cell": "R3",
@@ -211,6 +285,10 @@
                }
             },
             {
+               "help": {
+                  "link": "https://fac.gov/documentation/validation/#unknown",
+                  "text": "If you see this error, please contact support."
+               },
                "range_name": "audit_report_type",
                "title": "If yes (MP), Type of Audit Report",
                "title_cell": "S3",
@@ -219,6 +297,10 @@
                "width": 12
             },
             {
+               "help": {
+                  "link": "https://fac.gov/documentation/validation/#positive_number",
+                  "text": "The number in this field must be zero or greater"
+               },
                "range_name": "number_of_audit_findings",
                "title": "Number of Audit Findings",
                "title_cell": "T3",
@@ -234,6 +316,10 @@
          ],
          "single_cells": [
             {
+               "help": {
+                  "link": "https://fac.gov/documentation/validation/#uei",
+                  "text": "UEIs are 12 characters long and match rules as given by SAM.gov"
+               },
                "range_cell": "B2",
                "range_name": "auditee_uei",
                "title": "Auditee UEI",
@@ -249,6 +335,10 @@
             },
             {
                "formula": "=SUM(FIRSTCELLREF:LASTCELLREF)",
+               "help": {
+                  "link": "https://fac.gov/documentation/validation/#positive_number",
+                  "text": "The number in this field must be zero or greater"
+               },
                "range_cell": "E2",
                "range_name": "total_amount_expended",
                "title": "Total amount expended",

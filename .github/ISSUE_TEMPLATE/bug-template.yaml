@@ -1,5 +1,5 @@
 name: Bug Report 🐞
-description: Report a bug and help USWDS improve.
+description: Report a bug and help the FAC improve.
 title: "FAC - Bug: [YOUR TITLE]"
 labels: ['Type: Bug','Status: Triage','Needs: Confirmation']
 body:
