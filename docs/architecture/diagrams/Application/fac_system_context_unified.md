@@ -9,21 +9,20 @@ Person(Public, "User", "Public")
 Person(Staff, "User", "FAC Staff")
 Person(AgencyApp, "App", "Agency App")
 
-note as EncryptionNote
+note as ConnectionNote
 All connections depicted are encrypted with TLS 1.2 unless otherwise noted. 
-end note
-note as PortsNote
 All connextions are on port 443 and use https unles otherwise noted.
+All connections use TCP. 
 end note
 
 
 Boundary(cloudgov, "Cloud.gov Boundary") {
     Boundary(atob, "ATO Boundary") {
         Boundary(backend, "FAC application", "egress-controlled-space") {
-            System(django, "FAC Web App", "port 8080") 
+            System(django, "FAC Web App (8080)", "Django") 
             Boundary(services, "FAC Services") {
-                System(api, "REST API", "PostgREST")
-                System(scan, "Virus Scanner", "ClamAV")
+                System(api, "REST API (3000)", "PostgREST")
+                System(scan, "Virus Scanner (8080)", "ClamAV")
             }
         }
         Boundary(proxy, "Proxy services", "egress-permitted-space"){
@@ -32,7 +31,7 @@ Boundary(cloudgov, "Cloud.gov Boundary") {
         }
     }
     Boundary(cloudgov-services,"Cloud.gov services") {
-        System(db, "Database", "postgres, port 5432")
+        System(db, "Database (5432)", "postgreSQL")
         System(s3, "PDF/XLS storage", "Brokered S3")
     }
 }
@@ -40,7 +39,7 @@ Boundary(cloudgov, "Cloud.gov Boundary") {
     System(Login, "Login.gov", "ID provider")
     System(datagov, "api.data.gov", "Access Provider")
     System(samgov, "SAM.gov", "UEI Source")
-    System(Email, "GSA Email")
+    System(Email, "GSA Email (587)")
     System(relic, "New Relic", "Telemetry site")
     System(dap, "DAP", "Access abalytics")
     System(clamav, "ClamAv Provider", "Vulnerability data provider")
@@ -48,8 +47,8 @@ Boundary(cloudgov, "Cloud.gov Boundary") {
 
 AddRelTag("authenticated", $lineColor="#008787", $textColor="#008787")
 Rel(User, django, "Submits/edits audits", $tags="authenticated")
+Rel(User, dap, "logs user visits data")
 Rel(Public, django, "Searches for/reads information")
-Rel(Agency, django, "Searches for/reads non-public information")
 Rel(Staff, django, "Manages audits, roles, content", $tags="authenticated")
 
 Rel(User, Login, "Authenticates with")
@@ -59,21 +58,21 @@ Rel(AgencyApp, datagov, "Routes requests through")
 
 
 Rel(datagov, api, "Searches, filters, requests audit", "via api.data.gov", $tags="authenticated")
-Rel(Login, backend, "Provides identities", "email address")
+Rel(Login, django, "Autheniticated", "email address")
 
 Rel(api, db, "Fetches (read-only) Audits")
-Rel(api, s3, "Fetches (read-only) Audit Attachments")
+Rel(AgencyApp, s3, "Fetches (read-only) PDF Docs")
 
-Rel(django, https_proxy, "Looks up UEI info")
+Rel(django, https_proxy, "Uses external services (Clam DB, SAM.gov, New Relic)")
 Rel(https_proxy, samgov, "Looks up UEI info")
+Rel(https_proxy, clamav, "retrievesvulnerability data")
+Rel(https_proxy, relic, "logs telemetry data")
 Rel(django, mail_proxy, "Sends emails using")
 Rel(mail_proxy, Email, "Sends emails using")
 Rel(django, scan, "Scans attachments")
 Rel(django, db, "read/write")
-Rel(backend, s3, "Stores single audit packages/Excel files")
-Rel(django, relic, "logs telemetry data")
-Rel(django, dap, "logs user visits data")
-Rel(scan, clamav, "retrievesvulnerability checke")
+Rel(django, s3, "Stores single audit packages/Excel files")
+Rel(django, api, "Handles search requests")
 
 @enduml
 ```
