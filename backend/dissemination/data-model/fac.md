@@ -45,17 +45,14 @@ TABLE(General, "General") {
     auditor_firm_name 
     auditor_foreign_addr
     auditor_ein 
+    multiple_auditors
     sequence_number ?
     is_public
     pdf_urls
     cognizant_agency
     oversight_agency
     cognizant_agency_over 
-    auditee_date_signed 
-    auditor_date_signed
-    date_published 
     fac_accepted_date 
-    form_date_received
     initial_date_received
     fy_end_date 
     fy_start_date 
@@ -90,54 +87,42 @@ TABLE(General, "General") {
     type_report_special_purpose_framework 
     is_public 
     data_source 
-	"AUDITEEDATESIGNED"
-	"CPADATESIGNED"
-	"CPANAMETITLE"
-	"TYPEREPORT_FS" VARCHAR2(4 BYTE) COLLATE "USING_NLS_COMP", 
-	"REPORTABLECONDITION" VARCHAR2(1 BYTE) COLLATE "USING_NLS_COMP", 
-	"MATERIALWEAKNESS" VARCHAR2(1 BYTE) COLLATE "USING_NLS_COMP", 
-	"MATERIALNONCOMPLIANCE" VARCHAR2(1 BYTE) COLLATE "USING_NLS_COMP", 
-	"GOINGCONCERN" VARCHAR2(1 BYTE) COLLATE "USING_NLS_COMP", 
-	"TYPEREPORT_MP" VARCHAR2(4 BYTE) COLLATE "USING_NLS_COMP", 
-	"DOLLARTHRESHOLD" NUMBER(12,0), 
-	"LOWRISK" VARCHAR2(1 BYTE) COLLATE "USING_NLS_COMP", 
-	"REPORTREQUIRED" VARCHAR2(1 BYTE) COLLATE "USING_NLS_COMP", 
-	"TOTFEDEXPEND" NUMBER(14,0), 
+    auditee_date_signed
+    auditor_date_signed
+    type_report_financial_statements
+    reportable_condition
+    material_weakness
+    material_noncompliance
+    going_concern
+    type_report_major_program
+    dollar_threshold
+    low_risk
+    report_required
+    total_fed_expenditures
+    condition_or_deficiency_major_program
+    material_weakness_major_program
+    questioned_costs
+    current_or_former_findings
+    prior_year_schedule
+    dup_reports
+    form_date_received
+    date_published
+    previous_date_published
+    agency_cdfa ?
+    special_framework
+    special_framework_required
+    type_report_special_purpose_framework
 	"COPIES" VARCHAR2(2 BYTE) COLLATE "USING_NLS_COMP", 
-	"REPORTABLECONDITION_MP" VARCHAR2(1 BYTE) COLLATE "USING_NLS_COMP", 
-	"MATERIALWEAKNESS_MP" VARCHAR2(4 BYTE) COLLATE "USING_NLS_COMP", 
-	"QCOSTS" VARCHAR2(1 BYTE) COLLATE "USING_NLS_COMP", 
-	"CYFINDINGS" VARCHAR2(1 BYTE) COLLATE "USING_NLS_COMP", 
-	"PYSCHEDULE" VARCHAR2(1 BYTE) COLLATE "USING_NLS_COMP", 
-	"DUP_REPORTS" VARCHAR2(1 BYTE) COLLATE "USING_NLS_COMP", 
-	"COG_AGENCY" VARCHAR2(2 BYTE) COLLATE "USING_NLS_COMP", 
-	"OVERSIGHTAGENCY" VARCHAR2(2 BYTE) COLLATE "USING_NLS_COMP", 
-	"DATERECEIVED" DATE, 
-	"DATEFIREWALL" DATE, 
-	"PREVIOUSDATEFIREWALL" VARCHAR2(1 BYTE) COLLATE "USING_NLS_COMP", 
 	"FINDINGREFNUM" CHAR(1 BYTE) COLLATE "USING_NLS_COMP", 
-	"TYPEOFENTITY" VARCHAR2(3 BYTE) COLLATE "USING_NLS_COMP", 
 	"IMAGE" NUMBER(1,0), 
-	"AGENCYCFDA" VARCHAR2(198 BYTE) COLLATE "USING_NLS_COMP", 
 	"INITIALDATE" DATE, 
 	"DATERECEIVEDOTHER" DATE, 
-	"MULTIPLE_CPAS" VARCHAR2(1 BYTE) COLLATE "USING_NLS_COMP", 
-	"AUDITEECERTIFYNAME" VARCHAR2(50 BYTE) COLLATE "USING_NLS_COMP", 
-	"AUDITEECERTIFYTITLE" VARCHAR2(50 BYTE) COLLATE "USING_NLS_COMP", 
-	"FACACCEPTEDDATE" DATE, 
-	"AUDITOR_EIN" VARCHAR2(9 BYTE) COLLATE "USING_NLS_COMP", 
-	"ELECAUDITHEADERID" NUMBER, 
 	"SD_MATERIALWEAKNESS" VARCHAR2(1 BYTE) COLLATE "USING_NLS_COMP", 
 	"SD_MATERIALWEAKNESS_MP" VARCHAR2(1 BYTE) COLLATE "USING_NLS_COMP", 
 	"SIGNIFICANTDEFICIENCY" VARCHAR2(1 BYTE) COLLATE "USING_NLS_COMP", 
 	"SIGNIFICANTDEFICIENCY_MP" VARCHAR2(1 BYTE) COLLATE "USING_NLS_COMP", 
-	"SP_FRAMEWORK" VARCHAR2(15 BYTE) COLLATE "USING_NLS_COMP", 
-	"SP_FRAMEWORK_REQUIRED" VARCHAR2(1 BYTE) COLLATE "USING_NLS_COMP", 
-	"TYPEREPORT_SP_FRAMEWORK" VARCHAR2(15 BYTE) COLLATE "USING_NLS_COMP", 
 	"SUPPRESSION_CODE" VARCHAR2(4 BYTE) COLLATE "USING_NLS_COMP", 
 	"TYPEAUDIT_CODE" VARCHAR2(4 BYTE) COLLATE "USING_NLS_COMP", 
-	"UEI" VARCHAR2(12 BYTE) COLLATE "USING_NLS_COMP", 
-	"MULTIPLEUEIS" VARCHAR2(1 BYTE) COLLATE "USING_NLS_COMP", 
 	"OPEID" VARCHAR2(4000 BYTE) COLLATE "USING_NLS_COMP", 
 	"DATETOED" DATE, 
 	"DATEFINISHED" DATE, 
@@ -146,6 +131,24 @@ TABLE(General, "General") {
 
 }
 
+TABLE(Auditor, "GenAuditor") {
+    + General.report_id
+  + auditor_seq_number
+    auditor_phone
+    auditor_fax 
+    auditor_state 
+    auditor_city
+    auditor_title 
+    auditor_street1 
+    auditor_zip_code
+    auditor_country 
+    auditor_contact
+    auditor_email
+    auditor_firm_name 
+    auditor_foreign_addr
+    auditor_ein 
+	"VERSION" NUMBER(2,0), 
+}
 
 
 TABLE(Award, "FederalAward") {
@@ -155,39 +158,32 @@ TABLE(Award, "FederalAward") {
   cfda_ext
   award_identification
   fed_prog_name
+  major_program
   amount
   cluster_name
   other_cluster_name
   state_cluster_name
   cluster_total
-  award [JSON]
-	"MAJORPROGRAM" VARCHAR2(4 BYTE) COLLATE "USING_NLS_COMP", 
-	"TYPEREQUIREMENT" VARCHAR2(15 BYTE) COLLATE "USING_NLS_COMP", 
-	"QCOSTS2" VARCHAR2(12 BYTE) COLLATE "USING_NLS_COMP", 
+  program_total
+  loan_balance
+  type_requirement
+  questioned_costs
+  research_and_development
+  direct
+  type_report_major_program
+  arra
+  loans
+  state_cluster_name
+  other_cluster_name
+  passthrough_award
+  passthrough_amount
 	"FINDINGS" VARCHAR2(3 BYTE) COLLATE "USING_NLS_COMP", 
 	"FINDINGREFNUMS" VARCHAR2(100 BYTE) COLLATE "USING_NLS_COMP", 
-	"RD" VARCHAR2(1 BYTE) COLLATE "USING_NLS_COMP", 
-	"DIRECT" VARCHAR2(1 BYTE) COLLATE "USING_NLS_COMP", 
-	"EIN" VARCHAR2(9 BYTE) COLLATE "USING_NLS_COMP", 
 	"CFDA2" VARCHAR2(2 BYTE) COLLATE "USING_NLS_COMP", 
-	"TYPEREPORT_MP" VARCHAR2(1 BYTE) COLLATE "USING_NLS_COMP", 
 	"TYPEREPORT_MP_OVERRIDE" VARCHAR2(1 BYTE) COLLATE "USING_NLS_COMP", 
-	"ARRA" VARCHAR2(4 BYTE) COLLATE "USING_NLS_COMP", 
-	"LOANS" VARCHAR2(4 BYTE) COLLATE "USING_NLS_COMP", 
-	"ELECAUDITSID" NUMBER, 
 	"FINDINGSCOUNT" NUMBER(7,0), 
-	"LOANBALANCE" NUMBER(12,0), 
-	"PASSTHROUGHAMOUNT" NUMBER(12,0), 
-	"PASSTHROUGHAWARD" VARCHAR2(1 BYTE) COLLATE "USING_NLS_COMP", 
-	"STATECLUSTERNAME" VARCHAR2(75 BYTE) COLLATE "USING_NLS_COMP", 
-	"PROGRAMTOTAL" NUMBER(12,0), 
-	"CLUSTERTOTAL" NUMBER(12,0), 
-	"OTHERCLUSTERNAME" VARCHAR2(75 BYTE) COLLATE "USING_NLS_COMP", 
 	"CFDAPROGRAMNAME" VARCHAR2(300 BYTE) COLLATE "USING_NLS_COMP", 
-	"UEI" VARCHAR2(12 BYTE) COLLATE "USING_NLS_COMP", 
-	"MULTIPLEUEIS" VARCHAR2(1 BYTE) COLLATE "USING_NLS_COMP"
 
-  
 }
 
 TABLE(Passthrough, "Passthrough") {
@@ -202,15 +198,29 @@ TABLE(Finding, "Finding") {
   + Award.report_id
   + Award.award_seq_number
   + finding_seq_number
-  ref_number
-  finding [JSON]
+  finding_ref_number
+  modified_opinion
+  other_non_compliance
+  material_weakness
+  significant_deficiency
+  other_findings
+  questioned_costs
+  repeat_finding
+  prior_finding_ref_number
+  type_requirement
 }
 
 TABLE(Note, "Note") {
   + Award.report_id
   + Award.award_seq_number
   + note_seq_number
-  note [JSON]
+  type_id [choice??]
+  version
+  content
+  title
+  "REPORTID": ["Note", "report_id"]
+  "NOTE_INDEX": ["Note", "note_index"]
+
 }
 
 
@@ -219,7 +229,8 @@ TABLE(FindingText, "FindingText") {
   + Finding.award_seq_number
   + Finding.finding_seq_number
   + finding_text_seq_number
-  finding_text [JSON]
+  charts_tables
+  finding_text
 }
 
 TABLE(CAPText, "CAPText") {
@@ -227,11 +238,18 @@ TABLE(CAPText, "CAPText") {
   + Finding.award_seq_number
   + Finding.finding_seq_number
   + cap_text_seq_number
-  cap_text [JSON]
+  charts_tables
+  cap+text
+  finding_ref_number [derivabke??]
 }
 
 
+TABLE(Revision, "Revision") {
+}
+
 General "1" -- "*" Award : covers
+General "1" -- "0,*" Auditor : may-have
+General "1" -- "0,*" Revision : may-have
 Award "1" -- "0.*" Passthrough : may-contain
 Award "1" -- "*" Finding : contains
 Finding "1" -- "*" FindingText : contains
