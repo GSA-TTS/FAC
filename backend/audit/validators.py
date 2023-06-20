@@ -7,7 +7,6 @@ from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 from django.conf import settings
 import requests
-from slugify import slugify
 from openpyxl import load_workbook
 
 from audit.excel import (
