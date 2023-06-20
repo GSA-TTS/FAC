@@ -222,9 +222,11 @@ if ENVIRONMENT not in ["DEVELOPMENT", "STAGING", "PRODUCTION"]:
     AWS_PRIVATE_SECRET_ACCESS_KEY = os.environ.get(
         "AWS_PRIVATE_SECRET_ACCESS_KEY", "longtest"
     )
-    AWS_S3_PRIVATE_ENDPOINT = os.environ.get("AWS_S3_PRIVATE_ENDPOINT", "minio:9000")
+    AWS_S3_PRIVATE_ENDPOINT = os.environ.get(
+        "AWS_S3_PRIVATE_ENDPOINT", "http://minio:9000"
+    )
 
-    AWS_S3_ENDPOINT_URL = f"http://{AWS_S3_PRIVATE_ENDPOINT}"
+    AWS_S3_ENDPOINT_URL = AWS_S3_PRIVATE_ENDPOINT
 
     DISABLE_AUTH = env.bool("DISABLE_AUTH", default=False)
 
