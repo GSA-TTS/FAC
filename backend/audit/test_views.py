@@ -364,7 +364,7 @@ class ExcelFileHandlerViewTests(TestCase):
                     data={"FILES": excel_file},
                 )
 
-                self.assertEqual(response.status_code, 302)
+                self.assertEqual(response.status_code, 200)
 
                 updated_sac = SingleAuditChecklist.objects.get(pk=sac.id)
 
@@ -489,7 +489,7 @@ class ExcelFileHandlerViewTests(TestCase):
 
                 print(response.content)
 
-                self.assertEqual(response.status_code, 302)
+                self.assertEqual(response.status_code, 200)
 
                 updated_sac = SingleAuditChecklist.objects.get(pk=sac.id)
 
@@ -553,7 +553,7 @@ class ExcelFileHandlerViewTests(TestCase):
                     data={"FILES": excel_file},
                 )
 
-                self.assertEqual(response.status_code, 302)
+                self.assertEqual(response.status_code, 200)
 
                 updated_sac = SingleAuditChecklist.objects.get(pk=sac.id)
 
@@ -631,7 +631,7 @@ class ExcelFileHandlerViewTests(TestCase):
                     data={"FILES": excel_file},
                 )
 
-                self.assertEqual(response.status_code, 302)
+                self.assertEqual(response.status_code, 200)
 
                 updated_sac = SingleAuditChecklist.objects.get(pk=sac.id)
 
