@@ -24,7 +24,7 @@ from audit.mixins import (
     CertifyingAuditorRequiredMixin,
     SingleAuditChecklistAccessRequiredMixin,
 )
-from audit.models import ExcelFile, SingleAuditChecklist
+from audit.models import ExcelFile, SingleAuditChecklist, SingleAuditReportFile
 from audit.validators import (
     validate_federal_award_json,
     validate_corrective_action_plan_json,
@@ -149,6 +149,27 @@ class ExcelFileHandlerView(SingleAuditChecklistAccessRequiredMixin, generic.View
         except KeyError as e:
             logger.warn(f"Field error. Field: {e}")
             return JsonResponse({"errors": str(e), "type": "error_field"}, status=400)
+        
+
+class SingleAuditReportFileHandlerView(SingleAuditChecklistAccessRequiredMixin, generic.View):
+    # this is marked as csrf_exempt to enable by-hand testing via tools like Postman. Should be removed when the frontend form is implemented!
+    @method_decorator(csrf_exempt)
+    def dispatch(self, *args, **kwargs):
+        return super(SingleAuditReportFileHandlerView, self).dispatch(*args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        report_id = kwargs["report_id"]
+
+        sac = SingleAuditChecklist.objects.get(report_id=report_id)
+
+        file = request.FILES["FILES"]
+
+        sar_file = SingleAuditReportFile(
+            **{"file": file, "filename": "temp", "sac_id": sac.id}
+        )
+
+        sar_file.full_clean()
+        sar_file.save()
 
 
 class ReadyForCertificationView(SingleAuditChecklistAccessRequiredMixin, generic.View):

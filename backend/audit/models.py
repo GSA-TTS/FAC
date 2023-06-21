@@ -458,13 +458,18 @@ class ExcelFile(models.Model):
         super(ExcelFile, self).save(*args, **kwargs)
 
 
-class SingleAuditReportPackage(models.Model):
+class SingleAuditReportFile(models.Model):
     """
     Data model to track uploaded Single Audit report PDFs and associate them with SingleAuditChecklists
     """
 
-    file = models.FileField(upload_to="singleauditreportpackages")
+    file = models.FileField(upload_to="singleauditreport")
     filename = models.CharField(max_length=255)
     sac = models.ForeignKey(SingleAuditChecklist, on_delete=models.CASCADE)
     user = models.ForeignKey(User, blank=True, null=True, on_delete=models.SET_NULL)
     date_created = models.DateTimeField(auto_now_add=True)
+
+    def save(self, *args, **kwargs):
+        report_id = SingleAuditChecklist.objects.get(id=self.sac.id).report_id
+        self.filename = f"{report_id}.pdf"
+        super(SingleAuditReportFile, self).save(*args, **kwargs)

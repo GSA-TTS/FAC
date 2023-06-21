@@ -16,6 +16,11 @@ urlpatterns = [
     path("", views.MySubmissions.as_view(), name="MySubmissions"),
     path("<str:report_id>", views.EditSubmission.as_view(), name="EditSubmission"),
     path(
+        "single-audit-report-package/<str:report_id>",
+        views.SingleAuditReportFileHandlerView.as_view(),
+        name="SingleAuditReportPackage",
+    ),
+    path(
         "ready-for-certification/<str:report_id>",
         views.ReadyForCertificationView.as_view(),
         name="ReadyForCertification",
