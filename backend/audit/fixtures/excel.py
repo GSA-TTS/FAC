@@ -1,3 +1,4 @@
+from collections import namedtuple
 from django.conf import settings
 
 SHEETS_DIR = settings.XLSX_TEMPLATE_SHEET_DIR
@@ -37,7 +38,20 @@ FEDERAL_AWARDS_ENTRY_FIXTURES = (
 
 SIMPLE_CASES_TEST_FILE = settings.AUDIT_TEST_DATA_ENTRY_DIR / "simple-cases.json"
 
-FEDERAL_AWARDS_EXPENDED = "FederalAwardsExpended"
-CORRECTIVE_ACTION_PLAN = "CorrectiveActionPlan"
-FINDINGS_TEXT = "FindingsText"
-FINDINGS_UNIFORM_GUIDANCE = "FindingsUniformGuidance"
+# Make FORM_SECTIONS convenient to both iterate over and access by field name:
+FormSections = namedtuple(
+    "FormSections",
+    (
+        "CORRECTIVE_ACTION_PLAN",
+        "FEDERAL_AWARDS_EXPENDED",
+        "FINDINGS_TEXT",
+        "FINDINGS_UNIFORM_GUIDANCE",
+    ),
+)
+# Note: we turn these into hyphenated lowercase for URLs, e.g. federal-awards-expended
+FORM_SECTIONS = FormSections(
+    CORRECTIVE_ACTION_PLAN="CorrectiveActionPlan",
+    FEDERAL_AWARDS_EXPENDED="FederalAwardsExpended",
+    FINDINGS_TEXT="FindingsText",
+    FINDINGS_UNIFORM_GUIDANCE="FindingsUniformGuidance",
+)

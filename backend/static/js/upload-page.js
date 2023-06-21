@@ -3,10 +3,10 @@
 */
 // Matches current URL against the correct upload endpoint. Comes from /audit/fixtures/excel.py
 const UPLOAD_URLS = {
-  'federal-awards': 'FederalAwardsExpended',
-  'audit-findings': 'FindingsUniformGuidance',
-  'audit-findings-text': 'FindingsText',
-  CAP: 'CorrectiveActionPlan',
+  'federal-awards': 'federal-awards-expended',
+  'audit-findings': 'findings-uniform-guidance',
+  'audit-findings-text': 'findings-text',
+  CAP: 'corrective-action-plan',
 };
 
 /*

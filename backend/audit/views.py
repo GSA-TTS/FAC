@@ -10,12 +10,7 @@ from django.urls import reverse
 from django.utils.datastructures import MultiValueDictKeyError
 from django.utils.decorators import method_decorator
 
-from .fixtures.excel import (
-    FEDERAL_AWARDS_EXPENDED,
-    CORRECTIVE_ACTION_PLAN,
-    FINDINGS_TEXT,
-    FINDINGS_UNIFORM_GUIDANCE,
-)
+from .fixtures.excel import FORM_SECTIONS
 
 from audit.excel import (
     extract_federal_awards,
@@ -98,31 +93,36 @@ class ExcelFileHandlerView(SingleAuditChecklistAccessRequiredMixin, generic.View
             file = request.FILES["FILES"]
 
             excel_file = ExcelFile(
-                **{"file": file, "filename": "temp", "sac_id": sac.id}
+                **{
+                    "file": file,
+                    "filename": "temp",
+                    "sac_id": sac.id,
+                    "form_section": form_section,
+                }
             )
 
             excel_file.full_clean()
             excel_file.save()
 
-            if form_section == FEDERAL_AWARDS_EXPENDED:
+            if form_section == FORM_SECTIONS.FEDERAL_AWARDS_EXPENDED:
                 audit_data = extract_federal_awards(excel_file.file)
                 validate_federal_award_json(audit_data)
                 SingleAuditChecklist.objects.filter(pk=sac.id).update(
                     federal_awards=audit_data
                 )
-            elif form_section == CORRECTIVE_ACTION_PLAN:
+            elif form_section == FORM_SECTIONS.CORRECTIVE_ACTION_PLAN:
                 audit_data = extract_corrective_action_plan(excel_file.file)
                 validate_corrective_action_plan_json(audit_data)
                 SingleAuditChecklist.objects.filter(pk=sac.id).update(
                     corrective_action_plan=audit_data
                 )
-            elif form_section == FINDINGS_UNIFORM_GUIDANCE:
+            elif form_section == FORM_SECTIONS.FINDINGS_UNIFORM_GUIDANCE:
                 audit_data = extract_findings_uniform_guidance(excel_file.file)
                 validate_findings_uniform_guidance_json(audit_data)
                 SingleAuditChecklist.objects.filter(pk=sac.id).update(
                     findings_uniform_guidance=audit_data
                 )
-            elif form_section == FINDINGS_TEXT:
+            elif form_section == FORM_SECTIONS.FINDINGS_TEXT:
                 audit_data = extract_findings_text(excel_file.file)
                 validate_findings_text_json(audit_data)
                 SingleAuditChecklist.objects.filter(pk=sac.id).update(
