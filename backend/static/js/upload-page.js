@@ -3,10 +3,10 @@
 */
 // Matches current URL against the correct upload endpoint. Comes from /audit/fixtures/excel.py
 const UPLOAD_URLS = {
-  'federal-awards': 'FederalAwardsExpended',
-  'audit-findings': 'FindingsUniformGuidance',
-  'audit-findings-text': 'FindingsText',
-  CAP: 'CorrectiveActionPlan',
+  'federal-awards': 'federal-awards-expended',
+  'audit-findings': 'findings-uniform-guidance',
+  'audit-findings-text': 'findings-text',
+  CAP: 'corrective-action-plan',
 };
 
 /*
@@ -22,13 +22,13 @@ const already_submitted = document.getElementById(`already-submitted`);
   Function definitions
 */
 // Disable/enable "Continue" button
-function setContinueButtonDisabled(disabled) {
+function setFormDisabled(shouldDisable) {
   const submitButton = document.getElementById('continue');
-  submitButton.disabled = disabled;
+  submitButton.disabled = shouldDisable;
 }
 
 // Print helpful error info to page & console on unsuccessful upload
-function handleUploadErrors(error) {
+function handleErrorOnUpload(error) {
   if (typeof error.text === 'function') {
     error.text().then((errorMessage) => {
       console.error(
@@ -43,31 +43,32 @@ function handleUploadErrors(error) {
     info_box.innerHTML = `Timeout - Response took longer than expected. Try again later.`;
   } else {
     info_box.innerHTML =
-      'Error when uploading file. Ensure you have upload the correct template, or contact an administrator.';
+      'Error when uploading file. Ensure you have uploaded the correct template, or contact an administrator.';
     console.error(`Unexpected error.\n`, error);
   }
 }
 
-function getValidationErrorsTable(res) {
+function get_error_table(res) {
   var rows_html = '';
   var row_array = [];
-  for (let i = 0; i < res.errors.length; i++) {
-    row_array = res.errors[i].replaceAll(/[()']/g, ` `).split(',');
+  for (let i = 0; i < res.errors.length; i += 5) {
+    row_array = res.errors.slice(i, i + 5);
     rows_html += `
     <tr>
-      <td class="text-center">${row_array[0]}</p>
-      <td class="text-center">${row_array[1]}</p>
-      <td>${row_array[2]}</p>
+      <td class="text-center">${row_array[0]}${row_array[1]}</td>
+      <td>${row_array[2]}</td>
+      <td>${row_array[4]}.</td>
     </tr>`;
+    // <a class="usa-link" href="${row_array[3]}">Link</a>
   }
   const validationTable = `<p>Error on validation. Check the following cells for errors, and re-upload. 
   Common errors include incorrect data types or missing information.</p>
   <table class="usa-table usa-table--striped">
     <thead>
       <tr>
-        <th scope="col">Row</th>
-        <th scope="col">Column</th>
+        <th scope="col">Cell</th>
         <th scope="col">Field</th>
+        <th scope="col">Help Text</th>
       </tr>
     </thead>
     <tbody>
@@ -94,35 +95,42 @@ function attachFileUploadHandler() {
       info_box.hidden = false;
       info_box.innerHTML = 'Validating your file...';
 
-      const currentURL = new URL(window.location.href);
+      const current_url = new URL(window.location.href);
       const report_submission_url =
-        UPLOAD_URLS[currentURL.pathname.split('/')[2]];
+        UPLOAD_URLS[current_url.pathname.split('/')[2]];
       if (!report_submission_url) throw 'No upload URL available.';
       if (!e.target.files[0]) throw 'No file selected.';
       if (e.target.files[0].name.split('.').pop() !== 'xlsx')
         throw 'File type not accepted.';
 
-      var data = new FormData();
-      data.append('FILES', e.target.files[0]);
-      data.append('filename', e.target.files[0].name);
-      data.append('sac_id', sac_id);
+      var body = new FormData();
+      body.append('FILES', e.target.files[0]);
+      body.append('filename', e.target.files[0].name);
+      body.append('sac_id', sac_id);
 
       fetch(`/audit/excel/${report_submission_url}/${sac_id}`, {
         method: 'POST',
-        body: data,
+        body: body,
       })
-        .then((res) => res.json())
         .then((res) => {
-          if (res.status == 200) {
-            info_box.innerHTML =
-              'File successfully validated! Your work has been saved.';
-            setContinueButtonDisabled(false);
-          } else {
-            info_box.innerHTML = getValidationErrorsTable(res);
-          }
+          res.json().then((data) => {
+            if (res.ok) {
+              info_box.innerHTML =
+                'File successfully validated! Your work has been saved.';
+              setFormDisabled(false);
+            } else {
+              if (data.type === 'error_row') {
+                info_box.innerHTML = get_error_table(data);
+              } else if (data.type === 'error_field') {
+                info_box.innerHTML = `Field Error: ${res.errors}`;
+              } else {
+                throw new Error('Returned error type is missing!');
+              }
+            }
+          });
         })
         .catch((error) => {
-          handleUploadErrors(error);
+          handleErrorOnUpload(error);
         });
     } catch (error) {
       info_box.innerHTML = `Error when sending excel file.\n ${error}`;
@@ -139,9 +147,7 @@ function attachEventHandlers() {
 function init() {
   attachEventHandlers();
 
-  already_submitted
-    ? setContinueButtonDisabled(false)
-    : setContinueButtonDisabled(true);
+  already_submitted ? setFormDisabled(false) : setFormDisabled(true);
 }
 
 init();

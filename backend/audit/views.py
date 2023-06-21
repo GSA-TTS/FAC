@@ -133,20 +133,23 @@ class ExcelFileHandlerView(SingleAuditChecklistAccessRequiredMixin, generic.View
                 logger.warn(f"no form section found with name {form_section}")
                 raise BadRequest()
 
-            return redirect("/")
+            return JsonResponse({"message": "File upload successful"}, status=200)
         except SingleAuditChecklist.DoesNotExist:
             logger.warn(f"no SingleAuditChecklist found with report ID {report_id}")
             raise PermissionDenied()
         except ValidationError as e:
             # The good error, where bad rows/columns are sent back in the request.
+            # These come back as:
+            # [col1, row1, field1, link1, help-text1, col2, row2, ...]
+            # Instead of as a nested list or in tuple form.
             logger.warn(f"{form_section} Excel upload failed validation: {e}")
-            return JsonResponse({"errors": list(e)}, status=400)
+            return JsonResponse({"errors": list(e), "type": "error_row"}, status=400)
         except MultiValueDictKeyError:
             logger.warn("No file found in request")
             raise BadRequest()
         except KeyError as e:
             logger.warn(f"Field error. Field: {e}")
-            raise BadRequest(e)
+            return JsonResponse({"errors": str(e), "type": "error_field"}, status=400)
 
 
 class ReadyForCertificationView(SingleAuditChecklistAccessRequiredMixin, generic.View):

@@ -129,30 +129,6 @@ TODO: Include the "Completed at X by Y", after timestamps are included in the da
 					<p class="margin-0">Sample description text, lorem ipsum, various questionably accurate latin phrases.</p>
 				</div>
 			</li>
-			<!-- Findings text workbook -->
-			<li class="usa-icon-list__item padding-bottom-2">
-				<div class="usa-icon-list__icon {% if findings_text_workbook.completed == True %}text-green{% else %}text-base{% endif %}">
-					<svg class="usa-icon margin-right-2" aria-hidden="true" role="img">
-						{% if findings_text_workbook.completed == True %}
-							<use xlink:href="/static/img/sprite.svg#check_circle"></use>
-						{% else %}
-							<use xlink:href="/static/img/sprite.svg#radio_button_unchecked"></use>
-						{% endif %}
-					</svg>
-				</div>
-				<div class="usa-icon-list__content {% if findings_text_workbook.created is True %} text-green {% else %} text-base-dark {% endif %}">
-					{% if federal_awards_workbook.completed == True %}
-						<a class="usa-link text-bold"
-							href="/report_submission/audit-findings-text/{{ report_id | default_if_none:'' }}">Upload the Findings Text workbook</a>
-					{% else %}
-						<svg class="usa-icon margin-right-05" aria-hidden="true" role="img">
-							<use xlink:href="/static/img/sprite.svg#lock_outline"></use>
-						</svg>
-						<span class="text-base">Upload the Findings Text workbook</span>
-					{% endif %}
-					<p class="margin-0">Sample description text, lorem ipsum, various questionably accurate latin phrases.</p>
-				</div>
-			</li>
 			<!-- Audit findings workbook -->
 			<li class="usa-icon-list__item padding-bottom-2">
 				<div class="usa-icon-list__icon {% if audit_findings_workbook.completed == True %}text-green{% else %}text-base{% endif %}">
@@ -165,15 +141,25 @@ TODO: Include the "Completed at X by Y", after timestamps are included in the da
 					</svg>
 				</div>
 				<div class="usa-icon-list__content {% if audit_findings_workbook.created is True %} text-green {% else %} text-base-dark {% endif %}">
-					{% if federal_awards_workbook.completed == True %}
-						<a class="usa-link text-bold"
-							href="/report_submission/audit-findings/{{ report_id | default_if_none:'' }}">Upload the Audit Findings workbook</a>
-					{% else %}
-						<svg class="usa-icon margin-right-05" aria-hidden="true" role="img">
-							<use xlink:href="/static/img/sprite.svg#lock_outline"></use>
-						</svg>
-						<span class="text-base">Upload the Audit Findings workbook</span>
-					{% endif %}
+					<a class="usa-link text-bold"
+						href="/report_submission/audit-findings/{{ report_id | default_if_none:'' }}">Upload the Audit Findings workbook</a>
+					<p class="margin-0">Sample description text, lorem ipsum, various questionably accurate latin phrases.</p>
+				</div>
+			</li>
+			<!-- Findings text workbook -->
+			<li class="usa-icon-list__item padding-bottom-2">
+				<div class="usa-icon-list__icon {% if findings_text_workbook.completed == True %}text-green{% else %}text-base{% endif %}">
+					<svg class="usa-icon margin-right-2" aria-hidden="true" role="img">
+						{% if findings_text_workbook.completed == True %}
+							<use xlink:href="/static/img/sprite.svg#check_circle"></use>
+						{% else %}
+							<use xlink:href="/static/img/sprite.svg#radio_button_unchecked"></use>
+						{% endif %}
+					</svg>
+				</div>
+				<div class="usa-icon-list__content {% if findings_text_workbook.created is True %} text-green {% else %} text-base-dark {% endif %}">
+					<a class="usa-link text-bold"
+						href="/report_submission/audit-findings-text/{{ report_id | default_if_none:'' }}">Upload the Findings Text workbook</a>
 					<p class="margin-0">Sample description text, lorem ipsum, various questionably accurate latin phrases.</p>
 				</div>
 			</li>
@@ -189,15 +175,8 @@ TODO: Include the "Completed at X by Y", after timestamps are included in the da
 					</svg>
 				</div>
 				<div class="usa-icon-list__content {% if CAP_workbook.created is True %} text-green {% else %} text-base-dark {% endif %}">
-					{% if federal_awards_workbook.completed == True %}
-						<a class="usa-link text-bold"
-							href="/report_submission/CAP/{{ report_id | default_if_none:'' }}">Upload the Corrective Action Plan (CAP) workbook</a>
-					{% else %}
-						<svg class="usa-icon margin-right-05" aria-hidden="true" role="img">
-							<use xlink:href="/static/img/sprite.svg#lock_outline"></use>
-						</svg>
-						<span class="text-base">Upload the Corrective Action Plan (CAP) workbook</span>
-					{% endif %}
+					<a class="usa-link text-bold"
+						href="/report_submission/CAP/{{ report_id | default_if_none:'' }}">Upload the Corrective Action Plan (CAP) workbook</a>
 					<p class="margin-0">Sample description text, lorem ipsum, various questionably accurate latin phrases.</p>
 				</div>
 			</li>
