@@ -1,3 +1,6 @@
+"""
+Fixtures for use with Excel spreadsheet handling.
+"""
 from collections import namedtuple
 from django.conf import settings
 
