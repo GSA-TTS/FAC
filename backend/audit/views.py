@@ -133,7 +133,7 @@ class ExcelFileHandlerView(SingleAuditChecklistAccessRequiredMixin, generic.View
                 logger.warn(f"no form section found with name {form_section}")
                 raise BadRequest()
 
-            return JsonResponse({"message": "File upload successful"}, status=200)
+            return redirect("/")
         except SingleAuditChecklist.DoesNotExist:
             logger.warn(f"no SingleAuditChecklist found with report ID {report_id}")
             raise PermissionDenied()
