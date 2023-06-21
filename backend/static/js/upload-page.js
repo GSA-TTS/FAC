@@ -55,13 +55,15 @@ function get_error_table(data) {
     // Convert given string-tuples into arrays:
     // "(col, row...)" -> [col, row, ...]
     row_array = data.errors[i];
-    row_array = JSON.parse(row_array.replaceAll("(","[").replaceAll(")","]").replaceAll(`'`, `"`))
-    
+    row_array = JSON.parse(
+      row_array.replaceAll('(', '[').replaceAll(')', ']').replaceAll(`'`, `"`)
+    );
+
     rows_html += `
     <tr>
       <td class="text-center">${row_array[0]}${row_array[1]}</td>
       <td>${row_array[2]}</td>
-      <td>${row_array[3]["text"]}.</td>
+      <td>${row_array[3]['text']}.</td>
     </tr>`;
     // <a class="usa-link" href="${row_array[3]["link"]}">Link</a>
   }
