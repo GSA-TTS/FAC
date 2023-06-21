@@ -1,6 +1,6 @@
+import calendar
 import logging
 
-from secrets import choice
 from django.db import models
 from django.db.models import Q
 from django.contrib.auth import get_user_model
@@ -11,7 +11,6 @@ from django_fsm import FSMField, RETURN_VALUE, transition
 
 from .validators import (
     validate_excel_file,
-    validate_excel_filename,
     validate_corrective_action_plan_json,
     validate_federal_award_json,
     validate_findings_text_json,
@@ -33,19 +32,17 @@ class SingleAuditChecklistManager(models.Manager):
 
         Currently only used for report_id, a 17-character value consisting of:
             -   Four-digit year of start of audit period.
-            -   Three-digit char (but without I or O) random.
+            -   Three-character all-caps month abbrevation (start of audit period)
             -   10-digit numeric monotonically increasing, but starting from
                 0001000001 because the Census numbers are six-digit values. The
                 formula for creating this is basically "how many non-legacy
-                entries there are in the system plus one plus 1,000,000".
-
-
+                entries there are in the system plus 1,000,000".
         """
-        year = obj_data["general_information"]["auditee_fiscal_period_start"][:4]
-        chars = "ABCDEFGHJKLMNPQRSTUVWXYZ1234567890"
-        trichar = "".join(choice(chars) for _ in range(3))
+        fiscal_start = obj_data["general_information"]["auditee_fiscal_period_start"]
+        year = fiscal_start[:4]
+        month = calendar.month_abbr[int(fiscal_start[5:7])].upper()
         count = SingleAuditChecklist.objects.count() + 1_000_001
-        report_id = f"{year}{trichar}{str(count).zfill(10)}"
+        report_id = f"{year}{month}{str(count).zfill(10)}"
         updated = obj_data | {"report_id": report_id}
         return super().create(**updated)
 
@@ -450,12 +447,14 @@ class ExcelFile(models.Model):
 
     file = models.FileField(upload_to="excel", validators=[validate_excel_file])
     filename = models.CharField(max_length=255)
+    form_section = models.CharField(max_length=255)
     sac = models.ForeignKey(SingleAuditChecklist, on_delete=models.CASCADE)
     user = models.ForeignKey(User, blank=True, null=True, on_delete=models.SET_NULL)
     date_created = models.DateTimeField(auto_now_add=True)
 
     def save(self, *args, **kwargs):
-        self.filename = validate_excel_filename(self.file)
+        report_id = SingleAuditChecklist.objects.get(id=self.sac.id).report_id
+        self.filename = f"{report_id}--{self.form_section}.xlsx"
         super(ExcelFile, self).save(*args, **kwargs)
 
 

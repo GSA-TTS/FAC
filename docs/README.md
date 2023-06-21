@@ -6,7 +6,7 @@ System-wide How-tos:
 * [Agile Process](./agile-process.md)
 * [Architectural Decision Records](./architecture/decisions)
 * [Branching](./branching.md)
-* [Data Loading](./data_loading)
+* [Data Loading](./data_loading.md)
 * [Diagrams](./architecture/diagrams/)
 * [Development](./development.md)
 * [Dependency Management](./dependency-management.md)
