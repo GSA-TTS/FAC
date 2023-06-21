@@ -61,4 +61,4 @@ jobs:
       - name: Comment on Pull Request
         id: pr-comment
         run: |
-          gh pr comment ${{ steps.open-pr.outputs.pr_number }} --body "Please close and re-open this pull request to ensure that a terraform plan is generated on the PR for the staging deployment after merging."
+          gh pr comment ${{ steps.pr-number.outputs.pull_request_number }} --body "Please close and re-open this pull request to ensure that a terraform plan is generated on the PR for the staging deployment after merging."
