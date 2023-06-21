@@ -113,12 +113,12 @@ function attachFileUploadHandler() {
         body: body,
       })
         .then((res) => {
-          res.json().then((data) => {
-            if (res.ok) {
-              info_box.innerHTML =
-                'File successfully validated! Your work has been saved.';
-              setFormDisabled(false);
-            } else {
+          if (res.status == 200) {
+            info_box.innerHTML =
+              'File successfully validated! Your work has been saved.';
+            setFormDisabled(false);
+          } else {
+            res.json().then((data) => {
               if (data.type === 'error_row') {
                 info_box.innerHTML = get_error_table(data);
               } else if (data.type === 'error_field') {
@@ -126,8 +126,8 @@ function attachFileUploadHandler() {
               } else {
                 throw new Error('Returned error type is missing!');
               }
-            }
-          });
+            });
+          }
         })
         .catch((error) => {
           handleErrorOnUpload(error);
