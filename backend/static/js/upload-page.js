@@ -48,18 +48,22 @@ function handleErrorOnUpload(error) {
   }
 }
 
-function get_error_table(res) {
+function get_error_table(data) {
   var rows_html = '';
   var row_array = [];
-  for (let i = 0; i < res.errors.length; i += 5) {
-    row_array = res.errors.slice(i, i + 5);
+  for (let i = 0; i < data.errors.length; i++) {
+    // Convert given string-tuples into arrays:
+    // "(col, row...)" -> [col, row, ...]
+    row_array = data.errors[i];
+    row_array = JSON.parse(row_array.replaceAll("(","[").replaceAll(")","]").replaceAll(`'`, `"`))
+    
     rows_html += `
     <tr>
       <td class="text-center">${row_array[0]}${row_array[1]}</td>
       <td>${row_array[2]}</td>
-      <td>${row_array[4]}.</td>
+      <td>${row_array[3]["text"]}.</td>
     </tr>`;
-    // <a class="usa-link" href="${row_array[3]}">Link</a>
+    // <a class="usa-link" href="${row_array[3]["link"]}">Link</a>
   }
   const validationTable = `<p>Error on validation. Check the following cells for errors, and re-upload. 
   Common errors include incorrect data types or missing information.</p>

@@ -44,7 +44,7 @@ AV_SCAN_CODES = {
 
 XLSX_TEMPLATE_DEFINITION_DIR = settings.XLSX_TEMPLATE_JSON_DIR
 
-ErrorDetails = list[str]
+ErrorDetails = list[tuple[str, str, str, str]]
 
 
 def validate_uei(value):
@@ -286,23 +286,23 @@ def _get_error_details(xlsx_definition_template, named_ranges_row_indices):
         for open_range in xlsx_definition_template["sheets"][0]["open_ranges"]:
             if open_range["range_name"] == named_range:
                 error_details.append(
-                    [
+                    (
                         open_range["title_cell"][0],
                         xlsx_definition_template["title_row"] + row_index + 1,
                         open_range["title"],
                         open_range["help"],
-                    ]
+                    )
                 )
                 break
         for single_cell in xlsx_definition_template["sheets"][0]["single_cells"]:
             if single_cell["range_name"] == named_range:
                 error_details.append(
-                    [
+                    (
                         single_cell["range_cell"][0],
                         single_cell["range_cell"][1],
                         single_cell["title"],
                         single_cell["help"],
-                    ]
+                    )
                 )
                 break
     return error_details

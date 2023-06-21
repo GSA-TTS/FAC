@@ -139,9 +139,8 @@ class ExcelFileHandlerView(SingleAuditChecklistAccessRequiredMixin, generic.View
             raise PermissionDenied()
         except ValidationError as e:
             # The good error, where bad rows/columns are sent back in the request.
-            # These come back as:
-            # [col1, row1, field1, link1, help-text1, col2, row2, ...]
-            # Instead of as a nested list or in tuple form.
+            # These come back as tuples:
+            # [(col1, row1, field1, link1, help-text1), (col2, row2, ...), ...]
             logger.warn(f"{form_section} Excel upload failed validation: {e}")
             return JsonResponse({"errors": list(e), "type": "error_row"}, status=400)
         except MultiValueDictKeyError:
