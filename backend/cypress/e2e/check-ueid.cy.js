@@ -358,7 +358,7 @@ describe('Create New Audit', () => {
           interception.response.body.validueid,
           'Failure API Response'
         );
-        console.log('Response:' + interception.response.body.validueid);
+        // console.log('Response:' + interception.response.body.validueid);
       });
     });
 
@@ -377,7 +377,7 @@ describe('Create New Audit', () => {
           interception.response.body.validueid,
           'Succcessful API Response'
         );
-        console.log('Response:' + interception.response.body.validueid);
+        // console.log('Response:' + interception.response.body.validueid);
       });
       cy.url().should('include', '/report_submission/accessandsubmission');
     });
