@@ -3,7 +3,6 @@
 We want to create a simple
 """
 
-import json
 import logging
 from datetime import date, timedelta
 

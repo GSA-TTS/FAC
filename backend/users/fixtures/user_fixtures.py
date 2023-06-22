@@ -3,6 +3,7 @@
 import logging
 
 from django.apps import apps
+from django.conf import settings
 from django.contrib.auth import get_user_model
 
 logger = logging.getLogger(__name__)
@@ -11,10 +12,13 @@ logger = logging.getLogger(__name__)
 # username here is the UUID for this person's Login.gov user
 USERS = [
     {
+        "username": settings.TEST_USERNAME,
+    },
+    {
         "username": "b276a5b3-2d2a-42a3-a078-ad57a36975d4",
         "first_name": "Neil",
         "last_name": "M-B",
-    }
+    },
 ]
 
 
