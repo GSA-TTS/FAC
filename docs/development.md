@@ -160,6 +160,27 @@ docker compose run web python manage.py load_test_data
 
 If you want to load more data, see the section on loading previous years.
 
+### Load SingleAuditChecklist fixtures
+
+You can also add fake fixture data for single audit checklists. There is a list
+of users in
+[`backend/users/fixtures/user_fixtures.py`](/backend/users/fixtures/user_fixtures.py)
+that will be created by default. If you are a new developer, you can add your
+information in that file so that there will be a user created for you if
+necessary and various submission fixtures available to that user. You will need your
+Login.gov sandbox UUID to specify as your "username". The easiest way to get that is to
+log in while running in a local Docker environment and look for the message that says something like
+
+```
+INFO Successfully logged in user b276a5b3-2d2a-42a3-a078-ad57a36975d4
+```
+
+Once you have a user listed in that file, you can run the command
+
+```shell
+docker compose run web python manage.py load_fixtures
+```
+
 ### Create a test bucket
 
 We need a mocked S3 bucket for testing.
