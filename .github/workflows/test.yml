@@ -75,7 +75,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-
       - name: Restore npm cache
         uses: actions/cache@v3
         id: cache-npm
@@ -96,6 +95,7 @@ jobs:
         run: npm run check-all
 
   test:
+    needs: [build-with-docker]
     runs-on: ubuntu-latest
     env:
       ENV: TESTING
@@ -121,6 +121,7 @@ jobs:
           docker compose run web bash -c 'coverage run --parallel-mode --concurrency=multiprocessing manage.py test --parallel && coverage combine && coverage report -m --fail-under=90'
 
   a11y-testing:
+    needs: [build-with-docker]
     runs-on: ubuntu-20.04
     env:
       ENV: TESTING
