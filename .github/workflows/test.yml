@@ -105,8 +105,9 @@ jobs:
           context: ./backend
           cache-from: type=gha
           cache-to: type=gha,mode=max
+      - uses: docker/setup-buildx-action@v1
       - name: Run Django test suite
         working-directory: ./backend
         run:
-          docker-compose run web bash -c 'coverage run --parallel-mode --concurrency=multiprocessing manage.py test --parallel &&
+          docker compose run web bash -c 'coverage run --parallel-mode --concurrency=multiprocessing manage.py test --parallel &&
           coverage combine && coverage report -m --fail-under=90'
