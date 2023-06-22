@@ -2,6 +2,7 @@ import json
 import string
 from unittest import TestCase
 from unittest.mock import patch
+from django.conf import settings
 from django.test import SimpleTestCase
 from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import TemporaryUploadedFile
@@ -11,18 +12,19 @@ from tempfile import NamedTemporaryFile
 
 import requests
 
-from audit.fixtures.excel import SIMPLE_CASES_TEST_FILE
+from audit.fixtures.excel import (
+    SIMPLE_CASES_TEST_FILE,
+    CORRECTIVE_ACTION_TEMPLATE_DEFINITION,
+)
 
 from .validators import (
     ALLOWED_EXCEL_CONTENT_TYPES,
     ALLOWED_EXCEL_FILE_EXTENSIONS,
-    ERROR_MESSAGE,
     MAX_EXCEL_FILE_SIZE_MB,
     validate_corrective_action_plan_json,
     validate_excel_file_content_type,
     validate_excel_file_extension,
     validate_excel_file_integrity,
-    validate_excel_filename,
     validate_excel_file_size,
     validate_federal_award_json,
     validate_file_infection,
@@ -429,59 +431,6 @@ class UEIValidatorTests(SimpleTestCase):
         validate_uei_nine_digit_sequences(self.valid)
 
 
-class ExcelFileFilenameValidatorTests(SimpleTestCase):
-    def test_valid_filename_slug(self):
-        """
-        Filenames that can be slugified are valid
-        """
-        test_cases = [
-            ("this one just has spaces.xlsx", "this-one-just-has-spaces.xlsx"),
-            (
-                "this_one\\ has some? other things!.xlsx",
-                "this-one-has-some-other-things.xlsx",
-            ),
-            ("this/one/has/forward/slashes.xlsx", "slashes.xlsx"),
-            (
-                "this.one.has.multiple.extensions.xlsx",
-                "this-one-has-multiple-extensions.xlsx",
-            ),
-        ]
-
-        for test_case in test_cases:
-            with self.subTest():
-                before, after = test_case
-                valid_file = TemporaryUploadedFile(
-                    before, ALLOWED_EXCEL_CONTENT_TYPES[0], 10000, "utf-8"
-                )
-
-                validated_filename = validate_excel_filename(valid_file)
-
-                self.assertEqual(validated_filename, after)
-
-    def test_invalid_filename_slug(self):
-        """
-        Filenames that cannot be slugified are not valid
-        """
-        test_cases = [
-            "no-extension",
-            ".xlsx",
-            "".join(choice("!?#$%^&*") for _ in range(9)),
-            "".join(choice("!?#$%^&*") for _ in range(9)) + ".xlsx",
-        ]
-
-        for test_case in test_cases:
-            with self.subTest():
-                file = TemporaryUploadedFile(
-                    test_case, ALLOWED_EXCEL_CONTENT_TYPES[0], 10000, "utf-8"
-                )
-
-                with self.assertRaises(
-                    ValidationError,
-                    msg=f"ValidationError not raised with filename = {test_case}",
-                ):
-                    validate_excel_filename(file)
-
-
 class ExcelFileExtensionValidatorTests(SimpleTestCase):
     def test_invalid_file_extensions(self):
         """
@@ -692,8 +641,14 @@ class CorrectiveActionPlanValidatorTests(SimpleTestCase):
         """
         Empty Corrective Action Plan should fail, simple case should pass.
         """
+        template_definition_path = (
+            settings.XLSX_TEMPLATE_JSON_DIR / CORRECTIVE_ACTION_TEMPLATE_DEFINITION
+        )
+        template = json.loads(template_definition_path.read_text(encoding="utf-8"))
         invalid = json.loads('{"CorrectiveActionPlan":{}}')
-        expected_msg = str(("B", "2", "Auditee UEI", ERROR_MESSAGE))
+        expected_msg = str(
+            ("B", "2", "Auditee UEI", template["sheets"][0]["single_cells"][0]["help"])
+        )
         self.assertRaisesRegex(
             ValidationError, expected_msg, validate_corrective_action_plan_json, invalid
         )

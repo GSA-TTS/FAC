@@ -48,6 +48,10 @@
          "name": "Form",
          "open_ranges": [
             {
+               "help": {
+                  "link": "https://fac.gov/documentation/validation/#reference_number",
+                  "text": "Reference numbers have the form YYYY-NNN (e.g. 2023-001)"
+               },
                "range_name": "reference_number",
                "title": "Audit Finding Reference Number",
                "title_cell": "A3",
@@ -61,6 +65,10 @@
                "width": 36
             },
             {
+               "help": {
+                  "link": "https://fac.gov/documentation/validation/#plain_text",
+                  "text": "Only plain text is allowed in this field, no emoji or other special additions"
+               },
                "range_name": "text_of_finding",
                "title": "Text of the Audit Finding",
                "title_cell": "C3",
@@ -69,6 +77,10 @@
                "width": 100
             },
             {
+               "help": {
+                  "link": "https://fac.gov/documentation/validation/#yorn",
+                  "text": "This field must be either `Y` or `N`"
+               },
                "range_name": "contains_chart_or_table",
                "title": "Did Text Contain a Chart or Table?",
                "title_cell": "G3",
@@ -85,6 +97,10 @@
          ],
          "single_cells": [
             {
+               "help": {
+                  "link": "https://fac.gov/documentation/validation/#uei",
+                  "text": "UEIs are 12 characters long and match rules as given by SAM.gov"
+               },
                "range_cell": "B2",
                "range_name": "auditee_uei",
                "title": "Auditee UEI",

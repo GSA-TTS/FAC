@@ -1,20 +1,17 @@
 from django.urls import path
 
-from .fixtures.excel import (
-    CORRECTIVE_ACTION_PLAN,
-    FEDERAL_AWARDS_EXPENDED,
-    FINDINGS_TEXT,
-    FINDINGS_UNIFORM_GUIDANCE,
-)
+from .fixtures.excel import FORM_SECTIONS
 from . import views
 
 app_name = "audit"
-form_sections = [
-    CORRECTIVE_ACTION_PLAN,
-    FEDERAL_AWARDS_EXPENDED,
-    FINDINGS_TEXT,
-    FINDINGS_UNIFORM_GUIDANCE,
-]
+
+
+def camel_to_hyphen(raw: str) -> str:
+    """Convert camel case to hyphen-delimited."""
+    text = f"{raw[0].lower()}{raw[1:]}"
+    return "".join(c if c.islower() else f"-{c.lower()}" for c in text)
+
+
 urlpatterns = [
     path("", views.MySubmissions.as_view(), name="MySubmissions"),
     path("<str:report_id>", views.EditSubmission.as_view(), name="EditSubmission"),
@@ -50,10 +47,10 @@ urlpatterns = [
     ),
 ]
 
-for form_section in form_sections:
+for form_section in FORM_SECTIONS:
     urlpatterns.append(
         path(
-            f"excel/{form_section}/<str:report_id>",
+            f"excel/{camel_to_hyphen(form_section)}/<str:report_id>",
             views.ExcelFileHandlerView.as_view(),
             name=form_section,
             kwargs={"form_section": form_section},

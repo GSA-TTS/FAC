@@ -7,7 +7,6 @@ from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 from django.conf import settings
 import requests
-from slugify import slugify
 from openpyxl import load_workbook
 
 from audit.excel import (
@@ -28,8 +27,6 @@ logger = logging.getLogger(__name__)
 
 
 MAX_EXCEL_FILE_SIZE_MB = 25
-
-ERROR_MESSAGE = "No input found or invalid input provided."
 
 ALLOWED_EXCEL_FILE_EXTENSIONS = [".xls", ".xlsx"]
 
@@ -178,28 +175,6 @@ def validate_general_information_json(value):
     return value
 
 
-def validate_excel_filename(file):
-    """
-    User-provided filenames are slugified during validation
-    """
-    filename, extension = os.path.splitext(file.name)
-
-    if len(filename) == 0:
-        raise ValidationError("Invalid filename")
-
-    if len(extension) == 0:
-        raise ValidationError("Invalid filename")
-
-    slugified = slugify(filename)
-
-    logger.info(f"Uploaded file {file.name} slugified filename: {slugified}")
-
-    if len(slugified) == 0:
-        raise ValidationError("Invalid filename")
-
-    return f"{slugified}{extension}"
-
-
 def validate_excel_file_extension(file):
     """
     User-provided filenames must be have an allowed extension
@@ -297,7 +272,6 @@ def validate_excel_file_integrity(file):
 
 
 def validate_excel_file(file):
-    validate_excel_filename(file)
     validate_excel_file_extension(file)
     validate_excel_file_content_type(file)
     validate_excel_file_size(file)
@@ -316,7 +290,7 @@ def _get_error_details(xlsx_definition_template, named_ranges_row_indices):
                         open_range["title_cell"][0],
                         xlsx_definition_template["title_row"] + row_index + 1,
                         open_range["title"],
-                        ERROR_MESSAGE,
+                        open_range["help"],
                     )
                 )
                 break
@@ -327,7 +301,7 @@ def _get_error_details(xlsx_definition_template, named_ranges_row_indices):
                         single_cell["range_cell"][0],
                         single_cell["range_cell"][1],
                         single_cell["title"],
-                        ERROR_MESSAGE,
+                        single_cell["help"],
                     )
                 )
                 break
