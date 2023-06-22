@@ -109,6 +109,9 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 16
+      - name: Create .env
+        working-directory: ./backend
+        run: touch .env
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
         with:
@@ -134,6 +137,9 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 16
+      - name: Create .env
+        working-directory: ./backend
+        run: touch .env
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
         with:
