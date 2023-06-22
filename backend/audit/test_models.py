@@ -91,6 +91,7 @@ class SingleAuditChecklistTests(TestCase):
                 transition_method()
 
                 self.assertEqual(sac.submission_status, status_to)
+                self.assertGreater(sac.transition_name.index(status_to), 0)
 
                 bad_statuses = [
                     status[0]

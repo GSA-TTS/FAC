@@ -1,4 +1,5 @@
 import calendar
+from datetime import date
 import logging
 
 from django.db import models
@@ -8,6 +9,8 @@ from django.contrib.auth import get_user_model
 from django.utils.translation import gettext_lazy as _
 
 from django_fsm import FSMField, RETURN_VALUE, transition
+from django.contrib.postgres.fields import ArrayField
+
 
 from .validators import (
     validate_excel_file,
@@ -97,6 +100,14 @@ class SingleAuditChecklist(models.Model):
     date_created = models.DateTimeField(auto_now_add=True)
     submission_status = FSMField(default=STATUS.IN_PROGRESS, choices=STATUS_CHOICES)
 
+    # implement an array of tuples as two arrays since we can only have simple fields inside an array
+    transition_name = ArrayField(
+        models.CharField(max_length=40, choices=STATUS_CHOICES),
+        default=[STATUS.IN_PROGRESS],
+        size=None,
+    )
+    transition_date = ArrayField(models.DateTimeField(), default=[date.today()])
+
     report_id = models.CharField(max_length=17, unique=True)
 
     # Q2 Type of Uniform Guidance Audit
@@ -138,7 +149,12 @@ class SingleAuditChecklist(models.Model):
         validation and reports back to the user.
         """
         if self.validate_full():
+            self.transition_name.append(
+                SingleAuditChecklist.STATUS.READY_FOR_CERTIFICATION
+            )
+            self.transition_date.append(date.today())
             return SingleAuditChecklist.STATUS.READY_FOR_CERTIFICATION
+
         return SingleAuditChecklist.STATUS.IN_PROGRESS
 
     @transition(
@@ -151,6 +167,8 @@ class SingleAuditChecklist(models.Model):
         The permission checks verifying that the user attempting to do this has
         the appropriate privileges will done at the view level.
         """
+        self.transition_name.append(SingleAuditChecklist.STATUS.AUDITOR_CERTIFIED)
+        self.transition_date.append(date.today())
 
     @transition(
         field="submission_status",
@@ -162,6 +180,8 @@ class SingleAuditChecklist(models.Model):
         The permission checks verifying that the user attempting to do this has
         the appropriate privileges will done at the view level.
         """
+        self.transition_name.append(SingleAuditChecklist.STATUS.AUDITEE_CERTIFIED)
+        self.transition_date.append(date.today())
 
     @transition(
         field="submission_status",
@@ -173,6 +193,8 @@ class SingleAuditChecklist(models.Model):
         The permission checks verifying that the user attempting to do this has
         the appropriate privileges will done at the view level.
         """
+        self.transition_name.append(SingleAuditChecklist.STATUS.CERTIFIED)
+        self.transition_date.append(date.today())
 
     @transition(
         field="submission_status",
@@ -184,6 +206,8 @@ class SingleAuditChecklist(models.Model):
         The permission checks verifying that the user attempting to do this has
         the appropriate privileges will done at the view level.
         """
+        self.transition_name.append(SingleAuditChecklist.STATUS.SUBMITTED)
+        self.transition_date.append(date.today())
 
     @transition(
         field="submission_status",
@@ -209,6 +233,8 @@ class SingleAuditChecklist(models.Model):
         the model level, and will again leave it up to the views to track that
         changes have been made at that point.
         """
+        self.transition_name.append(SingleAuditChecklist.STATUS.SUBMITTED)
+        self.transition_date.append(date.today())
 
     # Corrective Action Plan:
     corrective_action_plan = models.JSONField(
