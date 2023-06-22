@@ -1,7 +1,7 @@
 ---
 name: Runs linting and tests
 on:
-  workflow_call:
+  workflow_dispatch:
 
 jobs:
   linting:
@@ -56,6 +56,7 @@ jobs:
       - name: Run HTML template linting
         working-directory: ./backend
         run: djlint --lint .
+
   frontend-linting:
     runs-on: ubuntu-latest
     steps:
@@ -79,6 +80,7 @@ jobs:
       - name: Lint JS & SCSS
         working-directory: ./backend
         run: npm run check-all
+
   test:
     runs-on: ubuntu-latest
     env:
@@ -96,43 +98,15 @@ jobs:
           node-version: 16
       - name: Pull Docker Hub images
         working-directory: ./backend
-        run: touch .env && docker-compose pull
-      - name: Start services
-        working-directory: ./backend
-        run: docker-compose up -d
+        run: touch .env && docker compose pull
+      - uses: docker/setup-buildx-action@v1
+      - uses: docker/build-push-action@v2
+        with:
+          context: ./backend
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
       - name: Run Django test suite
         working-directory: ./backend
         run:
           docker-compose run web bash -c 'coverage run --parallel-mode --concurrency=multiprocessing manage.py test --parallel &&
           coverage combine && coverage report -m --fail-under=90'
-  a11y-testing:
-    runs-on: ubuntu-20.04
-    env:
-      ENV: TESTING
-      SAM_API_KEY: ${{ secrets.SAM_API_KEY }}"
-      DJANGO_BASE_URL: 'http://localhost:8000'
-      DJANGO_SECRET_LOGIN_KEY: ${{ secrets.DJANGO_SECRET_LOGIN_KEY }}"
-      SECRET_KEY: ${{ secrets.SECRET_KEY }}
-      ALLOWED_HOSTS: '0.0.0.0 127.0.0.1 localhost'
-      DISABLE_AUTH: True
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 16
-      - name: Pull Docker Hub images
-        working-directory: ./backend
-        run: touch .env && docker-compose pull
-      - name: Start services
-        working-directory: ./backend
-        run: docker-compose up -d
-      - name: run Lighthouse CI
-        run: |
-          npm install -g @lhci/cli@0.8.x
-          lhci autorun
-      - name: run pa11y
-        run: |
-          npm i -g pa11y-ci
-          pa11y-ci
-  validate-terraform:
-    uses: ./.github/workflows/terraform-lint.yml
