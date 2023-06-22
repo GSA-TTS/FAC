@@ -111,7 +111,3 @@ Content-Length: 37
 
 { "Status": "OK", "Description": "" }
 ```
-If you are watching the logs of the container, or have docker desktop, we can view the container logs and validate that the file was scanned, and its result
-![](image.png)
-
-## Scanning an xls file through the workflow (Jadud)
