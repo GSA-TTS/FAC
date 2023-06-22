@@ -16,6 +16,7 @@ from .validators import (
     validate_findings_text_json,
     validate_findings_uniform_guidance_json,
     validate_general_information_json,
+    validate_additional_ueis_json,
 )
 
 User = get_user_model()
@@ -223,6 +224,11 @@ class SingleAuditChecklist(models.Model):
     # Findings Uniform Guidance:
     findings_uniform_guidance = models.JSONField(
         blank=True, null=True, validators=[validate_findings_uniform_guidance_json]
+    )
+
+    # Additional UEIs:
+    additional_ueis = models.JSONField(
+        blank=True, null=True, validators=[validate_additional_ueis_json]
     )
 
     @property
