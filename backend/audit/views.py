@@ -149,27 +149,34 @@ class ExcelFileHandlerView(SingleAuditChecklistAccessRequiredMixin, generic.View
         except KeyError as e:
             logger.warn(f"Field error. Field: {e}")
             return JsonResponse({"errors": str(e), "type": "error_field"}, status=400)
-        
 
-class SingleAuditReportFileHandlerView(SingleAuditChecklistAccessRequiredMixin, generic.View):
+
+class SingleAuditReportFileHandlerView(
+    SingleAuditChecklistAccessRequiredMixin, generic.View
+):
     # this is marked as csrf_exempt to enable by-hand testing via tools like Postman. Should be removed when the frontend form is implemented!
     @method_decorator(csrf_exempt)
     def dispatch(self, *args, **kwargs):
         return super(SingleAuditReportFileHandlerView, self).dispatch(*args, **kwargs)
 
     def post(self, request, *args, **kwargs):
-        report_id = kwargs["report_id"]
+        try:
+            report_id = kwargs["report_id"]
 
-        sac = SingleAuditChecklist.objects.get(report_id=report_id)
+            sac = SingleAuditChecklist.objects.get(report_id=report_id)
 
-        file = request.FILES["FILES"]
+            file = request.FILES["FILES"]
 
-        sar_file = SingleAuditReportFile(
-            **{"file": file, "filename": "temp", "sac_id": sac.id}
-        )
+            sar_file = SingleAuditReportFile(
+                **{"file": file, "filename": "temp", "sac_id": sac.id}
+            )
 
-        sar_file.full_clean()
-        sar_file.save()
+            sar_file.full_clean()
+            sar_file.save()
+
+        except MultiValueDictKeyError:
+            logger.warn("No file found in request")
+            raise BadRequest()
 
 
 class ReadyForCertificationView(SingleAuditChecklistAccessRequiredMixin, generic.View):

@@ -47,11 +47,7 @@ RUN \
 COPY package.* /src/
 WORKDIR /src/
 
-
-RUN npm install -g npm@9.7.1
-RUN apt-get install -yqq chromium
-RUN npm i run-p
-
+RUN npm install
 RUN chown -R 1001:123 "/root/.npm"
 
 COPY . /src/
