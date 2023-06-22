@@ -119,7 +119,7 @@ jobs:
       - name: Run Django test suite
         working-directory: ./backend
         run: |
-          docker compose run web bash -c 'coverage run --parallel-mode --concurrency=multiprocessing manage.py test --parallel && coverage combine && coverage report -m --fail-under=90'
+          docker-compose run web bash -c 'coverage run --parallel-mode --concurrency=multiprocessing manage.py test --parallel && coverage combine && coverage report -m --fail-under=90'
 
   a11y-testing:
     needs: [build-with-docker]
