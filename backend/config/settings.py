@@ -287,7 +287,7 @@ else:
     # see settings options https://django-csp.readthedocs.io/en/latest/configuration.html#configuration-chapter
     bucket = f"{STATIC_URL}"
     allowed_sources = (
-        "self",
+        "'self'",
         bucket,
         "https://idp.int.identitysandbox.gov/",
         "https://dap.digitalgov.gov",
