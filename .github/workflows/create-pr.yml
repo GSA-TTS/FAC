@@ -1,39 +1,16 @@
 ---
-name: Auto Generated PR From Main to Staging
+name: Auto Generated Pull Request From Main to Staging
 on:
-  workflow_call:
+  schedule:
+    - cron: '30 4 * * *'
   workflow_dispatch:
 
 env:
   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 jobs:
-  check-commit:
-    runs-on: ubuntu-latest
-    name: Check For a Commit
-    outputs:
-        should_run: ${{ steps.should_run.outputs.should_run }}
-    steps:
-      - uses: actions/checkout@v3
-      - name: Print Latest Commit
-        run: echo ${{ github.sha }}
-
-      - name: Check if There Has Been A Commit
-        id: should_run
-        continue-on-error: false
-        run: |
-          sha=$(git rev-list --after="24 hours" ${{ github.sha }})
-          if test -z $sha
-          then
-            echo "should_run=false" >> $GITHUB_OUTPUT
-          else
-            echo "should_run=true" >> $GITHUB_OUTPUT
-          fi
-
   pull-request:
     name: Create Pull Request
-    needs: [check-commit]
-    if: ${{ needs.check-commit.outputs.should_run != 'false' }}
     runs-on: ubuntu-latest
     outputs:
         pr_number: ${{ steps.pr-number.outputs.pull_request_number }}
