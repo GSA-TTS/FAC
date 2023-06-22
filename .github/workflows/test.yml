@@ -109,9 +109,6 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 16
-      - name: Pull Docker Hub images
-        working-directory: ./backend
-        run: touch .env && docker compose pull
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
         with:
@@ -137,9 +134,6 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 16
-      - name: Pull Docker Hub images
-        working-directory: ./backend
-        run: touch .env && docker compose pull
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
         with:
