@@ -107,9 +107,8 @@ jobs:
           cache-to: type=gha,mode=max
       - name: Run Django test suite
         working-directory: ./backend
-        run:
-          docker compose run web bash -c 'coverage run --parallel-mode --concurrency=multiprocessing manage.py test --parallel &&
-          coverage combine && coverage report -m --fail-under=90'
+        run: |
+          docker compose run web bash -c 'coverage run --parallel-mode --concurrency=multiprocessing manage.py test --parallel && coverage combine && coverage report -m --fail-under=90'
   a11y-testing:
     runs-on: ubuntu-20.04
     env:
