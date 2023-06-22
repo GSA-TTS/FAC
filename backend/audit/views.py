@@ -9,13 +9,9 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse
 from django.utils.datastructures import MultiValueDictKeyError
 from django.utils.decorators import method_decorator
+from django.http import JsonResponse
 
-from .fixtures.excel import (
-    FEDERAL_AWARDS_EXPENDED,
-    CORRECTIVE_ACTION_PLAN,
-    FINDINGS_TEXT,
-    FINDINGS_UNIFORM_GUIDANCE,
-)
+from .fixtures.excel import FORM_SECTIONS
 
 from audit.excel import (
     extract_federal_awards,
@@ -98,31 +94,36 @@ class ExcelFileHandlerView(SingleAuditChecklistAccessRequiredMixin, generic.View
             file = request.FILES["FILES"]
 
             excel_file = ExcelFile(
-                **{"file": file, "filename": "temp", "sac_id": sac.id}
+                **{
+                    "file": file,
+                    "filename": "temp",
+                    "sac_id": sac.id,
+                    "form_section": form_section,
+                }
             )
 
             excel_file.full_clean()
             excel_file.save()
 
-            if form_section == FEDERAL_AWARDS_EXPENDED:
+            if form_section == FORM_SECTIONS.FEDERAL_AWARDS_EXPENDED:
                 audit_data = extract_federal_awards(excel_file.file)
                 validate_federal_award_json(audit_data)
                 SingleAuditChecklist.objects.filter(pk=sac.id).update(
                     federal_awards=audit_data
                 )
-            elif form_section == CORRECTIVE_ACTION_PLAN:
+            elif form_section == FORM_SECTIONS.CORRECTIVE_ACTION_PLAN:
                 audit_data = extract_corrective_action_plan(excel_file.file)
                 validate_corrective_action_plan_json(audit_data)
                 SingleAuditChecklist.objects.filter(pk=sac.id).update(
                     corrective_action_plan=audit_data
                 )
-            elif form_section == FINDINGS_UNIFORM_GUIDANCE:
+            elif form_section == FORM_SECTIONS.FINDINGS_UNIFORM_GUIDANCE:
                 audit_data = extract_findings_uniform_guidance(excel_file.file)
                 validate_findings_uniform_guidance_json(audit_data)
                 SingleAuditChecklist.objects.filter(pk=sac.id).update(
                     findings_uniform_guidance=audit_data
                 )
-            elif form_section == FINDINGS_TEXT:
+            elif form_section == FORM_SECTIONS.FINDINGS_TEXT:
                 audit_data = extract_findings_text(excel_file.file)
                 validate_findings_text_json(audit_data)
                 SingleAuditChecklist.objects.filter(pk=sac.id).update(
@@ -137,11 +138,17 @@ class ExcelFileHandlerView(SingleAuditChecklistAccessRequiredMixin, generic.View
             logger.warn(f"no SingleAuditChecklist found with report ID {report_id}")
             raise PermissionDenied()
         except ValidationError as e:
+            # The good error, where bad rows/columns are sent back in the request.
+            # These come back as tuples:
+            # [(col1, row1, field1, link1, help-text1), (col2, row2, ...), ...]
             logger.warn(f"{form_section} Excel upload failed validation: {e}")
-            raise BadRequest(e)
+            return JsonResponse({"errors": list(e), "type": "error_row"}, status=400)
         except MultiValueDictKeyError:
-            logger.warn("no file found in request")
+            logger.warn("No file found in request")
             raise BadRequest()
+        except KeyError as e:
+            logger.warn(f"Field error. Field: {e}")
+            return JsonResponse({"errors": str(e), "type": "error_field"}, status=400)
 
 
 class ReadyForCertificationView(SingleAuditChecklistAccessRequiredMixin, generic.View):
