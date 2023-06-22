@@ -5,6 +5,7 @@ from typing import Any, Callable
 from openpyxl import load_workbook, Workbook
 from openpyxl.cell import Cell
 from audit.fixtures.excel import (
+    ADDITIONAL_UEIS_TEMPLATE_DEFINITION,
     CORRECTIVE_ACTION_TEMPLATE_DEFINITION,
     FEDERAL_AWARDS_TEMPLATE_DEFINITION,
     FINDINGS_TEXT_TEMPLATE_DEFINITION,
@@ -63,6 +64,9 @@ findings_uniform_guidance_field_mapping: FieldMapping = {
 }
 findings_text_field_mapping: FieldMapping = {
     "auditee_uei": ("FindingsText.auditee_uei", _set_by_path),
+}
+additional_ueis_field_mapping: FieldMapping = {
+    "auditee_uei": ("AdditionalUEIs.auditee_uei", _set_by_path),
 }
 
 federal_awards_column_mapping: ColumnMapping = {
@@ -274,6 +278,13 @@ findings_text_column_mapping: ColumnMapping = {
         _set_by_path,
     ),
 }
+additional_ueis_column_mapping: ColumnMapping = {
+    "additional_uei": (
+        "AdditionalUEIs.additional_ueis_entries",
+        "additional_uei",
+        _set_by_path,
+    ),
+}
 
 
 class ExcelExtractionError(Exception):
@@ -454,6 +465,30 @@ def extract_findings_text(file):
     )
 
 
+def extract_additional_ueis(file):
+    template_definition_path = (
+        XLSX_TEMPLATE_DEFINITION_DIR / ADDITIONAL_UEIS_TEMPLATE_DEFINITION
+    )
+    template = json.loads(template_definition_path.read_text(encoding="utf-8"))
+    data = _extract_data(
+        file,
+        additional_ueis_field_mapping,
+        additional_ueis_column_mapping,
+        template["title_row"],
+    )
+    return _add_seq_number_to_additional_uei_entries(data)
+
+
+def _add_seq_number_to_additional_uei_entries(json_obj):
+    if "AdditionalUEIs" in json_obj:
+        additional_ueis = json_obj["AdditionalUEIs"]
+        if "additional_ueis_entries" in additional_ueis:
+            entries = additional_ueis["additional_ueis_entries"]
+            for i, entry in enumerate(entries, start=1):
+                entry["seq_number"] = i
+    return json_obj
+
+
 def _extract_from_column_mapping(path, row_index, column_mapping, match=None):
     """Extract named ranges from column mapping"""
     for key, value in column_mapping.items():
@@ -541,4 +576,10 @@ def findings_uniform_guidance_named_ranges(errors):
 def findings_text_named_ranges(errors):
     return _extract_named_ranges(
         errors, findings_text_column_mapping, findings_text_field_mapping
+    )
+
+
+def additional_ueis_named_ranges(errors):
+    return _extract_named_ranges(
+        errors, additional_ueis_column_mapping, additional_ueis_field_mapping
     )

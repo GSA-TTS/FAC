@@ -13,6 +13,7 @@ from django.utils.decorators import method_decorator
 from .fixtures.excel import FORM_SECTIONS
 
 from audit.excel import (
+    extract_additional_ueis,
     extract_federal_awards,
     extract_corrective_action_plan,
     extract_findings_text,
@@ -25,6 +26,7 @@ from audit.mixins import (
 )
 from audit.models import ExcelFile, SingleAuditChecklist
 from audit.validators import (
+    validate_additional_ueis_json,
     validate_federal_award_json,
     validate_corrective_action_plan_json,
     validate_findings_text_json,
@@ -127,6 +129,12 @@ class ExcelFileHandlerView(SingleAuditChecklistAccessRequiredMixin, generic.View
                 validate_findings_text_json(audit_data)
                 SingleAuditChecklist.objects.filter(pk=sac.id).update(
                     findings_text=audit_data
+                )
+            elif form_section == FORM_SECTIONS.ADDITIONAL_UEIS:
+                audit_data = extract_additional_ueis(excel_file.file)
+                validate_additional_ueis_json(audit_data)
+                SingleAuditChecklist.objects.filter(pk=sac.id).update(
+                    additional_ueis=audit_data
                 )
             else:
                 logger.warn(f"no form section found with name {form_section}")
