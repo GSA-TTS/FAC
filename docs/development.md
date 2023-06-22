@@ -162,7 +162,7 @@ If you want to load more data, see the section on loading previous years.
 
 ### Load SingleAuditChecklist fixtures
 
-You can also add fake fixture data for single audit checklists. There is a list
+You can also load fake fixture data for single audit checklists. There is a list
 of users in
 [`backend/users/fixtures/user_fixtures.py`](/backend/users/fixtures/user_fixtures.py)
 that will be created by default. If you are a new developer, you can add your
@@ -179,6 +179,13 @@ Once you have a user listed in that file, you can run the command
 
 ```shell
 docker compose run web python manage.py load_fixtures
+```
+
+It is not completely obvious that you would want to, but you could run this in
+one of the Cloud.gov environments with `cf run-task` like
+
+```shell
+cf run-task ENVIRONMENT --command "./manage.py load_fixtures" --name fixtures
 ```
 
 ### Create a test bucket
