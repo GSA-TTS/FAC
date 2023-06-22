@@ -11,16 +11,20 @@ from audit.excel import (
     extract_findings_text,
     extract_findings_uniform_guidance,
     extract_corrective_action_plan,
+    extract_additional_ueis,
     federal_awards_field_mapping,
     findings_text_field_mapping,
     findings_uniform_guidance_field_mapping,
     corrective_action_field_mapping,
+    additional_ueis_field_mapping,
     federal_awards_column_mapping,
     findings_text_column_mapping,
     findings_uniform_guidance_column_mapping,
     corrective_action_column_mapping,
+    additional_ueis_column_mapping,
 )
 from audit.validators import (
+    validate_additional_ueis_json,
     validate_federal_award_json,
     validate_corrective_action_plan_json,
     validate_findings_text_json,
@@ -35,6 +39,8 @@ from audit.fixtures.excel import (
     FINDINGS_TEXT_ENTRY_FIXTURES,
     FINDINGS_UNIFORM_GUIDANCE_TEMPLATE,
     FINDINGS_UNIFORM_GUIDANCE_ENTRY_FIXTURES,
+    ADDITIONAL_UEIS_TEMPLATE,
+    ADDITIONAL_UEIS_ENTRY_FIXTURES,
 )
 
 # Simplest way to create a new copy of simple case rather than getting
@@ -437,4 +443,66 @@ class FindingsTextExcelTests(SimpleTestCase):
 
                 self.assertRaises(
                     ValidationError, validate_findings_text_json, findings
+                )
+
+
+class AdditionalUeisExcelTests(SimpleTestCase):
+    GOOD_UEI = "AAA123456BBB"
+    TEST_DATA = json.loads(ADDITIONAL_UEIS_ENTRY_FIXTURES.read_text(encoding="utf-8"))
+
+    def test_template_has_named_ranges(self):
+        """Test that the AdditionalUEIs Excel template contains the expected named ranges"""
+        workbook = load_workbook(ADDITIONAL_UEIS_TEMPLATE, data_only=True)
+
+        for name in additional_ueis_field_mapping.keys():
+            self.assertIsNotNone(workbook.defined_names[name])
+
+        for name in additional_ueis_column_mapping:
+            self.assertIsNotNone(workbook.defined_names[name])
+
+    def test_single_additional_ueis_entry(self):
+        """Test that extraction and validation succeed when there is a single additional ueis entry"""
+        workbook = load_workbook(ADDITIONAL_UEIS_TEMPLATE, data_only=True)
+
+        _set_by_name(workbook, "auditee_uei", AdditionalUeisExcelTests.GOOD_UEI)
+        _add_entry(workbook, 0, AdditionalUeisExcelTests.TEST_DATA[0])
+
+        additional_ueis = extract_additional_ueis(workbook)
+
+        validate_additional_ueis_json(additional_ueis)
+
+    def test_multiple_additional_ueis_entries(self):
+        """Test that extraction and validation succeed when there are multiple additional ueis entries"""
+        workbook = load_workbook(ADDITIONAL_UEIS_TEMPLATE, data_only=True)
+
+        _set_by_name(workbook, "auditee_uei", AdditionalUeisExcelTests.GOOD_UEI)
+        for index, entry in enumerate(AdditionalUeisExcelTests.TEST_DATA):
+            _add_entry(workbook, index, entry)
+
+        additional_ueis = extract_additional_ueis(workbook)
+
+        validate_additional_ueis_json(additional_ueis)
+
+    def test_additional_ueis_checking(self):
+        """Test that extraction succeeds and validation fails when fields are of the wrong data type"""
+        workbook = load_workbook(ADDITIONAL_UEIS_TEMPLATE, data_only=True)
+
+        # add valid data to the workbook
+        _set_by_name(workbook, "auditee_uei", AdditionalUeisExcelTests.GOOD_UEI)
+        _add_entry(workbook, 0, AdditionalUeisExcelTests.TEST_DATA[0])
+
+        test_cases = [
+            ("auditee_uei", 123456789123),
+            ("additional_uei", 123456789123),
+        ]
+
+        # validate that each test_case appropriately checks the data type
+        for field_name, value in test_cases:
+            with self.subTest():
+                _set_by_name(workbook, field_name, value)
+
+                additional_ueis = extract_additional_ueis(workbook)
+
+                self.assertRaises(
+                    ValidationError, validate_additional_ueis_json, additional_ueis
                 )
