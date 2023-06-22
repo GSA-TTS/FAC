@@ -1,0 +1,69 @@
+{
+   "filename": "additional-ueis-template.xlsx",
+   "sheets": [
+      {
+         "header_inclusion": [
+            "A1"
+         ],
+         "mergeable_cells": [
+            [
+               1,
+               2,
+               "A",
+               "B"
+            ],
+            [
+               3,
+               3001,
+               "A",
+               "B"
+            ]
+         ],
+         "merged_unreachable": [
+            "B"
+         ],
+         "name": "Form",
+         "open_ranges": [
+            {
+               "help": {
+                  "link": "https://fac.gov/documentation/validation/#uei",
+                  "text": "UEIs are 12 characters long and match rules as given by SAM.gov"
+               },
+               "range_name": "additional_uei",
+               "title": "Additional UEIs",
+               "title_cell": "A3",
+               "type": "open_range",
+               "validation": {
+                  "custom_error": "Expecting something with only twelve characters",
+                  "custom_title": "Must be length of 12",
+                  "formula1": 12,
+                  "operator": "equal",
+                  "type": "textLength"
+               },
+               "width": 36
+            }
+         ],
+         "single_cells": [
+            {
+               "help": {
+                  "link": "https://fac.gov/documentation/validation/#uei",
+                  "text": "UEIs are 12 characters long and match rules as given by SAM.gov"
+               },
+               "range_cell": "B2",
+               "range_name": "auditee_uei",
+               "title": "Auditee UEI",
+               "title_cell": "A2",
+               "type": "single_cell",
+               "validation": {
+                  "custom_error": "Expecting something with only twelve characters",
+                  "custom_title": "Must be length of 12",
+                  "formula1": 12,
+                  "operator": "equal",
+                  "type": "textLength"
+               }
+            }
+         ]
+      }
+   ],
+   "title_row": 3
+}
