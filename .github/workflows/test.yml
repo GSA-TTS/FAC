@@ -11,6 +11,8 @@ jobs:
       DJANGO_BASE_URL: 'http://localhost:8000'
       DJANGO_SECRET_LOGIN_KEY: ${{ secrets.DJANGO_SECRET_LOGIN_KEY }}
       SECRET_KEY: ${{ secrets.SECRET_KEY }}
+      ALLOWED_HOSTS: '0.0.0.0 127.0.0.1 localhost'
+      DISABLE_AUTH: True
     name: Build Docker and Cache
     runs-on: ubuntu-latest
     steps:
