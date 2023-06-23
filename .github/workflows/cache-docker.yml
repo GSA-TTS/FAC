@@ -29,7 +29,7 @@ jobs:
             password: ${{ secrets.GITHUB_TOKEN }}
 
         - name: Push Image
-          run: docker push ${{ env.GH_REPO }}/django:latest
+          run: docker push ${{ env.GH_REPO }}
         # - uses: jpribyl/action-docker-layer-caching@v0.1.1
         #   continue-on-error: false
         # - uses: docker/bake-action@v3
