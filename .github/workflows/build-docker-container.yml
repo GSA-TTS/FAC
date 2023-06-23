@@ -39,7 +39,7 @@ jobs:
 
         - name: Build
           working-directory: ./backend
-          run: docker build . -t ${{ env.IMAGE }}:${{ steps.date.outputs.date }}
+          run: docker build . -t ${{ env.GH_REPO }}/${{ env.IMAGE }}:${{ steps.date.outputs.date }}
 
         - name: Login to GitHub Container Registry
           uses: docker/login-action@v2
@@ -49,4 +49,4 @@ jobs:
             password: ${{ secrets.GITHUB_TOKEN }}
 
         - name: Push Image
-          run: docker push ${{ env.GH_REPO }}/${{ env.IMAGE }}
+          run: docker push ${{ env.GH_REPO }}/${{ env.IMAGE }}:${{ steps.date.outputs.date }}
