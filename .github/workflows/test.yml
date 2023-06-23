@@ -38,7 +38,7 @@ jobs:
       #       web.cache-to=type=gha,mode=max
       - name: Start services
         working-directory: ./backend
-        run: docker-compose pull && docker-compose up -d --no-build
+        run: docker-compose pull && docker-compose up -d
 
   linting:
     runs-on: ubuntu-latest
