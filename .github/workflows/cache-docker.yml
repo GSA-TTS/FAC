@@ -33,9 +33,7 @@ jobs:
         - name: Build & push Docker image
           uses: mr-smithers-excellent/docker-build-push@v6
           with:
-            directory: ./backend
             image: web
-            tags: latest
             registry: ghcr.io
             username: ${{ github.repository_owner }}
             password: ${{ secrets.GITHUB_TOKEN }}
