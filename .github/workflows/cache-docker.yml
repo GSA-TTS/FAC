@@ -37,7 +37,6 @@ jobs:
             image: web
             tags: latest
             registry: ghcr.io
-            dockerfile: Dockerfile
             username: ${{ github.repository_owner }}
             password: ${{ secrets.GITHUB_TOKEN }}
 
