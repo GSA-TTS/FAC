@@ -32,7 +32,7 @@ jobs:
 
         - name: Tag Image
           run: |
-            docker tag ${{ steps.buildx.outputs.name }} ${{ env.GH_REPO }}/django:latest
+            docker tag ${{ steps.buildx.outputs.name }} django
 
         - name: Push Image
           run: docker push --all-tags ${{ env.GH_REPO }}/django
