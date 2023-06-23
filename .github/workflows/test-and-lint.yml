@@ -3,6 +3,8 @@
   on:
     workflow_dispatch:
     workflow_call:
+    schedule:
+      - cron: '30 9 * * *'
 
   jobs:
     linting:
@@ -81,7 +83,7 @@
           working-directory: ./backend
           run: npm run check-all
 
-    test:
+    django-test:
       runs-on: ubuntu-latest
       env:
         ENV: TESTING
