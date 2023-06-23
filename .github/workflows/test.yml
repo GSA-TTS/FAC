@@ -27,7 +27,6 @@ jobs:
           context: ./backend
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          load: true
           outputs: type=oci,dest=/tmp/image.tar
       - name: Upload artifact
         uses: actions/upload-artifact@v2
