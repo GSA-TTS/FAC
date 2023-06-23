@@ -142,9 +142,9 @@ jobs:
         with:
           name: image
           path: /tmp/image.tar
-      - name: Start services
+      - name: Docker Load
         working-directory: ./backend
-        run: docker load --input image.tar
+        run: docker load --input /tmp/image.tar
       - name: Run Django test suite
         working-directory: ./backend
         run: |
@@ -173,9 +173,9 @@ jobs:
         with:
           name: image
           path: /tmp/image.tar
-      - name: Start services
+      - name: Docker Load
         working-directory: ./backend
-        run: docker load --input image.tar
+        run: docker load --input /tmp/image.tar
       - name: run Lighthouse CI
         run: |
           npm install -g @lhci/cli@0.8.x
