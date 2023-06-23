@@ -27,7 +27,8 @@ jobs:
           context: ./backend
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          load: true
+      - uses: jpribyl/action-docker-layer-caching@v0.1.1
+        continue-on-error: false
       # - uses: docker/bake-action@v3
       #   with:
       #     workdir: ./backend
@@ -133,8 +134,6 @@ jobs:
       - name: Create .env file
         working-directory: ./backend
         run: touch .env
-      - uses: jpribyl/action-docker-layer-caching@v0.1.1
-        continue-on-error: true
       - name: Start Services
         working-directory: ./backend
         run: docker-compose up -d
@@ -162,8 +161,6 @@ jobs:
       - name: Create .env file
         working-directory: ./backend
         run: touch .env
-      - uses: jpribyl/action-docker-layer-caching@v0.1.1
-        continue-on-error: true
       - name: Start Services
         working-directory: ./backend
         run: docker-compose up -d
