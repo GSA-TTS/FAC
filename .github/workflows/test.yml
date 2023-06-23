@@ -27,15 +27,15 @@ jobs:
           context: ./backend
           cache-from: type=gha
           cache-to: type=gha,mode=max
-      - uses: docker/bake-action@v3
-        with:
-          workdir: ./backend
-          files: docker-compose.yml
-          push: false
-          load: true
-          set: |
-            web.cache-from=type=gha
-            web.cache-to=type=gha,mode=max
+      # - uses: docker/bake-action@v3
+      #   with:
+      #     workdir: ./backend
+      #     files: docker-compose.yml
+      #     push: false
+      #     load: true
+      #     set: |
+      #       web.cache-from=type=gha
+      #       web.cache-to=type=gha,mode=max
       - name: Start services
         working-directory: ./backend
         run: docker-compose pull && docker-compose up -d --no-build
