@@ -27,12 +27,7 @@ jobs:
           context: ./backend
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          outputs: type=oci,dest=/tmp/image.tar
-      - name: Upload artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: image
-          path: /tmp/image.tar
+          load: true
       # - uses: docker/bake-action@v3
       #   with:
       #     workdir: ./backend
@@ -138,13 +133,10 @@ jobs:
       - name: Create .env file
         working-directory: ./backend
         run: touch .env
-      - uses: actions/download-artifact@v3
-        with:
-          name: image
-          path: /tmp/image.tar
-      - name: Docker Load
-        working-directory: ./backend
-        run: docker load --input /tmp/image.tar
+      - run: docker-compose pull
+      - uses: jpribyl/action-docker-layer-caching@v0.1.1
+        continue-on-error: true
+      - run: docker-compose up -d
       - name: Run Django test suite
         working-directory: ./backend
         run: |
@@ -169,13 +161,10 @@ jobs:
       - name: Create .env file
         working-directory: ./backend
         run: touch .env
-      - uses: actions/download-artifact@v3
-        with:
-          name: image
-          path: /tmp/image.tar
-      - name: Docker Load
-        working-directory: ./backend
-        run: docker load --input /tmp/image.tar
+      - run: docker-compose pull
+      - uses: jpribyl/action-docker-layer-caching@v0.1.1
+        continue-on-error: true
+      - run: docker-compose up -d
       - name: run Lighthouse CI
         run: |
           npm install -g @lhci/cli@0.8.x
