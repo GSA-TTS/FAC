@@ -25,7 +25,8 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
       - name: Create .env file
-        run: touch ./backend/.env
+        working-directory: ./backend/
+        run: touch .env && cat .env && pwd
       - uses: docker/bake-action@v3
         with:
           files: ./backend/docker-compose.yml
