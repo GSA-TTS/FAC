@@ -1,5 +1,5 @@
 ---
-name: Build and publish docker container
+name: Build and Publish Docker Web Container
 on:
     workflow_dispatch:
     workflow_call:
@@ -13,7 +13,7 @@ env:
 
 jobs:
     build-with-docker:
-      name: Build with Docker
+      name: Build Docker Container
       runs-on: ubuntu-latest
       permissions:
         contents: read
@@ -46,5 +46,5 @@ jobs:
             username: ${{ github.repository_owner }}
             password: ${{ secrets.GITHUB_TOKEN }}
 
-        - name: Push Image
+        - name: Push Web Container
           run: docker push --all-tags ghcr.io/${{ env.GH_REPO }}/${{ env.IMAGE }}
