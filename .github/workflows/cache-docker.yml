@@ -4,7 +4,6 @@ on:
     workflow_dispatch:
 
 env:
-    GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     GH_REPO: ghcr.io/asteel-gsa/fac
 
 jobs:
