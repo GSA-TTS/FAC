@@ -126,7 +126,7 @@ def validate_additional_ueis_json(value):
     """
     Apply JSON Schema for additional UEIs and report errors.
     """
-    schema_path = settings.SECTION_SCHEMA_DIR / "AdditionalUEIs.schema.json"
+    schema_path = settings.SECTION_SCHEMA_DIR / "AdditionalUeis.schema.json"
     schema = json.loads(schema_path.read_text(encoding="utf-8"))
 
     validator = Draft7Validator(schema)
