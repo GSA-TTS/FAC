@@ -37,7 +37,7 @@ jobs:
             cache-from: type=gha
             cache-to: type=gha,mode=max
             push: false
-            tags: django:latest
+            tags: ${{ env.GH_REPO }}/django:latest
 
         - name: Push Image
           run: docker push ${{ env.GH_REPO }}/django:latest
