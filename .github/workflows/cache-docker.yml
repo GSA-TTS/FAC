@@ -45,7 +45,6 @@ jobs:
             image: web
             registry: ghcr.io
             directory: ./backend
-            dockerfile: .
             username: ${{ github.repository_owner }}
             password: ${{ secrets.GITHUB_TOKEN }}
 
