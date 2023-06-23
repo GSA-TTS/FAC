@@ -30,12 +30,12 @@ jobs:
             username: ${{ github.repository_owner }}
             password: ${{ secrets.GITHUB_TOKEN }}
 
-        - name: Tag Image
-          run: |
-            docker tag ${{ steps.buildx.outputs.name }} django
+        # - name: Tag Image
+        #   run: |
+        #     docker tag ${{ steps.buildx.outputs.name }} django
 
         - name: Push Image
-          run: docker push --all-tags ${{ env.GH_REPO }}/django
+          run: docker push  ${{ env.GH_REPO }}/${{ steps.buildx.outputs.name }}:latest
         # - uses: jpribyl/action-docker-layer-caching@v0.1.1
         #   continue-on-error: false
         # - uses: docker/bake-action@v3
