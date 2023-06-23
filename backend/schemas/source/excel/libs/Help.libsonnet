@@ -20,6 +20,10 @@ local make_url = function(anchor)
     text: 'Not one of the allowed cluster names',
     link: make_url('cluster_name'),
   },
+  ein: {
+    text: 'Employer identification numbers (EIN) are nine characters long and match rules given by the IRS',
+    link: make_url('ein'),
+  },
   // F
   federal_program_name: {
     text: 'Not one of the allowed federal program names',
