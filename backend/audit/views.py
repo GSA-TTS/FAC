@@ -25,13 +25,6 @@ from audit.mixins import (
     SingleAuditChecklistAccessRequiredMixin,
 )
 from audit.models import ExcelFile, SingleAuditChecklist
-from audit.validators import (
-    validate_additional_ueis_json,
-    validate_federal_award_json,
-    validate_corrective_action_plan_json,
-    validate_findings_text_json,
-    validate_findings_uniform_guidance_json,
-)
 
 logger = logging.getLogger(__name__)
 
@@ -79,6 +72,23 @@ class EditSubmission(LoginRequiredMixin, generic.View):
 
 
 class ExcelFileHandlerView(SingleAuditChecklistAccessRequiredMixin, generic.View):
+    FORM_SECTION_HANDLERS = {
+        FORM_SECTIONS.FEDERAL_AWARDS_EXPENDED: (
+            extract_federal_awards,
+            "federal_awards",
+        ),
+        FORM_SECTIONS.CORRECTIVE_ACTION_PLAN: (
+            extract_corrective_action_plan,
+            "corrective_action_plan",
+        ),
+        FORM_SECTIONS.FINDINGS_UNIFORM_GUIDANCE: (
+            extract_findings_uniform_guidance,
+            "findings_uniform_guidance",
+        ),
+        FORM_SECTIONS.FINDINGS_TEXT: (extract_findings_text, "findings_text"),
+        FORM_SECTIONS.ADDITIONAL_UEIS: (extract_additional_ueis, "additional_ueis"),
+    }
+
     # this is marked as csrf_exempt to enable by-hand testing via tools like Postman. Should be removed when the frontend form is implemented!
     @method_decorator(csrf_exempt)
     def dispatch(self, *args, **kwargs):
@@ -105,40 +115,23 @@ class ExcelFileHandlerView(SingleAuditChecklistAccessRequiredMixin, generic.View
 
             excel_file.full_clean()
             excel_file.save()
-
-            if form_section == FORM_SECTIONS.FEDERAL_AWARDS_EXPENDED:
-                audit_data = extract_federal_awards(excel_file.file)
-                validate_federal_award_json(audit_data)
-                SingleAuditChecklist.objects.filter(pk=sac.id).update(
-                    federal_awards=audit_data
-                )
-            elif form_section == FORM_SECTIONS.CORRECTIVE_ACTION_PLAN:
-                audit_data = extract_corrective_action_plan(excel_file.file)
-                validate_corrective_action_plan_json(audit_data)
-                SingleAuditChecklist.objects.filter(pk=sac.id).update(
-                    corrective_action_plan=audit_data
-                )
-            elif form_section == FORM_SECTIONS.FINDINGS_UNIFORM_GUIDANCE:
-                audit_data = extract_findings_uniform_guidance(excel_file.file)
-                validate_findings_uniform_guidance_json(audit_data)
-                SingleAuditChecklist.objects.filter(pk=sac.id).update(
-                    findings_uniform_guidance=audit_data
-                )
-            elif form_section == FORM_SECTIONS.FINDINGS_TEXT:
-                audit_data = extract_findings_text(excel_file.file)
-                validate_findings_text_json(audit_data)
-                SingleAuditChecklist.objects.filter(pk=sac.id).update(
-                    findings_text=audit_data
-                )
-            elif form_section == FORM_SECTIONS.ADDITIONAL_UEIS:
-                audit_data = extract_additional_ueis(excel_file.file)
-                validate_additional_ueis_json(audit_data)
-                SingleAuditChecklist.objects.filter(pk=sac.id).update(
-                    additional_ueis=audit_data
-                )
-            else:
+            handler, field_name = self.FORM_SECTION_HANDLERS.get(
+                form_section, (None, None)
+            )
+            if handler is None:
                 logger.warn(f"no form section found with name {form_section}")
                 raise BadRequest()
+
+            audit_data = handler(excel_file.file)
+            validate_function = f"validate_{field_name}_json"
+            if validate_function in globals() and callable(
+                globals()[validate_function]
+            ):
+                globals()[validate_function](audit_data)
+
+            SingleAuditChecklist.objects.filter(pk=sac.id).update(
+                **{field_name: audit_data}
+            )
 
             return redirect("/")
         except SingleAuditChecklist.DoesNotExist:
