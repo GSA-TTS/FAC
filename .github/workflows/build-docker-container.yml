@@ -6,6 +6,7 @@ on:
       - cron: '0 9 * * *'
 
 env:
+    DOCKER_NAME: fac
     IMAGE: web-container
     GH_REPO: asteel-gsa/fac
 
@@ -37,9 +38,14 @@ jobs:
         #     cache-from: type=gha
         #     cache-to: type=gha,mode=max
 
-        - name: Build
+        - name: Build Container
           working-directory: ./backend
-          run: docker build . -t ${{ env.GH_REPO }}/${{ env.IMAGE }}:${{ steps.date.outputs.date }}
+          run: docker build . -t ${{ env.DOCKER_NAME }}:${{ steps.date.outputs.date }}
+
+        - name: Tag Image
+          run: |
+            docker tag ${{ env.DOCKER_NAME }}:${{ steps.date.outputs.date }} ghcr.io/${{ env.GH_REPO }}/${{ env.IMAGE }}:${{ steps.date.outputs.date }}
+            docker tag ${{ env.DOCKER_NAME }}:${{ steps.date.outputs.date }} ghcr.io/${{ env.GH_REPO }}/${{ env.IMAGE }}:latest
 
         - name: Login to GitHub Container Registry
           uses: docker/login-action@v2
@@ -49,4 +55,4 @@ jobs:
             password: ${{ secrets.GITHUB_TOKEN }}
 
         - name: Push Image
-          run: docker push ${{ env.GH_REPO }}/${{ env.IMAGE }}:${{ steps.date.outputs.date }}
+          run: docker push --all-tags ghcr.io/${{ env.GH_REPO }}/${{ env.IMAGE }}
