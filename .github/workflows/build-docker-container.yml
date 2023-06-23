@@ -2,6 +2,8 @@
 name: Build and publish docker container
 on:
     workflow_dispatch:
+    schedule:
+      - cron: '0 9 * * *'
 
 env:
     GH_REPO: ghcr.io/asteel-gsa/fac

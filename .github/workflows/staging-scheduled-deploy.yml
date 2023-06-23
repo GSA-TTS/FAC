@@ -2,7 +2,7 @@
     name: Scheduled Deploy From Main to Staging
     on:
         schedule:
-        - cron: '30 4 * * *'
+        - cron: '0 10 * * *'
     jobs:
       create-pr:
         name: Auto Create PR at 430am UTC Daily
