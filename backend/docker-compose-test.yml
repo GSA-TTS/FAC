@@ -11,7 +11,7 @@ services:
       - "5432:5432"
 
   web:
-    image: ghcr.io/gsa-tts/fac/django:latest
+    image: ghcr.io/asteel-gsa/fac/web:latest
     command: /src/run.sh
     depends_on:
       - db
