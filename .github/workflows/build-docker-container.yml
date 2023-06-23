@@ -6,9 +6,9 @@ on:
       - cron: '0 9 * * *'
 
 env:
-    GH_REPO: ghcr.io/asteel-gsa/fac
     DOCKER_NAME: fac
     IMAGE: web-container
+    GH_REPO: asteel-gsa/fac
 
 jobs:
     build-with-docker:
