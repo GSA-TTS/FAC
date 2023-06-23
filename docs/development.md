@@ -188,6 +188,21 @@ one of the Cloud.gov environments with `cf run-task` like
 cf run-task ENVIRONMENT --command "./manage.py load_fixtures" --name fixtures
 ```
 
+You can also run this command for users by email address(es). These users do
+not have to be present in
+[`backend/users/fixtures/user_fixtures.py`](/backend/users/fixtures/user_fixtures.py),
+but must have logged into the system in order for this to work.
+
+```shell
+docker compose run web python manage.py load_fixtures userone@example.com usertwo@example.com
+```
+
+This will create a fake submission for each of the users. These submissions
+will be separate for each user—this command only associates one user with each
+fake submission.
+
+Note that all of these fake submissions use the same UEI.
+
 ### Create a test bucket
 
 We need a mocked S3 bucket for testing.

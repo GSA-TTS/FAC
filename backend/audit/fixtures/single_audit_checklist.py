@@ -95,18 +95,35 @@ SACS = [
 ]
 
 
+def _load_single_audit_checklists_for_user(user):
+    """Create SACs for a given user."""
+    logger.info("Creating single audit checklists for %s", user)
+    SingleAuditChecklist = apps.get_model("audit.SingleAuditChecklist")
+    for item_info in SACS:
+        auditee_name = item_info["auditee_name"]
+        if not SingleAuditChecklist.objects.filter(
+            submitted_by=user, general_information__auditee_name=auditee_name
+        ).exists():
+            # need to make this object
+            _create_sac(user, auditee_name)
+
+
 def load_single_audit_checklists():
     """Load example SACs for every user."""
 
     all_users = User.objects.all()
-    SingleAuditChecklist = apps.get_model("audit.SingleAuditChecklist")
 
     for user in all_users:
-        logger.info("Creating single audit checklists for %s", user)
-        for item_info in SACS:
-            auditee_name = item_info["auditee_name"]
-            if not SingleAuditChecklist.objects.filter(
-                submitted_by=user, general_information__auditee_name=auditee_name
-            ).exists():
-                # need to make this object
-                _create_sac(user, auditee_name)
+        _load_single_audit_checklists_for_user(user)
+
+
+def load_single_audit_checklists_for_email_address(user_email):
+    """Load example SACs for user with this email address."""
+
+    try:
+        user = User.objects.get(email=user_email)
+    except User.DoesNotExist:
+        logger.info("No user found for %s, have you logged in once?", user_email)
+        return
+
+    _load_single_audit_checklists_for_user(user)
