@@ -41,7 +41,7 @@ jobs:
             registry: ghcr.io
             username: ${{ github.repository_owner }}
             password: ${{ secrets.GITHUB_TOKEN }}
-        - name: Tag Image
+        - name: Push image
           run: |
             date=$(date +%Y%m%d)
             docker push ${{ env.GH_REPO }}/django:latest
