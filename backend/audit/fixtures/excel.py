@@ -61,5 +61,5 @@ FORM_SECTIONS = FormSections(
     FEDERAL_AWARDS_EXPENDED="FederalAwardsExpended",
     FINDINGS_TEXT="FindingsText",
     FINDINGS_UNIFORM_GUIDANCE="FindingsUniformGuidance",
-    ADDITIONAL_UEIS="AdditionalUEIs",
+    ADDITIONAL_UEIS="AdditionalUeis",
 )
