@@ -37,6 +37,7 @@ jobs:
             cache-to: type=gha,mode=max
             push: true
             tags: ${{ env.GH_REPO }}/web:latest
+            secrets: GIT_AUTH_TOKEN=${{ secrets.GITHUB_TOKEN }}
 
         # - uses: jpribyl/action-docker-layer-caching@v0.1.1
         #   continue-on-error: false
