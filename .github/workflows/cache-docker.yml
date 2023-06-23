@@ -22,6 +22,13 @@ jobs:
           id: buildx
           uses: docker/setup-buildx-action@v2
 
+        - name: Build and push
+          uses: docker/build-push-action@v4
+          with:
+            context: ./backend
+            cache-from: type=gha
+            cache-to: type=gha,mode=max
+
         - name: Login to GitHub Container Registry
           uses: docker/login-action@v2
           with:
@@ -30,11 +37,15 @@ jobs:
             password: ${{ secrets.GITHUB_TOKEN }}
 
         - uses: jpribyl/action-docker-layer-caching@v0.1.1
+          continue-on-error: false
+
         - name: Build & push Docker image
           uses: mr-smithers-excellent/docker-build-push@v6
           with:
             image: web
             registry: ghcr.io
+            directory: ./backend
+            dockerfile: .
             username: ${{ github.repository_owner }}
             password: ${{ secrets.GITHUB_TOKEN }}
 
