@@ -105,8 +105,11 @@ class SingleAuditChecklist(models.Model):
         models.CharField(max_length=40, choices=STATUS_CHOICES),
         default=list,
         size=None,
+        blank=True,
     )
-    transition_date = ArrayField(models.DateTimeField(), default=list)
+    transition_date = ArrayField(
+        models.DateTimeField(), default=list, size=None, blank=True
+    )
 
     report_id = models.CharField(max_length=17, unique=True)
 
