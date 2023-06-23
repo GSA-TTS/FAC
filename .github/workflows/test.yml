@@ -129,7 +129,7 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 16
-      - name: Pull Docker Hub images
+      - name: Create .env file
         working-directory: ./backend
         run: touch .env
       - name: Run Django test suite
@@ -153,7 +153,7 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 16
-      - name: Pull Docker Hub images
+      - name: Create .env file
         working-directory: ./backend
         run: touch .env
       - name: run Lighthouse CI
