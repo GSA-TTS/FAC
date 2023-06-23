@@ -31,7 +31,7 @@ jobs:
 
         - name: Build
           working-directory: ./backend
-          run: docker builder build . -t web:latest --cache-from gha
+          run: docker builder build . -t ${{ env.GH_REPO }}/web:latest --cache-from gha
 
         - name: Login to GitHub Container Registry
           uses: docker/login-action@v2
