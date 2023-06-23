@@ -12,7 +12,7 @@ local make_url = function(anchor)
     link: make_url('aln_extension'),
   },
   aln_prefix: {
-    text: 'Not a valid agency ALN (CFDA) prefix',
+    text: 'Invalid agency ALN (CFDA) prefix',
     link: make_url('aln_prefix'),
   },
   // C
