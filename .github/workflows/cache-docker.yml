@@ -40,7 +40,7 @@ jobs:
             tags: django:latest
 
         - name: Push Image
-          run: docker push --all-tags ${{ env.GH_REPO }}/django:latest
+          run: docker push ${{ env.GH_REPO }}/django:latest
 
         # - name: Tag Image
         #   run: |
