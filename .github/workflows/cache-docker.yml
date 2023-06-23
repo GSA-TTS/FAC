@@ -12,6 +12,9 @@ jobs:
       name: Build with Docker
       runs-on: ubuntu-latest
       steps:
+        - name: Checkout
+          uses: actions/checkout@v3
+
         - name: Create .env file
           working-directory: ./backend
           run: touch .env
