@@ -36,15 +36,9 @@ jobs:
             context: ./backend
             cache-from: type=gha
             cache-to: type=gha,mode=max
-            push: false
-            tags: ${{ env.GH_REPO }}/django:latest
-
-        - name: Push Image
-          run: docker push ${{ env.GH_REPO }}/django:latest
-
-        # - name: Tag Image
-        #   run: |
-        #     docker tag ${{ steps.buildx.outputs.name }} django
+            platforms: linux/arm64
+            push: true
+            tags: ${{ env.GH_REPO }}/web:latest
 
         # - uses: jpribyl/action-docker-layer-caching@v0.1.1
         #   continue-on-error: false
