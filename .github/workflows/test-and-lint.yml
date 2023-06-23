@@ -2,16 +2,22 @@
 name: Run Testing and Linting
 on:
   workflow_dispatch:
-  # workflow_call:
+  workflow_call:
   schedule:
-    - cron: '15 9 * * *'
+    - cron: '30 9 * * *'
+
+env:
+  ENV: 'TESTING'
+  SAM_API_KEY: ${{ secrets.SAM_API_KEY }}
+  DJANGO_BASE_URL: 'http://localhost:8000'
+  DJANGO_SECRET_LOGIN_KEY: ${{ secrets.DJANGO_SECRET_LOGIN_KEY }}
+  SECRET_KEY: ${{ secrets.SECRET_KEY }}
+  ALLOWED_HOSTS: '0.0.0.0 127.0.0.1 localhost'
+  DISABLE_AUTH: True
 
 jobs:
   linting:
     runs-on: ubuntu-latest
-    env:
-      ENV: TESTING
-      SECRET_KEY: secrets.SECRET_KEY
     steps:
       - uses: actions/checkout@v3
       - name: Restore npm cache
@@ -85,14 +91,6 @@ jobs:
 
   test:
     runs-on: ubuntu-latest
-    env:
-      ENV: TESTING
-      SAM_API_KEY: ${{ secrets.SAM_API_KEY }}
-      DJANGO_BASE_URL: 'http://localhost:8000'
-      DJANGO_SECRET_LOGIN_KEY: ${{ secrets.DJANGO_SECRET_LOGIN_KEY }}
-      SECRET_KEY: ${{ secrets.SECRET_KEY }}
-      ALLOWED_HOSTS: '0.0.0.0 127.0.0.1 localhost'
-      DISABLE_AUTH: False
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
@@ -110,15 +108,7 @@ jobs:
           docker compose -f docker-compose-test.yml run web bash -c 'coverage run --parallel-mode --concurrency=multiprocessing manage.py test --parallel && coverage combine && coverage report -m --fail-under=90'
 
   a11y-testing:
-    runs-on: ubuntu-20.04
-    env:
-      ENV: TESTING
-      SAM_API_KEY: ${{ secrets.SAM_API_KEY }}
-      DJANGO_BASE_URL: 'http://localhost:8000'
-      DJANGO_SECRET_LOGIN_KEY: ${{ secrets.DJANGO_SECRET_LOGIN_KEY }}
-      SECRET_KEY: ${{ secrets.SECRET_KEY }}
-      ALLOWED_HOSTS: '0.0.0.0 127.0.0.1 localhost'
-      DISABLE_AUTH: True
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3

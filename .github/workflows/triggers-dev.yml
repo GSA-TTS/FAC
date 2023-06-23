@@ -1,8 +1,6 @@
 name: Deploy to the dev and management cloud.gov environments
 on:
-  push:
-    branches:
-      - main
+  workflow_dispatch: null
 
 jobs:
   # testing

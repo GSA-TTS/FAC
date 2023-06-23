@@ -4,7 +4,15 @@
         schedule:
         - cron: '0 10 * * *'
     jobs:
+      build-web-container:
+        uses: ./.github/workflows/build-docker-container.yml
+        secrets: inherit
+
+      test-and-lint:
+        uses: ./.github/workflows/test-and-lint.yml
+        secrets: inherit
+
       create-pr:
-        name: Auto Create PR at 430am UTC Daily
+        name: Auto Create Pull Request
         uses: ./.github/workflows/auto-create-pr.yml
         secrets: inherit
