@@ -16,6 +16,7 @@ from .validators import (
     validate_findings_text_json,
     validate_findings_uniform_guidance_json,
     validate_general_information_json,
+    validate_single_audit_report_file,
 )
 
 User = get_user_model()
@@ -463,7 +464,9 @@ class SingleAuditReportFile(models.Model):
     Data model to track uploaded Single Audit report PDFs and associate them with SingleAuditChecklists
     """
 
-    file = models.FileField(upload_to="singleauditreport")
+    file = models.FileField(
+        upload_to="singleauditreport", validators=[validate_single_audit_report_file]
+    )
     filename = models.CharField(max_length=255)
     sac = models.ForeignKey(SingleAuditChecklist, on_delete=models.CASCADE)
     user = models.ForeignKey(User, blank=True, null=True, on_delete=models.SET_NULL)

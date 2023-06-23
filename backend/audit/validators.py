@@ -29,6 +29,7 @@ logger = logging.getLogger(__name__)
 MAX_EXCEL_FILE_SIZE_MB = 25
 
 ALLOWED_EXCEL_FILE_EXTENSIONS = [".xls", ".xlsx"]
+ALLOWED_SINGLE_AUDIT_REPORT_EXTENSIONS = [".pdf"]
 
 ALLOWED_EXCEL_CONTENT_TYPES = [
     "application/vnd.ms-excel",
@@ -175,7 +176,7 @@ def validate_general_information_json(value):
     return value
 
 
-def validate_excel_file_extension(file):
+def validate_file_extension(file, allowed_extensions):
     """
     User-provided filenames must be have an allowed extension
     """
@@ -183,9 +184,9 @@ def validate_excel_file_extension(file):
 
     logger.info(f"Uploaded file {file.name} extension: {extension}")
 
-    if not extension.lower() in ALLOWED_EXCEL_FILE_EXTENSIONS:
+    if not extension.lower() in allowed_extensions:
         raise ValidationError(
-            f"Invalid extension - allowed extensions are {', '.join(ALLOWED_EXCEL_FILE_EXTENSIONS)}"
+            f"Invalid extension - allowed extensions are {', '.join(allowed_extensions)}"
         )
 
     return extension
@@ -272,7 +273,7 @@ def validate_excel_file_integrity(file):
 
 
 def validate_excel_file(file):
-    validate_excel_file_extension(file)
+    validate_file_extension(file, ALLOWED_EXCEL_FILE_EXTENSIONS)
     validate_excel_file_content_type(file)
     validate_excel_file_size(file)
     validate_file_infection(file)
@@ -342,3 +343,24 @@ def _findings_uniform_guidance_json_error(errors):
     )
     template = json.loads(template_definition_path.read_text(encoding="utf-8"))
     return _get_error_details(template, findings_uniform_guidance_named_ranges(errors))
+
+
+def validate_single_audit_report_file_extension(file):
+    """
+    User-provided filenames must be have an allowed extension
+    """
+    _, extension = os.path.splitext(file.name)
+
+    logger.info(f"Uploaded file {file.name} extension: {extension}")
+
+    if not extension.lower() in ALLOWED_EXCEL_FILE_EXTENSIONS:
+        raise ValidationError(
+            f"Invalid extension - allowed extensions are {', '.join(ALLOWED_EXCEL_FILE_EXTENSIONS)}"
+        )
+
+    return extension
+
+
+def validate_single_audit_report_file(file):
+    validate_file_extension(file, ALLOWED_SINGLE_AUDIT_REPORT_EXTENSIONS)
+    validate_file_infection(file)

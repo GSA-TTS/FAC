@@ -23,7 +23,7 @@ from .validators import (
     MAX_EXCEL_FILE_SIZE_MB,
     validate_corrective_action_plan_json,
     validate_excel_file_content_type,
-    validate_excel_file_extension,
+    validate_file_extension,
     validate_excel_file_integrity,
     validate_excel_file_size,
     validate_federal_award_json,
@@ -431,7 +431,7 @@ class UEIValidatorTests(SimpleTestCase):
         validate_uei_nine_digit_sequences(self.valid)
 
 
-class ExcelFileExtensionValidatorTests(SimpleTestCase):
+class FileExtensionValidatorTests(SimpleTestCase):
     def test_invalid_file_extensions(self):
         """
         Filenames that have disallowed extensions are not valid
@@ -470,7 +470,7 @@ class ExcelFileExtensionValidatorTests(SimpleTestCase):
                     ValidationError,
                     msg=f"ValidationError not raised with filename = {test_case}",
                 ):
-                    validate_excel_file_extension(file)
+                    validate_file_extension(file, ALLOWED_EXCEL_FILE_EXTENSIONS)
 
     def test_valid_file_extensions(self):
         """Filenames that have allowed extensions are valid"""
@@ -485,7 +485,7 @@ class ExcelFileExtensionValidatorTests(SimpleTestCase):
                     filename, ALLOWED_EXCEL_CONTENT_TYPES[0], 10000, "utf-8"
                 )
 
-                validate_excel_file_extension(file)
+                validate_file_extension(file, ALLOWED_EXCEL_FILE_EXTENSIONS)
 
 
 class ExcelFileContentTypeValidatorTests(SimpleTestCase):
@@ -572,7 +572,7 @@ class MockHttpResponse:
         self.text = text
 
 
-class ExcelFileInfectionValidatorTests(TestCase):
+class FileInfectionValidatorTests(TestCase):
     def setUp(self):
         self.fake_file = TemporaryUploadedFile("file.txt", "text/plain", 10000, "utf-8")
 
@@ -656,3 +656,7 @@ class CorrectiveActionPlanValidatorTests(SimpleTestCase):
         validate_corrective_action_plan_json(
             CorrectiveActionPlanValidatorTests.SIMPLE_CASE
         )
+
+
+class SingleAuditReportFile(SimpleTestCase):
+    pass
