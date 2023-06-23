@@ -133,10 +133,11 @@ jobs:
       - name: Create .env file
         working-directory: ./backend
         run: touch .env
-      - run: docker-compose pull
       - uses: jpribyl/action-docker-layer-caching@v0.1.1
         continue-on-error: true
-      - run: docker-compose up -d
+      - name: Start Services
+        working-directory: ./backend
+        run: docker-compose up -d
       - name: Run Django test suite
         working-directory: ./backend
         run: |
@@ -161,10 +162,11 @@ jobs:
       - name: Create .env file
         working-directory: ./backend
         run: touch .env
-      - run: docker-compose pull
       - uses: jpribyl/action-docker-layer-caching@v0.1.1
         continue-on-error: true
-      - run: docker-compose up -d
+      - name: Start Services
+        working-directory: ./backend
+        run: docker-compose up -d
       - name: run Lighthouse CI
         run: |
           npm install -g @lhci/cli@0.8.x
