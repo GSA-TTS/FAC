@@ -13,7 +13,7 @@ services:
       - "5432:5432"
 
   web:
-    image: ghcr.io/asteel-gsa/fac/web:latest
+    image: ghcr.io/asteel-gsa/fac/web-container:latest
     command: /src/run.sh
     depends_on:
       - db
