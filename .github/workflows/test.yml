@@ -28,6 +28,12 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
           load: true
+          outputs: type=oci,dest=/tmp/image.tar
+      - name: Upload artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: image
+          path: /tmp/image.tar
       # - uses: docker/bake-action@v3
       #   with:
       #     workdir: ./backend
@@ -133,9 +139,10 @@ jobs:
       - name: Create .env file
         working-directory: ./backend
         run: touch .env
-      - name: Start services
-        working-directory: ./backend
-        run: docker compose up -d
+      - uses: actions/download-artifact@v3
+        with:
+          name: image
+          path: /tmp/image.tar
       - name: Run Django test suite
         working-directory: ./backend
         run: |
@@ -160,6 +167,10 @@ jobs:
       - name: Create .env file
         working-directory: ./backend
         run: touch .env
+      - uses: actions/download-artifact@v3
+        with:
+          name: image
+          path: /tmp/image.tar
       - name: Start services
         working-directory: ./backend
         run: docker compose up -d
