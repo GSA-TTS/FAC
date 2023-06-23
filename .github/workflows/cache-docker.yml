@@ -13,26 +13,23 @@ jobs:
       runs-on: ubuntu-latest
       steps:
         - uses: actions/checkout@v3
+
         - name: Create .env file
           working-directory: ./backend
           run: touch .env
+
         - name: Set up Docker Buildx
           uses: docker/setup-buildx-action@v2
+
         - name: Login to GitHub Container Registry
           uses: docker/login-action@v2
           with:
             registry: ghcr.io
             username: ${{ github.repository_owner }}
             password: ${{ secrets.GITHUB_TOKEN }}
-        - uses: docker/build-push-action@v2
-          with:
-            context: ./backend
-            cache-from: type=gha
-            cache-to: type=gha,mode=max
-            push: true
-            tags: django:latest
-            secrets: |
-              GIT_AUTH_TOKEN=${{ secrets.GITHUB_TOKEN }}
+
+        - name: Push Image
+          run: docker push ${{ env.GH_REPO }}/django:latest
         # - uses: jpribyl/action-docker-layer-caching@v0.1.1
         #   continue-on-error: false
         # - uses: docker/bake-action@v3
