@@ -1,3 +1,5 @@
+# This version of docker-compose.yml is strictly for usage in ./.github/workflows/test.yml
+
 version: "3.7"
 
 services:
