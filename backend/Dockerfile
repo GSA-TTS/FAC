@@ -47,7 +47,6 @@ RUN \
 COPY package.* /src/
 WORKDIR /src/
 
-RUN npm install
 RUN npm install messageformat-parser
 RUN chown -R 1001:123 "/root/.npm"
 
