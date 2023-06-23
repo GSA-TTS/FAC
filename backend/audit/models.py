@@ -103,10 +103,10 @@ class SingleAuditChecklist(models.Model):
     # implement an array of tuples as two arrays since we can only have simple fields inside an array
     transition_name = ArrayField(
         models.CharField(max_length=40, choices=STATUS_CHOICES),
-        default=[STATUS.IN_PROGRESS],
+        default=list,
         size=None,
     )
-    transition_date = ArrayField(models.DateTimeField(), default=[date.today()])
+    transition_date = ArrayField(models.DateTimeField(), default=list)
 
     report_id = models.CharField(max_length=17, unique=True)
 
@@ -399,6 +399,12 @@ class SingleAuditChecklist(models.Model):
     @property
     def auditor_phone(self):
         return self._general_info_get("auditor_phone")
+
+    def get_transition_date(self, status):
+        index = self.transition_name.index(status)
+        if index >= 0:
+            return self.transition_date[index]
+        return None
 
     def _general_info_get(self, key):
         try:

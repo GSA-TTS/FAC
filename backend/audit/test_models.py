@@ -1,3 +1,5 @@
+from datetime import date
+
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db.utils import IntegrityError
 from django.test import TestCase
@@ -83,6 +85,7 @@ class SingleAuditChecklistTests(TestCase):
             ),
         )
 
+        now = date.today()
         for statuses_from, status_to, transition_name in cases:
             for status_from in statuses_from:
                 sac = baker.make(SingleAuditChecklist, submission_status=status_from)
@@ -91,7 +94,7 @@ class SingleAuditChecklistTests(TestCase):
                 transition_method()
 
                 self.assertEqual(sac.submission_status, status_to)
-                self.assertGreater(sac.transition_name.index(status_to), 0)
+                self.assertGreaterEqual(sac.get_transition_date(status_to), now)
 
                 bad_statuses = [
                     status[0]
