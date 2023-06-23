@@ -29,15 +29,25 @@ jobs:
             username: ${{ github.repository_owner }}
             password: ${{ secrets.GITHUB_TOKEN }}
 
-        - name: Build and push
-          uses: docker/build-push-action@v4
+        - name: Build & push Docker image
+          uses: mr-smithers-excellent/docker-build-push@v6
           with:
-            context: ./backend
-            cache-from: type=gha
-            cache-to: type=gha,mode=max
-            push: true
-            tags: ${{ env.GH_REPO }}/web:latest
-            secrets: GIT_AUTH_TOKEN=${{ secrets.GITHUB_TOKEN }}
+            image: web
+            tags: latest
+            registry: ghcr.io
+            dockerfile: ./backend/Dockerfile
+            username: ${{ github.repository_owner }}
+            password: ${{ secrets.GITHUB_TOKEN }}
+
+        # - name: Build and push
+        #   uses: docker/build-push-action@v4
+        #   with:
+        #     context: ./backend
+        #     cache-from: type=gha
+        #     cache-to: type=gha,mode=max
+        #     push: true
+        #     tags: ${{ env.GH_REPO }}/web:latest
+        #     secrets: GIT_AUTH_TOKEN=${{ secrets.GITHUB_TOKEN }}
 
         # - uses: jpribyl/action-docker-layer-caching@v0.1.1
         #   continue-on-error: false
