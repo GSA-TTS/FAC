@@ -7,12 +7,23 @@ on:
 
 env:
     GH_REPO: ghcr.io/asteel-gsa/fac
+    DOCKER_NAME: fac
+    IMAGE: web-container
 
 jobs:
     build-with-docker:
       name: Build with Docker
       runs-on: ubuntu-latest
+      permissions:
+        contents: read
+        packages: write
       steps:
+        - name: Get Date
+          shell: bash
+          id: date
+          run: |
+            echo "date=$(date +%Y%m%d)" >> $GITHUB_OUTPUT
+
         - name: Checkout
           uses: actions/checkout@v3
 
@@ -29,7 +40,7 @@ jobs:
 
         - name: Build
           working-directory: ./backend
-          run: docker builder build . -t ${{ env.GH_REPO }}/web-container:latest --cache-from type=gha
+          run: docker builder build . -t ${{ env.DOCKER_NAME }}:${{ steps.date.outputs.date }} --cache-from type=gha
 
         - name: Login to GitHub Container Registry
           uses: docker/login-action@v2
@@ -38,5 +49,10 @@ jobs:
             username: ${{ github.repository_owner }}
             password: ${{ secrets.GITHUB_TOKEN }}
 
+        - name: Tag Image
+          run: |
+            docker tag ${{ env.DOCKER_NAME }}:${{ steps.date.outputs.date }} ghcr.io/${{ env.GH_REPO }}/${{ env.IMAGE }}:${{ steps.date.outputs.date }}
+            docker tag ${{ env.DOCKER_NAME }}:${{ steps.date.outputs.date }} ghcr.io/${{ env.GH_REPO }}/${{ env.IMAGE }}:latest
+
         - name: Push Image
-          run: docker push ${{ env.GH_REPO }}/web-container:latest
+          run: docker push --all-tags ${{ env.GH_REPO }}/${{ env.IMAGE }}
