@@ -19,7 +19,7 @@ jobs:
       - uses: actions/checkout@v3
       - name: Create .env file
         working-directory: ./backend
-        run: touch .env && docker-compose pull
+        run: touch .env
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
       - uses: docker/build-push-action@v2
@@ -38,7 +38,7 @@ jobs:
             web.cache-to=type=gha,mode=max
       - name: Start services
         working-directory: ./backend
-        run: docker compose up -d --no-build
+        run: docker-compose pull && docker-compose up -d --no-build
 
   linting:
     runs-on: ubuntu-latest
