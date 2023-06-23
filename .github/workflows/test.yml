@@ -132,6 +132,8 @@ jobs:
       - name: Create .env file
         working-directory: ./backend
         run: touch .env
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
       - name: Run Django test suite
         working-directory: ./backend
         run: |
