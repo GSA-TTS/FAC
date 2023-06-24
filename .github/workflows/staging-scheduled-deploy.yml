@@ -1,18 +1,26 @@
 ---
     name: Scheduled Deploy From Main to Staging
     on:
+        workflow_dispatch:
         schedule:
-        - cron: '0 10 * * *'
+        - cron: '0 10 * * 1-5'
+
     jobs:
       build-web-container:
+        name: Build FAC Web Container
         uses: ./.github/workflows/build-docker-container.yml
         secrets: inherit
 
       test-and-lint:
+        name: Run Django, Lighthouse, a11y and lint
+        needs:
+          - build-web-container
         uses: ./.github/workflows/test-and-lint.yml
         secrets: inherit
 
       create-pr:
         name: Auto Create Pull Request
+        needs:
+          - test-and-lint
         uses: ./.github/workflows/auto-create-pr.yml
         secrets: inherit
