@@ -3,8 +3,6 @@ name: Build and Publish Docker Web Container
 on:
     workflow_dispatch:
     workflow_call:
-    schedule:
-      - cron: '0 9 * * *'
 
 env:
     DOCKER_NAME: fac

@@ -3,8 +3,6 @@
   on:
     workflow_dispatch:
     workflow_call:
-    schedule:
-      - cron: '30 9 * * *'
 
   jobs:
     linting:
