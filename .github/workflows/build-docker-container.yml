@@ -1,18 +1,28 @@
 ---
-name: Build and publish docker container
+name: Build and Publish Docker Web Container
 on:
     workflow_dispatch:
-    schedule:
-      - cron: '0 9 * * *'
+    workflow_call:
 
 env:
-    GH_REPO: ghcr.io/asteel-gsa/fac
+    DOCKER_NAME: fac
+    IMAGE: web-container
+    GH_REPO: asteel-gsa/fac
 
 jobs:
     build-with-docker:
-      name: Build with Docker
+      name: Build Docker Container
       runs-on: ubuntu-latest
+      permissions:
+        contents: read
+        packages: write
       steps:
+        - name: Get Date
+          shell: bash
+          id: date
+          run: |
+            echo "date=$(date +%Y%m%d)" >> $GITHUB_OUTPUT
+
         - name: Checkout
           uses: actions/checkout@v3
 
@@ -20,16 +30,12 @@ jobs:
           id: buildx
           uses: docker/setup-buildx-action@v2
 
-        - name: Build and Push Action
-          uses: docker/build-push-action@v4
-          with:
-            context: ./backend
-            cache-from: type=gha
-            cache-to: type=gha,mode=max
-
-        - name: Build
+        - name: Build Container
           working-directory: ./backend
-          run: docker builder build . -t ${{ env.GH_REPO }}/web-container:latest --cache-from type=gha
+          run: docker build . -t ${{ env.DOCKER_NAME }}:${{ steps.date.outputs.date }}
+
+        - name: Tag Image
+          run: docker tag ${{ env.DOCKER_NAME }}:${{ steps.date.outputs.date }} ghcr.io/${{ env.GH_REPO }}/${{ env.IMAGE }}:latest
 
         - name: Login to GitHub Container Registry
           uses: docker/login-action@v2
@@ -38,5 +44,5 @@ jobs:
             username: ${{ github.repository_owner }}
             password: ${{ secrets.GITHUB_TOKEN }}
 
-        - name: Push Image
-          run: docker push ${{ env.GH_REPO }}/web-container:latest
+        - name: Push Web Container
+          run: docker push --all-tags ghcr.io/${{ env.GH_REPO }}/${{ env.IMAGE }}
