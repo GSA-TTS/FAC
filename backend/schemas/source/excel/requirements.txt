@@ -1,5 +1,6 @@
 jsonnet
 openpyxl
+pandas
 pytest
 xkcdpass
 wheel

@@ -36,7 +36,7 @@ clean:
 		rm $$f; \
 	done
 
-build-xlsx:
+build-xlsx: source_data
 	for f in $(specs); do \
 		python3 render.py $$f; \
 	done

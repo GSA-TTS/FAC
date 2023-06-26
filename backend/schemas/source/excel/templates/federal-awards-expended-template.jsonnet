@@ -1,3 +1,4 @@
+local Base = import '../../base/Base.libsonnet';
 local Fun = import '../libs/Functions.libsonnet';
 local Help = import '../libs/Help.libsonnet';
 local SV = import '../libs/SheetValidations.libsonnet';
@@ -46,7 +47,9 @@ local open_ranges_defns = [
     'three_digit_extension',
   ],
   [
-    Sheets.open_range,
+    Sheets.open_range {
+      help: Help.unknown,
+    },
     SV.NoValidation,
     'Additional Award Identification',
     'additional_award_identification',
@@ -56,7 +59,10 @@ local open_ranges_defns = [
       width: 48,
       help: Help.federal_program_name,
     },
-    SV.NoValidation,
+    SV.RangeLookupValidation {
+      sheet: 'FederalPrograms',
+      lookup_range: 'federal_program_name_lookup',
+    },
     'Federal Program Name',
     'program_name',
   ],
@@ -70,9 +76,13 @@ local open_ranges_defns = [
   ],
   [
     Sheets.open_range {
+      width: 48,
       help: Help.yorn,
     },
-    SV.NoValidation,
+    SV.RangeLookupValidation {
+      sheet: 'Clusters',
+      lookup_range: 'cluster_name_lookup',
+    },
     'Cluster Name',
     'cluster_name',
   ],
@@ -205,6 +215,39 @@ local sheets = [
     ],
     header_inclusion: ['A1', 'C2', 'F2'],
   },
+  {
+    name: 'Clusters',
+    text_ranges: [
+      {
+        // Make this look like an open range
+        type: 'text_range',
+        title: 'Cluster Names',
+        title_cell: 'A1',
+        range_name: 'cluster_name_lookup',
+        contents: Base.Compound.ClusterName,
+        validation: SV.LookupValidation {
+          lookup_range: 'cluster_name_lookup',
+        },
+      },
+    ],
+  },
+  {
+    name: 'FederalPrograms',
+    text_ranges: [
+      {
+        // Make this look like an open range
+        type: 'text_range',
+        title: 'Federal Program Names',
+        title_cell: 'A1',
+        range_name: 'federal_program_name_lookup',
+        contents: Base.Compound.FederalProgramNames,
+        validation: SV.LookupValidation {
+          lookup_range: 'federal_prorgam_name_lookup',
+        },
+      },
+    ],
+  },
+
 ];
 
 local workbook = {
