@@ -279,7 +279,9 @@ else:
             AWS_PRIVATE_DEFAULT_ACL = "private"
             # If wrong, https://docs.aws.amazon.com/AmazonS3/latest/userguide/acl-overview.html#canned-acl
 
-            MEDIA_URL = f"https://{AWS_S3_PRIVATE_CUSTOM_DOMAIN}/{AWS_LOCATION}/"
+            MEDIA_URL = (
+                f"https://{AWS_S3_PRIVATE_CUSTOM_DOMAIN}/{AWS_PRIVATE_LOCATION}/"
+            )
 
     # secure headers
     MIDDLEWARE.append("csp.middleware.CSPMiddleware")
