@@ -322,16 +322,11 @@ class Note(models.Model):
     report_id = models.IntegerField(
         "Internal Audit Report Id", help_text=docs.report_id
     )
-<<<<<<< HEAD
     version = models.IntegerField(
         "Internal Version", 
         help_text=docs.version
     )
-    sequence_number = models.IntegerField(
-=======
-    version = models.IntegerField("Internal Version", help_text=docs.version)
     note_seq_number = models.IntegerField(
->>>>>>> 883cfe0612415dfbb9f3ad57aaac7d67529c92db
         "Order that the Note was reported", help_text=docs.seq_number_notes
     )
     note_index = models.IntegerField(
