@@ -1,9 +1,20 @@
 ---
 name: Build and Publish Docker Container
 on:
-  pull_request:
-    branches:
-      - main
+  workflow_dispatch:
+    inputs:
+      docker-name:
+        required: true
+        type: string
+        default: fac
+      image-name:
+        required: true
+        type: string
+        default: web-container
+      repo-name:
+        required: true
+        type: string
+        default: gsa-tts/fac
   workflow_call:
     inputs:
       docker-name:
