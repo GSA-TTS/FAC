@@ -1,8 +1,9 @@
 ---
     name: Scheduled Deploy From Main to Staging
     on:
-        schedule:
+      schedule:
         - cron: '0 10 * * 1-5'
+      workflow_dispatch:
     jobs:
       trivy-scan:
         uses: ./.github/workflows/trivy.yml

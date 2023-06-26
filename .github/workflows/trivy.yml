@@ -3,24 +3,24 @@ name: Trivy Scan
 on:
   workflow_dispatch:
     inputs:
-      work-dir:
-        required: true
-        type: string
-        default: ./Docker
       docker-name:
         required: true
         type: string
         default: fac
-  workflow_call:
-    inputs:
       work-dir:
         required: true
         type: string
         default: ./backend
+  workflow_call:
+    inputs:
       docker-name:
         required: true
         type: string
         default: fac
+      work-dir:
+        required: true
+        type: string
+        default: ./backend
 
 permissions:
   contents: read
