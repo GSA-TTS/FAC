@@ -2,9 +2,43 @@
     name: Scheduled Deploy From Main to Staging
     on:
         schedule:
-        - cron: '30 4 * * *'
+        - cron: '0 10 * * 1-5'
     jobs:
+      trivy-scan:
+        uses: ./.github/workflows/trivy.yml
+        secrets: inherit
+        permissions:
+          contents: read
+          packages: write
+          actions: read
+          security-events: write
+        with:
+          work-dir: ./backend
+          docker-name: fac
+
+      build-container:
+        needs:
+          - trivy-scan
+        uses: ./.github/workflows/build-docker-container.yml
+        secrets: inherit
+        permissions:
+          contents: read
+          packages: write
+        with:
+          docker-name: fac
+          image-name: web-container
+          repo-name: gsa-tts/fac
+
+      test-and-lint:
+        name: Run Django, Lighthouse, a11y and lint
+        needs:
+          - build-container
+        uses: ./.github/workflows/test.yml
+        secrets: inherit
+
       create-pr:
-        name: Auto Create PR at 430am UTC Daily
+        needs:
+          - test-and-lint
+        name: Create Pull Request to Staging
         uses: ./.github/workflows/auto-create-pr.yml
         secrets: inherit
