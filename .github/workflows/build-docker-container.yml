@@ -1,9 +1,6 @@
 ---
 name: Build and Publish Docker Container
 on:
-  pull_request:
-    branches:
-      - main
   workflow_dispatch:
     inputs:
       docker-name:
