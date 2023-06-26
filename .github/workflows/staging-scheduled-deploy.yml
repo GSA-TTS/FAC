@@ -28,6 +28,7 @@
           docker-name: fac
           image-name: web-container
           repo-name: gsa-tts/fac
+          work-dir: ./backend
 
       test-and-lint:
         name: Run Django, Lighthouse, a11y and lint

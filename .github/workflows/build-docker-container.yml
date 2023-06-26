@@ -42,10 +42,10 @@ on:
         default: ./backend
 
 env:
-  DOCKER_NAME: fac
-  IMAGE: web-container
-  GH_REPO: gsa-tts/fac
-  WORKING_DIRECTORY: ./backend
+  DOCKER_NAME: ${{ inputs.docker-name }}
+  IMAGE: ${{ inputs.image-name }}
+  GH_REPO: ${{ inputs.repo-name }}
+  WORKING_DIRECTORY: ${{ inputs.work-dir }}
 
 jobs:
   build-with-docker:
