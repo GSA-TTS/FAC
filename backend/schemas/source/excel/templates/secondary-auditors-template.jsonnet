@@ -125,7 +125,7 @@ local sheets = [
     single_cells: single_cells,
     open_ranges: Fun.make_open_ranges_with_column(title_row, open_ranges_defns),
     mergeable_cells: [
-      [1, 2, 'A', 'H'],
+      [1, 2, 'A', 'J'],
       [2, 3, 'C', 'H'],
       [3, Sheets.MAX_ROWS, 'A', 'B'],
       [3, Sheets.MAX_ROWS, 'C', 'F'],
@@ -137,7 +137,7 @@ local sheets = [
 ];
 
 local workbook = {
-  filename: 'corrective-action-plan-template.xlsx',
+  filename: 'secondary-auditors-template.xlsx',
   sheets: sheets,
   title_row: title_row,
 };
