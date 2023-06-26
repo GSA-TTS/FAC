@@ -34,9 +34,9 @@ on:
         default: gsa-tts/fac
 
 env:
-  DOCKER_NAME: ${{ inputs.docker-name }}
-  IMAGE: ${{ inputs.image-name }}
-  GH_REPO: ${{ inputs.repo-name }}
+  DOCKER_NAME: fac
+  IMAGE: web-container
+  GH_REPO: gsa-tts/fac
 
 jobs:
   build-with-docker:
