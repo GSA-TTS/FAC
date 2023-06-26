@@ -21,16 +21,13 @@ on:
         required: true
         type: string
         default: fac
-  pull_request:
-    branches:
-      - main
 
 permissions:
   contents: read
 
 env:
-    DOCKER_NAME: fac
-    WORKING_DIRECTORY: ./backend
+    DOCKER_NAME: ${{ inputs.docker-name }}
+    WORKING_DIRECTORY: ${{ inputs.work-dir }}
 
 jobs:
     trivy:
