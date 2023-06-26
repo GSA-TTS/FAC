@@ -18,6 +18,10 @@ on:
         required: true
         type: string
         default: gsa-tts/fac
+      work-dir:
+        required: true
+        type: string
+        default: ./backend
   workflow_call:
     inputs:
       docker-name:
@@ -32,11 +36,16 @@ on:
         required: true
         type: string
         default: gsa-tts/fac
+      work-dir:
+        required: true
+        type: string
+        default: ./backend
 
 env:
   DOCKER_NAME: fac
   IMAGE: web-container
   GH_REPO: gsa-tts/fac
+  WORKING_DIRECTORY: ./backend
 
 jobs:
   build-with-docker:
@@ -59,7 +68,7 @@ jobs:
         uses: docker/setup-buildx-action@v2
 
       - name: Build Container
-        working-directory: ./Docker
+        working-directory: ${{ env.WORKING_DIRECTORY }}
         run: docker build -t ${{ env.DOCKER_NAME }}:${{ steps.date.outputs.date }} .
 
       - name: Tag Image
