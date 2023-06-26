@@ -55,13 +55,12 @@ jobs:
           uses: aquasecurity/trivy-action@master
           with:
             image-ref: '${{ env.DOCKER_NAME }}:${{ steps.date.outputs.date }}'
-            scan-type: 'fs'
+            scan-type: 'image'
             hide-progress: false
             format: 'sarif'
             output: 'trivy-results.sarif'
             exit-code: '1'
             ignore-unfixed: true
-            severity: 'CRITICAL,HIGH'
 
         - name: Upload Trivy scan results to GitHub Security tab
           uses: github/codeql-action/upload-sarif@v2
