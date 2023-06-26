@@ -233,7 +233,7 @@ if ENVIRONMENT not in ["DEVELOPMENT", "STAGING", "PRODUCTION"]:
 else:
     # One of the Cloud.gov environments
     STATICFILES_STORAGE = "storages.backends.s3boto3.S3ManifestStaticStorage"
-    DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
+    DEFAULT_FILE_STORAGE = "report_submission.storages.S3PrivateStorage"
     vcap = json.loads(env.str("VCAP_SERVICES"))
     for service in vcap["s3"]:
         if service["instance_name"] == "fac-public-s3":
