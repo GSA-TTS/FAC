@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from dissemination.models import ( 
     FindingText, 
     Finding, 
@@ -13,11 +15,9 @@ from .models import SingleAuditChecklist
 class ETL(object):
     def __init__(self, sac: SingleAuditChecklist) -> None:
         self.single_audit_checklist = sac
-        self.general_information = sac.general_information
         self.report_id = sac.report_id
-        audit_date = self.general_information["auditee_fiscal_period_start"]
+        audit_date = sac.general_information["auditee_fiscal_period_start"]
         self.audit_year = audit_date.split("-")[0]
-        self.is_public = True # TODO: update this when necessary
 
     def load_finding_texts(self):
         findings_text = self.single_audit_checklist.findings_text
@@ -25,14 +25,11 @@ class ETL(object):
         sequence_number = 1 # TODO: replace this when we are getting sequence number in JSON
 
         for entry in findings_text_entries:
-            reference_number = entry["reference_number"]
-            charts_tables = entry["contains_chart_or_table"] == "Y"
-            text = entry["text_of_finding"]
             finding_text = FindingText(
-                charts_tables = charts_tables,
-                finding_ref_number = reference_number,
+                charts_tables = entry["contains_chart_or_table"] == "Y",
+                finding_ref_number = entry["reference_number"],
                 sequence_number = sequence_number,
-                text = text,
+                text = entry["text_of_finding"],
                 # dbkey = None,
                 # audit_year = self.audit_year,
                 # is_public = self.is_public,
@@ -53,11 +50,9 @@ class ETL(object):
 
         for entry in findings_uniform_guidance_entries:
             findings = entry["findings"]
-            reference_number = findings["reference_number"]
-            prior_references = findings.get("prior_references")
             finding = Finding(
-                finding_ref_number = reference_number,
-                prior_finding_ref_numbers = prior_references,
+                finding_ref_number = findings["reference_number"],
+                prior_finding_ref_numbers = findings.get("prior_references"),
                 modified_opinion = entry["modified_opinion"] == "Y",
                 other_non_compliance = entry["other_matters"] == "Y",
                 material_weakness = entry["material_weakness"] == "Y",
@@ -93,7 +88,6 @@ class ETL(object):
                 f"{entry['three_digit_extension']}"
             )
             loan = entry["loan_or_loan_guarantee"]
-            loans = loan["is_guaranteed"] == "Y"
             is_direct = (
                 entry["direct_or_indirect_award"]
                 ["is_direct"] == "Y"
@@ -101,20 +95,19 @@ class ETL(object):
             is_passthrough = (
                 entry["subrecipients"]["is_passed"] == "Y"
             )
-            is_major = program["is_major"] == "Y"
             cluster = entry["cluster"]
             subrecipient_amount = (
                 entry["subrecipients"]
-                .get("subrecipient_amount", None)
+                .get("subrecipient_amount")
             )
             loan_balance = (
-                loan.get("loan_balance_at_audit_period_end", None)
+                loan.get("loan_balance_at_audit_period_end")
             )
             state_cluster_name = (
-                cluster.get("state_cluster_name", None)
+                cluster.get("state_cluster_name")
             )
             other_cluster_name = (
-                cluster.get("other_cluster_name", None)
+                cluster.get("other_cluster_name")
             )
             federal_award = FederalAward(
                 award_id = entry.get("seq_number", 1),
@@ -125,11 +118,11 @@ class ETL(object):
                     program["additional_award_identification"]
                 ),
                 research_and_development = None, # TODO: Where does this come from?
-                loans = loans,
+                loans = loan["is_guaranteed"] == "Y",
                 arra = None, # TODO: Where does this come from?
                 direct = is_direct,
                 passthrough_award = is_passthrough,
-                major_program = is_major,
+                major_program = program["is_major"] == "Y",
                 amount = program["amount_expended"],
                 program_total = program["federal_program_total"],
                 cluster_total = cluster["cluster_total"],
@@ -218,17 +211,78 @@ class ETL(object):
         passthrough.save()
 
     def load_general(self):
+        general_information = self.single_audit_checklist["general_information"]
         general = General(
             report_id = self.report_id,
             auditee_certify_name = None, # TODO: Where does this come from?
             auditee_certify_title = None, # TODO: Where does this come from?
-            auditee_contact = self.general_information["auditee_contact_name"],
-            auditee_email = self.general_information["auditee_email"],
+            auditee_contact = general_information["auditee_contact_name"],
+            auditee_email = general_information["auditee_email"],
             auditee_fax = None, # TODO: Notes say this field is not in use.
-            auditee_name = self.general_information["auditee_name"],
-            auditee_name_title = self.general_information["auditee_contact_title"],
-            auditee_phone = self.general_information["auditee_phone"],
-            auditee_title = self.general_information["auditee_contact_title"],
-            auditee_street_1 = self.general_information["auditee_address_line_1"],
-            auditee_street_2 = None, # TODO: Notes say thins field is not in use.
+            auditee_name = general_information["auditee_name"],
+            auditee_name_title = general_information["auditee_contact_title"],
+            auditee_phone = general_information["auditee_phone"],
+            auditee_title = general_information["auditee_contact_title"],
+            auditee_street_1 = general_information["auditee_address_line_1"],
+            auditee_street_2 = None, # TODO: Notes say this field is not in use.
+            auditee_city = general_information["auditee_city"],
+            auditee_state = general_information["auditee_state"],
+            ein_list = [general_information["ein"]],
+            ein_subcode = None, # TODO: Notes say this field is not in use.
+            auditee_zip_code = general_information["auditee_zip"],
+            auditor_phone = general_information["auditor_phone"],
+            auditor_fax = None, # TODO: Notes say this field is not in use.
+            auditor_state = general_information["auditor_state"],
+            auditor_city = general_information["auditor_city"],
+            auditor_title = general_information["auditor_contact_title"],
+            auditor_street1 = general_information["auditor_address_line_1"],
+            auditor_street2 = None, # TODO: Notes say this field is not in use.
+            auditor_zip_code = general_information["auditor_zip"],
+            auditor_country = general_information["auditor_country"],
+            auditor_contact = general_information["auditor_contact_name"],
+            auditor_email = general_information["auditor_email"],
+            auditor_firm_name = general_information["auditor_firm_name"],
+            auditor_foreign = None, # TODO: Where does this come from?
+            auditor_ein = general_information["auditor_ein"],
+            sequence_number = None, # TODO: Update this when we have a source for sequence numbers.
+            is_public = None, # TODO: Update this when we have a source for is_public.
+            pdf_urls = None, # TODO: Where does this come from?
+            cognizant_agency = None, # TODO: Where does this come from?
+            oversight_agency = None, # TODO: Where does this come from?
+            cognizant_agency_over = None, # TODO: Where does this come from?
+            auditee_date_signed = None, # TODO: Where does this come from?
+            auditor_date_signed = None, # TODO: Where does this come from?
+            date_published = None, # TODO: Where does this come from?
+            fac_accepted_date = datetime.now().date(), # TODO: Where does this come from?
+            form_date_received = None, # TODO: Where does this come from?
+            initial_date_received = None, # TODO: Where does this come from?
+            fy_end_date = general_information["auditee_fiscal_period_end"],
+            fy_start_date = None, # TODO: Where does this come from?
+            previous_completed_on = None, # TODO: Where does this come from?
+            previous_date_published = None, # TODO: Where does this come from?
+            completed_date = None, # TODO: Where does this come from?
+            component_date_received = None, # TODO: Where does this come from?
+            audit_year = self.audit_year,
+            audit_type = general_information["audit_type"],
+            going_concern = None, # TODO: Where does this come from?
+            low_risk = None, # TODO: Where does this come from?
+            material_noncompliance = None, # TODO: Where does this come from?
+            material_weakness = None, # TODO: Where does this come from?
+            material_weakness_major_program = None, # TODO: Notes say this hasn't been used since 2013.
+            number_months = None, # TODO: Where does this come from?
+            period_covered = general_information["audit_period_covered"],
+            prior_year_schedule = None, # TODO: Notes say this hasn't been used since 2016.
+            questioned_costs = None, # TODO: Notes say this hasn't been used since 2013.
+            report_required = None, # TODO: Notes say this hasn't been used since 2008.
+            special_framework = None, # TODO: Where does this come from?
+            special_framework_required = None, # TODO: Where does this come from?
+            total_fed_expenditures = None, # TODO: Where does this come from?
+            type_of_entity = None, # TODO: Where does this come from?
+            type_report_financial_statements = None, # TODO: Where does this come from?
+            type_report_special_purpose_framework = None, # TODO: Where does this come from?
+            dbkey = self.report_id,
+            is_public = True, # TODO: Change this when we have a field that will reflect if the record is public or not.
+            # modified_date should auto-generate/update
+            # create_date should auto-generate
+            data_source = "G-FAC"
         )
