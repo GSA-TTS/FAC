@@ -11,107 +11,86 @@ hide empty attributes
 TABLE(General, "General") {
   + report_id
     auditee_certify_name
-    auditee_certify_title 
+    auditee_certify_title
     auditee_contact
-    auditee_email 
-    auditee_fax 
+    auditee_email
+    auditee_fax
     auditee_name
     auditee_name_title?
     auditee_phone
-    auditee_title 
-    auditee_street1 
-    auditee_street2 
-    auditee_city 
-    auditee_state 
+    auditee_title
+    auditee_street1
+    auditee_street2
+    auditee_city
+    auditee_state
     ein
     multiple_ein
     duns
     multiple_duns
     uei
     multiple_uei
-    ein_subcode 
+    ein_subcode
     auditee_zip_code
     auditor_phone
-    auditor_fax 
-    auditor_state 
+    auditor_fax
+    auditor_state
     auditor_city
-    auditor_title 
-    auditor_street1 
+    auditor_title
+    auditor_street1
     auditor_street2
     auditor_zip_code
-    auditor_country 
+    auditor_country
     auditor_contact
     auditor_email
-    auditor_firm_name 
+    auditor_firm_name
     auditor_foreign_addr
-    auditor_ein 
+    auditor_ein
     multiple_auditors
     sequence_number ?
     is_public
     pdf_urls
     cognizant_agency
     oversight_agency
-    cognizant_agency_over 
-    fac_accepted_date 
+    cognizant_agency_over
+    fac_accepted_date
     initial_date_received
-    fy_end_date 
-    fy_start_date 
-    previous_completed_on 
+    fy_end_date
+    fy_start_date
+    previous_completed_on
     previous_date_published
-    completed_date 
-    component_date_received 
+    completed_date
+    component_date_received
     audit_type
     reportable_condition
     significant_deficiency
-    condition_or_deficiency_major_program 
-    current_or_former_findings 
-    dollar_threshold 
-    dup_reports 
-    entity_type 
-    going_concern 
-    low_risk 
-    material_noncompliance 
-    material_weakness 
+    condition_or_deficiency_major_program
+    current_or_former_findings
+    dollar_threshold
+    dup_reports
+    entity_type
+    going_concern
+    low_risk
+    material_noncompliance
+    material_weakness
     material_weakness_major_program
     number_months
-    period_covered 
-    prior_year_schedule 
-    questioned_costs 
-    report_required 
-    special_framework
-    special_framework_required 
-    total_fed_expenditures 
-    type_of_entity 
-    type_report_financial_statements 
-    type_report_major_program
-    type_report_special_purpose_framework 
-    is_public 
-    data_source 
-    auditee_date_signed
-    auditor_date_signed
-    type_report_financial_statements
-    reportable_condition
-    material_weakness
-    material_noncompliance
-    going_concern
-    type_report_major_program
-    dollar_threshold
-    low_risk
-    report_required
-    total_fed_expenditures
-    condition_or_deficiency_major_program
-    material_weakness_major_program
-    questioned_costs
-    current_or_former_findings
+    period_covered
     prior_year_schedule
-    dup_reports
-    form_date_received
-    date_published
-    previous_date_published
-    agency_cdfa ?
+    questioned_costs
+    report_required
     special_framework
     special_framework_required
+    total_fed_expenditures
+    type_of_entity
+    type_report_financial_statements
+    type_report_major_program
     type_report_special_purpose_framework
+    data_source
+    auditee_date_signed
+    auditor_date_signed
+    form_date_received
+    date_published
+    agency_cdfa ?
 	"COPIES" VARCHAR2(2 BYTE) COLLATE "USING_NLS_COMP", 
 	"FINDINGREFNUM" CHAR(1 BYTE) COLLATE "USING_NLS_COMP", 
 	"IMAGE" NUMBER(1,0), 

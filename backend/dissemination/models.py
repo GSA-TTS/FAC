@@ -99,7 +99,9 @@ class Finding(models.Model):
         max_length=40,
     )
     agency_cfda = models.CharField(
-        "Federal Agency Prefix and Extension", max_length=52, help_text=docs.cfda
+        "Federal Agency Prefix and Extension", 
+        max_length=52, 
+        help_text=docs.cfda
     )
     award_identification = models.CharField(
         "Other data used to identify the award which is not a CFDA number (e.g., program year, contract number)",
@@ -525,7 +527,9 @@ class General(models.Model):
         help_text=docs.auditee_fax
     )
     auditee_name = models.CharField(
-        "Name of the Auditee", max_length=70, help_text=docs.auditee_name
+        "Name of the Auditee", 
+        max_length=70, 
+        help_text=docs.auditee_name
     )
     auditee_name_title = models.CharField(
         "Title of Auditee Certifying Official",
@@ -534,7 +538,8 @@ class General(models.Model):
         help_text=docs.auditee_name_title,
     )
     auditee_phone = models.PositiveBigIntegerField(
-        "Auditee Phone Number", help_text=docs.auditee_phone
+        "Auditee Phone Number", 
+        help_text=docs.auditee_phone
     )
     auditee_title = models.CharField(
         "Title of Auditee Contact",
@@ -543,7 +548,9 @@ class General(models.Model):
         help_text=docs.auditee_title,
     )
     auditee_street1 = models.CharField(
-        "Auditee Street Address", max_length=45, help_text=docs.street1
+        "Auditee Street Address", 
+        max_length=45, 
+        help_text=docs.street1
     )
     auditee_street2 = models.CharField(
         "Auditee Street Address", 
@@ -551,9 +558,46 @@ class General(models.Model):
         null=True, 
         help_text=docs.street2
     )
-    auditee_city = models.CharField("Auditee City", max_length=30, help_text=docs.city)
+    auditee_city = models.CharField(
+        "Auditee City", 
+        max_length=30, 
+        help_text=docs.city
+    )
     auditee_state = models.CharField(
-        "Auditee State", max_length=2, help_text=docs.state
+        "Auditee State", 
+        max_length=2, 
+        help_text=docs.state
+    )
+    ein = models.IntegerField(
+        "Primary Employer Identification Number",
+        null=True,
+    )
+    multiple_ein = models.BooleanField(
+        "True if the audit contains more than one EIN",
+        null=True,
+        help_text=docs.multiple_eins
+    )
+    duns = ArrayField(
+        models.CharField(
+            "",
+            null=True,
+            help_text=docs.duns_list
+        )
+    )
+    multiple_duns = models.BooleanField(
+        "True if the audit contains multiple DUNS",
+        null=True,
+        help_text=docs.multiple_duns
+    )
+    uei = models.CharField(
+        "",
+        null=True,
+        help_text=docs.uei_general
+    )
+    multiple_uei = models.BooleanField(
+        "True if the audit contains more than one UEI",
+        null=True,
+        help_text=docs.multiple_ueis
     )
     ein_list = ArrayField(
         models.IntegerField(
@@ -641,13 +685,19 @@ class General(models.Model):
         null=True,
         help_text=docs.auditor_ein,
     )
+    multiple_auditors = models.BooleanField(
+        "True if the audit contains multiple auditors",
+        null=True
+    )
     sequence_number = models.IntegerField(
         "Order that Auditors were reported on page 5 of SF-SAC (only for secondary_auditors)",
         null=True,
         help_text=docs.seqnum,
     )
 
-    is_public = models.BooleanField("True if appears in a public record")
+    is_public = models.BooleanField(
+        "True if appears in a public record"
+    )
     pdf_urls = ArrayField(
         models.CharField("PDFs associated with the report", max_length=400, null=True),
         null=True,

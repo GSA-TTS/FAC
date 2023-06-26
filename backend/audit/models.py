@@ -9,7 +9,8 @@ from django.utils.translation import gettext_lazy as _
 
 from django_fsm import FSMField, RETURN_VALUE, transition
 
-from etl import ETL
+#import audit.etl as etl
+#   from etl import ETL
 from .validators import (
     validate_excel_file,
     validate_excel_filename,
@@ -186,7 +187,7 @@ class SingleAuditChecklist(models.Model):
         The permission checks verifying that the user attempting to do this has
         the appropriate privileges will done at the view level.
         """
-        etl_ = ETL(self)
+        # etl = etl.ETL(self)
 
     @transition(
         field="submission_status",
