@@ -213,7 +213,9 @@ class FederalAward(models.Model):
         help_text=docs.type_report_major_program_cfdainfo,
     )
     findings_page = models.TextField(
-        "Items on the Findings page", null=True, help_text=docs.findings
+        "Items on the Findings page", 
+        null=True, 
+        help_text=docs.findings
     )
 
     # can this be computed?
@@ -265,7 +267,11 @@ class CapText(models.Model):
 class Note(models.Model):
     """Note to Schedule of Expenditures of Federal Awards (SEFA)"""
 
-    type_id = models.CharField("Note Type", max_length=1, help_text=docs.type_id)
+    type_id = models.CharField(
+        "Note Type", 
+        max_length=1, 
+        help_text=docs.type_id
+    )
 
     # fac_id = models.IntegerField(
     #     unique=True
@@ -274,7 +280,10 @@ class Note(models.Model):
     report_id = models.IntegerField(
         "Internal Audit Report Id", help_text=docs.report_id
     )
-    version = models.IntegerField("Internal Version", help_text=docs.version)
+    version = models.IntegerField(
+        "Internal Version", 
+        help_text=docs.version
+    )
     sequence_number = models.IntegerField(
         "Order that the Note was reported", help_text=docs.seq_number_notes
     )
@@ -464,7 +473,9 @@ class General(models.Model):
         help_text=docs.auditee_email,
     )
     auditee_fax = models.PositiveBigIntegerField(
-        "Auditee Fax Number (optional)", null=True, help_text=docs.auditee_fax
+        "Auditee Fax Number (optional)", 
+        null=True, 
+        help_text=docs.auditee_fax
     )
     auditee_name = models.CharField(
         "Name of the Auditee", max_length=70, help_text=docs.auditee_name
@@ -488,7 +499,10 @@ class General(models.Model):
         "Auditee Street Address", max_length=45, help_text=docs.street1
     )
     auditee_street2 = models.CharField(
-        "Auditee Street Address", max_length=45, null=True, help_text=docs.street2
+        "Auditee Street Address", 
+        max_length=45, 
+        null=True, 
+        help_text=docs.street2
     )
     auditee_city = models.CharField("Auditee City", max_length=30, help_text=docs.city)
     auditee_state = models.CharField(
@@ -502,7 +516,9 @@ class General(models.Model):
         )
     )
     ein_subcode = models.IntegerField(
-        "Subcode assigned to the EIN.", null=True, help_text=docs.ein_subcode
+        "Subcode assigned to the EIN.", 
+        null=True, 
+        help_text=docs.ein_subcode
     )
     auditee_zip_code = models.CharField(
         "Auditee Zip Code",
@@ -622,7 +638,9 @@ class General(models.Model):
         help_text=docs.date_firewall,
     )
     fac_accepted_date = models.DateField(
-        "The most recent date an audit report was submitted to the FAC that passed FAC screening and was accepted as a valid OMB Circular A-133 report submission.",
+        ("The most recent date an audit report was submitted to the FAC that "
+         "passed FAC screening and was accepted as a valid OMB Circular A-133 "
+         "report submission."),
         help_text=docs.fac_accepted_date,
     )
     form_date_received = models.DateField(
