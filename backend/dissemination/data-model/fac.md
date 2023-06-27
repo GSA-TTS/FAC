@@ -9,105 +9,110 @@ FAC Data Dissemination Data Model
 hide empty attributes
 
 TABLE(General, "General") {
-  + report_id
-    auditee_certify_name
-    auditee_certify_title
-    auditee_contact
-    auditee_email
-    auditee_fax
-    auditee_name
-    auditee_name_title?
-    auditee_phone
-    auditee_title
-    auditee_street1
-    auditee_street2
-    auditee_city
-    auditee_state
-    ein
-    multiple_ein
-    duns
-    multiple_duns
-    uei
-    multiple_uei
-    ein_subcode
-    auditee_zip_code
-    auditor_phone
-    auditor_fax
-    auditor_state
-    auditor_city
-    auditor_title
-    auditor_street1
-    auditor_street2
-    auditor_zip_code
-    auditor_country
-    auditor_contact
-    auditor_email
-    auditor_firm_name
-    auditor_foreign_addr
-    auditor_ein
-    multiple_auditors
-    sequence_number ?
-    is_public
-    pdf_urls
-    cognizant_agency
-    oversight_agency
-    cognizant_agency_over
-    fac_accepted_date
-    initial_date_received
-    fy_end_date
-    fy_start_date
-    previous_completed_on
-    previous_date_published
-    completed_date
-    component_date_received
+    audit_period_covered
     audit_type
-    reportable_condition
-    significant_deficiency
-    condition_or_deficiency_major_program
-    current_or_former_findings
+    auditee_address_line_1
+    auditee_address_line_2 
+    auditee_certified 
+    auditee_certify_name  
+    auditee_certify_title
+    auditee_city
+    auditee_contact_name
+    auditee_contact_title 
+    auditee_email
+    auditee_fax 
+    auditee_fiscal_period_end 
+    auditee_fiscal_period_end 
+    auditee_name
+    auditee_phone
+    auditee_state
+    auditee_uei
+    auditee_zip
+    auditor_address_line_1 
+    auditor_address_line_2 
+    auditor_certified 
+    auditor_city
+    auditor_contact_name
+    auditor_contact_title 
+    auditor_country
+    auditor_ein
+    auditor_email
+    auditor_fax 
+    auditor_firm_name 
+    auditor_foreign_addr   
+    auditor_phone
+    auditor_state
+    auditor_title
+    auditor_zip
+    cognizant_agency
+    cognizant_agency_over 
+    completed_date  
+    component_date_received  
+    condition_or_deficiency_major_program 
+    current_or_former_findings 
+    data_source 
+    date_firewall 
+    date_published 
     dollar_threshold
+    duns 
     dup_reports
+    ein
+    ein_subcode
     entity_type
+    fac_accepted_date
+    form_date_received 
+    fy_end_date 
+    fy_start_date
     going_concern
-    low_risk
-    material_noncompliance
-    material_weakness
+    image 
+    initial_date_received 
+    is_public
+    low_risk 
+    material_noncompliance 
+    material_weakness 
     material_weakness_major_program
+    multiple_auditors 
+    multiple_duns 
+    multiple_eins_covered
+    multiple_ueis_covered
     number_months
-    period_covered
-    prior_year_schedule
-    questioned_costs
-    report_required
+    oversight_agency
+    pdf_url     
+    previous_completed_on  
+    previous_date_firewall 
+    previous_date_published 
+    prior_year_schedule 
+    questioned_costs 
+    report_required  
+    reportable_condition 
+    reportable_condition_major_program 
+    sd_material_weakness, 
+    sd_material_weakness_major_program
+    significant_deficiency
+    significant_deficiency_major_program 
     special_framework
-    special_framework_required
-    total_fed_expenditures
-    type_of_entity
-    type_report_financial_statements
-    type_report_major_program
+    special_framework_required 
+    suppression_code  
+    total_fed_expenditures 
+    type_audit_code
+    type_of_entity 
+    type_report_financial_statements 
+    type_report_major_program  
     type_report_special_purpose_framework
-    data_source
-    auditee_date_signed
-    auditor_date_signed
-    form_date_received
-    date_published
-    agency_cdfa ?
-	"COPIES" VARCHAR2(2 BYTE) COLLATE "USING_NLS_COMP", 
-	"FINDINGREFNUM" CHAR(1 BYTE) COLLATE "USING_NLS_COMP", 
-	"IMAGE" NUMBER(1,0), 
-	"INITIALDATE" DATE, 
-	"DATERECEIVEDOTHER" DATE, 
-	"SD_MATERIALWEAKNESS" VARCHAR2(1 BYTE) COLLATE "USING_NLS_COMP", 
-	"SD_MATERIALWEAKNESS_MP" VARCHAR2(1 BYTE) COLLATE "USING_NLS_COMP", 
-	"SIGNIFICANTDEFICIENCY" VARCHAR2(1 BYTE) COLLATE "USING_NLS_COMP", 
-	"SIGNIFICANTDEFICIENCY_MP" VARCHAR2(1 BYTE) COLLATE "USING_NLS_COMP", 
-	"SUPPRESSION_CODE" VARCHAR2(4 BYTE) COLLATE "USING_NLS_COMP", 
-	"TYPEAUDIT_CODE" VARCHAR2(4 BYTE) COLLATE "USING_NLS_COMP", 
-	"OPEID" VARCHAR2(4000 BYTE) COLLATE "USING_NLS_COMP", 
-	"DATETOED" DATE, 
-	"DATEFINISHED" DATE, 
-	"TYPEFINDING" VARCHAR2(1 BYTE) COLLATE "USING_NLS_COMP", 
-	"TYPEFUNDING" VARCHAR2(1 BYTE) COLLATE "USING_NLS_COMP"
+  + report_id      
 
+  "COPIES" VARCHAR2(2 BYTE) COLLATE "USING_NLS_COMP", ?
+	"INITIALDATE" DATE, ?
+  "DATERECEIVEDOTHER" DATE,  ?
+	"OPEID" VARCHAR2(4000 BYTE) COLLATE "USING_NLS_COMP", ?
+	"DATETOED" DATE, ?
+	"DATEFINISHED" DATE, ? 
+	"TYPEFINDING" VARCHAR2(1 BYTE) COLLATE "USING_NLS_COMP", ?
+  "DATERECEIVED" ?
+  "FINDINGREFNUM" ?
+  "AGENCYCFDA" ?
+  "AUDITEECERTIFYNAME" ?
+  "TYPEFUNDING" ?
 }
 
 TABLE(Auditor, "GenAuditor") {
@@ -126,43 +131,46 @@ TABLE(Auditor, "GenAuditor") {
     auditor_firm_name 
     auditor_foreign_addr
     auditor_ein 
-	"VERSION" NUMBER(2,0), 
+	"VERSION" NUMBER(2,0), ?
 }
 
 
 TABLE(Award, "FederalAward") {
+  + award_seq_number 
   + General.report_id
-  + award_seq_number
-  cfda_prefix
-  cfda_ext
-  award_identification
-  fed_prog_name
-  major_program
-  amount
+  additional_award_identification 
+  amount_expended 
+  arra 
+  audit_report_type 
   cluster_name
-  other_cluster_name
-  state_cluster_name
   cluster_total
-  program_total
-  loan_balance
-  type_requirement
-  questioned_costs
-  research_and_development
-  direct
-  type_report_major_program
-  arra
+  elecauditsid
+  federal_agency_prefix 
+  federal_program_total 
+  findingscount
+  is_direct 
+  is_guaranteed 
+  is_major 
+  is_passed 
+  loan_balance_at_audit_period_end 
   loans
-  state_cluster_name
+  number_of_audit_findings 
   other_cluster_name
-  passthrough_award
   passthrough_amount
-	"FINDINGS" VARCHAR2(3 BYTE) COLLATE "USING_NLS_COMP", 
-	"FINDINGREFNUMS" VARCHAR2(100 BYTE) COLLATE "USING_NLS_COMP", 
-	"CFDA2" VARCHAR2(2 BYTE) COLLATE "USING_NLS_COMP", 
-	"TYPEREPORT_MP_OVERRIDE" VARCHAR2(1 BYTE) COLLATE "USING_NLS_COMP", 
-	"FINDINGSCOUNT" NUMBER(7,0), 
-	"CFDAPROGRAMNAME" VARCHAR2(300 BYTE) COLLATE "USING_NLS_COMP", 
+  passthrough_award
+  program_name 
+  research_and_development 
+  state_cluster_name
+  subrecipient_amount 
+  three_digit_extension 
+  type_report_major_program
+  type_requirement
 
+  questioned_costs ?
+  findings ?
+  cfdaprogramname ?
+  "CFDA2" VARCHAR2(2 BYTE) COLLATE "USING_NLS_COMP", ?
+	"TYPEREPORT_MP_OVERRIDE" VARCHAR2(1 BYTE) COLLATE "USING_NLS_COMP",?
 }
 
 TABLE(Passthrough, "Passthrough") {
