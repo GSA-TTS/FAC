@@ -73,7 +73,9 @@
                "title": "Planned Corrective Action",
                "title_cell": "C3",
                "type": "open_range",
-               "validation": { },
+               "validation": {
+                  "type": "NOVALIDATION"
+               },
                "width": 100
             },
             {

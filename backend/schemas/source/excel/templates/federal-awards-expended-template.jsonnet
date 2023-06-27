@@ -245,6 +245,17 @@ local sheets = [
           lookup_range: 'federal_prorgam_name_lookup',
         },
       },
+      {
+        // Make this look like an open range
+        type: 'text_range',
+        title: 'Program Numbers',
+        title_cell: 'B1',
+        range_name: 'aln_lookup',
+        contents: Base.Compound.AllALNNumbers,
+        validation: SV.LookupValidation {
+          lookup_range: 'aln_lookup',
+        },
+      },
     ],
   },
 

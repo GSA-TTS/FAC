@@ -17,6 +17,7 @@ Sheet = NT('Sheet', 'name single_cells open_ranges mergeable_cells merged_unreac
 Posn = NT('Posn', 'title title_cell range_name range_cell width')
 SingleCell = NT('SingleCell', 'posn validation formula help')
 MergeableCell = NT('MergeableCell', 'start_row end_row start_column end_column')
+MergedUnreachable = NT('MergedUnreachable', 'columns')
 HeaderInclusion = NT('HeaderInclusion', 'cells')
 Help = NT('Help', 'text link')
 OpenRange = NT('OpenRange', 'posn validation formula help')
@@ -87,6 +88,12 @@ def parse_open_range(spec):
 def parse_mergeable_cell(spec):
     return MergeableCell(spec[0], spec[1], spec[2], spec[3])
 
+def parse_merged_unreachable(spec):
+    # Should just be a list of columns
+    if spec == None:
+        return None
+    else:
+        return MergedUnreachable(spec)
 
 def parse_header_inclusion(spec):
     return HeaderInclusion(spec)
@@ -122,7 +129,7 @@ def parse_sheet(spec):
     else:
         mc = []
     if 'merged_unreachable' in spec:
-        mur = list(map(parse_mergeable_cell, get(spec, 'merged_unreachable', default=[])))
+        mur = parse_merged_unreachable(get(spec, 'merged_unreachable', default=None))
     else:
         mur = []
     if 'header_inclusion' in spec:

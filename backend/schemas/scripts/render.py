@@ -376,9 +376,10 @@ def unlock_data_entry_cells(header_row, ws, sheet):
             cell_reference = f"${coords.column}${rowndx}"
             cell = ws[cell_reference]
             cell.protection = Protection(locked=False)
-    if sheet.merged_unreachable is not None:
+    if sheet.merged_unreachable not in [None, []]:
+        print(sheet.merged_unreachable)
         data_row_index = header_row + 1
-        for column in sheet.merged_unreachable:
+        for column in sheet.merged_unreachable.columns:
             for rowndx in range(data_row_index, MAX_ROWS):
                 cell_reference = f"${column}${rowndx}"
                 cell = ws[cell_reference]
