@@ -1,0 +1,68 @@
+---
+name: Trivy Scan
+on:
+  workflow_dispatch:
+    inputs:
+      docker-name:
+        required: true
+        type: string
+        default: fac
+      work-dir:
+        required: true
+        type: string
+        default: ./backend
+  workflow_call:
+    inputs:
+      docker-name:
+        required: true
+        type: string
+        default: fac
+      work-dir:
+        required: true
+        type: string
+        default: ./backend
+
+permissions:
+  contents: read
+
+env:
+    DOCKER_NAME: ${{ inputs.docker-name }}
+    WORKING_DIRECTORY: ${{ inputs.work-dir }}
+
+jobs:
+    trivy:
+      permissions:
+        contents: read
+        security-events: write
+        actions: read
+      name: Trivy Scan
+      runs-on: ubuntu-latest
+      steps:
+        - name: Checkout
+          uses: actions/checkout@v3
+
+        - name: Get Date
+          shell: bash
+          id: date
+          run: |
+            echo "date=$(date +%Y%m%d%H%M%S)" >> $GITHUB_OUTPUT
+
+        - name: Build Container
+          working-directory: ${{ env.WORKING_DIRECTORY }}
+          run: docker build -t ${{ env.DOCKER_NAME }}:${{ steps.date.outputs.date }} .
+
+        - name: Run Trivy vulnerability scanner
+          uses: aquasecurity/trivy-action@master
+          with:
+            image-ref: '${{ env.DOCKER_NAME }}:${{ steps.date.outputs.date }}'
+            scan-type: 'image'
+            hide-progress: false
+            format: 'sarif'
+            output: 'trivy-results.sarif'
+            exit-code: '1'
+            ignore-unfixed: true
+
+        - name: Upload Trivy scan results to GitHub Security tab
+          uses: github/codeql-action/upload-sarif@v2
+          with:
+            sarif_file: 'trivy-results.sarif'
