@@ -565,7 +565,7 @@ class General(models.Model):
     )
     auditee_state = models.CharField(
         "Auditee State", 
-        max_length=2, 
+        max_length=2,
         help_text=docs.state
     )
     ein = models.IntegerField(
@@ -582,7 +582,8 @@ class General(models.Model):
             "",
             null=True,
             help_text=docs.duns_list
-        )
+        ),
+        null=True
     )
     multiple_duns = models.BooleanField(
         "True if the audit contains multiple DUNS",
@@ -626,10 +627,16 @@ class General(models.Model):
         help_text=docs.auditor_fax,
     )
     auditor_state = models.CharField(
-        "CPA State", max_length=2, null=True, help_text=docs.auditor_state
+        "CPA State", 
+        max_length=2, 
+        null=True, 
+        help_text=docs.auditor_state
     )
     auditor_city = models.CharField(
-        "CPA City", max_length=30, null=True, help_text=docs.auditor_city
+        "CPA City", 
+        max_length=30, 
+        null=True, 
+        help_text=docs.auditor_city
     )
     auditor_title = models.CharField(
         "Title of CPA Contact",
@@ -656,7 +663,10 @@ class General(models.Model):
         help_text=docs.auditor_zip_code,
     )
     auditor_country = models.CharField(
-        "CPA Country", max_length=6, null=True, help_text=docs.auditor_country
+        "CPA Country", 
+        max_length=45,
+        null=True, 
+        help_text=docs.auditor_country
     )
     auditor_contact = models.CharField(
         "Name of CPA Contact",
@@ -693,10 +703,6 @@ class General(models.Model):
         "Order that Auditors were reported on page 5 of SF-SAC (only for secondary_auditors)",
         null=True,
         help_text=docs.seqnum,
-    )
-
-    is_public = models.BooleanField(
-        "True if appears in a public record"
     )
     pdf_urls = ArrayField(
         models.CharField("PDFs associated with the report", max_length=400, null=True),
@@ -922,7 +928,8 @@ class General(models.Model):
         help_text=docs.dbkey_general,
     )
     is_public = models.BooleanField(
-        "True for public records, False for non-public records"
+        "True for public records, False for non-public records",
+        null=True
     )
     # Might want to add meta data to other models too, but everything eventually links back here, so this is good enough for now
     modified_date = models.DateTimeField(auto_now=True)

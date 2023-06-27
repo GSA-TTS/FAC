@@ -10,16 +10,18 @@ from dissemination.models import (
     Passthrough,
     General
 )
-# import audit.models
-# from .models import SingleAuditChecklist
+from audit.models import SingleAuditChecklist
+
 
 class ETL(object):
-    from audit.models import SingleAuditChecklist
     def __init__(self, sac: SingleAuditChecklist) -> None:
         self.single_audit_checklist = sac
         self.report_id = sac.report_id
         audit_date = sac.general_information["auditee_fiscal_period_start"]
         self.audit_year = audit_date.split("-")[0]
+
+    def load_all(self):
+        self.load_general()
 
     def load_finding_texts(self):
         findings_text = self.single_audit_checklist.findings_text
@@ -81,9 +83,7 @@ class ETL(object):
     
     def load_federal_award(self):
         federal_awards = self.single_audit_checklist.federal_awards
-        for entry in federal_awards(
-            ["FederalAwards"]["federal_awards"]
-        ):
+        for entry in federal_awards["FederalAwards"]["federal_awards"]:
             program = entry["program"]
             agency_cfda = (
                 f"{entry['federal_agency_prefix']}."
@@ -213,7 +213,7 @@ class ETL(object):
         passthrough.save()
 
     def load_general(self):
-        general_information = self.single_audit_checklist["general_information"]
+        general_information = self.single_audit_checklist.general_information
         general = General(
             report_id=self.report_id,
             auditee_certify_name=None, # TODO: Where does this come from?
@@ -225,8 +225,8 @@ class ETL(object):
             auditee_name_title=general_information["auditee_contact_title"],
             auditee_phone=general_information["auditee_phone"],
             auditee_title=general_information["auditee_contact_title"],
-            auditee_street_1=general_information["auditee_address_line_1"],
-            auditee_street_2=None, # TODO: Notes say this field is not in use.
+            auditee_street1=general_information["auditee_address_line_1"],
+            auditee_street2=None, # TODO: Notes say this field is not in use.
             auditee_city=general_information["auditee_city"],
             auditee_state=general_information["auditee_state"],
             ein_list=[general_information["ein"]],

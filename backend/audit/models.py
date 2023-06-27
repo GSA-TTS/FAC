@@ -187,7 +187,9 @@ class SingleAuditChecklist(models.Model):
         The permission checks verifying that the user attempting to do this has
         the appropriate privileges will done at the view level.
         """
-        # etl = etl.ETL(self)
+        from audit.etl import ETL
+        etl = ETL(self)
+        etl.load_all()
 
     @transition(
         field="submission_status",
