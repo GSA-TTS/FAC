@@ -9,6 +9,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse
 from django.utils.datastructures import MultiValueDictKeyError
 from django.utils.decorators import method_decorator
+from django.http import JsonResponse
 
 from .fixtures.excel import FORM_SECTIONS
 
@@ -23,7 +24,7 @@ from audit.mixins import (
     CertifyingAuditorRequiredMixin,
     SingleAuditChecklistAccessRequiredMixin,
 )
-from audit.models import ExcelFile, SingleAuditChecklist
+from audit.models import Access, ExcelFile, SingleAuditChecklist
 from audit.validators import (
     validate_federal_award_json,
     validate_corrective_action_plan_json,
@@ -52,18 +53,17 @@ class MySubmissions(LoginRequiredMixin, generic.View):
 
     @classmethod
     def fetch_my_submissions(cls, user):
-        data = (
-            SingleAuditChecklist.objects.all()
-            .values(
-                "report_id",
-                "submission_status",
-                auditee_uei=F("general_information__auditee_uei"),
-                auditee_name=F("general_information__auditee_name"),
-                fiscal_year_end_date=F(
-                    "general_information__auditee_fiscal_period_end"
-                ),
-            )
-            .filter(submitted_by=user)
+        """
+        Get all submissions the user is associated with via Access objects.
+        """
+        accesses = Access.objects.filter(user=user)
+        sac_ids = [access.sac.id for access in accesses]
+        data = SingleAuditChecklist.objects.filter(id__in=sac_ids).values(
+            "report_id",
+            "submission_status",
+            auditee_uei=F("general_information__auditee_uei"),
+            auditee_name=F("general_information__auditee_name"),
+            fiscal_year_end_date=F("general_information__auditee_fiscal_period_end"),
         )
         return data
 
@@ -137,11 +137,17 @@ class ExcelFileHandlerView(SingleAuditChecklistAccessRequiredMixin, generic.View
             logger.warn(f"no SingleAuditChecklist found with report ID {report_id}")
             raise PermissionDenied()
         except ValidationError as e:
+            # The good error, where bad rows/columns are sent back in the request.
+            # These come back as tuples:
+            # [(col1, row1, field1, link1, help-text1), (col2, row2, ...), ...]
             logger.warn(f"{form_section} Excel upload failed validation: {e}")
-            raise BadRequest(e)
+            return JsonResponse({"errors": list(e), "type": "error_row"}, status=400)
         except MultiValueDictKeyError:
-            logger.warn("no file found in request")
+            logger.warn("No file found in request")
             raise BadRequest()
+        except KeyError as e:
+            logger.warn(f"Field error. Field: {e}")
+            return JsonResponse({"errors": str(e), "type": "error_field"}, status=400)
 
 
 class ReadyForCertificationView(SingleAuditChecklistAccessRequiredMixin, generic.View):
