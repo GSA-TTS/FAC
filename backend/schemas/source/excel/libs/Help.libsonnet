@@ -8,7 +8,7 @@ local make_url = function(anchor)
 {
   // A
   aln_extension: {
-    text: 'An ALN (CFDA) extension is typically three digits, with some exceptions. If unknown, enter "U01"',
+    text: 'An ALN (CFDA) extension is typically three digits, with some exceptions. If unknown extension, enter "UNN" (e.g. U01, U02, U03, etc.). For research and development, enter "RD"',
     link: make_url('aln_extension'),
   },
   aln_prefix: {
