@@ -302,7 +302,7 @@ else:
     CSP_IMG_SRC = allowed_sources
     CSP_MEDIA_SRC = allowed_sources
     CSP_FRAME_SRC = allowed_sources
-    CSP_FONT_SRC = ("self", bucket)
+    CSP_FONT_SRC = ("'self'", bucket)
     CSP_WORKER_SRC = allowed_sources
     CSP_FRAME_ANCESTORS = allowed_sources
     CSP_STYLE_SRC = allowed_sources
