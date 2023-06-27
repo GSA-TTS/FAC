@@ -47,7 +47,7 @@
             <form action="/openid/logout" class="sign-out">
                 <button class="usa-button usa-button--unstyled">
                     <svg class="usa-icon" aria-hidden="true" focusable="false" role="img">
-                        <use xlink:href="/static/img/sprite.svg#logout"></use>
+                        <use xlink:href="{% static 'img/sprite.svg#logout' %}"></use>
                     </svg>
                     <span>Sign out</span>
                     {% if request.user.first_name == '' %}
