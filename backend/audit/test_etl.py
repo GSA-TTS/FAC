@@ -7,7 +7,11 @@ from .models import SingleAuditChecklist, User
 
 class ETLTests(TestCase):
 
-    def test_load_general(self):
+    def __init__(self, methodName: str = "runTest") -> None:
+        self.report_id_1 = ""
+        super().__init__(methodName)
+
+    def setUp(self):
         user = baker.make(User)
         general_information = {
             "ein": "123456789", 
@@ -84,5 +88,12 @@ class ETLTests(TestCase):
             general_information=general_information,
             federal_awards=federal_awards
         )
+        self.report_id_1 = sac.report_id
+
+    def test_load_general(self):
+        sac = SingleAuditChecklist.objects.get(
+            report_id=self.report_id_1
+        )
         sac.transition_to_submitted()
-        self.assertTrue(True)
+        sac_status = sac.submission_status
+        self.assertEqual(sac_status, "submitted")
