@@ -32,6 +32,9 @@ export NEW_RELIC_HOST="gov-collector.newrelic.com"
 echo 'Starting migrate' &&
 python manage.py migrate &&
 echo 'Finished migrate' &&
+echo 'Starting view creation' &&
+python manage.py create_views &&
+echo 'Finished view creation' &&
 echo 'Starting collectstatic' &&
 python manage.py collectstatic --noinput &&
 echo 'Finished collectstatic'
