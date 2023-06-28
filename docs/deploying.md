@@ -117,3 +117,35 @@ More info: When there are changes to the `terraform/` directory in a PR, [a GitH
 However, we don't deploy immediately to the `staging` and `production` environments, and it's possible that other PRs will get merged, or that someone will make manual changes in those environments in the meantime. As a sanity check the plan is regenerated right before applying a change in those environments. If there's any difference from what was approved in the PR (captured in those comments), it's an indicator that the approved plan is **not** what is about to happen, and the action aborts so that humans can inspect and intervene if necessary. The simplest way to say "yeah, I want the new plan to happen, that's still OK" is to go regenerate the plans being compared against in the PR, using the steps indicated.
 
 For more about how all this works, see [the `dflook/terraform-github-actions` documentation](https://github.com/dflook/terraform-github-actions), particularly [the `terraform-apply` action](https://github.com/dflook/terraform-github-actions/tree/main/terraform-apply).
+
+## Questions
+
+### Why are we copying an SVG file around in `run.sh` and `.profile`?
+
+USWDS uses a specific pattern with its icons to load a single SVG file as a sprite and then refer to fragments of it for the actual images for specific icons:
+
+```html
+<svg class="usa-icon" aria-hidden="true" focusable="false" role="img">
+    <use xlink:href="path-to-svg-file#logout"></use>
+</svg>
+```
+
+The SVG file in question is with all of our other static assets, so that it’s in the container for local development but in an S3 bucket in our cloud.gov environments. This means that the SVG is on a different domain from our app, and that means that browsers may (and do) block loading of the file to prevent cross-domain exploits.
+
+In cloud.gov, we don’t serve any assets from our instance, only from the S3 bucket, and adding the ability to do so is tricky.
+
+Similarly, adding the machinery to serve assets from our domain that are actually coming from S3, transparently to browsers, is tricky.
+
+The SVG can, however, be included as part of the HTML document itself, at which point its fragments—assuming there are no name collisions—become available for use with `use` and, since it’s just part of the current document, no cross-domain implications arise.
+
+Disadvantages:
+
+1.  The SVG file is 70K in size and by inserting it into every document we’re basically ensuring that it’s uncacheable, and most of the size seems to come from icons we don’t actually use.
+1.  We have to copy the file around manually.
+
+Possible future enhancement approaches:
+
+1.  Serve assets from the application instance and serve it that way.
+2.  Serve assets from a specific path from the S3 bucket so that the browser doesn’t think they’re coming from different domains.
+3.  Either compile just the icons we need into the SVG file or winnow the file down to just the icons we need.
+4.  Use JavaScript to grab the file, since JS should be cross-domain enabled in this scenario, and use it to insert the entire thing onto the page, as now at least the file will be cached.

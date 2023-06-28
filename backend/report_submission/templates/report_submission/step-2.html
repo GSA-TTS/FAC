@@ -1,5 +1,6 @@
 {% extends "report_submission/step-base.html" %}
 {% load static %}
+{% load hacky_sprite %}
 {% block step-content %}
     <div class="grid-container auditee-information">
         <div class="grid-row">
@@ -18,7 +19,7 @@
                     <div id="no-uei-warning" hidden>
                         <h2>
                             <svg class="usa-icon" aria-hidden="true" focusable="false" role="img">
-                                <use xlink:href="{% static 'img/sprite.svg'%}#error_outline"></use>
+                                {% uswds_sprite "error_outline" %}
                             </svg>
                             Your UEI was not confirmed
                         </h2>
@@ -184,7 +185,7 @@
                 aria-label="Close this window"
                 data-close-modal>
             <svg class="usa-icon" aria-hidden="true" focusable="false" role="img">
-                <use xlink:href="{% static 'img/sprite.svg'%}#close"></use>
+                {% uswds_sprite "close" %}
             </svg>
         </button>
     </div>

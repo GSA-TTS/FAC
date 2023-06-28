@@ -41,4 +41,6 @@ python manage.py migrate &&
 echo 'Finished migrate' &&
 echo 'Starting collectstatic' &&
 python manage.py collectstatic --noinput &&
-echo 'Finished collectstatic'
+echo 'Finished collectstatic' &&
+# This is part of inlining this sprite due to cross-domain issues with the svg use element; see docs/deploying.md#questions
+cp static/img/sprite.svg templates/includes/

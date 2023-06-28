@@ -17,5 +17,6 @@ fi;
 
 # Migrate first
 python manage.py migrate
+cp static/img/sprite.svg templates/includes/
 # Run the build/watch assets + run server at the same time
 npm run dev & python manage.py runserver 0.0.0.0:8000
