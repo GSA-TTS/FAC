@@ -475,12 +475,22 @@ class Access(models.Model):
         ]
 
 
+def excel_file_path(instance, filename):
+    """
+    We want the actual filename in the filesystem to be unique and determined
+    by report_id and form_section--not the user-provided filename.
+    """
+    base_path = "excel"
+    report_id = SingleAuditChecklist.objects.get(id=instance.sac.id).report_id
+    return f"{base_path}/{report_id}--{instance.form_section}.xlsx"
+
+
 class ExcelFile(models.Model):
     """
     Data model to track uploaded Excel files and associate them with SingleAuditChecklists
     """
 
-    file = models.FileField(upload_to="excel", validators=[validate_excel_file])
+    file = models.FileField(upload_to=excel_file_path, validators=[validate_excel_file])
     filename = models.CharField(max_length=255)
     form_section = models.CharField(max_length=255)
     sac = models.ForeignKey(SingleAuditChecklist, on_delete=models.CASCADE)
