@@ -9,52 +9,52 @@ FAC Data Dissemination Data Model
 hide empty attributes
 
 TABLE(General, "General") {
+    + report_id
     audit_period_covered
     audit_type
     auditee_address_line_1
-    auditee_address_line_2 
-    auditee_certified 
+    auditee_address_line_2            /' STREET2 Historic data '/
+    auditee_certified                 /' 22 AUDITEEDATESIGNED. AUDITEEDATESIGNED is derived by certification status timestamp'/
     auditee_certify_name  
     auditee_certify_title
     auditee_city
     auditee_contact_name
-    auditee_contact_title 
+    auditee_contact_title             /'22 AUDITEENAMETITLE and AUDITEETITLE'/
     auditee_email
-    auditee_fax 
-    auditee_fiscal_period_end 
-    auditee_fiscal_period_end 
+    auditee_fax                       /' Historic data '/
+    auditee_audit_year                /'22 AUDITYEAR '/
     auditee_name
     auditee_phone
     auditee_state
     auditee_uei
     auditee_zip
     auditor_address_line_1 
-    auditor_address_line_2 
-    auditor_certified 
+    auditor_address_line_2            /' CPASTREET2 Historic data '/
+    auditor_certified                 /' 22 CPADATESIGNED. CPADATESIGNED is derived by certification status timestamp'/
     auditor_city
     auditor_contact_name
-    auditor_contact_title 
+    auditor_contact_title             /' 22 CPANAMETITLE '/
     auditor_country
     auditor_ein
     auditor_email
-    auditor_fax 
+    auditor_fax                       /' Historic data '/
     auditor_firm_name 
-    auditor_foreign_addr   
+    auditor_foreign_addr              /' 22 CPAFOREIGN'/
     auditor_phone
     auditor_state
     auditor_title
     auditor_zip
     cognizant_agency
-    cognizant_agency_over 
-    completed_date  
-    component_date_received  
+    cognizant_agency_over             /' 22 COG_OVER '/
+    completed_date                    /' Historic data '/
+    component_date_received           /' Historic data '/
     condition_or_deficiency_major_program 
-    current_or_former_findings 
-    data_source 
-    date_firewall 
+    current_or_former_findings        /'22 CYFINDINGS '/
+    data_source                       /'GFAC or CFAC '/
+    date_firewall                     /' Historic data '/
     date_published 
     dollar_threshold
-    duns 
+    duns                              /' Historic data '/
     dup_reports
     ein
     ein_subcode
@@ -64,42 +64,42 @@ TABLE(General, "General") {
     fy_end_date 
     fy_start_date
     going_concern
-    image 
+    image                             /' Historic data '/
     initial_date_received 
     is_public
     low_risk 
     material_noncompliance 
     material_weakness 
     material_weakness_major_program
-    multiple_auditors 
-    multiple_duns 
+    multiple_auditors                 /'22 MULTIPLE_CPAS '/
+    multiple_duns                     /' Historic data '/
     multiple_eins_covered
     multiple_ueis_covered
     number_months
     oversight_agency
-    pdf_url     
-    previous_completed_on  
-    previous_date_firewall 
-    previous_date_published 
+    pdf_url                           /' GFAC '/
+    previous_completed_on             /' Historic data '/  
+    previous_date_firewall            /' Historic data '/
+    previous_date_published           /' Historic data '/
     prior_year_schedule 
     questioned_costs 
     report_required  
-    reportable_condition 
-    reportable_condition_major_program 
+    reportable_condition              /' Historic data '/
+    reportable_condition_major_program    /' Historic data '/
     sd_material_weakness, 
     sd_material_weakness_major_program
     significant_deficiency
-    significant_deficiency_major_program 
+    significant_deficiency_major_program  /' Historic data.  22 SIGNIFICANTDEFICIENCY_MP '/
     special_framework
     special_framework_required 
     suppression_code  
     total_fed_expenditures 
     type_audit_code
-    type_of_entity 
+    type_of_entity                    /' Historic data '/
     type_report_financial_statements 
     type_report_major_program  
     type_report_special_purpose_framework
-  + report_id      
+      
 
   "COPIES" VARCHAR2(2 BYTE) COLLATE "USING_NLS_COMP", ?
 	"INITIALDATE" DATE, ?
@@ -116,22 +116,23 @@ TABLE(General, "General") {
 }
 
 TABLE(Auditor, "GenAuditor") {
-    + General.report_id
+  + General.report_id
   + auditor_seq_number
-    auditor_phone
-    auditor_fax 
-    auditor_state 
     auditor_city
-    auditor_title 
-    auditor_street1 
-    auditor_zip_code
-    auditor_country 
     auditor_contact
+    auditor_country 
+    auditor_ein 
     auditor_email
+    auditor_fax 
     auditor_firm_name 
     auditor_foreign_addr
-    auditor_ein 
-	"VERSION" NUMBER(2,0), ?
+    auditor_phone
+    auditor_state 
+    auditor_street1 
+    auditor_title 
+    auditor_zip_code
+ 
+  "VERSION" ? /' Discuss with Matt '/
 }
 
 
@@ -174,64 +175,59 @@ TABLE(Award, "FederalAward") {
 }
 
 TABLE(Passthrough, "Passthrough") {
+  + Award.award_seq_number /' Old ELECSAUDIT '/
   + Award.report_id
-  + Award.award_seq_number
-  + passthrough_seq_number
-  passthrough [JSON]
+  + passthrough_id
+  passthrough_name
 }
 
 
 TABLE(Finding, "Finding") {
+  + Award.award_seq_number /' To be added to GFAC '/
   + Award.report_id
-  + Award.award_seq_number
-  + finding_seq_number
-  finding_ref_number
-  modified_opinion
-  other_non_compliance
+  finding_ref_number /' GFAC '/
   material_weakness
-  significant_deficiency
+  modified_opinion
   other_findings
+  other_non_compliance
+  prior_finding_ref_numbers
   questioned_costs
   repeat_finding
-  prior_finding_ref_number
+  significant_deficiency
   type_requirement
+
+  findingrefnums ?
 }
 
 TABLE(Note, "Note") {
-  + Award.report_id
-  + Award.award_seq_number
+  + General.report_id
   + note_seq_number
-  type_id [choice??]
-  version
   content
-  title
-  "REPORTID": ["Note", "report_id"]
-  "NOTE_INDEX": ["Note", "note_index"]
-
+  note_index
+  note_title
+  type_id 
+  version /' Is this the latest version? Discuss with Matt.  Is this required in General? '/
 }
 
 
 TABLE(FindingText, "FindingText") {
-  + Finding.report_id
-  + Finding.award_seq_number
-  + Finding.finding_seq_number
   + finding_text_seq_number
+  + Finding.finding_ref_number
   charts_tables
   finding_text
 }
 
 TABLE(CAPText, "CAPText") {
-  + Finding.report_id
-  + Finding.award_seq_number
-  + Finding.finding_seq_number
   + cap_text_seq_number
+  + Finding.finding_ref_number
+  cap_text
   charts_tables
-  cap+text
-  finding_ref_number [derivabke??]
 }
 
 
 TABLE(Revision, "Revision") {
+  /' Maybe needed only for Historical data' 
+  Is this needed for GFAC? - Decision to be made.'/
 }
 
 General "1" -- "*" Award : covers
