@@ -24,7 +24,9 @@ from audit.mixins import (
     CertifyingAuditorRequiredMixin,
     SingleAuditChecklistAccessRequiredMixin,
 )
-from audit.models import ExcelFile, SingleAuditChecklist, SingleAuditReportFile
+
+from audit.models import Access, ExcelFile, SingleAuditChecklist, SingleAuditReportFile
+
 from audit.validators import (
     validate_federal_award_json,
     validate_corrective_action_plan_json,
@@ -53,18 +55,17 @@ class MySubmissions(LoginRequiredMixin, generic.View):
 
     @classmethod
     def fetch_my_submissions(cls, user):
-        data = (
-            SingleAuditChecklist.objects.all()
-            .values(
-                "report_id",
-                "submission_status",
-                auditee_uei=F("general_information__auditee_uei"),
-                auditee_name=F("general_information__auditee_name"),
-                fiscal_year_end_date=F(
-                    "general_information__auditee_fiscal_period_end"
-                ),
-            )
-            .filter(submitted_by=user)
+        """
+        Get all submissions the user is associated with via Access objects.
+        """
+        accesses = Access.objects.filter(user=user)
+        sac_ids = [access.sac.id for access in accesses]
+        data = SingleAuditChecklist.objects.filter(id__in=sac_ids).values(
+            "report_id",
+            "submission_status",
+            auditee_uei=F("general_information__auditee_uei"),
+            auditee_name=F("general_information__auditee_name"),
+            fiscal_year_end_date=F("general_information__auditee_fiscal_period_end"),
         )
         return data
 
