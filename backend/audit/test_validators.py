@@ -22,10 +22,10 @@ from .validators import (
     ALLOWED_EXCEL_FILE_EXTENSIONS,
     MAX_EXCEL_FILE_SIZE_MB,
     validate_corrective_action_plan_json,
-    validate_excel_file_content_type,
+    validate_file_content_type,
     validate_file_extension,
     validate_excel_file_integrity,
-    validate_excel_file_size,
+    validate_file_size,
     validate_federal_award_json,
     validate_file_infection,
     validate_uei,
@@ -488,7 +488,7 @@ class FileExtensionValidatorTests(SimpleTestCase):
                 validate_file_extension(file, ALLOWED_EXCEL_FILE_EXTENSIONS)
 
 
-class ExcelFileContentTypeValidatorTests(SimpleTestCase):
+class FileContentTypeValidatorTests(SimpleTestCase):
     def test_invalid_file_content_types(self):
         """Files that have disallowed content types are invalid"""
         test_cases = [
@@ -516,7 +516,10 @@ class ExcelFileContentTypeValidatorTests(SimpleTestCase):
                 )
 
                 self.assertRaises(
-                    ValidationError, validate_excel_file_content_type, file
+                    ValidationError,
+                    validate_file_content_type,
+                    file,
+                    ALLOWED_EXCEL_CONTENT_TYPES,
                 )
 
     def test_valid_file_content_types(self):
@@ -527,10 +530,10 @@ class ExcelFileContentTypeValidatorTests(SimpleTestCase):
                     TemporaryUploadedFile("file.xlsx", content_type, 10000, "utf-8")
                 )
 
-                validate_excel_file_content_type(file)
+                validate_file_content_type(file, ALLOWED_EXCEL_CONTENT_TYPES)
 
 
-class ExcelFileFileSizeValidatorTests(SimpleTestCase):
+class FileFileSizeValidatorTests(SimpleTestCase):
     def test_valid_file_size(self):
         """Files that are under (or equal to) the maximum file size are valid"""
         max_file_size = MAX_EXCEL_FILE_SIZE_MB * 1024 * 1024
@@ -546,7 +549,7 @@ class ExcelFileFileSizeValidatorTests(SimpleTestCase):
                     "file.xlsx", b"this is a file", test_case, "utf-8"
                 )
 
-                validate_excel_file_size(file)
+                validate_file_size(file, MAX_EXCEL_FILE_SIZE_MB)
 
     def test_invalid_file_size(self):
         """Files that are over the maximum file size are invalid"""
@@ -563,7 +566,9 @@ class ExcelFileFileSizeValidatorTests(SimpleTestCase):
                     "file.xlsx", b"this is a file", test_case, "utf-8"
                 )
 
-                self.assertRaises(ValidationError, validate_excel_file_size, file)
+                self.assertRaises(
+                    ValidationError, validate_file_size, file, MAX_EXCEL_FILE_SIZE_MB
+                )
 
 
 class MockHttpResponse:

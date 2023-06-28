@@ -27,6 +27,7 @@ logger = logging.getLogger(__name__)
 
 
 MAX_EXCEL_FILE_SIZE_MB = 25
+MAX_SINGLE_AUDIT_REPORT_FILE_SIZE_MB = 25
 
 ALLOWED_EXCEL_FILE_EXTENSIONS = [".xls", ".xlsx"]
 ALLOWED_SINGLE_AUDIT_REPORT_EXTENSIONS = [".pdf"]
@@ -34,6 +35,9 @@ ALLOWED_SINGLE_AUDIT_REPORT_EXTENSIONS = [".pdf"]
 ALLOWED_EXCEL_CONTENT_TYPES = [
     "application/vnd.ms-excel",
     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+]
+ALLOWED_SINGLE_AUDIT_REPORT_CONTENT_TYPES = [
+    "application/pdf",
 ]
 
 # https://github.com/ajilaag/clamav-rest#status-codes
@@ -192,23 +196,23 @@ def validate_file_extension(file, allowed_extensions):
     return extension
 
 
-def validate_excel_file_content_type(file):
+def validate_file_content_type(file, allowed_content_types):
     """
     Files must have an allowed content (MIME) type
     """
     logger.info(f"Uploaded file {file.name} content-type: {file.file.content_type}")
 
-    if file.file.content_type not in ALLOWED_EXCEL_CONTENT_TYPES:
+    if file.file.content_type not in allowed_content_types:
         raise ValidationError(
-            f"Invalid content type - allowed types are {', '.join(ALLOWED_EXCEL_CONTENT_TYPES)}"
+            f"Invalid content type - allowed types are {', '.join(allowed_content_types)}"
         )
 
     return file.file.content_type
 
 
-def validate_excel_file_size(file):
+def validate_file_size(file, max_file_size_mb):
     """Files must be under the maximum allowed file size"""
-    max_file_size = MAX_EXCEL_FILE_SIZE_MB * 1024 * 1024
+    max_file_size = max_file_size_mb * 1024 * 1024
 
     logger.info(
         f"Uploaded file {file.name} size: {file.size} (max allowed: {max_file_size})"
@@ -217,7 +221,7 @@ def validate_excel_file_size(file):
     if file.size > max_file_size:
         file_size_mb = round(file.size / 1024 / 1024, 2)
         raise ValidationError(
-            f"This file size is: {file_size_mb} MB this cannot be uploaded, maximum allowed: {MAX_EXCEL_FILE_SIZE_MB} MB"
+            f"This file size is: {file_size_mb} MB this cannot be uploaded, maximum allowed: {max_file_size_mb} MB"
         )
 
     return file.size
@@ -274,8 +278,8 @@ def validate_excel_file_integrity(file):
 
 def validate_excel_file(file):
     validate_file_extension(file, ALLOWED_EXCEL_FILE_EXTENSIONS)
-    validate_excel_file_content_type(file)
-    validate_excel_file_size(file)
+    validate_file_content_type(file, ALLOWED_EXCEL_CONTENT_TYPES)
+    validate_file_size(file, MAX_EXCEL_FILE_SIZE_MB)
     validate_file_infection(file)
     validate_excel_file_integrity(file)
 
@@ -363,4 +367,6 @@ def validate_single_audit_report_file_extension(file):
 
 def validate_single_audit_report_file(file):
     validate_file_extension(file, ALLOWED_SINGLE_AUDIT_REPORT_EXTENSIONS)
+    validate_file_content_type(file, ALLOWED_SINGLE_AUDIT_REPORT_CONTENT_TYPES)
+    validate_file_size(file, MAX_SINGLE_AUDIT_REPORT_FILE_SIZE_MB)
     validate_file_infection(file)
