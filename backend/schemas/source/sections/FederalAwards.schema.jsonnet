@@ -3,7 +3,25 @@ local Func = import '../base/Functions.libsonnet';
 local Types = Base.Types;
 
 local Validations = {
-
+  PassThroughEntity: Types.object {
+    additionalProperties: false,
+    properties: {
+      passthrough_name: Types.string,
+      passthrough_identifying_number: {
+        type: 'string',
+        minLength: 1,
+      },
+    },
+    required: ['passthrough_name', 'passthrough_identifying_number'],
+  },
+  PassThroughEntityEmpty: Types.object {
+    additionalProperties: false,
+    properties: {
+      passthrough_name: Base.Enum.EmptyString_Null,
+      passthrough_identifying_number: Base.Enum.EmptyString_Null,
+    },
+    required: ['passthrough_name', 'passthrough_identifying_number'],
+  },
   DirectAwardValidations: [
     {
       'if': {
@@ -15,8 +33,19 @@ local Validations = {
       },
       'then': {
         properties: {
-          entities: Base.Enum.EmptyString_EmptyArray_Null,
+          entities: {
+            anyOf: [
+              Types.array {
+                items: Validations.PassThroughEntityEmpty,
+              },
+              Base.Enum.EmptyString_EmptyArray_Null,
+            ],
+          },
         },
+        // 20230627 MCJ Not required to be present if "Y"
+        // required: [
+        //   'entities',
+        // ],
       },
     },
     {
@@ -28,6 +57,11 @@ local Validations = {
         },
       },
       'then': {
+        properties: {
+          entities: Types.array {
+            items: Validations.PassThroughEntity,
+          },
+        },
         required: [
           'entities',
         ],
@@ -117,6 +151,7 @@ local Validations = {
         },
       },
       'then': {
+        required: ['audit_report_type'],
         'if': {
           properties: {
             audit_report_type: {
@@ -133,6 +168,7 @@ local Validations = {
         },
         'then': {
           properties: {
+            // If it is A or Q, then the number MUST be greater than 0.
             number_of_audit_findings: Types.integer {
               exclusiveMinimum: 0,
             },
@@ -140,19 +176,22 @@ local Validations = {
         },
         'else': {
           properties: {
-            audit_report_type: Base.Enum.MajorProgramAuditReportType,
+            // 20230627 MCJ FIXME: Should... this ever be empty? Or, must it always have data?
+            audit_report_type: {
+              anyOf: [
+                Base.Enum.EmptyString_Null,
+                Base.Enum.MajorProgramAuditReportType,
+              ],
+            },
+            // Otherwise, it just has to be an integer that is zero or greater.
             number_of_audit_findings: Types.integer {
-              const: 0,
+              minimum: 0,
             },
           },
         },
       },
     },
     {
-      // 20230409 MCJ FIXME: Should we require all fields always,
-      // and make sure thet ype checking is correct in each conditional branch?
-      // FIXME: Should we ALWAYS require a value in EVERY field, and disallow
-      // the empty/null responses everywhere?
       'if': {
         properties: {
           is_major: {
@@ -163,7 +202,10 @@ local Validations = {
       'then': {
         properties: {
           audit_report_type: Base.Enum.EmptyString_Null,
-          number_of_audit_findings: { const: 0 },
+          // MCJ 20230627 This just seems to be *wrong*.
+          // number_of_audit_findings: Types.integer {
+          //   const: 0
+          //   },
         },
 
       },
@@ -214,7 +256,7 @@ local Parts = {
         },
         'then': {
           required: [
-          'state_cluster_name',
+            'state_cluster_name',
           ],
           allOf: [
             {
@@ -240,8 +282,8 @@ local Parts = {
         },
         'then': {
           required: [
-          'other_cluster_name',
-          ],          
+            'other_cluster_name',
+          ],
           allOf: [
             {
               properties: {
@@ -259,26 +301,14 @@ local Parts = {
     ],
     required: ['cluster_name', 'cluster_total'],
   },
-  PassThroughEntity: Types.object {
-    additionalProperties: false,
-    properties: {
-      passthrough_name: Types.string,
-      passthrough_identifying_number: {
-        type: 'string',
-        minLength: 1,
-      },
-    },
-    required: ['passthrough_name', 'passthrough_identifying_number'],
-  },
+
   DirectOrIndirectAward: Types.object {
     // 20230409 MCJ FIXME: I think this needs the amount...
     additionalProperties: false,
     description: 'If direct_award is N, the form must include a list of the pass-through entity by name and identifying number',
     properties: {
       is_direct: Base.Enum.YorN,
-      entities: Types.array {
-        items: Parts.PassThroughEntity,
-      },
+      entities: Types.array,
     },
     allOf: Validations.DirectAwardValidations,
   },
@@ -316,7 +346,9 @@ local Parts = {
       audit_report_type: Types.string,
       number_of_audit_findings: Types.integer,
     },
-    required: ['program_name', 'federal_agency_prefix', 'three_digit_extension', 'is_major', 'audit_report_type', 'number_of_audit_findings'],
+    // 20230627 MCJ FIXME
+    // 'audit_report_type', may not be strictly required, only when MP == Y?
+    required: ['program_name', 'federal_agency_prefix', 'three_digit_extension', 'is_major', 'number_of_audit_findings'],
     allOf: Validations.ProgramValidations,
   },
 };

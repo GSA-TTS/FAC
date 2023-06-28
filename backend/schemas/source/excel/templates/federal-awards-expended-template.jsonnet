@@ -137,7 +137,7 @@ local open_ranges_defns = [
     Sheets.y_or_n_range {
       help: Help.plain_text,
     },
-    SV.YoNValidation,
+    SV.NoValidation,
     'If no (Direct Award), Name of Passthrough Entity',
     'passthrough_name',
   ],

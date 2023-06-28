@@ -213,13 +213,7 @@
                "title": "If no (Direct Award), Name of Passthrough Entity",
                "title_cell": "N3",
                "type": "yorn_range",
-               "validation": {
-                  "allow_blank": "False",
-                  "custom_error": "Must be 'Y' or 'N'",
-                  "custom_title": "Y/N",
-                  "formula1": "\"Y,N\"",
-                  "type": "list"
-               }
+               "validation": { }
             },
             {
                "help": {

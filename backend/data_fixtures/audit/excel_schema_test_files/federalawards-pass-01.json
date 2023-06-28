@@ -52,7 +52,8 @@
                     "loan_balance_at_audit_period_end": 42
                 },
                 "direct_or_indirect_award": {
-                    "is_direct": "Y"
+                    "is_direct": "Y",
+                    "entities": []
                 },
                 "subrecipients": {
                     "is_passed": "Y",

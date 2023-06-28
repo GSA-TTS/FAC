@@ -1,0 +1,41 @@
+{
+    "FederalAwards": {
+        "auditee_uei": "EJLRWNCJTJF5",
+        "total_amount_expended": 12345,
+        "federal_awards": [
+            {
+                "program": {
+                    "federal_agency_prefix": "42",
+                    "three_digit_extension": "RD",
+                    "additional_award_identification": 1234,
+                    "program_name": "MAIN PROGRAM",
+                    "is_major": "N",
+                    "audit_report_type": "",
+                    "number_of_audit_findings": 0,
+                    "amount_expended": 500,
+                    "federal_program_total": 4000
+                },
+                "loan_or_loan_guarantee": {
+                    "is_guaranteed": "N",
+                    "loan_balance_at_audit_period_end": 0
+                },
+                "direct_or_indirect_award": {
+                    "is_direct": "Y",
+                    "entities": [
+                        {
+                            "passthrough_name": "",
+                            "passthrough_identifying_number": ""
+                        }
+                    ]
+                },
+                "cluster": {
+                    "cluster_name": "N/A",
+                    "cluster_total": 123
+                },
+                "subrecipients": {
+                    "is_passed": "N"
+                }
+            }
+        ]
+    }
+}
