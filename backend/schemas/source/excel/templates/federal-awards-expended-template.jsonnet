@@ -77,7 +77,7 @@ local open_ranges_defns = [
   [
     Sheets.open_range {
       width: 48,
-      help: Help.yorn,
+      help: Help.cluster_name,
     },
     SV.RangeLookupValidation {
       sheet: 'Clusters',
