@@ -137,8 +137,8 @@ TABLE(Auditor, "GenAuditor") {
 
 
 TABLE(Award, "FederalAward") {
-  + award_seq_number 
   + General.report_id
+  + award_seq_number 
   additional_award_identification 
   amount_expended 
   arra 
@@ -175,17 +175,17 @@ TABLE(Award, "FederalAward") {
 }
 
 TABLE(Passthrough, "Passthrough") {
-  + Award.award_seq_number /' Old ELECSAUDIT '/
   + Award.report_id
+  + Award.award_seq_number /' Old ELECSAUDIT '/
   + passthrough_id
   passthrough_name
 }
 
 
 TABLE(Finding, "Finding") {
-  + Award.award_seq_number /' To be added to GFAC '/
   + Award.report_id
-  finding_ref_number /' GFAC '/
+  Award.award_seq_number /' To be added to GFAC '/
+  + finding_ref_number /' GFAC '/
   material_weakness
   modified_opinion
   other_findings
@@ -211,8 +211,9 @@ TABLE(Note, "Note") {
 
 
 TABLE(FindingText, "FindingText") {
-  + finding_text_seq_number
+  + Finding.report_id
   + Finding.finding_ref_number
+  + finding_text_seq_number
   charts_tables
   finding_text
 }
