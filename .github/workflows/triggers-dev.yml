@@ -5,6 +5,7 @@ on:
       - main
 
 jobs:
+  # ensure that every time a push to main occurs, the container is built and published to ghcr
   build-container:
     uses: ./.github/workflows/build-docker-container.yml
     secrets: inherit
