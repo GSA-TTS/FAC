@@ -20,6 +20,7 @@ jobs:
       requirements: ${{ steps.filter.outputs.requirements }}
       dev-requirements: ${{ steps.filter.outputs.devrequirements }}
       docker: ${{ steps.filter.outputs.docker }}
+      package: ${{ steps.filter.outputs.package }}
     steps:
       - uses: dorny/paths-filter@v2
         id: filter
@@ -31,6 +32,8 @@ jobs:
               - './backend/dev-requirements.txt'
             docker:
               - './backend/Dockerfile'
+            package:
+              - './backend/package.json'
 
   # Testing for all main and prod PRs
   test-and-lint:
