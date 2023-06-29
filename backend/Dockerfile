@@ -56,6 +56,7 @@ RUN npm run build && python manage.py collectstatic
 
 # ------------------------------------------------------------
 # Dev/testing layer
+# Modify for testing (to remove)
 # ------------------------------------------------------------
 
 FROM builder AS release

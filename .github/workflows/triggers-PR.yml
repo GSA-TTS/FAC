@@ -36,15 +36,15 @@ jobs:
               - './backend/package.json'
 
   # Testing for all main and prod PRs
-  test-and-lint:
+  test-and-lint-docker-build:
     needs: [changes]
-    if: ${{ needs.changes.outputs.requirements == 'true' || needs.changes.outputs.dev-requirements == 'true' || needs.changes.outputs.docker == 'true' }}
+    if: ${{ needs.changes.outputs.requirements == 'true' || needs.changes.outputs.dev-requirements == 'true' || needs.changes.outputs.docker == 'true' || needs.changes.outputs.package == 'true' }}
     uses: ./.github/workflows/test-and-lint-docker-build.yml
     secrets: inherit
 
-  test-and-lint-ghcr:
+  test-and-lint-from-ghcr:
     needs: [changes]
-    if: ${{ needs.changes.outputs.requirements == 'false' && needs.changes.outputs.dev-requirements == 'false' && needs.changes.outputs.docker == 'false'}}
+    if: ${{ needs.changes.outputs.requirements == 'false' && needs.changes.outputs.dev-requirements == 'false' && needs.changes.outputs.docker == 'false' || needs.changes.outputs.package == 'false' }}
     uses: ./.github/workflows/test-and-lint-from-ghcr.yml
     secrets: inherit
 
@@ -54,8 +54,7 @@ jobs:
     secrets: inherit
 
   # Create terraform plan as part of the PR review process
-
-  # PR to main bafore dev deploy
+  # PR to main before dev deploy
   plan-terraform-dev:
     if: ${{ github.base_ref == 'main' }}
     uses: ./.github/workflows/terraform-plan-env.yml
