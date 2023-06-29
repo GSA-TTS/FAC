@@ -20,20 +20,22 @@ if __name__ == "__main__":
     outfile = os.path.basename(sys.argv[1])
     # inp = open(infile, mode="r")
     # outp = open(os.path.join(cleaned_dir, outfile), mode="w")
-    
-    bonus_headers = 0 
+
+    bonus_headers = 0
 
     # FIXME: May have unicode issues...
-    with open(infile, newline='', encoding='utf-8') as inp:
+    with open(infile, newline="", encoding="utf-8") as inp:
         with open(os.path.join(cleaned_dir, outfile), mode="w") as outp:
             writer = csv.writer(outp)
             # Skip the headers...
-            headers = next(inp, None)  
+            headers = next(inp, None)
             # But, put them in the output file!
             outp.write(headers)
 
             headers = headers.split(",")
-            reader = csv.reader(inp, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+            reader = csv.reader(
+                inp, delimiter=",", quotechar='"', quoting=csv.QUOTE_MINIMAL
+            )
             columncount_shown = 0
             for row in reader:
                 if len(row) != columncount_shown:
@@ -44,13 +46,17 @@ if __name__ == "__main__":
                 else:
                     newrow = list()
                     for cell in row:
-                        if '\n' in cell:
-                            origtext = cell.split('\n')
-                            origtext = list(map(lambda s: s.replace('\r', ''), origtext))
-                            origtext = list(map(lambda s: s.replace('\t', ' '), origtext))
+                        if "\n" in cell:
+                            origtext = cell.split("\n")
+                            origtext = list(
+                                map(lambda s: s.replace("\r", ""), origtext)
+                            )
+                            origtext = list(
+                                map(lambda s: s.replace("\t", " "), origtext)
+                            )
                             # print(f"ORIGTEXT {origtext}")
-                            text = ' '.join(origtext)
-                            text = re.sub(' +', ' ', text)
+                            text = " ".join(origtext)
+                            text = re.sub(" +", " ", text)
                         else:
                             text = cell
                         newrow.append(text)
