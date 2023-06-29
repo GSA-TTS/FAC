@@ -39,5 +39,5 @@ disable = [
 ]
 
 [tool.djlint]
-ignore="H006,H022,H023,H019,H031"
-# img_height, https,entity,javascript,lang
+ignore="H006,H021,H022,H023,H019,H031"
+# img_height,inline_style,https,entity,javascript,lang
