@@ -17,12 +17,11 @@ jobs:
     permissions:
       pull-requests: read
     outputs:
-      requirements: ${{ steps.filter.outputs.requirements }}
-      dev-requirements: ${{ steps.filter.outputs.devrequirements }}
-      docker: ${{ steps.filter.outputs.docker }}
-      package: ${{ steps.filter.outputs.package }}
+      requirements: ${{ steps.filter.outcome.requirements }}
+      dev-requirements: ${{ steps.filter.outcome.devrequirements }}
+      docker: ${{ steps.filter.outcome.docker }}
+      package: ${{ steps.filter.outcome.package }}
     steps:
-      - uses: actions/checkout@v3
       - uses: dorny/paths-filter@v2
         id: filter
         with:
@@ -45,7 +44,7 @@ jobs:
 
   test-and-lint-from-ghcr:
     needs: [check-for-changes]
-    if: ${{ needs.check-for-changes.outputs.requirements == 'false' || needs.check-for-changes.outputs.dev-requirements == 'false' || needs.check-for-changes.outputs.docker == 'false' || needs.check-for-changes.outputs.package == 'false' }}
+    if: ${{ needs.check-for-changes.outputs.requirements == 'false' && needs.check-for-changes.outputs.dev-requirements == 'false' && needs.check-for-changes.outputs.docker == 'false' && needs.check-for-changes.outputs.package == 'false' }}
     uses: ./.github/workflows/test-and-lint-from-ghcr.yml
     secrets: inherit
 
