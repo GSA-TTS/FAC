@@ -40,7 +40,7 @@ We use [DRY](https://docs.behat.org/en/latest/user_guide/writing_scenarios.html#
 [comment]: # "Each task should be a verifiable outcome"
 ```[tasklist]
 ### then... 
-- [ ] 
+- [ ] [a thing happens]
 ```
 
 ### Shepherd
@@ -68,7 +68,7 @@ We're thinking we'll try implementing A and then changing B.
 
 ```[tasklist]
 # Tasks
-- [ ] 
+- [ ] [something we'll definitely have to do]
 ```
 
 ---
