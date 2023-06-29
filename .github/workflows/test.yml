@@ -101,11 +101,11 @@ jobs:
         run: touch .env
       - name: Start Services
         working-directory: ./backend
-        run: docker compose -f docker-compose.yml up -d
+        run: docker compose -f docker-compose-web.yml up -d
       - name: Run Django test suite
         working-directory: ./backend
         run: |
-          docker compose -f docker-compose.yml run web bash -c 'coverage run --parallel-mode --concurrency=multiprocessing manage.py test --parallel && coverage combine && coverage report -m --fail-under=90'
+          docker compose -f docker-compose-web.yml run web bash -c 'coverage run --parallel-mode --concurrency=multiprocessing manage.py test --parallel && coverage combine && coverage report -m --fail-under=90'
 
   a11y-testing:
     runs-on: ubuntu-20.04
@@ -127,7 +127,7 @@ jobs:
         run: touch .env
       - name: Start Services
         working-directory: ./backend
-        run: docker compose -f docker-compose.yml up -d
+        run: docker compose -f docker-compose-web.yml up -d
       - name: run Lighthouse CI
         run: |
           npm install -g @lhci/cli@0.8.x
