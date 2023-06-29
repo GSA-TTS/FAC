@@ -21,30 +21,27 @@ jobs:
       dev-requirements: ${{ steps.filter.outputs.devrequirements }}
       docker: ${{ steps.filter.outputs.docker }}
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
       - uses: dorny/paths-filter@v2
         id: filter
         with:
           filters: |
             requirements:
-              - 'backend/requirements.txt'
+              - './backend/requirements.txt'
             devrequirements:
-              - 'backend/dev-requirements.txt'
+              - './backend/dev-requirements.txt'
             docker:
-              - 'backend/Dockerfile'
+              - './backend/Dockerfile'
 
   # Testing for all main and prod PRs
   test-and-lint:
     needs: [changes]
-    if: ${{ needs.changes.outputs.requirements == 'true' }} || ${{ needs.changes.outputs.dev-requirements == 'true' }} || ${{ needs.changes.outputs.docker == 'true' }}
+    if: ${{ needs.changes.outputs.requirements == 'true' || needs.changes.outputs.dev-requirements == 'true' || needs.changes.outputs.docker == 'true' }}
     uses: ./.github/workflows/build-and-test.yml
     secrets: inherit
 
   test-and-lint-ghcr:
     needs: [changes]
-    if: ${{ needs.changes.outputs.requirements != 'true' }} && ${{ needs.changes.outputs.dev-requirements != 'true' }} && ${{ needs.changes.outputs.docker != 'true' }}
+    if: ${{ needs.changes.outputs.requirements == 'false' && needs.changes.outputs.dev-requirements == 'false' && needs.changes.outputs.docker == 'false'}}
     uses: ./.github/workflows/test.yml
     secrets: inherit
 
