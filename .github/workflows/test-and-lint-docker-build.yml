@@ -60,7 +60,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-
       - name: Restore npm cache
         uses: actions/cache@v3
         id: cache-npm
@@ -94,16 +93,16 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 16
-      - name: Pull Docker Hub images
+      - name: Create .env
         working-directory: ./backend
-        run: touch .env && docker compose pull
+        run: touch .env
       - name: Start services
         working-directory: ./backend
-        run: docker compose up -d
+        run: docker-compose up -d
       - name: Run Django test suite
         working-directory: ./backend
         run:
-          docker compose run web bash -c 'coverage run --parallel-mode --concurrency=multiprocessing manage.py test --parallel && coverage combine && coverage report -m --fail-under=90'
+          docker-compose run web bash -c 'coverage run --parallel-mode --concurrency=multiprocessing manage.py test --parallel && coverage combine && coverage report -m --fail-under=90'
   a11y-testing:
     runs-on: ubuntu-20.04
     env:
@@ -119,9 +118,9 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 16
-      - name: Pull Docker Hub images
+      - name: Create .env
         working-directory: ./backend
-        run: touch .env && docker compose pull
+        run: touch .env
       - name: Start services
         working-directory: ./backend
         run: docker-compose up -d
