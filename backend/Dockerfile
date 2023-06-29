@@ -56,7 +56,6 @@ RUN npm run build && python manage.py collectstatic
 
 # ------------------------------------------------------------
 # Dev/testing layer
-# Testing Dockerfile Changes Final
 # ------------------------------------------------------------
 
 FROM builder AS release
