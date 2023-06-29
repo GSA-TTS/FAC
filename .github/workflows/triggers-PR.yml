@@ -12,22 +12,39 @@ on:
   workflow_dispatch: null
 
 jobs:
-  build-container:
-    if: ${{ github.base_ref == 'main' }}
-    uses: ./.github/workflows/build-docker-container.yml
-    secrets: inherit
+  changes:
+    runs-on: ubuntu-latest
     permissions:
-      contents: read
-      packages: write
-    with:
-      docker-name: fac
-      image-name: web-container
-      repo-name: gsa-tts/fac
-      work-dir: ./backend
+      pull-requests: read
+    outputs:
+      requirements: ${{ steps.filter.outputs.requirements }}
+      dev-requirements: ${{ steps.filter.outputs.devrequirements }}
+      docker: ${{ steps.filter.outputs.docker }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - uses: dorny/paths-filter@v2
+        id: filter
+        with:
+          filters: |
+            requirements:
+              - 'backend/requirements.txt'
+            devrequirements:
+              - 'backend/dev-requirements.txt'
+            docker:
+              - 'backend/Dockerfile'
 
   # Testing for all main and prod PRs
   test-and-lint:
-    needs: [build-container]
+    needs: [changes]
+    if: ${{ needs.changes.outputs.requirements == 'true' }} || ${{ needs.changes.outputs.dev-requirements == 'true' }} || ${{ needs.changes.outputs.docker == 'true' }}
+    uses: ./.github/workflows/build-and-test.yml
+    secrets: inherit
+
+  test-and-lint-ghcr:
+    needs: [changes]
+    if: ${{ needs.changes.outputs.requirements != 'true' }} && ${{ needs.changes.outputs.dev-requirements != 'true' }} && ${{ needs.changes.outputs.docker != 'true' }}
     uses: ./.github/workflows/test.yml
     secrets: inherit
 

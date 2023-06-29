@@ -5,8 +5,21 @@ on:
       - main
 
 jobs:
+  build-container:
+    uses: ./.github/workflows/build-docker-container.yml
+    secrets: inherit
+    permissions:
+      contents: read
+      packages: write
+    with:
+      docker-name: fac
+      image-name: web-container
+      repo-name: gsa-tts/fac
+      work-dir: ./backend
+
   # testing
   test-and-lint:
+    needs: [build-container]
     uses: ./.github/workflows/test.yml
     secrets: inherit
 
