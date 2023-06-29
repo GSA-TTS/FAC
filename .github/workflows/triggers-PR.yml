@@ -44,7 +44,7 @@ jobs:
 
   test-and-lint-from-ghcr:
     needs: [changes]
-    if: ${{ needs.changes.outputs.requirements == 'false' && needs.changes.outputs.dev-requirements == 'false' && needs.changes.outputs.docker == 'false' || needs.changes.outputs.package == 'false' }}
+    if: ${{ needs.changes.outputs.requirements != 'true' && needs.changes.outputs.dev-requirements != 'true' && needs.changes.outputs.docker != 'true' || needs.changes.outputs.package != 'true' }}
     uses: ./.github/workflows/test-and-lint-from-ghcr.yml
     secrets: inherit
 
