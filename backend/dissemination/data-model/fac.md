@@ -12,6 +12,7 @@ TABLE(General, "General") {
     + report_id
     audit_period_covered
     audit_type
+    audit_year                        /'22 AUDITYEAR '/
     auditee_address_line_1
     auditee_address_line_2            /' STREET2 Historic data '/
     auditee_certified                 /' 22 AUDITEEDATESIGNED. AUDITEEDATESIGNED is derived by certification status timestamp'/
@@ -22,7 +23,6 @@ TABLE(General, "General") {
     auditee_contact_title             /'22 AUDITEENAMETITLE and AUDITEETITLE'/
     auditee_email
     auditee_fax                       /' Historic data '/
-    auditee_audit_year                /'22 AUDITYEAR '/
     auditee_name
     auditee_phone
     auditee_state
@@ -49,10 +49,13 @@ TABLE(General, "General") {
     completed_date                    /' Historic data '/
     component_date_received           /' Historic data '/
     condition_or_deficiency_major_program 
+    copies                            /' Historic data '/
     current_or_former_findings        /'22 CYFINDINGS '/
     data_source                       /'GFAC or CFAC '/
     date_firewall                     /' Historic data '/
-    date_published 
+    date_published
+    date_received
+    date_received_other               /' Historic data '/ 
     dollar_threshold
     duns                              /' Historic data '/
     dup_reports
@@ -60,6 +63,7 @@ TABLE(General, "General") {
     ein_subcode
     entity_type
     fac_accepted_date
+    finding_ref_num
     form_date_received 
     fy_end_date 
     fy_start_date
@@ -101,18 +105,8 @@ TABLE(General, "General") {
     type_report_special_purpose_framework
       
 
-  "COPIES" VARCHAR2(2 BYTE) COLLATE "USING_NLS_COMP", ?
-	"INITIALDATE" DATE, ?
-  "DATERECEIVEDOTHER" DATE,  ?
-	"OPEID" VARCHAR2(4000 BYTE) COLLATE "USING_NLS_COMP", ?
-	"DATETOED" DATE, ?
-	"DATEFINISHED" DATE, ? 
-	"TYPEFINDING" VARCHAR2(1 BYTE) COLLATE "USING_NLS_COMP", ?
-  "DATERECEIVED" ?
-  "FINDINGREFNUM" ?
   "AGENCYCFDA" ?
-  "AUDITEECERTIFYNAME" ?
-  "TYPEFUNDING" ?
+
 }
 
 TABLE(Auditor, "GenAuditor") {
@@ -132,7 +126,7 @@ TABLE(Auditor, "GenAuditor") {
     auditor_title 
     auditor_zip_code
  
-  "VERSION" ? /' Discuss with Matt '/
+    "VERSION" ? /' Discuss with Matt '/
 }
 
 
@@ -143,11 +137,13 @@ TABLE(Award, "FederalAward") {
   amount_expended 
   arra 
   audit_report_type 
+  cfdaprogramname
   cluster_name
   cluster_total
   elecauditsid
   federal_agency_prefix 
   federal_program_total 
+  findings                                    /' Historic data '/
   findingscount
   is_direct 
   is_guaranteed 
@@ -159,7 +155,8 @@ TABLE(Award, "FederalAward") {
   other_cluster_name
   passthrough_amount
   passthrough_award
-  program_name 
+  program_name
+  questioned_costs2                             /' Historic data '/ 
   research_and_development 
   state_cluster_name
   subrecipient_amount 
@@ -167,16 +164,13 @@ TABLE(Award, "FederalAward") {
   type_report_major_program
   type_requirement
 
-  questioned_costs ?
-  findings ?
-  cfdaprogramname ?
-  "CFDA2" VARCHAR2(2 BYTE) COLLATE "USING_NLS_COMP", ?
-	"TYPEREPORT_MP_OVERRIDE" VARCHAR2(1 BYTE) COLLATE "USING_NLS_COMP",?
+
+  "CFDA2" VARCHAR2(2 BYTE) COLLATE "USING_NLS_COMP", ?	
 }
 
 TABLE(Passthrough, "Passthrough") {
-  + Award.report_id
   + Award.award_seq_number /' Old ELECSAUDIT '/
+  + Award.report_id
   + passthrough_id
   passthrough_name
 }
@@ -184,8 +178,8 @@ TABLE(Passthrough, "Passthrough") {
 
 TABLE(Finding, "Finding") {
   + Award.report_id
-  Award.award_seq_number /' To be added to GFAC '/
   + finding_ref_number /' GFAC '/
+  Award.award_seq_number /' To be added to GFAC '/
   material_weakness
   modified_opinion
   other_findings
@@ -239,6 +233,7 @@ Award "1" -- "*" Finding : contains
 Finding "1" -- "*" FindingText : contains
 Finding "1" -- "*" CAPText : contains
 Award "1" -- "*" Note : contains
+FindingText “1” -- “*” Finding : applies-to
 
 @enduml
 ```
