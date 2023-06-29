@@ -151,7 +151,7 @@ class Sprite(generic.View):
     particular file from Django.
     """
 
-    def get(self):
+    def get(self, _request):
         """Grab the file from static and return its contents as an image."""
         fpath = BASE_DIR / "static" / "img" / "sprite.svg"
         return HttpResponse(
