@@ -1,4 +1,7 @@
-import re, sys
+import re
+import sys
+
+# flake8: noqa
 
 EMPTY_STRING = ""
 repls = [
@@ -20,7 +23,7 @@ repls = [
 
 if __name__ == "__main__":
     if len(sys.argv) != 3:
-        print(f"repair-sql.py INFILE OUTFILE")
+        print("repair-sql.py INFILE OUTFILE")
         exit()
     tables_file_to_be_cleaned = sys.argv[1]
     outp = open(sys.argv[2], "w")

@@ -11,7 +11,6 @@ from jsonschema import exceptions, validate as jsonschema_validate, FormatChecke
 
 from audit.fixtures.excel import (
     CORRECTIVE_ACTION_PLAN_TEST_FILE,
-    FEDERAL_AWARDS_TEST_FILE,
     FEDERAL_AWARDS_TEST_FILES,
     FINDINGS_TEXT_TEST_FILE,
     FINDINGS_UNIFORM_GUIDANCE_TEST_FILE,
