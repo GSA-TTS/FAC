@@ -10,7 +10,6 @@ djangorestframework
 djangorestframework-simplejwt
 django-fsm
 environs[django]
-faker
 gunicorn
 jsonpath-ng
 jsonschema
