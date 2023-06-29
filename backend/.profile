@@ -41,4 +41,4 @@ python manage.py migrate &&
 echo 'Finished migrate' &&
 echo 'Starting collectstatic' &&
 python manage.py collectstatic --noinput &&
-echo 'Finished collectstatic'
+echo 'Finished collectstatic' &&

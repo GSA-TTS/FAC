@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
+{% load sprite_helper %}
 {% block content %}
     <div class="grid-container">
         <h1>In-progress Audit Submissions</h1>
@@ -94,7 +95,7 @@
                         aria-label="Close this window"
                         data-close-modal>
                     <svg class="usa-icon" aria-hidden="true" focusable="false" role="img">
-                        <use xlink:href="{% static 'img/sprite.svg'%}#close"></use>
+                        {% uswds_sprite "close" %}
                     </svg>
                 </button>
             </div>
@@ -150,7 +151,7 @@
                         aria-label="Close this window"
                         data-close-modal>
                     <svg class="usa-icon" aria-hidden="true" focusable="false" role="img">
-                        <use xlink:href="{% static 'img/sprite.svg'%}#close"></use>
+                        {% uswds_sprite "close" %}
                     </svg>
                 </button>
             </div>
