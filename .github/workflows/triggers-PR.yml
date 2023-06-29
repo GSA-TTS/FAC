@@ -12,7 +12,7 @@ on:
   workflow_dispatch: null
 
 jobs:
-  changes:
+  check-for-changes:
     runs-on: ubuntu-latest
     permissions:
       pull-requests: read
@@ -22,6 +22,7 @@ jobs:
       docker: ${{ steps.filter.outputs.docker }}
       package: ${{ steps.filter.outputs.package }}
     steps:
+      - uses: actions/checkout@v3
       - uses: dorny/paths-filter@v2
         id: filter
         with:
@@ -37,14 +38,14 @@ jobs:
 
   # Testing for all main and prod PRs
   test-and-lint-docker-build:
-    needs: [changes]
-    if: ${{ needs.changes.outputs.requirements == 'true' || needs.changes.outputs.dev-requirements == 'true' || needs.changes.outputs.docker == 'true' || needs.changes.outputs.package == 'true' }}
+    needs: [check-for-changes]
+    if: ${{ needs.check-for-changes.outputs.requirements == 'true' || needs.check-for-changes.outputs.dev-requirements == 'true' || needs.check-for-changes.outputs.docker == 'true' || needs.check-for-changes.outputs.package == 'true' }}
     uses: ./.github/workflows/test-and-lint-docker-build.yml
     secrets: inherit
 
   test-and-lint-from-ghcr:
-    needs: [changes]
-    if: ${{ needs.changes.outputs.requirements != 'true' && needs.changes.outputs.dev-requirements != 'true' && needs.changes.outputs.docker != 'true' || needs.changes.outputs.package != 'true' }}
+    needs: [check-for-changes]
+    if: ${{ needs.check-for-changes.outputs.requirements == 'false' || needs.check-for-changes.outputs.dev-requirements == 'false' || needs.check-for-changes.outputs.docker == 'false' || needs.check-for-changes.outputs.package == 'false' }}
     uses: ./.github/workflows/test-and-lint-from-ghcr.yml
     secrets: inherit
 
