@@ -39,13 +39,13 @@ jobs:
   test-and-lint:
     needs: [changes]
     if: ${{ needs.changes.outputs.requirements == 'true' || needs.changes.outputs.dev-requirements == 'true' || needs.changes.outputs.docker == 'true' }}
-    uses: ./.github/workflows/build-and-test.yml
+    uses: ./.github/workflows/test-and-lint-docker-build.yml
     secrets: inherit
 
   test-and-lint-ghcr:
     needs: [changes]
     if: ${{ needs.changes.outputs.requirements == 'false' && needs.changes.outputs.dev-requirements == 'false' && needs.changes.outputs.docker == 'false'}}
-    uses: ./.github/workflows/test.yml
+    uses: ./.github/workflows/test-and-lint-from-ghcr.yml
     secrets: inherit
 
   # Update BPMN diagram

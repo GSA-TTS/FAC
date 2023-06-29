@@ -21,7 +21,7 @@ jobs:
   # testing
   test-and-lint:
     needs: [build-container]
-    uses: ./.github/workflows/test.yml
+    uses: ./.github/workflows/test-and-lint-from-ghcr.yml
     secrets: inherit
 
   # deploy to Dev & Management spaces

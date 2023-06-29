@@ -7,7 +7,7 @@ on:
 jobs:
   # testing
   test-and-lint:
-    uses: ./.github/workflows/test.yml
+    uses: ./.github/workflows/test-and-lint-from-ghcr.yml
     secrets: inherit
 
   # deploy to staging
