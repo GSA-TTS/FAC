@@ -83,9 +83,9 @@ jobs:
     runs-on: ubuntu-latest
     env:
       ENV: TESTING
-      SAM_API_KEY: ${{ secrets.SAM_API_KEY }}"
+      SAM_API_KEY: ${{ secrets.SAM_API_KEY }}
       DJANGO_BASE_URL: 'http://localhost:8000'
-      DJANGO_SECRET_LOGIN_KEY: ${{ secrets.DJANGO_SECRET_LOGIN_KEY }}"
+      DJANGO_SECRET_LOGIN_KEY: ${{ secrets.DJANGO_SECRET_LOGIN_KEY }}
       SECRET_KEY: ${{ secrets.SECRET_KEY }}
       ALLOWED_HOSTS: '0.0.0.0 127.0.0.1 localhost'
       DISABLE_AUTH: False
@@ -103,15 +103,14 @@ jobs:
       - name: Run Django test suite
         working-directory: ./backend
         run:
-          docker compose run web bash -c 'coverage run --parallel-mode --concurrency=multiprocessing manage.py test --parallel &&
-          coverage combine && coverage report -m --fail-under=90'
+          docker compose run web bash -c 'coverage run --parallel-mode --concurrency=multiprocessing manage.py test --parallel && coverage combine && coverage report -m --fail-under=90'
   a11y-testing:
     runs-on: ubuntu-20.04
     env:
       ENV: TESTING
-      SAM_API_KEY: ${{ secrets.SAM_API_KEY }}"
+      SAM_API_KEY: ${{ secrets.SAM_API_KEY }}
       DJANGO_BASE_URL: 'http://localhost:8000'
-      DJANGO_SECRET_LOGIN_KEY: ${{ secrets.DJANGO_SECRET_LOGIN_KEY }}"
+      DJANGO_SECRET_LOGIN_KEY: ${{ secrets.DJANGO_SECRET_LOGIN_KEY }}
       SECRET_KEY: ${{ secrets.SECRET_KEY }}
       ALLOWED_HOSTS: '0.0.0.0 127.0.0.1 localhost'
       DISABLE_AUTH: True
