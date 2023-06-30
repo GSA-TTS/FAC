@@ -59,5 +59,3 @@ jobs:
         run: |
           npm i -g pa11y-ci
           pa11y-ci
-  validate-terraform:
-    uses: ./.github/workflows/terraform-lint.yml
