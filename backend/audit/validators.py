@@ -28,7 +28,7 @@ logger = logging.getLogger(__name__)
 
 MAX_EXCEL_FILE_SIZE_MB = 25
 
-ALLOWED_EXCEL_FILE_EXTENSIONS = [".xls", ".xlsx"]
+ALLOWED_EXCEL_FILE_EXTENSIONS = [".xlsx"]
 
 ALLOWED_EXCEL_CONTENT_TYPES = [
     "application/vnd.ms-excel",
