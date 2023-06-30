@@ -1,4 +1,5 @@
 {% load static %}
+{% load sprite_helper %}
 <div class="usa-nav-container">
     <div class="usa-navbar">
         <div class="usa-logo" id="basic-logo">
@@ -47,7 +48,7 @@
             <form action="/openid/logout" class="sign-out">
                 <button class="usa-button usa-button--unstyled">
                     <svg class="usa-icon" aria-hidden="true" focusable="false" role="img">
-                        <use xlink:href="/static/img/sprite.svg#logout"></use>
+                        {% uswds_sprite "logout" %}
                     </svg>
                     <span>Sign out</span>
                     {% if request.user.first_name == '' %}
@@ -105,7 +106,7 @@
                                     aria-label="Close this window"
                                     data-close-modal>
                                 <svg class="usa-icon" aria-hidden="true" focusable="false" role="img">
-                                    <use xlink:href="{% static 'img/sprite.svg#close' %}"></use>
+                                    {% uswds_sprite "close" %}
                                 </svg>
                             </button>
                         </div>
