@@ -494,13 +494,23 @@ class ExcelFile(models.Model):
         super(ExcelFile, self).save(*args, **kwargs)
 
 
+def single_audit_report_path(instance, filename):
+    """
+    We want the actual filename in the filesystem to be unique and determined
+    by report_id, not the user-provided filename.
+    """
+    base_path = "singleauditreport"
+    report_id = instance.sac.report_id
+    return f"{base_path}/{report_id}.pdf"
+
+
 class SingleAuditReportFile(models.Model):
     """
     Data model to track uploaded Single Audit report PDFs and associate them with SingleAuditChecklists
     """
 
     file = models.FileField(
-        upload_to="singleauditreport", validators=[validate_single_audit_report_file]
+        upload_to=single_audit_report_path, validators=[validate_single_audit_report_file]
     )
     filename = models.CharField(max_length=255)
     sac = models.ForeignKey(SingleAuditChecklist, on_delete=models.CASCADE)
