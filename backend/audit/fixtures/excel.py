@@ -9,8 +9,7 @@ TESTFILES_DIR = settings.DATA_FIXTURES / "audit" / "excel_schema_test_files"
 
 FEDERAL_AWARDS_TEMPLATE = SHEETS_DIR / "federal-awards-expended-template.xlsx"
 FINDINGS_TEXT_TEMPLATE = SHEETS_DIR / "findings-text-template.xlsx"
-CORRECTIVE_ACTION_PLAN_TEMPLATE = SHEETS_DIR / \
-    "corrective-action-plan-template.xlsx"
+CORRECTIVE_ACTION_PLAN_TEMPLATE = SHEETS_DIR / "corrective-action-plan-template.xlsx"
 FINDINGS_UNIFORM_GUIDANCE_TEMPLATE = (
     SHEETS_DIR / "findings-uniform-guidance-template.xlsx"
 )
@@ -21,13 +20,14 @@ FINDINGS_UNIFORM_TEMPLATE_DEFINITION = "findings-uniform-guidance-template.json"
 FINDINGS_TEXT_TEMPLATE_DEFINITION = "findings-text-template.json"
 
 FEDERAL_AWARDS_TEST_FILE = TESTFILES_DIR / "federalawards-pass-01.json"
-FEDERAL_AWARDS_TEST_FILES = list(map(lambda f: TESTFILES_DIR / f, [
-    "federalawards-pass-01.json",
-    "federalawards-pass-02.json"
-]))
+FEDERAL_AWARDS_TEST_FILES = list(
+    map(
+        lambda f: TESTFILES_DIR / f,
+        ["federalawards-pass-01.json", "federalawards-pass-02.json"],
+    )
+)
 
-CORRECTIVE_ACTION_PLAN_TEST_FILE = TESTFILES_DIR / \
-    "corrective-action-plan-pass-01.json"
+CORRECTIVE_ACTION_PLAN_TEST_FILE = TESTFILES_DIR / "corrective-action-plan-pass-01.json"
 FINDINGS_TEXT_TEST_FILE = TESTFILES_DIR / "findings-text-pass-01.json"
 FINDINGS_UNIFORM_GUIDANCE_TEST_FILE = (
     TESTFILES_DIR / "findings-uniform-guidance-pass-01.json"
