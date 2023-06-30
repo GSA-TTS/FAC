@@ -3,7 +3,8 @@ VENV_PYTHON    = $(VENV)/bin/python
 SYSTEM_PYTHON  = $(or $(shell which python3), $(shell which python))
 PYTHON         = $(or $(wildcard $(VENV_PYTHON)), $(SYSTEM_PYTHON))
 
-all: venv deps clean source_data build_xlsx build_templates build_sections 
+all: venv deps clean source_data build_xlsx format_jsonnet build_templates build_sections 
+json: format_jsonnet build_templates build_templates
 
 
 $(VENV_PYTHON):
@@ -40,12 +41,19 @@ build_xlsx: source_data
 		python3 render.py $$f; \
 	done
 
+format_jsonnet:
+	for jsonnet_file in $(template_specs); do \
+		jsonnetfmt -i "$$jsonnet_file"; \
+	done
+	for jsonnet_file in $(section_specs); do \
+		jsonnetfmt -i "$$jsonnet_file"; \
+	done
+
 build_template_json:
 	for jsonnet_file in $(specs); do \
 		base_name=$$(basename "$$jsonnet_file" .jsonnet); \
 		jsonnet -o output/excel/json/"$$base_name.json" "$$jsonnet_file"; \
 	done
-
 
 build_sections:
 	for jsonnet_file in $(section_specs); do \
