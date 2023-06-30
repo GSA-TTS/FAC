@@ -207,13 +207,12 @@ TABLE(Note, "Note") {
 TABLE(FindingText, "FindingText") {
   + Finding.report_id
   + Finding.finding_ref_number
-  + finding_text_seq_number
   charts_tables
   finding_text
 }
 
 TABLE(CAPText, "CAPText") {
-  + cap_text_seq_number
+  + Finding.report_id
   + Finding.finding_ref_number
   cap_text
   charts_tables
@@ -230,9 +229,9 @@ General "1" -- "0,*" Auditor : may-have
 General "1" -- "0,*" Revision : may-have
 Award "1" -- "0,*" Passthrough : may-contain
 Award "1" -- "*" Finding : contains
-Finding "1" -- "*" CAPText : contains
-Award "1" -- "*" Note : contains
+General "1" -- "*" Note : contains
 FindingText “1” -- “*” Finding : applies-to
+CAPText “1” -- “*” Finding : applies-to
 
 @enduml
 ```
