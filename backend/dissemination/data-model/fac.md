@@ -10,101 +10,112 @@ hide empty attributes
 
 TABLE(General, "General") {
     + report_id
+    auditee_uei
     audit_period_covered
     audit_type
-    audit_year                        /'22 AUDITYEAR '/
+    fy_start_date
+    fy_end_date 
+    audit_year                   /'22 AUDITYEAR '/
+    auditee_ein
+    auditee_duns
+    auditeee_addl_uei_list
+    auditeee_addl_ein_list
+    auditeee_addl_duns_list
+    auditor_ein
+
+    pdf_url                           /' GFAC '/
+    is_public
+    data_source                       /'GFAC or CFAC '/
+
     auditee_address_line_1
-    hist_auditee_address_line_2            /' STREET2 Historic data '/
-    auditee_certified                 /' 22 AUDITEEDATESIGNED. AUDITEEDATESIGNED is derived by certification status timestamp'/
     auditee_certify_name  
     auditee_certify_title
     auditee_city
     auditee_contact_name
     auditee_contact_title             /'22 AUDITEENAMETITLE and AUDITEETITLE'/
     auditee_email
-    hist_auditee_fax                       /' Historic data '/
     auditee_name
     auditee_phone
     auditee_state
-    auditee_uei
     auditee_zip
+    
+
     auditor_address_line_1 
-    hist_auditor_address_line_2            /' CPASTREET2 Historic data '/
-    auditor_certified                 /' 22 CPADATESIGNED. CPADATESIGNED is derived by certification status timestamp'/
     auditor_city
     auditor_contact_name
     auditor_contact_title             /' 22 CPANAMETITLE '/
     auditor_country
-    auditor_ein
     auditor_email
-    hist_auditor_fax                       /' Historic data '/
     auditor_firm_name 
     auditor_foreign_addr              /' 22 CPAFOREIGN'/
     auditor_phone
     auditor_state
     auditor_title
     auditor_zip
+    
     cognizant_agency
-    cognizant_agency_over             /' 22 COG_OVER '/
-    hist_completed_date                    /' Historic data '/
-    component_date_received           /' Historic data '/
-    condition_or_deficiency_major_program 
-    hist_copies                            /' Historic data '/
-    current_or_former_findings        /'22 CYFINDINGS '/
-    data_source                       /'GFAC or CFAC '/
-    hist_date_firewall                     /' Historic data '/
-    date_published
-    date_received
-    hist_date_received_other               /' Historic data '/ 
-    dollar_threshold
-    hist_duns                              /' Historic data '/
-    dup_reports
-    ein
-    ein_subcode
-    entity_type
-    fac_accepted_date
-    finding_ref_num
-    form_date_received 
-    fy_end_date 
-    fy_start_date
-    going_concern
-    hist_image                             /' Historic data '/
-    initial_date_received 
-    is_public
-    low_risk 
-    material_noncompliance 
-    material_weakness 
-    material_weakness_major_program
-    multiple_auditors                 /'22 MULTIPLE_CPAS '/
-    hist_multiple_duns                     /' Historic data '/
-    multiple_eins_covered
-    multiple_ueis_covered
-    number_months
     oversight_agency
-    pdf_url                           /' GFAC '/
-    hist_previous_completed_on_date    /' Historic data '/  
-    hist_previous_date_firewall            /' Historic data '/
-    hist_previous_date_published           /' Historic data '/
+
+    initial_date_received 
+    fac_accepted_date ? ready for certification
+    auditee_certified_date
+    auditor_certified_date 
+    date_published
+
+    type_report_financial_statements
+    special_framework
+    is_special_framework_required 
+    type_report_special_purpose_framework
+    is_going_concern
+    is_significant_deficiency
+    is_material_weakness 
+    is_material_noncompliance 
+    id_duplicate_reports
+    dollar_threshold
+    is_low_risk 
+
+    ' JM: Need to understand the following
+    ' JM: What about 3d in Part III - ageny reference
+    date_received ?
+    condition_or_deficiency_major_program 
+    current_or_former_findings        /'22 CYFINDINGS '/
+    ein_subcode ?
+    entity_type
+    form_date_received 
+    material_weakness_major_program
+    number_months
     prior_year_schedule 
     questioned_costs 
     report_required  
-    hist_reportable_condition              /' Historic data '/
-    hist_reportable_condition_major_program    /' Historic data '/
     sd_material_weakness, 
     sd_material_weakness_major_program
-    significant_deficiency
-    hist_significant_deficiency_major_program  /' Historic data.  22 SIGNIFICANTDEFICIENCY_MP '/
-    special_framework
-    special_framework_required 
     suppression_code  
     total_fed_expenditures 
-    type_audit_code
-    hist_type_of_entity                    /' Historic data '/
-    type_report_financial_statements 
+    type_audit_code     
     type_report_major_program  
-    type_report_special_purpose_framework
-      
+    
+    cfac_report_id
+    cfac_version ??needed?
+    ' JM: Do we need CFAC DN_KEY?
 
+    ' hist_auditee_address_line_2            /' STREET2 Historic data '/
+    ' hist_auditee_fax                       /' Historic data '/
+    ' hist_auditor_address_line_2            /' CPASTREET2 Historic data '/
+    ' hist_auditor_fax                       /' Historic data '/
+    ' hist_completed_date                    /' Historic data '/
+    ' hist_copies                            /' Historic data '/
+    ' hist_date_firewall                     /' Historic data '/
+    ' hist_date_received_other               /' Historic data '/ 
+    ' hist_component_date_received           /' Historic data '/
+    ' hist_image                             /' Historic data '/
+    ' hist_type_of_entity                    /' Historic data '/
+    ' hist_previous_completed_on_date    /' Historic data '/  
+    ' hist_previous_date_firewall            /' Historic data '/
+    ' hist_previous_date_published           /' Historic data '/
+    ' hist_reportable_condition              /' Historic data '/
+    ' hist_reportable_condition_major_program    /' Historic data '/
+    ' hist_significant_deficiency_major_program  /' Historic data.  22 SIGNIFICANTDEFICIENCY_MP '/
+    ' hist_finding_ref_num
   "AGENCYCFDA" ?
 
 }
@@ -133,38 +144,39 @@ TABLE(Auditor, "GenAuditor") {
 TABLE(Award, "FederalAward") {
   + General.report_id
   + award_seq_number 
+  federal_agency_prefix
+  federal_award_extension 
   additional_award_identification 
+  federal_program_name
   amount_expended 
-  arra 
-  audit_report_type 
-  cfdaprogramname
   cluster_name
-  cluster_total
-  elecauditsid
-  federal_agency_prefix 
-  federal_program_total 
-  hist_findings                                    /' Historic data '/
-  findingscount
-  is_direct 
-  is_guaranteed 
-  is_major 
-  is_passed 
-  loan_balance_at_audit_period_end 
-  loans
-  number_of_audit_findings 
   other_cluster_name
-  passthrough_amount
-  passthrough_award
-  program_name
-  hist_questioned_costs2                             /' Historic data '/ 
-  research_and_development 
   state_cluster_name
-  subrecipient_amount 
-  three_digit_extension 
-  type_report_major_program
-  type_requirement
+  cluster_total
+  federal_program_total 
+  is_loan
+  loan_balance
+  is_direct 
 
+  is_major 
+  mp_audit_report_type 
+  findings_count 
+  
+  ' --need more clarity on these fields
+  ' is_guaranteed 
+  ' is_passed 
+  ' passthrough_amount
+  ' passthrough_award
+  ' program_name
+  ' subrecipient_amount 
+  ' type_requirement
 
+  ' not needed for now
+  ' hist_research_and_development 
+  ' hist_questioned_costs2                             /' Historic data '/ 
+  ' hist_findings                                    /' Historic data '/
+  ' hist_arra 
+  ' hist_typereoirt_mp_iverride
   "CFDA2" VARCHAR2(2 BYTE) COLLATE "USING_NLS_COMP", ?	
 }
 
@@ -190,7 +202,7 @@ TABLE(Finding, "Finding") {
   significant_deficiency
   type_requirement
 
-  findingrefnums ?
+  ' hist_findingrefnums
 }
 
 TABLE(Note, "Note") {
@@ -227,6 +239,8 @@ TABLE(Revision, "Revision") {
 General "1" -- "*" Award : covers
 General "1" -- "0,*" Auditor : may-have
 General "1" -- "0,*" Revision : may-have
+General "1" -- "0,*" FindingText : may-have
+General "1" -- "0,*" CAPText : may-have
 Award "1" -- "0,*" Passthrough : may-contain
 Award "1" -- "*" Finding : contains
 General "1" -- "*" Note : contains

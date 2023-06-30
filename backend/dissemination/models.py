@@ -5,13 +5,11 @@ from . import docs
 
 
 class FindingText(models.Model):
-    """Specific findings details. References Finding"""
+    """Specific findings details. References General"""
 
-    charts_tables = models.BooleanField(
-        "Indicates whether or not the text contained charts or tables that could not be entered due to formatting restrictions",
-        max_length=1,
-        null=True,
-        help_text=docs.charts_tables_findingstext,
+    report_id = models.CharField(
+        "G-FAC generated identifier.l",
+        max_length=40,
     )
     finding_ref_number = models.CharField(
         "Finding Reference Number - FK",
@@ -19,31 +17,43 @@ class FindingText(models.Model):
         null=True,
         help_text=docs.finding_ref_nums_findingstext,
     )
-    finding_text_seq_number = models.IntegerField(
-        "Order that the findings text was reported",
+
+    charts_tables = models.BooleanField(
+        "Indicates whether or not the text contained charts or tables that could not be entered due to formatting restrictions",
+        max_length=1,
         null=True,
-        help_text=docs.seq_number_findingstext,
+        help_text=docs.charts_tables_findingstext,
     )
     finding_text = models.TextField(
         "Content of the finding text",
         null=True,
         help_text=docs.text_findingstext,
     )
-    report_id = models.CharField(
-        "G-FAC generated identifier.l",
-        max_length=40,
-    )
 
     class Meta:
-        unique_together = (("report_id", "finding_ref_number", "finding_text_seq_number"),)
+        unique_together = (
+            (
+                "report_id",
+                "finding_ref_number",
+            ),
+        )
         """
             FindingText
-            foreign_key(("report_id", "finding_ref_number") references Finding
+            foreign_key(("report_id", ) references General
         """
 
 
 class Finding(models.Model):
-    """A finding from the audit. References FederalAward"""
+    """A finding from the audit. References FederalAward and FindingText"""
+
+    report_id = models.CharField(
+        "G-FAC generated identifier. FK along with other fields - refers to Award",
+        max_length=40,
+    )
+    award_seq_number = models.IntegerField(
+        "Order that the award line was reported",
+        null=True,
+    )
 
     finding_ref_number = models.CharField(
         "Findings Reference Numbers",
@@ -93,49 +103,37 @@ class Finding(models.Model):
         help_text=docs.type_requirement_findings,
     )
 
-    # report_id
-    report_id = models.CharField(
-        "G-FAC generated identifier. FK along with other fields - refers to Award",
-        max_length=40,
-    )
-    # SK - Note: agency_cfda is not needed in Finding table
-    #agency_cfda = models.CharField(
-    #    "Federal Agency Prefix and Extension", max_length=52, help_text=docs.cfda
-    #)
-    # SK - Note: award_identification is not needed in Finding table
-    #award_identification = models.CharField(
-    #    "Other data used to identify the award which is not a CFDA number (e.g., program year, contract number)",
-    #    max_length=50,
-    #    null=True,
-    #    help_text=docs.award_identification,
-    #)
-    # SK - Note: federal_program_name is not needed in Finding table
-    # federal_program_name = models.CharField(
-    #     "Name of Federal Program",
-    #     max_length=300,
-    #     null=True,
-    #     help_text=docs.federal_program_name,
-    # )
-    award_seq_number = models.IntegerField(
-        "Order that the award line was reported",
-        null=True,
-    )
-
     class Meta:
         unique_together = (("report_id", "finding_ref_number", "award_seq_number"),)
         """
             Finding
             foreign_key(("report_id", "award_seq_number",) references FederalAward
+            foreign_key(("report_id", "finding_ref_number",) references FindingText
         """
 
 
 class FederalAward(models.Model):
     """Information about the federal award section of the form. References General"""
 
+    report_id = models.CharField(
+        "G-FAC generated identifier. FK refers to a General",
+        max_length=40,
+    )
+
     award_seq_number = models.IntegerField(
         "Order that the award line was reported",
         null=True,
     )
+
+    federal_agency_prefix = models.CharField(
+        "2-char code refers to an agency",
+        max_length=2,
+    )
+    federal_award_extension = models.CharField(
+        "3-dogit extn for a program defined by the agency",
+        max_length=3,
+    )
+
     # SK - Note:  agency_name is not needed in FederalAward table
     # Agency
     # agency_name = models.CharField(
@@ -149,72 +147,21 @@ class FederalAward(models.Model):
     # agency_cfda = models.CharField(
     #     "Federal Agency Prefix and Extension", max_length=52, help_text=docs.cfda
     # )
+
     additional_award_identification = models.CharField(
         "Other data used to identify the award which is not a CFDA number (e.g., program year, contract number)",
         max_length=50,
         null=True,
         help_text=docs.award_identification,
     )
-    cfdaprogramname = models.CharField(
+    federal_program_name = models.CharField(
         "Name of Federal Program",
         max_length=300,
         null=True,
         help_text=docs.federal_program_name,
     )
-
-    research_and_development = models.BooleanField(
-        "Indicate whether or not the program is a Research and Development program",
-        null=True,
-        help_text=docs.research_and_development,
-    )
-    loans = models.BooleanField(
-        "Indicate whether or not the program is a Loan or Loan Guarantee (only available for audit years 2013 and beyond)",
-        null=True,
-        help_text=docs.loans,
-    )
-    arra = models.BooleanField(
-        "American Recovery and Reinvestment Act Funded Program",
-        null=True,
-        help_text=docs.arra,
-    )
-    is_direct = models.BooleanField(
-        "Indicate whether or not the award was received directly from a Federal awarding agency",
-        null=True,
-        help_text=docs.direct,
-    )
-    passthrough_award = models.BooleanField(
-        "Indicates whether or not funds were passed through to any subrecipients for the Federal program",
-        null=True,
-        help_text=docs.passthrough_award,
-    )
-    is_major = models.BooleanField(
-        "Indicate whether or not the Federal program is a major program",
-        null=True,
-        help_text=docs.major_program,
-    )
     amount_expended = models.BigIntegerField(
         "Amount Expended for the Federal Program", help_text=docs.amount
-    )
-    federal_program_total = models.BigIntegerField(
-        "Total Federal awards expended for each individual Federal program is auto-generated by summing the amount expended for all line items with the same CFDA Prefix and Extension",
-        null=True,
-        help_text=docs.program_total,
-    )
-    cluster_total = models.BigIntegerField(
-        "Total Federal awards expended for each individual Federal program is auto-generated by summing the amount expended for all line items with the same Cluster Name",
-        null=True,
-        help_text=docs.cluster_total,
-    )
-    passthrough_amount = models.BigIntegerField(
-        "Amount passed through to subrecipients",
-        null=True,
-        help_text=docs.passthrough_amount,
-    )
-    loan_balance_at_audit_period_end = models.CharField(
-        "The loan or loan guarantee (loan) balance outstanding at the end of the audit period.  A response of ‘N/A’ is acceptable.",
-        max_length=40,
-        null=True,
-        help_text=docs.loan_balance,
     )
     cluster_name = models.CharField(
         "The name of the cluster",
@@ -234,29 +181,79 @@ class FederalAward(models.Model):
         null=True,
         help_text=docs.other_cluster_name,
     )
+    cluster_total = models.BigIntegerField(
+        "Total Federal awards expended for each individual Federal program is auto-generated by summing the amount expended for all line items with the same Cluster Name",
+        null=True,
+        help_text=docs.cluster_total,
+    )
+    federal_program_total = models.BigIntegerField(
+        "Total Federal awards expended for each individual Federal program is auto-generated by summing the amount expended for all line items with the same CFDA Prefix and Extension",
+        null=True,
+        help_text=docs.program_total,
+    )
+    is_loan = models.BooleanField(
+        "Indicate whether or not the program is a Loan or Loan Guarantee (only available for audit years 2013 and beyond)",
+        null=True,
+        help_text=docs.loans,
+    )
+    # TODO: loan_balance should be numeric, BigInteger or string?
+    loan_balance_at_audit_period_end = models.CharField(
+        "The loan or loan guarantee (loan) balance outstanding at the end of the audit period.  A response of ‘N/A’ is acceptable.",
+        max_length=40,
+        null=True,
+        help_text=docs.loan_balance,
+    )
+    is_direct = models.BooleanField(
+        "Indicate whether or not the award was received directly from a Federal awarding agency",
+        null=True,
+        help_text=docs.direct,
+    )
+
+    is_major = models.BooleanField(
+        "Indicate whether or not the Federal program is a major program",
+        null=True,
+        help_text=docs.major_program,
+    )
+    mp_audit_report_type = models.CharField(
+        "Type of Report Issued on the Major Program Compliance",
+        max_length=40,
+        null=True,
+        help_text=docs.type_report_major_program_cfdainfo,
+    )
+
+    # this may not be required in the dissemination model
+    findings_count = models.IntegerField(
+        "Number of findings for the federal program (only available for audit years 2013 and beyond)",
+        null=True,
+        help_text=docs.findings_count,
+    )
+
+    """
+
+    mp_audit_report_type
+    """
+
+    passthrough_award = models.BooleanField(
+        "Indicates whether or not funds were passed through to any subrecipients for the Federal program",
+        null=True,
+        help_text=docs.passthrough_award,
+    )
+    passthrough_amount = models.BigIntegerField(
+        "Amount passed through to subrecipients",
+        null=True,
+        help_text=docs.passthrough_amount,
+    )
     type_requirement = models.CharField(
         "Type Requirement Failure",
         max_length=40,
         null=True,
         help_text=docs.type_requirement_cfdainfo,
     )
-    type_report_major_program = models.CharField(
-        "Type of Report Issued on the Major Program Compliance",
-        max_length=40,
-        null=True,
-        help_text=docs.type_report_major_program_cfdainfo,
-    )
     # SK - Note: findings_page is not needed in FederalAward table.
     # findings_page = models.TextField(
     #     "Items on the Findings page", null=True, help_text=docs.findings
     # )
 
-    # can this be computed?
-    findings_count = models.IntegerField(
-        "Number of findings for the federal program (only available for audit years 2013 and beyond)",
-        null=True,
-        help_text=docs.findings_count,
-    )
     # SK - Note: questioned_costs is not needed in FederalAward table.
     # questioned_costs = models.CharField(
     #     "Dollar amount of questioned costs (Deprecated since 2002)",
@@ -264,11 +261,7 @@ class FederalAward(models.Model):
     #     max_length=40,
     #     help_text=docs.questioned_costs_FederalAward,
     # )
-    
-    report_id = models.CharField(
-        "G-FAC generated identifier. FK refers to a General",
-        max_length=40,
-    )
+
     # SK - Note: Need to add the following:
     # audit_report_type
     # elecauditsid
@@ -277,8 +270,8 @@ class FederalAward(models.Model):
     # is_passed
     # number_of_audit_findings - May be this is same as findingscount.  Need to confirm.
     # program_name - May be this is same as cfdaprogramname.  Need to confirm.
-    # subrecipient_amount 
-    # three_digit_extension 
+    # subrecipient_amount
+    # three_digit_extension
 
     class Meta:
         unique_together = (
@@ -295,7 +288,12 @@ class FederalAward(models.Model):
 
 
 class CapText(models.Model):
-    """Corrective action plan text. Referebces Finding"""
+    """Corrective action plan text. Referebces General"""
+
+    report_id = models.CharField(
+        "G-FAC generated identifier. FK refers to a General",
+        max_length=40,
+    )
 
     finding_ref_number = models.CharField(
         "Audit Finding Reference Number",
@@ -308,41 +306,33 @@ class CapText(models.Model):
         null=True,
         help_text=docs.charts_tables_captext,
     )
-    cap_text_seq_number = models.IntegerField(
-        "Order that the CAP text was reported", help_text=docs.seq_number_captext
-    )
     cap_text = models.TextField(
         "Content of the Corrective Action Plan (CAP)", help_text=docs.text_captext
     )
-    report_id = models.CharField(
-        "G-FAC generated identifier. FK refers to a Finding with finding_ref_num",
-        max_length=40,
-    )
 
     class Meta:
-        unique_together = (("report_id", "finding_ref_number", "cap_text_seq_number"),)
+        unique_together = (
+            (
+                "report_id",
+                "finding_ref_number",
+            ),
+        )
         """
             CapText
-            foreign_key(("report_id", "finding_ref_number") references Finding
+            foreign_key(("report_id", ) references General
         """
 
 
 class Note(models.Model):
     """Note to Schedule of Expenditures of Federal Awards (SEFA)"""
 
-    type_id = models.CharField("Note Type", max_length=1, help_text=docs.type_id)
-
-    # fac_id = models.IntegerField(
-    #     unique=True
-    #     "Internal Unique Identifier for the record", help_text=docs.fac_id
-    # )
     report_id = models.IntegerField(
         "Internal Audit Report Id", help_text=docs.report_id
     )
-    version = models.IntegerField("Internal Version", help_text=docs.version)
     note_seq_number = models.IntegerField(
         "Order that the Note was reported", help_text=docs.seq_number_notes
     )
+    type_id = models.CharField("Note Type", max_length=1, help_text=docs.type_id)
     note_index = models.IntegerField(
         "Display Index for the Note",
         null=True,
@@ -352,15 +342,12 @@ class Note(models.Model):
     note_title = models.CharField(
         "Note Title", max_length=75, null=True, help_text=docs.title
     )
-    # SK - Note: Add type_id
 
     class Meta:
         unique_together = (("report_id", "note_seq_number"),)
         """
             Note
             foreign_key(("report_id", ) references General
-            A Geeral has exactly four Note instances
-            Should we flatten this out and store as separate elements like note_1_content, note_2_conten, etc?
         """
 
 
@@ -478,12 +465,15 @@ class Passthrough(models.Model):
     We may not need this table. We can simply add three columns 
     pertating to passthrough in FederalAward table
     """
-    passthrough_name = models.CharField(
-        "Name of Pass-through Entity",
-        max_length=150,
-        null=True,
-        help_text=docs.passthrough_name,
+    report_id = models.CharField(
+        "G-FAC generated identifier. FK refers to General",
+        max_length=40,
     )
+    award_seq_number = models.IntegerField(
+        "Order that the award line was reported",
+        null=True,
+    )
+
     # This doesn't seem like it should be null but it is sometimes
     passthrough_id = models.CharField(
         "Identifying Number Assigned by the Pass-through Entity",
@@ -491,15 +481,25 @@ class Passthrough(models.Model):
         null=True,
         help_text=docs.passthrough_id,
     )
-    # SK - Note: audit_id is not needed in Passthrough table 
+    passthrough_name = models.CharField(
+        "Name of Pass-through Entity",
+        max_length=150,
+        null=True,
+        help_text=docs.passthrough_name,
+    )
+
+    class Meta:
+        unique_together = (("report_id", "award_seq_number", "passthrough_id"),)
+        """
+            Note
+            foreign_key(("report_id", ) references General
+        """
+
+    # SK - Note: audit_id is not needed in Passthrough table
     # audit_id = models.IntegerField(
     #     "FAC system generated sequence number used to link to Passthrough data between CFDA Info and Passthrough",
     #     help_text=docs.elec_audits_id_passthrough,
     # )
-    report_id = models.CharField(
-        "G-FAC generated identifier. FK refers to General",
-        max_length=40,
-    )
     # SK - Note:  Need to add Award.award_seq_number
     # SK - Note: Primary keys for this table are award_seq_number, report_id, passthrough_id
 
