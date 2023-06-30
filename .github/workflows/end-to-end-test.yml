@@ -20,7 +20,7 @@ jobs:
           node-version: 18
       - name: Start services
         working-directory: ./backend
-        run: touch .env && docker-compose up -d
+        run: touch .env && docker compose up -d
       - name: Run Cypress
         working-directory: ./backend
         run: |
