@@ -6,7 +6,7 @@ import sys
 def cleanup_string(s):
     s = str(s).strip()
     # Replace two spaces with one
-    s = ' '.join(s.split())
+    s = " ".join(s.split())
     return s
 
 
@@ -16,7 +16,7 @@ def lmap(fun, ls):
 
 if __name__ == "__main__":
     if len(sys.argv) == 3:
-        df = pd.read_csv(sys.argv[1], converters={'CFDAEXT': str})
+        df = pd.read_csv(sys.argv[1], converters={"CFDAEXT": str})
         # Build a couple of Python objects to render as
         # JSON, and then as Jsonnet
         program_names = list(df["FEDERALPROGRAMNAME"])
@@ -43,7 +43,6 @@ if __name__ == "__main__":
             "program_names": program_names,
             "all_alns": unique_cfda_list,
             "aln_prefixes": unique_prefix_list,
-
         }
 
         with open(sys.argv[2], "w") as write_file:
