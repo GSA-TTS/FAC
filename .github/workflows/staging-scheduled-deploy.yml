@@ -31,16 +31,20 @@ jobs:
       repo-name: gsa-tts/fac
       work-dir: ./backend
 
-  test-and-lint:
+  testing:
     name: Run Django, Lighthouse, a11y and lint
     needs:
       - build-container
-    uses: ./.github/workflows/test.yml
+    uses: ./.github/workflows/testing-from-ghcr.yml
+    secrets: inherit
+
+  linting:
+    uses: ./.github/workflows/linting.yml
     secrets: inherit
 
   create-pr:
     needs:
-      - test-and-lint
+      - testing
     name: Create Pull Request to Staging
     uses: ./.github/workflows/auto-create-pr.yml
     secrets: inherit
