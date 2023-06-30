@@ -19,6 +19,7 @@ applications:
     services:
       - fac-db
       - fac-public-s3
+      - fac-private-s3
       - fac-key-service
       - newrelic-creds
       - https-proxy-creds
