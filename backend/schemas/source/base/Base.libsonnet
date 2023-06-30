@@ -1,4 +1,5 @@
 local Func = import 'Functions.libsonnet';
+local FederalProgramNames = import 'FederalProgramNames.json';
 
 local Const = {
   Y: 'Y',
@@ -462,7 +463,18 @@ local SchemaBase = Types.object {
   Meta: Meta,
   Enum: Enum,
   Compound: Compound {
-    //UEI: type_uei,
+    FederalProgramNames: {
+      description: 'All Federal program names',
+      enum: FederalProgramNames.program_names
+    },
+    AllALNNumbers: {
+      description: 'All program numbers',
+      enum: FederalProgramNames.all_alns
+      },  
+    ALNPrefixes: {
+      description: 'Unique ALN prefixes',
+      enum: FederalProgramNames.aln_prefixes
+    }
   },
   Validation: Validation,
   SchemaBase: SchemaBase,
