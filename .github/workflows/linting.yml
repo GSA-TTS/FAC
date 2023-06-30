@@ -1,5 +1,5 @@
 ---
-name: Runs linting and tests
+name: Lint Files
 on:
   workflow_call:
 

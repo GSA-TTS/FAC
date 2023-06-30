@@ -39,7 +39,7 @@ jobs:
   testing-docker-build:
     needs: [check-for-changes]
     if: ${{ needs.check-for-changes.outputs.requirements == 'true' || needs.check-for-changes.outputs.dev-requirements == 'true' || needs.check-for-changes.outputs.docker == 'true' || needs.check-for-changes.outputs.package == 'true' }}
-    uses: ./.github/workflows/testing-docker-build.yml
+    uses: ./.github/workflows/testing-from-build.yml
     secrets: inherit
 
   testing-from-ghcr:

@@ -1,5 +1,5 @@
 ---
-name: Run Testing and Linting
+name: Run Django and A11y Tests
 on:
   workflow_dispatch:
   workflow_call:
