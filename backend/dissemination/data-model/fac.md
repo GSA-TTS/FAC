@@ -14,7 +14,7 @@ TABLE(General, "General") {
     audit_type
     audit_year                        /'22 AUDITYEAR '/
     auditee_address_line_1
-    auditee_address_line_2            /' STREET2 Historic data '/
+    hist_auditee_address_line_2            /' STREET2 Historic data '/
     auditee_certified                 /' 22 AUDITEEDATESIGNED. AUDITEEDATESIGNED is derived by certification status timestamp'/
     auditee_certify_name  
     auditee_certify_title
@@ -22,14 +22,14 @@ TABLE(General, "General") {
     auditee_contact_name
     auditee_contact_title             /'22 AUDITEENAMETITLE and AUDITEETITLE'/
     auditee_email
-    auditee_fax                       /' Historic data '/
+    hist_auditee_fax                       /' Historic data '/
     auditee_name
     auditee_phone
     auditee_state
     auditee_uei
     auditee_zip
     auditor_address_line_1 
-    auditor_address_line_2            /' CPASTREET2 Historic data '/
+    hist_auditor_address_line_2            /' CPASTREET2 Historic data '/
     auditor_certified                 /' 22 CPADATESIGNED. CPADATESIGNED is derived by certification status timestamp'/
     auditor_city
     auditor_contact_name
@@ -37,7 +37,7 @@ TABLE(General, "General") {
     auditor_country
     auditor_ein
     auditor_email
-    auditor_fax                       /' Historic data '/
+    hist_auditor_fax                       /' Historic data '/
     auditor_firm_name 
     auditor_foreign_addr              /' 22 CPAFOREIGN'/
     auditor_phone
@@ -46,18 +46,18 @@ TABLE(General, "General") {
     auditor_zip
     cognizant_agency
     cognizant_agency_over             /' 22 COG_OVER '/
-    completed_date                    /' Historic data '/
+    hist_completed_date                    /' Historic data '/
     component_date_received           /' Historic data '/
     condition_or_deficiency_major_program 
-    copies                            /' Historic data '/
+    hist_copies                            /' Historic data '/
     current_or_former_findings        /'22 CYFINDINGS '/
     data_source                       /'GFAC or CFAC '/
-    date_firewall                     /' Historic data '/
+    hist_date_firewall                     /' Historic data '/
     date_published
     date_received
-    date_received_other               /' Historic data '/ 
+    hist_date_received_other               /' Historic data '/ 
     dollar_threshold
-    duns                              /' Historic data '/
+    hist_duns                              /' Historic data '/
     dup_reports
     ein
     ein_subcode
@@ -68,7 +68,7 @@ TABLE(General, "General") {
     fy_end_date 
     fy_start_date
     going_concern
-    image                             /' Historic data '/
+    hist_image                             /' Historic data '/
     initial_date_received 
     is_public
     low_risk 
@@ -76,30 +76,30 @@ TABLE(General, "General") {
     material_weakness 
     material_weakness_major_program
     multiple_auditors                 /'22 MULTIPLE_CPAS '/
-    multiple_duns                     /' Historic data '/
+    hist_multiple_duns                     /' Historic data '/
     multiple_eins_covered
     multiple_ueis_covered
     number_months
     oversight_agency
     pdf_url                           /' GFAC '/
-    previous_completed_on             /' Historic data '/  
-    previous_date_firewall            /' Historic data '/
-    previous_date_published           /' Historic data '/
+    hist_previous_completed_on_date    /' Historic data '/  
+    hist_previous_date_firewall            /' Historic data '/
+    hist_previous_date_published           /' Historic data '/
     prior_year_schedule 
     questioned_costs 
     report_required  
-    reportable_condition              /' Historic data '/
-    reportable_condition_major_program    /' Historic data '/
+    hist_reportable_condition              /' Historic data '/
+    hist_reportable_condition_major_program    /' Historic data '/
     sd_material_weakness, 
     sd_material_weakness_major_program
     significant_deficiency
-    significant_deficiency_major_program  /' Historic data.  22 SIGNIFICANTDEFICIENCY_MP '/
+    hist_significant_deficiency_major_program  /' Historic data.  22 SIGNIFICANTDEFICIENCY_MP '/
     special_framework
     special_framework_required 
     suppression_code  
     total_fed_expenditures 
     type_audit_code
-    type_of_entity                    /' Historic data '/
+    hist_type_of_entity                    /' Historic data '/
     type_report_financial_statements 
     type_report_major_program  
     type_report_special_purpose_framework
@@ -143,7 +143,7 @@ TABLE(Award, "FederalAward") {
   elecauditsid
   federal_agency_prefix 
   federal_program_total 
-  findings                                    /' Historic data '/
+  hist_findings                                    /' Historic data '/
   findingscount
   is_direct 
   is_guaranteed 
@@ -156,7 +156,7 @@ TABLE(Award, "FederalAward") {
   passthrough_amount
   passthrough_award
   program_name
-  questioned_costs2                             /' Historic data '/ 
+  hist_questioned_costs2                             /' Historic data '/ 
   research_and_development 
   state_cluster_name
   subrecipient_amount 
@@ -177,9 +177,9 @@ TABLE(Passthrough, "Passthrough") {
 
 
 TABLE(Finding, "Finding") {
+  + Award.award_seq_number /' To be added to GFAC '/
   + Award.report_id
   + finding_ref_number /' GFAC '/
-  Award.award_seq_number /' To be added to GFAC '/
   material_weakness
   modified_opinion
   other_findings
@@ -228,9 +228,8 @@ TABLE(Revision, "Revision") {
 General "1" -- "*" Award : covers
 General "1" -- "0,*" Auditor : may-have
 General "1" -- "0,*" Revision : may-have
-Award "1" -- "0.*" Passthrough : may-contain
+Award "1" -- "0,*" Passthrough : may-contain
 Award "1" -- "*" Finding : contains
-Finding "1" -- "*" FindingText : contains
 Finding "1" -- "*" CAPText : contains
 Award "1" -- "*" Note : contains
 FindingText “1” -- “*” Finding : applies-to
