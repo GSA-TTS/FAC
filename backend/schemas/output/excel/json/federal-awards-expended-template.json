@@ -108,8 +108,8 @@
             },
             {
                "help": {
-                  "link": "https://fac.gov/documentation/validation/#yorn",
-                  "text": "This field must be either `Y` or `N`"
+                  "link": "https://fac.gov/documentation/validation/#cluster_name",
+                  "text": "Not one of the allowed cluster names"
                },
                "range_name": "cluster_name",
                "title": "Cluster Name",

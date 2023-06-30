@@ -13,22 +13,28 @@ from collections import namedtuple as NT
 # checking for values; at least NT creation fails
 # if we don't have the right number of fields, etc.
 
-Sheet = NT('Sheet', 'name single_cells open_ranges mergeable_cells merged_unreachable header_inclusion text_ranges')
-Posn = NT('Posn', 'title title_cell range_name range_cell width')
-SingleCell = NT('SingleCell', 'posn validation formula help')
-MergeableCell = NT('MergeableCell', 'start_row end_row start_column end_column')
-MergedUnreachable = NT('MergedUnreachable', 'columns')
-HeaderInclusion = NT('HeaderInclusion', 'cells')
-Help = NT('Help', 'text link')
-OpenRange = NT('OpenRange', 'posn validation formula help')
-TextRange = NT('TextRange', 'posn validation contents')
-Enum = NT('Enum', 'description values')
-Validation = NT('Validation', 'type allow_blank operator formula1 lookup_range custom_error custom_title')
-WB = NT('WB', 'filename sheets title_row')
+Sheet = NT(
+    "Sheet",
+    "name single_cells open_ranges mergeable_cells merged_unreachable header_inclusion text_ranges",
+)
+Posn = NT("Posn", "title title_cell range_name range_cell width")
+SingleCell = NT("SingleCell", "posn validation formula help")
+MergeableCell = NT("MergeableCell", "start_row end_row start_column end_column")
+MergedUnreachable = NT("MergedUnreachable", "columns")
+HeaderInclusion = NT("HeaderInclusion", "cells")
+Help = NT("Help", "text link")
+OpenRange = NT("OpenRange", "posn validation formula help")
+TextRange = NT("TextRange", "posn validation contents")
+Enum = NT("Enum", "description values")
+Validation = NT(
+    "Validation",
+    "type allow_blank operator formula1 lookup_range custom_error custom_title",
+)
+WB = NT("WB", "filename sheets title_row")
 
 
 def parse_help(spec):
-    return Help(spec['text'], spec['link'])
+    return Help(spec["text"], spec["link"])
 
 
 def get(obj, key, default=None):
@@ -48,114 +54,119 @@ def get(obj, key, default=None):
 
 
 def parse_validation(spec):
-    return Validation(get(spec, 'type'),
-                      get(spec, 'allow_blank'),
-                      get(spec, 'operator'),
-                      get(spec, 'formula1'),
-                      get(spec, 'lookup_range'),
-                      get(spec, 'custom_error'),
-                      get(spec, 'custom_title'),)
+    return Validation(
+        get(spec, "type"),
+        get(spec, "allow_blank"),
+        get(spec, "operator"),
+        get(spec, "formula1"),
+        get(spec, "lookup_range"),
+        get(spec, "custom_error"),
+        get(spec, "custom_title"),
+    )
 
 
 def parse_single_cell(spec):
-    return SingleCell(Posn(get(spec, 'title'),
-                           get(spec, 'title_cell'),
-                           get(spec, 'range_name'),
-                           get(spec, 'range_cell'),
-                           get(spec, 'width')
-                           ),
-                      parse_validation(get(spec, 'validation')),
-                      get(spec, 'formula'),
-                      parse_help(get(spec, 'help'))
-                      )
+    return SingleCell(
+        Posn(
+            get(spec, "title"),
+            get(spec, "title_cell"),
+            get(spec, "range_name"),
+            get(spec, "range_cell"),
+            get(spec, "width"),
+        ),
+        parse_validation(get(spec, "validation")),
+        get(spec, "formula"),
+        parse_help(get(spec, "help")),
+    )
 
 
 def parse_open_range(spec):
     # print("------------------- open range")
     # print(f"len opr: {len(spec)}")
-    return OpenRange(Posn(get(spec, 'title'),
-                          get(spec, 'title_cell'),
-                          get(spec, 'range_name'),
-                          get(spec, 'range_cell'),
-                          get(spec, 'width')
-                          ),
-                     parse_validation(get(spec, 'validation')),
-                     get(spec, 'formula'),
-                     parse_help(get(spec, 'help'))
-                     )
+    return OpenRange(
+        Posn(
+            get(spec, "title"),
+            get(spec, "title_cell"),
+            get(spec, "range_name"),
+            get(spec, "range_cell"),
+            get(spec, "width"),
+        ),
+        parse_validation(get(spec, "validation")),
+        get(spec, "formula"),
+        parse_help(get(spec, "help")),
+    )
 
 
 def parse_mergeable_cell(spec):
     return MergeableCell(spec[0], spec[1], spec[2], spec[3])
 
+
 def parse_merged_unreachable(spec):
     # Should just be a list of columns
-    if spec == None:
+    if spec is None:
         return None
-    else:
-        return MergedUnreachable(spec)
+    return MergedUnreachable(spec)
+
 
 def parse_header_inclusion(spec):
     return HeaderInclusion(spec)
 
 
 def parse_text_range(spec):
-    return TextRange(Posn(get(spec, 'title'),
-                          get(spec, 'title_cell'),
-                          get(spec, 'range_name'),
-                          get(spec, 'range_cell'),
-                          get(spec, 'width')
-                          ),
-                     parse_validation(get(spec, 'validation')),
-                     Enum(get(get(spec, 'contents'), 'description'),
-                          get(get(spec, 'contents'), 'enum')
-                          ))
+    return TextRange(
+        Posn(
+            get(spec, "title"),
+            get(spec, "title_cell"),
+            get(spec, "range_name"),
+            get(spec, "range_cell"),
+            get(spec, "width"),
+        ),
+        parse_validation(get(spec, "validation")),
+        Enum(
+            get(get(spec, "contents"), "description"),
+            get(get(spec, "contents"), "enum"),
+        ),
+    )
 
 
 def parse_sheet(spec):
     sc, opr, mc, mur, hi, tr = None, None, None, None, None, None
-    name = get(spec, 'name', default="Unnamed Sheet")
-    if 'single_cells' in spec:
-        sc = list(map(parse_single_cell, get(spec, 'single_cells', default=[])))
+    name = get(spec, "name", default="Unnamed Sheet")
+    if "single_cells" in spec:
+        sc = list(map(parse_single_cell, get(spec, "single_cells", default=[])))
     else:
         sc = []
 
-    if 'open_ranges' in spec:
-        opr = list(map(parse_open_range, get(spec, 'open_ranges', default=[])))
+    if "open_ranges" in spec:
+        opr = list(map(parse_open_range, get(spec, "open_ranges", default=[])))
     else:
         opr = []
-    if 'mergeable_cells' in spec:
-        mc = list(map(parse_mergeable_cell, get(spec, 'mergeable_cells', default=[])))
+    if "mergeable_cells" in spec:
+        mc = list(map(parse_mergeable_cell, get(spec, "mergeable_cells", default=[])))
     else:
         mc = []
-    if 'merged_unreachable' in spec:
-        mur = parse_merged_unreachable(get(spec, 'merged_unreachable', default=None))
+    if "merged_unreachable" in spec:
+        mur = parse_merged_unreachable(get(spec, "merged_unreachable", default=None))
     else:
         mur = []
-    if 'header_inclusion' in spec:
-        hi = parse_header_inclusion(get(spec, 'header_inclusion'))
+    if "header_inclusion" in spec:
+        hi = parse_header_inclusion(get(spec, "header_inclusion"))
     else:
         hi = HeaderInclusion([])
-    if 'text_ranges' in spec:
-        tr = list(map(parse_text_range, get(spec, 'text_ranges', default=[])))
+    if "text_ranges" in spec:
+        tr = list(map(parse_text_range, get(spec, "text_ranges", default=[])))
     else:
         tr = []
-    return Sheet(name,
-                 sc,
-                 opr,
-                 mc,
-                 mur,
-                 hi,
-                 tr
-                 )
+    return Sheet(name, sc, opr, mc, mur, hi, tr)
 
 
 def parse_spec(spec):
-    if 'filename' in spec:
-        return WB(get(spec, 'filename'),
-                  list(map(parse_sheet, get(spec, 'sheets'))),
-                  get(spec, 'title_row')
-                  )
+    if "filename" in spec:
+        return WB(
+            get(spec, "filename"),
+            list(map(parse_sheet, get(spec, "sheets"))),
+            get(spec, "title_row"),
+        )
     else:
-        print('unhandled')
+        print("unhandled")
         print(spec)

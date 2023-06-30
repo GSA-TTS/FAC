@@ -14,7 +14,6 @@ import json
 # from json import JSONEncoder
 import _jsonnet
 
-import os
 import sys
 
 from xkcdpass import xkcd_password as xp
@@ -95,7 +94,7 @@ def generate_password():
     """
     Generates a long password that we use to lock the workbook.
     We currently assume we will never unlock the workbook, so we ultimately
-    throw this away/ignore it. 
+    throw this away/ignore it.
     """
     wordfile = xp.locate_wordfile()
     words = xp.generate_wordlist(wordfile=wordfile, min_length=7, max_length=9)
@@ -106,7 +105,7 @@ def generate_password():
 def create_protected_sheet(wb, sheet, password, ndx):
     """
     We typically have one sheet per workbook, but some have enumerated values
-    that we want to check against. Each sheet must have password protection set 
+    that we want to check against. Each sheet must have password protection set
     independently.
     """
     print("---- created_protected_sheet ----")
@@ -135,8 +134,8 @@ def merge_adjacent_columns(ws, cell_ranges):
 def process_open_ranges(wb, ws, sheet):
     """
     Open ranges are the column-wise data in the sheet. They are called "open" ranges
-    because they go from a given start point "all the way down," and therefore are 
-    open-ended. 
+    because they go from a given start point "all the way down," and therefore are
+    open-ended.
     """
     print(f"---- process_open_ranges `{sheet.name}` ----")
     for r in sheet.open_ranges:
@@ -230,15 +229,20 @@ def apply_formula(ws, data_row, sheet):
     for r in sheet.single_cells:
         if r.formula is not None:
             formula = r.formula
-            formula = formula.replace("FIRSTCELLREF", f"{r.posn.range_cell[0]}{data_row}")
-            formula = formula.replace("LASTCELLREF", f"{r.posn.range_cell[0]}{MAX_ROWS}")
-            print(f"FORMULA")
+            formula = formula.replace(
+                "FIRSTCELLREF", f"{r.posn.range_cell[0]}{data_row}"
+            )
+            formula = formula.replace(
+                "LASTCELLREF", f"{r.posn.range_cell[0]}{MAX_ROWS}"
+            )
+            print("FORMULA")
             print(f"{r.posn.range_cell} :: {formula}")
             ws[r.posn.range_cell] = formula
 
 
 ######################################################
 # SHEET LOADING
+
 
 def jsonnet_sheet_spec_to_json(filename):
     json_str = _jsonnet.evaluate_snippet(filename, open(filename).read())
