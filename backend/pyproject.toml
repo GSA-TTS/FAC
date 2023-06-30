@@ -13,10 +13,11 @@ ignore_missing_imports = true
 
 [tool.bandit]
 # TDB 2022-12-07 - test_schemas and test_validators use random number generation, which bandit doesn't like
+skips = ["B110"]
 exclude_dirs = [
     "audit/test_schemas.py",
     "audit/test_validators.py",
-    "node_modules", 
+    "node_modules",
 ]
 
 enable = [
