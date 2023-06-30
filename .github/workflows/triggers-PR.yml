@@ -36,16 +36,20 @@ jobs:
               - './backend/package.json'
 
   # Testing for all main and prod PRs
-  test-and-lint-docker-build:
+  testing-docker-build:
     needs: [check-for-changes]
     if: ${{ needs.check-for-changes.outputs.requirements == 'true' || needs.check-for-changes.outputs.dev-requirements == 'true' || needs.check-for-changes.outputs.docker == 'true' || needs.check-for-changes.outputs.package == 'true' }}
-    uses: ./.github/workflows/test-and-lint-docker-build.yml
+    uses: ./.github/workflows/testing-docker-build.yml
     secrets: inherit
 
-  test-and-lint-from-ghcr:
+  testing-from-ghcr:
     needs: [check-for-changes]
     if: ${{ needs.check-for-changes.outputs.requirements != 'true' && needs.check-for-changes.outputs.dev-requirements != 'true' && needs.check-for-changes.outputs.docker != 'true' && needs.check-for-changes.outputs.package != 'true' }}
-    uses: ./.github/workflows/test-and-lint-from-ghcr.yml
+    uses: ./.github/workflows/testing-from-ghcr.yml
+    secrets: inherit
+
+  linting:
+    uses: ./.github/workflows/linting.yml
     secrets: inherit
 
   # Update BPMN diagram

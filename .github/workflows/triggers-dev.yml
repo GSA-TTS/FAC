@@ -18,17 +18,20 @@ jobs:
       repo-name: gsa-tts/fac
       work-dir: ./backend
 
-  # testing
-  test-and-lint:
+  testing:
     needs: [build-container]
-    uses: ./.github/workflows/test-and-lint-from-ghcr.yml
+    uses: ./.github/workflows/testing-from-ghcr.yml
+    secrets: inherit
+
+  linting:
+    uses: ./.github/workflows/linting.yml
     secrets: inherit
 
   # deploy to Dev & Management spaces
   deploy-infrastructure-dev:
     name: Deploy infrastructure (dev)
     needs:
-      - test-and-lint
+      - testing
     uses: ./.github/workflows/terraform-apply-env.yml
     with:
       environment: "dev"
@@ -37,7 +40,7 @@ jobs:
   deploy-infastructure-management:
     name: Deploy infrastructure (dev)
     needs:
-      - test-and-lint
+      - testing
     uses: ./.github/workflows/terraform-apply-env.yml
     with:
       environment: "management"
