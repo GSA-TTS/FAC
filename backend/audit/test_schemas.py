@@ -945,10 +945,6 @@ class AdditionalUeisSchemaValidityTest(SimpleTestCase):
         schema = self.ADDITIONAL_UEIS_SCHEMA
 
         simple_case = jsoncopy(self.SIMPLE_CASE)
-        del simple_case["AdditionalUEIs"]["additional_ueis_entries"][0]["seq_number"]
-        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
-
-        simple_case = jsoncopy(self.SIMPLE_CASE)
         del simple_case["AdditionalUEIs"]["additional_ueis_entries"][0][
             "additional_uei"
         ]

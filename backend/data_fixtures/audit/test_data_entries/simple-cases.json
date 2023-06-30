@@ -104,8 +104,7 @@
       "auditee_uei": "AAA123456BBB",
       "additional_ueis_entries": [
         {
-          "additional_uei": "AAA123456CCC",
-          "seq_number": 1
+          "additional_uei": "AAA123456CCC"
         }
       ]
     }
