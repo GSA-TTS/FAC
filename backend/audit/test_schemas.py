@@ -1,6 +1,7 @@
 # Even though the schemas are not Django views or modules etc., we test them
 # here for CI/CD integration.
 import json
+import random
 import string
 from collections import deque
 from random import choice, randrange
@@ -599,7 +600,6 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
                 "three_digit_extension": "123",
                 "program_name": "Bob",
                 "is_major": "Y",
-                "audit_report_type": "Z",
                 "number_of_audit_findings": 0,
                 "amount_expended": 42,
             }
@@ -681,7 +681,7 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
             validate(simple_case, schema)
 
         for report_type in ["U", "D"]:
-            # major_audit_report_type of U or D requires zero number_of_audit_findings
+            # major_audit_report_type of U or D can be zero or greater
             simple_case["FederalAwards"]["federal_awards"][0]["program"][
                 "audit_report_type"
             ] = report_type
@@ -692,8 +692,8 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
 
             simple_case["FederalAwards"]["federal_awards"][0]["program"][
                 "number_of_audit_findings"
-            ] = 1
-            self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
+            ] = random.randint(1, 100)
+            validate(simple_case, schema)
 
 
 class CorrectiveActionPlanSchemaValidityTest(SimpleTestCase):
