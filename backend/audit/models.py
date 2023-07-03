@@ -517,7 +517,8 @@ class SingleAuditReportFile(models.Model):
     """
 
     file = models.FileField(
-        upload_to=single_audit_report_path, validators=[validate_single_audit_report_file]
+        upload_to=single_audit_report_path,
+        validators=[validate_single_audit_report_file],
     )
     filename = models.CharField(max_length=255)
     sac = models.ForeignKey(SingleAuditChecklist, on_delete=models.CASCADE)
