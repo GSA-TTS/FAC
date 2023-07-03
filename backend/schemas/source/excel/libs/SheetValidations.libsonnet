@@ -22,6 +22,21 @@ local YoNValidation = {
 // of the relevant named range. It uses a relative row reference,
 // so that it applies to every cell in the range.
 
+local LookupValidation = {
+  type: 'lookup',
+  formula1: '=NOT(ISERROR(MATCH(FIRSTCELLREF,LOOKUPRANGE,0)))',
+  custom_error: "Not in the lookup list",
+  custom_title: 'Lookup validation',
+};
+
+local RangeLookupValidation = {
+  type: 'range_lookup',
+  lookup_range: 'NOTAVALIDNAMEDRANGE',
+  # formula1: 'NOTAVALIDFORMULA',
+  custom_error: "Not in the lookup list",
+  custom_title: 'Lookup validation',
+};
+
 // "type" is required; everything else is optional
 local PositiveNumberValidation = {
   type: 'custom',
@@ -64,10 +79,13 @@ local ComplianceRequirementValidation = {
   custom_title: 'Compliance requirement',
 };
 
+
 {
-  NoValidation: {},
+  NoValidation: { type: 'NOVALIDATION' },
   FAPPrefixValidation: FAPPrefixValidation,
   PositiveNumberValidation: PositiveNumberValidation,
+  LookupValidation: LookupValidation,
+  RangeLookupValidation: RangeLookupValidation,
   StringOfLengthThree: StringOfLengthThree,
   StringOfLengthTwelve: StringOfLengthTwelve,
   YoNValidation: YoNValidation,

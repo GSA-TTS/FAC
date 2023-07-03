@@ -67,7 +67,9 @@
                "title": "Additional Award Identification",
                "title_cell": "C3",
                "type": "open_range",
-               "validation": { }
+               "validation": {
+                  "type": "NOVALIDATION"
+               }
             },
             {
                "help": {
@@ -78,7 +80,9 @@
                "title": "Federal Program Name",
                "title_cell": "D3",
                "type": "open_range",
-               "validation": { },
+               "validation": {
+                  "type": "NOVALIDATION"
+               },
                "width": 48
             },
             {
@@ -249,7 +253,9 @@
                "title": "If Repeat Finding, provide Prior Year Audit Finding Reference Number(s)",
                "title_cell": "N3",
                "type": "open_range",
-               "validation": { },
+               "validation": {
+                  "type": "NOVALIDATION"
+               },
                "width": 24
             },
             {
