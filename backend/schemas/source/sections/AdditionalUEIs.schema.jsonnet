@@ -5,10 +5,9 @@ local Types = Base.Types;
 local AdditionalUeiEntry = {
   additionalProperties: false,
   properties: {
-    seq_number: Types.integer,
     additional_uei: Base.Compound.UniqueEntityIdentifier,
   },
-  required: ['seq_number', 'additional_uei'],
+  required: ['additional_uei'],
   title: 'AdditionalUeiEntry',
 };
 

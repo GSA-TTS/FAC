@@ -5,16 +5,33 @@ on:
       - main
 
 jobs:
-  # testing
-  test-and-lint:
-    uses: ./.github/workflows/test.yml
+  # ensure that every time a push to main occurs, the container is built and published to ghcr
+  build-container:
+    uses: ./.github/workflows/build-docker-container.yml
+    secrets: inherit
+    permissions:
+      contents: read
+      packages: write
+    with:
+      docker-name: fac
+      image-name: web-container
+      repo-name: gsa-tts/fac
+      work-dir: ./backend
+
+  testing:
+    needs: [build-container]
+    uses: ./.github/workflows/testing-from-ghcr.yml
+    secrets: inherit
+
+  linting:
+    uses: ./.github/workflows/linting.yml
     secrets: inherit
 
   # deploy to Dev & Management spaces
   deploy-infrastructure-dev:
     name: Deploy infrastructure (dev)
     needs:
-      - test-and-lint
+      - testing
     uses: ./.github/workflows/terraform-apply-env.yml
     with:
       environment: "dev"
@@ -23,7 +40,7 @@ jobs:
   deploy-infastructure-management:
     name: Deploy infrastructure (dev)
     needs:
-      - test-and-lint
+      - testing
     uses: ./.github/workflows/terraform-apply-env.yml
     with:
       environment: "management"

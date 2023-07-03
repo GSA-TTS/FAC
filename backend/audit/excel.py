@@ -470,23 +470,12 @@ def extract_additional_ueis(file):
         XLSX_TEMPLATE_DEFINITION_DIR / ADDITIONAL_UEIS_TEMPLATE_DEFINITION
     )
     template = json.loads(template_definition_path.read_text(encoding="utf-8"))
-    data = _extract_data(
+    return _extract_data(
         file,
         additional_ueis_field_mapping,
         additional_ueis_column_mapping,
         template["title_row"],
     )
-    return _add_seq_number_to_additional_uei_entries(data)
-
-
-def _add_seq_number_to_additional_uei_entries(json_obj):
-    if "AdditionalUEIs" in json_obj:
-        additional_ueis = json_obj["AdditionalUEIs"]
-        if "additional_ueis_entries" in additional_ueis:
-            entries = additional_ueis["additional_ueis_entries"]
-            for i, entry in enumerate(entries, start=1):
-                entry["seq_number"] = i
-    return json_obj
 
 
 def _extract_from_column_mapping(path, row_index, column_mapping, match=None):

@@ -1,4 +1,8 @@
-{% extends "base.html" %} {% load static %} {% block content %}
+{% extends "base.html" %}
+{% load static %}
+{% load sprite_helper %}
+
+{% block content %}
 <!-- 
 Submission progress/audit checklist/audit landing page.
 TODO: Include the "Completed at X by Y", after timestamps are included in the data model. 
@@ -55,7 +59,7 @@ TODO: Include the "Completed at X by Y", after timestamps are included in the da
 							aria-hidden="true"
 							focusable="false"
 							role="img">
-						<use xlink:href="/static/img/sprite.svg#person_add"></use>
+                        {% uswds_sprite "person_add" %}
 					</svg>
 					<span class="padding-top-05">Manage report access</span>
 				</button>
@@ -66,7 +70,7 @@ TODO: Include the "Completed at X by Y", after timestamps are included in the da
 			<li class="usa-icon-list__item padding-bottom-2">
 				<div class="usa-icon-list__icon text-green">
 					<svg class="usa-icon margin-right-2" aria-hidden="true" role="img">
-						<use xlink:href="/static/img/sprite.svg#check_circle"></use>
+                        {% uswds_sprite "check_circle" %}
 					</svg>
 				</div>
 				<div class="usa-icon-list__content {% if single_audit_checklist.created is True %}text-green{% endif %}">
@@ -96,13 +100,13 @@ TODO: Include the "Completed at X by Y", after timestamps are included in the da
 				{% if federal_awards_workbook.completed == True %}
 					<div class="usa-icon-list__icon text-green">
 						<svg class="usa-icon margin-right-2" aria-hidden="true" role="img">
-							<use xlink:href="/static/img/sprite.svg#check_circle"></use>
+                            {% uswds_sprite "check_circle" %}
 						</svg>
 					</div>
 				{% else %}
 					<div class="usa-icon-list__icon text-base">
 						<svg class="usa-icon margin-right-2" aria-hidden="true" role="img">
-							<use xlink:href="/static/img/sprite.svg#radio_button_unchecked"></use>
+                            {% uswds_sprite "radio_button_unchecked" %}
 						</svg>
 					</div>
 				{% endif %}
@@ -118,7 +122,7 @@ TODO: Include the "Completed at X by Y", after timestamps are included in the da
 			<li class="usa-icon-list__item padding-bottom-2">
 				<div class="usa-icon-list__icon text-base">
 					<svg class="usa-icon margin-right-2" aria-hidden="true" role="img">
-						<use xlink:href="/static/img/sprite.svg#radio_button_unchecked"></use>
+                        {% uswds_sprite "radio_button_unchecked" %}
 					</svg>
 				</div>
 				<div class="usa-icon-list__content {% if single_audit_checklist.completed is True %} text-green {% else %} text-base-dark {% endif %}">
@@ -131,9 +135,9 @@ TODO: Include the "Completed at X by Y", after timestamps are included in the da
 				<div class="usa-icon-list__icon {% if audit_findings_workbook.completed == True %}text-green{% else %}text-base{% endif %}">
 					<svg class="usa-icon margin-right-2" aria-hidden="true" role="img">
 						{% if audit_findings_workbook.completed == True %}
-							<use xlink:href="/static/img/sprite.svg#check_circle"></use>
+                            {% uswds_sprite "check_circle" %}
 						{% else %}
-							<use xlink:href="/static/img/sprite.svg#radio_button_unchecked"></use>
+                            {% uswds_sprite "radio_button_unchecked" %}
 						{% endif %}
 					</svg>
 				</div>
@@ -148,9 +152,9 @@ TODO: Include the "Completed at X by Y", after timestamps are included in the da
 				<div class="usa-icon-list__icon {% if findings_text_workbook.completed == True %}text-green{% else %}text-base{% endif %}">
 					<svg class="usa-icon margin-right-2" aria-hidden="true" role="img">
 						{% if findings_text_workbook.completed == True %}
-							<use xlink:href="/static/img/sprite.svg#check_circle"></use>
+                            {% uswds_sprite "check_circle" %}
 						{% else %}
-							<use xlink:href="/static/img/sprite.svg#radio_button_unchecked"></use>
+                            {% uswds_sprite "radio_button_unchecked" %}
 						{% endif %}
 					</svg>
 				</div>
@@ -165,9 +169,9 @@ TODO: Include the "Completed at X by Y", after timestamps are included in the da
 				<div class="usa-icon-list__icon {% if CAP_workbook.completed == True %}text-green{% else %}text-base{% endif %}">
 					<svg class="usa-icon margin-right-2" aria-hidden="true" role="img">
 						{% if CAP_workbook.completed == True %}
-							<use xlink:href="/static/img/sprite.svg#check_circle"></use>
+                            {% uswds_sprite "check_circle" %}
 						{% else %}
-							<use xlink:href="/static/img/sprite.svg#radio_button_unchecked"></use>
+                            {% uswds_sprite "radio_button_unchecked" %}
 						{% endif %}
 					</svg>
 				</div>
@@ -182,9 +186,9 @@ TODO: Include the "Completed at X by Y", after timestamps are included in the da
 				<div class="usa-icon-list__icon {% if additional_UEIs_workbook.completed == True %}text-green{% else %}text-base{% endif %}">
 					<svg class="usa-icon margin-right-2" aria-hidden="true" role="img">
 						{% if additional_UEIs_workbook.completed == True %}
-							<use xlink:href="/static/img/sprite.svg#check_circle"></use>
+                            {% uswds_sprite "check_circle" %}
 						{% else %}
-							<use xlink:href="/static/img/sprite.svg#radio_button_unchecked"></use>
+                            {% uswds_sprite "radio_button_unchecked" %}
 						{% endif %}
 					</svg>
 				</div>
@@ -199,9 +203,9 @@ TODO: Include the "Completed at X by Y", after timestamps are included in the da
 				<div class="usa-icon-list__icon {% if secondary_auditors_workbook.completed == True %}text-green{% else %}text-base{% endif %}">
 					<svg class="usa-icon margin-right-2" aria-hidden="true" role="img">
 						{% if secondary_auditors_workbook.completed == True %}
-							<use xlink:href="/static/img/sprite.svg#check_circle"></use>
+                            {% uswds_sprite "check_circle" %}
 						{% else %}
-							<use xlink:href="/static/img/sprite.svg#radio_button_unchecked"></use>
+                            {% uswds_sprite "radio_button_unchecked" %}
 						{% endif %}
 					</svg>
 				</div>
@@ -224,9 +228,9 @@ TODO: Include the "Completed at X by Y", after timestamps are included in the da
 				<div class="usa-icon-list__icon {% if audit_report.completed == True %} text-green {% else %} text-base {% endif %}">
 					<svg class="usa-icon margin-right-2" aria-hidden="true" role="img">
 						{% if audit_report.completed == True %}
-							<use xlink:href="/static/img/sprite.svg#check_circle"></use>
+                            {% uswds_sprite "check_circle" %}
 						{% else %}
-							<use xlink:href="/static/img/sprite.svg#radio_button_unchecked"></use>
+                            {% uswds_sprite "radio_button_unchecked" %}
 						{% endif %}
 					</svg>
 				</div>
@@ -242,9 +246,9 @@ TODO: Include the "Completed at X by Y", after timestamps are included in the da
 				<div class="usa-icon-list__icon {% if certification.auditor_certified == True %} text-green {% else %} text-base {% endif %}">
 					<svg class="usa-icon margin-right-2" aria-hidden="true" role="img">
 						{% if certification.auditor_certified == True %}
-							<use xlink:href="/static/img/sprite.svg#check_circle"></use>
+                            {% uswds_sprite "check_circle" %}
 						{% else %}
-							<use xlink:href="/static/img/sprite.svg#radio_button_unchecked"></use>
+                            {% uswds_sprite "radio_button_unchecked" %}
 						{% endif %}
 					</svg>
 				</div>
@@ -254,7 +258,7 @@ TODO: Include the "Completed at X by Y", after timestamps are included in the da
 							href="{% url 'audit:AuditorCertification' report_id=report_id %}">Auditor Certification</a>
 					{% else %}
 						<svg class="usa-icon margin-right-05" aria-hidden="true" role="img">
-							<use xlink:href="/static/img/sprite.svg#lock_outline"></use>
+                            {% uswds_sprite "lock_outline" %}
 						</svg>
 						<span class="text-base">Auditor Certification</span>
 					{% endif %}
@@ -268,9 +272,9 @@ TODO: Include the "Completed at X by Y", after timestamps are included in the da
 				<div class="usa-icon-list__icon {% if certification.auditee_certified == True %} text-green {% else %} text-base {% endif %}">
 					<svg class="usa-icon margin-right-2" aria-hidden="true" role="img">
 						{% if certification.auditee_certified == True %}
-							<use xlink:href="/static/img/sprite.svg#check_circle"></use>
+                            {% uswds_sprite "check_circle" %}
 						{% else %}
-							<use xlink:href="/static/img/sprite.svg#radio_button_unchecked"></use>
+                            {% uswds_sprite "radio_button_unchecked" %}
 						{% endif %}
 					</svg>
 				</div>
@@ -280,7 +284,7 @@ TODO: Include the "Completed at X by Y", after timestamps are included in the da
 							href="{% url 'audit:AuditeeCertification' report_id=report_id %}">Auditee Certification</a>
 					{% else %}
 						<svg class="usa-icon margin-right-05" aria-hidden="true" role="img">
-							<use xlink:href="/static/img/sprite.svg#lock_outline"></use>
+                            {% uswds_sprite "lock_outline" %}
 						</svg>
 						<span class="text-base">Auditee Certification</span>
 					{% endif %}
@@ -294,9 +298,9 @@ TODO: Include the "Completed at X by Y", after timestamps are included in the da
 				<div class="usa-icon-list__icon {% if submission.completed == True %}text-green{% else %}text-base{% endif %}">
 					<svg class="usa-icon margin-right-2" aria-hidden="true" role="img">
 						{% if submission.completed == True %}
-							<use xlink:href="/static/img/sprite.svg#check_circle"></use>
+                            {% uswds_sprite "check_circle" %}
 						{% else %}
-							<use xlink:href="/static/img/sprite.svg#radio_button_unchecked"></use>
+                            {% uswds_sprite "radio_button_unchecked" %}
 						{% endif %}
 					</svg>
 				</div>
@@ -306,7 +310,7 @@ TODO: Include the "Completed at X by Y", after timestamps are included in the da
 							href="{% url 'audit:Submission' report_id=report_id %}">Submit to FAC for processing</a>
 					{% else %}
 						<svg class="usa-icon margin-right-05" aria-hidden="true" role="img">
-							<use xlink:href="/static/img/sprite.svg#lock_outline"></use>
+                            {% uswds_sprite "lock_outline" %}
 						</svg>
 						<span class="text-base">Submit to FAC for processing</span>
 					{% endif %}
