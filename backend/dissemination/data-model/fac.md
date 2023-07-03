@@ -57,7 +57,8 @@ TABLE(General, "General") {
     oversight_agency
 
     initial_date_received 
-    fac_accepted_date ? ready for certification
+    /' SK - from data key file - fac_accepted_date - The most recent date an audit report was submitted to the FAC that passed FAC screening and was accepted as a valid OMB Circular A-133 report submission. '/
+    fac_accepted_date ? ready for certification    
     auditee_certified_date
     auditor_certified_date 
     date_published
@@ -76,23 +77,34 @@ TABLE(General, "General") {
 
     ' JM: Need to understand the following
     ' JM: What about 3d in Part III - ageny reference
-    date_received ?
-    condition_or_deficiency_major_program 
-    current_or_former_findings        /'22 CYFINDINGS '/
-    ein_subcode ?
-    entity_type
-    form_date_received 
-    material_weakness_major_program
+    date_received /' SK - from Census meeting - Date when recent submission was received.  This is >= initialdate '/
+    form_date_received /' SK - from Data key file - The most Recent Date the Form SF-SAC was received by the FAC. This field was not populated before 2001.'/
+    /' SK Note:  date_received and form_date_received appear to be the same.  Which one do we keep? '/
+
+    condition_or_deficiency_major_program /' SK - from Data key file - Indicate whether any reportable condition/signficant deficiency was disclosed as a material weakness for a major program in the Schedule of Findings and Questioned Costs '/
+
+    is_current_or_former_findings        /'22 CYFINDINGS '/ /' SK - This is a boolean field '/
+    hist_ein_subcode /' SK - EINSUBCODE is no longer in use.  Added hist_ '/
+    entity_type /' SK - from Data key file - Self reported type of entity '/
+    
+    
     number_months
     prior_year_schedule 
     questioned_costs 
     report_required  
-    sd_material_weakness, 
-    sd_material_weakness_major_program
-    suppression_code  
-    total_fed_expenditures 
-    type_audit_code     
-    type_report_major_program  
+
+    is_material_weakness_major_program /' SK - Not used since 2013.  Is this hist_ ?'/
+    is_sd_material_weakness /' SK - from 1146 spreadsheet - Whether or not the audit disclosed any reportable condition/significant deficiency as a material weakness on financial statements. Its a Y/N field. It gets disseminated in the GEN file as MATERIALWEAKNESS'/
+    /' SK Note:  If is_sd_material_weakness is the same as is_material_weakness, do we need is_sd_material_weakness? '/
+
+    sd_material_weakness_major_program /' SK - Present in ELECAUDITHEADER.  Is this different from is_material_weakness_major_program ? '/
+
+    suppression_code  /' SK - from 1146 Questions sheet - This would indicate if the pdf audit would be displayed in the public site.  IT would mean indian tribe opting to not make the audit publicly available.  NULL would mean its pdf is on dispay on the public facing site. '/
+
+    total_fed_expenditures /' SK - from 1146 Questions sheet - It is the summation of all expenditures listed on the federal awards workbook. It is not entered by the user, the workbook calculates total expenditure and it is stored here. '/
+
+    type_audit_code   /' SK - from 1146 Questions sheet - Would indicate if the audit is A133 or UG. '/  
+    type_report_major_program  /' SK - from Data key file - Type of Report Issued on the Major Program Compliance '/
     
     cfac_report_id
     cfac_version ??needed?
@@ -163,13 +175,18 @@ TABLE(Award, "FederalAward") {
   findings_count 
   
   ' --need more clarity on these fields
-  ' is_guaranteed 
-  ' is_passed 
-  ' passthrough_amount
-  ' passthrough_award
-  ' program_name
-  ' subrecipient_amount 
-  ' type_requirement
+  ' is_guaranteed /' SK - is_loan and is_gurantee seem to be replacements for the original loans' field. '/
+  /'From Data key file and ELECAUDITS - loans - Indicate whether or not the program is a Loan or Loan Guarantee (only available for audit years 2013 and beyond)'/
+
+  ' is_passed /' SK - This is the same as is_passthrough_award.  Which field do we keep ? '/
+  ' subrecipient_amount /' SK - This is the same as passthrough_amount.  Which field do we keep ? '/
+  ' passthrough_amount /' SK - from Data key file - Amount passed through to subrecipients '/
+  ' is_passthrough_award /' SK - from Data key file - Indicates whether or not funds were passed through to any subrecipients for the Federal program'/
+
+
+  ' program_name /' SK - This might be CFDAPROGRAMNAME, which is different from federal_program_name. '/
+  ' type_requirement /' SK - from 1146 Questions sheet - Its collected on form III.4.f... '/
+
 
   ' not needed for now
   ' hist_research_and_development 
