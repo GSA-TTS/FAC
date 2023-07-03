@@ -27,7 +27,7 @@ local open_ranges_defns = [
     SV.StringOfLengthTwelve,
     'Additional UEIs',
     'additional_uei',
-  ]
+  ],
 ];
 
 local sheets = [
