@@ -88,10 +88,10 @@ TABLE(General, "General") {
     entity_type /' SK - from Data key file - Self reported type of entity '/
     
     
-    number_months
-    prior_year_schedule 
-    questioned_costs 
-    report_required  
+    number_months /' SK - from Data key file - Number of Months Covered by the 'Other' Audit Period'/
+    is_prior_year_schedule /' SK -  from Data key file -Indicate whether or not current year findings or prior year findings affecting direct funds were reported. This is a boolean field.  Added is_ '/
+    hist_questioned_costs /' SK -  from Data key file - Not used since 2013.  Added hist_ '/
+    hist_report_required  /' SK -  from Data key file - Not used since 2008.  Added hist_ '/
 
     is_material_weakness_major_program /' SK - Not used since 2013.  Is this hist_ ?'/
     is_sd_material_weakness /' SK - from 1146 spreadsheet - Whether or not the audit disclosed any reportable condition/significant deficiency as a material weakness on financial statements. Its a Y/N field. It gets disseminated in the GEN file as MATERIALWEAKNESS'/
@@ -184,7 +184,7 @@ TABLE(Award, "FederalAward") {
   ' is_passthrough_award /' SK - from Data key file - Indicates whether or not funds were passed through to any subrecipients for the Federal program'/
 
 
-  ' program_name /' SK - This might be CFDAPROGRAMNAME, which is different from federal_program_name. '/
+  ' program_name /' SK - This might be CFDAPROGRAMNAME, which is different from federal_program_name. Maybe rename to hist_cfda_program_name?  Seems to be part of internal table based on 1146 - Questions sheet.  '/
   ' type_requirement /' SK - from 1146 Questions sheet - Its collected on form III.4.f... '/
 
 
