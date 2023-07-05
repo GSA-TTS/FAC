@@ -58,7 +58,7 @@ TABLE(General, "General") {
 
     initial_date_received 
     /' SK - from data key file - fac_accepted_date - The most recent date an audit report was submitted to the FAC that passed FAC screening and was accepted as a valid OMB Circular A-133 report submission. '/
-    fac_accepted_date ? ready for certification    
+    fac_accepted_date /' JM: ?ready for certification. How is this different from initial_date_received? '/    
     auditee_certified_date
     auditor_certified_date 
     date_published
@@ -74,6 +74,7 @@ TABLE(General, "General") {
     is_duplicate_reports
     dollar_threshold
     is_low_risk 
+    prior_finding_agency_list
 
     ' JM: Need to understand the following
     ' JM: What about 3d in Part III - ageny reference
@@ -84,14 +85,15 @@ TABLE(General, "General") {
     condition_or_deficiency_major_program /' SK - from Data key file - Indicate whether any reportable condition/signficant deficiency was disclosed as a material weakness for a major program in the Schedule of Findings and Questioned Costs '/
 
     is_current_or_former_findings        /'22 CYFINDINGS '/ /' SK - This is a boolean field '/
-    hist_ein_subcode /' SK - EINSUBCODE is no longer in use.  Added hist_ '/
+    ' hist_ein_subcode /' SK - EINSUBCODE is no longer in use.  Added hist_ '/
     entity_type /' SK - from Data key file - Self reported type of entity '/
     
     
     number_months /' SK - from Data key file - Number of Months Covered by the 'Other' Audit Period'/
-    is_prior_year_schedule /' SK -  from Data key file -Indicate whether or not current year findings or prior year findings affecting direct funds were reported. This is a boolean field.  Added is_ '/
-    hist_questioned_costs /' SK -  from Data key file - Not used since 2013.  Added hist_ '/
-    hist_report_required  /' SK -  from Data key file - Not used since 2008.  Added hist_ '/
+    is_prior_year_schedule /' SK -  from Data key file -Indicate whether or not current year findings or prior year findings affecting direct funds were reported. This is a boolean field.  Added is_ . 
+    JM: the column name does not sound right - what is a schedule?'/
+    ' hist_questioned_costs /' SK -  from Data key file - Not used since 2013.  Added hist_ '/
+    ' hist_report_required  /' SK -  from Data key file - Not used since 2008.  Added hist_ '/
 
     is_material_weakness_major_program /' SK - Not used since 2013.  Is this hist_ ?'/
     is_sd_material_weakness /' SK - from 1146 spreadsheet - Whether or not the audit disclosed any reportable condition/significant deficiency as a material weakness on financial statements. Its a Y/N field. It gets disseminated in the GEN file as MATERIALWEAKNESS'/
@@ -108,7 +110,7 @@ TABLE(General, "General") {
     
     cfac_report_id
     cfac_version ??needed?
-    ' JM: Do we need CFAC DN_KEY?
+    ' JM: Do we need CFAC DB_KEY?
 
     ' hist_auditee_address_line_2            /' STREET2 Historic data '/
     ' hist_auditee_fax                       /' Historic data '/
@@ -208,7 +210,8 @@ TABLE(Passthrough, "Passthrough") {
 TABLE(Finding, "Finding") {
   + Award.award_seq_number /' To be added to GFAC '/
   + Award.report_id
-  + finding_ref_number /' GFAC '/
+  + finding_seq_number
+  finding_ref_number 
   material_weakness
   modified_opinion
   other_findings
