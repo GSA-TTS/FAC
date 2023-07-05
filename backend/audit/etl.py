@@ -213,6 +213,8 @@ class ETL(object):
         passthrough.save()
 
     def load_general(self):
+        # TODO: Use the mixin to access general_information fields once that code
+        #       is merged.
         general_information = self.single_audit_checklist.general_information
         general = General(
             report_id=self.report_id,
