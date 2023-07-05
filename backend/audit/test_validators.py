@@ -28,6 +28,7 @@ from .validators import (
     validate_file_size,
     validate_federal_award_json,
     validate_file_infection,
+    validate_pdf_file_integrity,
     validate_uei,
     validate_uei_alphanumeric,
     validate_uei_valid_chars,
@@ -663,5 +664,24 @@ class CorrectiveActionPlanValidatorTests(SimpleTestCase):
         )
 
 
-class SingleAuditReportFile(SimpleTestCase):
-    pass
+class PdfFileIntegrityValidatorTests(SimpleTestCase):
+    def test_broken_pdf_file(self):
+        """PDF files that are not readable by pdfminer are invalid"""
+        file = TemporaryUploadedFile(
+            "file.pdf", b"this is not really a pdf file", 10000, "utf-8"
+        )
+
+        self.assertRaises(ValidationError, validate_pdf_file_integrity, file)
+
+    def test_locked_pdf_file(self):
+        """PDF files that are locked / require a password are invalid"""
+        with open("audit/fixtures/locked.pdf", "rb") as file:
+            self.assertRaises(ValidationError, validate_pdf_file_integrity, file)
+
+    def test_scanned_pdf_file(self):
+        with open("audit/fixtures/scanned.pdf", "rb") as file:
+            self.assertRaises(ValidationError, validate_pdf_file_integrity, file)
+
+    def test_valid_pdf_file(self):
+        with open("audit/fixtures/basic.pdf", "rb") as file:
+            validate_pdf_file_integrity(file)
