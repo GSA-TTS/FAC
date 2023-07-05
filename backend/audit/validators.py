@@ -8,7 +8,7 @@ from django.utils.translation import gettext_lazy as _
 from django.conf import settings
 import requests
 from openpyxl import load_workbook
-from pdfminer.high_level import extract_text
+from pypdf import PdfReader
 
 from audit.excel import (
     corrective_action_plan_named_ranges,
@@ -367,13 +367,22 @@ def validate_single_audit_report_file_extension(file):
 
 
 def validate_pdf_file_integrity(file):
-    """Files must be readable by pdfminer"""
+    """Files must be readable PDFs"""
     try:
-        t = extract_text(file)
+        reader = PdfReader(file)
 
-        # PDF files with no readable text contain a single form feed character
-        if len(t) == 0 or t == "\x0c":
-            raise ValidationError("The file you uploaded contains no readable text")
+        if reader.is_encrypted:
+            raise ValidationError(
+                "We were unable to process the file you uploaded because it is encrypted."
+            )
+
+        all_text = "".join([p.extract_text() for p in reader.pages])
+
+        if len(all_text) == 0:
+            raise ValidationError(
+                "We were unable to process the file you uploaded because it contains no readable text."
+            )
+
     except ValidationError:
         raise
     except Exception:

@@ -175,6 +175,8 @@ class SingleAuditReportFileHandlerView(
             sar_file.full_clean()
             sar_file.save()
 
+            return redirect("/")
+
         except MultiValueDictKeyError:
             logger.warn("No file found in request")
             raise BadRequest()

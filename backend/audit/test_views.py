@@ -726,3 +726,20 @@ class SingleAuditReportFileHandlerViewTests(TestCase):
         )
 
         self.assertEqual(response.status_code, 400)
+
+    @patch("audit.validators._scan_file")
+    def test_valid_file_upload(self, mock_scan_file):
+        sac = _mock_login_and_scan(self.client, mock_scan_file)
+
+        with open("audit/fixtures/basic.pdf", "rb") as pdf_file:
+            response = self.client.post(
+                reverse(
+                    "audit:SingleAuditReport",
+                    kwargs={
+                        "report_id": sac.report_id,
+                    },
+                ),
+                data={"FILES": pdf_file},
+            )
+
+            self.assertEqual(response.status_code, 302)

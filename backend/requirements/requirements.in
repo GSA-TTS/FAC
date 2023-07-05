@@ -18,11 +18,11 @@ newrelic
 oic
 openpyxl
 pandas
-pdfminer.six
 psycopg2-binary
 pycryptodome
 pydash
 pyjwt
+pypdf
 python-json-logger
 python-slugify
 pyyaml
