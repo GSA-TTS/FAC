@@ -585,18 +585,29 @@ class General(models.Model):
         null=True,
         help_text=docs.multiple_ueis,
     )
-    auditeee_addl_uei_list = ArrayField(
-        models.CharField("", null=True, help_test=docs.uei_general)
+    auditee_addl_uei_list = ArrayField(
+        models.CharField(
+            "", 
+            null=True, 
+            help_text=docs.uei_general
+        ),
+        default=list
     )
-    auditeee_addl_ein_list = ArrayField(
+    auditee_addl_ein_list = ArrayField(
         models.IntegerField(
             "Primary Employer Identification Number, in the order that they were listed.",
             null=True,
             help_text=docs.ein_list,
-        )
+        ),
+        default=list
     )
-    auditeee_addl_duns_list = ArrayField(
-        models.CharField("", null=True, help_text=docs.duns_list)
+    auditee_addl_duns_list = ArrayField(
+        models.CharField(
+            "", 
+            null=True, 
+            help_text=docs.duns_list
+        ),
+        default=list
     )
     ein_subcode = models.IntegerField(
         "Subcode assigned to the EIN.", null=True, help_text=docs.ein_subcode
@@ -778,6 +789,11 @@ class General(models.Model):
         null=True,
         help_text=docs.significant_deficiency_general,
     )
+    is_material_weakness = models.BooleanField(
+        "",
+        null=True,
+        help_text=docs.material_weakness_general
+    )
     condition_or_deficiency_major_program = models.BooleanField(
         "Whether or not the audit disclosed a reportable condition/significant deficiency for any major program in the Schedule of Findings and Questioned Costs",
         null=True,
@@ -899,7 +915,8 @@ class General(models.Model):
         null=True
     )
     type_audit_code = models.CharField(
-        "Determines if audit is A133 or UG"
+        "Determines if audit is A133 or UG",
+        default=""
     )
     cfac_report_id = models.CharField(
         "Used by CFAC to uniquely identify a submission",

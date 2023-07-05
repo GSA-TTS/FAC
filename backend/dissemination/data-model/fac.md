@@ -18,9 +18,9 @@ TABLE(General, "General") {
     audit_year                   /'22 AUDITYEAR '/
     auditee_ein
     auditee_duns
-    auditeee_addl_uei_list
-    auditeee_addl_ein_list
-    auditeee_addl_duns_list
+    auditee_addl_uei_list
+    auditee_addl_ein_list
+    auditee_addl_duns_list
     auditor_ein
 
     pdf_url                           /' GFAC '/
@@ -71,7 +71,7 @@ TABLE(General, "General") {
     is_significant_deficiency
     is_material_weakness 
     is_material_noncompliance 
-    id_duplicate_reports
+    is_duplicate_reports
     dollar_threshold
     is_low_risk 
 
