@@ -2,8 +2,11 @@ import sys
 import os
 import csv
 import re
+import codecs
 
 # flake8: noqa
+# https://stackoverflow.com/questions/12468179/unicodedecodeerror-utf8-codec-cant-decode-byte-0x9c
+# Def
 
 if __name__ == "__main__":
     if len(sys.argv) != 3:
@@ -25,7 +28,8 @@ if __name__ == "__main__":
     bonus_headers = 0
 
     # FIXME: May have unicode issues...
-    with open(infile, newline="", encoding="utf-8") as inp:
+    # 20230705 MCJ - These come in as CP-1252. 
+    with open(infile, newline="", encoding="cp1252") as inp:
         with open(os.path.join(cleaned_dir, outfile), mode="w") as outp:
             writer = csv.writer(outp)
             # Skip the headers...
