@@ -52,11 +52,25 @@ class SingleAuditChecklistManager(models.Manager):
         return super().create(**updated)
 
 
-def general_information_mixin_generator():
+def camel_to_snake(raw: str) -> str:
+    """Convert camel case to snake_case."""
+    text = f"{raw[0].lower()}{raw[1:]}"
+    return "".join(c if c.islower() else f"_{c.lower()}" for c in text)
+
+
+def json_property_mixin_generator(name, fname=None, toplevel=None, classname=None):
+    """Generates a mixin class named classname, using the top-level fields
+    in the properties field in the file named fname, accessing those fields
+    in the JSON field named toplevel.
+    If the optional arguments aren't provided, generate them from name."""
+    filename = fname or f"{name}.schema.json"
+    toplevelproperty = toplevel or camel_to_snake(name)
+    mixinname = classname or f"{name}Mixin"
+
     def _wrapper(key):
         def inner(self):
             try:
-                return self.general_information[key]
+                return getattr(self, toplevelproperty)[key]
             except KeyError:
                 pass
             except TypeError:
@@ -66,17 +80,16 @@ def general_information_mixin_generator():
         return inner
 
     schemadir = settings.BASE_DIR / "schemas" / "output" / "sections"
-    schemafile = schemadir / "GeneralInformation.schema.json"
+    schemafile = schemadir / filename
     schema = json.loads(schemafile.read_text())
     attrdict = {k: property(_wrapper(k)) for k in schema["properties"]}
-    return type("GeneralInformationMixin", (), attrdict)
+    return type(mixinname, (), attrdict)
 
 
-GeneralInformationMixin = general_information_mixin_generator()
+GeneralInformationMixin = json_property_mixin_generator("GeneralInformation")
 
 
-# pylint: disable=too-many-public-methods
-class SingleAuditChecklist(models.Model, GeneralInformationMixin):
+class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: ignore
     """
     Monolithic Single Audit Checklist.
     """
@@ -307,138 +320,6 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):
             SingleAuditChecklist.STATUS.CERTIFIED,
             SingleAuditChecklist.STATUS.SUBMITTED,
         ]
-
-    # @property
-    # def is_submitted(self):
-    #     return self.submission_status in [SingleAuditChecklist.STATUS.SUBMITTED]
-    #
-    # @property
-    # def audit_period_covered(self):
-    #     return self._general_info_get("audit_period_covered")
-    #
-    # @property
-    # def auditee_uei(self):
-    #     return self._general_info_get("auditee_uei")
-    #
-    # @property
-    # def auditee_fiscal_period_end(self):
-    #     return self._general_info_get("auditee_fiscal_period_end")
-    #
-    # @property
-    # def auditee_fiscal_period_start(self):
-    #     return self._general_info_get("auditee_fiscal_period_start")
-    #
-    # @property
-    # def auditee_name(self):
-    #     return self._general_info_get("auditee_name")
-    #
-    # @property
-    # def auditee_email(self):
-    #     return self._general_info_get("auditee_email")
-    #
-    # @property
-    # def auditor_email(self):
-    #     return self._general_info_get("auditor_email")
-    #
-    # @property
-    # def auditee_phone(self):
-    #     return self._general_info_get("auditee_phone")
-    #
-    # @property
-    # def is_usa_based(self):
-    #     return self._general_info_get("is_usa_based")
-    #
-    # @property
-    # def met_spending_threshold(self):
-    #     return self._general_info_get("met_spending_threshold")
-    #
-    # @property
-    # def user_provided_organization_type(self):
-    #     return self._general_info_get("user_provided_organization_type")
-    #
-    # @property
-    # def ein(self):
-    #     return self._general_info_get("ein")
-    #
-    # @property
-    # def ein_not_an_ssn_attestation(self):
-    #     return self._general_info_get("ein_not_an_ssn_attestation")
-    #
-    # @property
-    # def multiple_eins_covered(self):
-    #     return self._general_info_get("multiple_eins_covered")
-    #
-    # @property
-    # def multiple_ueis_covered(self):
-    #     return self._general_info_get("multiple_ueis_covered")
-    #
-    # @property
-    # def auditee_address_line_1(self):
-    #     return self._general_info_get("auditee_address_line_1")
-    #
-    # @property
-    # def auditee_city(self):
-    #     return self._general_info_get("auditee_city")
-    #
-    # @property
-    # def auditee_state(self):
-    #     return self._general_info_get("auditee_state")
-    #
-    # @property
-    # def auditee_zip(self):
-    #     return self._general_info_get("auditee_zip")
-    #
-    # @property
-    # def auditee_contact_name(self):
-    #     return self._general_info_get("auditee_contact_name")
-    #
-    # @property
-    # def auditee_contact_title(self):
-    #     return self._general_info_get("auditee_contact_title")
-    #
-    # @property
-    # def auditor_firm_name(self):
-    #     return self._general_info_get("auditor_firm_name")
-    #
-    # @property
-    # def auditor_ein(self):
-    #     return self._general_info_get("auditor_ein")
-    #
-    # @property
-    # def auditor_ein_not_an_ssn_attestation(self):
-    #     return self._general_info_get("auditor_ein_not_an_ssn_attestation")
-    #
-    # @property
-    # def auditor_country(self):
-    #     return self._general_info_get("auditor_country")
-    #
-    # @property
-    # def auditor_address_line_1(self):
-    #     return self._general_info_get("auditor_address_line_1")
-    #
-    # @property
-    # def auditor_city(self):
-    #     return self._general_info_get("auditor_city")
-    #
-    # @property
-    # def auditor_state(self):
-    #     return self._general_info_get("auditor_state")
-    #
-    # @property
-    # def auditor_zip(self):
-    #     return self._general_info_get("auditor_zip")
-    #
-    # @property
-    # def auditor_contact_name(self):
-    #     return self._general_info_get("auditor_contact_name")
-    #
-    # @property
-    # def auditor_contact_title(self):
-    #     return self._general_info_get("auditor_contact_title")
-    #
-    # @property
-    # def auditor_phone(self):
-    #     return self._general_info_get("auditor_phone")
 
     def get_transition_date(self, status):
         index = self.transition_name.index(status)
