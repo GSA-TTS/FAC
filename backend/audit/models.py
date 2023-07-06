@@ -209,9 +209,9 @@ class SingleAuditChecklist(models.Model):
         the appropriate privileges will done at the view level.
         """
 
-        from audit.etl import ETL
+        # from audit.etl import ETL
 
-        # TODO: These lines are breaking 
+        # TODO: These lines are breaking
         #       `test_submission_status_transitions` in audit/test_models.py
         #       We'll figure out a fix for this and uncomment these lines.
         # etl = ETL(self)
