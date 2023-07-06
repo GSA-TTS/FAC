@@ -50,6 +50,11 @@ urlpatterns = [
         views.SubmissionProgressView.as_view(),
         name="SubmissionProgress",
     ),
+    path(
+        "upload-report/<str:report_id>",
+        views.UploadReportView.as_view(),
+        name="upload_report",
+    ),
 ]
 
 for form_section in FORM_SECTIONS:

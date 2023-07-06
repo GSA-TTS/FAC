@@ -11,6 +11,8 @@ from django.utils.datastructures import MultiValueDictKeyError
 from django.utils.decorators import method_decorator
 from django.http import JsonResponse
 
+from audit.forms import UploadReportForm
+
 from .fixtures.excel import FORM_SECTIONS
 
 from audit.excel import (
@@ -419,3 +421,109 @@ class SubmissionProgressView(SingleAuditChecklistAccessRequiredMixin, generic.Vi
             return render(request, "audit/submission-progress.html", context)
         except SingleAuditChecklist.DoesNotExist:
             raise PermissionDenied("You do not have access to this audit.")
+
+
+class PageInput:
+    def __init__(self, text="", id="", required=True, hint=None):
+        self.text = text
+        self.id = id
+        self.required = required
+        self.hint = hint
+
+
+class UploadReportView(SingleAuditChecklistAccessRequiredMixin, generic.View):
+    def page_number_inputs(self):
+        return [
+            PageInput(
+                "Financial Statement(s) 2 CFR 200.Sl0(a)", "financial_statements"
+            ),
+            PageInput(
+                "Opinion on Financial Statements 2 CFR 200.SlS(a)",
+                "financial_statements_opinion",
+            ),
+            PageInput(
+                "Schedule of Expenditures of Federal Awards 2 CFR 200.Sl0(b)",
+                "schedule_expenditures",
+            ),
+            PageInput(
+                "Opinion or Disclaimer of Opinion on Schedule of Federal Awards 2 CFR 200.SlS(a)",
+                "schedule_expenditures_opinion",
+            ),
+            PageInput(
+                "Uniform Guidance Report on Internal Control 2 CFR 200.SlS(b)",
+                "uniform_guidance_control",
+            ),
+            PageInput(
+                "Uniform Guidance Report on Compliance 2 CFR 200.SlS(c)",
+                "uniform_guidance_compliance",
+            ),
+            PageInput("GAS Report on Internal Control 2 CFR 200.SlS(b)", "GAS_control"),
+            PageInput(
+                "GAS Report on Internal Compliance 2 CFR 200.SlS(b)", "GAS_compliance"
+            ),
+            PageInput(
+                "Schedule of Findings and Questioned Costs 2 CFR 200.SlS(d)",
+                "schedule_findings",
+            ),
+            PageInput(
+                "Summary Schedule of Prior Audit Findings 2 CFR 200.Sll(b)",
+                "schedule_prior_findings",
+                required=False,
+                hint="Only required if prior audit findings exist",
+            ),
+            PageInput(
+                "Corrective Action Plan (if findings) 2 CFR 200.Sll(c)",
+                "CAP_page",
+                required=False,
+                hint="Only required if findings exist",
+            ),
+        ]
+
+    def get(self, request, *args, **kwargs):
+        report_id = kwargs["report_id"]
+        try:
+            sac = SingleAuditChecklist.objects.get(report_id=report_id)
+
+            context = {
+                "auditee_name": sac.auditee_name,
+                "report_id": report_id,
+                "auditee_uei": sac.auditee_uei,
+                "user_provided_organization_type": sac.user_provided_organization_type,
+                "page_number_inputs": self.page_number_inputs(),
+            }
+
+            # TODO: check if there's already a PDF in the DB and let the user know
+
+            return render(request, "audit/upload-report.html", context)
+        except SingleAuditChecklist.DoesNotExist:
+            raise PermissionDenied("You do not have access to this audit.")
+        except Exception as e:
+            logger.info("Enexpected error in UploadReportView get.\n", e)
+            raise BadRequest()
+
+    def post(self, request, *args, **kwargs):
+        report_id = kwargs["report_id"]
+
+        try:
+            sac = SingleAuditChecklist.objects.get(report_id=report_id)
+            form = UploadReportForm(request.POST, request.FILES)
+
+            if form.is_valid():
+                # TODO: handle_uploaded_stuff()
+                # PDF issues can be communicated to the user with form.errors["upload_report"]
+                print("Saving form!")
+                return redirect(reverse("audit:SubmissionProgress", args=[report_id]))
+            else:
+                context = {
+                    "auditee_name": sac.auditee_name,
+                    "report_id": report_id,
+                    "auditee_uei": sac.auditee_uei,
+                    "user_provided_organization_type": sac.user_provided_organization_type,
+                    "page_number_inputs": self.page_number_inputs(),
+                    "form": form,
+                }
+                return render(request, "audit/upload-report.html", context)
+
+        except Exception as e:
+            logger.info("Unexpected error in UploadReportView post.\n", e)
+            raise BadRequest()
