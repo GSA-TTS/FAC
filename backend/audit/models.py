@@ -321,6 +321,10 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
             SingleAuditChecklist.STATUS.SUBMITTED,
         ]
 
+    @property
+    def is_submitted(self):
+        return self.submission_status in [SingleAuditChecklist.STATUS.SUBMITTED]
+
     def get_transition_date(self, status):
         index = self.transition_name.index(status)
         if index >= 0:
