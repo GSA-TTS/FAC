@@ -30,8 +30,8 @@ permissions:
   contents: read
 
 env:
-    DOCKER_NAME: ${{ inputs.docker-name }}
-    WORKING_DIRECTORY: ${{ inputs.work-dir }}
+  DOCKER_NAME: ${{ inputs.docker-name }}
+  WORKING_DIRECTORY: ${{ inputs.work-dir }}
 
 jobs:
   trivy:
@@ -42,6 +42,9 @@ jobs:
       actions: read
     name: Trivy Scan
     runs-on: ubuntu-latest
+    env:
+      DOCKER_NAME: fac
+      WORKING_DIRECTORY: ./backend
     steps:
       - name: Checkout
         uses: actions/checkout@v3
