@@ -6,6 +6,8 @@ else
   echo "No environment variable ${ENV} is set!"
 fi;
 
+sleep 10
+
 if [[ "${ENV}" == "LOCAL" || "${ENV}" == "TESTING" ]]; then
     export AWS_PRIVATE_ACCESS_KEY_ID=longtest
     export AWS_PRIVATE_SECRET_ACCESS_KEY=longtest
