@@ -35,3 +35,18 @@ class GeneralInformationForm(forms.Form):
     auditor_contact_title = forms.CharField()
     auditor_phone = forms.CharField()
     auditor_email = forms.CharField()
+
+
+class UploadReportForm(forms.Form):
+    financial_statements = forms.CharField()
+    financial_statements_opinion = forms.CharField()
+    schedule_expenditures = forms.CharField()
+    schedule_expenditures_opinion = forms.CharField()
+    uniform_guidance_control = forms.CharField()
+    uniform_guidance_compliance = forms.CharField()
+    GAS_control = forms.CharField()
+    GAS_compliance = forms.CharField()
+    schedule_findings = forms.CharField()
+    schedule_prior_findings = forms.CharField(required=False)
+    CAP_page = forms.CharField(required=False)
+    upload_report = forms.FileField()

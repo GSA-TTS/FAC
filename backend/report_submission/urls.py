@@ -27,6 +27,11 @@ urlpatterns = [
         views.GeneralInformationFormView.as_view(),
         name="general_information",
     ),
+    path(
+        "upload-report/<str:report_id>",
+        views.UploadReportView.as_view(),
+        name="upload_report",
+    ),
 ]
 
 for page_id in upload_page_ids:
@@ -34,6 +39,6 @@ for page_id in upload_page_ids:
         path(
             "{}/<str:report_id>".format(page_id),
             views.UploadPageView.as_view(),
-            name="secondary_auditors",
+            name=page_id,
         )
     )

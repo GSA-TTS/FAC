@@ -235,7 +235,7 @@ TODO: Include the "Completed at X by Y", after timestamps are included in the da
 					</svg>
 				</div>
 				<div class="usa-icon-list__content {% if audit_report.created is True %} text-green {% else %} text-base-dark {% endif %}">
-					<a class="usa-link text-bold" href="javascript:void(0);">Upload the audit report PDF</a>
+					<a class="usa-link text-bold" href="/report_submission/upload-report/{{ report_id | default_if_none:'' }}">Upload the audit report PDF</a>
 					<p class="margin-0">
 						Upload the single audit report package, or audit report. This should be a single, unlocked, and machine-readable PDF. This can be re-uploaded with updated versions as necessary until the report has been certified, at which point it cannot be edited or re-uploaded.
 					</p>
