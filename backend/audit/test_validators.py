@@ -675,7 +675,7 @@ class AdditionalUeisValidatorTests(SimpleTestCase):
         template = json.loads(template_definition_path.read_text(encoding="utf-8"))
         invalid = json.loads('{"AdditionalUEIs":{}}')
         expected_msg = str(
-            ("B", "2", "Auditee UEI", template["sheets"][0]["single_cells"][0]["help"])
+            ("A", "2", "Auditee UEI", template["sheets"][1]["single_cells"][0]["help"])
         )
         self.assertRaisesRegex(
             ValidationError, expected_msg, validate_additional_ueis_json, invalid
