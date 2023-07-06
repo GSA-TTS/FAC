@@ -11,8 +11,9 @@ jobs:
     permissions:
       contents: read
       packages: write
+      security-events: write
     env:
-      GH_REPO: ghcr.io/gsa-tts/fac
+      GH_REPO: ghcr.io/asteel-gsa/fac
     strategy:
       fail-fast: false
       matrix:
