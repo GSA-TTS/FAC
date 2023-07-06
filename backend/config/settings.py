@@ -112,7 +112,7 @@ INSTALLED_APPS += [
     "users",
     "report_submission",
     "cms",
-    "data_distro",
+    # "data_distro",
     "dissemination",
 ]
 
