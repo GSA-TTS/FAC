@@ -30,7 +30,7 @@
             <ol class="usa-process-list">
                 <form id="upload-report__form"
                       id_test="upload-report__form"
-                      action="{% url 'report_submission:upload_report' report_id %}"
+                      action="{% url 'audit:upload_report' report_id %}"
                       enctype='multipart/form-data'
                       method="post">
                     {% csrf_token %}
