@@ -15,7 +15,7 @@ from collections import namedtuple as NT
 
 Sheet = NT(
     "Sheet",
-    "name single_cells open_ranges mergeable_cells merged_unreachable header_inclusion text_ranges",
+    "name single_cells open_ranges mergeable_cells merged_unreachable header_inclusion text_ranges header_height",
 )
 Posn = NT("Posn", "title title_cell range_name range_cell width")
 SingleCell = NT("SingleCell", "posn validation formula help")
@@ -157,7 +157,11 @@ def parse_sheet(spec):
         tr = list(map(parse_text_range, get(spec, "text_ranges", default=[])))
     else:
         tr = []
-    return Sheet(name, sc, opr, mc, mur, hi, tr)
+    if "header_height" in spec:
+        hh = get(spec, "header_height")
+    else:
+        hh = None
+    return Sheet(name, sc, opr, mc, mur, hi, tr, hh)
 
 
 def parse_spec(spec):

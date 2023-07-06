@@ -150,7 +150,9 @@ def process_open_ranges(wb, ws, sheet):
         wb.defined_names.add(new_range)
         configure_header_cell(ws, r)
         # Make the header row tall.
-        ws.row_dimensions[coords.range_start_row - 1].height = 100
+        ws.row_dimensions[coords.range_start_row - 1].height = (
+            sheet.header_height if sheet.header_height else 100
+        )
 
 
 #########################################################
@@ -309,9 +311,10 @@ def process_single_cells(wb, ws, sheet):
             f"{o.posn.range_cell}:{o.posn.range_cell}",
         )
         configure_validation(wb, ws, coord, o)
-        # Individual cells can have width set, optionally
-        if "width" in o:
-            ws.column_dimensions[o["title_cell"][0]].width = o["width"]
+
+        if sheet.header_height:
+            row = int(o.posn.title_cell[1])
+            ws.row_dimensions[row].height = sheet.header_height
 
 
 def make_range(r):
@@ -385,30 +388,46 @@ def unlock_data_entry_cells(header_row, ws, sheet):
                 cell.protection = Protection(locked=False)
 
 
+def calculate_average_width(ws):
+    if len(list(ws.rows)) == 0:
+        return 72
+    widths = {}
+    for row in ws.rows:
+        for cell in row:
+            if cell.value:
+                widths[cell.column_letter] = max(
+                    (widths.get(cell.column_letter, 0), len(str(cell.value)))
+                )
+    sum = 0
+    for _, value in widths.items():
+        sum += value
+    return sum / len(widths)
+
+
+def set_column_dimensions(ws, sheet, avg_width):
+    for col, _ in sheet.widths.items():
+        if col not in [o.posn.title_cell[0] for o in sheet.single_cells]:
+            ws.column_dimensions[col].width = avg_width / 2
+
+
+def set_open_range_and_single_cell_widths(ws, sheet):
+    for r in sheet.open_ranges:
+        column = r.posn.title_cell[0]
+        if r.posn.width:
+            ws.column_dimensions[column].width = r.posn.width
+    for r in sheet.single_cells:
+        column = r.posn.title_cell[0]
+        if r.posn.width:
+            ws.column_dimensions[column].width = r.posn.width
+
+
 def set_column_widths(wb, ws, sheet):
     # Set he widths to something... sensible.
     # https://stackoverflow.com/questions/13197574/openpyxl-adjust-column-width-size
     print("---- set_column_widths ----")
-    if len(list(ws.rows)) == 0:
-        return 72
-    else:
-        widths = {}
-        for row in ws.rows:
-            for cell in row:
-                if cell.value:
-                    widths[cell.column_letter] = max(
-                        (widths.get(cell.column_letter, 0), len(str(cell.value)))
-                    )
-        sum = 0
-        for col, value in widths.items():
-            sum += value
-        avg = sum / len(widths)
-        for col, value in widths.items():
-            ws.column_dimensions[col].width = avg / 2
-        for r in sheet.open_ranges:
-            column = r.posn.title_cell[0]
-            if r.posn.width:
-                ws.column_dimensions[column].width = r.posn.width
+    avg_width = calculate_average_width(ws)
+    set_column_dimensions(ws, sheet, avg_width)
+    set_open_range_and_single_cell_widths(ws, sheet)
 
 
 def set_wb_security(wb, password):
