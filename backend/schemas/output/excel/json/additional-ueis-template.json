@@ -2,26 +2,7 @@
    "filename": "additional-ueis-template.xlsx",
    "sheets": [
       {
-         "header_inclusion": [
-            "A1"
-         ],
-         "mergeable_cells": [
-            [
-               1,
-               2,
-               "A",
-               "B"
-            ],
-            [
-               3,
-               3001,
-               "A",
-               "B"
-            ]
-         ],
-         "merged_unreachable": [
-            "B"
-         ],
+         "header_height": 48,
          "name": "Form",
          "open_ranges": [
             {
@@ -31,7 +12,7 @@
                },
                "range_name": "additional_uei",
                "title": "Additional UEIs",
-               "title_cell": "A3",
+               "title_cell": "A1",
                "type": "open_range",
                "validation": {
                   "custom_error": "Expecting something with only twelve characters",
@@ -42,17 +23,21 @@
                },
                "width": 36
             }
-         ],
+         ]
+      },
+      {
+         "header_height": 48,
+         "name": "Auditee UEI",
          "single_cells": [
             {
                "help": {
                   "link": "https://fac.gov/documentation/validation/#uei",
                   "text": "UEIs are 12 characters long and match rules as given by SAM.gov"
                },
-               "range_cell": "B2",
+               "range_cell": "A2",
                "range_name": "auditee_uei",
                "title": "Auditee UEI",
-               "title_cell": "A2",
+               "title_cell": "A1",
                "type": "single_cell",
                "validation": {
                   "custom_error": "Expecting something with only twelve characters",
@@ -60,10 +45,11 @@
                   "formula1": 12,
                   "operator": "equal",
                   "type": "textLength"
-               }
+               },
+               "width": 36
             }
          ]
       }
    ],
-   "title_row": 3
+   "title_row": 1
 }
