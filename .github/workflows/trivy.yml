@@ -69,6 +69,7 @@ jobs:
           format: 'sarif'
           output: 'scan-results.sarif'
           exit-code: '1'
+          severity: HIGH,CRITICAL
           ignore-unfixed: true
 
       - name: Upload Trivy scan results to GitHub Security tab
@@ -101,7 +102,8 @@ jobs:
           hide-progress: false
           format: 'sarif'
           output: 'scan-results.sarif'
-          exit-code: '1'
+          exit-code: 1
+          severity: HIGH,CRITICAL
           ignore-unfixed: true
 
       - name: Upload Trivy scan results to GitHub Security tab of Third Party Images

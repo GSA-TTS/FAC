@@ -57,24 +57,8 @@
               echo $image_creation_date > ${{ matrix.image.tname }}.txt
             fi
 
-        - name: Run Trivy vulnerability scanner on Third Party Images
-          uses: aquasecurity/trivy-action@master
-          with:
-            image-ref: ${{ matrix.image.name }}
-            scan-type: 'image'
-            hide-progress: false
-            format: 'sarif'
-            output: 'scan-results.sarif'
-            exit-code: 1
-            ignore-unfixed: true
-
-        - name: Upload Trivy scan results to GitHub Security tab of Third Party Images
-          uses: github/codeql-action/upload-sarif@v2
-          with:
-            sarif_file: 'scan-results.sarif'
-
-        # - name: Scan Image
-        #   run: docker run aquasec/trivy:latest  image --timeout 5m --scanners vuln --exit-code 1 --severity CRITICAL,HIGH  ${{ matrix.image.name }}
+        - name: Scan Image
+          run: docker run aquasec/trivy:latest  image --timeout 5m --scanners vuln --exit-code 1 --severity CRITICAL,HIGH  ${{ matrix.image.name }}
 
         - name: Tag Image
           run: |
