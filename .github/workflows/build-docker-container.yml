@@ -79,4 +79,4 @@ jobs:
             password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Push Web Container
-        run: docker push --all-tags ghcr.io/${{ env.GH_REPO }}/${{ env.IMAGE }}
+        run: docker push --all-tags ghcr.io/${{ env.GH_REPO }}/${{ env.IMAGE }} --disable-content-trust=false
