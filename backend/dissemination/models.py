@@ -467,7 +467,7 @@ class Passthrough(models.Model):
     """The pass-through entity information, when it is not a direct federal award"""
 
     """
-    We may not need this table. We can simply add three columns 
+    We may not need this table. We can simply add three columns
     pertating to passthrough in FederalAward table
     """
     report_id = models.CharField(

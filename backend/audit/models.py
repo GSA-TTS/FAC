@@ -210,6 +210,7 @@ class SingleAuditChecklist(models.Model):
         """
 
         from audit.etl import ETL
+
         etl = ETL(self)
         etl.load_all()
         self.transition_name.append(SingleAuditChecklist.STATUS.SUBMITTED)
