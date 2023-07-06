@@ -72,14 +72,14 @@ def json_property_mixin_generator(name, fname=None, toplevel=None, classname=Non
             try:
                 return getattr(self, toplevelproperty)[key]
             except KeyError:
-                pass
+                logger.warning("Key %s not found in SAC", key)
             except TypeError:
-                pass
+                logger.warning("Type error trying to get %s from SAC %s", key, self)
             return None
 
         return inner
 
-    schemadir = settings.BASE_DIR / "schemas" / "output" / "sections"
+    schemadir = settings.SECTION_SCHEMA_DIR
     schemafile = schemadir / filename
     schema = json.loads(schemafile.read_text())
     attrdict = {k: property(_wrapper(k)) for k in schema["properties"]}
