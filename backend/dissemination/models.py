@@ -51,7 +51,11 @@ class Finding(models.Model):
         max_length=40,
     )
     award_seq_number = models.IntegerField(
-        "Order that the award line was reported",
+        "Order that the award line was reported in Award",
+        null=True,
+    )
+    finding_seq_number = models.IntegerField(
+        "Order that the finding line was reported",
         null=True,
     )
 
@@ -104,7 +108,7 @@ class Finding(models.Model):
     )
 
     class Meta:
-        unique_together = (("report_id", "finding_ref_number", "award_seq_number"),)
+        unique_together = (("report_id", "award_seq_number", "finding_seq_number"),)
         """
             Finding
             foreign_key(("report_id", "award_seq_number",) references FederalAward
@@ -326,8 +330,9 @@ class CapText(models.Model):
 class Note(models.Model):
     """Note to Schedule of Expenditures of Federal Awards (SEFA)"""
 
-    report_id = models.IntegerField(
-        "Internal Audit Report Id", help_text=docs.report_id
+    report_id = models.CharField(
+        "G-FAC generated identifier. FK refers to a General",
+        max_length=40,
     )
     note_seq_number = models.IntegerField(
         "Order that the Note was reported", help_text=docs.seq_number_notes
@@ -586,12 +591,7 @@ class General(models.Model):
         help_text=docs.multiple_ueis,
     )
     auditee_addl_uei_list = ArrayField(
-        models.CharField(
-            "", 
-            null=True, 
-            help_text=docs.uei_general
-        ),
-        default=list
+        models.CharField("", null=True, help_text=docs.uei_general), default=list
     )
     auditee_addl_ein_list = ArrayField(
         models.IntegerField(
@@ -599,15 +599,10 @@ class General(models.Model):
             null=True,
             help_text=docs.ein_list,
         ),
-        default=list
+        default=list,
     )
     auditee_addl_duns_list = ArrayField(
-        models.CharField(
-            "", 
-            null=True, 
-            help_text=docs.duns_list
-        ),
-        default=list
+        models.CharField("", null=True, help_text=docs.duns_list), default=list
     )
     ein_subcode = models.IntegerField(
         "Subcode assigned to the EIN.", null=True, help_text=docs.ein_subcode
@@ -739,7 +734,7 @@ class General(models.Model):
     )
     date_received = models.DateField(
         "The latest date an audit component or Form SF-SAC was received by the Federal audit Clearinghouse (FAC).",
-        null=True
+        null=True,
     )
     fy_end_date = models.DateField(
         "Fiscal Year End Date", null=True, help_text=docs.fy_end_date
@@ -790,9 +785,7 @@ class General(models.Model):
         help_text=docs.significant_deficiency_general,
     )
     is_material_weakness = models.BooleanField(
-        "",
-        null=True,
-        help_text=docs.material_weakness_general
+        "", null=True, help_text=docs.material_weakness_general
     )
     condition_or_deficiency_major_program = models.BooleanField(
         "Whether or not the audit disclosed a reportable condition/significant deficiency for any major program in the Schedule of Findings and Questioned Costs",
@@ -912,20 +905,13 @@ class General(models.Model):
     )
     suppression_code = models.CharField(
         "Determines whether the PDF audit will be displayed on the public site",
-        null=True
+        null=True,
     )
-    type_audit_code = models.CharField(
-        "Determines if audit is A133 or UG",
-        default=""
-    )
+    type_audit_code = models.CharField("Determines if audit is A133 or UG", default="")
     cfac_report_id = models.CharField(
-        "Used by CFAC to uniquely identify a submission",
-        null=True
+        "Used by CFAC to uniquely identify a submission", null=True
     )
-    cfac_version = models.CharField(
-        "Used by CFAC",
-        null=True
-    )
+    cfac_version = models.CharField("Used by CFAC", null=True)
 
     # Metadata
     dbkey = models.CharField(
