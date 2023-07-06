@@ -2,24 +2,6 @@
    "filename": "findings-uniform-guidance-template.xlsx",
    "sheets": [
       {
-         "header_inclusion": [
-            "A1",
-            "C2"
-         ],
-         "mergeable_cells": [
-            [
-               1,
-               2,
-               "A",
-               "O"
-            ],
-            [
-               2,
-               3,
-               "C",
-               "O"
-            ]
-         ],
          "name": "Form",
          "open_ranges": [
             {
@@ -29,7 +11,7 @@
                },
                "range_name": "federal_agency_prefix",
                "title": "Federal Agency Prefix",
-               "title_cell": "A3",
+               "title_cell": "A1",
                "type": "open_range",
                "validation": {
                   "allow_blank": "False",
@@ -47,7 +29,7 @@
                },
                "range_name": "three_digit_extension",
                "title": "CFDA Three Digit Extension",
-               "title_cell": "B3",
+               "title_cell": "B1",
                "type": "open_range",
                "validation": {
                   "custom_error": "Expecting something with only three characters",
@@ -65,7 +47,7 @@
                },
                "range_name": "additional_award_identification",
                "title": "Additional Award Identification",
-               "title_cell": "C3",
+               "title_cell": "C1",
                "type": "open_range",
                "validation": {
                   "type": "NOVALIDATION"
@@ -78,7 +60,7 @@
                },
                "range_name": "program_name",
                "title": "Federal Program Name",
-               "title_cell": "D3",
+               "title_cell": "D1",
                "type": "open_range",
                "validation": {
                   "type": "NOVALIDATION"
@@ -92,7 +74,7 @@
                },
                "range_name": "reference_number",
                "title": "Audit Finding Reference Number",
-               "title_cell": "E3",
+               "title_cell": "E1",
                "type": "open_range",
                "validation": {
                   "custom_error": "Expecting a value in the format YYYY-NNN, where YYYY is a year and NNN a three digit number (e.g. 2023-001)",
@@ -108,7 +90,7 @@
                },
                "range_name": "compliance_requirement",
                "title": "Type(s) of Compliance Requirement(s)",
-               "title_cell": "F3",
+               "title_cell": "F1",
                "type": "open_range",
                "validation": {
                   "custom_error": "Expecting a valid combination of the letters: A,B,C,E,F,G,H,I,J,L,M,N,P",
@@ -125,7 +107,7 @@
                },
                "range_name": "modified_opinion",
                "title": "Modified Opinion",
-               "title_cell": "G3",
+               "title_cell": "G1",
                "type": "yorn_range",
                "validation": {
                   "allow_blank": "False",
@@ -143,7 +125,7 @@
                },
                "range_name": "other_matters",
                "title": "Other Matters",
-               "title_cell": "H3",
+               "title_cell": "H1",
                "type": "yorn_range",
                "validation": {
                   "allow_blank": "False",
@@ -161,7 +143,7 @@
                },
                "range_name": "material_weakness",
                "title": "Material Weakness",
-               "title_cell": "I3",
+               "title_cell": "I1",
                "type": "yorn_range",
                "validation": {
                   "allow_blank": "False",
@@ -179,7 +161,7 @@
                },
                "range_name": "significant_deficiency",
                "title": "Significant Deficiency",
-               "title_cell": "J3",
+               "title_cell": "J1",
                "type": "yorn_range",
                "validation": {
                   "allow_blank": "False",
@@ -197,7 +179,7 @@
                },
                "range_name": "other_findings",
                "title": "Other Findings",
-               "title_cell": "K3",
+               "title_cell": "K1",
                "type": "yorn_range",
                "validation": {
                   "allow_blank": "False",
@@ -215,7 +197,7 @@
                },
                "range_name": "questioned_costs",
                "title": "Questioned Costs",
-               "title_cell": "L3",
+               "title_cell": "L1",
                "type": "yorn_range",
                "validation": {
                   "allow_blank": "False",
@@ -233,7 +215,7 @@
                },
                "range_name": "repeat_prior_reference",
                "title": "Repeat Findings from Prior Year",
-               "title_cell": "M3",
+               "title_cell": "M1",
                "type": "yorn_range",
                "validation": {
                   "allow_blank": "False",
@@ -251,7 +233,7 @@
                },
                "range_name": "prior_references",
                "title": "If Repeat Finding, provide Prior Year Audit Finding Reference Number(s)",
-               "title_cell": "N3",
+               "title_cell": "N1",
                "type": "open_range",
                "validation": {
                   "type": "NOVALIDATION"
@@ -266,7 +248,7 @@
                },
                "range_name": "is_valid",
                "title": "Is Findings Combination Valid? (Read Only - Please See Instructions tab)",
-               "title_cell": "O3",
+               "title_cell": "O1",
                "type": "yorn_range",
                "validation": {
                   "allow_blank": "False",
@@ -277,17 +259,21 @@
                },
                "width": 16
             }
-         ],
+         ]
+      },
+      {
+         "header_height": 100,
+         "name": "UEI",
          "single_cells": [
             {
                "help": {
                   "link": "https://fac.gov/documentation/validation/#uei",
                   "text": "UEIs are 12 characters long and match rules as given by SAM.gov"
                },
-               "range_cell": "B2",
+               "range_cell": "A2",
                "range_name": "auditee_uei",
                "title": "Auditee UEI",
-               "title_cell": "A2",
+               "title_cell": "A1",
                "type": "single_cell",
                "validation": {
                   "custom_error": "Expecting something with only twelve characters",
@@ -295,10 +281,11 @@
                   "formula1": 12,
                   "operator": "equal",
                   "type": "textLength"
-               }
+               },
+               "width": 36
             }
          ]
       }
    ],
-   "title_row": 3
+   "title_row": 1
 }
