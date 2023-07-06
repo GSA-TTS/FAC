@@ -52,7 +52,6 @@
             echo $image_creation_date
             if [[ $image_creation_date -le $last_image_date ]]; then
               echo "We have the latest version already"
-              exit 1
             else
               echo "We have an updated version"
               echo $image_creation_date > ${{ matrix.image.tname }}.txt
