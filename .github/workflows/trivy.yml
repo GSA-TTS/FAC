@@ -67,38 +67,6 @@ jobs:
         with:
           sarif_file: 'webcontainer-results.sarif'
 
-  scan-other:
-    permissions:
-      contents: read
-      security-events: write
-      actions: read
-    name: Trivy Scan Third Party Images
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        image:
-          - name: postgrest/postgrest:latest
-            short-name: postgrest
-          - name: ghcr.io/gsa-tts/clamav-rest/clamav:latest
-            short-name: clamav
-    steps:
-      - name: Pull Third Party Docker Images
-        run: docker pull ${{ matrix.image.name }}
-
-      - name: Run Trivy vulnerability scanner on Third Party Images
-        uses: aquasecurity/trivy-action@master
-        with:
-          image-ref: '${{ matrix.image.name }}'
-          scan-type: 'image'
-          hide-progress: false
-          format: 'sarif'
-          output: 'container-results.sarif'
-          exit-code: '1'
-          ignore-unfixed: true
-
-      - name: Upload Trivy scan results to GitHub Security tab of Third Party Images
-        uses: github/codeql-action/upload-sarif@v2
-        with:
-          sarif_file: 'container-results.sarif'
+      - name: Invoke scanning of third party tools
+        uses: ./.github/workflows/scan-images.yml
 

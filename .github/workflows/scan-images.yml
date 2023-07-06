@@ -61,12 +61,12 @@ jobs:
           fi
 
       - name: Scan Image
-        run: docker run aquasec/trivy:latest image --timeout 5m --scanners vuln --exit-code 1 --output trivy-results.sarif --severity CRITICAL,HIGH  ${{ matrix.image.name }}
+        run: docker run aquasec/trivy:latest image --timeout 5m --scanners vuln --exit-code 1 --template "@contrib/sarif.tpl" -o report.sarif --severity CRITICAL,HIGH  ${{ matrix.image.name }}
 
       - name: Upload Trivy scan results to GitHub Security tab
         uses: github/codeql-action/upload-sarif@v2
         with:
-          sarif_file: 'trivy-results.sarif'
+          sarif_file: 'report.sarif'
 
       - name: Tag Image
         run: |
