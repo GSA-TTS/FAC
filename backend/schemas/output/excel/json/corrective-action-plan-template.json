@@ -2,49 +2,7 @@
    "filename": "corrective-action-plan-template.xlsx",
    "sheets": [
       {
-         "header_inclusion": [
-            "A1",
-            "C2"
-         ],
-         "mergeable_cells": [
-            [
-               1,
-               2,
-               "A",
-               "H"
-            ],
-            [
-               2,
-               3,
-               "C",
-               "H"
-            ],
-            [
-               3,
-               3001,
-               "A",
-               "B"
-            ],
-            [
-               3,
-               3001,
-               "C",
-               "F"
-            ],
-            [
-               3,
-               3001,
-               "G",
-               "H"
-            ]
-         ],
-         "merged_unreachable": [
-            "B",
-            "D",
-            "E",
-            "F",
-            "H"
-         ],
+         "header_height": 48,
          "name": "Form",
          "open_ranges": [
             {
@@ -54,7 +12,7 @@
                },
                "range_name": "reference_number",
                "title": "Audit Finding Reference Number",
-               "title_cell": "A3",
+               "title_cell": "A1",
                "type": "open_range",
                "validation": {
                   "custom_error": "Expecting a value in the format YYYY-NNN, where YYYY is a year and NNN a three digit number (e.g. 2023-001)",
@@ -71,7 +29,7 @@
                },
                "range_name": "planned_action",
                "title": "Planned Corrective Action",
-               "title_cell": "C3",
+               "title_cell": "B1",
                "type": "open_range",
                "validation": {
                   "type": "NOVALIDATION"
@@ -85,7 +43,7 @@
                },
                "range_name": "contains_chart_or_table",
                "title": "Did Text Contain a Chart or Table?",
-               "title_cell": "G3",
+               "title_cell": "C1",
                "type": "yorn_range",
                "validation": {
                   "allow_blank": "False",
@@ -96,17 +54,21 @@
                },
                "width": 36
             }
-         ],
+         ]
+      },
+      {
+         "header_height": 48,
+         "name": "UEI",
          "single_cells": [
             {
                "help": {
                   "link": "https://fac.gov/documentation/validation/#uei",
                   "text": "UEIs are 12 characters long and match rules as given by SAM.gov"
                },
-               "range_cell": "B2",
+               "range_cell": "A2",
                "range_name": "auditee_uei",
                "title": "Auditee UEI",
-               "title_cell": "A2",
+               "title_cell": "A1",
                "type": "single_cell",
                "validation": {
                   "custom_error": "Expecting something with only twelve characters",
@@ -114,10 +76,11 @@
                   "formula1": 12,
                   "operator": "equal",
                   "type": "textLength"
-               }
+               },
+               "width": 36
             }
          ]
       }
    ],
-   "title_row": 3
+   "title_row": 1
 }

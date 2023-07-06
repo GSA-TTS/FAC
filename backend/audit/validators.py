@@ -309,7 +309,7 @@ def _get_error_details(xlsx_definition_template, named_ranges_row_indices):
                     )
                 )
                 break
-        for single_cell in xlsx_definition_template["sheets"][0]["single_cells"]:
+        for single_cell in xlsx_definition_template["sheets"][1]["single_cells"]:
             if single_cell["range_name"] == named_range:
                 error_details.append(
                     (

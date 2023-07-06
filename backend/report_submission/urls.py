@@ -34,6 +34,6 @@ for page_id in upload_page_ids:
         path(
             "{}/<str:report_id>".format(page_id),
             views.UploadPageView.as_view(),
-            name="secondary_auditors",
+            name=page_id,
         )
     )

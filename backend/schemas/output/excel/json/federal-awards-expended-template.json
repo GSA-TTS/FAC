@@ -2,25 +2,6 @@
    "filename": "federal-awards-expended-template.xlsx",
    "sheets": [
       {
-         "header_inclusion": [
-            "A1",
-            "C2",
-            "F2"
-         ],
-         "mergeable_cells": [
-            [
-               1,
-               2,
-               "A",
-               "T"
-            ],
-            [
-               2,
-               3,
-               "F",
-               "T"
-            ]
-         ],
          "name": "Form",
          "open_ranges": [
             {
@@ -30,7 +11,7 @@
                },
                "range_name": "federal_agency_prefix",
                "title": "Federal Agency Prefix",
-               "title_cell": "A3",
+               "title_cell": "A1",
                "type": "open_range",
                "validation": {
                   "allow_blank": "False",
@@ -48,7 +29,7 @@
                },
                "range_name": "three_digit_extension",
                "title": "ALN (CFDA) Three Digit Extension",
-               "title_cell": "B3",
+               "title_cell": "B1",
                "type": "open_range",
                "validation": {
                   "custom_error": "Expecting something with only three characters",
@@ -66,7 +47,7 @@
                },
                "range_name": "additional_award_identification",
                "title": "Additional Award Identification",
-               "title_cell": "C3",
+               "title_cell": "C1",
                "type": "open_range",
                "validation": {
                   "type": "NOVALIDATION"
@@ -79,7 +60,7 @@
                },
                "range_name": "program_name",
                "title": "Federal Program Name",
-               "title_cell": "D3",
+               "title_cell": "D1",
                "type": "open_range",
                "validation": {
                   "custom_error": "Not in the lookup list",
@@ -97,7 +78,7 @@
                },
                "range_name": "amount_expended",
                "title": "Amount Expended",
-               "title_cell": "E3",
+               "title_cell": "E1",
                "type": "open_range",
                "validation": {
                   "custom_error": "This cell must be a positive number",
@@ -113,7 +94,7 @@
                },
                "range_name": "cluster_name",
                "title": "Cluster Name",
-               "title_cell": "F3",
+               "title_cell": "F1",
                "type": "open_range",
                "validation": {
                   "custom_error": "Not in the lookup list",
@@ -131,7 +112,7 @@
                },
                "range_name": "state_cluster_name",
                "title": "If State Cluster, Enter State Cluster Name",
-               "title_cell": "G3",
+               "title_cell": "G1",
                "type": "open_range",
                "validation": {
                   "type": "NOVALIDATION"
@@ -144,7 +125,7 @@
                },
                "range_name": "other_cluster_name",
                "title": "If Other Cluster, Enter Other Cluster Name",
-               "title_cell": "H3",
+               "title_cell": "H1",
                "type": "open_range",
                "validation": {
                   "type": "NOVALIDATION"
@@ -157,7 +138,7 @@
                },
                "range_name": "federal_program_total",
                "title": "Federal Program Total",
-               "title_cell": "I3",
+               "title_cell": "I1",
                "type": "open_range",
                "validation": {
                   "custom_error": "This cell must be a positive number",
@@ -173,7 +154,7 @@
                },
                "range_name": "cluster_total",
                "title": "Cluster Total",
-               "title_cell": "J3",
+               "title_cell": "J1",
                "type": "open_range",
                "validation": {
                   "custom_error": "This cell must be a positive number",
@@ -189,7 +170,7 @@
                },
                "range_name": "is_guaranteed",
                "title": "Loan / Loan Guarantee",
-               "title_cell": "K3",
+               "title_cell": "K1",
                "type": "yorn_range",
                "validation": {
                   "allow_blank": "False",
@@ -206,7 +187,7 @@
                },
                "range_name": "loan_balance_at_audit_period_end",
                "title": "If yes (Loan/Loan Guarantee, End of Audit Period Outstanding Loan Balance)",
-               "title_cell": "L3",
+               "title_cell": "L1",
                "type": "open_range",
                "validation": {
                   "type": "NOVALIDATION"
@@ -219,7 +200,7 @@
                },
                "range_name": "is_direct",
                "title": "Direct Award",
-               "title_cell": "M3",
+               "title_cell": "M1",
                "type": "yorn_range",
                "validation": {
                   "allow_blank": "False",
@@ -236,7 +217,7 @@
                },
                "range_name": "passthrough_name",
                "title": "If no (Direct Award), Name of Passthrough Entity",
-               "title_cell": "N3",
+               "title_cell": "N1",
                "type": "yorn_range",
                "validation": {
                   "allow_blank": "False",
@@ -253,7 +234,7 @@
                },
                "range_name": "passthrough_identifying_number",
                "title": "If no (Direct Award), Identifying Number Assigned by the Pass-through Entity, if assigned",
-               "title_cell": "O3",
+               "title_cell": "O1",
                "type": "open_range",
                "validation": {
                   "allow_blank": "False",
@@ -271,7 +252,7 @@
                },
                "range_name": "is_passed",
                "title": "Federal Award Passed Through to Subrecipients",
-               "title_cell": "P3",
+               "title_cell": "P1",
                "type": "yorn_range",
                "validation": {
                   "allow_blank": "False",
@@ -288,7 +269,7 @@
                },
                "range_name": "subrecipient_amount",
                "title": "If yes (Passed Through), Amount Passed Through to Subrecipients",
-               "title_cell": "Q3",
+               "title_cell": "Q1",
                "type": "open_range",
                "validation": {
                   "type": "NOVALIDATION"
@@ -301,7 +282,7 @@
                },
                "range_name": "is_major",
                "title": "Major Program (MP)",
-               "title_cell": "R3",
+               "title_cell": "R1",
                "type": "yorn_range",
                "validation": {
                   "allow_blank": "False",
@@ -318,7 +299,7 @@
                },
                "range_name": "audit_report_type",
                "title": "If yes (MP), Type of Audit Report",
-               "title_cell": "S3",
+               "title_cell": "S1",
                "type": "open_range",
                "validation": {
                   "type": "NOVALIDATION"
@@ -332,7 +313,7 @@
                },
                "range_name": "number_of_audit_findings",
                "title": "Number of Audit Findings",
-               "title_cell": "T3",
+               "title_cell": "T1",
                "type": "open_range",
                "validation": {
                   "custom_error": "This cell must be a positive number",
@@ -342,17 +323,21 @@
                },
                "width": 12
             }
-         ],
+         ]
+      },
+      {
+         "header_height": 100,
+         "name": "UEI",
          "single_cells": [
             {
                "help": {
                   "link": "https://fac.gov/documentation/validation/#uei",
                   "text": "UEIs are 12 characters long and match rules as given by SAM.gov"
                },
-               "range_cell": "B2",
+               "range_cell": "A2",
                "range_name": "auditee_uei",
                "title": "Auditee UEI",
-               "title_cell": "A2",
+               "title_cell": "A1",
                "type": "single_cell",
                "validation": {
                   "custom_error": "Expecting something with only twelve characters",
@@ -360,18 +345,19 @@
                   "formula1": 12,
                   "operator": "equal",
                   "type": "textLength"
-               }
+               },
+               "width": 36
             },
             {
-               "formula": "=SUM(FIRSTCELLREF:LASTCELLREF)",
+               "formula": "=SUM('Form'!E$FIRSTROW:E$LASTROW)",
                "help": {
                   "link": "https://fac.gov/documentation/validation/#positive_number",
                   "text": "The number in this field must be zero or greater"
                },
-               "range_cell": "E2",
+               "range_cell": "B2",
                "range_name": "total_amount_expended",
                "title": "Total amount expended",
-               "title_cell": "D2",
+               "title_cell": "B1",
                "type": "single_cell",
                "width": 36
             }
@@ -6194,5 +6180,5 @@
          ]
       }
    ],
-   "title_row": 3
+   "title_row": 1
 }
