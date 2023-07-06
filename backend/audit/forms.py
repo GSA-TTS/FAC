@@ -1,5 +1,6 @@
 from django import forms
 
+
 class UploadReportForm(forms.Form):
     financial_statements = forms.IntegerField(min_value=1)
     financial_statements_opinion = forms.IntegerField(min_value=1)

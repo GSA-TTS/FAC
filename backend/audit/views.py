@@ -391,7 +391,6 @@ class SubmissionProgressView(SingleAuditChecklistAccessRequiredMixin, generic.Vi
             raise PermissionDenied("You do not have access to this audit.")
 
 
-
 class PageInput:
     def __init__(self, text="", id="", required=True, hint=None):
         self.text = text
