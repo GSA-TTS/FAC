@@ -509,7 +509,15 @@ class UploadReportView(SingleAuditChecklistAccessRequiredMixin, generic.View):
             form = UploadReportForm(request.POST, request.FILES)
 
             if form.is_valid():
-                # TODO: handle_uploaded_stuff()
+                file = request.FILES["upload_report"]
+
+                sar_file = SingleAuditReportFile(
+                    **{"file": file, "filename": "temp", "sac_id": sac.id}
+                )
+
+                sar_file.full_clean()
+                sar_file.save()
+
                 # PDF issues can be communicated to the user with form.errors["upload_report"]
                 print("Saving form!")
                 return redirect(reverse("audit:SubmissionProgress", args=[report_id]))
