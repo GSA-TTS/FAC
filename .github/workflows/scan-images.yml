@@ -19,8 +19,8 @@
               tname: postgrest
             - name: swaggerapi/swagger-ui:latest
               tname: swagger
-            - name: ghcr.io/gsa-tts/clamav-rest/clamav:latest
-              tname: clamav
+            # - name: ghcr.io/gsa-tts/clamav-rest/clamav:latest
+            #   tname: clamav
 
       steps:
         - name: Checkout
