@@ -320,7 +320,7 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
             SingleAuditChecklist.STATUS.CERTIFIED,
             SingleAuditChecklist.STATUS.SUBMITTED,
         ]
-    
+
     @property
     def is_submitted(self):
         return self.submission_status in [SingleAuditChecklist.STATUS.SUBMITTED]
