@@ -127,7 +127,6 @@ TODO: Include the "Completed at X by Y", after timestamps are included in the da
 				</div>
 				<div class="usa-icon-list__content {% if single_audit_checklist.completed is True %} text-green {% else %} text-base-dark {% endif %}">
 					<a class="usa-link text-bold" href="javascript:void(0);">Upload the Audit Information workbook</a>
-					<p class="margin-0">Sample description text, lorem ipsum, various questionably accurate latin phrases.</p>
 				</div>
 			</li>
 			<!-- Audit findings workbook -->
@@ -144,7 +143,6 @@ TODO: Include the "Completed at X by Y", after timestamps are included in the da
 				<div class="usa-icon-list__content {% if audit_findings_workbook.created is True %} text-green {% else %} text-base-dark {% endif %}">
 					<a class="usa-link text-bold"
 						href="/report_submission/audit-findings/{{ report_id | default_if_none:'' }}">Upload the Audit Findings workbook</a>
-					<p class="margin-0">Sample description text, lorem ipsum, various questionably accurate latin phrases.</p>
 				</div>
 			</li>
 			<!-- Findings text workbook -->
@@ -161,7 +159,6 @@ TODO: Include the "Completed at X by Y", after timestamps are included in the da
 				<div class="usa-icon-list__content {% if findings_text_workbook.created is True %} text-green {% else %} text-base-dark {% endif %}">
 					<a class="usa-link text-bold"
 						href="/report_submission/audit-findings-text/{{ report_id | default_if_none:'' }}">Upload the Findings Text workbook</a>
-					<p class="margin-0">Sample description text, lorem ipsum, various questionably accurate latin phrases.</p>
 				</div>
 			</li>
 			<!-- CAP -->
@@ -178,7 +175,6 @@ TODO: Include the "Completed at X by Y", after timestamps are included in the da
 				<div class="usa-icon-list__content {% if CAP_workbook.created is True %} text-green {% else %} text-base-dark {% endif %}">
 					<a class="usa-link text-bold"
 						href="/report_submission/CAP/{{ report_id | default_if_none:'' }}">Upload the Corrective Action Plan (CAP) workbook</a>
-					<p class="margin-0">Sample description text, lorem ipsum, various questionably accurate latin phrases.</p>
 				</div>
 			</li>
 			<!-- Additional UEIs -->
@@ -195,7 +191,6 @@ TODO: Include the "Completed at X by Y", after timestamps are included in the da
 				<div class="usa-icon-list__content {% if additional_UEIs_workbook.created is True %} text-green {% else %} text-base-dark {% endif %}">
 					<a class="usa-link text-bold"
 						href="/report_submission/additional-UEIs/{{ report_id | default_if_none:'' }}">Upload the Additional UEIs workbook</a>
-					<p class="margin-0">Sample description text, lorem ipsum, various questionably accurate latin phrases.</p>
 				</div>
 			</li>
 			<!-- Secondary Auditors -->
@@ -212,9 +207,6 @@ TODO: Include the "Completed at X by Y", after timestamps are included in the da
 				<div class="usa-icon-list__content {% if secondary_auditors_workbook.created is True %} text-green {% else %} text-base-dark {% endif %}">
 					<a class="usa-link text-bold"
 						href="/report_submission/secondary-auditors/{{ report_id | default_if_none:'' }}">Upload the Secondary Auditors workbook</a>
-					<p class="margin-0">
-						Sample description text, lorem ipsum, various questionably accurate latin phrases.
-					</p>
 				</div>
 			</li>
 			<!-- Ready for certification -->

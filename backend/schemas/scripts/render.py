@@ -67,11 +67,13 @@ def process_spec(WBNT):
         if sheet.mergeable_cells is not None:
             merge_adjacent_columns(ws, sheet.mergeable_cells)
         process_open_ranges(wb, ws, sheet)
-        add_validations(wb, ws, sheet)
+        add_validations(wb, ws, sheet.open_ranges)
+        add_validations(wb, ws, sheet.text_ranges)
         apply_formula(ws, WBNT.title_row + 1, sheet)
+        process_single_cells(wb, ws, sheet)
+        process_text_ranges(wb, ws, sheet)
         unlock_data_entry_cells(WBNT.title_row, ws, sheet)
         set_column_widths(wb, ws, sheet)
-        process_single_cells(wb, ws, sheet)
         if sheet.header_inclusion is not None:
             apply_header_cell_style(ws, sheet.header_inclusion)
 
@@ -148,55 +150,75 @@ def process_open_ranges(wb, ws, sheet):
         wb.defined_names.add(new_range)
         configure_header_cell(ws, r)
         # Make the header row tall.
-        ws.row_dimensions[coords.range_start_row - 1].height = 100
+        ws.row_dimensions[coords.range_start_row - 1].height = (
+            sheet.header_height if sheet.header_height else 100
+        )
 
 
 #########################################################
 # VALIDATIONS
 
 
-def add_validations(wb, ws, sheet):
+def add_validations(wb, ws, ranges):
     """
     Embedded validations do a lot of work, but also have a lot of detail
     in how they are processed and attached. Configure does most of the work.
     """
-    for r in sheet.open_ranges:
+    for r in ranges:
         coords = make_range(r)
-        configure_validation(ws, coords, r)
+        configure_validation(wb, ws, coords, r)
 
 
-def configure_validation(ws, coords: Range, r):
+def configure_validation(wb, ws, coords: Range, r):
     print("---- configure_validations ----")
     dv = None
+
     if r.validation.type == "NOVALIDATION":
         print("\t ---- NOVALIDATION")
-        # We just do nothing in this case.
-        pass
-    else:
-        dv = DataValidation(type=r.validation.type)
-        if r.validation.type == "yorn_range":
-            print("\t ---- yorn")
-            dv = add_yorn_validation(ws)
-            dv.add(coords.full_range)
-        if r.validation.formula1:
-            print("\t ---- formula1")
-            dv.formula1 = r.validation.formula1
+        return  # Exit early, no further action needed
+
+    print("----", r.validation.type)
+
+    if r.validation.type == "list":
+        dv = DataValidation(
+            type="list", formula1=r.validation.formula1, allow_blank=True
+        )
+        # https://stackoverflow.com/questions/75889368/openpyxl-excel-file-created-is-not-showing-validation-errors-or-prompt-message
+    elif r.validation.type == "range_lookup":
+        # https://openpyxl.readthedocs.io/en/latest/validation.html#:~:text=Cell%20range%20validation
+        # rng = wb.defined_names[f"{r.validation.lookup_range}"]
+        dv = DataValidation(
+            type="list", formula1=r.validation.lookup_range, allow_blank=True
+        )
+        print(f"---- formula1: {r.validation.lookup_range}")
+    elif r.validation.type in ["custom", "lookup"]:
+        dv = DataValidation(type="custom", allow_blank=True)
+        dv.formula1 = r.validation.formula1
+        if "FIRSTCELLREF" in dv.formula1:
             dv.formula1 = dv.formula1.replace(
                 "FIRSTCELLREF", f"${coords.column}{coords.range_start_row}"
             )
+        if "LASTCELLREF" in dv.formula1:
             dv.formula1 = dv.formula1.replace(
                 "LASTCELLREF", f"${coords.column}${MAX_ROWS}"
             )
-        if r.validation.operator:
-            print("\t ---- operator")
-            dv.operator = r.validation.operator
-        if r.validation.allow_blank:
-            print("\t ---- allow_blank")
-            dv.allow_blank = r.validation.allow_blank
-        if r.validation.custom_error:
-            print("\t ---- custom_error")
-            dv.error = r.validation.custom_error
-            dv.errorTitle = r.validation.custom_title
+        if "LOOKUPRANGE" in dv.formula1:
+            dv.formula1 = dv.formula1.replace("LOOKUPRANGE", r.validation.lookup_range)
+    elif r.validation.type == "textLength":
+        dv = DataValidation(
+            type="textLength",
+            formula1=r.validation.formula1,
+            operator=r.validation.operator,
+            allow_blank=True,
+        )
+
+    # Properties attached to the validation object
+    if dv:
+        dv.showErrorMessage = True
+        dv.operator = r.validation.operator or dv.operator
+        dv.allow_blank = r.validation.allow_blank or dv.allow_blank
+        dv.error = r.validation.custom_error or dv.error
+        dv.errorTitle = r.validation.custom_title or dv.errorTitle
 
         dv.showDropDown = False
         ws.add_data_validation(dv)
@@ -229,12 +251,18 @@ def apply_formula(ws, data_row, sheet):
     for r in sheet.single_cells:
         if r.formula is not None:
             formula = r.formula
-            formula = formula.replace(
-                "FIRSTCELLREF", f"{r.posn.range_cell[0]}{data_row}"
-            )
-            formula = formula.replace(
-                "LASTCELLREF", f"{r.posn.range_cell[0]}{MAX_ROWS}"
-            )
+            if "FIRSTCELLREF" in formula:
+                formula = formula.replace(
+                    "FIRSTCELLREF", f"{r.posn.range_cell[0]}{data_row}"
+                )
+            if "LASTCELLREF" in formula:
+                formula = formula.replace(
+                    "LASTCELLREF", f"{r.posn.range_cell[0]}{MAX_ROWS}"
+                )
+            if "FIRSTROW" in formula:
+                formula = formula.replace("FIRSTROW", f"{data_row}")
+            if "LASTROW" in formula:
+                formula = formula.replace("LASTROW", f"{MAX_ROWS}")
             print("FORMULA")
             print(f"{r.posn.range_cell} :: {formula}")
             ws[r.posn.range_cell] = formula
@@ -286,10 +314,11 @@ def process_single_cells(wb, ws, sheet):
             "",
             f"{o.posn.range_cell}:{o.posn.range_cell}",
         )
-        configure_validation(ws, coord, o)
-        # Individual cells can have width set, optionally
-        if "width" in o:
-            ws.column_dimensions[o["title_cell"][0]].width = o["width"]
+        configure_validation(wb, ws, coord, o)
+
+        if sheet.header_height:
+            row = int(o.posn.title_cell[1])
+            ws.row_dimensions[row].height = sheet.header_height
 
 
 def make_range(r):
@@ -325,6 +354,26 @@ def apply_header_cell_style(ws, additional_header_cells):
         the_cell.fill = header_row_fill
 
 
+def process_text_ranges(wb, ws, sheet):
+    print("---- parse_text_ranges ----")
+    max_width = 72
+    for tr in sheet.text_ranges:
+        coords = make_range(tr)
+        cell_reference = f"{quote_sheetname(ws.title)}!{coords.full_range}"
+        ws[tr.posn.title_cell] = tr.posn.title
+        start_cell_column = tr.posn.title_cell[0]
+        start_cell_row = int(tr.posn.title_cell[1]) + 1
+        for ndx, v in enumerate(tr.contents.values):
+            ws[f"{start_cell_column}{start_cell_row + ndx}"] = v
+            if len(v) > max_width:
+                max_width = len(v)
+        new_range = DefinedName(name=coords.name, attr_text=cell_reference)
+        print(f"Adding named text range: {coords.name}, {cell_reference}")
+        wb.defined_names.add(new_range)
+
+        ws.column_dimensions[start_cell_column].width = max_width
+
+
 def unlock_data_entry_cells(header_row, ws, sheet):
     print("---- unlock_data_entry_cells ----")
     for r in sheet.open_ranges:
@@ -333,21 +382,19 @@ def unlock_data_entry_cells(header_row, ws, sheet):
             cell_reference = f"${coords.column}${rowndx}"
             cell = ws[cell_reference]
             cell.protection = Protection(locked=False)
-    if sheet.merged_unreachable is not None:
+    if sheet.merged_unreachable not in [None, []]:
+        print(sheet.merged_unreachable)
         data_row_index = header_row + 1
-        for column in sheet.merged_unreachable:
+        for column in sheet.merged_unreachable.columns:
             for rowndx in range(data_row_index, MAX_ROWS):
                 cell_reference = f"${column}${rowndx}"
                 cell = ws[cell_reference]
                 cell.protection = Protection(locked=False)
 
 
-def set_column_widths(wb, ws, sheet):
-    # Set he widths to something... sensible.
-    # https://stackoverflow.com/questions/13197574/openpyxl-adjust-column-width-size
-    print("---- set_column_widths ----")
+def calculate_average_width(ws):
     if len(list(ws.rows)) == 0:
-        return 72
+        return 72, {}
     else:
         widths = {}
         for row in ws.rows:
@@ -356,22 +403,42 @@ def set_column_widths(wb, ws, sheet):
                     widths[cell.column_letter] = max(
                         (widths.get(cell.column_letter, 0), len(str(cell.value)))
                     )
-        sum = 0
-        for col, value in widths.items():
-            sum += value
-        avg = sum / len(widths)
-        for col, value in widths.items():
-            ws.column_dimensions[col].width = avg / 2
-        for r in sheet.open_ranges:
-            column = r.posn.title_cell[0]
-            if r.posn.width:
-                ws.column_dimensions[column].width = r.posn.width
+        sum_widths = sum(widths.values())
+        avg_width = sum_widths / len(widths)
+        return avg_width, widths
+
+
+def set_column_dimensions(ws, sheet, avg_width, widths):
+    for col, value in widths.items():
+        if col not in [o.posn.title_cell[0] for o in sheet.single_cells]:
+            ws.column_dimensions[col].width = avg_width / 2
+
+
+def set_open_range_and_single_cell_widths(ws, sheet):
+    for r in sheet.open_ranges:
+        column = r.posn.title_cell[0]
+        if r.posn.width:
+            ws.column_dimensions[column].width = r.posn.width
+    for r in sheet.single_cells:
+        column = r.posn.title_cell[0]
+        if r.posn.width:
+            ws.column_dimensions[column].width = r.posn.width
+
+
+def set_column_widths(wb, ws, sheet):
+    # Set he widths to something... sensible.
+    # https://stackoverflow.com/questions/13197574/openpyxl-adjust-column-width-size
+    print("---- set_column_widths ----")
+    avg_width, widths = calculate_average_width(ws)
+    set_column_dimensions(ws, sheet, avg_width, widths)
+    set_open_range_and_single_cell_widths(ws, sheet)
 
 
 def set_wb_security(wb, password):
     # This is not doing what I want.
     # I cannot prevent the sheets from unlocking.
     wb.security = WorkbookProtection(workbookPassword=password, lockStructure=True)
+    wb.security.lockStructure = True
     print(f"To unlock: {password}")
 
 

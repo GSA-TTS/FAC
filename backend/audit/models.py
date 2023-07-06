@@ -1,15 +1,17 @@
 import calendar
 from datetime import date
+import json
 import logging
 
 from django.db import models
 from django.db.models import Q
+from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.contrib.postgres.fields import ArrayField
 
 from django.utils.translation import gettext_lazy as _
 
 from django_fsm import FSMField, RETURN_VALUE, transition
-from django.contrib.postgres.fields import ArrayField
 
 
 from .validators import (
@@ -51,7 +53,44 @@ class SingleAuditChecklistManager(models.Manager):
         return super().create(**updated)
 
 
-class SingleAuditChecklist(models.Model):
+def camel_to_snake(raw: str) -> str:
+    """Convert camel case to snake_case."""
+    text = f"{raw[0].lower()}{raw[1:]}"
+    return "".join(c if c.islower() else f"_{c.lower()}" for c in text)
+
+
+def json_property_mixin_generator(name, fname=None, toplevel=None, classname=None):
+    """Generates a mixin class named classname, using the top-level fields
+    in the properties field in the file named fname, accessing those fields
+    in the JSON field named toplevel.
+    If the optional arguments aren't provided, generate them from name."""
+    filename = fname or f"{name}.schema.json"
+    toplevelproperty = toplevel or camel_to_snake(name)
+    mixinname = classname or f"{name}Mixin"
+
+    def _wrapper(key):
+        def inner(self):
+            try:
+                return getattr(self, toplevelproperty)[key]
+            except KeyError:
+                logger.warning("Key %s not found in SAC", key)
+            except TypeError:
+                logger.warning("Type error trying to get %s from SAC %s", key, self)
+            return None
+
+        return inner
+
+    schemadir = settings.SECTION_SCHEMA_DIR
+    schemafile = schemadir / filename
+    schema = json.loads(schemafile.read_text())
+    attrdict = {k: property(_wrapper(k)) for k in schema["properties"]}
+    return type(mixinname, (), attrdict)
+
+
+GeneralInformationMixin = json_property_mixin_generator("GeneralInformation")
+
+
+class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: ignore
     """
     Monolithic Single Audit Checklist.
     """
@@ -78,6 +117,8 @@ class SingleAuditChecklist(models.Model):
     )
 
     class STATUS:
+        """The states that a submission can be in."""
+
         IN_PROGRESS = "in_progress"
         READY_FOR_CERTIFICATION = "ready_for_certification"
         AUDITOR_CERTIFIED = "auditor_certified"
@@ -132,12 +173,36 @@ class SingleAuditChecklist(models.Model):
         blank=True, null=True, validators=[validate_federal_award_json]
     )
 
+    # Corrective Action Plan:
+    corrective_action_plan = models.JSONField(
+        blank=True, null=True, validators=[validate_corrective_action_plan_json]
+    )
+
+    # Findings Text:
+    findings_text = models.JSONField(
+        blank=True, null=True, validators=[validate_findings_text_json]
+    )
+
+    # Findings Uniform Guidance:
+    findings_uniform_guidance = models.JSONField(
+        blank=True, null=True, validators=[validate_findings_uniform_guidance_json]
+    )
+
     def validate_full(self):
         """
         A stub method to represent the cross-sheet, “full” validation that we
         do once all the individual sections are complete and valid in
         themselves.
         """
+        all_sections = [
+            self.general_information,
+            self.federal_awards,
+            self.corrective_action_plan,
+            self.findings_text,
+            self.findings_uniform_guidance,
+        ]
+        if all(section for section in all_sections):
+            return True
         return True
 
     @transition(
@@ -240,21 +305,6 @@ class SingleAuditChecklist(models.Model):
         self.transition_name.append(SingleAuditChecklist.STATUS.SUBMITTED)
         self.transition_date.append(date.today())
 
-    # Corrective Action Plan:
-    corrective_action_plan = models.JSONField(
-        blank=True, null=True, validators=[validate_corrective_action_plan_json]
-    )
-
-    # Findings Text:
-    findings_text = models.JSONField(
-        blank=True, null=True, validators=[validate_findings_text_json]
-    )
-
-    # Findings Uniform Guidance:
-    findings_uniform_guidance = models.JSONField(
-        blank=True, null=True, validators=[validate_findings_uniform_guidance_json]
-    )
-
     @property
     def is_auditee_certified(self):
         return self.submission_status in [
@@ -271,138 +321,6 @@ class SingleAuditChecklist(models.Model):
             SingleAuditChecklist.STATUS.CERTIFIED,
             SingleAuditChecklist.STATUS.SUBMITTED,
         ]
-
-    @property
-    def is_submitted(self):
-        return self.submission_status in [SingleAuditChecklist.STATUS.SUBMITTED]
-
-    @property
-    def audit_period_covered(self):
-        return self._general_info_get("audit_period_covered")
-
-    @property
-    def auditee_uei(self):
-        return self._general_info_get("auditee_uei")
-
-    @property
-    def auditee_fiscal_period_end(self):
-        return self._general_info_get("auditee_fiscal_period_end")
-
-    @property
-    def auditee_fiscal_period_start(self):
-        return self._general_info_get("auditee_fiscal_period_start")
-
-    @property
-    def auditee_name(self):
-        return self._general_info_get("auditee_name")
-
-    @property
-    def auditee_email(self):
-        return self._general_info_get("auditee_email")
-
-    @property
-    def auditor_email(self):
-        return self._general_info_get("auditor_email")
-
-    @property
-    def auditee_phone(self):
-        return self._general_info_get("auditee_phone")
-
-    @property
-    def is_usa_based(self):
-        return self._general_info_get("is_usa_based")
-
-    @property
-    def met_spending_threshold(self):
-        return self._general_info_get("met_spending_threshold")
-
-    @property
-    def user_provided_organization_type(self):
-        return self._general_info_get("user_provided_organization_type")
-
-    @property
-    def ein(self):
-        return self._general_info_get("ein")
-
-    @property
-    def ein_not_an_ssn_attestation(self):
-        return self._general_info_get("ein_not_an_ssn_attestation")
-
-    @property
-    def multiple_eins_covered(self):
-        return self._general_info_get("multiple_eins_covered")
-
-    @property
-    def multiple_ueis_covered(self):
-        return self._general_info_get("multiple_ueis_covered")
-
-    @property
-    def auditee_address_line_1(self):
-        return self._general_info_get("auditee_address_line_1")
-
-    @property
-    def auditee_city(self):
-        return self._general_info_get("auditee_city")
-
-    @property
-    def auditee_state(self):
-        return self._general_info_get("auditee_state")
-
-    @property
-    def auditee_zip(self):
-        return self._general_info_get("auditee_zip")
-
-    @property
-    def auditee_contact_name(self):
-        return self._general_info_get("auditee_contact_name")
-
-    @property
-    def auditee_contact_title(self):
-        return self._general_info_get("auditee_contact_title")
-
-    @property
-    def auditor_firm_name(self):
-        return self._general_info_get("auditor_firm_name")
-
-    @property
-    def auditor_ein(self):
-        return self._general_info_get("auditor_ein")
-
-    @property
-    def auditor_ein_not_an_ssn_attestation(self):
-        return self._general_info_get("auditor_ein_not_an_ssn_attestation")
-
-    @property
-    def auditor_country(self):
-        return self._general_info_get("auditor_country")
-
-    @property
-    def auditor_address_line_1(self):
-        return self._general_info_get("auditor_address_line_1")
-
-    @property
-    def auditor_city(self):
-        return self._general_info_get("auditor_city")
-
-    @property
-    def auditor_state(self):
-        return self._general_info_get("auditor_state")
-
-    @property
-    def auditor_zip(self):
-        return self._general_info_get("auditor_zip")
-
-    @property
-    def auditor_contact_name(self):
-        return self._general_info_get("auditor_contact_name")
-
-    @property
-    def auditor_contact_title(self):
-        return self._general_info_get("auditor_contact_title")
-
-    @property
-    def auditor_phone(self):
-        return self._general_info_get("auditor_phone")
 
     def get_transition_date(self, status):
         index = self.transition_name.index(status)
