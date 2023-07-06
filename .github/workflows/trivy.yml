@@ -47,22 +47,39 @@ jobs:
           run: |
             echo "date=$(date +%Y%m%d%H%M%S)" >> $GITHUB_OUTPUT
 
-        - name: Build Container
-          working-directory: ${{ env.WORKING_DIRECTORY }}
-          run: docker build -t ${{ env.DOCKER_NAME }}:${{ steps.date.outputs.date }} .
+        # - name: Build Container
+        #   working-directory: ${{ env.WORKING_DIRECTORY }}
+        #   run: docker build -t ${{ env.DOCKER_NAME }}:${{ steps.date.outputs.date }} .
+
+        # - name: Run Trivy vulnerability scanner
+        #   uses: aquasecurity/trivy-action@master
+        #   with:
+        #     image-ref: '${{ env.DOCKER_NAME }}:${{ steps.date.outputs.date }}'
+        #     scan-type: 'image'
+        #     hide-progress: false
+        #     format: 'sarif'
+        #     output: 'webcontainer-results.sarif'
+        #     exit-code: '1'
+        #     ignore-unfixed: true
+
+        # - name: Upload Trivy scan results to GitHub Security tab
+        #   uses: github/codeql-action/upload-sarif@v2
+        #   with:
+        #     sarif_file: 'webcontainer-results.sarif'
 
         - name: Run Trivy vulnerability scanner
           uses: aquasecurity/trivy-action@master
           with:
-            image-ref: '${{ env.DOCKER_NAME }}:${{ steps.date.outputs.date }}'
+            image-ref: 'ghcr.io/gsa-tts/fac/clamav:latest'
             scan-type: 'image'
             hide-progress: false
             format: 'sarif'
-            output: 'trivy-results.sarif'
+            output: 'clamav-results.sarif'
             exit-code: '1'
             ignore-unfixed: true
 
         - name: Upload Trivy scan results to GitHub Security tab
           uses: github/codeql-action/upload-sarif@v2
           with:
-            sarif_file: 'trivy-results.sarif'
+            sarif_file: 'clamav-results.sarif'
+
