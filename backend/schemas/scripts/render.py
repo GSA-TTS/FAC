@@ -259,6 +259,10 @@ def apply_formula(ws, data_row, sheet):
                 formula = formula.replace(
                     "LASTCELLREF", f"{r.posn.range_cell[0]}{MAX_ROWS}"
                 )
+            if "FIRSTROW" in formula:
+                formula = formula.replace("FIRSTROW", f"{data_row}")
+            if "LASTROW" in formula:
+                formula = formula.replace("LASTROW", f"{MAX_ROWS}")
             print("FORMULA")
             print(f"{r.posn.range_cell} :: {formula}")
             ws[r.posn.range_cell] = formula

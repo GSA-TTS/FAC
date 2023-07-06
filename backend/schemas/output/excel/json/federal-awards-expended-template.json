@@ -349,7 +349,7 @@
                "width": 36
             },
             {
-               "formula": "=SUM('Form'!FIRSTCELLREF:LASTCELLREF)",
+               "formula": "=SUM('Form'!E$FIRSTROW:E$LASTROW)",
                "help": {
                   "link": "https://fac.gov/documentation/validation/#positive_number",
                   "text": "The number in this field must be zero or greater"

@@ -24,7 +24,8 @@ local single_cells = [
     range_name: 'total_amount_expended',
     title_cell: 'B1',
     range_cell: 'B2',
-    formula: "=SUM('" + awardSheet + "'!FIRSTCELLREF:LASTCELLREF)",
+    // FIXME MSHD: Will need to pull E from this formula and get it dynamically.
+    formula: "=SUM('" + awardSheet + "'!E$FIRSTROW:E$LASTROW)",
     width: 36,
     help: Help.positive_number,
 
