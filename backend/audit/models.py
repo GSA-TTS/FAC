@@ -11,9 +11,6 @@ from django.utils.translation import gettext_lazy as _
 from django_fsm import FSMField, RETURN_VALUE, transition
 from django.contrib.postgres.fields import ArrayField
 
-
-#import audit.etl as etl
-#   from etl import ETL
 from .validators import (
     validate_excel_file,
     validate_corrective_action_plan_json,
