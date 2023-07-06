@@ -64,6 +64,33 @@ jobs:
         id: buildx
         uses: docker/setup-buildx-action@v2
 
+      - name: Create ssl key file
+        working-directory: ${{ env.WORKING_DIRECTORY }}
+        shell: bash
+        env:
+          SSL_KEY: ${{ secrets.RSA_KEY }}
+        run: |
+          echo "$SSL_KEY" > private.pem
+          chmod 600 private.pem
+          openssl rsa -in "private.pem" -pubout > "public.pem"
+
+      - name: Add signer
+        working-directory: ${{ env.WORKING_DIRECTORY }}
+        shell: bash
+        run: |
+          docker trust signer add --key "public.pem" "${{ env.GH_REPO }}" "${{ env.GH_REPO }}/${{ env.IMAGE }}"
+
+      - name: Load the private key onto Docker trust store
+        working-directory: ${{ env.WORKING_DIRECTORY }}
+        shell: bash
+        run: |
+          docker trust key load --name "fac-codesign" "private.pem"
+          GREEN='\033[0;32m'
+          PURPLE='\033[0;35m'
+          NC='\033[0m' # No Color
+          echo -e "Confirm \"${GREEN}Successfully imported key from private.pem${NC}\"" \
+          "\nIf successful, IGNORE  \"${PURPLE}failed to import key to store: ...${NC}\" (due to unused content within private key)"
+
       - name: Build Container
         working-directory: ${{ env.WORKING_DIRECTORY }}
         run: docker build -t ${{ env.DOCKER_NAME }}:${{ steps.date.outputs.date }} .
