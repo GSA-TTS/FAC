@@ -32,10 +32,10 @@ Boundary(cloudgov, "Cloud.gov Boundary") {
         Boundary(pages, "cloud.gov pages") {
             System(static, "FAC Static Site", "CG Pages") 
         }
-    }
-    Boundary(cloudgov-services,"Cloud.gov services") {
-        System(db, "Database", "Brokered postgreSQL")
-        System(s3, "PDF/XLS storage", "Brokered S3")
+        Boundary(cloudgov-services,"Cloud.gov services") {
+            System(db, "Database", "Brokered postgreSQL")
+            System(s3, "PDF/XLS storage", "Brokered S3")
+        }
     }
 }
 
