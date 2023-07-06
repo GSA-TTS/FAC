@@ -281,4 +281,3 @@ class UploadPageView(LoginRequiredMixin, View):
             logger.info("Unexpected error in UploadPageView post.\n", e)
 
         raise BadRequest()
-
