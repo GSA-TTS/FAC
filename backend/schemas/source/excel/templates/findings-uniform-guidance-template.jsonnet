@@ -3,14 +3,15 @@ local Help = import '../libs/Help.libsonnet';
 local SV = import '../libs/SheetValidations.libsonnet';
 local Sheets = import '../libs/Sheets.libsonnet';
 
-local title_row = 3;
+local title_row = 1;
 
 local single_cells = [
   Sheets.single_cell {
     title: 'Auditee UEI',
     range_name: 'auditee_uei',
-    title_cell: 'A2',
-    range_cell: 'B2',
+    width: 36,
+    title_cell: 'A1',
+    range_cell: 'A2',
     validation: SV.StringOfLengthTwelve,
     help: Help.uei,
   },
@@ -171,13 +172,12 @@ local open_ranges_defns = [
 local sheets = [
   {
     name: 'Form',
-    single_cells: single_cells,
     open_ranges: Fun.make_open_ranges(title_row, open_ranges_defns),
-    mergeable_cells: [
-      [1, 2, 'A', 'O'],
-      [2, 3, 'C', 'O'],
-    ],
-    header_inclusion: ['A1', 'C2'],
+  },
+  {
+    name: 'UEI',
+    single_cells: single_cells,
+    header_height: 100,
   },
 ];
 
