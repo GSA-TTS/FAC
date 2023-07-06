@@ -1,20 +1,22 @@
 {% extends "base.html" %}
 {% load static %}
 {% block content %}
-<div class="grid-container margin-top-6">
-  <div class="grid-row grid-gap">
-      <form class="usa-form usa-form--large" id="submission" method="post">
-          {% csrf_token %}
-          <fieldset class="usa-fieldset">
-              <legend class="usa-legend usa-legend--large" id="submission">
-                  Audit Submission
-              </legend>
-              <p>This is some text explaining that clicking the button below will submit this audit. Once submitted, the audit can no longer be edited.</p>
-              <p>Audit {{ report_id }} has a submission status of: {{ submission_status }}</p>
-              <h4 class="usa-process-list__heading">This action is taken by the CERTIFYING AUDITEE</h4>
-              <button class="usa-button" id="continue">Submit Audit</button>
-          </fieldset>
-      </form>
-  </div>
-</div>
+    <div class="grid-container margin-top-6">
+        <div class="grid-row grid-gap">
+            <form class="usa-form usa-form--large" id="submission" method="post">
+                {% csrf_token %}
+                <fieldset class="usa-fieldset">
+                    <legend class="usa-legend usa-legend--large" id="submission">
+                        Audit Submission
+                    </legend>
+                    <p>
+                        This is some text explaining that clicking the button below will submit this audit. Once submitted, the audit can no longer be edited.
+                    </p>
+                    <p>Audit {{ report_id }} has a submission status of: {{ submission_status }}</p>
+                    <h4 class="usa-process-list__heading">This action is taken by the CERTIFYING AUDITEE</h4>
+                    <button class="usa-button" id="continue">Submit Audit</button>
+                </fieldset>
+            </form>
+        </div>
+    </div>
 {% endblock content %}
