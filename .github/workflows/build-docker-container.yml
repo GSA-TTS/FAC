@@ -64,6 +64,13 @@ jobs:
         id: buildx
         uses: docker/setup-buildx-action@v2
 
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+            registry: ghcr.io
+            username: ${{ github.repository_owner }}
+            password: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Create ssl key file
         working-directory: ${{ env.WORKING_DIRECTORY }}
         shell: bash
@@ -97,13 +104,6 @@ jobs:
 
       - name: Tag Image
         run: docker tag ${{ env.DOCKER_NAME }}:${{ steps.date.outputs.date }} ghcr.io/${{ env.GH_REPO }}/${{ env.IMAGE }}:latest
-
-      - name: Login to GitHub Container Registry
-        uses: docker/login-action@v2
-        with:
-            registry: ghcr.io
-            username: ${{ github.repository_owner }}
-            password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Push Web Container
         run: docker push --all-tags ghcr.io/${{ env.GH_REPO }}/${{ env.IMAGE }} --disable-content-trust=false
