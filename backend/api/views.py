@@ -1,20 +1,19 @@
 import json
 from typing import List
 
-from audit.models import Access, SingleAuditChecklist
-from audit.permissions import SingleAuditChecklistPermission
-from django.http import Http404, HttpResponse
+from django.http import Http404, HttpResponse, JsonResponse
 from django.urls import reverse
-from django.views import View
-from config.settings import AUDIT_SCHEMA_DIR, BASE_DIR
+from django.views import View, generic
+from django.core.exceptions import ValidationError
 from rest_framework import viewsets
 from rest_framework.authentication import BaseAuthentication
 from rest_framework.permissions import BasePermission, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from django.http import JsonResponse
-from django.core.exceptions import ValidationError
 
+from config.settings import AUDIT_SCHEMA_DIR, BASE_DIR
+from audit.models import Access, SingleAuditChecklist
+from audit.permissions import SingleAuditChecklistPermission
 from .serializers import (
     AccessAndSubmissionSerializer,
     AccessListSerializer,
@@ -143,6 +142,21 @@ def access_and_submission_check(user, data):
         return {"report_id": sac.report_id, "next": "TBD"}
 
     return {"errors": serializer.errors}
+
+
+class Sprite(generic.View):
+    """
+    Due to problematic interactions between the SVG use element and
+    cross-domain rules and serving assets from S3, we need to serve this
+    particular file from Django.
+    """
+
+    def get(self, _request):
+        """Grab the file from static and return its contents as an image."""
+        fpath = BASE_DIR / "static" / "img" / "sprite.svg"
+        return HttpResponse(
+            content=fpath.read_text(encoding="utf-8"), content_type="image/svg+xml"
+        )
 
 
 class IndexView(View):

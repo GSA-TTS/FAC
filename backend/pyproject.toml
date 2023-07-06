@@ -6,6 +6,8 @@ exclude = "node_modules/"
 
 [tool.mypy]
 ignore_missing_imports = true
+explicit_package_bases = true
+exclude = ".venv/"
 
 [tool.pylint."MESSAGES CONTROL"]
 # Tadhg 2022-05-03: I added the below because I've found them unhelpful.
@@ -16,7 +18,7 @@ ignore_missing_imports = true
 exclude_dirs = [
     "audit/test_schemas.py",
     "audit/test_validators.py",
-    "node_modules", 
+    "node_modules",
 ]
 
 enable = [
@@ -40,4 +42,4 @@ disable = [
 
 [tool.djlint]
 ignore="H006,H022,H023,H019,H031"
-# img_height, https,entity,javascript,lang
+# img_height,https,entity,javascript,lang

@@ -1,26 +1,50 @@
 ---
-    name: Scheduled Deploy From Main to Staging
-    on:
-        workflow_dispatch:
-        schedule:
-        - cron: '0 10 * * 1-5'
+name: Scheduled Deploy From Main to Staging
+on:
+  schedule:
+    - cron: '0 10 * * 1-5'
+  workflow_dispatch:
+jobs:
+  trivy-scan:
+    uses: ./.github/workflows/trivy.yml
+    secrets: inherit
+    permissions:
+      contents: read
+      packages: write
+      actions: read
+      security-events: write
+    with:
+      work-dir: ./backend
+      docker-name: fac
 
-    jobs:
-      build-web-container:
-        name: Build FAC Web Container
-        uses: ./.github/workflows/build-docker-container.yml
-        secrets: inherit
+  build-container:
+    needs:
+      - trivy-scan
+    uses: ./.github/workflows/build-docker-container.yml
+    secrets: inherit
+    permissions:
+      contents: read
+      packages: write
+    with:
+      docker-name: fac
+      image-name: web-container
+      repo-name: gsa-tts/fac
+      work-dir: ./backend
 
-      test-and-lint:
-        name: Run Django, Lighthouse, a11y and lint
-        needs:
-          - build-web-container
-        uses: ./.github/workflows/test-and-lint.yml
-        secrets: inherit
+  testing:
+    name: Run Django, Lighthouse, a11y and lint
+    needs:
+      - build-container
+    uses: ./.github/workflows/testing-from-ghcr.yml
+    secrets: inherit
 
-      create-pr:
-        name: Auto Create Pull Request
-        needs:
-          - test-and-lint
-        uses: ./.github/workflows/auto-create-pr.yml
-        secrets: inherit
+  linting:
+    uses: ./.github/workflows/linting.yml
+    secrets: inherit
+
+  create-pr:
+    needs:
+      - testing
+    name: Create Pull Request to Staging
+    uses: ./.github/workflows/auto-create-pr.yml
+    secrets: inherit

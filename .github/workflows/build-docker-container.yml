@@ -1,48 +1,82 @@
 ---
-name: Build and Publish Docker Web Container
+name: Build and Publish Docker Container
 on:
-    workflow_dispatch:
-    workflow_call:
+  workflow_dispatch:
+    inputs:
+      docker-name:
+        required: true
+        type: string
+        default: fac
+      image-name:
+        required: true
+        type: string
+        default: web-container
+      repo-name:
+        required: true
+        type: string
+        default: gsa-tts/fac
+      work-dir:
+        required: true
+        type: string
+        default: ./backend
+  workflow_call:
+    inputs:
+      docker-name:
+        required: true
+        type: string
+        default: fac
+      image-name:
+        required: true
+        type: string
+        default: web-container
+      repo-name:
+        required: true
+        type: string
+        default: gsa-tts/fac
+      work-dir:
+        required: true
+        type: string
+        default: ./backend
 
 env:
-    DOCKER_NAME: fac
-    IMAGE: web-container
-    GH_REPO: asteel-gsa/fac
+  DOCKER_NAME: ${{ inputs.docker-name }}
+  IMAGE: ${{ inputs.image-name }}
+  GH_REPO: ${{ inputs.repo-name }}
+  WORKING_DIRECTORY: ${{ inputs.work-dir }}
 
 jobs:
-    build-with-docker:
-      name: Build Docker Container
-      runs-on: ubuntu-latest
-      permissions:
+  build-with-docker:
+    name: Build Docker Container
+    runs-on: ubuntu-latest
+    permissions:
         contents: read
         packages: write
-      steps:
-        - name: Get Date
-          shell: bash
-          id: date
-          run: |
-            echo "date=$(date +%Y%m%d)" >> $GITHUB_OUTPUT
+    steps:
+      - name: Get Date
+        shell: bash
+        id: date
+        run: echo "date=$(date +%Y%m%d)" >> $GITHUB_OUTPUT
 
-        - name: Checkout
-          uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v3
 
-        - name: Set up Docker Buildx
-          id: buildx
-          uses: docker/setup-buildx-action@v2
+      - name: Set up Docker Buildx
+        id: buildx
+        uses: docker/setup-buildx-action@v2
 
-        - name: Build Container
-          working-directory: ./backend
-          run: docker build . -t ${{ env.DOCKER_NAME }}:${{ steps.date.outputs.date }}
+      - name: Build Container
+        working-directory: ${{ env.WORKING_DIRECTORY }}
+        run: docker build -t ${{ env.DOCKER_NAME }}:${{ steps.date.outputs.date }} .
 
-        - name: Tag Image
-          run: docker tag ${{ env.DOCKER_NAME }}:${{ steps.date.outputs.date }} ghcr.io/${{ env.GH_REPO }}/${{ env.IMAGE }}:latest
+      - name: Tag Image
+        run: docker tag ${{ env.DOCKER_NAME }}:${{ steps.date.outputs.date }} ghcr.io/${{ env.GH_REPO }}/${{ env.IMAGE }}:latest
 
-        - name: Login to GitHub Container Registry
-          uses: docker/login-action@v2
-          with:
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
             registry: ghcr.io
             username: ${{ github.repository_owner }}
             password: ${{ secrets.GITHUB_TOKEN }}
 
-        - name: Push Web Container
-          run: docker push --all-tags ghcr.io/${{ env.GH_REPO }}/${{ env.IMAGE }}
+      - name: Push Web Container
+        run: docker push --all-tags ghcr.io/${{ env.GH_REPO }}/${{ env.IMAGE }}
