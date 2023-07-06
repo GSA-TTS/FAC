@@ -390,22 +390,22 @@ def unlock_data_entry_cells(header_row, ws, sheet):
 
 def calculate_average_width(ws):
     if len(list(ws.rows)) == 0:
-        return 72
-    widths = {}
-    for row in ws.rows:
-        for cell in row:
-            if cell.value:
-                widths[cell.column_letter] = max(
-                    (widths.get(cell.column_letter, 0), len(str(cell.value)))
-                )
-    sum = 0
-    for _, value in widths.items():
-        sum += value
-    return sum / len(widths)
+        return 72, {}
+    else:
+        widths = {}
+        for row in ws.rows:
+            for cell in row:
+                if cell.value:
+                    widths[cell.column_letter] = max(
+                        (widths.get(cell.column_letter, 0), len(str(cell.value)))
+                    )
+        sum_widths = sum(widths.values())
+        avg_width = sum_widths / len(widths)
+        return avg_width, widths
 
 
-def set_column_dimensions(ws, sheet, avg_width):
-    for col, _ in sheet.widths.items():
+def set_column_dimensions(ws, sheet, avg_width, widths):
+    for col, value in widths.items():
         if col not in [o.posn.title_cell[0] for o in sheet.single_cells]:
             ws.column_dimensions[col].width = avg_width / 2
 
@@ -425,8 +425,8 @@ def set_column_widths(wb, ws, sheet):
     # Set he widths to something... sensible.
     # https://stackoverflow.com/questions/13197574/openpyxl-adjust-column-width-size
     print("---- set_column_widths ----")
-    avg_width = calculate_average_width(ws)
-    set_column_dimensions(ws, sheet, avg_width)
+    avg_width, widths = calculate_average_width(ws)
+    set_column_dimensions(ws, sheet, avg_width, widths)
     set_open_range_and_single_cell_widths(ws, sheet)
 
 
