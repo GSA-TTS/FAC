@@ -666,7 +666,7 @@ class CorrectiveActionPlanValidatorTests(SimpleTestCase):
 
 class PdfFileIntegrityValidatorTests(SimpleTestCase):
     def test_broken_pdf_file(self):
-        """PDF files that are not readable by pdfminer are invalid"""
+        """PDF files that are not readable by PyPDF are invalid"""
         file = TemporaryUploadedFile(
             "file.pdf", b"this is not really a pdf file", 10000, "utf-8"
         )
