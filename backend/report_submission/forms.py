@@ -1,9 +1,10 @@
 from django import forms
 
-
 # The general information fields are currently specified in two places:
 #   - report_submission.forms.GeneralInformationForm
 #   - schemas.sections.GeneralInformation.schema.json
+
+
 class GeneralInformationForm(forms.Form):
     audit_type = forms.CharField()
     auditee_fiscal_period_end = forms.CharField()
@@ -38,15 +39,21 @@ class GeneralInformationForm(forms.Form):
 
 
 class UploadReportForm(forms.Form):
-    financial_statements = forms.CharField()
-    financial_statements_opinion = forms.CharField()
-    schedule_expenditures = forms.CharField()
-    schedule_expenditures_opinion = forms.CharField()
-    uniform_guidance_control = forms.CharField()
-    uniform_guidance_compliance = forms.CharField()
-    GAS_control = forms.CharField()
-    GAS_compliance = forms.CharField()
-    schedule_findings = forms.CharField()
-    schedule_prior_findings = forms.CharField(required=False)
-    CAP_page = forms.CharField(required=False)
+    financial_statements = forms.IntegerField(min_value=1)
+    financial_statements_opinion = forms.IntegerField(min_value=1)
+    schedule_expenditures = forms.IntegerField(min_value=1)
+    schedule_expenditures_opinion = forms.IntegerField(
+        min_value=1
+    )
+    uniform_guidance_control = forms.IntegerField(min_value=1)
+    uniform_guidance_compliance = forms.IntegerField(min_value=1)
+    GAS_control = forms.IntegerField(min_value=1)
+    GAS_compliance = forms.IntegerField(min_value=1)
+    schedule_findings = forms.IntegerField(min_value=1)
+    schedule_prior_findings = forms.IntegerField(
+        initial=0, required=False, min_value=1
+    )
+    CAP_page = forms.IntegerField(
+        initial=0, required=False, min_value=1
+    )
     upload_report = forms.FileField()
