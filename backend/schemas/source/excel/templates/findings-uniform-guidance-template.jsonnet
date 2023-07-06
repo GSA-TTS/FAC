@@ -2,7 +2,8 @@ local Fun = import '../libs/Functions.libsonnet';
 local Help = import '../libs/Help.libsonnet';
 local SV = import '../libs/SheetValidations.libsonnet';
 local Sheets = import '../libs/Sheets.libsonnet';
-
+local findingSheet = 'Form';
+local ueiSheet = 'UEI';
 local title_row = 1;
 
 local single_cells = [
@@ -171,11 +172,11 @@ local open_ranges_defns = [
 
 local sheets = [
   {
-    name: 'Form',
+    name: findingSheet,
     open_ranges: Fun.make_open_ranges(title_row, open_ranges_defns),
   },
   {
-    name: 'UEI',
+    name: ueiSheet,
     single_cells: single_cells,
     header_height: 100,
   },

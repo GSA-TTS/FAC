@@ -3,7 +3,10 @@ local Fun = import '../libs/Functions.libsonnet';
 local Help = import '../libs/Help.libsonnet';
 local SV = import '../libs/SheetValidations.libsonnet';
 local Sheets = import '../libs/Sheets.libsonnet';
-
+local awardSheet = 'Form';
+local ueiSheet = 'UEI';
+local clusterSheet = 'Clusters';
+local programSheet = 'FederalPrograms';
 local title_row = 1;
 
 local single_cells = [
@@ -21,7 +24,7 @@ local single_cells = [
     range_name: 'total_amount_expended',
     title_cell: 'B1',
     range_cell: 'B2',
-    formula: "=SUM('Form'!FIRSTCELLREF:LASTCELLREF)",
+    formula: "=SUM('" + awardSheet + "'!FIRSTCELLREF:LASTCELLREF)",
     width: 36,
     help: Help.positive_number,
 
@@ -61,7 +64,7 @@ local open_ranges_defns = [
       help: Help.federal_program_name,
     },
     SV.RangeLookupValidation {
-      sheet: 'FederalPrograms',
+      sheet: programSheet,
       lookup_range: 'federal_program_name_lookup',
     },
     'Federal Program Name',
@@ -81,7 +84,7 @@ local open_ranges_defns = [
       help: Help.cluster_name,
     },
     SV.RangeLookupValidation {
-      sheet: 'Clusters',
+      sheet: clusterSheet,
       lookup_range: 'cluster_name_lookup',
     },
     'Cluster Name',
@@ -207,16 +210,16 @@ local open_ranges_defns = [
 
 local sheets = [
   {
-    name: 'Form',
+    name: awardSheet,
     open_ranges: Fun.make_open_ranges(title_row, open_ranges_defns),
   },
   {
-    name: 'UEI',
+    name: ueiSheet,
     single_cells: single_cells,
     header_height: 100,
   },
   {
-    name: 'Clusters',
+    name: clusterSheet,
     text_ranges: [
       {
         // Make this look like an open range
@@ -232,7 +235,7 @@ local sheets = [
     ],
   },
   {
-    name: 'FederalPrograms',
+    name: programSheet,
     text_ranges: [
       {
         // Make this look like an open range
