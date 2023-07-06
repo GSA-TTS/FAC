@@ -24,7 +24,9 @@ on:
   push:
     branches:
       - main
-      - test
+      - prod
+    tags:
+      - v1.*
 
 permissions:
   contents: read
@@ -32,6 +34,8 @@ permissions:
 env:
   DOCKER_NAME: ${{ inputs.docker-name }}
   WORKING_DIRECTORY: ${{ inputs.work-dir }}
+  CLAMAV_IMAGE: 'ghcr.io/asteel-gsa/fac/clamav:latest'
+  POSTGREST_IMAGE: 'ghcr.io/asteel-gsa/fac/postgrest:latest'
 
 jobs:
   trivy:
@@ -87,9 +91,7 @@ jobs:
       matrix:
         image:
           - name: ghcr.io/asteel-gsa/fac/postgrest:latest
-            short-name: postgrest
-          - name: ghcr.io/asteel-gsa/fac/swagger:latest
-            short-name: clamav
+          - name: ghcr.io/asteel-gsa/fac/clamav:latest
     steps:
       - name: Pull Third Party Docker Images
         run: docker pull ${{ matrix.image.name }}
