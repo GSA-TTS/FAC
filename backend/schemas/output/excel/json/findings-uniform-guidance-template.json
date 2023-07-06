@@ -23,6 +23,10 @@
          "name": "Form",
          "open_ranges": [
             {
+               "help": {
+                  "link": "https://fac.gov/documentation/validation/#aln_prefix",
+                  "text": "Not a valid agency ALN (CFDA) prefix"
+               },
                "range_name": "federal_agency_prefix",
                "title": "Federal Agency Prefix",
                "title_cell": "A3",
@@ -31,12 +35,16 @@
                   "allow_blank": "False",
                   "custom_error": "The Federal Agency Prefix you entered is not recognized",
                   "custom_title": "Unknown ALN Prefix",
-                  "formula1": "\"01,02,03,04,07,08,09,10,11,12,13,14,15,16,17,18,19,20,21,22,23,27,29,30,32,33,34,36,39,40,41,42,43,44,45,46,47,53,57,58,59,60,61,62,64,66,68,70,77,78,81,82,83,84,85,86,87,88,89,90,91,92,93,94,96,97,98,99\"",
+                  "formula1": "\"10,11,12,13,14,15,16,17,18,19,20,21,22,23,27,29,30,32,33,34,36,39,40,41,42,43,44,45,46,47,53,57,58,59,60,61,62,64,66,68,70,77,78,81,82,83,84,85,86,87,88,89,90,91,92,93,94,96,97,98,99\"",
                   "type": "list"
                },
                "width": 12
             },
             {
+               "help": {
+                  "link": "https://fac.gov/documentation/validation/#aln_extension",
+                  "text": "An ALN (CFDA) extension is typically three digits, with some exceptions"
+               },
                "range_name": "three_digit_extension",
                "title": "CFDA Three Digit Extension",
                "title_cell": "B3",
@@ -51,21 +59,37 @@
                "width": 12
             },
             {
+               "help": {
+                  "link": "https://fac.gov/documentation/validation/#unknown",
+                  "text": "If you see this error, please contact support."
+               },
                "range_name": "additional_award_identification",
                "title": "Additional Award Identification",
                "title_cell": "C3",
                "type": "open_range",
-               "validation": { }
+               "validation": {
+                  "type": "NOVALIDATION"
+               }
             },
             {
+               "help": {
+                  "link": "https://fac.gov/documentation/validation/#plain_text",
+                  "text": "Only plain text is allowed in this field, no emoji or other special additions"
+               },
                "range_name": "program_name",
                "title": "Federal Program Name",
                "title_cell": "D3",
                "type": "open_range",
-               "validation": { },
+               "validation": {
+                  "type": "NOVALIDATION"
+               },
                "width": 48
             },
             {
+               "help": {
+                  "link": "https://fac.gov/documentation/validation/#reference_number",
+                  "text": "Reference numbers have the form YYYY-NNN (e.g. 2023-001)"
+               },
                "range_name": "reference_number",
                "title": "Audit Finding Reference Number",
                "title_cell": "E3",
@@ -78,6 +102,10 @@
                }
             },
             {
+               "help": {
+                  "link": "https://fac.gov/documentation/validation/#unknown",
+                  "text": "If you see this error, please contact support."
+               },
                "range_name": "compliance_requirement",
                "title": "Type(s) of Compliance Requirement(s)",
                "title_cell": "F3",
@@ -91,6 +119,10 @@
                "width": 20
             },
             {
+               "help": {
+                  "link": "https://fac.gov/documentation/validation/#yorn",
+                  "text": "This field must be either `Y` or `N`"
+               },
                "range_name": "modified_opinion",
                "title": "Modified Opinion",
                "title_cell": "G3",
@@ -105,6 +137,10 @@
                "width": 12
             },
             {
+               "help": {
+                  "link": "https://fac.gov/documentation/validation/#unknown",
+                  "text": "If you see this error, please contact support."
+               },
                "range_name": "other_matters",
                "title": "Other Matters",
                "title_cell": "H3",
@@ -119,6 +155,10 @@
                "width": 12
             },
             {
+               "help": {
+                  "link": "https://fac.gov/documentation/validation/#unknown",
+                  "text": "If you see this error, please contact support."
+               },
                "range_name": "material_weakness",
                "title": "Material Weakness",
                "title_cell": "I3",
@@ -133,6 +173,10 @@
                "width": 12
             },
             {
+               "help": {
+                  "link": "https://fac.gov/documentation/validation/#yorn",
+                  "text": "This field must be either `Y` or `N`"
+               },
                "range_name": "significant_deficiency",
                "title": "Significant Deficiency",
                "title_cell": "J3",
@@ -147,6 +191,10 @@
                "width": 12
             },
             {
+               "help": {
+                  "link": "https://fac.gov/documentation/validation/#yorn",
+                  "text": "This field must be either `Y` or `N`"
+               },
                "range_name": "other_findings",
                "title": "Other Findings",
                "title_cell": "K3",
@@ -161,6 +209,10 @@
                "width": 12
             },
             {
+               "help": {
+                  "link": "https://fac.gov/documentation/validation/#yorn",
+                  "text": "This field must be either `Y` or `N`"
+               },
                "range_name": "questioned_costs",
                "title": "Questioned Costs",
                "title_cell": "L3",
@@ -175,6 +227,10 @@
                "width": 12
             },
             {
+               "help": {
+                  "link": "https://fac.gov/documentation/validation/#yorn",
+                  "text": "This field must be either `Y` or `N`"
+               },
                "range_name": "repeat_prior_reference",
                "title": "Repeat Findings from Prior Year",
                "title_cell": "M3",
@@ -189,15 +245,25 @@
                "width": 12
             },
             {
+               "help": {
+                  "link": "https://fac.gov/documentation/validation/#yorn",
+                  "text": "This field must be either `Y` or `N`"
+               },
                "range_name": "prior_references",
                "title": "If Repeat Finding, provide Prior Year Audit Finding Reference Number(s)",
                "title_cell": "N3",
                "type": "open_range",
-               "validation": { },
+               "validation": {
+                  "type": "NOVALIDATION"
+               },
                "width": 24
             },
             {
                "formula": "=IF(OR(G{0}=\"\", H{0}=\"\", I{0}=\"\", J{0}=\"\", K{0}=\"\"), \"\", IF(OR(AND(G{0}=\"Y\", H{0}=\"N\", I{0}=\"N\", J{0}=\"N\", K{0}=\"N\"), AND(G{0}=\"Y\", H{0}=\"N\", I{0}=\"Y\", J{0}=\"N\", K{0}=\"N\"), AND(G{0}=\"Y\", H{0}=\"N\", I{0}=\"N\", J{0}=\"Y\", K{0}=\"N\"), AND(G{0}=\"N\", H{0}=\"Y\", I{0}=\"N\", J{0}=\"N\", K{0}=\"N\"), AND(G{0}=\"N\", H{0}=\"Y\", I{0}=\"Y\", J{0}=\"N\", K{0}=\"N\"), AND(G{0}=\"N\", H{0}=\"Y\", I{0}=\"N\", J{0}=\"Y\", K{0}=\"N\"), AND(G{0}=\"N\", H{0}=\"N\", I{0}=\"Y\", J{0}=\"N\", K{0}=\"N\"), AND(G{0}=\"N\", H{0}=\"N\", I{0}=\"N\", J{0}=\"Y\", K{0}=\"N\"), AND(G{0}=\"N\", H{0}=\"N\", I{0}=\"N\", J{0}=\"N\", K{0}=\"Y\")), \"Y\", \"N\"))",
+               "help": {
+                  "link": "https://fac.gov/documentation/validation/#yorn",
+                  "text": "This field must be either `Y` or `N`"
+               },
                "range_name": "is_valid",
                "title": "Is Findings Combination Valid? (Read Only - Please See Instructions tab)",
                "title_cell": "O3",
@@ -214,6 +280,10 @@
          ],
          "single_cells": [
             {
+               "help": {
+                  "link": "https://fac.gov/documentation/validation/#uei",
+                  "text": "UEIs are 12 characters long and match rules as given by SAM.gov"
+               },
                "range_cell": "B2",
                "range_name": "auditee_uei",
                "title": "Auditee UEI",

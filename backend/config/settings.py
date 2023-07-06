@@ -230,16 +230,18 @@ if ENVIRONMENT not in ["DEVELOPMENT", "STAGING", "PRODUCTION"]:
     AWS_PRIVATE_SECRET_ACCESS_KEY = os.environ.get(
         "AWS_PRIVATE_SECRET_ACCESS_KEY", "longtest"
     )
-    AWS_S3_PRIVATE_ENDPOINT = os.environ.get("AWS_S3_PRIVATE_ENDPOINT", "minio:9000")
+    AWS_S3_PRIVATE_ENDPOINT = os.environ.get(
+        "AWS_S3_PRIVATE_ENDPOINT", "http://minio:9000"
+    )
 
-    AWS_S3_ENDPOINT_URL = f"http://{AWS_S3_PRIVATE_ENDPOINT}"
+    AWS_S3_ENDPOINT_URL = AWS_S3_PRIVATE_ENDPOINT
 
     DISABLE_AUTH = env.bool("DISABLE_AUTH", default=False)
 
 else:
     # One of the Cloud.gov environments
     STATICFILES_STORAGE = "storages.backends.s3boto3.S3ManifestStaticStorage"
-    DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
+    DEFAULT_FILE_STORAGE = "report_submission.storages.S3PrivateStorage"
     vcap = json.loads(env.str("VCAP_SERVICES"))
     for service in vcap["s3"]:
         if service["instance_name"] == "fac-public-s3":
@@ -264,7 +266,6 @@ else:
             STATIC_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/{AWS_LOCATION}/"
 
             STATICFILES_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
-            DEFAULT_FILE_STORAGE = "cts_forms.storages.PrivateS3Storage"
             AWS_IS_GZIPPED = True
 
         elif service["instance_name"] == "fac-private-s3":
@@ -286,14 +287,16 @@ else:
             AWS_PRIVATE_DEFAULT_ACL = "private"
             # If wrong, https://docs.aws.amazon.com/AmazonS3/latest/userguide/acl-overview.html#canned-acl
 
-            MEDIA_URL = f"https://{AWS_S3_PRIVATE_CUSTOM_DOMAIN}/{AWS_LOCATION}/"
+            MEDIA_URL = (
+                f"https://{AWS_S3_PRIVATE_CUSTOM_DOMAIN}/{AWS_PRIVATE_LOCATION}/"
+            )
 
     # secure headers
     MIDDLEWARE.append("csp.middleware.CSPMiddleware")
     # see settings options https://django-csp.readthedocs.io/en/latest/configuration.html#configuration-chapter
     bucket = f"{STATIC_URL}"
     allowed_sources = (
-        "self",
+        "'self'",
         bucket,
         "https://idp.int.identitysandbox.gov/",
         "https://dap.digitalgov.gov",
@@ -307,7 +310,7 @@ else:
     CSP_IMG_SRC = allowed_sources
     CSP_MEDIA_SRC = allowed_sources
     CSP_FRAME_SRC = allowed_sources
-    CSP_FONT_SRC = ("self", bucket)
+    CSP_FONT_SRC = ("'self'", bucket)
     CSP_WORKER_SRC = allowed_sources
     CSP_FRAME_ANCESTORS = allowed_sources
     CSP_STYLE_SRC = allowed_sources

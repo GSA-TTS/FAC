@@ -1,5 +1,6 @@
 {% extends "report_submission/step-base.html" %}
 {% load static %}
+{% load sprite_helper %}
 {% block step-content %}
     <div class="grid-container audit-submission-access">
         <div class="grid-row">
@@ -244,7 +245,7 @@
                                             aria-label="Delete contact"
                                             title="Delete contact">
                                         <svg class="usa-icon" aria-hidden="true" focusable="false" role="img">
-                                            <use xlink:href="/static/img/sprite.svg#cancel"></use>
+                                            {% uswds_sprite "cancel" %}
                                         </svg>
                                     </button>
                                 </template>
@@ -349,7 +350,7 @@
                                                 aria-label="Delete contact"
                                                 title="Delete contact">
                                             <svg class="usa-icon" aria-hidden="true" focusable="false" role="img">
-                                                <use xlink:href="/static/img/sprite.svg#cancel"></use>
+                                                {% uswds_sprite "cancel" %}
                                             </svg>
                                         </button>
                                     </template>

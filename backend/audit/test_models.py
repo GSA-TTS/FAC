@@ -1,3 +1,5 @@
+from datetime import date
+
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db.utils import IntegrityError
 from django.test import TestCase
@@ -83,6 +85,7 @@ class SingleAuditChecklistTests(TestCase):
             ),
         )
 
+        now = date.today()
         for statuses_from, status_to, transition_name in cases:
             for status_from in statuses_from:
                 sac = baker.make(SingleAuditChecklist, submission_status=status_from)
@@ -91,6 +94,7 @@ class SingleAuditChecklistTests(TestCase):
                 transition_method()
 
                 self.assertEqual(sac.submission_status, status_to)
+                self.assertGreaterEqual(sac.get_transition_date(status_to), now)
 
                 bad_statuses = [
                     status[0]
@@ -172,6 +176,7 @@ class ExcelFileTests(TestCase):
         """
         file = SimpleUploadedFile("this is a file.xlsx", b"this is a file")
 
-        excel_file = baker.make(ExcelFile, file=file)
+        excel_file = baker.make(ExcelFile, file=file, form_section="sectionname")
+        report_id = SingleAuditChecklist.objects.get(id=excel_file.sac.id).report_id
 
-        self.assertEqual("this-is-a-file.xlsx", excel_file.filename)
+        self.assertEqual(f"{report_id}--sectionname.xlsx", excel_file.filename)

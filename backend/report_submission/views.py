@@ -182,7 +182,7 @@ class GeneralInformationFormView(LoginRequiredMixin, View):
                 SingleAuditChecklist.objects.filter(pk=sac.id).update(**update)
 
                 return redirect(
-                    "/report_submission/federal-awards/{}".format(report_id)
+                    "/audit/submission-progress/{report_id}".format(report_id=report_id)
                 )
         except SingleAuditChecklist.DoesNotExist:
             raise PermissionDenied("You do not have access to this audit.")

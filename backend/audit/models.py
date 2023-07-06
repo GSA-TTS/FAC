@@ -1,4 +1,5 @@
 import calendar
+from datetime import date
 import logging
 
 from django.db import models
@@ -8,12 +9,13 @@ from django.contrib.auth import get_user_model
 from django.utils.translation import gettext_lazy as _
 
 from django_fsm import FSMField, RETURN_VALUE, transition
+from django.contrib.postgres.fields import ArrayField
+
 
 #import audit.etl as etl
 #   from etl import ETL
 from .validators import (
     validate_excel_file,
-    validate_excel_filename,
     validate_corrective_action_plan_json,
     validate_federal_award_json,
     validate_findings_text_json,
@@ -100,6 +102,17 @@ class SingleAuditChecklist(models.Model):
     date_created = models.DateTimeField(auto_now_add=True)
     submission_status = FSMField(default=STATUS.IN_PROGRESS, choices=STATUS_CHOICES)
 
+    # implement an array of tuples as two arrays since we can only have simple fields inside an array
+    transition_name = ArrayField(
+        models.CharField(max_length=40, choices=STATUS_CHOICES),
+        default=list,
+        size=None,
+        blank=True,
+    )
+    transition_date = ArrayField(
+        models.DateTimeField(), default=list, size=None, blank=True
+    )
+
     report_id = models.CharField(max_length=17, unique=True)
 
     # Q2 Type of Uniform Guidance Audit
@@ -141,7 +154,12 @@ class SingleAuditChecklist(models.Model):
         validation and reports back to the user.
         """
         if self.validate_full():
+            self.transition_name.append(
+                SingleAuditChecklist.STATUS.READY_FOR_CERTIFICATION
+            )
+            self.transition_date.append(date.today())
             return SingleAuditChecklist.STATUS.READY_FOR_CERTIFICATION
+
         return SingleAuditChecklist.STATUS.IN_PROGRESS
 
     @transition(
@@ -154,6 +172,8 @@ class SingleAuditChecklist(models.Model):
         The permission checks verifying that the user attempting to do this has
         the appropriate privileges will done at the view level.
         """
+        self.transition_name.append(SingleAuditChecklist.STATUS.AUDITOR_CERTIFIED)
+        self.transition_date.append(date.today())
 
     @transition(
         field="submission_status",
@@ -165,6 +185,8 @@ class SingleAuditChecklist(models.Model):
         The permission checks verifying that the user attempting to do this has
         the appropriate privileges will done at the view level.
         """
+        self.transition_name.append(SingleAuditChecklist.STATUS.AUDITEE_CERTIFIED)
+        self.transition_date.append(date.today())
 
     @transition(
         field="submission_status",
@@ -176,6 +198,8 @@ class SingleAuditChecklist(models.Model):
         The permission checks verifying that the user attempting to do this has
         the appropriate privileges will done at the view level.
         """
+        self.transition_name.append(SingleAuditChecklist.STATUS.CERTIFIED)
+        self.transition_date.append(date.today())
 
     @transition(
         field="submission_status",
@@ -187,9 +211,12 @@ class SingleAuditChecklist(models.Model):
         The permission checks verifying that the user attempting to do this has
         the appropriate privileges will done at the view level.
         """
+
         from audit.etl import ETL
         etl = ETL(self)
         etl.load_all()
+        self.transition_name.append(SingleAuditChecklist.STATUS.SUBMITTED)
+        self.transition_date.append(date.today())
 
     @transition(
         field="submission_status",
@@ -215,6 +242,8 @@ class SingleAuditChecklist(models.Model):
         the model level, and will again leave it up to the views to track that
         changes have been made at that point.
         """
+        self.transition_name.append(SingleAuditChecklist.STATUS.SUBMITTED)
+        self.transition_date.append(date.today())
 
     # Corrective Action Plan:
     corrective_action_plan = models.JSONField(
@@ -380,6 +409,12 @@ class SingleAuditChecklist(models.Model):
     def auditor_phone(self):
         return self._general_info_get("auditor_phone")
 
+    def get_transition_date(self, status):
+        index = self.transition_name.index(status)
+        if index >= 0:
+            return self.transition_date[index]
+        return None
+
     def _general_info_get(self, key):
         try:
             return self.general_information[key]
@@ -446,17 +481,26 @@ class Access(models.Model):
         ]
 
 
+def excel_file_path(instance, _filename):
+    """
+    We want the actual filename in the filesystem to be unique and determined
+    by report_id and form_section--not the user-provided filename.
+    """
+    return f"excel/{instance.sac.report_id}--{instance.form_section}.xlsx"
+
+
 class ExcelFile(models.Model):
     """
     Data model to track uploaded Excel files and associate them with SingleAuditChecklists
     """
 
-    file = models.FileField(upload_to="excel", validators=[validate_excel_file])
+    file = models.FileField(upload_to=excel_file_path, validators=[validate_excel_file])
     filename = models.CharField(max_length=255)
+    form_section = models.CharField(max_length=255)
     sac = models.ForeignKey(SingleAuditChecklist, on_delete=models.CASCADE)
     user = models.ForeignKey(User, blank=True, null=True, on_delete=models.SET_NULL)
     date_created = models.DateTimeField(auto_now_add=True)
 
     def save(self, *args, **kwargs):
-        self.filename = validate_excel_filename(self.file)
+        self.filename = f"{self.sac.report_id}--{self.form_section}.xlsx"
         super(ExcelFile, self).save(*args, **kwargs)
