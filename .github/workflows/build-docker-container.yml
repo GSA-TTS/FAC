@@ -71,7 +71,7 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Add signer
+      - name: Get public key
         working-directory: ${{ env.WORKING_DIRECTORY }}
         shell: bash
         env:
@@ -80,7 +80,10 @@ jobs:
           echo "$RSA_KEY" > private.pem
           chmod 600 private.pem
           ssh-keygen -y -f private.pem > key.pub
-          docker trust signer add --key key.pub ${{ inputs.docker-name }}-team ${{ env.GH_REPO }}/${{ env.IMAGE }}
+
+      - name: Add Signer
+        working-directory: ${{ env.WORKING_DIRECTORY }}
+        run: docker trust signer add --key key.pub ${{ inputs.docker-name }}-team ${{ env.GH_REPO }}/${{ env.IMAGE }}
 
       - name: Build Container
         working-directory: ${{ env.WORKING_DIRECTORY }}
