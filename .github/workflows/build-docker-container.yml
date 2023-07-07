@@ -77,13 +77,11 @@ jobs:
         env:
           RSA_KEY: ${{ secrets.RSA_KEY }}
         run: |
-          echo "$RSA_KEY" > private.pem
-          chmod 600 private.pem
-          ssh-keygen -y -f private.pem > key.pub
+          echo "$RSA_KEY" > public.pem
 
       - name: Add Signer
         working-directory: ${{ env.WORKING_DIRECTORY }}
-        run: docker trust signer add --key key.pub ${{ inputs.docker-name }}-team ${{ env.GH_REPO }}/${{ env.IMAGE }}
+        run: docker trust signer add --key public.pem ${{ inputs.docker-name }}-team ${{ env.GH_REPO }}/${{ env.IMAGE }}
 
       - name: Build Container
         working-directory: ${{ env.WORKING_DIRECTORY }}
