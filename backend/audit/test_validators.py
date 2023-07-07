@@ -24,12 +24,13 @@ from .validators import (
     MAX_EXCEL_FILE_SIZE_MB,
     validate_additional_ueis_json,
     validate_corrective_action_plan_json,
-    validate_excel_file_content_type,
-    validate_excel_file_extension,
+    validate_file_content_type,
+    validate_file_extension,
     validate_excel_file_integrity,
-    validate_excel_file_size,
+    validate_file_size,
     validate_federal_award_json,
     validate_file_infection,
+    validate_pdf_file_integrity,
     validate_uei,
     validate_uei_alphanumeric,
     validate_uei_valid_chars,
@@ -433,7 +434,7 @@ class UEIValidatorTests(SimpleTestCase):
         validate_uei_nine_digit_sequences(self.valid)
 
 
-class ExcelFileExtensionValidatorTests(SimpleTestCase):
+class FileExtensionValidatorTests(SimpleTestCase):
     def test_invalid_file_extensions(self):
         """
         Filenames that have disallowed extensions are not valid
@@ -472,7 +473,7 @@ class ExcelFileExtensionValidatorTests(SimpleTestCase):
                     ValidationError,
                     msg=f"ValidationError not raised with filename = {test_case}",
                 ):
-                    validate_excel_file_extension(file)
+                    validate_file_extension(file, ALLOWED_EXCEL_FILE_EXTENSIONS)
 
     def test_valid_file_extensions(self):
         """Filenames that have allowed extensions are valid"""
@@ -487,10 +488,10 @@ class ExcelFileExtensionValidatorTests(SimpleTestCase):
                     filename, ALLOWED_EXCEL_CONTENT_TYPES[0], 10000, "utf-8"
                 )
 
-                validate_excel_file_extension(file)
+                validate_file_extension(file, ALLOWED_EXCEL_FILE_EXTENSIONS)
 
 
-class ExcelFileContentTypeValidatorTests(SimpleTestCase):
+class FileContentTypeValidatorTests(SimpleTestCase):
     def test_invalid_file_content_types(self):
         """Files that have disallowed content types are invalid"""
         test_cases = [
@@ -518,7 +519,10 @@ class ExcelFileContentTypeValidatorTests(SimpleTestCase):
                 )
 
                 self.assertRaises(
-                    ValidationError, validate_excel_file_content_type, file
+                    ValidationError,
+                    validate_file_content_type,
+                    file,
+                    ALLOWED_EXCEL_CONTENT_TYPES,
                 )
 
     def test_valid_file_content_types(self):
@@ -529,10 +533,10 @@ class ExcelFileContentTypeValidatorTests(SimpleTestCase):
                     TemporaryUploadedFile("file.xlsx", content_type, 10000, "utf-8")
                 )
 
-                validate_excel_file_content_type(file)
+                validate_file_content_type(file, ALLOWED_EXCEL_CONTENT_TYPES)
 
 
-class ExcelFileFileSizeValidatorTests(SimpleTestCase):
+class FileFileSizeValidatorTests(SimpleTestCase):
     def test_valid_file_size(self):
         """Files that are under (or equal to) the maximum file size are valid"""
         max_file_size = MAX_EXCEL_FILE_SIZE_MB * 1024 * 1024
@@ -548,7 +552,7 @@ class ExcelFileFileSizeValidatorTests(SimpleTestCase):
                     "file.xlsx", b"this is a file", test_case, "utf-8"
                 )
 
-                validate_excel_file_size(file)
+                validate_file_size(file, MAX_EXCEL_FILE_SIZE_MB)
 
     def test_invalid_file_size(self):
         """Files that are over the maximum file size are invalid"""
@@ -565,7 +569,9 @@ class ExcelFileFileSizeValidatorTests(SimpleTestCase):
                     "file.xlsx", b"this is a file", test_case, "utf-8"
                 )
 
-                self.assertRaises(ValidationError, validate_excel_file_size, file)
+                self.assertRaises(
+                    ValidationError, validate_file_size, file, MAX_EXCEL_FILE_SIZE_MB
+                )
 
 
 class MockHttpResponse:
@@ -574,7 +580,7 @@ class MockHttpResponse:
         self.text = text
 
 
-class ExcelFileInfectionValidatorTests(TestCase):
+class FileInfectionValidatorTests(TestCase):
     def setUp(self):
         self.fake_file = TemporaryUploadedFile("file.txt", "text/plain", 10000, "utf-8")
 
@@ -658,6 +664,29 @@ class CorrectiveActionPlanValidatorTests(SimpleTestCase):
         validate_corrective_action_plan_json(
             CorrectiveActionPlanValidatorTests.SIMPLE_CASE
         )
+
+
+class PdfFileIntegrityValidatorTests(SimpleTestCase):
+    def test_broken_pdf_file(self):
+        """PDF files that are not readable by PyPDF are invalid"""
+        file = TemporaryUploadedFile(
+            "file.pdf", b"this is not really a pdf file", 10000, "utf-8"
+        )
+
+        self.assertRaises(ValidationError, validate_pdf_file_integrity, file)
+
+    def test_locked_pdf_file(self):
+        """PDF files that are locked / require a password are invalid"""
+        with open("audit/fixtures/locked.pdf", "rb") as file:
+            self.assertRaises(ValidationError, validate_pdf_file_integrity, file)
+
+    def test_scanned_pdf_file(self):
+        with open("audit/fixtures/scanned.pdf", "rb") as file:
+            self.assertRaises(ValidationError, validate_pdf_file_integrity, file)
+
+    def test_valid_pdf_file(self):
+        with open("audit/fixtures/basic.pdf", "rb") as file:
+            validate_pdf_file_integrity(file)
 
 
 class AdditionalUeisValidatorTests(SimpleTestCase):

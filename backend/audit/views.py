@@ -27,7 +27,8 @@ from audit.mixins import (
     CertifyingAuditorRequiredMixin,
     SingleAuditChecklistAccessRequiredMixin,
 )
-from audit.models import Access, ExcelFile, SingleAuditChecklist
+
+from audit.models import Access, ExcelFile, SingleAuditChecklist, SingleAuditReportFile
 
 logger = logging.getLogger(__name__)
 
@@ -151,6 +152,36 @@ class ExcelFileHandlerView(SingleAuditChecklistAccessRequiredMixin, generic.View
         except KeyError as e:
             logger.warn(f"Field error. Field: {e}")
             return JsonResponse({"errors": str(e), "type": "error_field"}, status=400)
+
+
+class SingleAuditReportFileHandlerView(
+    SingleAuditChecklistAccessRequiredMixin, generic.View
+):
+    # this is marked as csrf_exempt to enable by-hand testing via tools like Postman. Should be removed when the frontend form is implemented!
+    @method_decorator(csrf_exempt)
+    def dispatch(self, *args, **kwargs):
+        return super(SingleAuditReportFileHandlerView, self).dispatch(*args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        try:
+            report_id = kwargs["report_id"]
+
+            sac = SingleAuditChecklist.objects.get(report_id=report_id)
+
+            file = request.FILES["FILES"]
+
+            sar_file = SingleAuditReportFile(
+                **{"file": file, "filename": "temp", "sac_id": sac.id}
+            )
+
+            sar_file.full_clean()
+            sar_file.save()
+
+            return redirect("/")
+
+        except MultiValueDictKeyError:
+            logger.warn("No file found in request")
+            raise BadRequest()
 
 
 class ReadyForCertificationView(SingleAuditChecklistAccessRequiredMixin, generic.View):
@@ -478,7 +509,15 @@ class UploadReportView(SingleAuditChecklistAccessRequiredMixin, generic.View):
             form = UploadReportForm(request.POST, request.FILES)
 
             if form.is_valid():
-                # TODO: handle_uploaded_stuff()
+                file = request.FILES["upload_report"]
+
+                sar_file = SingleAuditReportFile(
+                    **{"file": file, "filename": "temp", "sac_id": sac.id}
+                )
+
+                sar_file.full_clean()
+                sar_file.save()
+
                 # PDF issues can be communicated to the user with form.errors["upload_report"]
                 print("Saving form!")
                 return redirect(reverse("audit:SubmissionProgress", args=[report_id]))
