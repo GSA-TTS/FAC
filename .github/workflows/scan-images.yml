@@ -60,9 +60,9 @@ jobs:
           echo "$SSH_PRIVATE_KEY" > private.pem
           chmod 600 private.pem
           openssl rsa -in "private.pem" -pubout > "public.pem"
-          docker trust signer add --key "public.pem" "${{ env.GH_REPO }}" "${{ env.GH_REPO }}/${{ matrix.image.short-name }}" <<< $SSH_PASSPHRASE | <<< $SSH_PASSPHRASE
+          docker trust signer add --key "public.pem" "fac-team" "${{ env.GH_REPO }}/${{ matrix.image.short-name }}" <<< $SSH_PASSPHRASE | <<< $SSH_PASSPHRASE
           docker trust sign ghcr.io/${{ env.GH_REPO }}/${{ matrix.image.short-name }}:latest <<< $SSH_PASSPHRASE | <<< $SSH_PASSPHRASE
-          docker trust key load --name "codesign" "private.pem"
+          docker trust key load --name "fac-team" "private.pem"
 
       # - name: Sign Image
       #   working-directory: ./backend
