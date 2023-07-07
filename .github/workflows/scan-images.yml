@@ -67,18 +67,13 @@ jobs:
         working-directory: ./backend
         shell: bash
         run: |
-          docker trust signer add --key public.pem fac ghcr.io/${{ env.GH_REPO }}/${{ matrix.image.short-name }}
+          docker trust signer add --key public.pem fac ghcr.io/${{ env.GH_REPO }}/${{ matrix.image.short-name }} <<< ${{ secrets.DCT_ROOT_PASS }}
 
       - name: Load the private key onto Docker trust store
         working-directory: ./backend
+        shell: bash
         run: |
           docker trust key load --name "codesign" "private.pem"
-          GREEN='\033[0;32m'
-          PURPLE='\033[0;35m'
-          NC='\033[0m' # No Color
-          echo -e "Confirm \"${GREEN}Successfully imported key from private.pem${NC}\"" \
-          "\nIf successful, IGNORE  \"${PURPLE}failed to import key to store: ...${NC}\" (due to unused content within private key)"
-        shell: bash
 
       - name: Push Image
         run: docker push --all-tags ghcr.io/${{ env.GH_REPO }}/${{ matrix.image.short-name }}
