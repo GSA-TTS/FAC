@@ -73,32 +73,13 @@ jobs:
 
       - name: Create ssl key file
         working-directory: ${{ env.WORKING_DIRECTORY }}
-        shell: bash
-        env:
-          DCT_KEY: ${{ secrets.RSA_KEY }}
-        run: |
-          # Set secret as private key file
-          echo "$DCT_KEY" > private.pem
-          chmod 600 private.pem
-          # Public key from private key
-          openssl rsa -in "private.pem" -pubout > "public.pem"
+        run: docker trust key generate fac
 
       - name: Add signer
         working-directory: ${{ env.WORKING_DIRECTORY }}
         shell: bash
         run: |
-          docker trust signer add --key "public.pem" "${{ inputs.docker-name }}-team" "${{ env.GH_REPO }}/${{ env.IMAGE }}"
-
-      - name: Load the private key onto Docker trust store
-        working-directory: ${{ env.WORKING_DIRECTORY }}
-        shell: bash
-        run: |
-          docker trust key load --name "fac-codesign" "private.pem"
-          GREEN='\033[0;32m'
-          PURPLE='\033[0;35m'
-          NC='\033[0m' # No Color
-          echo -e "Confirm \"${GREEN}Successfully imported key from private.pem${NC}\"" \
-          "\nIf successful, IGNORE  \"${PURPLE}failed to import key to store: ...${NC}\" (due to unused content within private key)"
+          docker trust signer add --key cert.pem ${{ inputs.docker-name }}-team ${{ env.GH_REPO }}/${{ env.IMAGE }}
 
       - name: Build Container
         working-directory: ${{ env.WORKING_DIRECTORY }}
@@ -108,4 +89,6 @@ jobs:
         run: docker tag ${{ env.DOCKER_NAME }}:${{ steps.date.outputs.date }} ghcr.io/${{ env.GH_REPO }}/${{ env.IMAGE }}:latest
 
       - name: Push Web Container
-        run: docker push --all-tags ghcr.io/${{ env.GH_REPO }}/${{ env.IMAGE }} --disable-content-trust=false
+        run: |
+          export DOCKER_CONTENT_TRUST=1
+          docker push --all-tags ghcr.io/${{ env.GH_REPO }}/${{ env.IMAGE }} --disable-content-trust=false
