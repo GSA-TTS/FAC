@@ -70,7 +70,7 @@ jobs:
           docker trust signer add --key public.pem fac ghcr.io/${{ env.GH_REPO }}/${{ matrix.image.short-name }}
 
       - name: Load the private key onto Docker trust store
-        working-directory: prime-router
+        working-directory: ./backend
         run: |
           docker trust key load --name "codesign" "private.pem"
           GREEN='\033[0;32m'
