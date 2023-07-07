@@ -148,9 +148,14 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         default=list,
         size=None,
         blank=True,
+        null=True,
     )
     transition_date = ArrayField(
-        models.DateTimeField(), default=list, size=None, blank=True
+        models.DateTimeField(),
+        default=list,
+        size=None,
+        blank=True,
+        null=True,
     )
 
     report_id = models.CharField(max_length=17, unique=True)
