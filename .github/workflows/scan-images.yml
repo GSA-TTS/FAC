@@ -50,6 +50,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup SSH passphrase
+        working-directory: ./backend
         env:
           SSH_PASSPHRASE: ${{secrets.DCT_ROOT_PASS}}
           SSH_PRIVATE_KEY: ${{secrets.RSA_KEY}}
@@ -63,7 +64,7 @@ jobs:
           openssl rsa -in "private.pem" -pubout > "public.pem"
 
       - name: Add signer
-        working-directory: prime-router
+        working-directory: ./backend
         shell: bash
         run: |
           docker trust signer add --key "public.pem" fac ghcr.io/${{ env.GH_REPO }}/${{ matrix.image.short-name }}
