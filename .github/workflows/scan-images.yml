@@ -87,5 +87,5 @@ jobs:
       - name: Push Image
         run: |
           export DOCKER_CONTENT_TRUST=1
-          docker push --all-tags ghcr.io/${{ env.GH_REPO }}/${{ matrix.image.short-name }}
+          docker push ghcr.io/${{ env.GH_REPO }}/${{ matrix.image.short-name }}:latest
 
