@@ -47,7 +47,7 @@ jobs:
         run: |
           docker tag ${{ matrix.image.name }} ghcr.io/${{ env.GH_REPO }}/${{ matrix.image.short-name }}:latest
 
-      - name: Setup SSH passphrase and add DCT Signer
+      - name: Setup Keys for DCT
         working-directory: ./backend
         env:
           SSH_PASSPHRASE: ${{secrets.DCT_ROOT_PASS}}
@@ -63,7 +63,7 @@ jobs:
         working-directory: ./backend
         shell: bash
         run: |
-          docker trust key load private.pem --name fac <<< $SSH_PASSPHRASE | <<< $SSH_PASSPHRASE
+          docker trust key load private.pem --name fac <<< $SSH_PASSPHRASE
 
       # - name: Sign Image
       #   working-directory: ./backend
