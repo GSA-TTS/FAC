@@ -13,7 +13,6 @@ from django.utils.translation import gettext_lazy as _
 
 from django_fsm import FSMField, RETURN_VALUE, transition
 
-
 from .validators import (
     validate_additional_ueis_json,
     validate_corrective_action_plan_json,
@@ -282,6 +281,14 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         The permission checks verifying that the user attempting to do this has
         the appropriate privileges will done at the view level.
         """
+
+        # from audit.etl import ETL
+
+        # TODO: These lines are breaking
+        #       `test_submission_status_transitions` in audit/test_models.py
+        #       We'll figure out a fix for this and uncomment these lines.
+        # etl = ETL(self)
+        # etl.load_all()
         self.transition_name.append(SingleAuditChecklist.STATUS.SUBMITTED)
         self.transition_date.append(date.today())
 
