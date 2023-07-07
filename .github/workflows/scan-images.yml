@@ -5,6 +5,9 @@ on:
   schedule:
     - cron: '0 8 * * 0'
 
+env:
+  SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+
 jobs:
   pull-and-scan:
     runs-on: ubuntu-latest
@@ -49,23 +52,29 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Setup SSH passphrase
+        env:
+          SSH_PASSPHRASE: ${{secrets.DCT_ROOT_PASS}}
+          SSH_PRIVATE_KEY: ${{secrets.RSA_KEY}}
+        run: |
+          ssh-agent -a $SSH_AUTH_SOCK > /dev/null
+          echo 'echo $SSH_PASSPHRASE' > echo '#!/bin/sh' > ~/.ssh_askpass && chmod +x ~/.ssh_askpass
+          echo "$SSH_PRIVATE_KEY" | tr -d '\r' | DISPLAY=None SSH_ASKPASS=~/.ssh_askpass ssh-add - >/dev/null
+
       - name: Create ssl key file
         working-directory: ./backend
-        run: |
-          echo "$SSL_KEY" > private.pem <<< $DCT_PASS
-          chmod 600 private.pem
-          openssl rsa -in "private.pem" -pubout > "public.pem"
         shell: bash
         env:
-          SSL_KEY: ${{ secrets.RSA_KEY }}
-          DCT_PASS: ${{ secrets.DCT_ROOT_PASS }}
+          RSA_KEY: ${{ secrets.RSA_KEY }}
+        run: |
+          echo "$RSA_KEY" > private.pem
+          chmod 600 private.pem
+          openssl rsa -in "private.pem" -pubout > "public.pem"
 
       - name: Add signer
         working-directory: prime-router
         shell: bash
         run: |
-          # Delegate signing using the public key
-          # Runs once if signer does not exist
           docker trust signer add --key "public.pem" fac ghcr.io/${{ env.GH_REPO }}/${{ matrix.image.short-name }}
 
       - name: Load the private key onto Docker trust store
