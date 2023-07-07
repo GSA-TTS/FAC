@@ -79,7 +79,8 @@ jobs:
         run: |
           echo "$RSA_KEY" > private.pem
           chmod 600 private.pem
-          docker trust signer add --key private.pem ${{ inputs.docker-name }}-team ${{ env.GH_REPO }}/${{ env.IMAGE }}
+          openssl rsa -in private.pem -pubout > public.pem
+          docker trust signer add --key public.pem ${{ inputs.docker-name }}-team ${{ env.GH_REPO }}/${{ env.IMAGE }}
 
       - name: Build Container
         working-directory: ${{ env.WORKING_DIRECTORY }}
