@@ -43,6 +43,10 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Tag Image
+        run: |
+          docker tag ${{ matrix.image.name }} ghcr.io/${{ env.GH_REPO }}/${{ matrix.image.short-name }}:latest
+
       - name: Setup SSH passphrase and add DCT Signer
         working-directory: ./backend
         env:
@@ -57,10 +61,6 @@ jobs:
           chmod 600 private.pem
           openssl rsa -in "private.pem" -pubout > "public.pem"
           docker trust signer add --key public.pem fac ghcr.io/${{ env.GH_REPO }}/${{ matrix.image.short-name }}:latest <<< $SSH_PASSPHRASE | <<< $SSH_PASSPHRASE
-
-      # - name: Tag Image
-      #   run: |
-      #     docker tag ${{ matrix.image.name }} ghcr.io/${{ env.GH_REPO }}/${{ matrix.image.short-name }}:latest
 
       - name: Sign Image
         working-directory: ./backend
