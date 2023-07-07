@@ -49,7 +49,7 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Setup SSH passphrase
+      - name: Setup SSH passphrase and add DCT Signer
         working-directory: ./backend
         env:
           SSH_PASSPHRASE: ${{secrets.DCT_ROOT_PASS}}
@@ -76,9 +76,9 @@ jobs:
         working-directory: ./backend
         shell: bash
         env:
-          SSH_PASSPHRASE: ${{secrets.DCT_REPO_PASS }}
+          TRUST_PASS: ${{ secrets.DCT_REPO_PASS }}
         run: |
-          docker trust key load --name "fac" "private.pem" <<< $SSH_PRIVATE_KEY
+          docker trust key load --name fac private.pem <<< $TRUST_PASS
 
       # - name: Push Image
       #   run: docker push --all-tags ghcr.io/${{ env.GH_REPO }}/${{ matrix.image.short-name }}
