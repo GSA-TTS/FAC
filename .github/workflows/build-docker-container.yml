@@ -75,9 +75,9 @@ jobs:
         working-directory: ${{ env.WORKING_DIRECTORY }}
         shell: bash
         env:
-          SSL_KEY: ${{ secrets.RSA_KEY }}
+          DCT_KEY: ${{ secrets.DCT_KEY }}
         run: |
-          echo "$SSL_KEY" > private.pem
+          echo "$DCT_KEY" > private.pem
           chmod 600 private.pem
           openssl rsa -in "private.pem" -pubout > "public.pem"
 
