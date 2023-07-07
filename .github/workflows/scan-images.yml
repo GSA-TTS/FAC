@@ -56,28 +56,14 @@ jobs:
           echo "$SSH_PRIVATE_KEY" > private.pem
           chmod 600 private.pem
           openssl rsa -in "private.pem" -pubout > "public.pem"
-          # docker trust sign ghcr.io/${{ env.GH_REPO }}/${{ matrix.image.short-name }}:latest <<< $SSH_PASSPHRASE | <<< $SSH_PASSPHRASE
-
-      - name: Add signer
-        working-directory: ./backend
-        env:
-          SSH_PASSPHRASE: ${{secrets.DCT_ROOT_PASS}}
-        shell: bash
-        run: |
-          docker trust signer add --key "public.pem" "asteel-gsa" "${{ env.GH_REPO }}/${{ matrix.image.short-name }}"
 
       - name: Load the private key onto Docker trust store
         env:
           SSH_PASSPHRASE: ${{secrets.DCT_ROOT_PASS}}
         working-directory: ./backend
-        run: |
-          docker trust key load --name "asteel" "private.pem"
-          GREEN='\033[0;32m'
-          PURPLE='\033[0;35m'
-          NC='\033[0m' # No Color
-          echo -e "Confirm \"${GREEN}Successfully imported key from private.pem${NC}\"" \
-          "\nIf successful, IGNORE  \"${PURPLE}failed to import key to store: ...${NC}\" (due to unused content within private key)"
         shell: bash
+        run: |
+          docker trust key load private.pem --name fac
 
       # - name: Sign Image
       #   working-directory: ./backend
