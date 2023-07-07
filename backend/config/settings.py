@@ -106,7 +106,15 @@ INSTALLED_APPS += [
 ]
 
 # Our apps
-INSTALLED_APPS += ["audit", "api", "users", "report_submission", "cms", "data_distro"]
+INSTALLED_APPS += [
+    "audit",
+    "api",
+    "users",
+    "report_submission",
+    "cms",
+    # "data_distro",
+    "dissemination",
+]
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -132,6 +140,9 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+            ],
+            "builtins": [
+                "report_submission.templatetags.get_attr",
             ],
         },
     },

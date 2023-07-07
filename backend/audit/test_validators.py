@@ -15,12 +15,14 @@ import requests
 from audit.fixtures.excel import (
     SIMPLE_CASES_TEST_FILE,
     CORRECTIVE_ACTION_TEMPLATE_DEFINITION,
+    ADDITIONAL_UEIS_TEMPLATE_DEFINITION,
 )
 
 from .validators import (
     ALLOWED_EXCEL_CONTENT_TYPES,
     ALLOWED_EXCEL_FILE_EXTENSIONS,
     MAX_EXCEL_FILE_SIZE_MB,
+    validate_additional_ueis_json,
     validate_corrective_action_plan_json,
     validate_excel_file_content_type,
     validate_excel_file_extension,
@@ -647,7 +649,7 @@ class CorrectiveActionPlanValidatorTests(SimpleTestCase):
         template = json.loads(template_definition_path.read_text(encoding="utf-8"))
         invalid = json.loads('{"CorrectiveActionPlan":{}}')
         expected_msg = str(
-            ("B", "2", "Auditee UEI", template["sheets"][0]["single_cells"][0]["help"])
+            ("A", "2", "Auditee UEI", template["sheets"][1]["single_cells"][0]["help"])
         )
         self.assertRaisesRegex(
             ValidationError, expected_msg, validate_corrective_action_plan_json, invalid
@@ -656,3 +658,27 @@ class CorrectiveActionPlanValidatorTests(SimpleTestCase):
         validate_corrective_action_plan_json(
             CorrectiveActionPlanValidatorTests.SIMPLE_CASE
         )
+
+
+class AdditionalUeisValidatorTests(SimpleTestCase):
+    SIMPLE_CASE = json.loads(SIMPLE_CASES_TEST_FILE.read_text(encoding="utf-8"))[
+        "AdditionalUeisCase"
+    ]
+
+    def test_validation_is_applied(self):
+        """
+        Empty Additional UEIs should fail, simple case should pass.
+        """
+        template_definition_path = (
+            settings.XLSX_TEMPLATE_JSON_DIR / ADDITIONAL_UEIS_TEMPLATE_DEFINITION
+        )
+        template = json.loads(template_definition_path.read_text(encoding="utf-8"))
+        invalid = json.loads('{"AdditionalUEIs":{}}')
+        expected_msg = str(
+            ("A", "2", "Auditee UEI", template["sheets"][1]["single_cells"][0]["help"])
+        )
+        self.assertRaisesRegex(
+            ValidationError, expected_msg, validate_additional_ueis_json, invalid
+        )
+
+        validate_additional_ueis_json(AdditionalUeisValidatorTests.SIMPLE_CASE)

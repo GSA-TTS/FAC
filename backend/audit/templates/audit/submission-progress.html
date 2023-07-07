@@ -8,19 +8,19 @@ Submission progress/audit checklist/audit landing page.
 TODO: Include the "Completed at X by Y", after timestamps are included in the data model. 
 -->
 <header class="usa-header usa-header-basic bg-primary-darker">
-	<div class="usa-nav-container">
-		<div class="usa-navbar bg-primary-darker text-white width-full flex">
-			<p class="margin-left-2">
-				<a href="/" class="text-gray-10">My audit submissions</a> » 
-				<span class="text-bold">{{ auditee_name | default_if_none:'' }}</span>
-			</p>
-		</div>
-	</div>
+  <div class="usa-nav-container">
+    <div class="usa-navbar bg-primary-darker text-white width-full flex">
+      <p class="margin-left-2">
+        <a href="/" class="text-gray-10">My audit submissions</a> »
+        <span class="text-bold">{{ auditee_name | default_if_none:'' }}</span>
+      </p>
+    </div>
+  </div>
 </header>
 <div class="grid-container margin-top-6">
-	<div class="usa-alert usa-alert--success margin-bottom-6">
-		<div class="usa-alert__body">
-			<!-- Success alert is NOT determined by most recently completed step.
+  <div class="usa-alert usa-alert--success margin-bottom-6">
+    <div class="usa-alert__body">
+      <!-- Success alert is NOT determined by most recently completed step.
 			Instead, it is determined by the furthest completed step down the checklist.
 			It can be changed to time-dependence after timestamp changes. -->
 			{% if audit_report.completed is True %}
@@ -190,7 +190,7 @@ TODO: Include the "Completed at X by Y", after timestamps are included in the da
 				</div>
 				<div class="usa-icon-list__content {% if additional_UEIs_workbook.created is True %} text-green {% else %} text-base-dark {% endif %}">
 					<a class="usa-link text-bold"
-						href="/report_submission/additional-UEIs/{{ report_id | default_if_none:'' }}">Upload the Additional UEIs workbook</a>
+						href="/report_submission/additional-ueis/{{ report_id | default_if_none:'' }}">Upload the Additional UEIs workbook</a>
 				</div>
 			</li>
 			<!-- Secondary Auditors -->
@@ -227,7 +227,7 @@ TODO: Include the "Completed at X by Y", after timestamps are included in the da
 					</svg>
 				</div>
 				<div class="usa-icon-list__content {% if audit_report.created is True %} text-green {% else %} text-base-dark {% endif %}">
-					<a class="usa-link text-bold" href="javascript:void(0);">Upload the audit report PDF</a>
+					<a class="usa-link text-bold" href="{% url 'audit:upload_report' report_id %}">Upload the audit report PDF</a>
 					<p class="margin-0">
 						Upload the single audit report package, or audit report. This should be a single, unlocked, and machine-readable PDF. This can be re-uploaded with updated versions as necessary until the report has been certified, at which point it cannot be edited or re-uploaded.
 					</p>
@@ -314,5 +314,4 @@ TODO: Include the "Completed at X by Y", after timestamps are included in the da
 		</ul>
 	</div>
 </div>
-{% include "audit-metadata.html" %}
-{% endblock content %}
+{% include "audit-metadata.html" %} {% endblock content %}
