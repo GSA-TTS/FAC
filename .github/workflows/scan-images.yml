@@ -85,9 +85,8 @@ jobs:
       #     docker trust key load --name fac private.pem <<< $SSH_PASSPHRASE | <<< $SSH_PASSPHRASE
 
       - name: Push Image
-        working-directory: ./backend
         env:
           SSH_PASSPHRASE: ${{secrets.DCT_ROOT_PASS}}
         run: |
-          docker push ghcr.io/${{ env.GH_REPO }}/${{ matrix.image.short-name }}:latest --disable-content-trust=false <<< $SSH_PASSPHRASE | <<< $SSH_PASSPHRASE
+          docker push --all-tags ghcr.io/${{ env.GH_REPO }}/${{ matrix.image.short-name }}:latest --disable-content-trust=false <<< $SSH_PASSPHRASE | <<< $SSH_PASSPHRASE
 
