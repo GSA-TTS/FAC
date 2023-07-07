@@ -1,26 +1,26 @@
 ---
-  name: Scan Images
+  name: Pull Third Party Containers, Scan, and Publish to GHCR
   on:
     workflow_dispatch:
+    schedule:
+      - cron: '0 8 * * 0'
+
   jobs:
-    docker-update:
+    pull-and-scan:
       runs-on: ubuntu-latest
       permissions:
         contents: read
         packages: write
-        security-events: write
       env:
-        GH_REPO: ghcr.io/asteel-gsa/fac
+        GH_REPO: asteel-gsa/fac
       strategy:
         fail-fast: false
         matrix:
           image:
             - name: postgrest/postgrest:latest
-              tname: postgrest
-            - name: swaggerapi/swagger-ui:latest
-              tname: swagger
-            # - name: ghcr.io/gsa-tts/clamav-rest/clamav:latest
-            #   tname: clamav
+              short-name: postgrest
+            - name: ghcr.io/gsa-tts/clamav-rest/clamav:latest
+              short-name: clamav
 
       steps:
         - name: Checkout
@@ -35,8 +35,8 @@
         - name: Tag Image
           run: |
             date=$(date +%Y%m%d)
-            docker tag ${{ matrix.image.name }} ${{ env.GH_REPO }}/${{ matrix.image.tname }}:latest
-            docker tag ${{ matrix.image.name }} ${{ env.GH_REPO }}/${{ matrix.image.tname }}:$date
+            docker tag ${{ matrix.image.name }} ${{ env.GH_REPO }}/${{ matrix.image.short-name }}:latest
+            docker tag ${{ matrix.image.name }} ${{ env.GH_REPO }}/${{ matrix.image.short-name }}:$date
 
         - name: Login to GitHub Container Registry
           uses: docker/login-action@v2
@@ -46,4 +46,4 @@
             password: ${{ secrets.GITHUB_TOKEN }}
 
         - name: Push Image
-          run: docker push --all-tags ${{ env.GH_REPO }}/${{ matrix.image.tname }}
+          run: docker push --all-tags ghcr.io/${{ env.GH_REPO }}/${{ matrix.image.tname }}

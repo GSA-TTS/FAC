@@ -2,25 +2,7 @@
 name: Trivy Scan
 on:
   workflow_dispatch:
-    inputs:
-      docker-name:
-        required: true
-        type: string
-        default: fac
-      work-dir:
-        required: true
-        type: string
-        default: ./backend
   workflow_call:
-    inputs:
-      docker-name:
-        required: true
-        type: string
-        default: fac
-      work-dir:
-        required: true
-        type: string
-        default: ./backend
   push:
     branches:
       - prod
@@ -30,10 +12,6 @@ on:
 permissions:
   contents: read
 
-env:
-  DOCKER_NAME: ${{ inputs.docker-name }}
-  WORKING_DIRECTORY: ${{ inputs.work-dir }}
-
 jobs:
   trivy:
     needs: [scan-third-party]
@@ -41,11 +19,11 @@ jobs:
       contents: read
       security-events: write
       actions: read
-    name: Trivy Scan
-    runs-on: ubuntu-latest
     env:
       DOCKER_NAME: fac
       WORKING_DIRECTORY: ./backend
+    name: Trivy Scan FAC Web Container
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -67,15 +45,14 @@ jobs:
           scan-type: 'image'
           hide-progress: false
           format: 'sarif'
-          output: 'scan-results.sarif'
+          output: 'trivy-results.sarif'
           exit-code: '1'
-          severity: HIGH,CRITICAL
           ignore-unfixed: true
 
       - name: Upload Trivy scan results to GitHub Security tab
         uses: github/codeql-action/upload-sarif@v2
         with:
-          sarif_file: 'scan-results.sarif'
+          sarif_file: 'trivy-results.sarif'
 
   scan-third-party:
     permissions:
@@ -88,8 +65,8 @@ jobs:
       fail-fast: false
       matrix:
         image:
-          - name: ghcr.io/asteel-gsa/fac/postgrest:latest
-          - name: ghcr.io/asteel-gsa/fac/clamav:latest
+          - name: ghcr.io/gsa-tts/fac/postgrest:latest
+          - name: ghcr.io/gsa-tts/fac/clamav:latest
     steps:
       - name: Pull Third Party Docker Images
         run: docker pull ${{ matrix.image.name }}
@@ -106,8 +83,7 @@ jobs:
           severity: HIGH,CRITICAL
           ignore-unfixed: true
 
-      - name: Upload Trivy scan results to GitHub Security tab of Third Party Images
+      - name: Upload Trivy scan results to GitHub Security tab for Third Party Images
         uses: github/codeql-action/upload-sarif@v2
         with:
           sarif_file: 'scan-results.sarif'
-
