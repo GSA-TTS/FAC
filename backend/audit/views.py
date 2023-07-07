@@ -30,14 +30,6 @@ from audit.mixins import (
 
 from audit.models import Access, ExcelFile, SingleAuditChecklist, SingleAuditReportFile
 
-from audit.validators import (
-    validate_federal_award_json,
-    validate_corrective_action_plan_json,
-    validate_findings_text_json,
-    validate_findings_uniform_guidance_json,
-)
-from audit.models import Access, ExcelFile, SingleAuditChecklist
-
 logger = logging.getLogger(__name__)
 
 

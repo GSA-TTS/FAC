@@ -745,6 +745,7 @@ class SingleAuditReportFileHandlerViewTests(TestCase):
             )
 
             self.assertEqual(response.status_code, 302)
+
     @patch("audit.validators._scan_file")
     def test_valid_file_upload_for_additional_ueis(self, mock_scan_file):
         """When a valid Excel file is uploaded, the file should be stored and the SingleAuditChecklist should be updated to include the uploaded Additional UEIs data"""
