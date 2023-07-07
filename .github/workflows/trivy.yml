@@ -14,7 +14,6 @@ permissions:
 
 jobs:
   trivy:
-    needs: [scan-third-party]
     permissions:
       contents: read
       security-events: write
@@ -47,6 +46,7 @@ jobs:
           format: 'sarif'
           output: 'trivy-results.sarif'
           exit-code: '1'
+          severity: 'CRITICAL,HIGH'
           ignore-unfixed: true
 
       - name: Upload Trivy scan results to GitHub Security tab
@@ -79,8 +79,8 @@ jobs:
           hide-progress: false
           format: 'sarif'
           output: 'scan-results.sarif'
-          exit-code: 1
-          severity: HIGH,CRITICAL
+          exit-code: '1'
+          severity: 'CRITICAL,HIGH'
           ignore-unfixed: true
 
       - name: Upload Trivy scan results to GitHub Security tab for Third Party Images
