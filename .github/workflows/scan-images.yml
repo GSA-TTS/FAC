@@ -72,7 +72,7 @@ jobs:
           SSH_PASSPHRASE: ${{secrets.DCT_ROOT_PASS}}
           IMAGE_PASSPHRASE: ${{ secrets.DCT_REPO_PASS }}
         run: |
-          { echo $SSH_PASSPHRASE ; echo $SSH_PASSPHRASE ; echo $IMAGE_PASSPHRASE ; echo $IMAGE_PASSPHRASE ; } | docker trust signer add --key private.pem fac ghcr.io/${{ env.GH_REPO }}/${{ matrix.image.short-name }}
+          { echo $SSH_PASSPHRASE ; echo $SSH_PASSPHRASE ; echo $IMAGE_PASSPHRASE ; echo $IMAGE_PASSPHRASE ; } | docker trust signer add --key public.pem fac ghcr.io/${{ env.GH_REPO }}/${{ matrix.image.short-name }}
 
       # - name: Sign Image
       #   working-directory: ./backend
