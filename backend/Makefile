@@ -55,7 +55,8 @@ docker-first-run:
 	docker compose build
 	docker compose run web python manage.py makemigrations
 	docker compose run web python manage.py migrate
-	docker compose run web python manage.py load_test_data
+	docker compose run web python manage.py create_views
+	# docker compose run web python manage.py load_test_data
 
 # Run Django tests with docker
 docker-test:
