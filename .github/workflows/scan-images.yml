@@ -65,27 +65,20 @@ jobs:
         run: |
           { echo $SSH_PASSPHRASE; echo $SSH_PASSPHRASE ; } | docker trust key load private.pem --name "fac"
 
+      - name: Add signer
+        working-directory: ./backend
+        shell: bash
+        env:
+          SSH_PASSPHRASE: ${{secrets.DCT_ROOT_PASS}}
+        run: |
+          { echo $SSH_PASSPHRASE; echo $SSH_PASSPHRASE ; } | docker trust signer add --key public.pem fac ghcr.io/${{ env.GH_REPO }}/${{ matrix.image.short-name }}
+
       # - name: Sign Image
       #   working-directory: ./backend
       #   env:
       #     SSH_PASSPHRASE: ${{secrets.DCT_ROOT_PASS}}
-      #   run: docker trust sign ghcr.io/${{ env.GH_REPO }}/${{ matrix.image.short-name }}:latest <<< $SSH_PASSPHRASE | <<< $SSH_PASSPHRASE
-
-      # - name: Add signer
-      #   working-directory: ./backend
-      #   shell: bash
-      #   env:
-      #     SSH_PASSPHRASE: ${{secrets.DCT_ROOT_PASS}}
       #   run: |
-      #     docker trust signer add --key public.pem fac ghcr.io/${{ env.GH_REPO }}/${{ matrix.image.short-name }} <<< $SSH_PASSPHRASE | <<< $SSH_PASSPHRASE
-
-      # - name: Load the private key onto Docker trust store
-      #   working-directory: ./backend
-      #   shell: bash
-      #   env:
-      #     SSH_PASSPHRASE: ${{secrets.DCT_ROOT_PASS}}
-      #   run: |
-      #     docker trust key load --name fac private.pem <<< $SSH_PASSPHRASE | <<< $SSH_PASSPHRASE
+      #     { echo $SSH_PASSPHRASE; echo $SSH_PASSPHRASE ; } | docker trust signer  ghcr.io/${{ env.GH_REPO }}/${{ matrix.image.short-name }}:latest
 
       - name: Push Image
         env:
