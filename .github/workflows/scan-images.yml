@@ -62,8 +62,7 @@ jobs:
           SSH_PASSPHRASE: ${{secrets.DCT_ROOT_PASS}}
         working-directory: ./backend
         shell: bash
-        run: |
-          docker trust key load private.pem --name fac <<< $SSH_PASSPHRASE <<< $SSH_PASSPHRASE
+        run: docker trust key load private.pem --name "fac" <<< "$SSH_PASSPHRASE" | <<< "$SSH_PASSPHRASE"
 
       # - name: Sign Image
       #   working-directory: ./backend
