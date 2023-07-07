@@ -84,5 +84,6 @@ jobs:
 
       - name: Push Image
         run: |
+          export DOCKER_CONTENT_TRUST=1
           docker push ghcr.io/${{ env.GH_REPO }}/${{ matrix.image.short-name }}:latest --disable-content-trust=false
 
