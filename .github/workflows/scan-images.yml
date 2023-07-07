@@ -58,9 +58,13 @@ jobs:
           openssl rsa -in "private.pem" -pubout > "public.pem"
           docker trust signer add --key public.pem fac ghcr.io/${{ env.GH_REPO }}/${{ matrix.image.short-name }} <<< $SSH_PASSPHRASE | <<< $SSH_PASSPHRASE
 
+      - name: Tag Image
+        run: |
+          docker tag ${{ matrix.image.name }} ghcr.io/${{ env.GH_REPO }}/${{ matrix.image.short-name }}:latest
+
       - name: Sign Image
         working-directory: ./backend
-        run: docker trust sign ghcr.io/${{ env.GH_REPO }}/${{ matrix.image.short-name }} <<< $SSH_PASSPHRASE | <<< $SSH_PASSPHRASE
+        run: docker trust sign ghcr.io/${{ env.GH_REPO }}/${{ matrix.image.short-name }}:latest <<< $SSH_PASSPHRASE | <<< $SSH_PASSPHRASE
 
       # - name: Add signer
       #   working-directory: ./backend
@@ -77,10 +81,6 @@ jobs:
       #     SSH_PASSPHRASE: ${{secrets.DCT_ROOT_PASS}}
       #   run: |
       #     docker trust key load --name fac private.pem <<< $SSH_PASSPHRASE | <<< $SSH_PASSPHRASE
-
-      - name: Tag Image
-        run: |
-          docker tag ${{ matrix.image.name }} ghcr.io/${{ env.GH_REPO }}/${{ matrix.image.short-name }}:latest
 
       - name: Push Image
         run: |
