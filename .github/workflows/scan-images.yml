@@ -70,8 +70,9 @@ jobs:
         shell: bash
         env:
           SSH_PASSPHRASE: ${{secrets.DCT_ROOT_PASS}}
+          IMAGE_PASSPHRASE: ${{ secrets.DCT_REPO_PASS }}
         run: |
-          { echo $SSH_PASSPHRASE; echo $SSH_PASSPHRASE ; } | docker trust signer add --key public.pem fac ghcr.io/${{ env.GH_REPO }}/${{ matrix.image.short-name }}
+          { echo $SSH_PASSPHRASE; echo $SSH_PASSPHRASE; echo $IMAGE_PASSPHRASE; echo $IMAGE_PASSPHRASE; } | docker trust signer add --key public.pem fac ghcr.io/${{ env.GH_REPO }}/${{ matrix.image.short-name }}
 
       # - name: Sign Image
       #   working-directory: ./backend
@@ -80,10 +81,10 @@ jobs:
       #   run: |
       #     { echo $SSH_PASSPHRASE; echo $SSH_PASSPHRASE ; } | docker trust signer  ghcr.io/${{ env.GH_REPO }}/${{ matrix.image.short-name }}:latest
 
-      - name: Push Image
-        env:
-          SSH_PASSPHRASE: ${{secrets.DCT_ROOT_PASS}}
-        run: |
-          echo "DOCKER_CONTENT_TRUST=1" >> $GITHUB_ENV
-          docker push --all-tags ghcr.io/${{ env.GH_REPO }}/${{ matrix.image.short-name }} <<< $SSH_PASSPHRASE
+      # - name: Push Image
+      #   env:
+      #     SSH_PASSPHRASE: ${{secrets.DCT_ROOT_PASS}}
+      #   run: |
+      #     echo "DOCKER_CONTENT_TRUST=1" >> $GITHUB_ENV
+      #     docker push --all-tags ghcr.io/${{ env.GH_REPO }}/${{ matrix.image.short-name }} <<< $SSH_PASSPHRASE
 
