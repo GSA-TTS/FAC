@@ -49,16 +49,43 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - uses: sigstore/cosign-installer@main
-      - name: Write signing key to disk (only needed for `cosign sign --key`)
-        run: echo "${{ secrets.RSA_KEY }}" > cosign.key
-
-      - name: Sign container image
-        run: |
-          cosign sign --key cosign.key \
-            ghcr.io/${{ env.GH_REPO }}/${{ matrix.image.short-name }}:latest
+      - name: Setup SSH passphrase
         env:
-          COSIGN_PASSWORD: ${{ secrets.DCT_ROOT_PASS }}
+          SSH_PASSPHRASE: ${{secrets.DCT_ROOT_PASS}}
+          SSH_PRIVATE_KEY: ${{secrets.RSA_KEY}}
+          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+        run: |
+          eval $(ssh-agent)
+          ssh-agent -a $SSH_AUTH_SOCK > /dev/null
+          echo 'echo $SSH_PASSPHRASE' > echo '#!/bin/sh' > ~/.ssh_askpass && chmod +x ~/.ssh_askpass
+          echo "$SSH_PRIVATE_KEY" | tr -d '\r' | DISPLAY=None SSH_ASKPASS=~/.ssh_askpass ssh-add - >/dev/null
+
+      - name: Create ssl key file
+        working-directory: ./backend
+        shell: bash
+        env:
+          RSA_KEY: ${{ secrets.RSA_KEY }}
+        run: |
+          echo "$RSA_KEY" > private.pem
+          chmod 600 private.pem
+          openssl rsa -in "private.pem" -pubout > "public.pem"
+
+      - name: Add signer
+        working-directory: prime-router
+        shell: bash
+        run: |
+          docker trust signer add --key "public.pem" fac ghcr.io/${{ env.GH_REPO }}/${{ matrix.image.short-name }}
+
+      - name: Load the private key onto Docker trust store
+        working-directory: prime-router
+        run: |
+          docker trust key load --name "codesign" "private.pem"
+          GREEN='\033[0;32m'
+          PURPLE='\033[0;35m'
+          NC='\033[0m' # No Color
+          echo -e "Confirm \"${GREEN}Successfully imported key from private.pem${NC}\"" \
+          "\nIf successful, IGNORE  \"${PURPLE}failed to import key to store: ...${NC}\" (due to unused content within private key)"
+        shell: bash
 
       - name: Push Image
         run: docker push --all-tags ghcr.io/${{ env.GH_REPO }}/${{ matrix.image.short-name }}
