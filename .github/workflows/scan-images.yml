@@ -84,6 +84,8 @@ jobs:
       #   run: |
       #     docker trust key load --name fac private.pem <<< $SSH_PASSPHRASE | <<< $SSH_PASSPHRASE
 
-      # - name: Push Image
-      #   run: docker push --all-tags ghcr.io/${{ env.GH_REPO }}/${{ matrix.image.short-name }}
+      - name: Push Image
+        run: |
+          export DOCKER_CONTENT_TRUST=1
+          docker push --all-tags ghcr.io/${{ env.GH_REPO }}/${{ matrix.image.short-name }}
 
