@@ -1,3 +1,11 @@
+---
+name: Cross-validation template
+about: Starting point for writing individual cross-validation functions.
+title: 'Cross-validation: short summary'
+labels: ''
+assignees: ''
+---
+
 ## Validation Description
 
 [//]: # (A description of the validalidation in plain language.)
