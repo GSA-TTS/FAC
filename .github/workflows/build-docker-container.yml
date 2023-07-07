@@ -71,17 +71,29 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Get public key
+      - name: Create ssl key file
         working-directory: ${{ env.WORKING_DIRECTORY }}
+        run: |
+          echo "$SSL_KEY" > private.pem
+          chmod 600 private.pem
+          openssl rsa -in "private.pem" -pubout > "public.pem"
         shell: bash
         env:
-          RSA_KEY: ${{ secrets.RSA_KEY }}
-        run: |
-          echo "$RSA_KEY" > public.pem
+          SSL_KEY: ${{ secrets.RSA_KEY }}
 
+      - name: Confirm if runner is a signer
+        working-directory: prime-router
+        shell: bash
+        run: |
+          echo "DOCKER_CONTENT_TRUST_ROOT_PASSPHRASE=${{ secrets.DCT_ROOT_PASS }}" >> $GITHUB_ENV
+          docker trust inspect --pretty "${{ env.ACR_NAME }}/${{ env.IMAGE_REPO }}"
+          SIGNERS=$(docker trust inspect "${{ env.ACR_NAME }}/${{ env.IMAGE_REPO }}" | jq '.[].Signers')
+          if [[ "$SIGNERS" != *${{ env.IMAGE_REPO }}* ]]; then
+            echo "NEEDS_SIGNER=true" >> $GITHUB_ENV
+          fi
       - name: Add Signer
         working-directory: ${{ env.WORKING_DIRECTORY }}
-        run: docker trust signer add --key public.pem ${{ inputs.docker-name }}-team ${{ env.GH_REPO }}/${{ env.IMAGE }}
+        run: docker trust signer add --key public.pem ${{ inputs.docker-name }} ghcr.io/asteel-gsa/
 
       - name: Build Container
         working-directory: ${{ env.WORKING_DIRECTORY }}
