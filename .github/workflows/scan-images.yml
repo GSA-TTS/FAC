@@ -52,12 +52,13 @@ jobs:
       - name: Create ssl key file
         working-directory: ./backend
         run: |
-          echo "$SSL_KEY" > private.pem
+          echo "$SSL_KEY" > private.pem <<< $DCT_PASS
           chmod 600 private.pem
           openssl rsa -in "private.pem" -pubout > "public.pem"
         shell: bash
         env:
           SSL_KEY: ${{ secrets.RSA_KEY }}
+          DCT_PASS: ${{ secrets.DCT_ROOT_PASS }}
 
       - name: Add signer
         working-directory: prime-router
