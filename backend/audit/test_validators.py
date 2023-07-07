@@ -15,12 +15,14 @@ import requests
 from audit.fixtures.excel import (
     SIMPLE_CASES_TEST_FILE,
     CORRECTIVE_ACTION_TEMPLATE_DEFINITION,
+    ADDITIONAL_UEIS_TEMPLATE_DEFINITION,
 )
 
 from .validators import (
     ALLOWED_EXCEL_CONTENT_TYPES,
     ALLOWED_EXCEL_FILE_EXTENSIONS,
     MAX_EXCEL_FILE_SIZE_MB,
+    validate_additional_ueis_json,
     validate_corrective_action_plan_json,
     validate_file_content_type,
     validate_file_extension,
@@ -685,3 +687,27 @@ class PdfFileIntegrityValidatorTests(SimpleTestCase):
     def test_valid_pdf_file(self):
         with open("audit/fixtures/basic.pdf", "rb") as file:
             validate_pdf_file_integrity(file)
+
+
+class AdditionalUeisValidatorTests(SimpleTestCase):
+    SIMPLE_CASE = json.loads(SIMPLE_CASES_TEST_FILE.read_text(encoding="utf-8"))[
+        "AdditionalUeisCase"
+    ]
+
+    def test_validation_is_applied(self):
+        """
+        Empty Additional UEIs should fail, simple case should pass.
+        """
+        template_definition_path = (
+            settings.XLSX_TEMPLATE_JSON_DIR / ADDITIONAL_UEIS_TEMPLATE_DEFINITION
+        )
+        template = json.loads(template_definition_path.read_text(encoding="utf-8"))
+        invalid = json.loads('{"AdditionalUEIs":{}}')
+        expected_msg = str(
+            ("A", "2", "Auditee UEI", template["sheets"][1]["single_cells"][0]["help"])
+        )
+        self.assertRaisesRegex(
+            ValidationError, expected_msg, validate_additional_ueis_json, invalid
+        )
+
+        validate_additional_ueis_json(AdditionalUeisValidatorTests.SIMPLE_CASE)

@@ -11,6 +11,7 @@ from django.test import SimpleTestCase
 from jsonschema import exceptions, validate as jsonschema_validate, FormatChecker
 
 from audit.fixtures.excel import (
+    ADDITIONAL_UEIS_TEST_FILE,
     CORRECTIVE_ACTION_PLAN_TEST_FILE,
     FEDERAL_AWARDS_TEST_FILE,
     FINDINGS_TEXT_TEST_FILE,
@@ -894,6 +895,83 @@ class FindingsTextSchemaValidityTest(SimpleTestCase):
         simple_case["FindingsText"]["findings_text_entries"][0][
             "contains_chart_or_table"
         ] = 0
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
+
+
+class AdditionalUeisSchemaValidityTest(SimpleTestCase):
+    """
+    Test the basic validity of the AdditionalUEIs JSON schema.
+    """
+
+    ADDITIONAL_UEIS_SCHEMA = json.loads(
+        (SECTION_SCHEMA_DIR / "AdditionalUeis.schema.json").read_text(encoding="utf-8")
+    )
+
+    SIMPLE_CASE = json.loads(SIMPLE_CASES_TEST_FILE.read_text(encoding="utf-8"))[
+        "AdditionalUeisCase"
+    ]
+
+    def test_schema(self):
+        """Try to test AdditionalUEIs first."""
+        schema = self.ADDITIONAL_UEIS_SCHEMA
+
+        in_flight_file = ADDITIONAL_UEIS_TEST_FILE
+        in_flight = json.loads(in_flight_file.read_text(encoding="utf-8"))
+        validate(in_flight, schema)
+
+    def test_simple_pass(self):
+        """
+        Test the simplest AdditionalUEIs case; none of the conditional fields apply.
+        """
+        schema = self.ADDITIONAL_UEIS_SCHEMA
+
+        validate(self.SIMPLE_CASE, schema)
+
+    def test_missing_auditee_ein(self):
+        """
+        Test that validation fails if auditee_uei is missing
+        """
+        schema = self.ADDITIONAL_UEIS_SCHEMA
+
+        simple_case = jsoncopy(self.SIMPLE_CASE)
+        del simple_case["AdditionalUEIs"]["auditee_uei"]
+
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
+
+    def test_missing_entry_fields(self):
+        """
+        Test that validation fails if any entry field is missing
+        """
+        schema = self.ADDITIONAL_UEIS_SCHEMA
+
+        simple_case = jsoncopy(self.SIMPLE_CASE)
+        del simple_case["AdditionalUEIs"]["additional_ueis_entries"][0][
+            "additional_uei"
+        ]
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
+
+    def test_empty_entry_fields(self):
+        """
+        Test that validation fails if any entry field is empty
+        """
+        schema = self.ADDITIONAL_UEIS_SCHEMA
+
+        simple_case = jsoncopy(self.SIMPLE_CASE)
+        simple_case["AdditionalUEIs"]["additional_ueis_entries"][0][
+            "additional_uei"
+        ] = None
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
+
+    def test_for_invalid_entry(self):
+        """
+        Test that validation fails if invalid value is provided for entry field
+        """
+        schema = self.ADDITIONAL_UEIS_SCHEMA
+
+        simple_case = jsoncopy(self.SIMPLE_CASE)
+        simple_case["AdditionalUEIs"]["additional_ueis_entries"][0][
+            "additional_uei"
+        ] = 123456789
         self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
 

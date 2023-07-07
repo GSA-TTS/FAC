@@ -11,12 +11,14 @@ from openpyxl import load_workbook
 from pypdf import PdfReader
 
 from audit.excel import (
+    additional_ueis_named_ranges,
     corrective_action_plan_named_ranges,
     federal_awards_named_ranges,
     findings_text_named_ranges,
     findings_uniform_guidance_named_ranges,
 )
 from audit.fixtures.excel import (
+    ADDITIONAL_UEIS_TEMPLATE_DEFINITION,
     CORRECTIVE_ACTION_TEMPLATE_DEFINITION,
     FEDERAL_AWARDS_TEMPLATE_DEFINITION,
     FINDINGS_TEXT_TEMPLATE_DEFINITION,
@@ -124,6 +126,19 @@ def validate_findings_uniform_guidance_json(value):
     errors = list(validator.iter_errors(value))
     if len(errors) > 0:
         raise ValidationError(message=_findings_uniform_guidance_json_error(errors))
+
+
+def validate_additional_ueis_json(value):
+    """
+    Apply JSON Schema for additional UEIs and report errors.
+    """
+    schema_path = settings.SECTION_SCHEMA_DIR / "AdditionalUeis.schema.json"
+    schema = json.loads(schema_path.read_text(encoding="utf-8"))
+
+    validator = Draft7Validator(schema)
+    errors = list(validator.iter_errors(value))
+    if len(errors) > 0:
+        raise ValidationError(message=_additional_ueis_json_error(errors))
 
 
 def validate_findings_text_json(value):
@@ -395,3 +410,12 @@ def validate_single_audit_report_file(file):
     validate_file_size(file, MAX_SINGLE_AUDIT_REPORT_FILE_SIZE_MB)
     validate_file_infection(file)
     validate_pdf_file_integrity(file)
+
+
+def _additional_ueis_json_error(errors):
+    """Process JSON Schema errors for additional UEIs"""
+    template_definition_path = (
+        XLSX_TEMPLATE_DEFINITION_DIR / ADDITIONAL_UEIS_TEMPLATE_DEFINITION
+    )
+    template = json.loads(template_definition_path.read_text(encoding="utf-8"))
+    return _get_error_details(template, additional_ueis_named_ranges(errors))
