@@ -67,7 +67,7 @@ jobs:
         working-directory: ./backend
         shell: bash
         run: |
-          docker trust signer add --key "public.pem" fac ghcr.io/${{ env.GH_REPO }}/${{ matrix.image.short-name }}
+          docker trust signer add --key public.pem fac ghcr.io/${{ env.GH_REPO }}/${{ matrix.image.short-name }}
 
       - name: Load the private key onto Docker trust store
         working-directory: prime-router
