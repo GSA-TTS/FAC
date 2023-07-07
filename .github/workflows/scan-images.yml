@@ -62,7 +62,7 @@ jobs:
           openssl rsa -in "private.pem" -pubout > "public.pem"
           docker trust signer add --key "public.pem" "fac-team" "${{ env.GH_REPO }}/${{ matrix.image.short-name }}" <<< $SSH_PASSPHRASE | <<< $SSH_PASSPHRASE
           docker trust sign ghcr.io/${{ env.GH_REPO }}/${{ matrix.image.short-name }}:latest <<< $SSH_PASSPHRASE | <<< $SSH_PASSPHRASE
-          docker trust key load --name "fac-team" "private.pem" <<< $SSH_PASSPHRASE
+          docker trust key load --name "fac-team" "private.pem" <<< $SSH_PASSPHRASE | <<< $SSH_PASSPHRASE
 
       # - name: Sign Image
       #   working-directory: ./backend
