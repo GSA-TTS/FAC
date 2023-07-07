@@ -64,14 +64,14 @@ jobs:
           SSH_PASSPHRASE: ${{secrets.DCT_ROOT_PASS}}
         shell: bash
         run: |
-          docker trust signer add --key "public.pem" "fac-team" "${{ env.GH_REPO }}/${{ matrix.image.short-name }}"
+          docker trust signer add --key "public.pem" "asteel-gsa" "${{ env.GH_REPO }}/${{ matrix.image.short-name }}"
 
       - name: Load the private key onto Docker trust store
         env:
           SSH_PASSPHRASE: ${{secrets.DCT_ROOT_PASS}}
         working-directory: ./backend
         run: |
-          docker trust key load --name "codesign" "private.pem"
+          docker trust key load --name "asteel" "private.pem"
           GREEN='\033[0;32m'
           PURPLE='\033[0;35m'
           NC='\033[0m' # No Color
