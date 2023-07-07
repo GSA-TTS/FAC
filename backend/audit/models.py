@@ -21,6 +21,7 @@ from .validators import (
     validate_findings_text_json,
     validate_findings_uniform_guidance_json,
     validate_general_information_json,
+    validate_additional_ueis_json,
 )
 
 User = get_user_model()
@@ -187,6 +188,11 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         blank=True, null=True, validators=[validate_findings_uniform_guidance_json]
     )
 
+    # Additional UEIs:
+    additional_ueis = models.JSONField(
+        blank=True, null=True, validators=[validate_additional_ueis_json]
+    )
+
     def validate_full(self):
         """
         A stub method to represent the cross-sheet, “full” validation that we
@@ -199,6 +205,7 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
             self.corrective_action_plan,
             self.findings_text,
             self.findings_uniform_guidance,
+            self.additional_ueis,
         ]
         if all(section for section in all_sections):
             return True

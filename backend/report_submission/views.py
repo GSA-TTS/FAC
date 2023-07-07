@@ -228,8 +228,8 @@ class UploadPageView(LoginRequiredMixin, View):
                 "view_name": "Additional EINs",
                 "instructions": "Enter any additional EINs using the provided worksheet.",
             },
-            "additional-UEIs": {
-                "view_id": "additional-UEIs",
+            "additional-ueis": {
+                "view_id": "additional-ueis",
                 "view_name": "Additional UEIs",
                 "instructions": "Enter any additional UEIs using the provided worksheet.",
             },
