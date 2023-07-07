@@ -62,14 +62,15 @@ jobs:
           echo "$SSH_PRIVATE_KEY" > private.pem
           chmod 600 private.pem
           openssl rsa -in "private.pem" -pubout > "public.pem"
-
-      - name: Add signer
-        working-directory: ./backend
-        shell: bash
-        env:
-          SSH_PASSPHRASE: ${{secrets.DCT_ROOT_PASS}}
-        run: |
           docker trust signer add --key public.pem fac ghcr.io/${{ env.GH_REPO }}/${{ matrix.image.short-name }} <<< $SSH_PRIVATE_KEY | <<< $SSH_PRIVATE_KEY
+
+      # - name: Add signer
+      #   working-directory: ./backend
+      #   shell: bash
+      #   env:
+      #     SSH_PASSPHRASE: ${{secrets.DCT_ROOT_PASS}}
+      #   run: |
+      #     docker trust signer add --key public.pem fac ghcr.io/${{ env.GH_REPO }}/${{ matrix.image.short-name }} <<< $SSH_PRIVATE_KEY | <<< $SSH_PRIVATE_KEY
 
       - name: Load the private key onto Docker trust store
         working-directory: ./backend
