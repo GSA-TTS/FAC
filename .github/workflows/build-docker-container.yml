@@ -71,15 +71,20 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Create ssl key file
+      - name: Convert Key to PEM
         working-directory: ${{ env.WORKING_DIRECTORY }}
-        run: docker trust key generate fac
+        env:
+          RSA_KEY: ${{ secrets.RSA_KEY }}
+        run: |
+          echo "$RSA_KEY" > private.pem
+          chmod 600 private.pem
+          docker trust key load private.pem --name fac
 
       - name: Add signer
         working-directory: ${{ env.WORKING_DIRECTORY }}
         shell: bash
         run: |
-          docker trust signer add --key cert.pem ${{ inputs.docker-name }}-team ${{ env.GH_REPO }}/${{ env.IMAGE }}
+          docker trust signer add --key private.pem ${{ inputs.docker-name }}-team ${{ env.GH_REPO }}/${{ env.IMAGE }}
 
       - name: Build Container
         working-directory: ${{ env.WORKING_DIRECTORY }}
