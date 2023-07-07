@@ -74,16 +74,15 @@ jobs:
       #   run: |
       #     docker trust signer add --key public.pem fac ghcr.io/${{ env.GH_REPO }}/${{ matrix.image.short-name }} <<< $SSH_PASSPHRASE | <<< $SSH_PASSPHRASE
 
-      # - name: Load the private key onto Docker trust store
-      #   working-directory: ./backend
-      #   shell: bash
-      #   env:
-      #     SSH_PASSPHRASE: ${{secrets.DCT_ROOT_PASS}}
-      #   run: |
-      #     docker trust key load --name fac private.pem <<< $SSH_PASSPHRASE | <<< $SSH_PASSPHRASE
+      - name: Load the private key onto Docker trust store
+        working-directory: ./backend
+        shell: bash
+        env:
+          SSH_PASSPHRASE: ${{secrets.DCT_ROOT_PASS}}
+        run: |
+          docker trust key load --name fac private.pem <<< $SSH_PASSPHRASE | <<< $SSH_PASSPHRASE
 
       - name: Push Image
         run: |
-          export DOCKER_CONTENT_TRUST=1
           docker push --all-tags ghcr.io/${{ env.GH_REPO }}/${{ matrix.image.short-name }} --disable-content-trust=false
 
