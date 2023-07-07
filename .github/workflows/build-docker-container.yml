@@ -75,10 +75,12 @@ jobs:
         working-directory: ${{ env.WORKING_DIRECTORY }}
         shell: bash
         env:
-          DCT_KEY: ${{ secrets.DCT_KEY }}
+          DCT_KEY: ${{ secrets.RSA_KEY }}
         run: |
+          # Set secret as private key file
           echo "$DCT_KEY" > private.pem
           chmod 600 private.pem
+          # Public key from private key
           openssl rsa -in "private.pem" -pubout > "public.pem"
 
       - name: Add signer
