@@ -76,7 +76,7 @@ jobs:
         working-directory: ./backend
         shell: bash
         env:
-          SSH_PASSPHRASE: ${{secrets.DCT_ROOT_PASS}}
+          SSH_PASSPHRASE: ${{secrets.DCT_REPO_PASS }}
         run: |
           docker trust key load --name "fac" "private.pem" <<< $SSH_PRIVATE_KEY
 
