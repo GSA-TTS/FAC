@@ -35,8 +35,8 @@ jobs:
       - name: Tag Image
         run: |
           date=$(date +%Y%m%d)
-          docker tag ${{ matrix.image.name }} ${{ env.GH_REPO }}/${{ matrix.image.short-name }}:latest
-          docker tag ${{ matrix.image.name }} ${{ env.GH_REPO }}/${{ matrix.image.short-name }}:$date
+          docker tag ${{ matrix.image.name }} ghcr.io/${{ env.GH_REPO }}/${{ matrix.image.short-name }}:latest
+          docker tag ${{ matrix.image.name }} ghcr.io/${{ env.GH_REPO }}/${{ matrix.image.short-name }}:$date
 
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v2
