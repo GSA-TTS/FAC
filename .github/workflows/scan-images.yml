@@ -62,7 +62,7 @@ jobs:
         env:
           REPO_PASS: ${{ secrets.DCT_REPO_PASS }}
         run: |
-          { echo $REPO_PASS; echo $REPO_PASS; } | docker trust signer add --key "public.pem" ghcr.io/${{ env.GH_REPO }}/${{ matrix.image.short-name }}
+          { echo $REPO_PASS; echo $REPO_PASS; } | docker trust signer add --key "public.pem" fac-sign ghcr.io/${{ env.GH_REPO }}/${{ matrix.image.short-name }}
 
       - name: Load the private key onto Docker trust store
         env:
