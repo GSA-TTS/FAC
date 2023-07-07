@@ -57,22 +57,22 @@ jobs:
           chmod 600 private.pem
           openssl rsa -in "private.pem" -pubout > "public.pem"
 
+      - name: Add signer
+        working-directory: ./backend
+        shell: bash
+        env:
+          SSH_PASSPHRASE: ${{secrets.DCT_ROOT_PASS}}
+          REPO_PASSPHRASE: ${{ secrets.DCT_REPO_PASS }}
+        run: |
+          { echo $SSH_PASSPHRASE; echo $SSH_PASSPHRASE; echo $IMAGE_PASSPHRASE; echo $IMAGE_PASSPHRASE ; } | docker trust signer add --key public.pem fac ghcr.io/${{ env.GH_REPO }}/${{ matrix.image.short-name }}
+
       - name: Load the private key onto Docker trust store
         env:
           SSH_PASSPHRASE: ${{secrets.DCT_ROOT_PASS}}
         working-directory: ./backend
         shell: bash
         run: |
-          { echo $SSH_PASSPHRASE; echo $SSH_PASSPHRASE ; } | docker trust key load private.pem --name "fac"
-
-      - name: Add signer
-        working-directory: ./backend
-        shell: bash
-        env:
-          SSH_PASSPHRASE: ${{secrets.DCT_ROOT_PASS}}
-          IMAGE_PASSPHRASE: ${{ secrets.DCT_REPO_PASS }}
-        run: |
-          { echo $SSH_PASSPHRASE; echo $SSH_PASSPHRASE; echo $IMAGE_PASSPHRASE; echo $IMAGE_PASSPHRASE ; } | docker trust signer add --key public.pem fac ghcr.io/${{ env.GH_REPO }}/${{ matrix.image.short-name }}
+          { echo $SSH_PASSPHRASE; echo $SSH_PASSPHRASE ; } | docker trust key load private.pem --name fac
 
       # - name: Sign Image
       #   working-directory: ./backend
