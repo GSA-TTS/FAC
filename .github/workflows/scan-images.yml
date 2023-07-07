@@ -62,7 +62,7 @@ jobs:
           echo "$SSH_PRIVATE_KEY" > private.pem
           chmod 600 private.pem
           openssl rsa -in "private.pem" -pubout > "public.pem"
-          docker trust signer add --key public.pem fac ghcr.io/${{ env.GH_REPO }}/${{ matrix.image.short-name }} <<< $SSH_PRIVATE_KEY
+          docker trust signer add --key public.pem fac ghcr.io/${{ env.GH_REPO }}/${{ matrix.image.short-name }} <<< $SSH_PRIVATE_KEY <<< $SSH_PRIVATE_KEY
 
       # - name: Add signer
       #   working-directory: ./backend
