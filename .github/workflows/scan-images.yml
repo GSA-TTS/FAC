@@ -78,7 +78,7 @@ jobs:
         env:
           TRUST_PASS: ${{ secrets.DCT_REPO_PASS }}
         run: |
-          docker trust key load --name fac private.pem <<< $TRUST_PASS
+          docker trust key load --name fac private.pem <<< $TRUST_PASS | <<< $TRUST_PASS
 
       # - name: Push Image
       #   run: docker push --all-tags ghcr.io/${{ env.GH_REPO }}/${{ matrix.image.short-name }}
