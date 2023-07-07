@@ -49,6 +49,35 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Create ssl key file
+        working-directory: ./backend
+        run: |
+          echo "$SSL_KEY" > private.pem
+          chmod 600 private.pem
+          openssl rsa -in "private.pem" -pubout > "public.pem"
+        shell: bash
+        env:
+          SSL_KEY: ${{ secrets.RSA_KEY }}
+
+      - name: Add signer
+        working-directory: prime-router
+        shell: bash
+        run: |
+          # Delegate signing using the public key
+          # Runs once if signer does not exist
+          docker trust signer add --key "public.pem" fac ghcr.io/${{ env.GH_REPO }}/${{ matrix.image.short-name }}
+
+      - name: Load the private key onto Docker trust store
+        working-directory: prime-router
+        run: |
+          docker trust key load --name "codesign" "private.pem"
+          GREEN='\033[0;32m'
+          PURPLE='\033[0;35m'
+          NC='\033[0m' # No Color
+          echo -e "Confirm \"${GREEN}Successfully imported key from private.pem${NC}\"" \
+          "\nIf successful, IGNORE  \"${PURPLE}failed to import key to store: ...${NC}\" (due to unused content within private key)"
+        shell: bash
+
       - name: Push Image
         run: docker push --all-tags ghcr.io/${{ env.GH_REPO }}/${{ matrix.image.short-name }}
 
