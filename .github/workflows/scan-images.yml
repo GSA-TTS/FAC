@@ -60,7 +60,7 @@ jobs:
           chmod 600 private.pem
           openssl rsa -in "private.pem" -pubout > "public.pem"
           echo "$SIGNER_KEY" > sign.pem
-          chmod 600 signer.pem
+          chmod 600 sign.pem
           openssl rsa -in "sign.pem" -pubout > "signer.pem"
 
       - name: Load the private key onto Docker trust store
