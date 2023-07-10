@@ -54,14 +54,10 @@ jobs:
         working-directory: ./backend
         env:
           SSH_PRIVATE_KEY: ${{secrets.RSA_KEY}}
-          SIGNER_KEY: ${{ secrets.SIGNER_KEY }}
         run: |
           echo "$SSH_PRIVATE_KEY" > private.pem
           chmod 600 private.pem
           openssl rsa -in "private.pem" -pubout > "public.pem"
-          echo "$SIGNER_KEY" > sign.pem
-          chmod 600 sign.pem
-          openssl rsa -in "sign.pem" -pubout > "signer.pem"
 
       - name: Load the private key onto Docker trust store
         env:
@@ -77,12 +73,12 @@ jobs:
           ROOT_PASS: ${{ secrets.DCT_ROOT_PASS}}
           REPO_PASS: ${{ env.GH_TOKEN }}
         run: |
-          { echo $ROOT_PASS; echo $ROOT_PASS; } | docker trust signer add --key "signer.pem" fac-sign ghcr.io/${{ env.GH_REPO }}/${{ matrix.image.short-name }} | { echo $REPO_PASS; echo $REPO_PASS ; }
+          { echo $ROOT_PASS; echo $ROOT_PASS; } | docker trust signer add --key "public.pem" fac-sign ghcr.io/${{ env.GH_REPO }}/${{ matrix.image.short-name }} | { echo $REPO_PASS; echo $REPO_PASS ; }
 
-      # - name: Push Image
-      #   env:
-      #     SSH_PASSPHRASE: ${{secrets.DCT_ROOT_PASS}}
-      #   run: |
-      #     echo "DOCKER_CONTENT_TRUST=1" >> $GITHUB_ENV
-      #     docker push --all-tags ghcr.io/${{ env.GH_REPO }}/${{ matrix.image.short-name }} <<< $SSH_PASSPHRASE
+      - name: Push Image
+        env:
+          ROOT_PASS: ${{secrets.DCT_ROOT_PASS}}
+        run: |
+          echo "DOCKER_CONTENT_TRUST=1" >> $GITHUB_ENV
+          { echo $ROOT_PASS; } | docker push --all-tags ghcr.io/${{ env.GH_REPO }}/${{ matrix.image.short-name }}
 
