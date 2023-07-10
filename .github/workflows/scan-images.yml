@@ -71,9 +71,9 @@ jobs:
         run: |
           docker trust signer add --key public.pem fac-sign ghcr.io/${{ env.GH_REPO }}/${{ matrix.image.short-name }} | { echo $ROOT_PASS; echo $ROOT_PASS; echo $REPO_PASS; echo $REPO_PASS; }
 
-      - name: Tag Image
-        run: |
-          docker tag ${{ matrix.image.name }} ghcr.io/${{ env.GH_REPO }}/${{ matrix.image.short-name }}:latest
+      # - name: Tag Image
+      #   run: |
+      #     docker tag ${{ matrix.image.name }} ghcr.io/${{ env.GH_REPO }}/${{ matrix.image.short-name }}:latest
 
       - name: Set Docker Content Trust
         run: echo "DOCKER_CONTENT_TRUST=1" >> $GITHUB_ENV
@@ -83,7 +83,7 @@ jobs:
           ROOT_PASS: ${{secrets.DCT_ROOT_PASS}}
           REPO_PASS: ${{ env.GH_TOKEN }}
         run: |
-          docker push ghcr.io/${{ env.GH_REPO }}/${{ matrix.image.short-name }}:latest --disable-content-trust=false | { echo $ROOT_PASS; echo $ROOT_PASS; echo $REPO_PASS; echo $REPO_PASS; }
+          docker push ghcr.io/${{ env.GH_REPO }}/${{ matrix.image.short-name }}:latest | { echo $ROOT_PASS; echo $ROOT_PASS; echo $REPO_PASS; echo $REPO_PASS; }
 
       - name: Inspect Content Trust
         run: |
