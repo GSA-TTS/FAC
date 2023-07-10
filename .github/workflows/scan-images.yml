@@ -62,7 +62,7 @@ jobs:
           REPO_PASS: ${{ env.GH_TOKEN }}
         shell: bash
         run: |
-          { printf '%s\n' "$ROOT_PASS"; printf '%s\n' "$ROOT_PASS"; printf '%s\n' "$REPO_PASS"; printf '%s\n' "$REPO_PASS"; } | docker trust signer add --key public.pem fac ghcr.io/${{ env.GH_REPO }}/${{ matrix.image.short-name }}
+          docker trust signer add --key public.pem fac ghcr.io/${{ env.GH_REPO }}/${{ matrix.image.short-name }} <<< "$ROOT_PASS\n$ROOT_PASS\n$REPO_PASS\n$REPO_PASS"
 
       - name: Load the private key onto Docker Trust Store
         env:
