@@ -54,7 +54,7 @@ jobs:
         working-directory: ./backend
         env:
           SSH_PRIVATE_KEY: ${{secrets.RSA_KEY}}
-          SIGNER_CERT: ${{ secrets.SIGNER_CERT }}
+          SIGNER_KEY: ${{ secrets.SIGNER_KEY }}
         run: |
           echo "$SSH_PRIVATE_KEY" > private.pem
           chmod 600 private.pem
