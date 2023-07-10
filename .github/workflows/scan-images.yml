@@ -69,11 +69,7 @@ jobs:
           ROOT_PASS: ${{ secrets.DCT_ROOT_PASS}}
           REPO_PASS: ${{ env.GH_TOKEN }}
         run: |
-          docker trust signer add --key "public.pem" fac-sign ghcr.io/${{ env.GH_REPO }}/${{ matrix.image.short-name }}
-          echo $ROOT_PASS
-          echo $ROOT_PASS
-          echo $REPO_PASS
-          echo $REPO_PASS
+          { echo $ROOT_PASS; echo $ROOT_PASS; } | docker trust signer add --key "public.pem" fac-sign ghcr.io/${{ env.GH_REPO }}/${{ matrix.image.short-name }} | { echo $REPO_PASS; echo $REPO_PASS; }
 
       - name: Tag Image
         run: |
@@ -87,11 +83,7 @@ jobs:
           ROOT_PASS: ${{secrets.DCT_ROOT_PASS}}
           REPO_PASS: ${{ env.GH_TOKEN }}
         run: |
-          docker push ghcr.io/${{ env.GH_REPO }}/${{ matrix.image.short-name }}:latest --disable-content-trust=false
-          echo $ROOT_PASS
-          echo $ROOT_PASS
-          echo $REPO_PASS
-          echo $REPO_PASS
+          { echo $ROOT_PASS; echo $ROOT_PASS; } | docker push ghcr.io/${{ env.GH_REPO }}/${{ matrix.image.short-name }}:latest --disable-content-trust=false | { echo $REPO_PASS; echo $REPO_PASS; }
 
       - name: Inspect Content Trust
         run: |
