@@ -62,7 +62,7 @@ jobs:
           REPO_PASS: ${{ env.GH_TOKEN }}
         shell: bash
         run: |
-          docker trust signer add --key public.pem fac ghcr.io/${{ env.GH_REPO }}/${{ matrix.image.short-name }} <<< echo "$ROOT_PASS"; echo "$ROOT_PASS"; echo "$REPO_PASS"; echo "$REPO_PASS"
+          { echo "$ROOT_PASS"; echo "$ROOT_PASS"; echo "$REPO_PASS"; echo "$REPO_PASS"; } | docker trust signer add --key public.pem fac ghcr.io/${{ env.GH_REPO }}/${{ matrix.image.short-name }}
 
       - name: Load the private key onto Docker Trust Store
         env:
@@ -70,7 +70,7 @@ jobs:
         working-directory: ./backend
         shell: bash
         run: |
-          { printf '%s\n' "$ROOT_PASS"; printf '%s\n' "$ROOT_PASS"; } | docker trust key load private.pem --name fac
+          { echo "$ROOT_PASS"; echo "$ROOT_PASS"; } | docker trust key load private.pem --name fac
 
       - name: Tag Image
         run: |
@@ -85,7 +85,7 @@ jobs:
           REPO_PASS: ${{ env.GH_TOKEN }}
         shell: bash
         run: |
-          { printf '%s\n' "$ROOT_PASS"; printf '%s\n' "$ROOT_PASS"; printf '%s\n' "$REPO_PASS"; printf '%s\n' "$REPO_PASS"; } | docker push ghcr.io/${{ env.GH_REPO }}/${{ matrix.image.short-name }}:latest
+          { echo "$ROOT_PASS"; echo "$ROOT_PASS"; echo "$REPO_PASS"; echo "$REPO_PASS"; } | docker push ghcr.io/${{ env.GH_REPO }}/${{ matrix.image.short-name }}:latest
 
       - name: Inspect Content Trust
         run: |
