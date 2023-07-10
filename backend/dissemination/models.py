@@ -126,7 +126,7 @@ class FederalAward(models.Model):
 
     award_seq_number = models.IntegerField(
         "Order that the award line was reported",
-        null=True,
+        null=False,
     )
 
     federal_agency_prefix = models.CharField(
