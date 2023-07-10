@@ -59,14 +59,6 @@ jobs:
           chmod 600 private.pem
           openssl rsa -in "private.pem" -pubout > "public.pem"
 
-      - name: Load the private key onto Docker trust store
-        env:
-          ROOT_PASS: ${{secrets.DCT_ROOT_PASS}}
-        working-directory: ./backend
-        shell: bash
-        run: |
-          { echo $ROOT_PASS; echo $ROOT_PASS ; } | docker trust key load private.pem --name fac
-
       - name: Sign Image
         working-directory: ./backend
         env:
@@ -75,10 +67,17 @@ jobs:
         run: |
           { echo $ROOT_PASS; echo $ROOT_PASS; } | docker trust signer add --key "public.pem" fac-sign ghcr.io/${{ env.GH_REPO }}/${{ matrix.image.short-name }} | { echo $REPO_PASS; echo $REPO_PASS ; }
 
-      - name: Push Image
+      - name: Load the private key onto Docker trust store
+        env:
+          ROOT_PASS: ${{secrets.DCT_ROOT_PASS}}
+        working-directory: ./backend
+        shell: bash
+        run: |
+          { echo $ROOT_PASS; echo $ROOT_PASS ; } | docker trust key load private.pem --name fac-sign
+
+      - name: Sign and Push to GHCR
         env:
           ROOT_PASS: ${{secrets.DCT_ROOT_PASS}}
         run: |
-          echo "DOCKER_CONTENT_TRUST=1" >> $GITHUB_ENV
-          { echo $ROOT_PASS; } | docker push --all-tags ghcr.io/${{ env.GH_REPO }}/${{ matrix.image.short-name }}
+          { echo $ROOT_PASS; } | docker trust sign ghcr.io/${{ env.GH_REPO }}/${{ matrix.image.short-name }}:latest
 
