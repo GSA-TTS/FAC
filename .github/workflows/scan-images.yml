@@ -83,7 +83,7 @@ jobs:
           ROOT_PASS: ${{secrets.DCT_ROOT_PASS}}
           REPO_PASS: ${{ env.GH_TOKEN }}
         run: |
-          { echo $ROOT_PASS; echo $ROOT_PASS; } | docker push ghcr.io/${{ env.GH_REPO }}/${{ matrix.image.short-name }}:latest --disable-content-trust=false <<< $REPO_PASS
+          docker push ghcr.io/${{ env.GH_REPO }}/${{ matrix.image.short-name }}:latest --disable-content-trust=false | { echo $ROOT_PASS; echo $ROOT_PASS; echo $REPO_PASS; echo $REPO_PASS; }
 
       - name: Inspect Content Trust
         run: |
