@@ -75,12 +75,14 @@ jobs:
         run: |
           docker tag ${{ matrix.image.name }} ghcr.io/${{ env.GH_REPO }}/${{ matrix.image.short-name }}:latest
 
+      - name: Set Docker Content Trust
+        run: echo "DOCKER_CONTENT_TRUST=1" >> $GITHUB_ENV
+
       - name: Sign and Push to GHCR
         env:
           ROOT_PASS: ${{secrets.DCT_ROOT_PASS}}
           REPO_PASS: ${{ env.GH_TOKEN }}
         run: |
-          echo "DOCKER_CONTENT_TRUST=1" >> $GITHUB_ENV
           { echo $ROOT_PASS; echo $ROOT_PASS ; } | docker push ghcr.io/${{ env.GH_REPO }}/${{ matrix.image.short-name }}:latest --disable-content-trust=false | { echo $REPO_PASS; echo $REPO_PASS ; }
 
       - name: Inspect Content Trust
