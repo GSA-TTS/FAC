@@ -209,14 +209,14 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         do once all the individual sections are complete and valid in
         themselves.
         """
-        all_sections = [
-            self.general_information,
-            self.federal_awards,
-            self.corrective_action_plan,
-            self.findings_text,
-            self.findings_uniform_guidance,
-            self.additional_ueis,
-        ]
+        all_sections = {
+            "general_information": self.general_information,
+            "federal_awards": self.federal_awards,
+            "corrective_action_plan": self.corrective_action_plan,
+            "findings_text": self.findings_text,
+            "findings_uniform_guidance": self.findings_uniform_guidance,
+            "additional_ueis": self.additional_ueis,
+        }
         all_functions = audit.cross_validation.functions
         errors = list(
             chain.from_iterable([func(all_sections) for func in all_functions])
