@@ -43,6 +43,13 @@ jobs:
         run: |
           docker tag ${{ matrix.image.name }} ghcr.io/${{ env.GH_REPO }}/${{ matrix.image.short-name }}:latest
 
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ env.GH_TOKEN }}
+
       - name: Setup Keys for DCT
         working-directory: ./backend
         env:
@@ -68,16 +75,9 @@ jobs:
         working-directory: ./backend
         env:
           ROOT_PASS: ${{ secrets.DCT_ROOT_PASS}}
-          REPO_PASS: ${{ env.REPO_PASS }}
+          REPO_PASS: ${{ env.GH_TOKEN }}
         run: |
           { echo $ROOT_PASS; echo $ROOT_PASS; echo $REPO_PASS; echo $REPO_PASS ; } | docker trust signer add --key "signer.pem" fac-sign ghcr.io/${{ env.GH_REPO }}/${{ matrix.image.short-name }}
-
-      - name: Login to GitHub Container Registry
-        uses: docker/login-action@v2
-        with:
-          registry: ghcr.io
-          username: ${{ github.repository_owner }}
-          password: ${{ env.GH_TOKEN }}
 
       # - name: Push Image
       #   env:
