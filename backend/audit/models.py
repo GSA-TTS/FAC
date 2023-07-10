@@ -1,5 +1,6 @@
 import calendar
 from datetime import date
+from itertools import chain
 import json
 import logging
 
@@ -13,6 +14,7 @@ from django.utils.translation import gettext_lazy as _
 
 from django_fsm import FSMField, RETURN_VALUE, transition
 
+import audit.cross_validation
 from .validators import (
     validate_additional_ueis_json,
     validate_corrective_action_plan_json,
@@ -198,8 +200,11 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         blank=True, null=True, validators=[validate_additional_ueis_json]
     )
 
-    def validate_full(self):
+    def validate_cross(self):
         """
+        This method should NOT be run as part of full_clean(), because we want
+        to be able to save in-progress submissions.
+
         A stub method to represent the cross-sheet, “full” validation that we
         do once all the individual sections are complete and valid in
         themselves.
@@ -212,9 +217,13 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
             self.findings_uniform_guidance,
             self.additional_ueis,
         ]
-        if all(section for section in all_sections):
-            return True
-        return True
+        all_functions = audit.cross_validation.functions
+        errors = list(
+            chain.from_iterable([func(all_sections) for func in all_functions])
+        )
+        if errors:
+            return [errors, all_sections]
+        return []
 
     @transition(
         field="submission_status",
@@ -228,13 +237,13 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         there's likely to be a step in one of the views that does cross-sheet
         validation and reports back to the user.
         """
-        if self.validate_full():
+        errors = self.validate_cross()
+        if not errors:
             self.transition_name.append(
                 SingleAuditChecklist.STATUS.READY_FOR_CERTIFICATION
             )
             self.transition_date.append(date.today())
             return SingleAuditChecklist.STATUS.READY_FOR_CERTIFICATION
-
         return SingleAuditChecklist.STATUS.IN_PROGRESS
 
     @transition(

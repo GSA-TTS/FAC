@@ -205,10 +205,14 @@ class ReadyForCertificationView(SingleAuditChecklistAccessRequiredMixin, generic
         try:
             sac = SingleAuditChecklist.objects.get(report_id=report_id)
 
-            sac.transition_to_ready_for_certification()
-            sac.save()
+            errors = sac.validate_cross()
+            if not errors:
+                sac.transition_to_ready_for_certification()
+                sac.save()
+                return redirect(reverse("audit:SubmissionProgress", args=[report_id]))
 
-            return redirect(reverse("audit:SubmissionProgress", args=[report_id]))
+            context = {"report_id": report_id, "errors": errors}
+            return render(request, "audit/not-ready-for-certification.html", context)
 
         except SingleAuditChecklist.DoesNotExist:
             raise PermissionDenied("You do not have access to this audit.")

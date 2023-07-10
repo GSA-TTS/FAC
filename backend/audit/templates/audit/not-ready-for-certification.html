@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+<div class="grid-container margin-top-6">
+  <div class="grid-row grid-gap">
+      <form class="usa-form usa-form--large" id="ready-for-certification" method="post">
+          {% csrf_token %}
+          <fieldset class="usa-fieldset">
+              <legend class="usa-legend usa-legend--large" id="federal-awards">
+                  Not ready for Certification
+              </legend>
+              <p>This is some text explaining that there are errors from running cross validation</p>
+              <p>Errors: {{ errors }} </p>
+              <p>Audit {{ report_id }} has a submission status of: {{ submission_status }}</p>
+          </fieldset>
+      </form>
+  </div>
+</div>
+{% endblock content %}
+
