@@ -60,6 +60,7 @@ jobs:
         env:
           ROOT_PASS: ${{ secrets.DCT_ROOT_PASS}}
           REPO_PASS: ${{ env.GH_TOKEN }}
+        shell: bash
         run: |
           export $ROOT_PASS
           export $REPO_PASS
@@ -84,6 +85,7 @@ jobs:
         env:
           ROOT_PASS: ${{secrets.DCT_ROOT_PASS}}
           REPO_PASS: ${{ env.GH_TOKEN }}
+        shell: bash
         run: |
           export $ROOT_PASS
           export $REPO_PASS
