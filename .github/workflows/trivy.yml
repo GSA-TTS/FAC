@@ -65,8 +65,8 @@ jobs:
       fail-fast: false
       matrix:
         image:
-          - name: ghcr.io/asteel-gsa/fac/postgrest:latest
-          - name: ghcr.io/asteel-gsa/fac/clamav:latest
+          - name: ghcr.io/gsa-tts/fac/postgrest:latest
+          - name: ghcr.io/gsa-tts/fac/clamav:latest
     steps:
       - name: Pull Third Party Docker Images
         run: docker pull ${{ matrix.image.name }}

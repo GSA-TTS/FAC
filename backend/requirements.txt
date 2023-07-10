@@ -639,6 +639,10 @@ pyjwt==2.7.0 \
     # via
     #   -r ./requirements/requirements.in
     #   djangorestframework-simplejwt
+pypdf==3.12.0 \
+    --hash=sha256:826ad4681660394d7a5742fe8380168cf13058e27b826b7f5b798e994cb77b38 \
+    --hash=sha256:cebac920db0698369f49c389018858a5436862bf3c45b64b10c55c008878db95
+    # via -r ./requirements/requirements.in
 pyrsistent==0.19.3 \
     --hash=sha256:016ad1afadf318eb7911baa24b049909f7f3bb2c5b1ed7b6a8f21db21ea3faa8 \
     --hash=sha256:1a2994773706bbb4995c31a97bc94f1418314923bd1048c6d964837040376440 \

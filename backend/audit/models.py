@@ -14,13 +14,14 @@ from django.utils.translation import gettext_lazy as _
 from django_fsm import FSMField, RETURN_VALUE, transition
 
 from .validators import (
-    validate_excel_file,
+    validate_additional_ueis_json,
     validate_corrective_action_plan_json,
+    validate_excel_file,
     validate_federal_award_json,
     validate_findings_text_json,
     validate_findings_uniform_guidance_json,
     validate_general_information_json,
-    validate_additional_ueis_json,
+    validate_single_audit_report_file,
 )
 
 User = get_user_model()
@@ -147,9 +148,14 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         default=list,
         size=None,
         blank=True,
+        null=True,
     )
     transition_date = ArrayField(
-        models.DateTimeField(), default=list, size=None, blank=True
+        models.DateTimeField(),
+        default=list,
+        size=None,
+        blank=True,
+        null=True,
     )
 
     report_id = models.CharField(max_length=17, unique=True)
@@ -434,3 +440,33 @@ class ExcelFile(models.Model):
     def save(self, *args, **kwargs):
         self.filename = f"{self.sac.report_id}--{self.form_section}.xlsx"
         super(ExcelFile, self).save(*args, **kwargs)
+
+
+def single_audit_report_path(instance, filename):
+    """
+    We want the actual filename in the filesystem to be unique and determined
+    by report_id, not the user-provided filename.
+    """
+    base_path = "singleauditreport"
+    report_id = instance.sac.report_id
+    return f"{base_path}/{report_id}.pdf"
+
+
+class SingleAuditReportFile(models.Model):
+    """
+    Data model to track uploaded Single Audit report PDFs and associate them with SingleAuditChecklists
+    """
+
+    file = models.FileField(
+        upload_to=single_audit_report_path,
+        validators=[validate_single_audit_report_file],
+    )
+    filename = models.CharField(max_length=255)
+    sac = models.ForeignKey(SingleAuditChecklist, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, blank=True, null=True, on_delete=models.SET_NULL)
+    date_created = models.DateTimeField(auto_now_add=True)
+
+    def save(self, *args, **kwargs):
+        report_id = SingleAuditChecklist.objects.get(id=self.sac.id).report_id
+        self.filename = f"{report_id}.pdf"
+        super(SingleAuditReportFile, self).save(*args, **kwargs)
