@@ -79,5 +79,5 @@ jobs:
         env:
           ROOT_PASS: ${{secrets.DCT_ROOT_PASS}}
         run: |
-          { echo $ROOT_PASS; } | docker trust sign ghcr.io/${{ env.GH_REPO }}/${{ matrix.image.short-name }}:latest
+          { echo $ROOT_PASS; echo $ROOT_PASS ; } | docker trust sign ghcr.io/${{ env.GH_REPO }}/${{ matrix.image.short-name }}:latest
 
