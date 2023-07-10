@@ -70,8 +70,10 @@ jobs:
           REPO_PASS: ${{ env.GH_TOKEN }}
         run: |
           docker trust signer add --key "public.pem" fac-sign ghcr.io/${{ env.GH_REPO }}/${{ matrix.image.short-name }}
-          { echo $ROOT_PASS; echo $ROOT_PASS; }
-          { echo $REPO_PASS; echo $REPO_PASS; }
+          echo $ROOT_PASS
+          echo $ROOT_PASS
+          echo $REPO_PASS
+          echo $REPO_PASS
 
       - name: Tag Image
         run: |
