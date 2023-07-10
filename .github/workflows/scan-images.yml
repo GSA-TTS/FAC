@@ -5,6 +5,9 @@ on:
   schedule:
     - cron: '0 8 * * 0'
 
+env:
+  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
 jobs:
   pull-and-scan:
     runs-on: ubuntu-latest
@@ -41,7 +44,7 @@ jobs:
         with:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          password: ${{ env.GH_TOKEN }}
 
       - name: Tag Image
         run: |
@@ -61,9 +64,9 @@ jobs:
         working-directory: ./backend
         env:
           ROOT_PASS: ${{ secrets.DCT_ROOT_PASS}}
-          REPO_PASS: ${{ secrets.DCT_REPO_PASS }}
+          REPO_PASS: ${{ env.GH_TOKEN }}
         run: |
-          { echo $ROOT_PASS; echo $ROOT_PASS; } | { echo $REPO_PASS; echo $REPO_PASS; } | docker trust signer add --key "public.pem" fac-sign ghcr.io/${{ env.GH_REPO }}/${{ matrix.image.short-name }}
+          { echo $ROOT_PASS; echo $ROOT_PASS; echo $REPO_PASS; echo $REPO_PASS ; } | docker trust signer add --key "public.pem" fac-sign ghcr.io/${{ env.GH_REPO }}/${{ matrix.image.short-name }}
 
       - name: Load the private key onto Docker trust store
         env:
