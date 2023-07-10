@@ -69,7 +69,7 @@ jobs:
           ROOT_PASS: ${{ secrets.DCT_ROOT_PASS}}
           REPO_PASS: ${{ env.GH_TOKEN }}
         run: |
-          { echo $ROOT_PASS; echo $ROOT_PASS; echo $REPO_PASS; echo $REPO_PASS; } | docker trust signer add --key public.pem fac-sign ghcr.io/${{ env.GH_REPO }}/${{ matrix.image.short-name }}
+          { echo $ROOT_PASS; echo $ROOT_PASS; echo $REPO_PASS; echo $REPO_PASS; } | docker trust signer add --key public.pem fac ghcr.io/${{ env.GH_REPO }}/${{ matrix.image.short-name }}
 
       # - name: Tag Image
       #   run: |
