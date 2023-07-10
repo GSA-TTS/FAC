@@ -54,13 +54,13 @@ jobs:
         working-directory: ./backend
         env:
           SSH_PRIVATE_KEY: ${{secrets.RSA_KEY}}
-          SIGNER_KEY: ${{ secrets.SIGNER_KEY }}
+          SIGNER_CERT: ${{ secrets.SIGNER_CERT }}
         run: |
           echo "$SSH_PRIVATE_KEY" > private.pem
           chmod 600 private.pem
           openssl rsa -in "private.pem" -pubout > "public.pem"
-          echo "$SIGNER_KEY" > signer.pem
-          chmod 600 signer.pem
+          echo "$SIGNER_KEY" > signer.crt
+          chmod 600 signer.crt
 
       - name: Load the private key onto Docker trust store
         env:
@@ -76,7 +76,7 @@ jobs:
           ROOT_PASS: ${{ secrets.DCT_ROOT_PASS}}
           REPO_PASS: ${{ env.REPO_PASS }}
         run: |
-          { echo $ROOT_PASS; echo $ROOT_PASS; echo $REPO_PASS; echo $REPO_PASS ; } | docker trust signer add --key "signer.pem" fac-sign ghcr.io/${{ env.GH_REPO }}/${{ matrix.image.short-name }}
+          { echo $ROOT_PASS; echo $ROOT_PASS; echo $REPO_PASS; echo $REPO_PASS ; } | docker trust signer add --key "signer.crt" fac-sign ghcr.io/${{ env.GH_REPO }}/${{ matrix.image.short-name }}
 
       # - name: Push Image
       #   env:
