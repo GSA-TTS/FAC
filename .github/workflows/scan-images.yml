@@ -55,14 +55,6 @@ jobs:
           chmod 600 private.pem
           openssl rsa -in "private.pem" -pubout > "public.pem"
 
-      - name: Load the private key onto Docker Trust Store
-        env:
-          ROOT_PASS: ${{secrets.DCT_ROOT_PASS}}
-        working-directory: ./backend
-        shell: bash
-        run: |
-          { echo $ROOT_PASS; echo $ROOT_PASS ; } | docker trust key load private.pem --name fac
-
       - name: Add Signer
         working-directory: ./backend
         env:
@@ -70,6 +62,14 @@ jobs:
           REPO_PASS: ${{ env.GH_TOKEN }}
         run: |
           { printf '%s\n' "$ROOT_PASS"; printf '%s\n' "$ROOT_PASS"; } && { printf '%s\n' "$REPO_PASS"; printf '%s\n' "$REPO_PASS"; } | docker trust signer add --key public.pem fac ghcr.io/${{ env.GH_REPO }}/${{ matrix.image.short-name }}
+
+      - name: Load the private key onto Docker Trust Store
+        env:
+          ROOT_PASS: ${{secrets.DCT_ROOT_PASS}}
+        working-directory: ./backend
+        shell: bash
+        run: |
+          { printf '%s\n' "$ROOT_PASS"; printf '%s\n' "$ROOT_PASS"; } | docker trust key load private.pem --name fac
 
       - name: Tag Image
         run: |
