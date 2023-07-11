@@ -1,13 +1,11 @@
 ---
 name: Terraform apply (single env)
-
 on:
   workflow_call:
     inputs:
       environment:
         required: true
         type: string
-  
 
 jobs:
   fetch-versions:
@@ -18,12 +16,11 @@ jobs:
     env:
       GH_REPO: ghcr.io/gsa-tts/fac
 
-
     steps:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Fetch all artifacta
+      - name: Fetch all artifacts
         uses: dawidd6/action-download-artifact@v2
         with:
           # name: postgrest

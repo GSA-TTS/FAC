@@ -81,4 +81,4 @@ jobs:
         run: npm run check-all
 
   validate-terraform:
-    uses: ./.github/workflows/linting/terraform-lint.yml
+    uses: ./.github/workflows/terraform-lint.yml

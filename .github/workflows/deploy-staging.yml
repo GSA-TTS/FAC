@@ -6,16 +6,16 @@ on:
 
 jobs:
   testing:
-    uses: ./.github/workflows/testing/testing-from-ghcr.yml
+    uses: ./.github/workflows/testing-from-ghcr.yml
     secrets: inherit
 
   linting:
-    uses: ./.github/workflows/linting/linting.yml
+    uses: ./.github/workflows/linting.yml
     secrets: inherit
 
   scan-dev:
     name: Zap scan of the dev site
-    uses: ./.github/workflows/security/zap-scan.yml
+    uses: ./.github/workflows/zap-scan.yml
     with:
       url: "https://fac-dev.app.cloud.gov/"
 
@@ -24,7 +24,7 @@ jobs:
     needs:
       - testing
       - scan-dev
-    uses: ./.github/workflows/terraform/terraform-apply-env.yml
+    uses: ./.github/workflows/terraform-apply-env.yml
     with:
       environment: "staging"
     secrets: inherit
@@ -33,7 +33,7 @@ jobs:
     name: Deploy staging app to cloud.gov
     needs:
       - deploy-infrastructure-staging
-    uses: ./.github/workflows/deployments/deploy-apps.yml
+    uses: ./.github/workflows/deploy-application.yml
     with:
       environment: "staging"
     secrets: inherit

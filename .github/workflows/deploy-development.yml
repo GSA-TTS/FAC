@@ -5,7 +5,7 @@ on:
 jobs:
   # ensure that every time a push to main occurs, the container is built and published to ghcr
   build-container:
-    uses: ./.github/workflows/docker/build-docker-container.yml
+    uses: ./.github/workflows/build-docker-container.yml
     secrets: inherit
     permissions:
       contents: read
@@ -18,11 +18,11 @@ jobs:
 
   testing:
     needs: [build-container]
-    uses: ./.github/workflows/testing/testing-from-ghcr.yml
+    uses: ./.github/workflows/testing-from-ghcr.yml
     secrets: inherit
 
   linting:
-    uses: ./.github/workflows/linting/linting.yml
+    uses: ./.github/workflows/linting.yml
     secrets: inherit
 
   # deploy to Dev & Management spaces
@@ -30,7 +30,7 @@ jobs:
     name: Deploy infrastructure (dev)
     needs:
       - testing
-    uses: ./.github/workflows/terraform/terraform-apply-env.yml
+    uses: ./.github/workflows/terraform-apply-env.yml
     with:
       environment: "dev"
     secrets: inherit
@@ -39,7 +39,7 @@ jobs:
     name: Deploy infrastructure (dev)
     needs:
       - testing
-    uses: ./.github/workflows/terraform/terraform-apply-env.yml
+    uses: ./.github/workflows/terraform-apply-env.yml
     with:
       environment: "management"
     secrets: inherit
@@ -48,7 +48,7 @@ jobs:
     name: Deploy dev app to cloud.gov
     needs:
       - deploy-infrastructure-dev
-    uses: ./.github/workflows/deployments/deploy-application.yml
+    uses: ./.github/workflows/deploy-application.yml
     with:
       environment: "dev"
     secrets: inherit
@@ -57,7 +57,7 @@ jobs:
     name: Zap scan of the dev site
     needs:
       - deploy-dev
-    uses: ./.github/workflows/security/zap-scan.yml
+    uses: ./.github/workflows/zap-scan.yml
     with:
       url: "https://fac-dev.app.cloud.gov/"
 

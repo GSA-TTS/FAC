@@ -7,7 +7,7 @@ on:
   workflow_dispatch: null
 jobs:
   trivy-scan:
-    uses: ./.github/workflows/security/trivy.yml
+    uses: ./.github/workflows/trivy.yml
     secrets: inherit
     permissions:
       contents: read
@@ -18,7 +18,7 @@ jobs:
   build-container:
     needs:
       - trivy-scan
-    uses: ./.github/workflows/docker/build-docker-container.yml
+    uses: ./.github/workflows/build-docker-container.yml
     secrets: inherit
     permissions:
       contents: read
@@ -33,16 +33,16 @@ jobs:
     name: Run Django, Lighthouse, a11y and lint
     needs:
       - build-container
-    uses: ./.github/workflows/testing/testing-from-ghcr.yml
+    uses: ./.github/workflows/testing-from-ghcr.yml
     secrets: inherit
 
   linting:
-    uses: ./.github/workflows/linting/linting.yml
+    uses: ./.github/workflows/linting.yml
     secrets: inherit
 
   create-pr:
     needs:
       - testing
     name: Create Pull Request to Staging
-    uses: ./.github/workflows/deployments/create-pull-request.yml
+    uses: ./.github/workflows/create-pull-request.yml
     secrets: inherit

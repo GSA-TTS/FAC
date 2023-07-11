@@ -54,7 +54,7 @@ jobs:
 
   # Update BPMN Diagrams
   sync-BPMN:
-    uses: ./.github/workflows/bpmn-renders/add-bpmn-renders.yml
+    uses: ./.github/workflows/add-bpmn-renders.yml
     secrets: inherit
 
   # Generate Terraform Plans
