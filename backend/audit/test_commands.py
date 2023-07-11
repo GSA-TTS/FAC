@@ -46,7 +46,9 @@ class TestLoadFixturesCommand(TestCase):
         call_command("load_fixtures")
 
         # should be a federal awards ExcelFile for this user
-        files = ExcelFile.objects.filter(user=user, form_section=FORM_SECTIONS.FEDERAL_AWARDS_EXPENDED)
+        files = ExcelFile.objects.filter(
+            user=user, form_section=FORM_SECTIONS.FEDERAL_AWARDS_EXPENDED
+        )
         self.assertTrue(files)
 
         # and the associated SAC has `federal_awards` data

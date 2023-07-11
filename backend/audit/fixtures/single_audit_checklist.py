@@ -102,9 +102,12 @@ def _post_create_federal_awards(this_sac, this_user):
     """
     ExcelFile = apps.get_model("audit.ExcelFile")
 
-    if ExcelFile.objects.filter(
-        sac_id=this_sac.id, form_section=FORM_SECTIONS.FEDERAL_AWARDS_EXPENDED
-    ).exists() and this_sac.federal_awards is not None:
+    if (
+        ExcelFile.objects.filter(
+            sac_id=this_sac.id, form_section=FORM_SECTIONS.FEDERAL_AWARDS_EXPENDED
+        ).exists()
+        and this_sac.federal_awards is not None
+    ):
         # there is already an uploaded file and data in the object so
         # nothing to do here
         return
