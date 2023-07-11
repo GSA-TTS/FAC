@@ -222,7 +222,7 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
             chain.from_iterable([func(all_sections) for func in all_functions])
         )
         if errors:
-            return [errors, all_sections]
+            return {"errors": errors, "data": all_sections}
         return []
 
     @transition(
