@@ -21,6 +21,7 @@ class ETL(object):
         self.audit_year = audit_date.split("-")[0]
 
     def load_all(self):
+        print('Loading into dissemination.."')
         self.load_general()
 
     def load_finding_texts(self):

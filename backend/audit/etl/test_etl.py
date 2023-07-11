@@ -2,7 +2,8 @@ from django.test import TestCase
 
 from model_bakery import baker
 
-from .models import SingleAuditChecklist, User
+from ..models import SingleAuditChecklist, User
+from ..fixtures import single_audit_checklist as sac_fixture
 
 
 class ETLTests(TestCase):
@@ -12,7 +13,9 @@ class ETLTests(TestCase):
 
     def setUp(self):
         user = baker.make(User)
-        general_information = {
+        general_information = sac_fixture._fake_general_information()
+        """
+        {
             "ein": "123456789",
             "audit_type": "single-audit",
             "auditee_uei": "ZQGGHJH74DW7",
@@ -47,6 +50,7 @@ class ETLTests(TestCase):
             "user_provided_organization_type": "state",
             "auditor_ein_not_an_ssn_attestation": "true",
         }
+        """
         federal_awards = {
             "FederalAwards": {
                 "auditee_uei": "ABC123DEF456",
@@ -74,7 +78,7 @@ class ETLTests(TestCase):
         }
         sac = SingleAuditChecklist.objects.create(
             submitted_by=user,
-            submission_status="auditee_certified",
+            # submission_status="auditee_certified",
             general_information=general_information,
             federal_awards=federal_awards,
         )
@@ -82,6 +86,12 @@ class ETLTests(TestCase):
 
     def test_load_general(self):
         sac = SingleAuditChecklist.objects.get(report_id=self.report_id_1)
+        sac.transition_to_ready_for_certification()
+        sac.transition_to_auditor_certified()
+        sac.transition_to_auditee_certified()
+        sac.transition_to_certified()
         sac.transition_to_submitted()
+        for name in sac.transition_name:
+            print(name, sac.get_transition_date(name))
         sac_status = sac.submission_status
         self.assertEqual(sac_status, "submitted")
