@@ -14,9 +14,6 @@ jobs:
       packages: write
       actions: read
       security-events: write
-    with:
-      work-dir: ./backend
-      docker-name: fac
 
   build-container:
     needs:
