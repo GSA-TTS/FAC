@@ -8,35 +8,9 @@ on:
         type: string
 
 jobs:
-  fetch-versions:
-    runs-on: ubuntu-latest
-    outputs:
-      postgrest: ${{ steps.read-version.outputs.TF_VAR_postgrest_image }}
-      clamav: ${{ steps.read-version.outputs.TF_VAR_clamav_image }}
-    env:
-      GH_REPO: ghcr.io/gsa-tts/fac
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: Fetch all artifacts
-        uses: dawidd6/action-download-artifact@v2
-        with:
-          # name: postgrest
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          workflow: scan-images.yml
-
-      - name: read image versions
-        id: read-version
-        run: |
-          echo "TF_VAR_postgrest_image=$GH_REPO/postgrest:$(cat postgrest/postgrest.txt)" >> "$GITHUB_OUTPUT"
-          echo "TF_VAR_clamav_image=$GH_REPO/clamav:$(cat clamav/clamav.txt)" >> "$GITHUB_OUTPUT"
-
   apply:
     name: apply ( ${{ inputs.environment }} )
     runs-on: ubuntu-latest
-    needs: fetch-versions
     environment: ${{ inputs.environment }}
     env:
       KEY: "terraform.tfstate.${{ inputs.environment }}"
@@ -47,8 +21,8 @@ jobs:
       TERRAFORM_PRE_RUN: |
           apt-get update
           apt-get install -y zip python
-      TF_VAR_postgrest_image: ${{ needs.fetch-versions.outputs.postgrest }}
-      TF_VAR_clamav_image: ${{ needs.fetch-versions.outputs.clamav }}
+      TF_VAR_postgrest_image: 'ghcr.io/gsa-tts/fac/postgrest:latest'
+      TF_VAR_clamav_image: 'ghcr.io/gsa-tts/fac/clamav:latest'
 
     steps:
       - name: checkout
