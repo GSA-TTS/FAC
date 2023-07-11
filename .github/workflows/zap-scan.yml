@@ -1,5 +1,5 @@
 ---
-name: Runs OWASP-ZAP scans
+name: Run OWASP-ZAP Scan
 on:
   workflow_call:
     inputs:

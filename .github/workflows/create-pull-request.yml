@@ -1,5 +1,5 @@
 ---
-name: Auto Generated PR From Main to Staging
+name: Create Pull Request
 on:
   workflow_call:
   workflow_dispatch:
