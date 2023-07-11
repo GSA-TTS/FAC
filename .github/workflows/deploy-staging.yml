@@ -13,7 +13,6 @@ jobs:
     uses: ./.github/workflows/linting.yml
     secrets: inherit
 
-  # deploy to staging
   scan-dev:
     name: Zap scan of the dev site
     uses: ./.github/workflows/zap-scan.yml
@@ -34,7 +33,7 @@ jobs:
     name: Deploy staging app to cloud.gov
     needs:
       - deploy-infrastructure-staging
-    uses: ./.github/workflows/deploy-apps.yml
+    uses: ./.github/workflows/deploy-application.yml
     with:
       environment: "staging"
     secrets: inherit

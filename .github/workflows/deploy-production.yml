@@ -34,7 +34,7 @@ jobs:
     name: Deploy production to cloud.gov
     needs:
       - deploy-infrastructure-production
-    uses: ./.github/workflows/deploy-apps.yml
+    uses: ./.github/workflows/deploy-application.yml
     with:
       environment: "production"
     secrets: inherit

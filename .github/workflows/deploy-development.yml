@@ -1,8 +1,6 @@
 name: Deploy to the dev and management cloud.gov environments
 on:
-  push:
-    branches:
-      - main
+  workflow_dispatch: null
 
 jobs:
   # ensure that every time a push to main occurs, the container is built and published to ghcr
@@ -50,7 +48,7 @@ jobs:
     name: Deploy dev app to cloud.gov
     needs:
       - deploy-infrastructure-dev
-    uses: ./.github/workflows/deploy-apps.yml
+    uses: ./.github/workflows/deploy-application.yml
     with:
       environment: "dev"
     secrets: inherit
