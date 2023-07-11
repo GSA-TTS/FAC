@@ -5,7 +5,7 @@ on:
 
 jobs:
   test:
-    name: Test format and validity
+    name: Test Format and Validite
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
