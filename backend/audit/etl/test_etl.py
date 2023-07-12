@@ -2,9 +2,9 @@ from django.test import TestCase
 
 from model_bakery import baker
 
-from .models import SingleAuditChecklist, User
+from ..models import SingleAuditChecklist, User
 from dissemination.models import General, FederalAward
-from audit.etl import ETL
+from .etl import ETL
 
 
 class ETLTests(TestCase):
