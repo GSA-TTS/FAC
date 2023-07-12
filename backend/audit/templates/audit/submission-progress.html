@@ -114,8 +114,7 @@ TODO: Include the "Completed at X by Y", after timestamps are included in the da
 					<a class="usa-link text-bold"
 						href="/report_submission/federal-awards/{{ report_id }}">Upload the Federal Awards workbook</a>
 					<p class="margin-0">
-						Provide general information on the auditee and auditor, financial statements for the auditee entity, and information on the entity's federal program compliance.
-					</p>
+						This workbook should be completed by the auditee. For each federal award received, you'll need the financial and agency details. This is also were you list the number of audit findings.					</p>
 				</div>
 			</li>
 			<!-- Audit information workbook -->
@@ -126,9 +125,11 @@ TODO: Include the "Completed at X by Y", after timestamps are included in the da
 					</svg>
 				</div>
 				<div class="usa-icon-list__content {% if single_audit_checklist.completed is True %} text-green {% else %} text-base-dark {% endif %}">
-					<a class="usa-link text-bold" href="javascript:void(0);">Upload the Audit Information workbook</a>
-				</div>
-			</li>
+					<a class="usa-link text-bold" href="javascript:void(0);">Upload the Federal Awards Audit Findings workbook</a>
+					<p class="margin-0">
+						This workbook is completed by both the auditee and auditor. Auditees complete this section using the Summary Schedule of Prior Audit Findings and Auditors complete this section using the information in the financial statement audit.				</div>
+					</div>
+					</li>
 			<!-- Audit findings workbook -->
 			<li class="usa-icon-list__item padding-bottom-2">
 				<div class="usa-icon-list__icon {% if audit_findings_workbook.completed == True %}text-green{% else %}text-base{% endif %}">
@@ -142,8 +143,10 @@ TODO: Include the "Completed at X by Y", after timestamps are included in the da
 				</div>
 				<div class="usa-icon-list__content {% if audit_findings_workbook.created is True %} text-green {% else %} text-base-dark {% endif %}">
 					<a class="usa-link text-bold"
-						href="/report_submission/audit-findings/{{ report_id | default_if_none:'' }}">Upload the Audit Findings workbook</a>
-				</div>
+						href="/report_submission/audit-findings/{{ report_id | default_if_none:'' }}">Upload the Federal Awards Audit Findings workbook</a>
+					<p class="margin-0">
+						This workbook is completed by both the auditee and auditor. Auditees complete this section using the Summary Schedule of Prior Audit Findings and Auditors complete this section using the information in the financial statement audit.				</div>
+					</div>
 			</li>
 			<!-- Findings text workbook -->
 			<li class="usa-icon-list__item padding-bottom-2">
@@ -158,8 +161,9 @@ TODO: Include the "Completed at X by Y", after timestamps are included in the da
 				</div>
 				<div class="usa-icon-list__content {% if findings_text_workbook.created is True %} text-green {% else %} text-base-dark {% endif %}">
 					<a class="usa-link text-bold"
-						href="/report_submission/audit-findings-text/{{ report_id | default_if_none:'' }}">Upload the Findings Text workbook</a>
-				</div>
+						href="/report_submission/audit-findings-text/{{ report_id | default_if_none:'' }}">Upload the Audit Findings Text workbook</a>
+						<p class="margin-0">
+							This workbook is completed by the auditee. Enter the full text of the audit finding, listing each finding only once, even if they relate to more than one program. Include the audit finding reference number for each.					</div>
 			</li>
 			<!-- CAP -->
 			<li class="usa-icon-list__item padding-bottom-2">
@@ -175,7 +179,8 @@ TODO: Include the "Completed at X by Y", after timestamps are included in the da
 				<div class="usa-icon-list__content {% if CAP_workbook.created is True %} text-green {% else %} text-base-dark {% endif %}">
 					<a class="usa-link text-bold"
 						href="/report_submission/CAP/{{ report_id | default_if_none:'' }}">Upload the Corrective Action Plan (CAP) workbook</a>
-				</div>
+						<p class="margin-0">
+							This workbook is completed by the auditee. The information should match to the data entered in the Findings Text workbook. Plans for findings relating to more than one program only need to be entered once.					</div>
 			</li>
 			<!-- Additional UEIs -->
 			<li class="usa-icon-list__item padding-bottom-2">
@@ -191,7 +196,8 @@ TODO: Include the "Completed at X by Y", after timestamps are included in the da
 				<div class="usa-icon-list__content {% if additional_UEIs_workbook.created is True %} text-green {% else %} text-base-dark {% endif %}">
 					<a class="usa-link text-bold"
 						href="/report_submission/additional-ueis/{{ report_id | default_if_none:'' }}">Upload the Additional UEIs workbook</a>
-				</div>
+						<p class="margin-0">
+							This workbook is only necessary if multiple the audit report covers UEIs. It is completed by the auditee. List the additional UEIs covered by the audit, excluding the primary UEI.					</div>
 			</li>
 			<!-- Secondary Auditors -->
 			<li class="usa-icon-list__item padding-bottom-2">
@@ -207,7 +213,8 @@ TODO: Include the "Completed at X by Y", after timestamps are included in the da
 				<div class="usa-icon-list__content {% if secondary_auditors_workbook.created is True %} text-green {% else %} text-base-dark {% endif %}">
 					<a class="usa-link text-bold"
 						href="/report_submission/secondary-auditors/{{ report_id | default_if_none:'' }}">Upload the Secondary Auditors workbook</a>
-				</div>
+						<p class="margin-0">
+							This workbook is only necessary if multiple auditors did the audit work. In these cases, the secondary auditors should enter their  information in this workbook.					</div>
 			</li>
 			<!-- Ready for certification -->
 			<a href="{% url 'audit:ReadyForCertification' report_id=report_id %}">
@@ -252,11 +259,10 @@ TODO: Include the "Completed at X by Y", after timestamps are included in the da
 						<svg class="usa-icon margin-right-05" aria-hidden="true" role="img">
                             {% uswds_sprite "lock_outline" %}
 						</svg>
-						<span class="text-base">Auditor Certification</span>
+						<span class="text-base">Auditor Certification (either certification order is fine)</span>
 					{% endif %}
 					<p class="margin-0">
-						The certifying auditor must attest and sign the single audit report before submission. This step is locked until after the SF-SAC and single audit report have been completed and uploaded in the previous steps.
-					</p>
+						The certifying auditor must attest and sign the single audit report before submission. This step is locked until after the SF-SAC and single audit report have been completed and uploaded in the previous steps.					</p>
 				</div>
 			</li>
 			<!-- Auditee certification -->
@@ -273,7 +279,7 @@ TODO: Include the "Completed at X by Y", after timestamps are included in the da
 				<div class="usa-icon-list__content {% if certification.auditee_certified is True %} text-green {% else %} text-base-dark {% endif %}">
 					{% if SF_SAC_completed == True and audit_report.completed == True and certification.auditor_certified == True %}
 						<a class="usa-link text-bold"
-							href="{% url 'audit:AuditeeCertification' report_id=report_id %}">Auditee Certification</a>
+							href="{% url 'audit:AuditeeCertification' report_id=report_id %}">Auditee Certification (either certification order is fine) </a>
 					{% else %}
 						<svg class="usa-icon margin-right-05" aria-hidden="true" role="img">
                             {% uswds_sprite "lock_outline" %}
@@ -281,8 +287,7 @@ TODO: Include the "Completed at X by Y", after timestamps are included in the da
 						<span class="text-base">Auditee Certification</span>
 					{% endif %}
 					<p class="margin-0">
-						After the SF-SAC and audit report have been completed and uploaded, the certifying auditee must attest and sign before an audit submission can be submitted.
-					</p>
+						The certifying auditee must attest and sign the single audit report before submission. This step is locked until after the SF-SAC and single audit report have been completed and uploaded in the previous steps.					</p>
 				</div>
 			</li>
 			<!-- Submit to FAC for processing -->
