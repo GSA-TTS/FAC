@@ -28,7 +28,7 @@ jobs:
 
   # deploy to Dev & Management spaces
   deploy-infrastructure-dev:
-    name: Deploy infrastructure (dev)
+    name: Terraform Apply
     needs:
       - testing
     uses: ./.github/workflows/terraform-apply-env.yml
@@ -37,7 +37,7 @@ jobs:
     secrets: inherit
 
   deploy-infastructure-management:
-    name: Deploy infrastructure (dev)
+    name: Terraform Apply Management
     needs:
       - testing
     uses: ./.github/workflows/terraform-apply-env.yml
@@ -46,7 +46,7 @@ jobs:
     secrets: inherit
 
   deploy-dev:
-    name: Deploy dev app to cloud.gov
+    name: Deploy Application
     needs:
       - deploy-infrastructure-dev
     uses: ./.github/workflows/deploy-application.yml
@@ -55,7 +55,7 @@ jobs:
     secrets: inherit
 
   scan-dev-post-deploy:
-    name: Zap scan of the dev site
+    name: ZAP Scan
     needs:
       - deploy-dev
     uses: ./.github/workflows/zap-scan.yml

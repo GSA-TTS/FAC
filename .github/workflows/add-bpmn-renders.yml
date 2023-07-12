@@ -19,18 +19,24 @@ jobs:
     if: startsWith(github.head_ref, 'auto/bpmn-patches') == false && github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+
       - name: Install bpmn-to-image
         run: npm install -g bpmn-to-image
 
       - name: Remove existing PNGs
         run: rm docs/bpmn-workflow-models/*.bpmn.png
-      - name: Generate a PNG for each BPMN file        
-        run: |    
+
+      - name: Generate a PNG for each BPMN file
+        run: |
           for file in docs/bpmn-workflow-models/*.bpmn ; do
             bpmn-to-image ${file}:${file}.png
           done
+
       - name: Did anything change?
         id: vars
         run: |
@@ -38,6 +44,7 @@ jobs:
           echo "branchname=${branchname}" >> $GITHUB_OUTPUT
           imagesupdated=$(git status --porcelain | cut -d ' ' -f 2 | wc -l)
           echo "imagesupdated=${imagesupdated}" >> $GITHUB_OUTPUT
+
       - name: Create PR with changes
         if: steps.vars.outputs.imagesupdated != 0
         uses: peter-evans/create-pull-request@v4

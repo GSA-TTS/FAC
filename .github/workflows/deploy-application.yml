@@ -16,7 +16,9 @@ jobs:
       space: ${{ inputs.environment }}
 
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v3
+
       - name: Restore npm cache
         uses: actions/cache@v3
         id: cache-npm
@@ -26,10 +28,12 @@ jobs:
           restore-keys: |
             fac-build-npm-
             fac-build-
+
       - name: Set up Python 3.10
         uses: actions/setup-python@v3
         with:
           python-version: "3.10"
+
       - name: Restore pip cache
         uses: actions/cache@v3
         id: cache-pip
@@ -42,12 +46,15 @@ jobs:
             fac-build-pip-${{ hashFiles('**/requirements.txt') }}-
             fac-build-pip-
             fac-build-
+
       - name: Install npm dependencies
         working-directory: ./backend
         run: npm install
+
       - name: Compile JS/CSS assets
         working-directory: ./backend
         run: npm run build
+
       - name: Update service keys
         uses: cloud-gov/cg-cli-tools@main
         env:
@@ -60,6 +67,7 @@ jobs:
           cf_org: gsa-tts-oros-fac
           cf_space: ${{ env.space }}
           cf_command: update-user-provided-service fac-key-service -p '"{\"SAM_API_KEY\":\"${{ secrets.SAM_API_KEY }}\", \"DJANGO_SECRET_LOGIN_KEY\":\"${{ secrets.DJANGO_SECRET_LOGIN_KEY }}\", \"SECRET_KEY\":\"${{ secrets.SECRET_KEY}}\"}"'
+
       - name: Deploy fac to cloud.gov
         uses: cloud-gov/cg-cli-tools@main
         with:

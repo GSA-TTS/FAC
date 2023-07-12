@@ -16,7 +16,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - name: grab docker container
+
+      - name: Pull Zap Container
         run: docker pull owasp/zap2docker-stable
-      - name: run command
+
+      - name: Run OWASP-ZAP
         run: docker run -v $(pwd):/zap/wrk/:rw -t owasp/zap2docker-stable zap-baseline.py -t https://fac-dev.app.cloud.gov/ -c zap.conf -I

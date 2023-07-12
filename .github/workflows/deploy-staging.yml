@@ -15,13 +15,13 @@ jobs:
     secrets: inherit
 
   scan-dev:
-    name: Zap scan of the dev site
+    name: Zap Scan
     uses: ./.github/workflows/zap-scan.yml
     with:
       url: "https://fac-dev.app.cloud.gov/"
 
   deploy-infrastructure-staging:
-    name: Deploy infrastructure (staging)
+    name: Terraform Apply
     needs:
       - testing
       - scan-dev
@@ -31,10 +31,16 @@ jobs:
     secrets: inherit
 
   deploy-staging:
-    name: Deploy staging app to cloud.gov
+    name: Deploy Application
     needs:
       - deploy-infrastructure-staging
     uses: ./.github/workflows/deploy-application.yml
     with:
       environment: "staging"
     secrets: inherit
+
+  scan-staging:
+    name: Zap Scan
+    uses: ./.github/workflows/zap-scan.yml
+    with:
+      url: "https://fac-staging.app.cloud.gov/"

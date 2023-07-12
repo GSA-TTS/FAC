@@ -16,13 +16,13 @@ jobs:
 
   # up to date scan of the staging instance
   scan-staging:
-    name: Zap scan of the staging site
+    name: Zap Scan
     uses: ./.github/workflows/zap-scan.yml
     with:
       url: "https://fac-staging.app.cloud.gov/"
 
   deploy-infrastructure-production:
-    name: Deploy infrastructure (production)
+    name: Terraform Apply
     needs:
       - testing
       - scan-staging
@@ -32,7 +32,7 @@ jobs:
     secrets: inherit
 
   deploy-production:
-    name: Deploy production to cloud.gov
+    name: Deploy Application
     needs:
       - deploy-infrastructure-production
     uses: ./.github/workflows/deploy-application.yml
@@ -41,7 +41,7 @@ jobs:
     secrets: inherit
 
   scan-production-post-deploy:
-    name: Zap scan of the production site
+    name: Zap Scan
     needs:
       - deploy-production
     uses: ./.github/workflows/zap-scan.yml

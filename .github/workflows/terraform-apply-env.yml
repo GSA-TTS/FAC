@@ -25,9 +25,10 @@ jobs:
       TF_VAR_clamav_image: 'ghcr.io/gsa-tts/fac/clamav:latest'
 
     steps:
-      - name: checkout
+      - name: Checkout
         uses: actions/checkout@v3
-      - name: terraform apply ( ${{ inputs.environment }} )
+
+      - name: Apply ( ${{ inputs.environment }} )
         uses: dflook/terraform-apply@v1
         with:
           path: terraform/${{ inputs.environment }}
