@@ -12,7 +12,7 @@
               <p>While validating across sheets we encountered the errors below. You must correct these errors in order to proceed to certification.</p>
               <p>Errors:</p>
               <pre>{{ errors.errors | pprint}}</pre>
-              <p>Data submitted:
+              <p>Data submitted:</p>
               <pre>{{ errors.data | pprint}}</pre>
               <p>Audit {{ report_id }} has a submission status of: {{ submission_status }}</p>
           </fieldset>
@@ -20,4 +20,3 @@
   </div>
 </div>
 {% endblock content %}
-
