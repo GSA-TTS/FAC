@@ -74,14 +74,6 @@ class ETLTests(TestCase):
                 "total_amount_expended": 9000,
             }
         }
-        # sac_general = SingleAuditChecklist.objects.create(
-        #     submitted_by=user,
-        #     submission_status="auditee_certified",
-        #     general_information=general_information,
-        # )
-        # sac_general.save()
-        # self.report_id_general = sac_general.report_id
-
         sac = SingleAuditChecklist.objects.create(
             submitted_by=user,
             general_information=general_information,
