@@ -50,7 +50,6 @@ TABLE(General, "General") {
     auditor_foreign_addr              /' 22 CPAFOREIGN'/
     auditor_phone
     auditor_state
-    auditor_title
     auditor_zip
     
     cognizant_agency
