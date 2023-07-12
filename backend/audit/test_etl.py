@@ -3,11 +3,13 @@ from django.test import TestCase
 from model_bakery import baker
 
 from .models import SingleAuditChecklist, User
+from dissemination.models import General, FederalAward
+from audit.etl import ETL
 
 
 class ETLTests(TestCase):
     def __init__(self, methodName: str = "runTest") -> None:
-        self.report_id_1 = ""
+        self.report_id = ""
         super().__init__(methodName)
 
     def setUp(self):
@@ -74,14 +76,26 @@ class ETLTests(TestCase):
         }
         sac = SingleAuditChecklist.objects.create(
             submitted_by=user,
-            submission_status="auditee_certified",
             general_information=general_information,
             federal_awards=federal_awards,
         )
-        self.report_id_1 = sac.report_id
+        sac.save()
+        self.report_id = sac.report_id
 
     def test_load_general(self):
-        sac = SingleAuditChecklist.objects.get(report_id=self.report_id_1)
-        sac.transition_to_submitted()
-        sac_status = sac.submission_status
-        self.assertEqual(sac_status, "submitted")
+        sac = SingleAuditChecklist.objects.get(report_id=self.report_id)
+        etl = ETL(sac)
+        etl.load_general()
+        generals = General.objects.all()
+        self.assertEqual(len(generals), 1)
+        general = generals.first()
+        self.assertEqual(self.report_id, general.report_id)
+
+    def test_load_federal_award(self):
+        sac = SingleAuditChecklist.objects.get(report_id=self.report_id)
+        etl = ETL(sac)
+        etl.load_federal_award()
+        federal_awards = FederalAward.objects.all()
+        self.assertEqual(len(federal_awards), 1)
+        federal_award = federal_awards.first()
+        self.assertEqual(self.report_id, federal_award.report_id)
