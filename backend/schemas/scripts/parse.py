@@ -15,9 +15,9 @@ from collections import namedtuple as NT
 
 Sheet = NT(
     "Sheet",
-    "name single_cells open_ranges mergeable_cells merged_unreachable header_inclusion text_ranges header_height",
+    "name single_cells open_ranges mergeable_cells merged_unreachable header_inclusion text_ranges header_height hide_col_from hide_row_from",
 )
-Posn = NT("Posn", "title title_cell range_name range_cell width")
+Posn = NT("Posn", "title title_cell range_name range_cell width keep_locked format")
 SingleCell = NT("SingleCell", "posn validation formula help")
 MergeableCell = NT("MergeableCell", "start_row end_row start_column end_column")
 MergedUnreachable = NT("MergedUnreachable", "columns")
@@ -73,6 +73,8 @@ def parse_single_cell(spec):
             get(spec, "range_name"),
             get(spec, "range_cell"),
             get(spec, "width"),
+            get(spec, "keep_locked", default=False),
+            get(spec, "format", default=None),
         ),
         parse_validation(get(spec, "validation")),
         get(spec, "formula"),
@@ -90,6 +92,8 @@ def parse_open_range(spec):
             get(spec, "range_name"),
             get(spec, "range_cell"),
             get(spec, "width"),
+            get(spec, "keep_locked", default=False),
+            get(spec, "format", default=None),
         ),
         parse_validation(get(spec, "validation")),
         get(spec, "formula"),
@@ -120,6 +124,8 @@ def parse_text_range(spec):
             get(spec, "range_name"),
             get(spec, "range_cell"),
             get(spec, "width"),
+            get(spec, "keep_locked", default=False),
+            get(spec, "format", default=None),
         ),
         parse_validation(get(spec, "validation")),
         Enum(
@@ -161,7 +167,15 @@ def parse_sheet(spec):
         hh = get(spec, "header_height")
     else:
         hh = None
-    return Sheet(name, sc, opr, mc, mur, hi, tr, hh)
+    if "hide_col_from" in spec:
+        hcf = get(spec, "hide_col_from")
+    else:
+        hcf = None
+    if "hide_row_from" in spec:
+        hrf = get(spec, "hide_row_from")
+    else:
+        hrf = None
+    return Sheet(name, sc, opr, mc, mur, hi, tr, hh, hcf, hrf)
 
 
 def parse_spec(spec):
