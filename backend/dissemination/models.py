@@ -230,7 +230,6 @@ class FederalAward(models.Model):
         null=True,
         help_text=docs.passthrough_amount,
     )
-    
     type_requirement = models.CharField(
         "Type Requirement Failure",
         max_length=40,
