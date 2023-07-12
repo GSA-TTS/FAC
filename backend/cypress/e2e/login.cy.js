@@ -1,25 +1,30 @@
-import '../support/commands.js'
-//require('dotenv').config();
+// import '../support/commands.js'
+// //require('dotenv').config();
 
-describe('login', () => {
-    //const username = Cypress.env('USERNAME');
-    //const password = Cypress.env('PASSWORD');
-    // const disableAuth = Cypress.env('DISABLE_AUTH'); //Console says disableAuth is undefined
-    // const disableAuth = true -- this works
+//Rough expiremental test
 
-    beforeEach(() => {
-        cy.visit('/');
-    });
+// describe('login', () => {
+        // pass username & password from .env to here to prevent manual entry
+//     //const username = Cypress.env('USERNAME');
+//     //const password = Cypress.env('PASSWORD');
+//     // const disableAuth = Cypress.env('DISABLE_AUTH'); //Console says disableAuth is undefined
+//     // const disableAuth = true -- this works
 
-    it('Page loads successfully', () => {
-        cy.url().should('include', '/');
-    });
+//     beforeEach(() => {
+//         cy.visit('/');
+//     });
 
-    describe('authenticate with login.gov', () => {
-        it('should log in with credentials', () => {
-            cy.login();
-        })
-    })
+//     it('Page loads successfully', () => {
+//         cy.url().should('include', '/');
+//     });
+
+//     describe('authenticate with login.gov', () => {
+//         it('should log in with credentials', () => {
+//             cy.login();
+//         })
+//     })
+
+    //This uses a IF/ Else statement whether authentication is required based if DISABLE_AUTH is True/False
     // describe('authenticate with Login.gov', () => {
     //     console.log('disableAuth:', disableAuth);
     //     if (!disableAuth) {
@@ -41,7 +46,7 @@ describe('login', () => {
     //         });
     //     }
     // });
-});
+//});
 
 
 

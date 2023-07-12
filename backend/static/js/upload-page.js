@@ -129,6 +129,11 @@ function attachFileUploadHandler() {
                 info_box.innerHTML = get_error_table(data);
               } else if (data.type === 'error_field') {
                 info_box.innerHTML = `Field Error: ${res.errors}`;
+              }//added this not sure how I feel about it
+              else if (res.status == 400) {
+                info_box.innerHTML =
+                  'Field Error: undefined';
+                setFormDisabled(false);
               } else {
                 throw new Error('Returned error type is missing!');
               }

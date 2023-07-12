@@ -1,0 +1,38 @@
+{
+    "date_created": "2023-07-11",
+    "submission_status": "in_progress",
+    "report_id": "2023MAY0001000001",
+    "auditee_fiscal_period_start": "2023-05-08",
+    "auditee_fiscal_period_end": "2024-05-08",
+    "audit_type": "single-audit",
+    "audit_period_covered": "annual",
+    "auditee_uei": "CMBSGK6P7BE1",
+    "auditee_name": "Commonwealth Of Virginia",
+    "auditee_address_line_1": "1111 E BROAD ST",
+    "auditee_city": "RICHMOND",
+    "auditee_state": "VA",
+    "auditee_zip": "23219",
+    "auditee_contact_name": "John Doe",
+    "auditee_contact_title": "Keymaster",
+    "auditee_phone": "5558675309",
+    "auditee_email": "johndoe@test.com",
+    "auditee_contacts": [
+        "a@a.com",
+        "b@b.com"
+    ],
+    "user_provided_organization_type": "local",
+    "auditor_firm_name": "House of Audit",
+    "auditor_country": "USA",
+    "auditor_address_line_1": "123 Around the corner",
+    "auditor_city": "Centreville",
+    "auditor_state": "VA",
+    "auditor_zip": "20121",
+    "auditor_contact_name": "Jane Doe",
+    "auditor_contact_title": "auditor",
+    "auditor_phone": "0008675309",
+    "auditor_email": "qualified.human.accountant@auditor.com",
+    "auditor_contacts": [
+        "c@c.com",
+        "d@d.com"
+    ]
+}
