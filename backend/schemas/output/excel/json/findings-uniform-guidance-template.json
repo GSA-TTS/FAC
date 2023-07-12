@@ -2,9 +2,11 @@
    "filename": "findings-uniform-guidance-template.xlsx",
    "sheets": [
       {
+         "hide_col_from": 16,
          "name": "Form",
          "open_ranges": [
             {
+               "format": "text",
                "help": {
                   "link": "https://fac.gov/documentation/validation/#aln_prefix",
                   "text": "Not a valid agency ALN (CFDA) prefix"
@@ -23,6 +25,7 @@
                "width": 12
             },
             {
+               "format": "text",
                "help": {
                   "link": "https://fac.gov/documentation/validation/#aln_extension",
                   "text": "An ALN (CFDA) extension is typically three digits, with some exceptions"
@@ -41,6 +44,7 @@
                "width": 12
             },
             {
+               "format": "text",
                "help": {
                   "link": "https://fac.gov/documentation/validation/#unknown",
                   "text": "If you see this error, please contact support."
@@ -263,9 +267,11 @@
       },
       {
          "header_height": 100,
+         "hide_col_from": 2,
          "name": "UEI",
          "single_cells": [
             {
+               "format": "text",
                "help": {
                   "link": "https://fac.gov/documentation/validation/#uei",
                   "text": "UEIs are 12 characters long and match rules as given by SAM.gov"
