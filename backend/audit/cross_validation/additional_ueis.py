@@ -1,13 +1,14 @@
-def additional_ueis(all_sections):
+def additional_ueis(sac_dict):
     """
     Checks that there are additional UEIs if
     general_information.multiple_ueis_covered is True, and that there are
     none if it's not True.
     """
-    addl_ueis_indicated = all_sections["general_information"].get("multiple_ueis_covered")
+    all_sections = sac_dict["sf_sac_sections"]
+    addl_ueis_checked = all_sections["general_information"].get("multiple_ueis_covered")
     auditee_uei = all_sections["general_information"].get("auditee_uei")
     addl_ueis = all_sections["additional_ueis"]
-    if addl_ueis_indicated:
+    if addl_ueis_checked:
         """
         We need to check that:
 

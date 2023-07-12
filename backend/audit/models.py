@@ -200,6 +200,23 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         blank=True, null=True, validators=[validate_additional_ueis_json]
     )
 
+    def validate_full(self):
+        """
+        Full validation, intended for use when the user indicates that the
+        submission is finished.
+
+        Currently a stub, but eventually will call each of the individual
+        section validation routines and then validate_cross.
+        """
+
+        validation_methods = []
+        errors = [f(self) for f in validation_methods]
+
+        if errors:
+            return errors
+
+        return self.validate_cross()
+
     def validate_cross(self):
         """
         This method should NOT be run as part of full_clean(), because we want
@@ -209,20 +226,11 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         do once all the individual sections are complete and valid in
         themselves.
         """
-        all_sections = {
-            "general_information": self.general_information,
-            "federal_awards": self.federal_awards,
-            "corrective_action_plan": self.corrective_action_plan,
-            "findings_text": self.findings_text,
-            "findings_uniform_guidance": self.findings_uniform_guidance,
-            "additional_ueis": self.additional_ueis,
-        }
+        shaped_sac = audit.cross_validation.sac_validation_shape(self)
         all_functions = audit.cross_validation.functions
-        errors = list(
-            chain.from_iterable([func(all_sections) for func in all_functions])
-        )
+        errors = list(chain.from_iterable([func(shaped_sac) for func in all_functions]))
         if errors:
-            return {"errors": errors, "data": all_sections}
+            return {"errors": errors, "data": shaped_sac}
         return []
 
     @transition(
@@ -237,7 +245,7 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         there's likely to be a step in one of the views that does cross-sheet
         validation and reports back to the user.
         """
-        errors = self.validate_cross()
+        errors = self.validate_full()
         if not errors:
             self.transition_name.append(
                 SingleAuditChecklist.STATUS.READY_FOR_CERTIFICATION
