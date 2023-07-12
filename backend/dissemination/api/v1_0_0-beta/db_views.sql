@@ -5,10 +5,17 @@ drop view if exists api_v1_0_0_beta.general;
 create view api_v1_0_0_beta.general as
     select gen.*, 
           award.federal_agency_prefix, award.federal_award_extension
-          -- , ga.*
     from dissemination_General gen
-    left join dissemination_FederalAward award on award.report_id = gen.report_id
-    -- left outer join GenAuditor ga on ga.report_id = gen.report_id
+    left outer join dissemination_FederalAward award on gen.report_id = award.report_id
+    where gen.is_public=True
+;
+
+drop view if exists api.vw_auditor;
+create view api.vw_auditor as
+    select gen.auditee_uei, gen.auditee_ein, gen.audit_year,
+           ga.*
+    from dissemination_GenAuditor ga
+    left join dissemination_General gen on ga.report_id = gen.report_id
     where gen.is_public=True
 ;
 
