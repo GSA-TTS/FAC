@@ -10,8 +10,8 @@ create view api_v1_0_0_beta.general as
     where gen.is_public=True
 ;
 
-drop view if exists api.vw_auditor;
-create view api.vw_auditor as
+drop view if exists api_v1_0_0_beta.auditor;
+create view api_v1_0_0_beta.auditor as
     select gen.auditee_uei, gen.auditee_ein, gen.audit_year,
            ga.*
     from dissemination_GenAuditor ga

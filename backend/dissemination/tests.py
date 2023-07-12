@@ -7,11 +7,10 @@ from model_bakery import baker
 from config import settings
 from .models import FederalAward, Finding, FindingText, General
 
-api_schemas = [
-    "api_v1_0_0_beta"
-]
-class APIViewTests(TestCase):
+api_schemas = ["api_v1_0_0_beta"]
 
+
+class APIViewTests(TestCase):
     def setUp(self):
         self.api_url = settings.POSTGREST.get("URL")
 
@@ -52,11 +51,11 @@ class APIViewTests(TestCase):
                     sql = open(filename, "r").read()
                     cursor.execute(sql)
 
-                cursor.execute("SELECT auditee_uei FROM api.vw_general")
+                cursor.execute(f"SELECT auditee_uei FROM {api_version}.general")
                 self.assertEquals(cursor.fetchall()[0][0], uei)
-                cursor.execute("SELECT auditee_uei FROM api.vw_federal_award")
+                cursor.execute(f"SELECT auditee_uei FROM {api_version}.federal_award")
                 self.assertEquals(cursor.fetchall()[0][0], uei)
-                cursor.execute("SELECT auditee_uei FROM api.vw_finding")
+                cursor.execute(f"SELECT auditee_uei FROM {api_version}.finding")
                 self.assertEquals(cursor.fetchall()[0][0], uei)
-                cursor.execute("SELECT auditee_uei FROM api.vw_finding_text")
+                cursor.execute(f"SELECT auditee_uei FROM {api_version}.finding_text")
                 self.assertEquals(cursor.fetchall()[0][0], uei)
