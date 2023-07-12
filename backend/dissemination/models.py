@@ -212,16 +212,25 @@ class FederalAward(models.Model):
         help_text=docs.findings_count,
     )
 
-    passthrough_award = models.BooleanField(
+    is_passthrough_award = models.BooleanField(
         "Indicates whether or not funds were passed through to any subrecipients for the Federal program",
         null=True,
         help_text=docs.passthrough_award,
+    )
+    passthrough_name = models.TextField(
+        "If no (Direct Award), Name of Passthrough Entity",
+        null=True,
+    )
+    passthrough_id = models.TextField(
+        "If no (Direct Award), Identifying Number Assigned by the Pass-through Entity, if assigned",
+        null=True,
     )
     passthrough_amount = models.BigIntegerField(
         "Amount passed through to subrecipients",
         null=True,
         help_text=docs.passthrough_amount,
     )
+    
     type_requirement = models.CharField(
         "Type Requirement Failure",
         max_length=40,
@@ -240,11 +249,6 @@ class FederalAward(models.Model):
     #     max_length=40,
     #     help_text=docs.questioned_costs_FederalAward,
     # )
-
-    # TODO: Do we need to add any of the following?:
-    # is_guaranteed
-    # is_passed
-    # subrecipient_amount
 
     class Meta:
         unique_together = (
