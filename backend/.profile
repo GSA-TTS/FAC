@@ -32,7 +32,7 @@ export NEW_RELIC_LOG=stdout
 # https://docs.newrelic.com/docs/security/security-privacy/compliance/fedramp-compliant-endpoints/
 export NEW_RELIC_HOST="gov-collector.newrelic.com"
 
-export API_VERSIONS=v1_0_0-beta
+export API_VERSIONS=api_v1_0_0_beta
 
 create_views() {
     for version in ${API_VERSIONS//,/ }

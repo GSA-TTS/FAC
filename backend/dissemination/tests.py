@@ -7,8 +7,11 @@ from model_bakery import baker
 from config import settings
 from .models import FederalAward, Finding, FindingText, General
 
-
+api_schemas = [
+    "api_v1_0_0_beta"
+]
 class APIViewTests(TestCase):
+
     def setUp(self):
         self.api_url = settings.POSTGREST.get("URL")
 
@@ -38,21 +41,22 @@ class APIViewTests(TestCase):
         )
         finding.save()
 
-        with connection.cursor() as cursor:
-            # TODO: Need a better way. Creating the views here as the data is in a temporary test databasse
-            for file in [
-                "init_api_db.sql",
-                "db_views.sql",
-            ]:
-                filename = f"dissemination/api/{file}"
-                sql = open(filename, "r").read()
-                cursor.execute(sql)
+        for api_version in api_schemas:
+            with connection.cursor() as cursor:
+                # TODO: Need a better way. Creating the views here as the data is in a temporary test databasse
+                for file in [
+                    "init_api_db.sql",
+                    "db_views.sql",
+                ]:
+                    filename = f"dissemination/api/{api_version}/{file}"
+                    sql = open(filename, "r").read()
+                    cursor.execute(sql)
 
-            cursor.execute("SELECT auditee_uei FROM api.vw_general")
-            self.assertEquals(cursor.fetchall()[0][0], uei)
-            cursor.execute("SELECT auditee_uei FROM api.vw_federal_award")
-            self.assertEquals(cursor.fetchall()[0][0], uei)
-            cursor.execute("SELECT auditee_uei FROM api.vw_finding")
-            self.assertEquals(cursor.fetchall()[0][0], uei)
-            cursor.execute("SELECT auditee_uei FROM api.vw_finding_text")
-            self.assertEquals(cursor.fetchall()[0][0], uei)
+                cursor.execute("SELECT auditee_uei FROM api.vw_general")
+                self.assertEquals(cursor.fetchall()[0][0], uei)
+                cursor.execute("SELECT auditee_uei FROM api.vw_federal_award")
+                self.assertEquals(cursor.fetchall()[0][0], uei)
+                cursor.execute("SELECT auditee_uei FROM api.vw_finding")
+                self.assertEquals(cursor.fetchall()[0][0], uei)
+                cursor.execute("SELECT auditee_uei FROM api.vw_finding_text")
+                self.assertEquals(cursor.fetchall()[0][0], uei)
