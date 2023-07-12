@@ -1,8 +1,8 @@
 
 begin;
 
-drop view if exists api.vw_general;
-create view api.vw_general as
+drop view if exists api_v1_0_0_beta.general;
+create view api_v1_0_0_beta.general as
     select gen.*, 
           award.federal_agency_prefix, award.federal_award_extension
           -- , ga.*
@@ -12,16 +12,16 @@ create view api.vw_general as
     where gen.is_public=True
 ;
 
-drop view if exists api.vw_federal_award;
-create view api.vw_federal_award as
+drop view if exists api_v1_0_0_beta.federal_award;
+create view api_v1_0_0_beta.federal_award as
     select gen.auditee_uei, gen.auditee_ein, gen.fy_start_date, gen.fy_end_date, gen.audit_year, award.*
     from dissemination_FederalAward award
     left join dissemination_General gen on award.report_id = gen.report_id
     where gen.is_public=True
 ;
 
-drop view if exists api.vw_finding;
-create view api.vw_finding as
+drop view if exists api_v1_0_0_beta.finding;
+create view api_v1_0_0_beta.finding as
     select gen.auditee_uei, gen.auditee_ein, gen.fy_start_date, gen.fy_end_date, gen.audit_year, 
           award.federal_agency_prefix, award.federal_award_extension, 
           finding.*
@@ -33,8 +33,8 @@ create view api.vw_finding as
     where gen.is_public=True
 ;
 
-drop view if exists api.vw_finding_text;
-create view api.vw_finding_text as
+drop view if exists api_v1_0_0_beta.finding_text;
+create view api_v1_0_0_beta.finding_text as
     select gen.auditee_uei, gen.auditee_ein, gen.fy_start_date, gen.fy_end_date, gen.audit_year, 
           ft.*
     from dissemination_FindingText ft
@@ -42,8 +42,8 @@ create view api.vw_finding_text as
     where gen.is_public=True
 ;
 
-drop view if exists api.vw_cap_text;
-create view api.vw_cap_text as
+drop view if exists api_v1_0_0_beta.cap_text;
+create view api_v1_0_0_beta.cap_text as
     select gen.auditee_uei, gen.auditee_ein, gen.fy_start_date, gen.fy_end_date, gen.audit_year, 
           ct.*
     from dissemination_CAPText ct
@@ -51,8 +51,8 @@ create view api.vw_cap_text as
     where gen.is_public=True
 ;
 
-drop view if exists api.vw_note;
-create view api.vw_note as
+drop view if exists api_v1_0_0_beta.note;
+create view api_v1_0_0_beta.note as
     select gen.auditee_uei, gen.auditee_ein, gen.fy_start_date, gen.fy_end_date, gen.audit_year, 
           note.*
     from dissemination_Note note
