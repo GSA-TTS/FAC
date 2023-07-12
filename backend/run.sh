@@ -22,8 +22,6 @@ API_VERSIONS=(api_v1_0_0_beta)
 create_views() {
     for version in "${API_VERSIONS[@]}"
     do
-        echo "🚨"
-        echo $version
         python manage.py create_views --api_version $version
     done
 }
