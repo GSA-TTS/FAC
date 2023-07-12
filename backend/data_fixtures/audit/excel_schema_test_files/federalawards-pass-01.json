@@ -4,37 +4,38 @@
         "total_amount_expended": 12345,
         "federal_awards": [
             {
-                "program": {
-                    "federal_agency_prefix": "42",
-                    "three_digit_extension": "RD",
-                    "additional_award_identification": 1234,
-                    "program_name": "MAIN PROGRAM",
-                    "is_major": "N",
-                    "audit_report_type": "",
-                    "number_of_audit_findings": 0,
-                    "amount_expended": 500,
-                    "federal_program_total": 4000
-                },
-                "loan_or_loan_guarantee": {
-                    "is_guaranteed": "N",
-                    "loan_balance_at_audit_period_end": 0
-                },
-                "direct_or_indirect_award": {
-                    "is_direct": "N",
-                    "entities": [
-                        {
-                            "passthrough_name": "Bob's Granting House",
-                            "passthrough_identifying_number": "12345"
-                        }
-                    ]
-                },
-                "cluster": {
-                    "cluster_name": "N/A",
-                    "cluster_total": 123
-                },
-                "subrecipients": {
-                    "is_passed": "N"
-                }
+              "program": {
+                "federal_agency_prefix": "42",
+                "three_digit_extension": "RD",
+                "additional_award_identification": 1234,
+                "program_name": "MAIN PROGRAM",
+                "is_major": "N",
+                "audit_report_type": "",
+                "number_of_audit_findings": 0,
+                "amount_expended": 500,
+                "federal_program_total": 4000
+              },
+              "loan_or_loan_guarantee": {
+                "is_guaranteed": "N",
+                "loan_balance_at_audit_period_end": 0
+              },
+              "direct_or_indirect_award": {
+                "is_direct": "N",
+                "entities": [
+                  {
+                    "passthrough_name": "Bob's Granting House",
+                    "passthrough_identifying_number": "12345"
+                  }
+                ]
+              },
+              "cluster": {
+                "cluster_name": "N/A",
+                "cluster_total": 0
+              },
+              "subrecipients": {
+                "is_passed": "N"
+              },
+              "award_index": "AWARD-00001"
             },
             {
                 "program": {
@@ -62,7 +63,8 @@
                   "cluster_name": "OTHER CLUSTER NOT LISTED ABOVE",
                   "other_cluster_name": "Some name",
                   "cluster_total": 123
-                }
+                },
+                "award_index": "AWARD-00002"
             },
             {
                 "program": {
@@ -93,7 +95,8 @@
                   "cluster_name": "STATE CLUSTER",
                   "state_cluster_name": "Maine",
                   "cluster_total": 123
-                }
+                },
+                "award_index": "AWARD-00003"
             }
         ]
     }
