@@ -31,8 +31,8 @@ class Command(BaseCommand):
 
         if kwargs["file"] is None:
             files = [
-                f"init_api_db.sql",
-                f"db_views.sql",
+                "init_api_db.sql",
+                "db_views.sql",
             ]
 
         if settings.ENVIRONMENT not in ["DEVELOPMENT", "STAGING", "PRODUCTION"]:
