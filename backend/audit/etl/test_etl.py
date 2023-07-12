@@ -2,8 +2,9 @@ from django.test import TestCase
 
 from model_bakery import baker
 
-from ..models import SingleAuditChecklist, User
-from ..fixtures import single_audit_checklist as sac_fixture
+from audit.models import SingleAuditChecklist, User
+from dissemination.models import General, GenAuditor
+from . import sac_fixture as sac_fixture
 
 
 class ETLTests(TestCase):
@@ -13,85 +14,26 @@ class ETLTests(TestCase):
 
     def setUp(self):
         user = baker.make(User)
-        general_information = sac_fixture._fake_general_information()
-        """
-        {
-            "ein": "123456789",
-            "audit_type": "single-audit",
-            "auditee_uei": "ZQGGHJH74DW7",
-            "auditee_zip": "68130",
-            "auditor_ein": "234567891",
-            "auditor_zip": "10123",
-            "auditee_city": "Cedar City",
-            "auditee_name": "INTERNATIONAL BUSINESS MACHINES CORPORATION",
-            "auditor_city": "New York City",
-            "is_usa_based": "true",
-            "auditee_email": "e@mail.com",
-            "auditee_phone": "4023001234",
-            "auditee_state": "IA",
-            "auditor_email": "e@mail.com",
-            "auditor_phone": "4024445555",
-            "auditor_state": "NY",
-            "auditor_country": "United States",
-            "auditor_firm_name": "Big Wigs Firm",
-            "audit_period_covered": "annual",
-            "auditee_contact_name": "Joe",
-            "auditor_contact_name": "Big Guy",
-            "auditee_contact_title": "Boss",
-            "auditor_contact_title": "Mega Boss",
-            "multiple_eins_covered": "false",
-            "multiple_ueis_covered": "false",
-            "auditee_address_line_1": "1 Main St",
-            "auditor_address_line_1": "2 Main Street",
-            "met_spending_threshold": "true",
-            "auditee_fiscal_period_end": "2023-06-01",
-            "ein_not_an_ssn_attestation": "true",
-            "auditee_fiscal_period_start": "2022-11-01",
-            "user_provided_organization_type": "state",
-            "auditor_ein_not_an_ssn_attestation": "true",
-        }
-        """
-        federal_awards = {
-            "FederalAwards": {
-                "auditee_uei": "ABC123DEF456",
-                "federal_awards": [
-                    {
-                        "cluster": {"cluster_name": "N/A", "cluster_total": 0},
-                        "program": {
-                            "is_major": "Y",
-                            "program_name": "RETIRED AND SENIOR VOLUNTEER PROGRAM",
-                            "amount_expended": 9000,
-                            "audit_report_type": "U",
-                            "federal_agency_prefix": "93",
-                            "federal_program_total": 9000,
-                            "three_digit_extension": "600",
-                            "number_of_audit_findings": 0,
-                            "additional_award_identification": "COVID-19",
-                        },
-                        "subrecipients": {"is_passed": "N"},
-                        "loan_or_loan_guarantee": {"is_guaranteed": "N"},
-                        "direct_or_indirect_award": {"is_direct": "Y"},
-                    }
-                ],
-                "total_amount_expended": 9000,
-            }
-        }
-        sac = SingleAuditChecklist.objects.create(
-            submitted_by=user,
-            # submission_status="auditee_certified",
-            general_information=general_information,
-            federal_awards=federal_awards,
-        )
-        self.report_id_1 = sac.report_id
+        self.sac = sac_fixture.load_single_audit_checklists_for_user(user)
 
-    def test_load_general(self):
-        sac = SingleAuditChecklist.objects.get(report_id=self.report_id_1)
-        sac.transition_to_ready_for_certification()
-        sac.transition_to_auditor_certified()
-        sac.transition_to_auditee_certified()
-        sac.transition_to_certified()
-        sac.transition_to_submitted()
-        for name in sac.transition_name:
-            print(name, sac.get_transition_date(name))
-        sac_status = sac.submission_status
+    def test_load_all(self):
+        self.sac.transition_to_ready_for_certification()
+        sac_status = self.sac.submission_status
+        self.assertEqual(sac_status, "ready_for_certification")
+
+        self.sac.transition_to_auditor_certified()
+        self.sac.transition_to_auditee_certified()
+        self.sac.transition_to_certified()
+        self.sac.transition_to_submitted()
+        for name in self.sac.transition_name:
+            print(name, self.sac.get_transition_date(name))
+        sac_status = self.sac.submission_status
         self.assertEqual(sac_status, "submitted")
+
+        gen = General.objects.first()
+        print("General:", gen)
+        self.assertEquals(self.sac.general_information["auditee_uei"], gen.auditee_uei)
+
+        gen_auditor = GenAuditor.objects.first()
+        print("GenAuditor:", gen_auditor)
+        self.assertEquals(self.sac.report_id, gen_auditor.report_id)

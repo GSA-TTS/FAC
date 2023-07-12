@@ -9,6 +9,7 @@ from dissemination.models import (
     Revision,
     Passthrough,
     General,
+    GenAuditor,
 )
 from audit.models import SingleAuditChecklist
 
@@ -17,12 +18,15 @@ class ETL(object):
     def __init__(self, sac: SingleAuditChecklist) -> None:
         self.single_audit_checklist = sac
         self.report_id = sac.report_id
-        audit_date = sac.general_information["auditee_fiscal_period_start"]
+        audit_date = sac.general_information.get(
+            "auditee_fiscal_period_start", datetime.now
+        )
         self.audit_year = audit_date.split("-")[0]
 
     def load_all(self):
-        print('Loading into dissemination.."')
         self.load_general()
+        self.load_gen_auditor()
+        # self.load_federal_award()
 
     def load_finding_texts(self):
         findings_text = self.single_audit_checklist.findings_text
@@ -82,43 +86,37 @@ class ETL(object):
         federal_awards = self.single_audit_checklist.federal_awards
         for entry in federal_awards["FederalAwards"]["federal_awards"]:
             program = entry["program"]
-            agency_cfda = (
-                f"{entry['federal_agency_prefix']}." f"{entry['three_digit_extension']}"
-            )
             loan = entry["loan_or_loan_guarantee"]
             is_direct = entry["direct_or_indirect_award"]["is_direct"] == "Y"
             is_passthrough = entry["subrecipients"]["is_passed"] == "Y"
             cluster = entry["cluster"]
             subrecipient_amount = entry["subrecipients"].get("subrecipient_amount")
-            loan_balance = loan.get("loan_balance_at_audit_period_end")
             state_cluster_name = cluster.get("state_cluster_name")
             other_cluster_name = cluster.get("other_cluster_name")
             federal_award = FederalAward(
-                award_id=entry.get("seq_number", 1),
-                federal_program_name=program["program_name"],
-                agency_name="?",  # TODO: Where is this coming from?
-                agency_cfda=agency_cfda,
-                award_identification=(program["additional_award_identification"]),
-                research_and_development=None,  # TODO: Where does this come from?
-                loans=loan["is_guaranteed"] == "Y",
-                arra=None,  # TODO: Where does this come from?
-                direct=is_direct,
-                passthrough_award=is_passthrough,
-                major_program=program["is_major"] == "Y",
-                amount=program["amount_expended"],
-                program_total=program["federal_program_total"],
-                cluster_total=cluster["cluster_total"],
-                passthrough_amount=subrecipient_amount,
-                loan_balance=loan_balance,
-                cluster_name=cluster["cluster_name"],
-                state_cluster_name=state_cluster_name,
-                other_cluster_name=other_cluster_name,
-                type_requirement=None,  # TODO: What is this?
-                type_report_major_program=(program["audit_report_type"]),
-                findings_page=None,  # TODO: Where does this come from?
-                findings_count=program["number_of_audit_findings"],
-                questioned_costs=None,  # TODO: Where does this come from?
                 report_id=self.report_id,
+                award_seq_number=entry.get("seq_number", 1),
+                federal_agency_prefix=program["federal_agency_prefix"],
+                federal_award_extension=program["three_digit_extension"],
+                additional_award_identification=program[
+                    "additional_award_identification"
+                ],
+                federal_program_name=program["program_name"],
+                amount_expended=program["amount_expended"],
+                cluster_name=cluster["cluster_name"],
+                other_cluster_name=other_cluster_name,
+                state_cluster_name=state_cluster_name,
+                cluster_total=cluster["cluster_total"],
+                federal_program_total=program["federal_program_total"],
+                is_loan=loan["is_guaranteed"] == "Y",
+                loan_balance=None,  # TODO: Where does this come from?
+                is_direct=is_direct,
+                is_major=program["is_major"] == "Y",
+                mp_audit_report_type=program["audit_report_type"],
+                findings_count=None,  # TODO: Where does this come from?  Is it needed?
+                passthrough_award=is_passthrough,
+                passthrough_amount=subrecipient_amount,
+                type_requirement=None,  # TODO: What is this?
             )
             federal_award.save()
 
@@ -196,32 +194,22 @@ class ETL(object):
             auditee_certify_title=None,  # TODO: Where does this come from?
             auditee_contact_name=general_information["auditee_contact_name"],
             auditee_email=general_information["auditee_email"],
-            hist_auditee_fax=None,
             auditee_name=general_information["auditee_name"],
             auditee_phone=general_information["auditee_phone"],
             auditee_contact_title=general_information["auditee_contact_title"],
             auditee_address_line_1=general_information["auditee_address_line_1"],
-            hist_auditee_address_line_2=None,
             auditee_city=general_information["auditee_city"],
             auditee_state=general_information["auditee_state"],
             auditee_ein=general_information["ein"],
-            multiple_ein=None,  # TODO: Where does this value come from?
-            auditee_duns=[],  # TODO: Where does this value come from?
-            multiple_duns=None,  # TODO: Where does this value come from?
-            auditee_uei=None,  # TODO: Where does this come from?
-            multiple_uei=[],  # TODO: Where does this come from?
+            auditee_uei=general_information["auditee_uei"],
             auditee_addl_uei_list=[],  # TODO: Where does this come from?
             auditee_addl_ein_list=[],  # TODO: Where does this come from?
-            auditee_addl_duns_list=[],  # TODO: Where does this come from?
-            ein_subcode=None,  # TODO: Notes say this field is not in use.
             auditee_zip=general_information["auditee_zip"],
             auditor_phone=general_information["auditor_phone"],
-            hist_auditor_fax=None,
             auditor_state=general_information["auditor_state"],
             auditor_city=general_information["auditor_city"],
             auditor_contact_title=general_information["auditor_contact_title"],
             auditor_address_line_1=general_information["auditor_address_line_1"],
-            hist_auditor_address_line_2=None,
             auditor_zip=general_information["auditor_zip"],
             auditor_country=general_information["auditor_country"],
             auditor_contact_name=general_information["auditor_contact_name"],
@@ -229,7 +217,6 @@ class ETL(object):
             auditor_firm_name=general_information["auditor_firm_name"],
             auditor_foreign_addr=None,  # TODO: Where does this come from?
             auditor_ein=general_information["auditor_ein"],
-            multiple_auditors=None,  # TODO: Where does this value come from?
             pdf_url=None,  # TODO: Where does this come from?
             cognizant_agency=None,  # TODO: Where does this come from?
             oversight_agency=None,  # TODO: Where does this come from?
@@ -242,13 +229,8 @@ class ETL(object):
             date_received=None,  # TODO: Where does this come from?
             fy_end_date=general_information["auditee_fiscal_period_end"],
             fy_start_date=None,  # TODO: Where does this come from?
-            hist_previous_completed_on=None,
-            hist_previous_date_published=None,
-            hist_completed_date=None,
-            hist_component_date_received=None,
             audit_year=self.audit_year,
             audit_type=general_information["audit_type"],
-            hist_reportable_condition=None,
             is_significant_deficiency=None,  # TODO: Where does this come from?
             is_material_weakness=None,  # TODO: Where does this come from?
             condition_or_deficiency_major_program=None,  # TODO: Where does this come from?
@@ -284,3 +266,24 @@ class ETL(object):
             data_source="G-FAC",
         )
         general.save()
+
+    def load_gen_auditor(self):
+        additional_auditors = self.single_audit_checklist.additional_auditors
+        for auditor in additional_auditors["AdditionalAuditors"]["auditors"]:
+            print("auditor:", auditor)
+            gen_auditor = GenAuditor(
+                report_id=self.single_audit_checklist.report_id,
+                auditor_seq_number=auditor["auditor_seq_number"],
+                auditor_address_line_1=auditor["auditor_address_line_1"],
+                auditor_city=auditor["auditor_city"],
+                # auditor_contact_name=auditor["auditor_contact_name"],
+                auditor_contact_title=auditor["auditor_contact_title"],
+                auditor_country=auditor["auditor_country"],
+                auditor_ein=auditor["auditor_ein"],
+                auditor_email=auditor["auditor_email"],
+                auditor_firm_name=auditor["auditor_firm_name"],
+                auditor_phone=auditor["auditor_phone"],
+                auditor_state=auditor["auditor_state"],
+                auditor_zip=auditor["auditor_zip"],
+            )
+            gen_auditor.save()
