@@ -208,14 +208,16 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         Currently a stub, but eventually will call each of the individual
         section validation routines and then validate_cross.
         """
+        return []
 
-        validation_methods = []
-        errors = [f(self) for f in validation_methods]
-
-        if errors:
-            return errors
-
-        return self.validate_cross()
+        # Commented out for the moment:
+        # validation_methods = []
+        # errors = [f(self) for f in validation_methods]
+        #
+        # if errors:
+        #     return errors
+        #
+        # return self.validate_cross()
 
     def validate_cross(self):
         """
