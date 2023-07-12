@@ -305,12 +305,11 @@ local Parts = {
       federal_agency_prefix: Base.Enum.ALNPrefixes,
       three_digit_extension: Base.Compound.ThreeDigitExtension,
       additional_award_identification: Func.compound_type([Types.string, Types.NULL, Types.integer]),
-      // 20230525 HDMS FIXME: It seems this should be both a drop down and a free text field  (see details in  census xlsx)!!!
       program_name: Types.string,
       amount_expended: Types.number,
       federal_program_total: Types.number,
       is_major: Base.Enum.YorN,
-      audit_report_type: Types.string,
+      audit_report_type: Func.compound_type([Base.Enum.MajorProgramAuditReportType, Types.NULL]),
       number_of_audit_findings: Types.integer,
     },
     required: ['program_name', 'federal_agency_prefix', 'three_digit_extension', 'is_major', 'number_of_audit_findings'],
@@ -327,6 +326,7 @@ local FederalAwardEntry = Types.object {
     loan_or_loan_guarantee: Parts.LoanOrLoanGuarantee,
     program: Parts.Program,
     subrecipients: Parts.Subrecipients,
+    award_index: Types.string,
   },
   required: [
     'cluster',
