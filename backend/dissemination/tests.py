@@ -14,10 +14,9 @@ class APIViewTests(TestCase):
     def setUp(self):
         self.api_url = settings.POSTGREST.get("URL")
 
-    # TODO: Get this test working!
-    # def test_postgrest_url_is_reachable(self):
-    #     response = requests.get(self.api_url, timeout=10)
-    #     self.assertAlmostEquals(response.status_code, 200)
+    def test_postgrest_url_is_reachable(self):
+        response = requests.get(self.api_url, timeout=10)
+        self.assertAlmostEquals(response.status_code, 200)
 
     def test_views_returns_data(self):
         pass
