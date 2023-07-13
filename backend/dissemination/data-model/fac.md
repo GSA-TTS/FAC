@@ -213,14 +213,14 @@ TABLE(Finding, "Finding") {
   + Award.report_id
   + finding_seq_number
   finding_ref_number 
-  material_weakness
-  modified_opinion
-  other_findings
-  other_non_compliance
+  is_material_weakness
+  is_modified_opinion
+  is_other_findings
+  is_other_non_compliance
   prior_finding_ref_numbers
-  questioned_costs
-  repeat_finding
-  significant_deficiency
+  is_questioned_costs
+  is_repeat_finding
+  is_significant_deficiency
   type_requirement
 
   ' hist_findingrefnums
