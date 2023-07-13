@@ -32,9 +32,9 @@
                "type": "single_cell",
                "validation": {
                   "allow_blank": "False",
-                  "custom_error": "Must be 'Y' or 'N'",
-                  "custom_title": "Y/N",
-                  "formula1": "\"Y,N\"",
+                  "custom_error": "Must be 'Y' or 'N' or 'Y&N'",
+                  "custom_title": "Y/N/Y&N",
+                  "formula1": "\"Y,N,Y&N\"",
                   "type": "list"
                },
                "width": 24
@@ -50,11 +50,7 @@
                "title_cell": "C1",
                "type": "single_cell",
                "validation": {
-                  "custom_error": "Expecting something with only twelve characters",
-                  "custom_title": "Must be length of 12",
-                  "formula1": 12,
-                  "operator": "equal",
-                  "type": "textLength"
+                  "type": "NOVALIDATION"
                },
                "width": 56
             }
@@ -88,11 +84,7 @@
                "title_cell": "B1",
                "type": "open_range",
                "validation": {
-                  "allow_blank": "False",
-                  "custom_error": "Must be 'Y' or 'N'",
-                  "custom_title": "Y/N",
-                  "formula1": "\"Y,N\"",
-                  "type": "list"
+                  "type": "NOVALIDATION"
                },
                "width": 56
             }
