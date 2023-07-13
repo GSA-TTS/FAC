@@ -62,13 +62,13 @@ class ETL(object):
             finding = Finding(
                 finding_ref_number=findings["reference_number"],
                 prior_finding_ref_numbers=findings.get("prior_references"),
-                modified_opinion=entry["modified_opinion"] == "Y",
-                other_non_compliance=entry["other_matters"] == "Y",
-                material_weakness=entry["material_weakness"] == "Y",
-                significant_deficiency=(entry["significant_deficiency"] == "Y"),
-                other_findings=entry["other_findings"] == "Y",
-                questioned_costs=entry["questioned_costs"] == "Y",
-                repeat_finding=(findings["repeat_prior_reference"] == "Y"),
+                is_modified_opinion=entry["modified_opinion"] == "Y",
+                is_other_matters=entry["other_matters"] == "Y",
+                is_material_weakness=entry["material_weakness"] == "Y",
+                is_significant_deficiency=(entry["significant_deficiency"] == "Y"),
+                is_other_findings=entry["other_findings"] == "Y",
+                is_questioned_costs=entry["questioned_costs"] == "Y",
+                is_repeat_finding=(findings["repeat_prior_reference"] == "Y"),
                 type_requirement=(entry["program"]["compliance_requirement"]),
                 report_id=self.report_id,
                 award_id=entry.get(
@@ -114,7 +114,7 @@ class ETL(object):
                 is_major=program["is_major"] == "Y",
                 mp_audit_report_type=program["audit_report_type"],
                 findings_count=None,  # TODO: Where does this come from?  Is it needed?
-                passthrough_award=is_passthrough,
+                is_passthrough_award=is_passthrough,
                 passthrough_amount=subrecipient_amount,
                 type_requirement=None,  # TODO: What is this?
             )

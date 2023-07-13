@@ -73,10 +73,10 @@ class Finding(models.Model):
         help_text=docs.prior_finding_ref_nums,
         null=True,
     )
-    modified_opinion = models.BooleanField(
+    is_modified_opinion = models.BooleanField(
         "Modified Opinion finding", null=True, help_text=docs.modified_opinion
     )
-    other_non_compliance = models.BooleanField(
+    is_other_matters = models.BooleanField(
         "Other Noncompliance finding", null=True, help_text=docs.other_non_compliance
     )
     is_material_weakness = models.BooleanField(
@@ -89,13 +89,13 @@ class Finding(models.Model):
         null=True,
         help_text=docs.significant_deficiency_findings,
     )
-    other_findings = models.BooleanField(
+    is_other_findings = models.BooleanField(
         "Other findings", null=True, help_text=docs.other_findings
     )
-    questioned_costs = models.BooleanField(
+    is_questioned_costs = models.BooleanField(
         "Questioned Costs", null=True, help_text=docs.questioned_costs_findings
     )
-    repeat_finding = models.BooleanField(
+    is_repeat_finding = models.BooleanField(
         "Indicates whether or not the audit finding was a repeat of an audit finding in the immediate prior audit",
         null=True,
         help_text=docs.repeat_finding,
@@ -212,10 +212,18 @@ class FederalAward(models.Model):
         help_text=docs.findings_count,
     )
 
-    passthrough_award = models.BooleanField(
+    is_passthrough_award = models.BooleanField(
         "Indicates whether or not funds were passed through to any subrecipients for the Federal program",
         null=True,
         help_text=docs.passthrough_award,
+    )
+    passthrough_name = models.TextField(
+        "If no (Direct Award), Name of Passthrough Entity",
+        null=True,
+    )
+    passthrough_id = models.TextField(
+        "If no (Direct Award), Identifying Number Assigned by the Pass-through Entity, if assigned",
+        null=True,
     )
     passthrough_amount = models.BigIntegerField(
         "Amount passed through to subrecipients",
