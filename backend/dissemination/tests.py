@@ -1,6 +1,6 @@
 from django.test import TestCase
 from dissemination import api_versions
-import requests
+# import requests
 from model_bakery import baker
 
 from config import settings
