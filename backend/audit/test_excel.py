@@ -574,7 +574,7 @@ class NotesToSefaExcelTests(SimpleTestCase):
                     ValidationError, validate_notes_to_sefa_json, notes_to_sefa
                 )
 
-    def _set_required_fields(self, workbook):
+    def _set_required_fields(workbook):
         _set_by_name(workbook, "auditee_uei", NotesToSefaExcelTests.GOOD_UEI)
         _set_by_name(workbook, "accounting_policies", "Mandatory notes")
         _set_by_name(workbook, "is_minimis_rate_used", "Y")
