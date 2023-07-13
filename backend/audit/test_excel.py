@@ -12,16 +12,19 @@ from audit.excel import (
     extract_findings_uniform_guidance,
     extract_corrective_action_plan,
     extract_additional_ueis,
+    extract_notes_to_sefa,
     federal_awards_field_mapping,
     findings_text_field_mapping,
     findings_uniform_guidance_field_mapping,
     corrective_action_field_mapping,
     additional_ueis_field_mapping,
+    notes_to_sefa_field_mapping,
     federal_awards_column_mapping,
     findings_text_column_mapping,
     findings_uniform_guidance_column_mapping,
     corrective_action_column_mapping,
     additional_ueis_column_mapping,
+    notes_to_sefa_column_mapping,
 )
 from audit.validators import (
     validate_additional_ueis_json,
@@ -29,6 +32,7 @@ from audit.validators import (
     validate_corrective_action_plan_json,
     validate_findings_text_json,
     validate_findings_uniform_guidance_json,
+    validate_notes_to_sefa_json,
 )
 from audit.fixtures.excel import (
     FEDERAL_AWARDS_TEMPLATE,
@@ -41,6 +45,8 @@ from audit.fixtures.excel import (
     FINDINGS_UNIFORM_GUIDANCE_ENTRY_FIXTURES,
     ADDITIONAL_UEIS_TEMPLATE,
     ADDITIONAL_UEIS_ENTRY_FIXTURES,
+    NOTES_TO_SEFA_TEMPLATE,
+    NOTES_TO_SEFA_ENTRY_FIXTURES,
 )
 
 # Simplest way to create a new copy of simple case rather than getting
@@ -506,3 +512,70 @@ class AdditionalUeisExcelTests(SimpleTestCase):
                 self.assertRaises(
                     ValidationError, validate_additional_ueis_json, additional_ueis
                 )
+
+
+class NotesToSefaExcelTests(SimpleTestCase):
+    GOOD_UEI = "AAA123456BBB"
+    TEST_DATA = json.loads(NOTES_TO_SEFA_ENTRY_FIXTURES.read_text(encoding="utf-8"))
+
+    def test_template_has_named_ranges(self):
+        """Test that the NotesToSefa Excel template contains the expected named ranges"""
+        workbook = load_workbook(NOTES_TO_SEFA_TEMPLATE, data_only=True)
+
+        for name in notes_to_sefa_field_mapping.keys():
+            self.assertIsNotNone(workbook.defined_names[name])
+
+        for name in notes_to_sefa_column_mapping:
+            self.assertIsNotNone(workbook.defined_names[name])
+
+    def test_single_notes_to_sefa_entry(self):
+        """Test that extraction and validation succeed when there is a single notes to sefa entry"""
+        workbook = load_workbook(NOTES_TO_SEFA_TEMPLATE, data_only=True)
+
+        NotesToSefaExcelTests._set_required_fields(workbook)
+        _add_entry(workbook, 0, NotesToSefaExcelTests.TEST_DATA[0])
+
+        notes_to_sefa = extract_notes_to_sefa(workbook)
+
+        validate_notes_to_sefa_json(notes_to_sefa)
+
+    def test_multiple_notes_to_sefa_entries(self):
+        """Test that extraction and validation succeed when there are multiple notes to sefa entries"""
+        workbook = load_workbook(NOTES_TO_SEFA_TEMPLATE, data_only=True)
+
+        NotesToSefaExcelTests._set_required_fields(workbook)
+        for index, entry in enumerate(NotesToSefaExcelTests.TEST_DATA):
+            _add_entry(workbook, index, entry)
+
+        notes_to_sefa = extract_notes_to_sefa(workbook)
+
+        validate_notes_to_sefa_json(notes_to_sefa)
+
+    def test_notes_to_sefa_checking(self):
+        """Test that extraction succeeds and validation fails when fields are of the wrong data type"""
+        workbook = load_workbook(NOTES_TO_SEFA_TEMPLATE, data_only=True)
+
+        # add valid data to the workbook
+        NotesToSefaExcelTests._set_required_fields(workbook)
+        _add_entry(workbook, 0, NotesToSefaExcelTests.TEST_DATA[0])
+
+        test_cases = [
+            ("auditee_uei", 123456789123),
+        ]
+
+        # validate that each test_case appropriately checks the data type
+        for field_name, value in test_cases:
+            with self.subTest():
+                _set_by_name(workbook, field_name, value)
+
+                notes_to_sefa = extract_notes_to_sefa(workbook)
+
+                self.assertRaises(
+                    ValidationError, validate_notes_to_sefa_json, notes_to_sefa
+                )
+
+    def _set_required_fields(self, workbook):
+        _set_by_name(workbook, "auditee_uei", NotesToSefaExcelTests.GOOD_UEI)
+        _set_by_name(workbook, "accounting_policies", "Mandatory notes")
+        _set_by_name(workbook, "is_minimis_rate_used", "Y")
+        _set_by_name(workbook, "rate_explained", "More explanation.")

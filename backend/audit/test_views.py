@@ -19,11 +19,13 @@ from .fixtures.excel import (
     CORRECTIVE_ACTION_PLAN_TEMPLATE,
     FINDINGS_TEXT_TEMPLATE,
     FINDINGS_UNIFORM_GUIDANCE_TEMPLATE,
+    NOTES_TO_SEFA_TEMPLATE,
     CORRECTIVE_ACTION_PLAN_ENTRY_FIXTURES,
     FINDINGS_TEXT_ENTRY_FIXTURES,
     FINDINGS_UNIFORM_GUIDANCE_ENTRY_FIXTURES,
     FEDERAL_AWARDS_ENTRY_FIXTURES,
     ADDITIONAL_UEIS_ENTRY_FIXTURES,
+    NOTES_TO_SEFA_ENTRY_FIXTURES,
     FORM_SECTIONS,
 )
 from .models import Access, SingleAuditChecklist
@@ -802,4 +804,62 @@ class SingleAuditReportFileHandlerViewTests(TestCase):
                 self.assertEqual(
                     additional_ueis_entries["additional_uei"],
                     test_data[0]["additional_uei"],
+                )
+
+    @patch("audit.validators._scan_file")
+    def test_valid_file_upload_for_notes_to_sefa(self, mock_scan_file):
+        """When a valid Excel file is uploaded, the file should be stored and the SingleAuditChecklist should be updated to include the uploaded Notes to SEFA data"""
+
+        sac = _mock_login_and_scan(self.client, mock_scan_file)
+        test_data = json.loads(NOTES_TO_SEFA_ENTRY_FIXTURES.read_text(encoding="utf-8"))
+
+        # add valid data to the workbook
+        workbook = load_workbook(NOTES_TO_SEFA_TEMPLATE, data_only=True)
+        _set_by_name(workbook, "auditee_uei", ExcelFileHandlerViewTests.GOOD_UEI)
+        _set_by_name(workbook, "accounting_policies", "Mandatory notes")
+        _set_by_name(workbook, "is_minimis_rate_used", "N")
+        _set_by_name(workbook, "rate_explained", "More explanation.")
+        _add_entry(workbook, 0, test_data[0])
+
+        with NamedTemporaryFile(suffix=".xlsx") as tmp:
+            workbook.save(tmp.name)
+            tmp.seek(0)
+
+            with open(tmp.name, "rb") as excel_file:
+                response = self.client.post(
+                    reverse(
+                        f"audit:{FORM_SECTIONS.NOTES_TO_SEFA}",
+                        kwargs={
+                            "report_id": sac.report_id,
+                            "form_section": FORM_SECTIONS.NOTES_TO_SEFA,
+                        },
+                    ),
+                    data={"FILES": excel_file},
+                )
+
+                self.assertEqual(response.status_code, 302)
+
+                updated_sac = SingleAuditChecklist.objects.get(pk=sac.id)
+
+                self.assertEqual(
+                    updated_sac.notes_to_sefa["NotesToSefa"]["auditee_uei"],
+                    ExcelFileHandlerViewTests.GOOD_UEI,
+                )
+
+                self.assertEqual(
+                    len(
+                        updated_sac.notes_to_sefa["NotesToSefa"][
+                            "notes_to_sefa_entries"
+                        ]
+                    ),
+                    1,
+                )
+
+                notes_to_sefa_entries = updated_sac.notes_to_sefa["NotesToSefa"][
+                    "notes_to_sefa_entries"
+                ][0]
+
+                self.assertEqual(
+                    notes_to_sefa_entries["note_title"],
+                    test_data[0]["note_title"],
                 )
