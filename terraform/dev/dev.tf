@@ -3,6 +3,7 @@ module "dev" {
   cf_space_name         = "dev"
   new_relic_license_key = var.new_relic_license_key
   postgrest_image       = var.postgrest_image
+  postgrest_db_schemas  = var.postgres_db_schemas
   clamav_image          = var.clamav_image
 
   database_plan         = "micro-psql"
