@@ -316,31 +316,37 @@ def validate_excel_file(file):
 
 
 def _get_error_details(xlsx_definition_template, named_ranges_row_indices):
-    """Retrieve error details givenn an XLSX template definition and a list of JSONSchemaValidationError"""
+    """Retrieve error details given an XLSX template definition and a list of JSONSchemaValidationError"""
     error_details: ErrorDetails = []
     for named_range, row_index in named_ranges_row_indices:
-        for open_range in xlsx_definition_template["sheets"][0]["open_ranges"]:
-            if open_range["range_name"] == named_range:
-                error_details.append(
-                    (
-                        open_range["title_cell"][0],
-                        xlsx_definition_template["title_row"] + row_index + 1,
-                        open_range["title"],
-                        open_range["help"],
-                    )
-                )
-                break
-        for single_cell in xlsx_definition_template["sheets"][1]["single_cells"]:
-            if single_cell["range_name"] == named_range:
-                error_details.append(
-                    (
-                        single_cell["range_cell"][0],
-                        single_cell["range_cell"][1],
-                        single_cell["title"],
-                        single_cell["help"],
-                    )
-                )
-                break
+        # Loop over all sheets instead of accessing them directly
+        for sheet in xlsx_definition_template["sheets"]:
+            # Check if "open_ranges" key is present in the sheet
+            if "open_ranges" in sheet:
+                for open_range in sheet["open_ranges"]:
+                    if open_range["range_name"] == named_range:
+                        error_details.append(
+                            (
+                                open_range["title_cell"][0],
+                                xlsx_definition_template["title_row"] + row_index + 1,
+                                open_range["title"],
+                                open_range["help"],
+                            )
+                        )
+                        break  # Break the loop once the named_range is found
+            # Check if "single_cells" key is present in the sheet
+            if "single_cells" in sheet:
+                for single_cell in sheet["single_cells"]:
+                    if single_cell["range_name"] == named_range:
+                        error_details.append(
+                            (
+                                single_cell["range_cell"][0],
+                                single_cell["range_cell"][1],
+                                single_cell["title"],
+                                single_cell["help"],
+                            )
+                        )
+                        break  # Break the loop once the named_range is found
     return error_details
 
 
