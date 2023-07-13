@@ -306,6 +306,12 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         the appropriate privileges will done at the view level.
         """
 
+        # from audit.etl import ETL
+
+        # if self.general_information:
+        #     etl = ETL(self)
+        #     etl.load_all()
+        
         self.transition_name.append(SingleAuditChecklist.STATUS.SUBMITTED)
         self.transition_date.append(date.today())
 

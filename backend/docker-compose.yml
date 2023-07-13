@@ -18,8 +18,10 @@ services:
     depends_on:
       - db
       - minio
+      - api
     environment:
       - "DATABASE_URL=postgres://postgres@db/postgres"
+      - "POSTGREST_URL=http://api:3000"
       - "DJANGO_DEBUG=true"
       - "SAM_API_KEY=${SAM_API_KEY}"
       - "DJANGO_BASE_URL=http://localhost:8000"
@@ -39,6 +41,7 @@ services:
       - /src/node_modules
       - /src/staticfiles
   clamav-rest:
+    # image: clamav/clamav
     image: ghcr.io/gsa-tts/fac/clamav:latest
     environment:
       - MAX_FILE_SIZE=25M
@@ -55,6 +58,7 @@ services:
     volumes:
       - "minio-vol:/tmp/minio"
   api:
+    # image: postgrest/postgrest
     image: ghcr.io/gsa-tts/fac/postgrest:latest
     ports:
       - "3000:3000"
