@@ -36,6 +36,9 @@ export NEW_RELIC_HOST="gov-collector.newrelic.com"
 # for additional app instances, so we gate all of this behind CF_INSTANCE_INDEX
 # being 0.
 [ "$CF_INSTANCE_INDEX" = 0 ] &&
+echo 'Starting API schema deprecation' &&
+python manage.py drop_deprecated_api_schemas_and_views &&
+echo 'Finished API schema deprecation' &&
 echo 'Starting API schema creation' &&
 python manage.py create_api_schemas &&
 echo 'Finished API schema creation' &&
