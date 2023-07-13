@@ -1,5 +1,5 @@
 from django import forms
-from audit.get_agency_names import get_agency_names
+from audit.get_agency_names import get_agency_choices
 
 
 class UploadReportForm(forms.Form):
@@ -27,12 +27,6 @@ class AuditInfoForm(forms.Form):
                 data[k] = False
         self.cleaned_data = data
         return data
-
-    def get_agency_choices():
-        choices_agencies = []
-        for x in get_agency_names():
-            choices_agencies.append((x, x))
-        return tuple(choices_agencies)
 
     choices_YoN = (("True", "Yes"), ("False", "No"))
     choices_GGAP = (
