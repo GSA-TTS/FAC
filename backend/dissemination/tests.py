@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.db import connection
 
-# import requests
+import requests
 from model_bakery import baker
 
 from config import settings
