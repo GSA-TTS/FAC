@@ -9,6 +9,7 @@ from dissemination.models import (
     Revision,
     Passthrough,
     General,
+    GenAuditor,
 )
 from audit.models import SingleAuditChecklist
 
@@ -24,6 +25,7 @@ class ETL(object):
 
     def load_all(self):
         self.load_general()
+        self.load_gen_auditor()
         self.load_federal_award()
 
     def load_finding_texts(self):
@@ -192,32 +194,22 @@ class ETL(object):
             auditee_certify_title=None,  # TODO: Where does this come from?
             auditee_contact_name=general_information["auditee_contact_name"],
             auditee_email=general_information["auditee_email"],
-            hist_auditee_fax=None,
             auditee_name=general_information["auditee_name"],
             auditee_phone=general_information["auditee_phone"],
             auditee_contact_title=general_information["auditee_contact_title"],
             auditee_address_line_1=general_information["auditee_address_line_1"],
-            hist_auditee_address_line_2=None,
             auditee_city=general_information["auditee_city"],
             auditee_state=general_information["auditee_state"],
             auditee_ein=general_information["ein"],
-            multiple_ein=None,  # TODO: Where does this value come from?
-            auditee_duns=[],  # TODO: Where does this value come from?
-            multiple_duns=None,  # TODO: Where does this value come from?
             auditee_uei=None,  # TODO: Where does this come from?
-            multiple_uei=[],  # TODO: Where does this come from?
             auditee_addl_uei_list=[],  # TODO: Where does this come from?
             auditee_addl_ein_list=[],  # TODO: Where does this come from?
-            auditee_addl_duns_list=[],  # TODO: Where does this come from?
-            ein_subcode=None,  # TODO: Notes say this field is not in use.
             auditee_zip=general_information["auditee_zip"],
             auditor_phone=general_information["auditor_phone"],
-            hist_auditor_fax=None,
             auditor_state=general_information["auditor_state"],
             auditor_city=general_information["auditor_city"],
             auditor_contact_title=general_information["auditor_contact_title"],
             auditor_address_line_1=general_information["auditor_address_line_1"],
-            hist_auditor_address_line_2=None,
             auditor_zip=general_information["auditor_zip"],
             auditor_country=general_information["auditor_country"],
             auditor_contact_name=general_information["auditor_contact_name"],
@@ -225,7 +217,6 @@ class ETL(object):
             auditor_firm_name=general_information["auditor_firm_name"],
             auditor_foreign_addr=None,  # TODO: Where does this come from?
             auditor_ein=general_information["auditor_ein"],
-            multiple_auditors=None,  # TODO: Where does this value come from?
             pdf_url=None,  # TODO: Where does this come from?
             cognizant_agency=None,  # TODO: Where does this come from?
             oversight_agency=None,  # TODO: Where does this come from?
@@ -238,13 +229,8 @@ class ETL(object):
             date_received=None,  # TODO: Where does this come from?
             fy_end_date=general_information["auditee_fiscal_period_end"],
             fy_start_date=None,  # TODO: Where does this come from?
-            hist_previous_completed_on=None,
-            hist_previous_date_published=None,
-            hist_completed_date=None,
-            hist_component_date_received=None,
             audit_year=self.audit_year,
             audit_type=general_information["audit_type"],
-            hist_reportable_condition=None,
             is_significant_deficiency=None,  # TODO: Where does this come from?
             is_material_weakness=None,  # TODO: Where does this come from?
             condition_or_deficiency_major_program=None,  # TODO: Where does this come from?
@@ -280,3 +266,23 @@ class ETL(object):
             data_source="G-FAC",
         )
         general.save()
+
+    def load_gen_auditor(self):
+        additional_auditors = self.single_audit_checklist.additional_auditors
+        for auditor in additional_auditors["AdditionalAuditors"]["auditors"]:
+            gen_auditor = GenAuditor(
+                report_id=self.single_audit_checklist.report_id,
+                auditor_seq_number=auditor["auditor_seq_number"],
+                auditor_address_line_1=auditor["auditor_address_line_1"],
+                auditor_city=auditor["auditor_city"],
+                # auditor_contact_name=auditor["auditor_contact_name"],
+                auditor_contact_title=auditor["auditor_contact_title"],
+                auditor_country=auditor["auditor_country"],
+                auditor_ein=auditor["auditor_ein"],
+                auditor_email=auditor["auditor_email"],
+                auditor_firm_name=auditor["auditor_firm_name"],
+                auditor_phone=auditor["auditor_phone"],
+                auditor_state=auditor["auditor_state"],
+                auditor_zip=auditor["auditor_zip"],
+            )
+            gen_auditor.save()

@@ -57,6 +57,35 @@ def _fake_general_information():
     return general_information
 
 
+def _fake_federal_awards():
+    federal_awards = {
+        "FederalAwards": {
+            "auditee_uei": "ABC123DEF456",
+            "federal_awards": [
+                {
+                    "cluster": {"cluster_name": "N/A", "cluster_total": 0},
+                    "program": {
+                        "is_major": "Y",
+                        "program_name": "RETIRED AND SENIOR VOLUNTEER PROGRAM",
+                        "amount_expended": 9000,
+                        "audit_report_type": "U",
+                        "federal_agency_prefix": "93",
+                        "federal_program_total": 9000,
+                        "three_digit_extension": "600",
+                        "number_of_audit_findings": 0,
+                        "additional_award_identification": "COVID-19",
+                    },
+                    "subrecipients": {"is_passed": "N"},
+                    "loan_or_loan_guarantee": {"is_guaranteed": "N"},
+                    "direct_or_indirect_award": {"is_direct": "Y"},
+                }
+            ],
+            "total_amount_expended": 9000,
+        }
+    }
+    return federal_awards
+
+
 def _fake_additional_auditors():
     fake = Faker()
     additional_auditors = {
@@ -89,6 +118,7 @@ def _create_sac(user):
         submitted_by=user,
         general_information=_fake_general_information(),
         additional_auditors=_fake_additional_auditors(),
+        federal_awards=_fake_federal_awards(),
     )
 
     Access.objects.create(

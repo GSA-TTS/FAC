@@ -198,6 +198,9 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         blank=True, null=True, validators=[validate_additional_ueis_json]
     )
 
+    # Additional Auditors:
+    additional_auditors = models.JSONField(blank=True, null=True)
+
     def validate_full(self):
         """
         A stub method to represent the cross-sheet, “full” validation that we
@@ -287,7 +290,7 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         the appropriate privileges will done at the view level.
         """
 
-        from audit.etl import ETL
+        from audit.etl.etl import ETL
 
         if self.general_information:
             etl = ETL(self)

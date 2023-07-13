@@ -241,11 +241,6 @@ class FederalAward(models.Model):
     #     help_text=docs.questioned_costs_FederalAward,
     # )
 
-    # TODO: Do we need to add any of the following?:
-    # is_guaranteed
-    # is_passed
-    # subrecipient_amount
-
     class Meta:
         unique_together = (
             (
