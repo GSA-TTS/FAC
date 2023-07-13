@@ -114,7 +114,8 @@ TODO: Include the "Completed at X by Y", after timestamps are included in the da
 					<a class="usa-link text-bold"
 						href="/report_submission/federal-awards/{{ report_id }}">Upload the Federal Awards workbook</a>
 					<p class="margin-0">
-						This workbook should be completed by the auditee. For each federal award received, you'll need the financial and agency details. This is also were you list the number of audit findings.					</p>
+						This workbook should be completed by the auditee. For each federal award received, you'll need the financial and agency details. This is also were you list the number of audit findings.
+					</p>
 				</div>
 			</li>
 			<!-- Audit information workbook -->
@@ -127,7 +128,8 @@ TODO: Include the "Completed at X by Y", after timestamps are included in the da
 				<div class="usa-icon-list__content {% if single_audit_checklist.completed is True %} text-green {% else %} text-base-dark {% endif %}">
 					<a class="usa-link text-bold" href="javascript:void(0);">Upload the Federal Awards Audit Findings workbook</a>
 					<p class="margin-0">
-						This workbook is completed by both the auditee and auditor. Auditees complete this section using the Summary Schedule of Prior Audit Findings and Auditors complete this section using the information in the financial statement audit.				</div>
+						This workbook is completed by both the auditee and auditor. Auditees complete this section using the Summary Schedule of Prior Audit Findings and Auditors complete this section using the information in the financial statement audit.
+					</p>
 					</div>
 					</li>
 			<!-- Audit findings workbook -->
@@ -145,7 +147,8 @@ TODO: Include the "Completed at X by Y", after timestamps are included in the da
 					<a class="usa-link text-bold"
 						href="/report_submission/audit-findings/{{ report_id | default_if_none:'' }}">Upload the Federal Awards Audit Findings workbook</a>
 					<p class="margin-0">
-						This workbook is completed by both the auditee and auditor. Auditees complete this section using the Summary Schedule of Prior Audit Findings and Auditors complete this section using the information in the financial statement audit.				</div>
+						This workbook is completed by both the auditee and auditor. Auditees complete this section using the Summary Schedule of Prior Audit Findings and Auditors complete this section using the information in the financial statement audit.
+					</p>
 					</div>
 			</li>
 			<!-- Findings text workbook -->
@@ -163,7 +166,9 @@ TODO: Include the "Completed at X by Y", after timestamps are included in the da
 					<a class="usa-link text-bold"
 						href="/report_submission/audit-findings-text/{{ report_id | default_if_none:'' }}">Upload the Audit Findings Text workbook</a>
 						<p class="margin-0">
-							This workbook is completed by the auditee. Enter the full text of the audit finding, listing each finding only once, even if they relate to more than one program. Include the audit finding reference number for each.					</div>
+							This workbook is completed by the auditee. Enter the full text of the audit finding, listing each finding only once, even if they relate to more than one program. Include the audit finding reference number for each.
+						</p>
+						</div>
 			</li>
 			<!-- CAP -->
 			<li class="usa-icon-list__item padding-bottom-2">
@@ -180,7 +185,9 @@ TODO: Include the "Completed at X by Y", after timestamps are included in the da
 					<a class="usa-link text-bold"
 						href="/report_submission/CAP/{{ report_id | default_if_none:'' }}">Upload the Corrective Action Plan (CAP) workbook</a>
 						<p class="margin-0">
-							This workbook is completed by the auditee. The information should match to the data entered in the Findings Text workbook. Plans for findings relating to more than one program only need to be entered once.					</div>
+							This workbook is completed by the auditee. The information should match to the data entered in the Findings Text workbook. Plans for findings relating to more than one program only need to be entered once.
+						</p>
+						</div>
 			</li>
 			<!-- Additional UEIs -->
 			<li class="usa-icon-list__item padding-bottom-2">
@@ -197,7 +204,9 @@ TODO: Include the "Completed at X by Y", after timestamps are included in the da
 					<a class="usa-link text-bold"
 						href="/report_submission/additional-ueis/{{ report_id | default_if_none:'' }}">Upload the Additional UEIs workbook</a>
 						<p class="margin-0">
-							This workbook is only necessary if multiple the audit report covers UEIs. It is completed by the auditee. List the additional UEIs covered by the audit, excluding the primary UEI.					</div>
+							This workbook is only necessary if multiple the audit report covers UEIs. It is completed by the auditee. List the additional UEIs covered by the audit, excluding the primary UEI.
+						</p>
+						</div>
 			</li>
 			<!-- Secondary Auditors -->
 			<li class="usa-icon-list__item padding-bottom-2">
@@ -214,7 +223,9 @@ TODO: Include the "Completed at X by Y", after timestamps are included in the da
 					<a class="usa-link text-bold"
 						href="/report_submission/secondary-auditors/{{ report_id | default_if_none:'' }}">Upload the Secondary Auditors workbook</a>
 						<p class="margin-0">
-							This workbook is only necessary if multiple auditors did the audit work. In these cases, the secondary auditors should enter their  information in this workbook.					</div>
+							This workbook is only necessary if multiple auditors did the audit work. In these cases, the secondary auditors should enter their  information in this workbook.
+						</p>
+						</div>
 			</li>
 			<!-- Ready for certification -->
 			<a href="{% url 'audit:ReadyForCertification' report_id=report_id %}">
@@ -262,7 +273,8 @@ TODO: Include the "Completed at X by Y", after timestamps are included in the da
 						<span class="text-base">Auditor Certification (either certification order is fine)</span>
 					{% endif %}
 					<p class="margin-0">
-						The certifying auditor must attest and sign the single audit report before submission. This step is locked until after the SF-SAC and single audit report have been completed and uploaded in the previous steps.					</p>
+						The certifying auditor must attest and sign the single audit report before submission. This step is locked until after the SF-SAC and single audit report have been completed and uploaded in the previous steps.
+					</p>
 				</div>
 			</li>
 			<!-- Auditee certification -->
@@ -287,7 +299,8 @@ TODO: Include the "Completed at X by Y", after timestamps are included in the da
 						<span class="text-base">Auditee Certification</span>
 					{% endif %}
 					<p class="margin-0">
-						The certifying auditee must attest and sign the single audit report before submission. This step is locked until after the SF-SAC and single audit report have been completed and uploaded in the previous steps.					</p>
+						The certifying auditee must attest and sign the single audit report before submission. This step is locked until after the SF-SAC and single audit report have been completed and uploaded in the previous steps.
+					</p>
 				</div>
 			</li>
 			<!-- Submit to FAC for processing -->
