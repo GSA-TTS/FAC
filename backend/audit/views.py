@@ -1,4 +1,5 @@
 import logging
+from audit.get_agency_names import get_agency_names
 
 from django.views import generic
 from django.views.decorators.csrf import csrf_exempt
@@ -11,7 +12,7 @@ from django.utils.datastructures import MultiValueDictKeyError
 from django.utils.decorators import method_decorator
 from django.http import JsonResponse
 
-from audit.forms import UploadReportForm
+from audit.forms import UploadReportForm, AuditInfoForm
 
 from .fixtures.excel import FORM_SECTIONS
 
@@ -345,6 +346,7 @@ class SubmissionProgressView(SingleAuditChecklistAccessRequiredMixin, generic.Vi
         try:
             sac = SingleAuditChecklist.objects.get(report_id=report_id)
 
+            # TODO: Ensure the correct SAC elements are used to determine what's complete.
             context = {
                 "single_audit_checklist": {
                     "created": True,
@@ -423,6 +425,62 @@ class SubmissionProgressView(SingleAuditChecklistAccessRequiredMixin, generic.Vi
             raise PermissionDenied("You do not have access to this audit.")
 
 
+class AuditInfoFormView(SingleAuditChecklistAccessRequiredMixin, generic.View):
+    def get(self, request, *args, **kwargs):
+        report_id = kwargs["report_id"]
+        try:
+            sac = SingleAuditChecklist.objects.get(report_id=report_id)
+            form = AuditInfoForm(request.POST, request.FILES)
+
+            context = {
+                "auditee_name": sac.auditee_name,
+                "report_id": report_id,
+                "auditee_uei": sac.auditee_uei,
+                "user_provided_organization_type": sac.user_provided_organization_type,
+                "agency_names": get_agency_names(),
+            }
+
+            # TODO: check if there's already a form in the DB and let the user know
+            # context['already_submitted'] = ...
+
+            return render(request, "audit/audit-info-form.html", context)
+        except SingleAuditChecklist.DoesNotExist:
+            raise PermissionDenied("You do not have access to this audit.")
+        except Exception as e:
+            logger.info("Enexpected error in AuditInfoFormView get.\n", e)
+            raise BadRequest()
+
+    def post(self, request, *args, **kwargs):
+        report_id = kwargs["report_id"]
+
+        try:
+            sac = SingleAuditChecklist.objects.get(report_id=report_id)
+            form = AuditInfoForm(request.POST, request.FILES)
+
+            if form.is_valid():
+                # Save the form, yay!
+                print("Saving audit info form!")
+                return redirect(reverse("audit:SubmissionProgress", args=[report_id]))
+            else:
+                form.clean_booleans()
+                print("hello", form.cleaned_data)
+                context = {
+                    "auditee_name": sac.auditee_name,
+                    "report_id": report_id,
+                    "auditee_uei": sac.auditee_uei,
+                    "user_provided_organization_type": sac.user_provided_organization_type,
+                    "agency_names": get_agency_names(),
+                    "form": form,
+                }
+                return render(request, "audit/audit-info-form.html", context)
+
+        except SingleAuditChecklist.DoesNotExist:
+            raise PermissionDenied("You do not have access to this audit.")
+        except Exception as e:
+            logger.info("Enexpected error in AuditInfoFormView post.\n", e)
+            raise BadRequest()
+
+
 class PageInput:
     def __init__(self, text="", id="", required=True, hint=None):
         self.text = text
@@ -493,6 +551,7 @@ class UploadReportView(SingleAuditChecklistAccessRequiredMixin, generic.View):
             }
 
             # TODO: check if there's already a PDF in the DB and let the user know
+            # context['already_submitted'] = ...
 
             return render(request, "audit/upload-report.html", context)
         except SingleAuditChecklist.DoesNotExist:
@@ -512,7 +571,7 @@ class UploadReportView(SingleAuditChecklistAccessRequiredMixin, generic.View):
                 file = request.FILES["upload_report"]
 
                 sar_file = SingleAuditReportFile(
-                    **{"file": file, "filename": "temp", "sac_id": sac.id}
+                    **{"file": file, "filename": file.name, "sac_id": sac.id}
                 )
 
                 sar_file.full_clean()
@@ -531,7 +590,8 @@ class UploadReportView(SingleAuditChecklistAccessRequiredMixin, generic.View):
                     "form": form,
                 }
                 return render(request, "audit/upload-report.html", context)
-
+        except SingleAuditChecklist.DoesNotExist:
+            raise PermissionDenied("You do not have access to this audit.")
         except Exception as e:
             logger.info("Unexpected error in UploadReportView post.\n", e)
             raise BadRequest()
