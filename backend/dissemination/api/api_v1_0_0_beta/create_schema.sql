@@ -49,3 +49,7 @@ $$
 ;
 
 commit;
+
+notify pgrst,
+       'reload schema';
+

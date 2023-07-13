@@ -36,10 +36,13 @@ export NEW_RELIC_HOST="gov-collector.newrelic.com"
 # for additional app instances, so we gate all of this behind CF_INSTANCE_INDEX
 # being 0.
 [ "$CF_INSTANCE_INDEX" = 0 ] &&
+echo 'Starting API schema creation' &&
+python manage.py create_api_schemas &&
+echo 'Finished API schema creation' &&
 echo 'Starting migrate' &&
 python manage.py migrate &&
 echo 'Finished migrate' &&
-echo 'Starting view creation' &&
+echo 'Starting API view creation' &&
 python manage.py create_api_views &&
 echo 'Finished view creation' &&
 echo 'Starting collectstatic' &&

@@ -8,9 +8,7 @@ live = [
 
 # These versions will have their schemas dropped
 # in a cascade
-deprecated = [
-
-]
+deprecated = []
 
 
 def get_conn_string():
@@ -22,6 +20,7 @@ def get_conn_string():
         conn_string = settings.CONNECTION_STRING
     return conn_string
 
+
 def exec_sql(version, filename):
     conn = connection(get_conn_string())
     conn.autocommit = True
@@ -30,19 +29,25 @@ def exec_sql(version, filename):
         sql = open(filename, "r").read()
         curs.execute(sql)
 
-def create_api(version):
-    for filename in ["create_schema.sql", "create_views.sql"]:
-        exec_sql(version, filename)
 
-def drop_api(version):
-    for filename in ["drop.sql"]:
-        exec_sql(version, filename)
+def create_views(version):
+    exec_sql(version, "create_views.sql")
 
-def create_live_apis():
+
+def create_schema(version):
+    exec_sql(version, "create_schema.sql")
+
+
+def create_live_schemas():
     for version in live:
-        create_api(version)
-        
-def deprecate_apis():
-    for version in deprecated:
-        drop_api(version)
+        create_schema(version)
 
+
+def create_live_views():
+    for version in live:
+        create_views(version)
+
+
+def deprecate_schemas_and_views():
+    for version in deprecated:
+        exec_sql(version, "drop.sql")

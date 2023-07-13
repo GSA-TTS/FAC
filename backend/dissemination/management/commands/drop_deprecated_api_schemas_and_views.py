@@ -8,4 +8,4 @@ class Command(BaseCommand):
     """
 
     def handle(self, *args, **kwargs):
-        api_versions.create_live_views()
+        api_versions.deprecate_schemas_and_views()
