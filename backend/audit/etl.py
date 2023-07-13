@@ -112,7 +112,7 @@ class ETL(object):
                 is_major=program["is_major"] == "Y",
                 mp_audit_report_type=program["audit_report_type"],
                 findings_count=None,  # TODO: Where does this come from?  Is it needed?
-                passthrough_award=is_passthrough,
+                is_passthrough_award=is_passthrough,
                 passthrough_amount=subrecipient_amount,
                 type_requirement=None,  # TODO: What is this?
             )
