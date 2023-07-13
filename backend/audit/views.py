@@ -430,7 +430,6 @@ class AuditInfoFormView(SingleAuditChecklistAccessRequiredMixin, generic.View):
         report_id = kwargs["report_id"]
         try:
             sac = SingleAuditChecklist.objects.get(report_id=report_id)
-            form = AuditInfoForm(request.POST, request.FILES)
 
             context = {
                 "auditee_name": sac.auditee_name,
