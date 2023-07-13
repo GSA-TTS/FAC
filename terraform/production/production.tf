@@ -3,6 +3,7 @@ module "production" {
   cf_space_name         = "production"
   new_relic_license_key = var.new_relic_license_key
   postgrest_image       = var.postgrest_image
+  postgrest_db_schemas  = var.postgrest_db_schemas
   clamav_image          = var.clamav_image
 }
 
