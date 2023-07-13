@@ -211,10 +211,10 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
 
         validation_methods = []
         errors = [f(self) for f in validation_methods]
-        
+
         if errors:
             return errors
-        
+
         return self.validate_cross()
 
     def validate_cross(self):
