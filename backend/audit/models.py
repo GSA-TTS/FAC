@@ -311,7 +311,7 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         # if self.general_information:
         #     etl = ETL(self)
         #     etl.load_all()
-        
+
         self.transition_name.append(SingleAuditChecklist.STATUS.SUBMITTED)
         self.transition_date.append(date.today())
 
