@@ -16,6 +16,7 @@ from audit.excel import (
     federal_awards_named_ranges,
     findings_text_named_ranges,
     findings_uniform_guidance_named_ranges,
+    notes_to_sefa_named_ranges,
 )
 from audit.fixtures.excel import (
     ADDITIONAL_UEIS_TEMPLATE_DEFINITION,
@@ -23,6 +24,7 @@ from audit.fixtures.excel import (
     FEDERAL_AWARDS_TEMPLATE_DEFINITION,
     FINDINGS_TEXT_TEMPLATE_DEFINITION,
     FINDINGS_UNIFORM_TEMPLATE_DEFINITION,
+    NOTES_TO_SEFA_TEMPLATE_DEFINITION,
 )
 
 
@@ -139,6 +141,19 @@ def validate_additional_ueis_json(value):
     errors = list(validator.iter_errors(value))
     if len(errors) > 0:
         raise ValidationError(message=_additional_ueis_json_error(errors))
+
+
+def validate_notes_to_sefa_json(value):
+    """
+    Apply JSON Schema for notes to SEFA and report errors.
+    """
+    schema_path = settings.SECTION_SCHEMA_DIR / "NotesToSefa.schema.json"
+    schema = json.loads(schema_path.read_text(encoding="utf-8"))
+
+    validator = Draft7Validator(schema)
+    errors = list(validator.iter_errors(value))
+    if len(errors) > 0:
+        raise ValidationError(message=_notes_to_sefa_json_error(errors))
 
 
 def validate_findings_text_json(value):
@@ -419,3 +434,12 @@ def _additional_ueis_json_error(errors):
     )
     template = json.loads(template_definition_path.read_text(encoding="utf-8"))
     return _get_error_details(template, additional_ueis_named_ranges(errors))
+
+
+def _notes_to_sefa_json_error(errors):
+    """Process JSON Schema errors for notes to sefa"""
+    template_definition_path = (
+        XLSX_TEMPLATE_DEFINITION_DIR / NOTES_TO_SEFA_TEMPLATE_DEFINITION
+    )
+    template = json.loads(template_definition_path.read_text(encoding="utf-8"))
+    return _get_error_details(template, notes_to_sefa_named_ranges(errors))
