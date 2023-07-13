@@ -34,7 +34,7 @@ local other_single_cells = [
     width: 24,
     title_cell: 'B1',
     range_cell: 'B2',
-    validation: SV.YoNValidation,
+    validation: SV.YoNoBValidation,
     help: Help.yorn,
   },
   Sheets.single_cell {
@@ -43,7 +43,7 @@ local other_single_cells = [
     width: 56,
     title_cell: 'C1',
     range_cell: 'C2',
-    validation: SV.StringOfLengthTwelve,
+    validation: SV.NoValidation,
     help: Help.plain_text,
   },
 ];
@@ -65,7 +65,7 @@ local open_ranges_defns = [
       width: 56,
       help: Help.plain_text,
     },
-    SV.YoNValidation,
+    SV.NoValidation,
     'Note content',
     'note_content',
   ],

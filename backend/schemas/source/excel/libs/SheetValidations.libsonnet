@@ -17,7 +17,13 @@ local YoNValidation = {
   custom_error: "Must be 'Y' or 'N'",
   custom_title: 'Y/N',
 };
-
+local YoNoBValidation = {
+  type: 'list',
+  allow_blank: 'False',
+  formula1: '"Y,N,Y&N"',
+  custom_error: "Must be 'Y' or 'N' or 'Y&N'",
+  custom_title: 'Y/N/Y&N',
+};
 // FIRSTCELLREF is magic, and gets replaced with the top
 // of the relevant named range. It uses a relative row reference,
 // so that it applies to every cell in the range.
@@ -91,4 +97,5 @@ local ComplianceRequirementValidation = {
   YoNValidation: YoNValidation,
   ReferenceNumberValidation: ReferenceNumberValidation,
   ComplianceRequirementValidation: ComplianceRequirementValidation,
+  YoNoBValidation: YoNoBValidation,
 }
