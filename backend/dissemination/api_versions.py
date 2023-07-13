@@ -1,5 +1,6 @@
 from psycopg2._psycopg import connection
 from config import settings
+from typing import List
 
 # These are API versions we want live.
 live = [
@@ -8,7 +9,7 @@ live = [
 
 # These versions will have their schemas dropped
 # in a cascade
-deprecated = []
+deprecated: List[str] = []
 
 
 def get_conn_string():
