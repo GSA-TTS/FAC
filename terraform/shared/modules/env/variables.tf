@@ -78,6 +78,11 @@ variable "postgrest_image" {
   description = "the tag for the docker image"
 }
 
+variable "postgrest_db_schemas" {
+  type = string
+  description = "the active API schemas being presented by PostgREST"
+}
+
 variable "clamav_image" {
   type        = string
   description = "the tag for the docker image"

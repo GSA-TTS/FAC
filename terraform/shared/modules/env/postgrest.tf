@@ -28,7 +28,7 @@ resource "cloudfoundry_app" "postgrest" {
 
   environment = {
     PGRST_DB_URI : cloudfoundry_service_key.postgrest.credentials.uri
-    PGRST_DB_SCHEMAS : "api"
+    PGRST_DB_SCHEMAS : var.postgrest_db_schemas
     PGRST_DB_ANON_ROLE : "anon"
   }
 }
