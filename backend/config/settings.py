@@ -160,7 +160,7 @@ DATABASES = {
     ),
 }
 
-POSTGREST = {"URL": env.str("POSTGREST_URL", "http://localhost:3000")}
+POSTGREST = {"URL": env.str("POSTGREST_URL", "http://api:3000")}
 
 
 # Password validation
