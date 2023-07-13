@@ -20,7 +20,7 @@ variable "postgrest_image" {
 }
 
 variable "postgrest_db_schemas" {
-  type = string
+  type        = string
   description = "the active API schemas being presented by PostgREST"
 }
 
