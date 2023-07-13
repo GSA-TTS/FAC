@@ -32,15 +32,6 @@ export NEW_RELIC_LOG=stdout
 # https://docs.newrelic.com/docs/security/security-privacy/compliance/fedramp-compliant-endpoints/
 export NEW_RELIC_HOST="gov-collector.newrelic.com"
 
-API_VERSIONS=("api_v1_0_0_beta")
-
-create_views() {
-    for version in "${API_VERSIONS[@]}"
-    do
-        python manage.py create_views --api_version $version
-    done
-}
-
 # We only want to run migrate and collecstatic for the first app instance, not
 # for additional app instances, so we gate all of this behind CF_INSTANCE_INDEX
 # being 0.
@@ -49,7 +40,7 @@ echo 'Starting migrate' &&
 python manage.py migrate &&
 echo 'Finished migrate' &&
 echo 'Starting view creation' &&
-create_views &&
+python manage.py create_api_views &&
 echo 'Finished view creation' &&
 echo 'Starting collectstatic' &&
 python manage.py collectstatic --noinput &&

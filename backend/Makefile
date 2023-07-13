@@ -56,7 +56,7 @@ docker-first-run:
 	docker compose run web bash -c '\
 		python manage.py makemigrations &&\
 		python manage.py migrate &&\
-		python manage.py create_views --api_version "api_v1_0_0_beta"\
+		python manage.py create_api_views\
 		'
 	# docker compose run web python manage.py load_test_data
 

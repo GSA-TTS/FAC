@@ -1,6 +1,6 @@
 from django.test import TestCase
 from django.db import connection
-
+from dissemination import api_versions
 import requests
 from model_bakery import baker
 
@@ -41,17 +41,11 @@ class APIViewTests(TestCase):
         )
         finding.save()
 
-        for api_version in api_schemas:
-            with connection.cursor() as cursor:
-                # TODO: Need a better way. Creating the views here as the data is in a temporary test databasse
-                for file in [
-                    "init_api_db.sql",
-                    "db_views.sql",
-                ]:
-                    filename = f"dissemination/api/{api_version}/{file}"
-                    sql = open(filename, "r").read()
-                    cursor.execute(sql)
+        
+        api_versions.create_live_apis()
 
+        for api_version in api_versions.live:
+            with connection.cursor() as cursor:
                 cursor.execute(f"SELECT auditee_uei FROM {api_version}.general")
                 self.assertEquals(cursor.fetchall()[0][0], uei)
                 cursor.execute(f"SELECT auditee_uei FROM {api_version}.federal_award")

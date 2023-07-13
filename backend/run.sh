@@ -17,16 +17,7 @@ if [[ "${ENV}" == "LOCAL" || "${ENV}" == "TESTING" ]]; then
     mc admin user svcacct add --access-key="${AWS_PRIVATE_ACCESS_KEY_ID}" --secret-key="${AWS_PRIVATE_SECRET_ACCESS_KEY}" myminio minioadmin
 fi;
 
-API_VERSIONS=(api_v1_0_0_beta)
-
-create_views() {
-    for version in "${API_VERSIONS[@]}"
-    do
-        python manage.py create_views --api_version $version
-    done
-}
-
 # Migrate first
-python manage.py migrate && create_views
+python manage.py migrate && python manage.py create_api_views
 # Run the build/watch assets + run server at the same time
 npm run dev & python manage.py runserver 0.0.0.0:8000
