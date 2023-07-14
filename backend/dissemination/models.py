@@ -809,7 +809,7 @@ class General(models.Model):
 
     # Metadata
     dbkey = models.CharField(
-        "Audit Year from .",
+        "Audit Year and DBKEY (database key) combined make up the primary key. Only on records created by Census.",
         max_length=40,
         help_text=docs.dbkey_general,
     )
