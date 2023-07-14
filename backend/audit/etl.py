@@ -58,25 +58,19 @@ class ETL(object):
         for entry in findings_uniform_guidance_entries:
             findings = entry["findings"]
             finding = Finding(
+                award_seq_number=entry["award_index"],
+                report_id=self.report_id,
+                finding_seq_number=entry["seq_number"],
                 finding_ref_number=findings["reference_number"],
-                prior_finding_ref_numbers=findings.get("prior_references"),
-                is_modified_opinion=entry["modified_opinion"] == "Y",
-                is_other_matters=entry["other_matters"] == "Y",
                 is_material_weakness=entry["material_weakness"] == "Y",
-                is_significant_deficiency=(entry["significant_deficiency"] == "Y"),
+                is_modified_opinion=entry["modified_opinion"] == "Y",
                 is_other_findings=entry["other_findings"] == "Y",
+                is_other_non_compliance=entry["other_findings"] == "Y",
+                prior_finding_ref_numbers=findings.get("prior_references"),
                 is_questioned_costs=entry["questioned_costs"] == "Y",
                 is_repeat_finding=(findings["repeat_prior_reference"] == "Y"),
+                is_significant_deficiency=(entry["significant_deficiency"] == "Y"),
                 type_requirement=(entry["program"]["compliance_requirement"]),
-                report_id=self.report_id,
-                award_id=entry.get(
-                    "seq_number", 1
-                ),  # TODO: This will be the sequence number
-                # audit_id=audit_id,
-                # audit_findings_id=audit_id,
-                # audit_year=self.audit_year,
-                # dbkey=None,
-                # is_public=self.is_public,
             )
             finding.save()
 

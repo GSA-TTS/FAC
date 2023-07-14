@@ -46,51 +46,44 @@ class FindingText(models.Model):
 class Finding(models.Model):
     """A finding from the audit. References FederalAward and FindingText"""
 
+    award_seq_number = models.CharField(
+        "Order that the award line was reported in Award",
+        null=True,
+    )
     report_id = models.CharField(
         "G-FAC generated identifier. FK along with other fields - refers to Award",
         max_length=40,
-    )
-    award_seq_number = models.IntegerField(
-        "Order that the award line was reported in Award",
-        null=True,
     )
     finding_seq_number = models.IntegerField(
         "Order that the finding line was reported",
         null=True,
     )
-
     finding_ref_number = models.CharField(
         "Findings Reference Numbers",
         max_length=100,
         unique=True,
         help_text=docs.finding_ref_nums_findings,
     )
-
-    # each element is the list is a FK to Finding
-    prior_finding_ref_numbers = models.CharField(
-        "Audit finding reference numbers from the immediate prior audit",
-        max_length=100,
-        help_text=docs.prior_finding_ref_nums,
-        null=True,
-    )
-    is_modified_opinion = models.BooleanField(
-        "Modified Opinion finding", null=True, help_text=docs.modified_opinion
-    )
-    is_other_matters = models.BooleanField(
-        "Other Noncompliance finding", null=True, help_text=docs.other_non_compliance
-    )
     is_material_weakness = models.BooleanField(
         "Material Weakness finding",
         null=True,
         help_text=docs.material_weakness_findings,
     )
-    is_significant_deficiency = models.BooleanField(
-        "Significant Deficiency finding",
-        null=True,
-        help_text=docs.significant_deficiency_findings,
+    is_modified_opinion = models.BooleanField(
+        "Modified Opinion finding", null=True, help_text=docs.modified_opinion
     )
     is_other_findings = models.BooleanField(
         "Other findings", null=True, help_text=docs.other_findings
+    )
+    is_other_non_compliance = models.BooleanField(
+        "Other non-compliance", null=True, help_text=docs.other_non_compliance
+    )
+    # each element in the list is a FK to Finding
+    prior_finding_ref_numbers = models.CharField(
+        "Audit finding reference numbers from the immediate prior audit",
+        max_length=100,
+        help_text=docs.prior_finding_ref_nums,
+        null=True,
     )
     is_questioned_costs = models.BooleanField(
         "Questioned Costs", null=True, help_text=docs.questioned_costs_findings
@@ -99,6 +92,11 @@ class Finding(models.Model):
         "Indicates whether or not the audit finding was a repeat of an audit finding in the immediate prior audit",
         null=True,
         help_text=docs.repeat_finding,
+    )
+    is_significant_deficiency = models.BooleanField(
+        "Significant Deficiency finding",
+        null=True,
+        help_text=docs.significant_deficiency_findings,
     )
     type_requirement = models.CharField(
         "Type Requirement Failure",
@@ -124,7 +122,7 @@ class FederalAward(models.Model):
         max_length=40,
     )
 
-    award_seq_number = models.IntegerField(
+    award_seq_number = models.CharField(
         "Order that the award line was reported", default=-1
     )
 
