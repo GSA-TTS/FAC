@@ -58,9 +58,9 @@ class ETL(object):
         for entry in findings_uniform_guidance_entries:
             findings = entry["findings"]
             finding = Finding(
-                award_seq_number=entry.get("seq_number", 1),
+                award_seq_number=entry["award_index"],
                 report_id=self.report_id,
-                finding_seq_number=1,  # TODO: Where does this come from?
+                finding_seq_number=entry["seq_number"],
                 finding_ref_number=findings["reference_number"],
                 is_material_weakness=entry["material_weakness"] == "Y",
                 is_modified_opinion=entry["modified_opinion"] == "Y",

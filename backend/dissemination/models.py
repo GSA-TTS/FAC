@@ -46,7 +46,7 @@ class FindingText(models.Model):
 class Finding(models.Model):
     """A finding from the audit. References FederalAward and FindingText"""
 
-    award_seq_number = models.IntegerField(
+    award_seq_number = models.CharField(
         "Order that the award line was reported in Award",
         null=True,
     )
@@ -122,7 +122,7 @@ class FederalAward(models.Model):
         max_length=40,
     )
 
-    award_seq_number = models.IntegerField(
+    award_seq_number = models.CharField(
         "Order that the award line was reported", default=-1
     )
 
