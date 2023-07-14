@@ -160,6 +160,8 @@ DATABASES = {
     ),
 }
 
+POSTGREST = {"URL": env.str("POSTGREST_URL", "http://api:3000")}
+
 
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators

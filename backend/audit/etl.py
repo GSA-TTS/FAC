@@ -17,11 +17,14 @@ class ETL(object):
     def __init__(self, sac: SingleAuditChecklist) -> None:
         self.single_audit_checklist = sac
         self.report_id = sac.report_id
-        audit_date = sac.general_information["auditee_fiscal_period_start"]
+        audit_date = sac.general_information.get(
+            "auditee_fiscal_period_start", datetime.now
+        )
         self.audit_year = audit_date.split("-")[0]
 
     def load_all(self):
         self.load_general()
+        self.load_federal_award()
 
     def load_finding_texts(self):
         findings_text = self.single_audit_checklist.findings_text
@@ -57,13 +60,13 @@ class ETL(object):
             finding = Finding(
                 finding_ref_number=findings["reference_number"],
                 prior_finding_ref_numbers=findings.get("prior_references"),
-                modified_opinion=entry["modified_opinion"] == "Y",
-                other_non_compliance=entry["other_matters"] == "Y",
-                material_weakness=entry["material_weakness"] == "Y",
-                significant_deficiency=(entry["significant_deficiency"] == "Y"),
-                other_findings=entry["other_findings"] == "Y",
-                questioned_costs=entry["questioned_costs"] == "Y",
-                repeat_finding=(findings["repeat_prior_reference"] == "Y"),
+                is_modified_opinion=entry["modified_opinion"] == "Y",
+                is_other_matters=entry["other_matters"] == "Y",
+                is_material_weakness=entry["material_weakness"] == "Y",
+                is_significant_deficiency=(entry["significant_deficiency"] == "Y"),
+                is_other_findings=entry["other_findings"] == "Y",
+                is_questioned_costs=entry["questioned_costs"] == "Y",
+                is_repeat_finding=(findings["repeat_prior_reference"] == "Y"),
                 type_requirement=(entry["program"]["compliance_requirement"]),
                 report_id=self.report_id,
                 award_id=entry.get(
@@ -81,43 +84,37 @@ class ETL(object):
         federal_awards = self.single_audit_checklist.federal_awards
         for entry in federal_awards["FederalAwards"]["federal_awards"]:
             program = entry["program"]
-            agency_cfda = (
-                f"{entry['federal_agency_prefix']}." f"{entry['three_digit_extension']}"
-            )
             loan = entry["loan_or_loan_guarantee"]
             is_direct = entry["direct_or_indirect_award"]["is_direct"] == "Y"
             is_passthrough = entry["subrecipients"]["is_passed"] == "Y"
             cluster = entry["cluster"]
             subrecipient_amount = entry["subrecipients"].get("subrecipient_amount")
-            loan_balance = loan.get("loan_balance_at_audit_period_end")
             state_cluster_name = cluster.get("state_cluster_name")
             other_cluster_name = cluster.get("other_cluster_name")
             federal_award = FederalAward(
-                award_id=entry.get("seq_number", 1),
-                federal_program_name=program["program_name"],
-                agency_name="?",  # TODO: Where is this coming from?
-                agency_cfda=agency_cfda,
-                award_identification=(program["additional_award_identification"]),
-                research_and_development=None,  # TODO: Where does this come from?
-                loans=loan["is_guaranteed"] == "Y",
-                arra=None,  # TODO: Where does this come from?
-                direct=is_direct,
-                passthrough_award=is_passthrough,
-                major_program=program["is_major"] == "Y",
-                amount=program["amount_expended"],
-                program_total=program["federal_program_total"],
-                cluster_total=cluster["cluster_total"],
-                passthrough_amount=subrecipient_amount,
-                loan_balance=loan_balance,
-                cluster_name=cluster["cluster_name"],
-                state_cluster_name=state_cluster_name,
-                other_cluster_name=other_cluster_name,
-                type_requirement=None,  # TODO: What is this?
-                type_report_major_program=(program["audit_report_type"]),
-                findings_page=None,  # TODO: Where does this come from?
-                findings_count=program["number_of_audit_findings"],
-                questioned_costs=None,  # TODO: Where does this come from?
                 report_id=self.report_id,
+                award_seq_number=entry.get("seq_number", 1),
+                federal_agency_prefix=program["federal_agency_prefix"],
+                federal_award_extension=program["three_digit_extension"],
+                additional_award_identification=program[
+                    "additional_award_identification"
+                ],
+                federal_program_name=program["program_name"],
+                amount_expended=program["amount_expended"],
+                cluster_name=cluster["cluster_name"],
+                other_cluster_name=other_cluster_name,
+                state_cluster_name=state_cluster_name,
+                cluster_total=cluster["cluster_total"],
+                federal_program_total=program["federal_program_total"],
+                is_loan=loan["is_guaranteed"] == "Y",
+                loan_balance=None,  # TODO: Where does this come from?
+                is_direct=is_direct,
+                is_major=program["is_major"] == "Y",
+                mp_audit_report_type=program["audit_report_type"],
+                findings_count=None,  # TODO: Where does this come from?  Is it needed?
+                is_passthrough_award=is_passthrough,
+                passthrough_amount=subrecipient_amount,
+                type_requirement=None,  # TODO: What is this?
             )
             federal_award.save()
 
