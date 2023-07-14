@@ -66,7 +66,7 @@ services:
       PGRST_DB_URI: postgres://postgres@db:5432/postgres
       PGRST_OPENAPI_SERVER_PROXY_URI: http://127.0.0.1:3000
       PGRST_DB_ANON_ROLE: anon
-      PGRST_DB_SCHEMAS: api
+      PGRST_DB_SCHEMAS: "api_v1_0_0_beta,api"
     depends_on:
       - db
 volumes:
