@@ -307,7 +307,7 @@ notes_to_sefa_column_mapping: ColumnMapping = {
         "NotesToSefa.notes_to_sefa_entries",
         "seq_number",
         _set_by_path,
-    ),    
+    ),
 }
 
 
