@@ -1,3 +1,5 @@
+from datetime import date
+
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db.utils import IntegrityError
 from django.test import TestCase
@@ -5,7 +7,7 @@ from django.test import TestCase
 from django_fsm import TransitionNotAllowed
 from model_bakery import baker
 
-from .models import Access, ExcelFile, SingleAuditChecklist, User
+from .models import Access, ExcelFile, SingleAuditChecklist, SingleAuditReportFile, User
 
 
 class SingleAuditChecklistTests(TestCase):
@@ -83,6 +85,7 @@ class SingleAuditChecklistTests(TestCase):
             ),
         )
 
+        now = date.today()
         for statuses_from, status_to, transition_name in cases:
             for status_from in statuses_from:
                 sac = baker.make(SingleAuditChecklist, submission_status=status_from)
@@ -91,6 +94,7 @@ class SingleAuditChecklistTests(TestCase):
                 transition_method()
 
                 self.assertEqual(sac.submission_status, status_to)
+                self.assertGreaterEqual(sac.get_transition_date(status_to), now)
 
                 bad_statuses = [
                     status[0]
@@ -176,3 +180,18 @@ class ExcelFileTests(TestCase):
         report_id = SingleAuditChecklist.objects.get(id=excel_file.sac.id).report_id
 
         self.assertEqual(f"{report_id}--sectionname.xlsx", excel_file.filename)
+
+
+class SingleAuditReportFileTests(TestCase):
+    """Model tests"""
+
+    def test_filename_generated(self):
+        """
+        The filename field should be generated based on the FileField filename
+        """
+        file = SimpleUploadedFile("this is a file.pdf", b"this is a file")
+
+        sar_file = baker.make(SingleAuditReportFile, file=file)
+        report_id = SingleAuditChecklist.objects.get(id=sar_file.sac.id).report_id
+
+        self.assertEqual(f"{report_id}.pdf", sar_file.filename)

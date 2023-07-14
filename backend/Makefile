@@ -53,17 +53,19 @@ nctest:
 
 docker-first-run:
 	docker compose build
-	docker compose run web python manage.py makemigrations
-	docker compose run web python manage.py migrate
-	docker compose run web python manage.py load_test_data
+	docker compose run web bash -c '\
+		python manage.py makemigrations &&\
+		python manage.py create_api_schemas &&\
+		python manage.py migrate &&\
+		python manage.py create_api_views\
+		'
+	# docker compose run web python manage.py load_test_data
 
-	
 # Run Django tests with docker
 docker-test:
 	docker compose build
 	docker compose run web python manage.py migrate
-	docker-compose run web bash -c 'coverage run --parallel-mode --concurrency=multiprocessing manage.py test --parallel && \
-          coverage combine && coverage report -m --fail-under=90'
+	docker compose run web bash -c 'coverage run --parallel-mode --concurrency=multiprocessing manage.py test --parallel && coverage combine && coverage report -m --fail-under=90'
 
 # Run Django tests with docker with no coverage and with scoping
 # e.g. just the audit/test_models.py tests:
@@ -75,11 +77,33 @@ docker-nctest:
 	docker compose run web python manage.py migrate
 	docker compose run web python manage.py test --parallel ${fac.test.scope}
 
+docker-lint:
+	docker compose build
+	docker compose run web bash -c 'flake8 && black --check . && bandit -c pyproject.toml -r . && mypy . && djlint .'
+
+ghcr-first-run:
+	docker compose -f docker-compose-web.yml run web python manage.py makemigrations
+	docker compose -f docker-compose-web.yml run web python manage.py migrate
+	docker compose -f docker-compose-web.yml run web python manage.py load_test_data
+
+# Run Django tests with docker
+ghcr-test:
+	docker compose -f docker-compose-web.yml run web python manage.py migrate
+	docker compose -f docker-compose-web.yml run web bash -c 'coverage run --parallel-mode --concurrency=multiprocessing manage.py test --parallel && coverage combine && coverage report -m --fail-under=90'
+
+# Run Django tests with docker with no coverage and with scoping
+# e.g. just the audit/test_models.py tests:
+#     make nctest fac.test.scope=audit.test_models"
+# or all tests with no coverage:
+#     make nctest
+ghcr-nctest:
+	docker compose -f docker-compose-web.yml run web python manage.py migrate
+	docker compose -f docker-compose-web.yml run web python manage.py test --parallel ${fac.test.scope}
+
+ghcr-lint:
+	docker compose -f docker-compose-web.yml run web bash -c 'flake8 && black --check . && bandit -c pyproject.toml -r . && mypy . && djlint .'
+
 docker-clean:
 	docker compose down
 	docker rm -f $(shell docker ps -a -q)
 	docker volume rm $(shell docker volume ls -q)
-
-docker-lint:
-	docker compose build
-	docker-compose run web bash -c 'flake8 && black --check . && bandit -c pyproject.toml -r . && mypy . && djlint .'

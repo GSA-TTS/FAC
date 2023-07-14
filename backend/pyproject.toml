@@ -6,19 +6,12 @@ exclude = "node_modules/"
 
 [tool.mypy]
 ignore_missing_imports = true
+explicit_package_bases = true
+exclude = ".venv/|audit/migrations/"
 
 [tool.pylint."MESSAGES CONTROL"]
 # Tadhg 2022-05-03: I added the below because I've found them unhelpful.
 #                   Anybody should feel free to alter these as needed.
-
-[tool.bandit]
-# TDB 2022-12-07 - test_schemas and test_validators use random number generation, which bandit doesn't like
-exclude_dirs = [
-    "audit/test_schemas.py",
-    "audit/test_validators.py",
-    "node_modules", 
-]
-
 enable = [
     "use-symbolic-message-instead",
     "useless-supression",
@@ -30,6 +23,7 @@ disable = [
     "format",
     "import-error",
     "missing-module-docstring",
+    "no-member",  # PyLint is consistently wrong about "missing" Django object methods
     "no-value-for-parameter",
     "pointless-string-statement",
     "protected-access",
@@ -38,6 +32,16 @@ disable = [
     "unsubscriptable-object",
 ]
 
+
+[tool.bandit]
+# TDB 2022-12-07 - test_schemas and test_validators use random number generation, which bandit doesn't like
+exclude_dirs = [
+    "audit/test_schemas.py",
+    "audit/test_validators.py",
+    "node_modules",
+    "dissemination/tests.py",
+]
+
 [tool.djlint]
 ignore="H006,H022,H023,H019,H031"
-# img_height, https,entity,javascript,lang
+# img_height,https,entity,javascript,lang

@@ -109,6 +109,13 @@ local Validations = {
   ],
   ProgramValidations: [
     {
+      properties: {
+        number_of_audit_findings: Types.integer {
+          minimum: 0,
+        },
+      },
+    },
+    {
       'if': {
         properties: {
           is_major: {
@@ -138,14 +145,6 @@ local Validations = {
             },
           },
         },
-        'else': {
-          properties: {
-            audit_report_type: Base.Enum.MajorProgramAuditReportType,
-            number_of_audit_findings: Types.integer {
-              const: 0,
-            },
-          },
-        },
       },
     },
     {
@@ -163,9 +162,7 @@ local Validations = {
       'then': {
         properties: {
           audit_report_type: Base.Enum.EmptyString_Null,
-          number_of_audit_findings: { const: 0 },
         },
-
       },
     },
     Base.Validation.AdditionalAwardIdentificationValidation[0],
@@ -214,7 +211,7 @@ local Parts = {
         },
         'then': {
           required: [
-          'state_cluster_name',
+            'state_cluster_name',
           ],
           allOf: [
             {
@@ -240,8 +237,8 @@ local Parts = {
         },
         'then': {
           required: [
-          'other_cluster_name',
-          ],          
+            'other_cluster_name',
+          ],
           allOf: [
             {
               properties: {
@@ -316,7 +313,7 @@ local Parts = {
       audit_report_type: Types.string,
       number_of_audit_findings: Types.integer,
     },
-    required: ['program_name', 'federal_agency_prefix', 'three_digit_extension', 'is_major', 'audit_report_type', 'number_of_audit_findings'],
+    required: ['program_name', 'federal_agency_prefix', 'three_digit_extension', 'is_major', 'number_of_audit_findings'],
     allOf: Validations.ProgramValidations,
   },
 };

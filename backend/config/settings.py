@@ -106,7 +106,15 @@ INSTALLED_APPS += [
 ]
 
 # Our apps
-INSTALLED_APPS += ["audit", "api", "users", "report_submission", "cms", "data_distro"]
+INSTALLED_APPS += [
+    "audit",
+    "api",
+    "users",
+    "report_submission",
+    "cms",
+    # "data_distro",
+    "dissemination",
+]
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -133,6 +141,9 @@ TEMPLATES = [
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
             ],
+            "builtins": [
+                "report_submission.templatetags.get_attr",
+            ],
         },
     },
 ]
@@ -148,6 +159,8 @@ DATABASES = {
         "DATABASE_URL", default="postgres://postgres:password@0.0.0.0/backend"
     ),
 }
+
+POSTGREST = {"URL": env.str("POSTGREST_URL", "http://api:3000")}
 
 
 # Password validation
@@ -233,7 +246,7 @@ if ENVIRONMENT not in ["DEVELOPMENT", "STAGING", "PRODUCTION"]:
 else:
     # One of the Cloud.gov environments
     STATICFILES_STORAGE = "storages.backends.s3boto3.S3ManifestStaticStorage"
-    DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
+    DEFAULT_FILE_STORAGE = "report_submission.storages.S3PrivateStorage"
     vcap = json.loads(env.str("VCAP_SERVICES"))
     for service in vcap["s3"]:
         if service["instance_name"] == "fac-public-s3":
@@ -258,7 +271,6 @@ else:
             STATIC_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/{AWS_LOCATION}/"
 
             STATICFILES_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
-            DEFAULT_FILE_STORAGE = "cts_forms.storages.PrivateS3Storage"
             AWS_IS_GZIPPED = True
 
         elif service["instance_name"] == "fac-private-s3":
@@ -280,7 +292,9 @@ else:
             AWS_PRIVATE_DEFAULT_ACL = "private"
             # If wrong, https://docs.aws.amazon.com/AmazonS3/latest/userguide/acl-overview.html#canned-acl
 
-            MEDIA_URL = f"https://{AWS_S3_PRIVATE_CUSTOM_DOMAIN}/{AWS_LOCATION}/"
+            MEDIA_URL = (
+                f"https://{AWS_S3_PRIVATE_CUSTOM_DOMAIN}/{AWS_PRIVATE_LOCATION}/"
+            )
 
     # secure headers
     MIDDLEWARE.append("csp.middleware.CSPMiddleware")
@@ -301,7 +315,7 @@ else:
     CSP_IMG_SRC = allowed_sources
     CSP_MEDIA_SRC = allowed_sources
     CSP_FRAME_SRC = allowed_sources
-    CSP_FONT_SRC = ("self", bucket)
+    CSP_FONT_SRC = ("'self'", bucket)
     CSP_WORKER_SRC = allowed_sources
     CSP_FRAME_ANCESTORS = allowed_sources
     CSP_STYLE_SRC = allowed_sources

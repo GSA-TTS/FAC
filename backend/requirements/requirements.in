@@ -10,6 +10,7 @@ djangorestframework
 djangorestframework-simplejwt
 django-fsm
 environs[django]
+faker
 gunicorn
 jsonpath-ng
 jsonschema
@@ -21,6 +22,7 @@ psycopg2-binary
 pycryptodome
 pydash
 pyjwt
+pypdf
 python-json-logger
 python-slugify
 pyyaml

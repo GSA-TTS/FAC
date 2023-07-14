@@ -8,14 +8,17 @@ from django.utils.translation import gettext_lazy as _
 from django.conf import settings
 import requests
 from openpyxl import load_workbook
+from pypdf import PdfReader
 
 from audit.excel import (
+    additional_ueis_named_ranges,
     corrective_action_plan_named_ranges,
     federal_awards_named_ranges,
     findings_text_named_ranges,
     findings_uniform_guidance_named_ranges,
 )
 from audit.fixtures.excel import (
+    ADDITIONAL_UEIS_TEMPLATE_DEFINITION,
     CORRECTIVE_ACTION_TEMPLATE_DEFINITION,
     FEDERAL_AWARDS_TEMPLATE_DEFINITION,
     FINDINGS_TEXT_TEMPLATE_DEFINITION,
@@ -27,12 +30,17 @@ logger = logging.getLogger(__name__)
 
 
 MAX_EXCEL_FILE_SIZE_MB = 25
+MAX_SINGLE_AUDIT_REPORT_FILE_SIZE_MB = 30
 
-ALLOWED_EXCEL_FILE_EXTENSIONS = [".xls", ".xlsx"]
+ALLOWED_EXCEL_FILE_EXTENSIONS = [".xlsx"]
+ALLOWED_SINGLE_AUDIT_REPORT_EXTENSIONS = [".pdf"]
 
 ALLOWED_EXCEL_CONTENT_TYPES = [
     "application/vnd.ms-excel",
     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+]
+ALLOWED_SINGLE_AUDIT_REPORT_CONTENT_TYPES = [
+    "application/pdf",
 ]
 
 # https://github.com/ajilaag/clamav-rest#status-codes
@@ -120,6 +128,19 @@ def validate_findings_uniform_guidance_json(value):
         raise ValidationError(message=_findings_uniform_guidance_json_error(errors))
 
 
+def validate_additional_ueis_json(value):
+    """
+    Apply JSON Schema for additional UEIs and report errors.
+    """
+    schema_path = settings.SECTION_SCHEMA_DIR / "AdditionalUeis.schema.json"
+    schema = json.loads(schema_path.read_text(encoding="utf-8"))
+
+    validator = Draft7Validator(schema)
+    errors = list(validator.iter_errors(value))
+    if len(errors) > 0:
+        raise ValidationError(message=_additional_ueis_json_error(errors))
+
+
 def validate_findings_text_json(value):
     """
     Apply JSON Schema for findings text and report errors.
@@ -175,7 +196,7 @@ def validate_general_information_json(value):
     return value
 
 
-def validate_excel_file_extension(file):
+def validate_file_extension(file, allowed_extensions):
     """
     User-provided filenames must be have an allowed extension
     """
@@ -183,31 +204,31 @@ def validate_excel_file_extension(file):
 
     logger.info(f"Uploaded file {file.name} extension: {extension}")
 
-    if not extension.lower() in ALLOWED_EXCEL_FILE_EXTENSIONS:
+    if not extension.lower() in allowed_extensions:
         raise ValidationError(
-            f"Invalid extension - allowed extensions are {', '.join(ALLOWED_EXCEL_FILE_EXTENSIONS)}"
+            f"Invalid extension - allowed extensions are {', '.join(allowed_extensions)}"
         )
 
     return extension
 
 
-def validate_excel_file_content_type(file):
+def validate_file_content_type(file, allowed_content_types):
     """
     Files must have an allowed content (MIME) type
     """
     logger.info(f"Uploaded file {file.name} content-type: {file.file.content_type}")
 
-    if file.file.content_type not in ALLOWED_EXCEL_CONTENT_TYPES:
+    if file.file.content_type not in allowed_content_types:
         raise ValidationError(
-            f"Invalid content type - allowed types are {', '.join(ALLOWED_EXCEL_CONTENT_TYPES)}"
+            f"Invalid content type - allowed types are {', '.join(allowed_content_types)}"
         )
 
     return file.file.content_type
 
 
-def validate_excel_file_size(file):
+def validate_file_size(file, max_file_size_mb):
     """Files must be under the maximum allowed file size"""
-    max_file_size = MAX_EXCEL_FILE_SIZE_MB * 1024 * 1024
+    max_file_size = max_file_size_mb * 1024 * 1024
 
     logger.info(
         f"Uploaded file {file.name} size: {file.size} (max allowed: {max_file_size})"
@@ -216,7 +237,7 @@ def validate_excel_file_size(file):
     if file.size > max_file_size:
         file_size_mb = round(file.size / 1024 / 1024, 2)
         raise ValidationError(
-            f"This file size is: {file_size_mb} MB this cannot be uploaded, maximum allowed: {MAX_EXCEL_FILE_SIZE_MB} MB"
+            f"This file size is: {file_size_mb} MB this cannot be uploaded, maximum allowed: {max_file_size_mb} MB"
         )
 
     return file.size
@@ -272,9 +293,9 @@ def validate_excel_file_integrity(file):
 
 
 def validate_excel_file(file):
-    validate_excel_file_extension(file)
-    validate_excel_file_content_type(file)
-    validate_excel_file_size(file)
+    validate_file_extension(file, ALLOWED_EXCEL_FILE_EXTENSIONS)
+    validate_file_content_type(file, ALLOWED_EXCEL_CONTENT_TYPES)
+    validate_file_size(file, MAX_EXCEL_FILE_SIZE_MB)
     validate_file_infection(file)
     validate_excel_file_integrity(file)
 
@@ -294,7 +315,7 @@ def _get_error_details(xlsx_definition_template, named_ranges_row_indices):
                     )
                 )
                 break
-        for single_cell in xlsx_definition_template["sheets"][0]["single_cells"]:
+        for single_cell in xlsx_definition_template["sheets"][1]["single_cells"]:
             if single_cell["range_name"] == named_range:
                 error_details.append(
                     (
@@ -342,3 +363,59 @@ def _findings_uniform_guidance_json_error(errors):
     )
     template = json.loads(template_definition_path.read_text(encoding="utf-8"))
     return _get_error_details(template, findings_uniform_guidance_named_ranges(errors))
+
+
+def validate_single_audit_report_file_extension(file):
+    """
+    User-provided filenames must be have an allowed extension
+    """
+    _, extension = os.path.splitext(file.name)
+
+    logger.info(f"Uploaded file {file.name} extension: {extension}")
+
+    if not extension.lower() in ALLOWED_EXCEL_FILE_EXTENSIONS:
+        raise ValidationError(
+            f"Invalid extension - allowed extensions are {', '.join(ALLOWED_EXCEL_FILE_EXTENSIONS)}"
+        )
+
+    return extension
+
+
+def validate_pdf_file_integrity(file):
+    """Files must be readable PDFs"""
+    try:
+        reader = PdfReader(file)
+
+        if reader.is_encrypted:
+            raise ValidationError(
+                "We were unable to process the file you uploaded because it is encrypted."
+            )
+
+        all_text = "".join([p.extract_text() for p in reader.pages])
+
+        if len(all_text) == 0:
+            raise ValidationError(
+                "We were unable to process the file you uploaded because it contains no readable text."
+            )
+
+    except ValidationError:
+        raise
+    except Exception:
+        raise ValidationError("We were unable to process the file you uploaded.")
+
+
+def validate_single_audit_report_file(file):
+    validate_file_extension(file, ALLOWED_SINGLE_AUDIT_REPORT_EXTENSIONS)
+    validate_file_content_type(file, ALLOWED_SINGLE_AUDIT_REPORT_CONTENT_TYPES)
+    validate_file_size(file, MAX_SINGLE_AUDIT_REPORT_FILE_SIZE_MB)
+    validate_file_infection(file)
+    validate_pdf_file_integrity(file)
+
+
+def _additional_ueis_json_error(errors):
+    """Process JSON Schema errors for additional UEIs"""
+    template_definition_path = (
+        XLSX_TEMPLATE_DEFINITION_DIR / ADDITIONAL_UEIS_TEMPLATE_DEFINITION
+    )
+    template = json.loads(template_definition_path.read_text(encoding="utf-8"))
+    return _get_error_details(template, additional_ueis_named_ranges(errors))

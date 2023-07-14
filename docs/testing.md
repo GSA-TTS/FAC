@@ -23,16 +23,16 @@ The test suite is run with Django's `test` management command. A number of helpf
 
 ```shell
 # Run the whole test suite
-docker-compose run web python manage.py test
+docker compose run web python manage.py test
 
 # Run only the tests within the `audit` app
-docker-compose run web python manage.py test audit
+docker compose run web python manage.py test audit
 
 # Run only the tests within the `audit.test_models` module
-docker-compose run web python manage.py test audit.test_models
+docker compose run web python manage.py test audit.test_models
 
 # Run only the tests within the `audit.test_models.SingleAuditChecklistTests` class
-docker-compose run web python manage.py test audit.test_models.SingleAuditChecklistTests
+docker compose run web python manage.py test audit.test_models.SingleAuditChecklistTests
 ```
 We are configured to require 90% test coverage. If a file should not be counted for test coverage, it can be added to the `.coveragerc` file with an explanation. For example, we don't need tests for environment specific settings so that is added there.
 
@@ -93,7 +93,7 @@ We are using [bandit](https://bandit.readthedocs.io/en/latest/) for static code 
 
 Run this locally via docker:
 ```
- docker-compose run web bandit -r crt_portal/
+ docker compose run web bandit -r crt_portal/
 ```
 
 Bandit tests are executed as part of our CI/CD pipeline on each PR to the `main` branch, commit to the `main` branch, and PR into the `prod` branch.

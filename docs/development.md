@@ -160,6 +160,49 @@ docker compose run web python manage.py load_test_data
 
 If you want to load more data, see the section on loading previous years.
 
+### Load SingleAuditChecklist fixtures
+
+You can also load fake fixture data for single audit checklists. There is a list
+of users in
+[`backend/users/fixtures/user_fixtures.py`](/backend/users/fixtures/user_fixtures.py)
+that will be created by default. If you are a new developer, you can add your
+information in that file so that there will be a user created for you if
+necessary and various submission fixtures available to that user. You will need your
+Login.gov sandbox UUID to specify as your "username". The easiest way to get that is to
+log in while running in a local Docker environment and look for the message that says something like
+
+```
+INFO Successfully logged in user b276a5b3-2d2a-42a3-a078-ad57a36975d4
+```
+
+Once you have a user listed in that file, you can run the command
+
+```shell
+docker compose run web python manage.py load_fixtures
+```
+
+It is not completely obvious that you would want to, but you could run this in
+one of the Cloud.gov environments with `cf run-task` like
+
+```shell
+cf run-task ENVIRONMENT --command "./manage.py load_fixtures" --name fixtures
+```
+
+You can also run this command for users by email address(es). These users do
+not have to be present in
+[`backend/users/fixtures/user_fixtures.py`](/backend/users/fixtures/user_fixtures.py),
+but must have logged into the system in order for this to work.
+
+```shell
+docker compose run web python manage.py load_fixtures userone@example.com usertwo@example.com
+```
+
+This will create a fake submission for each of the users. These submissions
+will be separate for each user—this command only associates one user with each
+fake submission.
+
+Note that all of these fake submissions use the same UEI.
+
 ### Create a test bucket
 
 We need a mocked S3 bucket for testing.
