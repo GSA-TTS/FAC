@@ -7,6 +7,7 @@ local NotesToSefaEntry = {
   properties: {
     note_title: Types.string,
     note_content: Types.string,
+    seq_number: Types.integer,
   },
   required: ['note_title', 'note_content'],
   title: 'NotesToSefaEntry',

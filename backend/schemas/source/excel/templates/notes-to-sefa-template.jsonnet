@@ -51,7 +51,6 @@ local other_single_cells = [
 local open_ranges_defns = [
   [
     Sheets.open_range {
-      title_cell: 'A1',
       width: 36,
       help: Help.plain_text,
     },
@@ -61,13 +60,22 @@ local open_ranges_defns = [
   ],
   [
     Sheets.open_range {
-      title_cell: 'B1',
       width: 56,
       help: Help.plain_text,
     },
     SV.NoValidation,
     'Note content',
     'note_content',
+  ],
+  [
+    Sheets.open_range {
+      formula: '=IF(A{0}<>"", ROW()-1, "")',
+      width: 18,
+      help: Help.unknown,
+    },
+    SV.NoValidation,
+    'Sequence number (Read Only)',
+    'seq_number',
   ],
 ];
 
@@ -79,7 +87,7 @@ local sheets = [
   },
   {
     name: sefaAdditionalSheet,
-    open_ranges: Fun.make_open_ranges_with_column(title_row, open_ranges_defns),
+    open_ranges: Fun.make_open_ranges(title_row, open_ranges_defns),
     header_height: 100,
   },
   {
