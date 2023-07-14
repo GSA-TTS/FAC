@@ -25,6 +25,7 @@ class ETL(object):
     def load_all(self):
         self.load_general()
         self.load_federal_award()
+        self.load_findings()
 
     def load_finding_texts(self):
         findings_text = self.single_audit_checklist.findings_text
@@ -186,32 +187,22 @@ class ETL(object):
             auditee_certify_title=None,  # TODO: Where does this come from?
             auditee_contact_name=general_information["auditee_contact_name"],
             auditee_email=general_information["auditee_email"],
-            hist_auditee_fax=None,
             auditee_name=general_information["auditee_name"],
             auditee_phone=general_information["auditee_phone"],
             auditee_contact_title=general_information["auditee_contact_title"],
             auditee_address_line_1=general_information["auditee_address_line_1"],
-            hist_auditee_address_line_2=None,
             auditee_city=general_information["auditee_city"],
             auditee_state=general_information["auditee_state"],
             auditee_ein=general_information["ein"],
-            multiple_ein=None,  # TODO: Where does this value come from?
-            auditee_duns=[],  # TODO: Where does this value come from?
-            multiple_duns=None,  # TODO: Where does this value come from?
-            auditee_uei=None,  # TODO: Where does this come from?
-            multiple_uei=[],  # TODO: Where does this come from?
+            auditee_uei=general_information["auditee_uei"],
             auditee_addl_uei_list=[],  # TODO: Where does this come from?
             auditee_addl_ein_list=[],  # TODO: Where does this come from?
-            auditee_addl_duns_list=[],  # TODO: Where does this come from?
-            ein_subcode=None,  # TODO: Notes say this field is not in use.
             auditee_zip=general_information["auditee_zip"],
             auditor_phone=general_information["auditor_phone"],
-            hist_auditor_fax=None,
             auditor_state=general_information["auditor_state"],
             auditor_city=general_information["auditor_city"],
             auditor_contact_title=general_information["auditor_contact_title"],
             auditor_address_line_1=general_information["auditor_address_line_1"],
-            hist_auditor_address_line_2=None,
             auditor_zip=general_information["auditor_zip"],
             auditor_country=general_information["auditor_country"],
             auditor_contact_name=general_information["auditor_contact_name"],
@@ -219,7 +210,6 @@ class ETL(object):
             auditor_firm_name=general_information["auditor_firm_name"],
             auditor_foreign_addr=None,  # TODO: Where does this come from?
             auditor_ein=general_information["auditor_ein"],
-            multiple_auditors=None,  # TODO: Where does this value come from?
             pdf_url=None,  # TODO: Where does this come from?
             cognizant_agency=None,  # TODO: Where does this come from?
             oversight_agency=None,  # TODO: Where does this come from?
@@ -232,13 +222,8 @@ class ETL(object):
             date_received=None,  # TODO: Where does this come from?
             fy_end_date=general_information["auditee_fiscal_period_end"],
             fy_start_date=None,  # TODO: Where does this come from?
-            hist_previous_completed_on=None,
-            hist_previous_date_published=None,
-            hist_completed_date=None,
-            hist_component_date_received=None,
             audit_year=self.audit_year,
             audit_type=general_information["audit_type"],
-            hist_reportable_condition=None,
             is_significant_deficiency=None,  # TODO: Where does this come from?
             is_material_weakness=None,  # TODO: Where does this come from?
             condition_or_deficiency_major_program=None,  # TODO: Where does this come from?
