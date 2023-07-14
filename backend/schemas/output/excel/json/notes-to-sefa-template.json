@@ -87,6 +87,21 @@
                   "type": "NOVALIDATION"
                },
                "width": 56
+            },
+            {
+               "formula": "=IF(A{0}<>\"\", ROW()-1, \"\")",
+               "help": {
+                  "link": "https://fac.gov/documentation/validation/#unknown",
+                  "text": "If you see this error, please contact support."
+               },
+               "range_name": "seq_number",
+               "title": "Sequence number (Read Only)",
+               "title_cell": "C1",
+               "type": "open_range",
+               "validation": {
+                  "type": "NOVALIDATION"
+               },
+               "width": 18
             }
          ]
       },
