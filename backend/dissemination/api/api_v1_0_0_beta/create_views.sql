@@ -1,6 +1,16 @@
 
 begin;
 
+drop table if exists api_v1_0_0_beta.metadata;
+create table api_v1_0_0_beta.metadata as
+select * 
+from 
+(values 	('version', '1.0.0-beta'), 
+        	('last_updated', '2023-07-14')) 
+as metadata(key, value)
+;
+
+
 drop view if exists api_v1_0_0_beta.general;
 create view api_v1_0_0_beta.general as
     select gen.*, 

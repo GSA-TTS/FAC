@@ -4,12 +4,17 @@ from typing import List
 
 # These are API versions we want live.
 live = [
+    # The "base" view is actually configuration for 
+    # PostgREST. Always leave it here.
+    "base",
+    # These are API versions we have in flight.
     "api_v1_0_0_beta",
 ]
 
-# These versions will have their schemas dropped
-# in a cascade
-deprecated: List[str] = []
+# These are API versions we have deprecated.
+# They will be removed. It should be safe to leave them
+# here for repeated runs.
+deprecated: List[str] = [ "api" ]
 
 
 def get_conn_string():
