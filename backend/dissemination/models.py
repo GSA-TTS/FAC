@@ -423,7 +423,7 @@ class Revision(models.Model):
         help_text=docs.general_info,
     )
     audit_year = models.IntegerField(
-        "Audit Year and DBKEY (database key) combined make up the primary key.",
+        "Audit year from fy_start_date",
         help_text=docs.audit_year_revisions,
     )
     report_id = models.CharField(
@@ -663,7 +663,7 @@ class General(models.Model):
         "Fiscal Year Start Date", null=True, help_text=docs.fy_start_date
     )
     audit_year = models.IntegerField(
-        "Audit Year, derived from fy_start_date.",
+        "Audit year from fy_start_date.",
         help_text=docs.audit_year_general,
     )
 
@@ -809,7 +809,7 @@ class General(models.Model):
 
     # Metadata
     dbkey = models.CharField(
-        "Audit Year and DBKEY (database key) combined make up the primary key. Only on records created by Census.",
+        "Audit Year from .",
         max_length=40,
         help_text=docs.dbkey_general,
     )
