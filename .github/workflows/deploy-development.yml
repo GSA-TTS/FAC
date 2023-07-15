@@ -1,7 +1,9 @@
 ---
 name: Deploy to Development and Management Environment
 on:
-  workflow_dispatch: null
+  push:
+    branches:
+      - main
 
 jobs:
   # ensure that every time a push to main occurs, the container is built and published to ghcr
