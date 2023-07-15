@@ -16,16 +16,16 @@ begin
             grant select
         -- this includes views
         on tables
-        to api_fac_gov_anon;
+        to api_fac_gov;
 
         -- Grant access to sequences, if we have them
-        grant usage on schema api_v1_0_0_beta to api_fac_gov_anon;
-        grant select, usage on all sequences in schema api_v1_0_0_beta to api_fac_gov_anon;
+        grant usage on schema api_v1_0_0_beta to api_fac_gov;
+        grant select, usage on all sequences in schema api_v1_0_0_beta to api_fac_gov;
         alter default privileges
             in schema api_v1_0_0_beta
             grant select, usage
         on sequences
-        to api_fac_gov_anon;
+        to api_fac_gov;
     end if;
 end
 $$
