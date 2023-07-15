@@ -21,6 +21,7 @@ from audit.excel import (
     extract_corrective_action_plan,
     extract_findings_text,
     extract_findings_uniform_guidance,
+    extract_secondary_auditors,
 )
 from audit.mixins import (
     CertifyingAuditeeRequiredMixin,
@@ -90,6 +91,7 @@ class ExcelFileHandlerView(SingleAuditChecklistAccessRequiredMixin, generic.View
         ),
         FORM_SECTIONS.FINDINGS_TEXT: (extract_findings_text, "findings_text"),
         FORM_SECTIONS.ADDITIONAL_UEIS: (extract_additional_ueis, "additional_ueis"),
+        FORM_SECTIONS.SECONDARY_AUDITORS: (extract_secondary_auditors, "secondary_auditors"),
     }
 
     # this is marked as csrf_exempt to enable by-hand testing via tools like Postman. Should be removed when the frontend form is implemented!

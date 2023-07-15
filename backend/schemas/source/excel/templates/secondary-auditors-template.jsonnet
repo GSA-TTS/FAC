@@ -2,15 +2,17 @@ local Fun = import '../libs/Functions.libsonnet';
 local Help = import '../libs/Help.libsonnet';
 local SV = import '../libs/SheetValidations.libsonnet';
 local Sheets = import '../libs/Sheets.libsonnet';
-
-local title_row = 3;
+local textSheet = 'Form';
+local ueiSheet = 'UEI';
+local title_row = 1;
 
 local single_cells = [
   Sheets.single_cell {
     title: 'Auditee UEI',
     range_name: 'auditee_uei',
-    title_cell: 'A2',
-    range_cell: 'B2',
+    width: 36,
+    title_cell: 'A1',
+    range_cell: 'A2',
     validation: SV.StringOfLengthTwelve,
     help: Help.uei,
   },
@@ -19,120 +21,116 @@ local single_cells = [
 local open_ranges_defns = [
   [
     Sheets.open_range {
-      title_cell: 'A3',
+      title_cell: 'A1',
       width: 100,
       help: Help.plain_text,
     },
     SV.NoValidation,
     'Audit Firm/Organization Name',
-    'auditor_name',
+    'secondary_auditor_name',
   ],
   [
     Sheets.open_range {
-      title_cell: 'B3',
+      title_cell: 'B1',
       width: 36,
       help: Help.ein,
     },
     SV.StringOfLengthNine,
-    'Audit Firm/Organization EIN',
-    'auditor_ein',
+    'Audit Firm or Organization EIN',
+    'secondary_auditor_ein',
   ],
   [
     Sheets.open_range {
-      title_cell: 'C3',
+      title_cell: 'C1',
       width: 100,
-      help: Help.plain_text
+      help: Help.plain_text,
     },
     SV.NoValidation,
     'Audit Firm/Organization Address (Number and Street)',
-    'auditor_address'
+    'secondary_auditor_address',
   ],
   [
     Sheets.open_range {
-      title_cell: 'D3',
+      title_cell: 'D1',
       width: 100,
-      help: Help.plain_text
+      help: Help.plain_text,
     },
     SV.NoValidation,
     'Audit Firm/Organization City',
-    'auditor_city'
+    'secondary_auditor_city',
   ],
   [
     Sheets.open_range {
-      title_cell: 'E3',
+      title_cell: 'E1',
       width: 100,
-      help: Help.plain_text
+      help: Help.plain_text,
     },
     SV.NoValidation,
     'Audit Firm/Organization State',
-    'auditor_state'
+    'secondary_auditor_state',
   ],
   [
     Sheets.open_range {
-      title_cell: 'F3',
-      width: 100,
-      help: Help.plain_text
+      title_cell: 'F1',
+      width: 36,
+      help: Help.plain_text,
     },
     SV.NoValidation,
     'Audit Firm/Organization ZIP',
-    'auditor_zip'
+    'secondary_auditor_zip',
   ],
   [
     Sheets.open_range {
-      title_cell: 'G3',
-      width: 100,
-      help: Help.plain_text
+      title_cell: 'G1',
+      width: 36,
+      help: Help.plain_text,
     },
     SV.NoValidation,
     'Contact Name',
-    'contact_name'
+    'secondary_auditor_contact_name',
   ],
   [
     Sheets.open_range {
-      title_cell: 'H3',
-      width: 100,
-      help: Help.plain_text
+      title_cell: 'H1',
+      width: 36,
+      help: Help.plain_text,
     },
     SV.NoValidation,
     'Contact Title',
-    'contact_title'
+    'secondary_auditor_contact_title',
   ],
   [
     Sheets.open_range {
-      title_cell: 'I3',
-      width: 100,
-      help: Help.plain_text
+      title_cell: 'I1',
+      width: 36,
+      help: Help.plain_text,
     },
     SV.NoValidation,
     'Contact Phone Number',
-    'contact_phone'
+    'secondary_auditor_contact_phone',
   ],
   [
     Sheets.open_range {
-      title_cell: 'J3',
-      width: 100,
-      help: Help.plain_text
+      title_cell: 'J1',
+      width: 36,
+      help: Help.plain_text,
     },
     SV.NoValidation,
     'Contact E-mail',
-    'contact_email'
+    'secondary_auditor_contact_email',
   ],
 ];
 
 local sheets = [
   {
-    name: 'Form',
-    single_cells: single_cells,
+    name: textSheet,
     open_ranges: Fun.make_open_ranges_with_column(title_row, open_ranges_defns),
-    mergeable_cells: [
-      [1, 2, 'A', 'J'],
-      [2, 3, 'C', 'H'],
-      [3, Sheets.MAX_ROWS, 'A', 'B'],
-      [3, Sheets.MAX_ROWS, 'C', 'F'],
-      [3, Sheets.MAX_ROWS, 'G', 'H'],
-    ],
-    merged_unreachable: ['B', 'D', 'E', 'F', 'H'],
-    header_inclusion: ['A1', 'C2'],
+    header_height: 48,
+  },
+  {
+    name: ueiSheet,
+    single_cells: single_cells,
+    header_height: 48,
   },
 ];
 

@@ -1,0 +1,174 @@
+{
+   "$schema": "https://json-schema.org/draft/2019-09/schema#",
+   "additionalProperties": false,
+   "metamodel_version": "1.7.0",
+   "properties": {
+      "SecondaryAuditors": {
+         "additionalProperties": false,
+         "properties": {
+            "auditee_uei": {
+               "allOf": [
+                  {
+                     "maxLength": 12,
+                     "minLength": 12
+                  },
+                  {
+                     "pattern": "^[A-HJ-NP-Z1-9][A-HJ-NP-Z0-9]+$"
+                  },
+                  {
+                     "pattern": "^(?![A-HJ-NP-Z1-9]+[A-HJ-NP-Z0-9]*?[0-9]{9})[A-HJ-NP-Z0-9]*$"
+                  },
+                  {
+                     "pattern": "^(?![0-9]{9})"
+                  }
+               ],
+               "type": "string"
+            },
+            "secondary_auditors_entries": {
+               "items": {
+                  "$defs": {
+                     "EIN": {
+                        "pattern": "^[0-9]{9}$",
+                        "type": [
+                           "null",
+                           "string"
+                        ]
+                     },
+                     "Phone": {
+                        "pattern": "^^(\\+0?1\\s)?\\(?\\d{3}\\)?[\\s.-]?\\d{3}[\\s.-]?\\d{4}$",
+                        "type": "string"
+                     },
+                     "State": {
+                        "enum": [
+                           "AL",
+                           "AK",
+                           "AS",
+                           "AZ",
+                           "AR",
+                           "CA",
+                           "CO",
+                           "CT",
+                           "DE",
+                           "DC",
+                           "FM",
+                           "FL",
+                           "GA",
+                           "GU",
+                           "HI",
+                           "ID",
+                           "IL",
+                           "IN",
+                           "IA",
+                           "KS",
+                           "KY",
+                           "LA",
+                           "ME",
+                           "MH",
+                           "MD",
+                           "MA",
+                           "MI",
+                           "MN",
+                           "MS",
+                           "MO",
+                           "MT",
+                           "NE",
+                           "NV",
+                           "NH",
+                           "NJ",
+                           "NM",
+                           "NY",
+                           "NC",
+                           "ND",
+                           "MP",
+                           "OH",
+                           "OK",
+                           "OR",
+                           "PW",
+                           "PA",
+                           "PR",
+                           "RI",
+                           "SC",
+                           "SD",
+                           "TN",
+                           "TX",
+                           "UT",
+                           "VT",
+                           "VI",
+                           "VA",
+                           "WA",
+                           "WV",
+                           "WI",
+                           "WY"
+                        ],
+                        "title": "State",
+                        "type": "string"
+                     },
+                     "Zip": {
+                        "pattern": "^[0-9]{5}(?:-[0-9]{4})?$",
+                        "type": "string"
+                     }
+                  },
+                  "additionalProperties": false,
+                  "properties": {
+                     "secondary_auditor_address": {
+                        "type": "string"
+                     },
+                     "secondary_auditor_city": {
+                        "type": "string"
+                     },
+                     "secondary_auditor_contact_email": {
+                        "format": "email",
+                        "type": "string"
+                     },
+                     "secondary_auditor_contact_name": {
+                        "type": "string"
+                     },
+                     "secondary_auditor_contact_phone": {
+                        "$ref": "#/$defs/Phone"
+                     },
+                     "secondary_auditor_contact_title": {
+                        "type": "string"
+                     },
+                     "secondary_auditor_ein": {
+                        "$ref": "#/$defs/EIN"
+                     },
+                     "secondary_auditor_name": {
+                        "type": "string"
+                     },
+                     "secondary_auditor_state": {
+                        "$ref": "#/$defs/State"
+                     },
+                     "secondary_auditor_zip": {
+                        "$ref": "#/$defs/Zip"
+                     }
+                  },
+                  "required": [
+                     "secondary_auditor_name",
+                     "secondary_auditor_ein",
+                     "secondary_auditor_address",
+                     "secondary_auditor_city",
+                     "secondary_auditor_state",
+                     "secondary_auditor_zip",
+                     "secondary_auditor_contact_name",
+                     "secondary_auditor_contact_title",
+                     "secondary_auditor_contact_phone",
+                     "secondary_auditor_contact_email"
+                  ],
+                  "title": "SecondaryAuditorsEntry"
+               },
+               "type": "array"
+            }
+         },
+         "required": [
+            "auditee_uei",
+            "secondary_auditors_entries"
+         ],
+         "title": "SecondaryAuditors",
+         "type": "object",
+         "version": 20230714
+      }
+   },
+   "title": "UNNAMED",
+   "type": "object",
+   "version": 20230714
+}

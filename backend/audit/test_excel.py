@@ -12,16 +12,19 @@ from audit.excel import (
     extract_findings_uniform_guidance,
     extract_corrective_action_plan,
     extract_additional_ueis,
+    extract_secondary_auditors,
     federal_awards_field_mapping,
     findings_text_field_mapping,
     findings_uniform_guidance_field_mapping,
     corrective_action_field_mapping,
     additional_ueis_field_mapping,
+    secondary_auditors_field_mapping,
     federal_awards_column_mapping,
     findings_text_column_mapping,
     findings_uniform_guidance_column_mapping,
     corrective_action_column_mapping,
     additional_ueis_column_mapping,
+    secondary_auditors_column_mapping,
 )
 from audit.validators import (
     validate_additional_ueis_json,
@@ -29,18 +32,21 @@ from audit.validators import (
     validate_corrective_action_plan_json,
     validate_findings_text_json,
     validate_findings_uniform_guidance_json,
+    validate_secondary_auditors_json,
 )
 from audit.fixtures.excel import (
     FEDERAL_AWARDS_TEMPLATE,
     FEDERAL_AWARDS_ENTRY_FIXTURES,
     CORRECTIVE_ACTION_PLAN_TEMPLATE,
     CORRECTIVE_ACTION_PLAN_ENTRY_FIXTURES,
+    SECONDARY_AUDITORS_ENTRY_FIXTURES,
     FINDINGS_TEXT_TEMPLATE,
     FINDINGS_TEXT_ENTRY_FIXTURES,
     FINDINGS_UNIFORM_GUIDANCE_TEMPLATE,
     FINDINGS_UNIFORM_GUIDANCE_ENTRY_FIXTURES,
     ADDITIONAL_UEIS_TEMPLATE,
     ADDITIONAL_UEIS_ENTRY_FIXTURES,
+    SECONDARY_AUDITORS_TEMPLATE,
 )
 
 # Simplest way to create a new copy of simple case rather than getting
@@ -505,4 +511,65 @@ class AdditionalUeisExcelTests(SimpleTestCase):
 
                 self.assertRaises(
                     ValidationError, validate_additional_ueis_json, additional_ueis
+                )
+
+class SecondaryAuditorsExcelTests(SimpleTestCase):
+    GOOD_UEI = "AAA123456BBB"
+    TEST_DATA = json.loads(SECONDARY_AUDITORS_ENTRY_FIXTURES.read_text(encoding="utf-8"))
+
+    def test_template_has_named_ranges(self):
+        """Test that the SecondaryAuditors Excel template contains the expected named ranges"""
+        workbook = load_workbook(SECONDARY_AUDITORS_TEMPLATE, data_only=True)
+
+        for name in secondary_auditors_field_mapping.keys():
+            self.assertIsNotNone(workbook.defined_names[name])
+
+        for name in secondary_auditors_column_mapping:
+            self.assertIsNotNone(workbook.defined_names[name])
+
+    def test_single_secondary_auditors_entry(self):
+        """Test that extraction and validation succeed when there is a single secondary auditors entry"""
+        workbook = load_workbook(SECONDARY_AUDITORS_TEMPLATE, data_only=True)
+
+        _set_by_name(workbook, "auditee_uei", SecondaryAuditorsExcelTests.GOOD_UEI)
+        _add_entry(workbook, 0, SecondaryAuditorsExcelTests.TEST_DATA[0])
+
+        secondary_auditors = extract_secondary_auditors(workbook)
+
+        validate_secondary_auditors_json(secondary_auditors)
+
+    def test_multiple_secondary_auditors_entries(self):
+        """Test that extraction and validation succeed when there are multiple secondary auditors entries"""
+        workbook = load_workbook(SECONDARY_AUDITORS_TEMPLATE, data_only=True)
+
+        _set_by_name(workbook, "auditee_uei", SecondaryAuditorsExcelTests.GOOD_UEI)
+        for index, entry in enumerate(SecondaryAuditorsExcelTests.TEST_DATA):
+            _add_entry(workbook, index, entry)
+
+        secondary_auditors = extract_secondary_auditors(workbook)
+
+        validate_secondary_auditors_json(secondary_auditors)
+
+    def test_secondary_auditors_checking(self):
+        """Test that extraction succeeds and validation fails when fields are of the wrong data type"""
+        workbook = load_workbook(SECONDARY_AUDITORS_TEMPLATE, data_only=True)
+
+        # add valid data to the workbook
+        _set_by_name(workbook, "auditee_uei", SecondaryAuditorsExcelTests.GOOD_UEI)
+        _add_entry(workbook, 0, SecondaryAuditorsExcelTests.TEST_DATA[0])
+
+        test_cases = [
+            ("auditee_uei", 123456789123),
+            ("additional_uei", 123456789123), #TODO
+        ]
+
+        # validate that each test_case appropriately checks the data type
+        for field_name, value in test_cases:
+            with self.subTest():
+                _set_by_name(workbook, field_name, value)
+
+                secondary_auditors = extract_secondary_auditors(workbook)
+
+                self.assertRaises(
+                    ValidationError, validate_secondary_auditors_json, secondary_auditors
                 )

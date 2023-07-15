@@ -21,6 +21,7 @@ from .validators import (
     validate_findings_text_json,
     validate_findings_uniform_guidance_json,
     validate_general_information_json,
+    validate_secondary_auditors_json,
     validate_single_audit_report_file,
 )
 
@@ -197,6 +198,11 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
     additional_ueis = models.JSONField(
         blank=True, null=True, validators=[validate_additional_ueis_json]
     )
+    
+    # Secondary Auditors:
+    secondary_auditors = models.JSONField(
+        blank=True, null=True, validators=[validate_secondary_auditors_json]
+    )
 
     def validate_full(self):
         """
@@ -211,6 +217,7 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
             self.findings_text,
             self.findings_uniform_guidance,
             self.additional_ueis,
+            self.secondary_auditors,
         ]
         if all(section for section in all_sections):
             return True

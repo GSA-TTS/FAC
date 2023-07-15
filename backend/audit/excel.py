@@ -10,6 +10,7 @@ from audit.fixtures.excel import (
     FEDERAL_AWARDS_TEMPLATE_DEFINITION,
     FINDINGS_TEXT_TEMPLATE_DEFINITION,
     FINDINGS_UNIFORM_TEMPLATE_DEFINITION,
+    SECONDARY_AUDITORS_TEMPLATE_DEFINITION,
 )
 import pydash
 
@@ -67,6 +68,9 @@ findings_text_field_mapping: FieldMapping = {
 }
 additional_ueis_field_mapping: FieldMapping = {
     "auditee_uei": ("AdditionalUEIs.auditee_uei", _set_by_path),
+}
+secondary_auditors_field_mapping: FieldMapping = {
+    "auditee_uei": ("SecondaryAuditors.auditee_uei", _set_by_path),
 }
 
 federal_awards_column_mapping: ColumnMapping = {
@@ -285,6 +289,58 @@ additional_ueis_column_mapping: ColumnMapping = {
         _set_by_path,
     ),
 }
+secondary_auditors_column_mapping: ColumnMapping = {
+    "secondary_auditor_name": (
+        "SecondaryAuditors.secondary_auditor_name_entries",
+        "secondary_auditor_name",
+        _set_by_path,
+    ),
+    "secondary_auditor_ein": (
+        "SecondaryAuditors.secondary_auditor_ein_entries",
+        "secondary_auditor_ein",
+        _set_by_path,
+    ),
+    "secondary_auditor_address_street": (
+        "SecondaryAuditors.secondary_auditor_address_street_entries",
+        "secondary_auditor_address_street",
+        _set_by_path,
+    ),
+    "secondary_auditor_address_city": (
+        "SecondaryAuditors.secondary_auditor_address_city_entries",
+        "secondary_auditor_address_city",
+        _set_by_path,
+    ),
+    "secondary_auditor_address_state": (
+        "SecondaryAuditors.secondary_auditor_address_state_entries",
+        "secondary_auditor_address_state",
+        _set_by_path,
+    ),
+    "secondary_auditor_address_zipcode": (
+        "SecondaryAuditors.secondary_auditor_address_zipcode_entries",
+        "secondary_auditor_address_zipcode",
+        _set_by_path,
+    ),
+    "secondary_auditor_contact_name": (
+        "SecondaryAuditors.secondary_auditor_contact_name_entries",
+        "secondary_auditor_contact_name",
+        _set_by_path,
+    ),
+    "secondary_auditor_contact_title": (
+        "SecondaryAuditors.secondary_auditor_contact_title_entries",
+        "secondary_auditor_contact_title",
+        _set_by_path,
+    ),
+    "secondary_auditor_contact_phone": (
+        "SecondaryAuditors.secondary_auditor_contact_phone_entries",
+        "secondary_auditor_contact_phone",
+        _set_by_path,
+    ),
+    "secondary_auditor_contact_email": (
+        "SecondaryAuditors.secondary_auditor_contact_email_entries",
+        "secondary_auditor_contact_email",
+        _set_by_path,
+    ),
+}
 
 
 class ExcelExtractionError(Exception):
@@ -477,6 +533,18 @@ def extract_additional_ueis(file):
         template["title_row"],
     )
 
+def extract_secondary_auditors(file):
+    template_definition_path = (
+        XLSX_TEMPLATE_DEFINITION_DIR / SECONDARY_AUDITORS_TEMPLATE_DEFINITION
+    )
+    template = json.loads(template_definition_path.read_text(encoding="utf-8"))
+    return _extract_data(
+        file,
+        secondary_auditors_field_mapping,
+        secondary_auditors_column_mapping,
+        template["title_row"],
+    )
+
 
 def _extract_from_column_mapping(path, row_index, column_mapping, match=None):
     """Extract named ranges from column mapping"""
@@ -571,4 +639,9 @@ def findings_text_named_ranges(errors):
 def additional_ueis_named_ranges(errors):
     return _extract_named_ranges(
         errors, additional_ueis_column_mapping, additional_ueis_field_mapping
+    )
+
+def secondary_auditors_named_ranges(errors):
+    return _extract_named_ranges(
+        errors, secondary_auditors_column_mapping, secondary_auditors_field_mapping
     )

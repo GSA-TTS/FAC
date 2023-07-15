@@ -16,6 +16,7 @@ from audit.fixtures.excel import (
     SIMPLE_CASES_TEST_FILE,
     CORRECTIVE_ACTION_TEMPLATE_DEFINITION,
     ADDITIONAL_UEIS_TEMPLATE_DEFINITION,
+    SECONDARY_AUDITORS_TEMPLATE_DEFINITION,
 )
 
 from .validators import (
@@ -29,6 +30,7 @@ from .validators import (
     validate_excel_file_integrity,
     validate_file_size,
     validate_federal_award_json,
+    validate_secondary_auditors_json,
     validate_file_infection,
     validate_pdf_file_integrity,
     validate_uei,
@@ -711,3 +713,26 @@ class AdditionalUeisValidatorTests(SimpleTestCase):
         )
 
         validate_additional_ueis_json(AdditionalUeisValidatorTests.SIMPLE_CASE)
+
+class SecondaryAuditorsValidatorTests(SimpleTestCase):
+    SIMPLE_CASE = json.loads(SIMPLE_CASES_TEST_FILE.read_text(encoding="utf-8"))[
+        "SecondaryAuditors"
+    ]
+
+    def test_validation_is_applied(self):
+        """
+        Empty secondary auditors should fail, simple case should pass.
+        """
+        template_definition_path = (
+            settings.XLSX_TEMPLATE_JSON_DIR / SECONDARY_AUDITORS_TEMPLATE_DEFINITION
+        )
+        template = json.loads(template_definition_path.read_text(encoding="utf-8"))
+        invalid = json.loads('{"SecondaryAuditors":{}}')
+        expected_msg = str(
+            ("A", "2", "Secondary Auditors", template["sheets"][1]["single_cells"][0]["help"])
+        )
+        self.assertRaisesRegex(
+            ValidationError, expected_msg, validate_secondary_auditors_json, invalid
+        )
+
+        validate_secondary_auditors_json(SecondaryAuditorsValidatorTests.SIMPLE_CASE)
