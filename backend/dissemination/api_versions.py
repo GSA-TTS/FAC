@@ -11,7 +11,7 @@ live = [
 # These are API versions we have deprecated.
 # They will be removed. It should be safe to leave them
 # here for repeated runs.
-deprecated: List[str] = [ "api" ]
+deprecated: List[str] = ["api"]
 
 
 def get_conn_string():
@@ -36,14 +36,18 @@ def exec_sql(version, filename):
 def create_views(version):
     exec_sql(version, "create_views.sql")
 
+
 def drop_views(version):
     exec_sql(version, "drop_views.sql")
+
 
 def create_schema(version):
     exec_sql(version, "create_schema.sql")
 
+
 def drop_schema(version):
     exec_sql(version, "drop_schema.sql")
+
 
 def create_live_schemas():
     for version in live:
@@ -51,24 +55,28 @@ def create_live_schemas():
         exec_sql(version, "base.sql")
         create_schema(version)
 
+
 def drop_live_schema():
     for version in live:
         drop_schema(version)
 
+
 def drop_live_views():
     for version in live:
         drop_views(version)
+
 
 def create_live_views():
     for version in live:
         drop_views(version)
         create_views(version)
 
+
 def create_functions():
     for version in live:
         exec_sql(version, "create_functions.sql")
 
+
 def deprecate_schemas_and_views():
     for version in deprecated:
-        exec_sql(version, "drop_views.sql")
-        exec_sql(version, "drop_schema.sql")
+        exec_sql(version, "drop.sql")
