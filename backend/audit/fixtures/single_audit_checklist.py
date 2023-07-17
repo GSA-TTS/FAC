@@ -1,6 +1,7 @@
 """Fixtures for SingleAuditChecklist.
 
-We want to create a simple
+We want to create a variety of SACs in different states of
+completion.
 """
 
 import logging
@@ -116,14 +117,14 @@ def _post_create_federal_awards(this_sac, this_user):
         settings.DATA_FIXTURES
         / "audit"
         / "excel_workbooks_test_files"
-        / "federal-awards-workbook-PASS.xlsx",
+        / "federal-awards-expended-PASS.xlsx",
         "rb",
     ) as f:
         content = f.read()
     file = SimpleUploadedFile("test.xlsx", content, "application/vnd.ms-excel")
     excel_file = ExcelFile(
         file=file,
-        filename="doesnt matter",
+        filename="temp",
         user=this_user,
         sac_id=this_sac.id,
         form_section=FORM_SECTIONS.FEDERAL_AWARDS_EXPENDED,
