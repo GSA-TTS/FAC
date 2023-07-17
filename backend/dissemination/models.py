@@ -46,7 +46,7 @@ class FindingText(models.Model):
 class Finding(models.Model):
     """A finding from the audit. References FederalAward and FindingText"""
 
-    award_seq_number = models.CharField(
+    award_reference = models.CharField(
         "Order that the award line was reported in Award",
         null=True,
     )
@@ -106,10 +106,10 @@ class Finding(models.Model):
     )
 
     class Meta:
-        unique_together = (("report_id", "award_seq_number", "finding_seq_number"),)
+        unique_together = (("report_id", "award_reference", "finding_seq_number"),)
         """
             Finding
-            foreign_key(("report_id", "award_seq_number",) references FederalAward
+            foreign_key(("report_id", "award_reference",) references FederalAward
             foreign_key(("report_id", "finding_ref_number",) references FindingText
         """
 
@@ -122,7 +122,7 @@ class FederalAward(models.Model):
         max_length=40,
     )
 
-    award_seq_number = models.CharField(
+    award_reference = models.CharField(
         "Order that the award line was reported", default=-1
     )
 
@@ -251,7 +251,7 @@ class FederalAward(models.Model):
         unique_together = (
             (
                 "report_id",
-                "award_seq_number",
+                "award_reference",
             ),
         )
         """
@@ -439,7 +439,7 @@ class Passthrough(models.Model):
     We may not need this table. We can simply add three columns
     pertating to passthrough in FederalAward table
     """
-    award_seq_number = models.CharField(
+    award_reference = models.CharField(
         "Order that the award line was reported",
         null=True,
     )
@@ -462,7 +462,7 @@ class Passthrough(models.Model):
     )
 
     class Meta:
-        unique_together = (("report_id", "award_seq_number", "passthrough_id"),)
+        unique_together = (("report_id", "award_reference", "passthrough_id"),)
         """
             Note
             foreign_key(("report_id", ) references General
@@ -473,8 +473,6 @@ class Passthrough(models.Model):
     #     "FAC system generated sequence number used to link to Passthrough data between CFDA Info and Passthrough",
     #     help_text=docs.elec_audits_id_passthrough,
     # )
-    # SK - Note:  Need to add Award.award_seq_number
-    # SK - Note: Primary keys for this table are award_seq_number, report_id, passthrough_id
 
 
 class General(models.Model):

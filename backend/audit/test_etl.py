@@ -68,7 +68,15 @@ class ETLTests(TestCase):
                         },
                         "subrecipients": {"is_passed": "N"},
                         "loan_or_loan_guarantee": {"is_guaranteed": "N"},
-                        "direct_or_indirect_award": {"is_direct": "Y"},
+                        "direct_or_indirect_award": {
+                            "is_direct": "N",
+                            "entities": [
+                                {
+                                    "passthrough_name": "Bob's Granting House",
+                                    "passthrough_identifying_number": "12345",
+                                }
+                            ],
+                        },
                     }
                 ],
                 "total_amount_expended": 9000,
