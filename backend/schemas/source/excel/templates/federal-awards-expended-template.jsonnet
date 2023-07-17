@@ -9,6 +9,12 @@ local clusterSheet = 'Clusters';
 local programSheet = 'FederalPrograms';
 local auditReportTypeSheet = 'AuditReportTypes';
 local title_row = 1;
+local amountExpendedNamedRange = 'amount_expended';
+local cfdaKeyNamedRange = 'cfda_key';
+local uniformOtherClusterNamedRange = 'uniform_other_cluster_name';
+local uniformStateClusterNamedRange = 'uniform_state_cluster_name';
+local clusterNamedRange = 'cluster_name';
+local auditReportTypeLookupNamedRange = 'audit_report_type_lookup';
 
 local single_cells = [
   Sheets.single_cell {
@@ -85,7 +91,7 @@ local open_ranges_defns = [
     },
     SV.PositiveNumberValidation,
     'Amount Expended',
-    'amount_expended',
+    amountExpendedNamedRange,
   ],
   [
     Sheets.open_range {
@@ -97,7 +103,7 @@ local open_ranges_defns = [
       lookup_range: 'cluster_name_lookup',
     },
     'Cluster Name',
-    'cluster_name',
+    clusterNamedRange,
   ],
   [
     Sheets.open_range {
@@ -119,7 +125,7 @@ local open_ranges_defns = [
     Sheets.open_range {
       keep_locked: true,
       format: 'dollar',
-      formula: '=SUMIFS(E:E,V:V,V{0})',
+      formula: '=SUMIFS(' + amountExpendedNamedRange + ',' + cfdaKeyNamedRange + ',V{0})',
       help: Help.positive_number,
     },
     SV.PositiveNumberValidation,
@@ -130,7 +136,7 @@ local open_ranges_defns = [
     Sheets.open_range {
       keep_locked: true,
       format: 'dollar',
-      formula: '=IF(F{0}="OTHER CLUSTER NOT LISTED ABOVE",SUMIFS(E:E,X:X,X{0}), IF(AND(OR(F{0}="N/A",F{0}=""),G{0}=""),0,IF(F{0}="STATE CLUSTER",SUMIFS(E:E,W:W,W{0}),SUMIFS(E:E,F:F,F{0}))))',
+      formula: '=IF(F{0}="' + Base.Const.OTHER_CLUSTER + '",SUMIFS(' + amountExpendedNamedRange + ',' + uniformOtherClusterNamedRange + ',X{0}), IF(AND(OR(F{0}="' + Base.Const.NA + '",F{0}=""),G{0}=""),0,IF(F{0}="' + Base.Const.STATE_CLUSTER + '",SUMIFS(' + amountExpendedNamedRange + ',' + uniformStateClusterNamedRange + ',W{0}),SUMIFS(' + amountExpendedNamedRange + ',' + clusterNamedRange + ',F{0}))))',
       help: Help.positive_number,
     },
     SV.PositiveNumberValidation,
@@ -209,7 +215,7 @@ local open_ranges_defns = [
       width: 12,
       help: Help.unknown,
     },
-    SV.AuditReportTypeValidation(auditReportTypeSheet),
+    SV.AuditReportTypeValidation(auditReportTypeLookupNamedRange),
     'If yes (MP), Type of Audit Report',
     'audit_report_type',
   ],
@@ -243,7 +249,7 @@ local open_ranges_defns = [
     },
     SV.NoValidation,
     'CFDA_KEY (Read Only)',
-    'cfda_key',
+    cfdaKeyNamedRange,
   ],
   [
     Sheets.open_range {
@@ -254,7 +260,7 @@ local open_ranges_defns = [
     },
     SV.NoValidation,
     'UNIFORM STATE CLUSTER NAME (Read Only)',
-    'uniform_state_cluster_name',
+    uniformStateClusterNamedRange,
   ],
   [
     Sheets.open_range {
@@ -265,7 +271,7 @@ local open_ranges_defns = [
     },
     SV.NoValidation,
     'UNIFORM OTHER CLUSTER NAME (Read Only)',
-    'uniform_other_cluster_name',
+    uniformOtherClusterNamedRange,
   ],
 ];
 
@@ -332,10 +338,11 @@ local sheets = [
         type: 'text_range',
         title: 'Major Program Audit Report Type',
         title_cell: 'A1',
-        range_name: 'audit_report_type_lookup',
+        range_name: auditReportTypeLookupNamedRange,
+        last_range_cell: 'A5',
         contents: Base.Enum.MajorProgramAuditReportType,
         validation: SV.LookupValidation {
-          lookup_range: 'audit_report_type_lookup',
+          lookup_range: auditReportTypeLookupNamedRange,
         },
       },
     ],

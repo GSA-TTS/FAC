@@ -106,11 +106,10 @@ local ComplianceRequirementValidation = {
   ReferenceNumberValidation: ReferenceNumberValidation,
   ComplianceRequirementValidation: ComplianceRequirementValidation,
   LoanBalanceValidation: LoanBalanceValidation,
-  AuditReportTypeValidation(formRef): {
+  AuditReportTypeValidation(namedRange): {
     type: 'list',
     allow_blank: 'True', 
-    // FIXME MSHD: for improvement, will need to pull column refs from this formula and retrieve that dynamically.
-    formula1: '=IF(R{0}="Y",' + formRef + '!$A$2:$A$5,' + formRef + '!$A$6:$A$6)', 
+    formula1: '=IF(R{0}="Y",' + namedRange + ',"")', 
     custom_error: 'The Audit Report Type must be empty if Major Program is "N"',
     custom_title: 'Invalid Audit Report Type',
   },

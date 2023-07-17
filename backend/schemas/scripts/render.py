@@ -373,7 +373,8 @@ def make_range(r):
     title_row = int(r.posn.title_cell[1])
     range_start_row = int(r.posn.title_cell[1]) + 1
     start_cell = column + str(range_start_row)
-    full_range = f"${column}${range_start_row}:${column}${MAX_ROWS}"
+    last_row = r.posn.last_range_cell[1] if r.posn.last_range_cell is not None else MAX_ROWS
+    full_range = f"${column}${range_start_row}:${column}${last_row}"
     return Range(
         r.posn.range_name,
         column,
