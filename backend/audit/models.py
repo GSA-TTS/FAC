@@ -21,6 +21,7 @@ from .validators import (
     validate_findings_text_json,
     validate_findings_uniform_guidance_json,
     validate_general_information_json,
+    validate_notes_to_sefa_json,
     validate_single_audit_report_file,
 )
 
@@ -198,6 +199,11 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         blank=True, null=True, validators=[validate_additional_ueis_json]
     )
 
+    # Notes to SEFA:
+    notes_to_sefa = models.JSONField(
+        blank=True, null=True, validators=[validate_notes_to_sefa_json]
+    )
+
     def validate_full(self):
         """
         A stub method to represent the cross-sheet, “full” validation that we
@@ -211,6 +217,7 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
             self.findings_text,
             self.findings_uniform_guidance,
             self.additional_ueis,
+            self.notes_to_sefa,
         ]
         if all(section for section in all_sections):
             return True
@@ -287,13 +294,11 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         the appropriate privileges will done at the view level.
         """
 
-        # from audit.etl import ETL
+        from audit.etl import ETL
 
-        # TODO: These lines are breaking
-        #       `test_submission_status_transitions` in audit/test_models.py
-        #       We'll figure out a fix for this and uncomment these lines.
-        # etl = ETL(self)
-        # etl.load_all()
+        if self.general_information:
+            etl = ETL(self)
+            etl.load_all()
         self.transition_name.append(SingleAuditChecklist.STATUS.SUBMITTED)
         self.transition_date.append(date.today())
 
