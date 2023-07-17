@@ -39,8 +39,12 @@ locals {
     "tadhg.ohiggins@gsa.gov",
   ]
 
-  # All spaces have full public egress (for now)
-  asgs = [
+  internal_asgs = [
+    "trusted_local_networks",
+  ]
+
+  # All egress spaces include full public egress
+  egress_asgs = [
     "trusted_local_networks",
     "public_networks_egress"
   ]
