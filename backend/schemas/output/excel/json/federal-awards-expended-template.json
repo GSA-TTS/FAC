@@ -138,7 +138,7 @@
             },
             {
                "format": "dollar",
-               "formula": "=SUMIFS(E:E,V:V,V{0})",
+               "formula": "=SUMIFS(amount_expended,cfda_key,V{0})",
                "help": {
                   "link": "https://fac.gov/documentation/validation/#positive_number",
                   "text": "The number in this field must be zero or greater"
@@ -157,7 +157,7 @@
             },
             {
                "format": "dollar",
-               "formula": "=IF(F{0}=\"OTHER CLUSTER NOT LISTED ABOVE\",SUMIFS(E:E,X:X,X{0}), IF(AND(OR(F{0}=\"N/A\",F{0}=\"\"),G{0}=\"\"),0,IF(F{0}=\"STATE CLUSTER\",SUMIFS(E:E,W:W,W{0}),SUMIFS(E:E,F:F,F{0}))))",
+               "formula": "=IF(F{0}=\"OTHER CLUSTER NOT LISTED ABOVE\",SUMIFS(amount_expended,uniform_other_cluster_name,X{0}), IF(AND(OR(F{0}=\"N/A\",F{0}=\"\"),G{0}=\"\"),0,IF(F{0}=\"STATE CLUSTER\",SUMIFS(amount_expended,uniform_state_cluster_name,W{0}),SUMIFS(amount_expended,cluster_name,F{0}))))",
                "help": {
                   "link": "https://fac.gov/documentation/validation/#positive_number",
                   "text": "The number in this field must be zero or greater"
@@ -313,7 +313,7 @@
                   "allow_blank": "True",
                   "custom_error": "The Audit Report Type must be empty if Major Program is \"N\"",
                   "custom_title": "Invalid Audit Report Type",
-                  "formula1": "=IF(R{0}=\"Y\",AuditReportTypes!$A$2:$A$5,AuditReportTypes!$A$6:$A$6)",
+                  "formula1": "=IF(R{0}=\"Y\",audit_report_type_lookup,\"\")",
                   "type": "list"
                },
                "width": 12
@@ -6281,6 +6281,7 @@
                   "title": "MajorProgramAuditReportType",
                   "type": "string"
                },
+               "last_range_cell": "A5",
                "range_name": "audit_report_type_lookup",
                "title": "Major Program Audit Report Type",
                "title_cell": "A1",
