@@ -52,7 +52,6 @@ done < copy_commands
 
 # Dump the resulting tables
 mkdir -p ${dump_dir}/plaintext
-mkdir -p ${dump_dir}/compressed
 
 for table in `cat dump_tables`; do
     echo Dumping $table as plaintext
@@ -64,17 +63,3 @@ for table in `cat dump_tables`; do
         --file=${dump_dir}/plaintext/${table}.sql \
         --table="public.\"${table}\"" 
 done
-
-# for table in `cat dump_tables`; do
-#     echo Dumping $table as compressed
-#     pg_dump \
-#         --no-owner \
-#         --schema=public \
-#         -Fc \
-#         -Z 9 \
-#         --dbname="postgres://postgres@localhost:5432/postgres" \
-#         --format=plain \
-#         --file=${dump_dir}/compressed/${table}.dump \
-#         --table="public.\"${table}\"" 
-# done
-
