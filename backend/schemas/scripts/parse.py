@@ -17,7 +17,10 @@ Sheet = NT(
     "Sheet",
     "name single_cells open_ranges mergeable_cells merged_unreachable header_inclusion text_ranges header_height hide_col_from hide_row_from",
 )
-Posn = NT("Posn", "title title_cell range_name range_cell width keep_locked format last_range_cell")
+Posn = NT(
+    "Posn",
+    "title title_cell range_name range_cell width keep_locked format last_range_cell",
+)
 SingleCell = NT("SingleCell", "posn validation formula help")
 MergeableCell = NT("MergeableCell", "start_row end_row start_column end_column")
 MergedUnreachable = NT("MergedUnreachable", "columns")
