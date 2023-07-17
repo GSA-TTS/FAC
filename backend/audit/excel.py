@@ -408,8 +408,8 @@ def _extract_data(
     return result
 
 
-def _remove_invalid_award_entries(data):
-    # Filter out invalid entries
+def _remove_empty_award_entries(data):
+    """Removes empty award entries from the data"""
     indexed_awards = []
     for award in data.get("FederalAwards", {}).get("federal_awards", []):
         if "program" in award:
@@ -434,7 +434,7 @@ def extract_federal_awards(file):
         federal_awards_column_mapping,
         template["title_row"],
     )
-    return _remove_invalid_award_entries(result)
+    return _remove_empty_award_entries(result)
 
 
 def extract_corrective_action_plan(file):
