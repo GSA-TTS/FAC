@@ -10,7 +10,7 @@ describe('Workbook upload successful', () => {
             fixture: 'success-res.json',
         }).as('uploadSuccess')
         cy.visit(`report_submission/federal-awards/${reportTestId}`);
-        cy.get('#file-input-federal-awards-xlsx').attachFile('federal-awards-Test.xlsx');
+        cy.get('#file-input-federal-awards-xlsx').attachFile('federal-awards-expended-UPDATE.xlsx');
         cy.wait('@uploadSuccess').its('response.statusCode').should('eq', 200)
         cy.wait(2000).get('#info_box').should('have.text', 'File successfully validated! Your work has been saved.');
         cy.get('#continue').click();
@@ -22,7 +22,7 @@ describe('Workbook upload successful', () => {
             fixture: 'success-res.json',
         }).as('uploadSuccess')
         cy.visit(`report_submission/audit-findings/${reportTestId}`);
-        cy.get('#file-input-audit-findings-xlsx').attachFile('findings-Test.xlsx');
+        cy.get('#file-input-audit-findings-xlsx').attachFile('findings-uniform-guidance-UPDATE.xlsx');
         cy.wait('@uploadSuccess').its('response.statusCode').should('eq', 200)
         cy.wait(2000).get('#info_box').should('have.text', 'File successfully validated! Your work has been saved.');
         cy.get('#continue').click();
@@ -34,7 +34,7 @@ describe('Workbook upload successful', () => {
             fixture: 'success-res.json',
         }).as('uploadSuccess')
         cy.visit(`report_submission/audit-findings-text/${reportTestId}`);
-        cy.get('#file-input-audit-findings-text-xlsx').attachFile('findings-text-Test.xlsx');
+        cy.get('#file-input-audit-findings-text-xlsx').attachFile('findings-text-UPDATE.xlsx');
         cy.wait('@uploadSuccess').its('response.statusCode').should('eq', 200)
         cy.wait(2000).get('#info_box').should('have.text', 'File successfully validated! Your work has been saved.');
         cy.get('#continue').click();
@@ -46,7 +46,7 @@ describe('Workbook upload successful', () => {
             fixture: 'success-res.json',
         }).as('uploadSuccess')
         cy.visit(`/report_submission/CAP/${reportTestId}`);
-        cy.get('#file-input-CAP-xlsx').attachFile('corrective-action-plan-Test.xlsx');
+        cy.get('#file-input-CAP-xlsx').attachFile('corrective-action-plan-UPDATE.xlsx');
         cy.wait('@uploadSuccess').its('response.statusCode').should('eq', 200)
         cy.wait(2000).get('#info_box').should('have.text', 'File successfully validated! Your work has been saved.');
         cy.get('#continue').click();

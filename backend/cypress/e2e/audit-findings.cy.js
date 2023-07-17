@@ -16,7 +16,7 @@ describe('Audit findings page', () => {
         fixture: 'success-res.json',
       }).as('uploadSuccess')
       cy.visit(`/report_submission/audit-findings/${reportTestId}`);
-      cy.get('#file-input-audit-findings-xlsx').attachFile('findings-Test.xlsx');
+      cy.get('#file-input-audit-findings-xlsx').attachFile('findings-uniform-guidance-UPDATE.xlsx');
       cy.wait('@uploadSuccess').its('response.statusCode').should('eq', 200)
       cy.wait(2000).get('#info_box').should('have.text', 'File successfully validated! Your work has been saved.');
       cy.get('#continue').click();
