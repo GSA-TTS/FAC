@@ -4,6 +4,7 @@ local FederalProgramNames = import 'FederalProgramNames.json';
 local Const = {
   Y: 'Y',
   N: 'N',
+  Y_N: 'Y&N',
   NA: 'N/A',
   SCHEMA_VERSION: 'https://json-schema.org/draft/2019-09/schema#',
   empty_string: '',
@@ -94,6 +95,13 @@ local Enum = {
     ],
     //title: 'YorN'
   },
+  YorNorBoth: Types.string {
+    enum: [
+      Const.Y,
+      Const.N,
+      Const.Y_N,
+    ],
+  },  
   NA: Types.string {
     //description: 'A 'not applicable' answer',
     enum: [

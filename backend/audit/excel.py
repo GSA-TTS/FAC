@@ -10,6 +10,7 @@ from audit.fixtures.excel import (
     FEDERAL_AWARDS_TEMPLATE_DEFINITION,
     FINDINGS_TEXT_TEMPLATE_DEFINITION,
     FINDINGS_UNIFORM_TEMPLATE_DEFINITION,
+    NOTES_TO_SEFA_TEMPLATE_DEFINITION,
 )
 import pydash
 
@@ -67,6 +68,12 @@ findings_text_field_mapping: FieldMapping = {
 }
 additional_ueis_field_mapping: FieldMapping = {
     "auditee_uei": ("AdditionalUEIs.auditee_uei", _set_by_path),
+}
+notes_to_sefa_field_mapping: FieldMapping = {
+    "auditee_uei": ("NotesToSefa.auditee_uei", _set_by_path),
+    "accounting_policies": ("NotesToSefa.accounting_policies", _set_by_path),
+    "is_minimis_rate_used": ("NotesToSefa.is_minimis_rate_used", _set_by_path),
+    "rate_explained": ("NotesToSefa.rate_explained", _set_by_path),
 }
 
 federal_awards_column_mapping: ColumnMapping = {
@@ -285,6 +292,23 @@ additional_ueis_column_mapping: ColumnMapping = {
         _set_by_path,
     ),
 }
+notes_to_sefa_column_mapping: ColumnMapping = {
+    "note_title": (
+        "NotesToSefa.notes_to_sefa_entries",
+        "note_title",
+        _set_by_path,
+    ),
+    "note_content": (
+        "NotesToSefa.notes_to_sefa_entries",
+        "note_content",
+        _set_by_path,
+    ),
+    "seq_number": (
+        "NotesToSefa.notes_to_sefa_entries",
+        "seq_number",
+        _set_by_path,
+    ),
+}
 
 
 class ExcelExtractionError(Exception):
@@ -478,6 +502,19 @@ def extract_additional_ueis(file):
     )
 
 
+def extract_notes_to_sefa(file):
+    template_definition_path = (
+        XLSX_TEMPLATE_DEFINITION_DIR / NOTES_TO_SEFA_TEMPLATE_DEFINITION
+    )
+    template = json.loads(template_definition_path.read_text(encoding="utf-8"))
+    return _extract_data(
+        file,
+        notes_to_sefa_field_mapping,
+        notes_to_sefa_column_mapping,
+        template["title_row"],
+    )
+
+
 def _extract_from_column_mapping(path, row_index, column_mapping, match=None):
     """Extract named ranges from column mapping"""
     for key, value in column_mapping.items():
@@ -571,4 +608,10 @@ def findings_text_named_ranges(errors):
 def additional_ueis_named_ranges(errors):
     return _extract_named_ranges(
         errors, additional_ueis_column_mapping, additional_ueis_field_mapping
+    )
+
+
+def notes_to_sefa_named_ranges(errors):
+    return _extract_named_ranges(
+        errors, notes_to_sefa_column_mapping, notes_to_sefa_field_mapping
     )
