@@ -23,6 +23,7 @@ from .validators import (
     validate_findings_text_json,
     validate_findings_uniform_guidance_json,
     validate_general_information_json,
+    validate_notes_to_sefa_json,
     validate_single_audit_report_file,
 )
 
@@ -198,6 +199,11 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
     # Additional UEIs:
     additional_ueis = models.JSONField(
         blank=True, null=True, validators=[validate_additional_ueis_json]
+    )
+
+    # Notes to SEFA:
+    notes_to_sefa = models.JSONField(
+        blank=True, null=True, validators=[validate_notes_to_sefa_json]
     )
 
     def validate_full(self):

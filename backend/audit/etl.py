@@ -20,11 +20,12 @@ class ETL(object):
         audit_date = sac.general_information.get(
             "auditee_fiscal_period_start", datetime.now
         )
-        self.audit_year = audit_date.split("-")[0]
+        self.audit_year = int(audit_date.split("-")[0])
 
     def load_all(self):
         self.load_general()
         self.load_federal_award()
+        self.load_findings()
 
     def load_finding_texts(self):
         findings_text = self.single_audit_checklist.findings_text
@@ -58,25 +59,19 @@ class ETL(object):
         for entry in findings_uniform_guidance_entries:
             findings = entry["findings"]
             finding = Finding(
+                award_seq_number=entry["award_index"],
+                report_id=self.report_id,
+                finding_seq_number=entry["seq_number"],
                 finding_ref_number=findings["reference_number"],
-                prior_finding_ref_numbers=findings.get("prior_references"),
-                is_modified_opinion=entry["modified_opinion"] == "Y",
-                is_other_matters=entry["other_matters"] == "Y",
                 is_material_weakness=entry["material_weakness"] == "Y",
-                is_significant_deficiency=(entry["significant_deficiency"] == "Y"),
+                is_modified_opinion=entry["modified_opinion"] == "Y",
                 is_other_findings=entry["other_findings"] == "Y",
+                is_other_non_compliance=entry["other_findings"] == "Y",
+                prior_finding_ref_numbers=findings.get("prior_references"),
                 is_questioned_costs=entry["questioned_costs"] == "Y",
                 is_repeat_finding=(findings["repeat_prior_reference"] == "Y"),
+                is_significant_deficiency=(entry["significant_deficiency"] == "Y"),
                 type_requirement=(entry["program"]["compliance_requirement"]),
-                report_id=self.report_id,
-                award_id=entry.get(
-                    "seq_number", 1
-                ),  # TODO: This will be the sequence number
-                # audit_id=audit_id,
-                # audit_findings_id=audit_id,
-                # audit_year=self.audit_year,
-                # dbkey=None,
-                # is_public=self.is_public,
             )
             finding.save()
 
@@ -192,32 +187,21 @@ class ETL(object):
             auditee_certify_title=None,  # TODO: Where does this come from?
             auditee_contact_name=general_information["auditee_contact_name"],
             auditee_email=general_information["auditee_email"],
-            hist_auditee_fax=None,
             auditee_name=general_information["auditee_name"],
             auditee_phone=general_information["auditee_phone"],
             auditee_contact_title=general_information["auditee_contact_title"],
             auditee_address_line_1=general_information["auditee_address_line_1"],
-            hist_auditee_address_line_2=None,
             auditee_city=general_information["auditee_city"],
             auditee_state=general_information["auditee_state"],
             auditee_ein=general_information["ein"],
-            multiple_ein=None,  # TODO: Where does this value come from?
-            auditee_duns=[],  # TODO: Where does this value come from?
-            multiple_duns=None,  # TODO: Where does this value come from?
-            auditee_uei=None,  # TODO: Where does this come from?
-            multiple_uei=[],  # TODO: Where does this come from?
+            auditee_uei=general_information["auditee_uei"],
             auditee_addl_uei_list=[],  # TODO: Where does this come from?
-            auditee_addl_ein_list=[],  # TODO: Where does this come from?
-            auditee_addl_duns_list=[],  # TODO: Where does this come from?
-            ein_subcode=None,  # TODO: Notes say this field is not in use.
             auditee_zip=general_information["auditee_zip"],
             auditor_phone=general_information["auditor_phone"],
-            hist_auditor_fax=None,
             auditor_state=general_information["auditor_state"],
             auditor_city=general_information["auditor_city"],
             auditor_contact_title=general_information["auditor_contact_title"],
             auditor_address_line_1=general_information["auditor_address_line_1"],
-            hist_auditor_address_line_2=None,
             auditor_zip=general_information["auditor_zip"],
             auditor_country=general_information["auditor_country"],
             auditor_contact_name=general_information["auditor_contact_name"],
@@ -225,7 +209,6 @@ class ETL(object):
             auditor_firm_name=general_information["auditor_firm_name"],
             auditor_foreign_addr=None,  # TODO: Where does this come from?
             auditor_ein=general_information["auditor_ein"],
-            multiple_auditors=None,  # TODO: Where does this value come from?
             pdf_url=None,  # TODO: Where does this come from?
             cognizant_agency=None,  # TODO: Where does this come from?
             oversight_agency=None,  # TODO: Where does this come from?
@@ -238,13 +221,8 @@ class ETL(object):
             date_received=None,  # TODO: Where does this come from?
             fy_end_date=general_information["auditee_fiscal_period_end"],
             fy_start_date=None,  # TODO: Where does this come from?
-            hist_previous_completed_on=None,
-            hist_previous_date_published=None,
-            hist_completed_date=None,
-            hist_component_date_received=None,
             audit_year=self.audit_year,
             audit_type=general_information["audit_type"],
-            hist_reportable_condition=None,
             is_significant_deficiency=None,  # TODO: Where does this come from?
             is_material_weakness=None,  # TODO: Where does this come from?
             condition_or_deficiency_major_program=None,  # TODO: Where does this come from?
