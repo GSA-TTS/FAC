@@ -26,6 +26,7 @@ class ETL(object):
         self.load_general()
         self.load_federal_award()
         self.load_findings()
+        self.load_passthrough()
 
     def load_finding_texts(self):
         findings_text = self.single_audit_checklist.findings_text
@@ -59,7 +60,7 @@ class ETL(object):
         for entry in findings_uniform_guidance_entries:
             findings = entry["findings"]
             finding = Finding(
-                award_seq_number=entry["award_index"],
+                award_reference=entry["award_reference"],
                 report_id=self.report_id,
                 finding_seq_number=entry["seq_number"],
                 finding_ref_number=findings["reference_number"],
@@ -88,7 +89,7 @@ class ETL(object):
             other_cluster_name = cluster.get("other_cluster_name")
             federal_award = FederalAward(
                 report_id=self.report_id,
-                award_seq_number=entry.get("seq_number", 1),
+                award_reference=entry["award_reference"],
                 federal_agency_prefix=program["federal_agency_prefix"],
                 federal_award_extension=program["three_digit_extension"],
                 additional_award_identification=program[
@@ -168,14 +169,16 @@ class ETL(object):
         revision.save()
 
     def load_passthrough(self):
-        passthrough = Passthrough(
-            passthrough_name=None,  # TODO: Where does this come from?
-            passthrough_id=None,  # TODO: Where does this come from?
-            audit_id=-1,  # TODO: Where does this come from?
-            audit_year=self.audit_year,
-            report_id=self.report_id,
-        )
-        passthrough.save()
+        federal_awards = self.single_audit_checklist.federal_awards
+        for entry in federal_awards["FederalAwards"]["federal_awards"]:
+            for entity in entry["direct_or_indirect_award"]["entities"]:
+                passthrough = Passthrough(
+                    award_reference=entry["award_reference"],
+                    report_id=self.report_id,
+                    passthrough_id=entity["passthrough_identifying_number"],
+                    passthrough_name=entity["passthrough_name"],
+                )
+                passthrough.save()
 
     def load_general(self):
         # TODO: Use the mixin to access general_information fields once that code
