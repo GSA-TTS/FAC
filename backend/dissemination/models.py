@@ -439,7 +439,7 @@ class Passthrough(models.Model):
     We may not need this table. We can simply add three columns
     pertating to passthrough in FederalAward table
     """
-    award_seq_number = models.IntegerField(
+    award_seq_number = models.CharField(
         "Order that the award line was reported",
         null=True,
     )

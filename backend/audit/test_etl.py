@@ -53,6 +53,7 @@ class ETLTests(TestCase):
                 "auditee_uei": "ABC123DEF456",
                 "federal_awards": [
                     {
+                        "award_reference": "ABC123",
                         "cluster": {"cluster_name": "N/A", "cluster_total": 0},
                         "program": {
                             "is_major": "Y",
@@ -78,7 +79,7 @@ class ETLTests(TestCase):
                 "auditee_uei": "AAA123456BBB",
                 "findings_uniform_guidance_entries": [
                     {
-                        "award_index": "ABC123",
+                        "award_reference": "ABC123",
                         "seq_number": 1,
                         "program": {
                             "program_name": "N/A",
@@ -101,7 +102,7 @@ class ETLTests(TestCase):
                         "significant_deficiency": "N",
                     },
                     {
-                        "award_index": "ABC123",
+                        "award_reference": "ABC123",
                         "seq_number": 2,
                         "program": {
                             "program_name": "N/A",
@@ -123,7 +124,7 @@ class ETLTests(TestCase):
                         "significant_deficiency": "N",
                     },
                     {
-                        "award_index": "ABC123",
+                        "award_reference": "ABC123",
                         "seq_number": 3,
                         "program": {
                             "program_name": "N/A",
@@ -145,7 +146,7 @@ class ETLTests(TestCase):
                         "significant_deficiency": "N",
                     },
                     {
-                        "award_index": "ABC123",
+                        "award_reference": "ABC123",
                         "seq_number": 4,
                         "program": {
                             "program_name": "N/A",
