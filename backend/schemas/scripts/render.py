@@ -26,7 +26,6 @@ Range = NT(
     "name,column,label_row,range_start_row,range_start,abs_range_start,full_range",
 )
 
-MAGIC_MAX_ROWS = 1048576
 MAX_ROWS = 3000
 XLSX_MAX_ROWS = 1048576  # Excel has a maximum of 1048576 rows
 XLSX_MAX_COLS = 16384  # Excel has a maximum of 16384 columns
