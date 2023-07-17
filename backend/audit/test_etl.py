@@ -3,7 +3,7 @@ from django.test import TestCase
 from model_bakery import baker
 
 from .models import SingleAuditChecklist, User
-from dissemination.models import General, FederalAward, Finding
+from dissemination.models import General, FederalAward, Finding, Passthrough
 from audit.etl import ETL
 
 
@@ -201,3 +201,10 @@ class ETLTests(TestCase):
         self.assertEqual(len(findings), 4)
         finding = findings.first()
         self.assertEqual(self.report_id, finding.report_id)
+
+    def test_load_passthrough(self):
+        self.etl.load_passthrough()
+        passthroughs = Passthrough.objects.all()
+        self.assertEqual(len(passthroughs), 1)
+        passthrough = passthroughs.first()
+        self.assertEqual(self.report_id, passthrough.report_id)

@@ -26,6 +26,7 @@ class ETL(object):
         self.load_general()
         self.load_federal_award()
         self.load_findings()
+        self.load_passthrough()
 
     def load_finding_texts(self):
         findings_text = self.single_audit_checklist.findings_text
@@ -169,11 +170,10 @@ class ETL(object):
 
     def load_passthrough(self):
         passthrough = Passthrough(
-            passthrough_name=None,  # TODO: Where does this come from?
-            passthrough_id=None,  # TODO: Where does this come from?
-            audit_id=-1,  # TODO: Where does this come from?
-            audit_year=self.audit_year,
+            award_seq_number=None,  # TODO: Where does this come from?
             report_id=self.report_id,
+            passthrough_id=None,  # TODO: Where does this come from?
+            passthrough_name=None,  # TODO: Where does this come from?
         )
         passthrough.save()
 

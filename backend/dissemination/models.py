@@ -439,15 +439,14 @@ class Passthrough(models.Model):
     We may not need this table. We can simply add three columns
     pertating to passthrough in FederalAward table
     """
-    report_id = models.CharField(
-        "G-FAC generated identifier. FK refers to General",
-        max_length=40,
-    )
     award_seq_number = models.IntegerField(
         "Order that the award line was reported",
         null=True,
     )
-
+    report_id = models.CharField(
+        "G-FAC generated identifier. FK refers to General",
+        max_length=40,
+    )
     # This doesn't seem like it should be null but it is sometimes
     passthrough_id = models.CharField(
         "Identifying Number Assigned by the Pass-through Entity",
