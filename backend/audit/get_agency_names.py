@@ -16,10 +16,3 @@ def get_agency_names():
             if row[0].isnumeric() and row[1] != "":
                 agency_names.append(f"{row[0]} - {row[1]}")
     return agency_names
-
-
-def get_agency_choices():
-    choices_agencies = []
-    for x in get_agency_names():
-        choices_agencies.append((x, x))
-    return tuple(choices_agencies)

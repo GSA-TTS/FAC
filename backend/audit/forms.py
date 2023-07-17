@@ -1,5 +1,5 @@
 from django import forms
-from audit.get_agency_names import get_agency_choices
+from config.settings import AGENCY_NAMES
 
 
 class UploadReportForm(forms.Form):
@@ -39,7 +39,7 @@ class AuditInfoForm(forms.Form):
             "Financial statements were not prepared in accordance with GGAP but were prepared in accordance with a special purpose framework.",
         ),
     )
-    choices_agencies = get_agency_choices()
+    choices_agencies = list((i, i) for i in AGENCY_NAMES)
 
     GGAP_results = forms.MultipleChoiceField(choices=choices_GGAP)
     going_concern_included = forms.MultipleChoiceField(choices=choices_YoN)
