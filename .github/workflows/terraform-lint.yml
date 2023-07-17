@@ -1,22 +1,22 @@
 ---
-name: terraform fmt+validate
+name: Terraform format and lint
 on:
   workflow_call:
 
 jobs:
   test:
-    name: test format and validity
+    name: Test format and validite
     runs-on: ubuntu-latest
     steps:
-      - name: checkout
+      - name: Checkout
         uses: actions/checkout@v3
 
-      - name: terraform fmt
+      - name: Terraform Format
         uses: dflook/terraform-fmt-check@v1
         with:
           path: ./terraform
 
-      - name: terraform validate
+      - name: Terraform Validate
         uses: dflook/terraform-validate@v1
         with:
           path: ./terraform
