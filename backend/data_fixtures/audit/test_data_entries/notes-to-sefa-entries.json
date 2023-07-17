@@ -1,0 +1,10 @@
+[
+  {
+    "note_title": "First Note",
+    "note_content": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. \nVestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Phasellus nec tortor ut ligula sollicitudin euismod."
+  },
+  {
+    "note_title": "Second Note",
+    "note_content": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. \nNulla facilisis urna et sem congue, ac pharetra ipso lorem sagittis. Maecenas sed nunc vel neque dignissim consequat."
+  }
+]
