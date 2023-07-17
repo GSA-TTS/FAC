@@ -1,23 +1,14 @@
-/*
-  Candidate(s) for global constants
-*/
-// Matches current URL against the correct upload endpoint. Comes from /audit/fixtures/excel.py
-const UPLOAD_URLS = {
-  'federal-awards': 'federal-awards-expended',
-  'audit-findings': 'findings-uniform-guidance',
-  'audit-findings-text': 'findings-text',
-  'additional-ueis': 'additional-ueis',
-  CAP: 'corrective-action-plan',
-};
+import { UPLOAD_TIMEOUT, UPLOAD_URLS } from './globals';
 
 /*
   Useful page elements
 */
-const sac_id = JSON.parse(document.getElementById('sac_id').textContent);
-const view_id = JSON.parse(document.getElementById('view_id').textContent);
-const file_input = document.getElementById(`file-input-${view_id}-xlsx`);
-const info_box = document.getElementById(`info_box`);
-const already_submitted = document.getElementById(`already-submitted`);
+const sac_id = JSON.parse(document.getElementById('sac_id').textContent); // String
+const view_id = JSON.parse(document.getElementById('view_id').textContent); // String
+const already_submitted = document.getElementById(`already-submitted`); // Boolean
+
+const file_input = document.getElementById(`file-input-${view_id}-xlsx`); // <input type="file">
+const info_box = document.getElementById(`info_box`); // <div>
 
 /* 
   Function definitions
@@ -29,29 +20,35 @@ function setFormDisabled(shouldDisable) {
 }
 
 // Print helpful error info to page & console on unsuccessful upload
-function handleErrorOnUpload(error) {
+function handleErrors(error) {
   if (typeof error.text === 'function') {
-    error.text().then((errorMessage) => {
-      console.error(
-        'Error when sending excel file.\n',
-        JSON.parse(errorMessage)
-      );
+    // The request never made it to the server. Suggests a local issue.
+    error.text().then((message) => {
+      console.error('Error when uploading file.', JSON.parse(message));
       info_box.innerHTML =
-        'Error when uploading file. See the console for more information, or contact an administrator.';
+        'There was an error when uploading the file. If this issue persists, contact an administrator.';
     });
   } else if (error.name === 'AbortError') {
     console.error(`Timeout - Response took longer than expected.\n`, error);
-    info_box.innerHTML = `Timeout - Response took longer than expected. Try again later.`;
+    info_box.innerHTML = `Timeout - Response took longer than expected. Please try again later. If this issue persists, contact an administrator.`;
+  } else if (error.name === 'Field error') {
+    console.error(`Field error.\n`, error);
+    info_box.innerHTML = `A field is missing in the uploaded file. Ensure you have uploaded the correct workbook, or contact an administrator.`;
+  } else if (error.name === 'Row error') {
+    // Unhelpful row error (not table-able). Suggests an issue in validation error reporting.
+    console.error(`Row error (unable to convert to table).\n`, error);
+    info_box.innerHTML = `There was an unexpected error when validating the file. Please ensure you have uploaded the correct workbook. If this issue persists, contact an administrator.`;
   } else {
-    info_box.innerHTML =
-      'Error when uploading file. Ensure you have uploaded the correct template, or contact an administrator.';
+    // Catch all.
     console.error(`Unexpected error.\n`, error);
+    info_box.innerHTML = `There was an unexpected error when validating the file. Please try again later. If this issue persists, contact an administrator.`;
   }
 }
 
 function get_error_table(data) {
   var rows_html = '';
   var row_array = [];
+
   for (let i = 0; i < data.errors.length; i++) {
     // Convert given string-tuples into arrays:
     // "(col, row...)" -> [col, row, ...]
@@ -59,15 +56,16 @@ function get_error_table(data) {
     row_array = JSON.parse(
       row_array.replaceAll('(', '[').replaceAll(')', ']').replaceAll(`'`, `"`)
     );
-
     rows_html += `
     <tr>
       <td class="text-center">${row_array[0]}${row_array[1]}</td>
       <td>${row_array[2]}</td>
       <td>${row_array[3]['text']}.</td>
     </tr>`;
+    // TODO: Add this link once the site is hosting elpful information.
     // <a class="usa-link" href="${row_array[3]["link"]}">Link</a>
   }
+
   const validationTable = `<p>Error on validation. Check the following cells for errors, and re-upload. 
   Common errors include incorrect data types or missing information.</p>
   <table class="usa-table usa-table--striped">
@@ -82,20 +80,11 @@ function get_error_table(data) {
       ${rows_html}
     </tbody>
   </table>`;
+
   return validationTable;
 }
 
 // On file upload, send it off for verification.
-// TODO: Enable timeout on too-long verifications
-/*
-const UPLOAD_TIMEOUT = 15000; // 15s - Global?
-const abortController = new AbortController();
-const signal = abortController.signal;
-setTimeout(() => {
-  abortController.abort();
-}, UPLOAD_TIMEOUT);
-// include signal in fetch body
-*/
 function attachFileUploadHandler() {
   file_input.addEventListener('change', (e) => {
     try {
@@ -115,11 +104,20 @@ function attachFileUploadHandler() {
       body.append('filename', e.target.files[0].name);
       body.append('sac_id', sac_id);
 
+      const abortController = new AbortController();
+      const signal = abortController.signal;
+      setTimeout(() => {
+        abortController.abort();
+      }, UPLOAD_TIMEOUT);
+
       fetch(`/audit/excel/${report_submission_url}/${sac_id}`, {
         method: 'POST',
         body: body,
+        signal: signal,
       })
         .then((res) => {
+          // If recieving a 200 response, we are done.
+          // Otherwise, pull the JSON data from the reponse and react accordingly.
           if (res.status == 200) {
             info_box.innerHTML =
               'File successfully validated! Your work has been saved.';
@@ -127,19 +125,30 @@ function attachFileUploadHandler() {
           } else {
             res.json().then((data) => {
               if (data.type === 'error_row') {
-                if (Array.isArray(data.errors[0]))
-                  handleErrorOnUpload(new Error(data.errors[0]));
+                // Issue in the rows. The "Good" error, which we can use to display the error table.
+                // There can also be 'error_row' data that is just an unhelpful array.
+                if (Array.isArray(data.errors[0])) {
+                  let e = new Error(`Row error: ${data.errors[0]}`);
+                  e.name = 'Row error';
+                  handleErrors(new Error(data.errors[0]));
+                }
                 info_box.innerHTML = get_error_table(data);
               } else if (data.type === 'error_field') {
-                info_box.innerHTML = `Field Error: ${res.errors}`;
+                // Issue with a fieldname, such as a missing field or column. Suggests an incorrect template.
+                let e = new Error(data.errors);
+                e.name = 'Field error';
+                handleErrors(e);
               } else {
-                throw new Error('Returned error type is missing!');
+                // Catch all.
+                let e = new Error('Unexpected error in JSON response.');
+                e.name = 'Unexpected';
+                handleErrors(e);
               }
             });
           }
         })
         .catch((error) => {
-          handleErrorOnUpload(error);
+          handleErrors(error);
         });
     } catch (error) {
       info_box.innerHTML = `Error when sending excel file.\n ${error}`;
