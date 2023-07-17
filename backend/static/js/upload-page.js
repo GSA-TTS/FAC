@@ -45,7 +45,7 @@ function handleErrors(error) {
   }
 }
 
-function get_error_table(data) {
+function display_error_table(data) {
   var rows_html = '';
   var row_array = [];
 
@@ -81,7 +81,7 @@ function get_error_table(data) {
     </tbody>
   </table>`;
 
-  return validationTable;
+  info_box.innerHTML = validationTable;
 }
 
 // On file upload, send it off for verification.
@@ -131,8 +131,9 @@ function attachFileUploadHandler() {
                   let e = new Error(`Row error: ${data.errors[0]}`);
                   e.name = 'Row error';
                   handleErrors(new Error(data.errors[0]));
+                } else {
+                  display_error_table(data);
                 }
-                info_box.innerHTML = get_error_table(data);
               } else if (data.type === 'error_field') {
                 // Issue with a fieldname, such as a missing field or column. Suggests an incorrect template.
                 let e = new Error(data.errors);
