@@ -3,6 +3,7 @@ name: Scheduled Deploy From Main to Staging
 on:
   # schedule:
   #   - cron: '0 10 * * 1-5'
+  # Disable Schedule for Pen Testing
   workflow_dispatch: null
 
 jobs:
@@ -44,5 +45,5 @@ jobs:
     needs:
       - testing
     name: Create Pull Request to Staging
-    uses: ./.github/workflows/auto-create-pr.yml
+    uses: ./.github/workflows/create-pull-request-to-staging.yml
     secrets: inherit

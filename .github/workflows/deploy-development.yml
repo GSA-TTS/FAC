@@ -30,7 +30,7 @@ jobs:
 
   # deploy to Dev & Management spaces
   deploy-infrastructure-dev:
-    name: Terraform Apply
+    name: Deploy infrastructure (development)
     needs:
       - testing
     uses: ./.github/workflows/terraform-apply-env.yml
@@ -39,7 +39,7 @@ jobs:
     secrets: inherit
 
   deploy-infastructure-management:
-    name: Terraform Apply Management
+    name: Deploy infrastructure (management)
     needs:
       - testing
     uses: ./.github/workflows/terraform-apply-env.yml
@@ -48,7 +48,7 @@ jobs:
     secrets: inherit
 
   deploy-dev:
-    name: Deploy Application
+    name: Deploy application
     needs:
       - deploy-infrastructure-dev
     uses: ./.github/workflows/deploy-application.yml

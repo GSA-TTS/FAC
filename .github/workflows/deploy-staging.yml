@@ -21,7 +21,7 @@ jobs:
       url: "https://fac-dev.app.cloud.gov/"
 
   deploy-infrastructure-staging:
-    name: Terraform Apply
+    name: Deploy infrastructure (staging)
     needs:
       - testing
       - scan-dev
@@ -31,7 +31,7 @@ jobs:
     secrets: inherit
 
   deploy-staging:
-    name: Deploy Application
+    name: Deploy application
     needs:
       - deploy-infrastructure-staging
     uses: ./.github/workflows/deploy-application.yml
