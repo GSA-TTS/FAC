@@ -99,7 +99,11 @@ class ExcelFileHandlerView(SingleAuditChecklistAccessRequiredMixin, generic.View
     def dispatch(self, *args, **kwargs):
         return super(ExcelFileHandlerView, self).dispatch(*args, **kwargs)
 
-    def post(self, request, *args, **kwargs):
+    def post(self, request, *_args, **kwargs):
+        """
+        Handle Excel file upload:
+        validate Excel, validate data, verify SAC exists, redirect.
+        """
         try:
             report_id = kwargs["report_id"]
 
@@ -124,7 +128,7 @@ class ExcelFileHandlerView(SingleAuditChecklistAccessRequiredMixin, generic.View
                 form_section, (None, None)
             )
             if handler is None:
-                logger.warn(f"no form section found with name {form_section}")
+                logger.warning("no form section found with name %s", form_section)
                 raise BadRequest()
 
             audit_data = handler(excel_file.file)
@@ -134,26 +138,25 @@ class ExcelFileHandlerView(SingleAuditChecklistAccessRequiredMixin, generic.View
             ):
                 globals()[validate_function](audit_data)
 
-            SingleAuditChecklist.objects.filter(pk=sac.id).update(
-                **{field_name: audit_data}
-            )
+            setattr(sac, field_name, audit_data)
+            sac.save()
 
             return redirect("/")
-        except SingleAuditChecklist.DoesNotExist:
-            logger.warn(f"no SingleAuditChecklist found with report ID {report_id}")
-            raise PermissionDenied()
-        except ValidationError as e:
+        except SingleAuditChecklist.DoesNotExist as err:
+            logger.warning("no SingleAuditChecklist found with report ID %s", report_id)
+            raise PermissionDenied() from err
+        except ValidationError as err:
             # The good error, where bad rows/columns are sent back in the request.
             # These come back as tuples:
             # [(col1, row1, field1, link1, help-text1), (col2, row2, ...), ...]
-            logger.warn(f"{form_section} Excel upload failed validation: {e}")
-            return JsonResponse({"errors": list(e), "type": "error_row"}, status=400)
-        except MultiValueDictKeyError:
-            logger.warn("No file found in request")
-            raise BadRequest()
-        except KeyError as e:
-            logger.warn(f"Field error. Field: {e}")
-            return JsonResponse({"errors": str(e), "type": "error_field"}, status=400)
+            logger.warning("%s Excel upload failed validation: %s", form_section, err)
+            return JsonResponse({"errors": list(err), "type": "error_row"}, status=400)
+        except MultiValueDictKeyError as err:
+            logger.warning("No file found in request")
+            raise BadRequest() from err
+        except KeyError as err:
+            logger.warning("Field error. Field: %s", err)
+            return JsonResponse({"errors": str(err), "type": "error_field"}, status=400)
 
 
 class SingleAuditReportFileHandlerView(
