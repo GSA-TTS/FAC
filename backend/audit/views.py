@@ -366,7 +366,7 @@ class SubmissionProgressView(SingleAuditChecklistAccessRequiredMixin, generic.Vi
                     "completed_date": None,
                     "completed_by": None,
                 },
-                "audit_information_workbook": {
+                "audit_information_form": {
                     "completed": False,
                     "completed_date": None,
                     "completed_by": None,
@@ -418,7 +418,7 @@ class SubmissionProgressView(SingleAuditChecklistAccessRequiredMixin, generic.Vi
             # Add all SF-SAC uploads to determine if the process is complete or not
             context["SF_SAC_completed"] = (
                 context["federal_awards_workbook"]["completed"]
-                and context["audit_information_workbook"]["completed"]
+                and context["audit_information_form"]["completed"]
                 and context["findings_text_workbook"]["completed"]
                 and context["CAP_workbook"]["completed"]
                 and context["additional_UEIs_workbook"]["completed"]
