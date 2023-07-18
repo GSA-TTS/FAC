@@ -236,7 +236,7 @@ local open_ranges_defns = [
       help: Help.unknown,
     },
     SV.NoValidation,
-    'Award Index (Read Only)',
+    'Award Reference (Read Only)',
     'award_reference',
   ],
   [
