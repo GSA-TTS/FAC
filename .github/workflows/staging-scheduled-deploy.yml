@@ -1,9 +1,11 @@
 ---
 name: Scheduled Deploy From Main to Staging
 on:
-  schedule:
-    - cron: '0 10 * * 1-5'
-  workflow_dispatch:
+  # schedule:
+  #   - cron: '0 10 * * 1-5'
+  # Disable Schedule for Pen Testing
+  workflow_dispatch: null
+
 jobs:
   trivy-scan:
     uses: ./.github/workflows/trivy.yml
@@ -13,9 +15,6 @@ jobs:
       packages: write
       actions: read
       security-events: write
-    with:
-      work-dir: ./backend
-      docker-name: fac
 
   build-container:
     needs:
@@ -31,16 +30,20 @@ jobs:
       repo-name: gsa-tts/fac
       work-dir: ./backend
 
-  test-and-lint:
+  testing:
     name: Run Django, Lighthouse, a11y and lint
     needs:
       - build-container
-    uses: ./.github/workflows/test.yml
+    uses: ./.github/workflows/testing-from-ghcr.yml
+    secrets: inherit
+
+  linting:
+    uses: ./.github/workflows/linting.yml
     secrets: inherit
 
   create-pr:
     needs:
-      - test-and-lint
+      - testing
     name: Create Pull Request to Staging
-    uses: ./.github/workflows/auto-create-pr.yml
+    uses: ./.github/workflows/create-pull-request-to-staging.yml
     secrets: inherit

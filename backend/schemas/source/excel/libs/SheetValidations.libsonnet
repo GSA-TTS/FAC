@@ -17,10 +17,31 @@ local YoNValidation = {
   custom_error: "Must be 'Y' or 'N'",
   custom_title: 'Y/N',
 };
-
+local YoNoBValidation = {
+  type: 'list',
+  allow_blank: 'False',
+  formula1: '"Y,N,Y&N"',
+  custom_error: "Must be 'Y' or 'N' or 'Y&N'",
+  custom_title: 'Y/N/Y&N',
+};
 // FIRSTCELLREF is magic, and gets replaced with the top
 // of the relevant named range. It uses a relative row reference,
 // so that it applies to every cell in the range.
+
+local LookupValidation = {
+  type: 'lookup',
+  formula1: '=NOT(ISERROR(MATCH(FIRSTCELLREF,LOOKUPRANGE,0)))',
+  custom_error: "Not in the lookup list",
+  custom_title: 'Lookup validation',
+};
+
+local RangeLookupValidation = {
+  type: 'range_lookup',
+  lookup_range: 'NOTAVALIDNAMEDRANGE',
+  # formula1: 'NOTAVALIDFORMULA',
+  custom_error: "Not in the lookup list",
+  custom_title: 'Lookup validation',
+};
 
 // "type" is required; everything else is optional
 local PositiveNumberValidation = {
@@ -55,6 +76,14 @@ local StringOfLengthTwelve = {
   custom_title: 'Must be length of 12',
 };
 
+local LoanBalanceValidation = {
+  type: 'custom',
+  // FIXME MSHD: for improvement, will need to pull column refs from this formula and retrieve that dynamically.
+  formula1: '=IF(K{0}="N",ISBLANK(L{0}),OR(L{0}="N/A",AND(ISNUMBER(L{0}),L{0}>=0)))',
+  custom_error: 'Loan Balance must be blank if Loan Guarantee is "N". If Loan Guarantee is "Y", Loan Balance must be a positive number or "N/A".',
+  custom_title: 'Loan Balance',
+};
+
 local ComplianceRequirementValidation = {
   type: 'custom',
   //This formula only checks if valid characters are used, it does not validate alphabetical order
@@ -64,13 +93,25 @@ local ComplianceRequirementValidation = {
   custom_title: 'Compliance requirement',
 };
 
+
 {
-  NoValidation: {},
+  NoValidation: { type: 'NOVALIDATION' },
   FAPPrefixValidation: FAPPrefixValidation,
   PositiveNumberValidation: PositiveNumberValidation,
+  LookupValidation: LookupValidation,
+  RangeLookupValidation: RangeLookupValidation,
   StringOfLengthThree: StringOfLengthThree,
   StringOfLengthTwelve: StringOfLengthTwelve,
   YoNValidation: YoNValidation,
   ReferenceNumberValidation: ReferenceNumberValidation,
   ComplianceRequirementValidation: ComplianceRequirementValidation,
+  LoanBalanceValidation: LoanBalanceValidation,
+  AuditReportTypeValidation(namedRange): {
+    type: 'list',
+    allow_blank: 'True', 
+    formula1: '=IF(R{0}="Y",' + namedRange + ',"")', 
+    custom_error: 'The Audit Report Type must be empty if Major Program is "N"',
+    custom_title: 'Invalid Audit Report Type',
+  },
+  YoNoBValidation: YoNoBValidation,
 }

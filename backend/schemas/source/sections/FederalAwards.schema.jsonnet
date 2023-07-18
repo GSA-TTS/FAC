@@ -109,6 +109,13 @@ local Validations = {
   ],
   ProgramValidations: [
     {
+      properties: {
+        number_of_audit_findings: Types.integer {
+          minimum: 0,
+        },
+      },
+    },
+    {
       'if': {
         properties: {
           is_major: {
@@ -138,14 +145,6 @@ local Validations = {
             },
           },
         },
-        'else': {
-          properties: {
-            audit_report_type: Base.Enum.MajorProgramAuditReportType,
-            number_of_audit_findings: Types.integer {
-              const: 0,
-            },
-          },
-        },
       },
     },
     {
@@ -163,9 +162,7 @@ local Validations = {
       'then': {
         properties: {
           audit_report_type: Base.Enum.EmptyString_Null,
-          number_of_audit_findings: { const: 0 },
         },
-
       },
     },
     Base.Validation.AdditionalAwardIdentificationValidation[0],
@@ -214,7 +211,7 @@ local Parts = {
         },
         'then': {
           required: [
-          'state_cluster_name',
+            'state_cluster_name',
           ],
           allOf: [
             {
@@ -240,8 +237,8 @@ local Parts = {
         },
         'then': {
           required: [
-          'other_cluster_name',
-          ],          
+            'other_cluster_name',
+          ],
           allOf: [
             {
               properties: {
@@ -308,15 +305,14 @@ local Parts = {
       federal_agency_prefix: Base.Enum.ALNPrefixes,
       three_digit_extension: Base.Compound.ThreeDigitExtension,
       additional_award_identification: Func.compound_type([Types.string, Types.NULL, Types.integer]),
-      // 20230525 HDMS FIXME: It seems this should be both a drop down and a free text field  (see details in  census xlsx)!!!
       program_name: Types.string,
       amount_expended: Types.number,
       federal_program_total: Types.number,
       is_major: Base.Enum.YorN,
-      audit_report_type: Types.string,
+      audit_report_type: Func.compound_type([Base.Enum.MajorProgramAuditReportType, Types.NULL]),
       number_of_audit_findings: Types.integer,
     },
-    required: ['program_name', 'federal_agency_prefix', 'three_digit_extension', 'is_major', 'audit_report_type', 'number_of_audit_findings'],
+    required: ['program_name', 'federal_agency_prefix', 'three_digit_extension', 'is_major', 'number_of_audit_findings'],
     allOf: Validations.ProgramValidations,
   },
 };
@@ -330,6 +326,7 @@ local FederalAwardEntry = Types.object {
     loan_or_loan_guarantee: Parts.LoanOrLoanGuarantee,
     program: Parts.Program,
     subrecipients: Parts.Subrecipients,
+    award_reference: Types.string,
   },
   required: [
     'cluster',

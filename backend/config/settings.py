@@ -106,7 +106,15 @@ INSTALLED_APPS += [
 ]
 
 # Our apps
-INSTALLED_APPS += ["audit", "api", "users", "report_submission", "cms", "data_distro"]
+INSTALLED_APPS += [
+    "audit",
+    "api",
+    "users",
+    "report_submission",
+    "cms",
+    # "data_distro",
+    "dissemination",
+]
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -133,6 +141,9 @@ TEMPLATES = [
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
             ],
+            "builtins": [
+                "report_submission.templatetags.get_attr",
+            ],
         },
     },
 ]
@@ -148,6 +159,8 @@ DATABASES = {
         "DATABASE_URL", default="postgres://postgres:password@0.0.0.0/backend"
     ),
 }
+
+POSTGREST = {"URL": env.str("POSTGREST_URL", "http://api:3000")}
 
 
 # Password validation
@@ -302,7 +315,7 @@ else:
     CSP_IMG_SRC = allowed_sources
     CSP_MEDIA_SRC = allowed_sources
     CSP_FRAME_SRC = allowed_sources
-    CSP_FONT_SRC = ("self", bucket)
+    CSP_FONT_SRC = ("'self'", bucket)
     CSP_WORKER_SRC = allowed_sources
     CSP_FRAME_ANCESTORS = allowed_sources
     CSP_STYLE_SRC = allowed_sources

@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
+{% load sprite_helper %}
 
 {% block content %}
 <!-- 
@@ -7,19 +8,19 @@ Submission progress/audit checklist/audit landing page.
 TODO: Include the "Completed at X by Y", after timestamps are included in the data model. 
 -->
 <header class="usa-header usa-header-basic bg-primary-darker">
-	<div class="usa-nav-container">
-		<div class="usa-navbar bg-primary-darker text-white width-full flex">
-			<p class="margin-left-2">
-				<a href="/" class="text-gray-10">My audit submissions</a> » 
-				<span class="text-bold">{{ auditee_name | default_if_none:'' }}</span>
-			</p>
-		</div>
-	</div>
+  <div class="usa-nav-container">
+    <div class="usa-navbar bg-primary-darker text-white width-full flex">
+      <p class="margin-left-2">
+        <a href="/" class="text-gray-10">My audit submissions</a> »
+        <span class="text-bold">{{ auditee_name | default_if_none:'' }}</span>
+      </p>
+    </div>
+  </div>
 </header>
 <div class="grid-container margin-top-6">
-	<div class="usa-alert usa-alert--success margin-bottom-6">
-		<div class="usa-alert__body">
-			<!-- Success alert is NOT determined by most recently completed step.
+  <div class="usa-alert usa-alert--success margin-bottom-6">
+    <div class="usa-alert__body">
+      <!-- Success alert is NOT determined by most recently completed step.
 			Instead, it is determined by the furthest completed step down the checklist.
 			It can be changed to time-dependence after timestamp changes. -->
 			{% if audit_report.completed is True %}
@@ -58,7 +59,7 @@ TODO: Include the "Completed at X by Y", after timestamps are included in the da
 							aria-hidden="true"
 							focusable="false"
 							role="img">
-						<use xlink:href="/static/img/sprite.svg#person_add"></use>
+                        {% uswds_sprite "person_add" %}
 					</svg>
 					<span class="padding-top-05">Manage report access</span>
 				</button>
@@ -69,7 +70,7 @@ TODO: Include the "Completed at X by Y", after timestamps are included in the da
 			<li class="usa-icon-list__item padding-bottom-2">
 				<div class="usa-icon-list__icon text-green">
 					<svg class="usa-icon margin-right-2" aria-hidden="true" role="img">
-						<use xlink:href="/static/img/sprite.svg#check_circle"></use>
+                        {% uswds_sprite "check_circle" %}
 					</svg>
 				</div>
 				<div class="usa-icon-list__content {% if single_audit_checklist.created is True %}text-green{% endif %}">
@@ -99,13 +100,13 @@ TODO: Include the "Completed at X by Y", after timestamps are included in the da
 				{% if federal_awards_workbook.completed == True %}
 					<div class="usa-icon-list__icon text-green">
 						<svg class="usa-icon margin-right-2" aria-hidden="true" role="img">
-							<use xlink:href="/static/img/sprite.svg#check_circle"></use>
+                            {% uswds_sprite "check_circle" %}
 						</svg>
 					</div>
 				{% else %}
 					<div class="usa-icon-list__icon text-base">
 						<svg class="usa-icon margin-right-2" aria-hidden="true" role="img">
-							<use xlink:href="/static/img/sprite.svg#radio_button_unchecked"></use>
+                            {% uswds_sprite "radio_button_unchecked" %}
 						</svg>
 					</div>
 				{% endif %}
@@ -113,7 +114,7 @@ TODO: Include the "Completed at X by Y", after timestamps are included in the da
 					<a class="usa-link text-bold"
 						href="/report_submission/federal-awards/{{ report_id }}">Upload the Federal Awards workbook</a>
 					<p class="margin-0">
-						Provide general information on the auditee and auditor, financial statements for the auditee entity, and information on the entity's federal program compliance.
+						This workbook should be completed by the auditee. For each federal award received, you'll need the financial and agency details. This is also where you list the number of audit findings.
 					</p>
 				</div>
 			</li>
@@ -121,100 +122,110 @@ TODO: Include the "Completed at X by Y", after timestamps are included in the da
 			<li class="usa-icon-list__item padding-bottom-2">
 				<div class="usa-icon-list__icon text-base">
 					<svg class="usa-icon margin-right-2" aria-hidden="true" role="img">
-						<use xlink:href="/static/img/sprite.svg#radio_button_unchecked"></use>
+                        {% uswds_sprite "radio_button_unchecked" %}
 					</svg>
 				</div>
 				<div class="usa-icon-list__content {% if single_audit_checklist.completed is True %} text-green {% else %} text-base-dark {% endif %}">
-					<a class="usa-link text-bold" href="javascript:void(0);">Upload the Audit Information workbook</a>
-					<p class="margin-0">Sample description text, lorem ipsum, various questionably accurate latin phrases.</p>
-				</div>
-			</li>
+					<a class="usa-link text-bold" href="javascript:void(0);">Upload the Federal Awards Audit Findings workbook</a>
+					<p class="margin-0">
+						This workbook is completed by both the auditee and auditor. Auditees complete this section using the Summary Schedule of Prior Audit Findings and Auditors complete this section using the information in the financial statement audit.
+					</p>
+					</div>
+					</li>
 			<!-- Audit findings workbook -->
 			<li class="usa-icon-list__item padding-bottom-2">
 				<div class="usa-icon-list__icon {% if audit_findings_workbook.completed == True %}text-green{% else %}text-base{% endif %}">
 					<svg class="usa-icon margin-right-2" aria-hidden="true" role="img">
 						{% if audit_findings_workbook.completed == True %}
-							<use xlink:href="/static/img/sprite.svg#check_circle"></use>
+                            {% uswds_sprite "check_circle" %}
 						{% else %}
-							<use xlink:href="/static/img/sprite.svg#radio_button_unchecked"></use>
+                            {% uswds_sprite "radio_button_unchecked" %}
 						{% endif %}
 					</svg>
 				</div>
 				<div class="usa-icon-list__content {% if audit_findings_workbook.created is True %} text-green {% else %} text-base-dark {% endif %}">
 					<a class="usa-link text-bold"
-						href="/report_submission/audit-findings/{{ report_id | default_if_none:'' }}">Upload the Audit Findings workbook</a>
-					<p class="margin-0">Sample description text, lorem ipsum, various questionably accurate latin phrases.</p>
-				</div>
+						href="/report_submission/audit-findings/{{ report_id | default_if_none:'' }}">Upload the Federal Awards Audit Findings workbook</a>
+					<p class="margin-0">
+						This workbook is completed by both the auditee and auditor. Auditees complete this section using the Summary Schedule of Prior Audit Findings and Auditors complete this section using the information in the financial statement audit.
+					</p>
+					</div>
 			</li>
 			<!-- Findings text workbook -->
 			<li class="usa-icon-list__item padding-bottom-2">
 				<div class="usa-icon-list__icon {% if findings_text_workbook.completed == True %}text-green{% else %}text-base{% endif %}">
 					<svg class="usa-icon margin-right-2" aria-hidden="true" role="img">
 						{% if findings_text_workbook.completed == True %}
-							<use xlink:href="/static/img/sprite.svg#check_circle"></use>
+                            {% uswds_sprite "check_circle" %}
 						{% else %}
-							<use xlink:href="/static/img/sprite.svg#radio_button_unchecked"></use>
+                            {% uswds_sprite "radio_button_unchecked" %}
 						{% endif %}
 					</svg>
 				</div>
 				<div class="usa-icon-list__content {% if findings_text_workbook.created is True %} text-green {% else %} text-base-dark {% endif %}">
 					<a class="usa-link text-bold"
-						href="/report_submission/audit-findings-text/{{ report_id | default_if_none:'' }}">Upload the Findings Text workbook</a>
-					<p class="margin-0">Sample description text, lorem ipsum, various questionably accurate latin phrases.</p>
-				</div>
+						href="/report_submission/audit-findings-text/{{ report_id | default_if_none:'' }}">Upload the Audit Findings Text workbook</a>
+						<p class="margin-0">
+							This workbook is completed by the auditee. Enter the full text of the audit finding, listing each finding only once, even if they relate to more than one program. Include the audit finding reference number for each.
+						</p>
+						</div>
 			</li>
 			<!-- CAP -->
 			<li class="usa-icon-list__item padding-bottom-2">
 				<div class="usa-icon-list__icon {% if CAP_workbook.completed == True %}text-green{% else %}text-base{% endif %}">
 					<svg class="usa-icon margin-right-2" aria-hidden="true" role="img">
 						{% if CAP_workbook.completed == True %}
-							<use xlink:href="/static/img/sprite.svg#check_circle"></use>
+                            {% uswds_sprite "check_circle" %}
 						{% else %}
-							<use xlink:href="/static/img/sprite.svg#radio_button_unchecked"></use>
+                            {% uswds_sprite "radio_button_unchecked" %}
 						{% endif %}
 					</svg>
 				</div>
 				<div class="usa-icon-list__content {% if CAP_workbook.created is True %} text-green {% else %} text-base-dark {% endif %}">
 					<a class="usa-link text-bold"
 						href="/report_submission/CAP/{{ report_id | default_if_none:'' }}">Upload the Corrective Action Plan (CAP) workbook</a>
-					<p class="margin-0">Sample description text, lorem ipsum, various questionably accurate latin phrases.</p>
-				</div>
+						<p class="margin-0">
+							This workbook is completed by the auditee. The information should match to the data entered in the Findings Text workbook. Plans for findings relating to more than one program only need to be entered once.
+						</p>
+						</div>
 			</li>
 			<!-- Additional UEIs -->
 			<li class="usa-icon-list__item padding-bottom-2">
 				<div class="usa-icon-list__icon {% if additional_UEIs_workbook.completed == True %}text-green{% else %}text-base{% endif %}">
 					<svg class="usa-icon margin-right-2" aria-hidden="true" role="img">
 						{% if additional_UEIs_workbook.completed == True %}
-							<use xlink:href="/static/img/sprite.svg#check_circle"></use>
+                            {% uswds_sprite "check_circle" %}
 						{% else %}
-							<use xlink:href="/static/img/sprite.svg#radio_button_unchecked"></use>
+                            {% uswds_sprite "radio_button_unchecked" %}
 						{% endif %}
 					</svg>
 				</div>
 				<div class="usa-icon-list__content {% if additional_UEIs_workbook.created is True %} text-green {% else %} text-base-dark {% endif %}">
 					<a class="usa-link text-bold"
-						href="/report_submission/additional-UEIs/{{ report_id | default_if_none:'' }}">Upload the Additional UEIs workbook</a>
-					<p class="margin-0">Sample description text, lorem ipsum, various questionably accurate latin phrases.</p>
-				</div>
+						href="/report_submission/additional-ueis/{{ report_id | default_if_none:'' }}">Upload the Additional UEIs workbook</a>
+						<p class="margin-0">
+							This workbook is only necessary if the audit report covers multiple UEIs. It is completed by the auditee. List the additional UEIs covered by the audit, excluding the primary UEI.
+						</p>
+						</div>
 			</li>
 			<!-- Secondary Auditors -->
 			<li class="usa-icon-list__item padding-bottom-2">
 				<div class="usa-icon-list__icon {% if secondary_auditors_workbook.completed == True %}text-green{% else %}text-base{% endif %}">
 					<svg class="usa-icon margin-right-2" aria-hidden="true" role="img">
 						{% if secondary_auditors_workbook.completed == True %}
-							<use xlink:href="/static/img/sprite.svg#check_circle"></use>
+                            {% uswds_sprite "check_circle" %}
 						{% else %}
-							<use xlink:href="/static/img/sprite.svg#radio_button_unchecked"></use>
+                            {% uswds_sprite "radio_button_unchecked" %}
 						{% endif %}
 					</svg>
 				</div>
 				<div class="usa-icon-list__content {% if secondary_auditors_workbook.created is True %} text-green {% else %} text-base-dark {% endif %}">
 					<a class="usa-link text-bold"
 						href="/report_submission/secondary-auditors/{{ report_id | default_if_none:'' }}">Upload the Secondary Auditors workbook</a>
-					<p class="margin-0">
-						Sample description text, lorem ipsum, various questionably accurate latin phrases.
-					</p>
-				</div>
+						<p class="margin-0">
+							This workbook is only necessary if multiple auditors did the audit work. In these cases, the secondary auditors should enter their information in this workbook.
+						</p>
+						</div>
 			</li>
 			<!-- Ready for certification -->
 			<a href="{% url 'audit:ReadyForCertification' report_id=report_id %}">
@@ -227,14 +238,14 @@ TODO: Include the "Completed at X by Y", after timestamps are included in the da
 				<div class="usa-icon-list__icon {% if audit_report.completed == True %} text-green {% else %} text-base {% endif %}">
 					<svg class="usa-icon margin-right-2" aria-hidden="true" role="img">
 						{% if audit_report.completed == True %}
-							<use xlink:href="/static/img/sprite.svg#check_circle"></use>
+                            {% uswds_sprite "check_circle" %}
 						{% else %}
-							<use xlink:href="/static/img/sprite.svg#radio_button_unchecked"></use>
+                            {% uswds_sprite "radio_button_unchecked" %}
 						{% endif %}
 					</svg>
 				</div>
 				<div class="usa-icon-list__content {% if audit_report.created is True %} text-green {% else %} text-base-dark {% endif %}">
-					<a class="usa-link text-bold" href="javascript:void(0);">Upload the audit report PDF</a>
+					<a class="usa-link text-bold" href="{% url 'audit:upload_report' report_id %}">Upload the audit report PDF</a>
 					<p class="margin-0">
 						Upload the single audit report package, or audit report. This should be a single, unlocked, and machine-readable PDF. This can be re-uploaded with updated versions as necessary until the report has been certified, at which point it cannot be edited or re-uploaded.
 					</p>
@@ -245,9 +256,9 @@ TODO: Include the "Completed at X by Y", after timestamps are included in the da
 				<div class="usa-icon-list__icon {% if certification.auditor_certified == True %} text-green {% else %} text-base {% endif %}">
 					<svg class="usa-icon margin-right-2" aria-hidden="true" role="img">
 						{% if certification.auditor_certified == True %}
-							<use xlink:href="/static/img/sprite.svg#check_circle"></use>
+                            {% uswds_sprite "check_circle" %}
 						{% else %}
-							<use xlink:href="/static/img/sprite.svg#radio_button_unchecked"></use>
+                            {% uswds_sprite "radio_button_unchecked" %}
 						{% endif %}
 					</svg>
 				</div>
@@ -257,9 +268,9 @@ TODO: Include the "Completed at X by Y", after timestamps are included in the da
 							href="{% url 'audit:AuditorCertification' report_id=report_id %}">Auditor Certification</a>
 					{% else %}
 						<svg class="usa-icon margin-right-05" aria-hidden="true" role="img">
-							<use xlink:href="/static/img/sprite.svg#lock_outline"></use>
+                            {% uswds_sprite "lock_outline" %}
 						</svg>
-						<span class="text-base">Auditor Certification</span>
+						<span class="text-base">Auditor Certification (either certification order is fine)</span>
 					{% endif %}
 					<p class="margin-0">
 						The certifying auditor must attest and sign the single audit report before submission. This step is locked until after the SF-SAC and single audit report have been completed and uploaded in the previous steps.
@@ -271,24 +282,24 @@ TODO: Include the "Completed at X by Y", after timestamps are included in the da
 				<div class="usa-icon-list__icon {% if certification.auditee_certified == True %} text-green {% else %} text-base {% endif %}">
 					<svg class="usa-icon margin-right-2" aria-hidden="true" role="img">
 						{% if certification.auditee_certified == True %}
-							<use xlink:href="/static/img/sprite.svg#check_circle"></use>
+                            {% uswds_sprite "check_circle" %}
 						{% else %}
-							<use xlink:href="/static/img/sprite.svg#radio_button_unchecked"></use>
+                            {% uswds_sprite "radio_button_unchecked" %}
 						{% endif %}
 					</svg>
 				</div>
 				<div class="usa-icon-list__content {% if certification.auditee_certified is True %} text-green {% else %} text-base-dark {% endif %}">
 					{% if SF_SAC_completed == True and audit_report.completed == True and certification.auditor_certified == True %}
 						<a class="usa-link text-bold"
-							href="{% url 'audit:AuditeeCertification' report_id=report_id %}">Auditee Certification</a>
+							href="{% url 'audit:AuditeeCertification' report_id=report_id %}">Auditee Certification (either certification order is fine) </a>
 					{% else %}
 						<svg class="usa-icon margin-right-05" aria-hidden="true" role="img">
-							<use xlink:href="/static/img/sprite.svg#lock_outline"></use>
+                            {% uswds_sprite "lock_outline" %}
 						</svg>
 						<span class="text-base">Auditee Certification</span>
 					{% endif %}
 					<p class="margin-0">
-						After the SF-SAC and audit report have been completed and uploaded, the certifying auditee must attest and sign before an audit submission can be submitted.
+						The certifying auditee must attest and sign the single audit report before submission. This step is locked until after the SF-SAC and single audit report have been completed and uploaded in the previous steps.
 					</p>
 				</div>
 			</li>
@@ -297,9 +308,9 @@ TODO: Include the "Completed at X by Y", after timestamps are included in the da
 				<div class="usa-icon-list__icon {% if submission.completed == True %}text-green{% else %}text-base{% endif %}">
 					<svg class="usa-icon margin-right-2" aria-hidden="true" role="img">
 						{% if submission.completed == True %}
-							<use xlink:href="/static/img/sprite.svg#check_circle"></use>
+                            {% uswds_sprite "check_circle" %}
 						{% else %}
-							<use xlink:href="/static/img/sprite.svg#radio_button_unchecked"></use>
+                            {% uswds_sprite "radio_button_unchecked" %}
 						{% endif %}
 					</svg>
 				</div>
@@ -309,7 +320,7 @@ TODO: Include the "Completed at X by Y", after timestamps are included in the da
 							href="{% url 'audit:Submission' report_id=report_id %}">Submit to FAC for processing</a>
 					{% else %}
 						<svg class="usa-icon margin-right-05" aria-hidden="true" role="img">
-							<use xlink:href="/static/img/sprite.svg#lock_outline"></use>
+                            {% uswds_sprite "lock_outline" %}
 						</svg>
 						<span class="text-base">Submit to FAC for processing</span>
 					{% endif %}
@@ -321,5 +332,4 @@ TODO: Include the "Completed at X by Y", after timestamps are included in the da
 		</ul>
 	</div>
 </div>
-{% include "audit-metadata.html" %}
-{% endblock content %}
+{% include "audit-metadata.html" %} {% endblock content %}

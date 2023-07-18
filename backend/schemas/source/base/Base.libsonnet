@@ -1,8 +1,10 @@
 local Func = import 'Functions.libsonnet';
+local FederalProgramNames = import 'FederalProgramNames.json';
 
 local Const = {
   Y: 'Y',
   N: 'N',
+  Y_N: 'Y&N',
   NA: 'N/A',
   SCHEMA_VERSION: 'https://json-schema.org/draft/2019-09/schema#',
   empty_string: '',
@@ -93,6 +95,13 @@ local Enum = {
     ],
     //title: 'YorN'
   },
+  YorNorBoth: Types.string {
+    enum: [
+      Const.Y,
+      Const.N,
+      Const.Y_N,
+    ],
+  },  
   NA: Types.string {
     //description: 'A 'not applicable' answer',
     enum: [
@@ -126,18 +135,23 @@ local Enum = {
     ],
     title: 'EmptyString_EmptyArray_Null',
   },
+  // Source: https://pe.usps.com/text/pub28/28apb.htm
   UnitedStatesStateAbbr: Types.string {
     enum: [
       'AL',
       'AK',
+      'AS',
       'AZ',
       'AR',
       'CA',
       'CO',
       'CT',
       'DE',
+      'DC',
+      'FM',
       'FL',
       'GA',
+      'GU',
       'HI',
       'ID',
       'IL',
@@ -147,6 +161,7 @@ local Enum = {
       'KY',
       'LA',
       'ME',
+      'MH',
       'MD',
       'MA',
       'MI',
@@ -162,10 +177,13 @@ local Enum = {
       'NY',
       'NC',
       'ND',
+      'MP',
       'OH',
       'OK',
       'OR',
+      'PW',
       'PA',
+      'PR',
       'RI',
       'SC',
       'SD',
@@ -173,6 +191,7 @@ local Enum = {
       'TX',
       'UT',
       'VT',
+      'VI',
       'VA',
       'WA',
       'WV',
@@ -452,7 +471,18 @@ local SchemaBase = Types.object {
   Meta: Meta,
   Enum: Enum,
   Compound: Compound {
-    //UEI: type_uei,
+    FederalProgramNames: {
+      description: 'All Federal program names',
+      enum: FederalProgramNames.program_names
+    },
+    AllALNNumbers: {
+      description: 'All program numbers',
+      enum: FederalProgramNames.all_alns
+      },  
+    ALNPrefixes: {
+      description: 'Unique ALN prefixes',
+      enum: FederalProgramNames.aln_prefixes
+    }
   },
   Validation: Validation,
   SchemaBase: SchemaBase,

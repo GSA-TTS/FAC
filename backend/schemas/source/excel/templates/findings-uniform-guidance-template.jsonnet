@@ -2,16 +2,19 @@ local Fun = import '../libs/Functions.libsonnet';
 local Help = import '../libs/Help.libsonnet';
 local SV = import '../libs/SheetValidations.libsonnet';
 local Sheets = import '../libs/Sheets.libsonnet';
-
-local title_row = 3;
+local findingSheet = 'Form';
+local ueiSheet = 'UEI';
+local title_row = 1;
 
 local single_cells = [
   Sheets.single_cell {
     title: 'Auditee UEI',
     range_name: 'auditee_uei',
-    title_cell: 'A2',
-    range_cell: 'B2',
+    width: 36,
+    title_cell: 'A1',
+    range_cell: 'A2',
     validation: SV.StringOfLengthTwelve,
+    format: 'text',
     help: Help.uei,
   },
 ];
@@ -48,6 +51,7 @@ local y_or_n_range_w12 = Sheets.y_or_n_range {
 local open_ranges_defns = [
   [
     open_range_w12 {
+      format: 'text',
       help: Help.aln_prefix,
     },
     SV.FAPPrefixValidation,
@@ -56,6 +60,7 @@ local open_ranges_defns = [
   ],
   [
     open_range_w12 {
+      format: 'text',
       help: Help.aln_extension,
     },
     SV.StringOfLengthThree,
@@ -64,6 +69,7 @@ local open_ranges_defns = [
   ],
   [
     Sheets.open_range {
+      format: 'text',
       help: Help.unknown,
     },
     SV.NoValidation,
@@ -170,14 +176,17 @@ local open_ranges_defns = [
 
 local sheets = [
   {
-    name: 'Form',
-    single_cells: single_cells,
+    name: findingSheet,
     open_ranges: Fun.make_open_ranges(title_row, open_ranges_defns),
-    mergeable_cells: [
-      [1, 2, 'A', 'O'],
-      [2, 3, 'C', 'O'],
-    ],
-    header_inclusion: ['A1', 'C2'],
+    hide_col_from: 16,
+  },
+  {
+    name: ueiSheet,
+    single_cells: single_cells,
+    header_height: 100,
+    hide_col_from: 2,
+    //FIXME MSHD: commented this out until we figure out if it is needed
+    //hide_row_from: 3,
   },
 ];
 

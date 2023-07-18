@@ -5,10 +5,12 @@ from typing import Any, Callable
 from openpyxl import load_workbook, Workbook
 from openpyxl.cell import Cell
 from audit.fixtures.excel import (
+    ADDITIONAL_UEIS_TEMPLATE_DEFINITION,
     CORRECTIVE_ACTION_TEMPLATE_DEFINITION,
     FEDERAL_AWARDS_TEMPLATE_DEFINITION,
     FINDINGS_TEXT_TEMPLATE_DEFINITION,
     FINDINGS_UNIFORM_TEMPLATE_DEFINITION,
+    NOTES_TO_SEFA_TEMPLATE_DEFINITION,
 )
 import pydash
 
@@ -63,6 +65,15 @@ findings_uniform_guidance_field_mapping: FieldMapping = {
 }
 findings_text_field_mapping: FieldMapping = {
     "auditee_uei": ("FindingsText.auditee_uei", _set_by_path),
+}
+additional_ueis_field_mapping: FieldMapping = {
+    "auditee_uei": ("AdditionalUEIs.auditee_uei", _set_by_path),
+}
+notes_to_sefa_field_mapping: FieldMapping = {
+    "auditee_uei": ("NotesToSefa.auditee_uei", _set_by_path),
+    "accounting_policies": ("NotesToSefa.accounting_policies", _set_by_path),
+    "is_minimis_rate_used": ("NotesToSefa.is_minimis_rate_used", _set_by_path),
+    "rate_explained": ("NotesToSefa.rate_explained", _set_by_path),
 }
 
 federal_awards_column_mapping: ColumnMapping = {
@@ -160,6 +171,11 @@ federal_awards_column_mapping: ColumnMapping = {
     "number_of_audit_findings": (
         "FederalAwards.federal_awards",
         "program.number_of_audit_findings",
+        _set_by_path,
+    ),
+    "award_reference": (
+        "FederalAwards.federal_awards",
+        "award_reference",
         _set_by_path,
     ),
 }
@@ -274,6 +290,30 @@ findings_text_column_mapping: ColumnMapping = {
         _set_by_path,
     ),
 }
+additional_ueis_column_mapping: ColumnMapping = {
+    "additional_uei": (
+        "AdditionalUEIs.additional_ueis_entries",
+        "additional_uei",
+        _set_by_path,
+    ),
+}
+notes_to_sefa_column_mapping: ColumnMapping = {
+    "note_title": (
+        "NotesToSefa.notes_to_sefa_entries",
+        "note_title",
+        _set_by_path,
+    ),
+    "note_content": (
+        "NotesToSefa.notes_to_sefa_entries",
+        "note_content",
+        _set_by_path,
+    ),
+    "seq_number": (
+        "NotesToSefa.notes_to_sefa_entries",
+        "seq_number",
+        _set_by_path,
+    ),
+}
 
 
 class ExcelExtractionError(Exception):
@@ -348,16 +388,6 @@ def _get_entries_by_path(dictionary, path):
     return val
 
 
-def _ensure_string_conversion(path, value):
-    """
-    This function checks whether the input path ends with certain specified suffixes,
-    and if it does, it ensures the corresponding value is format as string.
-    """
-    if path.endswith(FEDERAL_AGENCY_PREFIX) or path.endswith(THREE_DIGIT_EXTENSION):
-        return str(value)
-    return value
-
-
 def _extract_data(
     file,
     field_mapping: FieldMapping,
@@ -384,7 +414,7 @@ def _extract_data(
                 set_fn(
                     result,
                     f"{parent_target}[{index}].{field_target}",
-                    _ensure_string_conversion(field_target, value),
+                    value,
                 )
 
             # Necessary to prevent null entries when index/row is skipped in first column
@@ -402,17 +432,33 @@ def _extract_data(
     return result
 
 
+def _remove_empty_award_entries(data):
+    """Removes empty award entries from the data"""
+    indexed_awards = []
+    for award in data.get("FederalAwards", {}).get("federal_awards", []):
+        if "program" in award:
+            program = award["program"]
+            if FEDERAL_AGENCY_PREFIX in program:
+                indexed_awards.append(award)
+
+    # Update the federal_awards with the valid awards
+    data["FederalAwards"]["federal_awards"] = indexed_awards
+
+    return data
+
+
 def extract_federal_awards(file):
     template_definition_path = (
         XLSX_TEMPLATE_DEFINITION_DIR / FEDERAL_AWARDS_TEMPLATE_DEFINITION
     )
     template = json.loads(template_definition_path.read_text(encoding="utf-8"))
-    return _extract_data(
+    result = _extract_data(
         file,
         federal_awards_field_mapping,
         federal_awards_column_mapping,
         template["title_row"],
     )
+    return _remove_empty_award_entries(result)
 
 
 def extract_corrective_action_plan(file):
@@ -450,6 +496,32 @@ def extract_findings_text(file):
         file,
         findings_text_field_mapping,
         findings_text_column_mapping,
+        template["title_row"],
+    )
+
+
+def extract_additional_ueis(file):
+    template_definition_path = (
+        XLSX_TEMPLATE_DEFINITION_DIR / ADDITIONAL_UEIS_TEMPLATE_DEFINITION
+    )
+    template = json.loads(template_definition_path.read_text(encoding="utf-8"))
+    return _extract_data(
+        file,
+        additional_ueis_field_mapping,
+        additional_ueis_column_mapping,
+        template["title_row"],
+    )
+
+
+def extract_notes_to_sefa(file):
+    template_definition_path = (
+        XLSX_TEMPLATE_DEFINITION_DIR / NOTES_TO_SEFA_TEMPLATE_DEFINITION
+    )
+    template = json.loads(template_definition_path.read_text(encoding="utf-8"))
+    return _extract_data(
+        file,
+        notes_to_sefa_field_mapping,
+        notes_to_sefa_column_mapping,
         template["title_row"],
     )
 
@@ -541,4 +613,16 @@ def findings_uniform_guidance_named_ranges(errors):
 def findings_text_named_ranges(errors):
     return _extract_named_ranges(
         errors, findings_text_column_mapping, findings_text_field_mapping
+    )
+
+
+def additional_ueis_named_ranges(errors):
+    return _extract_named_ranges(
+        errors, additional_ueis_column_mapping, additional_ueis_field_mapping
+    )
+
+
+def notes_to_sefa_named_ranges(errors):
+    return _extract_named_ranges(
+        errors, notes_to_sefa_column_mapping, notes_to_sefa_field_mapping
     )

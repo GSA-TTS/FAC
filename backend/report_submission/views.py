@@ -152,10 +152,14 @@ class GeneralInformationFormView(LoginRequiredMixin, View):
             }
 
             return render(request, "report_submission/gen-form.html", context)
-        except SingleAuditChecklist.DoesNotExist:
-            raise PermissionDenied("You do not have access to this audit.")
+        except SingleAuditChecklist.DoesNotExist as err:
+            raise PermissionDenied("You do not have access to this audit.") from err
 
     def post(self, request, *args, **kwargs):
+        """
+        Handle POST of General Information:
+        verify access, validate form data, save, and redirect.
+        """
         report_id = kwargs["report_id"]
 
         try:
@@ -171,23 +175,19 @@ class GeneralInformationFormView(LoginRequiredMixin, View):
                 general_information = sac.general_information
                 general_information.update(form.cleaned_data)
 
-                validate_general_information_json(general_information)
-                update = {"general_information": general_information}
-
-                # audit_type is stored at the model root, not in the
-                # general_information JSON, so:
+                validated = validate_general_information_json(general_information)
+                sac.general_information = validated
                 if general_information.get("audit_type"):
-                    update["audit_type"] = general_information["audit_type"]
+                    sac.audit_type = general_information["audit_type"]
+                sac.save()
 
-                SingleAuditChecklist.objects.filter(pk=sac.id).update(**update)
-
-                return redirect(
-                    "/audit/submission-progress/{report_id}".format(report_id=report_id)
-                )
-        except SingleAuditChecklist.DoesNotExist:
-            raise PermissionDenied("You do not have access to this audit.")
-        except ValidationError as e:
-            logger.info(f"ValidationError for report ID {report_id}: {e.message}")
+                return redirect(f"/audit/submission-progress/{report_id}")
+        except SingleAuditChecklist.DoesNotExist as err:
+            raise PermissionDenied("You do not have access to this audit.") from err
+        except ValidationError as err:
+            logger.warning(
+                "ValidationError for report ID %s: %s", report_id, err.message
+            )
 
         raise BadRequest()
 
@@ -228,8 +228,8 @@ class UploadPageView(LoginRequiredMixin, View):
                 "view_name": "Additional EINs",
                 "instructions": "Enter any additional EINs using the provided worksheet.",
             },
-            "additional-UEIs": {
-                "view_id": "additional-UEIs",
+            "additional-ueis": {
+                "view_id": "additional-ueis",
                 "view_name": "Additional UEIs",
                 "instructions": "Enter any additional UEIs using the provided worksheet.",
             },

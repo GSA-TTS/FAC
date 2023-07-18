@@ -14,14 +14,18 @@ from openpyxl import load_workbook
 from openpyxl.cell import Cell
 
 from .fixtures.excel import (
+    ADDITIONAL_UEIS_TEMPLATE,
     FEDERAL_AWARDS_TEMPLATE,
     CORRECTIVE_ACTION_PLAN_TEMPLATE,
     FINDINGS_TEXT_TEMPLATE,
     FINDINGS_UNIFORM_GUIDANCE_TEMPLATE,
+    NOTES_TO_SEFA_TEMPLATE,
     CORRECTIVE_ACTION_PLAN_ENTRY_FIXTURES,
     FINDINGS_TEXT_ENTRY_FIXTURES,
     FINDINGS_UNIFORM_GUIDANCE_ENTRY_FIXTURES,
     FEDERAL_AWARDS_ENTRY_FIXTURES,
+    ADDITIONAL_UEIS_ENTRY_FIXTURES,
+    NOTES_TO_SEFA_ENTRY_FIXTURES,
     FORM_SECTIONS,
 )
 from .models import Access, SingleAuditChecklist
@@ -664,4 +668,198 @@ class ExcelFileHandlerViewTests(TestCase):
                 self.assertEqual(
                     findings_entries["reference_number"],
                     test_data[0]["reference_number"],
+                )
+
+
+class SingleAuditReportFileHandlerViewTests(TestCase):
+    def test_login_required(self):
+        """When an unauthenticated request is made"""
+
+        response = self.client.post(
+            reverse(
+                "audit:SingleAuditReport",
+                kwargs={"report_id": "12345"},
+            )
+        )
+
+        self.assertEqual(response.status_code, 403)
+
+    def test_bad_report_id_returns_403(self):
+        """When a request is made for a malformed or nonexistent report_id, a 403 error should be returned"""
+        user = baker.make(User)
+
+        self.client.force_login(user)
+
+        response = self.client.post(
+            reverse(
+                "audit:SingleAuditReport",
+                kwargs={
+                    "report_id": "this is not a report id",
+                },
+            )
+        )
+
+        self.assertEqual(response.status_code, 403)
+
+    def test_inaccessible_audit_returns_403(self):
+        """When a request is made for an audit that is inaccessible for this user, a 403 error should be returned"""
+        user, sac = _make_user_and_sac()
+
+        self.client.force_login(user)
+        response = self.client.post(
+            reverse(
+                "audit:SingleAuditReport",
+                kwargs={"report_id": sac.report_id},
+            )
+        )
+
+        self.assertEqual(response.status_code, 403)
+
+    def test_no_file_attached_returns_400(self):
+        """When a request is made with no file attached, a 400 error should be returned"""
+        user, sac = _make_user_and_sac()
+        baker.make(Access, user=user, sac=sac)
+
+        self.client.force_login(user)
+
+        response = self.client.post(
+            reverse(
+                "audit:SingleAuditReport",
+                kwargs={"report_id": sac.report_id},
+            )
+        )
+
+        self.assertEqual(response.status_code, 400)
+
+    @patch("audit.validators._scan_file")
+    def test_valid_file_upload(self, mock_scan_file):
+        sac = _mock_login_and_scan(self.client, mock_scan_file)
+
+        with open("audit/fixtures/basic.pdf", "rb") as pdf_file:
+            response = self.client.post(
+                reverse(
+                    "audit:SingleAuditReport",
+                    kwargs={
+                        "report_id": sac.report_id,
+                    },
+                ),
+                data={"FILES": pdf_file},
+            )
+
+            self.assertEqual(response.status_code, 302)
+
+    @patch("audit.validators._scan_file")
+    def test_valid_file_upload_for_additional_ueis(self, mock_scan_file):
+        """When a valid Excel file is uploaded, the file should be stored and the SingleAuditChecklist should be updated to include the uploaded Additional UEIs data"""
+
+        sac = _mock_login_and_scan(self.client, mock_scan_file)
+        test_data = json.loads(
+            ADDITIONAL_UEIS_ENTRY_FIXTURES.read_text(encoding="utf-8")
+        )
+
+        # add valid data to the workbook
+        workbook = load_workbook(ADDITIONAL_UEIS_TEMPLATE, data_only=True)
+        _set_by_name(workbook, "auditee_uei", ExcelFileHandlerViewTests.GOOD_UEI)
+
+        _add_entry(workbook, 0, test_data[0])
+
+        with NamedTemporaryFile(suffix=".xlsx") as tmp:
+            workbook.save(tmp.name)
+            tmp.seek(0)
+
+            with open(tmp.name, "rb") as excel_file:
+                response = self.client.post(
+                    reverse(
+                        f"audit:{FORM_SECTIONS.ADDITIONAL_UEIS}",
+                        kwargs={
+                            "report_id": sac.report_id,
+                            "form_section": FORM_SECTIONS.ADDITIONAL_UEIS,
+                        },
+                    ),
+                    data={"FILES": excel_file},
+                )
+
+                self.assertEqual(response.status_code, 302)
+
+                updated_sac = SingleAuditChecklist.objects.get(pk=sac.id)
+
+                self.assertEqual(
+                    updated_sac.additional_ueis["AdditionalUEIs"]["auditee_uei"],
+                    ExcelFileHandlerViewTests.GOOD_UEI,
+                )
+
+                self.assertEqual(
+                    len(
+                        updated_sac.additional_ueis["AdditionalUEIs"][
+                            "additional_ueis_entries"
+                        ]
+                    ),
+                    1,
+                )
+
+                additional_ueis_entries = updated_sac.additional_ueis["AdditionalUEIs"][
+                    "additional_ueis_entries"
+                ][0]
+
+                self.assertEqual(
+                    additional_ueis_entries["additional_uei"],
+                    test_data[0]["additional_uei"],
+                )
+
+    @patch("audit.validators._scan_file")
+    def test_valid_file_upload_for_notes_to_sefa(self, mock_scan_file):
+        """When a valid Excel file is uploaded, the file should be stored and the SingleAuditChecklist should be updated to include the uploaded Notes to SEFA data"""
+
+        sac = _mock_login_and_scan(self.client, mock_scan_file)
+        test_data = json.loads(NOTES_TO_SEFA_ENTRY_FIXTURES.read_text(encoding="utf-8"))
+
+        # add valid data to the workbook
+        workbook = load_workbook(NOTES_TO_SEFA_TEMPLATE, data_only=True)
+        _set_by_name(workbook, "auditee_uei", ExcelFileHandlerViewTests.GOOD_UEI)
+        _set_by_name(workbook, "accounting_policies", "Mandatory notes")
+        _set_by_name(workbook, "is_minimis_rate_used", "N")
+        _set_by_name(workbook, "rate_explained", "More explanation.")
+        _add_entry(workbook, 0, test_data[0])
+
+        with NamedTemporaryFile(suffix=".xlsx") as tmp:
+            workbook.save(tmp.name)
+            tmp.seek(0)
+
+            with open(tmp.name, "rb") as excel_file:
+                response = self.client.post(
+                    reverse(
+                        f"audit:{FORM_SECTIONS.NOTES_TO_SEFA}",
+                        kwargs={
+                            "report_id": sac.report_id,
+                            "form_section": FORM_SECTIONS.NOTES_TO_SEFA,
+                        },
+                    ),
+                    data={"FILES": excel_file},
+                )
+
+                self.assertEqual(response.status_code, 302)
+
+                updated_sac = SingleAuditChecklist.objects.get(pk=sac.id)
+
+                self.assertEqual(
+                    updated_sac.notes_to_sefa["NotesToSefa"]["auditee_uei"],
+                    ExcelFileHandlerViewTests.GOOD_UEI,
+                )
+
+                self.assertEqual(
+                    len(
+                        updated_sac.notes_to_sefa["NotesToSefa"][
+                            "notes_to_sefa_entries"
+                        ]
+                    ),
+                    1,
+                )
+
+                notes_to_sefa_entries = updated_sac.notes_to_sefa["NotesToSefa"][
+                    "notes_to_sefa_entries"
+                ][0]
+
+                self.assertEqual(
+                    notes_to_sefa_entries["note_title"],
+                    test_data[0]["note_title"],
                 )

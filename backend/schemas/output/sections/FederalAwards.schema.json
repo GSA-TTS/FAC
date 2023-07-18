@@ -29,6 +29,9 @@
                   "additionalProperties": false,
                   "description": "Award entry rows",
                   "properties": {
+                     "award_reference": {
+                        "type": "string"
+                     },
                      "cluster": {
                         "allOf": [
                            {
@@ -360,6 +363,14 @@
                         "additionalProperties": false,
                         "allOf": [
                            {
+                              "properties": {
+                                 "number_of_audit_findings": {
+                                    "minimum": 0,
+                                    "type": "integer"
+                                 }
+                              }
+                           },
+                           {
                               "if": {
                                  "properties": {
                                     "is_major": {
@@ -368,25 +379,6 @@
                                  }
                               },
                               "then": {
-                                 "else": {
-                                    "properties": {
-                                       "audit_report_type": {
-                                          "description": "Major program report types",
-                                          "enum": [
-                                             "U",
-                                             "Q",
-                                             "A",
-                                             "D"
-                                          ],
-                                          "title": "MajorProgramAuditReportType",
-                                          "type": "string"
-                                       },
-                                       "number_of_audit_findings": {
-                                          "const": 0,
-                                          "type": "integer"
-                                       }
-                                    }
-                                 },
                                  "if": {
                                     "properties": {
                                        "audit_report_type": {
@@ -428,9 +420,6 @@
                                           "null"
                                        ],
                                        "title": "EmptyString_Null"
-                                    },
-                                    "number_of_audit_findings": {
-                                       "const": 0
                                     }
                                  }
                               }
@@ -471,7 +460,10 @@
                               "type": "number"
                            },
                            "audit_report_type": {
-                              "type": "string"
+                              "type": [
+                                 "string",
+                                 "null"
+                              ]
                            },
                            "federal_agency_prefix": {
                               "description": "Valid two-digit program numbers; part of the CFDA/ALN",
@@ -568,7 +560,6 @@
                            "federal_agency_prefix",
                            "three_digit_extension",
                            "is_major",
-                           "audit_report_type",
                            "number_of_audit_findings"
                         ],
                         "type": "object"

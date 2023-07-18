@@ -30,9 +30,8 @@ jobs:
 
       - name: Start services
         working-directory: ./backend
-        run: docker compose -f docker-compose-web.yml up -d
-
-      - name: Run E2E Tests
+        run: touch .env && docker compose up -d
+      - name: Run Cypress
         working-directory: ./backend
         run: |
           # Add running code here

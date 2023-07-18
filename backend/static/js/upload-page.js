@@ -6,6 +6,7 @@ const UPLOAD_URLS = {
   'federal-awards': 'federal-awards-expended',
   'audit-findings': 'findings-uniform-guidance',
   'audit-findings-text': 'findings-text',
+  'additional-ueis': 'additional-ueis',
   CAP: 'corrective-action-plan',
 };
 
@@ -126,6 +127,8 @@ function attachFileUploadHandler() {
           } else {
             res.json().then((data) => {
               if (data.type === 'error_row') {
+                if (Array.isArray(data.errors[0]))
+                  handleErrorOnUpload(new Error(data.errors[0]));
                 info_box.innerHTML = get_error_table(data);
               } else if (data.type === 'error_field') {
                 info_box.innerHTML = `Field Error: ${res.errors}`;
