@@ -34,8 +34,8 @@ local single_cells = [
     title_cell: 'B1',
     range_cell: 'B2',
     format: 'dollar',
-    // FIXME MSHD: for improvement, will need to pull E from this formula and retrieve it dynamically.
-    formula: "=SUM('" + awardSheet + "'!E$FIRSTROW:E$LASTROW)",
+    // FIXME MSHD: for improvement, will need to pull F from this formula and retrieve it dynamically.
+    formula: "=SUM('" + awardSheet + "'!F$FIRSTROW:F$LASTROW)",
     width: 36,
     help: Help.positive_number,
     validation: SV.PositiveNumberValidation,
@@ -53,7 +53,7 @@ local open_ranges_defns = [
     SV.NoValidation,
     'Award Reference (Read Only)',
     'award_reference',
-  ],  
+  ],
   [
     Sheets.open_range {
       format: 'text',
