@@ -133,16 +133,31 @@ class ETL(object):
             cap_text.save()
 
     def load_note(self):
-        note = Note(
-            type_id="",  # TODO: What is this?
-            report_id=self.report_id,
-            version="",  # TODO: What is this?
-            sequence_number=-1,  # TODO: Where does this come from?
-            note_index=-1,  # TODO: Where does this come from?
-            content="",  # TODO: Where does this come from?
-            title="",  # TODO: Where does this come from?
-        )
-        note.save()
+        notes_to_sefa = self.single_audit_checklist.notes_to_sefa["NotesToSefa"]
+        accounting_policies = notes_to_sefa["accounting_policies"]
+        is_minimis_rate_used = notes_to_sefa["is_minimis_rate_used"]
+        rate_explained = notes_to_sefa["rate_explained"]
+        entries = notes_to_sefa["notes_to_sefa_entries"]
+        if not entries:
+            note = Note(
+                report_id=self.report_id,
+                accounting_policies=accounting_policies,
+                is_minimis_rate_used=is_minimis_rate_used,
+                rate_explained=rate_explained,
+            )
+            note.save()
+        else:
+            for entry in entries:
+                note = Note(
+                    report_id=self.report_id,
+                    note_seq_number=entry["seq_number"],
+                    content=entry["note_content"],
+                    note_title=entry["note_title"],
+                    accounting_policies=accounting_policies,
+                    is_minimis_rate_used=is_minimis_rate_used,
+                    rate_explained=rate_explained,
+                )
+                note.save()
 
     def load_revision(self):
         revision = Revision(

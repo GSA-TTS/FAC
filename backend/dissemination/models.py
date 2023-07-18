@@ -307,16 +307,13 @@ class Note(models.Model):
     note_seq_number = models.IntegerField(
         "Order that the Note was reported", help_text=docs.seq_number_notes
     )
-    type_id = models.CharField("Note Type", max_length=1, help_text=docs.type_id)
-    note_index = models.IntegerField(
-        "Display Index for the Note",
-        null=True,
-        help_text=docs.note_index,
-    )
     content = models.TextField("Content of the Note", null=True, help_text=docs.content)
     note_title = models.CharField(
         "Note Title", max_length=75, null=True, help_text=docs.title
     )
+    accounting_policies = models.TextField(null=True)
+    is_minimis_rate_used = models.CharField(max_length=3, null=True)
+    rate_explained = models.TextField(null=True)
 
     class Meta:
         unique_together = (("report_id", "note_seq_number"),)

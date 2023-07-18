@@ -3,7 +3,7 @@ from django.test import TestCase
 from model_bakery import baker
 
 from .models import SingleAuditChecklist, User
-from dissemination.models import General, FederalAward, Finding, Passthrough
+from dissemination.models import General, FederalAward, Finding, Passthrough, Note
 from audit.etl import ETL
 
 
@@ -178,12 +178,28 @@ class ETLTests(TestCase):
                 ],
             }
         }
+        notes_to_sefa = {
+            "NotesToSefa": {
+                "auditee_uei": "AAA123456BBB",
+                "accounting_policies": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. \nFusce in ipsum tempus, eleifend ipsum id, dignissim ipso lorem. Proin vel quam non metus placerat semper nec in nisi.",
+                "is_minimis_rate_used": "Y",
+                "rate_explained": "Ipsum lorem ipsum dolor sit amet, consectetur adipiscing elit. \nInteger nec elit sed est malesuada fermentum vitae in odio. In hac habitasse platea dictumst. Nunc ut tincidunt quam.",
+                "notes_to_sefa_entries": [
+                    {
+                        "note_title": "First Note",
+                        "note_content": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. \nVestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Phasellus nec tortor ut ligula sollicitudin euismod.",
+                        "seq_number": 1,
+                    },
+                ],
+            }
+        }
 
         sac = SingleAuditChecklist.objects.create(
             submitted_by=user,
             general_information=general_information,
             federal_awards=federal_awards,
             findings_uniform_guidance=findings_uniform_guidance,
+            notes_to_sefa=notes_to_sefa,
         )
         sac.save()
         self.sac = sac
@@ -217,3 +233,10 @@ class ETLTests(TestCase):
         self.assertEqual(len(passthroughs), 1)
         passthrough = passthroughs.first()
         self.assertEqual(self.report_id, passthrough.report_id)
+
+    def test_load_notes(self):
+        self.etl.load_note()
+        notes = Note.objects.all()
+        self.assertEqual(len(notes), 1)
+        note = notes.first()
+        self.assertEqual(self.report_id, note.report_id)
