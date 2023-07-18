@@ -12,7 +12,7 @@ terraform {
     # parameters are provided when you initialize terraform, eg run:
     # 
     #   terraform init \
-    #    --backend-config=../bootstrap/backend.tfvars \
+    #    --backend-config=../shared/config/backend.tfvars \
     #    --backend-config=key=terraform-state-$(basename $(pwd))
     #
     # For more info, see: 
