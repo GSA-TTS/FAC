@@ -173,6 +173,11 @@ federal_awards_column_mapping: ColumnMapping = {
         "program.number_of_audit_findings",
         _set_by_path,
     ),
+    "award_reference": (
+        "FederalAwards.federal_awards",
+        "award_reference",
+        _set_by_path,
+    ),
 }
 corrective_action_column_mapping: ColumnMapping = {
     "reference_number": (
@@ -383,16 +388,6 @@ def _get_entries_by_path(dictionary, path):
     return val
 
 
-def _ensure_string_conversion(path, value):
-    """
-    This function checks whether the input path ends with certain specified suffixes,
-    and if it does, it ensures the corresponding value is format as string.
-    """
-    if path.endswith(FEDERAL_AGENCY_PREFIX) or path.endswith(THREE_DIGIT_EXTENSION):
-        return str(value)
-    return value
-
-
 def _extract_data(
     file,
     field_mapping: FieldMapping,
@@ -419,7 +414,7 @@ def _extract_data(
                 set_fn(
                     result,
                     f"{parent_target}[{index}].{field_target}",
-                    _ensure_string_conversion(field_target, value),
+                    value,
                 )
 
             # Necessary to prevent null entries when index/row is skipped in first column
@@ -437,17 +432,33 @@ def _extract_data(
     return result
 
 
+def _remove_empty_award_entries(data):
+    """Removes empty award entries from the data"""
+    indexed_awards = []
+    for award in data.get("FederalAwards", {}).get("federal_awards", []):
+        if "program" in award:
+            program = award["program"]
+            if FEDERAL_AGENCY_PREFIX in program:
+                indexed_awards.append(award)
+
+    # Update the federal_awards with the valid awards
+    data["FederalAwards"]["federal_awards"] = indexed_awards
+
+    return data
+
+
 def extract_federal_awards(file):
     template_definition_path = (
         XLSX_TEMPLATE_DEFINITION_DIR / FEDERAL_AWARDS_TEMPLATE_DEFINITION
     )
     template = json.loads(template_definition_path.read_text(encoding="utf-8"))
-    return _extract_data(
+    result = _extract_data(
         file,
         federal_awards_field_mapping,
         federal_awards_column_mapping,
         template["title_row"],
     )
+    return _remove_empty_award_entries(result)
 
 
 def extract_corrective_action_plan(file):

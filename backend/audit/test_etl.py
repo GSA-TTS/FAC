@@ -3,7 +3,7 @@ from django.test import TestCase
 from model_bakery import baker
 
 from .models import SingleAuditChecklist, User
-from dissemination.models import General, FederalAward, Finding
+from dissemination.models import General, FederalAward, Finding, Passthrough
 from audit.etl import ETL
 
 
@@ -53,6 +53,7 @@ class ETLTests(TestCase):
                 "auditee_uei": "ABC123DEF456",
                 "federal_awards": [
                     {
+                        "award_reference": "ABC123",
                         "cluster": {"cluster_name": "N/A", "cluster_total": 0},
                         "program": {
                             "is_major": "Y",
@@ -67,7 +68,15 @@ class ETLTests(TestCase):
                         },
                         "subrecipients": {"is_passed": "N"},
                         "loan_or_loan_guarantee": {"is_guaranteed": "N"},
-                        "direct_or_indirect_award": {"is_direct": "Y"},
+                        "direct_or_indirect_award": {
+                            "is_direct": "N",
+                            "entities": [
+                                {
+                                    "passthrough_name": "Bob's Granting House",
+                                    "passthrough_identifying_number": "12345",
+                                }
+                            ],
+                        },
                     }
                 ],
                 "total_amount_expended": 9000,
@@ -78,7 +87,7 @@ class ETLTests(TestCase):
                 "auditee_uei": "AAA123456BBB",
                 "findings_uniform_guidance_entries": [
                     {
-                        "award_index": "ABC123",
+                        "award_reference": "ABC123",
                         "seq_number": 1,
                         "program": {
                             "program_name": "N/A",
@@ -101,7 +110,7 @@ class ETLTests(TestCase):
                         "significant_deficiency": "N",
                     },
                     {
-                        "award_index": "ABC123",
+                        "award_reference": "ABC123",
                         "seq_number": 2,
                         "program": {
                             "program_name": "N/A",
@@ -123,7 +132,7 @@ class ETLTests(TestCase):
                         "significant_deficiency": "N",
                     },
                     {
-                        "award_index": "ABC123",
+                        "award_reference": "ABC123",
                         "seq_number": 3,
                         "program": {
                             "program_name": "N/A",
@@ -145,7 +154,7 @@ class ETLTests(TestCase):
                         "significant_deficiency": "N",
                     },
                     {
-                        "award_index": "ABC123",
+                        "award_reference": "ABC123",
                         "seq_number": 4,
                         "program": {
                             "program_name": "N/A",
@@ -201,3 +210,10 @@ class ETLTests(TestCase):
         self.assertEqual(len(findings), 4)
         finding = findings.first()
         self.assertEqual(self.report_id, finding.report_id)
+
+    def test_load_passthrough(self):
+        self.etl.load_passthrough()
+        passthroughs = Passthrough.objects.all()
+        self.assertEqual(len(passthroughs), 1)
+        passthrough = passthroughs.first()
+        self.assertEqual(self.report_id, passthrough.report_id)

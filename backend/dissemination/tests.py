@@ -40,7 +40,7 @@ class APIViewTests(TestCase):
             Finding,
             report_id=general.report_id,
             finding_ref_number=finding_text.finding_ref_number,
-            award_seq_number=award.award_seq_number,
+            award_reference=award.award_reference,
         )
         finding.save()
 

@@ -3,6 +3,7 @@
    "sheets": [
       {
          "header_height": 100,
+         "hide_col_from": 4,
          "name": "MandatoryNotes",
          "single_cells": [
             {
@@ -58,6 +59,7 @@
       },
       {
          "header_height": 100,
+         "hide_col_from": 3,
          "name": "AdditionalNotes",
          "open_ranges": [
             {
@@ -94,6 +96,7 @@
                   "link": "https://fac.gov/documentation/validation/#unknown",
                   "text": "If you see this error, please contact support."
                },
+               "keep_locked": true,
                "range_name": "seq_number",
                "title": "Sequence number (Read Only)",
                "title_cell": "C1",
@@ -107,6 +110,7 @@
       },
       {
          "header_height": 100,
+         "hide_col_from": 2,
          "name": "UEI",
          "single_cells": [
             {

@@ -35,7 +35,7 @@ create view api_v1_0_0_beta.finding as
     from dissemination_Finding finding
     left join dissemination_FederalAward award 
         on award.report_id = finding.report_id 
-          and award.award_seq_number = finding.award_seq_number
+          and award.award_reference = finding.award_reference
     left join dissemination_General gen on award.report_id = gen.report_id
     where gen.is_public=True
 ;
