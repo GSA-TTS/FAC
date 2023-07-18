@@ -48,7 +48,7 @@ local open_ranges_defns = [
       keep_locked: true,
       formula: '=IF(B{0}<>"", "AWARD-"&TEXT(ROW()-1,"0000"), "")',
       width: 18,
-      help: Help.unknown,
+      help: Help.award_reference,
     },
     SV.NoValidation,
     'Award Reference (Read Only)',
