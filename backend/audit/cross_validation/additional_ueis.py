@@ -1,3 +1,10 @@
+from .errors import (
+    err_additional_ueis_empty,
+    err_additional_ueis_has_auditee_uei,
+    err_additional_ueis_not_empty,
+)
+
+
 def additional_ueis(sac_dict):
     """
     Checks that there are additional UEIs if
@@ -17,33 +24,14 @@ def additional_ueis(sac_dict):
         +   None of the values are the same as auditee_uei
         """
         if not addl_ueis:
-            msg = "".join(
-                [
-                    "general_information.multiple_ueis_covered is checked, ",
-                    "but no additonal UEIs were found.",
-                ]
-            )
-            return [{"error": msg}]
+            return [{"error": err_additional_ueis_empty()}]
         if not addl_ueis[0].get("additional_uei"):
-            msg = "".join(
-                [
-                    "general_information.multiple_ueis_covered is checked, ",
-                    "but no additonal UEIs were found.",
-                ]
-            )
-            return [{"error": msg}]
+            return [{"error": err_additional_ueis_empty()}]
         addl_uei_list = [_["additional_uei"] for _ in addl_ueis]
         if auditee_uei in addl_uei_list:
-            msg = "The additional UEIs list includes the auditee UEI."
-            return [{"error": msg}]
+            return [{"error": err_additional_ueis_has_auditee_uei()}]
     else:
         if addl_ueis:
-            msg = "".join(
-                [
-                    "general_information.multiple_ueis_covered is marked false, ",
-                    "but additonal UEIs were found.",
-                ]
-            )
-            return [{"error": msg}]
+            return [{"error": err_additional_ueis_not_empty()}]
 
     return []
