@@ -199,7 +199,7 @@ corrective_action_column_mapping: ColumnMapping = {
 findings_uniform_guidance_column_mapping: ColumnMapping = {
     "award_reference": (
         "FindingsUniformGuidance.findings_uniform_guidance_entries",
-        f"program.award_reference",
+        "program.award_reference",
         _set_by_path,
     ),
     "reference_number": (
