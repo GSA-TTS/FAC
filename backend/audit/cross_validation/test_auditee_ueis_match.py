@@ -10,6 +10,7 @@ from model_bakery import baker
 
 class AuditeeUEIsMatchTests(TestCase):
     def test_all_sections_none(self):
+        """For a SAC with all sections empty, the auditee UEIs match"""
         sac = baker.make(SingleAuditChecklist)
 
         shaped_sac = sac_validation_shape(sac)
@@ -19,6 +20,7 @@ class AuditeeUEIsMatchTests(TestCase):
         self.assertEqual(validation_result, [])
 
     def test_single_auditee_uei(self):
+        """For a SAC with a single section, the auditee UEIs match"""
         sac = baker.make(SingleAuditChecklist)
 
         sac.general_information = {"auditee_uei": "123456789"}
@@ -30,6 +32,7 @@ class AuditeeUEIsMatchTests(TestCase):
         self.assertEqual(validation_result, [])
 
     def test_multiple_matching_auditee_ueis(self):
+        """For a SAC with multiple sections where all auditee UEIs match, there should be no errors"""
         sac = baker.make(SingleAuditChecklist)
 
         sac.general_information = {"auditee_uei": "123456789"}
@@ -42,6 +45,7 @@ class AuditeeUEIsMatchTests(TestCase):
         self.assertEqual(validation_result, [])
 
     def test_multiple_mismatched_auditee_ueis(self):
+        """For a SAC with multiple sections where there are mismatched auditee UEIs, there should be an error"""
         sac = baker.make(SingleAuditChecklist)
 
         sac.general_information = {"auditee_uei": "123456789"}

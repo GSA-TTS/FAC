@@ -30,7 +30,7 @@ def additional_ueis(sac_dict):
         addl_uei_list = [_["additional_uei"] for _ in addl_ueis]
         if auditee_uei in addl_uei_list:
             return [{"error": err_additional_ueis_has_auditee_uei()}]
-    else:
+    else:  # addl_ueis_checked is false
         if addl_ueis:
             return [{"error": err_additional_ueis_not_empty()}]
 
