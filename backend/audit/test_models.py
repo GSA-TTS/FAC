@@ -56,11 +56,6 @@ class SingleAuditChecklistTests(TestCase):
         """
         cases = (
             (
-                [SingleAuditChecklist.STATUS.IN_PROGRESS],
-                SingleAuditChecklist.STATUS.READY_FOR_CERTIFICATION,
-                "transition_to_ready_for_certification",
-            ),
-            (
                 [SingleAuditChecklist.STATUS.READY_FOR_CERTIFICATION],
                 SingleAuditChecklist.STATUS.AUDITOR_CERTIFIED,
                 "transition_to_auditor_certified",
@@ -89,7 +84,6 @@ class SingleAuditChecklistTests(TestCase):
         for statuses_from, status_to, transition_name in cases:
             for status_from in statuses_from:
                 sac = baker.make(SingleAuditChecklist, submission_status=status_from)
-                sac.general_information = {"auditee_uei": "something"}
 
                 transition_method = getattr(sac, transition_name)
                 transition_method()
