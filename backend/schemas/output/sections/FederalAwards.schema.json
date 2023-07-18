@@ -29,6 +29,9 @@
                   "additionalProperties": false,
                   "description": "Award entry rows",
                   "properties": {
+                     "award_reference": {
+                        "type": "string"
+                     },
                      "cluster": {
                         "allOf": [
                            {
@@ -457,7 +460,10 @@
                               "type": "number"
                            },
                            "audit_report_type": {
-                              "type": "string"
+                              "type": [
+                                 "string",
+                                 "null"
+                              ]
                            },
                            "federal_agency_prefix": {
                               "description": "Valid two-digit program numbers; part of the CFDA/ALN",
