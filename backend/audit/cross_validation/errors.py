@@ -1,9 +1,7 @@
 def err_additional_ueis_empty():
-    return "".join(
-        [
-            "general_information.multiple_ueis_covered is checked, ",
-            "but no additonal UEIs were found.",
-        ]
+    return (
+        "general_information.multiple_ueis_covered is checked, "
+        "but no additonal UEIs were found."
     )
 
 
@@ -12,11 +10,9 @@ def err_additional_ueis_has_auditee_uei():
 
 
 def err_additional_ueis_not_empty():
-    return "".join(
-        [
-            "general_information.multiple_ueis_covered is marked false, ",
-            "but additonal UEIs were found.",
-        ]
+    return (
+        "general_information.multiple_ueis_covered is marked false, "
+        "but additonal UEIs were found."
     )
 
 
