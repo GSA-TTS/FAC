@@ -317,6 +317,9 @@ class Note(models.Model):
         "Note Title", max_length=75, null=True, help_text=docs.title
     )
     type_id = models.CharField("Note Type", max_length=1, help_text=docs.type_id)
+    accounting_policies = models.TextField(null=True)
+    is_minimis_rate_used = models.CharField(max_length=3, null=True)
+    rate_explained = models.TextField(null=True)
 
     class Meta:
         unique_together = (("report_id", "note_seq_number"),)
