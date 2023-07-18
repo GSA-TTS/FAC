@@ -231,7 +231,7 @@ local open_ranges_defns = [
   [
     Sheets.open_range {
       keep_locked: true,
-      formula: '=IF(A{0}<>"", "AWARD-"&TEXT(ROW()-1,"00000"), "")',
+      formula: '=IF(A{0}<>"", "AWARD-"&TEXT(ROW()-1,"0000"), "")',
       width: 24,
       help: Help.unknown,
     },
