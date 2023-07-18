@@ -133,16 +133,17 @@ class ETL(object):
             cap_text.save()
 
     def load_note(self):
-        note = Note(
-            type_id="",  # TODO: What is this?
-            report_id=self.report_id,
-            version="",  # TODO: What is this?
-            sequence_number=-1,  # TODO: Where does this come from?
-            note_index=-1,  # TODO: Where does this come from?
-            content="",  # TODO: Where does this come from?
-            title="",  # TODO: Where does this come from?
-        )
-        note.save()
+        notes_to_sefa = self.single_audit_checklist.notes_to_sefa
+        for entry in notes_to_sefa["NotesToSefa"]["notes_to_sefa_entries"]:
+            note = Note(
+                report_id=self.report_id,
+                note_seq_number=entry["seq_number"],
+                content=entry["note_content"],
+                note_index=-1,  # TODO: Is this different from seq_number?
+                note_title=entry["note_title"],
+                type_id="",  # TODO: What is this?
+            )
+            note.save()
 
     def load_revision(self):
         revision = Revision(
