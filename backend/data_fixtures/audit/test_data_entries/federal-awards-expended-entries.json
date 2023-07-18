@@ -9,14 +9,14 @@
     "passthrough_identifying_number": "1|2",
     "is_passed": "N",
     "subrecipient_amount": 0,
-    "program_name": "program name",
-    "loan_balance_at_audit_period_end": 0,
-    "is_guaranteed": "N",
+    "program_name": "BIOFUEL PRODUCER PROGRAM",
+    "is_guaranteed": "Y",
+    "loan_balance_at_audit_period_end":100,
     "is_major": "Y",
     "audit_report_type": "U",
     "number_of_audit_findings": 0,
     "state_cluster_name": "",
-    "cluster_total": 123
+    "cluster_total": 0
   },
   {
     "federal_agency_prefix": "10",
@@ -29,13 +29,12 @@
     "passthrough_identifying_number": "3|4",
     "is_passed": "N",
     "subrecipient_amount": 0,
-    "program_name": "program name",
-    "loan_balance_at_audit_period_end": 0,
+    "program_name": "AGRICULTURE BUSINESS INNOVATION CENTER AT HBCU",
     "is_guaranteed": "N",
     "is_major": "Y",
     "audit_report_type": "U",
     "number_of_audit_findings": 0,
     "state_cluster_name": "",
-    "cluster_total": 123
+    "cluster_total": 0
   }
 ]

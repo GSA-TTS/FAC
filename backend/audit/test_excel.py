@@ -92,7 +92,7 @@ class FederalAwardsExcelTests(SimpleTestCase):
         workbook = load_workbook(FEDERAL_AWARDS_TEMPLATE, data_only=True)
 
         _set_by_name(workbook, "auditee_uei", FederalAwardsExcelTests.GOOD_UEI)
-        _set_by_name(workbook, "total_amount_expended", 100)
+        _set_by_name(workbook, "amount_expended", 100)
         _add_entry(workbook, 0, FederalAwardsExcelTests.TEST_DATA[0])
 
         federal_awards = extract_federal_awards(workbook)
@@ -104,7 +104,7 @@ class FederalAwardsExcelTests(SimpleTestCase):
         workbook = load_workbook(FEDERAL_AWARDS_TEMPLATE, data_only=True)
 
         _set_by_name(workbook, "auditee_uei", FederalAwardsExcelTests.GOOD_UEI)
-        _set_by_name(workbook, "total_amount_expended", 200)
+        _set_by_name(workbook, "amount_expended", 200)
         for index, entry in enumerate(FederalAwardsExcelTests.TEST_DATA):
             _add_entry(workbook, index, entry)
 

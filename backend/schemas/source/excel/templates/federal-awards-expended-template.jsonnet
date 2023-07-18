@@ -7,7 +7,14 @@ local awardSheet = 'Form';
 local ueiSheet = 'UEI';
 local clusterSheet = 'Clusters';
 local programSheet = 'FederalPrograms';
+local auditReportTypeSheet = 'AuditReportTypes';
 local title_row = 1;
+local amountExpendedNamedRange = 'amount_expended';
+local cfdaKeyNamedRange = 'cfda_key';
+local uniformOtherClusterNamedRange = 'uniform_other_cluster_name';
+local uniformStateClusterNamedRange = 'uniform_state_cluster_name';
+local clusterNamedRange = 'cluster_name';
+local auditReportTypeLookupNamedRange = 'audit_report_type_lookup';
 
 local single_cells = [
   Sheets.single_cell {
@@ -17,24 +24,28 @@ local single_cells = [
     title_cell: 'A1',
     range_cell: 'A2',
     validation: SV.StringOfLengthTwelve,
+    format: 'text',
     help: Help.uei,
   },
   Sheets.single_cell {
+    keep_locked: true,
     title: 'Total amount expended',
     range_name: 'total_amount_expended',
     title_cell: 'B1',
     range_cell: 'B2',
-    // FIXME MSHD: Will need to pull E from this formula and get it dynamically.
+    format: 'dollar',
+    // FIXME MSHD: for improvement, will need to pull E from this formula and retrieve it dynamically.
     formula: "=SUM('" + awardSheet + "'!E$FIRSTROW:E$LASTROW)",
     width: 36,
     help: Help.positive_number,
-
+    validation: SV.PositiveNumberValidation,
   },
 ];
 
 local open_ranges_defns = [
   [
     Sheets.open_range {
+      format: 'text',
       width: 12,
       help: Help.aln_prefix,
     },
@@ -44,6 +55,7 @@ local open_ranges_defns = [
   ],
   [
     Sheets.open_range {
+      format: 'text',
       width: 12,
       help: Help.aln_extension,
     },
@@ -53,6 +65,7 @@ local open_ranges_defns = [
   ],
   [
     Sheets.open_range {
+      format: 'text',
       help: Help.unknown,
     },
     SV.NoValidation,
@@ -73,11 +86,12 @@ local open_ranges_defns = [
   ],
   [
     Sheets.open_range {
+      format: 'dollar',
       help: Help.positive_number,
     },
     SV.PositiveNumberValidation,
     'Amount Expended',
-    'amount_expended',
+    amountExpendedNamedRange,
   ],
   [
     Sheets.open_range {
@@ -89,7 +103,7 @@ local open_ranges_defns = [
       lookup_range: 'cluster_name_lookup',
     },
     'Cluster Name',
-    'cluster_name',
+    clusterNamedRange,
   ],
   [
     Sheets.open_range {
@@ -107,9 +121,11 @@ local open_ranges_defns = [
     'If Other Cluster, Enter Other Cluster Name',
     'other_cluster_name',
   ],
-  // 20230525 HDMS FIXME: A formula to auto calculate federal_program_total in the excel is missing (see instructions in census template)!!!
   [
     Sheets.open_range {
+      keep_locked: true,
+      format: 'dollar',
+      formula: '=SUMIFS(' + amountExpendedNamedRange + ',' + cfdaKeyNamedRange + ',V{0})',
       help: Help.positive_number,
     },
     SV.PositiveNumberValidation,
@@ -118,6 +134,9 @@ local open_ranges_defns = [
   ],
   [
     Sheets.open_range {
+      keep_locked: true,
+      format: 'dollar',
+      formula: '=IF(F{0}="' + Base.Const.OTHER_CLUSTER + '",SUMIFS(' + amountExpendedNamedRange + ',' + uniformOtherClusterNamedRange + ',X{0}), IF(AND(OR(F{0}="' + Base.Const.NA + '",F{0}=""),G{0}=""),0,IF(F{0}="' + Base.Const.STATE_CLUSTER + '",SUMIFS(' + amountExpendedNamedRange + ',' + uniformStateClusterNamedRange + ',W{0}),SUMIFS(' + amountExpendedNamedRange + ',' + clusterNamedRange + ',F{0}))))',
       help: Help.positive_number,
     },
     SV.PositiveNumberValidation,
@@ -134,9 +153,10 @@ local open_ranges_defns = [
   ],
   [
     Sheets.open_range {
+      format: 'dollar',
       help: Help.positive_number,
     },
-    SV.NoValidation,
+    SV.LoanBalanceValidation,
     'If yes (Loan/Loan Guarantee, End of Audit Period Outstanding Loan Balance)',
     'loan_balance_at_audit_period_end',
   ],
@@ -152,7 +172,7 @@ local open_ranges_defns = [
     Sheets.y_or_n_range {
       help: Help.plain_text,
     },
-    SV.YoNValidation,
+    SV.NoValidation,
     'If no (Direct Award), Name of Passthrough Entity',
     'passthrough_name',
   ],
@@ -161,7 +181,7 @@ local open_ranges_defns = [
       width: 18,
       help: Help.unknown,
     },
-    SV.YoNValidation,
+    SV.NoValidation,
     'If no (Direct Award), Identifying Number Assigned by the Pass-through Entity, if assigned',
     'passthrough_identifying_number',
   ],
@@ -175,6 +195,7 @@ local open_ranges_defns = [
   ],
   [
     Sheets.open_range {
+      format: 'dollar',
       help: Help.positive_number,
     },
     SV.NoValidation,
@@ -194,7 +215,7 @@ local open_ranges_defns = [
       width: 12,
       help: Help.unknown,
     },
-    SV.NoValidation,
+    SV.AuditReportTypeValidation(auditReportTypeLookupNamedRange),
     'If yes (MP), Type of Audit Report',
     'audit_report_type',
   ],
@@ -207,17 +228,65 @@ local open_ranges_defns = [
     'Number of Audit Findings',
     'number_of_audit_findings',
   ],
+  [
+    Sheets.open_range {
+      keep_locked: true,
+      formula: '=IF(A{0}<>"", "AWARD-"&TEXT(ROW()-1,"00000"), "")',
+      width: 24,
+      help: Help.unknown,
+    },
+    SV.NoValidation,
+    'Award Index (Read Only)',
+    'award_reference',
+  ],
+  [
+    Sheets.open_range {
+      keep_locked: true,
+      formula: '=CONCATENATE(A{0},B{0})',
+      width: 12,
+      format: 'text',
+      help: Help.unknown,
+    },
+    SV.NoValidation,
+    'CFDA_KEY (Read Only)',
+    cfdaKeyNamedRange,
+  ],
+  [
+    Sheets.open_range {
+      keep_locked: true,
+      formula: '=UPPER(TRIM(G{0}))',
+      width: 24,
+      help: Help.unknown,
+    },
+    SV.NoValidation,
+    'UNIFORM STATE CLUSTER NAME (Read Only)',
+    uniformStateClusterNamedRange,
+  ],
+  [
+    Sheets.open_range {
+      keep_locked: true,
+      formula: '=UPPER(TRIM(H{0}))',
+      width: 24,
+      help: Help.unknown,
+    },
+    SV.NoValidation,
+    'UNIFORM OTHER CLUSTER NAME (Read Only)',
+    uniformOtherClusterNamedRange,
+  ],
 ];
 
 local sheets = [
   {
     name: awardSheet,
     open_ranges: Fun.make_open_ranges(title_row, open_ranges_defns),
+    hide_col_from: 22,
   },
   {
     name: ueiSheet,
     single_cells: single_cells,
     header_height: 100,
+    hide_col_from: 3,
+    //  hide_row_from: 3,
   },
   {
     name: clusterSheet,
@@ -262,7 +331,22 @@ local sheets = [
       },
     ],
   },
-
+  {
+    name: auditReportTypeSheet,
+    text_ranges: [
+      {
+        type: 'text_range',
+        title: 'Major Program Audit Report Type',
+        title_cell: 'A1',
+        range_name: auditReportTypeLookupNamedRange,
+        last_range_cell: 'A5',
+        contents: Base.Enum.MajorProgramAuditReportType,
+        validation: SV.LookupValidation {
+          lookup_range: auditReportTypeLookupNamedRange,
+        },
+      },
+    ],
+  },
 ];
 
 local workbook = {

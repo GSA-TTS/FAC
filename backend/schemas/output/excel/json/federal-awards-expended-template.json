@@ -2,9 +2,11 @@
    "filename": "federal-awards-expended-template.xlsx",
    "sheets": [
       {
+         "hide_col_from": 22,
          "name": "Form",
          "open_ranges": [
             {
+               "format": "text",
                "help": {
                   "link": "https://fac.gov/documentation/validation/#aln_prefix",
                   "text": "Not a valid agency ALN (CFDA) prefix"
@@ -23,6 +25,7 @@
                "width": 12
             },
             {
+               "format": "text",
                "help": {
                   "link": "https://fac.gov/documentation/validation/#aln_extension",
                   "text": "An ALN (CFDA) extension is typically three digits, with some exceptions"
@@ -41,6 +44,7 @@
                "width": 12
             },
             {
+               "format": "text",
                "help": {
                   "link": "https://fac.gov/documentation/validation/#unknown",
                   "text": "If you see this error, please contact support."
@@ -72,6 +76,7 @@
                "width": 48
             },
             {
+               "format": "dollar",
                "help": {
                   "link": "https://fac.gov/documentation/validation/#positive_number",
                   "text": "The number in this field must be zero or greater"
@@ -132,10 +137,13 @@
                }
             },
             {
+               "format": "dollar",
+               "formula": "=SUMIFS(amount_expended,cfda_key,V{0})",
                "help": {
                   "link": "https://fac.gov/documentation/validation/#positive_number",
                   "text": "The number in this field must be zero or greater"
                },
+               "keep_locked": true,
                "range_name": "federal_program_total",
                "title": "Federal Program Total",
                "title_cell": "I1",
@@ -148,10 +156,13 @@
                }
             },
             {
+               "format": "dollar",
+               "formula": "=IF(F{0}=\"OTHER CLUSTER NOT LISTED ABOVE\",SUMIFS(amount_expended,uniform_other_cluster_name,X{0}), IF(AND(OR(F{0}=\"N/A\",F{0}=\"\"),G{0}=\"\"),0,IF(F{0}=\"STATE CLUSTER\",SUMIFS(amount_expended,uniform_state_cluster_name,W{0}),SUMIFS(amount_expended,cluster_name,F{0}))))",
                "help": {
                   "link": "https://fac.gov/documentation/validation/#positive_number",
                   "text": "The number in this field must be zero or greater"
                },
+               "keep_locked": true,
                "range_name": "cluster_total",
                "title": "Cluster Total",
                "title_cell": "J1",
@@ -181,6 +192,7 @@
                }
             },
             {
+               "format": "dollar",
                "help": {
                   "link": "https://fac.gov/documentation/validation/#positive_number",
                   "text": "The number in this field must be zero or greater"
@@ -190,7 +202,10 @@
                "title_cell": "L1",
                "type": "open_range",
                "validation": {
-                  "type": "NOVALIDATION"
+                  "custom_error": "Loan Balance must be blank if Loan Guarantee is \"N\". If Loan Guarantee is \"Y\", Loan Balance must be a positive number or \"N/A\".",
+                  "custom_title": "Loan Balance",
+                  "formula1": "=IF(K{0}=\"N\",ISBLANK(L{0}),OR(L{0}=\"N/A\",AND(ISNUMBER(L{0}),L{0}>=0)))",
+                  "type": "custom"
                }
             },
             {
@@ -220,11 +235,7 @@
                "title_cell": "N1",
                "type": "yorn_range",
                "validation": {
-                  "allow_blank": "False",
-                  "custom_error": "Must be 'Y' or 'N'",
-                  "custom_title": "Y/N",
-                  "formula1": "\"Y,N\"",
-                  "type": "list"
+                  "type": "NOVALIDATION"
                }
             },
             {
@@ -237,11 +248,7 @@
                "title_cell": "O1",
                "type": "open_range",
                "validation": {
-                  "allow_blank": "False",
-                  "custom_error": "Must be 'Y' or 'N'",
-                  "custom_title": "Y/N",
-                  "formula1": "\"Y,N\"",
-                  "type": "list"
+                  "type": "NOVALIDATION"
                },
                "width": 18
             },
@@ -263,6 +270,7 @@
                }
             },
             {
+               "format": "dollar",
                "help": {
                   "link": "https://fac.gov/documentation/validation/#positive_number",
                   "text": "The number in this field must be zero or greater"
@@ -302,7 +310,11 @@
                "title_cell": "S1",
                "type": "open_range",
                "validation": {
-                  "type": "NOVALIDATION"
+                  "allow_blank": "True",
+                  "custom_error": "The Audit Report Type must be empty if Major Program is \"N\"",
+                  "custom_title": "Invalid Audit Report Type",
+                  "formula1": "=IF(R{0}=\"Y\",audit_report_type_lookup,\"\")",
+                  "type": "list"
                },
                "width": 12
             },
@@ -322,14 +334,81 @@
                   "type": "custom"
                },
                "width": 12
+            },
+            {
+               "formula": "=IF(A{0}<>\"\", \"AWARD-\"&TEXT(ROW()-1,\"00000\"), \"\")",
+               "help": {
+                  "link": "https://fac.gov/documentation/validation/#unknown",
+                  "text": "If you see this error, please contact support."
+               },
+               "keep_locked": true,
+               "range_name": "award_reference",
+               "title": "Award Index (Read Only)",
+               "title_cell": "U1",
+               "type": "open_range",
+               "validation": {
+                  "type": "NOVALIDATION"
+               },
+               "width": 24
+            },
+            {
+               "format": "text",
+               "formula": "=CONCATENATE(A{0},B{0})",
+               "help": {
+                  "link": "https://fac.gov/documentation/validation/#unknown",
+                  "text": "If you see this error, please contact support."
+               },
+               "keep_locked": true,
+               "range_name": "cfda_key",
+               "title": "CFDA_KEY (Read Only)",
+               "title_cell": "V1",
+               "type": "open_range",
+               "validation": {
+                  "type": "NOVALIDATION"
+               },
+               "width": 12
+            },
+            {
+               "formula": "=UPPER(TRIM(G{0}))",
+               "help": {
+                  "link": "https://fac.gov/documentation/validation/#unknown",
+                  "text": "If you see this error, please contact support."
+               },
+               "keep_locked": true,
+               "range_name": "uniform_state_cluster_name",
+               "title": "UNIFORM STATE CLUSTER NAME (Read Only)",
+               "title_cell": "W1",
+               "type": "open_range",
+               "validation": {
+                  "type": "NOVALIDATION"
+               },
+               "width": 24
+            },
+            {
+               "formula": "=UPPER(TRIM(H{0}))",
+               "help": {
+                  "link": "https://fac.gov/documentation/validation/#unknown",
+                  "text": "If you see this error, please contact support."
+               },
+               "keep_locked": true,
+               "range_name": "uniform_other_cluster_name",
+               "title": "UNIFORM OTHER CLUSTER NAME (Read Only)",
+               "title_cell": "X1",
+               "type": "open_range",
+               "validation": {
+                  "type": "NOVALIDATION"
+               },
+               "width": 24
             }
          ]
       },
       {
          "header_height": 100,
+         "hide_col_from": 3,
          "name": "UEI",
          "single_cells": [
             {
+               "format": "text",
                "help": {
                   "link": "https://fac.gov/documentation/validation/#uei",
                   "text": "UEIs are 12 characters long and match rules as given by SAM.gov"
@@ -349,16 +428,24 @@
                "width": 36
             },
             {
+               "format": "dollar",
                "formula": "=SUM('Form'!E$FIRSTROW:E$LASTROW)",
                "help": {
                   "link": "https://fac.gov/documentation/validation/#positive_number",
                   "text": "The number in this field must be zero or greater"
                },
+               "keep_locked": true,
                "range_cell": "B2",
                "range_name": "total_amount_expended",
                "title": "Total amount expended",
                "title_cell": "B1",
                "type": "single_cell",
+               "validation": {
+                  "custom_error": "This cell must be a positive number",
+                  "custom_title": "Positive numbers",
+                  "formula1": "=AND(ISNUMBER(FIRSTCELLREF),OR(SIGN(FIRSTCELLREF)=0,SIGN(FIRSTCELLREF)=1))",
+                  "type": "custom"
+               },
                "width": 36
             }
          ]
@@ -6174,6 +6261,36 @@
                   "custom_title": "Lookup validation",
                   "formula1": "=NOT(ISERROR(MATCH(FIRSTCELLREF,LOOKUPRANGE,0)))",
                   "lookup_range": "aln_lookup",
+                  "type": "lookup"
+               }
+            }
+         ]
+      },
+      {
+         "name": "AuditReportTypes",
+         "text_ranges": [
+            {
+               "contents": {
+                  "description": "Major program report types",
+                  "enum": [
+                     "U",
+                     "Q",
+                     "A",
+                     "D"
+                  ],
+                  "title": "MajorProgramAuditReportType",
+                  "type": "string"
+               },
+               "last_range_cell": "A5",
+               "range_name": "audit_report_type_lookup",
+               "title": "Major Program Audit Report Type",
+               "title_cell": "A1",
+               "type": "text_range",
+               "validation": {
+                  "custom_error": "Not in the lookup list",
+                  "custom_title": "Lookup validation",
+                  "formula1": "=NOT(ISERROR(MATCH(FIRSTCELLREF,LOOKUPRANGE,0)))",
+                  "lookup_range": "audit_report_type_lookup",
                   "type": "lookup"
                }
             }

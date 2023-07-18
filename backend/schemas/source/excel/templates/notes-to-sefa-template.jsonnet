@@ -69,6 +69,7 @@ local open_ranges_defns = [
   ],
   [
     Sheets.open_range {
+      keep_locked: true,
       formula: '=IF(A{0}<>"", ROW()-1, "")',
       width: 18,
       help: Help.unknown,
@@ -84,16 +85,19 @@ local sheets = [
     name: sefaMandatorySheet,
     single_cells: other_single_cells,
     header_height: 100,
+    hide_col_from: 4,
   },
   {
     name: sefaAdditionalSheet,
     open_ranges: Fun.make_open_ranges(title_row, open_ranges_defns),
     header_height: 100,
+    hide_col_from: 3,
   },
   {
     name: ueiSheet,
     single_cells: single_cells,
     header_height: 100,
+    hide_col_from: 2,
   },
 ];
 
