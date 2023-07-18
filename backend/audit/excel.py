@@ -173,9 +173,9 @@ federal_awards_column_mapping: ColumnMapping = {
         "program.number_of_audit_findings",
         _set_by_path,
     ),
-    "award_index": (
+    "award_reference": (
         "FederalAwards.federal_awards",
-        "award_index",
+        "award_reference",
         _set_by_path,
     ),
 }

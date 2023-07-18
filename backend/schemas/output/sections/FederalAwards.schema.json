@@ -29,7 +29,7 @@
                   "additionalProperties": false,
                   "description": "Award entry rows",
                   "properties": {
-                     "award_index": {
+                     "award_reference": {
                         "type": "string"
                      },
                      "cluster": {

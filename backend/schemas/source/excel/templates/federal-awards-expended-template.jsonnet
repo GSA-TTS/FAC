@@ -237,7 +237,7 @@ local open_ranges_defns = [
     },
     SV.NoValidation,
     'Award Index (Read Only)',
-    'award_index',
+    'award_reference',
   ],
   [
     Sheets.open_range {

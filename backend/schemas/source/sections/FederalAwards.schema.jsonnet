@@ -326,7 +326,7 @@ local FederalAwardEntry = Types.object {
     loan_or_loan_guarantee: Parts.LoanOrLoanGuarantee,
     program: Parts.Program,
     subrecipients: Parts.Subrecipients,
-    award_index: Types.string,
+    award_reference: Types.string,
   },
   required: [
     'cluster',

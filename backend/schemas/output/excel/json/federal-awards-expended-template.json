@@ -342,7 +342,7 @@
                   "text": "If you see this error, please contact support."
                },
                "keep_locked": true,
-               "range_name": "award_index",
+               "range_name": "award_reference",
                "title": "Award Index (Read Only)",
                "title_cell": "U1",
                "type": "open_range",
