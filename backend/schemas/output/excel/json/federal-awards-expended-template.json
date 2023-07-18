@@ -8,8 +8,8 @@
             {
                "formula": "=IF(B{0}<>\"\", \"AWARD-\"&TEXT(ROW()-1,\"0000\"), \"\")",
                "help": {
-                  "link": "https://fac.gov/documentation/validation/#unknown",
-                  "text": "If you see this error, please contact support."
+                  "link": "https://fac.gov/documentation/validation/#award_reference",
+                  "text": "Award reference have the form AWARD-NNNN (e.g. AWARD-0001)"
                },
                "keep_locked": true,
                "range_name": "award_reference",

@@ -337,125 +337,21 @@
                      },
                      "program": {
                         "additionalProperties": false,
-                        "allOf": [
-                           {
-                              "if": {
-                                 "properties": {
-                                    "three_digit_extension": {
-                                       "pattern": "^(RD|U[0-9]{2})$"
-                                    }
-                                 }
-                              },
-                              "then": {
-                                 "properties": {
-                                    "additional_award_identification": {
-                                       "minLength": 1,
-                                       "type": [
-                                          "integer",
-                                          "string"
-                                       ]
-                                    }
-                                 },
-                                 "required": [
-                                    "additional_award_identification"
-                                 ]
-                              }
-                           }
-                        ],
                         "properties": {
-                           "additional_award_identification": {
-                              "type": [
-                                 "string",
-                                 "null",
-                                 "integer"
-                              ]
+                           "award_reference": {
+                              "description": "Award Reference",
+                              "pattern": "^AWARD-(?!0000)[0-9]{4}$",
+                              "title": "AwardReference",
+                              "type": "string"
                            },
                            "compliance_requirement": {
                               "description": "Compliance requirement type",
                               "pattern": "^A?B?C?E?F?G?H?I?J?L?M?N?P?$",
                               "title": "ComplianceRequirement"
-                           },
-                           "federal_agency_prefix": {
-                              "description": "Valid two-digit program numbers; part of the CFDA/ALN",
-                              "enum": [
-                                 "10",
-                                 "11",
-                                 "12",
-                                 "13",
-                                 "14",
-                                 "15",
-                                 "16",
-                                 "17",
-                                 "18",
-                                 "19",
-                                 "20",
-                                 "21",
-                                 "22",
-                                 "23",
-                                 "27",
-                                 "29",
-                                 "30",
-                                 "32",
-                                 "33",
-                                 "34",
-                                 "36",
-                                 "39",
-                                 "40",
-                                 "41",
-                                 "42",
-                                 "43",
-                                 "44",
-                                 "45",
-                                 "46",
-                                 "47",
-                                 "53",
-                                 "57",
-                                 "58",
-                                 "59",
-                                 "60",
-                                 "61",
-                                 "62",
-                                 "64",
-                                 "66",
-                                 "68",
-                                 "70",
-                                 "77",
-                                 "78",
-                                 "81",
-                                 "82",
-                                 "83",
-                                 "84",
-                                 "85",
-                                 "86",
-                                 "87",
-                                 "88",
-                                 "89",
-                                 "90",
-                                 "91",
-                                 "92",
-                                 "93",
-                                 "94",
-                                 "96",
-                                 "97",
-                                 "98",
-                                 "99"
-                              ],
-                              "type": "string"
-                           },
-                           "program_name": {
-                              "type": "string"
-                           },
-                           "three_digit_extension": {
-                              "description": "Three Digit Extension",
-                              "pattern": "^(RD|[0-9]{3}[A-Za-z]{0,1}|U[0-9]{2})$",
-                              "title": "ThreeDigitExtension",
-                              "type": "string"
                            }
                         },
                         "required": [
-                           "program_name",
-                           "federal_agency_prefix",
-                           "three_digit_extension",
+                           "award_reference",
                            "compliance_requirement"
                         ],
                         "type": "object"
