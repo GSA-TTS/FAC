@@ -93,6 +93,12 @@ local ComplianceRequirementValidation = {
   custom_title: 'Compliance requirement',
 };
 
+local AwardReferenceValidation = {
+  type: 'custom',
+  formula1: '=AND(LEN(FIRSTCELLREF)=10, LEFT(FIRSTCELLREF, 6)="AWARD-", ISNUMBER(VALUE(MID(FIRSTCELLREF, 7, 4))))',
+  custom_error: 'The value should follow the pattern AWARD-#### (where #### is a four-digit number).',
+  custom_title: 'Award Reference validation',
+};
 
 {
   NoValidation: { type: 'NOVALIDATION' },
@@ -114,4 +120,5 @@ local ComplianceRequirementValidation = {
     custom_title: 'Invalid Audit Report Type',
   },
   YoNoBValidation: YoNoBValidation,
+  AwardReferenceValidation: AwardReferenceValidation,
 }
