@@ -463,11 +463,10 @@ class AuditInfoFormView(SingleAuditChecklistAccessRequiredMixin, generic.View):
 
             if form.is_valid():
                 # Save the form, yay!
-                print("Saving audit info form!")
+                logger.info("Audit info form passed validation.")
                 return redirect(reverse("audit:SubmissionProgress", args=[report_id]))
             else:
                 form.clean_booleans()
-                print("hello", form.cleaned_data)
                 context = {
                     "auditee_name": sac.auditee_name,
                     "report_id": report_id,
@@ -582,7 +581,6 @@ class UploadReportView(SingleAuditChecklistAccessRequiredMixin, generic.View):
                 sar_file.save()
 
                 # PDF issues can be communicated to the user with form.errors["upload_report"]
-                print("Saving form!")
                 return redirect(reverse("audit:SubmissionProgress", args=[report_id]))
             else:
                 context = {
