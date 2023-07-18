@@ -137,19 +137,27 @@ class ETL(object):
         accounting_policies = notes_to_sefa["accounting_policies"]
         is_minimis_rate_used = notes_to_sefa["is_minimis_rate_used"]
         rate_explained = notes_to_sefa["rate_explained"]
-        for entry in notes_to_sefa["notes_to_sefa_entries"]:
+        entries = notes_to_sefa["notes_to_sefa_entries"]
+        if not entries:
             note = Note(
                 report_id=self.report_id,
-                note_seq_number=entry["seq_number"],
-                content=entry["note_content"],
-                note_index=-1,  # TODO: Is this different from seq_number?
-                note_title=entry["note_title"],
-                type_id="",  # TODO: What is this?
                 accounting_policies=accounting_policies,
                 is_minimis_rate_used=is_minimis_rate_used,
                 rate_explained=rate_explained,
             )
             note.save()
+        else:
+            for entry in entries:
+                note = Note(
+                    report_id=self.report_id,
+                    note_seq_number=entry["seq_number"],
+                    content=entry["note_content"],
+                    note_title=entry["note_title"],
+                    accounting_policies=accounting_policies,
+                    is_minimis_rate_used=is_minimis_rate_used,
+                    rate_explained=rate_explained,
+                )
+                note.save()
 
     def load_revision(self):
         revision = Revision(
