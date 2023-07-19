@@ -716,7 +716,7 @@ class AdditionalUeisValidatorTests(SimpleTestCase):
 
 class SecondaryAuditorsValidatorTests(SimpleTestCase):
     SIMPLE_CASE = json.loads(SIMPLE_CASES_TEST_FILE.read_text(encoding="utf-8"))[
-        "SecondaryAuditors"
+        "SecondaryAuditorsCase"
     ]
 
     def test_validation_is_applied(self):
