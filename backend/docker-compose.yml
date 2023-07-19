@@ -13,7 +13,7 @@ services:
   web:
     build:
       context: .
-      dockerfile: ./Dockerfile
+      dockerfile: "./${DOCKERFILE:-Dockerfile}"
     command: /src/run.sh
     depends_on:
       - db
