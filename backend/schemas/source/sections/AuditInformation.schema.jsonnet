@@ -5,16 +5,31 @@ local Types = Base.Types;
 local AuditInformation = Types.object {
   additionalProperties: false,
   properties: {
-    ggap_results: Types.array,
+    ggap_results: Types.array {
+      items: {
+        oneOf: [ Base.Enum.GGAPResults ],
+      },
+    },
     is_going_concern_included: Types.boolean,
     is_internal_control_deficiency_disclosed: Types.boolean,
     is_internal_control_material_weakness_disclosed: Types.boolean,
     is_material_noncompliance_disclosed: Types.boolean,
     is_aicpa_audit_guide_included: Types.boolean,
     is_low_risk_auditee: Types.boolean,
-    agencies: Types.array
+    # FIXME MCJ: This is a controlled field. 
+    # The validation needs to reflect that.
+    agencies: Types.array,
   },
-  required: ['ggap_results'],
+  required: [
+    'ggap_results',
+    'is_going_concern_included',
+    'is_internal_control_deficiency_disclosed',
+    'is_internal_control_material_weakness_disclosed',
+    'is_material_noncompliance_disclosed',
+    'is_aicpa_audit_guide_included',
+    'is_low_risk_auditee',
+    'agencies',
+  ],
   title: 'AuditInformation',
 };
 

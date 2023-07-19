@@ -1,5 +1,5 @@
-local Func = import 'Functions.libsonnet';
 local FederalProgramNames = import 'FederalProgramNames.json';
+local Func = import 'Functions.libsonnet';
 
 local Const = {
   Y: 'Y',
@@ -101,7 +101,7 @@ local Enum = {
       Const.N,
       Const.Y_N,
     ],
-  },  
+  },
   NA: Types.string {
     //description: 'A 'not applicable' answer',
     enum: [
@@ -249,6 +249,16 @@ local Enum = {
     ],
     title: 'SubmissionStatus',
   },
+  GGAPResults: Types.string {
+    description: 'GGAP Results (Audit Information)',
+    enum: [
+      'unmodified_opinion',
+      'qualified_opinion',
+      'adverse_opinion',
+      'disclaimer_of_opinion',
+      'not_ggap',
+    ],
+  },
   ALNPrefixes: Types.string {
     description: 'Valid two-digit program numbers; part of the CFDA/ALN',
     enum: [
@@ -365,8 +375,8 @@ local type_uei = Types.string {
     },
     // Does not start with 9 digits in a row
     {
-      pattern: "^(?![0-9]{9})"
-    }
+      pattern: '^(?![0-9]{9})',
+    },
   ],
 };
 
@@ -375,7 +385,7 @@ local Compound = {
     title: 'AwardReference',
     description: 'Award Reference',
     pattern: '^AWARD-(?!0000)[0-9]{4}$',
-  },  
+  },
   ThreeDigitExtension: Types.string {
     title: 'ThreeDigitExtension',
     description: 'Three Digit Extension',
@@ -478,16 +488,16 @@ local SchemaBase = Types.object {
   Compound: Compound {
     FederalProgramNames: {
       description: 'All Federal program names',
-      enum: FederalProgramNames.program_names
+      enum: FederalProgramNames.program_names,
     },
     AllALNNumbers: {
       description: 'All program numbers',
-      enum: FederalProgramNames.all_alns
-      },  
+      enum: FederalProgramNames.all_alns,
+    },
     ALNPrefixes: {
       description: 'Unique ALN prefixes',
-      enum: FederalProgramNames.aln_prefixes
-    }
+      enum: FederalProgramNames.aln_prefixes,
+    },
   },
   Validation: Validation,
   SchemaBase: SchemaBase,

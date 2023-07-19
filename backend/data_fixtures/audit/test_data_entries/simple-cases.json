@@ -34,14 +34,16 @@
     "auditor_email": "jane@test.test"
   },
   "AuditInformationCase": {
-    "ggap_results": [],
-    "is_going_concern_included": true,
-    "is_internal_control_deficiency_disclosed": false,
-    "is_internal_control_material_weakness_disclosed": false ,
-    "is_material_noncompliance_disclosed": true ,
-    "is_aicpa_audit_guide_included": false ,
-    "is_low_risk_auditee": true,
-    "agencies": [] 
+    "AuditInformation": {
+      "ggap_results": [],
+      "is_going_concern_included": true,
+      "is_internal_control_deficiency_disclosed": false,
+      "is_internal_control_material_weakness_disclosed": false ,
+      "is_material_noncompliance_disclosed": true ,
+      "is_aicpa_audit_guide_included": false ,
+      "is_low_risk_auditee": true,
+      "agencies": []   
+    }
   },
   "FederalAwardsCases": [
     {

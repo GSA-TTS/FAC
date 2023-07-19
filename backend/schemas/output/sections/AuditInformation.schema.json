@@ -1,1 +1,66 @@
-{ }
+{
+   "$schema": "https://json-schema.org/draft/2019-09/schema#",
+   "additionalProperties": false,
+   "metamodel_version": "1.7.0",
+   "properties": {
+      "AuditInformation": {
+         "additionalProperties": false,
+         "properties": {
+            "agencies": {
+               "type": "array"
+            },
+            "ggap_results": {
+               "items": {
+                  "oneOf": [
+                     {
+                        "description": "GGAP Results (Audit Information)",
+                        "enum": [
+                           "unmodified_opinion",
+                           "qualified_opinion",
+                           "adverse_opinion",
+                           "disclaimer_of_opinion",
+                           "not_ggap"
+                        ],
+                        "type": "string"
+                     }
+                  ]
+               },
+               "type": "array"
+            },
+            "is_aicpa_audit_guide_included": {
+               "type": "boolean"
+            },
+            "is_going_concern_included": {
+               "type": "boolean"
+            },
+            "is_internal_control_deficiency_disclosed": {
+               "type": "boolean"
+            },
+            "is_internal_control_material_weakness_disclosed": {
+               "type": "boolean"
+            },
+            "is_low_risk_auditee": {
+               "type": "boolean"
+            },
+            "is_material_noncompliance_disclosed": {
+               "type": "boolean"
+            }
+         },
+         "required": [
+            "ggap_results",
+            "is_going_concern_included",
+            "is_internal_control_deficiency_disclosed",
+            "is_internal_control_material_weakness_disclosed",
+            "is_material_noncompliance_disclosed",
+            "is_aicpa_audit_guide_included",
+            "is_low_risk_auditee",
+            "agencies"
+         ],
+         "title": "AuditInformation",
+         "type": "object"
+      }
+   },
+   "title": "UNNAMED",
+   "type": "object",
+   "version": 20230719
+}
