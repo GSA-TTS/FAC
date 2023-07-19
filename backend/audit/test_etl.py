@@ -3,7 +3,14 @@ from django.test import TestCase
 from model_bakery import baker
 
 from .models import SingleAuditChecklist, User
-from dissemination.models import General, FederalAward, Finding, Passthrough, Note
+from dissemination.models import (
+    General,
+    FederalAward,
+    Finding,
+    Passthrough,
+    Note,
+    FindingText,
+)
 from audit.etl import ETL
 
 
@@ -193,6 +200,18 @@ class ETLTests(TestCase):
                 ],
             }
         }
+        findings_text = {
+            "FindingsText": {
+                "auditee_uei": "AAA123456BBB",
+                "findings_text_entries": [
+                    {
+                        "contains_chart_or_table": "N",
+                        "text_of_finding": "This is an audit finding",
+                        "reference_number": "2023-123",
+                    },
+                ],
+            }
+        }
 
         sac = SingleAuditChecklist.objects.create(
             submitted_by=user,
@@ -200,6 +219,7 @@ class ETLTests(TestCase):
             federal_awards=federal_awards,
             findings_uniform_guidance=findings_uniform_guidance,
             notes_to_sefa=notes_to_sefa,
+            findings_text=findings_text,
         )
         sac.save()
         self.sac = sac
@@ -240,3 +260,10 @@ class ETLTests(TestCase):
         self.assertEqual(len(notes), 1)
         note = notes.first()
         self.assertEqual(self.report_id, note.report_id)
+
+    def test_load_finding_texts(self):
+        self.etl.load_finding_texts()
+        finding_texts = FindingText.objects.all()
+        self.assertEqual(len(finding_texts), 1)
+        finding_text = finding_texts.first()
+        self.assertEqual(self.report_id, finding_text.report_id)
