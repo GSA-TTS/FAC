@@ -51,9 +51,14 @@ urlpatterns = [
         name="SubmissionProgress",
     ),
     path(
+        "audit-info/<str:report_id>",
+        views.AuditInfoFormView.as_view(),
+        name="AuditInfoForm",
+    ),
+    path(
         "upload-report/<str:report_id>",
         views.UploadReportView.as_view(),
-        name="upload_report",
+        name="UploadReport",
     ),
 ]
 

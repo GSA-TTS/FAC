@@ -355,9 +355,7 @@ class FindingsUniformGuidanceExcelTests(SimpleTestCase):
         test_cases = [
             ("auditee_uei", 123456789123),
             ("reference_number", 0),
-            ("program_name", 123),
-            ("federal_agency_prefix", 10),
-            ("three_digit_extension", "001"),
+            ("award_reference", 123),
             ("prior_references", 123),
         ]
 
