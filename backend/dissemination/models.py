@@ -17,7 +17,6 @@ class FindingText(models.Model):
         null=True,
         help_text=docs.finding_ref_nums_findingstext,
     )
-
     charts_tables = models.BooleanField(
         "Indicates whether or not the text contained charts or tables that could not be entered due to formatting restrictions",
         max_length=1,
