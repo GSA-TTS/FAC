@@ -106,7 +106,7 @@ INSTALLED_APPS += [
 ]
 
 # Our apps
-INSTALLED_APPS += ["audit", "api", "users", "report_submission", "cms", "data_distro"]
+INSTALLED_APPS += ["audit", "api", "users", "report_submission", "cms", "data_distro", "historic"]
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",

@@ -36,6 +36,7 @@ class DisseminationFederalaward(BaseModel):
     report_id = CharField()
     award_seq_number = IntegerField()
     federal_agency_prefix = CharField()
+    # FIXME This should be federal_agency_extension
     federal_award_extension = CharField()
     additional_award_identification = CharField(null=True)
     federal_program_name = CharField(null=True)

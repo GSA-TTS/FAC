@@ -1,0 +1,57 @@
+import historic.Mapping
+from historic.base import NoMapping, MapRetype, MapOneOf, MapLateRemove
+from historic.retyping import to_int_to_str
+
+cfac_to_gfac = {
+    'amount': NoMapping(),
+    'arra': NoMapping(),
+    'audityear': NoMapping(),
+    'awardidentification': 'award_seq_number',
+    'cfda_ext': NoMapping(),
+    'cfda_prefix': NoMapping(),
+    'cfda2': NoMapping(),
+    'cfdaprogramname': NoMapping(),
+    'cfdaseqnum': 'finding_seq_number',
+    'clustername': NoMapping(),
+    'clustertotal': NoMapping(),
+    'dbkey': MapLateRemove(),
+    'direct': NoMapping(),
+    'ein': NoMapping(),
+    'elecauditsid': NoMapping(),
+    'federalprogramname': NoMapping(),
+    'findingrefnums': NoMapping(),
+    'findings': NoMapping(),
+    'findingscount': NoMapping(),
+    'id': NoMapping(),
+    'loanbalance': NoMapping(),
+    'loans': NoMapping(),
+    'majorprogram': NoMapping(),
+    'multipleueis': NoMapping(),
+    'otherclustername': NoMapping(),
+    'passthroughamount': NoMapping(),
+    'passthroughaward': NoMapping(),
+    'programtotal': NoMapping(),
+    'qcosts2': 'is_questioned_costs',
+    'rd': NoMapping(),
+    'stateclustername': NoMapping(),
+    'typereport_mp_override': NoMapping(),
+    'typereport_mp': NoMapping(),
+    'typerequirement': NoMapping(),
+    'uei': NoMapping(),
+}
+
+gfac_columns = [
+    'award_seq_number', 
+    'finding_ref_number', 
+    'finding_seq_number', 
+    'is_material_weakness', 
+    'is_modified_opinion', 
+    'is_other_findings', 
+    'is_other_matters', 
+    'is_questioned_costs', 
+    'is_repeat_finding', 
+    'is_significant_deficiency', 
+    'prior_finding_ref_numbers', 
+    'report_id', 
+    'type_requirement'
+]

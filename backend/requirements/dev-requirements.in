@@ -8,8 +8,10 @@ faker
 flake8
 model_bakery
 mypy
+numpy
 pandas
 pip-tools
+sqlalchemy
 toml
 types-python-slugify
 types-requests
