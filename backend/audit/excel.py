@@ -352,7 +352,7 @@ secondary_auditors_column_mapping: ColumnMapping = {
         "SecondaryAuditors.secondary_auditor_contact_email_entries",
         "secondary_auditor_contact_email",
         _set_by_path,
-    )
+    ),
 }
 
 notes_to_sefa_column_mapping: ColumnMapping = {

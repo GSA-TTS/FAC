@@ -522,7 +522,9 @@ class AdditionalUeisExcelTests(SimpleTestCase):
 
 class SecondaryAuditorsExcelTests(SimpleTestCase):
     GOOD_UEI = "AAA123456BBB"
-    TEST_DATA = json.loads(SECONDARY_AUDITORS_ENTRY_FIXTURES.read_text(encoding="utf-8"))
+    TEST_DATA = json.loads(
+        SECONDARY_AUDITORS_ENTRY_FIXTURES.read_text(encoding="utf-8")
+    )
 
     def test_template_has_named_ranges(self):
         """Test that the SecondaryAuditors Excel template contains the expected named ranges"""
@@ -567,8 +569,7 @@ class SecondaryAuditorsExcelTests(SimpleTestCase):
 
         test_cases = [
             ("auditee_uei", 123456789123),
-            ("secondary_auditor_name", False)
-            ("secondary_auditor_ein", 12345678),
+            ("secondary_auditor_name", False)("secondary_auditor_ein", 12345678),
             ("secondary_auditor_address", True),
             ("secondary_auditor_city", 0),
             ("secondary_auditor_state", "Of Mind"),
@@ -587,7 +588,9 @@ class SecondaryAuditorsExcelTests(SimpleTestCase):
                 secondary_auditors = extract_secondary_auditors(workbook)
 
                 self.assertRaises(
-                    ValidationError, validate_secondary_auditors_json, secondary_auditors
+                    ValidationError,
+                    validate_secondary_auditors_json,
+                    secondary_auditors,
                 )
 
 

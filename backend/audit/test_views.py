@@ -677,7 +677,9 @@ class ExcelFileHandlerViewTests(TestCase):
         """When a valid Excel file is uploaded, the file should be stored and the SingleAuditChecklist should be updated to include the uploaded secondary auditors data"""
 
         sac = _mock_login_and_scan(self.client, mock_scan_file)
-        test_data = json.loads(SECONDARY_AUDITORS_ENTRY_FIXTURES.read_text(encoding="utf-8"))
+        test_data = json.loads(
+            SECONDARY_AUDITORS_ENTRY_FIXTURES.read_text(encoding="utf-8")
+        )
 
         # add valid data to the workbook
         workbook = load_workbook(SECONDARY_AUDITORS_TEMPLATE, data_only=True)
@@ -719,9 +721,9 @@ class ExcelFileHandlerViewTests(TestCase):
                     1,
                 )
 
-                secondary_auditors_entries = updated_sac.secondary_auditors["SecondaryAuditors"][
-                    "secondary_auditors_entries"
-                ][0]
+                secondary_auditors_entries = updated_sac.secondary_auditors[
+                    "SecondaryAuditors"
+                ]["secondary_auditors_entries"][0]
 
                 self.assertEqual(
                     secondary_auditors_entries["secondary_auditor_name"],
