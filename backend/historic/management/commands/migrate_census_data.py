@@ -87,19 +87,6 @@ def common_migration(in_db, out_db, year, gen_db, mapping):
 
 
 def migrate_federalawards(gen_db : DB, year):
-    # dbkeys = list(gen_db.df.dbkey)
-    # f_db = DB()
-    # q = q_select_dbkeys_in_year("ELECAUDITS", dbkeys, year)
-    # # print(q)
-    # f_db.read_sql_to_df(q)
-    # f_db.apply_mappings(federalaward.cfac_to_gfac)
-    # the_map = build_reportid_map(gen_db)
-    # f_db.add_column('report_id', add_rid(the_map))
-    # #print(f_db.df.columns)
-    # f_db.apply_mappings(federalaward.cfac_to_gfac, when='late')
-    # #print(f_db.df.columns)
-    # f_db.write_df_to_sql('dissemination_federalaward')
-    # f_db.close()
     common_migration("ELECAUDITS", 
                      "dissemination_federalaward",
                     year,
@@ -107,19 +94,6 @@ def migrate_federalawards(gen_db : DB, year):
                     federalaward)
 
 def migrate_auditfindings(gen_db : DB, year):
-    # dbkeys = list(gen_db.df.dbkey)
-    # df_db = DB()
-    # q = q_select_dbkeys_in_year("ELECAUDITFINDINGS", dbkeys, year)
-    # # print(q)
-    # df_db.read_sql_to_df(q)
-    # df_db.apply_mappings(auditfindings.cfac_to_gfac)
-    # the_map = build_reportid_map(gen_db)
-    # df_db.add_column('report_id', add_rid(the_map))
-    # #print(f_db.df.columns)
-    # df_db.apply_mappings(auditfindings.cfac_to_gfac, when='late')
-    # #print(f_db.df.columns)
-    # df_db.write_df_to_sql('dissemination_finding')
-    # df_db.close()
     common_migration("ELECAUDITFINDINGS", 
                      "dissemination_finding",
                     year,
