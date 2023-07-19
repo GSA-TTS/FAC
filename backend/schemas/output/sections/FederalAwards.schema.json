@@ -151,17 +151,17 @@
                         ],
                         "properties": {
                            "cluster_name": {
-                              "description": "Cluster Name",
+                              "description": "All cluster names",
                               "enum": [
-                                 "N/A",
+                                 "HEAD START CLUSTER",
+                                 "477 CLUSTER",
+                                 "MATERNAL, INFANT, AND EARLY CHILDHOOD HOME VISITING CLUSTER",
+                                 "NAN",
                                  "RESEARCH AND DEVELOPMENT",
                                  "STUDENT FINANCIAL ASSISTANCE",
                                  "STATE CLUSTER",
-                                 "477 CLUSTER",
                                  "AGING CLUSTER",
                                  "CCDF CLUSTER",
-                                 "CDBG - DISASTER RECOVERY GRANTS - PUB. L. NO. 113-2 CLUSTER",
-                                 "CDBG - ENTITLEMENT GRANTS CLUSTER",
                                  "CDFI CLUSTER",
                                  "CHILD NUTRITION CLUSTER",
                                  "CLEAN WATER STATE REVOLVING FUND CLUSTER",
@@ -176,14 +176,12 @@
                                  "FOREIGN FOOD AID DONATION CLUSTER",
                                  "FOREST SERVICE SCHOOLS AND ROADS CLUSTER",
                                  "FOSTER GRANDPARENT/SENIOR COMPANION CLUSTER",
-                                 "HEAD START CLUSTER",
                                  "HEALTH CENTER PROGRAM CLUSTER",
                                  "HIGHWAY PLANNING AND CONSTRUCTION CLUSTER",
                                  "HIGHWAY SAFETY CLUSTER",
                                  "HOPE VI CLUSTER",
                                  "HOUSING VOUCHER CLUSTER",
                                  "HURRICANE SANDY RELIEF CLUSTER",
-                                 "MATERNAL, INFANT, AND EARLY CHILDHOOD HOME VISITING CLUSTER",
                                  "MEDICAID CLUSTER",
                                  "SCHOOL IMPROVEMENT GRANTS CLUSTER",
                                  "SECTION 8 PROJECT-BASED CLUSTER",
@@ -194,10 +192,10 @@
                                  "TRIO CLUSTER",
                                  "WATER AND WASTE PROGRAM CLUSTER",
                                  "WIOA CLUSTER",
+                                 "CDBG - ENTITLEMENT GRANTS CLUSTER",
+                                 "CDBG - DISASTER RECOVERY GRANTS - PUB. L. NO. 113-2 CLUSTER",
                                  "OTHER CLUSTER NOT LISTED ABOVE"
-                              ],
-                              "title": "ClusterName",
-                              "type": "string"
+                              ]
                            },
                            "cluster_total": {
                               "type": "number"
