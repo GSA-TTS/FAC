@@ -50,8 +50,7 @@ And an example with-errors return value is:
 
     [
         {
-            "message": "Your attempt at humor has been denied by the committee.",
-            "error_code": "UUDDLRLRBA"
+            "error": "Your attempt at humor has been denied by the committee."
         }
     ]
 
