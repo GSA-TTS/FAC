@@ -30,6 +30,9 @@
                   "description": "Award entry rows",
                   "properties": {
                      "award_reference": {
+                        "description": "Award Reference",
+                        "pattern": "^AWARD-(?!0000)[0-9]{4}$",
+                        "title": "AwardReference",
                         "type": "string"
                      },
                      "cluster": {

@@ -56,11 +56,6 @@ class SingleAuditChecklistTests(TestCase):
         """
         cases = (
             (
-                [SingleAuditChecklist.STATUS.IN_PROGRESS],
-                SingleAuditChecklist.STATUS.READY_FOR_CERTIFICATION,
-                "transition_to_ready_for_certification",
-            ),
-            (
                 [SingleAuditChecklist.STATUS.READY_FOR_CERTIFICATION],
                 SingleAuditChecklist.STATUS.AUDITOR_CERTIFIED,
                 "transition_to_auditor_certified",

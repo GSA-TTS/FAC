@@ -372,6 +372,11 @@ local type_uei = Types.string {
 };
 
 local Compound = {
+  AwardReference: Types.string {
+    title: 'AwardReference',
+    description: 'Award Reference',
+    pattern: '^AWARD-(?!0000)[0-9]{4}$',
+  },  
   ThreeDigitExtension: Types.string {
     title: 'ThreeDigitExtension',
     description: 'Three Digit Extension',
