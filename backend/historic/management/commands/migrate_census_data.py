@@ -1,8 +1,9 @@
 from historic.db import DB
 import historic.base as base
 from historic.mappings import (
+    auditfindings,
+    federalaward,
     general,
-    federalaward
 )
 import numpy as np
 import pandas as pd
@@ -66,44 +67,64 @@ def add_rid(the_map):
     def _add_rid(df, ndx):
         dbkey = df.at[ndx, 'dbkey']
         # print(f'looking up mapping [{int(dbkey)}] <- {the_map[int(dbkey)]}')
-        df['report_id'] = the_map[int(dbkey)]
+        return the_map[int(dbkey)]
     return _add_rid
 
-def migrate_auditfindings(gen_db : DB, year):
+def common_migration(in_db, out_db, year, gen_db, mapping):
     dbkeys = list(gen_db.df.dbkey)
     f_db = DB()
-    q = q_select_dbkeys_in_year("ELECAUDITS", dbkeys, year)
+    q = q_select_dbkeys_in_year(in_db, dbkeys, year)
     # print(q)
     f_db.read_sql_to_df(q)
-    f_db.apply_mappings(federalaward.cfac_to_gfac)
+    f_db.apply_mappings(mapping.cfac_to_gfac)
     the_map = build_reportid_map(gen_db)
     f_db.add_column('report_id', add_rid(the_map))
-    print(f_db.df.columns)
-    f_db.apply_mappings(federalaward.cfac_to_gfac, when='late')
-    print(f_db.df.columns)
-    f_db.write_df_to_sql('dissemination_federalaward')
+    #print(f_db.df.columns)
+    f_db.apply_mappings(mapping.cfac_to_gfac, when='late')
+    #print(f_db.df.columns)
+    f_db.write_df_to_sql(out_db)
     f_db.close()
 
 
-def migrate_auditfindings_slow(gen_db : DB):
-    for ndx, (dbkey, audityear, rid) in enumerate(list(zip(gen_db.df.dbkey, 
-                                                      gen_db.df.audit_year,
-                                                      gen_db.df.report_id))):
-        f_db = DB()
-        f_db.read_sql_to_df(q_select_finding(
-        "ELECAUDITS", dbkey, audityear))
-        f_db.apply_mappings(federalaward.cfac_to_gfac)
-        print(f"[{ndx:05}] Mapping {dbkey}, {audityear}, {len(f_db.df)}")
-        f_db.add_column('report_id', lambda df, ndx: rid)
-        # Recreate the table first time through
-        mode = None
-        if ndx == 0:
-            mode = 'replace'
-        else:
-            mode = 'append'
-        f_db.write_df_to_sql('dissemination_federalaward', mode=mode)
-        f_db.close()
-    
+def migrate_federalawards(gen_db : DB, year):
+    # dbkeys = list(gen_db.df.dbkey)
+    # f_db = DB()
+    # q = q_select_dbkeys_in_year("ELECAUDITS", dbkeys, year)
+    # # print(q)
+    # f_db.read_sql_to_df(q)
+    # f_db.apply_mappings(federalaward.cfac_to_gfac)
+    # the_map = build_reportid_map(gen_db)
+    # f_db.add_column('report_id', add_rid(the_map))
+    # #print(f_db.df.columns)
+    # f_db.apply_mappings(federalaward.cfac_to_gfac, when='late')
+    # #print(f_db.df.columns)
+    # f_db.write_df_to_sql('dissemination_federalaward')
+    # f_db.close()
+    common_migration("ELECAUDITS", 
+                     "dissemination_federalaward",
+                    year,
+                    gen_db,
+                    federalaward)
+
+def migrate_auditfindings(gen_db : DB, year):
+    # dbkeys = list(gen_db.df.dbkey)
+    # df_db = DB()
+    # q = q_select_dbkeys_in_year("ELECAUDITFINDINGS", dbkeys, year)
+    # # print(q)
+    # df_db.read_sql_to_df(q)
+    # df_db.apply_mappings(auditfindings.cfac_to_gfac)
+    # the_map = build_reportid_map(gen_db)
+    # df_db.add_column('report_id', add_rid(the_map))
+    # #print(f_db.df.columns)
+    # df_db.apply_mappings(auditfindings.cfac_to_gfac, when='late')
+    # #print(f_db.df.columns)
+    # df_db.write_df_to_sql('dissemination_finding')
+    # df_db.close()
+    common_migration("ELECAUDITFINDINGS", 
+                     "dissemination_finding",
+                    year,
+                    gen_db,
+                    auditfindings)
 
 class Command(BaseCommand):
     help = """
@@ -119,4 +140,7 @@ class Command(BaseCommand):
     def handle(self, *args, **kwargs):
         gen_db = migrate_general(kwargs["year"], kwargs["is_public_only"])
         print("Mapped and transfered general table.")
+        migrate_federalawards(gen_db, kwargs["year"])
+        print("Mapped and transferred federal awards table.")
         migrate_auditfindings(gen_db, kwargs["year"])
+        print("Mapped and transferred audit findings table.")
