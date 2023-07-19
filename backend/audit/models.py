@@ -22,6 +22,7 @@ from .validators import (
     validate_findings_uniform_guidance_json,
     validate_general_information_json,
     validate_secondary_auditors_json,
+    validate_notes_to_sefa_json,
     validate_single_audit_report_file,
 )
 
@@ -204,6 +205,11 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         blank=True, null=True, validators=[validate_secondary_auditors_json]
     )
 
+    # Notes to SEFA:
+    notes_to_sefa = models.JSONField(
+        blank=True, null=True, validators=[validate_notes_to_sefa_json]
+    )
+
     def validate_full(self):
         """
         A stub method to represent the cross-sheet, “full” validation that we
@@ -218,6 +224,7 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
             self.findings_uniform_guidance,
             self.additional_ueis,
             self.secondary_auditors,
+            self.notes_to_sefa,
         ]
         if all(section for section in all_sections):
             return True

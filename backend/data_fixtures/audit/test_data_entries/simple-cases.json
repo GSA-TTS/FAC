@@ -178,5 +178,19 @@
         }
       ]
     }
+  },
+  "NotesToSefaCase":{
+    "NotesToSefa": {
+      "auditee_uei": "AAA123456CCC",
+      "accounting_policies": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. \nFusce in ipsum tempus, eleifend ipsum id, dignissim ipso lorem. Proin vel quam non metus placerat semper nec in nisi.",
+      "is_minimis_rate_used": "Y",
+      "rate_explained": "Ipsum lorem ipsum dolor sit amet, consectetur adipiscing elit. \nInteger nec elit sed est malesuada fermentum vitae in odio. In hac habitasse platea dictumst. Nunc ut tincidunt quam.",
+      "notes_to_sefa_entries": [
+        {
+          "note_title": "Note one",
+          "note_content": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. \nVestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Phasellus nec tortor ut ligula sollicitudin euismod."
+        }
+      ]
+    }
   }
 }

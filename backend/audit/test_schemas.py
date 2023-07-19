@@ -17,6 +17,7 @@ from audit.fixtures.excel import (
     FINDINGS_TEXT_TEST_FILE,
     FINDINGS_UNIFORM_GUIDANCE_TEST_FILE,
     SECONDARY_AUDITORS_TEST_FILE,
+    NOTES_TO_SEFA_TEST_FILE,
     SIMPLE_CASES_TEST_FILE,
 )
 
@@ -381,7 +382,7 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
 
         validate(self.SIMPLE_CASES[0], schema)
 
-    def test_missing_auditee_ein(self):
+    def test_missing_auditee_uei(self):
         """
         Test that validation fails if auditee_uei is missing
         """
@@ -831,7 +832,7 @@ class FindingsTextSchemaValidityTest(SimpleTestCase):
 
         validate(self.SIMPLE_CASE, schema)
 
-    def test_missing_auditee_ein(self):
+    def test_missing_auditee_uei(self):
         """
         Test that validation fails if auditee_uei is missing
         """
@@ -913,7 +914,7 @@ class AdditionalUeisSchemaValidityTest(SimpleTestCase):
     ]
 
     def test_schema(self):
-        """Try to test AdditionalUEIs first."""
+        """Test AdditionalUEIs schema first."""
         schema = self.ADDITIONAL_UEIS_SCHEMA
 
         in_flight_file = ADDITIONAL_UEIS_TEST_FILE
@@ -922,13 +923,13 @@ class AdditionalUeisSchemaValidityTest(SimpleTestCase):
 
     def test_simple_pass(self):
         """
-        Test the simplest AdditionalUEIs case; none of the conditional fields apply.
+        Test a simple AdditionalUEIs case.
         """
         schema = self.ADDITIONAL_UEIS_SCHEMA
 
         validate(self.SIMPLE_CASE, schema)
 
-    def test_missing_auditee_ein(self):
+    def test_missing_auditee_uei(self):
         """
         Test that validation fails if auditee_uei is missing
         """
@@ -976,6 +977,68 @@ class AdditionalUeisSchemaValidityTest(SimpleTestCase):
         self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
 
+class NotesToSefaSchemaValidityTest(SimpleTestCase):
+    """
+    Test the basic validity of the NotesToSefa JSON schema.
+    """
+
+    NOTES_TO_SEFA_SCHEMA = json.loads(
+        (SECTION_SCHEMA_DIR / "NotesToSefa.schema.json").read_text(encoding="utf-8")
+    )
+    SIMPLE_CASE = json.loads(SIMPLE_CASES_TEST_FILE.read_text(encoding="utf-8"))[
+        "NotesToSefaCase"
+    ]
+
+    def test_schema(self):
+        """Test NotesToSefa schema first."""
+        schema = self.NOTES_TO_SEFA_SCHEMA
+        in_flight_file = NOTES_TO_SEFA_TEST_FILE
+        in_flight = json.loads(in_flight_file.read_text(encoding="utf-8"))
+        validate(in_flight, schema)
+
+    def test_simple_pass(self):
+        """
+        Test a simple NotesToSefa case.
+        """
+        schema = self.NOTES_TO_SEFA_SCHEMA
+        validate(self.SIMPLE_CASE, schema)
+
+    def test_missing_auditee_uei(self):
+        """
+        Test that validation fails when auditee_uei is missing
+        """
+        schema = self.NOTES_TO_SEFA_SCHEMA
+
+        simple_case = jsoncopy(self.SIMPLE_CASE)
+        del simple_case["NotesToSefa"]["auditee_uei"]
+
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
+
+    def test_missing_entry_fields(self):
+        """
+        Test that validation fails if any required entry field is missing
+        """
+        schema = self.NOTES_TO_SEFA_SCHEMA
+
+        simple_case = jsoncopy(self.SIMPLE_CASE)
+        del simple_case["NotesToSefa"]["accounting_policies"]
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
+
+        simple_case = jsoncopy(self.SIMPLE_CASE)
+        del simple_case["NotesToSefa"]["notes_to_sefa_entries"][0]["note_title"]
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
+
+    def test_for_invalid_entry(self):
+        """
+        Test that validation fails if invalid value is provided for entry field
+        """
+        schema = self.NOTES_TO_SEFA_SCHEMA
+
+        simple_case = jsoncopy(self.SIMPLE_CASE)
+        simple_case["NotesToSefa"]["auditee_uei"] = 123456789
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
+
+
 class FindingsUniformGuidanceSchemaValidityTest(SimpleTestCase):
     """
     Test the basic validity of the FindingsUniformGuidance JSON schema.
@@ -1009,7 +1072,7 @@ class FindingsUniformGuidanceSchemaValidityTest(SimpleTestCase):
 
         validate(self.SIMPLE_CASE, schema)
 
-    def test_missing_auditee_ein(self):
+    def test_missing_auditee_uei(self):
         """
         Test that validation fails if auditee_uei is missing
         """

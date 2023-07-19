@@ -1,4 +1,5 @@
-name: Deploy to the staging cloud.gov environment
+---
+name: Deploy to Staging Environment
 on:
   push:
     branches:
@@ -13,9 +14,8 @@ jobs:
     uses: ./.github/workflows/linting.yml
     secrets: inherit
 
-  # deploy to staging
   scan-dev:
-    name: Zap scan of the dev site
+    name: Zap Scan
     uses: ./.github/workflows/zap-scan.yml
     with:
       url: "https://fac-dev.app.cloud.gov/"
@@ -31,10 +31,16 @@ jobs:
     secrets: inherit
 
   deploy-staging:
-    name: Deploy staging app to cloud.gov
+    name: Deploy application
     needs:
       - deploy-infrastructure-staging
-    uses: ./.github/workflows/deploy-apps.yml
+    uses: ./.github/workflows/deploy-application.yml
     with:
       environment: "staging"
     secrets: inherit
+
+  scan-staging:
+    name: Zap Scan
+    uses: ./.github/workflows/zap-scan.yml
+    with:
+      url: "https://fac-staging.app.cloud.gov/"

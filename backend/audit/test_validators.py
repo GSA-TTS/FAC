@@ -17,6 +17,7 @@ from audit.fixtures.excel import (
     CORRECTIVE_ACTION_TEMPLATE_DEFINITION,
     ADDITIONAL_UEIS_TEMPLATE_DEFINITION,
     SECONDARY_AUDITORS_TEMPLATE_DEFINITION,
+    NOTES_TO_SEFA_TEMPLATE_DEFINITION,
 )
 
 from .validators import (
@@ -24,6 +25,7 @@ from .validators import (
     ALLOWED_EXCEL_FILE_EXTENSIONS,
     MAX_EXCEL_FILE_SIZE_MB,
     validate_additional_ueis_json,
+    validate_notes_to_sefa_json,
     validate_corrective_action_plan_json,
     validate_file_content_type,
     validate_file_extension,
@@ -714,6 +716,29 @@ class AdditionalUeisValidatorTests(SimpleTestCase):
 
         validate_additional_ueis_json(AdditionalUeisValidatorTests.SIMPLE_CASE)
 
+class NotesToSefaValidatorTests(SimpleTestCase):
+    SIMPLE_CASE = json.loads(SIMPLE_CASES_TEST_FILE.read_text(encoding="utf-8"))[
+        "NotesToSefaCase"
+    ]
+
+    def test_validation_is_applied(self):
+        """
+        Empty Notes to SEFA should fail, simple case should pass.
+        """
+        template_definition_path = (
+            settings.XLSX_TEMPLATE_JSON_DIR / NOTES_TO_SEFA_TEMPLATE_DEFINITION
+        )
+        template = json.loads(template_definition_path.read_text(encoding="utf-8"))
+        invalid = json.loads('{"NotesToSefa":{}}')
+        expected_msg = str(
+            ("A", "2", "Auditee UEI", template["sheets"][2]["single_cells"][0]["help"])
+        )
+        self.assertRaisesRegex(
+            ValidationError, expected_msg, validate_notes_to_sefa_json, invalid
+        )
+
+        validate_notes_to_sefa_json(NotesToSefaValidatorTests.SIMPLE_CASE)
+
 class SecondaryAuditorsValidatorTests(SimpleTestCase):
     SIMPLE_CASE = json.loads(SIMPLE_CASES_TEST_FILE.read_text(encoding="utf-8"))[
         "SecondaryAuditorsCase"
@@ -729,7 +754,7 @@ class SecondaryAuditorsValidatorTests(SimpleTestCase):
         template = json.loads(template_definition_path.read_text(encoding="utf-8"))
         invalid = json.loads('{"SecondaryAuditors":{}}')
         expected_msg = str(
-            ("A", "2", "Secondary Auditors", template["sheets"][1]["single_cells"][0]["help"])
+            ("A", "2", "Auditee UEI", template["sheets"][2]["single_cells"][0]["help"])
         )
         self.assertRaisesRegex(
             ValidationError, expected_msg, validate_secondary_auditors_json, invalid

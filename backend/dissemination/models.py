@@ -46,7 +46,7 @@ class FindingText(models.Model):
 class Finding(models.Model):
     """A finding from the audit. References FederalAward and FindingText"""
 
-    award_seq_number = models.CharField(
+    award_reference = models.CharField(
         "Order that the award line was reported in Award",
         null=True,
     )
@@ -106,10 +106,10 @@ class Finding(models.Model):
     )
 
     class Meta:
-        unique_together = (("report_id", "award_seq_number", "finding_seq_number"),)
+        unique_together = (("report_id", "award_reference", "finding_seq_number"),)
         """
             Finding
-            foreign_key(("report_id", "award_seq_number",) references FederalAward
+            foreign_key(("report_id", "award_reference",) references FederalAward
             foreign_key(("report_id", "finding_ref_number",) references FindingText
         """
 
@@ -122,7 +122,7 @@ class FederalAward(models.Model):
         max_length=40,
     )
 
-    award_seq_number = models.CharField(
+    award_reference = models.CharField(
         "Order that the award line was reported", default=-1
     )
 
@@ -251,7 +251,7 @@ class FederalAward(models.Model):
         unique_together = (
             (
                 "report_id",
-                "award_seq_number",
+                "award_reference",
             ),
         )
         """
@@ -307,16 +307,13 @@ class Note(models.Model):
     note_seq_number = models.IntegerField(
         "Order that the Note was reported", help_text=docs.seq_number_notes
     )
-    type_id = models.CharField("Note Type", max_length=1, help_text=docs.type_id)
-    note_index = models.IntegerField(
-        "Display Index for the Note",
-        null=True,
-        help_text=docs.note_index,
-    )
     content = models.TextField("Content of the Note", null=True, help_text=docs.content)
     note_title = models.CharField(
         "Note Title", max_length=75, null=True, help_text=docs.title
     )
+    accounting_policies = models.TextField(null=True)
+    is_minimis_rate_used = models.CharField(max_length=3, null=True)
+    rate_explained = models.TextField(null=True)
 
     class Meta:
         unique_together = (("report_id", "note_seq_number"),)
@@ -422,9 +419,8 @@ class Revision(models.Model):
         null=True,
         help_text=docs.general_info,
     )
-    audit_year = models.CharField(
-        "Audit Year and DBKEY (database key) combined make up the primary key.",
-        max_length=40,
+    audit_year = models.IntegerField(
+        "Audit year from fy_start_date",
         help_text=docs.audit_year_revisions,
     )
     report_id = models.CharField(
@@ -440,15 +436,14 @@ class Passthrough(models.Model):
     We may not need this table. We can simply add three columns
     pertating to passthrough in FederalAward table
     """
+    award_reference = models.CharField(
+        "Order that the award line was reported",
+        null=True,
+    )
     report_id = models.CharField(
         "G-FAC generated identifier. FK refers to General",
         max_length=40,
     )
-    award_seq_number = models.IntegerField(
-        "Order that the award line was reported",
-        null=True,
-    )
-
     # This doesn't seem like it should be null but it is sometimes
     passthrough_id = models.CharField(
         "Identifying Number Assigned by the Pass-through Entity",
@@ -464,7 +459,7 @@ class Passthrough(models.Model):
     )
 
     class Meta:
-        unique_together = (("report_id", "award_seq_number", "passthrough_id"),)
+        unique_together = (("report_id", "award_reference", "passthrough_id"),)
         """
             Note
             foreign_key(("report_id", ) references General
@@ -475,8 +470,6 @@ class Passthrough(models.Model):
     #     "FAC system generated sequence number used to link to Passthrough data between CFDA Info and Passthrough",
     #     help_text=docs.elec_audits_id_passthrough,
     # )
-    # SK - Note:  Need to add Award.award_seq_number
-    # SK - Note: Primary keys for this table are award_seq_number, report_id, passthrough_id
 
 
 class General(models.Model):
@@ -512,13 +505,10 @@ class General(models.Model):
         null=True,
         help_text=docs.auditee_email,
     )
-    hist_auditee_fax = models.PositiveBigIntegerField(
-        "Auditee Fax Number (optional)", null=True, help_text=docs.auditee_fax
-    )
     auditee_name = models.CharField(
         "Name of the Auditee", max_length=70, help_text=docs.auditee_name
     )
-    auditee_phone = models.PositiveBigIntegerField(
+    auditee_phone = models.TextField(
         "Auditee Phone Number", help_text=docs.auditee_phone
     )
     auditee_contact_title = models.CharField(
@@ -530,52 +520,20 @@ class General(models.Model):
     auditee_address_line_1 = models.CharField(
         "Auditee Street Address", max_length=45, help_text=docs.street1
     )
-    hist_auditee_address_line_2 = models.CharField(
-        "Auditee Street Address", max_length=45, null=True, help_text=docs.street2
-    )
     auditee_city = models.CharField("Auditee City", max_length=30, help_text=docs.city)
     auditee_state = models.CharField(
         "Auditee State", max_length=2, help_text=docs.state
     )
-    auditee_ein = models.IntegerField(
+    auditee_ein = models.CharField(
         "Primary Employer Identification Number",
         null=True,
+        max_length=30,
     )
-    multiple_ein = models.BooleanField(
-        "True if the audit contains more than one EIN",
-        null=True,
-        help_text=docs.multiple_eins,
-    )
-    auditee_duns = ArrayField(
-        models.CharField("", null=True, help_text=docs.duns_list), null=True
-    )
-    multiple_duns = models.BooleanField(
-        "True if the audit contains multiple DUNS",
-        null=True,
-        help_text=docs.multiple_duns,
-    )
-    auditee_uei = models.CharField("", null=True, help_text=docs.uei_general)
-    multiple_uei = models.BooleanField(
-        "True if the audit contains more than one UEI",
-        null=True,
-        help_text=docs.multiple_ueis,
+    auditee_uei = models.CharField(
+        "", max_length=30, null=True, help_text=docs.uei_general
     )
     auditee_addl_uei_list = ArrayField(
         models.CharField("", null=True, help_text=docs.uei_general), default=list
-    )
-    auditee_addl_ein_list = ArrayField(
-        models.IntegerField(
-            "Primary Employer Identification Number, in the order that they were listed.",
-            null=True,
-            help_text=docs.ein_list,
-        ),
-        default=list,
-    )
-    auditee_addl_duns_list = ArrayField(
-        models.CharField("", null=True, help_text=docs.duns_list), default=list
-    )
-    ein_subcode = models.IntegerField(
-        "Subcode assigned to the EIN.", null=True, help_text=docs.ein_subcode
     )
     auditee_zip = models.CharField(
         "Auditee Zip Code",
@@ -583,13 +541,8 @@ class General(models.Model):
         null=True,
         help_text=docs.zip_code,
     )
-    auditor_phone = models.PositiveBigIntegerField(
+    auditor_phone = models.TextField(
         "CPA phone number", null=True, help_text=docs.auditor_phone
-    )
-    hist_auditor_fax = models.PositiveBigIntegerField(
-        "CPA fax number (optional)",
-        null=True,
-        help_text=docs.auditor_fax,
     )
     auditor_state = models.CharField(
         "CPA State", max_length=2, null=True, help_text=docs.auditor_state
@@ -608,12 +561,6 @@ class General(models.Model):
         max_length=45,
         null=True,
         help_text=docs.auditor_street1,
-    )
-    hist_auditor_address_line_2 = models.CharField(
-        "CPA Street Address, line 2",
-        max_length=45,
-        null=True,
-        help_text=docs.auditor_street2,
     )
     auditor_zip = models.CharField(
         "CPA Zip Code",
@@ -650,9 +597,6 @@ class General(models.Model):
         "CPA Firm EIN (only available for audit years 2013 and beyond)",
         null=True,
         help_text=docs.auditor_ein,
-    )
-    multiple_auditors = models.BooleanField(
-        "True if the audit contains multiple auditors", null=True
     )
     pdf_url = ArrayField(
         models.CharField("PDFs associated with the report", max_length=400, null=True),
@@ -712,29 +656,8 @@ class General(models.Model):
     fy_start_date = models.DateField(
         "Fiscal Year Start Date", null=True, help_text=docs.fy_start_date
     )
-    hist_previous_completed_on = models.DateField(
-        "Date the Audit was Previously Posted to the Internet as Complete",
-        null=True,
-        help_text=docs.previous_completed_on,
-    )
-    # This may all be nulls and we can get rid of it
-    hist_previous_date_published = models.DateField(
-        null=True,
-        help_text=docs.previous_date_firewall,
-    )
-    hist_completed_date = models.DateField(
-        "Date the Audit was Posted to the Internet as Complete",
-        null=True,
-        help_text=docs.completed_on,
-    )
-    hist_component_date_received = models.DateField(
-        "The most recent date an audit component was received by the FAC. This field was not populated before 2004. Receipt of Financial statements only are not processed until the rest of the audit or a Form SF-SAC is also received.",
-        null=True,
-        help_text=docs.component_date_received,
-    )
-    audit_year = models.CharField(
-        "Audit Year and DBKEY (database key) combined make up the primary key.",
-        max_length=40,
+    audit_year = models.IntegerField(
+        "Audit year from fy_start_date.",
         help_text=docs.audit_year_general,
     )
 
@@ -743,11 +666,6 @@ class General(models.Model):
         "Type of Audit",
         max_length=40,
         help_text=docs.audit_type,
-    )
-    hist_reportable_condition = models.BooleanField(
-        "Whether or not the audit disclosed a reportable condition on financial statements",
-        null=True,
-        help_text=docs.reportable_condition,
     )
     is_significant_deficiency = models.BooleanField(
         "Whether or not the audit disclosed a significant deficiency on financial statements",
@@ -892,9 +810,6 @@ class General(models.Model):
     is_public = models.BooleanField(
         "True for public records, False for non-public records", null=True
     )
-    # Might want to add meta data to other models too, but everything eventually links back here, so this is good enough for now
-    modified_date = models.DateTimeField(auto_now=True)
-    create_date = models.DateTimeField(auto_now_add=True)
 
     # Choices are: C-FAC and G-FAC
     data_source = models.CharField("Origin of the upload", max_length=25)
@@ -905,6 +820,9 @@ class General(models.Model):
             General
             The root of the submission tree
         """
+
+    def __str__(self):
+        return f"Id:{self.report_id} UEI:{self.auditee_uei}, AY2x:{self.audit_year}"
 
 
 class GenAuditor(models.Model):
