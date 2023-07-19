@@ -367,7 +367,7 @@ class AuditInformationSchemaValidityTest(SimpleTestCase):
         """Try to test FederalAwards first."""
         schema = self.AUDIT_INFO_SCHEMA
 
-        validate(in_flight, schema)
+        validate(self.SIMPLE_CASE, schema)
 
 class FederalAwardsSchemaValidityTest(SimpleTestCase):
     """
