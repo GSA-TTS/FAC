@@ -6,6 +6,22 @@
          "name": "Form",
          "open_ranges": [
             {
+               "formula": "=IF(B{0}<>\"\", \"AWARD-\"&TEXT(ROW()-1,\"0000\"), \"\")",
+               "help": {
+                  "link": "https://fac.gov/documentation/validation/#award_reference",
+                  "text": "Award reference have the form AWARD-NNNN (e.g. AWARD-0001)"
+               },
+               "keep_locked": true,
+               "range_name": "award_reference",
+               "title": "Award Reference (Read Only)",
+               "title_cell": "A1",
+               "type": "open_range",
+               "validation": {
+                  "type": "NOVALIDATION"
+               },
+               "width": 18
+            },
+            {
                "format": "text",
                "help": {
                   "link": "https://fac.gov/documentation/validation/#aln_prefix",
@@ -13,7 +29,7 @@
                },
                "range_name": "federal_agency_prefix",
                "title": "Federal Agency Prefix",
-               "title_cell": "A1",
+               "title_cell": "B1",
                "type": "open_range",
                "validation": {
                   "allow_blank": "False",
@@ -32,7 +48,7 @@
                },
                "range_name": "three_digit_extension",
                "title": "ALN (CFDA) Three Digit Extension",
-               "title_cell": "B1",
+               "title_cell": "C1",
                "type": "open_range",
                "validation": {
                   "custom_error": "Expecting something with only three characters",
@@ -51,7 +67,7 @@
                },
                "range_name": "additional_award_identification",
                "title": "Additional Award Identification",
-               "title_cell": "C1",
+               "title_cell": "D1",
                "type": "open_range",
                "validation": {
                   "type": "NOVALIDATION"
@@ -64,7 +80,7 @@
                },
                "range_name": "program_name",
                "title": "Federal Program Name",
-               "title_cell": "D1",
+               "title_cell": "E1",
                "type": "open_range",
                "validation": {
                   "custom_error": "Not in the lookup list",
@@ -83,7 +99,7 @@
                },
                "range_name": "amount_expended",
                "title": "Amount Expended",
-               "title_cell": "E1",
+               "title_cell": "F1",
                "type": "open_range",
                "validation": {
                   "custom_error": "This cell must be a positive number",
@@ -99,7 +115,7 @@
                },
                "range_name": "cluster_name",
                "title": "Cluster Name",
-               "title_cell": "F1",
+               "title_cell": "G1",
                "type": "open_range",
                "validation": {
                   "custom_error": "Not in the lookup list",
@@ -117,7 +133,7 @@
                },
                "range_name": "state_cluster_name",
                "title": "If State Cluster, Enter State Cluster Name",
-               "title_cell": "G1",
+               "title_cell": "H1",
                "type": "open_range",
                "validation": {
                   "type": "NOVALIDATION"
@@ -130,7 +146,7 @@
                },
                "range_name": "other_cluster_name",
                "title": "If Other Cluster, Enter Other Cluster Name",
-               "title_cell": "H1",
+               "title_cell": "I1",
                "type": "open_range",
                "validation": {
                   "type": "NOVALIDATION"
@@ -146,7 +162,7 @@
                "keep_locked": true,
                "range_name": "federal_program_total",
                "title": "Federal Program Total",
-               "title_cell": "I1",
+               "title_cell": "J1",
                "type": "open_range",
                "validation": {
                   "custom_error": "This cell must be a positive number",
@@ -157,7 +173,7 @@
             },
             {
                "format": "dollar",
-               "formula": "=IF(F{0}=\"OTHER CLUSTER NOT LISTED ABOVE\",SUMIFS(amount_expended,uniform_other_cluster_name,X{0}), IF(AND(OR(F{0}=\"N/A\",F{0}=\"\"),G{0}=\"\"),0,IF(F{0}=\"STATE CLUSTER\",SUMIFS(amount_expended,uniform_state_cluster_name,W{0}),SUMIFS(amount_expended,cluster_name,F{0}))))",
+               "formula": "=IF(G{0}=\"OTHER CLUSTER NOT LISTED ABOVE\",SUMIFS(amount_expended,uniform_other_cluster_name,X{0}), IF(AND(OR(G{0}=\"N/A\",G{0}=\"\"),H{0}=\"\"),0,IF(G{0}=\"STATE CLUSTER\",SUMIFS(amount_expended,uniform_state_cluster_name,W{0}),SUMIFS(amount_expended,cluster_name,G{0}))))",
                "help": {
                   "link": "https://fac.gov/documentation/validation/#positive_number",
                   "text": "The number in this field must be zero or greater"
@@ -165,7 +181,7 @@
                "keep_locked": true,
                "range_name": "cluster_total",
                "title": "Cluster Total",
-               "title_cell": "J1",
+               "title_cell": "K1",
                "type": "open_range",
                "validation": {
                   "custom_error": "This cell must be a positive number",
@@ -181,7 +197,7 @@
                },
                "range_name": "is_guaranteed",
                "title": "Loan / Loan Guarantee",
-               "title_cell": "K1",
+               "title_cell": "L1",
                "type": "yorn_range",
                "validation": {
                   "allow_blank": "False",
@@ -199,12 +215,12 @@
                },
                "range_name": "loan_balance_at_audit_period_end",
                "title": "If yes (Loan/Loan Guarantee, End of Audit Period Outstanding Loan Balance)",
-               "title_cell": "L1",
+               "title_cell": "M1",
                "type": "open_range",
                "validation": {
                   "custom_error": "Loan Balance must be blank if Loan Guarantee is \"N\". If Loan Guarantee is \"Y\", Loan Balance must be a positive number or \"N/A\".",
                   "custom_title": "Loan Balance",
-                  "formula1": "=IF(K{0}=\"N\",ISBLANK(L{0}),OR(L{0}=\"N/A\",AND(ISNUMBER(L{0}),L{0}>=0)))",
+                  "formula1": "=IF(L{0}=\"N\",ISBLANK(M{0}),OR(M{0}=\"N/A\",AND(ISNUMBER(M{0}),M{0}>=0)))",
                   "type": "custom"
                }
             },
@@ -215,7 +231,7 @@
                },
                "range_name": "is_direct",
                "title": "Direct Award",
-               "title_cell": "M1",
+               "title_cell": "N1",
                "type": "yorn_range",
                "validation": {
                   "allow_blank": "False",
@@ -232,7 +248,7 @@
                },
                "range_name": "passthrough_name",
                "title": "If no (Direct Award), Name of Passthrough Entity",
-               "title_cell": "N1",
+               "title_cell": "O1",
                "type": "yorn_range",
                "validation": {
                   "type": "NOVALIDATION"
@@ -245,7 +261,7 @@
                },
                "range_name": "passthrough_identifying_number",
                "title": "If no (Direct Award), Identifying Number Assigned by the Pass-through Entity, if assigned",
-               "title_cell": "O1",
+               "title_cell": "P1",
                "type": "open_range",
                "validation": {
                   "type": "NOVALIDATION"
@@ -259,7 +275,7 @@
                },
                "range_name": "is_passed",
                "title": "Federal Award Passed Through to Subrecipients",
-               "title_cell": "P1",
+               "title_cell": "Q1",
                "type": "yorn_range",
                "validation": {
                   "allow_blank": "False",
@@ -277,7 +293,7 @@
                },
                "range_name": "subrecipient_amount",
                "title": "If yes (Passed Through), Amount Passed Through to Subrecipients",
-               "title_cell": "Q1",
+               "title_cell": "R1",
                "type": "open_range",
                "validation": {
                   "type": "NOVALIDATION"
@@ -290,7 +306,7 @@
                },
                "range_name": "is_major",
                "title": "Major Program (MP)",
-               "title_cell": "R1",
+               "title_cell": "S1",
                "type": "yorn_range",
                "validation": {
                   "allow_blank": "False",
@@ -307,13 +323,13 @@
                },
                "range_name": "audit_report_type",
                "title": "If yes (MP), Type of Audit Report",
-               "title_cell": "S1",
+               "title_cell": "T1",
                "type": "open_range",
                "validation": {
                   "allow_blank": "True",
                   "custom_error": "The Audit Report Type must be empty if Major Program is \"N\"",
                   "custom_title": "Invalid Audit Report Type",
-                  "formula1": "=IF(R{0}=\"Y\",audit_report_type_lookup,\"\")",
+                  "formula1": "=IF(S{0}=\"Y\",audit_report_type_lookup,\"\")",
                   "type": "list"
                },
                "width": 12
@@ -325,7 +341,7 @@
                },
                "range_name": "number_of_audit_findings",
                "title": "Number of Audit Findings",
-               "title_cell": "T1",
+               "title_cell": "U1",
                "type": "open_range",
                "validation": {
                   "custom_error": "This cell must be a positive number",
@@ -336,24 +352,8 @@
                "width": 12
             },
             {
-               "formula": "=IF(A{0}<>\"\", \"AWARD-\"&TEXT(ROW()-1,\"00000\"), \"\")",
-               "help": {
-                  "link": "https://fac.gov/documentation/validation/#unknown",
-                  "text": "If you see this error, please contact support."
-               },
-               "keep_locked": true,
-               "range_name": "award_reference",
-               "title": "Award Index (Read Only)",
-               "title_cell": "U1",
-               "type": "open_range",
-               "validation": {
-                  "type": "NOVALIDATION"
-               },
-               "width": 24
-            },
-            {
                "format": "text",
-               "formula": "=CONCATENATE(A{0},B{0})",
+               "formula": "=CONCATENATE(B{0},C{0})",
                "help": {
                   "link": "https://fac.gov/documentation/validation/#unknown",
                   "text": "If you see this error, please contact support."
@@ -369,7 +369,7 @@
                "width": 12
             },
             {
-               "formula": "=UPPER(TRIM(G{0}))",
+               "formula": "=UPPER(TRIM(H{0}))",
                "help": {
                   "link": "https://fac.gov/documentation/validation/#unknown",
                   "text": "If you see this error, please contact support."
@@ -385,7 +385,7 @@
                "width": 24
             },
             {
-               "formula": "=UPPER(TRIM(H{0}))",
+               "formula": "=UPPER(TRIM(I{0}))",
                "help": {
                   "link": "https://fac.gov/documentation/validation/#unknown",
                   "text": "If you see this error, please contact support."
@@ -429,7 +429,7 @@
             },
             {
                "format": "dollar",
-               "formula": "=SUM('Form'!E$FIRSTROW:E$LASTROW)",
+               "formula": "=SUM('Form'!F$FIRSTROW:F$LASTROW)",
                "help": {
                   "link": "https://fac.gov/documentation/validation/#positive_number",
                   "text": "The number in this field must be zero or greater"
