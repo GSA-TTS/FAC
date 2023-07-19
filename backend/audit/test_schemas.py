@@ -1296,7 +1296,7 @@ class SecondaryAuditorsSchemaValidityTest(SimpleTestCase):
 
         simple_case = jsoncopy(self.SIMPLE_CASE)
         simple_case["SecondaryAuditors"]["secondary_auditors_entries"][0][
-            "secondary_auditor_state"
+            "secondary_auditor_address_state"
         ] = None
         self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 

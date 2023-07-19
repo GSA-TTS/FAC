@@ -734,20 +734,20 @@ class ExcelFileHandlerViewTests(TestCase):
                     test_data[0]["secondary_auditor_ein"],
                 )
                 self.assertEqual(
-                    secondary_auditors_entries["secondary_auditor_address"],
-                    test_data[0]["secondary_auditor_address"],
+                    secondary_auditors_entries["secondary_auditor_address_street"],
+                    test_data[0]["secondary_auditor_address_street"],
                 )
                 self.assertEqual(
-                    secondary_auditors_entries["secondary_auditor_city"],
-                    test_data[0]["secondary_auditor_city"],
+                    secondary_auditors_entries["secondary_auditor_address_city"],
+                    test_data[0]["secondary_auditor_address_city"],
                 )
                 self.assertEqual(
-                    secondary_auditors_entries["secondary_auditor_state"],
-                    test_data[0]["secondary_auditor_state"],
+                    secondary_auditors_entries["secondary_auditor_address_state"],
+                    test_data[0]["secondary_auditor_address_state"],
                 )
                 self.assertEqual(
-                    secondary_auditors_entries["secondary_auditor_zip"],
-                    test_data[0]["secondary_auditor_zip"],
+                    secondary_auditors_entries["secondary_auditor_address_zipcode"],
+                    test_data[0]["secondary_auditor_address_zipcode"],
                 )
                 self.assertEqual(
                     secondary_auditors_entries["secondary_auditor_contact_name"],

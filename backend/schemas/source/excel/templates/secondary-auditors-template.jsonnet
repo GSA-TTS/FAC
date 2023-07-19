@@ -47,7 +47,7 @@ local open_ranges_defns = [
     },
     SV.NoValidation,
     'Audit Firm/Organization Address (Number and Street)',
-    'secondary_auditor_address',
+    'secondary_auditor_address_street',
   ],
   [
     Sheets.open_range {
@@ -57,7 +57,7 @@ local open_ranges_defns = [
     },
     SV.NoValidation,
     'Audit Firm/Organization City',
-    'secondary_auditor_city',
+    'secondary_auditor_address_city',
   ],
   [
     Sheets.open_range {
@@ -67,7 +67,7 @@ local open_ranges_defns = [
     },
     SV.NoValidation,
     'Audit Firm/Organization State',
-    'secondary_auditor_state',
+    'secondary_auditor_address_state',
   ],
   [
     Sheets.open_range {
@@ -77,7 +77,7 @@ local open_ranges_defns = [
     },
     SV.NoValidation,
     'Audit Firm/Organization ZIP',
-    'secondary_auditor_zip',
+    'secondary_auditor_address_zipcode',
   ],
   [
     Sheets.open_range {

@@ -42,7 +42,7 @@
                   "link": "https://fac.gov/documentation/validation/#plain_text",
                   "text": "Only plain text is allowed in this field, no emoji or other special additions"
                },
-               "range_name": "secondary_auditor_address",
+               "range_name": "secondary_auditor_address_street",
                "title": "Audit Firm/Organization Address (Number and Street)",
                "title_cell": "C1",
                "type": "open_range",
@@ -56,7 +56,7 @@
                   "link": "https://fac.gov/documentation/validation/#plain_text",
                   "text": "Only plain text is allowed in this field, no emoji or other special additions"
                },
-               "range_name": "secondary_auditor_city",
+               "range_name": "secondary_auditor_address_city",
                "title": "Audit Firm/Organization City",
                "title_cell": "D1",
                "type": "open_range",
@@ -70,7 +70,7 @@
                   "link": "https://fac.gov/documentation/validation/#plain_text",
                   "text": "Only plain text is allowed in this field, no emoji or other special additions"
                },
-               "range_name": "secondary_auditor_state",
+               "range_name": "secondary_auditor_address_state",
                "title": "Audit Firm/Organization State",
                "title_cell": "E1",
                "type": "open_range",
@@ -84,7 +84,7 @@
                   "link": "https://fac.gov/documentation/validation/#plain_text",
                   "text": "Only plain text is allowed in this field, no emoji or other special additions"
                },
-               "range_name": "secondary_auditor_zip",
+               "range_name": "secondary_auditor_address_zipcode",
                "title": "Audit Firm/Organization ZIP",
                "title_cell": "F1",
                "type": "open_range",

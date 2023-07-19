@@ -756,7 +756,7 @@ class SecondaryAuditorsValidatorTests(SimpleTestCase):
         template = json.loads(template_definition_path.read_text(encoding="utf-8"))
         invalid = json.loads('{"SecondaryAuditors":{}}')
         expected_msg = str(
-            ("A", "2", "Auditee UEI", template["sheets"][2]["single_cells"][0]["help"])
+            ("A", "2", "Auditee UEI", template["sheets"][1]["single_cells"][0]["help"])
         )
         self.assertRaisesRegex(
             ValidationError, expected_msg, validate_secondary_auditors_json, invalid

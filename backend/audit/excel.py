@@ -304,52 +304,52 @@ additional_ueis_column_mapping: ColumnMapping = {
 
 secondary_auditors_column_mapping: ColumnMapping = {
     "secondary_auditor_name": (
-        "SecondaryAuditors.secondary_auditor_name_entries",
+        "SecondaryAuditors.secondary_auditors_entries",
         "secondary_auditor_name",
         _set_by_path,
     ),
     "secondary_auditor_ein": (
-        "SecondaryAuditors.secondary_auditor_ein_entries",
+        "SecondaryAuditors.secondary_auditors_entries",
         "secondary_auditor_ein",
         _set_by_path,
     ),
     "secondary_auditor_address_street": (
-        "SecondaryAuditors.secondary_auditor_address_street_entries",
+        "SecondaryAuditors.secondary_auditors_entries",
         "secondary_auditor_address_street",
         _set_by_path,
     ),
     "secondary_auditor_address_city": (
-        "SecondaryAuditors.secondary_auditor_address_city_entries",
+        "SecondaryAuditors.secondary_auditors_entries",
         "secondary_auditor_address_city",
         _set_by_path,
     ),
     "secondary_auditor_address_state": (
-        "SecondaryAuditors.secondary_auditor_address_state_entries",
+        "SecondaryAuditors.secondary_auditors_entries",
         "secondary_auditor_address_state",
         _set_by_path,
     ),
     "secondary_auditor_address_zipcode": (
-        "SecondaryAuditors.secondary_auditor_address_zipcode_entries",
+        "SecondaryAuditors.secondary_auditors_entries",
         "secondary_auditor_address_zipcode",
         _set_by_path,
     ),
     "secondary_auditor_contact_name": (
-        "SecondaryAuditors.secondary_auditor_contact_name_entries",
+        "SecondaryAuditors.secondary_auditors_entries",
         "secondary_auditor_contact_name",
         _set_by_path,
     ),
     "secondary_auditor_contact_title": (
-        "SecondaryAuditors.secondary_auditor_contact_title_entries",
+        "SecondaryAuditors.secondary_auditors_entries",
         "secondary_auditor_contact_title",
         _set_by_path,
     ),
     "secondary_auditor_contact_phone": (
-        "SecondaryAuditors.secondary_auditor_contact_phone_entries",
+        "SecondaryAuditors.secondary_auditors_entries",
         "secondary_auditor_contact_phone",
         _set_by_path,
     ),
     "secondary_auditor_contact_email": (
-        "SecondaryAuditors.secondary_auditor_contact_email_entries",
+        "SecondaryAuditors.secondary_auditors_entries",
         "secondary_auditor_contact_email",
         _set_by_path,
     ),
