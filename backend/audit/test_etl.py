@@ -10,6 +10,7 @@ from dissemination.models import (
     Passthrough,
     Note,
     FindingText,
+    CapText,
 )
 from audit.etl import ETL
 
@@ -212,6 +213,18 @@ class ETLTests(TestCase):
                 ],
             }
         }
+        corrective_action_plan = {
+            "CorrectiveActionPlan": {
+                "auditee_uei": "AAA123456BBB",
+                "corrective_action_plan_entries": [
+                    {
+                        "contains_chart_or_table": "N",
+                        "planned_action": "This is an action",
+                        "reference_number": "2023-111",
+                    },
+                ],
+            }
+        }
 
         sac = SingleAuditChecklist.objects.create(
             submitted_by=user,
@@ -220,6 +233,7 @@ class ETLTests(TestCase):
             findings_uniform_guidance=findings_uniform_guidance,
             notes_to_sefa=notes_to_sefa,
             findings_text=findings_text,
+            corrective_action_plan=corrective_action_plan,
         )
         sac.save()
         self.sac = sac
@@ -267,3 +281,10 @@ class ETLTests(TestCase):
         self.assertEqual(len(finding_texts), 1)
         finding_text = finding_texts.first()
         self.assertEqual(self.report_id, finding_text.report_id)
+
+    def test_load_captext(self):
+        self.etl.load_captext()
+        cap_texts = CapText.objects.all()
+        self.assertEqual(len(cap_texts), 1)
+        cap_text = cap_texts.first()
+        self.assertEqual(self.report_id, cap_text.report_id)
