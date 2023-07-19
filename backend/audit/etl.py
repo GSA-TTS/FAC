@@ -18,7 +18,7 @@ class ETL(object):
         self.single_audit_checklist = sac
         self.report_id = sac.report_id
         audit_date = sac.general_information.get(
-            "auditee_fiscal_period_start", datetime.now
+            "auditee_fiscal_period_start", datetime.now().isoformat()
         )
         self.audit_year = int(audit_date.split("-")[0])
 

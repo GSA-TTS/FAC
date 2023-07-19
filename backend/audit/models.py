@@ -1,5 +1,6 @@
 import calendar
 from datetime import date
+from itertools import chain
 import json
 import logging
 
@@ -13,6 +14,7 @@ from django.utils.translation import gettext_lazy as _
 
 from django_fsm import FSMField, RETURN_VALUE, transition
 
+import audit.cross_validation
 from .validators import (
     validate_additional_ueis_json,
     validate_corrective_action_plan_json,
@@ -206,22 +208,38 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
 
     def validate_full(self):
         """
+        Full validation, intended for use when the user indicates that the
+        submission is finished.
+
+        Currently a stub, but eventually will call each of the individual
+        section validation routines and then validate_cross.
+        """
+
+        validation_methods = []
+        errors = [f(self) for f in validation_methods]
+
+        if errors:
+            return {"errors": errors}
+
+        return self.validate_cross()
+
+    def validate_cross(self):
+        """
+        This method should NOT be run as part of full_clean(), because we want
+        to be able to save in-progress submissions.
+
         A stub method to represent the cross-sheet, “full” validation that we
         do once all the individual sections are complete and valid in
         themselves.
         """
-        all_sections = [
-            self.general_information,
-            self.federal_awards,
-            self.corrective_action_plan,
-            self.findings_text,
-            self.findings_uniform_guidance,
-            self.additional_ueis,
-            self.notes_to_sefa,
-        ]
-        if all(section for section in all_sections):
-            return True
-        return True
+        shaped_sac = audit.cross_validation.sac_validation_shape(self)
+        validation_functions = audit.cross_validation.functions
+        errors = list(
+            chain.from_iterable([func(shaped_sac) for func in validation_functions])
+        )
+        if errors:
+            return {"errors": errors, "data": shaped_sac}
+        return {}
 
     @transition(
         field="submission_status",
@@ -235,13 +253,13 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         there's likely to be a step in one of the views that does cross-sheet
         validation and reports back to the user.
         """
-        if self.validate_full():
+        errors = self.validate_full()
+        if not errors:
             self.transition_name.append(
                 SingleAuditChecklist.STATUS.READY_FOR_CERTIFICATION
             )
             self.transition_date.append(date.today())
             return SingleAuditChecklist.STATUS.READY_FOR_CERTIFICATION
-
         return SingleAuditChecklist.STATUS.IN_PROGRESS
 
     @transition(
@@ -299,6 +317,7 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         if self.general_information:
             etl = ETL(self)
             etl.load_all()
+
         self.transition_name.append(SingleAuditChecklist.STATUS.SUBMITTED)
         self.transition_date.append(date.today())
 
