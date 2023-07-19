@@ -8,7 +8,7 @@ const UPLOAD_URLS = {
   'audit-findings-text': 'findings-text',
   'additional-ueis': 'additional-ueis',
   CAP: 'corrective-action-plan',
-  'secondary-auditors': 'secondary-auditors'
+  'secondary-auditors': 'secondary-auditors',
 };
 
 /*

@@ -212,6 +212,7 @@ def validate_general_information_json(value):
         ) from err
     return value
 
+
 def validate_secondary_auditors_json(value):
     """
     Apply JSON Schema for secondary auditors and report errors.
@@ -398,6 +399,7 @@ def _findings_uniform_guidance_json_error(errors):
     )
     template = json.loads(template_definition_path.read_text(encoding="utf-8"))
     return _get_error_details(template, findings_uniform_guidance_named_ranges(errors))
+
 
 def _secondary_auditors_json_error(errors):
     """Process JSON Schema errors for secondary auditors"""

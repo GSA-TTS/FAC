@@ -1233,6 +1233,7 @@ class FindingsUniformGuidanceSchemaValidityTest(SimpleTestCase):
         ]["is_valid"] = 0
         self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
+
 class SecondaryAuditorsSchemaValidityTest(SimpleTestCase):
     """
     Test the basic validity of the SecondaryAuditors JSON schema.

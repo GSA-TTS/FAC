@@ -716,6 +716,7 @@ class AdditionalUeisValidatorTests(SimpleTestCase):
 
         validate_additional_ueis_json(AdditionalUeisValidatorTests.SIMPLE_CASE)
 
+
 class NotesToSefaValidatorTests(SimpleTestCase):
     SIMPLE_CASE = json.loads(SIMPLE_CASES_TEST_FILE.read_text(encoding="utf-8"))[
         "NotesToSefaCase"
@@ -738,6 +739,7 @@ class NotesToSefaValidatorTests(SimpleTestCase):
         )
 
         validate_notes_to_sefa_json(NotesToSefaValidatorTests.SIMPLE_CASE)
+
 
 class SecondaryAuditorsValidatorTests(SimpleTestCase):
     SIMPLE_CASE = json.loads(SIMPLE_CASES_TEST_FILE.read_text(encoding="utf-8"))[

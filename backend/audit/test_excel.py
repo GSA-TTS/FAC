@@ -519,6 +519,7 @@ class AdditionalUeisExcelTests(SimpleTestCase):
                     ValidationError, validate_additional_ueis_json, additional_ueis
                 )
 
+
 class SecondaryAuditorsExcelTests(SimpleTestCase):
     GOOD_UEI = "AAA123456BBB"
     TEST_DATA = json.loads(SECONDARY_AUDITORS_ENTRY_FIXTURES.read_text(encoding="utf-8"))
@@ -566,7 +567,16 @@ class SecondaryAuditorsExcelTests(SimpleTestCase):
 
         test_cases = [
             ("auditee_uei", 123456789123),
-            ("additional_uei", 123456789123), #TODO
+            ("secondary_auditor_name", False)
+            ("secondary_auditor_ein", 12345678),
+            ("secondary_auditor_address", True),
+            ("secondary_auditor_city", 0),
+            ("secondary_auditor_state", "Of Mind"),
+            ("secondary_auditor_zip", "91919999"),
+            ("secondary_auditor_contact_name", 11),
+            ("secondary_auditor_contact_title", 4),
+            ("secondary_auditor_contact_phone", "333-333-55555"),
+            ("secondary_auditor_contact_email", "tory.audi$bae.com"),
         ]
 
         # validate that each test_case appropriately checks the data type
@@ -579,6 +589,7 @@ class SecondaryAuditorsExcelTests(SimpleTestCase):
                 self.assertRaises(
                     ValidationError, validate_secondary_auditors_json, secondary_auditors
                 )
+
 
 class NotesToSefaExcelTests(SimpleTestCase):
     GOOD_UEI = "AAA123456BBB"

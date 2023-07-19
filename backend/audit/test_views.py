@@ -726,44 +726,43 @@ class ExcelFileHandlerViewTests(TestCase):
                 self.assertEqual(
                     secondary_auditors_entries["secondary_auditor_name"],
                     test_data[0]["secondary_auditor_name"],
-                    )
+                )
                 self.assertEqual(
                     secondary_auditors_entries["secondary_auditor_ein"],
                     test_data[0]["secondary_auditor_ein"],
-                    )
+                )
                 self.assertEqual(
                     secondary_auditors_entries["secondary_auditor_address"],
                     test_data[0]["secondary_auditor_address"],
-                    )
+                )
                 self.assertEqual(
                     secondary_auditors_entries["secondary_auditor_city"],
                     test_data[0]["secondary_auditor_city"],
-                    )
+                )
                 self.assertEqual(
                     secondary_auditors_entries["secondary_auditor_state"],
                     test_data[0]["secondary_auditor_state"],
-                    )
+                )
                 self.assertEqual(
                     secondary_auditors_entries["secondary_auditor_zip"],
                     test_data[0]["secondary_auditor_zip"],
-                    )
+                )
                 self.assertEqual(
                     secondary_auditors_entries["secondary_auditor_contact_name"],
                     test_data[0]["secondary_auditor_contact_name"],
-                    )
+                )
                 self.assertEqual(
                     secondary_auditors_entries["secondary_auditor_contact_title"],
                     test_data[0]["secondary_auditor_contact_title"],
-                    )
+                )
                 self.assertEqual(
                     secondary_auditors_entries["secondary_auditor_contact_phone"],
                     test_data[0]["secondary_auditor_contact_phone"],
-                    )
+                )
                 self.assertEqual(
                     secondary_auditors_entries["secondary_auditor_contact_email"],
                     test_data[0]["secondary_auditor_contact_email"],
-                    )
-
+                )
 
 
 class SingleAuditReportFileHandlerViewTests(TestCase):

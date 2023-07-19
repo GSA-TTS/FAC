@@ -570,6 +570,7 @@ def extract_additional_ueis(file):
         template["title_row"],
     )
 
+
 def extract_secondary_auditors(file):
     template_definition_path = (
         XLSX_TEMPLATE_DEFINITION_DIR / SECONDARY_AUDITORS_TEMPLATE_DEFINITION
@@ -696,6 +697,7 @@ def secondary_auditors_named_ranges(errors):
     return _extract_named_ranges(
         errors, secondary_auditors_column_mapping, secondary_auditors_field_mapping
     )
+
 
 def notes_to_sefa_named_ranges(errors):
     return _extract_named_ranges(

@@ -199,7 +199,7 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
     additional_ueis = models.JSONField(
         blank=True, null=True, validators=[validate_additional_ueis_json]
     )
-    
+
     # Secondary Auditors:
     secondary_auditors = models.JSONField(
         blank=True, null=True, validators=[validate_secondary_auditors_json]
