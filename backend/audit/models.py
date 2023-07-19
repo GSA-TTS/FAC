@@ -234,7 +234,9 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         """
         shaped_sac = audit.cross_validation.sac_validation_shape(self)
         validation_functions = audit.cross_validation.functions
-        errors = list(chain.from_iterable([func(shaped_sac) for func in validation_functions]))
+        errors = list(
+            chain.from_iterable([func(shaped_sac) for func in validation_functions])
+        )
         if errors:
             return {"errors": errors, "data": shaped_sac}
         return {}
