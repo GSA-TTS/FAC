@@ -569,7 +569,8 @@ class SecondaryAuditorsExcelTests(SimpleTestCase):
 
         test_cases = [
             ("auditee_uei", 123456789123),
-            ("secondary_auditor_name", False)("secondary_auditor_ein", 12345678),
+            ("secondary_auditor_name", False),
+            ("secondary_auditor_ein", 12345678),
             ("secondary_auditor_address", True),
             ("secondary_auditor_city", 0),
             ("secondary_auditor_state", "Of Mind"),
