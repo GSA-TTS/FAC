@@ -87,7 +87,7 @@ local StringOfLengthTwelve = {
 local LoanBalanceValidation = {
   type: 'custom',
   // FIXME MSHD: for improvement, will need to pull column refs from this formula and retrieve that dynamically.
-  formula1: '=IF(K{0}="N",ISBLANK(L{0}),OR(L{0}="N/A",AND(ISNUMBER(L{0}),L{0}>=0)))',
+  formula1: '=IF(L{0}="N",ISBLANK(M{0}),OR(M{0}="N/A",AND(ISNUMBER(M{0}),M{0}>=0)))',
   custom_error: 'Loan Balance must be blank if Loan Guarantee is "N". If Loan Guarantee is "Y", Loan Balance must be a positive number or "N/A".',
   custom_title: 'Loan Balance',
 };
@@ -101,6 +101,12 @@ local ComplianceRequirementValidation = {
   custom_title: 'Compliance requirement',
 };
 
+local AwardReferenceValidation = {
+  type: 'custom',
+  formula1: '=AND(LEN(FIRSTCELLREF)=10, LEFT(FIRSTCELLREF, 6)="AWARD-", ISNUMBER(VALUE(MID(FIRSTCELLREF, 7, 4))))',
+  custom_error: 'The value should follow the pattern AWARD-#### (where #### is a four-digit number).',
+  custom_title: 'Award Reference validation',
+};
 
 {
   NoValidation: { type: 'NOVALIDATION' },
@@ -118,9 +124,10 @@ local ComplianceRequirementValidation = {
   AuditReportTypeValidation(namedRange): {
     type: 'list',
     allow_blank: 'True', 
-    formula1: '=IF(R{0}="Y",' + namedRange + ',"")', 
+    formula1: '=IF(S{0}="Y",' + namedRange + ',"")', 
     custom_error: 'The Audit Report Type must be empty if Major Program is "N"',
     custom_title: 'Invalid Audit Report Type',
   },
   YoNoBValidation: YoNoBValidation,
+  AwardReferenceValidation: AwardReferenceValidation,
 }

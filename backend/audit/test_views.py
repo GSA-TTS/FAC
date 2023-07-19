@@ -584,12 +584,8 @@ class ExcelFileHandlerViewTests(TestCase):
                 ]["findings_uniform_guidance_entries"][0]
 
                 self.assertEqual(
-                    findings_entries["program"]["federal_agency_prefix"],
-                    test_data[0]["federal_agency_prefix"],
-                )
-                self.assertEqual(
-                    findings_entries["program"]["three_digit_extension"],
-                    test_data[0]["three_digit_extension"],
+                    findings_entries["program"]["award_reference"],
+                    test_data[0]["award_reference"],
                 )
                 self.assertEqual(
                     findings_entries["program"]["compliance_requirement"],

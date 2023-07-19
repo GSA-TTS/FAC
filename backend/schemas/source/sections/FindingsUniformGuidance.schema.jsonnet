@@ -9,14 +9,10 @@ local Parts = {
   Program: Types.object {
     additionalProperties: false,
     properties: {
-      program_name: Types.string,
-      federal_agency_prefix: Base.Enum.ALNPrefixes,
-      three_digit_extension: Base.Compound.ThreeDigitExtension,
-      additional_award_identification: Func.compound_type([Types.string, Types.NULL, Types.integer]),
+      award_reference: Base.Compound.AwardReference,
       compliance_requirement: Base.Compound.ComplianceRequirement,
     },
-    required: ['program_name', 'federal_agency_prefix', 'three_digit_extension', 'compliance_requirement'],
-    allOf: Base.Validation.AdditionalAwardIdentificationValidation,
+    required: ['award_reference', 'compliance_requirement'],
   },
   Findings: Types.object {
     additionalProperties: false,

@@ -139,9 +139,7 @@
       "findings_uniform_guidance_entries": [
         {
           "program": {
-            "federal_agency_prefix": "42",
-            "three_digit_extension": "123",
-            "program_name": "program name",
+            "award_reference": "AWARD-0001",
             "compliance_requirement": "A"
           },
           "questioned_costs": "N",

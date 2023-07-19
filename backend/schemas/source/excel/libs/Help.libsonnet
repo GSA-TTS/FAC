@@ -15,6 +15,11 @@ local make_url = function(anchor)
     text: 'Not a valid agency ALN (CFDA) prefix',
     link: make_url('aln_prefix'),
   },
+  // A
+  award_reference: {
+    text: 'Award reference have the form AWARD-NNNN (e.g. AWARD-0001)',
+    link: make_url('award_reference'),
+  },
   // C
   cluster_name: {
     text: 'Not one of the allowed cluster names',

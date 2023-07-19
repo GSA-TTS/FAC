@@ -17,8 +17,7 @@ class FindingText(models.Model):
         null=True,
         help_text=docs.finding_ref_nums_findingstext,
     )
-
-    charts_tables = models.BooleanField(
+    contains_chart_or_table = models.BooleanField(
         "Indicates whether or not the text contained charts or tables that could not be entered due to formatting restrictions",
         max_length=1,
         null=True,
@@ -268,19 +267,18 @@ class CapText(models.Model):
         "G-FAC generated identifier. FK refers to a General",
         max_length=40,
     )
-
     finding_ref_number = models.CharField(
         "Audit Finding Reference Number",
         max_length=100,
         help_text=docs.finding_ref_nums_captext,
     )
-    charts_tables = models.BooleanField(
+    contains_chart_or_table = models.BooleanField(
         "Indicates whether or not the text contained charts or tables that could not be entered due to formatting restrictions",
         max_length=1,
         null=True,
         help_text=docs.charts_tables_captext,
     )
-    cap_text = models.TextField(
+    planned_action = models.TextField(
         "Content of the Corrective Action Plan (CAP)", help_text=docs.text_captext
     )
 

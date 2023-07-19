@@ -201,24 +201,9 @@ corrective_action_column_mapping: ColumnMapping = {
     ),
 }
 findings_uniform_guidance_column_mapping: ColumnMapping = {
-    "federal_agency_prefix": (
+    "award_reference": (
         "FindingsUniformGuidance.findings_uniform_guidance_entries",
-        f"program.{FEDERAL_AGENCY_PREFIX}",
-        _set_by_path,
-    ),
-    "three_digit_extension": (
-        "FindingsUniformGuidance.findings_uniform_guidance_entries",
-        f"program.{THREE_DIGIT_EXTENSION}",
-        _set_by_path,
-    ),
-    "additional_award_identification": (
-        "FindingsUniformGuidance.findings_uniform_guidance_entries",
-        "program.additional_award_identification",
-        _set_by_path,
-    ),
-    "program_name": (
-        "FindingsUniformGuidance.findings_uniform_guidance_entries",
-        "program.program_name",
+        "program.award_reference",
         _set_by_path,
     ),
     "reference_number": (
