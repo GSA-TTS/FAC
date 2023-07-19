@@ -1,8 +1,6 @@
 [
   {
-    "federal_agency_prefix": "10",
-    "three_digit_extension": "001",
-    "program_name": "program name",
+    "award_reference": "AWARD-0001",
     "compliance_requirement": "AB",
     "reference_number": "2023-001",
     "repeat_prior_reference": "Y",
@@ -16,9 +14,7 @@
     "material_weakness": "N"
   },
   {
-    "federal_agency_prefix": "10",
-    "three_digit_extension": "002",
-    "program_name": "program name",
+    "award_reference": "AWARD-0002",
     "compliance_requirement": "E",
     "reference_number": "2023-001",
     "repeat_prior_reference": "N",
