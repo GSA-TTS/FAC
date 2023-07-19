@@ -350,6 +350,24 @@ class GeneralInformationSchemaValidityTest(SimpleTestCase):
                     ):
                         validate(instance, schema)
 
+class AuditInformationSchemaValidityTest(SimpleTestCase):
+
+    AUDIT_INFO_SCHEMA = json.loads(
+        (SECTION_SCHEMA_DIR / "AuditInformation.schema.json").read_text(
+            encoding="utf-8"
+        )
+    )
+
+    SIMPLE_CASE = json.loads(SIMPLE_CASES_TEST_FILE.read_text(encoding="utf-8"))[
+        "AuditInformationCase"
+    ]
+
+    
+    def test_schema(self):
+        """Try to test FederalAwards first."""
+        schema = self.AUDIT_INFO_SCHEMA
+
+        validate(in_flight, schema)
 
 class FederalAwardsSchemaValidityTest(SimpleTestCase):
     """
