@@ -7,23 +7,86 @@
          "additionalProperties": false,
          "properties": {
             "agencies": {
+               "items": {
+                  "description": "Valid two-digit program numbers; part of the CFDA/ALN",
+                  "enum": [
+                     "10",
+                     "11",
+                     "12",
+                     "13",
+                     "14",
+                     "15",
+                     "16",
+                     "17",
+                     "18",
+                     "19",
+                     "20",
+                     "21",
+                     "22",
+                     "23",
+                     "27",
+                     "29",
+                     "30",
+                     "32",
+                     "33",
+                     "34",
+                     "36",
+                     "39",
+                     "40",
+                     "41",
+                     "42",
+                     "43",
+                     "44",
+                     "45",
+                     "46",
+                     "47",
+                     "53",
+                     "57",
+                     "58",
+                     "59",
+                     "60",
+                     "61",
+                     "62",
+                     "64",
+                     "66",
+                     "68",
+                     "70",
+                     "77",
+                     "78",
+                     "81",
+                     "82",
+                     "83",
+                     "84",
+                     "85",
+                     "86",
+                     "87",
+                     "88",
+                     "89",
+                     "90",
+                     "91",
+                     "92",
+                     "93",
+                     "94",
+                     "96",
+                     "97",
+                     "98",
+                     "99"
+                  ],
+                  "type": "string"
+               },
                "type": "array"
             },
             "ggap_results": {
                "items": {
-                  "oneOf": [
-                     {
-                        "description": "GGAP Results (Audit Information)",
-                        "enum": [
-                           "unmodified_opinion",
-                           "qualified_opinion",
-                           "adverse_opinion",
-                           "disclaimer_of_opinion",
-                           "not_ggap"
-                        ],
-                        "type": "string"
-                     }
-                  ]
+                  "description": "GGAP Results (Audit Information)",
+                  "enum": [
+                     "unmodified_opinion",
+                     "qualified_opinion",
+                     "adverse_opinion",
+                     "disclaimer_of_opinion",
+                     "not_ggap"
+                  ],
+                  "type": "string"
                },
                "type": "array"
             },

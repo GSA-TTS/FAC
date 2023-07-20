@@ -437,7 +437,37 @@ class AuditInformationSchemaValidityTest(SimpleTestCase):
 
         for word in not_ggap_values:
             simple_case["AuditInformation"]['ggap_results'] = [word]
-            self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
+            self.assertRaises(exceptions.ValidationError,
+                              validate, simple_case, schema)
+
+    def test_valid_aln_prefixes(self):
+        schema = self.AUDIT_INFO_SCHEMA
+        simple_case = jsoncopy(self.SIMPLE_CASE)
+        # Why "likely?" I have no idea what is authoritative.
+        # Fix the tests as we discover changes, and update the
+        # validation schema while we're at it.
+        likely_valid_aln_prefixes = ['10', '11', '12', '13', '14', '15',  '16',
+                                     '17', '18', '19', '20', '21', '22', '23', '27', '29', '30', '32', '33',
+                                     '34', '36', '39', '40', '41', '42', '43', '44', '45', '46', '47',
+                                     '53', '57', '58', '59', '60', '61', '62', '64', '66', '68',
+                                     '70', '77', '78', '81', '82', '83', '84', '85', '86',
+                                     '87', '88', '89', '90', '91', '92', '93', '94', '96', '97',
+                                     '98', '99', ]
+        likely_invalid_aln_prefixes = ['24', '25', '26', '35']
+
+
+        for _ in range(10):
+            for n in range(2, 10):
+                ls = random.sample(likely_valid_aln_prefixes, n)
+                simple_case["AuditInformation"]['agencies'] = ls
+                validate(simple_case, schema)
+        
+        for _ in range(10):
+            for n in range(2, 3):
+                ls = random.sample(likely_invalid_aln_prefixes, n)
+                simple_case["AuditInformation"]['agencies'] = ls
+                self.assertRaises(exceptions.ValidationError,
+                                  validate, simple_case, schema)
 
 
 class FederalAwardsSchemaValidityTest(SimpleTestCase):
