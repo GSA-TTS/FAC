@@ -189,7 +189,7 @@ class GeneralInformationFormView(LoginRequiredMixin, View):
                 "ValidationError for report ID %s: %s", report_id, err.message
             )
         except LateChangeError:
-            return render(request, "audit/already-certified.html")
+            return render(request, "audit/no-late-changes.html")
 
         raise BadRequest()
 

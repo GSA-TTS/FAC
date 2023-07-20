@@ -603,7 +603,7 @@ class UploadReportView(SingleAuditChecklistAccessRequiredMixin, generic.View):
         except SingleAuditChecklist.DoesNotExist:
             raise PermissionDenied("You do not have access to this audit.")
         except LateChangeError:
-            return render(request, "audit/already-certified.html")
+            return render(request, "audit/no-late-changes.html")
 
         except Exception as err:
             logger.info("Unexpected error in UploadReportView post.\n", err)
