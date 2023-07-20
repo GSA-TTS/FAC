@@ -68,6 +68,14 @@ local StringOfLengthThree = {
   custom_title: 'Must be length of 3',
 };
 
+local StringOfLengthNine = {
+  type: 'textLength',
+  operator: 'equal',
+  formula1: 9,
+  custom_error: 'Expecting something with nine characters',
+  custom_title: 'Must be length of 9',
+};
+
 local StringOfLengthTwelve = {
   type: 'textLength',
   operator: 'equal',
@@ -107,6 +115,7 @@ local AwardReferenceValidation = {
   LookupValidation: LookupValidation,
   RangeLookupValidation: RangeLookupValidation,
   StringOfLengthThree: StringOfLengthThree,
+  StringOfLengthNine: StringOfLengthNine,
   StringOfLengthTwelve: StringOfLengthTwelve,
   YoNValidation: YoNValidation,
   ReferenceNumberValidation: ReferenceNumberValidation,
