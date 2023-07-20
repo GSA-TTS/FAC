@@ -124,8 +124,8 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         if self.submission_status != self.STATUS.IN_PROGRESS:
             try:
                 self._reject_late_changes()
-            except AssertionError as err:
-                raise LateChangeError(err) from err
+            except LateChangeError as err:
+                raise LateChangeError from err
 
         return super().save(*args, **kwds)
 
@@ -144,11 +144,13 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
 
         current = audit.cross_validation.sac_validation_shape(self)
         prior = audit.cross_validation.sac_validation_shape(prior_obj)
-        assert current["sf_sac_sections"] == prior["sf_sac_sections"]
+        if current["sf_sac_sections"] != prior["sf_sac_sections"]:
+            raise LateChangeError
 
         meta_fields = ("submitted_by", "date_created", "report_id", "audit_type")
         for field in meta_fields:
-            assert current["sf_sac_meta"][field] == prior["sf_sac_meta"][field]
+            if current["sf_sac_meta"][field] != prior["sf_sac_meta"][field]:
+                raise LateChangeError
 
         return True
 
