@@ -1,0 +1,181 @@
+{
+   "filename": "secondary-auditors-template.xlsx",
+   "sheets": [
+      {
+         "header_height": 48,
+         "name": "Form",
+         "open_ranges": [
+            {
+               "help": {
+                  "link": "https://fac.gov/documentation/validation/#plain_text",
+                  "text": "Only plain text is allowed in this field, no emoji or other special additions"
+               },
+               "range_name": "secondary_auditor_name",
+               "title": "Audit Firm/Organization Name",
+               "title_cell": "A1",
+               "type": "open_range",
+               "validation": {
+                  "type": "NOVALIDATION"
+               },
+               "width": 100
+            },
+            {
+               "help": {
+                  "link": "https://fac.gov/documentation/validation/#ein",
+                  "text": "Employer identification numbers (EIN) are nine characters long and match rules given by the IRS"
+               },
+               "range_name": "secondary_auditor_ein",
+               "title": "Audit Firm or Organization EIN",
+               "title_cell": "B1",
+               "type": "open_range",
+               "validation": {
+                  "custom_error": "Expecting something with nine characters",
+                  "custom_title": "Must be length of 9",
+                  "formula1": 9,
+                  "operator": "equal",
+                  "type": "textLength"
+               },
+               "width": 36
+            },
+            {
+               "help": {
+                  "link": "https://fac.gov/documentation/validation/#plain_text",
+                  "text": "Only plain text is allowed in this field, no emoji or other special additions"
+               },
+               "range_name": "secondary_auditor_address_street",
+               "title": "Audit Firm/Organization Address (Number and Street)",
+               "title_cell": "C1",
+               "type": "open_range",
+               "validation": {
+                  "type": "NOVALIDATION"
+               },
+               "width": 100
+            },
+            {
+               "help": {
+                  "link": "https://fac.gov/documentation/validation/#plain_text",
+                  "text": "Only plain text is allowed in this field, no emoji or other special additions"
+               },
+               "range_name": "secondary_auditor_address_city",
+               "title": "Audit Firm/Organization City",
+               "title_cell": "D1",
+               "type": "open_range",
+               "validation": {
+                  "type": "NOVALIDATION"
+               },
+               "width": 100
+            },
+            {
+               "help": {
+                  "link": "https://fac.gov/documentation/validation/#plain_text",
+                  "text": "Only plain text is allowed in this field, no emoji or other special additions"
+               },
+               "range_name": "secondary_auditor_address_state",
+               "title": "Audit Firm/Organization State",
+               "title_cell": "E1",
+               "type": "open_range",
+               "validation": {
+                  "type": "NOVALIDATION"
+               },
+               "width": 100
+            },
+            {
+               "help": {
+                  "link": "https://fac.gov/documentation/validation/#plain_text",
+                  "text": "Only plain text is allowed in this field, no emoji or other special additions"
+               },
+               "range_name": "secondary_auditor_address_zipcode",
+               "title": "Audit Firm/Organization ZIP",
+               "title_cell": "F1",
+               "type": "open_range",
+               "validation": {
+                  "type": "NOVALIDATION"
+               },
+               "width": 36
+            },
+            {
+               "help": {
+                  "link": "https://fac.gov/documentation/validation/#plain_text",
+                  "text": "Only plain text is allowed in this field, no emoji or other special additions"
+               },
+               "range_name": "secondary_auditor_contact_name",
+               "title": "Contact Name",
+               "title_cell": "G1",
+               "type": "open_range",
+               "validation": {
+                  "type": "NOVALIDATION"
+               },
+               "width": 36
+            },
+            {
+               "help": {
+                  "link": "https://fac.gov/documentation/validation/#plain_text",
+                  "text": "Only plain text is allowed in this field, no emoji or other special additions"
+               },
+               "range_name": "secondary_auditor_contact_title",
+               "title": "Contact Title",
+               "title_cell": "H1",
+               "type": "open_range",
+               "validation": {
+                  "type": "NOVALIDATION"
+               },
+               "width": 36
+            },
+            {
+               "help": {
+                  "link": "https://fac.gov/documentation/validation/#plain_text",
+                  "text": "Only plain text is allowed in this field, no emoji or other special additions"
+               },
+               "range_name": "secondary_auditor_contact_phone",
+               "title": "Contact Phone Number",
+               "title_cell": "I1",
+               "type": "open_range",
+               "validation": {
+                  "type": "NOVALIDATION"
+               },
+               "width": 36
+            },
+            {
+               "help": {
+                  "link": "https://fac.gov/documentation/validation/#plain_text",
+                  "text": "Only plain text is allowed in this field, no emoji or other special additions"
+               },
+               "range_name": "secondary_auditor_contact_email",
+               "title": "Contact E-mail",
+               "title_cell": "J1",
+               "type": "open_range",
+               "validation": {
+                  "type": "NOVALIDATION"
+               },
+               "width": 36
+            }
+         ]
+      },
+      {
+         "header_height": 48,
+         "name": "UEI",
+         "single_cells": [
+            {
+               "help": {
+                  "link": "https://fac.gov/documentation/validation/#uei",
+                  "text": "UEIs are 12 characters long and match rules as given by SAM.gov"
+               },
+               "range_cell": "A2",
+               "range_name": "auditee_uei",
+               "title": "Auditee UEI",
+               "title_cell": "A1",
+               "type": "single_cell",
+               "validation": {
+                  "custom_error": "Expecting something with only twelve characters",
+                  "custom_title": "Must be length of 12",
+                  "formula1": 12,
+                  "operator": "equal",
+                  "type": "textLength"
+               },
+               "width": 36
+            }
+         ]
+      }
+   ],
+   "title_row": 1
+}
