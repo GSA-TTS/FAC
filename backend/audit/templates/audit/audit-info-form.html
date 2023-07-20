@@ -226,7 +226,10 @@
                     </legend>
                     <div class="grid-row">
                         <label class="margin-top-2 margin-right-1">$</label>
-                        <input id="dollar_threshold" name="dollar_threshold" class="usa-input usa-input--medium tablet:grid-col-2" min="1" pattern="\d+" required type="number" value={{ form.cleaned_data.dollar_threshold }} />
+                        <input id="dollar_threshold"
+                        name="dollar_threshold" class="usa-input
+                        usa-input--medium tablet:grid-col-2" min="1"
+                        pattern="\d+" required type="number" value="{{ form.cleaned_data.dollar_threshold }}" />
                     </div>
                     <span class="usa-error-message margin-top-2">{{ form.errors.dollar_threshold|striptags }}</span>
                 </fieldset>
