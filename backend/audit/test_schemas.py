@@ -26,7 +26,8 @@ SECTION_SCHEMA_DIR = settings.SECTION_SCHEMA_DIR
 # references to things used by other tests:
 
 
-def jsoncopy(v): return json.loads(json.dumps(v))
+def jsoncopy(v):
+    return json.loads(json.dumps(v))
 
 
 def validate(instance, schema):
@@ -115,10 +116,8 @@ class GeneralInformationSchemaValidityTest(SimpleTestCase):
         bad_eins = [
             f"{randrange(1000000000):010}",  # too long
             f"{randrange(10000000):08}",  # too short
-            "".join(choice(string.ascii_letters)
-                    for i in range(9)),  # contains letters
-            "".join(choice(string.punctuation)
-                    for i in range(9)),  # contains symbols
+            "".join(choice(string.ascii_letters) for i in range(9)),  # contains letters
+            "".join(choice(string.punctuation) for i in range(9)),  # contains symbols
         ]
 
         for bad_ein in bad_eins:
@@ -153,10 +152,9 @@ class GeneralInformationSchemaValidityTest(SimpleTestCase):
         too_short = "".join(choice(alpha_omit_oi) for i in range(11))
         too_long = "".join(choice(alpha_omit_oi) for i in range(13))
         zero_start = f"0{''.join(choice(alpha_omit_oi) for i in range(11))}"
-        with_punc = good_uei[:idx] + \
-            choice(string.punctuation) + good_uei[idx + 1:]
-        with_numlike = good_uei[:idx] + choice("ioIO") + good_uei[idx + 1:]
-        with_commas = good_uei[:idx] + "," + good_uei[idx + 1:]
+        with_punc = good_uei[:idx] + choice(string.punctuation) + good_uei[idx + 1 :]
+        with_numlike = good_uei[:idx] + choice("ioIO") + good_uei[idx + 1 :]
+        with_commas = good_uei[:idx] + "," + good_uei[idx + 1 :]
 
         digits = "".join(choice(string.digits) for i in range(9))
         three_chars = "".join(choice(string.ascii_uppercase) for i in range(3))
@@ -249,10 +247,8 @@ class GeneralInformationSchemaValidityTest(SimpleTestCase):
         bad_zips = [
             f"{randrange(1000000):06}",  # too long
             f"{randrange(10000):04}",  # too short
-            "".join(choice(string.ascii_letters)
-                    for i in range(5)),  # contains letters
-            "".join(choice(string.punctuation)
-                    for i in range(5)),  # contains symbols
+            "".join(choice(string.ascii_letters) for i in range(5)),  # contains letters
+            "".join(choice(string.punctuation) for i in range(5)),  # contains symbols
         ]
 
         for zip_field in ["auditee_zip", "auditor_zip"]:
@@ -324,8 +320,7 @@ class GeneralInformationSchemaValidityTest(SimpleTestCase):
             f"({randrange(1000):03}) {randrange(1000):03} {randrange(10000):04}",
         ]
 
-        good_phones_w_country_code = [
-            f"+1 {p}" for p in good_phones_wo_country_code]
+        good_phones_w_country_code = [f"+1 {p}" for p in good_phones_wo_country_code]
 
         good_phones = good_phones_wo_country_code + good_phones_w_country_code
 
@@ -405,40 +400,39 @@ class AuditInformationSchemaValidityTest(SimpleTestCase):
         schema = self.AUDIT_INFO_SCHEMA
         simple_case = jsoncopy(self.SIMPLE_CASE)
         ggap_results = [
-            'unmodified_opinion',
-            'qualified_opinion',
-            'adverse_opinion',
-            'disclaimer_of_opinion',
-            'not_ggap',
+            "unmodified_opinion",
+            "qualified_opinion",
+            "adverse_opinion",
+            "disclaimer_of_opinion",
+            "not_ggap",
         ]
 
         for result in ggap_results:
-            simple_case["AuditInformation"]['ggap_results'] = [result]
+            simple_case["AuditInformation"]["ggap_results"] = [result]
             validate(simple_case, schema)
 
         for _ in range(10):
             for n in range(2, 5):
                 ls = random.sample(ggap_results, n)
-                simple_case["AuditInformation"]['ggap_results'] = ls
+                simple_case["AuditInformation"]["ggap_results"] = ls
                 validate(simple_case, schema)
 
     def test_bad_ggap_results(self):
         schema = self.AUDIT_INFO_SCHEMA
         simple_case = jsoncopy(self.SIMPLE_CASE)
         not_ggap_values = [
-            'state',
-            'local',
-            'tribal',
-            'higher-ed',
-            'non-profit',
-            'unknown',
-            'none',
+            "state",
+            "local",
+            "tribal",
+            "higher-ed",
+            "non-profit",
+            "unknown",
+            "none",
         ]
 
         for word in not_ggap_values:
-            simple_case["AuditInformation"]['ggap_results'] = [word]
-            self.assertRaises(exceptions.ValidationError,
-                              validate, simple_case, schema)
+            simple_case["AuditInformation"]["ggap_results"] = [word]
+            self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
     def test_valid_aln_prefixes(self):
         schema = self.AUDIT_INFO_SCHEMA
@@ -446,28 +440,84 @@ class AuditInformationSchemaValidityTest(SimpleTestCase):
         # Why "likely?" I have no idea what is authoritative.
         # Fix the tests as we discover changes, and update the
         # validation schema while we're at it.
-        likely_valid_aln_prefixes = ['10', '11', '12', '13', '14', '15',  '16',
-                                     '17', '18', '19', '20', '21', '22', '23', '27', '29', '30', '32', '33',
-                                     '34', '36', '39', '40', '41', '42', '43', '44', '45', '46', '47',
-                                     '53', '57', '58', '59', '60', '61', '62', '64', '66', '68',
-                                     '70', '77', '78', '81', '82', '83', '84', '85', '86',
-                                     '87', '88', '89', '90', '91', '92', '93', '94', '96', '97',
-                                     '98', '99', ]
-        likely_invalid_aln_prefixes = ['24', '25', '26', '35']
-
+        likely_valid_aln_prefixes = [
+            "10",
+            "11",
+            "12",
+            "13",
+            "14",
+            "15",
+            "16",
+            "17",
+            "18",
+            "19",
+            "20",
+            "21",
+            "22",
+            "23",
+            "27",
+            "29",
+            "30",
+            "32",
+            "33",
+            "34",
+            "36",
+            "39",
+            "40",
+            "41",
+            "42",
+            "43",
+            "44",
+            "45",
+            "46",
+            "47",
+            "53",
+            "57",
+            "58",
+            "59",
+            "60",
+            "61",
+            "62",
+            "64",
+            "66",
+            "68",
+            "70",
+            "77",
+            "78",
+            "81",
+            "82",
+            "83",
+            "84",
+            "85",
+            "86",
+            "87",
+            "88",
+            "89",
+            "90",
+            "91",
+            "92",
+            "93",
+            "94",
+            "96",
+            "97",
+            "98",
+            "99",
+        ]
+        likely_invalid_aln_prefixes = ["24", "25", "26", "35"]
 
         for _ in range(10):
             for n in range(2, 10):
                 ls = random.sample(likely_valid_aln_prefixes, n)
-                simple_case["AuditInformation"]['agencies'] = ls
+                simple_case["AuditInformation"]["agencies"] = ls
                 validate(simple_case, schema)
-        
+
         for _ in range(10):
             for n in range(2, 3):
                 ls = random.sample(likely_invalid_aln_prefixes, n)
-                simple_case["AuditInformation"]['agencies'] = ls
-                self.assertRaises(exceptions.ValidationError,
-                                  validate, simple_case, schema)
+                simple_case["AuditInformation"]["agencies"] = ls
+                self.assertRaises(
+                    exceptions.ValidationError, validate, simple_case, schema
+                )
 
 
 class FederalAwardsSchemaValidityTest(SimpleTestCase):
@@ -509,8 +559,7 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
         simple_case = jsoncopy(self.SIMPLE_CASES[0])
         del simple_case["FederalAwards"]["auditee_uei"]
 
-        self.assertRaises(exceptions.ValidationError,
-                          validate, simple_case, schema)
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
     def test_missing_total_amount_expended(self):
         """
@@ -521,8 +570,7 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
         simple_case = jsoncopy(self.SIMPLE_CASES[0])
         del simple_case["FederalAwards"]["total_amount_expended"]
 
-        self.assertRaises(exceptions.ValidationError,
-                          validate, simple_case, schema)
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
     def test_simple_fail_with_extraneous(self):
         """
@@ -536,8 +584,7 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
         simple_case["FederalAwards"]["federal_awards"][0][
             "loan_balance_at_audit_period_end"
         ] = 10_000
-        self.assertRaises(exceptions.ValidationError,
-                          validate, simple_case, schema)
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
     def test_loan_dependents(self):
         """
@@ -569,20 +616,17 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
 
             validate(simple_case, schema)
 
-        no_dependent_fail = award | {
-            "loan_or_loan_guarantee": {"is_guaranteed": "Y"}}
+        no_dependent_fail = award | {"loan_or_loan_guarantee": {"is_guaranteed": "Y"}}
         simple_case["FederalAwards"]["federal_awards"] = [no_dependent_fail]
 
-        self.assertRaises(exceptions.ValidationError,
-                          validate, simple_case, schema)
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
         only_dependent_fail = award | {
             "loan_or_loan_guarantee": {"loan_balance_at_audit_period_end": 10_000}
         }
         simple_case["FederalAwards"]["federal_awards"] = [only_dependent_fail]
 
-        self.assertRaises(exceptions.ValidationError,
-                          validate, simple_case, schema)
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
         bad_value_fail = award | {
             "loan_or_loan_guarantee": {
@@ -592,8 +636,7 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
         }
         simple_case["FederalAwards"]["federal_awards"] = [bad_value_fail]
 
-        self.assertRaises(exceptions.ValidationError,
-                          validate, simple_case, schema)
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
         zero_value_fail = award | {
             "loan_or_loan_guarantee": {
@@ -603,8 +646,7 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
         }
         simple_case["FederalAwards"]["federal_awards"] = [zero_value_fail]
 
-        self.assertRaises(exceptions.ValidationError,
-                          validate, simple_case, schema)
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
     def test_direct_award_dependents(self):
         """
@@ -633,12 +675,10 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
 
         validate(simple_case, schema)
 
-        no_dependent_fail = award | {
-            "direct_or_indirect_award": {"is_direct": "N"}}
+        no_dependent_fail = award | {"direct_or_indirect_award": {"is_direct": "N"}}
         simple_case["FederalAwards"]["federal_awards"] = [no_dependent_fail]
 
-        self.assertRaises(exceptions.ValidationError,
-                          validate, simple_case, schema)
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
         only_dependent_fail = award | {
             "direct_or_indirect_award": {
@@ -652,8 +692,7 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
         }
         simple_case["FederalAwards"]["federal_awards"] = [only_dependent_fail]
 
-        self.assertRaises(exceptions.ValidationError,
-                          validate, simple_case, schema)
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
         bad_entity_fail = award | {
             "direct_or_indirect_award": {
@@ -662,8 +701,7 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
             }
         }
         simple_case["FederalAwards"]["federal_awards"] = [bad_entity_fail]
-        self.assertRaises(exceptions.ValidationError,
-                          validate, simple_case, schema)
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
         bad_entity_empty_fail = award | {
             "direct_or_indirect_award": {
@@ -673,10 +711,8 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
                 ],
             }
         }
-        simple_case["FederalAwards"]["federal_awards"] = [
-            bad_entity_empty_fail]
-        self.assertRaises(exceptions.ValidationError,
-                          validate, simple_case, schema)
+        simple_case["FederalAwards"]["federal_awards"] = [bad_entity_empty_fail]
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
     def test_passthrough_dependents(self):
         """
@@ -698,15 +734,12 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
         no_dependent_fail = award | {"subrecipients": {"is_passed": "Y"}}
         simple_case["FederalAwards"]["federal_awards"] = [no_dependent_fail]
 
-        self.assertRaises(exceptions.ValidationError,
-                          validate, simple_case, schema)
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
-        only_dependent_fail = award | {
-            "subrecipients": {"subrecipient_amount": 10_000}}
+        only_dependent_fail = award | {"subrecipients": {"subrecipient_amount": 10_000}}
         simple_case["FederalAwards"]["federal_awards"] = [only_dependent_fail]
 
-        self.assertRaises(exceptions.ValidationError,
-                          validate, simple_case, schema)
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
     def test_major_program_dependents(self):
         """
@@ -744,22 +777,19 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
         }
         simple_case["FederalAwards"]["federal_awards"] = [invalid_fail]
 
-        self.assertRaises(exceptions.ValidationError,
-                          validate, simple_case, schema)
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
         no_dependent_fail = award | {"is_major": "Y"}
         simple_case["FederalAwards"]["federal_awards"] = [no_dependent_fail]
 
-        self.assertRaises(exceptions.ValidationError,
-                          validate, simple_case, schema)
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
         only_dependent_fail = award | {
             "audit_report_type": "U",
         }
         simple_case["FederalAwards"]["federal_awards"] = [only_dependent_fail]
 
-        self.assertRaises(exceptions.ValidationError,
-                          validate, simple_case, schema)
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
     def test_missing_state_cluster_name(self):
         """
@@ -772,8 +802,7 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
         simple_case["FederalAwards"]["federal_awards"][0]["cluster"][
             "cluster_name"
         ] = "STATE CLUSTER"
-        self.assertRaises(exceptions.ValidationError,
-                          validate, simple_case, schema)
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
     def test_disallowed_state_cluster_name(self):
         """
@@ -787,8 +816,7 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
         ] = "ANYTHING"
 
         # Test for errors when state_cluster_name is not empty or null
-        self.assertRaises(exceptions.ValidationError,
-                          validate, simple_case, schema)
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
         # Test for successful validation when state_cluster_name is empty or null
         for valid in ["", "null"]:
@@ -816,8 +844,7 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
             simple_case["FederalAwards"]["federal_awards"][0]["program"][
                 "number_of_audit_findings"
             ] = 0
-            self.assertRaises(exceptions.ValidationError,
-                              validate, simple_case, schema)
+            self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
             simple_case["FederalAwards"]["federal_awards"][0]["program"][
                 "number_of_audit_findings"
@@ -881,8 +908,7 @@ class CorrectiveActionPlanSchemaValidityTest(SimpleTestCase):
         simple_case = jsoncopy(self.SIMPLE_CASE)
         del simple_case["CorrectiveActionPlan"]["auditee_uei"]
 
-        self.assertRaises(exceptions.ValidationError,
-                          validate, simple_case, schema)
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
     def test_missing_entry_fields(self):
         """
@@ -894,22 +920,19 @@ class CorrectiveActionPlanSchemaValidityTest(SimpleTestCase):
         del simple_case["CorrectiveActionPlan"]["corrective_action_plan_entries"][0][
             "contains_chart_or_table"
         ]
-        self.assertRaises(exceptions.ValidationError,
-                          validate, simple_case, schema)
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
         simple_case = jsoncopy(self.SIMPLE_CASE)
         del simple_case["CorrectiveActionPlan"]["corrective_action_plan_entries"][0][
             "planned_action"
         ]
-        self.assertRaises(exceptions.ValidationError,
-                          validate, simple_case, schema)
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
         simple_case = jsoncopy(self.SIMPLE_CASE)
         del simple_case["CorrectiveActionPlan"]["corrective_action_plan_entries"][0][
             "reference_number"
         ]
-        self.assertRaises(exceptions.ValidationError,
-                          validate, simple_case, schema)
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
     def test_empty_entry_fields(self):
         """
@@ -921,22 +944,19 @@ class CorrectiveActionPlanSchemaValidityTest(SimpleTestCase):
         simple_case["CorrectiveActionPlan"]["corrective_action_plan_entries"][0][
             "contains_chart_or_table"
         ] = None
-        self.assertRaises(exceptions.ValidationError,
-                          validate, simple_case, schema)
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
         simple_case = jsoncopy(self.SIMPLE_CASE)
         simple_case["CorrectiveActionPlan"]["corrective_action_plan_entries"][0][
             "planned_action"
         ] = None
-        self.assertRaises(exceptions.ValidationError,
-                          validate, simple_case, schema)
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
         simple_case = jsoncopy(self.SIMPLE_CASE)
         simple_case["CorrectiveActionPlan"]["corrective_action_plan_entries"][0][
             "reference_number"
         ] = None
-        self.assertRaises(exceptions.ValidationError,
-                          validate, simple_case, schema)
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
     def test_for_invalid_entry(self):
         """
@@ -948,8 +968,7 @@ class CorrectiveActionPlanSchemaValidityTest(SimpleTestCase):
         simple_case["CorrectiveActionPlan"]["corrective_action_plan_entries"][0][
             "contains_chart_or_table"
         ] = 0
-        self.assertRaises(exceptions.ValidationError,
-                          validate, simple_case, schema)
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
 
 class FindingsTextSchemaValidityTest(SimpleTestCase):
@@ -990,8 +1009,7 @@ class FindingsTextSchemaValidityTest(SimpleTestCase):
         simple_case = jsoncopy(self.SIMPLE_CASE)
         del simple_case["FindingsText"]["auditee_uei"]
 
-        self.assertRaises(exceptions.ValidationError,
-                          validate, simple_case, schema)
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
     def test_missing_entry_fields(self):
         """
@@ -1003,18 +1021,15 @@ class FindingsTextSchemaValidityTest(SimpleTestCase):
         del simple_case["FindingsText"]["findings_text_entries"][0][
             "contains_chart_or_table"
         ]
-        self.assertRaises(exceptions.ValidationError,
-                          validate, simple_case, schema)
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
         simple_case = jsoncopy(self.SIMPLE_CASE)
         del simple_case["FindingsText"]["findings_text_entries"][0]["text_of_finding"]
-        self.assertRaises(exceptions.ValidationError,
-                          validate, simple_case, schema)
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
         simple_case = jsoncopy(self.SIMPLE_CASE)
         del simple_case["FindingsText"]["findings_text_entries"][0]["reference_number"]
-        self.assertRaises(exceptions.ValidationError,
-                          validate, simple_case, schema)
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
     def test_empty_entry_fields(self):
         """
@@ -1026,22 +1041,19 @@ class FindingsTextSchemaValidityTest(SimpleTestCase):
         simple_case["FindingsText"]["findings_text_entries"][0][
             "contains_chart_or_table"
         ] = None
-        self.assertRaises(exceptions.ValidationError,
-                          validate, simple_case, schema)
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
         simple_case = jsoncopy(self.SIMPLE_CASE)
         simple_case["FindingsText"]["findings_text_entries"][0][
             "text_of_finding"
         ] = None
-        self.assertRaises(exceptions.ValidationError,
-                          validate, simple_case, schema)
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
         simple_case = jsoncopy(self.SIMPLE_CASE)
         simple_case["FindingsText"]["findings_text_entries"][0][
             "reference_number"
         ] = None
-        self.assertRaises(exceptions.ValidationError,
-                          validate, simple_case, schema)
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
     def test_for_invalid_entry(self):
         """
@@ -1053,8 +1065,7 @@ class FindingsTextSchemaValidityTest(SimpleTestCase):
         simple_case["FindingsText"]["findings_text_entries"][0][
             "contains_chart_or_table"
         ] = 0
-        self.assertRaises(exceptions.ValidationError,
-                          validate, simple_case, schema)
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
 
 class AdditionalUeisSchemaValidityTest(SimpleTestCase):
@@ -1095,8 +1106,7 @@ class AdditionalUeisSchemaValidityTest(SimpleTestCase):
         simple_case = jsoncopy(self.SIMPLE_CASE)
         del simple_case["AdditionalUEIs"]["auditee_uei"]
 
-        self.assertRaises(exceptions.ValidationError,
-                          validate, simple_case, schema)
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
     def test_missing_entry_fields(self):
         """
@@ -1108,8 +1118,7 @@ class AdditionalUeisSchemaValidityTest(SimpleTestCase):
         del simple_case["AdditionalUEIs"]["additional_ueis_entries"][0][
             "additional_uei"
         ]
-        self.assertRaises(exceptions.ValidationError,
-                          validate, simple_case, schema)
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
     def test_empty_entry_fields(self):
         """
@@ -1121,8 +1130,7 @@ class AdditionalUeisSchemaValidityTest(SimpleTestCase):
         simple_case["AdditionalUEIs"]["additional_ueis_entries"][0][
             "additional_uei"
         ] = None
-        self.assertRaises(exceptions.ValidationError,
-                          validate, simple_case, schema)
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
     def test_for_invalid_entry(self):
         """
@@ -1134,8 +1142,7 @@ class AdditionalUeisSchemaValidityTest(SimpleTestCase):
         simple_case["AdditionalUEIs"]["additional_ueis_entries"][0][
             "additional_uei"
         ] = 123456789
-        self.assertRaises(exceptions.ValidationError,
-                          validate, simple_case, schema)
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
 
 class NotesToSefaSchemaValidityTest(SimpleTestCase):
@@ -1173,8 +1180,7 @@ class NotesToSefaSchemaValidityTest(SimpleTestCase):
         simple_case = jsoncopy(self.SIMPLE_CASE)
         del simple_case["NotesToSefa"]["auditee_uei"]
 
-        self.assertRaises(exceptions.ValidationError,
-                          validate, simple_case, schema)
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
     def test_missing_entry_fields(self):
         """
@@ -1184,13 +1190,11 @@ class NotesToSefaSchemaValidityTest(SimpleTestCase):
 
         simple_case = jsoncopy(self.SIMPLE_CASE)
         del simple_case["NotesToSefa"]["accounting_policies"]
-        self.assertRaises(exceptions.ValidationError,
-                          validate, simple_case, schema)
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
         simple_case = jsoncopy(self.SIMPLE_CASE)
         del simple_case["NotesToSefa"]["notes_to_sefa_entries"][0]["note_title"]
-        self.assertRaises(exceptions.ValidationError,
-                          validate, simple_case, schema)
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
     def test_for_invalid_entry(self):
         """
@@ -1200,8 +1204,7 @@ class NotesToSefaSchemaValidityTest(SimpleTestCase):
 
         simple_case = jsoncopy(self.SIMPLE_CASE)
         simple_case["NotesToSefa"]["auditee_uei"] = 123456789
-        self.assertRaises(exceptions.ValidationError,
-                          validate, simple_case, schema)
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
 
 class FindingsUniformGuidanceSchemaValidityTest(SimpleTestCase):
@@ -1246,8 +1249,7 @@ class FindingsUniformGuidanceSchemaValidityTest(SimpleTestCase):
         simple_case = jsoncopy(self.SIMPLE_CASE)
         del simple_case["FindingsUniformGuidance"]["auditee_uei"]
 
-        self.assertRaises(exceptions.ValidationError,
-                          validate, simple_case, schema)
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
     def test_missing_entry_fields(self):
         """
@@ -1259,57 +1261,49 @@ class FindingsUniformGuidanceSchemaValidityTest(SimpleTestCase):
         del simple_case["FindingsUniformGuidance"]["findings_uniform_guidance_entries"][
             0
         ]["program"]
-        self.assertRaises(exceptions.ValidationError,
-                          validate, simple_case, schema)
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
         simple_case = jsoncopy(self.SIMPLE_CASE)
         del simple_case["FindingsUniformGuidance"]["findings_uniform_guidance_entries"][
             0
         ]["findings"]["prior_references"]
-        self.assertRaises(exceptions.ValidationError,
-                          validate, simple_case, schema)
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
         simple_case = jsoncopy(self.SIMPLE_CASE)
         del simple_case["FindingsUniformGuidance"]["findings_uniform_guidance_entries"][
             0
         ]["significant_deficiency"]
-        self.assertRaises(exceptions.ValidationError,
-                          validate, simple_case, schema)
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
         simple_case = jsoncopy(self.SIMPLE_CASE)
         del simple_case["FindingsUniformGuidance"]["findings_uniform_guidance_entries"][
             0
         ]["other_matters"]
-        self.assertRaises(exceptions.ValidationError,
-                          validate, simple_case, schema)
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
         simple_case = jsoncopy(self.SIMPLE_CASE)
         del simple_case["FindingsUniformGuidance"]["findings_uniform_guidance_entries"][
             0
         ]["other_findings"]
-        self.assertRaises(exceptions.ValidationError,
-                          validate, simple_case, schema)
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
         simple_case = jsoncopy(self.SIMPLE_CASE)
         del simple_case["FindingsUniformGuidance"]["findings_uniform_guidance_entries"][
             0
         ]["modified_opinion"]
-        self.assertRaises(exceptions.ValidationError,
-                          validate, simple_case, schema)
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
         simple_case = jsoncopy(self.SIMPLE_CASE)
         del simple_case["FindingsUniformGuidance"]["findings_uniform_guidance_entries"][
             0
         ]["material_weakness"]
-        self.assertRaises(exceptions.ValidationError,
-                          validate, simple_case, schema)
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
         simple_case = jsoncopy(self.SIMPLE_CASE)
         del simple_case["FindingsUniformGuidance"]["findings_uniform_guidance_entries"][
             0
         ]["findings"]
-        self.assertRaises(exceptions.ValidationError,
-                          validate, simple_case, schema)
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
     def test_empty_entry_fields(self):
         """
@@ -1321,57 +1315,49 @@ class FindingsUniformGuidanceSchemaValidityTest(SimpleTestCase):
         simple_case["FindingsUniformGuidance"]["findings_uniform_guidance_entries"][0][
             "program"
         ] = None
-        self.assertRaises(exceptions.ValidationError,
-                          validate, simple_case, schema)
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
         simple_case = jsoncopy(self.SIMPLE_CASE)
         simple_case["FindingsUniformGuidance"]["findings_uniform_guidance_entries"][0][
             "findings"
         ] = None
-        self.assertRaises(exceptions.ValidationError,
-                          validate, simple_case, schema)
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
         simple_case = jsoncopy(self.SIMPLE_CASE)
         simple_case["FindingsUniformGuidance"]["findings_uniform_guidance_entries"][0][
             "significant_deficiency"
         ] = None
-        self.assertRaises(exceptions.ValidationError,
-                          validate, simple_case, schema)
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
         simple_case = jsoncopy(self.SIMPLE_CASE)
         simple_case["FindingsUniformGuidance"]["findings_uniform_guidance_entries"][0][
             "other_matters"
         ] = None
-        self.assertRaises(exceptions.ValidationError,
-                          validate, simple_case, schema)
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
         simple_case = jsoncopy(self.SIMPLE_CASE)
         simple_case["FindingsUniformGuidance"]["findings_uniform_guidance_entries"][0][
             "other_findings"
         ] = None
-        self.assertRaises(exceptions.ValidationError,
-                          validate, simple_case, schema)
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
         simple_case = jsoncopy(self.SIMPLE_CASE)
         simple_case["FindingsUniformGuidance"]["findings_uniform_guidance_entries"][0][
             "modified_opinion"
         ] = None
-        self.assertRaises(exceptions.ValidationError,
-                          validate, simple_case, schema)
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
         simple_case = jsoncopy(self.SIMPLE_CASE)
         simple_case["FindingsUniformGuidance"]["findings_uniform_guidance_entries"][0][
             "material_weakness"
         ] = None
-        self.assertRaises(exceptions.ValidationError,
-                          validate, simple_case, schema)
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
         simple_case = jsoncopy(self.SIMPLE_CASE)
         simple_case["FindingsUniformGuidance"]["findings_uniform_guidance_entries"][0][
             "findings"
         ]["prior_references"] = None
-        self.assertRaises(exceptions.ValidationError,
-                          validate, simple_case, schema)
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
     def test_for_invalid_entry(self):
         """
@@ -1383,40 +1369,34 @@ class FindingsUniformGuidanceSchemaValidityTest(SimpleTestCase):
         simple_case["FindingsUniformGuidance"]["findings_uniform_guidance_entries"][0][
             "significant_deficiency"
         ] = 0
-        self.assertRaises(exceptions.ValidationError,
-                          validate, simple_case, schema)
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
         simple_case = jsoncopy(self.SIMPLE_CASE)
         simple_case["FindingsUniformGuidance"]["findings_uniform_guidance_entries"][0][
             "other_matters"
         ] = 0
-        self.assertRaises(exceptions.ValidationError,
-                          validate, simple_case, schema)
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
         simple_case = jsoncopy(self.SIMPLE_CASE)
         simple_case["FindingsUniformGuidance"]["findings_uniform_guidance_entries"][0][
             "other_findings"
         ] = "invalid"
-        self.assertRaises(exceptions.ValidationError,
-                          validate, simple_case, schema)
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
         simple_case = jsoncopy(self.SIMPLE_CASE)
         simple_case["FindingsUniformGuidance"]["findings_uniform_guidance_entries"][0][
             "modified_opinion"
         ] = "invalid"
-        self.assertRaises(exceptions.ValidationError,
-                          validate, simple_case, schema)
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
         simple_case = jsoncopy(self.SIMPLE_CASE)
         simple_case["FindingsUniformGuidance"]["findings_uniform_guidance_entries"][0][
             "material_weakness"
         ] = "invalid"
-        self.assertRaises(exceptions.ValidationError,
-                          validate, simple_case, schema)
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
         simple_case = jsoncopy(self.SIMPLE_CASE)
         simple_case["FindingsUniformGuidance"]["findings_uniform_guidance_entries"][0][
             "findings"
         ]["is_valid"] = 0
-        self.assertRaises(exceptions.ValidationError,
-                          validate, simple_case, schema)
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)

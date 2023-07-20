@@ -210,6 +210,7 @@ def validate_general_information_json(value):
         ) from err
     return value
 
+
 def validate_audit_information_json(value):
     """
     Apply JSON Schema for general information and report errors.
@@ -224,6 +225,7 @@ def validate_audit_information_json(value):
             _(err.message),
         ) from err
     return value
+
 
 def validate_file_extension(file, allowed_extensions):
     """

@@ -25,7 +25,7 @@ from .validators import (
     validate_general_information_json,
     validate_notes_to_sefa_json,
     validate_single_audit_report_file,
-    validate_audit_information_json
+    validate_audit_information_json,
 )
 
 User = get_user_model()
@@ -94,9 +94,7 @@ def json_property_mixin_generator(name, fname=None, toplevel=None, classname=Non
 GeneralInformationMixin = json_property_mixin_generator("GeneralInformation")
 
 
-class SingleAuditChecklist(models.Model, 
-                           GeneralInformationMixin
-                           ):  # type: ignore
+class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: ignore
     """
     Monolithic Single Audit Checklist.
     """
