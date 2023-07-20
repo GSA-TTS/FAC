@@ -75,7 +75,10 @@ class ETLTests(TestCase):
                             "additional_award_identification": "COVID-19",
                         },
                         "subrecipients": {"is_passed": "N"},
-                        "loan_or_loan_guarantee": {"is_guaranteed": "N"},
+                        "loan_or_loan_guarantee": {
+                            "is_guaranteed": "N",
+                            "loan_balance_at_audit_period_end": 0,
+                        },
                         "direct_or_indirect_award": {
                             "is_direct": "N",
                             "entities": [
