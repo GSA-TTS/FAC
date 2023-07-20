@@ -15,7 +15,7 @@ def lmap(fun, ls):
 
 
 def process_cfda_lookup(arg):
-    df = pd.read_csv(sys.argv[1], converters={"CFDAEXT": str})
+    df = pd.read_csv(arg[1], converters={"CFDAEXT": str})
     # Build a couple of Python objects to render as
     # JSON, and then as Jsonnet
     program_names = list(df["FEDERALPROGRAMNAME"])
@@ -29,9 +29,6 @@ def process_cfda_lookup(arg):
     for index, row in df.iterrows():
         unique_cfda_dict[f"{row['CFDAPREFIX']}.{row['CFDAEXT']}"] = 1
     unique_cfda_list = list(unique_cfda_dict.keys())
-
-    # print(program_names.values[0:10])
-    # print(unique_cfda_list[0:10])
 
     # Clean everything up
     program_names = lmap(cleanup_string, program_names)
@@ -49,7 +46,7 @@ def process_cfda_lookup(arg):
 
 
 def process_cluster_names(arg):
-    df = pd.read_csv(sys.argv[1])
+    df = pd.read_csv(arg[1])
     cluster_names = list(df["NAME"])
     # Clean everything up
     cluster_names = lmap(cleanup_string, cluster_names)
