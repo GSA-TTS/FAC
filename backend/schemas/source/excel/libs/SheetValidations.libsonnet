@@ -84,15 +84,6 @@ local LoanBalanceValidation = {
   custom_title: 'Loan Balance',
 };
 
-local ComplianceRequirementValidation = {
-  type: 'custom',
-  //This formula only checks if valid characters are used, it does not validate alphabetical order
-  //The json schema validation checks both valid characters and alphabetical order
-  formula1: '=IF(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(FIRSTCELLREF, "A", ""), "B", ""), "C", ""), "E", ""), "F", ""), "G", ""), "H", ""), "I", ""), "J", ""), "L", ""), "M", ""), "N", ""), "P", "")<>"", "Invalid", "Valid")',
-  custom_error: 'Expecting a valid combination of the letters: A,B,C,E,F,G,H,I,J,L,M,N,P',
-  custom_title: 'Compliance requirement',
-};
-
 local AwardReferenceValidation = {
   type: 'custom',
   formula1: '=AND(LEN(FIRSTCELLREF)=10, LEFT(FIRSTCELLREF, 6)="AWARD-", ISNUMBER(VALUE(MID(FIRSTCELLREF, 7, 4))))',
@@ -110,7 +101,6 @@ local AwardReferenceValidation = {
   StringOfLengthTwelve: StringOfLengthTwelve,
   YoNValidation: YoNValidation,
   ReferenceNumberValidation: ReferenceNumberValidation,
-  ComplianceRequirementValidation: ComplianceRequirementValidation,
   LoanBalanceValidation: LoanBalanceValidation,
   AuditReportTypeValidation(namedRange): {
     type: 'list',

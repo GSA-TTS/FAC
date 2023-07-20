@@ -1,5 +1,6 @@
 local Func = import 'Functions.libsonnet';
 local FederalProgramNames = import 'FederalProgramNames.json';
+local ComplianceRequirementTypes = import 'ComplianceRequirementTypes.json';
 
 local Const = {
   Y: 'Y',
@@ -476,6 +477,10 @@ local SchemaBase = Types.object {
   Meta: Meta,
   Enum: Enum,
   Compound: Compound {
+    ComplianceRequirementTypes: {
+      description: 'All compliance requirement types',
+      enum: ComplianceRequirementTypes.requirement_types
+    },
     FederalProgramNames: {
       description: 'All Federal program names',
       enum: FederalProgramNames.program_names
