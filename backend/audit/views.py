@@ -22,6 +22,7 @@ from audit.excel import (
     extract_corrective_action_plan,
     extract_findings_text,
     extract_findings_uniform_guidance,
+    extract_secondary_auditors,
     extract_notes_to_sefa,
 )
 from audit.mixins import (
@@ -92,6 +93,10 @@ class ExcelFileHandlerView(SingleAuditChecklistAccessRequiredMixin, generic.View
         ),
         FORM_SECTIONS.FINDINGS_TEXT: (extract_findings_text, "findings_text"),
         FORM_SECTIONS.ADDITIONAL_UEIS: (extract_additional_ueis, "additional_ueis"),
+        FORM_SECTIONS.SECONDARY_AUDITORS: (
+            extract_secondary_auditors,
+            "secondary_auditors",
+        ),
         FORM_SECTIONS.NOTES_TO_SEFA: (extract_notes_to_sefa, "notes_to_sefa"),
     }
 
@@ -211,10 +216,14 @@ class ReadyForCertificationView(SingleAuditChecklistAccessRequiredMixin, generic
         try:
             sac = SingleAuditChecklist.objects.get(report_id=report_id)
 
-            sac.transition_to_ready_for_certification()
-            sac.save()
+            errors = sac.validate_cross()
+            if not errors:
+                sac.transition_to_ready_for_certification()
+                sac.save()
+                return redirect(reverse("audit:SubmissionProgress", args=[report_id]))
 
-            return redirect(reverse("audit:SubmissionProgress", args=[report_id]))
+            context = {"report_id": report_id, "errors": errors}
+            return render(request, "audit/not-ready-for-certification.html", context)
 
         except SingleAuditChecklist.DoesNotExist:
             raise PermissionDenied("You do not have access to this audit.")

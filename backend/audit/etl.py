@@ -18,7 +18,7 @@ class ETL(object):
         self.single_audit_checklist = sac
         self.report_id = sac.report_id
         audit_date = sac.general_information.get(
-            "auditee_fiscal_period_start", datetime.now
+            "auditee_fiscal_period_start", datetime.now().isoformat()
         )
         self.audit_year = int(audit_date.split("-")[0])
 
@@ -29,6 +29,7 @@ class ETL(object):
         self.load_findings()
         self.load_passthrough()
         self.load_finding_texts()
+        self.load_captext()
 
     def load_finding_texts(self):
         findings_text = self.single_audit_checklist.findings_text
@@ -37,7 +38,7 @@ class ETL(object):
             finding_text_ = FindingText(
                 report_id=self.report_id,
                 finding_ref_number=entry["reference_number"],
-                charts_tables=entry["contains_chart_or_table"] == "Y",
+                contains_chart_or_table=entry["contains_chart_or_table"] == "Y",
                 finding_text=entry["text_of_finding"],
             )
             finding_text_.save()
@@ -114,14 +115,10 @@ class ETL(object):
         ]
         for entry in corrective_action_plan_entries:
             cap_text = CapText(
+                report_id=self.report_id,
                 finding_ref_number=entry["reference_number"],
-                charts_tables=entry["contains_chart_or_table"] == "Y",
-                sequence_number=-1,  # TODO: fix this as sonn as we know what it should be
-                text=entry["planned_action"],
-                # dbkey=None,
-                # audit_year=self.audit_year,
-                # is_public=True, # TODO: fix this when necessary
-                # report_id=self.report_id
+                contains_chart_or_table=entry["contains_chart_or_table"] == "Y",
+                planned_action=entry["planned_action"],
             )
             cap_text.save()
 
