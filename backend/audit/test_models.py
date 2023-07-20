@@ -123,9 +123,11 @@ class SingleAuditChecklistTests(TestCase):
 
         for status_from in bad_statuses:
             sac = baker.make(
-                SingleAuditChecklist, audit_type="annual", submission_status=status_from
+                SingleAuditChecklist,
+                audit_type="single-audit",
+                submission_status=status_from,
             )
-            sac.audit_type = "biennial"
+            sac.audit_type = "program-specific"
             with self.assertRaises(LateChangeError):
                 sac.save()
 
