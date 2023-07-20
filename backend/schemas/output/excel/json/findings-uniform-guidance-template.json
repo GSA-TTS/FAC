@@ -49,7 +49,7 @@
                "title_cell": "C1",
                "type": "open_range",
                "validation": {
-                  "custom_error": "Not in the lookup list",
+                  "custom_error": "Please enter a valid Type of Compliance Requirement. (One or more of ABCEFGHIJLMNP, in alphabetical order).",
                   "custom_title": "Lookup validation",
                   "lookup_range": "requirement_type_lookup",
                   "sheet": "ComplianceRequirementTypes",
@@ -8446,6 +8446,7 @@
                      "ABCEFGHIJLMNP"
                   ]
                },
+               "last_range_cell": "A8192",
                "range_name": "requirement_type_lookup",
                "title": "Compliance Requirement types",
                "title_cell": "A1",

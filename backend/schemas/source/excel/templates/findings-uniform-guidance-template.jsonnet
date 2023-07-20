@@ -71,6 +71,7 @@ local open_ranges_defns = [
     SV.RangeLookupValidation {
       sheet: complianceRequirementTypeSheet,
       lookup_range: 'requirement_type_lookup',
+      custom_error: 'Please enter a valid Type of Compliance Requirement. (One or more of ABCEFGHIJLMNP, in alphabetical order).',
     },
     'Type(s) of Compliance Requirement(s)',
     'compliance_requirement',
@@ -174,6 +175,7 @@ local sheets = [
         title: 'Compliance Requirement types',
         title_cell: 'A1',
         range_name: 'requirement_type_lookup',
+        last_range_cell: 'A8192',
         contents: Base.Compound.ComplianceRequirementTypes,
         validation: SV.LookupValidation {
           lookup_range: 'requirement_type_lookup',
