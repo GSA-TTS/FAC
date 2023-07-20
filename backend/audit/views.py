@@ -1,5 +1,4 @@
 import logging
-from audit.get_agency_names import get_agency_names
 
 from django.views import generic
 from django.views.decorators.csrf import csrf_exempt
@@ -12,10 +11,6 @@ from django.utils.datastructures import MultiValueDictKeyError
 from django.utils.decorators import method_decorator
 from django.http import JsonResponse
 
-from audit.forms import UploadReportForm, AuditInfoForm
-
-from .fixtures.excel import FORM_SECTIONS
-
 from audit.excel import (
     extract_additional_ueis,
     extract_federal_awards,
@@ -24,13 +19,22 @@ from audit.excel import (
     extract_findings_uniform_guidance,
     extract_notes_to_sefa,
 )
+from audit.forms import UploadReportForm, AuditInfoForm
+from audit.get_agency_names import get_agency_names
 from audit.mixins import (
     CertifyingAuditeeRequiredMixin,
     CertifyingAuditorRequiredMixin,
     SingleAuditChecklistAccessRequiredMixin,
 )
+from audit.models import (
+    Access,
+    ExcelFile,
+    LateChangeError,
+    SingleAuditChecklist,
+    SingleAuditReportFile,
+)
 
-from audit.models import Access, ExcelFile, SingleAuditChecklist, SingleAuditReportFile
+from .fixtures.excel import FORM_SECTIONS
 
 logger = logging.getLogger(__name__)
 
@@ -598,6 +602,9 @@ class UploadReportView(SingleAuditChecklistAccessRequiredMixin, generic.View):
                 return render(request, "audit/upload-report.html", context)
         except SingleAuditChecklist.DoesNotExist:
             raise PermissionDenied("You do not have access to this audit.")
-        except Exception as e:
-            logger.info("Unexpected error in UploadReportView post.\n", e)
-            raise BadRequest()
+        except LateChangeError:
+            return render(request, "audit/already-certified.html")
+
+        except Exception as err:
+            logger.info("Unexpected error in UploadReportView post.\n", err)
+            raise BadRequest() from err
