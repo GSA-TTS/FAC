@@ -29,6 +29,7 @@ class AuditInfoForm(forms.Form):
         return data
 
     choices_YoN = (("True", "Yes"), ("False", "No"))
+    # These should probably have the lowercase values from Jsonnet:
     choices_GGAP = (
         ("Unmodified opinion", "Unmodified opinion"),
         ("Qualified opinion", "Qualified opinion"),
@@ -41,16 +42,16 @@ class AuditInfoForm(forms.Form):
     )
     choices_agencies = list((i, i) for i in AGENCY_NAMES)
 
-    GGAP_results = forms.MultipleChoiceField(choices=choices_GGAP)
-    going_concern_included = forms.MultipleChoiceField(choices=choices_YoN)
-    internal_control_deficiency_disclosed = forms.MultipleChoiceField(
+    ggap_results = forms.MultipleChoiceField(choices=choices_GGAP)
+    is_going_concern_included = forms.MultipleChoiceField(choices=choices_YoN)
+    is_internal_control_deficiency_disclosed = forms.MultipleChoiceField(
         choices=choices_YoN
     )
-    internal_control_material_weakness_disclosed = forms.MultipleChoiceField(
+    is_internal_control_material_weakness_disclosed = forms.MultipleChoiceField(
         choices=choices_YoN
     )
-    material_noncompliance_disclosed = forms.MultipleChoiceField(choices=choices_YoN)
-    AICPA_audit_guide_included = forms.MultipleChoiceField(choices=choices_YoN)
+    is_material_noncompliance_disclosed = forms.MultipleChoiceField(choices=choices_YoN)
+    is_aicpa_audit_guide_included = forms.MultipleChoiceField(choices=choices_YoN)
     dollar_threshold = forms.IntegerField(min_value=1)
-    low_risk_auditee = forms.MultipleChoiceField(choices=choices_YoN)
+    is_low_risk_auditee = forms.MultipleChoiceField(choices=choices_YoN)
     agencies = forms.MultipleChoiceField(choices=choices_agencies)

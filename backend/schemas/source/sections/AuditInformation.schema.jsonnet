@@ -8,6 +8,7 @@ local AuditInformation = Types.object {
     ggap_results: Types.array {
       items: Base.Enum.GGAPResults
     },
+    dollar_threshold: Types.integer,
     is_going_concern_included: Types.boolean,
     is_internal_control_deficiency_disclosed: Types.boolean,
     is_internal_control_material_weakness_disclosed: Types.boolean,
@@ -21,6 +22,7 @@ local AuditInformation = Types.object {
     },
   },
   required: [
+    'dollar_threshold',
     'ggap_results',
     'is_going_concern_included',
     'is_internal_control_deficiency_disclosed',
@@ -42,4 +44,4 @@ local Root = Types.object {
   version: 20230719,
 };
 
-Base.SchemaBase + Root
+AuditInformation

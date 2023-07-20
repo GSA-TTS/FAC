@@ -31,6 +31,7 @@ from audit.mixins import (
 )
 
 from audit.models import Access, ExcelFile, SingleAuditChecklist, SingleAuditReportFile
+from audit.validators import validate_audit_information_json
 
 logger = logging.getLogger(__name__)
 
@@ -440,12 +441,43 @@ class AuditInfoFormView(SingleAuditChecklistAccessRequiredMixin, generic.View):
         try:
             sac = SingleAuditChecklist.objects.get(report_id=report_id)
 
+            # This is an attempt to display the information in database to the user if
+            # the form has already been submitted. Not sure it works, because I couldn't
+            # get the form to submit--Tadhg
+            current_info = {}
+            if sac.audit_information:
+                current_info = {
+                    "cleaned_data": {
+                        "ggap_results": sac.audit_information.get("ggap_results"),
+                        "is_going_concern_included": sac.audit_information.get(
+                            "is_going_concern_included"
+                        ),
+                        "is_internal_control_deficiency_disclosed": sac.audit_information.get(
+                            "is_internal_control_deficiency_disclosed"
+                        ),
+                        "is_internal_control_material_weakness_disclosed": sac.audit_information.get(
+                            "is_internal_control_material_weakness_disclosed"
+                        ),
+                        "is_material_noncompliance_disclosed": sac.audit_information.get(
+                            "is_material_noncompliance_disclosed"
+                        ),
+                        "is_aicpa_audit_guide_included": sac.audit_information.get(
+                            "is_aicpa_audit_guide_included"
+                        ),
+                        "is_low_risk_auditee": sac.audit_information.get(
+                            "is_low_risk_auditee"
+                        ),
+                        "agencies": sac.audit_information.get("agencies"),
+                    }
+                }
+
             context = {
                 "auditee_name": sac.auditee_name,
                 "report_id": report_id,
                 "auditee_uei": sac.auditee_uei,
                 "user_provided_organization_type": sac.user_provided_organization_type,
                 "agency_names": get_agency_names(),
+                "form": current_info,
             }
 
             # TODO: check if there's already a form in the DB and let the user know
@@ -468,8 +500,18 @@ class AuditInfoFormView(SingleAuditChecklistAccessRequiredMixin, generic.View):
             if form.is_valid():
                 # Save the form, yay!
                 logger.info("Audit info form passed validation.")
+                form.clean_booleans()
+
+                audit_information = sac.audit_information or {}
+                logger.warn(form.cleaned_data)
+                audit_information.update(form.cleaned_data)
+
+                validated = validate_audit_information_json(audit_information)
+                sac.audit_information = validated
+                sac.save()
                 return redirect(reverse("audit:SubmissionProgress", args=[report_id]))
             else:
+                logger.warn(form.errors)
                 form.clean_booleans()
                 context = {
                     "auditee_name": sac.auditee_name,

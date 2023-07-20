@@ -173,6 +173,7 @@ class GeneralInformationFormView(LoginRequiredMixin, View):
 
             if form.is_valid():
                 general_information = sac.general_information
+                logger.info(form.cleaned_data)
                 general_information.update(form.cleaned_data)
 
                 validated = validate_general_information_json(general_information)

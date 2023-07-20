@@ -1,129 +1,123 @@
 {
-   "$schema": "https://json-schema.org/draft/2019-09/schema#",
    "additionalProperties": false,
-   "metamodel_version": "1.7.0",
    "properties": {
-      "AuditInformation": {
-         "additionalProperties": false,
-         "properties": {
-            "agencies": {
-               "items": {
-                  "description": "Valid two-digit program numbers; part of the CFDA/ALN",
-                  "enum": [
-                     "10",
-                     "11",
-                     "12",
-                     "13",
-                     "14",
-                     "15",
-                     "16",
-                     "17",
-                     "18",
-                     "19",
-                     "20",
-                     "21",
-                     "22",
-                     "23",
-                     "27",
-                     "29",
-                     "30",
-                     "32",
-                     "33",
-                     "34",
-                     "36",
-                     "39",
-                     "40",
-                     "41",
-                     "42",
-                     "43",
-                     "44",
-                     "45",
-                     "46",
-                     "47",
-                     "53",
-                     "57",
-                     "58",
-                     "59",
-                     "60",
-                     "61",
-                     "62",
-                     "64",
-                     "66",
-                     "68",
-                     "70",
-                     "77",
-                     "78",
-                     "81",
-                     "82",
-                     "83",
-                     "84",
-                     "85",
-                     "86",
-                     "87",
-                     "88",
-                     "89",
-                     "90",
-                     "91",
-                     "92",
-                     "93",
-                     "94",
-                     "96",
-                     "97",
-                     "98",
-                     "99"
-                  ],
-                  "type": "string"
-               },
-               "type": "array"
-            },
-            "ggap_results": {
-               "items": {
-                  "description": "GGAP Results (Audit Information)",
-                  "enum": [
-                     "unmodified_opinion",
-                     "qualified_opinion",
-                     "adverse_opinion",
-                     "disclaimer_of_opinion",
-                     "not_ggap"
-                  ],
-                  "type": "string"
-               },
-               "type": "array"
-            },
-            "is_aicpa_audit_guide_included": {
-               "type": "boolean"
-            },
-            "is_going_concern_included": {
-               "type": "boolean"
-            },
-            "is_internal_control_deficiency_disclosed": {
-               "type": "boolean"
-            },
-            "is_internal_control_material_weakness_disclosed": {
-               "type": "boolean"
-            },
-            "is_low_risk_auditee": {
-               "type": "boolean"
-            },
-            "is_material_noncompliance_disclosed": {
-               "type": "boolean"
-            }
+      "agencies": {
+         "items": {
+            "description": "Valid two-digit program numbers; part of the CFDA/ALN",
+            "enum": [
+               "10",
+               "11",
+               "12",
+               "13",
+               "14",
+               "15",
+               "16",
+               "17",
+               "18",
+               "19",
+               "20",
+               "21",
+               "22",
+               "23",
+               "27",
+               "29",
+               "30",
+               "32",
+               "33",
+               "34",
+               "36",
+               "39",
+               "40",
+               "41",
+               "42",
+               "43",
+               "44",
+               "45",
+               "46",
+               "47",
+               "53",
+               "57",
+               "58",
+               "59",
+               "60",
+               "61",
+               "62",
+               "64",
+               "66",
+               "68",
+               "70",
+               "77",
+               "78",
+               "81",
+               "82",
+               "83",
+               "84",
+               "85",
+               "86",
+               "87",
+               "88",
+               "89",
+               "90",
+               "91",
+               "92",
+               "93",
+               "94",
+               "96",
+               "97",
+               "98",
+               "99"
+            ],
+            "type": "string"
          },
-         "required": [
-            "ggap_results",
-            "is_going_concern_included",
-            "is_internal_control_deficiency_disclosed",
-            "is_internal_control_material_weakness_disclosed",
-            "is_material_noncompliance_disclosed",
-            "is_aicpa_audit_guide_included",
-            "is_low_risk_auditee",
-            "agencies"
-         ],
-         "title": "AuditInformation",
-         "type": "object"
+         "type": "array"
+      },
+      "dollar_threshold": {
+         "type": "integer"
+      },
+      "ggap_results": {
+         "items": {
+            "description": "GGAP Results (Audit Information)",
+            "enum": [
+               "unmodified_opinion",
+               "qualified_opinion",
+               "adverse_opinion",
+               "disclaimer_of_opinion",
+               "not_ggap"
+            ],
+            "type": "string"
+         },
+         "type": "array"
+      },
+      "is_aicpa_audit_guide_included": {
+         "type": "boolean"
+      },
+      "is_going_concern_included": {
+         "type": "boolean"
+      },
+      "is_internal_control_deficiency_disclosed": {
+         "type": "boolean"
+      },
+      "is_internal_control_material_weakness_disclosed": {
+         "type": "boolean"
+      },
+      "is_low_risk_auditee": {
+         "type": "boolean"
+      },
+      "is_material_noncompliance_disclosed": {
+         "type": "boolean"
       }
    },
-   "title": "UNNAMED",
-   "type": "object",
-   "version": 20230719
+   "required": [
+      "dollar_threshold",
+      "ggap_results",
+      "is_going_concern_included",
+      "is_internal_control_deficiency_disclosed",
+      "is_internal_control_material_weakness_disclosed",
+      "is_material_noncompliance_disclosed",
+      "is_aicpa_audit_guide_included",
+      "is_low_risk_auditee",
+      "agencies"
+   ],
+   "title": "AuditInformation",
+   "type": "object"
 }
