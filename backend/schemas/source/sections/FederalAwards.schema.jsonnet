@@ -172,7 +172,7 @@ local Validations = {
 local Parts = {
   Cluster: Types.object {
     properties: {
-      cluster_name: Base.Compound.ClusterName,
+      cluster_name: Base.Compound.ClusterNames,
       cluster_total: Types.number,
     },
     allOf: [
