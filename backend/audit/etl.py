@@ -191,7 +191,7 @@ class ETL(object):
         for status_choice in sac.STATUS_CHOICES:
             status = status_choice[0]
             if status in sac.transition_name:
-                return_dict[status] = sac.get_transition_date(status_choice)
+                return_dict[status] = sac.get_transition_date(status)
             else:
                 return_dict[status] = None
         return return_dict
