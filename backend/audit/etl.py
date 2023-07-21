@@ -185,10 +185,22 @@ class ETL(object):
                 )
                 passthrough.save()
 
+    def _get_dates_from_sac(self):
+        return_dict = dict()
+        sac = self.single_audit_checklist
+        for status_choice in sac.STATUS_CHOICES:
+            status = status_choice[0]
+            if status in sac.transition_name:
+                return_dict[status] = sac.get_transition_date(status_choice)
+            else:
+                return_dict[status] = None
+        return return_dict
+
     def load_general(self):
         # TODO: Use the mixin to access general_information fields once that code
         #       is merged.
         general_information = self.single_audit_checklist.general_information
+        dates_by_status = self._get_dates_from_sac()
         general = General(
             report_id=self.report_id,
             auditee_certify_name=None,  # TODO: Where does this come from?
@@ -220,6 +232,21 @@ class ETL(object):
             cognizant_agency=None,  # TODO: https://github.com/GSA-TTS/FAC/issues/1218
             oversight_agency=None,  # TODO: https://github.com/GSA-TTS/FAC/issues/1218
             initial_date_received=self.single_audit_checklist.date_created,
+            ready_for_certification_date=dates_by_status[
+                self.single_audit_checklist.STATUS.READY_FOR_CERTIFICATION
+            ],
+            auditor_certified_date=dates_by_status[
+                self.single_audit_checklist.STATUS.AUDITOR_CERTIFIED
+            ],
+            auditee_certified_date=dates_by_status[
+                self.single_audit_checklist.STATUS.AUDITEE_CERTIFIED
+            ],
+            certified_date=dates_by_status[
+                self.single_audit_checklist.STATUS.CERTIFIED
+            ],
+            submitted_date=dates_by_status[
+                self.single_audit_checklist.STATUS.SUBMITTED
+            ],
             fy_end_date=general_information["auditee_fiscal_period_end"],
             fy_start_date=general_information["auditee_fiscal_period_start"],
             audit_year=self.audit_year,
@@ -230,7 +257,7 @@ class ETL(object):
             current_or_former_findings=None,  # TODO: Where does this come from?
             dollar_threshold=None,  # TODO: Where does this come from?
             is_duplicate_reports=None,  # TODO: Where does this come from?
-            entity_type=None,  # TODO: AUDIT_TYPE_CODES in audit.models.SingleAuditChecklist
+            entity_type=general_information["user_provided_organization_type"],
             is_going_concern=None,  # TODO: Where does this come from?
             is_low_risk=None,  # TODO: Where does this come from?
             is_material_noncompliance=None,  # TODO: Where does this come from?

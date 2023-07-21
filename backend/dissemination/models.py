@@ -233,18 +233,6 @@ class FederalAward(models.Model):
         null=True,
         help_text=docs.type_requirement_cfdainfo,
     )
-    # SK - Note: findings_page is not needed in FederalAward table.
-    # findings_page = models.TextField(
-    #     "Items on the Findings page", null=True, help_text=docs.findings
-    # )
-
-    # SK - Note: questioned_costs is not needed in FederalAward table.
-    # questioned_costs = models.CharField(
-    #     "Dollar amount of questioned costs (Deprecated since 2002)",
-    #     null=True,
-    #     max_length=40,
-    #     help_text=docs.questioned_costs_FederalAward,
-    # )
 
     class Meta:
         unique_together = (
@@ -463,12 +451,6 @@ class Passthrough(models.Model):
             foreign_key(("report_id", ) references General
         """
 
-    # SK - Note: audit_id is not needed in Passthrough table
-    # audit_id = models.IntegerField(
-    #     "FAC system generated sequence number used to link to Passthrough data between CFDA Info and Passthrough",
-    #     help_text=docs.elec_audits_id_passthrough,
-    # )
-
 
 class General(models.Model):
     # Relational fields
@@ -615,6 +597,22 @@ class General(models.Model):
         "The first date an audit component or Form SF-SAC was received by the Federal audit Clearinghouse (FAC).",
         null=True,
         help_text=docs.initial_date_received,
+    )
+    ready_for_certification_date = models.DateField(
+        "The date at which the audit transitioned to 'ready for certification'",
+        null=True,
+    )
+    auditor_certified_date = models.DateField(
+        "The date at which the audit transitioned to 'auditor certified'", null=True
+    )
+    auditee_certified_date = models.DateField(
+        "The date at which the audit transitioned to 'auditee certified'", null=True
+    )
+    certified_date = models.DateField(
+        "The date at which the audit transitioned to 'certified'", null=True
+    )
+    submitted_date = models.DateField(
+        "The date at which the audit transitioned to 'submitted'", null=True
     )
     fy_end_date = models.DateField(
         "Fiscal Year End Date", null=True, help_text=docs.fy_end_date
@@ -803,10 +801,10 @@ class GenAuditor(models.Model):
     auditor_country = models.CharField(
         "CPA Country", max_length=45, null=True, help_text=docs.auditor_country
     )
-    auditor_ein = models.IntegerField(
+    auditor_ein = models.CharField(
         "CPA Firm EIN (only available for audit years 2013 and beyond)",
         null=True,
-        help_text=docs.auditor_ein,
+        max_length=30,
     )
     auditor_email = models.CharField(
         "CPA mail address (optional)",
