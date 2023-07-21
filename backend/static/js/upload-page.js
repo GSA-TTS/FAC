@@ -134,7 +134,8 @@ function attachFileUploadHandler() {
               } else if (data.type === 'error_field') {
                 info_box.innerHTML = `Field Error: ${data.errors}`;
               } else if (data.type === 'no_late_changes') {
-                info_box.innerHTML = 'Access denied. Further changes to audits that have been marked ready for certification are not permitted.';
+                info_box.innerHTML =
+                  'Access denied. Further changes to audits that have been marked ready for certification are not permitted.';
               } else {
                 throw new Error('Returned error type is missing!');
               }
