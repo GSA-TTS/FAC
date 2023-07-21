@@ -9,7 +9,6 @@ from dissemination.models import (
     Revision,
     Passthrough,
     General,
-    SecondaryAuditor,
 )
 from audit.models import SingleAuditChecklist
 
@@ -26,12 +25,11 @@ class ETL(object):
     def load_all(self):
         # TODO: Wrap each method call in try/except to collect errors.
         self.load_general()
-        # self.load_federal_award()
-        # self.load_findings()
-        # self.load_passthrough()
-        # self.load_finding_texts()
-        # self.load_captext()
-        self.load_gen_auditor()
+        self.load_federal_award()
+        self.load_findings()
+        self.load_passthrough()
+        self.load_finding_texts()
+        self.load_captext()
 
     def load_finding_texts(self):
         findings_text = self.single_audit_checklist.findings_text
@@ -259,23 +257,22 @@ class ETL(object):
         general.save()
 
     def load_gen_auditor(self):
-        secondary_auditors = self.single_audit_checklist.secondary_auditors
-        for secondary_auditor in secondary_auditors["SecondaryAuditors"][
-            "secondary_auditors_entries"
-        ]["items"]:
-            print("auditor:", secondary_auditor)
-            sec_auditor = SecondaryAuditor(
+        additional_auditors = self.single_audit_checklist.additional_auditors
+        for auditor in additional_auditors["AdditionalAuditors"]["auditors"]:
+            print("auditor:", auditor)
+            gen_auditor = GenAuditor(
                 report_id=self.single_audit_checklist.report_id,
-                auditor_seq_number=secondary_auditor["secondary_auditor_seq_number"],
-                auditor_ein=secondary_auditor["secondary_auditor_ein"],
-                auditor_name=secondary_auditor["secondary_auditor_name"],
-                contact_name=secondary_auditor["secondary_auditor_contact_name"],
-                contact_title=secondary_auditor["secondary_auditor_contact_title"],
-                contact_email=secondary_auditor["secondary_auditor_contact_email"],
-                contact_phone=secondary_auditor["secondary_auditor_contact_phone"],
-                address_street=secondary_auditor["secondary_auditor_address_street"],
-                address_city=secondary_auditor["secondary_auditor_address_city"],
-                address_state=secondary_auditor["secondary_auditor_address_state"],
-                address_zipcode=secondary_auditor["secondary_auditor_address_zipcode"],
+                auditor_seq_number=auditor["auditor_seq_number"],
+                auditor_address_line_1=auditor["auditor_address_line_1"],
+                auditor_city=auditor["auditor_city"],
+                # auditor_contact_name=auditor["auditor_contact_name"],
+                auditor_contact_title=auditor["auditor_contact_title"],
+                auditor_country=auditor["auditor_country"],
+                auditor_ein=auditor["auditor_ein"],
+                auditor_email=auditor["auditor_email"],
+                auditor_firm_name=auditor["auditor_firm_name"],
+                auditor_phone=auditor["auditor_phone"],
+                auditor_state=auditor["auditor_state"],
+                auditor_zip=auditor["auditor_zip"],
             )
-            sec_auditor.save()
+            gen_auditor.save()

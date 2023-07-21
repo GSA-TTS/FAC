@@ -24,6 +24,8 @@ $$
 do
 $$
 begin
+    DROP SCHEMA IF EXISTS api_v1_0_0_beta CASCADE; 
+
     if not exists (select schema_name from information_schema.schemata where schema_name = 'api_v1_0_0_beta') then
         create schema api_v1_0_0_beta;
 

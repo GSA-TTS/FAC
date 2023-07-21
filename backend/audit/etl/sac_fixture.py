@@ -65,24 +65,28 @@ def _fake_general_information():
 def _fake_additional_auditors():
     fake = Faker()
     additional_auditors = {
-        "AdditionalAuditors": {
-            "auditors": [
-                {
-                    "auditor_seq_number": i,
-                    "auditor_address_line_1": fake.street_address(),
-                    "auditor_city": fake.city(),
-                    "auditor_contact_name": fake.name(),
-                    "auditor_contact_title": fake.job(),
-                    "auditor_country": fake.country(),
-                    "auditor_ein": fake.ssn().replace("-", ""),
-                    "auditor_email": fake.ascii_email(),
-                    "auditor_firm_name": fake.company(),
-                    "auditor_phone": fake.basic_phone_number(),
-                    "auditor_state": fake.state_abbr(include_territories=False),
-                    "auditor_zip": fake.postalcode(),
-                }
-                for i in range(random.randint(1, 3))
-            ]
+        "SecondaryAuditors": {
+            "secondary_auditors_entries": {
+                "items": [
+                    {
+                        "secondary_auditor_seq_number": i,
+                        "secondary_auditor_address_street": fake.street_address(),
+                        "secondary_auditor_address_city": fake.city(),
+                        "secondary_auditor_address_state": fake.state_abbr(
+                            include_territories=False
+                        ),
+                        "secondary_auditor_address_zipcode": fake.postalcode(),
+                        # "secondary_auditor_country": fake.country(),
+                        "secondary_auditor_ein": fake.ssn().replace("-", ""),
+                        "secondary_auditor_name": fake.company(),
+                        "secondary_auditor_contact_name": fake.name(),
+                        "secondary_auditor_contact_title": fake.job(),
+                        "secondary_auditor_contact_email": fake.ascii_email(),
+                        "secondary_auditor_contact_phone": fake.basic_phone_number(),
+                    }
+                    for i in range(random.randint(1, 3))
+                ]
+            }
         }
     }
     return additional_auditors
@@ -93,7 +97,7 @@ def _create_sac(user):
     sac = SingleAuditChecklist.objects.create(
         submitted_by=user,
         general_information=_fake_general_information(),
-        additional_auditors=_fake_additional_auditors(),
+        secondary_auditors=_fake_additional_auditors(),
     )
 
     Access.objects.create(

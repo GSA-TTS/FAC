@@ -373,7 +373,7 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         the appropriate privileges will done at the view level.
         """
 
-        from audit.etl import ETL
+        from audit.etl.etl import ETL
 
         if self.general_information:
             etl = ETL(self)

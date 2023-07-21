@@ -785,61 +785,57 @@ class General(models.Model):
         return f"Id:{self.report_id} UEI:{self.auditee_uei}, AY2x:{self.audit_year}"
 
 
-class GenAuditor(models.Model):
+class SecondaryAuditor(models.Model):
     report_id = models.CharField(
         "G-FAC generated identifier. FK to General",
         max_length=40,
     )
     auditor_seq_number = models.IntegerField("Order that the Auditor was reported")
-    auditor_city = models.CharField(
-        "CPA City", max_length=30, null=True, help_text=docs.auditor_city
-    )
-    auditor_contact_title = models.CharField(
-        "Title of CPA Contact",
-        max_length=40,
-        null=True,
-        help_text=docs.auditor_title,
-    )
-    auditor_country = models.CharField(
-        "CPA Country", max_length=45, null=True, help_text=docs.auditor_country
-    )
     auditor_ein = models.IntegerField(
         "CPA Firm EIN (only available for audit years 2013 and beyond)",
         null=True,
         help_text=docs.auditor_ein,
     )
-    auditor_email = models.CharField(
+    auditor_name = models.CharField(
+        "CPA Firm Name", max_length=64, help_text=docs.auditor_firm_name
+    )
+    contact_name = models.CharField(
+        "Name of CPA Contact",
+        max_length=40,
+        null=True,
+    )
+    contact_title = models.CharField(
+        "Title of CPA Contact",
+        max_length=40,
+        null=True,
+        help_text=docs.auditor_title,
+    )
+    contact_email = models.CharField(
         "CPA mail address (optional)",
         max_length=60,
         null=True,
         help_text=docs.auditor_email,
     )
-    auditor_phone = models.PositiveBigIntegerField(
+    contact_phone = models.TextField(
         "CPA phone number", null=True, help_text=docs.auditor_phone
     )
-    auditor_state = models.CharField(
-        "CPA State", max_length=2, null=True, help_text=docs.auditor_state
-    )
-    auditor_address_line_1 = models.CharField(
+    address_street = models.CharField(
         "CPA Street Address",
         max_length=45,
         null=True,
         help_text=docs.auditor_street1,
     )
-    auditor_zip = models.CharField(
+    address_city = models.CharField(
+        "CPA City", max_length=30, null=True, help_text=docs.auditor_city
+    )
+    address_state = models.CharField(
+        "CPA State", max_length=2, null=True, help_text=docs.auditor_state
+    )
+    address_zipcode = models.CharField(
         "CPA Zip Code",
         null=True,
         max_length=12,
         help_text=docs.auditor_zip_code,
-    )
-    auditor_firm_name = models.CharField(
-        "CPA Firm Name", max_length=64, help_text=docs.auditor_firm_name
-    )
-    auditor_foreign_addr = models.CharField(
-        "CPA Address - if international",
-        max_length=200,
-        null=True,
-        help_text=docs.auditor_foreign,
     )
 
     class Meta:

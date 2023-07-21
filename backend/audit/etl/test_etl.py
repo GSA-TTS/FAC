@@ -3,7 +3,7 @@ from django.test import TestCase
 from model_bakery import baker
 
 from audit.models import SingleAuditChecklist, User
-from dissemination.models import General, GenAuditor
+from dissemination.models import General, SecondaryAuditor
 from . import sac_fixture as sac_fixture
 
 
@@ -34,6 +34,6 @@ class ETLTests(TestCase):
         print("General:", gen)
         self.assertEquals(self.sac.general_information["auditee_uei"], gen.auditee_uei)
 
-        gen_auditor = GenAuditor.objects.first()
-        print("GenAuditor:", gen_auditor)
-        self.assertEquals(self.sac.report_id, gen_auditor.report_id)
+        sec_auditor = SecondaryAuditor.objects.first()
+        print("GenAuditor:", sec_auditor)
+        self.assertEquals(self.sac.report_id, sec_auditor.report_id)

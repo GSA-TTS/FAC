@@ -40,8 +40,8 @@ services:
       - /src/node_modules
       - /src/staticfiles
   clamav-rest:
-    # image: clamav/clamav
-    image: ghcr.io/gsa-tts/fac/clamav:latest
+    image: clamav/clamav
+    # image: ghcr.io/gsa-tts/fac/clamav:latest
     environment:
       - MAX_FILE_SIZE=25M
       - SIGNATURE_CHECKS=1
@@ -57,8 +57,8 @@ services:
     volumes:
       - "minio-vol:/tmp/minio"
   api:
-    # image: postgrest/postgrest
-    image: ghcr.io/gsa-tts/fac/postgrest:latest
+    image: postgrest/postgrest
+    # image: ghcr.io/gsa-tts/fac/postgrest:latest
     ports:
       - "3000:3000"
     expose:
