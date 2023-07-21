@@ -6,7 +6,7 @@ local AuditInformation = Types.object {
   additionalProperties: false,
   properties: {
     ggap_results: Types.array {
-      items: Base.Enum.GGAPResults
+      items: Base.Enum.GGAPResults,
     },
     dollar_threshold: Types.integer,
     is_going_concern_included: Types.boolean,

@@ -31,9 +31,9 @@ def get_agency_names() -> dict[str, str]:
 
     return agency_names
 
-def get_ggap_results() -> List(dict[str,str]):
+def get_ggap_results() -> list[dict[str,str]]:
     sonnet = "./schemas/source/base/GGAP.libsonnet"
     json_str = _jsonnet.evaluate_snippet(sonnet, open(sonnet).read())
     jobj = json.loads(json_str)
-    # Returns a list of dictionarys with the keys 'tag' and 'readable'
-    return jobj
+    # Returns a list of dictionaries with the keys 'tag' and 'readable'
+    return jobj["ggap_results"]

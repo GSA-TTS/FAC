@@ -31,12 +31,12 @@ class AuditInfoForm(forms.Form):
     choices_YoN = (("True", "Yes"), ("False", "No"))
     # These should probably have the lowercase values from Jsonnet:
     choices_GGAP = (
-        ("Unmodified opinion", "Unmodified opinion"),
-        ("Qualified opinion", "Qualified opinion"),
-        ("Adverse opinion", "Adverse opinion"),
-        ("Disclaimer of opinion", "Disclaimer of opinion"),
+        ("unmodified_opinion", "Unmodified opinion"),
+        ("qualified_opinion", "Qualified opinion"),
+        ("adverse_opinion", "Adverse opinion"),
+        ("disclaimer_of_opinion", "Disclaimer of opinion"),
         (
-            "Prepared under non-GGAP framework",
+            "not_ggap",
             "Financial statements were not prepared in accordance with GGAP but were prepared in accordance with a special purpose framework.",
         ),
     )

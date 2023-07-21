@@ -1,5 +1,4 @@
 import logging
-from audit.get_agency_names import get_agency_names, get_ggap_results
 
 from django.views import generic
 from django.views.decorators.csrf import csrf_exempt
@@ -14,6 +13,7 @@ from django.http import JsonResponse
 
 from audit.forms import UploadReportForm, AuditInfoForm
 
+from config.settings import AGENCY_NAMES, GGAP_RESULTS
 from .fixtures.excel import FORM_SECTIONS
 
 from audit.excel import (
@@ -464,6 +464,7 @@ class AuditInfoFormView(SingleAuditChecklistAccessRequiredMixin, generic.View):
                         "is_aicpa_audit_guide_included": sac.audit_information.get(
                             "is_aicpa_audit_guide_included"
                         ),
+                        "dollar_threshold": sac.audit_information.get("dollar_threshold"),
                         "is_low_risk_auditee": sac.audit_information.get(
                             "is_low_risk_auditee"
                         ),
@@ -476,8 +477,8 @@ class AuditInfoFormView(SingleAuditChecklistAccessRequiredMixin, generic.View):
                 "report_id": report_id,
                 "auditee_uei": sac.auditee_uei,
                 "user_provided_organization_type": sac.user_provided_organization_type,
-                "agency_names": get_agency_names(),
-                "ggap_results": get_ggap_results(),
+                "agency_names": AGENCY_NAMES,
+                "ggap_results": GGAP_RESULTS,
                 "form": current_info,
             }
 
@@ -496,11 +497,9 @@ class AuditInfoFormView(SingleAuditChecklistAccessRequiredMixin, generic.View):
 
         try:
             sac = SingleAuditChecklist.objects.get(report_id=report_id)
-            form = AuditInfoForm(request.POST, request.FILES)
+            form = AuditInfoForm(request.POST)
 
             if form.is_valid():
-                # Save the form, yay!
-                logger.info("Audit info form passed validation.")
                 form.clean_booleans()
 
                 audit_information = sac.audit_information or {}
@@ -519,7 +518,8 @@ class AuditInfoFormView(SingleAuditChecklistAccessRequiredMixin, generic.View):
                     "report_id": report_id,
                     "auditee_uei": sac.auditee_uei,
                     "user_provided_organization_type": sac.user_provided_organization_type,
-                    "agency_names": get_agency_names(),
+                    "agency_names": AGENCY_NAMES,
+                    "ggap_results": GGAP_RESULTS,
                     "form": form,
                 }
                 return render(request, "audit/audit-info-form.html", context)

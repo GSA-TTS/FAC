@@ -213,7 +213,7 @@ def validate_general_information_json(value):
 
 def validate_audit_information_json(value):
     """
-    Apply JSON Schema for general information and report errors.
+    Apply JSON Schema for audit information and report errors.
     """
     schema_path = settings.SECTION_SCHEMA_DIR / "AuditInformation.schema.json"
     schema = json.loads(schema_path.read_text(encoding="utf-8"))

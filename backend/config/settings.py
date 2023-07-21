@@ -16,7 +16,7 @@ import logging
 import json
 import environs
 from cfenv import AppEnv
-from audit.get_agency_names import get_agency_names
+from audit.get_agency_names import get_agency_names, get_ggap_results
 
 import newrelic.agent
 
