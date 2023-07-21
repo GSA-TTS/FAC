@@ -596,10 +596,6 @@ class General(models.Model):
         null=True,
         help_text=docs.auditor_ein,
     )
-    pdf_url = ArrayField(
-        models.CharField("PDFs associated with the report", max_length=400, null=True),
-        null=True,
-    )
 
     # Agency
     cognizant_agency = models.CharField(
@@ -615,38 +611,10 @@ class General(models.Model):
     )
 
     # Dates
-    auditee_certified_date = models.DateField(
-        "Date of Auditee signature", null=True, help_text=docs.auditee_date_signed
-    )
-    auditor_certified_date = models.DateField(
-        "Date of CPA signature", null=True, help_text=docs.auditor_date_signed
-    )
-    date_published = models.DateField(
-        "The date the audit information was made available on the dissemination site",
-        null=True,
-        help_text=docs.date_firewall,
-    )
-    fac_accepted_date = models.DateField(
-        (
-            "The most recent date an audit report was submitted to the FAC that "
-            "passed FAC screening and was accepted as a valid OMB Circular A-133 "
-            "report submission."
-        ),
-        help_text=docs.fac_accepted_date,
-    )
-    form_date_received = models.DateField(
-        "The most Recent Date the Form SF-SAC was received by the FAC. This field was not populated before 2001.",
-        null=True,
-        help_text=docs.form_date_received,
-    )
     initial_date_received = models.DateField(
         "The first date an audit component or Form SF-SAC was received by the Federal audit Clearinghouse (FAC).",
         null=True,
         help_text=docs.initial_date_received,
-    )
-    date_received = models.DateField(
-        "The latest date an audit component or Form SF-SAC was received by the Federal audit Clearinghouse (FAC).",
-        null=True,
     )
     fy_end_date = models.DateField(
         "Fiscal Year End Date", null=True, help_text=docs.fy_end_date
@@ -765,12 +733,6 @@ class General(models.Model):
         null=True,
         help_text=docs.total_fed_expenditures,
     )
-    hist_type_of_entity = models.CharField(
-        "Contact FAC for information",
-        max_length=40,
-        null=True,
-        help_text=docs.type_of_entity,
-    )
     type_report_financial_statements = models.CharField(
         "Type of Report Issued on the Financial Statements",
         max_length=40,
@@ -797,13 +759,13 @@ class General(models.Model):
     cfac_report_id = models.CharField(
         "Used by CFAC to uniquely identify a submission", null=True
     )
-    cfac_version = models.CharField("Used by CFAC", null=True)
 
     # Metadata
     dbkey = models.CharField(
         "Audit Year and DBKEY (database key) combined make up the primary key. Only on records created by Census.",
         max_length=40,
         help_text=docs.dbkey_general,
+        null=True,
     )
     is_public = models.BooleanField(
         "True for public records, False for non-public records", null=True

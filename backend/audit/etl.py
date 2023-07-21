@@ -18,7 +18,7 @@ class ETL(object):
         self.single_audit_checklist = sac
         self.report_id = sac.report_id
         audit_date = sac.general_information.get(
-            "auditee_fiscal_period_start", datetime.now().isoformat()
+            "auditee_fiscal_period_start", datetime.now
         )
         self.audit_year = int(audit_date.split("-")[0])
 
@@ -97,11 +97,11 @@ class ETL(object):
                 cluster_total=cluster["cluster_total"],
                 federal_program_total=program["federal_program_total"],
                 is_loan=loan["is_guaranteed"] == "Y",
-                loan_balance=None,  # TODO: Where does this come from?
+                loan_balance=loan["loan_balance_at_audit_period_end"],
                 is_direct=is_direct,
                 is_major=program["is_major"] == "Y",
                 mp_audit_report_type=program["audit_report_type"],
-                findings_count=None,  # TODO: Where does this come from?  Is it needed?
+                findings_count=program["number_of_audit_findings"],
                 is_passthrough_award=is_passthrough,
                 passthrough_amount=subrecipient_amount,
                 type_requirement=None,  # TODO: What is this?
@@ -203,7 +203,7 @@ class ETL(object):
             auditee_state=general_information["auditee_state"],
             auditee_ein=general_information["ein"],
             auditee_uei=general_information["auditee_uei"],
-            auditee_addl_uei_list=[],  # TODO: Where does this come from?
+            auditee_addl_uei_list=[],
             auditee_zip=general_information["auditee_zip"],
             auditor_phone=general_information["auditor_phone"],
             auditor_state=general_information["auditor_state"],
@@ -215,20 +215,13 @@ class ETL(object):
             auditor_contact_name=general_information["auditor_contact_name"],
             auditor_email=general_information["auditor_email"],
             auditor_firm_name=general_information["auditor_firm_name"],
-            auditor_foreign_addr=None,  # TODO: Where does this come from?
+            auditor_foreign_addr=None,  # TODO:  What does this look like in the incoming json?
             auditor_ein=general_information["auditor_ein"],
-            pdf_url=None,  # TODO: Where does this come from?
-            cognizant_agency=None,  # TODO: Where does this come from?
-            oversight_agency=None,  # TODO: Where does this come from?
-            auditee_certified_date=None,  # TODO: Where does this come from?
-            auditor_certified_date=None,  # TODO: Where does this come from?
-            date_published=None,  # TODO: Where does this come from?
-            fac_accepted_date=datetime.now().date(),  # TODO: Where does this come from?
-            form_date_received=None,  # TODO: Where does this come from?
-            initial_date_received=None,  # TODO: Where does this come from?
-            date_received=None,  # TODO: Where does this come from?
+            cognizant_agency=None,  # TODO: https://github.com/GSA-TTS/FAC/issues/1218
+            oversight_agency=None,  # TODO: https://github.com/GSA-TTS/FAC/issues/1218
+            initial_date_received=self.single_audit_checklist.date_created,
             fy_end_date=general_information["auditee_fiscal_period_end"],
-            fy_start_date=None,  # TODO: Where does this come from?
+            fy_start_date=general_information["auditee_fiscal_period_start"],
             audit_year=self.audit_year,
             audit_type=general_information["audit_type"],
             is_significant_deficiency=None,  # TODO: Where does this come from?
@@ -237,7 +230,7 @@ class ETL(object):
             current_or_former_findings=None,  # TODO: Where does this come from?
             dollar_threshold=None,  # TODO: Where does this come from?
             is_duplicate_reports=None,  # TODO: Where does this come from?
-            entity_type=None,  # TODO: Where does this come from?
+            entity_type=None,  # TODO: AUDIT_TYPE_CODES in audit.models.SingleAuditChecklist
             is_going_concern=None,  # TODO: Where does this come from?
             is_low_risk=None,  # TODO: Where does this come from?
             is_material_noncompliance=None,  # TODO: Where does this come from?
@@ -251,18 +244,14 @@ class ETL(object):
             special_framework=None,  # TODO: Where does this come from?
             is_special_framework_required=None,  # TODO: Where does this come from?
             total_fed_expenditures=None,  # TODO: Where does this come from?
-            hist_type_of_entity=None,
             type_report_financial_statements=None,  # TODO: Where does this come from?
             type_report_major_program=None,  # TODO: Where does this come from?
             type_report_special_purpose_framework=None,  # TODO: Where does this come from?
             suppression_code=None,  # TODO: Where does this come from?
             type_audit_code="A133",  # TODO: Where does this come from?
-            cfac_report_id=None,  # TODO: Where does this come from?
-            cfac_version=None,  # TODO: Where does this come from?
-            dbkey=self.report_id,
-            is_public=None,  # TODO: Update this when we have a source for is_public.
-            # modified_date should auto-generate/update
-            # create_date should auto-generate
+            cfac_report_id=None,  # Should only be populated for historical data
+            dbkey=None,  # Should only be populated for historical data
+            is_public=None,  # Should be coming from SingleAuditChecklist
             data_source="G-FAC",
         )
         general.save()
