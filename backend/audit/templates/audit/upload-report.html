@@ -30,7 +30,7 @@
             <ol class="usa-process-list">
                 <form id="upload-report__form"
                       id_test="upload-report__form"
-                      action="{% url 'audit:upload_report' report_id %}"
+                      action="{% url 'audit:UploadReport' report_id %}"
                       enctype='multipart/form-data'
                       method="post">
                     {% csrf_token %}
@@ -77,7 +77,7 @@
                                                pattern="\d+"
                                                {% if x.required %}required{% endif %}
                                                type="number"
-                                               value="{{ form.cleaned_data | get_attr:x.id }}"/>
+                                               value="{{ form.cleaned_data | get_attr:x.id }}" />
                                         <span class="usa-error-message tablet:grid-col-12">{{ form.errors | get_attr:x.id }}</span>
                                     </div>
                                 {% endfor %}
@@ -95,19 +95,15 @@
                                    accept=".pdf"
                                    aria-describedby="file_input_upload_report"
                                    required
-                                   type="file"/>
+                                   type="file" />
                             <span class="usa-error-message tablet:grid-col-12">{{ form.errors.upload_report }}</span>
                         </li>
                     </fieldset>
                     <button class="usa-button" id="continue" disabled="disabled">Upload Single Audit Package</button>
                 </form>
             </ol>
-            <div hidden id="info_box" class="grid-row margin-bottom-6"></div>
         </div>
     </div>
     {% include "audit-metadata.html" %}
-    <!-- Pass variables to JS as given alias -->
-    {{ report_id | json_script:'sac_id' }}
-    {{ view_id | json_script:'view_id' }}
     <script src="{% static 'compiled/js/upload-report-pdf.js' %}"></script>
 {% endblock content %}

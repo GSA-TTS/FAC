@@ -7,7 +7,14 @@ from django.test import TestCase
 from django_fsm import TransitionNotAllowed
 from model_bakery import baker
 
-from .models import Access, ExcelFile, SingleAuditChecklist, SingleAuditReportFile, User
+from .models import (
+    Access,
+    ExcelFile,
+    LateChangeError,
+    SingleAuditChecklist,
+    SingleAuditReportFile,
+    User,
+)
 
 
 class SingleAuditChecklistTests(TestCase):
@@ -56,11 +63,6 @@ class SingleAuditChecklistTests(TestCase):
         """
         cases = (
             (
-                [SingleAuditChecklist.STATUS.IN_PROGRESS],
-                SingleAuditChecklist.STATUS.READY_FOR_CERTIFICATION,
-                "transition_to_ready_for_certification",
-            ),
-            (
                 [SingleAuditChecklist.STATUS.READY_FOR_CERTIFICATION],
                 SingleAuditChecklist.STATUS.AUDITOR_CERTIFIED,
                 "transition_to_auditor_certified",
@@ -107,6 +109,27 @@ class SingleAuditChecklistTests(TestCase):
                         sac.submission_status = bad_status
 
                         self.assertRaises(TransitionNotAllowed, transition_method)
+
+    def test_no_late_changes(self):
+        """
+        Try to make a change to a submission with a status that isn't
+        in_progress and get an expected error.
+        """
+        bad_statuses = [
+            status[0]
+            for status in SingleAuditChecklist.STATUS_CHOICES
+            if status[0] != SingleAuditChecklist.STATUS.IN_PROGRESS
+        ]
+
+        for status_from in bad_statuses:
+            sac = baker.make(
+                SingleAuditChecklist,
+                audit_type="single-audit",
+                submission_status=status_from,
+            )
+            sac.audit_type = "program-specific"
+            with self.assertRaises(LateChangeError):
+                sac.save()
 
 
 class AccessTests(TestCase):
@@ -195,3 +218,20 @@ class SingleAuditReportFileTests(TestCase):
         report_id = SingleAuditChecklist.objects.get(id=sar_file.sac.id).report_id
 
         self.assertEqual(f"{report_id}.pdf", sar_file.filename)
+
+    def test_no_late_upload(self):
+        """
+        If the associated SAC isn't in progress, we should get an error.
+        """
+        file = SimpleUploadedFile("this is a file.pdf", b"this is a file")
+
+        bad_statuses = [
+            status[0]
+            for status in SingleAuditChecklist.STATUS_CHOICES
+            if status[0] != SingleAuditChecklist.STATUS.IN_PROGRESS
+        ]
+
+        for status_from in bad_statuses:
+            sac = baker.make(SingleAuditChecklist, submission_status=status_from)
+            with self.assertRaises(LateChangeError):
+                baker.make(SingleAuditReportFile, sac=sac, file=file)

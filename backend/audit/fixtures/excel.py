@@ -14,12 +14,16 @@ CORRECTIVE_ACTION_PLAN_TEMPLATE = SHEETS_DIR / "corrective-action-plan-template.
 FINDINGS_UNIFORM_GUIDANCE_TEMPLATE = (
     SHEETS_DIR / "findings-uniform-guidance-template.xlsx"
 )
+SECONDARY_AUDITORS_TEMPLATE = SHEETS_DIR / "secondary-auditors-template.xlsx"
+NOTES_TO_SEFA_TEMPLATE = SHEETS_DIR / "notes-to-sefa-template.xlsx"
 
 ADDITIONAL_UEIS_TEMPLATE_DEFINITION = "additional-ueis-template.json"
 FEDERAL_AWARDS_TEMPLATE_DEFINITION = "federal-awards-expended-template.json"
 CORRECTIVE_ACTION_TEMPLATE_DEFINITION = "corrective-action-plan-template.json"
 FINDINGS_UNIFORM_TEMPLATE_DEFINITION = "findings-uniform-guidance-template.json"
 FINDINGS_TEXT_TEMPLATE_DEFINITION = "findings-text-template.json"
+SECONDARY_AUDITORS_TEMPLATE_DEFINITION = "secondary-auditors-template.json"
+NOTES_TO_SEFA_TEMPLATE_DEFINITION = "notes-to-sefa-template.json"
 
 ADDITIONAL_UEIS_TEST_FILE = TESTFILES_DIR / "additional-ueis-pass-01.json"
 FEDERAL_AWARDS_TEST_FILE = TESTFILES_DIR / "federalawards-pass-01.json"
@@ -28,6 +32,8 @@ FINDINGS_TEXT_TEST_FILE = TESTFILES_DIR / "findings-text-pass-01.json"
 FINDINGS_UNIFORM_GUIDANCE_TEST_FILE = (
     TESTFILES_DIR / "findings-uniform-guidance-pass-01.json"
 )
+SECONDARY_AUDITORS_TEST_FILE = TESTFILES_DIR / "secondary-auditors-pass-01.json"
+NOTES_TO_SEFA_TEST_FILE = TESTFILES_DIR / "notes-to-sefa-pass-01.json"
 
 ADDITIONAL_UEIS_ENTRY_FIXTURES = (
     settings.AUDIT_TEST_DATA_ENTRY_DIR / "additional-ueis-entries.json"
@@ -44,7 +50,12 @@ FINDINGS_UNIFORM_GUIDANCE_ENTRY_FIXTURES = (
 FEDERAL_AWARDS_ENTRY_FIXTURES = (
     settings.AUDIT_TEST_DATA_ENTRY_DIR / "federal-awards-expended-entries.json"
 )
-
+SECONDARY_AUDITORS_ENTRY_FIXTURES = (
+    settings.AUDIT_TEST_DATA_ENTRY_DIR / "secondary-auditors-entries.json"
+)
+NOTES_TO_SEFA_ENTRY_FIXTURES = (
+    settings.AUDIT_TEST_DATA_ENTRY_DIR / "notes-to-sefa-entries.json"
+)
 SIMPLE_CASES_TEST_FILE = settings.AUDIT_TEST_DATA_ENTRY_DIR / "simple-cases.json"
 
 # Make FORM_SECTIONS convenient to both iterate over and access by field name:
@@ -56,6 +67,8 @@ FormSections = namedtuple(
         "FINDINGS_TEXT",
         "FINDINGS_UNIFORM_GUIDANCE",
         "ADDITIONAL_UEIS",
+        "SECONDARY_AUDITORS",
+        "NOTES_TO_SEFA",
     ),
 )
 # Note: we turn these into hyphenated lowercase for URLs, e.g. federal-awards-expended
@@ -65,4 +78,6 @@ FORM_SECTIONS = FormSections(
     FINDINGS_TEXT="FindingsText",
     FINDINGS_UNIFORM_GUIDANCE="FindingsUniformGuidance",
     ADDITIONAL_UEIS="AdditionalUeis",
+    SECONDARY_AUDITORS="SecondaryAuditors",
+    NOTES_TO_SEFA="NotesToSefa",
 )

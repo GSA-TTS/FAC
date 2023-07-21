@@ -14,3 +14,4 @@ toml
 types-python-slugify
 types-requests
 whitenoise
+tblib

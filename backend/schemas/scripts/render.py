@@ -1,7 +1,7 @@
 from openpyxl import Workbook
 from openpyxl.workbook.defined_name import DefinedName
 from openpyxl.worksheet.datavalidation import DataValidation
-from openpyxl.utils import quote_sheetname, absolute_coordinate
+from openpyxl.utils import get_column_letter, quote_sheetname, absolute_coordinate
 from openpyxl.styles import PatternFill, Alignment, Protection, Font
 
 from collections import namedtuple as NT
@@ -26,9 +26,9 @@ Range = NT(
     "name,column,label_row,range_start_row,range_start,abs_range_start,full_range",
 )
 
-MAGIC_MAX_ROWS = 1048576
 MAX_ROWS = 3000
-
+XLSX_MAX_ROWS = 1048576  # Excel has a maximum of 1048576 rows
+XLSX_MAX_COLS = 16384  # Excel has a maximum of 16384 columns
 
 # Styling
 header_row_fill = PatternFill(
@@ -66,6 +66,10 @@ def process_spec(WBNT):
         ws = create_protected_sheet(wb, sheet, password, ndx)
         if sheet.mergeable_cells is not None:
             merge_adjacent_columns(ws, sheet.mergeable_cells)
+        if sheet.hide_col_from is not None:
+            hide_all_columns_from(ws, sheet.hide_col_from)
+        if sheet.hide_row_from is not None:
+            hide_all_rows_from(ws, sheet.hide_row_from)
         process_open_ranges(wb, ws, sheet)
         add_validations(wb, ws, sheet.open_ranges)
         add_validations(wb, ws, sheet.text_ranges)
@@ -133,6 +137,39 @@ def merge_adjacent_columns(ws, cell_ranges):
             ws.merge_cells(merge_range)
 
 
+def hide_all_columns_from(ws, start_column):
+    """Hides all columns from the specified column to the end of the sheet."""
+    for col_idx in range(start_column, XLSX_MAX_COLS + 1):
+        col_letter = get_column_letter(col_idx)
+        ws.column_dimensions[col_letter].hidden = True
+
+
+def hide_all_rows_from(ws, start_row):
+    """Hides all rows from the specified row to the end of the sheet."""
+    for row_idx in range(start_row, XLSX_MAX_ROWS + 1):
+        ws.row_dimensions[row_idx].hidden = True
+
+
+def apply_cell_format(cell, format):
+    """
+    Applies formatting to the cell based on the format defined in the spec.
+    """
+    if format == "text":
+        cell.number_format = "@"
+    elif format == "dollar":
+        cell.number_format = "$#,##0"
+
+
+def apply_range_format(ws, coords, format):
+    """
+    Applies formatting to the range of cells based on the format defined in the spec.
+    """
+    for rowndx in range(coords.range_start_row, MAX_ROWS + 1):
+        cell_reference = f"{coords.column}{rowndx}"
+        cell = ws[cell_reference]
+        apply_cell_format(cell, format)
+
+
 def process_open_ranges(wb, ws, sheet):
     """
     Open ranges are the column-wise data in the sheet. They are called "open" ranges
@@ -149,6 +186,8 @@ def process_open_ranges(wb, ws, sheet):
         new_range = DefinedName(name=coords.name, attr_text=cell_reference)
         wb.defined_names.add(new_range)
         configure_header_cell(ws, r)
+        if r.posn.format is not None:
+            apply_range_format(ws, coords, r.posn.format)
         # Make the header row tall.
         ws.row_dimensions[coords.range_start_row - 1].height = (
             sheet.header_height if sheet.header_height else 100
@@ -181,7 +220,9 @@ def configure_validation(wb, ws, coords: Range, r):
 
     if r.validation.type == "list":
         dv = DataValidation(
-            type="list", formula1=r.validation.formula1, allow_blank=True
+            type="list",
+            formula1=r.validation.formula1.format(coords.range_start_row),
+            allow_blank=True,
         )
         # https://stackoverflow.com/questions/75889368/openpyxl-excel-file-created-is-not-showing-validation-errors-or-prompt-message
     elif r.validation.type == "range_lookup":
@@ -194,6 +235,8 @@ def configure_validation(wb, ws, coords: Range, r):
     elif r.validation.type in ["custom", "lookup"]:
         dv = DataValidation(type="custom", allow_blank=True)
         dv.formula1 = r.validation.formula1
+        # This to handle the cases where formula1 is expressed with placeholders {0}.
+        dv.formula1 = dv.formula1.format(coords.range_start_row)
         if "FIRSTCELLREF" in dv.formula1:
             dv.formula1 = dv.formula1.replace(
                 "FIRSTCELLREF", f"${coords.column}{coords.range_start_row}"
@@ -303,7 +346,8 @@ def process_single_cells(wb, ws, sheet):
         the_cell.alignment = Alignment(wrapText=True, wrap_text=True)
         # ws.row_dimensions[cell_row].height = 40
         entry_cell_obj = ws[absolute_cell_coordinate]
-        entry_cell_obj.protection = Protection(locked=False)
+        if not o.posn.keep_locked:
+            entry_cell_obj.protection = Protection(locked=False)
         # Creating a coord for the single-cell range for validation configuration
         coord = Range(
             "",
@@ -315,6 +359,8 @@ def process_single_cells(wb, ws, sheet):
             f"{o.posn.range_cell}:{o.posn.range_cell}",
         )
         configure_validation(wb, ws, coord, o)
+        if o.posn.format is not None:
+            apply_cell_format(entry_cell_obj, o.posn.format)
 
         if sheet.header_height:
             row = int(o.posn.title_cell[1])
@@ -326,7 +372,10 @@ def make_range(r):
     title_row = int(r.posn.title_cell[1])
     range_start_row = int(r.posn.title_cell[1]) + 1
     start_cell = column + str(range_start_row)
-    full_range = f"${column}${range_start_row}:${column}${MAX_ROWS}"
+    last_row = (
+        r.posn.last_range_cell[1] if r.posn.last_range_cell is not None else MAX_ROWS
+    )
+    full_range = f"${column}${range_start_row}:${column}${last_row}"
     return Range(
         r.posn.range_name,
         column,
@@ -377,11 +426,12 @@ def process_text_ranges(wb, ws, sheet):
 def unlock_data_entry_cells(header_row, ws, sheet):
     print("---- unlock_data_entry_cells ----")
     for r in sheet.open_ranges:
-        coords = make_range(r)
-        for rowndx in range(coords.range_start_row, MAX_ROWS):
-            cell_reference = f"${coords.column}${rowndx}"
-            cell = ws[cell_reference]
-            cell.protection = Protection(locked=False)
+        if not r.posn.keep_locked:
+            coords = make_range(r)
+            for rowndx in range(coords.range_start_row, MAX_ROWS):
+                cell_reference = f"${coords.column}${rowndx}"
+                cell = ws[cell_reference]
+                cell.protection = Protection(locked=False)
     if sheet.merged_unreachable not in [None, []]:
         print(sheet.merged_unreachable)
         data_row_index = header_row + 1

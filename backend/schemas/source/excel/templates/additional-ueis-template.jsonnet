@@ -14,6 +14,7 @@ local single_cells = [
     title_cell: 'A1',
     range_cell: 'A2',
     validation: SV.StringOfLengthTwelve,
+    format: 'text',
     help: Help.uei,
   },
 ];
@@ -23,6 +24,7 @@ local open_ranges_defns = [
     Sheets.open_range {
       title_cell: 'A1',
       width: 36,
+      format: 'text',
       help: Help.uei,
     },
     SV.StringOfLengthTwelve,
@@ -36,11 +38,15 @@ local sheets = [
     name: additionalUeiSheet,
     open_ranges: Fun.make_open_ranges_with_column(title_row, open_ranges_defns),
     header_height: 48,
+    hide_col_from: 2,
   },
   {
     name: ueiSheet,
     single_cells: single_cells,
     header_height: 48,
+    hide_col_from: 2,
+    //FIXME MSHD: commented this out until we figure out if it is needed
+    //  hide_row_from: 3,
   },
 ];
 

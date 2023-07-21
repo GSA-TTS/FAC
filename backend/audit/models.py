@@ -1,5 +1,6 @@
 import calendar
 from datetime import date
+from itertools import chain
 import json
 import logging
 
@@ -13,6 +14,7 @@ from django.utils.translation import gettext_lazy as _
 
 from django_fsm import FSMField, RETURN_VALUE, transition
 
+import audit.cross_validation
 from .validators import (
     validate_additional_ueis_json,
     validate_corrective_action_plan_json,
@@ -21,6 +23,8 @@ from .validators import (
     validate_findings_text_json,
     validate_findings_uniform_guidance_json,
     validate_general_information_json,
+    validate_secondary_auditors_json,
+    validate_notes_to_sefa_json,
     validate_single_audit_report_file,
 )
 
@@ -90,10 +94,86 @@ def json_property_mixin_generator(name, fname=None, toplevel=None, classname=Non
 GeneralInformationMixin = json_property_mixin_generator("GeneralInformation")
 
 
+class LateChangeError(Exception):
+    pass
+
+
 class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: ignore
     """
     Monolithic Single Audit Checklist.
     """
+
+    # Class management machinery:
+    class Meta:
+        """We need to set the name for the admin view."""
+
+        verbose_name = "SF-SAC"
+        verbose_name_plural = "SF-SACs"
+
+    objects = SingleAuditChecklistManager()
+
+    # Method overrides:
+    def __str__(self):
+        return f"#{self.id} - UEI({self.auditee_uei})"
+
+    def save(self, *args, **kwds):
+        """
+        Call _reject_late_changes() to verify that a submission that's no longer
+        in progress isn't being altered; skip this if we know this submission is
+        in progress.
+        """
+        if self.submission_status != self.STATUS.IN_PROGRESS:
+            try:
+                self._reject_late_changes()
+            except LateChangeError as err:
+                raise LateChangeError from err
+
+        return super().save(*args, **kwds)
+
+    def _reject_late_changes(self):
+        """
+        This should only be called if status isn't STATUS.IN_PROGRESS.
+        If there have been relevant changes, raise an AssertionError.
+        Here, "relevant" means anything other than fields related to the status
+        transition change itself.
+        """
+        try:
+            prior_obj = SingleAuditChecklist.objects.get(pk=self.pk)
+        except SingleAuditChecklist.DoesNotExist:
+            # No prior instance exists, so it's a new submission.
+            return True
+
+        current = audit.cross_validation.sac_validation_shape(self)
+        prior = audit.cross_validation.sac_validation_shape(prior_obj)
+        if current["sf_sac_sections"] != prior["sf_sac_sections"]:
+            raise LateChangeError
+
+        meta_fields = ("submitted_by", "date_created", "report_id", "audit_type")
+        for field in meta_fields:
+            if current["sf_sac_meta"][field] != prior["sf_sac_meta"][field]:
+                raise LateChangeError
+
+        return True
+
+    # Constants:
+    class STATUS:
+        """The states that a submission can be in."""
+
+        IN_PROGRESS = "in_progress"
+        READY_FOR_CERTIFICATION = "ready_for_certification"
+        AUDITOR_CERTIFIED = "auditor_certified"
+        AUDITEE_CERTIFIED = "auditee_certified"
+        CERTIFIED = "certified"
+        SUBMITTED = "submitted"
+
+    STATUS_CHOICES = (
+        (STATUS.IN_PROGRESS, "In Progress"),
+        (STATUS.READY_FOR_CERTIFICATION, "Ready for Certification"),
+        (STATUS.AUDITOR_CERTIFIED, "Auditor Certified"),
+        (STATUS.AUDITEE_CERTIFIED, "Auditee Certified"),
+        (STATUS.CERTIFIED, "Certified"),
+        (STATUS.SUBMITTED, "Submitted"),
+    )
 
     USER_PROVIDED_ORGANIZATION_TYPE_CODE = (
         ("state", _("State")),
@@ -115,27 +195,6 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         ("biennial", _("Biennial")),
         ("other", _("Other")),
     )
-
-    class STATUS:
-        """The states that a submission can be in."""
-
-        IN_PROGRESS = "in_progress"
-        READY_FOR_CERTIFICATION = "ready_for_certification"
-        AUDITOR_CERTIFIED = "auditor_certified"
-        AUDITEE_CERTIFIED = "auditee_certified"
-        CERTIFIED = "certified"
-        SUBMITTED = "submitted"
-
-    STATUS_CHOICES = (
-        (STATUS.IN_PROGRESS, "In Progress"),
-        (STATUS.READY_FOR_CERTIFICATION, "Ready for Certification"),
-        (STATUS.AUDITOR_CERTIFIED, "Auditor Certified"),
-        (STATUS.AUDITEE_CERTIFIED, "Auditee Certified"),
-        (STATUS.CERTIFIED, "Certified"),
-        (STATUS.SUBMITTED, "Submitted"),
-    )
-
-    objects = SingleAuditChecklistManager()
 
     # 0. Meta data
     submitted_by = models.ForeignKey(User, on_delete=models.PROTECT)
@@ -198,26 +257,50 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         blank=True, null=True, validators=[validate_additional_ueis_json]
     )
 
-    # Additional Auditors:
-    additional_auditors = models.JSONField(blank=True, null=True)
+    # Secondary Auditors:
+    secondary_auditors = models.JSONField(
+        blank=True, null=True, validators=[validate_secondary_auditors_json]
+    )
+
+    # Notes to SEFA:
+    notes_to_sefa = models.JSONField(
+        blank=True, null=True, validators=[validate_notes_to_sefa_json]
+    )
 
     def validate_full(self):
         """
+        Full validation, intended for use when the user indicates that the
+        submission is finished.
+
+        Currently a stub, but eventually will call each of the individual
+        section validation routines and then validate_cross.
+        """
+
+        validation_methods = []
+        errors = [f(self) for f in validation_methods]
+
+        if errors:
+            return {"errors": errors}
+
+        return self.validate_cross()
+
+    def validate_cross(self):
+        """
+        This method should NOT be run as part of full_clean(), because we want
+        to be able to save in-progress submissions.
+
         A stub method to represent the cross-sheet, “full” validation that we
         do once all the individual sections are complete and valid in
         themselves.
         """
-        all_sections = [
-            self.general_information,
-            self.federal_awards,
-            self.corrective_action_plan,
-            self.findings_text,
-            self.findings_uniform_guidance,
-            self.additional_ueis,
-        ]
-        if all(section for section in all_sections):
-            return True
-        return True
+        shaped_sac = audit.cross_validation.sac_validation_shape(self)
+        validation_functions = audit.cross_validation.functions
+        errors = list(
+            chain.from_iterable([func(shaped_sac) for func in validation_functions])
+        )
+        if errors:
+            return {"errors": errors, "data": shaped_sac}
+        return {}
 
     @transition(
         field="submission_status",
@@ -231,13 +314,13 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         there's likely to be a step in one of the views that does cross-sheet
         validation and reports back to the user.
         """
-        if self.validate_full():
+        errors = self.validate_full()
+        if not errors:
             self.transition_name.append(
                 SingleAuditChecklist.STATUS.READY_FOR_CERTIFICATION
             )
             self.transition_date.append(date.today())
             return SingleAuditChecklist.STATUS.READY_FOR_CERTIFICATION
-
         return SingleAuditChecklist.STATUS.IN_PROGRESS
 
     @transition(
@@ -290,13 +373,12 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         the appropriate privileges will done at the view level.
         """
 
-        from audit.etl.etl import ETL
+        from audit.etl import ETL
 
-        # TODO: These lines are breaking
-        #       `test_submission_status_transitions` in audit/test_models.py
-        #       We'll figure out a fix for this and uncomment these lines.
-        etl = ETL(self)
-        etl.load_all()
+        if self.general_information:
+            etl = ETL(self)
+            etl.load_all()
+
         self.transition_name.append(SingleAuditChecklist.STATUS.SUBMITTED)
         self.transition_date.append(date.today())
 
@@ -362,15 +444,6 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         except TypeError:
             pass
         return None
-
-    class Meta:
-        """We need to set the name for the admin view."""
-
-        verbose_name = "SF-SAC"
-        verbose_name_plural = "SF-SACs"
-
-    def __str__(self):
-        return f"#{self.id} - UEI({self.auditee_uei})"
 
 
 class Access(models.Model):
@@ -442,10 +515,10 @@ class ExcelFile(models.Model):
 
     def save(self, *args, **kwargs):
         self.filename = f"{self.sac.report_id}--{self.form_section}.xlsx"
-        super(ExcelFile, self).save(*args, **kwargs)
+        super().save(*args, **kwargs)
 
 
-def single_audit_report_path(instance, filename):
+def single_audit_report_path(instance, _filename):
     """
     We want the actual filename in the filesystem to be unique and determined
     by report_id, not the user-provided filename.
@@ -472,4 +545,6 @@ class SingleAuditReportFile(models.Model):
     def save(self, *args, **kwargs):
         report_id = SingleAuditChecklist.objects.get(id=self.sac.id).report_id
         self.filename = f"{report_id}.pdf"
-        super(SingleAuditReportFile, self).save(*args, **kwargs)
+        if self.sac.submission_status != self.sac.STATUS.IN_PROGRESS:
+            raise LateChangeError("Attempted PDF upload")
+        super().save(*args, **kwargs)

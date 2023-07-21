@@ -14,6 +14,7 @@ local single_cells = [
     title_cell: 'A1',
     range_cell: 'A2',
     validation: SV.StringOfLengthTwelve,
+    format: 'text',
     help: Help.uei,
   },
 ];
@@ -56,11 +57,14 @@ local sheets = [
     name: capSheet,
     open_ranges: Fun.make_open_ranges_with_column(title_row, open_ranges_defns),
     header_height: 48,
+    hide_col_from: 4,
   },
   {
     name: ueiSheet,
     single_cells: single_cells,
     header_height: 48,
+    //FIXME MSHD: commented this out until we figure out if it is needed
+    //hide_row_from: 3,
   },
 ];
 

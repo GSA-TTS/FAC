@@ -21,33 +21,37 @@ class ETL(object):
         audit_date = sac.general_information.get(
             "auditee_fiscal_period_start", datetime.now
         )
+<<<<<<< HEAD:backend/audit/etl/etl.py
         self.audit_year = audit_date.split("-")[0]
+=======
+        self.audit_year = int(audit_date.split("-")[0])
+>>>>>>> main:backend/audit/etl.py
 
     def load_all(self):
+        # TODO: Wrap each method call in try/except to collect errors.
         self.load_general()
+<<<<<<< HEAD:backend/audit/etl/etl.py
         self.load_gen_auditor()
         # self.load_federal_award()
+=======
+        self.load_federal_award()
+        self.load_findings()
+        self.load_passthrough()
+        self.load_finding_texts()
+        self.load_captext()
+>>>>>>> main:backend/audit/etl.py
 
     def load_finding_texts(self):
         findings_text = self.single_audit_checklist.findings_text
         findings_text_entries = findings_text["FindingsText"]["findings_text_entries"]
-        sequence_number = (
-            1  # TODO: replace this when we are getting sequence number in JSON
-        )
-
         for entry in findings_text_entries:
-            finding_text = FindingText(
-                charts_tables=entry["contains_chart_or_table"] == "Y",
+            finding_text_ = FindingText(
+                report_id=self.report_id,
                 finding_ref_number=entry["reference_number"],
-                sequence_number=sequence_number,
-                text=entry["text_of_finding"],
-                # dbkey=None,
-                # audit_year=self.audit_year,
-                # is_public=self.is_public,
-                # report_id=self.report_id
+                contains_chart_or_table=entry["contains_chart_or_table"] == "Y",
+                finding_text=entry["text_of_finding"],
             )
-            sequence_number += 1  # TODO: Remove this.
-            finding_text.save()
+            finding_text_.save()
 
     def load_findings(self):
         findings_uniform_guidance = (
@@ -60,25 +64,19 @@ class ETL(object):
         for entry in findings_uniform_guidance_entries:
             findings = entry["findings"]
             finding = Finding(
-                finding_ref_number=findings["reference_number"],
-                prior_finding_ref_numbers=findings.get("prior_references"),
-                modified_opinion=entry["modified_opinion"] == "Y",
-                other_non_compliance=entry["other_matters"] == "Y",
-                material_weakness=entry["material_weakness"] == "Y",
-                significant_deficiency=(entry["significant_deficiency"] == "Y"),
-                other_findings=entry["other_findings"] == "Y",
-                questioned_costs=entry["questioned_costs"] == "Y",
-                repeat_finding=(findings["repeat_prior_reference"] == "Y"),
-                type_requirement=(entry["program"]["compliance_requirement"]),
+                award_reference=entry["award_reference"],
                 report_id=self.report_id,
-                award_id=entry.get(
-                    "seq_number", 1
-                ),  # TODO: This will be the sequence number
-                # audit_id=audit_id,
-                # audit_findings_id=audit_id,
-                # audit_year=self.audit_year,
-                # dbkey=None,
-                # is_public=self.is_public,
+                finding_seq_number=entry["seq_number"],
+                finding_ref_number=findings["reference_number"],
+                is_material_weakness=entry["material_weakness"] == "Y",
+                is_modified_opinion=entry["modified_opinion"] == "Y",
+                is_other_findings=entry["other_findings"] == "Y",
+                is_other_non_compliance=entry["other_findings"] == "Y",
+                prior_finding_ref_numbers=findings.get("prior_references"),
+                is_questioned_costs=entry["questioned_costs"] == "Y",
+                is_repeat_finding=(findings["repeat_prior_reference"] == "Y"),
+                is_significant_deficiency=(entry["significant_deficiency"] == "Y"),
+                type_requirement=(entry["program"]["compliance_requirement"]),
             )
             finding.save()
 
@@ -95,7 +93,11 @@ class ETL(object):
             other_cluster_name = cluster.get("other_cluster_name")
             federal_award = FederalAward(
                 report_id=self.report_id,
+<<<<<<< HEAD:backend/audit/etl/etl.py
                 award_seq_number=entry.get("seq_number", 1),
+=======
+                award_reference=entry["award_reference"],
+>>>>>>> main:backend/audit/etl.py
                 federal_agency_prefix=program["federal_agency_prefix"],
                 federal_award_extension=program["three_digit_extension"],
                 additional_award_identification=program[
@@ -109,12 +111,21 @@ class ETL(object):
                 cluster_total=cluster["cluster_total"],
                 federal_program_total=program["federal_program_total"],
                 is_loan=loan["is_guaranteed"] == "Y",
+<<<<<<< HEAD:backend/audit/etl/etl.py
                 loan_balance=None,  # TODO: Where does this come from?
                 is_direct=is_direct,
                 is_major=program["is_major"] == "Y",
                 mp_audit_report_type=program["audit_report_type"],
                 findings_count=None,  # TODO: Where does this come from?  Is it needed?
                 passthrough_award=is_passthrough,
+=======
+                loan_balance=loan["loan_balance_at_audit_period_end"],
+                is_direct=is_direct,
+                is_major=program["is_major"] == "Y",
+                mp_audit_report_type=program["audit_report_type"],
+                findings_count=program["number_of_audit_findings"],
+                is_passthrough_award=is_passthrough,
+>>>>>>> main:backend/audit/etl.py
                 passthrough_amount=subrecipient_amount,
                 type_requirement=None,  # TODO: What is this?
             )
@@ -127,28 +138,39 @@ class ETL(object):
         ]
         for entry in corrective_action_plan_entries:
             cap_text = CapText(
+                report_id=self.report_id,
                 finding_ref_number=entry["reference_number"],
-                charts_tables=entry["contains_chart_or_table"] == "Y",
-                sequence_number=-1,  # TODO: fix this as sonn as we know what it should be
-                text=entry["planned_action"],
-                # dbkey=None,
-                # audit_year=self.audit_year,
-                # is_public=True, # TODO: fix this when necessary
-                # report_id=self.report_id
+                contains_chart_or_table=entry["contains_chart_or_table"] == "Y",
+                planned_action=entry["planned_action"],
             )
             cap_text.save()
 
     def load_note(self):
-        note = Note(
-            type_id="",  # TODO: What is this?
-            report_id=self.report_id,
-            version="",  # TODO: What is this?
-            sequence_number=-1,  # TODO: Where does this come from?
-            note_index=-1,  # TODO: Where does this come from?
-            content="",  # TODO: Where does this come from?
-            title="",  # TODO: Where does this come from?
-        )
-        note.save()
+        notes_to_sefa = self.single_audit_checklist.notes_to_sefa["NotesToSefa"]
+        accounting_policies = notes_to_sefa["accounting_policies"]
+        is_minimis_rate_used = notes_to_sefa["is_minimis_rate_used"]
+        rate_explained = notes_to_sefa["rate_explained"]
+        entries = notes_to_sefa["notes_to_sefa_entries"]
+        if not entries:
+            note = Note(
+                report_id=self.report_id,
+                accounting_policies=accounting_policies,
+                is_minimis_rate_used=is_minimis_rate_used,
+                rate_explained=rate_explained,
+            )
+            note.save()
+        else:
+            for entry in entries:
+                note = Note(
+                    report_id=self.report_id,
+                    note_seq_number=entry["seq_number"],
+                    content=entry["note_content"],
+                    note_title=entry["note_title"],
+                    accounting_policies=accounting_policies,
+                    is_minimis_rate_used=is_minimis_rate_used,
+                    rate_explained=rate_explained,
+                )
+                note.save()
 
     def load_revision(self):
         revision = Revision(
@@ -175,14 +197,16 @@ class ETL(object):
         revision.save()
 
     def load_passthrough(self):
-        passthrough = Passthrough(
-            passthrough_name=None,  # TODO: Where does this come from?
-            passthrough_id=None,  # TODO: Where does this come from?
-            audit_id=-1,  # TODO: Where does this come from?
-            audit_year=self.audit_year,
-            report_id=self.report_id,
-        )
-        passthrough.save()
+        federal_awards = self.single_audit_checklist.federal_awards
+        for entry in federal_awards["FederalAwards"]["federal_awards"]:
+            for entity in entry["direct_or_indirect_award"]["entities"]:
+                passthrough = Passthrough(
+                    award_reference=entry["award_reference"],
+                    report_id=self.report_id,
+                    passthrough_id=entity["passthrough_identifying_number"],
+                    passthrough_name=entity["passthrough_name"],
+                )
+                passthrough.save()
 
     def load_general(self):
         # TODO: Use the mixin to access general_information fields once that code
@@ -202,8 +226,12 @@ class ETL(object):
             auditee_state=general_information["auditee_state"],
             auditee_ein=general_information["ein"],
             auditee_uei=general_information["auditee_uei"],
+<<<<<<< HEAD:backend/audit/etl/etl.py
             auditee_addl_uei_list=[],  # TODO: Where does this come from?
             auditee_addl_ein_list=[],  # TODO: Where does this come from?
+=======
+            auditee_addl_uei_list=[],
+>>>>>>> main:backend/audit/etl.py
             auditee_zip=general_information["auditee_zip"],
             auditor_phone=general_information["auditor_phone"],
             auditor_state=general_information["auditor_state"],
@@ -215,8 +243,9 @@ class ETL(object):
             auditor_contact_name=general_information["auditor_contact_name"],
             auditor_email=general_information["auditor_email"],
             auditor_firm_name=general_information["auditor_firm_name"],
-            auditor_foreign_addr=None,  # TODO: Where does this come from?
+            auditor_foreign_addr=None,  # TODO:  What does this look like in the incoming json?
             auditor_ein=general_information["auditor_ein"],
+<<<<<<< HEAD:backend/audit/etl/etl.py
             pdf_url=None,  # TODO: Where does this come from?
             cognizant_agency=None,  # TODO: Where does this come from?
             oversight_agency=None,  # TODO: Where does this come from?
@@ -229,6 +258,13 @@ class ETL(object):
             date_received=None,  # TODO: Where does this come from?
             fy_end_date=general_information["auditee_fiscal_period_end"],
             fy_start_date=None,  # TODO: Where does this come from?
+=======
+            cognizant_agency=None,  # TODO: https://github.com/GSA-TTS/FAC/issues/1218
+            oversight_agency=None,  # TODO: https://github.com/GSA-TTS/FAC/issues/1218
+            initial_date_received=self.single_audit_checklist.date_created,
+            fy_end_date=general_information["auditee_fiscal_period_end"],
+            fy_start_date=general_information["auditee_fiscal_period_start"],
+>>>>>>> main:backend/audit/etl.py
             audit_year=self.audit_year,
             audit_type=general_information["audit_type"],
             is_significant_deficiency=None,  # TODO: Where does this come from?
@@ -237,7 +273,7 @@ class ETL(object):
             current_or_former_findings=None,  # TODO: Where does this come from?
             dollar_threshold=None,  # TODO: Where does this come from?
             is_duplicate_reports=None,  # TODO: Where does this come from?
-            entity_type=None,  # TODO: Where does this come from?
+            entity_type=None,  # TODO: AUDIT_TYPE_CODES in audit.models.SingleAuditChecklist
             is_going_concern=None,  # TODO: Where does this come from?
             is_low_risk=None,  # TODO: Where does this come from?
             is_material_noncompliance=None,  # TODO: Where does this come from?
@@ -251,18 +287,14 @@ class ETL(object):
             special_framework=None,  # TODO: Where does this come from?
             is_special_framework_required=None,  # TODO: Where does this come from?
             total_fed_expenditures=None,  # TODO: Where does this come from?
-            hist_type_of_entity=None,
             type_report_financial_statements=None,  # TODO: Where does this come from?
             type_report_major_program=None,  # TODO: Where does this come from?
             type_report_special_purpose_framework=None,  # TODO: Where does this come from?
             suppression_code=None,  # TODO: Where does this come from?
             type_audit_code="A133",  # TODO: Where does this come from?
-            cfac_report_id=None,  # TODO: Where does this come from?
-            cfac_version=None,  # TODO: Where does this come from?
-            dbkey=self.report_id,
-            is_public=None,  # TODO: Update this when we have a source for is_public.
-            # modified_date should auto-generate/update
-            # create_date should auto-generate
+            cfac_report_id=None,  # Should only be populated for historical data
+            dbkey=None,  # Should only be populated for historical data
+            is_public=None,  # Should be coming from SingleAuditChecklist
             data_source="G-FAC",
         )
         general.save()
