@@ -38,11 +38,11 @@ describe('login', () => {
                   });
                   cy.get('lg-submit-button > .usa-button').click();
               })
-              cy.url().should('contain', 'http://localhost:8000/audit/');
+              cy.url().should('match', '/audit/%');
           });
       } else {
           it('should not require authentication', () => {
-              cy.url().should('contain', 'http://localhost:8000/audit/')
+              cy.url().should('match', '/audit/$')
           });
       }
   });

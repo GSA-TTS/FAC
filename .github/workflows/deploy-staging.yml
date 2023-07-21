@@ -44,3 +44,10 @@ jobs:
     uses: ./.github/workflows/zap-scan.yml
     with:
       url: "https://fac-staging.app.cloud.gov/"
+
+  regression-test:
+    name: Run Regression Tests
+    uses: ./.github/workflows/end-to-end-test.yml
+    secrets: inherit
+    with:
+      url: "https://fac-staging.app.cloud.gov/"

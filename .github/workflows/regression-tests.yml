@@ -1,0 +1,48 @@
+---
+name: Runs end to end tests
+on:
+  workflow_dispatch:
+    inputs:
+      url:
+        description: "Base URL for Cypress"
+        required: true
+        type: string
+        default: "https://fac-staging.app.cloud.gov"
+  workflow_call:
+  # Called from deploy-staging.yml
+    inputs:
+      url:
+        description: "Base URL for Cypress"
+        required: true
+        type: string
+        default: "https://fac-staging.app.cloud.gov"
+  # Remove "push" trigger before opening PR
+  push:
+    branches:
+      - nmb/cypress-login
+  schedule:
+    - cron: '0 9 * * 1-5'
+
+jobs:
+  regression-testing:
+    runs-on: ubuntu-latest
+    environment: staging
+    env:
+      # CYPRESS_BASE_URL: ${{ inputs.url }}
+      CYPRESS_BASE_URL: "https://fac-staging.app.cloud.gov" # Remove this line and uncomment the above before PR
+      CYPRESS_LOGIN_TEST_EMAIL: ${{ secrets.CYPRESS_LOGIN_TEST_EMAIL }}
+      CYPRESS_LOGIN_TEST_PASSWORD: ${{ secrets.CYPRESS_LOGIN_TEST_PASSWORD }}
+      CYPRESS_LOGIN_TEST_OTP_SECRET: ${{ secrets.CYPRESS_LOGIN_TEST_OTP_SECRET }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Create .env file
+        run: touch .env
+
+      - name: Run Cypress tests
+        uses: cypress-io/github-action@v5
+        with:
+          working-directory: ./backend
+          spec: cypress/e2e/login.cy.js
+
