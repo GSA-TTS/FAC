@@ -1,5 +1,6 @@
 local FederalProgramNames = import 'FederalProgramNames.json';
 local Func = import 'Functions.libsonnet';
+local GGAP = import 'GGAP.libsonnet';
 
 local Const = {
   Y: 'Y',
@@ -251,13 +252,7 @@ local Enum = {
   },
   GGAPResults: Types.string {
     description: 'GGAP Results (Audit Information)',
-    enum: [
-      'unmodified_opinion',
-      'qualified_opinion',
-      'adverse_opinion',
-      'disclaimer_of_opinion',
-      'not_ggap',
-    ],
+    enum: std.map(function(pair) pair.tag, GGAP.ggap_results),
   },
   ALNPrefixes: Types.string {
     description: 'Valid two-digit program numbers; part of the CFDA/ALN',

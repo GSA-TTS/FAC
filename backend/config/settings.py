@@ -451,4 +451,6 @@ if DISABLE_AUTH:
         "users.auth.FACTestAuthenticationBackend",
     ]
 
+# A dictionary mapping agency number to agency name. dict[str, str]
 AGENCY_NAMES = get_agency_names()
+GGAP_RESULTS = get_ggap_results()

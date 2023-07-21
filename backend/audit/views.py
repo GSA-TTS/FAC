@@ -1,5 +1,5 @@
 import logging
-from audit.get_agency_names import get_agency_names
+from audit.get_agency_names import get_agency_names, get_ggap_results
 
 from django.views import generic
 from django.views.decorators.csrf import csrf_exempt
@@ -477,6 +477,7 @@ class AuditInfoFormView(SingleAuditChecklistAccessRequiredMixin, generic.View):
                 "auditee_uei": sac.auditee_uei,
                 "user_provided_organization_type": sac.user_provided_organization_type,
                 "agency_names": get_agency_names(),
+                "ggap_results": get_ggap_results(),
                 "form": current_info,
             }
 

@@ -39,6 +39,19 @@
                         What were the results of the auditor’s determination of whether the financial statements of the auditee were prepared in accordance with generally accepted accounting principles (GGAP)? <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
                     </legend>
                     <p class="text-base">Select any of the following that apply.</p>
+                    {% for pair in ggap_results %}
+                        <div class="usa-checkbox">
+                            <!-- TODO: these values should be pulled from the view (or the Jsonnet) -->
+                            <input id="ggap_results--{{pair.tag}}"
+                                name="ggap_results"
+                                class="usa-checkbox__input"
+                                required
+                                type="checkbox"
+                                value="{{pair.readable}}"
+                                {% if "Unmodified opinion" in form.cleaned_data.ggap_results %}checked{% endif %} />
+                            <label class="usa-checkbox__label" for="ggap_results--{{pair.tag}}">{{pair.readable}}</label>
+                        </div>
+                    {% endfor %}
                     <div class="usa-checkbox">
                         <!-- TODO: these values should be pulled from the view (or the Jsonnet) -->
                         <input id="ggap_results--unmodified_opinion"
@@ -269,10 +282,10 @@
                             multiple
                             required
                             size="18">
-                        {% for x in agency_names %}
+                        {% for number, name in agency_names.items %}
                             <option class="margin-top-1"
-                                    value="{{ x }}"
-                                    {% if x in form.cleaned_data.agencies %}selected{% endif %}>{{ x }}</option>
+                                    value="{{ number }}"
+                                    {% if x in form.cleaned_data.agencies %}selected{% endif %}>{{ name }}</option>
                         {% endfor %}
                     </select>
                     <span class="usa-error-message margin-top-2">{{ form.errors.agencies|striptags }}</span>
