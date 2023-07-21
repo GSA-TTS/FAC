@@ -28,7 +28,9 @@ describe('login', () => {
               cy.get('a.usa-button.sign-in-button').click();
               cy.get('button.usa-button.sign-in-button')
                   .should('contain.text', 'Authenticate with Login.gov').click();
-              cy.origin('https://idp.int.identitysandbox.gov/', {args: {LOGIN_TEST_EMAIL, LOGIN_TEST_PASSWORD}}, ({LOGIN_TEST_EMAIL, LOGIN_TEST_PASSWORD}) => {
+              cy.origin('https://idp.int.identitysandbox.gov/',
+                        {args: {LOGIN_TEST_EMAIL, LOGIN_TEST_PASSWORD}},
+                        ({LOGIN_TEST_EMAIL, LOGIN_TEST_PASSWORD}) => {
                   cy.get('#user_email').type(LOGIN_TEST_EMAIL);
                   cy.get('input[id^="password-toggle-input-"]').type(LOGIN_TEST_PASSWORD);
                   cy.get('lg-submit-button > .usa-button').click();
@@ -37,12 +39,18 @@ describe('login', () => {
                     cy.get('input.one-time-code-input__input').type(token);
                   });
                   cy.get('lg-submit-button > .usa-button').click();
+                  cy.url().then((url) => {
+                    if (url.match(/\/sign_up\/completed$/)) {
+                      // Login's additional data sharing consent
+                      cy.get('button:contains("Agree and continue")').click();
+                    }
+                  });
               })
-              cy.url().should('match', '/audit/%');
-          });
-      } else {
+              cy.url().should('match', /\/audit\/$/);
+            });
+          } else {
           it('should not require authentication', () => {
-              cy.url().should('match', '/audit/$')
+              cy.url().should('match', /\/audit\/$/)
           });
       }
   });
