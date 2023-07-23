@@ -181,9 +181,11 @@ class FederalAward(models.Model):
         null=True,
         help_text=docs.loans,
     )
-    loan_balance = models.BigIntegerField(
+    loan_balance = models.DecimalField(
         "The loan or loan guarantee (loan) balance outstanding at the end of the audit period.  A response of ‘N/A’ is acceptable.",
         null=True,
+        max_digits=10,
+        decimal_places=2,
         help_text=docs.loan_balance,
     )
     is_direct = models.BooleanField(
@@ -625,11 +627,38 @@ class General(models.Model):
         help_text=docs.audit_year_general,
     )
 
-    # Audit characteristics
     audit_type = models.CharField(
         "Type of Audit",
         max_length=40,
         help_text=docs.audit_type,
+    )
+
+    # Audit Info
+    gaap_results = models.TextField(
+        "GAAP Results by Auditor",
+        null=True,
+    )  # Concatenation of choices
+    sp_framework = models.CharField(
+        "Special Purpose Framework that was used as the basis of accounting",
+        max_length=40,
+        null=True,
+        help_text=docs.sp_framework,
+    )
+    is_sp_framework_required = models.BooleanField(
+        "Indicate whether or not the special purpose framework used as basis of accounting by state law or tribal law",
+        null=True,
+        help_text=docs.sp_framework_required,
+    )
+    sp_framework_auditor_opinion = models.CharField(
+        "The auditor's opinion on the special purpose framework",
+        max_length=40,
+        null=True,
+        help_text=docs.type_report_special_purpose_framework,
+    )
+    is_going_concern = models.BooleanField(
+        "Whether or not the audit contained a going concern paragraph on financial statements",
+        null=True,
+        help_text=docs.going_concern,
     )
     is_significant_deficiency = models.BooleanField(
         "Whether or not the audit disclosed a significant deficiency on financial statements",
@@ -639,6 +668,34 @@ class General(models.Model):
     is_material_weakness = models.BooleanField(
         "", null=True, help_text=docs.material_weakness_general
     )
+    is_material_noncompliance = models.BooleanField(
+        "Whether or not the audit disclosed a material noncompliance on financial statements",
+        null=True,
+        help_text=docs.material_noncompliance,
+    )
+    is_duplicate_reports = models.BooleanField(
+        "Whether or not the financial statements include departments that have separate expenditures not included in this audit",
+        null=True,
+        help_text=docs.dup_reports,
+    )  # is_aicpa_audit_guide_included
+    dollar_threshold = models.DecimalField(
+        "Dollar Threshold to distinguish between Type A and Type B programs.",
+        null=True,
+        max_digits=10,
+        decimal_places=2,
+        help_text=docs.dollar_threshold,
+    )
+    is_low_risk = models.BooleanField(
+        "Indicate whether or not the auditee qualified as a low-risk auditee",
+        null=True,
+        help_text=docs.low_risk,
+    )
+    agencies_with_prior_findings = models.TextField(
+        "List of agencues with prior findings",
+        null=True,
+    )  # Concatenation of agency codes
+    # End of Audit Info
+
     condition_or_deficiency_major_program = models.BooleanField(
         "Whether or not the audit disclosed a reportable condition/significant deficiency for any major program in the Schedule of Findings and Questioned Costs",
         null=True,
@@ -649,38 +706,13 @@ class General(models.Model):
         null=True,
         help_text=docs.current_or_former_findings,
     )
-    dollar_threshold = models.FloatField(
-        "Dollar Threshold to distinguish between Type A and Type B programs.",
-        null=True,
-        help_text=docs.dollar_threshold,
-    )
-    is_duplicate_reports = models.BooleanField(
-        "Whether or not the financial statements include departments that have separate expenditures not included in this audit",
-        null=True,
-        help_text=docs.dup_reports,
-    )
     entity_type = models.CharField(
         "Self reported type of entity (i.e., States, Local Governments, Indian Tribes, Institutions of Higher Education, NonProfit)",
         max_length=50,
         null=True,
         help_text=docs.entity_type,
     )
-    is_going_concern = models.BooleanField(
-        "Whether or not the audit contained a going concern paragraph on financial statements",
-        null=True,
-        help_text=docs.going_concern,
-    )
 
-    is_low_risk = models.BooleanField(
-        "Indicate whether or not the auditee qualified as a low-risk auditee",
-        null=True,
-        help_text=docs.low_risk,
-    )
-    is_material_noncompliance = models.BooleanField(
-        "Whether or not the audit disclosed a material noncompliance on financial statements",
-        null=True,
-        help_text=docs.material_noncompliance,
-    )
     material_weakness = models.BooleanField(
         "Whether or not the audit disclosed any reportable condition/significant deficiency as a material weakness on financial statements",
         null=True,
@@ -715,17 +747,7 @@ class General(models.Model):
         null=True,
         help_text=docs.report_required,
     )
-    special_framework = models.CharField(
-        "Special Purpose Framework that was used as the basis of accounting",
-        max_length=40,
-        null=True,
-        help_text=docs.sp_framework,
-    )
-    is_special_framework_required = models.BooleanField(
-        "Indicate whether or not the special purpose framework used as basis of accounting by state law or tribal law",
-        null=True,
-        help_text=docs.sp_framework_required,
-    )
+
     total_fed_expenditures = models.BigIntegerField(
         "Total Federal Expenditures",
         null=True,
@@ -743,32 +765,25 @@ class General(models.Model):
         null=True,
         help_text=docs.type_report_major_program_general,
     )
-    type_report_special_purpose_framework = models.CharField(
-        "The auditor's opinion on the special purpose framework",
-        max_length=40,
-        null=True,
-        help_text=docs.type_report_special_purpose_framework,
-    )
-    suppression_code = models.CharField(
-        "Determines whether the PDF audit will be displayed on the public site",
-        null=True,
-    )
+    # suppression_code = models.CharField(
+    #     "Determines whether the PDF audit will be displayed on the public site",
+    #     null=True,
+    # )
     type_audit_code = models.CharField("Determines if audit is A133 or UG", default="")
-    cfac_report_id = models.CharField(
-        "Used by CFAC to uniquely identify a submission", null=True
-    )
 
     # Metadata
-    dbkey = models.CharField(
-        "Audit Year and DBKEY (database key) combined make up the primary key. Only on records created by Census.",
-        max_length=40,
-        help_text=docs.dbkey_general,
-        null=True,
-    )
+    # cfac_report_id = models.CharField(
+    #     "Used by CFAC to uniquely identify a submission", null=True
+    # )
+    # dbkey = models.CharField(
+    #     "Audit Year and DBKEY (database key) combined make up the primary key. Only on records created by Census.",
+    #     max_length=40,
+    #     help_text=docs.dbkey_general,
+    #     null=True,
+    # )
     is_public = models.BooleanField(
         "True for public records, False for non-public records", null=True
     )
-
     # Choices are: C-FAC and G-FAC
     data_source = models.CharField("Origin of the upload", max_length=25)
 

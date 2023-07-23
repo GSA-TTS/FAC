@@ -240,6 +240,7 @@ class ETLTests(TestCase):
             findings_text=findings_text,
             corrective_action_plan=corrective_action_plan,
             secondary_auditors=self._fake_secondary_auditors(),
+            # audit_information=self._fake_audit_information(), TODO Un comment when frontend is done
         )
         sac.save()
         self.sac = sac
@@ -275,6 +276,24 @@ class ETLTests(TestCase):
             }
         }
         return secondary_auditors
+
+    def _fake_audit_information(self):
+        fake = Faker()
+
+        audit_information = {
+            "dollar_threshold": 10345.45,
+            "gaap_results": fake.word(),
+            "is_going_concern_included": "Y" if fake.boolean() else "N",
+            "is_internal_control_deficiency_disclosed": "Y" if fake.boolean() else "N",
+            "is_internal_control_material_weakness_disclosed": "Y"
+            if fake.boolean()
+            else "N",
+            "is_material_noncompliance_disclosed": "Y" if fake.boolean() else "N",
+            "is_aicpa_audit_guide_included": "Y" if fake.boolean() else "N",
+            "is_low_risk_auditee": "Y" if fake.boolean() else "N",
+            "agencies": fake.word(),
+        }
+        return audit_information
 
     def test_load_general(self):
         self.etl.load_general()
@@ -330,3 +349,11 @@ class ETLTests(TestCase):
         sec_auditor = SecondaryAuditor.objects.first()
         # print("SecondaryAuditor:", sec_auditor.auditor_name)
         self.assertEquals(self.sac.report_id, sec_auditor.report_id)
+
+    # TODO rename to test_load_audit once frontend is available
+    def todo_load_aidit_information(self):
+        self.etl.load_all()
+        general = General.objects.first()
+        sac = SingleAuditChecklist.objects.first()
+        print("general gaap_results:", general.gaap_results, sac.audit_information)
+        self.assertEquals(sac.audit_information["gaap_results"], general.gaap_results)
