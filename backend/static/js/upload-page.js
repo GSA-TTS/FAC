@@ -8,6 +8,7 @@ const UPLOAD_URLS = {
   'audit-findings-text': 'findings-text',
   'additional-ueis': 'additional-ueis',
   CAP: 'corrective-action-plan',
+  'secondary-auditors': 'secondary-auditors',
 };
 
 /*
@@ -131,7 +132,7 @@ function attachFileUploadHandler() {
                   handleErrorOnUpload(new Error(data.errors[0]));
                 info_box.innerHTML = get_error_table(data);
               } else if (data.type === 'error_field') {
-                info_box.innerHTML = `Field Error: ${res.errors}`;
+                info_box.innerHTML = `Field Error: ${data.errors}`;
               } else {
                 throw new Error('Returned error type is missing!');
               }

@@ -7,7 +7,7 @@ from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.views import View
 
-from audit.models import Access, SingleAuditChecklist
+from audit.models import Access, SingleAuditChecklist, LateChangeError
 from audit.validators import validate_general_information_json
 
 from report_submission.forms import GeneralInformationForm
@@ -189,6 +189,8 @@ class GeneralInformationFormView(LoginRequiredMixin, View):
             logger.warning(
                 "ValidationError for report ID %s: %s", report_id, err.message
             )
+        except LateChangeError:
+            return render(request, "audit/no-late-changes.html")
 
         raise BadRequest()
 

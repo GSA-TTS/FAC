@@ -1,6 +1,8 @@
 local FederalProgramNames = import 'FederalProgramNames.json';
 local Func = import 'Functions.libsonnet';
 local GAAP = import 'GAAP.libsonnet';
+local ComplianceRequirementTypes = import 'ComplianceRequirementTypes.json';
+local ClusterNames = import 'ClusterNames.json';
 
 local Const = {
   Y: 'Y',
@@ -411,54 +413,6 @@ local Compound = {
     description: 'Compliance requirement type',
     pattern: '^A?B?C?E?F?G?H?I?J?L?M?N?P?$',
   },
-  ClusterName: Types.string {
-    description: 'Cluster Name',
-    enum: [
-      'N/A',
-      'RESEARCH AND DEVELOPMENT',
-      'STUDENT FINANCIAL ASSISTANCE',
-      Const.STATE_CLUSTER,
-      '477 CLUSTER',
-      'AGING CLUSTER',
-      'CCDF CLUSTER',
-      'CDBG - DISASTER RECOVERY GRANTS - PUB. L. NO. 113-2 CLUSTER',
-      'CDBG - ENTITLEMENT GRANTS CLUSTER',
-      'CDFI CLUSTER',
-      'CHILD NUTRITION CLUSTER',
-      'CLEAN WATER STATE REVOLVING FUND CLUSTER',
-      'COMMUNITY FACILITIES LOANS AND GRANTS CLUSTER',
-      'DISABILITY INSURANCE/SSI CLUSTER',
-      'DRINKING WATER STATE REVOLVING FUND CLUSTER',
-      'ECONOMIC DEVELOPMENT CLUSTER',
-      'EMPLOYMENT SERVICE CLUSTER',
-      'FEDERAL TRANSIT CLUSTER',
-      'FISH AND WILDLIFE CLUSTER',
-      'FOOD DISTRIBUTION CLUSTER',
-      'FOREIGN FOOD AID DONATION CLUSTER',
-      'FOREST SERVICE SCHOOLS AND ROADS CLUSTER',
-      'FOSTER GRANDPARENT/SENIOR COMPANION CLUSTER',
-      'HEAD START CLUSTER',
-      'HEALTH CENTER PROGRAM CLUSTER',
-      'HIGHWAY PLANNING AND CONSTRUCTION CLUSTER',
-      'HIGHWAY SAFETY CLUSTER',
-      'HOPE VI CLUSTER',
-      'HOUSING VOUCHER CLUSTER',
-      'HURRICANE SANDY RELIEF CLUSTER',
-      'MATERNAL, INFANT, AND EARLY CHILDHOOD HOME VISITING CLUSTER',
-      'MEDICAID CLUSTER',
-      'SCHOOL IMPROVEMENT GRANTS CLUSTER',
-      'SECTION 8 PROJECT-BASED CLUSTER',
-      'SNAP CLUSTER',
-      'SPECIAL EDUCATION CLUSTER (IDEA)',
-      'TANF CLUSTER',
-      'TRANSIT SERVICES PROGRAMS CLUSTER',
-      'TRIO CLUSTER',
-      'WATER AND WASTE PROGRAM CLUSTER',
-      'WIOA CLUSTER',
-      Const.OTHER_CLUSTER,
-    ],
-    title: 'ClusterName',
-  },
 
   NonEmptyString: Types.string {
     minLength: 1,
@@ -491,6 +445,10 @@ local SchemaBase = Types.object {
   Meta: Meta,
   Enum: Enum,
   Compound: Compound {
+    ComplianceRequirementTypes: {
+      description: 'All compliance requirement types',
+      enum: ComplianceRequirementTypes.requirement_types
+    },
     FederalProgramNames: {
       description: 'All Federal program names',
       enum: FederalProgramNames.program_names,
@@ -503,6 +461,17 @@ local SchemaBase = Types.object {
       description: 'Unique ALN prefixes',
       enum: FederalProgramNames.aln_prefixes,
     },
+    # 20230719 HDMS FIXME: Because there is discrepancy between the ALN numbers 
+    # from the CSV and ALN numbers from the Enum object above, I commented out the ALNPrefixes enum below.  
+    # This is a temporary fix until we figure how the resolve the discrepancy (i.e., which list to use as source of truth).  
+    // ALNPrefixes: {
+    //   description: 'Unique ALN prefixes',
+    //   enum: FederalProgramNames.aln_prefixes
+    // },
+    ClusterNames: {
+      description: 'All cluster names',
+      enum: ClusterNames.cluster_names + [Const.NA, Const.OTHER_CLUSTER]
+    }
   },
   Validation: Validation,
   SchemaBase: SchemaBase,

@@ -19,12 +19,14 @@ from .fixtures.excel import (
     CORRECTIVE_ACTION_PLAN_TEMPLATE,
     FINDINGS_TEXT_TEMPLATE,
     FINDINGS_UNIFORM_GUIDANCE_TEMPLATE,
+    SECONDARY_AUDITORS_TEMPLATE,
     NOTES_TO_SEFA_TEMPLATE,
     CORRECTIVE_ACTION_PLAN_ENTRY_FIXTURES,
     FINDINGS_TEXT_ENTRY_FIXTURES,
     FINDINGS_UNIFORM_GUIDANCE_ENTRY_FIXTURES,
     FEDERAL_AWARDS_ENTRY_FIXTURES,
     ADDITIONAL_UEIS_ENTRY_FIXTURES,
+    SECONDARY_AUDITORS_ENTRY_FIXTURES,
     NOTES_TO_SEFA_ENTRY_FIXTURES,
     FORM_SECTIONS,
 )
@@ -664,6 +666,100 @@ class ExcelFileHandlerViewTests(TestCase):
                 self.assertEqual(
                     findings_entries["reference_number"],
                     test_data[0]["reference_number"],
+                )
+
+    @patch("audit.validators._scan_file")
+    def test_valid_file_upload_for_secondary_auditors(self, mock_scan_file):
+        """When a valid Excel file is uploaded, the file should be stored and the SingleAuditChecklist should be updated to include the uploaded secondary auditors data"""
+
+        sac = _mock_login_and_scan(self.client, mock_scan_file)
+        test_data = json.loads(
+            SECONDARY_AUDITORS_ENTRY_FIXTURES.read_text(encoding="utf-8")
+        )
+
+        # add valid data to the workbook
+        workbook = load_workbook(SECONDARY_AUDITORS_TEMPLATE, data_only=True)
+        _set_by_name(workbook, "auditee_uei", ExcelFileHandlerViewTests.GOOD_UEI)
+
+        _add_entry(workbook, 0, test_data[0])
+
+        with NamedTemporaryFile(suffix=".xlsx") as tmp:
+            workbook.save(tmp.name)
+            tmp.seek(0)
+
+            with open(tmp.name, "rb") as excel_file:
+                response = self.client.post(
+                    reverse(
+                        f"audit:{FORM_SECTIONS.SECONDARY_AUDITORS}",
+                        kwargs={
+                            "report_id": sac.report_id,
+                            "form_section": FORM_SECTIONS.SECONDARY_AUDITORS,
+                        },
+                    ),
+                    data={"FILES": excel_file},
+                )
+
+                self.assertEqual(response.status_code, 302)
+
+                updated_sac = SingleAuditChecklist.objects.get(pk=sac.id)
+
+                self.assertEqual(
+                    updated_sac.secondary_auditors["SecondaryAuditors"]["auditee_uei"],
+                    ExcelFileHandlerViewTests.GOOD_UEI,
+                )
+
+                self.assertEqual(
+                    len(
+                        updated_sac.secondary_auditors["SecondaryAuditors"][
+                            "secondary_auditors_entries"
+                        ]
+                    ),
+                    1,
+                )
+
+                secondary_auditors_entries = updated_sac.secondary_auditors[
+                    "SecondaryAuditors"
+                ]["secondary_auditors_entries"][0]
+
+                self.assertEqual(
+                    secondary_auditors_entries["secondary_auditor_name"],
+                    test_data[0]["secondary_auditor_name"],
+                )
+                self.assertEqual(
+                    secondary_auditors_entries["secondary_auditor_ein"],
+                    test_data[0]["secondary_auditor_ein"],
+                )
+                self.assertEqual(
+                    secondary_auditors_entries["secondary_auditor_address_street"],
+                    test_data[0]["secondary_auditor_address_street"],
+                )
+                self.assertEqual(
+                    secondary_auditors_entries["secondary_auditor_address_city"],
+                    test_data[0]["secondary_auditor_address_city"],
+                )
+                self.assertEqual(
+                    secondary_auditors_entries["secondary_auditor_address_state"],
+                    test_data[0]["secondary_auditor_address_state"],
+                )
+                self.assertEqual(
+                    secondary_auditors_entries["secondary_auditor_address_zipcode"],
+                    test_data[0]["secondary_auditor_address_zipcode"],
+                )
+                self.assertEqual(
+                    secondary_auditors_entries["secondary_auditor_contact_name"],
+                    test_data[0]["secondary_auditor_contact_name"],
+                )
+                self.assertEqual(
+                    secondary_auditors_entries["secondary_auditor_contact_title"],
+                    test_data[0]["secondary_auditor_contact_title"],
+                )
+                self.assertEqual(
+                    secondary_auditors_entries["secondary_auditor_contact_phone"],
+                    test_data[0]["secondary_auditor_contact_phone"],
+                )
+                self.assertEqual(
+                    secondary_auditors_entries["secondary_auditor_contact_email"],
+                    test_data[0]["secondary_auditor_contact_email"],
                 )
 
 

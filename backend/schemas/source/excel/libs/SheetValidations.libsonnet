@@ -68,6 +68,14 @@ local StringOfLengthThree = {
   custom_title: 'Must be length of 3',
 };
 
+local StringOfLengthNine = {
+  type: 'textLength',
+  operator: 'equal',
+  formula1: 9,
+  custom_error: 'Expecting something with nine characters',
+  custom_title: 'Must be length of 9',
+};
+
 local StringOfLengthTwelve = {
   type: 'textLength',
   operator: 'equal',
@@ -84,18 +92,9 @@ local LoanBalanceValidation = {
   custom_title: 'Loan Balance',
 };
 
-local ComplianceRequirementValidation = {
-  type: 'custom',
-  //This formula only checks if valid characters are used, it does not validate alphabetical order
-  //The json schema validation checks both valid characters and alphabetical order
-  formula1: '=IF(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(FIRSTCELLREF, "A", ""), "B", ""), "C", ""), "E", ""), "F", ""), "G", ""), "H", ""), "I", ""), "J", ""), "L", ""), "M", ""), "N", ""), "P", "")<>"", "Invalid", "Valid")',
-  custom_error: 'Expecting a valid combination of the letters: A,B,C,E,F,G,H,I,J,L,M,N,P',
-  custom_title: 'Compliance requirement',
-};
-
 local AwardReferenceValidation = {
   type: 'custom',
-  formula1: '=AND(LEN(FIRSTCELLREF)=10, LEFT(FIRSTCELLREF, 6)="AWARD-", ISNUMBER(VALUE(MID(FIRSTCELLREF, 7, 4))))',
+  formula1: '=AND(LEN(FIRSTCELLREF)=10, LEFT(FIRSTCELLREF, 6)="AWARD-", ISNUMBER(VALUE(MID(FIRSTCELLREF, 7, 4))), NOT(FIRSTCELLREF="AWARD-0000"))',
   custom_error: 'The value should follow the pattern AWARD-#### (where #### is a four-digit number).',
   custom_title: 'Award Reference validation',
 };
@@ -107,10 +106,10 @@ local AwardReferenceValidation = {
   LookupValidation: LookupValidation,
   RangeLookupValidation: RangeLookupValidation,
   StringOfLengthThree: StringOfLengthThree,
+  StringOfLengthNine: StringOfLengthNine,
   StringOfLengthTwelve: StringOfLengthTwelve,
   YoNValidation: YoNValidation,
   ReferenceNumberValidation: ReferenceNumberValidation,
-  ComplianceRequirementValidation: ComplianceRequirementValidation,
   LoanBalanceValidation: LoanBalanceValidation,
   AuditReportTypeValidation(namedRange): {
     type: 'list',

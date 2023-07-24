@@ -23,6 +23,7 @@ from .validators import (
     validate_findings_text_json,
     validate_findings_uniform_guidance_json,
     validate_general_information_json,
+    validate_secondary_auditors_json,
     validate_notes_to_sefa_json,
     validate_single_audit_report_file,
     validate_audit_information_json,
@@ -94,10 +95,86 @@ def json_property_mixin_generator(name, fname=None, toplevel=None, classname=Non
 GeneralInformationMixin = json_property_mixin_generator("GeneralInformation")
 
 
+class LateChangeError(Exception):
+    pass
+
+
 class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: ignore
     """
     Monolithic Single Audit Checklist.
     """
+
+    # Class management machinery:
+    class Meta:
+        """We need to set the name for the admin view."""
+
+        verbose_name = "SF-SAC"
+        verbose_name_plural = "SF-SACs"
+
+    objects = SingleAuditChecklistManager()
+
+    # Method overrides:
+    def __str__(self):
+        return f"#{self.id}--{self.report_id}--{self.auditee_uei}"
+
+    def save(self, *args, **kwds):
+        """
+        Call _reject_late_changes() to verify that a submission that's no longer
+        in progress isn't being altered; skip this if we know this submission is
+        in progress.
+        """
+        if self.submission_status != self.STATUS.IN_PROGRESS:
+            try:
+                self._reject_late_changes()
+            except LateChangeError as err:
+                raise LateChangeError from err
+
+        return super().save(*args, **kwds)
+
+    def _reject_late_changes(self):
+        """
+        This should only be called if status isn't STATUS.IN_PROGRESS.
+        If there have been relevant changes, raise an AssertionError.
+        Here, "relevant" means anything other than fields related to the status
+        transition change itself.
+        """
+        try:
+            prior_obj = SingleAuditChecklist.objects.get(pk=self.pk)
+        except SingleAuditChecklist.DoesNotExist:
+            # No prior instance exists, so it's a new submission.
+            return True
+
+        current = audit.cross_validation.sac_validation_shape(self)
+        prior = audit.cross_validation.sac_validation_shape(prior_obj)
+        if current["sf_sac_sections"] != prior["sf_sac_sections"]:
+            raise LateChangeError
+
+        meta_fields = ("submitted_by", "date_created", "report_id", "audit_type")
+        for field in meta_fields:
+            if current["sf_sac_meta"][field] != prior["sf_sac_meta"][field]:
+                raise LateChangeError
+
+        return True
+
+    # Constants:
+    class STATUS:
+        """The states that a submission can be in."""
+
+        IN_PROGRESS = "in_progress"
+        READY_FOR_CERTIFICATION = "ready_for_certification"
+        AUDITOR_CERTIFIED = "auditor_certified"
+        AUDITEE_CERTIFIED = "auditee_certified"
+        CERTIFIED = "certified"
+        SUBMITTED = "submitted"
+
+    STATUS_CHOICES = (
+        (STATUS.IN_PROGRESS, "In Progress"),
+        (STATUS.READY_FOR_CERTIFICATION, "Ready for Certification"),
+        (STATUS.AUDITOR_CERTIFIED, "Auditor Certified"),
+        (STATUS.AUDITEE_CERTIFIED, "Auditee Certified"),
+        (STATUS.CERTIFIED, "Certified"),
+        (STATUS.SUBMITTED, "Submitted"),
+    )
 
     USER_PROVIDED_ORGANIZATION_TYPE_CODE = (
         ("state", _("State")),
@@ -119,27 +196,6 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         ("biennial", _("Biennial")),
         ("other", _("Other")),
     )
-
-    class STATUS:
-        """The states that a submission can be in."""
-
-        IN_PROGRESS = "in_progress"
-        READY_FOR_CERTIFICATION = "ready_for_certification"
-        AUDITOR_CERTIFIED = "auditor_certified"
-        AUDITEE_CERTIFIED = "auditee_certified"
-        CERTIFIED = "certified"
-        SUBMITTED = "submitted"
-
-    STATUS_CHOICES = (
-        (STATUS.IN_PROGRESS, "In Progress"),
-        (STATUS.READY_FOR_CERTIFICATION, "Ready for Certification"),
-        (STATUS.AUDITOR_CERTIFIED, "Auditor Certified"),
-        (STATUS.AUDITEE_CERTIFIED, "Auditee Certified"),
-        (STATUS.CERTIFIED, "Certified"),
-        (STATUS.SUBMITTED, "Submitted"),
-    )
-
-    objects = SingleAuditChecklistManager()
 
     # 0. Meta data
     submitted_by = models.ForeignKey(User, on_delete=models.PROTECT)
@@ -204,6 +260,11 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
     # Additional UEIs:
     additional_ueis = models.JSONField(
         blank=True, null=True, validators=[validate_additional_ueis_json]
+    )
+
+    # Secondary Auditors:
+    secondary_auditors = models.JSONField(
+        blank=True, null=True, validators=[validate_secondary_auditors_json]
     )
 
     # Notes to SEFA:
@@ -389,15 +450,6 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
             pass
         return None
 
-    class Meta:
-        """We need to set the name for the admin view."""
-
-        verbose_name = "SF-SAC"
-        verbose_name_plural = "SF-SACs"
-
-    def __str__(self):
-        return f"#{self.id} - UEI({self.auditee_uei})"
-
 
 class Access(models.Model):
     """
@@ -468,10 +520,10 @@ class ExcelFile(models.Model):
 
     def save(self, *args, **kwargs):
         self.filename = f"{self.sac.report_id}--{self.form_section}.xlsx"
-        super(ExcelFile, self).save(*args, **kwargs)
+        super().save(*args, **kwargs)
 
 
-def single_audit_report_path(instance, filename):
+def single_audit_report_path(instance, _filename):
     """
     We want the actual filename in the filesystem to be unique and determined
     by report_id, not the user-provided filename.
@@ -498,4 +550,6 @@ class SingleAuditReportFile(models.Model):
     def save(self, *args, **kwargs):
         report_id = SingleAuditChecklist.objects.get(id=self.sac.id).report_id
         self.filename = f"{report_id}.pdf"
-        super(SingleAuditReportFile, self).save(*args, **kwargs)
+        if self.sac.submission_status != self.sac.STATUS.IN_PROGRESS:
+            raise LateChangeError("Attempted PDF upload")
+        super().save(*args, **kwargs)
