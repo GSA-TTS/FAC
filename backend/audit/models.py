@@ -114,7 +114,7 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
 
     # Method overrides:
     def __str__(self):
-        return f"#{self.id} - UEI({self.auditee_uei})"
+        return f"#{self.id}--{self.report_id}--{self.auditee_uei}"
 
     def save(self, *args, **kwds):
         """
