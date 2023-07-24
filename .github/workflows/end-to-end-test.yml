@@ -7,9 +7,9 @@ jobs:
     runs-on: ubuntu-latest
     env:
       ENV: TESTING
-      SAM_API_KEY: ${{ secrets.SAM_API_KEY }}"
+      SAM_API_KEY: ${{ secrets.SAM_API_KEY }}
       DJANGO_BASE_URL: 'http://localhost:8000'
-      DJANGO_SECRET_LOGIN_KEY: ${{ secrets.DJANGO_SECRET_LOGIN_KEY }}"
+      DJANGO_SECRET_LOGIN_KEY: ${{ secrets.DJANGO_SECRET_LOGIN_KEY }}
       SECRET_KEY: ${{ secrets.SECRET_KEY }}
       ALLOWED_HOSTS: '0.0.0.0 127.0.0.1 localhost'
       DISABLE_AUTH: True
@@ -20,7 +20,7 @@ jobs:
           node-version: 18
       - name: Start services
         working-directory: ./backend
-        run: touch .env && docker-compose up -d
+        run: touch .env && docker compose up -d
       - name: Run Cypress
         working-directory: ./backend
         run: |

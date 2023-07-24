@@ -7,6 +7,13 @@ export https_proxy="$(echo "$VCAP_SERVICES" | jq --raw-output --arg service_name
 export smtp_proxy_domain="$(echo "$VCAP_SERVICES" | jq --raw-output --arg service_name "smtp-proxy-creds" ".[][] | select(.name == \$service_name) | .credentials.domain")"
 export smtp_proxy_port="$(echo "$VCAP_SERVICES" | jq --raw-output --arg service_name "smtp-proxy-creds" ".[][] | select(.name == \$service_name) | .credentials.port")"
 
+S3_ENDPOINT_FOR_NO_PROXY="$(echo $VCAP_SERVICES | jq --raw-output --arg service_name "fac-public-s3" ".[][] | select(.name == \$service_name) | .credentials.endpoint")"
+S3_FIPS_ENDPOINT_FOR_NO_PROXY="$(echo $VCAP_SERVICES | jq --raw-output --arg service_name "fac-public-s3" ".[][] | select(.name == \$service_name) | .credentials.fips_endpoint")"
+S3_PRIVATE_ENDPOINT_FOR_NO_PROXY="$(echo $VCAP_SERVICES | jq --raw-output --arg service_name "fac-private-s3" ".[][] | select(.name == \$service_name) | .credentials.endpoint")"
+S3_PRIVATE_FIPS_ENDPOINT_FOR_NO_PROXY="$(echo $VCAP_SERVICES | jq --raw-output --arg service_name "fac-private-s3" ".[][] | select(.name == \$service_name) | .credentials.fips_endpoint")"
+export no_proxy="${S3_ENDPOINT_FOR_NO_PROXY},${S3_FIPS_ENDPOINT_FOR_NO_PROXY},${S3_PRIVATE_ENDPOINT_FOR_NO_PROXY},${S3_PRIVATE_FIPS_ENDPOINT_FOR_NO_PROXY},apps.internal"
+
+
 # Grab the New Relic license key from the newrelic-creds user-provided service instance
 export NEW_RELIC_LICENSE_KEY="$(echo "$VCAP_SERVICES" | jq --raw-output --arg service_name "newrelic-creds" ".[][] | select(.name == \$service_name) | .credentials.NEW_RELIC_LICENSE_KEY")"
 
@@ -29,9 +36,18 @@ export NEW_RELIC_HOST="gov-collector.newrelic.com"
 # for additional app instances, so we gate all of this behind CF_INSTANCE_INDEX
 # being 0.
 [ "$CF_INSTANCE_INDEX" = 0 ] &&
+echo 'Starting API schema deprecation' &&
+python manage.py drop_deprecated_api_schemas_and_views &&
+echo 'Finished API schema deprecation' &&
+echo 'Starting API schema creation' &&
+python manage.py create_api_schemas &&
+echo 'Finished API schema creation' &&
 echo 'Starting migrate' &&
 python manage.py migrate &&
 echo 'Finished migrate' &&
+echo 'Starting API view creation' &&
+python manage.py create_api_views &&
+echo 'Finished view creation' &&
 echo 'Starting collectstatic' &&
 python manage.py collectstatic --noinput &&
 echo 'Finished collectstatic'

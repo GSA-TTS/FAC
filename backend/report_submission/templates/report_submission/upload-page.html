@@ -1,19 +1,20 @@
 {% extends "base.html" %}
 {% load static %}
 {% block content %}
-<header class="usa-header usa-header-basic bg-primary-darker">
-	<div class="usa-nav-container">
-		<div class="usa-navbar bg-primary-darker text-white width-full flex">
-			<p class="margin-left-2">
-				<a href="/" class="text-gray-10">My audit submissions</a> » 
-                <a href="/audit/submission-progress/{{ report_id }}" class="text-gray-10">{{ auditee_name | default_if_none:'' }}</a> » 
-                <span class="text-bold">{{ view_name }}</span>
-			</p>
-		</div>
-	</div>
-</header>
+    <header class="usa-header usa-header-basic bg-primary-darker">
+        <div class="usa-nav-container">
+            <div class="usa-navbar bg-primary-darker text-white width-full flex">
+                <p class="margin-left-2">
+                    <a href="/" class="text-gray-10">My audit submissions</a> »
+                    <a href="/audit/submission-progress/{{ report_id }}"
+                       class="text-gray-10">{{ auditee_name | default_if_none:'' }}</a> »
+                    <span class="text-bold">{{ view_name }}</span>
+                </p>
+            </div>
+        </div>
+    </header>
     <div class="grid-container margin-top-6">
-        <div class="grid-row grid-gap">
+        <div class="grid-col grid-gap">
             {% comment %} {% include "../sidenav.html" %} {% endcomment %}
             <form class="usa-form usa-form--large"
                   id="{{ view_id }}"
@@ -39,12 +40,14 @@
                                accept=".xlsx"/>
                     </div>
                     {% if already_submitted %}
-                        <p class="text-green" id="already-submitted">A file has already been uploaded for this section. A successful reupload will overwrite your previous submission.</p>
+                        <p class="text-green" id="already-submitted">
+                            A file has already been uploaded for this section. A successful reupload will overwrite your previous submission.
+                        </p>
                     {% endif %}
-                    <p hidden id="info_box"></p>
-                    <button class="usa-button" id="continue" disabled="disabled">Continue to next section</button>
+                    <button class="usa-button" id="continue" disabled="disabled">Return to Report Home</button>
                 </fieldset>
             </form>
+            <div hidden id="info_box" class="grid-row margin-bottom-6"></div>
         </div>
     </div>
     {% include "audit-metadata.html" %}
