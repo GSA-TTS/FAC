@@ -9,6 +9,7 @@ from dissemination.models import (
     Revision,
     Passthrough,
     General,
+    SecondaryAuditor,
 )
 from audit.models import SingleAuditChecklist
 
@@ -25,11 +26,13 @@ class ETL(object):
     def load_all(self):
         # TODO: Wrap each method call in try/except to collect errors.
         self.load_general()
+        self.load_secondary_auditor()
         self.load_federal_award()
         self.load_findings()
         self.load_passthrough()
         self.load_finding_texts()
         self.load_captext()
+        # self.load_audit_info() TODO uncomment once the frontend is available
 
     def load_finding_texts(self):
         findings_text = self.single_audit_checklist.findings_text
@@ -185,10 +188,22 @@ class ETL(object):
                 )
                 passthrough.save()
 
+    def _get_dates_from_sac(self):
+        return_dict = dict()
+        sac = self.single_audit_checklist
+        for status_choice in sac.STATUS_CHOICES:
+            status = status_choice[0]
+            if status in sac.transition_name:
+                return_dict[status] = sac.get_transition_date(status)
+            else:
+                return_dict[status] = None
+        return return_dict
+
     def load_general(self):
         # TODO: Use the mixin to access general_information fields once that code
         #       is merged.
         general_information = self.single_audit_checklist.general_information
+        dates_by_status = self._get_dates_from_sac()
         general = General(
             report_id=self.report_id,
             auditee_certify_name=None,  # TODO: Where does this come from?
@@ -220,6 +235,21 @@ class ETL(object):
             cognizant_agency=None,  # TODO: https://github.com/GSA-TTS/FAC/issues/1218
             oversight_agency=None,  # TODO: https://github.com/GSA-TTS/FAC/issues/1218
             initial_date_received=self.single_audit_checklist.date_created,
+            ready_for_certification_date=dates_by_status[
+                self.single_audit_checklist.STATUS.READY_FOR_CERTIFICATION
+            ],
+            auditor_certified_date=dates_by_status[
+                self.single_audit_checklist.STATUS.AUDITOR_CERTIFIED
+            ],
+            auditee_certified_date=dates_by_status[
+                self.single_audit_checklist.STATUS.AUDITEE_CERTIFIED
+            ],
+            certified_date=dates_by_status[
+                self.single_audit_checklist.STATUS.CERTIFIED
+            ],
+            submitted_date=dates_by_status[
+                self.single_audit_checklist.STATUS.SUBMITTED
+            ],
             fy_end_date=general_information["auditee_fiscal_period_end"],
             fy_start_date=general_information["auditee_fiscal_period_start"],
             audit_year=self.audit_year,
@@ -230,7 +260,7 @@ class ETL(object):
             current_or_former_findings=None,  # TODO: Where does this come from?
             dollar_threshold=None,  # TODO: Where does this come from?
             is_duplicate_reports=None,  # TODO: Where does this come from?
-            entity_type=None,  # TODO: AUDIT_TYPE_CODES in audit.models.SingleAuditChecklist
+            entity_type=general_information["user_provided_organization_type"],
             is_going_concern=None,  # TODO: Where does this come from?
             is_low_risk=None,  # TODO: Where does this come from?
             is_material_noncompliance=None,  # TODO: Where does this come from?
@@ -241,17 +271,64 @@ class ETL(object):
             prior_year_schedule=None,  # TODO: Notes say this hasn't been used since 2016.
             questioned_costs=None,  # TODO: Notes say this hasn't been used since 2013.
             report_required=None,  # TODO: Notes say this hasn't been used since 2008.
-            special_framework=None,  # TODO: Where does this come from?
-            is_special_framework_required=None,  # TODO: Where does this come from?
             total_fed_expenditures=None,  # TODO: Where does this come from?
             type_report_financial_statements=None,  # TODO: Where does this come from?
             type_report_major_program=None,  # TODO: Where does this come from?
-            type_report_special_purpose_framework=None,  # TODO: Where does this come from?
-            suppression_code=None,  # TODO: Where does this come from?
             type_audit_code="A133",  # TODO: Where does this come from?
-            cfac_report_id=None,  # Should only be populated for historical data
-            dbkey=None,  # Should only be populated for historical data
             is_public=None,  # Should be coming from SingleAuditChecklist
             data_source="G-FAC",
         )
+        general.save()
+
+    def load_secondary_auditor(self):
+        secondary_auditors = self.single_audit_checklist.secondary_auditors
+
+        for secondary_auditor in secondary_auditors["SecondaryAuditors"][
+            "secondary_auditors_entries"
+        ]["items"]:
+            sec_auditor = SecondaryAuditor(
+                report_id=self.single_audit_checklist.report_id,
+                auditor_seq_number=secondary_auditor["secondary_auditor_seq_number"],
+                auditor_ein=secondary_auditor["secondary_auditor_ein"],
+                auditor_name=secondary_auditor["secondary_auditor_name"],
+                contact_name=secondary_auditor["secondary_auditor_contact_name"],
+                contact_title=secondary_auditor["secondary_auditor_contact_title"],
+                contact_email=secondary_auditor["secondary_auditor_contact_email"],
+                contact_phone=secondary_auditor["secondary_auditor_contact_phone"],
+                address_street=secondary_auditor["secondary_auditor_address_street"],
+                address_city=secondary_auditor["secondary_auditor_address_city"],
+                address_state=secondary_auditor["secondary_auditor_address_state"],
+                address_zipcode=secondary_auditor["secondary_auditor_address_zipcode"],
+            )
+            sec_auditor.save()
+
+    def load_audit_info(self):
+        general = General.objects.get(report_id=self.single_audit_checklist.report_id)
+        audit_information = self.single_audit_checklist.audit_information
+
+        general.gaap_results = audit_information["gaap_results"]
+        """
+            TODO:
+            Missing in schema
+            general.sp_framework = audit_information[]
+            general.is_sp_framework_required = audit_information[]
+            general.sp_framework_auditor_opinion = audit_information[]
+        """
+        general.is_going_concern = audit_information["is_going_concern_included"] == "Y"
+        general.is_significant_deficiency = (
+            audit_information["is_internal_control_deficiency_disclosed"] == "Y"
+        )
+        general.is_material_weakness = (
+            audit_information["is_internal_control_material_weakness_disclosed"] == "Y"
+        )
+        general.is_material_noncompliance = (
+            audit_information["is_material_noncompliance_disclosed"] == "Y"
+        )
+        general.is_duplicate_reports = (
+            audit_information["is_aicpa_audit_guide_included"] == "Y"
+        )
+        general.dollar_threshold = audit_information["dollar_threshold"]
+        general.is_low_risk = audit_information["is_low_risk_auditee"] == "Y"
+        general.agencies_with_prior_findings = audit_information["agencies"]
+
         general.save()

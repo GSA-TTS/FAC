@@ -8,7 +8,12 @@ class SACAdmin(admin.ModelAdmin):
 
 
 class AccessAdmin(admin.ModelAdmin):
-    list_display = ("role", "email", "user")
+    """
+    Fields we want in the admin view for Access; we're not showing user here because
+    it's redundant with email in almost all circumstances.
+    """
+
+    list_display = ("sac", "role", "email")
     list_filter = ["role"]
 
 
