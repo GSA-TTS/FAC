@@ -419,7 +419,7 @@ class SubmissionProgressView(SingleAuditChecklistAccessRequiredMixin, generic.Vi
                     "completed_by": None,
                 },
                 "audit_information_form": {
-                    "completed": False,
+                    "completed": True if (sac.audit_information) else False,
                     "completed_date": None,
                     "completed_by": None,
                 },
