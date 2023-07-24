@@ -41,7 +41,6 @@
                     <p class="text-base">Select any of the following that apply.</p>
                     {% for pair in gaap_results %}
                         <div class="usa-checkbox">
-                            <!-- TODO: these values should be pulled from the view (or the Jsonnet) -->
                             <input id="gaap_results--{{pair.tag}}"
                                 name="gaap_results"
                                 class="usa-checkbox__input"

@@ -529,9 +529,6 @@ class AuditInfoFormView(SingleAuditChecklistAccessRequiredMixin, generic.View):
                 "form": current_info,
             }
 
-            # TODO: check if there's already a form in the DB and let the user know
-            # context['already_submitted'] = ...
-
             return render(request, "audit/audit-info-form.html", context)
         except SingleAuditChecklist.DoesNotExist:
             raise PermissionDenied("You do not have access to this audit.")
@@ -548,6 +545,7 @@ class AuditInfoFormView(SingleAuditChecklistAccessRequiredMixin, generic.View):
 
             if form.is_valid():
                 form.clean_booleans()
+                print("look at me", form.cleaned_data)
 
                 audit_information = sac.audit_information or {}
                 logger.warn(form.cleaned_data)
