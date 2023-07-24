@@ -35,7 +35,7 @@
   },
   "AuditInformationCase": {
     "AuditInformation": {
-      "ggap_results": [],
+      "gaap_results": [],
       "is_going_concern_included": true,
       "is_internal_control_deficiency_disclosed": false,
       "is_internal_control_material_weakness_disclosed": false ,

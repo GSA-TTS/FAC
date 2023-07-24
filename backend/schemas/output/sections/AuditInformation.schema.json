@@ -84,15 +84,15 @@
       "dollar_threshold": {
          "type": "integer"
       },
-      "ggap_results": {
+      "gaap_results": {
          "items": {
-            "description": "GGAP Results (Audit Information)",
+            "description": "GAAP Results (Audit Information)",
             "enum": [
                "unmodified_opinion",
                "qualified_opinion",
                "adverse_opinion",
                "disclaimer_of_opinion",
-               "not_ggap"
+               "not_gaap"
             ],
             "type": "string"
          },
@@ -119,7 +119,7 @@
    },
    "required": [
       "dollar_threshold",
-      "ggap_results",
+      "gaap_results",
       "is_going_concern_included",
       "is_internal_control_deficiency_disclosed",
       "is_internal_control_material_weakness_disclosed",

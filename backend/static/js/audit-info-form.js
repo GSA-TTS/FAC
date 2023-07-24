@@ -31,7 +31,7 @@ function setCheckboxRequired(name) {
 }
 
 function init() {
-  setCheckboxRequired('ggap_results');
+  setCheckboxRequired('gaap_results');
   setCheckboxRequired('is_going_concern_included');
   setCheckboxRequired('is_internal_control_deficiency_disclosed');
   setCheckboxRequired('is_internal_control_material_weakness_disclosed');

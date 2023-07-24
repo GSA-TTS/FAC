@@ -16,7 +16,7 @@ import logging
 import json
 import environs
 from cfenv import AppEnv
-from audit.get_agency_names import get_agency_names, get_ggap_results
+from audit.get_agency_names import get_agency_names, get_gaap_results
 
 import newrelic.agent
 
@@ -453,4 +453,4 @@ if DISABLE_AUTH:
 
 # A dictionary mapping agency number to agency name. dict[str, str]
 AGENCY_NAMES = get_agency_names()
-GGAP_RESULTS = get_ggap_results()
+GAAP_RESULTS = get_gaap_results()

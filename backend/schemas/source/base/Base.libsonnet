@@ -1,6 +1,6 @@
 local FederalProgramNames = import 'FederalProgramNames.json';
 local Func = import 'Functions.libsonnet';
-local GGAP = import 'GGAP.libsonnet';
+local GAAP = import 'GAAP.libsonnet';
 
 local Const = {
   Y: 'Y',
@@ -250,9 +250,9 @@ local Enum = {
     ],
     title: 'SubmissionStatus',
   },
-  GGAPResults: Types.string {
-    description: 'GGAP Results (Audit Information)',
-    enum: std.map(function(pair) pair.tag, GGAP.ggap_results),
+  GAAPResults: Types.string {
+    description: 'GAAP Results (Audit Information)',
+    enum: std.map(function(pair) pair.tag, GAAP.gaap_results),
   },
   ALNPrefixes: Types.string {
     description: 'Valid two-digit program numbers; part of the CFDA/ALN',

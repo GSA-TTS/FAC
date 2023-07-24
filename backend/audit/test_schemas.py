@@ -396,31 +396,31 @@ class AuditInformationSchemaValidityTest(SimpleTestCase):
                 simple_case["AuditInformation"][field] = value
                 validate(simple_case, schema)
 
-    def test_all_ggap_results(self):
+    def test_all_gaap_results(self):
         schema = self.AUDIT_INFO_SCHEMA
         simple_case = jsoncopy(self.SIMPLE_CASE)
-        ggap_results = [
+        gaap_results = [
             "unmodified_opinion",
             "qualified_opinion",
             "adverse_opinion",
             "disclaimer_of_opinion",
-            "not_ggap",
+            "not_gaap",
         ]
 
-        for result in ggap_results:
-            simple_case["AuditInformation"]["ggap_results"] = [result]
+        for result in gaap_results:
+            simple_case["AuditInformation"]["gaap_results"] = [result]
             validate(simple_case, schema)
 
         for _ in range(10):
             for n in range(2, 5):
-                ls = random.sample(ggap_results, n)
-                simple_case["AuditInformation"]["ggap_results"] = ls
+                ls = random.sample(gaap_results, n)
+                simple_case["AuditInformation"]["gaap_results"] = ls
                 validate(simple_case, schema)
 
-    def test_bad_ggap_results(self):
+    def test_bad_gaap_results(self):
         schema = self.AUDIT_INFO_SCHEMA
         simple_case = jsoncopy(self.SIMPLE_CASE)
-        not_ggap_values = [
+        not_gaap_values = [
             "state",
             "local",
             "tribal",
@@ -430,8 +430,8 @@ class AuditInformationSchemaValidityTest(SimpleTestCase):
             "none",
         ]
 
-        for word in not_ggap_values:
-            simple_case["AuditInformation"]["ggap_results"] = [word]
+        for word in not_gaap_values:
+            simple_case["AuditInformation"]["gaap_results"] = [word]
             self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
     def test_valid_aln_prefixes(self):

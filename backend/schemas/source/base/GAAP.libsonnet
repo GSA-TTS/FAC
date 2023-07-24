@@ -1,4 +1,4 @@
-local ggap_results = [
+local gaap_results = [
   {
     readable: 'Unmodified opinion',
     tag: 'unmodified_opinion',
@@ -16,9 +16,9 @@ local ggap_results = [
     tag: 'disclaimer_of_opinion',
   },
   {
-    readable: 'Financial statements were not prepared in accordance with GGAP but were prepared in accordance with a special purpose framework.',
-    tag: 'not_ggap',
+    readable: 'Financial statements were not prepared in accordance with GAAP but were prepared in accordance with a special purpose framework.',
+    tag: 'not_gaap',
   },
 ];
 
-{ ggap_results: ggap_results}
+{ gaap_results: gaap_results}

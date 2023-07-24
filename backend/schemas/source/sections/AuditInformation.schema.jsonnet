@@ -5,8 +5,8 @@ local Types = Base.Types;
 local AuditInformation = Types.object {
   additionalProperties: false,
   properties: {
-    ggap_results: Types.array {
-      items: Base.Enum.GGAPResults,
+    gaap_results: Types.array {
+      items: Base.Enum.GAAPResults,
     },
     dollar_threshold: Types.integer,
     is_going_concern_included: Types.boolean,
@@ -23,7 +23,7 @@ local AuditInformation = Types.object {
   },
   required: [
     'dollar_threshold',
-    'ggap_results',
+    'gaap_results',
     'is_going_concern_included',
     'is_internal_control_deficiency_disclosed',
     'is_internal_control_material_weakness_disclosed',

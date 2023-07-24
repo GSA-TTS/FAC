@@ -30,19 +30,19 @@ class AuditInfoForm(forms.Form):
 
     choices_YoN = (("True", "Yes"), ("False", "No"))
     # These should probably have the lowercase values from Jsonnet:
-    choices_GGAP = (
+    choices_GAAP = (
         ("unmodified_opinion", "Unmodified opinion"),
         ("qualified_opinion", "Qualified opinion"),
         ("adverse_opinion", "Adverse opinion"),
         ("disclaimer_of_opinion", "Disclaimer of opinion"),
         (
-            "not_ggap",
-            "Financial statements were not prepared in accordance with GGAP but were prepared in accordance with a special purpose framework.",
+            "not_gaap",
+            "Financial statements were not prepared in accordance with GAAP but were prepared in accordance with a special purpose framework.",
         ),
     )
     choices_agencies = list((i, i) for i in AGENCY_NAMES)
 
-    ggap_results = forms.MultipleChoiceField(choices=choices_GGAP)
+    gaap_results = forms.MultipleChoiceField(choices=choices_GAAP)
     is_going_concern_included = forms.MultipleChoiceField(choices=choices_YoN)
     is_internal_control_deficiency_disclosed = forms.MultipleChoiceField(
         choices=choices_YoN

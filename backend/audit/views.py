@@ -13,7 +13,7 @@ from django.http import JsonResponse
 
 from audit.forms import UploadReportForm, AuditInfoForm
 
-from config.settings import AGENCY_NAMES, GGAP_RESULTS
+from config.settings import AGENCY_NAMES, GAAP_RESULTS
 from .fixtures.excel import FORM_SECTIONS
 
 from audit.excel import (
@@ -448,7 +448,7 @@ class AuditInfoFormView(SingleAuditChecklistAccessRequiredMixin, generic.View):
             if sac.audit_information:
                 current_info = {
                     "cleaned_data": {
-                        "ggap_results": sac.audit_information.get("ggap_results"),
+                        "gaap_results": sac.audit_information.get("gaap_results"),
                         "is_going_concern_included": sac.audit_information.get(
                             "is_going_concern_included"
                         ),
@@ -478,7 +478,7 @@ class AuditInfoFormView(SingleAuditChecklistAccessRequiredMixin, generic.View):
                 "auditee_uei": sac.auditee_uei,
                 "user_provided_organization_type": sac.user_provided_organization_type,
                 "agency_names": AGENCY_NAMES,
-                "ggap_results": GGAP_RESULTS,
+                "gaap_results": GAAP_RESULTS,
                 "form": current_info,
             }
 
@@ -519,7 +519,7 @@ class AuditInfoFormView(SingleAuditChecklistAccessRequiredMixin, generic.View):
                     "auditee_uei": sac.auditee_uei,
                     "user_provided_organization_type": sac.user_provided_organization_type,
                     "agency_names": AGENCY_NAMES,
-                    "ggap_results": GGAP_RESULTS,
+                    "gaap_results": GAAP_RESULTS,
                     "form": form,
                 }
                 return render(request, "audit/audit-info-form.html", context)
