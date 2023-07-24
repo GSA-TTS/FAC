@@ -1,6 +1,7 @@
 from django.test import TestCase
 
 from model_bakery import baker
+from faker import Faker
 
 from .models import SingleAuditChecklist, User
 from dissemination.models import (
@@ -11,6 +12,7 @@ from dissemination.models import (
     Note,
     FindingText,
     CapText,
+    SecondaryAuditor,
 )
 from audit.etl import ETL
 
@@ -237,11 +239,61 @@ class ETLTests(TestCase):
             notes_to_sefa=notes_to_sefa,
             findings_text=findings_text,
             corrective_action_plan=corrective_action_plan,
+            secondary_auditors=self._fake_secondary_auditors(),
+            # audit_information=self._fake_audit_information(), TODO Un comment when frontend is done
         )
         sac.save()
         self.sac = sac
+
         self.etl = ETL(self.sac)
         self.report_id = sac.report_id
+
+    def _fake_secondary_auditors(self):
+        fake = Faker()
+        secondary_auditors = {
+            "SecondaryAuditors": {
+                "secondary_auditors_entries": {
+                    "items": [
+                        {
+                            "secondary_auditor_seq_number": i,
+                            "secondary_auditor_address_street": fake.street_address(),
+                            "secondary_auditor_address_city": fake.city(),
+                            "secondary_auditor_address_state": fake.state_abbr(
+                                include_territories=False
+                            ),
+                            "secondary_auditor_address_zipcode": fake.postalcode(),
+                            # "secondary_auditor_country": fake.country(),
+                            "secondary_auditor_ein": fake.ssn().replace("-", ""),
+                            "secondary_auditor_name": fake.company(),
+                            "secondary_auditor_contact_name": fake.name(),
+                            "secondary_auditor_contact_title": fake.job(),
+                            "secondary_auditor_contact_email": fake.ascii_email(),
+                            "secondary_auditor_contact_phone": fake.basic_phone_number(),
+                        }
+                        for i in range(1, 3)
+                    ]
+                }
+            }
+        }
+        return secondary_auditors
+
+    def _fake_audit_information(self):
+        fake = Faker()
+
+        audit_information = {
+            "dollar_threshold": 10345.45,
+            "gaap_results": fake.word(),
+            "is_going_concern_included": "Y" if fake.boolean() else "N",
+            "is_internal_control_deficiency_disclosed": "Y" if fake.boolean() else "N",
+            "is_internal_control_material_weakness_disclosed": "Y"
+            if fake.boolean()
+            else "N",
+            "is_material_noncompliance_disclosed": "Y" if fake.boolean() else "N",
+            "is_aicpa_audit_guide_included": "Y" if fake.boolean() else "N",
+            "is_low_risk_auditee": "Y" if fake.boolean() else "N",
+            "agencies": fake.word(),
+        }
+        return audit_information
 
     def test_load_general(self):
         self.etl.load_general()
@@ -291,3 +343,17 @@ class ETLTests(TestCase):
         self.assertEqual(len(cap_texts), 1)
         cap_text = cap_texts.first()
         self.assertEqual(self.report_id, cap_text.report_id)
+
+    def test_load_sec_auditor(self):
+        self.etl.load_all()
+        sec_auditor = SecondaryAuditor.objects.first()
+        # print("SecondaryAuditor:", sec_auditor.auditor_name)
+        self.assertEquals(self.sac.report_id, sec_auditor.report_id)
+
+    # TODO rename to test_load_audit once frontend is available
+    def todo_load_aidit_information(self):
+        self.etl.load_all()
+        general = General.objects.first()
+        sac = SingleAuditChecklist.objects.first()
+        print("general gaap_results:", general.gaap_results, sac.audit_information)
+        self.assertEquals(sac.audit_information["gaap_results"], general.gaap_results)
