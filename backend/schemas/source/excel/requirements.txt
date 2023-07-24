@@ -1,5 +1,0 @@
-jsonnet
-openpyxl
-pytest
-xkcdpass
-wheel

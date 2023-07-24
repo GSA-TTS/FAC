@@ -66,14 +66,6 @@ python -m pip install --upgrade pip
 pip install pip-tools
 ```
 
-### LocalStack
-
-LocalStack is an AWS emulator. We use it to emulate S3 for storing files that users upload.
-
-It will set itself up correctly if you run the app with `docker compose up`. 
-
-If you wish to run the app locally, you'll need to install this locally as well. You can find [installation instructions](https://docs.localstack.cloud/getting-started/installation/) on their website.
-
 ### Django environment variables
 
 We use environment variables to configure much of how Django operates, at a minimum you'll need to configure the uri of your local database.
