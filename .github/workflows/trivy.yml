@@ -5,6 +5,7 @@ on:
   workflow_call:
   push:
     branches:
+      - main
       - prod
     tags:
       - v1.*
@@ -38,7 +39,7 @@ jobs:
         run: docker build -t ${{ env.DOCKER_NAME }}:${{ steps.date.outputs.date }} .
 
       - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@master
+        uses: aquasecurity/trivy-action@0.11.2
         with:
           image-ref: '${{ env.DOCKER_NAME }}:${{ steps.date.outputs.date }}'
           scan-type: 'image'
@@ -47,6 +48,7 @@ jobs:
           output: 'trivy-results.sarif'
           exit-code: '1'
           severity: 'CRITICAL,HIGH'
+          timeout: 15m0s
           ignore-unfixed: true
 
       - name: Upload Trivy scan results to GitHub Security tab
@@ -72,18 +74,19 @@ jobs:
         run: docker pull ${{ matrix.image.name }}
 
       - name: Run Trivy vulnerability scanner on Third Party Images
-        uses: aquasecurity/trivy-action@master
+        uses: aquasecurity/trivy-action@0.11.2
         with:
           image-ref: '${{ matrix.image.name }}'
           scan-type: 'image'
           hide-progress: false
           format: 'sarif'
-          output: 'scan-results.sarif'
+          output: 'trivy-results.sarif'
           exit-code: '1'
           severity: 'CRITICAL,HIGH'
+          timeout: 15m0s
           ignore-unfixed: true
 
       - name: Upload Trivy scan results to GitHub Security tab for Third Party Images
         uses: github/codeql-action/upload-sarif@v2
         with:
-          sarif_file: 'scan-results.sarif'
+          sarif_file: 'trivy-results.sarif'
