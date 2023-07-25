@@ -1,0 +1,5 @@
+__pycache__/**
+data/*.sqlite3
+output/**
+templates/*.xlsx
+
