@@ -43,6 +43,7 @@ SECRET_KEY =
 DJANGO_SECRET_LOGIN_KEY =
 DISABLE_AUTH = 
 ```
+If you are using a MacBook with Apple M1 hardware, you will probably also have to add `DOCKERFILE = Apple_M1_Dockerfile` to the file.
 
 If you need to add these to your local environment (should end up in `~/.bash_profile`, `~/.bashrc`, `~/.zshrc`, or whatever flavor of shell you're using.)
 
