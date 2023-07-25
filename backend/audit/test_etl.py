@@ -22,35 +22,56 @@ class ETLTests(TestCase):
         super().__init__(methodName)
 
     def setUp(self):
-        user = baker.make(User)
-        general_information = {
-            "ein": "123456789",
+        self.user = baker.make(User)
+
+        sac = SingleAuditChecklist.objects.create(
+            submitted_by=self.user,
+            general_information=self._fake_general(),
+            federal_awards=self._fake_federal_awards(),
+            findings_uniform_guidance=self._fake_findings_uniform_guidance(),
+            notes_to_sefa=self._fake_notes_to_sefa(),
+            findings_text=self._fake_findings_text(),
+            corrective_action_plan=self._fake_corrective_action_plan(),
+            secondary_auditors=self._fake_secondary_auditors(),
+            # audit_information=self._fake_audit_information(),  # TODO: Uncomment when SingleAuditChecklist adds audit_information
+        )
+        sac.save()
+        self.sac = sac
+
+        self.etl = ETL(self.sac)
+        self.report_id = sac.report_id
+
+    @staticmethod
+    def _fake_general():
+        fake = Faker()
+        return {
+            "ein": fake.ssn().replace("-", ""),
             "audit_type": "single-audit",
             "auditee_uei": "ZQGGHJH74DW7",
-            "auditee_zip": "68130",
-            "auditor_ein": "234567891",
-            "auditor_zip": "10123",
-            "auditee_city": "Cedar City",
-            "auditee_name": "INTERNATIONAL BUSINESS MACHINES CORPORATION",
-            "auditor_city": "New York City",
+            "auditee_zip": fake.zipcode(),
+            "auditor_ein": fake.ssn().replace("-", ""),
+            "auditor_zip": fake.zipcode(),
+            "auditee_city": fake.city(),
+            "auditee_name": fake.company(),
+            "auditor_city": fake.city(),
             "is_usa_based": "true",
-            "auditee_email": "e@mail.com",
-            "auditee_phone": "4023001234",
-            "auditee_state": "IA",
-            "auditor_email": "e@mail.com",
-            "auditor_phone": "4024445555",
-            "auditor_state": "NY",
+            "auditee_email": fake.email(),
+            "auditee_phone": fake.basic_phone_number(),
+            "auditee_state": fake.state_abbr(),
+            "auditor_email": fake.email(),
+            "auditor_phone": fake.basic_phone_number(),
+            "auditor_state": fake.state_abbr(),
             "auditor_country": "United States",
-            "auditor_firm_name": "Big Wigs Firm",
+            "auditor_firm_name": fake.company(),
             "audit_period_covered": "annual",
-            "auditee_contact_name": "Joe",
-            "auditor_contact_name": "Big Guy",
+            "auditee_contact_name": fake.name(),
+            "auditor_contact_name": fake.name(),
             "auditee_contact_title": "Boss",
             "auditor_contact_title": "Mega Boss",
             "multiple_eins_covered": "false",
             "multiple_ueis_covered": "false",
-            "auditee_address_line_1": "1 Main St",
-            "auditor_address_line_1": "2 Main Street",
+            "auditee_address_line_1": fake.street_address(),
+            "auditor_address_line_1": fake.street_address(),
             "met_spending_threshold": "true",
             "auditee_fiscal_period_end": "2023-06-01",
             "ein_not_an_ssn_attestation": "true",
@@ -58,7 +79,10 @@ class ETLTests(TestCase):
             "user_provided_organization_type": "state",
             "auditor_ein_not_an_ssn_attestation": "true",
         }
-        federal_awards = {
+
+    @staticmethod
+    def _fake_federal_awards():
+        return {
             "FederalAwards": {
                 "auditee_uei": "ABC123DEF456",
                 "federal_awards": [
@@ -95,13 +119,16 @@ class ETLTests(TestCase):
                 "total_amount_expended": 9000,
             }
         }
-        findings_uniform_guidance = {
+
+    @staticmethod
+    def _fake_findings_uniform_guidance(reference_number: int = 1):
+        return {
             "FindingsUniformGuidance": {
                 "auditee_uei": "AAA123456BBB",
                 "findings_uniform_guidance_entries": [
                     {
                         "award_reference": "ABC123",
-                        "seq_number": 1,
+                        "seq_number": i,
                         "program": {
                             "program_name": "N/A",
                             "federal_agency_prefix": "12",
@@ -112,7 +139,7 @@ class ETLTests(TestCase):
                         "findings": {
                             "is_valid": "Y",
                             "prior_references": "2020-010",
-                            "reference_number": "2021-001",
+                            "reference_number": f"2021-{i:03d}",
                             "repeat_prior_reference": "Y",
                         },
                         "other_matters": "N",
@@ -121,77 +148,15 @@ class ETLTests(TestCase):
                         "questioned_costs": "N",
                         "material_weakness": "N",
                         "significant_deficiency": "N",
-                    },
-                    {
-                        "award_reference": "ABC123",
-                        "seq_number": 2,
-                        "program": {
-                            "program_name": "N/A",
-                            "federal_agency_prefix": "10",
-                            "three_digit_extension": "123",
-                            "compliance_requirement": "A",
-                            "additional_award_identification": "egd",
-                        },
-                        "findings": {
-                            "is_valid": "Y",
-                            "reference_number": "2021-002",
-                            "repeat_prior_reference": "N",
-                        },
-                        "other_matters": "N",
-                        "other_findings": "N",
-                        "modified_opinion": "Y",
-                        "questioned_costs": "N",
-                        "material_weakness": "N",
-                        "significant_deficiency": "N",
-                    },
-                    {
-                        "award_reference": "ABC123",
-                        "seq_number": 3,
-                        "program": {
-                            "program_name": "N/A",
-                            "federal_agency_prefix": "10",
-                            "three_digit_extension": "123",
-                            "compliance_requirement": "A",
-                            "additional_award_identification": "egd",
-                        },
-                        "findings": {
-                            "is_valid": "Y",
-                            "reference_number": "2021-003",
-                            "repeat_prior_reference": "N",
-                        },
-                        "other_matters": "N",
-                        "other_findings": "N",
-                        "modified_opinion": "Y",
-                        "questioned_costs": "N",
-                        "material_weakness": "N",
-                        "significant_deficiency": "N",
-                    },
-                    {
-                        "award_reference": "ABC123",
-                        "seq_number": 4,
-                        "program": {
-                            "program_name": "N/A",
-                            "federal_agency_prefix": "10",
-                            "three_digit_extension": "123",
-                            "compliance_requirement": "A",
-                            "additional_award_identification": "egd",
-                        },
-                        "findings": {
-                            "is_valid": "Y",
-                            "reference_number": "2021-004",
-                            "repeat_prior_reference": "N",
-                        },
-                        "other_matters": "N",
-                        "other_findings": "N",
-                        "modified_opinion": "Y",
-                        "questioned_costs": "N",
-                        "material_weakness": "N",
-                        "significant_deficiency": "N",
-                    },
+                    }
+                    for i in range(1, 5)
                 ],
             }
         }
-        notes_to_sefa = {
+
+    @staticmethod
+    def _fake_notes_to_sefa():
+        return {
             "NotesToSefa": {
                 "auditee_uei": "AAA123456BBB",
                 "accounting_policies": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. \nFusce in ipsum tempus, eleifend ipsum id, dignissim ipso lorem. Proin vel quam non metus placerat semper nec in nisi.",
@@ -206,19 +171,26 @@ class ETLTests(TestCase):
                 ],
             }
         }
-        findings_text = {
+
+    @staticmethod
+    def _fake_findings_text(reference_number: int = 123):
+        faker = Faker()
+        return {
             "FindingsText": {
                 "auditee_uei": "AAA123456BBB",
                 "findings_text_entries": [
                     {
                         "contains_chart_or_table": "N",
                         "text_of_finding": "This is an audit finding",
-                        "reference_number": "2023-123",
+                        "reference_number": f"2023-{reference_number:03d}",
                     },
                 ],
             }
         }
-        corrective_action_plan = {
+
+    @staticmethod
+    def _fake_corrective_action_plan():
+        return {
             "CorrectiveActionPlan": {
                 "auditee_uei": "AAA123456BBB",
                 "corrective_action_plan_entries": [
@@ -231,24 +203,8 @@ class ETLTests(TestCase):
             }
         }
 
-        sac = SingleAuditChecklist.objects.create(
-            submitted_by=user,
-            general_information=general_information,
-            federal_awards=federal_awards,
-            findings_uniform_guidance=findings_uniform_guidance,
-            notes_to_sefa=notes_to_sefa,
-            findings_text=findings_text,
-            corrective_action_plan=corrective_action_plan,
-            secondary_auditors=self._fake_secondary_auditors(),
-            # audit_information=self._fake_audit_information(), TODO Un comment when frontend is done
-        )
-        sac.save()
-        self.sac = sac
-
-        self.etl = ETL(self.sac)
-        self.report_id = sac.report_id
-
-    def _fake_secondary_auditors(self):
+    @staticmethod
+    def _fake_secondary_auditors():
         fake = Faker()
         secondary_auditors = {
             "SecondaryAuditors": {
@@ -277,7 +233,8 @@ class ETLTests(TestCase):
         }
         return secondary_auditors
 
-    def _fake_audit_information(self):
+    @staticmethod
+    def _fake_audit_information():
         fake = Faker()
 
         audit_information = {
@@ -345,15 +302,82 @@ class ETLTests(TestCase):
         self.assertEqual(self.report_id, cap_text.report_id)
 
     def test_load_sec_auditor(self):
-        self.etl.load_all()
+        self.etl.load_secondary_auditor()
         sec_auditor = SecondaryAuditor.objects.first()
-        # print("SecondaryAuditor:", sec_auditor.auditor_name)
         self.assertEquals(self.sac.report_id, sec_auditor.report_id)
 
     # TODO rename to test_load_audit once frontend is available
-    def todo_load_aidit_information(self):
-        self.etl.load_all()
+    def todo_load_audit_information(self):
+        self.etl.load_audit_info()
         general = General.objects.first()
         sac = SingleAuditChecklist.objects.first()
         print("general gaap_results:", general.gaap_results, sac.audit_information)
         self.assertEquals(sac.audit_information["gaap_results"], general.gaap_results)
+
+    def test_load_all(self):
+        """On a happy path through load_all(), item(s) should be added to all of the 
+        tables."""
+        len_general = len(General.objects.all())
+        len_captext = len(CapText.objects.all())
+        sac = SingleAuditChecklist.objects.create(
+            submitted_by=self.user,
+            general_information=self._fake_general(),
+            federal_awards=self._fake_federal_awards(),
+            findings_uniform_guidance=self._fake_findings_uniform_guidance(),
+            notes_to_sefa=self._fake_notes_to_sefa(),
+            findings_text=self._fake_findings_text(reference_number=2),
+            corrective_action_plan=self._fake_corrective_action_plan(),
+            secondary_auditors=self._fake_secondary_auditors(),
+            # audit_information=self._fake_audit_information(),  # TODO: Uncomment when SingleAuditChecklist adds audit_information
+        )
+        sac.save()
+        self.etl.single_audit_checklist = sac
+        self.etl.load_all()
+        self.assertLess(len_general, len(General.objects.all()))
+        self.assertLess(len_captext, len(CapText.objects.all()))
+
+    def test_load_all_with_errors_1(self):
+        """If we encounter a KeyError on General (the first table to be loaded), we 
+        should still load all the other tables, but nothing should be loaded to General."""
+        len_general = len(General.objects.all())
+        len_captext = len(CapText.objects.all())
+        sac = SingleAuditChecklist.objects.create(
+            submitted_by=self.user,
+            general_information=self._fake_general(),
+            federal_awards=self._fake_federal_awards(),
+            findings_uniform_guidance=self._fake_findings_uniform_guidance(),
+            notes_to_sefa=self._fake_notes_to_sefa(),
+            findings_text=self._fake_findings_text(reference_number=3),
+            corrective_action_plan=self._fake_corrective_action_plan(),
+            secondary_auditors=self._fake_secondary_auditors(),
+            # audit_information=self._fake_audit_information(),  # TODO: Uncomment when SingleAuditChecklist adds audit_information
+        )
+        sac.general_information.pop("auditee_contact_name")
+        sac.save()
+        self.etl.single_audit_checklist = sac
+        self.etl.load_all()
+        self.assertEqual(len_general, len(General.objects.all()))
+        self.assertLess(len_captext, len(CapText.objects.all()))
+
+    def test_load_all_with_errors_2(self):
+        """If we encounter a KeyError on CapText (the last table to be loaded), we 
+        should still load all the other tables, but nothing should be loaded to CapText."""
+        len_general = len(General.objects.all())
+        len_captext = len(CapText.objects.all())
+        sac = SingleAuditChecklist.objects.create(
+            submitted_by=self.user,
+            general_information=self._fake_general(),
+            federal_awards=self._fake_federal_awards(),
+            findings_uniform_guidance=self._fake_findings_uniform_guidance(),
+            notes_to_sefa=self._fake_notes_to_sefa(),
+            findings_text=self._fake_findings_text(reference_number=3),
+            corrective_action_plan=self._fake_corrective_action_plan(),
+            secondary_auditors=self._fake_secondary_auditors(),
+            # audit_information=self._fake_audit_information(),  # TODO: Uncomment when SingleAuditChecklist adds audit_information
+        )
+        sac.corrective_action_plan.pop("CorrectiveActionPlan")
+        sac.save()
+        self.etl.single_audit_checklist = sac
+        self.etl.load_all()
+        self.assertLess(len_general, len(General.objects.all()))
+        self.assertEqual(len_captext, len(CapText.objects.all()))
