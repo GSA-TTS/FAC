@@ -5,9 +5,9 @@
     <div class="grid-container auditee-information">
         <div class="grid-row">
             <form class="usa-form usa-form--large tablet:grid-col"
-                  id="check-eligibility"
-                  data-fy-end-date=""
-                  method="post">
+                id="check-eligibility"
+                data-fy-end-date=""
+                method="post">
                 {% csrf_token %}
                 <fieldset class="usa-fieldset">
                     <legend class="usa-legend usa-legend--large">
@@ -39,21 +39,21 @@
                         <div class="usa-search" role="search">
                             <label class="usa-sr-only" for="auditee_uei">Search</label>
                             <input class="usa-input"
-                                   id="auditee_uei"
-                                   type="search"
-                                   name="auditee_uei"
-                                   required
-                                   data-validate-not-null=""
-                                   data-validate-length="== 12"/>
+                                id="auditee_uei"
+                                type="search"
+                                name="auditee_uei"
+                                required
+                                data-validate-not-null=""
+                                data-validate-length="== 12"/>
                             <button class="usa-button"
-                                    id="auditee_uei-btn"
-                                    type="submit"
-                                    aria-controls="uei-search-result"
-                                    data-open-modal>
+                                id="auditee_uei-btn"
+                                type="submit"
+                                aria-controls="uei-search-result"
+                                data-open-modal>
                                 <span class="usa-search__submit-text">
                                     <img src="/static/img/usa-icons-bg/search--white.svg"
-                                         class="usa-search__submit-icon"
-                                         alt="Search"/>
+                                        class="usa-search__submit-icon"
+                                        alt="Search"/>
                                     Search
                                 </span>
                             </button>
@@ -63,16 +63,12 @@
                         Don’t know your UEI? You can find your UEI or register for a new UEI by visiting <a href="https://sam.gov/">SAM.gov</a>.
                     </p>
                     <div class="usa-form-group">
-                        <label class="usa-label" for="auditee_name">Auditee name</label>
-                        <span class="usa-error-message"
-                              id="auditee_name-error-message"
-                              role="alert">
-                            Auditee Name is required if proceeding without a valid UEI
-                        </span>
+                        <label for="auditee_name" hidden>Auditee name</label>
                         <input class="usa-input"
-                               id="auditee_name"
-                               name="auditee_name"
-                               disabled="true"/>
+                            id="auditee_name"
+                            name="auditee_name"
+                            disabled="true"
+                            hidden />
                     </div>
                     <div class="usa-form-group validate-fy">
                         <ul class="usa-error-message"
@@ -82,8 +78,8 @@
                         </ul>
                         <div class="usa-form-group">
                             <label class="usa-label"
-                                   id="auditee_fiscal_period_start-label"
-                                   for="auditee_fiscal_period_start">
+                                id="auditee_fiscal_period_start-label"
+                                for="auditee_fiscal_period_start">
                                 Auditee fiscal period <strong>start</strong> date for this submission<abbr title="required" class="usa-hint usa-hint--required">*</abbr>
                             </label>
                             <div class="usa-hint" id="auditee_fiscal_period_start-hint">mm/dd/yyyy</div>
@@ -94,21 +90,21 @@
                                     <li id="auditee_fiscal_period_start-not-null" hidden>Can&#39;t be null</li>
                                 </ul>
                                 <input class="usa-input"
-                                       id="auditee_fiscal_period_start"
-                                       name="auditee_fiscal_period_start"
-                                       aria-labelledby="auditee_fiscal_period_start-label"
-                                       aria-describedby="auditee_fiscal_period_start-hint"
-                                       aria-required="true"
-                                       required
-                                       data-validate-not-null=""/>
+                                    id="auditee_fiscal_period_start"
+                                    name="auditee_fiscal_period_start"
+                                    aria-labelledby="auditee_fiscal_period_start-label"
+                                    aria-describedby="auditee_fiscal_period_start-hint"
+                                    aria-required="true"
+                                    required
+                                    data-validate-not-null=""/>
                             </div>
                         </div>
                     </div>
                     <div class="usa-form-group validate-fy">
                         <div class="usa-form-group">
                             <label class="usa-label"
-                                   id="auditee_fiscal_period_end-label"
-                                   for="auditee_fiscal_period_end">
+                                id="auditee_fiscal_period_end-label"
+                                for="auditee_fiscal_period_end">
                                 Auditee fiscal period <strong>end</strong> date for this submission<abbr title="required" class="usa-hint usa-hint--required">*</abbr>
                             </label>
                             <div class="usa-hint" id="auditee_fiscal_period_end-hint">mm/dd/yyyy</div>
@@ -119,13 +115,13 @@
                                     <li id="auditee_fiscal_period_end-not-null" hidden>Can&#39;t be null</li>
                                 </ul>
                                 <input class="usa-input"
-                                       id="auditee_fiscal_period_end"
-                                       name="auditee_fiscal_period_end"
-                                       aria-labelledby="auditee_fiscal_period_end-label"
-                                       aria-describedby="auditee_fiscal_period_end-hint"
-                                       aria-required="true"
-                                       required
-                                       data-validate-not-null=""/>
+                                    id="auditee_fiscal_period_end"
+                                    name="auditee_fiscal_period_end"
+                                    aria-labelledby="auditee_fiscal_period_end-label"
+                                    aria-describedby="auditee_fiscal_period_end-hint"
+                                    aria-required="true"
+                                    required
+                                    data-validate-not-null=""/>
                             </div>
                         </div>
                     </div>
@@ -156,39 +152,39 @@
             </div>
         </div>
     </div>
-</div>
-<div class="usa-modal usa-modal--lg uei-search-result loading"
-     id="uei-search-result"
-     aria-labelledby="uei-search-result-heading"
-     aria-describedby="uei-search-result-description">
-    <div class="usa-modal__content">
-        <div class="usa-modal__main">
-            <img src="/static/img/loader.svg" alt="loading"/>
-            <h2 class="usa-modal__heading" id="uei-search-result-heading"></h2>
-            <div class="usa-prose" id="uei-search-result-description"></div>
-            <div class="usa-modal__footer">
-                <ul class="usa-button-group">
-                    <li class="usa-button-group__item">
-                        <button type="button" class="usa-button primary" data-close-modal></button>
-                    </li>
-                    <li class="usa-button-group__item">
-                        <button type="button"
+    </div>
+    <div class="usa-modal usa-modal--lg uei-search-result loading"
+        id="uei-search-result"
+        aria-labelledby="uei-search-result-heading"
+        aria-describedby="uei-search-result-description">
+        <div class="usa-modal__content">
+            <div class="usa-modal__main">
+                <img src="/static/img/loader.svg" alt="loading"/>
+                <h2 class="usa-modal__heading" id="uei-search-result-heading"></h2>
+                <div class="usa-prose" id="uei-search-result-description"></div>
+                <div class="usa-modal__footer">
+                    <ul class="usa-button-group">
+                        <li class="usa-button-group__item">
+                            <button type="button" class="usa-button primary" data-close-modal></button>
+                        </li>
+                        <li class="usa-button-group__item">
+                            <button type="button"
                                 class="usa-button usa-button--unstyled padding-105 text-center secondary"
                                 data-close-modal>
-                        </button>
-                    </li>
-                </ul>
+                            </button>
+                        </li>
+                    </ul>
+                </div>
             </div>
-        </div>
-        <button class="usa-button usa-modal__close"
+            <button class="usa-button usa-modal__close"
                 aria-label="Close this window"
                 data-close-modal>
-            <svg class="usa-icon" aria-hidden="true" focusable="false" role="img">
-                {% uswds_sprite "close" %}
-            </svg>
-        </button>
+                <svg class="usa-icon" aria-hidden="true" focusable="false" role="img">
+                    {% uswds_sprite "close" %}
+                </svg>
+            </button>
+        </div>
     </div>
-</div>
-</div>
-<script src="{% static 'compiled/js/check-ueid.js' %}"></script>
+    </div>
+    <script src="{% static 'compiled/js/check-ueid.js' %}"></script>
 {% endblock %}

@@ -13,11 +13,6 @@ function handleUEIDResponse({ valid, response, errors }) {
 
 function handleValidUei(response) {
   document.getElementById('auditee_name').value = response.auditee_name;
-  document.getElementById('auditee_address_line_1').value =
-    response.auditee_address_line_1;
-  document.getElementById('auditee_city').value = response.auditee_city;
-  document.getElementById('auditee_state').value = response.auditee_state;
-  document.getElementById('auditee_zip').value = response.auditee_zip;
   populateModal('success', response.auditee_name);
 }
 
@@ -110,7 +105,6 @@ function populateModal(formStatus, auditeeName) {
           <dd>${auditeeUei}</dd>
         </dl>
         <p>We can't proceed without confirming your UEI with SAM.gov. We’re sorry for the delay.</p>
-        <p>You might also want to check the UEI you entered, go back, and try again.</p>
         `,
       buttons: {
         primary: {
