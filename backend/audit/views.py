@@ -11,6 +11,10 @@ from django.utils.datastructures import MultiValueDictKeyError
 from django.utils.decorators import method_decorator
 from django.http import JsonResponse
 
+from audit.forms import UploadReportForm, AuditInfoForm, AuditorCertificationForm
+
+from .fixtures.excel import FORM_SECTIONS
+
 from audit.excel import (
     extract_additional_ueis,
     extract_federal_awards,
@@ -275,6 +279,8 @@ class AuditorCertificationView(CertifyingAuditorRequiredMixin, generic.View):
             sac = SingleAuditChecklist.objects.get(report_id=report_id)
 
             context = {
+                "auditee_uei": sac.auditee_uei,
+                "auditee_name": sac.auditee_name,
                 "report_id": report_id,
                 "submission_status": sac.submission_status,
             }
@@ -288,11 +294,22 @@ class AuditorCertificationView(CertifyingAuditorRequiredMixin, generic.View):
 
         try:
             sac = SingleAuditChecklist.objects.get(report_id=report_id)
+            form = AuditorCertificationForm(request.POST)
 
-            sac.transition_to_auditor_certified()
-            sac.save()
-
-            return redirect(reverse("audit:SubmissionProgress", args=[report_id]))
+            if form.is_valid():
+                sac.transition_to_auditor_certified()
+                sac.save()
+                return redirect(reverse("audit:SubmissionProgress", args=[report_id]))
+            else:
+                print("sample", form.cleaned_data)
+                context = {
+                    "auditee_uei": sac.auditee_uei,
+                    "auditee_name": sac.auditee_name,
+                    "report_id": report_id,
+                    "submission_status": sac.submission_status,
+                    "form": form
+                }
+                return render(request, "audit/auditor-certification.html", context)
 
         except SingleAuditChecklist.DoesNotExist:
             raise PermissionDenied("You do not have access to this audit.")

@@ -54,3 +54,11 @@ class AuditInfoForm(forms.Form):
     dollar_threshold = forms.IntegerField(min_value=1)
     low_risk_auditee = forms.MultipleChoiceField(choices=choices_YoN)
     agencies = forms.MultipleChoiceField(choices=choices_agencies)
+
+
+class AuditorCertificationForm(forms.Form):
+    is_FAC_releasable = forms.BooleanField()
+    has_no_auditee_procedures = forms.BooleanField()
+    is_auditor_transferred = forms.BooleanField()
+    is_auditee_responsible = forms.BooleanField()
+    is_OMB_limited = forms.BooleanField()
