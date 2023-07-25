@@ -763,12 +763,12 @@ class SecondaryAuditor(models.Model):
     )
     contact_name = models.CharField(
         "Name of CPA Contact",
-        max_length=40,
+        max_length=80,
         null=True,
     )
     contact_title = models.CharField(
         "Title of CPA Contact",
-        max_length=40,
+        max_length=80,
         null=True,
         help_text=docs.auditor_title,
     )
