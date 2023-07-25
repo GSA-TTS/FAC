@@ -254,16 +254,9 @@ class ETL(object):
             fy_start_date=general_information["auditee_fiscal_period_start"],
             audit_year=self.audit_year,
             audit_type=general_information["audit_type"],
-            is_significant_deficiency=None,  # TODO: Where does this come from?
-            is_material_weakness=None,  # TODO: Where does this come from?
             condition_or_deficiency_major_program=None,  # TODO: Where does this come from?
             current_or_former_findings=None,  # TODO: Where does this come from?
-            dollar_threshold=None,  # TODO: Where does this come from?
-            is_duplicate_reports=None,  # TODO: Where does this come from?
             entity_type=general_information["user_provided_organization_type"],
-            is_going_concern=None,  # TODO: Where does this come from?
-            is_low_risk=None,  # TODO: Where does this come from?
-            is_material_noncompliance=None,  # TODO: Where does this come from?
             material_weakness=None,  # TODO: Where does this come from?
             material_weakness_major_program=None,  # TODO: Notes say this hasn't been used since 2013.
             number_months=None,  # TODO: Where does this come from?
