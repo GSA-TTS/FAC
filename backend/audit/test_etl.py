@@ -174,7 +174,6 @@ class ETLTests(TestCase):
 
     @staticmethod
     def _fake_findings_text(reference_number: int = 123):
-        faker = Faker()
         return {
             "FindingsText": {
                 "auditee_uei": "AAA123456BBB",
@@ -315,7 +314,7 @@ class ETLTests(TestCase):
         self.assertEquals(sac.audit_information["gaap_results"], general.gaap_results)
 
     def test_load_all(self):
-        """On a happy path through load_all(), item(s) should be added to all of the 
+        """On a happy path through load_all(), item(s) should be added to all of the
         tables."""
         len_general = len(General.objects.all())
         len_captext = len(CapText.objects.all())
@@ -337,8 +336,9 @@ class ETLTests(TestCase):
         self.assertLess(len_captext, len(CapText.objects.all()))
 
     def test_load_all_with_errors_1(self):
-        """If we encounter a KeyError on General (the first table to be loaded), we 
-        should still load all the other tables, but nothing should be loaded to General."""
+        """If we encounter a KeyError on General (the first table to be loaded), we
+        should still load all the other tables, but nothing should be loaded to General.
+        """
         len_general = len(General.objects.all())
         len_captext = len(CapText.objects.all())
         sac = SingleAuditChecklist.objects.create(
@@ -360,8 +360,9 @@ class ETLTests(TestCase):
         self.assertLess(len_captext, len(CapText.objects.all()))
 
     def test_load_all_with_errors_2(self):
-        """If we encounter a KeyError on CapText (the last table to be loaded), we 
-        should still load all the other tables, but nothing should be loaded to CapText."""
+        """If we encounter a KeyError on CapText (the last table to be loaded), we
+        should still load all the other tables, but nothing should be loaded to CapText.
+        """
         len_general = len(General.objects.all())
         len_captext = len(CapText.objects.all())
         sac = SingleAuditChecklist.objects.create(
