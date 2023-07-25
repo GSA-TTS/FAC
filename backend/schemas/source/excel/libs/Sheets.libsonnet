@@ -26,9 +26,14 @@ local y_or_n_range = open_range {
 // MAX_ROWS here is equal to MAX_ROWS in render.py plus 1 to account for the header row.
 local MAX_ROWS = 3001;
 
+// All workbooks should get the same version number.
+  // TODO: decide how/when to update this version number.
+local WORKBOOKS_VERSION = '1.0.0';
+
 {
   single_cell: single_cell,
   open_range: open_range,
   y_or_n_range: y_or_n_range,
   MAX_ROWS: MAX_ROWS,
+  WORKBOOKS_VERSION: WORKBOOKS_VERSION
 }

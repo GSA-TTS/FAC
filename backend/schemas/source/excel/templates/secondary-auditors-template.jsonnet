@@ -3,7 +3,7 @@ local Help = import '../libs/Help.libsonnet';
 local SV = import '../libs/SheetValidations.libsonnet';
 local Sheets = import '../libs/Sheets.libsonnet';
 local textSheet = 'Form';
-local ueiSheet = 'UEI';
+local coverSheet = 'Coversheet';
 local title_row = 1;
 
 local single_cells = [
@@ -11,10 +11,37 @@ local single_cells = [
     title: 'Auditee UEI',
     range_name: 'auditee_uei',
     width: 36,
-    title_cell: 'A1',
-    range_cell: 'A2',
+    title_cell: 'A3',
+    range_cell: 'B3',
     validation: SV.StringOfLengthTwelve,
     help: Help.uei,
+  },
+  Sheets.single_cell {
+    title: 'Federal Audit Clearinghouse',
+    range_name: 'coversheet_fac_name',
+    width: 36,
+    title_cell: 'A2',
+    range_cell: 'A1',
+    validation: SV.NoValidation,
+    help: Help.unknown,
+  },
+  Sheets.single_cell {
+    title: 'fac.gov',
+    range_name: 'coversheet_fac_website',
+    width: 24,
+    title_cell: 'B2',
+    range_cell: 'B1',
+    validation: SV.NoValidation,
+    help: Help.unknown,
+  },
+  Sheets.single_cell {
+    title: Sheets.WORKBOOKS_VERSION,
+    range_name: 'coversheet_version',
+    width: 12,
+    title_cell: 'C2',
+    range_cell: 'C1',
+    validation: SV.NoValidation,
+    help: Help.unknown,
   },
 ];
 
@@ -123,13 +150,13 @@ local open_ranges_defns = [
 
 local sheets = [
   {
-    name: textSheet,
-    open_ranges: Fun.make_open_ranges_with_column(title_row, open_ranges_defns),
+    name: coverSheet,
+    single_cells: single_cells,
     header_height: 48,
   },
   {
-    name: ueiSheet,
-    single_cells: single_cells,
+    name: textSheet,
+    open_ranges: Fun.make_open_ranges_with_column(title_row, open_ranges_defns),
     header_height: 48,
   },
 ];
