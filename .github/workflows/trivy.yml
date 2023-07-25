@@ -38,7 +38,7 @@ jobs:
         run: docker build -t ${{ env.DOCKER_NAME }}:${{ steps.date.outputs.date }} .
 
       - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@master
+        uses: aquasecurity/trivy-action@0.11.2
         with:
           image-ref: '${{ env.DOCKER_NAME }}:${{ steps.date.outputs.date }}'
           scan-type: 'image'
@@ -73,7 +73,7 @@ jobs:
         run: docker pull ${{ matrix.image.name }}
 
       - name: Run Trivy vulnerability scanner on Third Party Images
-        uses: aquasecurity/trivy-action@master
+        uses: aquasecurity/trivy-action@0.11.2
         with:
           image-ref: '${{ matrix.image.name }}'
           scan-type: 'image'
@@ -82,6 +82,7 @@ jobs:
           output: 'trivy-results.sarif'
           exit-code: '1'
           severity: 'CRITICAL,HIGH'
+          timeout: 10m0s
           ignore-unfixed: true
 
       - name: Upload Trivy scan results to GitHub Security tab for Third Party Images
