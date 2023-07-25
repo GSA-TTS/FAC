@@ -696,32 +696,11 @@ class General(models.Model):
     )  # Concatenation of agency codes
     # End of Audit Info
 
-    condition_or_deficiency_major_program = models.BooleanField(
-        "Whether or not the audit disclosed a reportable condition/significant deficiency for any major program in the Schedule of Findings and Questioned Costs",
-        null=True,
-        help_text=docs.reportable_condition_major_program,
-    )
-    current_or_former_findings = models.BooleanField(
-        "Indicate whether or not current year findings or prior year findings affecting direct funds were reported",
-        null=True,
-        help_text=docs.current_or_former_findings,
-    )
     entity_type = models.CharField(
         "Self reported type of entity (i.e., States, Local Governments, Indian Tribes, Institutions of Higher Education, NonProfit)",
         max_length=50,
         null=True,
         help_text=docs.entity_type,
-    )
-
-    material_weakness = models.BooleanField(
-        "Whether or not the audit disclosed any reportable condition/significant deficiency as a material weakness on financial statements",
-        null=True,
-        help_text=docs.material_weakness_general,
-    )
-    material_weakness_major_program = models.BooleanField(
-        "Indicate whether any reportable condition/significant deficiency was disclosed as a material weakness for a major program in the Schedule of Findings and Questioned Costs",
-        null=True,
-        help_text=docs.material_weakness_major_program,
     )
     number_months = models.IntegerField(
         "Number of Months Covered by the 'Other' Audit Period",
@@ -730,17 +709,6 @@ class General(models.Model):
     )
     audit_period_covered = models.CharField(
         "Audit Period Covered by Audit", max_length=40, help_text=docs.period_covered
-    )
-    prior_year_schedule = models.BooleanField(
-        "Indicate whether or not the report includes a Summary Schedule of Prior Year Audit Findings",
-        null=True,
-        help_text=docs.prior_year_schedule,
-    )
-
-    questioned_costs = models.BooleanField(
-        "Indicate whether or not the audit disclosed any known questioned costs.",
-        null=True,
-        help_text=docs.questioned_costs_general,
     )
     report_required = models.BooleanField(
         "Distribution to Federal Agency required?",
@@ -753,34 +721,15 @@ class General(models.Model):
         null=True,
         help_text=docs.total_fed_expenditures,
     )
-    type_report_financial_statements = models.CharField(
-        "Type of Report Issued on the Financial Statements",
-        max_length=40,
-        null=True,
-        help_text=docs.type_report_financial_statements,
-    )
     type_report_major_program = models.CharField(
         "Type of Report Issued on the Major Program Compliance",
         max_length=40,
         null=True,
         help_text=docs.type_report_major_program_general,
     )
-    # suppression_code = models.CharField(
-    #     "Determines whether the PDF audit will be displayed on the public site",
-    #     null=True,
-    # )
     type_audit_code = models.CharField("Determines if audit is A133 or UG", default="")
 
     # Metadata
-    # cfac_report_id = models.CharField(
-    #     "Used by CFAC to uniquely identify a submission", null=True
-    # )
-    # dbkey = models.CharField(
-    #     "Audit Year and DBKEY (database key) combined make up the primary key. Only on records created by Census.",
-    #     max_length=40,
-    #     help_text=docs.dbkey_general,
-    #     null=True,
-    # )
     is_public = models.BooleanField(
         "True for public records, False for non-public records", null=True
     )
