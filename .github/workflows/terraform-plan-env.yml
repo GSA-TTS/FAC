@@ -1,13 +1,11 @@
 ---
 name: Terraform plan (single env)
-
 on:
   workflow_call:
     inputs:
       environment:
         required: true
         type: string
-
 
 jobs:
   plan:
@@ -33,10 +31,6 @@ jobs:
         # The post includes a link to the workflow run where the plan was
         # generated, and the same comment will be updated each time a new commit
         # on the PR branch triggers a re-plan.
-      - name: show versions
-        run: |
-          echo "TF_VAR_postgrest_image=$TF_VAR_postgrest_image"
-          echo "TF_VAR_clamav_image=$TF_VAR_clamav_image"
       - name: terraform plan ( ${{ inputs.environment }} )
         uses: dflook/terraform-plan@v1
         with:
@@ -53,4 +47,3 @@ jobs:
             bucket=${{ secrets.terraform_BUCKET }},
             region=${{ secrets.terraform_REGION }},
             key=${{ env.KEY }},
-

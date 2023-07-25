@@ -1,11 +1,11 @@
 ---
-name: Terraform Format and Lint
+name: Terraform format and lint
 on:
   workflow_call:
 
 jobs:
   test:
-    name: Test format and validity
+    name: Test format and validite
     runs-on: ubuntu-latest
     steps:
       - name: Checkout

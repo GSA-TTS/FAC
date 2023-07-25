@@ -2,11 +2,11 @@
 
 -- We are self managing our migrations here
 -- The SQL is called and applied from data_distro/migrations
--- This is a point in time of sql run that is comparable with data distro models. The views in the api_views folder represent the current views for the API.
+-- This is a point in time of sql run that is comparable with data distro models. The views in the api_v1_0_0-beta_views folder represent the current views for the API_V1_0_0-BETA.
 -- As the models change later, we don't want
 -- our migration to reference fields that don't exist yet or already exist.
 
---This will be used by the postgrest API
+--This will be used by the postgrest API_V1_0_0-BETA
 
 begin;
 
@@ -24,22 +24,24 @@ $$
 do
 $$
 begin
-    if not exists (select schema_name from information_schema.schemata where schema_name = 'api') then
-        create schema api;
+    DROP SCHEMA IF EXISTS api_v1_0_0_beta CASCADE; 
+
+    if not exists (select schema_name from information_schema.schemata where schema_name = 'api_v1_0_0_beta') then
+        create schema api_v1_0_0_beta;
 
         -- Grant access to tables and views
         alter default privileges
-            in schema api
+            in schema api_v1_0_0_beta
             grant select
         -- this includes views
         on tables
         to anon;
 
         -- Grant access to sequences, if we have them
-        grant usage on schema api to anon;
-        grant select, usage on all sequences in schema api to anon;
+        grant usage on schema api_v1_0_0_beta to anon;
+        grant select, usage on all sequences in schema api_v1_0_0_beta to anon;
         alter default privileges
-            in schema api
+            in schema api_v1_0_0_beta
             grant select, usage
         on sequences
         to anon;
@@ -49,3 +51,7 @@ $$
 ;
 
 commit;
+
+notify pgrst,
+       'reload schema';
+

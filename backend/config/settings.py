@@ -16,6 +16,7 @@ import logging
 import json
 import environs
 from cfenv import AppEnv
+from audit.get_agency_names import get_agency_names
 
 import newrelic.agent
 
@@ -159,6 +160,8 @@ DATABASES = {
         "DATABASE_URL", default="postgres://postgres:password@0.0.0.0/backend"
     ),
 }
+
+POSTGREST = {"URL": env.str("POSTGREST_URL", "http://api:3000")}
 
 
 # Password validation
@@ -447,3 +450,5 @@ if DISABLE_AUTH:
     AUTHENTICATION_BACKENDS = [
         "users.auth.FACTestAuthenticationBackend",
     ]
+
+AGENCY_NAMES = get_agency_names()

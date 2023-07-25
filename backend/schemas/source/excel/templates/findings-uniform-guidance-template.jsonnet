@@ -14,6 +14,7 @@ local single_cells = [
     title_cell: 'A1',
     range_cell: 'A2',
     validation: SV.StringOfLengthTwelve,
+    format: 'text',
     help: Help.uei,
   },
 ];
@@ -38,50 +39,23 @@ local y_or_n_range_w16 = Sheets.y_or_n_range {
   width: 16,
 };
 
-local y_or_n_range_w16_with_formula = Sheets.y_or_n_range {
-  width: 16,
-  formula: '=IF(OR(G{0}="", H{0}="", I{0}="", J{0}="", K{0}=""), "", IF(OR(AND(G{0}="Y", H{0}="N", I{0}="N", J{0}="N", K{0}="N"), AND(G{0}="Y", H{0}="N", I{0}="Y", J{0}="N", K{0}="N"), AND(G{0}="Y", H{0}="N", I{0}="N", J{0}="Y", K{0}="N"), AND(G{0}="N", H{0}="Y", I{0}="N", J{0}="N", K{0}="N"), AND(G{0}="N", H{0}="Y", I{0}="Y", J{0}="N", K{0}="N"), AND(G{0}="N", H{0}="Y", I{0}="N", J{0}="Y", K{0}="N"), AND(G{0}="N", H{0}="N", I{0}="Y", J{0}="N", K{0}="N"), AND(G{0}="N", H{0}="N", I{0}="N", J{0}="Y", K{0}="N"), AND(G{0}="N", H{0}="N", I{0}="N", J{0}="N", K{0}="Y")), "Y", "N"))',
-};
-
 local y_or_n_range_w12 = Sheets.y_or_n_range {
   width: 12,
 };
 
 local open_ranges_defns = [
   [
-    open_range_w12 {
-      help: Help.aln_prefix,
+    Sheets.open_range {
+      width: 18,
+      help: Help.award_reference,
     },
-    SV.FAPPrefixValidation,
-    'Federal Agency Prefix',
-    'federal_agency_prefix',
-  ],
-  [
-    open_range_w12 {
-      help: Help.aln_extension,
-    },
-    SV.StringOfLengthThree,
-    'CFDA Three Digit Extension',
-    'three_digit_extension',
+    SV.AwardReferenceValidation,
+    'Award Reference',
+    'award_reference',
   ],
   [
     Sheets.open_range {
-      help: Help.unknown,
-    },
-    SV.NoValidation,
-    'Additional Award Identification',
-    'additional_award_identification',
-  ],
-  [
-    open_range_w48 {
-      help: Help.plain_text,
-    },
-    SV.NoValidation,
-    'Federal Program Name',
-    'program_name',
-  ],
-  [
-    Sheets.open_range {
+      width: 18,
       help: Help.reference_number,
     },
     SV.ReferenceNumberValidation,
@@ -161,11 +135,14 @@ local open_ranges_defns = [
     'prior_references',
   ],
   [
-    y_or_n_range_w16_with_formula {
+    y_or_n_range_w16 {
+      keep_locked: true,
+      formula: '=IF(OR(D{0}="", E{0}="", F{0}="", G{0}="", H{0}=""), "", IF(OR(AND(D{0}="Y", E{0}="N", F{0}="N", G{0}="N", H{0}="N"), AND(D{0}="Y", E{0}="N", F{0}="Y", G{0}="N", H{0}="N"), AND(D{0}="Y", E{0}="N", F{0}="N", G{0}="Y", H{0}="N"), AND(D{0}="N", E{0}="Y", F{0}="N", G{0}="N", H{0}="N"), AND(D{0}="N", E{0}="Y", F{0}="Y", G{0}="N", H{0}="N"), AND(D{0}="N", E{0}="Y", F{0}="N", G{0}="Y", H{0}="N"), AND(D{0}="N", E{0}="N", F{0}="Y", G{0}="N", H{0}="N"), AND(D{0}="N", E{0}="N", F{0}="N", G{0}="Y", H{0}="N"), AND(D{0}="N", E{0}="N", F{0}="N", G{0}="N", H{0}="Y")), "Y", "N"))',
       help: Help.yorn,
     },
     SV.YoNValidation,
-    'Is Findings Combination Valid? (Read Only - Please See Instructions tab)',
+    //FIXME MSHD: If we end up adding an instructions sheet, then we add back" - See Instructions tab" to the end of this string below
+    'Is Findings Combination Valid? (Read Only)',
     'is_valid',
   ],
 ];
@@ -174,11 +151,15 @@ local sheets = [
   {
     name: findingSheet,
     open_ranges: Fun.make_open_ranges(title_row, open_ranges_defns),
+    hide_col_from: 13,
   },
   {
     name: ueiSheet,
     single_cells: single_cells,
     header_height: 100,
+    hide_col_from: 2,
+    //FIXME MSHD: commented this out until we figure out if it is needed
+    //hide_row_from: 3,
   },
 ];
 
