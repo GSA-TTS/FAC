@@ -11,5 +11,5 @@ module.exports = defineConfig({
     excludeSpecPattern: ['*/*/**/sf-sac-general-info.cy.js', '*/*/**/display-submissions.cy.js'],
     video: false,
     screenshotOnRunFailure: false
-  },
+  }
 });
