@@ -211,10 +211,9 @@ class ETL(object):
         return return_dict
 
     def load_general(self):
-        # TODO: Use the mixin to access general_information fields once that code
-        #       is merged.
         general_information = self.single_audit_checklist.general_information
         dates_by_status = self._get_dates_from_sac()
+        sac_additional_ueis = self.single_audit_checklist.additional_ueis
         general = General(
             report_id=self.report_id,
             auditee_certify_name=None,  # TODO: Where does this come from?
@@ -229,7 +228,12 @@ class ETL(object):
             auditee_state=general_information["auditee_state"],
             auditee_ein=general_information["ein"],
             auditee_uei=general_information["auditee_uei"],
-            auditee_addl_uei_list=[],
+            auditee_addl_uei_list=[
+                entry["additional_uei"]
+                for entry in sac_additional_ueis["AdditionalUEIs"][
+                    "additional_ueis_entries"
+                ]
+            ],
             auditee_zip=general_information["auditee_zip"],
             auditor_phone=general_information["auditor_phone"],
             auditor_state=general_information["auditor_state"],
