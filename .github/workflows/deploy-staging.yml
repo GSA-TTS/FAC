@@ -47,7 +47,7 @@ jobs:
 
   regression-test:
     name: Run Regression Tests
-    uses: ./.github/workflows/end-to-end-test.yml
+    uses: ./.github/workflows/regression-tests.yml
     secrets: inherit
     with:
       url: "https://fac-staging.app.cloud.gov/"
