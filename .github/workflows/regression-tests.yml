@@ -7,14 +7,12 @@ on:
         description: "Base URL for Cypress"
         required: true
         type: string
-        default: "https://fac-staging.app.cloud.gov"
   workflow_call:
     inputs:
       url:
         description: "Base URL for Cypress"
         required: true
         type: string
-        default: "https://fac-staging.app.cloud.gov"
   schedule:
     - cron: '0 9 * * 1-5'
 

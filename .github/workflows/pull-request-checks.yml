@@ -92,5 +92,5 @@ jobs:
     uses: ./.github/workflows/regression-tests.yml
     secrets: inherit
     with:
-      url: "https://fac-staging.app.cloud.gov/"
+      url: "https://fac-staging.app.cloud.gov"
 
