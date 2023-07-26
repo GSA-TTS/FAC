@@ -41,14 +41,14 @@
                     <p class="text-base">Select any of the following that apply.</p>
                     {% for pair in gaap_results %}
                         <div class="usa-checkbox">
-                            <input id="gaap_results--{{pair.tag}}"
-                                name="gaap_results"
-                                class="usa-checkbox__input"
-                                required
-                                type="checkbox"
-                                value="{{pair.tag}}"
-                                {% if pair.tag in form.cleaned_data.gaap_results %}checked{% endif %} />
-                            <label class="usa-checkbox__label" for="gaap_results--{{pair.tag}}">{{pair.readable}}</label>
+                            <input id="gaap_results--{{ pair.tag }}"
+                                   name="gaap_results"
+                                   class="usa-checkbox__input"
+                                   required
+                                   type="checkbox"
+                                   value="{{ pair.tag }}"
+                                   {% if pair.tag in form.cleaned_data.gaap_results %}checked{% endif %} />
+                            <label class="usa-checkbox__label" for="gaap_results--{{ pair.tag }}">{{ pair.readable }}</label>
                         </div>
                     {% endfor %}
                     <span class="usa-error-message margin-top-2">{{ form.errors.gaap_results|striptags }}</span>
@@ -144,7 +144,8 @@
                                type="radio"
                                value="True"
                                {% if form.cleaned_data.is_material_noncompliance_disclosed is True %}checked{% endif %} />
-                        <label class="usa-radio__label" for="is_material_noncompliance_disclosed--true">Yes</label>
+                        <label class="usa-radio__label"
+                               for="is_material_noncompliance_disclosed--true">Yes</label>
                     </div>
                     <div class="usa-radio">
                         <input class="usa-radio__input"
@@ -191,9 +192,13 @@
                     <div class="grid-row">
                         <label class="margin-top-2 margin-right-1">$</label>
                         <input id="dollar_threshold"
-                        name="dollar_threshold" class="usa-input
-                        usa-input--medium tablet:grid-col-2" min="1"
-                        pattern="\d+" required type="number" value="{{ form.cleaned_data.dollar_threshold }}" />
+                               name="dollar_threshold"
+                               class="usa-input usa-input--medium tablet:grid-col-2"
+                               min="1"
+                               pattern="\d+"
+                               required
+                               type="number"
+                               value="{{ form.cleaned_data.dollar_threshold }}" />
                     </div>
                     <span class="usa-error-message margin-top-2">{{ form.errors.dollar_threshold|striptags }}</span>
                 </fieldset>
@@ -237,12 +242,16 @@
                         {% for number, name in agency_names.items %}
                             <option class="margin-top-1"
                                     value="{{ number }}"
-                                    {% if number in form.cleaned_data.agencies %}selected{% endif %}>{{ number }} - {{ name }}</option>
+                                    {% if number in form.cleaned_data.agencies %}selected{% endif %}>
+                                {{ number }} - {{ name }}
+                            </option>
                         {% endfor %}
                     </select>
                     <span class="usa-error-message margin-top-2">{{ form.errors.agencies|striptags }}</span>
                 </fieldset>
-                <button class="usa-button margin-top-2 margin-bottom-10" id="continue" name="continue">Save and continue to the next section</button>
+                <button class="usa-button margin-top-2 margin-bottom-10"
+                        id="continue"
+                        name="continue">Save and continue to the next section</button>
             </form>
         </div>
     </div>
