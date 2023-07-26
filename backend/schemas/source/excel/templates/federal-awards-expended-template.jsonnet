@@ -34,8 +34,8 @@ local single_cells = [
     title_cell: 'B1',
     range_cell: 'B2',
     format: 'dollar',
-    // FIXME MSHD: for improvement, will need to pull E from this formula and retrieve it dynamically.
-    formula: "=SUM('" + awardSheet + "'!E$FIRSTROW:E$LASTROW)",
+    // FIXME MSHD: for improvement, will need to pull F from this formula and retrieve it dynamically.
+    formula: "=SUM('" + awardSheet + "'!F$FIRSTROW:F$LASTROW)",
     width: 36,
     help: Help.positive_number,
     validation: SV.PositiveNumberValidation,
@@ -43,6 +43,17 @@ local single_cells = [
 ];
 
 local open_ranges_defns = [
+  [
+    Sheets.open_range {
+      keep_locked: true,
+      formula: '=IF(B{0}<>"", "AWARD-"&TEXT(ROW()-1,"0000"), "")',
+      width: 18,
+      help: Help.award_reference,
+    },
+    SV.NoValidation,
+    'Award Reference (Read Only)',
+    'award_reference',
+  ],
   [
     Sheets.open_range {
       format: 'text',
@@ -136,7 +147,7 @@ local open_ranges_defns = [
     Sheets.open_range {
       keep_locked: true,
       format: 'dollar',
-      formula: '=IF(F{0}="' + Base.Const.OTHER_CLUSTER + '",SUMIFS(' + amountExpendedNamedRange + ',' + uniformOtherClusterNamedRange + ',X{0}), IF(AND(OR(F{0}="' + Base.Const.NA + '",F{0}=""),G{0}=""),0,IF(F{0}="' + Base.Const.STATE_CLUSTER + '",SUMIFS(' + amountExpendedNamedRange + ',' + uniformStateClusterNamedRange + ',W{0}),SUMIFS(' + amountExpendedNamedRange + ',' + clusterNamedRange + ',F{0}))))',
+      formula: '=IF(G{0}="' + Base.Const.OTHER_CLUSTER + '",SUMIFS(' + amountExpendedNamedRange + ',' + uniformOtherClusterNamedRange + ',X{0}), IF(AND(OR(G{0}="' + Base.Const.NA + '",G{0}=""),H{0}=""),0,IF(G{0}="' + Base.Const.STATE_CLUSTER + '",SUMIFS(' + amountExpendedNamedRange + ',' + uniformStateClusterNamedRange + ',W{0}),SUMIFS(' + amountExpendedNamedRange + ',' + clusterNamedRange + ',G{0}))))',
       help: Help.positive_number,
     },
     SV.PositiveNumberValidation,
@@ -231,18 +242,7 @@ local open_ranges_defns = [
   [
     Sheets.open_range {
       keep_locked: true,
-      formula: '=IF(A{0}<>"", "AWARD-"&TEXT(ROW()-1,"00000"), "")',
-      width: 24,
-      help: Help.unknown,
-    },
-    SV.NoValidation,
-    'Award Index (Read Only)',
-    'award_reference',
-  ],
-  [
-    Sheets.open_range {
-      keep_locked: true,
-      formula: '=CONCATENATE(A{0},B{0})',
+      formula: '=CONCATENATE(B{0},C{0})',
       width: 12,
       format: 'text',
       help: Help.unknown,
@@ -254,7 +254,7 @@ local open_ranges_defns = [
   [
     Sheets.open_range {
       keep_locked: true,
-      formula: '=UPPER(TRIM(G{0}))',
+      formula: '=UPPER(TRIM(H{0}))',
       width: 24,
       help: Help.unknown,
     },
@@ -265,7 +265,7 @@ local open_ranges_defns = [
   [
     Sheets.open_range {
       keep_locked: true,
-      formula: '=UPPER(TRIM(H{0}))',
+      formula: '=UPPER(TRIM(I{0}))',
       width: 24,
       help: Help.unknown,
     },
@@ -297,7 +297,7 @@ local sheets = [
         title: 'Cluster Names',
         title_cell: 'A1',
         range_name: 'cluster_name_lookup',
-        contents: Base.Compound.ClusterName,
+        contents: Base.Compound.ClusterNames,
         validation: SV.LookupValidation {
           lookup_range: 'cluster_name_lookup',
         },

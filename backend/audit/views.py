@@ -11,25 +11,40 @@ from django.utils.datastructures import MultiValueDictKeyError
 from django.utils.decorators import method_decorator
 from django.http import JsonResponse
 
-from audit.forms import UploadReportForm
-
-from .fixtures.excel import FORM_SECTIONS
-
 from audit.excel import (
     extract_additional_ueis,
     extract_federal_awards,
     extract_corrective_action_plan,
     extract_findings_text,
     extract_findings_uniform_guidance,
+    extract_secondary_auditors,
     extract_notes_to_sefa,
 )
+from audit.validators import (
+    validate_additional_ueis_json,
+    validate_federal_award_json,
+    validate_corrective_action_plan_json,
+    validate_findings_text_json,
+    validate_findings_uniform_guidance_json,
+    validate_secondary_auditors_json,
+    validate_notes_to_sefa_json,
+)
+from audit.forms import UploadReportForm, AuditInfoForm
+from audit.get_agency_names import get_agency_names
 from audit.mixins import (
     CertifyingAuditeeRequiredMixin,
     CertifyingAuditorRequiredMixin,
     SingleAuditChecklistAccessRequiredMixin,
 )
+from audit.models import (
+    Access,
+    ExcelFile,
+    LateChangeError,
+    SingleAuditChecklist,
+    SingleAuditReportFile,
+)
 
-from audit.models import Access, ExcelFile, SingleAuditChecklist, SingleAuditReportFile
+from .fixtures.excel import FORM_SECTIONS
 
 logger = logging.getLogger(__name__)
 
@@ -77,22 +92,71 @@ class EditSubmission(LoginRequiredMixin, generic.View):
 
 class ExcelFileHandlerView(SingleAuditChecklistAccessRequiredMixin, generic.View):
     FORM_SECTION_HANDLERS = {
-        FORM_SECTIONS.FEDERAL_AWARDS_EXPENDED: (
-            extract_federal_awards,
-            "federal_awards",
-        ),
-        FORM_SECTIONS.CORRECTIVE_ACTION_PLAN: (
-            extract_corrective_action_plan,
-            "corrective_action_plan",
-        ),
-        FORM_SECTIONS.FINDINGS_UNIFORM_GUIDANCE: (
-            extract_findings_uniform_guidance,
-            "findings_uniform_guidance",
-        ),
-        FORM_SECTIONS.FINDINGS_TEXT: (extract_findings_text, "findings_text"),
-        FORM_SECTIONS.ADDITIONAL_UEIS: (extract_additional_ueis, "additional_ueis"),
-        FORM_SECTIONS.NOTES_TO_SEFA: (extract_notes_to_sefa, "notes_to_sefa"),
+        FORM_SECTIONS.FEDERAL_AWARDS_EXPENDED: {
+            "extractor": extract_federal_awards,
+            "field_name": "federal_awards",
+            "validator": validate_federal_award_json,
+        },
+        FORM_SECTIONS.CORRECTIVE_ACTION_PLAN: {
+            "extractor": extract_corrective_action_plan,
+            "field_name": "corrective_action_plan",
+            "validator": validate_corrective_action_plan_json,
+        },
+        FORM_SECTIONS.FINDINGS_UNIFORM_GUIDANCE: {
+            "extractor": extract_findings_uniform_guidance,
+            "field_name": "findings_uniform_guidance",
+            "validator": validate_findings_uniform_guidance_json,
+        },
+        FORM_SECTIONS.FINDINGS_TEXT: {
+            "extractor": extract_findings_text,
+            "field_name": "findings_text",
+            "validator": validate_findings_text_json,
+        },
+        FORM_SECTIONS.ADDITIONAL_UEIS: {
+            "extractor": extract_additional_ueis,
+            "field_name": "additional_ueis",
+            "validator": validate_additional_ueis_json,
+        },
+        FORM_SECTIONS.SECONDARY_AUDITORS: {
+            "extractor": extract_secondary_auditors,
+            "field_name": "secondary_auditors",
+            "validator": validate_secondary_auditors_json,
+        },
+        FORM_SECTIONS.NOTES_TO_SEFA: {
+            "extractor": extract_notes_to_sefa,
+            "field_name": "notes_to_sefa",
+            "validator": validate_notes_to_sefa_json,
+        },
     }
+
+    def _create_excel_file(self, file, sac_id, form_section):
+        excel_file = ExcelFile(
+            **{
+                "file": file,
+                "filename": "temp",
+                "sac_id": sac_id,
+                "form_section": form_section,
+            }
+        )
+        excel_file.full_clean()
+        return excel_file
+
+    def _extract_and_validate_data(self, form_section, excel_file):
+        handler_info = self.FORM_SECTION_HANDLERS.get(form_section)
+        if handler_info is None:
+            logger.warning("No form section found with name %s", form_section)
+            raise BadRequest()
+        audit_data = handler_info["extractor"](excel_file.file)
+        validator = handler_info.get("validator")
+        if validator is not None and callable(validator):
+            validator(audit_data)
+        return audit_data
+
+    def _save_audit_data(self, sac, form_section, audit_data):
+        handler_info = self.FORM_SECTION_HANDLERS.get(form_section)
+        if handler_info is not None:
+            setattr(sac, handler_info["field_name"], audit_data)
+            sac.save()
 
     # this is marked as csrf_exempt to enable by-hand testing via tools like Postman. Should be removed when the frontend form is implemented!
     @method_decorator(csrf_exempt)
@@ -113,33 +177,13 @@ class ExcelFileHandlerView(SingleAuditChecklistAccessRequiredMixin, generic.View
 
             file = request.FILES["FILES"]
 
-            excel_file = ExcelFile(
-                **{
-                    "file": file,
-                    "filename": "temp",
-                    "sac_id": sac.id,
-                    "form_section": form_section,
-                }
-            )
+            excel_file = self._create_excel_file(file, sac.id, form_section)
 
-            excel_file.full_clean()
             excel_file.save()
-            handler, field_name = self.FORM_SECTION_HANDLERS.get(
-                form_section, (None, None)
-            )
-            if handler is None:
-                logger.warning("no form section found with name %s", form_section)
-                raise BadRequest()
 
-            audit_data = handler(excel_file.file)
-            validate_function = f"validate_{field_name}_json"
-            if validate_function in globals() and callable(
-                globals()[validate_function]
-            ):
-                globals()[validate_function](audit_data)
+            audit_data = self._extract_and_validate_data(form_section, excel_file)
 
-            setattr(sac, field_name, audit_data)
-            sac.save()
+            self._save_audit_data(sac, form_section, audit_data)
 
             return redirect("/")
         except SingleAuditChecklist.DoesNotExist as err:
@@ -157,6 +201,15 @@ class ExcelFileHandlerView(SingleAuditChecklistAccessRequiredMixin, generic.View
         except KeyError as err:
             logger.warning("Field error. Field: %s", err)
             return JsonResponse({"errors": str(err), "type": "error_field"}, status=400)
+        except LateChangeError:
+            logger.warning("Attempted late change.")
+            return JsonResponse(
+                {
+                    "errors": "Access denied. Further changes to audits that have been marked ready for certification are not permitted.",
+                    "type": "no_late_changes",
+                },
+                status=400,
+            )
 
 
 class SingleAuditReportFileHandlerView(
@@ -210,10 +263,14 @@ class ReadyForCertificationView(SingleAuditChecklistAccessRequiredMixin, generic
         try:
             sac = SingleAuditChecklist.objects.get(report_id=report_id)
 
-            sac.transition_to_ready_for_certification()
-            sac.save()
+            errors = sac.validate_cross()
+            if not errors:
+                sac.transition_to_ready_for_certification()
+                sac.save()
+                return redirect(reverse("audit:SubmissionProgress", args=[report_id]))
 
-            return redirect(reverse("audit:SubmissionProgress", args=[report_id]))
+            context = {"report_id": report_id, "errors": errors}
+            return render(request, "audit/not-ready-for-certification.html", context)
 
         except SingleAuditChecklist.DoesNotExist:
             raise PermissionDenied("You do not have access to this audit.")
@@ -350,6 +407,7 @@ class SubmissionProgressView(SingleAuditChecklistAccessRequiredMixin, generic.Vi
         try:
             sac = SingleAuditChecklist.objects.get(report_id=report_id)
 
+            # TODO: Ensure the correct SAC elements are used to determine what's complete.
             context = {
                 "single_audit_checklist": {
                     "created": True,
@@ -364,7 +422,7 @@ class SubmissionProgressView(SingleAuditChecklistAccessRequiredMixin, generic.Vi
                     "completed_date": None,
                     "completed_by": None,
                 },
-                "audit_information_workbook": {
+                "audit_information_form": {
                     "completed": False,
                     "completed_date": None,
                     "completed_by": None,
@@ -416,7 +474,7 @@ class SubmissionProgressView(SingleAuditChecklistAccessRequiredMixin, generic.Vi
             # Add all SF-SAC uploads to determine if the process is complete or not
             context["SF_SAC_completed"] = (
                 context["federal_awards_workbook"]["completed"]
-                and context["audit_information_workbook"]["completed"]
+                and context["audit_information_form"]["completed"]
                 and context["findings_text_workbook"]["completed"]
                 and context["CAP_workbook"]["completed"]
                 and context["additional_UEIs_workbook"]["completed"]
@@ -426,6 +484,60 @@ class SubmissionProgressView(SingleAuditChecklistAccessRequiredMixin, generic.Vi
             return render(request, "audit/submission-progress.html", context)
         except SingleAuditChecklist.DoesNotExist:
             raise PermissionDenied("You do not have access to this audit.")
+
+
+class AuditInfoFormView(SingleAuditChecklistAccessRequiredMixin, generic.View):
+    def get(self, request, *args, **kwargs):
+        report_id = kwargs["report_id"]
+        try:
+            sac = SingleAuditChecklist.objects.get(report_id=report_id)
+
+            context = {
+                "auditee_name": sac.auditee_name,
+                "report_id": report_id,
+                "auditee_uei": sac.auditee_uei,
+                "user_provided_organization_type": sac.user_provided_organization_type,
+                "agency_names": get_agency_names(),
+            }
+
+            # TODO: check if there's already a form in the DB and let the user know
+            # context['already_submitted'] = ...
+
+            return render(request, "audit/audit-info-form.html", context)
+        except SingleAuditChecklist.DoesNotExist:
+            raise PermissionDenied("You do not have access to this audit.")
+        except Exception as e:
+            logger.info("Enexpected error in AuditInfoFormView get.\n", e)
+            raise BadRequest()
+
+    def post(self, request, *args, **kwargs):
+        report_id = kwargs["report_id"]
+
+        try:
+            sac = SingleAuditChecklist.objects.get(report_id=report_id)
+            form = AuditInfoForm(request.POST, request.FILES)
+
+            if form.is_valid():
+                # Save the form, yay!
+                logger.info("Audit info form passed validation.")
+                return redirect(reverse("audit:SubmissionProgress", args=[report_id]))
+            else:
+                form.clean_booleans()
+                context = {
+                    "auditee_name": sac.auditee_name,
+                    "report_id": report_id,
+                    "auditee_uei": sac.auditee_uei,
+                    "user_provided_organization_type": sac.user_provided_organization_type,
+                    "agency_names": get_agency_names(),
+                    "form": form,
+                }
+                return render(request, "audit/audit-info-form.html", context)
+
+        except SingleAuditChecklist.DoesNotExist:
+            raise PermissionDenied("You do not have access to this audit.")
+        except Exception as e:
+            logger.info("Enexpected error in AuditInfoFormView post.\n", e)
+            raise BadRequest()
 
 
 class PageInput:
@@ -498,6 +610,7 @@ class UploadReportView(SingleAuditChecklistAccessRequiredMixin, generic.View):
             }
 
             # TODO: check if there's already a PDF in the DB and let the user know
+            # context['already_submitted'] = ...
 
             return render(request, "audit/upload-report.html", context)
         except SingleAuditChecklist.DoesNotExist:
@@ -517,14 +630,13 @@ class UploadReportView(SingleAuditChecklistAccessRequiredMixin, generic.View):
                 file = request.FILES["upload_report"]
 
                 sar_file = SingleAuditReportFile(
-                    **{"file": file, "filename": "temp", "sac_id": sac.id}
+                    **{"file": file, "filename": file.name, "sac_id": sac.id}
                 )
 
                 sar_file.full_clean()
                 sar_file.save()
 
                 # PDF issues can be communicated to the user with form.errors["upload_report"]
-                print("Saving form!")
                 return redirect(reverse("audit:SubmissionProgress", args=[report_id]))
             else:
                 context = {
@@ -536,7 +648,11 @@ class UploadReportView(SingleAuditChecklistAccessRequiredMixin, generic.View):
                     "form": form,
                 }
                 return render(request, "audit/upload-report.html", context)
+        except SingleAuditChecklist.DoesNotExist:
+            raise PermissionDenied("You do not have access to this audit.")
+        except LateChangeError:
+            return render(request, "audit/no-late-changes.html")
 
-        except Exception as e:
-            logger.info("Unexpected error in UploadReportView post.\n", e)
-            raise BadRequest()
+        except Exception as err:
+            logger.info("Unexpected error in UploadReportView post.\n", err)
+            raise BadRequest() from err

@@ -21,7 +21,6 @@ We use either [Docker with `docker compose`](#docker) or [local development](#lo
   * [pyenv-virtualenv](https://github.com/pyenv/pyenv-virtualenv) for managing virtual environments
   * [Postgres](https://www.postgresql.org/)
   * [SAM.gov](https://sam.gov/content/home) to validate UEI's
-  * [LocalStack](https://localstack.cloud/) for S3 emulation
 
 ## Setting up your dev environment
 
@@ -44,6 +43,7 @@ SECRET_KEY =
 DJANGO_SECRET_LOGIN_KEY =
 DISABLE_AUTH = 
 ```
+If you are using a MacBook with Apple M1 hardware, you will probably also have to add `DOCKERFILE = Apple_M1_Dockerfile` to the file.
 
 If you need to add these to your local environment (should end up in `~/.bash_profile`, `~/.bashrc`, `~/.zshrc`, or whatever flavor of shell you're using.)
 
@@ -202,14 +202,6 @@ will be separate for each user—this command only associates one user with each
 fake submission.
 
 Note that all of these fake submissions use the same UEI.
-
-### Create a test bucket
-
-We need a mocked S3 bucket for testing.
-
-```
-docker compose run web bash -c 'awslocal s3 mb s3://gsa-fac-private-s3'
-```
 
 ### Run tests
 

@@ -1,4 +1,4 @@
 {
-    "status":"success",
-    "message":"File upload successful"
+    "status": "success",
+    "message": "File successfully validated! Your work has been saved."
 }

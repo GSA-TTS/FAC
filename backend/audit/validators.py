@@ -16,6 +16,7 @@ from audit.excel import (
     federal_awards_named_ranges,
     findings_text_named_ranges,
     findings_uniform_guidance_named_ranges,
+    secondary_auditors_named_ranges,
     notes_to_sefa_named_ranges,
 )
 from audit.fixtures.excel import (
@@ -24,6 +25,7 @@ from audit.fixtures.excel import (
     FEDERAL_AWARDS_TEMPLATE_DEFINITION,
     FINDINGS_TEXT_TEMPLATE_DEFINITION,
     FINDINGS_UNIFORM_TEMPLATE_DEFINITION,
+    SECONDARY_AUDITORS_TEMPLATE_DEFINITION,
     NOTES_TO_SEFA_TEMPLATE_DEFINITION,
 )
 
@@ -211,6 +213,19 @@ def validate_general_information_json(value):
     return value
 
 
+def validate_secondary_auditors_json(value):
+    """
+    Apply JSON Schema for secondary auditors and report errors.
+    """
+    schema_path = settings.SECTION_SCHEMA_DIR / "SecondaryAuditors.schema.json"
+    schema = json.loads(schema_path.read_text(encoding="utf-8"))
+
+    validator = Draft7Validator(schema)
+    errors = list(validator.iter_errors(value))
+    if len(errors) > 0:
+        raise ValidationError(message=_secondary_auditors_json_error(errors))
+
+
 def validate_file_extension(file, allowed_extensions):
     """
     User-provided filenames must be have an allowed extension
@@ -384,6 +399,15 @@ def _findings_uniform_guidance_json_error(errors):
     )
     template = json.loads(template_definition_path.read_text(encoding="utf-8"))
     return _get_error_details(template, findings_uniform_guidance_named_ranges(errors))
+
+
+def _secondary_auditors_json_error(errors):
+    """Process JSON Schema errors for secondary auditors"""
+    template_definition_path = (
+        XLSX_TEMPLATE_DEFINITION_DIR / SECONDARY_AUDITORS_TEMPLATE_DEFINITION
+    )
+    template = json.loads(template_definition_path.read_text(encoding="utf-8"))
+    return _get_error_details(template, secondary_auditors_named_ranges(errors))
 
 
 def validate_single_audit_report_file_extension(file):

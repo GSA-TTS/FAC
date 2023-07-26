@@ -35,7 +35,7 @@
         "subrecipients": {
           "is_passed": "N"
         },
-        "award_reference": "AWARD-00001"
+        "award_reference": "AWARD-0001"
       },
       {
         "program": {
@@ -64,7 +64,7 @@
           "other_cluster_name": "Some name",
           "cluster_total": 123
         },
-        "award_reference": "AWARD-00002"
+        "award_reference": "AWARD-0002"
       },
       {
         "program": {
@@ -98,7 +98,7 @@
           "state_cluster_name": "Maine",
           "cluster_total": 123
         },
-        "award_reference": "AWARD-00003"
+        "award_reference": "AWARD-0003"
       }
     ]
   }

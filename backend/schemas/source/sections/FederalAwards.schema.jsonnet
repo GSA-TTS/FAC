@@ -172,7 +172,7 @@ local Validations = {
 local Parts = {
   Cluster: Types.object {
     properties: {
-      cluster_name: Base.Compound.ClusterName,
+      cluster_name: Base.Compound.ClusterNames,
       cluster_total: Types.number,
     },
     allOf: [
@@ -326,7 +326,7 @@ local FederalAwardEntry = Types.object {
     loan_or_loan_guarantee: Parts.LoanOrLoanGuarantee,
     program: Parts.Program,
     subrecipients: Parts.Subrecipients,
-    award_reference: Types.string,
+    award_reference: Base.Compound.AwardReference,
   },
   required: [
     'cluster',

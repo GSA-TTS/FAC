@@ -139,9 +139,7 @@
       "findings_uniform_guidance_entries": [
         {
           "program": {
-            "federal_agency_prefix": "42",
-            "three_digit_extension": "123",
-            "program_name": "program name",
+            "award_reference": "AWARD-0001",
             "compliance_requirement": "A"
           },
           "questioned_costs": "N",
@@ -156,6 +154,25 @@
             "prior_references": "2022-001",
             "reference_number": "2023-001"
           }
+        }
+      ]
+    }
+  },
+  "SecondaryAuditorsCase": {
+    "SecondaryAuditors": {
+      "auditee_uei": "AAA123456BBB",
+      "secondary_auditors_entries": [
+        {
+          "secondary_auditor_name": "Best Auditor Ever",
+          "secondary_auditor_ein": "123123123",
+          "secondary_auditor_address_street": "123 Maple Street",
+          "secondary_auditor_address_city": "Anytown",
+          "secondary_auditor_address_state": "WA",
+          "secondary_auditor_address_zipcode": "91919",
+          "secondary_auditor_contact_name": "Tory Audi",
+          "secondary_auditor_contact_title": "Esquire",
+          "secondary_auditor_contact_phone": "555-555-5555",
+          "secondary_auditor_contact_email": "tory.audi@bae.com"
         }
       ]
     }
