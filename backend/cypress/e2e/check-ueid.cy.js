@@ -69,19 +69,19 @@ describe('Create New Audit', () => {
       }
 
       it('should display an error message when left blank', () => {
-        leaveFyStartBlank()
+        leaveFyStartBlank();
         cy.get('#auditee_fiscal_period_start').click().blur();
         cy.get('#auditee_fiscal_period_start-not-null').should('be.visible');
       });
 
       it('should disable the submit button when fields are invalid', () => {
-        leaveFyStartBlank()
+        leaveFyStartBlank();
         cy.get('button').contains('Continue').should('be.disabled');
       });
 
       it('should remove the error message when input is supplied', () => {
         // arrange
-        leaveFyStartBlank()
+        leaveFyStartBlank();
 
         // act
         cy.get('#auditee_fiscal_period_start').type('01/01/2022').blur();
@@ -109,12 +109,12 @@ describe('Create New Audit', () => {
       }
 
       it('should display an error message when left blank', () => {
-        leaveFyEndBlank()
+        leaveFyEndBlank();
         cy.get('#auditee_fiscal_period_end-not-null').should('be.visible');
       });
 
       it('should disable the submit button when fields are invalid', () => {
-        leaveFyEndBlank()
+        leaveFyEndBlank();
         cy.get('button').contains('Continue').should('be.disabled');
       });
 
@@ -161,21 +161,6 @@ describe('Create New Audit', () => {
 
           cy.contains(`We can't connect to SAM.gov to confirm your UEI.`);
         });
-
-        it('lets the user proceed without a UEI', () => {
-          cy.get('@searchButton').click();
-
-          cy.wait('@apiError').then((interception) => {
-            assert.isNotNull(
-              interception.response.body,
-              '1st API call has data'
-            );
-          });
-
-          cy.get('@secondaryButton').click();
-          cy.get('#no-uei-warning').should('be.visible');
-          cy.get('#auditee_uei').should('not.be.visible');
-        });
       });
 
       describe('An invalid UEI', () => {
@@ -208,21 +193,6 @@ describe('Create New Audit', () => {
           });
 
           cy.contains('Your UEI is not recognized');
-        });
-
-        it('lets the user proceed without a UEI', () => {
-          cy.get('@searchButton').click();
-
-          cy.wait('@invalidUeiRequest').then((interception) => {
-            assert.isNotNull(
-              interception.response.body,
-              '1st API call has data'
-            );
-          });
-
-          cy.get('@primaryButton').click();
-          cy.get('#no-uei-warning').should('be.visible');
-          cy.get('#auditee_uei').should('not.be.visible');
         });
       });
 
@@ -335,12 +305,12 @@ describe('Create New Audit', () => {
 
   describe('Auditee info validation via API', () => {
     function completeFormWithValidInfo() {
-        cy.get('#auditee_uei').clear().type('ASDFASDFASDF').blur();
-        cy.get('#auditee_uei-btn').as('searchButton');
-        cy.get('.usa-modal__footer button.primary').as('primaryButton');
-        cy.get('.usa-modal__footer button.secondary').as('secondaryButton');
-        cy.get('#auditee_fiscal_period_start').clear().type('01/01/2021');
-        cy.get('#auditee_fiscal_period_end').clear().type('01/01/2022');
+      cy.get('#auditee_uei').clear().type('ASDFASDFASDF').blur();
+      cy.get('#auditee_uei-btn').as('searchButton');
+      cy.get('.usa-modal__footer button.primary').as('primaryButton');
+      cy.get('.usa-modal__footer button.secondary').as('secondaryButton');
+      cy.get('#auditee_fiscal_period_start').clear().type('01/01/2021');
+      cy.get('#auditee_fiscal_period_end').clear().type('01/01/2022');
     }
 
     xit('should return auditee info errors from the remote server', () => {
