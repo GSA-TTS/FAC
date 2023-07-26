@@ -593,6 +593,12 @@ class General(models.Model):
     submitted_date = models.DateField(
         "The date at which the audit transitioned to 'submitted'", null=True
     )
+    auditor_signature_date = models.DateField(
+        "The date on which the auditor signed the audit", null=True
+    )
+    auditee_signature_date = models.DateField(
+        "The date on which the auditor signed the audit", null=True
+    )
     fy_end_date = models.DateField(
         "Fiscal Year End Date", null=True, help_text=docs.fy_end_date
     )
