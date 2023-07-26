@@ -7,7 +7,7 @@ terraform {
     }
 
     docker = {
-      source = "kreuzwerker/docker"
+      source  = "kreuzwerker/docker"
       version = "~>3.0.2"
     }
   }
