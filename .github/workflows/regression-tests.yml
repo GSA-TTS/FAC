@@ -9,17 +9,12 @@ on:
         type: string
         default: "https://fac-staging.app.cloud.gov"
   workflow_call:
-  # Called from deploy-staging.yml
     inputs:
       url:
         description: "Base URL for Cypress"
         required: true
         type: string
         default: "https://fac-staging.app.cloud.gov"
-  # Remove "push" trigger before opening PR
-  push:
-    branches:
-      - nmb/cypress-login
   schedule:
     - cron: '0 9 * * 1-5'
 
