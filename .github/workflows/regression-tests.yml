@@ -41,11 +41,11 @@ jobs:
       - name: Create .env file
         run: touch .env
 
-      - name: Run Cypress tests
+      - name: Run Cypress full submission test
         uses: cypress-io/github-action@v5
         with:
           working-directory: ./backend
-          spec: cypress/e2e/login.cy.js
+          spec: cypress/e2e/full-submission.cy.js
 
       - uses: actions/upload-artifact@v3
         # add the line below to store screenshots only on failures
