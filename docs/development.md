@@ -31,6 +31,11 @@ Target python version is defined in [../backend/runtime.txt](../backend/runtime.
 
 ---
 
+## EditorConfig
+
+We have a `.editorconfig` file at the root directory with basic settings.
+See [editorconfig.org](https://editorconfig.org/) for more information.
+
 ## Environment Variables
 
 Create a .env file in the `/backend` directory.
