@@ -136,6 +136,9 @@ function attachFileUploadHandler() {
               } else if (data.type === 'no_late_changes') {
                 info_box.innerHTML =
                   'Access denied. Further changes to audits that have been marked ready for certification are not permitted.';
+              } else if (res.status == 400) {
+                info_box.innerHTML = 'Field Error: undefined';
+                setFormDisabled(false);
               } else if (data.type) {
                 info_box.innerHTML = `Error: ${data.errors}`;
               } else {

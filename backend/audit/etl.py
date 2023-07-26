@@ -254,20 +254,13 @@ class ETL(object):
             fy_start_date=general_information["auditee_fiscal_period_start"],
             audit_year=self.audit_year,
             audit_type=general_information["audit_type"],
-            condition_or_deficiency_major_program=None,  # TODO: Where does this come from?
-            current_or_former_findings=None,  # TODO: Where does this come from?
             entity_type=general_information["user_provided_organization_type"],
-            material_weakness=None,  # TODO: Where does this come from?
-            material_weakness_major_program=None,  # TODO: Notes say this hasn't been used since 2013.
             number_months=None,  # TODO: Where does this come from?
             audit_period_covered=general_information["audit_period_covered"],
-            prior_year_schedule=None,  # TODO: Notes say this hasn't been used since 2016.
-            questioned_costs=None,  # TODO: Notes say this hasn't been used since 2013.
             report_required=None,  # TODO: Notes say this hasn't been used since 2008.
             total_fed_expenditures=None,  # TODO: Where does this come from?
-            type_report_financial_statements=None,  # TODO: Where does this come from?
             type_report_major_program=None,  # TODO: Where does this come from?
-            type_audit_code="A133",  # TODO: Where does this come from?
+            type_audit_code="UG",
             is_public=None,  # Should be coming from SingleAuditChecklist
             data_source="G-FAC",
         )
