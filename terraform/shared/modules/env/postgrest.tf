@@ -20,7 +20,7 @@ data "docker_registry_image" "postgrest" {
 resource "cloudfoundry_app" "postgrest" {
   name         = local.postgrest_name
   space        = data.cloudfoundry_space.apps.id
-  docker_image = "ghcr.io/gsa-tts/fac/postgrest@sha256:${data.docker_registry_image.postgrest.sha256_digest}"
+  docker_image = "ghcr.io/gsa-tts/fac/postgrest@${data.docker_registry_image.postgrest.sha256_digest}"
   timeout      = 180
   memory       = 128
   disk_quota   = 256
