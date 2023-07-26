@@ -2,6 +2,10 @@ locals {
   clam_name = "fac-av-${var.cf_space_name}"
 }
 
+data "docker_registry_image" "clamav" {
+  name = "ghcr.io/gsa-tts/fac/clamav:latest"
+}
+
 module "clamav" {
   source = "github.com/18f/terraform-cloudgov//clamav?ref=v0.6.0"
 
@@ -11,7 +15,7 @@ module "clamav" {
 
   cf_org_name   = var.cf_org_name
   cf_space_name = var.cf_space_name
-  clamav_image  = "ghcr.io/gsa-tts/fac/clamav:latest"
+  clamav_image  = "ghcr.io/gsa-tts/fac/clamav@sha256:${data.docker_registry_image.clamav.sha256_digest}"
   max_file_size = "30M"
 
   proxy_server   = module.https-proxy.domain
