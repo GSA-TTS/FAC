@@ -139,30 +139,26 @@ class FederalAward(models.Model):
         null=True,
         help_text=docs.award_identification,
     )
-    federal_program_name = models.CharField(
+    federal_program_name = models.TextField(
         "Name of Federal Program",
-        max_length=300,
         null=True,
         help_text=docs.federal_program_name,
     )
     amount_expended = models.BigIntegerField(
         "Amount Expended for the Federal Program", help_text=docs.amount
     )
-    cluster_name = models.CharField(
+    cluster_name = models.TextField(
         "The name of the cluster",
-        max_length=75,
         null=True,
         help_text=docs.cluster_name,
     )
-    other_cluster_name = models.CharField(
+    other_cluster_name = models.TextField(
         "The name of the cluster (if not listed in the Compliance Supplement)",
-        max_length=75,
         null=True,
         help_text=docs.other_cluster_name,
     )
-    state_cluster_name = models.CharField(
+    state_cluster_name = models.TextField(
         "The name of the state cluster",
-        max_length=75,
         null=True,
         help_text=docs.state_cluster_name,
     )
@@ -296,9 +292,7 @@ class Note(models.Model):
         "Order that the Note was reported", help_text=docs.seq_number_notes
     )
     content = models.TextField("Content of the Note", null=True, help_text=docs.content)
-    note_title = models.CharField(
-        "Note Title", max_length=75, null=True, help_text=docs.title
-    )
+    note_title = models.TextField("Note Title", null=True, help_text=docs.title)
     accounting_policies = models.TextField(null=True)
     is_minimis_rate_used = models.CharField(max_length=3, null=True)
     rate_explained = models.TextField(null=True)
@@ -314,9 +308,8 @@ class Note(models.Model):
 class Revision(models.Model):
     """Documents what was revised on the associated form from the previous version"""
 
-    findings = models.CharField(
+    findings = models.TextField(
         "Indicates what items on the Findings page were edited during the revision",
-        max_length=110,
         null=True,
         help_text=docs.findings_revisions,
     )
@@ -325,9 +318,8 @@ class Revision(models.Model):
         null=True,
         help_text=docs.elec_report_revision_id,
     )
-    federal_awards = models.CharField(
+    federal_awards = models.TextField(
         "Indicates what items on the Federal Awards page were edited during the revision",
-        max_length=140,
         null=True,
         help_text=docs.federal_awards,
     )
@@ -371,15 +363,13 @@ class Revision(models.Model):
         null=True,
         help_text=docs.other_explain,
     )
-    audit_info = models.CharField(
+    audit_info = models.TextField(
         "Indicates what items on the Audit Info page were edited during the revision",
-        max_length=200,
         null=True,
         help_text=docs.audit_info,
     )
-    notes_to_sefa = models.CharField(
+    notes_to_sefa = models.TextField(
         "Indicates what items on the Notes to Schedule of Expenditures of Federal Awards (SEFA) page were edited during the revision",
-        max_length=50,
         null=True,
         help_text=docs.notes_to_sefa,
     )
@@ -395,15 +385,13 @@ class Revision(models.Model):
         null=True,
         help_text=docs.cap,
     )
-    other = models.CharField(
+    other = models.TextField(
         "Indicates what other miscellaneous items were edited during the revision",
-        max_length=65,
         null=True,
         help_text=docs.other,
     )
-    general_info = models.CharField(
+    general_info = models.TextField(
         "Indicates what items on the General Info page were edited during the revision",
-        max_length=75,
         null=True,
         help_text=docs.general_info,
     )
@@ -439,9 +427,8 @@ class Passthrough(models.Model):
         null=True,
         help_text=docs.passthrough_id,
     )
-    passthrough_name = models.CharField(
+    passthrough_name = models.TextField(
         "Name of Pass-through Entity",
-        max_length=150,
         null=True,
         help_text=docs.passthrough_name,
     )
@@ -463,46 +450,40 @@ class General(models.Model):
         max_length=40,
         unique=True,
     )
-    auditee_certify_name = models.CharField(
+    auditee_certify_name = models.TextField(
         "Name of Auditee Certifying Official",
-        max_length=50,
         null=True,
         help_text=docs.auditee_certify_name,
     )
-    auditee_certify_title = models.CharField(
+    auditee_certify_title = models.TextField(
         "Title of Auditee Certifying Official",
-        max_length=50,
         null=True,
         help_text=docs.auditee_certify_title,
     )
-    auditee_contact_name = models.CharField(
+    auditee_contact_name = models.TextField(
         "Name of Auditee Contact",
-        max_length=50,
         null=True,
         help_text=docs.auditee_contact,
     )
     auditee_email = models.CharField(
         "Auditee Email address",
-        max_length=60,
+        max_length=254,
         null=True,
         help_text=docs.auditee_email,
     )
-    auditee_name = models.CharField(
-        "Name of the Auditee", max_length=70, help_text=docs.auditee_name
-    )
+    auditee_name = models.TextField("Name of the Auditee", help_text=docs.auditee_name)
     auditee_phone = models.TextField(
         "Auditee Phone Number", help_text=docs.auditee_phone
     )
-    auditee_contact_title = models.CharField(
+    auditee_contact_title = models.TextField(
         "Title of Auditee Contact",
-        max_length=40,
         null=True,
         help_text=docs.auditee_title,
     )
-    auditee_address_line_1 = models.CharField(
-        "Auditee Street Address", max_length=45, help_text=docs.street1
+    auditee_address_line_1 = models.TextField(
+        "Auditee Street Address", help_text=docs.street1
     )
-    auditee_city = models.CharField("Auditee City", max_length=30, help_text=docs.city)
+    auditee_city = models.TextField("Auditee City", help_text=docs.city)
     auditee_state = models.CharField(
         "Auditee State", max_length=2, help_text=docs.state
     )
@@ -529,16 +510,14 @@ class General(models.Model):
     auditor_state = models.CharField(
         "CPA State", max_length=2, null=True, help_text=docs.auditor_state
     )
-    auditor_city = models.CharField(
-        "CPA City", max_length=30, null=True, help_text=docs.auditor_city
-    )
-    auditor_contact_title = models.CharField(
+    auditor_city = models.TextField("CPA City", null=True, help_text=docs.auditor_city)
+    auditor_contact_title = models.TextField(
         "Title of CPA Contact",
         max_length=40,
         null=True,
         help_text=docs.auditor_title,
     )
-    auditor_address_line_1 = models.CharField(
+    auditor_address_line_1 = models.TextField(
         "CPA Street Address",
         max_length=45,
         null=True,
@@ -553,25 +532,23 @@ class General(models.Model):
     auditor_country = models.CharField(
         "CPA Country", max_length=45, null=True, help_text=docs.auditor_country
     )
-    auditor_contact_name = models.CharField(
+    auditor_contact_name = models.TextField(
         "Name of CPA Contact",
-        max_length=50,
         null=True,
         help_text=docs.auditor_contact,
     )
     auditor_email = models.CharField(
         "CPA mail address (optional)",
-        max_length=60,
+        max_length=254,
         null=True,
         help_text=docs.auditor_email,
     )
-    auditor_firm_name = models.CharField(
-        "CPA Firm Name", max_length=64, help_text=docs.auditor_firm_name
+    auditor_firm_name = models.TextField(
+        "CPA Firm Name", help_text=docs.auditor_firm_name
     )
     # Once loaded, would like to add these as regular addresses and just change this to a country field
-    auditor_foreign_addr = models.CharField(
+    auditor_foreign_addr = models.TextField(
         "CPA Address - if international",
-        max_length=200,
         null=True,
         help_text=docs.auditor_foreign,
     )
@@ -758,32 +735,27 @@ class SecondaryAuditor(models.Model):
         null=True,
         help_text=docs.auditor_ein,
     )
-    auditor_name = models.CharField(
-        "CPA Firm Name", max_length=64, help_text=docs.auditor_firm_name
-    )
-    contact_name = models.CharField(
+    auditor_name = models.TextField("CPA Firm Name", help_text=docs.auditor_firm_name)
+    contact_name = models.TextField(
         "Name of CPA Contact",
-        max_length=80,
         null=True,
     )
-    contact_title = models.CharField(
+    contact_title = models.TextField(
         "Title of CPA Contact",
-        max_length=80,
         null=True,
         help_text=docs.auditor_title,
     )
     contact_email = models.CharField(
         "CPA mail address (optional)",
-        max_length=60,
+        max_length=254,
         null=True,
         help_text=docs.auditor_email,
     )
     contact_phone = models.TextField(
         "CPA phone number", null=True, help_text=docs.auditor_phone
     )
-    address_street = models.CharField(
+    address_street = models.TextField(
         "CPA Street Address",
-        max_length=45,
         null=True,
         help_text=docs.auditor_street1,
     )
