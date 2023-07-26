@@ -25,6 +25,7 @@ jobs:
       CYPRESS_LOGIN_TEST_EMAIL: ${{ secrets.CYPRESS_LOGIN_TEST_EMAIL }}
       CYPRESS_LOGIN_TEST_PASSWORD: ${{ secrets.CYPRESS_LOGIN_TEST_PASSWORD }}
       CYPRESS_LOGIN_TEST_OTP_SECRET: ${{ secrets.CYPRESS_LOGIN_TEST_OTP_SECRET }}
+      DISABLE_AUTH: False
       # useful for debugging but otherwise complete overwhelm
       # DEBUG: cypress:*
     steps:
