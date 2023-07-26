@@ -8,36 +8,26 @@ import argparse
 import json
 import openpyxl as pyxl
 
-from data.models import (
+# FIXME
+# We'll want to figure out how to dynamically import the 
+# models for a given year based on a command-line input, and
+# then use that to match queries against the SQLite DBs.
+# However, if we only use AY22 data, it won't matter.
+from data.ay22.models import (
     Cfda,
     Gen,
     Passthrough,
-    Findings
+    Findings,
+    Findingstext
 )
 
 parser = argparse.ArgumentParser()
 
-# Award Reference (Read Only)
-# Federal Agency Prefix
-# ALN (CFDA) Three Digit Extension
-# Additional Award Identification
-# Federal Program Name
-# Amount Expended
-# Cluster Name
-# If State Cluster, Enter State Cluster Name
-# If Other Cluster, Enter Other Cluster Name
-# Federal Program Total
-# Cluster Total
-# Loan / Loan Guarantee
-# If yes (Loan/Loan Guarantee, End of Audit Period Outstanding Loan Balance)
-# Direct Award
-# If no (Direct Award), Name of Passthrough Entity
-# If no (Direct Award), Identifying Number Assigned by the Pass-through Entity, if assigned
-# Federal Award Passed Through to Subrecipients
-# If yes (Passed Through), Amount Passed Through to Subrecipients	Major Program (MP)
-# If yes (MP), Type of Audit Report
-# Number of Audit Findings
-
+# This provides a way to map the sheet in the workbook to the 
+# column in the DB. It also has a default value and 
+# the type of value, so that things can be set correctly
+# before filling in the XLSX workbooks.
+FieldMap = NT('FieldMap', 'in_sheet in_db default type')
 
 def set_single_cell_range(wb, range_name, value):
     the_range = wb.defined_names[range_name]
@@ -52,11 +42,14 @@ def set_single_cell_range(wb, range_name, value):
     ws = wb[sheet_title]
     ws[cell_ref] = value
 
-
+# A tiny helper to index into workbooks.
+# Assumes a capital letter.
 def col_to_ndx(col):
     return ord(col) - 65 + 1
 
-
+# Helper to set a range of values.
+# Takes a named range, and then walks down the range,
+# filling in values from the list past in (values).
 def set_range(wb, range_name, values, default=None, type=str):
     the_range = wb.defined_names[range_name]
     dest = list(the_range.destinations)[0]
@@ -70,10 +63,16 @@ def set_range(wb, range_name, values, default=None, type=str):
     for ndx, v in enumerate(values):
         row = ndx+start_row
         if v:
-            print(f'{range_name} c[{row}][{col}] <- {v} len({len(v)}) {default}')
+            # This is a very noisy statement, showing everything
+            # written into the workbook.
+            # print(f'{range_name} c[{row}][{col}] <- {v} len({len(v)}) {default}')
             ws.cell(row=row, column=col, value=type(v))
             if len(v) == 0 and default is not None:
-                print('Applying default')
+                # This is less noisy. Shows up for things like
+                # empty findings counts. 2023 submissions
+                # require that field to be 0, not empty,
+                # if there are no findings.
+                # print('Applying default')
                 ws.cell(row=row, column=col, value=type(default))
         if not v:
             if default is not None:
@@ -84,28 +83,24 @@ def set_range(wb, range_name, values, default=None, type=str):
             # Leave it blank if we have no default passed in
             pass
 
+def set_uei(wb, dbkey):
+    g = Gen.select().where(Gen.dbkey == dbkey).get()
+    set_single_cell_range(wb, 'auditee_uei', g.uei)
 
-def show(v):
-    print(json.dumps(model_to_dict(v)))
-    return v
+def map_simple_columns(wb, mappings, values):
+    # Map all the simple ones
+    for m in mappings:
+        set_range(wb, 
+                  m.in_sheet,
+                  map(lambda v: model_to_dict(v)[m.in_db], values),
+                  m.default, 
+                  m.type)
 
-
-FieldMap = NT('FieldMap', 'in_sheet in_db default type')
-
-
-# Award Reference	
-# Audit Finding Reference Number	
-# Type(s) of Compliance Requirement(s)	
-# Modified Opinion	
-# Other Matters	
-# Material Weakness	
-# Significant Deficiency	
-# Other Findings	
-# Questioned Costs	
-# Repeat Findings from Prior Year	
-# If Repeat Finding, provide Prior Year Audit Finding Reference Number(s)	
-# Is Findings Combination Valid? (Read Only)
-
+##########################################
+#
+# generate_findings
+#
+##########################################
 def generate_findings(dbkey):
     print("--- generate_findings ---")
     wb = pyxl.load_workbook('templates/findings-uniform-guidance-template.xlsx')
@@ -122,13 +117,12 @@ def generate_findings(dbkey):
        FieldMap('prior_references', 'priorfindingrefnums', None, str), 
        # is_valid is computed in the workbook
     ]
-
-    g = Gen.select().where(Gen.dbkey == dbkey).get()
-    set_single_cell_range(wb, 'auditee_uei', g.uei)
-    # Mapping the award numbers will require ELECAUDITIDs.
     cfdas = Cfda.select(Cfda.elecauditsid).where(Cfda.dbkey == g.dbkey)
     findings = Findings.select().where(Findings.dbkey == g.dbkey)
-    
+
+    set_uei(wb, dbkey)
+    map_simple_columns(wb, mappings, findings)
+
     # For each of them, I need to generate an elec -> award mapping.
     e2a = {}
     for ndx, cfda in enumerate(cfdas):
@@ -138,17 +132,14 @@ def generate_findings(dbkey):
     for find in findings:
         award_references.append(e2a[find.elecauditsid])
     set_range(wb, 'award_reference', award_references)
-
-    # Map all the simple ones
-    for m in mappings:
-        set_range(wb, 
-                  m.in_sheet,
-                  map(lambda v: model_to_dict(v)[m.in_db], findings),
-                  m.default, 
-                  m.type)
+    
     wb.save(os.path.join('output', dbkey, f'findings-{dbkey}.xlsx'))
 
-
+##########################################
+#
+# generate_federal_awards
+#
+##########################################
 def generate_federal_awards(dbkey):
     print("--- generate_federal_awards ---")
     wb = pyxl.load_workbook('templates/federal-awards-expended-template.xlsx')
@@ -170,26 +161,20 @@ def generate_federal_awards(dbkey):
         FieldMap('audit_report_type', 'typereport_mp', None, str),
         FieldMap('number_of_audit_findings', 'findings', 0, int)
     ]
-
-    # FIXME: Why only one?
-    g = Gen.select().where(Gen.dbkey ==  dbkey).get()
-    set_single_cell_range(wb, 'auditee_uei', g.uei)
     cfdas = Cfda.select().where(Cfda.dbkey == g.dbkey)
 
-    # Map all the simple ones
-    for m in mappings:
-        set_range(wb, 
-                  m.in_sheet,
-                  map(lambda v: model_to_dict(v)[m.in_db], cfdas),
-                  m.default, 
-                  m.type)
-
+    set_uei(wb, dbkey)
+    map_simple_columns(wb, mappings, cfdas)
+    
     # Map things with transformations
     set_range(wb, 'federal_agency_prefix', map(
         lambda v: (v.cfda).split('.')[0], cfdas))
     set_range(wb, 'three_digit_extension', map(
         lambda v: (v.cfda).split('.')[1], cfdas))
 
+    # We have to hop through several tables to build a list 
+    # of passthrough names. Note that anything without a passthrough
+    # needs to be represented in the list as an empty string.
     passthrough_names = []
     passthrough_ids = []
     for cfda in cfdas:
@@ -214,10 +199,29 @@ def generate_federal_awards(dbkey):
 
     wb.save(os.path.join('output', dbkey, f'federal-awards-{dbkey}.xlsx'))
 
+##########################################
+#
+# generate_findings_text
+#
+##########################################
+def generate_findings_text(dbkey):
+    print("--- generate_findings_text ---")
+    wb = pyxl.load_workbook('templates/findings-text-template.xlsx')
+    mappings = [
+        FieldMap('reference_number', 'findingrefnums', None, str),
+        FieldMap('text_of_finding', 'text', None, str),
+        FieldMap('contains_chart_or_table', 'chartstables', None, str),
+    ]
+    ftexts = Findingstext.select().where(Findingstext.dbkey == g.dbkey)
+    set_uei(wb, dbkey)
+    map_simple_columns(wb, mappings, ftexts)
+        
+    wb.save(os.path.join('output', dbkey, f'findings-text-{dbkey}.xlsx'))
 
 def main():
     generate_federal_awards(args.dbkey)
     generate_findings(args.dbkey)
+    generate_findings_text(args.dbkey)
 
 if __name__ == '__main__':
     parser.add_argument('--dbkey', type=str, required=True)
