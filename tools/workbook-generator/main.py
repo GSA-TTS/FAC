@@ -107,9 +107,20 @@ FieldMap = NT('FieldMap', 'in_sheet in_db default type')
 # Is Findings Combination Valid? (Read Only)
 
 def generate_findings(dbkey):
+    print("--- generate_findings ---")
     wb = pyxl.load_workbook('templates/findings-uniform-guidance-template.xlsx')
     mappings = [
-        # FieldMap('program_name', 'federalprogramname', None, str),
+       FieldMap('compliance_requirement', 'typerequirement', None, str), 
+       FieldMap('reference_number', 'findingsrefnums', None, str),
+       FieldMap('modified_opinion', 'modifiedopinion', None, str), 
+       FieldMap('other_matters', 'othernoncompliance', None, str), 
+       FieldMap('material_weakness', 'materialweakness', None, str), 
+       FieldMap('significant_deficiency', 'significantdeficiency', None, str), 
+       FieldMap('other_findings', 'otherfindings', None, str),
+       FieldMap('questioned_costs', 'qcosts', None, str),
+       FieldMap('repeat_prior_reference', 'repeatfinding', None, str), 
+       FieldMap('prior_references', 'priorfindingrefnums', None, str), 
+       # is_valid is computed in the workbook
     ]
 
     g = Gen.select().where(Gen.dbkey == dbkey).get()
@@ -132,13 +143,14 @@ def generate_findings(dbkey):
     for m in mappings:
         set_range(wb, 
                   m.in_sheet,
-                  map(lambda v: model_to_dict(v)[m.in_db], cfdas),
+                  map(lambda v: model_to_dict(v)[m.in_db], findings),
                   m.default, 
                   m.type)
     wb.save(os.path.join('output', dbkey, f'findings-{dbkey}.xlsx'))
 
 
 def generate_federal_awards(dbkey):
+    print("--- generate_federal_awards ---")
     wb = pyxl.load_workbook('templates/federal-awards-expended-template.xlsx')
     # In sheet : in DB
     mappings = [
