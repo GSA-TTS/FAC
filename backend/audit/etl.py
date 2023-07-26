@@ -35,6 +35,7 @@ class ETL(object):
             self.load_passthrough,
             self.load_finding_texts,
             self.load_captext,
+            self.load_additional_ueis,
             # self.load_audit_info()  # TODO: Uncomment when SingleAuditChecklist adds audit_information
         )
         for load_method in load_methods:
@@ -43,6 +44,10 @@ class ETL(object):
             except KeyError as key_error:
                 logger.warning(
                     f"{type(key_error).__name__} in {load_method.__name__}: {key_error}"
+                )
+            except General.DoesNotExist as does_not_exist:
+                logger.warning(
+                    f"{type(does_not_exist).__name__} in {load_method.__name__}: {does_not_exist}"
                 )
 
     def load_finding_texts(self):
@@ -332,4 +337,15 @@ class ETL(object):
         general.is_low_risk = audit_information["is_low_risk_auditee"] == "Y"
         general.agencies_with_prior_findings = audit_information["agencies"]
 
+        general.save()
+
+    def load_additional_ueis(self):
+        general = General.objects.get(report_id=self.single_audit_checklist.report_id)
+        sac_additional_ueis = self.single_audit_checklist.additional_ueis
+        general.auditee_addl_uei_list = [
+            entry["additional_uei"]
+            for entry in sac_additional_ueis["AdditionalUEIs"][
+                "additional_ueis_entries"
+            ]
+        ]
         general.save()
