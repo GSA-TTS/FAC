@@ -2,10 +2,7 @@
 name: Runs end to end tests
 on:
   # workflow_call:
-  # workflow_dispatch:
-  pull_request:
-    branches:
-      - main
+  workflow_dispatch: null
 
 jobs:
   e2e-testing:
