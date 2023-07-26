@@ -19,7 +19,6 @@ on:
 jobs:
   regression-testing:
     runs-on: ubuntu-latest
-    environment: staging
     env:
       CYPRESS_BASE_URL: ${{ inputs.url }}
       CYPRESS_LOGIN_TEST_EMAIL: ${{ secrets.CYPRESS_LOGIN_TEST_EMAIL }}
