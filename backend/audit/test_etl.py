@@ -33,11 +33,11 @@ class ETLTests(TestCase):
             findings_text=self._fake_findings_text(),
             corrective_action_plan=self._fake_corrective_action_plan(),
             secondary_auditors=self._fake_secondary_auditors(),
+            additional_ueis=self._fake_additional_ueis(),
             # audit_information=self._fake_audit_information(),  # TODO: Uncomment when SingleAuditChecklist adds audit_information
         )
         sac.save()
         self.sac = sac
-
         self.etl = ETL(self.sac)
         self.report_id = sac.report_id
 
@@ -251,6 +251,18 @@ class ETLTests(TestCase):
         }
         return audit_information
 
+    @staticmethod
+    def _fake_additional_ueis():
+        return {
+            "AdditionalUEIs": {
+                "auditee_uei": "ZQGGHJH74DW7",
+                "additional_ueis_entries": [
+                    {"additional_uei": "ABA123456BBC"},
+                    {"additional_uei": "ACA123456BBD"},
+                ],
+            }
+        }
+
     def test_load_general(self):
         self.etl.load_general()
         generals = General.objects.all()
@@ -313,6 +325,14 @@ class ETLTests(TestCase):
         print("general gaap_results:", general.gaap_results, sac.audit_information)
         self.assertEquals(sac.audit_information["gaap_results"], general.gaap_results)
 
+    def test_load_additional_ueis(self):
+        self.etl.load_general()
+        general = General.objects.get(report_id=self.report_id)
+        self.assertEqual(len(general.auditee_addl_uei_list), 0)
+        self.etl.load_additional_ueis()
+        general = General.objects.get(report_id=self.report_id)
+        self.assertEqual(len(general.auditee_addl_uei_list), 2)
+
     def test_load_all(self):
         """On a happy path through load_all(), item(s) should be added to all of the
         tables."""
@@ -327,10 +347,13 @@ class ETLTests(TestCase):
             findings_text=self._fake_findings_text(reference_number=2),
             corrective_action_plan=self._fake_corrective_action_plan(),
             secondary_auditors=self._fake_secondary_auditors(),
+            additional_ueis=self._fake_additional_ueis(),
             # audit_information=self._fake_audit_information(),  # TODO: Uncomment when SingleAuditChecklist adds audit_information
         )
         sac.save()
-        self.etl.single_audit_checklist = sac
+        self.sac = sac
+        self.etl = ETL(self.sac)
+        self.report_id = sac.report_id
         self.etl.load_all()
         self.assertLess(len_general, len(General.objects.all()))
         self.assertLess(len_captext, len(CapText.objects.all()))
@@ -350,11 +373,14 @@ class ETLTests(TestCase):
             findings_text=self._fake_findings_text(reference_number=3),
             corrective_action_plan=self._fake_corrective_action_plan(),
             secondary_auditors=self._fake_secondary_auditors(),
+            additional_ueis=self._fake_additional_ueis(),
             # audit_information=self._fake_audit_information(),  # TODO: Uncomment when SingleAuditChecklist adds audit_information
         )
         sac.general_information.pop("auditee_contact_name")
         sac.save()
-        self.etl.single_audit_checklist = sac
+        self.sac = sac
+        self.etl = ETL(self.sac)
+        self.report_id = sac.report_id
         self.etl.load_all()
         self.assertEqual(len_general, len(General.objects.all()))
         self.assertLess(len_captext, len(CapText.objects.all()))
@@ -374,11 +400,14 @@ class ETLTests(TestCase):
             findings_text=self._fake_findings_text(reference_number=3),
             corrective_action_plan=self._fake_corrective_action_plan(),
             secondary_auditors=self._fake_secondary_auditors(),
+            additional_ueis=self._fake_additional_ueis(),
             # audit_information=self._fake_audit_information(),  # TODO: Uncomment when SingleAuditChecklist adds audit_information
         )
         sac.corrective_action_plan.pop("CorrectiveActionPlan")
         sac.save()
-        self.etl.single_audit_checklist = sac
+        self.sac = sac
+        self.etl = ETL(self.sac)
+        self.report_id = sac.report_id
         self.etl.load_all()
         self.assertLess(len_general, len(General.objects.all()))
         self.assertEqual(len_captext, len(CapText.objects.all()))
