@@ -1,3 +1,4 @@
+import logging
 from datetime import datetime
 
 from dissemination.models import (
@@ -13,6 +14,8 @@ from dissemination.models import (
 )
 from audit.models import SingleAuditChecklist
 
+logger = logging.getLogger(__name__)
+
 
 class ETL(object):
     def __init__(self, sac: SingleAuditChecklist) -> None:
@@ -24,15 +27,23 @@ class ETL(object):
         self.audit_year = int(audit_date.split("-")[0])
 
     def load_all(self):
-        # TODO: Wrap each method call in try/except to collect errors.
-        self.load_general()
-        self.load_secondary_auditor()
-        self.load_federal_award()
-        self.load_findings()
-        self.load_passthrough()
-        self.load_finding_texts()
-        self.load_captext()
-        # self.load_audit_info() TODO uncomment once the frontend is available
+        load_methods = (
+            self.load_general,
+            self.load_secondary_auditor,
+            self.load_federal_award,
+            self.load_findings,
+            self.load_passthrough,
+            self.load_finding_texts,
+            self.load_captext,
+            # self.load_audit_info()  # TODO: Uncomment when SingleAuditChecklist adds audit_information
+        )
+        for load_method in load_methods:
+            try:
+                load_method()
+            except KeyError as key_error:
+                logger.warning(
+                    f"{type(key_error).__name__} in {load_method.__name__}: {key_error}"
+                )
 
     def load_finding_texts(self):
         findings_text = self.single_audit_checklist.findings_text
