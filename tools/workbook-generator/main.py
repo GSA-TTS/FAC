@@ -18,7 +18,11 @@ from data.ay22.models import (
     Gen,
     Passthrough,
     Findings,
-    Findingstext
+    Findingstext,
+    Ueis,
+    Notes,
+    Cpas,
+    Captext
 )
 
 parser = argparse.ArgumentParser()
@@ -86,6 +90,7 @@ def set_range(wb, range_name, values, default=None, type=str):
 def set_uei(wb, dbkey):
     g = Gen.select().where(Gen.dbkey == dbkey).get()
     set_single_cell_range(wb, 'auditee_uei', g.uei)
+    return g
 
 def map_simple_columns(wb, mappings, values):
     # Map all the simple ones
@@ -117,10 +122,11 @@ def generate_findings(dbkey):
        FieldMap('prior_references', 'priorfindingrefnums', None, str), 
        # is_valid is computed in the workbook
     ]
+    g = set_uei(wb, dbkey)
     cfdas = Cfda.select(Cfda.elecauditsid).where(Cfda.dbkey == g.dbkey)
     findings = Findings.select().where(Findings.dbkey == g.dbkey)
 
-    set_uei(wb, dbkey)
+    #set_uei(wb, dbkey)
     map_simple_columns(wb, mappings, findings)
 
     # For each of them, I need to generate an elec -> award mapping.
@@ -131,6 +137,8 @@ def generate_findings(dbkey):
     award_references = []
     for find in findings:
         award_references.append(e2a[find.elecauditsid])
+
+    print("award_references",  award_references)
     set_range(wb, 'award_reference', award_references)
     
     wb.save(os.path.join('output', dbkey, f'findings-{dbkey}.xlsx'))
@@ -150,8 +158,8 @@ def generate_federal_awards(dbkey):
         FieldMap('cluster_name', 'clustername', None, str),
         FieldMap('state_cluster_name', 'stateclustername', None, str),
         FieldMap('other_cluster_name', 'otherclustername', None, str),
-        FieldMap('federal_program_total', 'programtotal', 0, int),
-        FieldMap('cluster_total', 'clustertotal', 0, float),
+        #FieldMap('federal_program_total', 'programtotal', 0, int),
+        #FieldMap('cluster_total', 'clustertotal', 0, float),
         FieldMap('is_guaranteed', 'loans', None, str),
         FieldMap('loan_balance_at_audit_period_end', 'loanbalance', None, float),
         FieldMap('is_direct', 'direct', None, str),
@@ -161,9 +169,10 @@ def generate_federal_awards(dbkey):
         FieldMap('audit_report_type', 'typereport_mp', None, str),
         FieldMap('number_of_audit_findings', 'findings', 0, int)
     ]
+    g = set_uei(wb, dbkey)
     cfdas = Cfda.select().where(Cfda.dbkey == g.dbkey)
 
-    set_uei(wb, dbkey)
+    #set_uei(wb, dbkey)
     map_simple_columns(wb, mappings, cfdas)
     
     # Map things with transformations
@@ -212,16 +221,115 @@ def generate_findings_text(dbkey):
         FieldMap('text_of_finding', 'text', None, str),
         FieldMap('contains_chart_or_table', 'chartstables', None, str),
     ]
+    g = set_uei(wb, dbkey)
     ftexts = Findingstext.select().where(Findingstext.dbkey == g.dbkey)
-    set_uei(wb, dbkey)
+    
     map_simple_columns(wb, mappings, ftexts)
         
     wb.save(os.path.join('output', dbkey, f'findings-text-{dbkey}.xlsx'))
 
+##########################################
+#
+# generate_additional_ueis
+#
+##########################################
+def generate_additional_ueis(dbkey):
+    print("--- generate_additional_ueis ---")
+    wb = pyxl.load_workbook('templates/additional-ueis-template.xlsx')
+    mappings = [
+        FieldMap('additional_uei', 'uei', None, str),
+        #FieldMap('ueiseqnum', 'ueiseqnum', 0, int)
+    ]
+
+    g = set_uei(wb, dbkey)
+    addl_ueis = Ueis.select().where(Ueis.dbkey == g.dbkey)
+    
+    map_simple_columns(wb, mappings, addl_ueis)
+
+    wb.save(os.path.join('output', dbkey, f'additional-ueis-{dbkey}.xlsx'))
+
+
+##########################################
+#
+# generate_notes_to_sefa
+#
+##########################################
+def generate_notes_to_sefa(dbkey):
+    print("--- generate_notes_to_sefa ---")
+    wb = pyxl.load_workbook('templates/notes-to-sefa-template.xlsx')
+    mappings = [
+        #FieldMap('??', 'accounting_policies', None, str),
+        #FieldMap('??', 'is_minimis_rate_used', None, str),
+        #FieldMap('rate_explained', 'rate_explained', None, str),
+        FieldMap('note_title', 'title', None, str),
+        FieldMap('note_content', 'content', None, str)
+        #FieldMap('note_seq_number', 'note_seq_number', 0, int),
+    ]
+    g =  set_uei(wb, dbkey)
+    notes = Notes.select().where(Notes.dbkey == g.dbkey)
+   
+    map_simple_columns(wb, mappings, notes)
+    wb.save(os.path.join('output', dbkey, f'notes-{dbkey}.xlsx'))
+
+
+##########################################
+#
+# generate_secondary_auditors
+#
+##########################################
+def generate_secondary_auditors(dbkey):
+    print("--- generate-secondary-auditors ---")
+    wb = pyxl.load_workbook('templates/secondary-auditors-template.xlsx')
+    mappings = [
+        FieldMap('secondary_auditor_address_city', 'cpacity', None, str),
+        FieldMap('secondary_auditor_contact_name', 'cpacontact', None, str),
+        FieldMap('secondary_auditor_ein', 'cpaein', 0, int),
+        FieldMap('secondary_auditor_contact_email', 'cpaemail', None, str),
+        FieldMap('secondary_auditor_name', 'cpafirmname', None, str),
+        FieldMap('secondary_auditor_contact_phone', 'cpaphone', None, str),
+        FieldMap('secondary_auditor_address_state', 'cpastate', None, str),
+        FieldMap('secondary_auditor_address_street', 'cpastreet1', None, str),
+        FieldMap('secondary_auditor_contact_title', 'cpatitle', None, str),
+        FieldMap('secondary_auditor_address_zipcode', 'cpazipcode', None, str)
+    ]
+
+    g = set_uei(wb, dbkey)
+    sec_cpas = Cpas.select().where(Cpas.dbkey == g.dbkey)
+    
+    map_simple_columns(wb, mappings, sec_cpas)
+    wb.save(os.path.join('output', dbkey, f'cpas-{dbkey}.xlsx'))
+
+
+##########################################
+#
+# generate_captext
+#
+##########################################
+def generate_captext(dbkey):
+    print("--- generate_corrective_action_plan ---")
+    wb = pyxl.load_workbook('templates/corrective-action-plan-template.xlsx')
+    mappings = [
+        FieldMap('reference_number', 'findingrefnums', None, str),
+        FieldMap('planned_action', 'text', None, str),
+        FieldMap('contains_chart_or_table', 'chartstables', None, str)
+    ]
+    
+    g = set_uei(wb, dbkey)
+    captexts = Captext.select().where(Captext.dbkey == g.dbkey)
+    
+    map_simple_columns(wb, mappings, captexts)
+    wb.save(os.path.join('output', dbkey, f'captext-{dbkey}.xlsx'))
+
+
+##########################################
 def main():
     generate_federal_awards(args.dbkey)
-    generate_findings(args.dbkey)
+    #generate_findings(args.dbkey)
     generate_findings_text(args.dbkey)
+    generate_additional_ueis(args.dbkey)
+    generate_notes_to_sefa(args.dbkey)
+    generate_secondary_auditors(args.dbkey)
+    generate_captext(args.dbkey)
 
 if __name__ == '__main__':
     parser.add_argument('--dbkey', type=str, required=True)
