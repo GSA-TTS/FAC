@@ -1,22 +1,27 @@
-import { testLoginGovLogin } from '../support/login_gov.js';
+import { testLoginGovLogin } from '../support/login-gov.js';
+import { testValidEligibility } from '../support/check-eligibility.js';
 
 describe('Full audit submission', () => {
   before(() => {
     cy.visit('/');
   });
 
-  it('Loads the home page', () => {
+  it('Completes a full submission', () => {
     cy.url().should('include', '/');
-  });
 
-  it('Logs in with Login.gov', () => {
+    // Logs in with Login.gov'
     testLoginGovLogin();
+
+    // Moves on to the eligibility screen
+    // check the terms and conditions link and click "Accept and start..."
+    //
+    // this click actually goes to the "terms and conditions" link which
+    // brings up a modal
+    cy.get('label[for=check-start-new-submission]').click();
+    cy.get('.usa-button').contains('Accept and start').click();
+    cy.url().should('match', /\/report_submission\/eligibility\/$/);
+
+    // Completes the eligibility screen
+    testValidEligibility();
   });
-
-  // finishes on `/audit/`
-  // check the terms and conditions box and click "Start a new submission"
-  cy.get('label[for=check-start-new-submission]').click();
-  cy.get('.usa-button').contains('Start a new submission').click();
-  cy.url().should('match', /\/report_submission\/eligibility\/$/);
-
 });
