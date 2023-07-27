@@ -214,6 +214,7 @@ class ETL(object):
         general_information = self.single_audit_checklist.general_information
         dates_by_status = self._get_dates_from_sac()
         sac_additional_ueis = self.single_audit_checklist.additional_ueis
+        entity_type = general_information["user_provided_organization_type"]
         general = General(
             report_id=self.report_id,
             auditee_certify_name=None,  # TODO: Where does this come from?
@@ -271,14 +272,14 @@ class ETL(object):
             fy_start_date=general_information["auditee_fiscal_period_start"],
             audit_year=self.audit_year,
             audit_type=general_information["audit_type"],
-            entity_type=general_information["user_provided_organization_type"],
+            entity_type=entity_type,
             number_months=None,  # TODO: Where does this come from?
             audit_period_covered=general_information["audit_period_covered"],
             report_required=None,  # TODO: Notes say this hasn't been used since 2008.
             total_fed_expenditures=None,  # TODO: Where does this come from?
             type_report_major_program=None,  # TODO: Where does this come from?
             type_audit_code="UG",
-            is_public=None,  # Should be coming from SingleAuditChecklist
+            is_public=entity_type != "tribal",
             data_source="G-FAC",
         )
         general.save()
