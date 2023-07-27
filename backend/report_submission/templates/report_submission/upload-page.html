@@ -24,9 +24,7 @@
                 <fieldset class="usa-fieldset">
                     <legend class="usa-legend usa-legend--large"
                             id="{{ view_id }}"
-                            id_test="upload-page__legend">
-                        {{ view_name }}
-                    </legend>
+                            id_test="upload-page__legend">{{ view_name }}</legend>
                     <p>{{ instructions }}</p>
                     <h4 class="usa-process-list__heading margin-top-4">Upload completed worksheet</h4>
                     <p>Save your completed worksheet as an XLSX file and upload it below.</p>
@@ -37,7 +35,7 @@
                                type="file"
                                name="file-input-{{ view_id }}-xlsx"
                                aria-describedby="file-input-{{ view_id }}-xlsx"
-                               accept=".xlsx"/>
+                               accept=".xlsx" />
                     </div>
                     {% if already_submitted %}
                         <p class="text-green" id="already-submitted">
