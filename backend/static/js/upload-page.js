@@ -40,14 +40,12 @@ function handleErrors(error) {
     // Unhelpful row error (not table-able). Suggests an issue in validation error reporting.
     console.error(`Row error (unable to convert to table).\n`, error);
     info_box.innerHTML = `There was an unexpected error when validating the file. Please ensure you have uploaded the correct workbook. If this issue persists, contact an administrator.`;
-  }  else if (error.name === "Access denied") {
-    // User is attempting to change their file after certifying. 
+  } else if (error.name === 'Access denied') {
+    // User is attempting to change their file after certifying.
     console.error(`Access denied. Audit is locked to SF-SAC changes.\n`, error);
     info_box.innerHTML =
-    'Access denied. Further changes to audits that have been marked ready for certification are not permitted.';
-  }
-  
-  else {
+      'Access denied. Further changes to audits that have been marked ready for certification are not permitted.';
+  } else {
     // Catch all.
     console.error(`Unexpected error.\n`, error);
     info_box.innerHTML = `There was an unexpected error when validating the file. Please try again later. If this issue persists, contact an administrator.\nError: ${error}`;
@@ -98,6 +96,7 @@ function attachFileUploadHandler() {
   file_input.addEventListener('change', (e) => {
     try {
       info_box.hidden = false;
+      already_submitted.hidden = true;
       info_box.innerHTML = 'Validating your file...';
 
       const current_url = new URL(window.location.href);

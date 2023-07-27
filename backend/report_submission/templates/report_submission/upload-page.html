@@ -14,9 +14,10 @@
         </div>
     </header>
     <div class="grid-container margin-top-6">
-        <div class="grid-col grid-gap">
+        <div class="grid-row">
             {% comment %} {% include "../sidenav.html" %} {% endcomment %}
-            <form id="{{ view_id }}"
+            <form class="tablet:grid-col-8 tablet:grid-offset-2"
+                  id="{{ view_id }}"
                   id_test="upload-page__form"
                   method="post">
                 {% csrf_token %}
@@ -43,10 +44,8 @@
                             A file has already been uploaded for this section. A successful reupload will overwrite your previous submission.
                         </p>
                     {% endif %}
-
-                     <div hidden id="info_box" class="grid-row margin-bottom-2 margin-top-2"></div>
-
-                    <button class="usa-button margin-bottom-4" id="continue" disabled="disabled">Return to Report Home</button>
+                    <div hidden id="info_box" class="grid-row margin-bottom-3 margin-top-3"></div>
+                    <button class="usa-button margin-bottom-8" id="continue" disabled="disabled">Return to Report Home</button>
                 </fieldset>
             </form>
         </div>
