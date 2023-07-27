@@ -117,8 +117,8 @@ def generate_findings(dbkey):
        FieldMap('prior_references', 'priorfindingrefnums', None, str), 
        # is_valid is computed in the workbook
     ]
-    cfdas = Cfda.select(Cfda.elecauditsid).where(Cfda.dbkey == g.dbkey)
-    findings = Findings.select().where(Findings.dbkey == g.dbkey)
+    cfdas = Cfda.select(Cfda.elecauditsid).where(Cfda.dbkey == dbkey)
+    findings = Findings.select().where(Findings.dbkey == dbkey)
 
     set_uei(wb, dbkey)
     map_simple_columns(wb, mappings, findings)
@@ -161,7 +161,7 @@ def generate_federal_awards(dbkey):
         FieldMap('audit_report_type', 'typereport_mp', None, str),
         FieldMap('number_of_audit_findings', 'findings', 0, int)
     ]
-    cfdas = Cfda.select().where(Cfda.dbkey == g.dbkey)
+    cfdas = Cfda.select().where(Cfda.dbkey == dbkey)
 
     set_uei(wb, dbkey)
     map_simple_columns(wb, mappings, cfdas)
@@ -212,7 +212,7 @@ def generate_findings_text(dbkey):
         FieldMap('text_of_finding', 'text', None, str),
         FieldMap('contains_chart_or_table', 'chartstables', None, str),
     ]
-    ftexts = Findingstext.select().where(Findingstext.dbkey == g.dbkey)
+    ftexts = Findingstext.select().where(Findingstext.dbkey == dbkey)
     set_uei(wb, dbkey)
     map_simple_columns(wb, mappings, ftexts)
         
