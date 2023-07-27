@@ -21,8 +21,6 @@ jobs:
       TERRAFORM_PRE_RUN: |
           apt-get update
           apt-get install -y zip python
-      TF_VAR_postgrest_image: 'ghcr.io/gsa-tts/fac/postgrest:latest'
-      TF_VAR_clamav_image: 'ghcr.io/gsa-tts/fac/clamav:latest'
 
     steps:
       - name: Checkout

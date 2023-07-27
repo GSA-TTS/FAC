@@ -242,6 +242,7 @@
                }
             },
             {
+               "format": "text",
                "help": {
                   "link": "https://fac.gov/documentation/validation/#plain_text",
                   "text": "Only plain text is allowed in this field, no emoji or other special additions"
@@ -255,6 +256,7 @@
                }
             },
             {
+               "format": "text",
                "help": {
                   "link": "https://fac.gov/documentation/validation/#unknown",
                   "text": "If you see this error, please contact support."

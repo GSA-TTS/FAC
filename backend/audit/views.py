@@ -206,6 +206,15 @@ class ExcelFileHandlerView(SingleAuditChecklistAccessRequiredMixin, generic.View
         except KeyError as err:
             logger.warning("Field error. Field: %s", err)
             return JsonResponse({"errors": str(err), "type": "error_field"}, status=400)
+        except LateChangeError:
+            logger.warning("Attempted late change.")
+            return JsonResponse(
+                {
+                    "errors": "Access denied. Further changes to audits that have been marked ready for certification are not permitted.",
+                    "type": "no_late_changes",
+                },
+                status=400,
+            )
 
 
 class SingleAuditReportFileHandlerView(

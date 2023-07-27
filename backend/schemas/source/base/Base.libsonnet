@@ -445,10 +445,6 @@ local SchemaBase = Types.object {
   Meta: Meta,
   Enum: Enum,
   Compound: Compound {
-    ComplianceRequirementTypes: {
-      description: 'All compliance requirement types',
-      enum: ComplianceRequirementTypes.requirement_types
-    },
     FederalProgramNames: {
       description: 'All Federal program names',
       enum: FederalProgramNames.program_names,
