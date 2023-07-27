@@ -433,7 +433,7 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
     @property
     def is_public(self):
         return self.general_information["user_provided_organization_type"] != "tribal"
-    
+
     def get_transition_date(self, status):
         index = self.transition_name.index(status)
         if index >= 0:
