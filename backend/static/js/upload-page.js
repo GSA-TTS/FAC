@@ -35,7 +35,7 @@ function handleErrors(error) {
   } else if (error.name === 'Field error') {
     // Incorrect file template (probably).
     console.error(`Field error.\n`, error);
-    info_box.innerHTML = `A field is missing in the uploaded file. Ensure you have uploaded the correct workbook, or contact an administrator.`;
+    info_box.innerHTML = `A field is missing in the uploaded file. Ensure you have uploaded the correct workbook, or contact an administrator. ${error}`;
   } else if (error.name === 'Row error') {
     // Unhelpful row error (not table-able). Suggests an issue in validation error reporting.
     console.error(`Row error (unable to convert to table).\n`, error);
@@ -48,7 +48,7 @@ function handleErrors(error) {
   } else {
     // Catch all.
     console.error(`Unexpected error.\n`, error);
-    info_box.innerHTML = `There was an unexpected error when validating the file. Please try again later. If this issue persists, contact an administrator.\nError: ${error}`;
+    info_box.innerHTML = `There was an unexpected error when validating the file. Please try again later. If this issue persists, contact an administrator. Error: ${error}`;
   }
 }
 
@@ -96,7 +96,7 @@ function attachFileUploadHandler() {
   file_input.addEventListener('change', (e) => {
     try {
       info_box.hidden = false;
-      already_submitted.hidden = true;
+      if (already_submitted) already_submitted.hidden = true;
       info_box.innerHTML = 'Validating your file...';
 
       const current_url = new URL(window.location.href);
