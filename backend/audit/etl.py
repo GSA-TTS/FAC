@@ -265,6 +265,8 @@ class ETL(object):
             submitted_date=dates_by_status[
                 self.single_audit_checklist.STATUS.SUBMITTED
             ],
+            auditor_signature_date=None,  # TODO: Field will be added by front end
+            auditee_signature_date=None,  # TODO: Field will be added by front end
             fy_end_date=general_information["auditee_fiscal_period_end"],
             fy_start_date=general_information["auditee_fiscal_period_start"],
             audit_year=self.audit_year,
