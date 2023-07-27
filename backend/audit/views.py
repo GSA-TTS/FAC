@@ -34,8 +34,6 @@ from audit.validators import (
     validate_secondary_auditors_json,
     validate_notes_to_sefa_json,
 )
-from audit.forms import UploadReportForm, AuditInfoForm
-from audit.get_agency_names import get_agency_names
 from audit.mixins import (
     CertifyingAuditeeRequiredMixin,
     CertifyingAuditorRequiredMixin,
@@ -48,7 +46,6 @@ from audit.models import (
     SingleAuditChecklist,
     SingleAuditReportFile,
 )
-from audit.models import Access, ExcelFile, SingleAuditChecklist, SingleAuditReportFile
 from audit.validators import validate_audit_information_json
 
 logger = logging.getLogger(__name__)
@@ -520,7 +517,9 @@ class AuditInfoFormView(SingleAuditChecklistAccessRequiredMixin, generic.View):
                         "is_aicpa_audit_guide_included": sac.audit_information.get(
                             "is_aicpa_audit_guide_included"
                         ),
-                        "dollar_threshold": sac.audit_information.get("dollar_threshold"),
+                        "dollar_threshold": sac.audit_information.get(
+                            "dollar_threshold"
+                        ),
                         "is_low_risk_auditee": sac.audit_information.get(
                             "is_low_risk_auditee"
                         ),

@@ -1,10 +1,10 @@
 from collections import OrderedDict
-from typing import List
 import csv
 import glob
 import json
 import _jsonnet
 import os
+
 
 # Pull in agency names from the most recent cfda-agencies-YYYYMMDD.csv
 # Scraps rows with non-int agency nums and rows with empty agency names.
@@ -19,7 +19,6 @@ def get_agency_names() -> dict[str, str]:
     list_of_files = glob.glob("./schemas/source/data/cfda-agencies*.csv")
     latest_file = max(list_of_files, key=os.path.getctime)
 
-    keys = []
     with open(latest_file, "r") as file:
         csvreader = csv.reader(file)
         csvreader = sorted(csvreader, key=lambda x: x[0])
@@ -31,7 +30,8 @@ def get_agency_names() -> dict[str, str]:
 
     return agency_names
 
-def get_gaap_results() -> list[dict[str,str]]:
+
+def get_gaap_results() -> list[dict[str, str]]:
     sonnet = "./schemas/source/base/GAAP.libsonnet"
     json_str = _jsonnet.evaluate_snippet(sonnet, open(sonnet).read())
     jobj = json.loads(json_str)

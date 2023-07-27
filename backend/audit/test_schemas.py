@@ -364,7 +364,6 @@ class GeneralInformationSchemaValidityTest(SimpleTestCase):
 
 
 class AuditInformationSchemaValidityTest(SimpleTestCase):
-
     AUDIT_INFO_SCHEMA = json.loads(
         (SECTION_SCHEMA_DIR / "AuditInformation.schema.json").read_text(
             encoding="utf-8"
