@@ -13,9 +13,9 @@ create view api_v1_0_0_beta.general as
 drop view if exists api_v1_0_0_beta.auditor;
 create view api_v1_0_0_beta.auditor as
     select gen.auditee_uei, gen.auditee_ein, gen.audit_year,
-           ga.*
-    from dissemination_GenAuditor ga
-    left join dissemination_General gen on ga.report_id = gen.report_id
+           sa.*
+    from dissemination_SecondaryAuditor sa
+    left join dissemination_General gen on sa.report_id = gen.report_id
     where gen.is_public=True
 ;
 
@@ -35,7 +35,7 @@ create view api_v1_0_0_beta.finding as
     from dissemination_Finding finding
     left join dissemination_FederalAward award 
         on award.report_id = finding.report_id 
-          and award.award_seq_number = finding.award_seq_number
+          and award.award_reference = finding.award_reference
     left join dissemination_General gen on award.report_id = gen.report_id
     where gen.is_public=True
 ;

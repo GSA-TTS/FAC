@@ -29,19 +29,28 @@ function handleErrors(error) {
         'There was an error when uploading the file. If this issue persists, contact an administrator.';
     });
   } else if (error.name === 'AbortError') {
+    // Timeout from the frontend.
     console.error(`Timeout - Response took longer than expected.\n`, error);
     info_box.innerHTML = `Timeout - Response took longer than expected. Please try again later. If this issue persists, contact an administrator.`;
   } else if (error.name === 'Field error') {
+    // Incorrect file template (probably).
     console.error(`Field error.\n`, error);
     info_box.innerHTML = `A field is missing in the uploaded file. Ensure you have uploaded the correct workbook, or contact an administrator.`;
   } else if (error.name === 'Row error') {
     // Unhelpful row error (not table-able). Suggests an issue in validation error reporting.
     console.error(`Row error (unable to convert to table).\n`, error);
     info_box.innerHTML = `There was an unexpected error when validating the file. Please ensure you have uploaded the correct workbook. If this issue persists, contact an administrator.`;
-  } else {
+  }  else if (error.name === "Access denied") {
+    // User is attempting to change their file after certifying. 
+    console.error(`Access denied. Audit is locked to SF-SAC changes.\n`, error);
+    info_box.innerHTML =
+    'Access denied. Further changes to audits that have been marked ready for certification are not permitted.';
+  }
+  
+  else {
     // Catch all.
     console.error(`Unexpected error.\n`, error);
-    info_box.innerHTML = `There was an unexpected error when validating the file. Please try again later. If this issue persists, contact an administrator.`;
+    info_box.innerHTML = `There was an unexpected error when validating the file. Please try again later. If this issue persists, contact an administrator.\nError: ${error}`;
   }
 }
 
@@ -125,7 +134,7 @@ function attachFileUploadHandler() {
           } else {
             res.json().then((data) => {
               if (data.type === 'error_row') {
-                // Issue in the rows. The "Good" error, which we can use to display the error table.
+                // Issue in the rows. The "good" error, which we can use to display the error table.
                 // There can also be 'error_row' data that is just an unhelpful array.
                 if (Array.isArray(data.errors[0])) {
                   let e = new Error(`Row error: ${data.errors[0]}`);
@@ -135,9 +144,12 @@ function attachFileUploadHandler() {
                   display_error_table(data);
                 }
               } else if (data.type === 'error_field') {
-                // Issue with a fieldname, such as a missing field or column. Suggests an incorrect template.
                 let e = new Error(data.errors);
                 e.name = 'Field error';
+                handleErrors(e);
+              } else if (data.type === 'no_late_changes') {
+                let e = new Error(data.errors);
+                e.name = 'Access denied';
                 handleErrors(e);
               } else {
                 // Catch all.

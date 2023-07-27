@@ -3,6 +3,7 @@
    "sheets": [
       {
          "header_height": 48,
+         "hide_col_from": 4,
          "name": "Form",
          "open_ranges": [
             {
@@ -58,9 +59,11 @@
       },
       {
          "header_height": 48,
+         "hide_col_from": 2,
          "name": "UEI",
          "single_cells": [
             {
+               "format": "text",
                "help": {
                   "link": "https://fac.gov/documentation/validation/#uei",
                   "text": "UEIs are 12 characters long and match rules as given by SAM.gov"
