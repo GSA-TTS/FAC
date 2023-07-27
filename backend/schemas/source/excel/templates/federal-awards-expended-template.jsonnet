@@ -181,6 +181,7 @@ local open_ranges_defns = [
   ],
   [
     Sheets.y_or_n_range {
+      format: 'text',
       help: Help.plain_text,
     },
     SV.NoValidation,
@@ -189,6 +190,7 @@ local open_ranges_defns = [
   ],
   [
     Sheets.open_range {
+      format: 'text',
       width: 18,
       help: Help.unknown,
     },
