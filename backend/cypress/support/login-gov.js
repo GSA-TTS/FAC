@@ -3,7 +3,7 @@ const LOGIN_TEST_EMAIL = Cypress.env('LOGIN_TEST_EMAIL');
 const LOGIN_TEST_PASSWORD = Cypress.env('LOGIN_TEST_PASSWORD');
 const LOGIN_TEST_OTP_SECRET = Cypress.env('LOGIN_TEST_OTP_SECRET');
 
-export function login_gov_login() {
+export function testLoginGovLogin() {
   it('should login with email, password and OTP', () => {
     cy.get('a.usa-button.sign-in-button').click();
     cy.get('button.usa-button.sign-in-button')

@@ -1,4 +1,4 @@
-import { login_gov_login } from '../support/login_gov.js';
+import { testLoginGovLogin } from '../support/login_gov.js';
 
 describe('Full audit submission', () => {
   before(() => {
@@ -10,6 +10,13 @@ describe('Full audit submission', () => {
   });
 
   it('Logs in with Login.gov', () => {
-    login_gov_login();
+    testLoginGovLogin();
   });
+
+  // finishes on `/audit/`
+  // check the terms and conditions box and click "Start a new submission"
+  cy.get('label[for=check-start-new-submission]').click();
+  cy.get('.usa-button').contains('Start a new submission').click();
+  cy.url().should('match', /\/report_submission\/eligibility\/$/);
+
 });
