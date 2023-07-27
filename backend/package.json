@@ -24,10 +24,13 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@4tw/cypress-drag-drop": "^2.2.4",
     "@lhci/cli": "^0.12.0",
     "@uswds/uswds": "^3.3.0",
     "autoprefixer": "^10.4.13",
     "cypress": "^12.17.2",
+    "cypress-file-upload": "^5.0.8",
+    "cypress-otp": "^1.0.3",
     "esbuild-postcss": "^0.0.4",
     "esbuild-sass-plugin": "2.4.5",
     "eslint": "^8.35.0",
