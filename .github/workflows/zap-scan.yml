@@ -6,13 +6,17 @@ on:
       url:
         required: true
         type: string
+  push:
+    branches:
+      - asteel/zap-action
 
 jobs:
   zap_scan:
     name: Scan site with OWASP-ZAP
     runs-on: ubuntu-latest
     env:
-      url: ${{ inputs.url }}
+      # url: ${{ inputs.url }}
+      url: 'https://app.fac.gov'
     steps:
       - name: Checkout
         uses: actions/checkout@v3
