@@ -1,6 +1,6 @@
   - type: report
     parameters:
-      template: sarif
+      template: sarif-json
       reportDir: /zap/wrk/
       reportFile: zap-report.sarif
       reportTitle: Zap Scan

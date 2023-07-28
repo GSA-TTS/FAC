@@ -28,7 +28,7 @@ jobs:
           docker_name: 'owasp/zap2docker-stable'
           target: '${{ env.url }}'
           rules_file_name: 'zap.conf'
-          cmd_options: '-d -z "-addonupdate -addoninstall ReportGeneration -autorun zap.yaml"'
+          cmd_options: '-z "-addoninstall ReportGeneration -autorun /zap/wrk/zap.yaml"'
           allow_issue_writing: false
           fail_action: false
 
