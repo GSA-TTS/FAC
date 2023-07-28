@@ -36,10 +36,5 @@ jobs:
           cmd_options: '-a'
           allow_issue_writing: true
           fail_action: false
-          issue_title: 'ZAP Scan Findings ${{ steps.date.outputs.date }}'
+          issue_title: 'ZAP Scan Findings'
 
-      # - name: Pull Zap Image
-      #   run: docker pull owasp/zap2docker-stable
-
-      # - name: Run OWASP-ZAP
-      #   run: docker run -v $(pwd):/zap/wrk/:rw -t owasp/zap2docker-stable zap-baseline.py -t https://fac-dev.app.cloud.gov/ -c zap.conf -I
