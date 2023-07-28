@@ -1,9 +1,10 @@
   - type: report
     parameters:
       template: sarif
-      reportDir: /zap/wrk/
+      reportDir: tmp/
       reportFile: zap-report.sarif
       reportTitle: Zap Scan
+      displayReport: true
     risks:
       - high
       - medium
@@ -15,4 +16,7 @@
       - low
       - falsepositive
     sections: all
-    sites: all
+    sites:
+      - https://fac-dev.app.cloud.gov
+      - https://fac-staging.app.cloud.gov
+      - https://app.fac.gov
