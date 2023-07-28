@@ -25,7 +25,6 @@ jobs:
           target: '${{ env.url }}'
           rules_file_name: 'zap.conf'
           cmd_options: '-a'
-          allow_issue_writing: true
-          issue_title: 'ZAP Scan Findings'
+          allow_issue_writing: false
           fail_action: false
 
