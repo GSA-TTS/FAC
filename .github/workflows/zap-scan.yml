@@ -28,7 +28,7 @@ jobs:
           docker_name: 'owasp/zap2docker-stable'
           target: '${{ env.url }}'
           rules_file_name: 'zap.conf'
-          cmd_options: '-a -addonupdate --auto zap.yaml'
+          cmd_options: '-z -addonupdate -autorun ./zap.yaml'
           allow_issue_writing: false
           fail_action: false
 
