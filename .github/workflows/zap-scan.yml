@@ -33,7 +33,7 @@ jobs:
           docker_name: 'owasp/zap2docker-stable'
           target: '${{ env.url }}'
           rules_file_name: 'zap.conf'
-          cmd_options: '-J zap-report.json'
+          cmd_options: '-a'
           allow_issue_writing: true
           fail_action: false
           issue_title: 'ZAP Scan Findings ${{ steps.date.outputs.date }}'
