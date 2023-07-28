@@ -51,7 +51,7 @@ jobs:
         run: docker pull owasp/zap2docker-stable
 
       - name: Run OWASP-ZAP
-        run: docker run -v $(pwd):/zap/wrk/:rw -t owasp/zap2docker-stable zap-baseline.py -t https://fac-dev.app.cloud.gov/ -c zap.conf bash -c "zap.sh -cmd -addonupdate; zap.sh -cmd -addoninstall ReportGeneration; zap.sh -cmd -autorun zap.yaml"
+        run: docker run -v $(pwd):/zap/wrk/:rw --user root -t owasp/zap2docker-stable zap-baseline.py -t https://fac-dev.app.cloud.gov/ -c zap.conf bash -c "zap.sh -cmd -addonupdate; zap.sh -cmd -addoninstall ReportGeneration; zap.sh -cmd -autorun zap.yaml"
 
       - name: Upload ZAP scan results to GitHub Security tab
         uses: github/codeql-action/upload-sarif@v2
