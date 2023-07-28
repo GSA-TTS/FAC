@@ -4,18 +4,19 @@
       {
          "header_height": 48,
          "hide_col_from": 2,
-         "name": "Form",
-         "open_ranges": [
+         "name": "Auditee UEI",
+         "single_cells": [
             {
                "format": "text",
                "help": {
                   "link": "https://fac.gov/documentation/validation/#uei",
                   "text": "UEIs are 12 characters long and match rules as given by SAM.gov"
                },
-               "range_name": "additional_uei",
-               "title": "Additional UEIs",
-               "title_cell": "A1",
-               "type": "open_range",
+               "range_cell": "B2",
+               "range_name": "auditee_uei",
+               "title": "Auditee UEI",
+               "title_cell": "A2",
+               "type": "single_cell",
                "validation": {
                   "custom_error": "Expecting something with only twelve characters",
                   "custom_title": "Must be length of 12",
@@ -30,19 +31,18 @@
       {
          "header_height": 48,
          "hide_col_from": 2,
-         "name": "Auditee UEI",
-         "single_cells": [
+         "name": "Form",
+         "open_ranges": [
             {
                "format": "text",
                "help": {
                   "link": "https://fac.gov/documentation/validation/#uei",
                   "text": "UEIs are 12 characters long and match rules as given by SAM.gov"
                },
-               "range_cell": "A2",
-               "range_name": "auditee_uei",
-               "title": "Auditee UEI",
+               "range_name": "additional_uei",
+               "title": "Additional UEIs",
                "title_cell": "A1",
-               "type": "single_cell",
+               "type": "open_range",
                "validation": {
                   "custom_error": "Expecting something with only twelve characters",
                   "custom_title": "Must be length of 12",

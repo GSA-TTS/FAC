@@ -39,10 +39,29 @@ header_row_fill = PatternFill(
     patternType="solid",
 )
 
+meta_row_fill = PatternFill(
+    fill_type="solid",
+    start_color="333333",
+    end_color="333333",
+    bgColor="333333",
+    patternType="solid",
+)
+
 header_row_font = Font(
     name="Calibri",
     size=11,
     bold=True,
+    italic=False,
+    vertAlign=None,
+    underline="none",
+    strike=False,
+    color="00FFFFFF",
+)
+
+meta_row_font = Font(
+    name="Calibri",
+    size=11,
+    bold=False,
     italic=False,
     vertAlign=None,
     underline="none",
@@ -73,8 +92,11 @@ def process_spec(WBNT):
         process_open_ranges(wb, ws, sheet)
         add_validations(wb, ws, sheet.open_ranges)
         add_validations(wb, ws, sheet.text_ranges)
+        # TODO: meta cells can't exist in row: title_row + 1 because they don't have a formula attribute
         apply_formula(ws, WBNT.title_row + 1, sheet)
         process_single_cells(wb, ws, sheet)
+        if sheet.meta_cells is not None:
+            process_meta_cells(wb, ws, sheet)
         process_text_ranges(wb, ws, sheet)
         unlock_data_entry_cells(WBNT.title_row, ws, sheet)
         set_column_widths(wb, ws, sheet)
@@ -359,6 +381,33 @@ def process_single_cells(wb, ws, sheet):
             f"{o.posn.range_cell}:{o.posn.range_cell}",
         )
         configure_validation(wb, ws, coord, o)
+        if o.posn.format is not None:
+            apply_cell_format(entry_cell_obj, o.posn.format)
+
+        if sheet.header_height:
+            row = int(o.posn.title_cell[1])
+            ws.row_dimensions[row].height = sheet.header_height
+
+
+def process_meta_cells(wb, ws, sheet):
+    print("---- process_meta_cells ----")
+    # Create all the meta cells
+    for o in sheet.meta_cells:
+        cell_coordinate = o.posn.title_cell
+        absolute_cell_coordinate = f"{absolute_coordinate(cell_coordinate)}"
+        sheet_cell_coordinate = (
+            f"{quote_sheetname(ws.title)}!{absolute_cell_coordinate}"
+        )
+        print(f"Meta Cell: {absolute_cell_coordinate} {sheet_cell_coordinate}")
+        the_cell = ws[o.posn.title_cell]
+        the_cell.value = o.posn.title
+        the_cell.fill = meta_row_fill
+        the_cell.font = meta_row_font
+        the_cell.alignment = Alignment(wrapText=True, wrap_text=True)
+        entry_cell_obj = ws[absolute_cell_coordinate]
+        # Should this be configurable?
+        if not o.posn.keep_locked:
+            entry_cell_obj.protection = Protection(locked=False)
         if o.posn.format is not None:
             apply_cell_format(entry_cell_obj, o.posn.format)
 

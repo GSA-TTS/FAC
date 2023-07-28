@@ -6,42 +6,32 @@ local textSheet = 'Form';
 local coverSheet = 'Coversheet';
 local title_row = 1;
 
+local meta_cells = [
+  Sheets.meta_cell {
+    keep_locked: true,
+    title: 'Federal Audit Clearinghouse\nfac.gov\nVersion: %s' % (Sheets.WORKBOOKS_VERSION),
+    title_cell: 'A1',
+    help: Help.unknown,
+  },
+  Sheets.meta_cell {
+    keep_locked: true,
+    width: 48,
+    title: 'This workbook contains two worksheets: a coversheet (this sheet) and a data entry sheet.\nBefore submitting, please make sure the fields below are filled out.',
+    title_cell: 'B1',
+    help: Help.unknown,
+  },
+];
+
 local single_cells = [
   Sheets.single_cell {
-    title: 'Auditee UEI',
+    title: 'Auditee UEI:',
     range_name: 'auditee_uei',
-    width: 36,
-    title_cell: 'A3',
-    range_cell: 'B3',
+    width: 48,
+    title_cell: 'A2',
+    range_cell: 'B2',
+    format: 'text',
     validation: SV.StringOfLengthTwelve,
     help: Help.uei,
-  },
-  Sheets.single_cell {
-    title: 'Federal Audit Clearinghouse',
-    range_name: 'coversheet_fac_name',
-    width: 36,
-    title_cell: 'A2',
-    range_cell: 'A1',
-    validation: SV.NoValidation,
-    help: Help.unknown,
-  },
-  Sheets.single_cell {
-    title: 'fac.gov',
-    range_name: 'coversheet_fac_website',
-    width: 24,
-    title_cell: 'B2',
-    range_cell: 'B1',
-    validation: SV.NoValidation,
-    help: Help.unknown,
-  },
-  Sheets.single_cell {
-    title: Sheets.WORKBOOKS_VERSION,
-    range_name: 'coversheet_version',
-    width: 12,
-    title_cell: 'C2',
-    range_cell: 'C1',
-    validation: SV.NoValidation,
-    help: Help.unknown,
   },
 ];
 
@@ -151,8 +141,12 @@ local open_ranges_defns = [
 local sheets = [
   {
     name: coverSheet,
+    meta_cells: meta_cells,
     single_cells: single_cells,
-    header_height: 48,
+    header_height: 60,
+    hide_col_from: 3,
+    //Hiding rows seems to create massive workbooks
+    //hide_row_from: 4,
   },
   {
     name: textSheet,

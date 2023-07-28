@@ -2,6 +2,54 @@
    "filename": "federal-awards-expended-template.xlsx",
    "sheets": [
       {
+         "header_height": 100,
+         "hide_col_from": 3,
+         "name": "UEI",
+         "single_cells": [
+            {
+               "format": "text",
+               "help": {
+                  "link": "https://fac.gov/documentation/validation/#uei",
+                  "text": "UEIs are 12 characters long and match rules as given by SAM.gov"
+               },
+               "range_cell": "B2",
+               "range_name": "auditee_uei",
+               "title": "Auditee UEI",
+               "title_cell": "A2",
+               "type": "single_cell",
+               "validation": {
+                  "custom_error": "Expecting something with only twelve characters",
+                  "custom_title": "Must be length of 12",
+                  "formula1": 12,
+                  "operator": "equal",
+                  "type": "textLength"
+               },
+               "width": 36
+            },
+            {
+               "format": "dollar",
+               "formula": "=SUM('Form'!F$FIRSTROW:F$LASTROW)",
+               "help": {
+                  "link": "https://fac.gov/documentation/validation/#positive_number",
+                  "text": "The number in this field must be zero or greater"
+               },
+               "keep_locked": true,
+               "range_cell": "B3",
+               "range_name": "total_amount_expended",
+               "title": "Total amount expended",
+               "title_cell": "A3",
+               "type": "single_cell",
+               "validation": {
+                  "custom_error": "This cell must be a positive number",
+                  "custom_title": "Positive numbers",
+                  "formula1": "=AND(ISNUMBER(FIRSTCELLREF),OR(SIGN(FIRSTCELLREF)=0,SIGN(FIRSTCELLREF)=1))",
+                  "type": "custom"
+               },
+               "width": 36
+            }
+         ]
+      },
+      {
          "hide_col_from": 22,
          "name": "Form",
          "open_ranges": [
@@ -399,54 +447,6 @@
                   "type": "NOVALIDATION"
                },
                "width": 24
-            }
-         ]
-      },
-      {
-         "header_height": 100,
-         "hide_col_from": 3,
-         "name": "UEI",
-         "single_cells": [
-            {
-               "format": "text",
-               "help": {
-                  "link": "https://fac.gov/documentation/validation/#uei",
-                  "text": "UEIs are 12 characters long and match rules as given by SAM.gov"
-               },
-               "range_cell": "A2",
-               "range_name": "auditee_uei",
-               "title": "Auditee UEI",
-               "title_cell": "A1",
-               "type": "single_cell",
-               "validation": {
-                  "custom_error": "Expecting something with only twelve characters",
-                  "custom_title": "Must be length of 12",
-                  "formula1": 12,
-                  "operator": "equal",
-                  "type": "textLength"
-               },
-               "width": 36
-            },
-            {
-               "format": "dollar",
-               "formula": "=SUM('Form'!F$FIRSTROW:F$LASTROW)",
-               "help": {
-                  "link": "https://fac.gov/documentation/validation/#positive_number",
-                  "text": "The number in this field must be zero or greater"
-               },
-               "keep_locked": true,
-               "range_cell": "B2",
-               "range_name": "total_amount_expended",
-               "title": "Total amount expended",
-               "title_cell": "B1",
-               "type": "single_cell",
-               "validation": {
-                  "custom_error": "This cell must be a positive number",
-                  "custom_title": "Positive numbers",
-                  "formula1": "=AND(ISNUMBER(FIRSTCELLREF),OR(SIGN(FIRSTCELLREF)=0,SIGN(FIRSTCELLREF)=1))",
-                  "type": "custom"
-               },
-               "width": 36
             }
          ]
       },

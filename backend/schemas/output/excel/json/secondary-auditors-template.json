@@ -2,18 +2,43 @@
    "filename": "secondary-auditors-template.xlsx",
    "sheets": [
       {
-         "header_height": 48,
+         "header_height": 60,
+         "hide_col_from": 3,
+         "meta_cells": [
+            {
+               "help": {
+                  "link": "https://fac.gov/documentation/validation/#unknown",
+                  "text": "If you see this error, please contact support."
+               },
+               "keep_locked": true,
+               "title": "Federal Audit Clearinghouse\nfac.gov\nVersion: 1.0.0",
+               "title_cell": "A1",
+               "type": "meta_cell"
+            },
+            {
+               "help": {
+                  "link": "https://fac.gov/documentation/validation/#unknown",
+                  "text": "If you see this error, please contact support."
+               },
+               "keep_locked": true,
+               "title": "This workbook contains two worksheets: a coversheet (this sheet) and a data entry sheet.\nBefore submitting, please make sure the fields below are filled out.",
+               "title_cell": "B1",
+               "type": "meta_cell",
+               "width": 48
+            }
+         ],
          "name": "Coversheet",
          "single_cells": [
             {
+               "format": "text",
                "help": {
                   "link": "https://fac.gov/documentation/validation/#uei",
                   "text": "UEIs are 12 characters long and match rules as given by SAM.gov"
                },
-               "range_cell": "B3",
+               "range_cell": "B2",
                "range_name": "auditee_uei",
-               "title": "Auditee UEI",
-               "title_cell": "A3",
+               "title": "Auditee UEI:",
+               "title_cell": "A2",
                "type": "single_cell",
                "validation": {
                   "custom_error": "Expecting something with only twelve characters",
@@ -22,52 +47,7 @@
                   "operator": "equal",
                   "type": "textLength"
                },
-               "width": 36
-            },
-            {
-               "help": {
-                  "link": "https://fac.gov/documentation/validation/#unknown",
-                  "text": "If you see this error, please contact support."
-               },
-               "range_cell": "A1",
-               "range_name": "coversheet_fac_name",
-               "title": "Federal Audit Clearinghouse",
-               "title_cell": "A2",
-               "type": "single_cell",
-               "validation": {
-                  "type": "NOVALIDATION"
-               },
-               "width": 36
-            },
-            {
-               "help": {
-                  "link": "https://fac.gov/documentation/validation/#unknown",
-                  "text": "If you see this error, please contact support."
-               },
-               "range_cell": "B1",
-               "range_name": "coversheet_fac_website",
-               "title": "fac.gov",
-               "title_cell": "B2",
-               "type": "single_cell",
-               "validation": {
-                  "type": "NOVALIDATION"
-               },
-               "width": 24
-            },
-            {
-               "help": {
-                  "link": "https://fac.gov/documentation/validation/#unknown",
-                  "text": "If you see this error, please contact support."
-               },
-               "range_cell": "C1",
-               "range_name": "coversheet_version",
-               "title": "1.0.0",
-               "title_cell": "C2",
-               "type": "single_cell",
-               "validation": {
-                  "type": "NOVALIDATION"
-               },
-               "width": 12
+               "width": 48
             }
          ]
       },

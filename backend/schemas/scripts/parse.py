@@ -15,13 +15,15 @@ from collections import namedtuple as NT
 
 Sheet = NT(
     "Sheet",
-    "name single_cells open_ranges mergeable_cells merged_unreachable header_inclusion text_ranges header_height hide_col_from hide_row_from",
+    "name single_cells meta_cells open_ranges mergeable_cells merged_unreachable header_inclusion text_ranges header_height hide_col_from hide_row_from",
 )
 Posn = NT(
     "Posn",
     "title title_cell range_name range_cell width keep_locked format last_range_cell",
 )
 SingleCell = NT("SingleCell", "posn validation formula help")
+# TODO: flesh out NT for meta cells
+MetaCell = NT("MetaCell", "posn formula help")
 MergeableCell = NT("MergeableCell", "start_row end_row start_column end_column")
 MergedUnreachable = NT("MergedUnreachable", "columns")
 HeaderInclusion = NT("HeaderInclusion", "cells")
@@ -86,6 +88,24 @@ def parse_single_cell(spec):
     )
 
 
+# Meta cells probably don't need named ranges
+def parse_meta_cell(spec):
+    return MetaCell(
+        Posn(
+            get(spec, "title"),
+            get(spec, "title_cell"),
+            get(spec, "range_name"),
+            get(spec, "range_cell"),
+            get(spec, "width"),
+            get(spec, "keep_locked", default=False),
+            get(spec, "format", default=None),
+            get(spec, "last_range_cell", default=None),
+        ),
+        get(spec, "formula"),
+        parse_help(get(spec, "help")),
+    )
+
+
 def parse_open_range(spec):
     # print("------------------- open range")
     # print(f"len opr: {len(spec)}")
@@ -142,13 +162,16 @@ def parse_text_range(spec):
 
 
 def parse_sheet(spec):
-    sc, opr, mc, mur, hi, tr = None, None, None, None, None, None
+    sc, mtc, opr, mc, mur, hi, tr = None, None, None, None, None, None, None
     name = get(spec, "name", default="Unnamed Sheet")
     if "single_cells" in spec:
         sc = list(map(parse_single_cell, get(spec, "single_cells", default=[])))
     else:
         sc = []
-
+    if "meta_cells" in spec:
+        mtc = list(map(parse_meta_cell, get(spec, "meta_cells", default=[])))
+    else:
+        sc = []
     if "open_ranges" in spec:
         opr = list(map(parse_open_range, get(spec, "open_ranges", default=[])))
     else:
@@ -181,7 +204,7 @@ def parse_sheet(spec):
         hrf = get(spec, "hide_row_from")
     else:
         hrf = None
-    return Sheet(name, sc, opr, mc, mur, hi, tr, hh, hcf, hrf)
+    return Sheet(name, sc, mtc, opr, mc, mur, hi, tr, hh, hcf, hrf)
 
 
 def parse_spec(spec):

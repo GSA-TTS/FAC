@@ -2,6 +2,56 @@
    "filename": "findings-uniform-guidance-template.xlsx",
    "sheets": [
       {
+         "header_height": 100,
+         "hide_col_from": 3,
+         "meta_cells": [
+            {
+               "help": {
+                  "link": "https://fac.gov/documentation/validation/#unknown",
+                  "text": "If you see this error, please contact support."
+               },
+               "keep_locked": true,
+               "title": "Federal Audit Clearinghouse\nfac.gov\nVersion: 1.0.0",
+               "title_cell": "A1",
+               "type": "meta_cell"
+            },
+            {
+               "help": {
+                  "link": "https://fac.gov/documentation/validation/#unknown",
+                  "text": "If you see this error, please contact support."
+               },
+               "keep_locked": true,
+               "title": "This workbook contains two worksheets: a coversheet (this sheet) and a data entry sheet.\nBefore submitting, please make sure the fields below are filled out.",
+               "title_cell": "B1",
+               "type": "meta_cell",
+               "width": 48
+            }
+         ],
+         "name": "UEI",
+         "single_cells": [
+            {
+               "format": "text",
+               "help": {
+                  "link": "https://fac.gov/documentation/validation/#uei",
+                  "text": "UEIs are 12 characters long and match rules as given by SAM.gov"
+               },
+               "range_cell": "B2",
+               "range_name": "auditee_uei",
+               "title": "Auditee UEI",
+               "title_cell": "A2",
+               "type": "single_cell",
+               "validation": {
+                  "custom_error": "Expecting something with only twelve characters",
+                  "custom_title": "Must be length of 12",
+                  "formula1": 12,
+                  "operator": "equal",
+                  "type": "textLength"
+               },
+               "width": 36
+            }
+         ]
+      },
+      {
          "hide_col_from": 13,
          "name": "Form",
          "open_ranges": [
@@ -215,33 +265,6 @@
                   "type": "list"
                },
                "width": 16
-            }
-         ]
-      },
-      {
-         "header_height": 100,
-         "hide_col_from": 2,
-         "name": "UEI",
-         "single_cells": [
-            {
-               "format": "text",
-               "help": {
-                  "link": "https://fac.gov/documentation/validation/#uei",
-                  "text": "UEIs are 12 characters long and match rules as given by SAM.gov"
-               },
-               "range_cell": "A2",
-               "range_name": "auditee_uei",
-               "title": "Auditee UEI",
-               "title_cell": "A1",
-               "type": "single_cell",
-               "validation": {
-                  "custom_error": "Expecting something with only twelve characters",
-                  "custom_title": "Must be length of 12",
-                  "formula1": 12,
-                  "operator": "equal",
-                  "type": "textLength"
-               },
-               "width": 36
             }
          ]
       }

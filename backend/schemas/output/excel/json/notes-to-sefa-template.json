@@ -3,6 +3,32 @@
    "sheets": [
       {
          "header_height": 100,
+         "hide_col_from": 2,
+         "name": "UEI",
+         "single_cells": [
+            {
+               "help": {
+                  "link": "https://fac.gov/documentation/validation/#uei",
+                  "text": "UEIs are 12 characters long and match rules as given by SAM.gov"
+               },
+               "range_cell": "B2",
+               "range_name": "auditee_uei",
+               "title": "Auditee UEI",
+               "title_cell": "A2",
+               "type": "single_cell",
+               "validation": {
+                  "custom_error": "Expecting something with only twelve characters",
+                  "custom_title": "Must be length of 12",
+                  "formula1": 12,
+                  "operator": "equal",
+                  "type": "textLength"
+               },
+               "width": 36
+            }
+         ]
+      },
+      {
+         "header_height": 100,
          "hide_col_from": 4,
          "name": "MandatoryNotes",
          "single_cells": [
@@ -105,32 +131,6 @@
                   "type": "NOVALIDATION"
                },
                "width": 18
-            }
-         ]
-      },
-      {
-         "header_height": 100,
-         "hide_col_from": 2,
-         "name": "UEI",
-         "single_cells": [
-            {
-               "help": {
-                  "link": "https://fac.gov/documentation/validation/#uei",
-                  "text": "UEIs are 12 characters long and match rules as given by SAM.gov"
-               },
-               "range_cell": "A2",
-               "range_name": "auditee_uei",
-               "title": "Auditee UEI",
-               "title_cell": "A1",
-               "type": "single_cell",
-               "validation": {
-                  "custom_error": "Expecting something with only twelve characters",
-                  "custom_title": "Must be length of 12",
-                  "formula1": 12,
-                  "operator": "equal",
-                  "type": "textLength"
-               },
-               "width": 36
             }
          ]
       }

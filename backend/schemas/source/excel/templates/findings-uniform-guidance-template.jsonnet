@@ -6,13 +6,29 @@ local findingSheet = 'Form';
 local ueiSheet = 'UEI';
 local title_row = 1;
 
+local meta_cells = [
+  Sheets.meta_cell {
+    keep_locked: true,
+    title: 'Federal Audit Clearinghouse\nfac.gov\nVersion: %s' % (Sheets.WORKBOOKS_VERSION),
+    title_cell: 'A1',
+    help: Help.unknown,
+  },
+  Sheets.meta_cell {
+    keep_locked: true,
+    width: 48,
+    title: 'This workbook contains two worksheets: a coversheet (this sheet) and a data entry sheet.\nBefore submitting, please make sure the fields below are filled out.',
+    title_cell: 'B1',
+    help: Help.unknown,
+  },
+];
+
 local single_cells = [
   Sheets.single_cell {
     title: 'Auditee UEI',
     range_name: 'auditee_uei',
     width: 36,
-    title_cell: 'A1',
-    range_cell: 'A2',
+    title_cell: 'A2',
+    range_cell: 'B2',
     validation: SV.StringOfLengthTwelve,
     format: 'text',
     help: Help.uei,
@@ -149,17 +165,18 @@ local open_ranges_defns = [
 
 local sheets = [
   {
+    name: ueiSheet,
+    meta_cells: meta_cells,
+    single_cells: single_cells,
+    header_height: 100,
+    hide_col_from: 3,
+    //FIXME MSHD: commented this out until we figure out if it is needed
+    //hide_row_from: 3,
+  },
+  {
     name: findingSheet,
     open_ranges: Fun.make_open_ranges(title_row, open_ranges_defns),
     hide_col_from: 13,
-  },
-  {
-    name: ueiSheet,
-    single_cells: single_cells,
-    header_height: 100,
-    hide_col_from: 2,
-    //FIXME MSHD: commented this out until we figure out if it is needed
-    //hide_row_from: 3,
   },
 ];
 
