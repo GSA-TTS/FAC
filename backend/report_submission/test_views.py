@@ -47,7 +47,7 @@ SAMPLE_BASE_SAC_DATA = {
         "auditor_firm_name": "Dollar Audit Store",
         "auditor_ein": "123456789",
         "auditor_ein_not_an_ssn_attestation": True,
-        "auditor_country": "USA",
+        "auditor_country": "US",
         "auditor_address_line_1": "100 Percent Respectable St.",
         "auditor_city": "Podunk",
         "auditor_state": "NY",
