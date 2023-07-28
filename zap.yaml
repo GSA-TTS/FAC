@@ -1,0 +1,18 @@
+  - type: report
+    parameters:
+      template: sarif
+      reportDir: /zap/wrk/
+      reportFile: zap-report.sarif
+      reportTitle: Zap Scan
+    risks:
+      - high
+      - medium
+      - low
+      - info
+    confidences:
+      - high
+      - medium
+      - low
+      - falsepositive
+    sections: all
+    sites: all

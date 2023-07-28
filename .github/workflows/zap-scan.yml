@@ -1,18 +1,22 @@
 ---
 name: Run OWASP-ZAP Scan
 on:
-  workflow_call:
-    inputs:
-      url:
-        required: true
-        type: string
+  # workflow_call:
+  #   inputs:
+  #     url:
+  #       required: true
+  #       type: string
+  push:
+    branches:
+      - asteel/zap-action
 
 jobs:
   zap_scan:
     name: Scan site with OWASP-ZAP
     runs-on: ubuntu-latest
     env:
-      url: ${{ inputs.url }}
+      # url: ${{ inputs.url }}
+      url: 'https://fac-dev.app.cloud.gov'
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -24,7 +28,12 @@ jobs:
           docker_name: 'owasp/zap2docker-stable'
           target: '${{ env.url }}'
           rules_file_name: 'zap.conf'
-          cmd_options: '-a'
+          cmd_options: '-a -addonupdate --auto zap.yaml'
           allow_issue_writing: false
           fail_action: false
+
+      - name: Upload ZAP scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: '/zap/wrk/zap-report.sarif'
 
