@@ -1,7 +1,7 @@
   - type: report
     parameters:
       template: sarif
-      reportDir: tmp/
+      reportDir: /zap/wrk/
       reportFile: zap-report.sarif
       reportTitle: Zap Scan
       displayReport: true

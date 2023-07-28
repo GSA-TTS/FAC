@@ -11,32 +11,6 @@ on:
       - asteel/zap-action
 
 jobs:
-  # zap-scan:
-  #   name: Scan site with OWASP-ZAP
-  #   runs-on: ubuntu-latest
-  #   env:
-  #     # url: ${{ inputs.url }}
-  #     url: 'https://fac-dev.app.cloud.gov'
-  #   steps:
-  #     - name: Checkout
-  #       uses: actions/checkout@v3
-
-  #     - name: ZAP Scan of ${{ env.url }}
-  #       uses: zaproxy/action-full-scan@v0.5.1
-  #       with:
-  #         token: ${{ secrets.GITHUB_TOKEN }}
-  #         docker_name: 'owasp/zap2docker-stable'
-  #         target: '${{ env.url }}'
-  #         rules_file_name: 'zap.conf'
-  #         cmd_options: '-z "-addonupdate -addoninstall ReportGeneration -autorun zap.yaml"'
-  #         allow_issue_writing: false
-  #         fail_action: false
-
-  #     - name: Upload ZAP scan results to GitHub Security tab
-  #       uses: github/codeql-action/upload-sarif@v2
-  #       with:
-  #         sarif_file: 'tmp/zap-report.sarif'
-
   zap-scan:
     name: Scan site with OWASP-ZAP
     runs-on: ubuntu-latest
@@ -47,14 +21,18 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Pull Zap Image
-        run: docker pull owasp/zap2docker-stable
-
-      - name: Run OWASP-ZAP
-        run: docker run -v $(pwd):/zap/wrk/:rw --user root -t owasp/zap2docker-stable zap-baseline.py -t https://fac-dev.app.cloud.gov/ -c zap.conf -I zap.sh -cmd -autorun zap.yaml
+      - name: ZAP Scan of ${{ env.url }}
+        uses: zaproxy/action-full-scan@v0.5.1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          docker_name: 'owasp/zap2docker-stable'
+          target: '${{ env.url }}'
+          rules_file_name: 'zap.conf'
+          cmd_options: '-d -z "-addonupdate -addoninstall ReportGeneration -autorun zap.yaml"'
+          allow_issue_writing: false
+          fail_action: false
 
       - name: Upload ZAP scan results to GitHub Security tab
         uses: github/codeql-action/upload-sarif@v2
         with:
-          sarif_file: 'tmp/zap-report.sarif'
-
+          sarif_file: '/zap/wrk/zap-report.sarif'
