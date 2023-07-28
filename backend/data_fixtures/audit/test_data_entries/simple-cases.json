@@ -23,7 +23,7 @@
     "auditor_firm_name": "Firm LLC",
     "auditor_ein": "123456789",
     "auditor_ein_not_an_ssn_attestation": true,
-    "auditor_country": "USA",
+    "auditor_country": "US",
     "auditor_address_line_1": "456 Fake St.",
     "auditor_city": "AnotherFakeCity",
     "auditor_state": "WY",
