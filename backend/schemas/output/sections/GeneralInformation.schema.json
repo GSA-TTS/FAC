@@ -203,7 +203,10 @@
          "type": "string"
       },
       "auditor_country": {
-         "maxLength": 100,
+         "enum": [
+            "US",
+            "non-US"
+         ],
          "type": "string"
       },
       "auditor_ein": {
@@ -220,6 +223,9 @@
          "type": "string"
       },
       "auditor_firm_name": {
+         "type": "string"
+      },
+      "auditor_international_address": {
          "type": "string"
       },
       "auditor_phone": {

@@ -14,6 +14,8 @@ local Const = {
   NULL: 'null',
   STATE_CLUSTER: 'STATE CLUSTER',
   OTHER_CLUSTER: 'OTHER CLUSTER NOT LISTED ABOVE',
+  US: 'US',
+  NON_US: 'non-US'
 };
 
 local Types = {
@@ -316,6 +318,12 @@ local Enum = {
       '99',
     ],
   },
+  USOrNonUS: Types.string {
+    enum: [
+      Const.US,
+      Const.NON_US,
+    ],
+  }
 };
 
 local simple_phone_regex = '[1-9]{1}[0-9]{9}+';

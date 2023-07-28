@@ -69,9 +69,7 @@ local Types = Base.Types;
     auditor_contact_title: Types.string {
       maxLength: 100,
     },
-    auditor_country: Types.string {
-      maxLength: 100,
-    },
+    auditor_country: Base.Enum.USOrNonUS,
     auditor_ein: {
       '$ref': '#/$defs/EIN',
     },
@@ -83,6 +81,7 @@ local Types = Base.Types;
     auditor_phone: {
       '$ref': '#/$defs/Phone',
     },
+    auditor_international_address: Types.string,
     auditor_state: {
       '$ref': '#/$defs/State',
     },
