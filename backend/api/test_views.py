@@ -702,6 +702,7 @@ class SingleAuditChecklistViewTests(TestCase):
                 "user_provided_organization_type",
                 "['state', 'local', 'tribal', 'higher-ed', 'non-profit', 'unknown', 'none']",
             ),
+            ("auditor_country", "['US', 'non-US']"),
         ]
 
         length_100_keys = [
@@ -709,7 +710,6 @@ class SingleAuditChecklistViewTests(TestCase):
             "auditee_city",
             "auditee_contact_name",
             "auditee_contact_title",
-            "auditor_country",
             "auditor_address_line_1",
             "auditor_city",
             "auditor_contact_name",
