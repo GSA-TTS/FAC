@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       # url: ${{ inputs.url }}
-      url: "https://fac-dev.app.cloud.gov"
+      url: "https://fac-staging.app.cloud.gov"
     steps:
       - name: Checkout
         uses: actions/checkout@v3
