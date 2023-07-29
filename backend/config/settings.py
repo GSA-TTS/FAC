@@ -115,6 +115,7 @@ INSTALLED_APPS += [
     "cms",
     # "data_distro",
     "dissemination",
+    "historic",
 ]
 
 MIDDLEWARE = [

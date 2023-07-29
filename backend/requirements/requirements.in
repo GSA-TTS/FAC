@@ -27,5 +27,6 @@ python-json-logger
 python-slugify
 pyyaml
 requests>=2.31.0
+sqlalchemy
 sqlparse>=0.4.4
 uritemplate
