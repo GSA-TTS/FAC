@@ -37,6 +37,7 @@ class mapper:
             return df.drop(columns=list(self.to_drop_late))
 
     def apply_mappings_to_df(self, df, when="early"):
+        df = df.drop("id", axis=1)  # drop django id col
         df = self._drop_columns(df, when=when)
         df = df.rename(columns=self.c2g_map)
         df = self.apply_retyping(df)

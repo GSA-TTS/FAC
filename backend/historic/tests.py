@@ -1,24 +1,32 @@
 from django.test import TestCase
 from .models import ELECAUDITHEADER
 from dissemination.models import General
-from . import db, etl
+from . import etl
 from model_bakery import baker
 from faker import Faker
 
 
 class TestHistETL(TestCase):
-    def setUp(self):
-        self.db = db.DB()
+    def test_etl_gen_works_for_one(self):
+        audit_header = self._fake_AUDITHEADER()
+        etl.ETL(audit_year=2022).load_general()
+        d_gen = General.objects.first()
+        self.assertEqual(audit_header.UEI, d_gen.auditee_uei)
 
-    def test_db_connection(self):
-        print("db = ", self.db)
-        self.assertIsNotNone(self.db)
+    def test_etl_gen_works_for_many(self):
+        for _ in range(1_000):
+            self._fake_AUDITHEADER()
+        etl.ETL(audit_year=2022).load_general()
+        audit_count = ELECAUDITHEADER.objects.count()
+        gen_count = General.objects.count()
+        self.assertEqual(audit_count, gen_count)
 
-    def test_etl_gen(self):
+    def _fake_AUDITHEADER(self):
         fake = Faker()
         gen = baker.make(
             ELECAUDITHEADER,
             AUDITYEAR="2022",
+            FYSTARTDATE=fake.date(),
             AGENCYCFDA=fake.company(),
             AUDITEENAME=fake.company(),
             AUDITTYPE="Single",
@@ -38,7 +46,4 @@ class TestHistETL(TestCase):
             TOTFEDEXPEND=25000,
         )
         gen.save()
-        etl.ETL(audit_year=2022).load_general()
-        d_gen = General.objects.first()
-
-        self.assertEqual(gen.UEI, d_gen.auditee_uei)
+        return gen
