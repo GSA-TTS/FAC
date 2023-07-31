@@ -1,3 +1,6 @@
+import { testValidEligibility } from '../support/check-eligibility.js';
+import { testValidAuditeeInfo } from '../support/auditee-info.js';
+
 describe('Create New Audit', () => {
 
   beforeEach(() => {
@@ -5,6 +8,12 @@ describe('Create New Audit', () => {
     cy.session('loginSession', () => {
       cy.visit('/')
       cy.login();
+
+      // submitting accessandsubmission can't succeed unless we fill in some
+      // of the previous pages
+      cy.visit('/report_submission/eligibility/')
+      testValidEligibility();
+      testValidAuditeeInfo();
     });
     cy.visit('/report_submission/accessandsubmission/');
   });
