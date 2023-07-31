@@ -131,15 +131,21 @@ def generate_findings(dbkey):
 
     # For each of them, I need to generate an elec -> award mapping.
     e2a = {}
-    for ndx, cfda in enumerate(cfdas):
-        e2a[cfda.elecauditsid] = f'AWARD-{ndx+1:04d}'
-
     award_references = []
-    for find in findings:
-        award_references.append(e2a[find.elecauditsid])
+    if (cfdas != None) and (findings != None):
+        for ndx, cfda in enumerate(cfdas):
+            if cfda:
+                e2a[cfda.elecauditsid] = f'AWARD-{ndx+1:04d}'
 
-    print("award_references",  award_references)
-    set_range(wb, 'award_reference', award_references)
+        #award_references = []
+        if len(e2a) != 0:
+            for find in findings:
+                if find:
+                    award_references.append(e2a[find.elecauditsid])
+
+            if len(award_references) != 0:
+                print("award_references",  award_references)
+                set_range(wb, 'award_reference', award_references)
     
     wb.save(os.path.join('output', dbkey, f'findings-{dbkey}.xlsx'))
 
@@ -324,7 +330,7 @@ def generate_captext(dbkey):
 ##########################################
 def main():
     generate_federal_awards(args.dbkey)
-    #generate_findings(args.dbkey)
+    generate_findings(args.dbkey) 
     generate_findings_text(args.dbkey)
     generate_additional_ueis(args.dbkey)
     generate_notes_to_sefa(args.dbkey)
