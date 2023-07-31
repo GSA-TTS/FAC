@@ -1,0 +1,55 @@
+---
+name: Deploy to Preview Environment
+on:
+  workflow_dispatch:
+
+jobs:
+  testing:
+    uses: ./.github/workflows/testing-from-ghcr.yml
+    secrets: inherit
+
+  linting:
+    uses: ./.github/workflows/linting.yml
+    secrets: inherit
+
+  scan-dev:
+    name: ZAP scan of the dev site
+    uses: ./.github/workflows/zap-scan.yml
+    with:
+        url: "https://fac-dev.app.cloud.gov/"
+
+  terraform-plan:
+    needs:
+      - scan-dev
+    uses: ./.github/workflows/terraform-plan-env.yml
+    with:
+        environment: "preview"
+    secrets: inherit
+
+  deploy-infrastructure-preview:
+    name: Deploy infrastructure (preview)
+    needs:
+      - terraform-plan
+      - testing
+      - scan-dev
+    uses: ./.github/workflows/terraform-apply-env.yml
+    with:
+        environment: "preview"
+    secrets: inherit
+
+  deploy-preview:
+    name: Deploy application
+    needs:
+      - deploy-infrastructure-preview
+    uses: ./.github/workflows/deploy-application.yml
+    with:
+        environment: "preview"
+    secrets: inherit
+
+  scan-preview-post-deploy:
+    name: Zap Scan
+    needs:
+        - deploy-preview
+    uses: ./.github/workflows/zap-scan.yml
+    with:
+        url: "https://fac-preview.app.fac.gov/"
