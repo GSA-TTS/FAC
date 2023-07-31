@@ -493,10 +493,6 @@ class AuditInfoFormView(SingleAuditChecklistAccessRequiredMixin, generic.View):
         report_id = kwargs["report_id"]
         try:
             sac = SingleAuditChecklist.objects.get(report_id=report_id)
-
-            # This is an attempt to display the information in database to the user if
-            # the form has already been submitted. Not sure it works, because I couldn't
-            # get the form to submit--Tadhg
             current_info = {}
             if sac.audit_information:
                 current_info = {
