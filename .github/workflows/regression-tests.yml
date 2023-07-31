@@ -7,31 +7,29 @@ on:
         description: "Base URL for Cypress"
         required: true
         type: string
-        default: "https://fac-staging.app.cloud.gov"
+      environment:
+        required: true
+        type: string
   workflow_call:
-  # Called from deploy-staging.yml
     inputs:
       url:
         description: "Base URL for Cypress"
         required: true
         type: string
-        default: "https://fac-staging.app.cloud.gov"
-  # Remove "push" trigger before opening PR
-  push:
-    branches:
-      - nmb/cypress-login
-  schedule:
-    - cron: '0 9 * * 1-5'
+      environment:
+        required: true
+        type: string
 
 jobs:
   regression-testing:
     runs-on: ubuntu-latest
-    environment: staging
+    environment: ${{ inputs.environment }}
     env:
       CYPRESS_BASE_URL: ${{ inputs.url }}
       CYPRESS_LOGIN_TEST_EMAIL: ${{ secrets.CYPRESS_LOGIN_TEST_EMAIL }}
       CYPRESS_LOGIN_TEST_PASSWORD: ${{ secrets.CYPRESS_LOGIN_TEST_PASSWORD }}
       CYPRESS_LOGIN_TEST_OTP_SECRET: ${{ secrets.CYPRESS_LOGIN_TEST_OTP_SECRET }}
+      DISABLE_AUTH: False
       # useful for debugging but otherwise complete overwhelm
       # DEBUG: cypress:*
     steps:

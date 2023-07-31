@@ -265,6 +265,8 @@ class ETL(object):
             submitted_date=dates_by_status[
                 self.single_audit_checklist.STATUS.SUBMITTED
             ],
+            auditor_signature_date=None,  # TODO: Field will be added by front end
+            auditee_signature_date=None,  # TODO: Field will be added by front end
             fy_end_date=general_information["auditee_fiscal_period_end"],
             fy_start_date=general_information["auditee_fiscal_period_start"],
             audit_year=self.audit_year,
@@ -276,7 +278,7 @@ class ETL(object):
             total_fed_expenditures=None,  # TODO: Where does this come from?
             type_report_major_program=None,  # TODO: Where does this come from?
             type_audit_code="UG",
-            is_public=None,  # Should be coming from SingleAuditChecklist
+            is_public=self.single_audit_checklist.is_public,
             data_source="G-FAC",
         )
         general.save()

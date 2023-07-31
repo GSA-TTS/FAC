@@ -126,7 +126,7 @@ in files in [backend/cypress/e2e/](/backend/cypress/e2e).
  For tests that run against our existing Cloud.gov environments, we can't use
  our `DISABLE_AUTH` environment variable to allow the end-to-end tests access
  to our authenticated pages. Instead, we need to use an actual Login.gov
- sadnbox account to log in. 
+ sandbox account to log in.
 
  We have a Google Group <fac-gov-test-users@gsa.gov> to provide an email
  address for those test users. Additional test users can be created using that
@@ -144,8 +144,8 @@ in files in [backend/cypress/e2e/](/backend/cypress/e2e).
  password.
 
  To pass that email address, password, and secret key into Cypress, set the
- environment variables `CYPRESS_LOGIN_EMAIL`, `CYPRESS_LOGIN_PASSWORD`, and
- `CYPRESS_LOGIN_OTP_SECRET`. Obviously, do not store these values in our
+ environment variables `CYPRESS_LOGIN_TEST_EMAIL`, `CYPRESS_LOGIN_TEST_PASSWORD`, and
+ `CYPRESS_LOGIN_TEST_OTP_SECRET`. Obviously, do not store these values in our
  Github repository. To use them in a Github Actions workflow, use the [Github
  Actions secrets
  store](https://docs.github.com/en/actions/security-guides/encrypted-secrets)
