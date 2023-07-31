@@ -324,6 +324,19 @@ make docker-first-run
 make docker-test
 ```
 
+### What to do if your local tests fail
+
+The most likely explanation is that one of the services (such as MinIO or ClamAV) didn’t finish startup before the tests reached a point that was reliant on that service.
+
+The easiest way to handle this is to run `docker compose up` and wait for ClamAV and Django to start, then run tests in another shell.
+
+The most efficient way to run tests is to run them in the same container, via something like:
+
+```sh
+docker compose exec web /bin/bash -c "python manage.py test; /bin/bash"
+```
+
+
 ## Development, in principle
 
 We're working against a [QASP](https://derisking-guide.18f.gov/qasp/) (which does *not* look like the linked document, but it serves as an example), and therefore we have a variety of practices we are holding ourselves to.
