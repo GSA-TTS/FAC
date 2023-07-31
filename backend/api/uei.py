@@ -21,6 +21,11 @@ class CustomHttpAdapter(requests.adapters.HTTPAdapter):
             ssl_context=self.ssl_context,
         )
 
+_ctx = ssl.create_default_context(ssl.Purpose.SERVER_AUTH)
+_ctx.options |= 0x4  # OP_LEGACY_SERVER_CONNECT
+SESSION = requests.session()
+SESSION.mount("https://", CustomHttpAdapter(_ctx))
+
 
 def call_sam_api(
     sam_api_url: str, params: dict, headers: dict
@@ -33,12 +38,8 @@ def call_sam_api(
     ssl.OP_LEGACY_SERVER_CONNECT for the SSL context.
     """
     try:
-        ctx = ssl.create_default_context(ssl.Purpose.SERVER_AUTH)
-        ctx.options |= 0x4  # OP_LEGACY_SERVER_CONNECT
-        session = requests.session()
-        session.mount("https://", CustomHttpAdapter(ctx))
         return (
-            session.get(sam_api_url, params=params, headers=headers, timeout=15),
+            SESSION.get(sam_api_url, params=params, headers=headers, timeout=15),
             None,
         )
 
