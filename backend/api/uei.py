@@ -5,8 +5,9 @@ import urllib3
 
 from config.settings import SAM_API_URL, SAM_API_KEY
 
-class CustomHttpAdapter (requests.adapters.HTTPAdapter):
-    '''Transport adapter that allows us to use custom ssl_context.'''
+
+class CustomHttpAdapter(requests.adapters.HTTPAdapter):
+    """Transport adapter that allows us to use custom ssl_context."""
 
     def __init__(self, ssl_context=None, **kwargs):
         self.ssl_context = ssl_context
@@ -14,8 +15,11 @@ class CustomHttpAdapter (requests.adapters.HTTPAdapter):
 
     def init_poolmanager(self, connections, maxsize, block=False):
         self.poolmanager = urllib3.poolmanager.PoolManager(
-            num_pools=connections, maxsize=maxsize,
-            block=block, ssl_context=self.ssl_context)
+            num_pools=connections,
+            maxsize=maxsize,
+            block=block,
+            ssl_context=self.ssl_context,
+        )
 
 
 def call_sam_api(
@@ -24,15 +28,15 @@ def call_sam_api(
     """
     Call the SAM.gov API and return the response and/or error string
 
-	SAM.gov uses a legacy version of SSL that OpenSSL 3 rejects. We specify
+    SAM.gov uses a legacy version of SSL that OpenSSL 3 rejects. We specify
     just in this one spot the magic flag 0x04 corresponding to
-	ssl.OP_LEGACY_SERVER_CONNECT for the SSL context.
+    ssl.OP_LEGACY_SERVER_CONNECT for the SSL context.
     """
     try:
         ctx = ssl.create_default_context(ssl.Purpose.SERVER_AUTH)
         ctx.options |= 0x4  # OP_LEGACY_SERVER_CONNECT
         session = requests.session()
-        session.mount('https://', CustomHttpAdapter(ctx))
+        session.mount("https://", CustomHttpAdapter(ctx))
         return (
             session.get(sam_api_url, params=params, headers=headers, timeout=15),
             None,
