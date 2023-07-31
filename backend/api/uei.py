@@ -21,6 +21,7 @@ class CustomHttpAdapter(requests.adapters.HTTPAdapter):
             ssl_context=self.ssl_context,
         )
 
+
 _ctx = ssl.create_default_context(ssl.Purpose.SERVER_AUTH)
 _ctx.options |= 0x4  # OP_LEGACY_SERVER_CONNECT
 SESSION = requests.session()
