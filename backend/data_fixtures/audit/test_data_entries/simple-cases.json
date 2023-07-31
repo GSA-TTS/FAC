@@ -34,16 +34,15 @@
     "auditor_email": "jane@test.test"
   },
   "AuditInformationCase": {
-    "AuditInformation": {
-      "gaap_results": [],
-      "is_going_concern_included": true,
-      "is_internal_control_deficiency_disclosed": false,
-      "is_internal_control_material_weakness_disclosed": false ,
-      "is_material_noncompliance_disclosed": true ,
-      "is_aicpa_audit_guide_included": false ,
-      "is_low_risk_auditee": true,
-      "agencies": []   
-    }
+    "gaap_results": [],
+    "dollar_threshold": 1,
+    "is_going_concern_included": true,
+    "is_internal_control_deficiency_disclosed": false,
+    "is_internal_control_material_weakness_disclosed": false,
+    "is_material_noncompliance_disclosed": true,
+    "is_aicpa_audit_guide_included": false,
+    "is_low_risk_auditee": true,
+    "agencies": []
   },
   "FederalAwardsCases": [
     {
@@ -189,7 +188,7 @@
       ]
     }
   },
-  "NotesToSefaCase":{
+  "NotesToSefaCase": {
     "NotesToSefa": {
       "auditee_uei": "AAA123456CCC",
       "accounting_policies": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. \nFusce in ipsum tempus, eleifend ipsum id, dignissim ipso lorem. Proin vel quam non metus placerat semper nec in nisi.",
