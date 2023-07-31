@@ -393,7 +393,7 @@ class AuditInformationSchemaValidityTest(SimpleTestCase):
         ]
         for value in [True, False]:
             for field in boolean_fields:
-                simple_case["AuditInformation"][field] = value
+                simple_case[field] = value
                 validate(simple_case, schema)
 
     def test_all_gaap_results(self):
@@ -408,13 +408,13 @@ class AuditInformationSchemaValidityTest(SimpleTestCase):
         ]
 
         for result in gaap_results:
-            simple_case["AuditInformation"]["gaap_results"] = [result]
+            simple_case["gaap_results"] = [result]
             validate(simple_case, schema)
 
         for _ in range(10):
             for n in range(2, 5):
                 ls = random.sample(gaap_results, n)
-                simple_case["AuditInformation"]["gaap_results"] = ls
+                simple_case["gaap_results"] = ls
                 validate(simple_case, schema)
 
     def test_bad_gaap_results(self):
@@ -431,7 +431,7 @@ class AuditInformationSchemaValidityTest(SimpleTestCase):
         ]
 
         for word in not_gaap_values:
-            simple_case["AuditInformation"]["gaap_results"] = [word]
+            simple_case["gaap_results"] = [word]
             self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
     def test_valid_aln_prefixes(self):
@@ -508,13 +508,13 @@ class AuditInformationSchemaValidityTest(SimpleTestCase):
         for _ in range(10):
             for n in range(2, 10):
                 ls = random.sample(likely_valid_aln_prefixes, n)
-                simple_case["AuditInformation"]["agencies"] = ls
+                simple_case["agencies"] = ls
                 validate(simple_case, schema)
 
         for _ in range(10):
             for n in range(2, 3):
                 ls = random.sample(likely_invalid_aln_prefixes, n)
-                simple_case["AuditInformation"]["agencies"] = ls
+                simple_case["agencies"] = ls
                 self.assertRaises(
                     exceptions.ValidationError, validate, simple_case, schema
                 )
