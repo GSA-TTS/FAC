@@ -1,5 +1,6 @@
 import { testLoginGovLogin } from '../support/login-gov.js';
 import { testValidEligibility } from '../support/check-eligibility.js';
+import { testValidAuditeeInfo } from '../support/auditee-info.js';
 
 describe('Full audit submission', () => {
   before(() => {
@@ -23,5 +24,8 @@ describe('Full audit submission', () => {
 
     // Completes the eligibility screen
     testValidEligibility();
+
+    // Now the auditee info screen
+    testValidAuditeeInfo();
   });
 });

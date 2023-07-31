@@ -10,5 +10,5 @@ export function testValidEligibility() {
   selectValidEntries();
 
   cy.get('.usa-button').contains('Continue').click();
-  cy.url().should('include', '/report_submission/auditeeinfo/');
+  cy.url().should('match', /\/report_submission\/auditeeinfo\/$/);
 }

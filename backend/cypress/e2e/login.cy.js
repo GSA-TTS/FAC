@@ -1,4 +1,4 @@
-import { testLoginGovLogin } from '../support/login_gov.js';
+import { testLoginGovLogin } from '../support/login-gov.js';
 
 describe('login', () => {
   // To set DISABLE_AUTH in Cypress, set the environment variable
@@ -14,9 +14,11 @@ describe('login', () => {
   });
 
   //This uses a IF/ Else statement whether authentication is required based if DISABLE_AUTH is True/False
-  describe('authenticate with Login.gov', () => {
+  describe('authenticating', () => {
     if (!disableAuth) {
-      testLoginGovLogin();
+      it('should use Login.gov', () => {
+        testLoginGovLogin();
+      });
     } else {
       it('should not require authentication', () => {
         cy.url().should('match', /\/audit\/$/);
