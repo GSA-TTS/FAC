@@ -17,6 +17,10 @@ class ETL:
         src_df = pd.DataFrame.from_records(
             ELECAUDITHEADER.objects.all().filter(AUDITYEAR=self.audit_year).values()
         )
+        if len(src_df) == 0:
+            print("No matching rows in ELECAUDITHEADER")
+            return 0
+
         tgt_df = src_df.copy(deep=True)
         # print("Found Columns to DB:", tgt_df.columns)
 
