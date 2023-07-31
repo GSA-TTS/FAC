@@ -8,7 +8,7 @@ import os
 
 # Pull in agency names from the most recent cfda-agencies-YYYYMMDD.csv
 # Scraps rows with non-int agency nums and rows with empty agency names.
-def get_agency_names() -> dict[str, str]:
+def get_agency_names():
     # Lets build a dictionary of names, mapping the agency number
     # to the name.
     _agency_names = dict()
@@ -31,7 +31,7 @@ def get_agency_names() -> dict[str, str]:
     return agency_names
 
 
-def get_gaap_results() -> list[dict[str, str]]:
+def get_gaap_results():
     sonnet = "./schemas/source/base/GAAP.libsonnet"
     json_str = _jsonnet.evaluate_snippet(sonnet, open(sonnet).read())
     jobj = json.loads(json_str)
