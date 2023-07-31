@@ -291,7 +291,7 @@ class UtilsTesting(TestCase):
         test_uei = "ZQGGHJH74DW7"
 
         # Valid
-        with patch("api.uei.requests.get") as mock_get:
+        with patch("api.uei.SESSION.get") as mock_get:
             mock_get.return_value.status_code = 200  # Mock the status code
             mock_get.return_value.json.return_value = json.loads(
                 valid_uei_results
@@ -306,7 +306,7 @@ class UtilsTesting(TestCase):
             )
 
         # Invalid Status Code
-        with patch("api.uei.requests.get") as mock_get:
+        with patch("api.uei.SESSION.get") as mock_get:
             mock_get.return_value.status_code = 400  # Mock the status code
             results = get_uei_info_from_sam_gov(uei=test_uei)
 
@@ -318,7 +318,7 @@ class UtilsTesting(TestCase):
             )
 
         # Timeout
-        with patch("api.uei.requests.get") as mock_get:
+        with patch("api.uei.SESSION.get") as mock_get:
 
             def bad_timeout(*args, **kwds):
                 raise requests.exceptions.Timeout
@@ -331,7 +331,7 @@ class UtilsTesting(TestCase):
             self.assertEquals(results["errors"], ["SAM.gov API timeout"])
 
         # TooManyRedirects
-        with patch("api.uei.requests.get") as mock_get:
+        with patch("api.uei.SESSION.get") as mock_get:
 
             def bad_redirects(*args, **kwds):
                 raise requests.exceptions.TooManyRedirects
@@ -346,7 +346,7 @@ class UtilsTesting(TestCase):
             )
 
         # RequestException
-        with patch("api.uei.requests.get") as mock_get:
+        with patch("api.uei.SESSION.get") as mock_get:
 
             def bad_reqexception(*args, **kwds):
                 raise requests.exceptions.RequestException
@@ -362,7 +362,7 @@ class UtilsTesting(TestCase):
             )
 
         # UEI registrationStatus not active
-        with patch("api.uei.requests.get") as mock_get:
+        with patch("api.uei.SESSION.get") as mock_get:
             mock_get.return_value.status_code = 200  # Mock the status code
             mock_get.return_value.json.return_value = json.loads(
                 invalid_uei_results
@@ -373,7 +373,7 @@ class UtilsTesting(TestCase):
             self.assertTrue(results["errors"])
 
         # No matching UEI's found
-        with patch("api.uei.requests.get") as mock_get:
+        with patch("api.uei.SESSION.get") as mock_get:
             mock_get.return_value.status_code = 200  # Mock the status code
             mock_get.return_value.json.return_value = json.loads(
                 missing_uei_results
@@ -388,7 +388,7 @@ class UtilsTesting(TestCase):
             )
 
         # Invalid number of SAM.gov entries
-        with patch("api.uei.requests.get") as mock_get:
+        with patch("api.uei.SESSION.get") as mock_get:
             mock_get.return_value.status_code = 200  # Mock the status code
             mock_get.return_value.json.return_value = json.loads(
                 lying_uei_results
@@ -404,7 +404,7 @@ class UtilsTesting(TestCase):
             )
 
         # Invalid number of SAM.gov entries
-        with patch("api.uei.requests.get") as mock_get:
+        with patch("api.uei.SESSION.get") as mock_get:
             mock_get.return_value.status_code = 200  # Mock the status code
             mock_get.return_value.json.return_value = json.loads(
                 misshapen_uei_results
@@ -420,7 +420,7 @@ class UtilsTesting(TestCase):
             )
 
         # Inactive entry
-        with patch("api.uei.requests.get") as mock_get:
+        with patch("api.uei.SESSION.get") as mock_get:
             mock_get.return_value.status_code = 200  # Mock the status code
             mock_get.return_value.json.return_value = json.loads(
                 inactive_uei_results
