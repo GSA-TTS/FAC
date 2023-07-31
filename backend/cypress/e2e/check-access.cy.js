@@ -1,5 +1,11 @@
 describe('Create New Audit', () => {
+
   beforeEach(() => {
+    // contents of session are only called once
+    cy.session('loginSession', () => {
+      cy.visit('/')
+      cy.login();
+    });
     cy.visit('/report_submission/accessandsubmission/');
   });
 
@@ -357,12 +363,10 @@ describe('Create New Audit', () => {
       ].forEach(field => addValidEmail(field))
     }
 
-    // TODO add general info form path here and enable this 
-    // spec after that page is re-implemented
-    xit('should proceed to the next step after successful submission', () => {
+    it('should proceed to the next step after successful submission', () => {
       completeFormWithValidInfo();
-      cy.get('.usa-button').contains('Continue').click();
-      cy.url().should('include', '/report_submission/accessandsubmission');
+      cy.get('.usa-button').contains('Create').click();
+      cy.url().should('contains', '/report_submission/general-information/');
     });
   });
 
