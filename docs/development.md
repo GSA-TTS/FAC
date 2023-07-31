@@ -337,7 +337,6 @@ docker compose exec web /bin/bash -c "python manage.py test; /bin/bash"
 ```
 
 
-
 ## Development, in principle
 
 We're working against a [QASP](https://derisking-guide.18f.gov/qasp/) (which does *not* look like the linked document, but it serves as an example), and therefore we have a variety of practices we are holding ourselves to.
