@@ -7,19 +7,23 @@ on:
         description: "Base URL for Cypress"
         required: true
         type: string
+      environment:
+        required: true
+        type: string
   workflow_call:
     inputs:
       url:
         description: "Base URL for Cypress"
         required: true
         type: string
-  schedule:
-    - cron: '0 9 * * 1-5'
+      environment:
+        required: true
+        type: string
 
 jobs:
   regression-testing:
     runs-on: ubuntu-latest
-    environment: staging
+    environment: ${{ inputs.environment }}
     env:
       CYPRESS_BASE_URL: ${{ inputs.url }}
       CYPRESS_LOGIN_TEST_EMAIL: ${{ secrets.CYPRESS_LOGIN_TEST_EMAIL }}
