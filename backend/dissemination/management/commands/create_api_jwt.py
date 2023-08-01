@@ -1,7 +1,6 @@
 from django.core.management.base import BaseCommand
 from datetime import datetime
-from dateutil.relativedelta import relativedelta
-from math import floor
+# from dateutil.relativedelta import relativedelta
 
 import jwt
 import sys
@@ -31,14 +30,12 @@ class Command(BaseCommand):
             sys.exit(-1)
         else:
             secret = kwargs["secret"]
-
-        six_months = datetime.today() + relativedelta(months=+6)
-
+        # six_months = datetime.today() + relativedelta(months=+6)
         payload = {
-                # PostgREST only cares about the role.
-                "role": role,
-                "created": datetime.today().isoformat(),
-            }
+            # PostgREST only cares about the role.
+            "role": role,
+            "created": datetime.today().isoformat(),
+        }
         print(payload)
         encoded_jwt = jwt.encode(payload, secret, algorithm="HS256")
         print(encoded_jwt)
