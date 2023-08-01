@@ -1,0 +1,54 @@
+---
+name: Runs automated regression tests for the app
+on:
+  workflow_dispatch:
+    inputs:
+      url:
+        description: "Base URL for Cypress"
+        required: true
+        type: string
+      environment:
+        required: true
+        type: string
+  workflow_call:
+    inputs:
+      url:
+        description: "Base URL for Cypress"
+        required: true
+        type: string
+      environment:
+        required: true
+        type: string
+
+jobs:
+  regression-testing:
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    env:
+      CYPRESS_BASE_URL: ${{ inputs.url }}
+      CYPRESS_LOGIN_TEST_EMAIL: ${{ secrets.CYPRESS_LOGIN_TEST_EMAIL }}
+      CYPRESS_LOGIN_TEST_PASSWORD: ${{ secrets.CYPRESS_LOGIN_TEST_PASSWORD }}
+      CYPRESS_LOGIN_TEST_OTP_SECRET: ${{ secrets.CYPRESS_LOGIN_TEST_OTP_SECRET }}
+      DISABLE_AUTH: False
+      # useful for debugging but otherwise complete overwhelm
+      # DEBUG: cypress:*
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Create .env file
+        run: touch .env
+
+      - name: Run Cypress tests
+        uses: cypress-io/github-action@v5
+        with:
+          working-directory: ./backend
+          spec: cypress/e2e/login.cy.js
+
+      - uses: actions/upload-artifact@v3
+        # add the line below to store screenshots only on failures
+        if: failure()
+        with:
+          name: cypress-screenshots
+          path: backend/cypress/screenshots
+          if-no-files-found: warn # 'warn' or 'error' are also available, defaults to `warn`
