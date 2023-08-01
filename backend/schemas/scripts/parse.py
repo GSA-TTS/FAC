@@ -171,7 +171,7 @@ def parse_sheet(spec):
     if "meta_cells" in spec:
         mtc = list(map(parse_meta_cell, get(spec, "meta_cells", default=[])))
     else:
-        sc = []
+        mtc = []
     if "open_ranges" in spec:
         opr = list(map(parse_open_range, get(spec, "open_ranges", default=[])))
     else:

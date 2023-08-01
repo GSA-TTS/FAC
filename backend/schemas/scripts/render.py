@@ -92,11 +92,9 @@ def process_spec(WBNT):
         process_open_ranges(wb, ws, sheet)
         add_validations(wb, ws, sheet.open_ranges)
         add_validations(wb, ws, sheet.text_ranges)
-        # TODO: meta cells can't exist in row: title_row + 1 because they don't have a formula attribute
         apply_formula(ws, WBNT.title_row + 1, sheet)
         process_single_cells(wb, ws, sheet)
-        if sheet.meta_cells is not None:
-            process_meta_cells(wb, ws, sheet)
+        process_meta_cells(wb, ws, sheet)
         process_text_ranges(wb, ws, sheet)
         unlock_data_entry_cells(WBNT.title_row, ws, sheet)
         set_column_widths(wb, ws, sheet)
