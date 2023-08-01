@@ -3,10 +3,14 @@ from collections import namedtuple as NT
 from pathlib import Path
 from playhouse.shortcuts import model_to_dict, dict_to_model
 import os
+import sys
 
 import argparse
 import json
+import pprint
 import openpyxl as pyxl
+
+pp = pprint.PrettyPrinter(indent=2)
 
 # FIXME
 # We'll want to figure out how to dynamically import the 
@@ -70,7 +74,9 @@ def set_range(wb, range_name, values, default=None, type=str):
             # This is a very noisy statement, showing everything
             # written into the workbook.
             # print(f'{range_name} c[{row}][{col}] <- {v} len({len(v)}) {default}')
-            ws.cell(row=row, column=col, value=type(v))
+            # MCJ BAD
+            if v is not None:
+                ws.cell(row=row, column=col, value=type(v))
             if len(v) == 0 and default is not None:
                 # This is less noisy. Shows up for things like
                 # empty findings counts. 2023 submissions
@@ -82,7 +88,9 @@ def set_range(wb, range_name, values, default=None, type=str):
             if default is not None:
                ws.cell(row=row, column=col, value=type(default))
             else:
-                ws.cell(row=row, column=col, value='')
+                # MCJ BAD
+                pass
+                # ws.cell(row=row, column=col, value='')
         else:
             # Leave it blank if we have no default passed in
             pass
@@ -101,13 +109,38 @@ def map_simple_columns(wb, mappings, values):
                   m.default, 
                   m.type)
 
+
+# FIXME: Get the padding/shape right on the report_id
+def dbkey_to_report_id(dbkey):
+    g = Gen.select(Gen.audityear,Gen.fyenddate).where(Gen.dbkey == dbkey).get()
+    month = g.fyenddate.split('-')[1]
+    return f'{g.audityear}-{month}-{1:05}{int(dbkey):09}'
+
+def generate_api_test_table(api_endpoint, dbkey, mappings, objects):
+    table = []
+    for o in objects:
+        as_dict = model_to_dict(o)
+        test_obj = {}
+        test_obj['endpoint'] = api_endpoint
+        test_obj['report_id'] = dbkey_to_report_id(dbkey)
+        test_obj['fields'] = []
+        test_obj['values'] = []
+        for m in mappings:
+            # What if we only test non-null values?
+            if ((m.in_db in as_dict) and as_dict[m.in_db] is not None) and (as_dict[m.in_db] != ""):               
+                test_obj['fields'].append(m.in_sheet)
+                test_obj['values'].append(as_dict[m.in_db])
+        table.append(test_obj)
+    return table
+
+
 ##########################################
 #
 # generate_findings
 #
 ##########################################
 def generate_findings(dbkey):
-    print("--- generate_findings ---")
+    print("--- generate findings ---")
     wb = pyxl.load_workbook('templates/findings-uniform-guidance-template.xlsx')
     mappings = [
        FieldMap('compliance_requirement', 'typerequirement', None, str), 
@@ -148,6 +181,8 @@ def generate_findings(dbkey):
                 set_range(wb, 'award_reference', award_references)
     
     wb.save(os.path.join('output', dbkey, f'findings-{dbkey}.xlsx'))
+    table = generate_api_test_table('findings', dbkey, mappings, findings)
+    return table
 
 ##########################################
 #
@@ -155,7 +190,7 @@ def generate_findings(dbkey):
 #
 ##########################################
 def generate_federal_awards(dbkey):
-    print("--- generate_federal_awards ---")
+    print("--- generate federal awards ---")
     wb = pyxl.load_workbook('templates/federal-awards-expended-template.xlsx')
     # In sheet : in DB
     mappings = [
@@ -173,7 +208,9 @@ def generate_federal_awards(dbkey):
         FieldMap('subrecipient_amount', 'passthroughamount', None, float),
         FieldMap('is_major', 'majorprogram', None, str),
         FieldMap('audit_report_type', 'typereport_mp', None, str),
-        FieldMap('number_of_audit_findings', 'findings', 0, int)
+        FieldMap('number_of_audit_findings', 'findings', 0, int),
+        FieldMap('amount_expended', 'amount', 0, int),
+        FieldMap('federal_program_total', 'programtotal', 0, int)
     ]
     g = set_uei(wb, dbkey)
     cfdas = Cfda.select().where(Cfda.dbkey == g.dbkey)
@@ -206,13 +243,10 @@ def generate_federal_awards(dbkey):
             passthrough_ids.append('')
     set_range(wb, 'passthrough_name', passthrough_names)
     set_range(wb, 'passthrough_identifying_number', passthrough_ids)
-
-    try:
-        os.mkdir(os.path.join('output', dbkey))
-    except Exception as e:
-        pass
-
     wb.save(os.path.join('output', dbkey, f'federal-awards-{dbkey}.xlsx'))
+
+    table = generate_api_test_table('federal_awards', dbkey, mappings, cfdas)
+    return table
 
 ##########################################
 #
@@ -220,7 +254,7 @@ def generate_federal_awards(dbkey):
 #
 ##########################################
 def generate_findings_text(dbkey):
-    print("--- generate_findings_text ---")
+    print("--- generate findings text ---")
     wb = pyxl.load_workbook('templates/findings-text-template.xlsx')
     mappings = [
         FieldMap('reference_number', 'findingrefnums', None, str),
@@ -229,10 +263,10 @@ def generate_findings_text(dbkey):
     ]
     g = set_uei(wb, dbkey)
     ftexts = Findingstext.select().where(Findingstext.dbkey == g.dbkey)
-    
     map_simple_columns(wb, mappings, ftexts)
-        
     wb.save(os.path.join('output', dbkey, f'findings-text-{dbkey}.xlsx'))
+    table = generate_api_test_table('findings_text', dbkey, mappings, ftexts)
+    return table
 
 ##########################################
 #
@@ -240,7 +274,7 @@ def generate_findings_text(dbkey):
 #
 ##########################################
 def generate_additional_ueis(dbkey):
-    print("--- generate_additional_ueis ---")
+    print("--- generate additional ueis ---")
     wb = pyxl.load_workbook('templates/additional-ueis-template.xlsx')
     mappings = [
         FieldMap('additional_uei', 'uei', None, str),
@@ -249,11 +283,10 @@ def generate_additional_ueis(dbkey):
 
     g = set_uei(wb, dbkey)
     addl_ueis = Ueis.select().where(Ueis.dbkey == g.dbkey)
-    
     map_simple_columns(wb, mappings, addl_ueis)
-
     wb.save(os.path.join('output', dbkey, f'additional-ueis-{dbkey}.xlsx'))
-
+    table = generate_api_test_table('additional_ueis', dbkey, mappings, addl_ueis)
+    return table
 
 ##########################################
 #
@@ -261,7 +294,7 @@ def generate_additional_ueis(dbkey):
 #
 ##########################################
 def generate_notes_to_sefa(dbkey):
-    print("--- generate_notes_to_sefa ---")
+    print("--- generate notes to sefa ---")
     wb = pyxl.load_workbook('templates/notes-to-sefa-template.xlsx')
     mappings = [
         #FieldMap('??', 'accounting_policies', None, str),
@@ -277,6 +310,8 @@ def generate_notes_to_sefa(dbkey):
     map_simple_columns(wb, mappings, notes)
     wb.save(os.path.join('output', dbkey, f'notes-{dbkey}.xlsx'))
 
+    table = generate_api_test_table('notes_to_sefa', dbkey, mappings, notes)
+    return table
 
 ##########################################
 #
@@ -284,7 +319,7 @@ def generate_notes_to_sefa(dbkey):
 #
 ##########################################
 def generate_secondary_auditors(dbkey):
-    print("--- generate-secondary-auditors ---")
+    print("--- generate secondary auditors ---")
     wb = pyxl.load_workbook('templates/secondary-auditors-template.xlsx')
     mappings = [
         FieldMap('secondary_auditor_address_city', 'cpacity', None, str),
@@ -304,7 +339,9 @@ def generate_secondary_auditors(dbkey):
     
     map_simple_columns(wb, mappings, sec_cpas)
     wb.save(os.path.join('output', dbkey, f'cpas-{dbkey}.xlsx'))
-
+    
+    table = generate_api_test_table('secondary_auditors', dbkey, mappings, sec_cpas)
+    return table
 
 ##########################################
 #
@@ -312,7 +349,7 @@ def generate_secondary_auditors(dbkey):
 #
 ##########################################
 def generate_captext(dbkey):
-    print("--- generate_corrective_action_plan ---")
+    print("--- generate corrective action plan ---")
     wb = pyxl.load_workbook('templates/corrective-action-plan-template.xlsx')
     mappings = [
         FieldMap('reference_number', 'findingrefnums', None, str),
@@ -326,16 +363,34 @@ def generate_captext(dbkey):
     map_simple_columns(wb, mappings, captexts)
     wb.save(os.path.join('output', dbkey, f'captext-{dbkey}.xlsx'))
 
+    table = generate_api_test_table('cap_text', dbkey, mappings, captexts)
+    return table
+
 
 ##########################################
 def main():
-    generate_federal_awards(args.dbkey)
-    generate_findings(args.dbkey) 
-    generate_findings_text(args.dbkey)
-    generate_additional_ueis(args.dbkey)
-    generate_notes_to_sefa(args.dbkey)
-    generate_secondary_auditors(args.dbkey)
-    generate_captext(args.dbkey)
+    if not os.path.exists('output'):
+        try:
+            os.mkdir('output')
+        except Exception as e:
+            pass
+    outdir = os.path.join('output', args.dbkey)
+    if not os.path.exists(outdir):
+        try:
+            os.mkdir(outdir)
+        except Exception as e:
+            print('could not create output directory. exiting.')
+            sys.exit()
+
+    fat = generate_federal_awards(args.dbkey)
+    ft = generate_findings(args.dbkey) 
+    ftt = generate_findings_text(args.dbkey)
+    aut = generate_additional_ueis(args.dbkey)
+    ntst = generate_notes_to_sefa(args.dbkey)
+    sat = generate_secondary_auditors(args.dbkey)
+    ctt = generate_captext(args.dbkey)
+    tables = sat + ctt + ntst + aut + ftt + ft + fat
+    pp.pprint(tables)
 
 if __name__ == '__main__':
     parser.add_argument('--dbkey', type=str, required=True)
