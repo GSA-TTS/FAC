@@ -135,7 +135,7 @@ local sheets = [
 ];
 
 local workbook = {
-  filename: 'secondary-auditors-template.xlsx',
+  filename: 'secondary-auditors-workbook.xlsx',
   sheets: sheets,
   title_row: title_row,
 };

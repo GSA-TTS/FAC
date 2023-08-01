@@ -352,7 +352,7 @@ local sheets = [
 ];
 
 local workbook = {
-  filename: 'federal-awards-expended-template.xlsx',
+  filename: 'federal-awards-workbook.xlsx',
   sheets: sheets,
   title_row: title_row,
 };

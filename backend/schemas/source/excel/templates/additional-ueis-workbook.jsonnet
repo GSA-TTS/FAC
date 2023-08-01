@@ -2,8 +2,8 @@ local Fun = import '../libs/Functions.libsonnet';
 local Help = import '../libs/Help.libsonnet';
 local SV = import '../libs/SheetValidations.libsonnet';
 local Sheets = import '../libs/Sheets.libsonnet';
-local textSheet = 'Form';
-local ueiSheet = 'UEI';
+local additionalUeiSheet = 'Form';
+local ueiSheet = 'Auditee UEI';
 local title_row = 1;
 
 local single_cells = [
@@ -24,40 +24,21 @@ local open_ranges_defns = [
     Sheets.open_range {
       title_cell: 'A1',
       width: 36,
-      help: Help.reference_number,
+      format: 'text',
+      help: Help.uei,
     },
-    SV.ReferenceNumberValidation,
-    'Audit Finding Reference Number',
-    'reference_number',
-  ],
-  [
-    Sheets.open_range {
-      title_cell: 'B1',
-      width: 100,
-      help: Help.plain_text,
-    },
-    SV.NoValidation,
-    'Text of the Audit Finding',
-    'text_of_finding',
-  ],
-  [
-    Sheets.y_or_n_range {
-      title_cell: 'C1',
-      width: 36,
-      help: Help.yorn,
-    },
-    SV.YoNValidation,
-    'Did Text Contain a Chart or Table?',
-    'contains_chart_or_table',
+    SV.StringOfLengthTwelve,
+    'Additional UEIs',
+    'additional_uei',
   ],
 ];
 
 local sheets = [
   {
-    name: textSheet,
+    name: additionalUeiSheet,
     open_ranges: Fun.make_open_ranges_with_column(title_row, open_ranges_defns),
     header_height: 48,
-    hide_col_from: 4,
+    hide_col_from: 2,
   },
   {
     name: ueiSheet,
@@ -65,12 +46,12 @@ local sheets = [
     header_height: 48,
     hide_col_from: 2,
     //FIXME MSHD: commented this out until we figure out if it is needed
-    //hide_row_from: 3,
+    //  hide_row_from: 3,
   },
 ];
 
 local workbook = {
-  filename: 'findings-text-template.xlsx',
+  filename: 'additional-ueis-workbook.xlsx',
   sheets: sheets,
   title_row: title_row,
 };
