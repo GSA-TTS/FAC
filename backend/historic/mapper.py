@@ -1,3 +1,6 @@
+import pandas as pd
+import numpy as np
+from dissemination.models import General
 from historic.base import NoMapping, MapOneOf, MapRetype, MapLateRemove
 
 
@@ -36,11 +39,13 @@ class mapper:
         elif when == "late":
             return df.drop(columns=list(self.to_drop_late))
 
-    def apply_mappings_to_df(self, df, when="early"):
+    def apply_mappings_to_df(self, df, make_report_id=False):
         df = df.drop("id", axis=1)  # drop django id col
-        df = self._drop_columns(df, when=when)
+        df = self._drop_columns(df, when="early")
         df = df.rename(columns=self.c2g_map)
         df = self.apply_retyping(df)
+        df = self.set_report_id(df, make_report_id)
+        df = self._drop_columns(df, when="late")
         return df
 
     def apply_retyping(self, df):
@@ -55,4 +60,23 @@ class mapper:
 
     def add_const_column_to_df(self, df, column, value):
         df[column] = value
+        return df
+
+    def set_report_id(self, df, make_report_id):
+        if make_report_id:
+            df["report_id"] = np.arange(len(df))
+            df["report_id"] = (
+                df["fy_start_date"].astype(str) + "_" + df["report_id"].astype(str)
+            )
+
+            # str(df["audit_year"])
+            # + str(df["fy_start_date"])
+        else:
+            rid_dbkey_df = pd.DataFrame.from_records(
+                General.objects.all().values("hist_dbkey", "report_id")
+            )
+            df = pd.merge(
+                df, rid_dbkey_df, left_on="DBKEY", right_on="hist_dbkey", how="left"
+            )
+            df = df.drop(columns="hist_dbkey")
         return df
