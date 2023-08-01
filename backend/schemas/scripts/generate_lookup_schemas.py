@@ -60,14 +60,12 @@ def process_cluster_names(arg):
 
 if __name__ == "__main__":
     if len(sys.argv) >= 2:
-        lookup_name = sys.argv[1]
+        filename = sys.argv[1]
         obj = None
-        if "cfda-lookup" in lookup_name.lower():
+        if "cfda-lookup" in filename.lower():
             obj = process_cfda_lookup(sys.argv)
-        elif "cluster-names" in lookup_name.lower():
+        elif "cluster-names" in filename.lower():
             obj = process_cluster_names(sys.argv)
-        # elif "section-names" in lookup_name.lower():
-        #     obj = FORM_SECTIONS
         else:
             print("Unknown filename, exiting")
             sys.exit(1)
