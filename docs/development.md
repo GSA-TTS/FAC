@@ -21,7 +21,6 @@ We use either [Docker with `docker compose`](#docker) or [local development](#lo
   * [pyenv-virtualenv](https://github.com/pyenv/pyenv-virtualenv) for managing virtual environments
   * [Postgres](https://www.postgresql.org/)
   * [SAM.gov](https://sam.gov/content/home) to validate UEI's
-  * [LocalStack](https://localstack.cloud/) for S3 emulation
 
 ## Setting up your dev environment
 
@@ -31,6 +30,11 @@ We use either [Docker with `docker compose`](#docker) or [local development](#lo
 Target python version is defined in [../backend/runtime.txt](../backend/runtime.txt)
 
 ---
+
+## EditorConfig
+
+We have a `.editorconfig` file at the root directory with basic settings.
+See [editorconfig.org](https://editorconfig.org/) for more information.
 
 ## Environment Variables
 
@@ -44,6 +48,7 @@ SECRET_KEY =
 DJANGO_SECRET_LOGIN_KEY =
 DISABLE_AUTH = 
 ```
+If you are using a MacBook with Apple M1 hardware, you will probably also have to add `DOCKERFILE = Apple_M1_Dockerfile` to the file.
 
 If you need to add these to your local environment (should end up in `~/.bash_profile`, `~/.bashrc`, `~/.zshrc`, or whatever flavor of shell you're using.)
 
@@ -203,14 +208,6 @@ fake submission.
 
 Note that all of these fake submissions use the same UEI.
 
-### Create a test bucket
-
-We need a mocked S3 bucket for testing.
-
-```
-docker compose run web bash -c 'awslocal s3 mb s3://gsa-fac-private-s3'
-```
-
 ### Run tests
 
 If everything is set up correctly, you should now be able to run tests. You will want to make sure that your `.env` is set so that auth is not diabled.
@@ -326,6 +323,19 @@ At this point, you'll need to re-run migrations, load test, and recreate your te
 make docker-first-run
 make docker-test
 ```
+
+### What to do if your local tests fail
+
+The most likely explanation is that one of the services (such as MinIO or ClamAV) didn’t finish startup before the tests reached a point that was reliant on that service.
+
+The easiest way to handle this is to run `docker compose up` and wait for ClamAV and Django to start, then run tests in another shell.
+
+The most efficient way to run tests is to run them in the same container, via something like:
+
+```sh
+docker compose exec web /bin/bash -c "python manage.py test; /bin/bash"
+```
+
 
 ## Development, in principle
 

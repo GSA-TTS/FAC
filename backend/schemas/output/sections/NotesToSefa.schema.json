@@ -1,0 +1,77 @@
+{
+   "$schema": "https://json-schema.org/draft/2019-09/schema#",
+   "additionalProperties": false,
+   "metamodel_version": "1.7.0",
+   "properties": {
+      "NotesToSefa": {
+         "additionalProperties": false,
+         "properties": {
+            "accounting_policies": {
+               "type": "string"
+            },
+            "auditee_uei": {
+               "allOf": [
+                  {
+                     "maxLength": 12,
+                     "minLength": 12
+                  },
+                  {
+                     "pattern": "^[A-HJ-NP-Z1-9][A-HJ-NP-Z0-9]+$"
+                  },
+                  {
+                     "pattern": "^(?![A-HJ-NP-Z1-9]+[A-HJ-NP-Z0-9]*?[0-9]{9})[A-HJ-NP-Z0-9]*$"
+                  },
+                  {
+                     "pattern": "^(?![0-9]{9})"
+                  }
+               ],
+               "type": "string"
+            },
+            "is_minimis_rate_used": {
+               "enum": [
+                  "Y",
+                  "N",
+                  "Y&N"
+               ],
+               "type": "string"
+            },
+            "notes_to_sefa_entries": {
+               "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                     "note_content": {
+                        "type": "string"
+                     },
+                     "note_title": {
+                        "type": "string"
+                     },
+                     "seq_number": {
+                        "type": "integer"
+                     }
+                  },
+                  "required": [
+                     "note_title",
+                     "note_content"
+                  ],
+                  "title": "NotesToSefaEntry"
+               },
+               "type": "array"
+            },
+            "rate_explained": {
+               "type": "string"
+            }
+         },
+         "required": [
+            "auditee_uei",
+            "accounting_policies",
+            "is_minimis_rate_used"
+         ],
+         "title": "NotesToSefa",
+         "type": "object",
+         "version": 20230713
+      }
+   },
+   "title": "UNNAMED",
+   "type": "object",
+   "version": 20230713
+}

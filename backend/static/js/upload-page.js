@@ -6,7 +6,9 @@ const UPLOAD_URLS = {
   'federal-awards': 'federal-awards-expended',
   'audit-findings': 'findings-uniform-guidance',
   'audit-findings-text': 'findings-text',
+  'additional-ueis': 'additional-ueis',
   CAP: 'corrective-action-plan',
+  'secondary-auditors': 'secondary-auditors',
 };
 
 /*
@@ -126,9 +128,19 @@ function attachFileUploadHandler() {
           } else {
             res.json().then((data) => {
               if (data.type === 'error_row') {
+                if (Array.isArray(data.errors[0]))
+                  handleErrorOnUpload(new Error(data.errors[0]));
                 info_box.innerHTML = get_error_table(data);
               } else if (data.type === 'error_field') {
-                info_box.innerHTML = `Field Error: ${res.errors}`;
+                info_box.innerHTML = `Field Error: ${data.errors}`;
+              } else if (data.type === 'no_late_changes') {
+                info_box.innerHTML =
+                  'Access denied. Further changes to audits that have been marked ready for certification are not permitted.';
+              } else if (res.status == 400) {
+                info_box.innerHTML = 'Field Error: undefined';
+                setFormDisabled(false);
+              } else if (data.type) {
+                info_box.innerHTML = `Error: ${data.errors}`;
               } else {
                 throw new Error('Returned error type is missing!');
               }

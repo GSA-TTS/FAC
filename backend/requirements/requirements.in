@@ -1,11 +1,11 @@
 boto3
 cfenv
-cryptography>=41.0.0
+cryptography>=41.0.2
 django-cors-headers
 django-csp
 django-logingov-backend
 django-storages
-Django>=4.1.9
+Django>=4.2.3
 djangorestframework
 djangorestframework-simplejwt
 django-fsm
@@ -23,6 +23,7 @@ psycopg2-binary
 pycryptodome
 pydash
 pyjwt
+pypdf
 python-json-logger
 python-slugify
 pyyaml

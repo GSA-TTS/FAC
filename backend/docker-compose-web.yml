@@ -17,8 +17,11 @@ services:
     depends_on:
       - db
       - minio
+      - api
+
     environment:
       - "DATABASE_URL=postgres://postgres@db/postgres"
+      - "POSTGREST_URL=http://api:3000"
       - "DJANGO_DEBUG=true"
       - "SAM_API_KEY=${SAM_API_KEY}"
       - "DJANGO_BASE_URL=http://localhost:8000"
@@ -28,7 +31,6 @@ services:
       - "ALLOWED_HOSTS=0.0.0.0 127.0.0.1 localhost"
       - "AV_SCAN_URL=http://clamav-rest:9000/scan"
       - "DISABLE_AUTH=${DISABLE_AUTH:-False}"
-      - "LOCALSTACK_HOST=localstack"
     env_file:
       - ".env"
     ports:
@@ -63,7 +65,7 @@ services:
       PGRST_DB_URI: postgres://postgres@db:5432/postgres
       PGRST_OPENAPI_SERVER_PROXY_URI: http://127.0.0.1:3000
       PGRST_DB_ANON_ROLE: anon
-      PGRST_DB_SCHEMAS: api
+      PGRST_DB_SCHEMAS: "api_v1_0_0_beta,api"
     depends_on:
       - db
 volumes:

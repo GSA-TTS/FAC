@@ -6,6 +6,8 @@ else
   echo "No environment variable ${ENV} is set!"
 fi;
 
+sleep 10
+
 if [[ "${ENV}" == "LOCAL" || "${ENV}" == "TESTING" ]]; then
     export AWS_PRIVATE_ACCESS_KEY_ID=longtest
     export AWS_PRIVATE_SECRET_ACCESS_KEY=longtest
@@ -16,6 +18,7 @@ if [[ "${ENV}" == "LOCAL" || "${ENV}" == "TESTING" ]]; then
 fi;
 
 # Migrate first
-python manage.py migrate
+python manage.py migrate && python manage.py create_api_schemas && python manage.py create_api_views
+python manage.py drop_deprecated_api_schemas_and_views
 # Run the build/watch assets + run server at the same time
 npm run dev & python manage.py runserver 0.0.0.0:8000

@@ -4,10 +4,7 @@
            "findings_uniform_guidance_entries": [
             {
                 "program": {
-                  "federal_agency_prefix": "12",
-                  "three_digit_extension": "123",
-                  "additional_award_identification": "1234567",
-                  "program_name": "FRIST PROGRAM",
+                  "award_reference": "AWARD-0001",
                   "compliance_requirement": "ABC"
                 },
                 "questioned_costs": "N",
@@ -25,10 +22,7 @@
             },
             {
                 "program": {
-                  "federal_agency_prefix": "12",
-                  "three_digit_extension": "U12",
-                  "additional_award_identification": "ANYTHING",
-                  "program_name": "ANOTHER PROGRAM",
+                  "award_reference": "AWARD-0002",
                   "compliance_requirement": "BC"
                 },
                 "questioned_costs": "Y",

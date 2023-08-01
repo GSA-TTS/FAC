@@ -1,4 +1,17 @@
 {% extends "base.html" %}
 {% block content %}
-You do not have permission to view this resource.
+<div class="grid-container">
+  <h1>Access denied</h1>
+  <div class="grid-row" tabindex="0">
+    {% if exception %}
+      <p>
+        {{ exception }}
+      </p>
+    {% else %}
+      <p>
+        You do not have permission to view this resource.
+      </p>
+    {% endif %}
+  </div>
+</div>
 {% endblock content %}

@@ -13,10 +13,14 @@ resource "cloudfoundry_service_key" "postgrest" {
   service_instance = module.database.instance_id
 }
 
+data "docker_registry_image" "postgrest" {
+  name = "ghcr.io/gsa-tts/fac/postgrest:latest"
+}
+
 resource "cloudfoundry_app" "postgrest" {
   name         = local.postgrest_name
   space        = data.cloudfoundry_space.apps.id
-  docker_image = var.postgrest_image
+  docker_image = "ghcr.io/gsa-tts/fac/postgrest@${data.docker_registry_image.postgrest.sha256_digest}"
   timeout      = 180
   memory       = 128
   disk_quota   = 256
@@ -28,7 +32,7 @@ resource "cloudfoundry_app" "postgrest" {
 
   environment = {
     PGRST_DB_URI : cloudfoundry_service_key.postgrest.credentials.uri
-    PGRST_DB_SCHEMAS : "api"
+    PGRST_DB_SCHEMAS : "api_v1_0_0_beta"
     PGRST_DB_ANON_ROLE : "anon"
   }
 }

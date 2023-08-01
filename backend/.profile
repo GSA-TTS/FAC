@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 
 export SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt
 export REQUESTS_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt
@@ -36,9 +37,18 @@ export NEW_RELIC_HOST="gov-collector.newrelic.com"
 # for additional app instances, so we gate all of this behind CF_INSTANCE_INDEX
 # being 0.
 [ "$CF_INSTANCE_INDEX" = 0 ] &&
+echo 'Starting API schema deprecation' &&
+python manage.py drop_deprecated_api_schemas_and_views &&
+echo 'Finished API schema deprecation' &&
+echo 'Starting API schema creation' &&
+python manage.py create_api_schemas &&
+echo 'Finished API schema creation' &&
 echo 'Starting migrate' &&
 python manage.py migrate &&
 echo 'Finished migrate' &&
+echo 'Starting API view creation' &&
+python manage.py create_api_views &&
+echo 'Finished view creation' &&
 echo 'Starting collectstatic' &&
 python manage.py collectstatic --noinput &&
 echo 'Finished collectstatic'

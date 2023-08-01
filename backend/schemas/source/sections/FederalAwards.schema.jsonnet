@@ -143,6 +143,13 @@ local Validations = {
   ],
   ProgramValidations: [
     {
+      properties: {
+        number_of_audit_findings: Types.integer {
+          minimum: 0,
+        },
+      },
+    },
+    {
       'if': {
         properties: {
           is_major: {
@@ -174,21 +181,6 @@ local Validations = {
             },
           },
         },
-        'else': {
-          properties: {
-            // 20230627 MCJ FIXME: Should... this ever be empty? Or, must it always have data?
-            audit_report_type: {
-              anyOf: [
-                Base.Enum.EmptyString_Null,
-                Base.Enum.MajorProgramAuditReportType,
-              ],
-            },
-            // Otherwise, it just has to be an integer that is zero or greater.
-            number_of_audit_findings: Types.integer {
-              minimum: 0,
-            },
-          },
-        },
       },
     },
     {
@@ -202,12 +194,7 @@ local Validations = {
       'then': {
         properties: {
           audit_report_type: Base.Enum.EmptyString_Null,
-          // MCJ 20230627 This just seems to be *wrong*.
-          // number_of_audit_findings: Types.integer {
-          //   const: 0
-          //   },
         },
-
       },
     },
     Base.Validation.AdditionalAwardIdentificationValidation[0],
@@ -217,7 +204,7 @@ local Validations = {
 local Parts = {
   Cluster: Types.object {
     properties: {
-      cluster_name: Base.Compound.ClusterName,
+      cluster_name: Base.Compound.ClusterNames,
       cluster_total: Types.number,
     },
     allOf: [
@@ -338,16 +325,13 @@ local Parts = {
       federal_agency_prefix: Base.Enum.ALNPrefixes,
       three_digit_extension: Base.Compound.ThreeDigitExtension,
       additional_award_identification: Func.compound_type([Types.string, Types.NULL, Types.integer]),
-      // 20230525 HDMS FIXME: It seems this should be both a drop down and a free text field  (see details in  census xlsx)!!!
       program_name: Types.string,
       amount_expended: Types.number,
       federal_program_total: Types.number,
       is_major: Base.Enum.YorN,
-      audit_report_type: Types.string,
+      audit_report_type: Func.compound_type([Base.Enum.MajorProgramAuditReportType, Types.NULL]),
       number_of_audit_findings: Types.integer,
     },
-    // 20230627 MCJ FIXME
-    // 'audit_report_type', may not be strictly required, only when MP == Y?
     required: ['program_name', 'federal_agency_prefix', 'three_digit_extension', 'is_major', 'number_of_audit_findings'],
     allOf: Validations.ProgramValidations,
   },
@@ -362,6 +346,7 @@ local FederalAwardEntry = Types.object {
     loan_or_loan_guarantee: Parts.LoanOrLoanGuarantee,
     program: Parts.Program,
     subrecipients: Parts.Subrecipients,
+    award_reference: Base.Compound.AwardReference,
   },
   required: [
     'cluster',
