@@ -2,6 +2,7 @@ import { testLoginGovLogin } from '../support/login-gov.js';
 import { testValidAccess } from '../support/check-access.js';
 import { testValidEligibility } from '../support/check-eligibility.js';
 import { testValidAuditeeInfo } from '../support/auditee-info.js';
+import { testValidGeneralInfo } from '../support/general-info.js';
 
 describe('Full audit submission', () => {
   before(() => {
@@ -31,5 +32,8 @@ describe('Full audit submission', () => {
 
     // Now the accessandsubmission screen
     testValidAccess();
+
+    // Fill out the general info form
+    testValidGeneralInfo();
   });
 });
