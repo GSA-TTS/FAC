@@ -8,7 +8,7 @@ import sys
 
 class Command(BaseCommand):
     help = """
-    Runs sql scripts  to recreate views for the postgrest API.
+    Creates JWT tokens for use in authenticating requests to PostgREST
     """
 
     def add_arguments(self, parser):
