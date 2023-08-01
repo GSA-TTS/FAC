@@ -4,7 +4,7 @@ local Help = import '../libs/Help.libsonnet';
 local SV = import '../libs/SheetValidations.libsonnet';
 local Sheets = import '../libs/Sheets.libsonnet';
 local awardSheet = 'Form';
-local ueiSheet = 'UEI';
+local coverSheet = 'Coversheet';
 local clusterSheet = 'Clusters';
 local programSheet = 'FederalPrograms';
 local auditReportTypeSheet = 'AuditReportTypes';
@@ -19,7 +19,7 @@ local auditReportTypeLookupNamedRange = 'audit_report_type_lookup';
 local meta_cells = [
   Sheets.meta_cell {
     keep_locked: true,
-    title: 'Federal Audit Clearinghouse\nfac.gov\nVersion: %s' % (Sheets.WORKBOOKS_VERSION),
+    title: 'Federal Audit Clearinghouse\nfac.gov',
     title_cell: 'A1',
     help: Help.unknown,
   },
@@ -34,21 +34,45 @@ local meta_cells = [
 
 local single_cells = [
   Sheets.single_cell {
-    title: 'Auditee UEI',
-    range_name: 'auditee_uei',
-    width: 36,
+    keep_locked: true,
+    title: 'Version',
+    range_name: 'version',
+    width: 48,
     title_cell: 'A2',
     range_cell: 'B2',
-    validation: SV.StringOfLengthTwelve,
     format: 'text',
+    formula: '="' + Sheets.WORKBOOKS_VERSION + '"',
+    help: Help.plain_text,
+    validation: SV.NoValidation,
+  },
+  Sheets.single_cell {
+    keep_locked: true,
+    title: 'Section',
+    range_name: 'section_name',
+    width: 48,
+    title_cell: 'A3',
+    range_cell: 'B3',
+    format: 'text',
+    formula: '="' + Sheets.section_names.FEDERAL_AWARDS_EXPENDED + '"',
+    help: Help.plain_text,
+    validation: SV.NoValidation,
+  },
+  Sheets.single_cell {
+    title: 'Auditee UEI:',
+    range_name: 'auditee_uei',
+    width: 48,
+    title_cell: 'A4',
+    range_cell: 'B4',
+    format: 'text',
+    validation: SV.StringOfLengthTwelve,
     help: Help.uei,
   },
   Sheets.single_cell {
     keep_locked: true,
     title: 'Total amount expended',
     range_name: 'total_amount_expended',
-    title_cell: 'A3',
-    range_cell: 'B3',
+    title_cell: 'A5',
+    range_cell: 'B5',
     format: 'dollar',
     // FIXME MSHD: for improvement, will need to pull F from this formula and retrieve it dynamically.
     formula: "=SUM('" + awardSheet + "'!F$FIRSTROW:F$LASTROW)",
@@ -293,9 +317,10 @@ local open_ranges_defns = [
 
 local sheets = [
   {
-    name: ueiSheet,
+    name: coverSheet,
+    meta_cells: meta_cells,
     single_cells: single_cells,
-    header_height: 100,
+    header_height: 60,
     hide_col_from: 3,
     //  hide_row_from: 3,
   },

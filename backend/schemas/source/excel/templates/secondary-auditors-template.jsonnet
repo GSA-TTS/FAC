@@ -8,13 +8,11 @@ local title_row = 1;
 
 local meta_cells = [
   Sheets.meta_cell {
-    keep_locked: true,
-    title: 'Federal Audit Clearinghouse\nfac.gov\nVersion: %s' % (Sheets.WORKBOOKS_VERSION),
+    title: 'Federal Audit Clearinghouse\nfac.gov',
     title_cell: 'A1',
     help: Help.unknown,
   },
   Sheets.meta_cell {
-    keep_locked: true,
     width: 48,
     title: 'This workbook contains two worksheets: a coversheet (this sheet) and a data entry sheet.\nBefore submitting, please make sure the fields below are filled out.',
     title_cell: 'B1',
@@ -24,11 +22,35 @@ local meta_cells = [
 
 local single_cells = [
   Sheets.single_cell {
-    title: 'Auditee UEI:',
-    range_name: 'auditee_uei',
+    keep_locked: true,
+    title: 'Version',
+    range_name: 'version',
     width: 48,
     title_cell: 'A2',
     range_cell: 'B2',
+    format: 'text',
+    formula: '="' + Sheets.WORKBOOKS_VERSION + '"',
+    help: Help.plain_text,
+    validation: SV.NoValidation,
+  },
+  Sheets.single_cell {
+    keep_locked: true,
+    title: 'Section',
+    range_name: 'section_name',
+    width: 48,
+    title_cell: 'A3',
+    range_cell: 'B3',
+    format: 'text',
+    formula: '="' + Sheets.section_names.SECONDARY_AUDITORS + '"',
+    help: Help.plain_text,
+    validation: SV.NoValidation,
+  },
+  Sheets.single_cell {
+    title: 'Auditee UEI:',
+    range_name: 'auditee_uei',
+    width: 48,
+    title_cell: 'A4',
+    range_cell: 'B4',
     format: 'text',
     validation: SV.StringOfLengthTwelve,
     help: Help.uei,

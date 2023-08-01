@@ -97,7 +97,7 @@ def parse_meta_cell(spec):
             get(spec, "range_name"),
             get(spec, "range_cell"),
             get(spec, "width"),
-            get(spec, "keep_locked", default=False),
+            get(spec, "keep_locked", default=True),
             get(spec, "format", default=None),
             get(spec, "last_range_cell", default=None),
         ),
