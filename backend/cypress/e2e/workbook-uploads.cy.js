@@ -53,6 +53,17 @@ describe('Workbook upload successful', () => {
         cy.url().should('contain', `/audit/submission-progress/${reportTestId}`);
     });
 
+    it('Successfully uploads Additional UEIs', () => {  
+        cy.intercept('/audit/excel/additional-ueis/*', {
+            fixture: 'success-res.json',
+        }).as('uploadSuccess')
+        cy.visit(`/report_submission/additional-ueis/${reportTestId}`);
+        cy.get('#file-input-additional-ueis-xlsx').attachFile('additional-uei-UPDATE.xlsx');
+        cy.wait('@uploadSuccess').its('response.statusCode').should('eq', 200)
+        cy.wait(2000).get('#info_box').should('have.text', 'File successfully validated! Your work has been saved.');
+        cy.get('#continue').click();
+        cy.url().should('contain', `/audit/submission-progress/${reportTestId}`);
+    })
 
     describe('Workbook upload fail', () => {
         it('unsuccessful upload Federal Awards', () => {
@@ -98,6 +109,17 @@ describe('Workbook upload successful', () => {
             cy.wait('@uploadFail').its('response.statusCode').should('eq', 400)
             cy.wait(2000).get('#info_box').should('have.text', 'Field Error: undefined');
         })
+
+        it('unsuccessful upload Additional UEIs', () => {
+            cy.intercept('POST', '/audit/excel/additional-ueis/*', {
+                statusCode: 400,
+                fixture: 'fail-res.json',
+            }).as('uploadFail')
+            cy.visit(`/report_submission/additional-ueis/${reportTestId}`);
+            cy.get('#file-input-additional-ueis-xlsx').attachFile('cap-invalid.xlsx');
+            cy.wait('@uploadFail').its('response.statusCode').should('eq', 400)
+            cy.wait(2000).get('#info_box').should('have.text', 'Field Error: undefined');
+           })
     })
 
 })
