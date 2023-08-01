@@ -1,5 +1,6 @@
 import { testValidEligibility } from '../support/check-eligibility.js';
 import { testValidAuditeeInfo } from '../support/auditee-info.js';
+import { addValidEmail, testValidAccess } from '../support/check-access.js';
 
 describe('Create New Audit', () => {
 
@@ -17,13 +18,6 @@ describe('Create New Audit', () => {
     });
     cy.visit('/report_submission/accessandsubmission/');
   });
-
-  function addValidEmail(field) {
-    cy.get(field)
-      .clear()
-      .type('test.address-with+features@test.gsa.gov')
-      .blur();
-  }
 
   describe('A Blank Form', () => {
     it('marks empty responses as invalid', () => {
@@ -363,19 +357,8 @@ describe('Create New Audit', () => {
       });
     });
 
-    function completeFormWithValidInfo() {
-      [
-        '#certifying_auditee_contact_email', '#certifying_auditee_contact_re_email',
-        '#certifying_auditor_contact_email', '#certifying_auditor_contact_re_email',
-        '#auditee_contacts_email', '#auditee_contacts_re_email',
-        '#auditor_contacts_email', '#auditor_contacts_re_email' 
-      ].forEach(field => addValidEmail(field))
-    }
-
     it('should proceed to the next step after successful submission', () => {
-      completeFormWithValidInfo();
-      cy.get('.usa-button').contains('Create').click();
-      cy.url().should('contains', '/report_submission/general-information/');
+      testValidAccess();
     });
   });
 

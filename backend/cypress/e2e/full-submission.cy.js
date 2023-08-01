@@ -1,4 +1,5 @@
 import { testLoginGovLogin } from '../support/login-gov.js';
+import { testValidAccess } from '../support/check-access.js';
 import { testValidEligibility } from '../support/check-eligibility.js';
 import { testValidAuditeeInfo } from '../support/auditee-info.js';
 
@@ -27,5 +28,8 @@ describe('Full audit submission', () => {
 
     // Now the auditee info screen
     testValidAuditeeInfo();
+
+    // Now the accessandsubmission screen
+    testValidAccess();
   });
 });
