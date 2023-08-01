@@ -274,7 +274,7 @@ class ETL(object):
             entity_type=general_information["user_provided_organization_type"],
             number_months=None,  # TODO: Where does this come from?
             audit_period_covered=general_information["audit_period_covered"],
-            report_required=None,  # TODO: Notes say this hasn't been used since 2008.
+            is_report_required=None,  # TODO: Notes say this hasn't been used since 2008.
             total_fed_expenditures=None,  # TODO: Where does this come from?
             type_report_major_program=None,  # TODO: Where does this come from?
             type_audit_code="UG",
