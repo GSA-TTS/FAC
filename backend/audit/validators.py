@@ -123,7 +123,7 @@ def validate_findings_uniform_guidance_json(value):
     """
     Apply JSON Schema for findings uniform guidance and report errors.
     """
-    schema_path = settings.SECTION_SCHEMA_DIR / "FindingsUniformGuidance.schema.json"
+    schema_path = settings.SECTION_SCHEMA_DIR / "FederalAwardsAuditFindings.schema.json"
     schema = json.loads(schema_path.read_text(encoding="utf-8"))
 
     validator = Draft7Validator(schema)
@@ -162,7 +162,7 @@ def validate_findings_text_json(value):
     """
     Apply JSON Schema for findings text and report errors.
     """
-    schema_path = settings.SECTION_SCHEMA_DIR / "FindingsText.schema.json"
+    schema_path = settings.SECTION_SCHEMA_DIR / "AuditFindingsText.schema.json"
     schema = json.loads(schema_path.read_text(encoding="utf-8"))
 
     validator = Draft7Validator(schema)
