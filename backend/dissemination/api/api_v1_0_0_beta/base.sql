@@ -6,7 +6,7 @@ BEGIN
       WHERE  rolname = 'authenticator') THEN
       RAISE NOTICE 'Role "authenticator" already exists. Skipping.';
    ELSE
-      CREATE ROLE authenticator  LOGIN NOINHERIT NOCREATEDB NOCREATEROLE NOSUPERUSER;
+      CREATE ROLE authenticator LOGIN NOINHERIT NOCREATEDB NOCREATEROLE NOSUPERUSER;
    END IF;
 END
 $do$;

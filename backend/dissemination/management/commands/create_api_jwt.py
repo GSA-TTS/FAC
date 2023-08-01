@@ -35,12 +35,10 @@ class Command(BaseCommand):
         six_months = datetime.today() + relativedelta(months=+6)
 
         payload = {
-            # PostgREST only cares about the role.
-            "role": role,
-            "created": datetime.today().isoformat(),
-            "expires": six_months.isoformat(),
-            "exp": floor(six_months.timestamp()),
-        }
+                # PostgREST only cares about the role.
+                "role": role,
+                "created": datetime.today().isoformat(),
+            }
         print(payload)
         encoded_jwt = jwt.encode(payload, secret, algorithm="HS256")
         print(encoded_jwt)

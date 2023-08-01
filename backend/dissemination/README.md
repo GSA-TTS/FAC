@@ -40,8 +40,6 @@ However, without the passphrase, the signature cannot be verified. PostgREST wil
 
 We pass `role` and `exp`, which are fields that PostgREST expect. We add two human-readable fields, `created` and `expires`. All tokens generated with this tool expire after 6 months, and must be refreshed at api.data.gov. If we don't refresh the token, api.data.gov (meaning api.fac.gov) will stop working.
 
-FIXME: We do not yet have logic in the code that will reject the JWT after it expires. This should be added.
-
 ## Using the JWT token
 
 For symmetric use, that passphrase must be loaded into a GH Secret, and that secret deployed to our environments via Terraform. In this way, our PostgREST container knows how to verify the integrity of JWTs that are sent to us.
@@ -49,6 +47,14 @@ For symmetric use, that passphrase must be loaded into a GH Secret, and that sec
 Our JWT only lives at api.data.gov. We will put it in the `Authorization: Bearer <jwt>` header. In this way, only API requests that come through api.data.gov (meaning requests that go to api.fac.gov) will be executed by PostgREST. All other queries, from all other sources, will be rejected.
 
 It is important that the role you choose matches the role we expect for public queries. Our schemas are attached to the role `api_fac_gov`. 
+
+For example:
+
+```
+curl -X GET -H "Authorization: Bearer ${JWT}" "${API_FAC_URL}/general?limit=1" 
+```
+
+should return one item from the general view. API_FAC_URL might be `http://localhost:3000` in testing locally, or `https://api.fac.gov` when working live.
 
 ### Limiting access
 

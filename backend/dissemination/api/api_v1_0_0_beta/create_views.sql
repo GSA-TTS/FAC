@@ -1,13 +1,13 @@
 
 begin;
 
-create table api_v1_0_0_beta.metadata as
-select * 
-from 
-    (values 	('version', '1.0.0-beta'), 
-            	('last_updated', '2023-07-14'))
-as metadata(key, value)
-;
+-- create table api_v1_0_0_beta.metadata as
+-- select * 
+-- from 
+--     (values 	('version', '1.0.0-beta'), 
+--             	('last_updated', '2023-07-14'))
+-- as metadata(key, value)
+-- ;
 
 create view api_v1_0_0_beta.general as
     select gen.*, 
@@ -57,11 +57,22 @@ create view api_v1_0_0_beta.finding_text as
 ;
 
 create view api_v1_0_0_beta.cap_text as
-    select gen.auditee_uei, gen.auditee_ein, gen.fy_start_date, gen.fy_end_date, gen.audit_year, 
-          ct.*
+    select 
+        gen.auditee_uei, 
+        gen.auditee_ein, 
+        gen.fy_start_date, 
+        gen.fy_end_date, 
+        gen.audit_year, 
+        ct.finding_ref_number, 
+        ct.charts_tables,
+        ct.sequence_number,
+        ct.text,
+        ct.dbkey,
+        ct.audit_year,
+        ct.is_public
     from dissemination_CAPText ct
     left join dissemination_General gen on ct.report_id = gen.report_id
-    where gen.is_public=True
+    where gen.is_public=True and ct.is_public=True
 ;
 
 create view api_v1_0_0_beta.note as
