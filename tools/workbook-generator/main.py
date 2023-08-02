@@ -74,7 +74,6 @@ def set_range(wb, range_name, values, default=None, type=str):
             # This is a very noisy statement, showing everything
             # written into the workbook.
             # print(f'{range_name} c[{row}][{col}] <- {v} len({len(v)}) {default}')
-            # MCJ BAD
             if v is not None:
                 ws.cell(row=row, column=col, value=type(v))
             if len(v) == 0 and default is not None:
@@ -88,9 +87,7 @@ def set_range(wb, range_name, values, default=None, type=str):
             if default is not None:
                ws.cell(row=row, column=col, value=type(default))
             else:
-                # MCJ BAD
-                pass
-                # ws.cell(row=row, column=col, value='')
+                ws.cell(row=row, column=col, value='')
         else:
             # Leave it blank if we have no default passed in
             pass

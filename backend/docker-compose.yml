@@ -28,7 +28,7 @@ services:
       - "DJANGO_SECRET_LOGIN_KEY=${DJANGO_SECRET_LOGIN_KEY}"
       - "ENV=${ENV}"
       - "SECRET_KEY=${SECRET_KEY}"
-      - "ALLOWED_HOSTS=0.0.0.0 127.0.0.1 localhost"
+      - "ALLOWED_HOSTS=0.0.0.0 127.0.0.1 localhost testserver"
       - "AV_SCAN_URL=http://clamav-rest:9000/scan"
       - "DISABLE_AUTH=${DISABLE_AUTH:-False}"
     env_file:
