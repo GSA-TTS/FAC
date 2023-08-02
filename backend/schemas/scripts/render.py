@@ -403,7 +403,6 @@ def process_meta_cells(wb, ws, sheet):
         the_cell.font = meta_row_font
         the_cell.alignment = Alignment(wrapText=True, wrap_text=True)
         entry_cell_obj = ws[absolute_cell_coordinate]
-        # Should this be configurable?
         if not o.posn.keep_locked:
             entry_cell_obj.protection = Protection(locked=False)
         if o.posn.format is not None:
