@@ -30,6 +30,7 @@ from .fixtures.excel import (
     NOTES_TO_SEFA_ENTRY_FIXTURES,
     FORM_SECTIONS,
 )
+from .fixtures.single_audit_checklist import fake_auditor_certification, fake_auditee_certification
 from .models import Access, SingleAuditChecklist
 from .views import MySubmissions
 
@@ -188,11 +189,14 @@ class SubmissionStatusTests(TestCase):
         """
         Test that certifying auditor contacts can provide auditor certification
         """
+        data_step_1, data_step_2 = fake_auditor_certification()
+
         user, sac = _make_user_and_sac(submission_status="ready_for_certification")
         baker.make(Access, sac=sac, user=user, role="certifying_auditor_contact")
 
         kwargs = {"report_id": sac.report_id}
-        _authed_post(self.client, user, "audit:AuditorCertification", kwargs=kwargs)
+        _authed_post(self.client, user, "audit:AuditorCertification", kwargs=kwargs, data=data_step_1)
+        _authed_post(self.client, user, "audit:AuditorCertificationConfirm", kwargs=kwargs, data=data_step_2)
 
         updated_sac = SingleAuditChecklist.objects.get(report_id=sac.report_id)
 
@@ -202,11 +206,14 @@ class SubmissionStatusTests(TestCase):
         """
         Test that certifying auditee contacts can provide auditee certification
         """
+        data_step_1, data_step_2 = fake_auditee_certification()
+
         user, sac = _make_user_and_sac(submission_status="auditor_certified")
         baker.make(Access, sac=sac, user=user, role="certifying_auditee_contact")
 
         kwargs = {"report_id": sac.report_id}
-        _authed_post(self.client, user, "audit:AuditeeCertification", kwargs=kwargs)
+        _authed_post(self.client, user, "audit:AuditeeCertification", kwargs=kwargs, data=data_step_1)
+        _authed_post(self.client, user, "audit:AuditeeCertificationConfirm", kwargs=kwargs, data=data_step_2)
 
         updated_sac = SingleAuditChecklist.objects.get(report_id=sac.report_id)
 
