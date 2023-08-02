@@ -1,7 +1,5 @@
 local Base = import '../base/Base.libsonnet';
-local Func = import '../base/Functions.libsonnet';
-local Requirement = import 'FindingsUniformGuidance.libsonnet';
-local Additional = import 'FindingsUniformGuidance.validation.libsonnet';
+local Additional = import 'FederalAwardsAuditFindings.validation.libsonnet';
 local Types = Base.Types;
 local Validations = Additional.Validations;
 

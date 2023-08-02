@@ -278,7 +278,7 @@ class ETL(object):
             total_fed_expenditures=None,  # TODO: Where does this come from?
             type_report_major_program=None,  # TODO: Where does this come from?
             type_audit_code="UG",
-            is_public=None,  # Should be coming from SingleAuditChecklist
+            is_public=self.single_audit_checklist.is_public,
             data_source="G-FAC",
         )
         general.save()
