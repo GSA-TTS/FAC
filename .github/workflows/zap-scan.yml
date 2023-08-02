@@ -8,7 +8,7 @@ on:
         type: string
 
 jobs:
-  zap_scan:
+  zap-scan:
     name: Scan site with OWASP-ZAP
     runs-on: ubuntu-latest
     env:
@@ -17,8 +17,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Pull Zap Image
-        run: docker pull owasp/zap2docker-stable
-
-      - name: Run OWASP-ZAP
-        run: docker run -v $(pwd):/zap/wrk/:rw -t owasp/zap2docker-stable zap-baseline.py -t https://fac-dev.app.cloud.gov/ -c zap.conf -I
+      - name: ZAP Scan of ${{ env.url }}
+        uses: zaproxy/action-baseline@v0.8.2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          docker_name: 'owasp/zap2docker-stable'
+          target: '${{ env.url }}'
+          rules_file_name: 'zap.conf'
+          allow_issue_writing: false
+          fail_action: false

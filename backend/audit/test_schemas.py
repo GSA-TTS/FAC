@@ -977,7 +977,9 @@ class FindingsTextSchemaValidityTest(SimpleTestCase):
     """
 
     FINDINGS_TEXT_SCHEMA = json.loads(
-        (SECTION_SCHEMA_DIR / "FindingsText.schema.json").read_text(encoding="utf-8")
+        (SECTION_SCHEMA_DIR / "AuditFindingsText.schema.json").read_text(
+            encoding="utf-8"
+        )
     )
 
     SIMPLE_CASE = json.loads(SIMPLE_CASES_TEST_FILE.read_text(encoding="utf-8"))[
@@ -1213,7 +1215,7 @@ class FindingsUniformGuidanceSchemaValidityTest(SimpleTestCase):
     """
 
     FINDINGS_UNIFORM_GUIDANCE_SCHEMA = json.loads(
-        (SECTION_SCHEMA_DIR / "FindingsUniformGuidance.schema.json").read_text(
+        (SECTION_SCHEMA_DIR / "FederalAwardsAuditFindings.schema.json").read_text(
             encoding="utf-8"
         )
     )

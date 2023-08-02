@@ -77,3 +77,4 @@ jobs:
           cf_space: ${{ env.space }}
           cf_manifest: backend/manifests/manifest-fac.yml
           cf_vars_file: backend/manifests/vars/vars-${{ env.space }}.yml
+          command: bin/ops/deploy.sh
