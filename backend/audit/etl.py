@@ -139,7 +139,7 @@ class ETL(object):
     def load_note(self):
         notes_to_sefa = self.single_audit_checklist.notes_to_sefa["NotesToSefa"]
         accounting_policies = notes_to_sefa["accounting_policies"]
-        is_minimis_rate_used = notes_to_sefa["is_minimis_rate_used"]
+        is_minimis_rate_used = notes_to_sefa["is_minimis_rate_used"] == "Y"
         rate_explained = notes_to_sefa["rate_explained"]
         entries = notes_to_sefa["notes_to_sefa_entries"]
         if not entries:
