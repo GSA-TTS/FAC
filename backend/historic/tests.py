@@ -9,15 +9,14 @@ from faker import Faker
 class TestHistETL(TestCase):
     def test_etl_gen_works_for_one(self):
         audit_header = self._fake_AUDITHEADER()
-        ETL(audit_year=2022).load_general()
+        ETL(audit_year=2022).load_history()
         d_gen = General.objects.first()
         self.assertEqual(audit_header.UEI, d_gen.auditee_uei)
 
     def test_etl_award_works_for_one(self):
         award = self._fake_AUDIT()
         etl = ETL(audit_year=2022)
-        etl.load_general()
-        etl.load_award()
+        etl.load_history()
         d_award = FederalAward.objects.first()
         self.assertEqual(award.FEDERALPROGRAMNAME, d_award.federal_program_name)
         self.assertIsNotNone(d_award.report_id)
@@ -25,7 +24,7 @@ class TestHistETL(TestCase):
     def test_etl_gen_works_for_many(self):
         for _ in range(10):
             self._fake_AUDITHEADER()
-        ETL(audit_year=2022).load_general()
+        ETL(audit_year=2022).load_history()
         audit_gen_count = ELECAUDITHEADER.objects.count()
         diss_gen_count = General.objects.count()
         self.assertEqual(audit_gen_count, diss_gen_count)
@@ -34,8 +33,7 @@ class TestHistETL(TestCase):
         for _ in range(10):
             self._fake_AUDIT()
         etl = ETL(audit_year=2022)
-        etl.load_general()
-        etl.load_award()
+        etl.load_history()
         audit_award_count = ELECAUDITS.objects.count()
         diss_award_count = FederalAward.objects.count()
         self.assertEqual(audit_award_count, diss_award_count)

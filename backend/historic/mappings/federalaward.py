@@ -1,11 +1,11 @@
 from historic.base import NoMapping, MapLateRemove, MapRetype
-from historic.retyping import to_boolean
+from historic.retyping import to_boolean, to_str
 
 cfac_to_gfac = {
     "ID": NoMapping(),
     "AUDITYEAR": NoMapping(),
     "DBKEY": MapLateRemove(),
-    "CFDASEQNUM": "award_reference",
+    "CFDASEQNUM": MapRetype("award_reference", to_str),
     "CFDA": NoMapping(),
     "FEDERALPROGRAMNAME": "federal_program_name",
     "AMOUNT": "amount_expended",

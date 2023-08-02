@@ -66,11 +66,15 @@ class mapper:
         if make_report_id:
             df["report_id"] = np.arange(len(df))
             df["report_id"] = (
-                df["fy_start_date"].astype(str) + "_" + df["report_id"].astype(str)
+                df["audit_year"].astype(str)
+                + "_"
+                + df["fy_start_date"].astype(str)
+                + "_"
+                + df["hist_dbkey"].astype(str)
+                + "_"
+                + df["report_id"].astype(str)
             )
-
-            # str(df["audit_year"])
-            # + str(df["fy_start_date"])
+            df = self.add_const_column_to_df(df, "data_source", "Census")
         else:
             rid_dbkey_df = pd.DataFrame.from_records(
                 General.objects.all().values("hist_dbkey", "report_id")
