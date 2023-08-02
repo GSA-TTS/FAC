@@ -1,6 +1,6 @@
 module "environments" {
   for_each   = toset(local.spaces)
-  source     = "../shared/modules/bootstrap-env"
+  source     = "./bootstrap-env"
   name       = each.key
   org_name   = local.org_name
   developers = local.developers
@@ -10,7 +10,7 @@ module "environments" {
 
 module "environments-egress" {
   for_each   = toset(local.spaces)
-  source     = "../shared/modules/bootstrap-env"
+  source     = "./bootstrap-env"
   name       = "${each.key}-egress"
   org_name   = local.org_name
   developers = local.developers
