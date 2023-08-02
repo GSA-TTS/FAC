@@ -204,89 +204,113 @@ local Validations = {
 local Parts = {
   Cluster: Types.object {
     properties: {
-      cluster_name: Base.Compound.ClusterNames,
-      cluster_total: Types.number,
+      cluster_name: Types.string,
+      // We always get a cluster total, and must
+      // always be zero or more
+      cluster_total: Types.number {
+        minimum: 0,
+      },
     },
     allOf: [
       {
+        // If I have a cluster_total greater than zero, then I
+        // must have a valid cluster name.
         'if': {
-          not: {
-            properties: {
-              cluster_name: {
-                enum: [Base.Const.OTHER_CLUSTER, Base.Const.STATE_CLUSTER],
-              },
+          properties: {
+            cluster_total: Types.number {
+              exclusiveMinimum: 0,
             },
           },
         },
         'then': {
           allOf: [
             {
-              properties: {
-                other_cluster_name: Base.Enum.EmptyString_Null,
-              },
+              required: ['cluster_name'],
             },
             {
+              // FIXME: This might require adding OTHER_CLUSTER and STATE_CLUSTER
+              // as valid values here.
               properties: {
-                state_cluster_name: Base.Enum.EmptyString_Null,
+                cluster_name: Base.Compound.ClusterNames,
               },
             },
           ],
         },
       },
       {
+        // If I have a cluster total greater than zero, then
+        // I must set conditions on the existence/values of other cluster name, state cluster name.
         'if': {
           properties: {
-            cluster_name: {
-              const: Base.Const.STATE_CLUSTER,
+            cluster_total: Types.number {
+              exclusiveMinimum: 0,
             },
           },
         },
         'then': {
-          required: [
-            'state_cluster_name',
-          ],
           allOf: [
+            // IF we have OTHER_CLUSTER, THEN...
+            //   - other_cluster_name is required
+            //   - other_cluster_name must not be empty
+            //   - state_cluster_name must be empty
             {
-              properties: {
-                other_cluster_name: Base.Enum.EmptyString_Null,
+              'if': {
+                properties: {
+                  cluster_name: {
+                    const: Base.Const.OTHER_CLUSTER,
+                  },
+                },
+              },
+              'then': {
+                required: ['other_cluster_name'],
+                allOf: [
+                  {
+                    properties: {
+                      other_cluster_name: Base.Compound.NonEmptyString,
+                    },
+                  },
+                  {
+                    properties: {
+                      state_cluster_name: Base.Enum.EmptyString_Null,
+                    },
+                  },
+                ],
               },
             },
+            // IF we have STATE_CLUSTER, THEN...
+            //   - state_cluster_name is required
+            //   - state_cluster_name must not be empty
+            //   - other_cluster_name must be empty
             {
-              properties: {
-                state_cluster_name: Base.Compound.NonEmptyString,
+              'if': {
+                properties: {
+                  cluster_name: {
+                    const: Base.Const.STATE_CLUSTER,
+                  },
+                },
               },
-            },
-          ],
-        },
-      },
-      {
-        'if': {
-          properties: {
-            cluster_name: {
-              const: Base.Const.OTHER_CLUSTER,
-            },
-          },
-        },
-        'then': {
-          required: [
-            'other_cluster_name',
-          ],
-          allOf: [
-            {
-              properties: {
-                other_cluster_name: Base.Compound.NonEmptyString,
-              },
-            },
-            {
-              properties: {
-                state_cluster_name: Base.Enum.EmptyString_Null,
+              'then': {
+                required: ['state_cluster_name'],
+                allOf: [
+                  {
+                    properties: {
+                      other_cluster_name: Base.Enum.EmptyString_Null,
+                    },
+                  },
+                  {
+                    properties: {
+                      state_cluster_name: Base.Compound.NonEmptyString,
+                    },
+                  },
+                ],
               },
             },
           ],
         },
       },
     ],
-    required: ['cluster_name', 'cluster_total'],
+    // Handle all requireds conditionally?
+    required: [],
   },
 
   DirectOrIndirectAward: Types.object {

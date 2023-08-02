@@ -6,6 +6,7 @@ import json
 import os
 import sys
 from django.test import Client
+import re
 
 from audit.test_views import (
     _mock_login_and_scan
@@ -59,6 +60,13 @@ mapping = {
     # it appears that there is data not coming through to the XLSX file.
     # FORM_SECTIONS.NOTES_TO_SEFA : 'notes-{0}.xlsx'
 }
+
+def big(s):
+    print("##########################################################")
+    print(f"# {s}")
+    print("##########################################################")
+    
+
 class Command(BaseCommand):
     help = """
     Creates workbooks for testing from Census data, and then runs it through the app.
@@ -67,9 +75,13 @@ class Command(BaseCommand):
     def handle(self, *args, **kwargs):
         basepath = os.path.join(settings.DATA_FIXTURES, 'historic')
         for dbkey in os.listdir(basepath):
-            print(f'Handling {dbkey}')
-            client = Client()
-            for section, file in mapping.items():
-                test_workbook(os.path.join(basepath, dbkey, file.format(dbkey)), 
-                            section, 
-                            client)
+            # Only handle directories that look like DBKEYs, or 
+            # a sack of numbers.
+            if re.search('^[0-9]+$', dbkey):
+                big(f'Handling {dbkey}')
+                client = Client()
+                for section, file in mapping.items():
+                    big(file.format(dbkey))
+                    test_workbook(os.path.join(basepath, dbkey, file.format(dbkey)), 
+                                section, 
+                                client)

@@ -3,7 +3,10 @@ import json
 import logging
 from jsonschema import Draft7Validator, FormatChecker, validate
 from jsonschema.exceptions import ValidationError as JSONSchemaValidationError
+from jsonschema.exceptions import SchemaError as JSONSchemaError
+
 from django.core.exceptions import ValidationError
+
 from django.utils.translation import gettext_lazy as _
 from django.conf import settings
 import requests
@@ -191,8 +194,18 @@ def validate_federal_award_json(value):
     schema_path = settings.SECTION_SCHEMA_DIR / "FederalAwards.schema.json"
     schema = json.loads(schema_path.read_text(encoding="utf-8"))
 
-    validator = Draft7Validator(schema)
-    errors = list(validator.iter_errors(value))
+    # FIXME: For some classes of error, this approach
+    # will go into an infinite/recursive loop in the iterator. 
+    # There needs to either be a way to solve that, or we need
+    # to not use this approach.
+    # validator = Draft7Validator(schema)
+    # errors = list(validator.iter_errors(value))
+    # The side-effect is that now I only do one error at a time...
+    errors = []
+    try:
+        validate(schema=schema, instance=value)
+    except (JSONSchemaValidationError, JSONSchemaError) as e:
+        errors = [e]
     if len(errors) > 0:
         raise ValidationError(message=_federal_awards_json_error(errors))
 
