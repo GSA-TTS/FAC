@@ -202,11 +202,17 @@ local Validations = {
 };
 
 local Parts = {
+  // FIXME
+  // cluster_name should always be present.
+  // At the least, it should always be N/A.
   Cluster: Types.object {
     properties: {
-      cluster_name: Types.string,
-      // We always get a cluster total, and must
-      // always be zero or more
+      // Cluster name must always be present, and it must EITHER be:
+      //  - A valid cluster name from the enumeration
+      //  - N/A
+      //  - STATE CLUSTER, or
+      //  - the designation for other cluster name
+      cluster_name: Base.Compound.ClusterNamesNAStateOther,
       cluster_total: Types.number {
         minimum: 0,
       },
@@ -214,7 +220,8 @@ local Parts = {
     allOf: [
       {
         // If I have a cluster_total greater than zero, then I
-        // must have a valid cluster name.
+        // must have a valid cluster name. It cannot be N/A if the
+        // cluster total is greater than zero.
         'if': {
           properties: {
             cluster_total: Types.number {
@@ -225,30 +232,10 @@ local Parts = {
         'then': {
           allOf: [
             {
-              required: ['cluster_name'],
-            },
-            {
-              // FIXME: This might require adding OTHER_CLUSTER and STATE_CLUSTER
-              // as valid values here.
               properties: {
-                cluster_name: Base.Compound.ClusterNames,
+                cluster_name: Base.Compound.ClusterNamesNAStateOther,
               },
             },
-          ],
-        },
-      },
-      {
-        // If I have a cluster total greater than zero, then
-        // I must set conditions on the existence/values of other cluster name, state cluster name.
-        'if': {
-          properties: {
-            cluster_total: Types.number {
-              exclusiveMinimum: 0,
-            },
-          },
-        },
-        'then': {
-          allOf: [
             // IF we have OTHER_CLUSTER, THEN...
             //   - other_cluster_name is required
             //   - other_cluster_name must not be empty
@@ -310,7 +297,7 @@ local Parts = {
       },
     ],
     // Handle all requireds conditionally?
-    required: [],
+    required: ['cluster_name', 'cluster_total'],
   },
 
   DirectOrIndirectAward: Types.object {

@@ -1,6 +1,6 @@
-local Func = import 'Functions.libsonnet';
-local FederalProgramNames = import 'FederalProgramNames.json';
 local ClusterNames = import 'ClusterNames.json';
+local FederalProgramNames = import 'FederalProgramNames.json';
+local Func = import 'Functions.libsonnet';
 
 local Const = {
   Y: 'Y',
@@ -102,7 +102,7 @@ local Enum = {
       Const.N,
       Const.Y_N,
     ],
-  },  
+  },
   NA: Types.string {
     //description: 'A 'not applicable' answer',
     enum: [
@@ -366,8 +366,8 @@ local type_uei = Types.string {
     },
     // Does not start with 9 digits in a row
     {
-      pattern: "^(?![0-9]{9})"
-    }
+      pattern: '^(?![0-9]{9})',
+    },
   ],
 };
 
@@ -376,7 +376,7 @@ local Compound = {
     title: 'AwardReference',
     description: 'Award Reference',
     pattern: '^AWARD-(?!0000)[0-9]{4}$',
-  },  
+  },
   ThreeDigitExtension: Types.string {
     title: 'ThreeDigitExtension',
     description: 'Three Digit Extension',
@@ -431,23 +431,27 @@ local SchemaBase = Types.object {
   Compound: Compound {
     FederalProgramNames: {
       description: 'All Federal program names',
-      enum: FederalProgramNames.program_names
+      enum: FederalProgramNames.program_names,
     },
     AllALNNumbers: {
       description: 'All program numbers',
-      enum: FederalProgramNames.all_alns
-      },
-    # 20230719 HDMS FIXME: Because there is discrepancy between the ALN numbers 
-    # from the CSV and ALN numbers from the Enum object above, I commented out the ALNPrefixes enum below.  
-    # This is a temporary fix until we figure how the resolve the discrepancy (i.e., which list to use as source of truth).  
+      enum: FederalProgramNames.all_alns,
+    },
+    // 20230719 HDMS FIXME: Because there is discrepancy between the ALN numbers
+    // from the CSV and ALN numbers from the Enum object above, I commented out the ALNPrefixes enum below.
+    // This is a temporary fix until we figure how the resolve the discrepancy (i.e., which list to use as source of truth).
     // ALNPrefixes: {
     //   description: 'Unique ALN prefixes',
     //   enum: FederalProgramNames.aln_prefixes
     // },
     ClusterNames: {
       description: 'All cluster names',
-      enum: ClusterNames.cluster_names
-    }
+      enum: ClusterNames.cluster_names,
+    },
+    ClusterNamesNAStateOther: {
+      description: 'All cluster names',
+      enum: ClusterNames.cluster_names + [Const.NA, Const.STATE_CLUSTER, Const.OTHER_CLUSTER],
+    },
   },
   Validation: Validation,
   SchemaBase: SchemaBase,

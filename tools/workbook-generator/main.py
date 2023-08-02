@@ -203,7 +203,7 @@ def generate_federal_awards(dbkey, outdir):
     mappings = [
         FieldMap('program_name', 'federalprogramname', None, str),
         FieldMap('additional_award_identification', 'awardidentification', None, str),
-        FieldMap('cluster_name', 'clustername', None, str),
+        FieldMap('cluster_name', 'clustername', "N/A", str),
         FieldMap('state_cluster_name', 'stateclustername', None, str),
         FieldMap('other_cluster_name', 'otherclustername', None, str),
         FieldMap('federal_program_total', 'programtotal', 0, int),
