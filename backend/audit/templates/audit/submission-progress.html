@@ -252,24 +252,26 @@ It can be changed to time-dependence after timestamp changes. -->
                 </li>
                 <!-- Auditor certification -->
                 <li class="usa-icon-list__item padding-bottom-2">
-                    <div class="usa-icon-list__icon {% if certification.auditor_certified == True %} text-green {% else %} text-base {% endif %}">
+                    <div class="usa-icon-list__icon {% if certification.auditor_certified %} text-green {% else %} text-base {% endif %}">
                         <svg class="usa-icon margin-right-2" aria-hidden="true" role="img">
-                            {% if certification.auditor_certified == True %}
+                            {% if certification.auditor_certified %}
                                 {% uswds_sprite "check_circle" %}
                             {% else %}
                                 {% uswds_sprite "radio_button_unchecked" %}
                             {% endif %}
                         </svg>
                     </div>
-                    <div class="usa-icon-list__content {% if certification.auditor_certified is True %} text-green {% else %} text-base-dark {% endif %}">
-                        {% if SF_SAC_completed == True and audit_report.completed == True %}
+                    <div class="usa-icon-list__content {% if certification.auditor_certified %} text-green {% else %} text-base-dark {% endif %}">
+                        {% if certification.auditor_certified %}
+                            <span class="text-green">Auditor Certification</span>
+                        {% elif SF_SAC_completed == True and audit_report.completed == True  %}
                             <a class="usa-link text-bold"
                                href="{% url 'audit:AuditorCertification' report_id=report_id %}">Auditor Certification</a>
                         {% else %}
                             <svg class="usa-icon margin-right-05" aria-hidden="true" role="img">
                                 {% uswds_sprite "lock_outline" %}
                             </svg>
-                            <span class="text-base">Auditor Certification (either certification order is fine)</span>
+                            <span class="text-base">Auditor Certification</span>
                         {% endif %}
                         <p class="margin-0">
                             The certifying auditor must attest and sign the single audit report before submission. This step is locked until after the SF-SAC and single audit report have been completed and uploaded in the previous steps.
@@ -288,9 +290,11 @@ It can be changed to time-dependence after timestamp changes. -->
                         </svg>
                     </div>
                     <div class="usa-icon-list__content {% if certification.auditee_certified is True %} text-green {% else %} text-base-dark {% endif %}">
-                        {% if SF_SAC_completed == True and audit_report.completed == True and certification.auditor_certified == True %}
+                        {% if certification.auditee_certified %}
+                            <span class="text-green">Auditee Certification</span>
+                        {% elif certification.auditor_certified %}
                             <a class="usa-link text-bold"
-                               href="{% url 'audit:AuditeeCertification' report_id=report_id %}">Auditee Certification (either certification order is fine) </a>
+                               href="{% url 'audit:AuditeeCertification' report_id=report_id %}">Auditee Certification</a>
                         {% else %}
                             <svg class="usa-icon margin-right-05" aria-hidden="true" role="img">
                                 {% uswds_sprite "lock_outline" %}
@@ -314,9 +318,11 @@ It can be changed to time-dependence after timestamp changes. -->
                         </svg>
                     </div>
                     <div class="usa-icon-list__content {% if certification.auditee_certified is True %} text-green {% else %} text-base-dark {% endif %}">
-                        {% if SF_SAC_completed == True and audit_report.completed == True and certification.auditor_certified == True and certification.auditee_certified == True %}
+                        {% if submission.completed %}
+                            <span class="text-green">Submit to FAC for processing</span>
+                        {% elif certification.auditee_certified %}
                             <a class="usa-link text-bold"
-                               href="{% url 'audit:Submission' report_id=report_id %}">Submit to FAC for processing</a>
+                               href="javascript:void(0);">Submit to FAC for processing</a>
                         {% else %}
                             <svg class="usa-icon margin-right-05" aria-hidden="true" role="img">
                                 {% uswds_sprite "lock_outline" %}

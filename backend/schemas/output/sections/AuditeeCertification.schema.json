@@ -1,0 +1,63 @@
+{
+   "additionalProperties": false,
+   "properties": {
+      "auditee_certification": {
+         "description": "Auditee certification (required checkboxes)",
+         "properties": {
+            "has_engaged_auditor": {
+               "type": "boolean"
+            },
+            "has_no_BII": {
+               "type": "boolean"
+            },
+            "has_no_PII": {
+               "type": "boolean"
+            },
+            "is_2CFR_compliant": {
+               "type": "boolean"
+            },
+            "is_FAC_releasable": {
+               "type": "boolean"
+            },
+            "is_complete_and_accurate": {
+               "type": "boolean"
+            },
+            "is_issued_and_signed": {
+               "type": "boolean"
+            },
+            "meets_2CFR_specifications": {
+               "type": "boolean"
+            }
+         },
+         "required": [
+            "has_no_PII",
+            "has_no_BII",
+            "meets_2CFR_specifications",
+            "is_2CFR_compliant",
+            "is_complete_and_accurate",
+            "has_engaged_auditor",
+            "is_issued_and_signed",
+            "is_FAC_releasable"
+         ],
+         "type": "object"
+      },
+      "auditee_signature": {
+         "description": "Auditee signature and title",
+         "properties": {
+            "auditee_name": {
+               "type": "string"
+            },
+            "auditee_title": {
+               "type": "string"
+            }
+         },
+         "required": [
+            "auditee_name",
+            "auditee_title"
+         ],
+         "type": "object"
+      }
+   },
+   "title": "AuditeeCertification",
+   "type": "object"
+}

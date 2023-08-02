@@ -26,6 +26,8 @@ from .validators import (
     validate_secondary_auditors_json,
     validate_notes_to_sefa_json,
     validate_single_audit_report_file,
+    validate_auditor_certification_json,
+    validate_auditee_certification_json
 )
 
 User = get_user_model()
@@ -265,6 +267,14 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
     # Notes to SEFA:
     notes_to_sefa = models.JSONField(
         blank=True, null=True, validators=[validate_notes_to_sefa_json]
+    )
+
+    auditor_certification = models.JSONField(
+        blank=True, null=True, validators=[validate_auditor_certification_json]
+    )
+
+    auditee_certification = models.JSONField(
+        blank=True, null=True, validators=[validate_auditee_certification_json]
     )
 
     def validate_full(self):

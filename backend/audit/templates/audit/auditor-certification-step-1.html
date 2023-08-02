@@ -3,12 +3,12 @@
 {% block content %}
     <div class="grid-container margin-top-6">
         <div class="grid-row">
-            <form class="grid-col-8 grid-offset-2" id="auditor-certification" method="post">
+            <form class="grid-col-8 grid-offset-2" id="auditor-certification-step-1" method="post">
                 {% csrf_token %}
                 <fieldset class="usa-fieldset padding-bottom-2">
-                    <legend class="usa-legend usa-legend--large" id="auditor-certification">Auditor Certification</legend>
-                    <h3>Check the box next to each item to signify you agree.</h3>
-                    <p class="text-base">All boxes must be checked in order to certify.</p>
+                    <legend class="usa-legend usa-legend--large" id="auditor-certification">Auditor certification checklist</legend>
+                    <h3>Check the box next to each item confirm your report meets the requirements.</h3>
+                    <p class="text-base">You must check all boxes in order to certify your single audit.</p>
                     <div class="usa-checkbox margin-top-4">
                         <input id="is_OMB_limited"
                                name="is_OMB_limited"
@@ -18,7 +18,7 @@
                                value="True"
                                {% if form.cleaned_data.is_OMB_limited %}checked{% endif %}  />
                         <label class="usa-checkbox__label" for="is_OMB_limited">
-                            The data elements and information included in this Form SF-SAC are limited to those prescribed by the Office of Management and Budget.
+                            The SF-SAC contains only the data and information required by the Office of Management and Budget.
                         </label>
                         <span class="usa-error-message">{{ form.errors.is_OMB_limited|striptags }}</span>
                     </div>
@@ -31,22 +31,22 @@
                                value="True"
                                {% if form.cleaned_data.is_auditee_responsible %}checked{% endif %}  />
                         <label class="usa-checkbox__label" for="is_auditee_responsible">
-                            The information in Part II of this Form SF-SAC is the responsibility of the auditee and is based on information included in the reporting package required by the Uniform Guidance.
+                            The auditee completed the Federal Awards workbook using the audit reporting package as required by the Uniform Guidance.
                         </label>
                         <span class="usa-error-message">{{ form.errors.is_auditee_responsible|striptags }}</span>
                     </div>
                     <div class="usa-checkbox margin-top-4">
-                        <input id="is_auditor_transferred"
-                               name="is_auditor_transferred"
+                        <input id="has_used_auditors_report"
+                               name="has_used_auditors_report"
                                class="usa-checkbox__input"
                                required
                                type="checkbox"
                                value="True"
-                               {% if form.cleaned_data.is_auditor_transferred %}checked{% endif %}  />
-                        <label class="usa-checkbox__label" for="is_auditor_transferred">
-                            The information included in Part III of this Form SF-SAC, except for Part III, Item 3(d), and Items 4(a)-(d) (when there are audit findings), was transferred by the auditor from the auditor’s report(s) for the period described in Part I, Items 1 and 3, and is not a substitute for such reports.
+                               {% if form.cleaned_data.has_used_auditors_report %}checked{% endif %}  />
+                        <label class="usa-checkbox__label" for="has_used_auditors_report">
+                            The auditor completed the Federal Award Audit Findings and Audit Findings Text workbooks using the auditor's report.
                         </label>
-                        <span class="usa-error-message">{{ form.errors.is_auditor_transferred|striptags }}</span>
+                        <span class="usa-error-message">{{ form.errors.has_used_auditors_report|striptags }}</span>
                     </div>
                     <div class="usa-checkbox margin-top-4">
                         <input id="has_no_auditee_procedures"
@@ -57,7 +57,7 @@
                                value="True"
                                {% if form.cleaned_data.has_no_auditee_procedures %}checked{% endif %}  />
                         <label class="usa-checkbox__label" for="has_no_auditee_procedures">
-                            The auditor has not performed any auditing procedures since the date of the auditor’s report(s) or any additional auditing procedures in connection with the completion of this Form SF-SAC.
+                            No auditor has performed any audit work since the completion of the auditor's report or the single audit submission workbooks.
                         </label>
                         <span class="usa-error-message">{{ form.errors.has_no_auditee_procedures|striptags }}</span>
                     </div>
@@ -70,18 +70,17 @@
                                value="True"
                                {% if form.cleaned_data.is_FAC_releasable %}checked{% endif %} />
                         <label class="usa-checkbox__label" for="is_FAC_releasable">
-                            A copy of the reporting package required by the Uniform Guidance, which includes the complete auditor’s report(s), may be made available by the Federal Audit Clearinghouse (FAC) on the FAC website or from the auditee at the address listed in Part I of this Form SF-SAC.
+                            The full reporting package and auditor's report may shared publicly by the Federal Audit Clearinghouse or the report auditee, as required by the Uniform Guidance.
                         </label>
                         <span class="usa-error-message">{{ form.errors.is_FAC_releasable|striptags }}</span>
                     </div>
                 </fieldset>
-                <button class="usa-button margin-bottom-8 margin-top-4" id="continue">Agree to Auditor Certification</button>
+                <div class="grid-row margin-bottom-8 margin-top-10">
+                    <button class="usa-button grid-col-5" id="continue">Agree to auditor certification</button>
+                    <a class="usa-link margin-left-3 grid-col-2 flex-align-self-center" href="/">Cancel</a>
+                </div>
             </form>
         </div>
     </div>
     {% include "audit-metadata.html" %}
-    {% comment %} <!-- Pass variables to JS as given alias -->
-            {{ report_id | json_script:'sac_id' }}
-            {{ view_id | json_script:'view_id' }}
-    <script src="{% static 'compiled/js/upload-page.js' %}"></script> {% endcomment %}
 {% endblock content %}

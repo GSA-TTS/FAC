@@ -56,9 +56,30 @@ class AuditInfoForm(forms.Form):
     agencies = forms.MultipleChoiceField(choices=choices_agencies)
 
 
-class AuditorCertificationForm(forms.Form):
-    is_FAC_releasable = forms.BooleanField()
-    has_no_auditee_procedures = forms.BooleanField()
-    is_auditor_transferred = forms.BooleanField()
-    is_auditee_responsible = forms.BooleanField()
+class AuditorCertificationStep1Form(forms.Form):
     is_OMB_limited = forms.BooleanField()
+    is_auditee_responsible = forms.BooleanField()
+    has_used_auditors_report = forms.BooleanField()
+    has_no_auditee_procedures = forms.BooleanField()
+    is_FAC_releasable = forms.BooleanField()
+
+
+class AuditorCertificationStep2Form(forms.Form):
+    auditor_name = forms.CharField()
+    auditor_title = forms.CharField()
+
+
+class AuditeeCertificationStep1Form(forms.Form):
+    has_no_PII = forms.BooleanField()
+    has_no_BII = forms.BooleanField()
+    meets_2CFR_specifications = forms.BooleanField()
+    is_2CFR_compliant = forms.BooleanField()
+    is_complete_and_accurate = forms.BooleanField()
+    has_engaged_auditor = forms.BooleanField()
+    is_issued_and_signed = forms.BooleanField()
+    is_FAC_releasable = forms.BooleanField()
+
+
+class AuditeeCertificationStep2Form(forms.Form):
+    auditee_name = forms.CharField()
+    auditee_title = forms.CharField()

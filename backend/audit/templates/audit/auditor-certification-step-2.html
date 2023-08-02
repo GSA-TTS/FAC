@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+    <div class="grid-container margin-top-6">
+        <div class="grid-row">
+            <form class="grid-col-8 grid-offset-2" id="auditor-certification-step-2" method="post">
+                {% csrf_token %}
+                    <fieldset class="usa-fieldset padding-bottom-2">
+                        <h1 id="auditor-certification">Auditor certification agreement</h1>
+                        <h3>Agree and sign to auditor statement</h3>
+                        <label class="usa-label" for="auditor_name">Name of certifying official</label>
+                        <input class="usa-input" id="auditor_name" name="auditor_name" placeholder="[your name]"/>
+                        <label class="usa-label" for="auditor_title">Title of certifying official</label>
+                        <input class="usa-input" id="auditor_title" name="auditor_title" placeholder="[your role]"/>
+                    </fieldset>
+                <button class="usa-button margin-bottom-8 margin-top-4" id="continue">Agree to auditor certification</button>
+            </form>
+        </div>
+    </div>
+    {% include "audit-metadata.html" %}
+{% endblock content %}
