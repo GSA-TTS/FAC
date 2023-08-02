@@ -11,9 +11,8 @@ class FindingText(models.Model):
         "G-FAC generated identifier.l",
         max_length=40,
     )
-    finding_ref_number = models.CharField(
+    finding_ref_number = models.TextField(
         "Finding Reference Number - FK",
-        max_length=100,
         null=True,
         help_text=docs.finding_ref_nums_findingstext,
     )
@@ -46,6 +45,7 @@ class Finding(models.Model):
 
     award_reference = models.CharField(
         "Order that the award line was reported in Award",
+        max_length=12,
         null=True,
     )
     report_id = models.CharField(
@@ -56,10 +56,8 @@ class Finding(models.Model):
         "Order that the finding line was reported",
         null=True,
     )
-    finding_ref_number = models.CharField(
+    finding_ref_number = models.TextField(
         "Findings Reference Numbers",
-        max_length=100,
-        unique=True,
         help_text=docs.finding_ref_nums_findings,
     )
     is_material_weakness = models.BooleanField(
@@ -77,9 +75,8 @@ class Finding(models.Model):
         "Other non-compliance", null=True, help_text=docs.other_non_compliance
     )
     # each element in the list is a FK to Finding
-    prior_finding_ref_numbers = models.CharField(
+    prior_finding_ref_numbers = models.TextField(
         "Audit finding reference numbers from the immediate prior audit",
-        max_length=100,
         help_text=docs.prior_finding_ref_nums,
         null=True,
     )
@@ -121,7 +118,9 @@ class FederalAward(models.Model):
     )
 
     award_reference = models.CharField(
-        "Order that the award line was reported", default=-1
+        "Order that the award line was reported",
+        default=-1,
+        max_length=12,
     )
 
     federal_agency_prefix = models.CharField(
@@ -132,9 +131,8 @@ class FederalAward(models.Model):
         "3-digit extn for a program defined by the agency",
         max_length=3,
     )
-    additional_award_identification = models.CharField(
+    additional_award_identification = models.TextField(
         "Other data used to identify the award which is not a CFDA number (e.g., program year, contract number)",
-        max_length=50,
         null=True,
         help_text=docs.award_identification,
     )
@@ -262,9 +260,8 @@ class CapText(models.Model):
         "G-FAC generated identifier. FK refers to a General",
         max_length=40,
     )
-    finding_ref_number = models.CharField(
+    finding_ref_number = models.TextField(
         "Audit Finding Reference Number",
-        max_length=100,
         help_text=docs.finding_ref_nums_captext,
     )
     contains_chart_or_table = models.BooleanField(
@@ -273,7 +270,9 @@ class CapText(models.Model):
         help_text=docs.charts_tables_captext,
     )
     planned_action = models.TextField(
-        "Content of the Corrective Action Plan (CAP)", help_text=docs.text_captext
+        "Content of the Corrective Action Plan (CAP)",
+        null=True,
+        help_text=docs.text_captext,
     )
 
     class Meta:
@@ -302,7 +301,7 @@ class Note(models.Model):
     content = models.TextField("Content of the Note", null=True, help_text=docs.content)
     note_title = models.TextField("Note Title", null=True, help_text=docs.title)
     accounting_policies = models.TextField(null=True)
-    is_minimis_rate_used = models.CharField(max_length=3, null=True)
+    is_minimis_rate_used = models.BooleanField("", null=True)
     rate_explained = models.TextField(null=True)
 
     class Meta:
@@ -423,15 +422,15 @@ class Passthrough(models.Model):
     award_reference = models.CharField(
         "Order that the award line was reported",
         null=True,
+        max_length=12,
     )
     report_id = models.CharField(
         "G-FAC generated identifier. FK refers to General",
         max_length=40,
     )
     # This doesn't seem like it should be null but it is sometimes
-    passthrough_id = models.CharField(
+    passthrough_id = models.TextField(
         "Identifying Number Assigned by the Pass-through Entity",
-        max_length=70,
         null=True,
         help_text=docs.passthrough_id,
     )
@@ -473,9 +472,8 @@ class General(models.Model):
         null=True,
         help_text=docs.auditee_contact,
     )
-    auditee_email = models.CharField(
+    auditee_email = models.TextField(
         "Auditee Email address",
-        max_length=254,
         null=True,
         help_text=docs.auditee_email,
     )
@@ -513,7 +511,7 @@ class General(models.Model):
         "", max_length=30, null=True, help_text=docs.uei_general
     )
     auditee_addl_uei_list = ArrayField(
-        models.CharField("", null=True, help_text=docs.uei_general),
+        models.CharField("", null=True, max_length=30, help_text=docs.uei_general),
         null=True,
         default=list,
     )
@@ -536,19 +534,16 @@ class General(models.Model):
     auditor_city = models.TextField("CPA City", null=True, help_text=docs.auditor_city)
     auditor_contact_title = models.TextField(
         "Title of CPA Contact",
-        max_length=40,
         null=True,
         help_text=docs.auditor_title,
     )
     auditor_address_line_1 = models.TextField(
         "CPA Street Address",
-        max_length=45,
         null=True,
         help_text=docs.auditor_street1,
     )
     hist_auditor_address_line_2 = models.TextField(
         "CPA Street Address Line 2 in C-FAC",
-        max_length=45,
         null=True,
     )
     auditor_zip = models.CharField(
@@ -565,9 +560,8 @@ class General(models.Model):
         null=True,
         help_text=docs.auditor_contact,
     )
-    auditor_email = models.CharField(
+    auditor_email = models.TextField(
         "CPA mail address (optional)",
-        max_length=254,
         null=True,
         help_text=docs.auditor_email,
     )
@@ -711,7 +705,7 @@ class General(models.Model):
 
     entity_type = models.CharField(
         "Self reported type of entity (i.e., States, Local Governments, Indian Tribes, Institutions of Higher Education, NonProfit)",
-        max_length=50,
+        max_length=40,
         null=True,
         help_text=docs.entity_type,
     )
@@ -753,7 +747,7 @@ class General(models.Model):
         "True for public records, False for non-public records", null=True
     )
     # Choices are: C-FAC and G-FAC
-    data_source = models.CharField("Origin of the upload", max_length=25)
+    data_source = models.CharField("Origin of the upload", max_length=12)
 
     class Meta:
         unique_together = (("report_id",),)
@@ -788,9 +782,8 @@ class SecondaryAuditor(models.Model):
         null=True,
         help_text=docs.auditor_title,
     )
-    contact_email = models.CharField(
+    contact_email = models.TextField(
         "CPA mail address (optional)",
-        max_length=254,
         null=True,
         help_text=docs.auditor_email,
     )
