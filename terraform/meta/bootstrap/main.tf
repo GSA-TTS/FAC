@@ -27,7 +27,7 @@ output "bucket_credentials" {
 # Run `init.sh` in any environment directory to configure the backend for that directory
 resource "local_file" "backend.tfvars" {
   count           = local.populate_creds_locally ? 1 : 0
-  filename        = "${local.path}/../shared/config/backend.tfvars"
+  filename        = "${path.module}/../../shared/config/backend.tfvars"
   file_permission = "0600"
   content         = <<-EOF
   access_key  = "${local.credentials.access_key_id}"
