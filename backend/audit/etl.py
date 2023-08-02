@@ -139,7 +139,7 @@ class ETL(object):
     def load_note(self):
         notes_to_sefa = self.single_audit_checklist.notes_to_sefa["NotesToSefa"]
         accounting_policies = notes_to_sefa["accounting_policies"]
-        is_minimis_rate_used = notes_to_sefa["is_minimis_rate_used"]
+        is_minimis_rate_used = notes_to_sefa["is_minimis_rate_used"] == "Y"
         rate_explained = notes_to_sefa["rate_explained"]
         entries = notes_to_sefa["notes_to_sefa_entries"]
         if not entries:
@@ -274,7 +274,7 @@ class ETL(object):
             entity_type=general_information["user_provided_organization_type"],
             number_months=None,  # TODO: Where does this come from?
             audit_period_covered=general_information["audit_period_covered"],
-            report_required=None,  # TODO: Notes say this hasn't been used since 2008.
+            is_report_required=None,  # TODO: Notes say this hasn't been used since 2008.
             total_fed_expenditures=None,  # TODO: Where does this come from?
             type_report_major_program=None,  # TODO: Where does this come from?
             type_audit_code="UG",
