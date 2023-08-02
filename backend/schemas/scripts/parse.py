@@ -22,7 +22,6 @@ Posn = NT(
     "title title_cell range_name range_cell width keep_locked format last_range_cell",
 )
 SingleCell = NT("SingleCell", "posn validation formula help")
-# TODO: flesh out NT for meta cells
 MetaCell = NT("MetaCell", "posn formula help")
 MergeableCell = NT("MergeableCell", "start_row end_row start_column end_column")
 MergedUnreachable = NT("MergedUnreachable", "columns")
@@ -88,13 +87,14 @@ def parse_single_cell(spec):
     )
 
 
-# Meta cells probably don't need named ranges
 def parse_meta_cell(spec):
     return MetaCell(
         Posn(
             get(spec, "title"),
             get(spec, "title_cell"),
             get(spec, "range_name"),
+            # Meta cellts don't use ranges right now, but
+            # we might use them to check things, e.g. version number
             get(spec, "range_cell"),
             get(spec, "width"),
             get(spec, "keep_locked", default=True),
@@ -161,7 +161,7 @@ def parse_text_range(spec):
     )
 
 
-def parse_sheet(spec):
+def parse_sheet(spec):  # noqa: C901
     sc, mtc, opr, mc, mur, hi, tr = None, None, None, None, None, None, None
     name = get(spec, "name", default="Unnamed Sheet")
     if "single_cells" in spec:
