@@ -69,7 +69,7 @@ local sheets = [
 ];
 
 local workbook = {
-  filename: 'corrective-action-plan-template.xlsx',
+  filename: 'corrective-action-plan-workbook.xlsx',
   sheets: sheets,
   title_row: title_row,
 };
