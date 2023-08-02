@@ -27,7 +27,7 @@ from .validators import (
     validate_notes_to_sefa_json,
     validate_single_audit_report_file,
     validate_auditor_certification_json,
-    validate_auditee_certification_json
+    validate_auditee_certification_json,
 )
 
 User = get_user_model()
