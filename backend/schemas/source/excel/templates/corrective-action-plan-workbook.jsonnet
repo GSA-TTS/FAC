@@ -2,7 +2,7 @@ local Fun = import '../libs/Functions.libsonnet';
 local Help = import '../libs/Help.libsonnet';
 local SV = import '../libs/SheetValidations.libsonnet';
 local Sheets = import '../libs/Sheets.libsonnet';
-local textSheet = 'Form';
+local capSheet = 'Form';
 local coverSheet = 'Coversheet';
 local title_row = 1;
 
@@ -43,7 +43,7 @@ local single_cells = [
     title_cell: 'A3',
     range_cell: 'B3',
     format: 'text',
-    formula: '="' + Sheets.section_names.FINDINGS_TEXT + '"',
+    formula: '="' + Sheets.section_names.CORRECTIVE_ACTION_PLAN + '"',
     help: Help.plain_text,
     validation: SV.NoValidation,
   },
@@ -77,8 +77,8 @@ local open_ranges_defns = [
       help: Help.plain_text,
     },
     SV.NoValidation,
-    'Text of the Audit Finding',
-    'text_of_finding',
+    'Planned Corrective Action',
+    'planned_action',
   ],
   [
     Sheets.y_or_n_range {
@@ -103,7 +103,7 @@ local sheets = [
     //hide_row_from: 3,
   },
   {
-    name: textSheet,
+    name: capSheet,
     open_ranges: Fun.make_open_ranges_with_column(title_row, open_ranges_defns),
     header_height: 48,
     hide_col_from: 4,
@@ -111,7 +111,7 @@ local sheets = [
 ];
 
 local workbook = {
-  filename: 'findings-text-template.xlsx',
+  filename: 'corrective-action-plan-workbook.xlsx',
   sheets: sheets,
   title_row: title_row,
 };

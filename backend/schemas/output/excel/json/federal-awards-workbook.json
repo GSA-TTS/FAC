@@ -1,5 +1,5 @@
 {
-   "filename": "federal-awards-expended-template.xlsx",
+   "filename": "federal-awards-workbook.xlsx",
    "sheets": [
       {
          "header_height": 60,
@@ -349,6 +349,7 @@
                }
             },
             {
+               "format": "text",
                "help": {
                   "link": "https://fac.gov/documentation/validation/#plain_text",
                   "text": "Only plain text is allowed in this field, no emoji or other special additions"
@@ -362,6 +363,7 @@
                }
             },
             {
+               "format": "text",
                "help": {
                   "link": "https://fac.gov/documentation/validation/#unknown",
                   "text": "If you see this error, please contact support."

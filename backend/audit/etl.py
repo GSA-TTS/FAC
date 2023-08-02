@@ -1,3 +1,4 @@
+import logging
 from datetime import datetime
 
 from dissemination.models import (
@@ -13,6 +14,8 @@ from dissemination.models import (
 )
 from audit.models import SingleAuditChecklist
 
+logger = logging.getLogger(__name__)
+
 
 class ETL(object):
     def __init__(self, sac: SingleAuditChecklist) -> None:
@@ -24,15 +27,23 @@ class ETL(object):
         self.audit_year = int(audit_date.split("-")[0])
 
     def load_all(self):
-        # TODO: Wrap each method call in try/except to collect errors.
-        self.load_general()
-        self.load_secondary_auditor()
-        self.load_federal_award()
-        self.load_findings()
-        self.load_passthrough()
-        self.load_finding_texts()
-        self.load_captext()
-        # self.load_audit_info() TODO uncomment once the frontend is available
+        load_methods = (
+            self.load_general,
+            self.load_secondary_auditor,
+            self.load_federal_award,
+            self.load_findings,
+            self.load_passthrough,
+            self.load_finding_texts,
+            self.load_captext,
+            # self.load_audit_info()  # TODO: Uncomment when SingleAuditChecklist adds audit_information
+        )
+        for load_method in load_methods:
+            try:
+                load_method()
+            except KeyError as key_error:
+                logger.warning(
+                    f"{type(key_error).__name__} in {load_method.__name__}: {key_error}"
+                )
 
     def load_finding_texts(self):
         findings_text = self.single_audit_checklist.findings_text
@@ -200,10 +211,9 @@ class ETL(object):
         return return_dict
 
     def load_general(self):
-        # TODO: Use the mixin to access general_information fields once that code
-        #       is merged.
         general_information = self.single_audit_checklist.general_information
         dates_by_status = self._get_dates_from_sac()
+        sac_additional_ueis = self.single_audit_checklist.additional_ueis
         general = General(
             report_id=self.report_id,
             auditee_certify_name=None,  # TODO: Where does this come from?
@@ -218,7 +228,12 @@ class ETL(object):
             auditee_state=general_information["auditee_state"],
             auditee_ein=general_information["ein"],
             auditee_uei=general_information["auditee_uei"],
-            auditee_addl_uei_list=[],
+            auditee_addl_uei_list=[
+                entry["additional_uei"]
+                for entry in sac_additional_ueis["AdditionalUEIs"][
+                    "additional_ueis_entries"
+                ]
+            ],
             auditee_zip=general_information["auditee_zip"],
             auditor_phone=general_information["auditor_phone"],
             auditor_state=general_information["auditor_state"],
@@ -250,25 +265,20 @@ class ETL(object):
             submitted_date=dates_by_status[
                 self.single_audit_checklist.STATUS.SUBMITTED
             ],
+            auditor_signature_date=None,  # TODO: Field will be added by front end
+            auditee_signature_date=None,  # TODO: Field will be added by front end
             fy_end_date=general_information["auditee_fiscal_period_end"],
             fy_start_date=general_information["auditee_fiscal_period_start"],
             audit_year=self.audit_year,
             audit_type=general_information["audit_type"],
-            condition_or_deficiency_major_program=None,  # TODO: Where does this come from?
-            current_or_former_findings=None,  # TODO: Where does this come from?
             entity_type=general_information["user_provided_organization_type"],
-            material_weakness=None,  # TODO: Where does this come from?
-            material_weakness_major_program=None,  # TODO: Notes say this hasn't been used since 2013.
             number_months=None,  # TODO: Where does this come from?
             audit_period_covered=general_information["audit_period_covered"],
-            prior_year_schedule=None,  # TODO: Notes say this hasn't been used since 2016.
-            questioned_costs=None,  # TODO: Notes say this hasn't been used since 2013.
             report_required=None,  # TODO: Notes say this hasn't been used since 2008.
             total_fed_expenditures=None,  # TODO: Where does this come from?
-            type_report_financial_statements=None,  # TODO: Where does this come from?
             type_report_major_program=None,  # TODO: Where does this come from?
-            type_audit_code="A133",  # TODO: Where does this come from?
-            is_public=None,  # Should be coming from SingleAuditChecklist
+            type_audit_code="UG",
+            is_public=self.single_audit_checklist.is_public,
             data_source="G-FAC",
         )
         general.save()

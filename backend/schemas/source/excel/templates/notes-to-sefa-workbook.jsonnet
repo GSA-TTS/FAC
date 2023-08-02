@@ -144,7 +144,7 @@ local sheets = [
 ];
 
 local workbook = {
-  filename: 'notes-to-sefa-template.xlsx',
+  filename: 'notes-to-sefa-workbook.xlsx',
   sheets: sheets,
   title_row: title_row,
 };

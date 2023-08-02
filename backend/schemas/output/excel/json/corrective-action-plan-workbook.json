@@ -1,5 +1,5 @@
 {
-   "filename": "additional-ueis-template.xlsx",
+   "filename": "corrective-action-plan-workbook.xlsx",
    "sheets": [
       {
          "header_height": 60,
@@ -49,7 +49,7 @@
             },
             {
                "format": "text",
-               "formula": "=\"AdditionalUeis\"",
+               "formula": "=\"CorrectiveActionPlan\"",
                "help": {
                   "link": "https://fac.gov/documentation/validation/#plain_text",
                   "text": "Only plain text is allowed in this field, no emoji or other special additions"
@@ -89,25 +89,55 @@
       },
       {
          "header_height": 48,
-         "hide_col_from": 2,
+         "hide_col_from": 4,
          "name": "Form",
          "open_ranges": [
             {
-               "format": "text",
                "help": {
-                  "link": "https://fac.gov/documentation/validation/#uei",
-                  "text": "UEIs are 12 characters long and match rules as given by SAM.gov"
+                  "link": "https://fac.gov/documentation/validation/#reference_number",
+                  "text": "Reference numbers have the form YYYY-NNN (e.g. 2023-001)"
                },
-               "range_name": "additional_uei",
-               "title": "Additional UEIs",
+               "range_name": "reference_number",
+               "title": "Audit Finding Reference Number",
                "title_cell": "A1",
                "type": "open_range",
                "validation": {
-                  "custom_error": "Expecting something with only twelve characters",
-                  "custom_title": "Must be length of 12",
-                  "formula1": 12,
-                  "operator": "equal",
-                  "type": "textLength"
+                  "custom_error": "Expecting a value in the format YYYY-NNN, where YYYY is a year and NNN a three digit number (e.g. 2023-001)",
+                  "custom_title": "Reference number",
+                  "formula1": "=OR(ISBLANK(FIRSTCELLREF), AND(LEN(FIRSTCELLREF) = 8, LEFT(FIRSTCELLREF, 2) = \"20\", ISNUMBER(MID(FIRSTCELLREF, 3, 2) * 1), MID(FIRSTCELLREF, 5, 1) = \"-\", ISNUMBER(RIGHT(FIRSTCELLREF, 3) * 1)))",
+                  "type": "custom"
+               },
+               "width": 36
+            },
+            {
+               "help": {
+                  "link": "https://fac.gov/documentation/validation/#plain_text",
+                  "text": "Only plain text is allowed in this field, no emoji or other special additions"
+               },
+               "range_name": "planned_action",
+               "title": "Planned Corrective Action",
+               "title_cell": "B1",
+               "type": "open_range",
+               "validation": {
+                  "type": "NOVALIDATION"
+               },
+               "width": 100
+            },
+            {
+               "help": {
+                  "link": "https://fac.gov/documentation/validation/#yorn",
+                  "text": "This field must be either `Y` or `N`"
+               },
+               "range_name": "contains_chart_or_table",
+               "title": "Did Text Contain a Chart or Table?",
+               "title_cell": "C1",
+               "type": "yorn_range",
+               "validation": {
+                  "allow_blank": "False",
+                  "custom_error": "Must be 'Y' or 'N'",
+                  "custom_title": "Y/N",
+                  "formula1": "\"Y,N\"",
+                  "type": "list"
                },
                "width": 36
             }

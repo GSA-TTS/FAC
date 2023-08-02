@@ -31,6 +31,11 @@ Target python version is defined in [../backend/runtime.txt](../backend/runtime.
 
 ---
 
+## EditorConfig
+
+We have a `.editorconfig` file at the root directory with basic settings.
+See [editorconfig.org](https://editorconfig.org/) for more information.
+
 ## Environment Variables
 
 Create a .env file in the `/backend` directory.
@@ -43,6 +48,7 @@ SECRET_KEY =
 DJANGO_SECRET_LOGIN_KEY =
 DISABLE_AUTH = 
 ```
+If you are using a MacBook with Apple M1 hardware, you will probably also have to add `DOCKERFILE = Apple_M1_Dockerfile` to the file.
 
 If you need to add these to your local environment (should end up in `~/.bash_profile`, `~/.bashrc`, `~/.zshrc`, or whatever flavor of shell you're using.)
 
@@ -317,6 +323,19 @@ At this point, you'll need to re-run migrations, load test, and recreate your te
 make docker-first-run
 make docker-test
 ```
+
+### What to do if your local tests fail
+
+The most likely explanation is that one of the services (such as MinIO or ClamAV) didn’t finish startup before the tests reached a point that was reliant on that service.
+
+The easiest way to handle this is to run `docker compose up` and wait for ClamAV and Django to start, then run tests in another shell.
+
+The most efficient way to run tests is to run them in the same container, via something like:
+
+```sh
+docker compose exec web /bin/bash -c "python manage.py test; /bin/bash"
+```
+
 
 ## Development, in principle
 

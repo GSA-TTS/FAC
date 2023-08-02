@@ -205,7 +205,7 @@ local sheets = [
 ];
 
 local workbook = {
-  filename: 'findings-uniform-guidance-template.xlsx',
+  filename: 'federal-awards-audit-findings-workbook.xlsx',
   sheets: sheets,
   title_row: title_row,
 };

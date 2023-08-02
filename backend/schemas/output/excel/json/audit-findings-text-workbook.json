@@ -1,5 +1,5 @@
 {
-   "filename": "notes-to-sefa-template.xlsx",
+   "filename": "audit-findings-text-workbook.xlsx",
    "sheets": [
       {
          "header_height": 60,
@@ -21,7 +21,7 @@
                   "text": "If you see this error, please contact support."
                },
                "keep_locked": true,
-               "title": "This workbook contains three worksheets: a coversheet (this sheet), a data entry sheet, and a mandatory notes sheet.\nBefore submitting, please make sure the fields below are filled out.",
+               "title": "This workbook contains two worksheets: a coversheet (this sheet) and a data entry sheet.\nBefore submitting, please make sure the fields below are filled out.",
                "title_cell": "B1",
                "type": "meta_cell",
                "width": 48
@@ -49,7 +49,7 @@
             },
             {
                "format": "text",
-               "formula": "=\"NotesToSefa\"",
+               "formula": "=\"FindingsText\"",
                "help": {
                   "link": "https://fac.gov/documentation/validation/#plain_text",
                   "text": "Only plain text is allowed in this field, no emoji or other special additions"
@@ -88,77 +88,24 @@
          ]
       },
       {
-         "header_height": 100,
+         "header_height": 48,
          "hide_col_from": 4,
-         "name": "MandatoryNotes",
-         "single_cells": [
-            {
-               "help": {
-                  "link": "https://fac.gov/documentation/validation/#plain_text",
-                  "text": "Only plain text is allowed in this field, no emoji or other special additions"
-               },
-               "range_cell": "A2",
-               "range_name": "accounting_policies",
-               "title": "Describe the significant accounting policies \nused in preparing the SEFA. (2 CFR 200.510(b)(6))",
-               "title_cell": "A1",
-               "type": "single_cell",
-               "validation": {
-                  "type": "NOVALIDATION"
-               },
-               "width": 56
-            },
-            {
-               "help": {
-                  "link": "https://fac.gov/documentation/validation/#yorn",
-                  "text": "This field must be either `Y` or `N`"
-               },
-               "range_cell": "B2",
-               "range_name": "is_minimis_rate_used",
-               "title": "Did the auditee use the de minimis cost rate? \n(2 CFR 200.414(f))",
-               "title_cell": "B1",
-               "type": "single_cell",
-               "validation": {
-                  "allow_blank": "False",
-                  "custom_error": "Must be 'Y' or 'N' or 'Y&N'",
-                  "custom_title": "Y/N/Y&N",
-                  "formula1": "\"Y,N,Y&N\"",
-                  "type": "list"
-               },
-               "width": 24
-            },
-            {
-               "help": {
-                  "link": "https://fac.gov/documentation/validation/#plain_text",
-                  "text": "Only plain text is allowed in this field, no emoji or other special additions"
-               },
-               "range_cell": "C2",
-               "range_name": "rate_explained",
-               "title": "Please explain",
-               "title_cell": "C1",
-               "type": "single_cell",
-               "validation": {
-                  "type": "NOVALIDATION"
-               },
-               "width": 56
-            }
-         ]
-      },
-      {
-         "header_height": 100,
-         "hide_col_from": 3,
-         "name": "AdditionalNotes",
+         "name": "Form",
          "open_ranges": [
             {
                "help": {
-                  "link": "https://fac.gov/documentation/validation/#plain_text",
-                  "text": "Only plain text is allowed in this field, no emoji or other special additions"
+                  "link": "https://fac.gov/documentation/validation/#reference_number",
+                  "text": "Reference numbers have the form YYYY-NNN (e.g. 2023-001)"
                },
-               "range_name": "note_title",
-               "title": "Note title",
+               "range_name": "reference_number",
+               "title": "Audit Finding Reference Number",
                "title_cell": "A1",
                "type": "open_range",
                "validation": {
-                  "type": "NOVALIDATION"
+                  "custom_error": "Expecting a value in the format YYYY-NNN, where YYYY is a year and NNN a three digit number (e.g. 2023-001)",
+                  "custom_title": "Reference number",
+                  "formula1": "=OR(ISBLANK(FIRSTCELLREF), AND(LEN(FIRSTCELLREF) = 8, LEFT(FIRSTCELLREF, 2) = \"20\", ISNUMBER(MID(FIRSTCELLREF, 3, 2) * 1), MID(FIRSTCELLREF, 5, 1) = \"-\", ISNUMBER(RIGHT(FIRSTCELLREF, 3) * 1)))",
+                  "type": "custom"
                },
                "width": 36
             },
@@ -167,30 +114,32 @@
                   "link": "https://fac.gov/documentation/validation/#plain_text",
                   "text": "Only plain text is allowed in this field, no emoji or other special additions"
                },
-               "range_name": "note_content",
-               "title": "Note content",
+               "range_name": "text_of_finding",
+               "title": "Text of the Audit Finding",
                "title_cell": "B1",
                "type": "open_range",
                "validation": {
                   "type": "NOVALIDATION"
                },
-               "width": 56
+               "width": 100
             },
             {
-               "formula": "=IF(A{0}<>\"\", ROW()-1, \"\")",
                "help": {
-                  "link": "https://fac.gov/documentation/validation/#unknown",
-                  "text": "If you see this error, please contact support."
+                  "link": "https://fac.gov/documentation/validation/#yorn",
+                  "text": "This field must be either `Y` or `N`"
                },
-               "keep_locked": true,
-               "range_name": "seq_number",
-               "title": "Sequence number (Read Only)",
+               "range_name": "contains_chart_or_table",
+               "title": "Did Text Contain a Chart or Table?",
                "title_cell": "C1",
-               "type": "open_range",
+               "type": "yorn_range",
                "validation": {
-                  "type": "NOVALIDATION"
+                  "allow_blank": "False",
+                  "custom_error": "Must be 'Y' or 'N'",
+                  "custom_title": "Y/N",
+                  "formula1": "\"Y,N\"",
+                  "type": "list"
                },
-               "width": 18
+               "width": 36
             }
          ]
       }

@@ -2,7 +2,7 @@ local Fun = import '../libs/Functions.libsonnet';
 local Help = import '../libs/Help.libsonnet';
 local SV = import '../libs/SheetValidations.libsonnet';
 local Sheets = import '../libs/Sheets.libsonnet';
-local additionalUeiSheet = 'Form';
+local textSheet = 'Form';
 local coverSheet = 'Coversheet';
 local title_row = 1;
 
@@ -43,7 +43,7 @@ local single_cells = [
     title_cell: 'A3',
     range_cell: 'B3',
     format: 'text',
-    formula: '="' + Sheets.section_names.ADDITIONAL_UEIS + '"',
+    formula: '="' + Sheets.section_names.FINDINGS_TEXT + '"',
     help: Help.plain_text,
     validation: SV.NoValidation,
   },
@@ -64,12 +64,31 @@ local open_ranges_defns = [
     Sheets.open_range {
       title_cell: 'A1',
       width: 36,
-      format: 'text',
-      help: Help.uei,
+      help: Help.reference_number,
     },
-    SV.StringOfLengthTwelve,
-    'Additional UEIs',
-    'additional_uei',
+    SV.ReferenceNumberValidation,
+    'Audit Finding Reference Number',
+    'reference_number',
+  ],
+  [
+    Sheets.open_range {
+      title_cell: 'B1',
+      width: 100,
+      help: Help.plain_text,
+    },
+    SV.NoValidation,
+    'Text of the Audit Finding',
+    'text_of_finding',
+  ],
+  [
+    Sheets.y_or_n_range {
+      title_cell: 'C1',
+      width: 36,
+      help: Help.yorn,
+    },
+    SV.YoNValidation,
+    'Did Text Contain a Chart or Table?',
+    'contains_chart_or_table',
   ],
 ];
 
@@ -81,18 +100,18 @@ local sheets = [
     header_height: 60,
     hide_col_from: 3,
     //FIXME MSHD: commented this out until we figure out if it is needed
-    //  hide_row_from: 3,
+    //hide_row_from: 3,
   },
   {
-    name: additionalUeiSheet,
+    name: textSheet,
     open_ranges: Fun.make_open_ranges_with_column(title_row, open_ranges_defns),
     header_height: 48,
-    hide_col_from: 2,
+    hide_col_from: 4,
   },
 ];
 
 local workbook = {
-  filename: 'additional-ueis-template.xlsx',
+  filename: 'audit-findings-text-workbook.xlsx',
   sheets: sheets,
   title_row: title_row,
 };
