@@ -1,7 +1,7 @@
 locals {
   cf_api_url             = "https://api.fr.cloud.gov"
   s3_service_name        = "fac-terraform-state"
-  credentials            = jsondecode(cloudfoundry_service_key.bucket_creds.credentials)
+  credentials            = cloudfoundry_service_key.bucket_creds.credentials
   populate_creds_locally = true
 }
 
