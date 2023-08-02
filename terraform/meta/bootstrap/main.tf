@@ -24,8 +24,10 @@ output "bucket_credentials" {
 }
 
 # Populate Terraform state credentials for use during local development
-# Run `init.sh` in any environment directory to configure the backend for that directory
-resource "local_file" "backend.tfvars" {
+# Run `init.sh`, then `terraform apply` in the meta module to setup any missing environment module directories (and their corresponding spaces)
+# Commit any changes made to the modules on disk by that step
+# Run `init.sh` in any environment directory to configure the backend for that directory if you want to work with it locally
+resource "local_file" "backend-tfvars" {
   count           = local.populate_creds_locally ? 1 : 0
   filename        = "${path.module}/../../shared/config/backend.tfvars"
   file_permission = "0600"
