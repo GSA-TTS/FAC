@@ -659,7 +659,14 @@ class CorrectiveActionPlanValidatorTests(SimpleTestCase):
         template = json.loads(template_definition_path.read_text(encoding="utf-8"))
         invalid = json.loads('{"CorrectiveActionPlan":{}}')
         expected_msg = str(
-            [("B", "4", "Auditee UEI", template["sheets"][0]["single_cells"][2]["help"])]
+            [
+                (
+                    "B",
+                    "4",
+                    "Auditee UEI",
+                    template["sheets"][0]["single_cells"][2]["help"],
+                )
+            ]
         )
         self.assertRaisesRegex(
             ValidationError, expected_msg, validate_corrective_action_plan_json, invalid
@@ -708,7 +715,14 @@ class AdditionalUeisValidatorTests(SimpleTestCase):
         template = json.loads(template_definition_path.read_text(encoding="utf-8"))
         invalid = json.loads('{"AdditionalUEIs":{}}')
         expected_msg = str(
-            [("B", "4", "Auditee UEI", template["sheets"][0]["single_cells"][2]["help"])]
+            [
+                (
+                    "B",
+                    "4",
+                    "Auditee UEI",
+                    template["sheets"][0]["single_cells"][2]["help"],
+                )
+            ]
         )
         self.assertRaisesRegex(
             ValidationError, expected_msg, validate_additional_ueis_json, invalid
@@ -732,7 +746,14 @@ class NotesToSefaValidatorTests(SimpleTestCase):
         template = json.loads(template_definition_path.read_text(encoding="utf-8"))
         invalid = json.loads('{"NotesToSefa":{}}')
         expected_msg = str(
-            [("B", "4", "Auditee UEI", template["sheets"][0]["single_cells"][2]["help"])]
+            [
+                (
+                    "B",
+                    "4",
+                    "Auditee UEI",
+                    template["sheets"][0]["single_cells"][2]["help"],
+                )
+            ]
         )
         self.assertRaisesRegex(
             ValidationError, expected_msg, validate_notes_to_sefa_json, invalid
@@ -756,7 +777,14 @@ class SecondaryAuditorsValidatorTests(SimpleTestCase):
         template = json.loads(template_definition_path.read_text(encoding="utf-8"))
         invalid = json.loads('{"SecondaryAuditors":{}}')
         expected_msg = str(
-            [("B", "4", "Auditee UEI", template["sheets"][0]["single_cells"][2]["help"])]
+            [
+                (
+                    "B",
+                    "4",
+                    "Auditee UEI",
+                    template["sheets"][0]["single_cells"][2]["help"],
+                )
+            ]
         )
         self.assertRaisesRegex(
             ValidationError, expected_msg, validate_secondary_auditors_json, invalid
