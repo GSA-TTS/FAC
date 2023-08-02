@@ -231,6 +231,11 @@ local Parts = {
         },
         'then': {
           allOf: [
+            {
+              properties: {
+                cluster_name: Base.Compound.ClusterNamesStateOther
+              },
+            },
             // IF we have OTHER_CLUSTER, THEN...
             //   - other_cluster_name is required
             //   - other_cluster_name must not be empty

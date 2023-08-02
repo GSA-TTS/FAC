@@ -37,6 +37,25 @@ parser = argparse.ArgumentParser()
 # before filling in the XLSX workbooks.
 FieldMap = NT('FieldMap', 'in_sheet in_db default type')
 
+# tools/workbook-generator/templates/additional-ueis-workbook.xlsx 
+# tools/workbook-generator/templates/audit-findings-text-workbook.xlsx 
+# tools/workbook-generator/templates/corrective-action-plan-workbook.xlsx 
+# tools/workbook-generator/templates/federal-awards-audit-findings-workbook.xlsx 
+# tools/workbook-generator/templates/federal-awards-workbook.xlsx 
+# tools/workbook-generator/templates/notes-to-sefa-workbook.xlsx 
+# tools/workbook-generator/templates/PLACE-TEMPLATE-FILES-HERE 
+# tools/workbook-generator/templates/secondary-auditors-workbook.xlsx
+
+templates = {
+    'AdditionalUEIs': 'additional-ueis-workbook.xlsx', 
+    'AuditFindingsText': 'audit-findings-text-workbook.xlsx',
+    'CAP': 'corrective-action-plan-workbook.xlsx',
+    'AuditFindings': 'federal-awards-audit-findings-workbook.xlsx',
+    'FederalAwards': 'federal-awards-workbook.xlsx',
+    'SEFA': 'notes-to-sefa-workbook.xlsx',
+    'SecondaryAuditors': 'secondary-auditors-workbook.xlsx'
+}
+
 def set_single_cell_range(wb, range_name, value):
     the_range = wb.defined_names[range_name]
     # The above returns a generator. Turn it to a list, and grab
@@ -142,7 +161,7 @@ def generate_dissemination_test_table(api_endpoint, dbkey, mappings, objects):
 ##########################################
 def generate_findings(dbkey, outdir):
     print("--- generate findings ---")
-    wb = pyxl.load_workbook('templates/findings-uniform-guidance-template.xlsx')
+    wb = pyxl.load_workbook(f'templates/{templates["AuditFindings"]}')
     mappings = [
        FieldMap('compliance_requirement', 'typerequirement', None, str), 
        FieldMap('reference_number', 'findingsrefnums', None, str),
@@ -198,7 +217,7 @@ def generate_findings(dbkey, outdir):
 ##########################################
 def generate_federal_awards(dbkey, outdir):
     print("--- generate federal awards ---")
-    wb = pyxl.load_workbook('templates/federal-awards-expended-template.xlsx')
+    wb = pyxl.load_workbook(f'templates/{templates["FederalAwards"]}')
     # In sheet : in DB
     mappings = [
         FieldMap('program_name', 'federalprogramname', None, str),
@@ -272,7 +291,7 @@ def generate_federal_awards(dbkey, outdir):
 ##########################################
 def generate_findings_text(dbkey, outdir):
     print("--- generate findings text ---")
-    wb = pyxl.load_workbook('templates/findings-text-template.xlsx')
+    wb = pyxl.load_workbook(f'templates/{templates["AuditFindingsText"]}')
     mappings = [
         FieldMap('reference_number', 'findingrefnums', None, str),
         FieldMap('text_of_finding', 'text', None, str),
@@ -292,7 +311,7 @@ def generate_findings_text(dbkey, outdir):
 ##########################################
 def generate_additional_ueis(dbkey, outdir):
     print("--- generate additional ueis ---")
-    wb = pyxl.load_workbook('templates/additional-ueis-template.xlsx')
+    wb = pyxl.load_workbook(f'templates/{templates["AdditionalUEIs"]}')
     mappings = [
         FieldMap('additional_uei', 'uei', None, str),
         #FieldMap('ueiseqnum', 'ueiseqnum', 0, int)
@@ -312,7 +331,7 @@ def generate_additional_ueis(dbkey, outdir):
 ##########################################
 def generate_notes_to_sefa(dbkey, outdir):
     print("--- generate notes to sefa ---")
-    wb = pyxl.load_workbook('templates/notes-to-sefa-template.xlsx')
+    wb = pyxl.load_workbook(f'templates/{templates["SEFA"]}')
     mappings = [
         #FieldMap('??', 'accounting_policies', None, str),
         #FieldMap('??', 'is_minimis_rate_used', None, str),
@@ -337,7 +356,7 @@ def generate_notes_to_sefa(dbkey, outdir):
 ##########################################
 def generate_secondary_auditors(dbkey, outdir):
     print("--- generate secondary auditors ---")
-    wb = pyxl.load_workbook('templates/secondary-auditors-template.xlsx')
+    wb = pyxl.load_workbook(f'templates/{templates["SecondaryAuditors"]}')
     mappings = [
         FieldMap('secondary_auditor_address_city', 'cpacity', None, str),
         FieldMap('secondary_auditor_contact_name', 'cpacontact', None, str),
@@ -367,7 +386,7 @@ def generate_secondary_auditors(dbkey, outdir):
 ##########################################
 def generate_captext(dbkey, outdir):
     print("--- generate corrective action plan ---")
-    wb = pyxl.load_workbook('templates/corrective-action-plan-template.xlsx')
+    wb = pyxl.load_workbook(f'templates/{templates["CAP"]}')
     mappings = [
         FieldMap('reference_number', 'findingrefnums', None, str),
         FieldMap('planned_action', 'text', None, str),

@@ -85,3 +85,7 @@ class Command(BaseCommand):
                     test_workbook(os.path.join(basepath, dbkey, file.format(dbkey)), 
                                 section, 
                                 client)
+                # Set the certification flags
+                # Invoke cross-validation
+                # Trigger dissemination/ETL
+                # Check against the JSON source of truth

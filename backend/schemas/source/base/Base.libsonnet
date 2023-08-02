@@ -452,6 +452,11 @@ local SchemaBase = Types.object {
       description: 'All cluster names',
       enum: ClusterNames.cluster_names + [Const.NA, Const.STATE_CLUSTER, Const.OTHER_CLUSTER],
     },
+    ClusterNamesStateOther: {
+      description: 'All cluster names',
+      enum: ClusterNames.cluster_names + [Const.STATE_CLUSTER, Const.OTHER_CLUSTER],
+    },
+
   },
   Validation: Validation,
   SchemaBase: SchemaBase,
