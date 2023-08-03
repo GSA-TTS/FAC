@@ -227,6 +227,21 @@ It can be changed to time-dependence after timestamp changes. -->
                         </p>
                     </div>
                 </li>
+                <!-- Cross Validation -->
+                <li class="usa-icon-list__item padding-bottom-2">
+                    <div class="usa-icon-list__icon text-base">
+                        <svg class="usa-icon margin-right-2" aria-hidden="true" role="img">
+                            {% uswds_sprite "radio_button_unchecked" %}
+                        </svg>
+                    </div>
+                    <div class="usa-icon-list__content text-base-dark">
+                        <a class="usa-link text-bold"
+                           href="/audit/cross-validation/{{ report_id | default_if_none:'' }}">Pre-submission validation</a>
+                        <p class="margin-0">
+                            Before submitting your audit, use our validation tool to check your workbooks for errors.
+                        </p>
+                    </div>
+                </li>
                 <!-- Ready for certification -->
                 <a href="{% url 'audit:ReadyForCertification' report_id=report_id %}">
                     <button class="usa-button">Ready for SF-SAC Certification</button>

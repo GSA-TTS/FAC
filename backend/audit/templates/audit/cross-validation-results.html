@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+<div class="grid-container margin-top-6">
+  <div class="grid-row grid-gap">
+      <form class="usa-form usa-form--large" id="cross-validation" method="post">
+          {% csrf_token %}
+          <fieldset class="usa-fieldset">
+              <legend class="usa-legend usa-legend--large" id="federal-awards">
+                  Cross Validation Results
+              </legend>
+              <fieldset class="usa-fieldset">
+                {% if errors.errors %}
+                <p>While validating across sheets we encountered the errors below. You must correct these errors in order to proceed to certification.</p>
+                <p>Errors:</p>
+                <pre>{{ errors.errors | pprint}}</pre>
+                <p>Data submitted:</p>
+                <pre>{{ errors.data | pprint}}</pre>
+                <p>Audit {{ report_id }} has a submission status of: {{ submission_status }}</p>
+                {% else %}
+                Looks good!
+                {% endif %}
+            </fieldset>
+          </fieldset>
+      </form>
+  </div>
+</div>
+{% endblock content %}
