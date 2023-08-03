@@ -38,13 +38,13 @@ jobs:
       environment: "dev"
     secrets: inherit
 
-  deploy-infastructure-management:
-    name: Deploy infrastructure (management)
+  deploy-infastructure-meta:
+    name: Deploy infrastructure (meta)
     needs:
       - testing
     uses: ./.github/workflows/terraform-apply-env.yml
     with:
-      environment: "management"
+      environment: "meta"
     secrets: inherit
 
   deploy-dev:
