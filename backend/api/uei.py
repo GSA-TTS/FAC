@@ -1,7 +1,8 @@
 from typing import Optional
-import requests
+import environs
 import ssl
 import urllib3
+import requests
 
 from config.settings import SAM_API_URL, SAM_API_KEY
 
@@ -15,6 +16,9 @@ class CustomHttpAdapter(requests.adapters.HTTPAdapter):
 
     def proxy_manager_for(self, *args, **kwargs):
         kwargs["ssl_context"] = self.ssl_context
+        proxy = environs.Env().get("https_proxy")
+        if proxy:
+            return super().proxy_manager_for(proxy, *args, **kwargs)
         return super().proxy_manager_for(*args, **kwargs)
 
     def init_poolmanager(self, connections, maxsize, block=False, *args, **kwargs):
