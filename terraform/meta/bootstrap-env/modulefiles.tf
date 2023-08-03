@@ -1,10 +1,3 @@
-locals {
-  # These files are kept tightly in sync with the backend config
-  managed_files = toset([
-    "providers.tf",
-  ])
-}
-
 # Leave a script for properly initializing when running locally
 resource "local_file" "initialization_script" {
   filename        = "${local.path}/init.sh"
@@ -12,6 +5,10 @@ resource "local_file" "initialization_script" {
   content         = <<-EOF
   #!/bin/bash
 
+  # The content of this file is managed by Terraform. If you modify it, it may
+  # be reverted the next time Terraform runs. If you want to make changes, do it
+  # in ../meta/bootstrap-env/templates.
+  
   set -e
   terraform init \
     --backend-config=../shared/config/backend.tfvars \
@@ -19,20 +16,11 @@ resource "local_file" "initialization_script" {
   EOF
 }
 
-resource "local_file" "managed_files" {
-  for_each        = local.managed_files
-  filename        = "${local.path}/${each.key}"
-  file_permission = "0644"
-  content = templatefile("${path.module}/templates/${each.key}-template",
-    { name = var.name }
-  )
-}
-
 resource "local_file" "main-tf" {
   lifecycle {
     ignore_changes = all
   }
-  filename        = "${local.path}/${var.name}.tf"
+  filename        = "${local.path}/${var.name}.tf-example"
   file_permission = "0644"
   content = templatefile("${path.module}/templates/main.tf-template",
     { name = var.name }
@@ -40,12 +28,17 @@ resource "local_file" "main-tf" {
 }
 
 resource "local_file" "variables-tf" {
-  lifecycle {
-    ignore_changes = all
-  }
-  filename        = "${local.path}/variables.tf"
+  filename        = "${local.path}/variables-managed.tf"
   file_permission = "0644"
   content = templatefile("${path.module}/templates/variables.tf-template",
+    { name = var.name }
+  )
+}
+
+resource "local_file" "providers-tf" {
+  filename        = "${local.path}/providers-managed.tf"
+  file_permission = "0644"
+  content = templatefile("${path.module}/templates/providers.tf-template",
     { name = var.name }
   )
 }
