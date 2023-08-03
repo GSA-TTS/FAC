@@ -4,6 +4,7 @@
     "error": {
         "code": 400,
         "description": "The file upload request was invalid",
-        "error_type": "Field Error: undefined"
+        "type": "error_field",
+        "message": "Field Error: undefined"
     }
 }
