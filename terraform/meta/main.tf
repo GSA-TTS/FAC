@@ -6,6 +6,7 @@ module "environments" {
   developers = local.developers
   managers   = local.managers
   asgs       = tolist(local.internal_asgs)
+  reponame   = "GSA-TTS/FAC"
 }
 
 module "environments-egress" {
