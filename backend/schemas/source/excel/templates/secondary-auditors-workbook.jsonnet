@@ -167,8 +167,6 @@ local sheets = [
     single_cells: single_cells,
     header_height: 60,
     hide_col_from: 3,
-    //Hiding rows seems to create massive workbooks
-    //hide_row_from: 4,
   },
   {
     name: textSheet,

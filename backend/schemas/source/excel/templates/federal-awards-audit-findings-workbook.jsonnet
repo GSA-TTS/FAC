@@ -194,8 +194,6 @@ local sheets = [
     single_cells: single_cells,
     header_height: 60,
     hide_col_from: 3,
-    //FIXME MSHD: commented this out until we figure out if it is needed
-    //hide_row_from: 3,
   },
   {
     name: findingSheet,
