@@ -44,7 +44,7 @@ class ETL:
         if len(df) == 0:
             print(f"No matching rows in {table}")
             return 0
-        print(f"Processing {len(df)} rows in {table}")
+        # print(f"Processing {len(df)} rows in {table}")
 
         df = c2g_mapper.apply_mappings_to_df(df, make_report_id)
 

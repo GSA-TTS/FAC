@@ -507,10 +507,25 @@ class General(models.Model):
         null=True,
         max_length=30,
     )
+    hist_auditee_duns = models.CharField(
+        "Primary Employer Identification Number",
+        null=True,
+        max_length=30,
+    )
     auditee_uei = models.CharField(
         "", max_length=30, null=True, help_text=docs.uei_general
     )
     auditee_addl_uei_list = ArrayField(
+        models.CharField("", null=True, max_length=30, help_text=docs.uei_general),
+        null=True,
+        default=list,
+    )
+    hist_auditee_addl_ein_list = ArrayField(
+        models.CharField("", null=True, max_length=30, help_text=docs.uei_general),
+        null=True,
+        default=list,
+    )
+    hist_auditee_addl_duns_list = ArrayField(
         models.CharField("", null=True, max_length=30, help_text=docs.uei_general),
         null=True,
         default=list,

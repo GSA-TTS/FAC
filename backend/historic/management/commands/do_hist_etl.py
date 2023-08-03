@@ -26,5 +26,4 @@ class Command(BaseCommand):
             return
 
         etl = ETL(audit_year=audit_year)
-        etl.load_general()
-        etl.load_award()
+        etl.load_history()
