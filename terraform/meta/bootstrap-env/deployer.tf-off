@@ -1,5 +1,5 @@
 locals {
-  populate_creds_locally    = true
+  populate_creds_locally    = false
   deployer_service_instance = "${var.name}-deployer"
   deployer_service_key      = "${local.deployer_service_instance}-key"
   deployer_creds            = cloudfoundry_service_key.deployer_creds.credentials
