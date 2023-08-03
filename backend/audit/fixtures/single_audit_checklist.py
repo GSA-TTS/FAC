@@ -3,9 +3,10 @@
 We want to create a variety of SACs in different states of
 completion.
 """
-
-import logging
 from datetime import date, timedelta
+import logging
+import re
+from pathlib import Path
 
 from django.apps import apps
 from django.conf import settings
@@ -13,7 +14,11 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 
 from faker import Faker
 
-import audit.excel
+from audit.excel import (
+    extract_federal_awards,
+    extract_findings_uniform_guidance,
+    extract_findings_text
+)
 import audit.validators
 
 from audit.fixtures.excel import FORM_SECTIONS
@@ -142,6 +147,63 @@ def _post_create_federal_awards(this_sac, this_user):
     logger.info("Created Federal Awards workbook upload for SAC %s", this_sac.id)
 
 
+extract_mapping = {
+    FORM_SECTIONS.FEDERAL_AWARDS_EXPENDED : extract_federal_awards,
+    FORM_SECTIONS.FINDINGS_UNIFORM_GUIDANCE : extract_findings_uniform_guidance,
+    FORM_SECTIONS.FINDINGS_TEXT : extract_findings_text
+}
+
+validator_mapping = {
+    FORM_SECTIONS.FEDERAL_AWARDS_EXPENDED : audit.validators.validate_federal_award_json,
+    FORM_SECTIONS.FINDINGS_UNIFORM_GUIDANCE : audit.validators.validate_findings_uniform_guidance_json,
+    FORM_SECTIONS.FINDINGS_TEXT : audit.validators.validate_findings_text_json
+}
+
+def _post_upload_workbook(this_sac, this_user, section, xlsx_filename):
+    """Upload a workbook for this SAC.
+
+    This should be idempotent if it is called on a SAC that already
+    has a federal awards file uploaded.
+    """
+    ExcelFile = apps.get_model("audit.ExcelFile")
+
+    if (
+        ExcelFile.objects.filter(
+            sac_id=this_sac.id, form_section=section
+        ).exists()
+        and this_sac.federal_awards is not None
+    ):
+        # there is already an uploaded file and data in the object so
+        # nothing to do here
+        return
+
+    with open(xlsx_filename, "rb") as f:
+        content = f.read()
+    file = SimpleUploadedFile(xlsx_filename, content, "application/vnd.ms-excel")
+    excel_file = ExcelFile(
+        file=file,
+        filename=Path(xlsx_filename).stem,
+        user=this_user,
+        sac_id=this_sac.id,
+        form_section=section,
+    )
+    excel_file.full_clean()
+    excel_file.save()
+
+    audit_data = extract_mapping[section](excel_file.file)
+    validator_mapping[section](audit_data)
+
+    if section == FORM_SECTIONS.FEDERAL_AWARDS_EXPENDED:
+        this_sac.federal_awards = audit_data
+    elif section == FORM_SECTIONS.FINDINGS_UNIFORM_GUIDANCE:
+        this_sac.findings_uniform_guidance = audit_data
+    elif section == FORM_SECTIONS.FINDINGS_TEXT:
+        this_sac.findings_text = audit_data
+
+    this_sac.save()
+
+    logger.info("Created Federal Awards workbook upload for SAC %s", this_sac.id)
+    
 # list of the default SingleAuditChecklists to create for each user
 # The auditee name is used to disambiguate them, so it must be unique
 # or another SAC won't be created.
@@ -152,12 +214,32 @@ SACS = [
     {"auditee_name": "SAC in progress"},
     {
         "auditee_name": "Federal awards submitted",
-        "post_create_callable": _post_create_federal_awards,
+        "post_upload_workbook": {
+            "section": FORM_SECTIONS.FEDERAL_AWARDS_EXPENDED,
+            "regex": "federal-awards"
+        }
+    },
+    {
+        "auditee_name": "All workbooks submitted",
+        "post_upload_workbooks": [
+            {
+            "section": FORM_SECTIONS.FEDERAL_AWARDS_EXPENDED,
+            "regex": "federal-awards"
+            },
+            {
+            "section": FORM_SECTIONS.FINDINGS_UNIFORM_GUIDANCE,
+            "regex": "findings-[0-9]+"
+            },
+            {
+            "section": FORM_SECTIONS.FINDINGS_TEXT,
+            "regex": "findings-text"
+            },
+        ]
     },
 ]
 
 
-def _load_single_audit_checklists_for_user(user):
+def _load_single_audit_checklists_for_user(user, workbooks):
     """Create SACs for a given user."""
     logger.info("Creating single audit checklists for %s", user)
     SingleAuditChecklist = apps.get_model("audit.SingleAuditChecklist")
@@ -171,6 +253,29 @@ def _load_single_audit_checklists_for_user(user):
             sac = _create_sac(user, auditee_name)
         if "post_create_callable" in item_info:
             item_info["post_create_callable"](sac, user)
+        if workbooks and ("post_upload_workbook" in item_info):
+            # The workbooks directory will contain a list of files.
+            # We need to match them based on filename. 
+            section = item_info["post_upload_workbook"]["section"]
+            regex = item_info["post_upload_workbook"]["regex"]
+            # Grab the first filename matching the regex
+            file = list(filter(lambda f: re.search(regex, f), workbooks))[0]
+            _post_upload_workbook(sac, user, section, file)
+        if workbooks and ("post_upload_workbooks" in item_info):
+            for wb in item_info["post_upload_workbooks"]:
+                section = wb["section"]
+                regex = wb["regex"]
+                print(f"{section} Looking for {regex} in {workbooks}")
+                workbook_names = list(map(lambda full: (full, Path(full).stem), workbooks))
+                print(workbook_names)
+                filtered = list(filter(lambda ftuple: re.search(regex, ftuple[1]), workbook_names))
+                print(filtered)
+                file = filtered.pop()
+                print("################")
+                print(f"## Loading workbook {file}")
+                print("################")
+                _post_upload_workbook(sac, user, section, file[0])
+
 
 
 def load_single_audit_checklists():
@@ -182,7 +287,7 @@ def load_single_audit_checklists():
         _load_single_audit_checklists_for_user(user)
 
 
-def load_single_audit_checklists_for_email_address(user_email):
+def load_single_audit_checklists_for_email_address(user_email, workbooks):
     """Load example SACs for user with this email address."""
 
     try:
@@ -191,4 +296,4 @@ def load_single_audit_checklists_for_email_address(user_email):
         logger.info("No user found for %s, have you logged in once?", user_email)
         return
 
-    _load_single_audit_checklists_for_user(user)
+    _load_single_audit_checklists_for_user(user, workbooks)

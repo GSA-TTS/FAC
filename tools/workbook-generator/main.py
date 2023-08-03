@@ -183,7 +183,6 @@ def generate_findings(dbkey, outdir):
     cfdas = Cfda.select(Cfda.elecauditsid).where(Cfda.dbkey == g.dbkey)
     findings = Findings.select().where(Findings.dbkey == g.dbkey)
 
-    #set_uei(wb, dbkey)
     map_simple_columns(wb, mappings, findings)
 
     # For each of them, I need to generate an elec -> award mapping.
@@ -271,6 +270,13 @@ def generate_federal_awards(dbkey, outdir):
             passthrough_ids.append('')
     set_range(wb, 'passthrough_name', passthrough_names)
     set_range(wb, 'passthrough_identifying_number', passthrough_ids)
+
+    # Total amount expended must be calculated and inserted
+    total = 0
+    for cfda in cfdas:
+        total += int(cfda.amount)
+    set_single_cell_range(wb, 'total_amount_expended', total)
+
     wb.save(os.path.join(outdir, f'federal-awards-{dbkey}.xlsx'))
 
     table = generate_dissemination_test_table('federal_awards', dbkey, mappings, cfdas)
@@ -287,6 +293,7 @@ def generate_federal_awards(dbkey, outdir):
         obj['fields'].append('passthrough_identifying_number')
         obj['values'].append(id)
     table['singletons']['auditee_uei'] = g.uei
+    table['singletons']['total_amount_expended'] = total
 
     return table
 
