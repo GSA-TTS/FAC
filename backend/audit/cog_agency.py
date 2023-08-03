@@ -76,9 +76,17 @@ def cog_over_assignment(audit_data):
 
     if tot_amount_expended > 50000000:
         # Cognizant agency
-        # Use 2019 Base year submission data
         ######## To do next
-        pass
+        ####### Use 2019 Base year submission data
+        data_2019 = False  #For now
+        if data_2019:
+            pass
+        else:
+            if tot_da_amount_expended >= 0.25 * tot_amount_expended:
+                cog_agency, val = tot_da_amount_agency[0]
+            else:
+                cog_agency, val = tot_amount_agency[0]
+            print("cognizant agency = ", cog_agency)
     else:
         # Oversight agency
         if tot_da_amount_expended >= 0.25 * tot_amount_expended:
