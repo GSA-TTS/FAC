@@ -33,7 +33,7 @@ def get_agency_names():
 
 def get_gaap_results():
     sonnet = "./schemas/source/base/GAAP.libsonnet"
-    json_str = _jsonnet.evaluate_snippet(sonnet, open(sonnet).read())
+    json_str = _jsonnet.evaluate_file(sonnet)
     jobj = json.loads(json_str)
     # Returns a list of dictionaries with the keys 'tag' and 'readable'
     return jobj["gaap_results"]

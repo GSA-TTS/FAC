@@ -549,15 +549,15 @@ class AuditInfoFormView(SingleAuditChecklistAccessRequiredMixin, generic.View):
 
             if form.is_valid():
                 form.clean_booleans()
-                print("look at me", form.cleaned_data)
 
                 audit_information = sac.audit_information or {}
-                logger.warn(form.cleaned_data)
                 audit_information.update(form.cleaned_data)
-
                 validated = validate_audit_information_json(audit_information)
                 sac.audit_information = validated
                 sac.save()
+
+                logger.info("Audit info form saved.", form.cleaned_data)
+
                 return redirect(reverse("audit:SubmissionProgress", args=[report_id]))
             else:
                 logger.warn(form.errors)
