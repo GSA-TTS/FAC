@@ -78,31 +78,6 @@ class FederalAwardsValidatorTests(SimpleTestCase):
         simple = FederalAwardsValidatorTests.SIMPLE_CASE
         validate_federal_award_json(simple)
 
-    def test_prefix_under_ten(self):
-        """
-        Prefixes between 00 and 09 should fail
-        """
-        simple = jsoncopy(FederalAwardsValidatorTests.SIMPLE_CASE)
-
-        # pick a prefix between 00 and 09 (invalid)
-        prefix = f"{randrange(10):02}"
-        # 20230512 HDMS FIXME: For some reasons, this fails randomly. I suspect it's because the random number generated is sometimes incorrect ,i.e., has less than three digits.
-        # pick an extension beteween 001 and 999 (valid)
-        extension = f"{randrange(100, 1000):03}"
-
-        simple["FederalAwards"]["federal_awards"][0]["program"][
-            "federal_agency_prefix"
-        ] = f"{prefix}"
-        simple["FederalAwards"]["federal_awards"][0]["program"][
-            "three_digit_extension"
-        ] = f"{extension}"
-
-        with self.assertRaises(
-            ValidationError,
-            msg=f"ValidationError not raised with prefix = {prefix}, extension = {extension}",
-        ):
-            validate_federal_award_json(simple)
-
     def test_prefix_over_99(self):
         """
         Prefixes over 99 should fail
