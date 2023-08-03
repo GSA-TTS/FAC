@@ -1,5 +1,5 @@
 module "environments" {
-  for_each   = toset(local.spaces)
+  for_each   = local.spaces
   source     = "./bootstrap-env"
   name       = each.key
   org_name   = local.org_name
@@ -7,4 +7,5 @@ module "environments" {
   managers   = local.managers
   asgs       = tolist(local.internal_asgs)
   reponame   = "GSA-TTS/FAC"
+  allow_ssh  = lookup(each.value, "allow_ssh", true)
 }

@@ -14,7 +14,7 @@ resource "cloudfoundry_space" "space" {
   org  = data.cloudfoundry_org.org.id
 
   # Disallow SSH access for the special name production
-  allow_ssh = var.name != "production" && var.name != "production-egress"
+  allow_ssh = var.allow_ssh
 
   asgs = [for d in var.asgs : d]
 

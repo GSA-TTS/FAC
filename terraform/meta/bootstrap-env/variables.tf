@@ -33,3 +33,9 @@ variable "reponame" {
   type        = string
   description = "the OWNER/REPOSITORY in GitHub where deployer secrets for the environment should be set up"
 }
+
+variable "allow_ssh" {
+  type        = bool
+  description = "whether SSH should be enabled in the space (and corresponding egress space)"
+  default     = true
+}
