@@ -13,7 +13,11 @@ class CustomHttpAdapter(requests.adapters.HTTPAdapter):
         self.ssl_context = ssl_context
         super().__init__(**kwargs)
 
-    def init_poolmanager(self, connections, maxsize, block=False):
+    def proxy_manager_for(self, *args, **kwargs):
+        kwargs["ssl_context"] = self.ssl_context
+        return super().proxy_manager_for(*args, **kwargs)
+
+    def init_poolmanager(self, connections, maxsize, block=False, *args, **kwargs):
         self.poolmanager = urllib3.poolmanager.PoolManager(
             num_pools=connections,
             maxsize=maxsize,
