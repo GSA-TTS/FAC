@@ -36,6 +36,7 @@ jobs:
     uses: ./.github/workflows/terraform-apply-env.yml
     with:
       environment: "dev"
+      autoapprove: false
     secrets: inherit
 
   deploy-infastructure-meta:
@@ -45,6 +46,7 @@ jobs:
     uses: ./.github/workflows/terraform-apply-env.yml
     with:
       environment: "meta"
+      autoapprove: false
     secrets: inherit
 
   deploy-dev:

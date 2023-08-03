@@ -18,23 +18,15 @@ jobs:
     with:
         url: "https://fac-dev.app.cloud.gov/"
 
-  terraform-plan:
-    needs:
-      - scan-dev
-    uses: ./.github/workflows/terraform-plan-env.yml
-    with:
-        environment: "preview"
-    secrets: inherit
-
   deploy-infrastructure-preview:
     name: Deploy infrastructure (preview)
     needs:
-      - terraform-plan
       - testing
       - scan-dev
     uses: ./.github/workflows/terraform-apply-env.yml
     with:
         environment: "preview"
+        autoapprove: true
     secrets: inherit
 
   deploy-preview:

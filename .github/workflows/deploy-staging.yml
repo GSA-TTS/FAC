@@ -28,6 +28,7 @@ jobs:
     uses: ./.github/workflows/terraform-apply-env.yml
     with:
       environment: "staging"
+      autoapprove: false
     secrets: inherit
 
   deploy-staging:
