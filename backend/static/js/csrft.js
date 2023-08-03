@@ -1,3 +1,3 @@
-export const getCookie = (name) => {
+export const getCookie = () => {
   return document.querySelector('[name=csrfmiddlewaretoken]').value;
 };
