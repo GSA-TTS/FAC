@@ -5,7 +5,7 @@ module "environments" {
   org_name   = local.org_name
   developers = local.developers
   managers   = local.managers
-  asgs       = local.asgs
+  asgs       = tolist(local.internal_asgs)
 }
 
 module "environments-egress" {
