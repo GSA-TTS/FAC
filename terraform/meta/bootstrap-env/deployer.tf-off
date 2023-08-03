@@ -33,23 +33,23 @@ resource "local_sensitive_file" "deployer_creds" {
   EOF
 }
 
-data "github_repository" "repo" {
-  full_name = var.reponame
-}
+# data "github_repository" "repo" {
+#   full_name = var.reponame
+# }
 
-resource "github_actions_environment_secret" "cf_username" {
-  count           = var.populate_creds_in_github ? 1 : 0
-  repository      = data.github_repository.repo.name
-  environment     = var.name
-  secret_name     = "CF_USERNAME"
-  plaintext_value = local.deployer_creds["username"]
-}
+# resource "github_actions_environment_secret" "cf_username" {
+#   count           = var.populate_creds_in_github ? 1 : 0
+#   repository      = data.github_repository.repo.name
+#   environment     = var.name
+#   secret_name     = "CF_USERNAME"
+#   plaintext_value = local.deployer_creds["username"]
+# }
 
-resource "github_actions_environment_secret" "cf_password" {
-  count           = var.populate_creds_in_github ? 1 : 0
-  repository      = data.github_repository.repo.name
-  environment     = var.name
-  secret_name     = "CF_PASSWORD"
-  plaintext_value = local.deployer_creds["password"]
-}
+# resource "github_actions_environment_secret" "cf_password" {
+#   count           = var.populate_creds_in_github ? 1 : 0
+#   repository      = data.github_repository.repo.name
+#   environment     = var.name
+#   secret_name     = "CF_PASSWORD"
+#   plaintext_value = local.deployer_creds["password"]
+# }
 
