@@ -30,15 +30,11 @@ resource "local_file" "main-tf" {
 resource "local_file" "variables-tf" {
   filename        = "${local.path}/variables-managed.tf"
   file_permission = "0644"
-  content = templatefile("${path.module}/templates/variables.tf-template",
-    { name = var.name }
-  )
+  content = file("${path.module}/templates/variables.tf-template")
 }
 
 resource "local_file" "providers-tf" {
   filename        = "${local.path}/providers-managed.tf"
   file_permission = "0644"
-  content = templatefile("${path.module}/templates/providers.tf-template",
-    { name = var.name }
-  )
+  content = file("${path.module}/templates/providers.tf-template")
 }
