@@ -4,6 +4,7 @@ locals {
     "dev",
     "staging",
     "production",
+    "preview",
   ]
 
   # All spaces have the same SpaceDevelopers for now
