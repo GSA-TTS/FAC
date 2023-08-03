@@ -213,6 +213,22 @@ def validate_general_information_json(value):
     return value
 
 
+def validate_audit_information_json(value):
+    """
+    Apply JSON Schema for audit information and report errors.
+    """
+    schema_path = settings.SECTION_SCHEMA_DIR / "AuditInformation.schema.json"
+    schema = json.loads(schema_path.read_text(encoding="utf-8"))
+
+    try:
+        validate(value, schema, format_checker=FormatChecker())
+    except JSONSchemaValidationError as err:
+        raise ValidationError(
+            _(err.message),
+        ) from err
+    return value
+
+
 def validate_secondary_auditors_json(value):
     """
     Apply JSON Schema for secondary auditors and report errors.

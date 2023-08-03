@@ -25,7 +25,10 @@ SECTION_SCHEMA_DIR = settings.SECTION_SCHEMA_DIR
 
 # Simplest way to create a new copy of simple case rather than getting
 # references to things used by other tests:
-jsoncopy = lambda v: json.loads(json.dumps(v))
+
+
+def jsoncopy(v):
+    return json.loads(json.dumps(v))
 
 
 def validate(instance, schema):
@@ -276,8 +279,10 @@ class GeneralInformationSchemaValidityTest(SimpleTestCase):
         bad_zips = [
             f"{valid_zip}-{randrange(10000):05}",  # +4 too long
             f"{valid_zip}-{randrange(1000):03}",  # +4 too short
-            f"{valid_zip}-{''.join(choice(string.ascii_letters) for i in range(4))}",  # contains letters
-            f"{valid_zip}-{''.join(choice(string.punctuation) for i in range(4))}",  # contains symbols
+            # contains letters
+            f"{valid_zip}-{''.join(choice(string.ascii_letters) for i in range(4))}",
+            # contains symbols
+            f"{valid_zip}-{''.join(choice(string.punctuation) for i in range(4))}",
         ]
 
         for zip_field in ["auditee_zip", "auditor_zip"]:
@@ -302,12 +307,18 @@ class GeneralInformationSchemaValidityTest(SimpleTestCase):
 
         good_phones_wo_country_code = [
             f"{randrange(10000000000):010}",  # e.g. 5555555555
-            f"{randrange(1000):03}-{randrange(1000):03}-{randrange(10000):04}",  # e.g. 555-555-5555
-            f"{randrange(1000):03}.{randrange(1000):03}.{randrange(10000):04}",  # e.g. 555.555.5555
-            f"{randrange(1000):03} {randrange(1000):03} {randrange(10000):04}",  # e.g. 555 555 5555
-            f"({randrange(1000):03})-{randrange(1000):03}-{randrange(10000):04}",  # e.g. (555)-555-5555
-            f"({randrange(1000):03}).{randrange(1000):03}.{randrange(10000):04}",  # e.g. (555).555.5555
-            f"({randrange(1000):03}) {randrange(1000):03} {randrange(10000):04}",  # e.g. (555) 555 5555
+            # e.g. 555-555-5555
+            f"{randrange(1000):03}-{randrange(1000):03}-{randrange(10000):04}",
+            # e.g. 555.555.5555
+            f"{randrange(1000):03}.{randrange(1000):03}.{randrange(10000):04}",
+            # e.g. 555 555 5555
+            f"{randrange(1000):03} {randrange(1000):03} {randrange(10000):04}",
+            # e.g. (555)-555-5555
+            f"({randrange(1000):03})-{randrange(1000):03}-{randrange(10000):04}",
+            # e.g. (555).555.5555
+            f"({randrange(1000):03}).{randrange(1000):03}.{randrange(10000):04}",
+            # e.g. (555) 555 5555
+            f"({randrange(1000):03}) {randrange(1000):03} {randrange(10000):04}",
         ]
 
         good_phones_w_country_code = [f"+1 {p}" for p in good_phones_wo_country_code]
@@ -350,6 +361,163 @@ class GeneralInformationSchemaValidityTest(SimpleTestCase):
                         msg=f"ValidationError not raised with phone = {bad_phone}",
                     ):
                         validate(instance, schema)
+
+
+class AuditInformationSchemaValidityTest(SimpleTestCase):
+    AUDIT_INFO_SCHEMA = json.loads(
+        (SECTION_SCHEMA_DIR / "AuditInformation.schema.json").read_text(
+            encoding="utf-8"
+        )
+    )
+
+    SIMPLE_CASE = json.loads(SIMPLE_CASES_TEST_FILE.read_text(encoding="utf-8"))[
+        "AuditInformationCase"
+    ]
+
+    def test_schema(self):
+        """Try to test Audit Info schema."""
+        schema = self.AUDIT_INFO_SCHEMA
+        validate(self.SIMPLE_CASE, schema)
+
+    def test_all_booleans(self):
+        schema = self.AUDIT_INFO_SCHEMA
+        simple_case = jsoncopy(self.SIMPLE_CASE)
+
+        boolean_fields = [
+            "is_going_concern_included",
+            "is_internal_control_deficiency_disclosed",
+            "is_internal_control_material_weakness_disclosed",
+            "is_material_noncompliance_disclosed",
+            "is_aicpa_audit_guide_included",
+            "is_low_risk_auditee",
+        ]
+        for value in [True, False]:
+            for field in boolean_fields:
+                simple_case[field] = value
+                validate(simple_case, schema)
+
+    def test_all_gaap_results(self):
+        schema = self.AUDIT_INFO_SCHEMA
+        simple_case = jsoncopy(self.SIMPLE_CASE)
+        gaap_results = [
+            "unmodified_opinion",
+            "qualified_opinion",
+            "adverse_opinion",
+            "disclaimer_of_opinion",
+            "not_gaap",
+        ]
+
+        for result in gaap_results:
+            simple_case["gaap_results"] = [result]
+            validate(simple_case, schema)
+
+        for _ in range(10):
+            for n in range(2, 5):
+                ls = random.sample(gaap_results, n)
+                simple_case["gaap_results"] = ls
+                validate(simple_case, schema)
+
+    def test_bad_gaap_results(self):
+        schema = self.AUDIT_INFO_SCHEMA
+        simple_case = jsoncopy(self.SIMPLE_CASE)
+        not_gaap_values = [
+            "state",
+            "local",
+            "tribal",
+            "higher-ed",
+            "non-profit",
+            "unknown",
+            "none",
+        ]
+
+        for word in not_gaap_values:
+            simple_case["gaap_results"] = [word]
+            self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
+
+    def test_valid_aln_prefixes(self):
+        schema = self.AUDIT_INFO_SCHEMA
+        simple_case = jsoncopy(self.SIMPLE_CASE)
+        # Why "likely?" I have no idea what is authoritative.
+        # Fix the tests as we discover changes, and update the
+        # validation schema while we're at it.
+        likely_valid_aln_prefixes = [
+            "10",
+            "11",
+            "12",
+            "13",
+            "14",
+            "15",
+            "16",
+            "17",
+            "18",
+            "19",
+            "20",
+            "21",
+            "22",
+            "23",
+            "27",
+            "29",
+            "30",
+            "32",
+            "33",
+            "34",
+            "36",
+            "39",
+            "40",
+            "41",
+            "42",
+            "43",
+            "44",
+            "45",
+            "46",
+            "47",
+            "53",
+            "57",
+            "58",
+            "59",
+            "60",
+            "61",
+            "62",
+            "64",
+            "66",
+            "68",
+            "70",
+            "77",
+            "78",
+            "81",
+            "82",
+            "83",
+            "84",
+            "85",
+            "86",
+            "87",
+            "88",
+            "89",
+            "90",
+            "91",
+            "92",
+            "93",
+            "94",
+            "96",
+            "97",
+            "98",
+            "99",
+        ]
+        likely_invalid_aln_prefixes = ["24", "25", "26", "35"]
+
+        for _ in range(10):
+            for n in range(2, 10):
+                ls = random.sample(likely_valid_aln_prefixes, n)
+                simple_case["agencies"] = ls
+                validate(simple_case, schema)
+
+        for _ in range(10):
+            for n in range(2, 3):
+                ls = random.sample(likely_invalid_aln_prefixes, n)
+                simple_case["agencies"] = ls
+                self.assertRaises(
+                    exceptions.ValidationError, validate, simple_case, schema
+                )
 
 
 class FederalAwardsSchemaValidityTest(SimpleTestCase):

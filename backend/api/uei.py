@@ -1,7 +1,7 @@
 from typing import Optional
-import requests
 import ssl
 import urllib3
+import requests
 
 from config.settings import SAM_API_URL, SAM_API_KEY
 
@@ -17,7 +17,7 @@ class CustomHttpAdapter(requests.adapters.HTTPAdapter):
         kwargs["ssl_context"] = self.ssl_context
         return super().proxy_manager_for(*args, **kwargs)
 
-    def init_poolmanager(self, connections, maxsize, block=False, *args, **kwargs):
+    def init_poolmanager(self, connections, maxsize, block=False):
         self.poolmanager = urllib3.poolmanager.PoolManager(
             num_pools=connections,
             maxsize=maxsize,
