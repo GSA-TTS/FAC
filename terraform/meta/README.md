@@ -8,10 +8,11 @@ environments. In an initial bring-up or contingency recovery situation:
 After that you should be able to run `terraform apply` whenever needed.
 
 Among other things, this module...
-- configures the spaces for dev, staging, and production
+- Configures the environment modules consistently
+- (future) configures the spaces for dev, staging, and production
   - _See https://github.com/cloudfoundry-community/terraform-provider-cloudfoundry/issues/436_
-- configures user access to those spaces
-- configures application security groups (ASGs) for the spaces
+- (future) configures user access to those spaces
+- (future) configures application security groups (ASGs) for the spaces
   - _See https://github.com/cloudfoundry-community/terraform-provider-cloudfoundry/issues/405_
 - ensures the production space does not have SSH enabled
 - (future) sets up the deployer cred secrets in the corresponding GitHub environment
