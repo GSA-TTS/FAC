@@ -78,3 +78,10 @@ import 'cypress-file-upload';
 //     )
 //     cy.url().should('contain', 'https://idp.int.identitysandbox.gov/login/two_factor/authenticator');
 // })
+//
+
+import { testLoginGovLogin } from './login-gov.js';
+
+Cypress.Commands.add('login', () => {
+  testLoginGovLogin();
+})
