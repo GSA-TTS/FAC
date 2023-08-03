@@ -3,6 +3,7 @@ from collections import namedtuple as NT
 from pathlib import Path
 from playhouse.shortcuts import model_to_dict, dict_to_model
 import os
+import re
 import sys
 
 import argparse
@@ -137,12 +138,15 @@ def dbkey_to_report_id(dbkey):
     return f'{g.audityear}{month}{dbkey.zfill(10)}'
 
 def generate_dissemination_test_table(api_endpoint, dbkey, mappings, objects):
-    table = []
+    table = {
+        'rows': list(),
+        'singletons': dict()
+    }
+    table['endpoint'] = api_endpoint
+    table['report_id'] = dbkey_to_report_id(dbkey)
     for o in objects:
         as_dict = model_to_dict(o)
         test_obj = {}
-        test_obj['endpoint'] = api_endpoint
-        test_obj['report_id'] = dbkey_to_report_id(dbkey)
         test_obj['fields'] = []
         test_obj['values'] = []
         for m in mappings:
@@ -150,7 +154,7 @@ def generate_dissemination_test_table(api_endpoint, dbkey, mappings, objects):
             if ((m.in_db in as_dict) and as_dict[m.in_db] is not None) and (as_dict[m.in_db] != ""):               
                 test_obj['fields'].append(m.in_sheet)
                 test_obj['values'].append(as_dict[m.in_db])
-        table.append(test_obj)
+        table['rows'].append(test_obj)
     return table
 
 
@@ -204,7 +208,7 @@ def generate_findings(dbkey, outdir):
     
     table = generate_dissemination_test_table('findings', dbkey, mappings, findings)
     # Add the award references to the objects.
-    for obj, ar in zip(table, award_references):
+    for obj, ar in zip(table['rows'], award_references):
         obj['fields'].append('award_reference')
         obj['values'].append(ar)
 
@@ -271,17 +275,19 @@ def generate_federal_awards(dbkey, outdir):
 
     table = generate_dissemination_test_table('federal_awards', dbkey, mappings, cfdas)
     # prefix
-    for obj, pfix, ext in zip(table, prefixes, extensions):
+    for obj, pfix, ext in zip(table['rows'], prefixes, extensions):
         obj['fields'].append('federal_agency_prefix')
         obj['values'].append(pfix)
         obj['fields'].append('three_digit_extension')
         obj['values'].append(ext)
     # names, ids
-    for obj, name, id in zip(table, passthrough_names, passthrough_ids):
+    for obj, name, id in zip(table['rows'], passthrough_names, passthrough_ids):
         obj['fields'].append('passthrough_name')
         obj['values'].append(name)
         obj['fields'].append('passthrough_identifying_number')
         obj['values'].append(id)
+    table['singletons']['auditee_uei'] = g.uei
+
     return table
 
 ##########################################
@@ -302,6 +308,8 @@ def generate_findings_text(dbkey, outdir):
     map_simple_columns(wb, mappings, ftexts)
     wb.save(os.path.join(outdir, f'findings-text-{dbkey}.xlsx'))
     table = generate_dissemination_test_table('findings_text', dbkey, mappings, ftexts)
+    table['singletons']['auditee_uei'] = g.uei
+
     return table
 
 ##########################################
@@ -322,6 +330,8 @@ def generate_additional_ueis(dbkey, outdir):
     map_simple_columns(wb, mappings, addl_ueis)
     wb.save(os.path.join(outdir, f'additional-ueis-{dbkey}.xlsx'))
     table = generate_dissemination_test_table('additional_ueis', dbkey, mappings, addl_ueis)
+    table['singletons']['auditee_uei'] = g.uei
+
     return table
 
 ##########################################
@@ -333,20 +343,52 @@ def generate_notes_to_sefa(dbkey, outdir):
     print("--- generate notes to sefa ---")
     wb = pyxl.load_workbook(f'templates/{templates["SEFA"]}')
     mappings = [
-        #FieldMap('??', 'accounting_policies', None, str),
-        #FieldMap('??', 'is_minimis_rate_used', None, str),
-        #FieldMap('rate_explained', 'rate_explained', None, str),
         FieldMap('note_title', 'title', None, str),
         FieldMap('note_content', 'content', None, str)
-        #FieldMap('note_seq_number', 'note_seq_number', 0, int),
     ]
     g =  set_uei(wb, dbkey)
-    notes = Notes.select().where(Notes.dbkey == g.dbkey)
-   
+    # The mapping is weird.
+    # https://facdissem.census.gov/Documents/DataDownloadKey.xlsx
+    # The TYPEID column determines which field in the form a given row corresponds to.
+    # TYPEID=1 is the description of significant accounting policies.
+    # TYPEID=2 is the De Minimis cost rate.
+    # TYPEID=3 is for notes, which have sequence numbers... that must align somewhere.
+    policies = Notes.select().where((Notes.dbkey == g.dbkey) & (Notes.type_id == 1)).get()
+    rate = Notes.select().where((Notes.dbkey == g.dbkey) & (Notes.type_id == 2)).get()
+    notes = Notes.select().where((Notes.dbkey == g.dbkey) & (Notes.type_id == 3)).order_by(Notes.seq_number)
+
+    # This looks like the right way to set the three required fields
+    set_single_cell_range(wb, 'accounting_policies', policies.content)
+    # WARNING
+    # This is being faked. We're askign a Y/N question in the collection. 
+    # Census just let them type some stuff. So, this is a rough
+    # attempt to generate a Y/N value from the content. 
+    # This means the data is *not* true to what was intended, but
+    # it *is* good enough for us to use for testing.
+    is_used = "Huh"
+    if (re.search('did not use', rate.content)
+        or re.search('not to use', rate.content)
+        or re.search('not use', rate.content)
+        or re.search('not elected', rate.content)
+    ):
+        is_used = "N"
+    elif re.search("used", rate.content):
+        is_used = "Y"
+    else:
+        is_used = "Y&N"
+
+    set_single_cell_range(wb, 'is_minimis_rate_used', is_used)
+    set_single_cell_range(wb, 'rate_explained', rate.content)
+    
+    # Map the rest as notes.
     map_simple_columns(wb, mappings, notes)
     wb.save(os.path.join(outdir, f'notes-{dbkey}.xlsx'))
 
     table = generate_dissemination_test_table('notes_to_sefa', dbkey, mappings, notes)
+    table['singletons']['accounting_policites'] = policies.content
+    table['singletons']['is_minimis_rate_used'] =  is_used
+    table['singletons']['rate_explained'] = rate.content
+    table['singletons']['auditee_uei'] = g.uei
     return table
 
 ##########################################
@@ -377,6 +419,8 @@ def generate_secondary_auditors(dbkey, outdir):
     wb.save(os.path.join(outdir, f'cpas-{dbkey}.xlsx'))
     
     table = generate_dissemination_test_table('secondary_auditors', dbkey, mappings, sec_cpas)
+    table['singletons']['auditee_uei'] = g.uei
+
     return table
 
 ##########################################
@@ -400,6 +444,8 @@ def generate_captext(dbkey, outdir):
     wb.save(os.path.join(outdir, f'captext-{dbkey}.xlsx'))
 
     table = generate_dissemination_test_table('cap_text', dbkey, mappings, captexts)
+    table['singletons']['auditee_uei'] = g.uei
+
     return table
 
 
@@ -431,7 +477,7 @@ def main():
     ntst = generate_notes_to_sefa(args.dbkey, outdir)
     sat = generate_secondary_auditors(args.dbkey, outdir)
     ctt = generate_captext(args.dbkey, outdir)
-    tables = sat + ctt + ntst + aut + ftt + ft + fat
+    tables = [sat, ctt, ntst, aut, ftt, ft, fat]
     with open(os.path.join(outdir, f'test-array-{args.dbkey}.json'), "w") as test_file:
         jstr = json.dumps(tables, indent=2, sort_keys=True)
         test_file.write(jstr)
