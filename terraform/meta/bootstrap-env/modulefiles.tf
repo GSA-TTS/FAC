@@ -3,12 +3,6 @@ locals {
   managed_files = toset([
     "providers.tf",
   ])
-
-  # These are just starting points, go wild!
-  customizable_files = toset([
-    "variables.tf",
-    "main.tf",
-  ])
 }
 
 # Leave a script for properly initializing when running locally
@@ -34,14 +28,24 @@ resource "local_file" "managed_files" {
   )
 }
 
-resource "local_file" "customizable_files" {
-  for_each = local.customizable_files
+resource "local_file" "main-tf" {
   lifecycle {
     ignore_changes = all
   }
-  filename        = "${local.path}/${each.key}"
+  filename        = "${local.path}/${var.name}.tf"
   file_permission = "0644"
-  content = templatefile("${path.module}/templates/${each.key}-template",
+  content = templatefile("${path.module}/templates/main.tf-template",
+    { name = var.name }
+  )
+}
+
+resource "local_file" "variables-tf" {
+  lifecycle {
+    ignore_changes = all
+  }
+  filename        = "${local.path}/variables.tf"
+  file_permission = "0644"
+  content = templatefile("${path.module}/templates/variables.tf-template",
     { name = var.name }
   )
 }
