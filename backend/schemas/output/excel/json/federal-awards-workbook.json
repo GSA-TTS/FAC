@@ -35,8 +35,8 @@
                   "allow_blank": "False",
                   "custom_error": "The Federal Agency Prefix you entered is not recognized",
                   "custom_title": "Unknown ALN Prefix",
-                  "formula1": "\"00,01,02,03,04,05,06,07,08,09,10,11,12,13,14,15,16,17,18,19,20,21,22,23,27,29,30,32,33,34,36,39,40,41,42,43,44,45,46,47,53,57,58,59,60,61,62,64,66,68,70,77,78,81,82,83,84,85,86,87,88,89,90,91,92,93,94,96,97,98,99\"",
-                  "type": "list"
+                  "formula1": "=AND(LEN(FIRSTCELLREF)=2, AND(ISNUMBER(VALUE(MID(FIRSTCELLREF, 1, 1))), ISNUMBER(VALUE(MID(FIRSTCELLREF, 2, 1)))))",
+                  "type": "custom"
                },
                "width": 12
             },
@@ -51,11 +51,7 @@
                "title_cell": "C1",
                "type": "open_range",
                "validation": {
-                  "custom_error": "Expecting something with only three characters",
-                  "custom_title": "Must be length of 3",
-                  "formula1": 3,
-                  "operator": "equal",
-                  "type": "textLength"
+                  "type": "NOVALIDATION"
                },
                "width": 12
             },
@@ -83,11 +79,11 @@
                "title_cell": "E1",
                "type": "open_range",
                "validation": {
-                  "custom_error": "Not in the lookup list",
-                  "custom_title": "Lookup validation",
-                  "lookup_range": "federal_program_name_lookup",
-                  "sheet": "FederalPrograms",
-                  "type": "range_lookup"
+                  "custom_error": "If known, the Program Name should have been provided  for you. Please do not change the Program Name unless absolutely necessary or the Program Name is unknown. The Program Name must be 300 characters or less. Continue?",
+                  "custom_title": "Unknown Federal Program Name",
+                  "errorStyle": "warning",
+                  "formula1": "=Y{0}:Y{0}",
+                  "type": "list"
                },
                "width": 48
             },
@@ -355,7 +351,7 @@
             },
             {
                "format": "text",
-               "formula": "=CONCATENATE(B{0},C{0})",
+               "formula": "=IF(OR(B{0}=\"\",C{0}),\"\",CONCATENATE(B{0},\".\",C{0}))",
                "help": {
                   "link": "https://fac.gov/documentation/validation/#unknown",
                   "text": "If you see this error, please contact support."
@@ -401,6 +397,22 @@
                   "type": "NOVALIDATION"
                },
                "width": 24
+            },
+            {
+               "formula": "=IF(V{0}<>\"\",IFERROR(INDEX(federal_program_name_lookup,MATCH(V{0},aln_lookup,0)),\"\"),\"\")",
+               "help": {
+                  "link": "https://fac.gov/documentation/validation/#unknown",
+                  "text": "If you see this error, please contact support."
+               },
+               "keep_locked": true,
+               "range_name": "default_program_name",
+               "title": "DEFAULT PROGRAM NAME (Read Only)",
+               "title_cell": "Y1",
+               "type": "open_range",
+               "validation": {
+                  "type": "NOVALIDATION"
+               },
+               "width": 48
             }
          ]
       },
@@ -421,7 +433,7 @@
                "title_cell": "A1",
                "type": "single_cell",
                "validation": {
-                  "custom_error": "Expecting something with only twelve characters",
+                  "custom_error": "Expecting something with 12 characters",
                   "custom_title": "Must be length of 12",
                   "formula1": 12,
                   "operator": "equal",
@@ -3389,7 +3401,7 @@
                   "custom_error": "Not in the lookup list",
                   "custom_title": "Lookup validation",
                   "formula1": "=NOT(ISERROR(MATCH(FIRSTCELLREF,LOOKUPRANGE,0)))",
-                  "lookup_range": "federal_prorgam_name_lookup",
+                  "lookup_range": "federal_program_name_lookup",
                   "type": "lookup"
                }
             },
