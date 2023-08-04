@@ -3,7 +3,25 @@ local Func = import '../base/Functions.libsonnet';
 local Types = Base.Types;
 
 local Validations = {
-
+  PassThroughEntity: Types.object {
+    additionalProperties: false,
+    properties: {
+      passthrough_name: Types.string,
+      passthrough_identifying_number: {
+        type: 'string',
+        minLength: 1,
+      },
+    },
+    required: ['passthrough_name', 'passthrough_identifying_number'],
+  },
+  PassThroughEntityEmpty: Types.object {
+    additionalProperties: false,
+    properties: {
+      passthrough_name: Base.Enum.EmptyString_Null,
+      passthrough_identifying_number: Base.Enum.EmptyString_Null,
+    },
+    required: ['passthrough_name', 'passthrough_identifying_number'],
+  },
   DirectAwardValidations: [
     {
       'if': {
@@ -15,8 +33,19 @@ local Validations = {
       },
       'then': {
         properties: {
-          entities: Base.Enum.EmptyString_EmptyArray_Null,
+          entities: {
+            anyOf: [
+              Types.array {
+                items: Validations.PassThroughEntityEmpty,
+              },
+              Base.Enum.EmptyString_EmptyArray_Null,
+            ],
+          },
         },
+        // 20230627 MCJ Not required to be present if "Y"
+        // required: [
+        //   'entities',
+        // ],
       },
     },
     {
@@ -28,6 +57,11 @@ local Validations = {
         },
       },
       'then': {
+        properties: {
+          entities: Types.array {
+            items: Validations.PassThroughEntity,
+          },
+        },
         required: [
           'entities',
         ],
@@ -124,6 +158,7 @@ local Validations = {
         },
       },
       'then': {
+        required: ['audit_report_type'],
         'if': {
           properties: {
             audit_report_type: {
@@ -140,6 +175,7 @@ local Validations = {
         },
         'then': {
           properties: {
+            // If it is A or Q, then the number MUST be greater than 0.
             number_of_audit_findings: Types.integer {
               exclusiveMinimum: 0,
             },
@@ -148,10 +184,6 @@ local Validations = {
       },
     },
     {
-      // 20230409 MCJ FIXME: Should we require all fields always,
-      // and make sure thet ype checking is correct in each conditional branch?
-      // FIXME: Should we ALWAYS require a value in EVERY field, and disallow
-      // the empty/null responses everywhere?
       'if': {
         properties: {
           is_major: {
@@ -170,112 +202,111 @@ local Validations = {
 };
 
 local Parts = {
+  // FIXME
+  // cluster_name should always be present.
+  // At the least, it should always be N/A.
   Cluster: Types.object {
     properties: {
-      cluster_name: Base.Compound.ClusterNames,
-      cluster_total: Types.number,
+      // Cluster name must always be present, and it must EITHER be:
+      //  - A valid cluster name from the enumeration
+      //  - N/A
+      //  - STATE CLUSTER, or
+      //  - the designation for other cluster name
+      cluster_name: Base.Compound.ClusterNamesNAStateOther,
+      cluster_total: Types.number {
+        minimum: 0,
+      },
     },
     allOf: [
       {
-        'if': {
-          not: {
-            properties: {
-              cluster_name: {
-                enum: [Base.Const.OTHER_CLUSTER, Base.Const.STATE_CLUSTER],
-              },
-            },
-          },
-        },
-        'then': {
-          allOf: [
-            {
-              properties: {
-                other_cluster_name: Base.Enum.EmptyString_Null,
-              },
-            },
-            {
-              properties: {
-                state_cluster_name: Base.Enum.EmptyString_Null,
-              },
-            },
-          ],
-        },
-      },
-      {
+        // If I have a cluster_total greater than zero, then I
+        // must have a valid cluster name. It cannot be N/A if the
+        // cluster total is greater than zero.
         'if': {
           properties: {
-            cluster_name: {
-              const: Base.Const.STATE_CLUSTER,
+            cluster_total: Types.number {
+              exclusiveMinimum: 0,
             },
           },
         },
         'then': {
-          required: [
-            'state_cluster_name',
-          ],
           allOf: [
             {
               properties: {
-                other_cluster_name: Base.Enum.EmptyString_Null,
+                cluster_name: Base.Compound.ClusterNamesStateOther,
               },
             },
+            // IF we have OTHER_CLUSTER, THEN...
+            //   - other_cluster_name is required
+            //   - other_cluster_name must not be empty
+            //   - state_cluster_name must be empty
             {
-              properties: {
-                state_cluster_name: Base.Compound.NonEmptyString,
+              'if': {
+                properties: {
+                  cluster_name: {
+                    const: Base.Const.OTHER_CLUSTER,
+                  },
+                },
+              },
+              'then': {
+                required: ['other_cluster_name'],
+                allOf: [
+                  {
+                    properties: {
+                      other_cluster_name: Base.Compound.NonEmptyString,
+                    },
+                  },
+                  {
+                    properties: {
+                      state_cluster_name: Base.Enum.EmptyString_Null,
+                    },
+                  },
+                ],
               },
             },
-          ],
-        },
-      },
-      {
-        'if': {
-          properties: {
-            cluster_name: {
-              const: Base.Const.OTHER_CLUSTER,
-            },
-          },
-        },
-        'then': {
-          required: [
-            'other_cluster_name',
-          ],
-          allOf: [
+            // IF we have STATE_CLUSTER, THEN...
+            //   - state_cluster_name is required
+            //   - state_cluster_name must not be empty
+            //   - other_cluster_name must be empty
             {
-              properties: {
-                other_cluster_name: Base.Compound.NonEmptyString,
+              'if': {
+                properties: {
+                  cluster_name: {
+                    const: Base.Const.STATE_CLUSTER,
+                  },
+                },
               },
-            },
-            {
-              properties: {
-                state_cluster_name: Base.Enum.EmptyString_Null,
+              'then': {
+                required: ['state_cluster_name'],
+                allOf: [
+                  {
+                    properties: {
+                      other_cluster_name: Base.Enum.EmptyString_Null,
+                    },
+                  },
+                  {
+                    properties: {
+                      state_cluster_name: Base.Compound.NonEmptyString,
+                    },
+                  },
+                ],
               },
             },
           ],
         },
       },
     ],
+    // Handle all requireds conditionally?
     required: ['cluster_name', 'cluster_total'],
   },
-  PassThroughEntity: Types.object {
-    additionalProperties: false,
-    properties: {
-      passthrough_name: Types.string,
-      passthrough_identifying_number: {
-        type: 'string',
-        minLength: 1,
-      },
-    },
-    required: ['passthrough_name', 'passthrough_identifying_number'],
-  },
+
   DirectOrIndirectAward: Types.object {
     // 20230409 MCJ FIXME: I think this needs the amount...
     additionalProperties: false,
     description: 'If direct_award is N, the form must include a list of the pass-through entity by name and identifying number',
     properties: {
       is_direct: Base.Enum.YorN,
-      entities: Types.array {
-        items: Parts.PassThroughEntity,
-      },
+      entities: Types.array,
     },
     allOf: Validations.DirectAwardValidations,
   },

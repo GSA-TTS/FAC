@@ -383,7 +383,7 @@ local type_uei = Types.string {
     // Does not start with 9 digits in a row
     {
       pattern: '^(?![0-9]{9})',
-    },
+    }
   ],
 };
 
@@ -391,7 +391,7 @@ local Compound = {
   AwardReference: Types.string {
     title: 'AwardReference',
     description: 'Award Reference',
-    pattern: '^AWARD-(?!0000)[0-9]{4}$',
+    pattern: '^AWARD-(?!0000)[0-9]{4}$'
   },
   ThreeDigitExtension: Types.string {
     title: 'ThreeDigitExtension',
@@ -424,8 +424,7 @@ local Compound = {
   UnitedStatesPhone: Types.string {
     pattern: phone_regex,
   },
-  Zip: type_zipcode,
-
+  Zip: type_zipcode
 };
 
 
@@ -447,7 +446,7 @@ local SchemaBase = Types.object {
   Compound: Compound {
     FederalProgramNames: {
       description: 'All Federal program names',
-      enum: FederalProgramNames.program_names,
+      enum: FederalProgramNames.program_names
     },
     AllALNNumbers: {
       description: 'All program numbers',
@@ -466,8 +465,17 @@ local SchemaBase = Types.object {
     // },
     ClusterNames: {
       description: 'All cluster names',
-      enum: ClusterNames.cluster_names + [Const.NA, Const.OTHER_CLUSTER]
-    }
+      enum: ClusterNames.cluster_names,
+    },
+    ClusterNamesNAStateOther: {
+      description: 'All cluster names',
+      enum: ClusterNames.cluster_names + [Const.NA, Const.STATE_CLUSTER, Const.OTHER_CLUSTER],
+    },
+    ClusterNamesStateOther: {
+      description: 'All cluster names',
+      enum: ClusterNames.cluster_names + [Const.STATE_CLUSTER, Const.OTHER_CLUSTER],
+    },
+
   },
   Validation: Validation,
   SchemaBase: SchemaBase,
