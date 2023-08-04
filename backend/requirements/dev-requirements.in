@@ -6,6 +6,8 @@ coverage
 djlint
 faker
 flake8
+jsonnet
+jsonschema
 model_bakery
 mypy
 pandas
