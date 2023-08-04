@@ -77,7 +77,7 @@
                "title_cell": "A4",
                "type": "single_cell",
                "validation": {
-                  "custom_error": "Expecting something with only twelve characters",
+                  "custom_error": "Expecting something with 12 characters",
                   "custom_title": "Must be length of 12",
                   "formula1": 12,
                   "operator": "equal",

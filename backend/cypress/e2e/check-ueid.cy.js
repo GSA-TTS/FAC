@@ -206,8 +206,8 @@ describe('Create New Audit', () => {
             {
               valid: true,
               response: {
-                uei: 'ZQGGHJH74DW7',
-                auditee_name: 'INTERNATIONAL BUSINESS MACHINES CORPORATION',
+                uei: 'CMBSGK6P7BE1',
+                auditee_name: 'Commonwealth of Virginia',
               },
             }
           ).as('validUeiRequest');
@@ -226,7 +226,7 @@ describe('Create New Audit', () => {
           cy.get('#uei-error-message li').should('have.length', 0);
           cy.get('#auditee_name').should(
             'have.value',
-            'INTERNATIONAL BUSINESS MACHINES CORPORATION'
+            'Commonwealth of Virginia'
           );
         });
 
@@ -255,7 +255,7 @@ describe('Create New Audit', () => {
 
     describe('Add Auditee UEID', () => {
       it('should add auditee UEI', () => {
-        cy.get('#auditee_uei').clear().type('ZQGGHJH74DW7').blur();
+        cy.get('#auditee_uei').clear().type('CMBSGK6P7BE1').blur();
       });
     });
 
@@ -269,8 +269,8 @@ describe('Create New Audit', () => {
           {
             valid: true,
             response: {
-              uei: 'ZQGGHJH74DW7',
-              auditee_name: 'INTERNATIONAL BUSINESS MACHINES CORPORATION',
+              uei: 'CMBSGK6P7BE1',
+              auditee_name: 'Commonwealth of Virginia',
             },
           }
         ).as('validUeiRequest');
@@ -286,18 +286,18 @@ describe('Create New Audit', () => {
         cy.get('#uei-error-message li').should('have.length', 0);
         cy.get('#auditee_name').should(
           'have.value',
-          'INTERNATIONAL BUSINESS MACHINES CORPORATION'
+          'Commonwealth of Virginia'
         );
       });
     });
 
     describe('ADD Fiscal start/end dates', () => {
       it('Enter expected start date', () => {
-        cy.get('#auditee_fiscal_period_start').clear().type('01/01/2021');
+        cy.get('#auditee_fiscal_period_start').clear().type('05/08/2023');
         cy.get('#fy-error-message li').should('have.length', 0);
       });
       it('Enter expected end date', () => {
-        cy.get('#auditee_fiscal_period_end').clear().type('01/01/2022');
+        cy.get('#auditee_fiscal_period_end').clear().type('05/08/2024');
         cy.get('#fy-error-message li').should('have.length', 0);
       });
     });
@@ -305,12 +305,12 @@ describe('Create New Audit', () => {
 
   describe('Auditee info validation via API', () => {
     function completeFormWithValidInfo() {
-      cy.get('#auditee_uei').clear().type('ASDFASDFASDF').blur();
+      cy.get('#auditee_uei').clear().type('CMBSGK6P7BE1S').blur();
       cy.get('#auditee_uei-btn').as('searchButton');
       cy.get('.usa-modal__footer button.primary').as('primaryButton');
       cy.get('.usa-modal__footer button.secondary').as('secondaryButton');
-      cy.get('#auditee_fiscal_period_start').clear().type('01/01/2021');
-      cy.get('#auditee_fiscal_period_end').clear().type('01/01/2022');
+      cy.get('#auditee_fiscal_period_start').clear().type('05/08/2023');
+      cy.get('#auditee_fiscal_period_end').clear().type('05/08/2024');
     }
 
     xit('should return auditee info errors from the remote server', () => {

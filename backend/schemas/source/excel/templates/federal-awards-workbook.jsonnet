@@ -15,6 +15,8 @@ local uniformOtherClusterNamedRange = 'uniform_other_cluster_name';
 local uniformStateClusterNamedRange = 'uniform_state_cluster_name';
 local clusterNamedRange = 'cluster_name';
 local auditReportTypeLookupNamedRange = 'audit_report_type_lookup';
+local alnLookUpNamedRange = 'aln_lookup';
+local federalProgramNameLookupNamedRange = 'federal_program_name_lookup';
 
 local meta_cells = [
   Sheets.meta_cell {
@@ -110,7 +112,7 @@ local open_ranges_defns = [
       width: 12,
       help: Help.aln_extension,
     },
-    SV.StringOfLengthThree,
+    SV.NoValidation,
     'ALN (CFDA) Three Digit Extension',
     'three_digit_extension',
   ],
@@ -128,10 +130,7 @@ local open_ranges_defns = [
       width: 48,
       help: Help.federal_program_name,
     },
-    SV.RangeLookupValidation {
-      sheet: programSheet,
-      lookup_range: 'federal_program_name_lookup',
-    },
+    SV.FederalProgramNameValidation(programSheet),
     'Federal Program Name',
     'program_name',
   ],
@@ -284,7 +283,7 @@ local open_ranges_defns = [
   [
     Sheets.open_range {
       keep_locked: true,
-      formula: '=CONCATENATE(B{0},C{0})',
+      formula: '=IF(OR(B{0}="",C{0}),"",CONCATENATE(B{0},".",C{0}))',
       width: 12,
       format: 'text',
       help: Help.unknown,
@@ -315,6 +314,17 @@ local open_ranges_defns = [
     'UNIFORM OTHER CLUSTER NAME (Read Only)',
     uniformOtherClusterNamedRange,
   ],
+  [
+    Sheets.open_range {
+      keep_locked: true,
+      formula: '=IF(V{0}<>"",IFERROR(INDEX(' + federalProgramNameLookupNamedRange + ',MATCH(V{0},' + alnLookUpNamedRange + ',0)),""),"")',
+      width: 48,
+      help: Help.unknown,
+    },
+    SV.NoValidation,
+    'DEFAULT PROGRAM NAME (Read Only)',
+    'default_program_name',
+  ],
 ];
 
 local sheets = [
@@ -340,7 +350,7 @@ local sheets = [
         title: 'Cluster Names',
         title_cell: 'A1',
         range_name: 'cluster_name_lookup',
-        contents: Base.Compound.ClusterNames,
+        contents: Base.Compound.ClusterNamesNAStateOther,
         validation: SV.LookupValidation {
           lookup_range: 'cluster_name_lookup',
         },
@@ -355,10 +365,10 @@ local sheets = [
         type: 'text_range',
         title: 'Federal Program Names',
         title_cell: 'A1',
-        range_name: 'federal_program_name_lookup',
+        range_name: federalProgramNameLookupNamedRange,
         contents: Base.Compound.FederalProgramNames,
         validation: SV.LookupValidation {
-          lookup_range: 'federal_prorgam_name_lookup',
+          lookup_range: federalProgramNameLookupNamedRange,
         },
       },
       {
@@ -366,10 +376,10 @@ local sheets = [
         type: 'text_range',
         title: 'Program Numbers',
         title_cell: 'B1',
-        range_name: 'aln_lookup',
+        range_name: alnLookUpNamedRange,
         contents: Base.Compound.AllALNNumbers,
         validation: SV.LookupValidation {
-          lookup_range: 'aln_lookup',
+          lookup_range: alnLookUpNamedRange,
         },
       },
     ],

@@ -32,7 +32,7 @@ TextRange = NT("TextRange", "posn validation contents")
 Enum = NT("Enum", "description values")
 Validation = NT(
     "Validation",
-    "type allow_blank operator formula1 lookup_range custom_error custom_title",
+    "type allow_blank operator formula1 lookup_range custom_error custom_title errorStyle",
 )
 WB = NT("WB", "filename sheets title_row")
 
@@ -66,6 +66,7 @@ def parse_validation(spec):
         get(spec, "lookup_range"),
         get(spec, "custom_error"),
         get(spec, "custom_title"),
+        get(spec, "errorStyle", default="stop"),
     )
 
 

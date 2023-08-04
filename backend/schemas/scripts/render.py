@@ -243,6 +243,7 @@ def configure_validation(wb, ws, coords: Range, r):
             type="list",
             formula1=r.validation.formula1.format(coords.range_start_row),
             allow_blank=True,
+            errorStyle=r.validation.errorStyle,
         )
         # https://stackoverflow.com/questions/75889368/openpyxl-excel-file-created-is-not-showing-validation-errors-or-prompt-message
     elif r.validation.type == "range_lookup":
