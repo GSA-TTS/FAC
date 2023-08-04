@@ -73,7 +73,7 @@
                 }
               ]
             },
-            "cluster": { "cluster_name": "N/A", "cluster_total": 123 },
+            "cluster": { "cluster_name": "N/A", "cluster_total": 0 },
             "subrecipients": { "is_passed": "N" }
           }
         ]
