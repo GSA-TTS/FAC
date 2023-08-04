@@ -1,11 +1,11 @@
 locals {
   org_name = "gsa-tts-oros-fac"
-  spaces = [
-    "dev",
-    "staging",
-    "production",
-    "management"
-  ]
+  spaces = {
+    "dev"        = {},
+    "staging"    = {},
+    "preview"    = {},
+    "production" = { allow_ssh = false },
+  }
 
   # All spaces have the same SpaceDevelopers for now
   developers = [
@@ -39,8 +39,18 @@ locals {
     "tadhg.ohiggins@gsa.gov",
   ]
 
-  # All spaces have full public egress (for now)
-  asgs = [
+  internal_asgs = [
+    # Why are these both here? See Slack:
+    # https://gsa-tts.slack.com/archives/C09CR1Q9Z/p1691079035528469
+    # Also, having these here means that the provider won't attempt to 
+    # change anything... which is good, because this bug still exists:
+    # https://github.com/cloudfoundry-community/terraform-provider-cloudfoundry/issues/405
+    "trusted_local_networks",
+    "trusted_local_networks_egress",
+  ]
+
+  # All egress spaces include full public egress
+  egress_asgs = [
     "trusted_local_networks",
     "public_networks_egress"
   ]

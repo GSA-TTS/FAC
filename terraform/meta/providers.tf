@@ -8,10 +8,14 @@ terraform {
   }
 
   backend "s3" {
-    # The rest of the backend parameters must be supplied when you initialize:
-    #   terraform init --backend-config=../shared/config/backend.tfvars
+    # We are using "partial configuration" here. The rest of the backend
+    # parameters are provided when you initialize terraform, eg run:
+    # 
+    #   terraform init \
+    #    --backend-config=../shared/config/backend.tfvars \
+    #    --backend-config=key=terraform-state-$(basename $(pwd))
     #
-    # For more info, see:
+    # For more info, see: 
     # https://developer.hashicorp.com/terraform/language/settings/backends/configuration#partial-configuration
     encrypt = "true"
   }

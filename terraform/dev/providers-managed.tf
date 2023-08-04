@@ -1,3 +1,7 @@
+# The content of this file is managed by Terraform. If you modify it, it may
+# be reverted the next time Terraform runs. If you want to make changes, do it
+# in ../meta/bootstrap-env/templates.
+
 terraform {
   required_version = "~> 1.0"
   required_providers {
@@ -9,7 +13,8 @@ terraform {
 
   backend "s3" {
     # The rest of the backend parameters must be supplied when you initialize:
-    #   terraform init --backend-config=../shared/config/backend.tfvars
+    #   terraform init --backend-config=../shared/config/backend.tfvars \
+    #    --backend-config=key=terraform.tfstate.$(basename $(pwd))
     #
     # For more info, see:
     # https://developer.hashicorp.com/terraform/language/settings/backends/configuration#partial-configuration
