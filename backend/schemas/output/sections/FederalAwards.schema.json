@@ -39,115 +39,187 @@
                         "allOf": [
                            {
                               "if": {
-                                 "not": {
-                                    "properties": {
-                                       "cluster_name": {
-                                          "enum": [
-                                             "OTHER CLUSTER NOT LISTED ABOVE",
-                                             "STATE CLUSTER"
+                                 "properties": {
+                                    "cluster_total": {
+                                       "const": 0,
+                                       "type": "number"
+                                    }
+                                 }
+                              },
+                              "then": {
+                                 "allOf": [
+                                    {
+                                       "properties": {
+                                          "cluster_name": {
+                                             "enum": [
+                                                "N/A"
+                                             ],
+                                             "title": "N/A",
+                                             "type": "string"
+                                          }
+                                       }
+                                    },
+                                    {
+                                       "properties": {
+                                          "other_cluster_name": {
+                                             "description": "Empty string or null",
+                                             "enum": [
+                                                "",
+                                                "null"
+                                             ],
+                                             "title": "EmptyString_Null"
+                                          }
+                                       }
+                                    },
+                                    {
+                                       "properties": {
+                                          "state_cluster_name": {
+                                             "description": "Empty string or null",
+                                             "enum": [
+                                                "",
+                                                "null"
+                                             ],
+                                             "title": "EmptyString_Null"
+                                          }
+                                       }
+                                    }
+                                 ]
+                              }
+                           },
+                           {
+                              "if": {
+                                 "properties": {
+                                    "cluster_total": {
+                                       "exclusiveMinimum": 0,
+                                       "type": "number"
+                                    }
+                                 }
+                              },
+                              "then": {
+                                 "allOf": [
+                                    {
+                                       "properties": {
+                                          "cluster_name": {
+                                             "description": "All cluster names",
+                                             "enum": [
+                                                "HEAD START CLUSTER",
+                                                "477 CLUSTER",
+                                                "MATERNAL, INFANT, AND EARLY CHILDHOOD HOME VISITING CLUSTER",
+                                                "NAN",
+                                                "RESEARCH AND DEVELOPMENT",
+                                                "STUDENT FINANCIAL ASSISTANCE",
+                                                "STATE CLUSTER",
+                                                "AGING CLUSTER",
+                                                "CCDF CLUSTER",
+                                                "CDFI CLUSTER",
+                                                "CHILD NUTRITION CLUSTER",
+                                                "CLEAN WATER STATE REVOLVING FUND CLUSTER",
+                                                "COMMUNITY FACILITIES LOANS AND GRANTS CLUSTER",
+                                                "DISABILITY INSURANCE/SSI CLUSTER",
+                                                "DRINKING WATER STATE REVOLVING FUND CLUSTER",
+                                                "ECONOMIC DEVELOPMENT CLUSTER",
+                                                "EMPLOYMENT SERVICE CLUSTER",
+                                                "FEDERAL TRANSIT CLUSTER",
+                                                "FISH AND WILDLIFE CLUSTER",
+                                                "FOOD DISTRIBUTION CLUSTER",
+                                                "FOREIGN FOOD AID DONATION CLUSTER",
+                                                "FOREST SERVICE SCHOOLS AND ROADS CLUSTER",
+                                                "FOSTER GRANDPARENT/SENIOR COMPANION CLUSTER",
+                                                "HEALTH CENTER PROGRAM CLUSTER",
+                                                "HIGHWAY PLANNING AND CONSTRUCTION CLUSTER",
+                                                "HIGHWAY SAFETY CLUSTER",
+                                                "HOPE VI CLUSTER",
+                                                "HOUSING VOUCHER CLUSTER",
+                                                "HURRICANE SANDY RELIEF CLUSTER",
+                                                "MEDICAID CLUSTER",
+                                                "SCHOOL IMPROVEMENT GRANTS CLUSTER",
+                                                "SECTION 8 PROJECT-BASED CLUSTER",
+                                                "SNAP CLUSTER",
+                                                "SPECIAL EDUCATION CLUSTER (IDEA)",
+                                                "TANF CLUSTER",
+                                                "TRANSIT SERVICES PROGRAMS CLUSTER",
+                                                "TRIO CLUSTER",
+                                                "WATER AND WASTE PROGRAM CLUSTER",
+                                                "WIOA CLUSTER",
+                                                "CDBG - ENTITLEMENT GRANTS CLUSTER",
+                                                "CDBG - DISASTER RECOVERY GRANTS - PUB. L. NO. 113-2 CLUSTER",
+                                                "OTHER CLUSTER NOT LISTED ABOVE"
+                                             ]
+                                          }
+                                       }
+                                    },
+                                    {
+                                       "if": {
+                                          "properties": {
+                                             "cluster_name": {
+                                                "const": "OTHER CLUSTER NOT LISTED ABOVE"
+                                             }
+                                          }
+                                       },
+                                       "then": {
+                                          "allOf": [
+                                             {
+                                                "properties": {
+                                                   "other_cluster_name": {
+                                                      "minLength": 1,
+                                                      "type": "string"
+                                                   }
+                                                }
+                                             },
+                                             {
+                                                "properties": {
+                                                   "state_cluster_name": {
+                                                      "description": "Empty string or null",
+                                                      "enum": [
+                                                         "",
+                                                         "null"
+                                                      ],
+                                                      "title": "EmptyString_Null"
+                                                   }
+                                                }
+                                             }
+                                          ],
+                                          "required": [
+                                             "other_cluster_name"
+                                          ]
+                                       }
+                                    },
+                                    {
+                                       "if": {
+                                          "properties": {
+                                             "cluster_name": {
+                                                "const": "STATE CLUSTER"
+                                             }
+                                          }
+                                       },
+                                       "then": {
+                                          "allOf": [
+                                             {
+                                                "properties": {
+                                                   "other_cluster_name": {
+                                                      "description": "Empty string or null",
+                                                      "enum": [
+                                                         "",
+                                                         "null"
+                                                      ],
+                                                      "title": "EmptyString_Null"
+                                                   }
+                                                }
+                                             },
+                                             {
+                                                "properties": {
+                                                   "state_cluster_name": {
+                                                      "minLength": 1,
+                                                      "type": "string"
+                                                   }
+                                                }
+                                             }
+                                          ],
+                                          "required": [
+                                             "state_cluster_name"
                                           ]
                                        }
                                     }
-                                 }
-                              },
-                              "then": {
-                                 "allOf": [
-                                    {
-                                       "properties": {
-                                          "other_cluster_name": {
-                                             "description": "Empty string or null",
-                                             "enum": [
-                                                "",
-                                                "null"
-                                             ],
-                                             "title": "EmptyString_Null"
-                                          }
-                                       }
-                                    },
-                                    {
-                                       "properties": {
-                                          "state_cluster_name": {
-                                             "description": "Empty string or null",
-                                             "enum": [
-                                                "",
-                                                "null"
-                                             ],
-                                             "title": "EmptyString_Null"
-                                          }
-                                       }
-                                    }
-                                 ]
-                              }
-                           },
-                           {
-                              "if": {
-                                 "properties": {
-                                    "cluster_name": {
-                                       "const": "STATE CLUSTER"
-                                    }
-                                 }
-                              },
-                              "then": {
-                                 "allOf": [
-                                    {
-                                       "properties": {
-                                          "other_cluster_name": {
-                                             "description": "Empty string or null",
-                                             "enum": [
-                                                "",
-                                                "null"
-                                             ],
-                                             "title": "EmptyString_Null"
-                                          }
-                                       }
-                                    },
-                                    {
-                                       "properties": {
-                                          "state_cluster_name": {
-                                             "minLength": 1,
-                                             "type": "string"
-                                          }
-                                       }
-                                    }
-                                 ],
-                                 "required": [
-                                    "state_cluster_name"
-                                 ]
-                              }
-                           },
-                           {
-                              "if": {
-                                 "properties": {
-                                    "cluster_name": {
-                                       "const": "OTHER CLUSTER NOT LISTED ABOVE"
-                                    }
-                                 }
-                              },
-                              "then": {
-                                 "allOf": [
-                                    {
-                                       "properties": {
-                                          "other_cluster_name": {
-                                             "minLength": 1,
-                                             "type": "string"
-                                          }
-                                       }
-                                    },
-                                    {
-                                       "properties": {
-                                          "state_cluster_name": {
-                                             "description": "Empty string or null",
-                                             "enum": [
-                                                "",
-                                                "null"
-                                             ],
-                                             "title": "EmptyString_Null"
-                                          }
-                                       }
-                                    }
-                                 ],
-                                 "required": [
-                                    "other_cluster_name"
                                  ]
                               }
                            }
@@ -202,6 +274,7 @@
                               ]
                            },
                            "cluster_total": {
+                              "minimum": 0,
                               "type": "number"
                            }
                         },
@@ -225,13 +298,46 @@
                               "then": {
                                  "properties": {
                                     "entities": {
-                                       "description": "Empty string, empty array, or null",
-                                       "enum": [
-                                          "",
-                                          [ ],
-                                          "null"
-                                       ],
-                                       "title": "EmptyString_EmptyArray_Null"
+                                       "anyOf": [
+                                          {
+                                             "items": {
+                                                "additionalProperties": false,
+                                                "properties": {
+                                                   "passthrough_identifying_number": {
+                                                      "description": "Empty string or null",
+                                                      "enum": [
+                                                         "",
+                                                         "null"
+                                                      ],
+                                                      "title": "EmptyString_Null"
+                                                   },
+                                                   "passthrough_name": {
+                                                      "description": "Empty string or null",
+                                                      "enum": [
+                                                         "",
+                                                         "null"
+                                                      ],
+                                                      "title": "EmptyString_Null"
+                                                   }
+                                                },
+                                                "required": [
+                                                   "passthrough_name",
+                                                   "passthrough_identifying_number"
+                                                ],
+                                                "type": "object"
+                                             },
+                                             "type": "array"
+                                          },
+                                          {
+                                             "description": "Empty string, empty array, or null",
+                                             "enum": [
+                                                "",
+                                                [ ],
+                                                "null"
+                                             ],
+                                             "title": "EmptyString_EmptyArray_Null"
+                                          }
+                                       ]
                                     }
                                  }
                               }
@@ -245,6 +351,28 @@
                                  }
                               },
                               "then": {
+                                 "properties": {
+                                    "entities": {
+                                       "items": {
+                                          "additionalProperties": false,
+                                          "properties": {
+                                             "passthrough_identifying_number": {
+                                                "minLength": 1,
+                                                "type": "string"
+                                             },
+                                             "passthrough_name": {
+                                                "type": "string"
+                                             }
+                                          },
+                                          "required": [
+                                             "passthrough_name",
+                                             "passthrough_identifying_number"
+                                          ],
+                                          "type": "object"
+                                       },
+                                       "type": "array"
+                                    }
+                                 },
                                  "required": [
                                     "entities"
                                  ]
@@ -254,23 +382,6 @@
                         "description": "If direct_award is N, the form must include a list of the pass-through entity by name and identifying number",
                         "properties": {
                            "entities": {
-                              "items": {
-                                 "additionalProperties": false,
-                                 "properties": {
-                                    "passthrough_identifying_number": {
-                                       "minLength": 1,
-                                       "type": "string"
-                                    },
-                                    "passthrough_name": {
-                                       "type": "string"
-                                    }
-                                 },
-                                 "required": [
-                                    "passthrough_name",
-                                    "passthrough_identifying_number"
-                                 ],
-                                 "type": "object"
-                              },
                               "type": "array"
                            },
                            "is_direct": {
@@ -395,6 +506,9 @@
                                        }
                                     }
                                  },
+                                 "required": [
+                                    "audit_report_type"
+                                 ],
                                  "then": {
                                     "properties": {
                                        "number_of_audit_findings": {
