@@ -27,6 +27,7 @@ from .validators import (
     validate_notes_to_sefa_json,
     validate_single_audit_report_file,
     validate_audit_information_json,
+    validate_component_page_numbers
 )
 
 User = get_user_model()
@@ -271,6 +272,10 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
     notes_to_sefa = models.JSONField(
         blank=True, null=True, validators=[validate_notes_to_sefa_json]
     )
+
+    # audit_report = models.BinaryField(
+    #     blank=True, null=True, validators=[validate_single_audit_report_file]
+    # )
 
     def validate_full(self):
         """
@@ -550,6 +555,9 @@ class SingleAuditReportFile(models.Model):
     sac = models.ForeignKey(SingleAuditChecklist, on_delete=models.CASCADE)
     user = models.ForeignKey(User, blank=True, null=True, on_delete=models.SET_NULL)
     date_created = models.DateTimeField(auto_now_add=True)
+    component_page_numbers = models.JSONField(
+        blank=True, null=True, validators=[validate_component_page_numbers]
+    )
 
     def save(self, *args, **kwargs):
         report_id = SingleAuditChecklist.objects.get(id=self.sac.id).report_id

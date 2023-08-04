@@ -195,7 +195,7 @@ def validate_federal_award_json(value):
     schema = json.loads(schema_path.read_text(encoding="utf-8"))
 
     # FIXME: For some classes of error, this approach
-    # will go into an infinite/recursive loop in the iterator. 
+    # will go into an infinite/recursive loop in the iterator.
     # There needs to either be a way to solve that, or we need
     # to not use this approach.
     # validator = Draft7Validator(schema)
@@ -502,3 +502,28 @@ def _notes_to_sefa_json_error(errors):
     )
     template = json.loads(template_definition_path.read_text(encoding="utf-8"))
     return _get_error_details(template, notes_to_sefa_named_ranges(errors))
+
+
+def validate_component_page_numbers(obj):
+    required_keys = [
+        "financial_statements",
+        "financial_statements_opinion",
+        "schedule_expenditures",
+        "schedule_expenditures_opinion",
+        "uniform_guidance_control",
+        "uniform_guidance_compliance",
+        "GAS_control",
+        "GAS_compliance",
+        "schedule_findings",
+    ]
+    optional_keys = ["schedule_prior_findings", "CAP_page"]
+    required_keys_are_good = all(
+        [((key in obj) and isinstance(obj[key], int)) for key in required_keys]
+    )
+    optional_keys_are_good = all(
+        [
+            ((key not in obj) or ((key in obj) and isinstance(obj[key], int)))
+            for key in optional_keys
+        ]
+    )
+    return required_keys_are_good and optional_keys_are_good

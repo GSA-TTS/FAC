@@ -17,7 +17,11 @@ from faker import Faker
 from audit.excel import (
     extract_federal_awards,
     extract_findings_uniform_guidance,
-    extract_findings_text
+    extract_findings_text,
+    extract_corrective_action_plan,
+    extract_secondary_auditors,
+    extract_notes_to_sefa,
+    extract_additional_ueis,
 )
 import audit.validators
 
@@ -148,16 +152,25 @@ def _post_create_federal_awards(this_sac, this_user):
 
 
 extract_mapping = {
-    FORM_SECTIONS.FEDERAL_AWARDS_EXPENDED : extract_federal_awards,
-    FORM_SECTIONS.FINDINGS_UNIFORM_GUIDANCE : extract_findings_uniform_guidance,
-    FORM_SECTIONS.FINDINGS_TEXT : extract_findings_text
+    FORM_SECTIONS.FEDERAL_AWARDS_EXPENDED: extract_federal_awards,
+    FORM_SECTIONS.FINDINGS_UNIFORM_GUIDANCE: extract_findings_uniform_guidance,
+    FORM_SECTIONS.FINDINGS_TEXT: extract_findings_text,
+    FORM_SECTIONS.CORRECTIVE_ACTION_PLAN: extract_corrective_action_plan,
+    FORM_SECTIONS.SECONDARY_AUDITORS: extract_secondary_auditors,
+    FORM_SECTIONS.NOTES_TO_SEFA: extract_notes_to_sefa,
+    FORM_SECTIONS.ADDITIONAL_UEIS: extract_additional_ueis,
 }
 
 validator_mapping = {
-    FORM_SECTIONS.FEDERAL_AWARDS_EXPENDED : audit.validators.validate_federal_award_json,
-    FORM_SECTIONS.FINDINGS_UNIFORM_GUIDANCE : audit.validators.validate_findings_uniform_guidance_json,
-    FORM_SECTIONS.FINDINGS_TEXT : audit.validators.validate_findings_text_json
+    FORM_SECTIONS.FEDERAL_AWARDS_EXPENDED: audit.validators.validate_federal_award_json,
+    FORM_SECTIONS.FINDINGS_UNIFORM_GUIDANCE: audit.validators.validate_findings_uniform_guidance_json,
+    FORM_SECTIONS.FINDINGS_TEXT: audit.validators.validate_findings_text_json,
+    FORM_SECTIONS.CORRECTIVE_ACTION_PLAN: audit.validators.validate_corrective_action_plan_json,
+    FORM_SECTIONS.SECONDARY_AUDITORS: audit.validators.validate_secondary_auditors_json,
+    FORM_SECTIONS.NOTES_TO_SEFA: audit.validators.validate_notes_to_sefa_json,
+    FORM_SECTIONS.ADDITIONAL_UEIS: audit.validators.validate_additional_ueis_json,
 }
+
 
 def _post_upload_workbook(this_sac, this_user, section, xlsx_filename):
     """Upload a workbook for this SAC.
@@ -168,9 +181,7 @@ def _post_upload_workbook(this_sac, this_user, section, xlsx_filename):
     ExcelFile = apps.get_model("audit.ExcelFile")
 
     if (
-        ExcelFile.objects.filter(
-            sac_id=this_sac.id, form_section=section
-        ).exists()
+        ExcelFile.objects.filter(sac_id=this_sac.id, form_section=section).exists()
         and this_sac.federal_awards is not None
     ):
         # there is already an uploaded file and data in the object so
@@ -199,11 +210,20 @@ def _post_upload_workbook(this_sac, this_user, section, xlsx_filename):
         this_sac.findings_uniform_guidance = audit_data
     elif section == FORM_SECTIONS.FINDINGS_TEXT:
         this_sac.findings_text = audit_data
+    elif section == FORM_SECTIONS.CORRECTIVE_ACTION_PLAN:
+        this_sac.corrective_action_plan = audit_data
+    elif section == FORM_SECTIONS.SECONDARY_AUDITORS:
+        this_sac.secondary_auditors = audit_data
+    elif section == FORM_SECTIONS.NOTES_TO_SEFA:
+        this_sac.notes_to_sefa = audit_data
+    elif section == FORM_SECTIONS.ADDITIONAL_UEIS:
+        this_sac.additional_ueis = audit_data
 
     this_sac.save()
 
     logger.info("Created Federal Awards workbook upload for SAC %s", this_sac.id)
-    
+
+
 # list of the default SingleAuditChecklists to create for each user
 # The auditee name is used to disambiguate them, so it must be unique
 # or another SAC won't be created.
@@ -216,55 +236,31 @@ SACS = [
         "auditee_name": "Federal awards submitted",
         "post_upload_workbook": {
             "section": FORM_SECTIONS.FEDERAL_AWARDS_EXPENDED,
-            "regex": "federal-awards"
-        }
-    },
-    {
-        "auditee_name": "Audit finding submitted",
-        "post_upload_workbook": {
-            "section": FORM_SECTIONS.FINDINGS_UNIFORM_GUIDANCE,
-            "regex": "findings-[0-9]+"
-        }
+            "regex": "federal-awards",
+        },
     },
     {
         "auditee_name": "All workbooks submitted",
         "post_upload_workbooks": [
             {
-            "section": FORM_SECTIONS.FEDERAL_AWARDS_EXPENDED,
-            "regex": "federal-awards"
+                "section": FORM_SECTIONS.FEDERAL_AWARDS_EXPENDED,
+                "regex": "federal-awards",
             },
             {
-            "section": FORM_SECTIONS.FINDINGS_UNIFORM_GUIDANCE,
-            "regex": "findings-[0-9]+"
+                "section": FORM_SECTIONS.FINDINGS_UNIFORM_GUIDANCE,
+                "regex": "findings-[0-9]+",
             },
-            {
-            "section": FORM_SECTIONS.FINDINGS_TEXT,
-            "regex": "findings-text"
-            },
-            {
-                "section": FORM_SECTIONS.CORRECTIVE_ACTION_PLAN,
-                "regex": "captext"
-            },
-            {
-                "section": FORM_SECTIONS.ADDITIONAL_UEIS,
-                "regex": "additional-ueis"
-            },
-            {
-                "section": FORM_SECTIONS.SECONDARY_AUDITORS,
-                "regex": "cpas"
-            },
-            {
-                "section": FORM_SECTIONS.NOTES_TO_SEFA,
-                "regex": "notes"
-            },
-            
-            
+            {"section": FORM_SECTIONS.FINDINGS_TEXT, "regex": "findings-text"},
+            {"section": FORM_SECTIONS.CORRECTIVE_ACTION_PLAN, "regex": "captext"},
+            {"section": FORM_SECTIONS.ADDITIONAL_UEIS, "regex": "additional-ueis"},
+            {"section": FORM_SECTIONS.SECONDARY_AUDITORS, "regex": "cpas"},
+            {"section": FORM_SECTIONS.NOTES_TO_SEFA, "regex": "notes"},
         ],
     },
 ]
 
 
-def _load_single_audit_checklists_for_user(user, workbooks):
+def _load_single_audit_checklists_for_user(user, workbooks, pdf_filename):
     """Create SACs for a given user."""
     logger.info("Creating single audit checklists for %s", user)
     SingleAuditChecklist = apps.get_model("audit.SingleAuditChecklist")
@@ -280,7 +276,7 @@ def _load_single_audit_checklists_for_user(user, workbooks):
             item_info["post_create_callable"](sac, user)
         if workbooks and ("post_upload_workbook" in item_info):
             # The workbooks directory will contain a list of files.
-            # We need to match them based on filename. 
+            # We need to match them based on filename.
             section = item_info["post_upload_workbook"]["section"]
             regex = item_info["post_upload_workbook"]["regex"]
             # Grab the first filename matching the regex
@@ -290,14 +286,17 @@ def _load_single_audit_checklists_for_user(user, workbooks):
             for wb in item_info["post_upload_workbooks"]:
                 section = wb["section"]
                 regex = wb["regex"]
-                workbook_names = list(map(lambda full: (full, Path(full).stem), workbooks))
-                filtered = list(filter(lambda ftuple: re.search(regex, ftuple[1]), workbook_names))
+                workbook_names = list(
+                    map(lambda full: (full, Path(full).stem), workbooks)
+                )
+                filtered = list(
+                    filter(lambda ftuple: re.search(regex, ftuple[1]), workbook_names)
+                )
                 file = filtered.pop()
                 print("################")
                 print(f"## Loading workbook {file}")
                 print("################")
                 _post_upload_workbook(sac, user, section, file[0])
-
 
 
 def load_single_audit_checklists():
@@ -309,7 +308,7 @@ def load_single_audit_checklists():
         _load_single_audit_checklists_for_user(user)
 
 
-def load_single_audit_checklists_for_email_address(user_email, workbooks):
+def load_single_audit_checklists_for_email_address(user_email, workbooks, pdf_filename):
     """Load example SACs for user with this email address."""
 
     try:
@@ -318,4 +317,4 @@ def load_single_audit_checklists_for_email_address(user_email, workbooks):
         logger.info("No user found for %s, have you logged in once?", user_email)
         return
 
-    _load_single_audit_checklists_for_user(user, workbooks)
+    _load_single_audit_checklists_for_user(user, workbooks, pdf_filename)
