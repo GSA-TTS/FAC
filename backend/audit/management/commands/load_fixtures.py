@@ -24,7 +24,9 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument("email_addresses", nargs="*", type=str)
-        parser.add_argument("--workbooks", type=str, help="Directory containing submission workbooks")
+        parser.add_argument(
+            "--workbooks", type=str, help="Directory containing submission workbooks"
+        )
 
     def handle(self, *args, **options):
         # load users first so later fixtures will load items for them
