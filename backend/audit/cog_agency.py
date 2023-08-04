@@ -40,28 +40,32 @@ def cog_over_assignment(federal_awards_data):
     tot_amount_agency = {}
     tot_da_amount_agency = {}
     tot_da_amount_expended = 0
-    for i in federal_awards_data['FederalAwards']['federal_awards']:
-        tot_amount_expended += i['program']['amount_expended']
-        agency = i['program']['federal_agency_prefix']
+    for i in federal_awards_data["FederalAwards"]["federal_awards"]:
+        tot_amount_expended += i["program"]["amount_expended"]
+        agency = i["program"]["federal_agency_prefix"]
         if agency in tot_amount_agency.keys():
-            tot_amount_agency[agency] += i['program']['amount_expended']
+            tot_amount_agency[agency] += i["program"]["amount_expended"]
         else:
-            tot_amount_agency[agency] = i['program']['amount_expended']
-        if i['direct_or_indirect_award']['is_direct'] == 'Y':
-            tot_da_amount_expended += i['program']['amount_expended']
+            tot_amount_agency[agency] = i["program"]["amount_expended"]
+        if i["direct_or_indirect_award"]["is_direct"] == "Y":
+            tot_da_amount_expended += i["program"]["amount_expended"]
             if agency in tot_da_amount_agency.keys():
-                tot_da_amount_agency[agency] += i['program']['amount_expended']
+                tot_da_amount_agency[agency] += i["program"]["amount_expended"]
             else:
-                tot_da_amount_agency[agency] = i['program']['amount_expended']
-#   print("tot_amount_expended = ", tot_amount_expended)
+                tot_da_amount_agency[agency] = i["program"]["amount_expended"]
+    #   print("tot_amount_expended = ", tot_amount_expended)
 
-    tot_amount_agency = list(sorted(tot_amount_agency.items(), reverse=True, key=lambda item: item[1]))
-#   print("tot_amount_agency = ", tot_amount_agency)
+    tot_amount_agency = list(
+        sorted(tot_amount_agency.items(), reverse=True, key=lambda item: item[1])
+    )
+    #   print("tot_amount_agency = ", tot_amount_agency)
 
-    tot_da_amount_agency = list(sorted(tot_da_amount_agency.items(), reverse=True, key=lambda item: item[1]))
-#   print("tot_da_amount_agency = ", tot_da_amount_agency)
+    tot_da_amount_agency = list(
+        sorted(tot_da_amount_agency.items(), reverse=True, key=lambda item: item[1])
+    )
+    #   print("tot_da_amount_agency = ", tot_da_amount_agency)
 
-#   print("tot_da_amount_expended = ", tot_da_amount_expended)
+    #   print("tot_da_amount_expended = ", tot_da_amount_expended)
 
     if tot_amount_expended > 50000000:
         #############################################################
