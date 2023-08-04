@@ -10,7 +10,7 @@
 # Calculate total amount_expended (tot_amount_expended)
 # Calculate total amount_expended by agency
 #   tot_amount_agency = {agency, tot_amt}
-#                 
+#               
 # Calculate total direct award amount_expended by agency
 #   tot_da_amount_agency = {agency, tot_da_amt}
 # Calculate total direct award amount_expended (tot_da_amount_expended)
@@ -65,9 +65,11 @@ def cog_over_assignment(federal_awards_data):
 #   print("tot_da_amount_expended = ", tot_da_amount_expended)
 
     if tot_amount_expended > 50000000:
-    #       Cognizant agency
-    #       ######## TO DO NEXT
-    #       ####### Use 2019 Base year submission data
+        #############################################################
+        #       Cognizant agency
+        #       ######## TO DO NEXT
+        #       ####### Use 2019 Base year submission data
+        #############################################################
         data_2019 = False  # For now
         if data_2019:
             pass
