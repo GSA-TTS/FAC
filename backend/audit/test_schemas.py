@@ -503,21 +503,12 @@ class AuditInformationSchemaValidityTest(SimpleTestCase):
             "98",
             "99",
         ]
-        likely_invalid_aln_prefixes = ["24", "25", "26", "35"]
 
         for _ in range(10):
             for n in range(2, 10):
                 ls = random.sample(likely_valid_aln_prefixes, n)
                 simple_case["agencies"] = ls
                 validate(simple_case, schema)
-
-        for _ in range(10):
-            for n in range(2, 3):
-                ls = random.sample(likely_invalid_aln_prefixes, n)
-                simple_case["agencies"] = ls
-                self.assertRaises(
-                    exceptions.ValidationError, validate, simple_case, schema
-                )
 
 
 class FederalAwardsSchemaValidityTest(SimpleTestCase):

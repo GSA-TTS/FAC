@@ -15,7 +15,9 @@ local AuditInformation = Types.object {
     is_material_noncompliance_disclosed: Types.boolean,
     is_aicpa_audit_guide_included: Types.boolean,
     is_low_risk_auditee: Types.boolean,
-    agencies: Base.Compound.ALNPrefixes,
+    agencies: Types.array {
+      items: Base.Compound.ALNPrefixes,
+    },
   },
   required: [
     'dollar_threshold',
