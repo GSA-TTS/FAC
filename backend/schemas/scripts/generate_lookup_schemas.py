@@ -70,5 +70,5 @@ if __name__ == "__main__":
             print("Unknown filename, exiting")
             sys.exit(1)
 
-        with open(sys.argv[2], "w") as write_file:
+        with open(sys.argv[2], "w", newline="\n") as write_file:
             json.dump(obj, write_file, indent=2, sort_keys=True)

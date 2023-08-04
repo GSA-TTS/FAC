@@ -232,7 +232,7 @@ local Parts = {
               properties: {
                 cluster_name: Base.Enum.NA,
               },
-            },  
+            },
             {
               properties: {
                 other_cluster_name: Base.Enum.EmptyString_Null,
