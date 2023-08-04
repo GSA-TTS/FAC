@@ -1,8 +1,8 @@
+local ClusterNames = import 'ClusterNames.json';
+local ComplianceRequirementTypes = import 'ComplianceRequirementTypes.json';
 local FederalProgramNames = import 'FederalProgramNames.json';
 local Func = import 'Functions.libsonnet';
 local GAAP = import 'GAAP.libsonnet';
-local ComplianceRequirementTypes = import 'ComplianceRequirementTypes.json';
-local ClusterNames = import 'ClusterNames.json';
 
 local Const = {
   Y: 'Y',
@@ -69,7 +69,7 @@ local REGEX_THREE_DIGIT_EXTENSION = '[0-9]{3}[A-Za-z]{0,1}';
 local REGEX_U_EXTENSION = 'U[0-9]{2}';
 
 local type_aln_prefix = Types.string {
-    allOf: [
+  allOf: [
     {
       minLength: 2,
       maxLength: 2,
@@ -77,16 +77,16 @@ local type_aln_prefix = Types.string {
     {
       pattern: REGEX_ALN_PREFIX,
     },
-  ]
+  ],
 };
 local type_three_digit_extension = Types.string {
   pattern: '^('
-            + REGEX_RD_EXTENSION
-            + '|'
-            + REGEX_THREE_DIGIT_EXTENSION
-            + '|'
-            + REGEX_U_EXTENSION
-            + ')$',
+           + REGEX_RD_EXTENSION
+           + '|'
+           + REGEX_THREE_DIGIT_EXTENSION
+           + '|'
+           + REGEX_U_EXTENSION
+           + ')$',
 
 };
 
@@ -96,7 +96,7 @@ local Validation = {
       'if': {
         properties: {
           three_digit_extension: {
-            pattern: '^('+REGEX_RD_EXTENSION+'|'+REGEX_U_EXTENSION+')$',
+            pattern: '^(' + REGEX_RD_EXTENSION + '|' + REGEX_U_EXTENSION + ')$',
           },
         },
       },
@@ -282,7 +282,7 @@ local Enum = {
   GAAPResults: Types.string {
     description: 'GAAP Results (Audit Information)',
     enum: std.map(function(pair) pair.tag, GAAP.gaap_results),
-  },  
+  },
 };
 
 local simple_phone_regex = '[1-9]{1}[0-9]{9}+';
@@ -370,7 +370,7 @@ local Compound = {
   UnitedStatesPhone: Types.string {
     pattern: phone_regex,
   },
-  Zip: type_zipcode
+  Zip: type_zipcode,
 };
 
 
@@ -396,14 +396,22 @@ local SchemaBase = Types.object {
     },
     AllALNNumbers: {
       description: 'All program numbers',
-      enum: FederalProgramNames.all_alns
-      },
+      enum: FederalProgramNames.all_alns,
+    },
     ClusterNames: {
       description: 'All cluster names',
-      enum: ClusterNames.cluster_names + [Const.NA, Const.OTHER_CLUSTER]
+      enum: ClusterNames.cluster_names,
     },
-    ALNPrefixes : type_aln_prefix,
-    ThreeDigitExtension : type_three_digit_extension, 
+    ClusterNamesNAStateOther: {
+      description: 'All cluster names',
+      enum: ClusterNames.cluster_names + [Const.NA, Const.OTHER_CLUSTER],
+    },
+    ClusterNamesStateOther: {
+      description: 'All cluster names',
+      enum: ClusterNames.cluster_names + [Const.OTHER_CLUSTER],
+    },
+    ALNPrefixes: type_aln_prefix,
+    ThreeDigitExtension: type_three_digit_extension,
   },
   Validation: Validation,
   SchemaBase: SchemaBase,
