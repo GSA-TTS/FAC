@@ -31,13 +31,13 @@ function setCheckboxRequired(name) {
 }
 
 function init() {
-  setCheckboxRequired('GGAP_results');
-  setCheckboxRequired('going_concern_included');
-  setCheckboxRequired('internal_control_deficiency_disclosed');
-  setCheckboxRequired('internal_control_material_weakness_disclosed');
-  setCheckboxRequired('material_noncompliance_disclosed');
-  setCheckboxRequired('AICPA_audit_guide_included');
-  setCheckboxRequired('low_risk_auditee');
+  setCheckboxRequired('gaap_results');
+  setCheckboxRequired('is_going_concern_included');
+  setCheckboxRequired('is_internal_control_deficiency_disclosed');
+  setCheckboxRequired('is_internal_control_material_weakness_disclosed');
+  setCheckboxRequired('is_material_noncompliance_disclosed');
+  setCheckboxRequired('is_aicpa_audit_guide_included');
+  setCheckboxRequired('is_low_risk_auditee');
 }
 
 init();

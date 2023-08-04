@@ -1,14 +1,23 @@
+import { testValidEligibility } from '../support/check-eligibility.js';
+import { testValidAuditeeInfo } from '../support/auditee-info.js';
+import { addValidEmail, testValidAccess } from '../support/check-access.js';
+
 describe('Create New Audit', () => {
+
   beforeEach(() => {
+    // contents of session are only called once
+    cy.session('loginSession', () => {
+      cy.visit('/')
+      cy.login();
+
+      // submitting accessandsubmission can't succeed unless we fill in some
+      // of the previous pages
+      cy.visit('/report_submission/eligibility/')
+      testValidEligibility();
+      testValidAuditeeInfo();
+    });
     cy.visit('/report_submission/accessandsubmission/');
   });
-
-  function addValidEmail(field) {
-    cy.get(field)
-      .clear()
-      .type('test.address-with+features@test.gsa.gov')
-      .blur();
-  }
 
   describe('A Blank Form', () => {
     it('marks empty responses as invalid', () => {
@@ -348,21 +357,8 @@ describe('Create New Audit', () => {
       });
     });
 
-    function completeFormWithValidInfo() {
-      [
-        '#certifying_auditee_contact_email', '#certifying_auditee_contact_re_email',
-        '#certifying_auditor_contact_email', '#certifying_auditor_contact_re_email',
-        '#auditee_contacts_email', '#auditee_contacts_re_email',
-        '#auditor_contacts_email', '#auditor_contacts_re_email' 
-      ].forEach(field => addValidEmail(field))
-    }
-
-    // TODO add general info form path here and enable this 
-    // spec after that page is re-implemented
-    xit('should proceed to the next step after successful submission', () => {
-      completeFormWithValidInfo();
-      cy.get('.usa-button').contains('Continue').click();
-      cy.url().should('include', '/report_submission/accessandsubmission');
+    it('should proceed to the next step after successful submission', () => {
+      testValidAccess();
     });
   });
 

@@ -1,5 +1,7 @@
-local Func = import 'Functions.libsonnet';
 local FederalProgramNames = import 'FederalProgramNames.json';
+local Func = import 'Functions.libsonnet';
+local GAAP = import 'GAAP.libsonnet';
+local ComplianceRequirementTypes = import 'ComplianceRequirementTypes.json';
 local ClusterNames = import 'ClusterNames.json';
 
 local Const = {
@@ -129,7 +131,7 @@ local Enum = {
       Const.N,
       Const.Y_N,
     ],
-  },  
+  },
   NA: Types.string {
     //description: 'A 'not applicable' answer',
     enum: [
@@ -277,6 +279,10 @@ local Enum = {
     ],
     title: 'SubmissionStatus',
   },
+  GAAPResults: Types.string {
+    description: 'GAAP Results (Audit Information)',
+    enum: std.map(function(pair) pair.tag, GAAP.gaap_results),
+  },  
 };
 
 local simple_phone_regex = '[1-9]{1}[0-9]{9}+';
@@ -327,8 +333,8 @@ local type_uei = Types.string {
     },
     // Does not start with 9 digits in a row
     {
-      pattern: "^(?![0-9]{9})"
-    }
+      pattern: '^(?![0-9]{9})',
+    },
   ],
 };
 
@@ -387,7 +393,7 @@ local SchemaBase = Types.object {
   Compound: Compound {
     FederalProgramNames: {
       description: 'All Federal program names',
-      enum: FederalProgramNames.program_names
+      enum: FederalProgramNames.program_names,
     },
     AllALNNumbers: {
       description: 'All program numbers',
