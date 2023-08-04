@@ -56,5 +56,16 @@ describe('Full audit submission', () => {
 
     cy.get(".usa-link").contains("Additional UEIs workbook").click();
     testWorkbookAdditionalUEIs(false);  // don't intercept
+    
+
+    // Can it be? We are ready for certification?
+    cy.get(".usa-button").contains("Ready for SF-SAC Certification").click();
+    cy.url().should('match', /\/audit\/ready-for-certification\/[0-9A-Z]{17}/);
+    // Submit for certification button
+    cy.get("#continue").click()
+    // Can't tell if this is the right place for this to end up?
+    cy.url().should('match', /\/audit\/submission-progress\/[0-9A-Z]{17}/);
+
+
   });
 });
