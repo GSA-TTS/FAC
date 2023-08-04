@@ -299,7 +299,7 @@ local sheets = [
         title: 'Cluster Names',
         title_cell: 'A1',
         range_name: 'cluster_name_lookup',
-        contents: Base.Compound.ClusterNames,
+        contents: Base.Compound.ClusterNamesNAStateOther,
         validation: SV.LookupValidation {
           lookup_range: 'cluster_name_lookup',
         },
