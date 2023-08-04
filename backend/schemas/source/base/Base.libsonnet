@@ -334,7 +334,7 @@ local type_uei = Types.string {
     // Does not start with 9 digits in a row
     {
       pattern: '^(?![0-9]{9})',
-    },
+    }
   ],
 };
 
@@ -342,7 +342,7 @@ local Compound = {
   AwardReference: Types.string {
     title: 'AwardReference',
     description: 'Award Reference',
-    pattern: '^AWARD-(?!0000)[0-9]{4}$',
+    pattern: '^AWARD-(?!0000)[0-9]{4}$'
   },
   PriorReferences: Types.string {
     title: 'PriorReferences',
@@ -370,8 +370,7 @@ local Compound = {
   UnitedStatesPhone: Types.string {
     pattern: phone_regex,
   },
-  Zip: type_zipcode,
-
+  Zip: type_zipcode
 };
 
 
@@ -393,7 +392,7 @@ local SchemaBase = Types.object {
   Compound: Compound {
     FederalProgramNames: {
       description: 'All Federal program names',
-      enum: FederalProgramNames.program_names,
+      enum: FederalProgramNames.program_names
     },
     AllALNNumbers: {
       description: 'All program numbers',

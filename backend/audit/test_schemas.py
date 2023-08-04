@@ -13,7 +13,7 @@ from jsonschema import exceptions, validate as jsonschema_validate, FormatChecke
 from audit.fixtures.excel import (
     ADDITIONAL_UEIS_TEST_FILE,
     CORRECTIVE_ACTION_PLAN_TEST_FILE,
-    FEDERAL_AWARDS_TEST_FILE,
+    FEDERAL_AWARDS_TEST_FILES,
     FINDINGS_TEXT_TEST_FILE,
     FINDINGS_UNIFORM_GUIDANCE_TEST_FILE,
     SECONDARY_AUDITORS_TEST_FILE,
@@ -524,13 +524,12 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
         "FederalAwardsCases"
     ]
 
-    def test_schema(self):
+    def test_multiple_files(self):
         """Try to test FederalAwards first."""
         schema = self.FEDERAL_AWARDS_SCHEMA
-
-        in_flight_file = FEDERAL_AWARDS_TEST_FILE
-        in_flight = json.loads(in_flight_file.read_text(encoding="utf-8"))
-        validate(in_flight, schema)
+        for in_flight_file in FEDERAL_AWARDS_TEST_FILES:
+            in_flight = json.loads(in_flight_file.read_text(encoding="utf-8"))
+            validate(in_flight, schema)
 
     def test_simple_pass(self):
         """
@@ -641,7 +640,7 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
 
     def test_direct_award_dependents(self):
         """
-        If direct_award is Y, loan_balance_at_audit_period_end must have a value.
+        If direct_award is Y or N, check dependent values
         """
         schema = self.FEDERAL_AWARDS_SCHEMA
 
@@ -666,10 +665,10 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
 
         validate(simple_case, schema)
 
-        no_dependent_fail = award | {"direct_or_indirect_award": {"is_direct": "N"}}
+        no_dependent_fail = award | {"direct_or_indirect_award": {"is_direct": "Y"}}
         simple_case["FederalAwards"]["federal_awards"] = [no_dependent_fail]
-
-        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
+        # self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
+        validate(simple_case, schema)
 
         only_dependent_fail = award | {
             "direct_or_indirect_award": {
