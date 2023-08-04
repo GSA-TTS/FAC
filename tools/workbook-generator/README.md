@@ -44,15 +44,15 @@ But, I think it's still better than trying to create test workbooks by hand.
 
 ## Requirements
 
-1. In `data`, place the file `allfac22.sqlite3`. This is currently hard-coded into `models.py`. For now/for the spike, 2022 data should be plenty.
+1. In `data/ay22`, place the file `allfac22.sqlite3`. This is currently hard-coded into `models.py`. For now/for the spike, 2022 data should be plenty.
 2. In `templates`, place recent workbook template files. Their names are also hard-coded into the script. If we change the workbook names (which, in theory, we're going to, to add version numbers...) this will break. If we keep this tool, we can be smarter about this.
 3. The directory `output` will be created by the script.
 
-The sqlite file can be found in our GDrive.
+The sqlite file can be found in our GDrive. Or, you can use `generate-sqlite-files` to create one from a Census `.zip` file of the AY22 data.
 
 ## Notes
 
-All of the data in the SQLite file is, as far as we know, guaranteed to be public. The SQLite file was generated from the pipe-delimited CSVs that Census distributes on their website. So, it is data that Census published, and we converted from CSV to SQLite. 
+All of the data in the SQLite file is guaranteed to be public. The SQLite file was generated from the pipe-delimited CSVs that Census distributes on their website. So, it is data that Census published, and we converted from CSV to SQLite. 
 
 The `models.py` file was generated with the `pwiz` tool. It is part of the `peewee` suite of tools that are associated with that (small?) Python ORM.
 
@@ -62,7 +62,11 @@ Something like
 pwiz allfac22.sqlite3 > models.py
 ```
 
-generated the file.
+generated the file. 
+
+The `models.py` can be made to take a dynamic path to a database, which would allow us to put the `sqlite3` file somewhere else. I have not attempted this change, because this is a spike, and it may not be necessary.
+
+If we come up with a use-case to improve this tool, we'll do so.
 
 ## And...
 
