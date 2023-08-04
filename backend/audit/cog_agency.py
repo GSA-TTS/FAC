@@ -9,7 +9,7 @@
 
 # Calculate total amount_expended (tot_amount_expended)
 # Calculate total amount_expended by agency
-#   tot_amount_agency = {agency, tot_amt}         
+#   tot_amount_agency = {agency, tot_amt}
 # Calculate total direct award amount_expended by agency
 #   tot_da_amount_agency = {agency, tot_da_amt}
 # Calculate total direct award amount_expended (tot_da_amount_expended)
