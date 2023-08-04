@@ -41,6 +41,55 @@
                               "if": {
                                  "properties": {
                                     "cluster_total": {
+                                       "const": 0,
+                                       "type": "number"
+                                    }
+                                 }
+                              },
+                              "then": {
+                                 "allOf": [
+                                    {
+                                       "properties": {
+                                          "cluster_name": {
+                                             "enum": [
+                                                "N/A"
+                                             ],
+                                             "title": "N/A",
+                                             "type": "string"
+                                          }
+                                       }
+                                    },
+                                    {
+                                       "properties": {
+                                          "other_cluster_name": {
+                                             "description": "Empty string or null",
+                                             "enum": [
+                                                "",
+                                                "null"
+                                             ],
+                                             "title": "EmptyString_Null"
+                                          }
+                                       }
+                                    },
+                                    {
+                                       "properties": {
+                                          "state_cluster_name": {
+                                             "description": "Empty string or null",
+                                             "enum": [
+                                                "",
+                                                "null"
+                                             ],
+                                             "title": "EmptyString_Null"
+                                          }
+                                       }
+                                    }
+                                 ]
+                              }
+                           },
+                           {
+                              "if": {
+                                 "properties": {
+                                    "cluster_total": {
                                        "exclusiveMinimum": 0,
                                        "type": "number"
                                     }

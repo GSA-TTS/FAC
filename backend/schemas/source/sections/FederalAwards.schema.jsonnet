@@ -219,6 +219,34 @@ local Parts = {
     },
     allOf: [
       {
+        'if': {
+          properties: {
+            cluster_total: Types.number {
+              const: 0,
+            },
+          },
+        },
+        'then': {
+          allOf: [
+            {
+              properties: {
+                cluster_name: Base.Enum.NA,
+              },
+            },  
+            {
+              properties: {
+                other_cluster_name: Base.Enum.EmptyString_Null,
+              },
+            },
+            {
+              properties: {
+                state_cluster_name: Base.Enum.EmptyString_Null,
+              },
+            },
+          ],
+        },
+      },
+      {
         // If I have a cluster_total greater than zero, then I
         // must have a valid cluster name. It cannot be N/A if the
         // cluster total is greater than zero.
