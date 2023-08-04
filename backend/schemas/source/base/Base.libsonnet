@@ -1,6 +1,8 @@
-local ClusterNames = import 'ClusterNames.json';
 local FederalProgramNames = import 'FederalProgramNames.json';
 local Func = import 'Functions.libsonnet';
+local GAAP = import 'GAAP.libsonnet';
+local ComplianceRequirementTypes = import 'ComplianceRequirementTypes.json';
+local ClusterNames = import 'ClusterNames.json';
 
 local Const = {
   Y: 'Y',
@@ -250,9 +252,23 @@ local Enum = {
     ],
     title: 'SubmissionStatus',
   },
+  GAAPResults: Types.string {
+    description: 'GAAP Results (Audit Information)',
+    enum: std.map(function(pair) pair.tag, GAAP.gaap_results),
+  },
   ALNPrefixes: Types.string {
     description: 'Valid two-digit program numbers; part of the CFDA/ALN',
     enum: [
+      '00',
+      '01', 
+      '02',
+      '03',
+      '04',
+      '05',
+      '06',
+      '07',
+      '08',
+      '09',
       '10',
       '11',
       '12',
@@ -368,6 +384,8 @@ local type_uei = Types.string {
     {
       pattern: '^(?![0-9]{9})',
     },
+      pattern: '^(?![0-9]{9})',
+    },
   ],
 };
 
@@ -376,6 +394,7 @@ local Compound = {
     title: 'AwardReference',
     description: 'Award Reference',
     pattern: '^AWARD-(?!0000)[0-9]{4}$',
+  },
   },
   ThreeDigitExtension: Types.string {
     title: 'ThreeDigitExtension',
@@ -432,14 +451,19 @@ local SchemaBase = Types.object {
     FederalProgramNames: {
       description: 'All Federal program names',
       enum: FederalProgramNames.program_names,
+      enum: FederalProgramNames.program_names,
     },
     AllALNNumbers: {
       description: 'All program numbers',
       enum: FederalProgramNames.all_alns,
     },
-    // 20230719 HDMS FIXME: Because there is discrepancy between the ALN numbers
-    // from the CSV and ALN numbers from the Enum object above, I commented out the ALNPrefixes enum below.
-    // This is a temporary fix until we figure how the resolve the discrepancy (i.e., which list to use as source of truth).
+    ALNPrefixes: {
+      description: 'Unique ALN prefixes',
+      enum: FederalProgramNames.aln_prefixes,
+    },
+    # 20230719 HDMS FIXME: Because there is discrepancy between the ALN numbers 
+    # from the CSV and ALN numbers from the Enum object above, I commented out the ALNPrefixes enum below.  
+    # This is a temporary fix until we figure how the resolve the discrepancy (i.e., which list to use as source of truth).  
     // ALNPrefixes: {
     //   description: 'Unique ALN prefixes',
     //   enum: FederalProgramNames.aln_prefixes

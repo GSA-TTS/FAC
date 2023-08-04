@@ -11,6 +11,11 @@ from django.utils.datastructures import MultiValueDictKeyError
 from django.utils.decorators import method_decorator
 from django.http import JsonResponse
 
+from audit.forms import UploadReportForm, AuditInfoForm
+
+from config.settings import AGENCY_NAMES, GAAP_RESULTS
+from .fixtures.excel import FORM_SECTIONS
+
 from audit.excel import (
     extract_additional_ueis,
     extract_federal_awards,
@@ -29,8 +34,6 @@ from audit.validators import (
     validate_secondary_auditors_json,
     validate_notes_to_sefa_json,
 )
-from audit.forms import UploadReportForm, AuditInfoForm
-from audit.get_agency_names import get_agency_names
 from audit.mixins import (
     CertifyingAuditeeRequiredMixin,
     CertifyingAuditorRequiredMixin,
@@ -43,8 +46,7 @@ from audit.models import (
     SingleAuditChecklist,
     SingleAuditReportFile,
 )
-
-from .fixtures.excel import FORM_SECTIONS
+from audit.validators import validate_audit_information_json
 
 logger = logging.getLogger(__name__)
 
@@ -423,7 +425,7 @@ class SubmissionProgressView(SingleAuditChecklistAccessRequiredMixin, generic.Vi
                     "completed_by": None,
                 },
                 "audit_information_form": {
-                    "completed": False,
+                    "completed": True if (sac.audit_information) else False,
                     "completed_date": None,
                     "completed_by": None,
                 },
@@ -491,17 +493,45 @@ class AuditInfoFormView(SingleAuditChecklistAccessRequiredMixin, generic.View):
         report_id = kwargs["report_id"]
         try:
             sac = SingleAuditChecklist.objects.get(report_id=report_id)
+            current_info = {}
+            if sac.audit_information:
+                current_info = {
+                    "cleaned_data": {
+                        "gaap_results": sac.audit_information.get("gaap_results"),
+                        "is_going_concern_included": sac.audit_information.get(
+                            "is_going_concern_included"
+                        ),
+                        "is_internal_control_deficiency_disclosed": sac.audit_information.get(
+                            "is_internal_control_deficiency_disclosed"
+                        ),
+                        "is_internal_control_material_weakness_disclosed": sac.audit_information.get(
+                            "is_internal_control_material_weakness_disclosed"
+                        ),
+                        "is_material_noncompliance_disclosed": sac.audit_information.get(
+                            "is_material_noncompliance_disclosed"
+                        ),
+                        "is_aicpa_audit_guide_included": sac.audit_information.get(
+                            "is_aicpa_audit_guide_included"
+                        ),
+                        "dollar_threshold": sac.audit_information.get(
+                            "dollar_threshold"
+                        ),
+                        "is_low_risk_auditee": sac.audit_information.get(
+                            "is_low_risk_auditee"
+                        ),
+                        "agencies": sac.audit_information.get("agencies"),
+                    }
+                }
 
             context = {
                 "auditee_name": sac.auditee_name,
                 "report_id": report_id,
                 "auditee_uei": sac.auditee_uei,
                 "user_provided_organization_type": sac.user_provided_organization_type,
-                "agency_names": get_agency_names(),
+                "agency_names": AGENCY_NAMES,
+                "gaap_results": GAAP_RESULTS,
+                "form": current_info,
             }
-
-            # TODO: check if there's already a form in the DB and let the user know
-            # context['already_submitted'] = ...
 
             return render(request, "audit/audit-info-form.html", context)
         except SingleAuditChecklist.DoesNotExist:
@@ -515,20 +545,30 @@ class AuditInfoFormView(SingleAuditChecklistAccessRequiredMixin, generic.View):
 
         try:
             sac = SingleAuditChecklist.objects.get(report_id=report_id)
-            form = AuditInfoForm(request.POST, request.FILES)
+            form = AuditInfoForm(request.POST)
 
             if form.is_valid():
-                # Save the form, yay!
-                logger.info("Audit info form passed validation.")
+                form.clean_booleans()
+
+                audit_information = sac.audit_information or {}
+                audit_information.update(form.cleaned_data)
+                validated = validate_audit_information_json(audit_information)
+                sac.audit_information = validated
+                sac.save()
+
+                logger.info("Audit info form saved.", form.cleaned_data)
+
                 return redirect(reverse("audit:SubmissionProgress", args=[report_id]))
             else:
+                logger.warn(form.errors)
                 form.clean_booleans()
                 context = {
                     "auditee_name": sac.auditee_name,
                     "report_id": report_id,
                     "auditee_uei": sac.auditee_uei,
                     "user_provided_organization_type": sac.user_provided_organization_type,
-                    "agency_names": get_agency_names(),
+                    "agency_names": AGENCY_NAMES,
+                    "gaap_results": GAAP_RESULTS,
                     "form": form,
                 }
                 return render(request, "audit/audit-info-form.html", context)
