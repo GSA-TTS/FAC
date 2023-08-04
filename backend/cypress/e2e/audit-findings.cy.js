@@ -32,7 +32,7 @@ describe('Audit findings page', () => {
       cy.visit(`/report_submission/audit-findings/${reportTestId}`);
       cy.get('#file-input-audit-findings-xlsx').attachFile('federal-awards-Test.xlsx');
       cy.wait('@uploadFail').its('response.statusCode').should('eq', 400)
-      cy.wait(2000).get('#info_box').should('have.text', 'Field Error: undefined');
+      cy.wait(2000).get('#info_box').should('contain', 'A field is missing');
     })
   })
 

@@ -28,7 +28,7 @@ export function testWorkbookFederalAwards(intercept = true) {
   testWorkbookUpload(
     '/audit/excel/federal-awards-expended/*',
     '#file-input-federal-awards-xlsx',
-    'federal-awards-expended-UPDATE.xlsx'
+    'federal-awards-expended-PASS.xlsx'
   );
 }
 

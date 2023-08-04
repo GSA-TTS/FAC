@@ -30,7 +30,7 @@ jobs:
             fac-build-
 
       - name: Set up Python 3.10
-        uses: actions/setup-python@v3
+        uses: actions/setup-python@v4
         with:
           python-version: "3.10"
 
@@ -77,3 +77,4 @@ jobs:
           cf_space: ${{ env.space }}
           cf_manifest: backend/manifests/manifest-fac.yml
           cf_vars_file: backend/manifests/vars/vars-${{ env.space }}.yml
+          command: bin/ops/deploy.sh

@@ -1,5 +1,5 @@
 {
-   "filename": "findings-uniform-guidance-template.xlsx",
+   "filename": "federal-awards-audit-findings-workbook.xlsx",
    "sheets": [
       {
          "hide_col_from": 13,
@@ -235,7 +235,7 @@
                "title_cell": "A1",
                "type": "single_cell",
                "validation": {
-                  "custom_error": "Expecting something with only twelve characters",
+                  "custom_error": "Expecting something with 12 characters",
                   "custom_title": "Must be length of 12",
                   "formula1": 12,
                   "operator": "equal",

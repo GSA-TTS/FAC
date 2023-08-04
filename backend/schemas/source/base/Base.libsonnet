@@ -1,5 +1,7 @@
-local Func = import 'Functions.libsonnet';
 local FederalProgramNames = import 'FederalProgramNames.json';
+local Func = import 'Functions.libsonnet';
+local GAAP = import 'GAAP.libsonnet';
+local ComplianceRequirementTypes = import 'ComplianceRequirementTypes.json';
 local ClusterNames = import 'ClusterNames.json';
 
 local Const = {
@@ -61,13 +63,40 @@ local Meta = {
   },
 };
 
+local REGEX_ALN_PREFIX = '^([0-9]{2})$';
+local REGEX_RD_EXTENSION = 'RD';
+local REGEX_THREE_DIGIT_EXTENSION = '[0-9]{3}[A-Za-z]{0,1}';
+local REGEX_U_EXTENSION = 'U[0-9]{2}';
+
+local type_aln_prefix = Types.string {
+    allOf: [
+    {
+      minLength: 2,
+      maxLength: 2,
+    },
+    {
+      pattern: REGEX_ALN_PREFIX,
+    },
+  ]
+};
+local type_three_digit_extension = Types.string {
+  pattern: '^('
+            + REGEX_RD_EXTENSION
+            + '|'
+            + REGEX_THREE_DIGIT_EXTENSION
+            + '|'
+            + REGEX_U_EXTENSION
+            + ')$',
+
+};
+
 local Validation = {
   AdditionalAwardIdentificationValidation: [
     {
       'if': {
         properties: {
           three_digit_extension: {
-            pattern: '^(RD|U[0-9]{2})$',
+            pattern: '^('+REGEX_RD_EXTENSION+'|'+REGEX_U_EXTENSION+')$',
           },
         },
       },
@@ -102,7 +131,7 @@ local Enum = {
       Const.N,
       Const.Y_N,
     ],
-  },  
+  },
   NA: Types.string {
     //description: 'A 'not applicable' answer',
     enum: [
@@ -250,72 +279,10 @@ local Enum = {
     ],
     title: 'SubmissionStatus',
   },
-  ALNPrefixes: Types.string {
-    description: 'Valid two-digit program numbers; part of the CFDA/ALN',
-    enum: [
-      '10',
-      '11',
-      '12',
-      '13',
-      '14',
-      '15',
-      '16',
-      '17',
-      '18',
-      '19',
-      '20',
-      '21',
-      '22',
-      '23',
-      '27',
-      '29',
-      '30',
-      '32',
-      '33',
-      '34',
-      '36',
-      '39',
-      '40',
-      '41',
-      '42',
-      '43',
-      '44',
-      '45',
-      '46',
-      '47',
-      '53',
-      '57',
-      '58',
-      '59',
-      '60',
-      '61',
-      '62',
-      '64',
-      '66',
-      '68',
-      '70',
-      '77',
-      '78',
-      '81',
-      '82',
-      '83',
-      '84',
-      '85',
-      '86',
-      '87',
-      '88',
-      '89',
-      '90',
-      '91',
-      '92',
-      '93',
-      '94',
-      '96',
-      '97',
-      '98',
-      '99',
-    ],
-  },
+  GAAPResults: Types.string {
+    description: 'GAAP Results (Audit Information)',
+    enum: std.map(function(pair) pair.tag, GAAP.gaap_results),
+  },  
 };
 
 local simple_phone_regex = '[1-9]{1}[0-9]{9}+';
@@ -366,8 +333,8 @@ local type_uei = Types.string {
     },
     // Does not start with 9 digits in a row
     {
-      pattern: "^(?![0-9]{9})"
-    }
+      pattern: '^(?![0-9]{9})',
+    },
   ],
 };
 
@@ -376,11 +343,6 @@ local Compound = {
     title: 'AwardReference',
     description: 'Award Reference',
     pattern: '^AWARD-(?!0000)[0-9]{4}$',
-  },  
-  ThreeDigitExtension: Types.string {
-    title: 'ThreeDigitExtension',
-    description: 'Three Digit Extension',
-    pattern: '^(RD|[0-9]{3}[A-Za-z]{0,1}|U[0-9]{2})$',
   },
   PriorReferences: Types.string {
     title: 'PriorReferences',
@@ -431,23 +393,18 @@ local SchemaBase = Types.object {
   Compound: Compound {
     FederalProgramNames: {
       description: 'All Federal program names',
-      enum: FederalProgramNames.program_names
+      enum: FederalProgramNames.program_names,
     },
     AllALNNumbers: {
       description: 'All program numbers',
       enum: FederalProgramNames.all_alns
       },
-    # 20230719 HDMS FIXME: Because there is discrepancy between the ALN numbers 
-    # from the CSV and ALN numbers from the Enum object above, I commented out the ALNPrefixes enum below.  
-    # This is a temporary fix until we figure how the resolve the discrepancy (i.e., which list to use as source of truth).  
-    // ALNPrefixes: {
-    //   description: 'Unique ALN prefixes',
-    //   enum: FederalProgramNames.aln_prefixes
-    // },
     ClusterNames: {
       description: 'All cluster names',
       enum: ClusterNames.cluster_names + [Const.NA, Const.OTHER_CLUSTER]
-    }
+    },
+    ALNPrefixes : type_aln_prefix,
+    ThreeDigitExtension : type_three_digit_extension, 
   },
   Validation: Validation,
   SchemaBase: SchemaBase,

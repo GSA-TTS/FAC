@@ -55,9 +55,7 @@ describe('Workbook upload successful', () => {
         'fed-awards-invalid.xlsx'
       );
       cy.wait('@uploadFail').its('response.statusCode').should('eq', 400);
-      cy.wait(2000)
-        .get('#info_box')
-        .should('have.text', 'Field Error: undefined');
+      cy.wait(2000).get('#info_box').should('contain', 'A field is missing');
     });
 
     it('unsuccessful upload audit findings', () => {
@@ -70,9 +68,7 @@ describe('Workbook upload successful', () => {
         'find-uni-invalid.xlsx'
       );
       cy.wait('@uploadFail').its('response.statusCode').should('eq', 400);
-      cy.wait(2000)
-        .get('#info_box')
-        .should('have.text', 'Field Error: undefined');
+      cy.wait(2000).get('#info_box').should('contain', 'A field is missing');
     });
 
     it('unsuccessful upload audit findings text', () => {
@@ -85,9 +81,7 @@ describe('Workbook upload successful', () => {
         'find-text-invalid.xlsx'
       );
       cy.wait('@uploadFail').its('response.statusCode').should('eq', 400);
-      cy.wait(2000)
-        .get('#info_box')
-        .should('have.text', 'Field Error: undefined');
+      cy.wait(2000).get('#info_box').should('contain', 'A field is missing');
     });
 
     it('unsuccessful upload CAP', () => {
@@ -111,9 +105,7 @@ describe('Workbook upload successful', () => {
       cy.visit(`/report_submission/additional-ueis/${reportTestId}`);
       cy.get('#file-input-additional-ueis-xlsx').attachFile('cap-invalid.xlsx');
       cy.wait('@uploadFail').its('response.statusCode').should('eq', 400);
-      cy.wait(2000)
-        .get('#info_box')
-        .should('have.text', 'Field Error: undefined');
+      cy.wait(2000).get('#info_box').should('contain', 'A field is missing');
     });
   });
 });

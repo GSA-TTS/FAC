@@ -1,5 +1,5 @@
 {
-   "filename": "notes-to-sefa-template.xlsx",
+   "filename": "notes-to-sefa-workbook.xlsx",
    "sheets": [
       {
          "header_height": 100,
@@ -124,7 +124,7 @@
                "title_cell": "A1",
                "type": "single_cell",
                "validation": {
-                  "custom_error": "Expecting something with only twelve characters",
+                  "custom_error": "Expecting something with 12 characters",
                   "custom_title": "Must be length of 12",
                   "formula1": 12,
                   "operator": "equal",

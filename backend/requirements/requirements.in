@@ -12,6 +12,7 @@ django-fsm
 environs[django]
 faker
 gunicorn
+jsonnet
 jsonpath-ng
 jsonschema
 newrelic
