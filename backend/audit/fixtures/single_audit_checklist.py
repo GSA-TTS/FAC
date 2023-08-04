@@ -220,6 +220,13 @@ SACS = [
         }
     },
     {
+        "auditee_name": "Audit finding submitted",
+        "post_upload_workbook": {
+            "section": FORM_SECTIONS.FINDINGS_UNIFORM_GUIDANCE,
+            "regex": "findings-[0-9]+"
+        }
+    },
+    {
         "auditee_name": "All workbooks submitted",
         "post_upload_workbooks": [
             {
@@ -234,7 +241,25 @@ SACS = [
             "section": FORM_SECTIONS.FINDINGS_TEXT,
             "regex": "findings-text"
             },
-        ]
+            {
+                "section": FORM_SECTIONS.CORRECTIVE_ACTION_PLAN,
+                "regex": "captext"
+            },
+            {
+                "section": FORM_SECTIONS.ADDITIONAL_UEIS,
+                "regex": "additional-ueis"
+            },
+            {
+                "section": FORM_SECTIONS.SECONDARY_AUDITORS,
+                "regex": "cpas"
+            },
+            {
+                "section": FORM_SECTIONS.NOTES_TO_SEFA,
+                "regex": "notes"
+            },
+            
+            
+        ],
     },
 ]
 
@@ -265,11 +290,8 @@ def _load_single_audit_checklists_for_user(user, workbooks):
             for wb in item_info["post_upload_workbooks"]:
                 section = wb["section"]
                 regex = wb["regex"]
-                print(f"{section} Looking for {regex} in {workbooks}")
                 workbook_names = list(map(lambda full: (full, Path(full).stem), workbooks))
-                print(workbook_names)
                 filtered = list(filter(lambda ftuple: re.search(regex, ftuple[1]), workbook_names))
-                print(filtered)
                 file = filtered.pop()
                 print("################")
                 print(f"## Loading workbook {file}")
