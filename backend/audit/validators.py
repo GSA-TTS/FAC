@@ -517,7 +517,7 @@ def validate_component_page_numbers(obj):
         "schedule_findings",
     ]
     optional_keys = ["schedule_prior_findings", "CAP_page"]
-    
+
     required_keys_are_good = all(
         [((key in obj) and isinstance(obj[key], int)) for key in required_keys]
     )
