@@ -424,7 +424,7 @@ local Compound = {
   UnitedStatesPhone: Types.string {
     pattern: phone_regex,
   },
-  Zip: type_zipcode
+  Zip: type_zipcode,
 };
 
 
