@@ -1,4 +1,3 @@
-import os
 import json
 from cog_agency import cog_over_assignment
 
@@ -8,7 +7,7 @@ file = "../data_fixtures/audit/test_data_entries/test_cog_over.json"
 print("File used: ", file)
 with open(file, "r") as f:
     test_data = json.load(f)
-#print(test_data['FederalAwards']['federal_awards'])
+# print(test_data['FederalAwards']['federal_awards'])
 
 cog_agency, over_agency = cog_over_assignment(test_data)
 print("cognizant agency = ", cog_agency)
@@ -20,7 +19,7 @@ file = "../data_fixtures/audit/test_data_entries/test_cog_over_more_awards.json"
 print("File used: ", file)
 with open(file, "r") as f:
     test_data = json.load(f)
-#print(test_data['FederalAwards']['federal_awards'])
+# print(test_data['FederalAwards']['federal_awards'])
 
 cog_agency, over_agency = cog_over_assignment(test_data)
 print("cognizant agency = ", cog_agency)
