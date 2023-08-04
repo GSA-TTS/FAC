@@ -768,7 +768,7 @@ class ComponentPageNumberTests(SimpleTestCase):
             self.fail("validate_component_page_numbers incorrectly says our good data is bad!")
     
     def test_nan_pages(self):
-        res = validate_component_page_numbers(ComponentPageNumberTests.missing_pages)
+        res = validate_component_page_numbers(ComponentPageNumberTests.nan_pages)
         if res:
             self.fail("validate_component_page_numbers incorrectly validated an object that has numbers instead of ints")
     
@@ -778,7 +778,7 @@ class ComponentPageNumberTests(SimpleTestCase):
             self.fail("validate_component_page_numbers incorrectly validated an object that is missing pages")
 
     def test_optional_pages(self):
-        res = validate_component_page_numbers(ComponentPageNumberTests.missing_pages)
+        res = validate_component_page_numbers(ComponentPageNumberTests.optional_pages)
         if not res:
             self.fail("validate_component_page_numbers rejected an object with optional pages")
 
