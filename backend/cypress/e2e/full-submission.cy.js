@@ -3,6 +3,11 @@ import { testValidAccess } from '../support/check-access.js';
 import { testValidEligibility } from '../support/check-eligibility.js';
 import { testValidAuditeeInfo } from '../support/auditee-info.js';
 import { testValidGeneralInfo } from '../support/general-info.js';
+import { testWorkbookFederalAwards,
+         testWorkbookFindingsUniformGuidance,
+         testWorkbookFindingsText,
+         testWorkbookCorrectiveActionPlan,
+         testWorkbookAdditionalUEIs } from '../support/workbook-uploads.js'
 
 describe('Full audit submission', () => {
   before(() => {
@@ -35,5 +40,21 @@ describe('Full audit submission', () => {
 
     // Fill out the general info form
     testValidGeneralInfo();
+
+    // Upload all the workbooks
+    cy.get(".usa-link").contains("Federal Awards workbook").click();
+    testWorkbookFederalAwards(false);  // don't intercept
+
+    cy.get(".usa-link").contains("Audit Findings workbook").click();
+    testWorkbookFindingsUniformGuidance(false);  // don't intercept
+
+    cy.get(".usa-link").contains("Audit Findings Text workbook").click();
+    testWorkbookFindingsText(false);  // don't intercept
+
+    cy.get(".usa-link").contains("Corrective Action Plan (CAP) workbook").click();
+    testWorkbookCorrectiveActionPlan(false);  // don't intercept
+
+    cy.get(".usa-link").contains("Additional UEIs workbook").click();
+    testWorkbookAdditionalUEIs(false);  // don't intercept
   });
 });
