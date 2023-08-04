@@ -302,7 +302,7 @@ local Parts = {
   Program: Types.object {
     additionalProperties: false,
     properties: {
-      federal_agency_prefix: Base.Enum.ALNPrefixes,
+      federal_agency_prefix: Base.Compound.ALNPrefixes,
       three_digit_extension: Base.Compound.ThreeDigitExtension,
       additional_award_identification: Func.compound_type([Types.string, Types.NULL, Types.integer]),
       program_name: Types.string,

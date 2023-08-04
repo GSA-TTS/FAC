@@ -1,33 +1,8 @@
 local Sheets = import 'Sheets.libsonnet';
 
-local columns = [
-  'A',
-  'B',
-  'C',
-  'D',
-  'E',
-  'F',
-  'G',
-  'H',
-  'I',
-  'J',
-  'K',
-  'L',
-  'M',
-  'N',
-  'O',
-  'P',
-  'Q',
-  'R',
-  'S',
-  'T',
-  'U',
-  'V',
-  'W',
-  'X',
-  'Y',
-  'Z',
-];
+local getColumn(idx) =
+  if idx < 26 then std.char(65 + idx)
+  else std.char(65 + (idx / 26 - 1)) + std.char(65 + (idx % 26));
 
 {
   // base is the base object; e.g. Sheets.open_range
@@ -37,7 +12,7 @@ local columns = [
     std.mapWithIndex(function(ndx, a) a[0] {
       title: a[2],
       range_name: a[3],
-      title_cell: columns[ndx] + std.toString(row),
+      title_cell: getColumn(ndx) + std.toString(row),
       validation: a[1],
     }, arrs),
 
