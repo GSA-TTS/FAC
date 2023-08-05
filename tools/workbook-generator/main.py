@@ -271,21 +271,31 @@ def generate_federal_awards(dbkey, outdir):
     set_range(wb, 'passthrough_name', passthrough_names)
     set_range(wb, 'passthrough_identifying_number', passthrough_ids)
 
+    # The award numbers!
+    set_range(wb, 'award_reference', [f"AWARD-{n+1:04}" for n in range(len(passthrough_names))])
+
     # Total amount expended must be calculated and inserted
     total = 0
     for cfda in cfdas:
         total += int(cfda.amount)
     set_single_cell_range(wb, 'total_amount_expended', total)
 
+
+
     wb.save(os.path.join(outdir, f'federal-awards-{dbkey}.xlsx'))
 
     table = generate_dissemination_test_table('federal_awards', dbkey, mappings, cfdas)
+    award_counter = 1
     # prefix
     for obj, pfix, ext in zip(table['rows'], prefixes, extensions):
         obj['fields'].append('federal_agency_prefix')
         obj['values'].append(pfix)
         obj['fields'].append('three_digit_extension')
         obj['values'].append(ext)
+        # Sneak in the award number here
+        obj['fields'].append('award_reference')
+        obj['values'].append(f"AWARD-{award_counter:04}")
+        award_counter += 1
     # names, ids
     for obj, name, id in zip(table['rows'], passthrough_names, passthrough_ids):
         obj['fields'].append('passthrough_name')

@@ -408,6 +408,10 @@ class SubmissionProgressView(SingleAuditChecklistAccessRequiredMixin, generic.Vi
 
         try:
             sac = SingleAuditChecklist.objects.get(report_id=report_id)
+            print(report_id, sac.id)
+            # component_page_numbers, date_created, file, filename, id, sac, sac_id, user, user_id
+            audit_report = SingleAuditReportFile.objects.filter(sac_id=sac.id)
+            print(audit_report)
 
             # TODO: Ensure the correct SAC elements are used to determine what's complete.
             context = {
@@ -445,17 +449,17 @@ class SubmissionProgressView(SingleAuditChecklistAccessRequiredMixin, generic.Vi
                     "completed_by": None,
                 },
                 "additional_UEIs_workbook": {
-                    "completed": False,
+                    "completed": True if (sac.additional_ueis) else False,
                     "completed_date": None,
                     "completed_by": None,
                 },
                 "secondary_auditors_workbook": {
-                    "completed": False,
+                    "completed": True if (sac.secondary_auditors) else False,
                     "completed_date": None,
                     "completed_by": None,
                 },
                 "audit_report": {
-                    "completed": False,
+                    "completed": True if audit_report else False,
                     "completed_date": None,
                     "completed_by": None,
                 },
@@ -669,8 +673,39 @@ class UploadReportView(SingleAuditChecklistAccessRequiredMixin, generic.View):
             if form.is_valid():
                 file = request.FILES["upload_report"]
 
+                component_page_numbers = {
+                    "financial_statements": form.cleaned_data["financial_statements"],
+                    "financial_statements_opinion": form.cleaned_data[
+                        "financial_statements_opinion"
+                    ],
+                    "schedule_expenditures": form.cleaned_data["schedule_expenditures"],
+                    "schedule_expenditures_opinion": form.cleaned_data[
+                        "schedule_expenditures_opinion"
+                    ],
+                    "uniform_guidance_control": form.cleaned_data[
+                        "uniform_guidance_control"
+                    ],
+                    "uniform_guidance_compliance": form.cleaned_data[
+                        "uniform_guidance_compliance"
+                    ],
+                    "GAS_control": form.cleaned_data["GAS_control"],
+                    "GAS_compliance": form.cleaned_data["GAS_compliance"],
+                    "schedule_findings": form.cleaned_data["schedule_findings"],
+                    # These two fields are optional on the part of the submitter
+                    "schedule_prior_findings": form.cleaned_data[
+                        "schedule_prior_findings"
+                    ]
+                    or None,
+                    "CAP_page": form.cleaned_data["CAP_page"] or None,
+                }
+
                 sar_file = SingleAuditReportFile(
-                    **{"file": file, "filename": file.name, "sac_id": sac.id}
+                    **{
+                        "component_page_numbers": component_page_numbers,
+                        "file": file,
+                        "filename": file.name,
+                        "sac_id": sac.id,
+                    }
                 )
 
                 sar_file.full_clean()
