@@ -2,7 +2,7 @@ from peewee import *
 from playhouse.postgres_ext import *
 
 # FIXME: pull this from the config
-database = PostgresqlDatabase('postgres', **{'host': 'localhost', 'user': 'postgres'})
+database = PostgresqlDatabase('postgres', **{'host': 'db', 'user': 'postgres'})
 
 class UnknownField(object):
     def __init__(self, *_, **__): pass

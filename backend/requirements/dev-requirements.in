@@ -6,9 +6,11 @@ coverage
 djlint
 faker
 flake8
+fs
 model_bakery
 mypy
 pandas
+peewee
 pip-tools
 sqlalchemy
 toml

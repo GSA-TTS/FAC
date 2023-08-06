@@ -11,6 +11,7 @@ djangorestframework-simplejwt
 django-fsm
 environs[django]
 faker
+fs
 gunicorn
 jsonnet
 jsonpath-ng
@@ -19,6 +20,7 @@ newrelic
 oic
 openpyxl
 pandas
+peewee
 psycopg2-binary
 pycryptodome
 pydash

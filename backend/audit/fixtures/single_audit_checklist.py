@@ -252,8 +252,13 @@ validator_mapping = {
     "PDF": audit.validators.validate_single_audit_report_file,
 }
 
+def _make_excel_file(filename, f_obj):
+    content = f_obj.read()
+    f_obj.seek(0)
+    file = SimpleUploadedFile(filename, content, "application/vnd.ms-excel")
+    return file
 
-def _post_upload_workbook(this_sac, this_user, section, xlsx_filename):
+def _post_upload_workbook(this_sac, this_user, section, xlsx_file):
     """Upload a workbook for this SAC.
 
     This should be idempotent if it is called on a SAC that already
@@ -269,12 +274,9 @@ def _post_upload_workbook(this_sac, this_user, section, xlsx_filename):
         # nothing to do here
         return
 
-    with open(xlsx_filename, "rb") as f:
-        content = f.read()
-    file = SimpleUploadedFile(xlsx_filename, content, "application/vnd.ms-excel")
     excel_file = ExcelFile(
-        file=file,
-        filename=Path(xlsx_filename).stem,
+        file=xlsx_file,
+        filename=Path("xlsx.xlsx").stem,
         user=this_user,
         sac_id=this_sac.id,
         form_section=section,
