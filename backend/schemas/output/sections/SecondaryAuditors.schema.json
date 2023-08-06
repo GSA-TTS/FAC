@@ -156,12 +156,12 @@
                   ],
                   "title": "SecondaryAuditorsEntry"
                },
+               "minContains": 0,
                "type": "array"
             }
          },
          "required": [
-            "auditee_uei",
-            "secondary_auditors_entries"
+            "auditee_uei"
          ],
          "title": "SecondaryAuditors",
          "type": "object",

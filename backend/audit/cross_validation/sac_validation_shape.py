@@ -9,11 +9,17 @@ def sac_validation_shape(sac):
     shape = {
         "sf_sac_sections": {
             "general_information": sac.general_information,
-            "federal_awards": sac.federal_awards,
-            "corrective_action_plan": sac.corrective_action_plan,
-            "findings_text": sac.findings_text,
-            "findings_uniform_guidance": sac.findings_uniform_guidance,
-            "additional_ueis": sac.additional_ueis,
+            "audit_information": sac.audit_information,
+            "federal_awards": sac.federal_awards["FederalAwards"],
+            "corrective_action_plan": sac.corrective_action_plan[
+                "CorrectiveActionPlan"
+            ],
+            "findings_text": sac.findings_text["FindingsText"],
+            "findings_uniform_guidance": sac.findings_uniform_guidance[
+                "FindingsUniformGuidance"
+            ],
+            "additional_ueis": sac.additional_ueis["AdditionalUEIs"],
+            "notes_to_sefa": sac.notes_to_sefa["NotesToSefa"],
         },
         "sf_sac_meta": {
             "submitted_by": sac.submitted_by,

@@ -21,6 +21,8 @@ class ETL(object):
     def __init__(self, sac: SingleAuditChecklist) -> None:
         self.single_audit_checklist = sac
         self.report_id = sac.report_id
+        # MCJ QUESTION: What is the second parameter to `get` for?
+        # https://docs.djangoproject.com/en/4.2/ref/models/querysets/#django.db.models.query.QuerySet.get
         audit_date = sac.general_information.get(
             "auditee_fiscal_period_start", datetime.now
         )
@@ -47,42 +49,55 @@ class ETL(object):
 
     def load_finding_texts(self):
         findings_text = self.single_audit_checklist.findings_text
-        findings_text_entries = findings_text["FindingsText"]["findings_text_entries"]
-        for entry in findings_text_entries:
-            finding_text_ = FindingText(
-                report_id=self.report_id,
-                finding_ref_number=entry["reference_number"],
-                contains_chart_or_table=entry["contains_chart_or_table"] == "Y",
-                finding_text=entry["text_of_finding"],
-            )
-            finding_text_.save()
+        if "findings_text_entries" in findings_text["FindingsText"]:
+            findings_text_entries = findings_text["FindingsText"][
+                "findings_text_entries"
+            ]
+            for entry in findings_text_entries:
+                finding_text_ = FindingText(
+                    report_id=self.report_id,
+                    finding_ref_number=entry["reference_number"],
+                    contains_chart_or_table=entry["contains_chart_or_table"] == "Y",
+                    finding_text=entry["text_of_finding"],
+                )
+                finding_text_.save()
 
     def load_findings(self):
         findings_uniform_guidance = (
             self.single_audit_checklist.findings_uniform_guidance
         )
-        findings_uniform_guidance_entries = findings_uniform_guidance[
-            "FindingsUniformGuidance"
-        ]["findings_uniform_guidance_entries"]
+        if (
+            "findings_uniform_guidance_entries"
+            in findings_uniform_guidance["FindingsUniformGuidance"]
+        ):
+            findings_uniform_guidance_entries = findings_uniform_guidance[
+                "FindingsUniformGuidance"
+            ]["findings_uniform_guidance_entries"]
 
-        for entry in findings_uniform_guidance_entries:
-            findings = entry["findings"]
-            finding = Finding(
-                award_reference=entry["award_reference"],
-                report_id=self.report_id,
-                finding_seq_number=entry["seq_number"],
-                finding_ref_number=findings["reference_number"],
-                is_material_weakness=entry["material_weakness"] == "Y",
-                is_modified_opinion=entry["modified_opinion"] == "Y",
-                is_other_findings=entry["other_findings"] == "Y",
-                is_other_non_compliance=entry["other_findings"] == "Y",
-                prior_finding_ref_numbers=findings.get("prior_references"),
-                is_questioned_costs=entry["questioned_costs"] == "Y",
-                is_repeat_finding=(findings["repeat_prior_reference"] == "Y"),
-                is_significant_deficiency=(entry["significant_deficiency"] == "Y"),
-                type_requirement=(entry["program"]["compliance_requirement"]),
-            )
-            finding.save()
+            for entry in findings_uniform_guidance_entries:
+                findings = entry["findings"]
+                finding = Finding(
+                    award_reference=entry["award_reference"],
+                    report_id=self.report_id,
+                    finding_seq_number=entry["seq_number"],
+                    finding_ref_number=findings["reference_number"],
+                    is_material_weakness=entry["material_weakness"] == "Y",
+                    is_modified_opinion=entry["modified_opinion"] == "Y",
+                    is_other_findings=entry["other_findings"] == "Y",
+                    is_other_non_compliance=entry["other_findings"] == "Y",
+                    prior_finding_ref_numbers=findings.get("prior_references"),
+                    is_questioned_costs=entry["questioned_costs"] == "Y",
+                    is_repeat_finding=(findings["repeat_prior_reference"] == "Y"),
+                    is_significant_deficiency=(entry["significant_deficiency"] == "Y"),
+                    type_requirement=(entry["program"]["compliance_requirement"]),
+                )
+                finding.save()
+
+    def conditional_lookup(self, dict, key, default):
+        if key in dict:
+            return dict[key]
+        else:
+            return default
 
     def load_federal_award(self):
         federal_awards = self.single_audit_checklist.federal_awards
@@ -100,9 +115,10 @@ class ETL(object):
                 award_reference=entry["award_reference"],
                 federal_agency_prefix=program["federal_agency_prefix"],
                 federal_award_extension=program["three_digit_extension"],
-                additional_award_identification=program[
-                    "additional_award_identification"
-                ],
+                # CONDITIONAL
+                additional_award_identification=self.conditional_lookup(
+                    program, "additional_award_identification", ""
+                ),
                 federal_program_name=program["program_name"],
                 amount_expended=program["amount_expended"],
                 cluster_name=cluster["cluster_name"],
@@ -111,10 +127,15 @@ class ETL(object):
                 cluster_total=cluster["cluster_total"],
                 federal_program_total=program["federal_program_total"],
                 is_loan=loan["is_guaranteed"] == "Y",
-                loan_balance=loan["loan_balance_at_audit_period_end"],
+                loan_balance=self.conditional_lookup(
+                    loan, "loan_balance_at_audit_period_end", 0
+                ),
                 is_direct=is_direct,
                 is_major=program["is_major"] == "Y",
-                mp_audit_report_type=program["audit_report_type"],
+                # MCJ FIXME: Should this be conditional?
+                mp_audit_report_type=self.conditional_lookup(
+                    program, "audit_report_type", ""
+                ),
                 findings_count=program["number_of_audit_findings"],
                 is_passthrough_award=is_passthrough,
                 passthrough_amount=subrecipient_amount,
@@ -124,17 +145,21 @@ class ETL(object):
 
     def load_captext(self):
         corrective_action_plan = self.single_audit_checklist.corrective_action_plan
-        corrective_action_plan_entries = corrective_action_plan["CorrectiveActionPlan"][
+        if (
             "corrective_action_plan_entries"
-        ]
-        for entry in corrective_action_plan_entries:
-            cap_text = CapText(
-                report_id=self.report_id,
-                finding_ref_number=entry["reference_number"],
-                contains_chart_or_table=entry["contains_chart_or_table"] == "Y",
-                planned_action=entry["planned_action"],
-            )
-            cap_text.save()
+            in corrective_action_plan["CorrectiveActionPlan"]
+        ):
+            corrective_action_plan_entries = corrective_action_plan[
+                "CorrectiveActionPlan"
+            ]["corrective_action_plan_entries"]
+            for entry in corrective_action_plan_entries:
+                cap_text = CapText(
+                    report_id=self.report_id,
+                    finding_ref_number=entry["reference_number"],
+                    contains_chart_or_table=entry["contains_chart_or_table"] == "Y",
+                    planned_action=entry["planned_action"],
+                )
+                cap_text.save()
 
     def load_note(self):
         notes_to_sefa = self.single_audit_checklist.notes_to_sefa["NotesToSefa"]
@@ -190,14 +215,15 @@ class ETL(object):
     def load_passthrough(self):
         federal_awards = self.single_audit_checklist.federal_awards
         for entry in federal_awards["FederalAwards"]["federal_awards"]:
-            for entity in entry["direct_or_indirect_award"]["entities"]:
-                passthrough = Passthrough(
-                    award_reference=entry["award_reference"],
-                    report_id=self.report_id,
-                    passthrough_id=entity["passthrough_identifying_number"],
-                    passthrough_name=entity["passthrough_name"],
-                )
-                passthrough.save()
+            if "entities" in entry["direct_or_indirect_award"]:
+                for entity in entry["direct_or_indirect_award"]["entities"]:
+                    passthrough = Passthrough(
+                        award_reference=entry["award_reference"],
+                        report_id=self.report_id,
+                        passthrough_id=entity["passthrough_identifying_number"],
+                        passthrough_name=entity["passthrough_name"],
+                    )
+                    passthrough.save()
 
     def _get_dates_from_sac(self):
         return_dict = dict()
@@ -214,6 +240,17 @@ class ETL(object):
         general_information = self.single_audit_checklist.general_information
         dates_by_status = self._get_dates_from_sac()
         sac_additional_ueis = self.single_audit_checklist.additional_ueis
+
+        # Handle things that might be empty, deep down
+        auditee_addl_uei_list = []
+        if "additional_ueis_entries" in sac_additional_ueis["AdditionalUEIs"]:
+            auditee_addl_uei_list = [
+                entry["additional_uei"]
+                for entry in sac_additional_ueis["AdditionalUEIs"][
+                    "additional_ueis_entries"
+                ]
+            ]
+
         general = General(
             report_id=self.report_id,
             auditee_certify_name=None,  # TODO: Where does this come from?
@@ -228,12 +265,7 @@ class ETL(object):
             auditee_state=general_information["auditee_state"],
             auditee_ein=general_information["ein"],
             auditee_uei=general_information["auditee_uei"],
-            auditee_addl_uei_list=[
-                entry["additional_uei"]
-                for entry in sac_additional_ueis["AdditionalUEIs"][
-                    "additional_ueis_entries"
-                ]
-            ],
+            auditee_addl_uei_list=auditee_addl_uei_list,
             auditee_zip=general_information["auditee_zip"],
             auditor_phone=general_information["auditor_phone"],
             auditor_state=general_information["auditor_state"],
@@ -279,30 +311,37 @@ class ETL(object):
             type_report_major_program=None,  # TODO: Where does this come from?
             type_audit_code="UG",
             is_public=self.single_audit_checklist.is_public,
-            data_source="G-FAC",
+            data_source="GSA",
         )
         general.save()
 
     def load_secondary_auditor(self):
         secondary_auditors = self.single_audit_checklist.secondary_auditors
-
-        for secondary_auditor in secondary_auditors["SecondaryAuditors"][
-            "secondary_auditors_entries"
-        ]["items"]:
-            sec_auditor = SecondaryAuditor(
-                report_id=self.single_audit_checklist.report_id,
-                auditor_seq_number=secondary_auditor["secondary_auditor_seq_number"],
-                auditor_ein=secondary_auditor["secondary_auditor_ein"],
-                auditor_name=secondary_auditor["secondary_auditor_name"],
-                contact_name=secondary_auditor["secondary_auditor_contact_name"],
-                contact_title=secondary_auditor["secondary_auditor_contact_title"],
-                contact_email=secondary_auditor["secondary_auditor_contact_email"],
-                contact_phone=secondary_auditor["secondary_auditor_contact_phone"],
-                address_street=secondary_auditor["secondary_auditor_address_street"],
-                address_city=secondary_auditor["secondary_auditor_address_city"],
-                address_state=secondary_auditor["secondary_auditor_address_state"],
-                address_zipcode=secondary_auditor["secondary_auditor_address_zipcode"],
-            )
+        # MCJ This might be empty
+        if "secondary_auditors_entries" in secondary_auditors["SecondaryAuditors"]:
+            for secondary_auditor in secondary_auditors["SecondaryAuditors"][
+                "secondary_auditors_entries"
+            ]["items"]:
+                sec_auditor = SecondaryAuditor(
+                    report_id=self.single_audit_checklist.report_id,
+                    auditor_seq_number=secondary_auditor[
+                        "secondary_auditor_seq_number"
+                    ],
+                    auditor_ein=secondary_auditor["secondary_auditor_ein"],
+                    auditor_name=secondary_auditor["secondary_auditor_name"],
+                    contact_name=secondary_auditor["secondary_auditor_contact_name"],
+                    contact_title=secondary_auditor["secondary_auditor_contact_title"],
+                    contact_email=secondary_auditor["secondary_auditor_contact_email"],
+                    contact_phone=secondary_auditor["secondary_auditor_contact_phone"],
+                    address_street=secondary_auditor[
+                        "secondary_auditor_address_street"
+                    ],
+                    address_city=secondary_auditor["secondary_auditor_address_city"],
+                    address_state=secondary_auditor["secondary_auditor_address_state"],
+                    address_zipcode=secondary_auditor[
+                        "secondary_auditor_address_zipcode"
+                    ],
+                )
             sec_auditor.save()
 
     def load_audit_info(self):

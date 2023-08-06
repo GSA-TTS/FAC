@@ -7,12 +7,9 @@ local Validations = {
     additionalProperties: false,
     properties: {
       passthrough_name: Types.string,
-      passthrough_identifying_number: {
-        type: 'string',
-        minLength: 1,
-      },
+      passthrough_identifying_number: Types.string,
     },
-    required: ['passthrough_name', 'passthrough_identifying_number'],
+    required: ['passthrough_name'],
   },
   PassThroughEntityEmpty: Types.object {
     additionalProperties: false,
@@ -20,7 +17,8 @@ local Validations = {
       passthrough_name: Base.Enum.EmptyString_Null,
       passthrough_identifying_number: Base.Enum.EmptyString_Null,
     },
-    required: ['passthrough_name', 'passthrough_identifying_number'],
+    // The passthrough number is not requier
+    required: ['passthrough_name'],
   },
   DirectAwardValidations: [
     {
@@ -42,10 +40,6 @@ local Validations = {
             ],
           },
         },
-        // 20230627 MCJ Not required to be present if "Y"
-        // required: [
-        //   'entities',
-        // ],
       },
     },
     {

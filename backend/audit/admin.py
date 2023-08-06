@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from audit.models import SingleAuditChecklist, Access, ExcelFile
+from audit.models import SingleAuditChecklist, Access, ExcelFile, SingleAuditReportFile
 
 
 class SACAdmin(admin.ModelAdmin):
@@ -21,6 +21,20 @@ class ExcelFileAdmin(admin.ModelAdmin):
     list_display = ("filename", "user", "date_created")
 
 
+class AuditReportAdmin(admin.ModelAdmin):
+    list_display = (
+        "filename",
+        "user",
+        "date_created",
+        "component_page_numbers",
+        "user_id",
+        "sac",
+        "sac_id",
+        "file",
+    )
+
+
 admin.site.register(Access, AccessAdmin)
 admin.site.register(ExcelFile, ExcelFileAdmin)
 admin.site.register(SingleAuditChecklist, SACAdmin)
+admin.site.register(SingleAuditReportFile, AuditReportAdmin)
