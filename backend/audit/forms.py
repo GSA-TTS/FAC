@@ -68,6 +68,7 @@ class AuditorCertificationStep1Form(forms.Form):
 class AuditorCertificationStep2Form(forms.Form):
     auditor_name = forms.CharField()
     auditor_title = forms.CharField()
+    auditor_certification_date_signed = forms.DateField()
 
 
 class AuditeeCertificationStep1Form(forms.Form):
@@ -84,3 +85,4 @@ class AuditeeCertificationStep1Form(forms.Form):
 class AuditeeCertificationStep2Form(forms.Form):
     auditee_name = forms.CharField()
     auditee_title = forms.CharField()
+    auditee_certification_date_signed = forms.DateField()

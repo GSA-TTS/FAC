@@ -3,7 +3,9 @@
 {% block content %}
     <div class="grid-container margin-top-6">
         <div class="grid-row">
-            <form class="grid-col-8 grid-offset-2" id="auditor-certification-step-1" method="post">
+            <form class="grid-col-8 grid-offset-2"
+                  id="auditor-certification-step-1"
+                  method="post">
                 {% csrf_token %}
                 <fieldset class="usa-fieldset padding-bottom-2">
                     <legend class="usa-legend usa-legend--large" id="auditor-certification">Auditor certification checklist</legend>
@@ -16,7 +18,7 @@
                                required
                                type="checkbox"
                                value="True"
-                               {% if form.cleaned_data.is_OMB_limited %}checked{% endif %}  />
+                               {% if form.cleaned_data.is_OMB_limited %}checked{% endif %} />
                         <label class="usa-checkbox__label" for="is_OMB_limited">
                             The SF-SAC contains only the data and information required by the Office of Management and Budget.
                         </label>
@@ -29,7 +31,7 @@
                                required
                                type="checkbox"
                                value="True"
-                               {% if form.cleaned_data.is_auditee_responsible %}checked{% endif %}  />
+                               {% if form.cleaned_data.is_auditee_responsible %}checked{% endif %} />
                         <label class="usa-checkbox__label" for="is_auditee_responsible">
                             The auditee completed the Federal Awards workbook using the audit reporting package as required by the Uniform Guidance.
                         </label>
@@ -42,7 +44,7 @@
                                required
                                type="checkbox"
                                value="True"
-                               {% if form.cleaned_data.has_used_auditors_report %}checked{% endif %}  />
+                               {% if form.cleaned_data.has_used_auditors_report %}checked{% endif %} />
                         <label class="usa-checkbox__label" for="has_used_auditors_report">
                             The auditor completed the Federal Award Audit Findings and Audit Findings Text workbooks using the auditor's report.
                         </label>
@@ -52,10 +54,12 @@
                         <input id="has_no_auditee_procedures"
                                name="has_no_auditee_procedures"
                                class="usa-checkbox__input"
-                               {% comment %} required {% endcomment %}
+                               {% comment %}
+                               required
+                               {% endcomment %}
                                type="checkbox"
                                value="True"
-                               {% if form.cleaned_data.has_no_auditee_procedures %}checked{% endif %}  />
+                               {% if form.cleaned_data.has_no_auditee_procedures %}checked{% endif %} />
                         <label class="usa-checkbox__label" for="has_no_auditee_procedures">
                             No auditor has performed any audit work since the completion of the auditor's report or the single audit submission workbooks.
                         </label>
@@ -77,7 +81,8 @@
                 </fieldset>
                 <div class="grid-row margin-bottom-8 margin-top-10">
                     <button class="usa-button grid-col-5" id="continue">Agree to auditor certification</button>
-                    <a class="usa-link margin-left-3 grid-col-2 flex-align-self-center" href="/">Cancel</a>
+                    <a class="usa-link margin-left-3 grid-col-2 flex-align-self-center"
+                       href="/">Cancel</a>
                 </div>
             </form>
         </div>

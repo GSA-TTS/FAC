@@ -398,6 +398,7 @@ class AuditorCertificationStep2View(CertifyingAuditorRequiredMixin, generic.View
                     "auditor_certification": form1_cleaned,
                     "auditor_signature": form2.cleaned_data,
                 }
+                form_cleaned['auditor_signature']['auditor_certification_date_signed'] = form_cleaned['auditor_signature']['auditor_certification_date_signed'].strftime("%d/%m/%Y")
                 auditor_certification = sac.auditor_certification or {}
                 auditor_certification.update(form_cleaned)
                 validated = validate_auditor_certification_json(auditor_certification)
@@ -525,6 +526,7 @@ class AuditeeCertificationStep2View(CertifyingAuditeeRequiredMixin, generic.View
                     "auditee_certification": form1_cleaned,
                     "auditee_signature": form2.cleaned_data,
                 }
+                form_cleaned['auditee_signature']['auditee_certification_date_signed'] = form_cleaned['auditee_signature']['auditee_certification_date_signed'].strftime("%d/%m/%Y")
                 auditee_certification = sac.auditee_certification or {}
                 auditee_certification.update(form_cleaned)
                 validated = validate_auditee_certification_json(auditee_certification)

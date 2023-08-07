@@ -32,6 +32,12 @@
       "auditor_signature": {
          "description": "Auditor signature and title",
          "properties": {
+            "auditor_certification_date_signed": {
+               "description": "MM/DD/YYYY",
+               "pattern": "^[0-9]{2}/[0-9]{2}/[0-9]{4}$",
+               "title": "Date",
+               "type": "string"
+            },
             "auditor_name": {
                "type": "string"
             },

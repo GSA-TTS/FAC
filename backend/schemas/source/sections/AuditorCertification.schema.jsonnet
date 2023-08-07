@@ -27,6 +27,7 @@ local AuditorCertification = Types.object {
       properties: {
         auditor_name: Types.string,
         auditor_title: Types.string,
+        auditor_certification_date_signed: Base.Compound.Date,
       },
       required: ['auditor_name', 'auditor_title'],
     },

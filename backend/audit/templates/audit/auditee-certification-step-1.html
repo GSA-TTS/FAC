@@ -3,7 +3,9 @@
 {% block content %}
     <div class="grid-container margin-top-6">
         <div class="grid-row">
-            <form class="grid-col-8 grid-offset-2" id="auditee-certification-step-1" method="post">
+            <form class="grid-col-8 grid-offset-2"
+                  id="auditee-certification-step-1"
+                  method="post">
                 {% csrf_token %}
                 <fieldset class="usa-fieldset padding-bottom-2">
                     <legend class="usa-legend usa-legend--large" id="auditee-certification">Auditee certification checklist</legend>
@@ -16,13 +18,12 @@
                                required
                                type="checkbox"
                                value="True"
-                               {% if form.cleaned_data.has_no_PII %}checked{% endif %}  />
+                               {% if form.cleaned_data.has_no_PII %}checked{% endif %} />
                         <label class="usa-checkbox__label" for="has_no_PII">
                             The SF-SAC and reporting package don't include protected personally identifiable information (protected PII). If any protected PII is included, the FAC may publicly publish all information contained in the single audit report.
                         </label>
                         <span class="usa-error-message">{{ form.errors.has_no_PII|striptags }}</span>
                     </div>
-
                     <div class="usa-checkbox margin-top-4">
                         <input id="has_no_BII"
                                name="has_no_BII"
@@ -30,7 +31,7 @@
                                required
                                type="checkbox"
                                value="True"
-                               {% if form.cleaned_data.has_no_BII %}checked{% endif %}  />
+                               {% if form.cleaned_data.has_no_BII %}checked{% endif %} />
                         <label class="usa-checkbox__label" for="has_no_BII">
                             The SF-SAC and reporting package don't include business identifiable information (BII). If any protected BII is included, the FAC may publicly publish all information contained in the single audit report.
                         </label>
@@ -43,7 +44,7 @@
                                required
                                type="checkbox"
                                value="True"
-                               {% if form.cleaned_data.meets_2CFR_specifications %}checked{% endif %}  />
+                               {% if form.cleaned_data.meets_2CFR_specifications %}checked{% endif %} />
                         <label class="usa-checkbox__label" for="meets_2CFR_specifications">
                             Meets the requirements of 2 CFR Part 200 Subpart F specific to the auditee.
                         </label>
@@ -56,7 +57,7 @@
                                required
                                type="checkbox"
                                value="True"
-                               {% if form.cleaned_data.is_2CFR_compliant %}checked{% endif %}  />
+                               {% if form.cleaned_data.is_2CFR_compliant %}checked{% endif %} />
                         <label class="usa-checkbox__label" for="is_2CFR_compliant">
                             The data in the SF-SAC is in accordance with 2 CFR Part 200 Subpart F and the accompanying instructions to the SF-FAC.
                         </label>
@@ -69,10 +70,8 @@
                                required
                                type="checkbox"
                                value="True"
-                               {% if form.cleaned_data.is_complete_and_accurate %}checked{% endif %}  />
-                        <label class="usa-checkbox__label" for="is_complete_and_accurate">
-                            The SF-SAC is complete and accurate.
-                        </label>
+                               {% if form.cleaned_data.is_complete_and_accurate %}checked{% endif %} />
+                        <label class="usa-checkbox__label" for="is_complete_and_accurate">The SF-SAC is complete and accurate.</label>
                         <span class="usa-error-message">{{ form.errors.is_complete_and_accurate|striptags }}</span>
                     </div>
                     <div class="usa-checkbox margin-top-4">
@@ -82,7 +81,7 @@
                                required
                                type="checkbox"
                                value="True"
-                               {% if form.cleaned_data.has_engaged_auditor %}checked{% endif %}  />
+                               {% if form.cleaned_data.has_engaged_auditor %}checked{% endif %} />
                         <label class="usa-checkbox__label" for="has_engaged_auditor">
                             Engaged an auditor to perform an audit in accordance with 2 CFR Part 200 Subpart F for the period described in Part I, Items 1 and 3.
                         </label>
@@ -95,7 +94,7 @@
                                required
                                type="checkbox"
                                value="True"
-                               {% if form.cleaned_data.is_issued_and_signed %}checked{% endif %}  />
+                               {% if form.cleaned_data.is_issued_and_signed %}checked{% endif %} />
                         <label class="usa-checkbox__label" for="is_issued_and_signed">
                             The auditor has completed and issued the signed audit report required by 2 CFR 200.515, stating the audit follows the audit requirements of the Uniform Guidance.
                         </label>
@@ -108,7 +107,7 @@
                                required
                                type="checkbox"
                                value="True"
-                               {% if form.cleaned_data.is_FAC_releasable %}checked{% endif %}  />
+                               {% if form.cleaned_data.is_FAC_releasable %}checked{% endif %} />
                         <label class="usa-checkbox__label" for="is_FAC_releasable">
                             The FAC is authorized to make the SF-SAC data and reporting package publicly available online.
                         </label>
@@ -117,7 +116,8 @@
                 </fieldset>
                 <div class="grid-row margin-bottom-8 margin-top-10">
                     <button class="usa-button grid-col-5" id="continue">Agree to auditee certification</button>
-                    <a class="usa-link margin-left-3 grid-col-2 flex-align-self-center" href="/">Cancel</a>
+                    <a class="usa-link margin-left-3 grid-col-2 flex-align-self-center"
+                       href="/">Cancel</a>
                 </div>
             </form>
         </div>

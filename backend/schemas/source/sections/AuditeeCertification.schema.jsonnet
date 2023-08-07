@@ -33,6 +33,7 @@ local AuditeeCertification = Types.object {
       properties: {
         auditee_name: Types.string,
         auditee_title: Types.string,
+        auditee_certification_date_signed: Base.Compound.Date,
       },
       required: ['auditee_name', 'auditee_title'],
     },
