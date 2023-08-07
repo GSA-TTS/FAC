@@ -1067,7 +1067,7 @@ class AdditionalUeisSchemaValidityTest(SimpleTestCase):
     """
 
     ADDITIONAL_UEIS_SCHEMA = json.loads(
-        (SECTION_SCHEMA_DIR / "AdditionalUeis.schema.json").read_text(encoding="utf-8")
+        (SECTION_SCHEMA_DIR / "AdditionalUEIs.schema.json").read_text(encoding="utf-8")
     )
 
     SIMPLE_CASE = json.loads(SIMPLE_CASES_TEST_FILE.read_text(encoding="utf-8"))[
