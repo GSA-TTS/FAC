@@ -439,9 +439,13 @@ class SubmissionProgressView(SingleAuditChecklistAccessRequiredMixin, generic.Vi
 
         try:
             sac = SingleAuditChecklist.objects.get(report_id=report_id)
-            audit_report = SingleAuditReportFile.objects.filter(sac_id=sac.id).latest(
-                "date_created"
-            )
+            
+            try:
+                audit_report = SingleAuditReportFile.objects.filter(sac_id=sac.id).latest(
+                    "date_created"
+                )
+            except:
+                audit_report = None
 
             # TODO: Ensure the correct SAC elements are used to determine what's complete.
             context = {
