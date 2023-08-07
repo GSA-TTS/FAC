@@ -26,6 +26,7 @@ from .validators import (
     validate_secondary_auditors_json,
     validate_notes_to_sefa_json,
     validate_single_audit_report_file,
+    validate_audit_information_json,
 )
 
 User = get_user_model()
@@ -230,6 +231,10 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
     #   - schemas.sections.GeneralInformation.schema.json
     general_information = models.JSONField(
         blank=True, null=True, validators=[validate_general_information_json]
+    )
+
+    audit_information = models.JSONField(
+        blank=True, null=True, validators=[validate_audit_information_json]
     )
 
     # Federal Awards:
