@@ -13,17 +13,21 @@ from audit.management.commands.census_models.ay22 import  (
 )
 
 import openpyxl as pyxl
-import os
 import re
 
+import logging
+logger = logging.getLogger(__name__)
+
+mappings = [
+    FieldMap('note_title', 'title', None, str),
+    FieldMap('note_content', 'content', None, str)
+]
+
 def generate_notes_to_sefa(dbkey, outfile):
-    print("--- generate notes to sefa ---")
-    wb = pyxl.load_workbook(f'{templates["SEFA"]}')
-    mappings = [
-        FieldMap('note_title', 'title', None, str),
-        FieldMap('note_content', 'content', None, str)
-    ]
-    g =  set_uei(wb, Gen, dbkey)
+    logger.info(f"--- generate notes to sefa {dbkey}---")
+    wb = pyxl.load_workbook(templates["SEFA"])
+
+    g =  set_uei(Gen, wb, dbkey)
 
     # The mapping is weird.
     # https://facdissem.census.gov/Documents/DataDownloadKey.xlsx
@@ -62,7 +66,7 @@ def generate_notes_to_sefa(dbkey, outfile):
     map_simple_columns(wb, mappings, notes)
     wb.save(outfile)
 
-    table = generate_dissemination_test_table('notes_to_sefa', Gen, dbkey, mappings, notes)
+    table = generate_dissemination_test_table(Gen, 'notes_to_sefa', dbkey, mappings, notes)
     table['singletons']['accounting_policites'] = policies.content
     table['singletons']['is_minimis_rate_used'] =  is_used
     table['singletons']['rate_explained'] = rate.content

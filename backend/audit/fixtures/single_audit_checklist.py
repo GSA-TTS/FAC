@@ -32,8 +32,10 @@ from users.models import User
 
 logger = logging.getLogger(__name__)
 
-# TODO: Pull this from actual information.
+from audit.management.commands.workbooks.base import dbkey_to_report_id
+from audit.management.commands.census_models.ay22 import CensusGen22 as Gen
 
+# TODO: Pull this from actual information.
 
 def _fake_general_information(auditee_name=None):
     """Create a fake general_information object."""
@@ -134,7 +136,7 @@ def _fake_audit_information(auditee_name=None):
     return audit_information
 
 
-def _create_sac(user, auditee_name):
+def _create_sac(user, auditee_name, dbkey):
     """Create a single example SAC."""
     SingleAuditChecklist = apps.get_model("audit.SingleAuditChecklist")
     sac = SingleAuditChecklist.objects.create(
@@ -142,6 +144,8 @@ def _create_sac(user, auditee_name):
         general_information=_fake_general_information(auditee_name),
         audit_information=_fake_audit_information(auditee_name),
     )
+    sac.report_id = dbkey_to_report_id(Gen, dbkey)
+    sac.save()
 
     Access = apps.get_model("audit.Access")
     Access.objects.create(

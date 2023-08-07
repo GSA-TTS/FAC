@@ -80,7 +80,7 @@ def set_range(wb, range_name, values, default=None, type=str):
             # Leave it blank if we have no default passed in
             pass
 
-def set_uei(wb, Gen, dbkey):
+def set_uei(Gen, wb, dbkey):
     g = Gen.select().where(Gen.dbkey == dbkey).get()
     set_single_cell_range(wb, 'auditee_uei', g.uei)
     return g
@@ -98,14 +98,14 @@ def map_simple_columns(wb, mappings, values):
 # FIXME: Get the padding/shape right on the report_id
 def dbkey_to_report_id(Gen, dbkey):
     g = Gen.select(Gen.audityear,Gen.fyenddate).where(Gen.dbkey == dbkey).get()
-    month = g.fyenddate.split('-')[1]
+    # month = g.fyenddate.split('-')[1]
     # 2022JUN0001000003
     # We start new audits at 1 million.
     # So, we want 10 digits, and zero-pad for 
     # historic DBKEY report_ids
-    return f'{g.audityear}{month}{dbkey.zfill(10)}'
+    return f'{g.audityear}-TEST-{dbkey.zfill(7)}'
 
-def generate_dissemination_test_table(api_endpoint, Gen, dbkey, mappings, objects):
+def generate_dissemination_test_table(Gen, api_endpoint, dbkey, mappings, objects):
     table = {
         'rows': list(),
         'singletons': dict()
