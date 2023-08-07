@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+{% load static %}
+{% load sprite_helper %}
+{% block content %}
+<div class="grid-row font-body-md">
+    <div class="grid-container margin-top-6 margin-bottom-6">
+        {% include './title.html'  with auditee_name=auditee_name %}
+        <div id="submission-checklist-content">
+            <ul class="usa-icon-list usa-icon-list--size-md tablet:grid-col-9">
+                
+                {% comment %} Single audit submission {% endcomment %}
+                <li class="usa-icon-list__item padding-bottom-105"
+                    id="single-audit-submission">
+                    {% include './icon-list-icon.html' with completed=single_audit_checklist.created %}
+                    <div class="text-green">
+                        <p class="text-bold text-underline margin-0">Single audit submission (Complete)</p>
+                        <p class="margin-0">
+                            Begin your single audit submission by entering basic information about the auditee organization.
+                        </p>
+                        {% include './created-by.html' with time=single_audit_checklist.created_date name=single_audit_checklist.created_by %}
+                        <p class="margin-0">
+                            <a class="usa-link"
+                               href="{% url 'report_submission:general_information' report_id %}">Edit the audit information</a>
+                        </p>
+                    </div>
+                </li>
+
+                {% comment %} Audit report PDF {% endcomment %}
+                {% if audit_report.completed %}
+                    <li class="usa-icon-list__item padding-bottom-105" id="audit-report-completed">
+                        {% include './icon-list-icon.html' with completed=audit_report.completed %}
+                        <div class="text-green">
+                            <p class="text-bold text-underline margin-0">Audit report PDF (Complete)</p>
+                            <p class="margin-0">
+                                Upload the single audit report package, or audit report. This should be a single PDF that is unlocked and machine-readable.
+                            </p>
+                            {% include './created-by.html' with time=audit_report.completed_date name=audit_report.created_by %}
+                            <p class="margin-0">
+                                <a class="usa-link" href="{% url 'audit:UploadReport' report_id %}">Re-upload the Audit report PDF</a>
+                            </p>
+                        </div>
+                    </li>
+                {% else %}
+                    <li class="usa-icon-list__item padding-bottom-105" id="audit-report-incomplete">
+                        {% include './icon-list-icon.html' with completed=audit_report.completed %}
+                        <div>
+                            <p class="text-bold text-underline margin-0">
+                                <a class="usa-link" href="{% url 'audit:UploadReport' report_id %}">Audit report PDF</a>
+                            </p>
+                            <p class="margin-0">
+                                Upload the single audit report package, or audit report. This should be a single PDF that is unlocked and machine-readable.
+                            </p>
+                        </div>
+                    </li>
+                {% endif %}
+
+                {% comment %} Workbook 1: Federal Awards {% endcomment %}
+                {% if federal_awards_workbook.completed %}
+                    <li class="usa-icon-list__item padding-bottom-105" id="audit-report-completed">
+                        {% include './icon-list-icon.html' with completed=federal_awards_workbook.completed %}
+                        <div class="text-green">
+                            <p class="text-bold text-underline margin-0">Workbook 1: Federal Awards (Complete)</p>
+                            <p class="margin-0">
+                                For each federal award received, you'll need the financial and agency details. This is also where you list the number of audit findings.
+                            </p>
+                            {% include './created-by.html' with time=federal_awards_workbook.completed_date name=federal_awards_workbook.created_by %}
+                            <p class="margin-0">
+                                <a class="usa-link" href="{% url 'report_submission:federal-awards' report_id %}">Re-upload Workbook 1: Federal Awards</a>
+                            </p>
+                        </div>
+                    </li>
+                {% else %}
+                    <li class="usa-icon-list__item padding-bottom-105" id="audit-report-incomplete">
+                        {% include './icon-list-icon.html' with completed=federal_awards_workbook.completed %}
+                        <div>
+                            <p class="text-bold text-underline margin-0">
+                                <a class="usa-link" href="{% url 'report_submission:federal-awards' report_id %}">Upload Workbook 1: Federal Awards</a>
+                            </p>
+                            <p class="margin-0">
+                                For each federal award received, you'll need the financial and agency details. This is also where you list the number of audit findings.
+                            </p>
+                        </div>
+                    </li>
+                {% endif %}
+
+                {% comment %} Workbook 2: Federal Awards Audit Findings {% endcomment %}
+                {% if audit_findings_workbook.completed %}
+                    <li class="usa-icon-list__item padding-bottom-105" id="audit-report-completed">
+                        {% include './icon-list-icon.html' with completed=audit_findings_workbook.completed %}
+                        <div class="text-green">
+                            <p class="text-bold text-underline margin-0">Workbook 2: Federal Awards Audit Findings (Complete)</p>
+                            <p class="margin-0">
+                                Complete this section using the Summary Schedule of Prior Audit Findings and the information in the financial statement audit. If there are no audit findings listed in Workbook 1: Federal Awards, you do not need to complete this workbook.
+                            </p>
+                            {% include './created-by.html' with time=audit_findings_workbook.completed_date name=audit_findings_workbook.created_by %}
+                            <p class="margin-0">
+                                <a class="usa-link" href="{% url 'report_submission:audit-findings' report_id %}">Re-upload Upload Workbook 2: Federal Awards Audit Findings</a>
+                            </p>
+                        </div>
+                    </li>
+                {% else %}
+                    <li class="usa-icon-list__item padding-bottom-105" id="audit-report-incomplete">
+                        {% include './icon-list-icon.html' with completed=audit_findings_workbook.completed %}
+                        <div>
+                            <p class="text-bold text-underline margin-0">
+                                <a class="usa-link" href="{% url 'report_submission:audit-findings' report_id %}">Upload Workbook 2: Federal Awards Audit Findings</a>
+                            </p>
+                            <p class="margin-0">
+                                Complete this section using the Summary Schedule of Prior Audit Findings and the information in the financial statement audit. If there are no audit findings listed in Workbook 1: Federal Awards, you do not need to complete this workbook.
+                            </p>
+                        </div>
+                    </li>
+                {% endif %}
+
+            </ul>
+        </div>
+    </div>
+</div>
+    {% include "audit-metadata.html" %}
+{% endblock content %}

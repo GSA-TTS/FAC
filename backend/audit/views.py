@@ -9,6 +9,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse
 from django.utils.datastructures import MultiValueDictKeyError
 from django.utils.decorators import method_decorator
+from django.utils.timezone import localtime
 from django.http import JsonResponse
 
 from audit.forms import UploadReportForm, AuditInfoForm
@@ -408,19 +409,30 @@ class SubmissionProgressView(SingleAuditChecklistAccessRequiredMixin, generic.Vi
 
         try:
             sac = SingleAuditChecklist.objects.get(report_id=report_id)
+            sar = SingleAuditReportFile.objects.filter(sac_id=sac.id).latest('date_created')
 
             # TODO: Ensure the correct SAC elements are used to determine what's complete.
             context = {
                 "single_audit_checklist": {
                     "created": True,
-                    "created_date": sac.date_created,
+                    "created_date": sac.date_created.strftime("%b %d,%Y at %H:%M %p %Z"),
                     "created_by": sac.submitted_by,
                     "completed": False,
                     "completed_date": None,
                     "completed_by": None,
                 },
+                "audit_report": {
+                    "completed": True if (sar) else False,
+                    "completed_date": sar.date_created.strftime("%b %d,%Y at %H:%M %p %Z") or None,
+                    "completed_by": None,
+                },
                 "federal_awards_workbook": {
                     "completed": True if (sac.federal_awards) else False,
+                    "completed_date": None,
+                    "completed_by": None,
+                },
+                "audit_findings_workbook": {
+                    "completed": True if (sac.findings_uniform_guidance) else False,
                     "completed_date": None,
                     "completed_by": None,
                 },
@@ -434,11 +446,7 @@ class SubmissionProgressView(SingleAuditChecklistAccessRequiredMixin, generic.Vi
                     "completed_date": None,
                     "completed_by": None,
                 },
-                "audit_findings_workbook": {
-                    "completed": True if (sac.findings_uniform_guidance) else False,
-                    "completed_date": None,
-                    "completed_by": None,
-                },
+                
                 "CAP_workbook": {
                     "completed": True if (sac.corrective_action_plan) else False,
                     "completed_date": None,
@@ -454,11 +462,7 @@ class SubmissionProgressView(SingleAuditChecklistAccessRequiredMixin, generic.Vi
                     "completed_date": None,
                     "completed_by": None,
                 },
-                "audit_report": {
-                    "completed": False,
-                    "completed_date": None,
-                    "completed_by": None,
-                },
+                
                 "certification": {
                     "auditee_certified": sac.is_auditee_certified,
                     "auditor_certified": sac.is_auditor_certified,
@@ -483,7 +487,7 @@ class SubmissionProgressView(SingleAuditChecklistAccessRequiredMixin, generic.Vi
                 and context["secondary_auditors_workbook"]["completed"]
             )
 
-            return render(request, "audit/submission-progress.html", context)
+            return render(request, "audit/submission-checklist/submission-checklist.html", context)
         except SingleAuditChecklist.DoesNotExist:
             raise PermissionDenied("You do not have access to this audit.")
 
@@ -668,6 +672,7 @@ class UploadReportView(SingleAuditChecklistAccessRequiredMixin, generic.View):
 
             if form.is_valid():
                 file = request.FILES["upload_report"]
+                print('hi', form.cleaned_data)
 
                 sar_file = SingleAuditReportFile(
                     **{"file": file, "filename": file.name, "sac_id": sac.id}

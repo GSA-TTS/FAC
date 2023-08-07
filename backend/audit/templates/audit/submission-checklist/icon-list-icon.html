@@ -1,0 +1,23 @@
+{% comment %} 
+    <div> for icon list icon.
+    If completed is true, use a green check. Else, an empty space.
+
+    Variables: 
+        completed (bool)
+{% endcomment %}
+
+
+{% load sprite_helper %}
+{% if completed %}
+    <div class="usa-icon-list__icon text-green">
+        <svg class="usa-icon margin-right-3" aria-hidden="true" role="img">
+            {% uswds_sprite "check_circle" %}
+        </svg>
+    </div>
+{% else %}
+    <div class="usa-icon-list__icon text-green">
+        <svg class="usa-icon margin-right-3" aria-hidden="true" role="img">
+            {% comment %} {% uswds_sprite "radio_button_unchecked" %} {% endcomment %}
+        </svg>
+    </div>
+{% endif %}
