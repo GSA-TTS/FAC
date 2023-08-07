@@ -128,14 +128,14 @@ def map_simple_columns(wb, mappings, values):
 
 
 # FIXME: Get the padding/shape right on the report_id
-def dbkey_to_report_id(dbkey):
+def dbkey_to_test_report_id(dbkey):
     g = Gen.select(Gen.audityear,Gen.fyenddate).where(Gen.dbkey == dbkey).get()
-    month = g.fyenddate.split('-')[1]
+    # month = g.fyenddate.split('-')[1]
     # 2022JUN0001000003
     # We start new audits at 1 million.
     # So, we want 10 digits, and zero-pad for 
     # historic DBKEY report_ids
-    return f'{g.audityear}{month}{dbkey.zfill(10)}'
+    return f'{g.audityear}-TEST-{dbkey.zfill(7)}'
 
 def generate_dissemination_test_table(api_endpoint, dbkey, mappings, objects):
     table = {
@@ -143,7 +143,7 @@ def generate_dissemination_test_table(api_endpoint, dbkey, mappings, objects):
         'singletons': dict()
     }
     table['endpoint'] = api_endpoint
-    table['report_id'] = dbkey_to_report_id(dbkey)
+    table['report_id'] = dbkey_to_test_report_id(dbkey)
     for o in objects:
         as_dict = model_to_dict(o)
         test_obj = {}
