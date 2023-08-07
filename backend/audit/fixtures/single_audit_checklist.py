@@ -150,7 +150,7 @@ def _post_create_federal_awards(this_sac, this_user):
         settings.DATA_FIXTURES
         / "audit"
         / "excel_workbooks_test_files"
-        / "federal-awards-expended-PASS.xlsx",
+        / "federal-awards-workbook-PASS.xlsx",
         "rb",
     ) as f:
         content = f.read()

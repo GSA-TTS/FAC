@@ -1,0 +1,14 @@
+# The content of this file is managed by Terraform. If you modify it, it may
+# be reverted the next time Terraform runs. If you want to make changes, do it
+# in ../meta/bootstrap-env/templates.
+
+# Add resources to this module describing what you want in the corresponding 
+# space in cloud.gov. You should probably just reference a shared module as in the
+# example below to keep consistency across spaces, but you can also vary the 
+# content for each environment as needed.
+
+module "${name}" {
+  source        = "../shared/modules/env"
+  cf_space_name = "${name}"
+}
+

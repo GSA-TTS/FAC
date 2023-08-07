@@ -1,0 +1,68 @@
+{
+   "additionalProperties": false,
+   "properties": {
+      "agencies": {
+         "items": {
+            "allOf": [
+               {
+                  "maxLength": 2,
+                  "minLength": 2
+               },
+               {
+                  "pattern": "^([0-9]{2})$"
+               }
+            ],
+            "type": "string"
+         },
+         "type": "array"
+      },
+      "dollar_threshold": {
+         "type": "integer"
+      },
+      "gaap_results": {
+         "items": {
+            "description": "GAAP Results (Audit Information)",
+            "enum": [
+               "unmodified_opinion",
+               "qualified_opinion",
+               "adverse_opinion",
+               "disclaimer_of_opinion",
+               "not_gaap"
+            ],
+            "type": "string"
+         },
+         "type": "array"
+      },
+      "is_aicpa_audit_guide_included": {
+         "type": "boolean"
+      },
+      "is_going_concern_included": {
+         "type": "boolean"
+      },
+      "is_internal_control_deficiency_disclosed": {
+         "type": "boolean"
+      },
+      "is_internal_control_material_weakness_disclosed": {
+         "type": "boolean"
+      },
+      "is_low_risk_auditee": {
+         "type": "boolean"
+      },
+      "is_material_noncompliance_disclosed": {
+         "type": "boolean"
+      }
+   },
+   "required": [
+      "dollar_threshold",
+      "gaap_results",
+      "is_going_concern_included",
+      "is_internal_control_deficiency_disclosed",
+      "is_internal_control_material_weakness_disclosed",
+      "is_material_noncompliance_disclosed",
+      "is_aicpa_audit_guide_included",
+      "is_low_risk_auditee",
+      "agencies"
+   ],
+   "title": "AuditInformation",
+   "type": "object"
+}

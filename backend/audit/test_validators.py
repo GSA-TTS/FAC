@@ -78,31 +78,6 @@ class FederalAwardsValidatorTests(SimpleTestCase):
         simple = FederalAwardsValidatorTests.SIMPLE_CASE
         validate_federal_award_json(simple)
 
-    def test_prefix_under_ten(self):
-        """
-        Prefixes between 00 and 09 should fail
-        """
-        simple = jsoncopy(FederalAwardsValidatorTests.SIMPLE_CASE)
-
-        # pick a prefix between 00 and 09 (invalid)
-        prefix = f"{randrange(10):02}"
-        # 20230512 HDMS FIXME: For some reasons, this fails randomly. I suspect it's because the random number generated is sometimes incorrect ,i.e., has less than three digits.
-        # pick an extension beteween 001 and 999 (valid)
-        extension = f"{randrange(100, 1000):03}"
-
-        simple["FederalAwards"]["federal_awards"][0]["program"][
-            "federal_agency_prefix"
-        ] = f"{prefix}"
-        simple["FederalAwards"]["federal_awards"][0]["program"][
-            "three_digit_extension"
-        ] = f"{extension}"
-
-        with self.assertRaises(
-            ValidationError,
-            msg=f"ValidationError not raised with prefix = {prefix}, extension = {extension}",
-        ):
-            validate_federal_award_json(simple)
-
     def test_prefix_over_99(self):
         """
         Prefixes over 99 should fail
@@ -659,7 +634,14 @@ class CorrectiveActionPlanValidatorTests(SimpleTestCase):
         template = json.loads(template_definition_path.read_text(encoding="utf-8"))
         invalid = json.loads('{"CorrectiveActionPlan":{}}')
         expected_msg = str(
-            ("A", "2", "Auditee UEI", template["sheets"][1]["single_cells"][0]["help"])
+            [
+                (
+                    "B",
+                    "4",
+                    "Auditee UEI",
+                    template["sheets"][0]["single_cells"][2]["help"],
+                )
+            ]
         )
         self.assertRaisesRegex(
             ValidationError, expected_msg, validate_corrective_action_plan_json, invalid
@@ -708,7 +690,14 @@ class AdditionalUeisValidatorTests(SimpleTestCase):
         template = json.loads(template_definition_path.read_text(encoding="utf-8"))
         invalid = json.loads('{"AdditionalUEIs":{}}')
         expected_msg = str(
-            ("A", "2", "Auditee UEI", template["sheets"][1]["single_cells"][0]["help"])
+            [
+                (
+                    "B",
+                    "4",
+                    "Auditee UEI",
+                    template["sheets"][0]["single_cells"][2]["help"],
+                )
+            ]
         )
         self.assertRaisesRegex(
             ValidationError, expected_msg, validate_additional_ueis_json, invalid
@@ -732,7 +721,14 @@ class NotesToSefaValidatorTests(SimpleTestCase):
         template = json.loads(template_definition_path.read_text(encoding="utf-8"))
         invalid = json.loads('{"NotesToSefa":{}}')
         expected_msg = str(
-            ("A", "2", "Auditee UEI", template["sheets"][2]["single_cells"][0]["help"])
+            [
+                (
+                    "B",
+                    "4",
+                    "Auditee UEI",
+                    template["sheets"][0]["single_cells"][2]["help"],
+                )
+            ]
         )
         self.assertRaisesRegex(
             ValidationError, expected_msg, validate_notes_to_sefa_json, invalid
@@ -756,7 +752,14 @@ class SecondaryAuditorsValidatorTests(SimpleTestCase):
         template = json.loads(template_definition_path.read_text(encoding="utf-8"))
         invalid = json.loads('{"SecondaryAuditors":{}}')
         expected_msg = str(
-            ("A", "2", "Auditee UEI", template["sheets"][1]["single_cells"][0]["help"])
+            [
+                (
+                    "B",
+                    "4",
+                    "Auditee UEI",
+                    template["sheets"][0]["single_cells"][2]["help"],
+                )
+            ]
         )
         self.assertRaisesRegex(
             ValidationError, expected_msg, validate_secondary_auditors_json, invalid

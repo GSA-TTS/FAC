@@ -121,7 +121,11 @@ It can be changed to time-dependence after timestamp changes. -->
                 <li class="usa-icon-list__item padding-bottom-2">
                     <div class="usa-icon-list__icon text-base">
                         <svg class="usa-icon margin-right-2" aria-hidden="true" role="img">
-                            {% uswds_sprite "radio_button_unchecked" %}
+                            {% if audit_information_form.completed == True %}
+                                {% uswds_sprite "check_circle" %}
+                            {% else %}
+                                {% uswds_sprite "radio_button_unchecked" %}
+                            {% endif %}
                         </svg>
                     </div>
                     <div class="usa-icon-list__content {% if audit_information_form.completed is True %} text-green {% else %} text-base-dark {% endif %}">

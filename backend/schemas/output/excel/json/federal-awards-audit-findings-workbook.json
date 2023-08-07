@@ -1,0 +1,309 @@
+{
+   "filename": "federal-awards-audit-findings-workbook.xlsx",
+   "sheets": [
+      {
+         "header_height": 60,
+         "hide_col_from": 3,
+         "meta_cells": [
+            {
+               "help": {
+                  "link": "https://fac.gov/documentation/validation/#unknown",
+                  "text": "If you see this error, please contact support."
+               },
+               "keep_locked": true,
+               "title": "Federal Audit Clearinghouse\nfac.gov",
+               "title_cell": "A1",
+               "type": "meta_cell"
+            },
+            {
+               "help": {
+                  "link": "https://fac.gov/documentation/validation/#unknown",
+                  "text": "If you see this error, please contact support."
+               },
+               "keep_locked": true,
+               "title": "This workbook contains two worksheets: a coversheet (this sheet) and a data entry sheet.\nBefore submitting, please make sure the fields below are filled out.",
+               "title_cell": "B1",
+               "type": "meta_cell",
+               "width": 48
+            }
+         ],
+         "name": "Coversheet",
+         "single_cells": [
+            {
+               "format": "text",
+               "formula": "=\"1.0.0\"",
+               "help": {
+                  "link": "https://fac.gov/documentation/validation/#plain_text",
+                  "text": "Only plain text is allowed in this field, no emoji or other special additions"
+               },
+               "keep_locked": true,
+               "range_cell": "B2",
+               "range_name": "version",
+               "title": "Version",
+               "title_cell": "A2",
+               "type": "single_cell",
+               "validation": {
+                  "type": "NOVALIDATION"
+               },
+               "width": 48
+            },
+            {
+               "format": "text",
+               "formula": "=\"FindingsUniformGuidance\"",
+               "help": {
+                  "link": "https://fac.gov/documentation/validation/#plain_text",
+                  "text": "Only plain text is allowed in this field, no emoji or other special additions"
+               },
+               "keep_locked": true,
+               "range_cell": "B3",
+               "range_name": "section_name",
+               "title": "Section",
+               "title_cell": "A3",
+               "type": "single_cell",
+               "validation": {
+                  "type": "NOVALIDATION"
+               },
+               "width": 48
+            },
+            {
+               "format": "text",
+               "help": {
+                  "link": "https://fac.gov/documentation/validation/#uei",
+                  "text": "UEIs are 12 characters long and match rules as given by SAM.gov"
+               },
+               "range_cell": "B4",
+               "range_name": "auditee_uei",
+               "title": "Auditee UEI:",
+               "title_cell": "A4",
+               "type": "single_cell",
+               "validation": {
+                  "custom_error": "Expecting something with 12 characters",
+                  "custom_title": "Must be length of 12",
+                  "formula1": 12,
+                  "operator": "equal",
+                  "type": "textLength"
+               },
+               "width": 48
+            }
+         ]
+      },
+      {
+         "hide_col_from": 13,
+         "name": "Form",
+         "open_ranges": [
+            {
+               "help": {
+                  "link": "https://fac.gov/documentation/validation/#award_reference",
+                  "text": "Award reference have the form AWARD-NNNN (e.g. AWARD-0001)"
+               },
+               "range_name": "award_reference",
+               "title": "Award Reference",
+               "title_cell": "A1",
+               "type": "open_range",
+               "validation": {
+                  "custom_error": "The value should follow the pattern AWARD-#### (where #### is a four-digit number).",
+                  "custom_title": "Award Reference validation",
+                  "formula1": "=AND(LEN(FIRSTCELLREF)=10, LEFT(FIRSTCELLREF, 6)=\"AWARD-\", ISNUMBER(VALUE(MID(FIRSTCELLREF, 7, 4))))",
+                  "type": "custom"
+               },
+               "width": 18
+            },
+            {
+               "help": {
+                  "link": "https://fac.gov/documentation/validation/#reference_number",
+                  "text": "Reference numbers have the form YYYY-NNN (e.g. 2023-001)"
+               },
+               "range_name": "reference_number",
+               "title": "Audit Finding Reference Number",
+               "title_cell": "B1",
+               "type": "open_range",
+               "validation": {
+                  "custom_error": "Expecting a value in the format YYYY-NNN, where YYYY is a year and NNN a three digit number (e.g. 2023-001)",
+                  "custom_title": "Reference number",
+                  "formula1": "=OR(ISBLANK(FIRSTCELLREF), AND(LEN(FIRSTCELLREF) = 8, LEFT(FIRSTCELLREF, 2) = \"20\", ISNUMBER(MID(FIRSTCELLREF, 3, 2) * 1), MID(FIRSTCELLREF, 5, 1) = \"-\", ISNUMBER(RIGHT(FIRSTCELLREF, 3) * 1)))",
+                  "type": "custom"
+               },
+               "width": 18
+            },
+            {
+               "help": {
+                  "link": "https://fac.gov/documentation/validation/#unknown",
+                  "text": "If you see this error, please contact support."
+               },
+               "range_name": "compliance_requirement",
+               "title": "Type(s) of Compliance Requirement(s)",
+               "title_cell": "C1",
+               "type": "open_range",
+               "validation": {
+                  "custom_error": "Expecting a valid combination of the letters: A,B,C,E,F,G,H,I,J,L,M,N,P",
+                  "custom_title": "Compliance requirement",
+                  "formula1": "=IF(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(FIRSTCELLREF, \"A\", \"\"), \"B\", \"\"), \"C\", \"\"), \"E\", \"\"), \"F\", \"\"), \"G\", \"\"), \"H\", \"\"), \"I\", \"\"), \"J\", \"\"), \"L\", \"\"), \"M\", \"\"), \"N\", \"\"), \"P\", \"\")<>\"\", \"Invalid\", \"Valid\")",
+                  "type": "custom"
+               },
+               "width": 20
+            },
+            {
+               "help": {
+                  "link": "https://fac.gov/documentation/validation/#yorn",
+                  "text": "This field must be either `Y` or `N`"
+               },
+               "range_name": "modified_opinion",
+               "title": "Modified Opinion",
+               "title_cell": "D1",
+               "type": "yorn_range",
+               "validation": {
+                  "allow_blank": "False",
+                  "custom_error": "Must be 'Y' or 'N'",
+                  "custom_title": "Y/N",
+                  "formula1": "\"Y,N\"",
+                  "type": "list"
+               },
+               "width": 12
+            },
+            {
+               "help": {
+                  "link": "https://fac.gov/documentation/validation/#unknown",
+                  "text": "If you see this error, please contact support."
+               },
+               "range_name": "other_matters",
+               "title": "Other Matters",
+               "title_cell": "E1",
+               "type": "yorn_range",
+               "validation": {
+                  "allow_blank": "False",
+                  "custom_error": "Must be 'Y' or 'N'",
+                  "custom_title": "Y/N",
+                  "formula1": "\"Y,N\"",
+                  "type": "list"
+               },
+               "width": 12
+            },
+            {
+               "help": {
+                  "link": "https://fac.gov/documentation/validation/#unknown",
+                  "text": "If you see this error, please contact support."
+               },
+               "range_name": "material_weakness",
+               "title": "Material Weakness",
+               "title_cell": "F1",
+               "type": "yorn_range",
+               "validation": {
+                  "allow_blank": "False",
+                  "custom_error": "Must be 'Y' or 'N'",
+                  "custom_title": "Y/N",
+                  "formula1": "\"Y,N\"",
+                  "type": "list"
+               },
+               "width": 12
+            },
+            {
+               "help": {
+                  "link": "https://fac.gov/documentation/validation/#yorn",
+                  "text": "This field must be either `Y` or `N`"
+               },
+               "range_name": "significant_deficiency",
+               "title": "Significant Deficiency",
+               "title_cell": "G1",
+               "type": "yorn_range",
+               "validation": {
+                  "allow_blank": "False",
+                  "custom_error": "Must be 'Y' or 'N'",
+                  "custom_title": "Y/N",
+                  "formula1": "\"Y,N\"",
+                  "type": "list"
+               },
+               "width": 12
+            },
+            {
+               "help": {
+                  "link": "https://fac.gov/documentation/validation/#yorn",
+                  "text": "This field must be either `Y` or `N`"
+               },
+               "range_name": "other_findings",
+               "title": "Other Findings",
+               "title_cell": "H1",
+               "type": "yorn_range",
+               "validation": {
+                  "allow_blank": "False",
+                  "custom_error": "Must be 'Y' or 'N'",
+                  "custom_title": "Y/N",
+                  "formula1": "\"Y,N\"",
+                  "type": "list"
+               },
+               "width": 12
+            },
+            {
+               "help": {
+                  "link": "https://fac.gov/documentation/validation/#yorn",
+                  "text": "This field must be either `Y` or `N`"
+               },
+               "range_name": "questioned_costs",
+               "title": "Questioned Costs",
+               "title_cell": "I1",
+               "type": "yorn_range",
+               "validation": {
+                  "allow_blank": "False",
+                  "custom_error": "Must be 'Y' or 'N'",
+                  "custom_title": "Y/N",
+                  "formula1": "\"Y,N\"",
+                  "type": "list"
+               },
+               "width": 12
+            },
+            {
+               "help": {
+                  "link": "https://fac.gov/documentation/validation/#yorn",
+                  "text": "This field must be either `Y` or `N`"
+               },
+               "range_name": "repeat_prior_reference",
+               "title": "Repeat Findings from Prior Year",
+               "title_cell": "J1",
+               "type": "yorn_range",
+               "validation": {
+                  "allow_blank": "False",
+                  "custom_error": "Must be 'Y' or 'N'",
+                  "custom_title": "Y/N",
+                  "formula1": "\"Y,N\"",
+                  "type": "list"
+               },
+               "width": 12
+            },
+            {
+               "help": {
+                  "link": "https://fac.gov/documentation/validation/#yorn",
+                  "text": "This field must be either `Y` or `N`"
+               },
+               "range_name": "prior_references",
+               "title": "If Repeat Finding, provide Prior Year Audit Finding Reference Number(s)",
+               "title_cell": "K1",
+               "type": "open_range",
+               "validation": {
+                  "type": "NOVALIDATION"
+               },
+               "width": 24
+            },
+            {
+               "formula": "=IF(OR(D{0}=\"\", E{0}=\"\", F{0}=\"\", G{0}=\"\", H{0}=\"\"), \"\", IF(OR(AND(D{0}=\"Y\", E{0}=\"N\", F{0}=\"N\", G{0}=\"N\", H{0}=\"N\"), AND(D{0}=\"Y\", E{0}=\"N\", F{0}=\"Y\", G{0}=\"N\", H{0}=\"N\"), AND(D{0}=\"Y\", E{0}=\"N\", F{0}=\"N\", G{0}=\"Y\", H{0}=\"N\"), AND(D{0}=\"N\", E{0}=\"Y\", F{0}=\"N\", G{0}=\"N\", H{0}=\"N\"), AND(D{0}=\"N\", E{0}=\"Y\", F{0}=\"Y\", G{0}=\"N\", H{0}=\"N\"), AND(D{0}=\"N\", E{0}=\"Y\", F{0}=\"N\", G{0}=\"Y\", H{0}=\"N\"), AND(D{0}=\"N\", E{0}=\"N\", F{0}=\"Y\", G{0}=\"N\", H{0}=\"N\"), AND(D{0}=\"N\", E{0}=\"N\", F{0}=\"N\", G{0}=\"Y\", H{0}=\"N\"), AND(D{0}=\"N\", E{0}=\"N\", F{0}=\"N\", G{0}=\"N\", H{0}=\"Y\")), \"Y\", \"N\"))",
+               "help": {
+                  "link": "https://fac.gov/documentation/validation/#yorn",
+                  "text": "This field must be either `Y` or `N`"
+               },
+               "keep_locked": true,
+               "range_name": "is_valid",
+               "title": "Is Findings Combination Valid? (Read Only)",
+               "title_cell": "L1",
+               "type": "yorn_range",
+               "validation": {
+                  "allow_blank": "False",
+                  "custom_error": "Must be 'Y' or 'N'",
+                  "custom_title": "Y/N",
+                  "formula1": "\"Y,N\"",
+                  "type": "list"
+               },
+               "width": 16
+            }
+         ]
+      }
+   ],
+   "title_row": 1
+}
