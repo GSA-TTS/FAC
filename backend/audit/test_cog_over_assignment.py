@@ -14,7 +14,7 @@ class CogOverAssignmentTests(TestCase):
     def setUp(self):
         self.user = baker.make(User)
         self.federal_awards_for_test = self._fake_federal_awards()
-        self.cog_over_assignment = cog_over_assignment(self.federal_awards_for_test)
+    #   self.cog_over_assignment = cog_over_assignment(self.federal_awards_for_test)
 
     @staticmethod
     def _fake_federal_awards():
@@ -57,6 +57,6 @@ class CogOverAssignmentTests(TestCase):
         }
 
     def test_cog_over_assignment(self):
-        cog_agency, over_agency = self.cog_over_assignment(self.federal_awards_for_test)
+        cog_agency, over_agency = cog_over_assignment(self.federal_awards_for_test)
         print("cognizant agency = ", cog_agency)
         print("oversignt agency = ", over_agency)
