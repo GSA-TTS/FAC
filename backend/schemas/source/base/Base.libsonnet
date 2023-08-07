@@ -386,7 +386,7 @@ local SchemaBase = Types.object {
   Compound: Compound {
     FederalProgramNames: {
       description: 'All Federal program names',
-      enum: FederalProgramNames.program_names
+      enum: FederalProgramNames.program_names,
     },
     AllALNNumbers: {
       description: 'All program numbers',
