@@ -1,83 +1,47 @@
 import 'cypress-file-upload';
 //require("@4tw/cypress-drag-drop");
 
-const reportTestId = '2023MAY0001000001';
+import {
+  testWorkbookFederalAwards,
+  testWorkbookFindingsUniformGuidance,
+  testWorkbookFindingsText,
+  testWorkbookCorrectiveActionPlan,
+  testWorkbookAdditionalUEIs,
+} from '../support/workbook-uploads.js';
+
+const reportTestId = '2023AUG0001000016';
 
 describe('Workbook upload successful', () => {
+  before(() => {
+    cy.session('login-session', () => {
+      cy.visit('/');
+      cy.login();
+    });
+  });
+
   it('Successfully uploads Federal Awards', () => {
-    cy.intercept('/audit/excel/federal-awards-expended/*', {
-      fixture: 'success-res.json',
-    }).as('uploadSuccess');
-    cy.visit(`report_submission/federal-awards/${reportTestId}`);
-    cy.get('#file-input-federal-awards-xlsx').attachFile(
-      'federal-awards-expended-UPDATE.xlsx'
-    );
-    cy.wait('@uploadSuccess').its('response.statusCode').should('eq', 200);
-    cy.wait(2000)
-      .get('#info_box')
-      .should(
-        'have.text',
-        'File successfully validated! Your work has been saved.'
-      );
-    cy.get('#continue').click();
-    cy.url().should('contain', `/audit/submission-progress/${reportTestId}`);
+    cy.visit(`/report_submission/federal-awards/${reportTestId}`);
+    testWorkbookFederalAwards();
   });
 
   it('Successfully uploads audit findings', () => {
-    cy.intercept('/audit/excel/findings-uniform-guidance/*', {
-      fixture: 'success-res.json',
-    }).as('uploadSuccess');
     cy.visit(`report_submission/audit-findings/${reportTestId}`);
-    cy.get('#file-input-audit-findings-xlsx').attachFile(
-      'findings-uniform-guidance-UPDATE.xlsx'
-    );
-    cy.wait('@uploadSuccess').its('response.statusCode').should('eq', 200);
-    cy.wait(2000)
-      .get('#info_box')
-      .should(
-        'have.text',
-        'File successfully validated! Your work has been saved.'
-      );
-    cy.get('#continue').click();
-    cy.url().should('contain', `/audit/submission-progress/${reportTestId}`);
+    testWorkbookFindingsUniformGuidance();
   });
 
   it('Successfully uploads audit findings text', () => {
-    cy.intercept('/audit/excel/findings-text/*', {
-      fixture: 'success-res.json',
-    }).as('uploadSuccess');
     cy.visit(`report_submission/audit-findings-text/${reportTestId}`);
-    cy.get('#file-input-audit-findings-text-xlsx').attachFile(
-      'findings-text-UPDATE.xlsx'
-    );
-    cy.wait('@uploadSuccess').its('response.statusCode').should('eq', 200);
-    cy.wait(2000)
-      .get('#info_box')
-      .should(
-        'have.text',
-        'File successfully validated! Your work has been saved.'
-      );
-    cy.get('#continue').click();
-    cy.url().should('contain', `/audit/submission-progress/${reportTestId}`);
+    testWorkbookFindingsText();
   });
 
   it('Successfully uploads CAP', () => {
-    cy.intercept('/audit/excel/corrective-action-plan/*', {
-      fixture: 'success-res.json',
-    }).as('uploadSuccess');
     cy.visit(`/report_submission/CAP/${reportTestId}`);
-    cy.get('#file-input-CAP-xlsx').attachFile(
-      'corrective-action-plan-UPDATE.xlsx'
-    );
-    cy.wait('@uploadSuccess').its('response.statusCode').should('eq', 200);
-    cy.wait(2000)
-      .get('#info_box')
-      .should(
-        'have.text',
-        'File successfully validated! Your work has been saved.'
-      );
-    cy.get('#continue').click();
-    cy.url().should('contain', `/audit/submission-progress/${reportTestId}`);
+    testWorkbookCorrectiveActionPlan();
+  });
+
+  it('Successfully uploads Additional UEIs', () => {
+    cy.visit(`/report_submission/additional-ueis/${reportTestId}`);
+    testWorkbookAdditionalUEIs();
   });
 
   describe('Workbook upload fail', () => {
@@ -127,6 +91,19 @@ describe('Workbook upload successful', () => {
       }).as('uploadFail');
       cy.visit(`/report_submission/CAP/${reportTestId}`);
       cy.get('#file-input-CAP-xlsx').attachFile('cap-invalid.xlsx');
+      cy.wait('@uploadFail').its('response.statusCode').should('eq', 400);
+      cy.wait(2000)
+        .get('#info_box')
+        .should('have.text', 'Field Error: undefined');
+    });
+
+    it('unsuccessful upload Additional UEIs', () => {
+      cy.intercept('POST', '/audit/excel/additional-ueis/*', {
+        statusCode: 400,
+        fixture: 'fail-res.json',
+      }).as('uploadFail');
+      cy.visit(`/report_submission/additional-ueis/${reportTestId}`);
+      cy.get('#file-input-additional-ueis-xlsx').attachFile('cap-invalid.xlsx');
       cy.wait('@uploadFail').its('response.statusCode').should('eq', 400);
       cy.wait(2000).get('#info_box').should('contain', 'A field is missing');
     });

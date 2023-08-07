@@ -2,6 +2,12 @@ import { testLoginGovLogin } from '../support/login-gov.js';
 import { testValidAccess } from '../support/check-access.js';
 import { testValidEligibility } from '../support/check-eligibility.js';
 import { testValidAuditeeInfo } from '../support/auditee-info.js';
+import { testValidGeneralInfo } from '../support/general-info.js';
+import { testWorkbookFederalAwards,
+         testWorkbookFindingsUniformGuidance,
+         testWorkbookFindingsText,
+         testWorkbookCorrectiveActionPlan,
+         testWorkbookAdditionalUEIs } from '../support/workbook-uploads.js'
 
 describe('Full audit submission', () => {
   before(() => {
@@ -31,5 +37,35 @@ describe('Full audit submission', () => {
 
     // Now the accessandsubmission screen
     testValidAccess();
+
+    // Fill out the general info form
+    testValidGeneralInfo();
+
+    // Upload all the workbooks
+    cy.get(".usa-link").contains("Federal Awards workbook").click();
+    testWorkbookFederalAwards(false);  // don't intercept
+
+    cy.get(".usa-link").contains("Audit Findings workbook").click();
+    testWorkbookFindingsUniformGuidance(false);  // don't intercept
+
+    cy.get(".usa-link").contains("Audit Findings Text workbook").click();
+    testWorkbookFindingsText(false);  // don't intercept
+
+    cy.get(".usa-link").contains("Corrective Action Plan (CAP) workbook").click();
+    testWorkbookCorrectiveActionPlan(false);  // don't intercept
+
+    cy.get(".usa-link").contains("Additional UEIs workbook").click();
+    testWorkbookAdditionalUEIs(false);  // don't intercept
+    
+
+    // Can it be? We are ready for certification?
+    cy.get(".usa-button").contains("Ready for SF-SAC Certification").click();
+    cy.url().should('match', /\/audit\/ready-for-certification\/[0-9A-Z]{17}/);
+    // Submit for certification button
+    cy.get("#continue").click()
+    // Can't tell if this is the right place for this to end up?
+    cy.url().should('match', /\/audit\/submission-progress\/[0-9A-Z]{17}/);
+
+
   });
 });

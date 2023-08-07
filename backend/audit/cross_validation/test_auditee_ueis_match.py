@@ -36,7 +36,7 @@ class AuditeeUEIsMatchTests(TestCase):
         sac = baker.make(SingleAuditChecklist)
 
         sac.general_information = {"auditee_uei": "123456789"}
-        sac.federal_awards = {"auditee_uei": "123456789"}
+        sac.federal_awards = {"FederalAwards": {"auditee_uei": "123456789"}}
 
         shaped_sac = sac_validation_shape(sac)
 
@@ -49,7 +49,7 @@ class AuditeeUEIsMatchTests(TestCase):
         sac = baker.make(SingleAuditChecklist)
 
         sac.general_information = {"auditee_uei": "123456789"}
-        sac.federal_awards = {"auditee_uei": "123456780"}
+        sac.federal_awards = {"FederalAwards": {"auditee_uei": "123456780"}}
 
         shaped_sac = sac_validation_shape(sac)
 
