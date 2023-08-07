@@ -244,6 +244,37 @@ class SingleAuditReportFileHandlerView(
             raise BadRequest()
 
 
+class CrossValidationView(SingleAuditChecklistAccessRequiredMixin, generic.View):
+    def get(self, request, *args, **kwargs):
+        report_id = kwargs["report_id"]
+
+        try:
+            sac = SingleAuditChecklist.objects.get(report_id=report_id)
+
+            context = {
+                "report_id": report_id,
+                "submission_status": sac.submission_status,
+            }
+            return render(request, "audit/cross-validation.html", context)
+        except SingleAuditChecklist.DoesNotExist:
+            raise PermissionDenied("You do not have access to this audit.")
+
+    def post(self, request, *args, **kwargs):
+        report_id = kwargs["report_id"]
+
+        try:
+            sac = SingleAuditChecklist.objects.get(report_id=report_id)
+
+            errors = sac.validate_full()
+
+            context = {"report_id": report_id, "errors": errors}
+
+            return render(request, "audit/cross-validation-results.html", context)
+
+        except SingleAuditChecklist.DoesNotExist:
+            raise PermissionDenied("You do not have access to this audit.")
+
+
 class ReadyForCertificationView(SingleAuditChecklistAccessRequiredMixin, generic.View):
     def get(self, request, *args, **kwargs):
         report_id = kwargs["report_id"]
@@ -265,14 +296,14 @@ class ReadyForCertificationView(SingleAuditChecklistAccessRequiredMixin, generic
         try:
             sac = SingleAuditChecklist.objects.get(report_id=report_id)
 
-            errors = sac.validate_cross()
+            errors = sac.validate_full()
             if not errors:
                 sac.transition_to_ready_for_certification()
                 sac.save()
                 return redirect(reverse("audit:SubmissionProgress", args=[report_id]))
 
             context = {"report_id": report_id, "errors": errors}
-            return render(request, "audit/not-ready-for-certification.html", context)
+            return render(request, "audit/cross-validation-results.html", context)
 
         except SingleAuditChecklist.DoesNotExist:
             raise PermissionDenied("You do not have access to this audit.")
