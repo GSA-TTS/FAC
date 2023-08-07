@@ -86,7 +86,11 @@ def fake_auditor_certification():
         "has_no_auditee_procedures": True,
         "is_FAC_releasable": True,
     }
-    data_step_2 = {"auditor_name": fake.name(), "auditor_title": fake.job(), "auditor_certification_date_signed": fake.date(str="%m/%d/%Y")}
+    data_step_2 = {
+        "auditor_name": fake.name(),
+        "auditor_title": fake.job(),
+        "auditor_certification_date_signed": fake.date(str="%m/%d/%Y"),
+    }
 
     return data_step_1, data_step_2
 
@@ -104,7 +108,11 @@ def fake_auditee_certification():
         "is_issued_and_signed": True,
         "is_FAC_releasable": True,
     }
-    data_step_2 = {"auditee_name": fake.name(), "auditee_title": fake.job(), "auditee_certification_date_signed": fake.date(str="%m/%d/%Y")}
+    data_step_2 = {
+        "auditee_name": fake.name(),
+        "auditee_title": fake.job(),
+        "auditee_certification_date_signed": fake.date(str="%m/%d/%Y"),
+    }
 
     return data_step_1, data_step_2
 
