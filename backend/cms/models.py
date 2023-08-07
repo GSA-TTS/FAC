@@ -7,9 +7,9 @@ class Posts(models.Model):
     """Basic model for posts."""
 
     # title field using charfield constraint with unique constraint
-    title = models.CharField(max_length=200, unique=True)
+    title = models.CharField(unique=True)
     # slug field auto populated using title with unique constraint
-    slug = models.SlugField(max_length=200, unique=True)
+    slug = models.SlugField(unique=True)
     # author field populated using users database
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     # and date time fields automatically populated using system time
@@ -18,7 +18,7 @@ class Posts(models.Model):
     # content field to store our post
     content = models.TextField()
     # meta description for SEO benefits and accessibility
-    meta_description = models.CharField(max_length=300, null=True)
+    meta_description = models.CharField(null=True)
 
     class Meta:
         """Meta information"""

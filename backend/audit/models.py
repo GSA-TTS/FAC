@@ -204,7 +204,7 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
 
     # implement an array of tuples as two arrays since we can only have simple fields inside an array
     transition_name = ArrayField(
-        models.CharField(max_length=40, choices=STATUS_CHOICES),
+        models.CharField(choices=STATUS_CHOICES),
         default=list,
         size=None,
         blank=True,
@@ -218,11 +218,11 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         null=True,
     )
 
-    report_id = models.CharField(max_length=17, unique=True)
+    report_id = models.CharField(unique=True)
 
     # Q2 Type of Uniform Guidance Audit
     audit_type = models.CharField(
-        max_length=20, choices=AUDIT_TYPE_CODES, blank=True, null=True
+        choices=AUDIT_TYPE_CODES, blank=True, null=True
     )
 
     # General Information
@@ -470,7 +470,6 @@ class Access(models.Model):
     role = models.CharField(
         choices=ROLES,
         help_text="Access type granted to this user",
-        max_length=50,
     )
     email = models.EmailField()
     user = models.ForeignKey(
@@ -516,8 +515,8 @@ class ExcelFile(models.Model):
     """
 
     file = models.FileField(upload_to=excel_file_path, validators=[validate_excel_file])
-    filename = models.CharField(max_length=255)
-    form_section = models.CharField(max_length=255)
+    filename = models.CharField()
+    form_section = models.CharField()
     sac = models.ForeignKey(SingleAuditChecklist, on_delete=models.CASCADE)
     user = models.ForeignKey(User, blank=True, null=True, on_delete=models.SET_NULL)
     date_created = models.DateTimeField(auto_now_add=True)
@@ -546,7 +545,7 @@ class SingleAuditReportFile(models.Model):
         upload_to=single_audit_report_path,
         validators=[validate_single_audit_report_file],
     )
-    filename = models.CharField(max_length=255)
+    filename = models.CharField()
     sac = models.ForeignKey(SingleAuditChecklist, on_delete=models.CASCADE)
     user = models.ForeignKey(User, blank=True, null=True, on_delete=models.SET_NULL)
     date_created = models.DateTimeField(auto_now_add=True)
