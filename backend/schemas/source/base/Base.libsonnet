@@ -416,6 +416,10 @@ local SchemaBase = Types.object {
     },
     ALNPrefixes: type_aln_prefix,
     ThreeDigitExtension: type_three_digit_extension,
+    ComplianceRequirementTypes: {
+      description: 'Compliance requirement types',
+      enum: ComplianceRequirementTypes.requirement_types,
+    },    
   },
   Validation: Validation,
   SchemaBase: SchemaBase,

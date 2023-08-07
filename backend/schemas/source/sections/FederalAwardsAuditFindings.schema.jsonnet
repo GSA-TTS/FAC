@@ -8,7 +8,7 @@ local Parts = {
     additionalProperties: false,
     properties: {
       award_reference: Base.Compound.AwardReference,
-      compliance_requirement: Base.Compound.ComplianceRequirement,
+      compliance_requirement: Base.Compound.ComplianceRequirementTypes,
     },
     required: ['award_reference', 'compliance_requirement'],
   },
