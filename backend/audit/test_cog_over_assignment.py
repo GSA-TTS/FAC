@@ -4,7 +4,7 @@ from model_bakery import baker
 
 from .models import User
 
-from cog_agency import cog_over_assignment
+from audit.cog_agency import cog_over_assignment
 
 
 class CogOverAssignmentTests(TestCase):
