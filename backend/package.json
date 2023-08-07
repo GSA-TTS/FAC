@@ -34,7 +34,7 @@
     "esbuild-postcss": "^0.0.4",
     "esbuild-sass-plugin": "2.4.5",
     "eslint": "^8.46.0",
-    "eslint-config-prettier": "^8.7.0",
+    "eslint-config-prettier": "^9.0.0",
     "eslint-plugin-cypress": "^2.12.1",
     "eslint-plugin-prettier": "^4.2.1",
     "glob": "^8.1.0",
