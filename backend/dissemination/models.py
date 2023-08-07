@@ -501,9 +501,7 @@ class General(models.Model):
         "Primary Employer Identification Number",
         null=True,
     )
-    auditee_uei = models.TextField(
-        "", null=True, help_text=docs.uei_general
-    )
+    auditee_uei = models.TextField("", null=True, help_text=docs.uei_general)
     auditee_addl_uei_list = ArrayField(
         models.TextField("", null=True, help_text=docs.uei_general),
         null=True,
@@ -798,9 +796,7 @@ class SecondaryAuditor(models.Model):
         "CPA Street Address Line 2 in C-FAC",
         null=True,
     )
-    address_city = models.TextField(
-        "CPA City", null=True, help_text=docs.auditor_city
-    )
+    address_city = models.TextField("CPA City", null=True, help_text=docs.auditor_city)
     address_state = models.TextField(
         "CPA State", null=True, help_text=docs.auditor_state
     )

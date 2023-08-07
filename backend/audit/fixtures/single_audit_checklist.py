@@ -37,6 +37,7 @@ from audit.management.commands.census_models.ay22 import CensusGen22 as Gen
 
 # TODO: Pull this from actual information.
 
+
 def _fake_general_information(auditee_name=None):
     """Create a fake general_information object."""
     # TODO: can we generate this object from the schema definition in
@@ -257,11 +258,13 @@ validator_mapping = {
     "PDF": audit.validators.validate_single_audit_report_file,
 }
 
+
 def _make_excel_file(filename, f_obj):
     content = f_obj.read()
     f_obj.seek(0)
     file = SimpleUploadedFile(filename, content, "application/vnd.ms-excel")
     return file
+
 
 def _post_upload_workbook(this_sac, this_user, section, xlsx_file):
     """Upload a workbook for this SAC.

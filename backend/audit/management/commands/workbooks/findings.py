@@ -5,34 +5,36 @@ from audit.management.commands.workbooks.base import (
     set_single_cell_range,
     map_simple_columns,
     generate_dissemination_test_table,
-    set_range
+    set_range,
 )
 
-from audit.management.commands.census_models.ay22 import  (
+from audit.management.commands.census_models.ay22 import (
     CensusCfda22 as Cfda,
     CensusFindings22 as Findings,
-    CensusGen22 as Gen
+    CensusGen22 as Gen,
 )
 
 import openpyxl as pyxl
 
 import logging
+
 logger = logging.getLogger(__name__)
 
 mappings = [
-    FieldMap('compliance_requirement', 'typerequirement', None, str), 
-    FieldMap('reference_number', 'findingsrefnums', None, str),
-    FieldMap('modified_opinion', 'modifiedopinion', None, str), 
-    FieldMap('other_matters', 'othernoncompliance', None, str), 
-    FieldMap('material_weakness', 'materialweakness', None, str), 
-    FieldMap('significant_deficiency', 'significantdeficiency', None, str), 
-    FieldMap('other_findings', 'otherfindings', None, str),
-    FieldMap('questioned_costs', 'qcosts', None, str),
-    FieldMap('repeat_prior_reference', 'repeatfinding', None, str), 
-    FieldMap('prior_references', 'priorfindingrefnums', None, str), 
+    FieldMap("compliance_requirement", "typerequirement", None, str),
+    FieldMap("reference_number", "findingsrefnums", None, str),
+    FieldMap("modified_opinion", "modifiedopinion", None, str),
+    FieldMap("other_matters", "othernoncompliance", None, str),
+    FieldMap("material_weakness", "materialweakness", None, str),
+    FieldMap("significant_deficiency", "significantdeficiency", None, str),
+    FieldMap("other_findings", "otherfindings", None, str),
+    FieldMap("questioned_costs", "qcosts", None, str),
+    FieldMap("repeat_prior_reference", "repeatfinding", None, str),
+    FieldMap("prior_references", "priorfindingrefnums", None, str),
     # FIXME: We have to calculate, and patch in, is_valid
     # is_valid is computed in the workbook
 ]
+
 
 def generate_findings(dbkey, outfile):
     logger.info(f"--- generate findings {dbkey} ---")
@@ -49,7 +51,7 @@ def generate_findings(dbkey, outfile):
     if (cfdas != None) and (findings != None):
         for ndx, cfda in enumerate(cfdas):
             if cfda:
-                e2a[cfda.elecauditsid] = f'AWARD-{ndx+1:04d}'
+                e2a[cfda.elecauditsid] = f"AWARD-{ndx+1:04d}"
 
         if len(e2a) != 0:
             for find in findings:
@@ -57,13 +59,15 @@ def generate_findings(dbkey, outfile):
                     award_references.append(e2a[find.elecauditsid])
 
             if len(award_references) != 0:
-                set_range(wb, 'award_reference', award_references)
-    
+                set_range(wb, "award_reference", award_references)
+
     wb.save(outfile)
-    
-    table = generate_dissemination_test_table(Gen, 'findings', dbkey, mappings, findings)
-    for obj, ar in zip(table['rows'], award_references):
-        obj['fields'].append('award_reference')
-        obj['values'].append(ar)
+
+    table = generate_dissemination_test_table(
+        Gen, "findings", dbkey, mappings, findings
+    )
+    for obj, ar in zip(table["rows"], award_references):
+        obj["fields"].append("award_reference")
+        obj["values"].append(ar)
 
     return (wb, table)
