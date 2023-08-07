@@ -1,9 +1,11 @@
+local Base = import '../../base/Base.libsonnet';
 local Fun = import '../libs/Functions.libsonnet';
 local Help = import '../libs/Help.libsonnet';
 local SV = import '../libs/SheetValidations.libsonnet';
 local Sheets = import '../libs/Sheets.libsonnet';
 local findingSheet = 'Form';
 local coverSheet = 'Coversheet';
+local complianceRequirementTypeSheet = 'ComplianceRequirementTypes';
 local title_row = 1;
 
 local meta_cells = [
@@ -106,7 +108,11 @@ local open_ranges_defns = [
     open_range_w20 {
       help: Help.unknown,
     },
-    SV.ComplianceRequirementValidation,
+    SV.RangeLookupValidation {
+      sheet: complianceRequirementTypeSheet,
+      lookup_range: 'requirement_type_lookup',
+      custom_error: 'Please enter a valid Type of Compliance Requirement. (One or more of ABCEFGHIJLMNP, in alphabetical order).',
+    },
     'Type(s) of Compliance Requirement(s)',
     'compliance_requirement',
   ],
@@ -199,6 +205,22 @@ local sheets = [
     name: findingSheet,
     open_ranges: Fun.make_open_ranges(title_row, open_ranges_defns),
     hide_col_from: 13,
+  },
+  {
+    name: complianceRequirementTypeSheet,
+    text_ranges: [
+      {
+        type: 'text_range',
+        title: 'Compliance Requirement types',
+        title_cell: 'A1',
+        range_name: 'requirement_type_lookup',
+        last_range_cell: 'A8192',
+        contents: Base.Compound.ComplianceRequirementTypes,
+        validation: SV.LookupValidation {
+          lookup_range: 'requirement_type_lookup',
+        },
+      },
+    ],
   },
 ];
 

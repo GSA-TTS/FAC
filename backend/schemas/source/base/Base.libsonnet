@@ -354,12 +354,6 @@ local Compound = {
     description: 'Reference Number',
     pattern: '^20[2-9][0-9]-[0-9]{3}$',
   },
-  ComplianceRequirement: {
-    title: 'ComplianceRequirement',
-    description: 'Compliance requirement type',
-    pattern: '^A?B?C?E?F?G?H?I?J?L?M?N?P?$',
-  },
-
   NonEmptyString: Types.string {
     minLength: 1,
   },
@@ -412,6 +406,10 @@ local SchemaBase = Types.object {
     },
     ALNPrefixes: type_aln_prefix,
     ThreeDigitExtension: type_three_digit_extension,
+    ComplianceRequirementTypes: {
+      description: 'Compliance requirement types',
+      enum: ComplianceRequirementTypes.requirement_types,
+    },    
   },
   Validation: Validation,
   SchemaBase: SchemaBase,
