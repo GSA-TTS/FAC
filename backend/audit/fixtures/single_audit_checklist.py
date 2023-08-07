@@ -111,7 +111,7 @@ def fake_auditee_certification():
     data_step_2 = {
         "auditee_name": fake.name(),
         "auditee_title": fake.job(),
-        "auditee_certification_date_signed": fake.date_time(),
+        "auditee_certification_date_signed": fake.date(),
     }
 
     return data_step_1, data_step_2
