@@ -15,7 +15,6 @@ class CogOverAssignmentTests(TestCase):
         self.user = baker.make(User)
         self.federal_awards_for_test = self._fake_federal_awards()
 
-
     @staticmethod
     def _fake_federal_awards():
         return {
