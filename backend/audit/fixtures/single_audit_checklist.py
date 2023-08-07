@@ -32,7 +32,7 @@ from users.models import User
 
 logger = logging.getLogger(__name__)
 
-from audit.management.commands.workbooks.base import dbkey_to_report_id
+from audit.management.commands.workbooks.base import dbkey_to_test_report_id
 from audit.management.commands.census_models.ay22 import CensusGen22 as Gen
 
 # TODO: Pull this from actual information.
@@ -144,7 +144,8 @@ def _create_sac(user, auditee_name, dbkey):
         general_information=_fake_general_information(auditee_name),
         audit_information=_fake_audit_information(auditee_name),
     )
-    sac.report_id = dbkey_to_report_id(Gen, dbkey)
+    # Set a TEST report id for this data
+    sac.report_id = dbkey_to_test_report_id(Gen, dbkey)
     sac.save()
 
     Access = apps.get_model("audit.Access")

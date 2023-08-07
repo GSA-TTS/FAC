@@ -96,7 +96,7 @@ def map_simple_columns(wb, mappings, values):
 
 
 # FIXME: Get the padding/shape right on the report_id
-def dbkey_to_report_id(Gen, dbkey):
+def dbkey_to_test_report_id(Gen, dbkey):
     g = Gen.select(Gen.audityear,Gen.fyenddate).where(Gen.dbkey == dbkey).get()
     # month = g.fyenddate.split('-')[1]
     # 2022JUN0001000003
@@ -111,7 +111,7 @@ def generate_dissemination_test_table(Gen, api_endpoint, dbkey, mappings, object
         'singletons': dict()
     }
     table['endpoint'] = api_endpoint
-    table['report_id'] = dbkey_to_report_id(Gen, dbkey)
+    table['report_id'] = dbkey_to_test_report_id(Gen, dbkey)
     for o in objects:
         as_dict = model_to_dict(o)
         test_obj = {}
