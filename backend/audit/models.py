@@ -273,10 +273,6 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         blank=True, null=True, validators=[validate_notes_to_sefa_json]
     )
 
-    # audit_report = models.BinaryField(
-    #     blank=True, null=True, validators=[validate_single_audit_report_file]
-    # )
-
     def validate_full(self):
         """
         Full validation, intended for use when the user indicates that the
