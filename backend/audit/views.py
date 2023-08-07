@@ -44,7 +44,6 @@ from audit.validators import (
     validate_notes_to_sefa_json,
     validate_secondary_auditors_json,
 )
-from audit.get_agency_names import get_agency_names
 from audit.mixins import (
     CertifyingAuditeeRequiredMixin,
     CertifyingAuditorRequiredMixin,
