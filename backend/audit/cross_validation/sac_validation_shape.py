@@ -1,3 +1,30 @@
+camel_to_snake = {
+    "AdditionalUEIs": "additional_ueis",
+    "AuditInformation": "audit_information",
+    "CorrectiveActionPlan": "corrective_action_plan",
+    "FederalAwards": "federal_awards",
+    "FindingsText": "findings_text",
+    "FindingsUniformGuidance": "findings_uniform_guidance",
+    "GeneralInformation": "general_information",
+    "NotesToSefa": "notes_to_sefa",
+}
+snake_to_camel = {v: k for k, v in camel_to_snake.items()}
+at_root_sections = ("audit_information", "general_information")
+
+
+def get_shaped_section(sac, section_name):
+    """Extract either None or the appropriate dict from the section."""
+    true_name = camel_to_snake.get(section_name, section_name)
+    section = getattr(sac, true_name, None)
+    if true_name in at_root_sections:
+        return section
+
+    if section:
+        return section.get(snake_to_camel.get(true_name), {})
+
+    return None
+
+
 def sac_validation_shape(sac):
     """
     Takes an instance of SingleAuditChecklist and converts it to the shape
@@ -5,21 +32,47 @@ def sac_validation_shape(sac):
 
     This function exists so that as either the SingleAuditChecklist or the
     validation shape changes we only have to make adjustments in one place.
+
+    The sections that have spreadsheet workbooks all have root-level properties that
+    are the camel-case names of those sections. This function eliminates these names
+    and moves the actual values to the top level as part of returning a structure
+    that's appropriate for passing to the validation functions.
+
+    For example, if the Audit Information and Notes to SEFA sections have content,
+    this function wil return something like:
+
+    {
+        "sf_sac_sections": {
+            "audit_information": {
+                "dollar_threshold": ...,
+                "is_going_concern_included": ...,
+                "is_internal_control_deficiency_disclosed": ...,
+                "is_internal_control_material_weakness_disclosed": ...,
+                "is_material_noncompliance_disclosed": ...,
+                "is_aicpa_audit_guide_included": ...,
+                "is_low_risk_auditee": ...,
+                [other audit_information fields]
+            },
+            "notes_to_sefa": {
+                "auditee_uei": ...,
+                "accounting_policies": ...,
+                "is_minimis_rate_used": ...,
+                "rate_explained": ...,
+                "notes_to_sefa_entries": ...,
+                [other notes_to_sefa fields]
+
+            },
+            "federal_awards": None,
+            ...
+        },
+        "sf_sac_meta": { ... },
+    }
+
     """
+
     shape = {
         "sf_sac_sections": {
-            "general_information": sac.general_information,
-            "audit_information": sac.audit_information,
-            "federal_awards": sac.federal_awards["FederalAwards"],
-            "corrective_action_plan": sac.corrective_action_plan[
-                "CorrectiveActionPlan"
-            ],
-            "findings_text": sac.findings_text["FindingsText"],
-            "findings_uniform_guidance": sac.findings_uniform_guidance[
-                "FindingsUniformGuidance"
-            ],
-            "additional_ueis": sac.additional_ueis["AdditionalUEIs"],
-            "notes_to_sefa": sac.notes_to_sefa["NotesToSefa"],
+            k: get_shaped_section(sac, k) for k in camel_to_snake.values()
         },
         "sf_sac_meta": {
             "submitted_by": sac.submitted_by,

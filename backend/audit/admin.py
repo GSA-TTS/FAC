@@ -22,16 +22,7 @@ class ExcelFileAdmin(admin.ModelAdmin):
 
 
 class AuditReportAdmin(admin.ModelAdmin):
-    list_display = (
-        "filename",
-        "user",
-        "date_created",
-        "component_page_numbers",
-        "user_id",
-        "sac",
-        "sac_id",
-        "file",
-    )
+    list_display = ("filename", "user", "date_created", "component_page_numbers")
 
 
 admin.site.register(Access, AccessAdmin)

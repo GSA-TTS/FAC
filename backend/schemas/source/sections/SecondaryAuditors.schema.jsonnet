@@ -6,22 +6,14 @@ local SecondaryAuditorsEntry = {
   additionalProperties: false,
   properties: {
     secondary_auditor_name: Types.string,
-    secondary_auditor_ein: {
-      '$ref': '#/$defs/EIN',
-    },
+    secondary_auditor_ein: Func.join_types(Base.Compound.EmployerIdentificationNumber, [Types.NULL]),
     secondary_auditor_address_street: Types.string,
     secondary_auditor_address_city: Types.string,
-    secondary_auditor_address_state: {
-      '$ref': '#/$defs/State',
-    },
-    secondary_auditor_address_zipcode: {
-      '$ref': '#/$defs/Zip',
-    },
+    secondary_auditor_address_state: Base.Enum.UnitedStatesStateAbbr,
+    secondary_auditor_address_zipcode: Base.Compound.Zip,
     secondary_auditor_contact_name: Types.string,
     secondary_auditor_contact_title: Types.string,
-    secondary_auditor_contact_phone: {
-      '$ref': '#/$defs/Phone',
-    },
+    secondary_auditor_contact_phone: Base.Compound.UnitedStatesPhone,
     secondary_auditor_contact_email: Types.string {
       format: 'email',
     },
@@ -46,14 +38,6 @@ local SecondaryAuditors = Types.object {
 
 local Root = Types.object {
   additionalProperties: false,
-  '$defs': {
-    EIN: Func.join_types(Base.Compound.EmployerIdentificationNumber, [Types.NULL]),
-    Phone: Base.Compound.UnitedStatesPhone,
-    State: Base.Enum.UnitedStatesStateAbbr {
-      title: 'State',
-    },
-    Zip: Base.Compound.Zip,
-  },
   properties: {
     SecondaryAuditors: SecondaryAuditors,
   },

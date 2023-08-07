@@ -12,6 +12,7 @@ from tempfile import NamedTemporaryFile
 
 import copy
 import requests
+from typing import Dict, Union
 
 from audit.fixtures.excel import (
     SIMPLE_CASES_TEST_FILE,
@@ -769,7 +770,7 @@ class SecondaryAuditorsValidatorTests(SimpleTestCase):
 
 
 class ComponentPageNumberTests(SimpleTestCase):
-    good_pages = {
+    good_pages: Dict[str, Union[str, int]] = {
         "financial_statements": 1,
         "financial_statements_opinion": 2,
         "schedule_expenditures": 3,
