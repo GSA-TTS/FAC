@@ -436,19 +436,18 @@ class SubmissionProgressView(SingleAuditChecklistAccessRequiredMixin, generic.Vi
                     "completed_date": None,
                     "completed_by": None,
                 },
-                "audit_information_form": {
-                    "completed": True if (sac.audit_information) else False,
-                    "completed_date": None,
-                    "completed_by": None,
-                },
                 "findings_text_workbook": {
                     "completed": True if (sac.findings_text) else False,
                     "completed_date": None,
                     "completed_by": None,
                 },
-                
                 "CAP_workbook": {
                     "completed": True if (sac.corrective_action_plan) else False,
+                    "completed_date": None,
+                    "completed_by": None,
+                },
+                "audit_information_form": {
+                    "completed": True if (sac.audit_information) else False,
                     "completed_date": None,
                     "completed_by": None,
                 },

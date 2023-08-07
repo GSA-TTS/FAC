@@ -2,7 +2,9 @@
   $theme-show-notifications: false,
   $theme-font-path: '../fonts',
   $theme-image-path: '../img',
-  $theme-font-type-sans: 'public-sans'
+  $theme-font-type-sans: 'public-sans',
+  $theme-type-scale-md: 7,
+  $theme-type-scale-2xl: 13,
 );
 
 @forward 'uswds';
