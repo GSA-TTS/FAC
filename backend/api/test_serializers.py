@@ -71,7 +71,7 @@ class UEIValidatorStepTests(SimpleTestCase):
         valid = {"auditee_uei": "ZQGGHJH74DW7"}
 
         # Valid
-        with patch("api.uei.requests.get") as mock_get:
+        with patch("api.uei.SESSION.get") as mock_get:
             mock_get.return_value.status_code = 200  # Mock the status code
             mock_get.return_value.json.return_value = json.loads(
                 valid_uei_results
@@ -80,7 +80,7 @@ class UEIValidatorStepTests(SimpleTestCase):
             self.assertTrue(UEISerializer(data=valid).is_valid())
 
         # Has errors
-        with patch("api.uei.requests.get") as mock_get:
+        with patch("api.uei.SESSION.get") as mock_get:
             mock_get.return_value.status_code = 200  # Mock the status code
             mock_get.return_value.json.return_value = {"errors": [1, 2, 3]}
             self.assertFalse(UEISerializer(data=valid).is_valid())

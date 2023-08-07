@@ -26,6 +26,7 @@ from .validators import (
     validate_secondary_auditors_json,
     validate_notes_to_sefa_json,
     validate_single_audit_report_file,
+    validate_audit_information_json,
 )
 
 User = get_user_model()
@@ -232,6 +233,10 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         blank=True, null=True, validators=[validate_general_information_json]
     )
 
+    audit_information = models.JSONField(
+        blank=True, null=True, validators=[validate_audit_information_json]
+    )
+
     # Federal Awards:
     federal_awards = models.JSONField(
         blank=True, null=True, validators=[validate_federal_award_json]
@@ -429,6 +434,10 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
     @property
     def is_submitted(self):
         return self.submission_status in [SingleAuditChecklist.STATUS.SUBMITTED]
+
+    @property
+    def is_public(self):
+        return self.general_information["user_provided_organization_type"] != "tribal"
 
     def get_transition_date(self, status):
         index = self.transition_name.index(status)

@@ -5,6 +5,7 @@ on:
   workflow_call:
   push:
     branches:
+      - main
       - prod
     tags:
       - v1.*

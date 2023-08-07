@@ -65,11 +65,11 @@ jobs:
       environment: "dev"
     secrets: inherit
 
-  terraform-plan-management:
+  terraform-plan-meta:
     if: ${{ github.base_ref == 'main' }}
     uses: ./.github/workflows/terraform-plan-env.yml
     with:
-      environment: "management"
+      environment: "meta"
     secrets: inherit
 
   terraform-plan-staging:
@@ -86,4 +86,3 @@ jobs:
     with:
       environment: "production"
     secrets: inherit
-

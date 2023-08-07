@@ -22,7 +22,7 @@ deps:
 template_specs = $(wildcard source/excel/templates/*.jsonnet)
 section_specs = $(wildcard source/sections/*.jsonnet)
 
-xlsx = $(wildcard output/excel/xlsx/*-template*.xlsx)
+xlsx = $(wildcard output/excel/xlsx/*-workbook*.xlsx)
 json = $(wildcard output/excel/json/*.json)
 
 source_data:

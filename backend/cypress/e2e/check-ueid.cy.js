@@ -69,19 +69,19 @@ describe('Create New Audit', () => {
       }
 
       it('should display an error message when left blank', () => {
-        leaveFyStartBlank()
+        leaveFyStartBlank();
         cy.get('#auditee_fiscal_period_start').click().blur();
         cy.get('#auditee_fiscal_period_start-not-null').should('be.visible');
       });
 
       it('should disable the submit button when fields are invalid', () => {
-        leaveFyStartBlank()
+        leaveFyStartBlank();
         cy.get('button').contains('Continue').should('be.disabled');
       });
 
       it('should remove the error message when input is supplied', () => {
         // arrange
-        leaveFyStartBlank()
+        leaveFyStartBlank();
 
         // act
         cy.get('#auditee_fiscal_period_start').type('01/01/2022').blur();
@@ -109,12 +109,12 @@ describe('Create New Audit', () => {
       }
 
       it('should display an error message when left blank', () => {
-        leaveFyEndBlank()
+        leaveFyEndBlank();
         cy.get('#auditee_fiscal_period_end-not-null').should('be.visible');
       });
 
       it('should disable the submit button when fields are invalid', () => {
-        leaveFyEndBlank()
+        leaveFyEndBlank();
         cy.get('button').contains('Continue').should('be.disabled');
       });
 
@@ -161,21 +161,6 @@ describe('Create New Audit', () => {
 
           cy.contains(`We can't connect to SAM.gov to confirm your UEI.`);
         });
-
-        it('lets the user proceed without a UEI', () => {
-          cy.get('@searchButton').click();
-
-          cy.wait('@apiError').then((interception) => {
-            assert.isNotNull(
-              interception.response.body,
-              '1st API call has data'
-            );
-          });
-
-          cy.get('@secondaryButton').click();
-          cy.get('#no-uei-warning').should('be.visible');
-          cy.get('#auditee_uei').should('not.be.visible');
-        });
       });
 
       describe('An invalid UEI', () => {
@@ -209,21 +194,6 @@ describe('Create New Audit', () => {
 
           cy.contains('Your UEI is not recognized');
         });
-
-        it('lets the user proceed without a UEI', () => {
-          cy.get('@searchButton').click();
-
-          cy.wait('@invalidUeiRequest').then((interception) => {
-            assert.isNotNull(
-              interception.response.body,
-              '1st API call has data'
-            );
-          });
-
-          cy.get('@primaryButton').click();
-          cy.get('#no-uei-warning').should('be.visible');
-          cy.get('#auditee_uei').should('not.be.visible');
-        });
       });
 
       describe('A successful lookup', () => {
@@ -236,8 +206,8 @@ describe('Create New Audit', () => {
             {
               valid: true,
               response: {
-                uei: 'ZQGGHJH74DW7',
-                auditee_name: 'INTERNATIONAL BUSINESS MACHINES CORPORATION',
+                uei: 'CMBSGK6P7BE1',
+                auditee_name: 'Commonwealth of Virginia',
               },
             }
           ).as('validUeiRequest');
@@ -256,7 +226,7 @@ describe('Create New Audit', () => {
           cy.get('#uei-error-message li').should('have.length', 0);
           cy.get('#auditee_name').should(
             'have.value',
-            'INTERNATIONAL BUSINESS MACHINES CORPORATION'
+            'Commonwealth of Virginia'
           );
         });
 
@@ -285,7 +255,7 @@ describe('Create New Audit', () => {
 
     describe('Add Auditee UEID', () => {
       it('should add auditee UEI', () => {
-        cy.get('#auditee_uei').clear().type('ZQGGHJH74DW7').blur();
+        cy.get('#auditee_uei').clear().type('CMBSGK6P7BE1').blur();
       });
     });
 
@@ -299,8 +269,8 @@ describe('Create New Audit', () => {
           {
             valid: true,
             response: {
-              uei: 'ZQGGHJH74DW7',
-              auditee_name: 'INTERNATIONAL BUSINESS MACHINES CORPORATION',
+              uei: 'CMBSGK6P7BE1',
+              auditee_name: 'Commonwealth of Virginia',
             },
           }
         ).as('validUeiRequest');
@@ -316,18 +286,18 @@ describe('Create New Audit', () => {
         cy.get('#uei-error-message li').should('have.length', 0);
         cy.get('#auditee_name').should(
           'have.value',
-          'INTERNATIONAL BUSINESS MACHINES CORPORATION'
+          'Commonwealth of Virginia'
         );
       });
     });
 
     describe('ADD Fiscal start/end dates', () => {
       it('Enter expected start date', () => {
-        cy.get('#auditee_fiscal_period_start').clear().type('01/01/2021');
+        cy.get('#auditee_fiscal_period_start').clear().type('05/08/2023');
         cy.get('#fy-error-message li').should('have.length', 0);
       });
       it('Enter expected end date', () => {
-        cy.get('#auditee_fiscal_period_end').clear().type('01/01/2022');
+        cy.get('#auditee_fiscal_period_end').clear().type('05/08/2024');
         cy.get('#fy-error-message li').should('have.length', 0);
       });
     });
@@ -335,12 +305,12 @@ describe('Create New Audit', () => {
 
   describe('Auditee info validation via API', () => {
     function completeFormWithValidInfo() {
-        cy.get('#auditee_uei').clear().type('ASDFASDFASDF').blur();
-        cy.get('#auditee_uei-btn').as('searchButton');
-        cy.get('.usa-modal__footer button.primary').as('primaryButton');
-        cy.get('.usa-modal__footer button.secondary').as('secondaryButton');
-        cy.get('#auditee_fiscal_period_start').clear().type('01/01/2021');
-        cy.get('#auditee_fiscal_period_end').clear().type('01/01/2022');
+      cy.get('#auditee_uei').clear().type('CMBSGK6P7BE1S').blur();
+      cy.get('#auditee_uei-btn').as('searchButton');
+      cy.get('.usa-modal__footer button.primary').as('primaryButton');
+      cy.get('.usa-modal__footer button.secondary').as('secondaryButton');
+      cy.get('#auditee_fiscal_period_start').clear().type('05/08/2023');
+      cy.get('#auditee_fiscal_period_end').clear().type('05/08/2024');
     }
 
     xit('should return auditee info errors from the remote server', () => {
