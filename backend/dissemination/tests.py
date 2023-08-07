@@ -2,8 +2,6 @@ from django.test import TestCase
 
 import os
 from datetime import datetime
-from dateutil.relativedelta import relativedelta
-from math import floor
 
 
 import jwt
@@ -18,14 +16,11 @@ class APIViewTests(TestCase):
     def setUp(self):
         self.api_url = settings.POSTGREST.get("URL")
 
-    def create_payload(self, role="api_fac_gov", expires=6):
-        six_months = datetime.today() + relativedelta(months=+expires)
+    def create_payload(self, role="api_fac_gov"):
         payload = {
             # PostgREST only cares about the role.
             "role": role,
             "created": datetime.today().isoformat(),
-            "expires": six_months.isoformat(),
-            "exp": floor(six_months.timestamp()),
         }
         return payload
 
