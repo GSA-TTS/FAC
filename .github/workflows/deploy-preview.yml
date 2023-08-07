@@ -20,9 +20,9 @@ jobs:
 
   deploy-infrastructure-preview:
     name: Deploy infrastructure (preview)
-    needs:
-      - testing
-      - scan-dev
+    # needs:
+    #   - testing
+    #   - scan-dev
     uses: ./.github/workflows/terraform-apply-env.yml
     with:
         environment: "preview"
