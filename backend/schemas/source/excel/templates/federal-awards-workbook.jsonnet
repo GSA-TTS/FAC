@@ -207,7 +207,7 @@ local open_ranges_defns = [
       help: Help.positive_number,
     },
     SV.LoanBalanceValidation,
-    'If yes (Loan/Loan Guarantee, End of Audit Period Outstanding Loan Balance)',
+    'If yes (Loan/Loan Guarantee), End of Audit Period Outstanding Loan Balance',
     'loan_balance_at_audit_period_end',
   ],
   [

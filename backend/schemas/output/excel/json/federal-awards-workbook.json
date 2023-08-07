@@ -317,7 +317,7 @@
                   "text": "The number in this field must be zero or greater"
                },
                "range_name": "loan_balance_at_audit_period_end",
-               "title": "If yes (Loan/Loan Guarantee, End of Audit Period Outstanding Loan Balance)",
+               "title": "If yes (Loan/Loan Guarantee), End of Audit Period Outstanding Loan Balance",
                "title_cell": "M1",
                "type": "open_range",
                "validation": {
