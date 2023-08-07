@@ -75,16 +75,12 @@ class Auditee(models.Model):
         null=True,
         help_text=docs.auditee_title,
     )
-    auditee_street1 = models.CharField(
-        "Auditee Street Address", help_text=docs.street1
-    )
+    auditee_street1 = models.CharField("Auditee Street Address", help_text=docs.street1)
     auditee_street2 = models.CharField(
         "Auditee Street Address", null=True, help_text=docs.street2
     )
     auditee_city = models.CharField("Auditee City", help_text=docs.city)
-    auditee_state = models.CharField(
-        "Auditee State", help_text=docs.state
-    )
+    auditee_state = models.CharField("Auditee State", help_text=docs.state)
     ein_list = ArrayField(
         models.IntegerField(
             "Primary Employer Identification Number, in the order that they were listed.",
@@ -108,9 +104,7 @@ class Auditee(models.Model):
         ),
     )
     uei_list = ArrayField(
-        models.CharField(
-            "Unique Entity ID", null=True, help_text=docs.uei_general
-        ),
+        models.CharField("Unique Entity ID", null=True, help_text=docs.uei_general),
     )
     is_public = models.BooleanField("True if appears in a public record")
 
@@ -126,12 +120,8 @@ class Auditor(models.Model):
         null=True,
         help_text=docs.cpa_fax,
     )
-    cpa_state = models.CharField(
-        "CPA State", null=True, help_text=docs.cpa_state
-    )
-    cpa_city = models.CharField(
-        "CPA City", null=True, help_text=docs.cpa_city
-    )
+    cpa_state = models.CharField("CPA State", null=True, help_text=docs.cpa_state)
+    cpa_city = models.CharField("CPA City", null=True, help_text=docs.cpa_city)
     cpa_title = models.CharField(
         "Title of CPA Contact",
         null=True,
@@ -152,9 +142,7 @@ class Auditor(models.Model):
         null=True,
         help_text=docs.cpa_zip_code,
     )
-    cpa_country = models.CharField(
-        "CPA Country", null=True, help_text=docs.cpa_country
-    )
+    cpa_country = models.CharField("CPA Country", null=True, help_text=docs.cpa_country)
     cpa_contact = models.CharField(
         "Name of CPA Contact",
         null=True,
@@ -165,9 +153,7 @@ class Auditor(models.Model):
         null=True,
         help_text=docs.cpa_email,
     )
-    cpa_firm_name = models.CharField(
-        "CPA Firm Name", help_text=docs.cpa_firm_name
-    )
+    cpa_firm_name = models.CharField("CPA Firm Name", help_text=docs.cpa_firm_name)
     # Once loaded, would like to add these as regular addresses and just change this to a country field
     cpa_foreign = models.CharField(
         "CPA Address - if international",
@@ -494,9 +480,7 @@ class Note(models.Model):
         help_text=docs.note_index,
     )
     content = models.TextField("Content of the Note", null=True, help_text=docs.content)
-    title = models.CharField(
-        "Note Title", null=True, help_text=docs.title
-    )
+    title = models.CharField("Note Title", null=True, help_text=docs.title)
     dbkey = models.CharField(
         "Audit Year and DBKEY (database key) combined make up the primary key.",
         help_text=docs.dbkey_notes,

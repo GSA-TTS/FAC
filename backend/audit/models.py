@@ -221,9 +221,7 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
     report_id = models.CharField(unique=True)
 
     # Q2 Type of Uniform Guidance Audit
-    audit_type = models.CharField(
-        choices=AUDIT_TYPE_CODES, blank=True, null=True
-    )
+    audit_type = models.CharField(choices=AUDIT_TYPE_CODES, blank=True, null=True)
 
     # General Information
     # The general information fields are currently specified in two places:
