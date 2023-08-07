@@ -13,7 +13,7 @@ from jsonschema import exceptions, validate as jsonschema_validate, FormatChecke
 from audit.fixtures.excel import (
     ADDITIONAL_UEIS_TEST_FILE,
     CORRECTIVE_ACTION_PLAN_TEST_FILE,
-    FEDERAL_AWARDS_TEST_FILES,
+    FEDERAL_AWARDS_TEST_FILE,
     FINDINGS_TEXT_TEST_FILE,
     FINDINGS_UNIFORM_GUIDANCE_TEST_FILE,
     SECONDARY_AUDITORS_TEST_FILE,
@@ -527,7 +527,7 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
     def test_multiple_files(self):
         """Try to test FederalAwards first."""
         schema = self.FEDERAL_AWARDS_SCHEMA
-        for in_flight_file in FEDERAL_AWARDS_TEST_FILES:
+        for in_flight_file in FEDERAL_AWARDS_TEST_FILE:
             in_flight = json.loads(in_flight_file.read_text(encoding="utf-8"))
             validate(in_flight, schema)
 
