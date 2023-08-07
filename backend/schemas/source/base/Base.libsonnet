@@ -334,7 +334,7 @@ local type_uei = Types.string {
     // Does not start with 9 digits in a row
     {
       pattern: '^(?![0-9]{9})',
-    }
+    },
   ],
 };
 
