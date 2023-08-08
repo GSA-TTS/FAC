@@ -411,6 +411,15 @@ class SubmissionProgressView(SingleAuditChecklistAccessRequiredMixin, generic.Vi
             sac = SingleAuditChecklist.objects.get(report_id=report_id)
             sar = SingleAuditReportFile.objects.filter(sac_id=sac.id).latest('date_created')
 
+            submission_status_order = [
+                "in_progress",
+                "ready_for_certification",
+                "auditor_certified",
+                "auditee_certified",
+                "certified",
+                "submitted",
+            ]
+
             # TODO: Ensure the correct SAC elements are used to determine what's complete.
             context = {
                 "single_audit_checklist": {
@@ -461,10 +470,18 @@ class SubmissionProgressView(SingleAuditChecklistAccessRequiredMixin, generic.Vi
                     "completed_date": None,
                     "completed_by": None,
                 },
-                
-                "certification": {
-                    "auditee_certified": sac.is_auditee_certified,
-                    "auditor_certified": sac.is_auditor_certified,
+                "pre_submission_validation": {
+                    "completed": submission_status_order.index(sac.submission_status) > submission_status_order.index('in_progress'),
+                },
+                "auditor_certified": {
+                    "enabled": sac.submission_status == "ready_for_certification",
+                    "completed": submission_status_order.index(sac.submission_status) > submission_status_order.index('auditor_certified'),
+                    "completed_date": None,
+                },
+                "auditee_certified": {
+                    "enabled": sac.submission_status == "auditor_certified",
+                    "completed": submission_status_order.index(sac.submission_status) > submission_status_order.index('auditee_certified'),
+                    "completed_date": None,
                 },
                 "submission": {
                     "completed": sac.is_submitted,
@@ -476,14 +493,14 @@ class SubmissionProgressView(SingleAuditChecklistAccessRequiredMixin, generic.Vi
                 "auditee_uei": sac.auditee_uei,
                 "user_provided_organization_type": sac.user_provided_organization_type,
             }
-            # Add all SF-SAC uploads to determine if the process is complete or not
-            context["SF_SAC_completed"] = (
+            # Ensure required uploads are complete
+            context["SFSAC_completed"] = (
                 context["federal_awards_workbook"]["completed"]
-                and context["audit_information_form"]["completed"]
+                and context["federal_awards_workbook"]["completed"]
+                and context["audit_findings_workbook"]["completed"]
                 and context["findings_text_workbook"]["completed"]
                 and context["CAP_workbook"]["completed"]
-                and context["additional_UEIs_workbook"]["completed"]
-                and context["secondary_auditors_workbook"]["completed"]
+                and context["audit_information_form"]["completed"]
             )
 
             return render(request, "audit/submission-checklist/submission-checklist.html", context)
