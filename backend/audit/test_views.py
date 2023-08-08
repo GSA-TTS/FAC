@@ -989,3 +989,39 @@ class SingleAuditReportFileHandlerViewTests(TestCase):
                     notes_to_sefa_entries["note_title"],
                     test_data[0]["note_title"],
                 )
+
+
+class SubmissionProgressViewTests(TestCase):
+    """
+    The page shows information about a submission and conditionally displays links/other
+    affordances for individual sections.
+    """
+
+    def setUp(self):
+        self.user = baker.make(User)
+        self.sac = baker.make(SingleAuditChecklist)
+        self.client = Client()
+
+    def test_login_required(self):
+        """When an unauthenticated request is made"""
+
+        response = self.client.post(
+            reverse(
+                "audit:SubmissionProgress",
+                kwargs={"report_id": "12345"},
+            )
+        )
+
+        self.assertEqual(response.status_code, 403)
+
+    def test_phrase_in_page(self):
+        """Check for 'Create a single audit submission'."""
+        baker.make(Access, user=self.user, sac=self.sac)
+        self.client.force_login(user=self.user)
+        phrase = "Create a single audit submission"
+        res = self.client.get(
+            reverse(
+                "audit:SubmissionProgress", kwargs={"report_id": self.sac.report_id}
+            )
+        )
+        self.assertIn(phrase, res.content.decode("utf-8"))

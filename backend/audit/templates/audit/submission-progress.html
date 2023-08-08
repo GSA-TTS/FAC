@@ -267,6 +267,7 @@ It can be changed to time-dependence after timestamp changes. -->
                         <p class="margin-0">
                             Upload the single audit report package, or audit report. This should be a single, unlocked, and machine-readable PDF. This can be re-uploaded with updated versions as necessary until the report has been certified, at which point it cannot be edited or re-uploaded.
                         </p>
+
                     </div>
                 </li>
                 <!-- Auditor certification -->
@@ -281,8 +282,13 @@ It can be changed to time-dependence after timestamp changes. -->
                         </svg>
                     </div>
                     <div class="usa-icon-list__content {% if certification.auditor_certified %} text-green {% else %} text-base-dark {% endif %}">
+                      <p> sac completed:
+                      {{ SF_SAC_completed }}</p>
+
+                        {{ audit_report.completed }}
                         {% if certification.auditor_certified %}
                             <span class="text-green">Auditor Certification</span>
+
                         {% elif SF_SAC_completed == True and audit_report.completed == True  %}
                             <a class="usa-link text-bold"
                                href="{% url 'audit:AuditorCertification' report_id=report_id %}">Auditor Certification</a>

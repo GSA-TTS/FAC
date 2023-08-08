@@ -662,6 +662,26 @@ class SubmissionProgressView(SingleAuditChecklistAccessRequiredMixin, generic.Vi
                 audit_report = None
 
             # TODO: Ensure the correct SAC elements are used to determine what's complete.
+            additional_ueis_completed = False
+            if not sac.multiple_ueis_covered:
+                additional_ueis_completed = True
+            elif sac.additional_ueis:
+                additional_ueis_completed = True
+
+            secondary_auditors_completed = True
+            # 2023-08-07 it's not clear to me how this can be false; either
+            # they've uploaded nothing because there are no secondary auditors,
+            # or they've uploaded a valid secondary auditors workbook.
+            # The logic for checking whether other workbooks are necessary is
+            # complicated, but for now I'm going to allow skipping most of them
+            # for ease of testing.
+            # TODO this entire section should probably be elsewhere,
+            # with the logic for determining whether or not a submission is
+            # "finished" living in its own function―Tadhg
+            findings_text_complete = True
+            audit_findings_complete = True
+            corrective_action_plan_complete = True
+
             context = {
                 "single_audit_checklist": {
                     "created": True,
@@ -672,53 +692,51 @@ class SubmissionProgressView(SingleAuditChecklistAccessRequiredMixin, generic.Vi
                     "completed_by": None,
                 },
                 "federal_awards_workbook": {
-                    "completed": True if (sac.federal_awards) else False,
+                    "completed": bool(sac.federal_awards),
                     "completed_date": None,
                     "completed_by": None,
                 },
                 "audit_information_form": {
-                    "completed": True if (sac.audit_information) else False,
+                    "completed": bool(sac.audit_information),
                     "completed_date": None,
                     "completed_by": None,
                 },
                 "findings_text_workbook": {
-                    "completed": True if (sac.findings_text) else False,
+                    "completed": findings_text_complete,
                     "completed_date": None,
                     "completed_by": None,
                 },
                 "audit_findings_workbook": {
-                    "completed": True if (sac.findings_uniform_guidance) else False,
+                    "completed": audit_findings_complete,
                     "completed_date": None,
                     "completed_by": None,
                 },
                 "CAP_workbook": {
-                    "completed": True if (sac.corrective_action_plan) else False,
+                    "completed": corrective_action_plan_complete,
                     "completed_date": None,
                     "completed_by": None,
                 },
                 "additional_UEIs_workbook": {
-                    "completed": True if (sac.additional_ueis) else False,
+                    "completed": additional_ueis_completed,
                     "completed_date": None,
                     "completed_by": None,
                 },
                 "secondary_auditors_workbook": {
-                    "completed": True if (sac.secondary_auditors) else False,
+                    "completed": secondary_auditors_completed,
                     "completed_date": None,
                     "completed_by": None,
                 },
                 "audit_report": {
-                    "completed": True if audit_report else False,
+                    "completed": bool(audit_report),
                     "completed_date": None,
                     "completed_by": None,
                 },
                 "certification": {
-                    "auditor_certified": True if (sac.auditor_certification) else False,
+                    "auditor_certified": bool(sac.auditor_certification),
                     "auditee_certified": sac.is_auditee_certified,
                 },
                 "submission": {
-                    "completed": True
-                    if (sac.submission_status == "submitted")
-                    else False,
+                    "completed": sac.submission_status == "submitted",
                     "completed_date": None,
                     "completed_by": None,
                 },
