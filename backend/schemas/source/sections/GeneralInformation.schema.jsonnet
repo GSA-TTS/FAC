@@ -23,6 +23,10 @@ local Types = Base.Types;
     audit_period_covered: {
       '$ref': '#/$defs/AuditPeriod',
     },
+    audit_period_months: Types.number{
+      min: 0,
+      max: 19, #  TODO What should the nax be?
+    },
     auditee_address_line_1: Types.string {
       maxLength: 100,
     },

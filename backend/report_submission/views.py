@@ -37,7 +37,7 @@ class EligibilityFormView(LoginRequiredMixin, View):
         if eligibility.get("eligible"):
             return redirect(reverse("report_submission:auditeeinfo"))
 
-        print("Eligibility data error: ", eligibility)
+        # print("Eligibility data error: ", eligibility)
         return redirect(reverse("report_submission:eligibility"))
 
 
@@ -99,7 +99,7 @@ class AccessAndSubmissionFormView(LoginRequiredMixin, View):
 
         if report_id:
             return redirect(f"/report_submission/general-information/{report_id}")
-        print("Error processing data: ", result)
+        # print("Error processing data: ", result)
         return redirect(reverse("report_submission:accessandsubmission"))
 
 
@@ -120,6 +120,7 @@ class GeneralInformationFormView(LoginRequiredMixin, View):
                 "auditee_fiscal_period_end": sac.auditee_fiscal_period_end,
                 "auditee_fiscal_period_start": sac.auditee_fiscal_period_start,
                 "audit_period_covered": sac.audit_period_covered,
+                "audit_period_months": sac.audit_period_months,
                 "ein": sac.ein,
                 "ein_not_an_ssn_attestation": sac.ein_not_an_ssn_attestation,
                 "multiple_eins_covered": sac.multiple_eins_covered,
@@ -170,6 +171,7 @@ class GeneralInformationFormView(LoginRequiredMixin, View):
                 raise PermissionDenied("You do not have access to this audit.")
 
             form = GeneralInformationForm(request.POST)
+            # print("GeneralInformationForm:", form)
 
             if form.is_valid():
                 general_information = sac.general_information

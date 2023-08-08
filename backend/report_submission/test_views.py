@@ -26,7 +26,8 @@ SAMPLE_BASE_SAC_DATA = {
     "general_information": {
         "auditee_fiscal_period_start": "2021-10-01",
         "auditee_fiscal_period_end": "2022-10-01",
-        "audit_period_covered": "annual",
+        "audit_period_covered": "other",
+        "audit_period_months": 10,
         "ein": "123456789",
         "ein_not_an_ssn_attestation": True,
         "multiple_eins_covered": False,
@@ -357,6 +358,7 @@ class GeneralInformationFormViewTests(TestCase):
             "auditee_fiscal_period_start",
             "auditee_fiscal_period_end",
             "audit_period_covered",
+            "audit_period_months",
             "auditee_uei",
             "auditee_name",
             "auditee_address_line_1",
@@ -382,8 +384,10 @@ class GeneralInformationFormViewTests(TestCase):
         # assert that the text fields are populated in the returned form
         for field in text_fields:
             value = sac.general_information[field]
+            # print(f'{field}="{value}"')
 
-            self.assertContains(response, f'value="{value}"')
+            self.assertEqual(response.context[field], value)
+            # self.assertContains(response, f'value="{value}"')
 
     def test_post_requires_login(self):
         """Requests to the POST endpoint require the user to be authenticated"""
@@ -445,7 +449,8 @@ class GeneralInformationFormViewTests(TestCase):
             "audit_type": "single-audit",
             "auditee_fiscal_period_start": "2021-11-01",
             "auditee_fiscal_period_end": "2022-11-01",
-            "audit_period_covered": "biennial",
+            "audit_period_covered": "other",
+            "audit_period_months": 10,
             "ein": "123456780",
             "ein_not_an_ssn_attestation": True,
             "multiple_eins_covered": True,
