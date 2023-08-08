@@ -23,7 +23,7 @@ local Types = Base.Types;
     audit_period_covered: {
       '$ref': '#/$defs/AuditPeriod',
     },
-    audit_period_months: Types.number{
+    audit_period_other_months: Types.number{
       min: 0,
       max: 19, #  TODO What should the nax be?
     },

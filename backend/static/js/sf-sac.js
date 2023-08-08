@@ -66,7 +66,7 @@ function attachEventHandlers() {
 
   const rbInputs = document.querySelectorAll('[name="audit_period_covered"]');
   const monthsInput = document.querySelector(
-    '#audit_period_covered-other_months'
+    '#audit_period_other_months'
   );
   rbInputs.forEach((input) => {
     input.addEventListener('change', () => {
