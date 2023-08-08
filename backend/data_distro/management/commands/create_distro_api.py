@@ -22,7 +22,8 @@ class Command(BaseCommand):
         else:
             files = ["basic_views.sql", "findings.sql", "general.sql"]
 
-        if settings.ENVIRONMENT not in ["DEVELOPMENT", "PREVIEW", "STAGING", "PRODUCTION"]:
+        cloudgov = ["DEVELOPMENT", "STAGING", "PRODUCTION"]:
+        if settings.ENVIRONMENT not in cloudgov:
             conn_string = "dbname='postgres' user='postgres' port='5432' host='db'"
         else:
             conn_string = settings.CONNECTION_STRING
