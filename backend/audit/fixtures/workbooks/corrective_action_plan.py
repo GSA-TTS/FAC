@@ -1,4 +1,4 @@
-from audit.management.commands.workbooks.excel_creation import (
+from audit.fixtures.workbooks.excel_creation import (
     FieldMap,
     templates,
     set_uei,
@@ -6,7 +6,7 @@ from audit.management.commands.workbooks.excel_creation import (
     generate_dissemination_test_table,
 )
 
-from audit.management.commands.census_models.ay22 import (
+from audit.fixtures.census_models.ay22 import (
     CensusGen22 as Gen,
     CensusCaptext22 as Captext
 )

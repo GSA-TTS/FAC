@@ -1,4 +1,4 @@
-from audit.management.commands.workbooks.excel_creation import (
+from audit.fixtures.workbooks.excel_creation import (
     FieldMap,
     templates,
     set_uei,
@@ -8,7 +8,7 @@ from audit.management.commands.workbooks.excel_creation import (
     set_range,
 )
 
-from audit.management.commands.census_models.ay22 import (
+from audit.fixtures.census_models.ay22 import (
     CensusCfda22 as Cfda,
     CensusFindings22 as Findings,
     CensusGen22 as Gen,
@@ -20,8 +20,11 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+def sorted_string(s):
+    return ''.join(sorted(s))
+
 mappings = [
-    FieldMap("compliance_requirement", "typerequirement", None, str),
+    FieldMap("compliance_requirement", "typerequirement", None, sorted_string),
     FieldMap("reference_number", "findingsrefnums", None, str),
     FieldMap("modified_opinion", "modifiedopinion", None, str),
     FieldMap("other_matters", "othernoncompliance", None, str),

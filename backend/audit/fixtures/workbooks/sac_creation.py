@@ -11,10 +11,6 @@ from django.apps import apps
 # from django.conf import settings
 from django.core.files.uploadedfile import SimpleUploadedFile
 
-from faker import Faker
-import random
-import uuid
-
 from audit.excel import (
     extract_federal_awards,
     extract_findings_uniform_guidance,
@@ -31,10 +27,10 @@ from audit.fixtures.excel import FORM_SECTIONS
 
 logger = logging.getLogger(__name__)
 
-from audit.management.commands.workbooks.excel_creation import dbkey_to_test_report_id
-from audit.management.commands.census_models.ay22 import CensusGen22 as Gen
+from audit.fixtures.workbooks.excel_creation import dbkey_to_test_report_id
+from audit.fixtures.census_models.ay22 import CensusGen22 as Gen
 
-from audit.management.commands.census_models.ay22 import (
+from audit.fixtures.census_models.ay22 import (
     CensusGen22 as Gen,
     CensusCfda22 as Cfda,
     CensusFindings22 as Finding

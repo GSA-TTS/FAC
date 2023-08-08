@@ -2,8 +2,6 @@ import argparse
 
 from django.core.management.base import BaseCommand
 from users.models import User
-from audit.fixtures.excel import FORM_SECTIONS
-from django.apps import apps
 
 import datetime
 import logging
@@ -18,61 +16,11 @@ pw = logging.getLogger('peewee')
 pw.addHandler(logging.StreamHandler())
 pw.setLevel(logging.INFO)
 
-
-from audit.management.commands.workbooks.sac_creation import (
-    _post_upload_workbook,
-    _create_test_sac,
-    _make_excel_file,
+from audit.fixtures.workbooks.workbook_creation import (
+    sections,
+    workbook_loader,
+    setup_sac
 )
-
-from fs.memoryfs import MemoryFS
-from audit.management.commands.workbooks.notes_to_sefa import generate_notes_to_sefa
-from audit.management.commands.workbooks.federal_awards import generate_federal_awards
-from audit.management.commands.workbooks.findings import generate_findings
-from audit.management.commands.workbooks.findings_text import generate_findings_text
-from audit.management.commands.workbooks.corrective_action_plan import generate_corrective_action_plan
-from audit.management.commands.workbooks.additional_ueis import generate_additional_ueis
-from audit.management.commands.workbooks.secondary_auditors import generate_secondary_auditors
-
-
-def setup_sac(user, test_name, dbkey):
-    logger.info(f"Creating a SAC object for {user}, {test_name}")
-    SingleAuditChecklist = apps.get_model("audit.SingleAuditChecklist")
-    sac = SingleAuditChecklist.objects.filter(
-        submitted_by=user, general_information__auditee_name=test_name
-    ).first()
-    logger.info(sac)
-    if sac is None:
-        sac = _create_test_sac(user, test_name, dbkey)
-    return sac
-
-
-def workbook_loader(user, sac, dbkey, entity_id):
-    def _loader(workbook_generator, section):
-        json = None
-        with MemoryFS() as mem_fs:
-            filename = "workbook.xlsx"
-            outfile = mem_fs.openbin(filename, mode="w")
-            (_, json) = workbook_generator(dbkey, outfile)
-            outfile.close()
-            outfile = mem_fs.openbin(filename, mode="r")
-            excel_file = _make_excel_file(filename, outfile)
-            _post_upload_workbook(sac, user, section, excel_file)
-            outfile.close()
-        return json
-
-    return _loader
-
-
-sections = {
-    FORM_SECTIONS.FEDERAL_AWARDS_EXPENDED: generate_federal_awards,
-    FORM_SECTIONS.FINDINGS_UNIFORM_GUIDANCE: generate_findings,
-    FORM_SECTIONS.FINDINGS_TEXT: generate_findings_text,
-    FORM_SECTIONS.CORRECTIVE_ACTION_PLAN: generate_corrective_action_plan,
-    FORM_SECTIONS.NOTES_TO_SEFA: generate_notes_to_sefa,
-    FORM_SECTIONS.ADDITIONAL_UEIS: generate_additional_ueis,   
-    FORM_SECTIONS.SECONDARY_AUDITORS: generate_secondary_auditors,
-}
 
 
 class Command(BaseCommand):
@@ -96,4 +44,5 @@ class Command(BaseCommand):
         json_test_tables = []
         for section, fun in sections.items():
             # FIXME: Can we conditionally upload the addl' and secondary workbooks?
-            json_test_tables.append(loader(fun, section))
+            (_, json, _) = loader(fun, section)
+            json_test_tables.append(json)
