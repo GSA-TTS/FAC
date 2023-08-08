@@ -32,28 +32,25 @@
 #           over_agency = agency with max tot_amt in tot_amount_agency
 #############################################################
 
+from collections import defaultdict
+
 
 def cog_over_assignment(federal_awards_data):
+    MILLION = 1_000_000
+    constants = {
+        "amount_expended_limit" : 50 * MILLION
+    }
     cog_agency = 0
     over_agency = 0
-    tot_amount_expended = 0
-    tot_amount_agency = {}
-    tot_da_amount_agency = {}
+    tot_amount_agency = defaultdict(lambda: 0)
+    tot_da_amount_agency = defaultdict(lambda: 0)
     tot_da_amount_expended = 0
-    for i in federal_awards_data["FederalAwards"]["federal_awards"]:
-        tot_amount_expended += i["program"]["amount_expended"]
-        agency = i["program"]["federal_agency_prefix"]
-        if agency in tot_amount_agency.keys():
-            tot_amount_agency[agency] += i["program"]["amount_expended"]
-        else:
-            tot_amount_agency[agency] = i["program"]["amount_expended"]
-        if i["direct_or_indirect_award"]["is_direct"] == "Y":
-            tot_da_amount_expended += i["program"]["amount_expended"]
-            if agency in tot_da_amount_agency.keys():
-                tot_da_amount_agency[agency] += i["program"]["amount_expended"]
-            else:
-                tot_da_amount_agency[agency] = i["program"]["amount_expended"]
-    #   print("tot_amount_expended = ", tot_amount_expended)
+    for award in federal_awards_data["FederalAwards"]["federal_awards"]:
+        agency = award["program"]["federal_agency_prefix"]
+        tot_amount_agency[agency] += award["program"]["amount_expended"]
+        if award["direct_or_indirect_award"]["is_direct"] == "Y":
+            tot_da_amount_expended += award["program"]["amount_expended"]
+            tot_da_amount_agency[agency] += award["program"]["amount_expended"]
 
     tot_amount_agency = list(
         sorted(tot_amount_agency.items(), reverse=True, key=lambda item: item[1])
@@ -67,7 +64,7 @@ def cog_over_assignment(federal_awards_data):
 
     #   print("tot_da_amount_expended = ", tot_da_amount_expended)
 
-    if tot_amount_expended > 50000000:
+    if federal_awards_data["FederalAwards"]["total_amount_expended"] > constants["amount_expended_limit"]:
         #############################################################
         #       Cognizant agency
         #       ######## TO DO NEXT
@@ -77,14 +74,14 @@ def cog_over_assignment(federal_awards_data):
         if data_2019:
             pass
         else:
-            if tot_da_amount_expended >= 0.25 * tot_amount_expended:
+            if tot_da_amount_expended >= 0.25 * federal_awards_data["FederalAwards"]["total_amount_expended"]:
                 cog_agency, val = tot_da_amount_agency[0]
             else:
                 cog_agency, val = tot_amount_agency[0]
         #           print("cognizant agency = ", cog_agency)
     else:
         #       Oversight agency
-        if tot_da_amount_expended >= 0.25 * tot_amount_expended:
+        if tot_da_amount_expended >= 0.25 * federal_awards_data["FederalAwards"]["total_amount_expended"]:
             over_agency, val = tot_da_amount_agency[0]
         else:
             over_agency, val = tot_amount_agency[0]

@@ -57,5 +57,5 @@ class CogOverAssignmentTests(TestCase):
 
     def test_cog_over_assignment(self):
         cog_agency, over_agency = cog_over_assignment(self.federal_awards_for_test)
-        print("cognizant agency = ", cog_agency)
-        print("oversignt agency = ", over_agency)
+        print("cognizant agency =  ", cog_agency)
+        print("oversignt agency =  ", over_agency)
