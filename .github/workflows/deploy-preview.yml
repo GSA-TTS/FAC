@@ -12,17 +12,11 @@ jobs:
     uses: ./.github/workflows/linting.yml
     secrets: inherit
 
-  scan-dev:
-    name: ZAP scan of the dev site
-    uses: ./.github/workflows/zap-scan.yml
-    with:
-        url: "https://fac-dev.app.cloud.gov/"
-
   deploy-infrastructure-preview:
     name: Deploy infrastructure (preview)
-    # needs:
-    #   - testing
-    #   - scan-dev
+    needs:
+      - testing
+      - linting
     uses: ./.github/workflows/terraform-apply-env.yml
     with:
         environment: "preview"
