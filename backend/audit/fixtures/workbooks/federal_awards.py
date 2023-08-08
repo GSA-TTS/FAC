@@ -6,6 +6,7 @@ from audit.fixtures.workbooks.excel_creation import (
     map_simple_columns,
     generate_dissemination_test_table,
     set_range,
+    test_pfix
 )
 
 from audit.fixtures.census_models.ay22 import (
@@ -18,13 +19,15 @@ from config import settings
 
 import openpyxl as pyxl
 import json
+import re
 
 import logging
 
 logger = logging.getLogger(__name__)
 
+
 mappings = [
-    FieldMap("program_name", "federalprogramname", None, str),
+    FieldMap("program_name", "federalprogramname", None, test_pfix(3)),
     FieldMap("additional_award_identification", "awardidentification", None, str),
     FieldMap("cluster_name", "clustername", "N/A", str),
     FieldMap("state_cluster_name", "stateclustername", None, str),
@@ -103,7 +106,9 @@ def generate_federal_awards(dbkey, outfile):
     addls = ["" for x in list(range(0, len(cfdas)))]
     for cfda in Cfda.select().where((Cfda.dbkey==dbkey) 
                                     & 
-                                    ((Cfda.cfda % '%U%') 
+                                    ((Cfda.cfda % '%U%') |
+                                     (Cfda.cfda % '%u%')
+                                     | (Cfda.cfda % '%rd%')
                                      | (Cfda.cfda % '%RD%'))).order_by(Cfda.index):
         if cfda.awardidentification is None or len(cfda.awardidentification) < 1:
             addls[get_list_index(cfdas, cfda.index)] = f"ADDITIONAL AWARD INFO - DBKEY {dbkey}"
@@ -124,7 +129,9 @@ def generate_federal_awards(dbkey, outfile):
 
     # Map things with transformations
     prefixes = map(lambda v: (v.cfda).split(".")[0], cfdas)
-    extensions = map(lambda v: (v.cfda).split(".")[1], cfdas)
+    ## Truncate any nastiness in the CFDA extensions to three characters.
+    extensions = map(lambda v: ((v.cfda).split(".")[1])[:3].upper(), cfdas)
+    extensions = map(lambda v: v if re.search("^(RD|[0-9]{3}[A-Za-z]{0,1}|U[0-9]{2})$", v) else "000", extensions)
     set_range(wb, "federal_agency_prefix", prefixes)
     set_range(wb, "three_digit_extension", extensions)
 

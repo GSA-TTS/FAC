@@ -4,6 +4,7 @@ from audit.fixtures.workbooks.excel_creation import (
     set_uei,
     map_simple_columns,
     generate_dissemination_test_table,
+    test_pfix
 )
 
 from audit.fixtures.census_models.ay22 import (
@@ -22,7 +23,7 @@ def generate_findings_text(dbkey, outfile):
     wb = pyxl.load_workbook(templates["AuditFindingsText"])
     mappings = [
         FieldMap('reference_number', 'findingrefnums', None, str),
-        FieldMap('text_of_finding', 'text', None, str),
+        FieldMap('text_of_finding', 'text', None, test_pfix(3)),
         FieldMap('contains_chart_or_table', 'chartstables', None, str),
     ]
     g = set_uei(Gen, wb, dbkey)

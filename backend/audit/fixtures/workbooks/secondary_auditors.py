@@ -2,9 +2,9 @@ from audit.fixtures.workbooks.excel_creation import (
     FieldMap,
     templates,
     set_uei,
-    set_single_cell_range,
     map_simple_columns,
     generate_dissemination_test_table,
+    test_pfix
 )
 
 from audit.fixtures.census_models.ay22 import (
@@ -26,8 +26,8 @@ mappings = [
     FieldMap('secondary_auditor_name', 'cpafirmname', None, str),
     FieldMap('secondary_auditor_contact_phone', 'cpaphone', None, str),
     FieldMap('secondary_auditor_address_state', 'cpastate', None, str),
-    FieldMap('secondary_auditor_address_street', 'cpastreet1', None, str),
-    FieldMap('secondary_auditor_contact_title', 'cpatitle', None, str),
+    FieldMap('secondary_auditor_address_street', 'cpastreet1', None, test_pfix(3)),
+    FieldMap('secondary_auditor_contact_title', 'cpatitle', None, test_pfix(3)),
     FieldMap('secondary_auditor_address_zipcode', 'cpazipcode', None, str)
 ]
 

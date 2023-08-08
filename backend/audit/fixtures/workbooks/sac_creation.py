@@ -122,7 +122,7 @@ def _fake_general_information(dbkey, auditee_name=None):
         "auditor_city": gobj.cpacity,
         "auditor_contact_name": gobj.cpacontact,
         "auditor_contact_title": gobj.cpatitle,
-        "auditor_country": gobj.cpacountry,
+        "auditor_country": "N/A" if not gobj.cpacountry else gobj.cpacountry,
         "auditor_ein": gobj.auditor_ein,
         "auditor_ein_not_an_ssn_attestation": True,
         "auditor_email": gobj.cpaemail,

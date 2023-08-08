@@ -29,6 +29,11 @@ for k, v in templates_raw.items():
     templates[k] = os.path.join(templates_root, v)
 
 
+def test_pfix(n):
+    def _test(o):
+       return ' '.join(["TEST" for x in range(n)]) + " " + str(o)
+    return _test
+
 def set_single_cell_range(wb, range_name, value):
     the_range = wb.defined_names[range_name]
     # The above returns a generator. Turn it to a list, and grab

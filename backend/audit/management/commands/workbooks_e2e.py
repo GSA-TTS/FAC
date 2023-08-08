@@ -1,8 +1,8 @@
-import argparse
-
+from django.apps import apps
 from django.core.management.base import BaseCommand
 from users.models import User
 
+import argparse
 import datetime
 import logging
 
@@ -22,7 +22,42 @@ from audit.fixtures.workbooks.workbook_creation import (
     setup_sac
 )
 
+# # def transition(sac):
+# #     SingleAuditChecklist = apps.get_model("audit.SingleAuditChecklist")
+# #     # I couldn't use the transition functions. Don't know why.
+# #     # In progress
+# #     sac.transition_name.append(SingleAuditChecklist.STATUS.SUBMITTED)
+# #     sac.transition_date.append(datetime.date.today())
 
+# #     sac.transition_name.append(SingleAuditChecklist.STATUS.AUDITOR_CERTIFIED)
+# #     sac.transition_date.append(datetime.date.today())
+
+# #     sac.transition_name.append(SingleAuditChecklist.STATUS.AUDITEE_CERTIFIED)
+# #     sac.transition_date.append(datetime.date.today())
+
+# #     sac.transition_name.append(SingleAuditChecklist.STATUS.CERTIFIED)
+# #     sac.transition_date.append(datetime.date.today())
+
+# # def cross_validate(sac):
+# #     print("CROSS VALIDATING")
+# #     validation_functions = audit.cross_validation.functions
+
+# #     shape = audit.cross_validation.sac_validation_shape(sac)
+# #     for fun in validation_functions:
+# #         fun(shape)
+
+# #     sac.validate_cross()
+
+# # def etl(sac):
+# #     print("TRANSFERRING DATA... HARDER BETTER FASTER STRONGER ...")
+# #     from audit.etl import ETL
+
+# #     if sac.general_information:
+# #         etl = ETL(sac)
+# #         etl.load_all()
+
+#     sac.transition_name.append(SingleAuditChecklist.STATUS.SUBMITTED)
+#     sac.transition_date.append(date.today())
 class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument("--email", type=str, required=True)

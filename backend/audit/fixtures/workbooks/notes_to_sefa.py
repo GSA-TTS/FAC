@@ -5,6 +5,7 @@ from audit.fixtures.workbooks.excel_creation import (
     set_single_cell_range,
     map_simple_columns,
     generate_dissemination_test_table,
+    test_pfix
 )
 
 from audit.fixtures.census_models.ay22 import (
@@ -20,8 +21,8 @@ import logging
 logger = logging.getLogger(__name__)
 
 mappings = [
-    FieldMap("note_title", "title", None, str),
-    FieldMap("note_content", "content", None, str),
+    FieldMap("note_title", "title", None, test_pfix(3)),
+    FieldMap("note_content", "content", None, test_pfix(3)),
 ]
 
 

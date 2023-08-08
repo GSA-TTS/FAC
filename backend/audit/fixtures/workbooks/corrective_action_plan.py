@@ -4,6 +4,7 @@ from audit.fixtures.workbooks.excel_creation import (
     set_uei,
     map_simple_columns,
     generate_dissemination_test_table,
+    test_pfix
 )
 
 from audit.fixtures.census_models.ay22 import (
@@ -21,7 +22,7 @@ def generate_corrective_action_plan(dbkey, outfile):
     wb = pyxl.load_workbook(templates["CAP"])
     mappings = [
         FieldMap('reference_number', 'findingrefnums', None, str),
-        FieldMap('planned_action', 'text', None, str),
+        FieldMap('planned_action', 'text', None, test_pfix(3)),
         FieldMap('contains_chart_or_table', 'chartstables', None, str)
     ]
     
