@@ -44,4 +44,4 @@ jobs:
         - deploy-preview
     uses: ./.github/workflows/zap-scan.yml
     with:
-        url: "https://fac-preview.app.fac.gov/"
+        url: "https://fac-preview.app.cloud.gov/"
