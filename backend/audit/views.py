@@ -539,7 +539,7 @@ class SubmissionProgressView(SingleAuditChecklistAccessRequiredMixin, generic.Vi
                 and context["audit_information_form"]["completed"]
             )
 
-            return render(request, "audit/submission-checklist/submission-checklist.html", context)
+            return render(request, "audit/submission_checklist/submission-checklist.html", context)
         except SingleAuditChecklist.DoesNotExist:
             raise PermissionDenied("You do not have access to this audit.")
 
