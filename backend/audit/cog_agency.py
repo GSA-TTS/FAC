@@ -35,9 +35,13 @@
 from collections import defaultdict
 
 
-def cog_over_assignment(federal_awards_data):
+def calc_amount_expended_limit():
     MILLION = 1_000_000
-    constants = {"amount_expended_limit": 50 * MILLION}
+    amount_expended_limit = 50 * MILLION
+    return amount_expended_limit
+
+
+def cog_over_assignment(federal_awards_data):
     cog_agency = 0
     over_agency = 0
     tot_amount_agency = defaultdict(lambda: 0)
@@ -64,7 +68,7 @@ def cog_over_assignment(federal_awards_data):
 
     if (
         federal_awards_data["FederalAwards"]["total_amount_expended"]
-        > constants["amount_expended_limit"]
+        > calc_amount_expended_limit()
     ):
         #############################################################
         #       Cognizant agency
