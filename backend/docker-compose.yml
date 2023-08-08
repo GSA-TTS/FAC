@@ -4,7 +4,7 @@ services:
   db:
     image: "postgres:12"
     environment:
-      - "POSTGRES_HOST_AUTH_METHOD=trust"
+      POSTGRES_HOST_AUTH_METHOD: trust
     volumes:
       - postgres-data:/var/lib/postgresql/data/
     ports:
@@ -20,18 +20,18 @@ services:
       - minio
       - api
     environment:
-      - "DATABASE_URL=postgres://postgres@db/postgres"
-      - "POSTGREST_URL=http://api:3000"
-      - "DJANGO_DEBUG=true"
-      - "SAM_API_KEY=${SAM_API_KEY}"
-      - "DJANGO_BASE_URL=http://localhost:8000"
-      - "DJANGO_SECRET_LOGIN_KEY=${DJANGO_SECRET_LOGIN_KEY}"
-      - "ENV=${ENV}"
-      - "SECRET_KEY=${SECRET_KEY}"
-      - "ALLOWED_HOSTS=0.0.0.0 127.0.0.1 localhost"
-      - "AV_SCAN_URL=http://clamav-rest:9000/scan"
-      - "DISABLE_AUTH=${DISABLE_AUTH:-False}"
-      - "PGRST_JWT_SECRET=${PGRST_JWT_SECRET:-32_chars_fallback_secret_testing}"
+      DATABASE_URL: postgres://postgres@db/postgres
+      POSTGREST_URL: http://api:3000
+      DJANGO_DEBUG: true
+      SAM_API_KEY: ${SAM_API_KEY}
+      DJANGO_BASE_URL: http://localhost:8000
+      DJANGO_SECRET_LOGIN_KEY: ${DJANGO_SECRET_LOGIN_KEY}
+      ENV: ${ENV}
+      SECRET_KEY: ${SECRET_KEY}
+      ALLOWED_HOSTS: 0.0.0.0 127.0.0.1 localhost
+      AV_SCAN_URL: http://clamav-rest:9000/scan
+      DISABLE_AUTH: ${DISABLE_AUTH:-False}
+      PGRST_JWT_SECRET: ${PGRST_JWT_SECRET}
 
     env_file:
       - ".env"
@@ -45,8 +45,8 @@ services:
     # image: clamav/clamav
     image: ghcr.io/gsa-tts/fac/clamav:latest
     environment:
-      - MAX_FILE_SIZE=25M
-      - SIGNATURE_CHECKS=1
+      MAX_FILE_SIZE: 25M
+      SIGNATURE_CHECKS: 1
     ports:
       - "9000:9000"
   minio:
