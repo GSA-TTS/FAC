@@ -27,10 +27,10 @@ class CogOverAssignmentTests(TestCase):
                         "program": {
                             "is_major": "Y",
                             "program_name": "RETIRED AND SENIOR VOLUNTEER PROGRAM",
-                            "amount_expended": 9000,
+                            "amount_expended": 40_000_000,
                             "audit_report_type": "U",
                             "federal_agency_prefix": "93",
-                            "federal_program_total": 9000,
+                            "federal_program_total": 45_000_000,
                             "three_digit_extension": "600",
                             "number_of_audit_findings": 0,
                             "additional_award_identification": "COVID-19",
@@ -49,9 +49,30 @@ class CogOverAssignmentTests(TestCase):
                                 }
                             ],
                         },
-                    }
+                    },
+                    {
+                        "award_reference": "ABC124",
+                        "cluster": {"cluster_name": "N/A", "cluster_total": 0},
+                        "program": {
+                            "is_major": "Y",
+                            "program_name": "SENIOR VOLUNTEER PROGRAM",
+                            "amount_expended": 11_000_000,
+                            "audit_report_type": "U",
+                            "federal_agency_prefix": "10",
+                            "federal_program_total": 12_000_000,
+                            "three_digit_extension": "600",
+                            "number_of_audit_findings": 0,
+                            "additional_award_identification": "COVID-19",
+                        },
+                        "subrecipients": {"is_passed": "N"},
+                        "loan_or_loan_guarantee": {
+                            "is_guaranteed": "N",
+                            "loan_balance_at_audit_period_end": 0,
+                        },
+                        "direct_or_indirect_award": {"is_direct": "Y"},
+                    },
                 ],
-                "total_amount_expended": 9000,
+                "total_amount_expended": 51_000_000,
             }
         }
 
