@@ -245,6 +245,37 @@ class SingleAuditReportFileHandlerView(
             raise BadRequest()
 
 
+class CrossValidationView(SingleAuditChecklistAccessRequiredMixin, generic.View):
+    def get(self, request, *args, **kwargs):
+        report_id = kwargs["report_id"]
+
+        try:
+            sac = SingleAuditChecklist.objects.get(report_id=report_id)
+
+            context = {
+                "report_id": report_id,
+                "submission_status": sac.submission_status,
+            }
+            return render(request, "audit/cross-validation.html", context)
+        except SingleAuditChecklist.DoesNotExist:
+            raise PermissionDenied("You do not have access to this audit.")
+
+    def post(self, request, *args, **kwargs):
+        report_id = kwargs["report_id"]
+
+        try:
+            sac = SingleAuditChecklist.objects.get(report_id=report_id)
+
+            errors = sac.validate_full()
+
+            context = {"report_id": report_id, "errors": errors}
+
+            return render(request, "audit/cross-validation-results.html", context)
+
+        except SingleAuditChecklist.DoesNotExist:
+            raise PermissionDenied("You do not have access to this audit.")
+
+
 class ReadyForCertificationView(SingleAuditChecklistAccessRequiredMixin, generic.View):
     def get(self, request, *args, **kwargs):
         report_id = kwargs["report_id"]
@@ -266,14 +297,14 @@ class ReadyForCertificationView(SingleAuditChecklistAccessRequiredMixin, generic
         try:
             sac = SingleAuditChecklist.objects.get(report_id=report_id)
 
-            errors = sac.validate_cross()
+            errors = sac.validate_full()
             if not errors:
                 sac.transition_to_ready_for_certification()
                 sac.save()
                 return redirect(reverse("audit:SubmissionProgress", args=[report_id]))
 
             context = {"report_id": report_id, "errors": errors}
-            return render(request, "audit/not-ready-for-certification.html", context)
+            return render(request, "audit/cross-validation-results.html", context)
 
         except SingleAuditChecklist.DoesNotExist:
             raise PermissionDenied("You do not have access to this audit.")
@@ -409,7 +440,12 @@ class SubmissionProgressView(SingleAuditChecklistAccessRequiredMixin, generic.Vi
 
         try:
             sac = SingleAuditChecklist.objects.get(report_id=report_id)
-            sar = SingleAuditReportFile.objects.filter(sac_id=sac.id).latest('date_created')
+            try:
+                sar = SingleAuditReportFile.objects.filter(
+                    sac_id=sac.id
+                ).latest("date_created")
+            except SingleAuditReportFile.DoesNotExist:
+                sar = None
 
             submission_status_order = [
                 "in_progress",
@@ -461,12 +497,12 @@ class SubmissionProgressView(SingleAuditChecklistAccessRequiredMixin, generic.Vi
                     "completed_by": None,
                 },
                 "additional_UEIs_workbook": {
-                    "completed": False,
+                    "completed": True if (sac.additional_ueis) else False,
                     "completed_date": None,
                     "completed_by": None,
                 },
                 "secondary_auditors_workbook": {
-                    "completed": False,
+                    "completed": True if (sac.secondary_auditors) else False,
                     "completed_date": None,
                     "completed_by": None,
                 },
@@ -690,8 +726,39 @@ class UploadReportView(SingleAuditChecklistAccessRequiredMixin, generic.View):
                 file = request.FILES["upload_report"]
                 print('hi', form.cleaned_data)
 
+                component_page_numbers = {
+                    "financial_statements": form.cleaned_data["financial_statements"],
+                    "financial_statements_opinion": form.cleaned_data[
+                        "financial_statements_opinion"
+                    ],
+                    "schedule_expenditures": form.cleaned_data["schedule_expenditures"],
+                    "schedule_expenditures_opinion": form.cleaned_data[
+                        "schedule_expenditures_opinion"
+                    ],
+                    "uniform_guidance_control": form.cleaned_data[
+                        "uniform_guidance_control"
+                    ],
+                    "uniform_guidance_compliance": form.cleaned_data[
+                        "uniform_guidance_compliance"
+                    ],
+                    "GAS_control": form.cleaned_data["GAS_control"],
+                    "GAS_compliance": form.cleaned_data["GAS_compliance"],
+                    "schedule_findings": form.cleaned_data["schedule_findings"],
+                    # These two fields are optional on the part of the submitter
+                    "schedule_prior_findings": form.cleaned_data[
+                        "schedule_prior_findings"
+                    ]
+                    or None,
+                    "CAP_page": form.cleaned_data["CAP_page"] or None,
+                }
+
                 sar_file = SingleAuditReportFile(
-                    **{"file": file, "filename": file.name, "sac_id": sac.id}
+                    **{
+                        "component_page_numbers": component_page_numbers,
+                        "file": file,
+                        "filename": file.name,
+                        "sac_id": sac.id,
+                    }
                 )
 
                 sar_file.full_clean()

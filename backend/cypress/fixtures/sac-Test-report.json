@@ -2,8 +2,8 @@
     "date_created": "2023-07-11",
     "submission_status": "in_progress",
     "report_id": "2023MAY0001000001",
-    "auditee_fiscal_period_start": "2023-05-08",
-    "auditee_fiscal_period_end": "2024-05-08",
+    "auditee_fiscal_period_start": "05/08/2023",
+    "auditee_fiscal_period_end": "05/08/2024",
     "audit_type": "single-audit",
     "audit_period_covered": "annual",
     "auditee_uei": "CMBSGK6P7BE1",
@@ -15,7 +15,7 @@
     "auditee_contact_name": "John Doe",
     "auditee_contact_title": "Keymaster",
     "auditee_phone": "5558675309",
-    "auditee_email": "johndoe@test.com",
+    "auditee_email": "va@test.com",
     "auditee_contacts": [
         "a@a.com",
         "b@b.com"
