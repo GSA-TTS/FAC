@@ -15,10 +15,8 @@ local AuditInformation = Types.object {
     is_material_noncompliance_disclosed: Types.boolean,
     is_aicpa_audit_guide_included: Types.boolean,
     is_low_risk_auditee: Types.boolean,
-    // FIXME MCJ: This is a controlled field.
-    // The validation needs to reflect that.
     agencies: Types.array {
-      items: Base.Enum.ALNPrefixes,
+      items: Base.Compound.ALNPrefixes,
     },
   },
   required: [
