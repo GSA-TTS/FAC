@@ -17,7 +17,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 def generate_corrective_action_plan(dbkey, outfile):
-    print("--- generate corrective action plan ---")
+    logger.info(f"--- generate corrective action plan {dbkey}---")
     wb = pyxl.load_workbook(templates["CAP"])
     mappings = [
         FieldMap('reference_number', 'findingrefnums', None, str),

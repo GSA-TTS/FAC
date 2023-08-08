@@ -33,7 +33,7 @@ mappings = [
     FieldMap("federal_program_total", "programtotal", 0, int),
     FieldMap("cluster_total", "clustertotal", 0, int),
     FieldMap("is_guaranteed", "loans", None, str),
-    FieldMap("loan_balance_at_audit_period_end", "loanbalance", None, float),
+    FieldMap("loan_balance_at_audit_period_end", "loanbalance", None, int),
     FieldMap("is_direct", "direct", None, str),
     FieldMap("is_passed", "passthroughaward", None, str),
     FieldMap("subrecipient_amount", "passthroughamount", None, float),
@@ -54,13 +54,21 @@ def get_list_index(all, index):
             counter += 1
     return -1
 
+def int_or_na(o):
+    if o == "N/A":
+        return o
+    elif isinstance(o, int):
+        return int(o)
+    else:
+        return "N/A"
+
 def generate_federal_awards(dbkey, outfile):
     logger.info(f"--- generate federal awards {dbkey}---")
     wb = pyxl.load_workbook(templates["FederalAwards"])
     # In sheet : in DB
 
     g = set_uei(Gen, wb, dbkey)
-    cfdas = Cfda.select().where(Cfda.dbkey == g.dbkey).order_by(Cfda.dbkey)
+    cfdas = Cfda.select().where(Cfda.dbkey == g.dbkey).order_by(Cfda.index)
     map_simple_columns(wb, mappings, cfdas)
 
     # Patch the clusternames. They used to be allowed to enter anything
@@ -91,6 +99,30 @@ def generate_federal_awards(dbkey, outfile):
     set_range(wb, "other_cluster_name", other_cluster_names)
     # Now, the cluster totals have to be calculated.
 
+    # Fix the additional award identification. If they had a "U", we want
+    # to see something in the addl. column.
+    addls = ["" for x in list(range(0, len(cfdas)))]
+    for cfda in Cfda.select().where((Cfda.dbkey==dbkey) 
+                                    & 
+                                    ((Cfda.cfda % '%U%') 
+                                     | (Cfda.cfda % '%RD%'))).order_by(Cfda.index):
+        if cfda.awardidentification is None or len(cfda.awardidentification) < 1:
+            addls[get_list_index(cfdas, cfda.index)] = f"ADDITIONAL AWARD INFO - DBKEY {dbkey}"
+        else:
+            addls[get_list_index(cfdas, cfda.index)] = cfda.awardidentification
+    set_range(wb, "additional_award_identification", addls)
+
+    ## Fix loan guarantees
+    # loansatend = ["" for x in list(range(0, len(cfdas)))]
+    # for cfda in Cfda.select().where((Cfda.dbkey==dbkey) & (Cfda.loans == "Y")):
+    #     logger.info(f"{cfda.loans} - {cfda.loanbalance}")
+    #     if cfda.loanbalance is None:
+    #         loansatend[get_list_index(cfdas, cfda.index)] = "N/A"
+    #     else:
+    #         loansatend[get_list_index(cfdas, cfda.index)] = cfda.loanbalance
+    # logger.info(list(enumerate(loansatend)))
+    # set_range(wb, "loan_balance_at_audit_period_end", loansatend)
+
     # Map things with transformations
     prefixes = map(lambda v: (v.cfda).split(".")[0], cfdas)
     extensions = map(lambda v: (v.cfda).split(".")[1], cfdas)
@@ -104,7 +136,7 @@ def generate_federal_awards(dbkey, outfile):
     # Sadly, we can't just... build the list...
     passthrough_names = ["" for x in list(range(0, len(cfdas)))]
     passthrough_ids = ["" for x in list(range(0, len(cfdas)))]
-    ls = list(Cfda.select().where((Cfda.direct=="N") & (Cfda.dbkey==dbkey)))
+    ls = list(Cfda.select().where((Cfda.direct=="N") & (Cfda.dbkey==dbkey)).order_by(Cfda.index))
     for cfda in ls:
         try:
             pnq = (
@@ -134,6 +166,17 @@ def generate_federal_awards(dbkey, outfile):
         total += int(cfda.amount)
     set_single_cell_range(wb, "total_amount_expended", total)
 
+    loansatend = list()
+    for ndx, cfda in enumerate(Cfda.select().where((Cfda.dbkey==dbkey)).order_by(Cfda.index)):
+        if cfda.loans == "Y":
+            if cfda.loanbalance is None:
+                loansatend.append("N/A")
+            else:
+                loansatend.append(cfda.loanbalance)
+        else:
+            loansatend.append("")              
+    set_range(wb, "loan_balance_at_audit_period_end", loansatend, type=int_or_na)
+
     wb.save(outfile)
 
     table = generate_dissemination_test_table(
@@ -158,9 +201,5 @@ def generate_federal_awards(dbkey, outfile):
         obj["values"].append(id)
     table["singletons"]["auditee_uei"] = g.uei
     table["singletons"]["total_amount_expended"] = total
-
-    from pprint import pprint
-    for ndx, row in enumerate(wb["Form"].values):
-        pprint([ndx] + list(row))
 
     return (wb, table)

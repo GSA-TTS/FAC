@@ -289,4 +289,4 @@ def _post_upload_workbook(this_sac, this_user, section, xlsx_file):
 
     this_sac.save()
 
-    logger.info("Created Federal Awards workbook upload for SAC %s", this_sac.id)
+    logger.info(f"Created {section} workbook upload for SAC {this_sac.id}")

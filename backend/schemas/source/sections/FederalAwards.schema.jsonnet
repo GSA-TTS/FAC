@@ -72,18 +72,20 @@ local Validations = {
         },
       },
       'then': {
-        properties: {
-          // 20230409 MCJ
-          // FIXME: If the answer is Y, why can the balance be N/A?
-          loan_balance_at_audit_period_end: {
-            anyOf: [
-              Types.integer {
+        oneOf: [
+          {
+            properties: {
+              loan_balance_at_audit_period_end: Types.integer {
                 minimum: 1,
               },
-              Base.Enum.NA,
-            ],
+            },
           },
-        },
+          {
+            properties: {
+              loan_balance_at_audit_period_end: Base.Enum.NA,
+            },
+          },
+        ],
         required: ['loan_balance_at_audit_period_end'],
       },
     },
@@ -153,28 +155,29 @@ local Validations = {
       },
       'then': {
         required: ['audit_report_type'],
-        'if': {
-          properties: {
-            audit_report_type: {
-              anyOf: [
-                {
-                  const: 'A',
-                },
-                {
-                  const: 'Q',
-                },
-              ],
-            },
-          },
-        },
-        'then': {
-          properties: {
-            // If it is A or Q, then the number MUST be greater than 0.
-            number_of_audit_findings: Types.integer {
-              exclusiveMinimum: 0,
-            },
-          },
-        },
+        // MCJ FIXME can we find in UG that this condition is true?
+        // 'if': {
+        //   properties: {
+        //     audit_report_type: {
+        //       anyOf: [
+        //         {
+        //           const: 'A',
+        //         },
+        //         {
+        //           const: 'Q',
+        //         },
+        //       ],
+        //     },
+        //   },
+        // },
+        // 'then': {
+        //   properties: {
+        //     // If it is A or Q, then the number MUST be greater than 0.
+        //     number_of_audit_findings: Types.integer {
+        //       exclusiveMinimum: 0,
+        //     },
+        //   },
+        // },
       },
     },
     {

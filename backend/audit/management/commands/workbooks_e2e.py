@@ -9,7 +9,15 @@ import datetime
 import logging
 
 logger = logging.getLogger(__name__)
+logging.basicConfig()
+logging.getLogger().setLevel(logging.INFO)
 parser = argparse.ArgumentParser()
+
+# Peewee runs a really noisy DEBUG log.
+pw = logging.getLogger('peewee')
+pw.addHandler(logging.StreamHandler())
+pw.setLevel(logging.INFO)
+
 
 from audit.management.commands.workbooks.sac_creation import (
     _post_upload_workbook,
@@ -23,6 +31,8 @@ from audit.management.commands.workbooks.federal_awards import generate_federal_
 from audit.management.commands.workbooks.findings import generate_findings
 from audit.management.commands.workbooks.findings_text import generate_findings_text
 from audit.management.commands.workbooks.corrective_action_plan import generate_corrective_action_plan
+from audit.management.commands.workbooks.additional_ueis import generate_additional_ueis
+from audit.management.commands.workbooks.secondary_auditors import generate_secondary_auditors
 
 
 def setup_sac(user, test_name, dbkey):
@@ -60,6 +70,8 @@ sections = {
     FORM_SECTIONS.FINDINGS_TEXT: generate_findings_text,
     FORM_SECTIONS.CORRECTIVE_ACTION_PLAN: generate_corrective_action_plan,
     FORM_SECTIONS.NOTES_TO_SEFA: generate_notes_to_sefa,
+    FORM_SECTIONS.ADDITIONAL_UEIS: generate_additional_ueis,   
+    FORM_SECTIONS.SECONDARY_AUDITORS: generate_secondary_auditors,
 }
 
 
@@ -83,4 +95,5 @@ class Command(BaseCommand):
         loader = workbook_loader(user, sac, options["dbkey"], entity_id)
         json_test_tables = []
         for section, fun in sections.items():
+            # FIXME: Can we conditionally upload the addl' and secondary workbooks?
             json_test_tables.append(loader(fun, section))

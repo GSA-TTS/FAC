@@ -2,6 +2,10 @@ from collections import namedtuple as NT
 from playhouse.shortcuts import model_to_dict
 import os
 
+import logging
+logger = logging.getLogger(__name__)
+
+
 # This provides a way to map the sheet in the workbook to the
 # column in the DB. It also has a default value and
 # the type of value, so that things can be set correctly
