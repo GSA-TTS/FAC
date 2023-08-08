@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
 
 env:
-  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  GH_TOKEN: ${{ secrets.DEPLOY_TOKEN }}
 
 jobs:
   check-commit:
@@ -58,7 +58,15 @@ jobs:
         id: pr-number
         run: echo "pull_request_number=$(gh pr view --json number -q .number || echo "")" >> $GITHUB_OUTPUT
 
-      - name: Comment on Pull Request
-        id: pr-comment
-        run: |
-          gh pr comment ${{ steps.pr-number.outputs.pull_request_number }} --body "Please close and re-open this pull request to ensure that a terraform plan is generated on the PR for the staging deployment after merging."
+  auto-approve:
+    name: Auto Approve The Created Pull Request
+    needs: [pull-request]
+    if: ${{ needs.pull-request.outputs.pr_number != null }}
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    steps:
+      - uses: hmarr/auto-approve-action@v3
+        with:
+          pull-request-number: ${{ needs.pull-request.outputs.pr_number }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
