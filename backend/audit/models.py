@@ -202,6 +202,7 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
     submitted_by = models.ForeignKey(User, on_delete=models.PROTECT)
     date_created = models.DateTimeField(auto_now_add=True)
     submission_status = FSMField(default=STATUS.IN_PROGRESS, choices=STATUS_CHOICES)
+    data_source = models.CharField(default="GSA")
 
     # implement an array of tuples as two arrays since we can only have simple fields inside an array
     transition_name = ArrayField(

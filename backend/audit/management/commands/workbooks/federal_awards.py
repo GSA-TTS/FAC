@@ -1,4 +1,4 @@
-from audit.management.commands.workbooks.base import (
+from audit.management.commands.workbooks.excel_creation import (
     FieldMap,
     templates,
     set_uei,
@@ -14,7 +14,11 @@ from audit.management.commands.census_models.ay22 import (
     CensusGen22 as Gen,
 )
 
+from config import settings
+from playhouse.shortcuts import model_to_dict
+
 import openpyxl as pyxl
+import json
 
 import logging
 
@@ -27,7 +31,7 @@ mappings = [
     FieldMap("state_cluster_name", "stateclustername", None, str),
     FieldMap("other_cluster_name", "otherclustername", None, str),
     FieldMap("federal_program_total", "programtotal", 0, int),
-    FieldMap("cluster_total", "clustertotal", 0, float),
+    FieldMap("cluster_total", "clustertotal", 0, int),
     FieldMap("is_guaranteed", "loans", None, str),
     FieldMap("loan_balance_at_audit_period_end", "loanbalance", None, float),
     FieldMap("is_direct", "direct", None, str),
@@ -41,14 +45,51 @@ mappings = [
 ]
 
 
+def get_list_index(all, index):
+    counter = 0
+    for o in list(all):
+        if o.index == index:
+            return counter
+        else:
+            counter += 1
+    return -1
+
 def generate_federal_awards(dbkey, outfile):
     logger.info(f"--- generate federal awards {dbkey}---")
     wb = pyxl.load_workbook(templates["FederalAwards"])
     # In sheet : in DB
 
     g = set_uei(Gen, wb, dbkey)
-    cfdas = Cfda.select().where(Cfda.dbkey == g.dbkey)
+    cfdas = Cfda.select().where(Cfda.dbkey == g.dbkey).order_by(Cfda.dbkey)
     map_simple_columns(wb, mappings, cfdas)
+
+    # Patch the clusternames. They used to be allowed to enter anything
+    # they wanted.
+    valid_file = open(f"{settings.BASE_DIR}/schemas/source/base/ClusterNames.json")
+    valid_json = json.load(valid_file)
+
+    cluster_names = []
+    other_cluster_names = []
+    cfda: Cfda
+    for cfda in cfdas:
+        if cfda.clustername is None:
+            cluster_names.append("N/A")
+            other_cluster_names.append("")
+        elif cfda.clustername in valid_json["cluster_names"]:
+            cluster_names.append(cfda.clustername)
+            other_cluster_names.append("")
+        else:
+            logger.debug(f"Cluster {cfda.clustername} not in the list. Replacing.")
+            cluster_names.append("OTHER CLUSTER NOT LISTED ABOVE")
+            other_cluster_names.append(f"{cfda.clustername}")
+
+        # if cfda.clustertotal == 0 and cfda.clustername is None:
+        #     cluster_names.append("N/A")
+        #     other_cluster_names.append("")
+
+    set_range(wb, "cluster_name", cluster_names)
+    set_range(wb, "other_cluster_name", other_cluster_names)
+    # Now, the cluster totals have to be calculated.
 
     # Map things with transformations
     prefixes = map(lambda v: (v.cfda).split(".")[0], cfdas)
@@ -59,9 +100,12 @@ def generate_federal_awards(dbkey, outfile):
     # We have to hop through several tables to build a list
     # of passthrough names. Note that anything without a passthrough
     # needs to be represented in the list as an empty string.
-    passthrough_names = []
-    passthrough_ids = []
-    for cfda in cfdas:
+    # Anywhere .direct is N, there needs to be passthroughs.
+    # Sadly, we can't just... build the list...
+    passthrough_names = ["" for x in list(range(0, len(cfdas)))]
+    passthrough_ids = ["" for x in list(range(0, len(cfdas)))]
+    ls = list(Cfda.select().where((Cfda.direct=="N") & (Cfda.dbkey==dbkey)))
+    for cfda in ls:
         try:
             pnq = (
                 Passthrough.select().where(
@@ -69,11 +113,11 @@ def generate_federal_awards(dbkey, outfile):
                     & (Passthrough.elecauditsid == cfda.elecauditsid)
                 )
             ).get()
-            passthrough_names.append(pnq.passthroughname)
-            passthrough_ids.append(pnq.passthroughid)
+            passthrough_names[get_list_index(cfdas, cfda.index)] = pnq.passthroughname
+            passthrough_ids[get_list_index(cfdas, cfda.index)] = pnq.passthroughid
         except Exception as e:
-            passthrough_names.append("")
-            passthrough_ids.append("")
+            passthrough_names[get_list_index(cfdas, cfda.index)] = ""
+            passthrough_ids[get_list_index(cfdas, cfda.index)] = ""
     set_range(wb, "passthrough_name", passthrough_names)
     set_range(wb, "passthrough_identifying_number", passthrough_ids)
 
@@ -114,5 +158,9 @@ def generate_federal_awards(dbkey, outfile):
         obj["values"].append(id)
     table["singletons"]["auditee_uei"] = g.uei
     table["singletons"]["total_amount_expended"] = total
+
+    from pprint import pprint
+    for ndx, row in enumerate(wb["Form"].values):
+        pprint([ndx] + list(row))
 
     return (wb, table)

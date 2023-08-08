@@ -11,9 +11,9 @@ import logging
 logger = logging.getLogger(__name__)
 parser = argparse.ArgumentParser()
 
-from audit.fixtures.single_audit_checklist import (
+from audit.management.commands.workbooks.sac_creation import (
     _post_upload_workbook,
-    _create_sac,
+    _create_test_sac,
     _make_excel_file,
 )
 
@@ -21,6 +21,8 @@ from fs.memoryfs import MemoryFS
 from audit.management.commands.workbooks.notes_to_sefa import generate_notes_to_sefa
 from audit.management.commands.workbooks.federal_awards import generate_federal_awards
 from audit.management.commands.workbooks.findings import generate_findings
+from audit.management.commands.workbooks.findings_text import generate_findings_text
+from audit.management.commands.workbooks.corrective_action_plan import generate_corrective_action_plan
 
 
 def setup_sac(user, test_name, dbkey):
@@ -31,18 +33,17 @@ def setup_sac(user, test_name, dbkey):
     ).first()
     logger.info(sac)
     if sac is None:
-        sac = _create_sac(user, test_name, dbkey)
+        sac = _create_test_sac(user, test_name, dbkey)
     return sac
 
 
-def workbook_loader(user, dbkey, entity_id):
+def workbook_loader(user, sac, dbkey, entity_id):
     def _loader(workbook_generator, section):
         json = None
         with MemoryFS() as mem_fs:
             filename = "workbook.xlsx"
             outfile = mem_fs.openbin(filename, mode="w")
             (_, json) = workbook_generator(dbkey, outfile)
-            sac = setup_sac(user, entity_id, dbkey)
             outfile.close()
             outfile = mem_fs.openbin(filename, mode="r")
             excel_file = _make_excel_file(filename, outfile)
@@ -54,9 +55,11 @@ def workbook_loader(user, dbkey, entity_id):
 
 
 sections = {
-    FORM_SECTIONS.NOTES_TO_SEFA: generate_notes_to_sefa,
     FORM_SECTIONS.FEDERAL_AWARDS_EXPENDED: generate_federal_awards,
     FORM_SECTIONS.FINDINGS_UNIFORM_GUIDANCE: generate_findings,
+    FORM_SECTIONS.FINDINGS_TEXT: generate_findings_text,
+    FORM_SECTIONS.CORRECTIVE_ACTION_PLAN: generate_corrective_action_plan,
+    FORM_SECTIONS.NOTES_TO_SEFA: generate_notes_to_sefa,
 }
 
 
@@ -76,7 +79,8 @@ class Command(BaseCommand):
         entity_id = "DBKEY {dbkey} {date:%Y_%m_%d_%H_%M_%S}".format(
             dbkey=options["dbkey"], date=datetime.datetime.now()
         )
-        loader = workbook_loader(user, options["dbkey"], entity_id)
+        sac = setup_sac(user, entity_id, options["dbkey"])
+        loader = workbook_loader(user, sac, options["dbkey"], entity_id)
         json_test_tables = []
         for section, fun in sections.items():
             json_test_tables.append(loader(fun, section))

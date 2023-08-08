@@ -291,7 +291,7 @@ local e164_regex = '^\\+[0-9]{1,3}[ ]*[0-9]{2,3}[ ]*[0-9]{2,3}[ ]*[0-9]{4}|^\\+[
 local email_regex = "^[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?\\.)+[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?$";
 
 
-local REGEX_ZIPCODE = '^[0-9]{5}(?:-[0-9]{4})?$';
+local REGEX_ZIPCODE = '^[0-9]{5}(?:[0-9]{4})?$';
 local REGEX_DBKEY = '[1-9][0-9]+';
 local type_zipcode = Types.string {
   pattern: REGEX_ZIPCODE,

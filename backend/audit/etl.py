@@ -311,7 +311,7 @@ class ETL(object):
             type_report_major_program=None,  # TODO: Where does this come from?
             type_audit_code="UG",
             is_public=self.single_audit_checklist.is_public,
-            data_source="GSA",
+            data_source=self.single_audit_checklist.data_source,
         )
         general.save()
 

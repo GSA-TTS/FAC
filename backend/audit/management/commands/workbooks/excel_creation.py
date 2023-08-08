@@ -109,7 +109,7 @@ def dbkey_to_test_report_id(Gen, dbkey):
     # We start new audits at 1 million.
     # So, we want 10 digits, and zero-pad for
     # historic DBKEY report_ids
-    return f"{g.audityear}-TEST-{dbkey.zfill(7)}"
+    return f"{g.audityear}TEST{dbkey.zfill(9)}"
 
 
 def generate_dissemination_test_table(Gen, api_endpoint, dbkey, mappings, objects):
@@ -130,3 +130,4 @@ def generate_dissemination_test_table(Gen, api_endpoint, dbkey, mappings, object
                 test_obj["values"].append(as_dict[m.in_db])
         table["rows"].append(test_obj)
     return table
+

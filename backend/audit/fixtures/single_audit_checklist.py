@@ -137,7 +137,7 @@ def _fake_audit_information(auditee_name=None):
     return audit_information
 
 
-def _create_sac(user, auditee_name, dbkey):
+def _create_test_sac(user, auditee_name, dbkey):
     """Create a single example SAC."""
     SingleAuditChecklist = apps.get_model("audit.SingleAuditChecklist")
     sac = SingleAuditChecklist.objects.create(
@@ -169,6 +169,8 @@ def _create_sac(user, auditee_name, dbkey):
         email=user.email,
         role="certifying_auditor_contact",
     )
+    sac.data_source = "TEST DATA"
+
     logger.info("Created single audit checklist %s", sac)
     return sac
 
@@ -379,29 +381,31 @@ SACS = [
             "regex": "federal-awards",
         },
     },
-    {
-        "auditee_name": f"Cert and ETL-{uuid.uuid4()}",
-        "post_upload_workbooks": [
-            {
-                "section": FORM_SECTIONS.FEDERAL_AWARDS_EXPENDED,
-                "regex": "federal-awards",
-            },
-            {
-                "section": FORM_SECTIONS.FINDINGS_UNIFORM_GUIDANCE,
-                "regex": "findings-[0-9]+",
-            },
-            {"section": FORM_SECTIONS.FINDINGS_TEXT, "regex": "findings-text"},
-            {"section": FORM_SECTIONS.CORRECTIVE_ACTION_PLAN, "regex": "captext"},
-            {"section": FORM_SECTIONS.ADDITIONAL_UEIS, "regex": "additional-ueis"},
-            {"section": FORM_SECTIONS.SECONDARY_AUDITORS, "regex": "cpas"},
-            {"section": FORM_SECTIONS.NOTES_TO_SEFA, "regex": "notes"},
-            {"pdf": "audit/fixtures/basic.pdf"},
-            {"save": lambda sac: sac.save()},
-        ],
-    },
+    # {
+    #     "auditee_name": f"Cert and ETL-{uuid.uuid4()}",
+    #     "post_upload_workbooks": [
+    #         {
+    #             "section": FORM_SECTIONS.FEDERAL_AWARDS_EXPENDED,
+    #             "regex": "federal-awards",
+    #         },
+    #         {
+    #             "section": FORM_SECTIONS.FINDINGS_UNIFORM_GUIDANCE,
+    #             "regex": "findings-[0-9]+",
+    #         },
+    #         {"section": FORM_SECTIONS.FINDINGS_TEXT, "regex": "findings-text"},
+    #         {"section": FORM_SECTIONS.CORRECTIVE_ACTION_PLAN, "regex": "captext"},
+    #         {"section": FORM_SECTIONS.ADDITIONAL_UEIS, "regex": "additional-ueis"},
+    #         {"section": FORM_SECTIONS.SECONDARY_AUDITORS, "regex": "cpas"},
+    #         {"section": FORM_SECTIONS.NOTES_TO_SEFA, "regex": "notes"},
+    #         {"pdf": "audit/fixtures/basic.pdf"},
+    #         {"save": lambda sac: sac.save()},
+    #     ],
+    # },
 ]
 
 
+# MCJ I broke this badly, moving towards E2E with backend data.
+# It no longer is a good bootstrap for a single user manually testing.
 def _load_single_audit_checklists_for_user(user, workbooks):
     """Create SACs for a given user."""
     logger.info("Creating single audit checklists for %s", user)

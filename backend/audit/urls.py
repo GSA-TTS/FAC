@@ -1,7 +1,7 @@
 from django.urls import path
 
-from .fixtures.excel import FORM_SECTIONS
-from . import views
+from audit.fixtures.excel import FORM_SECTIONS
+from audit import views
 
 app_name = "audit"
 
