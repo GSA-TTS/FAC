@@ -93,7 +93,7 @@ jobs:
     permissions:
       contents: write
     runs-on: ubuntu-latest
-    needs: [terraform-plan-staging]
+    needs: [terraform-plan-staging, testing-from-ghcr]
     steps:
       - name: Repository Dispatch
         uses: peter-evans/repository-dispatch@v2
