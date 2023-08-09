@@ -714,7 +714,7 @@ def submission_progress_check(
     # Use sac_validation_shape as source of truth for list of sections:
     shaped_sac = sac_validation_shape(sac)
     sections = shaped_sac["sf_sac_sections"]
-    result = {k: None for k in sections}
+    result = {k: None for k in sections}  # type: ignore
     progress = {
         "display": None,
         "completed": None,
@@ -737,7 +737,7 @@ def submission_progress_check(
         "completed": bool(sar),
     }
 
-    result["single_audit_report"] = progress | sar_progress
+    result["single_audit_report"] = progress | sar_progress  # type: ignore
 
     complete = False
 
@@ -749,7 +749,7 @@ def submission_progress_check(
         if all(cond_pass(j) for j in cond_keys):
             complete = True
 
-    result["complete"] = complete
+    result["complete"] = complete  # type: ignore
 
     return result
 
