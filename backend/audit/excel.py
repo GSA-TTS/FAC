@@ -448,7 +448,7 @@ def _extract_data(file, params: ExtractDataParams) -> dict:
     Extracts data from an Excel file using provided field and column mappings
     """
     workbook = _open_workbook(file)
-    result = {}
+    result: dict = {}
 
     if SECTION_NAME not in workbook.defined_names:
         raise ExcelExtractionError(
@@ -473,8 +473,6 @@ def _extract_meta_and_field_data(workbook, params, result) -> dict:
     if result.get("Meta", {}).get(SECTION_NAME) == params.section:
         for name, (target, set_fn) in params.field_mapping.items():
             set_fn(result, target, _extract_single_value(workbook, name))
-
-    return result
 
 
 def _extract_column_data(workbook, result, params) -> dict:
