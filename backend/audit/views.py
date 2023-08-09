@@ -649,6 +649,9 @@ class SubmissionView(CertifyingAuditeeRequiredMixin, generic.View):
 
 
 def conditional_keys_progress_check(sac, sections):
+    """
+    Support function for submission_progress_check; handles the conditional sections.
+    """
     conditional_keys = {
         "additional_ueis": sac.multiple_ueis_covered,
         "additional_eins": sac.multiple_eins_covered,
@@ -666,8 +669,11 @@ def conditional_keys_progress_check(sac, sections):
     return output
 
 
-def mandatory_keys_progress_check(sections, cond_keys):
-    other_keys = [k for k in sections if k not in cond_keys]
+def mandatory_keys_progress_check(sections, conditional_keys):
+    """
+    Support function for submission_progress_check; handles the mandatory sections.
+    """
+    other_keys = [k for k in sections if k not in conditional_keys]
     output = {}
     for k in other_keys:
         if bool(sections[k]):
@@ -781,30 +787,6 @@ class SubmissionProgressView(SingleAuditChecklistAccessRequiredMixin, generic.Vi
             except SingleAuditReportFile.DoesNotExist:
                 audit_report = None
 
-            additional_ueis_display = "incomplete"
-            if not sac.multiple_ueis_covered:
-                additional_ueis_display = "hidden"
-            elif sac.additional_ueis:
-                additional_ueis_display = "complete"
-
-            additional_eins_display = "incomplete"
-            if not sac.multiple_eins_covered:
-                additional_eins_display = "hidden"
-            # 2023-08-08 uncomment this once we have sac.additional_eins
-            # elif sac.additional_eins:
-            #     additional_eins_display = "complete"
-
-            secondary_auditors_display = "incomplete"
-            # 2023-08-08 uncomment this once we have the auditors question in General
-            # Information.
-            # if not sac.multiple_ueis_covered:
-            #     secondary_auditors_display = "hidden"
-            # elif sac.secondary_auditors:
-            #     secondary_auditors_display = "complete"
-
-            findings_text_complete = bool(sac.findings_text)
-            audit_findings_complete = bool(sac.findings_uniform_guidance)
-            corrective_action_plan_complete = bool(sac.corrective_action_plan)
             subcheck = submission_progress_check(sac, audit_report)
 
             context = {
@@ -816,53 +798,6 @@ class SubmissionProgressView(SingleAuditChecklistAccessRequiredMixin, generic.Vi
                     "completed_date": None,
                     "completed_by": None,
                 },
-                """
-                "federal_awards_workbook": {
-                    "completed": bool(sac.federal_awards),
-                    "completed_date": None,
-                    "completed_by": None,
-                },
-                "audit_information_form": {
-                    "completed": bool(sac.audit_information),
-                    "completed_date": None,
-                    "completed_by": None,
-                },
-                "findings_text_workbook": {
-                    "completed": findings_text_complete,
-                    "completed_date": None,
-                    "completed_by": None,
-                },
-                "audit_findings_workbook": {
-                    "completed": audit_findings_complete,
-                    "completed_date": None,
-                    "completed_by": None,
-                },
-                "CAP_workbook": {
-                    "completed": corrective_action_plan_complete,
-                    "completed_date": None,
-                    "completed_by": None,
-                },
-                "additional_UEIs_workbook": {
-                    "display": additional_ueis_display,
-                    "completed_date": None,
-                    "completed_by": None,
-                },
-                "additional_EINs_workbook": {
-                    "display": additional_eins_display,
-                    "completed_date": None,
-                    "completed_by": None,
-                },
-                "secondary_auditors_workbook": {
-                    "display": secondary_auditors_display,
-                    "completed_date": None,
-                    "completed_by": None,
-                },
-                "audit_report": {
-                    "completed": bool(audit_report),
-                    "completed_date": None,
-                    "completed_by": None,
-                },
-                """
                 "certification": {
                     "auditor_certified": bool(sac.auditor_certification),
                     "auditee_certified": sac.is_auditee_certified,
