@@ -1057,6 +1057,18 @@ class SubmissionProgressViewTests(TestCase):
         for key in conditional_keys:
             self.assertEqual(result[key]["display"], "hidden")
         self.assertFalse(result["complete"])
+        baker.make(Access, user=self.user, sac=sac)
+        self.client.force_login(user=self.user)
+        res = self.client.get(
+            reverse("audit:SubmissionProgress", kwargs={"report_id": sac.report_id})
+        )
+        phrases = (
+            "Upload the Additional UEIs workbook",
+            "Upload the Additional EINs workbook",
+            "Upload the Secondary Auditors workbook",
+        )
+        for phrase in phrases:
+            self.assertNotIn(phrase, res.content.decode("utf-8"))
 
     def test_submission_progress_check_simple_pass(self):
         """
