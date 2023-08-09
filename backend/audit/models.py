@@ -456,11 +456,32 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         return None
 
 
+class AccessManager(models.Manager):
+    """Custom manager for Access."""
+
+    def create(self, **obj_data):
+        """
+        Check for existing users and add them at access creation time.
+        Not doing this would mean that users logged in at time of Access
+        instance creation would have to log out and in again to get the new
+        access.
+        """
+        try:
+            acc_user = User.objects.get(email=obj_data["email"])
+        except User.DoesNotExist:
+            acc_user = None
+        if acc_user:
+            obj_data["user"] = acc_user
+        return super().create(**obj_data)
+
+
 class Access(models.Model):
     """
     Email addresses which have been granted access to SAC instances.
     An email address may be associated with a User ID if an FAC account exists.
     """
+
+    objects = AccessManager()
 
     ROLES = (
         ("certifying_auditee_contact", _("Auditee Certifying Official")),

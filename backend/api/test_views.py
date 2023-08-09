@@ -386,6 +386,9 @@ class AccessAndSubmissionTests(TestCase):
         )
         self.user.profile.save()
 
+        # Create a user to check that association happens on Access creation:
+        catcdotcom = baker.make(User, email="c@c.com")
+
         response = self.client.post(
             ACCESS_AND_SUBMISSION_PATH, VALID_ACCESS_AND_SUBMISSION_DATA, format="json"
         )
@@ -399,14 +402,20 @@ class AccessAndSubmissionTests(TestCase):
         certifying_auditor_contact_access = Access.objects.get(
             sac=sac, role="certifying_auditor_contact"
         )
-        editors = [acc.email for acc in Access.objects.filter(sac=sac, role="editor")]
+
+        editors = Access.objects.filter(sac=sac, role="editor")
+        editor_emails = [acc.email for acc in editors]
+        editor_users = [acc.user for acc in editors]
 
         self.assertEqual(sac.submitted_by, self.user)
-        self.assertTrue(self.user.email in editors)
-        self.assertTrue("c@c.com" in editors)
-        self.assertTrue("d@d.com" in editors)
+        self.assertTrue(self.user.email in editor_emails)
+        self.assertTrue("c@c.com" in editor_emails)
+        self.assertTrue("d@d.com" in editor_emails)
         self.assertEqual(certifying_auditee_contact_access.email, "a@a.com")
         self.assertEqual(certifying_auditor_contact_access.email, "b@b.com")
+
+        # Check that existing user was associated without having had to log in:
+        self.assertIn(catcdotcom, editor_users)
 
     def test_multiple_auditee_auditor_contacts(self):
         """A new SAC is created along with related Access instances"""
