@@ -134,7 +134,9 @@
                                    type="text"
                                    id="audit_period_other_months"
                                    name="audit_period_other_months"
-                                   disabled/>
+                                   value="{{ audit_period_other_months | default_if_none:'' }}"
+                                   {% if audit_period_other_months.len == 0 %} disabled {% endif %}
+                                   />
                             <label class="usa-label usa-input--small__label"
                                    for="audit_period_other_months">months</label>
                         </div>
