@@ -46,3 +46,18 @@ class TribalDataSharingConsentTests(TestCase):
         self.assertEqual(
             validation_result, [{"error": err_missing_tribal_data_sharing_consent()}]
         )
+
+    def test_tribal_org_with_consent(self):
+        """SACs for tribal orders should pass this validation if there is a completed data sharing consent form"""
+        sac = baker.make(SingleAuditChecklist)
+
+        sac.general_information = {"user_provided_organization_type": "tribal"}
+
+        shaped_sac = sac_validation_shape(sac)
+
+        # placeholder consent form until schema is finalized
+        shaped_sac["sf_sac_sections"]["tribal_data_consent"] = {"complete": True}
+
+        validation_result = tribal_data_sharing_consent(shaped_sac)
+
+        self.assertEqual(validation_result, [])
