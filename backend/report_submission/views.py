@@ -174,9 +174,9 @@ class GeneralInformationFormView(LoginRequiredMixin, View):
 
             if form.is_valid():
                 general_information = sac.general_information
-                fields = sorted(general_information.keys())
-                for field in fields:
-                    print(f"{field} : {general_information[field]}")
+                # fields = sorted(general_information.keys())
+                # for field in fields:
+                #     print(f"{field} : {general_information[field]}")
                 general_information.update(form.cleaned_data)
                 validated = validate_general_information_json(general_information)
                 sac.general_information = validated
