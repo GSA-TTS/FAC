@@ -37,6 +37,7 @@ from .fixtures.single_audit_checklist import (
 )
 from .models import Access, SingleAuditChecklist
 from .views import MySubmissions, submission_progress_check
+from .cross_validation.sac_validation_shape import snake_to_camel
 
 User = get_user_model()
 
@@ -100,8 +101,9 @@ def _make_user_and_sac(**kwargs):
     sac = baker.make(SingleAuditChecklist, **kwargs)
     return user, sac
 
+
 def _load_json(target):
-    """ Given a str or Path, load JSON from that target. """
+    """Given a str or Path, load JSON from that target."""
     raw = Path(target).read_text(encoding="utf-8")
     return json.loads(raw)
 
@@ -1065,3 +1067,22 @@ class SubmissionProgressViewTests(TestCase):
 
 
         """
+        filename = "general-information--test0001test--simple-pass.json"
+        info = _load_json(AUDIT_JSON_FIXTURES / filename)
+        addl_sections = {}
+        for section_name, camel_name in snake_to_camel.items():
+            addl_sections[section_name] = {camel_name: "whatever"}
+        addl_sections["general_information"] = info
+
+        sac = baker.make(SingleAuditChecklist, **addl_sections)
+        result = submission_progress_check(sac, None)
+        self.assertEqual(result["general_information"]["display"], "complete")
+        self.assertTrue(result["general_information"]["completed"])
+        conditional_keys = (
+            "additional_ueis",
+            "additional_eins",
+            "secondary_auditors",
+        )
+        for key in conditional_keys:
+            self.assertEqual(result[key]["display"], "hidden")
+        self.assertTrue(result["complete"])

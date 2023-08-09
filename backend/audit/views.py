@@ -648,6 +648,36 @@ class SubmissionView(CertifyingAuditeeRequiredMixin, generic.View):
             raise PermissionDenied("You do not have access to this audit.")
 
 
+def conditional_keys_progress_check(sac, sections):
+    conditional_keys = {
+        "additional_ueis": sac.multiple_ueis_covered,
+        "additional_eins": sac.multiple_eins_covered,
+        "secondary_auditors": False,  # update this once we have the question in.
+    }
+    output = {}
+    for key, value in conditional_keys.items():
+        current = "incomplete"
+        if not value:
+            current = "hidden"
+        elif sections.get(key):
+            current = "complete"
+        info = {"display": current, "completed": current == "completed"}
+        output[key] = info
+    return output
+
+
+def mandatory_keys_progress_check(sections, cond_keys):
+    other_keys = [k for k in sections if k not in cond_keys]
+    output = {}
+    for k in other_keys:
+        if bool(sections[k]):
+            info = {"display": "complete", "completed": True}
+        else:
+            info = {"display": "incomplete", "completed": False}
+        output[k] = info
+    return output
+
+
 def submission_progress_check(
     sac: SingleAuditChecklist, sar: SingleAuditReportFile
 ) -> dict:
@@ -678,7 +708,7 @@ def submission_progress_check(
     # Use sac_validation_shape as source of truth for list of sections:
     shaped_sac = sac_validation_shape(sac)
     sections = shaped_sac["sf_sac_sections"]
-    shape = {k: None for k in sections}
+    result = {k: None for k in sections}
     progress = {
         "display": None,
         "completed": None,
@@ -686,49 +716,36 @@ def submission_progress_check(
         "completed_date": None,
     }
 
-    conditional_keys = {
-        "additional_ueis": sac.multiple_ueis_covered,
-        "additional_eins": sac.multiple_eins_covered,
-        "secondary_auditors": False,  # update this once we have the question in.
-    }
+    cond_keys = conditional_keys_progress_check(sac, sections)
+    for ckey, cvalue in cond_keys.items():
+        result[ckey] = progress | cvalue
 
-    for key, value in conditional_keys.items():
-        current = "incomplete"
-        if not value:
-            current = "hidden"
-        elif sections.get(key):
-            current = "complete"
-        info = {"display": current, "completed": current == "completed"}
-        shape[key] = progress | info
-
-    other_keys = [k for k in shape if k not in conditional_keys]
-    for k in other_keys:
-        if bool(sections[k]):
-            info = progress | {"display": "complete", "completed": True}
-        else:
-            info = progress | {"display": "incomplete", "completed": False}
-        shape[k] = info
+    mandatory_keys = mandatory_keys_progress_check(sections, cond_keys)
+    for mkey, mvalue in mandatory_keys.items():
+        result[mkey] = progress | mvalue
+    # TODO: remove this once Notes to SEFA is integrated
+    del mandatory_keys["notes_to_sefa"]
 
     sar_progress = {
         "display": "complete" if bool(sar) else "incomplete",
         "completed": bool(sar),
     }
 
-    shape["single_audit_report"] = progress | sar_progress
+    result["single_audit_report"] = progress | sar_progress
 
     complete = False
 
     def cond_pass(cond_key):
         passing = ("hidden", "complete")
-        return shape.get(cond_key, {}).get("display") in passing
+        return result.get(cond_key, {}).get("display") in passing
 
-    if all(bool(sections[k]) for k in other_keys):
-        if all(cond_pass[j] for j in other_keys):
+    if all(bool(sections[k]) for k in mandatory_keys):
+        if all(cond_pass(j) for j in cond_keys):
             complete = True
 
-    shape["complete"] = complete
+    result["complete"] = complete
 
-    return shape
+    return result
 
 
 class SubmissionProgressView(SingleAuditChecklistAccessRequiredMixin, generic.View):
@@ -860,31 +877,10 @@ class SubmissionProgressView(SingleAuditChecklistAccessRequiredMixin, generic.Vi
                 "auditee_uei": sac.auditee_uei,
                 "user_provided_organization_type": sac.user_provided_organization_type,
             }
-            complete = False
-            always_required = (
-                bool(sac.general_information),
-                bool(sac.federal_awards),
-                bool(sac.audit_information),
-                findings_text_complete,
-                audit_findings_complete,
-                corrective_action_plan_complete,
-            )
-            import json
-
-            logger.info("subcheck: %s", json.dumps(subcheck))
-            logger.info("always_required: %s", always_required)
-            passing = ("hidden", "complete")
-            conditional = (
-                additional_ueis_display in passing,
-                additional_eins_display in passing,
-                # Uncomment this once Secondary Auditors q is in General Information:
-                # secondary_auditors_display in passing,
-            )
-            if all(always_required) and all(conditional):
-                complete = True
+            context = context | subcheck
 
             # Add all SF-SAC uploads to determine if the process is complete or not
-            context["SF_SAC_completed"] = complete
+            context["SF_SAC_completed"] = context["complete"]
             return render(request, "audit/submission-progress.html", context)
         except SingleAuditChecklist.DoesNotExist as err:
             raise PermissionDenied("You do not have access to this audit.") from err

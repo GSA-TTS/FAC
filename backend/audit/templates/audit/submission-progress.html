@@ -96,7 +96,7 @@ It can be changed to time-dependence after timestamp changes. -->
                 </li>
                 <!-- Federal awards workbook -->
                 <li class="usa-icon-list__item padding-bottom-2">
-                    {% if federal_awards_workbook.completed == True %}
+                    {% if federal_awards.completed == True %}
                         <div class="usa-icon-list__icon text-green">
                             <svg class="usa-icon margin-right-2" aria-hidden="true" role="img">
                                 {% uswds_sprite "check_circle" %}
@@ -121,7 +121,7 @@ It can be changed to time-dependence after timestamp changes. -->
                 <li class="usa-icon-list__item padding-bottom-2">
                     <div class="usa-icon-list__icon text-base">
                         <svg class="usa-icon margin-right-2" aria-hidden="true" role="img">
-                            {% if audit_information_form.completed == True %}
+                            {% if audit_information.completed == True %}
                                 {% uswds_sprite "check_circle" %}
                             {% else %}
                                 {% uswds_sprite "radio_button_unchecked" %}
@@ -140,7 +140,7 @@ It can be changed to time-dependence after timestamp changes. -->
                 <li class="usa-icon-list__item padding-bottom-2">
                     <div class="usa-icon-list__icon {% if audit_findings_workbook.completed == True %}text-green{% else %}text-base{% endif %}">
                         <svg class="usa-icon margin-right-2" aria-hidden="true" role="img">
-                            {% if audit_findings_workbook.completed == True %}
+                            {% if findings_uniform_guidance.completed == True %}
                                 {% uswds_sprite "check_circle" %}
                             {% else %}
                                 {% uswds_sprite "radio_button_unchecked" %}
@@ -159,7 +159,7 @@ It can be changed to time-dependence after timestamp changes. -->
                 <li class="usa-icon-list__item padding-bottom-2">
                     <div class="usa-icon-list__icon {% if findings_text_workbook.completed == True %}text-green{% else %}text-base{% endif %}">
                         <svg class="usa-icon margin-right-2" aria-hidden="true" role="img">
-                            {% if findings_text_workbook.completed == True %}
+                            {% if findings_text.completed == True %}
                                 {% uswds_sprite "check_circle" %}
                             {% else %}
                                 {% uswds_sprite "radio_button_unchecked" %}
@@ -178,7 +178,7 @@ It can be changed to time-dependence after timestamp changes. -->
                 <li class="usa-icon-list__item padding-bottom-2">
                     <div class="usa-icon-list__icon {% if CAP_workbook.completed == True %}text-green{% else %}text-base{% endif %}">
                         <svg class="usa-icon margin-right-2" aria-hidden="true" role="img">
-                            {% if CAP_workbook.completed == True %}
+                            {% if corrective_action_plan.completed == True %}
                                 {% uswds_sprite "check_circle" %}
                             {% else %}
                                 {% uswds_sprite "radio_button_unchecked" %}
@@ -194,11 +194,11 @@ It can be changed to time-dependence after timestamp changes. -->
                     </div>
                 </li>
                 <!-- Additional UEIs -->
-                {% if additional_UEIs_workbook.display != "hidden" %}
+                {% if additional_ueis.display != "hidden" %}
                   <li class="usa-icon-list__item padding-bottom-2">
                       <div class="usa-icon-list__icon {% if additional_UEIs_workbook.completed == True %}text-green{% else %}text-base{% endif %}">
                           <svg class="usa-icon margin-right-2" aria-hidden="true" role="img">
-                              {% if additional_UEIs_workbook.display == "completed" %}
+                              {% if additional_ueis.display == "completed" %}
                                   {% uswds_sprite "check_circle" %}
                               {% else %}
                                   {% uswds_sprite "radio_button_unchecked" %}
@@ -215,11 +215,11 @@ It can be changed to time-dependence after timestamp changes. -->
                   </li>
                 {% endif %}
                 <!-- Additional EINs -->
-                {% if additional_EINs_workbook.display != "hidden" %}
+                {% if additional_eins.display != "hidden" %}
                   <li class="usa-icon-list__item padding-bottom-2">
                       <div class="usa-icon-list__icon {% if additional_EINs_workbook.completed == True %}text-green{% else %}text-base{% endif %}">
                           <svg class="usa-icon margin-right-2" aria-hidden="true" role="img">
-                              {% if additional_EINs_workbook.display == "completed" %}
+                              {% if additional_eins.display == "completed" %}
                                   {% uswds_sprite "check_circle" %}
                               {% else %}
                                   {% uswds_sprite "radio_button_unchecked" %}
@@ -236,11 +236,11 @@ It can be changed to time-dependence after timestamp changes. -->
                   </li>
                 {% endif %}
                 <!-- Secondary Auditors -->
-                {% if secondary_auditors_workbook.display != "hidden" %}
+                {% if secondary_auditors.display != "hidden" %}
                   <li class="usa-icon-list__item padding-bottom-2">
                       <div class="usa-icon-list__icon {% if secondary_auditors_workbook.completed == True %}text-green{% else %}text-base{% endif %}">
                           <svg class="usa-icon margin-right-2" aria-hidden="true" role="img">
-                              {% if secondary_auditors_workbook.display == "completed" %}
+                              {% if secondary_auditors.display == "completed" %}
                                   {% uswds_sprite "check_circle" %}
                               {% else %}
                                   {% uswds_sprite "radio_button_unchecked" %}
@@ -279,7 +279,7 @@ It can be changed to time-dependence after timestamp changes. -->
                 <li class="usa-icon-list__item padding-bottom-2 padding-top-2">
                     <div class="usa-icon-list__icon {% if audit_report.completed == True %} text-green {% else %} text-base {% endif %}">
                         <svg class="usa-icon margin-right-2" aria-hidden="true" role="img">
-                            {% if audit_report.completed == True %}
+                            {% if single_audit_report.completed == True %}
                                 {% uswds_sprite "check_circle" %}
                             {% else %}
                                 {% uswds_sprite "radio_button_unchecked" %}
