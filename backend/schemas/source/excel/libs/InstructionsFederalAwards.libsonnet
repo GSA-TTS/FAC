@@ -1,7 +1,7 @@
 {
-  secondary_auditor_name: {
+  federal_agency_prefix: {
     instructions: [
-      'Enter the name of the secondary auditor organization.',
+      'Enter the first two digits of the agency's CFDA number.',
     ],
   },
   secondary_auditor_ein: {
