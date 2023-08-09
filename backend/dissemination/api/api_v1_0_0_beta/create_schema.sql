@@ -1,25 +1,6 @@
--- Cloned from Lindsay's code in data_distro
-
--- We are self managing our migrations here
--- The SQL is called and applied from data_distro/migrations
--- This is a point in time of sql run that is comparable with data distro models. The views in the api_v1_0_0-beta_views folder represent the current views for the API_V1_0_0-BETA.
--- As the models change later, we don't want
--- our migration to reference fields that don't exist yet or already exist.
-
 --This will be used by the postgrest API_V1_0_0-BETA
 
 begin;
-
--- These need to be if statements because the schema and rolls already exist when you run tests
-do
-$$
-begin
-    if not exists (select * from pg_catalog.pg_roles where rolname = 'anon') then
-        create role anon;
-    end if;
-end
-$$
-;
 
 do
 $$
@@ -35,20 +16,32 @@ begin
             grant select
         -- this includes views
         on tables
-        to anon;
+        to api_fac_gov;
 
         -- Grant access to sequences, if we have them
-        grant usage on schema api_v1_0_0_beta to anon;
-        grant select, usage on all sequences in schema api_v1_0_0_beta to anon;
+        grant usage on schema api_v1_0_0_beta to api_fac_gov;
+        grant select, usage on all sequences in schema api_v1_0_0_beta to api_fac_gov;
         alter default privileges
             in schema api_v1_0_0_beta
             grant select, usage
         on sequences
-        to anon;
+        to api_fac_gov;
     end if;
 end
 $$
 ;
+
+-- This is the description
+COMMENT ON SCHEMA api_v1_0_0_beta IS
+    'The FAC dissemation API version 1.0.0-beta.'
+;
+
+-- https://postgrest.org/en/stable/references/api/openapi.html
+-- This is the title
+COMMENT ON SCHEMA api_v1_0_0_beta IS
+$$v1.0.0-beta
+
+A RESTful API that serves data from the SF-SAC.$$;
 
 commit;
 

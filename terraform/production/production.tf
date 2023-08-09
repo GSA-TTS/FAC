@@ -2,6 +2,7 @@ module "production" {
   source                = "../shared/modules/env"
   cf_space_name         = "production"
   new_relic_license_key = var.new_relic_license_key
+  pgrst_jwt_secret      = var.pgrst_jwt_secret
 }
 
 # Note: The very first time we run apply in production, this will fail because

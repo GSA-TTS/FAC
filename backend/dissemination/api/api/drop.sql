@@ -1,7 +1,7 @@
 
 begin;
 
-DROP SCHEMA IF EXISTS api_v1_0_0_beta CASCADE; 
+DROP SCHEMA IF EXISTS api CASCADE; 
 
 commit;
 
