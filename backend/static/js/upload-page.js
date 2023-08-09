@@ -45,6 +45,13 @@ function handleErrors(error) {
     console.error(`Access denied. Audit is locked to SF-SAC changes.\n`, error);
     info_box.innerHTML =
       'Access denied. Further changes to audits that have been marked ready for certification are not permitted.';
+  } else if (error.name === 'Unknown workbook') {
+    // Unknown workbook.
+    console.error(
+      `Unknown workbook - The uploaded workbook template does not originate from SF-SAC.\n`,
+      error
+    );
+    info_box.innerHTML = `Unknown workbook - The uploaded workbook template does not originate from SF-SAC. Please ensure you have uploaded the correct workbook. If this issue persists, contact an administrator.`;
   } else {
     // Catch all.
     console.error(`Unexpected error.\n`, error);
@@ -149,6 +156,10 @@ function attachFileUploadHandler() {
               } else if (data.type === 'no_late_changes') {
                 let e = new Error(data.errors);
                 e.name = 'Access denied';
+                handleErrors(e);
+              } else if (data.type === 'unknown_workbook') {
+                let e = new Error(data.errors);
+                e.name = 'Unknown workbook';
                 handleErrors(e);
               } else {
                 // Catch all.
