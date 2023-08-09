@@ -44,7 +44,7 @@ local single_cells = [
     range_cell: 'B3',
     format: 'text',
     formula: '="' + Sheets.section_names.ADDITIONAL_UEIS + '"',
-    help: Help.plain_text,
+    help: Help.wrong_workbook_template,
     validation: SV.NoValidation,
   },
   Sheets.single_cell {

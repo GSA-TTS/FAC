@@ -67,5 +67,9 @@ local make_url = function(anchor)
     text: 'This field must be either `Y` or `N`',
     link: make_url('yorn'),
   },
-
+  // w
+  wrong_workbook_template: {
+    text: 'The workbook you are trying to upload does not match the required template',
+    link: make_url('section_name'),
+  },
 }
