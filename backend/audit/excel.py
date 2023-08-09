@@ -466,7 +466,7 @@ def _extract_data(file, params: ExtractDataParams) -> dict:
         raise ExcelExtractionError(e)
 
 
-def _extract_meta_and_field_data(workbook, params, result) -> dict:
+def _extract_meta_and_field_data(workbook, params, result):
     for name, (target, set_fn) in params.meta_mapping.items():
         set_fn(result, target, _extract_single_value(workbook, name))
 
@@ -475,7 +475,7 @@ def _extract_meta_and_field_data(workbook, params, result) -> dict:
             set_fn(result, target, _extract_single_value(workbook, name))
 
 
-def _extract_column_data(workbook, result, params) -> dict:
+def _extract_column_data(workbook, result, params):
     for i, (name, (parent_target, field_target, set_fn)) in enumerate(
         params.column_mapping.items()
     ):
@@ -491,7 +491,6 @@ def _extract_column_data(workbook, result, params) -> dict:
             ]
             if entries:
                 set_fn(result, f"{parent_target}", entries)
-    return result
 
 
 def _remove_empty_award_entries(data):
