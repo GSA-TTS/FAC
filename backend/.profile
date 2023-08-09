@@ -40,6 +40,9 @@ if [[ "$CF_INSTANCE_INDEX" == 0 ]]; then
     echo 'Starting API schema deprecation' &&
     python manage.py drop_deprecated_api_schemas_and_views &&
     echo 'Finished API schema deprecation' &&
+    echo 'Dropping API schema' &&
+	python manage.py drop_api_schema &&
+	echo 'Finished dropping API schema' &
     echo 'Starting API schema creation' &&
     python manage.py create_api_schemas &&
     echo 'Finished API schema creation' &&
