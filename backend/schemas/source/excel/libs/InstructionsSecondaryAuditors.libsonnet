@@ -2,12 +2,11 @@
   secondary_auditor_name: {
     instructions: [
       'Enter the name of the secondary auditor organization.',
-      'One organization per row.',
     ],
   },
   secondary_auditor_ein: {
     instructions: [
-      "Enter the auditing organization's EIN. This should be nine characters long.",
+      "Enter the auditing organization's EIN.",
     ],
   },
   secondary_auditor_address_street: {
@@ -27,7 +26,7 @@
   },
   secondary_auditor_address_zipcode: {
     instructions: [
-      'Enter the zipcode for the auditing organization. This should be 5 digits long.',
+      'Enter the zipcode for the auditing organization.',
     ],
   },
   secondary_auditor_contact_name: {
@@ -42,7 +41,7 @@
   },
   secondary_auditor_contact_phone: {
     instructions: [
-      'Enter the phone number of the secondary auditor. This should be 10 digits, separated by hyphens.',
+      'Enter the phone number of the secondary auditor.',
     ],
   },
   secondary_auditor_contact_email: {
