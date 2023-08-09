@@ -18,3 +18,7 @@ def err_additional_ueis_not_empty():
 
 def err_auditee_ueis_match():
     return "Not all auditee UEIs matched."
+
+
+def err_awards_findings_but_no_findings_text():
+    return "There are findings indicated in Federal Awards but" "none in Findings Text."

@@ -1,4 +1,8 @@
 import json
+from pathlib import Path
+from tempfile import NamedTemporaryFile
+from unittest.mock import patch
+
 from django.test import TestCase
 from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -6,9 +10,6 @@ from django.urls import reverse
 
 from django.test import Client
 from model_bakery import baker
-from unittest.mock import patch
-
-from tempfile import NamedTemporaryFile
 
 from openpyxl import load_workbook
 from openpyxl.cell import Cell
@@ -35,7 +36,7 @@ from .fixtures.single_audit_checklist import (
     fake_auditee_certification,
 )
 from .models import Access, SingleAuditChecklist
-from .views import MySubmissions
+from .views import MySubmissions, submission_progress_check
 
 User = get_user_model()
 
@@ -62,6 +63,8 @@ VALID_ACCESS_AND_SUBMISSION_DATA = {
     "auditee_contacts": ["c@c.com"],
     "auditor_contacts": ["d@d.com"],
 }
+
+AUDIT_JSON_FIXTURES = Path(__file__).parent / "fixtures" / "json"
 
 
 # Mocking the user login and file scan functions
@@ -96,6 +99,11 @@ def _make_user_and_sac(**kwargs):
     user = baker.make(User)
     sac = baker.make(SingleAuditChecklist, **kwargs)
     return user, sac
+
+def _load_json(target):
+    """ Given a str or Path, load JSON from that target. """
+    raw = Path(target).read_text(encoding="utf-8")
+    return json.loads(raw)
 
 
 class MySubmissionsViewTests(TestCase):
@@ -1025,3 +1033,35 @@ class SubmissionProgressViewTests(TestCase):
             )
         )
         self.assertIn(phrase, res.content.decode("utf-8"))
+
+    def test_submission_progress_check_geninfo_only(self):
+        """
+        Check the function containing the logic around which sections are required.
+
+        If the conditional questions all have negative answers and data is absent for
+        the rest, return the appropriate shape.
+        """
+        filename = "general-information--test0001test--simple-pass.json"
+        info = _load_json(AUDIT_JSON_FIXTURES / filename)
+        sac = baker.make(SingleAuditChecklist, general_information=info)
+        result = submission_progress_check(sac, None)
+        self.assertEqual(result["general_information"]["display"], "complete")
+        self.assertTrue(result["general_information"]["completed"])
+        conditional_keys = (
+            "additional_ueis",
+            "additional_eins",
+            "secondary_auditors",
+        )
+        for key in conditional_keys:
+            self.assertEqual(result[key]["display"], "hidden")
+        self.assertFalse(result["complete"])
+
+    def test_submission_progress_check_simple_pass(self):
+        """
+        Check the function containing the logic around which sections are required.
+
+        If the conditional questions all have negative answers and data is present for
+        the rest, return the appropriate shape.
+
+
+        """

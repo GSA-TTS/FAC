@@ -194,43 +194,68 @@ It can be changed to time-dependence after timestamp changes. -->
                     </div>
                 </li>
                 <!-- Additional UEIs -->
-                <li class="usa-icon-list__item padding-bottom-2">
-                    <div class="usa-icon-list__icon {% if additional_UEIs_workbook.completed == True %}text-green{% else %}text-base{% endif %}">
-                        <svg class="usa-icon margin-right-2" aria-hidden="true" role="img">
-                            {% if additional_UEIs_workbook.completed == True %}
-                                {% uswds_sprite "check_circle" %}
-                            {% else %}
-                                {% uswds_sprite "radio_button_unchecked" %}
-                            {% endif %}
-                        </svg>
-                    </div>
-                    <div class="usa-icon-list__content {% if additional_UEIs_workbook.created is True %} text-green {% else %} text-base-dark {% endif %}">
-                        <a class="usa-link text-bold"
-                           href="/report_submission/additional-ueis/{{ report_id | default_if_none:'' }}">Upload the Additional UEIs workbook</a>
-                        <p class="margin-0">
-                            This workbook is only necessary if the audit report covers multiple UEIs. It is completed by the auditee. List the additional UEIs covered by the audit, excluding the primary UEI.
-                        </p>
-                    </div>
-                </li>
+                {% if additional_UEIs_workbook.display != "hidden" %}
+                  <li class="usa-icon-list__item padding-bottom-2">
+                      <div class="usa-icon-list__icon {% if additional_UEIs_workbook.completed == True %}text-green{% else %}text-base{% endif %}">
+                          <svg class="usa-icon margin-right-2" aria-hidden="true" role="img">
+                              {% if additional_UEIs_workbook.display == "completed" %}
+                                  {% uswds_sprite "check_circle" %}
+                              {% else %}
+                                  {% uswds_sprite "radio_button_unchecked" %}
+                              {% endif %}
+                          </svg>
+                      </div>
+                      <div class="usa-icon-list__content {% if additional_UEIs_workbook.created is True %} text-green {% else %} text-base-dark {% endif %}">
+                          <a class="usa-link text-bold"
+                             href="/report_submission/additional-ueis/{{ report_id | default_if_none:'' }}">Upload the Additional UEIs workbook</a>
+                          <p class="margin-0">
+                              This workbook is only necessary if the audit report covers multiple UEIs. It is completed by the auditee. List the additional UEIs covered by the audit, excluding the primary UEI.
+                          </p>
+                      </div>
+                  </li>
+                {% endif %}
+                <!-- Additional EINs -->
+                {% if additional_EINs_workbook.display != "hidden" %}
+                  <li class="usa-icon-list__item padding-bottom-2">
+                      <div class="usa-icon-list__icon {% if additional_EINs_workbook.completed == True %}text-green{% else %}text-base{% endif %}">
+                          <svg class="usa-icon margin-right-2" aria-hidden="true" role="img">
+                              {% if additional_EINs_workbook.display == "completed" %}
+                                  {% uswds_sprite "check_circle" %}
+                              {% else %}
+                                  {% uswds_sprite "radio_button_unchecked" %}
+                              {% endif %}
+                          </svg>
+                      </div>
+                      <div class="usa-icon-list__content {% if additional_EINs_workbook.created is True %} text-green {% else %} text-base-dark {% endif %}">
+                          <a class="usa-link text-bold"
+                             href="/report_submission/additional-ueis/{{ report_id | default_if_none:'' }}">Upload the Additional EINs workbook</a>
+                          <p class="margin-0">
+                              This workbook is only necessary if the audit report covers multiple EINs. It is completed by the auditee. List the additional EINs covered by the audit, excluding the primary EIN.
+                          </p>
+                      </div>
+                  </li>
+                {% endif %}
                 <!-- Secondary Auditors -->
-                <li class="usa-icon-list__item padding-bottom-2">
-                    <div class="usa-icon-list__icon {% if secondary_auditors_workbook.completed == True %}text-green{% else %}text-base{% endif %}">
-                        <svg class="usa-icon margin-right-2" aria-hidden="true" role="img">
-                            {% if secondary_auditors_workbook.completed == True %}
-                                {% uswds_sprite "check_circle" %}
-                            {% else %}
-                                {% uswds_sprite "radio_button_unchecked" %}
-                            {% endif %}
-                        </svg>
-                    </div>
-                    <div class="usa-icon-list__content {% if secondary_auditors_workbook.created is True %} text-green {% else %} text-base-dark {% endif %}">
-                        <a class="usa-link text-bold"
-                           href="/report_submission/secondary-auditors/{{ report_id | default_if_none:'' }}">Upload the Secondary Auditors workbook</a>
-                        <p class="margin-0">
-                            This workbook is only necessary if multiple auditors did the audit work. In these cases, the secondary auditors should enter their information in this workbook.
-                        </p>
-                    </div>
-                </li>
+                {% if secondary_auditors_workbook.display != "hidden" %}
+                  <li class="usa-icon-list__item padding-bottom-2">
+                      <div class="usa-icon-list__icon {% if secondary_auditors_workbook.completed == True %}text-green{% else %}text-base{% endif %}">
+                          <svg class="usa-icon margin-right-2" aria-hidden="true" role="img">
+                              {% if secondary_auditors_workbook.display == "completed" %}
+                                  {% uswds_sprite "check_circle" %}
+                              {% else %}
+                                  {% uswds_sprite "radio_button_unchecked" %}
+                              {% endif %}
+                          </svg>
+                      </div>
+                      <div class="usa-icon-list__content {% if secondary_auditors_workbook.created is True %} text-green {% else %} text-base-dark {% endif %}">
+                          <a class="usa-link text-bold"
+                             href="/report_submission/secondary-auditors/{{ report_id | default_if_none:'' }}">Upload the Secondary Auditors workbook</a>
+                          <p class="margin-0">
+                              This workbook is only necessary if multiple auditors did the audit work. In these cases, the secondary auditors should enter their information in this workbook.
+                          </p>
+                      </div>
+                  </li>
+                {% endif %}
                 <!-- Cross Validation -->
                 <li class="usa-icon-list__item padding-bottom-2">
                     <div class="usa-icon-list__icon text-base">

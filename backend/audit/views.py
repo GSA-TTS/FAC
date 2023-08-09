@@ -11,18 +11,8 @@ from django.utils.datastructures import MultiValueDictKeyError
 from django.utils.decorators import method_decorator
 from django.http import JsonResponse
 
-from audit.forms import (
-    UploadReportForm,
-    AuditInfoForm,
-    AuditorCertificationStep1Form,
-    AuditorCertificationStep2Form,
-    AuditeeCertificationStep1Form,
-    AuditeeCertificationStep2Form,
-)
-
 from config.settings import AGENCY_NAMES, GAAP_RESULTS
-from .fixtures.excel import FORM_SECTIONS
-
+from audit.cross_validation import sac_validation_shape
 from audit.excel import (
     extract_additional_ueis,
     extract_federal_awards,
@@ -32,17 +22,13 @@ from audit.excel import (
     extract_secondary_auditors,
     extract_notes_to_sefa,
 )
-from audit.validators import (
-    validate_additional_ueis_json,
-    validate_audit_information_json,
-    validate_auditee_certification_json,
-    validate_auditor_certification_json,
-    validate_corrective_action_plan_json,
-    validate_federal_award_json,
-    validate_findings_text_json,
-    validate_findings_uniform_guidance_json,
-    validate_notes_to_sefa_json,
-    validate_secondary_auditors_json,
+from audit.forms import (
+    UploadReportForm,
+    AuditInfoForm,
+    AuditorCertificationStep1Form,
+    AuditorCertificationStep2Form,
+    AuditeeCertificationStep1Form,
+    AuditeeCertificationStep2Form,
 )
 from audit.mixins import (
     CertifyingAuditeeRequiredMixin,
@@ -56,6 +42,20 @@ from audit.models import (
     SingleAuditChecklist,
     SingleAuditReportFile,
 )
+from audit.validators import (
+    validate_additional_ueis_json,
+    validate_audit_information_json,
+    validate_auditee_certification_json,
+    validate_auditor_certification_json,
+    validate_corrective_action_plan_json,
+    validate_federal_award_json,
+    validate_findings_text_json,
+    validate_findings_uniform_guidance_json,
+    validate_notes_to_sefa_json,
+    validate_secondary_auditors_json,
+)
+from .fixtures.excel import FORM_SECTIONS
+
 
 logger = logging.getLogger(__name__)
 
@@ -648,7 +648,110 @@ class SubmissionView(CertifyingAuditeeRequiredMixin, generic.View):
             raise PermissionDenied("You do not have access to this audit.")
 
 
+def submission_progress_check(
+    sac: SingleAuditChecklist, sar: SingleAuditReportFile
+) -> dict:
+    """
+    Given a SingleAuditChecklist instance and a SingleAuditReportFile instance,
+    return information about submission progress.
+
+    Returns this shape:
+
+        {
+            "complete": [bool],
+            "single_audit_report": [progress_dict],
+            "additional_ueis": [progress_dict],
+            ...
+            "general_information": [progress_dict],
+        }
+
+    Where each of the sections is represented at the top level, along with
+    single_audit_report, and [progress_dict] is:
+
+        {
+            "display": "hidden"/"incomplete"/"complete",
+            "completed": [bool],
+            "completed_by": [email],
+            "completed_date": [date],
+        }
+    """
+    # Use sac_validation_shape as source of truth for list of sections:
+    shaped_sac = sac_validation_shape(sac)
+    sections = shaped_sac["sf_sac_sections"]
+    shape = {k: None for k in sections}
+    progress = {
+        "display": None,
+        "completed": None,
+        "completed_by": None,
+        "completed_date": None,
+    }
+
+    conditional_keys = {
+        "additional_ueis": sac.multiple_ueis_covered,
+        "additional_eins": sac.multiple_eins_covered,
+        "secondary_auditors": False,  # update this once we have the question in.
+    }
+
+    for key, value in conditional_keys.items():
+        current = "incomplete"
+        if not value:
+            current = "hidden"
+        elif sections.get(key):
+            current = "complete"
+        info = {"display": current, "completed": current == "completed"}
+        shape[key] = progress | info
+
+    other_keys = [k for k in shape if k not in conditional_keys]
+    for k in other_keys:
+        if bool(sections[k]):
+            info = progress | {"display": "complete", "completed": True}
+        else:
+            info = progress | {"display": "incomplete", "completed": False}
+        shape[k] = info
+
+    sar_progress = {
+        "display": "complete" if bool(sar) else "incomplete",
+        "completed": bool(sar),
+    }
+
+    shape["single_audit_report"] = progress | sar_progress
+
+    complete = False
+
+    def cond_pass(cond_key):
+        passing = ("hidden", "complete")
+        return shape.get(cond_key, {}).get("display") in passing
+
+    if all(bool(sections[k]) for k in other_keys):
+        if all(cond_pass[j] for j in other_keys):
+            complete = True
+
+    shape["complete"] = complete
+
+    return shape
+
+
 class SubmissionProgressView(SingleAuditChecklistAccessRequiredMixin, generic.View):
+    """
+    Display information about and the current status of the sections of the submission,
+    including links to the pages for the sections.
+
+    The following sections have three states, rather than two:
+
+    +   Additionai UEIs
+    +   Additionai EINs
+    +   Secondary Auditors
+
+    The states are:
+
+    +   hidden
+    +   incomplete
+    +   complete
+
+    In each case, they are hidden if the corresponding question in the General
+    Information form has been answered with a negative response.
+    """
+
     def get(self, request, *args, **kwargs):
         report_id = kwargs["report_id"]
 
@@ -661,26 +764,31 @@ class SubmissionProgressView(SingleAuditChecklistAccessRequiredMixin, generic.Vi
             except SingleAuditReportFile.DoesNotExist:
                 audit_report = None
 
-            # TODO: Ensure the correct SAC elements are used to determine what's complete.
-            additional_ueis_completed = False
+            additional_ueis_display = "incomplete"
             if not sac.multiple_ueis_covered:
-                additional_ueis_completed = True
+                additional_ueis_display = "hidden"
             elif sac.additional_ueis:
-                additional_ueis_completed = True
+                additional_ueis_display = "complete"
 
-            secondary_auditors_completed = True
-            # 2023-08-07 it's not clear to me how this can be false; either
-            # they've uploaded nothing because there are no secondary auditors,
-            # or they've uploaded a valid secondary auditors workbook.
-            # The logic for checking whether other workbooks are necessary is
-            # complicated, but for now I'm going to allow skipping most of them
-            # for ease of testing.
-            # TODO this entire section should probably be elsewhere,
-            # with the logic for determining whether or not a submission is
-            # "finished" living in its own function―Tadhg
-            findings_text_complete = True
-            audit_findings_complete = True
-            corrective_action_plan_complete = True
+            additional_eins_display = "incomplete"
+            if not sac.multiple_eins_covered:
+                additional_eins_display = "hidden"
+            # 2023-08-08 uncomment this once we have sac.additional_eins
+            # elif sac.additional_eins:
+            #     additional_eins_display = "complete"
+
+            secondary_auditors_display = "incomplete"
+            # 2023-08-08 uncomment this once we have the auditors question in General
+            # Information.
+            # if not sac.multiple_ueis_covered:
+            #     secondary_auditors_display = "hidden"
+            # elif sac.secondary_auditors:
+            #     secondary_auditors_display = "complete"
+
+            findings_text_complete = bool(sac.findings_text)
+            audit_findings_complete = bool(sac.findings_uniform_guidance)
+            corrective_action_plan_complete = bool(sac.corrective_action_plan)
+            subcheck = submission_progress_check(sac, audit_report)
 
             context = {
                 "single_audit_checklist": {
@@ -691,6 +799,7 @@ class SubmissionProgressView(SingleAuditChecklistAccessRequiredMixin, generic.Vi
                     "completed_date": None,
                     "completed_by": None,
                 },
+                """
                 "federal_awards_workbook": {
                     "completed": bool(sac.federal_awards),
                     "completed_date": None,
@@ -717,12 +826,17 @@ class SubmissionProgressView(SingleAuditChecklistAccessRequiredMixin, generic.Vi
                     "completed_by": None,
                 },
                 "additional_UEIs_workbook": {
-                    "completed": additional_ueis_completed,
+                    "display": additional_ueis_display,
+                    "completed_date": None,
+                    "completed_by": None,
+                },
+                "additional_EINs_workbook": {
+                    "display": additional_eins_display,
                     "completed_date": None,
                     "completed_by": None,
                 },
                 "secondary_auditors_workbook": {
-                    "completed": secondary_auditors_completed,
+                    "display": secondary_auditors_display,
                     "completed_date": None,
                     "completed_by": None,
                 },
@@ -731,6 +845,7 @@ class SubmissionProgressView(SingleAuditChecklistAccessRequiredMixin, generic.Vi
                     "completed_date": None,
                     "completed_by": None,
                 },
+                """
                 "certification": {
                     "auditor_certified": bool(sac.auditor_certification),
                     "auditee_certified": sac.is_auditee_certified,
@@ -745,19 +860,34 @@ class SubmissionProgressView(SingleAuditChecklistAccessRequiredMixin, generic.Vi
                 "auditee_uei": sac.auditee_uei,
                 "user_provided_organization_type": sac.user_provided_organization_type,
             }
-            # Add all SF-SAC uploads to determine if the process is complete or not
-            context["SF_SAC_completed"] = (
-                context["federal_awards_workbook"]["completed"]
-                and context["audit_information_form"]["completed"]
-                and context["findings_text_workbook"]["completed"]
-                and context["CAP_workbook"]["completed"]
-                and context["additional_UEIs_workbook"]["completed"]
-                and context["secondary_auditors_workbook"]["completed"]
+            complete = False
+            always_required = (
+                bool(sac.general_information),
+                bool(sac.federal_awards),
+                bool(sac.audit_information),
+                findings_text_complete,
+                audit_findings_complete,
+                corrective_action_plan_complete,
             )
+            import json
 
+            logger.info("subcheck: %s", json.dumps(subcheck))
+            logger.info("always_required: %s", always_required)
+            passing = ("hidden", "complete")
+            conditional = (
+                additional_ueis_display in passing,
+                additional_eins_display in passing,
+                # Uncomment this once Secondary Auditors q is in General Information:
+                # secondary_auditors_display in passing,
+            )
+            if all(always_required) and all(conditional):
+                complete = True
+
+            # Add all SF-SAC uploads to determine if the process is complete or not
+            context["SF_SAC_completed"] = complete
             return render(request, "audit/submission-progress.html", context)
-        except SingleAuditChecklist.DoesNotExist:
-            raise PermissionDenied("You do not have access to this audit.")
+        except SingleAuditChecklist.DoesNotExist as err:
+            raise PermissionDenied("You do not have access to this audit.") from err
 
 
 class AuditInfoFormView(SingleAuditChecklistAccessRequiredMixin, generic.View):
