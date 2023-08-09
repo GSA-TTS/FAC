@@ -33,8 +33,10 @@
 #############################################################
 
 from collections import defaultdict
+
 # 2019 cfda table - Fix names when 2019 data is available
-from 2019models import cfda2019
+# from 2019models import cfda2019
+
 
 def calc_amount_expended_limit():
     MILLION = 1_000_000
@@ -47,59 +49,48 @@ def load_2019_federal_award_data():
 
 
 def auditee_2019_submission_exists():
-    return False # for now
+    return False  # for now
 
 
-def calc_total_amounts(tot_amt_agency, tot_da_amt_agency, tot_da_amt_expended, fed_award_data):
+def calc_total_amounts_agency(fed_award_data):
+    agency = 0
+    tot_amount_agency = defaultdict(lambda: 0)
+    tot_da_amount_agency = defaultdict(lambda: 0)
+    tot_da_amount_expended = 0
     for award in fed_award_data["FederalAwards"]["federal_awards"]:
         agency = award["program"]["federal_agency_prefix"]
-        tot_amt_agency[agency] += award["program"]["amount_expended"]
+        tot_amount_agency[agency] += award["program"]["amount_expended"]
         if award["direct_or_indirect_award"]["is_direct"] == "Y":
-            tot_da_amt_expended += award["program"]["amount_expended"]
-            tot_da_amt_agency[agency] += award["program"]["amount_expended"]
+            tot_da_amount_expended += award["program"]["amount_expended"]
+            tot_da_amount_agency[agency] += award["program"]["amount_expended"]
 
-    tot_amt_agency = list(
-        sorted(tot_amt_agency.items(), reverse=True, key=lambda item: item[1])
+    tot_amount_agency = list(
+        sorted(tot_amount_agency.items(), reverse=True, key=lambda item: item[1])
     )
-    #   print("tot_amt_agency = ", tot_amt_agency)
+    # print("tot_amount_agency = ", tot_amount_agency)
 
-    tot_da_amt_agency = list(
-        sorted(tot_da_amt_agency.items(), reverse=True, key=lambda item: item[1])
+    tot_da_amount_agency = list(
+        sorted(tot_da_amount_agency.items(), reverse=True, key=lambda item: item[1])
     )
-    #   print("tot_da_amt_agency = ", tot_da_amt_agency)
+    # print("tot_da_amount_agency = ", tot_da_amount_agency)
 
-    #   print("tot_da_amt_expended = ", tot_da_amt_expended)
-    return tot_amt_agency, tot_da_amt_agency, tot_da_amt_expended
+    # print("tot_da_amount_expended = ", tot_da_amount_expended)
+
+    if (
+        tot_da_amount_expended
+        >= 0.25 * fed_award_data["FederalAwards"]["total_amount_expended"]
+    ):
+        agency, val = tot_da_amount_agency[0]
+    else:
+        agency, val = tot_amount_agency[0]
+    # print("cognizant agency = ", cog_agency)
+
+    return agency
 
 
 def cog_over_assignment(federal_awards_data):
     cog_agency = 0
     over_agency = 0
-    tot_amount_agency = defaultdict(lambda: 0)
-    tot_da_amount_agency = defaultdict(lambda: 0)
-    tot_da_amount_expended = 0
-
-    tot_amount_agency, tot_da_amount_agency, tot_da_amount_expended = \
-        calc_total_amounts(tot_amount_agency, tot_da_amount_agency, tot_da_amount_expended, federal_awards_data)
-
-    # for award in federal_awards_data["FederalAwards"]["federal_awards"]:
-    #     agency = award["program"]["federal_agency_prefix"]
-    #     tot_amount_agency[agency] += award["program"]["amount_expended"]
-    #     if award["direct_or_indirect_award"]["is_direct"] == "Y":
-    #         tot_da_amount_expended += award["program"]["amount_expended"]
-    #         tot_da_amount_agency[agency] += award["program"]["amount_expended"]
-
-    # tot_amount_agency = list(
-    #     sorted(tot_amount_agency.items(), reverse=True, key=lambda item: item[1])
-    # )
-    # #   print("tot_amount_agency = ", tot_amount_agency)
-
-    # tot_da_amount_agency = list(
-    #     sorted(tot_da_amount_agency.items(), reverse=True, key=lambda item: item[1])
-    # )
-    # #   print("tot_da_amount_agency = ", tot_da_amount_agency)
-
-    # #   print("tot_da_amount_expended = ", tot_da_amount_expended)
 
     if (
         federal_awards_data["FederalAwards"]["total_amount_expended"]
@@ -111,39 +102,12 @@ def cog_over_assignment(federal_awards_data):
         #       ####### Use 2019 Base year submission data
         #############################################################
         if auditee_2019_submission_exists():
-            tot_amount_agency_2019 = defaultdict(lambda: 0)
-            tot_da_amount_agency_2019 = defaultdict(lambda: 0)
-            tot_da_amount_expended_2019 = 0
-
-            tot_amount_agency_2019, tot_da_amount_agency_2019, tot_da_amount_expended_2019 = \
-                calc_total_amounts(tot_amount_agency_2019, tot_da_amount_agency_2019, tot_da_amount_expended_2019, federal_awards_data_2019)
-            
-            if (
-                tot_da_amount_expended_2019
-                >= 0.25 * federal_awards_data_2019["FederalAwards"]["total_amount_expended"]
-            ):
-                cog_agency, val = tot_da_amount_agency_2019[0]
-            else:
-                cog_agency, val = tot_amount_agency_2019[0]
-        #           print("cognizant agency = ", cog_agency)
+            federal_awards_data_2019 = federal_awards_data  # For now
+            cog_agency = calc_total_amounts_agency(federal_awards_data_2019)
         else:
-            if (
-                tot_da_amount_expended
-                >= 0.25 * federal_awards_data["FederalAwards"]["total_amount_expended"]
-            ):
-                cog_agency, val = tot_da_amount_agency[0]
-            else:
-                cog_agency, val = tot_amount_agency[0]
-        #           print("cognizant agency = ", cog_agency)
+            cog_agency = calc_total_amounts_agency(federal_awards_data)
     else:
         #       Oversight agency
-        if (
-            tot_da_amount_expended
-            >= 0.25 * federal_awards_data["FederalAwards"]["total_amount_expended"]
-        ):
-            over_agency, val = tot_da_amount_agency[0]
-        else:
-            over_agency, val = tot_amount_agency[0]
-        #       print("oversight agency = ", over_agency)
+        over_agency = calc_total_amounts_agency(federal_awards_data)
 
     return cog_agency, over_agency
