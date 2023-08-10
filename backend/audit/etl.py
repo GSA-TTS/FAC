@@ -27,6 +27,7 @@ class ETL(object):
         )
         self.audit_year = int(audit_date.split("-")[0])
         self.write_to_db = write_to_db
+        self.loaded_objects = []
 
     def load_all(self):
         load_methods = {
@@ -47,7 +48,11 @@ class ETL(object):
                 logger.warning(
                     f"{type(key_error).__name__} in {load_method.__name__}: {key_error}"
                 )
+        self.loaded_objects = results
         return results
+    
+    def get_loaded_objects(self):
+        return self.loaded_objects
 
     def load_finding_texts(self):
         findings_text = self.single_audit_checklist.findings_text
