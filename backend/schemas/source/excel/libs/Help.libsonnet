@@ -69,7 +69,7 @@ local make_url = function(anchor)
   },
   // w
   wrong_workbook_template: {
-    text: 'The workbook you are trying to upload does not match the required template',
+    text: 'The workbook you tried to upload is for a different section.',
     link: make_url('section_name'),
   },
 }
