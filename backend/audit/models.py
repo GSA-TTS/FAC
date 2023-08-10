@@ -466,12 +466,13 @@ class AccessManager(models.Manager):
         instance creation would have to log out and in again to get the new
         access.
         """
-        try:
-            acc_user = User.objects.get(email=obj_data["email"])
-        except User.DoesNotExist:
-            acc_user = None
-        if acc_user:
-            obj_data["user"] = acc_user
+        if obj_data["email"]:
+            try:
+                acc_user = User.objects.get(email=obj_data["email"])
+            except User.DoesNotExist:
+                acc_user = None
+            if acc_user:
+                obj_data["user"] = acc_user
         return super().create(**obj_data)
 
 
