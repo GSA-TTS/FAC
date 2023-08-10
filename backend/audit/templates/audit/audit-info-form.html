@@ -6,7 +6,7 @@
             <div class="usa-navbar bg-primary-darker text-white width-full flex">
                 <p class="margin-left-2">
                     <a href="/" class="text-gray-10">My audit submissions</a> »
-                    <a href="/audit/submission-progress/{{ report_id }}"
+                    <a href="{% url 'audit:SubmissionProgress' report_id %}"
                        class="text-gray-10">{{ auditee_name | default_if_none:'' }}</a> »
                     <span class="text-bold">Audit information</span>
                 </p>

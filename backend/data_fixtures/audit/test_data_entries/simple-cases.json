@@ -46,6 +46,9 @@
   },
   "FederalAwardsCases": [
     {
+      "Meta": {
+        "section_name": "FederalAwardsExpended"
+      },
       "FederalAwards": {
         "auditee_uei": "AAA123456BBB",
         "total_amount_expended": 12345,
@@ -80,6 +83,9 @@
       }
     },
     {
+      "Meta": {
+        "section_name": "FederalAwardsExpended"
+      },
       "FederalAwards": {
         "auditee_uei": "AAA123456BBB",
         "total_amount_expended": 12345,
@@ -111,6 +117,9 @@
     }
   ],
   "AdditionalUeisCase": {
+    "Meta": {
+      "section_name": "AdditionalUeis"
+    },
     "AdditionalUEIs": {
       "auditee_uei": "AAA123456BBB",
       "additional_ueis_entries": [
@@ -121,6 +130,9 @@
     }
   },
   "CorrectiveActionPlanCase": {
+    "Meta": {
+      "section_name": "CorrectiveActionPlan"
+    },
     "CorrectiveActionPlan": {
       "auditee_uei": "AAA123456BBB",
       "corrective_action_plan_entries": [
@@ -133,6 +145,9 @@
     }
   },
   "FindingsTextCase": {
+    "Meta": {
+      "section_name": "FindingsText"
+    },
     "FindingsText": {
       "auditee_uei": "AAA123456BBB",
       "findings_text_entries": [
@@ -145,6 +160,9 @@
     }
   },
   "FindingsUniformGuidanceCase": {
+    "Meta": {
+      "section_name": "FindingsUniformGuidance"
+    },
     "FindingsUniformGuidance": {
       "auditee_uei": "AAA123456BBB",
       "findings_uniform_guidance_entries": [
@@ -170,6 +188,9 @@
     }
   },
   "SecondaryAuditorsCase": {
+    "Meta": {
+      "section_name": "SecondaryAuditors"
+    },
     "SecondaryAuditors": {
       "auditee_uei": "AAA123456BBB",
       "secondary_auditors_entries": [
@@ -189,6 +210,9 @@
     }
   },
   "NotesToSefaCase": {
+    "Meta": {
+      "section_name": "NotesToSefa"
+    },
     "NotesToSefa": {
       "auditee_uei": "AAA123456CCC",
       "accounting_policies": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. \nFusce in ipsum tempus, eleifend ipsum id, dignissim ipso lorem. Proin vel quam non metus placerat semper nec in nisi.",

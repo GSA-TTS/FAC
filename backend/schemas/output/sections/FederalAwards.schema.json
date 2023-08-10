@@ -712,8 +712,32 @@
          "title": "FederalAward",
          "type": "object",
          "version": 20230408
+      },
+      "Meta": {
+         "additionalProperties": false,
+         "properties": {
+            "section_name": {
+               "enum": [
+                  "FederalAwardsExpended"
+               ],
+               "type": "string"
+            },
+            "version": {
+               "const": "1.0.0",
+               "type": "string"
+            }
+         },
+         "required": [
+            "section_name"
+         ],
+         "title": "Meta",
+         "type": "object",
+         "version": 20230807
       }
    },
+   "required": [
+      "Meta"
+   ],
    "title": "UNNAMED",
    "type": "object",
    "version": 20230408

@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db.utils import IntegrityError
@@ -87,7 +87,7 @@ class SingleAuditChecklistTests(TestCase):
             ),
         )
 
-        now = datetime.now()
+        now = datetime.now(timezone.utc)
         for statuses_from, status_to, transition_name in cases:
             for status_from in statuses_from:
                 sac = baker.make(SingleAuditChecklist, submission_status=status_from)

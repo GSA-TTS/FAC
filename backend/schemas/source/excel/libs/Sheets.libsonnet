@@ -31,9 +31,9 @@ local y_or_n_range = open_range {
 // TODO: import from audits.fixtures.excel. Ref: https://github.com/GSA-TTS/FAC/issues/1673 
 local section_names = {
   CORRECTIVE_ACTION_PLAN: 'CorrectiveActionPlan',
-  FEDERAL_AWARDS_EXPENDED: 'FederalAwardsExpended',
-  FINDINGS_TEXT: 'FindingsText',
-  FINDINGS_UNIFORM_GUIDANCE: 'FindingsUniformGuidance',
+  FEDERAL_AWARDS: 'FederalAwardsExpended',
+  AUDIT_FINDINGS_TEXT: 'FindingsText',
+  FEDERAL_AWARDS_AUDIT_FINDINGS: 'FindingsUniformGuidance',
   ADDITIONAL_UEIS: 'AdditionalUeis',
   SECONDARY_AUDITORS: 'SecondaryAuditors',
   NOTES_TO_SEFA: 'NotesToSefa',

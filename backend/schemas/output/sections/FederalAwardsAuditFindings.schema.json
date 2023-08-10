@@ -8580,8 +8580,32 @@
          "title": "FindingsUniformGuidance",
          "type": "object",
          "version": 20230410
+      },
+      "Meta": {
+         "additionalProperties": false,
+         "properties": {
+            "section_name": {
+               "enum": [
+                  "FindingsUniformGuidance"
+               ],
+               "type": "string"
+            },
+            "version": {
+               "const": "1.0.0",
+               "type": "string"
+            }
+         },
+         "required": [
+            "section_name"
+         ],
+         "title": "Meta",
+         "type": "object",
+         "version": 20230807
       }
    },
+   "required": [
+      "Meta"
+   ],
    "title": "UNNAMED",
    "type": "object",
    "version": 20230410

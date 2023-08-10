@@ -14,7 +14,7 @@ from django.http import JsonResponse
 from audit.forms import UploadReportForm, AuditInfoForm
 
 from config.settings import AGENCY_NAMES, GAAP_RESULTS
-from .fixtures.excel import FORM_SECTIONS
+from .fixtures.excel import FORM_SECTIONS, UNKNOWN_WORKBOOK
 
 from audit.excel import (
     extract_additional_ueis,
@@ -47,6 +47,7 @@ from audit.models import (
     SingleAuditReportFile,
 )
 from audit.validators import validate_audit_information_json
+from audit.utils import ExcelExtractionError
 
 logging.basicConfig(
     format="%(asctime)s %(levelname)-8s %(module)s:%(lineno)d %(message)s"
@@ -191,6 +192,7 @@ class ExcelFileHandlerView(SingleAuditChecklistAccessRequiredMixin, generic.View
             self._save_audit_data(sac, form_section, audit_data)
 
             return redirect("/")
+
         except SingleAuditChecklist.DoesNotExist as err:
             logger.warning("no SingleAuditChecklist found with report ID %s", report_id)
             raise PermissionDenied() from err
@@ -206,6 +208,12 @@ class ExcelFileHandlerView(SingleAuditChecklistAccessRequiredMixin, generic.View
         except KeyError as err:
             logger.warning("Field error. Field: %s", err)
             return JsonResponse({"errors": str(err), "type": "error_field"}, status=400)
+        except ExcelExtractionError as err:
+            if err.error_key == UNKNOWN_WORKBOOK:
+                return JsonResponse(
+                    {"errors": str(err), "type": UNKNOWN_WORKBOOK}, status=400
+                )
+            raise JsonResponse({"errors": list(err), "type": "error_row"}, status=400)
         except LateChangeError:
             logger.warning("Attempted late change.")
             return JsonResponse(
@@ -443,34 +451,44 @@ class SubmissionProgressView(SingleAuditChecklistAccessRequiredMixin, generic.Vi
         try:
             sac = SingleAuditChecklist.objects.get(report_id=report_id)
             try:
-                audit_report = SingleAuditReportFile.objects.filter(
-                    sac_id=sac.id
-                ).latest("date_created")
+                sar = SingleAuditReportFile.objects.filter(sac_id=sac.id).latest(
+                    "date_created"
+                )
             except SingleAuditReportFile.DoesNotExist:
-                audit_report = None
+                sar = None
+
+            submission_status_order = [
+                "in_progress",
+                "ready_for_certification",
+                "auditor_certified",
+                "auditee_certified",
+                "certified",
+                "submitted",
+            ]
 
             # TODO: Ensure the correct SAC elements are used to determine what's complete.
             context = {
                 "single_audit_checklist": {
                     "created": True,
-                    "created_date": sac.date_created,
+                    "created_date": sac.date_created.strftime(
+                        "%b %d,%Y at %H:%M %p %Z"
+                    ),
                     "created_by": sac.submitted_by,
                     "completed": False,
                     "completed_date": None,
                     "completed_by": None,
                 },
+                "audit_report": {
+                    "completed": True if (sar) else False,
+                    "completed_date": sar.date_created.strftime(
+                        "%b %d,%Y at %H:%M %p %Z"
+                    )
+                    if (sar)
+                    else None,
+                    "completed_by": None,
+                },
                 "federal_awards_workbook": {
                     "completed": True if (sac.federal_awards) else False,
-                    "completed_date": None,
-                    "completed_by": None,
-                },
-                "audit_information_form": {
-                    "completed": True if (sac.audit_information) else False,
-                    "completed_date": None,
-                    "completed_by": None,
-                },
-                "findings_text_workbook": {
-                    "completed": True if (sac.findings_text) else False,
                     "completed_date": None,
                     "completed_by": None,
                 },
@@ -479,8 +497,18 @@ class SubmissionProgressView(SingleAuditChecklistAccessRequiredMixin, generic.Vi
                     "completed_date": None,
                     "completed_by": None,
                 },
+                "findings_text_workbook": {
+                    "completed": True if (sac.findings_text) else False,
+                    "completed_date": None,
+                    "completed_by": None,
+                },
                 "CAP_workbook": {
                     "completed": True if (sac.corrective_action_plan) else False,
+                    "completed_date": None,
+                    "completed_by": None,
+                },
+                "audit_information_form": {
+                    "completed": True if (sac.audit_information) else False,
                     "completed_date": None,
                     "completed_by": None,
                 },
@@ -494,14 +522,21 @@ class SubmissionProgressView(SingleAuditChecklistAccessRequiredMixin, generic.Vi
                     "completed_date": None,
                     "completed_by": None,
                 },
-                "audit_report": {
-                    "completed": True if audit_report else False,
-                    "completed_date": None,
-                    "completed_by": None,
+                "pre_submission_validation": {
+                    "completed": submission_status_order.index(sac.submission_status)
+                    > submission_status_order.index("in_progress"),
                 },
-                "certification": {
-                    "auditee_certified": sac.is_auditee_certified,
-                    "auditor_certified": sac.is_auditor_certified,
+                "auditor_certified": {
+                    "enabled": sac.submission_status == "ready_for_certification",
+                    "completed": submission_status_order.index(sac.submission_status)
+                    > submission_status_order.index("auditor_certified"),
+                    "completed_date": None,
+                },
+                "auditee_certified": {
+                    "enabled": sac.submission_status == "auditor_certified",
+                    "completed": submission_status_order.index(sac.submission_status)
+                    > submission_status_order.index("auditee_certified"),
+                    "completed_date": None,
                 },
                 "submission": {
                     "completed": sac.is_submitted,
@@ -513,17 +548,19 @@ class SubmissionProgressView(SingleAuditChecklistAccessRequiredMixin, generic.Vi
                 "auditee_uei": sac.auditee_uei,
                 "user_provided_organization_type": sac.user_provided_organization_type,
             }
-            # Add all SF-SAC uploads to determine if the process is complete or not
-            context["SF_SAC_completed"] = (
+            # Ensure required uploads are complete
+            context["SFSAC_completed"] = (
                 context["federal_awards_workbook"]["completed"]
-                and context["audit_information_form"]["completed"]
+                and context["federal_awards_workbook"]["completed"]
+                and context["audit_findings_workbook"]["completed"]
                 and context["findings_text_workbook"]["completed"]
                 and context["CAP_workbook"]["completed"]
-                and context["additional_UEIs_workbook"]["completed"]
-                and context["secondary_auditors_workbook"]["completed"]
+                and context["audit_information_form"]["completed"]
             )
 
-            return render(request, "audit/submission-progress.html", context)
+            return render(
+                request, "audit/submission_checklist/submission-checklist.html", context
+            )
         except SingleAuditChecklist.DoesNotExist:
             raise PermissionDenied("You do not have access to this audit.")
 
@@ -708,6 +745,7 @@ class UploadReportView(SingleAuditChecklistAccessRequiredMixin, generic.View):
 
             if form.is_valid():
                 file = request.FILES["upload_report"]
+                print("hi", form.cleaned_data)
 
                 component_page_numbers = {
                     "financial_statements": form.cleaned_data["financial_statements"],

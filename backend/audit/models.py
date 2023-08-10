@@ -1,5 +1,5 @@
 import calendar
-from datetime import datetime
+from datetime import datetime, timezone
 from itertools import chain
 import json
 import logging
@@ -325,7 +325,7 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
             self.transition_name.append(
                 SingleAuditChecklist.STATUS.READY_FOR_CERTIFICATION
             )
-            self.transition_date.append(datetime.now())
+            self.transition_date.append(datetime.now(timezone.utc))
             return SingleAuditChecklist.STATUS.READY_FOR_CERTIFICATION
         return SingleAuditChecklist.STATUS.IN_PROGRESS
 
@@ -340,7 +340,7 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         the appropriate privileges will done at the view level.
         """
         self.transition_name.append(SingleAuditChecklist.STATUS.AUDITOR_CERTIFIED)
-        self.transition_date.append(datetime.now())
+        self.transition_date.append(datetime.now(timezone.utc))
 
     @transition(
         field="submission_status",
@@ -353,7 +353,7 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         the appropriate privileges will done at the view level.
         """
         self.transition_name.append(SingleAuditChecklist.STATUS.AUDITEE_CERTIFIED)
-        self.transition_date.append(datetime.now())
+        self.transition_date.append(datetime.now(timezone.utc))
 
     @transition(
         field="submission_status",
@@ -366,7 +366,7 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         the appropriate privileges will done at the view level.
         """
         self.transition_name.append(SingleAuditChecklist.STATUS.CERTIFIED)
-        self.transition_date.append(datetime.now())
+        self.transition_date.append(datetime.now(timezone.utc))
 
     @transition(
         field="submission_status",
@@ -386,7 +386,7 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
             etl.load_all()
 
         self.transition_name.append(SingleAuditChecklist.STATUS.SUBMITTED)
-        self.transition_date.append(datetime.now())
+        self.transition_date.append(datetime.now(timezone.utc))
 
     @transition(
         field="submission_status",
@@ -413,7 +413,7 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         changes have been made at that point.
         """
         self.transition_name.append(SingleAuditChecklist.STATUS.SUBMITTED)
-        self.transition_date.append(datetime.now())
+        self.transition_date.append(datetime.now(timezone.utc))
 
     @property
     def is_auditee_certified(self):
@@ -456,11 +456,33 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         return None
 
 
+class AccessManager(models.Manager):
+    """Custom manager for Access."""
+
+    def create(self, **obj_data):
+        """
+        Check for existing users and add them at access creation time.
+        Not doing this would mean that users logged in at time of Access
+        instance creation would have to log out and in again to get the new
+        access.
+        """
+        if obj_data["email"]:
+            try:
+                acc_user = User.objects.get(email=obj_data["email"])
+            except User.DoesNotExist:
+                acc_user = None
+            if acc_user:
+                obj_data["user"] = acc_user
+        return super().create(**obj_data)
+
+
 class Access(models.Model):
     """
     Email addresses which have been granted access to SAC instances.
     An email address may be associated with a User ID if an FAC account exists.
     """
+
+    objects = AccessManager()
 
     ROLES = (
         ("certifying_auditee_contact", _("Auditee Certifying Official")),
