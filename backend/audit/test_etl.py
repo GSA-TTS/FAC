@@ -325,7 +325,7 @@ class ETLTests(TestCase):
         print("general gaap_results:", general.gaap_results, sac.audit_information)
         self.assertEquals(sac.audit_information["gaap_results"], general.gaap_results)
 
-    def test_load_all(self):
+    def test_load_all(self, ret=False):
         """On a happy path through load_all(), item(s) should be added to all of the
         tables."""
         len_general = len(General.objects.all())
@@ -346,9 +346,11 @@ class ETLTests(TestCase):
         self.sac = sac
         self.etl = ETL(self.sac)
         self.report_id = sac.report_id
-        self.etl.load_all()
+        objects = self.etl.load_all()
         self.assertLess(len_general, len(General.objects.all()))
         self.assertLess(len_captext, len(CapText.objects.all()))
+        if ret:
+            return objects 
 
     def test_load_all_with_errors_1(self):
         """If we encounter a KeyError on General (the first table to be loaded), we
@@ -403,3 +405,14 @@ class ETLTests(TestCase):
         self.etl.load_all()
         self.assertLess(len_general, len(General.objects.all()))
         self.assertEqual(len_captext, len(CapText.objects.all()))
+
+    def test_load_and_return_objects(self):
+        objs = self.test_load_all(ret=True)
+        keys = ['Generals', 'SecondaryAuditors', 'FederalAwards', 
+                'Findings', 'FindingTexts', 'Passthroughs', 'CapTexts'
+        ]
+        for k, v in objs.items():
+            assert(k in keys)
+            assert(len(v) > 0)
+            for obj in v:
+                assert(obj is not None)
