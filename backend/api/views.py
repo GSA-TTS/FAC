@@ -121,33 +121,21 @@ def access_and_submission_check(user, data):
 
         # Create all contact Access objects
         Access.objects.create(sac=sac, role="editor", email=user.email, user=user)
-        cert_auditee_access = Access.objects.create(
+        Access.objects.create(
             sac=sac,
             role="certifying_auditee_contact",
             email=serializer.data.get("certifying_auditee_contact"),
         )
-        cert_auditor_access = Access.objects.create(
+        Access.objects.create(
             sac=sac,
             role="certifying_auditor_contact",
             email=serializer.data.get("certifying_auditor_contact"),
         )
-        editor_accesses = []
-        for contact in serializer.data.get("auditee_contacts"):
-            editor = Access.objects.create(sac=sac, role="editor", email=contact)
-            editor_accesses.append(editor)
-        for contact in serializer.data.get("auditor_contacts"):
-            editor = Access.objects.create(sac=sac, role="editor", email=contact)
-            editor_accesses.append(editor)
 
-        to_reify = editor_accesses + [cert_auditee_access] + [cert_auditor_access]
-        for access in to_reify:
-            try:
-                acc_user = UserModel.objects.get(email=access.email)
-            except UserModel.DoesNotExist:
-                acc_user = None
-            if acc_user:
-                access.user = acc_user
-                access.save()
+        for contact in serializer.data.get("auditee_contacts"):
+            Access.objects.create(sac=sac, role="editor", email=contact)
+        for contact in serializer.data.get("auditor_contacts"):
+            Access.objects.create(sac=sac, role="editor", email=contact)
 
         sac.save()
 
