@@ -64,6 +64,7 @@ class ETLTests(TestCase):
             "auditor_country": "United States",
             "auditor_firm_name": fake.company(),
             "audit_period_covered": "annual",
+            "audit_period_other_months": None,
             "auditee_contact_name": fake.name(),
             "auditor_contact_name": fake.name(),
             "auditee_contact_title": "Boss",
@@ -322,7 +323,6 @@ class ETLTests(TestCase):
         self.etl.load_audit_info()
         general = General.objects.first()
         sac = SingleAuditChecklist.objects.first()
-        print("general gaap_results:", general.gaap_results, sac.audit_information)
         self.assertEquals(sac.audit_information["gaap_results"], general.gaap_results)
 
     def test_load_all(self):

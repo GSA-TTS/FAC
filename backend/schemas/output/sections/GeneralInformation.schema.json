@@ -131,6 +131,10 @@
       "audit_period_covered": {
          "$ref": "#/$defs/AuditPeriod"
       },
+      "audit_period_other_months": {
+         "pattern": "^[0-1][0-9]$",
+         "type": "string"
+      },
       "audit_type": {
          "description": "Type of audit being submitted",
          "enum": [
