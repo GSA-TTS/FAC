@@ -11,11 +11,10 @@ from django.utils.datastructures import MultiValueDictKeyError
 from django.utils.decorators import method_decorator
 from django.http import JsonResponse
 
-from audit.forms import UploadReportForm, AuditInfoForm
-
 from config.settings import AGENCY_NAMES, GAAP_RESULTS
 from .fixtures.excel import FORM_SECTIONS
 
+from audit.etl import ETL
 from audit.excel import (
     extract_additional_ueis,
     extract_federal_awards,
@@ -25,15 +24,7 @@ from audit.excel import (
     extract_secondary_auditors,
     extract_notes_to_sefa,
 )
-from audit.validators import (
-    validate_additional_ueis_json,
-    validate_federal_award_json,
-    validate_corrective_action_plan_json,
-    validate_findings_text_json,
-    validate_findings_uniform_guidance_json,
-    validate_secondary_auditors_json,
-    validate_notes_to_sefa_json,
-)
+from audit.forms import UploadReportForm, AuditInfoForm
 from audit.mixins import (
     CertifyingAuditeeRequiredMixin,
     CertifyingAuditorRequiredMixin,
@@ -46,7 +37,18 @@ from audit.models import (
     SingleAuditChecklist,
     SingleAuditReportFile,
 )
+from audit.validators import (
+    validate_additional_ueis_json,
+    validate_federal_award_json,
+    validate_corrective_action_plan_json,
+    validate_findings_text_json,
+    validate_findings_uniform_guidance_json,
+    validate_secondary_auditors_json,
+    validate_notes_to_sefa_json,
+)
 from audit.validators import validate_audit_information_json
+
+from dissemination.models import FederalAward, General
 
 logger = logging.getLogger(__name__)
 
@@ -794,3 +796,37 @@ class UploadReportView(SingleAuditChecklistAccessRequiredMixin, generic.View):
         except Exception as err:
             logger.info("Unexpected error in UploadReportView post.\n", err)
             raise BadRequest() from err
+
+
+class SummaryView(SingleAuditChecklistAccessRequiredMixin, generic.View):
+    def get(self, request, *args, **kwargs):
+        report_id = kwargs["report_id"]
+        try:
+            sac = SingleAuditChecklist.objects.get(report_id=report_id)
+
+            # If there's no awards in the dissemination tables, load them in. If there are already some there, the DB will throw an error when trying to enter duplicates.
+            # TODO: Fix up ETL such that it can either:
+            #       (a) Overwrite old entires
+            #       (b) Skip old entries and save only new ones
+            if not FederalAward.objects.filter(report_id=report_id).exists():
+                ETL(sac).load_federal_award()
+            awards = FederalAward.objects.filter(report_id=report_id).values()
+
+            if not General.objects.filter(report_id=report_id).exists():
+                ETL(sac).load_general()
+            general = General.objects.filter(report_id=report_id).values()[0]
+
+            context = {
+                "general": general,
+                "federal_awards": awards,
+                "auditee_name": sac.auditee_name,
+                "report_id": report_id,
+                "auditee_uei": sac.auditee_uei,
+            }
+
+            return render(request, "audit/summary.html", context)
+        except SingleAuditChecklist.DoesNotExist:
+            raise PermissionDenied("You do not have access to this audit.")
+        except Exception as e:
+            logger.info("Enexpected error in UploadReportView get.\n", e)
+            raise BadRequest()

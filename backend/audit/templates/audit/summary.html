@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% load static %}
+{% load field_name_to_label %}
+{% load sprite_helper %}
+{% block content %}
+    <div class="grid-row">
+        <div class="grid-container margin-top-6 margin-bottom-6">
+            <div id="audit-summary-content" class="usa-in-page-nav-container">
+                <aside class="usa-in-page-nav"
+                    data-title-text="On this page"
+                    data-title-heading-level="h2"
+                    data-scroll-offset="0"
+                    data-root-margin="0px 0px 0px 0px"
+                    data-threshold="1">
+                </aside>
+                <main id="main-content" class="main-content">
+                    {% comment %} General Information {% endcomment %}
+                    <div id="general-information" class="position-relative overflow-scroll">
+                        <h2 class="">General Information</h2>
+                        <div class="grid-row">
+                            {% for k, v in general.items %}
+                                <p class="margin-y-1 desktop:grid-col-6">
+                                    <strong>{{ k|field_name_to_label }}:</strong> {{ v }}
+                                </p>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% comment %} Federal Awards {% endcomment %}
+                    <div id="federal-awards" class="usa-table-container--scrollable">
+                        <h2 id="federal-awards-title" class="margin-bottom-3">
+                            <span>Federal Awards</span>
+                            <svg class="usa-icon padding-top-05 text-base font-sans-md"
+                                aria-hidden="true"
+                                role="img">
+                            {% uswds_sprite "more_vert" %}
+                            </svg>
+                            <span class="text-base">{{ federal_awards|length }}</span>
+                        </h2>
+                        <table id="federal-awards-table"
+                               class="usa-table usa-table--striped overflow-scroll">
+                            <thead>
+                                <tr>
+                                    {% for k in federal_awards.0 %}<th scope="col">{{ k|field_name_to_label }}</th>{% endfor %}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for award in federal_awards %}
+                                    <tr>
+                                        {% for k, v in award.items %}<td>{{ v }}</td>{% endfor %}
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </main>
+            </div>
+        </div>
+    </div>
+    {% include "audit-metadata.html" %}
+{% endblock content %}

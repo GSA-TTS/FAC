@@ -65,6 +65,11 @@ urlpatterns = [
         views.CrossValidationView.as_view(),
         name="CrossValidation",
     ),
+    path(
+        "summary/<str:report_id>",
+        views.SummaryView.as_view(),
+        name="Summary",
+    ),
 ]
 
 for form_section in FORM_SECTIONS:

@@ -4,7 +4,7 @@ SYSTEM_PYTHON  = $(or $(shell which python3), $(shell which python))
 PYTHON         = $(or $(wildcard $(VENV_PYTHON)), $(SYSTEM_PYTHON))
 
 all: venv deps clean source_data build_xlsx format_jsonnet build_templates build_sections 
-json: format_jsonnet build_templates build_templates
+json: format_jsonnet build_templates
 
 
 $(VENV_PYTHON):

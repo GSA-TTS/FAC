@@ -6,6 +6,7 @@
         <meta charset="UTF-8" />
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link rel="icon" href="{% static 'img/fac-logo.svg' %}" type="image/svg+xml">
         <link rel="stylesheet"
               href="{% static 'compiled/scss/main-post.css' %}"
               media="all"
@@ -28,7 +29,7 @@
     <body>
         {% include 'includes/header.html' %}
         {% include 'includes/DAP.html' %}
-        <main id="main-content">
+        <div id="page-content">
             {% block content %}{% endblock %}
             <div class="usa-modal usa-modal--lg"
                  id="legacy-fac-modal"
@@ -65,7 +66,7 @@
                     </div>
                 </div>
             </div>
-        </main>
+        </div>
         {% include 'includes/footer.html' %}
         <script src="{% static 'compiled/js/app.js' %}" type="text/javascript"></script>
 

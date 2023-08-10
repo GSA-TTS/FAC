@@ -11,14 +11,14 @@
         name (object)
 {% endcomment %}
 <p class="text-base margin-0">
-    {% if name %}
+    {% if name and time %}
         Completed {{ time }} by
         {% if name.first_name == '' %}
             {{ name.email }}.
         {% else %}
             {{ name.first_name }} {{ name.last_name }}.
         {% endif %}
-    {% else %}
+    {% elif time %}
         Completed {{ time }}.
     {% endif %}
 </p>
