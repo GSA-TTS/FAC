@@ -48,6 +48,9 @@ from audit.models import (
 )
 from audit.validators import validate_audit_information_json
 
+logging.basicConfig(
+    format="%(asctime)s %(levelname)-8s %(module)s:%(lineno)d %(message)s"
+)
 logger = logging.getLogger(__name__)
 
 
