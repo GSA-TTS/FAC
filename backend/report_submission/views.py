@@ -99,7 +99,6 @@ class AccessAndSubmissionFormView(LoginRequiredMixin, View):
 
         if report_id:
             return redirect(f"/report_submission/general-information/{report_id}")
-        # print("Error processing data: ", result)
         return redirect(reverse("report_submission:accessandsubmission"))
 
 
