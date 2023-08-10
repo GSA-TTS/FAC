@@ -18,7 +18,10 @@ if [[ "${ENV}" == "LOCAL" || "${ENV}" == "TESTING" ]]; then
 fi;
 
 # Migrate first
-python manage.py migrate && python manage.py create_api_schemas && python manage.py create_api_views
-python manage.py drop_deprecated_api_schemas_and_views
+python manage.py migrate
+python manage.py drop_deprecated_api_schema_and_views && 
+  python manage.py drop_api_schema && 
+  python manage.py create_api_schema && 
+  python manage.py create_api_views
 # Run the build/watch assets + run server at the same time
 npm run dev & python manage.py runserver 0.0.0.0:8000

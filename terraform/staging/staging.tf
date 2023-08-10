@@ -2,6 +2,7 @@ module "staging" {
   source                = "../shared/modules/env"
   cf_space_name         = "staging"
   new_relic_license_key = var.new_relic_license_key
+  pgrst_jwt_secret      = var.pgrst_jwt_secret
 
   database_plan         = "medium-gp-psql"
   postgrest_instances   = 1
