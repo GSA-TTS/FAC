@@ -12,7 +12,6 @@ from django.utils.decorators import method_decorator
 from django.http import JsonResponse
 
 from config.settings import AGENCY_NAMES, GAAP_RESULTS
-from .fixtures.excel import FORM_SECTIONS, UNKNOWN_WORKBOOK
 
 from audit.cross_validation import sac_validation_shape
 from audit.excel import (
@@ -58,7 +57,7 @@ from audit.validators import (
     validate_secondary_auditors_json,
 )
 
-from .fixtures.excel import FORM_SECTIONS
+from .fixtures.excel import FORM_SECTIONS, UNKNOWN_WORKBOOK
 
 logger = logging.getLogger(__name__)
 
