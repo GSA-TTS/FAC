@@ -36,7 +36,7 @@
   },
   other_findings: {
     instructions: [
-      'Select "Y" if Modified Opinion, Other Matters, Material Weakness, and Significant Deficiency are all marked "N". If any of these fields are marked "Y", select "N".',
+      'Select "Y" if Modified Opinion, Other Matters, Material Weakness, and Significant Deficiency are all marked "N". Select "N" if any of these fields are marked "Y".',
     ],
   },
   questioned_costs: {

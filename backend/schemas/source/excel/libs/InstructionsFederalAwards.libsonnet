@@ -4,49 +4,128 @@
       'Enter the first two digits of the agency's CFDA number.',
     ],
   },
-  secondary_auditor_ein: {
+  three_digit_extension: {
     instructions: [
-      "Enter the auditing organization's EIN.",
+      'Enter the last three digits of the agency's CFDA number.',
+      'Programs with No CFDA Number or the CFDA Number is Unknown
+      If the three-digit CFDA extension is unknown, enter a “U” followed by a two-digit number in the CFDA extension to identify one or more Federal award lines that form the program.',
+      'Programs that are part of the R&D Cluster and the CFDA Number is Unknown
+      If the Federal program is part of the Research and Development (R&D) cluster and the three-digit CFDA extension is unknown, enter “RD” in the CFDA Three-Digit Extension field.',
+      If the Federal program is part of the R&D cluster and the CFDA Three-Digit Extension is known, enter the CFDA Three-Digit Extension.'
     ],
   },
-  secondary_auditor_address_street: {
+  additional_award_identification: {
     instructions: [
-      'Enter the street address for the auditing organization.',
+      'Enter non-CFDA identifying data for the award (e.g., program year, contract number, state issued numbers, etc.).',
+      'This field is required if you don't know the agency's CFDA extension. If you entered a valid extension in the previous field, this field can be left blank.'
     ],
   },
-  secondary_auditor_address_city: {
+  program_name: {
     instructions: [
-      'Enter the city for the auditing organization.',
+      'Enter the name of the Federal program as shown in the CFDA. If the program is not listed in the CFDA, enter a description of the award recognizable by the Federal awarding agency or pass-through entity.',
     ],
   },
-  secondary_auditor_address_state: {
+  amount_expended: {
     instructions: [
-      'Enter the state for the auditing organization.',
+      'Enter the amount of expenditures for each Federal award.',
     ],
   },
-  secondary_auditor_address_zipcode: {
+  cluster_name: {
     instructions: [
-      'Enter the zipcode for the auditing organization.',
+      'Select the name of the cluster of programs using the drop-down menu.',
+      'If the program is not part of a cluster, select “N/A” for no cluster.',
+      'If the cluster name is not on the drop-down list, select "Other Cluster Not Listed Above".',
     ],
   },
-  secondary_auditor_contact_name: {
+  state_cluster_name: {
     instructions: [
-      'Enter the first and last name of the secondary auditor.',
+      'If the program is part of a state cluster, enter the State Cluster name. If the program is not part of a state cluster, leave this blank.',
     ],
   },
-  secondary_auditor_contact_title: {
+  other_cluster_name: {
     instructions: [
-      'Enter the title of the secondary auditor.',
+      'If you selected "Other Cluster Not Listed Above" in the Cluster Name field, enter the cluster name here.',
     ],
   },
-  secondary_auditor_contact_phone: {
+  federal_program_total: {
     instructions: [
-      'Enter the phone number of the secondary auditor.',
+      'This field is auto-completed based on previous field responses.',
     ],
   },
-  secondary_auditor_contact_email: {
+  cluster_total: {
     instructions: [
-      'Enter the email address of the secondary auditor.',
+      'This field is auto-completed based on previous field responses.',
+    ],
+  },
+}
+  is_guaranteed: {
+    instructions: [
+      'Select "Y" if the program is a Federal loan or a Federal loan guarantee. If not, select "N".',
+    ],
+  },
+}
+  loan_balance_at_audit_period_end: {
+    instructions: [
+      'If the program is a Federal loan or a Federal loan guarantee, enter the loan or loan guarantee balance outstanding at the end of the audit period.',
+      'If the outstanding loan balance is not applicable, enter “N/A”.'
+    ],
+  },
+}
+  is_direct: {
+    instructions: [
+      'Select "Y" if the if the award came directly from a Federal awarding agency. If not, select "N".',
+    ],
+  },
+}
+  passthrough_name: {
+    instructions: [
+      'If the award did not come directly from a Federal awarding agency,enter the name of the pass-through entity.',
+    ],
+  },
+}
+  passthrough_identifying_number: {
+    instructions: [
+      'If the award did not come directly from a Federal awarding agency, enter the identifying number assigned by the pass-through entity.',
+      'If there is not an identifying number assigned by the pass-through entity, enter “N/A” in this field.'
+    ],
+  },
+}
+  is_passed: {
+    instructions: [
+      'Select "Y" if the auditee entity passed on the Federal award to a subrecpient. If not, select "N".',
+      'Direct awards transferred within departments of the auditee entity are not considered passthrough funds.',
+    ],
+  },
+}
+  subrecipient_amount: {
+    instructions: [
+      'Enter the amount passed through to the subrecipient.',
+    ],
+  },
+}
+  is_major: {
+    instructions: [
+      'Select "Y" if the Federal program is a major program, as defined in 2 CFR 200.518. If not, select "N".',
+    ],
+  },
+}
+  audit_report_type: {
+    instructions: [
+      'If the Federal program is a major program, enter the letter (U, Q, A, or D) for the type of audit report on the major program.',
+      '"U" for Unmodified opinion',
+      '"Q" for Qualified opinion',
+      '"A" for Adverse opinion',
+      '"D" for Disclaimer of opinion',
+      'The type of audit report applies to all programs in a cluster. For clusters, enter the same letter for all programs in each.',
+      'If a CFDA number has multiple lines, each line must have the same major program determination and type of audit report.',
+      'If the program is not a major program, leave this field blank.'
+    ],
+  },
+}
+  number_of_audit_findings: {
+    instructions: [
+      'Enter the number of audit findings for each Federal program. If there are no audit findings, enter “0” (zero).',
+      'If the type of audit report is "Adverse opinion" or "Qualified opinion", this field cannot be 0 (zero).',
     ],
   },
 }
