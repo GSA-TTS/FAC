@@ -78,7 +78,7 @@ class CogOverAssignmentTests(TestCase):
 
     def test_cog_over_assignment(self):
         try:
-            cog_agency, over_agency = cog_over_assignment(self.federal_awards_for_test)
+            cog_agency, over_agency = cog_over_assignment(self.federal_awards_for_test, '731084819')
         except Exception as err:
             msg = f"cog_over_assignment failed!, got {type(err)}"
             self.fail(msg)

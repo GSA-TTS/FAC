@@ -115,6 +115,7 @@ INSTALLED_APPS += [
     "cms",
     # "data_distro",
     "dissemination",
+    "census2019",
 ]
 
 MIDDLEWARE = [
@@ -210,7 +211,7 @@ STATIC_URL = "/static/"
 
 # Environment specific configurations
 DEBUG = False
-if ENVIRONMENT not in ["DEVELOPMENT", "PREVIEW", "STAGING", "PRODUCTION"]:
+if ENVIRONMENT not in ["DEVELOPMENT", "STAGING", "PRODUCTION"]:
     # Local environment and Testing environment (CI/CD/GitHub Actions)
 
     if ENVIRONMENT == "LOCAL":
