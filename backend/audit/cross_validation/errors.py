@@ -22,3 +22,10 @@ def err_auditee_ueis_match():
 
 def err_awards_findings_but_no_findings_text():
     return "There are findings indicated in Federal Awards but" "none in Findings Text."
+
+
+def err_missing_tribal_data_sharing_consent():
+    return (
+        "As a tribal organization, you must complete the data "
+        "sharing consent statement before submitting your audit."
+    )
