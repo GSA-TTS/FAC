@@ -51,7 +51,7 @@ function handleErrors(error) {
       `Unknown workbook - The uploaded workbook template does not originate from SF-SAC.\n`,
       error
     );
-    info_box.innerHTML = `Unknown workbook - The uploaded workbook template does not originate from SF-SAC. Please ensure you have uploaded the correct workbook. If this issue persists, contact an administrator.`;
+    info_box.innerHTML = `This does not look like a GSA SF-SAC workbook. Please download a workbook template from fac.gov for entering and submitting SF-SAC data.`;
   } else {
     // Catch all.
     console.error(`Unexpected error.\n`, error);
