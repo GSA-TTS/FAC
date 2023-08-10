@@ -186,10 +186,6 @@ class ExcelFileHandlerView(SingleAuditChecklistAccessRequiredMixin, generic.View
 
             audit_data = self._extract_and_validate_data(form_section, excel_file)
 
-            audit_data.pop(
-                "Meta", None
-            )  # FIXME Delete this line if Meta needs to be stored in the database.
-
             self._save_audit_data(sac, form_section, audit_data)
 
             return redirect("/")
