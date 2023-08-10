@@ -13,6 +13,7 @@ from dissemination.models import (
     SecondaryAuditor,
 )
 from audit.models import SingleAuditChecklist
+from copy import deepcopy as dc
 
 logger = logging.getLogger(__name__)
 
@@ -40,8 +41,8 @@ class ETL(object):
         results = {}
         for key, load_method in load_methods.items():
             try:
-                obj = load_method()
-                results[key] = obj
+                objs = load_method()
+                results[key] = objs
             except KeyError as key_error:
                 logger.warning(
                     f"{type(key_error).__name__} in {load_method.__name__}: {key_error}"
@@ -172,7 +173,7 @@ class ETL(object):
             )
             if self.write_to_db:
                 note.save()
-                sefa_objects.append(note)
+            sefa_objects.append(note)
         else:
             for entry in entries:
                 note = Note(
