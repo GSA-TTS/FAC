@@ -384,7 +384,6 @@ class GeneralInformationFormViewTests(TestCase):
         # assert that the text fields are populated in the returned form
         for field in text_fields:
             value = sac.general_information[field]
-            # print(f'{field}="{value}"')
 
             self.assertEqual(response.context[field], value)
             # self.assertContains(response, f'value="{value}"')
