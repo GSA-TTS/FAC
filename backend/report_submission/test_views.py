@@ -386,7 +386,6 @@ class GeneralInformationFormViewTests(TestCase):
             value = sac.general_information[field]
 
             self.assertEqual(response.context[field], value)
-            # self.assertContains(response, f'value="{value}"')
 
     def test_post_requires_login(self):
         """Requests to the POST endpoint require the user to be authenticated"""
