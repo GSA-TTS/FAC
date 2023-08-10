@@ -395,7 +395,7 @@ class ExcelFileHandlerViewTests(TestCase):
         # add valid data to the workbook
         workbook = load_workbook(FEDERAL_AWARDS_TEMPLATE, data_only=True)
         _set_by_name(workbook, "auditee_uei", ExcelFileHandlerViewTests.GOOD_UEI)
-        _set_by_name(workbook, "total_amount_expended", 200)
+        _set_by_name(workbook, "section_name", FORM_SECTIONS.FEDERAL_AWARDS_EXPENDED)
         _add_entry(workbook, 0, test_data[0])
 
         with NamedTemporaryFile(suffix=".xlsx") as tmp:
@@ -421,12 +421,6 @@ class ExcelFileHandlerViewTests(TestCase):
                 self.assertEqual(
                     updated_sac.federal_awards["FederalAwards"]["auditee_uei"],
                     ExcelFileHandlerViewTests.GOOD_UEI,
-                )
-                self.assertEqual(
-                    updated_sac.federal_awards["FederalAwards"][
-                        "total_amount_expended"
-                    ],
-                    200,
                 )
                 self.assertEqual(
                     len(updated_sac.federal_awards["FederalAwards"]["federal_awards"]),
@@ -518,6 +512,7 @@ class ExcelFileHandlerViewTests(TestCase):
         # add valid data to the workbook
         workbook = load_workbook(CORRECTIVE_ACTION_PLAN_TEMPLATE, data_only=True)
         _set_by_name(workbook, "auditee_uei", test_uei)
+        _set_by_name(workbook, "section_name", FORM_SECTIONS.CORRECTIVE_ACTION_PLAN)
 
         _add_entry(workbook, 0, test_data[0])
 
@@ -584,7 +579,7 @@ class ExcelFileHandlerViewTests(TestCase):
         # add valid data to the workbook
         workbook = load_workbook(FINDINGS_UNIFORM_GUIDANCE_TEMPLATE, data_only=True)
         _set_by_name(workbook, "auditee_uei", ExcelFileHandlerViewTests.GOOD_UEI)
-
+        _set_by_name(workbook, "section_name", FORM_SECTIONS.FINDINGS_UNIFORM_GUIDANCE)
         _add_entry(workbook, 0, test_data[0])
 
         with NamedTemporaryFile(suffix=".xlsx") as tmp:
@@ -658,7 +653,7 @@ class ExcelFileHandlerViewTests(TestCase):
         # add valid data to the workbook
         workbook = load_workbook(FINDINGS_TEXT_TEMPLATE, data_only=True)
         _set_by_name(workbook, "auditee_uei", ExcelFileHandlerViewTests.GOOD_UEI)
-
+        _set_by_name(workbook, "section_name", FORM_SECTIONS.FINDINGS_TEXT)
         _add_entry(workbook, 0, test_data[0])
 
         with NamedTemporaryFile(suffix=".xlsx") as tmp:
@@ -724,7 +719,7 @@ class ExcelFileHandlerViewTests(TestCase):
         # add valid data to the workbook
         workbook = load_workbook(SECONDARY_AUDITORS_TEMPLATE, data_only=True)
         _set_by_name(workbook, "auditee_uei", ExcelFileHandlerViewTests.GOOD_UEI)
-
+        _set_by_name(workbook, "section_name", FORM_SECTIONS.SECONDARY_AUDITORS)
         _add_entry(workbook, 0, test_data[0])
 
         with NamedTemporaryFile(suffix=".xlsx") as tmp:
@@ -896,7 +891,7 @@ class SingleAuditReportFileHandlerViewTests(TestCase):
         # add valid data to the workbook
         workbook = load_workbook(ADDITIONAL_UEIS_TEMPLATE, data_only=True)
         _set_by_name(workbook, "auditee_uei", ExcelFileHandlerViewTests.GOOD_UEI)
-
+        _set_by_name(workbook, "section_name", FORM_SECTIONS.ADDITIONAL_UEIS)
         _add_entry(workbook, 0, test_data[0])
 
         with NamedTemporaryFile(suffix=".xlsx") as tmp:
@@ -955,6 +950,7 @@ class SingleAuditReportFileHandlerViewTests(TestCase):
         _set_by_name(workbook, "accounting_policies", "Mandatory notes")
         _set_by_name(workbook, "is_minimis_rate_used", "N")
         _set_by_name(workbook, "rate_explained", "More explanation.")
+        _set_by_name(workbook, "section_name", FORM_SECTIONS.NOTES_TO_SEFA)
         _add_entry(workbook, 0, test_data[0])
 
         with NamedTemporaryFile(suffix=".xlsx") as tmp:

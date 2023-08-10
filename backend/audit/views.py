@@ -12,6 +12,8 @@ from django.utils.decorators import method_decorator
 from django.http import JsonResponse
 
 from config.settings import AGENCY_NAMES, GAAP_RESULTS
+from .fixtures.excel import FORM_SECTIONS, UNKNOWN_WORKBOOK
+
 from audit.cross_validation import sac_validation_shape
 from audit.excel import (
     extract_additional_ueis,
@@ -42,6 +44,7 @@ from audit.models import (
     SingleAuditChecklist,
     SingleAuditReportFile,
 )
+from audit.utils import ExcelExtractionError
 from audit.validators import (
     validate_additional_ueis_json,
     validate_audit_information_json,
@@ -54,8 +57,8 @@ from audit.validators import (
     validate_notes_to_sefa_json,
     validate_secondary_auditors_json,
 )
-from .fixtures.excel import FORM_SECTIONS
 
+from .fixtures.excel import FORM_SECTIONS
 
 logger = logging.getLogger(__name__)
 
@@ -197,6 +200,7 @@ class ExcelFileHandlerView(SingleAuditChecklistAccessRequiredMixin, generic.View
             self._save_audit_data(sac, form_section, audit_data)
 
             return redirect("/")
+
         except SingleAuditChecklist.DoesNotExist as err:
             logger.warning("no SingleAuditChecklist found with report ID %s", report_id)
             raise PermissionDenied() from err
@@ -212,6 +216,12 @@ class ExcelFileHandlerView(SingleAuditChecklistAccessRequiredMixin, generic.View
         except KeyError as err:
             logger.warning("Field error. Field: %s", err)
             return JsonResponse({"errors": str(err), "type": "error_field"}, status=400)
+        except ExcelExtractionError as err:
+            if err.error_key == UNKNOWN_WORKBOOK:
+                return JsonResponse(
+                    {"errors": str(err), "type": UNKNOWN_WORKBOOK}, status=400
+                )
+            raise JsonResponse({"errors": list(err), "type": "error_row"}, status=400)
         except LateChangeError:
             logger.warning("Attempted late change.")
             return JsonResponse(
