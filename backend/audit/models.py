@@ -1,5 +1,5 @@
 import calendar
-from datetime import date
+from datetime import datetime, timezone
 from itertools import chain
 import json
 import logging
@@ -340,7 +340,7 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
             self.transition_name.append(
                 SingleAuditChecklist.STATUS.READY_FOR_CERTIFICATION
             )
-            self.transition_date.append(date.today())
+            self.transition_date.append(datetime.now(timezone.utc))
             return SingleAuditChecklist.STATUS.READY_FOR_CERTIFICATION
         return SingleAuditChecklist.STATUS.IN_PROGRESS
 
@@ -355,7 +355,7 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         the appropriate privileges will done at the view level.
         """
         self.transition_name.append(SingleAuditChecklist.STATUS.AUDITOR_CERTIFIED)
-        self.transition_date.append(date.today())
+        self.transition_date.append(datetime.now(timezone.utc))
 
     @transition(
         field="submission_status",
@@ -368,7 +368,7 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         the appropriate privileges will done at the view level.
         """
         self.transition_name.append(SingleAuditChecklist.STATUS.AUDITEE_CERTIFIED)
-        self.transition_date.append(date.today())
+        self.transition_date.append(datetime.now(timezone.utc))
 
     @transition(
         field="submission_status",
@@ -381,7 +381,7 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         the appropriate privileges will done at the view level.
         """
         self.transition_name.append(SingleAuditChecklist.STATUS.CERTIFIED)
-        self.transition_date.append(date.today())
+        self.transition_date.append(datetime.now(timezone.utc))
 
     @transition(
         field="submission_status",
@@ -401,7 +401,7 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
             etl.load_all()
 
         self.transition_name.append(SingleAuditChecklist.STATUS.SUBMITTED)
-        self.transition_date.append(date.today())
+        self.transition_date.append(datetime.now(timezone.utc))
 
     @transition(
         field="submission_status",
@@ -428,7 +428,7 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         changes have been made at that point.
         """
         self.transition_name.append(SingleAuditChecklist.STATUS.SUBMITTED)
-        self.transition_date.append(date.today())
+        self.transition_date.append(datetime.now(timezone.utc))
 
     @property
     def is_auditee_certified(self):

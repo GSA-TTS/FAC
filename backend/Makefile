@@ -38,6 +38,8 @@ lint:
 	@mypy .
 	@echo "djlint:"
 	@djlint .
+	@echo eslint
+	@npx eslint --ignore-path ../.gitignore static/js
 
 # Run Django tests:
 test:

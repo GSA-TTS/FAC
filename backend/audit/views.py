@@ -1,4 +1,6 @@
 import logging
+import pprint
+
 
 from django.views import generic
 from django.views.decorators.csrf import csrf_exempt
@@ -790,18 +792,29 @@ class SubmissionProgressView(SingleAuditChecklistAccessRequiredMixin, generic.Vi
         try:
             sac = SingleAuditChecklist.objects.get(report_id=report_id)
             try:
-                audit_report = SingleAuditReportFile.objects.filter(
-                    sac_id=sac.id
-                ).latest("date_created")
+                sar = SingleAuditReportFile.objects.filter(sac_id=sac.id).latest(
+                    "date_created"
+                )
             except SingleAuditReportFile.DoesNotExist:
-                audit_report = None
+                sar = None
 
-            subcheck = submission_progress_check(sac, audit_report)
+            submission_status_order = [
+                "in_progress",
+                "ready_for_certification",
+                "auditor_certified",
+                "auditee_certified",
+                "certified",
+                "submitted",
+            ]
+
+            subcheck = submission_progress_check(sac, sar)
 
             context = {
                 "single_audit_checklist": {
                     "created": True,
-                    "created_date": sac.date_created,
+                    "created_date": sac.date_created.strftime(
+                        "%b %d,%Y at %H:%M %p %Z"
+                    ),
                     "created_by": sac.submitted_by,
                     "completed": False,
                     "completed_date": None,
@@ -809,12 +822,15 @@ class SubmissionProgressView(SingleAuditChecklistAccessRequiredMixin, generic.Vi
                 },
                 "certification": {
                     "auditor_certified": bool(sac.auditor_certification),
+                    "auditor_enabled": sac.submission_status == "ready_for_certification",
                     "auditee_certified": sac.is_auditee_certified,
+                    "auditee_enabled": sac.submission_status == "auditor_certified",
                 },
                 "submission": {
                     "completed": sac.submission_status == "submitted",
                     "completed_date": None,
                     "completed_by": None,
+                    "enabled": sac.submission_status == "auditee_certified",
                 },
                 "report_id": report_id,
                 "auditee_name": sac.auditee_name,
@@ -823,9 +839,7 @@ class SubmissionProgressView(SingleAuditChecklistAccessRequiredMixin, generic.Vi
             }
             context = context | subcheck
 
-            # Add all SF-SAC uploads to determine if the process is complete or not
-            context["SF_SAC_completed"] = context["complete"]
-            return render(request, "audit/submission-progress.html", context)
+            return render(request, "audit/submission_checklist/submission-checklist.html", context)
         except SingleAuditChecklist.DoesNotExist as err:
             raise PermissionDenied("You do not have access to this audit.") from err
 
@@ -1010,6 +1024,7 @@ class UploadReportView(SingleAuditChecklistAccessRequiredMixin, generic.View):
 
             if form.is_valid():
                 file = request.FILES["upload_report"]
+                print("hi", form.cleaned_data)
 
                 component_page_numbers = {
                     "financial_statements": form.cleaned_data["financial_statements"],

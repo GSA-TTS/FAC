@@ -23,6 +23,7 @@ local Types = Base.Types;
     audit_period_covered: {
       '$ref': '#/$defs/AuditPeriod',
     },
+    audit_period_other_months: Base.Compound.MonthsOther,
     auditee_address_line_1: Types.string {
       maxLength: 100,
     },
