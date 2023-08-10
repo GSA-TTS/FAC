@@ -1081,7 +1081,6 @@ class SubmissionProgressViewTests(TestCase):
         for section_name, camel_name in snake_to_camel.items():
             addl_sections[section_name] = {camel_name: "whatever"}
         addl_sections["general_information"] = info
-
         sac = baker.make(SingleAuditChecklist, **addl_sections)
         result = submission_progress_check(sac, None)
         self.assertEqual(result["general_information"]["display"], "complete")

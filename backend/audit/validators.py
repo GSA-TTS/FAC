@@ -287,6 +287,13 @@ def validate_auditee_certification_json(value):
     return value
 
 
+def validate_tribal_data_consent_json(value):
+    """
+    Apply JSON Schema for tribal data consent and report errors.
+    """
+    raise ValidationError("Not implemented")
+
+
 def validate_file_extension(file, allowed_extensions):
     """
     User-provided filenames must be have an allowed extension
