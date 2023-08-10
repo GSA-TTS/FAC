@@ -37,7 +37,6 @@ class EligibilityFormView(LoginRequiredMixin, View):
         if eligibility.get("eligible"):
             return redirect(reverse("report_submission:auditeeinfo"))
 
-        # print("Eligibility data error: ", eligibility)
         return redirect(reverse("report_submission:eligibility"))
 
 
