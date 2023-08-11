@@ -293,8 +293,12 @@ local email_regex = "^[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-zA-Z0-9!#$%&'*+/=?
 
 local REGEX_ZIPCODE = '^[0-9]{5}(?:-[0-9]{4})?$';
 local REGEX_DBKEY = '[1-9][0-9]+';
+local REGEX_MONTHS_OTHER = '^0[0-9]|1[0-8]$';
 local type_zipcode = Types.string {
   pattern: REGEX_ZIPCODE,
+};
+local type_months_other = Types.string {
+  pattern: REGEX_MONTHS_OTHER,
 };
 
 // UEIs are not case-sensitive, but we will upper-case all UEIs and store them
@@ -365,6 +369,7 @@ local Compound = {
     pattern: phone_regex,
   },
   Zip: type_zipcode,
+  MonthsOther: type_months_other,
 };
 
 

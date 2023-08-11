@@ -319,7 +319,7 @@ class IntakeToDissemination(object):
             audit_year=self.audit_year,
             audit_type=general_information["audit_type"],
             entity_type=general_information["user_provided_organization_type"],
-            number_months=None,  # TODO: Where does this come from?
+            number_months=general_information["audit_period_other_months"],
             audit_period_covered=general_information["audit_period_covered"],
             is_report_required=None,  # TODO: Notes say this hasn't been used since 2008.
             total_fed_expenditures=None,  # TODO: Where does this come from?

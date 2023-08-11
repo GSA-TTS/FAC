@@ -1,4 +1,7 @@
 {
+  "Meta": {
+    "section_name": "SecondaryAuditors"
+  },
   "SecondaryAuditors": {
     "auditee_uei": "AAA123456BBB",
     "secondary_auditors_entries": [
