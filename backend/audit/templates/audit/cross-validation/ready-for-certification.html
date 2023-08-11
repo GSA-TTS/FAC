@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+    <div class="grid-container margin-top-6 margin-bottom-6">
+        <div class="grid-row grid-gap">
+            <form class="tablet:grid-col-8" id="ready-for-certification" method="post">
+                {% csrf_token %}
+                <fieldset class="usa-fieldset">
+                    <legend class="usa-legend usa-legend--large" id="federal-awards">Lock for certification</legend>
+                    <p>The audit validates and is ready for certification.</p>
+                    <p>
+                        In order to certify, your submission must be locked. No further changes will be possible. Click to lock this audit for certification by the designated certifying officials.
+                    </p>
+                    <button class="usa-button margin-top-10" id="continue">Lock for Certification</button>
+                    <a href="{% url 'audit:CrossValidation' report_id %}">Back</a>
+                </fieldset>
+            </form>
+        </div>
+    </div>
+{% endblock content %}
