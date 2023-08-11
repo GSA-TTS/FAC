@@ -13,41 +13,46 @@ from dissemination.models import (
     SecondaryAuditor,
 )
 from audit.models import SingleAuditChecklist
+from copy import deepcopy as dc
 
 logger = logging.getLogger(__name__)
 
 
 class ETL(object):
-    def __init__(self, sac: SingleAuditChecklist) -> None:
+    def __init__(self, sac: SingleAuditChecklist, write_to_db=True) -> None:
         self.single_audit_checklist = sac
         self.report_id = sac.report_id
         audit_date = sac.general_information.get(
             "auditee_fiscal_period_start", datetime.now
         )
         self.audit_year = int(audit_date.split("-")[0])
+        self.write_to_db = write_to_db
 
     def load_all(self):
-        load_methods = (
-            self.load_general,
-            self.load_secondary_auditor,
-            self.load_federal_award,
-            self.load_findings,
-            self.load_passthrough,
-            self.load_finding_texts,
-            self.load_captext,
-            # self.load_audit_info()  # TODO: Uncomment when SingleAuditChecklist adds audit_information
-        )
-        for load_method in load_methods:
+        load_methods = {
+            'Generals': self.load_general,
+            'SecondaryAuditors': self.load_secondary_auditor,
+            'FederalAwards': self.load_federal_award,
+            'Findings': self.load_findings,
+            'FindingTexts': self.load_finding_texts,
+            'Passthroughs': self.load_passthrough,
+            'CapTexts': self.load_captext,
+        }
+        results = {}
+        for key, load_method in load_methods.items():
             try:
-                load_method()
+                objs = load_method()
+                results[key] = objs
             except KeyError as key_error:
                 logger.warning(
                     f"{type(key_error).__name__} in {load_method.__name__}: {key_error}"
                 )
+        return results
 
     def load_finding_texts(self):
         findings_text = self.single_audit_checklist.findings_text
         findings_text_entries = findings_text["FindingsText"]["findings_text_entries"]
+        findings_text_objects = []
         for entry in findings_text_entries:
             finding_text_ = FindingText(
                 report_id=self.report_id,
@@ -55,7 +60,11 @@ class ETL(object):
                 contains_chart_or_table=entry["contains_chart_or_table"] == "Y",
                 finding_text=entry["text_of_finding"],
             )
-            finding_text_.save()
+            if self.write_to_db:
+                finding_text_.save()
+            findings_text_objects.append(finding_text_)
+        return findings_text_objects
+
 
     def load_findings(self):
         findings_uniform_guidance = (
@@ -65,6 +74,7 @@ class ETL(object):
             "FindingsUniformGuidance"
         ]["findings_uniform_guidance_entries"]
 
+        findings_objects = []
         for entry in findings_uniform_guidance_entries:
             findings = entry["findings"]
             finding = Finding(
@@ -82,10 +92,14 @@ class ETL(object):
                 is_significant_deficiency=(entry["significant_deficiency"] == "Y"),
                 type_requirement=(entry["program"]["compliance_requirement"]),
             )
-            finding.save()
+            if self.write_to_db:
+                finding.save()        
+            findings_objects.append(finding)
+        return findings_objects
 
     def load_federal_award(self):
         federal_awards = self.single_audit_checklist.federal_awards
+        federal_awards_objects = []
         for entry in federal_awards["FederalAwards"]["federal_awards"]:
             program = entry["program"]
             loan = entry["loan_or_loan_guarantee"]
@@ -120,13 +134,17 @@ class ETL(object):
                 passthrough_amount=subrecipient_amount,
                 type_requirement=None,  # TODO: What is this?
             )
-            federal_award.save()
+            if self.write_to_db:
+                federal_award.save()
+            federal_awards_objects.append(federal_award)
+        return federal_awards_objects
 
     def load_captext(self):
         corrective_action_plan = self.single_audit_checklist.corrective_action_plan
         corrective_action_plan_entries = corrective_action_plan["CorrectiveActionPlan"][
             "corrective_action_plan_entries"
         ]
+        cap_text_objects = []
         for entry in corrective_action_plan_entries:
             cap_text = CapText(
                 report_id=self.report_id,
@@ -134,7 +152,10 @@ class ETL(object):
                 contains_chart_or_table=entry["contains_chart_or_table"] == "Y",
                 planned_action=entry["planned_action"],
             )
-            cap_text.save()
+            if self.write_to_db:
+                cap_text.save()
+            cap_text_objects.append(cap_text)
+        return cap_text_objects
 
     def load_note(self):
         notes_to_sefa = self.single_audit_checklist.notes_to_sefa["NotesToSefa"]
@@ -142,6 +163,7 @@ class ETL(object):
         is_minimis_rate_used = notes_to_sefa["is_minimis_rate_used"] == "Y"
         rate_explained = notes_to_sefa["rate_explained"]
         entries = notes_to_sefa["notes_to_sefa_entries"]
+        sefa_objects = []
         if not entries:
             note = Note(
                 report_id=self.report_id,
@@ -149,7 +171,9 @@ class ETL(object):
                 is_minimis_rate_used=is_minimis_rate_used,
                 rate_explained=rate_explained,
             )
-            note.save()
+            if self.write_to_db:
+                note.save()
+            sefa_objects.append(note)
         else:
             for entry in entries:
                 note = Note(
@@ -161,7 +185,10 @@ class ETL(object):
                     is_minimis_rate_used=is_minimis_rate_used,
                     rate_explained=rate_explained,
                 )
-                note.save()
+                if self.write_to_db:
+                    note.save()
+                sefa_objects.append(note)
+        return sefa_objects
 
     def load_revision(self):
         revision = Revision(
@@ -185,10 +212,13 @@ class ETL(object):
             audit_year=self.audit_year,
             report_id=self.report_id,
         )
-        revision.save()
+        if self.write_to_db:
+            revision.save()
+        return [revision]
 
     def load_passthrough(self):
         federal_awards = self.single_audit_checklist.federal_awards
+        pass_objects = []
         for entry in federal_awards["FederalAwards"]["federal_awards"]:
             for entity in entry["direct_or_indirect_award"]["entities"]:
                 passthrough = Passthrough(
@@ -197,7 +227,11 @@ class ETL(object):
                     passthrough_id=entity["passthrough_identifying_number"],
                     passthrough_name=entity["passthrough_name"],
                 )
-                passthrough.save()
+                if self.write_to_db:
+                    passthrough.save()
+                pass_objects.append(passthrough)
+        return pass_objects
+
 
     def _get_dates_from_sac(self):
         return_dict = dict()
@@ -279,13 +313,17 @@ class ETL(object):
             type_report_major_program=None,  # TODO: Where does this come from?
             type_audit_code="UG",
             is_public=self.single_audit_checklist.is_public,
-            data_source="G-FAC",
+            data_source="GSA",
         )
-        general.save()
+        self._load_audit_info(general)
+        if self.write_to_db:
+            general.save()
+        return [general]
 
     def load_secondary_auditor(self):
         secondary_auditors = self.single_audit_checklist.secondary_auditors
 
+        sec_objs = []
         for secondary_auditor in secondary_auditors["SecondaryAuditors"][
             "secondary_auditors_entries"
         ]["items"]:
@@ -303,35 +341,38 @@ class ETL(object):
                 address_state=secondary_auditor["secondary_auditor_address_state"],
                 address_zipcode=secondary_auditor["secondary_auditor_address_zipcode"],
             )
-            sec_auditor.save()
+            if self.write_to_db:
+                sec_auditor.save()
+            sec_objs.append(sec_auditor)
+        return sec_objs
 
-    def load_audit_info(self):
-        general = General.objects.get(report_id=self.single_audit_checklist.report_id)
+    def _load_audit_info(self, general):
+        # Because this operates on the general object, it is called from load_general.
         audit_information = self.single_audit_checklist.audit_information
 
-        general.gaap_results = audit_information["gaap_results"]
-        """
-            TODO:
-            Missing in schema
-            general.sp_framework = audit_information[]
-            general.is_sp_framework_required = audit_information[]
-            general.sp_framework_auditor_opinion = audit_information[]
-        """
-        general.is_going_concern = audit_information["is_going_concern_included"] == "Y"
-        general.is_significant_deficiency = (
-            audit_information["is_internal_control_deficiency_disclosed"] == "Y"
-        )
-        general.is_material_weakness = (
-            audit_information["is_internal_control_material_weakness_disclosed"] == "Y"
-        )
-        general.is_material_noncompliance = (
-            audit_information["is_material_noncompliance_disclosed"] == "Y"
-        )
-        general.is_duplicate_reports = (
-            audit_information["is_aicpa_audit_guide_included"] == "Y"
-        )
-        general.dollar_threshold = audit_information["dollar_threshold"]
-        general.is_low_risk = audit_information["is_low_risk_auditee"] == "Y"
-        general.agencies_with_prior_findings = audit_information["agencies"]
-
-        general.save()
+        if audit_information:
+            general.gaap_results = audit_information["gaap_results"]
+            """
+                TODO:
+                Missing in schema
+                general.sp_framework = audit_information[]
+                general.is_sp_framework_required = audit_information[]
+                general.sp_framework_auditor_opinion = audit_information[]
+            """
+            general.is_going_concern = audit_information["is_going_concern_included"] == "Y"
+            general.is_significant_deficiency = (
+                audit_information["is_internal_control_deficiency_disclosed"] == "Y"
+            )
+            general.is_material_weakness = (
+                audit_information["is_internal_control_material_weakness_disclosed"] == "Y"
+            )
+            general.is_material_noncompliance = (
+                audit_information["is_material_noncompliance_disclosed"] == "Y"
+            )
+            general.is_duplicate_reports = (
+                audit_information["is_aicpa_audit_guide_included"] == "Y"
+            )
+            general.dollar_threshold = audit_information["dollar_threshold"]
+            general.is_low_risk = audit_information["is_low_risk_auditee"] == "Y"
+            general.agencies_with_prior_findings = audit_information["agencies"]
+        

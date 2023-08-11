@@ -325,11 +325,12 @@ class ETLTests(TestCase):
         sac = SingleAuditChecklist.objects.first()
         self.assertEquals(sac.audit_information["gaap_results"], general.gaap_results)
 
-    def test_load_all(self):
+    def test_load_all(self, write_to_db=True):
         """On a happy path through load_all(), item(s) should be added to all of the
         tables."""
         len_general = len(General.objects.all())
         len_captext = len(CapText.objects.all())
+
         sac = SingleAuditChecklist.objects.create(
             submitted_by=self.user,
             general_information=self._fake_general(),
@@ -345,8 +346,8 @@ class ETLTests(TestCase):
         sac.save()
         self.sac = sac
         self.etl = ETL(self.sac)
-        self.report_id = sac.report_id
         self.etl.load_all()
+        self.report_id = sac.report_id
         self.assertLess(len_general, len(General.objects.all()))
         self.assertLess(len_captext, len(CapText.objects.all()))
 
@@ -403,3 +404,37 @@ class ETLTests(TestCase):
         self.etl.load_all()
         self.assertLess(len_general, len(General.objects.all()))
         self.assertEqual(len_captext, len(CapText.objects.all()))
+
+    def test_load_and_return_objects(self):
+        len_general = len(General.objects.all())
+        len_captext = len(CapText.objects.all())
+        sac = SingleAuditChecklist.objects.create(
+            submitted_by=self.user,
+            general_information=self._fake_general(),
+            federal_awards=self._fake_federal_awards(),
+            findings_uniform_guidance=self._fake_findings_uniform_guidance(),
+            notes_to_sefa=self._fake_notes_to_sefa(),
+            findings_text=self._fake_findings_text(reference_number=2),
+            corrective_action_plan=self._fake_corrective_action_plan(),
+            secondary_auditors=self._fake_secondary_auditors(),
+            additional_ueis=self._fake_additional_ueis(),
+            # audit_information=self._fake_audit_information(),  # TODO: Uncomment when SingleAuditChecklist adds audit_information
+        )
+        sac.save()
+        self.sac = sac
+        self.etl = ETL(self.sac, write_to_db=False)
+        self.report_id = sac.report_id
+        objs = self.etl.load_all()
+        self.assertEqual(len_general, len(General.objects.all()))
+        self.assertEqual(len_captext, len(CapText.objects.all()))
+        keys = ['Generals', 'SecondaryAuditors', 'FederalAwards', 
+                'Findings', 'FindingTexts', 'Passthroughs', 'CapTexts'
+        ]
+
+        print(objs)
+
+        for k, v in objs.items():
+            assert(k in keys)
+            assert(len(v) > 0)
+            for obj in v:
+                assert(obj is not None)
