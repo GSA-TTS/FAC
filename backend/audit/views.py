@@ -13,7 +13,12 @@ from django.http import JsonResponse
 
 from audit.forms import UploadReportForm, AuditInfoForm
 
-from config.settings import AGENCY_NAMES, GAAP_RESULTS
+from config.settings import (
+    AGENCY_NAMES,
+    GAAP_RESULTS,
+    SP_FRAMEWORK_BASIS,
+    SP_FRAMEWORK_OPINIONS,
+)
 from .fixtures.excel import FORM_SECTIONS, UNKNOWN_WORKBOOK
 
 from audit.excel import (
@@ -604,6 +609,8 @@ class AuditInfoFormView(SingleAuditChecklistAccessRequiredMixin, generic.View):
                 "user_provided_organization_type": sac.user_provided_organization_type,
                 "agency_names": AGENCY_NAMES,
                 "gaap_results": GAAP_RESULTS,
+                "sp_framework_basis": SP_FRAMEWORK_BASIS,
+                "sp_framework_opinions": SP_FRAMEWORK_OPINIONS,
                 "form": current_info,
             }
 
