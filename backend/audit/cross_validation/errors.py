@@ -25,3 +25,10 @@ def err_missing_tribal_data_sharing_consent():
         "As a tribal organization, you must complete the data "
         "sharing consent statement before submitting your audit."
     )
+
+
+def err_number_of_findings_inconsistent(total_expected, total_rows, workbook_name):
+    return (
+        f"You reported {total_expected} findings in the Federal Awards workbook, "
+        f"but have {total_rows} row(s) in the {workbook_name} workbook."
+    )
