@@ -52,7 +52,7 @@
                "formula": "=\"FindingsText\"",
                "help": {
                   "link": "https://fac.gov/documentation/validation/#section_name",
-                  "text": "The workbook you are trying to upload does not match the required template"
+                  "text": "The workbook you tried to upload is for a different section."
                },
                "keep_locked": true,
                "range_cell": "B3",
