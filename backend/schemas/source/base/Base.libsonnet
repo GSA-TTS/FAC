@@ -297,9 +297,6 @@ local REGEX_MONTHS_OTHER = '^0[0-9]|1[0-8]$';
 local type_zipcode = Types.string {
   pattern: REGEX_ZIPCODE,
 };
-local type_months_other = Types.string {
-  pattern: REGEX_MONTHS_OTHER,
-};
 
 // UEIs are not case-sensitive, but we will upper-case all UEIs and store them
 // as uppercase-only, so we're only dealing with uppercase letters in these patterns.
@@ -379,7 +376,9 @@ local Compound = {
     pattern: phone_regex,
   },
   Zip: type_zipcode,
-  MonthsOther: type_months_other,
+  MonthsOther: Types.string {
+    pattern: REGEX_MONTHS_OTHER,
+  },
 };
 
 

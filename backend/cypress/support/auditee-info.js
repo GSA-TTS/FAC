@@ -1,9 +1,13 @@
 // re-usable code for testing the Auditee Info form
 
 export function testValidAuditeeInfo() {
+  cy.intercept('api/sac/ueivalidation', {
+    fixture: 'sam-gov-api-mock.json',
+  }).as('uei_check_success')
+
   // hard-coding some UEI which may eventually become unregistered
   cy.get('#auditee_uei').type('LZGKJ22EF7B5');
-  cy.get('#auditee_uei-btn').click();
+  cy.get('#auditee_uei-btn').click().wait('@uei_check_success');
   // modal search result box needs "Continue" to be clicked
   cy.get('button[data-close-modal]').contains('Continue').click();
 

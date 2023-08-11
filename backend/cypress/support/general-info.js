@@ -16,7 +16,7 @@ export function testValidGeneralInfo() {
 	cy.get('#auditee_zip').type('23219');
   // there should already be a UEI in this box
 	// cy.get('#auditee_uei').type('CMBSGK6P7BE1');
-	cy.get('label[for=multiple-ueis-no]').click();
+	cy.get('label[for=multiple-ueis-yes]').click();
 	cy.get('#ein').type('546000173');
 	cy.get('label[for=ein_not_an_ssn_attestation]').click();
 	cy.get('label[for=multiple-eins-no]').click();
