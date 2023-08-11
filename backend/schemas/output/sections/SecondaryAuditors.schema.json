@@ -173,9 +173,6 @@
          "version": 20230714
       }
    },
-   "required": [
-      "Meta"
-   ],
    "title": "UNNAMED",
    "type": "object",
    "version": 20230714
