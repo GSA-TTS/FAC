@@ -273,7 +273,7 @@ class CrossValidationView(SingleAuditChecklistAccessRequiredMixin, generic.View)
                 "report_id": report_id,
                 "submission_status": sac.submission_status,
             }
-            return render(request, "audit/cross-validation.html", context)
+            return render(request, "audit/cross-validation/cross-validation.html", context)
         except SingleAuditChecklist.DoesNotExist:
             raise PermissionDenied("You do not have access to this audit.")
 
@@ -287,7 +287,7 @@ class CrossValidationView(SingleAuditChecklistAccessRequiredMixin, generic.View)
 
             context = {"report_id": report_id, "errors": errors}
 
-            return render(request, "audit/cross-validation-results.html", context)
+            return render(request, "audit/cross-validation/cross-validation-results.html", context)
 
         except SingleAuditChecklist.DoesNotExist:
             raise PermissionDenied("You do not have access to this audit.")
@@ -304,7 +304,7 @@ class ReadyForCertificationView(SingleAuditChecklistAccessRequiredMixin, generic
                 "report_id": report_id,
                 "submission_status": sac.submission_status,
             }
-            return render(request, "audit/ready-for-certification.html", context)
+            return render(request, "audit/cross-validation/ready-for-certification.html", context)
         except SingleAuditChecklist.DoesNotExist:
             raise PermissionDenied("You do not have access to this audit.")
 
@@ -321,7 +321,7 @@ class ReadyForCertificationView(SingleAuditChecklistAccessRequiredMixin, generic
                 return redirect(reverse("audit:SubmissionProgress", args=[report_id]))
 
             context = {"report_id": report_id, "errors": errors}
-            return render(request, "audit/cross-validation-results.html", context)
+            return render(request, "audit/cross-validation/cross-validation-results.html", context)
 
         except SingleAuditChecklist.DoesNotExist:
             raise PermissionDenied("You do not have access to this audit.")
