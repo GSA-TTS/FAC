@@ -7,18 +7,11 @@ const accessFields = [
 ];
 
 export function addValidInfo(field) {
-  const filedType = field.split('_').pop();
-  if(filedType === 'email') {
-    cy.get(field)
-      .clear()
-      .type('test.address-with+features@test.gsa.gov')
-      .blur();
-  } else {
-    cy.get(field)
+  const fieldType = field.split('_').pop();
+  cy.get(field)
     .clear()
-    .type('Real Full Name')
+    .type(fieldType === 'email' ? 'test.address-with+features@test.gsa.gov' : 'Percy A. Person')
     .blur();
-  }
 }
 
 export function testValidAccess() {
