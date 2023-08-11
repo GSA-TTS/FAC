@@ -22,6 +22,7 @@ jobs:
       TF_VAR_cf_user: ${{ secrets.CF_USERNAME }}
       TF_VAR_cf_password: ${{ secrets.CF_PASSWORD }}
       TF_VAR_new_relic_license_key: ${{ secrets.NEW_RELIC_LICENSE_KEY }}
+      TF_VAR_pgrst_jwt_secret: ${{ secrets.PGRST_JWT_SECRET }}
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       TERRAFORM_PRE_RUN: |
           apt-get update

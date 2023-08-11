@@ -4,6 +4,7 @@ Fixtures for use with Excel spreadsheet handling.
 from collections import namedtuple
 from django.conf import settings
 
+UNKNOWN_WORKBOOK = "unknown_workbook"
 SHEETS_DIR = settings.XLSX_TEMPLATE_SHEET_DIR
 TESTFILES_DIR = settings.DATA_FIXTURES / "audit" / "excel_schema_test_files"
 

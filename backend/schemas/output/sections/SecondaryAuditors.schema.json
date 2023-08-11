@@ -1,90 +1,29 @@
 {
-   "$defs": {
-      "EIN": {
-         "pattern": "^[0-9]{9}$",
-         "type": [
-            "null",
-            "string"
-         ]
-      },
-      "Phone": {
-         "pattern": "^^(\\+0?1\\s)?\\(?\\d{3}\\)?[\\s.-]?\\d{3}[\\s.-]?\\d{4}$",
-         "type": "string"
-      },
-      "State": {
-         "enum": [
-            "AL",
-            "AK",
-            "AS",
-            "AZ",
-            "AR",
-            "CA",
-            "CO",
-            "CT",
-            "DE",
-            "DC",
-            "FM",
-            "FL",
-            "GA",
-            "GU",
-            "HI",
-            "ID",
-            "IL",
-            "IN",
-            "IA",
-            "KS",
-            "KY",
-            "LA",
-            "ME",
-            "MH",
-            "MD",
-            "MA",
-            "MI",
-            "MN",
-            "MS",
-            "MO",
-            "MT",
-            "NE",
-            "NV",
-            "NH",
-            "NJ",
-            "NM",
-            "NY",
-            "NC",
-            "ND",
-            "MP",
-            "OH",
-            "OK",
-            "OR",
-            "PW",
-            "PA",
-            "PR",
-            "RI",
-            "SC",
-            "SD",
-            "TN",
-            "TX",
-            "UT",
-            "VT",
-            "VI",
-            "VA",
-            "WA",
-            "WV",
-            "WI",
-            "WY"
-         ],
-         "title": "State",
-         "type": "string"
-      },
-      "Zip": {
-         "pattern": "^[0-9]{5}(?:-[0-9]{4})?$",
-         "type": "string"
-      }
-   },
    "$schema": "https://json-schema.org/draft/2019-09/schema#",
    "additionalProperties": false,
    "metamodel_version": "1.7.0",
    "properties": {
+      "Meta": {
+         "additionalProperties": false,
+         "properties": {
+            "section_name": {
+               "enum": [
+                  "SecondaryAuditors"
+               ],
+               "type": "string"
+            },
+            "version": {
+               "const": "1.0.0",
+               "type": "string"
+            }
+         },
+         "required": [
+            "section_name"
+         ],
+         "title": "Meta",
+         "type": "object",
+         "version": 20230807
+      },
       "SecondaryAuditors": {
          "additionalProperties": false,
          "properties": {
@@ -114,13 +53,75 @@
                         "type": "string"
                      },
                      "secondary_auditor_address_state": {
-                        "$ref": "#/$defs/State"
+                        "enum": [
+                           "AL",
+                           "AK",
+                           "AS",
+                           "AZ",
+                           "AR",
+                           "CA",
+                           "CO",
+                           "CT",
+                           "DE",
+                           "DC",
+                           "FM",
+                           "FL",
+                           "GA",
+                           "GU",
+                           "HI",
+                           "ID",
+                           "IL",
+                           "IN",
+                           "IA",
+                           "KS",
+                           "KY",
+                           "LA",
+                           "ME",
+                           "MH",
+                           "MD",
+                           "MA",
+                           "MI",
+                           "MN",
+                           "MS",
+                           "MO",
+                           "MT",
+                           "NE",
+                           "NV",
+                           "NH",
+                           "NJ",
+                           "NM",
+                           "NY",
+                           "NC",
+                           "ND",
+                           "MP",
+                           "OH",
+                           "OK",
+                           "OR",
+                           "PW",
+                           "PA",
+                           "PR",
+                           "RI",
+                           "SC",
+                           "SD",
+                           "TN",
+                           "TX",
+                           "UT",
+                           "VT",
+                           "VI",
+                           "VA",
+                           "WA",
+                           "WV",
+                           "WI",
+                           "WY"
+                        ],
+                        "type": "string"
                      },
                      "secondary_auditor_address_street": {
                         "type": "string"
                      },
                      "secondary_auditor_address_zipcode": {
-                        "$ref": "#/$defs/Zip"
+                        "pattern": "^[0-9]{5}(?:-[0-9]{4})?$",
+                        "type": "string"
                      },
                      "secondary_auditor_contact_email": {
                         "format": "email",
@@ -130,13 +131,18 @@
                         "type": "string"
                      },
                      "secondary_auditor_contact_phone": {
-                        "$ref": "#/$defs/Phone"
+                        "pattern": "^^(\\+0?1\\s)?\\(?\\d{3}\\)?[\\s.-]?\\d{3}[\\s.-]?\\d{4}$",
+                        "type": "string"
                      },
                      "secondary_auditor_contact_title": {
                         "type": "string"
                      },
                      "secondary_auditor_ein": {
-                        "$ref": "#/$defs/EIN"
+                        "pattern": "^[0-9]{9}$",
+                        "type": [
+                           "null",
+                           "string"
+                        ]
                      },
                      "secondary_auditor_name": {
                         "type": "string"
@@ -168,6 +174,9 @@
          "version": 20230714
       }
    },
+   "required": [
+      "Meta"
+   ],
    "title": "UNNAMED",
    "type": "object",
    "version": 20230714

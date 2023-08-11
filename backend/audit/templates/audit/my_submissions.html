@@ -30,7 +30,7 @@
                         {% for item in data %}
                             <tr>
                                 <td>
-                                    <a class="usa-link" href="/audit/submission-progress/{{ item.report_id }}">{{ item.submission_status }}</a>
+                                    <a class="usa-link" href="{% url 'audit:SubmissionProgress' item.report_id %}">{{ item.submission_status }}</a>
                                 </td>
                                 <td>{{ item.auditee_name }}</td>
                                 <td>{{ item.report_id }}</td>

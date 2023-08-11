@@ -132,10 +132,13 @@
                             <label class="usa-radio__label" for="audit-period-other">Other</label>
                             <input class="usa-input usa-input--small"
                                    type="text"
-                                   id="audit_period_covered-other_months"
-                                   disabled/>
+                                   id="audit_period_other_months"
+                                   name="audit_period_other_months"
+                                   value="{{ audit_period_other_months | default_if_none:'' }}"
+                                   {% if audit_period_other_months.len == 0 %} disabled {% endif %}
+                                   />
                             <label class="usa-label usa-input--small__label"
-                                   for="audit_period_covered-other_months">months</label>
+                                   for="audit_period_other_months">months</label>
                         </div>
                     </fieldset>
                     <fieldset class="usa-fieldset question" id="fiscal-period-dates">

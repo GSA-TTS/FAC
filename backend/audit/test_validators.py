@@ -20,6 +20,7 @@ from audit.fixtures.excel import (
     ADDITIONAL_UEIS_TEMPLATE_DEFINITION,
     SECONDARY_AUDITORS_TEMPLATE_DEFINITION,
     NOTES_TO_SEFA_TEMPLATE_DEFINITION,
+    FORM_SECTIONS,
 )
 
 from .validators import (
@@ -72,7 +73,9 @@ class FederalAwardsValidatorTests(SimpleTestCase):
         """
         Empty Federal Awards should fail, simple case should pass.
         """
-        invalid = json.loads('{"FederalAwards":{}}')
+        invalid = json.loads(
+            f'{{"Meta":{{"section_name":"{FORM_SECTIONS.FEDERAL_AWARDS_EXPENDED}"}},"FederalAwards":{{}}}}'
+        )
         expected_msg = "[\"'Federal Awards' is a required property.\"]"
         self.assertRaisesRegex(
             ValidationError, expected_msg, validate_federal_award_json, invalid
@@ -633,7 +636,9 @@ class CorrectiveActionPlanValidatorTests(SimpleTestCase):
             settings.XLSX_TEMPLATE_JSON_DIR / CORRECTIVE_ACTION_TEMPLATE_DEFINITION
         )
         template = json.loads(template_definition_path.read_text(encoding="utf-8"))
-        invalid = json.loads('{"CorrectiveActionPlan":{}}')
+        invalid = json.loads(
+            f'{{"Meta":{{"section_name":"{FORM_SECTIONS.CORRECTIVE_ACTION_PLAN}"}},"CorrectiveActionPlan":{{}}}}'
+        )
         expected_msg = str(
             [
                 (
@@ -689,7 +694,9 @@ class AdditionalUeisValidatorTests(SimpleTestCase):
             settings.XLSX_TEMPLATE_JSON_DIR / ADDITIONAL_UEIS_TEMPLATE_DEFINITION
         )
         template = json.loads(template_definition_path.read_text(encoding="utf-8"))
-        invalid = json.loads('{"AdditionalUEIs":{}}')
+        invalid = json.loads(
+            f'{{"Meta":{{"section_name":"{FORM_SECTIONS.ADDITIONAL_UEIS}"}},"AdditionalUEIs":{{}}}}'
+        )
         expected_msg = str(
             [
                 (
@@ -720,7 +727,9 @@ class NotesToSefaValidatorTests(SimpleTestCase):
             settings.XLSX_TEMPLATE_JSON_DIR / NOTES_TO_SEFA_TEMPLATE_DEFINITION
         )
         template = json.loads(template_definition_path.read_text(encoding="utf-8"))
-        invalid = json.loads('{"NotesToSefa":{}}')
+        invalid = json.loads(
+            f'{{"Meta":{{"section_name":"{FORM_SECTIONS.NOTES_TO_SEFA}"}},"NotesToSefa":{{}}}}'
+        )
         expected_msg = str(
             [
                 (
@@ -751,7 +760,9 @@ class SecondaryAuditorsValidatorTests(SimpleTestCase):
             settings.XLSX_TEMPLATE_JSON_DIR / SECONDARY_AUDITORS_TEMPLATE_DEFINITION
         )
         template = json.loads(template_definition_path.read_text(encoding="utf-8"))
-        invalid = json.loads('{"SecondaryAuditors":{}}')
+        invalid = json.loads(
+            f'{{"Meta":{{"section_name":"{FORM_SECTIONS.SECONDARY_AUDITORS}"}},"SecondaryAuditors":{{}}}}'
+        )
         expected_msg = str(
             [
                 (
