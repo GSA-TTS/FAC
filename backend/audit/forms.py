@@ -40,9 +40,51 @@ class AuditInfoForm(forms.Form):
             "Financial statements were not prepared in accordance with GAAP but were prepared in accordance with a special purpose framework.",
         ),
     )
+    choices_SP_FRAMEWORK_BASIS = (
+        (
+            "cash_basis",
+            "Cash basis",
+        ),
+        (
+            "tax_basis",
+            "Tax basis",
+        ),
+        (
+            "contractual_basis",
+            "Contractual basis",
+        ),
+        (
+            "other_basis",
+            "Other basis",
+        ),
+    )
+    choices_SP_FRAMEWORK_OPINIONS = (
+        (
+            "unmodified_opinion",
+            "Unmodified opinion",
+        ),
+        (
+            "qualified_opinion",
+            "Qualified opinion",
+        ),
+        (
+            "adverse_opinion",
+            "Adverse opinion",
+        ),
+        (
+            "disclaimer_of_opinion",
+            "Disclaimer of opinion",
+        ),
+    )
+
     choices_agencies = list((i, i) for i in AGENCY_NAMES)
 
     gaap_results = forms.MultipleChoiceField(choices=choices_GAAP)
+    sp_framework_basis = forms.MultipleChoiceField(choices=choices_SP_FRAMEWORK_BASIS)
+    is_sp_framework_required = forms.MultipleChoiceField(choices=choices_YoN)
+    sp_framework_opinions = forms.MultipleChoiceField(
+        choices=choices_SP_FRAMEWORK_OPINIONS
+    )
     is_going_concern_included = forms.MultipleChoiceField(choices=choices_YoN)
     is_internal_control_deficiency_disclosed = forms.MultipleChoiceField(
         choices=choices_YoN

@@ -577,6 +577,15 @@ class AuditInfoFormView(SingleAuditChecklistAccessRequiredMixin, generic.View):
                 current_info = {
                     "cleaned_data": {
                         "gaap_results": sac.audit_information.get("gaap_results"),
+                        "sp_framework_basis": sac.audit_information.get(
+                            "sp_framework_basis"
+                        ),
+                        "is_sp_framework_required": sac.audit_information.get(
+                            "is_sp_framework_required"
+                        ),
+                        "sp_framework_opinions": sac.audit_information.get(
+                            "sp_framework_opinions"
+                        ),
                         "is_going_concern_included": sac.audit_information.get(
                             "is_going_concern_included"
                         ),
@@ -602,17 +611,7 @@ class AuditInfoFormView(SingleAuditChecklistAccessRequiredMixin, generic.View):
                     }
                 }
 
-            context = {
-                "auditee_name": sac.auditee_name,
-                "report_id": report_id,
-                "auditee_uei": sac.auditee_uei,
-                "user_provided_organization_type": sac.user_provided_organization_type,
-                "agency_names": AGENCY_NAMES,
-                "gaap_results": GAAP_RESULTS,
-                "sp_framework_basis": SP_FRAMEWORK_BASIS,
-                "sp_framework_opinions": SP_FRAMEWORK_OPINIONS,
-                "form": current_info,
-            }
+            context = self._get_context(sac, current_info)
 
             return render(request, "audit/audit-info-form.html", context)
         except SingleAuditChecklist.DoesNotExist:
@@ -636,22 +635,14 @@ class AuditInfoFormView(SingleAuditChecklistAccessRequiredMixin, generic.View):
                 validated = validate_audit_information_json(audit_information)
                 sac.audit_information = validated
                 sac.save()
-
-                logger.info("Audit info form saved.", form.cleaned_data)
-
                 return redirect(reverse("audit:SubmissionProgress", args=[report_id]))
             else:
-                logger.warn(form.errors)
+                for field, errors in form.errors.items():
+                    for error in errors:
+                        logger.warn(f"ERROR in field {field} : {error}")
+
                 form.clean_booleans()
-                context = {
-                    "auditee_name": sac.auditee_name,
-                    "report_id": report_id,
-                    "auditee_uei": sac.auditee_uei,
-                    "user_provided_organization_type": sac.user_provided_organization_type,
-                    "agency_names": AGENCY_NAMES,
-                    "gaap_results": GAAP_RESULTS,
-                    "form": form,
-                }
+                context = self._get_context(sac, form)
                 return render(request, "audit/audit-info-form.html", context)
 
         except SingleAuditChecklist.DoesNotExist:
@@ -659,6 +650,26 @@ class AuditInfoFormView(SingleAuditChecklistAccessRequiredMixin, generic.View):
         except Exception as e:
             logger.info("Enexpected error in AuditInfoFormView post.\n", e)
             raise BadRequest()
+
+    def _get_context(self, sac, form):
+        context = {
+            "auditee_name": sac.auditee_name,
+            "report_id": sac.report_id,
+            "auditee_uei": sac.auditee_uei,
+            "user_provided_organization_type": sac.user_provided_organization_type,
+            "agency_names": AGENCY_NAMES,
+            "gaap_results": GAAP_RESULTS,
+            "sp_framework_basis": SP_FRAMEWORK_BASIS,
+            "sp_framework_opinions": SP_FRAMEWORK_OPINIONS,
+        }
+        for field, value in context.items():
+            logger.warn(f"{field}:{value}")
+        context.update(
+            {
+                "form": form,
+            }
+        )
+        return context
 
 
 class PageInput:

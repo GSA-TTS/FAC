@@ -32,6 +32,9 @@ function setCheckboxRequired(name) {
 
 function init() {
   setCheckboxRequired('gaap_results');
+  setCheckboxRequired('sp_framework_basis');
+  setCheckboxRequired('is_sp_framework_required');
+  setCheckboxRequired('sp_framework_opinions');
   setCheckboxRequired('is_going_concern_included');
   setCheckboxRequired('is_internal_control_deficiency_disclosed');
   setCheckboxRequired('is_internal_control_material_weakness_disclosed');
