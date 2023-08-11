@@ -680,7 +680,6 @@ def conditional_keys_progress_check(sac, sections):
     for key, value in conditional_keys.items():
         current = "incomplete"
         if not value:
-            print(key)
             current = "hidden"
         elif sections.get(key):
             current = "complete"
