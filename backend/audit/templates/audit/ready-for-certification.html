@@ -7,13 +7,11 @@
           {% csrf_token %}
           <fieldset class="usa-fieldset">
               <legend class="usa-legend usa-legend--large" id="federal-awards">
-                  Submit for Certification
+                  Lock for certification
               </legend>
-              <p>This is some text explaining that clicking the button below will result in the audit being made available to the certifying auditor for certification.</p>
-              <p>This button will run cross-sheet validation on the sheets that come before this step.</p>
-              <p>Audit {{ report_id }} has a submission status of: {{ submission_status }}</p>
-              <h4 class="usa-process-list__heading">This action is taken by the AUDITEE</h4>
-              <button class="usa-button" id="continue">Submit for Certification</button>
+              <p>The audit validates and is ready for certification.</p>
+              <p>In order to certify, your submission must be locked. No further changes will be possible. Click to lock this audit for certification by the designated certifying officials.</p>
+              <button class="usa-button" id="continue">Lock for Certification</button>
           </fieldset>
       </form>
   </div>
