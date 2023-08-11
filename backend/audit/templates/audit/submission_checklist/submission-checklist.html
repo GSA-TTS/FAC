@@ -290,7 +290,7 @@
                                 <p class="text-bold text-underline margin-0">Pre-submission validation (Complete)</p>
                                 <p class="margin-0">Before submitting your audit, use our validation tool to check your workbooks for errors.</p>
                             </div>
-                        {% elif SFSAC_completed %}
+                        {% elif complete %}
                             {% include './icon-list-icon.html' with completed=pre_submission_validation.completed %}
                             <div>
                                 <p class="text-bold margin-0">

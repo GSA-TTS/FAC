@@ -665,17 +665,19 @@ def conditional_keys_progress_check(sac, sections):
     """
     conditional_keys = {
         "additional_ueis": sac.multiple_ueis_covered,
-        "additional_eins": sac.multiple_eins_covered,
+        "additional_eins": False, # Update once we have the question in. This may be handled in the gen info form rather than as a workbook.
+        # "additional_eins": sac.multiple_eins_covered,
         "secondary_auditors": False,  # update this once we have the question in.
     }
     output = {}
     for key, value in conditional_keys.items():
         current = "incomplete"
         if not value:
+            print(key)
             current = "hidden"
         elif sections.get(key):
             current = "complete"
-        info = {"display": current, "completed": current == "completed"}
+        info = {"display": current, "completed": current == "complete"}
         output[key] = info
     return output
 
@@ -725,6 +727,9 @@ def submission_progress_check(
     # Use sac_validation_shape as source of truth for list of sections:
     shaped_sac = sac_validation_shape(sac)
     sections = shaped_sac["sf_sac_sections"]
+    # TODO: remove these once Notes to SEFA and tribal data consent are implemented
+    del sections["notes_to_sefa"]
+    del sections["tribal_data_consent"]
     result = {k: None for k in sections}  # type: ignore
     progress = {
         "display": None,
@@ -740,8 +745,6 @@ def submission_progress_check(
     mandatory_keys = mandatory_keys_progress_check(sections, cond_keys)
     for mkey, mvalue in mandatory_keys.items():
         result[mkey] = progress | mvalue
-    # TODO: remove this once Notes to SEFA is integrated
-    del mandatory_keys["notes_to_sefa"]
 
     sar_progress = {
         "display": "complete" if bool(sar) else "incomplete",
@@ -798,15 +801,6 @@ class SubmissionProgressView(SingleAuditChecklistAccessRequiredMixin, generic.Vi
             except SingleAuditReportFile.DoesNotExist:
                 sar = None
 
-            submission_status_order = [
-                "in_progress",
-                "ready_for_certification",
-                "auditor_certified",
-                "auditee_certified",
-                "certified",
-                "submitted",
-            ]
-
             subcheck = submission_progress_check(sac, sar)
 
             context = {
@@ -820,10 +814,16 @@ class SubmissionProgressView(SingleAuditChecklistAccessRequiredMixin, generic.Vi
                     "completed_date": None,
                     "completed_by": None,
                 },
+                "pre_submission_validation": {
+                    "completed": sac.submission_status == "ready_for_certification",
+                    "completed_date": None,
+                    "completed_by": None,
+                    "enabled": sac.submission_status == "auditee_certified",
+                },
                 "certification": {
                     "auditor_certified": bool(sac.auditor_certification),
                     "auditor_enabled": sac.submission_status == "ready_for_certification",
-                    "auditee_certified": sac.is_auditee_certified,
+                    "auditee_certified": bool(sac.auditee_certification),
                     "auditee_enabled": sac.submission_status == "auditor_certified",
                 },
                 "submission": {
@@ -838,6 +838,9 @@ class SubmissionProgressView(SingleAuditChecklistAccessRequiredMixin, generic.Vi
                 "user_provided_organization_type": sac.user_provided_organization_type,
             }
             context = context | subcheck
+
+            pp = pprint.PrettyPrinter()
+            pp.pprint(context)
 
             return render(request, "audit/submission_checklist/submission-checklist.html", context)
         except SingleAuditChecklist.DoesNotExist as err:
