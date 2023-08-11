@@ -2,7 +2,7 @@ from django.db import models
 
 
 # Create your models here.
-class Cfda(models.Model):
+class Cfda19(models.Model):
     index = models.BigIntegerField(blank=True, null=False, primary_key=True)
     audityear = models.BigIntegerField(db_column='AUDITYEAR', blank=True, null=True)  # Field name made lowercase.
     dbkey = models.BigIntegerField(db_column='DBKEY', blank=True, null=True)  # Field name made lowercase.
@@ -38,7 +38,7 @@ class Cfda(models.Model):
     #     db_table = 'suk_cfda19'
 
 
-class Gen(models.Model):
+class Gen19(models.Model):
     index = models.BigIntegerField(blank=True, null=False, primary_key=True)
     audityear = models.TextField(db_column='AUDITYEAR', blank=True, null=True)  # Field name made lowercase.
     dbkey = models.TextField(db_column='DBKEY', blank=True, null=True)  # Field name made lowercase.

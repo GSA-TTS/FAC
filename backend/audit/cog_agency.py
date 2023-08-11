@@ -33,7 +33,8 @@
 #############################################################
 
 from collections import defaultdict
-from census2019.models import Cfda, Gen
+
+# from census2019.models import Cfda19, Gen19
 
 
 def calc_amount_expended_limit():
@@ -45,25 +46,36 @@ def calc_amount_expended_limit():
 def load_2019_federal_award_data(auditee_ein):
     # Load 2019 ["FederalAwards"] where
     # 2019 Cfda.auditee_ein = auditee_ein
-    return Cfda.objects.filter(ein=auditee_ein)
+    # return Cfda19.objects.filter(ein=auditee_ein)
+    pass
 
 
-def auditee_2019_submission_exists(auditee_ein):
+def auditee_2019_submission_exists(auditee_ein, general_2019_data):
     # Check if auditee_ein exists in 2019 data
-    return Gen.objects.filter(ein=auditee_ein)
+    # return Gen19.objects.filter(ein=auditee_ein)
+    return auditee_ein == general_2019_data["General"]["ein"]
 
 
-def calc_total_amounts_agency(fed_award_data):
+def calc_total_amounts_agency(fed_award_data, year=2023):
     selected_agency_prefix = 0
     tot_amount_agency = defaultdict(lambda: 0)
     tot_da_amount_agency = defaultdict(lambda: 0)
     tot_da_amount_expended = 0
     for award in fed_award_data["FederalAwards"]["federal_awards"]:
-        agency_prefix = award["program"]["federal_agency_prefix"]
-        tot_amount_agency[agency_prefix] += award["program"]["amount_expended"]
-        if award["direct_or_indirect_award"]["is_direct"] == "Y":
-            tot_da_amount_expended += award["program"]["amount_expended"]
-            tot_da_amount_agency[agency_prefix] += award["program"]["amount_expended"]
+        if year == 2019:
+            agency_prefix = award["cfda"][:2]
+            tot_amount_agency[agency_prefix] += award["amount"]
+            if award["direct"] == "Y":
+                tot_da_amount_expended += award["amount"]
+                tot_da_amount_agency[agency_prefix] += award["amount"]
+        else:  # 2023
+            agency_prefix = award["program"]["federal_agency_prefix"]
+            tot_amount_agency[agency_prefix] += award["program"]["amount_expended"]
+            if award["direct_or_indirect_award"]["is_direct"] == "Y":
+                tot_da_amount_expended += award["program"]["amount_expended"]
+                tot_da_amount_agency[agency_prefix] += award["program"][
+                    "amount_expended"
+                ]
 
     tot_amount_agency = list(
         sorted(tot_amount_agency.items(), reverse=True, key=lambda item: item[1])
@@ -89,27 +101,29 @@ def calc_total_amounts_agency(fed_award_data):
     return selected_agency_prefix
 
 
-def calc_tot_amt_expended(federal_awards_data, auditee_ein):
+def calc_tot_amt_expended(federal_awards_data, auditee_ein, general_2019_data):
     if auditee_2019_submission_exists(auditee_ein):
         # Calculate from 2019 data
-        gen = Gen.objects.filter(EIN=auditee_ein)
-        return gen.totfedexpend  # ??????????
+        # gen = Gen19.objects.filter(EIN=auditee_ein)
+        return general_2019_data["totfedexpend"]
     else:
         return federal_awards_data["FederalAwards"]["total_amount_expended"]
 
 
-def cog_over_assignment(federal_awards_data, auditee_ein):
+def cog_over_assignment(
+    federal_awards_data, auditee_ein, federal_awards_data_2019_data, general_2019_data
+):
     cog_agency_prefix = 0
     over_agency_prefix = 0
 
     # #print(CensusCfda19.objects.filter(index__lt = 10))
     # #print("Cfda first row = ", Cfda.objects.first())
-    print("Cfda first row = ", Cfda.objects.filter(index__lt=10))
+    # print("Cfda first row = ", Cfda19.objects.filter(index__lt=10))
     # #cfda = Cfda.objects.filter(EIN = 731084819)
-    print("Gen first row = ", Gen.objects.filter(index__lt=10))
+    # print("Gen first row = ", Gen19.objects.filter(index__lt=10))
 
     if (
-        calc_tot_amt_expended(federal_awards_data, auditee_ein)
+        calc_tot_amt_expended(federal_awards_data, auditee_ein, general_2019_data)
         > calc_amount_expended_limit()
     ):
         #############################################################
@@ -117,9 +131,11 @@ def cog_over_assignment(federal_awards_data, auditee_ein):
         #       ######## TO DO NEXT
         #       ####### Use 2019 Base year submission data
         #############################################################
-        if auditee_2019_submission_exists(auditee_ein):
-            federal_awards_data_2019 = load_2019_federal_award_data(auditee_ein)
-            cog_agency_prefix = calc_total_amounts_agency(federal_awards_data_2019)
+        if auditee_2019_submission_exists(auditee_ein, general_2019_data):
+            # federal_awards_data_2019 = load_2019_federal_award_data(auditee_ein)
+            cog_agency_prefix = calc_total_amounts_agency(
+                federal_awards_data_2019_data, 2019
+            )
         else:
             cog_agency_prefix = calc_total_amounts_agency(federal_awards_data)
     else:
