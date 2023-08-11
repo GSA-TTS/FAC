@@ -54,7 +54,7 @@ describe('Create New Audit', () => {
         });
 
         it('should remove the error message when input is supplied', () => {
-          addValidInfo('#certifying_auditee_contact_fullname')
+          addValidInfo('#certifying_auditee_contact_fullname');
           cy.get('#certifying_auditee_contact_fullname-not-null').should(
             'not.be.visible'
           );
@@ -361,10 +361,7 @@ describe('Create New Audit', () => {
         });
 
         it('should remove the error message when input is supplied', () => {
-          cy.get('#auditor_contacts_fullname')
-            .clear()
-            .type('A Name')
-            .blur();
+          addValidInfo('#auditor_contacts_fullname');
           cy.get('#auditor_contacts_fullname-not-null').should(
             'not.be.visible'
           );
@@ -457,7 +454,7 @@ describe('Create New Audit', () => {
           cy.get('input[id*="auditor_contacts_fullname"]')
             .eq(1)
             .clear()
-            .type('test.address-with+features@test.gsa.gov');
+            .type('A Name');
           cy.get('input[id*="auditor_contacts_email"]')
             .eq(1)
             .clear()
