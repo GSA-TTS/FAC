@@ -37,7 +37,6 @@ class EligibilityFormView(LoginRequiredMixin, View):
         if eligibility.get("eligible"):
             return redirect(reverse("report_submission:auditeeinfo"))
 
-        print("Eligibility data error: ", eligibility)
         return redirect(reverse("report_submission:eligibility"))
 
 
@@ -99,7 +98,6 @@ class AccessAndSubmissionFormView(LoginRequiredMixin, View):
 
         if report_id:
             return redirect(f"/report_submission/general-information/{report_id}")
-        print("Error processing data: ", result)
         return redirect(reverse("report_submission:accessandsubmission"))
 
 
@@ -120,6 +118,7 @@ class GeneralInformationFormView(LoginRequiredMixin, View):
                 "auditee_fiscal_period_end": sac.auditee_fiscal_period_end,
                 "auditee_fiscal_period_start": sac.auditee_fiscal_period_start,
                 "audit_period_covered": sac.audit_period_covered,
+                "audit_period_other_months": sac.audit_period_other_months,
                 "ein": sac.ein,
                 "ein_not_an_ssn_attestation": sac.ein_not_an_ssn_attestation,
                 "multiple_eins_covered": sac.multiple_eins_covered,
@@ -173,6 +172,9 @@ class GeneralInformationFormView(LoginRequiredMixin, View):
 
             if form.is_valid():
                 general_information = sac.general_information
+                # fields = sorted(general_information.keys())
+                # for field in fields:
+                #     print(f"{field} : {general_information[field]}")
                 general_information.update(form.cleaned_data)
                 validated = validate_general_information_json(general_information)
                 sac.general_information = validated

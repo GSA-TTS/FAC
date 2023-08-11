@@ -1,0 +1,40 @@
+---
+name: Create Release
+on:
+#   schedule:
+#     - cron: '0 18 * * 3'
+  workflow_dispatch: null
+
+jobs:
+  release:
+    permissions: write-all
+    name: Create Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          ref: prod
+
+      - name: Get Current Date
+        id: date
+        run: |
+          echo "date=$(date +%Y%m%d)" >> $GITHUB_OUTPUT
+
+      - name: Changelog
+        uses: Bullrich/generate-release-changelog@master
+        id: changelog
+        env:
+          REPO: ${{ github.repository }}
+
+      - name: Create Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v1.${{ steps.date.outputs.date }}
+          release_name: Release for ${{ steps.date.outputs.date }}
+          body: |
+              ${{ steps.changelog.outputs.changelog }}
+          draft: false
+          prerelease: true
