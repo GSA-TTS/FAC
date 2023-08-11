@@ -1022,7 +1022,7 @@ class SubmissionProgressViewTests(TestCase):
         """Check for 'Create a single audit submission'."""
         baker.make(Access, user=self.user, sac=self.sac)
         self.client.force_login(user=self.user)
-        phrase = "Create a single audit submission"
+        phrase = "Single audit submission"
         res = self.client.get(
             reverse(
                 "audit:SubmissionProgress", kwargs={"report_id": self.sac.report_id}
