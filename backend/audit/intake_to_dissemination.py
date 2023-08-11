@@ -13,46 +13,49 @@ from dissemination.models import (
     SecondaryAuditor,
 )
 from audit.models import SingleAuditChecklist
-from copy import deepcopy as dc
 
 logger = logging.getLogger(__name__)
 
 
-class ETL(object):
-    def __init__(self, sac: SingleAuditChecklist, write_to_db=True) -> None:
+class IntakeToDissemination(object):
+    def __init__(self, sac: SingleAuditChecklist) -> None:
         self.single_audit_checklist = sac
         self.report_id = sac.report_id
         audit_date = sac.general_information.get(
             "auditee_fiscal_period_start", datetime.now
         )
         self.audit_year = int(audit_date.split("-")[0])
-        self.write_to_db = write_to_db
-        self.loaded_objects = []
+        self.loaded_objects = dict()
 
     def load_all(self):
         load_methods = {
-            'Generals': self.load_general,
-            'SecondaryAuditors': self.load_secondary_auditor,
-            'FederalAwards': self.load_federal_award,
-            'Findings': self.load_findings,
-            'FindingTexts': self.load_finding_texts,
-            'Passthroughs': self.load_passthrough,
-            'CapTexts': self.load_captext,
+            "Generals": self.load_general,
+            "SecondaryAuditors": self.load_secondary_auditor,
+            "FederalAwards": self.load_federal_award,
+            "Findings": self.load_findings,
+            "FindingTexts": self.load_finding_texts,
+            "Passthroughs": self.load_passthrough,
+            "CapTexts": self.load_captext,
+            "Notes": self.load_notes,
+            "Revisions": self.load_revision,
         }
-        results = {}
-        for key, load_method in load_methods.items():
+        for _, load_method in load_methods.items():
             try:
-                objs = load_method()
-                results[key] = objs
+                # Each method writes results into self.loaded_objects
+                load_method()
             except KeyError as key_error:
                 logger.warning(
                     f"{type(key_error).__name__} in {load_method.__name__}: {key_error}"
                 )
-        self.loaded_objects = results
-        return results
-    
-    def get_loaded_objects(self):
         return self.loaded_objects
+
+    def get_dissemination_objects(self):
+        return self.loaded_objects
+
+    def save_dissemination_objects(self):
+        for key in self.loaded_objects.keys():
+            for o in self.loaded_objects[key]:
+                o.save()
 
     def load_finding_texts(self):
         findings_text = self.single_audit_checklist.findings_text
@@ -65,11 +68,11 @@ class ETL(object):
                 contains_chart_or_table=entry["contains_chart_or_table"] == "Y",
                 finding_text=entry["text_of_finding"],
             )
-            if self.write_to_db:
-                finding_text_.save()
+            # if self.write_to_db:
+            #     finding_text_.save()
             findings_text_objects.append(finding_text_)
+        self.loaded_objects["FindingTexts"] = findings_text_objects
         return findings_text_objects
-
 
     def load_findings(self):
         findings_uniform_guidance = (
@@ -97,9 +100,10 @@ class ETL(object):
                 is_significant_deficiency=(entry["significant_deficiency"] == "Y"),
                 type_requirement=(entry["program"]["compliance_requirement"]),
             )
-            if self.write_to_db:
-                finding.save()        
+            # if self.write_to_db:
+            #     finding.save()
             findings_objects.append(finding)
+        self.loaded_objects["Findings"] = findings_objects
         return findings_objects
 
     def load_federal_award(self):
@@ -139,9 +143,10 @@ class ETL(object):
                 passthrough_amount=subrecipient_amount,
                 type_requirement=None,  # TODO: What is this?
             )
-            if self.write_to_db:
-                federal_award.save()
+            # if self.write_to_db:
+            #     federal_award.save()
             federal_awards_objects.append(federal_award)
+        self.loaded_objects["FederalAwards"] = federal_awards_objects
         return federal_awards_objects
 
     def load_captext(self):
@@ -157,12 +162,13 @@ class ETL(object):
                 contains_chart_or_table=entry["contains_chart_or_table"] == "Y",
                 planned_action=entry["planned_action"],
             )
-            if self.write_to_db:
-                cap_text.save()
+            # if self.write_to_db:
+            #     cap_text.save()
             cap_text_objects.append(cap_text)
+        self.loaded_objects["CapTexts"] = cap_text_objects
         return cap_text_objects
 
-    def load_note(self):
+    def load_notes(self):
         notes_to_sefa = self.single_audit_checklist.notes_to_sefa["NotesToSefa"]
         accounting_policies = notes_to_sefa["accounting_policies"]
         is_minimis_rate_used = notes_to_sefa["is_minimis_rate_used"] == "Y"
@@ -176,8 +182,8 @@ class ETL(object):
                 is_minimis_rate_used=is_minimis_rate_used,
                 rate_explained=rate_explained,
             )
-            if self.write_to_db:
-                note.save()
+            # if self.write_to_db:
+            #     note.save()
             sefa_objects.append(note)
         else:
             for entry in entries:
@@ -190,9 +196,10 @@ class ETL(object):
                     is_minimis_rate_used=is_minimis_rate_used,
                     rate_explained=rate_explained,
                 )
-                if self.write_to_db:
-                    note.save()
+                # if self.write_to_db:
+                #     note.save()
                 sefa_objects.append(note)
+        self.loaded_objects["Notes"] = sefa_objects
         return sefa_objects
 
     def load_revision(self):
@@ -210,15 +217,16 @@ class ETL(object):
             other_explain=None,  # TODO: Where does this come from?
             audit_info=None,  # TODO: Where does this come from?
             notes_to_sefa=None,  # TODO: Where does this come from?
-            findings_tex=None,  # TODO: Where does this come from?
+            findings_text=None,  # TODO: Where does this come from?
             cap=None,  # TODO: Where does this come from?
             other=None,  # TODO: Where does this come from?
             general_info=None,  # TODO: Where does this come from?
             audit_year=self.audit_year,
             report_id=self.report_id,
         )
-        if self.write_to_db:
-            revision.save()
+        # if self.write_to_db:
+        #     revision.save()
+        self.loaded_objects["Revisions"] = [revision]
         return [revision]
 
     def load_passthrough(self):
@@ -232,11 +240,11 @@ class ETL(object):
                     passthrough_id=entity["passthrough_identifying_number"],
                     passthrough_name=entity["passthrough_name"],
                 )
-                if self.write_to_db:
-                    passthrough.save()
+                # if self.write_to_db:
+                #     passthrough.save()
                 pass_objects.append(passthrough)
+        self.loaded_objects["Passthroughs"] = pass_objects
         return pass_objects
-
 
     def _get_dates_from_sac(self):
         return_dict = dict()
@@ -321,8 +329,9 @@ class ETL(object):
             data_source="GSA",
         )
         self._load_audit_info(general)
-        if self.write_to_db:
-            general.save()
+        # if self.write_to_db:
+        #     general.save()
+        self.loaded_objects["Generals"] = [general]
         return [general]
 
     def load_secondary_auditor(self):
@@ -346,9 +355,10 @@ class ETL(object):
                 address_state=secondary_auditor["secondary_auditor_address_state"],
                 address_zipcode=secondary_auditor["secondary_auditor_address_zipcode"],
             )
-            if self.write_to_db:
-                sec_auditor.save()
+            # if self.write_to_db:
+            #     sec_auditor.save()
             sec_objs.append(sec_auditor)
+        self.loaded_objects["SecondaryAuditors"] = sec_objs
         return sec_objs
 
     def _load_audit_info(self, general):
@@ -364,12 +374,15 @@ class ETL(object):
                 general.is_sp_framework_required = audit_information[]
                 general.sp_framework_auditor_opinion = audit_information[]
             """
-            general.is_going_concern = audit_information["is_going_concern_included"] == "Y"
+            general.is_going_concern = (
+                audit_information["is_going_concern_included"] == "Y"
+            )
             general.is_significant_deficiency = (
                 audit_information["is_internal_control_deficiency_disclosed"] == "Y"
             )
             general.is_material_weakness = (
-                audit_information["is_internal_control_material_weakness_disclosed"] == "Y"
+                audit_information["is_internal_control_material_weakness_disclosed"]
+                == "Y"
             )
             general.is_material_noncompliance = (
                 audit_information["is_material_noncompliance_disclosed"] == "Y"
@@ -380,4 +393,3 @@ class ETL(object):
             general.dollar_threshold = audit_information["dollar_threshold"]
             general.is_low_risk = audit_information["is_low_risk_auditee"] == "Y"
             general.agencies_with_prior_findings = audit_information["agencies"]
-        

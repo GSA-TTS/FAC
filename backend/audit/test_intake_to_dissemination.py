@@ -14,10 +14,10 @@ from dissemination.models import (
     CapText,
     SecondaryAuditor,
 )
-from audit.etl import ETL
+from audit.intake_to_dissemination import IntakeToDissemination
 
 
-class ETLTests(TestCase):
+class IntakeToDisseminationTests(TestCase):
     def __init__(self, methodName: str = "runTest") -> None:
         super().__init__(methodName)
 
@@ -38,7 +38,7 @@ class ETLTests(TestCase):
         )
         sac.save()
         self.sac = sac
-        self.etl = ETL(self.sac)
+        self.intake_to_dissemination = IntakeToDissemination(self.sac)
         self.report_id = sac.report_id
 
     @staticmethod
@@ -264,68 +264,79 @@ class ETLTests(TestCase):
         }
 
     def test_load_general(self):
-        self.etl.load_general()
+        self.intake_to_dissemination.load_general()
+        self.intake_to_dissemination.save_dissemination_objects()
         generals = General.objects.all()
         self.assertEqual(len(generals), 1)
         general = generals.first()
         self.assertEqual(self.report_id, general.report_id)
 
     def test_load_federal_award(self):
-        self.etl.load_federal_award()
+        self.intake_to_dissemination.load_federal_award()
+        self.intake_to_dissemination.save_dissemination_objects()
         federal_awards = FederalAward.objects.all()
         self.assertEqual(len(federal_awards), 1)
         federal_award = federal_awards.first()
         self.assertEqual(self.report_id, federal_award.report_id)
 
     def test_load_findings(self):
-        self.etl.load_findings()
+        self.intake_to_dissemination.load_findings()
+        self.intake_to_dissemination.save_dissemination_objects()
         findings = Finding.objects.all()
         self.assertEqual(len(findings), 4)
         finding = findings.first()
         self.assertEqual(self.report_id, finding.report_id)
 
     def test_load_passthrough(self):
-        self.etl.load_passthrough()
+        self.intake_to_dissemination.load_passthrough()
+        self.intake_to_dissemination.save_dissemination_objects()
         passthroughs = Passthrough.objects.all()
         self.assertEqual(len(passthroughs), 1)
         passthrough = passthroughs.first()
         self.assertEqual(self.report_id, passthrough.report_id)
 
     def test_load_notes(self):
-        self.etl.load_note()
+        self.intake_to_dissemination.load_notes()
+        self.intake_to_dissemination.save_dissemination_objects()
         notes = Note.objects.all()
         self.assertEqual(len(notes), 1)
         note = notes.first()
         self.assertEqual(self.report_id, note.report_id)
 
     def test_load_finding_texts(self):
-        self.etl.load_finding_texts()
+        self.intake_to_dissemination.load_finding_texts()
+        self.intake_to_dissemination.save_dissemination_objects()
         finding_texts = FindingText.objects.all()
         self.assertEqual(len(finding_texts), 1)
         finding_text = finding_texts.first()
         self.assertEqual(self.report_id, finding_text.report_id)
 
     def test_load_captext(self):
-        self.etl.load_captext()
+        self.intake_to_dissemination.load_captext()
+        self.intake_to_dissemination.save_dissemination_objects()
         cap_texts = CapText.objects.all()
         self.assertEqual(len(cap_texts), 1)
         cap_text = cap_texts.first()
         self.assertEqual(self.report_id, cap_text.report_id)
 
     def test_load_sec_auditor(self):
-        self.etl.load_secondary_auditor()
+        self.intake_to_dissemination.load_secondary_auditor()
+        self.intake_to_dissemination.save_dissemination_objects()
         sec_auditor = SecondaryAuditor.objects.first()
+        print(self.sac.report_id)
+        print(sec_auditor.report_id)
         self.assertEquals(self.sac.report_id, sec_auditor.report_id)
 
     # TODO rename to test_load_audit once frontend is available
     def todo_load_audit_information(self):
-        self.etl.load_audit_info()
+        self.intake_to_dissemination._load_audit_info()
+        self.intake_to_dissemination.save_dissemination_objects()
         general = General.objects.first()
         sac = SingleAuditChecklist.objects.first()
         print("general gaap_results:", general.gaap_results, sac.audit_information)
         self.assertEquals(sac.audit_information["gaap_results"], general.gaap_results)
 
-    def test_load_all(self, write_to_db=True):
+    def test_load_all(self):
         """On a happy path through load_all(), item(s) should be added to all of the
         tables."""
         len_general = len(General.objects.all())
@@ -345,8 +356,9 @@ class ETLTests(TestCase):
         )
         sac.save()
         self.sac = sac
-        self.etl = ETL(self.sac)
-        self.etl.load_all()
+        self.intake_to_dissemination = IntakeToDissemination(self.sac)
+        self.intake_to_dissemination.load_all()
+        self.intake_to_dissemination.save_dissemination_objects()
         self.report_id = sac.report_id
         self.assertLess(len_general, len(General.objects.all()))
         self.assertLess(len_captext, len(CapText.objects.all()))
@@ -372,9 +384,10 @@ class ETLTests(TestCase):
         sac.general_information.pop("auditee_contact_name")
         sac.save()
         self.sac = sac
-        self.etl = ETL(self.sac)
+        self.intake_to_dissemination = IntakeToDissemination(self.sac)
         self.report_id = sac.report_id
-        self.etl.load_all()
+        self.intake_to_dissemination.load_all()
+        self.intake_to_dissemination.save_dissemination_objects()
         self.assertEqual(len_general, len(General.objects.all()))
         self.assertLess(len_captext, len(CapText.objects.all()))
 
@@ -399,9 +412,10 @@ class ETLTests(TestCase):
         sac.corrective_action_plan.pop("CorrectiveActionPlan")
         sac.save()
         self.sac = sac
-        self.etl = ETL(self.sac)
+        self.intake_to_dissemination = IntakeToDissemination(self.sac)
         self.report_id = sac.report_id
-        self.etl.load_all()
+        self.intake_to_dissemination.load_all()
+        self.intake_to_dissemination.save_dissemination_objects()
         self.assertLess(len_general, len(General.objects.all()))
         self.assertEqual(len_captext, len(CapText.objects.all()))
 
@@ -422,19 +436,28 @@ class ETLTests(TestCase):
         )
         sac.save()
         self.sac = sac
-        self.etl = ETL(self.sac, write_to_db=False)
+        self.intake_to_dissemination = IntakeToDissemination(self.sac)
         self.report_id = sac.report_id
-        objs = self.etl.load_all()
+        self.intake_to_dissemination.load_all()
+        objs = self.intake_to_dissemination.get_dissemination_objects()
         self.assertEqual(len_general, len(General.objects.all()))
         self.assertEqual(len_captext, len(CapText.objects.all()))
-        keys = ['Generals', 'SecondaryAuditors', 'FederalAwards', 
-                'Findings', 'FindingTexts', 'Passthroughs', 'CapTexts'
+        keys = [
+            "Generals",
+            "SecondaryAuditors",
+            "FederalAwards",
+            "Findings",
+            "FindingTexts",
+            "Passthroughs",
+            "CapTexts",
+            "Notes",
+            "Revisions",
         ]
 
         print(objs)
 
         for k, v in objs.items():
-            assert(k in keys)
-            assert(len(v) > 0)
+            assert k in keys
+            assert len(v) > 0
             for obj in v:
-                assert(obj is not None)
+                assert obj is not None
