@@ -1,6 +1,4 @@
 import logging
-import pprint
-
 
 from django.views import generic
 from django.views.decorators.csrf import csrf_exempt
@@ -798,14 +796,15 @@ class SubmissionProgressView(SingleAuditChecklistAccessRequiredMixin, generic.Vi
             except SingleAuditReportFile.DoesNotExist:
                 sar = None
 
-            submission_status_order = [
-                "in_progress",
-                "ready_for_certification",
-                "auditor_certified",
-                "auditee_certified",
-                "certified",
-                "submitted",
-            ]
+            # Not currently used?
+            # submission_status_order = [
+            #     "in_progress",
+            #     "ready_for_certification",
+            #     "auditor_certified",
+            #     "auditee_certified",
+            #     "certified",
+            #     "submitted",
+            # ]
 
             subcheck = submission_progress_check(sac, sar)
 
@@ -822,7 +821,8 @@ class SubmissionProgressView(SingleAuditChecklistAccessRequiredMixin, generic.Vi
                 },
                 "certification": {
                     "auditor_certified": bool(sac.auditor_certification),
-                    "auditor_enabled": sac.submission_status == "ready_for_certification",
+                    "auditor_enabled": sac.submission_status
+                    == "ready_for_certification",
                     "auditee_certified": sac.is_auditee_certified,
                     "auditee_enabled": sac.submission_status == "auditor_certified",
                 },
@@ -839,7 +839,9 @@ class SubmissionProgressView(SingleAuditChecklistAccessRequiredMixin, generic.Vi
             }
             context = context | subcheck
 
-            return render(request, "audit/submission_checklist/submission-checklist.html", context)
+            return render(
+                request, "audit/submission_checklist/submission-checklist.html", context
+            )
         except SingleAuditChecklist.DoesNotExist as err:
             raise PermissionDenied("You do not have access to this audit.") from err
 
