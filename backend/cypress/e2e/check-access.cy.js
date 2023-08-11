@@ -54,10 +54,7 @@ describe('Create New Audit', () => {
         });
 
         it('should remove the error message when input is supplied', () => {
-          cy.get('#certifying_auditee_contact_fullname')
-            .clear()
-            .type('A Name')
-            .blur();
+          addValidInfo('#certifying_auditee_contact_fullname')
           cy.get('#certifying_auditee_contact_fullname-not-null').should(
             'not.be.visible'
           );
@@ -154,10 +151,7 @@ describe('Create New Audit', () => {
         });
 
         it('should remove the error message when input is supplied', () => {
-          cy.get('#certifying_auditor_contact_fullname')
-            .clear()
-            .type('A Name')
-            .blur();
+          addValidInfo('#certifying_auditor_contact_fullname');
           cy.get('#certifying_auditor_contact_fullname-not-null').should(
             'not.be.visible'
           );
@@ -259,10 +253,7 @@ describe('Create New Audit', () => {
         });
 
         it('should remove the error message when input is supplied', () => {
-          cy.get('#auditee_contacts_fullname')
-            .clear()
-            .type('A Name')
-            .blur();
+          addValidInfo('#auditee_contacts_fullname')
           cy.get('#auditee_contacts_fullname-not-null').should(
             'not.be.visible'
           );
