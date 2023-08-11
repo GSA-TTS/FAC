@@ -48,8 +48,7 @@ class NumberOfFindingsTests(TestCase):
         return {
             "FindingsText": {
                 "findings_text_entries": [
-                    NumberOfFindingsTests.findings_text
-                    for _ in range(findings_count)
+                    NumberOfFindingsTests.findings_text for _ in range(findings_count)
                 ]
             }
         }
@@ -64,10 +63,12 @@ class NumberOfFindingsTests(TestCase):
             }
         }
 
-    def _make_sac(self, findings_count)->SingleAuditChecklist:
+    def _make_sac(self, findings_count) -> SingleAuditChecklist:
         sac = baker.make(SingleAuditChecklist)
         sac.federal_awards = self._make_federal_awards(findings_count)
-        sac.findings_uniform_guidance = self._make_findings_uniform_guidance(findings_count)
+        sac.findings_uniform_guidance = self._make_findings_uniform_guidance(
+            findings_count
+        )
         sac.findings_text = self._make_findings_text(findings_count)
         sac.corrective_action_plan = self._make_corrective_action_plan(findings_count)
         return sac
