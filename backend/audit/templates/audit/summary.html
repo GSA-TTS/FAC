@@ -27,14 +27,14 @@
                     </div>
                     {% comment %} Federal Awards {% endcomment %}
                     <div id="federal-awards" class="usa-table-container--scrollable">
-                        <h2 id="federal-awards-title" class="margin-bottom-3">
-                            <span>Federal Awards</span>
-                            <svg class="usa-icon padding-top-05 text-base font-sans-md"
+                        <h2 id="federal-awards-title" class="grid-row margin-bottom-3">
+                            <span class="">Federal Awards</span>
+                            <svg class="usa-icon text-base font-sans-md"
                                 aria-hidden="true"
                                 role="img">
                             {% uswds_sprite "more_vert" %}
                             </svg>
-                            <span class="text-base">{{ federal_awards|length }}</span>
+                            <span class="text-base"><p hidden>(</p>{{ federal_awards|length }}<p hidden>)</p></span>
                         </h2>
                         <table id="federal-awards-table"
                                class="usa-table usa-table--striped overflow-scroll">
