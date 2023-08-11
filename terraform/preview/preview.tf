@@ -10,3 +10,8 @@ module "preview" {
   smtp_proxy_instances  = 1
   recursive_delete      = true
 }
+
+import {
+  to = module.preview.module.clamav.cloudfoundry_app.clamav_api
+  id = "ed9b5108-1e31-44b8-9ba0-375e091c5589"
+}
