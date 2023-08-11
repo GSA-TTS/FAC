@@ -29,15 +29,13 @@ class IntakeToDissemination(object):
 
     def load_all(self):
         load_methods = {
-            "Generals": self.load_general,
-            "SecondaryAuditors": self.load_secondary_auditor,
-            "FederalAwards": self.load_federal_award,
-            "Findings": self.load_findings,
-            "FindingTexts": self.load_finding_texts,
-            "Passthroughs": self.load_passthrough,
-            "CapTexts": self.load_captext,
-            "Notes": self.load_notes,
-            "Revisions": self.load_revision,
+            # 'Generals': self.load_general,
+            'SecondaryAuditors': self.load_secondary_auditor,
+            'FederalAwards': self.load_federal_award,
+            # 'Findings': self.load_findings,
+            # 'FindingTexts': self.load_finding_texts,
+            # 'Passthroughs': self.load_passthrough,
+            'CapTexts': self.load_captext,
         }
         for _, load_method in load_methods.items():
             try:
@@ -108,37 +106,39 @@ class IntakeToDissemination(object):
 
     def load_federal_award(self):
         federal_awards = self.single_audit_checklist.federal_awards
+        if (not federal_awards):
+            return {}
         federal_awards_objects = []
         for entry in federal_awards["FederalAwards"]["federal_awards"]:
-            program = entry["program"]
-            loan = entry["loan_or_loan_guarantee"]
-            is_direct = entry["direct_or_indirect_award"]["is_direct"] == "Y"
-            is_passthrough = entry["subrecipients"]["is_passed"] == "Y"
-            cluster = entry["cluster"]
-            subrecipient_amount = entry["subrecipients"].get("subrecipient_amount")
+            program = entry.get("program")
+            loan = entry.get("loan_or_loan_guarantee")
+            is_direct = entry.get("direct_or_indirect_award")["is_direct"] == "Y"
+            is_passthrough = entry.get("subrecipients")["is_passed"] == "Y"
+            cluster = entry.get("cluster")
+            subrecipient_amount = entry.get("subrecipients").get("subrecipient_amount")
             state_cluster_name = cluster.get("state_cluster_name")
             other_cluster_name = cluster.get("other_cluster_name")
             federal_award = FederalAward(
                 report_id=self.report_id,
-                award_reference=entry["award_reference"],
-                federal_agency_prefix=program["federal_agency_prefix"],
-                federal_award_extension=program["three_digit_extension"],
-                additional_award_identification=program[
+                award_reference=entry.get("award_reference"),
+                federal_agency_prefix=program.get("federal_agency_prefix"),
+                federal_award_extension=program.get("three_digit_extension"),
+                additional_award_identification=program.get(
                     "additional_award_identification"
-                ],
-                federal_program_name=program["program_name"],
-                amount_expended=program["amount_expended"],
+                ),
+                federal_program_name=program.get("program_name"),
+                amount_expended=program.get("amount_expended"),
                 cluster_name=cluster["cluster_name"],
                 other_cluster_name=other_cluster_name,
                 state_cluster_name=state_cluster_name,
                 cluster_total=cluster["cluster_total"],
-                federal_program_total=program["federal_program_total"],
+                federal_program_total=program.get("federal_program_total"),
                 is_loan=loan["is_guaranteed"] == "Y",
                 loan_balance=loan["loan_balance_at_audit_period_end"],
                 is_direct=is_direct,
-                is_major=program["is_major"] == "Y",
-                mp_audit_report_type=program["audit_report_type"],
-                findings_count=program["number_of_audit_findings"],
+                is_major=program.get("is_major") == "Y",
+                mp_audit_report_type=program.get("audit_report_type"),
+                findings_count=program.get("number_of_audit_findings"),
                 is_passthrough_award=is_passthrough,
                 passthrough_amount=subrecipient_amount,
                 type_requirement=None,  # TODO: What is this?
@@ -151,6 +151,8 @@ class IntakeToDissemination(object):
 
     def load_captext(self):
         corrective_action_plan = self.single_audit_checklist.corrective_action_plan
+        if (not corrective_action_plan):
+            return {}
         corrective_action_plan_entries = corrective_action_plan["CorrectiveActionPlan"][
             "corrective_action_plan_entries"
         ]
@@ -158,9 +160,9 @@ class IntakeToDissemination(object):
         for entry in corrective_action_plan_entries:
             cap_text = CapText(
                 report_id=self.report_id,
-                finding_ref_number=entry["reference_number"],
-                contains_chart_or_table=entry["contains_chart_or_table"] == "Y",
-                planned_action=entry["planned_action"],
+                finding_ref_number=entry.get("reference_number"),
+                contains_chart_or_table=entry.get("contains_chart_or_table") == "Y",
+                planned_action=entry.get("planned_action"),
             )
             # if self.write_to_db:
             #     cap_text.save()
@@ -336,6 +338,8 @@ class IntakeToDissemination(object):
 
     def load_secondary_auditor(self):
         secondary_auditors = self.single_audit_checklist.secondary_auditors
+        if (not secondary_auditors):
+            return {}
 
         sec_objs = []
         for secondary_auditor in secondary_auditors["SecondaryAuditors"][
@@ -343,17 +347,17 @@ class IntakeToDissemination(object):
         ]["items"]:
             sec_auditor = SecondaryAuditor(
                 report_id=self.single_audit_checklist.report_id,
-                auditor_seq_number=secondary_auditor["secondary_auditor_seq_number"],
-                auditor_ein=secondary_auditor["secondary_auditor_ein"],
-                auditor_name=secondary_auditor["secondary_auditor_name"],
-                contact_name=secondary_auditor["secondary_auditor_contact_name"],
-                contact_title=secondary_auditor["secondary_auditor_contact_title"],
-                contact_email=secondary_auditor["secondary_auditor_contact_email"],
-                contact_phone=secondary_auditor["secondary_auditor_contact_phone"],
-                address_street=secondary_auditor["secondary_auditor_address_street"],
-                address_city=secondary_auditor["secondary_auditor_address_city"],
-                address_state=secondary_auditor["secondary_auditor_address_state"],
-                address_zipcode=secondary_auditor["secondary_auditor_address_zipcode"],
+                auditor_seq_number=secondary_auditor.get("secondary_auditor_seq_number"),
+                auditor_ein=secondary_auditor.get("secondary_auditor_ein"),
+                auditor_name=secondary_auditor.get("secondary_auditor_name"),
+                contact_name=secondary_auditor.get("secondary_auditor_contact_name"),
+                contact_title=secondary_auditor.get("secondary_auditor_contact_title"),
+                contact_email=secondary_auditor.get("secondary_auditor_contact_email"),
+                contact_phone=secondary_auditor.get("secondary_auditor_contact_phone"),
+                address_street=secondary_auditor.get("secondary_auditor_address_street"),
+                address_city=secondary_auditor.get("secondary_auditor_address_city"),
+                address_state=secondary_auditor.get("secondary_auditor_address_state"),
+                address_zipcode=secondary_auditor.get("secondary_auditor_address_zipcode"),
             )
             # if self.write_to_db:
             #     sec_auditor.save()

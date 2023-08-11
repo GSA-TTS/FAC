@@ -13,7 +13,7 @@ from django.http import JsonResponse
 
 from config.settings import AGENCY_NAMES, GAAP_RESULTS
 
-from audit.etl import ETL
+from audit.intake_to_dissemination import IntakeToDissemination
 from audit.cross_validation import sac_validation_shape
 from audit.excel import (
     extract_additional_ueis,
@@ -1097,20 +1097,18 @@ class SummaryView(SingleAuditChecklistAccessRequiredMixin, generic.View):
         try:
             sac = SingleAuditChecklist.objects.get(report_id=report_id)
 
-            # If there's no awards in the dissemination tables, load them in. If there are already some there, the DB will throw an error when trying to enter duplicates.
-            # TODO: Fix up ETL such that it can either:
-            #       (a) Overwrite old entires
-            #       (b) Skip old entries and save only new ones
-            if not FederalAward.objects.filter(report_id=report_id).exists():
-                ETL(sac).load_federal_award()
-            awards = FederalAward.objects.filter(report_id=report_id).values()
+            etl = IntakeToDissemination(sac)
+            data = etl.load_all()
+            awards = [vars(x) for x in data['FederalAwards']]
 
-            if not General.objects.filter(report_id=report_id).exists():
-                ETL(sac).load_general()
-            general = General.objects.filter(report_id=report_id).values()[0]
+            print(awards)
+
+            for x in awards:
+                del x['id']
+                del x['_state']
 
             context = {
-                "general": general,
+                # "general": general,
                 "federal_awards": awards,
                 "auditee_name": sac.auditee_name,
                 "report_id": report_id,
