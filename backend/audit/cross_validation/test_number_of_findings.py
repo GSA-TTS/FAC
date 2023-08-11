@@ -89,8 +89,8 @@ class NumberOfFindingsTests(TestCase):
         """
         Check that an error is returned when the number of findings is inconsistent between Federal Awards and Federal Awards Audit Findings workbooks.
         """
-        findings_count = random.randint(2, 9)
-        mismatch = findings_count - 1
+        findings_count = random.randint(5, 9)
+        mismatch = random.randint(1, 4)
         sac = self._make_sac(findings_count)
         sac.findings_uniform_guidance = self._make_findings_uniform_guidance(mismatch)
         shaped_sac = sac_validation_shape(sac)
@@ -106,8 +106,8 @@ class NumberOfFindingsTests(TestCase):
         """
         Check that an error is returned when the number of findings is inconsistent between Federal Awards and Corrective Action Plan workbooks.
         """
-        findings_count = random.randint(2, 9)
-        mismatch = findings_count - 1
+        findings_count = random.randint(5, 9)
+        mismatch = random.randint(1, 4)
         sac = self._make_sac(findings_count)
         sac.corrective_action_plan = self._make_corrective_action_plan(mismatch)
         shaped_sac = sac_validation_shape(sac)
@@ -123,8 +123,8 @@ class NumberOfFindingsTests(TestCase):
         """
         Check that an error is returned when the number of findings is inconsistent between Federal Awards and Audit Findings Text workbooks.
         """
-        findings_count = random.randint(2, 9)
-        mismatch = findings_count - 1
+        findings_count = random.randint(5, 9)
+        mismatch = random.randint(1, 4)
         sac = self._make_sac(findings_count)
         sac.findings_text = self._make_findings_text(mismatch)
         shaped_sac = sac_validation_shape(sac)
@@ -140,8 +140,8 @@ class NumberOfFindingsTests(TestCase):
         """
         Check that an error is returned when the number of findings is inconsistent between Federal Awards and the other workbooks.
         """
-        findings_count = random.randint(2, 9)
-        mismatch = findings_count - 1
+        findings_count = random.randint(5, 9)
+        mismatch = random.randint(1, 4)
         sac = self._make_sac(findings_count)
         sac.findings_text = self._make_findings_text(mismatch)
         sac.corrective_action_plan = self._make_corrective_action_plan(mismatch)
