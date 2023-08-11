@@ -7,6 +7,7 @@ camel_to_snake = {
     "FindingsUniformGuidance": "findings_uniform_guidance",
     "GeneralInformation": "general_information",
     "NotesToSefa": "notes_to_sefa",
+    "TribalDataConsent": "tribal_data_consent",
 }
 snake_to_camel = {v: k for k, v in camel_to_snake.items()}
 at_root_sections = ("audit_information", "general_information")

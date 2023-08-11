@@ -55,11 +55,13 @@ And an example with-errors return value is:
     ]
 
 """
-from .auditee_ueis_match import auditee_ueis_match
 from .additional_ueis import additional_ueis
+from .auditee_ueis_match import auditee_ueis_match
+from .audit_findings import audit_findings
 from .sac_validation_shape import sac_validation_shape  # noqa: F401
 
 functions = [
+    audit_findings,
     auditee_ueis_match,
     additional_ueis,
 ]

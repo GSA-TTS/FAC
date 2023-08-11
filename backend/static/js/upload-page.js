@@ -45,6 +45,13 @@ function handleErrors(error) {
     console.error(`Access denied. Audit is locked to SF-SAC changes.\n`, error);
     info_box.innerHTML =
       'Access denied. Further changes to audits that have been marked ready for certification are not permitted.';
+  } else if (error.name === 'Unknown workbook') {
+    // Unknown workbook.
+    console.error(
+      `Unknown workbook - The uploaded workbook template does not originate from SF-SAC.\n`,
+      error
+    );
+    info_box.innerHTML = `This does not look like a GSA SF-SAC workbook. Please download a workbook template from fac.gov for entering and submitting SF-SAC data.`;
   } else {
     // Catch all.
     console.error(`Unexpected error.\n`, error);
@@ -149,6 +156,10 @@ function attachFileUploadHandler() {
               } else if (data.type === 'no_late_changes') {
                 let e = new Error(data.errors);
                 e.name = 'Access denied';
+                handleErrors(e);
+              } else if (data.type === 'unknown_workbook') {
+                let e = new Error(data.errors);
+                e.name = 'Unknown workbook';
                 handleErrors(e);
               } else {
                 // Catch all.

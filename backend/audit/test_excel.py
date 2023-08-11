@@ -53,6 +53,7 @@ from audit.fixtures.excel import (
     SECONDARY_AUDITORS_TEMPLATE,
     NOTES_TO_SEFA_TEMPLATE,
     NOTES_TO_SEFA_ENTRY_FIXTURES,
+    FORM_SECTIONS,
 )
 
 # Simplest way to create a new copy of simple case rather than getting
@@ -98,6 +99,7 @@ class FederalAwardsExcelTests(SimpleTestCase):
         workbook = load_workbook(FEDERAL_AWARDS_TEMPLATE, data_only=True)
 
         _set_by_name(workbook, "auditee_uei", FederalAwardsExcelTests.GOOD_UEI)
+        _set_by_name(workbook, "section_name", FORM_SECTIONS.FEDERAL_AWARDS_EXPENDED)
         _set_by_name(workbook, "amount_expended", 100)
         _add_entry(workbook, 0, FederalAwardsExcelTests.TEST_DATA[0])
 
@@ -110,6 +112,7 @@ class FederalAwardsExcelTests(SimpleTestCase):
         workbook = load_workbook(FEDERAL_AWARDS_TEMPLATE, data_only=True)
 
         _set_by_name(workbook, "auditee_uei", FederalAwardsExcelTests.GOOD_UEI)
+        _set_by_name(workbook, "section_name", FORM_SECTIONS.FEDERAL_AWARDS_EXPENDED)
         _set_by_name(workbook, "amount_expended", 200)
         for index, entry in enumerate(FederalAwardsExcelTests.TEST_DATA):
             _add_entry(workbook, index, entry)
@@ -123,6 +126,7 @@ class FederalAwardsExcelTests(SimpleTestCase):
         workbook = load_workbook(FEDERAL_AWARDS_TEMPLATE, data_only=True)
 
         _set_by_name(workbook, "auditee_uei", FederalAwardsExcelTests.GOOD_UEI)
+        _set_by_name(workbook, "section_name", FORM_SECTIONS.FEDERAL_AWARDS_EXPENDED)
         _set_by_name(workbook, "total_amount_expended", 200)
 
         entry = jsoncopy(FederalAwardsExcelTests.TEST_DATA[0])
@@ -140,7 +144,7 @@ class FederalAwardsExcelTests(SimpleTestCase):
 
         # add valid data to the workbook
         _set_by_name(workbook, "auditee_uei", FederalAwardsExcelTests.GOOD_UEI)
-        _set_by_name(workbook, "total_amount_expended", 200)
+        _set_by_name(workbook, "section_name", FORM_SECTIONS.FEDERAL_AWARDS_EXPENDED)
         _add_entry(workbook, 0, FederalAwardsExcelTests.TEST_DATA[0])
 
         test_cases = [
@@ -179,6 +183,7 @@ class FederalAwardsExcelTests(SimpleTestCase):
 
         # add valid data to the workbook
         _set_by_name(workbook, "auditee_uei", FederalAwardsExcelTests.GOOD_UEI)
+        _set_by_name(workbook, "section_name", FORM_SECTIONS.FEDERAL_AWARDS_EXPENDED)
         _set_by_name(workbook, "amount_expended", 200)
         _add_entry(workbook, 0, FederalAwardsExcelTests.TEST_DATA[0])
 
@@ -218,7 +223,7 @@ class CorrectiveActionPlanExcelTests(SimpleTestCase):
         workbook = load_workbook(CORRECTIVE_ACTION_PLAN_TEMPLATE, data_only=True)
 
         _set_by_name(workbook, "auditee_uei", CorrectiveActionPlanExcelTests.GOOD_UEI)
-
+        _set_by_name(workbook, "section_name", FORM_SECTIONS.CORRECTIVE_ACTION_PLAN)
         _add_entry(workbook, 0, CorrectiveActionPlanExcelTests.TEST_DATA[0])
 
         corrective_action_plan = extract_corrective_action_plan(workbook)
@@ -230,7 +235,7 @@ class CorrectiveActionPlanExcelTests(SimpleTestCase):
         workbook = load_workbook(CORRECTIVE_ACTION_PLAN_TEMPLATE, data_only=True)
 
         _set_by_name(workbook, "auditee_uei", CorrectiveActionPlanExcelTests.GOOD_UEI)
-
+        _set_by_name(workbook, "section_name", FORM_SECTIONS.CORRECTIVE_ACTION_PLAN)
         for index, entry in enumerate(CorrectiveActionPlanExcelTests.TEST_DATA):
             _add_entry(workbook, index, entry)
 
@@ -243,7 +248,7 @@ class CorrectiveActionPlanExcelTests(SimpleTestCase):
         workbook = load_workbook(CORRECTIVE_ACTION_PLAN_TEMPLATE, data_only=True)
 
         _set_by_name(workbook, "auditee_uei", CorrectiveActionPlanExcelTests.GOOD_UEI)
-
+        _set_by_name(workbook, "section_name", FORM_SECTIONS.CORRECTIVE_ACTION_PLAN)
         entry = jsoncopy(CorrectiveActionPlanExcelTests.TEST_DATA[0])
         del entry["planned_action"]
 
@@ -309,6 +314,7 @@ class FindingsUniformGuidanceExcelTests(SimpleTestCase):
         _set_by_name(
             workbook, "auditee_uei", FindingsUniformGuidanceExcelTests.GOOD_UEI
         )
+        _set_by_name(workbook, "section_name", FORM_SECTIONS.FINDINGS_UNIFORM_GUIDANCE)
         _add_entry(workbook, 0, FindingsUniformGuidanceExcelTests.TEST_DATA[0])
 
         findings = extract_findings_uniform_guidance(workbook)
@@ -322,6 +328,7 @@ class FindingsUniformGuidanceExcelTests(SimpleTestCase):
         _set_by_name(
             workbook, "auditee_uei", FindingsUniformGuidanceExcelTests.GOOD_UEI
         )
+        _set_by_name(workbook, "section_name", FORM_SECTIONS.FINDINGS_UNIFORM_GUIDANCE)
         for index, entry in enumerate(FindingsUniformGuidanceExcelTests.TEST_DATA):
             _add_entry(workbook, index, entry)
 
@@ -396,6 +403,7 @@ class FindingsTextExcelTests(SimpleTestCase):
         workbook = load_workbook(FINDINGS_TEXT_TEMPLATE, data_only=True)
 
         _set_by_name(workbook, "auditee_uei", FindingsTextExcelTests.GOOD_UEI)
+        _set_by_name(workbook, "section_name", FORM_SECTIONS.FINDINGS_TEXT)
         _add_entry(workbook, 0, FindingsTextExcelTests.TEST_DATA[0])
 
         findings = extract_findings_text(workbook)
@@ -407,6 +415,7 @@ class FindingsTextExcelTests(SimpleTestCase):
         workbook = load_workbook(FINDINGS_TEXT_TEMPLATE, data_only=True)
 
         _set_by_name(workbook, "auditee_uei", FindingsTextExcelTests.GOOD_UEI)
+        _set_by_name(workbook, "section_name", FORM_SECTIONS.FINDINGS_TEXT)
         for index, entry in enumerate(FindingsTextExcelTests.TEST_DATA):
             _add_entry(workbook, index, entry)
 
@@ -475,6 +484,7 @@ class AdditionalUeisExcelTests(SimpleTestCase):
         workbook = load_workbook(ADDITIONAL_UEIS_TEMPLATE, data_only=True)
 
         _set_by_name(workbook, "auditee_uei", AdditionalUeisExcelTests.GOOD_UEI)
+        _set_by_name(workbook, "section_name", FORM_SECTIONS.ADDITIONAL_UEIS)
         _add_entry(workbook, 0, AdditionalUeisExcelTests.TEST_DATA[0])
 
         additional_ueis = extract_additional_ueis(workbook)
@@ -486,6 +496,7 @@ class AdditionalUeisExcelTests(SimpleTestCase):
         workbook = load_workbook(ADDITIONAL_UEIS_TEMPLATE, data_only=True)
 
         _set_by_name(workbook, "auditee_uei", AdditionalUeisExcelTests.GOOD_UEI)
+        _set_by_name(workbook, "section_name", FORM_SECTIONS.ADDITIONAL_UEIS)
         for index, entry in enumerate(AdditionalUeisExcelTests.TEST_DATA):
             _add_entry(workbook, index, entry)
 
@@ -539,6 +550,7 @@ class SecondaryAuditorsExcelTests(SimpleTestCase):
         workbook = load_workbook(SECONDARY_AUDITORS_TEMPLATE, data_only=True)
 
         _set_by_name(workbook, "auditee_uei", SecondaryAuditorsExcelTests.GOOD_UEI)
+        _set_by_name(workbook, "section_name", FORM_SECTIONS.SECONDARY_AUDITORS)
         _add_entry(workbook, 0, SecondaryAuditorsExcelTests.TEST_DATA[0])
 
         secondary_auditors = extract_secondary_auditors(workbook)
@@ -550,6 +562,7 @@ class SecondaryAuditorsExcelTests(SimpleTestCase):
         workbook = load_workbook(SECONDARY_AUDITORS_TEMPLATE, data_only=True)
 
         _set_by_name(workbook, "auditee_uei", SecondaryAuditorsExcelTests.GOOD_UEI)
+        _set_by_name(workbook, "section_name", FORM_SECTIONS.SECONDARY_AUDITORS)
         for index, entry in enumerate(SecondaryAuditorsExcelTests.TEST_DATA):
             _add_entry(workbook, index, entry)
 
@@ -658,3 +671,4 @@ class NotesToSefaExcelTests(SimpleTestCase):
         _set_by_name(workbook, "accounting_policies", "Mandatory notes")
         _set_by_name(workbook, "is_minimis_rate_used", "Y")
         _set_by_name(workbook, "rate_explained", "More explanation.")
+        _set_by_name(workbook, "section_name", FORM_SECTIONS.NOTES_TO_SEFA)
