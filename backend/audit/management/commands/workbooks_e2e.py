@@ -60,6 +60,27 @@ from audit.fixtures.workbooks.sac_creation import _post_upload_pdf
 
 #     sac.transition_name.append(SingleAuditChecklist.STATUS.SUBMITTED)
 #     sac.transition_date.append(date.today())
+
+def step_through_certifications(sac, SAC):
+    sac.transition_name.append(SAC.STATUS.SUBMITTED)
+    sac.transition_date.append(datetime.date.today())
+
+    sac.transition_name.append(SAC.STATUS.AUDITOR_CERTIFIED)
+    sac.transition_date.append(datetime.date.today())
+
+    sac.transition_name.append(SAC.STATUS.AUDITEE_CERTIFIED)
+    sac.transition_date.append(datetime.date.today())
+
+    sac.transition_name.append(SAC.STATUS.CERTIFIED)
+    sac.transition_date.append(datetime.date.today())
+
+def disseminate(sac):
+    print("TRANSFERRING DATA... HARDER BETTER FASTER STRONGER ...")
+    from audit.etl import ETL
+    if sac.general_information:
+        etl = ETL(sac)
+        etl.load_all()
+
 class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument("--email", type=str, required=True)
@@ -84,3 +105,6 @@ class Command(BaseCommand):
             (_, json, _) = loader(fun, section)
             json_test_tables.append(json)
         _post_upload_pdf(sac, user, 'audit/fixtures/basic.pdf')
+        SingleAuditChecklist = apps.get_model("audit.SingleAuditChecklist")
+        step_through_certifications(sac, SingleAuditChecklist)
+        disseminate(sac)
