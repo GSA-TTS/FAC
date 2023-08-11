@@ -1,15 +1,12 @@
 import argparse
 from collections import defaultdict
-import glob
 import os
 from pathlib import Path
 import pandas as pd
-import tempfile
-import zipfile
-import sys
 import sqlalchemy
 from django.db import connection
 
+import csv
 parser = argparse.ArgumentParser()
 dtypes = defaultdict(lambda: str)
 
@@ -19,6 +16,10 @@ from django.conf import settings
 import logging
 
 logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.WARNING)
+loggers = [logging.getLogger(name) for name in logging.root.manager.loggerDict]
+for logger in loggers:
+    logger.setLevel(logging.WARNING)
 
 from django.core.files.storage import default_storage
 import io
@@ -52,13 +53,16 @@ class Command(BaseCommand):
 
         for txtfile in files:
             file = default_storage.open(f"{options['path']}/{txtfile}", "rb")
-            file_bytes = io.BytesIO(file.read())
+            file_bytes = file.read()# .decode('utf-8', 'replace')
             file.close()
-            # Because the files were encoded in CP1252, we have to wrap them in that
-            # encoding to pull them apart in Pandas correctly.
-            wrapped = io.TextIOWrapper(
-                file_bytes, encoding="cp1252", line_buffering=True
-            )
-            # Census exports data in CP-1252.
-            df = pd.read_csv(wrapped, delimiter="|", encoding="cp1252", dtype=dtypes)
+            df = pd.read_csv(io.BytesIO(file_bytes), #.encode('utf-8', 'skip')),
+                        delimiter="|", 
+                        dtype=dtypes,
+                        #low_memory=False,
+                        on_bad_lines='skip',
+                        engine='python', 
+                        quoting=csv.QUOTE_NONE,
+                        # lineterminator='\n',
+                        encoding='utf-8',
+                        )
             df.to_sql(name=make_tablename(txtfile), con=engine)

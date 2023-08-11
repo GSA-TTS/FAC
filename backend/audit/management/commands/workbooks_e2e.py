@@ -19,8 +19,10 @@ pw.setLevel(logging.INFO)
 from audit.fixtures.workbooks.workbook_creation import (
     sections,
     workbook_loader,
-    setup_sac
+    setup_sac,
 )
+
+from audit.fixtures.workbooks.sac_creation import _post_upload_pdf
 
 # # def transition(sac):
 # #     SingleAuditChecklist = apps.get_model("audit.SingleAuditChecklist")
@@ -81,3 +83,4 @@ class Command(BaseCommand):
             # FIXME: Can we conditionally upload the addl' and secondary workbooks?
             (_, json, _) = loader(fun, section)
             json_test_tables.append(json)
+        _post_upload_pdf(sac, user, 'audit/fixtures/basic.pdf')

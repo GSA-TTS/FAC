@@ -238,6 +238,47 @@ def _make_excel_file(filename, f_obj):
     file = SimpleUploadedFile(filename, content, "application/vnd.ms-excel")
     return file
 
+def _post_upload_pdf(this_sac, this_user, pdf_filename):
+    """Upload a workbook for this SAC.
+
+    This should be idempotent if it is called on a SAC that already
+    has a federal awards file uploaded.
+    """
+    PDFFile = apps.get_model("audit.SingleAuditReportFile")
+
+    if PDFFile.objects.filter(sac_id=this_sac.id).exists():
+        # there is already an uploaded file and data in the object so
+        # nothing to do here
+        return
+
+    with open(pdf_filename, "rb") as f:
+        content = f.read()
+    file = SimpleUploadedFile(pdf_filename, content, "application/pdf")
+    print(file.__dict__)
+    pdf_file = PDFFile(
+        file=file,
+        component_page_numbers={
+            "financial_statements": 1,
+            "financial_statements_opinion": 2,
+            "schedule_expenditures": 3,
+            "schedule_expenditures_opinion": 4,
+            "uniform_guidance_control": 5,
+            "uniform_guidance_compliance": 6,
+            "GAS_control": 6,
+            "GAS_compliance": 7,
+            "schedule_findings": 8,
+        },
+        filename=Path(pdf_filename).stem,
+        user=this_user,
+        sac_id=this_sac.id,
+    )
+
+    validator_mapping["PDF"](pdf_file.file)
+
+    pdf_file.full_clean()
+    pdf_file.save()
+
+    this_sac.save()
 
 def _post_upload_workbook(this_sac, this_user, section, xlsx_file):
     """Upload a workbook for this SAC.
