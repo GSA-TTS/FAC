@@ -59,6 +59,9 @@ from audit.validators import (
 
 from .fixtures.excel import FORM_SECTIONS, UNKNOWN_WORKBOOK
 
+logging.basicConfig(
+    format="%(asctime)s %(levelname)-8s %(module)s:%(lineno)d %(message)s"
+)
 logger = logging.getLogger(__name__)
 
 
