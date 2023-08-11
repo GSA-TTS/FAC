@@ -63,7 +63,7 @@ def calc_total_amounts_agency(fed_award_data, year=2023):
     tot_da_amount_expended = 0
     for award in fed_award_data["FederalAwards"]["federal_awards"]:
         if year == 2019:
-            agency_prefix = award["cfda"][:2]
+            agency_prefix = int(str(award["cfda"])[:2])
             tot_amount_agency[agency_prefix] += award["amount"]
             if award["direct"] == "Y":
                 tot_da_amount_expended += award["amount"]
@@ -89,23 +89,32 @@ def calc_total_amounts_agency(fed_award_data, year=2023):
 
     # print("tot_da_amount_expended = ", tot_da_amount_expended)
 
-    if (
-        tot_da_amount_expended
-        >= 0.25 * fed_award_data["FederalAwards"]["total_amount_expended"]
-    ):
-        selected_agency_prefix, val = tot_da_amount_agency[0]
+    if year == 2019:
+        if (
+            tot_da_amount_expended
+            >= 0.25 * fed_award_data["FederalAwards"]["total_amount_expended"]   # To Do: Gen data needed
+        ):
+            selected_agency_prefix, val = tot_da_amount_agency[0]
+        else:
+            selected_agency_prefix, val = tot_amount_agency[0]
     else:
-        selected_agency_prefix, val = tot_amount_agency[0]
+        if (
+            tot_da_amount_expended
+            >= 0.25 * fed_award_data["FederalAwards"]["total_amount_expended"]
+        ):
+            selected_agency_prefix, val = tot_da_amount_agency[0]
+        else:
+            selected_agency_prefix, val = tot_amount_agency[0]
     # print("selected agency prefix = ", selected_agency_prefix)
 
     return selected_agency_prefix
 
 
 def calc_tot_amt_expended(federal_awards_data, auditee_ein, general_2019_data):
-    if auditee_2019_submission_exists(auditee_ein):
+    if auditee_2019_submission_exists(auditee_ein, general_2019_data):
         # Calculate from 2019 data
         # gen = Gen19.objects.filter(EIN=auditee_ein)
-        return general_2019_data["totfedexpend"]
+        return general_2019_data["General"]["totfedexpend"]
     else:
         return federal_awards_data["FederalAwards"]["total_amount_expended"]
 
