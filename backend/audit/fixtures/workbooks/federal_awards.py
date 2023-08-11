@@ -186,7 +186,7 @@ def generate_federal_awards(dbkey, outfile):
     wb.save(outfile)
 
     table = generate_dissemination_test_table(
-        Gen, "federal_awards", dbkey, mappings, cfdas
+        Gen, "federal_award", dbkey, mappings, cfdas
     )
     award_counter = 1
     # prefix

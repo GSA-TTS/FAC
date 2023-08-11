@@ -81,6 +81,37 @@ def disseminate(sac):
         etl = ETL(sac)
         etl.load_all()
 
+# [{'endpoint': 'federal_awards',
+#   'report_id': '2022TEST000100010',
+#   'rows': [{'fields': ['program_name',
+#                        'federal_program_total',
+#                        'cluster_total',
+#                        'is_guaranteed',
+#                        'is_direct',
+#                        'is_passed',
+#                        'subrecipient_amount',
+#                        'is_major',
+#                        'amount_expended',
+#                        'federal_program_total',
+#                        'passthrough_name',
+#                        'passthrough_identifying_number'],
+#             'values': ['COMMUNITY FACILITIES LOANS AND GRANTS',
+#                        '69038',
+#                        '0',
+#                        'N',
+#                        'Y',
+#                        'N',
+#                        '0',
+#                        'N',
+#                        '69038',
+#                        '69038',
+#                        '',
+#                        '']},
+
+from pprint import pprint
+def api_check(json_test_tables):
+    pprint(json_test_tables)
+
 class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument("--email", type=str, required=True)
@@ -108,3 +139,4 @@ class Command(BaseCommand):
         SingleAuditChecklist = apps.get_model("audit.SingleAuditChecklist")
         step_through_certifications(sac, SingleAuditChecklist)
         disseminate(sac)
+        api_check(json_test_tables)
