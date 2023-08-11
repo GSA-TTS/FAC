@@ -1,6 +1,6 @@
 import { testValidEligibility } from '../support/check-eligibility.js';
 import { testValidAuditeeInfo } from '../support/auditee-info.js';
-import { addValidEmail, testValidAccess } from '../support/check-access.js';
+import { addValidInfo, testValidAccess } from '../support/check-access.js';
 
 describe('Create New Audit', () => {
 
@@ -21,7 +21,7 @@ describe('Create New Audit', () => {
 
   describe('A Blank Form', () => {
     it('marks empty responses as invalid', () => {
-      cy.get('#grant-access input:invalid').should('have.length', 8);
+      cy.get('#grant-access input:invalid').should('have.length', 12);
     });
 
     it('will not submit', () => {
@@ -64,7 +64,7 @@ describe('Create New Audit', () => {
         });
 
         it('should enable the "Create" button when entities are fixed', () => {
-          addValidEmail('#certifying_auditee_contact_fullname');
+          addValidInfo('#certifying_auditee_contact_fullname');
           cy.get('button').contains('Create').should('not.be.disabled');
         });
       });
@@ -104,21 +104,21 @@ describe('Create New Audit', () => {
         });
 
         it('should remove the error message when valid input is supplied', () => {
-          addValidEmail('#certifying_auditee_contact_email');
+          addValidInfo('#certifying_auditee_contact_email');
           cy.get('#certifying_auditee_contact_email-error-message').should(
             'not.be.visible'
           );
         });
 
         it('should enable the "Create" button when entities are fixed', () => {
-          addValidEmail('#certifying_auditee_contact_email');
+          addValidInfo('#certifying_auditee_contact_email');
           cy.get('button').contains('Create').should('not.be.disabled');
         });
       });
 
       describe('Email Address Confirmation', () => {
         it('should display an error message when input does not match email field', () => {
-          addValidEmail('#certifying_auditee_contact_email');
+          addValidInfo('#certifying_auditee_contact_email');
           cy.get('#certifying_auditee_contact_re_email')
             .clear()
             .type('test.address-wit')
@@ -129,8 +129,8 @@ describe('Create New Audit', () => {
         });
 
         it('should remove the error message when input matches email field', () => {
-          addValidEmail('#certifying_auditee_contact_email');
-          addValidEmail('#certifying_auditee_contact_re_email');
+          addValidInfo('#certifying_auditee_contact_email');
+          addValidInfo('#certifying_auditee_contact_re_email');
           cy.get('#certifying_auditee_contact_re_email-must-match').should(
             'not.be.visible'
           );
@@ -164,7 +164,7 @@ describe('Create New Audit', () => {
         });
 
         it('should enable the "Create" button when entities are fixed', () => {
-          addValidEmail('#certifying_auditor_contact_fullname');
+          addValidInfo('#certifying_auditor_contact_fullname');
           cy.get('button').contains('Create').should('not.be.disabled');
         });
       });
@@ -209,7 +209,7 @@ describe('Create New Audit', () => {
         });
 
         it('should remove the error message when valid input is supplied', () => {
-          addValidEmail('#certifying_auditor_contact_email')
+          addValidInfo('#certifying_auditor_contact_email')
           cy.get('#certifying_auditor_contact_email-email').should(
             'not.be.visible'
           );
@@ -222,7 +222,7 @@ describe('Create New Audit', () => {
 
       describe('Email Address Confirmation', () => {
         it('should display an error message when input does not match email field', () => {
-          addValidEmail('#certifying_auditor_contact_email')
+          addValidInfo('#certifying_auditor_contact_email')
           cy.get('#certifying_auditor_contact_re_email')
             .clear()
             .type('test.address-wit')
@@ -233,8 +233,8 @@ describe('Create New Audit', () => {
         });
 
         it('should remove the error message when input matches email field', () => {
-          addValidEmail('#certifying_auditor_contact_email')
-          addValidEmail('#certifying_auditor_contact_re_email')
+          addValidInfo('#certifying_auditor_contact_email')
+          addValidInfo('#certifying_auditor_contact_re_email')
 
           cy.get('#certifying_auditor_contact_re_email-must-match').should(
             'not.be.visible'
@@ -269,7 +269,7 @@ describe('Create New Audit', () => {
         });
 
         it('should enable the "Create" button when entities are fixed', () => {
-          addValidEmail('#auditee_contacts_fullname');
+          addValidInfo('#auditee_contacts_fullname');
           cy.get('button').contains('Create').should('not.be.disabled');
         });
       });
@@ -296,14 +296,14 @@ describe('Create New Audit', () => {
         });
 
         it('should remove the error message when valid input is supplied', () => {
-          addValidEmail('#auditee_contacts_email')
+          addValidInfo('#auditee_contacts_email')
           cy.get('#auditee_contacts_email-email').should('not.be.visible');
         });
       });
 
       describe('Email Address Confirmation', () => {
         it('should display an error message when input does not match email field', () => {
-          addValidEmail('#auditee_contacts_email')
+          addValidInfo('#auditee_contacts_email')
 
           cy.get('#auditee_contacts_re_email')
             .clear()
@@ -313,8 +313,8 @@ describe('Create New Audit', () => {
         });
 
         it('should remove the error message when input matches email field', () => {
-          addValidEmail('#auditee_contacts_email')
-          addValidEmail('#auditee_contacts_re_email')
+          addValidInfo('#auditee_contacts_email')
+          addValidInfo('#auditee_contacts_re_email')
 
           cy.get('#auditee_contacts_re_email-must-match').should(
             'not.be.visible'
@@ -325,7 +325,7 @@ describe('Create New Audit', () => {
       it('should allow adding new contact fields', () => {
         cy.get('.auditee_contacts').within(() => {
           cy.get('button').click();
-          cy.get('.grid-row').should('have.length', 2);
+          cy.get('.grid-row').should('have.length', 4);
         });
       });
 
@@ -335,13 +335,13 @@ describe('Create New Audit', () => {
         });
 
         cy.get('.auditee_contacts .delete-contact').click();
-        cy.get('.auditee_contacts .grid-row').should('have.length', 1);
+        cy.get('.auditee_contacts .grid-row').should('have.length', 3);
       });
 
       it('should be able to add contact and contact info to new inputs', () => {
         cy.get('.auditee_contacts').within(() => {
           cy.get('button').click();
-          cy.get('.grid-row').should('have.length', 2);
+          cy.get('.grid-row').should('have.length', 4);
           cy.get('input[id*="auditee_contacts_email"]')
             .eq(1)
             .clear()
@@ -380,7 +380,7 @@ describe('Create New Audit', () => {
         });
 
         it('should enable the "Create" button when entities are fixed', () => {
-          addValidEmail('#auditor_contacts_fullname');
+          addValidInfo('#auditor_contacts_fullname');
           cy.get('button').contains('Create').should('not.be.disabled');
         });
       });
@@ -412,19 +412,19 @@ describe('Create New Audit', () => {
         });
 
         it('should remove the error message when valid input is supplied', () => {
-          addValidEmail('#auditor_contacts_email')
+          addValidInfo('#auditor_contacts_email')
           cy.get('#auditor_contacts_email-email').should('not.be.visible');
         });
 
         it('should enable the "Create" button when entities are fixed', () => {
-          addValidEmail('#auditor_contacts_email')
+          addValidInfo('#auditor_contacts_email')
           cy.get('button').contains('Create').should('not.be.disabled');
         });
       });
 
       describe('Email Address Confirmation', () => {
         it('should display an error message when input does not match email field', () => {
-          addValidEmail('#auditor_contacts_email')
+          addValidInfo('#auditor_contacts_email')
 
           cy.get('#auditor_contacts_re_email')
             .clear()
@@ -434,8 +434,8 @@ describe('Create New Audit', () => {
         });
 
         it('should remove the error message when input matches email field', () => {
-          addValidEmail('#auditor_contacts_email')
-          addValidEmail('#auditor_contacts_re_email')
+          addValidInfo('#auditor_contacts_email')
+          addValidInfo('#auditor_contacts_re_email')
 
           cy.get('#auditor_contacts_re_email-must-match').should(
             'not.be.visible'
@@ -446,7 +446,7 @@ describe('Create New Audit', () => {
       it('should allow adding new contact fields', () => {
         cy.get('.auditor_contacts').within(() => {
           cy.get('button').click();
-          cy.get('.grid-row').should('have.length', 2);
+          cy.get('.grid-row').should('have.length', 4);
         });
       });
 
@@ -456,13 +456,13 @@ describe('Create New Audit', () => {
         });
 
         cy.get('.auditor_contacts .delete-contact').click();
-        cy.get('.auditor_contacts .grid-row').should('have.length', 1);
+        cy.get('.auditor_contacts .grid-row').should('have.length', 3);
       });
 
       it('should be able to add contact and contact info to new inputs', () => {
         cy.get('.auditor_contacts').within(() => {
           cy.get('button').click();
-          cy.get('.grid-row').should('have.length', 3);
+          cy.get('.grid-row').should('have.length', 4);
           cy.get('input[id*="auditor_contacts_fullname"]')
             .eq(1)
             .clear()
