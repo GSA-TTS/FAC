@@ -1,6 +1,4 @@
 import logging
-import pprint
-
 
 from django.views import generic
 from django.views.decorators.csrf import csrf_exempt
@@ -665,7 +663,8 @@ def conditional_keys_progress_check(sac, sections):
     """
     conditional_keys = {
         "additional_ueis": sac.multiple_ueis_covered,
-        "additional_eins": False, # Update once we have the question in. This may be handled in the gen info form rather than as a workbook.
+        # Update once we have the question in. This may be handled in the gen info form rather than as a workbook.
+        "additional_eins": False,
         # "additional_eins": sac.multiple_eins_covered,
         "secondary_auditors": False,  # update this once we have the question in.
     }
@@ -822,7 +821,8 @@ class SubmissionProgressView(SingleAuditChecklistAccessRequiredMixin, generic.Vi
                 },
                 "certification": {
                     "auditor_certified": bool(sac.auditor_certification),
-                    "auditor_enabled": sac.submission_status == "ready_for_certification",
+                    "auditor_enabled": sac.submission_status
+                    == "ready_for_certification",
                     "auditee_certified": bool(sac.auditee_certification),
                     "auditee_enabled": sac.submission_status == "auditor_certified",
                 },
@@ -839,10 +839,9 @@ class SubmissionProgressView(SingleAuditChecklistAccessRequiredMixin, generic.Vi
             }
             context = context | subcheck
 
-            pp = pprint.PrettyPrinter()
-            pp.pprint(context)
-
-            return render(request, "audit/submission_checklist/submission-checklist.html", context)
+            return render(
+                request, "audit/submission_checklist/submission-checklist.html", context
+            )
         except SingleAuditChecklist.DoesNotExist as err:
             raise PermissionDenied("You do not have access to this audit.") from err
 
