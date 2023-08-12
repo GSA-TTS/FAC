@@ -11,7 +11,6 @@ from django.utils.datastructures import MultiValueDictKeyError
 from django.utils.decorators import method_decorator
 from django.http import JsonResponse
 
-from audit.forms import UploadReportForm, AuditInfoForm
 
 from config.settings import (
     AGENCY_NAMES,
@@ -20,7 +19,6 @@ from config.settings import (
     SP_FRAMEWORK_OPINIONS,
 )
 from .fixtures.excel import FORM_SECTIONS, UNKNOWN_WORKBOOK
-from config.settings import AGENCY_NAMES, GAAP_RESULTS
 
 from audit.cross_validation import sac_validation_shape
 from audit.excel import (
@@ -66,7 +64,6 @@ from audit.validators import (
     validate_secondary_auditors_json,
 )
 
-from .fixtures.excel import FORM_SECTIONS, UNKNOWN_WORKBOOK
 
 logging.basicConfig(
     format="%(asctime)s %(levelname)-8s %(module)s:%(lineno)d %(message)s"
