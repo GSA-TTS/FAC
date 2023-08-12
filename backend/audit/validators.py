@@ -255,6 +255,45 @@ def validate_secondary_auditors_json(value):
         raise ValidationError(message=_secondary_auditors_json_error(errors))
 
 
+def validate_auditor_certification_json(value):
+    """
+    Apply JSON Schema for auditor certification and report errors.
+    """
+    schema_path = settings.SECTION_SCHEMA_DIR / "AuditorCertification.schema.json"
+    schema = json.loads(schema_path.read_text(encoding="utf-8"))
+
+    try:
+        validate(value, schema, format_checker=FormatChecker())
+    except JSONSchemaValidationError as err:
+        raise ValidationError(
+            _(err.message),
+        ) from err
+    return value
+
+
+def validate_auditee_certification_json(value):
+    """
+    Apply JSON Schema for auditee certification and report errors.
+    """
+    schema_path = settings.SECTION_SCHEMA_DIR / "AuditeeCertification.schema.json"
+    schema = json.loads(schema_path.read_text(encoding="utf-8"))
+
+    try:
+        validate(value, schema, format_checker=FormatChecker())
+    except JSONSchemaValidationError as err:
+        raise ValidationError(
+            _(err.message),
+        ) from err
+    return value
+
+
+def validate_tribal_data_consent_json(value):
+    """
+    Apply JSON Schema for tribal data consent and report errors.
+    """
+    raise ValidationError("Not implemented")
+
+
 def validate_file_extension(file, allowed_extensions):
     """
     User-provided filenames must be have an allowed extension
