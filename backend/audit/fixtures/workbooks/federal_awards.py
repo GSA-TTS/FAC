@@ -33,10 +33,10 @@ logger = logging.getLogger(__name__)
 
 mappings = [
     FieldMap("program_name", "federalprogramname", "federal_program_name", None, test_pfix(3)),
-    FieldMap("additional_award_identification", "awardidentification", WorkbookFieldInDissem, None, str),
-    FieldMap("cluster_name", "clustername", WorkbookFieldInDissem, "N/A", str),
+    # FieldMap("additional_award_identification", "awardidentification", WorkbookFieldInDissem, None, str),
+    #FieldMap("cluster_name", "clustername", WorkbookFieldInDissem, "N/A", str),
     FieldMap("state_cluster_name", "stateclustername", WorkbookFieldInDissem, None, str),
-    FieldMap("other_cluster_name", "otherclustername", WorkbookFieldInDissem, None, str),
+    #FieldMap("other_cluster_name", "otherclustername", WorkbookFieldInDissem, None, str),
     FieldMap("federal_program_total", "programtotal", WorkbookFieldInDissem, 0, int),
     FieldMap("cluster_total", "clustertotal", WorkbookFieldInDissem, 0, int),
     FieldMap("is_guaranteed", "loans", "is_loan", None, str),
@@ -119,7 +119,7 @@ def generate_federal_awards(dbkey, outfile):
                                      | (Cfda.cfda % '%rd%')
                                      | (Cfda.cfda % '%RD%'))).order_by(Cfda.index):
         if cfda.awardidentification is None or len(cfda.awardidentification) < 1:
-            addls[get_list_index(cfdas, cfda.index)] = f"ADDITIONAL AWARD INFO - DBKEY {dbkey}"
+            addls[get_list_index(cfdas, cfda.index)] = "" # f"ADDITIONAL AWARD INFO - DBKEY {dbkey}"
         else:
             addls[get_list_index(cfdas, cfda.index)] = cfda.awardidentification
     set_range(wb, "additional_award_identification", addls)
@@ -164,8 +164,6 @@ def generate_federal_awards(dbkey, outfile):
         except Exception as e:
             passthrough_names[get_list_index(cfdas, cfda.index)] = ""
             passthrough_ids[get_list_index(cfdas, cfda.index)] = ""
-    print("Setting passthrough names to ", passthrough_names)
-    print("Setting passthrough_ids to ", passthrough_ids)
     set_range(wb, "passthrough_name", passthrough_names)
     set_range(wb, "passthrough_identifying_number", passthrough_ids)
 
@@ -186,12 +184,14 @@ def generate_federal_awards(dbkey, outfile):
     for ndx, cfda in enumerate(Cfda.select().where((Cfda.dbkey==dbkey)).order_by(Cfda.index)):
         if cfda.loans == "Y":
             if cfda.loanbalance is None:
-                loansatend.append("N/A")
+                # loansatend.append("N/A")
+                loansatend.append(0)
             else:
                 loansatend.append(cfda.loanbalance)
         else:
             loansatend.append("")              
-    set_range(wb, "loan_balance_at_audit_period_end", loansatend, type=int_or_na)
+    # set_range(wb, "loan_balance_at_audit_period_end", loansatend, type=int_or_na)
+    set_range(wb, "loan_balance_at_audit_period_end", loansatend, type=int)
 
     wb.save(outfile)
 
@@ -200,7 +200,7 @@ def generate_federal_awards(dbkey, outfile):
     )
     award_counter = 1
     # prefix
-    for obj, pfix, ext in zip(table["rows"], prefixes, extensions):
+    for obj, pfix, ext, addl, cn, ocn in zip(table["rows"], prefixes, extensions, addls, cluster_names, other_cluster_names):
         obj["fields"].append("federal_agency_prefix")
         obj["values"].append(pfix)
         obj["fields"].append("three_digit_extension")
@@ -208,7 +208,14 @@ def generate_federal_awards(dbkey, outfile):
         # Sneak in the award number here
         obj["fields"].append("award_reference")
         obj["values"].append(f"AWARD-{award_counter:04}")
+        obj['fields'].append('additional_award_identification')
+        obj['values'].append(addl)
+        obj['fields'].append('cluster_name')
+        obj['values'].append(cn)
+        obj['fields'].append('other_cluster_name')
+        obj['fields'].append(ocn)
         award_counter += 1
+    
     # These are in the passthrough endpoint. The JSON should be different.
     # names, ids
     # for obj, name, id in zip(table["rows"], passthrough_names, passthrough_ids):

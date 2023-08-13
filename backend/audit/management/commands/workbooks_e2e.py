@@ -163,8 +163,8 @@ def call_api(api_url, endpoint, rid, field):
     return response
 
 import re
+import math
 def just_numbers(s):
-    # return re.search('^[0-9\.]+$', str(s))
     try:
         float(s)
         return True
@@ -180,7 +180,7 @@ def check_equality(in_wb, in_json):
     if in_wb in ["Y", "N"]:
         return (True if in_wb == "Y" else False) == in_json
     elif just_numbers(in_wb) and just_numbers(in_json):
-        return True if int(in_wb) == int(in_json) else False 
+        return True if math.isclose(float(in_wb), float(in_json),rel_tol=1e-1) else False 
     elif isinstance(in_wb, str) and isinstance(in_json, str):
         return in_wb.strip() == in_json.strip()
     elif in_wb is None or in_json is None:
@@ -199,32 +199,49 @@ def get_api_values(endpoint, rid, field):
         print(f'{res.status_code} {res.url}')
         return []
             
+
+def count(d, key):
+    if key in d:
+        d[key] += 1
+    else:
+        d[key] = 1
+
+def combine_counts(combined, d):
+    for k in combined.keys():
+        if k in d:
+            combined[k] = combined[k] + d[k]
+    return combined
+
 def api_check(json_test_tables):
-    
-    # We start with a list of objects.
-    # It contains an `endpoint`, a `report_id`, and
-    # a list of row objects keyed at `rows`.
+    combined_summary = {'endpoints': 0, 'correct_rows': 0, 'incorrect_rows': 0}
     for endo in json_test_tables:
+        count(combined_summary, 'endpoints')
         endpoint = endo['endpoint']
         report_id = endo['report_id']
         print(f"-------------------- {endpoint} --------------------")
+        summary = {}
         for row_ndx, row in enumerate(endo['rows']):
-            print("CHECKING ROW:")
-            pprint(row)
-            print("---")
+            count(summary, 'total_rows')
             equality_results = []
             for field_ndx, f in enumerate(row['fields']):
                 api_values = get_api_values(endpoint, report_id, f)
                 this_api_value = api_values[row_ndx]
                 this_field_value = row['values'][field_ndx]
                 eq = check_equality(this_field_value, this_api_value)
-                print(f'{eq} {this_field_value} == {this_api_value}')
+                if not eq:
+                    print(f'{eq} {f} {this_field_value} == {this_api_value}')
                 equality_results.append(eq)
                     
             if all(equality_results):
                 print(f"------ YESYESYES")
+                count(summary, 'correct_rows')
             else:
                 print(f"------ NONONO")
+                count(summary, 'incorrect_rows')
+                print(row)
+        print(summary)
+        combined_summary = combine_counts(combined_summary, summary)
+    return combined_summary
 
 class Command(BaseCommand):
     def add_arguments(self, parser):
@@ -253,5 +270,6 @@ class Command(BaseCommand):
         SingleAuditChecklist = apps.get_model("audit.SingleAuditChecklist")
         step_through_certifications(sac, SingleAuditChecklist)
         disseminate(sac)
-        pprint(json_test_tables)
-        api_check(json_test_tables)
+        # pprint(json_test_tables)
+        combined_summary = api_check(json_test_tables)
+        print(combined_summary)

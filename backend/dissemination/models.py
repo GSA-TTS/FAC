@@ -178,6 +178,7 @@ class FederalAward(models.Model):
         null=True,
         help_text=docs.loans,
     )
+    # This wants to be N/A sometimes.
     loan_balance = models.DecimalField(
         "The loan or loan guarantee (loan) balance outstanding at the end of the audit period.  A response of ‘N/A’ is acceptable.",
         null=True,

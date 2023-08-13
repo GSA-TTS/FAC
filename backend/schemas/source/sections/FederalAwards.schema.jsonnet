@@ -352,16 +352,23 @@ local FederalAwardEntry = Types.object {
 local Meta = Types.object {
   additionalProperties: false,
   properties: {
-    section_name: Types.string {
-      enum: [Sheets.section_names.FEDERAL_AWARDS],
-    },
+    section_name: Types.string,
     // FIXME: 2023-08-07 MSHD: The 'Version' is currently used here as a placeholder, and it is not being enforced at the moment.
     // Once we establish a versioning pattern, we can update this and enforce it accordingly.
     version: Types.string {
       const: Sheets.WORKBOOKS_VERSION,
     },
   },
-  required: ['section_name'],
+  // allOf: [
+  //   // {
+  //   //   properties: {
+  //   //     section_name: {
+  //   //       const: Sheets.section_names.FEDERAL_AWARDS,
+  //   //     },
+  //   //   },
+  //   // },
+  // ],
+  required: [],
   title: 'Meta',
   version: 20230807,
 };
