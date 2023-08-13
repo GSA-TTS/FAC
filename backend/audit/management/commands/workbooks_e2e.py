@@ -22,6 +22,7 @@ from audit.fixtures.workbooks.workbook_creation import (
     setup_sac,
 )
 
+
 from audit.fixtures.workbooks.sac_creation import _post_upload_pdf
 
 # # def transition(sac):
@@ -74,9 +75,34 @@ def step_through_certifications(sac, SAC):
     sac.transition_name.append(SAC.STATUS.CERTIFIED)
     sac.transition_date.append(datetime.date.today())
 
+from dissemination.models import (
+    FindingText,
+    Finding,
+    FederalAward,
+    CapText,
+    Note,
+    Revision,
+    Passthrough,
+    General,
+    SecondaryAuditor,
+)
+
+from audit.etl import ETL
+    
 def disseminate(sac):
     print("TRANSFERRING DATA... HARDER BETTER FASTER STRONGER ...")
-    from audit.etl import ETL
+    for model in [FindingText,
+            Finding,
+            FederalAward,
+            CapText,
+            Note,
+            Revision,
+            Passthrough,
+            General,
+            SecondaryAuditor
+        ]:
+        model.objects.filter(report_id=sac.report_id).delete()
+
     if sac.general_information:
         etl = ETL(sac)
         etl.load_all()
@@ -109,8 +135,96 @@ def disseminate(sac):
 #                        '']},
 
 from pprint import pprint
+from config import settings
+
+import os
+
+
+import jwt
+import requests
+
+def create_payload(api_url, role="api_fac_gov"):
+    payload = {
+        # PostgREST only cares about the role.
+        "role": role,
+        "created": datetime.datetime.today().isoformat(),
+    }
+    return payload
+
+def call_api(api_url, endpoint, rid, field):
+    # We must pass a properly signed JWT to access the API
+    encoded_jwt = jwt.encode(
+        create_payload(api_url), os.getenv("PGRST_JWT_SECRET"), algorithm="HS256"
+    )
+    full_request = f'{api_url}/{endpoint}?report_id=eq.{rid}&select={field}'
+    response = requests.get(
+        full_request, headers={"Authorization": f"Bearer {encoded_jwt}"}, timeout=10
+    )
+    return response
+
+import re
+def just_numbers(s):
+    # return re.search('^[0-9\.]+$', str(s))
+    try:
+        float(s)
+        return True
+    except ValueError:
+        return False
+
+def are_they_both_none_or_empty(a, b):
+    a_val = True if (a is None or a == "") else False
+    b_val = True if (b is None or b == "") else False
+    return a_val and b_val
+
+def check_equality(in_wb, in_json):
+    if in_wb in ["Y", "N"]:
+        return (True if in_wb == "Y" else False) == in_json
+    elif just_numbers(in_wb) and just_numbers(in_json):
+        return True if int(in_wb) == int(in_json) else False 
+    elif isinstance(in_wb, str) and isinstance(in_json, str):
+        return in_wb.strip() == in_json.strip()
+    elif in_wb is None or in_json is None:
+        return are_they_both_none_or_empty(in_wb, in_json)
+    else:
+        return in_wb == in_json
+
+def get_api_values(endpoint, rid, field):
+    api_url = settings.POSTGREST.get("URL")
+    res = call_api(api_url, endpoint, rid, field)
+    
+    if res.status_code == 200:
+        # print(f'{res.status_code} {res.url} {res.json()}')
+        return list(map(lambda d: d[field], res.json()))
+    else:
+        print(f'{res.status_code} {res.url}')
+        return []
+            
 def api_check(json_test_tables):
-    pprint(json_test_tables)
+    
+    # We start with a list of objects.
+    # It contains an `endpoint`, a `report_id`, and
+    # a list of row objects keyed at `rows`.
+    for endo in json_test_tables:
+        endpoint = endo['endpoint']
+        report_id = endo['report_id']
+        print(f"-------------------- {endpoint} --------------------")
+        for row_ndx, row in enumerate(endo['rows']):
+            print("CHECKING ROW:")
+            pprint(row)
+            print("---")
+            equality_results = []
+            for field_ndx, f in enumerate(row['fields']):
+                api_values = get_api_values(endpoint, report_id, f)
+                this_api_value = api_values[row_ndx]
+                this_field_value = row['values'][field_ndx]
+                eq = check_equality(this_field_value, this_api_value)
+                print(f'{eq} {this_field_value} == {this_api_value}')
+                equality_results.append(eq)
+                    
+            if all(equality_results):
+                print(f"------ YESYESYES")
+            else:
+                print(f"------ NONONO")
 
 class Command(BaseCommand):
     def add_arguments(self, parser):
@@ -139,4 +253,5 @@ class Command(BaseCommand):
         SingleAuditChecklist = apps.get_model("audit.SingleAuditChecklist")
         step_through_certifications(sac, SingleAuditChecklist)
         disseminate(sac)
+        pprint(json_test_tables)
         api_check(json_test_tables)

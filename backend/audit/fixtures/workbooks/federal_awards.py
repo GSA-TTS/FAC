@@ -1,5 +1,6 @@
 from audit.fixtures.workbooks.excel_creation import (
     FieldMap,
+    WorkbookFieldInDissem,
     templates,
     set_uei,
     set_single_cell_range,
@@ -15,6 +16,10 @@ from audit.fixtures.census_models.ay22 import (
     CensusGen22 as Gen,
 )
 
+from audit.fixtures.workbooks.excel_creation import (
+    insert_version_and_sheet_name
+)
+
 from config import settings
 
 import openpyxl as pyxl
@@ -27,23 +32,23 @@ logger = logging.getLogger(__name__)
 
 
 mappings = [
-    FieldMap("program_name", "federalprogramname", None, test_pfix(3)),
-    FieldMap("additional_award_identification", "awardidentification", None, str),
-    FieldMap("cluster_name", "clustername", "N/A", str),
-    FieldMap("state_cluster_name", "stateclustername", None, str),
-    FieldMap("other_cluster_name", "otherclustername", None, str),
-    FieldMap("federal_program_total", "programtotal", 0, int),
-    FieldMap("cluster_total", "clustertotal", 0, int),
-    FieldMap("is_guaranteed", "loans", None, str),
-    FieldMap("loan_balance_at_audit_period_end", "loanbalance", None, int),
-    FieldMap("is_direct", "direct", None, str),
-    FieldMap("is_passed", "passthroughaward", None, str),
-    FieldMap("subrecipient_amount", "passthroughamount", None, float),
-    FieldMap("is_major", "majorprogram", None, str),
-    FieldMap("audit_report_type", "typereport_mp", None, str),
-    FieldMap("number_of_audit_findings", "findings", 0, int),
-    FieldMap("amount_expended", "amount", 0, int),
-    FieldMap("federal_program_total", "programtotal", 0, int),
+    FieldMap("program_name", "federalprogramname", "federal_program_name", None, test_pfix(3)),
+    FieldMap("additional_award_identification", "awardidentification", WorkbookFieldInDissem, None, str),
+    FieldMap("cluster_name", "clustername", WorkbookFieldInDissem, "N/A", str),
+    FieldMap("state_cluster_name", "stateclustername", WorkbookFieldInDissem, None, str),
+    FieldMap("other_cluster_name", "otherclustername", WorkbookFieldInDissem, None, str),
+    FieldMap("federal_program_total", "programtotal", WorkbookFieldInDissem, 0, int),
+    FieldMap("cluster_total", "clustertotal", WorkbookFieldInDissem, 0, int),
+    FieldMap("is_guaranteed", "loans", "is_loan", None, str),
+    FieldMap("loan_balance_at_audit_period_end", "loanbalance", "loan_balance", None, int),
+    FieldMap("is_direct", "direct", WorkbookFieldInDissem, None, str),
+    FieldMap("is_passed", "passthroughaward", "is_passthrough_award", None, str),
+    FieldMap("subrecipient_amount", "passthroughamount", "passthrough_amount", None, float),
+    FieldMap("is_major", "majorprogram", WorkbookFieldInDissem, None, str),
+    FieldMap("audit_report_type", "typereport_mp", "mp_audit_report_type", None, str),
+    FieldMap("number_of_audit_findings", "findings", "findings_count", 0, int),
+    FieldMap("amount_expended", "amount", WorkbookFieldInDissem, 0, int),
+    FieldMap("federal_program_total", "programtotal", WorkbookFieldInDissem, 0, int),
 ]
 
 
@@ -64,12 +69,15 @@ def int_or_na(o):
     else:
         return "N/A"
 
+
 def generate_federal_awards(dbkey, outfile):
     logger.info(f"--- generate federal awards {dbkey}---")
     wb = pyxl.load_workbook(templates["FederalAwards"])
     # In sheet : in DB
 
     g = set_uei(Gen, wb, dbkey)
+    insert_version_and_sheet_name(wb, "federal-awards-workbook")
+
     cfdas = Cfda.select().where(Cfda.dbkey == g.dbkey).order_by(Cfda.index)
     map_simple_columns(wb, mappings, cfdas)
 
@@ -156,6 +164,8 @@ def generate_federal_awards(dbkey, outfile):
         except Exception as e:
             passthrough_names[get_list_index(cfdas, cfda.index)] = ""
             passthrough_ids[get_list_index(cfdas, cfda.index)] = ""
+    print("Setting passthrough names to ", passthrough_names)
+    print("Setting passthrough_ids to ", passthrough_ids)
     set_range(wb, "passthrough_name", passthrough_names)
     set_range(wb, "passthrough_identifying_number", passthrough_ids)
 
@@ -199,12 +209,13 @@ def generate_federal_awards(dbkey, outfile):
         obj["fields"].append("award_reference")
         obj["values"].append(f"AWARD-{award_counter:04}")
         award_counter += 1
+    # These are in the passthrough endpoint. The JSON should be different.
     # names, ids
-    for obj, name, id in zip(table["rows"], passthrough_names, passthrough_ids):
-        obj["fields"].append("passthrough_name")
-        obj["values"].append(name)
-        obj["fields"].append("passthrough_identifying_number")
-        obj["values"].append(id)
+    # for obj, name, id in zip(table["rows"], passthrough_names, passthrough_ids):
+    #     obj["fields"].append("passthrough_name")
+    #     obj["values"].append(name)
+    #     obj["fields"].append("passthrough_id")
+    #     obj["values"].append(id)
     table["singletons"]["auditee_uei"] = g.uei
     table["singletons"]["total_amount_expended"] = total
 

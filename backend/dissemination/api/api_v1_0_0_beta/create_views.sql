@@ -31,16 +31,18 @@ create view api_v1_0_0_beta.auditor as
 
 create view api_v1_0_0_beta.federal_award as
     select gen.auditee_uei, gen.auditee_ein, gen.fy_start_date, gen.fy_end_date, gen.audit_year, award.*
-    from dissemination_FederalAward award
-    left join dissemination_General gen on award.report_id = gen.report_id
-    where gen.is_public=True
+    from dissemination_federalaward award, dissemination_General gen
+    -- left join dissemination_General gen on award.report_id = gen.report_id
+    where award.report_id = gen.report_id 
+        and gen.is_public=True
+    order by award.id
 ;
 
 create view api_v1_0_0_beta.finding as
     select gen.auditee_uei, gen.auditee_ein, gen.fy_start_date, gen.fy_end_date, gen.audit_year, 
           award.federal_agency_prefix, award.federal_award_extension, 
           finding.*
-    from dissemination_Finding finding
+    from dissemination_Finding finding 
     left join dissemination_FederalAward award 
         on award.report_id = finding.report_id 
           and award.award_reference = finding.award_reference

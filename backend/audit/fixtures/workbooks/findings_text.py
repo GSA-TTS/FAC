@@ -11,7 +11,9 @@ from audit.fixtures.census_models.ay22 import (
     CensusGen22 as Gen,
     CensusFindingstext22 as Findingstext
 )
-
+from audit.fixtures.workbooks.excel_creation import (
+    insert_version_and_sheet_name
+)
 import openpyxl as pyxl
 
 import logging
@@ -22,11 +24,13 @@ def generate_findings_text(dbkey, outfile):
     logger.info(f"--- generate findings text {dbkey} ---")
     wb = pyxl.load_workbook(templates["AuditFindingsText"])
     mappings = [
-        FieldMap('reference_number', 'findingrefnums', None, str),
-        FieldMap('text_of_finding', 'text', None, test_pfix(3)),
-        FieldMap('contains_chart_or_table', 'chartstables', None, str),
+        FieldMap('reference_number', 'findingrefnums', 'finding_ref_number', None, str),
+        FieldMap('text_of_finding', 'text', 'finding_text', None, test_pfix(3)),
+        FieldMap('contains_chart_or_table', 'chartstables', 'contains_chart_or_table', None, str),
     ]
     g = set_uei(Gen, wb, dbkey)
+    insert_version_and_sheet_name(wb, "audit-findings-text-workbook")
+
     ftexts = Findingstext.select().where(Findingstext.dbkey == g.dbkey)
     map_simple_columns(wb, mappings, ftexts)
     wb.save(outfile)

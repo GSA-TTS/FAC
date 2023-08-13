@@ -4,14 +4,16 @@ import os
 
 import logging
 logger = logging.getLogger(__name__)
-
+from config import settings
+import re
+import json
 
 # This provides a way to map the sheet in the workbook to the
 # column in the DB. It also has a default value and
 # the type of value, so that things can be set correctly
 # before filling in the XLSX workbooks.
-FieldMap = NT("FieldMap", "in_sheet in_db default type")
-
+FieldMap = NT("FieldMap", "in_sheet in_db in_dissem default type")
+WorkbookFieldInDissem = 1000
 
 templates_root = "schemas/output/excel/xlsx/"
 templates_raw = {
@@ -31,7 +33,8 @@ for k, v in templates_raw.items():
 
 def test_pfix(n):
     def _test(o):
-       return ' '.join(["TEST" for x in range(n)]) + " " + str(o)
+       #return ' '.join(["TEST" for x in range(n)]) + " " + str(o)
+        return o
     return _test
 
 def set_single_cell_range(wb, range_name, value):
@@ -135,8 +138,31 @@ def generate_dissemination_test_table(Gen, api_endpoint, dbkey, mappings, object
             if ((m.in_db in as_dict) and as_dict[m.in_db] is not None) and (
                 as_dict[m.in_db] != ""
             ):
-                test_obj["fields"].append(m.in_sheet)
+                if m.in_dissem == WorkbookFieldInDissem:
+                    test_obj["fields"].append(m.in_sheet)
+                else:
+                    test_obj["fields"].append(m.in_dissem)
                 test_obj["values"].append(as_dict[m.in_db])
         table["rows"].append(test_obj)
     return table
 
+
+def extract_metadata(sheet_json, range):
+    excel_defn = open(f"{settings.BASE_DIR}/schemas/output/excel/json/{sheet_json}.json")
+    excel_defn_json = json.load(excel_defn)
+    result = None
+    for sheet in excel_defn_json["sheets"]:
+        if "name" in sheet and sheet["name"] == "Coversheet":
+            coversheet = sheet
+            for scell in coversheet["single_cells"]:
+                if ("range_name" in scell) and (scell["range_name"] == range):
+                    result = scell["formula"]
+    return result
+
+def insert_version_and_sheet_name(wb, sheet_json):
+    ver_cell = extract_metadata(sheet_json, "version")
+    ver_re = re.search("\"(.*?)\"", ver_cell)[1]
+    wb_name_cell = extract_metadata(sheet_json, "section_name")
+    wb_name_re = re.search("\"(.*?)\"", wb_name_cell)[1]
+    set_single_cell_range(wb, "version", ver_re)
+    set_single_cell_range(wb, "section_name", wb_name_re)

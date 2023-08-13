@@ -1,5 +1,6 @@
 from audit.fixtures.workbooks.excel_creation import (
     FieldMap,
+    WorkbookFieldInDissem,
     templates,
     set_uei,
     set_single_cell_range,
@@ -12,7 +13,9 @@ from audit.fixtures.census_models.ay22 import (
     CensusGen22 as Gen,
     CensusNotes22 as Notes,
 )
-
+from audit.fixtures.workbooks.excel_creation import (
+    insert_version_and_sheet_name
+)
 import openpyxl as pyxl
 import re
 
@@ -21,8 +24,8 @@ import logging
 logger = logging.getLogger(__name__)
 
 mappings = [
-    FieldMap("note_title", "title", None, test_pfix(3)),
-    FieldMap("note_content", "content", None, test_pfix(3)),
+    FieldMap("note_title", "title", WorkbookFieldInDissem, None, test_pfix(3)),
+    FieldMap("note_content", "content", 'content', None, test_pfix(3)),
 ]
 
 
@@ -31,6 +34,7 @@ def generate_notes_to_sefa(dbkey, outfile):
     wb = pyxl.load_workbook(templates["SEFA"])
 
     g = set_uei(Gen, wb, dbkey)
+    insert_version_and_sheet_name(wb, "notes-to-sefa-workbook")
 
     # The mapping is weird.
     # https://facdissem.census.gov/Documents/DataDownloadKey.xlsx

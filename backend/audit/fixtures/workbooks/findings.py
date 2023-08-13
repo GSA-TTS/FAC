@@ -13,7 +13,9 @@ from audit.fixtures.census_models.ay22 import (
     CensusFindings22 as Findings,
     CensusGen22 as Gen,
 )
-
+from audit.fixtures.workbooks.excel_creation import (
+    insert_version_and_sheet_name
+)
 import openpyxl as pyxl
 
 import logging
@@ -24,16 +26,16 @@ def sorted_string(s):
     return ''.join(sorted(s))
 
 mappings = [
-    FieldMap("compliance_requirement", "typerequirement", None, sorted_string),
-    FieldMap("reference_number", "findingsrefnums", None, str),
-    FieldMap("modified_opinion", "modifiedopinion", None, str),
-    FieldMap("other_matters", "othernoncompliance", None, str),
-    FieldMap("material_weakness", "materialweakness", None, str),
-    FieldMap("significant_deficiency", "significantdeficiency", None, str),
-    FieldMap("other_findings", "otherfindings", None, str),
-    FieldMap("questioned_costs", "qcosts", None, str),
-    FieldMap("repeat_prior_reference", "repeatfinding", None, str),
-    FieldMap("prior_references", "priorfindingrefnums", None, str),
+    FieldMap("compliance_requirement", "typerequirement", 'type_requirement', None, sorted_string),
+    FieldMap("reference_number", "findingsrefnums", 'finding_ref_number', None, str),
+    FieldMap("modified_opinion", "modifiedopinion", 'is_modified_opinion', None, str),
+    FieldMap("other_matters", "othernoncompliance", 'is_other_non_compliance', None, str),
+    FieldMap("material_weakness", "materialweakness", 'is_material_weakness', None, str),
+    FieldMap("significant_deficiency", "significantdeficiency", 'is_significant_deficiency', None, str),
+    FieldMap("other_findings", "otherfindings", 'is_other_findings', None, str),
+    FieldMap("questioned_costs", "qcosts", 'is_questioned_costs', None, str),
+    FieldMap("repeat_prior_reference", "repeatfinding", 'is_repeat_finding', None, str),
+    FieldMap("prior_references", "priorfindingrefnums", 'prior_fniding_ref_numbers', None, str),
     # FIXME: We have to calculate, and patch in, is_valid
     # is_valid is computed in the workbook
 ]
@@ -43,6 +45,8 @@ def generate_findings(dbkey, outfile):
     logger.info(f"--- generate findings {dbkey} ---")
     wb = pyxl.load_workbook(templates["AuditFindings"])
     g = set_uei(Gen, wb, dbkey)
+    insert_version_and_sheet_name(wb, "federal-awards-audit-findings-workbook")
+
     cfdas = Cfda.select(Cfda.elecauditsid).where(Cfda.dbkey == g.dbkey)
     findings = Findings.select().where(Findings.dbkey == g.dbkey)
 

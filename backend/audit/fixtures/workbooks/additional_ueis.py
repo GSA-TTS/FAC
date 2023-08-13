@@ -1,5 +1,6 @@
 from audit.fixtures.workbooks.excel_creation import (
     FieldMap,
+    WorkbookFieldInDissem,
     templates,
     set_uei,
     map_simple_columns,
@@ -10,7 +11,9 @@ from audit.fixtures.census_models.ay22 import (
     CensusGen22 as Gen,
     CensusUeis22 as Ueis,
 )
-
+from audit.fixtures.workbooks.excel_creation import (
+    insert_version_and_sheet_name
+)
 import openpyxl as pyxl
 
 import logging
@@ -18,8 +21,8 @@ import logging
 logger = logging.getLogger(__name__)
 
 mappings = [
-    FieldMap('additional_uei', 'uei', None, str),
-    #FieldMap('ueiseqnum', 'ueiseqnum', 0, int)
+    # FIXME: We have no dissemination nodel for this.
+    FieldMap('additional_uei', 'uei', WorkbookFieldInDissem, None, str),
 ]
 
 def generate_additional_ueis(dbkey, outfile):
@@ -27,9 +30,13 @@ def generate_additional_ueis(dbkey, outfile):
     wb = pyxl.load_workbook(templates["AdditionalUEIs"])
 
     g = set_uei(Gen, wb, dbkey)
+    insert_version_and_sheet_name(wb, "additional-ueis-workbook")
+
     addl_ueis = Ueis.select().where(Ueis.dbkey == g.dbkey)
     map_simple_columns(wb, mappings, addl_ueis)
     wb.save(outfile)
+    
+    
     table = generate_dissemination_test_table(Gen, 'additional_ueis', dbkey, mappings, addl_ueis)
     table['singletons']['auditee_uei'] = g.uei
 

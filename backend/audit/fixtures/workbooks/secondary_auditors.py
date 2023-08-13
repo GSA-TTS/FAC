@@ -11,7 +11,9 @@ from audit.fixtures.census_models.ay22 import (
     CensusGen22 as Gen,
     CensusCpas22 as Cpas,
 )
-
+from audit.fixtures.workbooks.excel_creation import (
+    insert_version_and_sheet_name
+)
 import openpyxl as pyxl
 
 import logging
@@ -19,16 +21,16 @@ import logging
 logger = logging.getLogger(__name__)
 
 mappings = [
-    FieldMap('secondary_auditor_address_city', 'cpacity', None, str),
-    FieldMap('secondary_auditor_contact_name', 'cpacontact', None, str),
-    FieldMap('secondary_auditor_ein', 'cpaein', None, str),
-    FieldMap('secondary_auditor_contact_email', 'cpaemail', None, str),
-    FieldMap('secondary_auditor_name', 'cpafirmname', None, str),
-    FieldMap('secondary_auditor_contact_phone', 'cpaphone', None, str),
-    FieldMap('secondary_auditor_address_state', 'cpastate', None, str),
-    FieldMap('secondary_auditor_address_street', 'cpastreet1', None, test_pfix(3)),
-    FieldMap('secondary_auditor_contact_title', 'cpatitle', None, test_pfix(3)),
-    FieldMap('secondary_auditor_address_zipcode', 'cpazipcode', None, str)
+    FieldMap('secondary_auditor_address_city', 'cpacity', 'auditor_city',None, str),
+    FieldMap('secondary_auditor_contact_name', 'cpacontact', 'contact_name', None, str),
+    FieldMap('secondary_auditor_ein', 'cpaein', 'auditor_ein', None, str),
+    FieldMap('secondary_auditor_contact_email', 'contact_email', 'cpaemail', None, str),
+    FieldMap('secondary_auditor_name', 'cpafirmname', 'auditor_name', None, str),
+    FieldMap('secondary_auditor_contact_phone', 'cpaphone', 'contact_phone', None, str),
+    FieldMap('secondary_auditor_address_state', 'cpastate', 'address_state', None, str),
+    FieldMap('secondary_auditor_address_street', 'cpastreet1', 'address_street', None, test_pfix(3)),
+    FieldMap('secondary_auditor_contact_title', 'cpatitle', 'contact_title', None, test_pfix(3)),
+    FieldMap('secondary_auditor_address_zipcode', 'cpazipcode', 'address_zipcode', None, str)
 ]
 
 def generate_secondary_auditors(dbkey, outfile):
@@ -36,6 +38,8 @@ def generate_secondary_auditors(dbkey, outfile):
     wb = pyxl.load_workbook(templates["SecondaryAuditors"])
 
     g = set_uei(Gen, wb, dbkey)
+    insert_version_and_sheet_name(wb, "secondary-auditors-workbook")
+
     sec_cpas = Cpas.select().where(Cpas.dbkey == g.dbkey)
     
     map_simple_columns(wb, mappings, sec_cpas)
