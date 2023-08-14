@@ -26,6 +26,9 @@ from .validators import (
     validate_secondary_auditors_json,
     validate_notes_to_sefa_json,
     validate_single_audit_report_file,
+    validate_auditor_certification_json,
+    validate_auditee_certification_json,
+    validate_tribal_data_consent_json,
     validate_audit_information_json,
     validate_component_page_numbers,
 )
@@ -274,9 +277,17 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         blank=True, null=True, validators=[validate_notes_to_sefa_json]
     )
 
-    # audit_report = models.BinaryField(
-    #     blank=True, null=True, validators=[validate_single_audit_report_file]
-    # )
+    auditor_certification = models.JSONField(
+        blank=True, null=True, validators=[validate_auditor_certification_json]
+    )
+
+    auditee_certification = models.JSONField(
+        blank=True, null=True, validators=[validate_auditee_certification_json]
+    )
+
+    tribal_data_consent = models.JSONField(
+        blank=True, null=True, validators=[validate_tribal_data_consent_json]
+    )
 
     def validate_full(self):
         """

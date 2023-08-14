@@ -119,7 +119,7 @@ Like with Bandit, new code will need to pass all of these to be merged into the 
 # End-to-end testing
 
 We use Cypress to do end-to-end testing of the application. Tests are defined
-in files in [backend/cypress/e2e/](/backend/cypress/e2e).
+in files in [backend/cypress/e2e/](/backend/cypress/e2e). Run cypress with `npx cypress open`.
 
 ## Testing behind Login.gov
 

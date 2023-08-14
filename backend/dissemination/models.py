@@ -196,12 +196,16 @@ class FederalAward(models.Model):
         help_text=docs.direct,
     )
 
+<<<<<<< HEAD
     is_major = models.BooleanField(
         "Indicate whether or not the Federal program is a major program",
         null=True,
         help_text=docs.major_program,
     )
     mp_audit_report_type = models.TextField(
+=======
+    mp_audit_report_type = models.CharField(
+>>>>>>> main
         "Type of Report Issued on the Major Program Compliance",
         null=True,
         help_text=docs.type_report_major_program_cfdainfo,
@@ -232,11 +236,14 @@ class FederalAward(models.Model):
         decimal_places=2,
         help_text=docs.passthrough_amount,
     )
+<<<<<<< HEAD
     type_requirement = models.TextField(
         "Type Requirement Failure",
         null=True,
         help_text=docs.type_requirement_cfdainfo,
     )
+=======
+>>>>>>> main
 
     class Meta:
         unique_together = (
@@ -722,25 +729,23 @@ class General(models.Model):
     audit_period_covered = models.TextField(
         "Audit Period Covered by Audit", max_length=40, help_text=docs.period_covered
     )
-    is_report_required = models.BooleanField(
-        "Distribution to Federal Agency required?",
-        null=True,
-        help_text=docs.report_required,
-    )
-
-    total_fed_expenditures = models.DecimalField(
+    total_amount_expended = models.DecimalField(
         "Total Federal Expenditures",
         null=True,
         max_digits=98,
         decimal_places=2,
         help_text=docs.total_fed_expenditures,
     )
+<<<<<<< HEAD
     type_report_major_program = models.TextField(
         "Type of Report Issued on the Major Program Compliance",
         null=True,
         help_text=docs.type_report_major_program_general,
     )
     type_audit_code = models.TextField("Determines if audit is A133 or UG", default="")
+=======
+    type_audit_code = models.CharField("Determines if audit is A133 or UG", default="")
+>>>>>>> main
 
     # Metadata
     hist_dbkey = models.IntegerField(
