@@ -80,10 +80,16 @@ class AuditInfoForm(forms.Form):
     choices_agencies = list((i, i) for i in AGENCY_NAMES)
 
     gaap_results = forms.MultipleChoiceField(choices=choices_GAAP)
-    sp_framework_basis = forms.MultipleChoiceField(choices=choices_SP_FRAMEWORK_BASIS)
-    is_sp_framework_required = forms.MultipleChoiceField(choices=choices_YoN)
+    sp_framework_basis = forms.MultipleChoiceField(
+        choices=choices_SP_FRAMEWORK_BASIS,
+        required=False,
+    )
+    is_sp_framework_required = forms.MultipleChoiceField(
+        choices=choices_YoN,
+    )
     sp_framework_opinions = forms.MultipleChoiceField(
-        choices=choices_SP_FRAMEWORK_OPINIONS
+        choices=choices_SP_FRAMEWORK_OPINIONS,
+        required=False,
     )
     is_going_concern_included = forms.MultipleChoiceField(choices=choices_YoN)
     is_internal_control_deficiency_disclosed = forms.MultipleChoiceField(

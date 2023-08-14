@@ -48,13 +48,6 @@ function attachEventHandlers() {
         basi.required = false;
         basi.checked = false;
       });
-      const reqds = document.querySelectorAll(
-        'input[name="is_sp_framework_required"]'
-      );
-      reqds.forEach((reqd) => {
-        reqd.required = false;
-        reqd.checked = false;
-      });
       const opinions = document.querySelectorAll(
         'input[name="sp_framework_opinions"]'
       );
