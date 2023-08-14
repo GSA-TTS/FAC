@@ -4,7 +4,8 @@ from .errors import (
 from collections import defaultdict
 
 
-def number_of_findings(sac_dict):
+def number_of_findings(sac_dict, *_args, **_kwargs):
+
     """
     Checks that the number of findings mentioned in Federal Awards matches
     the number of findings referenced in Federal Awards Audit Findings.
