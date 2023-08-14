@@ -57,6 +57,7 @@ local sp_framework_opinions = [
   },
 ];
 
-{ gaap_results: gaap_results}
-{ sp_framework_basis: sp_framework_basis}
-{ sp_framework_opinions: sp_framework_opinions}
+{ gaap_results: gaap_results,
+  sp_framework_basis: sp_framework_basis,
+  sp_framework_opinions: sp_framework_opinions,
+}
