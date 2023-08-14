@@ -11,8 +11,12 @@ def number_of_findings(sac_dict):
     """
 
     all_sections = sac_dict.get("sf_sac_sections", {})
-    federal_awards = all_sections.get("federal_awards", {}).get("federal_awards", [])
-    findings_uniform_guidance = all_sections.get("findings_uniform_guidance", {}).get(
+    federal_awards_section = all_sections.get("federal_awards") or {}
+    federal_awards = federal_awards_section.get("federal_awards", [])
+    findings_uniform_guidance_section = (
+        all_sections.get("findings_uniform_guidance") or {}
+    )
+    findings_uniform_guidance = findings_uniform_guidance_section.get(
         "findings_uniform_guidance_entries", []
     )
 
