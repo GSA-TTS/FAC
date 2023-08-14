@@ -1,4 +1,4 @@
-const FORM = document.forms[0];
+const FORM = document.getElementById('upload-report__form');
 const not_gaap_id = 'gaap_results--not_gaap';
 const sp_framework_div = document.querySelector('#sp_framework_section');
 
