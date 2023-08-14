@@ -805,9 +805,7 @@ class SubmissionProgressView(SingleAuditChecklistAccessRequiredMixin, generic.Vi
             context = {
                 "single_audit_checklist": {
                     "created": True,
-                    "created_date": sac.date_created.strftime(
-                        "%b %d,%Y at %H:%M %p %Z"
-                    ),
+                    "created_date": sac.date_created,
                     "created_by": sac.submitted_by,
                     "completed": False,
                     "completed_date": None,
