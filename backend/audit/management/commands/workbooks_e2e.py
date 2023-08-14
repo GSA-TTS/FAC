@@ -26,43 +26,6 @@ from audit.fixtures.workbooks.workbook_creation import (
 
 from audit.fixtures.workbooks.sac_creation import _post_upload_pdf
 
-# # def transition(sac):
-# #     SingleAuditChecklist = apps.get_model("audit.SingleAuditChecklist")
-# #     # I couldn't use the transition functions. Don't know why.
-# #     # In progress
-# #     sac.transition_name.append(SingleAuditChecklist.STATUS.SUBMITTED)
-# #     sac.transition_date.append(datetime.date.today())
-
-# #     sac.transition_name.append(SingleAuditChecklist.STATUS.AUDITOR_CERTIFIED)
-# #     sac.transition_date.append(datetime.date.today())
-
-# #     sac.transition_name.append(SingleAuditChecklist.STATUS.AUDITEE_CERTIFIED)
-# #     sac.transition_date.append(datetime.date.today())
-
-# #     sac.transition_name.append(SingleAuditChecklist.STATUS.CERTIFIED)
-# #     sac.transition_date.append(datetime.date.today())
-
-# # def cross_validate(sac):
-# #     print("CROSS VALIDATING")
-# #     validation_functions = audit.cross_validation.functions
-
-# #     shape = audit.cross_validation.sac_validation_shape(sac)
-# #     for fun in validation_functions:
-# #         fun(shape)
-
-# #     sac.validate_cross()
-
-# # def etl(sac):
-# #     print("TRANSFERRING DATA... HARDER BETTER FASTER STRONGER ...")
-# #     from audit.etl import ETL
-
-# #     if sac.general_information:
-# #         etl = ETL(sac)
-# #         etl.load_all()
-
-#     sac.transition_name.append(SingleAuditChecklist.STATUS.SUBMITTED)
-#     sac.transition_date.append(date.today())
-
 def step_through_certifications(sac, SAC):
     sac.transition_name.append(SAC.STATUS.SUBMITTED)
     sac.transition_date.append(datetime.date.today())
@@ -86,54 +49,30 @@ from dissemination.models import (
     Passthrough,
     General,
     SecondaryAuditor,
+    AdditionalUei
 )
 
 from audit.etl import ETL
     
 def disseminate(sac):
     print("TRANSFERRING DATA... HARDER BETTER FASTER STRONGER ...")
-    for model in [FindingText,
-            Finding,
-            FederalAward,
-            CapText,
-            Note,
-            Revision,
-            Passthrough,
-            General,
-            SecondaryAuditor
-        ]:
+    for model in [
+        Note,
+        FindingText,
+        Finding,
+        FederalAward,
+        CapText,
+        Revision,
+        Passthrough,
+        General,
+        SecondaryAuditor,
+        AdditionalUei
+    ]:
         model.objects.filter(report_id=sac.report_id).delete()
 
     if sac.general_information:
         etl = ETL(sac)
         etl.load_all()
-
-# [{'endpoint': 'federal_awards',
-#   'report_id': '2022TEST000100010',
-#   'rows': [{'fields': ['program_name',
-#                        'federal_program_total',
-#                        'cluster_total',
-#                        'is_guaranteed',
-#                        'is_direct',
-#                        'is_passed',
-#                        'subrecipient_amount',
-#                        'is_major',
-#                        'amount_expended',
-#                        'federal_program_total',
-#                        'passthrough_name',
-#                        'passthrough_identifying_number'],
-#             'values': ['COMMUNITY FACILITIES LOANS AND GRANTS',
-#                        '69038',
-#                        '0',
-#                        'N',
-#                        'Y',
-#                        'N',
-#                        '0',
-#                        'N',
-#                        '69038',
-#                        '69038',
-#                        '',
-#                        '']},
 
 from pprint import pprint
 from config import settings
@@ -233,17 +172,17 @@ def api_check(json_test_tables):
                 eq = check_equality(this_field_value, this_api_value)
                 if not eq:
                     print(f'eq {eq} field {f} fval {this_field_value} == aval {this_api_value}')
+                    pprint(api_values)
                 equality_results.append(eq)
                     
             if all(equality_results):
-                print(f"------ YESYESYES")
+                # print(f"------ YESYESYES")
                 count(summary, 'correct_rows')
             else:
-                print(f"------ NONONO")
+                # print(f"------ NONONO")
                 count(summary, 'incorrect_rows')
-                print(equality_results)
-                sys.exit()
-                # print(row)
+                # print(equality_results)
+                sys.exit(-1)
         print(summary)
         combined_summary = combine_counts(combined_summary, summary)
     return combined_summary
@@ -265,16 +204,19 @@ class Command(BaseCommand):
             dbkey=options["dbkey"], date=datetime.datetime.now()
         )
         sac = setup_sac(user, entity_id, options["dbkey"])
-        loader = workbook_loader(user, sac, options["dbkey"], entity_id)
-        json_test_tables = []
-        for section, fun in sections.items():
-            # FIXME: Can we conditionally upload the addl' and secondary workbooks?
-            (_, json, _) = loader(fun, section)
-            json_test_tables.append(json)
-        _post_upload_pdf(sac, user, 'audit/fixtures/basic.pdf')
-        SingleAuditChecklist = apps.get_model("audit.SingleAuditChecklist")
-        step_through_certifications(sac, SingleAuditChecklist)
-        disseminate(sac)
-        # pprint(json_test_tables)
-        combined_summary = api_check(json_test_tables)
-        print(combined_summary)
+        if sac.general_information['audit_type'] == "alternative-compliance-engagement":
+            print(f"Skipping ACE audit: {options['dbkey']}")
+        else:
+            loader = workbook_loader(user, sac, options["dbkey"], entity_id)
+            json_test_tables = []
+            for section, fun in sections.items():
+                # FIXME: Can we conditionally upload the addl' and secondary workbooks?
+                (_, json, _) = loader(fun, section)
+                json_test_tables.append(json)
+            _post_upload_pdf(sac, user, 'audit/fixtures/basic.pdf')
+            SingleAuditChecklist = apps.get_model("audit.SingleAuditChecklist")
+            step_through_certifications(sac, SingleAuditChecklist)
+            disseminate(sac)
+            # pprint(json_test_tables)
+            combined_summary = api_check(json_test_tables)
+            print(combined_summary)

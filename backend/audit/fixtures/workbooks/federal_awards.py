@@ -119,24 +119,14 @@ def generate_federal_awards(dbkey, outfile):
                                      | (Cfda.cfda % '%rd%')
                                      | (Cfda.cfda % '%RD%'))).order_by(Cfda.index):
         if cfda.awardidentification is None or len(cfda.awardidentification) < 1:
-            addls[get_list_index(cfdas, cfda.index)] = "" # f"ADDITIONAL AWARD INFO - DBKEY {dbkey}"
+            addls[get_list_index(cfdas, cfda.index)] = f"ADDITIONAL AWARD INFO - DBKEY {dbkey}"
         else:
             addls[get_list_index(cfdas, cfda.index)] = cfda.awardidentification
     set_range(wb, "additional_award_identification", addls)
 
-    ## Fix loan guarantees
-    # loansatend = ["" for x in list(range(0, len(cfdas)))]
-    # for cfda in Cfda.select().where((Cfda.dbkey==dbkey) & (Cfda.loans == "Y")):
-    #     logger.info(f"{cfda.loans} - {cfda.loanbalance}")
-    #     if cfda.loanbalance is None:
-    #         loansatend[get_list_index(cfdas, cfda.index)] = "N/A"
-    #     else:
-    #         loansatend[get_list_index(cfdas, cfda.index)] = cfda.loanbalance
-    # logger.info(list(enumerate(loansatend)))
-    # set_range(wb, "loan_balance_at_audit_period_end", loansatend)
-
     # Map things with transformations
     prefixes = map(lambda v: (v.cfda).split(".")[0], cfdas)
+    # prefixes = map(lambda v: f'0{v}' if int(v) < 10 else v, prefixes)
     ## Truncate any nastiness in the CFDA extensions to three characters.
     extensions = map(lambda v: ((v.cfda).split(".")[1])[:3].upper(), cfdas)
     extensions = map(lambda v: v if re.search("^(RD|[0-9]{3}[A-Za-z]{0,1}|U[0-9]{2})$", v) else "000", extensions)
@@ -150,20 +140,44 @@ def generate_federal_awards(dbkey, outfile):
     # Sadly, we can't just... build the list...
     passthrough_names = ["" for x in list(range(0, len(cfdas)))]
     passthrough_ids = ["" for x in list(range(0, len(cfdas)))]
-    ls = list(Cfda.select().where((Cfda.direct=="N") & (Cfda.dbkey==dbkey)).order_by(Cfda.index))
+    ls = Cfda.select().where(Cfda.dbkey==dbkey).order_by(Cfda.index)
+    cfda : Cfda
     for cfda in ls:
-        try:
-            pnq = (
-                Passthrough.select().where(
-                    (Passthrough.dbkey == cfda.dbkey)
-                    & (Passthrough.elecauditsid == cfda.elecauditsid)
-                )
-            ).get()
-            passthrough_names[get_list_index(cfdas, cfda.index)] = pnq.passthroughname
+        pnq = Passthrough()
+        if cfda.direct == "Y":
+            pnq.passthroughname = ""
+            pnq.passthroughid = ""
+        if cfda.direct == "N":
+            try:
+                pnq = (
+                    Passthrough.select().where(
+                        (Passthrough.dbkey == cfda.dbkey)
+                        & (Passthrough.elecauditsid == cfda.elecauditsid)
+                    )
+                ).get()
+            except Exception as e:
+                print(e)
+                pnq.passthroughname = "EXCEPTIONAL PASSTHROUGH NAME"
+                pnq.passthroughid = "EXCEPTIONAL PASSTHROUGH ID"        
+
+        name = pnq.passthroughname
+        if name is None:
+            name = ""
+        name = name.rstrip()
+        if name == "" and cfda.direct == "N":
+            passthrough_names[get_list_index(cfdas, cfda.index)] = "NO PASSTHROUGH NAME PROVIDED"
+        else:
+            passthrough_names[get_list_index(cfdas, cfda.index)] = name
+
+        id = pnq.passthroughid
+        if id is None:
+            id = ""
+        id = id.rstrip()
+        if id == "" and cfda.direct == "N":
+            passthrough_ids[get_list_index(cfdas, cfda.index)] = "NO PASSTHROUGH ID PROVIDED"
+        else:
             passthrough_ids[get_list_index(cfdas, cfda.index)] = pnq.passthroughid
-        except Exception as e:
-            passthrough_names[get_list_index(cfdas, cfda.index)] = ""
-            passthrough_ids[get_list_index(cfdas, cfda.index)] = ""
+            
     set_range(wb, "passthrough_name", passthrough_names)
     set_range(wb, "passthrough_identifying_number", passthrough_ids)
 
@@ -185,7 +199,7 @@ def generate_federal_awards(dbkey, outfile):
         if cfda.loans == "Y":
             if cfda.loanbalance is None:
                 # loansatend.append("N/A")
-                loansatend.append(0)
+                loansatend.append(1)
             else:
                 loansatend.append(cfda.loanbalance)
         else:

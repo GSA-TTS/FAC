@@ -12,6 +12,7 @@ from dissemination.models import (
     Passthrough,
     General,
     SecondaryAuditor,
+    AdditionalUei
 )
 from audit.models import SingleAuditChecklist
 
@@ -38,6 +39,8 @@ class ETL(object):
             self.load_passthrough,
             self.load_finding_texts,
             self.load_captext,
+            self.load_note,
+            self.load_additional_uei
             # self.load_audit_info()  # TODO: Uncomment when SingleAuditChecklist adds audit_information
         )
         for load_method in load_methods:
@@ -236,12 +239,14 @@ class ETL(object):
         federal_awards = self.single_audit_checklist.federal_awards
         for entry in federal_awards["FederalAwards"]["federal_awards"]:
             if "entities" in entry["direct_or_indirect_award"]:
+                # FIXME: What is going on here? This feels like a confusion
+                # between the old Census model and ours. It passes tests... :/ 
                 for entity in entry["direct_or_indirect_award"]["entities"]:
                     passthrough = Passthrough(
                         award_reference=entry["award_reference"],
                         report_id=self.report_id,
-                        passthrough_id=entity["passthrough_identifying_number"],
-                        passthrough_name=entity["passthrough_name"],
+                        passthrough_id=entry["passthrough_identifying_number"],
+                        passthrough_name=entry["passthrough_name"],
                     )
                     passthrough.save()
 
@@ -259,18 +264,7 @@ class ETL(object):
     def load_general(self):
         general_information = self.single_audit_checklist.general_information
         dates_by_status = self._get_dates_from_sac()
-        sac_additional_ueis = self.single_audit_checklist.additional_ueis
-
-        # Handle things that might be empty, deep down
-        auditee_addl_uei_list = []
-        if "additional_ueis_entries" in sac_additional_ueis["AdditionalUEIs"]:
-            auditee_addl_uei_list = [
-                entry["additional_uei"]
-                for entry in sac_additional_ueis["AdditionalUEIs"][
-                    "additional_ueis_entries"
-                ]
-            ]
-
+        # sac_additional_ueis = self.single_audit_checklist.additional_ueis
         general = General(
             report_id=self.report_id,
             auditee_certify_name=None,  # TODO: Where does this come from?
@@ -285,7 +279,8 @@ class ETL(object):
             auditee_state=general_information["auditee_state"],
             auditee_ein=general_information["ein"],
             auditee_uei=general_information["auditee_uei"],
-            auditee_addl_uei_list=auditee_addl_uei_list,
+            additional_ueis = self.single_audit_checklist.additional_ueis == "Y",
+            # auditee_addl_uei_list=auditee_addl_uei_list,
             auditee_zip=general_information["auditee_zip"],
             auditor_phone=general_information["auditor_phone"],
             auditor_state=general_information["auditor_state"],
@@ -340,13 +335,13 @@ class ETL(object):
         # MCJ This might be empty
         if "secondary_auditors_entries" in secondary_auditors["SecondaryAuditors"]:
             for secondary_auditor in secondary_auditors["SecondaryAuditors"][
-                "secondary_auditors_entries"
-            ]["items"]:
+                "secondary_auditors_entries"]:
                 sec_auditor = SecondaryAuditor(
                     report_id=self.single_audit_checklist.report_id,
-                    auditor_seq_number=secondary_auditor[
-                        "secondary_auditor_seq_number"
-                    ],
+                    # FIXME: Do we need this seq number?
+                    # auditor_seq_number=secondary_auditor[
+                    #     "secondary_auditor_seq_number"
+                    # ],
                     auditor_ein=secondary_auditor["secondary_auditor_ein"],
                     auditor_name=secondary_auditor["secondary_auditor_name"],
                     contact_name=secondary_auditor["secondary_auditor_contact_name"],
@@ -362,7 +357,18 @@ class ETL(object):
                         "secondary_auditor_address_zipcode"
                     ],
                 )
-            sec_auditor.save()
+                print(f'Saving {sec_auditor}')
+                sec_auditor.save()
+
+    def load_additional_uei(self):
+        addls = self.single_audit_checklist.additional_ueis
+        if "additional_ueis_entries" in addls["AdditionalUEIs"]:
+            for uei in addls["AdditionalUEIs"]['additional_ueis_entries']:
+                auei = AdditionalUei(
+                    report_id = self.single_audit_checklist.report_id,
+                    additional_uei = uei['additional_uei']
+                )
+                auei.save()
 
     def load_audit_info(self):
         general = General.objects.get(report_id=self.single_audit_checklist.report_id)

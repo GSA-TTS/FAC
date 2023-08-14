@@ -18,13 +18,13 @@ from audit.fixtures.workbooks.additional_ueis import generate_additional_ueis
 from audit.fixtures.workbooks.secondary_auditors import generate_secondary_auditors
 
 sections = {
+    FORM_SECTIONS.NOTES_TO_SEFA: generate_notes_to_sefa,
+    FORM_SECTIONS.CORRECTIVE_ACTION_PLAN: generate_corrective_action_plan,
+    FORM_SECTIONS.ADDITIONAL_UEIS: generate_additional_ueis,   
+    FORM_SECTIONS.SECONDARY_AUDITORS: generate_secondary_auditors,
     FORM_SECTIONS.FINDINGS_UNIFORM_GUIDANCE: generate_findings,
     FORM_SECTIONS.FEDERAL_AWARDS_EXPENDED: generate_federal_awards,
     FORM_SECTIONS.FINDINGS_TEXT: generate_findings_text,
-    FORM_SECTIONS.CORRECTIVE_ACTION_PLAN: generate_corrective_action_plan,
-    FORM_SECTIONS.NOTES_TO_SEFA: generate_notes_to_sefa,
-    FORM_SECTIONS.ADDITIONAL_UEIS: generate_additional_ueis,   
-    FORM_SECTIONS.SECONDARY_AUDITORS: generate_secondary_auditors,
 }
 
 filenames = {

@@ -39,6 +39,10 @@ class FindingText(models.Model):
             foreign_key(("report_id", ) references General
         """
 
+class AdditionalUei(models.Model):
+    """Additional UEIs for this audit."""
+    report_id = models.TextField()
+    additional_uei = models.TextField()
 
 class Finding(models.Model):
     """A finding from the audit. References FederalAward and FindingText"""
@@ -503,11 +507,16 @@ class General(models.Model):
         null=True,
     )
     auditee_uei = models.TextField("", null=True, help_text=docs.uei_general)
-    auditee_addl_uei_list = ArrayField(
-        models.TextField("", null=True, help_text=docs.uei_general),
-        null=True,
-        default=list,
-    )
+    # auditee_addl_uei_list = ArrayField(
+    #     models.TextField("", null=True, help_text=docs.uei_general),
+    #     null=True,
+    #     default=list,
+    # )
+    # No nesting of structures.
+    # Just store the bool, and load the workbook into a separate table
+    # This adds a lot of complexity to the process.
+    additional_ueis = models.BooleanField(default=False)
+
     hist_auditee_addl_ein_list = ArrayField(
         models.TextField("", null=True, help_text=docs.uei_general),
         null=True,
@@ -760,7 +769,7 @@ class SecondaryAuditor(models.Model):
         "G-FAC generated identifier. FK to General",
         max_length=40,
     )
-    auditor_seq_number = models.IntegerField("Order that the Auditor was reported")
+    # auditor_seq_number = models.IntegerField("Order that the Auditor was reported")
     auditor_ein = models.TextField(
         "CPA Firm EIN (only available for audit years 2013 and beyond)",
         null=True,
@@ -808,7 +817,7 @@ class SecondaryAuditor(models.Model):
     )
 
     class Meta:
-        unique_together = (("report_id", "auditor_seq_number"),)
+        # unique_together = (("report_id", "auditor_seq_number"),)
         """
             SecondaryAuditor
             Secindary and additional auditors

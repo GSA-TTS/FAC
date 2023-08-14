@@ -243,6 +243,7 @@ local Enum = {
     enum: [
       'program-specific',
       'single-audit',
+      'alternative-compliance-engagement'
     ],
     title: 'AuditType',
   },

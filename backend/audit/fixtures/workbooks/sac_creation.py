@@ -89,7 +89,9 @@ def _period_covered(s):
     return {"A": "annual", "B": "biennial", "O": "other"}[s]
 
 def _census_audit_type(s):
-    return {"S": "single-audit"}[s]
+    return {"S": "single-audit",
+            "P": "program-specific",
+            "A": "alternative-compliance-engagement"}[s]
 
 def _fake_general_information(dbkey, auditee_name=None):
     """Create a fake general_information object."""
@@ -125,7 +127,7 @@ def _fake_general_information(dbkey, auditee_name=None):
         "auditor_country": "N/A" if not gobj.cpacountry else gobj.cpacountry,
         "auditor_ein": gobj.auditor_ein,
         "auditor_ein_not_an_ssn_attestation": True,
-        "auditor_email": gobj.cpaemail,
+        "auditor_email": gobj.cpaemail if gobj.cpaemail else "noemailfound@noemail.com",
         "auditor_firm_name": gobj.cpafirmname,
         "auditor_phone": gobj.cpaphone,
         # TODO: when we include territories in our valid states, remove this restriction
@@ -172,7 +174,7 @@ def _fake_audit_information(dbkey, auditee_name=None):
         
 
     audit_information = {
-        "agencies": list(map(lambda i: str(i), agencies.keys())),
+        "agencies": list(map(lambda i: str(i) if len(str(i)) > 1 else f'0{str(i)}', agencies.keys())),
         "dollar_threshold": 750000,
         "gaap_results": list(gaap_results.keys()),
         "is_aicpa_audit_guide_included": True if gobj.reportablecondition == "Y" else False,

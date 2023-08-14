@@ -12,27 +12,36 @@ begin;
 create view api_v1_0_0_beta.general as
     select gen.*, 
           award.federal_agency_prefix, award.federal_award_extension
-    from dissemination_General gen
-    left outer join dissemination_FederalAward award on gen.report_id = award.report_id
-    where gen.is_public=true 
+    from dissemination_General gen,
+         dissemination_FederalAward award
+    where gen.report_id = award.report_id
+          and gen.is_public=true 
     -- MCJ When it comes time to enable tribal access, this is what it looks like.
     -- For each view, we add a conditional clause where the data is not public and 
     -- the user also has tribal access based on headers from api.data.gov.
     -- or (gen.is_public=false and has_tribal_data_access())
+    order by gen.id
 ;
 
-create view api_v1_0_0_beta.auditor as
+create view api_v1_0_0_beta.secondary_auditor as
     select gen.auditee_uei, gen.auditee_ein, gen.audit_year,
            sa.*
-    from dissemination_SecondaryAuditor sa
-    left join dissemination_General gen on sa.report_id = gen.report_id
-    where gen.is_public=True
+    from dissemination_SecondaryAuditor sa,
+         dissemination_General gen 
+    where sa.report_id = gen.report_id 
+          and gen.is_public=True
+    order by sa.id
 ;
 
 create view api_v1_0_0_beta.federal_award as
-    select gen.auditee_uei, gen.auditee_ein, gen.fy_start_date, gen.fy_end_date, gen.audit_year, award.*
-    from dissemination_federalaward award, dissemination_General gen
-    -- left join dissemination_General gen on award.report_id = gen.report_id
+    select gen.auditee_uei, 
+        gen.auditee_ein, 
+        gen.fy_start_date, 
+        gen.fy_end_date, 
+        gen.audit_year, 
+        award.*
+    from dissemination_federalaward award, 
+         dissemination_General gen
     where award.report_id = gen.report_id 
           and gen.is_public=True
     order by award.id
@@ -57,24 +66,14 @@ create view api_v1_0_0_beta.finding as
     -- where gen.is_public=True
 ;
 
-
-create view api_v1_0_0_beta.finding2 as
-    select finding.*
-    from dissemination_Finding finding
-    order by finding.id
-    -- left join dissemination_FederalAward award 
-    --    on award.report_id = finding.report_id 
-    --      and award.award_reference = finding.award_reference
-    -- left join dissemination_General gen on award.report_id = gen.report_id
-    -- where gen.is_public=True
-;
-
 create view api_v1_0_0_beta.finding_text as
     select gen.auditee_uei, gen.auditee_ein, gen.fy_start_date, gen.fy_end_date, gen.audit_year, 
           ft.*
-    from dissemination_FindingText ft
-    left join dissemination_General gen on ft.report_id = gen.report_id
-    where gen.is_public=True
+    from dissemination_FindingText ft,
+         dissemination_General gen
+    where ft.report_id = gen.report_id
+          and gen.is_public=True
+    order by ft.id
 ;
 
 create view api_v1_0_0_beta.cap_text as
@@ -85,17 +84,30 @@ create view api_v1_0_0_beta.cap_text as
         gen.fy_end_date, 
         gen.audit_year, 
         ct.*
-    from dissemination_CAPText ct
-    left join dissemination_General gen on ct.report_id = gen.report_id
-    where gen.is_public=True
+    from dissemination_CAPText ct,
+         dissemination_General gen
+    where ct.report_id = gen.report_id and gen.is_public=True
+    order by ct.id
 ;
 
 create view api_v1_0_0_beta.note as
     select gen.auditee_uei, gen.auditee_ein, gen.fy_start_date, gen.fy_end_date, gen.audit_year, 
           note.*
-    from dissemination_Note note
-    left join dissemination_General gen on note.report_id = gen.report_id
-    where gen.is_public=True
+    from dissemination_Note note,
+         dissemination_General gen
+    where note.report_id = gen.report_id
+          and gen.is_public=True
+    order by note.id
+;
+
+create view api_v1_0_0_beta.additional_uei as
+    select gen.auditee_uei, gen.auditee_ein,
+           ueis.*
+    from dissemination_additionaluei ueis,
+         dissemination_General gen
+    where ueis.report_id = gen.report_id
+          and gen.is_public = True
+    order by ueis.id
 ;
 
 commit;

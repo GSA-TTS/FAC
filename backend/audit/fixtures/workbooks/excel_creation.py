@@ -78,7 +78,7 @@ def set_range(wb, range_name, values, default=None, type=str):
             # print(f'{range_name} c[{row}][{col}] <- {v} len({len(v)}) {default}')
             if v is not None:
                 ws.cell(row=row, column=col, value=type(v))
-            if len(v) == 0 and default is not None:
+            if len(str(v)) == 0 and default is not None:
                 # This is less noisy. Shows up for things like
                 # empty findings counts. 2023 submissions
                 # require that field to be 0, not empty,

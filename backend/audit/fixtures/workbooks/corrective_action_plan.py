@@ -20,6 +20,7 @@ import openpyxl as pyxl
 import logging
 
 logger = logging.getLogger(__name__)
+
 def generate_corrective_action_plan(dbkey, outfile):
     logger.info(f"--- generate corrective action plan {dbkey}---")
     wb = pyxl.load_workbook(templates["CAP"])
