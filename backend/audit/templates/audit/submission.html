@@ -1,20 +1,24 @@
 {% extends "base.html" %}
 {% load static %}
 {% block content %}
-    <div class="grid-container margin-top-6">
+    <div class="grid-container margin-y-6">
         <div class="grid-row grid-gap">
             <form class="usa-form usa-form--large" id="submission" method="post">
                 {% csrf_token %}
                 <fieldset class="usa-fieldset">
-                    <legend class="usa-legend usa-legend--large" id="submission">
-                        Audit Submission
-                    </legend>
-                    <p>
-                        This is some text explaining that clicking the button below will submit this audit. Once submitted, the audit can no longer be edited.
+                    <h1 class="font-sans-2xl" id="submission">
+                        Single Audit Submission
+                    </h1>
+                    <p class="margin-0 font-sans-md">
+                        Clicking the "Submit Single Audit" button below will send your report to the Federal Audit Clearinghouse (FAC). Once you've done this, you can't undo this action and can't make changes to the report. 
                     </p>
-                    <p>Audit {{ report_id }} has a submission status of: {{ submission_status }}</p>
-                    <h4 class="usa-process-list__heading">This action is taken by the CERTIFYING AUDITEE</h4>
-                    <button class="usa-button" id="continue">Submit Audit</button>
+                    <p class="margin-y-4 font-sans-md">
+                        Please save copies of all submitted documents to your local drive. The FAC doesn't maintain these files, and can't return them for future review.
+                    </p>
+                    <div class="margin-top-6">
+                        <button class="usa-button margin-right-2" id="continue">Submit Single Audit</button>
+                        <a href="{% url 'audit:SubmissionProgress' report_id %}">Cancel</a>
+                    </div>
                 </fieldset>
             </form>
         </div>
