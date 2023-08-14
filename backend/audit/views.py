@@ -60,8 +60,9 @@ from audit.validators import (
 
 from .fixtures.excel import FORM_SECTIONS, UNKNOWN_WORKBOOK
 
-from dissemination.models import FederalAward, General
-
+logging.basicConfig(
+    format="%(asctime)s %(levelname)-8s %(module)s:%(lineno)d %(message)s"
+)
 logger = logging.getLogger(__name__)
 
 
@@ -815,9 +816,7 @@ class SubmissionProgressView(SingleAuditChecklistAccessRequiredMixin, generic.Vi
             context = {
                 "single_audit_checklist": {
                     "created": True,
-                    "created_date": sac.date_created.strftime(
-                        "%b %d,%Y at %H:%M %p %Z"
-                    ),
+                    "created_date": sac.date_created,
                     "created_by": sac.submitted_by,
                     "completed": False,
                     "completed_date": None,

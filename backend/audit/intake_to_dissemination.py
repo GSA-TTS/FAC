@@ -109,6 +109,19 @@ class IntakeToDissemination(object):
         if (not federal_awards):
             return {}
         federal_awards_objects = []
+        report_id = self.single_audit_checklist.report_id
+        try:
+            general = General.objects.get(report_id=report_id)
+        except General.DoesNotExist:
+            logger.error(
+                f"General must be loaded before FederalAward. report_id = {report_id}"
+            )
+            return
+        general.total_amount_expended = federal_awards["FederalAwards"].get(
+            "total_amount_expended"
+        )
+        general.save()
+
         for entry in federal_awards["FederalAwards"]["federal_awards"]:
             program = entry.get("program")
             loan = entry.get("loan_or_loan_guarantee")
@@ -141,7 +154,6 @@ class IntakeToDissemination(object):
                 findings_count=program.get("number_of_audit_findings"),
                 is_passthrough_award=is_passthrough,
                 passthrough_amount=subrecipient_amount,
-                type_requirement=None,  # TODO: What is this?
             )
             # if self.write_to_db:
             #     federal_award.save()
@@ -323,9 +335,7 @@ class IntakeToDissemination(object):
             entity_type=general_information["user_provided_organization_type"],
             number_months=general_information["audit_period_other_months"],
             audit_period_covered=general_information["audit_period_covered"],
-            is_report_required=None,  # TODO: Notes say this hasn't been used since 2008.
-            total_fed_expenditures=None,  # TODO: Where does this come from?
-            type_report_major_program=None,  # TODO: Where does this come from?
+            total_amount_expended=None,  # loaded from FederalAward
             type_audit_code="UG",
             is_public=self.single_audit_checklist.is_public,
             data_source="GSA",
