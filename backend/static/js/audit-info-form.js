@@ -1,12 +1,11 @@
-const FORM = document.getElementById('upload-report__form');
 const not_gaap_id = 'gaap_results--not_gaap';
 const sp_framework_div = document.querySelector('#sp_framework_section');
 
 /*
-  HTML5 doesn't provide a native way to set multiple choice options as required, without setting ALL of them as required. 
-  This solution sets them all as required, so a user is notified if they try to submit without selecting an answer.
-  If they select an answer, the options are set to no longer be required. 
-  This function attaches handles by the name of the <input> tag, which is shared between choices. 
+HTML5 doesn't provide a native way to set multiple choice options as required, without setting ALL of them as required. 
+This solution sets them all as required, so a user is notified if they try to submit without selecting an answer.
+If they select an answer, the options are set to no longer be required. 
+This function attaches handles by the name of the <input> tag, which is shared between choices. 
 */
 function setCheckboxRequired(name) {
   let checkboxes = document.getElementsByName(name);
@@ -36,31 +35,35 @@ function setCheckboxRequired(name) {
 }
 
 function attachEventHandlers() {
-  /* Uncheck sp_ fields if they are not applicable */
-  FORM.addEventListener('submit', (e) => {
-    e.preventDefault();
+  const CONTINUE_BUTTON = document.querySelector('#continue');
+  CONTINUE_BUTTON.addEventListener('click', () => {
+    /* Uncheck sp_ fields if they are not applicable */
+    sp_framework_div.removeAttribute('hidden');
     const not_gaap_cb = document.querySelector(`#${not_gaap_id}`);
     if (!not_gaap_cb.checked) {
       const basis = document.querySelectorAll(
         'input[name="sp_framework_basis"]'
       );
       basis.forEach((basi) => {
+        basi.required = false;
         basi.checked = false;
       });
       const reqds = document.querySelectorAll(
         'input[name="is_sp_framework_required"]'
       );
       reqds.forEach((reqd) => {
+        reqd.required = false;
         reqd.checked = false;
       });
       const opinions = document.querySelectorAll(
         'input[name="sp_framework_opinions"]'
       );
       opinions.forEach((opinion) => {
+        opinion.required = false;
         opinion.checked = false;
       });
     }
-    FORM.submit();
+    return;
   });
 }
 
@@ -81,7 +84,6 @@ function init() {
 /* show or hide sp_f fields based on no_gaap being checked */
 function toggle_sp_div() {
   const not_gaap_cb = document.querySelector(`#${not_gaap_id}`);
-  console.log('toggle', not_gaap_cb.checked);
   if (not_gaap_cb.checked) {
     sp_framework_div.removeAttribute('hidden');
   } else {
