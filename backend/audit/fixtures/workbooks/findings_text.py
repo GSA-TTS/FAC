@@ -1,5 +1,6 @@
 from audit.fixtures.workbooks.excel_creation import (
     FieldMap,
+    WorkbookFieldInDissem,
     templates,
     set_uei,
     map_simple_columns,
@@ -26,7 +27,7 @@ def generate_findings_text(dbkey, outfile):
     mappings = [
         FieldMap('reference_number', 'findingrefnums', 'finding_ref_number', None, str),
         FieldMap('text_of_finding', 'text', 'finding_text', None, test_pfix(3)),
-        FieldMap('contains_chart_or_table', 'chartstables', 'contains_chart_or_table', None, str),
+        FieldMap('contains_chart_or_table', 'chartstables', WorkbookFieldInDissem, None, str),
     ]
     g = set_uei(Gen, wb, dbkey)
     insert_version_and_sheet_name(wb, "audit-findings-text-workbook")
