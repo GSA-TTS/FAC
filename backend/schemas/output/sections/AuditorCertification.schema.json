@@ -1,0 +1,57 @@
+{
+   "additionalProperties": false,
+   "properties": {
+      "auditor_certification": {
+         "description": "Auditor certification (required checkboxes)",
+         "properties": {
+            "has_no_auditee_procedures": {
+               "type": "boolean"
+            },
+            "has_used_auditors_report": {
+               "type": "boolean"
+            },
+            "is_FAC_releasable": {
+               "type": "boolean"
+            },
+            "is_OMB_limited": {
+               "type": "boolean"
+            },
+            "is_auditee_responsible": {
+               "type": "boolean"
+            }
+         },
+         "required": [
+            "is_OMB_limited",
+            "is_auditee_responsible",
+            "has_used_auditors_report",
+            "has_no_auditee_procedures",
+            "is_FAC_releasable"
+         ],
+         "type": "object"
+      },
+      "auditor_signature": {
+         "description": "Auditor signature and title",
+         "properties": {
+            "auditor_certification_date_signed": {
+               "description": "MM/DD/YYYY",
+               "pattern": "^[0-9]{2}/[0-9]{2}/[0-9]{4}$",
+               "title": "Date",
+               "type": "string"
+            },
+            "auditor_name": {
+               "type": "string"
+            },
+            "auditor_title": {
+               "type": "string"
+            }
+         },
+         "required": [
+            "auditor_name",
+            "auditor_title"
+         ],
+         "type": "object"
+      }
+   },
+   "title": "AuditorCertification",
+   "type": "object"
+}

@@ -1,0 +1,90 @@
+{
+   "$schema": "https://json-schema.org/draft/2019-09/schema#",
+   "additionalProperties": false,
+   "metamodel_version": "1.7.0",
+   "properties": {
+      "CorrectiveActionPlan": {
+         "additionalProperties": false,
+         "properties": {
+            "auditee_uei": {
+               "allOf": [
+                  {
+                     "maxLength": 12,
+                     "minLength": 12
+                  },
+                  {
+                     "pattern": "^[A-HJ-NP-Z1-9][A-HJ-NP-Z0-9]+$"
+                  },
+                  {
+                     "pattern": "^(?![A-HJ-NP-Z1-9]+[A-HJ-NP-Z0-9]*?[0-9]{9})[A-HJ-NP-Z0-9]*$"
+                  },
+                  {
+                     "pattern": "^(?![0-9]{9})"
+                  }
+               ],
+               "type": "string"
+            },
+            "corrective_action_plan_entries": {
+               "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                     "contains_chart_or_table": {
+                        "enum": [
+                           "Y",
+                           "N"
+                        ],
+                        "type": "string"
+                     },
+                     "planned_action": {
+                        "type": "string"
+                     },
+                     "reference_number": {
+                        "description": "Reference Number",
+                        "pattern": "^20[2-9][0-9]-[0-9]{3}$",
+                        "title": "ReferenceNumber",
+                        "type": "string"
+                     }
+                  },
+                  "required": [
+                     "reference_number",
+                     "planned_action",
+                     "contains_chart_or_table"
+                  ],
+                  "title": "CorrectiveActionPlanEntry"
+               },
+               "type": "array"
+            }
+         },
+         "required": [
+            "auditee_uei"
+         ],
+         "title": "CorrectiveActionPlan",
+         "type": "object",
+         "version": 20230410
+      },
+      "Meta": {
+         "additionalProperties": false,
+         "properties": {
+            "section_name": {
+               "enum": [
+                  "CorrectiveActionPlan"
+               ],
+               "type": "string"
+            },
+            "version": {
+               "const": "1.0.0",
+               "type": "string"
+            }
+         },
+         "required": [
+            "section_name"
+         ],
+         "title": "Meta",
+         "type": "object",
+         "version": 20230807
+      }
+   },
+   "title": "UNNAMED",
+   "type": "object",
+   "version": 20230410
+}
