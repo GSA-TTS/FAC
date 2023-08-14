@@ -12,7 +12,7 @@
 {% endcomment %}
 <p class="text-base margin-0">
     {% if name %}
-        Completed {{ time }} by
+        Completed {{ time|date:"N j, Y g:i A T" }} by
         {% if name.first_name == '' %}
             {{ name.email }}.
         {% else %}
