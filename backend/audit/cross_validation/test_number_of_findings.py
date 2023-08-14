@@ -1,4 +1,3 @@
-import json
 import random
 from django.test import TestCase
 from audit.models import SingleAuditChecklist
@@ -6,165 +5,102 @@ from .errors import err_number_of_findings_inconsistent
 from .number_of_findings import number_of_findings
 from .sac_validation_shape import sac_validation_shape
 from model_bakery import baker
-from audit.fixtures.excel import (
-    CORRECTIVE_ACTION_PLAN_ENTRY_FIXTURES,
-    FINDINGS_TEXT_ENTRY_FIXTURES,
-    FINDINGS_UNIFORM_GUIDANCE_ENTRY_FIXTURES,
-    SECTION_NAMES,
-)
 
 
 class NumberOfFindingsTests(TestCase):
-    findings_text = json.loads(
-        FINDINGS_TEXT_ENTRY_FIXTURES.read_text(encoding="utf-8")
-    )[0]
-    findings_uniform_guidance = json.loads(
-        FINDINGS_UNIFORM_GUIDANCE_ENTRY_FIXTURES.read_text(encoding="utf-8")
-    )[0]
-    corrective_action_plan = json.loads(
-        CORRECTIVE_ACTION_PLAN_ENTRY_FIXTURES.read_text(encoding="utf-8")
-    )[0]
+    AWARD_MIN = 1000
+    AWARD_MAX = 2000
+    FINDINGS_MIN = 1
+    FINDINGS_MAX = 5
 
-    def _make_federal_awards(self, findings_count):
+    def _award_reference(self):
+        return f"AWARD-{random.randint(NumberOfFindingsTests.AWARD_MIN, NumberOfFindingsTests.AWARD_MAX)}"  # nosec
+
+    def _make_federal_awards(self, findings_count) -> dict:
+        number_of_award = random.randint(2, 4)  # nosec
         return {
             "FederalAwards": {
                 "federal_awards": [
-                    {"program": {"number_of_audit_findings": findings_count}}
+                    {
+                        "program": {"number_of_audit_findings": findings_count},
+                        "award_reference": self._award_reference(),
+                    }
+                    for _ in range(number_of_award)
                 ]
             }
         }
 
-    def _make_findings_uniform_guidance(self, findings_count):
-        return {
-            "FindingsUniformGuidance": {
-                "findings_uniform_guidance_entries": [
-                    NumberOfFindingsTests.findings_uniform_guidance
-                    for _ in range(findings_count)
-                ]
-            }
-        }
+    def _make_findings_uniform_guidance(self, awards, mismatch) -> dict:
+        entries = []
+        for award in awards["FederalAwards"]["federal_awards"]:
+            award_reference = award["award_reference"]
+            count = award["program"]["number_of_audit_findings"]
+            for _ in range(count + mismatch):
+                entries.append({"program": {"award_reference": award_reference}})
 
-    def _make_findings_text(self, findings_count):
-        return {
-            "FindingsText": {
-                "findings_text_entries": [
-                    NumberOfFindingsTests.findings_text for _ in range(findings_count)
-                ]
+        findings = (
+            {
+                "auditee_uei": "AAA123456BBB",
+                "findings_uniform_guidance_entries": entries,
             }
-        }
+            if len(entries) > 0
+            else {"auditee_uei": "AAA123456BBB"}
+        )
 
-    def _make_corrective_action_plan(self, findings_count):
-        return {
-            "CorrectiveActionPlan": {
-                "corrective_action_plan_entries": [
-                    NumberOfFindingsTests.corrective_action_plan
-                    for _ in range(findings_count)
-                ]
-            }
-        }
+        return {"FindingsUniformGuidance": findings}
 
-    def _make_sac(self, findings_count) -> SingleAuditChecklist:
+    def _make_sac(self, findings_count, mismatch=0) -> SingleAuditChecklist:
         sac = baker.make(SingleAuditChecklist)
         sac.federal_awards = self._make_federal_awards(findings_count)
         sac.findings_uniform_guidance = self._make_findings_uniform_guidance(
-            findings_count
+            sac.federal_awards, mismatch
         )
-        sac.findings_text = self._make_findings_text(findings_count)
-        sac.corrective_action_plan = self._make_corrective_action_plan(findings_count)
         return sac
 
-    def test_findings_match_across_all_workbooks(self):
-        """
-        Check that no error is returned when the number of findings is consistent across all workbooks.
-        """
-        findings_count = random.randint(2, 9)  # nosec
-        sac = self._make_sac(findings_count)
-        shaped_sac = sac_validation_shape(sac)
-        errors = number_of_findings(shaped_sac)
+    def test_zero_findings_count_report(self):
+        """Ensure no error is returned for consistent zero findings."""
+        sac = self._make_sac(0)
+        errors = number_of_findings(sac_validation_shape(sac))
         self.assertEqual(errors, [])
 
-    def test_findings_mismatch_between_federal_awards_and_findings_uniform_guidance(
-        self,
-    ):
-        """
-        Check that an error is returned when the number of findings is inconsistent between Federal Awards and Federal Awards Audit Findings workbooks.
-        """
-        findings_count = random.randint(5, 9)  # nosec
-        mismatch = random.randint(1, 4)  # nosec
-        sac = self._make_sac(findings_count)
-        sac.findings_uniform_guidance = self._make_findings_uniform_guidance(mismatch)
-        shaped_sac = sac_validation_shape(sac)
-        errors = number_of_findings(shaped_sac)
+    def test_findings_count_matches_across_workbooks(self):
+        """Ensure no error is returned for consistent findings count."""
+        sac = self._make_sac(
+            random.randint(
+                NumberOfFindingsTests.FINDINGS_MIN, NumberOfFindingsTests.FINDINGS_MAX
+            )
+        )  # nosec
+        errors = number_of_findings(sac_validation_shape(sac))
+        self.assertEqual(errors, [])
 
-        self.assertEqual(len(errors), 1)
-        expected_error = err_number_of_findings_inconsistent(
-            findings_count, mismatch, SECTION_NAMES.FEDERAL_AWARDS_AUDIT_FINDINGS
+    def _test_findings_count_mismatch(self, base_count, mismatch):
+        sac = self._make_sac(base_count, mismatch)
+        errors = number_of_findings(sac_validation_shape(sac))
+        self.assertEqual(
+            len(errors), len(sac.federal_awards["FederalAwards"]["federal_awards"])
         )
-        self.assertEqual(errors[0]["error"], expected_error)
 
-    def test_findings_mismatch_between_federal_awards_and_corrective_action_plan(self):
+        for award in sac.federal_awards["FederalAwards"]["federal_awards"]:
+            award_reference = award["award_reference"]
+            expected_error = err_number_of_findings_inconsistent(
+                base_count, base_count + mismatch, award_reference
+            )
+            self.assertIn({"error": expected_error}, errors)
+
+    def test_reported_findings_exceed_declared_count(self):
         """
-        Check that an error is returned when the number of findings is inconsistent between Federal Awards and Corrective Action Plan workbooks.
+        Expect errors when the number of findings in the Federal Awards Audit Findings workbook,
+        a.k.a the Findings Uniform Guidance workbook, exceeds those declared in the Federal Awards workbook.
         """
-        findings_count = random.randint(5, 9)  # nosec
-        mismatch = random.randint(1, 4)  # nosec
-        sac = self._make_sac(findings_count)
-        sac.corrective_action_plan = self._make_corrective_action_plan(mismatch)
-        shaped_sac = sac_validation_shape(sac)
-        errors = number_of_findings(shaped_sac)
+        self._test_findings_count_mismatch(
+            random.randint(2, 4), random.randint(1, 2)
+        )  # nosec
 
-        self.assertEqual(len(errors), 1)
-        expected_error = err_number_of_findings_inconsistent(
-            findings_count, mismatch, SECTION_NAMES.CORRECTIVE_ACTION_PLAN
-        )
-        self.assertEqual(errors[0]["error"], expected_error)
-
-    def test_findings_mismatch_between_federal_awards_and_findings_text(self):
+    def test_declared_findings_exceed_reported_count(self):
         """
-        Check that an error is returned when the number of findings is inconsistent between Federal Awards and Audit Findings Text workbooks.
+        Expect errors when the number of findings in the Federal Awards workbook
+        exceeds those reported in the Federal Awards Audit Findings workbook.
         """
-        findings_count = random.randint(5, 9)  # nosec
-        mismatch = random.randint(1, 4)  # nosec
-        sac = self._make_sac(findings_count)
-        sac.findings_text = self._make_findings_text(mismatch)
-        shaped_sac = sac_validation_shape(sac)
-        errors = number_of_findings(shaped_sac)
-
-        self.assertEqual(len(errors), 1)
-        expected_error = err_number_of_findings_inconsistent(
-            findings_count, mismatch, SECTION_NAMES.AUDIT_FINDINGS_TEXT
-        )
-        self.assertEqual(errors[0]["error"], expected_error)
-
-    def test_findings_mismatch_between_federal_awards_and_all_workbooks(self):
-        """
-        Check that an error is returned when the number of findings is inconsistent between Federal Awards and the other workbooks.
-        """
-        findings_count = random.randint(5, 9)  # nosec
-        mismatch = random.randint(1, 4)  # nosec
-        sac = self._make_sac(findings_count)
-        sac.findings_text = self._make_findings_text(mismatch)
-        sac.corrective_action_plan = self._make_corrective_action_plan(mismatch)
-        sac.findings_uniform_guidance = self._make_findings_uniform_guidance(mismatch)
-        shaped_sac = sac_validation_shape(sac)
-        errors = number_of_findings(shaped_sac)
-
-        self.assertEqual(len(errors), 3)
-
-        error_messages = [error["error"] for error in errors]
-
-        # Check for the existence of each error message
-        expected_error1 = err_number_of_findings_inconsistent(
-            findings_count, mismatch, SECTION_NAMES.AUDIT_FINDINGS_TEXT
-        )
-        self.assertEqual(error_messages.count(expected_error1), 1)
-
-        expected_error2 = err_number_of_findings_inconsistent(
-            findings_count, mismatch, SECTION_NAMES.CORRECTIVE_ACTION_PLAN
-        )
-        self.assertEqual(error_messages.count(expected_error2), 1)
-
-        expected_error3 = err_number_of_findings_inconsistent(
-            findings_count, mismatch, SECTION_NAMES.FEDERAL_AWARDS_AUDIT_FINDINGS
-        )
-        self.assertEqual(error_messages.count(expected_error3), 1)
+        self._test_findings_count_mismatch(
+            random.randint(2, 4), random.randint(-2, -1)
+        )  # nosec
