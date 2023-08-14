@@ -1,3 +1,8 @@
+from audit.fixtures.excel import (
+    SECTION_NAMES,
+)
+
+
 def err_additional_ueis_empty():
     return (
         "general_information.multiple_ueis_covered is checked, "
@@ -27,8 +32,8 @@ def err_missing_tribal_data_sharing_consent():
     )
 
 
-def err_number_of_findings_inconsistent(total_expected, total_rows, workbook_name):
+def err_number_of_findings_inconsistent(total_expected, total_counted, award_ref):
     return (
-        f"You reported {total_expected} findings in the Federal Awards workbook, "
-        f"but have {total_rows} row(s) in the {workbook_name} workbook."
+        f"You reported {total_expected} findings for award {award_ref} in the {SECTION_NAMES.FEDERAL_AWARDS} workbook, "
+        f"but declared {total_counted} findings for the same award in the {SECTION_NAMES.FEDERAL_AWARDS_AUDIT_FINDINGS} workbook."
     )

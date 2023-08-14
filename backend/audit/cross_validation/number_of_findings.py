@@ -1,68 +1,46 @@
 from .errors import (
     err_number_of_findings_inconsistent,
 )
-from audit.fixtures.excel import (
-    SECTION_NAMES,
-)
+from collections import defaultdict
 
 
 def number_of_findings(sac_dict):
     """
-    Checks that the number of findings mentioned in Federal Awards
-    matches the number of rows in findings, findings text, and CAP text.
+    Checks that the number of findings mentioned in Federal Awards matches
+    the number of findings referenced in Federal Awards Audit Findings.
     """
-    all_sections = sac_dict["sf_sac_sections"]
-    federal_awards = all_sections["federal_awards"]
-    findings_uniform_guidance = all_sections["findings_uniform_guidance"]
-    findings_text = all_sections["findings_text"]
-    corrective_action_plan = all_sections["corrective_action_plan"]
+
+    all_sections = sac_dict.get("sf_sac_sections", {})
+    federal_awards = all_sections.get("federal_awards", {}).get("federal_awards", [])
+    findings_uniform_guidance = all_sections.get("findings_uniform_guidance", {}).get(
+        "findings_uniform_guidance_entries", []
+    )
+
+    expected_award_refs_count = {}
+    found_award_refs_count = defaultdict(int)
     errors = []
-    total_findings_expected = 0
-    if federal_awards:
-        total_findings_expected = sum(
-            award["program"]["number_of_audit_findings"]
-            for award in federal_awards.get("federal_awards", [])
-        )
 
-    if findings_uniform_guidance:
-        total_rows = len(
-            findings_uniform_guidance.get("findings_uniform_guidance_entries", [])
-        )
-        if total_rows != total_findings_expected:
+    for award in federal_awards:
+        award_reference = award.get("award_reference", None)
+        if award_reference:
+            expected_award_refs_count[award_reference] = award["program"][
+                "number_of_audit_findings"
+            ]
+
+    for finding in findings_uniform_guidance:
+        award_ref = finding["program"]["award_reference"]
+        if award_ref in expected_award_refs_count:
+            found_award_refs_count[award_ref] += 1
+
+    for award_ref, expected in expected_award_refs_count.items():
+        counted = found_award_refs_count[award_ref]
+        if counted != expected:
             errors.append(
                 {
                     "error": err_number_of_findings_inconsistent(
-                        total_findings_expected,
-                        total_rows,
-                        SECTION_NAMES.FEDERAL_AWARDS_AUDIT_FINDINGS,
-                    )
-                }
-            )
-
-    if findings_text:
-        total_rows = len(findings_text.get("findings_text_entries", []))
-        if total_rows != total_findings_expected:
-            errors.append(
-                {
-                    "error": err_number_of_findings_inconsistent(
-                        total_findings_expected,
-                        total_rows,
-                        SECTION_NAMES.AUDIT_FINDINGS_TEXT,
-                    )
-                }
-            )
-
-    if corrective_action_plan:
-        total_rows = len(
-            corrective_action_plan.get("corrective_action_plan_entries", [])
-        )
-        if total_rows != total_findings_expected:
-            errors.append(
-                {
-                    "error": err_number_of_findings_inconsistent(
-                        total_findings_expected,
-                        total_rows,
-                        SECTION_NAMES.CORRECTIVE_ACTION_PLAN,
+                        expected,
+                        counted,
+                        award_ref,
                     )
                 }
             )
