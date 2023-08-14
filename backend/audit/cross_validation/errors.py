@@ -29,3 +29,7 @@ def err_missing_tribal_data_sharing_consent():
         "As a tribal organization, you must complete the data "
         "sharing consent statement before submitting your audit."
     )
+
+
+def err_award_ref_repeat_reference(award_ref, ref_number):
+    return f"Award {award_ref} repeats reference {ref_number}. The reference {ref_number} should only appear once for award {award_ref}."
