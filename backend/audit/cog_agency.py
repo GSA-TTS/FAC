@@ -57,7 +57,6 @@ def auditee_2019_submission_exists(auditee_ein, general_2019_data):
 
 
 def calc_total_amounts_agency(fed_award_data, year=2023):
-    selected_agency_prefix = 0
     tot_amount_agency = defaultdict(lambda: 0)
     tot_da_amount_agency = defaultdict(lambda: 0)
     tot_da_amount_expended = 0
@@ -76,37 +75,27 @@ def calc_total_amounts_agency(fed_award_data, year=2023):
                 tot_da_amount_agency[agency_prefix] += award["program"][
                     "amount_expended"
                 ]
-
     tot_amount_agency = list(
         sorted(tot_amount_agency.items(), reverse=True, key=lambda item: item[1])
     )
-    # print("tot_amount_agency = ", tot_amount_agency)
-
     tot_da_amount_agency = list(
         sorted(tot_da_amount_agency.items(), reverse=True, key=lambda item: item[1])
     )
+    # print("tot_amount_agency = ", tot_amount_agency)
     # print("tot_da_amount_agency = ", tot_da_amount_agency)
-
     # print("tot_da_amount_expended = ", tot_da_amount_expended)
 
-    if year == 2019:
-        if (
-            tot_da_amount_expended
-            >= 0.25 * fed_award_data["FederalAwards"]["total_amount_expended"]   # To Do: Gen data needed
-        ):
-            selected_agency_prefix, val = tot_da_amount_agency[0]
-        else:
-            selected_agency_prefix, val = tot_amount_agency[0]
-    else:
-        if (
-            tot_da_amount_expended
-            >= 0.25 * fed_award_data["FederalAwards"]["total_amount_expended"]
-        ):
-            selected_agency_prefix, val = tot_da_amount_agency[0]
-        else:
-            selected_agency_prefix, val = tot_amount_agency[0]
-    # print("selected agency prefix = ", selected_agency_prefix)
+    return tot_da_amount_expended, tot_da_amount_agency[0], tot_amount_agency[0]
 
+
+def select_agency(
+    tot_da_amount_expended, tot_da_amount_agency, tot_amount_agency, tot_amount_expended
+):
+    if tot_da_amount_expended >= 0.25 * tot_amount_expended:
+        selected_agency_prefix, val = tot_da_amount_agency
+    else:
+        selected_agency_prefix, val = tot_amount_agency
+    # print("selected agency prefix = ", selected_agency_prefix)
     return selected_agency_prefix
 
 
@@ -135,20 +124,47 @@ def cog_over_assignment(
         calc_tot_amt_expended(federal_awards_data, auditee_ein, general_2019_data)
         > calc_amount_expended_limit()
     ):
-        #############################################################
         #       Cognizant agency
-        #       ######## TO DO NEXT
-        #       ####### Use 2019 Base year submission data
-        #############################################################
         if auditee_2019_submission_exists(auditee_ein, general_2019_data):
             # federal_awards_data_2019 = load_2019_federal_award_data(auditee_ein)
-            cog_agency_prefix = calc_total_amounts_agency(
-                federal_awards_data_2019_data, 2019
+            (
+                tot_da_amount_expended,
+                tot_da_amount_agency,
+                tot_amount_agency,
+            ) = calc_total_amounts_agency(federal_awards_data_2019_data, 2019)
+            cog_agency_prefix = select_agency(
+                tot_da_amount_expended,
+                tot_da_amount_agency,
+                tot_amount_agency,
+                general_2019_data["General"]["totfedexpend"],
             )
         else:
-            cog_agency_prefix = calc_total_amounts_agency(federal_awards_data)
+            print("No 2019 submission")
+            (
+                tot_da_amount_expended,
+                tot_da_amount_agency,
+                tot_amount_agency,
+            ) = calc_total_amounts_agency(federal_awards_data)
+            cog_agency_prefix = select_agency(
+                tot_da_amount_expended,
+                tot_da_amount_agency,
+                tot_amount_agency,
+                federal_awards_data["FederalAwards"]["total_amount_expended"],
+            )
     else:
         #       Oversight agency
-        over_agency_prefix = calc_total_amounts_agency(federal_awards_data)
+        (
+            tot_da_amount_expended,
+            tot_da_amount_agency,
+            tot_amount_agency,
+        ) = calc_total_amounts_agency(federal_awards_data)
+        over_agency_prefix = select_agency(
+            tot_da_amount_expended,
+            tot_da_amount_agency,
+            tot_amount_agency,
+            federal_awards_data["FederalAwards"]["total_amount_expended"],
+        )
 
+    print("cog_agency_prefix = ", cog_agency_prefix)
+    print("over_agency_prefix = ", over_agency_prefix)
     return cog_agency_prefix, over_agency_prefix
