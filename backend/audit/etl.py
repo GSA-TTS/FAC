@@ -1,5 +1,6 @@
 import logging
 from datetime import datetime
+from pprint import pprint
 
 from dissemination.models import (
     FindingText,
@@ -62,6 +63,24 @@ class ETL(object):
                 )
                 finding_text_.save()
 
+        # "findings_uniform_guidance_entries": [
+        #     {
+        #         "program": {
+        #             "award_reference": "AWARD-1145",
+        #             "compliance_requirement": "M"
+        #         },
+        #         "findings": {
+        #             "prior_references": "2021-069",
+        #             "reference_number": "2022-012",
+        #             "repeat_prior_reference": "Y"
+        #         },
+        #         "other_matters": "Y",
+        #         "other_findings": "N",
+        #         "modified_opinion": "N",
+        #         "questioned_costs": "N",
+        #         "material_weakness": "N",
+        #         "significant_deficiency": "Y"
+        #     },
     def load_findings(self):
         findings_uniform_guidance = (
             self.single_audit_checklist.findings_uniform_guidance
@@ -76,20 +95,21 @@ class ETL(object):
 
             for entry in findings_uniform_guidance_entries:
                 findings = entry["findings"]
+                program = entry['program']
                 finding = Finding(
-                    award_reference=entry["award_reference"],
+                    award_reference=program["award_reference"],
                     report_id=self.report_id,
-                    finding_seq_number=entry["seq_number"],
+                    # finding_seq_number=entry["seq_number"],
                     finding_ref_number=findings["reference_number"],
                     is_material_weakness=entry["material_weakness"] == "Y",
                     is_modified_opinion=entry["modified_opinion"] == "Y",
                     is_other_findings=entry["other_findings"] == "Y",
-                    is_other_non_compliance=entry["other_findings"] == "Y",
-                    prior_finding_ref_numbers=findings.get("prior_references"),
+                    is_other_non_compliance=entry["other_matters"] == "Y",
+                    prior_finding_ref_numbers=None if 'prior_references' not in findings else findings["prior_references"],
                     is_questioned_costs=entry["questioned_costs"] == "Y",
                     is_repeat_finding=(findings["repeat_prior_reference"] == "Y"),
                     is_significant_deficiency=(entry["significant_deficiency"] == "Y"),
-                    type_requirement=(entry["program"]["compliance_requirement"]),
+                    type_requirement=(program["compliance_requirement"]),
                 )
                 finding.save()
 

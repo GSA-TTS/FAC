@@ -34,7 +34,7 @@ create view api_v1_0_0_beta.federal_award as
     from dissemination_federalaward award, dissemination_General gen
     -- left join dissemination_General gen on award.report_id = gen.report_id
     where award.report_id = gen.report_id 
-        and gen.is_public=True
+          and gen.is_public=True
     order by award.id
 ;
 
@@ -42,12 +42,31 @@ create view api_v1_0_0_beta.finding as
     select gen.auditee_uei, gen.auditee_ein, gen.fy_start_date, gen.fy_end_date, gen.audit_year, 
           award.federal_agency_prefix, award.federal_award_extension, 
           finding.*
-    from dissemination_Finding finding 
-    left join dissemination_FederalAward award 
-        on award.report_id = finding.report_id 
+    from dissemination_Finding finding, 
+         dissemination_FederalAward award,
+         dissemination_General gen 
+    where award.report_id = finding.report_id 
           and award.award_reference = finding.award_reference
-    left join dissemination_General gen on award.report_id = gen.report_id
-    where gen.is_public=True
+          and award.report_id = gen.report_id
+          and gen.is_public=True
+    order by finding.id
+    -- left join dissemination_FederalAward award 
+    --    on award.report_id = finding.report_id 
+    --      and award.award_reference = finding.award_reference
+    -- left join dissemination_General gen on award.report_id = gen.report_id
+    -- where gen.is_public=True
+;
+
+
+create view api_v1_0_0_beta.finding2 as
+    select finding.*
+    from dissemination_Finding finding
+    order by finding.id
+    -- left join dissemination_FederalAward award 
+    --    on award.report_id = finding.report_id 
+    --      and award.award_reference = finding.award_reference
+    -- left join dissemination_General gen on award.report_id = gen.report_id
+    -- where gen.is_public=True
 ;
 
 create view api_v1_0_0_beta.finding_text as

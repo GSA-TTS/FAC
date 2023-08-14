@@ -5,6 +5,7 @@ from users.models import User
 import argparse
 import datetime
 import logging
+import sys
 
 logger = logging.getLogger(__name__)
 logging.basicConfig()
@@ -177,7 +178,8 @@ def are_they_both_none_or_empty(a, b):
     return a_val and b_val
 
 def check_equality(in_wb, in_json):
-    if in_wb in ["Y", "N"]:
+    # Type requirement is sometimes just 'N'
+    if in_wb in ["Y", "N"] and isinstance(in_json, bool):
         return (True if in_wb == "Y" else False) == in_json
     elif just_numbers(in_wb) and just_numbers(in_json):
         return True if math.isclose(float(in_wb), float(in_json),rel_tol=1e-1) else False 
@@ -225,11 +227,12 @@ def api_check(json_test_tables):
             equality_results = []
             for field_ndx, f in enumerate(row['fields']):
                 api_values = get_api_values(endpoint, report_id, f)
+                # print(api_values)
                 this_api_value = api_values[row_ndx]
                 this_field_value = row['values'][field_ndx]
                 eq = check_equality(this_field_value, this_api_value)
                 if not eq:
-                    print(f'{eq} {f} {this_field_value} == {this_api_value}')
+                    print(f'eq {eq} field {f} fval {this_field_value} == aval {this_api_value}')
                 equality_results.append(eq)
                     
             if all(equality_results):
@@ -238,7 +241,9 @@ def api_check(json_test_tables):
             else:
                 print(f"------ NONONO")
                 count(summary, 'incorrect_rows')
-                print(row)
+                print(equality_results)
+                sys.exit()
+                # print(row)
         print(summary)
         combined_summary = combine_counts(combined_summary, summary)
     return combined_summary
