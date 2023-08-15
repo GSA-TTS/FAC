@@ -145,7 +145,7 @@ def generate_dissemination_test_table(Gen, api_endpoint, dbkey, mappings, object
                 if m.in_dissem == WorkbookFieldInDissem:
                     # print(f'in_sheet {m.in_sheet} <- {as_dict[m.in_db]}')
                     test_obj["fields"].append(m.in_sheet)
-                    # The typing must be applied here as well, as in the case of 
+                    # The typing must be applied here as well, as in the case of
                     # type_requirement, it alphabetizes the value...
                     test_obj["values"].append(m.type(as_dict[m.in_db]))
                 else:

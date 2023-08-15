@@ -16,7 +16,6 @@ from audit.fixtures.workbooks.excel_creation import insert_version_and_sheet_nam
 import openpyxl as pyxl
 
 import logging
-from pprint import pprint
 
 logger = logging.getLogger(__name__)
 

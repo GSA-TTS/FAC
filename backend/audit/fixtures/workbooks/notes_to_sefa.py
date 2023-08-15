@@ -18,6 +18,7 @@ import openpyxl as pyxl
 import re
 
 import logging
+
 # import unidecode
 
 logger = logging.getLogger(__name__)
@@ -28,14 +29,16 @@ mappings = [
     FieldMap("seq_number", "seq_number", "note_seq_number", 0, int),
 ]
 
+
 def cleanup_string(s):
     if s is None:
         return ""
     else:
         s = s.rstrip()
         # s = unidecode.unidecode(s)
-        s = str(s.encode('utf-8').decode('ascii', 'ignore'))
+        s = str(s.encode("utf-8").decode("ascii", "ignore"))
         return s
+
 
 def generate_notes_to_sefa(dbkey, outfile):
     logger.info(f"--- generate notes to sefa {dbkey}---")
@@ -62,13 +65,12 @@ def generate_notes_to_sefa(dbkey, outfile):
 
     rate_content = cleanup_string(rate.content)
     policies_content = cleanup_string(policies.content)
-    
+
     if rate_content == "":
         rate_content = "FILLED FOR TESTING"
     if policies_content == "":
         policies_content = "FILLED FOR TESTING"
 
-    
     # WARNING
     # This is being faked. We're askign a Y/N question in the collection.
     # Census just let them type some stuff. So, this is a rough
@@ -87,7 +89,7 @@ def generate_notes_to_sefa(dbkey, outfile):
         is_used = "Y"
     else:
         is_used = "Y&N"
-    
+
     set_single_cell_range(wb, "accounting_policies", policies_content)
     set_single_cell_range(wb, "is_minimis_rate_used", is_used)
     set_single_cell_range(wb, "rate_explained", rate_content)

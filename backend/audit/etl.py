@@ -237,7 +237,7 @@ class ETL(object):
     def load_passthrough(self):
         federal_awards = self.single_audit_checklist.federal_awards
         for entry in federal_awards["FederalAwards"]["federal_awards"]:
-            if 'entities' in entry["direct_or_indirect_award"]:
+            if "entities" in entry["direct_or_indirect_award"]:
                 for entity in entry["direct_or_indirect_award"]["entities"]:
                     passthrough = Passthrough(
                         award_reference=entry["award_reference"],
@@ -262,11 +262,13 @@ class ETL(object):
         general_information = self.single_audit_checklist.general_information
         dates_by_status = self._get_dates_from_sac()
         # sac_additional_ueis = self.single_audit_checklist.additional_ueis
-        
+
         num_months = None
-        if (("audit_period_other_months" in general_information) 
+        if (
+            ("audit_period_other_months" in general_information)
             and general_information["audit_period_other_months"] != ""
-            and general_information["audit_period_other_months"] is not None):
+            and general_information["audit_period_other_months"] is not None
+        ):
             num_months = int(general_information["audit_period_other_months"])
 
         general = General(
@@ -344,15 +346,27 @@ class ETL(object):
                         report_id=self.single_audit_checklist.report_id,
                         auditor_ein=secondary_auditor["secondary_auditor_ein"],
                         auditor_name=secondary_auditor["secondary_auditor_name"],
-                        contact_name=secondary_auditor["secondary_auditor_contact_name"],
-                        contact_title=secondary_auditor["secondary_auditor_contact_title"],
-                        contact_email=secondary_auditor["secondary_auditor_contact_email"],
-                        contact_phone=secondary_auditor["secondary_auditor_contact_phone"],
+                        contact_name=secondary_auditor[
+                            "secondary_auditor_contact_name"
+                        ],
+                        contact_title=secondary_auditor[
+                            "secondary_auditor_contact_title"
+                        ],
+                        contact_email=secondary_auditor[
+                            "secondary_auditor_contact_email"
+                        ],
+                        contact_phone=secondary_auditor[
+                            "secondary_auditor_contact_phone"
+                        ],
                         address_street=secondary_auditor[
                             "secondary_auditor_address_street"
                         ],
-                        address_city=secondary_auditor["secondary_auditor_address_city"],
-                        address_state=secondary_auditor["secondary_auditor_address_state"],
+                        address_city=secondary_auditor[
+                            "secondary_auditor_address_city"
+                        ],
+                        address_state=secondary_auditor[
+                            "secondary_auditor_address_state"
+                        ],
                         address_zipcode=secondary_auditor[
                             "secondary_auditor_address_zipcode"
                         ],
@@ -383,7 +397,11 @@ class ETL(object):
             logger.warning("No audit info found to load")
             return
         general.gaap_results = audit_information["gaap_results"]
-        general.sp_framework = audit_information["sp_framework_basis"] if "sp_framework_basis" in audit_information else None,
+        general.sp_framework = (
+            audit_information["sp_framework_basis"]
+            if "sp_framework_basis" in audit_information
+            else None,
+        )
         general.is_sp_framework_required = (
             audit_information["is_sp_framework_required"] == "Y"
         )
