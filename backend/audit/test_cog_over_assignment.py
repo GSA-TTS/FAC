@@ -169,61 +169,55 @@ class CogOverAssignmentTests(TestCase):
         # print(fixtures)
 
         # Test Case #1 - Cog agency from 2019 with Direct Award > 0.25 * total expended
-        print(
-            "\n\nTest Case 1 - Cog agency from 2019 with Direct Award > 0.25 * total expended"
+        # print(
+        #     "\n\nTest Case 1 - Cog agency from 2019 with Direct Award > 0.25 * total expended"
+        # )
+        cog_agency, over_agency = cog_over_assignment(
+            self.federal_awards_for_test,
+            "731084819",
+            self.federal_awards_2019_for_test,
+            self.general_2019_for_test,
         )
-        try:
-            cog_agency, over_agency = cog_over_assignment(
-                self.federal_awards_for_test,
-                "731084819",
-                self.federal_awards_2019_for_test,
-                self.general_2019_for_test,
-            )
-        except Exception as err:
-            msg = f"cog_over_assignment Test 1 failed!, got {type(err)}"
-            self.fail(msg)
+        self.assertEqual(over_agency, 0)
 
+
+    def test_cog_over_assignment_2(self):
         # Test Case #2 - Oversight agency 2023 with Direct Award > 0.25 * total expended
-        print(
-            "\n\n Test Case 2 - Oversight agency 2023 with Direct Award > 0.25 * total expended"
+        # print(
+        #     "\n\n Test Case 2 - Oversight agency 2023 with Direct Award > 0.25 * total expended"
+        # )
+        cog_agency, over_agency = cog_over_assignment(
+            self.federal_awards_for_test2,
+            "731084818",
+            self.federal_awards_2019_for_test,
+            self.general_2019_for_test,
         )
-        try:
-            cog_agency, over_agency = cog_over_assignment(
-                self.federal_awards_for_test2,
-                "731084818",
-                self.federal_awards_2019_for_test,
-                self.general_2019_for_test,
-            )
-        except Exception as err:
-            msg = f"cog_over_assignment Test 2 failed!, got {type(err)}"
-            self.fail(msg)
+        self.assertEqual(cog_agency, 0)
 
+
+    def test_cog_over_assignment_3(self):
         # Test Case #3 - Cog agency from 2019 with Direct Award < 0.25 * total expended
-        print(
-            "\n\nTest Case 3 - Cog agency from 2019 with Direct Award < 0.25 * total expended"
+        # print(
+        #     "\n\nTest Case 3 - Cog agency from 2019 with Direct Award < 0.25 * total expended"
+        # )
+        cog_agency, over_agency = cog_over_assignment(
+            self.federal_awards_for_test,
+            "731084819",
+            self.federal_awards_2019_for_test3,
+            self.general_2019_for_test,
         )
-        try:
-            cog_agency, over_agency = cog_over_assignment(
-                self.federal_awards_for_test,
-                "731084819",
-                self.federal_awards_2019_for_test3,
-                self.general_2019_for_test,
-            )
-        except Exception as err:
-            msg = f"cog_over_assignment Test 3 failed!, got {type(err)}"
-            self.fail(msg)
+        self.assertEqual(over_agency, 0)
 
+
+    def test_cog_over_assignment_4(self):
         # Test Case #4 - Oversight agency 2023 with Direct Award < 0.25 * total expended
-        print(
-            "\n\n Test Case 4 - Oversight agency 2023 with Direct Award < 0.25 * total expended"
+        # print(
+        #     "\n\n Test Case 4 - Oversight agency 2023 with Direct Award < 0.25 * total expended"
+        # )
+        cog_agency, over_agency = cog_over_assignment(
+            self.federal_awards_for_test4,
+            "731084818",
+            self.federal_awards_2019_for_test,
+            self.general_2019_for_test,
         )
-        try:
-            cog_agency, over_agency = cog_over_assignment(
-                self.federal_awards_for_test4,
-                "731084818",
-                self.federal_awards_2019_for_test,
-                self.general_2019_for_test,
-            )
-        except Exception as err:
-            msg = f"cog_over_assignment Test 4 failed!, got {type(err)}"
-            self.fail(msg)
+        self.assertEqual(over_agency, 0)
