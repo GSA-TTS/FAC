@@ -85,7 +85,8 @@
          "required": [
             "auditee_uei",
             "accounting_policies",
-            "is_minimis_rate_used"
+            "is_minimis_rate_used",
+            "rate_explained"
          ],
          "title": "NotesToSefa",
          "type": "object",
