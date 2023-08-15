@@ -39,8 +39,8 @@ class ETL(object):
             self.load_finding_texts,
             self.load_captext,
             self.load_note,
-            self.load_additional_uei
-            # self.load_audit_info()  # TODO: Uncomment when SingleAuditChecklist adds audit_information
+            self.load_additional_uei,
+            self.load_audit_info,
         )
         for load_method in load_methods:
             try:
@@ -52,71 +52,54 @@ class ETL(object):
 
     def load_finding_texts(self):
         findings_text = self.single_audit_checklist.findings_text
-        if "findings_text_entries" in findings_text["FindingsText"]:
-            findings_text_entries = findings_text["FindingsText"][
-                "findings_text_entries"
-            ]
-            for entry in findings_text_entries:
-                finding_text_ = FindingText(
-                    report_id=self.report_id,
-                    finding_ref_number=entry["reference_number"],
-                    contains_chart_or_table=entry["contains_chart_or_table"] == "Y",
-                    finding_text=entry["text_of_finding"],
-                )
-                finding_text_.save()
 
-        # "findings_uniform_guidance_entries": [
-        #     {
-        #         "program": {
-        #             "award_reference": "AWARD-1145",
-        #             "compliance_requirement": "M"
-        #         },
-        #         "findings": {
-        #             "prior_references": "2021-069",
-        #             "reference_number": "2022-012",
-        #             "repeat_prior_reference": "Y"
-        #         },
-        #         "other_matters": "Y",
-        #         "other_findings": "N",
-        #         "modified_opinion": "N",
-        #         "questioned_costs": "N",
-        #         "material_weakness": "N",
-        #         "significant_deficiency": "Y"
-        #     },
+        if not findings_text:
+            logger.warning("No finding texts found to load")
+            return
+
+        findings_text_entries = findings_text["FindingsText"]["findings_text_entries"]
+        for entry in findings_text_entries:
+            finding_text_ = FindingText(
+                report_id=self.report_id,
+                finding_ref_number=entry["reference_number"],
+                contains_chart_or_table=entry["contains_chart_or_table"] == "Y",
+                finding_text=entry["text_of_finding"],
+            )
+            finding_text_.save()
 
     def load_findings(self):
         findings_uniform_guidance = (
             self.single_audit_checklist.findings_uniform_guidance
         )
-        if (
-            "findings_uniform_guidance_entries"
-            in findings_uniform_guidance["FindingsUniformGuidance"]
-        ):
-            findings_uniform_guidance_entries = findings_uniform_guidance[
-                "FindingsUniformGuidance"
-            ]["findings_uniform_guidance_entries"]
+        if not findings_uniform_guidance:
+            logger.warning("No findings found to load")
+            return
 
-            for entry in findings_uniform_guidance_entries:
-                findings = entry["findings"]
-                program = entry["program"]
-                finding = Finding(
-                    award_reference=program["award_reference"],
-                    report_id=self.report_id,
-                    # finding_seq_number=entry["seq_number"],
-                    finding_ref_number=findings["reference_number"],
-                    is_material_weakness=entry["material_weakness"] == "Y",
-                    is_modified_opinion=entry["modified_opinion"] == "Y",
-                    is_other_findings=entry["other_findings"] == "Y",
-                    is_other_non_compliance=entry["other_matters"] == "Y",
-                    prior_finding_ref_numbers=None
-                    if "prior_references" not in findings
-                    else findings["prior_references"],
-                    is_questioned_costs=entry["questioned_costs"] == "Y",
-                    is_repeat_finding=(findings["repeat_prior_reference"] == "Y"),
-                    is_significant_deficiency=(entry["significant_deficiency"] == "Y"),
-                    type_requirement=(program["compliance_requirement"]),
-                )
-                finding.save()
+        findings_uniform_guidance_entries = findings_uniform_guidance[
+            "FindingsUniformGuidance"
+        ]["findings_uniform_guidance_entries"]
+
+        for entry in findings_uniform_guidance_entries:
+            findings = entry["findings"]
+            program = entry["program"]
+            finding = Finding(
+                award_reference=program["award_reference"],
+                report_id=self.report_id,
+                # finding_seq_number=entry["seq_number"],
+                finding_ref_number=findings["reference_number"],
+                is_material_weakness=entry["material_weakness"] == "Y",
+                is_modified_opinion=entry["modified_opinion"] == "Y",
+                is_other_findings=entry["other_findings"] == "Y",
+                is_other_non_compliance=entry["other_matters"] == "Y",
+                prior_finding_ref_numbers=None
+                if "prior_references" not in findings
+                else findings["prior_references"],
+                is_questioned_costs=entry["questioned_costs"] == "Y",
+                is_repeat_finding=(findings["repeat_prior_reference"] == "Y"),
+                is_significant_deficiency=(entry["significant_deficiency"] == "Y"),
+                type_requirement=(program["compliance_requirement"]),
+            )
+            finding.save()
 
     def conditional_lookup(self, dict, key, default):
         if key in dict:
@@ -200,6 +183,10 @@ class ETL(object):
 
     def load_note(self):
         notes_to_sefa = self.single_audit_checklist.notes_to_sefa["NotesToSefa"]
+        if not notes_to_sefa:
+            logger.warning("No notes to sefa found to load")
+            return
+
         accounting_policies = notes_to_sefa["accounting_policies"]
         is_minimis_rate_used = notes_to_sefa["is_minimis_rate_used"] == "Y"
         rate_explained = notes_to_sefa["rate_explained"]
@@ -252,15 +239,21 @@ class ETL(object):
     def load_passthrough(self):
         federal_awards = self.single_audit_checklist.federal_awards
         for entry in federal_awards["FederalAwards"]["federal_awards"]:
-            if "entities" in entry["direct_or_indirect_award"]:
-                for entity in entry["direct_or_indirect_award"]["entities"]:
-                    passthrough = Passthrough(
-                        award_reference=entry["award_reference"],
-                        report_id=self.report_id,
-                        passthrough_id=entity["passthrough_identifying_number"],
-                        passthrough_name=entity["passthrough_name"],
-                    )
-                    passthrough.save()
+            entities = (
+                entry["direct_or_indirect_award"]
+                and entry["direct_or_indirect_award"]["entities"]
+            )
+            if not entities:
+                logger.warning("No passthrough to load")
+                return
+            for entity in entry["direct_or_indirect_award"]["entities"]:
+                passthrough = Passthrough(
+                    award_reference=entry["award_reference"],
+                    report_id=self.report_id,
+                    passthrough_id=entity["passthrough_identifying_number"],
+                    passthrough_name=entity["passthrough_name"],
+                )
+                passthrough.save()
 
     def _get_dates_from_sac(self):
         return_dict = dict()
@@ -379,17 +372,26 @@ class ETL(object):
                 auei.save()
 
     def load_audit_info(self):
-        general = General.objects.get(report_id=self.single_audit_checklist.report_id)
+        report_id = self.single_audit_checklist.report_id
+        try:
+            general = General.objects.get(report_id=report_id)
+        except General.DoesNotExist:
+            logger.error(
+                f"General must be loaded before AuditInfo. report_id = {report_id}"
+            )
+            return
         audit_information = self.single_audit_checklist.audit_information
-
+        if not audit_information:
+            logger.warning("No audit info found to load")
+            return
         general.gaap_results = audit_information["gaap_results"]
-        """
-            TODO:
-            Missing in schema
-            general.sp_framework = audit_information[]
-            general.is_sp_framework_required = audit_information[]
-            general.sp_framework_auditor_opinion = audit_information[]
-        """
+        general.sp_framework = audit_information["sp_framework_basis"]
+        general.is_sp_framework_required = (
+            audit_information["is_sp_framework_required"] == "Y"
+        )
+        general.sp_framework_auditor_opinion = audit_information[
+            "sp_framework_opinions"
+        ]
         general.is_going_concern = audit_information["is_going_concern_included"] == "Y"
         general.is_significant_deficiency = (
             audit_information["is_internal_control_deficiency_disclosed"] == "Y"

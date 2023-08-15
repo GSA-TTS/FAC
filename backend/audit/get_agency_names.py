@@ -31,9 +31,9 @@ def get_agency_names():
     return agency_names
 
 
-def get_gaap_results():
+def get_audit_info_lists(name):
     sonnet = "./schemas/source/base/GAAP.libsonnet"
     json_str = _jsonnet.evaluate_file(sonnet)
     jobj = json.loads(json_str)
     # Returns a list of dictionaries with the keys 'tag' and 'readable'
-    return jobj["gaap_results"]
+    return jobj[name]

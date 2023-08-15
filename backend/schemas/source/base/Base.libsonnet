@@ -284,6 +284,15 @@ local Enum = {
     description: 'GAAP Results (Audit Information)',
     enum: std.map(function(pair) pair.tag, GAAP.gaap_results),
   },
+  SP_Framework_Basis: Types.string {
+    description: 'SP Framework Basis (Audit Information)',
+    enum: std.map(function(pair) pair.tag, GAAP.sp_framework_basis),
+  },
+  SP_Framework_Opinions: Types.string {
+    description: 'SP Framework Opinions (Audit Information)',
+    enum: std.map(function(pair) pair.tag, GAAP.sp_framework_opinions),
+  },
+
 };
 
 local simple_phone_regex = '[1-9]{1}[0-9]{9}+';
