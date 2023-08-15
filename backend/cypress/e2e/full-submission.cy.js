@@ -1,3 +1,4 @@
+import { testCrossValidation } from '../support/cross-validation.js';
 import { testLoginGovLogin } from '../support/login-gov.js';
 import { testValidAccess } from '../support/check-access.js';
 import { testValidEligibility } from '../support/check-eligibility.js';
@@ -57,15 +58,18 @@ describe('Full audit submission', () => {
     cy.get(".usa-link").contains("Additional UEIs").click();
     testWorkbookAdditionalUEIs(false);  // don't intercept
 
+    cy.get(".usa-link").contains("Pre-submission validation").click();
+    testCrossValidation();
+
     // Uncomment this block when ready to implement the certification steps.
     /*
-    
-    // These aren't enabled because the previous steps didn't actually upload anything. Our upload responses are mocked. 
+
+    // These aren't enabled because the previous steps didn't actually upload anything. Our upload responses are mocked.
     // First step, pre-validation.
     cy.get(".usa-link").contains("Pre-submission validation").click();
     cy.url().should('match', /\/audit\/ready-for-certification\/[0-9A-Z]{17}/);
     // Mock a prositive response on validation, then it comes back to the checklist
-    
+
     // Second, auditor certification
     cy.get(".usa-link").contains("Auditor Certification").click();
     // Two pages:
@@ -79,7 +83,7 @@ describe('Full audit submission', () => {
     // Finally, submit for processing.
     cy.get(".usa-link").contains("Submit to the FAC for processing").click();
     // This will probably take you back to the homepage, where the audit is now oof status "submitted".
-    
+
     */
   });
 });

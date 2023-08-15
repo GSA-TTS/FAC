@@ -8,6 +8,13 @@ local AuditInformation = Types.object {
     gaap_results: Types.array {
       items: Base.Enum.GAAPResults,
     },
+    sp_framework_basis: Types.array {
+      items: Base.Enum.SP_Framework_Basis,
+    },
+    is_sp_framework_required: Types.boolean,
+    sp_framework_opinions: Types.array {
+      items: Base.Enum.SP_Framework_Opinions,
+    },
     dollar_threshold: Types.integer,
     is_going_concern_included: Types.boolean,
     is_internal_control_deficiency_disclosed: Types.boolean,
