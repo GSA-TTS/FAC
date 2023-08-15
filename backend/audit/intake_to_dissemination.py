@@ -1,5 +1,6 @@
 import logging
 from datetime import datetime
+from typing import Dict
 
 from dissemination.models import (
     FindingText,
@@ -25,17 +26,17 @@ class IntakeToDissemination(object):
             "auditee_fiscal_period_start", datetime.now
         )
         self.audit_year = int(audit_date.split("-")[0])
-        self.loaded_objects = dict()
+        self.loaded_objects: Dict[dict, dict] = dict()
 
     def load_all(self):
         load_methods = {
-            'Generals': self.load_general,
-            'SecondaryAuditors': self.load_secondary_auditor,
-            'FederalAwards': self.load_federal_award,
-            'Findings': self.load_findings,
-            'FindingTexts': self.load_finding_texts,
-            'Passthroughs': self.load_passthrough,
-            'CapTexts': self.load_captext,
+            "Generals": self.load_general,
+            "SecondaryAuditors": self.load_secondary_auditor,
+            "FederalAwards": self.load_federal_award,
+            "Findings": self.load_findings,
+            "FindingTexts": self.load_finding_texts,
+            "Passthroughs": self.load_passthrough,
+            "CapTexts": self.load_captext,
         }
         for _, load_method in load_methods.items():
             try:
@@ -106,7 +107,7 @@ class IntakeToDissemination(object):
 
     def load_federal_award(self):
         federal_awards = self.single_audit_checklist.federal_awards
-        if (not federal_awards):
+        if not federal_awards:
             return {}
         federal_awards_objects = []
         report_id = self.single_audit_checklist.report_id
@@ -165,7 +166,7 @@ class IntakeToDissemination(object):
 
     def load_captext(self):
         corrective_action_plan = self.single_audit_checklist.corrective_action_plan
-        if (not corrective_action_plan):
+        if not corrective_action_plan:
             return {}
         corrective_action_plan_entries = corrective_action_plan["CorrectiveActionPlan"][
             "corrective_action_plan_entries"
@@ -350,7 +351,7 @@ class IntakeToDissemination(object):
 
     def load_secondary_auditor(self):
         secondary_auditors = self.single_audit_checklist.secondary_auditors
-        if (not secondary_auditors):
+        if not secondary_auditors:
             return {}
 
         sec_objs = []
@@ -359,17 +360,23 @@ class IntakeToDissemination(object):
         ]["items"]:
             sec_auditor = SecondaryAuditor(
                 report_id=self.single_audit_checklist.report_id,
-                auditor_seq_number=secondary_auditor.get("secondary_auditor_seq_number"),
+                auditor_seq_number=secondary_auditor.get(
+                    "secondary_auditor_seq_number"
+                ),
                 auditor_ein=secondary_auditor.get("secondary_auditor_ein"),
                 auditor_name=secondary_auditor.get("secondary_auditor_name"),
                 contact_name=secondary_auditor.get("secondary_auditor_contact_name"),
                 contact_title=secondary_auditor.get("secondary_auditor_contact_title"),
                 contact_email=secondary_auditor.get("secondary_auditor_contact_email"),
                 contact_phone=secondary_auditor.get("secondary_auditor_contact_phone"),
-                address_street=secondary_auditor.get("secondary_auditor_address_street"),
+                address_street=secondary_auditor.get(
+                    "secondary_auditor_address_street"
+                ),
                 address_city=secondary_auditor.get("secondary_auditor_address_city"),
                 address_state=secondary_auditor.get("secondary_auditor_address_state"),
-                address_zipcode=secondary_auditor.get("secondary_auditor_address_zipcode"),
+                address_zipcode=secondary_auditor.get(
+                    "secondary_auditor_address_zipcode"
+                ),
             )
             # if self.write_to_db:
             #     sec_auditor.save()

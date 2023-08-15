@@ -5,18 +5,20 @@
 {% block content %}
     <div class="grid-row">
         <div class="grid-container margin-top-6 margin-bottom-6">
-            <div id="audit-summary-content" class="usa-in-page-nav-container margin-x-4">
+            <div id="audit-summary-content"
+                 class="usa-in-page-nav-container margin-x-4">
                 <aside class="usa-in-page-nav"
-                    data-title-text="On this page"
-                    data-title-heading-level="h2"
-                    data-scroll-offset="0"
-                    data-root-margin="0px 0px 0px 0px"
-                    data-threshold="1">
+                       data-title-text="On this page"
+                       data-title-heading-level="h2"
+                       data-scroll-offset="0"
+                       data-root-margin="0px 0px 0px 0px"
+                       data-threshold="1">
                 </aside>
                 <main id="main-content" class="main-content">
                     {% comment %} General Information {% endcomment %}
-                    <h2 class="">General Information</h2>
-                    <div id="general-information" class="position-relative overflow-scroll height-mobile border radius-lg">
+                    <h2>General Information</h2>
+                    <div id="general-information"
+                         class="position-relative overflow-scroll height-mobile border radius-lg">
                         <div class="grid-row padding-2">
                             {% for k, v in general_info.items %}
                                 <p class="margin-y-1 desktop:grid-col-6">
@@ -25,39 +27,33 @@
                             {% endfor %}
                         </div>
                     </div>
-
                     {% for section_key, section_list in data.items %}
-                    <div id="{{ section_key }}">
-                        <span id="{{ section_key }}-title" class="grid-row margin-top-3">
-                            <h2 class="">{{ section_key }}</h2>
-                            <span class="text-base-light font-sans-lg display-flex flex-align-self-center margin-x-2">|</span>
-                            <span class="text-base font-sans-lg display-flex flex-align-self-center">{{ section_list|length }}</span>
-                        </span>
-
-                        <div id="{{ section_key }}-table" class="usa-table-container--scrollable">
-                            <table class="usa-table usa-table--striped overflow-scroll">
-                                <thead id="{{ section_key }}-table__head">
-                                    <tr>
-                                        {% for k in section_list.0 %}<th scope="col">{{ k|field_name_to_label }}</th>{% endfor %}
-                                    </tr>
-                                </thead>
-                                <tbody id="{{ section_key }}-table__body">
-                                    {% for item in section_list %}
+                        <div id="{{ section_key }}">
+                            <span id="{{ section_key }}-title" class="grid-row margin-top-3">
+                                <h2>{{ section_key }}</h2>
+                                <span class="text-base-light font-sans-lg display-flex flex-align-self-center margin-x-2">|</span>
+                                <span class="text-base font-sans-lg display-flex flex-align-self-center">{{ section_list|length }}</span>
+                            </span>
+                            <div id="{{ section_key }}-table" class="usa-table-container--scrollable">
+                                <table class="usa-table usa-table--striped overflow-scroll">
+                                    <thead id="{{ section_key }}-table__head">
                                         <tr>
-                                            {% for k, v in item.items %}<td>{{ v }}</td>{% endfor %}
+                                            {% for k in section_list.0 %}<th scope="col">{{ k|field_name_to_label }}</th>{% endfor %}
                                         </tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
+                                    </thead>
+                                    <tbody id="{{ section_key }}-table__body">
+                                        {% for item in section_list %}
+                                            <tr>
+                                                {% for k, v in item.items %}<td>{{ v }}</td>{% endfor %}
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
-                    </div>
                     {% endfor %}
                     <a href="{% url 'audit:SubmissionProgress' report_id %}">
-                        <button class="usa-button margin-top-6"
-                                type="button"
-                                id="back-button">
-                            Return to checklist
-                        </button>
+                        <button class="usa-button margin-top-6" type="button" id="back-button">Return to checklist</button>
                     </a>
                 </main>
             </div>

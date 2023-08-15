@@ -466,7 +466,7 @@ class IntakeToDisseminationTests(TestCase):
         print(objs)
 
         for k, v in objs.items():
-            assert k in keys
-            assert len(v) > 0
+            self.assertIn(k, keys)
+            self.assertGreater(len(v), 0)
             for obj in v:
-                assert obj is not None
+                self.assertIsNotNone(obj)
