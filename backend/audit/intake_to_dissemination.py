@@ -29,12 +29,12 @@ class IntakeToDissemination(object):
 
     def load_all(self):
         load_methods = {
-            # 'Generals': self.load_general,
+            'Generals': self.load_general,
             'SecondaryAuditors': self.load_secondary_auditor,
             'FederalAwards': self.load_federal_award,
-            # 'Findings': self.load_findings,
-            # 'FindingTexts': self.load_finding_texts,
-            # 'Passthroughs': self.load_passthrough,
+            'Findings': self.load_findings,
+            'FindingTexts': self.load_finding_texts,
+            'Passthroughs': self.load_passthrough,
             'CapTexts': self.load_captext,
         }
         for _, load_method in load_methods.items():
@@ -84,19 +84,19 @@ class IntakeToDissemination(object):
         for entry in findings_uniform_guidance_entries:
             findings = entry["findings"]
             finding = Finding(
-                award_reference=entry["award_reference"],
+                award_reference=entry.get("award_reference"),
                 report_id=self.report_id,
-                finding_seq_number=entry["seq_number"],
-                finding_ref_number=findings["reference_number"],
-                is_material_weakness=entry["material_weakness"] == "Y",
-                is_modified_opinion=entry["modified_opinion"] == "Y",
-                is_other_findings=entry["other_findings"] == "Y",
-                is_other_non_compliance=entry["other_findings"] == "Y",
+                finding_seq_number=entry.get("seq_number"),
+                finding_ref_number=findings.get("reference_number"),
+                is_material_weakness=entry.get("material_weakness") == "Y",
+                is_modified_opinion=entry.get("modified_opinion") == "Y",
+                is_other_findings=entry.get("other_findings") == "Y",
+                is_other_non_compliance=entry.get("other_findings") == "Y",
                 prior_finding_ref_numbers=findings.get("prior_references"),
-                is_questioned_costs=entry["questioned_costs"] == "Y",
-                is_repeat_finding=(findings["repeat_prior_reference"] == "Y"),
-                is_significant_deficiency=(entry["significant_deficiency"] == "Y"),
-                type_requirement=(entry["program"]["compliance_requirement"]),
+                is_questioned_costs=entry.get("questioned_costs") == "Y",
+                is_repeat_finding=(findings.get("repeat_prior_reference") == "Y"),
+                is_significant_deficiency=(entry.get("significant_deficiency") == "Y"),
+                type_requirement=(entry.get("program").get("compliance_requirement")),
             )
             # if self.write_to_db:
             #     finding.save()
@@ -111,16 +111,17 @@ class IntakeToDissemination(object):
         federal_awards_objects = []
         report_id = self.single_audit_checklist.report_id
         try:
-            general = General.objects.get(report_id=report_id)
-        except General.DoesNotExist:
+            general = self.loaded_objects["Generals"][0]
+        except KeyError:
             logger.error(
                 f"General must be loaded before FederalAward. report_id = {report_id}"
             )
             return
+        print(general)
         general.total_amount_expended = federal_awards["FederalAwards"].get(
             "total_amount_expended"
         )
-        general.save()
+        self.loaded_objects["Generals"] = general
 
         for entry in federal_awards["FederalAwards"]["federal_awards"]:
             program = entry.get("program")
@@ -149,7 +150,8 @@ class IntakeToDissemination(object):
                 is_loan=loan["is_guaranteed"] == "Y",
                 loan_balance=loan["loan_balance_at_audit_period_end"],
                 is_direct=is_direct,
-                is_major=program.get("is_major") == "Y",
+                # Was removed in migration 0024
+                # is_major=program.get("is_major") == "Y",
                 mp_audit_report_type=program.get("audit_report_type"),
                 findings_count=program.get("number_of_audit_findings"),
                 is_passthrough_award=is_passthrough,
@@ -247,7 +249,7 @@ class IntakeToDissemination(object):
         federal_awards = self.single_audit_checklist.federal_awards
         pass_objects = []
         for entry in federal_awards["FederalAwards"]["federal_awards"]:
-            for entity in entry["direct_or_indirect_award"]["entities"]:
+            for entity in entry["direct_or_indirect_award"].get("entities", []):
                 passthrough = Passthrough(
                     award_reference=entry["award_reference"],
                     report_id=self.report_id,
@@ -279,35 +281,35 @@ class IntakeToDissemination(object):
             report_id=self.report_id,
             auditee_certify_name=None,  # TODO: Where does this come from?
             auditee_certify_title=None,  # TODO: Where does this come from?
-            auditee_contact_name=general_information["auditee_contact_name"],
-            auditee_email=general_information["auditee_email"],
-            auditee_name=general_information["auditee_name"],
-            auditee_phone=general_information["auditee_phone"],
-            auditee_contact_title=general_information["auditee_contact_title"],
-            auditee_address_line_1=general_information["auditee_address_line_1"],
-            auditee_city=general_information["auditee_city"],
-            auditee_state=general_information["auditee_state"],
-            auditee_ein=general_information["ein"],
-            auditee_uei=general_information["auditee_uei"],
+            auditee_contact_name=general_information.get("auditee_contact_name"),
+            auditee_email=general_information.get("auditee_email"),
+            auditee_name=general_information.get("auditee_name"),
+            auditee_phone=general_information.get("auditee_phone"),
+            auditee_contact_title=general_information.get("auditee_contact_title"),
+            auditee_address_line_1=general_information.get("auditee_address_line_1"),
+            auditee_city=general_information.get("auditee_city"),
+            auditee_state=general_information.get("auditee_state"),
+            auditee_ein=general_information.get("ein"),
+            auditee_uei=general_information.get("auditee_uei"),
             auditee_addl_uei_list=[
                 entry["additional_uei"]
                 for entry in sac_additional_ueis["AdditionalUEIs"][
                     "additional_ueis_entries"
                 ]
             ],
-            auditee_zip=general_information["auditee_zip"],
-            auditor_phone=general_information["auditor_phone"],
-            auditor_state=general_information["auditor_state"],
-            auditor_city=general_information["auditor_city"],
-            auditor_contact_title=general_information["auditor_contact_title"],
-            auditor_address_line_1=general_information["auditor_address_line_1"],
-            auditor_zip=general_information["auditor_zip"],
-            auditor_country=general_information["auditor_country"],
-            auditor_contact_name=general_information["auditor_contact_name"],
-            auditor_email=general_information["auditor_email"],
-            auditor_firm_name=general_information["auditor_firm_name"],
+            auditee_zip=general_information.get("auditee_zip"),
+            auditor_phone=general_information.get("auditor_phone"),
+            auditor_state=general_information.get("auditor_state"),
+            auditor_city=general_information.get("auditor_city"),
+            auditor_contact_title=general_information.get("auditor_contact_title"),
+            auditor_address_line_1=general_information.get("auditor_address_line_1"),
+            auditor_zip=general_information.get("auditor_zip"),
+            auditor_country=general_information.get("auditor_country"),
+            auditor_contact_name=general_information.get("auditor_contact_name"),
+            auditor_email=general_information.get("auditor_email"),
+            auditor_firm_name=general_information.get("auditor_firm_name"),
             auditor_foreign_addr=None,  # TODO:  What does this look like in the incoming json?
-            auditor_ein=general_information["auditor_ein"],
+            auditor_ein=general_information.get("auditor_ein"),
             cognizant_agency=None,  # TODO: https://github.com/GSA-TTS/FAC/issues/1218
             oversight_agency=None,  # TODO: https://github.com/GSA-TTS/FAC/issues/1218
             initial_date_received=self.single_audit_checklist.date_created,
@@ -328,13 +330,13 @@ class IntakeToDissemination(object):
             ],
             auditor_signature_date=None,  # TODO: Field will be added by front end
             auditee_signature_date=None,  # TODO: Field will be added by front end
-            fy_end_date=general_information["auditee_fiscal_period_end"],
-            fy_start_date=general_information["auditee_fiscal_period_start"],
+            fy_end_date=general_information.get("auditee_fiscal_period_end"),
+            fy_start_date=general_information.get("auditee_fiscal_period_start"),
             audit_year=self.audit_year,
-            audit_type=general_information["audit_type"],
-            entity_type=general_information["user_provided_organization_type"],
-            number_months=general_information["audit_period_other_months"],
-            audit_period_covered=general_information["audit_period_covered"],
+            audit_type=general_information.get("audit_type"),
+            entity_type=general_information.get("user_provided_organization_type"),
+            number_months=general_information.get("audit_period_other_months"),
+            audit_period_covered=general_information.get("audit_period_covered"),
             total_amount_expended=None,  # loaded from FederalAward
             type_audit_code="UG",
             is_public=self.single_audit_checklist.is_public,

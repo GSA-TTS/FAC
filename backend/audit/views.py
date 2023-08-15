@@ -1,15 +1,17 @@
 import logging
+import re
 
-from django.views import generic
-from django.views.decorators.csrf import csrf_exempt
-from django.shortcuts import render, redirect
-from django.db.models import F
-from django.core.exceptions import BadRequest, PermissionDenied, ValidationError
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.exceptions import BadRequest, PermissionDenied, ValidationError
+from django.db.models import F
+from django.forms.models import model_to_dict
+from django.http import JsonResponse
+from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.utils.datastructures import MultiValueDictKeyError
 from django.utils.decorators import method_decorator
-from django.http import JsonResponse
+from django.views import generic
+from django.views.decorators.csrf import csrf_exempt
 
 from config.settings import AGENCY_NAMES, GAAP_RESULTS
 
@@ -1104,18 +1106,43 @@ class SummaryView(SingleAuditChecklistAccessRequiredMixin, generic.View):
             sac = SingleAuditChecklist.objects.get(report_id=report_id)
 
             etl = IntakeToDissemination(sac)
-            data = etl.load_all()
-            awards = [vars(x) for x in data['FederalAwards']]
+            etl_data = etl.load_all()
 
-            print(awards)
+            general_info = etl_data['Generals']
+            general_info = model_to_dict(general_info)
+            del general_info["id"]
 
-            for x in awards:
-                del x['id']
-                del x['_state']
+            page_data = etl_data
+            del page_data['Generals']
 
+            # For all sections in page_data:
+            # (a) Change the sections "FederalAwards": [<FederalAwards>, ...] --> "Federal Awards": [{}, ...]
+            # (b) Omit any empty sections, and remove the DB id from all items
+            for k, v in page_data.items():
+                if len(v) > 0:
+                    split_name = " ".join(re.findall('[A-Z][^A-Z]*', k))  # "FederalAwards" -> "Federal Awards"
+                    page_data[split_name] = [model_to_dict(x) for x in v]  # [<FederalAwards>, ...] -> [{}, ...]
+                    for x in page_data[split_name]:
+                        del x['id']
+
+            '''
+            general_info is a simple object with lits of fields.
+            page_data looks like:
+            page_data = {
+                "Federal Awards": [
+                    {An award minus a DB id},
+                    ...
+                ]
+                "Finding Texts": [
+                    {An entry minus a DB id},
+                    ...
+                ],
+                ...
+            }
+            '''    
             context = {
-                # "general": general,
-                "federal_awards": awards,
+                "general_info": general_info,
+                "data": page_data,
                 "auditee_name": sac.auditee_name,
                 "report_id": report_id,
                 "auditee_uei": sac.auditee_uei,

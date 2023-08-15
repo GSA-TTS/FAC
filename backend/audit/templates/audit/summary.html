@@ -5,7 +5,7 @@
 {% block content %}
     <div class="grid-row">
         <div class="grid-container margin-top-6 margin-bottom-6">
-            <div id="audit-summary-content" class="usa-in-page-nav-container">
+            <div id="audit-summary-content" class="usa-in-page-nav-container margin-x-4">
                 <aside class="usa-in-page-nav"
                     data-title-text="On this page"
                     data-title-heading-level="h2"
@@ -15,43 +15,53 @@
                 </aside>
                 <main id="main-content" class="main-content">
                     {% comment %} General Information {% endcomment %}
-                    <div id="general-information" class="position-relative overflow-scroll">
-                        <h2 class="">General Information</h2>
-                        <div class="grid-row">
-                            {% for k, v in general.items %}
+                    <h2 class="">General Information</h2>
+                    <div id="general-information" class="position-relative overflow-scroll height-mobile border radius-lg">
+                        <div class="grid-row padding-2">
+                            {% for k, v in general_info.items %}
                                 <p class="margin-y-1 desktop:grid-col-6">
                                     <strong>{{ k|field_name_to_label }}:</strong> {{ v }}
                                 </p>
                             {% endfor %}
                         </div>
                     </div>
-                    {% comment %} Federal Awards {% endcomment %}
-                    <div id="federal-awards" class="usa-table-container--scrollable">
-                        <h2 id="federal-awards-title" class="grid-row margin-bottom-3">
-                            <span class="">Federal Awards</span>
-                            <svg class="usa-icon text-base font-sans-md"
-                                aria-hidden="true"
-                                role="img">
-                            {% uswds_sprite "more_vert" %}
-                            </svg>
-                            <span class="text-base"><p hidden>(</p>{{ federal_awards|length }}<p hidden>)</p></span>
-                        </h2>
-                        <table id="federal-awards-table"
-                               class="usa-table usa-table--striped overflow-scroll">
-                            <thead>
-                                <tr>
-                                    {% for k in federal_awards.0 %}<th scope="col">{{ k|field_name_to_label }}</th>{% endfor %}
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for award in federal_awards %}
+
+                    {% for section_key, section_list in data.items %}
+                        <div id="{{ section_key }}" class="usa-table-container--scrollable">
+                            <h2 id="{{ section_key }}-title" class="grid-row margin-bottom-3">
+                                <span class="">{{ section_key }}</span>
+                                <svg class="usa-icon text-base font-sans-md"
+                                    aria-hidden="true"
+                                    role="img">
+                                {% uswds_sprite "more_vert" %}
+                                </svg>
+                                <span class="text-base"><p hidden>(</p>{{ section_list|length }}<p hidden>)</p></span>
+                            </h2>
+
+                            <table id="{{ section_key }}-table"
+                                class="usa-table usa-table--striped overflow-scroll">
+                                <thead>
                                     <tr>
-                                        {% for k, v in award.items %}<td>{{ v }}</td>{% endfor %}
+                                        {% for k in section_list.0 %}<th scope="col">{{ k|field_name_to_label }}</th>{% endfor %}
                                     </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
+                                </thead>
+                                <tbody>
+                                    {% for item in section_list %}
+                                        <tr>
+                                            {% for k, v in item.items %}<td>{{ v }}</td>{% endfor %}
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% endfor %}
+                    <a href="{% url 'audit:SubmissionProgress' report_id %}">
+                        <button class="usa-button margin-top-6"
+                                type="button"
+                                id="back-button">
+                            Return to checklist
+                        </button>
+                    </a>
                 </main>
             </div>
         </div>
