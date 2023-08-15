@@ -235,9 +235,17 @@ class TestPreliminaryViews(TestCase):
             url, data=json.dumps(data), content_type="application/json"
         )
         self.assertEqual(response.status_code, 200)
-        self.assertListEqual(response.context["form"].errors["auditee_uei"], ["This field is required."])
-        self.assertListEqual(response.context["form"].errors["auditee_fiscal_period_start"], ["This field is required."])
-        self.assertListEqual(response.context["form"].errors["auditee_fiscal_period_end"], ["This field is required."])
+        self.assertListEqual(
+            response.context["form"].errors["auditee_uei"], ["This field is required."]
+        )
+        self.assertListEqual(
+            response.context["form"].errors["auditee_fiscal_period_start"],
+            ["This field is required."],
+        )
+        self.assertListEqual(
+            response.context["form"].errors["auditee_fiscal_period_end"],
+            ["This field is required."],
+        )
 
     def test_step_three_accessandsubmission_submission_fail(self):
         """
