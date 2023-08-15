@@ -61,6 +61,27 @@
          "title": "CorrectiveActionPlan",
          "type": "object",
          "version": 20230410
+      },
+      "Meta": {
+         "additionalProperties": false,
+         "properties": {
+            "section_name": {
+               "enum": [
+                  "CorrectiveActionPlan"
+               ],
+               "type": "string"
+            },
+            "version": {
+               "const": "1.0.0",
+               "type": "string"
+            }
+         },
+         "required": [
+            "section_name"
+         ],
+         "title": "Meta",
+         "type": "object",
+         "version": 20230807
       }
    },
    "title": "UNNAMED",

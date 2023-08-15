@@ -4,6 +4,7 @@ Fixtures for use with Excel spreadsheet handling.
 from collections import namedtuple
 from django.conf import settings
 
+UNKNOWN_WORKBOOK = "unknown_workbook"
 SHEETS_DIR = settings.XLSX_TEMPLATE_SHEET_DIR
 TESTFILES_DIR = settings.DATA_FIXTURES / "audit" / "excel_schema_test_files"
 
@@ -80,4 +81,27 @@ FORM_SECTIONS = FormSections(
     ADDITIONAL_UEIS="AdditionalUeis",
     SECONDARY_AUDITORS="SecondaryAuditors",
     NOTES_TO_SEFA="NotesToSefa",
+)
+
+# FIXME MSHD: We should consolidate SectionNames with the above FormSections
+SectionNames = namedtuple(
+    "SectionNames",
+    (
+        "ADDITIONAL_UEIS",
+        "AUDIT_FINDINGS_TEXT",
+        "CORRECTIVE_ACTION_PLAN",
+        "FEDERAL_AWARDS",
+        "FEDERAL_AWARDS_AUDIT_FINDINGS",
+        "NOTES_TO_SEFA",
+        "SECONDARY_AUDITORS",
+    ),
+)
+SECTION_NAMES = SectionNames(
+    ADDITIONAL_UEIS="Additional UEIs",
+    AUDIT_FINDINGS_TEXT="Audit Findings Text",
+    CORRECTIVE_ACTION_PLAN="Corrective Action Plan",
+    FEDERAL_AWARDS="Federal Awards",
+    FEDERAL_AWARDS_AUDIT_FINDINGS="Federal Awards Audit Findings",
+    NOTES_TO_SEFA="Notes to SEFA",
+    SECONDARY_AUDITORS="Secondary Auditors",
 )

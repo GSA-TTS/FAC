@@ -6,7 +6,7 @@
             <div class="usa-navbar bg-primary-darker text-white width-full flex">
                 <p class="margin-left-2">
                     <a href="/" class="text-gray-10">My audit submissions</a> »
-                    <a href="/audit/submission-progress/{{ report_id }}"
+                    <a href="{% url 'audit:SubmissionProgress' report_id %}"
                        class="text-gray-10">{{ auditee_name | default_if_none:'' }}</a> »
                     <span class="text-bold">Audit information</span>
                 </p>
@@ -36,7 +36,7 @@
                 <h1>Financial statements</h1>
                 <fieldset class="usa-fieldset">
                     <legend>
-                        What were the results of the auditor’s determination of whether the financial statements of the auditee were prepared in accordance with generally accepted accounting principles (GAAP)? <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
+                        a. What were the results of the auditor’s determination of whether the financial statements of the auditee were prepared in accordance with generally accepted accounting principles (GAAP)? <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
                     </legend>
                     <p class="text-base">Select any of the following that apply.</p>
                     {% for pair in gaap_results %}
@@ -53,9 +53,74 @@
                     {% endfor %}
                     <span class="usa-error-message margin-top-2">{{ form.errors.gaap_results|striptags }}</span>
                 </fieldset>
+                <div id="sp_framework_section">
+                    <fieldset class="usa-fieldset margin-top-2">
+                        <legend>
+                            If the financial statements of the auditee were prepared in accordance with GAAP, proceed to question b.
+                        </legend>
+                        <p class="text-base">i. What was the special purpose framework? Select only one.</p>
+                        {% for pair in sp_framework_basis %}
+                            <div class="usa-checkbox">
+                                <input id="sp_framework_basis--{{ pair.tag }}"
+                                    name="sp_framework_basis"
+                                    class="usa-radio__input"
+                                    required
+                                    type="radio"
+                                    value="{{ pair.tag }}"
+                                    {% if pair.tag in form.cleaned_data.sp_framework_basis %}checked{% endif %} />
+                                <label class="usa-radio__label" for="sp_framework_basis--{{ pair.tag }}">{{ pair.readable }}</label>
+                            </div>
+                        {% endfor %}
+                        <span class="usa-error-message margin-top-2">{{ form.errors.gaap_results|striptags }}</span>
+                    </fieldset>
+                    <fieldset class="usa-fieldset margin-top-2">
+                        <legend>
+                            ii. Was the special purpose framework used as a basis of accounting required by state law?
+                        </legend>
+                        <div class="usa-radio">
+                            <input id="is_sp_framework_required--true"
+                                name="is_sp_framework_required"
+                                class="usa-radio__input"
+                                required
+                                type="radio"
+                                value="True"
+                                {% if form.cleaned_data.is_sp_framework_required is True %}checked{% endif %} />
+                            <label class="usa-radio__label" for="is_sp_framework_required--true">Yes</label>
+                        </div>
+                        <div class="usa-radio">
+                            <input id="is_sp_framework_required--false"
+                                name="is_sp_framework_required"
+                                class="usa-radio__input"
+                                type="radio"
+                                value="False"
+                                {% if form.cleaned_data.is_sp_framework_required is False %}checked{% endif %} />
+                            <label class="usa-radio__label" for="is_sp_framework_required--false">No</label>
+                        </div>
+                        <span class="usa-error-message margin-top-2">{{ form.errors.is_going_concern_included|striptags }}</span>
+                    </fieldset>
+                    <fieldset class="usa-fieldset">
+                        <legend>
+                            iii. What was the auditor’s opinion on the special purpose framework? <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
+                        </legend>
+                        <p class="text-base">Select any of the following that apply.</p>
+                        {% for pair in sp_framework_opinions %}
+                            <div class="usa-checkbox">
+                                <input id="sp_framework_opinions--{{ pair.tag }}"
+                                    name="sp_framework_opinions"
+                                    class="usa-checkbox__input"
+                                    required
+                                    type="checkbox"
+                                    value="{{ pair.tag }}"
+                                    {% if pair.tag in form.cleaned_data.sp_framework_opinions %}checked{% endif %} />
+                                <label class="usa-checkbox__label" for="sp_framework_opinions--{{ pair.tag }}">{{ pair.readable }}</label>
+                            </div>
+                        {% endfor %}
+                        <span class="usa-error-message margin-top-2">{{ form.errors.gaap_results|striptags }}</span>
+                    </fieldset>
+                </div>
                 <fieldset class="usa-fieldset margin-top-2">
                     <legend>
-                        Is a "going concern" emphasis-of-matter paragraph included in the audit report? <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
+                        b. Is a "going concern" emphasis-of-matter paragraph included in the audit report? <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
                     </legend>
                     <div class="usa-radio">
                         <input id="is_going_concern_included--true"
@@ -80,7 +145,7 @@
                 </fieldset>
                 <fieldset class="usa-fieldset margin-top-2">
                     <legend>
-                        Is a significant deficiency in internal control disclosed? <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
+                        c. Is a significant deficiency in internal control disclosed? <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
                     </legend>
                     <div class="usa-radio">
                         <input id="is_internal_control_deficiency_disclosed--true"
@@ -107,7 +172,7 @@
                 </fieldset>
                 <fieldset class="usa-fieldset margin-top-2">
                     <legend>
-                        Is a material weakness in internal control disclosed? <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
+                        d. Is a material weakness in internal control disclosed? <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
                     </legend>
                     <div class="usa-radio">
                         <input id="is_internal_control_material_weakness_disclosed--true"
@@ -134,7 +199,7 @@
                 </fieldset>
                 <fieldset class="usa-fieldset margin-top-2">
                     <legend>
-                        Is a material noncompliance disclosed? <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
+                        e. Is a material noncompliance disclosed? <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
                     </legend>
                     <div class="usa-radio">
                         <input id="is_material_noncompliance_disclosed--true"

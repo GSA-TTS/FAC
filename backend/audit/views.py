@@ -11,11 +11,16 @@ from django.utils.datastructures import MultiValueDictKeyError
 from django.utils.decorators import method_decorator
 from django.http import JsonResponse
 
-from audit.forms import UploadReportForm, AuditInfoForm
 
-from config.settings import AGENCY_NAMES, GAAP_RESULTS
-from .fixtures.excel import FORM_SECTIONS
+from config.settings import (
+    AGENCY_NAMES,
+    GAAP_RESULTS,
+    SP_FRAMEWORK_BASIS,
+    SP_FRAMEWORK_OPINIONS,
+)
+from .fixtures.excel import FORM_SECTIONS, UNKNOWN_WORKBOOK
 
+from audit.cross_validation import sac_validation_shape, submission_progress_check
 from audit.excel import (
     extract_additional_ueis,
     extract_federal_awards,
@@ -25,14 +30,13 @@ from audit.excel import (
     extract_secondary_auditors,
     extract_notes_to_sefa,
 )
-from audit.validators import (
-    validate_additional_ueis_json,
-    validate_federal_award_json,
-    validate_corrective_action_plan_json,
-    validate_findings_text_json,
-    validate_findings_uniform_guidance_json,
-    validate_secondary_auditors_json,
-    validate_notes_to_sefa_json,
+from audit.forms import (
+    UploadReportForm,
+    AuditInfoForm,
+    AuditorCertificationStep1Form,
+    AuditorCertificationStep2Form,
+    AuditeeCertificationStep1Form,
+    AuditeeCertificationStep2Form,
 )
 from audit.mixins import (
     CertifyingAuditeeRequiredMixin,
@@ -46,8 +50,24 @@ from audit.models import (
     SingleAuditChecklist,
     SingleAuditReportFile,
 )
-from audit.validators import validate_audit_information_json
+from audit.utils import ExcelExtractionError
+from audit.validators import (
+    validate_additional_ueis_json,
+    validate_audit_information_json,
+    validate_auditee_certification_json,
+    validate_auditor_certification_json,
+    validate_corrective_action_plan_json,
+    validate_federal_award_json,
+    validate_findings_text_json,
+    validate_findings_uniform_guidance_json,
+    validate_notes_to_sefa_json,
+    validate_secondary_auditors_json,
+)
 
+
+logging.basicConfig(
+    format="%(asctime)s %(levelname)-8s %(module)s:%(lineno)d %(message)s"
+)
 logger = logging.getLogger(__name__)
 
 
@@ -188,6 +208,7 @@ class ExcelFileHandlerView(SingleAuditChecklistAccessRequiredMixin, generic.View
             self._save_audit_data(sac, form_section, audit_data)
 
             return redirect("/")
+
         except SingleAuditChecklist.DoesNotExist as err:
             logger.warning("no SingleAuditChecklist found with report ID %s", report_id)
             raise PermissionDenied() from err
@@ -203,6 +224,12 @@ class ExcelFileHandlerView(SingleAuditChecklistAccessRequiredMixin, generic.View
         except KeyError as err:
             logger.warning("Field error. Field: %s", err)
             return JsonResponse({"errors": str(err), "type": "error_field"}, status=400)
+        except ExcelExtractionError as err:
+            if err.error_key == UNKNOWN_WORKBOOK:
+                return JsonResponse(
+                    {"errors": str(err), "type": UNKNOWN_WORKBOOK}, status=400
+                )
+            raise JsonResponse({"errors": list(err), "type": "error_row"}, status=400)
         except LateChangeError:
             logger.warning("Attempted late change.")
             return JsonResponse(
@@ -255,7 +282,9 @@ class CrossValidationView(SingleAuditChecklistAccessRequiredMixin, generic.View)
                 "report_id": report_id,
                 "submission_status": sac.submission_status,
             }
-            return render(request, "audit/cross-validation.html", context)
+            return render(
+                request, "audit/cross-validation/cross-validation.html", context
+            )
         except SingleAuditChecklist.DoesNotExist:
             raise PermissionDenied("You do not have access to this audit.")
 
@@ -269,7 +298,9 @@ class CrossValidationView(SingleAuditChecklistAccessRequiredMixin, generic.View)
 
             context = {"report_id": report_id, "errors": errors}
 
-            return render(request, "audit/cross-validation-results.html", context)
+            return render(
+                request, "audit/cross-validation/cross-validation-results.html", context
+            )
 
         except SingleAuditChecklist.DoesNotExist:
             raise PermissionDenied("You do not have access to this audit.")
@@ -286,7 +317,9 @@ class ReadyForCertificationView(SingleAuditChecklistAccessRequiredMixin, generic
                 "report_id": report_id,
                 "submission_status": sac.submission_status,
             }
-            return render(request, "audit/ready-for-certification.html", context)
+            return render(
+                request, "audit/cross-validation/ready-for-certification.html", context
+            )
         except SingleAuditChecklist.DoesNotExist:
             raise PermissionDenied("You do not have access to this audit.")
 
@@ -303,25 +336,35 @@ class ReadyForCertificationView(SingleAuditChecklistAccessRequiredMixin, generic
                 return redirect(reverse("audit:SubmissionProgress", args=[report_id]))
 
             context = {"report_id": report_id, "errors": errors}
-            return render(request, "audit/cross-validation-results.html", context)
+            return render(
+                request, "audit/cross-validation/cross-validation-results.html", context
+            )
 
         except SingleAuditChecklist.DoesNotExist:
             raise PermissionDenied("You do not have access to this audit.")
 
 
-class AuditorCertificationView(CertifyingAuditorRequiredMixin, generic.View):
+class AuditorCertificationStep1View(CertifyingAuditorRequiredMixin, generic.View):
     def get(self, request, *args, **kwargs):
         report_id = kwargs["report_id"]
 
         try:
             sac = SingleAuditChecklist.objects.get(report_id=report_id)
-
+            initial = {
+                "AuditorCertificationStep1Session": request.session.get(
+                    "AuditorCertificationStep1Session", None
+                )
+            }
+            form = AuditorCertificationStep1Form(request.POST or None, initial=initial)
             context = {
+                "auditee_uei": sac.auditee_uei,
+                "auditee_name": sac.auditee_name,
                 "report_id": report_id,
                 "submission_status": sac.submission_status,
+                "form": form,
             }
+            return render(request, "audit/auditor-certification-step-1.html", context)
 
-            return render(request, "audit/auditor-certification.html", context)
         except SingleAuditChecklist.DoesNotExist:
             raise PermissionDenied("You do not have access to this audit.")
 
@@ -330,29 +373,63 @@ class AuditorCertificationView(CertifyingAuditorRequiredMixin, generic.View):
 
         try:
             sac = SingleAuditChecklist.objects.get(report_id=report_id)
+            initial = {
+                "AuditorCertificationStep1Session": request.session.get(
+                    "AuditorCertificationStep1Session", None
+                )
+            }
+            form = AuditorCertificationStep1Form(request.POST or None, initial=initial)
+            context = {
+                "auditee_uei": sac.auditee_uei,
+                "auditee_name": sac.auditee_name,
+                "report_id": report_id,
+                "submission_status": sac.submission_status,
+            }
 
-            sac.transition_to_auditor_certified()
-            sac.save()
+            if form.is_valid():
+                # Save to session. Retrieved and saved after step 2.
+                request.session["AuditorCertificationStep1Session"] = form.cleaned_data
+                return redirect(
+                    reverse("audit:AuditorCertificationConfirm", args=[report_id])
+                )
 
-            return redirect(reverse("audit:SubmissionProgress", args=[report_id]))
+            context["form"] = form
+            return render(request, "audit/auditor-certification-step-1.html", context)
 
         except SingleAuditChecklist.DoesNotExist:
             raise PermissionDenied("You do not have access to this audit.")
 
 
-class AuditeeCertificationView(CertifyingAuditeeRequiredMixin, generic.View):
+class AuditorCertificationStep2View(CertifyingAuditorRequiredMixin, generic.View):
     def get(self, request, *args, **kwargs):
         report_id = kwargs["report_id"]
 
         try:
             sac = SingleAuditChecklist.objects.get(report_id=report_id)
+            initial = {
+                "AuditorCertificationStep2Session": request.session.get(
+                    "AuditorCertificationStep2Session", None
+                )
+            }
+            form = AuditorCertificationStep2Form(request.POST or None, initial=initial)
+
+            # Suggests a load/reload on step 2, which means we don't have step 1 session information.
+            # Send them back.
+            form1_cleaned = request.session.get(
+                "AuditorCertificationStep1Session", None
+            )
+            if form1_cleaned is None:
+                return redirect(reverse("audit:AuditorCertification", args=[report_id]))
 
             context = {
+                "auditee_uei": sac.auditee_uei,
+                "auditee_name": sac.auditee_name,
                 "report_id": report_id,
                 "submission_status": sac.submission_status,
+                "form": form,
             }
+            return render(request, "audit/auditor-certification-step-2.html", context)
 
-            return render(request, "audit/auditee-certification.html", context)
         except SingleAuditChecklist.DoesNotExist:
             raise PermissionDenied("You do not have access to this audit.")
 
@@ -361,11 +438,175 @@ class AuditeeCertificationView(CertifyingAuditeeRequiredMixin, generic.View):
 
         try:
             sac = SingleAuditChecklist.objects.get(report_id=report_id)
+            form1_cleaned = request.session.get(
+                "AuditorCertificationStep1Session", None
+            )
+            form2 = AuditorCertificationStep2Form(request.POST or None)
 
-            sac.transition_to_auditee_certified()
-            sac.save()
+            context = {
+                "auditee_uei": sac.auditee_uei,
+                "auditee_name": sac.auditee_name,
+                "report_id": report_id,
+                "submission_status": sac.submission_status,
+            }
 
-            return redirect(reverse("audit:SubmissionProgress", args=[report_id]))
+            if form2.is_valid():
+                form_cleaned = {
+                    "auditor_certification": form1_cleaned,
+                    "auditor_signature": form2.cleaned_data,
+                }
+                form_cleaned["auditor_signature"][
+                    "auditor_certification_date_signed"
+                ] = form_cleaned["auditor_signature"][
+                    "auditor_certification_date_signed"
+                ].strftime(
+                    "%d/%m/%Y"
+                )
+                auditor_certification = sac.auditor_certification or {}
+                auditor_certification.update(form_cleaned)
+                validated = validate_auditor_certification_json(auditor_certification)
+                sac.auditor_certification = validated
+                sac.transition_to_auditor_certified()
+                sac.save()
+                logger.info("Auditor certification saved.", auditor_certification)
+                return redirect(reverse("audit:SubmissionProgress", args=[report_id]))
+
+            context["form"] = form2
+            return render(request, "audit/auditor-certification-step-2.html", context)
+
+        except SingleAuditChecklist.DoesNotExist:
+            raise PermissionDenied("You do not have access to this audit.")
+
+
+class AuditeeCertificationStep1View(CertifyingAuditeeRequiredMixin, generic.View):
+    def get(self, request, *args, **kwargs):
+        report_id = kwargs["report_id"]
+
+        try:
+            sac = SingleAuditChecklist.objects.get(report_id=report_id)
+            initial = {
+                "AuditeeCertificationStep1Session": request.session.get(
+                    "AuditeeCertificationStep1Session", None
+                )
+            }
+            form = AuditeeCertificationStep1Form(request.POST or None, initial=initial)
+            context = {
+                "auditee_uei": sac.auditee_uei,
+                "auditee_name": sac.auditee_name,
+                "report_id": report_id,
+                "submission_status": sac.submission_status,
+                "form": form,
+            }
+            return render(request, "audit/auditee-certification-step-1.html", context)
+
+        except SingleAuditChecklist.DoesNotExist:
+            raise PermissionDenied("You do not have access to this audit.")
+
+    def post(self, request, *args, **kwargs):
+        report_id = kwargs["report_id"]
+
+        try:
+            sac = SingleAuditChecklist.objects.get(report_id=report_id)
+            initial = {
+                "AuditeeCertificationStep1Session": request.session.get(
+                    "AuditeeCertificationStep1Session", None
+                )
+            }
+            form = AuditeeCertificationStep1Form(request.POST or None, initial=initial)
+            context = {
+                "auditee_uei": sac.auditee_uei,
+                "auditee_name": sac.auditee_name,
+                "report_id": report_id,
+                "submission_status": sac.submission_status,
+            }
+
+            if form.is_valid():
+                # Save to session. Retrieved and saved after step 2.
+                request.session["AuditeeCertificationStep1Session"] = form.cleaned_data
+                return redirect(
+                    reverse("audit:AuditeeCertificationConfirm", args=[report_id])
+                )
+
+            context["form"] = form
+            return render(request, "audit/auditee-certification-step-1.html", context)
+
+        except SingleAuditChecklist.DoesNotExist:
+            raise PermissionDenied("You do not have access to this audit.")
+
+
+class AuditeeCertificationStep2View(CertifyingAuditeeRequiredMixin, generic.View):
+    def get(self, request, *args, **kwargs):
+        report_id = kwargs["report_id"]
+
+        try:
+            sac = SingleAuditChecklist.objects.get(report_id=report_id)
+            initial = {
+                "AuditeeCertificationStep2Session": request.session.get(
+                    "AuditeeCertificationStep2Session", None
+                )
+            }
+            form = AuditeeCertificationStep2Form(request.POST or None, initial=initial)
+
+            # Suggests a load/reload on step 2, which means we don't have step 1 session information.
+            # Send them back.
+            form1_cleaned = request.session.get(
+                "AuditeeCertificationStep1Session", None
+            )
+            if form1_cleaned is None:
+                return redirect(reverse("audit:AuditeeCertification", args=[report_id]))
+
+            context = {
+                "auditee_uei": sac.auditee_uei,
+                "auditee_name": sac.auditee_name,
+                "report_id": report_id,
+                "submission_status": sac.submission_status,
+                "form": form,
+            }
+            return render(request, "audit/auditee-certification-step-2.html", context)
+
+        except SingleAuditChecklist.DoesNotExist:
+            raise PermissionDenied("You do not have access to this audit.")
+
+    def post(self, request, *args, **kwargs):
+        report_id = kwargs["report_id"]
+
+        try:
+            sac = SingleAuditChecklist.objects.get(report_id=report_id)
+            form1_cleaned = request.session.get(
+                "AuditeeCertificationStep1Session", None
+            )
+            form2 = AuditeeCertificationStep2Form(request.POST or None)
+
+            context = {
+                "auditee_uei": sac.auditee_uei,
+                "auditee_name": sac.auditee_name,
+                "report_id": report_id,
+                "submission_status": sac.submission_status,
+            }
+
+            if form2.is_valid():
+                form_cleaned = {
+                    "auditee_certification": form1_cleaned,
+                    "auditee_signature": form2.cleaned_data,
+                }
+                form_cleaned["auditee_signature"][
+                    "auditee_certification_date_signed"
+                ] = form_cleaned["auditee_signature"][
+                    "auditee_certification_date_signed"
+                ].strftime(
+                    "%d/%m/%Y"
+                )
+                auditee_certification = sac.auditee_certification or {}
+                auditee_certification.update(form_cleaned)
+                validated = validate_auditee_certification_json(auditee_certification)
+                sac.auditee_certification = validated
+                sac.transition_to_auditee_certified()
+                sac.save()
+                logger.info("Auditee certification saved.", auditee_certification)
+                return redirect(reverse("audit:SubmissionProgress", args=[report_id]))
+
+            context["form"] = form2
+            return render(request, "audit/auditee-certification-step-2.html", context)
 
         except SingleAuditChecklist.DoesNotExist:
             raise PermissionDenied("You do not have access to this audit.")
@@ -434,19 +675,41 @@ class SubmissionView(CertifyingAuditeeRequiredMixin, generic.View):
 
 
 class SubmissionProgressView(SingleAuditChecklistAccessRequiredMixin, generic.View):
+    """
+    Display information about and the current status of the sections of the submission,
+    including links to the pages for the sections.
+
+    The following sections have three states, rather than two:
+
+    +   Additionai UEIs
+    +   Additionai EINs
+    +   Secondary Auditors
+
+    The states are:
+
+    +   hidden
+    +   incomplete
+    +   complete
+
+    In each case, they are hidden if the corresponding question in the General
+    Information form has been answered with a negative response.
+    """
+
     def get(self, request, *args, **kwargs):
         report_id = kwargs["report_id"]
 
         try:
             sac = SingleAuditChecklist.objects.get(report_id=report_id)
             try:
-                audit_report = SingleAuditReportFile.objects.filter(
-                    sac_id=sac.id
-                ).latest("date_created")
+                sar = SingleAuditReportFile.objects.filter(sac_id=sac.id).latest(
+                    "date_created"
+                )
             except SingleAuditReportFile.DoesNotExist:
-                audit_report = None
+                sar = None
 
-            # TODO: Ensure the correct SAC elements are used to determine what's complete.
+            shaped_sac = sac_validation_shape(sac)
+            subcheck = submission_progress_check(shaped_sac, sar, crossval=False)
+
             context = {
                 "single_audit_checklist": {
                     "created": True,
@@ -456,73 +719,38 @@ class SubmissionProgressView(SingleAuditChecklistAccessRequiredMixin, generic.Vi
                     "completed_date": None,
                     "completed_by": None,
                 },
-                "federal_awards_workbook": {
-                    "completed": True if (sac.federal_awards) else False,
+                "pre_submission_validation": {
+                    "completed": sac.submission_status == "ready_for_certification",
                     "completed_date": None,
                     "completed_by": None,
-                },
-                "audit_information_form": {
-                    "completed": True if (sac.audit_information) else False,
-                    "completed_date": None,
-                    "completed_by": None,
-                },
-                "findings_text_workbook": {
-                    "completed": True if (sac.findings_text) else False,
-                    "completed_date": None,
-                    "completed_by": None,
-                },
-                "audit_findings_workbook": {
-                    "completed": True if (sac.findings_uniform_guidance) else False,
-                    "completed_date": None,
-                    "completed_by": None,
-                },
-                "CAP_workbook": {
-                    "completed": True if (sac.corrective_action_plan) else False,
-                    "completed_date": None,
-                    "completed_by": None,
-                },
-                "additional_UEIs_workbook": {
-                    "completed": True if (sac.additional_ueis) else False,
-                    "completed_date": None,
-                    "completed_by": None,
-                },
-                "secondary_auditors_workbook": {
-                    "completed": True if (sac.secondary_auditors) else False,
-                    "completed_date": None,
-                    "completed_by": None,
-                },
-                "audit_report": {
-                    "completed": True if audit_report else False,
-                    "completed_date": None,
-                    "completed_by": None,
+                    # We want the user to always be able to run this check:
+                    "enabled": True,
                 },
                 "certification": {
-                    "auditee_certified": sac.is_auditee_certified,
-                    "auditor_certified": sac.is_auditor_certified,
+                    "auditor_certified": bool(sac.auditor_certification),
+                    "auditor_enabled": sac.submission_status
+                    == "ready_for_certification",
+                    "auditee_certified": bool(sac.auditee_certification),
+                    "auditee_enabled": sac.submission_status == "auditor_certified",
                 },
                 "submission": {
-                    "completed": sac.is_submitted,
+                    "completed": sac.submission_status == "submitted",
                     "completed_date": None,
                     "completed_by": None,
+                    "enabled": sac.submission_status == "auditee_certified",
                 },
                 "report_id": report_id,
                 "auditee_name": sac.auditee_name,
                 "auditee_uei": sac.auditee_uei,
                 "user_provided_organization_type": sac.user_provided_organization_type,
             }
-            # Add all SF-SAC uploads to determine if the process is complete or not
-            context["SF_SAC_completed"] = (
-                context["federal_awards_workbook"]["completed"]
-                and context["audit_information_form"]["completed"]
-                and context["findings_text_workbook"]["completed"]
-                and context["CAP_workbook"]["completed"]
-                and context["additional_UEIs_workbook"]["completed"]
-                and context["secondary_auditors_workbook"]["completed"]
-            )
+            context = context | subcheck
 
-            return render(request, "audit/submission-progress.html", context)
-        except SingleAuditChecklist.DoesNotExist:
-            raise PermissionDenied("You do not have access to this audit.")
+            return render(
+                request, "audit/submission_checklist/submission-checklist.html", context
+            )
+        except SingleAuditChecklist.DoesNotExist as err:
+            raise PermissionDenied("You do not have access to this audit.") from err
 
 
 class AuditInfoFormView(SingleAuditChecklistAccessRequiredMixin, generic.View):
@@ -535,6 +763,15 @@ class AuditInfoFormView(SingleAuditChecklistAccessRequiredMixin, generic.View):
                 current_info = {
                     "cleaned_data": {
                         "gaap_results": sac.audit_information.get("gaap_results"),
+                        "sp_framework_basis": sac.audit_information.get(
+                            "sp_framework_basis"
+                        ),
+                        "is_sp_framework_required": sac.audit_information.get(
+                            "is_sp_framework_required"
+                        ),
+                        "sp_framework_opinions": sac.audit_information.get(
+                            "sp_framework_opinions"
+                        ),
                         "is_going_concern_included": sac.audit_information.get(
                             "is_going_concern_included"
                         ),
@@ -560,15 +797,7 @@ class AuditInfoFormView(SingleAuditChecklistAccessRequiredMixin, generic.View):
                     }
                 }
 
-            context = {
-                "auditee_name": sac.auditee_name,
-                "report_id": report_id,
-                "auditee_uei": sac.auditee_uei,
-                "user_provided_organization_type": sac.user_provided_organization_type,
-                "agency_names": AGENCY_NAMES,
-                "gaap_results": GAAP_RESULTS,
-                "form": current_info,
-            }
+            context = self._get_context(sac, current_info)
 
             return render(request, "audit/audit-info-form.html", context)
         except SingleAuditChecklist.DoesNotExist:
@@ -592,22 +821,14 @@ class AuditInfoFormView(SingleAuditChecklistAccessRequiredMixin, generic.View):
                 validated = validate_audit_information_json(audit_information)
                 sac.audit_information = validated
                 sac.save()
-
-                logger.info("Audit info form saved.", form.cleaned_data)
-
                 return redirect(reverse("audit:SubmissionProgress", args=[report_id]))
             else:
-                logger.warn(form.errors)
+                for field, errors in form.errors.items():
+                    for error in errors:
+                        logger.warn(f"ERROR in field {field} : {error}")
+
                 form.clean_booleans()
-                context = {
-                    "auditee_name": sac.auditee_name,
-                    "report_id": report_id,
-                    "auditee_uei": sac.auditee_uei,
-                    "user_provided_organization_type": sac.user_provided_organization_type,
-                    "agency_names": AGENCY_NAMES,
-                    "gaap_results": GAAP_RESULTS,
-                    "form": form,
-                }
+                context = self._get_context(sac, form)
                 return render(request, "audit/audit-info-form.html", context)
 
         except SingleAuditChecklist.DoesNotExist:
@@ -615,6 +836,26 @@ class AuditInfoFormView(SingleAuditChecklistAccessRequiredMixin, generic.View):
         except Exception as e:
             logger.info("Enexpected error in AuditInfoFormView post.\n", e)
             raise BadRequest()
+
+    def _get_context(self, sac, form):
+        context = {
+            "auditee_name": sac.auditee_name,
+            "report_id": sac.report_id,
+            "auditee_uei": sac.auditee_uei,
+            "user_provided_organization_type": sac.user_provided_organization_type,
+            "agency_names": AGENCY_NAMES,
+            "gaap_results": GAAP_RESULTS,
+            "sp_framework_basis": SP_FRAMEWORK_BASIS,
+            "sp_framework_opinions": SP_FRAMEWORK_OPINIONS,
+        }
+        for field, value in context.items():
+            logger.warn(f"{field}:{value}")
+        context.update(
+            {
+                "form": form,
+            }
+        )
+        return context
 
 
 class PageInput:
@@ -705,6 +946,7 @@ class UploadReportView(SingleAuditChecklistAccessRequiredMixin, generic.View):
 
             if form.is_valid():
                 file = request.FILES["upload_report"]
+                print("hi", form.cleaned_data)
 
                 component_page_numbers = {
                     "financial_statements": form.cleaned_data["financial_statements"],

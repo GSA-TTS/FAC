@@ -1,3 +1,4 @@
+import { testCrossValidation } from '../support/cross-validation.js';
 import { testLoginGovLogin } from '../support/login-gov.js';
 import { testValidAccess } from '../support/check-access.js';
 import { testValidEligibility } from '../support/check-eligibility.js';
@@ -42,30 +43,47 @@ describe('Full audit submission', () => {
     testValidGeneralInfo();
 
     // Upload all the workbooks
-    cy.get(".usa-link").contains("Federal Awards workbook").click();
+    cy.get(".usa-link").contains("Federal Awards").click();
     testWorkbookFederalAwards(false);  // don't intercept
 
-    cy.get(".usa-link").contains("Audit Findings workbook").click();
+    cy.get(".usa-link").contains("Federal Awards Audit Findings").click();
     testWorkbookFindingsUniformGuidance(false);  // don't intercept
 
-    cy.get(".usa-link").contains("Audit Findings Text workbook").click();
+    cy.get(".usa-link").contains("Federal Awards Audit Findings Text").click();
     testWorkbookFindingsText(false);  // don't intercept
 
-    cy.get(".usa-link").contains("Corrective Action Plan (CAP) workbook").click();
+    cy.get(".usa-link").contains("Corrective Action Plan").click();
     testWorkbookCorrectiveActionPlan(false);  // don't intercept
 
-    cy.get(".usa-link").contains("Additional UEIs workbook").click();
+    cy.get(".usa-link").contains("Additional UEIs").click();
     testWorkbookAdditionalUEIs(false);  // don't intercept
-    
 
-    // Can it be? We are ready for certification?
-    cy.get(".usa-button").contains("Ready for SF-SAC Certification").click();
+    cy.get(".usa-link").contains("Pre-submission validation").click();
+    testCrossValidation();
+
+    // Uncomment this block when ready to implement the certification steps.
+    /*
+
+    // These aren't enabled because the previous steps didn't actually upload anything. Our upload responses are mocked.
+    // First step, pre-validation.
+    cy.get(".usa-link").contains("Pre-submission validation").click();
     cy.url().should('match', /\/audit\/ready-for-certification\/[0-9A-Z]{17}/);
-    // Submit for certification button
-    cy.get("#continue").click()
-    // Can't tell if this is the right place for this to end up?
-    cy.url().should('match', /\/audit\/submission-progress\/[0-9A-Z]{17}/);
+    // Mock a prositive response on validation, then it comes back to the checklist
 
+    // Second, auditor certification
+    cy.get(".usa-link").contains("Auditor Certification").click();
+    // Two pages:
+    // 1. Click all the checkboxes to agree, submit and got to page 2
+    // 2. Sign and date, submit and go back to checklist
 
+    // Third, auditee certification
+    cy.get(".usa-link").contains("Auditee Certification").click();
+    // The same as auditor certification, with different checkboxes.
+
+    // Finally, submit for processing.
+    cy.get(".usa-link").contains("Submit to the FAC for processing").click();
+    // This will probably take you back to the homepage, where the audit is now oof status "submitted".
+
+    */
   });
 });

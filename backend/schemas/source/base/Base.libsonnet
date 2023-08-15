@@ -283,6 +283,15 @@ local Enum = {
     description: 'GAAP Results (Audit Information)',
     enum: std.map(function(pair) pair.tag, GAAP.gaap_results),
   },
+  SP_Framework_Basis: Types.string {
+    description: 'SP Framework Basis (Audit Information)',
+    enum: std.map(function(pair) pair.tag, GAAP.sp_framework_basis),
+  },
+  SP_Framework_Opinions: Types.string {
+    description: 'SP Framework Opinions (Audit Information)',
+    enum: std.map(function(pair) pair.tag, GAAP.sp_framework_opinions),
+  },
+
 };
 
 local simple_phone_regex = '[1-9]{1}[0-9]{9}+';
@@ -293,6 +302,7 @@ local email_regex = "^[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-zA-Z0-9!#$%&'*+/=?
 
 local REGEX_ZIPCODE = '^[0-9]{5}(?:-[0-9]{4})?$';
 local REGEX_DBKEY = '[1-9][0-9]+';
+local REGEX_MONTHS_OTHER = '^0[0-9]|1[0-8]$';
 local type_zipcode = Types.string {
   pattern: REGEX_ZIPCODE,
 };
@@ -354,6 +364,16 @@ local Compound = {
     description: 'Reference Number',
     pattern: '^20[2-9][0-9]-[0-9]{3}$',
   },
+  ComplianceRequirement: {
+    title: 'ComplianceRequirement',
+    description: 'Compliance requirement type',
+    pattern: '^A?B?C?E?F?G?H?I?J?L?M?N?P?$',
+  },
+  Date: Types.string {
+    title: 'Date',
+    description: 'MM/DD/YYYY',
+    pattern: '^[0-9]{2}\/[0-9]{2}\/[0-9]{4}$',
+  },
   NonEmptyString: Types.string {
     minLength: 1,
   },
@@ -365,6 +385,9 @@ local Compound = {
     pattern: phone_regex,
   },
   Zip: type_zipcode,
+  MonthsOther: Types.string {
+    pattern: REGEX_MONTHS_OTHER,
+  },
 };
 
 

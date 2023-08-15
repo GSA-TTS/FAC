@@ -16,7 +16,7 @@ import logging
 import json
 import environs
 from cfenv import AppEnv
-from audit.get_agency_names import get_agency_names, get_gaap_results
+from audit.get_agency_names import get_agency_names, get_audit_info_lists
 
 import newrelic.agent
 
@@ -189,7 +189,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = "en-us"
 
-TIME_ZONE = "UTC"
+TIME_ZONE = "EST"
 
 USE_I18N = True
 
@@ -454,4 +454,6 @@ if DISABLE_AUTH:
 
 # A dictionary mapping agency number to agency name. dict[str, str]
 AGENCY_NAMES = get_agency_names()
-GAAP_RESULTS = get_gaap_results()
+GAAP_RESULTS = get_audit_info_lists("gaap_results")
+SP_FRAMEWORK_BASIS = get_audit_info_lists("sp_framework_basis")
+SP_FRAMEWORK_OPINIONS = get_audit_info_lists("sp_framework_opinions")
