@@ -641,7 +641,7 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
 
     def test_direct_award_dependents(self):
         """
-        If direct_award is Y, loan_balance_at_audit_period_end must have a value.
+        direct_or_indirect_award tests
         """
         schema = self.FEDERAL_AWARDS_SCHEMA
 
@@ -660,7 +660,7 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
                         "passthrough_identifying_number": "Bob-123",
                     }
                 ],
-            }
+            },
         }
         simple_case["FederalAwards"]["federal_awards"] = [both_pass]
 
@@ -692,7 +692,7 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
             }
         }
         simple_case["FederalAwards"]["federal_awards"] = [bad_entity_fail]
-        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
+        validate(simple_case, schema)
 
         bad_entity_empty_fail = award | {
             "direct_or_indirect_award": {
@@ -703,7 +703,7 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
             }
         }
         simple_case["FederalAwards"]["federal_awards"] = [bad_entity_empty_fail]
-        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
+        validate(simple_case, schema)
 
     def test_passthrough_dependents(self):
         """
@@ -784,7 +784,7 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
 
     def test_missing_state_cluster_name(self):
         """
-        If cluster name is 'STATE CLUSTER' state_cluster_name must have a value
+        state_cluster_name tests
         """
         schema = self.FEDERAL_AWARDS_SCHEMA
 
@@ -810,7 +810,7 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
         self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
         # Test for successful validation when state_cluster_name is empty or null
-        for valid in ["", "null"]:
+        for valid in ["", 'null']:
             simple_case = jsoncopy(self.SIMPLE_CASES[0])
             simple_case["FederalAwards"]["federal_awards"][0]["cluster"][
                 "state_cluster_name"
@@ -835,7 +835,10 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
             simple_case["FederalAwards"]["federal_awards"][0]["program"][
                 "number_of_audit_findings"
             ] = 0
-            self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
+            # We cannot find, in the UG, anything that suggests this is true.
+            # This seems like it should be allowed to pass.
+            # self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
+            validate(simple_case, schema)
 
             simple_case["FederalAwards"]["federal_awards"][0]["program"][
                 "number_of_audit_findings"

@@ -243,7 +243,7 @@ local Enum = {
     enum: [
       'program-specific',
       'single-audit',
-      'alternative-compliance-engagement'
+      'alternative-compliance-engagement',
     ],
     title: 'AuditType',
   },
@@ -364,7 +364,7 @@ local Compound = {
   Date: Types.string {
     title: 'Date',
     description: 'MM/DD/YYYY',
-    pattern: '^[0-9]{2}\/[0-9]{2}\/[0-9]{4}$',
+    pattern: '^[0-9]{2}/[0-9]{2}/[0-9]{4}$',
   },
   NonEmptyString: Types.string {
     minLength: 1,
@@ -399,32 +399,36 @@ local SchemaBase = Types.object {
   Meta: Meta,
   Enum: Enum,
   Compound: Compound {
-    FederalProgramNames: {
+    FederalProgramNames: Types.string {
       description: 'All Federal program names',
       enum: FederalProgramNames.program_names,
     },
-    AllALNNumbers: {
+    AllALNNumbers: Types.string {
       description: 'All program numbers',
       enum: FederalProgramNames.all_alns,
     },
-    ClusterNames: {
+    ClusterNames: Types.string {
       description: 'All cluster names',
       enum: ClusterNames.cluster_names,
     },
-    ClusterNamesNAStateOther: {
-      description: 'All cluster names',
-      enum: ClusterNames.cluster_names + [Const.NA, Const.OTHER_CLUSTER],
+    ClusterNamesNA: Types.string {
+      description: 'All cluster names + N/A',
+      enum: ClusterNames.cluster_names + [Const.NA],
     },
-    ClusterNamesStateOther: {
+    ClusterNamesNAStateOther: Types.string {
       description: 'All cluster names',
-      enum: ClusterNames.cluster_names + [Const.OTHER_CLUSTER],
+      enum: ClusterNames.cluster_names + [Const.NA, Const.STATE_CLUSTER, Const.OTHER_CLUSTER],
+    },
+    ClusterNamesStateOther: Types.string {
+      description: 'All cluster names',
+      enum: ClusterNames.cluster_names + [Const.OTHER_CLUSTER, Const.OTHER_CLUSTER],
     },
     ALNPrefixes: type_aln_prefix,
     ThreeDigitExtension: type_three_digit_extension,
     ComplianceRequirementTypes: {
       description: 'Compliance requirement types',
       enum: ComplianceRequirementTypes.requirement_types,
-    },    
+    },
   },
   Validation: Validation,
   SchemaBase: SchemaBase,

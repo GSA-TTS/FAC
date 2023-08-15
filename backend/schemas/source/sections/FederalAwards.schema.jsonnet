@@ -19,7 +19,7 @@ local Validations = {
       passthrough_name: Base.Enum.EmptyString_Null,
       passthrough_identifying_number: Base.Enum.EmptyString_Null,
     },
-    // The passthrough number is not requier
+    // The passthrough number is not required
     required: ['passthrough_name'],
   },
   DirectAwardValidations: [
@@ -211,13 +211,34 @@ local Parts = {
       //  - N/A
       //  - STATE CLUSTER, or
       //  - the designation for other cluster name
-      cluster_name: Base.Compound.ClusterNamesNAStateOther,
+      cluster_name: Types.string,
       // cluster_total: Types.number {
       //   minimum: 0,
       // },
     },
     allOf: [
+      {
+        'if': {
+          properties: {
+            cluster_name: Base.Compound.ClusterNamesNA,
+          },
+        },
+        'then': {
+          allOf: [
+            {
+              properties: {
+                other_cluster_name: Base.Enum.EmptyString_Null,
 
+              },
+            },
+            {
+              properties: {
+                state_cluster_name: Base.Enum.EmptyString_Null,
+              },
+            },
+          ],
+        },
+      },
       // IF we have OTHER_CLUSTER, THEN...
       //   - other_cluster_name is required
       //   - other_cluster_name must not be empty
@@ -253,7 +274,7 @@ local Parts = {
       {
         'if': {
           properties: {
-            cluster_name: {
+            cluster_name: Types.string {
               const: Base.Const.STATE_CLUSTER,
             },
           },

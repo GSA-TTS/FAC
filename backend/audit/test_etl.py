@@ -127,9 +127,9 @@ class ETLTests(TestCase):
                 "auditee_uei": "AAA123456BBB",
                 "findings_uniform_guidance_entries": [
                     {
-                        "award_reference": "ABC123",
                         "seq_number": i,
                         "program": {
+                            "award_reference": "ABC123",
                             "program_name": "N/A",
                             "federal_agency_prefix": "12",
                             "three_digit_extension": "123",
@@ -207,8 +207,7 @@ class ETLTests(TestCase):
         fake = Faker()
         secondary_auditors = {
             "SecondaryAuditors": {
-                "secondary_auditors_entries": {
-                    "items": [
+                "secondary_auditors_entries": [
                         {
                             "secondary_auditor_seq_number": i,
                             "secondary_auditor_address_street": fake.street_address(),
@@ -227,7 +226,6 @@ class ETLTests(TestCase):
                         }
                         for i in range(1, 3)
                     ]
-                }
             }
         }
         return secondary_auditors

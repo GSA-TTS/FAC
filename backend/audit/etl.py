@@ -167,7 +167,8 @@ class ETL(object):
                     loan, "loan_balance_at_audit_period_end", 0
                 ),
                 is_direct=is_direct,
-                is_major=program["is_major"] == "Y",
+                # FIXME: This is potentially to-be-removed/historic
+                is_major=program["is_major"] == "Y" if "is_major" in program else False,
                 mp_audit_report_type=self.conditional_lookup(
                     program, "audit_report_type", ""
                 ),
@@ -250,14 +251,12 @@ class ETL(object):
         federal_awards = self.single_audit_checklist.federal_awards
         for entry in federal_awards["FederalAwards"]["federal_awards"]:
             if "entities" in entry["direct_or_indirect_award"]:
-                # FIXME: What is going on here? This feels like a confusion
-                # between the old Census model and ours. It passes tests... :/ 
                 for entity in entry["direct_or_indirect_award"]["entities"]:
                     passthrough = Passthrough(
                         award_reference=entry["award_reference"],
                         report_id=self.report_id,
-                        passthrough_id=entry["passthrough_identifying_number"],
-                        passthrough_name=entry["passthrough_name"],
+                        passthrough_id=entity["passthrough_identifying_number"],
+                        passthrough_name=entity["passthrough_name"],
                     )
                     passthrough.save()
 
@@ -347,10 +346,6 @@ class ETL(object):
                 "secondary_auditors_entries"]:
                 sec_auditor = SecondaryAuditor(
                     report_id=self.single_audit_checklist.report_id,
-                    # FIXME: Do we need this seq number?
-                    # auditor_seq_number=secondary_auditor[
-                    #     "secondary_auditor_seq_number"
-                    # ],
                     auditor_ein=secondary_auditor["secondary_auditor_ein"],
                     auditor_name=secondary_auditor["secondary_auditor_name"],
                     contact_name=secondary_auditor["secondary_auditor_contact_name"],
@@ -366,7 +361,6 @@ class ETL(object):
                         "secondary_auditor_address_zipcode"
                     ],
                 )
-                print(f'Saving {sec_auditor}')
                 sec_auditor.save()
 
     def load_additional_uei(self):
