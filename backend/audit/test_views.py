@@ -16,6 +16,7 @@ from openpyxl.cell import Cell
 
 from .fixtures.excel import (
     ADDITIONAL_UEIS_TEMPLATE,
+    ADDITIONAL_EINS_TEMPLATE,
     FEDERAL_AWARDS_TEMPLATE,
     CORRECTIVE_ACTION_PLAN_TEMPLATE,
     FINDINGS_TEXT_TEMPLATE,
@@ -27,6 +28,7 @@ from .fixtures.excel import (
     FINDINGS_UNIFORM_GUIDANCE_ENTRY_FIXTURES,
     FEDERAL_AWARDS_ENTRY_FIXTURES,
     ADDITIONAL_UEIS_ENTRY_FIXTURES,
+    ADDITIONAL_EINS_ENTRY_FIXTURES,
     SECONDARY_AUDITORS_ENTRY_FIXTURES,
     NOTES_TO_SEFA_ENTRY_FIXTURES,
     FORM_SECTIONS,
@@ -933,6 +935,64 @@ class SingleAuditReportFileHandlerViewTests(TestCase):
                 self.assertEqual(
                     additional_ueis_entries["additional_uei"],
                     test_data[0]["additional_uei"],
+                )
+
+    @patch("audit.validators._scan_file")
+    def test_valid_file_upload_for_additional_eins(self, mock_scan_file):
+        """When a valid Excel file is uploaded, the file should be stored and the SingleAuditChecklist should be updated to include the uploaded Additional EINs data"""
+
+        sac = _mock_login_and_scan(self.client, mock_scan_file)
+        test_data = json.loads(
+            ADDITIONAL_EINS_ENTRY_FIXTURES.read_text(encoding="utf-8")
+        )
+
+        # add valid data to the workbook
+        workbook = load_workbook(ADDITIONAL_EINS_TEMPLATE, data_only=True)
+        _set_by_name(workbook, "auditee_uei", ExcelFileHandlerViewTests.GOOD_UEI)
+        _set_by_name(workbook, "section_name", FORM_SECTIONS.ADDITIONAL_EINS)
+        _add_entry(workbook, 0, test_data[0])
+
+        with NamedTemporaryFile(suffix=".xlsx") as tmp:
+            workbook.save(tmp.name)
+            tmp.seek(0)
+
+            with open(tmp.name, "rb") as excel_file:
+                response = self.client.post(
+                    reverse(
+                        f"audit:{FORM_SECTIONS.ADDITIONAL_EINS}",
+                        kwargs={
+                            "report_id": sac.report_id,
+                            "form_section": FORM_SECTIONS.ADDITIONAL_EINS,
+                        },
+                    ),
+                    data={"FILES": excel_file},
+                )
+
+                self.assertEqual(response.status_code, 302)
+
+                updated_sac = SingleAuditChecklist.objects.get(pk=sac.id)
+
+                self.assertEqual(
+                    updated_sac.additional_eins["AdditionalEINs"]["auditee_uei"],
+                    ExcelFileHandlerViewTests.GOOD_UEI,
+                )
+
+                self.assertEqual(
+                    len(
+                        updated_sac.additional_eins["AdditionalEINs"][
+                            "additional_eins_entries"
+                        ]
+                    ),
+                    1,
+                )
+
+                additional_eins_entries = updated_sac.additional_eins["AdditionalEINs"][
+                    "additional_eins_entries"
+                ][0]
+
+                self.assertEqual(
+                    additional_eins_entries["additional_ein"],
+                    test_data[0]["additional_ein"],
                 )
 
     @patch("audit.validators._scan_file")
