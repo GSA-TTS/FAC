@@ -1108,17 +1108,16 @@ class SummaryView(SingleAuditChecklistAccessRequiredMixin, generic.View):
             etl = IntakeToDissemination(sac)
             etl_data = etl.load_all()
 
+            page_data = {}
             general_info = etl_data['Generals']
             general_info = model_to_dict(general_info)
             del general_info["id"]
-
-            page_data = etl_data
-            del page_data['Generals']
+            del etl_data['Generals']
 
             # For all sections in page_data:
             # (a) Change the sections "FederalAwards": [<FederalAwards>, ...] --> "Federal Awards": [{}, ...]
             # (b) Omit any empty sections, and remove the DB id from all items
-            for k, v in page_data.items():
+            for k, v in etl_data.items():
                 if len(v) > 0:
                     split_name = " ".join(re.findall('[A-Z][^A-Z]*', k))  # "FederalAwards" -> "Federal Awards"
                     page_data[split_name] = [model_to_dict(x) for x in v]  # [<FederalAwards>, ...] -> [{}, ...]
