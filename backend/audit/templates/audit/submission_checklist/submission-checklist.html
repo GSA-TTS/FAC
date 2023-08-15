@@ -373,6 +373,22 @@
                             </div>
                         {% endif %}
                     </li>
+
+                    {% comment %} Summary view {% endcomment %}
+                    <div class="padding-bottom-3" id="submit-audit">
+                        <div class="usa-summary-box font-sans-md"
+                             role="region"
+                             aria-labelledby="summary-box-key-information">
+                            <div class="usa-summary-box__body">
+                                <div class="usa-summary-box__text">
+                                    <span class="text-bold">Audit Summary</span>
+                                    <p class="margin-0">
+                                        View a <a class="usa-link" href="{% url 'audit:Summary' report_id %}">detail-rich summary</a> of your submission so far. 
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     
                     {% comment %} Submit to the FAC for processing {% endcomment %}
                     <div class="padding-bottom-3" id="submit-audit">
@@ -387,21 +403,6 @@
                                     <p class="margin-0">
                                         This is the last step and must be completed by the <span class="text-underline">certifying auditee</span>. <strong>Once the audit has been submitted, it cannot be undone.</strong>
                                     </p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    {% comment %} Summary view {% endcomment %}
-                    <div class="padding-y-6" id="submit-audit">
-                        <div class="usa-summary-box font-sans-md bg-error-lighter"
-                             role="region"
-                             aria-labelledby="summary-box-key-information">
-                            <div class="usa-summary-box__body">
-                                <div class="usa-summary-box__text">
-                                    <h2 class="text-bold margin-0">
-                                        <a class="usa-link" href="{% url 'audit:Summary' report_id %}">SUMMARY VIEW</a>
-                                    </h2>
                                 </div>
                             </div>
                         </div>
