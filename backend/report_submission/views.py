@@ -226,8 +226,8 @@ class UploadPageView(LoginRequiredMixin, View):
                 "instructions": "Enter your CAP text using the provided worksheet.",
                 "DB_id": "corrective_action_plan",
             },
-            "additional-EINs": {
-                "view_id": "additional-EINs",
+            "additional-eins": {
+                "view_id": "additional-eins",
                 "view_name": "Additional EINs",
                 "instructions": "Enter any additional EINs using the provided worksheet.",
             },
