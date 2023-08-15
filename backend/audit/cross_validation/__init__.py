@@ -58,10 +58,12 @@ And an example with-errors return value is:
 from .additional_ueis import additional_ueis
 from .auditee_ueis_match import auditee_ueis_match
 from .audit_findings import audit_findings
+from .award_ref_and_references_uniqueness import award_ref_and_references_uniqueness
 from .sac_validation_shape import sac_validation_shape  # noqa: F401
 
 functions = [
     audit_findings,
     auditee_ueis_match,
     additional_ueis,
+    award_ref_and_references_uniqueness,
 ]
