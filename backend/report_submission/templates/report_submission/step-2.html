@@ -13,6 +13,7 @@
                     <legend class="usa-legend usa-legend--large">
                         Auditee information
                     </legend>
+                    {{ form.non_field_errors }}
                     <p>
                         <abbr title="required" class="usa-hint usa-hint--required">*</abbr>Indicates a required field.
                     </p>
@@ -36,6 +37,7 @@
                             <li id="auditee_uei-not-null" hidden>Can&#39;t be null</li>
                             <li id="auditee_uei-length" hidden>UEI is twelve characters long</li>
                         </ul>
+                        {{ form.auditee_uei.errors }}
                         <div class="usa-search" role="search">
                             <label class="usa-sr-only" for="auditee_uei">Search</label>
                             <input class="usa-input"

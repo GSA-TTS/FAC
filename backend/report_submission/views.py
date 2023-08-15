@@ -1,4 +1,3 @@
-import datetime
 import logging
 
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -10,7 +9,7 @@ from django.views import View
 from audit.models import Access, SingleAuditChecklist, LateChangeError
 from audit.validators import validate_general_information_json
 
-from report_submission.forms import GeneralInformationForm
+from report_submission.forms import AuditeeInfoForm, GeneralInformationForm
 
 import api.views
 
@@ -45,35 +44,38 @@ class AuditeeInfoFormView(LoginRequiredMixin, View):
     def get(self, request):
         args = {}
         args["step"] = 2
+        args["form"] = AuditeeInfoForm()
         return render(request, "report_submission/step-2.html", args)
 
     # render auditee info form
 
     # gather/save step 2 info, redirect to step 3
-    def post(self, post_request):
-        # TODO: Wrap in better error-checking
-        start = datetime.datetime.strptime(
-            post_request.POST.get("auditee_fiscal_period_start", "01/01/1970"),
-            "%m/%d/%Y",
-        )
-        end = datetime.datetime.strptime(
-            post_request.POST.get("auditee_fiscal_period_end", "01/01/1970"),
-            "%m/%d/%Y",
-        )
+    def post(self, request):
+        form = AuditeeInfoForm(request.POST)
+        if not form.is_valid():
+            context = {
+                "form": form,
+                "step": 2,
+            }
+            return render(request, "report_submission/step-2.html", context)
 
         formatted_post = {
-            "csrfmiddlewaretoken": post_request.POST.get("csrfmiddlewaretoken"),
-            "auditee_uei": post_request.POST.get("auditee_uei"),
-            "auditee_name": post_request.POST.get("auditee_name"),
-            "auditee_address_line_1": post_request.POST.get("auditee_address_line_1"),
-            "auditee_city": post_request.POST.get("auditee_city"),
-            "auditee_state": post_request.POST.get("auditee_state"),
-            "auditee_zip": post_request.POST.get("auditee_zip"),
-            "auditee_fiscal_period_start": start.strftime("%Y-%m-%d"),
-            "auditee_fiscal_period_end": end.strftime("%Y-%m-%d"),
+            "csrfmiddlewaretoken": request.POST.get("csrfmiddlewaretoken"),
+            "auditee_uei": request.POST.get("auditee_uei"),
+            "auditee_name": request.POST.get("auditee_name"),
+            "auditee_address_line_1": request.POST.get("auditee_address_line_1"),
+            "auditee_city": request.POST.get("auditee_city"),
+            "auditee_state": request.POST.get("auditee_state"),
+            "auditee_zip": request.POST.get("auditee_zip"),
+            "auditee_fiscal_period_start": form.cleaned_data[
+                "auditee_fiscal_period_start"
+            ].strftime("%Y-%m-%d"),
+            "auditee_fiscal_period_end": form.cleaned_data[
+                "auditee_fiscal_period_end"
+            ].strftime("%Y-%m-%d"),
         }
 
-        info_check = api.views.auditee_info_check(post_request.user, formatted_post)
+        info_check = api.views.auditee_info_check(request.user, formatted_post)
         if info_check.get("errors"):
             return redirect(reverse("report_submission:auditeeinfo"))
 
