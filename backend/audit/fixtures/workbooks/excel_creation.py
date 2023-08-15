@@ -79,7 +79,7 @@ def set_range(wb, range_name, values, default=None, type=str):
         if v:
             # This is a very noisy statement, showing everything
             # written into the workbook.
-            # print(f'{range_name} c[{row}][{col}] <- {v} len({len(v)}) {default}')
+            # print(f'{range_name} c[{row}][{col}] <- {type(v)} len({len(v)}) {default}')
             if v is not None:
                 ws.cell(row=row, column=col, value=type(v))
             if len(str(v)) == 0 and default is not None:
@@ -143,10 +143,16 @@ def generate_dissemination_test_table(Gen, api_endpoint, dbkey, mappings, object
                 as_dict[m.in_db] != ""
             ):
                 if m.in_dissem == WorkbookFieldInDissem:
+                    # print(f'in_sheet {m.in_sheet} <- {as_dict[m.in_db]}')
                     test_obj["fields"].append(m.in_sheet)
+                    # The typing must be applied here as well, as in the case of 
+                    # type_requirement, it alphabetizes the value...
+                    test_obj["values"].append(m.type(as_dict[m.in_db]))
                 else:
+                    # print(f'in_dissem {m.in_dissem} <- {as_dict[m.in_db]}')
                     test_obj["fields"].append(m.in_dissem)
-                test_obj["values"].append(as_dict[m.in_db])
+                    test_obj["values"].append(m.type(as_dict[m.in_db]))
+
         table["rows"].append(test_obj)
     return table
 

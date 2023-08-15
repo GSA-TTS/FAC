@@ -197,6 +197,8 @@ def generate_federal_awards(dbkey, outfile):
     # they wanted.
     valid_file = open(f"{settings.BASE_DIR}/schemas/source/base/ClusterNames.json")
     valid_json = json.load(valid_file)
+    # This was removed from the CSV...
+    valid_json["cluster_names"].append("STATE CLUSTER")
 
     (cluster_names, other_cluster_names) = _generate_cluster_names(cfdas, valid_json)
     set_range(wb, "cluster_name", cluster_names)

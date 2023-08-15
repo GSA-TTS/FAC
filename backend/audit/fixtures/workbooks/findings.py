@@ -16,12 +16,15 @@ from audit.fixtures.workbooks.excel_creation import insert_version_and_sheet_nam
 import openpyxl as pyxl
 
 import logging
+from pprint import pprint
 
 logger = logging.getLogger(__name__)
 
 
 def sorted_string(s):
-    return "".join(sorted(s))
+    s_sorted = "".join(sorted(s))
+    # print(f's before: {s} after {s_sorted}')
+    return s_sorted
 
 
 mappings = [
@@ -84,14 +87,12 @@ def generate_findings(dbkey, outfile):
     for find in findings:
         award_references.append(e2a[find.elecauditsid])
 
-    # print(f"Found {len(cfdas)} CFDAs and {len(findings)} Findings and {len(award_references)} award refs")
     map_simple_columns(wb, mappings, findings)
     set_range(wb, "award_reference", award_references)
 
     wb.save(outfile)
 
     table = generate_dissemination_test_table(Gen, "finding", dbkey, mappings, findings)
-    # pprint(table)
     for obj, ar in zip(table["rows"], award_references):
         obj["fields"].append("award_reference")
         obj["values"].append(ar)

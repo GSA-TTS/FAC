@@ -18,6 +18,7 @@ import openpyxl as pyxl
 import re
 
 import logging
+# import unidecode
 
 logger = logging.getLogger(__name__)
 
@@ -27,6 +28,14 @@ mappings = [
     FieldMap("seq_number", "seq_number", "note_seq_number", 0, int),
 ]
 
+def cleanup_string(s):
+    if s is None:
+        return ""
+    else:
+        s = s.rstrip()
+        # s = unidecode.unidecode(s)
+        s = str(s.encode('utf-8').decode('ascii', 'ignore'))
+        return s
 
 def generate_notes_to_sefa(dbkey, outfile):
     logger.info(f"--- generate notes to sefa {dbkey}---")
@@ -51,8 +60,15 @@ def generate_notes_to_sefa(dbkey, outfile):
         .order_by(Notes.seq_number)
     )
 
-    # This looks like the right way to set the three required fields
-    set_single_cell_range(wb, "accounting_policies", policies.content)
+    rate_content = cleanup_string(rate.content)
+    policies_content = cleanup_string(policies.content)
+    
+    if rate_content == "":
+        rate_content = "FILLED FOR TESTING"
+    if policies_content == "":
+        policies_content = "FILLED FOR TESTING"
+
+    
     # WARNING
     # This is being faked. We're askign a Y/N question in the collection.
     # Census just let them type some stuff. So, this is a rough
@@ -61,19 +77,20 @@ def generate_notes_to_sefa(dbkey, outfile):
     # it *is* good enough for us to use for testing.
     is_used = "Huh"
     if (
-        re.search("did not use", rate.content)
-        or re.search("not to use", rate.content)
-        or re.search("not use", rate.content)
-        or re.search("not elected", rate.content)
+        re.search("did not use", rate_content)
+        or re.search("not to use", rate_content)
+        or re.search("not use", rate_content)
+        or re.search("not elected", rate_content)
     ):
         is_used = "N"
-    elif re.search("used", rate.content):
+    elif re.search("used", rate_content):
         is_used = "Y"
     else:
         is_used = "Y&N"
-
+    
+    set_single_cell_range(wb, "accounting_policies", policies_content)
     set_single_cell_range(wb, "is_minimis_rate_used", is_used)
-    set_single_cell_range(wb, "rate_explained", rate.content)
+    set_single_cell_range(wb, "rate_explained", rate_content)
 
     # Map the rest as notes.
     map_simple_columns(wb, mappings, notes)
@@ -81,8 +98,9 @@ def generate_notes_to_sefa(dbkey, outfile):
 
     table = generate_dissemination_test_table(Gen, "note", dbkey, mappings, notes)
 
-    table["singletons"]["accounting_policies"] = policies.content
+    table["singletons"]["accounting_policies"] = policies_content
     table["singletons"]["is_minimis_rate_used"] = is_used
-    table["singletons"]["rate_explained"] = rate.content
+    table["singletons"]["rate_explained"] = rate_content
     table["singletons"]["auditee_uei"] = g.uei
+
     return (wb, table)

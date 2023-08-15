@@ -6,7 +6,6 @@ import datetime
 import logging
 import sys
 import math
-from pprint import pprint
 from config import settings
 import os
 import jwt
@@ -177,7 +176,10 @@ def api_check(json_test_tables):
                     print(
                         f"eq {eq} field {f} fval {this_field_value} == aval {this_api_value}"
                     )
-                    pprint(api_values)
+                    # print(f"FIELD VALUES FOR {f}")
+                    # pprint(row["values"])
+                    # print("API VALUES")
+                    # pprint(api_values)
                 equality_results.append(eq)
 
             if all(equality_results):

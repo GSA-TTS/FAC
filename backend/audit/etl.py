@@ -183,34 +183,32 @@ class ETL(object):
 
     def load_note(self):
         notes_to_sefa = self.single_audit_checklist.notes_to_sefa["NotesToSefa"]
-        if not notes_to_sefa:
-            logger.warning("No notes to sefa found to load")
-            return
-
-        accounting_policies = notes_to_sefa["accounting_policies"]
-        is_minimis_rate_used = notes_to_sefa["is_minimis_rate_used"] == "Y"
-        rate_explained = notes_to_sefa["rate_explained"]
-        entries = notes_to_sefa["notes_to_sefa_entries"]
-        if not entries:
-            note = Note(
-                report_id=self.report_id,
-                accounting_policies=accounting_policies,
-                is_minimis_rate_used=is_minimis_rate_used,
-                rate_explained=rate_explained,
-            )
-            note.save()
-        else:
-            for entry in entries:
-                note = Note(
-                    report_id=self.report_id,
-                    note_seq_number=entry["seq_number"],
-                    content=entry["note_content"],
-                    note_title=entry["note_title"],
-                    accounting_policies=accounting_policies,
-                    is_minimis_rate_used=is_minimis_rate_used,
-                    rate_explained=rate_explained,
-                )
-                note.save()
+        if notes_to_sefa:
+            accounting_policies = notes_to_sefa["accounting_policies"]
+            is_minimis_rate_used = notes_to_sefa["is_minimis_rate_used"] == "Y"
+            rate_explained = notes_to_sefa["rate_explained"]
+            if "notes_to_sefa_entries" in notes_to_sefa:
+                entries = notes_to_sefa["notes_to_sefa_entries"]
+                if not entries:
+                    note = Note(
+                        report_id=self.report_id,
+                        accounting_policies=accounting_policies,
+                        is_minimis_rate_used=is_minimis_rate_used,
+                        rate_explained=rate_explained,
+                    )
+                    note.save()
+                else:
+                    for entry in entries:
+                        note = Note(
+                            report_id=self.report_id,
+                            note_seq_number=entry["seq_number"],
+                            content=entry["note_content"],
+                            note_title=entry["note_title"],
+                            accounting_policies=accounting_policies,
+                            is_minimis_rate_used=is_minimis_rate_used,
+                            rate_explained=rate_explained,
+                        )
+                        note.save()
 
     def load_revision(self):
         revision = Revision(
@@ -239,21 +237,15 @@ class ETL(object):
     def load_passthrough(self):
         federal_awards = self.single_audit_checklist.federal_awards
         for entry in federal_awards["FederalAwards"]["federal_awards"]:
-            entities = (
-                entry["direct_or_indirect_award"]
-                and entry["direct_or_indirect_award"]["entities"]
-            )
-            if not entities:
-                logger.warning("No passthrough to load")
-                return
-            for entity in entry["direct_or_indirect_award"]["entities"]:
-                passthrough = Passthrough(
-                    award_reference=entry["award_reference"],
-                    report_id=self.report_id,
-                    passthrough_id=entity["passthrough_identifying_number"],
-                    passthrough_name=entity["passthrough_name"],
-                )
-                passthrough.save()
+            if 'entities' in entry["direct_or_indirect_award"]:
+                for entity in entry["direct_or_indirect_award"]["entities"]:
+                    passthrough = Passthrough(
+                        award_reference=entry["award_reference"],
+                        report_id=self.report_id,
+                        passthrough_id=entity["passthrough_identifying_number"],
+                        passthrough_name=entity["passthrough_name"],
+                    )
+                    passthrough.save()
 
     def _get_dates_from_sac(self):
         return_dict = dict()
@@ -324,9 +316,8 @@ class ETL(object):
             audit_year=self.audit_year,
             audit_type=general_information["audit_type"],
             entity_type=general_information["user_provided_organization_type"],
-            number_months=0
-            if "audit_period_other_months" not in general_information
-            else general_information["audit_period_other_months"],
+            number_months=int(general_information["audit_period_other_months"])
+            if (("audit_period_other_months" in general_information) and general_information["audit_period_other_months"] != "") else None,
             audit_period_covered=general_information["audit_period_covered"],
             total_amount_expended=None,  # loaded from FederalAward
             type_audit_code="UG",
@@ -338,28 +329,29 @@ class ETL(object):
     def load_secondary_auditor(self):
         secondary_auditors = self.single_audit_checklist.secondary_auditors
         # MCJ This might be empty
-        if "secondary_auditors_entries" in secondary_auditors["SecondaryAuditors"]:
-            for secondary_auditor in secondary_auditors["SecondaryAuditors"][
-                "secondary_auditors_entries"
-            ]:
-                sec_auditor = SecondaryAuditor(
-                    report_id=self.single_audit_checklist.report_id,
-                    auditor_ein=secondary_auditor["secondary_auditor_ein"],
-                    auditor_name=secondary_auditor["secondary_auditor_name"],
-                    contact_name=secondary_auditor["secondary_auditor_contact_name"],
-                    contact_title=secondary_auditor["secondary_auditor_contact_title"],
-                    contact_email=secondary_auditor["secondary_auditor_contact_email"],
-                    contact_phone=secondary_auditor["secondary_auditor_contact_phone"],
-                    address_street=secondary_auditor[
-                        "secondary_auditor_address_street"
-                    ],
-                    address_city=secondary_auditor["secondary_auditor_address_city"],
-                    address_state=secondary_auditor["secondary_auditor_address_state"],
-                    address_zipcode=secondary_auditor[
-                        "secondary_auditor_address_zipcode"
-                    ],
-                )
-                sec_auditor.save()
+        if secondary_auditors:
+            if "secondary_auditors_entries" in secondary_auditors["SecondaryAuditors"]:
+                for secondary_auditor in secondary_auditors["SecondaryAuditors"][
+                    "secondary_auditors_entries"
+                ]:
+                    sec_auditor = SecondaryAuditor(
+                        report_id=self.single_audit_checklist.report_id,
+                        auditor_ein=secondary_auditor["secondary_auditor_ein"],
+                        auditor_name=secondary_auditor["secondary_auditor_name"],
+                        contact_name=secondary_auditor["secondary_auditor_contact_name"],
+                        contact_title=secondary_auditor["secondary_auditor_contact_title"],
+                        contact_email=secondary_auditor["secondary_auditor_contact_email"],
+                        contact_phone=secondary_auditor["secondary_auditor_contact_phone"],
+                        address_street=secondary_auditor[
+                            "secondary_auditor_address_street"
+                        ],
+                        address_city=secondary_auditor["secondary_auditor_address_city"],
+                        address_state=secondary_auditor["secondary_auditor_address_state"],
+                        address_zipcode=secondary_auditor[
+                            "secondary_auditor_address_zipcode"
+                        ],
+                    )
+                    sec_auditor.save()
 
     def load_additional_uei(self):
         addls = self.single_audit_checklist.additional_ueis
@@ -385,7 +377,7 @@ class ETL(object):
             logger.warning("No audit info found to load")
             return
         general.gaap_results = audit_information["gaap_results"]
-        general.sp_framework = audit_information["sp_framework_basis"]
+        general.sp_framework = audit_information["sp_framework_basis"] if "sp_framework_basis" in audit_information else None,
         general.is_sp_framework_required = (
             audit_information["is_sp_framework_required"] == "Y"
         )
