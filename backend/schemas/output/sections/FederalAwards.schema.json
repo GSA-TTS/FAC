@@ -41,6 +41,87 @@
                               "if": {
                                  "properties": {
                                     "cluster_name": {
+                                       "description": "All cluster names + N/A",
+                                       "enum": [
+                                          "HEAD START CLUSTER",
+                                          "477 CLUSTER",
+                                          "MATERNAL, INFANT, AND EARLY CHILDHOOD HOME VISITING CLUSTER",
+                                          "NAN",
+                                          "RESEARCH AND DEVELOPMENT",
+                                          "STUDENT FINANCIAL ASSISTANCE",
+                                          "AGING CLUSTER",
+                                          "CCDF CLUSTER",
+                                          "CDFI CLUSTER",
+                                          "CHILD NUTRITION CLUSTER",
+                                          "CLEAN WATER STATE REVOLVING FUND CLUSTER",
+                                          "COMMUNITY FACILITIES LOANS AND GRANTS CLUSTER",
+                                          "DISABILITY INSURANCE/SSI CLUSTER",
+                                          "DRINKING WATER STATE REVOLVING FUND CLUSTER",
+                                          "ECONOMIC DEVELOPMENT CLUSTER",
+                                          "EMPLOYMENT SERVICE CLUSTER",
+                                          "FEDERAL TRANSIT CLUSTER",
+                                          "FISH AND WILDLIFE CLUSTER",
+                                          "FOOD DISTRIBUTION CLUSTER",
+                                          "FOREIGN FOOD AID DONATION CLUSTER",
+                                          "FOREST SERVICE SCHOOLS AND ROADS CLUSTER",
+                                          "FOSTER GRANDPARENT/SENIOR COMPANION CLUSTER",
+                                          "HEALTH CENTER PROGRAM CLUSTER",
+                                          "HIGHWAY PLANNING AND CONSTRUCTION CLUSTER",
+                                          "HIGHWAY SAFETY CLUSTER",
+                                          "HOPE VI CLUSTER",
+                                          "HOUSING VOUCHER CLUSTER",
+                                          "HURRICANE SANDY RELIEF CLUSTER",
+                                          "MEDICAID CLUSTER",
+                                          "SCHOOL IMPROVEMENT GRANTS CLUSTER",
+                                          "SECTION 8 PROJECT-BASED CLUSTER",
+                                          "SNAP CLUSTER",
+                                          "SPECIAL EDUCATION CLUSTER (IDEA)",
+                                          "TANF CLUSTER",
+                                          "TRANSIT SERVICES PROGRAMS CLUSTER",
+                                          "TRIO CLUSTER",
+                                          "WATER AND WASTE PROGRAM CLUSTER",
+                                          "WIOA CLUSTER",
+                                          "CDBG - ENTITLEMENT GRANTS CLUSTER",
+                                          "CDBG - DISASTER RECOVERY GRANTS - PUB. L. NO. 113-2 CLUSTER",
+                                          "N/A"
+                                       ],
+                                       "type": "string"
+                                    }
+                                 }
+                              },
+                              "then": {
+                                 "allOf": [
+                                    {
+                                       "properties": {
+                                          "other_cluster_name": {
+                                             "description": "Empty string or null",
+                                             "enum": [
+                                                "",
+                                                "null"
+                                             ],
+                                             "title": "EmptyString_Null"
+                                          }
+                                       }
+                                    },
+                                    {
+                                       "properties": {
+                                          "state_cluster_name": {
+                                             "description": "Empty string or null",
+                                             "enum": [
+                                                "",
+                                                "null"
+                                             ],
+                                             "title": "EmptyString_Null"
+                                          }
+                                       }
+                                    }
+                                 ]
+                              }
+                           },
+                           {
+                              "if": {
+                                 "properties": {
+                                    "cluster_name": {
                                        "const": "OTHER CLUSTER NOT LISTED ABOVE"
                                     }
                                  }
@@ -77,7 +158,8 @@
                               "if": {
                                  "properties": {
                                     "cluster_name": {
-                                       "const": "STATE CLUSTER"
+                                       "const": "STATE CLUSTER",
+                                       "type": "string"
                                     }
                                  }
                               },
@@ -112,52 +194,7 @@
                         ],
                         "properties": {
                            "cluster_name": {
-                              "description": "All cluster names",
-                              "enum": [
-                                 "HEAD START CLUSTER",
-                                 "477 CLUSTER",
-                                 "MATERNAL, INFANT, AND EARLY CHILDHOOD HOME VISITING CLUSTER",
-                                 "NAN",
-                                 "RESEARCH AND DEVELOPMENT",
-                                 "STUDENT FINANCIAL ASSISTANCE",
-                                 "STATE CLUSTER",
-                                 "AGING CLUSTER",
-                                 "CCDF CLUSTER",
-                                 "CDFI CLUSTER",
-                                 "CHILD NUTRITION CLUSTER",
-                                 "CLEAN WATER STATE REVOLVING FUND CLUSTER",
-                                 "COMMUNITY FACILITIES LOANS AND GRANTS CLUSTER",
-                                 "DISABILITY INSURANCE/SSI CLUSTER",
-                                 "DRINKING WATER STATE REVOLVING FUND CLUSTER",
-                                 "ECONOMIC DEVELOPMENT CLUSTER",
-                                 "EMPLOYMENT SERVICE CLUSTER",
-                                 "FEDERAL TRANSIT CLUSTER",
-                                 "FISH AND WILDLIFE CLUSTER",
-                                 "FOOD DISTRIBUTION CLUSTER",
-                                 "FOREIGN FOOD AID DONATION CLUSTER",
-                                 "FOREST SERVICE SCHOOLS AND ROADS CLUSTER",
-                                 "FOSTER GRANDPARENT/SENIOR COMPANION CLUSTER",
-                                 "HEALTH CENTER PROGRAM CLUSTER",
-                                 "HIGHWAY PLANNING AND CONSTRUCTION CLUSTER",
-                                 "HIGHWAY SAFETY CLUSTER",
-                                 "HOPE VI CLUSTER",
-                                 "HOUSING VOUCHER CLUSTER",
-                                 "HURRICANE SANDY RELIEF CLUSTER",
-                                 "MEDICAID CLUSTER",
-                                 "SCHOOL IMPROVEMENT GRANTS CLUSTER",
-                                 "SECTION 8 PROJECT-BASED CLUSTER",
-                                 "SNAP CLUSTER",
-                                 "SPECIAL EDUCATION CLUSTER (IDEA)",
-                                 "TANF CLUSTER",
-                                 "TRANSIT SERVICES PROGRAMS CLUSTER",
-                                 "TRIO CLUSTER",
-                                 "WATER AND WASTE PROGRAM CLUSTER",
-                                 "WIOA CLUSTER",
-                                 "CDBG - ENTITLEMENT GRANTS CLUSTER",
-                                 "CDBG - DISASTER RECOVERY GRANTS - PUB. L. NO. 113-2 CLUSTER",
-                                 "N/A",
-                                 "OTHER CLUSTER NOT LISTED ABOVE"
-                              ]
+                              "type": "string"
                            }
                         },
                         "required": [
