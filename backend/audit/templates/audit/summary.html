@@ -30,12 +30,8 @@
                         <div id="{{ section_key }}" class="usa-table-container--scrollable">
                             <h2 id="{{ section_key }}-title" class="grid-row margin-bottom-3">
                                 <span class="">{{ section_key }}</span>
-                                <svg class="usa-icon text-base font-sans-md"
-                                    aria-hidden="true"
-                                    role="img">
-                                {% uswds_sprite "more_vert" %}
-                                </svg>
-                                <span class="text-base"><p hidden>(</p>{{ section_list|length }}<p hidden>)</p></span>
+                                <span class="text-base margin-x-2">|</span>
+                                <span class="text-base">{{ section_list|length }}</span>
                             </h2>
 
                             <table id="{{ section_key }}-table"
