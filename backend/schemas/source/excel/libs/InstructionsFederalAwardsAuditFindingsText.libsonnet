@@ -14,3 +14,4 @@
       'Select "Y" if the full text in the Schedule of Findings and Questioned Costs includes a chart or table. Select "N" if it does not.',
     ],
   },
+}

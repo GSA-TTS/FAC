@@ -14,3 +14,4 @@
       'Select "Y" if the full text in the Audit PDF includes a chart or table. Select "N" if it does not.',
     ],
   },
+}

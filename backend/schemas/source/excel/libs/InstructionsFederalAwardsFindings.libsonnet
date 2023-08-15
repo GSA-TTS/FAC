@@ -41,18 +41,12 @@
   },
   questioned_costs: {
     instructions: [
-      'Select "Y" if there are questioned costs related to the audit finding, even if the amount can't be determined. If there are no questioned costs, select "N".',
+      'Select "Y" if there are questioned costs related to the audit finding, even if the amount can\'t be determined. If there are no questioned costs, select "N".',
     ],
   },
   repeat_prior_reference: {
     instructions: [
       'Select "Y" if the audit finding is a repeat from the immediate prior audit. If it is not a repeat, select "N".',
-    ],
-  },
-}
-  questioned_costs: {
-    instructions: [
-      'Select "Y" if there are questioned costs related to the audit finding, even if the amount can't be determined. If there are no questioned costs, select "N".',
     ],
   },
   prior_references: {
