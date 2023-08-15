@@ -315,9 +315,17 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         themselves.
         """
         shaped_sac = audit.cross_validation.sac_validation_shape(self)
+        try:
+            sar = SingleAuditReportFile.objects.filter(sac_id=self.id).latest(
+                "date_created"
+            )
+        except SingleAuditReportFile.DoesNotExist:
+            sar = None
         validation_functions = audit.cross_validation.functions
         errors = list(
-            chain.from_iterable([func(shaped_sac) for func in validation_functions])
+            chain.from_iterable(
+                [func(shaped_sac, sar=sar) for func in validation_functions]
+            )
         )
         if errors:
             return {"errors": errors, "data": shaped_sac}

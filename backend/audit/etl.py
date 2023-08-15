@@ -35,7 +35,7 @@ class ETL(object):
             self.load_passthrough,
             self.load_finding_texts,
             self.load_captext,
-            # self.load_audit_info()  # TODO: Uncomment when SingleAuditChecklist adds audit_information
+            self.load_audit_info,
         )
         for load_method in load_methods:
             try:
@@ -47,6 +47,11 @@ class ETL(object):
 
     def load_finding_texts(self):
         findings_text = self.single_audit_checklist.findings_text
+
+        if not findings_text:
+            logger.warning("No finding texts found to load")
+            return
+
         findings_text_entries = findings_text["FindingsText"]["findings_text_entries"]
         for entry in findings_text_entries:
             finding_text_ = FindingText(
@@ -61,6 +66,10 @@ class ETL(object):
         findings_uniform_guidance = (
             self.single_audit_checklist.findings_uniform_guidance
         )
+        if not findings_uniform_guidance:
+            logger.warning("No findings found to load")
+            return
+
         findings_uniform_guidance_entries = findings_uniform_guidance[
             "FindingsUniformGuidance"
         ]["findings_uniform_guidance_entries"]
@@ -135,6 +144,10 @@ class ETL(object):
 
     def load_captext(self):
         corrective_action_plan = self.single_audit_checklist.corrective_action_plan
+        if not corrective_action_plan:
+            logger.warning("No corrective action plans found to load")
+            return
+
         corrective_action_plan_entries = corrective_action_plan["CorrectiveActionPlan"][
             "corrective_action_plan_entries"
         ]
@@ -149,6 +162,10 @@ class ETL(object):
 
     def load_note(self):
         notes_to_sefa = self.single_audit_checklist.notes_to_sefa["NotesToSefa"]
+        if not notes_to_sefa:
+            logger.warning("No notes to sefa found to load")
+            return
+
         accounting_policies = notes_to_sefa["accounting_policies"]
         is_minimis_rate_used = notes_to_sefa["is_minimis_rate_used"] == "Y"
         rate_explained = notes_to_sefa["rate_explained"]
@@ -201,6 +218,13 @@ class ETL(object):
     def load_passthrough(self):
         federal_awards = self.single_audit_checklist.federal_awards
         for entry in federal_awards["FederalAwards"]["federal_awards"]:
+            entities = (
+                entry["direct_or_indirect_award"]
+                and entry["direct_or_indirect_award"]["entities"]
+            )
+            if not entities:
+                logger.warning("No passthrough to load")
+                return
             for entity in entry["direct_or_indirect_award"]["entities"]:
                 passthrough = Passthrough(
                     award_reference=entry["award_reference"],
@@ -294,6 +318,9 @@ class ETL(object):
 
     def load_secondary_auditor(self):
         secondary_auditors = self.single_audit_checklist.secondary_auditors
+        if not secondary_auditors:
+            logger.warning("No secondary_auditors found to load")
+            return
 
         for secondary_auditor in secondary_auditors["SecondaryAuditors"][
             "secondary_auditors_entries"
@@ -315,17 +342,26 @@ class ETL(object):
             sec_auditor.save()
 
     def load_audit_info(self):
-        general = General.objects.get(report_id=self.single_audit_checklist.report_id)
+        report_id = self.single_audit_checklist.report_id
+        try:
+            general = General.objects.get(report_id=report_id)
+        except General.DoesNotExist:
+            logger.error(
+                f"General must be loaded before AuditInfo. report_id = {report_id}"
+            )
+            return
         audit_information = self.single_audit_checklist.audit_information
-
+        if not audit_information:
+            logger.warning("No audit info found to load")
+            return
         general.gaap_results = audit_information["gaap_results"]
-        """
-            TODO:
-            Missing in schema
-            general.sp_framework = audit_information[]
-            general.is_sp_framework_required = audit_information[]
-            general.sp_framework_auditor_opinion = audit_information[]
-        """
+        general.sp_framework = audit_information["sp_framework_basis"]
+        general.is_sp_framework_required = (
+            audit_information["is_sp_framework_required"] == "Y"
+        )
+        general.sp_framework_auditor_opinion = audit_information[
+            "sp_framework_opinions"
+        ]
         general.is_going_concern = audit_information["is_going_concern_included"] == "Y"
         general.is_significant_deficiency = (
             audit_information["is_internal_control_deficiency_disclosed"] == "Y"
