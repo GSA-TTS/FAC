@@ -1,11 +1,37 @@
 from django.apps import apps
 from django.core.management.base import BaseCommand
 from users.models import User
-
 import argparse
 import datetime
 import logging
 import sys
+import math
+from pprint import pprint
+from config import settings
+import os
+import jwt
+import requests
+
+from audit.fixtures.workbooks.workbook_creation import (
+    sections,
+    workbook_loader,
+    setup_sac,
+)
+from audit.fixtures.workbooks.sac_creation import _post_upload_pdf
+from audit.etl import ETL
+from dissemination.models import (
+    FindingText,
+    Finding,
+    FederalAward,
+    CapText,
+    Note,
+    Revision,
+    Passthrough,
+    General,
+    SecondaryAuditor,
+    AdditionalUei,
+)
+
 
 logger = logging.getLogger(__name__)
 logging.basicConfig()
@@ -13,18 +39,10 @@ logging.getLogger().setLevel(logging.INFO)
 parser = argparse.ArgumentParser()
 
 # Peewee runs a really noisy DEBUG log.
-pw = logging.getLogger('peewee')
+pw = logging.getLogger("peewee")
 pw.addHandler(logging.StreamHandler())
 pw.setLevel(logging.INFO)
 
-from audit.fixtures.workbooks.workbook_creation import (
-    sections,
-    workbook_loader,
-    setup_sac,
-)
-
-
-from audit.fixtures.workbooks.sac_creation import _post_upload_pdf
 
 def step_through_certifications(sac, SAC):
     sac.transition_name.append(SAC.STATUS.SUBMITTED)
@@ -39,23 +57,9 @@ def step_through_certifications(sac, SAC):
     sac.transition_name.append(SAC.STATUS.CERTIFIED)
     sac.transition_date.append(datetime.date.today())
 
-from dissemination.models import (
-    FindingText,
-    Finding,
-    FederalAward,
-    CapText,
-    Note,
-    Revision,
-    Passthrough,
-    General,
-    SecondaryAuditor,
-    AdditionalUei
-)
 
-from audit.etl import ETL
-    
 def disseminate(sac):
-    print("TRANSFERRING DATA... HARDER BETTER FASTER STRONGER ...")
+    logger.info("Invoking movement of data from Intake to Dissemination")
     for model in [
         Note,
         FindingText,
@@ -66,7 +70,7 @@ def disseminate(sac):
         Passthrough,
         General,
         SecondaryAuditor,
-        AdditionalUei
+        AdditionalUei,
     ]:
         model.objects.filter(report_id=sac.report_id).delete()
 
@@ -74,14 +78,6 @@ def disseminate(sac):
         etl = ETL(sac)
         etl.load_all()
 
-from pprint import pprint
-from config import settings
-
-import os
-
-
-import jwt
-import requests
 
 def create_payload(api_url, role="api_fac_gov"):
     payload = {
@@ -91,19 +87,19 @@ def create_payload(api_url, role="api_fac_gov"):
     }
     return payload
 
+
 def call_api(api_url, endpoint, rid, field):
     # We must pass a properly signed JWT to access the API
     encoded_jwt = jwt.encode(
         create_payload(api_url), os.getenv("PGRST_JWT_SECRET"), algorithm="HS256"
     )
-    full_request = f'{api_url}/{endpoint}?report_id=eq.{rid}&select={field}'
+    full_request = f"{api_url}/{endpoint}?report_id=eq.{rid}&select={field}"
     response = requests.get(
         full_request, headers={"Authorization": f"Bearer {encoded_jwt}"}, timeout=10
     )
     return response
 
-import re
-import math
+
 def just_numbers(s):
     try:
         float(s)
@@ -111,17 +107,21 @@ def just_numbers(s):
     except ValueError:
         return False
 
+
 def are_they_both_none_or_empty(a, b):
     a_val = True if (a is None or a == "") else False
     b_val = True if (b is None or b == "") else False
     return a_val and b_val
+
 
 def check_equality(in_wb, in_json):
     # Type requirement is sometimes just 'N'
     if in_wb in ["Y", "N"] and isinstance(in_json, bool):
         return (True if in_wb == "Y" else False) == in_json
     elif just_numbers(in_wb) and just_numbers(in_json):
-        return True if math.isclose(float(in_wb), float(in_json),rel_tol=1e-1) else False 
+        return (
+            True if math.isclose(float(in_wb), float(in_json), rel_tol=1e-1) else False
+        )
     elif isinstance(in_wb, str) and isinstance(in_json, str):
         return in_wb.strip() == in_json.strip()
     elif in_wb is None or in_json is None:
@@ -129,17 +129,18 @@ def check_equality(in_wb, in_json):
     else:
         return in_wb == in_json
 
+
 def get_api_values(endpoint, rid, field):
     api_url = settings.POSTGREST.get("URL")
     res = call_api(api_url, endpoint, rid, field)
-    
+
     if res.status_code == 200:
         # print(f'{res.status_code} {res.url} {res.json()}')
         return list(map(lambda d: d[field], res.json()))
     else:
-        print(f'{res.status_code} {res.url}')
+        print(f"{res.status_code} {res.url}")
         return []
-            
+
 
 def count(d, key):
     if key in d:
@@ -147,45 +148,50 @@ def count(d, key):
     else:
         d[key] = 1
 
+
 def combine_counts(combined, d):
     for k in combined.keys():
         if k in d:
             combined[k] = combined[k] + d[k]
     return combined
 
+
 def api_check(json_test_tables):
-    combined_summary = {'endpoints': 0, 'correct_rows': 0, 'incorrect_rows': 0}
+    combined_summary = {"endpoints": 0, "correct_rows": 0, "incorrect_rows": 0}
     for endo in json_test_tables:
-        count(combined_summary, 'endpoints')
-        endpoint = endo['endpoint']
-        report_id = endo['report_id']
+        count(combined_summary, "endpoints")
+        endpoint = endo["endpoint"]
+        report_id = endo["report_id"]
         print(f"-------------------- {endpoint} --------------------")
         summary = {}
-        for row_ndx, row in enumerate(endo['rows']):
-            count(summary, 'total_rows')
+        for row_ndx, row in enumerate(endo["rows"]):
+            count(summary, "total_rows")
             equality_results = []
-            for field_ndx, f in enumerate(row['fields']):
+            for field_ndx, f in enumerate(row["fields"]):
                 api_values = get_api_values(endpoint, report_id, f)
                 # print(api_values)
                 this_api_value = api_values[row_ndx]
-                this_field_value = row['values'][field_ndx]
+                this_field_value = row["values"][field_ndx]
                 eq = check_equality(this_field_value, this_api_value)
                 if not eq:
-                    print(f'eq {eq} field {f} fval {this_field_value} == aval {this_api_value}')
+                    print(
+                        f"eq {eq} field {f} fval {this_field_value} == aval {this_api_value}"
+                    )
                     pprint(api_values)
                 equality_results.append(eq)
-                    
+
             if all(equality_results):
                 # print(f"------ YESYESYES")
-                count(summary, 'correct_rows')
+                count(summary, "correct_rows")
             else:
                 # print(f"------ NONONO")
-                count(summary, 'incorrect_rows')
+                count(summary, "incorrect_rows")
                 # print(equality_results)
                 sys.exit(-1)
         print(summary)
         combined_summary = combine_counts(combined_summary, summary)
     return combined_summary
+
 
 class Command(BaseCommand):
     def add_arguments(self, parser):
@@ -204,7 +210,7 @@ class Command(BaseCommand):
             dbkey=options["dbkey"], date=datetime.datetime.now()
         )
         sac = setup_sac(user, entity_id, options["dbkey"])
-        if sac.general_information['audit_type'] == "alternative-compliance-engagement":
+        if sac.general_information["audit_type"] == "alternative-compliance-engagement":
             print(f"Skipping ACE audit: {options['dbkey']}")
         else:
             loader = workbook_loader(user, sac, options["dbkey"], entity_id)
@@ -213,7 +219,7 @@ class Command(BaseCommand):
                 # FIXME: Can we conditionally upload the addl' and secondary workbooks?
                 (_, json, _) = loader(fun, section)
                 json_test_tables.append(json)
-            _post_upload_pdf(sac, user, 'audit/fixtures/basic.pdf')
+            _post_upload_pdf(sac, user, "audit/fixtures/basic.pdf")
             SingleAuditChecklist = apps.get_model("audit.SingleAuditChecklist")
             step_through_certifications(sac, SingleAuditChecklist)
             disseminate(sac)

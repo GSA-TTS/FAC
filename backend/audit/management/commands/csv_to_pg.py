@@ -7,30 +7,22 @@ import sqlalchemy
 from django.db import connection
 
 import csv
-parser = argparse.ArgumentParser()
-dtypes = defaultdict(lambda: str)
 
 from django.core.management.base import BaseCommand
-from django.conf import settings
+
+from django.core.files.storage import default_storage
+import io
 
 import logging
+
+parser = argparse.ArgumentParser()
+dtypes: defaultdict = defaultdict(lambda: str)
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.WARNING)
 loggers = [logging.getLogger(name) for name in logging.root.manager.loggerDict]
 for logger in loggers:
     logger.setLevel(logging.WARNING)
-
-from django.core.files.storage import default_storage
-import io
-
-# This assumes that the file
-#
-# allfac22.zip
-#
-# Is in the private S3 bucket at the location
-#
-# /fixture-data/allfac22.zip
 
 
 def make_tablename(filename):
@@ -53,16 +45,15 @@ class Command(BaseCommand):
 
         for txtfile in files:
             file = default_storage.open(f"{options['path']}/{txtfile}", "rb")
-            file_bytes = file.read()# .decode('utf-8', 'replace')
+            file_bytes = file.read()
             file.close()
-            df = pd.read_csv(io.BytesIO(file_bytes), #.encode('utf-8', 'skip')),
-                        delimiter="|", 
-                        dtype=dtypes,
-                        #low_memory=False,
-                        on_bad_lines='skip',
-                        engine='python', 
-                        quoting=csv.QUOTE_NONE,
-                        # lineterminator='\n',
-                        encoding='utf-8',
-                        )
+            df = pd.read_csv(
+                io.BytesIO(file_bytes),
+                delimiter="|",
+                dtype=dtypes,
+                on_bad_lines="skip",
+                engine="python",
+                quoting=csv.QUOTE_NONE,
+                encoding="utf-8",
+            )
             df.to_sql(name=make_tablename(txtfile), con=engine)

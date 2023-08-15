@@ -39,10 +39,13 @@ class FindingText(models.Model):
             foreign_key(("report_id", ) references General
         """
 
+
 class AdditionalUei(models.Model):
     """Additional UEIs for this audit."""
+
     report_id = models.TextField()
     additional_uei = models.TextField()
+
 
 class Finding(models.Model):
     """A finding from the audit. References FederalAward and FindingText"""
@@ -813,8 +816,8 @@ class SecondaryAuditor(models.Model):
     class Meta:
         # unique_together = (("report_id", "auditor_seq_number"),)
         """
-            SecondaryAuditor
-            Secindary and additional auditors
-            foreign_key(("report_id", ) references General
+        SecondaryAuditor
+        Secindary and additional auditors
+        foreign_key(("report_id", ) references General
 
-       """
+        """

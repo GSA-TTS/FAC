@@ -3,10 +3,12 @@ from playhouse.shortcuts import model_to_dict
 import os
 
 import logging
-logger = logging.getLogger(__name__)
+
 from config import settings
 import re
 import json
+
+logger = logging.getLogger(__name__)
 
 # This provides a way to map the sheet in the workbook to the
 # column in the DB. It also has a default value and
@@ -33,9 +35,11 @@ for k, v in templates_raw.items():
 
 def test_pfix(n):
     def _test(o):
-       #return ' '.join(["TEST" for x in range(n)]) + " " + str(o)
+        # return ' '.join(["TEST" for x in range(n)]) + " " + str(o)
         return o
+
     return _test
+
 
 def set_single_cell_range(wb, range_name, value):
     the_range = wb.defined_names[range_name]
@@ -148,7 +152,9 @@ def generate_dissemination_test_table(Gen, api_endpoint, dbkey, mappings, object
 
 
 def extract_metadata(sheet_json, range):
-    excel_defn = open(f"{settings.BASE_DIR}/schemas/output/excel/json/{sheet_json}.json")
+    excel_defn = open(
+        f"{settings.BASE_DIR}/schemas/output/excel/json/{sheet_json}.json"
+    )
     excel_defn_json = json.load(excel_defn)
     result = None
     for sheet in excel_defn_json["sheets"]:
@@ -159,10 +165,11 @@ def extract_metadata(sheet_json, range):
                     result = scell["formula"]
     return result
 
+
 def insert_version_and_sheet_name(wb, sheet_json):
     ver_cell = extract_metadata(sheet_json, "version")
-    ver_re = re.search("\"(.*?)\"", ver_cell)[1]
+    ver_re = re.search('"(.*?)"', ver_cell)[1]
     wb_name_cell = extract_metadata(sheet_json, "section_name")
-    wb_name_re = re.search("\"(.*?)\"", wb_name_cell)[1]
+    wb_name_re = re.search('"(.*?)"', wb_name_cell)[1]
     set_single_cell_range(wb, "version", ver_re)
     set_single_cell_range(wb, "section_name", wb_name_re)

@@ -1,5 +1,9 @@
-from peewee import *
-from playhouse.postgres_ext import *
+from peewee import (
+    Model,
+    TextField,
+    BigIntegerField,
+)
+from playhouse.postgres_ext import PostgresqlDatabase
 
 # FIXME: pull this from the config
 database = PostgresqlDatabase("postgres", **{"host": "db", "user": "postgres"})

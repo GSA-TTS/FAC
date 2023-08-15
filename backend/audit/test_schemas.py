@@ -810,7 +810,7 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
         self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
         # Test for successful validation when state_cluster_name is empty or null
-        for valid in ["", 'null']:
+        for valid in ["", "null"]:
             simple_case = jsoncopy(self.SIMPLE_CASES[0])
             simple_case["FederalAwards"]["federal_awards"][0]["cluster"][
                 "state_cluster_name"

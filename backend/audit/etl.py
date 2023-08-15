@@ -1,6 +1,5 @@
 import logging
 from datetime import datetime
-from pprint import pprint
 
 from dissemination.models import (
     FindingText,
@@ -12,7 +11,7 @@ from dissemination.models import (
     Passthrough,
     General,
     SecondaryAuditor,
-    AdditionalUei
+    AdditionalUei,
 )
 from audit.models import SingleAuditChecklist
 
@@ -84,6 +83,7 @@ class ETL(object):
         #         "material_weakness": "N",
         #         "significant_deficiency": "Y"
         #     },
+
     def load_findings(self):
         findings_uniform_guidance = (
             self.single_audit_checklist.findings_uniform_guidance
@@ -98,7 +98,7 @@ class ETL(object):
 
             for entry in findings_uniform_guidance_entries:
                 findings = entry["findings"]
-                program = entry['program']
+                program = entry["program"]
                 finding = Finding(
                     award_reference=program["award_reference"],
                     report_id=self.report_id,
@@ -108,7 +108,9 @@ class ETL(object):
                     is_modified_opinion=entry["modified_opinion"] == "Y",
                     is_other_findings=entry["other_findings"] == "Y",
                     is_other_non_compliance=entry["other_matters"] == "Y",
-                    prior_finding_ref_numbers=None if 'prior_references' not in findings else findings["prior_references"],
+                    prior_finding_ref_numbers=None
+                    if "prior_references" not in findings
+                    else findings["prior_references"],
                     is_questioned_costs=entry["questioned_costs"] == "Y",
                     is_repeat_finding=(findings["repeat_prior_reference"] == "Y"),
                     is_significant_deficiency=(entry["significant_deficiency"] == "Y"),
@@ -289,7 +291,7 @@ class ETL(object):
             auditee_state=general_information["auditee_state"],
             auditee_ein=general_information["ein"],
             auditee_uei=general_information["auditee_uei"],
-            additional_ueis = self.single_audit_checklist.additional_ueis == "Y",
+            additional_ueis=self.single_audit_checklist.additional_ueis == "Y",
             # auditee_addl_uei_list=auditee_addl_uei_list,
             auditee_zip=general_information["auditee_zip"],
             auditor_phone=general_information["auditor_phone"],
@@ -329,7 +331,9 @@ class ETL(object):
             audit_year=self.audit_year,
             audit_type=general_information["audit_type"],
             entity_type=general_information["user_provided_organization_type"],
-            number_months= 0 if not "audit_period_other_months" in general_information else general_information["audit_period_other_months"],
+            number_months=0
+            if "audit_period_other_months" not in general_information
+            else general_information["audit_period_other_months"],
             audit_period_covered=general_information["audit_period_covered"],
             total_amount_expended=None,  # loaded from FederalAward
             type_audit_code="UG",
@@ -343,7 +347,8 @@ class ETL(object):
         # MCJ This might be empty
         if "secondary_auditors_entries" in secondary_auditors["SecondaryAuditors"]:
             for secondary_auditor in secondary_auditors["SecondaryAuditors"][
-                "secondary_auditors_entries"]:
+                "secondary_auditors_entries"
+            ]:
                 sec_auditor = SecondaryAuditor(
                     report_id=self.single_audit_checklist.report_id,
                     auditor_ein=secondary_auditor["secondary_auditor_ein"],
@@ -366,10 +371,10 @@ class ETL(object):
     def load_additional_uei(self):
         addls = self.single_audit_checklist.additional_ueis
         if "additional_ueis_entries" in addls["AdditionalUEIs"]:
-            for uei in addls["AdditionalUEIs"]['additional_ueis_entries']:
+            for uei in addls["AdditionalUEIs"]["additional_ueis_entries"]:
                 auei = AdditionalUei(
-                    report_id = self.single_audit_checklist.report_id,
-                    additional_uei = uei['additional_uei']
+                    report_id=self.single_audit_checklist.report_id,
+                    additional_uei=uei["additional_uei"],
                 )
                 auei.save()
 

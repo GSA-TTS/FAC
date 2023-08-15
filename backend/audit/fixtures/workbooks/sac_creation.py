@@ -8,7 +8,7 @@ import logging
 from pathlib import Path
 
 from django.apps import apps
-# from django.conf import settings
+
 from django.core.files.uploadedfile import SimpleUploadedFile
 
 from audit.excel import (
@@ -23,18 +23,17 @@ from audit.excel import (
 import audit.validators
 
 from audit.fixtures.excel import FORM_SECTIONS
-# from users.models import User
-
-logger = logging.getLogger(__name__)
 
 from audit.fixtures.workbooks.excel_creation import dbkey_to_test_report_id
-from audit.fixtures.census_models.ay22 import CensusGen22 as Gen
 
 from audit.fixtures.census_models.ay22 import (
     CensusGen22 as Gen,
     CensusCfda22 as Cfda,
-    CensusFindings22 as Finding
+    CensusFindings22 as Finding,
 )
+
+logger = logging.getLogger(__name__)
+
 
 def get_field_by_section(sac, section):
     if section == FORM_SECTIONS.FEDERAL_AWARDS_EXPENDED:
@@ -74,37 +73,54 @@ validator_mapping = {
     "PDF": audit.validators.validate_single_audit_report_file,
 }
 
+
 def _census_date_to_datetime(cd):
     lookup = {
-        "JAN": 1, "FEB": 2, "MAR": 3, "APR": 4, "MAY": 5,
-        "JUN": 6, "JUL": 7, "AUG": 8, "SEP": 9, "OCT": 10, 
-        "NOV": 11, "DEC": 12
+        "JAN": 1,
+        "FEB": 2,
+        "MAR": 3,
+        "APR": 4,
+        "MAY": 5,
+        "JUN": 6,
+        "JUL": 7,
+        "AUG": 8,
+        "SEP": 9,
+        "OCT": 10,
+        "NOV": 11,
+        "DEC": 12,
     }
     year = int(cd.split("-")[2])
     month = lookup[cd.split("-")[1]]
     day = int(cd.split("-")[0])
-    return date(year+2000, month, day)
+    return date(year + 2000, month, day)
+
 
 def _period_covered(s):
     return {"A": "annual", "B": "biennial", "O": "other"}[s]
 
+
 def _census_audit_type(s):
-    return {"S": "single-audit",
-            "P": "program-specific",
-            "A": "alternative-compliance-engagement"}[s]
+    return {
+        "S": "single-audit",
+        "P": "program-specific",
+        "A": "alternative-compliance-engagement",
+    }[s]
+
 
 def _fake_general_information(dbkey, auditee_name=None):
     """Create a fake general_information object."""
     # TODO: can we generate this object from the schema definition in
     # schemas/output/GeneralInformation.schema.json?
-    gobj: Gen = Gen.select().where(Gen.dbkey==dbkey).first()
-    auditee_fiscal_period_end = _census_date_to_datetime(gobj.fyenddate).strftime("%Y-%m-%d")
-    auditee_fiscal_period_start = (_census_date_to_datetime(gobj.fyenddate) - timedelta(days=365)).strftime(
-            "%Y-%m-%d"
-        )
+    gobj: Gen = Gen.select().where(Gen.dbkey == dbkey).first()
+    auditee_fiscal_period_end = _census_date_to_datetime(gobj.fyenddate).strftime(
+        "%Y-%m-%d"
+    )
+    auditee_fiscal_period_start = (
+        _census_date_to_datetime(gobj.fyenddate) - timedelta(days=365)
+    ).strftime("%Y-%m-%d")
     general_information = {
         "auditee_fiscal_period_start": auditee_fiscal_period_start,
-        "auditee_fiscal_period_end":  auditee_fiscal_period_end,
+        "auditee_fiscal_period_end": auditee_fiscal_period_end,
         "audit_period_covered": _period_covered(gobj.periodcovered),
         "audit_type": _census_audit_type(gobj.audittype),
         "auditee_address_line_1": gobj.street1,
@@ -151,15 +167,15 @@ def _fake_general_information(dbkey, auditee_name=None):
 
 # TODO: Pull this from actual information.
 def _fake_audit_information(dbkey, auditee_name=None):
-    gobj: Gen = Gen.select().where(Gen.dbkey==dbkey).first()
-    cfdas = Cfda.select().where(Cfda.dbkey==dbkey)
+    gobj: Gen = Gen.select().where(Gen.dbkey == dbkey).first()
+    cfdas = Cfda.select().where(Cfda.dbkey == dbkey)
 
     agencies = {}
     cfda: Cfda
     for cfda in cfdas:
         agencies[int((cfda.cfda).split(".")[0])] = 1
 
-    findings = Finding.select().where(Finding.dbkey==dbkey)
+    findings = Finding.select().where(Finding.dbkey == dbkey)
     finding: Finding
     gaap_results = {}
     # THIS IS NOT A GOOD WAY TO DO THIS, BUT IT IS CLOSE.
@@ -171,35 +187,47 @@ def _fake_audit_information(dbkey, auditee_name=None):
             gaap_results["adverse_opinion"] = 1
         if finding.significantdeficiency == "Y":
             gaap_results["disclaimer_of_opinion"] = 1
-        
 
     audit_information = {
-        "agencies": list(map(lambda i: str(i) if len(str(i)) > 1 else f'0{str(i)}', agencies.keys())),
+        "agencies": list(
+            map(lambda i: str(i) if len(str(i)) > 1 else f"0{str(i)}", agencies.keys())
+        ),
         "dollar_threshold": 750000,
         "gaap_results": list(gaap_results.keys()),
-        "is_aicpa_audit_guide_included": True if gobj.reportablecondition == "Y" else False,
+        "is_aicpa_audit_guide_included": True
+        if gobj.reportablecondition == "Y"
+        else False,
         "is_going_concern_included": True if gobj.goingconcern == "Y" else False,
-        "is_internal_control_deficiency_disclosed": True if gobj.materialweakness == "Y" else False,
-        "is_internal_control_material_weakness_disclosed": True if gobj.materialweakness_mp == "Y" else False,
+        "is_internal_control_deficiency_disclosed": True
+        if gobj.materialweakness == "Y"
+        else False,
+        "is_internal_control_material_weakness_disclosed": True
+        if gobj.materialweakness_mp == "Y"
+        else False,
         "is_low_risk_auditee": False,
-        "is_material_noncompliance_disclosed": True if gobj.materialnoncompliance == "Y" else False,
+        "is_material_noncompliance_disclosed": True
+        if gobj.materialnoncompliance == "Y"
+        else False,
     }
 
     audit.validators.validate_audit_information_json(audit_information)
 
     return audit_information
 
+
 def _create_test_sac(user, auditee_name, dbkey):
     """Create a single example SAC."""
     SingleAuditChecklist = apps.get_model("audit.SingleAuditChecklist")
 
     try:
-        exists = SingleAuditChecklist.objects.get(report_id=dbkey_to_test_report_id(Gen, dbkey))
+        exists = SingleAuditChecklist.objects.get(
+            report_id=dbkey_to_test_report_id(Gen, dbkey)
+        )
     except SingleAuditChecklist.DoesNotExist:
         exists = None
     if exists:
         exists.delete()
-        
+
     sac = SingleAuditChecklist.objects.create(
         submitted_by=user,
         general_information=_fake_general_information(dbkey, auditee_name),
@@ -234,11 +262,13 @@ def _create_test_sac(user, auditee_name, dbkey):
     logger.info("Created single audit checklist %s", sac)
     return sac
 
+
 def _make_excel_file(filename, f_obj):
     content = f_obj.read()
     f_obj.seek(0)
     file = SimpleUploadedFile(filename, content, "application/vnd.ms-excel")
     return file
+
 
 def _post_upload_pdf(this_sac, this_user, pdf_filename):
     """Upload a workbook for this SAC.
@@ -282,6 +312,7 @@ def _post_upload_pdf(this_sac, this_user, pdf_filename):
 
     this_sac.save()
 
+
 def _post_upload_workbook(this_sac, this_user, section, xlsx_file):
     """Upload a workbook for this SAC.
 
@@ -310,7 +341,7 @@ def _post_upload_workbook(this_sac, this_user, section, xlsx_file):
 
     audit_data = extract_mapping[section](excel_file.file)
     validator_mapping[section](audit_data)
-    
+
     if section == FORM_SECTIONS.FEDERAL_AWARDS_EXPENDED:
         this_sac.federal_awards = audit_data
     elif section == FORM_SECTIONS.FINDINGS_UNIFORM_GUIDANCE:

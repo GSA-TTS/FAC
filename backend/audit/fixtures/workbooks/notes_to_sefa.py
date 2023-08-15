@@ -6,16 +6,14 @@ from audit.fixtures.workbooks.excel_creation import (
     set_single_cell_range,
     map_simple_columns,
     generate_dissemination_test_table,
-    test_pfix
+    test_pfix,
 )
 
 from audit.fixtures.census_models.ay22 import (
     CensusGen22 as Gen,
     CensusNotes22 as Notes,
 )
-from audit.fixtures.workbooks.excel_creation import (
-    insert_version_and_sheet_name
-)
+from audit.fixtures.workbooks.excel_creation import insert_version_and_sheet_name
 import openpyxl as pyxl
 import re
 
@@ -25,11 +23,10 @@ logger = logging.getLogger(__name__)
 
 mappings = [
     FieldMap("note_title", "title", WorkbookFieldInDissem, None, test_pfix(3)),
-    FieldMap("note_content", "content", 'content', None, test_pfix(3)),
-    FieldMap("seq_number", "seq_number", "note_seq_number", 0, int)
+    FieldMap("note_content", "content", "content", None, test_pfix(3)),
+    FieldMap("seq_number", "seq_number", "note_seq_number", 0, int),
 ]
 
-from pprint import pprint
 
 def generate_notes_to_sefa(dbkey, outfile):
     logger.info(f"--- generate notes to sefa {dbkey}---")
@@ -82,9 +79,7 @@ def generate_notes_to_sefa(dbkey, outfile):
     map_simple_columns(wb, mappings, notes)
     wb.save(outfile)
 
-    table = generate_dissemination_test_table(
-        Gen, "note", dbkey, mappings, notes
-    )
+    table = generate_dissemination_test_table(Gen, "note", dbkey, mappings, notes)
 
     table["singletons"]["accounting_policies"] = policies.content
     table["singletons"]["is_minimis_rate_used"] = is_used
