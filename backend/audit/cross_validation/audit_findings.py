@@ -1,4 +1,4 @@
-def audit_findings(sac_dict):
+def audit_findings(sac_dict, *_args, **_kwargs):
     """
     Checks that the number of audit findings in the Federal Awards and Audit Findings
     sections are consistent.

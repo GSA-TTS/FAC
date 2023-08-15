@@ -35,9 +35,9 @@ from .fixtures.single_audit_checklist import (
     fake_auditor_certification,
     fake_auditee_certification,
 )
-from .models import Access, SingleAuditChecklist
+from .models import Access, SingleAuditChecklist, SingleAuditReportFile
 from .views import MySubmissions, submission_progress_check
-from .cross_validation.sac_validation_shape import snake_to_camel
+from .cross_validation.sac_validation_shape import sac_validation_shape, snake_to_camel
 
 User = get_user_model()
 
@@ -194,8 +194,26 @@ class SubmissionStatusTests(TestCase):
         self.assertEqual(data[0]["submission_status"], "in_progress")
         report_id = data[0]["report_id"]
 
+        filename = "general-information--test0001test--simple-pass.json"
+        info = _load_json(AUDIT_JSON_FIXTURES / filename)
+        # Update the SAC so that it will pass overall validation:
+        sac = SingleAuditChecklist.objects.get(report_id=report_id)
+        sac.general_information = info
+        sac.audit_information = {"stuff": "whatever"}
+        sac.federal_awards = {"FederalAwards": {"federal_awards": []}}
+        sac.corrective_action_plan = {
+            "CorrectiveActionPlan": {"auditee_uei": "TEST0001TEST"}
+        }
+        sac.findings_text = {"FindingsText": {"auditee_uei": "TEST0001TEST"}}
+        sac.findings_uniform_guidance = {
+            "FindingsUniformGuidance": {"auditee_uei": "TEST0001TEST"}
+        }
+        baker.make(SingleAuditReportFile, sac=sac)
+        sac.save()
+
         self.client.post(f"/audit/ready-for-certification/{report_id}", data={})
         data = MySubmissions.fetch_my_submissions(self.user)
+
         self.assertEqual(data[0]["submission_status"], "ready_for_certification")
 
     def test_auditor_certification(self):
@@ -1040,7 +1058,8 @@ class SubmissionProgressViewTests(TestCase):
         filename = "general-information--test0001test--simple-pass.json"
         info = _load_json(AUDIT_JSON_FIXTURES / filename)
         sac = baker.make(SingleAuditChecklist, general_information=info)
-        result = submission_progress_check(sac, None)
+        shaped_sac = sac_validation_shape(sac)
+        result = submission_progress_check(shaped_sac, sar=None, crossval=False)
         self.assertEqual(result["general_information"]["display"], "complete")
         self.assertTrue(result["general_information"]["completed"])
         conditional_keys = (
@@ -1080,7 +1099,8 @@ class SubmissionProgressViewTests(TestCase):
             addl_sections[section_name] = {camel_name: "whatever"}
         addl_sections["general_information"] = info
         sac = baker.make(SingleAuditChecklist, **addl_sections)
-        result = submission_progress_check(sac, None)
+        shaped_sac = sac_validation_shape(sac)
+        result = submission_progress_check(shaped_sac, sar=None, crossval=False)
         self.assertEqual(result["general_information"]["display"], "complete")
         self.assertTrue(result["general_information"]["completed"])
         conditional_keys = (
