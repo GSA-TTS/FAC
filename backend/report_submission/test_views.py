@@ -1,10 +1,10 @@
-import json
 from datetime import datetime
 
 from django.contrib.auth.models import User
 from django.http import HttpResponseRedirect
 from django.test import TestCase
 from django.urls import reverse
+from unittest.mock import patch
 from model_bakery import baker
 
 from audit.models import Access, SingleAuditChecklist
@@ -144,10 +144,15 @@ class TestPreliminaryViews(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, "/report_submission/eligibility/")
 
-    def test_end_to_end_submission_pass(self):
+    @patch("report_submission.forms.get_uei_info_from_sam_gov")
+    def test_end_to_end_submission_pass(self, mock_get_uei_info):
         """
         Go through all three and verify that we end up with a SAC.
         """
+        mock_get_uei_info.return_value = {
+            "valid": True,
+        }
+
         user = baker.make(User)
         self.client.force_login(user)
         step1 = reverse("report_submission:eligibility")
@@ -214,12 +219,17 @@ class TestPreliminaryViews(TestCase):
             matches = [acc for acc in accesses if acc.email == val]
             self.assertEqual(matches[0].role, key)
 
-    def test_step_two_auditeeinfo_submission_fail(self):
+    @patch("report_submission.forms.get_uei_info_from_sam_gov")
+    def test_step_two_auditeeinfo_submission_empty(self, mock_get_uei_info):
         """
         /report_submissions/auditeeinfo
         Check that the correct templates are loaded on GET.
         Check that the POST fails with an empty data payload
         """
+        mock_get_uei_info.return_value = {
+            "valid": True,
+        }
+
         user = baker.make(User)
         self.client.force_login(user)
         url = reverse("report_submission:auditeeinfo")
@@ -232,7 +242,8 @@ class TestPreliminaryViews(TestCase):
 
         data = {}
         response = self.client.post(
-            url, data=json.dumps(data), content_type="application/json"
+            url,
+            data=data,
         )
         self.assertEqual(response.status_code, 200)
         self.assertListEqual(
@@ -245,6 +256,40 @@ class TestPreliminaryViews(TestCase):
         self.assertListEqual(
             response.context["form"].errors["auditee_fiscal_period_end"],
             ["This field is required."],
+        )
+
+    @patch("report_submission.forms.get_uei_info_from_sam_gov")
+    def test_step_two_auditeeinfo_invalid_dates(self, mock_get_uei_info):
+        """
+        Check that the server validates that start date preceeds end date
+        """
+        mock_get_uei_info.return_value = {"valid": True}
+
+        user = baker.make(User)
+        self.client.force_login(user)
+        url = reverse("report_submission:auditeeinfo")
+
+        get_response = self.client.get(url)
+        self.assertTrue(user.is_authenticated)
+        self.assertEqual(get_response.status_code, 200)
+        self.assertTemplateUsed(get_response, "report_submission/step-base.html")
+        self.assertTemplateUsed(get_response, "report_submission/step-2.html")
+
+        data = {
+            "auditee_uei": "ZQGGHJH74DW7",
+            "auditee_fiscal_period_start": "2023-08-31",
+            "auditee_fiscal_period_end": "2023-08-01",
+        }
+        response = self.client.post(url, data=data)
+
+        self.assertEqual(response.status_code, 200)
+
+        errors = response.context["form"].non_field_errors()
+        self.assertListEqual(
+            errors,
+            [
+                "Auditee fiscal period end date must be later than auditee fiscal period start date"
+            ],
         )
 
     def test_step_three_accessandsubmission_submission_fail(self):
