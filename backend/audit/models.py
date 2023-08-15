@@ -27,7 +27,6 @@ from .validators import (
     validate_notes_to_sefa_json,
     validate_single_audit_report_file,
     validate_audit_information_json,
-    validate_component_page_numbers,
 )
 
 User = get_user_model()
@@ -551,9 +550,6 @@ class SingleAuditReportFile(models.Model):
     sac = models.ForeignKey(SingleAuditChecklist, on_delete=models.CASCADE)
     user = models.ForeignKey(User, blank=True, null=True, on_delete=models.SET_NULL)
     date_created = models.DateTimeField(auto_now_add=True)
-    component_page_numbers = models.JSONField(
-        blank=True, null=True, validators=[validate_component_page_numbers]
-    )
 
     def save(self, *args, **kwargs):
         report_id = SingleAuditChecklist.objects.get(id=self.sac.id).report_id
@@ -561,3 +557,26 @@ class SingleAuditReportFile(models.Model):
         if self.sac.submission_status != self.sac.STATUS.IN_PROGRESS:
             raise LateChangeError("Attempted PDF upload")
         super().save(*args, **kwargs)
+
+
+class CognizantBaseline(models.Model):
+    dbkey = models.IntegerField(
+        "Identifier for a submission along with audit_year in C-FAC",
+        null=True,
+    )
+    audit_year = models.IntegerField(
+        "Audit year from fy_start_date",
+        null=True,
+    )
+    ein = models.CharField(
+        "Primary Employer Identification Number",
+        null=True,
+        max_length=30,
+    )
+    cognizant_agency = models.CharField(
+        "Two digit Federal agency prefix of the cognizant agency",
+        max_length=2,
+        null=True,
+    )
+    class Meta:
+        unique_together = (("dbkey","audit_year"),)

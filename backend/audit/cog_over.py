@@ -1,9 +1,43 @@
+#############################################################
+# cog_over_assignment
+#   Input - federal_awards_data - federal awards json object
+#   Returns - cog_agency_prefix, over_agency_prefix - Agency prefix integer
+#
+# Algorithm:
+# Use all "federal_awards" to do calculations required to
+#   determine cognizant / oversight agency assignment
+
+# Calculate total amount_expended (tot_amount_expended)
+# Calculate total amount_expended by agency
+#   tot_amount_agency = {agency, tot_amt}
+# Calculate total direct award amount_expended by agency
+#   tot_da_amount_agency = {agency, tot_da_amt}
+# Calculate total direct award amount_expended (tot_da_amount_expended)
+#
+# If tot_amount_expended > $ 50,000,000, find cog agency
+#   Pull 2019 data from DB
+#       If 2019 data exists, use this for all calculations
+#           data_to_use = 2019 data
+#           Do all the above calculations with data_to_use
+#       else use current data
+#           data_to_use = current data
+#       if tot_da_amount_expended >= 25% tot_amount_expended
+#           cog_agency_prefix = agency with max tot_da_amt in tot_da_amount_agency
+#       else
+#           cog_agency_prefix = agency with max tot_amt in tot_amount_agency
+# else, find over agency
+#       if tot_da_amount_expended >= 25% tot_amount_expended
+#           over_agency_prefix = agency with max tot_da_amt in tot_da_amount_agency
+#       else
+#           over_agency_prefix = agency with max tot_amt in tot_amount_agency
+#############################################################
+
 from collections import defaultdict
 from .models import SingleAuditChecklist, CognizantBaseline
 from census2019.models import Cfda19, Gen19
 
 COG_LIMIT = 50_000_000
-DA_THRESHOLD_FACTOR = 0.0
+DA_THRESHOLD_FACTOR = 0.25
 
 
 def cog_over(sac: SingleAuditChecklist):
@@ -66,8 +100,9 @@ def determine_2019_agency(ein):
 def set_2019_baseline():
     gens = Gen19.objects.filter(aufityear=2019, amount__ge=COG_LIMIT)
     for gen in gens:
+        dbkey = gen.dbkey
         ein = gen.ein
-        total_amount_expended = gen.amount
+        total_amount_expended = gen.totfedexpend
         cfdas = Cfda19.objects.filter(aufityear=2019, dbkey=gen.dbkey)
         (total_da_amount_expended, max_total_agency, max_da_agency) = calc_cfda_amounts(
             cfdas
@@ -79,7 +114,7 @@ def set_2019_baseline():
             max_da_agency,
         )
         CognizantBaseline(
-            audit_year=2019, ein=ein, cognizant_agency=cognizant_agency
+            dbkey, audit_year=2019, ein=ein, cognizant_agency=cognizant_agency
         ).save()
 
 
