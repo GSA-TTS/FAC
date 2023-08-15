@@ -317,7 +317,9 @@ class ETL(object):
             audit_type=general_information["audit_type"],
             entity_type=general_information["user_provided_organization_type"],
             number_months=int(general_information["audit_period_other_months"])
-            if (("audit_period_other_months" in general_information) and general_information["audit_period_other_months"] != "") else None,
+            if (("audit_period_other_months" in general_information) 
+                and (general_information["audit_period_other_months"] != "" 
+                     or general_information["audit_period_other_months"] is None)) else None,
             audit_period_covered=general_information["audit_period_covered"],
             total_amount_expended=None,  # loaded from FederalAward
             type_audit_code="UG",
