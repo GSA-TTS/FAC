@@ -262,6 +262,13 @@ class ETL(object):
         general_information = self.single_audit_checklist.general_information
         dates_by_status = self._get_dates_from_sac()
         # sac_additional_ueis = self.single_audit_checklist.additional_ueis
+        
+        num_months = None
+        if (("audit_period_other_months" in general_information) 
+            and general_information["audit_period_other_months"] != ""
+            and general_information["audit_period_other_months"] is not None):
+            num_months = int(general_information["audit_period_other_months"])
+
         general = General(
             report_id=self.report_id,
             auditee_certify_name=None,  # TODO: Where does this come from?
@@ -316,10 +323,7 @@ class ETL(object):
             audit_year=self.audit_year,
             audit_type=general_information["audit_type"],
             entity_type=general_information["user_provided_organization_type"],
-            number_months=int(general_information["audit_period_other_months"])
-            if (("audit_period_other_months" in general_information) 
-                and (general_information["audit_period_other_months"] != "" 
-                     or general_information["audit_period_other_months"] is None)) else None,
+            number_months=num_months,
             audit_period_covered=general_information["audit_period_covered"],
             total_amount_expended=None,  # loaded from FederalAward
             type_audit_code="UG",
