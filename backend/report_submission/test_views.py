@@ -218,7 +218,7 @@ class TestPreliminaryViews(TestCase):
         """
         /report_submissions/auditeeinfo
         Check that the correct templates are loaded on GET.
-        Check that the POST succeeds with appropriate data.
+        Check that the POST fails with an empty data payload
         """
         user = baker.make(User)
         self.client.force_login(user)
@@ -234,8 +234,10 @@ class TestPreliminaryViews(TestCase):
         response = self.client.post(
             url, data=json.dumps(data), content_type="application/json"
         )
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.url, "/report_submission/auditeeinfo/")
+        self.assertEqual(response.status_code, 200)
+        self.assertListEqual(response.context["form"].errors["auditee_uei"], ["This field is required."])
+        self.assertListEqual(response.context["form"].errors["auditee_fiscal_period_start"], ["This field is required."])
+        self.assertListEqual(response.context["form"].errors["auditee_fiscal_period_end"], ["This field is required."])
 
     def test_step_three_accessandsubmission_submission_fail(self):
         """

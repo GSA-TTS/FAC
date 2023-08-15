@@ -10,20 +10,21 @@ def validate_uei(value):
 
 
 class AuditeeInfoForm(forms.Form):
-    auditee_uei = forms.CharField(validators=[validate_uei])
-    auditee_fiscal_period_start = forms.DateField()
-    auditee_fiscal_period_end = forms.DateField()
+    auditee_uei = forms.CharField(required=True, validators=[validate_uei])
+    auditee_fiscal_period_start = forms.DateField(required=True)
+    auditee_fiscal_period_end = forms.DateField(required=True)
 
     def clean(self):
-        cleaned_data = super().clean()
+        if self.is_valid():
+            cleaned_data = super().clean()
 
-        auditee_fiscal_period_start = cleaned_data["auditee_fiscal_period_start"]
-        auditee_fiscal_period_end = cleaned_data["auditee_fiscal_period_end"]
+            auditee_fiscal_period_start = cleaned_data["auditee_fiscal_period_start"]
+            auditee_fiscal_period_end = cleaned_data["auditee_fiscal_period_end"]
 
-        if auditee_fiscal_period_start >= auditee_fiscal_period_end:
-            raise forms.ValidationError(
-                "Auditee fiscal period end date must be later than auditee fiscal period start date"
-            )
+            if auditee_fiscal_period_start >= auditee_fiscal_period_end:
+                raise forms.ValidationError(
+                    "Auditee fiscal period end date must be later than auditee fiscal period start date"
+                )
 
 
 # The general information fields are currently specified in two places:
