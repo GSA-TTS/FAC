@@ -31,3 +31,4 @@
       'Enter the full text of the note. Do not include charts, tables, or footnotes.',
     ],
   }
+}
