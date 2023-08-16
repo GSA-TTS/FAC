@@ -30,6 +30,7 @@ from .validators import (
     validate_auditee_certification_json,
     validate_tribal_data_consent_json,
     validate_audit_information_json,
+    validate_component_page_numbers,
 )
 
 User = get_user_model()
@@ -595,6 +596,9 @@ class SingleAuditReportFile(models.Model):
     sac = models.ForeignKey(SingleAuditChecklist, on_delete=models.CASCADE)
     user = models.ForeignKey(User, blank=True, null=True, on_delete=models.SET_NULL)
     date_created = models.DateTimeField(auto_now_add=True)
+    component_page_numbers = models.JSONField(
+        blank=True, null=True, validators=[validate_component_page_numbers]
+    )
 
     def save(self, *args, **kwargs):
         report_id = SingleAuditChecklist.objects.get(id=self.sac.id).report_id
