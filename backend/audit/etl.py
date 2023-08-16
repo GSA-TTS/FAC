@@ -83,7 +83,6 @@ class ETL(object):
             finding = Finding(
                 award_reference=program["award_reference"],
                 report_id=self.report_id,
-                # finding_seq_number=entry["seq_number"],
                 finding_ref_number=findings["reference_number"],
                 is_material_weakness=entry["material_weakness"] == "Y",
                 is_modified_opinion=entry["modified_opinion"] == "Y",
