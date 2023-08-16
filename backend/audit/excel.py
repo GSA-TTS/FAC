@@ -7,6 +7,7 @@ from openpyxl import load_workbook, Workbook
 from openpyxl.cell import Cell
 from audit.fixtures.excel import (
     ADDITIONAL_UEIS_TEMPLATE_DEFINITION,
+    ADDITIONAL_EINS_TEMPLATE_DEFINITION,
     CORRECTIVE_ACTION_TEMPLATE_DEFINITION,
     FEDERAL_AWARDS_TEMPLATE_DEFINITION,
     FINDINGS_TEXT_TEMPLATE_DEFINITION,
@@ -94,6 +95,9 @@ notes_to_sefa_field_mapping: FieldMapping = {
     "accounting_policies": ("NotesToSefa.accounting_policies", _set_by_path),
     "is_minimis_rate_used": ("NotesToSefa.is_minimis_rate_used", _set_by_path),
     "rate_explained": ("NotesToSefa.rate_explained", _set_by_path),
+}
+additional_eins_field_mapping: FieldMapping = {
+    "auditee_uei": ("AdditionalEINs.auditee_uei", _set_by_path),
 }
 
 federal_awards_column_mapping: ColumnMapping = {
@@ -302,7 +306,13 @@ additional_ueis_column_mapping: ColumnMapping = {
         _set_by_path,
     ),
 }
-
+additional_eins_column_mapping: ColumnMapping = {
+    "additional_ein": (
+        "AdditionalEINs.additional_eins_entries",
+        "additional_ein",
+        _set_by_path,
+    ),
+}
 secondary_auditors_column_mapping: ColumnMapping = {
     "secondary_auditor_name": (
         "SecondaryAuditors.secondary_auditors_entries",
@@ -584,6 +594,21 @@ def extract_additional_ueis(file):
     return _extract_data(file, params)
 
 
+def extract_additional_eins(file):
+    template_definition_path = (
+        XLSX_TEMPLATE_DEFINITION_DIR / ADDITIONAL_EINS_TEMPLATE_DEFINITION
+    )
+    template = json.loads(template_definition_path.read_text(encoding="utf-8"))
+    params = ExtractDataParams(
+        additional_eins_field_mapping,
+        additional_eins_column_mapping,
+        meta_mapping,
+        FORM_SECTIONS.ADDITIONAL_EINS,
+        template["title_row"],
+    )
+    return _extract_data(file, params)
+
+
 def extract_secondary_auditors(file):
     template_definition_path = (
         XLSX_TEMPLATE_DEFINITION_DIR / SECONDARY_AUDITORS_TEMPLATE_DEFINITION
@@ -726,6 +751,15 @@ def additional_ueis_named_ranges(errors):
         errors,
         additional_ueis_column_mapping,
         additional_ueis_field_mapping,
+        meta_mapping,
+    )
+
+
+def additional_eins_named_ranges(errors):
+    return _extract_named_ranges(
+        errors,
+        additional_eins_column_mapping,
+        additional_eins_field_mapping,
         meta_mapping,
     )
 
