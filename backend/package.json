@@ -39,7 +39,7 @@
     "eslint-plugin-prettier": "^4.2.1",
     "glob": "^8.1.0",
     "pa11y-ci": "^3.0.1",
-    "prettier": "^2.8.4",
+    "prettier": "^3.0.2",
     "stylelint": "^14.16.1",
     "stylelint-config-prettier": "^9.0.5",
     "stylelint-config-scss": "^1.0.0-security",
