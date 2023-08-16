@@ -10,7 +10,9 @@ from random import choice, randrange
 from openpyxl import Workbook
 from tempfile import NamedTemporaryFile
 
+import copy
 import requests
+from typing import Dict, Union
 
 from audit.fixtures.excel import (
     SIMPLE_CASES_TEST_FILE,
@@ -18,6 +20,7 @@ from audit.fixtures.excel import (
     ADDITIONAL_UEIS_TEMPLATE_DEFINITION,
     SECONDARY_AUDITORS_TEMPLATE_DEFINITION,
     NOTES_TO_SEFA_TEMPLATE_DEFINITION,
+    FORM_SECTIONS,
 )
 
 from .validators import (
@@ -40,6 +43,7 @@ from .validators import (
     validate_uei_valid_chars,
     validate_uei_leading_char,
     validate_uei_nine_digit_sequences,
+    validate_component_page_numbers,
 )
 
 # Simplest way to create a new copy of simple case rather than getting
@@ -69,7 +73,9 @@ class FederalAwardsValidatorTests(SimpleTestCase):
         """
         Empty Federal Awards should fail, simple case should pass.
         """
-        invalid = json.loads('{"FederalAwards":{}}')
+        invalid = json.loads(
+            f'{{"Meta":{{"section_name":"{FORM_SECTIONS.FEDERAL_AWARDS_EXPENDED}"}},"FederalAwards":{{}}}}'
+        )
         expected_msg = "[\"'Federal Awards' is a required property.\"]"
         self.assertRaisesRegex(
             ValidationError, expected_msg, validate_federal_award_json, invalid
@@ -138,8 +144,6 @@ class FederalAwardsValidatorTests(SimpleTestCase):
         A CFDA extension of RD should pass
         """
         simple = jsoncopy(FederalAwardsValidatorTests.SIMPLE_CASE)
-        # 20230512 HDMS FIXME: This is wrong. Not all two digits from 10 to 20  are valid. Changed to 10 to 69 for now.
-        # pick a prefix between 10 and 99 (valid)
         prefix = f"{randrange(10, 20):02}"
         # use RD as extension (valid)
         extension = "RD"
@@ -632,7 +636,9 @@ class CorrectiveActionPlanValidatorTests(SimpleTestCase):
             settings.XLSX_TEMPLATE_JSON_DIR / CORRECTIVE_ACTION_TEMPLATE_DEFINITION
         )
         template = json.loads(template_definition_path.read_text(encoding="utf-8"))
-        invalid = json.loads('{"CorrectiveActionPlan":{}}')
+        invalid = json.loads(
+            f'{{"Meta":{{"section_name":"{FORM_SECTIONS.CORRECTIVE_ACTION_PLAN}"}},"CorrectiveActionPlan":{{}}}}'
+        )
         expected_msg = str(
             [
                 (
@@ -688,7 +694,9 @@ class AdditionalUeisValidatorTests(SimpleTestCase):
             settings.XLSX_TEMPLATE_JSON_DIR / ADDITIONAL_UEIS_TEMPLATE_DEFINITION
         )
         template = json.loads(template_definition_path.read_text(encoding="utf-8"))
-        invalid = json.loads('{"AdditionalUEIs":{}}')
+        invalid = json.loads(
+            f'{{"Meta":{{"section_name":"{FORM_SECTIONS.ADDITIONAL_UEIS}"}},"AdditionalUEIs":{{}}}}'
+        )
         expected_msg = str(
             [
                 (
@@ -719,7 +727,9 @@ class NotesToSefaValidatorTests(SimpleTestCase):
             settings.XLSX_TEMPLATE_JSON_DIR / NOTES_TO_SEFA_TEMPLATE_DEFINITION
         )
         template = json.loads(template_definition_path.read_text(encoding="utf-8"))
-        invalid = json.loads('{"NotesToSefa":{}}')
+        invalid = json.loads(
+            f'{{"Meta":{{"section_name":"{FORM_SECTIONS.NOTES_TO_SEFA}"}},"NotesToSefa":{{}}}}'
+        )
         expected_msg = str(
             [
                 (
@@ -750,7 +760,9 @@ class SecondaryAuditorsValidatorTests(SimpleTestCase):
             settings.XLSX_TEMPLATE_JSON_DIR / SECONDARY_AUDITORS_TEMPLATE_DEFINITION
         )
         template = json.loads(template_definition_path.read_text(encoding="utf-8"))
-        invalid = json.loads('{"SecondaryAuditors":{}}')
+        invalid = json.loads(
+            f'{{"Meta":{{"section_name":"{FORM_SECTIONS.SECONDARY_AUDITORS}"}},"SecondaryAuditors":{{}}}}'
+        )
         expected_msg = str(
             [
                 (
@@ -766,3 +778,55 @@ class SecondaryAuditorsValidatorTests(SimpleTestCase):
         )
 
         validate_secondary_auditors_json(SecondaryAuditorsValidatorTests.SIMPLE_CASE)
+
+
+class ComponentPageNumberTests(SimpleTestCase):
+    good_pages: Dict[str, Union[str, int]] = {
+        "financial_statements": 1,
+        "financial_statements_opinion": 2,
+        "schedule_expenditures": 3,
+        "schedule_expenditures_opinion": 4,
+        "uniform_guidance_control": 5,
+        "uniform_guidance_compliance": 6,
+        "GAS_control": 8,
+        "GAS_compliance": 9,
+        "schedule_findings": 10,
+    }
+
+    nan_pages = copy.deepcopy(good_pages)
+    nan_pages["financial_statements"] = "1000"
+
+    missing_pages = copy.deepcopy(good_pages)
+    del missing_pages["financial_statements"]
+
+    optional_pages = copy.deepcopy(good_pages)
+    optional_pages["schedule_prior_findings"] = 11
+    optional_pages["CAP_page"] = 12
+
+    def test_good_pages(self):
+        res = validate_component_page_numbers(ComponentPageNumberTests.good_pages)
+        if not res:
+            self.fail(
+                "validate_component_page_numbers incorrectly says our good data is bad!"
+            )
+
+    def test_nan_pages(self):
+        res = validate_component_page_numbers(ComponentPageNumberTests.nan_pages)
+        if res:
+            self.fail(
+                "validate_component_page_numbers incorrectly validated an object that has numbers instead of ints"
+            )
+
+    def test_missing_pages(self):
+        res = validate_component_page_numbers(ComponentPageNumberTests.missing_pages)
+        if res:
+            self.fail(
+                "validate_component_page_numbers incorrectly validated an object that is missing pages"
+            )
+
+    def test_optional_pages(self):
+        res = validate_component_page_numbers(ComponentPageNumberTests.optional_pages)
+        if not res:
+            self.fail(
+                "validate_component_page_numbers rejected an object with optional pages"
+            )

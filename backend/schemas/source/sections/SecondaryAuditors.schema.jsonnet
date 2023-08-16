@@ -1,27 +1,37 @@
 local Base = import '../base/Base.libsonnet';
 local Func = import '../base/Functions.libsonnet';
+local Sheets = import '../excel/libs/Sheets.libsonnet';
 local Types = Base.Types;
+
+local Meta = Types.object {
+  additionalProperties: false,
+  properties: {
+    section_name: Types.string {
+      enum: [Sheets.section_names.SECONDARY_AUDITORS],
+    },
+    // FIXME: 2023-08-07 MSHD: The 'Version' is currently used here as a placeholder, and it is not being enforced at the moment.
+    // Once we establish a versioning pattern, we can update this and enforce it accordingly.
+    version: Types.string {
+      const: Sheets.WORKBOOKS_VERSION,
+    },
+  },
+  required: ['section_name'],
+  title: 'Meta',
+  version: 20230807,
+};
 
 local SecondaryAuditorsEntry = {
   additionalProperties: false,
   properties: {
     secondary_auditor_name: Types.string,
-    secondary_auditor_ein: {
-      '$ref': '#/$defs/EIN',
-    },
+    secondary_auditor_ein: Func.join_types(Base.Compound.EmployerIdentificationNumber, [Types.NULL]),
     secondary_auditor_address_street: Types.string,
     secondary_auditor_address_city: Types.string,
-    secondary_auditor_address_state: {
-      '$ref': '#/$defs/State',
-    },
-    secondary_auditor_address_zipcode: {
-      '$ref': '#/$defs/Zip',
-    },
+    secondary_auditor_address_state: Base.Enum.UnitedStatesStateAbbr,
+    secondary_auditor_address_zipcode: Base.Compound.Zip,
     secondary_auditor_contact_name: Types.string,
     secondary_auditor_contact_title: Types.string,
-    secondary_auditor_contact_phone: {
-      '$ref': '#/$defs/Phone',
-    },
+    secondary_auditor_contact_phone: Base.Compound.UnitedStatesPhone,
     secondary_auditor_contact_email: Types.string {
       format: 'email',
     },
@@ -38,23 +48,16 @@ local SecondaryAuditors = Types.object {
       items: SecondaryAuditorsEntry,
     },
   },
-  required: ['auditee_uei', 'secondary_auditors_entries'],
+  required: ['auditee_uei'],
   title: 'SecondaryAuditors',
   version: 20230714,
 };
 
 local Root = Types.object {
   additionalProperties: false,
-  '$defs': {
-    EIN: Func.join_types(Base.Compound.EmployerIdentificationNumber, [Types.NULL]),
-    Phone: Base.Compound.UnitedStatesPhone,
-    State: Base.Enum.UnitedStatesStateAbbr {
-      title: 'State',
-    },
-    Zip: Base.Compound.Zip,
-  },
   properties: {
     SecondaryAuditors: SecondaryAuditors,
+    Meta: Meta,
   },
   version: 20230714,
 };

@@ -61,6 +61,27 @@
          "title": "FindingsText",
          "type": "object",
          "version": 20230408
+      },
+      "Meta": {
+         "additionalProperties": false,
+         "properties": {
+            "section_name": {
+               "enum": [
+                  "FindingsText"
+               ],
+               "type": "string"
+            },
+            "version": {
+               "const": "1.0.0",
+               "type": "string"
+            }
+         },
+         "required": [
+            "section_name"
+         ],
+         "title": "Meta",
+         "type": "object",
+         "version": 20230807
       }
    },
    "title": "UNNAMED",

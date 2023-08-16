@@ -10,6 +10,7 @@ class GeneralInformationForm(forms.Form):
     auditee_fiscal_period_end = forms.CharField()
     auditee_fiscal_period_start = forms.CharField()
     audit_period_covered = forms.CharField()
+    audit_period_other_months = forms.CharField(required=False)
     ein = forms.CharField()
     ein_not_an_ssn_attestation = forms.BooleanField(required=False)
     multiple_eins_covered = forms.BooleanField(required=False)

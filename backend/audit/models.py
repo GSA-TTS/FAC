@@ -1,5 +1,5 @@
 import calendar
-from datetime import date
+from datetime import datetime, timezone
 from itertools import chain
 import json
 import logging
@@ -26,7 +26,11 @@ from .validators import (
     validate_secondary_auditors_json,
     validate_notes_to_sefa_json,
     validate_single_audit_report_file,
+    validate_auditor_certification_json,
+    validate_auditee_certification_json,
+    validate_tribal_data_consent_json,
     validate_audit_information_json,
+    validate_component_page_numbers,
 )
 
 User = get_user_model()
@@ -272,6 +276,18 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         blank=True, null=True, validators=[validate_notes_to_sefa_json]
     )
 
+    auditor_certification = models.JSONField(
+        blank=True, null=True, validators=[validate_auditor_certification_json]
+    )
+
+    auditee_certification = models.JSONField(
+        blank=True, null=True, validators=[validate_auditee_certification_json]
+    )
+
+    tribal_data_consent = models.JSONField(
+        blank=True, null=True, validators=[validate_tribal_data_consent_json]
+    )
+
     def validate_full(self):
         """
         Full validation, intended for use when the user indicates that the
@@ -299,9 +315,17 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         themselves.
         """
         shaped_sac = audit.cross_validation.sac_validation_shape(self)
+        try:
+            sar = SingleAuditReportFile.objects.filter(sac_id=self.id).latest(
+                "date_created"
+            )
+        except SingleAuditReportFile.DoesNotExist:
+            sar = None
         validation_functions = audit.cross_validation.functions
         errors = list(
-            chain.from_iterable([func(shaped_sac) for func in validation_functions])
+            chain.from_iterable(
+                [func(shaped_sac, sar=sar) for func in validation_functions]
+            )
         )
         if errors:
             return {"errors": errors, "data": shaped_sac}
@@ -324,7 +348,7 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
             self.transition_name.append(
                 SingleAuditChecklist.STATUS.READY_FOR_CERTIFICATION
             )
-            self.transition_date.append(date.today())
+            self.transition_date.append(datetime.now(timezone.utc))
             return SingleAuditChecklist.STATUS.READY_FOR_CERTIFICATION
         return SingleAuditChecklist.STATUS.IN_PROGRESS
 
@@ -339,7 +363,7 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         the appropriate privileges will done at the view level.
         """
         self.transition_name.append(SingleAuditChecklist.STATUS.AUDITOR_CERTIFIED)
-        self.transition_date.append(date.today())
+        self.transition_date.append(datetime.now(timezone.utc))
 
     @transition(
         field="submission_status",
@@ -352,7 +376,7 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         the appropriate privileges will done at the view level.
         """
         self.transition_name.append(SingleAuditChecklist.STATUS.AUDITEE_CERTIFIED)
-        self.transition_date.append(date.today())
+        self.transition_date.append(datetime.now(timezone.utc))
 
     @transition(
         field="submission_status",
@@ -365,7 +389,7 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         the appropriate privileges will done at the view level.
         """
         self.transition_name.append(SingleAuditChecklist.STATUS.CERTIFIED)
-        self.transition_date.append(date.today())
+        self.transition_date.append(datetime.now(timezone.utc))
 
     @transition(
         field="submission_status",
@@ -385,7 +409,7 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
             etl.load_all()
 
         self.transition_name.append(SingleAuditChecklist.STATUS.SUBMITTED)
-        self.transition_date.append(date.today())
+        self.transition_date.append(datetime.now(timezone.utc))
 
     @transition(
         field="submission_status",
@@ -412,7 +436,7 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         changes have been made at that point.
         """
         self.transition_name.append(SingleAuditChecklist.STATUS.SUBMITTED)
-        self.transition_date.append(date.today())
+        self.transition_date.append(datetime.now(timezone.utc))
 
     @property
     def is_auditee_certified(self):
@@ -455,11 +479,33 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         return None
 
 
+class AccessManager(models.Manager):
+    """Custom manager for Access."""
+
+    def create(self, **obj_data):
+        """
+        Check for existing users and add them at access creation time.
+        Not doing this would mean that users logged in at time of Access
+        instance creation would have to log out and in again to get the new
+        access.
+        """
+        if obj_data["email"]:
+            try:
+                acc_user = User.objects.get(email=obj_data["email"])
+            except User.DoesNotExist:
+                acc_user = None
+            if acc_user:
+                obj_data["user"] = acc_user
+        return super().create(**obj_data)
+
+
 class Access(models.Model):
     """
     Email addresses which have been granted access to SAC instances.
     An email address may be associated with a User ID if an FAC account exists.
     """
+
+    objects = AccessManager()
 
     ROLES = (
         ("certifying_auditee_contact", _("Auditee Certifying Official")),
@@ -550,6 +596,9 @@ class SingleAuditReportFile(models.Model):
     sac = models.ForeignKey(SingleAuditChecklist, on_delete=models.CASCADE)
     user = models.ForeignKey(User, blank=True, null=True, on_delete=models.SET_NULL)
     date_created = models.DateTimeField(auto_now_add=True)
+    component_page_numbers = models.JSONField(
+        blank=True, null=True, validators=[validate_component_page_numbers]
+    )
 
     def save(self, *args, **kwargs):
         report_id = SingleAuditChecklist.objects.get(id=self.sac.id).report_id

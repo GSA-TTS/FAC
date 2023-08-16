@@ -3,7 +3,10 @@ import json
 import logging
 from jsonschema import Draft7Validator, FormatChecker, validate
 from jsonschema.exceptions import ValidationError as JSONSchemaValidationError
+from jsonschema.exceptions import SchemaError as JSONSchemaError
+
 from django.core.exceptions import ValidationError
+
 from django.utils.translation import gettext_lazy as _
 from django.conf import settings
 import requests
@@ -136,7 +139,7 @@ def validate_additional_ueis_json(value):
     """
     Apply JSON Schema for additional UEIs and report errors.
     """
-    schema_path = settings.SECTION_SCHEMA_DIR / "AdditionalUeis.schema.json"
+    schema_path = settings.SECTION_SCHEMA_DIR / "AdditionalUEIs.schema.json"
     schema = json.loads(schema_path.read_text(encoding="utf-8"))
 
     validator = Draft7Validator(schema)
@@ -191,8 +194,18 @@ def validate_federal_award_json(value):
     schema_path = settings.SECTION_SCHEMA_DIR / "FederalAwards.schema.json"
     schema = json.loads(schema_path.read_text(encoding="utf-8"))
 
-    validator = Draft7Validator(schema)
-    errors = list(validator.iter_errors(value))
+    # FIXME: For some classes of error, this approach
+    # will go into an infinite/recursive loop in the iterator.
+    # There needs to either be a way to solve that, or we need
+    # to not use this approach.
+    # validator = Draft7Validator(schema)
+    # errors = list(validator.iter_errors(value))
+    # The side-effect is that now I only do one error at a time...
+    errors = []
+    try:
+        validate(schema=schema, instance=value)
+    except (JSONSchemaValidationError, JSONSchemaError) as e:
+        errors = [e]
     if len(errors) > 0:
         raise ValidationError(message=_federal_awards_json_error(errors))
 
@@ -240,6 +253,45 @@ def validate_secondary_auditors_json(value):
     errors = list(validator.iter_errors(value))
     if len(errors) > 0:
         raise ValidationError(message=_secondary_auditors_json_error(errors))
+
+
+def validate_auditor_certification_json(value):
+    """
+    Apply JSON Schema for auditor certification and report errors.
+    """
+    schema_path = settings.SECTION_SCHEMA_DIR / "AuditorCertification.schema.json"
+    schema = json.loads(schema_path.read_text(encoding="utf-8"))
+
+    try:
+        validate(value, schema, format_checker=FormatChecker())
+    except JSONSchemaValidationError as err:
+        raise ValidationError(
+            _(err.message),
+        ) from err
+    return value
+
+
+def validate_auditee_certification_json(value):
+    """
+    Apply JSON Schema for auditee certification and report errors.
+    """
+    schema_path = settings.SECTION_SCHEMA_DIR / "AuditeeCertification.schema.json"
+    schema = json.loads(schema_path.read_text(encoding="utf-8"))
+
+    try:
+        validate(value, schema, format_checker=FormatChecker())
+    except JSONSchemaValidationError as err:
+        raise ValidationError(
+            _(err.message),
+        ) from err
+    return value
+
+
+def validate_tribal_data_consent_json(value):
+    """
+    Apply JSON Schema for tribal data consent and report errors.
+    """
+    raise ValidationError("Not implemented")
 
 
 def validate_file_extension(file, allowed_extensions):
@@ -489,3 +541,29 @@ def _notes_to_sefa_json_error(errors):
     )
     template = json.loads(template_definition_path.read_text(encoding="utf-8"))
     return _get_error_details(template, notes_to_sefa_named_ranges(errors))
+
+
+def validate_component_page_numbers(obj):
+    required_keys = [
+        "financial_statements",
+        "financial_statements_opinion",
+        "schedule_expenditures",
+        "schedule_expenditures_opinion",
+        "uniform_guidance_control",
+        "uniform_guidance_compliance",
+        "GAS_control",
+        "GAS_compliance",
+        "schedule_findings",
+    ]
+    optional_keys = ["schedule_prior_findings", "CAP_page"]
+
+    required_keys_are_good = all(
+        [((key in obj) and isinstance(obj[key], int)) for key in required_keys]
+    )
+    optional_keys_are_good = all(
+        [
+            ((key not in obj) or ((key in obj) and isinstance(obj[key], int)))
+            for key in optional_keys
+        ]
+    )
+    return required_keys_are_good and optional_keys_are_good

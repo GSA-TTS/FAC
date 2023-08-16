@@ -195,11 +195,6 @@ class FederalAward(models.Model):
         help_text=docs.direct,
     )
 
-    is_major = models.BooleanField(
-        "Indicate whether or not the Federal program is a major program",
-        null=True,
-        help_text=docs.major_program,
-    )
     mp_audit_report_type = models.CharField(
         "Type of Report Issued on the Major Program Compliance",
         max_length=40,
@@ -231,12 +226,6 @@ class FederalAward(models.Model):
         max_digits=10,
         decimal_places=2,
         help_text=docs.passthrough_amount,
-    )
-    type_requirement = models.CharField(
-        "Type Requirement Failure",
-        max_length=40,
-        null=True,
-        help_text=docs.type_requirement_cfdainfo,
     )
 
     class Meta:
@@ -732,24 +721,12 @@ class General(models.Model):
     audit_period_covered = models.CharField(
         "Audit Period Covered by Audit", max_length=40, help_text=docs.period_covered
     )
-    is_report_required = models.BooleanField(
-        "Distribution to Federal Agency required?",
-        null=True,
-        help_text=docs.report_required,
-    )
-
-    total_fed_expenditures = models.DecimalField(
+    total_amount_expended = models.DecimalField(
         "Total Federal Expenditures",
         null=True,
         max_digits=10,
         decimal_places=2,
         help_text=docs.total_fed_expenditures,
-    )
-    type_report_major_program = models.CharField(
-        "Type of Report Issued on the Major Program Compliance",
-        max_length=40,
-        null=True,
-        help_text=docs.type_report_major_program_general,
     )
     type_audit_code = models.CharField("Determines if audit is A133 or UG", default="")
 
