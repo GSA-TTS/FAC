@@ -35,10 +35,14 @@ VALID_ELIGIBILITY_DATA = {
 }
 
 VALID_ACCESS_AND_SUBMISSION_DATA = {
-    "certifying_auditee_contact": "a@a.com",
-    "certifying_auditor_contact": "b@b.com",
-    "auditee_contacts": ["c@c.com"],
-    "auditor_contacts": ["d@d.com"],
+    "certifying_auditee_contact_email": "a@a.com",
+    "certifying_auditee_contact_fullname": "Full Name",
+    "certifying_auditor_contact_email": "b@b.com",
+    "certifying_auditor_contact_fullname": "Full Name",
+    "auditee_contacts_email": ["c@c.com"],
+    "auditee_contacts_fullname": ["Name"],
+    "auditor_contacts_email": ["d@d.com"],
+    "auditor_contacts_fullname": ["Name"],
 }
 
 SAMPLE_BASE_SAC_DATA = {
@@ -505,10 +509,14 @@ class SACCreationTests(TestCase):
 
         # Submit AccessAndSubmission details
         access_and_submission_data = {
-            "certifying_auditee_contact": "a@a.com",
-            "certifying_auditor_contact": "b@b.com",
-            "auditor_contacts": ["c@c.com"],
-            "auditee_contacts": ["e@e.com"],
+            "certifying_auditee_contact_fullname": "Name",
+            "certifying_auditee_contact_email": "a@a.com",
+            "certifying_auditor_contact_fullname": "Name",
+            "certifying_auditor_contact_email": "b@b.com",
+            "auditee_contacts_fullname": ["Name"],  # noqa: F601
+            "auditor_contacts_email": ["c@c.com"],
+            "auditee_contacts_fullname": ["Name"],  # noqa: F601
+            "auditee_contacts_email": ["e@e.com"],
         }
         response = self.client.post(
             next_step, access_and_submission_data, format="json"
@@ -562,10 +570,14 @@ class SingleAuditChecklistViewTests(TestCase):
 
         # Submit AccessAndSubmission details
         access_and_submission_data = {
-            "certifying_auditee_contact": "x@x.com",
-            "certifying_auditor_contact": "y@y.com",
-            "auditor_contacts": ["z@z.com"],
-            "auditee_contacts": ["w@w.com"],
+            "certifying_auditee_contact_fullname": "Name",
+            "certifying_auditee_contact_email": "x@x.com",
+            "certifying_auditor_contact_fullname": "Name",
+            "certifying_auditor_contact_email": "y@y.com",
+            "auditee_contacts_fullname": ["Name"],  # noqa: F601
+            "auditor_contacts_email": ["z@z.com"],
+            "auditee_contacts_fullname": ["Name"],  # noqa: F601
+            "auditee_contacts_email": ["yz@yz.com"],
         }
         response = self.client.post(
             next_step, access_and_submission_data, format="json"
