@@ -23,6 +23,7 @@ from .fixtures.excel import FORM_SECTIONS, UNKNOWN_WORKBOOK
 from audit.cross_validation import sac_validation_shape, submission_progress_check
 from audit.excel import (
     extract_additional_ueis,
+    extract_additional_eins,
     extract_federal_awards,
     extract_corrective_action_plan,
     extract_findings_text,
@@ -53,6 +54,7 @@ from audit.models import (
 from audit.utils import ExcelExtractionError
 from audit.validators import (
     validate_additional_ueis_json,
+    validate_additional_eins_json,
     validate_audit_information_json,
     validate_auditee_certification_json,
     validate_auditor_certification_json,
@@ -138,6 +140,11 @@ class ExcelFileHandlerView(SingleAuditChecklistAccessRequiredMixin, generic.View
             "extractor": extract_additional_ueis,
             "field_name": "additional_ueis",
             "validator": validate_additional_ueis_json,
+        },
+        FORM_SECTIONS.ADDITIONAL_EINS: {
+            "extractor": extract_additional_eins,
+            "field_name": "additional_eins",
+            "validator": validate_additional_eins_json,
         },
         FORM_SECTIONS.SECONDARY_AUDITORS: {
             "extractor": extract_secondary_auditors,
