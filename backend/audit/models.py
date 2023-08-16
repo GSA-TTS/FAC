@@ -510,6 +510,7 @@ class Access(models.Model):
         help_text="Access type granted to this user",
         max_length=50,
     )
+    fullname = models.CharField(default="")
     email = models.EmailField()
     user = models.ForeignKey(
         User,

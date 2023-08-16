@@ -120,22 +120,26 @@ def access_and_submission_check(user, data):
         )
 
         # Create all contact Access objects
-        Access.objects.create(sac=sac, role="editor", email=user.email, user=user)
+        Access.objects.create(sac=sac, role="editor", fullname=f"{user.first_name} {user.last_name}", email=user.email, user=user)
         Access.objects.create(
             sac=sac,
             role="certifying_auditee_contact",
-            email=serializer.data.get("certifying_auditee_contact"),
+            fullname=serializer.data.get("certifying_auditee_contact_fullname"),
+            email=serializer.data.get("certifying_auditee_contact_email"),
         )
         Access.objects.create(
             sac=sac,
             role="certifying_auditor_contact",
-            email=serializer.data.get("certifying_auditor_contact"),
+            fullname=serializer.data.get("certifying_auditor_contact_fullname"),
+            email=serializer.data.get("certifying_auditor_contact_email"),
         )
 
-        for contact in serializer.data.get("auditee_contacts"):
-            Access.objects.create(sac=sac, role="editor", email=contact)
-        for contact in serializer.data.get("auditor_contacts"):
-            Access.objects.create(sac=sac, role="editor", email=contact)
+        for index, email in enumerate(serializer.data.get("auditee_contacts_email")):
+            # TODO: Handle multiple types in list
+            Access.objects.create(sac=sac, role="editor", fullname=serializer.data.get("auditee_contacts_fullname")[index], email=email)
+        for index, email in enumerate(serializer.data.get("auditor_contacts_email")):
+            # TODO: Handle multiple types in list
+            Access.objects.create(sac=sac, role="editor", fullname=serializer.data.get("auditor_contacts_fullname"), email=email)
 
         sac.save()
 
@@ -251,8 +255,8 @@ def get_role_emails_for_sac(sac_id) -> dict:
 
     {
         "editors": ["a@a.com", "b@b.com", "victor@frankenstein.com"]
-        "certfying_auditor_contact": ["c@c.com"],
-        "certfying_auditee_contact": ["e@e.com"],
+        "certfying_auditor_contact_email": ["c@c.com"],
+        "certfying_auditee_contact_email": ["e@e.com"],
     }
     """
     accesses = Access.objects.filter(sac=sac_id)
@@ -260,12 +264,12 @@ def get_role_emails_for_sac(sac_id) -> dict:
     # Turn lists into single items or None for the certifier roles:
     only_one = lambda x: x[0] if x else None
     return {
-        "editors": [a.email for a in accesses if a.role == "editor"],
-        "certifying_auditee_contact": only_one(
-            [a.email for a in accesses if a.role == "certifying_auditee_contact"]
+        "editors": [{a.email, a.fullname} for a in accesses if a.role == "editor"],
+        "certifying_auditee_contact_email": only_one(
+            [a.email for a in accesses if a.role == "certifying_auditee_contact_email"]
         ),
-        "certifying_auditor_contact": only_one(
-            [a.email for a in accesses if a.role == "certifying_auditor_contact"]
+        "certifying_auditor_contact_email": only_one(
+            [a.email for a in accesses if a.role == "certifying_auditor_contact_email"]
         ),
     }
 
