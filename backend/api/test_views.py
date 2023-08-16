@@ -430,8 +430,10 @@ class AccessAndSubmissionTests(TestCase):
         self.user.profile.save()
 
         access_and_submission_data = VALID_ACCESS_AND_SUBMISSION_DATA.copy()
-        access_and_submission_data["auditee_contacts"].append("e@e.com")
-        access_and_submission_data["auditor_contacts"].append("f@f.com")
+        access_and_submission_data["auditee_contacts_email"].append("e@e.com")
+        access_and_submission_data["auditor_contacts_email"].append("f@f.com")
+        access_and_submission_data["auditee_contacts_fullname"].append("Real Name")
+        access_and_submission_data["auditor_contacts_fullname"].append("Real Name")
 
         response = self.client.post(
             ACCESS_AND_SUBMISSION_PATH, access_and_submission_data, format="json"
@@ -447,8 +449,8 @@ class AccessAndSubmissionTests(TestCase):
         )
 
         submitted_contacts = (
-            access_and_submission_data["auditee_contacts"]
-            + access_and_submission_data["auditor_contacts"]
+            access_and_submission_data["auditee_contacts_email"]
+            + access_and_submission_data["auditor_contacts_email"]
         )
 
         for db_addr, form_addr in zip(filter(None, editors), submitted_contacts):
@@ -466,18 +468,18 @@ class AccessAndSubmissionTests(TestCase):
         response = self.client.post(ACCESS_AND_SUBMISSION_PATH, {}, format="json")
         data = response.json()
         self.assertEqual(
-            data.get("errors", [])["certifying_auditee_contact"][0],
+            data.get("errors", [])["certifying_auditee_contact_email"][0],
             "This field is required.",
         )
         self.assertEqual(
-            data.get("errors", [])["certifying_auditor_contact"][0],
+            data.get("errors", [])["certifying_auditor_contact_email"][0],
             "This field is required.",
         )
         self.assertEqual(
-            data.get("errors", [])["auditee_contacts"][0], "This field is required."
+            data.get("errors", [])["auditee_contacts_email"][0], "This field is required."
         )
         self.assertEqual(
-            data.get("errors", [])["auditor_contacts"][0], "This field is required."
+            data.get("errors", [])["auditor_contacts_email"][0], "This field is required."
         )
 
 
@@ -513,9 +515,9 @@ class SACCreationTests(TestCase):
             "certifying_auditee_contact_email": "a@a.com",
             "certifying_auditor_contact_fullname": "Name",
             "certifying_auditor_contact_email": "b@b.com",
-            "auditee_contacts_fullname": ["Name"],  # noqa: F601
+            "auditor_contacts_fullname": ["Name"],
             "auditor_contacts_email": ["c@c.com"],
-            "auditee_contacts_fullname": ["Name"],  # noqa: F601
+            "auditee_contacts_fullname": ["Name"],
             "auditee_contacts_email": ["e@e.com"],
         }
         response = self.client.post(
@@ -574,9 +576,9 @@ class SingleAuditChecklistViewTests(TestCase):
             "certifying_auditee_contact_email": "x@x.com",
             "certifying_auditor_contact_fullname": "Name",
             "certifying_auditor_contact_email": "y@y.com",
-            "auditee_contacts_fullname": ["Name"],  # noqa: F601
+            "auditor_contacts_fullname": ["Name"],
             "auditor_contacts_email": ["z@z.com"],
-            "auditee_contacts_fullname": ["Name"],  # noqa: F601
+            "auditee_contacts_fullname": ["Name"],
             "auditee_contacts_email": ["yz@yz.com"],
         }
         response = self.client.post(
@@ -587,7 +589,7 @@ class SingleAuditChecklistViewTests(TestCase):
         response = self.client.get(self.path(sac.report_id))
         full_data = response.json()
         for key, value in access_and_submission_data.items():
-            if key in ["auditee_contacts", "auditor_contacts"]:
+            if key in ["auditee_contacts_email", "auditor_contacts_email"]:
                 for item in value:
                     self.assertTrue(item in full_data["editors"])
             else:
@@ -900,7 +902,10 @@ class SingleAuditChecklistViewTests(TestCase):
                 nested_after = {"general_information": after}
 
                 path = self.path(access.sac.report_id)
+                print(f"😻 {nested_after}")
+                print(f"🙀 {type(nested_after)}")
                 response = self.client.put(path, nested_after, format="json")
+                print(f"🐱 {response}")
                 self.assertEqual(response.status_code, 200)
 
                 updated_sac = SingleAuditChecklist.objects.get(pk=sac.id)

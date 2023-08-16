@@ -119,6 +119,7 @@ def access_and_submission_check(user, data):
             general_information=all_steps_user_form_data,
         )
 
+        print(f"🔶 {user.profile}")
         # Create all contact Access objects
         Access.objects.create(
             sac=sac,
@@ -139,7 +140,10 @@ def access_and_submission_check(user, data):
             email=serializer.data.get("certifying_auditor_contact_email"),
         )
 
+        # This fails if you leave out a name. "index" is undefined.
         for index, email in enumerate(serializer.data.get("auditee_contacts_email")):
+            print(f"📇 {index}")
+            print(f"📇 {email}")
             Access.objects.create(
                 sac=sac,
                 role="editor",

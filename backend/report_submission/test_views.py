@@ -106,14 +106,10 @@ class TestPreliminaryViews(TestCase):
         "certifying_auditee_contact_email": "a@a.com",
         "certifying_auditor_contact_fullname": "Fuller B. Namesmith",
         "certifying_auditor_contact_email": "b@b.com",
-        "auditee_contacts_fullname": ["Fuller C. Namesmith"],  # noqa: F601
-        "auditee_contacts_email": ["c@c.com"],  # noqa: F601
-        "auditee_contacts_fullname": ["Fuller CC. Namesmith"],  # noqa: F601
-        "auditee_contacts_email": ["cc@c.com"],  # noqa: F601
-        "auditor_contacts_fullname": ["Fuller D. Namesmith"],  # noqa: F601
-        "auditor_contacts_email": ["d@d.com"],  # noqa: F601
-        "auditor_contacts_fullname": ["Fuller DD. Namesmith"],  # noqa: F601
-        "auditor_contacts_email": ["dd@d.com"],  # noqa: F601
+        "auditee_contacts_fullname": "Fuller C. Namesmith",
+        "auditee_contacts_email": "c@c.com",
+        "auditor_contacts_fullname": "Fuller D. Namesmith",
+        "auditor_contacts_email": "d@d.com",
     }
 
     def test_step_one_eligibility_submission_pass(self):
@@ -227,6 +223,18 @@ class TestPreliminaryViews(TestCase):
             if key in ("auditee_contacts_email", "auditor_contacts_email"):
                 key = "editor"
             matches = [acc for acc in accesses if acc.email == val]
+            print(f"✅ {self.step3_data.items()}")
+            print(f"✅ {accesses}")
+            print(f"✅ {accesses[1].email}")
+            print(f"🌮 {matches}")
+
+            print(f"🚨 {val}")
+            print(f"🚨 {accesses[0].email}")
+            print(f"🚨 {accesses[1].email}")
+            print(f"🚨 {accesses[2].email}")
+            print(f"🚨 {accesses[3].email}")
+            print(f"🚨 {accesses[4].email}")
+            
             self.assertEqual(matches[0].role, key)
 
     @patch("report_submission.forms.get_uei_info_from_sam_gov")
