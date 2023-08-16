@@ -1,7 +1,7 @@
 from .errors import err_missing_tribal_data_sharing_consent
 
 
-def tribal_data_sharing_consent(sac_dict):
+def tribal_data_sharing_consent(sac_dict, *_args, **_kwargs):
     """
     Checks that if the user identified as a tribal organization
     then there must be a completed data sharing consent form associated with the submission

@@ -20,7 +20,7 @@ from config.settings import (
 )
 from .fixtures.excel import FORM_SECTIONS, UNKNOWN_WORKBOOK
 
-from audit.cross_validation import sac_validation_shape
+from audit.cross_validation import sac_validation_shape, submission_progress_check
 from audit.excel import (
     extract_additional_ueis,
     extract_federal_awards,
@@ -674,115 +674,6 @@ class SubmissionView(CertifyingAuditeeRequiredMixin, generic.View):
             raise PermissionDenied("You do not have access to this audit.")
 
 
-def conditional_keys_progress_check(sac, sections):
-    """
-    Support function for submission_progress_check; handles the conditional sections.
-    """
-    conditional_keys = {
-        "additional_ueis": sac.multiple_ueis_covered,
-        # Update once we have the question in. This may be handled in the gen info form rather than as a workbook.
-        "additional_eins": False,
-        # "additional_eins": sac.multiple_eins_covered,
-        "secondary_auditors": False,  # update this once we have the question in.
-    }
-    output = {}
-    for key, value in conditional_keys.items():
-        current = "incomplete"
-        if not value:
-            current = "hidden"
-        elif sections.get(key):
-            current = "complete"
-        info = {"display": current, "completed": current == "complete"}
-        output[key] = info
-    return output
-
-
-def mandatory_keys_progress_check(sections, conditional_keys):
-    """
-    Support function for submission_progress_check; handles the mandatory sections.
-    """
-    other_keys = [k for k in sections if k not in conditional_keys]
-    output = {}
-    for k in other_keys:
-        if bool(sections[k]):
-            info = {"display": "complete", "completed": True}
-        else:
-            info = {"display": "incomplete", "completed": False}
-        output[k] = info
-    return output
-
-
-def submission_progress_check(
-    sac: SingleAuditChecklist, sar: SingleAuditReportFile
-) -> dict:
-    """
-    Given a SingleAuditChecklist instance and a SingleAuditReportFile instance,
-    return information about submission progress.
-
-    Returns this shape:
-
-        {
-            "complete": [bool],
-            "single_audit_report": [progress_dict],
-            "additional_ueis": [progress_dict],
-            ...
-            "general_information": [progress_dict],
-        }
-
-    Where each of the sections is represented at the top level, along with
-    single_audit_report, and [progress_dict] is:
-
-        {
-            "display": "hidden"/"incomplete"/"complete",
-            "completed": [bool],
-            "completed_by": [email],
-            "completed_date": [date],
-        }
-    """
-    # Use sac_validation_shape as source of truth for list of sections:
-    shaped_sac = sac_validation_shape(sac)
-    sections = shaped_sac["sf_sac_sections"]
-    # TODO: remove these once Notes to SEFA and tribal data consent are implemented
-    del sections["notes_to_sefa"]
-    del sections["tribal_data_consent"]
-    result = {k: None for k in sections}  # type: ignore
-    progress = {
-        "display": None,
-        "completed": None,
-        "completed_by": None,
-        "completed_date": None,
-    }
-
-    cond_keys = conditional_keys_progress_check(sac, sections)
-    for ckey, cvalue in cond_keys.items():
-        result[ckey] = progress | cvalue
-
-    mandatory_keys = mandatory_keys_progress_check(sections, cond_keys)
-    for mkey, mvalue in mandatory_keys.items():
-        result[mkey] = progress | mvalue
-
-    sar_progress = {
-        "display": "complete" if bool(sar) else "incomplete",
-        "completed": bool(sar),
-    }
-
-    result["single_audit_report"] = progress | sar_progress  # type: ignore
-
-    complete = False
-
-    def cond_pass(cond_key):
-        passing = ("hidden", "complete")
-        return result.get(cond_key, {}).get("display") in passing
-
-    if all(bool(sections[k]) for k in mandatory_keys):
-        if all(cond_pass(j) for j in cond_keys):
-            complete = True
-
-    result["complete"] = complete  # type: ignore
-
-    return result
-
-
 class SubmissionProgressView(SingleAuditChecklistAccessRequiredMixin, generic.View):
     """
     Display information about and the current status of the sections of the submission,
@@ -816,7 +707,8 @@ class SubmissionProgressView(SingleAuditChecklistAccessRequiredMixin, generic.Vi
             except SingleAuditReportFile.DoesNotExist:
                 sar = None
 
-            subcheck = submission_progress_check(sac, sar)
+            shaped_sac = sac_validation_shape(sac)
+            subcheck = submission_progress_check(shaped_sac, sar, crossval=False)
 
             context = {
                 "single_audit_checklist": {
@@ -831,7 +723,8 @@ class SubmissionProgressView(SingleAuditChecklistAccessRequiredMixin, generic.Vi
                     "completed": sac.submission_status == "ready_for_certification",
                     "completed_date": None,
                     "completed_by": None,
-                    "enabled": sac.submission_status == "auditee_certified",
+                    # We want the user to always be able to run this check:
+                    "enabled": True,
                 },
                 "certification": {
                     "auditor_certified": bool(sac.auditor_certification),
