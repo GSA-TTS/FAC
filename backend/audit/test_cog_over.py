@@ -26,17 +26,6 @@ class CogOverTests(TestCase):
 
     def setUp(self):
         self.user = baker.make(User)
-        sac = SingleAuditChecklist.objects.create(
-            general_information=self._fake_general(),
-            federal_awards=self._fake_federal_awards(),
-        )
-        cognizantbaseline = CognizantBaseline.objects.create(
-            self._fake_cognizantbaseline()
-        )
-        sac.save()
-        self.sac = sac
-        self.cognizantbaseline = cognizantbaseline
-
 
     @staticmethod
     def _fake_general():
@@ -148,11 +137,134 @@ class CogOverTests(TestCase):
             }
         }
 
+    @staticmethod
+    def _fake_federal_awards_lt_cog_limit():
+        return {
+            "FederalAwards": {
+                "auditee_uei": "ABC123DEF456",
+                "federal_awards": [
+                    {
+                        "award_reference": "ABC125",
+                        "program": {
+                            "program_name": "SENIOR VOLUNTEER PROGRAM",
+                            "amount_expended": 11_000_000,
+                            "federal_agency_prefix": "15",
+                            "federal_program_total": 12_000_000,
+                            "three_digit_extension": "600",
+                        },
+                        "direct_or_indirect_award": {"is_direct": "Y"},
+                    },
+                ],
+                "total_amount_expended": 11_000_000,
+            }
+        }
 
-    def test_cog_over(self):
-        # Test Case #1 - Cog agency from 2019 with Direct Award > 0.25 * total expended
-        # print(
-        #     "\n\nTest Case 1 - Cog agency from 2019 with Direct Award > 0.25 * total expended"
-        # )
+    @staticmethod
+    def _fake_federal_awards_lt_da_threshold():
+        return {
+            "FederalAwards": {
+                "auditee_uei": "ABC123DEF456",
+                "federal_awards": [
+                    {
+                        "award_reference": "ABC125",
+                        "program": {
+                            "program_name": "SENIOR VOLUNTEER PROGRAM",
+                            "amount_expended": 11_000_000,
+                            "federal_agency_prefix": "25",
+                            "federal_program_total": 12_000_000,
+                            "three_digit_extension": "600",
+                        },
+                        "direct_or_indirect_award": {"is_direct": "Y"},
+                    },
+                ],
+                "total_amount_expended": 49_000_000,
+            }
+        }
+    
+    def test_cog_over_for_gt_cog_limit_gt_da_threshold_factor_cog_2019(self):
+        sac = SingleAuditChecklist.objects.create(
+            submitted_by=self.user,
+            general_information=self._fake_general(),
+            federal_awards=self._fake_federal_awards(),
+        )
+        sac.save()
+        self.sac = sac
+
+        fake_cogBaseline = self._fake_cognizantbaseline()
+        self.cognizantbaseline = CognizantBaseline(
+            dbkey=fake_cogBaseline['dbkey'],
+            audit_year=fake_cogBaseline['audit_year'],
+            ein=self.sac.general_information["ein"],  # fake_cogBaseline['ein'], # self.sac.general_information["ein"],
+            cognizant_agency=fake_cogBaseline['cognizant_agency']
+            ).save()
         cog_agency, over_agency = cog_over(self.sac)
-        self.assertEqual(over_agency, 0)
+        # print("cog_agency = ", cog_agency)
+        # print("over_agency = ", over_agency)
+        self.assertEqual(over_agency, None)
+
+
+    def test_cog_over_for_lt_cog_lit_gt_da_threshold_factor_oversight(self):
+        sac = SingleAuditChecklist.objects.create(
+            submitted_by=self.user,
+            general_information=self._fake_general(),
+            federal_awards=self._fake_federal_awards_lt_cog_limit(),
+        )
+        sac.save()
+        self.sac = sac
+
+        fake_cogBaseline = self._fake_cognizantbaseline()
+        self.cognizantbaseline = CognizantBaseline(
+            dbkey=fake_cogBaseline['dbkey'],
+            audit_year=fake_cogBaseline['audit_year'],
+            ein=self.sac.general_information["ein"],  # fake_cogBaseline['ein'], # self.sac.general_information["ein"],
+            cognizant_agency=fake_cogBaseline['cognizant_agency']
+            ).save()
+        cog_agency, over_agency = cog_over(self.sac)
+        # print("cog_agency = ", cog_agency)
+        # print("over_agency = ", over_agency)
+        self.assertEqual(cog_agency, None)
+
+
+    def test_cog_over_for_lt_cog_limit_lt_da_threshold_oversight(self):
+        sac = SingleAuditChecklist.objects.create(
+            submitted_by=self.user,
+            general_information=self._fake_general(),
+            federal_awards=self._fake_federal_awards_lt_da_threshold(),
+        )
+        sac.save()
+        self.sac = sac
+
+        fake_cogBaseline = self._fake_cognizantbaseline()
+        self.cognizantbaseline = CognizantBaseline(
+            dbkey=fake_cogBaseline['dbkey'],
+            audit_year=fake_cogBaseline['audit_year'],
+            ein=self.sac.general_information["ein"],  # fake_cogBaseline['ein'], # self.sac.general_information["ein"],
+            cognizant_agency=fake_cogBaseline['cognizant_agency']
+            ).save()
+        cog_agency, over_agency = cog_over(self.sac)
+        # print("cog_agency = ", cog_agency)
+        # print("over_agency = ", over_agency)
+        self.assertEqual(cog_agency, None)
+
+
+    def test_cog_over_gt_cog_limit_no_2019(self):
+        sac = SingleAuditChecklist.objects.create(
+            submitted_by=self.user,
+            general_information=self._fake_general(),
+            federal_awards=self._fake_federal_awards(),
+        )
+        sac.save()
+        self.sac = sac
+
+        fake_cogBaseline = self._fake_cognizantbaseline()
+        self.cognizantbaseline = CognizantBaseline(
+            dbkey=fake_cogBaseline['dbkey'],
+            audit_year=fake_cogBaseline['audit_year'],
+            ein=fake_cogBaseline['ein'], # self.sac.general_information["ein"],
+            cognizant_agency=fake_cogBaseline['cognizant_agency']
+            ).save()
+        cog_agency, over_agency = cog_over(self.sac)
+        # print("cog_agency = ", cog_agency)
+        # print("over_agency = ", over_agency)
+        self.assertEqual(over_agency, None)
+

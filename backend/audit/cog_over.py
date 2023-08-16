@@ -3,6 +3,7 @@ import os
 from .models import SingleAuditChecklist, CognizantBaseline
 import sqlalchemy
 
+
 COG_LIMIT = 50_000_000
 DA_THRESHOLD_FACTOR = 0.25
 
@@ -14,6 +15,11 @@ def cog_over(sac: SingleAuditChecklist):
     (total_da_amount_expended, max_total_agency, max_da_agency) = calc_award_amounts(
         awards
     )
+
+    # print("\n\ntotal_amount_expended =", total_amount_expended)
+    # print("total_da_amount_expended = ", total_da_amount_expended)
+    # print("max_total_agency = ", max_total_agency)
+    # print("max_da_agency = ", max_da_agency)
 
     agency = determine_agency(
         total_amount_expended,
@@ -52,16 +58,21 @@ def determine_agency(
     total_amount_expended, total_da_amount_expended, max_total_agency, max_da_agency
 ):
     if total_da_amount_expended >= DA_THRESHOLD_FACTOR * total_amount_expended:
-        return max_da_agency.keys()[0]
-    return max_total_agency.keys()[0]
+        # print("max_da_agency[0] = ", max_da_agency[0])
+        return max_da_agency[0]
+    # print("max_total_agency[0] = ", max_total_agency[0])
+    return max_total_agency[0]
 
 
 def determine_2019_agency(ein):
-    cognizant_agency = CognizantBaseline.objects.get(
-        audit_year=2019,
-        ein=ein,
-    ).cognizant_agency
-    return cognizant_agency
+    try:
+        cognizant_agency = CognizantBaseline.objects.get(
+            audit_year=2019,
+            ein=ein,
+        ).cognizant_agency
+        return cognizant_agency
+    except CognizantBaseline.DoesNotExist:
+        return None
 
 
 def set_2019_baseline():
@@ -104,16 +115,15 @@ def set_2019_baseline():
 
 
 def calc_cfda_amounts(cfdas):
-    # TODO Are we mapping the corect fields?
     total_amount_agency = defaultdict(lambda: 0)
     total_da_amount_agency = defaultdict(lambda: 0)
     total_da_amount_expended = 0
     for cfda in cfdas:
         agency = cfda.cfda
-        total_amount_agency[agency] += cfda.amount
+        total_amount_agency[agency] += cfda.program["amount_expended"]
         if cfda.direct == "Y":
-            total_da_amount_expended += cfda.programtotal
-            total_da_amount_agency[agency] += cfda.programtotal
+            total_da_amount_expended += cfda.program["amount_expended"]
+            total_da_amount_agency[agency] += cfda.program["amount_expended"]
     max_total_agency, max_da_agency = _extract_max_agency(
         total_amount_agency, total_da_amount_agency
     )
