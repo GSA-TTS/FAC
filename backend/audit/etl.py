@@ -22,8 +22,6 @@ class ETL(object):
     def __init__(self, sac: SingleAuditChecklist) -> None:
         self.single_audit_checklist = sac
         self.report_id = sac.report_id
-        # MCJ QUESTION: What is the second parameter to `get` for?
-        # https://docs.djangoproject.com/en/4.2/ref/models/querysets/#django.db.models.query.QuerySet.get
         audit_date = sac.general_information.get(
             "auditee_fiscal_period_start", datetime.now
         )
