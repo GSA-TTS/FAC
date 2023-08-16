@@ -12,6 +12,7 @@ from audit.excel import (
     extract_findings_uniform_guidance,
     extract_corrective_action_plan,
     extract_additional_ueis,
+    extract_additional_eins,
     extract_secondary_auditors,
     extract_notes_to_sefa,
     federal_awards_field_mapping,
@@ -19,6 +20,7 @@ from audit.excel import (
     findings_uniform_guidance_field_mapping,
     corrective_action_field_mapping,
     additional_ueis_field_mapping,
+    additional_eins_field_mapping,
     secondary_auditors_field_mapping,
     notes_to_sefa_field_mapping,
     federal_awards_column_mapping,
@@ -26,11 +28,13 @@ from audit.excel import (
     findings_uniform_guidance_column_mapping,
     corrective_action_column_mapping,
     additional_ueis_column_mapping,
+    additional_eins_column_mapping,
     secondary_auditors_column_mapping,
     notes_to_sefa_column_mapping,
 )
 from audit.validators import (
     validate_additional_ueis_json,
+    validate_additional_eins_json,
     validate_federal_award_json,
     validate_corrective_action_plan_json,
     validate_findings_text_json,
@@ -50,6 +54,8 @@ from audit.fixtures.excel import (
     FINDINGS_UNIFORM_GUIDANCE_ENTRY_FIXTURES,
     ADDITIONAL_UEIS_TEMPLATE,
     ADDITIONAL_UEIS_ENTRY_FIXTURES,
+    ADDITIONAL_EINS_TEMPLATE,
+    ADDITIONAL_EINS_ENTRY_FIXTURES,
     SECONDARY_AUDITORS_TEMPLATE,
     NOTES_TO_SEFA_TEMPLATE,
     NOTES_TO_SEFA_ENTRY_FIXTURES,
@@ -526,6 +532,70 @@ class AdditionalUeisExcelTests(SimpleTestCase):
 
                 self.assertRaises(
                     ValidationError, validate_additional_ueis_json, additional_ueis
+                )
+
+
+class AdditionalEinsExcelTests(SimpleTestCase):
+    GOOD_UEI = "AAA123456BBB"
+    TEST_DATA = json.loads(ADDITIONAL_EINS_ENTRY_FIXTURES.read_text(encoding="utf-8"))
+
+    def test_template_has_named_ranges(self):
+        """Test that the AdditionalEINs Excel template contains the expected named ranges"""
+        workbook = load_workbook(ADDITIONAL_EINS_TEMPLATE, data_only=True)
+
+        for name in additional_eins_field_mapping.keys():
+            self.assertIsNotNone(workbook.defined_names[name])
+
+        for name in additional_eins_column_mapping:
+            self.assertIsNotNone(workbook.defined_names[name])
+
+    def test_single_additional_eins_entry(self):
+        """Test that extraction and validation succeed when there is a single additional ein entry"""
+        workbook = load_workbook(ADDITIONAL_EINS_TEMPLATE, data_only=True)
+
+        _set_by_name(workbook, "auditee_uei", self.GOOD_UEI)
+        _set_by_name(workbook, "section_name", FORM_SECTIONS.ADDITIONAL_EINS)
+        _add_entry(workbook, 0, self.TEST_DATA[0])
+
+        additional_eins = extract_additional_eins(workbook)
+
+        validate_additional_eins_json(additional_eins)
+
+    def test_multiple_additional_eins_entries(self):
+        """Test that extraction and validation succeed when there are multiple additional ein entries"""
+        workbook = load_workbook(ADDITIONAL_EINS_TEMPLATE, data_only=True)
+
+        _set_by_name(workbook, "auditee_uei", self.GOOD_UEI)
+        _set_by_name(workbook, "section_name", FORM_SECTIONS.ADDITIONAL_EINS)
+        for index, entry in enumerate(self.TEST_DATA):
+            _add_entry(workbook, index, entry)
+
+        additional_eins = extract_additional_eins(workbook)
+
+        validate_additional_eins_json(additional_eins)
+
+    def test_additional_eins_checking(self):
+        """Test that extraction succeeds and validation fails when fields are of the wrong data type"""
+        workbook = load_workbook(ADDITIONAL_EINS_TEMPLATE, data_only=True)
+
+        # add valid data to the workbook
+        _set_by_name(workbook, "auditee_uei", self.GOOD_UEI)
+        _add_entry(workbook, 0, self.TEST_DATA[0])
+
+        test_cases = [
+            ("auditee_uei", 123456789123),
+            ("additional_ein", self.GOOD_UEI),
+        ]
+
+        # validate that each test_case appropriately checks the data type
+        for field_name, value in test_cases:
+            with self.subTest():
+                _set_by_name(workbook, field_name, value)
+
+                additional_eins = extract_additional_eins(workbook)
+
+                self.assertRaises(
+                    ValidationError, validate_additional_eins_json, additional_eins
                 )
 
 

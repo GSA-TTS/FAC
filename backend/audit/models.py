@@ -17,6 +17,7 @@ from django_fsm import FSMField, RETURN_VALUE, transition
 import audit.cross_validation
 from .validators import (
     validate_additional_ueis_json,
+    validate_additional_eins_json,
     validate_corrective_action_plan_json,
     validate_excel_file,
     validate_federal_award_json,
@@ -266,6 +267,11 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         blank=True, null=True, validators=[validate_additional_ueis_json]
     )
 
+    # Additional EINs:
+    additional_eins = models.JSONField(
+        blank=True, null=True, validators=[validate_additional_eins_json]
+    )
+
     # Secondary Auditors:
     secondary_auditors = models.JSONField(
         blank=True, null=True, validators=[validate_secondary_auditors_json]
@@ -315,9 +321,17 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         themselves.
         """
         shaped_sac = audit.cross_validation.sac_validation_shape(self)
+        try:
+            sar = SingleAuditReportFile.objects.filter(sac_id=self.id).latest(
+                "date_created"
+            )
+        except SingleAuditReportFile.DoesNotExist:
+            sar = None
         validation_functions = audit.cross_validation.functions
         errors = list(
-            chain.from_iterable([func(shaped_sac) for func in validation_functions])
+            chain.from_iterable(
+                [func(shaped_sac, sar=sar) for func in validation_functions]
+            )
         )
         if errors:
             return {"errors": errors, "data": shaped_sac}

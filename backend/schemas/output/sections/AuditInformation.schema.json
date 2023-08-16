@@ -50,6 +50,35 @@
       },
       "is_material_noncompliance_disclosed": {
          "type": "boolean"
+      },
+      "is_sp_framework_required": {
+         "type": "boolean"
+      },
+      "sp_framework_basis": {
+         "items": {
+            "description": "GAAP Results (Audit Information)",
+            "enum": [
+               "cash_basis",
+               "tax_basis",
+               "contractual_basis",
+               "other_basis"
+            ],
+            "type": "string"
+         },
+         "type": "array"
+      },
+      "sp_framework_opinions": {
+         "items": {
+            "description": "GAAP Results (Audit Information)",
+            "enum": [
+               "unmodified_opinion",
+               "qualified_opinion",
+               "adverse_opinion",
+               "disclaimer_of_opinion"
+            ],
+            "type": "string"
+         },
+         "type": "array"
       }
    },
    "required": [

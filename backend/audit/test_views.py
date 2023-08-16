@@ -16,6 +16,7 @@ from openpyxl.cell import Cell
 
 from .fixtures.excel import (
     ADDITIONAL_UEIS_TEMPLATE,
+    ADDITIONAL_EINS_TEMPLATE,
     FEDERAL_AWARDS_TEMPLATE,
     CORRECTIVE_ACTION_PLAN_TEMPLATE,
     FINDINGS_TEXT_TEMPLATE,
@@ -27,6 +28,7 @@ from .fixtures.excel import (
     FINDINGS_UNIFORM_GUIDANCE_ENTRY_FIXTURES,
     FEDERAL_AWARDS_ENTRY_FIXTURES,
     ADDITIONAL_UEIS_ENTRY_FIXTURES,
+    ADDITIONAL_EINS_ENTRY_FIXTURES,
     SECONDARY_AUDITORS_ENTRY_FIXTURES,
     NOTES_TO_SEFA_ENTRY_FIXTURES,
     FORM_SECTIONS,
@@ -35,9 +37,9 @@ from .fixtures.single_audit_checklist import (
     fake_auditor_certification,
     fake_auditee_certification,
 )
-from .models import Access, SingleAuditChecklist
+from .models import Access, SingleAuditChecklist, SingleAuditReportFile
 from .views import MySubmissions, submission_progress_check
-from .cross_validation.sac_validation_shape import snake_to_camel
+from .cross_validation.sac_validation_shape import sac_validation_shape, snake_to_camel
 
 User = get_user_model()
 
@@ -194,8 +196,26 @@ class SubmissionStatusTests(TestCase):
         self.assertEqual(data[0]["submission_status"], "in_progress")
         report_id = data[0]["report_id"]
 
+        filename = "general-information--test0001test--simple-pass.json"
+        info = _load_json(AUDIT_JSON_FIXTURES / filename)
+        # Update the SAC so that it will pass overall validation:
+        sac = SingleAuditChecklist.objects.get(report_id=report_id)
+        sac.general_information = info
+        sac.audit_information = {"stuff": "whatever"}
+        sac.federal_awards = {"FederalAwards": {"federal_awards": []}}
+        sac.corrective_action_plan = {
+            "CorrectiveActionPlan": {"auditee_uei": "TEST0001TEST"}
+        }
+        sac.findings_text = {"FindingsText": {"auditee_uei": "TEST0001TEST"}}
+        sac.findings_uniform_guidance = {
+            "FindingsUniformGuidance": {"auditee_uei": "TEST0001TEST"}
+        }
+        baker.make(SingleAuditReportFile, sac=sac)
+        sac.save()
+
         self.client.post(f"/audit/ready-for-certification/{report_id}", data={})
         data = MySubmissions.fetch_my_submissions(self.user)
+
         self.assertEqual(data[0]["submission_status"], "ready_for_certification")
 
     def test_auditor_certification(self):
@@ -936,6 +956,64 @@ class SingleAuditReportFileHandlerViewTests(TestCase):
                 )
 
     @patch("audit.validators._scan_file")
+    def test_valid_file_upload_for_additional_eins(self, mock_scan_file):
+        """When a valid Excel file is uploaded, the file should be stored and the SingleAuditChecklist should be updated to include the uploaded Additional EINs data"""
+
+        sac = _mock_login_and_scan(self.client, mock_scan_file)
+        test_data = json.loads(
+            ADDITIONAL_EINS_ENTRY_FIXTURES.read_text(encoding="utf-8")
+        )
+
+        # add valid data to the workbook
+        workbook = load_workbook(ADDITIONAL_EINS_TEMPLATE, data_only=True)
+        _set_by_name(workbook, "auditee_uei", ExcelFileHandlerViewTests.GOOD_UEI)
+        _set_by_name(workbook, "section_name", FORM_SECTIONS.ADDITIONAL_EINS)
+        _add_entry(workbook, 0, test_data[0])
+
+        with NamedTemporaryFile(suffix=".xlsx") as tmp:
+            workbook.save(tmp.name)
+            tmp.seek(0)
+
+            with open(tmp.name, "rb") as excel_file:
+                response = self.client.post(
+                    reverse(
+                        f"audit:{FORM_SECTIONS.ADDITIONAL_EINS}",
+                        kwargs={
+                            "report_id": sac.report_id,
+                            "form_section": FORM_SECTIONS.ADDITIONAL_EINS,
+                        },
+                    ),
+                    data={"FILES": excel_file},
+                )
+
+                self.assertEqual(response.status_code, 302)
+
+                updated_sac = SingleAuditChecklist.objects.get(pk=sac.id)
+
+                self.assertEqual(
+                    updated_sac.additional_eins["AdditionalEINs"]["auditee_uei"],
+                    ExcelFileHandlerViewTests.GOOD_UEI,
+                )
+
+                self.assertEqual(
+                    len(
+                        updated_sac.additional_eins["AdditionalEINs"][
+                            "additional_eins_entries"
+                        ]
+                    ),
+                    1,
+                )
+
+                additional_eins_entries = updated_sac.additional_eins["AdditionalEINs"][
+                    "additional_eins_entries"
+                ][0]
+
+                self.assertEqual(
+                    additional_eins_entries["additional_ein"],
+                    test_data[0]["additional_ein"],
+                )
+
+    @patch("audit.validators._scan_file")
     def test_valid_file_upload_for_notes_to_sefa(self, mock_scan_file):
         """When a valid Excel file is uploaded, the file should be stored and the SingleAuditChecklist should be updated to include the uploaded Notes to SEFA data"""
 
@@ -1040,7 +1118,8 @@ class SubmissionProgressViewTests(TestCase):
         filename = "general-information--test0001test--simple-pass.json"
         info = _load_json(AUDIT_JSON_FIXTURES / filename)
         sac = baker.make(SingleAuditChecklist, general_information=info)
-        result = submission_progress_check(sac, None)
+        shaped_sac = sac_validation_shape(sac)
+        result = submission_progress_check(shaped_sac, sar=None, crossval=False)
         self.assertEqual(result["general_information"]["display"], "complete")
         self.assertTrue(result["general_information"]["completed"])
         conditional_keys = (
@@ -1080,7 +1159,8 @@ class SubmissionProgressViewTests(TestCase):
             addl_sections[section_name] = {camel_name: "whatever"}
         addl_sections["general_information"] = info
         sac = baker.make(SingleAuditChecklist, **addl_sections)
-        result = submission_progress_check(sac, None)
+        shaped_sac = sac_validation_shape(sac)
+        result = submission_progress_check(shaped_sac, sar=None, crossval=False)
         self.assertEqual(result["general_information"]["display"], "complete")
         self.assertTrue(result["general_information"]["completed"])
         conditional_keys = (

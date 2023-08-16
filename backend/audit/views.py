@@ -11,11 +11,19 @@ from django.utils.datastructures import MultiValueDictKeyError
 from django.utils.decorators import method_decorator
 from django.http import JsonResponse
 
-from config.settings import AGENCY_NAMES, GAAP_RESULTS
 
-from audit.cross_validation import sac_validation_shape
+from config.settings import (
+    AGENCY_NAMES,
+    GAAP_RESULTS,
+    SP_FRAMEWORK_BASIS,
+    SP_FRAMEWORK_OPINIONS,
+)
+from .fixtures.excel import FORM_SECTIONS, UNKNOWN_WORKBOOK
+
+from audit.cross_validation import sac_validation_shape, submission_progress_check
 from audit.excel import (
     extract_additional_ueis,
+    extract_additional_eins,
     extract_federal_awards,
     extract_corrective_action_plan,
     extract_findings_text,
@@ -46,6 +54,7 @@ from audit.models import (
 from audit.utils import ExcelExtractionError
 from audit.validators import (
     validate_additional_ueis_json,
+    validate_additional_eins_json,
     validate_audit_information_json,
     validate_auditee_certification_json,
     validate_auditor_certification_json,
@@ -57,7 +66,6 @@ from audit.validators import (
     validate_secondary_auditors_json,
 )
 
-from .fixtures.excel import FORM_SECTIONS, UNKNOWN_WORKBOOK
 
 logging.basicConfig(
     format="%(asctime)s %(levelname)-8s %(module)s:%(lineno)d %(message)s"
@@ -132,6 +140,11 @@ class ExcelFileHandlerView(SingleAuditChecklistAccessRequiredMixin, generic.View
             "extractor": extract_additional_ueis,
             "field_name": "additional_ueis",
             "validator": validate_additional_ueis_json,
+        },
+        FORM_SECTIONS.ADDITIONAL_EINS: {
+            "extractor": extract_additional_eins,
+            "field_name": "additional_eins",
+            "validator": validate_additional_eins_json,
         },
         FORM_SECTIONS.SECONDARY_AUDITORS: {
             "extractor": extract_secondary_auditors,
@@ -668,115 +681,6 @@ class SubmissionView(CertifyingAuditeeRequiredMixin, generic.View):
             raise PermissionDenied("You do not have access to this audit.")
 
 
-def conditional_keys_progress_check(sac, sections):
-    """
-    Support function for submission_progress_check; handles the conditional sections.
-    """
-    conditional_keys = {
-        "additional_ueis": sac.multiple_ueis_covered,
-        # Update once we have the question in. This may be handled in the gen info form rather than as a workbook.
-        "additional_eins": False,
-        # "additional_eins": sac.multiple_eins_covered,
-        "secondary_auditors": False,  # update this once we have the question in.
-    }
-    output = {}
-    for key, value in conditional_keys.items():
-        current = "incomplete"
-        if not value:
-            current = "hidden"
-        elif sections.get(key):
-            current = "complete"
-        info = {"display": current, "completed": current == "complete"}
-        output[key] = info
-    return output
-
-
-def mandatory_keys_progress_check(sections, conditional_keys):
-    """
-    Support function for submission_progress_check; handles the mandatory sections.
-    """
-    other_keys = [k for k in sections if k not in conditional_keys]
-    output = {}
-    for k in other_keys:
-        if bool(sections[k]):
-            info = {"display": "complete", "completed": True}
-        else:
-            info = {"display": "incomplete", "completed": False}
-        output[k] = info
-    return output
-
-
-def submission_progress_check(
-    sac: SingleAuditChecklist, sar: SingleAuditReportFile
-) -> dict:
-    """
-    Given a SingleAuditChecklist instance and a SingleAuditReportFile instance,
-    return information about submission progress.
-
-    Returns this shape:
-
-        {
-            "complete": [bool],
-            "single_audit_report": [progress_dict],
-            "additional_ueis": [progress_dict],
-            ...
-            "general_information": [progress_dict],
-        }
-
-    Where each of the sections is represented at the top level, along with
-    single_audit_report, and [progress_dict] is:
-
-        {
-            "display": "hidden"/"incomplete"/"complete",
-            "completed": [bool],
-            "completed_by": [email],
-            "completed_date": [date],
-        }
-    """
-    # Use sac_validation_shape as source of truth for list of sections:
-    shaped_sac = sac_validation_shape(sac)
-    sections = shaped_sac["sf_sac_sections"]
-    # TODO: remove these once Notes to SEFA and tribal data consent are implemented
-    del sections["notes_to_sefa"]
-    del sections["tribal_data_consent"]
-    result = {k: None for k in sections}  # type: ignore
-    progress = {
-        "display": None,
-        "completed": None,
-        "completed_by": None,
-        "completed_date": None,
-    }
-
-    cond_keys = conditional_keys_progress_check(sac, sections)
-    for ckey, cvalue in cond_keys.items():
-        result[ckey] = progress | cvalue
-
-    mandatory_keys = mandatory_keys_progress_check(sections, cond_keys)
-    for mkey, mvalue in mandatory_keys.items():
-        result[mkey] = progress | mvalue
-
-    sar_progress = {
-        "display": "complete" if bool(sar) else "incomplete",
-        "completed": bool(sar),
-    }
-
-    result["single_audit_report"] = progress | sar_progress  # type: ignore
-
-    complete = False
-
-    def cond_pass(cond_key):
-        passing = ("hidden", "complete")
-        return result.get(cond_key, {}).get("display") in passing
-
-    if all(bool(sections[k]) for k in mandatory_keys):
-        if all(cond_pass(j) for j in cond_keys):
-            complete = True
-
-    result["complete"] = complete  # type: ignore
-
-    return result
-
-
 class SubmissionProgressView(SingleAuditChecklistAccessRequiredMixin, generic.View):
     """
     Display information about and the current status of the sections of the submission,
@@ -810,14 +714,13 @@ class SubmissionProgressView(SingleAuditChecklistAccessRequiredMixin, generic.Vi
             except SingleAuditReportFile.DoesNotExist:
                 sar = None
 
-            subcheck = submission_progress_check(sac, sar)
+            shaped_sac = sac_validation_shape(sac)
+            subcheck = submission_progress_check(shaped_sac, sar, crossval=False)
 
             context = {
                 "single_audit_checklist": {
                     "created": True,
-                    "created_date": sac.date_created.strftime(
-                        "%b %d,%Y at %H:%M %p %Z"
-                    ),
+                    "created_date": sac.date_created,
                     "created_by": sac.submitted_by,
                     "completed": False,
                     "completed_date": None,
@@ -827,7 +730,8 @@ class SubmissionProgressView(SingleAuditChecklistAccessRequiredMixin, generic.Vi
                     "completed": sac.submission_status == "ready_for_certification",
                     "completed_date": None,
                     "completed_by": None,
-                    "enabled": sac.submission_status == "auditee_certified",
+                    # We want the user to always be able to run this check:
+                    "enabled": True,
                 },
                 "certification": {
                     "auditor_certified": bool(sac.auditor_certification),
@@ -866,6 +770,15 @@ class AuditInfoFormView(SingleAuditChecklistAccessRequiredMixin, generic.View):
                 current_info = {
                     "cleaned_data": {
                         "gaap_results": sac.audit_information.get("gaap_results"),
+                        "sp_framework_basis": sac.audit_information.get(
+                            "sp_framework_basis"
+                        ),
+                        "is_sp_framework_required": sac.audit_information.get(
+                            "is_sp_framework_required"
+                        ),
+                        "sp_framework_opinions": sac.audit_information.get(
+                            "sp_framework_opinions"
+                        ),
                         "is_going_concern_included": sac.audit_information.get(
                             "is_going_concern_included"
                         ),
@@ -891,15 +804,7 @@ class AuditInfoFormView(SingleAuditChecklistAccessRequiredMixin, generic.View):
                     }
                 }
 
-            context = {
-                "auditee_name": sac.auditee_name,
-                "report_id": report_id,
-                "auditee_uei": sac.auditee_uei,
-                "user_provided_organization_type": sac.user_provided_organization_type,
-                "agency_names": AGENCY_NAMES,
-                "gaap_results": GAAP_RESULTS,
-                "form": current_info,
-            }
+            context = self._get_context(sac, current_info)
 
             return render(request, "audit/audit-info-form.html", context)
         except SingleAuditChecklist.DoesNotExist:
@@ -923,22 +828,14 @@ class AuditInfoFormView(SingleAuditChecklistAccessRequiredMixin, generic.View):
                 validated = validate_audit_information_json(audit_information)
                 sac.audit_information = validated
                 sac.save()
-
-                logger.info("Audit info form saved.", form.cleaned_data)
-
                 return redirect(reverse("audit:SubmissionProgress", args=[report_id]))
             else:
-                logger.warn(form.errors)
+                for field, errors in form.errors.items():
+                    for error in errors:
+                        logger.warn(f"ERROR in field {field} : {error}")
+
                 form.clean_booleans()
-                context = {
-                    "auditee_name": sac.auditee_name,
-                    "report_id": report_id,
-                    "auditee_uei": sac.auditee_uei,
-                    "user_provided_organization_type": sac.user_provided_organization_type,
-                    "agency_names": AGENCY_NAMES,
-                    "gaap_results": GAAP_RESULTS,
-                    "form": form,
-                }
+                context = self._get_context(sac, form)
                 return render(request, "audit/audit-info-form.html", context)
 
         except SingleAuditChecklist.DoesNotExist:
@@ -946,6 +843,26 @@ class AuditInfoFormView(SingleAuditChecklistAccessRequiredMixin, generic.View):
         except Exception as e:
             logger.info("Enexpected error in AuditInfoFormView post.\n", e)
             raise BadRequest()
+
+    def _get_context(self, sac, form):
+        context = {
+            "auditee_name": sac.auditee_name,
+            "report_id": sac.report_id,
+            "auditee_uei": sac.auditee_uei,
+            "user_provided_organization_type": sac.user_provided_organization_type,
+            "agency_names": AGENCY_NAMES,
+            "gaap_results": GAAP_RESULTS,
+            "sp_framework_basis": SP_FRAMEWORK_BASIS,
+            "sp_framework_opinions": SP_FRAMEWORK_OPINIONS,
+        }
+        for field, value in context.items():
+            logger.warn(f"{field}:{value}")
+        context.update(
+            {
+                "form": form,
+            }
+        )
+        return context
 
 
 class PageInput:
