@@ -3,9 +3,9 @@ name: Run Django and A11y Tests
 on:
   workflow_dispatch:
   workflow_call:
-  push:
+  pull_request:
     branches:
-      - as/coverage
+      - main
 
 jobs:
   django-test:
