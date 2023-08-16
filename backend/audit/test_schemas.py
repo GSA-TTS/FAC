@@ -1185,9 +1185,7 @@ class NotesToSefaSchemaValidityTest(SimpleTestCase):
         schema = self.NOTES_TO_SEFA_SCHEMA
 
         simple_case = jsoncopy(self.SIMPLE_CASE)
-        del simple_case["NotesToSefa"]["accounting_policies"]
-        # I don't know if these are REQUIRED
-        # self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
         validate(simple_case, schema)
 
         simple_case = jsoncopy(self.SIMPLE_CASE)

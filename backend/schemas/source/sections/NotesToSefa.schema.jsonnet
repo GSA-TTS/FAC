@@ -42,9 +42,7 @@ local NotesToSefa = Types.object {
       items: NotesToSefaEntry,
     },
   },
-  // 20230815 -- MCJ -- are any of these required?
-  // 'accounting_policies',
-  required: ['auditee_uei'],
+  required: ['auditee_uei', 'accounting_policies', 'is_minimis_rate_used'],
   title: 'NotesToSefa',
   version: 20230713,
 };

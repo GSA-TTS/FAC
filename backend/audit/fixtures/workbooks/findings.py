@@ -31,7 +31,7 @@ mappings = [
         "compliance_requirement",
         "typerequirement",
         "type_requirement",
-        None,
+        "ABC",
         sorted_string,
     ),
     FieldMap("reference_number", "findingsrefnums", "finding_ref_number", None, str),
