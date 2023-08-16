@@ -31,8 +31,12 @@ CERTIFYING_AUDITEE_CONTACT_EMAIL = _(
 CERTIFYING_AUDITOR_CONTACT_EMAIL = _(
     "Certifying Auditor Contact email is a required field"
 )
-AUDITEE_CONTACTS_LIST = _("Auditee Contacts needs to be a list of full names and emails")
-AUDITOR_CONTACTS_LIST = _("Auditor Contacts needs to be a list of full names and emails")
+AUDITEE_CONTACTS_LIST = _(
+    "Auditee Contacts needs to be a list of full names and emails"
+)
+AUDITOR_CONTACTS_LIST = _(
+    "Auditor Contacts needs to be a list of full names and emails"
+)
 
 
 class EligibilitySerializer(serializers.Serializer):

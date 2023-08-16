@@ -110,7 +110,7 @@ class TestPreliminaryViews(TestCase):
         "auditee_contacts_email": ["c@c.com"],  # noqa: F601
         "auditee_contacts_fullname": ["Fuller CC. Namesmith"],  # noqa: F601
         "auditee_contacts_email": ["cc@c.com"],  # noqa: F601
-        "auditor_contacts_fullname": ["Fuller D. Namesmith"],   # noqa: F601
+        "auditor_contacts_fullname": ["Fuller D. Namesmith"],  # noqa: F601
         "auditor_contacts_email": ["d@d.com"],  # noqa: F601
         "auditor_contacts_fullname": ["Fuller DD. Namesmith"],  # noqa: F601
         "auditor_contacts_email": ["dd@d.com"],  # noqa: F601

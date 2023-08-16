@@ -120,7 +120,13 @@ def access_and_submission_check(user, data):
         )
 
         # Create all contact Access objects
-        Access.objects.create(sac=sac, role="editor", fullname=f"{user.first_name} {user.last_name}", email=user.email, user=user)
+        Access.objects.create(
+            sac=sac,
+            role="editor",
+            fullname=f"{user.first_name} {user.last_name}",
+            email=user.email,
+            user=user,
+        )
         Access.objects.create(
             sac=sac,
             role="certifying_auditee_contact",
@@ -136,10 +142,20 @@ def access_and_submission_check(user, data):
 
         for index, email in enumerate(serializer.data.get("auditee_contacts_email")):
             # TODO: Handle multiple types in list
-            Access.objects.create(sac=sac, role="editor", fullname=serializer.data.get("auditee_contacts_fullname")[index], email=email)
+            Access.objects.create(
+                sac=sac,
+                role="editor",
+                fullname=serializer.data.get("auditee_contacts_fullname")[index],
+                email=email,
+            )
         for index, email in enumerate(serializer.data.get("auditor_contacts_email")):
             # TODO: Handle multiple types in list
-            Access.objects.create(sac=sac, role="editor", fullname=serializer.data.get("auditor_contacts_fullname"), email=email)
+            Access.objects.create(
+                sac=sac,
+                role="editor",
+                fullname=serializer.data.get("auditor_contacts_fullname"),
+                email=email,
+            )
 
         sac.save()
 
