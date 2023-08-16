@@ -78,10 +78,14 @@ class TestPreliminaryViews(TestCase):
         +   auditee_fiscal_period_end
     #.  /report_submission/accessandsubmission
 
-        +   certifying_auditee_contact
-        +   certifying_auditor_contact
-        +   auditee_contacts
-        +   auditor_contacts
+        +   certifying_auditee_contact_fullname
+        +   certifying_auditee_contact_email
+        +   certifying_auditor_contact_fullname
+        +   certifying_auditor_contact_email
+        +   auditee_contacts_fullname
+        +   auditee_contacts_email
+        +   auditor_contacts_fullname
+        +   auditor_contacts_email
 
     """
 
@@ -98,12 +102,18 @@ class TestPreliminaryViews(TestCase):
     }
 
     step3_data = {
-        "certifying_auditee_contact": "a@a.com",
-        "certifying_auditor_contact": "b@b.com",
-        "auditee_contacts": "c@c.com",  # noqa: F601
-        "auditee_contacts": "d@d.com",  # noqa: F601
-        "auditor_contacts": "e@e.com",  # noqa: F601
-        "auditor_contacts": "f@f.com",  # noqa: F601
+        "certifying_auditee_contact_fullname": "Fuller A. Namesmith",
+        "certifying_auditee_contact_email": "a@a.com",
+        "certifying_auditor_contact_fullname": "Fuller B. Namesmith",
+        "certifying_auditor_contact_email": "b@b.com",
+        "auditee_contacts_fullname": ["Fuller C. Namesmith"],  # noqa: F601
+        "auditee_contacts_email": ["c@c.com"],  # noqa: F601
+        "auditee_contacts_fullname": ["Fuller CC. Namesmith"],  # noqa: F601
+        "auditee_contacts_email": ["cc@c.com"],  # noqa: F601
+        "auditor_contacts_fullname": ["Fuller D. Namesmith"],   # noqa: F601
+        "auditor_contacts_email": ["d@d.com"],  # noqa: F601
+        "auditor_contacts_fullname": ["Fuller DD. Namesmith"],  # noqa: F601
+        "auditor_contacts_email": ["dd@d.com"],  # noqa: F601
     }
 
     def test_step_one_eligibility_submission_pass(self):
@@ -213,8 +223,8 @@ class TestPreliminaryViews(TestCase):
 
         accesses = Access.objects.filter(sac=sac)
         for key, val in self.step3_data.items():
-            # Fields come in as auditee/auditor contacts, become editor:
-            if key in ("auditee_contacts", "auditor_contacts"):
+            # Fields come in as auditee/auditor emails, become editor:
+            if key in ("auditee_contacts_email", "auditor_contacts_email"):
                 key = "editor"
             matches = [acc for acc in accesses if acc.email == val]
             self.assertEqual(matches[0].role, key)

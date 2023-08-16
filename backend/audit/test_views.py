@@ -61,10 +61,14 @@ VALID_AUDITEE_INFO_DATA = {
 }
 
 VALID_ACCESS_AND_SUBMISSION_DATA = {
-    "certifying_auditee_contact": "a@a.com",
-    "certifying_auditor_contact": "b@b.com",
-    "auditee_contacts": ["c@c.com"],
-    "auditor_contacts": ["d@d.com"],
+    "certifying_auditee_contact_fullname": "Fuller A. Namesmith",
+    "certifying_auditee_contact_email": "a@a.com",
+    "certifying_auditor_contact_fullname": "Fuller B. Namesmith",
+    "certifying_auditor_contact_email": "b@b.com",
+    "auditee_contacts_fullname": ["Fuller C. Namesmith"],
+    "auditee_contacts_email": ["c@c.com"],
+    "auditor_contacts_fullname": ["Fuller D. Namesmith"],
+    "auditor_contacts_email": ["d@d.com"],
 }
 
 AUDIT_JSON_FIXTURES = Path(__file__).parent / "fixtures" / "json"
