@@ -28,7 +28,19 @@ jobs:
       - name: Run Django test suite
         working-directory: ./backend
         run:
-          docker compose -f docker-compose.yml run web bash -c 'coverage run --parallel-mode --concurrency=multiprocessing manage.py test --parallel && coverage combine && coverage report -m --fail-under=90'
+          docker compose -f docker-compose.yml run web bash -c 'coverage run --parallel-mode --concurrency=multiprocessing manage.py test --parallel && coverage combine && coverage report -m --fail-under=90 && coverage xml tmp/coverage.xml'
+
+      # - name: Archive the Coverage File
+      #   uses: actions/upload-artifact@v2
+      #   with:
+      #     name: coverage.xml
+      #     path: tmp/coverage.xml
+
+      - name: Coverage Report
+        uses: orgoro/coverage@v3.1
+        with:
+          coverageFile: tmp/coverage.xml
+          token: ${{ secrets.GITHUB_TOKEN }}
 
   a11y-testing:
     runs-on: ubuntu-20.04
