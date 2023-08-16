@@ -123,7 +123,6 @@ def access_and_submission_check(user, data):
         Access.objects.create(
             sac=sac,
             role="editor",
-            fullname=f"{user.first_name} {user.last_name}",
             email=user.email,
             user=user,
         )
@@ -141,7 +140,6 @@ def access_and_submission_check(user, data):
         )
 
         for index, email in enumerate(serializer.data.get("auditee_contacts_email")):
-            # TODO: Handle multiple types in list
             Access.objects.create(
                 sac=sac,
                 role="editor",
@@ -149,7 +147,6 @@ def access_and_submission_check(user, data):
                 email=email,
             )
         for index, email in enumerate(serializer.data.get("auditor_contacts_email")):
-            # TODO: Handle multiple types in list
             Access.objects.create(
                 sac=sac,
                 role="editor",
