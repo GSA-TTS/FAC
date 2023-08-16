@@ -2,8 +2,8 @@
 name: Pull Third Party Containers, Scan, and Publish to GHCR
 on:
   workflow_dispatch:
-  schedule:
-    - cron: '0 5 * * 0'
+  # schedule:
+  #   - cron: '0 5 * * 0'
 
 jobs:
   pull-and-scan:

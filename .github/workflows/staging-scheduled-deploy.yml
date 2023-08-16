@@ -1,9 +1,9 @@
 ---
 name: Scheduled Deploy From Main to Staging
 on:
-  schedule:
+  # schedule:
     # Invoke every Mon-Sat
-    - cron: '0 10 * * 1-6'
+    # - cron: '0 10 * * 1-6'
   workflow_dispatch: null
 
 jobs:
