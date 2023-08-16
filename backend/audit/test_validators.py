@@ -18,6 +18,7 @@ from audit.fixtures.excel import (
     SIMPLE_CASES_TEST_FILE,
     CORRECTIVE_ACTION_TEMPLATE_DEFINITION,
     ADDITIONAL_UEIS_TEMPLATE_DEFINITION,
+    ADDITIONAL_EINS_TEMPLATE_DEFINITION,
     SECONDARY_AUDITORS_TEMPLATE_DEFINITION,
     NOTES_TO_SEFA_TEMPLATE_DEFINITION,
     FORM_SECTIONS,
@@ -28,6 +29,7 @@ from .validators import (
     ALLOWED_EXCEL_FILE_EXTENSIONS,
     MAX_EXCEL_FILE_SIZE_MB,
     validate_additional_ueis_json,
+    validate_additional_eins_json,
     validate_notes_to_sefa_json,
     validate_corrective_action_plan_json,
     validate_file_content_type,
@@ -712,6 +714,39 @@ class AdditionalUeisValidatorTests(SimpleTestCase):
         )
 
         validate_additional_ueis_json(AdditionalUeisValidatorTests.SIMPLE_CASE)
+
+
+class AdditionalEinsValidatorTests(SimpleTestCase):
+    SIMPLE_CASE = json.loads(SIMPLE_CASES_TEST_FILE.read_text(encoding="utf-8"))[
+        "AdditionalEinsCase"
+    ]
+
+    def test_validation_is_applied(self):
+        """
+        Empty Additional EINs should fail, simple case should pass.
+        """
+        template_definition_path = (
+            settings.XLSX_TEMPLATE_JSON_DIR / ADDITIONAL_EINS_TEMPLATE_DEFINITION
+        )
+        template = json.loads(template_definition_path.read_text(encoding="utf-8"))
+        invalid = json.loads(
+            f'{{"Meta":{{"section_name":"{FORM_SECTIONS.ADDITIONAL_EINS}"}},"AdditionalEINs":{{}}}}'
+        )
+        expected_msg = str(
+            [
+                (
+                    "B",
+                    "4",
+                    "Auditee UEI",
+                    template["sheets"][0]["single_cells"][2]["help"],
+                )
+            ]
+        )
+        self.assertRaisesRegex(
+            ValidationError, expected_msg, validate_additional_eins_json, invalid
+        )
+
+        validate_additional_eins_json(self.SIMPLE_CASE)
 
 
 class NotesToSefaValidatorTests(SimpleTestCase):

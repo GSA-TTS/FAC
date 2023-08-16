@@ -1,5 +1,32 @@
 from django import forms
 
+from api.uei import get_uei_info_from_sam_gov
+
+
+def validate_uei(value):
+    sam_response = get_uei_info_from_sam_gov(value)
+    if sam_response.get("errors"):
+        raise forms.ValidationError(sam_response.get("errors"))
+
+
+class AuditeeInfoForm(forms.Form):
+    auditee_uei = forms.CharField(required=True, validators=[validate_uei])
+    auditee_fiscal_period_start = forms.DateField(required=True)
+    auditee_fiscal_period_end = forms.DateField(required=True)
+
+    def clean(self):
+        if self.is_valid():
+            cleaned_data = super().clean()
+
+            auditee_fiscal_period_start = cleaned_data["auditee_fiscal_period_start"]
+            auditee_fiscal_period_end = cleaned_data["auditee_fiscal_period_end"]
+
+            if auditee_fiscal_period_start >= auditee_fiscal_period_end:
+                raise forms.ValidationError(
+                    "Auditee fiscal period end date must be later than auditee fiscal period start date"
+                )
+
+
 # The general information fields are currently specified in two places:
 #   - report_submission.forms.GeneralInformationForm
 #   - schemas.sections.GeneralInformation.schema.json

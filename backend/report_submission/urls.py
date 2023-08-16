@@ -8,7 +8,7 @@ upload_page_ids = [
     "audit-findings",
     "audit-findings-text",
     "CAP",
-    "additional-EINs",
+    "additional-eins",
     "additional-ueis",
     "secondary-auditors",
 ]

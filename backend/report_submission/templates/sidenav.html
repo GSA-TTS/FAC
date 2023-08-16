@@ -55,11 +55,11 @@
       {% endif %}
     </li>
     <li class="usa-sidenav__item">
-      {% if '/additional-EINs/' in request.path %}
-      <a href="#additional-EINs" class="usa-current">Additional EINs</a>
+      {% if '/additional-eins/' in request.path %}
+      <a href="#additional-eins" class="usa-current">Additional EINs</a>
       {% else %}
       <a
-        href="/report_submission/additional-EINs/{{ report_id | default_if_none:'' }}"
+        href="/report_submission/additional-eins/{{ report_id | default_if_none:'' }}"
         class=""
         >Additional EINs</a
       >
