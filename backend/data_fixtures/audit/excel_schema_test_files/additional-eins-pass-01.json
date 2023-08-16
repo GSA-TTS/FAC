@@ -1,0 +1,16 @@
+{
+  "Meta": {
+    "section_name": "AdditionalEins"
+  },
+  "AdditionalEINs": {
+    "auditee_uei": "AAA123456BBB",
+    "additional_eins_entries": [
+      {
+        "additional_ein": "123123123"
+      },
+      {
+        "additional_ein": "321321321"
+      }
+    ]
+  }
+}

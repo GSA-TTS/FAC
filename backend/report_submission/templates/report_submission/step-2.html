@@ -13,6 +13,7 @@
                     <legend class="usa-legend usa-legend--large">
                         Auditee information
                     </legend>
+                    <span class="usa-error-message margin-top-2">{{ form.non_field_errors|striptags }}</span>
                     <p>
                         <abbr title="required" class="usa-hint usa-hint--required">*</abbr>Indicates a required field.
                     </p>
@@ -36,6 +37,7 @@
                             <li id="auditee_uei-not-null" hidden>Can&#39;t be null</li>
                             <li id="auditee_uei-length" hidden>UEI is twelve characters long</li>
                         </ul>
+                        <span class="usa-error-message margin-top-2">{{ form.auditee_uei.errors|striptags }}</span>
                         <div class="usa-search" role="search">
                             <label class="usa-sr-only" for="auditee_uei">Search</label>
                             <input class="usa-input"
@@ -89,6 +91,7 @@
                                     role="alert">
                                     <li id="auditee_fiscal_period_start-not-null" hidden>Can&#39;t be null</li>
                                 </ul>
+                                <span class="usa-error-message margin-top-2">{{ form.auditee_fiscal_period_start.errors|striptags }}</span>
                                 <input class="usa-input"
                                     id="auditee_fiscal_period_start"
                                     name="auditee_fiscal_period_start"
@@ -114,6 +117,7 @@
                                     role="alert">
                                     <li id="auditee_fiscal_period_end-not-null" hidden>Can&#39;t be null</li>
                                 </ul>
+                                <span class="usa-error-message margin-top-2">{{ form.auditee_fiscal_period_end.errors|striptags }}</span>
                                 <input class="usa-input"
                                     id="auditee_fiscal_period_end"
                                     name="auditee_fiscal_period_end"

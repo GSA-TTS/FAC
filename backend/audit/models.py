@@ -17,6 +17,7 @@ from django_fsm import FSMField, RETURN_VALUE, transition
 import audit.cross_validation
 from .validators import (
     validate_additional_ueis_json,
+    validate_additional_eins_json,
     validate_corrective_action_plan_json,
     validate_excel_file,
     validate_federal_award_json,
@@ -265,6 +266,11 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
     # Additional UEIs:
     additional_ueis = models.JSONField(
         blank=True, null=True, validators=[validate_additional_ueis_json]
+    )
+
+    # Additional EINs:
+    additional_eins = models.JSONField(
+        blank=True, null=True, validators=[validate_additional_eins_json]
     )
 
     # Secondary Auditors:
