@@ -35,6 +35,7 @@ local section_names = {
   AUDIT_FINDINGS_TEXT: 'FindingsText',
   FEDERAL_AWARDS_AUDIT_FINDINGS: 'FindingsUniformGuidance',
   ADDITIONAL_UEIS: 'AdditionalUeis',
+  ADDITIONAL_EINS: 'AdditionalEins',
   SECONDARY_AUDITORS: 'SecondaryAuditors',
   NOTES_TO_SEFA: 'NotesToSefa',
 };

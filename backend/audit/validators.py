@@ -15,6 +15,7 @@ from pypdf import PdfReader
 
 from audit.excel import (
     additional_ueis_named_ranges,
+    additional_eins_named_ranges,
     corrective_action_plan_named_ranges,
     federal_awards_named_ranges,
     findings_text_named_ranges,
@@ -24,6 +25,7 @@ from audit.excel import (
 )
 from audit.fixtures.excel import (
     ADDITIONAL_UEIS_TEMPLATE_DEFINITION,
+    ADDITIONAL_EINS_TEMPLATE_DEFINITION,
     CORRECTIVE_ACTION_TEMPLATE_DEFINITION,
     FEDERAL_AWARDS_TEMPLATE_DEFINITION,
     FINDINGS_TEXT_TEMPLATE_DEFINITION,
@@ -146,6 +148,19 @@ def validate_additional_ueis_json(value):
     errors = list(validator.iter_errors(value))
     if len(errors) > 0:
         raise ValidationError(message=_additional_ueis_json_error(errors))
+
+
+def validate_additional_eins_json(value):
+    """
+    Apply JSON Schema for additional EINs and report errors.
+    """
+    schema_path = settings.SECTION_SCHEMA_DIR / "AdditionalEINs.schema.json"
+    schema = json.loads(schema_path.read_text(encoding="utf-8"))
+
+    validator = Draft7Validator(schema)
+    errors = list(validator.iter_errors(value))
+    if len(errors) > 0:
+        raise ValidationError(message=_additional_eins_json_error(errors))
 
 
 def validate_notes_to_sefa_json(value):
@@ -532,6 +547,15 @@ def _additional_ueis_json_error(errors):
     )
     template = json.loads(template_definition_path.read_text(encoding="utf-8"))
     return _get_error_details(template, additional_ueis_named_ranges(errors))
+
+
+def _additional_eins_json_error(errors):
+    """Process JSON Schema errors for additional EINs"""
+    template_definition_path = (
+        XLSX_TEMPLATE_DEFINITION_DIR / ADDITIONAL_EINS_TEMPLATE_DEFINITION
+    )
+    template = json.loads(template_definition_path.read_text(encoding="utf-8"))
+    return _get_error_details(template, additional_eins_named_ranges(errors))
 
 
 def _notes_to_sefa_json_error(errors):
