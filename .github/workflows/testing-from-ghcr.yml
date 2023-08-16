@@ -44,10 +44,10 @@ jobs:
           docker compose -f docker-compose-web.yml run web bash -c 'coverage run --parallel-mode --concurrency=multiprocessing manage.py test --parallel && coverage combine && coverage report -m --fail-under=90 && coverage xml -o coverage.xml'
 
       - name: Coverage
-        uses: orgoro/coverage@v3.1
+        uses: 5monkeys/cobertura-action@master
         with:
-          coverageFile: coverage.xml
-          token: ${{ secrets.GITHUB_TOKEN }}
+          path: coverage.xml
+          minimum_coverage: 90
 
   # a11y-testing:
   #   runs-on: ubuntu-20.04
