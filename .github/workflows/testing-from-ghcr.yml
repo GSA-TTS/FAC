@@ -7,6 +7,9 @@ on:
     branches:
       - main
 
+permissions:
+  pull-requests: write
+
 jobs:
   django-test:
     runs-on: ubuntu-latest
@@ -38,7 +41,7 @@ jobs:
       - name: Run Django test suite
         working-directory: ./backend
         run: |
-          docker compose -f docker-compose-web.yml run web bash -c 'coverage run --parallel-mode --concurrency=multiprocessing manage.py test --parallel && coverage combine && coverage report -m --fail-under=90 && coverage xml tmp/coverage.xml'
+          docker compose -f docker-compose-web.yml run web bash -c 'coverage run --parallel-mode --concurrency=multiprocessing manage.py test --parallel && coverage combine && coverage report -m --fail-under=90 && coverage xml -i tmp/coverage.xml'
 
       - name: Coverage
         uses: orgoro/coverage@v3.1
