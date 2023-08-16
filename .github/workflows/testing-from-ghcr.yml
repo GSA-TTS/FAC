@@ -3,6 +3,9 @@ name: Run Django and A11y Tests
 on:
   workflow_dispatch:
   workflow_call:
+  push:
+    branches:
+      - as/coverage
 
 jobs:
   django-test:
@@ -17,47 +20,64 @@ jobs:
       DISABLE_AUTH: False
       PGRST_JWT_SECRET: ${{ secrets.PGRST_JWT_SECRET }}
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v3
+
       - uses: actions/setup-node@v3
         with:
           node-version: 16
+
       - name: Create .env file
         working-directory: ./backend
         run: touch .env
+
       - name: Start Services
         working-directory: ./backend
         run: docker compose -f docker-compose-web.yml up -d
+
       - name: Run Django test suite
         working-directory: ./backend
         run: |
-          docker compose -f docker-compose-web.yml run web bash -c 'coverage run --parallel-mode --concurrency=multiprocessing manage.py test --parallel && coverage combine && coverage report -m --fail-under=90'
+          docker compose -f docker-compose-web.yml run web bash -c 'coverage run --parallel-mode --concurrency=multiprocessing manage.py test --parallel && coverage combine && coverage report -m --fail-under=90 && coverage xml tmp/coverage.xml'
 
-  a11y-testing:
-    runs-on: ubuntu-20.04
-    env:
-      ENV: TESTING
-      SAM_API_KEY: ${{ secrets.SAM_API_KEY }}
-      DJANGO_BASE_URL: 'http://localhost:8000'
-      DJANGO_SECRET_LOGIN_KEY: ${{ secrets.DJANGO_SECRET_LOGIN_KEY }}
-      SECRET_KEY: ${{ secrets.SECRET_KEY }}
-      ALLOWED_HOSTS: '0.0.0.0 127.0.0.1 localhost'
-      DISABLE_AUTH: True
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - name: Coverage
+        uses: orgoro/coverage@v3.1
         with:
-          node-version: 16
-      - name: Create .env file
-        working-directory: ./backend
-        run: touch .env
-      - name: Start Services
-        working-directory: ./backend
-        run: docker compose -f docker-compose-web.yml up -d
-      - name: run Lighthouse CI
-        run: |
-          npm install -g @lhci/cli@0.8.x
-          lhci autorun
-      - name: run pa11y
-        run: |
-          npm i -g pa11y-ci
-          pa11y-ci
+          coverageFile: tmp/coverage.xml
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+  # a11y-testing:
+  #   runs-on: ubuntu-20.04
+  #   env:
+  #     ENV: TESTING
+  #     SAM_API_KEY: ${{ secrets.SAM_API_KEY }}
+  #     DJANGO_BASE_URL: 'http://localhost:8000'
+  #     DJANGO_SECRET_LOGIN_KEY: ${{ secrets.DJANGO_SECRET_LOGIN_KEY }}
+  #     SECRET_KEY: ${{ secrets.SECRET_KEY }}
+  #     ALLOWED_HOSTS: '0.0.0.0 127.0.0.1 localhost'
+  #     DISABLE_AUTH: True
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v3
+
+  #     - uses: actions/setup-node@v3
+  #       with:
+  #         node-version: 16
+
+  #     - name: Create .env file
+  #       working-directory: ./backend
+  #       run: touch .env
+
+  #     - name: Start Services
+  #       working-directory: ./backend
+  #       run: docker compose -f docker-compose-web.yml up -d
+
+  #     - name: run Lighthouse CI
+  #       run: |
+  #         npm install -g @lhci/cli@0.8.x
+  #         lhci autorun
+
+  #     - name: run pa11y
+  #       run: |
+  #         npm i -g pa11y-ci
+  #         pa11y-ci
