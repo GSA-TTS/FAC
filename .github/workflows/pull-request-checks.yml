@@ -1,14 +1,14 @@
 ---
 name: Pull Request Checks
 on:
-  pull_request:
-    branches:
-      - main
-      - prod
-    paths:
-      - '**'
-      - '!docs/**'
-      - 'docs/bpmn-workflow-models/**'
+  # pull_request:
+  #   branches:
+  #     - main
+  #     - prod
+  #   paths:
+  #     - '**'
+  #     - '!docs/**'
+  #     - 'docs/bpmn-workflow-models/**'
   workflow_dispatch: null
 
 jobs:
