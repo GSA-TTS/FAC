@@ -28,7 +28,7 @@ export function testWorkbookFederalAwards(intercept = true) {
   testWorkbookUpload(
     '/audit/excel/federal-awards-expended/*',
     '#file-input-federal-awards-xlsx',
-    'federal-awards-expended-PASS.xlsx'
+    'federal-awards-UPDATE.xlsx'
   );
 }
 
@@ -36,7 +36,7 @@ export function testWorkbookFindingsUniformGuidance(intercept = true) {
   testWorkbookUpload(
     '/audit/excel/findings-uniform-guidance/',
     '#file-input-audit-findings-xlsx',
-    'findings-uniform-guidance-UPDATE.xlsx'
+    'federal-awards-audit-findings-UPDATE.xlsx'
   )
 }
 
@@ -44,7 +44,7 @@ export function testWorkbookFindingsText(intercept = true) {
   testWorkbookUpload(
     '/audit/excel/findings-text/',
     '#file-input-audit-findings-text-xlsx',
-    'findings-text-UPDATE.xlsx'
+    'audit-findings-text-UPDATE.xlsx'
   )
 }
 
