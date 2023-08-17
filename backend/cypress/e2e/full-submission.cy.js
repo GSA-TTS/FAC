@@ -9,6 +9,7 @@ import { testWorkbookFederalAwards,
          testWorkbookFindingsText,
          testWorkbookCorrectiveActionPlan,
          testWorkbookAdditionalUEIs } from '../support/workbook-uploads.js'
+import { testAuditInformationForm } from '../support/audit-info-form.js'
 
 describe('Full audit submission', () => {
   before(() => {
@@ -42,33 +43,34 @@ describe('Full audit submission', () => {
     // Fill out the general info form
     testValidGeneralInfo();
 
-    // Upload all the workbooks
+    // Fill out the audit report package form, and upload its associated PDF
+    // testAuditReportPackage();
+
+    // Upload all the workbooks. Don't intercept the uploads, which means a file will make it into the DB.
     cy.get(".usa-link").contains("Federal Awards").click();
-    testWorkbookFederalAwards(false);  // don't intercept
+    testWorkbookFederalAwards(false); 
 
     cy.get(".usa-link").contains("Federal Awards Audit Findings").click();
-    testWorkbookFindingsUniformGuidance(false);  // don't intercept
+    testWorkbookFindingsUniformGuidance(false);
 
     cy.get(".usa-link").contains("Federal Awards Audit Findings Text").click();
-    testWorkbookFindingsText(false);  // don't intercept
+    testWorkbookFindingsText(false);
 
     cy.get(".usa-link").contains("Corrective Action Plan").click();
-    testWorkbookCorrectiveActionPlan(false);  // don't intercept
+    testWorkbookCorrectiveActionPlan(false);
 
     cy.get(".usa-link").contains("Additional UEIs").click();
-    testWorkbookAdditionalUEIs(false);  // don't intercept
+    testWorkbookAdditionalUEIs(false);
+
+    // Complete the audit information form
+    cy.get(".usa-link").contains("Audit Information Form").click();
+    testAuditInformationForm();
 
     cy.get(".usa-link").contains("Pre-submission validation").click();
     testCrossValidation();
 
     // Uncomment this block when ready to implement the certification steps.
     /*
-
-    // These aren't enabled because the previous steps didn't actually upload anything. Our upload responses are mocked.
-    // First step, pre-validation.
-    cy.get(".usa-link").contains("Pre-submission validation").click();
-    cy.url().should('match', /\/audit\/ready-for-certification\/[0-9A-Z]{17}/);
-    // Mock a prositive response on validation, then it comes back to the checklist
 
     // Second, auditor certification
     cy.get(".usa-link").contains("Auditor Certification").click();
