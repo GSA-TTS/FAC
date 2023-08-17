@@ -34,6 +34,8 @@ from .validators import (
     validate_component_page_numbers,
 )
 
+
+
 User = get_user_model()
 
 logger = logging.getLogger(__name__)
@@ -409,8 +411,12 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         """
 
         from audit.etl import ETL
+        from audit.cog_over import cog_over
 
         if self.general_information:
+            # cog / over assignment
+            cognizant_agency, oversight_agency = cog_over(self)
+
             etl = ETL(self)
             etl.load_all()
 
