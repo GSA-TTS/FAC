@@ -34,7 +34,7 @@ export function testWorkbookFederalAwards(will_intercept = true) {
   );
 }
 
-export function testPdfAuditReport(will_intercept = true) {
+export function testPdfAuditReport() {
   cy.get('#financial_statements').type(1);
   cy.get('#financial_statements_opinion').type(1);
   cy.get('#schedule_expenditures').type(1);
@@ -47,12 +47,8 @@ export function testPdfAuditReport(will_intercept = true) {
   cy.get('#schedule_prior_findings').type(1);
   cy.get('#CAP_page').type(1);
 
-  testWorkbookUpload(
-    '/audit/pdf/what-should-this-be?/*',
-    '#upload_report',
-    'basic.pdf',
-    will_intercept
-  );
+  cy.get('#upload_report').selectFile('cypress/fixtures/basic.pdf');
+  cy.get('#continue').click();
 }
 
 export function testWorkbookFindingsUniformGuidance(will_intercept = true) {

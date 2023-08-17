@@ -99,11 +99,11 @@
                             <span class="usa-error-message tablet:grid-col-12">{{ form.errors.upload_report }}</span>
                         </li>
                     </fieldset>
-                <button class="usa-button margin-bottom-8 margin-top-4" id="continue" disabled="disabled">Upload Single Audit Package</button>
+                <button class="usa-button margin-bottom-8 margin-top-4" id="continue">Upload Single Audit Package</button>
                 </form>
             </ol>
         </div>
     </div>
     {% include "audit-metadata.html" %}
-    <script src="{% static 'compiled/js/upload-report-pdf.js' %}"></script>
+    <!-- <script src="{% static 'compiled/js/upload-report-pdf.js' %}"></script> -->
 {% endblock content %}
