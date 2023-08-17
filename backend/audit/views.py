@@ -953,7 +953,6 @@ class UploadReportView(SingleAuditChecklistAccessRequiredMixin, generic.View):
 
             if form.is_valid():
                 file = request.FILES["upload_report"]
-                print("hi", form.cleaned_data)
 
                 component_page_numbers = {
                     "financial_statements": form.cleaned_data["financial_statements"],
