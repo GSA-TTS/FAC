@@ -4,7 +4,8 @@ import { testValidAccess } from '../support/check-access.js';
 import { testValidEligibility } from '../support/check-eligibility.js';
 import { testValidAuditeeInfo } from '../support/auditee-info.js';
 import { testValidGeneralInfo } from '../support/general-info.js';
-import { testWorkbookFederalAwards,
+import { testPdfAuditReport,
+         testWorkbookFederalAwards,
          testWorkbookFindingsUniformGuidance,
          testWorkbookFindingsText,
          testWorkbookCorrectiveActionPlan,
@@ -48,7 +49,10 @@ describe('Full audit submission', () => {
 
     // Upload all the workbooks. Don't intercept the uploads, which means a file will make it into the DB.
     cy.get(".usa-link").contains("Federal Awards").click();
-    testWorkbookFederalAwards(false); 
+    testWorkbookFederalAwards(false);
+
+    cy.get(".usa-link").contains("Audit report PDF").click();
+    testPdfAuditReport(false);
 
     cy.get(".usa-link").contains("Federal Awards Audit Findings").click();
     testWorkbookFindingsUniformGuidance(false);
