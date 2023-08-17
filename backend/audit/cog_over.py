@@ -6,6 +6,7 @@ import sqlalchemy
 
 COG_LIMIT = 50_000_000
 DA_THRESHOLD_FACTOR = 0.25
+REF_YEAR = "2019"
 
 
 def cog_over(sac: SingleAuditChecklist):
@@ -72,7 +73,6 @@ def set_2019_baseline():
     engine = sqlalchemy.create_engine(
         os.getenv("DATABASE_URL").replace("postgres", "postgresql", 1)
     )
-    REF_YEAR = "2019"
     AUDIT_QUERY = """
         SELECT gen."DBKEY", gen."EIN", cast(gen."TOTFEDEXPEND" as BIGINT),
                 cfda."CFDA", cast(cfda."AMOUNT" as BIGINT), cfda."DIRECT", cast(cfda."PROGRAMTOTAL" as BIGINT)

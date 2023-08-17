@@ -1,13 +1,11 @@
 from collections import defaultdict
 from pathlib import Path
 import argparse
-import glob
 import os
 import pandas as pd
 import re
 import sqlite3
 import zipfile
-import shutil
 
 import csv
 

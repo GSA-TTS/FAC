@@ -1,7 +1,4 @@
-import json
-from pathlib import Path
 from django.test import TestCase
-from census2019.models import Cfda19, Gen19
 from model_bakery import baker
 from .models import User
 from audit.cog_agency import cog_over_assignment
@@ -180,7 +177,6 @@ class CogOverAssignmentTests(TestCase):
         )
         self.assertEqual(over_agency, 0)
 
-
     def test_cog_over_for_gt_threshold_oversight(self):
         # Test Case #2 - Oversight agency 2023 with Direct Award > 0.25 * total expended
         # print(
@@ -194,7 +190,6 @@ class CogOverAssignmentTests(TestCase):
         )
         self.assertEqual(cog_agency, 0)
 
-
     def test_cog_over_for_lt_threshold_cog_2019(self):
         # Test Case #3 - Cog agency from 2019 with Direct Award < 0.25 * total expended
         # print(
@@ -207,7 +202,6 @@ class CogOverAssignmentTests(TestCase):
             self.general_2019_for_test,
         )
         self.assertEqual(over_agency, 0)
-
 
     def test_cog_over_lt_threshold_oversight(self):
         # Test Case #4 - Oversight agency 2023 with Direct Award < 0.25 * total expended

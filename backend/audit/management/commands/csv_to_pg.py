@@ -5,16 +5,15 @@ from pathlib import Path
 import pandas as pd
 import sqlalchemy
 from django.db import connection
-
+from django.core.management.base import BaseCommand
+import logging
 import csv
+from django.core.files.storage import default_storage
+import io
 
 parser = argparse.ArgumentParser()
 dtypes = defaultdict(lambda: str)
 
-from django.core.management.base import BaseCommand
-from django.conf import settings
-
-import logging
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.WARNING)
@@ -22,8 +21,6 @@ loggers = [logging.getLogger(name) for name in logging.root.manager.loggerDict]
 for logger in loggers:
     logger.setLevel(logging.WARNING)
 
-from django.core.files.storage import default_storage
-import io
 
 # This assumes that the file
 #
