@@ -5,16 +5,15 @@ from pathlib import Path
 import pandas as pd
 import sqlalchemy
 from django.db import connection
-
+from django.core.management.base import BaseCommand
+import logging
 import csv
+from django.core.files.storage import default_storage
+import io
 
 parser = argparse.ArgumentParser()
 dtypes = defaultdict(lambda: str)
 
-from django.core.management.base import BaseCommand
-from django.conf import settings
-
-import logging
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.WARNING)
@@ -22,8 +21,6 @@ loggers = [logging.getLogger(name) for name in logging.root.manager.loggerDict]
 for logger in loggers:
     logger.setLevel(logging.WARNING)
 
-from django.core.files.storage import default_storage
-import io
 
 # This assumes that the file
 #
@@ -46,8 +43,11 @@ class Command(BaseCommand):
         engine = sqlalchemy.create_engine(
             os.getenv("DATABASE_URL").replace("postgres", "postgresql", 1)
         )
+        logger.warning(f"engine created {engine}")
         (_, files) = default_storage.listdir(options["path"])
-
+        if not files or len(files) == 0:
+            logger.warning("No files to load")
+            return
         for txtfile in files:
             with connection.cursor() as cursor:
                 cursor.execute(f"DROP TABLE IF EXISTS {make_tablename(txtfile)}")
@@ -68,3 +68,13 @@ class Command(BaseCommand):
                 encoding="utf-8",
             )
             df.to_sql(name=make_tablename(txtfile), con=engine)
+            logger.warning(f"Loaded {make_tablename(txtfile)}")
+
+        GEN_QUERY = """
+            SELECT
+                count(*) as rc
+            FROM
+                census_gen2019
+        """
+        result = connection.execute(sqlalchemy.text(GEN_QUERY))
+        print("Gen table has:", result.all())

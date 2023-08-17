@@ -639,5 +639,6 @@ class CognizantBaseline(models.Model):
         max_length=2,
         null=True,
     )
+
     class Meta:
-        unique_together = (("dbkey","audit_year"),)
+        unique_together = (("dbkey", "audit_year"),)
