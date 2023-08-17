@@ -1,13 +1,13 @@
 from django.test import TestCase
 from audit.models import SingleAuditChecklist
-from .errors import err_number_of_findings_inconsistent
-from .number_of_findings import number_of_findings
+from .errors import err_findings_count_inconsistent
+from .check_findings_count_consistency import check_findings_count_consistency
 from .sac_validation_shape import sac_validation_shape
 from .utils import generate_random_integer
 from model_bakery import baker
 
 
-class NumberOfFindingsTests(TestCase):
+class CheckFindingsCountConsistencyTests(TestCase):
     AWARD_MIN = 1000
     AWARD_MAX = 2000
     FINDINGS_MIN = 1
@@ -60,7 +60,7 @@ class NumberOfFindingsTests(TestCase):
     def test_zero_findings_count_report(self):
         """Ensure no error is returned for consistent zero findings."""
         sac = self._make_sac(0)
-        errors = number_of_findings(sac_validation_shape(sac))
+        errors = check_findings_count_consistency(sac_validation_shape(sac))
         self.assertEqual(errors, [])
 
     def test_findings_count_matches_across_workbooks(self):
@@ -68,19 +68,19 @@ class NumberOfFindingsTests(TestCase):
         sac = self._make_sac(
             generate_random_integer(self.FINDINGS_MIN, self.FINDINGS_MAX)
         )
-        errors = number_of_findings(sac_validation_shape(sac))
+        errors = check_findings_count_consistency(sac_validation_shape(sac))
         self.assertEqual(errors, [])
 
     def _test_findings_count_mismatch(self, base_count, mismatch):
         sac = self._make_sac(base_count, mismatch)
-        errors = number_of_findings(sac_validation_shape(sac))
+        errors = check_findings_count_consistency(sac_validation_shape(sac))
         self.assertEqual(
             len(errors), len(sac.federal_awards["FederalAwards"]["federal_awards"])
         )
 
         for award in sac.federal_awards["FederalAwards"]["federal_awards"]:
             award_reference = award["award_reference"]
-            expected_error = err_number_of_findings_inconsistent(
+            expected_error = err_findings_count_inconsistent(
                 base_count, base_count + mismatch, award_reference
             )
             self.assertIn({"error": expected_error}, errors)

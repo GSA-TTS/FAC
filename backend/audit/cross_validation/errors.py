@@ -40,7 +40,7 @@ def err_award_ref_repeat_reference(award_ref, ref_number):
     return f"Award {award_ref} repeats reference {ref_number}. The reference {ref_number} should only appear once for award {award_ref}."
 
 
-def err_number_of_findings_inconsistent(total_expected, total_counted, award_ref):
+def err_findings_count_inconsistent(total_expected, total_counted, award_ref):
     return (
         f"You reported {total_expected} findings for award {award_ref} in the {SECTION_NAMES.FEDERAL_AWARDS} workbook, "
         f"but declared {total_counted} findings for the same award in the {SECTION_NAMES.FEDERAL_AWARDS_AUDIT_FINDINGS} workbook."

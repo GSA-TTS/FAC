@@ -1,10 +1,10 @@
 from .errors import (
-    err_number_of_findings_inconsistent,
+    err_findings_count_inconsistent,
 )
 from collections import defaultdict
 
 
-def number_of_findings(sac_dict, *_args, **_kwargs):
+def check_findings_count_consistency(sac_dict, *_args, **_kwargs):
     """
     Checks that the number of findings mentioned in Federal Awards matches
     the number of findings referenced in Federal Awards Audit Findings.
@@ -41,7 +41,7 @@ def number_of_findings(sac_dict, *_args, **_kwargs):
         if counted != expected:
             errors.append(
                 {
-                    "error": err_number_of_findings_inconsistent(
+                    "error": err_findings_count_inconsistent(
                         expected,
                         counted,
                         award_ref,
