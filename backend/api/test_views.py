@@ -904,8 +904,12 @@ class SingleAuditChecklistViewTests(TestCase):
                 path = self.path(access.sac.report_id)
                 print(f"😻 {nested_after}")
                 print(f"🙀 {type(nested_after)}")
+                print(f"🤷‍♂️ {json.dumps(nested_after)}")
+                #try:
                 response = self.client.put(path, nested_after, format="json")
-                print(f"🐱 {response}")
+                #    print(f"🐱 {response}")
+                #except Exception as e:
+                #    print(e)
                 self.assertEqual(response.status_code, 200)
 
                 updated_sac = SingleAuditChecklist.objects.get(pk=sac.id)

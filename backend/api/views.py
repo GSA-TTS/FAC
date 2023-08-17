@@ -119,7 +119,6 @@ def access_and_submission_check(user, data):
             general_information=all_steps_user_form_data,
         )
 
-        print(f"🔶 {user.profile}")
         # Create all contact Access objects
         Access.objects.create(
             sac=sac,
@@ -142,8 +141,6 @@ def access_and_submission_check(user, data):
 
         # This fails if you leave out a name. "index" is undefined.
         for index, email in enumerate(serializer.data.get("auditee_contacts_email")):
-            print(f"📇 {index}")
-            print(f"📇 {email}")
             Access.objects.create(
                 sac=sac,
                 role="editor",
@@ -282,11 +279,11 @@ def get_role_emails_for_sac(sac_id) -> dict:
     only_one = lambda x: x[0] if x else None
     return {
         "editors": [{a.email, a.fullname} for a in accesses if a.role == "editor"],
-        "certifying_auditee_contact_email": only_one(
-            [a.email for a in accesses if a.role == "certifying_auditee_contact_email"]
+        "certifying_auditee_contact": only_one(
+            [a.email for a in accesses if a.role == "certifying_auditee_contact"]
         ),
-        "certifying_auditor_contact_email": only_one(
-            [a.email for a in accesses if a.role == "certifying_auditor_contact_email"]
+        "certifying_auditor_contact": only_one(
+            [a.email for a in accesses if a.role == "certifying_auditor_contact"]
         ),
     }
 
