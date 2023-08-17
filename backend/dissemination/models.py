@@ -87,6 +87,7 @@ class Finding(models.Model):
         help_text=docs.type_requirement_findings,
     )
 
+
 class FederalAward(models.Model):
     """Information about the federal award section of the form. References General"""
 
@@ -371,7 +372,6 @@ class Passthrough(models.Model):
         null=True,
         help_text=docs.passthrough_name,
     )
-
 
 
 class General(models.Model):
