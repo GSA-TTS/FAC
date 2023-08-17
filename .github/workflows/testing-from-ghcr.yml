@@ -7,11 +7,10 @@ on:
     branches:
       - main
 
-permissions:
-  pull-requests: write
-
 jobs:
   django-test:
+    permissions:
+      pull-requests: write
     runs-on: ubuntu-latest
     env:
       ENV: TESTING
@@ -54,6 +53,7 @@ jobs:
         with:
           path: ./coverage.xml
           minimum_coverage: 90
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
 
   # a11y-testing:
   #   runs-on: ubuntu-20.04
