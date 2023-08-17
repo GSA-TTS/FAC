@@ -45,3 +45,10 @@ def err_number_of_findings_inconsistent(total_expected, total_counted, award_ref
         f"You reported {total_expected} findings for award {award_ref} in the {SECTION_NAMES.FEDERAL_AWARDS} workbook, "
         f"but declared {total_counted} findings for the same award in the {SECTION_NAMES.FEDERAL_AWARDS_AUDIT_FINDINGS} workbook."
     )
+
+
+def err_duplicate_award_reference(award_ref):
+    return (
+        f"The award reference {award_ref} shows up more than once. "
+        f"This should not be possible. Please contact customer support."
+    )
