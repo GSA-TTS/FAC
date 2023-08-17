@@ -34,7 +34,7 @@ class CheckAwardRefDeclarationTests(TestCase):
     def _make_findings_uniform_guidance(self, award_refs) -> dict:
         entries = []
         for ref in award_refs:
-            entries.append({"program": {"award_reference": ref}})
+            entries.append({"program": ref})
 
         findings = (
             {
@@ -80,5 +80,5 @@ class CheckAwardRefDeclarationTests(TestCase):
         sac = self._make_sac([self.award1, self.award3], [self.award1, self.award2])
         errors = check_award_ref_declaration(sac_validation_shape(sac))
         self.assertEqual(len(errors), 1)
-        expected_error = err_award_ref_not_declared([self.award2])
+        expected_error = err_award_ref_not_declared([self.award2["award_reference"]])
         self.assertIn({"error": expected_error}, errors)
