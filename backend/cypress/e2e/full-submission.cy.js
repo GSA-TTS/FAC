@@ -4,13 +4,13 @@ import { testValidAccess } from '../support/check-access.js';
 import { testValidEligibility } from '../support/check-eligibility.js';
 import { testValidAuditeeInfo } from '../support/auditee-info.js';
 import { testValidGeneralInfo } from '../support/general-info.js';
-import { testPdfAuditReport,
-         testWorkbookFederalAwards,
+import { testAuditInformationForm } from '../support/audit-info-form.js';
+import { testPdfAuditReport } from '../support/report-pdf.js';
+import { testWorkbookFederalAwards,
          testWorkbookFindingsUniformGuidance,
          testWorkbookFindingsText,
          testWorkbookCorrectiveActionPlan,
-         testWorkbookAdditionalUEIs } from '../support/workbook-uploads.js'
-import { testAuditInformationForm } from '../support/audit-info-form.js'
+         testWorkbookAdditionalUEIs } from '../support/workbook-uploads.js';
 
 describe('Full audit submission', () => {
   before(() => {
