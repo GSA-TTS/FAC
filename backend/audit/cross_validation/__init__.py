@@ -55,6 +55,7 @@ And an example with-errors return value is:
     ]
 
 """
+from .check_award_ref_declaration import check_award_ref_declaration
 from .check_findings_count_consistency import check_findings_count_consistency
 from .additional_ueis import additional_ueis
 from .auditee_ueis_match import auditee_ueis_match
@@ -68,6 +69,7 @@ functions = [
     audit_findings,
     auditee_ueis_match,
     additional_ueis,
+    check_award_ref_declaration,
     check_finding_reference_uniqueness,
     check_findings_count_consistency,
     submission_progress_check,
