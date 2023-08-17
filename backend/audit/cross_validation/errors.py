@@ -36,7 +36,7 @@ def err_missing_tribal_data_sharing_consent():
     )
 
 
-def err_award_ref_repeat_reference(award_ref, ref_number):
+def err_duplicate_finding_reference(award_ref, ref_number):
     return f"Award {award_ref} repeats reference {ref_number}. The reference {ref_number} should only appear once for award {award_ref}."
 
 

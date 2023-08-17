@@ -1,13 +1,13 @@
 from django.test import TestCase
 from audit.models import SingleAuditChecklist
-from .award_ref_and_references_uniqueness import award_ref_and_references_uniqueness
+from .check_finding_reference_uniqueness import check_finding_reference_uniqueness
 from .sac_validation_shape import sac_validation_shape
-from .errors import err_award_ref_repeat_reference
+from .errors import err_duplicate_finding_reference
 from .utils import generate_random_integer
 from model_bakery import baker
 
 
-class AwardRefAndReferencesUniquenessTests(TestCase):
+class CheckFindingReferenceUniquenessTests(TestCase):
     AWARD_MIN = 1000
     AWARD_MAX = 2000
     REF_MIN = 100
@@ -53,7 +53,7 @@ class AwardRefAndReferencesUniquenessTests(TestCase):
             [self._award_reference() for _ in range(range_size)],
             [[self._reference_number(self.REF_MIN + i)] for i in range(range_size)],
         )
-        errors = award_ref_and_references_uniqueness(sac_validation_shape(sac))
+        errors = check_finding_reference_uniqueness(sac_validation_shape(sac))
         self.assertEqual(errors, [])
 
     def test_duplicate_references_for_award(self):
@@ -72,12 +72,12 @@ class AwardRefAndReferencesUniquenessTests(TestCase):
                 ]
             ],
         )
-        errors = award_ref_and_references_uniqueness(sac_validation_shape(sac))
+        errors = check_finding_reference_uniqueness(sac_validation_shape(sac))
         for finding in sac.findings_uniform_guidance["FindingsUniformGuidance"][
             "findings_uniform_guidance_entries"
         ]:
             expected_error = {
-                "error": err_award_ref_repeat_reference(
+                "error": err_duplicate_finding_reference(
                     finding["program"]["award_reference"],
                     self._reference_number(self.REF_MIN),
                 )
