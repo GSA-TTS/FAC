@@ -47,7 +47,7 @@ jobs:
       - name: Coverage
         uses: 5monkeys/cobertura-action@master
         with:
-          path: coverage.xml
+          path: ./coverage.xml
           minimum_coverage: 90
 
   # a11y-testing:
