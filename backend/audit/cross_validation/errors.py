@@ -45,3 +45,19 @@ def err_findings_count_inconsistent(total_expected, total_counted, award_ref):
         f"You reported {total_expected} findings for award {award_ref} in the {SECTION_NAMES.FEDERAL_AWARDS} workbook, "
         f"but declared {total_counted} findings for the same award in the {SECTION_NAMES.FEDERAL_AWARDS_AUDIT_FINDINGS} workbook."
     )
+
+
+def err_award_ref_not_declared(award_refs: list):
+    is_plural = len(award_refs) > 1
+    if is_plural:
+        award_refs_str = (
+            ", ".join(str(ar) for ar in award_refs[:-1]) + " and " + str(award_refs[-1])
+        )
+    else:
+        award_refs_str = str(award_refs[0])
+
+    return (
+        f"Award{'s' if is_plural else ''} {award_refs_str} {'are' if is_plural else 'is'} reported in the "
+        f"{SECTION_NAMES.FEDERAL_AWARDS_AUDIT_FINDINGS} workbook, but {'were' if is_plural else 'was'} not "
+        f"declared in the {SECTION_NAMES.FEDERAL_AWARDS} workbook."
+    )
