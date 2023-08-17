@@ -223,18 +223,6 @@ class TestPreliminaryViews(TestCase):
             if key in ("auditee_contacts_email", "auditor_contacts_email"):
                 key = "editor"
             matches = [acc for acc in accesses if acc.email == val]
-            print(f"✅ {self.step3_data.items()}")
-            print(f"✅ {accesses}")
-            print(f"✅ {accesses[1].email}")
-            print(f"🌮 {matches}")
-
-            print(f"🚨 {val}")
-            print(f"🚨 {accesses[0].email}")
-            print(f"🚨 {accesses[1].email}")
-            print(f"🚨 {accesses[2].email}")
-            print(f"🚨 {accesses[3].email}")
-            print(f"🚨 {accesses[4].email}")
-            
             self.assertEqual(matches[0].role, key)
 
     @patch("report_submission.forms.get_uei_info_from_sam_gov")

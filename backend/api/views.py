@@ -269,8 +269,8 @@ def get_role_emails_for_sac(sac_id) -> dict:
 
     {
         "editors": ["a@a.com", "b@b.com", "victor@frankenstein.com"]
-        "certfying_auditor_contact_email": ["c@c.com"],
-        "certfying_auditee_contact_email": ["e@e.com"],
+        "certfying_auditor_contact": ["c@c.com"],
+        "certfying_auditee_contact": ["e@e.com"],
     }
     """
     accesses = Access.objects.filter(sac=sac_id)
@@ -278,7 +278,7 @@ def get_role_emails_for_sac(sac_id) -> dict:
     # Turn lists into single items or None for the certifier roles:
     only_one = lambda x: x[0] if x else None
     return {
-        "editors": [{a.email, a.fullname} for a in accesses if a.role == "editor"],
+        "editors": [a.email for a in accesses if a.role == "editor"],
         "certifying_auditee_contact": only_one(
             [a.email for a in accesses if a.role == "certifying_auditee_contact"]
         ),
