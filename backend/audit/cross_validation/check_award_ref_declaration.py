@@ -36,10 +36,6 @@ def check_award_ref_declaration(sac_dict, *_args, **_kwargs):
 
     is_included, diff_list = check_inclusion(reported_award_refs, declared_award_refs)
     if not is_included:
-        errors.append(
-            {
-                "error": err_award_ref_not_declared(diff_list)
-            }
-        )
+        errors.append({"error": err_award_ref_not_declared(diff_list)})
 
     return errors
