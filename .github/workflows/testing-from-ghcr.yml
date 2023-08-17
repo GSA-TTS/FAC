@@ -9,8 +9,7 @@ on:
 
 jobs:
   django-test:
-    permissions:
-      pull-requests: write
+    permissions: write-all
     runs-on: ubuntu-latest
     env:
       ENV: TESTING
@@ -42,17 +41,21 @@ jobs:
         run: |
           docker compose -f docker-compose-web.yml run web bash -c 'coverage run --parallel-mode --concurrency=multiprocessing manage.py test --parallel && coverage combine && coverage report -m --fail-under=90 && coverage xml -o coverage.xml'
 
-      - name: Copy Coverage from Docker Container
+      - name: Copy Coverage From Docker Container
         run: |
           docker cp backend-web-1:/src/coverage.xml ./coverage.xml
           pwd
           ls -al | grep 'coverage'
 
-      - name: Coverage
+      - name: Publish Coverage Report to Pull Request
         uses: 5monkeys/cobertura-action@master
         with:
           path: ./coverage.xml
           minimum_coverage: 90
+          skip_covered: false
+          fail_below_threshold: false
+          show_branch: true
+          show_missing: true
           repo_token: ${{ secrets.GITHUB_TOKEN }}
 
   # a11y-testing:
