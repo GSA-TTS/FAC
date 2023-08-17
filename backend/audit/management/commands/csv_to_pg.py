@@ -46,8 +46,11 @@ class Command(BaseCommand):
         engine = sqlalchemy.create_engine(
             os.getenv("DATABASE_URL").replace("postgres", "postgresql", 1)
         )
+        logger.warning(f"engine created {engine}")
         (_, files) = default_storage.listdir(options["path"])
-
+        if not files or len(files) == 0:
+            logger.warning("No files to load")
+            return
         for txtfile in files:
             with connection.cursor() as cursor:
                 cursor.execute(f"DROP TABLE IF EXISTS {make_tablename(txtfile)}")
@@ -68,3 +71,13 @@ class Command(BaseCommand):
                 encoding="utf-8",
             )
             df.to_sql(name=make_tablename(txtfile), con=engine)
+            logger.warning(f"Loaded {make_tablename(txtfile)}")
+
+        GEN_QUERY = """
+            SELECT
+                count(*) as rc
+            FROM
+                census_gen2019
+        """
+        result = connection.execute(sqlalchemy.text(GEN_QUERY))
+        print("Gen table has:", result.all())

@@ -16,11 +16,6 @@ def cog_over(sac: SingleAuditChecklist):
         awards
     )
 
-    # print("\n\ntotal_amount_expended =", total_amount_expended)
-    # print("total_da_amount_expended = ", total_da_amount_expended)
-    # print("max_total_agency = ", max_total_agency)
-    # print("max_da_agency = ", max_da_agency)
-
     agency = determine_agency(
         total_amount_expended,
         total_da_amount_expended,
@@ -58,9 +53,7 @@ def determine_agency(
     total_amount_expended, total_da_amount_expended, max_total_agency, max_da_agency
 ):
     if total_da_amount_expended >= DA_THRESHOLD_FACTOR * total_amount_expended:
-        # print("max_da_agency[0] = ", max_da_agency[0])
         return max_da_agency[0]
-    # print("max_total_agency[0] = ", max_total_agency[0])
     return max_total_agency[0]
 
 
@@ -79,29 +72,36 @@ def set_2019_baseline():
     engine = sqlalchemy.create_engine(
         os.getenv("DATABASE_URL").replace("postgres", "postgresql", 1)
     )
-    session = sqlalchemy.orm.Session(engine)
-    gen_table = sqlalchemy.Table("census_gen19", session.get_bind())
-    cfda_table = sqlalchemy.Table("census_cfda19", session.get_bind())
-
-    gens = (
-        session.query(gen_table)
-        .filter(gen_table.c.aufityear == 2019)
-        .filter(gen_table.c.amount >= COG_LIMIT)
-        .all()
-    )
-
-    for gen in gens:
-        dbkey = gen.dbkey
-        ein = gen.ein
-        total_amount_expended = gen.amount
-        cfdas = (
-            session.query(cfda_table)
-            .filter(cfda_table.c.aufityear == 2019)
-            .filter(cfda_table.c.dbkey == gen.dbkey)
-            .all()
+    REF_YEAR = "2019"
+    AUDIT_QUERY = """
+        SELECT gen."DBKEY", gen."EIN", cast(gen."TOTFEDEXPEND" as BIGINT),
+                cfda."CFDA", cast(cfda."AMOUNT" as BIGINT), cfda."DIRECT", cast(cfda."PROGRAMTOTAL" as BIGINT)
+        FROM census_gen19 gen, census_cfda19 cfda
+        WHERE gen."AUDITYEAR" = :ref_year
+        AND cast(gen."TOTFEDEXPEND" as BIGINT) >= :threshold
+        AND gen."DBKEY" = cfda."DBKEY"
+        ORDER BY gen."DBKEY"
+    """
+    with engine.connect() as conn:
+        result = conn.execute(
+            sqlalchemy.text(AUDIT_QUERY), {"ref_year": REF_YEAR, "threshold": COG_LIMIT}
         )
+        gens = []
+        cfdas = []
+
+        for row in result:
+            (DBKEY, EIN, TOTFEDEXPEND, CFDA, AMOUNT, DIRECT, PROGRAMTOTAL) = row
+            if (DBKEY, EIN, TOTFEDEXPEND) not in gens:
+                gens.append((DBKEY, EIN, TOTFEDEXPEND))
+            cfdas.append((DBKEY, CFDA, AMOUNT, DIRECT, PROGRAMTOTAL))
+
+    CognizantBaseline.objects.all().delete()
+    for gen in gens:
+        dbkey = gen[0]
+        ein = gen[1]
+        total_amount_expended = gen[2]
         (total_da_amount_expended, max_total_agency, max_da_agency) = calc_cfda_amounts(
-            cfdas
+            cfdas=[cfda for cfda in cfdas if cfda[0] == dbkey]
         )
         cognizant_agency = determine_agency(
             total_amount_expended,
@@ -109,9 +109,11 @@ def set_2019_baseline():
             max_total_agency,
             max_da_agency,
         )
-        CognizantBaseline(
-            dbkey=dbkey, audit_year=2019, ein=ein, cognizant_agency=cognizant_agency
-        ).save()
+        if cognizant_agency:
+            CognizantBaseline(
+                dbkey=dbkey, audit_year=2019, ein=ein, cognizant_agency=cognizant_agency
+            ).save()
+    return CognizantBaseline.objects.count()
 
 
 def calc_cfda_amounts(cfdas):
@@ -119,11 +121,14 @@ def calc_cfda_amounts(cfdas):
     total_da_amount_agency = defaultdict(lambda: 0)
     total_da_amount_expended = 0
     for cfda in cfdas:
-        agency = cfda.cfda
-        total_amount_agency[agency] += cfda.program["amount_expended"]
-        if cfda.direct == "Y":
-            total_da_amount_expended += cfda.program["amount_expended"]
-            total_da_amount_agency[agency] += cfda.program["amount_expended"]
+        agency = cfda[1][:2]
+        amount = cfda[2] or 0
+        direct = cfda[3]
+        programtotal = cfda[4] or 0
+        total_amount_agency[agency] += amount
+        if direct == "Y":
+            total_da_amount_expended += programtotal
+            total_da_amount_agency[agency] += programtotal
     max_total_agency, max_da_agency = _extract_max_agency(
         total_amount_agency, total_da_amount_agency
     )
@@ -132,5 +137,8 @@ def calc_cfda_amounts(cfdas):
 
 def _extract_max_agency(total_amount_agency, total_da_amount_agency):
     max_total_agency = max(total_amount_agency.items(), key=lambda x: x[1])
-    max_da_agency = max(total_da_amount_agency.items(), key=lambda x: x[1])
+    if len(total_da_amount_agency) > 1:
+        max_da_agency = max(total_da_amount_agency.items(), key=lambda x: x[1])
+    else:
+        max_da_agency = total_da_amount_agency
     return max_total_agency, max_da_agency

@@ -30,26 +30,16 @@ def main(args):
 
     with zipfile.ZipFile(args.zip, "r") as zip_ref:
         zip_ref.extractall(tdir)
-    for filename in glob.glob(os.path.join(tdir, "[!clean]*.txt")):
+    # for filename in glob.glob(os.path.join(tdir, "[!clean]*.txt")):
+    for filename in os.listdir(tdir):
+        filepath = os.path.join(tdir, filename)
+        print(f"Extracted {filepath}")
         # print(f'{filename} - {translate[encoding["encoding"]]}')
-        clean_filename = os.path.join(f"clean-{tdir}", f"{Path(filename).stem}.txt")
-        print(f"{filename} -> {clean_filename}")
-        # with open(filename, 'r', encoding='cp1252') as inp:
-        #     counter = 0
-        #     with open(clean_filename, 'w', encoding='utf-8') as outp:
-        #         line = True
-        #         while line:
-        #             try:
-        #                 line = inp.readline()
-        #                 outp.write(str(line.encode('utf-8')))
-        #                 outp.write("\n")
-        #             except Exception as e:
-        #                 print(e)
-        #                 counter += 1
-        #                 pass
-        #     outp.close()
+        # clean_filename = os.path.join(f"clean-{tdir}", f"{Path(filename).stem}.txt")
+        clean_filename = os.path.join(f"clean-{tdir}", filename)
+        print(f"{filepath} -> {clean_filename}")
 
-        content = open(filename, "rb").read().decode("cp1252")
+        content = open(filepath, "rb").read().decode("cp1252")
         ascii = content.encode("ascii", "ignore")
         f = open(clean_filename, "wb")
         f.write(ascii)
@@ -72,6 +62,8 @@ def main(args):
             # Remove the year
             tablename = re.sub(r"[0-9]+", "", tablename)
             df.to_sql(name=tablename, con=conn)
+
+        print(f"loaded {clean_filename} to {tablename}")
 
 
 if __name__ == "__main__":

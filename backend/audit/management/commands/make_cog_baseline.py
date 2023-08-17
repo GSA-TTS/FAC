@@ -8,4 +8,5 @@ class Command(BaseCommand):
     """
 
     def handle(self, *args, **kwargs):
-        set_2019_baseline()
+        count = set_2019_baseline()
+        print(f"Loaded {count} rows to baseline table")
