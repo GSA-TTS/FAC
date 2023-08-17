@@ -13,8 +13,8 @@ from audit.cog_over import cog_over
 
 
 class CogOverTests(TestCase):
-    def __init__(self, methodName: str = "runTest") -> None:
-        super().__init__(methodName)
+    def __init__(self, method_name: str = "runTest") -> None:
+        super().__init__(method_name)
 
     def setUp(self):
         self.user = baker.make(User)
@@ -182,14 +182,14 @@ class CogOverTests(TestCase):
         sac.save()
         self.sac = sac
 
-        fake_cogBaseline = self._fake_cognizantbaseline()
+        fake_cog_baseline = self._fake_cognizantbaseline()
         self.cognizantbaseline = CognizantBaseline(
-            dbkey=fake_cogBaseline["dbkey"],
-            audit_year=fake_cogBaseline["audit_year"],
+            dbkey=fake_cog_baseline["dbkey"],
+            audit_year=fake_cog_baseline["audit_year"],
             ein=self.sac.general_information[
                 "ein"
-            ],  # fake_cogBaseline['ein'], # self.sac.general_information["ein"],
-            cognizant_agency=fake_cogBaseline["cognizant_agency"],
+            ],  # fake_cog_baseline['ein'], # self.sac.general_information["ein"],
+            cognizant_agency=fake_cog_baseline["cognizant_agency"],
         ).save()
         cog_agency, over_agency = cog_over(self.sac)
         # print("cog_agency = ", cog_agency)
@@ -205,14 +205,14 @@ class CogOverTests(TestCase):
         sac.save()
         self.sac = sac
 
-        fake_cogBaseline = self._fake_cognizantbaseline()
+        fake_cog_baseline = self._fake_cognizantbaseline()
         self.cognizantbaseline = CognizantBaseline(
-            dbkey=fake_cogBaseline["dbkey"],
-            audit_year=fake_cogBaseline["audit_year"],
+            dbkey=fake_cog_baseline["dbkey"],
+            audit_year=fake_cog_baseline["audit_year"],
             ein=self.sac.general_information[
                 "ein"
-            ],  # fake_cogBaseline['ein'], # self.sac.general_information["ein"],
-            cognizant_agency=fake_cogBaseline["cognizant_agency"],
+            ],  # fake_cog_baseline['ein'], # self.sac.general_information["ein"],
+            cognizant_agency=fake_cog_baseline["cognizant_agency"],
         ).save()
         cog_agency, over_agency = cog_over(self.sac)
         # print("cog_agency = ", cog_agency)
@@ -228,14 +228,14 @@ class CogOverTests(TestCase):
         sac.save()
         self.sac = sac
 
-        fake_cogBaseline = self._fake_cognizantbaseline()
+        fake_cog_baseline = self._fake_cognizantbaseline()
         self.cognizantbaseline = CognizantBaseline(
-            dbkey=fake_cogBaseline["dbkey"],
-            audit_year=fake_cogBaseline["audit_year"],
+            dbkey=fake_cog_baseline["dbkey"],
+            audit_year=fake_cog_baseline["audit_year"],
             ein=self.sac.general_information[
                 "ein"
-            ],  # fake_cogBaseline['ein'], # self.sac.general_information["ein"],
-            cognizant_agency=fake_cogBaseline["cognizant_agency"],
+            ],  # fake_cog_baseline['ein'], # self.sac.general_information["ein"],
+            cognizant_agency=fake_cog_baseline["cognizant_agency"],
         ).save()
         cog_agency, over_agency = cog_over(self.sac)
         # print("cog_agency = ", cog_agency)
@@ -251,12 +251,12 @@ class CogOverTests(TestCase):
         sac.save()
         self.sac = sac
 
-        fake_cogBaseline = self._fake_cognizantbaseline()
+        fake_cog_baseline = self._fake_cognizantbaseline()
         self.cognizantbaseline = CognizantBaseline(
-            dbkey=fake_cogBaseline["dbkey"],
-            audit_year=fake_cogBaseline["audit_year"],
-            ein=fake_cogBaseline["ein"],  # self.sac.general_information["ein"],
-            cognizant_agency=fake_cogBaseline["cognizant_agency"],
+            dbkey=fake_cog_baseline["dbkey"],
+            audit_year=fake_cog_baseline["audit_year"],
+            ein=fake_cog_baseline["ein"],  # self.sac.general_information["ein"],
+            cognizant_agency=fake_cog_baseline["cognizant_agency"],
         ).save()
         cog_agency, over_agency = cog_over(self.sac)
         # print("cog_agency = ", cog_agency)

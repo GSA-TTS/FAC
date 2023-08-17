@@ -38,9 +38,9 @@ def main(args):
         print(f"{filepath} -> {clean_filename}")
 
         content = open(filepath, "rb").read().decode("cp1252")
-        ascii = content.encode("ascii", "ignore")
+        ascii_encoded = content.encode("ascii", "ignore")
         f = open(clean_filename, "wb")
-        f.write(ascii)
+        f.write(ascii_encoded)
         f.close()
 
         # print(f'Skipped {counter} lines in {filename} for encoding reasons.')
