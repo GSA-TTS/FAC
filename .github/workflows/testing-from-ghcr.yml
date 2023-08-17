@@ -42,11 +42,12 @@ jobs:
         working-directory: ./backend
         run: |
           docker compose -f docker-compose-web.yml run web bash -c 'coverage run --parallel-mode --concurrency=multiprocessing manage.py test --parallel && coverage combine && coverage report -m --fail-under=90 && coverage xml -o coverage.xml'
+          docker cp backend-web-1:/src/coverage.xml ./coverage.xml
 
       - name: Coverage
         uses: 5monkeys/cobertura-action@master
         with:
-          path: /src/coverage.xml
+          path: coverage.xml
           minimum_coverage: 90
 
   # a11y-testing:
