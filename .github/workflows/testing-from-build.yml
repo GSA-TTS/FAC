@@ -48,8 +48,8 @@ jobs:
           path: ./coverage.xml
           minimum_coverage: 90
           skip_covered: true # Set to false to show 100% covered on report
-          fail_below_threshold: false # Fails the action
-          show_missing: false # enable true to see exact lines that are missing (report is formatted odd on pr and hard to read)
+          fail_below_threshold: false # Fails the action if 90% threshold is not met
+          show_missing: true
           repo_token: ${{ secrets.GITHUB_TOKEN }}
 
   a11y-testing:
