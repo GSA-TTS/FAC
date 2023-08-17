@@ -12,7 +12,7 @@ import csv
 # Usage:
 # python main.py --zip all.zip --sqlite file.sqlite3
 parser = argparse.ArgumentParser()
-dtypes = defaultdict(lambda: str)
+dtypes: defaultdict = defaultdict(lambda: str)
 
 
 def main(args):
