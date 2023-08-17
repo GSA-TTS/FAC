@@ -12,5 +12,5 @@ export function testPdfAuditReport() {
   cy.get('#CAP_page').type(1);
 
   cy.get('#upload_report').selectFile('cypress/fixtures/basic.pdf');
-  cy.get('#continue').click();
+  cy.get('#continue').click(); // Performs upload and return to main page
 }

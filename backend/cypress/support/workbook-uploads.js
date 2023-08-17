@@ -3,18 +3,18 @@
 // testWorkbookUpload('/audit/excel/federal-awards-expended/*', '#file-input-federal-awards-xlsx', 'federal-awards-expended-UPDATE.xlsx')
 // assumes you are on the appropriate upload page already
 function testWorkbookUpload(interceptUrl, uploadSelector, filename, will_intercept = true) {
-  cy.intercept(interceptUrl + '*', (req) => {
-    if (will_intercept) {
-      // return a success fixture
-      req.reply({ fixture: 'success-res.json' });
-    } else {
-      // with no intercept, don't intervene
-      req.continue();
-    }
-  }).as('uploadSuccess');
+    cy.intercept(interceptUrl + '*', (req) => {
+      if (will_intercept) {
+        // return a success fixture
+        req.reply({ fixture: 'success-res.json' });
+      } else {
+        // with no intercept, don't intervene
+        req.continue();
+      }
+    }).as('uploadSuccess');
   cy.get(uploadSelector).attachFile(filename);
   // Upload url (POST /audit/excel/workbookname) returns a redirect to "/" on successful upload. So, 302.
-  cy.wait('@uploadSuccess').its('response.statusCode').should('eq', 302);
+  cy.wait('@uploadSuccess').its('response.statusCode').should('eq', 302);  
   cy.get('#info_box')
     .should(
       'have.text',
