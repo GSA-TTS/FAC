@@ -60,6 +60,13 @@ SAMPLE_BASE_SAC_DATA = {
     },
 }
 
+EMAIL_TO_ROLE = {
+    "certifying_auditee_contact_email": "certifying_auditee_contact",
+    "certifying_auditor_contact_email": "certifying_auditor_contact",
+    "auditee_contacts_email": "editor",
+    "auditor_contacts_email": "editor",
+}
+
 
 class TestPreliminaryViews(TestCase):
     """
@@ -219,11 +226,11 @@ class TestPreliminaryViews(TestCase):
 
         accesses = Access.objects.filter(sac=sac)
         for key, val in self.step3_data.items():
-            # Fields come in as auditee/auditor emails, become editor:
-            if key in ("auditee_contacts_email", "auditor_contacts_email"):
-                key = "editor"
-            matches = [acc for acc in accesses if acc.email == val]
-            self.assertEqual(matches[0].role, key)
+            # Fields come in as auditee/auditor emails, become roles:
+            if key in ("auditee_contacts_email", "auditor_contacts_email", "certifying_auditee_contact_email", "certifying_auditor_contact_email"):
+                key = EMAIL_TO_ROLE[key]
+                matches = [acc for acc in accesses if acc.email == val]
+                self.assertEqual(matches[0].role, key)
 
     @patch("report_submission.forms.get_uei_info_from_sam_gov")
     def test_step_two_auditeeinfo_submission_empty(self, mock_get_uei_info):

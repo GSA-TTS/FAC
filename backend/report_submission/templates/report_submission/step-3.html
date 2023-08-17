@@ -195,19 +195,16 @@
                                 <div class="usa-form-group">
                                     <label class="usa-label" for="auditee_contacts_fullname">
                                         First name, last name
-                                        <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
                                     </label>
                                     <ul class="usa-error-message"
                                         id="auditee_contacts_fullname-error-message"
                                         role="alert">
-                                        <li id="auditee_contacts_fullname-not-null" hidden>Please enter the auditee contact's fist and last names.</li>
+                                        <li id="auditee_contacts_fullname-matched-field" hidden>When adding an auditee contact, please provide both an email address and a first and last name. </li>
                                     </ul>
                                     <input class="usa-input"
                                            id="auditee_contacts_fullname"
                                            name="auditee_contacts_fullname"
-                                           aria-required="true"
-                                           required
-                                           data-validate-not-null=""/>
+                                           data-validate-matched-field="auditee_contacts_email"/>
                                 </div>
                             </div>
                             <div class="grid-row grid-gap">
@@ -215,30 +212,26 @@
                                     <div class="usa-form-group">
                                         <label class="usa-label" for="auditee_contacts_email">
                                             Email address
-                                            <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
                                         </label>
                                         <ul class="usa-error-message"
                                             id="auditee_contacts_email-error-message"
                                             role="alert">
-                                            <li id="auditee_contacts_email-not-null" hidden>Please enter a valid email address</li>
                                             <li id="auditee_contacts_email-email" hidden>
                                                 An email address should have a username, an &#39;@&#39; symbol, and a domain name
                                             </li>
+                                            <li id="auditee_contacts_email-matched-field" hidden>When adding an auditee contact, please provide both an email address and a first and last name.</li>
                                         </ul>
                                         <input class="usa-input"
                                                id="auditee_contacts_email"
                                                name="auditee_contacts_email"
-                                               aria-required="true"
-                                               required
-                                               data-validate-not-null=""
-                                               data-validate-email=""/>
+                                               data-validate-email=""
+                                               data-validate-matched-field="auditee_contacts_fullname"/>
                                     </div>
                                 </div>
                                 <div class="tablet:grid-col-fill">
                                     <div class="usa-form-group">
                                         <label class="usa-label" for="auditee_contacts_re_email">
                                             Re-enter email address
-                                            <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
                                         </label>
                                         <ul class="usa-error-message"
                                             id="auditee_contacts_re_email-error-message"
@@ -248,8 +241,6 @@
                                         <input class="usa-input"
                                                id="auditee_contacts_re_email"
                                                name="auditee_contacts_re_email"
-                                               aria-required="true"
-                                               required
                                                data-validate-must-match="auditee_contacts_email"/>
                                     </div>
                                 </div>
@@ -259,19 +250,16 @@
                                     <div class="usa-form-group">
                                         <label class="usa-label" for="auditee_contacts_fullname">
                                             First name, last name
-                                            <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
                                         </label>
                                         <ul class="usa-error-message"
                                             id="auditee_contacts_fullname-error-message"
                                             role="alert">
-                                            <li id="auditee_contacts_fullname-not-null" hidden>Please enter the auditee contact's first and last names.</li>
+                                            <li id="auditee_contacts_fullname-matched-field" hidden>When adding an auditee contact, please provide both an email address and a first and last name. </li>
                                         </ul>
                                         <input class="usa-input"
                                                id="auditee_contacts_fullname"
                                                name="auditee_contacts_fullname"
-                                               aria-required="true"
-                                               required
-                                               data-validate-not-null=""/>
+                                               data-validate-matched-field="auditee_contacts_email"/>
                                     </div>
                                 </div>
                                 <div class="grid-row grid-gap">
@@ -279,30 +267,26 @@
                                         <div class="usa-form-group">
                                             <label class="usa-label" for="auditee_contacts_email">
                                                 Email address
-                                                <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
                                             </label>
                                             <ul class="usa-error-message"
                                                 id="auditee_contacts_email-error-message"
                                                 role="alert">
-                                                <li id="auditee_contacts_email-not-null" hidden>Please enter a valid email address</li>
                                                 <li id="auditee_contacts_email-email" hidden>
                                                     An email address should have a username, an &#39;@&#39; symbol, and a domain name
                                                 </li>
+                                                <li id="auditee_contacts_email-matched-field" hidden>When adding an auditee contact, please provide both an email address and a first and last name.</li>
                                             </ul>
                                             <input class="usa-input"
                                                    id="auditee_contacts_email"
                                                    name="auditee_contacts_email"
-                                                   aria-required="true"
-                                                   required
-                                                   data-validate-not-null=""
-                                                   data-validate-email=""/>
+                                                   data-validate-email=""
+                                                   data-validate-matched-field="auditee_contacts_fullname"/>
                                         </div>
                                     </div>
                                     <div class="tablet:grid-col-fill">
                                         <div class="usa-form-group">
                                             <label class="usa-label" for="auditee_contacts_re_email">
                                                 Re-enter email address
-                                                <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
                                             </label>
                                             <ul class="usa-error-message"
                                                 id="auditee_contacts_re_email-error-message"
@@ -312,11 +296,10 @@
                                             <input class="usa-input"
                                                    id="auditee_contacts_re_email"
                                                    name="auditee_contacts_re_email"
-                                                   aria-required="true"
-                                                   required
                                                    data-validate-must-match="auditee_contacts_email"/>
                                         </div>
                                     </div>
+                                </div>
                                     <button class="usa-button usa-button--unstyled delete-contact"
                                             aria-label="Delete contact"
                                             title="Delete contact">
@@ -338,19 +321,16 @@
                                     <div class="usa-form-group">
                                         <label class="usa-label" for="auditor_contacts_fullname">
                                             First name, last name
-                                            <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
                                         </label>
                                         <ul class="usa-error-message"
                                             id="auditor_contacts_fullname-error-message"
                                             role="alert">
-                                            <li id="auditor_contacts_fullname-not-null" hidden>Please enter the auditor contact's first and last names.</li>
+                                            <li id="auditor_contacts_fullname-matched-field" hidden>When adding an auditor contact, please provide both an email address and a first and last name. </li>
                                         </ul>
                                         <input class="usa-input"
                                                id="auditor_contacts_fullname"
                                                name="auditor_contacts_fullname"
-                                               aria-required="true"
-                                               required
-                                               data-validate-not-null=""/>
+                                               data-validate-matched-field="auditor_contacts_email"/>
                                     </div>
                                 </div>
                                 <div class="grid-row grid-gap">
@@ -358,30 +338,26 @@
                                         <div class="usa-form-group">
                                             <label class="usa-label" for="auditor_contacts_email">
                                                 Email address
-                                                <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
                                             </label>
                                             <ul class="usa-error-message"
                                                 id="auditor_contacts_email-error-message"
                                                 role="alert">
-                                                <li id="auditor_contacts_email-not-null" hidden>Please enter a valid email address</li>
                                                 <li id="auditor_contacts_email-email" hidden>
                                                     An email address should have a username, an &#39;@&#39; symbol, and a domain name
                                                 </li>
+                                                <li id="auditor_contacts_email-matched-field" hidden>When adding an auditor contact, please provide both an email address and a first and last name.</li>
                                             </ul>
                                             <input class="usa-input"
                                                    id="auditor_contacts_email"
                                                    name="auditor_contacts_email"
-                                                   aria-required="true"
-                                                   required
-                                                   data-validate-not-null=""
-                                                   data-validate-email=""/>
+                                                   data-validate-email=""
+                                                   data-validate-matched-field="auditor_contacts_fullname"/>
                                         </div>
                                     </div>
                                     <div class="tablet:grid-col-fill">
                                         <div class="usa-form-group">
                                             <label class="usa-label" for="auditor_contacts_re_email">
                                                 Re-enter email address
-                                                <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
                                             </label>
                                             <ul class="usa-error-message"
                                                 id="auditor_contacts_re_email-error-message"
@@ -391,8 +367,6 @@
                                             <input class="usa-input"
                                                    id="auditor_contacts_re_email"
                                                    name="auditor_contacts_re_email"
-                                                   aria-required="true"
-                                                   required
                                                    data-validate-must-match="auditor_contacts_email"/>
                                         </div>
                                     </div>
@@ -402,19 +376,16 @@
                                         <div class="usa-form-group">
                                             <label class="usa-label" for="auditor_contacts_fullname">
                                                 First name, last name
-                                                <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
                                             </label>
                                             <ul class="usa-error-message"
                                                 id="auditor_contacts_fullname-error-message"
                                                 role="alert">
-                                                <li id="auditor_contacts_fullname-not-null" hidden>Please enter the auditor contact's first and last names.</li>
+                                                <li id="auditor_contacts_fullname-matched-field" hidden>When adding an auditor contact, please provide both an email address and a first and last name. </li>
                                             </ul>
                                             <input class="usa-input"
                                                    id="auditor_contacts_fullname"
                                                    name="auditor_contacts_fullname"
-                                                   aria-required="true"
-                                                   required
-                                                   data-validate-not-null=""/>
+                                                   data-validate-matched-field="auditor_contacts_email"/>
                                         </div>
                                     </div>
                                     <div class="grid-row grid-gap">
@@ -422,30 +393,26 @@
                                             <div class="usa-form-group">
                                                 <label class="usa-label" for="auditor_contacts_email">
                                                     Email address
-                                                    <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
                                                 </label>
                                                 <ul class="usa-error-message"
                                                     id="auditor_contacts_email-error-message"
                                                     role="alert">
-                                                    <li id="auditor_contacts_email-not-null" hidden>Please enter a valid email address</li>
                                                     <li id="auditor_contacts_email-email" hidden>
                                                         An email address should have a username, an &#39;@&#39; symbol, and a domain name
                                                     </li>
+                                                    <li id="auditor_contacts_email-matched-field" hidden>When adding an auditor contact, please provide both an email address and a first and last name.</li>
                                                 </ul>
                                                 <input class="usa-input"
                                                        id="auditor_contacts_email"
                                                        name="auditor_contacts_email"
-                                                       aria-required="true"
-                                                       required
-                                                       data-validate-not-null=""
-                                                       data-validate-email=""/>
+                                                       data-validate-email=""
+                                                       data-validate-matched-field="auditor_contacts_fullname"/>
                                             </div>
                                         </div>
                                         <div class="tablet:grid-col-fill">
                                             <div class="usa-form-group">
                                                 <label class="usa-label" for="auditor_contacts_re_email">
                                                     Re-enter email address
-                                                    <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
                                                 </label>
                                                 <ul class="usa-error-message"
                                                     id="auditor_contacts_re_email-error-message"
@@ -455,8 +422,6 @@
                                                 <input class="usa-input"
                                                        id="auditor_contacts_re_email"
                                                        name="auditor_contacts_re_email"
-                                                       aria-required="true"
-                                                       required
                                                        data-validate-must-match="auditor_contacts_email"/>
                                             </div>
                                         </div>

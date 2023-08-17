@@ -139,7 +139,6 @@ def access_and_submission_check(user, data):
             email=serializer.data.get("certifying_auditor_contact_email"),
         )
 
-        # This fails if you leave out a name. "index" is undefined.
         for index, email in enumerate(serializer.data.get("auditee_contacts_email")):
             Access.objects.create(
                 sac=sac,

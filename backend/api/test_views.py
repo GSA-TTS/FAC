@@ -45,6 +45,13 @@ VALID_ACCESS_AND_SUBMISSION_DATA = {
     "auditor_contacts_fullname": ["Name"],
 }
 
+EMAIL_TO_ROLE = {
+    "certifying_auditee_contact_email": "certifying_auditee_contact",
+    "certifying_auditor_contact_email": "certifying_auditor_contact",
+    "auditee_contacts_email": "editor",
+    "auditor_contacts_email": "editor",
+}
+
 SAMPLE_BASE_SAC_DATA = {
     # 0. Meta data
     "submitted_by": None,
@@ -592,8 +599,8 @@ class SingleAuditChecklistViewTests(TestCase):
             if key in ["auditee_contacts_email", "auditor_contacts_email"]:
                 for item in value:
                     self.assertTrue(item in full_data["editors"])
-            else:
-                self.assertEqual(full_data[key], value)
+            elif key in ["certifying_auditee_contact_email", "certifying_auditor_contact_email"]:
+                self.assertEqual(full_data[EMAIL_TO_ROLE[key]], value)
         for key, value in eligibility_info.items():
             self.assertEqual(full_data["general_information"][key], value)
         for key, value in VALID_AUDITEE_INFO_DATA.items():

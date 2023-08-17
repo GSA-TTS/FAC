@@ -45,12 +45,18 @@ function appendContactField(btnEl) {
       const newMatchVal = newInputs[key - 1].id + '_' + addedContactNum;
       q.setAttribute('data-validate-must-match', newMatchVal);
     }
+    if (key in [0, 1]) {
+      const newMatchVal = newInputs[key].id + '_' + addedContactNum;
+      q.setAttribute('data-validate-matched-field', newMatchVal)
+    }
   });
   const newLabels = newRow.querySelectorAll('label');
   const nrErrorMsgs = newRow.querySelectorAll('.usa-error-message');
   const nrErrorItems1 = newRow.querySelectorAll('li[id$="-not-null"]');
   const nrErrorItems2 = newRow.querySelectorAll('li[id$="-email"]');
   const nrErrorItems3 = newRow.querySelectorAll('li[id$="-must-match"]');
+  const nrErrorItems4 = newRow.querySelectorAll('li[id$="-matched-field"]');
+  //const nrMatchedInputs = newRow.querySelectorAll('[data-validate-matched-field]')
 
   appendInc(newInputs, 'id', addedContactNum);
   appendInc(newLabels, 'for', addedContactNum);
@@ -58,6 +64,8 @@ function appendContactField(btnEl) {
   insertInc(nrErrorItems1, 'id', '-not-null', addedContactNum);
   insertInc(nrErrorItems2, 'id', '-email', addedContactNum);
   insertInc(nrErrorItems3, 'id', '-must-match', addedContactNum);
+  insertInc(nrErrorItems4, 'id', '-matched-field', addedContactNum);
+  //insertInc(nrMatchedInputs, 'data-validate-matched-field', '-matched-field', addedContactNum);
 
   addedContactNum++;
 
