@@ -12,7 +12,7 @@ from django.core.files.storage import default_storage
 import io
 
 parser = argparse.ArgumentParser()
-dtypes = defaultdict(lambda: str)
+dtypes: defaultdict = defaultdict(lambda: str)
 
 
 logger = logging.getLogger(__name__)

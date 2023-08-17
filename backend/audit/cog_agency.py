@@ -36,7 +36,6 @@
 from collections import defaultdict
 
 
-
 def calc_amount_expended_limit():
     MILLION = 1_000_000
     amount_expended_limit = 50 * MILLION
