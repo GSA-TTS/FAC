@@ -34,7 +34,6 @@
 
 from collections import defaultdict
 
-# from census2019.models import Cfda19, Gen19
 
 
 def calc_amount_expended_limit():

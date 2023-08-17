@@ -113,9 +113,7 @@ INSTALLED_APPS += [
     "users",
     "report_submission",
     "cms",
-    # "data_distro",
     "dissemination",
-    "census2019",
 ]
 
 MIDDLEWARE = [

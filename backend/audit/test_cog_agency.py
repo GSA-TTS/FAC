@@ -157,7 +157,6 @@ class CogOverAssignmentTests(TestCase):
         }
 
     def test_cog_over_for_gt_threshold_cog_2019(self):
-        # filename = "census2019_cfda19.json"
         # info = json.loads(Path(AUDIT_JSON_FIXTURES / filename).read_text(encoding="utf-8"))
         # # info = json.loads(AUDIT_JSON_FIXTURES / filename)
         # cfda19 = baker.make(Cfda19, info)
