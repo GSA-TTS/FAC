@@ -374,7 +374,9 @@ class ETL(object):
 
     def load_additional_uei(self):
         addls = self.single_audit_checklist.additional_ueis
-        if addls and "additional_ueis_entries" in addls["AdditionalUEIs"]:
+        if (addls 
+            and "AdditionalUEIs" in addls
+            and "additional_ueis_entries" in addls["AdditionalUEIs"]):
             for uei in addls["AdditionalUEIs"]["additional_ueis_entries"]:
                 auei = AdditionalUei(
                     report_id=self.single_audit_checklist.report_id,
