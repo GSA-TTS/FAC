@@ -7,7 +7,6 @@ from .models import SingleAuditChecklist, CognizantBaseline, User
 
 from audit.cog_over import cog_over
 
-
 # Note:  Fake data is generated for SingleAuditChecklist, CognizantBaseline.
 #        Using only the data fields that apply to cog / over assignment.
 
@@ -188,12 +187,13 @@ class CogOverTests(TestCase):
             audit_year=fake_cog_baseline["audit_year"],
             ein=self.sac.general_information[
                 "ein"
-            ],  # fake_cog_baseline['ein'], # self.sac.general_information["ein"],
+            ],
             cognizant_agency=fake_cog_baseline["cognizant_agency"],
         ).save()
+        cog_agency = None
+        over_agency = None
         cog_agency, over_agency = cog_over(self.sac)
-        # print("cog_agency = ", cog_agency)
-        # print("over_agency = ", over_agency)
+        self.assertEqual(cog_agency, '20')
         self.assertEqual(over_agency, None)
 
     def test_cog_over_for_lt_cog_lit_gt_da_threshold_factor_oversight(self):
@@ -211,13 +211,14 @@ class CogOverTests(TestCase):
             audit_year=fake_cog_baseline["audit_year"],
             ein=self.sac.general_information[
                 "ein"
-            ],  # fake_cog_baseline['ein'], # self.sac.general_information["ein"],
+            ],
             cognizant_agency=fake_cog_baseline["cognizant_agency"],
         ).save()
+        cog_agency = None
+        over_agency = None
         cog_agency, over_agency = cog_over(self.sac)
-        # print("cog_agency = ", cog_agency)
-        # print("over_agency = ", over_agency)
         self.assertEqual(cog_agency, None)
+        self.assertEqual(over_agency, '15')
 
     def test_cog_over_for_lt_cog_limit_lt_da_threshold_oversight(self):
         sac = SingleAuditChecklist.objects.create(
@@ -234,13 +235,14 @@ class CogOverTests(TestCase):
             audit_year=fake_cog_baseline["audit_year"],
             ein=self.sac.general_information[
                 "ein"
-            ],  # fake_cog_baseline['ein'], # self.sac.general_information["ein"],
+            ],
             cognizant_agency=fake_cog_baseline["cognizant_agency"],
         ).save()
+        cog_agency = None
+        over_agency = None
         cog_agency, over_agency = cog_over(self.sac)
-        # print("cog_agency = ", cog_agency)
-        # print("over_agency = ", over_agency)
         self.assertEqual(cog_agency, None)
+        self.assertEqual(over_agency, '25')
 
     def test_cog_over_gt_cog_limit_no_2019(self):
         sac = SingleAuditChecklist.objects.create(
@@ -255,10 +257,11 @@ class CogOverTests(TestCase):
         self.cognizantbaseline = CognizantBaseline(
             dbkey=fake_cog_baseline["dbkey"],
             audit_year=fake_cog_baseline["audit_year"],
-            ein=fake_cog_baseline["ein"],  # self.sac.general_information["ein"],
+            ein=fake_cog_baseline["ein"],
             cognizant_agency=fake_cog_baseline["cognizant_agency"],
         ).save()
+        cog_agency = None
+        over_agency = None
         cog_agency, over_agency = cog_over(self.sac)
-        # print("cog_agency = ", cog_agency)
-        # print("over_agency = ", over_agency)
+        self.assertEqual(cog_agency, '10')
         self.assertEqual(over_agency, None)
