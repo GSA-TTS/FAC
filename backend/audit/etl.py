@@ -202,7 +202,6 @@ class ETL(object):
                         for entry in entries:
                             note = Note(
                                 report_id=self.report_id,
-                                note_seq_number=entry["seq_number"],
                                 content=entry["note_content"],
                                 note_title=entry["note_title"],
                                 accounting_policies=accounting_policies,
