@@ -34,8 +34,6 @@ from .validators import (
     validate_component_page_numbers,
 )
 
-
-
 User = get_user_model()
 
 logger = logging.getLogger(__name__)

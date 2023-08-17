@@ -137,7 +137,7 @@ def calc_cfda_amounts(cfdas):
 
 def _extract_max_agency(total_amount_agency, total_da_amount_agency):
     max_total_agency = max(total_amount_agency.items(), key=lambda x: x[1])
-    if len(total_da_amount_agency) > 1:
+    if len(total_da_amount_agency) > 0:
         max_da_agency = max(total_da_amount_agency.items(), key=lambda x: x[1])
     else:
         max_da_agency = total_da_amount_agency
