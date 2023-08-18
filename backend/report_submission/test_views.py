@@ -227,7 +227,12 @@ class TestPreliminaryViews(TestCase):
         accesses = Access.objects.filter(sac=sac)
         for key, val in self.step3_data.items():
             # Fields come in as auditee/auditor emails, become roles:
-            if key in ("auditee_contacts_email", "auditor_contacts_email", "certifying_auditee_contact_email", "certifying_auditor_contact_email"):
+            if key in (
+                "auditee_contacts_email",
+                "auditor_contacts_email",
+                "certifying_auditee_contact_email",
+                "certifying_auditor_contact_email",
+            ):
                 key = EMAIL_TO_ROLE[key]
                 matches = [acc for acc in accesses if acc.email == val]
                 self.assertEqual(matches[0].role, key)

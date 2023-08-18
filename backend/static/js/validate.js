@@ -123,9 +123,7 @@ export const validations = {
       validation: 'matched-field',
     };
     const isMatchedForgotten = field.value && !matchFieldEl.value;
-    return isMatchedForgotten
-      ? { ...result, error: true }
-      : result;
+    return isMatchedForgotten ? { ...result, error: true } : result;
   },
 
   validateMustMatch: (field, matchField) => {

@@ -207,9 +207,15 @@ class AccessAndSubmissionStepTests(TestCase):
             "certifying_auditee_contact_email": "a@a.com",
             "certifying_auditor_contact_fullname": "Fuller B. Namesmith",
             "certifying_auditor_contact_email": "b@b.com",
-            "auditee_contacts_fullname": ["Fuller C. Namesmith", "Fuller CC. Namesmith"],
+            "auditee_contacts_fullname": [
+                "Fuller C. Namesmith",
+                "Fuller CC. Namesmith",
+            ],
             "auditee_contacts_email": ["c@c.com", "cc@c.com"],
-            "auditor_contacts_fullname": ["Fuller D. Namesmith", "Fuller DD. Namesmith"],
+            "auditor_contacts_fullname": [
+                "Fuller D. Namesmith",
+                "Fuller DD. Namesmith",
+            ],
             "auditor_contacts_email": ["d@d.com", "dd@d.com"],
         }
         self.assertTrue(AccessAndSubmissionSerializer(data=valid2).is_valid())

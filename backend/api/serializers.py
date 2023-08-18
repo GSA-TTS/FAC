@@ -146,16 +146,24 @@ class AccessAndSubmissionSerializer(serializers.Serializer):
     certifying_auditor_contact_fullname = serializers.CharField()
     certifying_auditor_contact_email = serializers.EmailField()
     auditor_contacts_email = serializers.ListField(
-        child=serializers.EmailField(required=False, allow_null=True, allow_blank=True), allow_empty=True, min_length=0
+        child=serializers.EmailField(required=False, allow_null=True, allow_blank=True),
+        allow_empty=True,
+        min_length=0,
     )
     auditee_contacts_email = serializers.ListField(
-        child=serializers.EmailField(required=False, allow_null=True, allow_blank=True), allow_empty=True, min_length=0
+        child=serializers.EmailField(required=False, allow_null=True, allow_blank=True),
+        allow_empty=True,
+        min_length=0,
     )
     auditor_contacts_fullname = serializers.ListField(
-        child=serializers.CharField(required=False, allow_null=True, allow_blank=True), allow_empty=True, min_length=0
+        child=serializers.CharField(required=False, allow_null=True, allow_blank=True),
+        allow_empty=True,
+        min_length=0,
     )
     auditee_contacts_fullname = serializers.ListField(
-        child=serializers.CharField(required=False, allow_null=True, allow_blank=True), allow_empty=True, min_length=0
+        child=serializers.CharField(required=False, allow_null=True, allow_blank=True),
+        allow_empty=True,
+        min_length=0,
     )
 
 

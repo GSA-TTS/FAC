@@ -42,11 +42,11 @@ function appendContactField(btnEl) {
   newInputs.forEach((q, key, arr) => {
     attachFocusoutMulti(newInputs);
     if (key === arr.length - 1) {
-      const newMatchVal = newInputs[(key - 1)].id + '_' + addedContactNum;
+      const newMatchVal = newInputs[key - 1].id + '_' + addedContactNum;
       q.setAttribute('data-validate-must-match', newMatchVal);
     }
     if (key in [0, 1]) {
-      const newMatchVal = newInputs[key ^= 1].id + '_' + addedContactNum;
+      const newMatchVal = newInputs[(key ^= 1)].id + '_' + addedContactNum;
       q.setAttribute('data-validate-matched-field', newMatchVal);
     }
   });
@@ -108,9 +108,9 @@ function attachEventHandlers() {
   const certifyingInputs = Array.from(
     document.querySelectorAll(
       '#grant-access input:not(.auditee_contacts input, .auditor_contacts input)'
-      )
+    )
   );
-  
+
   certifyingInputs.forEach((q) => {
     q.addEventListener('blur', (e) => {
       performValidations(e.target);
