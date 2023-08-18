@@ -7,9 +7,7 @@
   three_digit_extension: {
     instructions: [
       'Enter the last three digits of the agency\'s CFDA number.',
-      'Programs with No CFDA Number or the CFDA Number is Unknown',
-      'If the three-digit CFDA extension is unknown, enter a "U" followed by a two-digit number in the CFDA extension to identify one or more Federal award lines that form the program.',
-      'Programs that are part of the R&D Cluster and the CFDA Number is Unknown',
+      'For programs with No CFDA Number or if the CDFA Number is Unknown, enter a "U" followed by a two-digit number in the CFDA extension to identify one or more Federal award lines that form the program.',
       'If the Federal program is part of the Research and Development (R&D) cluster and the three-digit CFDA extension is unknown, enter "RD" in the CFDA Three-Digit Extension field.',
       'If the Federal program is part of the R&D cluster and the CFDA Three-Digit Extension is known, enter the CFDA Three-Digit Extension.'
     ],
