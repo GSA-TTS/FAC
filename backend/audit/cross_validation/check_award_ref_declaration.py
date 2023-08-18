@@ -25,7 +25,7 @@ def check_award_ref_declaration(sac_dict, *_args, **_kwargs):
     errors = []
 
     for award in federal_awards:
-        award_ref = award.get("award_reference", None)
+        award_ref = award.get("award_reference")
         if award_ref:
             declared_award_refs.add(award_ref)
 
