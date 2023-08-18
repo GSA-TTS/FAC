@@ -823,9 +823,9 @@ class AuditInfoFormView(SingleAuditChecklistAccessRequiredMixin, generic.View):
             if form.is_valid():
                 form.clean_booleans()
 
-                if 'not_gaap' not in form.cleaned_data['gaap_results']:
+                if "not_gaap" not in form.cleaned_data["gaap_results"]:
                     form.cleaned_data["sp_framework_basis"] = []
-                    form.cleaned_data["is_sp_framework_required"] = ''
+                    form.cleaned_data["is_sp_framework_required"] = ""
                     form.cleaned_data["sp_framework_opinions"] = []
                 else:
                     # This one needs to be a string, even if it's empty.

@@ -90,7 +90,7 @@ function attachEventHandlers() {
   // Add event listener to the larger form
   // If the "Not GAAP" option of quesion one is not checked, banish the optional questions.
   // So, if the user fills out optional questions then unchecks the "Not GAAP" option, they will not be submitted.
-  form.addEventListener('submit', (e) => {
+  form.addEventListener('submit', () => {
     const formData = new FormData(form);
     if (!checkbox_not_gaap.checked) {
       for (const test of [
@@ -100,9 +100,6 @@ function attachEventHandlers() {
       ]) {
         formData.delete(test);
       }
-    }
-    for (item of formData.entries()){
-      console.log(item)
     }
   });
 }
