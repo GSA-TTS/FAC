@@ -675,7 +675,7 @@ class SubmissionView(CertifyingAuditeeRequiredMixin, generic.View):
             sac.transition_to_submitted()
             sac.save()
 
-            return redirect(reverse("audit:SubmissionProgress", args=[report_id]))
+            return redirect(reverse("audit:MySubmissions"))
 
         except SingleAuditChecklist.DoesNotExist:
             raise PermissionDenied("You do not have access to this audit.")
