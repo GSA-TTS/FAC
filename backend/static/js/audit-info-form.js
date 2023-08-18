@@ -47,7 +47,7 @@ function attachEventHandlers() {
   const checkbox_not_gaap = document.getElementById('gaap_results--not_gaap');
   checkbox_not_gaap.addEventListener('click', () => {
     sp_framework_div.hidden = !checkbox_not_gaap.checked;
-    
+
     basis.forEach((checkbox) => {
       checkbox.required = checkbox_not_gaap.checked;
     });
@@ -59,9 +59,9 @@ function attachEventHandlers() {
     });
   });
 
-  // For the subquestions, they need to be required/unrequired if one option is clicked. 
-  // i.e. if the subquestions are showing and an option is clicked, the question is no longer required. 
-  // These are overwritten to be not required if the "Not GAAP" checkbox is un-checked. 
+  // For the subquestions, they need to be required/unrequired if one option is clicked.
+  // i.e. if the subquestions are showing and an option is clicked, the question is no longer required.
+  // These are overwritten to be not required if the "Not GAAP" checkbox is un-checked.
   basis.forEach((checkbox) => {
     // If any checkbox in basis is clicked, unrequire the section.
     checkbox.addEventListener('click', () => {
@@ -90,10 +90,14 @@ function attachEventHandlers() {
   // Add event listener to the larger form
   // If the "Not GAAP" option of quesion one is not checked, banish the optional questions.
   // So, if the user fills out optional questions then unchecks the "Not GAAP" option, they will not be submitted.
-  form.addEventListener('submit', (e) => {
+  form.addEventListener('submit', () => {
     const formData = new FormData(form);
-    if (!checkbox_not_gaap.checked){
-      for (const test of ['is_sp_framework_required', 'sp_framework_basis', 'sp_framework_opinions']){
+    if (!checkbox_not_gaap.checked) {
+      for (const test of [
+        'is_sp_framework_required',
+        'sp_framework_basis',
+        'sp_framework_opinions',
+      ]) {
         formData.delete(test);
       }
     }
