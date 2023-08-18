@@ -25,6 +25,9 @@ class AuditInfoForm(forms.Form):
                 data[k] = True
             elif v == ["False"]:
                 data[k] = False
+        # Hack fix until JSON Schema for this is improved:
+        if data["is_sp_framework_required"] == []:
+            del data["is_sp_framework_required"]
         self.cleaned_data = data
         return data
 
