@@ -45,3 +45,10 @@ def err_number_of_findings_inconsistent(total_expected, total_counted, award_ref
         f"You reported {total_expected} findings for award {award_ref} in the {SECTION_NAMES.FEDERAL_AWARDS} workbook, "
         f"but declared {total_counted} findings for the same award in the {SECTION_NAMES.FEDERAL_AWARDS_AUDIT_FINDINGS} workbook."
     )
+
+
+def err_missing_award_reference(row_num):
+    return (
+        f"The award listed in row {row_num} of your Federal Award workbook is missing a reference code. "
+        f"This should not be possible. Please contact customer support."
+    )
