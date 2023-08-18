@@ -32,7 +32,7 @@
                         <p class="margin-0">
                             <strong>Entity UEI <a>Unique Identity Identifier</a></strong>
                         </p>
-                        <div class="usa-hint margin-y-05" id="auditee_fiscal_period_start-hint">12-character alphanumeric ID</div>
+                        <div class="usa-hint margin-y-05" id="auditee_uei_hint">12-character alphanumeric ID</div>
                         <div class="usa-search" role="search">
                             <label class="usa-sr-only" for="auditee_uei">Search</label>
                             <input class="usa-input"
@@ -41,7 +41,8 @@
                                 name="auditee_uei"
                                 required
                                 data-validate-not-null=""
-                                data-validate-length="== 12"/>
+                                data-validate-length="== 12"
+                                aria-autocomplete/>
                             <button class="usa-button"
                                 id="auditee_uei-btn"
                                 type="submit"
@@ -52,7 +53,7 @@
                                         {% uswds_sprite "verified" %}
                                     </svg>
                                     <p class="margin-0 text-no-wrap">Validate UEI</p>
-                                </span>
+                                </spa
                             </button>
                         </div>
                         <ul class="usa-error-message" id="auditee_uei-error-message" role="alert">
@@ -135,7 +136,7 @@
                 </ul>
             </form>
             <div class="ueid-explanation tablet:grid-col usa-prose font-sans-sm">
-                <h3>The FAC now uses the Unique Entity ID (UEI) instead of the DUNS number.</h3>
+                <p class="font-sans-lg text-bold">The FAC now uses the Unique Entity ID (UEI) instead of the DUNS number.</p>
                 <p>
                     On April 4, 2022, the unique entity identifier used across the federal government changed from the DUNS
                     Number to the Unique Entity ID (UEI).
