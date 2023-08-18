@@ -181,16 +181,16 @@
                             </div>
                         </div>
                     </fieldset>
-                    <p id="dynamic_fieldset_instruction">
-                        These individuals will have access to the single audit submission but
-                        will not have the ability to certify the submission.
-                    </p>
                     <fieldset class="usa-fieldset question"
                               aria-labelledby="auditee_contacts_legend dynamic_fieldset_instruction">
                         <legend id="auditee_contacts_legend" class="usa-legend">
-                            Auditee contacts
+                            Auditee contact
                         </legend>
-                        <div class="grid-container auditee_contacts">
+                        <p id="dynamic_fieldset_instruction">
+                            These individuals will have access to the single audit submission but
+                            will not have the ability to certify the submission.
+                        </p>
+                        <div id="auditee_contacts" class="grid-container auditee_contacts">
                             <div class="grid-row grid-gap">
                                 <div class="usa-form-group">
                                     <label class="usa-label" for="auditee_contacts_fullname">
@@ -245,7 +245,9 @@
                                     </div>
                                 </div>
                             </div>
-                            <template id="auditee_contacts-template">
+                        </div>
+                        <template id="auditee_contacts-template">
+                            <div id="auditee_contacts" class="grid-container auditee_contacts additional_contacts">
                                 <div class="grid-row grid-gap">
                                     <div class="usa-form-group">
                                         <label class="usa-label" for="auditee_contacts_fullname">
@@ -257,9 +259,9 @@
                                             <li id="auditee_contacts_fullname-matched-field" hidden>When adding an auditee contact, please provide both an email address and a first and last name. </li>
                                         </ul>
                                         <input class="usa-input"
-                                               id="auditee_contacts_fullname"
-                                               name="auditee_contacts_fullname"
-                                               data-validate-matched-field="auditee_contacts_email"/>
+                                            id="auditee_contacts_fullname"
+                                            name="auditee_contacts_fullname"
+                                            data-validate-matched-field="auditee_contacts_email"/>
                                     </div>
                                 </div>
                                 <div class="grid-row grid-gap">
@@ -277,10 +279,10 @@
                                                 <li id="auditee_contacts_email-matched-field" hidden>When adding an auditee contact, please provide both an email address and a first and last name.</li>
                                             </ul>
                                             <input class="usa-input"
-                                                   id="auditee_contacts_email"
-                                                   name="auditee_contacts_email"
-                                                   data-validate-email=""
-                                                   data-validate-matched-field="auditee_contacts_fullname"/>
+                                                id="auditee_contacts_email"
+                                                name="auditee_contacts_email"
+                                                data-validate-email=""
+                                                data-validate-matched-field="auditee_contacts_fullname"/>
                                         </div>
                                     </div>
                                     <div class="tablet:grid-col-fill">
@@ -294,29 +296,99 @@
                                                 <li id="auditee_contacts_re_email-must-match" hidden>This field should match the one before it</li>
                                             </ul>
                                             <input class="usa-input"
-                                                   id="auditee_contacts_re_email"
-                                                   name="auditee_contacts_re_email"
-                                                   data-validate-must-match="auditee_contacts_email"/>
+                                                id="auditee_contacts_re_email"
+                                                name="auditee_contacts_re_email"
+                                                data-validate-must-match="auditee_contacts_email"/>
                                         </div>
                                     </div>
                                 </div>
-                                    <button class="usa-button usa-button--unstyled delete-contact"
-                                            aria-label="Delete contact"
-                                            title="Delete contact">
-                                        <svg class="usa-icon" aria-hidden="true" focusable="false" role="img">
-                                            {% uswds_sprite "cancel" %}
-                                        </svg>
-                                    </button>
-                                </template>
-                                <button class="usa-button usa-button--unstyled add-contact">Add another contact</button>
+                                <div class="grid-row grid-gap">
+                                    <div class="tablet:grid-coll-fill">
+                                        <button class="usa-button usa-button--unstyled delete-contact"
+                                                aria-label="Delete contact"
+                                                title="Delete contact">
+                                            <svg class="usa-icon" aria-hidden="true" focusable="false" role="img">
+                                                {% uswds_sprite "cancel" %}
+                                            </svg>
+                                            <span>Delete the contact above.</span>
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
-                        </fieldset>
-                        <fieldset class="usa-fieldset question"
-                                  aria-labelledby="auditor_contacts_legend dynamic_fieldset_instruction">
-                            <legend id="auditor_contacts_legend" class="usa-legend">
-                                Auditor contacts
-                            </legend>
-                            <div class="grid-container auditor_contacts">
+                        </template>
+                        <button class="usa-button usa-button--unstyled add-contact margin-top-2"
+                                aria-label="Add contact"
+                                title="Add contact">
+                            <span>Add another contact</span>
+                        </button>
+                    </fieldset>
+                    <fieldset class="usa-fieldset question"
+                                aria-labelledby="auditor_contacts_legend dynamic_fieldset_instruction">
+                        <legend id="auditor_contacts_legend" class="usa-legend">
+                            Auditor contacts
+                        </legend>
+                        <p id="dynamic_fieldset_instruction">
+                            These individuals will have access to the single audit submission but
+                            will not have the ability to certify the submission.
+                        </p>
+                        <div id="auditor_contacts" class="grid-container auditor_contacts">
+                            <div class="grid-row grid-gap">
+                                <div class="usa-form-group">
+                                    <label class="usa-label" for="auditor_contacts_fullname">
+                                        First name, last name
+                                    </label>
+                                    <ul class="usa-error-message"
+                                        id="auditor_contacts_fullname-error-message"
+                                        role="alert">
+                                        <li id="auditor_contacts_fullname-matched-field" hidden>When adding an auditor contact, please provide both an email address and a first and last name. </li>
+                                    </ul>
+                                    <input class="usa-input"
+                                            id="auditor_contacts_fullname"
+                                            name="auditor_contacts_fullname"
+                                            data-validate-matched-field="auditor_contacts_email"/>
+                                </div>
+                            </div>
+                            <div class="grid-row grid-gap">
+                                <div class="tablet:grid-col-fill">
+                                    <div class="usa-form-group">
+                                        <label class="usa-label" for="auditor_contacts_email">
+                                            Email address
+                                        </label>
+                                        <ul class="usa-error-message"
+                                            id="auditor_contacts_email-error-message"
+                                            role="alert">
+                                            <li id="auditor_contacts_email-email" hidden>
+                                                An email address should have a username, an &#39;@&#39; symbol, and a domain name
+                                            </li>
+                                            <li id="auditor_contacts_email-matched-field" hidden>When adding an auditor contact, please provide both an email address and a first and last name.</li>
+                                        </ul>
+                                        <input class="usa-input"
+                                                id="auditor_contacts_email"
+                                                name="auditor_contacts_email"
+                                                data-validate-email=""
+                                                data-validate-matched-field="auditor_contacts_fullname"/>
+                                    </div>
+                                </div>
+                                <div class="tablet:grid-col-fill">
+                                    <div class="usa-form-group">
+                                        <label class="usa-label" for="auditor_contacts_re_email">
+                                            Re-enter email address
+                                        </label>
+                                        <ul class="usa-error-message"
+                                            id="auditor_contacts_re_email-error-message"
+                                            role="alert">
+                                            <li id="auditor_contacts_re_email-must-match" hidden>This field should match the one before it</li>
+                                        </ul>
+                                        <input class="usa-input"
+                                                id="auditor_contacts_re_email"
+                                                name="auditor_contacts_re_email"
+                                                data-validate-must-match="auditor_contacts_email"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <template id="auditor_contacts-template">
+                            <div id="auditor_contacts" class="grid-container auditor_contacts additional_contacts">
                                 <div class="grid-row grid-gap">
                                     <div class="usa-form-group">
                                         <label class="usa-label" for="auditor_contacts_fullname">
@@ -328,9 +400,9 @@
                                             <li id="auditor_contacts_fullname-matched-field" hidden>When adding an auditor contact, please provide both an email address and a first and last name. </li>
                                         </ul>
                                         <input class="usa-input"
-                                               id="auditor_contacts_fullname"
-                                               name="auditor_contacts_fullname"
-                                               data-validate-matched-field="auditor_contacts_email"/>
+                                                id="auditor_contacts_fullname"
+                                                name="auditor_contacts_fullname"
+                                                data-validate-matched-field="auditor_contacts_email"/>
                                     </div>
                                 </div>
                                 <div class="grid-row grid-gap">
@@ -348,10 +420,10 @@
                                                 <li id="auditor_contacts_email-matched-field" hidden>When adding an auditor contact, please provide both an email address and a first and last name.</li>
                                             </ul>
                                             <input class="usa-input"
-                                                   id="auditor_contacts_email"
-                                                   name="auditor_contacts_email"
-                                                   data-validate-email=""
-                                                   data-validate-matched-field="auditor_contacts_fullname"/>
+                                                    id="auditor_contacts_email"
+                                                    name="auditor_contacts_email"
+                                                    data-validate-email=""
+                                                    data-validate-matched-field="auditor_contacts_fullname"/>
                                         </div>
                                     </div>
                                     <div class="tablet:grid-col-fill">
@@ -365,90 +437,43 @@
                                                 <li id="auditor_contacts_re_email-must-match" hidden>This field should match the one before it</li>
                                             </ul>
                                             <input class="usa-input"
-                                                   id="auditor_contacts_re_email"
-                                                   name="auditor_contacts_re_email"
-                                                   data-validate-must-match="auditor_contacts_email"/>
+                                                    id="auditor_contacts_re_email"
+                                                    name="auditor_contacts_re_email"
+                                                    data-validate-must-match="auditor_contacts_email"/>
                                         </div>
                                     </div>
                                 </div>
-                                <template id="auditor_contacts-template">
-                                    <div class="grid-row grid-gap">
-                                        <div class="usa-form-group">
-                                            <label class="usa-label" for="auditor_contacts_fullname">
-                                                First name, last name
-                                            </label>
-                                            <ul class="usa-error-message"
-                                                id="auditor_contacts_fullname-error-message"
-                                                role="alert">
-                                                <li id="auditor_contacts_fullname-matched-field" hidden>When adding an auditor contact, please provide both an email address and a first and last name. </li>
-                                            </ul>
-                                            <input class="usa-input"
-                                                   id="auditor_contacts_fullname"
-                                                   name="auditor_contacts_fullname"
-                                                   data-validate-matched-field="auditor_contacts_email"/>
-                                        </div>
-                                    </div>
-                                    <div class="grid-row grid-gap">
-                                        <div class="tablet:grid-col-fill">
-                                            <div class="usa-form-group">
-                                                <label class="usa-label" for="auditor_contacts_email">
-                                                    Email address
-                                                </label>
-                                                <ul class="usa-error-message"
-                                                    id="auditor_contacts_email-error-message"
-                                                    role="alert">
-                                                    <li id="auditor_contacts_email-email" hidden>
-                                                        An email address should have a username, an &#39;@&#39; symbol, and a domain name
-                                                    </li>
-                                                    <li id="auditor_contacts_email-matched-field" hidden>When adding an auditor contact, please provide both an email address and a first and last name.</li>
-                                                </ul>
-                                                <input class="usa-input"
-                                                       id="auditor_contacts_email"
-                                                       name="auditor_contacts_email"
-                                                       data-validate-email=""
-                                                       data-validate-matched-field="auditor_contacts_fullname"/>
-                                            </div>
-                                        </div>
-                                        <div class="tablet:grid-col-fill">
-                                            <div class="usa-form-group">
-                                                <label class="usa-label" for="auditor_contacts_re_email">
-                                                    Re-enter email address
-                                                </label>
-                                                <ul class="usa-error-message"
-                                                    id="auditor_contacts_re_email-error-message"
-                                                    role="alert">
-                                                    <li id="auditor_contacts_re_email-must-match" hidden>This field should match the one before it</li>
-                                                </ul>
-                                                <input class="usa-input"
-                                                       id="auditor_contacts_re_email"
-                                                       name="auditor_contacts_re_email"
-                                                       data-validate-must-match="auditor_contacts_email"/>
-                                            </div>
-                                        </div>
+                                <div class="grid-row grid-gap">
+                                    <div class="tablet:grid-coll-fill">
                                         <button class="usa-button usa-button--unstyled delete-contact"
                                                 aria-label="Delete contact"
                                                 title="Delete contact">
                                             <svg class="usa-icon" aria-hidden="true" focusable="false" role="img">
                                                 {% uswds_sprite "cancel" %}
                                             </svg>
+                                            <span>Delete the contact above.</span>
                                         </button>
-                                    </template>
-                                    <button class="usa-button usa-button--unstyled add-contact">Add another contact</button>
+                                    </div>
                                 </div>
-                            </fieldset>
-                            <p id="email-notice">The above contacts will receive an e-mail once this audit is created.</p>
-                            <ul class="usa-button-group">
-                                <li class="usa-button-group__item">{% include "../cancel-button.html" %}</li>
-                                <li class="usa-button-group__item">
-                                    <button class="usa-button" id="create">
-                                        Create
-                                    </button>
-                                </li>
-                            </ul>
-                        </fieldset>
-                    </form>
-                </div>
-            </div>
+                            </div>
+                        </template>
+                        <button class="usa-button usa-button--unstyled add-contact margin-top-2"
+                                aria-label="Add contact"
+                                title="Add contact">
+                            <span>Add another contact</span>
+                        </button>
+                    </fieldset>
+                    <p id="email-notice">The above contacts will receive an e-mail once this audit is created.</p>
+                    <ul class="usa-button-group">
+                        <li class="usa-button-group__item">{% include "../cancel-button.html" %}</li>
+                        <li class="usa-button-group__item">
+                            <button class="usa-button" id="create">
+                                Create
+                            </button>
+                        </li>
+                    </ul>
+                </fieldset>
+            </form>
         </div>
     </div>
     <script src="{% static 'compiled/js/check-access.js' %}"

@@ -13,8 +13,10 @@ function allResponsesValid() {
   return inputsWithErrors.length === 0;
 }
 
-function performValidations(field) {
-  const errors = checkValidity(field);
+function performValidations(nodes) {
+  const errors = Array.from(nodes).filter(field => {
+    return checkValidity(field).length > 0;
+  });
   setFormDisabled(errors.length > 0);
 }
 
@@ -32,21 +34,19 @@ function appendInc(elements, attr, inc) {
   });
 }
 function appendContactField(btnEl) {
-  const inputContainer = btnEl.parentElement;
+  const inputContainer = btnEl.parentElement.parentElement;
   const template = inputContainer.querySelector('template');
   const newRow = template.content.cloneNode(true);
 
   const newInputs = newRow.querySelectorAll('input');
   newInputs.forEach((q, key, arr) => {
-    q.addEventListener('blur', (e) => {
-      performValidations(e.target);
-    });
+    attachFocusoutMulti(newInputs);
     if (key === arr.length - 1) {
       const newMatchVal = newInputs[key - 1].id + '_' + addedContactNum;
       q.setAttribute('data-validate-must-match', newMatchVal);
     }
     if (key in [0, 1]) {
-      const newMatchVal = newInputs[key].id + '_' + addedContactNum;
+      const newMatchVal = newInputs[key ^= 1].id + '_' + addedContactNum;
       q.setAttribute('data-validate-matched-field', newMatchVal)
     }
   });
@@ -56,7 +56,6 @@ function appendContactField(btnEl) {
   const nrErrorItems2 = newRow.querySelectorAll('li[id$="-email"]');
   const nrErrorItems3 = newRow.querySelectorAll('li[id$="-must-match"]');
   const nrErrorItems4 = newRow.querySelectorAll('li[id$="-matched-field"]');
-  //const nrMatchedInputs = newRow.querySelectorAll('[data-validate-matched-field]')
 
   appendInc(newInputs, 'id', addedContactNum);
   appendInc(newLabels, 'for', addedContactNum);
@@ -65,7 +64,6 @@ function appendContactField(btnEl) {
   insertInc(nrErrorItems2, 'id', '-email', addedContactNum);
   insertInc(nrErrorItems3, 'id', '-must-match', addedContactNum);
   insertInc(nrErrorItems4, 'id', '-matched-field', addedContactNum);
-  //insertInc(nrMatchedInputs, 'data-validate-matched-field', '-matched-field', addedContactNum);
 
   addedContactNum++;
 
@@ -86,10 +84,18 @@ function deleteContactField(el) {
     nodeName == 'use'
       ? el.parentElement.parentElement.parentElement
       : nodeName == 'svg'
-      ? el.parentElement.parentElement
-      : el.parentElement;
+      ? el.parentElement.parentElement.parentElement.parentElement
+      : el.parentElement.parentElement.parentElement.parentElement;
 
   inputContainer.remove();
+}
+
+function attachFocusoutMulti(elements) {
+  elements.forEach((p) => {
+    p.addEventListener('focusout', (e) => {
+      performValidations(elements);
+    });
+  })
 }
 
 function attachEventHandlers() {
@@ -99,10 +105,11 @@ function attachEventHandlers() {
     FORM.submit();
   });
 
-  const fieldsNeedingValidation = Array.from(
-    document.querySelectorAll('#grant-access input')
+  const certifyingInputs = Array.from(
+    document.querySelectorAll('#grant-access input:not(.auditee_contacts input, .auditor_contacts input)')
   );
-  fieldsNeedingValidation.forEach((q) => {
+  
+  certifyingInputs.forEach((q) => {
     q.addEventListener('blur', (e) => {
       performValidations(e.target);
     });
@@ -116,6 +123,11 @@ function attachEventHandlers() {
       e.preventDefault();
       appendContactField(e.target);
     });
+  });
+  const contactsCollections = Array.from(document.querySelectorAll('.auditee_contacts, .auditor_contacts'));
+  contactsCollections.forEach((q) => {
+    const accFields = Array.from(q.querySelectorAll('input'));
+    attachFocusoutMulti(accFields);
   });
 }
 
