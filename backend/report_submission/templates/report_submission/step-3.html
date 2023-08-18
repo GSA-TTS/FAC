@@ -89,6 +89,7 @@
                             </div>
                         </div>
                     </fieldset>
+
                     <fieldset class="usa-fieldset question"
                               aria-labelledby="certifying_auditor_contact_legend certifying_auditor_contact_instruction">
                         <legend id="certifying_auditor_contact_legend" class="usa-legend">
@@ -164,16 +165,16 @@
                             </div>
                         </div>
                     </fieldset>
-                    <p id="dynamic_fieldset_instruction">
-                        These individuals will have access to the single audit submission but
-                        will not have the ability to certify the submission.
-                    </p>
+                    
                     <fieldset class="usa-fieldset question"
                               aria-labelledby="auditee_contacts_legend dynamic_fieldset_instruction">
                         <legend id="auditee_contacts_legend" class="usa-legend">
                             Auditee contacts
                         </legend>
                         <div class="grid-container auditee_contacts">
+                            <p id="dynamic_fieldset_instruction">
+                                These individuals will have access to the single audit submission but will not be able to certify the submission.
+                            </p>
                             <div class="grid-row grid-gap">
                                 <div class="usa-form-group">
                                     <label class="usa-label" for="auditee_contacts_fullname">
@@ -311,12 +312,16 @@
                                 <button class="usa-button usa-button--unstyled add-contact">Add another contact</button>
                             </div>
                         </fieldset>
+
                         <fieldset class="usa-fieldset question"
                                   aria-labelledby="auditor_contacts_legend dynamic_fieldset_instruction">
                             <legend id="auditor_contacts_legend" class="usa-legend">
                                 Auditor contacts
                             </legend>
                             <div class="grid-container auditor_contacts">
+                                <p id="dynamic_fieldset_instruction">
+                                    This individual will have access to upload data and information to the audit submission but will not be able to certify the submission.
+                                </p>
                                 <div class="grid-row grid-gap">
                                     <div class="usa-form-group">
                                         <label class="usa-label" for="auditor_contacts_fullname">
@@ -454,6 +459,7 @@
                                     <button class="usa-button usa-button--unstyled add-contact">Add another contact</button>
                                 </div>
                             </fieldset>
+
                             <p id="email-notice">The above contacts will receive an e-mail once this audit is created.</p>
                             <ul class="usa-button-group">
                                 <li class="usa-button-group__item">
