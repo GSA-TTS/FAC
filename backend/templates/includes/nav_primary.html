@@ -16,11 +16,14 @@
             <img src="{% static 'img/usa-icons/close.svg' %}" role="img" alt="Close" />
         </button>
         <ul class="usa-nav__primary usa-accordion">
-            <li class="usa-nav__primary-item">
-                <a href="https://example.gov" class="usa-nav__link">
-                    <span>Search audit reports</span>
-                </a>
-            </li>
+            {% comment %} 
+                Uncomment after search is implemented.
+                <li class="usa-nav__primary-item">
+                    <a href="https://example.gov" class="usa-nav__link">
+                        <span>Search audit reports</span>
+                    </a>
+                </li> 
+            {% endcomment %}
             <li class="usa-nav__primary-item">
                 <button class="usa-accordion__button usa-nav__link"
                         aria-expanded="false"
@@ -60,7 +63,7 @@
             </form>
         {% else %}
             <div class="sign-in">
-                <a class="sign-in-logo"
+                <a class="sign-in-logo display-flex flex-align-self-center"
                    aria-controls="login-modal"
                    href="/openid/login/"
                    data-open-modal

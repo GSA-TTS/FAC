@@ -81,7 +81,16 @@ class MySubmissions(LoginRequiredMixin, generic.View):
         new_link = "report_submission"
         edit_link = "audit:EditSubmission"
 
-        data = MySubmissions.fetch_my_submissions(request.user)
+        submissions = MySubmissions.fetch_my_submissions(request.user)
+
+        data = {'completed_audits': [], 'in_progress_audits': []}
+        for audit in submissions:
+            audit["submission_status"] = audit["submission_status"].replace('_', " ").title()  # auditee_certified --> Auditee Certified
+            if audit["submission_status"] == 'Submitted':
+                data['completed_audits'].append(audit)
+            else:
+                data['in_progress_audits'].append(audit)
+                
         context = {
             "data": data,
             "new_link": new_link,
