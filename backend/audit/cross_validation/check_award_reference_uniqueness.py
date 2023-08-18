@@ -16,7 +16,8 @@ def check_award_reference_uniqueness(sac_dict, *_args, **_kwargs):
     errors = []
 
     for award in federal_awards:
-        award_reference = award.get("award_reference", None)
+        award_reference = award.get("award_reference")
+
         if award_reference:
             award_refs.append(award_reference)
 
