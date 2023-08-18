@@ -1,12 +1,12 @@
 from .errors import (
-    err_award_ref_repeat_reference,
+    err_duplicate_finding_reference,
 )
 from collections import defaultdict
 
 
-def award_ref_and_references_uniqueness(sac_dict, *_args, **_kwargs):
+def check_finding_reference_uniqueness(sac_dict, *_args, **_kwargs):
     """
-    Ensure the REFERENCE numbers uniqueness for a given AWARD in findings.
+    Check the uniqueness of REFERENCE numbers for each AWARD in findings.
     """
 
     all_sections = sac_dict.get("sf_sac_sections", {})
@@ -32,7 +32,7 @@ def award_ref_and_references_uniqueness(sac_dict, *_args, **_kwargs):
         for ref_num in ref_nums:
             errors.append(
                 {
-                    "error": err_award_ref_repeat_reference(
+                    "error": err_duplicate_finding_reference(
                         award_ref,
                         ref_num,
                     )
