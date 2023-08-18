@@ -122,7 +122,7 @@ export const validations = {
       fieldId: field.id,
       validation: 'matched-field',
     };
-    const isMatchedForgotten = field.value && !matchFieldEl.value
+    const isMatchedForgotten = field.value && !matchFieldEl.value;
     return isMatchedForgotten
       ? { ...result, error: true }
       : result;
