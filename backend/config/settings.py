@@ -463,8 +463,10 @@ if DEBUG:
         "debug_toolbar",
     ]
 
-    MIDDLEWARE = ["debug_toolbar.middleware.DebugToolbarMiddleware",] + MIDDLEWARE
-    
+    MIDDLEWARE = [
+        "debug_toolbar.middleware.DebugToolbarMiddleware",
+    ] + MIDDLEWARE
+
     INTERNAL_IPS = [
         "127.0.0.1",
     ]
@@ -473,5 +475,5 @@ if DEBUG:
         return True
 
     DEBUG_TOOLBAR_CONFIG = {
-        "SHOW_TOOLBAR_CALLBACK" : show_toolbar,
+        "SHOW_TOOLBAR_CALLBACK": show_toolbar,
     }
