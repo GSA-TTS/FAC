@@ -20,9 +20,11 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    {% for error in errors.errors %}<td>{{ error.error }}</td>{% endfor %}
-                                </tr>
+                                {% for error in errors.errors %}
+                                    <tr>
+                                        <td>{{ error.error }}</td>
+                                    </tr>
+                                {% endfor %}
                             </tbody>
                         </table>
                     {% else %}

@@ -59,14 +59,13 @@ from .check_award_ref_declaration import check_award_ref_declaration
 from .check_findings_count_consistency import check_findings_count_consistency
 from .additional_ueis import additional_ueis
 from .auditee_ueis_match import auditee_ueis_match
-from .audit_findings import audit_findings
 from .check_finding_reference_uniqueness import check_finding_reference_uniqueness
+from .award_ref_and_references_uniqueness import award_ref_and_references_uniqueness
 from .sac_validation_shape import sac_validation_shape  # noqa: F401
 from .submission_progress_check import submission_progress_check
 from .tribal_data_sharing_consent import tribal_data_sharing_consent
 
 functions = [
-    audit_findings,
     auditee_ueis_match,
     additional_ueis,
     check_award_ref_declaration,

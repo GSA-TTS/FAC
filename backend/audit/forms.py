@@ -25,6 +25,9 @@ class AuditInfoForm(forms.Form):
                 data[k] = True
             elif v == ["False"]:
                 data[k] = False
+        # Hack fix until JSON Schema for this is improved:
+        if data["is_sp_framework_required"] == []:
+            del data["is_sp_framework_required"]
         self.cleaned_data = data
         return data
 
@@ -86,6 +89,7 @@ class AuditInfoForm(forms.Form):
     )
     is_sp_framework_required = forms.MultipleChoiceField(
         choices=choices_YoN,
+        required=False,
     )
     sp_framework_opinions = forms.MultipleChoiceField(
         choices=choices_SP_FRAMEWORK_OPINIONS,
