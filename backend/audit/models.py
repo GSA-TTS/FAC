@@ -206,6 +206,7 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
     submitted_by = models.ForeignKey(User, on_delete=models.PROTECT)
     date_created = models.DateTimeField(auto_now_add=True)
     submission_status = FSMField(default=STATUS.IN_PROGRESS, choices=STATUS_CHOICES)
+    data_source = models.CharField(default="GSA")
 
     # implement an array of tuples as two arrays since we can only have simple fields inside an array
     transition_name = ArrayField(
@@ -409,8 +410,12 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         """
 
         from audit.etl import ETL
+        from audit.cog_over import cog_over
 
         if self.general_information:
+            # cog / over assignment
+            self.cognizant_agency, self.oversight_agency = cog_over(self)
+
             etl = ETL(self)
             etl.load_all()
 
@@ -613,3 +618,27 @@ class SingleAuditReportFile(models.Model):
         if self.sac.submission_status != self.sac.STATUS.IN_PROGRESS:
             raise LateChangeError("Attempted PDF upload")
         super().save(*args, **kwargs)
+
+
+class CognizantBaseline(models.Model):
+    dbkey = models.IntegerField(
+        "Identifier for a submission along with audit_year in C-FAC",
+        null=True,
+    )
+    audit_year = models.IntegerField(
+        "Audit year from fy_start_date",
+        null=True,
+    )
+    ein = models.CharField(
+        "Primary Employer Identification Number",
+        null=True,
+        max_length=30,
+    )
+    cognizant_agency = models.CharField(
+        "Two digit Federal agency prefix of the cognizant agency",
+        max_length=2,
+        null=True,
+    )
+
+    class Meta:
+        unique_together = (("dbkey", "audit_year"),)

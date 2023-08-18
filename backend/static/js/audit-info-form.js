@@ -55,6 +55,13 @@ function attachEventHandlers() {
         opinion.required = false;
         opinion.checked = false;
       });
+      const spf_required_matches = document.querySelectorAll(
+        'input[name="is_sp_framework_required"]'
+      );
+      spf_required_matches.forEach((spf_required_match) => {
+        spf_required_match.required = false;
+        spf_required_match.checked = false;
+      });
     }
     return;
   });

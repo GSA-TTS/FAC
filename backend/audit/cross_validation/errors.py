@@ -36,12 +36,35 @@ def err_missing_tribal_data_sharing_consent():
     )
 
 
-def err_award_ref_repeat_reference(award_ref, ref_number):
+def err_duplicate_finding_reference(award_ref, ref_number):
     return f"Award {award_ref} repeats reference {ref_number}. The reference {ref_number} should only appear once for award {award_ref}."
 
 
-def err_number_of_findings_inconsistent(total_expected, total_counted, award_ref):
+def err_findings_count_inconsistent(total_expected, total_counted, award_ref):
     return (
         f"You reported {total_expected} findings for award {award_ref} in the {SECTION_NAMES.FEDERAL_AWARDS} workbook, "
         f"but declared {total_counted} findings for the same award in the {SECTION_NAMES.FEDERAL_AWARDS_AUDIT_FINDINGS} workbook."
+    )
+
+
+def err_award_ref_not_declared(award_refs: list):
+    is_plural = len(award_refs) > 1
+    if is_plural:
+        award_refs_str = (
+            ", ".join(str(ar) for ar in award_refs[:-1]) + " and " + str(award_refs[-1])
+        )
+    else:
+        award_refs_str = str(award_refs[0])
+
+    return (
+        f"Award{'s' if is_plural else ''} {award_refs_str} {'are' if is_plural else 'is'} reported in the "
+        f"{SECTION_NAMES.FEDERAL_AWARDS_AUDIT_FINDINGS} workbook, but {'were' if is_plural else 'was'} not "
+        f"declared in the {SECTION_NAMES.FEDERAL_AWARDS} workbook."
+    )
+
+
+def err_missing_award_reference(row_num):
+    return (
+        f"The award listed in row {row_num} of your Federal Award workbook is missing a reference code. "
+        f"This should not be possible. Please contact customer support."
     )

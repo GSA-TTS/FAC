@@ -127,9 +127,9 @@ class ETLTests(TestCase):
                 "auditee_uei": "AAA123456BBB",
                 "findings_uniform_guidance_entries": [
                     {
-                        "award_reference": "ABC123",
                         "seq_number": i,
                         "program": {
+                            "award_reference": "ABC123",
                             "program_name": "N/A",
                             "federal_agency_prefix": "12",
                             "three_digit_extension": "123",
@@ -207,27 +207,25 @@ class ETLTests(TestCase):
         fake = Faker()
         secondary_auditors = {
             "SecondaryAuditors": {
-                "secondary_auditors_entries": {
-                    "items": [
-                        {
-                            "secondary_auditor_seq_number": i,
-                            "secondary_auditor_address_street": fake.street_address(),
-                            "secondary_auditor_address_city": fake.city(),
-                            "secondary_auditor_address_state": fake.state_abbr(
-                                include_territories=False
-                            ),
-                            "secondary_auditor_address_zipcode": fake.postalcode(),
-                            # "secondary_auditor_country": fake.country(),
-                            "secondary_auditor_ein": fake.ssn().replace("-", ""),
-                            "secondary_auditor_name": fake.company(),
-                            "secondary_auditor_contact_name": fake.name(),
-                            "secondary_auditor_contact_title": fake.job(),
-                            "secondary_auditor_contact_email": fake.ascii_email(),
-                            "secondary_auditor_contact_phone": fake.basic_phone_number(),
-                        }
-                        for i in range(1, 3)
-                    ]
-                }
+                "secondary_auditors_entries": [
+                    {
+                        "secondary_auditor_seq_number": i,
+                        "secondary_auditor_address_street": fake.street_address(),
+                        "secondary_auditor_address_city": fake.city(),
+                        "secondary_auditor_address_state": fake.state_abbr(
+                            include_territories=False
+                        ),
+                        "secondary_auditor_address_zipcode": fake.postalcode(),
+                        # "secondary_auditor_country": fake.country(),
+                        "secondary_auditor_ein": fake.ssn().replace("-", ""),
+                        "secondary_auditor_name": fake.company(),
+                        "secondary_auditor_contact_name": fake.name(),
+                        "secondary_auditor_contact_title": fake.job(),
+                        "secondary_auditor_contact_email": fake.ascii_email(),
+                        "secondary_auditor_contact_phone": fake.basic_phone_number(),
+                    }
+                    for i in range(1, 3)
+                ]
             }
         }
         return secondary_auditors
