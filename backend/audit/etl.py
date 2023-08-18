@@ -80,6 +80,13 @@ class ETL(object):
         for entry in findings_uniform_guidance_entries:
             findings = entry["findings"]
             program = entry["program"]
+<<<<<<< HEAD
+=======
+            prior_finding_ref_numbers = None
+            if "prior_references" in findings:
+                prior_finding_ref_numbers = findings["prior_references"]
+
+>>>>>>> main
             finding = Finding(
                 award_reference=program["award_reference"],
                 report_id=self.report_id,
@@ -88,9 +95,13 @@ class ETL(object):
                 is_modified_opinion=entry["modified_opinion"] == "Y",
                 is_other_findings=entry["other_findings"] == "Y",
                 is_other_non_compliance=entry["other_matters"] == "Y",
+<<<<<<< HEAD
                 prior_finding_ref_numbers=None
                 if "prior_references" not in findings
                 else findings["prior_references"],
+=======
+                prior_finding_ref_numbers=prior_finding_ref_numbers,
+>>>>>>> main
                 is_questioned_costs=entry["questioned_costs"] == "Y",
                 is_repeat_finding=(findings["repeat_prior_reference"] == "Y"),
                 is_significant_deficiency=(entry["significant_deficiency"] == "Y"),
@@ -128,15 +139,22 @@ class ETL(object):
             subrecipient_amount = entry["subrecipients"].get("subrecipient_amount")
             state_cluster_name = cluster.get("state_cluster_name")
             other_cluster_name = cluster.get("other_cluster_name")
+            additional_award_identification = self.conditional_lookup(
+                program, "additional_award_identification", ""
+            )
             federal_award = FederalAward(
                 report_id=self.report_id,
                 award_reference=entry["award_reference"],
                 federal_agency_prefix=program["federal_agency_prefix"],
                 federal_award_extension=program["three_digit_extension"],
+<<<<<<< HEAD
                 # CONDITIONAL
                 additional_award_identification=self.conditional_lookup(
                     program, "additional_award_identification", ""
                 ),
+=======
+                additional_award_identification=additional_award_identification,
+>>>>>>> main
                 federal_program_name=program["program_name"],
                 amount_expended=program["amount_expended"],
                 cluster_name=cluster["cluster_name"],
@@ -149,7 +167,10 @@ class ETL(object):
                     loan, "loan_balance_at_audit_period_end", 0
                 ),
                 is_direct=is_direct,
+<<<<<<< HEAD
                 # FIXME: This is potentially to-be-removed/historic
+=======
+>>>>>>> main
                 is_major=program["is_major"] == "Y" if "is_major" in program else False,
                 mp_audit_report_type=self.conditional_lookup(
                     program, "audit_report_type", ""
@@ -179,6 +200,7 @@ class ETL(object):
                 cap_text.save()
 
     def load_note(self):
+<<<<<<< HEAD
         notes_to_sefa = self.single_audit_checklist.notes_to_sefa["NotesToSefa"]
         if notes_to_sefa:
             accounting_policies = notes_to_sefa["accounting_policies"]
@@ -201,11 +223,40 @@ class ETL(object):
                             note_seq_number=entry["seq_number"],
                             content=entry["note_content"],
                             note_title=entry["note_title"],
+=======
+        if (
+            self.single_audit_checklist.notes_to_sefa is not None
+        ) and "NotesToSefa" in self.single_audit_checklist.notes_to_sefa:
+            notes_to_sefa = self.single_audit_checklist.notes_to_sefa["NotesToSefa"]
+            if notes_to_sefa:
+                accounting_policies = notes_to_sefa["accounting_policies"]
+                is_minimis_rate_used = notes_to_sefa["is_minimis_rate_used"] == "Y"
+                rate_explained = notes_to_sefa["rate_explained"]
+                if "notes_to_sefa_entries" in notes_to_sefa:
+                    entries = notes_to_sefa["notes_to_sefa_entries"]
+                    if not entries:
+                        note = Note(
+                            report_id=self.report_id,
+>>>>>>> main
                             accounting_policies=accounting_policies,
                             is_minimis_rate_used=is_minimis_rate_used,
                             rate_explained=rate_explained,
                         )
                         note.save()
+<<<<<<< HEAD
+=======
+                    else:
+                        for entry in entries:
+                            note = Note(
+                                report_id=self.report_id,
+                                content=entry["note_content"],
+                                note_title=entry["note_title"],
+                                accounting_policies=accounting_policies,
+                                is_minimis_rate_used=is_minimis_rate_used,
+                                rate_explained=rate_explained,
+                            )
+                            note.save()
+>>>>>>> main
 
     def load_revision(self):
         revision = Revision(
@@ -258,7 +309,10 @@ class ETL(object):
     def load_general(self):
         general_information = self.single_audit_checklist.general_information
         dates_by_status = self._get_dates_from_sac()
+<<<<<<< HEAD
         # sac_additional_ueis = self.single_audit_checklist.additional_ueis
+=======
+>>>>>>> main
 
         num_months = None
         if (
@@ -283,7 +337,10 @@ class ETL(object):
             auditee_ein=general_information["ein"],
             auditee_uei=general_information["auditee_uei"],
             additional_ueis=self.single_audit_checklist.additional_ueis == "Y",
+<<<<<<< HEAD
             # auditee_addl_uei_list=auditee_addl_uei_list,
+=======
+>>>>>>> main
             auditee_zip=general_information["auditee_zip"],
             auditor_phone=general_information["auditor_phone"],
             auditor_state=general_information["auditor_state"],
@@ -372,7 +429,15 @@ class ETL(object):
 
     def load_additional_uei(self):
         addls = self.single_audit_checklist.additional_ueis
+<<<<<<< HEAD
         if "additional_ueis_entries" in addls["AdditionalUEIs"]:
+=======
+        if (
+            addls
+            and "AdditionalUEIs" in addls
+            and "additional_ueis_entries" in addls["AdditionalUEIs"]
+        ):
+>>>>>>> main
             for uei in addls["AdditionalUEIs"]["additional_ueis_entries"]:
                 auei = AdditionalUei(
                     report_id=self.single_audit_checklist.report_id,
