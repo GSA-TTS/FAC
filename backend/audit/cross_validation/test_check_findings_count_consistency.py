@@ -1,26 +1,23 @@
-import random
 from django.test import TestCase
 from audit.models import SingleAuditChecklist
-from .errors import err_number_of_findings_inconsistent
-from .number_of_findings import number_of_findings
+from .errors import err_findings_count_inconsistent
+from .check_findings_count_consistency import check_findings_count_consistency
 from .sac_validation_shape import sac_validation_shape
+from .utils import generate_random_integer
 from model_bakery import baker
 
 
-class NumberOfFindingsTests(TestCase):
+class CheckFindingsCountConsistencyTests(TestCase):
     AWARD_MIN = 1000
     AWARD_MAX = 2000
     FINDINGS_MIN = 1
     FINDINGS_MAX = 5
 
-    def _random(self, min, max):
-        return random.randint(min, max)  # nosec
-
     def _award_reference(self):
-        return f"AWARD-{self._random(self.AWARD_MIN,self.AWARD_MAX)}"
+        return f"AWARD-{generate_random_integer(self.AWARD_MIN,self.AWARD_MAX)}"
 
     def _make_federal_awards(self, findings_count) -> dict:
-        number_of_award = self._random(2, 4)
+        number_of_award = generate_random_integer(2, 4)
         return {
             "FederalAwards": {
                 "federal_awards": [
@@ -63,25 +60,27 @@ class NumberOfFindingsTests(TestCase):
     def test_zero_findings_count_report(self):
         """Ensure no error is returned for consistent zero findings."""
         sac = self._make_sac(0)
-        errors = number_of_findings(sac_validation_shape(sac))
+        errors = check_findings_count_consistency(sac_validation_shape(sac))
         self.assertEqual(errors, [])
 
     def test_findings_count_matches_across_workbooks(self):
         """Ensure no error is returned for consistent findings count."""
-        sac = self._make_sac(self._random(self.FINDINGS_MIN, self.FINDINGS_MAX))
-        errors = number_of_findings(sac_validation_shape(sac))
+        sac = self._make_sac(
+            generate_random_integer(self.FINDINGS_MIN, self.FINDINGS_MAX)
+        )
+        errors = check_findings_count_consistency(sac_validation_shape(sac))
         self.assertEqual(errors, [])
 
     def _test_findings_count_mismatch(self, base_count, mismatch):
         sac = self._make_sac(base_count, mismatch)
-        errors = number_of_findings(sac_validation_shape(sac))
+        errors = check_findings_count_consistency(sac_validation_shape(sac))
         self.assertEqual(
             len(errors), len(sac.federal_awards["FederalAwards"]["federal_awards"])
         )
 
         for award in sac.federal_awards["FederalAwards"]["federal_awards"]:
             award_reference = award["award_reference"]
-            expected_error = err_number_of_findings_inconsistent(
+            expected_error = err_findings_count_inconsistent(
                 base_count, base_count + mismatch, award_reference
             )
             self.assertIn({"error": expected_error}, errors)
@@ -91,11 +90,15 @@ class NumberOfFindingsTests(TestCase):
         Expect errors when the number of findings in the Federal Awards Audit Findings workbook,
         a.k.a the Findings Uniform Guidance workbook, exceeds those declared in the Federal Awards workbook.
         """
-        self._test_findings_count_mismatch(self._random(2, 4), self._random(1, 2))
+        self._test_findings_count_mismatch(
+            generate_random_integer(2, 4), generate_random_integer(1, 2)
+        )
 
     def test_declared_findings_exceed_reported_count(self):
         """
         Expect errors when the number of findings in the Federal Awards workbook
         exceeds those reported in the Federal Awards Audit Findings workbook.
         """
-        self._test_findings_count_mismatch(self._random(2, 4), self._random(-2, -1))
+        self._test_findings_count_mismatch(
+            generate_random_integer(2, 4), generate_random_integer(-2, -1)
+        )
