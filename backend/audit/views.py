@@ -822,6 +822,8 @@ class AuditInfoFormView(SingleAuditChecklistAccessRequiredMixin, generic.View):
 
             if form.is_valid():
                 form.clean_booleans()
+                # This one needs to be a string.
+                form.cleaned_data['is_sp_framework_required'] = str(form.cleaned_data.get('is_sp_framework_required', ''))
 
                 audit_information = sac.audit_information or {}
                 audit_information.update(form.cleaned_data)

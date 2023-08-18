@@ -86,6 +86,7 @@ class AuditInfoForm(forms.Form):
     )
     is_sp_framework_required = forms.MultipleChoiceField(
         choices=choices_YoN,
+        required=False,
     )
     sp_framework_opinions = forms.MultipleChoiceField(
         choices=choices_SP_FRAMEWORK_OPINIONS,

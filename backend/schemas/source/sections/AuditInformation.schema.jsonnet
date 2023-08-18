@@ -11,7 +11,7 @@ local AuditInformation = Types.object {
     sp_framework_basis: Types.array {
       items: Base.Enum.SP_Framework_Basis,
     },
-    is_sp_framework_required: Types.boolean,
+    is_sp_framework_required: Types.string,
     sp_framework_opinions: Types.array {
       items: Base.Enum.SP_Framework_Opinions,
     },
