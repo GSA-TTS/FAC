@@ -456,3 +456,22 @@ AGENCY_NAMES = get_agency_names()
 GAAP_RESULTS = get_audit_info_lists("gaap_results")
 SP_FRAMEWORK_BASIS = get_audit_info_lists("sp_framework_basis")
 SP_FRAMEWORK_OPINIONS = get_audit_info_lists("sp_framework_opinions")
+
+# django debug toolbar
+if DEBUG:
+    INSTALLED_APPS += [
+        "debug_toolbar",
+    ]
+
+    MIDDLEWARE = ["debug_toolbar.middleware.DebugToolbarMiddleware",] + MIDDLEWARE
+    
+    INTERNAL_IPS = [
+        "127.0.0.1",
+    ]
+
+    def show_toolbar(_request):
+        return True
+
+    DEBUG_TOOLBAR_CONFIG = {
+        "SHOW_TOOLBAR_CALLBACK" : show_toolbar,
+    }
