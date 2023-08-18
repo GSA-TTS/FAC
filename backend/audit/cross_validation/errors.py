@@ -61,3 +61,10 @@ def err_award_ref_not_declared(award_refs: list):
         f"{SECTION_NAMES.FEDERAL_AWARDS_AUDIT_FINDINGS} workbook, but {'were' if is_plural else 'was'} not "
         f"declared in the {SECTION_NAMES.FEDERAL_AWARDS} workbook."
     )
+
+
+def err_missing_award_reference(row_num):
+    return (
+        f"The award listed in row {row_num} of your Federal Award workbook is missing a reference code. "
+        f"This should not be possible. Please contact customer support."
+    )
