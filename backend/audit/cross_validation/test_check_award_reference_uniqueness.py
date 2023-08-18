@@ -36,11 +36,13 @@ class CheckAwardReferenceUniquenessTests(TestCase):
         sac = self._make_sac(
             [self.award1, self.award1, self.award3, self.award3, self.award3]
         )
-        errors = errors = check_award_reference_uniqueness(sac_validation_shape(sac))
+        errors = check_award_reference_uniqueness(sac_validation_shape(sac))
+
         self.assertEqual(len(errors), 2)
 
-        errors = check_award_reference_uniqueness(sac_validation_shape(sac))
         expected_error1 = err_duplicate_award_reference(self.award1["award_reference"])
         expected_error2 = err_duplicate_award_reference(self.award3["award_reference"])
+
         self.assertIn({"error": expected_error1}, errors)
+
         self.assertIn({"error": expected_error2}, errors)
