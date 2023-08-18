@@ -81,7 +81,7 @@ jobs:
       - name: run Lighthouse CI
         run: |
           npm install -g @lhci/cli@0.8.x
-          lhci
+          lhci autorun
 
       - name: run pa11y
         run: |
