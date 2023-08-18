@@ -48,6 +48,7 @@ class Command(BaseCommand):
         if not files or len(files) == 0:
             logger.warning("No files to load")
             return
+
         for txtfile in files:
             with connection.cursor() as cursor:
                 cursor.execute(f"DROP TABLE IF EXISTS {make_tablename(txtfile)}")
@@ -72,9 +73,10 @@ class Command(BaseCommand):
 
         GEN_QUERY = """
             SELECT
-                count(*) as rc
+                count(*)
             FROM
-                census_gen2019
+                census_gen19
         """
-        result = connection.execute(sqlalchemy.text(GEN_QUERY))
-        print("Gen table has:", result.all())
+        with engine.connect() as conn:
+            result = conn.execute(sqlalchemy.text(GEN_QUERY))
+            print("Gen table has:", result.all())

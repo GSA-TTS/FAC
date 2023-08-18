@@ -124,11 +124,12 @@ def calc_cfda_amounts(cfdas):
         agency = cfda[1][:2]
         amount = cfda[2] or 0
         direct = cfda[3]
-        programtotal = cfda[4] or 0
+        # TODO use amount rather than programamount?
+        # programtotal = cfda[4] or 0
         total_amount_agency[agency] += amount
         if direct == "Y":
-            total_da_amount_expended += programtotal
-            total_da_amount_agency[agency] += programtotal
+            total_da_amount_expended += amount
+            total_da_amount_agency[agency] += amount
     max_total_agency, max_da_agency = _extract_max_agency(
         total_amount_agency, total_da_amount_agency
     )
