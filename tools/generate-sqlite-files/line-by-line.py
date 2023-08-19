@@ -23,7 +23,9 @@ def main():
                 if not c:
                     break
                 else:
-                    if ord(c) >= 32 and ord(c) <= 122:
+                    if (ord(c) >= 32 and ord(c) <= 122):
+                        line.append(c)
+                    if c == '|':
                         line.append(c)
                     if c == '\n':
                         lines.append(line)

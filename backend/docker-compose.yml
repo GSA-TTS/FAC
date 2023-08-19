@@ -9,6 +9,13 @@ services:
       - postgres-data:/var/lib/postgresql/data/
     ports:
       - "5432:5432"
+      
+  load:
+    image: "fac/wait-and-load"
+    environment:
+      DATABASE_URL: postgres://postgres@db/postgres
+    depends_on:
+      - db
 
   web:
     build:
@@ -32,7 +39,6 @@ services:
       AV_SCAN_URL: http://clamav-rest:9000/scan
       DISABLE_AUTH: ${DISABLE_AUTH:-False}
       PGRST_JWT_SECRET: ${PGRST_JWT_SECRET:-32_chars_fallback_secret_testing}
-
     env_file:
       - ".env"
     ports:
