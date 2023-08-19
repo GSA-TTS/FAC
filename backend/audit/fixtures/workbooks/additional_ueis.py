@@ -7,7 +7,7 @@ from audit.fixtures.workbooks.excel_creation import (
     generate_dissemination_test_table,
 )
 
-from audit.fixtures.census_models.ay22 import (
+from audit.fixtures.census_models.census import (
     CensusGen22 as Gen,
     CensusUeis22 as Ueis,
 )

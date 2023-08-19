@@ -7,7 +7,7 @@ from audit.fixtures.workbooks.excel_creation import (
     set_range,
 )
 
-from audit.fixtures.census_models.ay22 import (
+from audit.fixtures.census_models.census import (
     CensusCfda22 as Cfda,
     CensusFindings22 as Findings,
     CensusGen22 as Gen,

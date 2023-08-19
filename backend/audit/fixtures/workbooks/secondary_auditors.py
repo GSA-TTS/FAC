@@ -7,7 +7,7 @@ from audit.fixtures.workbooks.excel_creation import (
     test_pfix,
 )
 
-from audit.fixtures.census_models.ay22 import (
+from audit.fixtures.census_models.census import (
     CensusGen22 as Gen,
     CensusCpas22 as Cpas,
 )
