@@ -168,7 +168,7 @@ def api_check(json_test_tables):
             equality_results = []
             for field_ndx, f in enumerate(row["fields"]):
                 api_values = get_api_values(endpoint, report_id, f)
-                # print(api_values)
+                # print(f, api_values)
                 this_api_value = api_values[row_ndx]
                 this_field_value = row["values"][field_ndx]
                 eq = check_equality(this_field_value, this_api_value)

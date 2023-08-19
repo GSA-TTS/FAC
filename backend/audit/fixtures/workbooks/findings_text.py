@@ -37,7 +37,7 @@ def generate_findings_text(dbkey, outfile):
     map_simple_columns(wb, mappings, ftexts)
     wb.save(outfile)
     table = generate_dissemination_test_table(
-        Gen, "finding_text", dbkey, mappings, ftexts
+        Gen, "findings_text", dbkey, mappings, ftexts
     )
     table["singletons"]["auditee_uei"] = g.uei
 

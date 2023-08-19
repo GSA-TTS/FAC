@@ -36,7 +36,7 @@ def generate_additional_ueis(dbkey, outfile):
     wb.save(outfile)
 
     table = generate_dissemination_test_table(
-        Gen, "additional_uei", dbkey, mappings, addl_ueis
+        Gen, "additional_ueis", dbkey, mappings, addl_ueis
     )
     table["singletons"]["auditee_uei"] = g.uei
 

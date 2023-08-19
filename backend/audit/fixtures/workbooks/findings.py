@@ -91,7 +91,7 @@ def generate_findings(dbkey, outfile):
 
     wb.save(outfile)
 
-    table = generate_dissemination_test_table(Gen, "finding", dbkey, mappings, findings)
+    table = generate_dissemination_test_table(Gen, "findings", dbkey, mappings, findings)
     for obj, ar in zip(table["rows"], award_references):
         obj["fields"].append("award_reference")
         obj["values"].append(ar)

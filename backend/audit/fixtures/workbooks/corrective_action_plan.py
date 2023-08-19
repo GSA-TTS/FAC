@@ -40,7 +40,7 @@ def generate_corrective_action_plan(dbkey, outfile):
     wb.save(outfile)
 
     table = generate_dissemination_test_table(
-        Gen, "cap_text", dbkey, mappings, captexts
+        Gen, "corrective_action_plans", dbkey, mappings, captexts
     )
     table["singletons"]["auditee_uei"] = g.uei
 

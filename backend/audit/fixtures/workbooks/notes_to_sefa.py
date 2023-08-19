@@ -24,9 +24,9 @@ import logging
 logger = logging.getLogger(__name__)
 
 mappings = [
-    FieldMap("note_title", "title", WorkbookFieldInDissem, None, test_pfix(3)),
+    FieldMap("note_title", "title", "title", None, test_pfix(3)),
     FieldMap("note_content", "content", "content", None, test_pfix(3)),
-    FieldMap("seq_number", "seq_number", "note_seq_number", 0, int),
+    # FieldMap("seq_number", "seq_number", "note_seq_number", 0, int),
 ]
 
 
@@ -98,7 +98,7 @@ def generate_notes_to_sefa(dbkey, outfile):
     map_simple_columns(wb, mappings, notes)
     wb.save(outfile)
 
-    table = generate_dissemination_test_table(Gen, "note", dbkey, mappings, notes)
+    table = generate_dissemination_test_table(Gen, "notes_to_sefa", dbkey, mappings, notes)
 
     table["singletons"]["accounting_policies"] = policies_content
     table["singletons"]["is_minimis_rate_used"] = is_used
