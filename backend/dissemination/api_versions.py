@@ -6,6 +6,7 @@ from typing import List
 live = [
     # These are API versions we have in flight.
     "api_v1_0_0_beta",
+    "api_historic_v0_1_0_alpha",
 ]
 
 # These are API versions we have deprecated.
@@ -51,7 +52,6 @@ def drop_schema(version):
 
 def create_live_schemas():
     for version in live:
-        drop_schema(version)
         exec_sql(version, "base.sql")
         create_schema(version)
 
@@ -68,7 +68,6 @@ def drop_live_views():
 
 def create_live_views():
     for version in live:
-        drop_views(version)
         create_views(version)
 
 

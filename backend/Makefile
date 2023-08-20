@@ -53,17 +53,22 @@ test:
 nctest:
 	@python -m coverage run --source="." manage.py test --parallel ${fac.test.scope}
 
+# docker compose run web bash -c '\
+# 	# python manage.py drop_deprecated_api_schema_and_views &&\
+# 	# python manage.py drop_api_schema &&\
+# 	python manage.py makemigrations &&\
+# 	# python manage.py create_api_schema &&\
+# 	python manage.py migrate &&\
+# 	# python manage.py create_api_views\
+# 	'
+
 docker-first-run:
 	docker compose build
+	docker compose run load
 	docker compose run web bash -c '\
-		python manage.py drop_deprecated_api_schema_and_views &&\
-		python manage.py drop_api_schema &&\
 		python manage.py makemigrations &&\
-		python manage.py create_api_schema &&\
-		python manage.py migrate &&\
-		python manage.py create_api_views\
+		python manage.py migrate\
 		'
-	# docker compose run web python manage.py load_test_data
 
 # Run Django tests with docker
 docker-test:

@@ -9,13 +9,19 @@ services:
       - postgres-data:/var/lib/postgresql/data/
     ports:
       - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d postgres -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
       
   load:
     image: "fac/wait-and-load"
     environment:
       DATABASE_URL: postgres://postgres@db/postgres
     depends_on:
-      - db
+      db:
+        condition: service_healthy
 
   web:
     build:
@@ -23,9 +29,14 @@ services:
       dockerfile: "./${DOCKERFILE:-Dockerfile}"
     command: /src/run.sh
     depends_on:
-      - db
-      - minio
-      - api
+      db:
+        condition: service_healthy
+      minio:
+        condition: service_started
+      load:
+        condition: service_completed_successfully
+      clamav-rest:
+        condition: service_started
     environment:
       DATABASE_URL: postgres://postgres@db/postgres
       POSTGREST_URL: http://api:3000
@@ -47,6 +58,7 @@ services:
       - .:/src
       - /src/node_modules
       - /src/staticfiles
+
   clamav-rest:
     # image: clamav/clamav
     image: ghcr.io/gsa-tts/fac/clamav:latest
@@ -64,8 +76,8 @@ services:
       - "9002:9002"
     volumes:
       - "minio-vol:/tmp/minio"
+
   api:
-    # image: postgrest/postgrest
     image: ghcr.io/gsa-tts/fac/postgrest:latest
     ports:
       - "3000:3000"
@@ -75,10 +87,11 @@ services:
       PGRST_DB_URI: postgres://postgres@db:5432/postgres
       PGRST_OPENAPI_SERVER_PROXY_URI: http://127.0.0.1:3000
       PGRST_DB_ANON_ROLE: anon
-      PGRST_DB_SCHEMAS: "api_v1_0_0_beta"
+      PGRST_DB_SCHEMAS: "api_v1_0_0_beta,api_historic_v0_1_0_alpha"
       PGRST_JWT_SECRET: ${PGRST_JWT_SECRET:-32_chars_fallback_secret_testing} # Fallback value for testing environments
     depends_on:
-      - db
+      load:
+        condition: service_completed_successfully
 volumes:
   postgres-data:
   minio-vol:
