@@ -64,7 +64,6 @@ nctest:
 
 docker-first-run:
 	docker compose build
-	docker compose run load
 	docker compose run web bash -c '\
 		python manage.py makemigrations &&\
 		python manage.py migrate\
