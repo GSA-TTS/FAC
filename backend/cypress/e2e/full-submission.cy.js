@@ -83,13 +83,9 @@ describe('Full audit submission', () => {
      cy.get(".usa-link").contains("Auditee Certification").click();
      testAuditeeCertification();
      // The same as auditor certification, with different checkboxes.
+
     // Uncomment this block when ready to implement the certification steps.
     /*
-
-    // Third, auditee certification
-    cy.get(".usa-link").contains("Auditee Certification").click();
-    // The same as auditor certification, with different checkboxes.
-
     // Finally, submit for processing.
     cy.get(".usa-link").contains("Submit to the FAC for processing").click();
     // This will probably take you back to the homepage, where the audit is now oof status "submitted".
