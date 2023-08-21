@@ -32,8 +32,7 @@ def submission_progress_check(sac, sar=None, crossval=True):
         }
     """
     sections = sac["sf_sac_sections"]
-    # TODO: remove these once Notes to SEFA and tribal data consent are implemented
-    del sections["notes_to_sefa"]
+    # TODO: remove these once tribal data consent are implemented
     del sections["tribal_data_consent"]
     result = {k: None for k in sections}  # type: ignore
     progress = {
