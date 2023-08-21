@@ -18,7 +18,6 @@ class MockHttpResponse:
 
 
 class TestLoadFixturesCommand(TestCase):
-
     @patch("audit.validators._scan_file")
     def test_load_fixtures(self, mock_scan_file):
         """load_fixtures command makes some single audit checklists."""
