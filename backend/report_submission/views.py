@@ -150,7 +150,6 @@ class GeneralInformationFormView(LoginRequiredMixin, View):
                 "auditor_phone": sac.auditor_phone,
                 "auditor_email": sac.auditor_email,
                 "secondary_auditors_exist": sac.secondary_auditors_exist,
-
                 "report_id": report_id,
             }
 
@@ -196,7 +195,6 @@ class GeneralInformationFormView(LoginRequiredMixin, View):
             raise BadRequest()
         except LateChangeError:
             return render(request, "audit/no-late-changes.html")
-
 
 
 class UploadPageView(LoginRequiredMixin, View):
