@@ -195,36 +195,41 @@ def api_check(json_test_tables):
     return combined_summary
 
 
+def generate_workbooks(user, email, dbkey):
+    entity_id = "DBKEY {dbkey} {date:%Y_%m_%d_%H_%M_%S}".format(
+        dbkey=dbkey, date=datetime.datetime.now()
+    )
+    sac = setup_sac(user, entity_id, dbkey)
+    if sac.general_information["audit_type"] == "alternative-compliance-engagement":
+        print(f"Skipping ACE audit: {dbkey}")
+    else:
+        loader = workbook_loader(user, sac, dbkey, entity_id)
+        json_test_tables = []
+        for section, fun in sections.items():
+            # FIXME: Can we conditionally upload the addl' and secondary workbooks?
+            (_, json, _) = loader(fun, section)
+            json_test_tables.append(json)
+        _post_upload_pdf(sac, user, "audit/fixtures/basic.pdf")
+        SingleAuditChecklist = apps.get_model("audit.SingleAuditChecklist")
+        step_through_certifications(sac, SingleAuditChecklist)
+        disseminate(sac)
+        # pprint(json_test_tables)
+        combined_summary = api_check(json_test_tables)
+        print(combined_summary)
+
+
 class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument("--email", type=str, required=True)
         parser.add_argument("--dbkey", type=str, required=True)
 
     def handle(self, *args, **options):
+        email = options["email"]
+        dbkey = options["dbkey"]
         try:
-            user = User.objects.get(email=options["email"])
+            user = User.objects.get(email=email)
         except User.DoesNotExist:
-            logger.info(
-                "No user found for %s, have you logged in once?", options["email"]
-            )
+            logger.info("No user found for %s, have you logged in once?", email)
             return
-        entity_id = "DBKEY {dbkey} {date:%Y_%m_%d_%H_%M_%S}".format(
-            dbkey=options["dbkey"], date=datetime.datetime.now()
-        )
-        sac = setup_sac(user, entity_id, options["dbkey"])
-        if sac.general_information["audit_type"] == "alternative-compliance-engagement":
-            print(f"Skipping ACE audit: {options['dbkey']}")
-        else:
-            loader = workbook_loader(user, sac, options["dbkey"], entity_id)
-            json_test_tables = []
-            for section, fun in sections.items():
-                # FIXME: Can we conditionally upload the addl' and secondary workbooks?
-                (_, json, _) = loader(fun, section)
-                json_test_tables.append(json)
-            _post_upload_pdf(sac, user, "audit/fixtures/basic.pdf")
-            SingleAuditChecklist = apps.get_model("audit.SingleAuditChecklist")
-            step_through_certifications(sac, SingleAuditChecklist)
-            disseminate(sac)
-            # pprint(json_test_tables)
-            combined_summary = api_check(json_test_tables)
-            print(combined_summary)
+
+        generate_workbooks(user, email, dbkey)

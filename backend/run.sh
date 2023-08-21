@@ -19,11 +19,21 @@ fi;
 
 # Migrate first
 python manage.py migrate
+
 python manage.py drop_deprecated_api_schema_and_views && 
-  python manage.py drop_api_views &&
-  python manage.py drop_api_schema && 
-  python manage.py create_api_schema && 
-  python manage.py create_api_views
-  
+python manage.py drop_api_views &&
+python manage.py drop_api_schema && 
+python manage.py create_api_schema && 
+python manage.py create_api_views
+
+if [[ ("${ENV}" == "LOCAL" || "${ENV}" == "STAGING") && "$LOAD_TEST_DATA" == 1 ]];
+then
+  # 175887 162392 
+  for dbkey in 91651 147134 175887 162392; 
+  do
+    python manage.py workbooks_e2e --email workbook.generator@test.fac.gov --dbkey $dbkey
+  done
+fi
+
 # Run the build/watch assets + run server at the same time
 npm run dev & python manage.py runserver 0.0.0.0:8000

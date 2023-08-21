@@ -1,6 +1,5 @@
 from audit.fixtures.workbooks.excel_creation import (
     FieldMap,
-    WorkbookFieldInDissem,
     templates,
     set_uei,
     set_single_cell_range,
@@ -98,7 +97,9 @@ def generate_notes_to_sefa(dbkey, outfile):
     map_simple_columns(wb, mappings, notes)
     wb.save(outfile)
 
-    table = generate_dissemination_test_table(Gen, "notes_to_sefa", dbkey, mappings, notes)
+    table = generate_dissemination_test_table(
+        Gen, "notes_to_sefa", dbkey, mappings, notes
+    )
 
     table["singletons"]["accounting_policies"] = policies_content
     table["singletons"]["is_minimis_rate_used"] = is_used

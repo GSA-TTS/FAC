@@ -32,10 +32,12 @@ services:
       db:
         condition: service_healthy
       minio:
-        condition: service_started
+        condition: service_healthy
       load:
         condition: service_completed_successfully
       clamav-rest:
+        condition: service_started
+      api:
         condition: service_started
     environment:
       DATABASE_URL: postgres://postgres@db/postgres
@@ -50,6 +52,7 @@ services:
       AV_SCAN_URL: http://clamav-rest:9000/scan
       DISABLE_AUTH: ${DISABLE_AUTH:-False}
       PGRST_JWT_SECRET: ${PGRST_JWT_SECRET:-32_chars_fallback_secret_testing}
+      LOAD_TEST_DATA: 1
     env_file:
       - ".env"
     ports:
@@ -67,6 +70,7 @@ services:
       SIGNATURE_CHECKS: 1
     ports:
       - "9000:9000"
+
   minio:
     container_name: "minio"
     image: minio/minio
@@ -76,6 +80,11 @@ services:
       - "9002:9002"
     volumes:
       - "minio-vol:/tmp/minio"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
 
   api:
     image: ghcr.io/gsa-tts/fac/postgrest:latest
@@ -94,6 +103,19 @@ services:
         condition: service_healthy
       load:
         condition: service_completed_successfully
+
+  pgweb:
+    image: sosedoff/pgweb
+    ports:
+      - "8081:8081"
+    expose:
+      - "8081"
+    environment:
+      PGWEB_DATABASE_URL: postgres://postgres@db:5432/postgres?sslmode=disable
+    depends_on:
+      db:
+        condition: service_healthy
+
 volumes:
   postgres-data:
   minio-vol:
