@@ -190,19 +190,33 @@ class AccessAndSubmissionStepTests(TestCase):
         Auditee UEI is optional
         """
         valid1 = {
-            "certifying_auditee_contact": "a@a.com",
-            "certifying_auditor_contact": "b@b.com",
-            "auditor_contacts": ["c@c.com"],
-            "auditee_contacts": ["e@e.com"],
+            "certifying_auditee_contact_fullname": "Fuller A. Namesmith",
+            "certifying_auditee_contact_email": "a@a.com",
+            "certifying_auditor_contact_fullname": "Fuller B. Namesmith",
+            "certifying_auditor_contact_email": "b@b.com",
+            "auditee_contacts_fullname": ["Fuller C. Namesmith"],
+            "auditee_contacts_email": ["c@c.com"],
+            "auditor_contacts_fullname": ["Fuller D. Namesmith"],
+            "auditor_contacts_email": ["d@d.com"],
         }
         self.assertTrue(AccessAndSubmissionSerializer(data=valid1).is_valid())
 
     def test_valid_payload_with_two_contacts(self):
         valid2 = {
-            "certifying_auditee_contact": "a@a.com",
-            "certifying_auditor_contact": "b@b.com",
-            "auditor_contacts": ["c@c.com", "d@d.com"],
-            "auditee_contacts": ["e@e.com", "f@f.com"],
+            "certifying_auditee_contact_fullname": "Fuller A. Namesmith",
+            "certifying_auditee_contact_email": "a@a.com",
+            "certifying_auditor_contact_fullname": "Fuller B. Namesmith",
+            "certifying_auditor_contact_email": "b@b.com",
+            "auditee_contacts_fullname": [
+                "Fuller C. Namesmith",
+                "Fuller CC. Namesmith",
+            ],
+            "auditee_contacts_email": ["c@c.com", "cc@c.com"],
+            "auditor_contacts_fullname": [
+                "Fuller D. Namesmith",
+                "Fuller DD. Namesmith",
+            ],
+            "auditor_contacts_email": ["d@d.com", "dd@d.com"],
         }
         self.assertTrue(AccessAndSubmissionSerializer(data=valid2).is_valid())
 
@@ -212,9 +226,9 @@ class AccessAndSubmissionStepTests(TestCase):
 
     def test_missing_certifying_auditee(self):
         missing_cert_auditee = {
-            "certifying_auditor_contact": "b@b.com",
-            "auditor_contacts": ["c@c.com", "d@d.com"],
-            "auditee_contacts": ["e@e.com", "f@f.com"],
+            "certifying_auditor_contact_email": "b@b.com",
+            "auditor_contacts_email": ["c@c.com", "d@d.com"],
+            "auditee_contacts_email": ["e@e.com", "f@f.com"],
         }
         self.assertFalse(
             AccessAndSubmissionSerializer(data=missing_cert_auditee).is_valid()
@@ -222,9 +236,10 @@ class AccessAndSubmissionStepTests(TestCase):
 
     def test_missing_certifying_auditor(self):
         missing_cert_auditor = {
-            "certifying_auditee_contact": "a@a.com",
-            "auditor_contacts": ["c@c.com", "d@d.com"],
-            "auditee_contacts": ["e@e.com", "f@f.com"],
+            "certifying_auditee_contact_fullname": "Fuller A. Namesmith",
+            "certifying_auditee_contact_email": "a@a.com",
+            "auditor_contacts_email": ["c@c.com", "d@d.com"],
+            "auditee_contacts_email": ["e@e.com", "f@f.com"],
         }
         self.assertFalse(
             AccessAndSubmissionSerializer(data=missing_cert_auditor).is_valid()
@@ -232,9 +247,9 @@ class AccessAndSubmissionStepTests(TestCase):
 
     def test_missing_auditor_contacts(self):
         missing_auditor_contacts = {
-            "certifying_auditee_contact": "a@a.com",
-            "certifying_auditor_contact": "b@b.com",
-            "auditee_contacts": ["e@e.com", "f@f.com"],
+            "certifying_auditee_contact_email": "a@a.com",
+            "certifying_auditor_contact_email": "b@b.com",
+            "auditee_contacts_email": ["e@e.com", "f@f.com"],
         }
         self.assertFalse(
             AccessAndSubmissionSerializer(data=missing_auditor_contacts).is_valid()
@@ -242,9 +257,9 @@ class AccessAndSubmissionStepTests(TestCase):
 
     def test_missing_auditee_contacts(self):
         missing_auditee_contacts = {
-            "certifying_auditee_contact": "a@a.com",
-            "certifying_auditor_contact": "b@b.com",
-            "auditor_contacts": ["c@c.com", "d@d.com"],
+            "certifying_auditee_contact_email": "a@a.com",
+            "certifying_auditor_contact_email": "b@b.com",
+            "auditor_contacts_email": ["c@c.com", "d@d.com"],
         }
         self.assertFalse(
             AccessAndSubmissionSerializer(data=missing_auditee_contacts).is_valid()
@@ -252,10 +267,10 @@ class AccessAndSubmissionStepTests(TestCase):
 
     def test_auditee_contacts_not_in_a_list(self):
         auditee_contacts_not_list = {
-            "certifying_auditee_contact": "a@a.com",
-            "certifying_auditor_contact": "b@b.com",
-            "auditor_contacts": "c@c.com",
-            "auditee_contacts": ["e@e.com", "f@f.com"],
+            "certifying_auditee_contact_email": "a@a.com",
+            "certifying_auditor_contact_email": "b@b.com",
+            "auditor_contacts_email": "c@c.com",
+            "auditee_contacts_email": ["e@e.com", "f@f.com"],
         }
         self.assertFalse(
             AccessAndSubmissionSerializer(data=auditee_contacts_not_list).is_valid()
@@ -263,10 +278,10 @@ class AccessAndSubmissionStepTests(TestCase):
 
     def test_auditor_contacts_not_in_a_list(self):
         auditor_contacts_not_list = {
-            "certifying_auditee_contact": "a@a.com",
-            "certifying_auditor_contact": "b@b.com",
-            "auditor_contacts": ["c@c.com", "d@d.com"],
-            "auditee_contacts": "e@e.com",
+            "certifying_auditee_contact_email": "a@a.com",
+            "certifying_auditor_contact_email": "b@b.com",
+            "auditor_contacts_email": ["c@c.com", "d@d.com"],
+            "auditee_contacts_email": "e@e.com",
         }
         self.assertFalse(
             AccessAndSubmissionSerializer(data=auditor_contacts_not_list).is_valid()
@@ -274,10 +289,10 @@ class AccessAndSubmissionStepTests(TestCase):
 
     def test_certifying_auditee_not_valid_email(self):
         cert_auditee_not_valid_email = {
-            "certifying_auditee_contact": "this is not an email",
-            "certifying_auditor_contact": "b@b.com",
-            "auditor_contacts": ["c@c.com", "d@d.com"],
-            "auditee_contacts": ["e@e.com", "f@f.com"],
+            "certifying_auditee_contact_email": "this is not an email",
+            "certifying_auditor_contact_email": "b@b.com",
+            "auditor_contacts_email": ["c@c.com", "d@d.com"],
+            "auditee_contacts_email": ["e@e.com", "f@f.com"],
         }
         self.assertFalse(
             AccessAndSubmissionSerializer(data=cert_auditee_not_valid_email).is_valid()
@@ -285,10 +300,10 @@ class AccessAndSubmissionStepTests(TestCase):
 
     def test_certifying_auditor_not_valid_email(self):
         cert_auditor_not_valid_email = {
-            "certifying_auditee_contact": "a@a.com",
-            "certifying_auditor_contact": "this is not an email",
-            "auditor_contacts": ["c@c.com", "d@d.com"],
-            "auditee_contacts": ["e@e.com", "f@f.com"],
+            "certifying_auditee_contact_email": "a@a.com",
+            "certifying_auditor_contact_email": "this is not an email",
+            "auditor_contacts_email": ["c@c.com", "d@d.com"],
+            "auditee_contacts_email": ["e@e.com", "f@f.com"],
         }
         self.assertFalse(
             AccessAndSubmissionSerializer(data=cert_auditor_not_valid_email).is_valid()
@@ -296,10 +311,10 @@ class AccessAndSubmissionStepTests(TestCase):
 
     def test_auditor_list_not_all_valid_emails(self):
         auditor_not_all_valid_emails = {
-            "certifying_auditee_contact": "a@a.com",
-            "certifying_auditor_contact": "b@b.com",
-            "auditor_contacts": ["c@c.com", "this is not an email", "d@d.com"],
-            "auditee_contacts": ["e@e.com", "f@f.com"],
+            "certifying_auditee_contact_email": "a@a.com",
+            "certifying_auditor_contact_email": "b@b.com",
+            "auditor_contacts_email": ["c@c.com", "this is not an email", "d@d.com"],
+            "auditee_contacts_email": ["e@e.com", "f@f.com"],
         }
         self.assertFalse(
             AccessAndSubmissionSerializer(data=auditor_not_all_valid_emails).is_valid()
@@ -307,10 +322,10 @@ class AccessAndSubmissionStepTests(TestCase):
 
     def test_auditee_list_not_all_valid_emails(self):
         auditee_not_all_valid_emails = {
-            "certifying_auditee_contact": "a@a.com",
-            "certifying_auditor_contact": "b@b.com",
-            "auditor_contacts": ["c@c.com", "d@d.com"],
-            "auditee_contacts": ["e@e.com", "this is not an email", "f@f.com"],
+            "certifying_auditee_contact_email": "a@a.com",
+            "certifying_auditor_contact_email": "b@b.com",
+            "auditor_contacts_email": ["c@c.com", "d@d.com"],
+            "auditee_contacts_email": ["e@e.com", "this is not an email", "f@f.com"],
         }
         self.assertFalse(
             AccessAndSubmissionSerializer(data=auditee_not_all_valid_emails).is_valid()
