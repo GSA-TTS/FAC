@@ -2,7 +2,7 @@
 
 We use either [Docker with `docker compose`](#docker) or [local development](#local-development) when working on issues and shipping pull requests.
 
-See [the pull request template](../.github/PULL_REQUEST_TEMPLATE/pr-review-template.md) for steps to follow when submitting or reviewing pull requests.
+See [the pull request template](../.github/pull_request_template.md) for steps to follow when submitting or reviewing pull requests.
 
 ## Contents
 
