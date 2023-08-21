@@ -2,7 +2,7 @@
 {% load static %}
 {% load sprite_helper %}
 {% block step-content %}
-    <div class="grid-container auditee-information">
+    <div class="grid-container auditee-information padding-bottom-6 padding-top-4">
         <div class="grid-row">
             <form class="usa-form usa-form--large tablet:grid-col"
                 id="check-eligibility"
@@ -13,7 +13,7 @@
                     <legend class="usa-legend usa-legend--large">
                         Auditee information
                     </legend>
-                    <span class="usa-error-message margin-top-2">{{ form.non_field_errors|striptags }}</span>
+                    <span class="usa-error-message">{{ form.non_field_errors|striptags }}</span>
                     <p>
                         <abbr title="required" class="usa-hint usa-hint--required">*</abbr>Indicates a required field.
                     </p>
@@ -28,16 +28,11 @@
                             A UEI is required in order to proceed.
                         </p>
                     </div>
-                    <p class="uei-explanation">
-                        Search by Unique Entity Identifier (UEI) for your entity name in the SAM.gov
-                        database.
-                    </p>
                     <div class="usa-form-group">
-                        <ul class="usa-error-message" id="auditee_uei-error-message" role="alert">
-                            <li id="auditee_uei-not-null" hidden>Can&#39;t be null</li>
-                            <li id="auditee_uei-length" hidden>UEI is twelve characters long</li>
-                        </ul>
-                        <span class="usa-error-message margin-top-2">{{ form.auditee_uei.errors|striptags }}</span>
+                        <p class="margin-0">
+                            <strong>Entity UEI <a>Unique Identity Identifier</a></strong>
+                        </p>
+                        <div class="usa-hint margin-y-05" id="auditee_uei_hint">12-character alphanumeric ID</div>
                         <div class="usa-search" role="search">
                             <label class="usa-sr-only" for="auditee_uei">Search</label>
                             <input class="usa-input"
@@ -46,24 +41,27 @@
                                 name="auditee_uei"
                                 required
                                 data-validate-not-null=""
-                                data-validate-length="== 12"/>
+                                data-validate-length="== 12"
+                                aria-autocomplete="inline"/>
                             <button class="usa-button"
                                 id="auditee_uei-btn"
                                 type="submit"
                                 aria-controls="uei-search-result"
                                 data-open-modal>
                                 <span class="usa-search__submit-text">
-                                    <img src="/static/img/usa-icons-bg/search--white.svg"
-                                        class="usa-search__submit-icon"
-                                        alt="Search"/>
-                                    Search
+                                    <svg class="usa-icon usa-icon--size-3 margin-right-1" aria-hidden="true" focusable="false" role="img">
+                                        {% uswds_sprite "verified" %}
+                                    </svg>
+                                    <p class="margin-0 text-no-wrap">Validate UEI</p>
                                 </span>
                             </button>
                         </div>
+                        <ul class="usa-error-message" id="auditee_uei-error-message" role="alert">
+                            <li id="auditee_uei-not-null" hidden>Can&#39;t be null</li>
+                            <li id="auditee_uei-length" hidden>UEI is twelve characters long</li>
+                        </ul>
+                        <span class="usa-error-message margin-top-1">{{ form.auditee_uei.errors|striptags }}</span>
                     </div>
-                    <p class="uei-explanation">
-                        Don’t know your UEI? You can find your UEI or register for a new UEI by visiting <a href="https://sam.gov/">SAM.gov</a>.
-                    </p>
                     <div class="usa-form-group">
                         <label for="auditee_name" hidden>Auditee name</label>
                         <input class="usa-input"
@@ -82,16 +80,11 @@
                             <label class="usa-label"
                                 id="auditee_fiscal_period_start-label"
                                 for="auditee_fiscal_period_start">
-                                Auditee fiscal period <strong>start</strong> date for this submission<abbr title="required" class="usa-hint usa-hint--required">*</abbr>
+                                <strong>Fiscal period start date</strong><abbr title="required" class="usa-hint usa-hint--required">*</abbr>
                             </label>
                             <div class="usa-hint" id="auditee_fiscal_period_start-hint">mm/dd/yyyy</div>
                             <div class="usa-date-picker">
-                                <ul class="usa-error-message"
-                                    id="auditee_fiscal_period_start-error-message"
-                                    role="alert">
-                                    <li id="auditee_fiscal_period_start-not-null" hidden>Can&#39;t be null</li>
-                                </ul>
-                                <span class="usa-error-message margin-top-2">{{ form.auditee_fiscal_period_start.errors|striptags }}</span>
+                                <span class="usa-error-message margin-top-1">{{ form.auditee_fiscal_period_start.errors|striptags }}</span>
                                 <input class="usa-input"
                                     id="auditee_fiscal_period_start"
                                     name="auditee_fiscal_period_start"
@@ -101,6 +94,11 @@
                                     required
                                     data-validate-not-null=""/>
                             </div>
+                            <ul class="usa-error-message"
+                                id="auditee_fiscal_period_start-error-message"
+                                role="alert">
+                                <li id="auditee_fiscal_period_start-not-null" hidden>Can&#39;t be null</li>
+                            </ul>
                         </div>
                     </div>
                     <div class="usa-form-group validate-fy">
@@ -108,16 +106,11 @@
                             <label class="usa-label"
                                 id="auditee_fiscal_period_end-label"
                                 for="auditee_fiscal_period_end">
-                                Auditee fiscal period <strong>end</strong> date for this submission<abbr title="required" class="usa-hint usa-hint--required">*</abbr>
+                                <strong>Fiscal period end date</strong><abbr title="required" class="usa-hint usa-hint--required">*</abbr>
                             </label>
                             <div class="usa-hint" id="auditee_fiscal_period_end-hint">mm/dd/yyyy</div>
                             <div class="usa-date-picker">
-                                <ul class="usa-error-message"
-                                    id="auditee_fiscal_period_end-error-message"
-                                    role="alert">
-                                    <li id="auditee_fiscal_period_end-not-null" hidden>Can&#39;t be null</li>
-                                </ul>
-                                <span class="usa-error-message margin-top-2">{{ form.auditee_fiscal_period_end.errors|striptags }}</span>
+                                <span class="usa-error-message margin-top-1">{{ form.auditee_fiscal_period_end.errors|striptags }}</span>
                                 <input class="usa-input"
                                     id="auditee_fiscal_period_end"
                                     name="auditee_fiscal_period_end"
@@ -127,31 +120,34 @@
                                     required
                                     data-validate-not-null=""/>
                             </div>
+                            <ul class="usa-error-message"
+                                id="auditee_fiscal_period_end-error-message"
+                                role="alert">
+                                <li id="auditee_fiscal_period_end-not-null" hidden>Can&#39;t be null</li>
+                            </ul>
                         </div>
                     </div>
                 </fieldset>
                 <ul class="usa-button-group">
-                    <li class="usa-button-group__item">{% include "../cancel-button.html" %}</li>
                     <li class="usa-button-group__item">
                         <button class="usa-button" id="continue">Continue</button>
                     </li>
+                    <li class="usa-button-group__item margin-left-4">{% include "../cancel-button.html" %}</li>
                 </ul>
             </form>
             <div class="ueid-explanation tablet:grid-col usa-prose font-sans-sm">
-                <h2>The unique entity identifier used by the FAC has changed.</h2>
+                <p class="font-sans-lg text-bold">The FAC now uses the Unique Entity ID (UEI) instead of the DUNS number.</p>
                 <p>
                     On April 4, 2022, the unique entity identifier used across the federal government changed from the DUNS
-                    Number to the Unique Entity ID (generated by SAM.gov).
+                    Number to the Unique Entity ID (UEI).
                 </p>
-                <ul>
-                    <li>The Unique Entity ID is a 12-character alphanumeric ID assigned to an entity by SAM.gov.</li>
-                    <li>As part of this transition, the DUNS Number has been removed.</li>
-                    <li>Entity registration, searching, and data entry in the FAC now require use of the new Unique Entity ID.</li>
+                <ul class="usa-list">
+                    <li>UEIs are 12-character alphanumeric IDs assigned to entities by SAM.gov</li>
+                    <li>Data entry, entity registration, and searching in the FAC now require use of an entity's UEI</li>
+                    <li>DUNS Numbers are no longer accepted to create new single audit submissions</li>
                 </ul>
-                <h2>What is a UEI?</h2>
-                <p>
-                    For more information about this transition, visit SAM.gov or the Federal Service Desk, FSD.gov. You can
-                    search for help at FSD any time or request help from an FSD agent Monday–Friday 8 a.m. to 8 p.m. ET.
+                <p class="border-top border-base-light padding-top-2">
+                    For more information about this transition, visit <a class="usa-link" href="https://sam.gov/">SAM.gov</a> or the Federal Service Desk, <a class="usa-link" href="https://www.fsd.gov/">FSD.gov</a>. You can search for help at FSD any time or request help from an FSD agent Monday–Friday 8 a.m. to 8 p.m. ET.
                 </p>
             </div>
         </div>
