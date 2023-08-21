@@ -7,6 +7,7 @@ import { testValidGeneralInfo } from '../support/general-info.js';
 import { testAuditInformationForm } from '../support/audit-info-form.js';
 import { testPdfAuditReport } from '../support/report-pdf.js';
 import { testAuditorCertification } from '../support/auditor-certification.js';
+import { testAuditeeCertification } from '../support/auditee-certification.js';
 import { testWorkbookFederalAwards,
          testWorkbookFindingsUniformGuidance,
          testWorkbookFindingsText,
@@ -78,6 +79,10 @@ describe('Full audit submission', () => {
     cy.get(".usa-link").contains("Auditor Certification").click();
     testAuditorCertification();
 
+     // Third, auditee certification
+     cy.get(".usa-link").contains("Auditee Certification").click();
+     testAuditeeCertification();
+     // The same as auditor certification, with different checkboxes.
     // Uncomment this block when ready to implement the certification steps.
     /*
 
