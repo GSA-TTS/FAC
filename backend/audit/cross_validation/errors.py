@@ -47,6 +47,13 @@ def err_findings_count_inconsistent(total_expected, total_counted, award_ref):
     )
 
 
+def err_duplicate_award_reference(award_ref):
+    return (
+        f"The award reference {award_ref} shows up more than once. "
+        f"This should not be possible. Please contact customer support."
+    )
+
+
 def err_award_ref_not_declared(award_refs: list):
     is_plural = len(award_refs) > 1
     if is_plural:

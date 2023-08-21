@@ -2,7 +2,7 @@
 {% load static %}
 {% load sprite_helper %}
 {% block step-content %}
-    <div class="grid-container audit-submission-access">
+    <div class="grid-container margin-y-6 audit-submission-access">
         <div class="grid-row">
             <form class="usa-form usa-form--large" id="grant-access" method="post">
                 {% csrf_token %}
@@ -10,26 +10,9 @@
                     <legend class="usa-legend usa-legend--large">
                         Who will need access to this audit?
                     </legend>
-                    <div class="usa-summary-box"
-                         role="region"
-                         aria-labelledby="audit_submission_access-summary-box-key-information">
-                        <div class="usa-summary-box__body">
-                            <h2 class="usa-summary-box__heading"
-                                id="audit_submission_access-summary-box-key-information">Key information</h2>
-                            <div class="usa-summary-box__text">
-                                <ul class="usa-list">
-                                    <li>In this section, list anyone who needs access to the audit submission.</li>
-                                    <li>If you’ll need access to the audit submission, list yourself.</li>
-                                    <li>
-                                        You can make changes later using the <a class="usa-link" href="javascript:void(0);">Account
-                                        Tools</a> option on the <a class="usa-link" href="javascript:void(0);">account homepage.</a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
+                    <p>Enter the email address for everyone who will need to edit the audit submission.</p>
                     <p class="required-explanation">
-                        <abbr title="required" class="usa-hint usa-hint--required">*</abbr>Indicates a required field.
+                        <abbr title="required" class="usa-hint usa-hint--required">*</abbr> Indicates a required field.
                     </p>
                     <fieldset class="usa-fieldset question"
                               aria-labelledby="certifying_auditee_contact_legend certifying_auditee_contact_instruction">
@@ -106,6 +89,7 @@
                             </div>
                         </div>
                     </fieldset>
+
                     <fieldset class="usa-fieldset question"
                               aria-labelledby="certifying_auditor_contact_legend certifying_auditor_contact_instruction">
                         <legend id="certifying_auditor_contact_legend" class="usa-legend">
@@ -181,14 +165,14 @@
                             </div>
                         </div>
                     </fieldset>
+                    
                     <fieldset class="usa-fieldset question"
                               aria-labelledby="auditee_contacts_legend dynamic_fieldset_instruction_auditee">
                         <legend id="auditee_contacts_legend" class="usa-legend">
                             Auditee contacts
                         </legend>
                         <p id="dynamic_fieldset_instruction_auditee">
-                            These individuals will have access to the single audit submission but
-                            will not have the ability to certify the submission.
+                            These individuals will have access to the single audit submission but will not be able to certify the submission.
                         </p>
                         <div id="auditee_contacts" class="grid-container auditee_contacts">
                             <div class="grid-row grid-gap">
@@ -321,14 +305,14 @@
                             <span>Add another contact</span>
                         </button>
                     </fieldset>
+
                     <fieldset class="usa-fieldset question"
                                 aria-labelledby="auditor_contacts_legend dynamic_fieldset_instruction_auditor">
                         <legend id="auditor_contacts_legend" class="usa-legend">
                             Auditor contacts
                         </legend>
                         <p id="dynamic_fieldset_instruction_auditor">
-                            These individuals will have access to the single audit submission but
-                            will not have the ability to certify the submission.
+                            These individuals will have access to upload data and information to the audit submission but will not be able to certify the submission.
                         </p>
                         <div id="auditor_contacts" class="grid-container auditor_contacts">
                             <div class="grid-row grid-gap">
@@ -466,9 +450,10 @@
                         <li class="usa-button-group__item">{% include "../cancel-button.html" %}</li>
                         <li class="usa-button-group__item">
                             <button class="usa-button" id="create">
-                                Create
+                                Save and create audit
                             </button>
                         </li>
+                        <li class="usa-button-group__item margin-left-4">{% include "../cancel-button.html" %}</li>
                     </ul>
                 </fieldset>
             </form>
