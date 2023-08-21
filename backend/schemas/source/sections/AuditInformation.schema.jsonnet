@@ -3,7 +3,7 @@ local Func = import '../base/Functions.libsonnet';
 local Types = Base.Types;
 
 local AuditInformation = Types.object {
-  additionalProperties: false,
+  //additionalProperties: false,
   properties: {
     gaap_results: Types.array {
       items: Base.Enum.GAAPResults,
@@ -11,7 +11,6 @@ local AuditInformation = Types.object {
     sp_framework_basis: Types.array {
       items: Base.Enum.SP_Framework_Basis,
     },
-    is_sp_framework_required: Types.string,
     sp_framework_opinions: Types.array {
       items: Base.Enum.SP_Framework_Opinions,
     },
@@ -26,6 +25,27 @@ local AuditInformation = Types.object {
       items: Base.Compound.ALNPrefixes,
     },
   },
+  //   is valid under each of {'properties':
+  // {'is_sp_framework_required': {'type': 'boolean'}}}, {'properties':
+  // {'is_sp_framework_required': {'const': ''}}}">
+  allOf: [
+    {
+      'if': {
+        properties: {
+          gaap_results: {
+            contains: {
+              const: 'not_gaap',
+            },
+          },
+        },
+      },
+      'then': {
+        properties: {
+          is_sp_framework_required: Types.boolean,
+        },
+      },
+    },
+  ],
   required: [
     'dollar_threshold',
     'gaap_results',

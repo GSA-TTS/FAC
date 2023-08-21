@@ -33,17 +33,56 @@
     "auditor_phone": "999-999-9999",
     "auditor_email": "jane@test.test"
   },
-  "AuditInformationCase": {
-    "gaap_results": [],
-    "dollar_threshold": 1,
-    "is_going_concern_included": true,
-    "is_internal_control_deficiency_disclosed": false,
-    "is_internal_control_material_weakness_disclosed": false,
-    "is_material_noncompliance_disclosed": true,
-    "is_aicpa_audit_guide_included": false,
-    "is_low_risk_auditee": true,
-    "agencies": []
-  },
+  "AuditInformationCases": 
+  [
+    {
+      "dollar_threshold": 1000000,
+      "gaap_results": [ "unmodified_opinion" ],
+        "is_going_concern_included": true,
+        "is_internal_control_deficiency_disclosed": false,
+        "is_internal_control_material_weakness_disclosed": true,
+        "is_material_noncompliance_disclosed": true,
+        "is_aicpa_audit_guide_included": true,
+        "is_low_risk_auditee": false,
+        "agencies": [ "31", "44" ]
+    },
+    {
+      "dollar_threshold": 1000000,
+      "gaap_results": [ "not_gaap" ],
+        "is_going_concern_included": true,
+        "is_sp_framework_required": true,
+        "is_internal_control_deficiency_disclosed": false,
+        "is_internal_control_material_weakness_disclosed": true,
+        "is_material_noncompliance_disclosed": true,
+        "is_aicpa_audit_guide_included": true,
+        "is_low_risk_auditee": false,
+        "agencies": [ "32", "45" ]
+    },
+    {
+      "dollar_threshold": 1000000,
+      "gaap_results": [ "unmodified_opinion" ],
+        "is_going_concern_included": true,
+        "is_sp_framework_required": "",
+        "is_internal_control_deficiency_disclosed": false,
+        "is_internal_control_material_weakness_disclosed": true,
+        "is_material_noncompliance_disclosed": true,
+        "is_aicpa_audit_guide_included": true,
+        "is_low_risk_auditee": false,
+        "agencies": [ "33", "46" ]
+    },
+    {
+      "dollar_threshold": 1000000,
+      "gaap_results": [ "not_gaap" ],
+        "is_going_concern_included": true,
+        "is_sp_framework_required": "",
+        "is_internal_control_deficiency_disclosed": false,
+        "is_internal_control_material_weakness_disclosed": true,
+        "is_material_noncompliance_disclosed": true,
+        "is_aicpa_audit_guide_included": true,
+        "is_low_risk_auditee": false,
+        "agencies": [ "32", "45" ]
+    }
+  ],
   "FederalAwardsCases": [
     {
       "Meta": {

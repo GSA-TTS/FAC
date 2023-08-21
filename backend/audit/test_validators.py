@@ -46,6 +46,7 @@ from .validators import (
     validate_uei_leading_char,
     validate_uei_nine_digit_sequences,
     validate_component_page_numbers,
+    validate_audit_information_json,
 )
 
 # Simplest way to create a new copy of simple case rather than getting
@@ -865,3 +866,26 @@ class ComponentPageNumberTests(SimpleTestCase):
             self.fail(
                 "validate_component_page_numbers rejected an object with optional pages"
             )
+
+class AuditInformationTests(SimpleTestCase):
+    SIMPLE_CASES = json.loads(SIMPLE_CASES_TEST_FILE.read_text(encoding="utf-8"))[
+        "AuditInformationCases"
+    ]
+
+    # def test_validation_is_applied(self):
+    #     validate_audit_information_json(AuditInformationTests.SIMPLE_CASES[0])
+    #     self.assertRaises(ValidationError, validate_excel_file_integrity, AuditInformationTests.SIMPLE_CASES[0])
+
+    def test_is_sp_can_be_a_bool(self):
+        validate_audit_information_json(AuditInformationTests.SIMPLE_CASES[1])
+        # self.assertRaises(ValidationError, validate_excel_file_integrity, AuditInformationTests.SIMPLE_CASES[0])
+
+    def test_is_sp_can_be_an_empty_string(self):
+        validate_audit_information_json(AuditInformationTests.SIMPLE_CASES[2])
+        # self.assertRaises(ValidationError, validate_excel_file_integrity, AuditInformationTests.SIMPLE_CASES[0])
+
+    def test_is_sp_cannot_be_empty(self):
+        # validate_audit_information_json(AuditInformationTests.SIMPLE_CASES[3])
+        self.assertRaises(ValidationError, validate_audit_information_json, AuditInformationTests.SIMPLE_CASES[0])
+
+    

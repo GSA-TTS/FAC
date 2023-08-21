@@ -371,18 +371,27 @@ class AuditInformationSchemaValidityTest(SimpleTestCase):
     )
 
     SIMPLE_CASE = json.loads(SIMPLE_CASES_TEST_FILE.read_text(encoding="utf-8"))[
-        "AuditInformationCase"
+        "AuditInformationCases"
     ]
 
     def test_schema(self):
         """Try to test Audit Info schema."""
         schema = self.AUDIT_INFO_SCHEMA
-        validate(self.SIMPLE_CASE, schema)
+        validate(self.SIMPLE_CASE[0], schema)
+
+    #  {'dollar_threshold': 1000000, 
+    #   'gaap_results': ['unmodified_opinion'], 
+    #   'is_going_concern_included': True, 
+    #   'is_internal_control_deficiency_disclosed': False, 
+    #   'is_internal_control_material_weakness_disclosed': True, 
+    #   'is_material_noncompliance_disclosed': True, 
+    #   'is_aicpa_audit_guide_included': True, 
+    #   'is_low_risk_auditee': False, 
+    #   'agencies': ['31', '44']}
 
     def test_all_booleans(self):
         schema = self.AUDIT_INFO_SCHEMA
-        simple_case = jsoncopy(self.SIMPLE_CASE)
-
+        simple_case = jsoncopy(self.SIMPLE_CASE[0])
         boolean_fields = [
             "is_going_concern_included",
             "is_internal_control_deficiency_disclosed",
@@ -398,7 +407,7 @@ class AuditInformationSchemaValidityTest(SimpleTestCase):
 
     def test_all_gaap_results(self):
         schema = self.AUDIT_INFO_SCHEMA
-        simple_case = jsoncopy(self.SIMPLE_CASE)
+        simple_case = jsoncopy(self.SIMPLE_CASE[0])
         gaap_results = [
             "unmodified_opinion",
             "qualified_opinion",
@@ -419,7 +428,7 @@ class AuditInformationSchemaValidityTest(SimpleTestCase):
 
     def test_bad_gaap_results(self):
         schema = self.AUDIT_INFO_SCHEMA
-        simple_case = jsoncopy(self.SIMPLE_CASE)
+        simple_case = jsoncopy(self.SIMPLE_CASE[0])
         not_gaap_values = [
             "state",
             "local",
@@ -436,7 +445,7 @@ class AuditInformationSchemaValidityTest(SimpleTestCase):
 
     def test_valid_aln_prefixes(self):
         schema = self.AUDIT_INFO_SCHEMA
-        simple_case = jsoncopy(self.SIMPLE_CASE)
+        simple_case = jsoncopy(self.SIMPLE_CASE[0])
         # Why "likely?" I have no idea what is authoritative.
         # Fix the tests as we discover changes, and update the
         # validation schema while we're at it.

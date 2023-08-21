@@ -1,5 +1,24 @@
 {
-   "additionalProperties": false,
+   "allOf": [
+      {
+         "if": {
+            "properties": {
+               "gaap_results": {
+                  "contains": {
+                     "const": "not_gaap"
+                  }
+               }
+            }
+         },
+         "then": {
+            "properties": {
+               "is_sp_framework_required": {
+                  "type": "boolean"
+               }
+            }
+         }
+      }
+   ],
    "properties": {
       "agencies": {
          "items": {
@@ -50,9 +69,6 @@
       },
       "is_material_noncompliance_disclosed": {
          "type": "boolean"
-      },
-      "is_sp_framework_required": {
-         "type": "string"
       },
       "sp_framework_basis": {
          "items": {
