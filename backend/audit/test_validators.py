@@ -867,6 +867,7 @@ class ComponentPageNumberTests(SimpleTestCase):
                 "validate_component_page_numbers rejected an object with optional pages"
             )
 
+
 class AuditInformationTests(SimpleTestCase):
     SIMPLE_CASES = json.loads(SIMPLE_CASES_TEST_FILE.read_text(encoding="utf-8"))[
         "AuditInformationCases"
@@ -886,6 +887,8 @@ class AuditInformationTests(SimpleTestCase):
 
     def test_is_sp_cannot_be_empty(self):
         # validate_audit_information_json(AuditInformationTests.SIMPLE_CASES[3])
-        self.assertRaises(ValidationError, validate_audit_information_json, AuditInformationTests.SIMPLE_CASES[0])
-
-    
+        self.assertRaises(
+            ValidationError,
+            validate_audit_information_json,
+            AuditInformationTests.SIMPLE_CASES[0],
+        )

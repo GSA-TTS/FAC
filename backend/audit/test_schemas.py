@@ -379,14 +379,14 @@ class AuditInformationSchemaValidityTest(SimpleTestCase):
         schema = self.AUDIT_INFO_SCHEMA
         validate(self.SIMPLE_CASE[0], schema)
 
-    #  {'dollar_threshold': 1000000, 
-    #   'gaap_results': ['unmodified_opinion'], 
-    #   'is_going_concern_included': True, 
-    #   'is_internal_control_deficiency_disclosed': False, 
-    #   'is_internal_control_material_weakness_disclosed': True, 
-    #   'is_material_noncompliance_disclosed': True, 
-    #   'is_aicpa_audit_guide_included': True, 
-    #   'is_low_risk_auditee': False, 
+    #  {'dollar_threshold': 1000000,
+    #   'gaap_results': ['unmodified_opinion'],
+    #   'is_going_concern_included': True,
+    #   'is_internal_control_deficiency_disclosed': False,
+    #   'is_internal_control_material_weakness_disclosed': True,
+    #   'is_material_noncompliance_disclosed': True,
+    #   'is_aicpa_audit_guide_included': True,
+    #   'is_low_risk_auditee': False,
     #   'agencies': ['31', '44']}
 
     def test_all_booleans(self):
