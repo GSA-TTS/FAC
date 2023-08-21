@@ -1,18 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
 {% block content %}
-    <header class="usa-header usa-header-basic bg-primary-darker">
-        <div class="usa-nav-container">
-            <div class="usa-navbar bg-primary-darker text-white width-full flex">
-                <p class="margin-left-2">
-                    <a href="/" class="text-gray-10">My audit submissions</a> »
-                    <a href="{% url 'audit:SubmissionProgress' report_id %}"
-                       class="text-gray-10">{{ auditee_name | default_if_none:'' }}</a> »
-                    <span class="text-bold">Upload report</span>
-                </p>
-            </div>
-        </div>
-    </header>
     <div class="grid-container margin-top-6 margin-bottom-6">
         <div class="grid-col grid-gap">
             {% comment %} {% include "../sidenav.html" %} {% endcomment %}

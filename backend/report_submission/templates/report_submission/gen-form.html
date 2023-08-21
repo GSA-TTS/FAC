@@ -47,6 +47,49 @@
                     <p>
                         <abbr title="required" class="usa-hint usa-hint--required">*</abbr>Indicates a required field.
                     </p>
+                    <fieldset class="usa-fieldset question" id="fiscal-period-dates">
+                        <legend class="usa-legend usa-legend--large">
+                            Fiscal Period
+                        </legend>
+                        <div class="usa-form-group" id="TEST">
+                            <label class="usa-label" for="auditee_fiscal_period_start">
+                                What is your fiscal period start date?
+                                <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
+                            </label>
+                            <p class="usa-hint margin-0" id="auditee_fiscal_period_start-hint">mm/dd/yyyy</p>
+                            <ul class="usa-error-message"
+                                id="auditee_fiscal_period_start-error-message"
+                                role="alert">
+                                <li id="auditee_fiscal_period_start-not-null" hidden>This field is required</li>
+                            </ul>
+                            <input class="usa-input"
+                                   id="auditee_fiscal_period_start"
+                                   name="auditee_fiscal_period_start"
+                                   aria-required="true"
+                                   required
+                                   data-validate-not-null=""
+                                   value="{{ auditee_fiscal_period_start | default_if_none:'' }}"/>
+                        </div>
+                        <div class="usa-form-group">
+                            <label class="usa-label" for="auditee_fiscal_period_end">
+                                What is your fiscal period end date?
+                                <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
+                            </label>
+                            <p class="usa-hint margin-0" id="auditee_fiscal_period_end-hint">mm/dd/yyyy</p>
+                            <ul class="usa-error-message"
+                                id="auditee_fiscal_period_end-error-message"
+                                role="alert">
+                                <li id="auditee_fiscal_period_end-not-null" hidden>This field is required</li>
+                            </ul>
+                            <input class="usa-input"
+                                   id="auditee_fiscal_period_end"
+                                   name="auditee_fiscal_period_end"
+                                   aria-required="true"
+                                   required
+                                   data-validate-not-null=""
+                                   value="{{ auditee_fiscal_period_end | default_if_none:'' }}"/>
+                        </div>
+                    </fieldset>
                     <fieldset class="usa-fieldset question" id="audit-type">
                         <legend class="usa-legend">
                             Type of audit
@@ -141,56 +184,92 @@
                                    for="audit_period_other_months">months</label>
                         </div>
                     </fieldset>
-                    <fieldset class="usa-fieldset question" id="fiscal-period-dates">
-                        <legend class="usa-legend">
-                            Fiscal Period
-                        </legend>
-                        <div class="usa-form-group" id="TEST">
-                            <label class="usa-label" for="auditee_fiscal_period_start">
-                                What is your fiscal period start date?
-                                <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
-                            </label>
-                            <p class="usa-hint margin-0" id="auditee_fiscal_period_start-hint">mm/dd/yyyy</p>
-                            <ul class="usa-error-message"
-                                id="auditee_fiscal_period_start-error-message"
-                                role="alert">
-                                <li id="auditee_fiscal_period_start-not-null" hidden>This field is required</li>
-                            </ul>
-                            <input class="usa-input"
-                                   id="auditee_fiscal_period_start"
-                                   name="auditee_fiscal_period_start"
-                                   aria-required="true"
-                                   required
-                                   data-validate-not-null=""
-                                   value="{{ auditee_fiscal_period_start | default_if_none:'' }}"/>
-                        </div>
-                        <div class="usa-form-group">
-                            <label class="usa-label" for="auditee_fiscal_period_end">
-                                What is your fiscal period end date?
-                                <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
-                            </label>
-                            <p class="usa-hint margin-0" id="auditee_fiscal_period_end-hint">mm/dd/yyyy</p>
-                            <ul class="usa-error-message"
-                                id="auditee_fiscal_period_end-error-message"
-                                role="alert">
-                                <li id="auditee_fiscal_period_end-not-null" hidden>This field is required</li>
-                            </ul>
-                            <input class="usa-input"
-                                   id="auditee_fiscal_period_end"
-                                   name="auditee_fiscal_period_end"
-                                   aria-required="true"
-                                   required
-                                   data-validate-not-null=""
-                                   value="{{ auditee_fiscal_period_end | default_if_none:'' }}"/>
-                        </div>
-                    </fieldset>
                     <fieldset class="usa-fieldset" id="auditee-information">
-                        <legend class="usa-legend text-bold">
+                        <h2 class="font-sans-xl">
                             Auditee information
-                        </legend>
-                        <p class="usa-hint margin-0">
-                            Some auditee information is pulled from <a>SAM.gov</a> and is not editable here.
-                        </p>
+                        </h2>
+                        <fieldset class="usa-fieldset" id="auditee-identification-numbers">
+                            <legend class="usa-legend">
+                                Auditee Employer Identification Number (EIN)
+                            </legend>
+                            <div class="usa-form-group">
+                                <label class="usa-label" for="ein">
+                                    What is your Auditee EIN?
+                                    <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
+                                </label>
+                                <ul class="usa-error-message" id="ein-error-message" role="alert">
+                                    <li id="ein-not-null" hidden>
+                                        This field is required
+                                    </li>
+                                </ul>
+                                <input class="usa-input"
+                                       id="ein"
+                                       name="ein"
+                                       aria-required="true"
+                                       required
+                                       data-validate-not-null=""
+                                       value="{{ ein | default_if_none:'' }}"/>
+                            </div>
+                            <div class="usa-checkbox">
+                                <input class="usa-checkbox__input"
+                                       id="ein_not_an_ssn_attestation"
+                                       type="checkbox"
+                                       name="ein_not_an_ssn_attestation"
+                                       data-validate-not-null=""
+                                       {% if ein_not_an_ssn_attestation == True %} checked {% endif %}
+                                       />
+                                <label class="usa-checkbox__label" for="ein_not_an_ssn_attestation">
+                                    By checking this box, I verify that the Auditee EIN is not a Social Security Number.
+                                </label>
+                                <ul class="usa-error-message"
+                                    id="ein_not_an_ssn_attestation-error-message"
+                                    role="alert">
+                                    <li id="ein_not_an_ssn_attestation-not-null" hidden>
+                                        EIN may not be a social security number
+                                    </li>
+                                </ul>
+                            </div>
+                            <fieldset class="usa-fieldset radio">
+                                <legend class="usa-legend">
+                                    Are multiple EINs covered in this report?<abbr title="required" class="usa-hint usa-hint--required">*</abbr>
+                                </legend>
+                                <p class="usa-hint margin-0">
+                                    You'll be able to add additional EINs later.
+                                </p>
+                                <ul class="usa-error-message"
+                                    id="multiple_eins_covered-error-message"
+                                    role="alert">
+                                    <li id="multiple_eins_covered-not-null" hidden>
+                                        This field is required
+                                    </li>
+                                </ul>
+                                <div class="usa-radio">
+                                    <input class="usa-radio__input"
+                                           type="radio"
+                                           id="multiple-eins-yes"
+                                           name="multiple_eins_covered"
+                                           value="true"
+                                           required
+                                           {% if multiple_eins_covered == True %} checked {% endif %}
+                                           data-validate-not-null=""/>
+                                    <label class="usa-radio__label" for="multiple-eins-yes">
+                                        Yes
+                                    </label>
+                                </div>
+                                <div class="usa-radio">
+                                    <input class="usa-radio__input"
+                                           type="radio"
+                                           id="multiple-eins-no"
+                                           name="multiple_eins_covered"
+                                           value="false"
+                                           {% if multiple_eins_covered == False %} checked {% endif %}
+                                           data-validate-not-null=""/>
+                                    <label class="usa-radio__label" for="multiple-eins-no">
+                                        No
+                                    </label>
+                                </div>
+                            </fieldset>
+                        </fieldset>
                         <fieldset class="usa-fieldset">
                             <legend class="usa-legend">
                                 Auditee details
@@ -347,88 +426,6 @@
                                 </div>
                             </fieldset>
                         </fieldset>
-                        <fieldset class="usa-fieldset" id="auditee-identification-numbers">
-                            <legend class="usa-legend">
-                                Auditee Employer Identification Number (EIN)
-                            </legend>
-                            <div class="usa-form-group">
-                                <label class="usa-label" for="ein">
-                                    What is your Auditee EIN?
-                                    <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
-                                </label>
-                                <ul class="usa-error-message" id="ein-error-message" role="alert">
-                                    <li id="ein-not-null" hidden>
-                                        This field is required
-                                    </li>
-                                </ul>
-                                <input class="usa-input"
-                                       id="ein"
-                                       name="ein"
-                                       aria-required="true"
-                                       required
-                                       data-validate-not-null=""
-                                       value="{{ ein | default_if_none:'' }}"/>
-                            </div>
-                            <div class="usa-checkbox">
-                                <input class="usa-checkbox__input"
-                                       id="ein_not_an_ssn_attestation"
-                                       type="checkbox"
-                                       name="ein_not_an_ssn_attestation"
-                                       data-validate-not-null=""
-                                       {% if ein_not_an_ssn_attestation == True %} checked {% endif %}
-                                       />
-                                <label class="usa-checkbox__label" for="ein_not_an_ssn_attestation">
-                                    By checking this box, I verify that the Auditee EIN is not a Social Security Number.
-                                </label>
-                                <ul class="usa-error-message"
-                                    id="ein_not_an_ssn_attestation-error-message"
-                                    role="alert">
-                                    <li id="ein_not_an_ssn_attestation-not-null" hidden>
-                                        EIN may not be a social security number
-                                    </li>
-                                </ul>
-                            </div>
-                            <fieldset class="usa-fieldset radio">
-                                <legend class="usa-legend">
-                                    Are multiple EINs covered in this report?<abbr title="required" class="usa-hint usa-hint--required">*</abbr>
-                                </legend>
-                                <p class="usa-hint margin-0">
-                                    You'll be able to add additional EINs later.
-                                </p>
-                                <ul class="usa-error-message"
-                                    id="multiple_eins_covered-error-message"
-                                    role="alert">
-                                    <li id="multiple_eins_covered-not-null" hidden>
-                                        This field is required
-                                    </li>
-                                </ul>
-                                <div class="usa-radio">
-                                    <input class="usa-radio__input"
-                                           type="radio"
-                                           id="multiple-eins-yes"
-                                           name="multiple_eins_covered"
-                                           value="true"
-                                           required
-                                           {% if multiple_eins_covered == True %} checked {% endif %}
-                                           data-validate-not-null=""/>
-                                    <label class="usa-radio__label" for="multiple-eins-yes">
-                                        Yes
-                                    </label>
-                                </div>
-                                <div class="usa-radio">
-                                    <input class="usa-radio__input"
-                                           type="radio"
-                                           id="multiple-eins-no"
-                                           name="multiple_eins_covered"
-                                           value="false"
-                                           {% if multiple_eins_covered == False %} checked {% endif %}
-                                           data-validate-not-null=""/>
-                                    <label class="usa-radio__label" for="multiple-eins-no">
-                                        No
-                                    </label>
-                                </div>
-                            </fieldset>
-                        </fieldset>
                         <fieldset class="usa-fieldset">
                             <legend class="usa-legend">
                                 Auditee contact information
@@ -516,13 +513,54 @@
                         </fieldset>
                     </fieldset>
                     <fieldset class="usa-fieldset" id="primary-auditor-information">
-                        <legend class="usa-legend text-bold">
+                        <h2 class="font-sans-xl">
                             Primary auditor information
-                        </legend>
+                        </h2>
                         <p class="usa-hint">
                             If multiple audit organizations worked on this audit, only include the lead or coordinating auditor's
                             information.
                         </p>
+                        <fieldset class="usa-fieldset">
+                            <legend class="usa-legend">
+                                Auditor EIN
+                            </legend>
+                            <div class="usa-form-group">
+                                <label class="usa-label" for="auditor_ein">
+                                    What is your audit firm/organization's EIN?
+                                    <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
+                                </label>
+                                <ul class="usa-error-message" id="auditor_ein-error-message" role="alert">
+                                    <li id="auditor_ein-not-null" hidden>
+                                        This field is required
+                                    </li>
+                                </ul>
+                                <input class="usa-input"
+                                       id="auditor_ein"
+                                       name="auditor_ein"
+                                       aria-required="true"
+                                       required
+                                       data-validate-not-null=""
+                                       value="{{ auditor_ein | default_if_none:'' }}"/>
+                            </div>
+                            <div class="usa-checkbox">
+                                <input class="usa-checkbox__input"
+                                       id="auditor_ein_not_an_ssn_attestation"
+                                       type="checkbox"
+                                       name="auditor_ein_not_an_ssn_attestation"
+                                       {% if auditor_ein_not_an_ssn_attestation == True %} checked {% endif %}
+                                       data-validate-not-null=""/>
+                                <label class="usa-checkbox__label" for="auditor_ein_not_an_ssn_attestation">
+                                    By checking this box, I verify that the Auditor EIN is not a Social Security Number.
+                                </label>
+                                <ul class="usa-error-message"
+                                    id="auditor_ein_not_an_ssn_attestation-error-message"
+                                    role="alert">
+                                    <li id="auditor_ein_not_an_ssn_attestation-not-null" hidden>
+                                        EIN may not be a social security number
+                                    </li>
+                                </ul>
+                            </div>
+                        </fieldset>
                         <fieldset class="usa-fieldset">
                             <legend class="usa-legend">
                                 Auditor details
@@ -650,47 +688,6 @@
                                            value="{{ auditor_zip | default_if_none:'' }}"/>
                                 </div>
                             </fieldset>
-                        </fieldset>
-                        <fieldset class="usa-fieldset">
-                            <legend class="usa-legend">
-                                Auditor EIN
-                            </legend>
-                            <div class="usa-form-group">
-                                <label class="usa-label" for="auditor_ein">
-                                    What is your audit firm/organization's EIN?
-                                    <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
-                                </label>
-                                <ul class="usa-error-message" id="auditor_ein-error-message" role="alert">
-                                    <li id="auditor_ein-not-null" hidden>
-                                        This field is required
-                                    </li>
-                                </ul>
-                                <input class="usa-input"
-                                       id="auditor_ein"
-                                       name="auditor_ein"
-                                       aria-required="true"
-                                       required
-                                       data-validate-not-null=""
-                                       value="{{ auditor_ein | default_if_none:'' }}"/>
-                            </div>
-                            <div class="usa-checkbox">
-                                <input class="usa-checkbox__input"
-                                       id="auditor_ein_not_an_ssn_attestation"
-                                       type="checkbox"
-                                       name="auditor_ein_not_an_ssn_attestation"
-                                       {% if auditor_ein_not_an_ssn_attestation == True %} checked {% endif %}
-                                       data-validate-not-null=""/>
-                                <label class="usa-checkbox__label" for="auditor_ein_not_an_ssn_attestation">
-                                    By checking this box, I verify that the Auditor EIN is not a Social Security Number.
-                                </label>
-                                <ul class="usa-error-message"
-                                    id="auditor_ein_not_an_ssn_attestation-error-message"
-                                    role="alert">
-                                    <li id="auditor_ein_not_an_ssn_attestation-not-null" hidden>
-                                        EIN may not be a social security number
-                                    </li>
-                                </ul>
-                            </div>
                         </fieldset>
                         <fieldset class="usa-fieldset">
                             <legend class="usa-legend">

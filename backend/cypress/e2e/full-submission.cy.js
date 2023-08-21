@@ -6,6 +6,7 @@ import { testValidAuditeeInfo } from '../support/auditee-info.js';
 import { testValidGeneralInfo } from '../support/general-info.js';
 import { testAuditInformationForm } from '../support/audit-info-form.js';
 import { testPdfAuditReport } from '../support/report-pdf.js';
+import { testAuditorCertification } from '../support/auditor-certification.js';
 import { testWorkbookFederalAwards,
          testWorkbookFindingsUniformGuidance,
          testWorkbookFindingsText,
@@ -73,14 +74,12 @@ describe('Full audit submission', () => {
     cy.get(".usa-link").contains("Pre-submission validation").click();
     testCrossValidation();
 
-    // Uncomment this block when ready to implement the certification steps.
-    /*
-
     // Second, auditor certification
     cy.get(".usa-link").contains("Auditor Certification").click();
-    // Two pages:
-    // 1. Click all the checkboxes to agree, submit and got to page 2
-    // 2. Sign and date, submit and go back to checklist
+    testAuditorCertification();
+
+    // Uncomment this block when ready to implement the certification steps.
+    /*
 
     // Third, auditee certification
     cy.get(".usa-link").contains("Auditee Certification").click();
