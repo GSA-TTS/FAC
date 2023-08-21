@@ -752,6 +752,8 @@ class SubmissionProgressView(SingleAuditChecklistAccessRequiredMixin, generic.Vi
                 "user_provided_organization_type": sac.user_provided_organization_type,
             }
             context = context | subcheck
+            for field in sorted(context.keys()):
+                print("JMM ", field, context[field])
 
             return render(
                 request, "audit/submission_checklist/submission-checklist.html", context

@@ -149,6 +149,8 @@ class GeneralInformationFormView(LoginRequiredMixin, View):
                 "auditor_contact_title": sac.auditor_contact_title,
                 "auditor_phone": sac.auditor_phone,
                 "auditor_email": sac.auditor_email,
+                "secondary_auditors_exist": sac.secondary_auditors_exist,
+
                 "report_id": report_id,
             }
 
@@ -174,9 +176,9 @@ class GeneralInformationFormView(LoginRequiredMixin, View):
 
             if form.is_valid():
                 general_information = sac.general_information
-                # fields = sorted(general_information.keys())
-                # for field in fields:
-                #     print(f"{field} : {general_information[field]}")
+                fields = sorted(general_information.keys())
+                for field in fields:
+                    print(f"{field} : {general_information[field]}")
                 general_information.update(form.cleaned_data)
                 validated = validate_general_information_json(general_information)
                 sac.general_information = validated
@@ -191,10 +193,10 @@ class GeneralInformationFormView(LoginRequiredMixin, View):
             logger.warning(
                 "ValidationError for report ID %s: %s", report_id, err.message
             )
+            raise BadRequest()
         except LateChangeError:
             return render(request, "audit/no-late-changes.html")
 
-        raise BadRequest()
 
 
 class UploadPageView(LoginRequiredMixin, View):
