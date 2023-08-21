@@ -213,14 +213,14 @@ class UploadPageView(LoginRequiredMixin, View):
                 "view_name": "Federal awards",
                 "instructions": "Enter the federal awards you received in the last audit year",
                 "DB_id": "federal_awards",
-                "workbook_url": base_url + "federal-awards/"
+                "workbook_url": base_url + "federal-awards/",
             },
             "notes-to-sefa": {
                 "view_id": "notes-to-sefa",
                 "view_name": "Notes to SEFA",
                 "instructions": "Enter the notes on the Schedule of Expenditures of Federal Awards (SEFA)",
                 "DB_id": "notes_to_sefa",
-                "workbook_url": base_url + "notes-to-sefa/"
+                "workbook_url": base_url + "notes-to-sefa/",
             },
             "audit-findings": {
                 "view_id": "audit-findings",
@@ -228,7 +228,7 @@ class UploadPageView(LoginRequiredMixin, View):
                 "instructions": "Enter the audit findings for your federal awards",
                 "DB_id": "findings_uniform_guidance",
                 "workbook_url": base_url + "federal-awards-audit-findings/",
-                "no_findings_disclaimer": True
+                "no_findings_disclaimer": True,
             },
             "audit-findings-text": {
                 "view_id": "audit-findings-text",
@@ -236,7 +236,7 @@ class UploadPageView(LoginRequiredMixin, View):
                 "instructions": "Enter the text for your audit findings",
                 "DB_id": "findings_text",
                 "workbook_url": base_url + "federal-awards-audit-findings-text/",
-                "no_findings_disclaimer": True
+                "no_findings_disclaimer": True,
             },
             "CAP": {
                 "view_id": "CAP",
@@ -244,25 +244,25 @@ class UploadPageView(LoginRequiredMixin, View):
                 "instructions": "Enter your CAP text",
                 "DB_id": "corrective_action_plan",
                 "workbook_url": base_url + "corrective-action-plan/",
-                "no_findings_disclaimer": True
+                "no_findings_disclaimer": True,
             },
             "additional-eins": {
                 "view_id": "additional-eins",
                 "view_name": "Additional EINs",
                 "instructions": "Enter any additional EINs",
-                "workbook_url": base_url + "additional-eins-workbook/"
+                "workbook_url": base_url + "additional-eins-workbook/",
             },
             "additional-ueis": {
                 "view_id": "additional-ueis",
                 "view_name": "Additional UEIs",
                 "instructions": "Enter any additional UEIs",
-                "workbook_url": base_url + "additional-ueis-workbook/"
+                "workbook_url": base_url + "additional-ueis-workbook/",
             },
             "secondary-auditors": {
                 "view_id": "secondary-auditors",
                 "view_name": "Secondary auditors",
                 "instructions": "Enter any additional auditors",
-                "workbook_url": base_url + "secondary-auditors-workbook/"
+                "workbook_url": base_url + "secondary-auditors-workbook/",
             },
         }
 
