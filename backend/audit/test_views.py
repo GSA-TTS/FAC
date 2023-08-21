@@ -168,6 +168,34 @@ class EditSubmissionViewTests(TestCase):
         self.assertAlmostEquals(result.status_code, 302)
 
 
+class SubmissionViewTests(TestCase):
+    """
+    Testing for the final step: submitting.
+    """
+
+    def test_post_redirect(self):
+        """
+        The status should be "submitted" after the post.
+        The user should be redirected to the submissions table.
+        """
+        user = baker.make(User)
+        sac = baker.make(
+            SingleAuditChecklist,
+            submission_status=SingleAuditChecklist.STATUS.AUDITEE_CERTIFIED,
+        )
+        baker.make(Access, user=user, sac=sac, role="certifying_auditee_contact")
+        response = _authed_post(
+            Client(),
+            user,
+            "audit:Submission",
+            kwargs={"report_id": sac.report_id},
+            data={},
+        )
+        sac_after = SingleAuditChecklist.objects.get(report_id=sac.report_id)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(sac_after.submission_status, sac_after.STATUS.SUBMITTED)
+
+
 class SubmissionStatusTests(TestCase):
     """
     Tests the expected order of progression for submission_status.
