@@ -115,6 +115,17 @@ export const validations = {
     return !field.value || !field.checked ? { ...result, error: true } : result;
   },
 
+  validateMatchedField: (field, matchField) => {
+    const matchFieldEl = document.querySelector(`input#${matchField}`);
+    const result = {
+      error: false,
+      fieldId: field.id,
+      validation: 'matched-field',
+    };
+    const isMatchedForgotten = field.value && !matchFieldEl.value;
+    return isMatchedForgotten ? { ...result, error: true } : result;
+  },
+
   validateMustMatch: (field, matchField) => {
     const matchFieldEl = document.querySelector(`input#${matchField}`);
     const result = {
