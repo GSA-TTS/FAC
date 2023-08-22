@@ -364,63 +364,16 @@ class GeneralInformationSchemaValidityTest(SimpleTestCase):
 
 
 class AuditInformationSchemaValidityTest(SimpleTestCase):
-    AUDIT_INFO_SCHEMA = json.loads(
-        (SECTION_SCHEMA_DIR / "AuditInformation.schema.json").read_text(
-            encoding="utf-8"
+    def setUp(self):
+        self.AUDIT_INFO_SCHEMA = json.loads(
+            (SECTION_SCHEMA_DIR / "AuditInformation.schema.json").read_text(
+                encoding="utf-8"
+            )
         )
-    )
-
-    SIMPLE_CASE = json.loads(SIMPLE_CASES_TEST_FILE.read_text(encoding="utf-8"))[
-        "AuditInformationCase"
-    ]
-
-    def test_schema(self):
-        """Try to test Audit Info schema."""
-        schema = self.AUDIT_INFO_SCHEMA
-        validate(self.SIMPLE_CASE, schema)
-
-    def test_all_booleans(self):
-        schema = self.AUDIT_INFO_SCHEMA
-        simple_case = jsoncopy(self.SIMPLE_CASE)
-
-        boolean_fields = [
-            "is_going_concern_included",
-            "is_internal_control_deficiency_disclosed",
-            "is_internal_control_material_weakness_disclosed",
-            "is_material_noncompliance_disclosed",
-            "is_aicpa_audit_guide_included",
-            "is_low_risk_auditee",
-        ]
-        for value in [True, False]:
-            for field in boolean_fields:
-                simple_case[field] = value
-                validate(simple_case, schema)
-
-    def test_all_gaap_results(self):
-        schema = self.AUDIT_INFO_SCHEMA
-        simple_case = jsoncopy(self.SIMPLE_CASE)
-        gaap_results = [
-            "unmodified_opinion",
-            "qualified_opinion",
-            "adverse_opinion",
-            "disclaimer_of_opinion",
-            "not_gaap",
-        ]
-
-        for result in gaap_results:
-            simple_case["gaap_results"] = [result]
-            validate(simple_case, schema)
-
-        for _ in range(10):
-            for n in range(2, 5):
-                ls = random.sample(gaap_results, n)
-                simple_case["gaap_results"] = ls
-                validate(simple_case, schema)
-
-    def test_bad_gaap_results(self):
-        schema = self.AUDIT_INFO_SCHEMA
-        simple_case = jsoncopy(self.SIMPLE_CASE)
-        not_gaap_values = [
+        self.SIMPLE_CASE = json.loads(
+            SIMPLE_CASES_TEST_FILE.read_text(encoding="utf-8")
+        )["AuditInformationCases"]
+        self.BAD_VALUES = [
             "state",
             "local",
             "tribal",
@@ -429,14 +382,98 @@ class AuditInformationSchemaValidityTest(SimpleTestCase):
             "unknown",
             "none",
         ]
+        self.ALL_OPINIONS = [
+            "unmodified_opinion",
+            "qualified_opinion",
+            "adverse_opinion",
+            "disclaimer_of_opinion",
+        ]
 
-        for word in not_gaap_values:
-            simple_case["gaap_results"] = [word]
-            self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
+    def test_schema(self):
+        """Try to test Audit Info schema."""
+        validate(self.SIMPLE_CASE[0], self.AUDIT_INFO_SCHEMA)
+
+    def test_all_booleans(self):
+        simple_case = jsoncopy(self.SIMPLE_CASE[0])
+        boolean_fields = [
+            "is_going_concern_included",
+            "is_internal_control_deficiency_disclosed",
+            "is_internal_control_material_weakness_disclosed",
+            "is_material_noncompliance_disclosed",
+            "is_aicpa_audit_guide_included",
+            "is_low_risk_auditee",
+        ]
+
+        for field in boolean_fields:
+            for value in [True, False]:
+                simple_case[field] = value
+                validate(simple_case, self.AUDIT_INFO_SCHEMA)
+        boolean_fields.append("is_sp_framework_required")
+        simple_case = jsoncopy(self.SIMPLE_CASE[1])
+
+        for field in boolean_fields:
+            for value in [True, False]:
+                simple_case[field] = value
+                validate(simple_case, self.AUDIT_INFO_SCHEMA)
+
+    def test_all_gaap_results(self):
+        simple_case = jsoncopy(self.SIMPLE_CASE[0])
+
+        for _ in range(5):
+            for n in range(1, 5):
+                ls = random.sample(self.ALL_OPINIONS, n)
+                simple_case["gaap_results"] = ls
+                validate(simple_case, self.AUDIT_INFO_SCHEMA)
+
+    def test_all_framework_basis(self):
+        simple_case = jsoncopy(self.SIMPLE_CASE[1])
+
+        sp_framework_basis = [
+            "cash_basis",
+            "tax_basis",
+            "contractual_basis",
+            "other_basis",
+        ]
+
+        for _ in range(5):
+            for n in range(1, 5):
+                opinions = random.sample(self.ALL_OPINIONS, n)
+                basis = random.sample(sp_framework_basis, n)
+                simple_case["sp_framework_opinions"] = opinions
+                simple_case["sp_framework_basis"] = basis
+                validate(simple_case, self.AUDIT_INFO_SCHEMA)
+
+    def test_bad_gaap_results(self):
+        simple_case = jsoncopy(self.SIMPLE_CASE[0])
+
+        for _ in range(5):
+            for n in range(1, 5):
+                ls = random.sample(self.BAD_VALUES, n)
+                simple_case["gaap_results"] = ls
+                self.assertRaises(
+                    exceptions.ValidationError,
+                    validate,
+                    simple_case,
+                    self.AUDIT_INFO_SCHEMA,
+                )
+
+    def test_bad_framework_basis(self):
+        simple_case = jsoncopy(self.SIMPLE_CASE[1])
+
+        for _ in range(5):
+            for n in range(1, 5):
+                bad_values = random.sample(self.BAD_VALUES, n)
+                simple_case["sp_framework_opinions"] = bad_values
+                simple_case["sp_framework_basis"] = bad_values
+                self.assertRaises(
+                    exceptions.ValidationError,
+                    validate,
+                    simple_case,
+                    self.AUDIT_INFO_SCHEMA,
+                )
 
     def test_valid_aln_prefixes(self):
-        schema = self.AUDIT_INFO_SCHEMA
-        simple_case = jsoncopy(self.SIMPLE_CASE)
+        simple_case = jsoncopy(self.SIMPLE_CASE[0])
         # Why "likely?" I have no idea what is authoritative.
         # Fix the tests as we discover changes, and update the
         # validation schema while we're at it.
@@ -508,7 +545,7 @@ class AuditInformationSchemaValidityTest(SimpleTestCase):
             for n in range(2, 10):
                 ls = random.sample(likely_valid_aln_prefixes, n)
                 simple_case["agencies"] = ls
-                validate(simple_case, schema)
+                validate(simple_case, self.AUDIT_INFO_SCHEMA)
 
 
 class FederalAwardsSchemaValidityTest(SimpleTestCase):
