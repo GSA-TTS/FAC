@@ -833,10 +833,19 @@ class AuditInfoFormView(SingleAuditChecklistAccessRequiredMixin, generic.View):
 
             if form.is_valid():
                 form.clean_booleans()
+                # List of keys to delete if "not_gaap" not in form.cleaned_data["gaap_results"]
+                keys_to_delete = [
+                    "sp_framework_basis",
+                    "is_sp_framework_required",
+                    "sp_framework_opinions",
+                ]
 
-                audit_information = sac.audit_information or {}
-                audit_information.update(form.cleaned_data)
-                validated = validate_audit_information_json(audit_information)
+                if "not_gaap" not in form.cleaned_data["gaap_results"]:
+                    for key in keys_to_delete:
+                        form.cleaned_data.pop(key, None)
+
+                validated = validate_audit_information_json(form.cleaned_data)
+
                 sac.audit_information = validated
                 sac.save()
                 return redirect(reverse("audit:SubmissionProgress", args=[report_id]))

@@ -41,7 +41,7 @@
                     {% endfor %}
                     <span class="usa-error-message margin-top-2">{{ form.errors.gaap_results|striptags }}</span>
                 </fieldset>
-                <div id="sp_framework_section">
+                <div class="margin-left-10" id="sp_framework_section">
                     <fieldset class="usa-fieldset">
                         <p class="text-base">What was the special purpose framework? Select only one.</p>
                         {% for pair in sp_framework_basis %}
@@ -49,7 +49,6 @@
                                 <input id="sp_framework_basis--{{ pair.tag }}"
                                     name="sp_framework_basis"
                                     class="usa-radio__input"
-                                    required
                                     type="radio"
                                     value="{{ pair.tag }}"
                                     {% if pair.tag in form.cleaned_data.sp_framework_basis %}checked{% endif %} />
@@ -66,7 +65,6 @@
                             <input id="is_sp_framework_required--true"
                                 name="is_sp_framework_required"
                                 class="usa-radio__input"
-                                required
                                 type="radio"
                                 value="True"
                                 {% if form.cleaned_data.is_sp_framework_required is True %}checked{% endif %} />
@@ -83,7 +81,7 @@
                         </div>
                         <span class="usa-error-message margin-top-2">{{ form.errors.is_going_concern_included|striptags }}</span>
                     </fieldset>
-                    <fieldset class="usa-fieldset">
+                    <fieldset class="usa-fieldset margin-top-2">
                         <legend>
                             What was the auditor’s opinion on the special purpose framework? <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
                         </legend>
@@ -93,7 +91,6 @@
                                 <input id="sp_framework_opinions--{{ pair.tag }}"
                                     name="sp_framework_opinions"
                                     class="usa-checkbox__input"
-                                    required
                                     type="checkbox"
                                     value="{{ pair.tag }}"
                                     {% if pair.tag in form.cleaned_data.sp_framework_opinions %}checked{% endif %} />
