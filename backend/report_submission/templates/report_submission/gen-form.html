@@ -773,6 +773,46 @@
                                        value="{{ auditor_email | default_if_none:'' }}"/>
                             </div>
                         </fieldset>
+                        <fieldset class="usa-fieldset radio">
+                                <legend class="usa-legend">
+                                    Are secondary auditors associated with this report?<abbr title="required" class="usa-hint usa-hint--required">*</abbr>
+                                </legend>
+                                <p class="usa-hint margin-0">
+                                    You'll be able to add secondary auditors later.
+                                </p>
+                                <ul class="usa-error-message"
+                                    id="secondary_auditors_exist-error-message"
+                                    role="alert">
+                                    <li id="secondary_auditors_exist-not-null" hidden>
+                                        This field is required
+                                    </li>
+                                </ul>
+                                <div class="usa-radio">
+                                    <input class="usa-radio__input"
+                                           type="radio"
+                                           id="secondary_auditors-yes"
+                                           name="secondary_auditors_exist"
+                                           value="true"
+                                           required
+                                           {% if secondary_auditors_exist == True %} checked {% endif %}
+                                           data-validate-not-null=""/>
+                                    <label class="usa-radio__label" for="secondary_auditors-yes">
+                                        Yes
+                                    </label>
+                                </div>
+                                <div class="usa-radio">
+                                    <input class="usa-radio__input"
+                                           type="radio"
+                                           id="secondary_auditors-no"
+                                           name="secondary_auditors_exist"
+                                           value="false"
+                                           {% if secondary_auditors_exist == False %} checked {% endif %}
+                                           data-validate-not-null=""/>
+                                    <label class="usa-radio__label" for="secondary_auditors-no">
+                                        No
+                                    </label>
+                                </div>
+                            </fieldset>
                     </fieldset>
                     <button class="usa-button" id="continue">
                         Save and continue to next section

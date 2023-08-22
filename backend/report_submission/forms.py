@@ -64,3 +64,4 @@ class GeneralInformationForm(forms.Form):
     auditor_contact_title = forms.CharField()
     auditor_phone = forms.CharField()
     auditor_email = forms.CharField()
+    secondary_auditors_exist = forms.BooleanField(required=False)
