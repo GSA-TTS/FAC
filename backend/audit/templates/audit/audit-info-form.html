@@ -24,7 +24,7 @@
                 <h1>Financial statements</h1>
                 <fieldset class="usa-fieldset">
                     <legend>
-                        a. What were the results of the auditor’s determination of whether the financial statements of the auditee were prepared in accordance with generally accepted accounting principles (GAAP)? <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
+                        What were the results of the auditor’s determination of whether the financial statements of the auditee were prepared in accordance with generally accepted accounting principles (GAAP)? <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
                     </legend>
                     <p class="text-base">Select any of the following that apply.</p>
                     {% for pair in gaap_results %}
@@ -42,11 +42,8 @@
                     <span class="usa-error-message margin-top-2">{{ form.errors.gaap_results|striptags }}</span>
                 </fieldset>
                 <div id="sp_framework_section">
-                    <fieldset class="usa-fieldset margin-top-2">
-                        <legend>
-                            If the financial statements of the auditee were prepared in accordance with GAAP, proceed to question b.
-                        </legend>
-                        <p class="text-base">i. What was the special purpose framework? Select only one.</p>
+                    <fieldset class="usa-fieldset">
+                        <p class="text-base">What was the special purpose framework? Select only one.</p>
                         {% for pair in sp_framework_basis %}
                             <div class="usa-checkbox">
                                 <input id="sp_framework_basis--{{ pair.tag }}"
@@ -63,7 +60,7 @@
                     </fieldset>
                     <fieldset class="usa-fieldset margin-top-2">
                         <legend>
-                            ii. Was the special purpose framework used as a basis of accounting required by state law?
+                            Was the special purpose framework used as a basis of accounting required by state law?
                         </legend>
                         <div class="usa-radio">
                             <input id="is_sp_framework_required--true"
@@ -88,7 +85,7 @@
                     </fieldset>
                     <fieldset class="usa-fieldset">
                         <legend>
-                            iii. What was the auditor’s opinion on the special purpose framework? <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
+                            What was the auditor’s opinion on the special purpose framework? <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
                         </legend>
                         <p class="text-base">Select any of the following that apply.</p>
                         {% for pair in sp_framework_opinions %}
@@ -108,7 +105,7 @@
                 </div>
                 <fieldset class="usa-fieldset margin-top-2">
                     <legend>
-                        b. Is a "going concern" emphasis-of-matter paragraph included in the audit report? <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
+                        Is a "going concern" emphasis-of-matter paragraph included in the audit report? <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
                     </legend>
                     <div class="usa-radio">
                         <input id="is_going_concern_included--true"
@@ -133,7 +130,7 @@
                 </fieldset>
                 <fieldset class="usa-fieldset margin-top-2">
                     <legend>
-                        c. Is a significant deficiency in internal control disclosed? <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
+                        Is a significant deficiency in internal control disclosed? <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
                     </legend>
                     <div class="usa-radio">
                         <input id="is_internal_control_deficiency_disclosed--true"
@@ -160,7 +157,7 @@
                 </fieldset>
                 <fieldset class="usa-fieldset margin-top-2">
                     <legend>
-                        d. Is a material weakness in internal control disclosed? <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
+                        Is a material weakness in internal control disclosed? <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
                     </legend>
                     <div class="usa-radio">
                         <input id="is_internal_control_material_weakness_disclosed--true"
@@ -187,7 +184,7 @@
                 </fieldset>
                 <fieldset class="usa-fieldset margin-top-2">
                     <legend>
-                        e. Is a material noncompliance disclosed? <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
+                        Is a material noncompliance disclosed? <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
                     </legend>
                     <div class="usa-radio">
                         <input id="is_material_noncompliance_disclosed--true"
@@ -305,7 +302,7 @@
                 <button class="usa-button margin-top-2 margin-bottom-10"
                         id="continue"
                         name="continue">Save and continue to the next section</button>
-                <a class="usa-button usa-button--unstyled margin-left-2" href="{% url 'audit:SubmissionProgress' report_id %}"
+                <a class="usa-button usa-button--unstyled margin-left-2" id="cancel-audit-info-form-link" href="{% url 'audit:SubmissionProgress' report_id %}"
                     aria-controls="upload-cancel">Cancel</a>
             </form>
         </div>
