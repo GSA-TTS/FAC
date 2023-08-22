@@ -53,9 +53,9 @@ def cog_over_for_2022():
     print("len(gens = ", len(gens))
     print("len(cfdas) = ", len(cfdas))
     # Generate cog / over assignments for 2022
-    df_calc = pd.DataFrame(['DBKEY', 'EIN', 'COGOVER', 'COGAGENCY', 'OVERAGENCY'])
-    df_2022 = pd.DataFrame(['DBKEY', 'EIN', 'COGOVER', 'COGAGENCY', 'OVERAGENCY'])
-    num_rows = 0
+    df_calc = pd.DataFrame(columns=['DBKEY', 'EIN', 'COGOVER', 'COGAGENCY', 'OVERAGENCY'])
+    df_2022 = pd.DataFrame(columns=['DBKEY', 'EIN', 'COGOVER', 'COGAGENCY', 'OVERAGENCY'])
+    # num_rows = 0
     for gen in gens:
         df_2022_row = {
             'DBKEY': gen[0],
@@ -96,13 +96,13 @@ def cog_over_for_2022():
         df_calc.loc[len(df_calc)] = df_calc_row
         # print(f"dbkey = {dbkey}, ein = {ein}, cogover = {cogover}, cogagency = {cognizant_agency}, overagency = {oversight_agency}")
         # print(f"From 2022 table: {gen[0]}, ein = {gen[1]}, cogover = {gen[3]}, cogagency = {gen[4]}, overagency = {gen[5]}")
-        num_rows += 1
-        if num_rows == 10:
-            break;
+        # num_rows += 1
+        # if num_rows == 10:
+        #     break;
 
     filedir = os.getcwd()
-    df_calc.to_csv(filedir + "\calc_2022")
-    df_2022.to_csv(filedir + "\actual_2022")
+    df_calc.to_csv(filedir + "/calc_2022.csv")
+    df_2022.to_csv(filedir + "/actual_2022.csv")
 
 
     # Compare generated cog / over assignment with 2022 public table data
