@@ -151,7 +151,7 @@
                             <div class="text-success-darker">
                                 <p class="text-bold text-underline margin-0">Workbook 3: Federal Awards Audit Findings (Complete)</p>
                                 <p class="margin-0">
-                                    Complete this section using the Summary Schedule of Prior Audit Findings and the information in the financial statement audit. If there are no audit findings listed in Workbook 1: Federal Awards, you do not need to complete this workbook.
+                                    Complete this section using the Summary Schedule of Prior Audit Findings and the information in the financial statement audit.
                                 </p>
                                 {% include './created-by.html' with time=findings_uniform_guidance.completed_date name=findings_uniform_guidance.created_by %}
                                 <p class="margin-0">
@@ -167,7 +167,7 @@
                                        href="{% url 'report_submission:audit-findings' report_id %}">Upload Workbook 3: Federal Awards Audit Findings</a>
                                 </p>
                                 <p class="margin-0">
-                                    Complete this section using the Summary Schedule of Prior Audit Findings and the information in the financial statement audit. If there are no audit findings listed in Workbook 1: Federal Awards, you do not need to complete this workbook.
+                                    Complete this section using the Summary Schedule of Prior Audit Findings and the information in the financial statement audit.
                                 </p>
                             </div>
                         {% endif %}
@@ -181,7 +181,7 @@
                             <div class="text-success-darker">
                                 <p class="text-bold text-underline margin-0">Workbook 4: Federal Awards Audit Findings Text (Complete)</p>
                                 <p class="margin-0">
-                                    Enter the full text of the audit finding, listing each finding only once, even if they relate to more than one program. Include the audit finding reference number for each. If there are no audit findings listed in Workbook 1: Federal Awards, you do not need to complete this workbook.
+                                    Enter the full text of the audit finding, listing each finding only once, even if they relate to more than one program. Include the audit finding reference number for each.
                                 </p>
                                 {% include './created-by.html' with time=findings_text.completed_date name=findings_text.created_by %}
                                 <p class="margin-0">
@@ -197,7 +197,7 @@
                                        href="{% url 'report_submission:audit-findings-text' report_id %}">Upload Workbook 4: Federal Awards Audit Findings Text</a>
                                 </p>
                                 <p class="margin-0">
-                                    Enter the full text of the audit finding, listing each finding only once, even if they relate to more than one program. Include the audit finding reference number for each. If there are no audit findings listed in Workbook 1: Federal Awards, you do not need to complete this workbook.
+                                    Enter the full text of the audit finding, listing each finding only once, even if they relate to more than one program. Include the audit finding reference number for each.
                                 </p>
                             </div>
                         {% endif %}
@@ -211,7 +211,7 @@
                             <div class="text-success-darker">
                                 <p class="text-bold text-underline margin-0">Workbook 5: Corrective Action Plan (CAP) (Complete)</p>
                                 <p class="margin-0">
-                                    This information should match the data you entered in the Findings Text workbook. You only need to enter plans for findings once if they relate to more than one program. If there are no audit findings listed in Workbook 1: Federal Awards, you do not need to complete this workbook.
+                                    This information should match the data you entered in the Findings Text workbook. You only need to enter plans for findings once if they relate to more than one program.
                                 </p>
                                 {% include './created-by.html' with time=corrective_action_plan.completed_date name=corrective_action_plan.created_by %}
                                 <p class="margin-0">
@@ -225,7 +225,7 @@
                                     <a class="usa-link" href="{% url 'report_submission:CAP' report_id %}">Upload Workbook 5: Corrective Action Plan (CAP)</a>
                                 </p>
                                 <p class="margin-0">
-                                    This information should match the data you entered in the Findings Text workbook. You only need to enter plans for findings once if they relate to more than one program. If there are no audit findings listed in Workbook 1: Federal Awards, you do not need to complete this workbook.
+                                    This information should match the data you entered in the Findings Text workbook. You only need to enter plans for findings once if they relate to more than one program.
                                 </p>
                             </div>
                         {% endif %}
@@ -431,6 +431,7 @@
                     </li>
                     
                     {% comment %} Submit to the FAC for processing {% endcomment %}
+                    {% if submission.enabled %}
                     <div class="padding-bottom-3" id="submit-audit">
                         <div class="usa-summary-box font-sans-md bg-success-lighter"
                              role="region"
@@ -447,6 +448,24 @@
                             </div>
                         </div>
                     </div>
+                    {% else %}
+                    <div class="padding-bottom-3" id="submit-audit">
+                        <div class="usa-summary-box font-sans-md bg-success-lighter"
+                             role="region"
+                             aria-labelledby="summary-box-key-information">
+                            <div class="usa-summary-box__body">
+                                <div class="usa-summary-box__text">
+                                    <p class="text-bold margin-0">
+                                        Submit to the FAC for processing
+                                    </p>
+                                    <p class="margin-0">
+                                        This is the last step and must be completed by the <span class="text-underline">certifying auditee</span>. <strong>Once the audit has been submitted, it cannot be undone.</strong>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
                 </ul>
             </div>
         </div>
