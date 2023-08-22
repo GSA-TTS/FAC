@@ -18,6 +18,6 @@ export function testValidAccess() {
   cy.wrap(accessFields).each((field) => {
     addValidInfo(field);
   });
-  cy.get('.usa-button').contains('Create').click();
+  cy.get('.usa-button').contains('create').click();
   cy.url().should('contains', '/report_submission/general-information/');
 }

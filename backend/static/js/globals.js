@@ -6,5 +6,6 @@ export const UPLOAD_URLS = {
   'audit-findings-text': 'findings-text',
   'additional-ueis': 'additional-ueis',
   'additional-eins': 'additional-eins',
+  'secondary-auditors': 'secondary-auditors',
   CAP: 'corrective-action-plan',
 };
