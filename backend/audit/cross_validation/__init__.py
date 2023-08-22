@@ -59,6 +59,8 @@ from .check_award_reference_uniqueness import check_award_reference_uniqueness
 from .check_award_ref_declaration import check_award_ref_declaration
 from .check_findings_count_consistency import check_findings_count_consistency
 from .check_award_ref_existence import check_award_ref_existence
+from .check_ref_number_in_cap import check_ref_number_in_cap
+from .check_ref_number_in_findings_text import check_ref_number_in_findings_text
 from .additional_ueis import additional_ueis
 from .auditee_ueis_match import auditee_ueis_match
 from .check_finding_reference_uniqueness import check_finding_reference_uniqueness
@@ -74,6 +76,8 @@ functions = [
     check_award_ref_declaration,
     check_finding_reference_uniqueness,
     check_findings_count_consistency,
+    check_ref_number_in_cap,
+    check_ref_number_in_findings_text,
     submission_progress_check,
     tribal_data_sharing_consent,
 ]

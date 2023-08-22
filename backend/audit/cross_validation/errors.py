@@ -1,6 +1,7 @@
 from audit.fixtures.excel import (
     SECTION_NAMES,
 )
+from .utils import format_refs
 
 
 def err_additional_ueis_empty():
@@ -75,3 +76,19 @@ def err_missing_award_reference(row_num):
         f"The award listed in row {row_num} of your Federal Award workbook is missing a reference code. "
         f"This should not be possible. Please contact customer support."
     )
+
+
+def err_missing_or_extra_references(
+    missing_refs: set, extra_refs: set, section_name: str
+) -> str:
+    messages = [f"In the {section_name} workbook"]
+
+    if missing_refs:
+        messages.append(f"you are missing the references: {format_refs(missing_refs)}")
+
+    if extra_refs:
+        messages.append(
+            f"{'and also ' if missing_refs else ''}you have some extra references: {format_refs(extra_refs)}"
+        )
+
+    return ", ".join(messages) + "."
