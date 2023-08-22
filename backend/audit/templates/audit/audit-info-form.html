@@ -70,7 +70,7 @@
                                 class="usa-radio__input"
                                 type="radio"
                                 value="True"
-                                {% if form.cleaned_data.is_sp_framework_required == 'True' %}checked{% endif %} />
+                                {% if form.cleaned_data.is_sp_framework_required == True %}checked{% endif %} />
                             <label class="usa-radio__label" for="is_sp_framework_required--true">Yes</label>
                         </div>
                         <div class="usa-radio">
@@ -79,7 +79,7 @@
                                 class="usa-radio__input"
                                 type="radio"
                                 value="False"
-                                {% if form.cleaned_data.is_sp_framework_required == 'False' %}checked{% endif %} />
+                                {% if form.cleaned_data.is_sp_framework_required == False %}checked{% endif %} />
                             <label class="usa-radio__label" for="is_sp_framework_required--false">No</label>
                         </div>
                         <span class="usa-error-message margin-top-2">{{ form.errors.is_going_concern_included|striptags }}</span>

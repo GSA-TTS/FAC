@@ -869,26 +869,31 @@ class ComponentPageNumberTests(SimpleTestCase):
 
 
 class AuditInformationTests(SimpleTestCase):
-    SIMPLE_CASES = json.loads(SIMPLE_CASES_TEST_FILE.read_text(encoding="utf-8"))[
-        "AuditInformationCases"
-    ]
+    def setUp(self):
+        """Set up common test data"""
+        self.SIMPLE_CASES = json.loads(
+            SIMPLE_CASES_TEST_FILE.read_text(encoding="utf-8")
+        )["AuditInformationCases"]
 
-    # def test_validation_is_applied(self):
-    #     validate_audit_information_json(AuditInformationTests.SIMPLE_CASES[0])
-    #     self.assertRaises(ValidationError, validate_excel_file_integrity, AuditInformationTests.SIMPLE_CASES[0])
+    def test_no_errors_when_audit_information_is_valid(self):
+        """No errors should be raised when audit information is valid"""
+        for case in self.SIMPLE_CASES:
+            validate_audit_information_json(case)
 
-    def test_is_sp_can_be_a_bool(self):
-        validate_audit_information_json(AuditInformationTests.SIMPLE_CASES[1])
-        # self.assertRaises(ValidationError, validate_excel_file_integrity, AuditInformationTests.SIMPLE_CASES[0])
+    def test_error_raised_for_missing_required_fields_with_not_gaap(self):
+        """Test that missing certain fields raises a validation error when 'gaap_results' contains 'not_gaap'."""
+        for required_field in [
+            "is_sp_framework_required",
+            "sp_framework_basis",
+            "sp_framework_opinions",
+        ]:
+            case = jsoncopy(self.SIMPLE_CASES[1])
+            del case[required_field]
+            self.assertRaises(ValidationError, validate_excel_file_integrity, case)
 
-    def test_is_sp_can_be_an_empty_string(self):
-        validate_audit_information_json(AuditInformationTests.SIMPLE_CASES[2])
-        # self.assertRaises(ValidationError, validate_excel_file_integrity, AuditInformationTests.SIMPLE_CASES[0])
-
-    def test_is_sp_cannot_be_empty(self):
-        # validate_audit_information_json(AuditInformationTests.SIMPLE_CASES[3])
-        self.assertRaises(
-            ValidationError,
-            validate_audit_information_json,
-            AuditInformationTests.SIMPLE_CASES[0],
-        )
+    def test_error_raised_for_missing_required_fields(self):
+        """Test that missing required fields raises a validation error."""
+        for key in self.SIMPLE_CASES[0].keys():
+            case = jsoncopy(self.SIMPLE_CASES[0])
+            del case[key]
+            self.assertRaises(ValidationError, validate_excel_file_integrity, case)
