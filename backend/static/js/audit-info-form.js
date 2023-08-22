@@ -1,6 +1,5 @@
 const not_gaap_id = 'gaap_results--not_gaap';
 const sp_framework_div = document.querySelector('#sp_framework_section');
-const form = document.getElementById('upload-report__form');
 
 /*
 HTML5 doesn't provide a native way to set multiple choice options as required, without setting ALL of them as required. 
@@ -85,22 +84,6 @@ function attachEventHandlers() {
         subbox.required = !checkbox.checked;
       });
     });
-  });
-
-  // Add event listener to the larger form
-  // If the "Not GAAP" option of quesion one is not checked, banish the optional questions.
-  // So, if the user fills out optional questions then unchecks the "Not GAAP" option, they will not be submitted.
-  form.addEventListener('submit', () => {
-    const formData = new FormData(form);
-    if (!checkbox_not_gaap.checked) {
-      for (const test of [
-        'is_sp_framework_required',
-        'sp_framework_basis',
-        'sp_framework_opinions',
-      ]) {
-        formData.delete(test);
-      }
-    }
   });
 }
 
