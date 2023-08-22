@@ -99,9 +99,10 @@ def _conditional_keys_progress_check(sections):
     conditional_keys = {
         "additional_ueis": general_info.get("multiple_ueis_covered"),
         # Update once we have the question in. This may be handled in the gen info form rather than as a workbook.
-        "additional_eins": False,
-        # "additional_eins": sac.multiple_eins_covered,
-        "secondary_auditors": False,  # update this once we have the question in.
+        "additional_eins": general_info.get("multiple_eins_covered"),
+        "secondary_auditors": general_info.get(
+            "secondary_auditors_exist"
+        ),  # update this once we have the question in.
     }
     output = {}
     for key, value in conditional_keys.items():
