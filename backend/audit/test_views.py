@@ -242,9 +242,7 @@ class SubmissionStatusTests(TestCase):
         sac.findings_uniform_guidance = {
             "FindingsUniformGuidance": {"auditee_uei": "TEST0001TEST"}
         }
-        sac.notes_to_sefa = {
-            "NotesToSefa": {"auditee_uei": "TEST0001TEST"}
-        }
+        sac.notes_to_sefa = {"NotesToSefa": {"auditee_uei": "TEST0001TEST"}}
         baker.make(SingleAuditReportFile, sac=sac)
         sac.save()
 

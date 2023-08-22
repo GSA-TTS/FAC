@@ -8,6 +8,5 @@ export const UPLOAD_URLS = {
   'secondary-auditors': 'secondary-auditors',
   'additional-ueis': 'additional-ueis',
   'additional-eins': 'additional-eins',
-  'secondary-auditors': 'secondary-auditors',
   CAP: 'corrective-action-plan',
 };
