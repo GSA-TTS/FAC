@@ -15,31 +15,68 @@
         <button class="usa-nav__close">
             <img src="{% static 'img/usa-icons/close.svg' %}" role="img" alt="Close" />
         </button>
-        <ul class="usa-nav__primary usa-accordion">
+        <ul class="usa-nav__primary usa-accordion pa11y-ignore">
+            {% comment %}
+                Uncomment after search is implemented.
+                <li class="usa-nav__primary-item">
+                    <a href="https://example.gov" class="usa-nav__link">
+                        <span>Search audit reports</span>
+                    </a>
+                </li> 
+            {% endcomment %}
             <li class="usa-nav__primary-item">
-                <a href="https://example.gov" class="usa-nav__link">
-                    <span>Search audit reports</span>
-                </a>
+                <button class="usa-accordion__button usa-nav__link"
+                        aria-expanded="false"
+                        aria-controls="basic-nav-section-1">
+                    <span>News</span>
+                </button>
+                <ul id="basic-nav-section-1" class="usa-nav__submenu" hidden="">
+                    <li class="usa-nav__submenu-item">
+                        <a href="https://federalist-35af9df5-a894-4ae9-aa3d-f6d95427c7bc.sites.pages.cloud.gov/preview/gsa-tts/fac-transition-site/lh/beta-testing/info/announcements/"
+                           target="_blank">OMB Announcements</a>
+                    </li>
+                    <li class="usa-nav__submenu-item">
+                        <a href="https://federalist-35af9df5-a894-4ae9-aa3d-f6d95427c7bc.sites.pages.cloud.gov/preview/gsa-tts/fac-transition-site/lh/beta-testing/info/updates/"
+                           target="_blank">FAC Updates</a>
+                    </li>
+                </ul>
             </li>
             <li class="usa-nav__primary-item">
                 <button class="usa-accordion__button usa-nav__link"
                         aria-expanded="false"
                         aria-controls="basic-nav-section-2">
-                    <span>Resources</span>
+                    <span>Resources &#38; Policy</span>
                 </button>
                 <ul id="basic-nav-section-2" class="usa-nav__submenu" hidden="">
                     <li class="usa-nav__submenu-item">
-                        <a href="https://example.com">Link 1</a>
+                        <a href="https://federalist-35af9df5-a894-4ae9-aa3d-f6d95427c7bc.sites.pages.cloud.gov/preview/gsa-tts/fac-transition-site/lh/beta-testing/resources/workbooks/"
+                           target="_blank">Workbooks</a>
+                    </li>
+                    <li class="usa-nav__submenu-item">
+                        <a href="https://federalist-35af9df5-a894-4ae9-aa3d-f6d95427c7bc.sites.pages.cloud.gov/preview/gsa-tts/fac-transition-site/lh/beta-testing/resources/instructions/"
+                           target="_blank">Instructions</a>
+                    </li>
+                    <li class="usa-nav__submenu-item">
+                        <a href="https://federalist-35af9df5-a894-4ae9-aa3d-f6d95427c7bc.sites.pages.cloud.gov/preview/gsa-tts/fac-transition-site/lh/beta-testing/resources/compliance/"
+                           target="_blank">Compliance</a>
+                    </li>
+                    <li class="usa-nav__submenu-item">
+                        <a href="https://federalist-35af9df5-a894-4ae9-aa3d-f6d95427c7bc.sites.pages.cloud.gov/preview/gsa-tts/fac-transition-site/lh/beta-testing/resources/guidance/"
+                           target="_blank">Uniform Guidance</a>
                     </li>
                 </ul>
             </li>
             <li class="usa-nav__primary-item">
-                <a href="https://example.gov" class="usa-nav__link">
+                <a class="usa-nav__link"
+                   href="https://federalist-35af9df5-a894-4ae9-aa3d-f6d95427c7bc.sites.pages.cloud.gov/preview/gsa-tts/fac-transition-site/lh/beta-testing/faq/"
+                   target="_blank">
                     <span>FAQs</span>
                 </a>
             </li>
             <li class="usa-nav__primary-item">
-                <a href="https://example.gov" class="usa-nav__link">
+                <a class="usa-nav__link"
+                   href="https://federalist-35af9df5-a894-4ae9-aa3d-f6d95427c7bc.sites.pages.cloud.gov/preview/gsa-tts/fac-transition-site/lh/beta-testing/contact/"
+                   targte="_blank">
                     <span>Contact Us</span>
                 </a>
             </li>
@@ -60,7 +97,7 @@
             </form>
         {% else %}
             <div class="sign-in">
-                <a class="sign-in-logo"
+                <a class="sign-in-logo display-flex flex-align-self-center"
                    aria-controls="login-modal"
                    href="/openid/login/"
                    data-open-modal
@@ -89,9 +126,7 @@
                                                 <button type="button"
                                                         class="usa-button sign-in-button"
                                                         id="sign-in"
-                                                        data-close-modal>
-                                                    Authenticate with Login.gov
-                                                </button>
+                                                        data-close-modal>Authenticate with Login.gov</button>
                                             </a>
                                         </li>
                                         <li class="usa-button-group__item">

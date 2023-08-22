@@ -98,6 +98,7 @@ local Types = Base.Types;
     met_spending_threshold: Types.boolean,
     multiple_eins_covered: Func.compound_type([Types.boolean, Types.NULL]),
     multiple_ueis_covered: Func.compound_type([Types.boolean, Types.NULL]),
+    secondary_auditors_exist: Func.compound_type([Types.boolean, Types.NULL]),
     user_provided_organization_type: {
       '$ref': '#/$defs/UserProvidedOrganizationType',
     },

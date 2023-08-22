@@ -35,10 +35,21 @@ VALID_ELIGIBILITY_DATA = {
 }
 
 VALID_ACCESS_AND_SUBMISSION_DATA = {
-    "certifying_auditee_contact": "a@a.com",
-    "certifying_auditor_contact": "b@b.com",
-    "auditee_contacts": ["c@c.com"],
-    "auditor_contacts": ["d@d.com"],
+    "certifying_auditee_contact_email": "a@a.com",
+    "certifying_auditee_contact_fullname": "Full Name",
+    "certifying_auditor_contact_email": "b@b.com",
+    "certifying_auditor_contact_fullname": "Full Name",
+    "auditee_contacts_email": ["c@c.com"],
+    "auditee_contacts_fullname": ["Name"],
+    "auditor_contacts_email": ["d@d.com"],
+    "auditor_contacts_fullname": ["Name"],
+}
+
+EMAIL_TO_ROLE = {
+    "certifying_auditee_contact_email": "certifying_auditee_contact",
+    "certifying_auditor_contact_email": "certifying_auditor_contact",
+    "auditee_contacts_email": "editor",
+    "auditor_contacts_email": "editor",
 }
 
 SAMPLE_BASE_SAC_DATA = {
@@ -426,8 +437,10 @@ class AccessAndSubmissionTests(TestCase):
         self.user.profile.save()
 
         access_and_submission_data = VALID_ACCESS_AND_SUBMISSION_DATA.copy()
-        access_and_submission_data["auditee_contacts"].append("e@e.com")
-        access_and_submission_data["auditor_contacts"].append("f@f.com")
+        access_and_submission_data["auditee_contacts_email"].append("e@e.com")
+        access_and_submission_data["auditor_contacts_email"].append("f@f.com")
+        access_and_submission_data["auditee_contacts_fullname"].append("Real Name")
+        access_and_submission_data["auditor_contacts_fullname"].append("Real Name")
 
         response = self.client.post(
             ACCESS_AND_SUBMISSION_PATH, access_and_submission_data, format="json"
@@ -443,8 +456,8 @@ class AccessAndSubmissionTests(TestCase):
         )
 
         submitted_contacts = (
-            access_and_submission_data["auditee_contacts"]
-            + access_and_submission_data["auditor_contacts"]
+            access_and_submission_data["auditee_contacts_email"]
+            + access_and_submission_data["auditor_contacts_email"]
         )
 
         for db_addr, form_addr in zip(filter(None, editors), submitted_contacts):
@@ -462,18 +475,20 @@ class AccessAndSubmissionTests(TestCase):
         response = self.client.post(ACCESS_AND_SUBMISSION_PATH, {}, format="json")
         data = response.json()
         self.assertEqual(
-            data.get("errors", [])["certifying_auditee_contact"][0],
+            data.get("errors", [])["certifying_auditee_contact_email"][0],
             "This field is required.",
         )
         self.assertEqual(
-            data.get("errors", [])["certifying_auditor_contact"][0],
+            data.get("errors", [])["certifying_auditor_contact_email"][0],
             "This field is required.",
         )
         self.assertEqual(
-            data.get("errors", [])["auditee_contacts"][0], "This field is required."
+            data.get("errors", [])["auditee_contacts_email"][0],
+            "This field is required.",
         )
         self.assertEqual(
-            data.get("errors", [])["auditor_contacts"][0], "This field is required."
+            data.get("errors", [])["auditor_contacts_email"][0],
+            "This field is required.",
         )
 
 
@@ -505,10 +520,14 @@ class SACCreationTests(TestCase):
 
         # Submit AccessAndSubmission details
         access_and_submission_data = {
-            "certifying_auditee_contact": "a@a.com",
-            "certifying_auditor_contact": "b@b.com",
-            "auditor_contacts": ["c@c.com"],
-            "auditee_contacts": ["e@e.com"],
+            "certifying_auditee_contact_fullname": "Name",
+            "certifying_auditee_contact_email": "a@a.com",
+            "certifying_auditor_contact_fullname": "Name",
+            "certifying_auditor_contact_email": "b@b.com",
+            "auditor_contacts_fullname": ["Name"],
+            "auditor_contacts_email": ["c@c.com"],
+            "auditee_contacts_fullname": ["Name"],
+            "auditee_contacts_email": ["e@e.com"],
         }
         response = self.client.post(
             next_step, access_and_submission_data, format="json"
@@ -562,10 +581,14 @@ class SingleAuditChecklistViewTests(TestCase):
 
         # Submit AccessAndSubmission details
         access_and_submission_data = {
-            "certifying_auditee_contact": "x@x.com",
-            "certifying_auditor_contact": "y@y.com",
-            "auditor_contacts": ["z@z.com"],
-            "auditee_contacts": ["w@w.com"],
+            "certifying_auditee_contact_fullname": "Name",
+            "certifying_auditee_contact_email": "x@x.com",
+            "certifying_auditor_contact_fullname": "Name",
+            "certifying_auditor_contact_email": "y@y.com",
+            "auditor_contacts_fullname": ["Name"],
+            "auditor_contacts_email": ["z@z.com"],
+            "auditee_contacts_fullname": ["Name"],
+            "auditee_contacts_email": ["yz@yz.com"],
         }
         response = self.client.post(
             next_step, access_and_submission_data, format="json"
@@ -575,11 +598,14 @@ class SingleAuditChecklistViewTests(TestCase):
         response = self.client.get(self.path(sac.report_id))
         full_data = response.json()
         for key, value in access_and_submission_data.items():
-            if key in ["auditee_contacts", "auditor_contacts"]:
+            if key in ["auditee_contacts_email", "auditor_contacts_email"]:
                 for item in value:
                     self.assertTrue(item in full_data["editors"])
-            else:
-                self.assertEqual(full_data[key], value)
+            elif key in [
+                "certifying_auditee_contact_email",
+                "certifying_auditor_contact_email",
+            ]:
+                self.assertEqual(full_data[EMAIL_TO_ROLE[key]], value)
         for key, value in eligibility_info.items():
             self.assertEqual(full_data["general_information"][key], value)
         for key, value in VALID_AUDITEE_INFO_DATA.items():
