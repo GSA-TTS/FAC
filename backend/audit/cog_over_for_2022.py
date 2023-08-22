@@ -117,7 +117,7 @@ def cog_over_for_2022():
         else:
             cogover = "C"
             cognizant_agency = determine_2019_agency(ein)
-            if not cognizant_agency:
+            if cognizant_agency is None:
                 cognizant_agency = agency
 
         df_calc_row = {
