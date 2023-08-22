@@ -42,7 +42,7 @@ jobs:
         run: touch .env
 
       - name: Run Cypress full submission test
-        uses: cypress-io/github-action@v5
+        uses: cypress-io/github-action@v6
         with:
           working-directory: ./backend
           spec: cypress/e2e/full-submission.cy.js
