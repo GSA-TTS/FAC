@@ -56,7 +56,7 @@
       },
       "sp_framework_basis": {
          "items": {
-            "description": "SP Framework Basis (Audit Information)",
+            "description": "GAAP Results (Audit Information)",
             "enum": [
                "cash_basis",
                "tax_basis",
@@ -69,7 +69,7 @@
       },
       "sp_framework_opinions": {
          "items": {
-            "description": "SP Framework Opinions (Audit Information)",
+            "description": "GAAP Results (Audit Information)",
             "enum": [
                "unmodified_opinion",
                "qualified_opinion",
