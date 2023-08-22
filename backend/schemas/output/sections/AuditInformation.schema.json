@@ -1,4 +1,5 @@
 {
+   "additionalProperties": false,
    "allOf": [
       {
          "if": {
@@ -11,10 +12,70 @@
             }
          },
          "then": {
+            "required": [
+               "is_sp_framework_required",
+               "sp_framework_basis",
+               "sp_framework_opinions"
+            ]
+         }
+      },
+      {
+         "if": {
             "properties": {
-               "is_sp_framework_required": {
-                  "type": "boolean"
+               "gaap_results": {
+                  "not": {
+                     "contains": {
+                        "const": "not_gaap"
+                     }
+                  }
                }
+            }
+         },
+         "then": {
+            "not": {
+               "required": [
+                  "is_sp_framework_required"
+               ]
+            }
+         }
+      },
+      {
+         "if": {
+            "properties": {
+               "gaap_results": {
+                  "not": {
+                     "contains": {
+                        "const": "not_gaap"
+                     }
+                  }
+               }
+            }
+         },
+         "then": {
+            "not": {
+               "required": [
+                  "sp_framework_basis"
+               ]
+            }
+         }
+      },
+      {
+         "if": {
+            "properties": {
+               "gaap_results": {
+                  "not": {
+                     "contains": {
+                        "const": "not_gaap"
+                     }
+                  }
+               }
+            }
+         },
+         "then": {
+            "not": {
+               "required": [
+                  "sp_framework_opinions"
+               ]
             }
          }
       }
@@ -68,6 +129,9 @@
          "type": "boolean"
       },
       "is_material_noncompliance_disclosed": {
+         "type": "boolean"
+      },
+      "is_sp_framework_required": {
          "type": "boolean"
       },
       "sp_framework_basis": {
