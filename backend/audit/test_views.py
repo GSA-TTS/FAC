@@ -242,6 +242,9 @@ class SubmissionStatusTests(TestCase):
         sac.findings_uniform_guidance = {
             "FindingsUniformGuidance": {"auditee_uei": "TEST0001TEST"}
         }
+        sac.notes_to_sefa = {
+            "NotesToSefa": {"auditee_uei": "TEST0001TEST"}
+        }
         baker.make(SingleAuditReportFile, sac=sac)
         sac.save()
 
@@ -1129,10 +1132,10 @@ class SubmissionProgressViewTests(TestCase):
         self.assertEqual(response.status_code, 403)
 
     def test_phrase_in_page(self):
-        """Check for 'Create a single audit submission'."""
+        """Check for 'General information form'."""
         baker.make(Access, user=self.user, sac=self.sac)
         self.client.force_login(user=self.user)
-        phrase = "Single audit submission"
+        phrase = "General information form"
         res = self.client.get(
             reverse(
                 "audit:SubmissionProgress", kwargs={"report_id": self.sac.report_id}
