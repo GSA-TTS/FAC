@@ -11,7 +11,7 @@ class FindingText(models.Model):
         "G-FAC generated identifier.l",
     )
     finding_ref_number = models.TextField(
-        "Finding Reference Number - FK",
+        docs.finding_ref_nums_findingstext,
         null=True,
         help_text=docs.finding_ref_nums_findingstext,
     )
