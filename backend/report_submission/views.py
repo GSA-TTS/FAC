@@ -189,12 +189,12 @@ class GeneralInformationFormView(LoginRequiredMixin, View):
         except SingleAuditChecklist.DoesNotExist as err:
             raise PermissionDenied("You do not have access to this audit.") from err
         except ValidationError as err:
-            logger.warning(
-                "ValidationError for report ID %s: %s", report_id, err.message
-            )
-            raise BadRequest()
+            message = f"ValidationError for report ID {report_id}: {err.message}"
+            logger.warning(message)
+            raise BadRequest(message)
         except LateChangeError:
             return render(request, "audit/no-late-changes.html")
+        raise BadRequest()
 
 
 class UploadPageView(LoginRequiredMixin, View):
