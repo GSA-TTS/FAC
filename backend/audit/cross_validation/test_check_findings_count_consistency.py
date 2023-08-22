@@ -13,19 +13,18 @@ class CheckFindingsCountConsistencyTests(TestCase):
     FINDINGS_MIN = 1
     FINDINGS_MAX = 5
 
-    def _award_reference(self):
-        return f"AWARD-{generate_random_integer(self.AWARD_MIN,self.AWARD_MAX)}"
-
     def _make_federal_awards(self, findings_count) -> dict:
-        number_of_award = generate_random_integer(2, 4)
         return {
             "FederalAwards": {
                 "federal_awards": [
                     {
                         "program": {"number_of_audit_findings": findings_count},
-                        "award_reference": self._award_reference(),
-                    }
-                    for _ in range(number_of_award)
+                        "award_reference": f"AWARD-{self.AWARD_MIN}",
+                    },
+                    {
+                        "program": {"number_of_audit_findings": findings_count},
+                        "award_reference": f"AWARD-{self.AWARD_MAX}",
+                    },
                 ]
             }
         }
