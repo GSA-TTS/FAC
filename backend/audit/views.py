@@ -72,6 +72,9 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
+# 2023-08-22 DO NOT ADD ANY FURTHER CODE TO THIS FILE; ADD IT IN viewlib AS WITH UploadReportView
+
+
 class MySubmissions(LoginRequiredMixin, generic.View):
     redirect_field_name = "Home"
 
@@ -873,3 +876,6 @@ class AuditInfoFormView(SingleAuditChecklistAccessRequiredMixin, generic.View):
             }
         )
         return context
+
+
+# 2023-08-22 DO NOT ADD ANY FURTHER CODE TO THIS FILE; ADD IT IN viewlib AS WITH UploadReportView
