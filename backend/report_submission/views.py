@@ -227,18 +227,22 @@ class UploadPageView(LoginRequiredMixin, View):
                 "view_name": "Audit findings",
                 "instructions": "Enter the audit findings for your federal awards using the provided worksheet.",
                 "DB_id": "findings_uniform_guidance",
-                "instructions_url": instructions_base_url + "federal-awards-audit-findings/",
+                "instructions_url": instructions_base_url
+                + "federal-awards-audit-findings/",
                 "no_findings_disclaimer": True,
-                "workbook_url": workbook_base_url + "federal-awards-audit-findings.xlsx",
+                "workbook_url": workbook_base_url
+                + "federal-awards-audit-findings.xlsx",
             },
             "audit-findings-text": {
                 "view_id": "audit-findings-text",
                 "view_name": "Audit findings text",
                 "instructions": "Enter the text for your audit findings using the provided worksheet.",
                 "DB_id": "findings_text",
-                "instructions_url": instructions_base_url + "federal-awards-audit-findings-text/",
+                "instructions_url": instructions_base_url
+                + "federal-awards-audit-findings-text/",
                 "no_findings_disclaimer": True,
-                "workbook_url": workbook_base_url + "federal-awards-audit-findings-text-workbook.xlsx",
+                "workbook_url": workbook_base_url
+                + "federal-awards-audit-findings-text-workbook.xlsx",
             },
             "CAP": {
                 "view_id": "CAP",
@@ -247,7 +251,8 @@ class UploadPageView(LoginRequiredMixin, View):
                 "DB_id": "corrective_action_plan",
                 "instructions_url": instructions_base_url + "corrective-action-plan/",
                 "no_findings_disclaimer": True,
-                "workbook_url": workbook_base_url + "corrective-action-plan-workbook.xlsx",
+                "workbook_url": workbook_base_url
+                + "corrective-action-plan-workbook.xlsx",
             },
             "additional-ueis": {
                 "view_id": "additional-ueis",
@@ -260,7 +265,8 @@ class UploadPageView(LoginRequiredMixin, View):
                 "view_id": "secondary-auditors",
                 "view_name": "Secondary auditors",
                 "instructions": "Enter any additional auditors using the provided worksheet.",
-                "instructions_url": instructions_base_url + "secondary-auditors-workbook/",
+                "instructions_url": instructions_base_url
+                + "secondary-auditors-workbook/",
                 "workbook_url": workbook_base_url + "secondary-auditors-workbook.xlsx",
             },
             "additional-eins": {
