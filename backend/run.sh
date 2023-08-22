@@ -29,7 +29,7 @@ python manage.py create_api_views
 if [[ ("${ENV}" == "LOCAL" || "${ENV}" == "STAGING") && "$LOAD_TEST_DATA" == 1 ]];
 then
   # 175887 162392 
-  for dbkey in 91651 147134 175887 162392; 
+  for dbkey in 91651 147134 175887; 
   do
     python manage.py workbooks_e2e --email workbook.generator@test.fac.gov --dbkey $dbkey
   done

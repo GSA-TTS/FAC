@@ -115,3 +115,14 @@ docker-clean:
 	docker compose down
 	docker rm -f $(shell docker ps -a -q)
 	docker volume rm $(shell docker volume ls -q)
+
+docker-full-clean:
+	rm -f .coverage*
+	#!/bin/bash
+	docker compose down
+	docker rm -f $(docker ps -a -q)
+	docker volume rm $(docker volume ls -q)
+	docker system prune -f
+	docker volume prune -f
+	make docker-clean
+	make docker-first-run
