@@ -3,6 +3,7 @@ local ComplianceRequirementTypes = import 'ComplianceRequirementTypes.json';
 local FederalProgramNames = import 'FederalProgramNames.json';
 local Func = import 'Functions.libsonnet';
 local GAAP = import 'GAAP.libsonnet';
+local States = import 'States.libsonnet';
 
 local Const = {
   Y: 'Y',
@@ -165,70 +166,6 @@ local Enum = {
     ],
     title: 'EmptyString_EmptyArray_Null',
   },
-  // Source: https://pe.usps.com/text/pub28/28apb.htm
-  UnitedStatesStateAbbr: Types.string {
-    enum: [
-      'AL',
-      'AK',
-      'AS',
-      'AZ',
-      'AR',
-      'CA',
-      'CO',
-      'CT',
-      'DE',
-      'DC',
-      'FM',
-      'FL',
-      'GA',
-      'GU',
-      'HI',
-      'ID',
-      'IL',
-      'IN',
-      'IA',
-      'KS',
-      'KY',
-      'LA',
-      'ME',
-      'MH',
-      'MD',
-      'MA',
-      'MI',
-      'MN',
-      'MS',
-      'MO',
-      'MT',
-      'NE',
-      'NV',
-      'NH',
-      'NJ',
-      'NM',
-      'NY',
-      'NC',
-      'ND',
-      'MP',
-      'OH',
-      'OK',
-      'OR',
-      'PW',
-      'PA',
-      'PR',
-      'RI',
-      'SC',
-      'SD',
-      'TN',
-      'TX',
-      'UT',
-      'VT',
-      'VI',
-      'VA',
-      'WA',
-      'WV',
-      'WI',
-      'WY',
-    ],
-  },
   AuditPeriod: Types.string {
     description: 'Period type of audit being submitted',
     enum: [
@@ -291,7 +228,10 @@ local Enum = {
     description: 'SP Framework Opinions (Audit Information)',
     enum: std.map(function(pair) pair.tag, GAAP.sp_framework_opinions),
   },
-
+  UnitedStatesStateAbbr: {
+    description: 'US States 2-letter abbreviations',
+    enum: States.UnitedStatesStateAbbr,
+  },
 };
 
 local simple_phone_regex = '[1-9]{1}[0-9]{9}+';
@@ -372,7 +312,7 @@ local Compound = {
   Date: Types.string {
     title: 'Date',
     description: 'MM/DD/YYYY',
-    pattern: '^[0-9]{2}\/[0-9]{2}\/[0-9]{4}$',
+    pattern: '^[0-9]{2}/[0-9]{2}/[0-9]{4}$',
   },
   NonEmptyString: Types.string {
     minLength: 1,
@@ -432,7 +372,7 @@ local SchemaBase = Types.object {
     ComplianceRequirementTypes: {
       description: 'Compliance requirement types',
       enum: ComplianceRequirementTypes.requirement_types,
-    },    
+    },
   },
   Validation: Validation,
   SchemaBase: SchemaBase,
