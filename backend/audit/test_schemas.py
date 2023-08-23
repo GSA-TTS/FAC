@@ -371,7 +371,7 @@ class AuditInformationSchemaValidityTest(SimpleTestCase):
     )
 
     SIMPLE_CASE = json.loads(SIMPLE_CASES_TEST_FILE.read_text(encoding="utf-8"))[
-        "AuditInformationCase"
+        "AuditInformationCases"
     ]
 
     def test_schema(self):
