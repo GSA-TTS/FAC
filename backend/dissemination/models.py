@@ -1,9 +1,9 @@
 from django.db import models
-from django.contrib.postgres.fields import ArrayField
 
 from . import docs
 
 report_id_help_text = "GSA FAC generated identifier; PK for a given submission, equivalent to DBKEY/AY in historic data."
+
 
 class FindingText(models.Model):
     """Specific findings details. References General"""
