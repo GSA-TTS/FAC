@@ -1,5 +1,6 @@
 import { testCrossValidation } from '../support/cross-validation.js';
 import { testLoginGovLogin } from '../support/login-gov.js';
+import { testLogoutGov } from '../support/logout-gov.js';
 import { testValidAccess } from '../support/check-access.js';
 import { testValidEligibility } from '../support/check-eligibility.js';
 import { testValidAuditeeInfo } from '../support/auditee-info.js';
@@ -8,11 +9,13 @@ import { testAuditInformationForm } from '../support/audit-info-form.js';
 import { testPdfAuditReport } from '../support/report-pdf.js';
 import { testAuditorCertification } from '../support/auditor-certification.js';
 import { testAuditeeCertification } from '../support/auditee-certification.js';
-import { testWorkbookFederalAwards,
-         testWorkbookFindingsUniformGuidance,
-         testWorkbookFindingsText,
-         testWorkbookCorrectiveActionPlan,
-         testWorkbookAdditionalUEIs } from '../support/workbook-uploads.js';
+import {
+  testWorkbookFederalAwards,
+  testWorkbookFindingsUniformGuidance,
+  testWorkbookFindingsText,
+  testWorkbookCorrectiveActionPlan,
+  testWorkbookAdditionalUEIs
+} from '../support/workbook-uploads.js';
 
 describe('Full audit submission', () => {
   before(() => {
@@ -78,10 +81,17 @@ describe('Full audit submission', () => {
     // Second, auditor certification
     cy.get(".usa-link").contains("Auditor Certification").click();
     testAuditorCertification();
+    //logout 
+    testLogoutGov();
+    //login as Auditee
+    testLoginGovLogin(Cypress.env.LOGIN_TEST_EMAIL_AUDITEE,
+      Cypress.env.LOGIN_TEST_PASSWORD_AUDITEE,
+      Cypress.env.LOGIN_TEST_OTP_SECRET_AUDITEE);
 
     // Third, auditee certification
     cy.get(".usa-link").contains("Auditee Certification").click();
     testAuditeeCertification();
+
     // The same as auditor certification, with different checkboxes.
 
     // Uncomment this block when ready to implement the certification steps.

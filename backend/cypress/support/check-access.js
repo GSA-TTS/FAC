@@ -8,7 +8,7 @@ const accessFields = [
 
 export function addValidInfo(field) {
   const fieldType = field.split('_').pop();
-  const email = field.contains('auditee') ? Cypress.env('LOGIN_TEST_EMAIL_AUDITEE') : Cypress.env('LOGIN_TEST_EMAIL');
+  const email = field.includes('auditee') ? Cypress.env('LOGIN_TEST_EMAIL_AUDITEE') : Cypress.env('LOGIN_TEST_EMAIL');
 
   cy.get(field)
     .clear()

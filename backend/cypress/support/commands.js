@@ -81,7 +81,12 @@ import 'cypress-file-upload';
 //
 
 import { testLoginGovLogin } from './login-gov.js';
+import { testLogoutGov } from './logout-gov.js';
 
 Cypress.Commands.add('login', () => {
   testLoginGovLogin();
+})
+
+Cypress.Commands.add('logout',() => {
+  testLogoutGov();
 })
