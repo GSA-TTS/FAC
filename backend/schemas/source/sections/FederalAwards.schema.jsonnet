@@ -380,15 +380,6 @@ local Meta = Types.object {
       const: Sheets.WORKBOOKS_VERSION,
     },
   },
-  // allOf: [
-  //   // {
-  //   //   properties: {
-  //   //     section_name: {
-  //   //       const: Sheets.section_names.FEDERAL_AWARDS,
-  //   //     },
-  //   //   },
-  //   // },
-  // ],
   required: [],
   title: 'Meta',
   version: 20230807,

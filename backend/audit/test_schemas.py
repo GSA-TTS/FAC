@@ -396,24 +396,6 @@ class AuditInformationSchemaValidityTest(SimpleTestCase):
                 simple_case[field] = value
                 validate(simple_case, schema)
 
-    # <ValidationError: "[{'dollar_threshold': 1000000, 'gaap_results':
-    # ['unmodified_opinion'], 'is_going_concern_included': True,
-    # 'is_internal_control_deficiency_disclosed': False,
-    # 'is_internal_control_material_weakness_disclosed': True,
-    # 'is_material_noncompliance_disclosed': True,
-    # 'is_aicpa_audit_guide_included': True, 'is_low_risk_auditee': False,
-    # 'agencies': ['31', '44']}, {'dollar_threshold': 1000000,
-    # 'gaap_results': ['not_gaap'], 'is_going_concern_included': True,
-    # 'is_sp_framework_required': True, 'sp_framework_basis': ['cash_basis',
-    # 'tax_basis', 'contractual_basis'], 'sp_framework_opinions':
-    # ['unmodified_opinion', 'qualified_opinion'],
-    # 'is_internal_control_deficiency_disclosed': False,
-    # 'is_internal_control_material_weakness_disclosed': True,
-    # 'is_material_noncompliance_disclosed': True,
-    # 'is_aicpa_audit_guide_included': True, 'is_low_risk_auditee': False,
-    # 'agencies': ['32', '45']}] should not be valid under {'required':
-    # ['is_sp_framework_required']}">
-
     def test_all_gaap_results(self):
         schema = self.AUDIT_INFO_SCHEMA
         simple_case = jsoncopy(self.SIMPLE_CASE[0])

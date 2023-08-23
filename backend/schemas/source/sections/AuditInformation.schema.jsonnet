@@ -114,18 +114,10 @@ local AuditInformation = Types.object {
 // ALWAYS add a new line to the end of the file, meaning this file will change every
 // time we run the formatter.
 //
-// The directions below suggest that the array should be added to the end of the file
-// to run local tests. There might be a better way: create a new file that we run the tests
+// To run local tests against an array of AuditInformation objects: 
+// create a new file that you would run the tests
 // against that imports from this one, and wraps the AuditInformation object in an array.
-// This will have the same effect, but make it testable without modifying this file.
 
-//To manually text against data_fixtures/audit/excel_schema_test_files/audit-information-pass-01.js
-//1. Uncomment the code below and comment out the line above
-//2. Regenerate the schema output file by running `make build_sections`
-//3. and Run `check-jsonschema --schemafile schemas/output/sections/AuditInformation.schema.json data_fixtures/audit/excel_schema_test_files/audit-information-pass-01.js`
-// Types.array {
-//       items: AuditInformation,
-// }
 
 local Root = Types.object {
   additionalProperties: false,
