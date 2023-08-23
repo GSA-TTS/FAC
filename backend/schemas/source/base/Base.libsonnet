@@ -430,7 +430,7 @@ local SchemaBase = Types.object {
     },
     ClusterNamesStateOther: Types.string {
       description: 'All cluster names',
-      enum: ClusterNames.cluster_names + [Const.OTHER_CLUSTER, Const.OTHER_CLUSTER],
+      enum: ClusterNames.cluster_names + [Const.STATE_CLUSTER, Const.OTHER_CLUSTER],
     },
     ALNPrefixes: type_aln_prefix,
     ThreeDigitExtension: type_three_digit_extension,
