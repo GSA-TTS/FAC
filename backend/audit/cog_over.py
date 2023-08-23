@@ -98,6 +98,7 @@ def set_2019_baseline():
         WHERE gen."AUDITYEAR" = :ref_year
         AND cast(gen."TOTFEDEXPEND" as BIGINT) >= :threshold
         AND gen."DBKEY" = cfda."DBKEY"
+        AND gen."EIN" = cfda."EIN"
         ORDER BY gen."DBKEY"
     """
     with engine.connect() as conn:
@@ -111,7 +112,7 @@ def set_2019_baseline():
             (DBKEY, EIN, TOTFEDEXPEND, CFDA, AMOUNT, DIRECT, PROGRAMTOTAL) = row
             if (DBKEY, EIN, TOTFEDEXPEND) not in gens:
                 gens.append((DBKEY, EIN, TOTFEDEXPEND))
-            cfdas.append((DBKEY, CFDA, AMOUNT, DIRECT, PROGRAMTOTAL))
+            cfdas.append((DBKEY, CFDA, AMOUNT, DIRECT, PROGRAMTOTAL, EIN))
 
     CognizantBaseline.objects.all().delete()
     for gen in gens:
@@ -119,7 +120,7 @@ def set_2019_baseline():
         ein = gen[1]
         total_amount_expended = gen[2]
         (total_da_amount_expended, max_total_agency, max_da_agency) = calc_cfda_amounts(
-            cfdas=[cfda for cfda in cfdas if cfda[0] == dbkey]
+            cfdas=[cfda for cfda in cfdas if ((cfda[0] == dbkey) & (cfda[5] == ein))]
         )
         cognizant_agency = determine_agency(
             total_amount_expended,

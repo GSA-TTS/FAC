@@ -24,6 +24,7 @@ def cog_over_for_2022():
         WHERE gen."AUDITYEAR" = :ref_year
         AND cast(gen."TOTFEDEXPEND" as BIGINT) >= :threshold
         AND gen."DBKEY" = cfda."DBKEY"
+        AND gen."EIN" = cfda."EIN"
         ORDER BY gen."DBKEY"
     """
     with engine.connect() as conn:
@@ -58,8 +59,8 @@ def cog_over_for_2022():
                 gens.append(
                     (DBKEY, EIN, TOTFEDEXPEND, COG_OVER, COGAGENCY, OVERSIGHTAGENCY)
                 )
-            if (DBKEY, CFDA, AMOUNT, DIRECT) not in cfdas:
-                cfdas.append((DBKEY, CFDA, AMOUNT, DIRECT))
+            if (DBKEY, CFDA, AMOUNT, DIRECT, EIN) not in cfdas:
+                cfdas.append((DBKEY, CFDA, AMOUNT, DIRECT, EIN))
 
     print("len(gens = ", len(gens))
     print("len(cfdas) = ", len(cfdas))
@@ -99,7 +100,7 @@ def cog_over_for_2022():
         ein = gen[1]
         total_amount_expended = gen[2]
         (total_da_amount_expended, max_total_agency, max_da_agency) = calc_cfda_amounts(
-            cfdas=[cfda for cfda in cfdas if cfda[0] == dbkey]
+            cfdas=[cfda for cfda in cfdas if ((cfda[0] == dbkey) & (cfda[4] == ein))]
         )
 
         agency = determine_agency(
