@@ -22,7 +22,7 @@ resource "cloudfoundry_app" "postgrest" {
   space        = data.cloudfoundry_space.apps.id
   docker_image = "ghcr.io/gsa-tts/fac/postgrest@${data.docker_registry_image.postgrest.sha256_digest}"
   timeout      = 180
-  memory       = 1024
+  memory       = 512
   disk_quota   = 256
   instances    = var.postgrest_instances
   strategy     = "rolling"
