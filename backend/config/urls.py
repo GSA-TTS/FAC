@@ -81,5 +81,9 @@ urlpatterns = [
     path("audit/", include("audit.urls")),
     # Keep last so we can use short urls for content pages like home page etc.
     path("", include("cms.urls")),
-    path("__debug__/", include("debug_toolbar.urls")),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+
+if settings.ENABLE_DEBUG_TOOLBAR:
+    urlpatterns += [
+        path("__debug__/", include("debug_toolbar.urls")),
+    ]

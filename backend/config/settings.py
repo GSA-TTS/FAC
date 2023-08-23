@@ -457,23 +457,17 @@ GAAP_RESULTS = get_audit_info_lists("gaap_results")
 SP_FRAMEWORK_BASIS = get_audit_info_lists("sp_framework_basis")
 SP_FRAMEWORK_OPINIONS = get_audit_info_lists("sp_framework_opinions")
 
-# django debug toolbar
-if DEBUG:
+# Are we in a test environment?
+TEST_RUN = len(sys.argv) > 1 and sys.argv[1] == "test"
+
+ENABLE_DEBUG_TOOLBAR = env.bool("ENABLE_DEBUG_TOOLBAR", False) and not TEST_RUN
+
+# Django debug toolbar setup
+if ENABLE_DEBUG_TOOLBAR:
     INSTALLED_APPS += [
         "debug_toolbar",
     ]
-
     MIDDLEWARE = [
         "debug_toolbar.middleware.DebugToolbarMiddleware",
     ] + MIDDLEWARE
-
-    INTERNAL_IPS = [
-        "127.0.0.1",
-    ]
-
-    def show_toolbar(_request):
-        return True
-
-    DEBUG_TOOLBAR_CONFIG = {
-        "SHOW_TOOLBAR_CALLBACK": show_toolbar,
-    }
+    DEBUG_TOOLBAR_CONFIG = {"SHOW_TOOLBAR_CALLBACK": lambda _: True}
