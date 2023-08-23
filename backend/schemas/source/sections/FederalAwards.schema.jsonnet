@@ -13,57 +13,6 @@ local Validations = {
     },
     required: ['passthrough_name'],
   },
-  PassThroughEntityEmpty: Types.object {
-    additionalProperties: false,
-    properties: {
-      passthrough_name: Base.Enum.EmptyString_Null,
-      passthrough_identifying_number: Base.Enum.EmptyString_Null,
-    },
-    // The passthrough number is not required
-    required: ['passthrough_name'],
-  },
-  DirectAwardValidations: [
-    {
-      'if': {
-        properties: {
-          is_direct: {
-            const: Base.Const.Y,
-          },
-        },
-      },
-      'then': {
-        properties: {
-          entities: {
-            anyOf: [
-              Types.array {
-                items: Validations.PassThroughEntityEmpty,
-              },
-              Base.Enum.EmptyString_EmptyArray_Null,
-            ],
-          },
-        },
-      },
-    },
-    {
-      'if': {
-        properties: {
-          is_direct: {
-            const: Base.Const.N,
-          },
-        },
-      },
-      'then': {
-        properties: {
-          entities: Types.array {
-            items: Validations.PassThroughEntity,
-          },
-        },
-        required: [
-          'entities',
-        ],
-      },
-    },
-  ],
   LoanOrLoanGuaranteeValidations: [
     {
       'if': {
@@ -307,9 +256,39 @@ local Parts = {
     description: 'If direct_award is N, the form must include a list of the pass-through entity by name and identifying number',
     properties: {
       is_direct: Base.Enum.YorN,
-      entities: Types.array,
+      entities: Types.array {
+        items: Validations.PassThroughEntity,
+      },
     },
-    allOf: Validations.DirectAwardValidations,
+    allOf: [
+      {
+        'if': {
+          properties: {
+            is_direct: {
+              const: Base.Const.N,
+            },
+          },
+        },
+        'then': {
+          required: ['entities'],
+        },
+      },
+      {
+        'if': {
+          properties: {
+            is_direct: {
+              const: Base.Const.Y,
+            },
+          },
+        },
+        'then': {
+          not: {
+            required: ['entities'],
+          },
+        },
+      },
+    ],
+    required: ['is_direct'],
   },
   LoanOrLoanGuarantee: Types.object {
     additionalProperties: false,

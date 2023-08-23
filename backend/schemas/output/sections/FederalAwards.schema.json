@@ -208,94 +208,51 @@
                               "if": {
                                  "properties": {
                                     "is_direct": {
-                                       "const": "Y"
+                                       "const": "N"
                                     }
                                  }
                               },
                               "then": {
-                                 "properties": {
-                                    "entities": {
-                                       "anyOf": [
-                                          {
-                                             "items": {
-                                                "additionalProperties": false,
-                                                "properties": {
-                                                   "passthrough_identifying_number": {
-                                                      "description": "Empty string or null",
-                                                      "enum": [
-                                                         "",
-                                                         "null"
-                                                      ],
-                                                      "title": "EmptyString_Null"
-                                                   },
-                                                   "passthrough_name": {
-                                                      "description": "Empty string or null",
-                                                      "enum": [
-                                                         "",
-                                                         "null"
-                                                      ],
-                                                      "title": "EmptyString_Null"
-                                                   }
-                                                },
-                                                "required": [
-                                                   "passthrough_name"
-                                                ],
-                                                "type": "object"
-                                             },
-                                             "type": "array"
-                                          },
-                                          {
-                                             "description": "Empty string, empty array, or null",
-                                             "enum": [
-                                                "",
-                                                [ ],
-                                                "null"
-                                             ],
-                                             "title": "EmptyString_EmptyArray_Null"
-                                          }
-                                       ]
-                                    }
-                                 }
+                                 "required": [
+                                    "entities"
+                                 ]
                               }
                            },
                            {
                               "if": {
                                  "properties": {
                                     "is_direct": {
-                                       "const": "N"
+                                       "const": "Y"
                                     }
                                  }
                               },
                               "then": {
-                                 "properties": {
-                                    "entities": {
-                                       "items": {
-                                          "additionalProperties": false,
-                                          "properties": {
-                                             "passthrough_identifying_number": {
-                                                "type": "string"
-                                             },
-                                             "passthrough_name": {
-                                                "type": "string"
-                                             }
-                                          },
-                                          "required": [
-                                             "passthrough_name"
-                                          ],
-                                          "type": "object"
-                                       },
-                                       "type": "array"
-                                    }
-                                 },
-                                 "required": [
-                                    "entities"
-                                 ]
+                                 "not": {
+                                    "required": [
+                                       "entities"
+                                    ]
+                                 }
                               }
                            }
                         ],
                         "description": "If direct_award is N, the form must include a list of the pass-through entity by name and identifying number",
                         "properties": {
                            "entities": {
+                              "items": {
+                                 "additionalProperties": false,
+                                 "properties": {
+                                    "passthrough_identifying_number": {
+                                       "type": "string"
+                                    },
+                                    "passthrough_name": {
+                                       "type": "string"
+                                    }
+                                 },
+                                 "required": [
+                                    "passthrough_name"
+                                 ],
+                                 "type": "object"
+                              },
                               "type": "array"
                            },
                            "is_direct": {
@@ -306,6 +263,9 @@
                               "type": "string"
                            }
                         },
+                        "required": [
+                           "is_direct"
+                        ],
                         "type": "object"
                      },
                      "loan_or_loan_guarantee": {
