@@ -536,7 +536,6 @@
                      "NAN",
                      "RESEARCH AND DEVELOPMENT",
                      "STUDENT FINANCIAL ASSISTANCE",
-                     "STATE CLUSTER",
                      "AGING CLUSTER",
                      "CCDF CLUSTER",
                      "CDFI CLUSTER",
@@ -572,8 +571,10 @@
                      "CDBG - ENTITLEMENT GRANTS CLUSTER",
                      "CDBG - DISASTER RECOVERY GRANTS - PUB. L. NO. 113-2 CLUSTER",
                      "N/A",
+                     "STATE CLUSTER",
                      "OTHER CLUSTER NOT LISTED ABOVE"
-                  ]
+                  ],
+                  "type": "string"
                },
                "range_name": "cluster_name_lookup",
                "title": "Cluster Names",
@@ -3450,7 +3451,8 @@
                      "EMERGENCY CONNECTIVITY FUND PROGRAM",
                      "FAMILY VIOLENCE PREVENTION AND SERVICES/CULTURALLY SPECIFIC DOMESTIC VIOLENCE AND SEXUAL VIOLENCE SERVICES",
                      "EASTERN NEVADA CONSERVATION, RECREATION AND DEVELOPMENT"
-                  ]
+                  ],
+                  "type": "string"
                },
                "range_name": "federal_program_name_lookup",
                "title": "Federal Program Names",
@@ -6322,7 +6324,8 @@
                      "32.009",
                      "93.496",
                      "15.017"
-                  ]
+                  ],
+                  "type": "string"
                },
                "range_name": "aln_lookup",
                "title": "Program Numbers",

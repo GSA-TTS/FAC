@@ -111,7 +111,7 @@ local AuditInformation = Types.object {
 };
 
 // WARNING: If a comment is the last thing in a Jsonnet file, then the formatter will
-// ALWAYS add a new line to the end of the file, meaning this file will change every 
+// ALWAYS add a new line to the end of the file, meaning this file will change every
 // time we run the formatter.
 //
 // The directions below suggest that the array should be added to the end of the file
