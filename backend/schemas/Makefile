@@ -1,5 +1,23 @@
-all: clean source_data build_xlsx format_jsonnet build_templates build_sections 
+VENV           = .venv
+VENV_PYTHON    = $(VENV)/bin/python
+SYSTEM_PYTHON  = $(or $(shell which python3), $(shell which python))
+PYTHON         = $(or $(wildcard $(VENV_PYTHON)), $(SYSTEM_PYTHON))
+
+all: venv deps clean source_data build_xlsx format_jsonnet build_templates build_sections 
 json: format_jsonnet build_templates build_templates
+
+
+$(VENV_PYTHON):
+	rm -rf $(VENV)
+	$(SYSTEM_PYTHON) -m venv $(VENV)
+
+venv: $(VENV_PYTHON)
+
+deps:
+	$(PYTHON) -m pip install --upgrade pip
+	$(PYTHON) -m pip install -r requirements.txt
+
+.PHONY: venv deps
 
 template_specs = $(wildcard source/excel/templates/*.jsonnet)
 section_specs = $(wildcard source/sections/*.jsonnet)
@@ -8,8 +26,8 @@ xlsx = $(wildcard output/excel/xlsx/*-workbook*.xlsx)
 json = $(wildcard output/excel/json/*.json)
 
 source_data:
-	python3 scripts/generate_lookup_schemas.py source/data/cfda-lookup-20230626.csv source/base/FederalProgramNames.json
-	python3 scripts/generate_lookup_schemas.py source/data/cluster-names-20230626.csv source/base/ClusterNames.json
+	python scripts/generate_lookup_schemas.py source/data/cfda-lookup-20230626.csv source/base/FederalProgramNames.json
+	python scripts/generate_lookup_schemas.py source/data/cluster-names-20230626.csv source/base/ClusterNames.json
 
 clean:
 	for f in $(xlsx); do \
