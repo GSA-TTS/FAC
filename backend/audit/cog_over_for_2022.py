@@ -22,7 +22,7 @@ def cog_over_for_2022():
                 cfda."CFDA", cast(cfda."AMOUNT" as BIGINT), cfda."DIRECT"
         FROM census_gen22 gen, census_cfda22 cfda
         WHERE gen."AUDITYEAR" = :ref_year
-        AND cast(gen."TOTFEDEXPEND" as BIGINT) >= :threshold
+        AND cast(gen."TOTFEDEXPEND" as BIGINT) > :threshold
         AND gen."DBKEY" = cfda."DBKEY"
         AND gen."EIN" = cfda."EIN"
         ORDER BY gen."DBKEY"

@@ -96,7 +96,7 @@ def set_2019_baseline():
                 cfda."CFDA", cast(cfda."AMOUNT" as BIGINT), cfda."DIRECT", cast(cfda."PROGRAMTOTAL" as BIGINT)
         FROM census_gen19 gen, census_cfda19 cfda
         WHERE gen."AUDITYEAR" = :ref_year
-        AND cast(gen."TOTFEDEXPEND" as BIGINT) >= :threshold
+        AND cast(gen."TOTFEDEXPEND" as BIGINT) > :threshold
         AND gen."DBKEY" = cfda."DBKEY"
         AND gen."EIN" = cfda."EIN"
         ORDER BY gen."DBKEY"
@@ -112,7 +112,8 @@ def set_2019_baseline():
             (DBKEY, EIN, TOTFEDEXPEND, CFDA, AMOUNT, DIRECT, PROGRAMTOTAL) = row
             if (DBKEY, EIN, TOTFEDEXPEND) not in gens:
                 gens.append((DBKEY, EIN, TOTFEDEXPEND))
-            cfdas.append((DBKEY, CFDA, AMOUNT, DIRECT, PROGRAMTOTAL, EIN))
+            if (DBKEY, CFDA, AMOUNT, DIRECT, PROGRAMTOTAL, EIN) not in cfdas:
+                cfdas.append((DBKEY, CFDA, AMOUNT, DIRECT, PROGRAMTOTAL, EIN))
 
     CognizantBaseline.objects.all().delete()
     for gen in gens:
