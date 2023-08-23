@@ -751,8 +751,8 @@ class AdditionalEinsValidatorTests(SimpleTestCase):
 
 
 class NotesToSefaValidatorTests(SimpleTestCase):
-    SIMPLE_CASE = json.loads(SIMPLE_CASES_TEST_FILE.read_text(encoding="utf-8"))[
-        "NotesToSefaCase"
+    SIMPLE_CASES = json.loads(SIMPLE_CASES_TEST_FILE.read_text(encoding="utf-8"))[
+        "NotesToSefaCases"
     ]
 
     def test_validation_is_applied(self):
@@ -780,7 +780,8 @@ class NotesToSefaValidatorTests(SimpleTestCase):
             ValidationError, expected_msg, validate_notes_to_sefa_json, invalid
         )
 
-        validate_notes_to_sefa_json(NotesToSefaValidatorTests.SIMPLE_CASE)
+        validate_notes_to_sefa_json(NotesToSefaValidatorTests.SIMPLE_CASES[0])
+        validate_notes_to_sefa_json(NotesToSefaValidatorTests.SIMPLE_CASES[1])
 
 
 class SecondaryAuditorsValidatorTests(SimpleTestCase):

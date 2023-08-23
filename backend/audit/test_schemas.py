@@ -1227,9 +1227,11 @@ class NotesToSefaSchemaValidityTest(SimpleTestCase):
     NOTES_TO_SEFA_SCHEMA = json.loads(
         (SECTION_SCHEMA_DIR / "NotesToSefa.schema.json").read_text(encoding="utf-8")
     )
-    SIMPLE_CASE = json.loads(SIMPLE_CASES_TEST_FILE.read_text(encoding="utf-8"))[
-        "NotesToSefaCase"
+    SIMPLE_CASES = json.loads(SIMPLE_CASES_TEST_FILE.read_text(encoding="utf-8"))[
+        "NotesToSefaCases"
     ]
+    
+    SIMPLE_CASE=SIMPLE_CASES[0]
 
     def test_schema(self):
         """Test NotesToSefa schema first."""
@@ -1241,9 +1243,12 @@ class NotesToSefaSchemaValidityTest(SimpleTestCase):
     def test_simple_pass(self):
         """
         Test a simple NotesToSefa case.
+        One with notes, one without
         """
         schema = self.NOTES_TO_SEFA_SCHEMA
         validate(self.SIMPLE_CASE, schema)
+        validate(self.SIMPLE_CASES[1], schema)
+
 
     def test_missing_auditee_uei(self):
         """
@@ -1264,9 +1269,12 @@ class NotesToSefaSchemaValidityTest(SimpleTestCase):
         schema = self.NOTES_TO_SEFA_SCHEMA
 
         simple_case = jsoncopy(self.SIMPLE_CASE)
+        validate(simple_case, schema)
+
+        simple_case = jsoncopy(self.SIMPLE_CASE)
+        del simple_case["NotesToSefa"]['accounting_policies']
         self.assertRaises(exceptions.ValidationError,
                           validate, simple_case, schema)
-        validate(simple_case, schema)
 
         simple_case = jsoncopy(self.SIMPLE_CASE)
         del simple_case["NotesToSefa"]["notes_to_sefa_entries"][0]["note_title"]
