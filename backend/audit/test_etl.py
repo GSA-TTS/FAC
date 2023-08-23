@@ -34,7 +34,6 @@ class ETLTests(TestCase):
             corrective_action_plan=self._fake_corrective_action_plan(),
             secondary_auditors=self._fake_secondary_auditors(),
             additional_ueis=self._fake_additional_ueis(),
-            # audit_information=self._fake_audit_information(),  # TODO: Uncomment when SingleAuditChecklist adds audit_information
         )
         sac.save()
         self.sac = sac
@@ -359,8 +358,8 @@ class ETLTests(TestCase):
         self.assertLess(len_captext, len(CapText.objects.all()))
 
     def test_load_all_with_errors_1(self):
-        """If we encounter a KeyError on General (the first table to be loaded), we
-        should still load all the other tables, but nothing should be loaded to General.
+        """IWe should not encounter a key error in general, 
+        an error that would prevent the loading of a child table
         """
         len_general = len(General.objects.all())
         len_captext = len(CapText.objects.all())
@@ -374,7 +373,6 @@ class ETLTests(TestCase):
             corrective_action_plan=self._fake_corrective_action_plan(),
             secondary_auditors=self._fake_secondary_auditors(),
             additional_ueis=self._fake_additional_ueis(),
-            # audit_information=self._fake_audit_information(),  # TODO: Uncomment when SingleAuditChecklist adds audit_information
         )
         sac.general_information.pop("auditee_contact_name")
         sac.save()
@@ -382,7 +380,7 @@ class ETLTests(TestCase):
         self.etl = ETL(self.sac)
         self.report_id = sac.report_id
         self.etl.load_all()
-        self.assertEqual(len_general, len(General.objects.all()))
+        self.assertLess(len_general, len(General.objects.all()))
         self.assertLess(len_captext, len(CapText.objects.all()))
 
     def test_load_all_with_errors_2(self):
@@ -401,7 +399,6 @@ class ETLTests(TestCase):
             corrective_action_plan=self._fake_corrective_action_plan(),
             secondary_auditors=self._fake_secondary_auditors(),
             additional_ueis=self._fake_additional_ueis(),
-            # audit_information=self._fake_audit_information(),  # TODO: Uncomment when SingleAuditChecklist adds audit_information
         )
         sac.corrective_action_plan.pop("CorrectiveActionPlan")
         sac.save()
