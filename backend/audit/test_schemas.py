@@ -448,16 +448,16 @@ class AuditInformationSchemaValidityTest(SimpleTestCase):
 
     def test_bad_sp_framework_opinions(self):
         schema = self.AUDIT_INFO_SCHEMA
-        simple_case = jsoncopy(self.SIMPLE_CASE[0])
+        simple_case = jsoncopy(self.SIMPLE_CASE[1])
 
-        simple_case["sp_framework_opinion"] = "not_a_real_opinion"
+        simple_case["sp_framework_opinions"] = "not_a_real_opinion"
         self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
     def test_bad_sp_framework_basis(self):
         schema = self.AUDIT_INFO_SCHEMA
-        simple_case = jsoncopy(self.SIMPLE_CASE[0])
+        simple_case = jsoncopy(self.SIMPLE_CASE[1])
 
-        simple_case["gaap_results"] = "an_invalid_basis"
+        simple_case["sp_framework_basis"] = "an_invalid_basis"
         self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
     def test_valid_aln_prefixes(self):
