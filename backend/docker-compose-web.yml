@@ -24,8 +24,6 @@ services:
         condition: service_healthy
       minio:
         condition: service_started
-      # load:
-      #   condition: service_completed_successfully
       clamav-rest:
         condition: service_started
     environment:
@@ -80,9 +78,7 @@ services:
     depends_on:
       db:
         condition: service_healthy
-      # load:
-      #   condition: service_completed_successfully
-      
+ 
 volumes:
   postgres-data:
   minio-vol:
