@@ -268,6 +268,24 @@ create view api_v1_0_0_beta.additional_ueis as
     order by uei.id
 ;
 
+create view api_v1_0_0_beta.additional_eins as
+    select
+        gen.report_id,
+        gen.auditee_uei,
+        gen.audit_year,
+        ---
+        ein.additional_ein
+    from
+        dissemination_general gen,
+        dissemination_additionalein ein
+    where
+        gen.report_id = ein.report_id
+        and
+        gen.is_public = True
+    order by uei.id
+;
+
+
 commit;
 
 notify pgrst,

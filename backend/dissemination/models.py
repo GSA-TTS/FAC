@@ -3,12 +3,13 @@ from django.contrib.postgres.fields import ArrayField
 
 from . import docs
 
+report_id_help_text = "GSA FAC generated identifier; PK for a given submission, equivalent to DBKEY/AY in historic data."
 
 class FindingText(models.Model):
     """Specific findings details. References General"""
 
     report_id = models.TextField(
-        "G-FAC generated identifier.l",
+        report_id_help_text,
     )
     finding_ref_number = models.TextField(
         "Finding Reference Number - FK",
@@ -30,8 +31,15 @@ class FindingText(models.Model):
 class AdditionalUei(models.Model):
     """Additional UEIs for this audit."""
 
-    report_id = models.TextField()
+    report_id = models.TextField(report_id_help_text)
     additional_uei = models.TextField()
+
+
+class AdditionalEin(models.Model):
+    """Additional EINs for this audit."""
+
+    report_id = models.TextField(report_id_help_text)
+    additional_ein = models.TextField()
 
 
 class Finding(models.Model):
@@ -42,7 +50,7 @@ class Finding(models.Model):
         null=True,
     )
     report_id = models.TextField(
-        "G-FAC generated identifier. FK along with other fields - refers to Award",
+        report_id_help_text,
     )
     finding_ref_number = models.TextField(
         "Findings Reference Numbers",
@@ -92,7 +100,7 @@ class FederalAward(models.Model):
     """Information about the federal award section of the form. References General"""
 
     report_id = models.TextField(
-        "G-FAC generated identifier. FK  to a General",
+        report_id_help_text,
     )
 
     award_reference = models.TextField(
@@ -217,7 +225,7 @@ class CapText(models.Model):
     """Corrective action plan text. Referebces General"""
 
     report_id = models.TextField(
-        "GSA FAC generated identifier. FK refers to a General",
+        report_id_help_text,
     )
     finding_ref_number = models.TextField(
         "Audit Finding Reference Number",
@@ -239,7 +247,7 @@ class Note(models.Model):
     """Note to Schedule of Expenditures of Federal Awards (SEFA)"""
 
     report_id = models.TextField(
-        "G-FAC generated identifier. FK refers to a General",
+        report_id_help_text,
     )
     content = models.TextField("Content of the Note", null=True, help_text=docs.content)
     note_title = models.TextField("Note Title", null=True, help_text=docs.title)
@@ -359,7 +367,7 @@ class Passthrough(models.Model):
         null=True,
     )
     report_id = models.TextField(
-        "G-FAC generated identifier. FK refers to General",
+        report_id_help_text,
     )
     # This doesn't seem like it should be null but it is sometimes
     passthrough_id = models.TextField(
@@ -379,7 +387,7 @@ class General(models.Model):
     # null = True for these so we can load in phases, may want to tighten validation later
 
     report_id = models.TextField(
-        "G-FAC generated identifier. ",
+        report_id_help_text,
         unique=True,
     )
     auditee_certify_name = models.TextField(
@@ -445,17 +453,17 @@ class General(models.Model):
     # Just store the bool, and load the workbook into a separate table
     # This adds a lot of complexity to the process.
     additional_ueis = models.BooleanField(default=False)
-
-    hist_auditee_addl_ein_list = ArrayField(
-        models.TextField("", null=True, help_text=docs.uei_general),
-        null=True,
-        default=list,
-    )
-    hist_auditee_addl_duns_list = ArrayField(
-        models.TextField("", null=True, help_text=docs.uei_general),
-        null=True,
-        default=list,
-    )
+    additional_eins = models.BooleanField(default=False)
+    # hist_auditee_addl_ein_list = ArrayField(
+    #     models.TextField("", null=True, help_text=docs.uei_general),
+    #     null=True,
+    #     default=list,
+    # )
+    # hist_auditee_addl_duns_list = ArrayField(
+    #     models.TextField("", null=True, help_text=docs.uei_general),
+    #     null=True,
+    #     default=list,
+    # )
     auditee_zip = models.TextField(
         "Auditee Zip Code",
         null=True,
@@ -687,7 +695,7 @@ class General(models.Model):
 
 class SecondaryAuditor(models.Model):
     report_id = models.TextField(
-        "G-FAC generated identifier. FK to General",
+        report_id_help_text,
     )
     # auditor_seq_number = models.IntegerField("Order that the Auditor was reported")
     auditor_ein = models.TextField(
