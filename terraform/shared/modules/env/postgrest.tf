@@ -35,7 +35,7 @@ resource "cloudfoundry_app" "postgrest" {
     PGRST_DB_SCHEMAS : "api_v1_0_0_beta"
     PGRST_DB_ANON_ROLE : "anon"
     PGRST_JWT_SECRET : var.pgrst_jwt_secret
-    PGRST_DB_MAX_ROWS : 1000
+    PGRST_DB_MAX_ROWS : 20000
   }
 }
 
