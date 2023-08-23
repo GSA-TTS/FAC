@@ -8,6 +8,7 @@ TODO We may not need ArrayField once we migrate historical data
 NOTE Django recommendation is to not use nulls for TextField
 """
 
+
 class FindingText(models.Model):
     """Specific findings details. References General"""
 
@@ -402,8 +403,12 @@ class General(models.Model):
     # No nesting of structures.
     # Just store the bool, and load the workbook into a separate table
     # This adds a lot of complexity to the process.
-    additional_ueis_covered = models.BooleanField(null=True,)
-    additional_eins_covered = models.BooleanField(null=True,)
+    additional_ueis_covered = models.BooleanField(
+        null=True,
+    )
+    additional_eins_covered = models.BooleanField(
+        null=True,
+    )
 
     hist_auditee_addl_ein_list = ArrayField(
         models.TextField("", null=True, help_text=docs.uei_general),
@@ -419,16 +424,12 @@ class General(models.Model):
         "Auditee Zip Code",
         help_text=docs.zip_code,
     )
-    auditor_phone = models.TextField(
-        "CPA phone number", help_text=docs.auditor_phone
-    )
+    auditor_phone = models.TextField("CPA phone number", help_text=docs.auditor_phone)
     hist_auditor_fax = models.TextField(
         "CPA fax number in C-FAC",
     )
-    auditor_state = models.TextField(
-        "CPA State",  help_text=docs.auditor_state
-    )
-    auditor_city = models.TextField("CPA City",  help_text=docs.auditor_city)
+    auditor_state = models.TextField("CPA State", help_text=docs.auditor_state)
+    auditor_city = models.TextField("CPA City", help_text=docs.auditor_city)
     auditor_contact_title = models.TextField(
         "Title of CPA Contact",
         help_text=docs.auditor_title,
@@ -444,17 +445,13 @@ class General(models.Model):
         "CPA Zip Code",
         help_text=docs.auditor_zip_code,
     )
-    auditor_country = models.TextField(
-        "CPA Country",  help_text=docs.auditor_country
-    )
+    auditor_country = models.TextField("CPA Country", help_text=docs.auditor_country)
     auditor_contact_name = models.TextField(
         "Name of CPA Contact",
-        
         help_text=docs.auditor_contact,
     )
     auditor_email = models.TextField(
         "CPA mail address (optional)",
-        
         help_text=docs.auditor_email,
     )
     auditor_firm_name = models.TextField(
@@ -463,12 +460,10 @@ class General(models.Model):
     # Once loaded, would like to add these as regular addresses and just change this to a country field
     auditor_foreign_addr = models.TextField(
         "CPA Address - if international",
-        
         help_text=docs.auditor_foreign,
     )
     auditor_ein = models.TextField(
         "CPA Firm EIN (only available for audit years 2013 and beyond)",
-        
         help_text=docs.auditor_ein,
     )
     secondary_auditors_exist = models.BooleanField(default=False)
@@ -648,9 +643,7 @@ class SecondaryAuditor(models.Model):
         "CPA mail address (optional)",
         help_text=docs.auditor_email,
     )
-    contact_phone = models.TextField(
-        "CPA phone number", help_text=docs.auditor_phone
-    )
+    contact_phone = models.TextField("CPA phone number", help_text=docs.auditor_phone)
     hist_contact_fax = models.TextField(
         "CPA fax number",
     )
@@ -662,9 +655,7 @@ class SecondaryAuditor(models.Model):
         "CPA Street Address Line 2 in C-FAC",
     )
     address_city = models.TextField("CPA City", help_text=docs.auditor_city)
-    address_state = models.TextField(
-        "CPA State", help_text=docs.auditor_state
-    )
+    address_state = models.TextField("CPA State", help_text=docs.auditor_state)
     address_zipcode = models.TextField(
         "CPA Zip Code",
         help_text=docs.auditor_zip_code,

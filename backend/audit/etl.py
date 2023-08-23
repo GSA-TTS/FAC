@@ -60,9 +60,9 @@ class ETL(object):
         for entry in findings_text_entries:
             finding_text_ = FindingText(
                 report_id=self.report_id,
-                finding_ref_number=entry.get("reference_number",""),
+                finding_ref_number=entry.get("reference_number", ""),
                 contains_chart_or_table=entry["contains_chart_or_table"] == "Y",
-                finding_text=entry.get("text_of_finding",""),
+                finding_text=entry.get("text_of_finding", ""),
             )
             finding_text_.save()
 
@@ -83,7 +83,7 @@ class ETL(object):
             program = entry["program"]
             prior_finding_ref_numbers = None
             if "prior_references" in findings:
-                prior_finding_ref_numbers = findings.get("prior_references","")
+                prior_finding_ref_numbers = findings.get("prior_references", "")
 
             finding = Finding(
                 award_reference=program.get("award_reference", ""),
@@ -97,7 +97,7 @@ class ETL(object):
                 is_questioned_costs=entry["questioned_costs"] == "Y",
                 is_repeat_finding=(findings["repeat_prior_reference"] == "Y"),
                 is_significant_deficiency=(entry["significant_deficiency"] == "Y"),
-                type_requirement=program.get("compliance_requirement",""),
+                type_requirement=program.get("compliance_requirement", ""),
             )
             finding.save()
 
@@ -129,8 +129,8 @@ class ETL(object):
             is_passthrough = entry["subrecipients"]["is_passed"] == "Y"
             cluster = entry["cluster"]
             subrecipient_amount = entry["subrecipients"].get("subrecipient_amount")
-            state_cluster_name = cluster.get("state_cluster_name","")
-            other_cluster_name = cluster.get("other_cluster_name","")
+            state_cluster_name = cluster.get("state_cluster_name", "")
+            other_cluster_name = cluster.get("other_cluster_name", "")
             additional_award_identification = self.conditional_lookup(
                 program, "additional_award_identification", ""
             )
@@ -241,10 +241,10 @@ class ETL(object):
             if "entities" in entry["direct_or_indirect_award"]:
                 for entity in entry["direct_or_indirect_award"]["entities"]:
                     passthrough = Passthrough(
-                        award_reference=entry.get("award_reference",""),
+                        award_reference=entry.get("award_reference", ""),
                         report_id=self.report_id,
-                        passthrough_id=entity.get("passthrough_identifying_number",""),
-                        passthrough_name=entity.get("passthrough_name","")
+                        passthrough_id=entity.get("passthrough_identifying_number", ""),
+                        passthrough_name=entity.get("passthrough_name", ""),
                     )
                     passthrough.save()
 
@@ -273,14 +273,16 @@ class ETL(object):
 
         general = General(
             report_id=self.report_id,
-            auditee_certify_name='',  # TODO: Where does this come from?
-            auditee_certify_title='',  # TODO: Where does this come from?
+            auditee_certify_name="",  # TODO: Where does this come from?
+            auditee_certify_title="",  # TODO: Where does this come from?
             auditee_contact_name=general_information.get("auditee_contact_name", ""),
             auditee_email=general_information.get("auditee_email", ""),
             auditee_name=general_information.get("auditee_name", ""),
             auditee_phone=general_information.get("auditee_phone", ""),
             auditee_contact_title=general_information.get("auditee_contact_title", ""),
-            auditee_address_line_1=general_information.get("auditee_address_line_1", ""),
+            auditee_address_line_1=general_information.get(
+                "auditee_address_line_1", ""
+            ),
             auditee_city=general_information.get("auditee_city", ""),
             auditee_state=general_information.get("auditee_state", ""),
             auditee_ein=general_information.get("ein", ""),
@@ -291,7 +293,9 @@ class ETL(object):
             auditor_state=general_information.get("auditor_state", ""),
             auditor_city=general_information.get("auditor_city", ""),
             auditor_contact_title=general_information.get("auditor_contact_title", ""),
-            auditor_address_line_1=general_information.get("auditor_address_line_1", ""),
+            auditor_address_line_1=general_information.get(
+                "auditor_address_line_1", ""
+            ),
             auditor_zip=general_information.get("auditor_zip", ""),
             auditor_country=general_information.get("auditor_country", ""),
             auditor_contact_name=general_information.get("auditor_contact_name", ""),
@@ -300,8 +304,8 @@ class ETL(object):
             auditor_foreign_addr="",  # TODO:  What does this look like in the incoming json?
             auditor_ein=general_information.get("auditor_ein", ""),
             additional_eins_covered=None,
-            cognizant_agency=self.single_audit_checklist.cognizant_agency or '',
-            oversight_agency=self.single_audit_checklist.oversight_agency or '',
+            cognizant_agency=self.single_audit_checklist.cognizant_agency or "",
+            oversight_agency=self.single_audit_checklist.oversight_agency or "",
             initial_date_received=self.single_audit_checklist.date_created,
             ready_for_certification_date=dates_by_status[
                 self.single_audit_checklist.STATUS.READY_FOR_CERTIFICATION
@@ -349,16 +353,32 @@ class ETL(object):
             ]:
                 sec_auditor = SecondaryAuditor(
                     report_id=self.single_audit_checklist.report_id,
-                    auditor_ein=secondary_auditor.get("secondary_auditor_ein",""),
-                    auditor_name=secondary_auditor.get("secondary_auditor_name",""),
-                    contact_name=secondary_auditor.get( "secondary_auditor_contact_name" ,""),
-                    contact_title=secondary_auditor.get( "secondary_auditor_contact_title" ,""),
-                    contact_email=secondary_auditor.get( "secondary_auditor_contact_email" ,""),
-                    contact_phone=secondary_auditor.get( "secondary_auditor_contact_phone" ,""),
-                    address_street=secondary_auditor.get( "secondary_auditor_address_street" ,""),
-                    address_city=secondary_auditor.get( "secondary_auditor_address_city" ,""),
-                    address_state=secondary_auditor.get( "secondary_auditor_address_state" ,""),
-                    address_zipcode=secondary_auditor.get( "secondary_auditor_address_zipcode" ,""),
+                    auditor_ein=secondary_auditor.get("secondary_auditor_ein", ""),
+                    auditor_name=secondary_auditor.get("secondary_auditor_name", ""),
+                    contact_name=secondary_auditor.get(
+                        "secondary_auditor_contact_name", ""
+                    ),
+                    contact_title=secondary_auditor.get(
+                        "secondary_auditor_contact_title", ""
+                    ),
+                    contact_email=secondary_auditor.get(
+                        "secondary_auditor_contact_email", ""
+                    ),
+                    contact_phone=secondary_auditor.get(
+                        "secondary_auditor_contact_phone", ""
+                    ),
+                    address_street=secondary_auditor.get(
+                        "secondary_auditor_address_street", ""
+                    ),
+                    address_city=secondary_auditor.get(
+                        "secondary_auditor_address_city", ""
+                    ),
+                    address_state=secondary_auditor.get(
+                        "secondary_auditor_address_state", ""
+                    ),
+                    address_zipcode=secondary_auditor.get(
+                        "secondary_auditor_address_zipcode", ""
+                    ),
                 )
                 sec_auditor.save()
 
@@ -446,5 +466,4 @@ class ETL(object):
             logger.error(
                 f"General must be loaded before AuditInfo. report_id = {report_id}"
             )
-            
         return general

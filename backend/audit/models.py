@@ -241,7 +241,6 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         null=True,
     )
 
-
     # General Information
     # The general information fields are currently specified in two places:
     #   - report_submission.forms.GeneralInformationForm
