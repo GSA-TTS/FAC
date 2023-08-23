@@ -10,24 +10,15 @@ services:
       - postgres-data:/var/lib/postgresql/data/
     ports:
       - "5432:5432"
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -d postgres -U postgres"]
-      interval: 10s
-      timeout: 5s
-      retries: 10
 
   web:
     image: ghcr.io/gsa-tts/fac/web-container:latest
     command: /src/run.sh
     depends_on:
-      db:
-        condition: service_healthy
-      minio:
-        condition: service_started
-      # load:
-      #   condition: service_completed_successfully
-      clamav-rest:
-        condition: service_started
+      - db
+      - minio
+      - api
+
     environment:
       DATABASE_URL: postgres://postgres@db/postgres
       POSTGREST_URL: http://api:3000
@@ -41,6 +32,7 @@ services:
       AV_SCAN_URL: http://clamav-rest:9000/scan
       DISABLE_AUTH: ${DISABLE_AUTH:-False}
       PGRST_JWT_SECRET: ${PGRST_JWT_SECRET:-32_chars_fallback_secret_testing} # Fallback value for testing environments
+
     env_file:
       - ".env"
     ports:
@@ -78,11 +70,7 @@ services:
       PGRST_DB_SCHEMAS: "api_v1_0_0_beta"
       PGRST_JWT_SECRET: ${PGRST_JWT_SECRET:-32_chars_fallback_secret_testing} # Fallback value for testing environments
     depends_on:
-      db:
-        condition: service_healthy
-      # load:
-      #   condition: service_completed_successfully
-      
+      - db
 volumes:
   postgres-data:
   minio-vol:

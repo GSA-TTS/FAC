@@ -9,9 +9,12 @@ local Validations = {
     additionalProperties: false,
     properties: {
       passthrough_name: Types.string,
-      passthrough_identifying_number: Types.string,
+      passthrough_identifying_number: {
+        type: 'string',
+        minLength: 1,
+      },
     },
-    required: ['passthrough_name'],
+    required: ['passthrough_name', 'passthrough_identifying_number'],
   },
   PassThroughEntityEmpty: Types.object {
     additionalProperties: false,
@@ -19,8 +22,7 @@ local Validations = {
       passthrough_name: Base.Enum.EmptyString_Null,
       passthrough_identifying_number: Base.Enum.EmptyString_Null,
     },
-    // The passthrough number is not required
-    required: ['passthrough_name'],
+    required: ['passthrough_name', 'passthrough_identifying_number'],
   },
   DirectAwardValidations: [
     {
@@ -42,6 +44,10 @@ local Validations = {
             ],
           },
         },
+        // 20230627 MCJ Not required to be present if "Y"
+        // required: [
+        //   'entities',
+        // ],
       },
     },
     {
@@ -74,20 +80,18 @@ local Validations = {
         },
       },
       'then': {
-        oneOf: [
-          {
-            properties: {
-              loan_balance_at_audit_period_end: Types.integer {
+        properties: {
+          // 20230409 MCJ
+          // FIXME: If the answer is Y, why can the balance be N/A?
+          loan_balance_at_audit_period_end: {
+            anyOf: [
+              Types.integer {
                 minimum: 1,
               },
-            },
+              Base.Enum.NA,
+            ],
           },
-          {
-            properties: {
-              loan_balance_at_audit_period_end: Base.Enum.NA,
-            },
-          },
-        ],
+        },
         required: ['loan_balance_at_audit_period_end'],
       },
     },
@@ -157,29 +161,28 @@ local Validations = {
       },
       'then': {
         required: ['audit_report_type'],
-        // MCJ FIXME can we find in UG that this condition is true?
-        // 'if': {
-        //   properties: {
-        //     audit_report_type: {
-        //       anyOf: [
-        //         {
-        //           const: 'A',
-        //         },
-        //         {
-        //           const: 'Q',
-        //         },
-        //       ],
-        //     },
-        //   },
-        // },
-        // 'then': {
-        //   properties: {
-        //     // If it is A or Q, then the number MUST be greater than 0.
-        //     number_of_audit_findings: Types.integer {
-        //       exclusiveMinimum: 0,
-        //     },
-        //   },
-        // },
+        'if': {
+          properties: {
+            audit_report_type: {
+              anyOf: [
+                {
+                  const: 'A',
+                },
+                {
+                  const: 'Q',
+                },
+              ],
+            },
+          },
+        },
+        'then': {
+          properties: {
+            // If it is A or Q, then the number MUST be greater than 0.
+            number_of_audit_findings: Types.integer {
+              exclusiveMinimum: 0,
+            },
+          },
+        },
       },
     },
     {
@@ -211,24 +214,30 @@ local Parts = {
       //  - N/A
       //  - STATE CLUSTER, or
       //  - the designation for other cluster name
-      cluster_name: Types.string,
-      // cluster_total: Types.number {
-      //   minimum: 0,
-      // },
+      cluster_name: Base.Compound.ClusterNamesNAStateOther,
+      cluster_total: Types.number {
+        minimum: 0,
+      },
     },
     allOf: [
       {
         'if': {
           properties: {
-            cluster_name: Base.Compound.ClusterNamesNA,
+            cluster_total: Types.number {
+              const: 0,
+            },
           },
         },
         'then': {
           allOf: [
             {
               properties: {
+                cluster_name: Base.Enum.NA,
+              },
+            },
+            {
+              properties: {
                 other_cluster_name: Base.Enum.EmptyString_Null,
-
               },
             },
             {
@@ -239,66 +248,86 @@ local Parts = {
           ],
         },
       },
-      // IF we have OTHER_CLUSTER, THEN...
-      //   - other_cluster_name is required
-      //   - other_cluster_name must not be empty
-      //   - state_cluster_name must be empty
       {
+        // If I have a cluster_total greater than zero, then I
+        // must have a valid cluster name. It cannot be N/A if the
+        // cluster total is greater than zero.
         'if': {
           properties: {
-            cluster_name: {
-              const: Base.Const.OTHER_CLUSTER,
+            cluster_total: Types.number {
+              exclusiveMinimum: 0,
             },
           },
         },
         'then': {
-          required: ['other_cluster_name'],
           allOf: [
             {
               properties: {
-                other_cluster_name: Base.Compound.NonEmptyString,
+                cluster_name: Base.Compound.ClusterNamesStateOther,
               },
             },
+            // IF we have OTHER_CLUSTER, THEN...
+            //   - other_cluster_name is required
+            //   - other_cluster_name must not be empty
+            //   - state_cluster_name must be empty
             {
-              properties: {
-                state_cluster_name: Base.Enum.EmptyString_Null,
+              'if': {
+                properties: {
+                  cluster_name: {
+                    const: Base.Const.OTHER_CLUSTER,
+                  },
+                },
+              },
+              'then': {
+                required: ['other_cluster_name'],
+                allOf: [
+                  {
+                    properties: {
+                      other_cluster_name: Base.Compound.NonEmptyString,
+                    },
+                  },
+                  {
+                    properties: {
+                      state_cluster_name: Base.Enum.EmptyString_Null,
+                    },
+                  },
+                ],
+              },
+            },
+            // IF we have STATE_CLUSTER, THEN...
+            //   - state_cluster_name is required
+            //   - state_cluster_name must not be empty
+            //   - other_cluster_name must be empty
+            {
+              'if': {
+                properties: {
+                  cluster_name: {
+                    const: Base.Const.STATE_CLUSTER,
+                  },
+                },
+              },
+              'then': {
+                required: ['state_cluster_name'],
+                allOf: [
+                  {
+                    properties: {
+                      other_cluster_name: Base.Enum.EmptyString_Null,
+                    },
+                  },
+                  {
+                    properties: {
+                      state_cluster_name: Base.Compound.NonEmptyString,
+                    },
+                  },
+                ],
               },
             },
           ],
         },
       },
-      // IF we have STATE_CLUSTER, THEN...
-      //   - state_cluster_name is required
-      //   - state_cluster_name must not be empty
-      //   - other_cluster_name must be empty
-      {
-        'if': {
-          properties: {
-            cluster_name: Types.string {
-              const: Base.Const.STATE_CLUSTER,
-            },
-          },
-        },
-        'then': {
-          required: ['state_cluster_name'],
-          allOf: [
-            {
-              properties: {
-                other_cluster_name: Base.Enum.EmptyString_Null,
-              },
-            },
-            {
-              properties: {
-                state_cluster_name: Base.Compound.NonEmptyString,
-              },
-            },
-          ],
-        },
-      },
-
     ],
     // Handle all requireds conditionally?
-    required: ['cluster_name'],
+    required: ['cluster_name', 'cluster_total'],
   },
 
   DirectOrIndirectAward: Types.object {
@@ -373,23 +402,16 @@ local FederalAwardEntry = Types.object {
 local Meta = Types.object {
   additionalProperties: false,
   properties: {
-    section_name: Types.string,
+    section_name: Types.string {
+      enum: [Sheets.section_names.FEDERAL_AWARDS],
+    },
     // FIXME: 2023-08-07 MSHD: The 'Version' is currently used here as a placeholder, and it is not being enforced at the moment.
     // Once we establish a versioning pattern, we can update this and enforce it accordingly.
     version: Types.string {
       const: Sheets.WORKBOOKS_VERSION,
     },
   },
-  // allOf: [
-  //   // {
-  //   //   properties: {
-  //   //     section_name: {
-  //   //       const: Sheets.section_names.FEDERAL_AWARDS,
-  //   //     },
-  //   //   },
-  //   // },
-  // ],
-  required: [],
+  required: ['section_name'],
   title: 'Meta',
   version: 20230807,
 };

@@ -3,12 +3,12 @@ cfenv
 cryptography>=41.0.2
 django-cors-headers
 django-csp
+django-fsm
 django-logingov-backend==0.0.5
 django-storages
 Django>=4.2.3
 djangorestframework
 djangorestframework-simplejwt
-django-fsm
 environs[django]
 faker
 fs
@@ -32,4 +32,5 @@ pyyaml
 requests>=2.31.0
 sqlalchemy
 sqlparse>=0.4.4
+tblib
 uritemplate
