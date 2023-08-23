@@ -456,3 +456,6 @@ AGENCY_NAMES = get_agency_names()
 GAAP_RESULTS = get_audit_info_lists("gaap_results")
 SP_FRAMEWORK_BASIS = get_audit_info_lists("sp_framework_basis")
 SP_FRAMEWORK_OPINIONS = get_audit_info_lists("sp_framework_opinions")
+
+# Links to the most applicable static site URL. Becomes more permanent post-beta.
+STATIC_SITE_URL = "https://federalist-35af9df5-a894-4ae9-aa3d-f6d95427c7bc.sites.pages.cloud.gov/preview/gsa-tts/fac-transition-site/lh/ia-updates/"

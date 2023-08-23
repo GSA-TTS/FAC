@@ -11,10 +11,11 @@ import { testAuditorCertification } from '../support/auditor-certification.js';
 import { testAuditeeCertification } from '../support/auditee-certification.js';
 import {
   testWorkbookFederalAwards,
+  testWorkbookNotesToSEFA,
   testWorkbookFindingsUniformGuidance,
   testWorkbookFindingsText,
   testWorkbookCorrectiveActionPlan,
-  testWorkbookAdditionalUEIs
+  testWorkbookAdditionalUEIs,
 } from '../support/workbook-uploads.js';
 
 const LOGIN_TEST_EMAIL_AUDITEE = Cypress.env('LOGIN_TEST_EMAIL_AUDITEE');
@@ -60,6 +61,9 @@ describe('Full audit submission', () => {
     cy.get(".usa-link").contains("Federal Awards").click();
     testWorkbookFederalAwards(false);
 
+    cy.get(".usa-link").contains("Notes to SEFA").click();
+    testWorkbookNotesToSEFA(false);
+
     cy.get(".usa-link").contains("Audit report PDF").click();
     testPdfAuditReport(false);
 
@@ -86,19 +90,25 @@ describe('Full audit submission', () => {
     cy.get(".usa-link").contains("Auditor Certification").click();
     testAuditorCertification();
 
-    testLogoutGov();
-
-    // Login as Auditee
-    testLoginGovLogin(LOGIN_TEST_EMAIL_AUDITEE,
-      LOGIN_TEST_PASSWORD_AUDITEE,
-      LOGIN_TEST_OTP_SECRET_AUDITEE);
-
-    // Return to the report
-    cy.visit('/audit/submission-progress/2022JAN0001000017');
-
     // Auditee certification
-    cy.get(".usa-link").contains("Auditee Certification").click();
-    testAuditeeCertification();
+    cy.url().then(url => {
+      // Grab the report ID from the URL
+      const reportId = url.split('/').pop();
+
+      testLogoutGov();
+
+      // Login as Auditee
+      testLoginGovLogin(
+        LOGIN_TEST_EMAIL_AUDITEE,
+        LOGIN_TEST_PASSWORD_AUDITEE,
+        LOGIN_TEST_OTP_SECRET_AUDITEE
+      );
+
+      cy.visit(`/audit/submission-progress/${reportId}`);
+
+      cy.get(".usa-link").contains("Auditee Certification").click();
+      testAuditeeCertification();
+    })
 
     // Uncomment this block when ready to implement the certification steps.
     /*

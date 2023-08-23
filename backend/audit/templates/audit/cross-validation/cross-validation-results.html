@@ -32,13 +32,17 @@
                     {% endif %}
                     <div class="margin-top-6">
                         <button class="usa-button margin-right-105" id="begin-validation">Begin Validation</button>
-                        <a href="{% url 'audit:ReadyForCertification' report_id %}">
-                            <button class="usa-button margin-right-105"
-                                    type="button"
-                                    id="proceed-to-certification"
-                                    {% if errors.errors %}disabled{% endif %}>Proceed to certification</button>
-                        </a>
-                        <a href="{% url 'audit:SubmissionProgress' report_id %}">Return to checklist</a>
+                        {% if errors.errors %}
+                            <button class="usa-button usa-button_ margin-right-105" disabled>
+                                Proceed to certification
+                            </button>
+                        {% else %}
+                            <a href="{% url 'audit:ReadyForCertification' report_id %}" class="usa-button margin-right-105">
+                                Proceed to certification
+                            </a>
+                        {% endif %}
+                        <a class="usa-button usa-button--unstyled margin-left-2" id="cancel-cross-validation-results-link" href="{% url 'audit:SubmissionProgress' report_id %}"
+                            aria-controls="upload-cancel">Cancel</a>
                     </div>
                 </fieldset>
             </form>
