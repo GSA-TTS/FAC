@@ -1,7 +1,6 @@
 from .errors import (
     err_award_ref_not_declared,
 )
-from .utils import check_inclusion
 
 
 def check_award_ref_declaration(sac_dict, *_args, **_kwargs):
@@ -34,8 +33,8 @@ def check_award_ref_declaration(sac_dict, *_args, **_kwargs):
         if award_ref:
             reported_award_refs.add(award_ref)
 
-    is_included, diff_list = check_inclusion(reported_award_refs, declared_award_refs)
-    if not is_included:
-        errors.append({"error": err_award_ref_not_declared(diff_list)})
+    difference = reported_award_refs.difference(declared_award_refs)
+    if difference:
+        errors.append({"error": err_award_ref_not_declared(list(difference))})
 
     return errors

@@ -13,7 +13,19 @@
                     <legend class="usa-legend usa-legend--large"
                             id="{{ view_id }}"
                             id_test="upload-page__legend">{{ view_name }}</legend>
-                    <p>{{ instructions }}</p>
+                    <p>{{ instructions }} using the <a target="_blank" class="usa-link" href={{workbook_url}}>provided worksheet</a>.</p>
+
+                    {% if no_findings_disclaimer %}
+                    <div class="margin-top-4">
+                        <h2>If you do not have findings:</h2>
+                        <ol>
+                            <li>Open the workbook.</li>
+                            <li>Enter the auditee UEI.</li>
+                            <li>Save and submit the workbook.</li>
+                        </ol>
+                    </div>
+                    {% endif %}
+
                     <h4 class="usa-process-list__heading margin-top-4">Upload completed worksheet</h4>
                     <p>Save your completed worksheet as an XLSX file and upload it below.</p>
                     <div class="usa-form-group">
@@ -32,6 +44,8 @@
                     {% endif %}
                     <div hidden id="info_box" class="grid-row margin-bottom-3 margin-top-3"></div>
                     <button class="usa-button margin-bottom-8" id="continue" disabled="disabled">Return to Report Home</button>
+                    <a class="usa-button usa-button--unstyled margin-left-2" href="{% url 'audit:SubmissionProgress' report_id %}"
+                    aria-controls="upload-cancel">Cancel</a>
                 </fieldset>
             </form>
         </div>
