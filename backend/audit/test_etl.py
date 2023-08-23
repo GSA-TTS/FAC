@@ -3,6 +3,7 @@ from django.test import TestCase
 from model_bakery import baker
 from faker import Faker
 
+
 from .models import SingleAuditChecklist, User
 from dissemination.models import (
     General,
@@ -13,6 +14,8 @@ from dissemination.models import (
     FindingText,
     CapText,
     SecondaryAuditor,
+    AdditionalUei,
+    AdditionalEin,
 )
 from audit.etl import ETL
 
@@ -260,6 +263,18 @@ class ETLTests(TestCase):
             }
         }
 
+    @staticmethod
+    def _fake_additional_eins():
+        return {
+            "AdditionalEINs": {
+                "auditee_uei": "ZQGGHJH74DW7",
+                "additional_eins_entries": [
+                    {"additional_ein": "874151234"},
+                    {"additional_ein": "876505678"},
+                ],
+            }
+        }
+
     def test_load_general(self):
         self.etl.load_general()
         generals = General.objects.all()
@@ -323,9 +338,13 @@ class ETLTests(TestCase):
     def test_load_sec_auditor(self):
         self.etl.load_secondary_auditor()
         sec_auditor = SecondaryAuditor.objects.first()
+        self.assertIsNone(sec_auditor)
+        self.etl.load_general()
+        self.etl.load_secondary_auditor()
+        sec_auditor = SecondaryAuditor.objects.first()
+
         self.assertEquals(self.sac.report_id, sec_auditor.report_id)
 
-    # TODO rename to test_load_audit once frontend is available
     def todo_load_audit_information(self):
         self.etl.load_audit_info()
         general = General.objects.first()
@@ -337,6 +356,8 @@ class ETLTests(TestCase):
         tables."""
         len_general = len(General.objects.all())
         len_captext = len(CapText.objects.all())
+        len_additional_ueis = len(AdditionalUei.objects.all())
+        len_additional_eins = len(AdditionalEin.objects.all())
         sac = SingleAuditChecklist.objects.create(
             submitted_by=self.user,
             general_information=self._fake_general(),
@@ -347,7 +368,8 @@ class ETLTests(TestCase):
             corrective_action_plan=self._fake_corrective_action_plan(),
             secondary_auditors=self._fake_secondary_auditors(),
             additional_ueis=self._fake_additional_ueis(),
-            # audit_information=self._fake_audit_information(),  # TODO: Uncomment when SingleAuditChecklist adds audit_information
+            additional_eins=self._fake_additional_eins(),
+            audit_information=self._fake_audit_information(),  # TODO: Uncomment when SingleAuditChecklist adds audit_information
         )
         sac.save()
         self.sac = sac
@@ -356,6 +378,8 @@ class ETLTests(TestCase):
         self.etl.load_all()
         self.assertLess(len_general, len(General.objects.all()))
         self.assertLess(len_captext, len(CapText.objects.all()))
+        self.assertLess(len_additional_ueis, len(AdditionalUei.objects.all()))
+        self.assertLess(len_additional_eins, len(AdditionalEin.objects.all()))
 
     def test_load_all_with_errors_1(self):
         """IWe should not encounter a key error in general,

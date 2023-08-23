@@ -39,6 +39,7 @@ class ETL(object):
             self.load_captext,
             self.load_note,
             self.load_additional_uei,
+            self.load_additional_ein,
             self.load_audit_info,
         )
         for load_method in load_methods:

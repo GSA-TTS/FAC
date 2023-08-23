@@ -234,10 +234,12 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
     # Computed fields
     cognizant_agency = models.CharField(
         max_length=2,
+        blank=True,
         null=True,
     )
     oversight_agency = models.CharField(
         max_length=2,
+        blank=True,
         null=True,
     )
 
