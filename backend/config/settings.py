@@ -460,7 +460,9 @@ SP_FRAMEWORK_OPINIONS = get_audit_info_lists("sp_framework_opinions")
 # Are we in a test environment?
 TEST_RUN = len(sys.argv) > 1 and sys.argv[1] == "test"
 
-ENABLE_DEBUG_TOOLBAR = env.bool("ENABLE_DEBUG_TOOLBAR", False) and not TEST_RUN
+ENABLE_DEBUG_TOOLBAR = (
+    env.bool("ENABLE_DEBUG_TOOLBAR", False) and ENVIRONMENT == "LOCAL" and not TEST_RUN
+)
 
 # Django debug toolbar setup
 if ENABLE_DEBUG_TOOLBAR:
