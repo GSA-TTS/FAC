@@ -110,12 +110,13 @@ class ETL(object):
 
     def load_federal_award(self):
         federal_awards = self.single_audit_checklist.federal_awards
-        report_id = self.single_audit_checklist.report_id
-        try:
-            general = General.objects.get(report_id=report_id)
-        except General.DoesNotExist:
+        general = self._get_general()
+        if not general:
             logger.error(
-                f"General must be loaded before FederalAward. report_id = {report_id}"
+                f"""
+                General must be loaded before FederalAward.
+                report_id = {self.single_audit_checklist.report_id}"
+                """
             )
             return
         general.total_amount_expended = federal_awards["FederalAwards"].get(
@@ -288,7 +289,7 @@ class ETL(object):
             auditee_state=general_information.get("auditee_state", ""),
             auditee_ein=general_information.get("ein", ""),
             auditee_uei=general_information.get("auditee_uei", ""),
-            additional_ueis_covered=None,
+            additional_ueis_covered=general_information.get("multiple_eins_covered") == 'Y',
             auditee_zip=general_information.get("auditee_zip", ""),
             auditor_phone=general_information.get("auditor_phone", ""),
             auditor_state=general_information.get("auditor_state", ""),
@@ -304,7 +305,7 @@ class ETL(object):
             auditor_firm_name=general_information.get("auditor_firm_name", ""),
             auditor_foreign_addr="",  # TODO:  What does this look like in the incoming json?
             auditor_ein=general_information.get("auditor_ein", ""),
-            additional_eins_covered=None,
+            additional_eins_covered=general_information.get("multiple_ueis_covered") == 'Y',
             cognizant_agency=self.single_audit_checklist.cognizant_agency or "",
             oversight_agency=self.single_audit_checklist.oversight_agency or "",
             initial_date_received=self.single_audit_checklist.date_created,
@@ -332,6 +333,9 @@ class ETL(object):
             entity_type=general_information.get("user_provided_organization_type", ""),
             number_months=num_months,
             audit_period_covered=general_information.get("audit_period_covered", ""),
+            secondary_auditors_exist=general_information.get(
+                "secondary_auditors_exist"
+            ) == 'Y',
             total_amount_expended=None,  # loaded from FederalAward
             type_audit_code="UG",
             is_public=self.single_audit_checklist.is_public,
@@ -346,7 +350,7 @@ class ETL(object):
         secondary_auditors = self.single_audit_checklist.secondary_auditors
         if not secondary_auditors:
             general.secondary_auditors_exist = False
-            general.save
+            general.save()
             return
         if "secondary_auditors_entries" in secondary_auditors["SecondaryAuditors"]:
             for secondary_auditor in secondary_auditors["SecondaryAuditors"][
@@ -384,38 +388,24 @@ class ETL(object):
                 sec_auditor.save()
 
     def load_additional_uei(self):
-        general = self._get_general()
-        if not general:
-            return
         addl_ueis = self.single_audit_checklist.additional_ueis
         if not addl_ueis:
-            general.additional_ueis_covered = False
-            general.save
             return
         if "AdditionalUEIs" in addl_ueis:
-            general.additional_ueis_covered = True
-            general.save
             for uei in addl_ueis["AdditionalUEIs"]["additional_ueis_entries"]:
                 AdditionalUei(
-                    report_id=general.report_id,
+                    report_id=self.single_audit_checklist.report_id,
                     additional_uei=uei["additional_uei"],
                 ).save()
 
     def load_additional_ein(self):
-        general = self._get_general()
-        if not general:
-            return
         addl_eins = self.single_audit_checklist.additional_eins
         if not addl_eins:
-            general.additional_eins_covered = False
-            general.save
             return
         if "AdditionalEINs" in addl_eins:
-            general.additional_eins_covered = True
-            general.save
             for ein in addl_eins["AdditionalEINs"]["additional_eins_entries"]:
                 AdditionalEin(
-                    report_id=general.report_id,
+                    report_id=self.single_audit_checklist.report_id,
                     additional_ein=ein["additional_ein"],
                 ).save()
 
@@ -428,11 +418,7 @@ class ETL(object):
             logger.warning("No audit info found to load")
             return
         general.gaap_results = audit_information.get("gaap_results", "")
-        general.sp_framework = (
-            audit_information.get("sp_framework_basis", "")
-            if "sp_framework_basis" in audit_information
-            else "",
-        )
+        general.sp_framework = audit_information.get("sp_framework_basis", "")
         general.is_sp_framework_required = (
             audit_information["is_sp_framework_required"] == "Y"
         )
