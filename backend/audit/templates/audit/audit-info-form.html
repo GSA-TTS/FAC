@@ -1,18 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
 {% block content %}
-    <header class="usa-header usa-header-basic bg-primary-darker">
-        <div class="usa-nav-container">
-            <div class="usa-navbar bg-primary-darker text-white width-full flex">
-                <p class="margin-left-2">
-                    <a href="/" class="text-gray-10">My audit submissions</a> »
-                    <a href="{% url 'audit:SubmissionProgress' report_id %}"
-                       class="text-gray-10">{{ auditee_name | default_if_none:'' }}</a> »
-                    <span class="text-bold">Audit information</span>
-                </p>
-            </div>
-        </div>
-    </header>
     <div class="grid-container margin-top-6">
         <div class="grid-col grid-gap">
             {% comment %} {% include "../sidenav.html" %} {% endcomment %}
@@ -53,7 +41,7 @@
                     {% endfor %}
                     <span class="usa-error-message margin-top-2">{{ form.errors.gaap_results|striptags }}</span>
                 </fieldset>
-                <div id="sp_framework_section">
+                <div class="margin-left-10" id="sp_framework_section">
                     <fieldset class="usa-fieldset margin-top-2">
                         <legend>
                             If the financial statements of the auditee were prepared in accordance with GAAP, proceed to question b.
@@ -64,7 +52,6 @@
                                 <input id="sp_framework_basis--{{ pair.tag }}"
                                     name="sp_framework_basis"
                                     class="usa-radio__input"
-                                    required
                                     type="radio"
                                     value="{{ pair.tag }}"
                                     {% if pair.tag in form.cleaned_data.sp_framework_basis %}checked{% endif %} />
@@ -81,7 +68,6 @@
                             <input id="is_sp_framework_required--true"
                                 name="is_sp_framework_required"
                                 class="usa-radio__input"
-                                required
                                 type="radio"
                                 value="True"
                                 {% if form.cleaned_data.is_sp_framework_required is True %}checked{% endif %} />
@@ -108,7 +94,6 @@
                                 <input id="sp_framework_opinions--{{ pair.tag }}"
                                     name="sp_framework_opinions"
                                     class="usa-checkbox__input"
-                                    required
                                     type="checkbox"
                                     value="{{ pair.tag }}"
                                     {% if pair.tag in form.cleaned_data.sp_framework_opinions %}checked{% endif %} />
@@ -317,6 +302,8 @@
                 <button class="usa-button margin-top-2 margin-bottom-10"
                         id="continue"
                         name="continue">Save and continue to the next section</button>
+                <a class="usa-button usa-button--unstyled margin-left-2" href="{% url 'audit:SubmissionProgress' report_id %}"
+                    aria-controls="upload-cancel">Cancel</a>
             </form>
         </div>
     </div>

@@ -15,7 +15,7 @@
                         id="single-audit-submission">
                         {% include './icon-list-icon.html' with completed=single_audit_checklist.created %}
                         <div class="text-success-darker">
-                            <p class="text-bold text-underline margin-0">Single audit submission (Complete)</p>
+                            <p class="text-bold text-underline margin-0">General information form (Complete)</p>
                             <p class="margin-0">
                                 Begin your single audit submission by entering basic information about the auditee organization.
                             </p>
@@ -26,7 +26,35 @@
                             </p>
                         </div>
                     </li>
-                    
+
+                    {% comment %} Audit Information Form {% endcomment %}
+                    <li class="usa-icon-list__item padding-bottom-105"
+                        id="audit-info-completed">
+                        {% if audit_information.completed %}
+                            {% include './icon-list-icon.html' with completed=audit_information.completed %}
+                            <div class="text-success-darker">
+                                <p class="text-bold text-underline margin-0">Audit Information Form (Complete)</p>
+                                <p class="margin-0">
+                                    This form is completed by both the auditee and auditor. Auditees complete this section using the Summary Schedule of Prior Audit Findings and Auditors complete this section using the information in the financial statement audit.
+                                </p>
+                                {% include './created-by.html' with time=audit_information.completed_date name=audit_information.created_by %}
+                                <p class="margin-0">
+                                    <a class="usa-link" href="{% url 'audit:AuditInfoForm' report_id %}">Edit the Audit Information Form</a>
+                                </p>
+                            </div>
+                        {% else %}
+                            {% include './icon-list-icon.html' with completed=audit_information.completed %}
+                            <div>
+                                <p class="text-bold margin-0">
+                                    <a class="usa-link" href="{% url 'audit:AuditInfoForm' report_id %}">Audit Information Form</a>
+                                </p>
+                                <p class="margin-0">
+                                    This form is completed by both the auditee and auditor. Auditees complete this section using the Summary Schedule of Prior Audit Findings and Auditors complete this section using the information in the financial statement audit.
+                                </p>
+                            </div>
+                        {% endif %}
+                    </li>
+
                     {% comment %} Audit report PDF {% endcomment %}
                     <li class="usa-icon-list__item padding-bottom-105"
                         id="audit-report-completed">
@@ -84,21 +112,51 @@
                             </div>
                         {% endif %}
                     </li>
+
+                    {% comment %} Workbook 2: Notes to SEFA {% endcomment %}
+                    <li class="usa-icon-list__item padding-bottom-105"
+                        id="notes-to-sefa-completed">
+                        {% if notes_to_sefa.completed %}
+                            {% include './icon-list-icon.html' with completed=notes_to_sefa.completed %}
+                            <div class="text-success-darker">
+                                <p class="text-bold text-underline margin-0">Workbook 2: Notes to SEFA (Complete)</p>
+                                <p class="margin-0">
+                                    This workbook covers notes on the Schedule of Expenditures of Federal Awards (SEFA). Enter the information of each Federal awards program from which the auditee received funds, even if they don't have audit findings.
+                                </p>
+                                {% include './created-by.html' with time=notes_to_sefa.completed_date name=notes_to_sefa.created_by %}
+                                <p class="margin-0">
+                                    <a class="usa-link"
+                                       href="{% url 'report_submission:notes-to-sefa' report_id %}">Re-upload Workbook 2: Notes to SEFA</a>
+                                </p>
+                            </div>
+                        {% else %}
+                            {% include './icon-list-icon.html' with completed=notes_to_sefa.completed %}
+                            <div>
+                                <p class="text-bold margin-0">
+                                    <a class="usa-link"
+                                       href="{% url 'report_submission:notes-to-sefa' report_id %}">Upload Workbook 2: Notes to SEFA</a>
+                                </p>
+                                <p class="margin-0">
+                                    This workbook covers notes on the Schedule of Expenditures of Federal Awards (SEFA). Enter the information of each Federal awards program from which the auditee received funds, even if they don't have audit findings.
+                                </p>
+                            </div>
+                        {% endif %}
+                    </li>
                     
-                    {% comment %} Workbook 2: Federal Awards Audit Findings {% endcomment %}
+                    {% comment %} Workbook 3: Federal Awards Audit Findings {% endcomment %}
                     <li class="usa-icon-list__item padding-bottom-105"
                         id="audit-findings-completed">
                         {% if findings_uniform_guidance.completed %}
                             {% include './icon-list-icon.html' with completed=findings_uniform_guidance.completed %}
                             <div class="text-success-darker">
-                                <p class="text-bold text-underline margin-0">Workbook 2: Federal Awards Audit Findings (Complete)</p>
+                                <p class="text-bold text-underline margin-0">Workbook 3: Federal Awards Audit Findings (Complete)</p>
                                 <p class="margin-0">
                                     Complete this section using the Summary Schedule of Prior Audit Findings and the information in the financial statement audit. If there are no audit findings listed in Workbook 1: Federal Awards, you do not need to complete this workbook.
                                 </p>
                                 {% include './created-by.html' with time=findings_uniform_guidance.completed_date name=findings_uniform_guidance.created_by %}
                                 <p class="margin-0">
                                     <a class="usa-link"
-                                       href="{% url 'report_submission:audit-findings' report_id %}">Re-upload Workbook 2: Federal Awards Audit Findings</a>
+                                       href="{% url 'report_submission:audit-findings' report_id %}">Re-upload Workbook 3: Federal Awards Audit Findings</a>
                                 </p>
                             </div>
                         {% else %}
@@ -106,7 +164,7 @@
                             <div>
                                 <p class="text-bold margin-0">
                                     <a class="usa-link"
-                                       href="{% url 'report_submission:audit-findings' report_id %}">Upload Workbook 2: Federal Awards Audit Findings</a>
+                                       href="{% url 'report_submission:audit-findings' report_id %}">Upload Workbook 3: Federal Awards Audit Findings</a>
                                 </p>
                                 <p class="margin-0">
                                     Complete this section using the Summary Schedule of Prior Audit Findings and the information in the financial statement audit. If there are no audit findings listed in Workbook 1: Federal Awards, you do not need to complete this workbook.
@@ -115,20 +173,20 @@
                         {% endif %}
                     </li>
                     
-                    {% comment %} Workbook 3: Federal Awards Audit Findings Text {% endcomment %}
+                    {% comment %} Workbook 4: Federal Awards Audit Findings Text {% endcomment %}
                     <li class="usa-icon-list__item padding-bottom-105"
                         id="findings-text-completed">
                         {% if findings_text.completed %}
                             {% include './icon-list-icon.html' with completed=findings_text.completed %}
                             <div class="text-success-darker">
-                                <p class="text-bold text-underline margin-0">Workbook 3: Federal Awards Audit Findings Text (Complete)</p>
+                                <p class="text-bold text-underline margin-0">Workbook 4: Federal Awards Audit Findings Text (Complete)</p>
                                 <p class="margin-0">
                                     Enter the full text of the audit finding, listing each finding only once, even if they relate to more than one program. Include the audit finding reference number for each. If there are no audit findings listed in Workbook 1: Federal Awards, you do not need to complete this workbook.
                                 </p>
                                 {% include './created-by.html' with time=findings_text.completed_date name=findings_text.created_by %}
                                 <p class="margin-0">
                                     <a class="usa-link"
-                                       href="{% url 'report_submission:audit-findings-text' report_id %}">Re-upload Workbook 3: Federal Awards Audit Findings Text</a>
+                                       href="{% url 'report_submission:audit-findings-text' report_id %}">Re-upload Workbook 4: Federal Awards Audit Findings Text</a>
                                 </p>
                             </div>
                         {% else %}
@@ -136,7 +194,7 @@
                             <div>
                                 <p class="text-bold margin-0">
                                     <a class="usa-link"
-                                       href="{% url 'report_submission:audit-findings-text' report_id %}">Upload Workbook 3: Federal Awards Audit Findings Text</a>
+                                       href="{% url 'report_submission:audit-findings-text' report_id %}">Upload Workbook 4: Federal Awards Audit Findings Text</a>
                                 </p>
                                 <p class="margin-0">
                                     Enter the full text of the audit finding, listing each finding only once, even if they relate to more than one program. Include the audit finding reference number for each. If there are no audit findings listed in Workbook 1: Federal Awards, you do not need to complete this workbook.
@@ -145,26 +203,26 @@
                         {% endif %}
                     </li>
                     
-                    {% comment %} Workbook 4: Corrective Action Plan (CAP) {% endcomment %}
+                    {% comment %} Workbook 5: Corrective Action Plan (CAP) {% endcomment %}
                     <li class="usa-icon-list__item padding-bottom-105"
                         id="CAP-text-completed">
                         {% if corrective_action_plan.completed %}
                             {% include './icon-list-icon.html' with completed=corrective_action_plan.completed %}
                             <div class="text-success-darker">
-                                <p class="text-bold text-underline margin-0">Workbook 4: Corrective Action Plan (CAP) (Complete)</p>
+                                <p class="text-bold text-underline margin-0">Workbook 5: Corrective Action Plan (CAP) (Complete)</p>
                                 <p class="margin-0">
                                     This information should match the data you entered in the Findings Text workbook. You only need to enter plans for findings once if they relate to more than one program. If there are no audit findings listed in Workbook 1: Federal Awards, you do not need to complete this workbook.
                                 </p>
                                 {% include './created-by.html' with time=corrective_action_plan.completed_date name=corrective_action_plan.created_by %}
                                 <p class="margin-0">
-                                    <a class="usa-link" href="{% url 'report_submission:CAP' report_id %}">Re-upload Workbook 4: Corrective Action Plan (CAP)</a>
+                                    <a class="usa-link" href="{% url 'report_submission:CAP' report_id %}">Re-upload Workbook 5: Corrective Action Plan (CAP)</a>
                                 </p>
                             </div>
                         {% else %}
                             {% include './icon-list-icon.html' with completed=corrective_action_plan.completed %}
                             <div>
                                 <p class="text-bold margin-0">
-                                    <a class="usa-link" href="{% url 'report_submission:CAP' report_id %}">Upload Workbook 4: Corrective Action Plan (CAP)</a>
+                                    <a class="usa-link" href="{% url 'report_submission:CAP' report_id %}">Upload Workbook 5: Corrective Action Plan (CAP)</a>
                                 </p>
                                 <p class="margin-0">
                                     This information should match the data you entered in the Findings Text workbook. You only need to enter plans for findings once if they relate to more than one program. If there are no audit findings listed in Workbook 1: Federal Awards, you do not need to complete this workbook.
@@ -173,49 +231,21 @@
                         {% endif %}
                     </li>
                     
-                    {% comment %} Audit Information Form {% endcomment %}
-                    <li class="usa-icon-list__item padding-bottom-105"
-                        id="audit-info-completed">
-                        {% if audit_information.completed %}
-                            {% include './icon-list-icon.html' with completed=audit_information.completed %}
-                            <div class="text-success-darker">
-                                <p class="text-bold text-underline margin-0">Audit Information Form (Complete)</p>
-                                <p class="margin-0">
-                                    This form is completed by both the auditee and auditor. Auditees complete this section using the Summary Schedule of Prior Audit Findings and Auditors complete this section using the information in the financial statement audit.
-                                </p>
-                                {% include './created-by.html' with time=audit_information.completed_date name=audit_information.created_by %}
-                                <p class="margin-0">
-                                    <a class="usa-link" href="{% url 'audit:AuditInfoForm' report_id %}">Edit the Audit Information Form</a>
-                                </p>
-                            </div>
-                        {% else %}
-                            {% include './icon-list-icon.html' with completed=audit_information.completed %}
-                            <div>
-                                <p class="text-bold margin-0">
-                                    <a class="usa-link" href="{% url 'audit:AuditInfoForm' report_id %}">Audit Information Form</a>
-                                </p>
-                                <p class="margin-0">
-                                    This form is completed by both the auditee and auditor. Auditees complete this section using the Summary Schedule of Prior Audit Findings and Auditors complete this section using the information in the financial statement audit.
-                                </p>
-                            </div>
-                        {% endif %}
-                    </li>
-                    
-                    {% comment %} Workbook 5: Additional UEIs (optional) {% endcomment %}
+                    {% comment %} Workbook 6: Additional UEIs (optional) {% endcomment %}
                     {% if additional_ueis.display != "hidden" %}
                         <li class="usa-icon-list__item padding-bottom-105"
                             id="additional-UEIs-completed">
                             {% if additional_ueis.completed %}
                                 {% include './icon-list-icon.html' with completed=additional_ueis.completed %}
                                 <div class="text-success-darker">
-                                    <p class="text-bold text-underline margin-0">Workbook 5: Additional UEIs (Complete)</p>
+                                    <p class="text-bold text-underline margin-0">Workbook 6: Additional UEIs (Complete)</p>
                                     <p class="margin-0">
                                         This workbook is only necessary if multiple the audit report covers UEIs. It is completed by the auditee. List the additional UEIs covered by the audit, excluding the primary UEI.
                                     </p>
                                     {% include './created-by.html' with time=additional_ueis.completed_date name=additional_ueis.created_by %}
                                     <p class="margin-0">
                                         <a class="usa-link"
-                                        href="{% url 'report_submission:additional-ueis' report_id %}">Re-upload Workbook 5: Additional UEIs</a>
+                                        href="{% url 'report_submission:additional-ueis' report_id %}">Re-upload Workbook 6: Additional UEIs</a>
                                     </p>
                                 </div>
                             {% else %}
@@ -223,7 +253,7 @@
                                 <div>
                                     <p class="text-bold margin-0">
                                         <a class="usa-link"
-                                        href="{% url 'report_submission:additional-ueis' report_id %}">Upload Workbook 5: Additional UEIs (optional)</a>
+                                        href="{% url 'report_submission:additional-ueis' report_id %}">Upload Workbook 6: Additional UEIs (optional)</a>
                                     </p>
                                     <p class="margin-0">
                                         This workbook is only necessary if multiple the audit report covers UEIs. It is completed by the auditee. List the additional UEIs covered by the audit, excluding the primary UEI.
@@ -233,21 +263,21 @@
                         </li>
                     {% endif %}
                     
-                    {% comment %} Upload Workbook 6: Secondary Auditors (optional) {% endcomment %}
+                    {% comment %} Upload Workbook 7: Secondary Auditors (optional) {% endcomment %}
                     {% if secondary_auditors.display != "hidden" %}
                         <li class="usa-icon-list__item padding-bottom-105"
                             id="secondary-auditors-completed">
                             {% if secondary_auditors.completed %}
                                 {% include './icon-list-icon.html' with completed=secondary_auditors.completed %}
                                 <div class="text-success-darker">
-                                    <p class="text-bold text-underline margin-0">Workbook 6: Secondary Auditors (Complete)</p>
+                                    <p class="text-bold text-underline margin-0">Workbook 7: Secondary Auditors (Complete)</p>
                                     <p class="margin-0">
                                         This workbook is only necessary if multiple auditors did the audit work. In these cases, the secondary auditors should enter their information in this workbook.
                                     </p>
                                     {% include './created-by.html' with time=secondary_auditors.completed_date name=secondary_auditors.created_by %}
                                     <p class="margin-0">
                                         <a class="usa-link"
-                                        href="{% url 'report_submission:secondary-auditors' report_id %}">Re-upload Workbook 6: Secondary Auditors</a>
+                                        href="{% url 'report_submission:secondary-auditors' report_id %}">Re-upload Workbook 7: Secondary Auditors</a>
                                     </p>
                                 </div>
                             {% else %}
@@ -255,10 +285,42 @@
                                 <div>
                                     <p class="text-bold margin-0">
                                         <a class="usa-link"
-                                        href="{% url 'report_submission:secondary-auditors' report_id %}">Upload Workbook 6: Secondary Auditors (optional)</a>
+                                        href="{% url 'report_submission:secondary-auditors' report_id %}">Upload Workbook 7: Secondary Auditors (optional)</a>
                                     </p>
                                     <p class="margin-0">
                                         This workbook is only necessary if multiple auditors did the audit work. In these cases, the secondary auditors should enter their information in this workbook.
+                                    </p>
+                                </div>
+                            {% endif %}
+                        </li>
+                    {% endif %}
+
+                    {% comment %} Upload Workbook 8: Secondary Auditors (optional) {% endcomment %}
+                    {% if additional_eins.display != "hidden" %}
+                        <li class="usa-icon-list__item padding-bottom-105"
+                            id="additional-eins-completed">
+                            {% if additional_eins.completed %}
+                                {% include './icon-list-icon.html' with completed=additional_eins.completed %}
+                                <div class="text-success-darker">
+                                    <p class="text-bold text-underline margin-0">Workbook 8: Additional EINs (Complete)</p>
+                                    <p class="margin-0">
+                                        This workbook is only necessary if the audit report covers multiple EINs. List the additional EINs covered by the audit, excluding the primary EIN.
+                                    </p>
+                                    {% include './created-by.html' with time=additional_eins.completed_date name=additional_eins.created_by %}
+                                    <p class="margin-0">
+                                        <a class="usa-link"
+                                        href="{% url 'report_submission:additional-eins' report_id %}">Re-upload Workbook 8: Additional EINs</a>
+                                    </p>
+                                </div>
+                            {% else %}
+                                {% include './icon-list-icon.html' with completed=additional_eins.completed %}
+                                <div>
+                                    <p class="text-bold margin-0">
+                                        <a class="usa-link"
+                                        href="{% url 'report_submission:additional-eins' report_id %}">Upload Workbook 8: Additional EINs (optional)</a>
+                                    </p>
+                                    <p class="margin-0">
+                                        This workbook is only necessary if the audit report covers multiple EINs. List the additional EINs covered by the audit, excluding the primary EIN.
                                     </p>
                                 </div>
                             {% endif %}

@@ -34,6 +34,15 @@ export function testWorkbookFederalAwards(will_intercept = true) {
   );
 }
 
+export function testWorkbookNotesToSEFA(will_intercept = true) {
+  testWorkbookUpload(
+    '/audit/excel/notes-to-sefa/*',
+    '#file-input-notes-to-sefa-xlsx',
+    'test_workbooks/notes-to-sefa-workbook.xlsx',
+    will_intercept
+  );
+}
+
 export function testWorkbookFindingsUniformGuidance(will_intercept = true) {
   testWorkbookUpload(
     '/audit/excel/findings-uniform-guidance/',

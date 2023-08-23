@@ -6,7 +6,10 @@ import { testValidAuditeeInfo } from '../support/auditee-info.js';
 import { testValidGeneralInfo } from '../support/general-info.js';
 import { testAuditInformationForm } from '../support/audit-info-form.js';
 import { testPdfAuditReport } from '../support/report-pdf.js';
+import { testAuditorCertification } from '../support/auditor-certification.js';
+import { testAuditeeCertification } from '../support/auditee-certification.js';
 import { testWorkbookFederalAwards,
+         testWorkbookNotesToSEFA,
          testWorkbookFindingsUniformGuidance,
          testWorkbookFindingsText,
          testWorkbookCorrectiveActionPlan,
@@ -51,6 +54,9 @@ describe('Full audit submission', () => {
     cy.get(".usa-link").contains("Federal Awards").click();
     testWorkbookFederalAwards(false);
 
+    cy.get(".usa-link").contains("Notes to SEFA").click();
+    testWorkbookNotesToSEFA(false);
+
     cy.get(".usa-link").contains("Audit report PDF").click();
     testPdfAuditReport(false);
 
@@ -73,19 +79,17 @@ describe('Full audit submission', () => {
     cy.get(".usa-link").contains("Pre-submission validation").click();
     testCrossValidation();
 
-    // Uncomment this block when ready to implement the certification steps.
-    /*
-
     // Second, auditor certification
     cy.get(".usa-link").contains("Auditor Certification").click();
-    // Two pages:
-    // 1. Click all the checkboxes to agree, submit and got to page 2
-    // 2. Sign and date, submit and go back to checklist
+    testAuditorCertification();
 
     // Third, auditee certification
     cy.get(".usa-link").contains("Auditee Certification").click();
+    testAuditeeCertification();
     // The same as auditor certification, with different checkboxes.
 
+    // Uncomment this block when ready to implement the certification steps.
+    /*
     // Finally, submit for processing.
     cy.get(".usa-link").contains("Submit to the FAC for processing").click();
     // This will probably take you back to the homepage, where the audit is now oof status "submitted".

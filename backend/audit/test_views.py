@@ -61,10 +61,14 @@ VALID_AUDITEE_INFO_DATA = {
 }
 
 VALID_ACCESS_AND_SUBMISSION_DATA = {
-    "certifying_auditee_contact": "a@a.com",
-    "certifying_auditor_contact": "b@b.com",
-    "auditee_contacts": ["c@c.com"],
-    "auditor_contacts": ["d@d.com"],
+    "certifying_auditee_contact_fullname": "Fuller A. Namesmith",
+    "certifying_auditee_contact_email": "a@a.com",
+    "certifying_auditor_contact_fullname": "Fuller B. Namesmith",
+    "certifying_auditor_contact_email": "b@b.com",
+    "auditee_contacts_fullname": ["Fuller C. Namesmith"],
+    "auditee_contacts_email": ["c@c.com"],
+    "auditor_contacts_fullname": ["Fuller D. Namesmith"],
+    "auditor_contacts_email": ["d@d.com"],
 }
 
 AUDIT_JSON_FIXTURES = Path(__file__).parent / "fixtures" / "json"
@@ -164,6 +168,34 @@ class EditSubmissionViewTests(TestCase):
         self.assertAlmostEquals(result.status_code, 302)
 
 
+class SubmissionViewTests(TestCase):
+    """
+    Testing for the final step: submitting.
+    """
+
+    def test_post_redirect(self):
+        """
+        The status should be "submitted" after the post.
+        The user should be redirected to the submissions table.
+        """
+        user = baker.make(User)
+        sac = baker.make(
+            SingleAuditChecklist,
+            submission_status=SingleAuditChecklist.STATUS.AUDITEE_CERTIFIED,
+        )
+        baker.make(Access, user=user, sac=sac, role="certifying_auditee_contact")
+        response = _authed_post(
+            Client(),
+            user,
+            "audit:Submission",
+            kwargs={"report_id": sac.report_id},
+            data={},
+        )
+        sac_after = SingleAuditChecklist.objects.get(report_id=sac.report_id)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(sac_after.submission_status, sac_after.STATUS.SUBMITTED)
+
+
 class SubmissionStatusTests(TestCase):
     """
     Tests the expected order of progression for submission_status.
@@ -210,6 +242,7 @@ class SubmissionStatusTests(TestCase):
         sac.findings_uniform_guidance = {
             "FindingsUniformGuidance": {"auditee_uei": "TEST0001TEST"}
         }
+        sac.notes_to_sefa = {"NotesToSefa": {"auditee_uei": "TEST0001TEST"}}
         baker.make(SingleAuditReportFile, sac=sac)
         sac.save()
 
@@ -1097,10 +1130,10 @@ class SubmissionProgressViewTests(TestCase):
         self.assertEqual(response.status_code, 403)
 
     def test_phrase_in_page(self):
-        """Check for 'Create a single audit submission'."""
+        """Check for 'General information form'."""
         baker.make(Access, user=self.user, sac=self.sac)
         self.client.force_login(user=self.user)
-        phrase = "Single audit submission"
+        phrase = "General information form"
         res = self.client.get(
             reverse(
                 "audit:SubmissionProgress", kwargs={"report_id": self.sac.report_id}

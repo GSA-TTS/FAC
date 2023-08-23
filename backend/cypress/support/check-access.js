@@ -10,7 +10,7 @@ export function addValidInfo(field) {
   const fieldType = field.split('_').pop();
   cy.get(field)
     .clear()
-    .type(fieldType === 'email' ? 'test.address-with+features@test.gsa.gov' : 'Percy A. Person')
+    .type(fieldType === 'email' ? Cypress.env('LOGIN_TEST_EMAIL') : 'Percy A. Person')
     .blur();
 }
 
@@ -18,6 +18,6 @@ export function testValidAccess() {
   cy.wrap(accessFields).each((field) => {
     addValidInfo(field);
   });
-  cy.get('.usa-button').contains('Create').click();
+  cy.get('.usa-button').contains('Save and create').click();
   cy.url().should('contains', '/report_submission/general-information/');
 }

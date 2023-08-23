@@ -11,11 +11,11 @@ local AuditInformation = Types.object {
     sp_framework_basis: Types.array {
       items: Base.Enum.SP_Framework_Basis,
     },
-    is_sp_framework_required: Types.boolean,
     sp_framework_opinions: Types.array {
       items: Base.Enum.SP_Framework_Opinions,
     },
     dollar_threshold: Types.integer,
+    is_sp_framework_required: Types.boolean,
     is_going_concern_included: Types.boolean,
     is_internal_control_deficiency_disclosed: Types.boolean,
     is_internal_control_material_weakness_disclosed: Types.boolean,
@@ -26,6 +26,76 @@ local AuditInformation = Types.object {
       items: Base.Compound.ALNPrefixes,
     },
   },
+  allOf: [
+    {
+      'if': {
+        properties: {
+          gaap_results: {
+            contains: {
+              const: 'not_gaap',
+            },
+          },
+        },
+      },
+      'then': {
+        required:['is_sp_framework_required', 'sp_framework_basis', 'sp_framework_opinions'],
+      },
+    },
+    {
+      'if': {
+        properties: {
+          gaap_results: {
+            not: {
+              contains: {
+                const: 'not_gaap',
+              },
+            },
+          },
+        },
+      },
+      'then': {
+        not: {
+          required: ['is_sp_framework_required'],
+        },
+      },
+    },
+    {
+      'if': {
+        properties: {
+          gaap_results: {
+            not: {
+              contains: {
+                const: 'not_gaap',
+              },
+            },
+          },
+        },
+      },
+      'then': {
+        not: {
+          required: ['sp_framework_basis'],
+        },
+      },
+    },
+    {
+      'if': {
+        properties: {
+          gaap_results: {
+            not: {
+              contains: {
+                const: 'not_gaap',
+              },
+            },
+          },
+        },
+      },
+      'then': {
+        not: {
+          required: ['sp_framework_opinions'],
+        },
+      },
+    }
+  ],
   required: [
     'dollar_threshold',
     'gaap_results',
@@ -50,3 +120,11 @@ local Root = Types.object {
 };
 
 AuditInformation
+
+//To manually text against data_fixtures/audit/excel_schema_test_files/audit-information-pass-01.js
+//1. Uncomment the code below and comment out the line above 
+//2. Regenerate the schema output file by running `make build_sections`
+//3. and Run `check-jsonschema --schemafile schemas/output/sections/AuditInformation.schema.json data_fixtures/audit/excel_schema_test_files/audit-information-pass-01.js`
+// Types.array {
+//       items: AuditInformation,
+// }

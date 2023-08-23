@@ -13,6 +13,8 @@ from report_submission.forms import AuditeeInfoForm, GeneralInformationForm
 
 import api.views
 
+from config.settings import STATIC_SITE_URL
+
 logger = logging.getLogger(__name__)
 
 
@@ -149,6 +151,7 @@ class GeneralInformationFormView(LoginRequiredMixin, View):
                 "auditor_contact_title": sac.auditor_contact_title,
                 "auditor_phone": sac.auditor_phone,
                 "auditor_email": sac.auditor_email,
+                "secondary_auditors_exist": sac.secondary_auditors_exist,
                 "report_id": report_id,
             }
 
@@ -174,9 +177,6 @@ class GeneralInformationFormView(LoginRequiredMixin, View):
 
             if form.is_valid():
                 general_information = sac.general_information
-                # fields = sorted(general_information.keys())
-                # for field in fields:
-                #     print(f"{field} : {general_information[field]}")
                 general_information.update(form.cleaned_data)
                 validated = validate_general_information_json(general_information)
                 sac.general_information = validated
@@ -188,12 +188,11 @@ class GeneralInformationFormView(LoginRequiredMixin, View):
         except SingleAuditChecklist.DoesNotExist as err:
             raise PermissionDenied("You do not have access to this audit.") from err
         except ValidationError as err:
-            logger.warning(
-                "ValidationError for report ID %s: %s", report_id, err.message
-            )
+            message = f"ValidationError for report ID {report_id}: {err.message}"
+            logger.warning(message)
+            raise BadRequest(message)
         except LateChangeError:
             return render(request, "audit/no-late-changes.html")
-
         raise BadRequest()
 
 
@@ -201,47 +200,66 @@ class UploadPageView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         report_id = kwargs["report_id"]
 
+        base_url = STATIC_SITE_URL + "resources/workbooks/"
+
         # Organized by URL name, page specific constants are defined here
         # Data can then be accessed by checking the current URL
         additional_context = {
             "federal-awards": {
                 "view_id": "federal-awards",
                 "view_name": "Federal awards",
-                "instructions": "Enter the federal awards you received in the last audit year using the provided worksheet.",
+                "instructions": "Enter the federal awards you received in the last audit year",
                 "DB_id": "federal_awards",
+                "workbook_url": base_url + "federal-awards/",
+            },
+            "notes-to-sefa": {
+                "view_id": "notes-to-sefa",
+                "view_name": "Notes to SEFA",
+                "instructions": "Enter the notes on the Schedule of Expenditures of Federal Awards (SEFA)",
+                "DB_id": "notes_to_sefa",
+                "workbook_url": base_url + "notes-to-sefa/",
             },
             "audit-findings": {
                 "view_id": "audit-findings",
                 "view_name": "Audit findings",
-                "instructions": "Enter the audit findings for your federal awards using the provided worksheet.",
+                "instructions": "Enter the audit findings for your federal awards",
                 "DB_id": "findings_uniform_guidance",
+                "workbook_url": base_url + "federal-awards-audit-findings/",
+                "no_findings_disclaimer": True,
             },
             "audit-findings-text": {
                 "view_id": "audit-findings-text",
                 "view_name": "Audit findings text",
-                "instructions": "Enter the text for your audit findings using the provided worksheet.",
+                "instructions": "Enter the text for your audit findings",
                 "DB_id": "findings_text",
+                "workbook_url": base_url + "federal-awards-audit-findings-text/",
+                "no_findings_disclaimer": True,
             },
             "CAP": {
                 "view_id": "CAP",
                 "view_name": "Corrective Action Plan (CAP)",
-                "instructions": "Enter your CAP text using the provided worksheet.",
+                "instructions": "Enter your CAP text",
                 "DB_id": "corrective_action_plan",
+                "workbook_url": base_url + "corrective-action-plan/",
+                "no_findings_disclaimer": True,
             },
             "additional-eins": {
                 "view_id": "additional-eins",
                 "view_name": "Additional EINs",
-                "instructions": "Enter any additional EINs using the provided worksheet.",
+                "instructions": "Enter any additional EINs",
+                "workbook_url": base_url + "additional-eins-workbook/",
             },
             "additional-ueis": {
                 "view_id": "additional-ueis",
                 "view_name": "Additional UEIs",
-                "instructions": "Enter any additional UEIs using the provided worksheet.",
+                "instructions": "Enter any additional UEIs",
+                "workbook_url": base_url + "additional-ueis-workbook/",
             },
             "secondary-auditors": {
                 "view_id": "secondary-auditors",
                 "view_name": "Secondary auditors",
-                "instructions": "Enter any additional auditors using the provided worksheet.",
+                "instructions": "Enter any additional auditors",
+                "workbook_url": base_url + "secondary-auditors-workbook/",
             },
         }
 

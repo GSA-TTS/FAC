@@ -33,6 +33,7 @@ SAMPLE_BASE_SAC_DATA = {
         "multiple_eins_covered": False,
         "auditee_uei": "ZQGGHJH74DW7",
         "multiple_ueis_covered": False,
+        "secondary_auditors_exist": True,
         "auditee_name": "Auditee McAudited",
         "auditee_address_line_1": "200 feet into left field",
         "auditee_city": "New York",
@@ -60,6 +61,13 @@ SAMPLE_BASE_SAC_DATA = {
     },
 }
 
+EMAIL_TO_ROLE = {
+    "certifying_auditee_contact_email": "certifying_auditee_contact",
+    "certifying_auditor_contact_email": "certifying_auditor_contact",
+    "auditee_contacts_email": "editor",
+    "auditor_contacts_email": "editor",
+}
+
 
 class TestPreliminaryViews(TestCase):
     """
@@ -78,10 +86,14 @@ class TestPreliminaryViews(TestCase):
         +   auditee_fiscal_period_end
     #.  /report_submission/accessandsubmission
 
-        +   certifying_auditee_contact
-        +   certifying_auditor_contact
-        +   auditee_contacts
-        +   auditor_contacts
+        +   certifying_auditee_contact_fullname
+        +   certifying_auditee_contact_email
+        +   certifying_auditor_contact_fullname
+        +   certifying_auditor_contact_email
+        +   auditee_contacts_fullname
+        +   auditee_contacts_email
+        +   auditor_contacts_fullname
+        +   auditor_contacts_email
 
     """
 
@@ -98,12 +110,14 @@ class TestPreliminaryViews(TestCase):
     }
 
     step3_data = {
-        "certifying_auditee_contact": "a@a.com",
-        "certifying_auditor_contact": "b@b.com",
-        "auditee_contacts": "c@c.com",  # noqa: F601
-        "auditee_contacts": "d@d.com",  # noqa: F601
-        "auditor_contacts": "e@e.com",  # noqa: F601
-        "auditor_contacts": "f@f.com",  # noqa: F601
+        "certifying_auditee_contact_fullname": "Fuller A. Namesmith",
+        "certifying_auditee_contact_email": "a@a.com",
+        "certifying_auditor_contact_fullname": "Fuller B. Namesmith",
+        "certifying_auditor_contact_email": "b@b.com",
+        "auditee_contacts_fullname": "Fuller C. Namesmith",
+        "auditee_contacts_email": "c@c.com",
+        "auditor_contacts_fullname": "Fuller D. Namesmith",
+        "auditor_contacts_email": "d@d.com",
     }
 
     def test_step_one_eligibility_submission_pass(self):
@@ -213,11 +227,16 @@ class TestPreliminaryViews(TestCase):
 
         accesses = Access.objects.filter(sac=sac)
         for key, val in self.step3_data.items():
-            # Fields come in as auditee/auditor contacts, become editor:
-            if key in ("auditee_contacts", "auditor_contacts"):
-                key = "editor"
-            matches = [acc for acc in accesses if acc.email == val]
-            self.assertEqual(matches[0].role, key)
+            # Fields come in as auditee/auditor emails, become roles:
+            if key in (
+                "auditee_contacts_email",
+                "auditor_contacts_email",
+                "certifying_auditee_contact_email",
+                "certifying_auditor_contact_email",
+            ):
+                key = EMAIL_TO_ROLE[key]
+                matches = [acc for acc in accesses if acc.email == val]
+                self.assertEqual(matches[0].role, key)
 
     @patch("report_submission.forms.get_uei_info_from_sam_gov")
     def test_step_two_auditeeinfo_submission_empty(self, mock_get_uei_info):
@@ -509,6 +528,7 @@ class GeneralInformationFormViewTests(TestCase):
             "multiple_eins_covered": True,
             "auditee_uei": "ZQGGHJH74DW8",
             "multiple_ueis_covered": True,
+            "secondary_auditors_exist": True,
             "auditee_name": "Auditee McAudited again",
             "auditee_address_line_1": "500 feet into left field",
             "auditee_city": "Chicago",
@@ -590,6 +610,7 @@ class GeneralInformationFormViewTests(TestCase):
             "multiple_eins_covered": False,
             "auditee_uei": "ZQGGHJH74DW8",
             "multiple_ueis_covered": False,
+            "secondary_auditors_exist": True,
             "auditee_name": "Auditee McAudited again",
             "auditee_address_line_1": "500 feet into left field",
             "auditee_city": "Chicago",

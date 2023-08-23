@@ -316,6 +316,12 @@
             "null"
          ]
       },
+      "secondary_auditors_exist": {
+         "type": [
+            "boolean",
+            "null"
+         ]
+      },
       "user_provided_organization_type": {
          "$ref": "#/$defs/UserProvidedOrganizationType"
       }
