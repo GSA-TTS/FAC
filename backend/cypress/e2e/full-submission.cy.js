@@ -17,6 +17,10 @@ import {
   testWorkbookAdditionalUEIs
 } from '../support/workbook-uploads.js';
 
+const LOGIN_TEST_EMAIL_AUDITEE = Cypress.env('LOGIN_TEST_EMAIL_AUDITEE');
+const LOGIN_TEST_PASSWORD_AUDITEE = Cypress.env('LOGIN_TEST_PASSWORD_AUDITEE');
+const LOGIN_TEST_OTP_SECRET_AUDITEE = Cypress.env('LOGIN_TEST_OTP_SECRET_AUDITEE');
+
 describe('Full audit submission', () => {
   before(() => {
     cy.visit('/');
@@ -81,12 +85,13 @@ describe('Full audit submission', () => {
     // Second, auditor certification
     cy.get(".usa-link").contains("Auditor Certification").click();
     testAuditorCertification();
-    //logout 
+
     testLogoutGov();
+
     //login as Auditee
-    testLoginGovLogin(Cypress.env.LOGIN_TEST_EMAIL_AUDITEE,
-      Cypress.env.LOGIN_TEST_PASSWORD_AUDITEE,
-      Cypress.env.LOGIN_TEST_OTP_SECRET_AUDITEE);
+    testLoginGovLogin(LOGIN_TEST_EMAIL_AUDITEE,
+      LOGIN_TEST_PASSWORD_AUDITEE,
+      LOGIN_TEST_OTP_SECRET_AUDITEE);
 
     // Third, auditee certification
     cy.get(".usa-link").contains("Auditee Certification").click();
