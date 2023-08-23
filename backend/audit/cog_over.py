@@ -67,6 +67,24 @@ def determine_2019_agency(ein):
         return cognizant_agency
     except CognizantBaseline.DoesNotExist:
         return None
+    except CognizantBaseline.MultipleObjectsReturned:
+        print("Multiple objects detected for ein = ", ein)
+        return None
+
+
+def determine_2019_agency_w_dbkey(ein, dbkey):
+    try:
+        cognizant_agency = CognizantBaseline.objects.get(
+            audit_year=2019,
+            ein=ein,
+            dbkey=dbkey,
+        ).cognizant_agency
+        return cognizant_agency
+    except CognizantBaseline.DoesNotExist:
+        return None
+    except CognizantBaseline.MultipleObjectsReturned:
+        print("Multiple objects detected for ein = ", ein)
+        return None
 
 
 def set_2019_baseline():

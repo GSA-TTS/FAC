@@ -1,7 +1,7 @@
 import os
 import sqlalchemy
 import pandas as pd
-from audit.cog_over import calc_cfda_amounts, determine_agency, determine_2019_agency
+from audit.cog_over import calc_cfda_amounts, determine_agency, determine_2019_agency_w_dbkey
 
 
 COG_LIMIT = 50_000_000
@@ -20,11 +20,10 @@ def cog_over_for_2022():
         SELECT gen."DBKEY", gen."EIN", cast(gen."TOTFEDEXPEND" as BIGINT),
                 gen."COG_OVER", gen."COGAGENCY", gen."OVERSIGHTAGENCY",
                 cfda."CFDA", cast(cfda."AMOUNT" as BIGINT), cfda."DIRECT"
-        FROM census_gen22 gen
-        LEFT JOIN census_cfda22 cfda
-        ON gen."DBKEY" = cfda."DBKEY"
-        WHERE cast(gen."TOTFEDEXPEND" as BIGINT) >= :threshold
-        AND gen."AUDITYEAR" = :ref_year
+        FROM census_gen22 gen, census_cfda22 cfda
+        WHERE gen."AUDITYEAR" = :ref_year
+        AND cast(gen."TOTFEDEXPEND" as BIGINT) >= :threshold
+        AND gen."DBKEY" = cfda."DBKEY"
         ORDER BY gen."DBKEY"
     """
     with engine.connect() as conn:
@@ -116,7 +115,7 @@ def cog_over_for_2022():
             cogover = "O"
         else:
             cogover = "C"
-            cognizant_agency = determine_2019_agency(ein)
+            cognizant_agency = determine_2019_agency_w_dbkey(ein, dbkey)
             if cognizant_agency is None:
                 cognizant_agency = agency
 
