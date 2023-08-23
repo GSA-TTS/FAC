@@ -289,7 +289,8 @@ class ETL(object):
             auditee_state=general_information.get("auditee_state", ""),
             auditee_ein=general_information.get("ein", ""),
             auditee_uei=general_information.get("auditee_uei", ""),
-            additional_ueis_covered=general_information.get("multiple_eins_covered") == 'Y',
+            additional_ueis_covered=general_information.get("multiple_eins_covered")
+            == "Y",
             auditee_zip=general_information.get("auditee_zip", ""),
             auditor_phone=general_information.get("auditor_phone", ""),
             auditor_state=general_information.get("auditor_state", ""),
@@ -305,7 +306,8 @@ class ETL(object):
             auditor_firm_name=general_information.get("auditor_firm_name", ""),
             auditor_foreign_addr="",  # TODO:  What does this look like in the incoming json?
             auditor_ein=general_information.get("auditor_ein", ""),
-            additional_eins_covered=general_information.get("multiple_ueis_covered") == 'Y',
+            additional_eins_covered=general_information.get("multiple_ueis_covered")
+            == "Y",
             cognizant_agency=self.single_audit_checklist.cognizant_agency or "",
             oversight_agency=self.single_audit_checklist.oversight_agency or "",
             initial_date_received=self.single_audit_checklist.date_created,
@@ -333,9 +335,8 @@ class ETL(object):
             entity_type=general_information.get("user_provided_organization_type", ""),
             number_months=num_months,
             audit_period_covered=general_information.get("audit_period_covered", ""),
-            secondary_auditors_exist=general_information.get(
-                "secondary_auditors_exist"
-            ) == 'Y',
+            secondary_auditors_exist=general_information.get("secondary_auditors_exist")
+            == "Y",
             total_amount_expended=None,  # loaded from FederalAward
             type_audit_code="UG",
             is_public=self.single_audit_checklist.is_public,
