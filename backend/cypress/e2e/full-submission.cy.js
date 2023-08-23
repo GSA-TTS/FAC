@@ -82,29 +82,29 @@ describe('Full audit submission', () => {
     cy.get(".usa-link").contains("Pre-submission validation").click();
     testCrossValidation();
 
-    // Second, auditor certification
+    // Auditor certification
     cy.get(".usa-link").contains("Auditor Certification").click();
     testAuditorCertification();
 
     testLogoutGov();
 
-    //login as Auditee
+    // Login as Auditee
     testLoginGovLogin(LOGIN_TEST_EMAIL_AUDITEE,
       LOGIN_TEST_PASSWORD_AUDITEE,
       LOGIN_TEST_OTP_SECRET_AUDITEE);
 
-    // Third, auditee certification
+    // Return to the report
+    cy.visit('/audit/submission-progress/2022JAN0001000017');
+
+    // Auditee certification
     cy.get(".usa-link").contains("Auditee Certification").click();
     testAuditeeCertification();
-
-    // The same as auditor certification, with different checkboxes.
 
     // Uncomment this block when ready to implement the certification steps.
     /*
     // Finally, submit for processing.
     cy.get(".usa-link").contains("Submit to the FAC for processing").click();
     // This will probably take you back to the homepage, where the audit is now oof status "submitted".
-
     */
   });
 });
