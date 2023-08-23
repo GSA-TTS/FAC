@@ -193,7 +193,9 @@ local Parts = {
       {
         'if': {
           properties: {
-            cluster_name: Base.Const.OTHER_CLUSTER,
+            cluster_name: Types.string {
+              const: Base.Const.OTHER_CLUSTER,
+            }
           },
         },
         'then': {
@@ -214,7 +216,9 @@ local Parts = {
       {
         'if': {
           properties: {
-            cluster_name: Base.Const.STATE_CLUSTER,
+            cluster_name: Types.string {
+              const: Base.Const.STATE_CLUSTER,
+            } 
           },
         },
         'then': {
@@ -232,99 +236,7 @@ local Parts = {
 
         },
       },
-      //  {
-      //     'if': {
-      //       properties: {
-      //         cluster_name: Base.Compound.ClusterNamesNA,
-      //       },
-      //     },
-      //     'then': {
-      //       not:{
-      //         required:['state_cluster_name']
-      //       }
-      //     },
-      //   }
-      // {
-      //   'if': {
-      //     properties: {
-      //       cluster_name: Base.Compound.ClusterNamesNA,
-      //     },
-      //   },
-      //   'then': {
-      //     allOf: [
-      //       {
-      //         properties: {
-      //           other_cluster_name: Base.Enum.EmptyString_Null,
-
-      //         },
-      //       },
-      //       {
-      //         properties: {
-      //           state_cluster_name: Base.Enum.EmptyString_Null,
-      //         },
-      //       },
-      //     ],
-      //   },
-      // },
-      // // IF we have OTHER_CLUSTER, THEN...
-      // //   - other_cluster_name is required
-      // //   - other_cluster_name must not be empty
-      // //   - state_cluster_name must be empty
-      // {
-      //   'if': {
-      //     properties: {
-      //       cluster_name: {
-      //         const: Base.Const.OTHER_CLUSTER,
-      //       },
-      //     },
-      //   },
-      //   'then': {
-      //     required: ['other_cluster_name'],
-      //     allOf: [
-      //       {
-      //         properties: {
-      //           other_cluster_name: Base.Compound.NonEmptyString,
-      //         },
-      //       },
-      //       {
-      //         properties: {
-      //           state_cluster_name: Base.Enum.EmptyString_Null,
-      //         },
-      //       },
-      //     ],
-      //   },
-      // },
-      // // IF we have STATE_CLUSTER, THEN...
-      // //   - state_cluster_name is required
-      // //   - state_cluster_name must not be empty
-      // //   - other_cluster_name must be empty
-      // {
-      //   'if': {
-      //     properties: {
-      //       cluster_name: Types.string {
-      //         const: Base.Const.STATE_CLUSTER,
-      //       },
-      //     },
-      //   },
-      //   'then': {
-      //     required: ['state_cluster_name'],
-      //     allOf: [
-      //       {
-      //         properties: {
-      //           other_cluster_name: Base.Enum.EmptyString_Null,
-      //         },
-      //       },
-      //       {
-      //         properties: {
-      //           state_cluster_name: Base.Compound.NonEmptyString,
-      //         },
-      //       },
-      //     ],
-      //   },
-      // },
-
     ],
-    // Handle all requireds conditionally?
     required: ['cluster_name'],
   },
 

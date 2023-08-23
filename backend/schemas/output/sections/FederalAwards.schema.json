@@ -110,7 +110,10 @@
                            {
                               "if": {
                                  "properties": {
-                                    "cluster_name": "OTHER CLUSTER NOT LISTED ABOVE"
+                                    "cluster_name": {
+                                       "const": "OTHER CLUSTER NOT LISTED ABOVE",
+                                       "type": "string"
+                                    }
                                  }
                               },
                               "then": {
@@ -133,7 +136,10 @@
                            {
                               "if": {
                                  "properties": {
-                                    "cluster_name": "STATE CLUSTER"
+                                    "cluster_name": {
+                                       "const": "STATE CLUSTER",
+                                       "type": "string"
+                                    }
                                  }
                               },
                               "then": {
