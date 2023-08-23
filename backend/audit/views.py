@@ -44,6 +44,10 @@ from audit.mixins import (
     CertifyingAuditorRequiredMixin,
     SingleAuditChecklistAccessRequiredMixin,
 )
+from audit.modellib import (
+    EventType,
+    SubmissionEvent
+)
 from audit.models import (
     Access,
     ExcelFile,
