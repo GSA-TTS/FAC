@@ -91,27 +91,17 @@
                               "then": {
                                  "allOf": [
                                     {
-                                       "properties": {
-                                          "other_cluster_name": {
-                                             "description": "Empty string or null",
-                                             "enum": [
-                                                "",
-                                                "null"
-                                             ],
-                                             "title": "EmptyString_Null"
-                                          }
+                                       "not": {
+                                          "required": [
+                                             "other_cluster_name"
+                                          ]
                                        }
                                     },
                                     {
-                                       "properties": {
-                                          "state_cluster_name": {
-                                             "description": "Empty string or null",
-                                             "enum": [
-                                                "",
-                                                "null"
-                                             ],
-                                             "title": "EmptyString_Null"
-                                          }
+                                       "not": {
+                                          "required": [
+                                             "state_cluster_name"
+                                          ]
                                        }
                                     }
                                  ]
@@ -120,79 +110,58 @@
                            {
                               "if": {
                                  "properties": {
-                                    "cluster_name": {
-                                       "const": "OTHER CLUSTER NOT LISTED ABOVE"
-                                    }
+                                    "cluster_name": "OTHER CLUSTER NOT LISTED ABOVE"
                                  }
                               },
                               "then": {
                                  "allOf": [
                                     {
-                                       "properties": {
-                                          "other_cluster_name": {
-                                             "minLength": 1,
-                                             "type": "string"
-                                          }
-                                       }
+                                       "required": [
+                                          "other_cluster_name"
+                                       ]
                                     },
                                     {
-                                       "properties": {
-                                          "state_cluster_name": {
-                                             "description": "Empty string or null",
-                                             "enum": [
-                                                "",
-                                                "null"
-                                             ],
-                                             "title": "EmptyString_Null"
-                                          }
+                                       "not": {
+                                          "required": [
+                                             "state_cluster_name"
+                                          ]
                                        }
                                     }
-                                 ],
-                                 "required": [
-                                    "other_cluster_name"
                                  ]
                               }
                            },
                            {
                               "if": {
                                  "properties": {
-                                    "cluster_name": {
-                                       "const": "STATE CLUSTER",
-                                       "type": "string"
-                                    }
+                                    "cluster_name": "STATE CLUSTER"
                                  }
                               },
                               "then": {
                                  "allOf": [
                                     {
-                                       "properties": {
-                                          "other_cluster_name": {
-                                             "description": "Empty string or null",
-                                             "enum": [
-                                                "",
-                                                "null"
-                                             ],
-                                             "title": "EmptyString_Null"
-                                          }
-                                       }
+                                       "required": [
+                                          "state_cluster_name"
+                                       ]
                                     },
                                     {
-                                       "properties": {
-                                          "state_cluster_name": {
-                                             "minLength": 1,
-                                             "type": "string"
-                                          }
+                                       "not": {
+                                          "required": [
+                                             "other_cluster_name"
+                                          ]
                                        }
                                     }
-                                 ],
-                                 "required": [
-                                    "state_cluster_name"
                                  ]
                               }
                            }
                         ],
                         "properties": {
                            "cluster_name": {
+                              "type": "string"
+                           },
+                           "other_cluster_name": {
+                              "type": "string"
+                           },
+                           "state_cluster_name": {
                               "type": "string"
                            }
                         },
@@ -573,6 +542,9 @@
          "additionalProperties": false,
          "properties": {
             "section_name": {
+               "enum": [
+                  "FederalAwardsExpended"
+               ],
                "type": "string"
             },
             "version": {
@@ -580,7 +552,9 @@
                "type": "string"
             }
          },
-         "required": [ ],
+         "required": [
+            "section_name"
+         ],
          "title": "Meta",
          "type": "object",
          "version": 20230807
