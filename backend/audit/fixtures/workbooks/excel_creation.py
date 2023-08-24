@@ -1,6 +1,7 @@
 from collections import namedtuple as NT
 from playhouse.shortcuts import model_to_dict
 import os
+import sys
 
 import logging
 
@@ -63,7 +64,7 @@ def col_to_ndx(col):
 # Helper to set a range of values.
 # Takes a named range, and then walks down the range,
 # filling in values from the list past in (values).
-def set_range(wb, range_name, values, default=None, type=str):
+def set_range(wb, range_name, values, default=None, conversion_fun=str):
     the_range = wb.defined_names[range_name]
     dest = list(the_range.destinations)[0]
     sheet_title = dest[0]
@@ -80,17 +81,17 @@ def set_range(wb, range_name, values, default=None, type=str):
             # written into the workbook.
             # print(f'{range_name} c[{row}][{col}] <- {type(v)} len({len(v)}) {default}')
             if v is not None:
-                ws.cell(row=row, column=col, value=type(v))
+                ws.cell(row=row, column=col, value=conversion_fun(v))
             if len(str(v)) == 0 and default is not None:
                 # This is less noisy. Shows up for things like
                 # empty findings counts. 2023 submissions
                 # require that field to be 0, not empty,
                 # if there are no findings.
                 # print('Applying default')
-                ws.cell(row=row, column=col, value=type(default))
+                ws.cell(row=row, column=col, value=conversion_fun(default))
         if not v:
             if default is not None:
-                ws.cell(row=row, column=col, value=type(default))
+                ws.cell(row=row, column=col, value=conversion_fun(default))
             else:
                 ws.cell(row=row, column=col, value="")
         else:
@@ -105,6 +106,15 @@ def set_uei(Gen, wb, dbkey):
 
 
 def map_simple_columns(wb, mappings, values):
+    len_passed_in = len(mappings)
+    unique_fields = set()
+    for mapping in mappings:
+        unique_fields.add(mapping.in_sheet)
+    if len_passed_in != len(unique_fields):
+        logger.info(f'unique: {len(unique_fields)} list: {len(mappings)}')
+        logger.error("You repeated a field in the mappings: {}".format(list(map(lambda m: m.in_sheet, mappings))))
+        sys.exit(-1)
+
     # Map all the simple ones
     for m in mappings:
         set_range(

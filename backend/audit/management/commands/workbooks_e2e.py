@@ -53,7 +53,6 @@ def step_through_certifications(sac, SAC):
     sac.transition_name.append(SAC.STATUS.CERTIFIED)
     sac.transition_date.append(datetime.date.today())
 
-
 def disseminate(sac):
     logger.info("Invoking movement of data from Intake to Dissemination")
     for model in [

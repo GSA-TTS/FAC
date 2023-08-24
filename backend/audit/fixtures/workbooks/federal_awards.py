@@ -28,18 +28,13 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-
 mappings = [
     FieldMap(
         "program_name", "federalprogramname", "federal_program_name", None, str
     ),
-    FieldMap("number_of_audit_findings", "findingscount", "findings_count",0, int),
-    # FieldMap("additional_award_identification", "awardidentification", WorkbookFieldInDissem, None, str),
-    # FieldMap("cluster_name", "clustername", WorkbookFieldInDissem, "N/A", str),
     FieldMap(
         "state_cluster_name", "stateclustername", WorkbookFieldInDissem, None, str
     ),
-    # FieldMap("other_cluster_name", "otherclustername", WorkbookFieldInDissem, None, str),
     FieldMap("federal_program_total", "programtotal", WorkbookFieldInDissem, 0, int),
     FieldMap("cluster_total", "clustertotal", WorkbookFieldInDissem, 0, int),
     FieldMap("is_guaranteed", "loans", "is_loan", None, str),
@@ -53,9 +48,8 @@ mappings = [
     ),
     FieldMap("is_major", "majorprogram", WorkbookFieldInDissem, None, str),
     FieldMap("audit_report_type", "typereport_mp", "mp_audit_report_type", None, str),
-    FieldMap("number_of_audit_findings", "findings", "findings_count", 0, int),
+    FieldMap("number_of_audit_findings", "findingscount", "findings_count", 0, int),
     FieldMap("amount_expended", "amount", WorkbookFieldInDissem, 0, int),
-    FieldMap("federal_program_total", "programtotal", WorkbookFieldInDissem, 0, int),
 ]
 
 
@@ -191,7 +185,7 @@ def generate_federal_awards(dbkey, outfile):
     g = set_uei(Gen, wb, dbkey)
     insert_version_and_sheet_name(wb, "federal-awards-workbook")
 
-    cfdas = Cfda.select().where(Cfda.dbkey == g.dbkey).order_by(Cfda.index)
+    cfdas = Cfda.select().where(Cfda.dbkey == dbkey).order_by(Cfda.index)
     map_simple_columns(wb, mappings, cfdas)
 
     # Patch the clusternames. They used to be allowed to enter anything
@@ -244,7 +238,7 @@ def generate_federal_awards(dbkey, outfile):
         else:
             loansatend.append("")
     # set_range(wb, "loan_balance_at_audit_period_end", loansatend, type=int_or_na)
-    set_range(wb, "loan_balance_at_audit_period_end", loansatend, type=int)
+    set_range(wb, "loan_balance_at_audit_period_end", loansatend, conversion_fun=int)
 
     wb.save(outfile)
 
