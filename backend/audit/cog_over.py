@@ -91,29 +91,38 @@ def set_2019_baseline():
     engine = sqlalchemy.create_engine(
         os.getenv("DATABASE_URL").replace("postgres", "postgresql", 1)
     )
+    # AUDIT_QUERY = """
+    #     SELECT gen."DBKEY", gen."EIN", cast(gen."TOTFEDEXPEND" as BIGINT),
+    #             cfda."CFDA", cast(cfda."AMOUNT" as BIGINT), cfda."DIRECT", cast(cfda."PROGRAMTOTAL" as BIGINT)
+    #     FROM census_gen19 gen, census_cfda19 cfda
+    #     WHERE gen."AUDITYEAR" = :ref_year
+    #     AND cast(gen."TOTFEDEXPEND" as BIGINT) > :threshold
+    #     AND gen."DBKEY" = cfda."DBKEY"
+    #     AND gen."EIN" = cfda."EIN"
+    #     ORDER BY gen."DBKEY"
+    # """
     AUDIT_QUERY = """
         SELECT gen."DBKEY", gen."EIN", cast(gen."TOTFEDEXPEND" as BIGINT),
-                cfda."CFDA", cast(cfda."AMOUNT" as BIGINT), cfda."DIRECT", cast(cfda."PROGRAMTOTAL" as BIGINT)
+                cfda."CFDA", cast(cfda."AMOUNT" as BIGINT), cfda."DIRECT"
         FROM census_gen19 gen, census_cfda19 cfda
         WHERE gen."AUDITYEAR" = :ref_year
-        AND cast(gen."TOTFEDEXPEND" as BIGINT) > :threshold
         AND gen."DBKEY" = cfda."DBKEY"
         AND gen."EIN" = cfda."EIN"
         ORDER BY gen."DBKEY"
     """
     with engine.connect() as conn:
         result = conn.execute(
-            sqlalchemy.text(AUDIT_QUERY), {"ref_year": REF_YEAR, "threshold": COG_LIMIT}
+            sqlalchemy.text(AUDIT_QUERY), {"ref_year": REF_YEAR}
         )
         gens = []
         cfdas = []
 
         for row in result:
-            (DBKEY, EIN, TOTFEDEXPEND, CFDA, AMOUNT, DIRECT, PROGRAMTOTAL) = row
+            (DBKEY, EIN, TOTFEDEXPEND, CFDA, AMOUNT, DIRECT) = row
             if (DBKEY, EIN, TOTFEDEXPEND) not in gens:
                 gens.append((DBKEY, EIN, TOTFEDEXPEND))
-            if (DBKEY, CFDA, AMOUNT, DIRECT, PROGRAMTOTAL, EIN) not in cfdas:
-                cfdas.append((DBKEY, CFDA, AMOUNT, DIRECT, PROGRAMTOTAL, EIN))
+            if (DBKEY, CFDA, AMOUNT, DIRECT, EIN) not in cfdas:
+                cfdas.append((DBKEY, CFDA, AMOUNT, DIRECT, EIN))
 
     CognizantBaseline.objects.all().delete()
     for gen in gens:
@@ -121,7 +130,7 @@ def set_2019_baseline():
         ein = gen[1]
         total_amount_expended = gen[2]
         (total_da_amount_expended, max_total_agency, max_da_agency) = calc_cfda_amounts(
-            cfdas=[cfda for cfda in cfdas if ((cfda[0] == dbkey) & (cfda[5] == ein))]
+            cfdas=[cfda for cfda in cfdas if ((cfda[0] == dbkey) & (cfda[4] == ein))]
         )
         cognizant_agency = determine_agency(
             total_amount_expended,
