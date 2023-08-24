@@ -12,6 +12,8 @@ from audit.fixtures.census_models.census import (
     CensusCpas22 as Cpas,
 )
 from audit.fixtures.workbooks.excel_creation import insert_version_and_sheet_name
+from audit.fixtures.workbooks.sac_creation import add_hyphen_to_zip
+
 import openpyxl as pyxl
 
 import logging
@@ -41,7 +43,7 @@ mappings = [
         test_pfix(3),
     ),
     FieldMap(
-        "secondary_auditor_address_zipcode", "cpazipcode", "address_zipcode", None, str
+        "secondary_auditor_address_zipcode", "cpazipcode", "address_zipcode", None, add_hyphen_to_zip
     ),
 ]
 

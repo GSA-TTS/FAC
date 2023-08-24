@@ -26,7 +26,7 @@ from audit.fixtures.excel import FORM_SECTIONS
 
 from audit.fixtures.workbooks.excel_creation import dbkey_to_test_report_id
 
-from audit.fixtures.census_models.ay22 import (
+from audit.fixtures.census_models.census import (
     CensusGen22 as Gen,
     CensusCfda22 as Cfda,
     CensusFindings22 as Finding,
@@ -106,6 +106,16 @@ def _census_audit_type(s):
         "A": "alternative-compliance-engagement",
     }[s]
 
+def add_hyphen_to_zip(zip):
+    strzip = str(zip)
+    if len(strzip) == 5:
+        return strzip
+    if len(strzip) == 9:
+        return f'{strzip[0:5]}-{strzip[5:9]}'
+    else:
+        logger.info("ZIP IS MALFORMED IN WORKBOOKS E2E / SAC_CREATION")
+        return strzip
+    
 
 def _fake_general_information(dbkey, auditee_name=None):
     """Create a fake general_information object."""
@@ -135,7 +145,7 @@ def _fake_general_information(dbkey, auditee_name=None):
         # TODO: this is GSA's UEI. We could do better at making random choices that
         # pass the schema's complex regex validation
         "auditee_uei": gobj.uei,
-        "auditee_zip": gobj.zipcode,
+        "auditee_zip": add_hyphen_to_zip(gobj.zipcode),
         "auditor_address_line_1": gobj.cpastreet1,
         "auditor_city": gobj.cpacity,
         "auditor_contact_name": gobj.cpacontact,
@@ -148,7 +158,7 @@ def _fake_general_information(dbkey, auditee_name=None):
         "auditor_phone": gobj.cpaphone,
         # TODO: when we include territories in our valid states, remove this restriction
         "auditor_state": gobj.cpastate,
-        "auditor_zip": gobj.cpazipcode,
+        "auditor_zip": add_hyphen_to_zip(gobj.cpazipcode),
         "ein": gobj.ein,
         "ein_not_an_ssn_attestation": True,
         "is_usa_based": True,

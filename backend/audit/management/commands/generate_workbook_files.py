@@ -17,7 +17,7 @@ from audit.fixtures.workbooks.workbook_creation import (
 
 import datetime
 
-from audit.fixtures.census_models.ay22 import (
+from audit.fixtures.census_models.census import (
     CensusGen22 as Gen,
 )
 
