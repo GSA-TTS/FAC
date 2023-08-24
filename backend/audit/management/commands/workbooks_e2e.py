@@ -170,7 +170,7 @@ def api_check(json_test_tables):
                 eq = check_equality(this_field_value, this_api_value)
                 if not eq:
                     logger.info(
-                        f"eq {eq} field {f} fval {this_field_value} == aval {this_api_value}"
+                        f"Does not match. [eq {eq}] [field {f}] [field val {this_field_value}] != [api val {this_api_value}]"
                     )
                 equality_results.append(eq)
 

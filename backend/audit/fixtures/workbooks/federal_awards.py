@@ -33,6 +33,7 @@ mappings = [
     FieldMap(
         "program_name", "federalprogramname", "federal_program_name", None, str
     ),
+    FieldMap("number_of_audit_findings", "findingscount", "findings_count",0, int),
     # FieldMap("additional_award_identification", "awardidentification", WorkbookFieldInDissem, None, str),
     # FieldMap("cluster_name", "clustername", WorkbookFieldInDissem, "N/A", str),
     FieldMap(
