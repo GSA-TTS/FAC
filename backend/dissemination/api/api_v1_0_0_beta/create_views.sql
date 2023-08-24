@@ -11,8 +11,8 @@ create view api_v1_0_0_beta.general as
         gen.auditee_uei,
         gen.audit_year,
         ---
-        award.federal_agency_prefix, 
-        award.federal_award_extension,
+        -- award.federal_agency_prefix, 
+        -- award.federal_award_extension,
         gen.auditee_certify_name,
         gen.auditee_certify_title,
         gen.auditee_contact_name,
@@ -282,7 +282,7 @@ create view api_v1_0_0_beta.additional_eins as
         gen.report_id = ein.report_id
         and
         gen.is_public = True
-    order by uei.id
+    order by ein.id
 ;
 
 
