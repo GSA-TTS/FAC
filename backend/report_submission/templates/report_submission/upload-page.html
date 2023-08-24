@@ -22,12 +22,7 @@
 
                     {% if no_findings_disclaimer %}
                     <div class="margin-top-4">
-                        <h2>If you do not have findings:</h2>
-                        <ol>
-                            <li>Open the workbook.</li>
-                            <li>Enter the auditee UEI.</li>
-                            <li>Save and submit the workbook.</li>
-                        </ol>
+                            <p>If you do not have {% if view_id == 'CAP'%}a CAP{% else %}any Federal awards findings{% endif %}, you must still upload this workbook. Download the workbook, enter your entity UEI, save and upload.</p>
                     </div>
                     {% endif %}
 
