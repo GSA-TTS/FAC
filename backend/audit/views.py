@@ -11,7 +11,6 @@ from django.utils.datastructures import MultiValueDictKeyError
 from django.utils.decorators import method_decorator
 from django.http import JsonResponse
 
-
 from config.settings import (
     AGENCY_NAMES,
     GAAP_RESULTS,
@@ -32,7 +31,6 @@ from audit.excel import (
     extract_notes_to_sefa,
 )
 from audit.forms import (
-    UploadReportForm,
     AuditInfoForm,
     AuditorCertificationStep1Form,
     AuditorCertificationStep2Form,
@@ -69,12 +67,16 @@ from audit.validators import (
     validate_notes_to_sefa_json,
     validate_secondary_auditors_json,
 )
+from audit.viewlib import UploadReportView  # noqa
 
 
 logging.basicConfig(
     format="%(asctime)s %(levelname)-8s %(module)s:%(lineno)d %(message)s"
 )
 logger = logging.getLogger(__name__)
+
+
+# 2023-08-22 DO NOT ADD ANY FURTHER CODE TO THIS FILE; ADD IT IN viewlib AS WITH UploadReportView
 
 
 class MySubmissions(LoginRequiredMixin, generic.View):
@@ -837,10 +839,19 @@ class AuditInfoFormView(SingleAuditChecklistAccessRequiredMixin, generic.View):
 
             if form.is_valid():
                 form.clean_booleans()
+                # List of keys to delete if "not_gaap" not in form.cleaned_data["gaap_results"]
+                keys_to_delete = [
+                    "sp_framework_basis",
+                    "is_sp_framework_required",
+                    "sp_framework_opinions",
+                ]
 
-                audit_information = sac.audit_information or {}
-                audit_information.update(form.cleaned_data)
-                validated = validate_audit_information_json(audit_information)
+                if "not_gaap" not in form.cleaned_data["gaap_results"]:
+                    for key in keys_to_delete:
+                        form.cleaned_data.pop(key, None)
+
+                validated = validate_audit_information_json(form.cleaned_data)
+
                 sac.audit_information = validated
                 sac.save()
                 return redirect(reverse("audit:SubmissionProgress", args=[report_id]))
@@ -880,150 +891,4 @@ class AuditInfoFormView(SingleAuditChecklistAccessRequiredMixin, generic.View):
         return context
 
 
-class PageInput:
-    def __init__(self, text="", id="", required=True, hint=None):
-        self.text = text
-        self.id = id
-        self.required = required
-        self.hint = hint
-
-
-class UploadReportView(SingleAuditChecklistAccessRequiredMixin, generic.View):
-    def page_number_inputs(self):
-        return [
-            PageInput(
-                "Financial Statement(s) 2 CFR 200.Sl0(a)", "financial_statements"
-            ),
-            PageInput(
-                "Opinion on Financial Statements 2 CFR 200.SlS(a)",
-                "financial_statements_opinion",
-            ),
-            PageInput(
-                "Schedule of Expenditures of Federal Awards 2 CFR 200.Sl0(b)",
-                "schedule_expenditures",
-            ),
-            PageInput(
-                "Opinion or Disclaimer of Opinion on Schedule of Federal Awards 2 CFR 200.SlS(a)",
-                "schedule_expenditures_opinion",
-            ),
-            PageInput(
-                "Uniform Guidance Report on Internal Control 2 CFR 200.SlS(b)",
-                "uniform_guidance_control",
-            ),
-            PageInput(
-                "Uniform Guidance Report on Compliance 2 CFR 200.SlS(c)",
-                "uniform_guidance_compliance",
-            ),
-            PageInput("GAS Report on Internal Control 2 CFR 200.SlS(b)", "GAS_control"),
-            PageInput(
-                "GAS Report on Internal Compliance 2 CFR 200.SlS(b)", "GAS_compliance"
-            ),
-            PageInput(
-                "Schedule of Findings and Questioned Costs 2 CFR 200.SlS(d)",
-                "schedule_findings",
-            ),
-            PageInput(
-                "Summary Schedule of Prior Audit Findings 2 CFR 200.Sll(b)",
-                "schedule_prior_findings",
-                required=False,
-                hint="Only required if prior audit findings exist",
-            ),
-            PageInput(
-                "Corrective Action Plan (if findings) 2 CFR 200.Sll(c)",
-                "CAP_page",
-                required=False,
-                hint="Only required if findings exist",
-            ),
-        ]
-
-    def get(self, request, *args, **kwargs):
-        report_id = kwargs["report_id"]
-        try:
-            sac = SingleAuditChecklist.objects.get(report_id=report_id)
-
-            context = {
-                "auditee_name": sac.auditee_name,
-                "report_id": report_id,
-                "auditee_uei": sac.auditee_uei,
-                "user_provided_organization_type": sac.user_provided_organization_type,
-                "page_number_inputs": self.page_number_inputs(),
-            }
-
-            # TODO: check if there's already a PDF in the DB and let the user know
-            # context['already_submitted'] = ...
-
-            return render(request, "audit/upload-report.html", context)
-        except SingleAuditChecklist.DoesNotExist:
-            raise PermissionDenied("You do not have access to this audit.")
-        except Exception as e:
-            logger.info("Enexpected error in UploadReportView get.\n", e)
-            raise BadRequest()
-
-    def post(self, request, *args, **kwargs):
-        report_id = kwargs["report_id"]
-
-        try:
-            sac = SingleAuditChecklist.objects.get(report_id=report_id)
-            form = UploadReportForm(request.POST, request.FILES)
-
-            if form.is_valid():
-                file = request.FILES["upload_report"]
-
-                component_page_numbers = {
-                    "financial_statements": form.cleaned_data["financial_statements"],
-                    "financial_statements_opinion": form.cleaned_data[
-                        "financial_statements_opinion"
-                    ],
-                    "schedule_expenditures": form.cleaned_data["schedule_expenditures"],
-                    "schedule_expenditures_opinion": form.cleaned_data[
-                        "schedule_expenditures_opinion"
-                    ],
-                    "uniform_guidance_control": form.cleaned_data[
-                        "uniform_guidance_control"
-                    ],
-                    "uniform_guidance_compliance": form.cleaned_data[
-                        "uniform_guidance_compliance"
-                    ],
-                    "GAS_control": form.cleaned_data["GAS_control"],
-                    "GAS_compliance": form.cleaned_data["GAS_compliance"],
-                    "schedule_findings": form.cleaned_data["schedule_findings"],
-                    # These two fields are optional on the part of the submitter
-                    "schedule_prior_findings": form.cleaned_data[
-                        "schedule_prior_findings"
-                    ]
-                    or None,
-                    "CAP_page": form.cleaned_data["CAP_page"] or None,
-                }
-
-                sar_file = SingleAuditReportFile(
-                    **{
-                        "component_page_numbers": component_page_numbers,
-                        "file": file,
-                        "filename": file.name,
-                        "sac_id": sac.id,
-                    }
-                )
-
-                sar_file.full_clean()
-                sar_file.save()
-
-                # PDF issues can be communicated to the user with form.errors["upload_report"]
-                return redirect(reverse("audit:SubmissionProgress", args=[report_id]))
-            else:
-                context = {
-                    "auditee_name": sac.auditee_name,
-                    "report_id": report_id,
-                    "auditee_uei": sac.auditee_uei,
-                    "user_provided_organization_type": sac.user_provided_organization_type,
-                    "page_number_inputs": self.page_number_inputs(),
-                    "form": form,
-                }
-                return render(request, "audit/upload-report.html", context)
-        except SingleAuditChecklist.DoesNotExist:
-            raise PermissionDenied("You do not have access to this audit.")
-        except LateChangeError:
-            return render(request, "audit/no-late-changes.html")
-
-        except Exception as err:
-            logger.info("Unexpected error in UploadReportView post.\n", err)
-            raise BadRequest() from err
+# 2023-08-22 DO NOT ADD ANY FURTHER CODE TO THIS FILE; ADD IT IN viewlib AS WITH UploadReportView

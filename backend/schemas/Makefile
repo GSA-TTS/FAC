@@ -1,23 +1,9 @@
-VENV           = .venv
-VENV_PYTHON    = $(VENV)/bin/python
 SYSTEM_PYTHON  = $(or $(shell which python3), $(shell which python))
-PYTHON         = $(or $(wildcard $(VENV_PYTHON)), $(SYSTEM_PYTHON))
+PYTHON=${SYSTEM_PYTHON}
 
-all: venv deps clean source_data build_xlsx format_jsonnet build_templates build_sections 
+all:  clean source_data build_xlsx format_jsonnet build_templates build_sections 
 json: format_jsonnet build_templates build_templates
 
-
-$(VENV_PYTHON):
-	rm -rf $(VENV)
-	$(SYSTEM_PYTHON) -m venv $(VENV)
-
-venv: $(VENV_PYTHON)
-
-deps:
-	$(PYTHON) -m pip install --upgrade pip
-	$(PYTHON) -m pip install -r requirements.txt
-
-.PHONY: venv deps
 
 template_specs = $(wildcard source/excel/templates/*.jsonnet)
 section_specs = $(wildcard source/sections/*.jsonnet)
@@ -39,7 +25,7 @@ clean:
 
 build_xlsx: source_data
 	for f in $(specs); do \
-		python3 render.py $$f; \
+		python render.py $$f; \
 	done
 
 format_jsonnet:
@@ -68,7 +54,7 @@ build_templates: build_template_json
 		echo $$jsonnet_file; \
 		echo "------------------------------"; \
 		base_name=$$(basename "$$jsonnet_file" .jsonnet); \
-		python3 scripts/render.py $$jsonnet_file output/excel/xlsx/"$$base_name.xlsx"; \
+		python scripts/render.py $$jsonnet_file output/excel/xlsx/"$$base_name.xlsx"; \
 	done
 	for jsonnet_file in $(template_specs); do \
 		base_name=$$(basename "$$jsonnet_file" .jsonnet); \
