@@ -195,7 +195,7 @@ local Parts = {
           properties: {
             cluster_name: Types.string {
               const: Base.Const.OTHER_CLUSTER,
-            }
+            },
           },
         },
         'then': {
@@ -218,7 +218,7 @@ local Parts = {
           properties: {
             cluster_name: Types.string {
               const: Base.Const.STATE_CLUSTER,
-            } 
+            },
           },
         },
         'then': {

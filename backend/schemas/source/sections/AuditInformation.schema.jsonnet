@@ -114,7 +114,7 @@ local AuditInformation = Types.object {
 // ALWAYS add a new line to the end of the file, meaning this file will change every
 // time we run the formatter.
 //
-// To run local tests against an array of AuditInformation objects: 
+// To run local tests against an array of AuditInformation objects:
 // create a new file that you would run the tests
 // against that imports from this one, and wraps the AuditInformation object in an array.
 
