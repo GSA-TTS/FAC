@@ -13,7 +13,12 @@
                     <legend class="usa-legend usa-legend--large"
                             id="{{ view_id }}"
                             id_test="upload-page__legend">{{ view_name }}</legend>
-                    <p>{{ instructions }} using the <a target="_blank" class="usa-link" href={{workbook_url}}>provided worksheet</a>.</p>
+
+                    <p>{{ instructions }}</p>
+                    <ul class="margin-top-4">
+                        <li>Review the <a class="usa-link" id="instructions-link" href={{instructions_url}} target="_blank">instructions for this workbook.</a></li>
+                        <li><a class="usa-link" id="download-template-link" href={{workbook_url}} target="_blank">Download</a> the {{view_name}} workbook template.</li>
+                    </ul>
 
                     {% if no_findings_disclaimer %}
                     <div class="margin-top-4">
