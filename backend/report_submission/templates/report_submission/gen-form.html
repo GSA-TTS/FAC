@@ -601,15 +601,38 @@
                                             This field is required
                                         </li>
                                     </ul>
-                                    <input class="usa-input"
+                                    <select class="usa-select"
                                            id="auditor_country"
                                            name="auditor_country"
                                            aria-required="true"
                                            required
                                            data-validate-not-null=""
-                                           value="{{ auditor_country | default_if_none:'' }}"/>
+                                    >
+                                      <option id = "USA" value="USA">USA</option>
+                                      <option value="non_USA">non USA</option>
+                                    </select>
                                 </div>
-                                <div class="usa-form-group">
+                                <div name="foreign_address" class="usa-form-group">
+                                    <label class="usa-label" for="auditor_international_address">
+                                        International Address
+                                        <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
+                                    </label>
+                                    <ul class="usa-error-message"
+                                        id="auditor_international_address-error-message"
+                                        role="alert">
+                                        <li id="auditor_international_address-not-null" hidden>
+                                            This field is required
+                                        </li>
+                                    </ul>
+                                    <input class="usa-textarea"
+                                           id="auditor_international_address"
+                                           name="auditor_international_address"
+                                           aria-required="true"
+                                           required
+                                           data-validate-not-null=""
+                                           value="{{ auditor_international_address | default_if_none:'' }}"/>
+                                </div>
+                                <div name="domestic_address" class="usa-form-group">
                                     <label class="usa-label" for="auditor_address_line_1">
                                         Street
                                         <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
@@ -629,7 +652,7 @@
                                            data-validate-not-null=""
                                            value="{{ auditor_address_line_1 | default_if_none:'' }}"/>
                                 </div>
-                                <div class="usa-form-group">
+                                <div name="domestic_address" class="usa-form-group">
                                     <label class="usa-label" for="auditor_city">
                                         City
                                         <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
@@ -649,7 +672,7 @@
                                            data-validate-not-null=""
                                            value="{{ auditor_city | default_if_none:'' }}"/>
                                 </div>
-                                <div class="usa-form-group">
+                                <div name="domestic_address" class="usa-form-group">
                                     <label class="usa-label" for="auditor_state">
                                         State
                                         <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
@@ -669,7 +692,7 @@
                                            data-validate-not-null=""
                                            value="{{ auditor_state | default_if_none:'' }}"/>
                                 </div>
-                                <div class="usa-form-group">
+                                <div name="domestic_address" class="usa-form-group">
                                     <label class="usa-label" for="auditor_zip">
                                         ZIP code
                                         <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
