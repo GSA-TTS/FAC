@@ -209,7 +209,7 @@ class UploadPageView(LoginRequiredMixin, View):
             "federal-awards": {
                 "view_id": "federal-awards",
                 "view_name": "Federal awards",
-                "instructions": "Enter the federal awards you received in the last audit year using the provided worksheet.",
+                "instructions": "Enter the text of your Federal awards in the provided worksheet using the instructions below.",
                 "DB_id": "federal_awards",
                 "instructions_url": instructions_base_url + "federal-awards/",
                 "workbook_url": workbook_base_url + "federal-awards-workbook.xlsx",
@@ -217,7 +217,7 @@ class UploadPageView(LoginRequiredMixin, View):
             "notes-to-sefa": {
                 "view_id": "notes-to-sefa",
                 "view_name": "Notes to SEFA",
-                "instructions": "Enter the notes on the Schedule of Expenditures of Federal Awards (SEFA) using the provided worksheet.",
+                "instructions": "Enter the text of your Notes to SEFA in the provided worksheet using the instructions below.",
                 "DB_id": "notes_to_sefa",
                 "instructions_url": instructions_base_url + "notes-to-sefa/",
                 "workbook_url": workbook_base_url + "notes-to-sefa-workbook.xlsx",
@@ -225,7 +225,7 @@ class UploadPageView(LoginRequiredMixin, View):
             "audit-findings": {
                 "view_id": "audit-findings",
                 "view_name": "Audit findings",
-                "instructions": "Enter the audit findings for your federal awards using the provided worksheet.",
+                "instructions": "Enter your Federal awards findings using the provided worksheet.",
                 "DB_id": "findings_uniform_guidance",
                 "instructions_url": instructions_base_url
                 + "federal-awards-audit-findings/",
@@ -236,7 +236,7 @@ class UploadPageView(LoginRequiredMixin, View):
             "audit-findings-text": {
                 "view_id": "audit-findings-text",
                 "view_name": "Audit findings text",
-                "instructions": "Enter the text for your audit findings using the provided worksheet.",
+                "instructions": "Enter your Federal awards findings text using the provided worksheet.",
                 "DB_id": "findings_text",
                 "instructions_url": instructions_base_url
                 + "federal-awards-audit-findings-text/",
@@ -247,7 +247,7 @@ class UploadPageView(LoginRequiredMixin, View):
             "CAP": {
                 "view_id": "CAP",
                 "view_name": "Corrective Action Plan (CAP)",
-                "instructions": "Enter your CAP text using the provided worksheet.",
+                "instructions": "Enter your Corrective Action Plan (CAP) using the provided worksheet.",
                 "DB_id": "corrective_action_plan",
                 "instructions_url": instructions_base_url + "corrective-action-plan/",
                 "no_findings_disclaimer": True,
