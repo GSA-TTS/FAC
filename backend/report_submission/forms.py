@@ -56,6 +56,7 @@ class GeneralInformationForm(forms.Form):
     auditor_ein = forms.CharField()
     auditor_ein_not_an_ssn_attestation = forms.BooleanField(required=False)
     auditor_country = forms.CharField()
+    auditor_international_address = forms.CharField()
     auditor_address_line_1 = forms.CharField()
     auditor_city = forms.CharField()
     auditor_state = forms.CharField()

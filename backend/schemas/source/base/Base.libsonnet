@@ -246,6 +246,14 @@ local Enum = {
     ],
     title: 'AuditType',
   },
+  CountryType: Types.string {
+    description: 'USA or International',
+    enum: [
+      'USA',
+      'non-USA',
+    ],
+    title: 'CountryType',
+  },
   MajorProgramAuditReportType: Types.string {
     description: 'Major program report types',
     enum: [

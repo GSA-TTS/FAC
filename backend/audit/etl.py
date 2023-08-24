@@ -293,7 +293,7 @@ class ETL(object):
             auditor_address_line_1=general_information["auditor_address_line_1"],
             auditor_zip=general_information["auditor_zip"],
             auditor_country=general_information["auditor_country"],
-            auditor_contact_name=general_information["auditor_contact_name"],
+            auditor_international_address=general_information["auditor_international_address"],
             auditor_email=general_information["auditor_email"],
             auditor_firm_name=general_information["auditor_firm_name"],
             auditor_foreign_addr=None,  # TODO:  What does this look like in the incoming json?

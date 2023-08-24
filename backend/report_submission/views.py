@@ -143,6 +143,7 @@ class GeneralInformationFormView(LoginRequiredMixin, View):
                 "auditor_ein": sac.auditor_ein,
                 "auditor_ein_not_an_ssn_attestation": sac.auditor_ein_not_an_ssn_attestation,
                 "auditor_country": sac.auditor_country,
+                "auditor_international_address": sac.auditor_international_address,
                 "auditor_address_line_1": sac.auditor_address_line_1,
                 "auditor_city": sac.auditor_city,
                 "auditor_state": sac.auditor_state,
@@ -154,6 +155,8 @@ class GeneralInformationFormView(LoginRequiredMixin, View):
                 "secondary_auditors_exist": sac.secondary_auditors_exist,
                 "report_id": report_id,
             }
+            for field in sorted(context.keys()):
+                print(f"JMM GET: {field} {context[field]}")
 
             return render(request, "report_submission/gen-form.html", context)
         except SingleAuditChecklist.DoesNotExist as err:
@@ -180,6 +183,8 @@ class GeneralInformationFormView(LoginRequiredMixin, View):
                 general_information.update(form.cleaned_data)
                 validated = validate_general_information_json(general_information)
                 sac.general_information = validated
+                for field in sorted(sac.general_information.keys()):
+                    print(f"JMM: {field} {sac.general_information[field]}")
                 if general_information.get("audit_type"):
                     sac.audit_type = general_information["audit_type"]
                 sac.save()
