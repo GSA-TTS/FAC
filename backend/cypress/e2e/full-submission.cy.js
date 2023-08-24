@@ -9,6 +9,7 @@ import { testPdfAuditReport } from '../support/report-pdf.js';
 import { testAuditorCertification } from '../support/auditor-certification.js';
 import { testAuditeeCertification } from '../support/auditee-certification.js';
 import { testWorkbookFederalAwards,
+         testWorkbookNotesToSEFA,
          testWorkbookFindingsUniformGuidance,
          testWorkbookFindingsText,
          testWorkbookCorrectiveActionPlan,
@@ -52,6 +53,9 @@ describe('Full audit submission', () => {
     // Upload all the workbooks. Don't intercept the uploads, which means a file will make it into the DB.
     cy.get(".usa-link").contains("Federal Awards").click();
     testWorkbookFederalAwards(false);
+
+    cy.get(".usa-link").contains("Notes to SEFA").click();
+    testWorkbookNotesToSEFA(false);
 
     cy.get(".usa-link").contains("Audit report PDF").click();
     testPdfAuditReport(false);

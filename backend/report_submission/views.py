@@ -13,6 +13,8 @@ from report_submission.forms import AuditeeInfoForm, GeneralInformationForm
 
 import api.views
 
+from config.settings import STATIC_SITE_URL
+
 logger = logging.getLogger(__name__)
 
 
@@ -198,6 +200,9 @@ class UploadPageView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         report_id = kwargs["report_id"]
 
+        instructions_base_url = STATIC_SITE_URL + "resources/workbooks/"
+        workbook_base_url = STATIC_SITE_URL + "assets/workbooks/"
+
         # Organized by URL name, page specific constants are defined here
         # Data can then be accessed by checking the current URL
         additional_context = {
@@ -206,39 +211,70 @@ class UploadPageView(LoginRequiredMixin, View):
                 "view_name": "Federal awards",
                 "instructions": "Enter the federal awards you received in the last audit year using the provided worksheet.",
                 "DB_id": "federal_awards",
+                "instructions_url": instructions_base_url + "federal-awards/",
+                "workbook_url": workbook_base_url + "federal-awards-workbook.xlsx",
+            },
+            "notes-to-sefa": {
+                "view_id": "notes-to-sefa",
+                "view_name": "Notes to SEFA",
+                "instructions": "Enter the notes on the Schedule of Expenditures of Federal Awards (SEFA) using the provided worksheet.",
+                "DB_id": "notes_to_sefa",
+                "instructions_url": instructions_base_url + "notes-to-sefa/",
+                "workbook_url": workbook_base_url + "notes-to-sefa-workbook.xlsx",
             },
             "audit-findings": {
                 "view_id": "audit-findings",
                 "view_name": "Audit findings",
                 "instructions": "Enter the audit findings for your federal awards using the provided worksheet.",
                 "DB_id": "findings_uniform_guidance",
+                "instructions_url": instructions_base_url
+                + "federal-awards-audit-findings/",
+                "no_findings_disclaimer": True,
+                "workbook_url": workbook_base_url
+                + "federal-awards-audit-findings.xlsx",
             },
             "audit-findings-text": {
                 "view_id": "audit-findings-text",
                 "view_name": "Audit findings text",
                 "instructions": "Enter the text for your audit findings using the provided worksheet.",
                 "DB_id": "findings_text",
+                "instructions_url": instructions_base_url
+                + "federal-awards-audit-findings-text/",
+                "no_findings_disclaimer": True,
+                "workbook_url": workbook_base_url
+                + "federal-awards-audit-findings-text-workbook.xlsx",
             },
             "CAP": {
                 "view_id": "CAP",
                 "view_name": "Corrective Action Plan (CAP)",
                 "instructions": "Enter your CAP text using the provided worksheet.",
                 "DB_id": "corrective_action_plan",
-            },
-            "additional-eins": {
-                "view_id": "additional-eins",
-                "view_name": "Additional EINs",
-                "instructions": "Enter any additional EINs using the provided worksheet.",
+                "instructions_url": instructions_base_url + "corrective-action-plan/",
+                "no_findings_disclaimer": True,
+                "workbook_url": workbook_base_url
+                + "corrective-action-plan-workbook.xlsx",
             },
             "additional-ueis": {
                 "view_id": "additional-ueis",
                 "view_name": "Additional UEIs",
                 "instructions": "Enter any additional UEIs using the provided worksheet.",
+                "instructions_url": instructions_base_url + "additional-ueis-workbook/",
+                "workbook_url": workbook_base_url + "additional-ueis-workbook.xlsx",
             },
             "secondary-auditors": {
                 "view_id": "secondary-auditors",
                 "view_name": "Secondary auditors",
                 "instructions": "Enter any additional auditors using the provided worksheet.",
+                "instructions_url": instructions_base_url
+                + "secondary-auditors-workbook/",
+                "workbook_url": workbook_base_url + "secondary-auditors-workbook.xlsx",
+            },
+            "additional-eins": {
+                "view_id": "additional-eins",
+                "view_name": "Additional EINs",
+                "instructions": "Enter any additional EINs using the provided worksheet.",
+                "instructions_url": instructions_base_url + "additional-eins-workbook/",
+                "workbook_url": workbook_base_url + "additional-eins-workbook.xlsx",
             },
         }
 
