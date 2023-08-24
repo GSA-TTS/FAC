@@ -4,11 +4,11 @@ from django.test import Client, TestCase
 from django.urls import reverse
 from model_bakery import baker
 
-from .cross_validation import (
+from audit.cross_validation import (
     sac_validation_shape,
-    snake_to_camel,
     submission_progress_check,
 )
+from audit.cross_validation.naming import SECTION_NAMES
 from .models import Access, SingleAuditChecklist
 from .test_views import _load_json
 
@@ -41,10 +41,10 @@ class SubmissionProgressViewTests(TestCase):
         self.assertEqual(response.status_code, 403)
 
     def test_phrase_in_page(self):
-        """Check for 'General information form'."""
+        """Check for 'General Information form'."""
         baker.make(Access, user=self.user, sac=self.sac)
         self.client.force_login(user=self.user)
-        phrase = "General information form"
+        phrase = "General Information form"
         res = self.client.get(
             reverse(
                 "audit:SubmissionProgress", kwargs={"report_id": self.sac.report_id}
@@ -72,7 +72,7 @@ class SubmissionProgressViewTests(TestCase):
             "secondary_auditors",
         )
         for key in conditional_keys:
-            self.assertEqual(result[key]["display"], "hidden")
+            self.assertEqual(result[key]["display"], "inactive")
         self.assertFalse(result["complete"])
         baker.make(Access, user=self.user, sac=sac)
         self.client.force_login(user=self.user)
@@ -99,12 +99,15 @@ class SubmissionProgressViewTests(TestCase):
         filename = "general-information--test0001test--simple-pass.json"
         info = _load_json(AUDIT_JSON_FIXTURES / filename)
         addl_sections = {}
-        for section_name, camel_name in snake_to_camel.items():
+        for section_name, guide in SECTION_NAMES.items():
+            camel_name = guide.camel_case
             addl_sections[section_name] = {camel_name: "whatever"}
+            addl_sections["federal_awards"] = {"FederalAwards": {"federal_awards": []}}
         addl_sections["general_information"] = info
+        del addl_sections["single_audit_report"]
         sac = baker.make(SingleAuditChecklist, **addl_sections)
         shaped_sac = sac_validation_shape(sac)
-        result = submission_progress_check(shaped_sac, sar=None, crossval=False)
+        result = submission_progress_check(shaped_sac, sar=True, crossval=False)
         self.assertEqual(result["general_information"]["display"], "complete")
         self.assertTrue(result["general_information"]["completed"])
         conditional_keys = (
@@ -113,5 +116,5 @@ class SubmissionProgressViewTests(TestCase):
             "secondary_auditors",
         )
         for key in conditional_keys:
-            self.assertEqual(result[key]["display"], "hidden")
+            self.assertEqual(result[key]["display"], "inactive")
         self.assertTrue(result["complete"])

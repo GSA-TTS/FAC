@@ -1,0 +1,65 @@
+{% load sprite_helper %}
+<li class="usa-icon-list__item padding-bottom-105"
+    id="{{url_tail}}">
+
+  {% include './audit/submission_checklist/icon-list-icon.html' with completed=completed display=display %}
+    {% if completed %}
+      <div class="text-success-darker">
+        <p class="text-bold text-underline margin-0">{{ title }}</p>
+        <p class="margin-0">
+          {{ text }}
+          {% if text_nb %}
+            <strong>{{ text_nb }}</strong>
+          {% endif %}
+        </p>
+
+        {% comment %} 
+            <p> for created by time and name.
+            If no name is available, uses email.
+
+            Examples:
+            Completed (formatted time) by (email).
+            Completed MMM DD, YYYY at 12:00 AM UST by example@example.gov.
+
+            Variables: 
+                completed_date (string)
+                completed_by (string)
+        {% endcomment %}
+        <p class="text-base margin-0">
+            {% if completed_by and completed_date %}
+                Completed {{ completed_date|date:"N j, Y g:i A T" }} by {{ completed_by }}.
+            {% elif completed_date %}
+                Completed {{ completed_date|date:"N j, Y g:i A T" }}.
+            {% endif %}
+        </p>
+        <p class="margin-0">
+            <a class="usa link"
+               href="{% url reverse_url report_id %}">{{ edit_text }}</a>
+        </p>
+      </div>
+    {% elif display == 'inactive' %}
+      <div class="text-disabled-dark">
+        <p class="text-bold margin-0">{{ title }}</p>
+        <p class="margin-0">
+          {{ text }}
+          {% if text_nb %}
+            <strong>{{ text_nb }}</strong>
+          {% endif %}
+        </p>
+      </div>
+    {% else %} {% comment %} This is the incomplete state {% endcomment %}
+      <div>
+        <p class="text-bold margin-0">
+          <a
+            class="usa link"
+            href="{% url reverse_url report_id %}">{{ title }}</a>
+        </p>
+        <p class="margin-0">
+          {{ text }}
+          {% if text_nb %}
+            <strong>{{ text_nb }}</strong>
+          {% endif %}
+        </p>
+      </div>
+    {% endif %}
+</li>
