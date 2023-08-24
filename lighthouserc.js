@@ -13,6 +13,9 @@ module.exports = {
       assertions: {
         "categories:accessibility": ["error", {"minScore": .98}]
       }
+    },
+    upload: {
+      target: 'temporary-public-storage',
     }
   },
 };
