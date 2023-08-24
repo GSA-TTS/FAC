@@ -46,13 +46,10 @@ pw.setLevel(logging.INFO)
 def step_through_certifications(sac, SAC):
     sac.transition_name.append(SAC.STATUS.SUBMITTED)
     sac.transition_date.append(datetime.date.today())
-
     sac.transition_name.append(SAC.STATUS.AUDITOR_CERTIFIED)
     sac.transition_date.append(datetime.date.today())
-
     sac.transition_name.append(SAC.STATUS.AUDITEE_CERTIFIED)
     sac.transition_date.append(datetime.date.today())
-
     sac.transition_name.append(SAC.STATUS.CERTIFIED)
     sac.transition_date.append(datetime.date.today())
 
@@ -168,29 +165,21 @@ def api_check(json_test_tables):
             equality_results = []
             for field_ndx, f in enumerate(row["fields"]):
                 api_values = get_api_values(endpoint, report_id, f)
-                # print(f, api_values)
                 this_api_value = api_values[row_ndx]
                 this_field_value = row["values"][field_ndx]
                 eq = check_equality(this_field_value, this_api_value)
                 if not eq:
-                    print(
+                    logger.info(
                         f"eq {eq} field {f} fval {this_field_value} == aval {this_api_value}"
                     )
-                    # print(f"FIELD VALUES FOR {f}")
-                    # pprint(row["values"])
-                    # print("API VALUES")
-                    # pprint(api_values)
                 equality_results.append(eq)
 
             if all(equality_results):
-                # print(f"------ YESYESYES")
-                count(summary, "correct_rows")
+                count(summary, "correct_fields")
             else:
-                # print(f"------ NONONO")
-                count(summary, "incorrect_rows")
-                # print(equality_results)
+                count(summary, "incorrect_fields")
                 sys.exit(-1)
-        print(summary)
+        logger.info(summary)
         combined_summary = combine_counts(combined_summary, summary)
     return combined_summary
 
@@ -215,7 +204,7 @@ def generate_workbooks(user, email, dbkey):
         disseminate(sac)
         # pprint(json_test_tables)
         combined_summary = api_check(json_test_tables)
-        print(combined_summary)
+        logger.info(combined_summary)
 
 
 class Command(BaseCommand):

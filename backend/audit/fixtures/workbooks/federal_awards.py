@@ -31,7 +31,7 @@ logger = logging.getLogger(__name__)
 
 mappings = [
     FieldMap(
-        "program_name", "federalprogramname", "federal_program_name", None, test_pfix(3)
+        "program_name", "federalprogramname", "federal_program_name", None, str
     ),
     # FieldMap("additional_award_identification", "awardidentification", WorkbookFieldInDissem, None, str),
     # FieldMap("cluster_name", "clustername", WorkbookFieldInDissem, "N/A", str),
@@ -48,7 +48,7 @@ mappings = [
     FieldMap("is_direct", "direct", WorkbookFieldInDissem, None, str),
     FieldMap("is_passed", "passthroughaward", "is_passthrough_award", None, str),
     FieldMap(
-        "subrecipient_amount", "passthroughamount", "passthrough_amount", None, float
+        "subrecipient_amount", "passthroughamount", "passthrough_amount", None, int
     ),
     FieldMap("is_major", "majorprogram", WorkbookFieldInDissem, None, str),
     FieldMap("audit_report_type", "typereport_mp", "mp_audit_report_type", None, str),

@@ -37,7 +37,6 @@ def test_pfix(n):
     def _test(o):
         # return ' '.join(["TEST" for x in range(n)]) + " " + str(o)
         return o
-
     return _test
 
 

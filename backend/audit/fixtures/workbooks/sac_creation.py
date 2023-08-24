@@ -110,7 +110,7 @@ def add_hyphen_to_zip(zip):
     strzip = str(zip)
     if len(strzip) == 5:
         return strzip
-    if len(strzip) == 9:
+    elif len(strzip) == 9:
         return f'{strzip[0:5]}-{strzip[5:9]}'
     else:
         logger.info("ZIP IS MALFORMED IN WORKBOOKS E2E / SAC_CREATION")
@@ -266,7 +266,7 @@ def _create_test_sac(user, auditee_name, dbkey):
         email=user.email,
         role="certifying_auditor_contact",
     )
-    sac.data_source = "TEST DATA"
+    sac.data_source = "TESTDATA"
     sac.save()
 
     logger.info("Created single audit checklist %s", sac)
