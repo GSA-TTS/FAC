@@ -103,7 +103,7 @@ class UploadReportView(SingleAuditChecklistAccessRequiredMixin, generic.View):
                 "user_provided_organization_type": sac.user_provided_organization_type,
                 "page_number_inputs": self.page_number_inputs(),
                 "already_submitted": True if sar else False,
-                "form": current_info
+                "form": current_info,
             }
 
             return render(request, "audit/upload-report.html", context)
