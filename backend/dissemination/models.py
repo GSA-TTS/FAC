@@ -420,7 +420,7 @@ class General(models.Model):
         null=True,
         default=list,
     )
-    
+
     auditee_zip = models.TextField(
         "Auditee Zip Code",
         help_text=docs.zip_code,

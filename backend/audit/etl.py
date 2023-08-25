@@ -47,7 +47,7 @@ class ETL(object):
                 load_method()
             except KeyError as key_error:
                 # logger.warning(
-                    print(
+                print(
                     f"{type(key_error).__name__} in {load_method.__name__}: {key_error}"
                 )
 
@@ -167,9 +167,8 @@ class ETL(object):
 
     def load_captext(self):
         corrective_action_plan = self.single_audit_checklist.corrective_action_plan
-        if (
-            "corrective_action_plan_entries"
-            in corrective_action_plan.get("CorrectiveActionPlan")
+        if "corrective_action_plan_entries" in corrective_action_plan.get(
+            "CorrectiveActionPlan", {}
         ):
             corrective_action_plan_entries = corrective_action_plan[
                 "CorrectiveActionPlan"
@@ -263,7 +262,6 @@ class ETL(object):
         return return_dict
 
     def load_general(self):
-
         general_information = self.single_audit_checklist.general_information
         dates_by_status = self._get_dates_from_sac()
 
@@ -277,43 +275,16 @@ class ETL(object):
 
         general = General(
             report_id=self.report_id,
-            auditee_certify_name=None,  # TODO: Where does this come from?
-            auditee_certify_title=None,  # TODO: Where does this come from?
-            auditee_contact_name=general_information.get("auditee_contact_name",""),
-            auditee_email=general_information["auditee_email"],
-            auditee_name=general_information["auditee_name"],
-            auditee_phone=general_information["auditee_phone"],
-            auditee_contact_title=general_information["auditee_contact_title"],
-            auditee_address_line_1=general_information["auditee_address_line_1"],
-            auditee_city=general_information["auditee_city"],
-            auditee_state=general_information["auditee_state"],
-            auditee_ein=general_information["ein"],
-            auditee_uei=general_information["auditee_uei"],
-            additional_ueis=self.single_audit_checklist.additional_ueis == "Y",
-            auditee_zip=general_information["auditee_zip"],
-            auditor_phone=general_information["auditor_phone"],
-            auditor_state=general_information["auditor_state"],
-            auditor_city=general_information["auditor_city"],
-            auditor_contact_title=general_information["auditor_contact_title"],
-            auditor_address_line_1=general_information["auditor_address_line_1"],
-            auditor_zip=general_information["auditor_zip"],
-            auditor_country=general_information["auditor_country"],
-            auditor_international_address=general_information.get(
-                "auditor_international_address",""
-            ),
-            auditor_email=general_information["auditor_email"],
-            auditor_firm_name=general_information["auditor_firm_name"],
-            auditor_foreign_addr=None,  # TODO:  What does this look like in the incoming json?
-            auditor_ein=general_information["auditor_ein"],
-            cognizant_agency=None,  # TODO: https://github.com/GSA-TTS/FAC/issues/1218
-            oversight_agency=None,  # TODO: https://github.com/GSA-TTS/FAC/issues/1218
             auditee_certify_name="",  # TODO: Where does this come from?
             auditee_certify_title="",  # TODO: Where does this come from?
+            auditor_international_address=general_information.get(
+                "auditor_international_address", ""
+            ),
             auditee_contact_name=general_information.get("auditee_contact_name", ""),
+            auditee_contact_title=general_information.get("auditee_contact_title", ""),
             auditee_email=general_information.get("auditee_email", ""),
             auditee_name=general_information.get("auditee_name", ""),
             auditee_phone=general_information.get("auditee_phone", ""),
-            auditee_contact_title=general_information.get("auditee_contact_title", ""),
             auditee_address_line_1=general_information.get(
                 "auditee_address_line_1", ""
             ),
@@ -336,7 +307,6 @@ class ETL(object):
             auditor_contact_name=general_information.get("auditor_contact_name", ""),
             auditor_email=general_information.get("auditor_email", ""),
             auditor_firm_name=general_information.get("auditor_firm_name", ""),
-            auditor_foreign_addr="",  # TODO:  What does this look like in the incoming json?
             auditor_ein=general_information.get("auditor_ein", ""),
             additional_eins_covered=general_information.get("multiple_ueis_covered")
             == "Y",
@@ -453,11 +423,11 @@ class ETL(object):
         general.gaap_results = audit_information.get("gaap_results", "")
         general.sp_framework = audit_information.get("sp_framework_basis", "")
         general.is_sp_framework_required = (
-            audit_information["is_sp_framework_required"] == "Y"
+            audit_information.get("is_sp_framework_required", "") == "Y"
         )
-        general.sp_framework_auditor_opinion = audit_information[
-            "sp_framework_opinions"
-        ]
+        general.sp_framework_auditor_opinion = audit_information.get(
+            "sp_framework_opinions", ""
+        )
         general.is_going_concern = audit_information["is_going_concern_included"] == "Y"
         general.is_significant_deficiency = (
             audit_information["is_internal_control_deficiency_disclosed"] == "Y"
