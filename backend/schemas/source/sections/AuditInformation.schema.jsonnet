@@ -38,7 +38,7 @@ local AuditInformation = Types.object {
         },
       },
       'then': {
-        required:['is_sp_framework_required', 'sp_framework_basis', 'sp_framework_opinions'],
+        required: ['is_sp_framework_required', 'sp_framework_basis', 'sp_framework_opinions'],
       },
     },
     {
@@ -94,7 +94,7 @@ local AuditInformation = Types.object {
           required: ['sp_framework_opinions'],
         },
       },
-    }
+    },
   ],
   required: [
     'dollar_threshold',
@@ -110,6 +110,14 @@ local AuditInformation = Types.object {
   title: 'AuditInformation',
 };
 
+// WARNING: If a comment is the last thing in a Jsonnet file, then the formatter will
+// ALWAYS add a new line to the end of the file, meaning this file will change every
+// time we run the formatter.
+//
+// To run local tests against an array of AuditInformation objects:
+// create a new file that you would run the tests
+// against that imports from this one, and wraps the AuditInformation object in an array.
+
 
 local Root = Types.object {
   additionalProperties: false,
@@ -120,11 +128,3 @@ local Root = Types.object {
 };
 
 AuditInformation
-
-//To manually text against data_fixtures/audit/excel_schema_test_files/audit-information-pass-01.js
-//1. Uncomment the code below and comment out the line above 
-//2. Regenerate the schema output file by running `make build_sections`
-//3. and Run `check-jsonschema --schemafile schemas/output/sections/AuditInformation.schema.json data_fixtures/audit/excel_schema_test_files/audit-information-pass-01.js`
-// Types.array {
-//       items: AuditInformation,
-// }

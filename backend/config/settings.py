@@ -82,10 +82,15 @@ LOGGING = {
         "django": {"handlers": ["local_debug_logger", "prod_logger"]},
     },
 }
-# this shold reduce the volume of message displayed when running tests
-if len(sys.argv) > 1 and sys.argv[1] == "test":
-    logging.disable(logging.ERROR)
 
+TEST_RUN = False
+if len(sys.argv) > 1 and sys.argv[1] == "test":
+    # This should reduce the volume of message displayed when running tests, but
+    # unfortunately doesn't suppress stdout.
+    logging.disable(logging.ERROR)
+    # Set var that Django Debug Toolbar can detect so that it doesn't run; we use
+    # this with ENABLE_DEBUG_TOOLBAR much further below:
+    TEST_RUN = True
 
 # Django application definition
 INSTALLED_APPS = [
@@ -456,9 +461,6 @@ AGENCY_NAMES = get_agency_names()
 GAAP_RESULTS = get_audit_info_lists("gaap_results")
 SP_FRAMEWORK_BASIS = get_audit_info_lists("sp_framework_basis")
 SP_FRAMEWORK_OPINIONS = get_audit_info_lists("sp_framework_opinions")
-
-# Are we in a test environment?
-TEST_RUN = len(sys.argv) > 1 and sys.argv[1] == "test"
 
 ENABLE_DEBUG_TOOLBAR = (
     env.bool("ENABLE_DEBUG_TOOLBAR", False) and ENVIRONMENT == "LOCAL" and not TEST_RUN
