@@ -122,12 +122,12 @@ SECTION_NAMES = {
         reverse_url="report_submission:notes-to-sefa",
         snake_case="notes_to_sefa",
         url_tail="notes-to-sefa",
-        workbook_number=None,
+        workbook_number=2,
     ),
     "single_audit_report": SectionBabelFish(
         all_caps="SINGLE_AUDIT_REPORT",
         camel_case="SingleAuditReport",
-        friendly="Single audit report",
+        friendly="Single Audit Report",
         friendly_title="Audit report PDF",
         reverse_url="audit:UploadReport",
         snake_case="single_audit_report",
@@ -142,7 +142,7 @@ SECTION_NAMES = {
         reverse_url="report_submission:secondary-auditors",
         snake_case="secondary_auditors",
         url_tail="secondary-auditors",
-        workbook_number=None,
+        workbook_number=7,
     ),
     "tribal_data_consent": SectionBabelFish(
         all_caps="TRIBAL_DATA_CONSENT",
