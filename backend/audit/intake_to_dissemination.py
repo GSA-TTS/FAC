@@ -67,20 +67,21 @@ class IntakeToDissemination(object):
             logger.warning("No finding texts found to load")
             return
 
-        findings_text_entries = findings_text["FindingsText"]["findings_text_entries"]
+        findings_text_entries = findings_text.get("FindingsText", {}).get("findings_text_entries")
         findings_text_objects = []
-        for entry in findings_text_entries:
-            finding_text_ = FindingText(
-                report_id=self.report_id,
-                finding_ref_number=entry["reference_number"],
-                contains_chart_or_table=entry["contains_chart_or_table"] == "Y",
-                finding_text=entry["text_of_finding"],
-            )
-            # if self.write_to_db:
-            #     finding_text_.save()
-            findings_text_objects.append(finding_text_)
+        if findings_text_entries:
+            for entry in findings_text_entries:
+                finding_text_ = FindingText(
+                    report_id=self.report_id,
+                    finding_ref_number=entry["reference_number"],
+                    contains_chart_or_table=entry["contains_chart_or_table"] == "Y",
+                    finding_text=entry["text_of_finding"],
+                )
+                # if self.write_to_db:
+                #     finding_text_.save()
+                findings_text_objects.append(finding_text_)
         self.loaded_objects["FindingTexts"] = findings_text_objects
-        return findings_text_objects
+        return findings_text_objects   #FIXME: Will return [] for an empty submission, is this okay ?
 
     def load_findings(self):
         findings_uniform_guidance = (
@@ -90,37 +91,32 @@ class IntakeToDissemination(object):
             logger.warning("No findings found to load")
             return
 
-        findings_uniform_guidance_entries = findings_uniform_guidance[
-            "FindingsUniformGuidance"
-        ]["findings_uniform_guidance_entries"]
-
+        findings_uniform_guidance_entries = findings_uniform_guidance.get("FindingsUniformGuidance",{}).get("findings_uniform_guidance_entries")
         findings_objects = []
-        for entry in findings_uniform_guidance_entries:
-            findings = entry["findings"]
-            program = entry["program"]
-            prior_finding_ref_numbers = None
-            if "prior_references" in findings:
-                prior_finding_ref_numbers = findings["prior_references"]
+        if findings_uniform_guidance_entries:
+            for entry in findings_uniform_guidance_entries:
+                findings = entry["findings"]
+                program = entry["program"]
 
-            finding = Finding(
-                award_reference=program["award_reference"],
-                report_id=self.report_id,
-                finding_ref_number=findings["reference_number"],
-                is_material_weakness=entry["material_weakness"] == "Y",
-                is_modified_opinion=entry["modified_opinion"] == "Y",
-                is_other_findings=entry["other_findings"] == "Y",
-                is_other_non_compliance=entry["other_matters"] == "Y",
-                prior_finding_ref_numbers=prior_finding_ref_numbers,
-                is_questioned_costs=entry["questioned_costs"] == "Y",
-                is_repeat_finding=(findings["repeat_prior_reference"] == "Y"),
-                is_significant_deficiency=(entry["significant_deficiency"] == "Y"),
-                type_requirement=(program["compliance_requirement"]),
-            )
-            # if self.write_to_db:
-            #     finding.save()
-            findings_objects.append(finding)
+                finding = Finding(
+                    award_reference=program["award_reference"],
+                    report_id=self.report_id,
+                    finding_ref_number=findings["reference_number"],
+                    is_material_weakness=entry["material_weakness"] == "Y",
+                    is_modified_opinion=entry["modified_opinion"] == "Y",
+                    is_other_findings=entry["other_findings"] == "Y",
+                    is_other_non_compliance=entry["other_matters"] == "Y",
+                    prior_finding_ref_numbers=findings.get("prior_references"),
+                    is_questioned_costs=entry["questioned_costs"] == "Y",
+                    is_repeat_finding=(findings["repeat_prior_reference"] == "Y"),
+                    is_significant_deficiency=(entry["significant_deficiency"] == "Y"),
+                    type_requirement=(program["compliance_requirement"]),
+                )
+                # if self.write_to_db:
+                #     finding.save()
+                findings_objects.append(finding)
         self.loaded_objects["Findings"] = findings_objects
-        return findings_objects
+        return findings_objects #FIXME: Will return [] for an empty submission, is this okay ?
 
     def conditional_lookup(self, dict, key, default):
         if key in dict:
@@ -147,40 +143,30 @@ class IntakeToDissemination(object):
         for entry in federal_awards["FederalAwards"]["federal_awards"]:
             program = entry["program"]
             loan = entry["loan_or_loan_guarantee"]
-            is_direct = entry["direct_or_indirect_award"]["is_direct"] == "Y"
-            is_passthrough = entry["subrecipients"]["is_passed"] == "Y"
             cluster = entry["cluster"]
-            subrecipient_amount = entry["subrecipients"].get("subrecipient_amount")
-            state_cluster_name = cluster.get("state_cluster_name")
-            other_cluster_name = cluster.get("other_cluster_name")
-            additional_award_identification = self.conditional_lookup(
-                program, "additional_award_identification", ""
-            )
+            state_cluster_name = cluster.get("state_cluster_name") # FIXME: what default value do we want here (None or "")?
+            other_cluster_name = cluster.get("other_cluster_name") # FIXME: what default value do we want here (None or "")?
             federal_award = FederalAward(
                 report_id=self.report_id,
                 award_reference=entry["award_reference"],
                 federal_agency_prefix=program["federal_agency_prefix"],
                 federal_award_extension=program["three_digit_extension"],
-                additional_award_identification=additional_award_identification,
+                additional_award_identification=program.get("additional_award_identification",""), # FIXME: update the type of additional_award_identification in the schema and determine the right default value
                 federal_program_name=program["program_name"],
                 amount_expended=program["amount_expended"],
                 cluster_name=cluster["cluster_name"],
                 other_cluster_name=other_cluster_name,
                 state_cluster_name=state_cluster_name,
-                cluster_total=cluster["cluster_total"],
-                federal_program_total=program["federal_program_total"],
+                cluster_total=cluster["cluster_total"], #FIXME: Why is cluster_total removed from the schema? This field should be required in the schema
+                federal_program_total=program["federal_program_total"], #FIXME: This field should be required in the schema
                 is_loan=loan["is_guaranteed"] == "Y",
-                loan_balance=self.conditional_lookup(
-                    loan, "loan_balance_at_audit_period_end", 0
-                ),
-                is_direct=is_direct,
+                loan_balance=loan.get("loan_balance_at_audit_period_end", 0),
+                is_direct= entry["direct_or_indirect_award"]["is_direct"] == "Y",
                 is_major=program["is_major"] == "Y" if "is_major" in program else False,
-                mp_audit_report_type=self.conditional_lookup(
-                    program, "audit_report_type", ""
-                ),
-                findings_count=program["number_of_audit_findings"],
-                is_passthrough_award=is_passthrough,
-                passthrough_amount=subrecipient_amount,
+                mp_audit_report_type=program.get("audit_report_type", ""), #FIXME: Update audit_report_type to remove Types.NULL unless this is expected for historical data
+                findings_count = program["number_of_audit_findings"],
+                is_passthrough_award= entry["subrecipients"]["is_passed"] == "Y" # FIXME: is_passed should be required in the schema  
+                passthrough_amount= entry["subrecipients"].get("subrecipient_amount") # FIXME: what default value do we want here (None or "")?
             )
             # if self.write_to_db:
             #     federal_award.save()
@@ -224,7 +210,7 @@ class IntakeToDissemination(object):
             # if self.write_to_db:
             #     note.save()
             sefa_objects.append(note)
-        else:  #FIXME: This does not seem right to me
+        else:
             for entry in entries:
                 note = Note(
                     report_id=self.report_id,
