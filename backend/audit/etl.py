@@ -44,7 +44,8 @@ class ETL(object):
             try:
                 load_method()
             except KeyError as key_error:
-                logger.warning(
+                # logger.warning(
+                    print(
                     f"{type(key_error).__name__} in {load_method.__name__}: {key_error}"
                 )
 
@@ -165,7 +166,7 @@ class ETL(object):
         corrective_action_plan = self.single_audit_checklist.corrective_action_plan
         if (
             "corrective_action_plan_entries"
-            in corrective_action_plan["CorrectiveActionPlan"]
+            in corrective_action_plan.get("CorrectiveActionPlan")
         ):
             corrective_action_plan_entries = corrective_action_plan[
                 "CorrectiveActionPlan"
@@ -259,6 +260,7 @@ class ETL(object):
         return return_dict
 
     def load_general(self):
+
         general_information = self.single_audit_checklist.general_information
         dates_by_status = self._get_dates_from_sac()
 
@@ -274,7 +276,7 @@ class ETL(object):
             report_id=self.report_id,
             auditee_certify_name=None,  # TODO: Where does this come from?
             auditee_certify_title=None,  # TODO: Where does this come from?
-            auditee_contact_name=general_information["auditee_contact_name"],
+            auditee_contact_name=general_information.get("auditee_contact_name",""),
             auditee_email=general_information["auditee_email"],
             auditee_name=general_information["auditee_name"],
             auditee_phone=general_information["auditee_phone"],
@@ -293,7 +295,9 @@ class ETL(object):
             auditor_address_line_1=general_information["auditor_address_line_1"],
             auditor_zip=general_information["auditor_zip"],
             auditor_country=general_information["auditor_country"],
-            auditor_international_address=general_information["auditor_international_address"],
+            auditor_international_address=general_information.get(
+                "auditor_international_address",""
+            ),
             auditor_email=general_information["auditor_email"],
             auditor_firm_name=general_information["auditor_firm_name"],
             auditor_foreign_addr=None,  # TODO:  What does this look like in the incoming json?

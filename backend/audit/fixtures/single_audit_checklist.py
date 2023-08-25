@@ -51,7 +51,7 @@ def _fake_general_information(auditee_name=None):
         "auditor_city": fake.city(),
         "auditor_contact_name": fake.name(),
         "auditor_contact_title": fake.job(),
-        "auditor_country": fake.country(),
+        "auditor_country": 'USA',
         "auditor_ein": fake.ssn().replace("-", ""),
         "auditor_ein_not_an_ssn_attestation": True,
         "auditor_email": fake.ascii_email(),
