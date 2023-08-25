@@ -4,6 +4,7 @@ from typing import List
 from django.http import Http404, HttpResponse, JsonResponse
 from django.urls import reverse
 from django.views import View, generic
+from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from rest_framework import viewsets
 from rest_framework.authentication import BaseAuthentication
@@ -22,6 +23,8 @@ from .serializers import (
     SingleAuditChecklistSerializer,
     UEISerializer,
 )
+
+UserModel = get_user_model()
 
 AUDITEE_INFO_PREVIOUS_STEP_DATA_WE_NEED = [
     "user_provided_organization_type",
@@ -117,21 +120,49 @@ def access_and_submission_check(user, data):
         )
 
         # Create all contact Access objects
-        Access.objects.create(sac=sac, role="editor", email=user.email, user=user)
+        Access.objects.create(
+            sac=sac,
+            role="editor",
+            email=user.email,
+            user=user,
+        )
         Access.objects.create(
             sac=sac,
             role="certifying_auditee_contact",
-            email=serializer.data.get("certifying_auditee_contact"),
+            fullname=serializer.data.get("certifying_auditee_contact_fullname"),
+            email=serializer.data.get("certifying_auditee_contact_email"),
         )
         Access.objects.create(
             sac=sac,
             role="certifying_auditor_contact",
-            email=serializer.data.get("certifying_auditor_contact"),
+            fullname=serializer.data.get("certifying_auditor_contact_fullname"),
+            email=serializer.data.get("certifying_auditor_contact_email"),
         )
-        for contact in serializer.data.get("auditee_contacts"):
-            Access.objects.create(sac=sac, role="editor", email=contact)
-        for contact in serializer.data.get("auditor_contacts"):
-            Access.objects.create(sac=sac, role="editor", email=contact)
+
+        # The contacts form should prevent users from submitting an incomplete contacts section
+        auditee_contacts_info = zip(
+            serializer.data.get("auditee_contacts_email"),
+            serializer.data.get("auditee_contacts_fullname"),
+        )
+        auditor_contacts_info = zip(
+            serializer.data.get("auditor_contacts_email"),
+            serializer.data.get("auditor_contacts_fullname"),
+        )
+
+        for email, name in auditee_contacts_info:
+            Access.objects.create(
+                sac=sac,
+                role="editor",
+                fullname=name,
+                email=email,
+            )
+        for email, name in auditor_contacts_info:
+            Access.objects.create(
+                sac=sac,
+                role="editor",
+                fullname=name,
+                email=email,
+            )
 
         sac.save()
 

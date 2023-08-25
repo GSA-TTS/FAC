@@ -1,4 +1,8 @@
 import json
+from pathlib import Path
+from tempfile import NamedTemporaryFile
+from unittest.mock import patch
+
 from django.test import TestCase
 from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -6,15 +10,13 @@ from django.urls import reverse
 
 from django.test import Client
 from model_bakery import baker
-from unittest.mock import patch
-
-from tempfile import NamedTemporaryFile
 
 from openpyxl import load_workbook
 from openpyxl.cell import Cell
 
 from .fixtures.excel import (
     ADDITIONAL_UEIS_TEMPLATE,
+    ADDITIONAL_EINS_TEMPLATE,
     FEDERAL_AWARDS_TEMPLATE,
     CORRECTIVE_ACTION_PLAN_TEMPLATE,
     FINDINGS_TEXT_TEMPLATE,
@@ -26,12 +28,18 @@ from .fixtures.excel import (
     FINDINGS_UNIFORM_GUIDANCE_ENTRY_FIXTURES,
     FEDERAL_AWARDS_ENTRY_FIXTURES,
     ADDITIONAL_UEIS_ENTRY_FIXTURES,
+    ADDITIONAL_EINS_ENTRY_FIXTURES,
     SECONDARY_AUDITORS_ENTRY_FIXTURES,
     NOTES_TO_SEFA_ENTRY_FIXTURES,
     FORM_SECTIONS,
 )
-from .models import Access, SingleAuditChecklist
-from .views import MySubmissions
+from .fixtures.single_audit_checklist import (
+    fake_auditor_certification,
+    fake_auditee_certification,
+)
+from .models import Access, SingleAuditChecklist, SingleAuditReportFile
+from .views import MySubmissions, submission_progress_check
+from .cross_validation.sac_validation_shape import sac_validation_shape, snake_to_camel
 
 User = get_user_model()
 
@@ -53,11 +61,17 @@ VALID_AUDITEE_INFO_DATA = {
 }
 
 VALID_ACCESS_AND_SUBMISSION_DATA = {
-    "certifying_auditee_contact": "a@a.com",
-    "certifying_auditor_contact": "b@b.com",
-    "auditee_contacts": ["c@c.com"],
-    "auditor_contacts": ["d@d.com"],
+    "certifying_auditee_contact_fullname": "Fuller A. Namesmith",
+    "certifying_auditee_contact_email": "a@a.com",
+    "certifying_auditor_contact_fullname": "Fuller B. Namesmith",
+    "certifying_auditor_contact_email": "b@b.com",
+    "auditee_contacts_fullname": ["Fuller C. Namesmith"],
+    "auditee_contacts_email": ["c@c.com"],
+    "auditor_contacts_fullname": ["Fuller D. Namesmith"],
+    "auditor_contacts_email": ["d@d.com"],
 }
+
+AUDIT_JSON_FIXTURES = Path(__file__).parent / "fixtures" / "json"
 
 
 # Mocking the user login and file scan functions
@@ -92,6 +106,12 @@ def _make_user_and_sac(**kwargs):
     user = baker.make(User)
     sac = baker.make(SingleAuditChecklist, **kwargs)
     return user, sac
+
+
+def _load_json(target):
+    """Given a str or Path, load JSON from that target."""
+    raw = Path(target).read_text(encoding="utf-8")
+    return json.loads(raw)
 
 
 class MySubmissionsViewTests(TestCase):
@@ -148,6 +168,34 @@ class EditSubmissionViewTests(TestCase):
         self.assertAlmostEquals(result.status_code, 302)
 
 
+class SubmissionViewTests(TestCase):
+    """
+    Testing for the final step: submitting.
+    """
+
+    def test_post_redirect(self):
+        """
+        The status should be "submitted" after the post.
+        The user should be redirected to the submissions table.
+        """
+        user = baker.make(User)
+        sac = baker.make(
+            SingleAuditChecklist,
+            submission_status=SingleAuditChecklist.STATUS.AUDITEE_CERTIFIED,
+        )
+        baker.make(Access, user=user, sac=sac, role="certifying_auditee_contact")
+        response = _authed_post(
+            Client(),
+            user,
+            "audit:Submission",
+            kwargs={"report_id": sac.report_id},
+            data={},
+        )
+        sac_after = SingleAuditChecklist.objects.get(report_id=sac.report_id)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(sac_after.submission_status, sac_after.STATUS.SUBMITTED)
+
+
 class SubmissionStatusTests(TestCase):
     """
     Tests the expected order of progression for submission_status.
@@ -180,19 +228,53 @@ class SubmissionStatusTests(TestCase):
         self.assertEqual(data[0]["submission_status"], "in_progress")
         report_id = data[0]["report_id"]
 
+        filename = "general-information--test0001test--simple-pass.json"
+        info = _load_json(AUDIT_JSON_FIXTURES / filename)
+        # Update the SAC so that it will pass overall validation:
+        sac = SingleAuditChecklist.objects.get(report_id=report_id)
+        sac.general_information = info
+        sac.audit_information = {"stuff": "whatever"}
+        sac.federal_awards = {"FederalAwards": {"federal_awards": []}}
+        sac.corrective_action_plan = {
+            "CorrectiveActionPlan": {"auditee_uei": "TEST0001TEST"}
+        }
+        sac.findings_text = {"FindingsText": {"auditee_uei": "TEST0001TEST"}}
+        sac.findings_uniform_guidance = {
+            "FindingsUniformGuidance": {"auditee_uei": "TEST0001TEST"}
+        }
+        sac.notes_to_sefa = {"NotesToSefa": {"auditee_uei": "TEST0001TEST"}}
+        baker.make(SingleAuditReportFile, sac=sac)
+        sac.save()
+
         self.client.post(f"/audit/ready-for-certification/{report_id}", data={})
         data = MySubmissions.fetch_my_submissions(self.user)
+
         self.assertEqual(data[0]["submission_status"], "ready_for_certification")
 
     def test_auditor_certification(self):
         """
         Test that certifying auditor contacts can provide auditor certification
         """
+        data_step_1, data_step_2 = fake_auditor_certification()
+
         user, sac = _make_user_and_sac(submission_status="ready_for_certification")
         baker.make(Access, sac=sac, user=user, role="certifying_auditor_contact")
 
         kwargs = {"report_id": sac.report_id}
-        _authed_post(self.client, user, "audit:AuditorCertification", kwargs=kwargs)
+        _authed_post(
+            self.client,
+            user,
+            "audit:AuditorCertification",
+            kwargs=kwargs,
+            data=data_step_1,
+        )
+        _authed_post(
+            self.client,
+            user,
+            "audit:AuditorCertificationConfirm",
+            kwargs=kwargs,
+            data=data_step_2,
+        )
 
         updated_sac = SingleAuditChecklist.objects.get(report_id=sac.report_id)
 
@@ -202,11 +284,26 @@ class SubmissionStatusTests(TestCase):
         """
         Test that certifying auditee contacts can provide auditee certification
         """
+        data_step_1, data_step_2 = fake_auditee_certification()
+
         user, sac = _make_user_and_sac(submission_status="auditor_certified")
         baker.make(Access, sac=sac, user=user, role="certifying_auditee_contact")
 
         kwargs = {"report_id": sac.report_id}
-        _authed_post(self.client, user, "audit:AuditeeCertification", kwargs=kwargs)
+        _authed_post(
+            self.client,
+            user,
+            "audit:AuditeeCertification",
+            kwargs=kwargs,
+            data=data_step_1,
+        )
+        _authed_post(
+            self.client,
+            user,
+            "audit:AuditeeCertificationConfirm",
+            kwargs=kwargs,
+            data=data_step_2,
+        )
 
         updated_sac = SingleAuditChecklist.objects.get(report_id=sac.report_id)
 
@@ -892,6 +989,64 @@ class SingleAuditReportFileHandlerViewTests(TestCase):
                 )
 
     @patch("audit.validators._scan_file")
+    def test_valid_file_upload_for_additional_eins(self, mock_scan_file):
+        """When a valid Excel file is uploaded, the file should be stored and the SingleAuditChecklist should be updated to include the uploaded Additional EINs data"""
+
+        sac = _mock_login_and_scan(self.client, mock_scan_file)
+        test_data = json.loads(
+            ADDITIONAL_EINS_ENTRY_FIXTURES.read_text(encoding="utf-8")
+        )
+
+        # add valid data to the workbook
+        workbook = load_workbook(ADDITIONAL_EINS_TEMPLATE, data_only=True)
+        _set_by_name(workbook, "auditee_uei", ExcelFileHandlerViewTests.GOOD_UEI)
+        _set_by_name(workbook, "section_name", FORM_SECTIONS.ADDITIONAL_EINS)
+        _add_entry(workbook, 0, test_data[0])
+
+        with NamedTemporaryFile(suffix=".xlsx") as tmp:
+            workbook.save(tmp.name)
+            tmp.seek(0)
+
+            with open(tmp.name, "rb") as excel_file:
+                response = self.client.post(
+                    reverse(
+                        f"audit:{FORM_SECTIONS.ADDITIONAL_EINS}",
+                        kwargs={
+                            "report_id": sac.report_id,
+                            "form_section": FORM_SECTIONS.ADDITIONAL_EINS,
+                        },
+                    ),
+                    data={"FILES": excel_file},
+                )
+
+                self.assertEqual(response.status_code, 302)
+
+                updated_sac = SingleAuditChecklist.objects.get(pk=sac.id)
+
+                self.assertEqual(
+                    updated_sac.additional_eins["AdditionalEINs"]["auditee_uei"],
+                    ExcelFileHandlerViewTests.GOOD_UEI,
+                )
+
+                self.assertEqual(
+                    len(
+                        updated_sac.additional_eins["AdditionalEINs"][
+                            "additional_eins_entries"
+                        ]
+                    ),
+                    1,
+                )
+
+                additional_eins_entries = updated_sac.additional_eins["AdditionalEINs"][
+                    "additional_eins_entries"
+                ][0]
+
+                self.assertEqual(
+                    additional_eins_entries["additional_ein"],
+                    test_data[0]["additional_ein"],
+                )
+
+    @patch("audit.validators._scan_file")
     def test_valid_file_upload_for_notes_to_sefa(self, mock_scan_file):
         """When a valid Excel file is uploaded, the file should be stored and the SingleAuditChecklist should be updated to include the uploaded Notes to SEFA data"""
 
@@ -949,3 +1104,103 @@ class SingleAuditReportFileHandlerViewTests(TestCase):
                     notes_to_sefa_entries["note_title"],
                     test_data[0]["note_title"],
                 )
+
+
+class SubmissionProgressViewTests(TestCase):
+    """
+    The page shows information about a submission and conditionally displays links/other
+    affordances for individual sections.
+    """
+
+    def setUp(self):
+        self.user = baker.make(User)
+        self.sac = baker.make(SingleAuditChecklist)
+        self.client = Client()
+
+    def test_login_required(self):
+        """When an unauthenticated request is made"""
+
+        response = self.client.post(
+            reverse(
+                "audit:SubmissionProgress",
+                kwargs={"report_id": "12345"},
+            )
+        )
+
+        self.assertEqual(response.status_code, 403)
+
+    def test_phrase_in_page(self):
+        """Check for 'General information form'."""
+        baker.make(Access, user=self.user, sac=self.sac)
+        self.client.force_login(user=self.user)
+        phrase = "General information form"
+        res = self.client.get(
+            reverse(
+                "audit:SubmissionProgress", kwargs={"report_id": self.sac.report_id}
+            )
+        )
+        self.assertIn(phrase, res.content.decode("utf-8"))
+
+    def test_submission_progress_check_geninfo_only(self):
+        """
+        Check the function containing the logic around which sections are required.
+
+        If the conditional questions all have negative answers and data is absent for
+        the rest, return the appropriate shape.
+        """
+        filename = "general-information--test0001test--simple-pass.json"
+        info = _load_json(AUDIT_JSON_FIXTURES / filename)
+        sac = baker.make(SingleAuditChecklist, general_information=info)
+        shaped_sac = sac_validation_shape(sac)
+        result = submission_progress_check(shaped_sac, sar=None, crossval=False)
+        self.assertEqual(result["general_information"]["display"], "complete")
+        self.assertTrue(result["general_information"]["completed"])
+        conditional_keys = (
+            "additional_ueis",
+            "additional_eins",
+            "secondary_auditors",
+        )
+        for key in conditional_keys:
+            self.assertEqual(result[key]["display"], "hidden")
+        self.assertFalse(result["complete"])
+        baker.make(Access, user=self.user, sac=sac)
+        self.client.force_login(user=self.user)
+        res = self.client.get(
+            reverse("audit:SubmissionProgress", kwargs={"report_id": sac.report_id})
+        )
+        phrases = (
+            "Upload the Additional UEIs workbook",
+            "Upload the Additional EINs workbook",
+            "Upload the Secondary Auditors workbook",
+        )
+        for phrase in phrases:
+            self.assertNotIn(phrase, res.content.decode("utf-8"))
+
+    def test_submission_progress_check_simple_pass(self):
+        """
+        Check the function containing the logic around which sections are required.
+
+        If the conditional questions all have negative answers and data is present for
+        the rest, return the appropriate shape.
+
+
+        """
+        filename = "general-information--test0001test--simple-pass.json"
+        info = _load_json(AUDIT_JSON_FIXTURES / filename)
+        addl_sections = {}
+        for section_name, camel_name in snake_to_camel.items():
+            addl_sections[section_name] = {camel_name: "whatever"}
+        addl_sections["general_information"] = info
+        sac = baker.make(SingleAuditChecklist, **addl_sections)
+        shaped_sac = sac_validation_shape(sac)
+        result = submission_progress_check(shaped_sac, sar=None, crossval=False)
+        self.assertEqual(result["general_information"]["display"], "complete")
+        self.assertTrue(result["general_information"]["completed"])
+        conditional_keys = (
+            "additional_ueis",
+            "additional_eins",
+            "secondary_auditors",
+        )
+        for key in conditional_keys:
+            self.assertEqual(result[key]["display"], "hidden")
+        self.assertTrue(result["complete"])

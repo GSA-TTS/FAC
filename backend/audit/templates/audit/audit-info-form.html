@@ -1,18 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
 {% block content %}
-    <header class="usa-header usa-header-basic bg-primary-darker">
-        <div class="usa-nav-container">
-            <div class="usa-navbar bg-primary-darker text-white width-full flex">
-                <p class="margin-left-2">
-                    <a href="/" class="text-gray-10">My audit submissions</a> »
-                    <a href="{% url 'audit:SubmissionProgress' report_id %}"
-                       class="text-gray-10">{{ auditee_name | default_if_none:'' }}</a> »
-                    <span class="text-bold">Audit information</span>
-                </p>
-            </div>
-        </div>
-    </header>
     <div class="grid-container margin-top-6">
         <div class="grid-col grid-gap">
             {% comment %} {% include "../sidenav.html" %} {% endcomment %}
@@ -53,6 +41,65 @@
                     {% endfor %}
                     <span class="usa-error-message margin-top-2">{{ form.errors.gaap_results|striptags }}</span>
                 </fieldset>
+                <div class="margin-left-10" id="sp_framework_section">
+                    <fieldset class="usa-fieldset">
+                        <legend>What was the special purpose framework? Select only one.</legend>
+                        {% for pair in sp_framework_basis %}
+                            <div class="usa-checkbox">
+                                <input id="sp_framework_basis--{{ pair.tag }}"
+                                    name="sp_framework_basis"
+                                    class="usa-radio__input"
+                                    type="radio"
+                                    value="{{ pair.tag }}"
+                                    {% if pair.tag in form.cleaned_data.sp_framework_basis %}checked{% endif %} />
+                                <label class="usa-radio__label" for="sp_framework_basis--{{ pair.tag }}">{{ pair.readable }}</label>
+                            </div>
+                        {% endfor %}
+                        <span class="usa-error-message margin-top-2">{{ form.errors.gaap_results|striptags }}</span>
+                    </fieldset>
+                    <fieldset class="usa-fieldset margin-top-2">
+                        <legend>
+                            Was the special purpose framework used as a basis of accounting required by state law?
+                        </legend>
+                        <div class="usa-radio">
+                            <input id="is_sp_framework_required--true"
+                                name="is_sp_framework_required"
+                                class="usa-radio__input"
+                                type="radio"
+                                value="True"
+                                {% if form.cleaned_data.is_sp_framework_required is True %}checked{% endif %} />
+                            <label class="usa-radio__label" for="is_sp_framework_required--true">Yes</label>
+                        </div>
+                        <div class="usa-radio">
+                            <input id="is_sp_framework_required--false"
+                                name="is_sp_framework_required"
+                                class="usa-radio__input"
+                                type="radio"
+                                value="False"
+                                {% if form.cleaned_data.is_sp_framework_required is False %}checked{% endif %} />
+                            <label class="usa-radio__label" for="is_sp_framework_required--false">No</label>
+                        </div>
+                        <span class="usa-error-message margin-top-2">{{ form.errors.is_going_concern_included|striptags }}</span>
+                    </fieldset>
+                    <fieldset class="usa-fieldset margin-top-2">
+                        <legend>
+                            What was the auditor’s opinion on the special purpose framework? <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
+                        </legend>
+                        <p class="text-base">Select any of the following that apply.</p>
+                        {% for pair in sp_framework_opinions %}
+                            <div class="usa-checkbox">
+                                <input id="sp_framework_opinions--{{ pair.tag }}"
+                                    name="sp_framework_opinions"
+                                    class="usa-checkbox__input"
+                                    type="checkbox"
+                                    value="{{ pair.tag }}"
+                                    {% if pair.tag in form.cleaned_data.sp_framework_opinions %}checked{% endif %} />
+                                <label class="usa-checkbox__label" for="sp_framework_opinions--{{ pair.tag }}">{{ pair.readable }}</label>
+                            </div>
+                        {% endfor %}
+                        <span class="usa-error-message margin-top-2">{{ form.errors.gaap_results|striptags }}</span>
+                    </fieldset>
+                </div>
                 <fieldset class="usa-fieldset margin-top-2">
                     <legend>
                         Is a "going concern" emphasis-of-matter paragraph included in the audit report? <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
@@ -252,6 +299,8 @@
                 <button class="usa-button margin-top-2 margin-bottom-10"
                         id="continue"
                         name="continue">Save and continue to the next section</button>
+                <a class="usa-button usa-button--unstyled margin-left-2" id="cancel-audit-info-form-link" href="{% url 'audit:SubmissionProgress' report_id %}"
+                    aria-controls="upload-cancel">Cancel</a>
             </form>
         </div>
     </div>

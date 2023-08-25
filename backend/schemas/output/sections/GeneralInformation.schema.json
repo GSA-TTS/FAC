@@ -119,27 +119,82 @@
          "type": "string"
       },
       "Zip": {
-         "pattern": "^[0-9]{5}(?:-[0-9]{4})?$",
+         "pattern": "^[0-9]{5}(?:[0-9]{4})?$",
          "type": "string"
       }
    },
    "$id": "http://example.org/generalinformation",
    "$schema": "http://json-schema.org/draft/2019-09/schema#",
    "additionalProperties": false,
+   "anyOf": [
+      {
+         "if": {
+            "properties": {
+               "audit_period_covered": {
+                  "const": "annual"
+               }
+            }
+         },
+         "then": {
+            "audit_period_other_months": {
+               "description": "Empty string or null",
+               "enum": [
+                  "",
+                  "null"
+               ],
+               "title": "EmptyString_Null"
+            }
+         }
+      },
+      {
+         "if": {
+            "properties": {
+               "audit_period_covered": {
+                  "const": "biennial"
+               }
+            }
+         },
+         "then": {
+            "audit_period_other_months": {
+               "description": "Empty string or null",
+               "enum": [
+                  "",
+                  "null"
+               ],
+               "title": "EmptyString_Null"
+            }
+         }
+      },
+      {
+         "if": {
+            "properties": {
+               "audit_period_covered": {
+                  "const": "other"
+               }
+            }
+         },
+         "then": {
+            "audit_period_other_months": {
+               "pattern": "^0[0-9]|1[0-8]$",
+               "type": "string"
+            }
+         }
+      }
+   ],
    "metamodel_version": "1.7.0",
    "properties": {
       "audit_period_covered": {
          "$ref": "#/$defs/AuditPeriod"
       },
       "audit_period_other_months": {
-         "pattern": "^[0-1][0-9]$",
          "type": "string"
       },
       "audit_type": {
          "description": "Type of audit being submitted",
          "enum": [
             "program-specific",
-            "single-audit"
+            "single-audit",
+            "alternative-compliance-engagement"
          ],
          "title": "AuditType",
          "type": "string"
@@ -257,6 +312,12 @@
          ]
       },
       "multiple_ueis_covered": {
+         "type": [
+            "boolean",
+            "null"
+         ]
+      },
+      "secondary_auditors_exist": {
          "type": [
             "boolean",
             "null"

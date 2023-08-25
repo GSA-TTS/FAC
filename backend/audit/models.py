@@ -17,6 +17,7 @@ from django_fsm import FSMField, RETURN_VALUE, transition
 import audit.cross_validation
 from .validators import (
     validate_additional_ueis_json,
+    validate_additional_eins_json,
     validate_corrective_action_plan_json,
     validate_excel_file,
     validate_federal_award_json,
@@ -26,6 +27,9 @@ from .validators import (
     validate_secondary_auditors_json,
     validate_notes_to_sefa_json,
     validate_single_audit_report_file,
+    validate_auditor_certification_json,
+    validate_auditee_certification_json,
+    validate_tribal_data_consent_json,
     validate_audit_information_json,
     validate_component_page_numbers,
 )
@@ -202,6 +206,7 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
     submitted_by = models.ForeignKey(User, on_delete=models.PROTECT)
     date_created = models.DateTimeField(auto_now_add=True)
     submission_status = FSMField(default=STATUS.IN_PROGRESS, choices=STATUS_CHOICES)
+    data_source = models.CharField(default="GSA")
 
     # implement an array of tuples as two arrays since we can only have simple fields inside an array
     transition_name = ArrayField(
@@ -263,6 +268,11 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         blank=True, null=True, validators=[validate_additional_ueis_json]
     )
 
+    # Additional EINs:
+    additional_eins = models.JSONField(
+        blank=True, null=True, validators=[validate_additional_eins_json]
+    )
+
     # Secondary Auditors:
     secondary_auditors = models.JSONField(
         blank=True, null=True, validators=[validate_secondary_auditors_json]
@@ -271,6 +281,18 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
     # Notes to SEFA:
     notes_to_sefa = models.JSONField(
         blank=True, null=True, validators=[validate_notes_to_sefa_json]
+    )
+
+    auditor_certification = models.JSONField(
+        blank=True, null=True, validators=[validate_auditor_certification_json]
+    )
+
+    auditee_certification = models.JSONField(
+        blank=True, null=True, validators=[validate_auditee_certification_json]
+    )
+
+    tribal_data_consent = models.JSONField(
+        blank=True, null=True, validators=[validate_tribal_data_consent_json]
     )
 
     def validate_full(self):
@@ -300,9 +322,17 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         themselves.
         """
         shaped_sac = audit.cross_validation.sac_validation_shape(self)
+        try:
+            sar = SingleAuditReportFile.objects.filter(sac_id=self.id).latest(
+                "date_created"
+            )
+        except SingleAuditReportFile.DoesNotExist:
+            sar = None
         validation_functions = audit.cross_validation.functions
         errors = list(
-            chain.from_iterable([func(shaped_sac) for func in validation_functions])
+            chain.from_iterable(
+                [func(shaped_sac, sar=sar) for func in validation_functions]
+            )
         )
         if errors:
             return {"errors": errors, "data": shaped_sac}
@@ -380,8 +410,11 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         """
 
         from audit.intake_to_dissemination import IntakeToDissemination
+        from audit.cog_over import cog_over
 
         if self.general_information:
+            # cog / over assignment
+            self.cognizant_agency, self.oversight_agency = cog_over(self)
             intake_to_dissem = IntakeToDissemination(self)
             intake_to_dissem.load_all()
 
@@ -495,6 +528,7 @@ class Access(models.Model):
         help_text="Access type granted to this user",
         max_length=50,
     )
+    fullname = models.CharField(blank=True)
     email = models.EmailField()
     user = models.ForeignKey(
         User,
@@ -583,3 +617,27 @@ class SingleAuditReportFile(models.Model):
         if self.sac.submission_status != self.sac.STATUS.IN_PROGRESS:
             raise LateChangeError("Attempted PDF upload")
         super().save(*args, **kwargs)
+
+
+class CognizantBaseline(models.Model):
+    dbkey = models.IntegerField(
+        "Identifier for a submission along with audit_year in C-FAC",
+        null=True,
+    )
+    audit_year = models.IntegerField(
+        "Audit year from fy_start_date",
+        null=True,
+    )
+    ein = models.CharField(
+        "Primary Employer Identification Number",
+        null=True,
+        max_length=30,
+    )
+    cognizant_agency = models.CharField(
+        "Two digit Federal agency prefix of the cognizant agency",
+        max_length=2,
+        null=True,
+    )
+
+    class Meta:
+        unique_together = (("dbkey", "audit_year"),)

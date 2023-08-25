@@ -1,7 +1,7 @@
 from django.urls import path
 
-from .fixtures.excel import FORM_SECTIONS
-from . import views
+from audit.fixtures.excel import FORM_SECTIONS
+from audit import views
 
 app_name = "audit"
 
@@ -27,13 +27,23 @@ urlpatterns = [
     ),
     path(
         "auditor-certification/<str:report_id>",
-        views.AuditorCertificationView.as_view(),
+        views.AuditorCertificationStep1View.as_view(),
         name="AuditorCertification",
     ),
     path(
+        "auditor-certification-confirm/<str:report_id>",
+        views.AuditorCertificationStep2View.as_view(),
+        name="AuditorCertificationConfirm",
+    ),
+    path(
         "auditee-certification/<str:report_id>",
-        views.AuditeeCertificationView.as_view(),
+        views.AuditeeCertificationStep1View.as_view(),
         name="AuditeeCertification",
+    ),
+    path(
+        "auditee-certification-confirm/<str:report_id>",
+        views.AuditeeCertificationStep2View.as_view(),
+        name="AuditeeCertificationConfirm",
     ),
     path(
         "certification/<str:report_id>",

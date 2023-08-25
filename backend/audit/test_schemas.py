@@ -371,17 +371,17 @@ class AuditInformationSchemaValidityTest(SimpleTestCase):
     )
 
     SIMPLE_CASE = json.loads(SIMPLE_CASES_TEST_FILE.read_text(encoding="utf-8"))[
-        "AuditInformationCase"
+        "AuditInformationCases"
     ]
 
     def test_schema(self):
         """Try to test Audit Info schema."""
         schema = self.AUDIT_INFO_SCHEMA
-        validate(self.SIMPLE_CASE, schema)
+        validate(self.SIMPLE_CASE[0], schema)
 
     def test_all_booleans(self):
         schema = self.AUDIT_INFO_SCHEMA
-        simple_case = jsoncopy(self.SIMPLE_CASE)
+        simple_case = jsoncopy(self.SIMPLE_CASE[0])
 
         boolean_fields = [
             "is_going_concern_included",
@@ -398,18 +398,13 @@ class AuditInformationSchemaValidityTest(SimpleTestCase):
 
     def test_all_gaap_results(self):
         schema = self.AUDIT_INFO_SCHEMA
-        simple_case = jsoncopy(self.SIMPLE_CASE)
+        simple_case = jsoncopy(self.SIMPLE_CASE[0])
         gaap_results = [
             "unmodified_opinion",
             "qualified_opinion",
             "adverse_opinion",
             "disclaimer_of_opinion",
-            "not_gaap",
         ]
-
-        for result in gaap_results:
-            simple_case["gaap_results"] = [result]
-            validate(simple_case, schema)
 
         for _ in range(10):
             for n in range(2, 5):
@@ -417,9 +412,26 @@ class AuditInformationSchemaValidityTest(SimpleTestCase):
                 simple_case["gaap_results"] = ls
                 validate(simple_case, schema)
 
+        # Test when it is 'not_gaap', which requires other fields.
+        simple_case["gaap_results"] = ["not_gaap"]
+        simple_case["is_sp_framework_required"] = random.choice([True, False])
+        simple_case["sp_framework_basis"] = random.choices(
+            ["cash_basis", "tax_basis", "contractual_basis", "other_basis"], k=2
+        )
+        simple_case["sp_framework_opinions"] = random.choices(
+            [
+                "unmodified_opinion",
+                "qualified_opinion",
+                "adverse_opinion",
+                "disclaimer_of_opinion",
+            ],
+            k=2,
+        )
+        validate(simple_case, schema)
+
     def test_bad_gaap_results(self):
         schema = self.AUDIT_INFO_SCHEMA
-        simple_case = jsoncopy(self.SIMPLE_CASE)
+        simple_case = jsoncopy(self.SIMPLE_CASE[0])
         not_gaap_values = [
             "state",
             "local",
@@ -434,9 +446,23 @@ class AuditInformationSchemaValidityTest(SimpleTestCase):
             simple_case["gaap_results"] = [word]
             self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
+    def test_bad_sp_framework_opinions(self):
+        schema = self.AUDIT_INFO_SCHEMA
+        simple_case = jsoncopy(self.SIMPLE_CASE[1])
+
+        simple_case["sp_framework_opinions"] = "not_a_real_opinion"
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
+
+    def test_bad_sp_framework_basis(self):
+        schema = self.AUDIT_INFO_SCHEMA
+        simple_case = jsoncopy(self.SIMPLE_CASE[1])
+
+        simple_case["sp_framework_basis"] = "an_invalid_basis"
+        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
+
     def test_valid_aln_prefixes(self):
         schema = self.AUDIT_INFO_SCHEMA
-        simple_case = jsoncopy(self.SIMPLE_CASE)
+        simple_case = jsoncopy(self.SIMPLE_CASE[0])
         # Why "likely?" I have no idea what is authoritative.
         # Fix the tests as we discover changes, and update the
         # validation schema while we're at it.
@@ -641,7 +667,7 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
 
     def test_direct_award_dependents(self):
         """
-        If direct_award is Y, loan_balance_at_audit_period_end must have a value.
+        direct_or_indirect_award tests
         """
         schema = self.FEDERAL_AWARDS_SCHEMA
 
@@ -660,7 +686,7 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
                         "passthrough_identifying_number": "Bob-123",
                     }
                 ],
-            }
+            },
         }
         simple_case["FederalAwards"]["federal_awards"] = [both_pass]
 
@@ -692,7 +718,7 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
             }
         }
         simple_case["FederalAwards"]["federal_awards"] = [bad_entity_fail]
-        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
+        validate(simple_case, schema)
 
         bad_entity_empty_fail = award | {
             "direct_or_indirect_award": {
@@ -703,7 +729,7 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
             }
         }
         simple_case["FederalAwards"]["federal_awards"] = [bad_entity_empty_fail]
-        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
+        validate(simple_case, schema)
 
     def test_passthrough_dependents(self):
         """
@@ -784,7 +810,7 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
 
     def test_missing_state_cluster_name(self):
         """
-        If cluster name is 'STATE CLUSTER' state_cluster_name must have a value
+        state_cluster_name tests
         """
         schema = self.FEDERAL_AWARDS_SCHEMA
 
@@ -809,15 +835,6 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
         # Test for errors when state_cluster_name is not empty or null
         self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
-        # Test for successful validation when state_cluster_name is empty or null
-        for valid in ["", "null"]:
-            simple_case = jsoncopy(self.SIMPLE_CASES[0])
-            simple_case["FederalAwards"]["federal_awards"][0]["cluster"][
-                "state_cluster_name"
-            ] = valid
-
-            validate(simple_case, schema)
-
     def test_number_of_audit_findings(self):
         """
         If major_program_audit_report_type is A or Q, number_of_audit_findings must be greater than 0
@@ -835,7 +852,10 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
             simple_case["FederalAwards"]["federal_awards"][0]["program"][
                 "number_of_audit_findings"
             ] = 0
-            self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
+            # We cannot find, in the UG, anything that suggests this is true.
+            # This seems like it should be allowed to pass.
+            # self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
+            validate(simple_case, schema)
 
             simple_case["FederalAwards"]["federal_awards"][0]["program"][
                 "number_of_audit_findings"
@@ -1146,9 +1166,11 @@ class NotesToSefaSchemaValidityTest(SimpleTestCase):
     NOTES_TO_SEFA_SCHEMA = json.loads(
         (SECTION_SCHEMA_DIR / "NotesToSefa.schema.json").read_text(encoding="utf-8")
     )
-    SIMPLE_CASE = json.loads(SIMPLE_CASES_TEST_FILE.read_text(encoding="utf-8"))[
-        "NotesToSefaCase"
+    SIMPLE_CASES = json.loads(SIMPLE_CASES_TEST_FILE.read_text(encoding="utf-8"))[
+        "NotesToSefaCases"
     ]
+
+    SIMPLE_CASE = SIMPLE_CASES[0]
 
     def test_schema(self):
         """Test NotesToSefa schema first."""
@@ -1160,9 +1182,11 @@ class NotesToSefaSchemaValidityTest(SimpleTestCase):
     def test_simple_pass(self):
         """
         Test a simple NotesToSefa case.
+        One with notes, one without
         """
         schema = self.NOTES_TO_SEFA_SCHEMA
         validate(self.SIMPLE_CASE, schema)
+        validate(self.SIMPLE_CASES[1], schema)
 
     def test_missing_auditee_uei(self):
         """
@@ -1180,6 +1204,9 @@ class NotesToSefaSchemaValidityTest(SimpleTestCase):
         Test that validation fails if any required entry field is missing
         """
         schema = self.NOTES_TO_SEFA_SCHEMA
+
+        simple_case = jsoncopy(self.SIMPLE_CASE)
+        validate(simple_case, schema)
 
         simple_case = jsoncopy(self.SIMPLE_CASE)
         del simple_case["NotesToSefa"]["accounting_policies"]

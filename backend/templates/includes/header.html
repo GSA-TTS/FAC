@@ -83,3 +83,10 @@
 <header class="usa-header usa-header--basic">
     {% include "includes/nav_primary.html" %}
 </header>
+{% if request.path != '/' %}
+    <header class="usa-header usa-header-basic">
+        <div class="bg-primary-darker text-white width-full height-6">
+            {% comment %} Placeholder. Replace with required OMB control value when designed. {% endcomment %}
+        </div>
+    </header>
+{% endif %}

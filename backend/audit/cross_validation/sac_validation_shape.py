@@ -1,5 +1,6 @@
 camel_to_snake = {
     "AdditionalUEIs": "additional_ueis",
+    "SecondaryAuditors": "secondary_auditors",
     "AuditInformation": "audit_information",
     "CorrectiveActionPlan": "corrective_action_plan",
     "FederalAwards": "federal_awards",

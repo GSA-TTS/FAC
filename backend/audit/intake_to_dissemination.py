@@ -11,6 +11,7 @@ from dissemination.models import (
     Passthrough,
     General,
     SecondaryAuditor,
+    AdditionalUei,
 )
 from audit.models import SingleAuditChecklist
 
@@ -38,6 +39,8 @@ class IntakeToDissemination(object):
             "CapTexts": self.load_captext,
             "Notes": self.load_notes,
             "Revisions": self.load_revision,
+            "AdditionalUEIs": self.load_additional_ueis,
+            "AuditInfo": self.load_audit_info,
         }
         for _, load_method in load_methods.items():
             try:
@@ -59,6 +62,11 @@ class IntakeToDissemination(object):
 
     def load_finding_texts(self):
         findings_text = self.single_audit_checklist.findings_text
+
+        if not findings_text:
+            logger.warning("No finding texts found to load")
+            return
+
         findings_text_entries = findings_text["FindingsText"]["findings_text_entries"]
         findings_text_objects = []
         for entry in findings_text_entries:
@@ -78,6 +86,10 @@ class IntakeToDissemination(object):
         findings_uniform_guidance = (
             self.single_audit_checklist.findings_uniform_guidance
         )
+        if not findings_uniform_guidance:
+            logger.warning("No findings found to load")
+            return
+
         findings_uniform_guidance_entries = findings_uniform_guidance[
             "FindingsUniformGuidance"
         ]["findings_uniform_guidance_entries"]
@@ -85,20 +97,24 @@ class IntakeToDissemination(object):
         findings_objects = []
         for entry in findings_uniform_guidance_entries:
             findings = entry["findings"]
+            program = entry["program"]
+            prior_finding_ref_numbers = None
+            if "prior_references" in findings:
+                prior_finding_ref_numbers = findings["prior_references"]
+
             finding = Finding(
-                award_reference=entry["award_reference"],
+                award_reference=program["award_reference"],
                 report_id=self.report_id,
-                finding_seq_number=entry["seq_number"],
                 finding_ref_number=findings["reference_number"],
                 is_material_weakness=entry["material_weakness"] == "Y",
                 is_modified_opinion=entry["modified_opinion"] == "Y",
                 is_other_findings=entry["other_findings"] == "Y",
-                is_other_non_compliance=entry["other_findings"] == "Y",
-                prior_finding_ref_numbers=findings.get("prior_references"),
+                is_other_non_compliance=entry["other_matters"] == "Y",
+                prior_finding_ref_numbers=prior_finding_ref_numbers,
                 is_questioned_costs=entry["questioned_costs"] == "Y",
                 is_repeat_finding=(findings["repeat_prior_reference"] == "Y"),
                 is_significant_deficiency=(entry["significant_deficiency"] == "Y"),
-                type_requirement=(entry["program"]["compliance_requirement"]),
+                type_requirement=(program["compliance_requirement"]),
             )
             # if self.write_to_db:
             #     finding.save()
@@ -106,9 +122,28 @@ class IntakeToDissemination(object):
         self.loaded_objects["Findings"] = findings_objects
         return findings_objects
 
+    def conditional_lookup(self, dict, key, default):
+        if key in dict:
+            return dict[key]
+        else:
+            return default
+
     def load_federal_award(self):
         federal_awards = self.single_audit_checklist.federal_awards
         federal_awards_objects = []
+        report_id = self.single_audit_checklist.report_id
+        # try:  
+        #     general = General.objects.get(report_id=report_id)
+        # except General.DoesNotExist:
+        #     logger.error(
+        #         f"General must be loaded before FederalAward. report_id = {report_id}"
+        #     )
+        #     return
+        # general.total_amount_expended = federal_awards["FederalAwards"].get(
+        #     "total_amount_expended"
+        # )
+        # general.save() #FIXME: Lest's revisit this
+
         for entry in federal_awards["FederalAwards"]["federal_awards"]:
             program = entry["program"]
             loan = entry["loan_or_loan_guarantee"]
@@ -118,14 +153,15 @@ class IntakeToDissemination(object):
             subrecipient_amount = entry["subrecipients"].get("subrecipient_amount")
             state_cluster_name = cluster.get("state_cluster_name")
             other_cluster_name = cluster.get("other_cluster_name")
+            additional_award_identification = self.conditional_lookup(
+                program, "additional_award_identification", ""
+            )
             federal_award = FederalAward(
                 report_id=self.report_id,
                 award_reference=entry["award_reference"],
                 federal_agency_prefix=program["federal_agency_prefix"],
                 federal_award_extension=program["three_digit_extension"],
-                additional_award_identification=program[
-                    "additional_award_identification"
-                ],
+                additional_award_identification=additional_award_identification,
                 federal_program_name=program["program_name"],
                 amount_expended=program["amount_expended"],
                 cluster_name=cluster["cluster_name"],
@@ -134,14 +170,17 @@ class IntakeToDissemination(object):
                 cluster_total=cluster["cluster_total"],
                 federal_program_total=program["federal_program_total"],
                 is_loan=loan["is_guaranteed"] == "Y",
-                loan_balance=loan["loan_balance_at_audit_period_end"],
+                loan_balance=self.conditional_lookup(
+                    loan, "loan_balance_at_audit_period_end", 0
+                ),
                 is_direct=is_direct,
-                is_major=program["is_major"] == "Y",
-                mp_audit_report_type=program["audit_report_type"],
+                is_major=program["is_major"] == "Y" if "is_major" in program else False,
+                mp_audit_report_type=self.conditional_lookup(
+                    program, "audit_report_type", ""
+                ),
                 findings_count=program["number_of_audit_findings"],
                 is_passthrough_award=is_passthrough,
                 passthrough_amount=subrecipient_amount,
-                type_requirement=None,  # TODO: What is this?
             )
             # if self.write_to_db:
             #     federal_award.save()
@@ -151,9 +190,9 @@ class IntakeToDissemination(object):
 
     def load_captext(self):
         corrective_action_plan = self.single_audit_checklist.corrective_action_plan
-        corrective_action_plan_entries = corrective_action_plan["CorrectiveActionPlan"][
-            "corrective_action_plan_entries"
-        ]
+        corrective_action_plan_entries = corrective_action_plan[
+            "CorrectiveActionPlan"
+        ]["corrective_action_plan_entries"]
         cap_text_objects = []
         for entry in corrective_action_plan_entries:
             cap_text = CapText(
@@ -171,7 +210,7 @@ class IntakeToDissemination(object):
     def load_notes(self):
         notes_to_sefa = self.single_audit_checklist.notes_to_sefa["NotesToSefa"]
         accounting_policies = notes_to_sefa["accounting_policies"]
-        is_minimis_rate_used = notes_to_sefa["is_minimis_rate_used"] == "Y"
+        is_minimis_rate_used = notes_to_sefa["is_minimis_rate_used"] == "Y"  # FIXME This is not always a boolean
         rate_explained = notes_to_sefa["rate_explained"]
         entries = notes_to_sefa["notes_to_sefa_entries"]
         sefa_objects = []
@@ -185,11 +224,10 @@ class IntakeToDissemination(object):
             # if self.write_to_db:
             #     note.save()
             sefa_objects.append(note)
-        else:
+        else:  #FIXME: This does not seem right to me
             for entry in entries:
                 note = Note(
                     report_id=self.report_id,
-                    note_seq_number=entry["seq_number"],
                     content=entry["note_content"],
                     note_title=entry["note_title"],
                     accounting_policies=accounting_policies,
@@ -260,7 +298,15 @@ class IntakeToDissemination(object):
     def load_general(self):
         general_information = self.single_audit_checklist.general_information
         dates_by_status = self._get_dates_from_sac()
-        sac_additional_ueis = self.single_audit_checklist.additional_ueis
+
+        num_months = None
+        if (
+            ("audit_period_other_months" in general_information)
+            and general_information["audit_period_other_months"] != ""
+            and general_information["audit_period_other_months"] is not None
+        ):
+            num_months = int(general_information["audit_period_other_months"])
+
         general = General(
             report_id=self.report_id,
             auditee_certify_name=None,  # TODO: Where does this come from?
@@ -275,12 +321,7 @@ class IntakeToDissemination(object):
             auditee_state=general_information["auditee_state"],
             auditee_ein=general_information["ein"],
             auditee_uei=general_information["auditee_uei"],
-            auditee_addl_uei_list=[
-                entry["additional_uei"]
-                for entry in sac_additional_ueis["AdditionalUEIs"][
-                    "additional_ueis_entries"
-                ]
-            ],
+            additional_ueis=self.single_audit_checklist.additional_ueis == "Y",
             auditee_zip=general_information["auditee_zip"],
             auditor_phone=general_information["auditor_phone"],
             auditor_state=general_information["auditor_state"],
@@ -319,14 +360,13 @@ class IntakeToDissemination(object):
             audit_year=self.audit_year,
             audit_type=general_information["audit_type"],
             entity_type=general_information["user_provided_organization_type"],
-            number_months=general_information["audit_period_other_months"],
+            number_months=num_months,
             audit_period_covered=general_information["audit_period_covered"],
-            is_report_required=None,  # TODO: Notes say this hasn't been used since 2008.
-            total_fed_expenditures=None,  # TODO: Where does this come from?
-            type_report_major_program=None,  # TODO: Where does this come from?
+            total_amount_expended=None,  # loaded from FederalAward
             type_audit_code="UG",
             is_public=self.single_audit_checklist.is_public,
             data_source="GSA",
+            #data_source=self.single_audit_checklist.data_source,
         )
         self._load_audit_info(general)
         # if self.write_to_db:
@@ -336,7 +376,6 @@ class IntakeToDissemination(object):
 
     def load_secondary_auditor(self):
         secondary_auditors = self.single_audit_checklist.secondary_auditors
-
         sec_objs = []
         for secondary_auditor in secondary_auditors["SecondaryAuditors"][
             "secondary_auditors_entries"
@@ -393,3 +432,61 @@ class IntakeToDissemination(object):
             general.dollar_threshold = audit_information["dollar_threshold"]
             general.is_low_risk = audit_information["is_low_risk_auditee"] == "Y"
             general.agencies_with_prior_findings = audit_information["agencies"]
+
+    def load_additional_ueis(self):
+        addls = self.single_audit_checklist.additional_ueis
+        if (
+            addls
+            and "AdditionalUEIs" in addls
+            and "additional_ueis_entries" in addls["AdditionalUEIs"]
+        ):
+            for uei in addls["AdditionalUEIs"]["additional_ueis_entries"]:
+                auei = AdditionalUei(
+                    report_id=self.single_audit_checklist.report_id,
+                    additional_uei=uei["additional_uei"],
+                )
+                auei.save()   #FIXME: We could use a bulk insert here. Also, we could do all save in a batch.
+
+    def load_audit_info(self):
+        report_id = self.single_audit_checklist.report_id
+        try:
+            general = General.objects.get(report_id=report_id)
+        except General.DoesNotExist:
+            logger.error(
+                f"General must be loaded before AuditInfo. report_id = {report_id}"
+            )
+            return
+        audit_information = self.single_audit_checklist.audit_information
+        if not audit_information:
+            logger.warning("No audit info found to load")
+            return
+        general.gaap_results = audit_information["gaap_results"]
+        general.sp_framework = (
+            audit_information["sp_framework_basis"]
+            if "sp_framework_basis" in audit_information
+            else None,
+        )
+        general.is_sp_framework_required = (
+            audit_information["is_sp_framework_required"] == "Y"
+        )
+        general.sp_framework_auditor_opinion = audit_information[
+            "sp_framework_opinions"
+        ]
+        general.is_going_concern = audit_information["is_going_concern_included"] == "Y"
+        general.is_significant_deficiency = (
+            audit_information["is_internal_control_deficiency_disclosed"] == "Y"
+        )
+        general.is_material_weakness = (
+            audit_information["is_internal_control_material_weakness_disclosed"] == "Y"
+        )
+        general.is_material_noncompliance = (
+            audit_information["is_material_noncompliance_disclosed"] == "Y"
+        )
+        general.is_duplicate_reports = (
+            audit_information["is_aicpa_audit_guide_included"] == "Y"
+        )
+        general.dollar_threshold = audit_information["dollar_threshold"]
+        general.is_low_risk = audit_information["is_low_risk_auditee"] == "Y"
+        general.agencies_with_prior_findings = audit_information["agencies"]
+
+        general.save()   #FIXME: Let's revisit this

@@ -5,6 +5,7 @@ on:
 
 jobs:
   django-test:
+    permissions: write-all
     runs-on: ubuntu-latest
     env:
       ENV: TESTING
@@ -15,20 +16,41 @@ jobs:
       ALLOWED_HOSTS: '0.0.0.0 127.0.0.1 localhost'
       DISABLE_AUTH: False
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v3
+
       - uses: actions/setup-node@v3
         with:
           node-version: 16
+
       - name: Create .env
         working-directory: ./backend
         run: touch .env
+
       - name: Start services
         working-directory: ./backend
         run: docker compose -f docker-compose.yml up -d
+
       - name: Run Django test suite
         working-directory: ./backend
         run:
-          docker compose -f docker-compose.yml run web bash -c 'coverage run --parallel-mode --concurrency=multiprocessing manage.py test --parallel && coverage combine && coverage report -m --fail-under=90'
+          docker compose -f docker-compose.yml run web bash -c 'coverage run --parallel-mode --concurrency=multiprocessing manage.py test --parallel && coverage combine && coverage report -m --fail-under=90 && coverage xml -o coverage.xml'
+
+      - name: Copy Coverage From Docker Container
+        run: |
+          docker cp backend-web-1:/src/coverage.xml ./coverage.xml
+          pwd
+          ls -al | grep 'coverage'
+
+      - name: Publish Coverage Report to Pull Request
+        uses: 5monkeys/cobertura-action@master
+        with:
+          path: ./coverage.xml
+          minimum_coverage: 90
+          skip_covered: true # Set to true to remove 100% covered from report
+          fail_below_threshold: false # Fails the action if 90% threshold is not met
+          show_missing: true
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
 
   a11y-testing:
     runs-on: ubuntu-20.04
@@ -41,20 +63,26 @@ jobs:
       ALLOWED_HOSTS: '0.0.0.0 127.0.0.1 localhost'
       DISABLE_AUTH: True
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v3
+
       - uses: actions/setup-node@v3
         with:
           node-version: 16
+
       - name: Create .env
         working-directory: ./backend
         run: touch .env
+
       - name: Start services
         working-directory: ./backend
         run: docker compose -f docker-compose.yml up -d
+
       - name: run Lighthouse CI
         run: |
           npm install -g @lhci/cli@0.8.x
           lhci autorun
+
       - name: run pa11y
         run: |
           npm i -g pa11y-ci

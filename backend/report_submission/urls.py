@@ -5,10 +5,11 @@ app_name = "report_submission"
 
 upload_page_ids = [
     "federal-awards",
+    "notes-to-sefa",
     "audit-findings",
     "audit-findings-text",
     "CAP",
-    "additional-EINs",
+    "additional-eins",
     "additional-ueis",
     "secondary-auditors",
 ]

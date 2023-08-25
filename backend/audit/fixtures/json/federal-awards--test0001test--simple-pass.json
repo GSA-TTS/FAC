@@ -1,0 +1,42 @@
+{
+  "FederalAwards": {
+    "auditee_uei": "TEST0001TEST",
+    "total_amount_expended": 12345,
+    "federal_awards": [
+      {
+        "program": {
+          "federal_agency_prefix": "42",
+          "three_digit_extension": "RD",
+          "additional_award_identification": 1234,
+          "program_name": "FLOWER DREAMING",
+          "is_major": "N",
+          "audit_report_type": "",
+          "number_of_audit_findings": 0,
+          "amount_expended": 500,
+          "federal_program_total": 500
+        },
+        "loan_or_loan_guarantee": {
+          "is_guaranteed": "N",
+          "loan_balance_at_audit_period_end": 0
+        },
+        "direct_or_indirect_award": {
+          "is_direct": "N",
+          "entities": [
+            {
+              "passthrough_name": "Lothlórien",
+              "passthrough_identifying_number": "54321"
+            }
+          ]
+        },
+        "cluster": {
+          "cluster_name": "N/A",
+          "cluster_total": 0
+        },
+        "subrecipients": {
+          "is_passed": "N"
+        },
+        "award_reference": "AWARD-0001"
+      }
+    ]
+  }
+}

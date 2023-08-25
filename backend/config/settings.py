@@ -16,7 +16,7 @@ import logging
 import json
 import environs
 from cfenv import AppEnv
-from audit.get_agency_names import get_agency_names, get_gaap_results
+from audit.get_agency_names import get_agency_names, get_audit_info_lists
 
 import newrelic.agent
 
@@ -188,7 +188,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = "en-us"
 
-TIME_ZONE = "UTC"
+TIME_ZONE = "EST"
 
 USE_I18N = True
 
@@ -453,4 +453,26 @@ if DISABLE_AUTH:
 
 # A dictionary mapping agency number to agency name. dict[str, str]
 AGENCY_NAMES = get_agency_names()
-GAAP_RESULTS = get_gaap_results()
+GAAP_RESULTS = get_audit_info_lists("gaap_results")
+SP_FRAMEWORK_BASIS = get_audit_info_lists("sp_framework_basis")
+SP_FRAMEWORK_OPINIONS = get_audit_info_lists("sp_framework_opinions")
+
+# Are we in a test environment?
+TEST_RUN = len(sys.argv) > 1 and sys.argv[1] == "test"
+
+ENABLE_DEBUG_TOOLBAR = (
+    env.bool("ENABLE_DEBUG_TOOLBAR", False) and ENVIRONMENT == "LOCAL" and not TEST_RUN
+)
+
+# Django debug toolbar setup
+if ENABLE_DEBUG_TOOLBAR:
+    INSTALLED_APPS += [
+        "debug_toolbar",
+    ]
+    MIDDLEWARE = [
+        "debug_toolbar.middleware.DebugToolbarMiddleware",
+    ] + MIDDLEWARE
+    DEBUG_TOOLBAR_CONFIG = {"SHOW_TOOLBAR_CALLBACK": lambda _: True}
+
+# Links to the most applicable static site URL. Becomes more permanent post-beta.
+STATIC_SITE_URL = "https://federalist-35af9df5-a894-4ae9-aa3d-f6d95427c7bc.sites.pages.cloud.gov/preview/gsa-tts/fac-transition-site/lh/ia-updates/"

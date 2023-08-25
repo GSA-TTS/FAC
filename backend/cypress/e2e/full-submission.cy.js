@@ -1,13 +1,19 @@
+import { testCrossValidation } from '../support/cross-validation.js';
 import { testLoginGovLogin } from '../support/login-gov.js';
 import { testValidAccess } from '../support/check-access.js';
 import { testValidEligibility } from '../support/check-eligibility.js';
 import { testValidAuditeeInfo } from '../support/auditee-info.js';
 import { testValidGeneralInfo } from '../support/general-info.js';
+import { testAuditInformationForm } from '../support/audit-info-form.js';
+import { testPdfAuditReport } from '../support/report-pdf.js';
+import { testAuditorCertification } from '../support/auditor-certification.js';
+import { testAuditeeCertification } from '../support/auditee-certification.js';
 import { testWorkbookFederalAwards,
+         testWorkbookNotesToSEFA,
          testWorkbookFindingsUniformGuidance,
          testWorkbookFindingsText,
          testWorkbookCorrectiveActionPlan,
-         testWorkbookAdditionalUEIs } from '../support/workbook-uploads.js'
+         testWorkbookAdditionalUEIs } from '../support/workbook-uploads.js';
 
 describe('Full audit submission', () => {
   before(() => {
@@ -41,31 +47,53 @@ describe('Full audit submission', () => {
     // Fill out the general info form
     testValidGeneralInfo();
 
-    // Upload all the workbooks
-    cy.get(".usa-link").contains("Federal Awards workbook").click();
-    testWorkbookFederalAwards(false);  // don't intercept
+    // Fill out the audit report package form, and upload its associated PDF
+    // testAuditReportPackage();
 
-    cy.get(".usa-link").contains("Audit Findings workbook").click();
-    testWorkbookFindingsUniformGuidance(false);  // don't intercept
+    // Upload all the workbooks. Don't intercept the uploads, which means a file will make it into the DB.
+    cy.get(".usa-link").contains("Federal Awards").click();
+    testWorkbookFederalAwards(false);
 
-    cy.get(".usa-link").contains("Audit Findings Text workbook").click();
-    testWorkbookFindingsText(false);  // don't intercept
+    cy.get(".usa-link").contains("Notes to SEFA").click();
+    testWorkbookNotesToSEFA(false);
 
-    cy.get(".usa-link").contains("Corrective Action Plan (CAP) workbook").click();
-    testWorkbookCorrectiveActionPlan(false);  // don't intercept
+    cy.get(".usa-link").contains("Audit report PDF").click();
+    testPdfAuditReport(false);
 
-    cy.get(".usa-link").contains("Additional UEIs workbook").click();
-    testWorkbookAdditionalUEIs(false);  // don't intercept
-    
+    cy.get(".usa-link").contains("Federal Awards Audit Findings").click();
+    testWorkbookFindingsUniformGuidance(false);
 
-    // Can it be? We are ready for certification?
-    cy.get(".usa-button").contains("Ready for SF-SAC Certification").click();
-    cy.url().should('match', /\/audit\/ready-for-certification\/[0-9A-Z]{17}/);
-    // Submit for certification button
-    cy.get("#continue").click()
-    // Can't tell if this is the right place for this to end up?
-    cy.url().should('match', /\/audit\/submission-progress\/[0-9A-Z]{17}/);
+    cy.get(".usa-link").contains("Federal Awards Audit Findings Text").click();
+    testWorkbookFindingsText(false);
 
+    cy.get(".usa-link").contains("Corrective Action Plan").click();
+    testWorkbookCorrectiveActionPlan(false);
 
+    cy.get(".usa-link").contains("Additional UEIs").click();
+    testWorkbookAdditionalUEIs(false);
+
+    // Complete the audit information form
+    cy.get(".usa-link").contains("Audit Information Form").click();
+    testAuditInformationForm();
+
+    cy.get(".usa-link").contains("Pre-submission validation").click();
+    testCrossValidation();
+
+    // Second, auditor certification
+    cy.get(".usa-link").contains("Auditor Certification").click();
+    testAuditorCertification();
+
+    // Third, auditee certification
+    cy.get(".usa-link").contains("Auditee Certification").click();
+    testAuditeeCertification();
+    // The same as auditor certification, with different checkboxes.
+
+    // Uncomment this block when ready to implement the certification steps.
+    /*
+    // Finally, submit for processing.
+    cy.get(".usa-link").contains("Submit to the FAC for processing").click();
+    // This will probably take you back to the homepage, where the audit is now oof status "submitted".
+
+    */
   });
 });
