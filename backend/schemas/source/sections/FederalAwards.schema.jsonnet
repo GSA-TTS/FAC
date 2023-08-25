@@ -13,57 +13,6 @@ local Validations = {
     },
     required: ['passthrough_name'],
   },
-  PassThroughEntityEmpty: Types.object {
-    additionalProperties: false,
-    properties: {
-      passthrough_name: Base.Enum.EmptyString_Null,
-      passthrough_identifying_number: Base.Enum.EmptyString_Null,
-    },
-    // The passthrough number is not required
-    required: ['passthrough_name'],
-  },
-  DirectAwardValidations: [
-    {
-      'if': {
-        properties: {
-          is_direct: {
-            const: Base.Const.Y,
-          },
-        },
-      },
-      'then': {
-        properties: {
-          entities: {
-            anyOf: [
-              Types.array {
-                items: Validations.PassThroughEntityEmpty,
-              },
-              Base.Enum.EmptyString_EmptyArray_Null,
-            ],
-          },
-        },
-      },
-    },
-    {
-      'if': {
-        properties: {
-          is_direct: {
-            const: Base.Const.N,
-          },
-        },
-      },
-      'then': {
-        properties: {
-          entities: Types.array {
-            items: Validations.PassThroughEntity,
-          },
-        },
-        required: [
-          'entities',
-        ],
-      },
-    },
-  ],
   LoanOrLoanGuaranteeValidations: [
     {
       'if': {
@@ -212,6 +161,8 @@ local Parts = {
       //  - STATE CLUSTER, or
       //  - the designation for other cluster name
       cluster_name: Types.string,
+      other_cluster_name: Types.string,
+      state_cluster_name: Types.string,
       // cluster_total: Types.number {
       //   minimum: 0,
       // },
@@ -226,17 +177,17 @@ local Parts = {
         'then': {
           allOf: [
             {
-              properties: {
-                other_cluster_name: Base.Enum.EmptyString_Null,
-
+              not: {
+                required: ['other_cluster_name'],
               },
             },
             {
-              properties: {
-                state_cluster_name: Base.Enum.EmptyString_Null,
+              not: {
+                required: ['state_cluster_name'],
               },
             },
           ],
+
         },
       },
       // IF we have OTHER_CLUSTER, THEN...
@@ -246,7 +197,7 @@ local Parts = {
       {
         'if': {
           properties: {
-            cluster_name: {
+            cluster_name: Types.string {
               const: Base.Const.OTHER_CLUSTER,
             },
           },
@@ -255,16 +206,39 @@ local Parts = {
           required: ['other_cluster_name'],
           allOf: [
             {
-              properties: {
-                other_cluster_name: Base.Compound.NonEmptyString,
-              },
+              required: ['other_cluster_name'],
             },
             {
-              properties: {
-                state_cluster_name: Base.Enum.EmptyString_Null,
+              not: {
+                required: ['state_cluster_name'],
               },
             },
+
           ],
+
+        },
+      },
+      {
+        'if': {
+          properties: {
+            cluster_name: Types.string {
+              const: Base.Const.STATE_CLUSTER,
+            },
+          },
+        },
+        'then': {
+          allOf: [
+            {
+              required: ['state_cluster_name'],
+            },
+            {
+              not: {
+                required: ['other_cluster_name'],
+              },
+            },
+
+          ],
+
         },
       },
       // IF we have STATE_CLUSTER, THEN...
@@ -297,7 +271,6 @@ local Parts = {
       },
 
     ],
-    // Handle all requireds conditionally?
     required: ['cluster_name'],
   },
 
@@ -307,9 +280,39 @@ local Parts = {
     description: 'If direct_award is N, the form must include a list of the pass-through entity by name and identifying number',
     properties: {
       is_direct: Base.Enum.YorN,
-      entities: Types.array,
+      entities: Types.array {
+        items: Validations.PassThroughEntity,
+      },
     },
-    allOf: Validations.DirectAwardValidations,
+    allOf: [
+      {
+        'if': {
+          properties: {
+            is_direct: {
+              const: Base.Const.N,
+            },
+          },
+        },
+        'then': {
+          required: ['entities'],
+        },
+      },
+      {
+        'if': {
+          properties: {
+            is_direct: {
+              const: Base.Const.Y,
+            },
+          },
+        },
+        'then': {
+          not: {
+            required: ['entities'],
+          },
+        },
+      },
+    ],
+    required: ['is_direct'],
   },
   LoanOrLoanGuarantee: Types.object {
     additionalProperties: false,

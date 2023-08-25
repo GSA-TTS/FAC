@@ -15,7 +15,6 @@
     "is_major": "Y",
     "audit_report_type": "U",
     "number_of_audit_findings": 0,
-    "state_cluster_name": "",
     "cluster_total": 0
   },
   {
@@ -34,7 +33,6 @@
     "is_major": "Y",
     "audit_report_type": "U",
     "number_of_audit_findings": 0,
-    "state_cluster_name": "",
     "cluster_total": 0
   }
 ]
