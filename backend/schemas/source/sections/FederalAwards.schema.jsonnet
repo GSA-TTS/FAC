@@ -190,10 +190,6 @@ local Parts = {
 
         },
       },
-      // IF we have OTHER_CLUSTER, THEN...
-      //   - other_cluster_name is required
-      //   - other_cluster_name must not be empty
-      //   - state_cluster_name must be empty
       {
         'if': {
           properties: {
@@ -203,7 +199,6 @@ local Parts = {
           },
         },
         'then': {
-          required: ['other_cluster_name'],
           allOf: [
             {
               required: ['other_cluster_name'],
@@ -241,35 +236,6 @@ local Parts = {
 
         },
       },
-      // IF we have STATE_CLUSTER, THEN...
-      //   - state_cluster_name is required
-      //   - state_cluster_name must not be empty
-      //   - other_cluster_name must be empty
-      {
-        'if': {
-          properties: {
-            cluster_name: Types.string {
-              const: Base.Const.STATE_CLUSTER,
-            },
-          },
-        },
-        'then': {
-          required: ['state_cluster_name'],
-          allOf: [
-            {
-              properties: {
-                other_cluster_name: Base.Enum.EmptyString_Null,
-              },
-            },
-            {
-              properties: {
-                state_cluster_name: Base.Compound.NonEmptyString,
-              },
-            },
-          ],
-        },
-      },
-
     ],
     required: ['cluster_name'],
   },
@@ -376,23 +342,16 @@ local FederalAwardEntry = Types.object {
 local Meta = Types.object {
   additionalProperties: false,
   properties: {
-    section_name: Types.string,
+    section_name: Types.string {
+      enum: [Sheets.section_names.FEDERAL_AWARDS],
+    },
     // FIXME: 2023-08-07 MSHD: The 'Version' is currently used here as a placeholder, and it is not being enforced at the moment.
     // Once we establish a versioning pattern, we can update this and enforce it accordingly.
     version: Types.string {
       const: Sheets.WORKBOOKS_VERSION,
     },
   },
-  // allOf: [
-  //   // {
-  //   //   properties: {
-  //   //     section_name: {
-  //   //       const: Sheets.section_names.FEDERAL_AWARDS,
-  //   //     },
-  //   //   },
-  //   // },
-  // ],
-  required: [],
+  required: ['section_name'],
   title: 'Meta',
   version: 20230807,
 };
