@@ -64,7 +64,7 @@ export function testWorkbookFindingsText(will_intercept = true) {
 export function testWorkbookCorrectiveActionPlan(will_intercept = true) {
   testWorkbookUpload(
     '/audit/excel/corrective-action-plan/',
-    '#file-input-CAP-xlsx',
+    '#file-input-cap-xlsx',
     'test_workbooks/corrective-action-plan-workbook.xlsx',
     will_intercept
   )
