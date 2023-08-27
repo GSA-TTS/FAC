@@ -381,7 +381,7 @@ class ETLTests(TestCase):
         self.assertLess(len_additional_eins, len(AdditionalEin.objects.all()))
 
     def test_load_all_with_errors_1(self):
-        """IWe should not encounter a key error in general,
+        """We should not encounter a key error in general,
         an error that would prevent the loading of a child table
         """
         len_general = len(General.objects.all())

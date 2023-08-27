@@ -447,10 +447,7 @@ class General(models.Model):
         help_text=docs.auditor_zip_code,
     )
     auditor_country = models.TextField(
-        "CPA Country - USA or non-USA", null=True, help_text=docs.auditor_country
-    )
-    auditor_international_address = models.TextField(
-        "CPA non-USA address", null=True, help_text=docs.auditor_country
+        "CPA Country", null=True, help_text=docs.auditor_country
     )
     auditor_contact_name = models.TextField(
         "Name of CPA Contact",

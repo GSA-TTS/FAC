@@ -277,14 +277,11 @@ class ETL(object):
             report_id=self.report_id,
             auditee_certify_name="",  # TODO: Where does this come from?
             auditee_certify_title="",  # TODO: Where does this come from?
-            auditor_international_address=general_information.get(
-                "auditor_international_address", ""
-            ),
             auditee_contact_name=general_information.get("auditee_contact_name", ""),
-            auditee_contact_title=general_information.get("auditee_contact_title", ""),
             auditee_email=general_information.get("auditee_email", ""),
             auditee_name=general_information.get("auditee_name", ""),
             auditee_phone=general_information.get("auditee_phone", ""),
+            auditee_contact_title=general_information.get("auditee_contact_title", ""),
             auditee_address_line_1=general_information.get(
                 "auditee_address_line_1", ""
             ),
@@ -307,6 +304,7 @@ class ETL(object):
             auditor_contact_name=general_information.get("auditor_contact_name", ""),
             auditor_email=general_information.get("auditor_email", ""),
             auditor_firm_name=general_information.get("auditor_firm_name", ""),
+            auditor_foreign_addr="",  # TODO:  What does this look like in the incoming json?
             auditor_ein=general_information.get("auditor_ein", ""),
             additional_eins_covered=general_information.get("multiple_ueis_covered")
             == "Y",
