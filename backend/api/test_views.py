@@ -87,6 +87,9 @@ SAMPLE_BASE_SAC_DATA = {
         "auditor_country": "USA",
         "auditor_address_line_1": "100 Percent Respectable St.",
         "auditor_city": "Podunk",
+        "auditor_international_address": """
+            55, Rue du Faubourg Saint-Honoré, 75008 Paris, France
+        """,
         "auditor_state": "NY",
         "auditor_zip": "14886",
         "auditor_contact_name": "Qualified Human Accountant",
@@ -737,6 +740,7 @@ class SingleAuditChecklistViewTests(TestCase):
                 "user_provided_organization_type",
                 "['state', 'local', 'tribal', 'higher-ed', 'non-profit', 'unknown', 'none']",
             ),
+            ("auditor_country", "['USA', 'non-USA']"),
         ]
 
         length_100_keys = [
@@ -744,9 +748,9 @@ class SingleAuditChecklistViewTests(TestCase):
             "auditee_city",
             "auditee_contact_name",
             "auditee_contact_title",
-            "auditor_country",
             "auditor_address_line_1",
             "auditor_city",
+            # "auditor_international_address",
             "auditor_contact_name",
             "auditor_contact_title",
         ]
@@ -880,7 +884,7 @@ class SingleAuditChecklistViewTests(TestCase):
                 {"auditor_ein_not_an_ssn_attestation": None},
                 {"auditor_ein_not_an_ssn_attestation": True},
             ),
-            ({"auditor_country": "USA"}, {"auditor_country": "CAN"}),
+            ({"auditor_country": "USA"}, {"auditor_country": "non-USA"}),
             (
                 {"auditor_address_line_1": "100 Percent Respectable St."},
                 {"auditor_address_line_1": "75 Percent Respectable St."},
