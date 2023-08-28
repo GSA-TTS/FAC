@@ -183,7 +183,6 @@ class GeneralInformationFormView(LoginRequiredMixin, View):
                     logger.warning(f"Error {field}: {errors}")
                 raise BadRequest(message)
 
-            print("JMM: Valid form")
             general_information = sac.general_information
             general_information.update(form.cleaned_data)
             validated = validate_general_information_json(general_information)
