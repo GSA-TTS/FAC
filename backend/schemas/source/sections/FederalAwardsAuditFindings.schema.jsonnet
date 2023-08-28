@@ -1,4 +1,5 @@
 local Base = import '../base/Base.libsonnet';
+local Func = import '../base/Functions.libsonnet';
 local Sheets = import '../excel/libs/Sheets.libsonnet';
 local Additional = import 'FederalAwardsAuditFindings.validation.libsonnet';
 local Types = Base.Types;
@@ -36,13 +37,13 @@ local Parts = {
       reference_number: Base.Compound.ReferenceNumber,
       is_valid: Base.Enum.YorN,
       repeat_prior_reference: Base.Enum.YorN,
-      prior_references: Base.Compound.PriorReferences,
+      prior_references: Types.string,
     },
     required: [
       'reference_number',
       'repeat_prior_reference',
     ],
-    oneOf: Validations.PriorReferences,
+    allOf: Validations.PriorReferences,
   },
 };
 
