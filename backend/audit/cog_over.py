@@ -1,12 +1,10 @@
 from collections import defaultdict
-import os
-from .models import SingleAuditChecklist, CognizantBaseline
-import sqlalchemy
+from .models import SingleAuditChecklist
+from dissemination.models import CensusGen19, CensusCfda19
 
 
 COG_LIMIT = 50_000_000
 DA_THRESHOLD_FACTOR = 0.25
-REF_YEAR = "2019"
 
 
 def cog_over(sac: SingleAuditChecklist):
@@ -59,61 +57,34 @@ def determine_agency(
 
 
 def determine_2019_agency(ein):
-    try:
-        cognizant_agency = CognizantBaseline.objects.get(
-            audit_year=2019,
-            ein=ein,
-        ).cognizant_agency
-        return cognizant_agency
-    except CognizantBaseline.DoesNotExist:
+    (dbkey, total_amount_expended) = get_baseline_gen(ein)
+    if not dbkey:
         return None
-
-
-def set_2019_baseline():
-    engine = sqlalchemy.create_engine(
-        os.getenv("DATABASE_URL").replace("postgres", "postgresql", 1)
-    )
-    AUDIT_QUERY = """
-        SELECT gen."DBKEY", gen."EIN", cast(gen."TOTFEDEXPEND" as BIGINT),
-                cfda."CFDA", cast(cfda."AMOUNT" as BIGINT), cfda."DIRECT", cast(cfda."PROGRAMTOTAL" as BIGINT)
-        FROM census_gen19 gen, census_cfda19 cfda
-        WHERE gen."AUDITYEAR" = :ref_year
-        AND cast(gen."TOTFEDEXPEND" as BIGINT) >= :threshold
-        AND gen."DBKEY" = cfda."DBKEY"
-        ORDER BY gen."DBKEY"
-    """
-    with engine.connect() as conn:
-        result = conn.execute(
-            sqlalchemy.text(AUDIT_QUERY), {"ref_year": REF_YEAR, "threshold": COG_LIMIT}
-        )
-        gens = []
-        cfdas = []
-
-        for row in result:
-            (DBKEY, EIN, TOTFEDEXPEND, CFDA, AMOUNT, DIRECT, PROGRAMTOTAL) = row
-            if (DBKEY, EIN, TOTFEDEXPEND) not in gens:
-                gens.append((DBKEY, EIN, TOTFEDEXPEND))
-            cfdas.append((DBKEY, CFDA, AMOUNT, DIRECT, PROGRAMTOTAL))
-
-    CognizantBaseline.objects.all().delete()
-    for gen in gens:
-        dbkey = gen[0]
-        ein = gen[1]
-        total_amount_expended = gen[2]
-        (total_da_amount_expended, max_total_agency, max_da_agency) = calc_cfda_amounts(
-            cfdas=[cfda for cfda in cfdas if cfda[0] == dbkey]
-        )
-        cognizant_agency = determine_agency(
+    cfdas = get_baseline_cfdas(dbkey)
+    (total_da_amount_expended, max_total_agency, max_da_agency
+     ) = calc_cfda_amounts(cfdas)
+    cognizant_agency = determine_agency(
             total_amount_expended,
             total_da_amount_expended,
             max_total_agency,
             max_da_agency,
         )
-        if cognizant_agency:
-            CognizantBaseline(
-                dbkey=dbkey, audit_year=2019, ein=ein, cognizant_agency=cognizant_agency
-            ).save()
-    return CognizantBaseline.objects.count()
+    return cognizant_agency
+
+
+def get_baseline_gen(ein):
+    gens = CensusGen19.objects.filter(ein=ein)
+    if len(gens) != 1:
+        return (None, 0)
+    gen = gens[0]
+    return (gen.dbkey, gen.totfedexpend)
+
+def get_baseline_cfdas(dbkey):
+    cfdas = CensusCfda19.objects.filter(dbkey=dbkey)    
+    baseline_cfdas = []
+    for row in cfdas:
+        baseline_cfdas.append((row.cfda, row.amount, row.direct))
+    return baseline_cfdas
 
 
 def calc_cfda_amounts(cfdas):
@@ -121,11 +92,9 @@ def calc_cfda_amounts(cfdas):
     total_da_amount_agency = defaultdict(lambda: 0)
     total_da_amount_expended = 0
     for cfda in cfdas:
-        agency = cfda[1][:2]
-        amount = cfda[2] or 0
-        direct = cfda[3]
-        # TODO use amount rather than programamount?
-        # programtotal = cfda[4] or 0
+        agency = cfda[0][:2]
+        amount = cfda[1] or 0
+        direct = cfda[2]
         total_amount_agency[agency] += amount
         if direct == "Y":
             total_da_amount_expended += amount

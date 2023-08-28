@@ -1,7 +1,9 @@
 from django.test import TestCase
+from dissemination.models import CensusGen19
 
 from model_bakery import baker
 from faker import Faker
+from django.db import connection
 
 from .models import SingleAuditChecklist, CognizantBaseline, User
 
@@ -17,6 +19,18 @@ class CogOverTests(TestCase):
 
     def setUp(self):
         self.user = baker.make(User)
+
+    def test_setup_of_gen19(self):
+        with connection.schema_editor() as schema_editor:
+            schema_editor.create_model(CensusGen19)
+
+        len_at_start = CensusGen19.objects.count()
+        self.assertEqual(len_at_start,0)
+        gen = baker.make(CensusGen19)
+        gen.save()
+        len_at_end = CensusGen19.objects.count()
+        self.assertEqual(len_at_end,1)
+
 
     @staticmethod
     def _fake_general():
