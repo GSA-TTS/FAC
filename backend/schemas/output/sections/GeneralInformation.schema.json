@@ -81,7 +81,8 @@
             "WA",
             "WV",
             "WI",
-            "WY"
+            "WY",
+            ""
          ],
          "title": "State",
          "type": "string"
@@ -296,7 +297,8 @@
          "$ref": "#/$defs/State"
       },
       "auditor_zip": {
-         "$ref": "#/$defs/Zip"
+         "maxLength": 10,
+         "type": "string"
       },
       "ein": {
          "$ref": "#/$defs/EIN"

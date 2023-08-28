@@ -227,6 +227,7 @@ local Enum = {
       'WV',
       'WI',
       'WY',
+      '',
     ],
   },
   AuditPeriod: Types.string {

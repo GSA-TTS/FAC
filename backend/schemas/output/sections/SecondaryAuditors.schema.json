@@ -112,7 +112,8 @@
                            "WA",
                            "WV",
                            "WI",
-                           "WY"
+                           "WY",
+                           ""
                         ],
                         "type": "string"
                      },

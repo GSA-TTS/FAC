@@ -155,8 +155,6 @@ class GeneralInformationFormView(LoginRequiredMixin, View):
                 "secondary_auditors_exist": sac.secondary_auditors_exist,
                 "report_id": report_id,
             }
-            for field in sorted(context.keys()):
-                print(f"JMM GET: {field} {context[field]}")
 
             return render(request, "report_submission/gen-form.html", context)
         except SingleAuditChecklist.DoesNotExist as err:
@@ -178,27 +176,29 @@ class GeneralInformationFormView(LoginRequiredMixin, View):
 
             form = GeneralInformationForm(request.POST)
 
-            if form.is_valid():
-                general_information = sac.general_information
-                general_information.update(form.cleaned_data)
-                validated = validate_general_information_json(general_information)
-                sac.general_information = validated
-                for field in sorted(sac.general_information.keys()):
-                    print(f"JMM: {field} {sac.general_information[field]}")
-                if general_information.get("audit_type"):
-                    sac.audit_type = general_information["audit_type"]
-                sac.save()
+            if not form.is_valid():
+                message = ""
+                for field, errors in form.errors.items():
+                    message = f"{message}\n {field}: {errors}"
+                    logger.warning(f"Error {field}: {errors}")
+                raise BadRequest(message)
 
-                return redirect(f"/audit/submission-progress/{report_id}")
+            print("JMM: Valid form")
+            general_information = sac.general_information
+            general_information.update(form.cleaned_data)
+            validated = validate_general_information_json(general_information)
+            sac.general_information = validated
+            sac.audit_type = general_information.get("audit_type")
+            sac.save()
+            return redirect(f"/audit/submission-progress/{report_id}")
         except SingleAuditChecklist.DoesNotExist as err:
             raise PermissionDenied("You do not have access to this audit.") from err
         except ValidationError as err:
             message = f"ValidationError for report ID {report_id}: {err.message}"
-            logger.warning(message)
+            print(message)
             raise BadRequest(message)
         except LateChangeError:
             return render(request, "audit/no-late-changes.html")
-        raise BadRequest()
 
 
 class UploadPageView(LoginRequiredMixin, View):
