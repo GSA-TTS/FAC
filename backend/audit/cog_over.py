@@ -68,7 +68,6 @@ def determine_2019_agency(ein):
     except CognizantBaseline.DoesNotExist:
         return None
     except CognizantBaseline.MultipleObjectsReturned:
-        print("Multiple objects detected for ein = ", ein)
         return None
 
 
@@ -83,7 +82,6 @@ def determine_2019_agency_w_dbkey(ein, dbkey):
     except CognizantBaseline.DoesNotExist:
         return None
     except CognizantBaseline.MultipleObjectsReturned:
-        print("Multiple objects detected for ein = ", ein)
         return None
 
 
