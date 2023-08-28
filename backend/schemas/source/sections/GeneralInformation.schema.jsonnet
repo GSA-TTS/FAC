@@ -86,9 +86,7 @@ local Types = Base.Types;
     auditor_state: {
       '$ref': '#/$defs/State',
     },
-    auditor_zip: {
-      '$ref': '#/$defs/Zip',
-    },
+    auditor_zip: Types.string,
     ein: {
       '$ref': '#/$defs/EIN',
     },
@@ -152,7 +150,9 @@ local Types = Base.Types;
         },
       },
       'then': {
-        required: ['auditor_zip'],
+        properties: {
+          auditor_zip: Base.Compound.Zip,
+        },
       },
     },
     {
@@ -164,13 +164,15 @@ local Types = Base.Types;
         },
       },
       'then': {
-        not: {
-          required: ['auditor_zip'],
+        properties: {
+          auditor_zip: {
+            const: '',
+          },
         },
       },
     },
   ],
-  required: [],
+  required: ['auditor_zip'],
   title: 'GeneralInformation',
   type: 'object',
   version: null,
