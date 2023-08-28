@@ -39,4 +39,17 @@ Now create a fixture for this table as follows:
 fac dumpdata audit.CognizantBaseline --output audit/fixtures/CognizantBaseline.json
 ```
 
-Make sure that the fixture file is tracjed in git
+Make sure that the fixture file is tracked in git
+
+# make_cog_over_for_2022
+
+Make sure CognizantBaseline.json is available in audit/fixtures.  If not, follow the steps above to create it.
+
+Load data from CognizantBaseline.json following procedure above.
+
+Populate census_gen22 and census_cfda22 tables similar to the census_gen19 and census_cfda19 tables above.
+
+Test cog / over with 2022 data, run the following:
+```bash
+fac make_cog_over_for_2022
+```
