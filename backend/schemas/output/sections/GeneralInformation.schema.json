@@ -297,8 +297,7 @@
          "$ref": "#/$defs/State"
       },
       "auditor_zip": {
-         "maxLength": 10,
-         "type": "string"
+         "$ref": "#/$defs/Zip"
       },
       "ein": {
          "$ref": "#/$defs/EIN"

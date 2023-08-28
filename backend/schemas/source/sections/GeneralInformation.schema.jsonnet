@@ -86,8 +86,8 @@ local Types = Base.Types;
     auditor_state: {
       '$ref': '#/$defs/State',
     },
-    auditor_zip: Types.string {
-      maxLength: 10,
+    auditor_zip: {
+      '$ref': '#/$defs/Zip',
     },
     ein: {
       '$ref': '#/$defs/EIN',
