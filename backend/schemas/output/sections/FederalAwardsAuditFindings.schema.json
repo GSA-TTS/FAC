@@ -257,12 +257,13 @@
                   "properties": {
                      "findings": {
                         "additionalProperties": false,
-                        "oneOf": [
+                        "allOf": [
                            {
                               "if": {
                                  "properties": {
                                     "repeat_prior_reference": {
-                                       "const": "Y"
+                                       "const": "Y",
+                                       "type": "string"
                                     }
                                  }
                               },
@@ -270,6 +271,24 @@
                                  "required": [
                                     "prior_references"
                                  ]
+                              }
+                           },
+                           {
+                              "if": {
+                                 "properties": {
+                                    "repeat_prior_reference": {
+                                       "const": "N",
+                                       "type": "string"
+                                    }
+                                 }
+                              },
+                              "then": {
+                                 "properties": {
+                                    "prior_references": {
+                                       "const": "N/A",
+                                       "type": "string"
+                                    }
+                                 }
                               }
                            }
                         ],
@@ -282,14 +301,11 @@
                               "type": "string"
                            },
                            "prior_references": {
-                              "description": "Prior references",
-                              "pattern": "^20[2-9][0-9]-[0-9]{3}(,\\s*20[2-9][0-9]-[0-9]{3})*$",
-                              "title": "PriorReferences",
                               "type": "string"
                            },
                            "reference_number": {
                               "description": "Reference Number",
-                              "pattern": "^20[2-9][0-9]-[0-9]{3}$",
+                              "pattern": "^20[1-9][0-9]-[0-9]{3}$",
                               "title": "ReferenceNumber",
                               "type": "string"
                            },
