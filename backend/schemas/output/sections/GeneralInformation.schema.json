@@ -127,57 +127,91 @@
    "$id": "http://example.org/generalinformation",
    "$schema": "http://json-schema.org/draft/2019-09/schema#",
    "additionalProperties": false,
-   "anyOf": [
+   "allOf": [
+      {
+         "anyOf": [
+            {
+               "if": {
+                  "properties": {
+                     "audit_period_covered": {
+                        "const": "annual"
+                     }
+                  }
+               },
+               "then": {
+                  "audit_period_other_months": {
+                     "description": "Empty string or null",
+                     "enum": [
+                        "",
+                        "null"
+                     ],
+                     "title": "EmptyString_Null"
+                  }
+               }
+            },
+            {
+               "if": {
+                  "properties": {
+                     "audit_period_covered": {
+                        "const": "biennial"
+                     }
+                  }
+               },
+               "then": {
+                  "audit_period_other_months": {
+                     "description": "Empty string or null",
+                     "enum": [
+                        "",
+                        "null"
+                     ],
+                     "title": "EmptyString_Null"
+                  }
+               }
+            },
+            {
+               "if": {
+                  "properties": {
+                     "audit_period_covered": {
+                        "const": "other"
+                     }
+                  }
+               },
+               "then": {
+                  "audit_period_other_months": {
+                     "pattern": "^0[0-9]|1[0-8]$",
+                     "type": "string"
+                  }
+               }
+            }
+         ]
+      },
       {
          "if": {
             "properties": {
-               "audit_period_covered": {
-                  "const": "annual"
+               "auditor_country": {
+                  "const": "USA"
                }
             }
          },
          "then": {
-            "audit_period_other_months": {
-               "description": "Empty string or null",
-               "enum": [
-                  "",
-                  "null"
-               ],
-               "title": "EmptyString_Null"
-            }
+            "required": [
+               "auditor_zip"
+            ]
          }
       },
       {
          "if": {
             "properties": {
-               "audit_period_covered": {
-                  "const": "biennial"
+               "auditor_country": {
+                  "const": "non-USA"
                }
             }
          },
          "then": {
-            "audit_period_other_months": {
-               "description": "Empty string or null",
-               "enum": [
-                  "",
-                  "null"
-               ],
-               "title": "EmptyString_Null"
-            }
-         }
-      },
-      {
-         "if": {
-            "properties": {
-               "audit_period_covered": {
-                  "const": "other"
-               }
-            }
-         },
-         "then": {
-            "audit_period_other_months": {
-               "pattern": "^0[0-9]|1[0-8]$",
-               "type": "string"
+            "not": {
+               "required": [
+                  "auditor_zip"
+               ]
             }
          }
       }

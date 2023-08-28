@@ -102,41 +102,71 @@ local Types = Base.Types;
       '$ref': '#/$defs/UserProvidedOrganizationType',
     },
   },
-  anyOf: [
+  allOf: [
+    {
+      anyOf: [
+        {
+          'if': {
+            properties: {
+              audit_period_covered: {
+                const: 'annual',
+              },
+            },
+          },
+          'then': {
+            audit_period_other_months: Base.Enum.EmptyString_Null,
+          },
+        },
+        {
+          'if': {
+            properties: {
+              audit_period_covered: {
+                const: 'biennial',
+              },
+            },
+          },
+          'then': {
+            audit_period_other_months: Base.Enum.EmptyString_Null,
+          },
+        },
+        {
+          'if': {
+            properties: {
+              audit_period_covered: {
+                const: 'other',
+              },
+            },
+          },
+          'then': {
+            audit_period_other_months: Base.Compound.MonthsOther,
+          },
+        },
+      ],
+    },
     {
       'if': {
         properties: {
-          audit_period_covered: {
-            const: 'annual',
+          auditor_country: {
+            const: 'USA',
           },
         },
       },
       'then': {
-        audit_period_other_months: Base.Enum.EmptyString_Null,
+        required: ['auditor_zip'],
       },
     },
     {
       'if': {
         properties: {
-          audit_period_covered: {
-            const: 'biennial',
+          auditor_country: {
+            const: 'non-USA',
           },
         },
       },
       'then': {
-        audit_period_other_months: Base.Enum.EmptyString_Null,
-      },
-    },
-    {
-      'if': {
-        properties: {
-          audit_period_covered: {
-            const: 'other',
-          },
+        not: {
+          required: ['auditor_zip'],
         },
-      },
-      'then': {
-        audit_period_other_months: Base.Compound.MonthsOther,
       },
     },
   ],
