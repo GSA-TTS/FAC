@@ -42,6 +42,7 @@ local Parts = {
     },
     required: [
       'reference_number',
+      'prior_references',
       'repeat_prior_reference',
     ],
     oneOf: Validations.PriorReferences,

@@ -347,6 +347,7 @@
                         },
                         "required": [
                            "reference_number",
+                           "prior_references",
                            "repeat_prior_reference"
                         ],
                         "type": "object"
