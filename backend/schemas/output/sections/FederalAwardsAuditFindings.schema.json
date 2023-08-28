@@ -257,7 +257,7 @@
                   "properties": {
                      "findings": {
                         "additionalProperties": false,
-                        "oneOf": [
+                        "allOf": [
                            {
                               "allOf": [
                                  {
@@ -272,7 +272,7 @@
                                        "properties": {
                                           "prior_references": {
                                              "description": "Prior references",
-                                             "pattern": "^20[2-9][0-9]-[0-9]{3}(,\\s*20[2-9][0-9]-[0-9]{3})*$",
+                                             "pattern": "^20[1-9][0-9]-[0-9]{3}(,\\s*20[1-9][0-9]-[0-9]{3})*$",
                                              "title": "PriorReferences",
                                              "type": "string"
                                           }
@@ -333,7 +333,7 @@
                            },
                            "reference_number": {
                               "description": "Reference Number",
-                              "pattern": "^20[2-9][0-9]-[0-9]{3}$",
+                              "pattern": "^20[1-9][0-9]-[0-9]{3}$",
                               "title": "ReferenceNumber",
                               "type": "string"
                            },
