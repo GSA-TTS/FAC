@@ -20,13 +20,25 @@ def cog_over_for_2022():
     engine = sqlalchemy.create_engine(
         os.getenv("DATABASE_URL").replace("postgres", "postgresql", 1)
     )
+    # Use the following query to test Cog
+    # AUDIT_QUERY = """
+    #     SELECT gen."DBKEY", gen."EIN", cast(gen."TOTFEDEXPEND" as BIGINT),
+    #             gen."COG_OVER", gen."COGAGENCY", gen."OVERSIGHTAGENCY",
+    #             cfda."CFDA", cast(cfda."AMOUNT" as BIGINT), cfda."DIRECT"
+    #     FROM census_gen22 gen, census_cfda22 cfda
+    #     WHERE gen."AUDITYEAR" = :ref_year
+    #     AND cast(gen."TOTFEDEXPEND" as BIGINT) > :threshold
+    #     AND gen."DBKEY" = cfda."DBKEY"
+    #     AND gen."EIN" = cfda."EIN"
+    #     ORDER BY gen."DBKEY"
+    # """
+    # Use the following query to test Cog / Over
     AUDIT_QUERY = """
         SELECT gen."DBKEY", gen."EIN", cast(gen."TOTFEDEXPEND" as BIGINT),
                 gen."COG_OVER", gen."COGAGENCY", gen."OVERSIGHTAGENCY",
                 cfda."CFDA", cast(cfda."AMOUNT" as BIGINT), cfda."DIRECT"
         FROM census_gen22 gen, census_cfda22 cfda
         WHERE gen."AUDITYEAR" = :ref_year
-        AND cast(gen."TOTFEDEXPEND" as BIGINT) > :threshold
         AND gen."DBKEY" = cfda."DBKEY"
         AND gen."EIN" = cfda."EIN"
         ORDER BY gen."DBKEY"
