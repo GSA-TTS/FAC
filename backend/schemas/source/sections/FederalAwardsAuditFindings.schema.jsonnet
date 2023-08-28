@@ -44,7 +44,7 @@ local Parts = {
       'reference_number',
       'repeat_prior_reference',
     ],
-    allOf: Validations.PriorReferences,
+    oneOf: Validations.PriorReferences,
   },
 };
 

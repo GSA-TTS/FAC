@@ -257,7 +257,7 @@
                   "properties": {
                      "findings": {
                         "additionalProperties": false,
-                        "allOf": [
+                        "oneOf": [
                            {
                               "allOf": [
                                  {
