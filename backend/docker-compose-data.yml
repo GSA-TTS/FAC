@@ -16,6 +16,7 @@ services:
       retries: 10
       
   load:
+    # image: fac/wait-and-load
     image: ghcr.io/gsa-tts/fac-historic-public-csvs/load-historic-public-data:latest
     environment:
       DATABASE_URL: postgres://postgres@db/postgres
