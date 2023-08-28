@@ -91,16 +91,6 @@ def set_2019_baseline():
     engine = sqlalchemy.create_engine(
         os.getenv("DATABASE_URL").replace("postgres", "postgresql", 1)
     )
-    # AUDIT_QUERY = """
-    #     SELECT gen."DBKEY", gen."EIN", cast(gen."TOTFEDEXPEND" as BIGINT),
-    #             cfda."CFDA", cast(cfda."AMOUNT" as BIGINT), cfda."DIRECT", cast(cfda."PROGRAMTOTAL" as BIGINT)
-    #     FROM census_gen19 gen, census_cfda19 cfda
-    #     WHERE gen."AUDITYEAR" = :ref_year
-    #     AND cast(gen."TOTFEDEXPEND" as BIGINT) > :threshold
-    #     AND gen."DBKEY" = cfda."DBKEY"
-    #     AND gen."EIN" = cfda."EIN"
-    #     ORDER BY gen."DBKEY"
-    # """
     AUDIT_QUERY = """
         SELECT gen."DBKEY", gen."EIN", cast(gen."TOTFEDEXPEND" as BIGINT),
                 cfda."CFDA", cast(cfda."AMOUNT" as BIGINT), cfda."DIRECT"
@@ -111,9 +101,7 @@ def set_2019_baseline():
         ORDER BY gen."DBKEY"
     """
     with engine.connect() as conn:
-        result = conn.execute(
-            sqlalchemy.text(AUDIT_QUERY), {"ref_year": REF_YEAR}
-        )
+        result = conn.execute(sqlalchemy.text(AUDIT_QUERY), {"ref_year": REF_YEAR})
         gens = []
         cfdas = []
 
@@ -153,8 +141,6 @@ def calc_cfda_amounts(cfdas):
         agency = cfda[1][:2]
         amount = cfda[2] or 0
         direct = cfda[3]
-        # TODO use amount rather than programamount?
-        # programtotal = cfda[4] or 0
         total_amount_agency[agency] += amount
         if direct == "Y":
             total_da_amount_expended += amount
