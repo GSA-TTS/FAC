@@ -199,17 +199,16 @@
                   "pattern": "^[0-9]{5}(?:[0-9]{4})?$",
                   "type": "string"
                }
-            },
-            "required": [
-               "auditor_zip"
-            ]
+            }
          }
       },
       {
          "if": {
             "properties": {
                "auditor_country": {
-                  "const": "non-USA"
+                  "not": {
+                     "const": "USA"
+                  }
                }
             }
          },
@@ -223,6 +222,13 @@
          }
       }
    ],
+   "dependentSchemas": {
+      "auditor_country": {
+         "required": [
+            "auditor_zip"
+         ]
+      }
+   },
    "metamodel_version": "1.7.0",
    "properties": {
       "audit_period_covered": {

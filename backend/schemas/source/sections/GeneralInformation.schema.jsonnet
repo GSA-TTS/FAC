@@ -158,14 +158,15 @@ local Types = Base.Types;
         properties: {
           auditor_zip: Base.Compound.Zip,
         },
-        required: ["auditor_zip"]
       },
     },
     {
       'if': {
         properties: {
           auditor_country: {
-            const: 'non-USA',
+            not: {
+              const: 'USA',
+            },
           },
         },
       },
@@ -176,6 +177,9 @@ local Types = Base.Types;
       },
     },
   ],
+  dependentSchemas: {
+    auditor_country: { "required": ["auditor_zip"] }
+  },
   required: [],
   title: 'GeneralInformation',
   type: 'object',
