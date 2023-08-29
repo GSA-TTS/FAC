@@ -71,7 +71,7 @@ local StringOfSize(size) = {
 local LoanBalanceValidation = {
   type: 'custom',
   // FIXME MSHD: for improvement, will need to pull column refs from this formula and retrieve that dynamically.
-  formula1: '=IF(L{0}="N",ISBLANK(M{0}),OR(M{0}="N/A",AND(ISNUMBER(M{0}),M{0}>=0)))',
+  formula1: '=IF(L{0}="N",ISBLANK(M{0}),OR(M{0}="N/A",AND(ISNUMBER(VALUE(M{0})),M{0}>=0)))',
   custom_error: 'Loan Balance must be blank if Loan Guarantee is "N". If Loan Guarantee is "Y", Loan Balance must be a positive number or "N/A".',
   custom_title: 'Loan Balance',
 };

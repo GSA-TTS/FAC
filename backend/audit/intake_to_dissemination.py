@@ -67,7 +67,9 @@ class IntakeToDissemination(object):
             logger.warning("No finding texts found to load")
             return
 
-        findings_text_entries = findings_text.get("FindingsText", {}).get("findings_text_entries")
+        findings_text_entries = findings_text.get("FindingsText", {}).get(
+            "findings_text_entries"
+        )
         findings_text_objects = []
         if findings_text_entries:
             for entry in findings_text_entries:
@@ -77,21 +79,17 @@ class IntakeToDissemination(object):
                     contains_chart_or_table=entry["contains_chart_or_table"] == "Y",
                     finding_text=entry["text_of_finding"],
                 )
-                # if self.write_to_db:
-                #     finding_text_.save()
                 findings_text_objects.append(finding_text_)
         self.loaded_objects["FindingTexts"] = findings_text_objects
-        return findings_text_objects   #FIXME: Will return [] for an empty submission, is this okay ?
+        return findings_text_objects
 
     def load_findings(self):
         findings_uniform_guidance = (
             self.single_audit_checklist.findings_uniform_guidance
         )
-        if not findings_uniform_guidance:
-            logger.warning("No findings found to load")
-            return
-
-        findings_uniform_guidance_entries = findings_uniform_guidance.get("FindingsUniformGuidance",{}).get("findings_uniform_guidance_entries")
+        findings_uniform_guidance_entries = findings_uniform_guidance.get(
+            "FindingsUniformGuidance", {}
+        ).get("findings_uniform_guidance_entries")
         findings_objects = []
         if findings_uniform_guidance_entries:
             for entry in findings_uniform_guidance_entries:
@@ -112,11 +110,9 @@ class IntakeToDissemination(object):
                     is_significant_deficiency=(entry["significant_deficiency"] == "Y"),
                     type_requirement=(program["compliance_requirement"]),
                 )
-                # if self.write_to_db:
-                #     finding.save()
                 findings_objects.append(finding)
         self.loaded_objects["Findings"] = findings_objects
-        return findings_objects #FIXME: Will return [] for an empty submission, is this okay ?
+        return findings_objects
 
     def conditional_lookup(self, dict, key, default):
         if key in dict:
@@ -128,7 +124,7 @@ class IntakeToDissemination(object):
         federal_awards = self.single_audit_checklist.federal_awards
         federal_awards_objects = []
         report_id = self.single_audit_checklist.report_id
-        # try:  
+        # try:
         #     general = General.objects.get(report_id=report_id)
         # except General.DoesNotExist:
         #     logger.error(
@@ -144,85 +140,86 @@ class IntakeToDissemination(object):
             program = entry["program"]
             loan = entry["loan_or_loan_guarantee"]
             cluster = entry["cluster"]
-            state_cluster_name = cluster.get("state_cluster_name") # FIXME: what default value do we want here (None or "")?
-            other_cluster_name = cluster.get("other_cluster_name") # FIXME: what default value do we want here (None or "")?
             federal_award = FederalAward(
                 report_id=self.report_id,
                 award_reference=entry["award_reference"],
                 federal_agency_prefix=program["federal_agency_prefix"],
                 federal_award_extension=program["three_digit_extension"],
-                additional_award_identification=program.get("additional_award_identification",""), # FIXME: update the type of additional_award_identification in the schema and determine the right default value
+                additional_award_identification=program.get(
+                    "additional_award_identification", ""
+                ),
                 federal_program_name=program["program_name"],
                 amount_expended=program["amount_expended"],
                 cluster_name=cluster["cluster_name"],
-                other_cluster_name=other_cluster_name,
-                state_cluster_name=state_cluster_name,
-                cluster_total=cluster["cluster_total"], #FIXME: Why is cluster_total removed from the schema? This field should be required in the schema
-                federal_program_total=program["federal_program_total"], #FIXME: This field should be required in the schema
+                other_cluster_name=cluster.get("other_cluster_name", ""),
+                state_cluster_name=cluster.get("state_cluster_name", ""),
+                cluster_total=cluster["cluster_total"],
+                federal_program_total=program["federal_program_total"],
                 is_loan=loan["is_guaranteed"] == "Y",
-                loan_balance=loan.get("loan_balance_at_audit_period_end", 0),
-                is_direct= entry["direct_or_indirect_award"]["is_direct"] == "Y",
-                is_major=program["is_major"] == "Y" if "is_major" in program else False,
-                mp_audit_report_type=program.get("audit_report_type", ""), #FIXME: Update audit_report_type to remove Types.NULL unless this is expected for historical data
-                findings_count = program["number_of_audit_findings"],
-                is_passthrough_award= entry["subrecipients"]["is_passed"] == "Y" # FIXME: is_passed should be required in the schema  
-                passthrough_amount= entry["subrecipients"].get("subrecipient_amount") # FIXME: what default value do we want here (None or "")?
+                loan_balance=loan.get("loan_balance_at_audit_period_end", 0),  # FIXME
+                is_direct=entry["direct_or_indirect_award"]["is_direct"] == "Y",
+                is_major=program["is_major"] == "Y",
+                mp_audit_report_type=program.get("audit_report_type", ""),
+                findings_count=program["number_of_audit_findings"],
+                is_passthrough_award=entry["subrecipients"]["is_passed"] == "Y",
+                # If the user entered "N" for is_passthrough_award, there will be no value for `passthrough_amount`.
+                # We insert a `null`, as opposed to a 0, in that case.
+                passthrough_amount=entry["subrecipients"].get(
+                    "subrecipient_amount", None
+                ),
             )
-            # if self.write_to_db:
-            #     federal_award.save()
             federal_awards_objects.append(federal_award)
         self.loaded_objects["FederalAwards"] = federal_awards_objects
         return federal_awards_objects
 
     def load_captext(self):
         corrective_action_plan = self.single_audit_checklist.corrective_action_plan
-        corrective_action_plan_entries = corrective_action_plan[
-            "CorrectiveActionPlan"
-        ]["corrective_action_plan_entries"]
+        corrective_action_plan_entries = corrective_action_plan.get(
+            "CorrectiveActionPlan", {}
+        ).get("corrective_action_plan_entries")
         cap_text_objects = []
-        for entry in corrective_action_plan_entries:
-            cap_text = CapText(
-                report_id=self.report_id,
-                finding_ref_number=entry["reference_number"],
-                contains_chart_or_table=entry["contains_chart_or_table"] == "Y",
-                planned_action=entry["planned_action"],
-            )
-            # if self.write_to_db:
-            #     cap_text.save()
-            cap_text_objects.append(cap_text)
+        if corrective_action_plan_entries:
+            for entry in corrective_action_plan_entries:
+                cap_text = CapText(
+                    report_id=self.report_id,
+                    finding_ref_number=entry["reference_number"],
+                    contains_chart_or_table=entry["contains_chart_or_table"] == "Y",
+                    planned_action=entry["planned_action"],
+                )
+                cap_text_objects.append(cap_text)
         self.loaded_objects["CapTexts"] = cap_text_objects
         return cap_text_objects
 
     def load_notes(self):
-        notes_to_sefa = self.single_audit_checklist.notes_to_sefa["NotesToSefa"]
-        accounting_policies = notes_to_sefa["accounting_policies"]
-        is_minimis_rate_used = notes_to_sefa["is_minimis_rate_used"] == "Y"  # FIXME This is not always a boolean
-        rate_explained = notes_to_sefa["rate_explained"]
-        entries = notes_to_sefa["notes_to_sefa_entries"]
+        sefa = self.single_audit_checklist.notes_to_sefa
+        notes_to_sefa = sefa.get("NotesToSefa", {})
         sefa_objects = []
-        if not entries:
-            note = Note(
-                report_id=self.report_id,
-                accounting_policies=accounting_policies,
-                is_minimis_rate_used=is_minimis_rate_used,
-                rate_explained=rate_explained,
-            )
-            # if self.write_to_db:
-            #     note.save()
-            sefa_objects.append(note)
-        else:
-            for entry in entries:
+        if notes_to_sefa:
+            accounting_policies = notes_to_sefa["accounting_policies"]
+            is_minimis_rate_used = (
+                notes_to_sefa["is_minimis_rate_used"] == "Y"
+            )  # FIXME This is not always a boolean
+            rate_explained = notes_to_sefa["rate_explained"]
+            entries = notes_to_sefa["notes_to_sefa_entries"]
+            if not entries:
                 note = Note(
                     report_id=self.report_id,
-                    content=entry["note_content"],
-                    note_title=entry["note_title"],
                     accounting_policies=accounting_policies,
                     is_minimis_rate_used=is_minimis_rate_used,
                     rate_explained=rate_explained,
                 )
-                # if self.write_to_db:
-                #     note.save()
                 sefa_objects.append(note)
+            else:
+                for entry in entries:
+                    note = Note(
+                        report_id=self.report_id,
+                        content=entry["note_content"],
+                        note_title=entry["note_title"],
+                        accounting_policies=accounting_policies,
+                        is_minimis_rate_used=is_minimis_rate_used,
+                        rate_explained=rate_explained,
+                    )
+                    sefa_objects.append(note)
         self.loaded_objects["Notes"] = sefa_objects
         return sefa_objects
 
@@ -255,18 +252,24 @@ class IntakeToDissemination(object):
 
     def load_passthrough(self):
         federal_awards = self.single_audit_checklist.federal_awards
+        federal_awards_entries = federal_awards.get("FederalAwards", {}).get(
+            "federal_awards"
+        )
         pass_objects = []
-        for entry in federal_awards["FederalAwards"]["federal_awards"]:
-            for entity in entry["direct_or_indirect_award"]["entities"]:
-                passthrough = Passthrough(
-                    award_reference=entry["award_reference"],
-                    report_id=self.report_id,
-                    passthrough_id=entity["passthrough_identifying_number"],
-                    passthrough_name=entity["passthrough_name"],
-                )
-                # if self.write_to_db:
-                #     passthrough.save()
-                pass_objects.append(passthrough)
+        if federal_awards_entries:
+            for entry in federal_awards_entries:
+                entities = entry.get("direct_or_indirect_award", {}).get("entities")
+                if entities:
+                    for entity in entities:
+                        passthrough = Passthrough(
+                            award_reference=entry["award_reference"],
+                            report_id=self.report_id,
+                            passthrough_id=entity.get(
+                                "passthrough_identifying_number", ""
+                            ),  # FIXME Discuss this
+                            passthrough_name=entity["passthrough_name"],
+                        )
+                        pass_objects.append(passthrough)
         self.loaded_objects["Passthroughs"] = pass_objects
         return pass_objects
 
@@ -352,7 +355,7 @@ class IntakeToDissemination(object):
             type_audit_code="UG",
             is_public=self.single_audit_checklist.is_public,
             data_source="GSA",
-            #data_source=self.single_audit_checklist.data_source,
+            # data_source=self.single_audit_checklist.data_source,
         )
         self._load_audit_info(general)
         # if self.write_to_db:
@@ -362,27 +365,30 @@ class IntakeToDissemination(object):
 
     def load_secondary_auditor(self):
         secondary_auditors = self.single_audit_checklist.secondary_auditors
+        secondary_auditors_entries = secondary_auditors.get(
+            "SecondaryAuditors", {}
+        ).get("secondary_auditors_entries")
         sec_objs = []
-        for secondary_auditor in secondary_auditors["SecondaryAuditors"][
-            "secondary_auditors_entries"
-        ]["items"]:
-            sec_auditor = SecondaryAuditor(
-                report_id=self.single_audit_checklist.report_id,
-                auditor_seq_number=secondary_auditor["secondary_auditor_seq_number"],
-                auditor_ein=secondary_auditor["secondary_auditor_ein"],
-                auditor_name=secondary_auditor["secondary_auditor_name"],
-                contact_name=secondary_auditor["secondary_auditor_contact_name"],
-                contact_title=secondary_auditor["secondary_auditor_contact_title"],
-                contact_email=secondary_auditor["secondary_auditor_contact_email"],
-                contact_phone=secondary_auditor["secondary_auditor_contact_phone"],
-                address_street=secondary_auditor["secondary_auditor_address_street"],
-                address_city=secondary_auditor["secondary_auditor_address_city"],
-                address_state=secondary_auditor["secondary_auditor_address_state"],
-                address_zipcode=secondary_auditor["secondary_auditor_address_zipcode"],
-            )
-            # if self.write_to_db:
-            #     sec_auditor.save()
-            sec_objs.append(sec_auditor)
+        if secondary_auditors_entries:
+            for secondary_auditor in secondary_auditors_entries:
+                sec_auditor = SecondaryAuditor(
+                    report_id=self.single_audit_checklist.report_id,
+                    auditor_ein=secondary_auditor["secondary_auditor_ein"],
+                    auditor_name=secondary_auditor["secondary_auditor_name"],
+                    contact_name=secondary_auditor["secondary_auditor_contact_name"],
+                    contact_title=secondary_auditor["secondary_auditor_contact_title"],
+                    contact_email=secondary_auditor["secondary_auditor_contact_email"],
+                    contact_phone=secondary_auditor["secondary_auditor_contact_phone"],
+                    address_street=secondary_auditor[
+                        "secondary_auditor_address_street"
+                    ],
+                    address_city=secondary_auditor["secondary_auditor_address_city"],
+                    address_state=secondary_auditor["secondary_auditor_address_state"],
+                    address_zipcode=secondary_auditor[
+                        "secondary_auditor_address_zipcode"
+                    ],
+                )
+                sec_objs.append(sec_auditor)
         self.loaded_objects["SecondaryAuditors"] = sec_objs
         return sec_objs
 
@@ -431,7 +437,7 @@ class IntakeToDissemination(object):
                     report_id=self.single_audit_checklist.report_id,
                     additional_uei=uei["additional_uei"],
                 )
-                auei.save()   #FIXME: We could use a bulk insert here. Also, we could do all save in a batch.
+                auei.save()  # FIXME: We could use a bulk insert here. Also, we could do all save in a batch.
 
     def load_audit_info(self):
         report_id = self.single_audit_checklist.report_id
@@ -475,4 +481,4 @@ class IntakeToDissemination(object):
         general.is_low_risk = audit_information["is_low_risk_auditee"] == "Y"
         general.agencies_with_prior_findings = audit_information["agencies"]
 
-        general.save()   #FIXME: Let's revisit this
+        general.save()  # FIXME: Let's revisit this

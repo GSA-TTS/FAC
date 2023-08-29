@@ -23,20 +23,6 @@ local Validations = {
         },
       },
       'then': {
-        oneOf: [
-          {
-            properties: {
-              loan_balance_at_audit_period_end: Types.integer {
-                minimum: 1,
-              },
-            },
-          },
-          {
-            properties: {
-              loan_balance_at_audit_period_end: Base.Enum.NA,
-            },
-          },
-        ],
         required: ['loan_balance_at_audit_period_end'],
       },
     },
@@ -49,8 +35,8 @@ local Validations = {
         },
       },
       'then': {
-        properties: {
-          loan_balance_at_audit_period_end: Base.Enum.EmptyString_Zero_Null,
+        not: {
+          required: ['loan_balance_at_audit_period_end'],
         },
       },
     },
@@ -68,9 +54,6 @@ local Validations = {
         required: [
           'subrecipient_amount',
         ],
-        properties: {
-          subrecipient_amount: Types.integer,
-        },
       },
     },
     {
@@ -82,8 +65,8 @@ local Validations = {
         },
       },
       'then': {
-        properties: {
-          subrecipient_amount: Base.Enum.EmptyString_Zero_Null,
+        not: {
+          required: ['subrecipient_amount'],
         },
       },
     },
@@ -140,33 +123,40 @@ local Validations = {
         },
       },
       'then': {
-        properties: {
-          audit_report_type: Base.Enum.EmptyString_Null,
+        not: {
+          required: ['audit_report_type'],
         },
       },
     },
-    Base.Validation.AdditionalAwardIdentificationValidation[0],
+    {
+      'if': {
+        properties: {
+          three_digit_extension: Base.Compound.ExtensionRdOrU,
+        },
+      },
+      'then': {
+        properties: {
+          additional_award_identification: Types.string {
+            minLength: 1,
+          },
+        },
+        required: ['additional_award_identification'],
+      },
+    },
   ],
 };
 
 local Parts = {
-  // FIXME
-  // cluster_name should always be present.
-  // At the least, it should always be N/A.
   Cluster: Types.object {
     properties: {
-      // Cluster name must always be present, and it must EITHER be:
-      //  - A valid cluster name from the enumeration
-      //  - N/A
-      //  - STATE CLUSTER, or
-      //  - the designation for other cluster name
       cluster_name: Types.string,
       other_cluster_name: Types.string,
       state_cluster_name: Types.string,
-      // cluster_total: Types.number {
-      //   minimum: 0,
-      // },
+      cluster_total: Types.number {
+        minimum: 0,
+      },
     },
+    required: ['cluster_name', 'cluster_total'],
     allOf: [
       {
         'if': {
@@ -237,7 +227,6 @@ local Parts = {
         },
       },
     ],
-    required: ['cluster_name'],
   },
 
   DirectOrIndirectAward: Types.object {
@@ -250,6 +239,7 @@ local Parts = {
         items: Validations.PassThroughEntity,
       },
     },
+    required: ['is_direct'],
     allOf: [
       {
         'if': {
@@ -278,14 +268,13 @@ local Parts = {
         },
       },
     ],
-    required: ['is_direct'],
   },
   LoanOrLoanGuarantee: Types.object {
     additionalProperties: false,
     description: 'A loan or loan guarantee and balance',
     properties: {
       is_guaranteed: Base.Enum.YorN,
-      loan_balance_at_audit_period_end: Func.compound_type([Types.number, Types.string]),
+      loan_balance_at_audit_period_end: Base.Compound.LoanBalanceAuditPeriodEnd,
     },
     required: [
       'is_guaranteed',
@@ -296,8 +285,11 @@ local Parts = {
     additionalProperties: false,
     properties: {
       is_passed: Base.Enum.YorN,
-      subrecipient_amount: Func.compound_type([Types.number, Types.string]),
+      subrecipient_amount: Types.number {
+        minimum: 0,
+      },
     },
+    required: ['is_passed'],
     allOf: Validations.SubrecipientValidations,
   },
   Program: Types.object {
@@ -305,15 +297,19 @@ local Parts = {
     properties: {
       federal_agency_prefix: Base.Compound.ALNPrefixes,
       three_digit_extension: Base.Compound.ThreeDigitExtension,
-      additional_award_identification: Func.compound_type([Types.string, Types.NULL, Types.integer]),
+      additional_award_identification: Types.string,
       program_name: Types.string,
-      amount_expended: Types.number,
-      federal_program_total: Types.number,
+      amount_expended: Types.number {
+        minimum: 0,
+      },
+      federal_program_total: Types.number {
+        minimum: 0,
+      },
       is_major: Base.Enum.YorN,
-      audit_report_type: Func.compound_type([Base.Enum.MajorProgramAuditReportType, Types.NULL]),
+      audit_report_type: Base.Enum.MajorProgramAuditReportType,
       number_of_audit_findings: Types.integer,
     },
-    required: ['program_name', 'federal_agency_prefix', 'three_digit_extension', 'is_major', 'number_of_audit_findings'],
+    required: ['program_name', 'federal_agency_prefix', 'three_digit_extension', 'is_major', 'number_of_audit_findings', 'federal_program_total', 'amount_expended'],
     allOf: Validations.ProgramValidations,
   },
 };
@@ -363,9 +359,9 @@ local FederalAwards = Types.object {
     federal_awards: Types.array {
       items: FederalAwardEntry,
     },
-    total_amount_expended: Func.compound_type([Types.number {
+    total_amount_expended: Types.number {
       minimum: 0,
-    }, Types.NULL]),
+    },
   },
   required: ['auditee_uei', 'total_amount_expended'],
   title: 'FederalAward',

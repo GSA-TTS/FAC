@@ -67,6 +67,16 @@ local REGEX_ALN_PREFIX = '^([0-9]{2})$';
 local REGEX_RD_EXTENSION = 'RD';
 local REGEX_THREE_DIGIT_EXTENSION = '[0-9]{3}[A-Za-z]{0,1}';
 local REGEX_U_EXTENSION = 'U[0-9]{2}';
+local REGEX_NUMBER = '[0-9]+';
+
+local type_loan_balance_at_audit_period_end = Types.string {
+  pattern: '^('
+           + REGEX_NUMBER
+           + '|'
+           + Const.NA
+           + ')$',                           
+};
+
 
 local type_aln_prefix = Types.string {
   allOf: [
@@ -90,26 +100,8 @@ local type_three_digit_extension = Types.string {
 
 };
 
-local Validation = {
-  AdditionalAwardIdentificationValidation: [
-    {
-      'if': {
-        properties: {
-          three_digit_extension: {
-            pattern: '^(' + REGEX_RD_EXTENSION + '|' + REGEX_U_EXTENSION + ')$',
-          },
-        },
-      },
-      'then': {
-        properties: {
-          additional_award_identification: Func.compound_type([Types.integer, Types.string]) {
-            minLength: 1,
-          },
-        },
-        required: ['additional_award_identification'],
-      },
-    },
-  ],
+local type_extension_rd_or_u = Types.string {
+      pattern:'^(' + REGEX_RD_EXTENSION + '|' + REGEX_U_EXTENSION + ')$',
 };
 
 local Atoms = {
@@ -438,7 +430,8 @@ local SchemaBase = Types.object {
       description: 'Compliance requirement types',
       enum: ComplianceRequirementTypes.requirement_types,
     },
+    ExtensionRdOrU: type_extension_rd_or_u,
+    LoanBalanceAuditPeriodEnd:type_loan_balance_at_audit_period_end,
   },
-  Validation: Validation,
   SchemaBase: SchemaBase,
 }

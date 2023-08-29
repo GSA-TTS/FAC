@@ -10,17 +10,15 @@
         "program": {
           "federal_agency_prefix": "42",
           "three_digit_extension": "RD",
-          "additional_award_identification": 1234,
+          "additional_award_identification": "1234",
           "program_name": "MAIN PROGRAM",
           "is_major": "N",
-          "audit_report_type": "",
           "number_of_audit_findings": 0,
           "amount_expended": 500,
           "federal_program_total": 4000
         },
         "loan_or_loan_guarantee": {
-          "is_guaranteed": "N",
-          "loan_balance_at_audit_period_end": 0
+          "is_guaranteed": "N"
         },
         "direct_or_indirect_award": {
           "is_direct": "N",
@@ -49,11 +47,12 @@
           "is_major": "Y",
           "audit_report_type": "U",
           "number_of_audit_findings": 0,
-          "amount_expended": 42
+          "amount_expended": 42,
+          "federal_program_total": 0
         },
         "loan_or_loan_guarantee": {
           "is_guaranteed": "Y",
-          "loan_balance_at_audit_period_end": 42
+          "loan_balance_at_audit_period_end": "42"
         },
         "direct_or_indirect_award": {
           "is_direct": "Y"
@@ -77,11 +76,12 @@
           "is_major": "Y",
           "audit_report_type": "Q",
           "number_of_audit_findings": 1,
-          "amount_expended": 42
+          "amount_expended": 42,
+          "federal_program_total": 0
         },
         "loan_or_loan_guarantee": {
           "is_guaranteed": "Y",
-          "loan_balance_at_audit_period_end": 42
+          "loan_balance_at_audit_period_end": "N/A"
         },
         "direct_or_indirect_award": {
           "is_direct": "N",
