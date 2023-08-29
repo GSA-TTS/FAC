@@ -98,16 +98,16 @@ class IntakeToDissemination(object):
 
                 finding = Finding(
                     award_reference=program["award_reference"],
-                    report_id=self.report_id,
                     finding_ref_number=findings["reference_number"],
-                    is_material_weakness=entry["material_weakness"] == "Y",
+                    is_material_weakness=entry["material_weakness"],
                     is_modified_opinion=entry["modified_opinion"] == "Y",
                     is_other_findings=entry["other_findings"] == "Y",
                     is_other_non_compliance=entry["other_matters"] == "Y",
-                    prior_finding_ref_numbers=findings.get("prior_references"),
                     is_questioned_costs=entry["questioned_costs"] == "Y",
                     is_repeat_finding=(findings["repeat_prior_reference"] == "Y"),
                     is_significant_deficiency=(entry["significant_deficiency"] == "Y"),
+                    prior_finding_ref_numbers=findings.get("prior_references"),
+                    report_id=self.report_id,
                     type_requirement=(program["compliance_requirement"]),
                 )
                 findings_objects.append(finding)
@@ -141,32 +141,28 @@ class IntakeToDissemination(object):
             loan = entry["loan_or_loan_guarantee"]
             cluster = entry["cluster"]
             federal_award = FederalAward(
-                report_id=self.report_id,
+                additional_award_identification=program.get("additional_award_identification", ""),
+                amount_expended=program["amount_expended"],
                 award_reference=entry["award_reference"],
+                cluster_name=cluster["cluster_name"],
+                cluster_total=cluster["cluster_total"],
                 federal_agency_prefix=program["federal_agency_prefix"],
                 federal_award_extension=program["three_digit_extension"],
-                additional_award_identification=program.get(
-                    "additional_award_identification", ""
-                ),
                 federal_program_name=program["program_name"],
-                amount_expended=program["amount_expended"],
-                cluster_name=cluster["cluster_name"],
-                other_cluster_name=cluster.get("other_cluster_name", ""),
-                state_cluster_name=cluster.get("state_cluster_name", ""),
-                cluster_total=cluster["cluster_total"],
                 federal_program_total=program["federal_program_total"],
-                is_loan=loan["is_guaranteed"] == "Y",
-                loan_balance=loan.get("loan_balance_at_audit_period_end", 0),  # FIXME
-                is_direct=entry["direct_or_indirect_award"]["is_direct"] == "Y",
-                is_major=program["is_major"] == "Y",
-                mp_audit_report_type=program.get("audit_report_type", ""),
                 findings_count=program["number_of_audit_findings"],
-                is_passthrough_award=entry["subrecipients"]["is_passed"] == "Y",
+                is_direct=entry["direct_or_indirect_award"]["is_direct"],
+                is_loan=loan["is_guaranteed"],
+                is_major=program["is_major"],
+                is_passthrough_award=entry["subrecipients"]["is_passed"],
+                loan_balance=loan.get("loan_balance_at_audit_period_end", ""),
+                audit_report_type=program.get("audit_report_type", ""),
+                other_cluster_name=cluster.get("other_cluster_name", ""),
                 # If the user entered "N" for is_passthrough_award, there will be no value for `passthrough_amount`.
                 # We insert a `null`, as opposed to a 0, in that case.
-                passthrough_amount=entry["subrecipients"].get(
-                    "subrecipient_amount", None
-                ),
+                passthrough_amount=entry["subrecipients"].get("subrecipient_amount", None),
+                report_id=self.report_id,
+                state_cluster_name=cluster.get("state_cluster_name", ""),
             )
             federal_awards_objects.append(federal_award)
         self.loaded_objects["FederalAwards"] = federal_awards_objects
@@ -266,7 +262,7 @@ class IntakeToDissemination(object):
                             report_id=self.report_id,
                             passthrough_id=entity.get(
                                 "passthrough_identifying_number", ""
-                            ),  # FIXME Discuss this
+                            ),
                             passthrough_name=entity["passthrough_name"],
                         )
                         pass_objects.append(passthrough)
