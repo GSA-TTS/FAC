@@ -231,18 +231,6 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         max_length=20, choices=AUDIT_TYPE_CODES, blank=True, null=True
     )
 
-    # Computed fields
-    cognizant_agency = models.CharField(
-        max_length=2,
-        blank=True,
-        null=True,
-    )
-    oversight_agency = models.CharField(
-        max_length=2,
-        blank=True,
-        null=True,
-    )
-
     # General Information
     # The general information fields are currently specified in two places:
     #   - report_submission.forms.GeneralInformationForm
