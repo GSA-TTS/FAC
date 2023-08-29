@@ -33,7 +33,7 @@ class SectionBabelFish(NamedTuple):
     workbook_number: int | None  # Our upload ordering of workbooks.
 
 
-SECTION_NAMES = {
+section_names = {
     "additional_eins": SectionBabelFish(
         all_caps="ADDITIONAL_EINS",
         camel_case="AdditionalEINs",
@@ -89,9 +89,9 @@ SECTION_NAMES = {
         camel_case="FindingsText",
         friendly="Federal Awards Audit Findings Text",
         friendly_title="Federal Awards Audit Findings Text",
-        reverse_url="report_submission:audit-findings-text",
+        reverse_url="report_submission:audit-findings",
         snake_case="findings_text",
-        url_tail="audit-findings-text",
+        url_tail="audit-findings",
         workbook_number=4,
     ),
     "findings_uniform_guidance": SectionBabelFish(
@@ -99,7 +99,7 @@ SECTION_NAMES = {
         camel_case="FindingsUniformGuidance",
         friendly="Findings Uniform Guidance",
         friendly_title="Federal Awards Audit Findings",
-        reverse_url="report_submission:audit-findings",
+        reverse_url="report_submission:audit_findings",
         snake_case="findings_uniform_guidance",
         url_tail="audit-findings",
         workbook_number=3,
@@ -118,31 +118,11 @@ SECTION_NAMES = {
         all_caps="NOTES_TO_SEFA",
         camel_case="NotesToSefa",
         friendly="Notes to SEFA",
-        friendly_title="Notes to SEFA",
-        reverse_url="report_submission:notes-to-sefa",
-        snake_case="notes_to_sefa",
-        url_tail="notes-to-sefa",
-        workbook_number=2,
-    ),
-    "single_audit_report": SectionBabelFish(
-        all_caps="SINGLE_AUDIT_REPORT",
-        camel_case="SingleAuditReport",
-        friendly="Single Audit Report",
-        friendly_title="Audit report PDF",
-        reverse_url="audit:UploadReport",
-        snake_case="single_audit_report",
-        url_tail="upload-report",
+        friendly_title="General Information form",
+        reverse_url="report_submission:general_information",
+        snake_case="general_information",
+        url_tail="general-information",
         workbook_number=None,
-    ),
-    "secondary_auditors": SectionBabelFish(
-        all_caps="SECONDARY_AUDITORS",
-        camel_case="SecondaryAuditors",
-        friendly="Secondary Auditors",
-        friendly_title="Secondary Auditors",
-        reverse_url="report_submission:secondary-auditors",
-        snake_case="secondary_auditors",
-        url_tail="secondary-auditors",
-        workbook_number=7,
     ),
     "tribal_data_consent": SectionBabelFish(
         all_caps="TRIBAL_DATA_CONSENT",
@@ -161,23 +141,11 @@ def find_section_by_name(name):
     """
     Find the answers, first trying snake_case and then all the other versions.
     """
-    if name in SECTION_NAMES:
-        return SECTION_NAMES[name]
+    if name in section_names:
+        return section_names[name]
 
-    for guide in SECTION_NAMES.values():
+    for guide in section_names.values():
         if name in guide:
             return guide
 
     return None
-
-
-def camel_to_snake(camel_case_section_name):
-    """Helper function for finding section names."""
-    guide = find_section_by_name(camel_case_section_name)
-    return guide.snake_case if guide else None
-
-
-def snake_to_camel(snake_case_section_name):
-    """Helper function for finding section names."""
-    guide = find_section_by_name(snake_case_section_name)
-    return guide.camel_case if guide else None
