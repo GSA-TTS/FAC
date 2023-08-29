@@ -232,30 +232,13 @@ local Validations = {
     {
       'if': {
         properties: {
-          repeat_prior_reference: Base.Types.string {
+          repeat_prior_reference: {
             const: Base.Const.Y,
           },
         },
       },
       'then': {
         required:['prior_references'] 
-      },
-    },
-    {
-      'if': {
-        properties: {
-          repeat_prior_reference: Base.Types.string {
-            const: Base.Const.N,
-          },
-        },
-      },
-      'then': {
-        properties: {
-          // required:['prior_references'], 
-          prior_references: Base.Types.string {
-            const: Base.Const.NA
-          },
-        },
       },
     },
   ],   
