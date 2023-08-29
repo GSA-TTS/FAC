@@ -398,6 +398,9 @@ local Compound = {
   MonthsOther: Types.string {
     pattern: REGEX_MONTHS_OTHER,
   },
+  EmptyString: Types.string {
+    const: Const.empty_string,
+  },
 };
 
 

@@ -792,6 +792,8 @@ class SingleAuditChecklistViewTests(TestCase):
             expected = {"errors": {"general_information": [message]}}
             with self.subTest():
                 nested = {"general_information": {key: "invalid_choice"}}
+                if key == "auditor_country":
+                    nested["general_information"]["auditor_zip"] = ""
                 check_response(nested, expected)
 
         for key in length_100_keys:
@@ -884,7 +886,10 @@ class SingleAuditChecklistViewTests(TestCase):
                 {"auditor_ein_not_an_ssn_attestation": None},
                 {"auditor_ein_not_an_ssn_attestation": True},
             ),
-            ({"auditor_country": "USA"}, {"auditor_country": "non-USA"}),
+            (
+                {"auditor_country": "USA"},
+                {"auditor_country": "non-USA", "auditor_zip": ""},
+            ),
             (
                 {"auditor_address_line_1": "100 Percent Respectable St."},
                 {"auditor_address_line_1": "75 Percent Respectable St."},

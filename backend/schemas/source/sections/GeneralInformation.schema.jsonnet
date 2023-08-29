@@ -86,7 +86,12 @@ local Types = Base.Types;
     auditor_state: {
       '$ref': '#/$defs/State',
     },
-    auditor_zip: Types.string,
+    auditor_zip: {
+      anyOf: [
+        Base.Compound.Zip,
+        Base.Compound.EmptyString,
+      ],
+    },
     ein: {
       '$ref': '#/$defs/EIN',
     },
@@ -153,6 +158,7 @@ local Types = Base.Types;
         properties: {
           auditor_zip: Base.Compound.Zip,
         },
+        required: ["auditor_zip"]
       },
     },
     {
@@ -165,14 +171,12 @@ local Types = Base.Types;
       },
       'then': {
         properties: {
-          auditor_zip: {
-            const: '',
-          },
+          auditor_zip: Base.Compound.EmptyString,
         },
       },
     },
   ],
-  required: ['auditor_zip'],
+  required: [],
   title: 'GeneralInformation',
   type: 'object',
   version: null,

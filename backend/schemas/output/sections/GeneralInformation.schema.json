@@ -199,7 +199,10 @@
                   "pattern": "^[0-9]{5}(?:[0-9]{4})?$",
                   "type": "string"
                }
-            }
+            },
+            "required": [
+               "auditor_zip"
+            ]
          }
       },
       {
@@ -213,7 +216,8 @@
          "then": {
             "properties": {
                "auditor_zip": {
-                  "const": ""
+                  "const": "",
+                  "type": "string"
                }
             }
          }
@@ -334,7 +338,16 @@
          "$ref": "#/$defs/State"
       },
       "auditor_zip": {
-         "type": "string"
+         "anyOf": [
+            {
+               "pattern": "^[0-9]{5}(?:[0-9]{4})?$",
+               "type": "string"
+            },
+            {
+               "const": "",
+               "type": "string"
+            }
+         ]
       },
       "ein": {
          "$ref": "#/$defs/EIN"
@@ -373,9 +386,7 @@
          "$ref": "#/$defs/UserProvidedOrganizationType"
       }
    },
-   "required": [
-      "auditor_zip"
-   ],
+   "required": [ ],
    "title": "GeneralInformation",
    "type": "object",
    "version": null
