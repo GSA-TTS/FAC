@@ -6,7 +6,7 @@ path = Path(__file__)
 
 BASE_DIR = path.resolve().parent.parent.parent
 
-SECRET_KEY = "fake-key-here"
+SECRET_KEY = "fake-key-here"  # nosec
 
 # Application definition
 INSTALLED_APPS = [
