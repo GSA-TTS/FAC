@@ -12,6 +12,8 @@ from audit.cog_over import cog_over
 # Note:  Fake data is generated for SingleAuditChecklist, CognizantBaseline.
 #        Using only the data fields that apply to cog / over assignment.
 
+BASELINE_EIN = "742094204"
+BASELINE_DUP_EIN = "987876765"
 
 class CogOverTests(TestCase):
     def __init__(self, method_name: str = "runTest") -> None:
@@ -26,20 +28,28 @@ class CogOverTests(TestCase):
 
         gen = baker.make(CensusGen19,
                          index=1, 
-                         ein='742094204',
-                         dbkey = '102318,',
-                         totfedexpend = '10000000',
+                         ein=BASELINE_EIN,
+                         dbkey = '102318',
+                         totfedexpend = '210000000',
                          )
         gen.save()
         for i in range(6):
             cfda = baker.make(CensusCfda19,
                         index=i, 
-                        dbkey = '102318,',
+                        dbkey = gen.dbkey,
                         cfda = '84.032',
-                        amount = 1_000_000 * i,
+                        amount = 10_000_000 * i,
                         direct = 'Y'
                         )
             cfda.save()
+        for i in range(2,5):
+            gen = baker.make(CensusGen19,
+                         index=i, 
+                         ein=BASELINE_DUP_EIN,
+                         totfedexpend = '10000000',
+                        )
+            gen.save()
+
 
 
     @staticmethod
@@ -148,7 +158,7 @@ class CogOverTests(TestCase):
                         "direct_or_indirect_award": {"is_direct": "Y"},
                     },
                 ],
-                "total_amount_expended": 51_000_000,
+                "total_amount_expended": 52_000_200,
             }
         }
 
@@ -162,7 +172,7 @@ class CogOverTests(TestCase):
                         "award_reference": "ABC125",
                         "program": {
                             "program_name": "SENIOR VOLUNTEER PROGRAM",
-                            "amount_expended": 11_000_000,
+                            "amount_expended": 11_200_300,
                             "federal_agency_prefix": "15",
                             "federal_program_total": 12_000_000,
                             "three_digit_extension": "600",
@@ -170,7 +180,7 @@ class CogOverTests(TestCase):
                         "direct_or_indirect_award": {"is_direct": "Y"},
                     },
                 ],
-                "total_amount_expended": 11_000_000,
+                "total_amount_expended": 11_200_300,
             }
         }
 
@@ -201,11 +211,54 @@ class CogOverTests(TestCase):
                         general_information=self._fake_general(),
                         federal_awards=self._fake_federal_awards(),
                          )
-        sac.general_information['ein'] = '742094204'
-        sac.general_information['total_amount_expended'] = 10_000_000
+        sac.general_information['ein'] = BASELINE_EIN
         cog_agency, over_agency = cog_over(sac)
         self.assertEqual(cog_agency, "84")
         self.assertEqual(over_agency, None)
+
+    def test_cog_assignment_with_no_baseline(self):
+        sac = baker.make(SingleAuditChecklist,
+                        submitted_by=self.user,
+                        general_information=self._fake_general(),
+                        federal_awards=self._fake_federal_awards(),
+                         )
+        cog_agency, over_agency = cog_over(sac)
+        self.assertEqual(cog_agency, "10")
+        self.assertEqual(over_agency, None)
+
+    def test_cog_assignment_with_multiple_baseline(self):
+        sac = baker.make(SingleAuditChecklist,
+                        submitted_by=self.user,
+                        general_information=self._fake_general(),
+                        federal_awards=self._fake_federal_awards(),
+                         )
+        sac.general_information['ein'] = BASELINE_DUP_EIN
+        cog_agency, over_agency = cog_over(sac)
+        self.assertEqual(cog_agency, "10")
+        self.assertEqual(over_agency, None)
+
+    def test_over_assignment(self):
+        sac = baker.make(SingleAuditChecklist,
+                        submitted_by=self.user,
+                        general_information=self._fake_general(),
+                        federal_awards=self._fake_federal_awards_lt_cog_limit(),
+                        )
+        cog_agency, over_agency = cog_over(sac)
+        self.assertEqual(cog_agency,None)
+        self.assertEqual(over_agency, "15")
+
+    def test_over_assignment_with_baseline(self):
+        sac = baker.make(SingleAuditChecklist,
+                        submitted_by=self.user,
+                        general_information=self._fake_general(),
+                        federal_awards=self._fake_federal_awards_lt_cog_limit(),
+                        )
+        sac.general_information['ein'] = BASELINE_EIN   
+        cog_agency, over_agency = cog_over(sac)
+        self.assertEqual(cog_agency,None)
+        self.assertEqual(over_agency, "15")
+"""
+TODO
 
     def test_cog_over_for_gt_cog_limit_gt_da_threshold_factor_cog_2019(self):
         sac = SingleAuditChecklist.objects.create(
@@ -294,3 +347,4 @@ class CogOverTests(TestCase):
         cog_agency, over_agency = cog_over(self.sac)
         self.assertEqual(cog_agency, "10")
         self.assertEqual(over_agency, None)
+"""

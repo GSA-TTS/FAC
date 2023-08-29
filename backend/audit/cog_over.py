@@ -26,14 +26,14 @@ def cog_over(sac: SingleAuditChecklist):
 
     if total_amount_expended <= COG_LIMIT:
         oversight_agency = agency
-        print("JMM: Assigning an oversight agenct")
+        print("Assigning an oversight agenct", oversight_agency)
         return (cognizant_agency, oversight_agency)
     cognizant_agency = determine_2019_agency(sac.ein)
     if cognizant_agency:
-        print("JMM: Assigning a 2019 cog agenct")
+        print("Assigning a 2019 cog agency",cognizant_agency )
         return (cognizant_agency, oversight_agency)
     cognizant_agency = agency
-    print("JMM: Assigning a current cog agenct")
+    print(" Assigning a current cog agenct", cognizant_agency)
     return (cognizant_agency, oversight_agency)
 
 
@@ -86,7 +86,6 @@ def get_baseline_gen(ein):
     if len(gens) != 1:
         return (None, 0)
     gen = gens[0]
-    print(f'Returning gen values: {(gen.dbkey, gen.amt)}')
     return (gen.dbkey, gen.amt)
 
 def get_baseline_cfdas(dbkey):
