@@ -238,6 +238,7 @@ class Client(oic.Client):
                     "client_secret": self.client_secret,
                 },
                 authn_method=self.registration_response["token_endpoint_auth_method"],
+                skew=10,
             )
         except Exception as err:
             logger.error(err)
