@@ -7,7 +7,7 @@ modelsDict = {
     'Finding': ['award_reference', 'prior_finding_ref_numbers', 'type_requirement'],
     'FederalAward': ['additional_award_identification', 'federal_program_name', 'cluster_name', 'other_cluster_name', 'state_cluster_name', 'mp_audit_report_type', 'passthrough_name', 'passthrough_id', 'type_requirement'],
     'CapText': ['planned_action'],
-    'Note': ['planned_action', 'note_title', 'accounting_policies', 'rate_explained'],
+    'Note': ['contetn', 'note_title', 'accounting_policies', 'rate_explained'],
     'Revision': ['findings', 'federal_awards', 'general_info_explain', 'federal_awards_explain', 'notes_to_sefa_explain', 'audit_info_explain', 'findings_explain', 'findings_text_explain', 'cap_explain', 'other_explain', 'audit_info', 'notes_to_sefa', 'findings_text', 'cap', 'other', 'general_info'],
     'Passthrough': ['award_reference', 'passthrough_id', 'passthrough_name'],
     'General': ['auditee_certify_name', 'auditee_certify_title', 'auditee_contact_name', 'auditee_email', 'hist_auditee_fax', 'auditee_contact_title', 'hist_auditee_address_line_2', 'auditee_ein', 'hist_auditee_duns', 'auditee_uei', 'auditee_zip', 'auditor_phone', 'hist_auditor_fax', 'auditor_state', 'auditor_city', 'auditor_contact_title', 'auditor_address_line_1', 'hist_auditor_address_line_2', 'auditor_zip', 'auditor_country', 'auditor_contact_name', 'auditor_email', 'auditor_foreign_addr', 'auditor_ein', 'cognizant_agency', 'oversight_agency', 'gaap_results', 'sp_framework', 'sp_framework_auditor_opinion', 'agencies_with_prior_findings', 'entity_type', 'type_report_major_program'],
