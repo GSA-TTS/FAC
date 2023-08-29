@@ -33,7 +33,7 @@ urlpatterns = [
 for page_id in upload_page_ids:
     urlpatterns.append(
         path(
-            f"{page_id.lower()}/<str:report_id>",
+            "{}/<str:report_id>".format(page_id),
             views.UploadPageView.as_view(),
             name=page_id,
         )

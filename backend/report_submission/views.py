@@ -244,8 +244,8 @@ class UploadPageView(LoginRequiredMixin, View):
                 "workbook_url": workbook_base_url
                 + "federal-awards-audit-findings-text-workbook.xlsx",
             },
-            "cap": {
-                "view_id": "cap",
+            "CAP": {
+                "view_id": "CAP",
                 "view_name": "Corrective Action Plan (CAP)",
                 "instructions": "Enter your CAP text using the provided worksheet.",
                 "DB_id": "corrective_action_plan",
