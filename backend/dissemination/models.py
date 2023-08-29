@@ -662,7 +662,7 @@ class SecondaryAuditor(models.Model):
     )
 
 class CensusCfda19(models.Model):
-    index = models.BigIntegerField(blank=True, null=True)
+    index = models.BigIntegerField(blank=True, primary_key=True)
     audityear = models.TextField(db_column='AUDITYEAR', blank=True, null=True)  # Field name made lowercase.
     dbkey = models.TextField(db_column='DBKEY', blank=True, null=True)  # Field name made lowercase.
     ein = models.TextField(db_column='EIN', blank=True, null=True)  # Field name made lowercase.
@@ -697,7 +697,7 @@ class CensusCfda19(models.Model):
         db_table = 'census_cfda19'
 
 class CensusGen19(models.Model):
-    index = models.BigIntegerField(blank=True, null=True)
+    index = models.BigIntegerField(blank=True, primary_key=True)
     audityear = models.TextField(db_column='AUDITYEAR', blank=True, null=True)  # Field name made lowercase.
     dbkey = models.TextField(db_column='DBKEY', blank=True, null=True)  # Field name made lowercase.
     typeofentity = models.TextField(db_column='TYPEOFENTITY', blank=True, null=True)  # Field name made lowercase.
@@ -767,6 +767,7 @@ class CensusGen19(models.Model):
     entity_type = models.TextField(db_column='ENTITY_TYPE', blank=True, null=True)  # Field name made lowercase.
     uei = models.TextField(db_column='UEI', blank=True, null=True)  # Field name made lowercase.
     multipleueis = models.TextField(db_column='MULTIPLEUEIS', blank=True, null=True)  # Field name made lowercase.
+    
     class Meta:
         managed = False
         db_table = 'census_gen19'

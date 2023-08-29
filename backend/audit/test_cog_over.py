@@ -1,5 +1,5 @@
 from django.test import TestCase
-from dissemination.models import CensusGen19
+from dissemination.models import CensusGen19, CensusCfda19
 
 from model_bakery import baker
 from faker import Faker
@@ -19,24 +19,34 @@ class CogOverTests(TestCase):
 
     def setUp(self):
         self.user = baker.make(User)
-
-    def test_setup_of_gen19(self):
         with connection.schema_editor() as schema_editor:
             schema_editor.create_model(CensusGen19)
+            schema_editor.create_model(CensusCfda19)
 
-        len_at_start = CensusGen19.objects.count()
-        self.assertEqual(len_at_start,0)
-        gen = baker.make(CensusGen19)
+
+        gen = baker.make(CensusGen19,
+                         index=1, 
+                         ein='742094204',
+                         dbkey = '102318,',
+                         totfedexpend = '10000000',
+                         )
         gen.save()
-        len_at_end = CensusGen19.objects.count()
-        self.assertEqual(len_at_end,1)
+        for i in range(6):
+            cfda = baker.make(CensusCfda19,
+                        index=i, 
+                        dbkey = '102318,',
+                        cfda = '84.032',
+                        amount = 1_000_000 * i,
+                        direct = 'Y'
+                        )
+            cfda.save()
 
 
     @staticmethod
     def _fake_general():
         fake = Faker()
         return {
-            "ein": fake.ssn().replace("-", ""),
+            "ein": "ABC123DEF456",
             "audit_type": "single-audit",
             "auditee_uei": "ZQGGHJH74DW7",
             "auditee_zip": fake.zipcode(),
@@ -185,6 +195,17 @@ class CogOverTests(TestCase):
                 "total_amount_expended": 49_000_000,
             }
         }
+    def test_cog_assignment_from_baseline(self):
+        sac = baker.make(SingleAuditChecklist,
+                        submitted_by=self.user,
+                        general_information=self._fake_general(),
+                        federal_awards=self._fake_federal_awards(),
+                         )
+        sac.general_information['ein'] = '742094204'
+        sac.general_information['total_amount_expended'] = 10_000_000
+        cog_agency, over_agency = cog_over(sac)
+        self.assertEqual(cog_agency, "84")
+        self.assertEqual(over_agency, None)
 
     def test_cog_over_for_gt_cog_limit_gt_da_threshold_factor_cog_2019(self):
         sac = SingleAuditChecklist.objects.create(
@@ -192,19 +213,19 @@ class CogOverTests(TestCase):
             general_information=self._fake_general(),
             federal_awards=self._fake_federal_awards(),
         )
-        sac.save()
-        self.sac = sac
+        # sac.save()
+        # self.sac = sac
 
-        fake_cog_baseline = self._fake_cognizantbaseline()
-        self.cognizantbaseline = CognizantBaseline(
-            dbkey=fake_cog_baseline["dbkey"],
-            audit_year=fake_cog_baseline["audit_year"],
-            ein=self.sac.general_information["ein"],
-            cognizant_agency=fake_cog_baseline["cognizant_agency"],
-        ).save()
-        cog_agency = None
-        over_agency = None
-        cog_agency, over_agency = cog_over(self.sac)
+        # fake_cog_baseline = self._fake_cognizantbaseline()
+        # self.cognizantbaseline = CognizantBaseline(
+        #     dbkey=fake_cog_baseline["dbkey"],
+        #     audit_year=fake_cog_baseline["audit_year"],
+        #     ein=self.sac.general_information["ein"],
+        #     cognizant_agency=fake_cog_baseline["cognizant_agency"],
+        # ).save()
+        # cog_agency = None
+        # over_agency = None
+        cog_agency, over_agency = cog_over(sac)
         self.assertEqual(cog_agency, "20")
         self.assertEqual(over_agency, None)
 
