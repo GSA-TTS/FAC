@@ -5,11 +5,6 @@ local Types = Base.Types;
 {
   '$defs': {
     AuditPeriod: Base.Enum.AuditPeriod,
-    EIN: Func.join_types(Base.Compound.EmployerIdentificationNumber, [Types.NULL]),
-    Phone: Base.Compound.UnitedStatesPhone,
-    State: Base.Enum.UnitedStatesStateAbbr {
-      title: 'State',
-    },
     UEI: Base.Compound.UniqueEntityIdentifier,
     UserProvidedOrganizationType: Base.Enum.OrganizationType,
     Zip: Base.Compound.Zip,
@@ -45,16 +40,14 @@ local Types = Base.Types;
     auditee_fiscal_period_start: Types.string {
       format: 'date',
     },
-    auditee_name: Func.compound_type([Types.string, Types.NULL]),
-    auditee_phone: {
-      '$ref': '#/$defs/Phone',
+    auditee_name: Types.string {
+      maxLength: 100
     },
-    auditee_state: {
-      '$ref': '#/$defs/State',
+    auditee_phone: Base.Compound.UnitedStatesPhone,
+    auditee_state: Base.Enum.UnitedStatesStateAbbr {
+      title: 'State',
     },
-    auditee_uei: {
-      '$ref': '#/$defs/UEI',
-    },
+    auditee_uei: Base.Compound.UniqueEntityIdentifier,
     auditee_zip: {
       '$ref': '#/$defs/Zip',
     },
@@ -73,9 +66,7 @@ local Types = Base.Types;
     auditor_country: Types.string {
       maxLength: 100,
     },
-    auditor_ein: {
-      '$ref': '#/$defs/EIN',
-    },
+    auditor_ein: Base.Compound.EmployerIdentificationNumber,
     auditor_ein_not_an_ssn_attestation: Func.compound_type([Types.boolean, Types.NULL]),
     auditor_email: Types.string {
       format: 'email',
@@ -90,19 +81,32 @@ local Types = Base.Types;
     auditor_zip: {
       '$ref': '#/$defs/Zip',
     },
-    ein: {
-      '$ref': '#/$defs/EIN',
-    },
+    ein: Base.Compound.EmployerIdentificationNumber,
     ein_not_an_ssn_attestation: Func.compound_type([Types.boolean, Types.NULL]),
     is_usa_based: Types.boolean,
     met_spending_threshold: Types.boolean,
-    multiple_eins_covered: Func.compound_type([Types.boolean, Types.NULL]),
-    multiple_ueis_covered: Func.compound_type([Types.boolean, Types.NULL]),
+    multiple_eins_covered: Types.boolean,
+    multiple_ueis_covered: Types.boolean,
     secondary_auditors_exist: Func.compound_type([Types.boolean, Types.NULL]),
     user_provided_organization_type: {
       '$ref': '#/$defs/UserProvidedOrganizationType',
     },
   },
+  required: [
+    'auditee_contact_name',
+    'auditee_email',
+    'auditee_name',
+    'auditee_phone',
+    'auditee_contact_title',
+    'auditee_address_line_1',
+    'auditee_city',
+    'auditee_state',
+    'ein',
+    'auditee_uei',
+
+
+
+  ],
   anyOf: [
     {
       'if': {
