@@ -887,7 +887,7 @@ class SingleAuditChecklistViewTests(TestCase):
                 {"auditor_ein_not_an_ssn_attestation": True},
             ),
             (
-                {"auditor_country": "USA"},
+                {"auditor_country": "USA", "auditor_zip": "14886"},
                 {"auditor_country": "non-USA", "auditor_zip": ""},
             ),
             (
@@ -896,7 +896,6 @@ class SingleAuditChecklistViewTests(TestCase):
             ),
             ({"auditor_city": "Podunk"}, {"auditor_city": "Pomunk"}),
             ({"auditor_state": "NY"}, {"auditor_state": "WY"}),
-            ({"auditor_zip": "14886"}, {"auditor_zip": "14887"}),
             (
                 {"auditor_contact_name": "Qualified Human Accountant"},
                 {"auditor_contact_name": "Qualified Robot Accountant"},
@@ -924,6 +923,8 @@ class SingleAuditChecklistViewTests(TestCase):
 
                 path = self.path(access.sac.report_id)
                 response = self.client.put(path, nested_after, format="json")
+                if response.status_code != 200:
+                    print(f"Got a bad response. {response.content}")
                 self.assertEqual(response.status_code, 200)
 
                 updated_sac = SingleAuditChecklist.objects.get(pk=sac.id)
