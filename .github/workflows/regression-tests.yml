@@ -1,5 +1,5 @@
 ---
-name: Runs automated regression tests for the app
+name: Run Regression Tests
 on:
   workflow_dispatch:
     inputs:
