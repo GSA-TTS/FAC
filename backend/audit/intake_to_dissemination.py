@@ -87,28 +87,27 @@ class IntakeToDissemination(object):
         )
         findings_uniform_guidance_entries = findings_uniform_guidance.get(
             "FindingsUniformGuidance", {}
-        ).get("findings_uniform_guidance_entries")
+        ).get("findings_uniform_guidance_entries", [])
         findings_objects = []
-        if findings_uniform_guidance_entries:
-            for entry in findings_uniform_guidance_entries:
-                findings = entry["findings"]
-                program = entry["program"]
+        for entry in findings_uniform_guidance_entries:
+            findings = entry["findings"]
+            program = entry["program"]
 
-                finding = Finding(
-                    award_reference=program["award_reference"],
-                    finding_ref_number=findings["reference_number"],
-                    is_material_weakness=entry["material_weakness"],
-                    is_modified_opinion=entry["modified_opinion"] == "Y",
-                    is_other_findings=entry["other_findings"] == "Y",
-                    is_other_non_compliance=entry["other_matters"] == "Y",
-                    is_questioned_costs=entry["questioned_costs"] == "Y",
-                    is_repeat_finding=(findings["repeat_prior_reference"] == "Y"),
-                    is_significant_deficiency=(entry["significant_deficiency"] == "Y"),
-                    prior_finding_ref_numbers=findings.get("prior_references"),
-                    report_id=self.report_id,
-                    type_requirement=(program["compliance_requirement"]),
-                )
-                findings_objects.append(finding)
+            finding = Finding(
+                award_reference=program["award_reference"],
+                reference_number=findings["reference_number"],
+                is_material_weakness=entry["material_weakness"],
+                is_modified_opinion=entry["modified_opinion"],
+                is_other_findings=entry["other_findings"],
+                is_other_matters=entry["other_matters"],
+                is_questioned_costs=entry["questioned_costs"],
+                is_repeat_finding=findings["repeat_prior_reference"],
+                is_significant_deficiency=entry["significant_deficiency"],
+                prior_finding_ref_numbers=findings.get("prior_references", ""),
+                report_id=self.report_id,
+                type_requirement=program["compliance_requirement"],
+            )
+            findings_objects.append(finding)
         self.loaded_objects["Findings"] = findings_objects
         return findings_objects
 

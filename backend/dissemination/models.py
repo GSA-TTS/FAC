@@ -31,17 +31,16 @@ class FindingText(models.Model):
 
 class AdditionalUei(models.Model):
     """Additional UEIs for this audit."""
-    report_id = models.TextField()
+    report_id = models.TextField(REPORT_ID_FK_HELP_TEXT)
     additional_uei = models.TextField()
 
 
 class Finding(models.Model):
     """A finding from the audit. References FederalAward and FindingText"""
-
     award_reference = models.TextField(
         "Order that the award line was reported in Award",
     )
-    finding_ref_number = models.TextField(
+    reference_number = models.TextField(
         "Findings Reference Numbers",
         help_text=docs.finding_ref_nums_findings,
     )
@@ -53,40 +52,36 @@ class Finding(models.Model):
         "Modified Opinion finding", 
         help_text=docs.modified_opinion
     )
-
-
-
-    report_id = models.TextField(
-        REPORT_ID_FK_HELP_TEXT,
+    is_other_findings = models.TextField(
+        "Other findings", 
+        help_text=docs.other_findings
     )
-    is_other_findings = models.BooleanField(
-        "Other findings", null=True, help_text=docs.other_findings
+    is_other_matters = models.TextField(
+        "Other non-compliance", 
+        help_text=docs.other_non_compliance
     )
-    is_other_non_compliance = models.BooleanField(
-        "Other non-compliance", null=True, help_text=docs.other_non_compliance
+    is_questioned_costs = models.TextField(
+        "Questioned Costs", 
+        help_text=docs.questioned_costs_findings
     )
-    # each element in the list is a FK to Finding
+    is_repeat_finding = models.TextField(
+        "Indicates whether or not the audit finding was a repeat of an audit finding in the immediate prior audit",
+        help_text=docs.repeat_finding,
+    )
+    is_significant_deficiency = models.TextField(
+        "Significant Deficiency finding",
+        help_text=docs.significant_deficiency_findings,
+    )
     prior_finding_ref_numbers = models.TextField(
         "Audit finding reference numbers from the immediate prior audit",
         help_text=docs.prior_finding_ref_nums,
-        null=True,
     )
-    is_questioned_costs = models.BooleanField(
-        "Questioned Costs", null=True, help_text=docs.questioned_costs_findings
+    report_id = models.TextField(
+        REPORT_ID_FK_HELP_TEXT,
     )
-    is_repeat_finding = models.BooleanField(
-        "Indicates whether or not the audit finding was a repeat of an audit finding in the immediate prior audit",
-        null=True,
-        help_text=docs.repeat_finding,
-    )
-    is_significant_deficiency = models.BooleanField(
-        "Significant Deficiency finding",
-        null=True,
-        help_text=docs.significant_deficiency_findings,
-    )
+    # each element in the list is a FK to Finding
     type_requirement = models.TextField(
         "Type Requirement Failure",
-        null=True,
         help_text=docs.type_requirement_findings,
     )
 

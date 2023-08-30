@@ -59,7 +59,16 @@ local FindingsUniformGuidanceEntry = {
     questioned_costs: Base.Enum.YorN,
 
   },
-  required: ['program', 'findings', 'other_matters', 'material_weakness', 'significant_deficiency', 'other_findings'],
+  required: [
+    'program', 
+    'findings', 
+    'other_matters', 
+    'material_weakness', 
+    'modified_opinion',
+    'significant_deficiency', 
+    'other_findings',
+    'questioned_costs'
+    ],
   allOf: Validations.Combinations,
 };
 
