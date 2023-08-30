@@ -7,7 +7,6 @@ from dissemination.models import (
     FederalAward,
     CapText,
     Note,
-    Revision,
     Passthrough,
     General,
     SecondaryAuditor,
@@ -38,7 +37,6 @@ class IntakeToDissemination(object):
             "Passthroughs": self.load_passthrough,
             "CapTexts": self.load_captext,
             "Notes": self.load_notes,
-            "Revisions": self.load_revision,
             "AdditionalUEIs": self.load_additional_ueis,
             "AuditInfo": self.load_audit_info,
         }
@@ -218,33 +216,6 @@ class IntakeToDissemination(object):
                     sefa_objects.append(note)
         self.loaded_objects["Notes"] = sefa_objects
         return sefa_objects
-
-    def load_revision(self):
-        revision = Revision(
-            findings=None,  # TODO: Where does this come from?
-            revision_id=None,  # TODO: Where does this come from?
-            federal_awards=None,  # TODO: Where does this come from?
-            general_info_explain=None,  # TODO: Where does this come from?
-            federal_awards_explain=None,  # TODO: Where does this come from?
-            notes_to_sefa_explain=None,  # TODO: Where does this come from?
-            audit_info_explain=None,  # TODO: Where does this come from?
-            findings_explain=None,  # TODO: Where does this come from?
-            findings_text_explain=None,  # TODO: Where does this come from?
-            cap_explain=None,  # TODO: Where does this come from?
-            other_explain=None,  # TODO: Where does this come from?
-            audit_info=None,  # TODO: Where does this come from?
-            notes_to_sefa=None,  # TODO: Where does this come from?
-            findings_text=None,  # TODO: Where does this come from?
-            cap=None,  # TODO: Where does this come from?
-            other=None,  # TODO: Where does this come from?
-            general_info=None,  # TODO: Where does this come from?
-            audit_year=self.audit_year,
-            report_id=self.report_id,
-        )
-        # if self.write_to_db:
-        #     revision.save()
-        self.loaded_objects["Revisions"] = [revision]
-        return [revision]
 
     def load_passthrough(self):
         federal_awards = self.single_audit_checklist.federal_awards
