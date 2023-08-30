@@ -174,7 +174,7 @@ local open_ranges_defns = [
   ],
   [
     open_range_w24 {
-      help: Help.prior_references,
+      help: Help.yorn,
     },
     SV.NoValidation,
     'If Repeat Finding, provide Prior Year Audit Finding Reference Number(s)',
