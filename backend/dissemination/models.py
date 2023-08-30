@@ -650,8 +650,12 @@ class SecondaryAuditor(models.Model):
         "CPA City",
         help_text=docs.auditor_city,
     )
+    # The General model enforces a max_length for State abbreviations.
+    # We're validating these on intake, so it might not be necessary to 
+    # enforce a max_length here
     address_state = models.TextField(
         "CPA State",
+        max_length=2,
         help_text=docs.auditor_state,
     )
     address_street = models.TextField(
