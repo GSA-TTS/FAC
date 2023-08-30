@@ -7,8 +7,7 @@ from django.urls import reverse
 from unittest.mock import patch
 from model_bakery import baker
 
-from audit.models import Access, SingleAuditChecklist
-from backend.audit.models import SubmissionEvent
+from audit.models import Access, SingleAuditChecklist, SubmissionEvent
 
 
 def omit(remove, d) -> dict:
