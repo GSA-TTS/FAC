@@ -173,14 +173,6 @@ class FederalAward(models.Model):
     )
 
 
-
-    # type_requirement = models.TextField(
-    #     "Type Requirement Failure",
-    #     null=True,
-    #     help_text=docs.type_requirement_cfdainfo,
-    # )
-
-
 class CapText(models.Model):
     """Corrective action plan text. Referebces General"""
 
@@ -197,7 +189,7 @@ class CapText(models.Model):
         help_text=docs.text_captext,
     )
     report_id = models.TextField(
-        "GSA FAC generated identifier. FK refers to a General",
+        REPORT_ID_FK_HELP_TEXT,
     )
 
 
@@ -215,105 +207,6 @@ class Note(models.Model):
     )
     content = models.TextField("Content of the Note", help_text=docs.content)
     note_title = models.TextField("Note title", help_text=docs.title)
-
-
-class Revision(models.Model):
-    """Documents what was revised on the associated form from the previous version"""
-
-    findings = models.TextField(
-        "Indicates what items on the Findings page were edited during the revision",
-        null=True,
-        help_text=docs.findings_revisions,
-    )
-    revision_id = models.IntegerField(
-        "Internal Unique Identifier for the record",
-        null=True,
-        help_text=docs.elec_report_revision_id,
-    )
-    federal_awards = models.TextField(
-        "Indicates what items on the Federal Awards page were edited during the revision",
-        null=True,
-        help_text=docs.federal_awards,
-    )
-    general_info_explain = models.TextField(
-        "Explanation of what items on the General Info page were edited during the revision",
-        null=True,
-        help_text=docs.general_info_explain,
-    )
-    federal_awards_explain = models.TextField(
-        "Explanation of what items on the Federal Awards page were edited during the revision",
-        null=True,
-        help_text=docs.federal_awards_explain,
-    )
-    notes_to_sefa_explain = models.TextField(
-        "Explanation of what items on the Notes to Schedule of Expenditures of Federal Awards (SEFA) page were edited during the revision",
-        null=True,
-        help_text=docs.notes_to_sefa_explain,
-    )
-    audit_info_explain = models.TextField(
-        "Explanation of what items on the Audit Info page were edited during the revision",
-        null=True,
-        help_text=docs.auditinfo_explain,
-    )
-    findings_explain = models.TextField(
-        "Explanation of what items on the Findings page were edited during the revision",
-        null=True,
-        help_text=docs.findings_explain,
-    )
-    findings_text_explain = models.TextField(
-        "Explanation of what items on the Text of the Audit Findings page were edited during the revision",
-        null=True,
-        help_text=docs.findings_text_explain,
-    )
-    cap_explain = models.TextField(
-        "Explanation of what items on the CAP Text page were edited during the revision",
-        null=True,
-        help_text=docs.cap_explain,
-    )
-    other_explain = models.TextField(
-        "Explanation of what other miscellaneous items were edited during the revision",
-        null=True,
-        help_text=docs.other_explain,
-    )
-    audit_info = models.TextField(
-        "Indicates what items on the Audit Info page were edited during the revision",
-        null=True,
-        help_text=docs.audit_info,
-    )
-    notes_to_sefa = models.TextField(
-        "Indicates what items on the Notes to Schedule of Expenditures of Federal Awards (SEFA) page were edited during the revision",
-        null=True,
-        help_text=docs.notes_to_sefa,
-    )
-    findings_text = models.TextField(
-        "Indicates what items on the Text of the Audit Findings page were edited during the revision",
-        max_length=6,
-        null=True,
-        help_text=docs.findings_text,
-    )
-    cap = models.TextField(
-        "Indicates what items on the CAP Text page were edited during the revision",
-        max_length=6,
-        null=True,
-        help_text=docs.cap,
-    )
-    other = models.TextField(
-        "Indicates what other miscellaneous items were edited during the revision",
-        null=True,
-        help_text=docs.other,
-    )
-    general_info = models.TextField(
-        "Indicates what items on the General Info page were edited during the revision",
-        null=True,
-        help_text=docs.general_info,
-    )
-    audit_year = models.IntegerField(
-        "Audit year from fy_start_date",
-        help_text=docs.audit_year_revisions,
-    )
-    report_id = models.TextField(
-        "G-FAC generated identifier. FK refers to General",
-    )
 
 
 class Passthrough(models.Model):
@@ -396,14 +289,7 @@ class General(models.Model):
         null=True,
     )
     auditee_uei = models.TextField("", null=True, help_text=docs.uei_general)
-    # auditee_addl_uei_list = ArrayField(
-    #     models.TextField("", null=True, help_text=docs.uei_general),
-    #     null=True,
-    #     default=list,
-    # )
-    # No nesting of structures.
-    # Just store the bool, and load the workbook into a separate table
-    # This adds a lot of complexity to the process.
+    
     additional_ueis = models.BooleanField(default=False)
 
     hist_auditee_addl_ein_list = ArrayField(
@@ -631,18 +517,14 @@ class General(models.Model):
     is_public = models.BooleanField(
         "True for public records, False for non-public records", null=True
     )
-    # Choices are: C-FAC and G-FAC
-    data_source = models.TextField("Origin of the upload", max_length=12)
+    # Choices are: GSA, Census, or TESTDATA
+    data_source = models.TextField("Data origin; GSA, Census, or TESTDATA")
 
     class Meta:
         unique_together = (("report_id",),)
-        """
-            General
-            The root of the submission tree
-        """
 
     def __str__(self):
-        return f"Id:{self.report_id} UEI:{self.auditee_uei}, AY2x:{self.audit_year}"
+        return f"report_id:{self.report_id} UEI:{self.auditee_uei}, AY:{self.audit_year}"
 
 
 class SecondaryAuditor(models.Model):
@@ -650,12 +532,8 @@ class SecondaryAuditor(models.Model):
         "CPA City",
         help_text=docs.auditor_city,
     )
-    # The General model enforces a max_length for State abbreviations.
-    # We're validating these on intake, so it might not be necessary to 
-    # enforce a max_length here
     address_state = models.TextField(
         "CPA State",
-        max_length=2,
         help_text=docs.auditor_state,
     )
     address_street = models.TextField(
@@ -690,5 +568,5 @@ class SecondaryAuditor(models.Model):
         help_text=docs.auditor_title,
     )
     report_id = models.TextField(
-        "G-FAC generated identifier. FK to General",
+        REPORT_ID_FK_HELP_TEXT,
     )

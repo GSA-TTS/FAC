@@ -122,17 +122,6 @@ class IntakeToDissemination(object):
         federal_awards = self.single_audit_checklist.federal_awards
         federal_awards_objects = []
         report_id = self.single_audit_checklist.report_id
-        # try:
-        #     general = General.objects.get(report_id=report_id)
-        # except General.DoesNotExist:
-        #     logger.error(
-        #         f"General must be loaded before FederalAward. report_id = {report_id}"
-        #     )
-        #     return
-        # general.total_amount_expended = federal_awards["FederalAwards"].get(
-        #     "total_amount_expended"
-        # )
-        # general.save() #FIXME: Lest's revisit this
 
         for entry in federal_awards["FederalAwards"]["federal_awards"]:
             program = entry["program"]
@@ -248,6 +237,51 @@ class IntakeToDissemination(object):
                 return_dict[status] = None
         return return_dict
 
+    def _load_audit_info(self, general):
+        # Because this operates on the general object, it is called from load_general.
+        audit_information = self.single_audit_checklist.audit_information
+
+        if audit_information:
+            general.gaap_results = audit_information["gaap_results"]
+            """
+                TODO:
+                Missing in schema
+                general.sp_framework = audit_information[]
+                general.is_sp_framework_required = audit_information[]
+                general.sp_framework_auditor_opinion = audit_information[]
+            """
+            general.is_going_concern = (
+                audit_information["is_going_concern_included"] == "Y"
+            )
+            general.is_significant_deficiency = (
+                audit_information["is_internal_control_deficiency_disclosed"] == "Y"
+            )
+            general.is_material_weakness = (
+                audit_information["is_internal_control_material_weakness_disclosed"]
+                == "Y"
+            )
+            general.is_material_noncompliance = (
+                audit_information["is_material_noncompliance_disclosed"] == "Y"
+            )
+            general.is_duplicate_reports = (
+                audit_information["is_aicpa_audit_guide_included"] == "Y"
+            )
+            general.dollar_threshold = audit_information["dollar_threshold"]
+            general.is_low_risk = audit_information["is_low_risk_auditee"] == "Y"
+            general.agencies_with_prior_findings = audit_information["agencies"]
+
+    # try:
+    #     general = General.objects.get(report_id=report_id)
+    # except General.DoesNotExist:
+    #     logger.error(
+    #         f"General must be loaded before FederalAward. report_id = {report_id}"
+    #     )
+    #     return
+    # general.total_amount_expended = federal_awards["FederalAwards"].get(
+    #     "total_amount_expended"
+    # )
+    # general.save() #FIXME: Lest's revisit this
+
     def load_general(self):
         general_information = self.single_audit_checklist.general_information
         dates_by_status = self._get_dates_from_sac()
@@ -331,59 +365,25 @@ class IntakeToDissemination(object):
         secondary_auditors = self.single_audit_checklist.secondary_auditors
         secondary_auditors_entries = secondary_auditors.get(
             "SecondaryAuditors", {}
-        ).get("secondary_auditors_entries")
+        ).get("secondary_auditors_entries", [])
         sec_objs = []
-        if secondary_auditors_entries:
-            for secondary_auditor in secondary_auditors_entries:
-                sec_auditor = SecondaryAuditor(
-                    address_city=secondary_auditor["secondary_auditor_address_city"],
-                    address_state=secondary_auditor["secondary_auditor_address_state"],
-                    address_street=secondary_auditor["secondary_auditor_address_street"],
-                    address_zipcode=secondary_auditor["secondary_auditor_address_zipcode"],
-                    auditor_ein=secondary_auditor["secondary_auditor_ein"],
-                    auditor_name=secondary_auditor["secondary_auditor_name"],
-                    contact_email=secondary_auditor["secondary_auditor_contact_email"],
-                    contact_name=secondary_auditor["secondary_auditor_contact_name"],
-                    contact_phone=secondary_auditor["secondary_auditor_contact_phone"],
-                    contact_title=secondary_auditor["secondary_auditor_contact_title"],
-                    report_id=self.single_audit_checklist.report_id,
-                )
-                sec_objs.append(sec_auditor)
+        for secondary_auditor in secondary_auditors_entries:
+            sec_auditor = SecondaryAuditor(
+                address_city=secondary_auditor["secondary_auditor_address_city"],
+                address_state=secondary_auditor["secondary_auditor_address_state"],
+                address_street=secondary_auditor["secondary_auditor_address_street"],
+                address_zipcode=secondary_auditor["secondary_auditor_address_zipcode"],
+                auditor_ein=secondary_auditor["secondary_auditor_ein"],
+                auditor_name=secondary_auditor["secondary_auditor_name"],
+                contact_email=secondary_auditor["secondary_auditor_contact_email"],
+                contact_name=secondary_auditor["secondary_auditor_contact_name"],
+                contact_phone=secondary_auditor["secondary_auditor_contact_phone"],
+                contact_title=secondary_auditor["secondary_auditor_contact_title"],
+                report_id=self.single_audit_checklist.report_id,
+            )
+            sec_objs.append(sec_auditor)
         self.loaded_objects["SecondaryAuditors"] = sec_objs
         return sec_objs
-
-    def _load_audit_info(self, general):
-        # Because this operates on the general object, it is called from load_general.
-        audit_information = self.single_audit_checklist.audit_information
-
-        if audit_information:
-            general.gaap_results = audit_information["gaap_results"]
-            """
-                TODO:
-                Missing in schema
-                general.sp_framework = audit_information[]
-                general.is_sp_framework_required = audit_information[]
-                general.sp_framework_auditor_opinion = audit_information[]
-            """
-            general.is_going_concern = (
-                audit_information["is_going_concern_included"] == "Y"
-            )
-            general.is_significant_deficiency = (
-                audit_information["is_internal_control_deficiency_disclosed"] == "Y"
-            )
-            general.is_material_weakness = (
-                audit_information["is_internal_control_material_weakness_disclosed"]
-                == "Y"
-            )
-            general.is_material_noncompliance = (
-                audit_information["is_material_noncompliance_disclosed"] == "Y"
-            )
-            general.is_duplicate_reports = (
-                audit_information["is_aicpa_audit_guide_included"] == "Y"
-            )
-            general.dollar_threshold = audit_information["dollar_threshold"]
-            general.is_low_risk = audit_information["is_low_risk_auditee"] == "Y"
-            general.agencies_with_prior_findings = audit_information["agencies"]
 
     def load_additional_ueis(self):
         addls = self.single_audit_checklist.additional_ueis
