@@ -14,9 +14,6 @@ local Types = Base.Types;
   additionalProperties: false,
   metamodel_version: '1.7.0',
   properties: {
-    audit_type: Base.Enum.AuditType,
-    audit_period_covered: Base.Enum.AuditPeriod,
-    audit_period_other_months: Types.string,
     auditee_address_line_1: Types.string {
       maxLength: 100,
     },
@@ -32,12 +29,6 @@ local Types = Base.Types;
     auditee_email: Types.string {
       format: 'email',
     },
-    auditee_fiscal_period_end: Types.string {
-      format: 'date',
-    },
-    auditee_fiscal_period_start: Types.string {
-      format: 'date',
-    },
     auditee_name: Types.string {
       maxLength: 100
     },
@@ -46,45 +37,58 @@ local Types = Base.Types;
       title: 'State',
     },
     auditee_uei: Base.Compound.UniqueEntityIdentifier,
-    auditee_zip:  Base.Compound.Zip, //FIXME is this required
-    auditor_address_line_1: Types.string {
-      maxLength: 100,
+    auditee_zip:  Base.Compound.Zip,
+    ein: Base.Compound.EmployerIdentificationNumber,
+
+
+    auditor_phone: Base.Compound.UnitedStatesPhone,
+    auditor_state: Base.Enum.UnitedStatesStateAbbr {
+      title: 'State',
     },
     auditor_city: Types.string {
-      maxLength: 100,
-    },
-    auditor_contact_name: Types.string {
       maxLength: 100,
     },
     auditor_contact_title: Types.string {
       maxLength: 100,
     },
+    auditor_address_line_1: Types.string {
+      maxLength: 100,
+    },
+    auditor_zip: Base.Compound.Zip,
     auditor_country: Types.string {
       maxLength: 100,
     },
-    auditor_ein: Base.Compound.EmployerIdentificationNumber,
-    auditor_ein_not_an_ssn_attestation: Func.compound_type([Types.boolean, Types.NULL]),
+    auditor_contact_name: Types.string {
+      maxLength: 100,
+    },
     auditor_email: Types.string {
       format: 'email',
     },
     auditor_firm_name: Types.string,
-    auditor_phone: Base.Compound.UnitedStatesPhone,
-    auditor_state: Base.Enum.UnitedStatesStateAbbr {
-      title: 'State',
+    auditor_foreign_address: Types.string,
+    auditor_ein: Base.Compound.EmployerIdentificationNumber,
+
+    auditee_fiscal_period_start: Types.string {
+      format: 'date'
     },
-    auditor_zip: {
-      '$ref': '#/$defs/Zip',
+    auditee_fiscal_period_end: Types.string {
+      format: 'date'
     },
-    ein: Base.Compound.EmployerIdentificationNumber,
-    ein_not_an_ssn_attestation: Func.compound_type([Types.boolean, Types.NULL]),
+    audit_type: Base.Enum.AuditType,
+    user_provided_organization_type: Base.Enum.OrganizationType,  
+    audit_period_other_months: Types.string,
+    audit_period_covered: Base.Enum.AuditPeriod,
+    
+    auditor_ein_not_an_ssn_attestation: Types.boolean,
+    ein_not_an_ssn_attestation: Types.boolean,
+    
     is_usa_based: Types.boolean,
     met_spending_threshold: Types.boolean,
+    
     multiple_eins_covered: Types.boolean,
     multiple_ueis_covered: Types.boolean,
-    secondary_auditors_exist: Func.compound_type([Types.boolean, Types.NULL]),
-    user_provided_organization_type: {
-      '$ref': '#/$defs/UserProvidedOrganizationType',
-    },
+    secondary_auditors_exist: Types.boolean,
+
   },
   required: [
     'auditee_contact_name',
@@ -97,9 +101,39 @@ local Types = Base.Types;
     'auditee_state',
     'ein',
     'auditee_uei',
+    'auditee_zip',
 
+    'auditor_phone',
+    'auditor_state',
+    'auditor_city',
+    'auditor_contact_title',
+    'auditor_address_line_1',
+    'auditor_zip',
+    'auditor_country',
+    'auditor_contact_name',
+    'auditor_email',
+    'auditor_firm_name',
+    // foreign address optional
+    'auditor_ein',
 
+    'auditee_fiscal_period_start',
+    'auditee_fiscal_period_end',
 
+    'audit_type',
+    'user_provided_organization_type',
+
+    // audit_period_other_months is optional
+    'audit_period_covered',
+
+    'multiple_eins_covered',
+    'multiple_ueis_covered',
+    'secondary_auditors_exist',
+    'met_spending_threshold',
+    'is_usa_based',
+    'ein_not_an_ssn_attestation',
+    'auditor_ein_not_an_ssn_attestation'
+
+    
   ],
   anyOf: [
     {
@@ -139,7 +173,6 @@ local Types = Base.Types;
       },
     },
   ],
-  required: [],
   title: 'GeneralInformation',
   type: 'object',
   version: null,
