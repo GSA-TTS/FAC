@@ -51,7 +51,7 @@ jobs:
           with: |
             working-directory: ./backend
             spec: cypress/e2e/full-submission.cy.js
-          attempt_limit: 10
+          attempt_limit: 5
           attempt_delay: 2000
 
       - uses: actions/upload-artifact@v3
