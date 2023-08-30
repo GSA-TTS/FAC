@@ -184,22 +184,20 @@ class FederalAward(models.Model):
 class CapText(models.Model):
     """Corrective action plan text. Referebces General"""
 
-    report_id = models.TextField(
-        "GSA FAC generated identifier. FK refers to a General",
+    contains_chart_or_table = models.TextField(
+        "Indicates whether or not the text contained charts or tables that could not be entered due to formatting restrictions",
+        help_text=docs.charts_tables_captext,
     )
     finding_ref_number = models.TextField(
         "Audit Finding Reference Number",
         help_text=docs.finding_ref_nums_captext,
     )
-    contains_chart_or_table = models.BooleanField(
-        "Indicates whether or not the text contained charts or tables that could not be entered due to formatting restrictions",
-        null=True,
-        help_text=docs.charts_tables_captext,
-    )
     planned_action = models.TextField(
         "Content of the Corrective Action Plan (CAP)",
-        null=True,
         help_text=docs.text_captext,
+    )
+    report_id = models.TextField(
+        "GSA FAC generated identifier. FK refers to a General",
     )
 
 

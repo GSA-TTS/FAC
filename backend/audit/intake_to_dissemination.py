@@ -174,10 +174,10 @@ class IntakeToDissemination(object):
         cap_text_objects = []
         for entry in corrective_action_plan_entries:
             cap_text = CapText(
-                report_id=self.report_id,
+                contains_chart_or_table=entry["contains_chart_or_table"],
                 finding_ref_number=entry["reference_number"],
-                contains_chart_or_table=entry["contains_chart_or_table"] == "Y",
                 planned_action=entry["planned_action"],
+                report_id=self.report_id,
             )
             cap_text_objects.append(cap_text)
         self.loaded_objects["CapTexts"] = cap_text_objects
