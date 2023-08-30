@@ -15,6 +15,7 @@ from audit.cog_over import cog_over
 BASELINE_EIN = "742094204"
 BASELINE_DUP_EIN = "987876765"
 
+
 class CogOverTests(TestCase):
     def __init__(self, method_name: str = "runTest") -> None:
         super().__init__(method_name)
@@ -25,32 +26,32 @@ class CogOverTests(TestCase):
             schema_editor.create_model(CensusGen19)
             schema_editor.create_model(CensusCfda19)
 
-
-        gen = baker.make(CensusGen19,
-                         index=1, 
-                         ein=BASELINE_EIN,
-                         dbkey = '102318',
-                         totfedexpend = '210000000',
-                         )
+        gen = baker.make(
+            CensusGen19,
+            index=1,
+            ein=BASELINE_EIN,
+            dbkey="102318",
+            totfedexpend="210000000",
+        )
         gen.save()
         for i in range(6):
-            cfda = baker.make(CensusCfda19,
-                        index=i, 
-                        dbkey = gen.dbkey,
-                        cfda = '84.032',
-                        amount = 10_000_000 * i,
-                        direct = 'Y'
-                        )
+            cfda = baker.make(
+                CensusCfda19,
+                index=i,
+                dbkey=gen.dbkey,
+                cfda="84.032",
+                amount=10_000_000 * i,
+                direct="Y",
+            )
             cfda.save()
-        for i in range(2,5):
-            gen = baker.make(CensusGen19,
-                         index=i, 
-                         ein=BASELINE_DUP_EIN,
-                         totfedexpend = '10000000',
-                        )
+        for i in range(2, 5):
+            gen = baker.make(
+                CensusGen19,
+                index=i,
+                ein=BASELINE_DUP_EIN,
+                totfedexpend="10000000",
+            )
             gen.save()
-
-
 
     @staticmethod
     def _fake_general():
@@ -205,82 +206,81 @@ class CogOverTests(TestCase):
                 "total_amount_expended": 49_000_000,
             }
         }
+
     def test_cog_assignment_from_baseline(self):
-        sac = baker.make(SingleAuditChecklist,
-                        submitted_by=self.user,
-                        general_information=self._fake_general(),
-                        federal_awards=self._fake_federal_awards(),
-                         )
-        sac.general_information['ein'] = BASELINE_EIN
+        sac = baker.make(
+            SingleAuditChecklist,
+            submitted_by=self.user,
+            general_information=self._fake_general(),
+            federal_awards=self._fake_federal_awards(),
+        )
+        sac.general_information["ein"] = BASELINE_EIN
         cog_agency, over_agency = cog_over(sac)
         self.assertEqual(cog_agency, "84")
         self.assertEqual(over_agency, None)
 
     def test_cog_assignment_with_no_baseline(self):
-        sac = baker.make(SingleAuditChecklist,
-                        submitted_by=self.user,
-                        general_information=self._fake_general(),
-                        federal_awards=self._fake_federal_awards(),
-                         )
+        sac = baker.make(
+            SingleAuditChecklist,
+            submitted_by=self.user,
+            general_information=self._fake_general(),
+            federal_awards=self._fake_federal_awards(),
+        )
         cog_agency, over_agency = cog_over(sac)
         self.assertEqual(cog_agency, "10")
         self.assertEqual(over_agency, None)
 
     def test_cog_assignment_with_multiple_baseline(self):
-        sac = baker.make(SingleAuditChecklist,
-                        submitted_by=self.user,
-                        general_information=self._fake_general(),
-                        federal_awards=self._fake_federal_awards(),
-                         )
-        sac.general_information['ein'] = BASELINE_DUP_EIN
+        sac = baker.make(
+            SingleAuditChecklist,
+            submitted_by=self.user,
+            general_information=self._fake_general(),
+            federal_awards=self._fake_federal_awards(),
+        )
+        sac.general_information["ein"] = BASELINE_DUP_EIN
         cog_agency, over_agency = cog_over(sac)
         self.assertEqual(cog_agency, "10")
         self.assertEqual(over_agency, None)
 
     def test_over_assignment(self):
-        sac = baker.make(SingleAuditChecklist,
-                        submitted_by=self.user,
-                        general_information=self._fake_general(),
-                        federal_awards=self._fake_federal_awards_lt_cog_limit(),
-                        )
+        sac = baker.make(
+            SingleAuditChecklist,
+            submitted_by=self.user,
+            general_information=self._fake_general(),
+            federal_awards=self._fake_federal_awards_lt_cog_limit(),
+        )
         cog_agency, over_agency = cog_over(sac)
-        self.assertEqual(cog_agency,None)
+        self.assertEqual(cog_agency, None)
         self.assertEqual(over_agency, "15")
 
     def test_over_assignment_with_baseline(self):
-        sac = baker.make(SingleAuditChecklist,
-                        submitted_by=self.user,
-                        general_information=self._fake_general(),
-                        federal_awards=self._fake_federal_awards_lt_cog_limit(),
-                        )
-        sac.general_information['ein'] = BASELINE_EIN   
-        cog_agency, over_agency = cog_over(sac)
-        self.assertEqual(cog_agency,None)
-        self.assertEqual(over_agency, "15")
-"""
-TODO
-
-    def test_cog_over_for_gt_cog_limit_gt_da_threshold_factor_cog_2019(self):
-        sac = SingleAuditChecklist.objects.create(
+        sac = baker.make(
+            SingleAuditChecklist,
             submitted_by=self.user,
             general_information=self._fake_general(),
-            federal_awards=self._fake_federal_awards(),
+            federal_awards=self._fake_federal_awards_lt_cog_limit(),
         )
-        # sac.save()
-        # self.sac = sac
-
-        # fake_cog_baseline = self._fake_cognizantbaseline()
-        # self.cognizantbaseline = CognizantBaseline(
-        #     dbkey=fake_cog_baseline["dbkey"],
-        #     audit_year=fake_cog_baseline["audit_year"],
-        #     ein=self.sac.general_information["ein"],
-        #     cognizant_agency=fake_cog_baseline["cognizant_agency"],
-        # ).save()
-        # cog_agency = None
-        # over_agency = None
+        sac.general_information["ein"] = BASELINE_EIN
         cog_agency, over_agency = cog_over(sac)
-        self.assertEqual(cog_agency, "20")
-        self.assertEqual(over_agency, None)
+        self.assertEqual(cog_agency, None)
+        self.assertEqual(over_agency, "15")
+
+
+    # TODO SK to check the following
+    # First one seems to be a duplicate, but the commented code is comparing with the wrong value
+    # CognizantBaseline is no longer used. Instead,
+    #   CensusGen19, CensusCfda19 need to be populated if needed.
+    #   See setup code for how to do this.
+    
+    # def test_cog_over_for_gt_cog_limit_gt_da_threshold_factor_cog_2019(self):
+    #     sac = SingleAuditChecklist.objects.create(
+    #         submitted_by=self.user,
+    #         general_information=self._fake_general(),
+    #         federal_awards=self._fake_federal_awards(),
+    #     )
+    #     cog_agency, over_agency = cog_over(sac)
+    #     self.assertEqual(cog_agency, "20")
+    #     self.assertEqual(over_agency, None)
 
     def test_cog_over_for_lt_cog_lit_gt_da_threshold_factor_oversight(self):
         sac = SingleAuditChecklist.objects.create(
@@ -288,19 +288,16 @@ TODO
             general_information=self._fake_general(),
             federal_awards=self._fake_federal_awards_lt_cog_limit(),
         )
-        sac.save()
-        self.sac = sac
 
         fake_cog_baseline = self._fake_cognizantbaseline()
-        self.cognizantbaseline = CognizantBaseline(
+        CognizantBaseline(
             dbkey=fake_cog_baseline["dbkey"],
             audit_year=fake_cog_baseline["audit_year"],
-            ein=self.sac.general_information["ein"],
+            ein=sac.general_information["ein"],
             cognizant_agency=fake_cog_baseline["cognizant_agency"],
         ).save()
-        cog_agency = None
-        over_agency = None
-        cog_agency, over_agency = cog_over(self.sac)
+
+        cog_agency, over_agency = cog_over(sac)
         self.assertEqual(cog_agency, None)
         self.assertEqual(over_agency, "15")
 
@@ -310,19 +307,16 @@ TODO
             general_information=self._fake_general(),
             federal_awards=self._fake_federal_awards_lt_da_threshold(),
         )
-        sac.save()
-        self.sac = sac
 
         fake_cog_baseline = self._fake_cognizantbaseline()
-        self.cognizantbaseline = CognizantBaseline(
+        CognizantBaseline(
             dbkey=fake_cog_baseline["dbkey"],
             audit_year=fake_cog_baseline["audit_year"],
-            ein=self.sac.general_information["ein"],
+            ein=sac.general_information["ein"],
             cognizant_agency=fake_cog_baseline["cognizant_agency"],
         ).save()
-        cog_agency = None
-        over_agency = None
-        cog_agency, over_agency = cog_over(self.sac)
+
+        cog_agency, over_agency = cog_over(sac)
         self.assertEqual(cog_agency, None)
         self.assertEqual(over_agency, "25")
 
@@ -332,19 +326,15 @@ TODO
             general_information=self._fake_general(),
             federal_awards=self._fake_federal_awards(),
         )
-        sac.save()
-        self.sac = sac
 
         fake_cog_baseline = self._fake_cognizantbaseline()
-        self.cognizantbaseline = CognizantBaseline(
+        CognizantBaseline(
             dbkey=fake_cog_baseline["dbkey"],
             audit_year=fake_cog_baseline["audit_year"],
             ein=fake_cog_baseline["ein"],
             cognizant_agency=fake_cog_baseline["cognizant_agency"],
         ).save()
-        cog_agency = None
-        over_agency = None
-        cog_agency, over_agency = cog_over(self.sac)
+
+        cog_agency, over_agency = cog_over(sac)
         self.assertEqual(cog_agency, "10")
         self.assertEqual(over_agency, None)
-"""
