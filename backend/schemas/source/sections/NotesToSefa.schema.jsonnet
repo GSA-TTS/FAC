@@ -42,7 +42,7 @@ local NotesToSefa = Types.object {
       items: NotesToSefaEntry,
     },
   },
-  required: ['auditee_uei', 'accounting_policies', 'is_minimis_rate_used'],
+  required: ['auditee_uei', 'accounting_policies', 'is_minimis_rate_used', 'rate_explained'],
   title: 'NotesToSefa',
   version: 20230713,
 };

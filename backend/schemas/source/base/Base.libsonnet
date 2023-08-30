@@ -8,6 +8,7 @@ local Const = {
   Y: 'Y',
   N: 'N',
   Y_N: 'Y&N',
+  BOTH: "Both",
   NA: 'N/A',
   SCHEMA_VERSION: 'https://json-schema.org/draft/2019-09/schema#',
   empty_string: '',
@@ -121,7 +122,7 @@ local Enum = {
     enum: [
       Const.Y,
       Const.N,
-      Const.Y_N,
+      Const.BOTH,
     ],
   },
   NA: Types.string {

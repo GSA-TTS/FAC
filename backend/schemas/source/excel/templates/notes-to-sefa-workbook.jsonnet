@@ -74,7 +74,7 @@ local single_cells = [
     title_cell: 'A6',
     range_cell: 'B6',
     validation: SV.YoNoBValidation,
-    help: Help.yorn,
+    help: Help.yornorboth,
   },
   Sheets.single_cell {
     title: 'Please explain',

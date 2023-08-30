@@ -170,32 +170,29 @@ class IntakeToDissemination(object):
         corrective_action_plan = self.single_audit_checklist.corrective_action_plan
         corrective_action_plan_entries = corrective_action_plan.get(
             "CorrectiveActionPlan", {}
-        ).get("corrective_action_plan_entries")
+        ).get("corrective_action_plan_entries", [])
         cap_text_objects = []
-        if corrective_action_plan_entries:
-            for entry in corrective_action_plan_entries:
-                cap_text = CapText(
-                    report_id=self.report_id,
-                    finding_ref_number=entry["reference_number"],
-                    contains_chart_or_table=entry["contains_chart_or_table"] == "Y",
-                    planned_action=entry["planned_action"],
-                )
-                cap_text_objects.append(cap_text)
+        for entry in corrective_action_plan_entries:
+            cap_text = CapText(
+                report_id=self.report_id,
+                finding_ref_number=entry["reference_number"],
+                contains_chart_or_table=entry["contains_chart_or_table"] == "Y",
+                planned_action=entry["planned_action"],
+            )
+            cap_text_objects.append(cap_text)
         self.loaded_objects["CapTexts"] = cap_text_objects
         return cap_text_objects
 
     def load_notes(self):
         sefa = self.single_audit_checklist.notes_to_sefa
-        notes_to_sefa = sefa.get("NotesToSefa", {})
+        n2sefa = sefa.get("NotesToSefa", {})
         sefa_objects = []
-        if notes_to_sefa:
-            accounting_policies = notes_to_sefa["accounting_policies"]
-            is_minimis_rate_used = (
-                notes_to_sefa["is_minimis_rate_used"] == "Y"
-            )  # FIXME This is not always a boolean
-            rate_explained = notes_to_sefa["rate_explained"]
-            entries = notes_to_sefa["notes_to_sefa_entries"]
-            if not entries:
+        if n2sefa:
+            accounting_policies = n2sefa["accounting_policies"]
+            is_minimis_rate_used = n2sefa["is_minimis_rate_used"]
+            rate_explained = n2sefa["rate_explained"]
+            entries = n2sefa.get("notes_to_sefa_entries", [])
+            if len(entries) == 0:
                 note = Note(
                     report_id=self.report_id,
                     accounting_policies=accounting_policies,
@@ -207,11 +204,11 @@ class IntakeToDissemination(object):
                 for entry in entries:
                     note = Note(
                         report_id=self.report_id,
-                        content=entry["note_content"],
-                        note_title=entry["note_title"],
                         accounting_policies=accounting_policies,
                         is_minimis_rate_used=is_minimis_rate_used,
                         rate_explained=rate_explained,
+                        content=entry["note_content"],
+                        note_title=entry["note_title"],
                     )
                     sefa_objects.append(note)
         self.loaded_objects["Notes"] = sefa_objects
@@ -406,46 +403,50 @@ class IntakeToDissemination(object):
                 )
                 auei.save()  # FIXME: We could use a bulk insert here. Also, we could do all save in a batch.
 
-    def load_audit_info(self):
-        report_id = self.single_audit_checklist.report_id
-        try:
-            general = General.objects.get(report_id=report_id)
-        except General.DoesNotExist:
-            logger.error(
-                f"General must be loaded before AuditInfo. report_id = {report_id}"
-            )
-            return
-        audit_information = self.single_audit_checklist.audit_information
-        if not audit_information:
-            logger.warning("No audit info found to load")
-            return
-        general.gaap_results = audit_information["gaap_results"]
-        general.sp_framework = (
-            audit_information["sp_framework_basis"]
-            if "sp_framework_basis" in audit_information
-            else None,
-        )
-        general.is_sp_framework_required = (
-            audit_information["is_sp_framework_required"] == "Y"
-        )
-        general.sp_framework_auditor_opinion = audit_information[
-            "sp_framework_opinions"
-        ]
-        general.is_going_concern = audit_information["is_going_concern_included"] == "Y"
-        general.is_significant_deficiency = (
-            audit_information["is_internal_control_deficiency_disclosed"] == "Y"
-        )
-        general.is_material_weakness = (
-            audit_information["is_internal_control_material_weakness_disclosed"] == "Y"
-        )
-        general.is_material_noncompliance = (
-            audit_information["is_material_noncompliance_disclosed"] == "Y"
-        )
-        general.is_duplicate_reports = (
-            audit_information["is_aicpa_audit_guide_included"] == "Y"
-        )
-        general.dollar_threshold = audit_information["dollar_threshold"]
-        general.is_low_risk = audit_information["is_low_risk_auditee"] == "Y"
-        general.agencies_with_prior_findings = audit_information["agencies"]
+    # MCJ
+    # This all is in _load_audit_info, which is called from load_general.
+    # If anything is missing from _load_audit_info, it should be fixed there.
 
-        general.save()  # FIXME: Let's revisit this
+    # def load_audit_info(self):
+    #     report_id = self.single_audit_checklist.report_id
+    #     try:
+    #         general = General.objects.get(report_id=report_id)
+    #     except General.DoesNotExist:
+    #         logger.error(
+    #             f"General must be loaded before AuditInfo. report_id = {report_id}"
+    #         )
+    #         return
+    #     audit_information = self.single_audit_checklist.audit_information
+    #     if not audit_information:
+    #         logger.warning("No audit info found to load")
+    #         return
+    #     general.gaap_results = audit_information["gaap_results"]
+    #     general.sp_framework = (
+    #         audit_information["sp_framework_basis"]
+    #         if "sp_framework_basis" in audit_information
+    #         else None,
+    #     )
+    #     general.is_sp_framework_required = (
+    #         audit_information["is_sp_framework_required"] == "Y"
+    #     )
+    #     general.sp_framework_auditor_opinion = audit_information[
+    #         "sp_framework_opinions"
+    #     ]
+    #     general.is_going_concern = audit_information["is_going_concern_included"] == "Y"
+    #     general.is_significant_deficiency = (
+    #         audit_information["is_internal_control_deficiency_disclosed"] == "Y"
+    #     )
+    #     general.is_material_weakness = (
+    #         audit_information["is_internal_control_material_weakness_disclosed"] == "Y"
+    #     )
+    #     general.is_material_noncompliance = (
+    #         audit_information["is_material_noncompliance_disclosed"] == "Y"
+    #     )
+    #     general.is_duplicate_reports = (
+    #         audit_information["is_aicpa_audit_guide_included"] == "Y"
+    #     )
+    #     general.dollar_threshold = audit_information["dollar_threshold"]
+    #     general.is_low_risk = audit_information["is_low_risk_auditee"] == "Y"
+    #     general.agencies_with_prior_findings = audit_information["agencies"]
+
+    #     general.save()  # FIXME: Let's revisit this

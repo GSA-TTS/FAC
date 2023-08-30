@@ -20,9 +20,9 @@ local YoNValidation = {
 local YoNoBValidation = {
   type: 'list',
   allow_blank: 'False',
-  formula1: '"Y,N,Y&N"',
-  custom_error: "Must be 'Y' or 'N' or 'Y&N'",
-  custom_title: 'Y/N/Y&N',
+  formula1: '"Y,N,Both"',
+  custom_error: "Must be 'Y' or 'N' or 'Both'",
+  custom_title: 'Y/N/Both',
 };
 // FIRSTCELLREF is magic, and gets replaced with the top
 // of the relevant named range. It uses a relative row reference,
@@ -94,14 +94,19 @@ local AwardReferenceValidation = {
   YoNValidation: YoNValidation,
   ReferenceNumberValidation: ReferenceNumberValidation,
   LoanBalanceValidation: LoanBalanceValidation,
-  AuditReportTypeValidation(namedRange): {
+  // WARNING MCJ
+  // These were expressed with a single `:`. I was getting errors.
+  // I replaced the single with a `::`. There is a semantic difference.
+  // (It means it is a hidden field.) I don't think we want functions
+  // manifested in the JSON. They... shouldn't be, but it was popping up. 
+  AuditReportTypeValidation(namedRange) :: {
     type: 'list',
     allow_blank: 'True', 
     formula1: '=IF(S{0}="Y",' + namedRange + ',"")', 
     custom_error: 'The Audit Report Type must be empty if Major Program is "N"',
     custom_title: 'Invalid Audit Report Type',
   },
-  FederalProgramNameValidation(sheetName): {
+  FederalProgramNameValidation(sheetName) :: {
     type: 'list',
     formula1: '=Y{0}:Y{0}',
     errorStyle: 'warning',

@@ -5,11 +5,12 @@ from . import docs
 
 BIGINT_MAX_DIGITS = 25
 
+REPORT_ID_FK_HELP_TEXT = "; foreign key everywhere else"
 class FindingText(models.Model):
     """Specific findings details. References General"""
 
     report_id = models.TextField(
-        "G-FAC generated identifier.l",
+        REPORT_ID_FK_HELP_TEXT,
     )
     finding_ref_number = models.TextField(
         "Finding Reference Number - FK",
@@ -30,7 +31,6 @@ class FindingText(models.Model):
 
 class AdditionalUei(models.Model):
     """Additional UEIs for this audit."""
-
     report_id = models.TextField()
     additional_uei = models.TextField()
 
@@ -57,7 +57,7 @@ class Finding(models.Model):
 
 
     report_id = models.TextField(
-        "G-FAC generated identifier. FK along with other fields - refers to Award",
+        REPORT_ID_FK_HELP_TEXT,
     )
     is_other_findings = models.BooleanField(
         "Other findings", null=True, help_text=docs.other_findings
@@ -165,7 +165,7 @@ class FederalAward(models.Model):
         null=True
     )
     report_id = models.TextField(
-        "G-FAC generated identifier. FK  to a General",
+        REPORT_ID_FK_HELP_TEXT,
     )
     state_cluster_name = models.TextField(
         "The name of the state cluster",
@@ -205,15 +205,18 @@ class CapText(models.Model):
 
 class Note(models.Model):
     """Note to Schedule of Expenditures of Federal Awards (SEFA)"""
-
-    report_id = models.TextField(
-        "G-FAC generated identifier. FK refers to a General",
+    accounting_policies = models.TextField(
+        "A description of the significant accounting policies used in preparing the SEFA (2 CFR 200.510(b)(6))",
     )
-    content = models.TextField("Content of the Note", null=True, help_text=docs.content)
-    note_title = models.TextField("Note Title", null=True, help_text=docs.title)
-    accounting_policies = models.TextField(null=True)
-    is_minimis_rate_used = models.BooleanField("", null=True)
-    rate_explained = models.TextField(null=True)
+    is_minimis_rate_used = models.TextField(
+        "'Yes', 'No', or 'Both' (2 CFR 200.414(f))"
+    )
+    rate_explained = models.TextField("Explanation for minimis rate")
+    report_id = models.TextField(
+        REPORT_ID_FK_HELP_TEXT,
+    )
+    content = models.TextField("Content of the Note", help_text=docs.content)
+    note_title = models.TextField("Note title", help_text=docs.title)
 
 
 class Revision(models.Model):
@@ -317,27 +320,18 @@ class Revision(models.Model):
 
 class Passthrough(models.Model):
     """The pass-through entity information, when it is not a direct federal award"""
-
-    """
-    We may not need this table. We can simply add three columns
-    pertating to passthrough in FederalAward table
-    """
     award_reference = models.TextField(
         "Order that the award line was reported",
-        null=True,
     )
     report_id = models.TextField(
         "G-FAC generated identifier. FK refers to General",
     )
-    # This doesn't seem like it should be null but it is sometimes
     passthrough_id = models.TextField(
         "Identifying Number Assigned by the Pass-through Entity",
-        null=True,
         help_text=docs.passthrough_id,
     )
     passthrough_name = models.TextField(
         "Name of Pass-through Entity",
-        null=True,
         help_text=docs.passthrough_name,
     )
 
