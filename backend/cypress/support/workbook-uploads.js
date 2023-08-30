@@ -88,3 +88,11 @@ export function testWorkbookSecondaryAuditors(will_intercept = true) {
   )
 }
 
+/*export function testWorkbookAdditionalEINs(will_intercept = true) {
+  testWorkbookUpload(
+    '/audit/excel/additional-eins/',
+    '#file-input-additional-eins-xlsx',
+    'test_workbooks/additional-eins-workbook.xlsx',
+    will_intercept
+  )
+}*/

@@ -82,7 +82,11 @@ describe('Full audit submission', () => {
 
     cy.get(".usa-link").contains("Secondary Auditors").click();
     testWorkbookSecondaryAuditors(false);
-
+    
+    //uncomment this once there is a valid Additional EINs workbook & import testWorkbookAdditionalEINs
+    /*cy.get(".usa-link").contains("Additional EINs").click();
+    testWorkbookAdditionalEINs(false);*/
+    
     // Complete the audit information form
     cy.get(".usa-link").contains("Audit Information form").click();
     testAuditInformationForm();
