@@ -336,21 +336,17 @@ class IntakeToDissemination(object):
         if secondary_auditors_entries:
             for secondary_auditor in secondary_auditors_entries:
                 sec_auditor = SecondaryAuditor(
-                    report_id=self.single_audit_checklist.report_id,
-                    auditor_ein=secondary_auditor["secondary_auditor_ein"],
-                    auditor_name=secondary_auditor["secondary_auditor_name"],
-                    contact_name=secondary_auditor["secondary_auditor_contact_name"],
-                    contact_title=secondary_auditor["secondary_auditor_contact_title"],
-                    contact_email=secondary_auditor["secondary_auditor_contact_email"],
-                    contact_phone=secondary_auditor["secondary_auditor_contact_phone"],
-                    address_street=secondary_auditor[
-                        "secondary_auditor_address_street"
-                    ],
                     address_city=secondary_auditor["secondary_auditor_address_city"],
                     address_state=secondary_auditor["secondary_auditor_address_state"],
-                    address_zipcode=secondary_auditor[
-                        "secondary_auditor_address_zipcode"
-                    ],
+                    address_street=secondary_auditor["secondary_auditor_address_street"],
+                    address_zipcode=secondary_auditor["secondary_auditor_address_zipcode"],
+                    auditor_ein=secondary_auditor["secondary_auditor_ein"],
+                    auditor_name=secondary_auditor["secondary_auditor_name"],
+                    contact_email=secondary_auditor["secondary_auditor_contact_email"],
+                    contact_name=secondary_auditor["secondary_auditor_contact_name"],
+                    contact_phone=secondary_auditor["secondary_auditor_contact_phone"],
+                    contact_title=secondary_auditor["secondary_auditor_contact_title"],
+                    report_id=self.single_audit_checklist.report_id,
                 )
                 sec_objs.append(sec_auditor)
         self.loaded_objects["SecondaryAuditors"] = sec_objs

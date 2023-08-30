@@ -646,52 +646,45 @@ class General(models.Model):
 
 
 class SecondaryAuditor(models.Model):
-    report_id = models.TextField(
-        "G-FAC generated identifier. FK to General",
+    address_city = models.TextField(
+        "CPA City",
+        help_text=docs.auditor_city,
     )
-    # auditor_seq_number = models.IntegerField("Order that the Auditor was reported")
-    auditor_ein = models.TextField(
-        "CPA Firm EIN (only available for audit years 2013 and beyond)",
-        null=True,
-        help_text=docs.auditor_ein,
-    )
-    auditor_name = models.TextField("CPA Firm Name", help_text=docs.auditor_firm_name)
-    contact_name = models.TextField(
-        "Name of CPA Contact",
-        null=True,
-    )
-    contact_title = models.TextField(
-        "Title of CPA Contact",
-        null=True,
-        help_text=docs.auditor_title,
-    )
-    contact_email = models.TextField(
-        "CPA mail address (optional)",
-        null=True,
-        help_text=docs.auditor_email,
-    )
-    contact_phone = models.TextField(
-        "CPA phone number", null=True, help_text=docs.auditor_phone
-    )
-    hist_contact_fax = models.TextField(
-        "CPA fax number",
-        null=True,
+    address_state = models.TextField(
+        "CPA State",
+        help_text=docs.auditor_state,
     )
     address_street = models.TextField(
         "CPA Street Address",
-        null=True,
         help_text=docs.auditor_street1,
-    )
-    hist_address_street_line_2 = models.TextField(
-        "CPA Street Address Line 2 in C-FAC",
-        null=True,
-    )
-    address_city = models.TextField("CPA City", null=True, help_text=docs.auditor_city)
-    address_state = models.TextField(
-        "CPA State", null=True, help_text=docs.auditor_state
     )
     address_zipcode = models.TextField(
         "CPA Zip Code",
-        null=True,
         help_text=docs.auditor_zip_code,
+    )
+    auditor_ein = models.TextField(
+        "CPA Firm EIN (only available for audit years 2013 and beyond)",
+        help_text=docs.auditor_ein,
+    )
+    auditor_name = models.TextField(
+        "CPA Firm Name", 
+        help_text=docs.auditor_firm_name,
+    )
+    contact_email = models.TextField(
+        "CPA mail address (optional)",
+        help_text=docs.auditor_email,
+    )
+    contact_name = models.TextField(
+        "Name of CPA Contact",
+    )
+    contact_phone = models.TextField(
+        "CPA phone number",
+        help_text=docs.auditor_phone,
+    )
+    contact_title = models.TextField(
+        "Title of CPA Contact",
+        help_text=docs.auditor_title,
+    )
+    report_id = models.TextField(
+        "G-FAC generated identifier. FK to General",
     )
