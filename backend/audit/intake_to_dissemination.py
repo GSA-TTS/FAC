@@ -121,7 +121,9 @@ class IntakeToDissemination(object):
         federal_awards = self.single_audit_checklist.federal_awards
         federal_awards_objects = []
 
-        for entry in federal_awards["FederalAwards"]["federal_awards"]: #FIXME To discuss
+        for entry in federal_awards["FederalAwards"][
+            "federal_awards"
+        ]:  # FIXME To discuss
             program = entry["program"]
             loan = entry["loan_or_loan_guarantee"]
             cluster = entry["cluster"]
@@ -283,21 +285,28 @@ class IntakeToDissemination(object):
     def _bool_to_yes_no(condition):
         return "Yes" if condition else "No"
 
+    def _optional_bool(condition):
+        if condition is None:
+            return ""
+        else:
+            return "Yes" if condition else "No"
+
+    def _json_array_to_str(json_array):
+        if json_array is None:
+            return ""
+        elif isinstance(json_array, list):
+            return ", ".join(map(str, json_array))
+        else:
+            # FIXME This should raise an error
+            return f"NOT AN ARRAY: {json_array}"
 
     def load_general(self):
         general_information = self.single_audit_checklist.general_information
         auditee_certification = self.single_audit_checklist.auditee_certification
         audit_information = self.single_audit_checklist.audit_information
+        # auditor_certification = self.single_audit_checklist.auditor_certification
 
         dates_by_status = self._get_dates_from_sac()
-
-        num_months = None
-        if (
-            ("audit_period_other_months" in general_information)
-            and general_information["audit_period_other_months"] != ""
-            and general_information["audit_period_other_months"] is not None
-        ):
-            num_months = int(general_information["audit_period_other_months"])
 
         general = General(
             report_id=self.report_id,
@@ -317,23 +326,31 @@ class IntakeToDissemination(object):
             auditee_state=general_information["auditee_state"],
             auditee_ein=general_information["ein"],
             auditee_uei=general_information["auditee_uei"],
-            additional_ueis= self._bool_to_yes_no(self.single_audit_checklist.additional_ueis),
+            is_additional_ueis=self._bool_to_yes_no(
+                self.single_audit_checklist.additional_ueis
+            ),
             auditee_zip=general_information["auditee_zip"],
             auditor_phone=general_information["auditor_phone"],
             auditor_state=general_information["auditor_state"],
             auditor_city=general_information["auditor_city"],
             auditor_contact_title=general_information["auditor_contact_title"],
             auditor_address_line_1=general_information["auditor_address_line_1"],
-            auditor_zip=general_information["auditor_zip"], # FIXME See PR #1603
+            auditor_zip=general_information["auditor_zip"],
             auditor_country=general_information["auditor_country"],
             auditor_contact_name=general_information["auditor_contact_name"],
             auditor_email=general_information["auditor_email"],
             auditor_firm_name=general_information["auditor_firm_name"],
-            auditor_foreign_addr=None,  # TODO:  What does this look like in the incoming json?
+            auditor_foreign_address=general_information.get(
+                "auditor_international_address", ""
+            ),
             auditor_ein=general_information["auditor_ein"],
-            cognizant_agency=None,  # TODO: https://github.com/GSA-TTS/FAC/issues/1218
-            oversight_agency=None,  # TODO: https://github.com/GSA-TTS/FAC/issues/1218
-            initial_date_received=self.single_audit_checklist.date_created,
+            cognizant_agency=self.single_audit_checklist.cognizant_agency
+            if self.single_audit_checklist.cognizant_agency
+            else "",
+            oversight_agency=self.single_audit_checklist.oversight_agency
+            if self.single_audit_checklist.oversight_agency
+            else "",
+            date_created=self.single_audit_checklist.date_created,
             ready_for_certification_date=dates_by_status[
                 self.single_audit_checklist.STATUS.READY_FOR_CERTIFICATION
             ],
@@ -349,51 +366,55 @@ class IntakeToDissemination(object):
             submitted_date=dates_by_status[
                 self.single_audit_checklist.STATUS.SUBMITTED
             ],
-            auditor_signature_date=None,  # TODO: Field will be added by front end
-            auditee_signature_date=None,  # TODO: Field will be added by front end
+            # auditor_signature_date=auditor_certification["auditor_signature"]["auditor_certification_date_signed"],
+            # auditee_signature_date=auditee_certification["auditee_signature"]["auditee_certification_date_signed"],
             fy_end_date=general_information["auditee_fiscal_period_end"],
             fy_start_date=general_information["auditee_fiscal_period_start"],
-            audit_year=self.audit_year,
+            audit_year=str(self.audit_year),
             audit_type=general_information["audit_type"],
+            gaap_results=self._json_array_to_str(audit_information["gaap_results"]),
+            sp_framework_basis=self._json_array_to_str(
+                audit_information.get("sp_framework_basis")
+            ),
+            is_sp_framework_required=self._optional_bool(
+                audit_information.get("is_sp_framework_required", None)
+            ),
+            sp_framework_opinions=self._json_array_to_str(
+                audit_information["sp_framework_opinions"]
+            ),
+            is_going_concern_included=self._bool_to_yes_no(
+                audit_information["is_going_concern_included"]
+            ),
+            is_internal_control_deficiency_disclosed=self._bool_to_yes_no(
+                audit_information["is_internal_control_deficiency_disclosed"]
+            ),
+            is_internal_control_material_weakness_disclosed=self._bool_to_yes_no(
+                audit_information["is_internal_control_material_weakness_disclosed"]
+            ),
+            is_material_noncompliance_disclosed=self._bool_to_yes_no(
+                audit_information["is_material_noncompliance_disclosed"]
+            ),
+            # is_duplicate_reports = self._bool_to_yes_no(audit_information["is_aicpa_audit_guide_included"]), #FIXME This mapping does not seem correct
+            is_aicpa_audit_guide_included=self._bool_to_yes_no(
+                audit_information["is_aicpa_audit_guide_included"]
+            ),
+            dollar_threshold=audit_information["dollar_threshold"],
+            is_low_risk_auditee=self._bool_to_yes_no(
+                audit_information["is_low_risk_auditee"]
+            ),
+            agencies_with_prior_findings=self._json_array_to_str(
+                audit_information["agencies"]
+            ),
             entity_type=general_information["user_provided_organization_type"],
-            number_months=num_months,
+            number_months=general_information.get("audit_period_other_months", ""),
             audit_period_covered=general_information["audit_period_covered"],
-            total_amount_expended=self.single_audit_checklist.federal_awards["FederalAwards"]["total_amount_expended"],
-            type_audit_code="UG", #FIXME ???
+            total_amount_expended=self.single_audit_checklist.federal_awards[
+                "FederalAwards"
+            ]["total_amount_expended"],
+            type_audit_code="UG",
             is_public=self.single_audit_checklist.is_public,
-            data_source="GSA",
-            # data_source=self.single_audit_checklist.data_source,
-            gaap_results = audit_information["gaap_results"],
-            is_going_concern = self._bool_to_yes_no(audit_information["is_going_concern_included"]),
-            is_significant_deficiency =  self._bool_to_yes_no(audit_information["is_internal_control_deficiency_disclosed"]),
-            #is_material_weakness = self._bool_to_yes_no(
+            data_source=self.single_audit_checklist.data_source,
         )
-        
-
-        # if audit_information:
-
-        #     """
-        #         TODO:
-        #         Missing in schema
-        #         general.sp_framework = audit_information[]
-        #         general.is_sp_framework_required = audit_information[]
-        #         general.sp_framework_auditor_opinion = audit_information[]
-        #     """
- 
-        #     general.is_material_weakness = (
-        #         audit_information["is_internal_control_material_weakness_disclosed"]
-        #         == "Y"
-        #     )
-        #     general.is_material_noncompliance = (
-        #         audit_information["is_material_noncompliance_disclosed"] == "Y"
-        #     )
-        #     general.is_duplicate_reports = (
-        #         audit_information["is_aicpa_audit_guide_included"] == "Y"
-        #     )
-        #     general.dollar_threshold = audit_information["dollar_threshold"]
-        #     general.is_low_risk = audit_information["is_low_risk_auditee"] == "Y"
-        #     general.agencies_with_prior_findings = audit_information["agencies"]
-        #self._load_audit_info(general)
 
         self.loaded_objects["Generals"] = [general]
         return [general]

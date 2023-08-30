@@ -39,7 +39,7 @@ local AuditeeCertification = Types.object {
         },
         auditee_certification_date_signed: Base.Compound.Date,
       },
-      required: ['auditee_name', 'auditee_title'],
+      required: ['auditee_name', 'auditee_title','auditee_certification_date_signed'],
     },
   },
   required: ['auditee_certification', 'auditee_signature'],

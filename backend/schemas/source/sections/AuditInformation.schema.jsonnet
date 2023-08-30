@@ -26,6 +26,17 @@ local AuditInformation = Types.object {
       items: Base.Compound.ALNPrefixes,
     },
   },
+  required: [
+    'dollar_threshold',
+    'gaap_results',
+    'is_going_concern_included',
+    'is_internal_control_deficiency_disclosed',
+    'is_internal_control_material_weakness_disclosed',
+    'is_material_noncompliance_disclosed',
+    'is_aicpa_audit_guide_included',
+    'is_low_risk_auditee',
+    'agencies',
+  ],
   allOf: [
     {
       'if': {
@@ -95,17 +106,6 @@ local AuditInformation = Types.object {
         },
       },
     },
-  ],
-  required: [
-    'dollar_threshold',
-    'gaap_results',
-    'is_going_concern_included',
-    'is_internal_control_deficiency_disclosed',
-    'is_internal_control_material_weakness_disclosed',
-    'is_material_noncompliance_disclosed',
-    'is_aicpa_audit_guide_included',
-    'is_low_risk_auditee',
-    'agencies',
   ],
   title: 'AuditInformation',
 };

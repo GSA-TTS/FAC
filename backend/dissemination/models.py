@@ -1,5 +1,4 @@
 from django.db import models
-from django.contrib.postgres.fields import ArrayField
 
 from . import docs
 
@@ -240,171 +239,116 @@ class General(models.Model):
     )
     auditee_contact_name = models.TextField(
         "Name of Auditee Contact",
-        null=True,
         help_text=docs.auditee_contact,
     )
     auditee_email = models.TextField(
         "Auditee Email address",
-        null=True,
         help_text=docs.auditee_email,
     )
     auditee_name = models.TextField("Name of the Auditee", help_text=docs.auditee_name)
     auditee_phone = models.TextField(
         "Auditee Phone Number", help_text=docs.auditee_phone
     )
-    hist_auditee_fax = models.TextField(
-        "Auditee Fax Number in C-FAC",
-        null=True,
-    )
     auditee_contact_title = models.TextField(
         "Title of Auditee Contact",
-        null=True,
         help_text=docs.auditee_title,
     )
     auditee_address_line_1 = models.TextField(
         "Auditee Street Address", help_text=docs.street1
     )
-    hist_auditee_address_line_2 = models.TextField(
-        "Auditee Street Address Line 2 in C-FAC",
-        null=True,
-    )
-
     auditee_city = models.TextField("Auditee City", help_text=docs.city)
-    auditee_state = models.TextField(
-        "Auditee State", max_length=2, help_text=docs.state
-    )
+    auditee_state = models.TextField("Auditee State", help_text=docs.state)
     auditee_ein = models.TextField(
         "Primary Employer Identification Number",
-        null=True,
     )
-    hist_auditee_duns = models.TextField(
-        "Primary Employer Identification Number",
-        null=True,
-    )
-    auditee_uei = models.TextField("", null=True, help_text=docs.uei_general)
 
-    additional_ueis = models.BooleanField(default=False)
+    auditee_uei = models.TextField("Auditee UEI", help_text=docs.uei_general)
 
-    hist_auditee_addl_ein_list = ArrayField(
-        models.TextField("", null=True, help_text=docs.uei_general),
-        null=True,
-        default=list,
-    )
-    hist_auditee_addl_duns_list = ArrayField(
-        models.TextField("", null=True, help_text=docs.uei_general),
-        null=True,
-        default=list,
-    )
+    is_additional_ueis = models.TextField()
+
     auditee_zip = models.TextField(
         "Auditee Zip Code",
-        null=True,
         help_text=docs.zip_code,
     )
-    auditor_phone = models.TextField(
-        "CPA phone number", null=True, help_text=docs.auditor_phone
-    )
-    hist_auditor_fax = models.TextField(
-        "CPA fax number in C-FAC",
-        null=True,
-    )
-    auditor_state = models.TextField(
-        "CPA State", null=True, help_text=docs.auditor_state
-    )
-    auditor_city = models.TextField("CPA City", null=True, help_text=docs.auditor_city)
+    auditor_phone = models.TextField("CPA phone number", help_text=docs.auditor_phone)
+
+    auditor_state = models.TextField("CPA State", help_text=docs.auditor_state)
+    auditor_city = models.TextField("CPA City", help_text=docs.auditor_city)
     auditor_contact_title = models.TextField(
         "Title of CPA Contact",
-        null=True,
         help_text=docs.auditor_title,
     )
     auditor_address_line_1 = models.TextField(
         "CPA Street Address",
-        null=True,
         help_text=docs.auditor_street1,
-    )
-    hist_auditor_address_line_2 = models.TextField(
-        "CPA Street Address Line 2 in C-FAC",
-        null=True,
     )
     auditor_zip = models.TextField(
         "CPA Zip Code",
-        null=True,
         help_text=docs.auditor_zip_code,
     )
-    auditor_country = models.TextField(
-        "CPA Country", null=True, help_text=docs.auditor_country
-    )
+    auditor_country = models.TextField("CPA Country", help_text=docs.auditor_country)
     auditor_contact_name = models.TextField(
         "Name of CPA Contact",
-        null=True,
         help_text=docs.auditor_contact,
     )
     auditor_email = models.TextField(
         "CPA mail address (optional)",
-        null=True,
         help_text=docs.auditor_email,
     )
     auditor_firm_name = models.TextField(
         "CPA Firm Name", help_text=docs.auditor_firm_name
     )
     # Once loaded, would like to add these as regular addresses and just change this to a country field
-    auditor_foreign_addr = models.TextField(
+    auditor_foreign_address = models.TextField(
         "CPA Address - if international",
-        null=True,
         help_text=docs.auditor_foreign,
     )
     auditor_ein = models.TextField(
         "CPA Firm EIN (only available for audit years 2013 and beyond)",
-        null=True,
         help_text=docs.auditor_ein,
     )
 
     # Agency
     cognizant_agency = models.TextField(
         "Two digit Federal agency prefix of the cognizant agency",
-        null=True,
         help_text=docs.cognizant_agency,
     )
     oversight_agency = models.TextField(
         "Two digit Federal agency prefix of the oversight agency",
-        null=True,
         help_text=docs.oversight_agency,
     )
 
     # Dates
-    initial_date_received = models.DateField(
+    date_created = models.DateField(
         "The first date an audit component or Form SF-SAC was received by the Federal audit Clearinghouse (FAC).",
-        null=True,
         help_text=docs.initial_date_received,
     )
     ready_for_certification_date = models.DateField(
         "The date at which the audit transitioned to 'ready for certification'",
-        null=True,
     )
     auditor_certified_date = models.DateField(
-        "The date at which the audit transitioned to 'auditor certified'", null=True
+        "The date at which the audit transitioned to 'auditor certified'",
     )
     auditee_certified_date = models.DateField(
-        "The date at which the audit transitioned to 'auditee certified'", null=True
+        "The date at which the audit transitioned to 'auditee certified'",
     )
     certified_date = models.DateField(
-        "The date at which the audit transitioned to 'certified'", null=True
+        "The date at which the audit transitioned to 'certified'",
     )
     submitted_date = models.DateField(
-        "The date at which the audit transitioned to 'submitted'", null=True
+        "The date at which the audit transitioned to 'submitted'",
     )
-    auditor_signature_date = models.DateField(
-        "The date on which the auditor signed the audit", null=True
-    )
-    auditee_signature_date = models.DateField(
-        "The date on which the auditee signed the audit", null=True
-    )
-    fy_end_date = models.DateField(
-        "Fiscal Year End Date", null=True, help_text=docs.fy_end_date
-    )
+    # auditor_signature_date = models.DateField(
+    #     "The date on which the auditor signed the audit",
+    # )
+    # auditee_signature_date = models.DateField(
+    #     "The date on which the auditee signed the audit",
+    # )
+    fy_end_date = models.DateField("Fiscal Year End Date", help_text=docs.fy_end_date)
     fy_start_date = models.DateField(
-        "Fiscal Year Start Date", null=True, help_text=docs.fy_start_date
+        "Fiscal Year Start Date", help_text=docs.fy_start_date
     )
-    audit_year = models.IntegerField(
+    audit_year = models.TextField(
         "Audit year from fy_start_date.",
         help_text=docs.audit_year_general,
     )
@@ -417,101 +361,85 @@ class General(models.Model):
     # Audit Info
     gaap_results = models.TextField(
         "GAAP Results by Auditor",
-        null=True,
     )  # Concatenation of choices
-    sp_framework = models.TextField(
+    sp_framework_basis = models.TextField(
         "Special Purpose Framework that was used as the basis of accounting",
-        null=True,
         help_text=docs.sp_framework,
     )
-    is_sp_framework_required = models.BooleanField(
+    is_sp_framework_required = models.TextField(
         "Indicate whether or not the special purpose framework used as basis of accounting by state law or tribal law",
-        null=True,
         help_text=docs.sp_framework_required,
     )
-    sp_framework_auditor_opinion = models.TextField(
+    sp_framework_opinions = models.TextField(
         "The auditor's opinion on the special purpose framework",
-        null=True,
         help_text=docs.type_report_special_purpose_framework,
     )
-    is_going_concern = models.BooleanField(
+    is_going_concern_included = models.TextField(
         "Whether or not the audit contained a going concern paragraph on financial statements",
-        null=True,
         help_text=docs.going_concern,
     )
-    is_significant_deficiency = models.BooleanField(
+    is_internal_control_deficiency_disclosed = models.TextField(
         "Whether or not the audit disclosed a significant deficiency on financial statements",
-        null=True,
         help_text=docs.significant_deficiency_general,
     )
-    is_material_weakness = models.BooleanField(
-        "", null=True, help_text=docs.material_weakness_general
+    is_internal_control_material_weakness_disclosed = models.TextField(
+        help_text=docs.material_weakness_general
     )
-    is_material_noncompliance = models.BooleanField(
+    is_material_noncompliance_disclosed = models.TextField(
         "Whether or not the audit disclosed a material noncompliance on financial statements",
-        null=True,
         help_text=docs.material_noncompliance,
     )
-    is_duplicate_reports = models.BooleanField(
-        "Whether or not the financial statements include departments that have separate expenditures not included in this audit",
-        null=True,
-        help_text=docs.dup_reports,
-    )  # is_aicpa_audit_guide_included
-    dollar_threshold = models.DecimalField(
+    # is_duplicate_reports = models.BooleanField(
+    #     "Whether or not the financial statements include departments that have separate expenditures not included in this audit",
+    #     null=True,
+    #     help_text=docs.dup_reports,
+    # )  # is_aicpa_audit_guide_included
+    is_aicpa_audit_guide_included = models.TextField()
+    dollar_threshold = models.BigIntegerField(
         "Dollar Threshold to distinguish between Type A and Type B programs.",
-        null=True,
-        max_digits=23,
-        decimal_places=2,
         help_text=docs.dollar_threshold,
     )
-    is_low_risk = models.BooleanField(
+    is_low_risk_auditee = models.TextField(
         "Indicate whether or not the auditee qualified as a low-risk auditee",
-        null=True,
         help_text=docs.low_risk,
     )
     agencies_with_prior_findings = models.TextField(
         "List of agencues with prior findings",
-        null=True,
     )  # Concatenation of agency codes
     # End of Audit Info
 
     entity_type = models.TextField(
         "Self reported type of entity (i.e., States, Local Governments, Indian Tribes, Institutions of Higher Education, NonProfit)",
-        null=True,
         help_text=docs.entity_type,
     )
-    number_months = models.IntegerField(
+    number_months = models.TextField(
         "Number of Months Covered by the 'Other' Audit Period",
-        null=True,
         help_text=docs.number_months,
     )
     audit_period_covered = models.TextField(
-        "Audit Period Covered by Audit", max_length=40, help_text=docs.period_covered
+        "Audit Period Covered by Audit", help_text=docs.period_covered
     )
-    total_amount_expended = models.DecimalField(
+    total_amount_expended = models.BigIntegerField(
         "Total Federal Expenditures",
-        null=True,
-        max_digits=23,
-        decimal_places=2,
         help_text=docs.total_fed_expenditures,
     )
-    type_report_major_program = models.TextField(
-        "Type of Report Issued on the Major Program Compliance",
-        null=True,
-        help_text=docs.type_report_major_program_general,
-    )
-    type_audit_code = models.TextField("Determines if audit is A133 or UG", default="")
 
-    # Metadata
-    hist_dbkey = models.IntegerField(
-        "Identifier for a submission along with audit_year in C-FAC",
-        null=True,
+    type_audit_code = models.TextField(
+        "Determines if audit is A133 or UG",
     )
+
     is_public = models.BooleanField(
-        "True for public records, False for non-public records", null=True
+        "True for public records, False for non-public records", default=False
     )
     # Choices are: GSA, Census, or TESTDATA
     data_source = models.TextField("Data origin; GSA, Census, or TESTDATA")
+    # FIXME This looks like audit_report_type in FederalAwards, must be verified
+    #  and removed if needed.
+    # type_report_major_program = models.TextField(
+    #     "Type of Report Issued on the Major Program Compliance",
+    #     null=True,
+    #     help_text=docs.type_report_major_program_general,
+    # )
 
     class Meta:
         unique_together = (("report_id",),)
