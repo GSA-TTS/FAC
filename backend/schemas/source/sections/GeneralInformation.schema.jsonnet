@@ -177,9 +177,6 @@ local Types = Base.Types;
       },
     },
   ],
-  dependentSchemas: {
-    auditor_country: { "required": ["auditor_zip"] }
-  },
   required: [],
   title: 'GeneralInformation',
   type: 'object',

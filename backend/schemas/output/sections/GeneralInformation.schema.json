@@ -222,13 +222,6 @@
          }
       }
    ],
-   "dependentSchemas": {
-      "auditor_country": {
-         "required": [
-            "auditor_zip"
-         ]
-      }
-   },
    "metamodel_version": "1.7.0",
    "properties": {
       "audit_period_covered": {
