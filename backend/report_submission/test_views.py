@@ -8,6 +8,7 @@ from unittest.mock import patch
 from model_bakery import baker
 
 from audit.models import Access, SingleAuditChecklist
+from backend.audit.models import SubmissionEvent
 
 
 def omit(remove, d) -> dict:
@@ -562,6 +563,16 @@ class GeneralInformationFormViewTests(TestCase):
             self.assertEqual(
                 getattr(updated_sac, field), data[field], f"mismatch for field: {field}"
             )
+
+        submission_events = SubmissionEvent.objects.filter(sac=sac)
+
+        # the most recent event should be GENERAL_INFORMATION_UPDATED
+        event_count = len(submission_events)
+        self.assertGreaterEqual(event_count, 1)
+        self.assertEqual(
+            submission_events[event_count - 1].event,
+            SubmissionEvent.EventType.GENERAL_INFORMATION_UPDATED,
+        )
 
     def test_post_requires_fields(self):
         """If there are fields missing from the submitted form, the submission should be rejected"""
