@@ -60,15 +60,15 @@ local FindingsUniformGuidanceEntry = {
 
   },
   required: [
-    'program', 
-    'findings', 
-    'other_matters', 
-    'material_weakness', 
+    'program',
+    'findings',
+    'other_matters',
+    'material_weakness',
     'modified_opinion',
-    'significant_deficiency', 
+    'significant_deficiency',
     'other_findings',
-    'questioned_costs'
-    ],
+    'questioned_costs',
+  ],
   allOf: Validations.Combinations,
 };
 

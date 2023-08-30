@@ -31,13 +31,18 @@ local AuditeeCertification = Types.object {
     auditee_signature: Types.object {
       description: 'Auditee signature and title',
       properties: {
-        auditee_name: Types.string,
-        auditee_title: Types.string,
+        auditee_name: Types.string {
+          minimum: 1,
+        },
+        auditee_title: Types.string {
+          minimum: 1,
+        },
         auditee_certification_date_signed: Base.Compound.Date,
       },
       required: ['auditee_name', 'auditee_title'],
     },
   },
+  required: ['auditee_certification', 'auditee_signature'],
   title: 'AuditeeCertification',
 };
 

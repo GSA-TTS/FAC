@@ -6,6 +6,8 @@ from . import docs
 BIGINT_MAX_DIGITS = 25
 
 REPORT_ID_FK_HELP_TEXT = "; foreign key everywhere else"
+
+
 class FindingText(models.Model):
     """Specific findings details. References General"""
 
@@ -31,12 +33,14 @@ class FindingText(models.Model):
 
 class AdditionalUei(models.Model):
     """Additional UEIs for this audit."""
+
     report_id = models.TextField(REPORT_ID_FK_HELP_TEXT)
     additional_uei = models.TextField()
 
 
 class Finding(models.Model):
     """A finding from the audit. References FederalAward and FindingText"""
+
     award_reference = models.TextField(
         "Order that the award line was reported in Award",
     )
@@ -49,20 +53,16 @@ class Finding(models.Model):
         help_text=docs.material_weakness_findings,
     )
     is_modified_opinion = models.TextField(
-        "Modified Opinion finding", 
-        help_text=docs.modified_opinion
+        "Modified Opinion finding", help_text=docs.modified_opinion
     )
     is_other_findings = models.TextField(
-        "Other findings", 
-        help_text=docs.other_findings
+        "Other findings", help_text=docs.other_findings
     )
     is_other_matters = models.TextField(
-        "Other non-compliance", 
-        help_text=docs.other_non_compliance
+        "Other non-compliance", help_text=docs.other_non_compliance
     )
     is_questioned_costs = models.TextField(
-        "Questioned Costs", 
-        help_text=docs.questioned_costs_findings
+        "Questioned Costs", help_text=docs.questioned_costs_findings
     )
     is_repeat_finding = models.TextField(
         "Indicates whether or not the audit finding was a repeat of an audit finding in the immediate prior audit",
@@ -157,7 +157,7 @@ class FederalAward(models.Model):
     passthrough_amount = models.BigIntegerField(
         "Amount passed through to subrecipients",
         help_text=docs.passthrough_amount,
-        null=True
+        null=True,
     )
     report_id = models.TextField(
         REPORT_ID_FK_HELP_TEXT,
@@ -190,12 +190,11 @@ class CapText(models.Model):
 
 class Note(models.Model):
     """Note to Schedule of Expenditures of Federal Awards (SEFA)"""
+
     accounting_policies = models.TextField(
         "A description of the significant accounting policies used in preparing the SEFA (2 CFR 200.510(b)(6))",
     )
-    is_minimis_rate_used = models.TextField(
-        "'Yes', 'No', or 'Both' (2 CFR 200.414(f))"
-    )
+    is_minimis_rate_used = models.TextField("'Yes', 'No', or 'Both' (2 CFR 200.414(f))")
     rate_explained = models.TextField("Explanation for minimis rate")
     report_id = models.TextField(
         REPORT_ID_FK_HELP_TEXT,
@@ -206,6 +205,7 @@ class Note(models.Model):
 
 class Passthrough(models.Model):
     """The pass-through entity information, when it is not a direct federal award"""
+
     award_reference = models.TextField(
         "Order that the award line was reported",
     )
@@ -232,12 +232,10 @@ class General(models.Model):
     )
     auditee_certify_name = models.TextField(
         "Name of Auditee Certifying Official",
-        null=True,
         help_text=docs.auditee_certify_name,
     )
     auditee_certify_title = models.TextField(
         "Title of Auditee Certifying Official",
-        null=True,
         help_text=docs.auditee_certify_title,
     )
     auditee_contact_name = models.TextField(
@@ -284,7 +282,7 @@ class General(models.Model):
         null=True,
     )
     auditee_uei = models.TextField("", null=True, help_text=docs.uei_general)
-    
+
     additional_ueis = models.BooleanField(default=False)
 
     hist_auditee_addl_ein_list = ArrayField(
@@ -519,7 +517,9 @@ class General(models.Model):
         unique_together = (("report_id",),)
 
     def __str__(self):
-        return f"report_id:{self.report_id} UEI:{self.auditee_uei}, AY:{self.audit_year}"
+        return (
+            f"report_id:{self.report_id} UEI:{self.auditee_uei}, AY:{self.audit_year}"
+        )
 
 
 class SecondaryAuditor(models.Model):
@@ -544,7 +544,7 @@ class SecondaryAuditor(models.Model):
         help_text=docs.auditor_ein,
     )
     auditor_name = models.TextField(
-        "CPA Firm Name", 
+        "CPA Firm Name",
         help_text=docs.auditor_firm_name,
     )
     contact_email = models.TextField(

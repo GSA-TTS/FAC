@@ -15,9 +15,7 @@ local Types = Base.Types;
   metamodel_version: '1.7.0',
   properties: {
     audit_type: Base.Enum.AuditType,
-    audit_period_covered: {
-      '$ref': '#/$defs/AuditPeriod',
-    },
+    audit_period_covered: Base.Enum.AuditPeriod,
     audit_period_other_months: Types.string,
     auditee_address_line_1: Types.string {
       maxLength: 100,
@@ -48,9 +46,7 @@ local Types = Base.Types;
       title: 'State',
     },
     auditee_uei: Base.Compound.UniqueEntityIdentifier,
-    auditee_zip: {
-      '$ref': '#/$defs/Zip',
-    },
+    auditee_zip:  Base.Compound.Zip, //FIXME is this required
     auditor_address_line_1: Types.string {
       maxLength: 100,
     },
@@ -72,11 +68,9 @@ local Types = Base.Types;
       format: 'email',
     },
     auditor_firm_name: Types.string,
-    auditor_phone: {
-      '$ref': '#/$defs/Phone',
-    },
-    auditor_state: {
-      '$ref': '#/$defs/State',
+    auditor_phone: Base.Compound.UnitedStatesPhone,
+    auditor_state: Base.Enum.UnitedStatesStateAbbr {
+      title: 'State',
     },
     auditor_zip: {
       '$ref': '#/$defs/Zip',

@@ -66,18 +66,18 @@ class IntakeToDissemination(object):
             return
 
         findings_text_entries = findings_text.get("FindingsText", {}).get(
-            "findings_text_entries"
+            "findings_text_entries", []
         )
         findings_text_objects = []
-        if findings_text_entries:
-            for entry in findings_text_entries:
-                finding_text_ = FindingText(
-                    report_id=self.report_id,
-                    finding_ref_number=entry["reference_number"],
-                    contains_chart_or_table=entry["contains_chart_or_table"] == "Y",
-                    finding_text=entry["text_of_finding"],
-                )
-                findings_text_objects.append(finding_text_)
+
+        for entry in findings_text_entries:
+            finding_text_ = FindingText(
+                report_id=self.report_id,
+                finding_ref_number=entry["reference_number"],
+                contains_chart_or_table=entry["contains_chart_or_table"] == "Y",
+                finding_text=entry["text_of_finding"],
+            )
+            findings_text_objects.append(finding_text_)
         self.loaded_objects["FindingTexts"] = findings_text_objects
         return findings_text_objects
 
@@ -120,14 +120,15 @@ class IntakeToDissemination(object):
     def load_federal_award(self):
         federal_awards = self.single_audit_checklist.federal_awards
         federal_awards_objects = []
-        report_id = self.single_audit_checklist.report_id
 
-        for entry in federal_awards["FederalAwards"]["federal_awards"]:
+        for entry in federal_awards["FederalAwards"]["federal_awards"]: #FIXME To discuss
             program = entry["program"]
             loan = entry["loan_or_loan_guarantee"]
             cluster = entry["cluster"]
             federal_award = FederalAward(
-                additional_award_identification=program.get("additional_award_identification", ""),
+                additional_award_identification=program.get(
+                    "additional_award_identification", ""
+                ),
                 amount_expended=program["amount_expended"],
                 award_reference=entry["award_reference"],
                 cluster_name=cluster["cluster_name"],
@@ -146,8 +147,10 @@ class IntakeToDissemination(object):
                 other_cluster_name=cluster.get("other_cluster_name", ""),
                 # If the user entered "N" for is_passthrough_award, there will be no value for `passthrough_amount`.
                 # We insert a `null`, as opposed to a 0, in that case.
-                passthrough_amount=entry["subrecipients"].get("subrecipient_amount", None),
-                report_id=self.report_id,
+                passthrough_amount=entry["subrecipients"].get(
+                    "subrecipient_amount", None
+                ),
+                report_id=self.single_audit_checklist.report_id,
                 state_cluster_name=cluster.get("state_cluster_name", ""),
             )
             federal_awards_objects.append(federal_award)
@@ -205,23 +208,19 @@ class IntakeToDissemination(object):
     def load_passthrough(self):
         federal_awards = self.single_audit_checklist.federal_awards
         federal_awards_entries = federal_awards.get("FederalAwards", {}).get(
-            "federal_awards"
+            "federal_awards", []
         )
         pass_objects = []
-        if federal_awards_entries:
-            for entry in federal_awards_entries:
-                entities = entry.get("direct_or_indirect_award", {}).get("entities")
-                if entities:
-                    for entity in entities:
-                        passthrough = Passthrough(
-                            award_reference=entry["award_reference"],
-                            report_id=self.report_id,
-                            passthrough_id=entity.get(
-                                "passthrough_identifying_number", ""
-                            ),
-                            passthrough_name=entity["passthrough_name"],
-                        )
-                        pass_objects.append(passthrough)
+        for entry in federal_awards_entries:
+            entities = entry.get("direct_or_indirect_award", {}).get("entities", [])
+            for entity in entities:
+                passthrough = Passthrough(
+                    award_reference=entry["award_reference"],
+                    report_id=self.report_id,
+                    passthrough_id=entity.get("passthrough_identifying_number", ""),
+                    passthrough_name=entity["passthrough_name"],
+                )
+                pass_objects.append(passthrough)
         self.loaded_objects["Passthroughs"] = pass_objects
         return pass_objects
 
@@ -236,38 +235,38 @@ class IntakeToDissemination(object):
                 return_dict[status] = None
         return return_dict
 
-    def _load_audit_info(self, general):
-        # Because this operates on the general object, it is called from load_general.
-        audit_information = self.single_audit_checklist.audit_information
+    # def _load_audit_info(self, general):
+    #     # Because this operates on the general object, it is called from load_general.
+    #     audit_information = self.single_audit_checklist.audit_information
 
-        if audit_information:
-            general.gaap_results = audit_information["gaap_results"]
-            """
-                TODO:
-                Missing in schema
-                general.sp_framework = audit_information[]
-                general.is_sp_framework_required = audit_information[]
-                general.sp_framework_auditor_opinion = audit_information[]
-            """
-            general.is_going_concern = (
-                audit_information["is_going_concern_included"] == "Y"
-            )
-            general.is_significant_deficiency = (
-                audit_information["is_internal_control_deficiency_disclosed"] == "Y"
-            )
-            general.is_material_weakness = (
-                audit_information["is_internal_control_material_weakness_disclosed"]
-                == "Y"
-            )
-            general.is_material_noncompliance = (
-                audit_information["is_material_noncompliance_disclosed"] == "Y"
-            )
-            general.is_duplicate_reports = (
-                audit_information["is_aicpa_audit_guide_included"] == "Y"
-            )
-            general.dollar_threshold = audit_information["dollar_threshold"]
-            general.is_low_risk = audit_information["is_low_risk_auditee"] == "Y"
-            general.agencies_with_prior_findings = audit_information["agencies"]
+    #     if audit_information:  #FIXME This should be checked as part of cross-validation
+    #         general.gaap_results = audit_information["gaap_results"]
+    #         """
+    #             TODO:
+    #             Missing in schema
+    #             general.sp_framework = audit_information[]
+    #             general.is_sp_framework_required = audit_information[]
+    #             general.sp_framework_auditor_opinion = audit_information[]
+    #         """
+    #         general.is_going_concern = (
+    #             audit_information["is_going_concern_included"] == "Y"
+    #         )
+    #         general.is_significant_deficiency = (
+    #             audit_information["is_internal_control_deficiency_disclosed"] == "Y"
+    #         )
+    #         general.is_material_weakness = (
+    #             audit_information["is_internal_control_material_weakness_disclosed"]
+    #             == "Y"
+    #         )
+    #         general.is_material_noncompliance = (
+    #             audit_information["is_material_noncompliance_disclosed"] == "Y"
+    #         )
+    #         general.is_duplicate_reports = (
+    #             audit_information["is_aicpa_audit_guide_included"] == "Y"
+    #         )
+    #         general.dollar_threshold = audit_information["dollar_threshold"]
+    #         general.is_low_risk = audit_information["is_low_risk_auditee"] == "Y"
+    #         general.agencies_with_prior_findings = audit_information["agencies"]
 
     # try:
     #     general = General.objects.get(report_id=report_id)
@@ -281,8 +280,15 @@ class IntakeToDissemination(object):
     # )
     # general.save() #FIXME: Lest's revisit this
 
+    def _bool_to_yes_no(condition):
+        return "Yes" if condition else "No"
+
+
     def load_general(self):
         general_information = self.single_audit_checklist.general_information
+        auditee_certification = self.single_audit_checklist.auditee_certification
+        audit_information = self.single_audit_checklist.audit_information
+
         dates_by_status = self._get_dates_from_sac()
 
         num_months = None
@@ -295,8 +301,12 @@ class IntakeToDissemination(object):
 
         general = General(
             report_id=self.report_id,
-            auditee_certify_name=None,  # TODO: Where does this come from?
-            auditee_certify_title=None,  # TODO: Where does this come from?
+            auditee_certify_name=auditee_certification["auditee_signature"][
+                "auditee_name"
+            ],
+            auditee_certify_title=auditee_certification["auditee_signature"][
+                "auditee_title"
+            ],
             auditee_contact_name=general_information["auditee_contact_name"],
             auditee_email=general_information["auditee_email"],
             auditee_name=general_information["auditee_name"],
@@ -307,14 +317,14 @@ class IntakeToDissemination(object):
             auditee_state=general_information["auditee_state"],
             auditee_ein=general_information["ein"],
             auditee_uei=general_information["auditee_uei"],
-            additional_ueis=self.single_audit_checklist.additional_ueis == "Y",
+            additional_ueis= self._bool_to_yes_no(self.single_audit_checklist.additional_ueis),
             auditee_zip=general_information["auditee_zip"],
             auditor_phone=general_information["auditor_phone"],
             auditor_state=general_information["auditor_state"],
             auditor_city=general_information["auditor_city"],
             auditor_contact_title=general_information["auditor_contact_title"],
             auditor_address_line_1=general_information["auditor_address_line_1"],
-            auditor_zip=general_information["auditor_zip"],
+            auditor_zip=general_information["auditor_zip"], # FIXME See PR #1603
             auditor_country=general_information["auditor_country"],
             auditor_contact_name=general_information["auditor_contact_name"],
             auditor_email=general_information["auditor_email"],
@@ -348,15 +358,43 @@ class IntakeToDissemination(object):
             entity_type=general_information["user_provided_organization_type"],
             number_months=num_months,
             audit_period_covered=general_information["audit_period_covered"],
-            total_amount_expended=None,  # loaded from FederalAward
-            type_audit_code="UG",
+            total_amount_expended=self.single_audit_checklist.federal_awards["FederalAwards"]["total_amount_expended"],
+            type_audit_code="UG", #FIXME ???
             is_public=self.single_audit_checklist.is_public,
             data_source="GSA",
             # data_source=self.single_audit_checklist.data_source,
+            gaap_results = audit_information["gaap_results"],
+            is_going_concern = self._bool_to_yes_no(audit_information["is_going_concern_included"]),
+            is_significant_deficiency =  self._bool_to_yes_no(audit_information["is_internal_control_deficiency_disclosed"]),
+            #is_material_weakness = self._bool_to_yes_no(
         )
-        self._load_audit_info(general)
-        # if self.write_to_db:
-        #     general.save()
+        
+
+        # if audit_information:
+
+        #     """
+        #         TODO:
+        #         Missing in schema
+        #         general.sp_framework = audit_information[]
+        #         general.is_sp_framework_required = audit_information[]
+        #         general.sp_framework_auditor_opinion = audit_information[]
+        #     """
+ 
+        #     general.is_material_weakness = (
+        #         audit_information["is_internal_control_material_weakness_disclosed"]
+        #         == "Y"
+        #     )
+        #     general.is_material_noncompliance = (
+        #         audit_information["is_material_noncompliance_disclosed"] == "Y"
+        #     )
+        #     general.is_duplicate_reports = (
+        #         audit_information["is_aicpa_audit_guide_included"] == "Y"
+        #     )
+        #     general.dollar_threshold = audit_information["dollar_threshold"]
+        #     general.is_low_risk = audit_information["is_low_risk_auditee"] == "Y"
+        #     general.agencies_with_prior_findings = audit_information["agencies"]
+        #self._load_audit_info(general)
+
         self.loaded_objects["Generals"] = [general]
         return [general]
 
