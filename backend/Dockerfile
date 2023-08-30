@@ -14,11 +14,6 @@ RUN \
     apt-get update && \
     apt-get install -yqq apt-transport-https wget gnupg2
 
-RUN apt-get update \
- && DEBIAN_FRONTEND=noninteractive \
-    apt-get install --no-install-recommends --assume-yes \
-      postgresql-client
-
 RUN \
     apt-get update -yq && \
     apt install curl -y && \
