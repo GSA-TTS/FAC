@@ -6,7 +6,7 @@ applications:
     memory: ((mem_amount))
     path: ../
     timeout: 180
-    disk_quota: 2G
+    disk_quota: 4G
     env:
       ENV: ((cf_env_name))
       DJANGO_BASE_URL: https://((endpoint))
