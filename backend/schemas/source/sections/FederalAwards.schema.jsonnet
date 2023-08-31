@@ -309,7 +309,15 @@ local Parts = {
       audit_report_type: Base.Enum.MajorProgramAuditReportType,
       number_of_audit_findings: Types.integer,
     },
-    required: ['program_name', 'federal_agency_prefix', 'three_digit_extension', 'is_major', 'number_of_audit_findings', 'federal_program_total', 'amount_expended'],
+    required: [
+      'program_name',
+      'federal_agency_prefix',
+      'three_digit_extension',
+      'is_major',
+      'number_of_audit_findings',
+      'federal_program_total',
+      'amount_expended',
+    ],
     allOf: Validations.ProgramValidations,
   },
 };
