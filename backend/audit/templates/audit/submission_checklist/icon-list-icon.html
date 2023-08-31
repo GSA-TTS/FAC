@@ -1,21 +1,30 @@
 {% comment %} 
     <div> for icon list icon.
-    If completed is true, use a success-darker (dark green) check. Else, an empty space.
+    If completed, use a success-darker (dark green) check.
+    If incomplete, an empty checkbox.
+    Else if inactive, an empty space.
 
     Variables: 
         completed (bool)
+        display (str)
 {% endcomment %}
 {% load sprite_helper %}
 {% if completed %}
-    <div class="usa-icon-list__icon text-success-darker">
-        <svg class="usa-icon margin-right-3" aria-hidden="true" role="img">
-            {% uswds_sprite "check_circle" %}
-        </svg>
-    </div>
+  <div class="usa-icon-list__icon text-success-darker">
+    <svg class="usa-icon margin-right-3" aria-hidden="true" role="img">
+      {% uswds_sprite "check_circle" %}
+    </svg>
+  </div>
+{% elif display == 'incomplete' %}
+  <div class="usa-icon-list__icon ">
+    <svg class="usa-icon margin-right-3" aria-hidden="true" role="img">
+      {% comment %} {% uswds_sprite "radio_button_unchecked" %} {% endcomment %}
+    </svg>
+</div>
 {% else %}
-    <div class="usa-icon-list__icon text-success-darker">
-        <svg class="usa-icon margin-right-3" aria-hidden="true" role="img">
-            {% comment %} {% uswds_sprite "radio_button_unchecked" %} {% endcomment %}
-        </svg>
-    </div>
+  <div class="usa-icon-list__icon text-disabled-dark">
+    <svg class="usa-icon margin-right-3" aria-hidden="true" role="img">
+      {% comment %} {% uswds_sprite "radio_button_unchecked" %} {% endcomment %}
+    </svg>
+  </div>
 {% endif %}

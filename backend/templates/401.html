@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block content %}
+    <div class="grid-container grid-row margin-y-15">
+        <div class="tablet:grid-col-10 tablet:grid-offset-1">
+            <h1 class="font-sans-2xl">401 Error: Unauthorized</h1>
+            <div class="font-sans-lg">
+                <p>
+                    Pleasse <a href="/openid/login/" class="usa-link">sign in</a> to view this page
+                </p>
+                <a href="/openid/login/" class="usa-button">Sign in</a>
+            </div>
+            {% if exception %}<p class="text-base">Error code: {{ exception }}</p>{% endif %}
+        </div>
+    </div>
+{% endblock content %}

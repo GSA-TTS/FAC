@@ -1,3 +1,6 @@
+from audit.cross_validation.naming import NC, find_section_by_name
+
+
 def submission_progress_check(sac, sar=None, crossval=True):
     """
     Because this function was initially created in a view and not as a
@@ -8,8 +11,8 @@ def submission_progress_check(sac, sar=None, crossval=True):
     crossval defaults to True because we don't want to have to change all the calls to
     the validation functions to include this argument.
 
-    Given a SingleAuditChecklist instance and a SingleAuditReportFile instance,
-    return information about submission progress.
+    Given the output of sac_validation_shape on a SingleAuditChecklist instance, and
+    a SingleAuditReportFile instance, return information about submission progress.
 
     Returns this shape:
 
@@ -25,63 +28,35 @@ def submission_progress_check(sac, sar=None, crossval=True):
     single_audit_report, and [progress_dict] is:
 
         {
+            "section_sname": [snake_case name of section],
             "display": "hidden"/"incomplete"/"complete",
             "completed": [bool],
             "completed_by": [email],
             "completed_date": [date],
         }
     """
-    sections = sac["sf_sac_sections"]
-    # TODO: remove these once tribal data consent are implemented
-    del sections["tribal_data_consent"]
-    result = {k: None for k in sections}  # type: ignore
-    progress = {
-        "display": None,
-        "completed": None,
-        "completed_by": None,
-        "completed_date": None,
-    }
+    # TODO: remove these once tribal data consent are implemented:
+    del sac["sf_sac_sections"][NC.TRIBAL_DATA_CONSENT]
 
-    cond_keys = _conditional_keys_progress_check(sections)
-    for ckey, cvalue in cond_keys.items():
-        result[ckey] = progress | cvalue
+    # Add the status of the SAR into the list of sections:
+    sac["sf_sac_sections"][NC.SINGLE_AUDIT_REPORT] = bool(sar)
 
-    mandatory_keys = _mandatory_keys_progress_check(sections, cond_keys)
-    for mkey, mvalue in mandatory_keys.items():
-        result[mkey] = progress | mvalue
+    result = {k: None for k in sac["sf_sac_sections"]}
 
-    sar_progress = {
-        "display": "complete" if bool(sar) else "incomplete",
-        "completed": bool(sar),
-    }
+    for key in sac["sf_sac_sections"]:
+        result = result | progress_check(sac["sf_sac_sections"], key)
 
-    result["single_audit_report"] = progress | sar_progress  # type: ignore
+    incomplete_sections = []
+    for k in result:
+        if result[k].get("display") == "incomplete":
+            incomplete_sections.append(find_section_by_name(k).friendly)
 
-    complete = False
-
-    def cond_pass(cond_key):
-        passing = ("hidden", "complete")
-        return result.get(cond_key, {}).get("display") in passing
-
-    error_keys = (
-        list(mandatory_keys.keys()) + list(cond_keys.keys()) + ["single_audit_report"]
-    )
-
-    # Need this to return useful errors in cross-validation:
-    incomplete_sections = [
-        k for k in error_keys if result[k].get("display") == "incomplete"
-    ]
-
-    if all(bool(sections[k]) for k in mandatory_keys):
-        if all(cond_pass(j) for j in cond_keys):
-            complete = True
-
-    result["complete"] = complete  # type: ignore
+    result["complete"] = len(incomplete_sections) == 0
 
     if not crossval:
-        return result  # return the cross-validation shape
+        return result  # return the submission progress shape.
 
-    if complete:
+    if result["complete"]:
         return []
 
     return [
@@ -91,41 +66,51 @@ def submission_progress_check(sac, sar=None, crossval=True):
     ]
 
 
-def _conditional_keys_progress_check(sections):
+def progress_check(sections, key):
     """
-    Support function for submission_progress_check; handles the conditional sections.
+    Given the content of sf_sac_sections from sac_validation_shape (plus a
+    single_audit_report key) and a key, determine whether that key is required, and
+    return a dictionary containing that key with its progress as the value.
     """
-    general_info = sections.get("general_information") or {}
-    conditional_keys = {
-        "additional_ueis": general_info.get("multiple_ueis_covered"),
-        # Update once we have the question in. This may be handled in the gen info form rather than as a workbook.
-        "additional_eins": general_info.get("multiple_eins_covered"),
-        "secondary_auditors": general_info.get(
-            "secondary_auditors_exist"
-        ),  # update this once we have the question in.
+
+    def get_num_findings(award):
+        if program := award.get("program"):
+            if findings := program.get("number_of_audit_findings", 0):
+                return int(findings)
+        return 0
+
+    progress = {
+        "display": None,
+        "completed": None,
+        "completed_by": None,
+        "completed_date": None,
+        "section_name": key,
     }
-    output = {}
-    for key, value in conditional_keys.items():
-        current = "incomplete"
-        if not value:
-            current = "hidden"
-        elif sections.get(key):
-            current = "complete"
-        info = {"display": current, "completed": current == "complete"}
-        output[key] = info
-    return output
+    awards = {}
+    if sections[NC.FEDERAL_AWARDS]:
+        awards = sections.get(NC.FEDERAL_AWARDS, {}).get(NC.FEDERAL_AWARDS, [])
+    general_info = sections.get(NC.GENERAL_INFORMATION, {}) or {}
+    num_findings = sum(get_num_findings(award) for award in awards)
+    conditions = {
+        NC.GENERAL_INFORMATION: True,
+        NC.AUDIT_INFORMATION: True,
+        NC.FEDERAL_AWARDS: True,
+        NC.NOTES_TO_SEFA: True,
+        NC.FINDINGS_UNIFORM_GUIDANCE: num_findings > 0,
+        NC.FINDINGS_TEXT: num_findings > 0,
+        NC.CORRECTIVE_ACTION_PLAN: num_findings > 0,
+        NC.ADDITIONAL_UEIS: bool(general_info.get("multiple_ueis_covered")),
+        NC.ADDITIONAL_EINS: bool(general_info.get("multiple_eins_covered")),
+        NC.SECONDARY_AUDITORS: bool(general_info.get("secondary_auditors_exist")),
+        NC.SINGLE_AUDIT_REPORT: True,
+    }
 
+    # If it's not required, it's inactive:
+    if not conditions[key]:
+        return {key: progress | {"display": "inactive"}}
 
-def _mandatory_keys_progress_check(sections, conditional_keys):
-    """
-    Support function for submission_progress_check; handles the mandatory sections.
-    """
-    other_keys = [k for k in sections if k not in conditional_keys]
-    output = {}
-    for k in other_keys:
-        if bool(sections[k]):
-            info = {"display": "complete", "completed": True}
-        else:
-            info = {"display": "incomplete", "completed": False}
-        output[k] = info
-    return output
+    # If it is required, it should be present
+    if sections.get(key):
+        return {key: progress | {"display": "complete", "completed": True}}
+
+    return {key: progress | {"display": "incomplete", "completed": False}}

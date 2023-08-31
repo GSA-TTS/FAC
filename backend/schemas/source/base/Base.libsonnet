@@ -180,6 +180,7 @@ local Enum = {
     enum: [
       'program-specific',
       'single-audit',
+      'alternative-compliance-engagement',
     ],
     title: 'AuditType',
   },
@@ -240,7 +241,7 @@ local e164_regex = '^\\+[0-9]{1,3}[ ]*[0-9]{2,3}[ ]*[0-9]{2,3}[ ]*[0-9]{4}|^\\+[
 local email_regex = "^[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?\\.)+[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?$";
 
 
-local REGEX_ZIPCODE = '^[0-9]{5}(?:-[0-9]{4})?$';
+local REGEX_ZIPCODE = '^[0-9]{5}(?:[0-9]{4})?$';
 local REGEX_DBKEY = '[1-9][0-9]+';
 local REGEX_MONTHS_OTHER = '^0[0-9]|1[0-8]$';
 local type_zipcode = Types.string {
@@ -297,12 +298,12 @@ local Compound = {
   PriorReferences: Types.string {
     title: 'PriorReferences',
     description: 'Prior references',
-    pattern: '^20[2-9][0-9]-[0-9]{3}(,\\s*20[2-9][0-9]-[0-9]{3})*$',
+    pattern: '^20[1-9][0-9]-[0-9]{3}(,\\s*20[1-9][0-9]-[0-9]{3})*$',
   },
   ReferenceNumber: Types.string {
     title: 'ReferenceNumber',
     description: 'Reference Number',
-    pattern: '^20[2-9][0-9]-[0-9]{3}$',
+    pattern: '^20[1-9][0-9]-[0-9]{3}$',
   },
   ComplianceRequirement: {
     title: 'ComplianceRequirement',
@@ -347,25 +348,29 @@ local SchemaBase = Types.object {
   Meta: Meta,
   Enum: Enum,
   Compound: Compound {
-    FederalProgramNames: {
+    FederalProgramNames: Types.string {
       description: 'All Federal program names',
       enum: FederalProgramNames.program_names,
     },
-    AllALNNumbers: {
+    AllALNNumbers: Types.string {
       description: 'All program numbers',
       enum: FederalProgramNames.all_alns,
     },
-    ClusterNames: {
+    ClusterNames: Types.string {
       description: 'All cluster names',
       enum: ClusterNames.cluster_names,
     },
-    ClusterNamesNAStateOther: {
-      description: 'All cluster names',
-      enum: ClusterNames.cluster_names + [Const.NA, Const.OTHER_CLUSTER],
+    ClusterNamesNA: Types.string {
+      description: 'All cluster names + N/A',
+      enum: ClusterNames.cluster_names + [Const.NA],
     },
-    ClusterNamesStateOther: {
+    ClusterNamesNAStateOther: Types.string {
       description: 'All cluster names',
-      enum: ClusterNames.cluster_names + [Const.OTHER_CLUSTER],
+      enum: ClusterNames.cluster_names + [Const.NA, Const.STATE_CLUSTER, Const.OTHER_CLUSTER],
+    },
+    ClusterNamesStateOther: Types.string {
+      description: 'All cluster names',
+      enum: ClusterNames.cluster_names + [Const.STATE_CLUSTER, Const.OTHER_CLUSTER],
     },
     ALNPrefixes: type_aln_prefix,
     ThreeDigitExtension: type_three_digit_extension,
