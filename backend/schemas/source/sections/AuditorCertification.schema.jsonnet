@@ -29,7 +29,7 @@ local AuditorCertification = Types.object {
         auditor_title: Types.string,
         auditor_certification_date_signed: Base.Compound.Date,
       },
-      required: ['auditor_name', 'auditor_title','auditor_certification_date_signed'],
+      required: ['auditor_name', 'auditor_title', 'auditor_certification_date_signed'],
     },
     required: ['auditor_certification', 'auditor_signature'],
   },

@@ -10,82 +10,6 @@
          "title": "AuditPeriod",
          "type": "string"
       },
-      "EIN": {
-         "pattern": "^[0-9]{9}$",
-         "type": [
-            "null",
-            "string"
-         ]
-      },
-      "Phone": {
-         "pattern": "^^(\\+0?1\\s)?\\(?\\d{3}\\)?[\\s.-]?\\d{3}[\\s.-]?\\d{4}$",
-         "type": "string"
-      },
-      "State": {
-         "enum": [
-            "AL",
-            "AK",
-            "AS",
-            "AZ",
-            "AR",
-            "CA",
-            "CO",
-            "CT",
-            "DE",
-            "DC",
-            "FM",
-            "FL",
-            "GA",
-            "GU",
-            "HI",
-            "ID",
-            "IL",
-            "IN",
-            "IA",
-            "KS",
-            "KY",
-            "LA",
-            "ME",
-            "MH",
-            "MD",
-            "MA",
-            "MI",
-            "MN",
-            "MS",
-            "MO",
-            "MT",
-            "NE",
-            "NV",
-            "NH",
-            "NJ",
-            "NM",
-            "NY",
-            "NC",
-            "ND",
-            "MP",
-            "OH",
-            "OK",
-            "OR",
-            "PW",
-            "PA",
-            "PR",
-            "RI",
-            "SC",
-            "SD",
-            "TN",
-            "TX",
-            "UT",
-            "VT",
-            "VI",
-            "VA",
-            "WA",
-            "WV",
-            "WI",
-            "WY"
-         ],
-         "title": "State",
-         "type": "string"
-      },
       "UEI": {
          "allOf": [
             {
@@ -184,7 +108,14 @@
    "metamodel_version": "1.7.0",
    "properties": {
       "audit_period_covered": {
-         "$ref": "#/$defs/AuditPeriod"
+         "description": "Period type of audit being submitted",
+         "enum": [
+            "annual",
+            "biennial",
+            "other"
+         ],
+         "title": "AuditPeriod",
+         "type": "string"
       },
       "audit_period_other_months": {
          "type": "string"
@@ -228,22 +159,99 @@
          "type": "string"
       },
       "auditee_name": {
-         "type": [
-            "string",
-            "null"
-         ]
+         "maxLength": 100,
+         "type": "string"
       },
       "auditee_phone": {
-         "$ref": "#/$defs/Phone"
+         "pattern": "^^(\\+0?1\\s)?\\(?\\d{3}\\)?[\\s.-]?\\d{3}[\\s.-]?\\d{4}$",
+         "type": "string"
       },
       "auditee_state": {
-         "$ref": "#/$defs/State"
+         "enum": [
+            "AL",
+            "AK",
+            "AS",
+            "AZ",
+            "AR",
+            "CA",
+            "CO",
+            "CT",
+            "DE",
+            "DC",
+            "FM",
+            "FL",
+            "GA",
+            "GU",
+            "HI",
+            "ID",
+            "IL",
+            "IN",
+            "IA",
+            "KS",
+            "KY",
+            "LA",
+            "ME",
+            "MH",
+            "MD",
+            "MA",
+            "MI",
+            "MN",
+            "MS",
+            "MO",
+            "MT",
+            "NE",
+            "NV",
+            "NH",
+            "NJ",
+            "NM",
+            "NY",
+            "NC",
+            "ND",
+            "MP",
+            "OH",
+            "OK",
+            "OR",
+            "PW",
+            "PA",
+            "PR",
+            "RI",
+            "SC",
+            "SD",
+            "TN",
+            "TX",
+            "UT",
+            "VT",
+            "VI",
+            "VA",
+            "WA",
+            "WV",
+            "WI",
+            "WY"
+         ],
+         "title": "State",
+         "type": "string"
       },
       "auditee_uei": {
-         "$ref": "#/$defs/UEI"
+         "allOf": [
+            {
+               "maxLength": 12,
+               "minLength": 12
+            },
+            {
+               "pattern": "^[A-HJ-NP-Z1-9][A-HJ-NP-Z0-9]+$"
+            },
+            {
+               "pattern": "^(?![A-HJ-NP-Z1-9]+[A-HJ-NP-Z0-9]*?[0-9]{9})[A-HJ-NP-Z0-9]*$"
+            },
+            {
+               "pattern": "^(?![0-9]{9})"
+            }
+         ],
+         "type": "string"
       },
       "auditee_zip": {
-         "$ref": "#/$defs/Zip"
+         "pattern": "^[0-9]{5}(?:[0-9]{4})?$",
+         "type": "string"
       },
       "auditor_address_line_1": {
          "maxLength": 100,
@@ -266,13 +274,11 @@
          "type": "string"
       },
       "auditor_ein": {
-         "$ref": "#/$defs/EIN"
+         "pattern": "^[0-9]{9}$",
+         "type": "string"
       },
       "auditor_ein_not_an_ssn_attestation": {
-         "type": [
-            "boolean",
-            "null"
-         ]
+         "type": "boolean"
       },
       "auditor_email": {
          "format": "email",
@@ -281,23 +287,88 @@
       "auditor_firm_name": {
          "type": "string"
       },
+      "auditor_foreign_address": {
+         "type": "string"
+      },
       "auditor_phone": {
-         "$ref": "#/$defs/Phone"
+         "pattern": "^^(\\+0?1\\s)?\\(?\\d{3}\\)?[\\s.-]?\\d{3}[\\s.-]?\\d{4}$",
+         "type": "string"
       },
       "auditor_state": {
-         "$ref": "#/$defs/State"
+         "enum": [
+            "AL",
+            "AK",
+            "AS",
+            "AZ",
+            "AR",
+            "CA",
+            "CO",
+            "CT",
+            "DE",
+            "DC",
+            "FM",
+            "FL",
+            "GA",
+            "GU",
+            "HI",
+            "ID",
+            "IL",
+            "IN",
+            "IA",
+            "KS",
+            "KY",
+            "LA",
+            "ME",
+            "MH",
+            "MD",
+            "MA",
+            "MI",
+            "MN",
+            "MS",
+            "MO",
+            "MT",
+            "NE",
+            "NV",
+            "NH",
+            "NJ",
+            "NM",
+            "NY",
+            "NC",
+            "ND",
+            "MP",
+            "OH",
+            "OK",
+            "OR",
+            "PW",
+            "PA",
+            "PR",
+            "RI",
+            "SC",
+            "SD",
+            "TN",
+            "TX",
+            "UT",
+            "VT",
+            "VI",
+            "VA",
+            "WA",
+            "WV",
+            "WI",
+            "WY"
+         ],
+         "title": "State",
+         "type": "string"
       },
       "auditor_zip": {
-         "$ref": "#/$defs/Zip"
+         "pattern": "^[0-9]{5}(?:[0-9]{4})?$",
+         "type": "string"
       },
       "ein": {
-         "$ref": "#/$defs/EIN"
+         "pattern": "^[0-9]{9}$",
+         "type": "string"
       },
       "ein_not_an_ssn_attestation": {
-         "type": [
-            "boolean",
-            "null"
-         ]
+         "type": "boolean"
       },
       "is_usa_based": {
          "type": "boolean"
@@ -306,28 +377,65 @@
          "type": "boolean"
       },
       "multiple_eins_covered": {
-         "type": [
-            "boolean",
-            "null"
-         ]
+         "type": "boolean"
       },
       "multiple_ueis_covered": {
-         "type": [
-            "boolean",
-            "null"
-         ]
+         "type": "boolean"
       },
       "secondary_auditors_exist": {
-         "type": [
-            "boolean",
-            "null"
-         ]
+         "type": "boolean"
       },
       "user_provided_organization_type": {
-         "$ref": "#/$defs/UserProvidedOrganizationType"
+         "description": "Org type",
+         "enum": [
+            "state",
+            "local",
+            "tribal",
+            "higher-ed",
+            "non-profit",
+            "unknown",
+            "none"
+         ],
+         "title": "OrganizationType",
+         "type": "string"
       }
    },
-   "required": [ ],
+   "required": [
+      "auditee_contact_name",
+      "auditee_email",
+      "auditee_name",
+      "auditee_phone",
+      "auditee_contact_title",
+      "auditee_address_line_1",
+      "auditee_city",
+      "auditee_state",
+      "ein",
+      "auditee_uei",
+      "auditee_zip",
+      "auditor_phone",
+      "auditor_state",
+      "auditor_city",
+      "auditor_contact_title",
+      "auditor_address_line_1",
+      "auditor_zip",
+      "auditor_country",
+      "auditor_contact_name",
+      "auditor_email",
+      "auditor_firm_name",
+      "auditor_ein",
+      "auditee_fiscal_period_start",
+      "auditee_fiscal_period_end",
+      "audit_type",
+      "user_provided_organization_type",
+      "audit_period_covered",
+      "multiple_eins_covered",
+      "multiple_ueis_covered",
+      "secondary_auditors_exist",
+      "met_spending_threshold",
+      "is_usa_based",
+      "ein_not_an_ssn_attestation",
+      "auditor_ein_not_an_ssn_attestation"
+   ],
    "title": "GeneralInformation",
    "type": "object",
    "version": null

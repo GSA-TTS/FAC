@@ -51,19 +51,26 @@
                "type": "string"
             },
             "auditee_name": {
+               "minimum": 1,
                "type": "string"
             },
             "auditee_title": {
+               "minimum": 1,
                "type": "string"
             }
          },
          "required": [
             "auditee_name",
-            "auditee_title"
+            "auditee_title",
+            "auditee_certification_date_signed"
          ],
          "type": "object"
       }
    },
+   "required": [
+      "auditee_certification",
+      "auditee_signature"
+   ],
    "title": "AuditeeCertification",
    "type": "object"
 }

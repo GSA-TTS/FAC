@@ -8612,8 +8612,10 @@
                      "findings",
                      "other_matters",
                      "material_weakness",
+                     "modified_opinion",
                      "significant_deficiency",
-                     "other_findings"
+                     "other_findings",
+                     "questioned_costs"
                   ]
                },
                "type": "array"

@@ -176,7 +176,8 @@
                            }
                         },
                         "required": [
-                           "cluster_name"
+                           "cluster_name",
+                           "cluster_total"
                         ],
                         "type": "object"
                      },

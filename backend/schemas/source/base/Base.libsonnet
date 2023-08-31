@@ -368,16 +368,6 @@ local Compound = {
     description: 'MM/DD/YYYY',
     pattern: '^[0-9]{2}/[0-9]{2}/[0-9]{4}$',
   },
-  ComplianceRequirement: {
-    title: 'ComplianceRequirement',
-    description: 'Compliance requirement type',
-    pattern: '^A?B?C?E?F?G?H?I?J?L?M?N?P?$',
-  },
-  Date: Types.string {
-    title: 'Date',
-    description: 'MM/DD/YYYY',
-    pattern: '^[0-9]{2}/[0-9]{2}/[0-9]{4}$',
-  },
   NonEmptyString: Types.string {
     minLength: 1,
   },

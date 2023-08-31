@@ -47,10 +47,15 @@
          },
          "required": [
             "auditor_name",
-            "auditor_title"
+            "auditor_title",
+            "auditor_certification_date_signed"
          ],
          "type": "object"
-      }
+      },
+      "required": [
+         "auditor_certification",
+         "auditor_signature"
+      ]
    },
    "title": "AuditorCertification",
    "type": "object"
