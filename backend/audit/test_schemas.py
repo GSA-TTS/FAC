@@ -775,7 +775,7 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
                 "audit_report_type": "U",
                 "number_of_audit_findings": 0,
                 "amount_expended": 42,
-                "federal_program_total": 94949
+                "federal_program_total": 94949,
             }
         }
         simple_case["FederalAwards"]["federal_awards"] = [both_pass]

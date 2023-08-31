@@ -19,7 +19,6 @@ from config.settings import (
 )
 from audit.fixtures.excel import FORM_SECTIONS, UNKNOWN_WORKBOOK
 
-from audit.cross_validation import sac_validation_shape, submission_progress_check
 from audit.excel import (
     extract_additional_ueis,
     extract_additional_eins,

@@ -270,23 +270,14 @@ class IntakeToDisseminationTests(TestCase):
         self.assertEqual(self.report_id, general.report_id)
 
     def test_load_award_before_general_should_fail(self):
-<<<<<<< HEAD:backend/audit/test_intake_to_dissemination.py
         self.intake_to_dissemination.load_federal_award()
-=======
-        self.etl.load_federal_award()
->>>>>>> main:backend/audit/test_etl.py
         federal_awards = FederalAward.objects.all()
         self.assertEqual(len(federal_awards), 0)
 
     def test_load_federal_award(self):
-<<<<<<< HEAD:backend/audit/test_intake_to_dissemination.py
         self.intake_to_dissemination.load_federal_award()
         self.intake_to_dissemination.save_dissemination_objects()
         self.intake_to_dissemination.load_general()
-=======
-        self.etl.load_general()
-        self.etl.load_federal_award()
->>>>>>> main:backend/audit/test_etl.py
         federal_awards = FederalAward.objects.all()
         self.assertEqual(len(federal_awards), 1)
         federal_award = federal_awards.first()
