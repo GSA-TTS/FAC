@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block content %}
+    <div class="grid-container grid-row margin-y-15">
+        <div class="tablet:grid-col-10 tablet:grid-offset-1">
+            <h1 class="font-sans-2xl">404 Error: Not Found</h1>
+            <div class="font-sans-lg">
+                <p>We can't find the page you are looking for.</p>
+                <p>Try returning to the previous page.</p>
+            </div>
+            {% if exception %}<p class="text-base">Error code: {{ exception }}</p>{% endif %}
+        </div>
+    </div>
+{% endblock content %}

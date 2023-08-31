@@ -23,6 +23,20 @@ local Validations = {
         },
       },
       'then': {
+        oneOf: [
+          {
+            properties: {
+              loan_balance_at_audit_period_end: Types.integer {
+                minimum: 1,
+              },
+            },
+          },
+          {
+            properties: {
+              loan_balance_at_audit_period_end: Base.Enum.NA,
+            },
+          },
+        ],
         required: ['loan_balance_at_audit_period_end'],
       },
     },

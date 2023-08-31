@@ -1,5 +1,6 @@
 import { testCrossValidation } from '../support/cross-validation.js';
 import { testLoginGovLogin } from '../support/login-gov.js';
+import { testLogoutGov } from '../support/logout-gov.js';
 import { testValidAccess } from '../support/check-access.js';
 import { testValidEligibility } from '../support/check-eligibility.js';
 import { testValidAuditeeInfo } from '../support/auditee-info.js';
@@ -8,12 +9,19 @@ import { testAuditInformationForm } from '../support/audit-info-form.js';
 import { testPdfAuditReport } from '../support/report-pdf.js';
 import { testAuditorCertification } from '../support/auditor-certification.js';
 import { testAuditeeCertification } from '../support/auditee-certification.js';
-import { testWorkbookFederalAwards,
-         testWorkbookNotesToSEFA,
-         testWorkbookFindingsUniformGuidance,
-         testWorkbookFindingsText,
-         testWorkbookCorrectiveActionPlan,
-         testWorkbookAdditionalUEIs } from '../support/workbook-uploads.js';
+import {
+  testWorkbookFederalAwards,
+  testWorkbookNotesToSEFA,
+  testWorkbookFindingsUniformGuidance,
+  testWorkbookFindingsText,
+  testWorkbookCorrectiveActionPlan,
+  testWorkbookAdditionalUEIs,
+  testWorkbookSecondaryAuditors
+} from '../support/workbook-uploads.js';
+
+const LOGIN_TEST_EMAIL_AUDITEE = Cypress.env('LOGIN_TEST_EMAIL_AUDITEE');
+const LOGIN_TEST_PASSWORD_AUDITEE = Cypress.env('LOGIN_TEST_PASSWORD_AUDITEE');
+const LOGIN_TEST_OTP_SECRET_AUDITEE = Cypress.env('LOGIN_TEST_OTP_SECRET_AUDITEE');
 
 describe('Full audit submission', () => {
   before(() => {
@@ -72,28 +80,49 @@ describe('Full audit submission', () => {
     cy.get(".usa-link").contains("Additional UEIs").click();
     testWorkbookAdditionalUEIs(false);
 
+    cy.get(".usa-link").contains("Secondary Auditors").click();
+    testWorkbookSecondaryAuditors(false);
+    
+    //uncomment this once there is a valid Additional EINs workbook & import testWorkbookAdditionalEINs
+    /*cy.get(".usa-link").contains("Additional EINs").click();
+    testWorkbookAdditionalEINs(false);*/
+    
     // Complete the audit information form
-    cy.get(".usa-link").contains("Audit Information Form").click();
+    cy.get(".usa-link").contains("Audit Information form").click();
     testAuditInformationForm();
 
     cy.get(".usa-link").contains("Pre-submission validation").click();
     testCrossValidation();
 
-    // Second, auditor certification
+    // Auditor certification
     cy.get(".usa-link").contains("Auditor Certification").click();
     testAuditorCertification();
 
-    // Third, auditee certification
-    cy.get(".usa-link").contains("Auditee Certification").click();
-    testAuditeeCertification();
-    // The same as auditor certification, with different checkboxes.
+    // Auditee certification
+    cy.url().then(url => {
+      // Grab the report ID from the URL
+      const reportId = url.split('/').pop();
+
+      testLogoutGov();
+
+      // Login as Auditee
+      testLoginGovLogin(
+        LOGIN_TEST_EMAIL_AUDITEE,
+        LOGIN_TEST_PASSWORD_AUDITEE,
+        LOGIN_TEST_OTP_SECRET_AUDITEE
+      );
+
+      cy.visit(`/audit/submission-progress/${reportId}`);
+
+      cy.get(".usa-link").contains("Auditee Certification").click();
+      testAuditeeCertification();
+    })
 
     // Uncomment this block when ready to implement the certification steps.
     /*
     // Finally, submit for processing.
     cy.get(".usa-link").contains("Submit to the FAC for processing").click();
     // This will probably take you back to the homepage, where the audit is now oof status "submitted".
-
     */
   });
 });

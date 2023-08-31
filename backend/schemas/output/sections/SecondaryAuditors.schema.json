@@ -162,6 +162,7 @@
                   ],
                   "title": "SecondaryAuditorsEntry"
                },
+               "minContains": 0,
                "type": "array"
             }
          },

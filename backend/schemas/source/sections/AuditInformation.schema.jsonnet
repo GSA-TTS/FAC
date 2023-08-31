@@ -26,6 +26,76 @@ local AuditInformation = Types.object {
       items: Base.Compound.ALNPrefixes,
     },
   },
+  allOf: [
+    {
+      'if': {
+        properties: {
+          gaap_results: {
+            contains: {
+              const: 'not_gaap',
+            },
+          },
+        },
+      },
+      'then': {
+        required: ['is_sp_framework_required', 'sp_framework_basis', 'sp_framework_opinions'],
+      },
+    },
+    {
+      'if': {
+        properties: {
+          gaap_results: {
+            not: {
+              contains: {
+                const: 'not_gaap',
+              },
+            },
+          },
+        },
+      },
+      'then': {
+        not: {
+          required: ['is_sp_framework_required'],
+        },
+      },
+    },
+    {
+      'if': {
+        properties: {
+          gaap_results: {
+            not: {
+              contains: {
+                const: 'not_gaap',
+              },
+            },
+          },
+        },
+      },
+      'then': {
+        not: {
+          required: ['sp_framework_basis'],
+        },
+      },
+    },
+    {
+      'if': {
+        properties: {
+          gaap_results: {
+            not: {
+              contains: {
+                const: 'not_gaap',
+              },
+            },
+          },
+        },
+      },
+      'then': {
+        not: {
+          required: ['sp_framework_opinions'],
+        },
+      },
+    },
+  ],
   required: [
     'dollar_threshold',
     'gaap_results',

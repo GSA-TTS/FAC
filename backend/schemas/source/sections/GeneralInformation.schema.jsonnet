@@ -14,6 +14,11 @@ local Types = Base.Types;
   additionalProperties: false,
   metamodel_version: '1.7.0',
   properties: {
+    audit_type: Base.Enum.AuditType,
+    audit_period_covered: {
+      '$ref': '#/$defs/AuditPeriod',
+    },
+    audit_period_other_months: Types.string,
     auditee_address_line_1: Types.string {
       maxLength: 100,
     },
