@@ -1,6 +1,9 @@
 version: "3.7"
 
 services:
+  #---------------------------------------------
+  # Postgres DB
+  #---------------------------------------------
   db:
     image: "postgres:12"
     environment:
@@ -9,16 +12,29 @@ services:
       - postgres-data:/var/lib/postgresql/data/
     ports:
       - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d postgres -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
 
+  #---------------------------------------------
+  # Django app
+  #---------------------------------------------
   web:
     build:
       context: .
       dockerfile: "./${DOCKERFILE:-Dockerfile}"
     command: /src/run.sh
     depends_on:
-      - db
-      - minio
-      - api
+      db:
+        condition: service_healthy
+      minio:
+        condition: service_started
+      clamav-rest:
+        condition: service_started
+      api:
+        condition: service_started
     environment:
       DATABASE_URL: postgres://postgres@db/postgres
       POSTGREST_URL: http://api:3000
@@ -42,16 +58,21 @@ services:
       - .:/src
       - /src/node_modules
       - /src/staticfiles
-    stdin_open: true
-    tty: true
+
+  #---------------------------------------------
+  # ClamAV virus scanner
+  #---------------------------------------------
   clamav-rest:
-    # image: clamav/clamav
     image: ghcr.io/gsa-tts/fac/clamav:latest
     environment:
       MAX_FILE_SIZE: 25M
       SIGNATURE_CHECKS: 1
     ports:
       - "9000:9000"
+
+  #---------------------------------------------
+  # Minio (S3 clone)
+  #---------------------------------------------
   minio:
     container_name: "minio"
     image: minio/minio
@@ -61,8 +82,11 @@ services:
       - "9002:9002"
     volumes:
       - "minio-vol:/tmp/minio"
+
+  #---------------------------------------------
+  # PostgREST API provider
+  #---------------------------------------------
   api:
-    # image: postgrest/postgrest
     image: ghcr.io/gsa-tts/fac/postgrest:latest
     ports:
       - "3000:3000"
@@ -75,7 +99,8 @@ services:
       PGRST_DB_SCHEMAS: "api_v1_0_0_beta"
       PGRST_JWT_SECRET: ${PGRST_JWT_SECRET:-32_chars_fallback_secret_testing} # Fallback value for testing environments
     depends_on:
-      - db
+      db:
+        condition: service_healthy
 volumes:
   postgres-data:
   minio-vol:
