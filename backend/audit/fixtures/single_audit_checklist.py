@@ -223,8 +223,13 @@ def load_single_audit_checklists():
         _load_single_audit_checklists_for_user(user)
 
 
-def load_single_audit_checklists_for_email_address(user_email):
+def load_single_audit_checklists_for_email_address(user_email, workbooks=None):
     """Load example SACs for user with this email address."""
+    # Unfinished code for handling specific workbooks was checked into the
+    # load_fixtures command; this handles the additional argument so that in
+    # future that work can be wired in.
+    if workbooks is None:
+        workbooks = []
 
     try:
         user = User.objects.get(email=user_email)
