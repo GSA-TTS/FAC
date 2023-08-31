@@ -47,6 +47,7 @@ from audit.models import (
     LateChangeError,
     SingleAuditChecklist,
     SingleAuditReportFile,
+    SubmissionEvent,
 )
 from audit.utils import ExcelExtractionError
 from audit.validators import (
@@ -186,6 +187,18 @@ class ExcelFileHandlerView(SingleAuditChecklistAccessRequiredMixin, generic.View
         excel_file.full_clean()
         return excel_file
 
+    def _event_type(self, form_section):
+        return {
+            FORM_SECTIONS.ADDITIONAL_EINS: SubmissionEvent.EventType.ADDITIONAL_EINS_UPDATED,
+            FORM_SECTIONS.ADDITIONAL_UEIS: SubmissionEvent.EventType.ADDITIONAL_UEIS_UPDATED,
+            FORM_SECTIONS.CORRECTIVE_ACTION_PLAN: SubmissionEvent.EventType.CORRECTIVE_ACTION_PLAN_UPDATED,
+            FORM_SECTIONS.FEDERAL_AWARDS_EXPENDED: SubmissionEvent.EventType.FEDERAL_AWARDS_UPDATED,
+            FORM_SECTIONS.FINDINGS_TEXT: SubmissionEvent.EventType.FEDERAL_AWARDS_AUDIT_FINDINGS_TEXT_UPDATED,
+            FORM_SECTIONS.FINDINGS_UNIFORM_GUIDANCE: SubmissionEvent.EventType.FINDINGS_UNIFORM_GUIDANCE_UPDATED,
+            FORM_SECTIONS.NOTES_TO_SEFA: SubmissionEvent.EventType.NOTES_TO_SEFA_UPDATED,
+            FORM_SECTIONS.SECONDARY_AUDITORS: SubmissionEvent.EventType.SECONDARY_AUDITORS_UPDATED,
+        }[form_section]
+
     def _extract_and_validate_data(self, form_section, excel_file):
         handler_info = self.FORM_SECTION_HANDLERS.get(form_section)
         if handler_info is None:
@@ -224,7 +237,9 @@ class ExcelFileHandlerView(SingleAuditChecklistAccessRequiredMixin, generic.View
 
             excel_file = self._create_excel_file(file, sac.id, form_section)
 
-            excel_file.save()
+            excel_file.save(
+                event_user=request.user, event_type=self._event_type(form_section)
+            )
 
             audit_data = self._extract_and_validate_data(form_section, excel_file)
 
@@ -285,7 +300,10 @@ class SingleAuditReportFileHandlerView(
             )
 
             sar_file.full_clean()
-            sar_file.save()
+            sar_file.save(
+                event_user=request.user,
+                event_type=SubmissionEvent.EventType.AUDIT_REPORT_PDF_UPDATED,
+            )
 
             return redirect("/")
 
@@ -355,7 +373,10 @@ class ReadyForCertificationView(SingleAuditChecklistAccessRequiredMixin, generic
             errors = sac.validate_full()
             if not errors:
                 sac.transition_to_ready_for_certification()
-                sac.save()
+                sac.save(
+                    event_user=request.user,
+                    event_type=SubmissionEvent.EventType.LOCKED_FOR_CERTIFICATION,
+                )
                 return redirect(reverse("audit:SubmissionProgress", args=[report_id]))
 
             context = {"report_id": report_id, "errors": errors}
@@ -490,7 +511,10 @@ class AuditorCertificationStep2View(CertifyingAuditorRequiredMixin, generic.View
                 validated = validate_auditor_certification_json(auditor_certification)
                 sac.auditor_certification = validated
                 sac.transition_to_auditor_certified()
-                sac.save()
+                sac.save(
+                    event_user=request.user,
+                    event_type=SubmissionEvent.EventType.AUDITOR_CERTIFICATION_COMPLETED,
+                )
                 logger.info("Auditor certification saved.", auditor_certification)
                 return redirect(reverse("audit:SubmissionProgress", args=[report_id]))
 
@@ -624,7 +648,10 @@ class AuditeeCertificationStep2View(CertifyingAuditeeRequiredMixin, generic.View
                 validated = validate_auditee_certification_json(auditee_certification)
                 sac.auditee_certification = validated
                 sac.transition_to_auditee_certified()
-                sac.save()
+                sac.save(
+                    event_user=request.user,
+                    event_type=SubmissionEvent.EventType.AUDITEE_CERTIFICATION_COMPLETED,
+                )
                 logger.info("Auditee certification saved.", auditee_certification)
                 return redirect(reverse("audit:SubmissionProgress", args=[report_id]))
 
@@ -689,7 +716,9 @@ class SubmissionView(CertifyingAuditeeRequiredMixin, generic.View):
             sac = SingleAuditChecklist.objects.get(report_id=report_id)
 
             sac.transition_to_submitted()
-            sac.save()
+            sac.save(
+                event_user=request.user, event_type=SubmissionEvent.EventType.SUBMITTED
+            )
 
             return redirect(reverse("audit:MySubmissions"))
 
@@ -773,7 +802,10 @@ class AuditInfoFormView(SingleAuditChecklistAccessRequiredMixin, generic.View):
                 validated = validate_audit_information_json(form.cleaned_data)
 
                 sac.audit_information = validated
-                sac.save()
+                sac.save(
+                    event_user=request.user,
+                    event_type=SubmissionEvent.EventType.AUDIT_INFORMATION_UPDATED,
+                )
                 return redirect(reverse("audit:SubmissionProgress", args=[report_id]))
             else:
                 for field, errors in form.errors.items():

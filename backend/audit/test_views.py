@@ -36,7 +36,7 @@ from .fixtures.single_audit_checklist import (
     fake_auditor_certification,
     fake_auditee_certification,
 )
-from .models import Access, SingleAuditChecklist, SingleAuditReportFile
+from .models import Access, SingleAuditChecklist, SingleAuditReportFile, SubmissionEvent
 from .views import MySubmissions
 
 User = get_user_model()
@@ -249,6 +249,16 @@ class SubmissionStatusTests(TestCase):
 
         self.assertEqual(data[0]["submission_status"], "ready_for_certification")
 
+        submission_events = SubmissionEvent.objects.filter(sac=sac)
+
+        # the most recent event should be LOCKED_FOR_CERTIFICATION
+        event_count = len(submission_events)
+        self.assertGreaterEqual(event_count, 1)
+        self.assertEqual(
+            submission_events[event_count - 1].event,
+            SubmissionEvent.EventType.LOCKED_FOR_CERTIFICATION,
+        )
+
     def test_auditor_certification(self):
         """
         Test that certifying auditor contacts can provide auditor certification
@@ -277,6 +287,16 @@ class SubmissionStatusTests(TestCase):
         updated_sac = SingleAuditChecklist.objects.get(report_id=sac.report_id)
 
         self.assertEqual(updated_sac.submission_status, "auditor_certified")
+
+        submission_events = SubmissionEvent.objects.filter(sac=sac)
+
+        # the most recent event should be AUDITOR_CERTIFICATION_COMPLETED
+        event_count = len(submission_events)
+        self.assertGreaterEqual(event_count, 1)
+        self.assertEqual(
+            submission_events[event_count - 1].event,
+            SubmissionEvent.EventType.AUDITOR_CERTIFICATION_COMPLETED,
+        )
 
     def test_auditee_certification(self):
         """
@@ -307,6 +327,16 @@ class SubmissionStatusTests(TestCase):
 
         self.assertEqual(updated_sac.submission_status, "auditee_certified")
 
+        submission_events = SubmissionEvent.objects.filter(sac=sac)
+
+        # the most recent event should be AUDITEE_CERTIFICATION_COMPLETED
+        event_count = len(submission_events)
+        self.assertGreaterEqual(event_count, 1)
+        self.assertEqual(
+            submission_events[event_count - 1].event,
+            SubmissionEvent.EventType.AUDITEE_CERTIFICATION_COMPLETED,
+        )
+
     def test_submission(self):
         """
         Test that certifying auditee contacts can perform submission
@@ -320,6 +350,16 @@ class SubmissionStatusTests(TestCase):
         updated_sac = SingleAuditChecklist.objects.get(report_id=sac.report_id)
 
         self.assertEqual(updated_sac.submission_status, "submitted")
+
+        submission_events = SubmissionEvent.objects.filter(sac=sac)
+
+        # the most recent event should be SUBMITTED
+        event_count = len(submission_events)
+        self.assertGreaterEqual(event_count, 1)
+        self.assertEqual(
+            submission_events[event_count - 1].event,
+            SubmissionEvent.EventType.SUBMITTED,
+        )
 
 
 class MockHttpResponse:
@@ -550,6 +590,16 @@ class ExcelFileHandlerViewTests(TestCase):
                     ],
                 )
 
+        submission_events = SubmissionEvent.objects.filter(sac=sac)
+
+        # the most recent event should be FEDERAL_AWARDS_UPDATED
+        event_count = len(submission_events)
+        self.assertGreaterEqual(event_count, 1)
+        self.assertEqual(
+            submission_events[event_count - 1].event,
+            SubmissionEvent.EventType.FEDERAL_AWARDS_UPDATED,
+        )
+
     @patch("audit.validators._scan_file")
     def test_valid_file_upload_for_corrective_action_plan(self, mock_scan_file):
         """When a valid Excel file is uploaded, the file should be stored and the SingleAuditChecklist should be updated to include the uploaded Corrective Action Plan data"""
@@ -615,6 +665,16 @@ class ExcelFileHandlerViewTests(TestCase):
                     corrective_action_plan_entry["reference_number"],
                     test_data[0]["reference_number"],
                 )
+
+        submission_events = SubmissionEvent.objects.filter(sac=sac)
+
+        # the most recent event should be CORRECTIVE_ACTION_PLAN_UPDATED
+        event_count = len(submission_events)
+        self.assertGreaterEqual(event_count, 1)
+        self.assertEqual(
+            submission_events[event_count - 1].event,
+            SubmissionEvent.EventType.CORRECTIVE_ACTION_PLAN_UPDATED,
+        )
 
     @patch("audit.validators._scan_file")
     def test_valid_file_upload_for_findings_uniform_guidance(self, mock_scan_file):
@@ -692,6 +752,16 @@ class ExcelFileHandlerViewTests(TestCase):
                     test_data[0]["modified_opinion"],
                 )
 
+        submission_events = SubmissionEvent.objects.filter(sac=sac)
+
+        # the most recent event should be FINDINGS_UNIFORM_GUIDANCE
+        event_count = len(submission_events)
+        self.assertGreaterEqual(event_count, 1)
+        self.assertEqual(
+            submission_events[event_count - 1].event,
+            SubmissionEvent.EventType.FINDINGS_UNIFORM_GUIDANCE_UPDATED,
+        )
+
     @patch("audit.validators._scan_file")
     def test_valid_file_upload_for_findings_text(self, mock_scan_file):
         """When a valid Excel file is uploaded, the file should be stored and the SingleAuditChecklist should be updated to include the uploaded Findings Text data"""
@@ -755,6 +825,16 @@ class ExcelFileHandlerViewTests(TestCase):
                     findings_entries["reference_number"],
                     test_data[0]["reference_number"],
                 )
+
+        submission_events = SubmissionEvent.objects.filter(sac=sac)
+
+        # the most recent event should be FEDERAL_AWARDS_AUDIT_FINDINGS_TEXT_UPDATED
+        event_count = len(submission_events)
+        self.assertGreaterEqual(event_count, 1)
+        self.assertEqual(
+            submission_events[event_count - 1].event,
+            SubmissionEvent.EventType.FEDERAL_AWARDS_AUDIT_FINDINGS_TEXT_UPDATED,
+        )
 
     @patch("audit.validators._scan_file")
     def test_valid_file_upload_for_secondary_auditors(self, mock_scan_file):
@@ -850,6 +930,16 @@ class ExcelFileHandlerViewTests(TestCase):
                     test_data[0]["secondary_auditor_contact_email"],
                 )
 
+        submission_events = SubmissionEvent.objects.filter(sac=sac)
+
+        # the most recent event should be SECONDARY_AUDITORS_UPDATED
+        event_count = len(submission_events)
+        self.assertGreaterEqual(event_count, 1)
+        self.assertEqual(
+            submission_events[event_count - 1].event,
+            SubmissionEvent.EventType.SECONDARY_AUDITORS_UPDATED,
+        )
+
 
 class SingleAuditReportFileHandlerViewTests(TestCase):
     def test_login_required(self):
@@ -928,6 +1018,16 @@ class SingleAuditReportFileHandlerViewTests(TestCase):
 
             self.assertEqual(response.status_code, 302)
 
+        submission_events = SubmissionEvent.objects.filter(sac=sac)
+
+        # the most recent event should be AUDIT_REPORT_PDF_UPDATED
+        event_count = len(submission_events)
+        self.assertGreaterEqual(event_count, 1)
+        self.assertEqual(
+            submission_events[event_count - 1].event,
+            SubmissionEvent.EventType.AUDIT_REPORT_PDF_UPDATED,
+        )
+
     @patch("audit.validators._scan_file")
     def test_valid_file_upload_for_additional_ueis(self, mock_scan_file):
         """When a valid Excel file is uploaded, the file should be stored and the SingleAuditChecklist should be updated to include the uploaded Additional UEIs data"""
@@ -985,6 +1085,16 @@ class SingleAuditReportFileHandlerViewTests(TestCase):
                     additional_ueis_entries["additional_uei"],
                     test_data[0]["additional_uei"],
                 )
+
+        submission_events = SubmissionEvent.objects.filter(sac=sac)
+
+        # the most recent event should be ADDITIONAL_UEIS_UPDATED
+        event_count = len(submission_events)
+        self.assertGreaterEqual(event_count, 1)
+        self.assertEqual(
+            submission_events[event_count - 1].event,
+            SubmissionEvent.EventType.ADDITIONAL_UEIS_UPDATED,
+        )
 
     @patch("audit.validators._scan_file")
     def test_valid_file_upload_for_additional_eins(self, mock_scan_file):
@@ -1044,6 +1154,16 @@ class SingleAuditReportFileHandlerViewTests(TestCase):
                     test_data[0]["additional_ein"],
                 )
 
+        submission_events = SubmissionEvent.objects.filter(sac=sac)
+
+        # the most recent event should be ADDITIONAL_EINS_UPDATED
+        event_count = len(submission_events)
+        self.assertGreaterEqual(event_count, 1)
+        self.assertEqual(
+            submission_events[event_count - 1].event,
+            SubmissionEvent.EventType.ADDITIONAL_EINS_UPDATED,
+        )
+
     @patch("audit.validators._scan_file")
     def test_valid_file_upload_for_notes_to_sefa(self, mock_scan_file):
         """When a valid Excel file is uploaded, the file should be stored and the SingleAuditChecklist should be updated to include the uploaded Notes to SEFA data"""
@@ -1102,3 +1222,13 @@ class SingleAuditReportFileHandlerViewTests(TestCase):
                     notes_to_sefa_entries["note_title"],
                     test_data[0]["note_title"],
                 )
+
+        submission_events = SubmissionEvent.objects.filter(sac=sac)
+
+        # the most recent event should be NOTES_TO_SEFA_UPDATED
+        event_count = len(submission_events)
+        self.assertGreaterEqual(event_count, 1)
+        self.assertEqual(
+            submission_events[event_count - 1].event,
+            SubmissionEvent.EventType.NOTES_TO_SEFA_UPDATED,
+        )

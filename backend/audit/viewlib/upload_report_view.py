@@ -12,6 +12,7 @@ from audit.models import (
     LateChangeError,
     SingleAuditChecklist,
     SingleAuditReportFile,
+    SubmissionEvent,
 )
 from audit.forms import UploadReportForm
 
@@ -159,7 +160,10 @@ class UploadReportView(SingleAuditChecklistAccessRequiredMixin, generic.View):
                 )
 
                 sar_file.full_clean()
-                sar_file.save()
+                sar_file.save(
+                    event_user=request.user,
+                    event_type=SubmissionEvent.EventType.AUDIT_REPORT_PDF_UPDATED,
+                )
 
                 # PDF issues can be communicated to the user with form.errors["upload_report"]
                 return redirect(reverse("audit:SubmissionProgress", args=[report_id]))
