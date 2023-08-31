@@ -600,7 +600,7 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
 
         simple_case["FederalAwards"]["federal_awards"][0][
             "loan_balance_at_audit_period_end"
-        ] = 10_000
+        ] = "10000"
         self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
     def test_loan_dependents(self):
@@ -615,7 +615,7 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
         both_int_pass = award | {
             "loan_or_loan_guarantee": {
                 "is_guaranteed": "Y",
-                "loan_balance_at_audit_period_end": 10_000,
+                "loan_balance_at_audit_period_end": "10000",
             }
         }
         simple_case["FederalAwards"]["federal_awards"] = [both_int_pass]
@@ -626,7 +626,6 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
             both_na_pass = award | {
                 "loan_or_loan_guarantee": {
                     "is_guaranteed": "N",
-                    "loan_balance_at_audit_period_end": valid,
                 }
             }
             simple_case["FederalAwards"]["federal_awards"] = [both_na_pass]
@@ -639,7 +638,7 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
         self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
         only_dependent_fail = award | {
-            "loan_or_loan_guarantee": {"loan_balance_at_audit_period_end": 10_000}
+            "loan_or_loan_guarantee": {"loan_balance_at_audit_period_end": "10000"}
         }
         simple_case["FederalAwards"]["federal_awards"] = [only_dependent_fail]
 
@@ -655,15 +654,15 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
 
         self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
-        zero_value_fail = award | {
+        # Zero dollars is a valid loan balance.
+        zero_value_pass = award | {
             "loan_or_loan_guarantee": {
                 "is_guaranteed": "Y",
-                "loan_balance_at_audit_period_end": 0,
+                "loan_balance_at_audit_period_end": "0",
             }
         }
-        simple_case["FederalAwards"]["federal_awards"] = [zero_value_fail]
-
-        self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
+        simple_case["FederalAwards"]["federal_awards"] = [zero_value_pass]
+        validate(simple_case, schema)
 
     def test_direct_award_dependents(self):
         """
@@ -769,13 +768,14 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
 
         both_pass = award | {
             "program": {
-                "federal_agency_prefix": "42",
+                "federal_agency_prefix": "62",
                 "three_digit_extension": "123",
                 "program_name": "Bob",
                 "is_major": "Y",
                 "audit_report_type": "U",
                 "number_of_audit_findings": 0,
                 "amount_expended": 42,
+                "federal_program_total": 94949
             }
         }
         simple_case["FederalAwards"]["federal_awards"] = [both_pass]
@@ -784,7 +784,7 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
 
         invalid_fail = award | {
             "program": {
-                "federal_agency_prefix": "42",
+                "federal_agency_prefix": "72",
                 "three_digit_extension": "123",
                 "program_name": "Bob",
                 "is_major": "Y",

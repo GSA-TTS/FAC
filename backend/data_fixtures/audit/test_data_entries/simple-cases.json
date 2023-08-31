@@ -88,17 +88,16 @@
         "federal_awards": [
           {
             "program": {
-              "federal_agency_prefix": "42",
+              "federal_agency_prefix": "52",
               "three_digit_extension": "123",
               "program_name": "Bob",
               "is_major": "N",
-              "audit_report_type": "",
               "number_of_audit_findings": 0,
-              "amount_expended": 42
+              "amount_expended": 42,
+              "federal_program_total": 2000
             },
             "loan_or_loan_guarantee": {
-              "is_guaranteed": "N",
-              "loan_balance_at_audit_period_end": 0
+              "is_guaranteed": "N"
             },
             "direct_or_indirect_award": {
               "is_direct": "N",
@@ -136,11 +135,12 @@
               "is_major": "Y",
               "audit_report_type": "U",
               "number_of_audit_findings": 0,
-              "amount_expended": 42
+              "amount_expended": 42,
+              "federal_program_total": 3000
             },
             "loan_or_loan_guarantee": {
               "is_guaranteed": "Y",
-              "loan_balance_at_audit_period_end": 42
+              "loan_balance_at_audit_period_end": "424242"
             },
             "direct_or_indirect_award": {
               "is_direct": "Y"
