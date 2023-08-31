@@ -1,10 +1,11 @@
 from audit.cross_validation.naming import (
+    NC,
     SECTION_NAMES,
     camel_to_snake,
     snake_to_camel,
 )
 
-at_root_sections = ("audit_information", "general_information")
+at_root_sections = (NC.AUDIT_INFORMATION, NC.GENERAL_INFORMATION)  # type: ignore
 
 
 def get_shaped_section(sac, section_name):
@@ -34,7 +35,7 @@ def sac_validation_shape(sac):
     that's appropriate for passing to the validation functions.
 
     For example, if the Audit Information and Notes to SEFA sections have content,
-    this function wil return something like:
+    this function will return something like:
 
     {
         "sf_sac_sections": {

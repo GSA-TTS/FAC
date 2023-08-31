@@ -1,4 +1,4 @@
-from audit.cross_validation.naming import find_section_by_name
+from audit.cross_validation.naming import NC, find_section_by_name
 
 
 def submission_progress_check(sac, sar=None, crossval=True):
@@ -36,10 +36,10 @@ def submission_progress_check(sac, sar=None, crossval=True):
         }
     """
     # TODO: remove these once tribal data consent are implemented:
-    del sac["sf_sac_sections"]["tribal_data_consent"]
+    del sac["sf_sac_sections"][NC.TRIBAL_DATA_CONSENT]
 
     # Add the status of the SAR into the list of sections:
-    sac["sf_sac_sections"]["single_audit_report"] = bool(sar)
+    sac["sf_sac_sections"][NC.SINGLE_AUDIT_REPORT] = bool(sar)
 
     result = {k: None for k in sac["sf_sac_sections"]}
 
@@ -87,22 +87,22 @@ def progress_check(sections, key):
         "section_name": key,
     }
     awards = {}
-    if sections["federal_awards"]:
-        awards = sections.get("federal_awards", {}).get("federal_awards", [])
-    general_info = sections.get("general_information", {}) or {}
+    if sections[NC.FEDERAL_AWARDS]:
+        awards = sections.get(NC.FEDERAL_AWARDS, {}).get(NC.FEDERAL_AWARDS, [])
+    general_info = sections.get(NC.GENERAL_INFORMATION, {}) or {}
     num_findings = sum(get_num_findings(award) for award in awards)
     conditions = {
-        "general_information": True,
-        "audit_information": True,
-        "federal_awards": True,
-        "notes_to_sefa": True,
-        "findings_uniform_guidance": num_findings > 0,
-        "findings_text": num_findings > 0,
-        "corrective_action_plan": num_findings > 0,
-        "additional_ueis": bool(general_info.get("multiple_ueis_covered")),
-        "additional_eins": bool(general_info.get("multiple_eins_covered")),
-        "secondary_auditors": bool(general_info.get("secondary_auditors_exist")),
-        "single_audit_report": True,
+        NC.GENERAL_INFORMATION: True,
+        NC.AUDIT_INFORMATION: True,
+        NC.FEDERAL_AWARDS: True,
+        NC.NOTES_TO_SEFA: True,
+        NC.FINDINGS_UNIFORM_GUIDANCE: num_findings > 0,
+        NC.FINDINGS_TEXT: num_findings > 0,
+        NC.CORRECTIVE_ACTION_PLAN: num_findings > 0,
+        NC.ADDITIONAL_UEIS: bool(general_info.get("multiple_ueis_covered")),
+        NC.ADDITIONAL_EINS: bool(general_info.get("multiple_eins_covered")),
+        NC.SECONDARY_AUDITORS: bool(general_info.get("secondary_auditors_exist")),
+        NC.SINGLE_AUDIT_REPORT: True,
     }
 
     # If it's not required, it's inactive:

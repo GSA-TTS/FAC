@@ -230,34 +230,61 @@ local Validations = {
   ],
   PriorReferences: [
     {
-      'if': {
-        properties: {
-          repeat_prior_reference: Base.Types.string {
-            const: Base.Const.Y,
+      allOf: [
+        {
+          "if": {
+            properties: {
+              repeat_prior_reference: {
+                const: Base.Const.Y
+              }
+            }
           },
+          "then": {
+            properties: {
+              "prior_references": Base.Compound.PriorReferences
+            }
+          }
         },
-      },
-      'then': {
-        required:['prior_references'] 
-      },
+        {
+          not: {
+            properties: {
+              repeat_prior_reference: {
+                const: Base.Const.N
+              }
+            }
+          }
+        }
+      ]
     },
     {
-      'if': {
-        properties: {
-          repeat_prior_reference: Base.Types.string {
-            const: Base.Const.N,
+      allOf: [
+        {
+          "if": {
+            properties: {
+              repeat_prior_reference: {
+                const: Base.Const.N
+              }
+            }
           },
+          "then": {
+            properties: {
+              prior_references: {
+                const: Base.Const.NA
+              }
+            }
+          }
         },
-      },
-      'then': {
-        properties: {
-          // required:['prior_references'], 
-          prior_references: Base.Types.string {
-            const: Base.Const.NA
-          },
-        },
-      },
-    },
+        {
+          not: {
+            properties: {
+              repeat_prior_reference: {
+                const: Base.Const.Y
+              }
+            }
+          }
+        }
+      ]
+    }
   ],   
 };
 

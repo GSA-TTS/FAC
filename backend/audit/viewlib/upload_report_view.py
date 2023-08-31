@@ -91,6 +91,11 @@ class UploadReportView(SingleAuditChecklistAccessRequiredMixin, generic.View):
         report_id = kwargs["report_id"]
         try:
             sac = SingleAuditChecklist.objects.get(report_id=report_id)
+            sar = SingleAuditReportFile.objects.filter(sac_id=sac.id).first()
+
+            current_info = {
+                "cleaned_data": getattr(sar, "component_page_numbers", {}),
+            }
 
             context = {
                 "auditee_name": sac.auditee_name,
@@ -98,10 +103,9 @@ class UploadReportView(SingleAuditChecklistAccessRequiredMixin, generic.View):
                 "auditee_uei": sac.auditee_uei,
                 "user_provided_organization_type": sac.user_provided_organization_type,
                 "page_number_inputs": self.page_number_inputs(),
+                "already_submitted": True if sar else False,
+                "form": current_info,
             }
-
-            # TODO: check if there's already a PDF in the DB and let the user know
-            # context['already_submitted'] = ...
 
             return render(request, "audit/upload-report.html", context)
         except SingleAuditChecklist.DoesNotExist as err:

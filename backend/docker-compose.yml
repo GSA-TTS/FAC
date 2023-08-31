@@ -32,7 +32,7 @@ services:
       AV_SCAN_URL: http://clamav-rest:9000/scan
       DISABLE_AUTH: ${DISABLE_AUTH:-False}
       PGRST_JWT_SECRET: ${PGRST_JWT_SECRET:-32_chars_fallback_secret_testing}
-      ENABLE_DEBUG_TOOLBAR: true
+      ENABLE_DEBUG_TOOLBAR: false
 
     env_file:
       - ".env"
