@@ -1,4 +1,5 @@
 from django import forms
+from config.settings import STATE_ABBREVS
 
 from api.uei import get_uei_info_from_sam_gov
 
@@ -33,6 +34,8 @@ class AuditeeInfoForm(forms.Form):
 
 
 class GeneralInformationForm(forms.Form):
+    choices_state_abbrevs = list((i, i) for i in STATE_ABBREVS)
+    
     audit_type = forms.CharField()
     auditee_fiscal_period_end = forms.CharField()
     auditee_fiscal_period_start = forms.CharField()
@@ -46,7 +49,7 @@ class GeneralInformationForm(forms.Form):
     auditee_name = forms.CharField()
     auditee_address_line_1 = forms.CharField()
     auditee_city = forms.CharField()
-    auditee_state = forms.CharField()
+    auditee_state = forms.ChoiceField(choices=choices_state_abbrevs)
     auditee_zip = forms.CharField()
     auditee_contact_name = forms.CharField()
     auditee_contact_title = forms.CharField()

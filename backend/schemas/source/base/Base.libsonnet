@@ -3,7 +3,7 @@ local ComplianceRequirementTypes = import 'ComplianceRequirementTypes.json';
 local FederalProgramNames = import 'FederalProgramNames.json';
 local Func = import 'Functions.libsonnet';
 local GAAP = import 'GAAP.libsonnet';
-local States = import 'States.libsonnet';
+local States = import 'States.json';
 
 local Const = {
   Y: 'Y',

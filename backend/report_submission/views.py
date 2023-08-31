@@ -13,7 +13,7 @@ from report_submission.forms import AuditeeInfoForm, GeneralInformationForm
 
 import api.views
 
-from config.settings import STATIC_SITE_URL
+from config.settings import STATIC_SITE_URL, STATE_ABBREVS
 
 logger = logging.getLogger(__name__)
 
@@ -153,6 +153,7 @@ class GeneralInformationFormView(LoginRequiredMixin, View):
                 "auditor_email": sac.auditor_email,
                 "secondary_auditors_exist": sac.secondary_auditors_exist,
                 "report_id": report_id,
+                "state_abbrevs": STATE_ABBREVS,
             }
 
             return render(request, "report_submission/gen-form.html", context)
