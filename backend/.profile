@@ -58,4 +58,4 @@ if [[ "$CF_INSTANCE_INDEX" == 0 ]]; then
 fi
 
 # Make psql usable by scripts, for debugging, etc.
-alias psql='../deps/0/apt/usr/lib/postgresql/*/bin/psql'
+alias psql='/home/vcap/deps/0/apt/usr/lib/postgresql/*/bin/psql'
