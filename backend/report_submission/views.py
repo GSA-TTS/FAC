@@ -178,13 +178,18 @@ class GeneralInformationFormView(LoginRequiredMixin, View):
             if form.is_valid():
                 general_information = sac.general_information
                 general_information.update(form.cleaned_data)
-                validated = validate_general_information_json(general_information)
-                sac.general_information = validated
+                # validated = validate_general_information_json(general_information)
+                sac.general_information = general_information
                 if general_information.get("audit_type"):
                     sac.audit_type = general_information["audit_type"]
                 sac.save()
 
                 return redirect(f"/audit/submission-progress/{report_id}")
+            else:
+                context = form.cleaned_data | {"errors": form.errors, "report_id": report_id}
+                return render(request, "report_submission/gen-form.html", context)
+
+
         except SingleAuditChecklist.DoesNotExist as err:
             raise PermissionDenied("You do not have access to this audit.") from err
         except ValidationError as err:
@@ -193,7 +198,10 @@ class GeneralInformationFormView(LoginRequiredMixin, View):
             raise BadRequest(message)
         except LateChangeError:
             return render(request, "audit/no-late-changes.html")
-        raise BadRequest()
+        except Exception as err:
+            message = f"Unexpected error in GeneralInformationFormView post. Report ID {report_id}: {err}"
+            logger.warning(message)
+            raise BadRequest(message)
 
 
 class UploadPageView(LoginRequiredMixin, View):

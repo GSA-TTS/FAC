@@ -24,9 +24,10 @@ function performValidations(field) {
   setFormDisabled(errors.length > 0);
 }
 
+// Fieldset elements with attribute "navitem" are watched. When scolled past, the applicable navLink is set to current.
 function highlightActiveNavSection() {
   let currentFieldsetId;
-  const fieldsets = document.querySelectorAll('fieldset[id]');
+  const fieldsets = document.querySelectorAll('fieldset[navitem]');
   const navLinks = document.querySelectorAll('li .usa-sidenav__item a');
 
   fieldsets.forEach((f) => {

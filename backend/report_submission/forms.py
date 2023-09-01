@@ -1,7 +1,10 @@
 from django import forms
+from django.core.validators import RegexValidator
 
 from api.uei import get_uei_info_from_sam_gov
 
+ein_validator = RegexValidator(r'^[0-9]{9}$', "EINs should be nine characters long and be made up of only numbers.")
+alpha_validator = RegexValidator(r'\b[^\W\d_]+\b', "Cities should not include numbers or special characters.")  # \w, but exclude \W and \d (numerics, underscores, etc). Includes non-[A-Z] ASCII things like ñ and ī
 
 def validate_uei(value):
     sam_response = get_uei_info_from_sam_gov(value)
@@ -33,35 +36,47 @@ class AuditeeInfoForm(forms.Form):
 
 
 class GeneralInformationForm(forms.Form):
-    audit_type = forms.CharField()
-    auditee_fiscal_period_end = forms.CharField()
-    auditee_fiscal_period_start = forms.CharField()
-    audit_period_covered = forms.CharField()
+    audit_type = forms.CharField(required=False)
+    auditee_fiscal_period_end = forms.CharField(required=False)
+    auditee_fiscal_period_start = forms.CharField(required=False)
+    audit_period_covered = forms.CharField(required=False)
     audit_period_other_months = forms.CharField(required=False)
-    ein = forms.CharField()
+    ein = forms.CharField(
+        required=False,
+        validators=[ein_validator]  # validators are not run against empty fields
+    )
     ein_not_an_ssn_attestation = forms.BooleanField(required=False)
     multiple_eins_covered = forms.BooleanField(required=False)
-    auditee_uei = forms.CharField()
+    auditee_uei = forms.CharField(required=False)
     multiple_ueis_covered = forms.BooleanField(required=False)
-    auditee_name = forms.CharField()
-    auditee_address_line_1 = forms.CharField()
-    auditee_city = forms.CharField()
-    auditee_state = forms.CharField()
-    auditee_zip = forms.CharField()
-    auditee_contact_name = forms.CharField()
-    auditee_contact_title = forms.CharField()
-    auditee_phone = forms.CharField()
-    auditee_email = forms.CharField()
-    auditor_firm_name = forms.CharField()
-    auditor_ein = forms.CharField()
+    auditee_name = forms.CharField(required=False)
+    auditee_address_line_1 = forms.CharField(required=False)
+    auditee_city = forms.CharField(
+        required=False, 
+        validators=[alpha_validator]  # validators are not run against empty fields
+    )
+    auditee_state = forms.CharField(required=False)
+    auditee_zip = forms.CharField(required=False)
+    auditee_contact_name = forms.CharField(required=False)
+    auditee_contact_title = forms.CharField(required=False)
+    auditee_phone = forms.CharField(required=False)
+    auditee_email = forms.CharField(required=False)
+    auditor_firm_name = forms.CharField(required=False)
+    auditor_ein = forms.CharField(
+        required=False,
+        validators=[ein_validator]  # validators are not run against empty fields
+    )
     auditor_ein_not_an_ssn_attestation = forms.BooleanField(required=False)
-    auditor_country = forms.CharField()
-    auditor_address_line_1 = forms.CharField()
-    auditor_city = forms.CharField()
-    auditor_state = forms.CharField()
-    auditor_zip = forms.CharField()
-    auditor_contact_name = forms.CharField()
-    auditor_contact_title = forms.CharField()
-    auditor_phone = forms.CharField()
-    auditor_email = forms.CharField()
+    auditor_country = forms.CharField(required=False)
+    auditor_address_line_1 = forms.CharField(required=False)
+    auditor_city = forms.CharField(
+        required=False, 
+        validators=[alpha_validator]  # validators are not run against empty fields
+    )
+    auditor_state = forms.CharField(required=False)
+    auditor_zip = forms.CharField(required=False)
+    auditor_contact_name = forms.CharField(required=False)
+    auditor_contact_title = forms.CharField(required=False)
+    auditor_phone = forms.CharField(required=False)
+    auditor_email = forms.CharField(required=False)
     secondary_auditors_exist = forms.BooleanField(required=False)
