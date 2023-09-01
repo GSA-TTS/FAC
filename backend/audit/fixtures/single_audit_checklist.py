@@ -66,6 +66,7 @@ def _fake_general_information(auditee_name=None):
         "met_spending_threshold": True,
         "multiple_eins_covered": False,
         "multiple_ueis_covered": False,
+        "secondary_auditors_exist": False,
         # TODO: could improve this by randomly choosing from the enum of possible values
         "user_provided_organization_type": "unknown",
     }

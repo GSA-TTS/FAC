@@ -100,7 +100,8 @@ local Types = Base.Types;
     'auditee_city',
     'auditee_state',
     'ein',
-    'auditee_uei',
+    // See FIXME 09/01/2023 below for why 'auditee_uei' is commented out
+    //'auditee_uei',
     'auditee_zip',
 
     'auditor_phone',
@@ -115,9 +116,14 @@ local Types = Base.Types;
     'auditor_firm_name',
     // foreign address optional
     'auditor_ein',
-
-    'auditee_fiscal_period_start',
-    'auditee_fiscal_period_end',
+    //FIXME 09/01/2023:
+    // The following two fields cannot be set as required because they are not editable via the API's PUT method.
+    // If these fields are marked as required, then using the PUT method would result in a schema validation error
+    // due to the missing fields, creating a Catch-22 situation.
+    // A potential workaround is to remove them from the list of required fields in the schema,
+    // but enforce their presence during cross-validation (which is why I commented them out here for now).
+    //'auditee_fiscal_period_start',
+    //'auditee_fiscal_period_end',
 
     'audit_type',
     'user_provided_organization_type',

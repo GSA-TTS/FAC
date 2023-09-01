@@ -4,6 +4,7 @@ from unittest.mock import patch
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
+from audit.fixtures.single_audit_checklist import _fake_general_information
 from model_bakery import baker
 from rest_framework.test import APIClient
 
@@ -711,6 +712,11 @@ class SingleAuditChecklistViewTests(TestCase):
         If we have edit access and we're submitting to the allowed general information fields but
         we're submitting bad data, we should get errors.
         """
+        general_information = _fake_general_information()
+        # Follwoing fields are not editable through the API
+        del general_information["auditee_fiscal_period_end"]
+        del general_information["auditee_fiscal_period_start"]
+        del general_information["auditee_uei"]
 
         def check_response(bad_data, expected):
             sac = baker.make(SingleAuditChecklist)
@@ -756,7 +762,7 @@ class SingleAuditChecklistViewTests(TestCase):
                 "errors": {"general_information": ["'invalid_email' is not a 'email'"]}
             }
             with self.subTest():
-                nested = {"general_information": {key: "invalid_email"}}
+                nested = {"general_information": general_information | {key: "invalid_email"}}
                 check_response(nested, expected)
 
         for key in boolean_keys:
@@ -768,26 +774,28 @@ class SingleAuditChecklistViewTests(TestCase):
                 }
             }
             with self.subTest():
-                nested = {"general_information": {key: "invalid_boolean"}}
+                nested = {"general_information": general_information | {key: "invalid_boolean"}}
                 check_response(nested, expected)
 
         for key in boolean_nullable_keys:
             expected = {
                 "errors": {
                     "general_information": [
-                        "'invalid_boolean' is not of type 'boolean', 'null'"
+                        "'invalid_boolean' is not of type 'boolean'"
                     ]
                 }
             }
             with self.subTest():
-                nested = {"general_information": {key: "invalid_boolean"}}
+                gen =  general_information | {key: "invalid_boolean"}
+                nested = {"general_information": gen}
                 check_response(nested, expected)
 
         for key, choices in choice_keys:
             message = f"'invalid_choice' is not one of {choices}"
             expected = {"errors": {"general_information": [message]}}
             with self.subTest():
-                nested = {"general_information": {key: "invalid_choice"}}
+                gen =  general_information | {key: "invalid_choice"}
+                nested = {"general_information": gen}
                 check_response(nested, expected)
 
         for key in length_100_keys:
@@ -797,7 +805,7 @@ class SingleAuditChecklistViewTests(TestCase):
             message = f"'{value}' is too long"
             expected = {"errors": {"general_information": [message]}}
             with self.subTest():
-                nested = {"general_information": {key: value}}
+                nested = {"general_information": general_information | {key: value}}
                 check_response(nested, expected)
 
     def test_put_edit_appropriate_metadata_fields(self):
