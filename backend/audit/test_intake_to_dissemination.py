@@ -465,7 +465,8 @@ class IntakeToDisseminationTests(TestCase):
         print(objs)
 
         for k, v in objs.items():
-            assert k in keys
-            assert len(v) > 0
+            self.assertTrue(k in keys, f"Key {k} not found in keys.")
+            self.assertTrue(len(v) > 0, f"Value list for {k} is empty.")
+
             for obj in v:
-                assert obj is not None
+                self.assertIsNotNone(obj, "Object should not be None.")
