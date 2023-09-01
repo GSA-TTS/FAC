@@ -13,7 +13,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from config.settings import AUDIT_SCHEMA_DIR, BASE_DIR
-from audit.models import Access, SingleAuditChecklist
+from audit.models import Access, SingleAuditChecklist, SubmissionEvent
 from audit.permissions import SingleAuditChecklistPermission
 from .serializers import (
     AccessAndSubmissionSerializer,
@@ -117,6 +117,8 @@ def access_and_submission_check(user, data):
             submitted_by=user,
             submission_status="in_progress",
             general_information=all_steps_user_form_data,
+            event_user=user,
+            event_type=SubmissionEvent.EventType.CREATED,
         )
 
         # Create all contact Access objects
@@ -125,18 +127,24 @@ def access_and_submission_check(user, data):
             role="editor",
             email=user.email,
             user=user,
+            event_user=user,
+            event_type=SubmissionEvent.EventType.ACCESS_GRANTED,
         )
         Access.objects.create(
             sac=sac,
             role="certifying_auditee_contact",
             fullname=serializer.data.get("certifying_auditee_contact_fullname"),
             email=serializer.data.get("certifying_auditee_contact_email"),
+            event_user=user,
+            event_type=SubmissionEvent.EventType.ACCESS_GRANTED,
         )
         Access.objects.create(
             sac=sac,
             role="certifying_auditor_contact",
             fullname=serializer.data.get("certifying_auditor_contact_fullname"),
             email=serializer.data.get("certifying_auditor_contact_email"),
+            event_user=user,
+            event_type=SubmissionEvent.EventType.ACCESS_GRANTED,
         )
 
         # The contacts form should prevent users from submitting an incomplete contacts section
@@ -155,6 +163,8 @@ def access_and_submission_check(user, data):
                 role="editor",
                 fullname=name,
                 email=email,
+                event_user=user,
+                event_type=SubmissionEvent.EventType.ACCESS_GRANTED,
             )
         for email, name in auditor_contacts_info:
             Access.objects.create(
@@ -162,9 +172,9 @@ def access_and_submission_check(user, data):
                 role="editor",
                 fullname=name,
                 email=email,
+                event_user=user,
+                event_type=SubmissionEvent.EventType.ACCESS_GRANTED,
             )
-
-        sac.save()
 
         # Clear entry form data from profile
         user.profile.entry_form_data = {}
