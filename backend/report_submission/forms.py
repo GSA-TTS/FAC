@@ -35,7 +35,7 @@ class AuditeeInfoForm(forms.Form):
 
 class GeneralInformationForm(forms.Form):
     choices_state_abbrevs = list((i, i) for i in STATE_ABBREVS)
-    
+
     audit_type = forms.CharField()
     auditee_fiscal_period_end = forms.CharField()
     auditee_fiscal_period_start = forms.CharField()
