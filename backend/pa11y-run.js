@@ -15,18 +15,30 @@ const config = {
   standard: 'WCAG2AA',
   // FIXME: temporarily ignoring contrast issues until pa11y fixes https://github.com/pa11y/pa11y/issues/633 or we find a workaround
   ignore: ['color-contrast'],
+  log: {
+    debug: console.log,
+    error: console.error,
+    info: console.info
+  },
+  chromeLaunchConfig: {
+    executablePath: "/usr/bin/google-chrome"
+  }
 };
 
 scanPages(urls);
 
 async function scanPages(pages) {
   try {
-    const results = await Promise.all(
-      urls.map((u) => {
-        return pa11y(u, config);
-      })
-    );
+    const pa11yRuns = async () => {
+      let a = [];
+      for(const u of urls) {
+        const res = await pa11y(u, config);
+        a.push(res);
+      }
+      return a;
+    }
     let totalIssues = 0;
+    const results = await pa11yRuns();
     results.forEach((r) => {
       if (r.issues.length > 0) {
         let issueCount = 0;
