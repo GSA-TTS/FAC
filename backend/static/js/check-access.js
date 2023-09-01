@@ -21,14 +21,14 @@ function performValidations(nodes) {
 }
 
 function insertInc(elements, attr, splitter, inc) {
-  elements.forEach(function(el) {
+  elements.forEach(function (el) {
     let newVal = el[attr].replace(splitter, '');
     newVal = newVal + '_' + inc + splitter;
     el.setAttribute(attr, newVal);
   });
 }
 function appendInc(elements, attr, inc) {
-  elements.forEach(function(el) {
+  elements.forEach(function (el) {
     const newVal = el.getAttribute(attr) + '_' + inc;
     el.setAttribute(attr, newVal);
   });
