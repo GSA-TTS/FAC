@@ -1,6 +1,5 @@
 locals {
   postgrest_name = "postgrest"
-  data_load_name = "dataload"
 }
 
 resource "cloudfoundry_route" "postgrest" {
@@ -16,10 +15,6 @@ resource "cloudfoundry_service_key" "postgrest" {
 
 data "docker_registry_image" "postgrest" {
   name = "ghcr.io/gsa-tts/fac/postgrest:latest"
-}
-
-data "docker_registry_image" "data_load" {
-  name = "ghcr.io/gsa-tts/fac-historic-public-csvs/load-historic-public-data:latest"
 }
 
 resource "cloudfoundry_app" "postgrest" {
@@ -42,22 +37,4 @@ resource "cloudfoundry_app" "postgrest" {
     PGRST_JWT_SECRET : var.pgrst_jwt_secret
     PGRST_DB_MAX_ROWS : 20000
   }
-}
-
-resource "cloudfoundry_app" "data_load" {
-  name         = local.data_load_name
-  space        = data.cloudfoundry_space.apps.id
-  docker_image = "ghcr.io/gsa-tts/fac-historic-public-csvs/load-historic-public-data@${data.docker_registry_image.data_load.sha256_digest}"
-  timeout      = 180
-  memory       = 64
-  disk_quota   = 64
-  instances    = 1
-  strategy     = "rolling"
-
-  environment = {
-    DATABASE_URL : cloudfoundry_service_key.postgrest.credentials.uri
-  }
-  depends_on = [
-    cloudfoundry_app.postgrest
-  ]
 }
