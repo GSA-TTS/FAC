@@ -51,8 +51,7 @@
           "federal_program_total": 0
         },
         "loan_or_loan_guarantee": {
-          "is_guaranteed": "Y",
-          "loan_balance_at_audit_period_end": "42"
+          "is_guaranteed": "N"
         },
         "direct_or_indirect_award": {
           "is_direct": "Y"

@@ -17,6 +17,7 @@
     "auditee_contact_title": "A Title",
     "auditee_phone": "555-555-5555",
     "auditee_email": "john@test.test",
+    "audit_type": "single-audit",
     "user_provided_organization_type": "state",
     "met_spending_threshold": true,
     "is_usa_based": true,
@@ -31,7 +32,8 @@
     "auditor_contact_name": "Jane",
     "auditor_contact_title": "Another Title",
     "auditor_phone": "999-999-9999",
-    "auditor_email": "jane@test.test"
+    "auditor_email": "jane@test.test",
+    "secondary_auditors_exist": false
   },
   "AuditInformationCases": [
     {
@@ -140,7 +142,7 @@
             },
             "loan_or_loan_guarantee": {
               "is_guaranteed": "Y",
-              "loan_balance_at_audit_period_end": "424242"
+              "loan_balance_at_audit_period_end": "9052022"
             },
             "direct_or_indirect_award": {
               "is_direct": "Y"
