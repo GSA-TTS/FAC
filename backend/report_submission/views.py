@@ -6,7 +6,7 @@ from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.views import View
 
-from audit.models import Access, SingleAuditChecklist, LateChangeError
+from audit.models import Access, SingleAuditChecklist, LateChangeError, SubmissionEvent
 from audit.validators import validate_general_information_json
 
 from report_submission.forms import AuditeeInfoForm, GeneralInformationForm
@@ -182,7 +182,11 @@ class GeneralInformationFormView(LoginRequiredMixin, View):
                 sac.general_information = general_information
                 if general_information.get("audit_type"):
                     sac.audit_type = general_information["audit_type"]
-                sac.save()
+
+                sac.save(
+                    event_user=request.user,
+                    event_type=SubmissionEvent.EventType.GENERAL_INFORMATION_UPDATED,
+                )
 
                 return redirect(f"/audit/submission-progress/{report_id}")
             else:

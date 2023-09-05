@@ -15,7 +15,7 @@ module "https-proxy" {
       "api.sam.gov:443",
 
       # New Relic telemetry (https://docs.newrelic.com/docs/new-relic-solutions/get-started/networks/#data-ingest)
-      # 
+      #
       # Note: New Relic says that APM agent data ingests via `collector*.newrelic.com`, but we can't specify that
       # to the Caddy forwardproxy (https://github.com/caddyserver/forwardproxy/blob/caddy2/README.md#access-control)
       # because it only allows subdomain wildcards in `*.` as a prefix. So this wildcard is a little broader than
@@ -23,8 +23,11 @@ module "https-proxy" {
       # We put in an upstream issue about this: https://github.com/caddyserver/forwardproxy/issues/102
       "*.newrelic.com:443",
 
-      # Login.gov sanbox
+      # Login.gov sandbox
       "idp.int.identitysandbox.gov:443",
+
+      # Git
+      "*.github.com:443"
     ],
     # The parens here make Terraform understand that the key below is a reference
     # Solution from https://stackoverflow.com/a/57401750
