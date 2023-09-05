@@ -182,7 +182,8 @@ class GeneralInformationFormView(LoginRequiredMixin, View):
                     message = f"{message}\n {field}: {errors}"
                     logger.warning(f"Error {field}: {errors}")
                 raise BadRequest(message)
-            
+
+            form = self._wipe_auditor_address(form)
             general_information = sac.general_information
             general_information.update(form.cleaned_data)
             validated = validate_general_information_json(general_information)
@@ -194,7 +195,7 @@ class GeneralInformationFormView(LoginRequiredMixin, View):
                 event_user=request.user,
                 event_type=SubmissionEvent.EventType.GENERAL_INFORMATION_UPDATED,
             )
-            
+
             return redirect(f"/audit/submission-progress/{report_id}")
         except SingleAuditChecklist.DoesNotExist as err:
             raise PermissionDenied("You do not have access to this audit.") from err
@@ -204,6 +205,22 @@ class GeneralInformationFormView(LoginRequiredMixin, View):
             raise BadRequest(message)
         except LateChangeError:
             return render(request, "audit/no-late-changes.html")
+
+    def _wipe_auditor_address(form):
+        # If non-USA is selected, wipe USA-specific fields
+        # Else, wipe the non-USA specific field
+        keys_to_wipe = [
+            "auditor_address_line_1",
+            "auditor_city",
+            "auditor_state",
+            "auditor_zip",
+        ]
+        if form.cleaned_data["auditor_country"] == "non-USA":
+            for key in keys_to_wipe:
+                form.cleaned_data[key] = ""
+        else:
+            form.cleaned_data["auditor_international_address"] = ""
+        return form
 
 
 class UploadPageView(LoginRequiredMixin, View):

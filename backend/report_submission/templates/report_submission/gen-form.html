@@ -630,13 +630,12 @@
                                             This field is required
                                         </li>
                                     </ul>
-                                    <input class="usa-textarea"
+                                    <textarea class="usa-textarea"
                                            id="auditor_international_address"
                                            name="auditor_international_address"
                                            aria-required="true"
                                            required
-                                           data-validate-not-null=""
-                                           value="{{ auditor_international_address | default_if_none:'' }}"/>
+                                           data-validate-not-null="">{{ auditor_international_address | default_if_none:'' }}</textarea>
                                 </div>
                                 <div name="domestic_address" class="usa-form-group">
                                     <label class="usa-label" for="auditor_address_line_1">
