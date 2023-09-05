@@ -108,7 +108,6 @@ class FederalAwardsExcelTests(SimpleTestCase):
         _set_by_name(workbook, "section_name", FORM_SECTIONS.FEDERAL_AWARDS_EXPENDED)
         _set_by_name(workbook, "amount_expended", 100)
         _set_by_name(workbook, "total_amount_expended", 500)
-        _set_by_name(workbook, "loan_balance_at_audit_period_end", 500)
 
         _add_entry(workbook, 0, FederalAwardsExcelTests.TEST_DATA[0])
         federal_awards = extract_federal_awards(workbook)
