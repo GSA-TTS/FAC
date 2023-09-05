@@ -27,7 +27,7 @@ jobs:
 
     steps:
       - name: checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         # Plan output will be posted as a comment on the PR to aid with review.
         # The post includes a link to the workflow run where the plan was
         # generated, and the same comment will be updated each time a new commit

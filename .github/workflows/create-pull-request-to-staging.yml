@@ -14,7 +14,7 @@ jobs:
     outputs:
         should_run: ${{ steps.should_run.outputs.should_run }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Print Latest Commit
         run: echo ${{ github.sha }}
 
@@ -38,7 +38,7 @@ jobs:
     outputs:
         pr_number: ${{ steps.pr-number.outputs.pull_request_number }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Get Current Date
         id: date
         run: |
