@@ -206,7 +206,7 @@ class GeneralInformationFormView(LoginRequiredMixin, View):
         except LateChangeError:
             return render(request, "audit/no-late-changes.html")
 
-    def _wipe_auditor_address(form):
+    def _wipe_auditor_address(self, form):
         # If non-USA is selected, wipe USA-specific fields
         # Else, wipe the non-USA specific field
         keys_to_wipe = [
