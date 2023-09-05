@@ -104,7 +104,7 @@ class GeneralInformationSchemaValidityTest(SimpleTestCase):
         schema = self.GENERAL_INFO_SCHEMA
         instance = jsoncopy(self.SIMPLE_CASE)
 
-        instance["auditee_name"] = None
+        instance["auditee_name"] = ""
 
         validate(instance, schema)
 
