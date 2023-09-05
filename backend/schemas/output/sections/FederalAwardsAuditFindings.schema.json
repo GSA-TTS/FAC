@@ -257,39 +257,67 @@
                   "properties": {
                      "findings": {
                         "additionalProperties": false,
-                        "allOf": [
+                        "oneOf": [
                            {
-                              "if": {
-                                 "properties": {
-                                    "repeat_prior_reference": {
-                                       "const": "Y",
-                                       "type": "string"
+                              "allOf": [
+                                 {
+                                    "if": {
+                                       "properties": {
+                                          "repeat_prior_reference": {
+                                             "const": "Y"
+                                          }
+                                       }
+                                    },
+                                    "then": {
+                                       "properties": {
+                                          "prior_references": {
+                                             "description": "Prior references",
+                                             "pattern": "^20[1-9][0-9]-[0-9]{3}(,\\s*20[1-9][0-9]-[0-9]{3})*$",
+                                             "title": "PriorReferences",
+                                             "type": "string"
+                                          }
+                                       }
+                                    }
+                                 },
+                                 {
+                                    "not": {
+                                       "properties": {
+                                          "repeat_prior_reference": {
+                                             "const": "N"
+                                          }
+                                       }
                                     }
                                  }
-                              },
-                              "then": {
-                                 "required": [
-                                    "prior_references"
-                                 ]
-                              }
+                              ]
                            },
                            {
-                              "if": {
-                                 "properties": {
-                                    "repeat_prior_reference": {
-                                       "const": "N",
-                                       "type": "string"
+                              "allOf": [
+                                 {
+                                    "if": {
+                                       "properties": {
+                                          "repeat_prior_reference": {
+                                             "const": "N"
+                                          }
+                                       }
+                                    },
+                                    "then": {
+                                       "properties": {
+                                          "prior_references": {
+                                             "const": "N/A"
+                                          }
+                                       }
+                                    }
+                                 },
+                                 {
+                                    "not": {
+                                       "properties": {
+                                          "repeat_prior_reference": {
+                                             "const": "Y"
+                                          }
+                                       }
                                     }
                                  }
-                              },
-                              "then": {
-                                 "properties": {
-                                    "prior_references": {
-                                       "const": "N/A",
-                                       "type": "string"
-                                    }
-                                 }
-                              }
+                              ]
                            }
                         ],
                         "properties": {
@@ -319,6 +347,7 @@
                         },
                         "required": [
                            "reference_number",
+                           "prior_references",
                            "repeat_prior_reference"
                         ],
                         "type": "object"

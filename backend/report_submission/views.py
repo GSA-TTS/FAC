@@ -6,7 +6,7 @@ from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.views import View
 
-from audit.models import Access, SingleAuditChecklist, LateChangeError
+from audit.models import Access, SingleAuditChecklist, LateChangeError, SubmissionEvent
 from audit.validators import validate_general_information_json
 
 from report_submission.forms import AuditeeInfoForm, GeneralInformationForm
@@ -182,13 +182,19 @@ class GeneralInformationFormView(LoginRequiredMixin, View):
                     message = f"{message}\n {field}: {errors}"
                     logger.warning(f"Error {field}: {errors}")
                 raise BadRequest(message)
-
+            
             general_information = sac.general_information
             general_information.update(form.cleaned_data)
             validated = validate_general_information_json(general_information)
             sac.general_information = validated
-            sac.audit_type = general_information.get("audit_type")
-            sac.save()
+            if general_information.get("audit_type"):
+                sac.audit_type = general_information["audit_type"]
+
+            sac.save(
+                event_user=request.user,
+                event_type=SubmissionEvent.EventType.GENERAL_INFORMATION_UPDATED,
+            )
+            
             return redirect(f"/audit/submission-progress/{report_id}")
         except SingleAuditChecklist.DoesNotExist as err:
             raise PermissionDenied("You do not have access to this audit.") from err

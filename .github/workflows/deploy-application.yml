@@ -78,3 +78,12 @@ jobs:
           cf_manifest: backend/manifests/manifest-fac.yml
           cf_vars_file: backend/manifests/vars/vars-${{ env.space }}.yml
           command: bin/ops/deploy.sh
+
+      - name: Load historical data
+        uses: cloud-gov/cg-cli-tools@main
+        with:
+          cf_username: ${{ secrets.CF_USERNAME }}
+          cf_password: ${{ secrets.CF_PASSWORD }}
+          cf_org: gsa-tts-oros-fac
+          cf_space: ${{ env.space }}
+          command: cf run-task gsa-fac -k 6G -m 1G --name load_data --command ./load_data.sh

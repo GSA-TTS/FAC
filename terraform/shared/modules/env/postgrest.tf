@@ -38,4 +38,3 @@ resource "cloudfoundry_app" "postgrest" {
     PGRST_DB_MAX_ROWS : 20000
   }
 }
-
