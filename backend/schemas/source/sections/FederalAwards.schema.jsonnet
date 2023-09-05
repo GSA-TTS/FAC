@@ -288,7 +288,7 @@ local Parts = {
     description: 'A loan or loan guarantee and balance',
     properties: {
       is_guaranteed: Base.Enum.YorN,
-      loan_balance_at_audit_period_end: Base.Compound.LoanBalanceAuditPeriodEnd,
+      loan_balance_at_audit_period_end: Types.string,
     },
     required: [
       'is_guaranteed',

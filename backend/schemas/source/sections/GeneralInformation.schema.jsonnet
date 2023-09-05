@@ -90,57 +90,6 @@ local Types = Base.Types;
     secondary_auditors_exist: Types.boolean,
 
   },
-  required: [
-    'auditee_contact_name',
-    'auditee_email',
-    'auditee_name',
-    'auditee_phone',
-    'auditee_contact_title',
-    'auditee_address_line_1',
-    'auditee_city',
-    'auditee_state',
-    'ein',
-    // See FIXME 09/01/2023 below for why 'auditee_uei' is commented out
-    //'auditee_uei',
-    'auditee_zip',
-
-    'auditor_phone',
-    'auditor_state',
-    'auditor_city',
-    'auditor_contact_title',
-    'auditor_address_line_1',
-    'auditor_zip',
-    'auditor_country',
-    'auditor_contact_name',
-    'auditor_email',
-    'auditor_firm_name',
-    // foreign address optional
-    'auditor_ein',
-    //FIXME 09/01/2023:
-    // The following two fields cannot be set as required because they are not editable via the API's PUT method.
-    // If these fields are marked as required, then using the PUT method would result in a schema validation error
-    // due to the missing fields, creating a Catch-22 situation.
-    // A potential workaround is to remove them from the list of required fields in the schema,
-    // but enforce their presence during cross-validation (which is why I commented them out here for now).
-    //'auditee_fiscal_period_start',
-    //'auditee_fiscal_period_end',
-
-    'audit_type',
-    'user_provided_organization_type',
-
-    // audit_period_other_months is optional
-    'audit_period_covered',
-
-    'multiple_eins_covered',
-    'multiple_ueis_covered',
-    'secondary_auditors_exist',
-    'met_spending_threshold',
-    'is_usa_based',
-    'ein_not_an_ssn_attestation',
-    'auditor_ein_not_an_ssn_attestation',
-
-
-  ],
   anyOf: [
     {
       'if': {

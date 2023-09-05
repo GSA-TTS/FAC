@@ -260,27 +260,20 @@
                                  }
                               },
                               "then": {
-                                 "oneOf": [
-                                    {
-                                       "properties": {
-                                          "loan_balance_at_audit_period_end": {
-                                             "minimum": 1,
-                                             "type": "integer"
-                                          }
-                                       }
-                                    },
-                                    {
-                                       "properties": {
-                                          "loan_balance_at_audit_period_end": {
-                                             "enum": [
-                                                "N/A"
-                                             ],
-                                             "title": "N/A",
+                                 "properties": {
+                                    "loan_balance_at_audit_period_end": {
+                                       "oneOf": [
+                                          {
+                                             "pattern": "[0-9]+",
+                                             "type": "string"
+                                          },
+                                          {
+                                             "const": "N/A",
                                              "type": "string"
                                           }
-                                       }
+                                       ]
                                     }
-                                 ],
+                                 },
                                  "required": [
                                     "loan_balance_at_audit_period_end"
                                  ]
@@ -313,7 +306,6 @@
                               "type": "string"
                            },
                            "loan_balance_at_audit_period_end": {
-                              "pattern": "^([0-9]+|N/A)$",
                               "type": "string"
                            }
                         },

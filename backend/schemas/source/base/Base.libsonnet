@@ -70,15 +70,6 @@ local REGEX_THREE_DIGIT_EXTENSION = '[0-9]{3}[A-Za-z]{0,1}';
 local REGEX_U_EXTENSION = 'U[0-9]{2}';
 local REGEX_NUMBER = '[0-9]+';
 
-local type_loan_balance_at_audit_period_end = Types.string {
-  pattern: '^('
-           + REGEX_NUMBER
-           + '|'
-           + Const.NA
-           + ')$',                           
-};
-
-
 local type_aln_prefix = Types.string {
   allOf: [
     {
@@ -432,7 +423,6 @@ local SchemaBase = Types.object {
       enum: ComplianceRequirementTypes.requirement_types,
     },
     ExtensionRdOrU: type_extension_rd_or_u,
-    LoanBalanceAuditPeriodEnd:type_loan_balance_at_audit_period_end,
   },
   SchemaBase: SchemaBase,
 }

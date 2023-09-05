@@ -5,7 +5,6 @@ from django.http import Http404, HttpResponse, JsonResponse
 from django.urls import reverse
 from django.views import View, generic
 from django.contrib.auth import get_user_model
-from django.core.exceptions import ValidationError
 from rest_framework import viewsets
 from rest_framework.authentication import BaseAuthentication
 from rest_framework.permissions import BasePermission, IsAuthenticated
@@ -340,48 +339,6 @@ class SingleAuditChecklistView(APIView):
         base_data = dict(SingleAuditChecklistSerializer(sac).data.items())
         full_data = base_data | get_role_emails_for_sac(sac.id)
 
-        return JsonResponse(full_data)
-
-    def put(self, request, report_id):
-        """
-        Retrieve the SAC by report_id.
-        Return 404 if it doesn't exist.
-        If it does, examine the submission for fields that cannot be updated
-        via this endpoint and return errors (and status 400) if they are
-        present.
-        Otherwise, update the database entry with the submitted values and
-        return the updated SAC in JSON format.
-        """
-        try:
-            sac = SingleAuditChecklist.objects.get(report_id=report_id)
-        except SingleAuditChecklist.DoesNotExist as e:
-            raise Http404() from e
-        self.check_object_permissions(request, sac)
-
-        submitted_invalid_keys = [
-            k for k in self.invalid_metadata_keys if k in request.data
-        ] + [
-            k
-            for k in self.invalid_general_information_keys
-            if k in request.data.get("general_information", {})
-        ]
-
-        if submitted_invalid_keys:
-            base_msg = "The following fields cannot be modified via this endpoint: "
-            errors_str = ", ".join(sorted(submitted_invalid_keys))
-            error_msg = f"{base_msg}{errors_str}."
-            return JsonResponse({"errors": error_msg}, status=400)
-
-        for attr, value in request.data.items():
-            setattr(sac, attr, value)
-        try:
-            sac.full_clean()
-            sac.save()
-        except ValidationError as err:
-            return JsonResponse({"errors": err.message_dict}, status=400)
-
-        base_data = dict(SingleAuditChecklistSerializer(sac).data.items())
-        full_data = base_data | get_role_emails_for_sac(sac.id)
         return JsonResponse(full_data)
 
 
