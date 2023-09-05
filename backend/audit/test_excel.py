@@ -107,8 +107,10 @@ class FederalAwardsExcelTests(SimpleTestCase):
         _set_by_name(workbook, "auditee_uei", FederalAwardsExcelTests.GOOD_UEI)
         _set_by_name(workbook, "section_name", FORM_SECTIONS.FEDERAL_AWARDS_EXPENDED)
         _set_by_name(workbook, "amount_expended", 100)
-        _add_entry(workbook, 0, FederalAwardsExcelTests.TEST_DATA[0])
+        _set_by_name(workbook, "total_amount_expended", 500)
+        _set_by_name(workbook, "loan_balance_at_audit_period_end", 500)
 
+        _add_entry(workbook, 0, FederalAwardsExcelTests.TEST_DATA[0])
         federal_awards = extract_federal_awards(workbook)
 
         validate_federal_award_json(federal_awards)
@@ -120,6 +122,8 @@ class FederalAwardsExcelTests(SimpleTestCase):
         _set_by_name(workbook, "auditee_uei", FederalAwardsExcelTests.GOOD_UEI)
         _set_by_name(workbook, "section_name", FORM_SECTIONS.FEDERAL_AWARDS_EXPENDED)
         _set_by_name(workbook, "amount_expended", 200)
+        _set_by_name(workbook, "total_amount_expended", 400)
+
         for index, entry in enumerate(FederalAwardsExcelTests.TEST_DATA):
             _add_entry(workbook, index, entry)
 
