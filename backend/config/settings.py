@@ -409,7 +409,7 @@ AUTHENTICATION_BACKENDS = [
 ]
 
 env_base_url = env.str("DJANGO_BASE_URL", "")
-login_client_id = env.str("LOGIN_CLIENT_ID", "")
+login_client_id = secret("LOGIN_CLIENT_ID", "")
 secret_login_key = b64decode(secret("DJANGO_SECRET_LOGIN_KEY", ""))
 
 # which provider to use if multiple are available
