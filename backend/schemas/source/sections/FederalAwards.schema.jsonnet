@@ -32,7 +32,7 @@ local Validations = {
               }
               ,
               Types.string {
-                const: 'N/A',
+                const: Base.Const.NA,
               },
             ],
           },
