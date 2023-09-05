@@ -88,7 +88,7 @@ function setupAddress() {
   if (countrySelect.value == 'USA') {
     foreignFields.forEach((input) => {
       input.setAttribute('hidden', true);
-      input.querySelectorAll('input').forEach((element) => {
+      input.querySelectorAll('textarea').forEach((element) => {
         element.removeAttribute('required');
       });
     });
@@ -101,7 +101,7 @@ function setupAddress() {
   } else {
     foreignFields.forEach((input) => {
       input.removeAttribute('hidden');
-      input.querySelectorAll('input').forEach((element) => {
+      input.querySelectorAll('textarea').forEach((element) => {
         element.setAttribute('required', true);
       });
     });
