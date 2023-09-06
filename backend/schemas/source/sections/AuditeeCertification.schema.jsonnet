@@ -37,12 +37,15 @@ local AuditeeCertification = Types.object {
         auditee_title: Types.string {
           minimum: 1,
         },
-        auditee_certification_date_signed: Base.Compound.Date,
+        auditee_certification_date_signed: Types.string {
+          format: 'date',
+        },
       },
       required: ['auditee_name', 'auditee_title', 'auditee_certification_date_signed'],
     },
   },
-  required: ['auditee_certification', 'auditee_signature'],
+  //FIXME MSHD: Discuss this (should we check it in cross-validation)?
+  //required: ['auditee_certification', 'auditee_signature'],
   title: 'AuditeeCertification',
 };
 
