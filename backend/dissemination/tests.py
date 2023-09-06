@@ -9,7 +9,7 @@ import requests
 
 from config import settings
 
-api_schemas = ["api_v1_0_0_beta"]
+api_schemas = ["api_v1_0_0"]
 
 
 class APIViewTests(TestCase):

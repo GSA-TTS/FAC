@@ -4,7 +4,7 @@ begin;
 ---------------------------------------
 -- finding_text
 ---------------------------------------
-create view api_v1_0_0_beta.findings_text as
+create view api_v1_0_0.findings_text as
     select 
         gen.report_id,
         gen.auditee_uei,
@@ -26,7 +26,7 @@ create view api_v1_0_0_beta.findings_text as
 ---------------------------------------
 -- additional_ueis
 ---------------------------------------
-create view api_v1_0_0_beta.additional_ueis as
+create view api_v1_0_0.additional_ueis as
     select
         gen.report_id,
         gen.auditee_uei,
@@ -47,7 +47,7 @@ create view api_v1_0_0_beta.additional_ueis as
 ---------------------------------------
 -- finding
 ---------------------------------------
-create view api_v1_0_0_beta.findings as
+create view api_v1_0_0.findings as
     select 
         gen.report_id,
         gen.auditee_uei,
@@ -77,7 +77,7 @@ create view api_v1_0_0_beta.findings as
 ---------------------------------------
 -- federal award
 ---------------------------------------
-create view api_v1_0_0_beta.federal_awards as
+create view api_v1_0_0.federal_awards as
     select 
         gen.report_id,
         gen.auditee_uei,
@@ -117,7 +117,7 @@ create view api_v1_0_0_beta.federal_awards as
 ---------------------------------------
 -- corrective_action_plan
 ---------------------------------------
-create view api_v1_0_0_beta.corrective_action_plans as
+create view api_v1_0_0.corrective_action_plans as
     select 
         gen.report_id,
         gen.auditee_uei,
@@ -140,7 +140,7 @@ create view api_v1_0_0_beta.corrective_action_plans as
 ---------------------------------------
 -- notes_to_sefa
 ---------------------------------------
-create view api_v1_0_0_beta.notes_to_sefa as
+create view api_v1_0_0.notes_to_sefa as
     select 
         gen.report_id,
         gen.auditee_uei,
@@ -165,7 +165,7 @@ create view api_v1_0_0_beta.notes_to_sefa as
 ---------------------------------------
 -- passthrough
 ---------------------------------------
-create view api_v1_0_0_beta.passthrough as
+create view api_v1_0_0.passthrough as
     select
         gen.report_id,
         gen.auditee_uei,
@@ -189,7 +189,7 @@ create view api_v1_0_0_beta.passthrough as
 ---------------------------------------
 -- general
 ---------------------------------------
-create view api_v1_0_0_beta.general as
+create view api_v1_0_0.general as
     select
         -- every table starts with report_id, UEI, and year
         gen.report_id,
@@ -274,7 +274,7 @@ create view api_v1_0_0_beta.general as
 ---------------------------------------
 -- auditor (secondary auditor)
 ---------------------------------------
-create view api_v1_0_0_beta.secondary_auditors as
+create view api_v1_0_0.secondary_auditors as
     select
         gen.report_id,
         gen.auditee_uei,
@@ -300,7 +300,7 @@ create view api_v1_0_0_beta.secondary_auditors as
     order by sa.id
 ;
 
--- create view api_v1_0_0_beta.additional_eins as
+-- create view api_v1_0_0.additional_eins as
 --     select
 --         gen.report_id,
 --         gen.auditee_uei,
