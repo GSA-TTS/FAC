@@ -16,6 +16,8 @@ import {
   testWorkbookFindingsText,
   testWorkbookCorrectiveActionPlan,
   testWorkbookAdditionalUEIs,
+  testWorkbookSecondaryAuditors,
+  testWorkbookAdditionalEINs
 } from '../support/workbook-uploads.js';
 
 const LOGIN_TEST_EMAIL_AUDITEE = Cypress.env('LOGIN_TEST_EMAIL_AUDITEE');
@@ -79,8 +81,15 @@ describe('Full audit submission', () => {
     cy.get(".usa-link").contains("Additional UEIs").click();
     testWorkbookAdditionalUEIs(false);
 
+    cy.get(".usa-link").contains("Secondary Auditors").click();
+    testWorkbookSecondaryAuditors(false);
+    
+    
+    cy.get(".usa-link").contains("Additional EINs").click();
+    testWorkbookAdditionalEINs(false);
+    
     // Complete the audit information form
-    cy.get(".usa-link").contains("Audit Information Form").click();
+    cy.get(".usa-link").contains("Audit Information form").click();
     testAuditInformationForm();
 
     cy.get(".usa-link").contains("Pre-submission validation").click();

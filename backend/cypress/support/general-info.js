@@ -19,7 +19,7 @@ export function testValidGeneralInfo() {
 	cy.get('label[for=multiple-ueis-yes]').click();
 	cy.get('#ein').type('546000173');
 	cy.get('label[for=ein_not_an_ssn_attestation]').click();
-	cy.get('label[for=multiple-eins-no]').click();
+	cy.get('label[for=multiple-eins-yes]').click();
 	cy.get('#auditee_contact_name').type('John Doe');
 	cy.get('#auditee_contact_title').type('Keymaster');
 	cy.get('#auditee_phone').type('5558675309');
@@ -37,7 +37,7 @@ export function testValidGeneralInfo() {
 	cy.get('#auditor_contact_title').type('Auditor');
 	cy.get('#auditor_phone').type('5555555555');
 	cy.get('#auditor_email').type('qualified.human.accountant@auditor');
-	cy.get('label[for=secondary_auditors-no]').click();
+	cy.get('label[for=secondary_auditors-yes]').click();
 
 	cy.get('#continue').click();
 

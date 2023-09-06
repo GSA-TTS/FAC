@@ -42,13 +42,14 @@ services:
       SAM_API_KEY: ${SAM_API_KEY}
       DJANGO_BASE_URL: http://localhost:8000
       DJANGO_SECRET_LOGIN_KEY: ${DJANGO_SECRET_LOGIN_KEY}
+      LOGIN_CLIENT_ID: ${LOGIN_CLIENT_ID}
       ENV: ${ENV}
       SECRET_KEY: ${SECRET_KEY}
       ALLOWED_HOSTS: 0.0.0.0 127.0.0.1 localhost
       AV_SCAN_URL: http://clamav-rest:9000/scan
       DISABLE_AUTH: ${DISABLE_AUTH:-False}
       PGRST_JWT_SECRET: ${PGRST_JWT_SECRET:-32_chars_fallback_secret_testing}
-      ENABLE_DEBUG_TOOLBAR: true
+      ENABLE_DEBUG_TOOLBAR: false
 
     env_file:
       - ".env"

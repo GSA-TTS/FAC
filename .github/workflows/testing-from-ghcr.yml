@@ -13,13 +13,14 @@ jobs:
       SAM_API_KEY: ${{ secrets.SAM_API_KEY }}
       DJANGO_BASE_URL: 'http://localhost:8000'
       DJANGO_SECRET_LOGIN_KEY: ${{ secrets.DJANGO_SECRET_LOGIN_KEY }}
+      LOGIN_CLIENT_ID: ${{ secrets.LOGIN_CLIENT_ID }}
       SECRET_KEY: ${{ secrets.SECRET_KEY }}
       ALLOWED_HOSTS: '0.0.0.0 127.0.0.1 localhost'
       DISABLE_AUTH: False
       PGRST_JWT_SECRET: ${{ secrets.PGRST_JWT_SECRET }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - uses: actions/setup-node@v3
         with:
@@ -61,12 +62,13 @@ jobs:
       SAM_API_KEY: ${{ secrets.SAM_API_KEY }}
       DJANGO_BASE_URL: 'http://localhost:8000'
       DJANGO_SECRET_LOGIN_KEY: ${{ secrets.DJANGO_SECRET_LOGIN_KEY }}
+      LOGIN_CLIENT_ID: ${{ secrets.LOGIN_CLIENT_ID }}
       SECRET_KEY: ${{ secrets.SECRET_KEY }}
       ALLOWED_HOSTS: '0.0.0.0 127.0.0.1 localhost'
       DISABLE_AUTH: True
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - uses: actions/setup-node@v3
         with:
