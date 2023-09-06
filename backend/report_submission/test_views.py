@@ -188,7 +188,6 @@ class TestPreliminaryViews(TestCase):
         self.assertTemplateUsed(step2_get, "report_submission/step-2.html")
 
         step2_data = {
-            # FIXME MSHD: Why auditee_name was commented out
             "auditee_name": "Federal Bureau of Control",
             "auditee_uei": "KZV2XNZZN3A8",
             "auditee_fiscal_period_start": "01/01/2022",

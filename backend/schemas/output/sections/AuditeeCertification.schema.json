@@ -65,6 +65,10 @@
          "type": "object"
       }
    },
+   "required": [
+      "auditee_certification",
+      "auditee_signature"
+   ],
    "title": "AuditeeCertification",
    "type": "object"
 }

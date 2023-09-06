@@ -281,7 +281,7 @@ class SubmissionStatusTests(TestCase):
             user,
             "audit:AuditorCertificationConfirm",
             kwargs=kwargs,
-            data=data_step_2,
+            data=data_step_1 | data_step_2,
         )
 
         updated_sac = SingleAuditChecklist.objects.get(report_id=sac.report_id)
@@ -320,7 +320,7 @@ class SubmissionStatusTests(TestCase):
             user,
             "audit:AuditeeCertificationConfirm",
             kwargs=kwargs,
-            data=data_step_2,
+            data=data_step_1 | data_step_2,
         )
 
         updated_sac = SingleAuditChecklist.objects.get(report_id=sac.report_id)

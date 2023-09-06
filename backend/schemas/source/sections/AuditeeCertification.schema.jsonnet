@@ -44,8 +44,7 @@ local AuditeeCertification = Types.object {
       required: ['auditee_name', 'auditee_title', 'auditee_certification_date_signed'],
     },
   },
-  //FIXME MSHD: Discuss this (should we check it in cross-validation)?
-  //required: ['auditee_certification', 'auditee_signature'],
+  required: ['auditee_certification', 'auditee_signature'],
   title: 'AuditeeCertification',
 };
 
