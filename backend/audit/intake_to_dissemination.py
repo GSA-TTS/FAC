@@ -234,51 +234,6 @@ class IntakeToDissemination(object):
                 return_dict[status] = None
         return return_dict
 
-    # def _load_audit_info(self, general):
-    #     # Because this operates on the general object, it is called from load_general.
-    #     audit_information = self.single_audit_checklist.audit_information
-
-    #     if audit_information:  #FIXME This should be checked as part of cross-validation
-    #         general.gaap_results = audit_information["gaap_results"]
-    #         """
-    #             TODO:
-    #             Missing in schema
-    #             general.sp_framework = audit_information[]
-    #             general.is_sp_framework_required = audit_information[]
-    #             general.sp_framework_auditor_opinion = audit_information[]
-    #         """
-    #         general.is_going_concern = (
-    #             audit_information["is_going_concern_included"] == "Y"
-    #         )
-    #         general.is_significant_deficiency = (
-    #             audit_information["is_internal_control_deficiency_disclosed"] == "Y"
-    #         )
-    #         general.is_material_weakness = (
-    #             audit_information["is_internal_control_material_weakness_disclosed"]
-    #             == "Y"
-    #         )
-    #         general.is_material_noncompliance = (
-    #             audit_information["is_material_noncompliance_disclosed"] == "Y"
-    #         )
-    #         general.is_duplicate_reports = (
-    #             audit_information["is_aicpa_audit_guide_included"] == "Y"
-    #         )
-    #         general.dollar_threshold = audit_information["dollar_threshold"]
-    #         general.is_low_risk = audit_information["is_low_risk_auditee"] == "Y"
-    #         general.agencies_with_prior_findings = audit_information["agencies"]
-
-    # try:
-    #     general = General.objects.get(report_id=report_id)
-    # except General.DoesNotExist:
-    #     logger.error(
-    #         f"General must be loaded before FederalAward. report_id = {report_id}"
-    #     )
-    #     return
-    # general.total_amount_expended = federal_awards["FederalAwards"].get(
-    #     "total_amount_expended"
-    # )
-    # general.save() #FIXME: Lest's revisit this
-
     def _bool_to_yes_no(self, condition):
         return "Yes" if condition else "No"
 

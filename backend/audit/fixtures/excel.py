@@ -91,7 +91,6 @@ FORM_SECTIONS = FormSections(
     NOTES_TO_SEFA="NotesToSefa",
 )
 
-# FIXME MSHD: We should consolidate SectionNames with the above FormSections
 SectionNames = namedtuple(
     "SectionNames",
     (
