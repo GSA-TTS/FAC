@@ -1,6 +1,9 @@
 from collections import defaultdict
 import os
 from .models import SingleAuditChecklist, CognizantBaseline
+from dissemination.models import CensusGen22, cognizant_agencies_21_25
+from django.db.models.functions import Cast
+from django.db.models import BigIntegerField
 import sqlalchemy
 
 
@@ -27,11 +30,38 @@ def cog_over(sac: SingleAuditChecklist):
     if total_amount_expended <= COG_LIMIT:
         oversight_agency = agency
         return (cognizant_agency, oversight_agency)
-    cognizant_agency = determine_2019_agency(sac.ein)
+
+    # Find dbkey from Gen22 table
+    dbkey = find_dbkey_from_Gen22(sac.auditee_ein, sac.auditee_uei)
+    if dbkey:
+        # Check cognizant_agencies_21_25 table
+        cognizant_agency = check_21_25_cog_assignment(dbkey, sac.auditee_ein)
+        if cognizant_agency:
+            return (cognizant_agency, oversight_agency)
+
+    cognizant_agency = determine_2019_agency_w_dbkey(sac.auditee_ein, dbkey)
     if cognizant_agency:
         return (cognizant_agency, oversight_agency)
     cognizant_agency = agency
     return (cognizant_agency, oversight_agency)
+
+
+def find_dbkey_from_Gen22(ein, uei):
+    dbkey = CensusGen22.objects.annotate(
+        int_ein=Cast("ein", output_field=BigIntegerField())
+        ).filter(int_ein=int(ein), uei=uei).values_list("dbkey", flat=True)
+    if len(dbkey) > 0:
+        return dbkey[0]
+    return None
+
+
+def check_21_25_cog_assignment(dbkey, ein):
+    cog_agency_list = cognizant_agencies_21_25.objects.annotate(
+        int_ein=Cast("ein", output_field=BigIntegerField())
+        ).filter(dbkey=dbkey, int_ein=int(ein)).values_list("cogagency", flat=True)
+    if len(cog_agency_list) > 0:
+        return cog_agency_list[0]
+    return None
 
 
 def calc_award_amounts(awards):
@@ -154,8 +184,6 @@ def calc_cfda_amounts(cfdas):
         agency = cfda[1][:2]
         amount = cfda[2] or 0
         direct = cfda[3]
-        # TODO use amount rather than programamount?
-        # programtotal = cfda[4] or 0
         total_amount_agency[agency] += amount
         if direct == "Y":
             total_da_amount_expended += amount

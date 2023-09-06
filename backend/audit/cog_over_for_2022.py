@@ -5,6 +5,7 @@ from audit.cog_over import (
     calc_cfda_amounts,
     determine_agency,
     determine_2019_agency_w_dbkey,
+    check_21_25_cog_assignment,
 )
 
 
@@ -21,28 +22,28 @@ def cog_over_for_2022():
         os.getenv("DATABASE_URL").replace("postgres", "postgresql", 1)
     )
     # Use the following query to test Cog
-    # AUDIT_QUERY = """
-    #     SELECT gen."DBKEY", gen."EIN", cast(gen."TOTFEDEXPEND" as BIGINT),
-    #             gen."COG_OVER", gen."COGAGENCY", gen."OVERSIGHTAGENCY",
-    #             cfda."CFDA", cast(cfda."AMOUNT" as BIGINT), cfda."DIRECT"
-    #     FROM census_gen22 gen, census_cfda22 cfda
-    #     WHERE gen."AUDITYEAR" = :ref_year
-    #     AND cast(gen."TOTFEDEXPEND" as BIGINT) > :threshold
-    #     AND gen."DBKEY" = cfda."DBKEY"
-    #     AND gen."EIN" = cfda."EIN"
-    #     ORDER BY gen."DBKEY"
-    # """
-    # Use the following query to test Cog / Over
     AUDIT_QUERY = """
         SELECT gen."DBKEY", gen."EIN", cast(gen."TOTFEDEXPEND" as BIGINT),
                 gen."COG_OVER", gen."COGAGENCY", gen."OVERSIGHTAGENCY",
                 cfda."CFDA", cast(cfda."AMOUNT" as BIGINT), cfda."DIRECT"
         FROM census_gen22 gen, census_cfda22 cfda
         WHERE gen."AUDITYEAR" = :ref_year
+        AND cast(gen."TOTFEDEXPEND" as BIGINT) > :threshold
         AND gen."DBKEY" = cfda."DBKEY"
         AND gen."EIN" = cfda."EIN"
         ORDER BY gen."DBKEY"
     """
+    # Use the following query to test Cog / Over
+    # AUDIT_QUERY = """
+    #     SELECT gen."DBKEY", gen."EIN", cast(gen."TOTFEDEXPEND" as BIGINT),
+    #             gen."COG_OVER", gen."COGAGENCY", gen."OVERSIGHTAGENCY",
+    #             cfda."CFDA", cast(cfda."AMOUNT" as BIGINT), cfda."DIRECT"
+    #     FROM census_gen22 gen, census_cfda22 cfda
+    #     WHERE gen."AUDITYEAR" = :ref_year
+    #     AND gen."DBKEY" = cfda."DBKEY"
+    #     AND gen."EIN" = cfda."EIN"
+    #     ORDER BY gen."DBKEY"
+    # """
     with engine.connect() as conn:
         result = conn.execute(
             sqlalchemy.text(AUDIT_QUERY), {"ref_year": REF_YEAR, "threshold": COG_LIMIT}
@@ -132,9 +133,12 @@ def cog_over_for_2022():
             cogover = "O"
         else:
             cogover = "C"
-            cognizant_agency = determine_2019_agency_w_dbkey(ein, dbkey)
+            # Check cognizant_agencies_21_25 table
+            cognizant_agency = check_21_25_cog_assignment(dbkey, ein)
             if cognizant_agency is None:
-                cognizant_agency = agency
+                cognizant_agency = determine_2019_agency_w_dbkey(ein, dbkey)
+                if cognizant_agency is None:
+                    cognizant_agency = agency
 
         df_calc_row = {
             "DBKEY": dbkey,
