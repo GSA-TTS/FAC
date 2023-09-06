@@ -51,13 +51,13 @@ def cog_over_for_2022():
         print("Obtained result from postgres")
         print("result.rowcount = ", result.rowcount)
 
-        local_test_count = 0
+        # local_test_count = 0
         gens = []
         cfdas = []
         for row in result:
-            local_test_count += 1
-            if local_test_count > 250_000:
-                break
+            # local_test_count += 1
+            # if local_test_count > 250_000:
+            #    # break
             (
                 DBKEY,
                 EIN,
