@@ -297,6 +297,10 @@
                                     "type": "integer"
                                  },
                                  {
+                                    "pattern": "[0-9]+",
+                                    "type": "string"
+                                 },
+                                 {
                                     "const": "N/A",
                                     "type": "string"
                                  }

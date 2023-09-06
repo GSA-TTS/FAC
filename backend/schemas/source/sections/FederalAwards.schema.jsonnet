@@ -274,12 +274,10 @@ local Parts = {
     description: 'A loan or loan guarantee and balance',
     properties: {
       is_guaranteed: Base.Enum.YorN,
-      //FIXME MSHD: This field is formatted as text in the workbook but openpyxl reads it as
-      // integer when user enters number ???
       loan_balance_at_audit_period_end: {
         anyOf: [
           Types.integer,
-          //Types.string { pattern: '[0-9]+' },
+          Types.string { pattern: '[0-9]+' },
           Types.string {
             const: Base.Const.NA,
           },
