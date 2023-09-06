@@ -1,8 +1,9 @@
 from collections import defaultdict
 from .models import SingleAuditChecklist
-from dissemination.models import CensusGen19, CensusCfda19
+from dissemination.hist_models.census_2019 import CensusGen19, CensusCfda19
+from dissemination.hist_models.census_2022 import CensusGen22
 from django.db.models.functions import Cast
-from django.db.models import BigIntegerField
+from django.db.models import BigIntegerField, Q
 
 
 COG_LIMIT = 50_000_000
@@ -25,7 +26,7 @@ def cog_over(sac: SingleAuditChecklist):
         oversight_agency = agency
         print("Assigning an oversight agenct", oversight_agency)
         return (cognizant_agency, oversight_agency)
-    cognizant_agency = determine_2019_agency(sac.ein)
+    cognizant_agency = determine_2019_agency(sac.ein, sac.auditee_uei)
     if cognizant_agency:
         print("Assigning a 2019 cog agency", cognizant_agency)
         return (cognizant_agency, oversight_agency)
@@ -59,12 +60,21 @@ def determine_agency(total_amount_expended, max_total_agency, max_da_agency):
         return agency
 
 
-def determine_2019_agency(ein):
-    (dbkey, total_amount_expended) = get_baseline_gen(ein)
-    if not dbkey:
+def determine_2019_agency(ein, uei):
+    dbkey = get_dbkey(ein, uei)
+    print(f"Looked up dbkey from 2022 and got {dbkey}")
+
+    cog_agency = lookup_baseline(ein, uei, dbkey)
+    if cog_agency:
+        print("Found cog in lookup table")
+        return cog_agency
+    (gen_count, total_amount_expended) = get_2019_gen(ein, dbkey)
+    if gen_count != 1:
+        print("Found no gen data for dbkey {dbkey} in 2019")
         return None
-    cfdas = get_baseline_cfdas(dbkey)
+    cfdas = get_2019_cfdas(ein, dbkey)
     if not cfdas:
+        print("Found no cfda data for dbkey {dbkey} in 2019")
         return None
     (max_total_agency, max_da_agency) = calc_cfda_amounts(cfdas)
     cognizant_agency = determine_agency(
@@ -75,21 +85,39 @@ def determine_2019_agency(ein):
     return cognizant_agency
 
 
-def get_baseline_gen(ein):
+def get_dbkey(ein, uei):
+    try:
+        dbkey = CensusGen22.objects.values_list("dbkey", flat=True).get(
+            Q(ein=ein), Q(uei=uei) | Q(uei=None))[:]
+    except (CensusGen22.DoesNotExist, CensusGen22.MultipleObjectsReturned):
+        dbkey = None
+    return dbkey
+
+
+def lookup_baseline(ein, uei, dbkey):
+    return None
+
+
+def get_2019_gen(ein, dbkey):
     gens = CensusGen19.objects.annotate(
         amt=Cast("totfedexpend", output_field=BigIntegerField())
-    ).filter(ein=ein)
-    print(f"Found {len(gens)} gen in 2019 for ein:{ein}")
+            ).filter(
+            Q(ein=ein), Q(dbkey=dbkey) | Q(dbkey=None))
+        
+    print(f"Found {len(gens)} gen in 2019 for ein: {ein} and dbkey:{dbkey}")
     if len(gens) != 1:
-        return (None, 0)
+        return (len(gens), 0)
     gen = gens[0]
-    return (gen.dbkey, gen.amt)
+    return (1, gen.amt)
 
 
-def get_baseline_cfdas(dbkey):
+def get_2019_cfdas(ein, dbkey):
     cfdas = CensusCfda19.objects.annotate(
         amt=Cast("amount", output_field=BigIntegerField())
-    ).filter(dbkey=dbkey)
+            ).filter(
+            Q(ein=ein), Q(dbkey=dbkey) | Q(dbkey=None))
+
+    print(f"Found {len(cfdas)} cfdas in 2019 for ein: {ein} and dbkey:{dbkey}")
     if len(cfdas) == 0:
         return None
     baseline_cfdas = []
