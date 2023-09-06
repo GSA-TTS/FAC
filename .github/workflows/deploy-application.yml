@@ -86,4 +86,4 @@ jobs:
           cf_password: ${{ secrets.CF_PASSWORD }}
           cf_org: gsa-tts-oros-fac
           cf_space: ${{ env.space }}
-          command: chmod +x ./load_data.sh && cf run-task gsa-fac -k 6G -m 1G --name load_data --command ./load_data.sh
+          command: cf run-task gsa-fac -k 6G -m 1G --name load_data --command "chmod +x ./load_data.sh && ./load_data.sh"
