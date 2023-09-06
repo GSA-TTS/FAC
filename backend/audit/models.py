@@ -625,6 +625,9 @@ class ExcelFile(models.Model):
     date_created = models.DateTimeField(auto_now_add=True)
 
     def save(self, *args, **kwargs):
+        if self.sac.submission_status != SingleAuditChecklist.STATUS.IN_PROGRESS:
+            raise LateChangeError("Attemtped Excel file upload")
+
         self.filename = f"{self.sac.report_id}--{self.form_section}.xlsx"
 
         event_user = kwargs.pop("event_user", None)

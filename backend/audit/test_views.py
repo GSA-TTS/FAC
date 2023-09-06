@@ -73,9 +73,9 @@ AUDIT_JSON_FIXTURES = Path(__file__).parent / "fixtures" / "json"
 
 
 # Mocking the user login and file scan functions
-def _mock_login_and_scan(client, mock_scan_file):
+def _mock_login_and_scan(client, mock_scan_file, **kwargs):
     """Helper function to mock the login and file scan functions"""
-    user, sac = _make_user_and_sac()
+    user, sac = _make_user_and_sac(**kwargs)
 
     baker.make(Access, user=user, sac=sac)
 
@@ -934,6 +934,79 @@ class ExcelFileHandlerViewTests(TestCase):
             submission_events[event_count - 1].event,
             SubmissionEvent.EventType.SECONDARY_AUDITORS_UPDATED,
         )
+
+    @patch("audit.validators._scan_file")
+    def test_late_file_upload(self, mock_scan_file):
+        """When a valid Excel file is uploaded after the submission has been locked, the upload should be rejected"""
+
+        test_cases = [
+            (
+                FEDERAL_AWARDS_ENTRY_FIXTURES,
+                FEDERAL_AWARDS_TEMPLATE,
+                FORM_SECTIONS.FEDERAL_AWARDS_EXPENDED,
+            ),
+            (
+                CORRECTIVE_ACTION_PLAN_ENTRY_FIXTURES,
+                CORRECTIVE_ACTION_PLAN_TEMPLATE,
+                FORM_SECTIONS.CORRECTIVE_ACTION_PLAN,
+            ),
+            (
+                FINDINGS_UNIFORM_GUIDANCE_ENTRY_FIXTURES,
+                FINDINGS_UNIFORM_GUIDANCE_TEMPLATE,
+                FORM_SECTIONS.FINDINGS_UNIFORM_GUIDANCE,
+            ),
+            (
+                FINDINGS_TEXT_ENTRY_FIXTURES,
+                FINDINGS_TEXT_TEMPLATE,
+                FORM_SECTIONS.FINDINGS_TEXT,
+            ),
+            (
+                SECONDARY_AUDITORS_ENTRY_FIXTURES,
+                SECONDARY_AUDITORS_TEMPLATE,
+                FORM_SECTIONS.SECONDARY_AUDITORS,
+            ),
+        ]
+
+        for test_case in test_cases:
+            with self.subTest():
+                fixtures, template, section = test_case
+
+                sac = _mock_login_and_scan(
+                    self.client,
+                    mock_scan_file,
+                    submission_status=SingleAuditChecklist.STATUS.READY_FOR_CERTIFICATION,
+                )
+
+                test_data = json.loads(fixtures.read_text(encoding="utf-8"))
+
+                # add valid data to the workbook
+                workbook = load_workbook(template, data_only=True)
+                _set_by_name(
+                    workbook, "auditee_uei", ExcelFileHandlerViewTests.GOOD_UEI
+                )
+                _set_by_name(workbook, "section_name", section)
+                _add_entry(workbook, 0, test_data[0])
+
+                with NamedTemporaryFile(suffix=".xlsx") as tmp:
+                    workbook.save(tmp.name)
+                    tmp.seek(0)
+
+                    with open(tmp.name, "rb") as excel_file:
+                        response = self.client.post(
+                            reverse(
+                                f"audit:{section}",
+                                kwargs={
+                                    "report_id": sac.report_id,
+                                    "form_section": section,
+                                },
+                            ),
+                            data={"FILES": excel_file},
+                        )
+
+                        self.assertEqual(response.status_code, 400)
+                        self.assertIn(
+                            "no_late_changes", response.content.decode("utf-8")
+                        )
 
 
 class SingleAuditReportFileHandlerViewTests(TestCase):
