@@ -40,7 +40,7 @@
                      },
                      "reference_number": {
                         "description": "Reference Number",
-                        "pattern": "^20[2-9][0-9]-[0-9]{3}$",
+                        "pattern": "^20[1-9][0-9]-[0-9]{3}$",
                         "title": "ReferenceNumber",
                         "type": "string"
                      }

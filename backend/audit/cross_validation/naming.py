@@ -1,21 +1,7 @@
+from types import new_class
 from typing import NamedTuple
 
-# There's no way around it, we need a canonical source of the different versions of each
-# name.
-"""
-    Starting point:
-
-        "AdditionalUEIs": "additional_ueis",
-        "AdditionalUEIs": "additional_ueis",
-        "AuditInformation": "audit_information",
-        "CorrectiveActionPlan": "corrective_action_plan",
-        "FederalAwards": "federal_awards",
-        "FindingsText": "findings_text",
-        "FindingsUniformGuidance": "findings_uniform_guidance",
-        "GeneralInformation": "general_information",
-        "NotesToSefa": "notes_to_sefa",
-        "TribalDataConsent": "tribal_data_consent",
-"""
+# We need a canonical source of the different versions of each name.
 
 
 class SectionBabelFish(NamedTuple):
@@ -157,6 +143,31 @@ SECTION_NAMES = {
 }
 
 
+# The following sets up NameConstantMetaclass as a metaclass that has property methods
+# for all of its attributes, then creates NC with NameConstantMetaclass as its
+# metaclass. The resulting class has each of the all_caps names from SECTION_NAMES as a
+# class-level attribute that is also read-only.
+# Thus e.g. NC.GENERAL_INFORMATION will return "general_information" and be read-only.
+
+
+def _readonly(value):
+    """
+    Given a value, return property method for that value, in order to set up the
+    metaclass below.
+    """
+    return property(lambda self: value)
+
+
+nameproperties = {
+    guide.all_caps: _readonly(guide.snake_case) for guide in SECTION_NAMES.values()
+}
+
+
+NameConstantsMetaclass = type("NCM", (type,), nameproperties)
+NC = new_class("NC", (object,), {"metaclass": NameConstantsMetaclass})
+
+
+# Helper funtions:
 def find_section_by_name(name):
     """
     Find the answers, first trying snake_case and then all the other versions.
