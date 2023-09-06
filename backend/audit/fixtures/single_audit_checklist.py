@@ -97,7 +97,7 @@ def fake_auditor_certification():
 
 
 def fake_auditee_certification():
-    """Create fake auditor confirmation form data."""
+    """Create fake auditee confirmation form data."""
     fake = Faker()
     data_step_1 = {
         "has_no_PII": True,

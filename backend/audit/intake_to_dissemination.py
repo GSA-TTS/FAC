@@ -25,7 +25,7 @@ class IntakeToDissemination(object):
             "auditee_fiscal_period_start", datetime.now
         )
         self.audit_year = int(audit_date.split("-")[0])
-        self.loaded_objects = dict()
+        self.loaded_objects: dict[str, list] = {}
 
     def load_all(self):
         load_methods = {
@@ -38,7 +38,6 @@ class IntakeToDissemination(object):
             "CapTexts": self.load_captext,
             "Notes": self.load_notes,
             "AdditionalUEIs": self.load_additional_ueis,
-            "AuditInfo": self.load_audit_info,
         }
         for _, load_method in load_methods.items():
             try:
@@ -121,9 +120,7 @@ class IntakeToDissemination(object):
         federal_awards = self.single_audit_checklist.federal_awards
         federal_awards_objects = []
 
-        for entry in federal_awards["FederalAwards"][
-            "federal_awards"
-        ]:  # FIXME To discuss
+        for entry in federal_awards["FederalAwards"]["federal_awards"]:
             program = entry["program"]
             loan = entry["loan_or_loan_guarantee"]
             cluster = entry["cluster"]
@@ -282,16 +279,16 @@ class IntakeToDissemination(object):
     # )
     # general.save() #FIXME: Lest's revisit this
 
-    def _bool_to_yes_no(condition):
+    def _bool_to_yes_no(self, condition):
         return "Yes" if condition else "No"
 
-    def _optional_bool(condition):
+    def _optional_bool(self, condition):
         if condition is None:
             return ""
         else:
             return "Yes" if condition else "No"
 
-    def _json_array_to_str(json_array):
+    def _json_array_to_str(self, json_array):
         if json_array is None:
             return ""
         elif isinstance(json_array, list):
@@ -327,7 +324,7 @@ class IntakeToDissemination(object):
             auditee_ein=general_information["ein"],
             auditee_uei=general_information["auditee_uei"],
             is_additional_ueis=self._bool_to_yes_no(
-                self.single_audit_checklist.additional_ueis
+                general_information["multiple_ueis_covered"]
             ),
             auditee_zip=general_information["auditee_zip"],
             auditor_phone=general_information["auditor_phone"],
@@ -380,7 +377,7 @@ class IntakeToDissemination(object):
                 audit_information.get("is_sp_framework_required", None)
             ),
             sp_framework_opinions=self._json_array_to_str(
-                audit_information["sp_framework_opinions"]
+                audit_information.get("sp_framework_opinions")
             ),
             is_going_concern_included=self._bool_to_yes_no(
                 audit_information["is_going_concern_included"]
@@ -456,51 +453,3 @@ class IntakeToDissemination(object):
                     additional_uei=uei["additional_uei"],
                 )
                 auei.save()  # FIXME: We could use a bulk insert here. Also, we could do all save in a batch.
-
-    # MCJ
-    # This all is in _load_audit_info, which is called from load_general.
-    # If anything is missing from _load_audit_info, it should be fixed there.
-
-    # def load_audit_info(self):
-    #     report_id = self.single_audit_checklist.report_id
-    #     try:
-    #         general = General.objects.get(report_id=report_id)
-    #     except General.DoesNotExist:
-    #         logger.error(
-    #             f"General must be loaded before AuditInfo. report_id = {report_id}"
-    #         )
-    #         return
-    #     audit_information = self.single_audit_checklist.audit_information
-    #     if not audit_information:
-    #         logger.warning("No audit info found to load")
-    #         return
-    #     general.gaap_results = audit_information["gaap_results"]
-    #     general.sp_framework = (
-    #         audit_information["sp_framework_basis"]
-    #         if "sp_framework_basis" in audit_information
-    #         else None,
-    #     )
-    #     general.is_sp_framework_required = (
-    #         audit_information["is_sp_framework_required"] == "Y"
-    #     )
-    #     general.sp_framework_auditor_opinion = audit_information[
-    #         "sp_framework_opinions"
-    #     ]
-    #     general.is_going_concern = audit_information["is_going_concern_included"] == "Y"
-    #     general.is_significant_deficiency = (
-    #         audit_information["is_internal_control_deficiency_disclosed"] == "Y"
-    #     )
-    #     general.is_material_weakness = (
-    #         audit_information["is_internal_control_material_weakness_disclosed"] == "Y"
-    #     )
-    #     general.is_material_noncompliance = (
-    #         audit_information["is_material_noncompliance_disclosed"] == "Y"
-    #     )
-    #     general.is_duplicate_reports = (
-    #         audit_information["is_aicpa_audit_guide_included"] == "Y"
-    #     )
-    #     general.dollar_threshold = audit_information["dollar_threshold"]
-    #     general.is_low_risk = audit_information["is_low_risk_auditee"] == "Y"
-    #     general.agencies_with_prior_findings = audit_information["agencies"]
-
-    #     general.save()  # FIXME: Let's revisit this

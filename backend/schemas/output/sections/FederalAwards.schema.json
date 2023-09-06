@@ -260,20 +260,6 @@
                                  }
                               },
                               "then": {
-                                 "properties": {
-                                    "loan_balance_at_audit_period_end": {
-                                       "oneOf": [
-                                          {
-                                             "pattern": "[0-9]+",
-                                             "type": "string"
-                                          },
-                                          {
-                                             "const": "N/A",
-                                             "type": "string"
-                                          }
-                                       ]
-                                    }
-                                 },
                                  "required": [
                                     "loan_balance_at_audit_period_end"
                                  ]
@@ -306,7 +292,15 @@
                               "type": "string"
                            },
                            "loan_balance_at_audit_period_end": {
-                              "type": "string"
+                              "anyOf": [
+                                 {
+                                    "type": "integer"
+                                 },
+                                 {
+                                    "const": "N/A",
+                                    "type": "string"
+                                 }
+                              ]
                            }
                         },
                         "required": [

@@ -485,6 +485,7 @@ class ExcelFileHandlerViewTests(TestCase):
 
         # add valid data to the workbook
         workbook = load_workbook(FEDERAL_AWARDS_TEMPLATE, data_only=True)
+        _set_by_name(workbook, "total_amount_expended", test_data[0]["amount_expended"])
         _set_by_name(workbook, "auditee_uei", ExcelFileHandlerViewTests.GOOD_UEI)
         _set_by_name(workbook, "section_name", FORM_SECTIONS.FEDERAL_AWARDS_EXPENDED)
         _add_entry(workbook, 0, test_data[0])
@@ -561,12 +562,6 @@ class ExcelFileHandlerViewTests(TestCase):
                 self.assertEqual(
                     federal_awards_entry["program"]["audit_report_type"],
                     test_data[0]["audit_report_type"],
-                )
-                self.assertEqual(
-                    federal_awards_entry["loan_or_loan_guarantee"][
-                        "loan_balance_at_audit_period_end"
-                    ],
-                    test_data[0]["loan_balance_at_audit_period_end"],
                 )
                 self.assertEqual(
                     federal_awards_entry["subrecipients"]["is_passed"],

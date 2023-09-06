@@ -319,6 +319,12 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         blank=True, null=True, validators=[validate_tribal_data_consent_json]
     )
 
+    cognizant_agency = models.TextField(null=True)
+
+    oversight_agency = models.TextField(
+        null=True,
+    )
+
     def validate_full(self):
         """
         Full validation, intended for use when the user indicates that the
@@ -436,14 +442,15 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         from audit.intake_to_dissemination import IntakeToDissemination
         from audit.cog_over import cog_over
 
+        # FIXME MSHD: I moved this up since submitted_date is expected in the dissemination
+        self.transition_name.append(SingleAuditChecklist.STATUS.SUBMITTED)
+        self.transition_date.append(datetime.now(timezone.utc))
+        # FIXME MSHD: Discuss this if statement
         if self.general_information:
             # cog / over assignment
             self.cognizant_agency, self.oversight_agency = cog_over(self)
             intake_to_dissem = IntakeToDissemination(self)
             intake_to_dissem.load_all()
-
-        self.transition_name.append(SingleAuditChecklist.STATUS.SUBMITTED)
-        self.transition_date.append(datetime.now(timezone.utc))
 
     @transition(
         field="submission_status",

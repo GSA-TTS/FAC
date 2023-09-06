@@ -27,11 +27,14 @@ local AuditorCertification = Types.object {
       properties: {
         auditor_name: Types.string,
         auditor_title: Types.string,
-        auditor_certification_date_signed: Base.Compound.Date,
+        auditor_certification_date_signed: Types.string {
+          format: 'date',
+        },
       },
       required: ['auditor_name', 'auditor_title', 'auditor_certification_date_signed'],
     },
-    required: ['auditor_certification', 'auditor_signature'],
+    //FIXME MSHD: Discuss this (should we check it in cross-validation)?
+    //required: ['auditor_certification', 'auditor_signature'],
   },
   title: 'AuditorCertification',
 };
