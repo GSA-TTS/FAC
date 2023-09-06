@@ -439,6 +439,9 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         if self.general_information:
             # cog / over assignment
             self.cognizant_agency, self.oversight_agency = cog_over(self)
+            self.cogover = 'O'
+            if self.oversight_agency is None:
+                self.cogover = 'C'
 
             etl = ETL(self)
             etl.load_all()
