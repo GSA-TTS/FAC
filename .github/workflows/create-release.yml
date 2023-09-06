@@ -3,7 +3,7 @@ name: Create Release
 on:
 #   schedule:
 #     - cron: '0 18 * * 3'
-  workflow_dispatch: null
+  workflow_dispatch:
 
 jobs:
   release:
