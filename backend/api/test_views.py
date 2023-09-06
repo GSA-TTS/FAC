@@ -308,19 +308,22 @@ class AuditeeInfoTests(TestCase):
             self.user.profile.entry_form_data, VALID_ELIGIBILITY_DATA | input_data
         )
 
-    def test_null_auditee_name(self):
-        """
-        Auditee name can be null
-        """
-        self.user.profile.entry_form_data = VALID_ELIGIBILITY_DATA
-        self.user.profile.save()
-        input_data = VALID_AUDITEE_INFO_DATA | {"auditee_name": None}
-        response = self.client.post(AUDITEE_INFO_PATH, input_data, format="json")
-        data = response.json()
-        self.assertEqual(data["next"], ACCESS_AND_SUBMISSION_PATH)
-        self.assertEqual(
-            self.user.profile.entry_form_data, VALID_ELIGIBILITY_DATA | input_data
-        )
+    # FIXME MSHD: This test is wrong (None is not an option), the following
+    # test is more accurate. Also, we are going to remove the API post endpoint.
+    #
+    # def test_null_auditee_name(self):
+    #     """
+    #     Auditee name can be null
+    #     """
+    #     self.user.profile.entry_form_data = VALID_ELIGIBILITY_DATA
+    #     self.user.profile.save()
+    #     input_data = VALID_AUDITEE_INFO_DATA | {"auditee_name": None}
+    #     response = self.client.post(AUDITEE_INFO_PATH, input_data, format="json")
+    #     data = response.json()
+    #     self.assertEqual(data["next"], ACCESS_AND_SUBMISSION_PATH)
+    #     self.assertEqual(
+    #         self.user.profile.entry_form_data, VALID_ELIGIBILITY_DATA | input_data
+    #     )
 
     def test_missing_auditee_name(self):
         """

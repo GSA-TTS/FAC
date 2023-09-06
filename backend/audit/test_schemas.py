@@ -600,7 +600,7 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
 
         simple_case["FederalAwards"]["federal_awards"][0][
             "loan_balance_at_audit_period_end"
-        ] = "10000"
+        ] = 10000
         self.assertRaises(exceptions.ValidationError, validate, simple_case, schema)
 
     def test_loan_dependents(self):
@@ -615,7 +615,7 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
         both_int_pass = award | {
             "loan_or_loan_guarantee": {
                 "is_guaranteed": "Y",
-                "loan_balance_at_audit_period_end": "10000",
+                "loan_balance_at_audit_period_end": 10000,
             }
         }
         simple_case["FederalAwards"]["federal_awards"] = [both_int_pass]
@@ -658,7 +658,7 @@ class FederalAwardsSchemaValidityTest(SimpleTestCase):
         zero_value_pass = award | {
             "loan_or_loan_guarantee": {
                 "is_guaranteed": "Y",
-                "loan_balance_at_audit_period_end": "0",
+                "loan_balance_at_audit_period_end": 0,
             }
         }
         simple_case["FederalAwards"]["federal_awards"] = [zero_value_pass]

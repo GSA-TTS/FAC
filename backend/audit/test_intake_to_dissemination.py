@@ -1,3 +1,4 @@
+from datetime import datetime, timezone
 from django.test import TestCase
 
 from model_bakery import baker
@@ -21,6 +22,20 @@ class IntakeToDisseminationTests(TestCase):
     def __init__(self, methodName: str = "runTest") -> None:
         super().__init__(methodName)
 
+    def _run_state_transition(self, sac):
+        statuses = [
+            SingleAuditChecklist.STATUS.READY_FOR_CERTIFICATION,
+            SingleAuditChecklist.STATUS.AUDITOR_CERTIFIED,
+            SingleAuditChecklist.STATUS.AUDITEE_CERTIFIED,
+            SingleAuditChecklist.STATUS.CERTIFIED,
+            SingleAuditChecklist.STATUS.SUBMITTED,
+        ]
+
+        for status in statuses:
+            sac.transition_date.append(datetime.now(timezone.utc))
+            sac.transition_name.append(status)
+            sac.save()
+
     def setUp(self):
         self.user = baker.make(User)
 
@@ -34,9 +49,12 @@ class IntakeToDisseminationTests(TestCase):
             corrective_action_plan=self._fake_corrective_action_plan(),
             secondary_auditors=self._fake_secondary_auditors(),
             additional_ueis=self._fake_additional_ueis(),
-            # audit_information=self._fake_audit_information(),  # TODO: Uncomment when SingleAuditChecklist adds audit_information
+            audit_information=self._fake_audit_information(),
+            auditee_certification=self._fake_auditee_certification(),
+            cognizant_agency="42",
+            oversight_agency="42",
         )
-        sac.save()
+        self._run_state_transition(sac)
         self.sac = sac
         self.intake_to_dissemination = IntakeToDissemination(self.sac)
         self.report_id = sac.report_id
@@ -64,13 +82,13 @@ class IntakeToDisseminationTests(TestCase):
             "auditor_country": "United States",
             "auditor_firm_name": fake.company(),
             "audit_period_covered": "annual",
-            "audit_period_other_months": None,
+            "audit_period_other_months": fake.random_int(min=1, max=12),
             "auditee_contact_name": fake.name(),
             "auditor_contact_name": fake.name(),
             "auditee_contact_title": "Boss",
             "auditor_contact_title": "Mega Boss",
-            "multiple_eins_covered": "false",
-            "multiple_ueis_covered": "false",
+            "multiple_eins_covered": fake.boolean(),
+            "multiple_ueis_covered": fake.boolean(),
             "auditee_address_line_1": fake.street_address(),
             "auditor_address_line_1": fake.street_address(),
             "met_spending_threshold": "true",
@@ -79,6 +97,27 @@ class IntakeToDisseminationTests(TestCase):
             "auditee_fiscal_period_start": "2022-11-01",
             "user_provided_organization_type": "state",
             "auditor_ein_not_an_ssn_attestation": "true",
+        }
+
+    @staticmethod
+    def _fake_auditee_certification():
+        fake = Faker()
+        return {
+            "auditee_certification": {
+                "has_no_PII": fake.boolean(),
+                "has_no_BII": fake.boolean(),
+                "meets_2CFR_specifications": fake.boolean(),
+                "is_2CFR_compliant": fake.boolean(),
+                "is_complete_and_accurate": fake.boolean(),
+                "has_engaged_auditor": fake.boolean(),
+                "is_issued_and_signed": fake.boolean(),
+                "is_FAC_releasable": fake.boolean(),
+            },
+            "auditee_signature": {
+                "auditee_name": fake.name(),
+                "auditee_title": fake.job(),
+                "auditee_certification_date_signed": fake.date(),
+            },
         }
 
     @staticmethod
@@ -99,6 +138,7 @@ class IntakeToDisseminationTests(TestCase):
                             "three_digit_extension": "600",
                             "number_of_audit_findings": 0,
                             "additional_award_identification": "COVID-19",
+                            "is_major": "N",
                         },
                         "subrecipients": {"is_passed": "N"},
                         "loan_or_loan_guarantee": {
@@ -268,6 +308,10 @@ class IntakeToDisseminationTests(TestCase):
         self.assertEqual(len(generals), 1)
         general = generals.first()
         self.assertEqual(self.report_id, general.report_id)
+        self.assertEqual(
+            general.total_amount_expended,
+            self.sac.federal_awards["FederalAwards"].get("total_amount_expended"),
+        )
 
     def test_load_award_before_general_should_fail(self):
         self.intake_to_dissemination.load_federal_award()
@@ -282,11 +326,6 @@ class IntakeToDisseminationTests(TestCase):
         self.assertEqual(len(federal_awards), 1)
         federal_award = federal_awards.first()
         self.assertEqual(self.report_id, federal_award.report_id)
-        general = General.objects.first()
-        self.assertEqual(
-            general.total_amount_expended,
-            self.sac.federal_awards["FederalAwards"].get("total_amount_expended"),
-        )
 
     def test_load_findings(self):
         self.intake_to_dissemination.load_findings()
@@ -360,9 +399,10 @@ class IntakeToDisseminationTests(TestCase):
             corrective_action_plan=self._fake_corrective_action_plan(),
             secondary_auditors=self._fake_secondary_auditors(),
             additional_ueis=self._fake_additional_ueis(),
-            # audit_information=self._fake_audit_information(),  # TODO: Uncomment when SingleAuditChecklist adds audit_information
+            audit_information=self._fake_audit_information(),
+            auditee_certification=self._fake_auditee_certification(),
         )
-        sac.save()
+        self._run_state_transition(sac)
         self.sac = sac
         self.intake_to_dissemination = IntakeToDissemination(self.sac)
         self.intake_to_dissemination.load_all()
@@ -387,10 +427,11 @@ class IntakeToDisseminationTests(TestCase):
             corrective_action_plan=self._fake_corrective_action_plan(),
             secondary_auditors=self._fake_secondary_auditors(),
             additional_ueis=self._fake_additional_ueis(),
-            # audit_information=self._fake_audit_information(),  # TODO: Uncomment when SingleAuditChecklist adds audit_information
+            audit_information=self._fake_audit_information(),
+            auditee_certification=self._fake_auditee_certification(),
         )
         sac.general_information.pop("auditee_contact_name")
-        sac.save()
+        self._run_state_transition(sac)
         self.sac = sac
         self.intake_to_dissemination = IntakeToDissemination(self.sac)
         self.report_id = sac.report_id
@@ -415,10 +456,11 @@ class IntakeToDisseminationTests(TestCase):
             corrective_action_plan=self._fake_corrective_action_plan(),
             secondary_auditors=self._fake_secondary_auditors(),
             additional_ueis=self._fake_additional_ueis(),
-            # audit_information=self._fake_audit_information(),  # TODO: Uncomment when SingleAuditChecklist adds audit_information
+            audit_information=self._fake_audit_information(),
+            auditee_certification=self._fake_auditee_certification(),
         )
         sac.corrective_action_plan.pop("CorrectiveActionPlan")
-        sac.save()
+        self._run_state_transition(sac)
         self.sac = sac
         self.intake_to_dissemination = IntakeToDissemination(self.sac)
         self.report_id = sac.report_id
@@ -440,9 +482,10 @@ class IntakeToDisseminationTests(TestCase):
             corrective_action_plan=self._fake_corrective_action_plan(),
             secondary_auditors=self._fake_secondary_auditors(),
             additional_ueis=self._fake_additional_ueis(),
-            # audit_information=self._fake_audit_information(),  # TODO: Uncomment when SingleAuditChecklist adds audit_information
+            audit_information=self._fake_audit_information(),
+            auditee_certification=self._fake_auditee_certification(),
         )
-        sac.save()
+        self._run_state_transition(sac)
         self.sac = sac
         self.intake_to_dissemination = IntakeToDissemination(self.sac)
         self.report_id = sac.report_id
