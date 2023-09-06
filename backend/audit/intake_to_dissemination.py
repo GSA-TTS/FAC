@@ -120,9 +120,7 @@ class IntakeToDissemination(object):
         federal_awards = self.single_audit_checklist.federal_awards
         federal_awards_objects = []
 
-        for entry in federal_awards["FederalAwards"][
-            "federal_awards"
-        ]:
+        for entry in federal_awards["FederalAwards"]["federal_awards"]:
             program = entry["program"]
             loan = entry["loan_or_loan_guarantee"]
             cluster = entry["cluster"]
