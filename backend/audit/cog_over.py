@@ -1,7 +1,7 @@
 from collections import defaultdict
 import os
 from .models import SingleAuditChecklist, CognizantBaseline
-from dissemination.models import CensusGen22, cognizant_agencies_21_25
+from dissemination.models import CensusGen22, cognizant_agencies_2021_2025, CensusGen19, CensusCfda19
 from django.db.models.functions import Cast
 from django.db.models import BigIntegerField
 import sqlalchemy
@@ -38,10 +38,9 @@ def cog_over(sac: SingleAuditChecklist):
         cognizant_agency = check_21_25_cog_assignment(dbkey, sac.auditee_ein)
         if cognizant_agency:
             return (cognizant_agency, oversight_agency)
-
-    cognizant_agency = determine_2019_agency_w_dbkey(sac.auditee_ein, dbkey)
-    if cognizant_agency:
-        return (cognizant_agency, oversight_agency)
+        cognizant_agency = determine_2019_agency_w_dbkey(sac.auditee_ein, dbkey)
+        if cognizant_agency:
+            return (cognizant_agency, oversight_agency)
     cognizant_agency = agency
     return (cognizant_agency, oversight_agency)
 
@@ -56,7 +55,7 @@ def find_dbkey_from_Gen22(ein, uei):
 
 
 def check_21_25_cog_assignment(dbkey, ein):
-    cog_agency_list = cognizant_agencies_21_25.objects.annotate(
+    cog_agency_list = cognizant_agencies_2021_2025.objects.annotate(
         int_ein=Cast("ein", output_field=BigIntegerField())
         ).filter(dbkey=dbkey, int_ein=int(ein)).values_list("cogagency", flat=True)
     if len(cog_agency_list) > 0:
