@@ -187,7 +187,6 @@ local open_ranges_defns = [
       help: Help.yorn,
     },
     SV.YoNValidation,
-    //FIXME MSHD: If we end up adding an instructions sheet, then we add back" - See Instructions tab" to the end of this string below
     'Is Findings Combination Valid? (Read Only)',
     'is_valid',
   ],
