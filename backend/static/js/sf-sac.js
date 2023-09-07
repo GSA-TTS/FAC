@@ -49,6 +49,8 @@ function highlightActiveNavSection() {
 }
 
 function attachEventHandlers() {
+  // These fields no longer exist. The gen form is submittable in an incomplete state, so non-null data is okay.
+  // Left alone for potential future enhancements on the form.
   const fieldsNeedingValidation = Array.from(
     document.querySelectorAll('.sf-sac input[data-validate-not-null]')
   );

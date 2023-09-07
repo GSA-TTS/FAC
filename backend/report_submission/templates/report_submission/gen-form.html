@@ -47,7 +47,6 @@
                                        id="auditee_fiscal_period_start"
                                        name="auditee_fiscal_period_start"
                                        aria-required="false"
-                                       data-validate-not-null=""
                                        value="{{ auditee_fiscal_period_start | default_if_none:'' }}" />
                             </div>
                             <div class="usa-form-group">
@@ -57,7 +56,6 @@
                                        id="auditee_fiscal_period_end"
                                        name="auditee_fiscal_period_end"
                                        aria-required="false"
-                                       data-validate-not-null=""
                                        value="{{ auditee_fiscal_period_end | default_if_none:'' }}" />
                             </div>
                         </fieldset>
@@ -70,8 +68,7 @@
                                        id="single-audit"
                                        name="audit_type"
                                        value="single-audit"
-                                       {% if audit_type == "single-audit" %}checked{% endif %}
-                                       data-validate-not-null="" />
+                                       {% if audit_type == "single-audit" %}checked{% endif %} />
                                 <label class="usa-radio__label" for="single-audit">Single Audit</label>
                             </div>
                             <div class="usa-radio">
@@ -80,8 +77,7 @@
                                        name="audit_type"
                                        value="program-specific"
                                        type="radio"
-                                       {% if audit_type == "program-specific" %}checked{% endif %}
-                                       data-validate-not-null="" />
+                                       {% if audit_type == "program-specific" %}checked{% endif %} />
                                 <label class="usa-radio__label" for="program-specific">Program-Specific Audit</label>
                             </div>
                             <div class="usa-radio">
@@ -89,8 +85,7 @@
                                        id="alt-compliance-examination"
                                        name="audit_type"
                                        value="alt-compliance-examination"
-                                       type="radio"
-                                       data-validate-not-null="" />
+                                       type="radio" />
                                 <label class="usa-radio__label" for="alt-compliance-examination">Alternative Compliance Examination</label>
                             </div>
                         </fieldset>
@@ -103,8 +98,7 @@
                                        id="audit-period-annual"
                                        name="audit_period_covered"
                                        value="annual"
-                                       {% if audit_period_covered == "annual" %}checked{% endif %}
-                                       data-validate-not-null="" />
+                                       {% if audit_period_covered == "annual" %}checked{% endif %} />
                                 <label class="usa-radio__label" for="audit-period-annual">Annual</label>
                             </div>
                             <div class="usa-radio">
@@ -113,8 +107,7 @@
                                        name="audit_period_covered"
                                        value="biennial"
                                        type="radio"
-                                       {% if audit_period_covered == "biennial" %}checked{% endif %}
-                                       data-validate-not-null="" />
+                                       {% if audit_period_covered == "biennial" %}checked{% endif %} />
                                 <label class="usa-radio__label" for="audit-period-biennial">Biennial</label>
                             </div>
                             <div class="usa-radio">
@@ -123,8 +116,7 @@
                                        name="audit_period_covered"
                                        value="other"
                                        type="radio"
-                                       {% if audit_period_covered == "other" %}checked{% endif %}
-                                       data-validate-not-null="" />
+                                       {% if audit_period_covered == "other" %}checked{% endif %} />
                                 <label class="usa-radio__label" for="audit-period-other">Other</label>
                                 <input class="usa-input usa-input--small"
                                        type="text"
@@ -147,7 +139,6 @@
                                        id="ein"
                                        name="ein"
                                        aria-required="false"
-                                       data-validate-not-null=""
                                        value="{{ ein | default_if_none:'' }}" />
                                 <span class="usa-error-message" id="ein-error-message" role="alert">{{ errors.ein|striptags }}</span>
                             </div>
@@ -156,7 +147,6 @@
                                        id="ein_not_an_ssn_attestation"
                                        type="checkbox"
                                        name="ein_not_an_ssn_attestation"
-                                       data-validate-not-null=""
                                        {% if ein_not_an_ssn_attestation == True %}checked{% endif %} />
                                 <label class="usa-checkbox__label" for="ein_not_an_ssn_attestation">
                                     By checking this box, I verify that the Auditee EIN is not a Social Security Number.
@@ -176,8 +166,7 @@
                                            id="multiple-eins-yes"
                                            name="multiple_eins_covered"
                                            value="true"
-                                           {% if multiple_eins_covered == True %}checked{% endif %}
-                                           data-validate-not-null="" />
+                                           {% if multiple_eins_covered == True %}checked{% endif %} />
                                     <label class="usa-radio__label" for="multiple-eins-yes">Yes</label>
                                 </div>
                                 <div class="usa-radio">
@@ -186,8 +175,7 @@
                                            id="multiple-eins-no"
                                            name="multiple_eins_covered"
                                            value="false"
-                                           {% if multiple_eins_covered == False %}checked{% endif %}
-                                           data-validate-not-null="" />
+                                           {% if multiple_eins_covered == False %}checked{% endif %} />
                                     <label class="usa-radio__label" for="multiple-eins-no">No</label>
                                 </div>
                             </fieldset>
@@ -200,7 +188,6 @@
                                        id="auditee_name"
                                        name="auditee_name"
                                        aria-required="false"
-                                       data-validate-not-null=""
                                        value="{{ auditee_name | default_if_none:'' }}" />
                             </div>
                             <div class="usa-form-group">
@@ -209,7 +196,6 @@
                                        id="auditee_address_line_1"
                                        name="auditee_address_line_1"
                                        aria-required="false"
-                                       data-validate-not-null=""
                                        value="{{ auditee_address_line_1 | default_if_none:'' }}" />
                             </div>
                             <div class="usa-form-group">
@@ -218,8 +204,8 @@
                                        id="auditee_city"
                                        name="auditee_city"
                                        aria-required="false"
-                                       data-validate-not-null=""
                                        value="{{ auditee_city | default_if_none:'' }}" />
+                                <span class="usa-error-message" id="auditee-city-error-message" role="alert">{{ errors.auditee_city|striptags }}</span>
                             </div>
                             <div class="usa-form-group">
                                 <label class="usa-label" for="auditee_state">State</label>
@@ -227,7 +213,6 @@
                                        id="auditee_state"
                                        name="auditee_state"
                                        aria-required="false"
-                                       data-validate-not-null=""
                                        value="{{ auditee_state | default_if_none:'' }}" />
                             </div>
                             <div class="usa-form-group">
@@ -236,7 +221,6 @@
                                        id="auditee_zip"
                                        name="auditee_zip"
                                        aria-required="false"
-                                       data-validate-not-null=""
                                        value="{{ auditee_zip | default_if_none:'' }}" />
                             </div>
                         </fieldset>
@@ -248,7 +232,6 @@
                                        id="auditee_uei"
                                        name="auditee_uei"
                                        aria-required="false"
-                                       data-validate-not-null=""
                                        value="{{ auditee_uei | default_if_none:'' }}" />
                             </div>
                             <fieldset class="usa-fieldset radio">
@@ -260,8 +243,7 @@
                                            id="multiple-ueis-yes"
                                            name="multiple_ueis_covered"
                                            value="true"
-                                           {% if multiple_ueis_covered == True %}checked{% endif %}
-                                           data-validate-not-null="" />
+                                           {% if multiple_ueis_covered == True %}checked{% endif %} />
                                     <label class="usa-radio__label" for="multiple-ueis-yes">Yes</label>
                                 </div>
                                 <div class="usa-radio">
@@ -270,8 +252,7 @@
                                            id="multiple-ueis-no"
                                            name="multiple_ueis_covered"
                                            value="false"
-                                           {% if multiple_ueis_covered == False %}checked{% endif %}
-                                           data-validate-not-null="" />
+                                           {% if multiple_ueis_covered == False %}checked{% endif %} />
                                     <label class="usa-radio__label" for="multiple-ueis-no">No</label>
                                 </div>
                             </fieldset>
@@ -284,7 +265,6 @@
                                        id="auditee_contact_name"
                                        name="auditee_contact_name"
                                        aria-required="false"
-                                       data-validate-not-null=""
                                        value="{{ auditee_contact_name | default_if_none:'' }}" />
                             </div>
                             <div class="usa-form-group">
@@ -293,7 +273,6 @@
                                        id="auditee_contact_title"
                                        name="auditee_contact_title"
                                        aria-required="false"
-                                       data-validate-not-null=""
                                        value="{{ auditee_contact_title | default_if_none:'' }}" />
                             </div>
                             <div class="usa-form-group">
@@ -302,7 +281,6 @@
                                        id="auditee_phone"
                                        name="auditee_phone"
                                        aria-required="false"
-                                       data-validate-not-null=""
                                        value="{{ auditee_phone | default_if_none:'' }}" />
                             </div>
                             <div class="usa-form-group">
@@ -311,7 +289,6 @@
                                        id="auditee_email"
                                        name="auditee_email"
                                        aria-required="false"
-                                       data-validate-not-null=""
                                        value="{{ auditee_email | default_if_none:'' }}" />
                             </div>
                         </fieldset>
@@ -330,7 +307,6 @@
                                        id="auditor_ein"
                                        name="auditor_ein"
                                        aria-required="false"
-                                       data-validate-not-null=""
                                        value="{{ auditor_ein | default_if_none:'' }}" />
                                 <span class="usa-error-message" id="ein-error-message" role="alert">{{ errors.auditor_ein|striptags }}</span>
                             </div>
@@ -339,8 +315,7 @@
                                        id="auditor_ein_not_an_ssn_attestation"
                                        type="checkbox"
                                        name="auditor_ein_not_an_ssn_attestation"
-                                       {% if auditor_ein_not_an_ssn_attestation == True %}checked{% endif %}
-                                       data-validate-not-null="" />
+                                       {% if auditor_ein_not_an_ssn_attestation == True %}checked{% endif %} />
                                 <label class="usa-checkbox__label" for="auditor_ein_not_an_ssn_attestation">
                                     By checking this box, I verify that the Auditor EIN is not a Social Security Number.
                                 </label>
@@ -359,7 +334,6 @@
                                        id="auditor_firm_name"
                                        name="auditor_firm_name"
                                        aria-required="false"
-                                       data-validate-not-null=""
                                        value="{{ auditor_firm_name | default_if_none:'' }}" />
                             </div>
                             <fieldset class="usa-fieldset" id="audit-firm-organization-address">
@@ -370,7 +344,6 @@
                                            id="auditor_country"
                                            name="auditor_country"
                                            aria-required="false"
-                                           data-validate-not-null=""
                                            value="{{ auditor_country | default_if_none:'' }}" />
                                 </div>
                                 <div class="usa-form-group">
@@ -379,7 +352,6 @@
                                            id="auditor_address_line_1"
                                            name="auditor_address_line_1"
                                            aria-required="false"
-                                           data-validate-not-null=""
                                            value="{{ auditor_address_line_1 | default_if_none:'' }}" />
                                 </div>
                                 <div class="usa-form-group">
@@ -388,8 +360,8 @@
                                            id="auditor_city"
                                            name="auditor_city"
                                            aria-required="false"
-                                           data-validate-not-null=""
                                            value="{{ auditor_city | default_if_none:'' }}" />
+                                    <span class="usa-error-message" id="auditor-city-error-message" role="alert">{{ errors.auditor_city|striptags }}</span>
                                 </div>
                                 <div class="usa-form-group">
                                     <label class="usa-label" for="auditor_state">State</label>
@@ -397,7 +369,6 @@
                                            id="auditor_state"
                                            name="auditor_state"
                                            aria-required="false"
-                                           data-validate-not-null=""
                                            value="{{ auditor_state | default_if_none:'' }}" />
                                 </div>
                                 <div class="usa-form-group">
@@ -406,7 +377,6 @@
                                            id="auditor_zip"
                                            name="auditor_zip"
                                            aria-required="false"
-                                           data-validate-not-null=""
                                            value="{{ auditor_zip | default_if_none:'' }}" />
                                 </div>
                             </fieldset>
@@ -419,7 +389,6 @@
                                        id="auditor_contact_name"
                                        name="auditor_contact_name"
                                        aria-required="false"
-                                       data-validate-not-null=""
                                        value="{{ auditor_contact_name | default_if_none:'' }}" />
                             </div>
                             <div class="usa-form-group">
@@ -428,7 +397,6 @@
                                        id="auditor_contact_title"
                                        name="auditor_contact_title"
                                        aria-required="false"
-                                       data-validate-not-null=""
                                        value="{{ auditor_contact_title | default_if_none:'' }}" />
                             </div>
                             <div class="usa-form-group">
@@ -437,7 +405,6 @@
                                        id="auditor_phone"
                                        name="auditor_phone"
                                        aria-required="false"
-                                       data-validate-not-null=""
                                        value="{{ auditor_phone | default_if_none:'' }}" />
                             </div>
                             <div class="usa-form-group">
@@ -446,7 +413,6 @@
                                        id="auditor_email"
                                        name="auditor_email"
                                        aria-required="false"
-                                       data-validate-not-null=""
                                        value="{{ auditor_email | default_if_none:'' }}" />
                             </div>
                         </fieldset>
@@ -459,8 +425,7 @@
                                        id="secondary_auditors-yes"
                                        name="secondary_auditors_exist"
                                        value="true"
-                                       {% if secondary_auditors_exist == True %}checked{% endif %}
-                                       data-validate-not-null="" />
+                                       {% if secondary_auditors_exist == True %}checked{% endif %} />
                                 <label class="usa-radio__label" for="secondary_auditors-yes">Yes</label>
                             </div>
                             <div class="usa-radio">
@@ -469,8 +434,7 @@
                                        id="secondary_auditors-no"
                                        name="secondary_auditors_exist"
                                        value="false"
-                                       {% if secondary_auditors_exist == False %}checked{% endif %}
-                                       data-validate-not-null="" />
+                                       {% if secondary_auditors_exist == False %}checked{% endif %} />
                                 <label class="usa-radio__label" for="secondary_auditors-no">No</label>
                             </div>
                         </fieldset>
