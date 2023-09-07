@@ -71,7 +71,6 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 16
-        run: npm ci
 
       - name: Create .env
         working-directory: ./backend
@@ -80,6 +79,7 @@ jobs:
       - name: Start services
         working-directory: ./backend
         run: docker compose -f docker-compose.yml up -d
+        run: npm ci
 
       - name: run Lighthouse CI
         run: |
