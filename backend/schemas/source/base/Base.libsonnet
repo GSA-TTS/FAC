@@ -184,6 +184,14 @@ local Enum = {
     ],
     title: 'AuditType',
   },
+  CountryType: Types.string {
+    description: 'USA or International',
+    enum: [
+      'USA',
+      'non-USA',
+    ],
+    title: 'CountryType',
+  },
   MajorProgramAuditReportType: Types.string {
     description: 'Major program report types',
     enum: [
@@ -328,6 +336,9 @@ local Compound = {
   Zip: type_zipcode,
   MonthsOther: Types.string {
     pattern: REGEX_MONTHS_OTHER,
+  },
+  EmptyString: Types.string {
+    const: Const.empty_string,
   },
 };
 
