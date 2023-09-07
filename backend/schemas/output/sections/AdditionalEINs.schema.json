@@ -1,0 +1,74 @@
+{
+   "$schema": "https://json-schema.org/draft/2019-09/schema#",
+   "additionalProperties": false,
+   "metamodel_version": "1.7.0",
+   "properties": {
+      "AdditionalEINs": {
+         "additionalProperties": false,
+         "properties": {
+            "additional_eins_entries": {
+               "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                     "additional_ein": {
+                        "pattern": "^[0-9]{9}$",
+                        "type": "string"
+                     }
+                  },
+                  "required": [
+                     "additional_ein"
+                  ],
+                  "title": "AdditionalEinEntry"
+               },
+               "type": "array"
+            },
+            "auditee_uei": {
+               "allOf": [
+                  {
+                     "maxLength": 12,
+                     "minLength": 12
+                  },
+                  {
+                     "pattern": "^[A-HJ-NP-Z1-9][A-HJ-NP-Z0-9]+$"
+                  },
+                  {
+                     "pattern": "^(?![A-HJ-NP-Z1-9]+[A-HJ-NP-Z0-9]*?[0-9]{9})[A-HJ-NP-Z0-9]*$"
+                  },
+                  {
+                     "pattern": "^(?![0-9]{9})"
+                  }
+               ],
+               "type": "string"
+            }
+         },
+         "required": [
+            "auditee_uei"
+         ],
+         "title": "AdditionalEINs",
+         "type": "object"
+      },
+      "Meta": {
+         "additionalProperties": false,
+         "properties": {
+            "section_name": {
+               "enum": [
+                  "AdditionalEins"
+               ],
+               "type": "string"
+            },
+            "version": {
+               "const": "1.0.0",
+               "type": "string"
+            }
+         },
+         "required": [
+            "section_name"
+         ],
+         "title": "Meta",
+         "type": "object"
+      }
+   },
+   "title": "UNNAMED",
+   "type": "object",
+   "version": 0
+}

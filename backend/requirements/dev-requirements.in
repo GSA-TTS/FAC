@@ -4,6 +4,7 @@ bandit
 black
 coverage
 djlint
+faker
 flake8
 model_bakery
 mypy
@@ -13,3 +14,5 @@ toml
 types-python-slugify
 types-requests
 whitenoise
+tblib
+django-debug-toolbar

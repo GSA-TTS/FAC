@@ -16,6 +16,7 @@ import logging
 import json
 import environs
 from cfenv import AppEnv
+from audit.get_agency_names import get_agency_names, get_audit_info_lists
 
 import newrelic.agent
 
@@ -81,10 +82,15 @@ LOGGING = {
         "django": {"handlers": ["local_debug_logger", "prod_logger"]},
     },
 }
-# this shold reduce the volume of message displayed when running tests
-if len(sys.argv) > 1 and sys.argv[1] == "test":
-    logging.disable(logging.ERROR)
 
+TEST_RUN = False
+if len(sys.argv) > 1 and sys.argv[1] == "test":
+    # This should reduce the volume of message displayed when running tests, but
+    # unfortunately doesn't suppress stdout.
+    logging.disable(logging.ERROR)
+    # Set var that Django Debug Toolbar can detect so that it doesn't run; we use
+    # this with ENABLE_DEBUG_TOOLBAR much further below:
+    TEST_RUN = True
 
 # Django application definition
 INSTALLED_APPS = [
@@ -106,7 +112,15 @@ INSTALLED_APPS += [
 ]
 
 # Our apps
-INSTALLED_APPS += ["audit", "api", "users", "report_submission", "cms", "data_distro"]
+INSTALLED_APPS += [
+    "audit",
+    "api",
+    "users",
+    "report_submission",
+    "cms",
+    # "data_distro",
+    "dissemination",
+]
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -133,6 +147,9 @@ TEMPLATES = [
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
             ],
+            "builtins": [
+                "report_submission.templatetags.get_attr",
+            ],
         },
     },
 ]
@@ -148,6 +165,8 @@ DATABASES = {
         "DATABASE_URL", default="postgres://postgres:password@0.0.0.0/backend"
     ),
 }
+
+POSTGREST = {"URL": env.str("POSTGREST_URL", "http://api:3000")}
 
 
 # Password validation
@@ -174,7 +193,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = "en-us"
 
-TIME_ZONE = "UTC"
+TIME_ZONE = "EST"
 
 USE_I18N = True
 
@@ -196,7 +215,7 @@ STATIC_URL = "/static/"
 
 # Environment specific configurations
 DEBUG = False
-if ENVIRONMENT not in ["DEVELOPMENT", "STAGING", "PRODUCTION"]:
+if ENVIRONMENT not in ["DEVELOPMENT", "PREVIEW", "STAGING", "PRODUCTION"]:
     # Local environment and Testing environment (CI/CD/GitHub Actions)
 
     if ENVIRONMENT == "LOCAL":
@@ -233,7 +252,7 @@ if ENVIRONMENT not in ["DEVELOPMENT", "STAGING", "PRODUCTION"]:
 else:
     # One of the Cloud.gov environments
     STATICFILES_STORAGE = "storages.backends.s3boto3.S3ManifestStaticStorage"
-    DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
+    DEFAULT_FILE_STORAGE = "report_submission.storages.S3PrivateStorage"
     vcap = json.loads(env.str("VCAP_SERVICES"))
     for service in vcap["s3"]:
         if service["instance_name"] == "fac-public-s3":
@@ -258,7 +277,6 @@ else:
             STATIC_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/{AWS_LOCATION}/"
 
             STATICFILES_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
-            DEFAULT_FILE_STORAGE = "cts_forms.storages.PrivateS3Storage"
             AWS_IS_GZIPPED = True
 
         elif service["instance_name"] == "fac-private-s3":
@@ -280,7 +298,9 @@ else:
             AWS_PRIVATE_DEFAULT_ACL = "private"
             # If wrong, https://docs.aws.amazon.com/AmazonS3/latest/userguide/acl-overview.html#canned-acl
 
-            MEDIA_URL = f"https://{AWS_S3_PRIVATE_CUSTOM_DOMAIN}/{AWS_LOCATION}/"
+            MEDIA_URL = (
+                f"https://{AWS_S3_PRIVATE_CUSTOM_DOMAIN}/{AWS_PRIVATE_LOCATION}/"
+            )
 
     # secure headers
     MIDDLEWARE.append("csp.middleware.CSPMiddleware")
@@ -301,7 +321,7 @@ else:
     CSP_IMG_SRC = allowed_sources
     CSP_MEDIA_SRC = allowed_sources
     CSP_FRAME_SRC = allowed_sources
-    CSP_FONT_SRC = ("self", bucket)
+    CSP_FONT_SRC = ("'self'", bucket)
     CSP_WORKER_SRC = allowed_sources
     CSP_FRAME_ANCESTORS = allowed_sources
     CSP_STYLE_SRC = allowed_sources
@@ -377,6 +397,7 @@ DATA_FIXTURES = BASE_DIR / "data_fixtures"
 AUDIT_TEST_DATA_ENTRY_DIR = DATA_FIXTURES / "audit" / "test_data_entries"
 AUDIT_SCHEMA_DIR = BASE_DIR / "schemas" / "output" / "audit"
 SECTION_SCHEMA_DIR = BASE_DIR / "schemas" / "output" / "sections"
+SCHEMA_BASE_DIR = BASE_DIR / "schemas" / "source" / "base"
 XLSX_TEMPLATE_JSON_DIR = BASE_DIR / "schemas" / "output" / "excel" / "json"
 XLSX_TEMPLATE_SHEET_DIR = BASE_DIR / "schemas" / "output" / "excel" / "xlsx"
 
@@ -389,6 +410,7 @@ AUTHENTICATION_BACKENDS = [
 ]
 
 env_base_url = env.str("DJANGO_BASE_URL", "")
+login_client_id = secret("LOGIN_CLIENT_ID", "")
 secret_login_key = b64decode(secret("DJANGO_SECRET_LOGIN_KEY", ""))
 
 # which provider to use if multiple are available
@@ -412,7 +434,7 @@ OIDC_PROVIDERS = {
             "acr_value": "http://idmanagement.gov/ns/assurance/ial/1",
         },
         "client_registration": {
-            "client_id": "urn:gov:gsa:openidconnect.profiles:sp:sso:gsa:gsa-fac-pk-jwt-01",
+            "client_id": login_client_id,
             "redirect_uris": [f"{env_base_url}/openid/callback/login/"],
             "post_logout_redirect_uris": [f"{env_base_url}/openid/callback/logout/"],
             "token_endpoint_auth_method": ["private_key_jwt"],
@@ -425,7 +447,6 @@ LOGIN_URL = f"{env_base_url}/openid/login/"
 
 USER_PROMOTION_COMMANDS_ENABLED = ENVIRONMENT in ["LOCAL", "TESTING", "UNDEFINED"]
 
-
 if DISABLE_AUTH:
     TEST_USERNAME = "test_user@test.test"
     MIDDLEWARE.append(
@@ -435,3 +456,29 @@ if DISABLE_AUTH:
     AUTHENTICATION_BACKENDS = [
         "users.auth.FACTestAuthenticationBackend",
     ]
+
+# A dictionary mapping agency number to agency name. dict[str, str]
+AGENCY_NAMES = get_agency_names()
+GAAP_RESULTS = get_audit_info_lists("gaap_results")
+SP_FRAMEWORK_BASIS = get_audit_info_lists("sp_framework_basis")
+SP_FRAMEWORK_OPINIONS = get_audit_info_lists("sp_framework_opinions")
+STATE_ABBREVS = json.load(open(f"{SCHEMA_BASE_DIR}/States.json"))[
+    "UnitedStatesStateAbbr"
+]
+
+ENABLE_DEBUG_TOOLBAR = (
+    env.bool("ENABLE_DEBUG_TOOLBAR", False) and ENVIRONMENT == "LOCAL" and not TEST_RUN
+)
+
+# Django debug toolbar setup
+if ENABLE_DEBUG_TOOLBAR:
+    INSTALLED_APPS += [
+        "debug_toolbar",
+    ]
+    MIDDLEWARE = [
+        "debug_toolbar.middleware.DebugToolbarMiddleware",
+    ] + MIDDLEWARE
+    DEBUG_TOOLBAR_CONFIG = {"SHOW_TOOLBAR_CALLBACK": lambda _: True}
+
+# Links to the most applicable static site URL. Becomes more permanent post-beta.
+STATIC_SITE_URL = "https://federalist-35af9df5-a894-4ae9-aa3d-f6d95427c7bc.sites.pages.cloud.gov/preview/gsa-tts/fac-transition-site/lh/ia-updates/"

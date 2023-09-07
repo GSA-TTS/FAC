@@ -1,22 +1,10 @@
 {% extends "base.html" %}
 {% load static %}
 {% block content %}
-    <header class="usa-header usa-header-basic bg-primary-darker">
-        <div class="usa-nav-container">
-            <div class="usa-navbar bg-primary-darker text-white width-full flex">
-                <p class="margin-left-2">
-                    <a href="/" class="text-gray-10">My audit submissions</a> »
-                    <a href="/audit/submission-progress/{{ report_id }}"
-                       class="text-gray-10">{{ auditee_name | default_if_none:'' }}</a> »
-                    <span class="text-bold">{{ view_name }}</span>
-                </p>
-            </div>
-        </div>
-    </header>
     <div class="grid-container margin-top-6">
-        <div class="grid-col grid-gap">
+        <div class="grid-row">
             {% comment %} {% include "../sidenav.html" %} {% endcomment %}
-            <form class="usa-form usa-form--large"
+            <form class="tablet:grid-col-8 tablet:grid-offset-2"
                   id="{{ view_id }}"
                   id_test="upload-page__form"
                   method="post">
@@ -24,11 +12,26 @@
                 <fieldset class="usa-fieldset">
                     <legend class="usa-legend usa-legend--large"
                             id="{{ view_id }}"
-                            id_test="upload-page__legend">
-                        {{ view_name }}
-                    </legend>
+                            id_test="upload-page__legend">{{ view_name }}</legend>
+
                     <p>{{ instructions }}</p>
-                    <h4 class="usa-process-list__heading">Upload completed worksheet</h4>
+                    <ul class="margin-top-4">
+                        <li>Review the <a class="usa-link" id="instructions-link" href={{instructions_url}} target="_blank">instructions for this workbook.</a></li>
+                        <li><a class="usa-link" id="download-template-link" href={{workbook_url}} target="_blank">Download</a> the {{view_name}} workbook template.</li>
+                    </ul>
+
+                    {% if no_findings_disclaimer %}
+                    <div class="margin-top-4">
+                        <h2>If you do not have findings:</h2>
+                        <ol>
+                            <li>Open the workbook.</li>
+                            <li>Enter the auditee UEI.</li>
+                            <li>Save and submit the workbook.</li>
+                        </ol>
+                    </div>
+                    {% endif %}
+
+                    <h4 class="usa-process-list__heading margin-top-4">Upload completed worksheet</h4>
                     <p>Save your completed worksheet as an XLSX file and upload it below.</p>
                     <div class="usa-form-group">
                         <input id="file-input-{{ view_id }}-xlsx"
@@ -37,17 +40,19 @@
                                type="file"
                                name="file-input-{{ view_id }}-xlsx"
                                aria-describedby="file-input-{{ view_id }}-xlsx"
-                               accept=".xlsx"/>
+                               accept=".xlsx" />
                     </div>
                     {% if already_submitted %}
                         <p class="text-green" id="already-submitted">
                             A file has already been uploaded for this section. A successful reupload will overwrite your previous submission.
                         </p>
                     {% endif %}
-                    <button class="usa-button" id="continue" disabled="disabled">Return to Report Home</button>
+                    <div hidden id="info_box" class="grid-row margin-bottom-3 margin-top-3"></div>
+                    <button class="usa-button margin-bottom-8" id="continue" disabled="disabled">Return to Report Home</button>
+                    <a class="usa-button usa-button--unstyled margin-left-2" href="{% url 'audit:SubmissionProgress' report_id %}"
+                    aria-controls="upload-cancel">Cancel</a>
                 </fieldset>
             </form>
-            <div hidden id="info_box" class="grid-row margin-bottom-6"></div>
         </div>
     </div>
     {% include "audit-metadata.html" %}

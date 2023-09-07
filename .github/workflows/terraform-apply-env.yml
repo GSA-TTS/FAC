@@ -1,66 +1,45 @@
 ---
 name: Terraform apply (single env)
-
 on:
   workflow_call:
     inputs:
       environment:
         required: true
         type: string
-  
+      autoapprove:
+        # true is only used for preview environment, since there is no pull request
+        required: true
+        type: boolean
+        default: false
 
 jobs:
-  fetch-versions:
-    runs-on: ubuntu-latest
-    outputs:
-      postgrest: ${{ steps.read-version.outputs.TF_VAR_postgrest_image }}
-      clamav: ${{ steps.read-version.outputs.TF_VAR_clamav_image }}
-    env:
-      GH_REPO: ghcr.io/gsa-tts/fac
-
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: Fetch all artifacta
-        uses: dawidd6/action-download-artifact@v2
-        with:
-          # name: postgrest
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          workflow: scan-images.yml
-
-      - name: read image versions
-        id: read-version
-        run: |
-          echo "TF_VAR_postgrest_image=$GH_REPO/postgrest:$(cat postgrest/postgrest.txt)" >> "$GITHUB_OUTPUT"
-          echo "TF_VAR_clamav_image=$GH_REPO/clamav:$(cat clamav/clamav.txt)" >> "$GITHUB_OUTPUT"
-
   apply:
     name: apply ( ${{ inputs.environment }} )
     runs-on: ubuntu-latest
-    needs: fetch-versions
     environment: ${{ inputs.environment }}
     env:
       KEY: "terraform.tfstate.${{ inputs.environment }}"
       TF_VAR_cf_user: ${{ secrets.CF_USERNAME }}
       TF_VAR_cf_password: ${{ secrets.CF_PASSWORD }}
       TF_VAR_new_relic_license_key: ${{ secrets.NEW_RELIC_LICENSE_KEY }}
+      TF_VAR_pgrst_jwt_secret: ${{ secrets.PGRST_JWT_SECRET }}
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       TERRAFORM_PRE_RUN: |
           apt-get update
           apt-get install -y zip python
-      TF_VAR_postgrest_image: ${{ needs.fetch-versions.outputs.postgrest }}
-      TF_VAR_clamav_image: ${{ needs.fetch-versions.outputs.clamav }}
+      TF_VAR_postgrest_image: 'ghcr.io/gsa-tts/fac/postgrest:latest'
+      TF_VAR_clamav_image: 'ghcr.io/gsa-tts/fac/clamav:latest'
 
     steps:
-      - name: checkout
-        uses: actions/checkout@v3
-      - name: terraform apply ( ${{ inputs.environment }} )
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Apply ( ${{ inputs.environment }} )
         uses: dflook/terraform-apply@v1
         with:
           path: terraform/${{ inputs.environment }}
           label: ${{ inputs.environment }}
+          auto_approve: ${{ inputs.autoapprove}}
           # These secrets grant access to the bucket with our remote Terraform
           # state. They're located in the "Secrets > Actions > Repository
           # Secrets" section of the repository settings, and are the same across

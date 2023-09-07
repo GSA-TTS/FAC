@@ -1,5 +1,7 @@
 <!-- Cancel submission button. Opens a confirmation modal which when accepted, moves the user to the home page. -->
-<a class="usa-button usa-button--outline"
+{% load static %}
+{% load sprite_helper %}
+<a class="usa-button usa-button--unstyled"
    aria-controls="modal-cancel"
    data-open-modal>Cancel</a>
 <div class="usa-modal flex-justify-start"
@@ -31,7 +33,7 @@
                 aria-label="Close this window"
                 data-close-modal>
             <svg class="usa-icon" aria-hidden="true" focusable="false" role="img">
-                <use xlink:href="/static/img/sprite.svg#close"></use>
+                {% uswds_sprite "close" %}
             </svg>
         </button>
     </div>

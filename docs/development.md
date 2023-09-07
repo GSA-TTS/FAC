@@ -2,6 +2,8 @@
 
 We use either [Docker with `docker compose`](#docker) or [local development](#local-development) when working on issues and shipping pull requests.
 
+See [the pull request template](../.github/pull_request_template.md) for steps to follow when submitting or reviewing pull requests.
+
 ## Contents
 
 * [Tools](#tools)
@@ -21,7 +23,6 @@ We use either [Docker with `docker compose`](#docker) or [local development](#lo
   * [pyenv-virtualenv](https://github.com/pyenv/pyenv-virtualenv) for managing virtual environments
   * [Postgres](https://www.postgresql.org/)
   * [SAM.gov](https://sam.gov/content/home) to validate UEI's
-  * [LocalStack](https://localstack.cloud/) for S3 emulation
 
 ## Setting up your dev environment
 
@@ -31,6 +32,11 @@ We use either [Docker with `docker compose`](#docker) or [local development](#lo
 Target python version is defined in [../backend/runtime.txt](../backend/runtime.txt)
 
 ---
+
+## EditorConfig
+
+We have a `.editorconfig` file at the root directory with basic settings.
+See [editorconfig.org](https://editorconfig.org/) for more information.
 
 ## Environment Variables
 
@@ -42,8 +48,10 @@ ENV = 'LOCAL'
 SAM_API_KEY =
 SECRET_KEY =
 DJANGO_SECRET_LOGIN_KEY =
+LOGIN_CLIENT_ID =
 DISABLE_AUTH = 
 ```
+If you are using a MacBook with Apple M1 hardware, you will probably also have to add `DOCKERFILE = Apple_M1_Dockerfile` to the file.
 
 If you need to add these to your local environment (should end up in `~/.bash_profile`, `~/.bashrc`, `~/.zshrc`, or whatever flavor of shell you're using.)
 
@@ -73,6 +81,9 @@ The `DJANGO_SECRET_LOGIN_KEY` environment variable is used to interact with Logi
 *  (Recommended) If you wish to use the shared Login.gov sandbox client application and credentials, you can obtain a valid  `DJANGO_SECRET_LOGIN_KEY` from our shared [dev secrets document](https://docs.google.com/spreadsheets/d/1byrBp16jufbiEY_GP5MyR0Uqf6WvB_5tubSXN_mYyJY/edit#gid=0)
 *  If you wish to use the shared Login.gov sandbox client application, but create your own client credentials, you must first be granted access to the GSA-FAC Login.gov sandbox team. Once you can access the GSA-FAC client application, follow [Login.gov's documentation for creating a public certificate](https://developers.login.gov/testing/#creating-a-public-certificate). Once created, you can add the newly-generated public key to the GSA-FAC app, and set `DJANGO_SECRET_LOGIN_KEY` to the base64-encoded value of the corresponding private key.
 *  If you wish to use your own Login.gov sandbox client application, follow [Login.gov's documentation for setting up a test application](https://developers.login.gov/testing/). Once completed, open `settings.py` and set `OIDC_PROVIDERS.login.gov.client_registration.client_id` so that it matches the `issuer` string for your newly-created client application. NOTE: changes to the `client_id` should __not__ be checked into version control!
+
+#### LOGIN_CLIENT_ID
+The `LOGIN_CLIENT_ID` environment variable is our unique application identifier at Login.gov. Each environment has its own client ID. You can obtain the client ID that should be used during local development from our shared [dev secrets document](https://docs.google.com/spreadsheets/d/1byrBp16jufbiEY_GP5MyR0Uqf6WvB_5tubSXN_mYyJY/edit#gid=0)
 
 #### DISABLE_AUTH
 The `DISABLE_AUTH` variable tells Django to disable the Login.gov authorization. This should almost always be `False` unless you need to temporarily disable it for your local development. 
@@ -160,13 +171,48 @@ docker compose run web python manage.py load_test_data
 
 If you want to load more data, see the section on loading previous years.
 
-### Create a test bucket
+### Load SingleAuditChecklist fixtures
 
-We need a mocked S3 bucket for testing.
+You can also load fake fixture data for single audit checklists. There is a list
+of users in
+[`backend/users/fixtures/user_fixtures.py`](/backend/users/fixtures/user_fixtures.py)
+that will be created by default. If you are a new developer, you can add your
+information in that file so that there will be a user created for you if
+necessary and various submission fixtures available to that user. You will need your
+Login.gov sandbox UUID to specify as your "username". The easiest way to get that is to
+log in while running in a local Docker environment and look for the message that says something like
 
 ```
-docker compose run web bash -c 'awslocal s3 mb s3://gsa-fac-private-s3'
+INFO Successfully logged in user b276a5b3-2d2a-42a3-a078-ad57a36975d4
 ```
+
+Once you have a user listed in that file, you can run the command
+
+```shell
+docker compose run web python manage.py load_fixtures
+```
+
+It is not completely obvious that you would want to, but you could run this in
+one of the Cloud.gov environments with `cf run-task` like
+
+```shell
+cf run-task ENVIRONMENT --command "./manage.py load_fixtures" --name fixtures
+```
+
+You can also run this command for users by email address(es). These users do
+not have to be present in
+[`backend/users/fixtures/user_fixtures.py`](/backend/users/fixtures/user_fixtures.py),
+but must have logged into the system in order for this to work.
+
+```shell
+docker compose run web python manage.py load_fixtures userone@example.com usertwo@example.com
+```
+
+This will create a fake submission for each of the users. These submissions
+will be separate for each user—this command only associates one user with each
+fake submission.
+
+Note that all of these fake submissions use the same UEI.
 
 ### Run tests
 
@@ -283,6 +329,19 @@ At this point, you'll need to re-run migrations, load test, and recreate your te
 make docker-first-run
 make docker-test
 ```
+
+### What to do if your local tests fail
+
+The most likely explanation is that one of the services (such as MinIO or ClamAV) didn’t finish startup before the tests reached a point that was reliant on that service.
+
+The easiest way to handle this is to run `docker compose up` and wait for ClamAV and Django to start, then run tests in another shell.
+
+The most efficient way to run tests is to run them in the same container, via something like:
+
+```sh
+docker compose exec web /bin/bash -c "python manage.py test; /bin/bash"
+```
+
 
 ## Development, in principle
 

@@ -1,0 +1,192 @@
+{
+   "filename": "notes-to-sefa-workbook.xlsx",
+   "sheets": [
+      {
+         "header_height": 60,
+         "hide_col_from": 3,
+         "meta_cells": [
+            {
+               "help": {
+                  "link": "https://fac.gov/documentation/validation/#unknown",
+                  "text": "If you see this error, please contact support."
+               },
+               "keep_locked": true,
+               "title": "Federal Audit Clearinghouse\nfac.gov",
+               "title_cell": "A1",
+               "type": "meta_cell"
+            },
+            {
+               "help": {
+                  "link": "https://fac.gov/documentation/validation/#unknown",
+                  "text": "If you see this error, please contact support."
+               },
+               "keep_locked": true,
+               "title": "This workbook contains two worksheets: a coversheet (this sheet) and a mandatory notes sheet.\nBefore submitting, please make sure the fields below are filled out.",
+               "title_cell": "B1",
+               "type": "meta_cell",
+               "width": 48
+            }
+         ],
+         "name": "Coversheet",
+         "single_cells": [
+            {
+               "format": "text",
+               "formula": "=\"1.0.0\"",
+               "help": {
+                  "link": "https://fac.gov/documentation/validation/#plain_text",
+                  "text": "Only plain text is allowed in this field, no emoji or other special additions"
+               },
+               "keep_locked": true,
+               "range_cell": "B2",
+               "range_name": "version",
+               "title": "Version",
+               "title_cell": "A2",
+               "type": "single_cell",
+               "validation": {
+                  "type": "NOVALIDATION"
+               },
+               "width": 48
+            },
+            {
+               "format": "text",
+               "formula": "=\"NotesToSefa\"",
+               "help": {
+                  "link": "https://fac.gov/documentation/validation/#section_name",
+                  "text": "The workbook you tried to upload is for a different section."
+               },
+               "keep_locked": true,
+               "range_cell": "B3",
+               "range_name": "section_name",
+               "title": "Section",
+               "title_cell": "A3",
+               "type": "single_cell",
+               "validation": {
+                  "type": "NOVALIDATION"
+               },
+               "width": 48
+            },
+            {
+               "format": "text",
+               "help": {
+                  "link": "https://fac.gov/documentation/validation/#uei",
+                  "text": "UEIs are 12 characters long and match rules as given by SAM.gov"
+               },
+               "range_cell": "B4",
+               "range_name": "auditee_uei",
+               "title": "Auditee UEI:",
+               "title_cell": "A4",
+               "type": "single_cell",
+               "validation": {
+                  "custom_error": "Expecting something with 12 characters",
+                  "custom_title": "Must be length of 12",
+                  "formula1": 12,
+                  "operator": "equal",
+                  "type": "textLength"
+               },
+               "width": 48
+            },
+            {
+               "help": {
+                  "link": "https://fac.gov/documentation/validation/#plain_text",
+                  "text": "Only plain text is allowed in this field, no emoji or other special additions"
+               },
+               "range_cell": "B5",
+               "range_name": "accounting_policies",
+               "title": "Describe the significant accounting policies \nused in preparing the SEFA. (2 CFR 200.510(b)(6))",
+               "title_cell": "A5",
+               "type": "single_cell",
+               "validation": {
+                  "type": "NOVALIDATION"
+               },
+               "width": 56
+            },
+            {
+               "help": {
+                  "link": "https://fac.gov/documentation/validation/#yorn",
+                  "text": "This field must be either `Y` or `N`"
+               },
+               "range_cell": "B6",
+               "range_name": "is_minimis_rate_used",
+               "title": "Did the auditee use the de minimis cost rate? \n(2 CFR 200.414(f))",
+               "title_cell": "A6",
+               "type": "single_cell",
+               "validation": {
+                  "allow_blank": "False",
+                  "custom_error": "Must be 'Y' or 'N' or 'Y&N'",
+                  "custom_title": "Y/N/Y&N",
+                  "formula1": "\"Y,N,Y&N\"",
+                  "type": "list"
+               },
+               "width": 24
+            },
+            {
+               "help": {
+                  "link": "https://fac.gov/documentation/validation/#plain_text",
+                  "text": "Only plain text is allowed in this field, no emoji or other special additions"
+               },
+               "range_cell": "B7",
+               "range_name": "rate_explained",
+               "title": "Please explain",
+               "title_cell": "A7",
+               "type": "single_cell",
+               "validation": {
+                  "type": "NOVALIDATION"
+               },
+               "width": 56
+            }
+         ]
+      },
+      {
+         "header_height": 100,
+         "hide_col_from": 3,
+         "name": "AdditionalNotes",
+         "open_ranges": [
+            {
+               "help": {
+                  "link": "https://fac.gov/documentation/validation/#plain_text",
+                  "text": "Only plain text is allowed in this field, no emoji or other special additions"
+               },
+               "range_name": "note_title",
+               "title": "Note title",
+               "title_cell": "A1",
+               "type": "open_range",
+               "validation": {
+                  "type": "NOVALIDATION"
+               },
+               "width": 36
+            },
+            {
+               "help": {
+                  "link": "https://fac.gov/documentation/validation/#plain_text",
+                  "text": "Only plain text is allowed in this field, no emoji or other special additions"
+               },
+               "range_name": "note_content",
+               "title": "Note content",
+               "title_cell": "B1",
+               "type": "open_range",
+               "validation": {
+                  "type": "NOVALIDATION"
+               },
+               "width": 56
+            },
+            {
+               "formula": "=IF(A{0}<>\"\", ROW()-1, \"\")",
+               "help": {
+                  "link": "https://fac.gov/documentation/validation/#unknown",
+                  "text": "If you see this error, please contact support."
+               },
+               "keep_locked": true,
+               "range_name": "seq_number",
+               "title": "Sequence number (Read Only)",
+               "title_cell": "C1",
+               "type": "open_range",
+               "validation": {
+                  "type": "NOVALIDATION"
+               },
+               "width": 18
+            }
+         ]
+      }
+   ],
+   "title_row": 1
+}

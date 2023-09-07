@@ -1,0 +1,68 @@
+---
+name: Deploy to Development and Management Environment
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  # ensure that every time a push to main occurs, the container is built and published to ghcr
+  build-container:
+    uses: ./.github/workflows/build-docker-container.yml
+    secrets: inherit
+    permissions:
+      contents: read
+      packages: write
+    with:
+      docker-name: fac
+      image-name: web-container
+      repo-name: gsa-tts/fac
+      work-dir: ./backend
+
+  testing:
+    needs: [build-container]
+    uses: ./.github/workflows/testing-from-ghcr.yml
+    secrets: inherit
+
+  linting:
+    uses: ./.github/workflows/linting.yml
+    secrets: inherit
+
+  # deploy to Dev & Management spaces
+  deploy-infrastructure-dev:
+    name: Deploy infrastructure (development)
+    needs:
+      - testing
+    uses: ./.github/workflows/terraform-apply-env.yml
+    with:
+      environment: "dev"
+      autoapprove: false
+    secrets: inherit
+
+  deploy-infastructure-meta:
+    name: Deploy infrastructure (meta)
+    needs:
+      - testing
+    uses: ./.github/workflows/terraform-apply-env.yml
+    with:
+      environment: "meta"
+      autoapprove: false
+    secrets: inherit
+
+  deploy-dev:
+    name: Deploy application
+    needs:
+      - deploy-infrastructure-dev
+    uses: ./.github/workflows/deploy-application.yml
+    with:
+      environment: "dev"
+    secrets: inherit
+
+  scan-dev-post-deploy:
+    name: ZAP Scan
+    needs:
+      - deploy-dev
+    uses: ./.github/workflows/zap-scan.yml
+    with:
+      url: "https://fac-dev.app.cloud.gov/"
+

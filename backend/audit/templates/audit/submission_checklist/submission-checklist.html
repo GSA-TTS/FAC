@@ -1,0 +1,170 @@
+{% extends "base.html" %}
+{% load static %}
+{% load sprite_helper %}
+{% load submission_progress_tags %}
+{% block content %}
+    <div class="grid-row">
+        <div class="grid-container margin-top-6 margin-bottom-6">
+            
+            {% include './title.html'  with auditee_name=auditee_name %}
+            
+            <div id="submission-checklist-content">
+                <ul class="usa-icon-list usa-icon-list--size-sm tablet:grid-col-11 font-sans-md">
+
+                  {% section_block report_id general_information %}
+                  {% section_block report_id audit_information %}
+                  {% section_block report_id single_audit_report %}
+                  {% section_block report_id federal_awards %}
+                  {% section_block report_id notes_to_sefa %}
+                  {% section_block report_id findings_uniform_guidance %}
+                  {% section_block report_id findings_text %}
+                  {% section_block report_id corrective_action_plan %}
+                  {% section_block report_id additional_ueis %}
+                  {% section_block report_id secondary_auditors %}
+                  {% section_block report_id additional_eins %}
+                    
+                  {% comment %} Key information (certification steps) {% endcomment %}
+                    <div class="padding-bottom-3 padding-top-105" id="submission-checklist-summary">
+                        <div class="usa-summary-box font-sans-md"
+                             role="region"
+                             aria-labelledby="summary-box-key-information">
+                            <div class="usa-summary-box__body">
+                                <div class="usa-summary-box__text">
+                                    <span class="text-bold margin-left-1">Key information</span>
+                                    <ul class="margin-top-0">
+                                        <li>The following steps will remain locked until you have completed all prior steps.</li>
+                                        <li class="text-bold">You cannot re-upload documents after certification by either party.</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    {% comment %} Pre-submission validation {% endcomment %}
+                    <li class="usa-icon-list__item padding-bottom-105" id="SF-SAC-completed">
+                        {% if pre_submission_validation.completed %}
+                            {% include './icon-list-icon.html' with completed=pre_submission_validation.completed %}
+                            <div class="text-success-darker">
+                                <p class="text-bold text-underline margin-0">Pre-submission validation (Complete)</p>
+                                <p class="margin-0">Before submitting your audit, use our validation tool to check your workbooks for errors.</p>
+                            </div>
+                        {% else %}
+                            {% include './icon-list-icon.html' with completed=pre_submission_validation.completed %}
+                            <div>
+                                <p class="text-bold margin-0">
+                                    <a class="usa-link"
+                                       href="{% url 'audit:CrossValidation' report_id %}">Pre-submission validation</a>
+                                </p>
+                                <p class="margin-0">Before submitting your audit, use our validation tool to check your workbooks for errors.</p>
+                            </div>
+                        {% endif %}
+                    </li>
+                    
+                    {% comment %} Auditor Certification {% endcomment %}
+                    <li class="usa-icon-list__item padding-bottom-105"
+                        id="auditor-certification-completed">
+                        {% if certification.auditor_certified %}
+                            {% include './icon-list-icon.html' with completed=certification.auditor_certified %}
+                            <div class="text-success-darker">
+                                <p class="text-bold text-underline margin-0">Auditor Certification (Complete)</p>
+                                <p class="margin-0">
+                                    Your certifying auditor must attest and sign the single audit package before submission. In order to unlock this step, you must complete and upload all required workbooks from the previous steps, as well as the single audit report PDF.
+                                </p>
+                            </div>
+                        {% elif certification.auditor_enabled %}
+                            {% include './icon-list-icon.html' with completed=certification.auditor_certified %}
+                            <div>
+                                <p class="text-bold margin-0">
+                                    <a class="usa-link"
+                                       href="{% url 'audit:AuditorCertification' report_id %}">Auditor Certification</a>
+                                </p>
+                                <p class="margin-0">
+                                    Your certifying auditor must attest and sign the single audit package before submission. In order to unlock this step, you must complete and upload all required workbooks from the previous steps, as well as the single audit report PDF.
+                                </p>
+                            </div>
+                        {% else %}
+                            {% include './icon-list-icon.html' with completed=certification.auditor_certified %}
+                            <div>
+                                <p class="text-bold margin-0">Auditor Certification</p>
+                                <p class="margin-0">
+                                    Your certifying auditor must attest and sign the single audit package before submission. In order to unlock this step, you must complete and upload all required workbooks from the previous steps, as well as the single audit report PDF.
+                                </p>
+                            </div>
+                        {% endif %}
+                    </li>
+                    
+                    {% comment %} Auditee Certification {% endcomment %}
+                    <li class="usa-icon-list__item padding-bottom-3"
+                        id="auditee-certification-completed">
+                        {% if certification.auditee_certified %}
+                            {% include './icon-list-icon.html' with completed=certification.auditee_certified %}
+                            <div class="text-success-darker">
+                                <p class="text-bold text-underline margin-0">Auditee Certification (Complete)</p>
+                                <p class="margin-0">
+                                    Your certifying auditee must attest and sign the single audit package before submission. In order to unlock this step, you must complete and upload all required workbooks from the previous steps, as well as the single audit report PDF.
+                                </p>
+                            </div>
+                        {% elif certification.auditee_enabled %}
+                            {% include './icon-list-icon.html' with completed=certification.auditee_certified %}
+                            <div>
+                                <p class="text-bold margin-0">
+                                    <a class="usa-link"
+                                       href="{% url 'audit:AuditeeCertification' report_id %}">Auditee Certification</a>
+                                </p>
+                                <p class="margin-0">
+                                    Your certifying auditee must attest and sign the single audit package before submission. In order to unlock this step, you must complete and upload all required workbooks from the previous steps, as well as the single audit report PDF.
+                                </p>
+                            </div>
+                        {% else %}
+                            {% include './icon-list-icon.html' with completed=certification.auditee_certified %}
+                            <div>
+                                <p class="text-bold margin-0">Auditee Certification</p>
+                                <p class="margin-0">
+                                    Your certifying auditee must attest and sign the single audit package before submission. In order to unlock this step, you must complete and upload all required workbooks from the previous steps, as well as the single audit report PDF.
+                                </p>
+                            </div>
+                        {% endif %}
+                    </li>
+                    
+                    {% comment %} Submit to the FAC for processing {% endcomment %}
+                    {% if submission.enabled %}
+                    <div class="padding-bottom-3" id="submit-audit">
+                        <div class="usa-summary-box font-sans-md bg-success-lighter"
+                             role="region"
+                             aria-labelledby="summary-box-key-information">
+                            <div class="usa-summary-box__body">
+                                <div class="usa-summary-box__text">
+                                    <p class="text-bold margin-0">
+                                        <a class="usa-link" href="{% url 'audit:Submission' report_id %}">Submit to the FAC for processing</a>
+                                    </p>
+                                    <p class="margin-0">
+                                        This is the last step and must be completed by the <span class="text-underline">certifying auditee</span>. <strong>Once the audit has been submitted, it cannot be undone.</strong>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="padding-bottom-3" id="submit-audit">
+                        <div class="usa-summary-box font-sans-md bg-success-lighter"
+                             role="region"
+                             aria-labelledby="summary-box-key-information">
+                            <div class="usa-summary-box__body">
+                                <div class="usa-summary-box__text">
+                                    <p class="text-bold margin-0">
+                                        Submit to the FAC for processing
+                                    </p>
+                                    <p class="margin-0">
+                                        This is the last step and must be completed by the <span class="text-underline">certifying auditee</span>. <strong>Once the audit has been submitted, it cannot be undone.</strong>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </div>
+    {% include "audit-metadata.html" %}
+{% endblock content %}

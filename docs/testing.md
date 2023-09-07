@@ -13,6 +13,7 @@ We use [Django's test execution framework](https://docs.djangoproject.com/en/4.0
   - [Accessibility](#accessibility)
   - [Security Scans](#security-scans)
   - [Linting](#linting)
+- [End-to-end testing](#end-to-end-testing)
 
 ## Packages
  - [model_bakery](https://model-bakery.readthedocs.io/en/latest/), to help create data and instances within our tests
@@ -23,16 +24,16 @@ The test suite is run with Django's `test` management command. A number of helpf
 
 ```shell
 # Run the whole test suite
-docker-compose run web python manage.py test
+docker compose run web python manage.py test
 
 # Run only the tests within the `audit` app
-docker-compose run web python manage.py test audit
+docker compose run web python manage.py test audit
 
 # Run only the tests within the `audit.test_models` module
-docker-compose run web python manage.py test audit.test_models
+docker compose run web python manage.py test audit.test_models
 
 # Run only the tests within the `audit.test_models.SingleAuditChecklistTests` class
-docker-compose run web python manage.py test audit.test_models.SingleAuditChecklistTests
+docker compose run web python manage.py test audit.test_models.SingleAuditChecklistTests
 ```
 We are configured to require 90% test coverage. If a file should not be counted for test coverage, it can be added to the `.coveragerc` file with an explanation. For example, we don't need tests for environment specific settings so that is added there.
 
@@ -93,7 +94,7 @@ We are using [bandit](https://bandit.readthedocs.io/en/latest/) for static code 
 
 Run this locally via docker:
 ```
- docker-compose run web bandit -r crt_portal/
+ docker compose run web bandit -r crt_portal/
 ```
 
 Bandit tests are executed as part of our CI/CD pipeline on each PR to the `main` branch, commit to the `main` branch, and PR into the `prod` branch.
@@ -115,3 +116,39 @@ You can also run most of them as one command with `make lint`.
 
 Like with Bandit, new code will need to pass all of these to be merged into the `main` branch.
 
+# End-to-end testing
+
+We use Cypress to do end-to-end testing of the application. Tests are defined
+in files in [backend/cypress/e2e/](/backend/cypress/e2e). Run cypress with `npx cypress open`.
+
+## Testing behind Login.gov
+
+ For tests that run against our existing Cloud.gov environments, we can't use
+ our `DISABLE_AUTH` environment variable to allow the end-to-end tests access
+ to our authenticated pages. Instead, we need to use an actual Login.gov
+ sandbox account to log in.
+
+ We have a Google Group <fac-gov-test-users@gsa.gov> to provide an email
+ address for those test users. Additional test users can be created using that
+ email address with different values after a plus sign, e.g.
+ <fac-gov-test-users+staging@gsa.gov>.
+
+ When creating a new Login.gov sandbox account with an email address of that
+ form, after confirming the email address in the email that was sent to the
+ Google Group, create a random password and record it locally, ideally in a
+ KeePassXC password vault. When the account creation flow asks to set up a
+ second factor, choose "Authentication Application". On the next screen where
+ you would normally use a QR code to configure an authenticator application,
+ there is a text box with a secret key labeled "enter this code manually into
+ your authentication app". You need to save that secret key alongside the
+ password.
+
+ To pass that email address, password, and secret key into Cypress, set the
+ environment variables `CYPRESS_LOGIN_TEST_EMAIL`, `CYPRESS_LOGIN_TEST_PASSWORD`, and
+ `CYPRESS_LOGIN_TEST_OTP_SECRET`. You'll need similar credentials for
+ `CYPRESS_LOGIN_TEST_EMAIL_AUDITEE`, `CYPRESS_LOGIN_TEST_PASSWORD_AUDITEE`, and
+ `CYPRESS_LOGIN_TEST_OTP_SECRET_AUDITEE`. These can be the same values, but ideally
+ they'll belong to a different account. Obviously, do not store these values in our
+ Github repository. To use them in a Github Actions workflow, use the [Github
+ Actions secrets
+ store](https://docs.github.com/en/actions/security-guides/encrypted-secrets)

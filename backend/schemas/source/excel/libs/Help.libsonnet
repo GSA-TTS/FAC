@@ -15,10 +15,19 @@ local make_url = function(anchor)
     text: 'Invalid agency ALN (CFDA) prefix',
     link: make_url('aln_prefix'),
   },
+  // A
+  award_reference: {
+    text: 'Award reference have the form AWARD-NNNN (e.g. AWARD-0001)',
+    link: make_url('award_reference'),
+  },
   // C
   cluster_name: {
     text: 'Select from the approved cluster names',
     link: make_url('cluster_name'),
+  },
+  ein: {
+    text: 'Employer identification numbers (EIN) are nine characters long and match rules given by the IRS',
+    link: make_url('ein'),
   },
   // F
   federal_program_name: {
@@ -39,6 +48,10 @@ local make_url = function(anchor)
     text: 'The number must be zero or greater',
     link: make_url('positive_number'),
   },
+  prior_references: {
+    text: 'Must be a comma-separated list of reference numbers (YYYY-NNN) or N/A.',
+    link: make_url('prior_references'),
+  },
   // R
   reference_number: {
     text: 'Reference numbers must be formatted YYYY-NNN (e.g. 2023-001)',
@@ -58,5 +71,9 @@ local make_url = function(anchor)
     text: 'This field must be either `Y` or `N`',
     link: make_url('yorn'),
   },
-
+  // w
+  wrong_workbook_template: {
+    text: 'The workbook you tried to upload is for a different section.',
+    link: make_url('section_name'),
+  },
 }

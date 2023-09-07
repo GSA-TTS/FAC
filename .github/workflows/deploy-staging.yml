@@ -1,0 +1,59 @@
+---
+name: Deploy to Staging Environment
+on:
+  push:
+    branches:
+      - prod
+
+jobs:
+  testing:
+    uses: ./.github/workflows/testing-from-ghcr.yml
+    secrets: inherit
+
+  linting:
+    uses: ./.github/workflows/linting.yml
+    secrets: inherit
+
+  scan-dev:
+    name: Zap Scan
+    uses: ./.github/workflows/zap-scan.yml
+    with:
+      url: "https://fac-dev.app.cloud.gov/"
+
+  deploy-infrastructure-staging:
+    name: Deploy infrastructure (staging)
+    needs:
+      - testing
+      - scan-dev
+    uses: ./.github/workflows/terraform-apply-env.yml
+    with:
+      environment: "staging"
+      autoapprove: false
+    secrets: inherit
+
+  deploy-staging:
+    name: Deploy application
+    needs:
+      - deploy-infrastructure-staging
+    uses: ./.github/workflows/deploy-application.yml
+    with:
+      environment: "staging"
+    secrets: inherit
+
+  scan-staging:
+    needs:
+      - deploy-staging
+    name: Zap Scan
+    uses: ./.github/workflows/zap-scan.yml
+    with:
+      url: "https://fac-staging.app.cloud.gov/"
+
+  regression-test:
+    needs:
+      - deploy-staging
+    name: Run Regression Tests
+    uses: ./.github/workflows/regression-tests.yml
+    secrets: inherit
+    with:
+      url: "https://fac-staging.app.cloud.gov"
+      environment: "staging"

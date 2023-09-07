@@ -1,39 +1,87 @@
 {
-    "GeneralInformationCase":{
-        "auditee_fiscal_period_start": "2022-01-01",
-        "auditee_fiscal_period_end": "2022-12-31",
-        "audit_period_covered": "annual",
-        "ein": "123456789",
-        "ein_not_an_ssn_attestation": true,
-        "multiple_eins_covered": false,
-        "auditee_uei": "1A2B3C4D5E6F",
-        "multiple_ueis_covered": false,
-        "auditee_name": "John",
-        "auditee_address_line_1": "123 Fake St.",
-        "auditee_city": "FakeCity",
-        "auditee_state": "AL",
-        "auditee_zip": "12345",
-        "auditee_contact_name": "John",
-        "auditee_contact_title": "A Title",
-        "auditee_phone": "555-555-5555",
-        "auditee_email": "john@test.test",
-        "user_provided_organization_type": "state",
-        "met_spending_threshold": true,
-        "is_usa_based": true,
-        "auditor_firm_name": "Firm LLC",
-        "auditor_ein": "123456789",
-        "auditor_ein_not_an_ssn_attestation": true,
-        "auditor_country": "USA",
-        "auditor_address_line_1": "456 Fake St.",
-        "auditor_city": "AnotherFakeCity",
-        "auditor_state": "WY",
-        "auditor_zip": "56789",
-        "auditor_contact_name": "Jane",
-        "auditor_contact_title": "Another Title",
-        "auditor_phone": "999-999-9999",
-        "auditor_email": "jane@test.test"
+  "GeneralInformationCase": {
+    "auditee_fiscal_period_start": "2022-01-01",
+    "auditee_fiscal_period_end": "2022-12-31",
+    "audit_period_covered": "annual",
+    "ein": "123456789",
+    "ein_not_an_ssn_attestation": true,
+    "multiple_eins_covered": false,
+    "auditee_uei": "1A2B3C4D5E6F",
+    "multiple_ueis_covered": false,
+    "auditee_name": "John",
+    "auditee_address_line_1": "123 Fake St.",
+    "auditee_city": "FakeCity",
+    "auditee_state": "AL",
+    "auditee_zip": "12345",
+    "auditee_contact_name": "John",
+    "auditee_contact_title": "A Title",
+    "auditee_phone": "555-555-5555",
+    "auditee_email": "john@test.test",
+    "user_provided_organization_type": "state",
+    "met_spending_threshold": true,
+    "is_usa_based": true,
+    "auditor_firm_name": "Firm LLC",
+    "auditor_ein": "123456789",
+    "auditor_ein_not_an_ssn_attestation": true,
+    "auditor_country": "USA",
+    "auditor_address_line_1": "456 Fake St.",
+    "auditor_city": "AnotherFakeCity",
+    "auditor_state": "WY",
+    "auditor_zip": "56789",
+    "auditor_contact_name": "Jane",
+    "auditor_contact_title": "Another Title",
+    "auditor_phone": "999-999-9999",
+    "auditor_email": "jane@test.test"
+  },
+  "AuditInformationCases": [
+    {
+      "dollar_threshold": 1000000,
+      "gaap_results": [
+        "unmodified_opinion"
+      ],
+      "is_going_concern_included": true,
+      "is_internal_control_deficiency_disclosed": false,
+      "is_internal_control_material_weakness_disclosed": true,
+      "is_material_noncompliance_disclosed": true,
+      "is_aicpa_audit_guide_included": true,
+      "is_low_risk_auditee": false,
+      "agencies": [
+        "31",
+        "44"
+      ]
     },
-    "FederalAwardsCases":[{
+    {
+      "dollar_threshold": 1000000,
+      "gaap_results": [
+        "not_gaap"
+      ],
+      "is_going_concern_included": true,
+      "is_sp_framework_required": true,
+      "sp_framework_basis": [
+        "cash_basis",
+        "tax_basis",
+        "contractual_basis"
+      ],
+      "sp_framework_opinions": [
+        "unmodified_opinion",
+        "qualified_opinion"
+      ],
+      "is_internal_control_deficiency_disclosed": false,
+      "is_internal_control_material_weakness_disclosed": true,
+      "is_material_noncompliance_disclosed": true,
+      "is_aicpa_audit_guide_included": true,
+      "is_low_risk_auditee": false,
+      "agencies": [
+        "32",
+        "45"
+      ]
+    }
+  ],
+  "FederalAwardsCases": [
+    {
+      "Meta": {
+        "section_name": "FederalAwardsExpended"
+      },
       "FederalAwards": {
         "auditee_uei": "AAA123456BBB",
         "total_amount_expended": 12345,
@@ -61,13 +109,21 @@
                 }
               ]
             },
-            "cluster": { "cluster_name": "N/A", "cluster_total": 123 },
-            "subrecipients": { "is_passed": "N" }
+            "cluster": {
+              "cluster_name": "N/A",
+              "cluster_total": 0
+            },
+            "subrecipients": {
+              "is_passed": "N"
+            }
           }
         ]
       }
     },
     {
+      "Meta": {
+        "section_name": "FederalAwardsExpended"
+      },
       "FederalAwards": {
         "auditee_uei": "AAA123456BBB",
         "total_amount_expended": 12345,
@@ -86,8 +142,13 @@
               "is_guaranteed": "Y",
               "loan_balance_at_audit_period_end": 42
             },
-            "direct_or_indirect_award": { "is_direct": "Y", "entities": [] },
-            "subrecipients": { "is_passed": "Y", "subrecipient_amount": 32 },
+            "direct_or_indirect_award": {
+              "is_direct": "Y"
+            },
+            "subrecipients": {
+              "is_passed": "Y",
+              "subrecipient_amount": 32
+            },
             "cluster": {
               "cluster_name": "STATE CLUSTER",
               "cluster_total": 123,
@@ -96,56 +157,142 @@
           }
         ]
       }
-    }],
-    "CorrectiveActionPlanCase":{
-      "CorrectiveActionPlan": {
-        "auditee_uei": "AAA123456BBB",
-        "corrective_action_plan_entries": [
-          {
-            "contains_chart_or_table": "N",
-            "planned_action": "Action 11",
-            "reference_number": "2023-111"
-          }
-        ]
-      }
+    }
+  ],
+  "AdditionalUeisCase": {
+    "Meta": {
+      "section_name": "AdditionalUeis"
     },
-    "FindingsTextCase":{
-      "FindingsText": {
-        "auditee_uei": "AAA123456BBB",
-        "findings_text_entries": [
-          {
-            "contains_chart_or_table": "N",
-            "text_of_finding": "Audit finding 11",
+    "AdditionalUEIs": {
+      "auditee_uei": "AAA123456BBB",
+      "additional_ueis_entries": [
+        {
+          "additional_uei": "AAA123456CCC"
+        }
+      ]
+    }
+  },
+  "AdditionalEinsCase": {
+    "Meta": {
+      "section_name": "AdditionalEins"
+    },
+    "AdditionalEINs": {
+      "auditee_uei": "AAA123456BBB",
+      "additional_eins_entries": [
+        {
+          "additional_ein": "123123123"
+        }
+      ]
+    }
+  },
+  "CorrectiveActionPlanCase": {
+    "Meta": {
+      "section_name": "CorrectiveActionPlan"
+    },
+    "CorrectiveActionPlan": {
+      "auditee_uei": "AAA123456BBB",
+      "corrective_action_plan_entries": [
+        {
+          "contains_chart_or_table": "N",
+          "planned_action": "Action 11",
+          "reference_number": "2023-111"
+        }
+      ]
+    }
+  },
+  "FindingsTextCase": {
+    "Meta": {
+      "section_name": "FindingsText"
+    },
+    "FindingsText": {
+      "auditee_uei": "AAA123456BBB",
+      "findings_text_entries": [
+        {
+          "contains_chart_or_table": "N",
+          "text_of_finding": "Audit finding 11",
+          "reference_number": "2023-001"
+        }
+      ]
+    }
+  },
+  "FindingsUniformGuidanceCase": {
+    "Meta": {
+      "section_name": "FindingsUniformGuidance"
+    },
+    "FindingsUniformGuidance": {
+      "auditee_uei": "AAA123456BBB",
+      "findings_uniform_guidance_entries": [
+        {
+          "program": {
+            "award_reference": "AWARD-0001",
+            "compliance_requirement": "A"
+          },
+          "questioned_costs": "N",
+          "significant_deficiency": "N",
+          "other_matters": "N",
+          "other_findings": "Y",
+          "modified_opinion": "N",
+          "material_weakness": "N",
+          "findings": {
+            "is_valid": "Y",
+            "repeat_prior_reference": "Y",
+            "prior_references": "2022-001",
             "reference_number": "2023-001"
           }
-        ]
-      }
+        }
+      ]
+    }
+  },
+  "SecondaryAuditorsCase": {
+    "Meta": {
+      "section_name": "SecondaryAuditors"
     },
-    "FindingsUniformGuidanceCase":{
-      "FindingsUniformGuidance": {
-        "auditee_uei": "AAA123456BBB",
-        "findings_uniform_guidance_entries": [
+    "SecondaryAuditors": {
+      "auditee_uei": "AAA123456BBB",
+      "secondary_auditors_entries": [
+        {
+          "secondary_auditor_name": "Best Auditor Ever",
+          "secondary_auditor_ein": "123123123",
+          "secondary_auditor_address_street": "123 Maple Street",
+          "secondary_auditor_address_city": "Anytown",
+          "secondary_auditor_address_state": "WA",
+          "secondary_auditor_address_zipcode": "91919",
+          "secondary_auditor_contact_name": "Tory Audi",
+          "secondary_auditor_contact_title": "Esquire",
+          "secondary_auditor_contact_phone": "555-555-5555",
+          "secondary_auditor_contact_email": "tory.audi@bae.com"
+        }
+      ]
+    }
+  },
+  "NotesToSefaCases": [
+    {
+      "Meta": {
+        "section_name": "NotesToSefa"
+      },
+      "NotesToSefa": {
+        "auditee_uei": "AAA123456CCC",
+        "accounting_policies": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. \nFusce in ipsum tempus, eleifend ipsum id, dignissim ipso lorem. Proin vel quam non metus placerat semper nec in nisi.",
+        "is_minimis_rate_used": "Y",
+        "rate_explained": "Ipsum lorem ipsum dolor sit amet, consectetur adipiscing elit. \nInteger nec elit sed est malesuada fermentum vitae in odio. In hac habitasse platea dictumst. Nunc ut tincidunt quam.",
+        "notes_to_sefa_entries": [
           {
-            "program": {
-              "federal_agency_prefix": "42",
-              "three_digit_extension": "123",
-              "program_name": "program name",
-              "compliance_requirement": "A"
-            },
-            "questioned_costs": "N",
-            "significant_deficiency": "N",
-            "other_matters": "N",
-            "other_findings": "Y",
-            "modified_opinion": "N",
-            "material_weakness": "N",
-            "findings": {
-              "is_valid": "Y",
-              "repeat_prior_reference": "Y",
-              "prior_references": "2022-001",
-              "reference_number": "2023-001"
-            }
+            "note_title": "Note one",
+            "note_content": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. \nVestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Phasellus nec tortor ut ligula sollicitudin euismod."
           }
         ]
       }
+    },
+    {
+      "Meta": {
+        "section_name": "NotesToSefa"
+      },
+      "NotesToSefa": {
+        "auditee_uei": "AAA123456CCC",
+        "accounting_policies": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. \nFusce in ipsum tempus, eleifend ipsum id, dignissim ipso lorem. Proin vel quam non metus placerat semper nec in nisi.",
+        "is_minimis_rate_used": "Y",
+        "rate_explained": "Ipsum lorem ipsum dolor sit amet, consectetur adipiscing elit. \nInteger nec elit sed est malesuada fermentum vitae in odio. In hac habitasse platea dictumst. Nunc ut tincidunt quam."
+      }
     }
+  ]
 }

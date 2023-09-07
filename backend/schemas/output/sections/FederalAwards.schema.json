@@ -29,45 +29,105 @@
                   "additionalProperties": false,
                   "description": "Award entry rows",
                   "properties": {
+                     "award_reference": {
+                        "description": "Award Reference",
+                        "pattern": "^AWARD-(?!0000)[0-9]{4}$",
+                        "title": "AwardReference",
+                        "type": "string"
+                     },
                      "cluster": {
                         "allOf": [
                            {
                               "if": {
-                                 "not": {
-                                    "properties": {
-                                       "cluster_name": {
-                                          "enum": [
-                                             "OTHER CLUSTER NOT LISTED ABOVE",
-                                             "STATE CLUSTER"
+                                 "properties": {
+                                    "cluster_name": {
+                                       "description": "All cluster names + N/A",
+                                       "enum": [
+                                          "HEAD START CLUSTER",
+                                          "477 CLUSTER",
+                                          "MATERNAL, INFANT, AND EARLY CHILDHOOD HOME VISITING CLUSTER",
+                                          "RESEARCH AND DEVELOPMENT",
+                                          "STUDENT FINANCIAL ASSISTANCE",
+                                          "AGING CLUSTER",
+                                          "CCDF CLUSTER",
+                                          "CDFI CLUSTER",
+                                          "CHILD NUTRITION CLUSTER",
+                                          "CLEAN WATER STATE REVOLVING FUND CLUSTER",
+                                          "COMMUNITY FACILITIES LOANS AND GRANTS CLUSTER",
+                                          "DISABILITY INSURANCE/SSI CLUSTER",
+                                          "DRINKING WATER STATE REVOLVING FUND CLUSTER",
+                                          "ECONOMIC DEVELOPMENT CLUSTER",
+                                          "EMPLOYMENT SERVICE CLUSTER",
+                                          "FEDERAL TRANSIT CLUSTER",
+                                          "FISH AND WILDLIFE CLUSTER",
+                                          "FOOD DISTRIBUTION CLUSTER",
+                                          "FOREIGN FOOD AID DONATION CLUSTER",
+                                          "FOREST SERVICE SCHOOLS AND ROADS CLUSTER",
+                                          "FOSTER GRANDPARENT/SENIOR COMPANION CLUSTER",
+                                          "HEALTH CENTER PROGRAM CLUSTER",
+                                          "HIGHWAY PLANNING AND CONSTRUCTION CLUSTER",
+                                          "HIGHWAY SAFETY CLUSTER",
+                                          "HOPE VI CLUSTER",
+                                          "HOUSING VOUCHER CLUSTER",
+                                          "HURRICANE SANDY RELIEF CLUSTER",
+                                          "MEDICAID CLUSTER",
+                                          "SCHOOL IMPROVEMENT GRANTS CLUSTER",
+                                          "SECTION 8 PROJECT-BASED CLUSTER",
+                                          "SNAP CLUSTER",
+                                          "SPECIAL EDUCATION CLUSTER (IDEA)",
+                                          "TANF CLUSTER",
+                                          "TRANSIT SERVICES PROGRAMS CLUSTER",
+                                          "TRIO CLUSTER",
+                                          "WATER AND WASTE PROGRAM CLUSTER",
+                                          "WIOA CLUSTER",
+                                          "CDBG - ENTITLEMENT GRANTS CLUSTER",
+                                          "CDBG - DISASTER RECOVERY GRANTS - PUB. L. NO. 113-2 CLUSTER",
+                                          "N/A"
+                                       ],
+                                       "type": "string"
+                                    }
+                                 }
+                              },
+                              "then": {
+                                 "allOf": [
+                                    {
+                                       "not": {
+                                          "required": [
+                                             "other_cluster_name"
+                                          ]
+                                       }
+                                    },
+                                    {
+                                       "not": {
+                                          "required": [
+                                             "state_cluster_name"
                                           ]
                                        }
                                     }
+                                 ]
+                              }
+                           },
+                           {
+                              "if": {
+                                 "properties": {
+                                    "cluster_name": {
+                                       "const": "OTHER CLUSTER NOT LISTED ABOVE",
+                                       "type": "string"
+                                    }
                                  }
                               },
                               "then": {
                                  "allOf": [
                                     {
-                                       "properties": {
-                                          "other_cluster_name": {
-                                             "description": "Empty string or null",
-                                             "enum": [
-                                                "",
-                                                "null"
-                                             ],
-                                             "title": "EmptyString_Null"
-                                          }
-                                       }
+                                       "required": [
+                                          "other_cluster_name"
+                                       ]
                                     },
                                     {
-                                       "properties": {
-                                          "state_cluster_name": {
-                                             "description": "Empty string or null",
-                                             "enum": [
-                                                "",
-                                                "null"
-                                             ],
-                                             "title": "EmptyString_Null"
-                                          }
+                                       "not": {
+                                          "required": [
+                                             "state_cluster_name"
+                                          ]
                                        }
                                     }
                                  ]
@@ -77,160 +137,48 @@
                               "if": {
                                  "properties": {
                                     "cluster_name": {
-                                       "const": "STATE CLUSTER"
+                                       "const": "STATE CLUSTER",
+                                       "type": "string"
                                     }
                                  }
                               },
                               "then": {
                                  "allOf": [
                                     {
-                                       "properties": {
-                                          "other_cluster_name": {
-                                             "description": "Empty string or null",
-                                             "enum": [
-                                                "",
-                                                "null"
-                                             ],
-                                             "title": "EmptyString_Null"
-                                          }
-                                       }
+                                       "required": [
+                                          "state_cluster_name"
+                                       ]
                                     },
                                     {
-                                       "properties": {
-                                          "state_cluster_name": {
-                                             "minLength": 1,
-                                             "type": "string"
-                                          }
+                                       "not": {
+                                          "required": [
+                                             "other_cluster_name"
+                                          ]
                                        }
                                     }
-                                 ],
-                                 "required": [
-                                    "state_cluster_name"
-                                 ]
-                              }
-                           },
-                           {
-                              "if": {
-                                 "properties": {
-                                    "cluster_name": {
-                                       "const": "OTHER CLUSTER NOT LISTED ABOVE"
-                                    }
-                                 }
-                              },
-                              "then": {
-                                 "allOf": [
-                                    {
-                                       "properties": {
-                                          "other_cluster_name": {
-                                             "minLength": 1,
-                                             "type": "string"
-                                          }
-                                       }
-                                    },
-                                    {
-                                       "properties": {
-                                          "state_cluster_name": {
-                                             "description": "Empty string or null",
-                                             "enum": [
-                                                "",
-                                                "null"
-                                             ],
-                                             "title": "EmptyString_Null"
-                                          }
-                                       }
-                                    }
-                                 ],
-                                 "required": [
-                                    "other_cluster_name"
                                  ]
                               }
                            }
                         ],
                         "properties": {
                            "cluster_name": {
-                              "description": "Cluster Name",
-                              "enum": [
-                                 "N/A",
-                                 "RESEARCH AND DEVELOPMENT",
-                                 "STUDENT FINANCIAL ASSISTANCE",
-                                 "STATE CLUSTER",
-                                 "477 CLUSTER",
-                                 "AGING CLUSTER",
-                                 "CCDF CLUSTER",
-                                 "CDBG - DISASTER RECOVERY GRANTS - PUB. L. NO. 113-2 CLUSTER",
-                                 "CDBG - ENTITLEMENT GRANTS CLUSTER",
-                                 "CDFI CLUSTER",
-                                 "CHILD NUTRITION CLUSTER",
-                                 "CLEAN WATER STATE REVOLVING FUND CLUSTER",
-                                 "COMMUNITY FACILITIES LOANS AND GRANTS CLUSTER",
-                                 "DISABILITY INSURANCE/SSI CLUSTER",
-                                 "DRINKING WATER STATE REVOLVING FUND CLUSTER",
-                                 "ECONOMIC DEVELOPMENT CLUSTER",
-                                 "EMPLOYMENT SERVICE CLUSTER",
-                                 "FEDERAL TRANSIT CLUSTER",
-                                 "FISH AND WILDLIFE CLUSTER",
-                                 "FOOD DISTRIBUTION CLUSTER",
-                                 "FOREIGN FOOD AID DONATION CLUSTER",
-                                 "FOREST SERVICE SCHOOLS AND ROADS CLUSTER",
-                                 "FOSTER GRANDPARENT/SENIOR COMPANION CLUSTER",
-                                 "HEAD START CLUSTER",
-                                 "HEALTH CENTER PROGRAM CLUSTER",
-                                 "HIGHWAY PLANNING AND CONSTRUCTION CLUSTER",
-                                 "HIGHWAY SAFETY CLUSTER",
-                                 "HOPE VI CLUSTER",
-                                 "HOUSING VOUCHER CLUSTER",
-                                 "HURRICANE SANDY RELIEF CLUSTER",
-                                 "MATERNAL, INFANT, AND EARLY CHILDHOOD HOME VISITING CLUSTER",
-                                 "MEDICAID CLUSTER",
-                                 "SCHOOL IMPROVEMENT GRANTS CLUSTER",
-                                 "SECTION 8 PROJECT-BASED CLUSTER",
-                                 "SNAP CLUSTER",
-                                 "SPECIAL EDUCATION CLUSTER (IDEA)",
-                                 "TANF CLUSTER",
-                                 "TRANSIT SERVICES PROGRAMS CLUSTER",
-                                 "TRIO CLUSTER",
-                                 "WATER AND WASTE PROGRAM CLUSTER",
-                                 "WIOA CLUSTER",
-                                 "OTHER CLUSTER NOT LISTED ABOVE"
-                              ],
-                              "title": "ClusterName",
                               "type": "string"
                            },
-                           "cluster_total": {
-                              "type": "number"
+                           "other_cluster_name": {
+                              "type": "string"
+                           },
+                           "state_cluster_name": {
+                              "type": "string"
                            }
                         },
                         "required": [
-                           "cluster_name",
-                           "cluster_total"
+                           "cluster_name"
                         ],
                         "type": "object"
                      },
                      "direct_or_indirect_award": {
                         "additionalProperties": false,
                         "allOf": [
-                           {
-                              "if": {
-                                 "properties": {
-                                    "is_direct": {
-                                       "const": "Y"
-                                    }
-                                 }
-                              },
-                              "then": {
-                                 "properties": {
-                                    "entities": {
-                                       "description": "Empty string, empty array, or null",
-                                       "enum": [
-                                          "",
-                                          [ ],
-                                          "null"
-                                       ],
-                                       "title": "EmptyString_EmptyArray_Null"
-                                    }
-                                 }
-                              }
-                           },
                            {
                               "if": {
                                  "properties": {
@@ -244,6 +192,22 @@
                                     "entities"
                                  ]
                               }
+                           },
+                           {
+                              "if": {
+                                 "properties": {
+                                    "is_direct": {
+                                       "const": "Y"
+                                    }
+                                 }
+                              },
+                              "then": {
+                                 "not": {
+                                    "required": [
+                                       "entities"
+                                    ]
+                                 }
+                              }
                            }
                         ],
                         "description": "If direct_award is N, the form must include a list of the pass-through entity by name and identifying number",
@@ -253,7 +217,6 @@
                                  "additionalProperties": false,
                                  "properties": {
                                     "passthrough_identifying_number": {
-                                       "minLength": 1,
                                        "type": "string"
                                     },
                                     "passthrough_name": {
@@ -261,8 +224,7 @@
                                     }
                                  },
                                  "required": [
-                                    "passthrough_name",
-                                    "passthrough_identifying_number"
+                                    "passthrough_name"
                                  ],
                                  "type": "object"
                               },
@@ -276,6 +238,9 @@
                               "type": "string"
                            }
                         },
+                        "required": [
+                           "is_direct"
+                        ],
                         "type": "object"
                      },
                      "loan_or_loan_guarantee": {
@@ -290,23 +255,27 @@
                                  }
                               },
                               "then": {
-                                 "properties": {
-                                    "loan_balance_at_audit_period_end": {
-                                       "anyOf": [
-                                          {
+                                 "oneOf": [
+                                    {
+                                       "properties": {
+                                          "loan_balance_at_audit_period_end": {
                                              "minimum": 1,
                                              "type": "integer"
-                                          },
-                                          {
+                                          }
+                                       }
+                                    },
+                                    {
+                                       "properties": {
+                                          "loan_balance_at_audit_period_end": {
                                              "enum": [
                                                 "N/A"
                                              ],
                                              "title": "N/A",
                                              "type": "string"
                                           }
-                                       ]
+                                       }
                                     }
-                                 },
+                                 ],
                                  "required": [
                                     "loan_balance_at_audit_period_end"
                                  ]
@@ -360,6 +329,14 @@
                         "additionalProperties": false,
                         "allOf": [
                            {
+                              "properties": {
+                                 "number_of_audit_findings": {
+                                    "minimum": 0,
+                                    "type": "integer"
+                                 }
+                              }
+                           },
+                           {
                               "if": {
                                  "properties": {
                                     "is_major": {
@@ -368,47 +345,9 @@
                                  }
                               },
                               "then": {
-                                 "else": {
-                                    "properties": {
-                                       "audit_report_type": {
-                                          "description": "Major program report types",
-                                          "enum": [
-                                             "U",
-                                             "Q",
-                                             "A",
-                                             "D"
-                                          ],
-                                          "title": "MajorProgramAuditReportType",
-                                          "type": "string"
-                                       },
-                                       "number_of_audit_findings": {
-                                          "const": 0,
-                                          "type": "integer"
-                                       }
-                                    }
-                                 },
-                                 "if": {
-                                    "properties": {
-                                       "audit_report_type": {
-                                          "anyOf": [
-                                             {
-                                                "const": "A"
-                                             },
-                                             {
-                                                "const": "Q"
-                                             }
-                                          ]
-                                       }
-                                    }
-                                 },
-                                 "then": {
-                                    "properties": {
-                                       "number_of_audit_findings": {
-                                          "exclusiveMinimum": 0,
-                                          "type": "integer"
-                                       }
-                                    }
-                                 }
+                                 "required": [
+                                    "audit_report_type"
+                                 ]
                               }
                            },
                            {
@@ -428,9 +367,6 @@
                                           "null"
                                        ],
                                        "title": "EmptyString_Null"
-                                    },
-                                    "number_of_audit_findings": {
-                                       "const": 0
                                     }
                                  }
                               }
@@ -471,72 +407,20 @@
                               "type": "number"
                            },
                            "audit_report_type": {
-                              "type": "string"
+                              "type": [
+                                 "string",
+                                 "null"
+                              ]
                            },
                            "federal_agency_prefix": {
-                              "description": "Valid two-digit program numbers; part of the CFDA/ALN",
-                              "enum": [
-                                 "10",
-                                 "11",
-                                 "12",
-                                 "13",
-                                 "14",
-                                 "15",
-                                 "16",
-                                 "17",
-                                 "18",
-                                 "19",
-                                 "20",
-                                 "21",
-                                 "22",
-                                 "23",
-                                 "27",
-                                 "29",
-                                 "30",
-                                 "32",
-                                 "33",
-                                 "34",
-                                 "36",
-                                 "39",
-                                 "40",
-                                 "41",
-                                 "42",
-                                 "43",
-                                 "44",
-                                 "45",
-                                 "46",
-                                 "47",
-                                 "53",
-                                 "57",
-                                 "58",
-                                 "59",
-                                 "60",
-                                 "61",
-                                 "62",
-                                 "64",
-                                 "66",
-                                 "68",
-                                 "70",
-                                 "77",
-                                 "78",
-                                 "81",
-                                 "82",
-                                 "83",
-                                 "84",
-                                 "85",
-                                 "86",
-                                 "87",
-                                 "88",
-                                 "89",
-                                 "90",
-                                 "91",
-                                 "92",
-                                 "93",
-                                 "94",
-                                 "96",
-                                 "97",
-                                 "98",
-                                 "99"
+                              "allOf": [
+                                 {
+                                    "maxLength": 2,
+                                    "minLength": 2
+                                 },
+                                 {
+                                    "pattern": "^([0-9]{2})$"
+                                 }
                               ],
                               "type": "string"
                            },
@@ -557,9 +441,7 @@
                               "type": "string"
                            },
                            "three_digit_extension": {
-                              "description": "Three Digit Extension",
                               "pattern": "^(RD|[0-9]{3}[A-Za-z]{0,1}|U[0-9]{2})$",
-                              "title": "ThreeDigitExtension",
                               "type": "string"
                            }
                         },
@@ -568,7 +450,6 @@
                            "federal_agency_prefix",
                            "three_digit_extension",
                            "is_major",
-                           "audit_report_type",
                            "number_of_audit_findings"
                         ],
                         "type": "object"
@@ -662,6 +543,27 @@
          "title": "FederalAward",
          "type": "object",
          "version": 20230408
+      },
+      "Meta": {
+         "additionalProperties": false,
+         "properties": {
+            "section_name": {
+               "enum": [
+                  "FederalAwardsExpended"
+               ],
+               "type": "string"
+            },
+            "version": {
+               "const": "1.0.0",
+               "type": "string"
+            }
+         },
+         "required": [
+            "section_name"
+         ],
+         "title": "Meta",
+         "type": "object",
+         "version": 20230807
       }
    },
    "title": "UNNAMED",

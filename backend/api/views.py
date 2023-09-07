@@ -1,20 +1,20 @@
 import json
 from typing import List
 
-from audit.models import Access, SingleAuditChecklist
-from audit.permissions import SingleAuditChecklistPermission
-from django.http import Http404, HttpResponse
+from django.http import Http404, HttpResponse, JsonResponse
 from django.urls import reverse
-from django.views import View
-from config.settings import AUDIT_SCHEMA_DIR, BASE_DIR
+from django.views import View, generic
+from django.contrib.auth import get_user_model
+from django.core.exceptions import ValidationError
 from rest_framework import viewsets
 from rest_framework.authentication import BaseAuthentication
 from rest_framework.permissions import BasePermission, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from django.http import JsonResponse
-from django.core.exceptions import ValidationError
 
+from config.settings import AUDIT_SCHEMA_DIR, BASE_DIR
+from audit.models import Access, SingleAuditChecklist, SubmissionEvent
+from audit.permissions import SingleAuditChecklistPermission
 from .serializers import (
     AccessAndSubmissionSerializer,
     AccessListSerializer,
@@ -23,6 +23,8 @@ from .serializers import (
     SingleAuditChecklistSerializer,
     UEISerializer,
 )
+
+UserModel = get_user_model()
 
 AUDITEE_INFO_PREVIOUS_STEP_DATA_WE_NEED = [
     "user_provided_organization_type",
@@ -115,26 +117,64 @@ def access_and_submission_check(user, data):
             submitted_by=user,
             submission_status="in_progress",
             general_information=all_steps_user_form_data,
+            event_user=user,
+            event_type=SubmissionEvent.EventType.CREATED,
         )
 
         # Create all contact Access objects
-        Access.objects.create(sac=sac, role="editor", email=user.email, user=user)
+        Access.objects.create(
+            sac=sac,
+            role="editor",
+            email=user.email,
+            user=user,
+            event_user=user,
+            event_type=SubmissionEvent.EventType.ACCESS_GRANTED,
+        )
         Access.objects.create(
             sac=sac,
             role="certifying_auditee_contact",
-            email=serializer.data.get("certifying_auditee_contact"),
+            fullname=serializer.data.get("certifying_auditee_contact_fullname"),
+            email=serializer.data.get("certifying_auditee_contact_email"),
+            event_user=user,
+            event_type=SubmissionEvent.EventType.ACCESS_GRANTED,
         )
         Access.objects.create(
             sac=sac,
             role="certifying_auditor_contact",
-            email=serializer.data.get("certifying_auditor_contact"),
+            fullname=serializer.data.get("certifying_auditor_contact_fullname"),
+            email=serializer.data.get("certifying_auditor_contact_email"),
+            event_user=user,
+            event_type=SubmissionEvent.EventType.ACCESS_GRANTED,
         )
-        for contact in serializer.data.get("auditee_contacts"):
-            Access.objects.create(sac=sac, role="editor", email=contact)
-        for contact in serializer.data.get("auditor_contacts"):
-            Access.objects.create(sac=sac, role="editor", email=contact)
 
-        sac.save()
+        # The contacts form should prevent users from submitting an incomplete contacts section
+        auditee_contacts_info = zip(
+            serializer.data.get("auditee_contacts_email"),
+            serializer.data.get("auditee_contacts_fullname"),
+        )
+        auditor_contacts_info = zip(
+            serializer.data.get("auditor_contacts_email"),
+            serializer.data.get("auditor_contacts_fullname"),
+        )
+
+        for email, name in auditee_contacts_info:
+            Access.objects.create(
+                sac=sac,
+                role="editor",
+                fullname=name,
+                email=email,
+                event_user=user,
+                event_type=SubmissionEvent.EventType.ACCESS_GRANTED,
+            )
+        for email, name in auditor_contacts_info:
+            Access.objects.create(
+                sac=sac,
+                role="editor",
+                fullname=name,
+                email=email,
+                event_user=user,
+                event_type=SubmissionEvent.EventType.ACCESS_GRANTED,
+            )
 
         # Clear entry form data from profile
         user.profile.entry_form_data = {}
@@ -143,6 +183,21 @@ def access_and_submission_check(user, data):
         return {"report_id": sac.report_id, "next": "TBD"}
 
     return {"errors": serializer.errors}
+
+
+class Sprite(generic.View):
+    """
+    Due to problematic interactions between the SVG use element and
+    cross-domain rules and serving assets from S3, we need to serve this
+    particular file from Django.
+    """
+
+    def get(self, _request):
+        """Grab the file from static and return its contents as an image."""
+        fpath = BASE_DIR / "static" / "img" / "sprite.svg"
+        return HttpResponse(
+            content=fpath.read_text(encoding="utf-8"), content_type="image/svg+xml"
+        )
 
 
 class IndexView(View):

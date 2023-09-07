@@ -1,0 +1,63 @@
+---
+name: Run Regression Tests
+on:
+  workflow_dispatch:
+    inputs:
+      url:
+        description: "Base URL for Cypress"
+        required: true
+        type: string
+        default: "https://fac-staging.app.cloud.gov"
+      environment:
+        required: true
+        type: string
+        default: "staging"
+  workflow_call:
+    inputs:
+      url:
+        description: "Base URL for Cypress"
+        required: true
+        type: string
+      environment:
+        required: true
+        type: string
+
+jobs:
+  regression-testing:
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    env:
+      CYPRESS_BASE_URL: ${{ inputs.url }}
+      CYPRESS_LOGIN_TEST_EMAIL: ${{ secrets.CYPRESS_LOGIN_TEST_EMAIL }}
+      CYPRESS_LOGIN_TEST_PASSWORD: ${{ secrets.CYPRESS_LOGIN_TEST_PASSWORD }}
+      CYPRESS_LOGIN_TEST_OTP_SECRET: ${{ secrets.CYPRESS_LOGIN_TEST_OTP_SECRET }}
+      CYPRESS_LOGIN_TEST_EMAIL_AUDITEE: ${{ secrets.CYPRESS_LOGIN_TEST_EMAIL_AUDITEE }}
+      CYPRESS_LOGIN_TEST_PASSWORD_AUDITEE: ${{ secrets.CYPRESS_LOGIN_TEST_PASSWORD_AUDITEE }}
+      CYPRESS_LOGIN_TEST_OTP_SECRET_AUDITEE: ${{ secrets.CYPRESS_LOGIN_TEST_OTP_SECRET_AUDITEE }}
+      DISABLE_AUTH: False
+      # useful for debugging but otherwise complete overwhelm
+      # DEBUG: cypress:*
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Create .env file
+        run: touch .env
+
+      - name: Run Cypress full submission test
+        uses: Wandalen/wretry.action@master
+        with:
+          action: cypress-io/github-action@v6
+          with: |
+            working-directory: ./backend
+            spec: cypress/e2e/full-submission.cy.js
+          attempt_limit: 5
+          attempt_delay: 2000
+
+      - uses: actions/upload-artifact@v3
+        # add the line below to store screenshots only on failures
+        if: failure()
+        with:
+          name: cypress-screenshots
+          path: backend/cypress/screenshots
+          if-no-files-found: warn # 'warn' or 'error' are also available, defaults to `warn`
