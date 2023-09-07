@@ -3,6 +3,27 @@
    "additionalProperties": false,
    "metamodel_version": "1.7.0",
    "properties": {
+      "Meta": {
+         "additionalProperties": false,
+         "properties": {
+            "section_name": {
+               "enum": [
+                  "NotesToSefa"
+               ],
+               "type": "string"
+            },
+            "version": {
+               "const": "1.0.0",
+               "type": "string"
+            }
+         },
+         "required": [
+            "section_name"
+         ],
+         "title": "Meta",
+         "type": "object",
+         "version": 20230807
+      },
       "NotesToSefa": {
          "additionalProperties": false,
          "properties": {

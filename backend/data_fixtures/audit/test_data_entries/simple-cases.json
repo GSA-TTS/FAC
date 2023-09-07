@@ -33,19 +33,55 @@
     "auditor_phone": "999-999-9999",
     "auditor_email": "jane@test.test"
   },
-  "AuditInformationCase": {
-    "gaap_results": [],
-    "dollar_threshold": 1,
-    "is_going_concern_included": true,
-    "is_internal_control_deficiency_disclosed": false,
-    "is_internal_control_material_weakness_disclosed": false,
-    "is_material_noncompliance_disclosed": true,
-    "is_aicpa_audit_guide_included": false,
-    "is_low_risk_auditee": true,
-    "agencies": []
-  },
+  "AuditInformationCases": [
+    {
+      "dollar_threshold": 1000000,
+      "gaap_results": [
+        "unmodified_opinion"
+      ],
+      "is_going_concern_included": true,
+      "is_internal_control_deficiency_disclosed": false,
+      "is_internal_control_material_weakness_disclosed": true,
+      "is_material_noncompliance_disclosed": true,
+      "is_aicpa_audit_guide_included": true,
+      "is_low_risk_auditee": false,
+      "agencies": [
+        "31",
+        "44"
+      ]
+    },
+    {
+      "dollar_threshold": 1000000,
+      "gaap_results": [
+        "not_gaap"
+      ],
+      "is_going_concern_included": true,
+      "is_sp_framework_required": true,
+      "sp_framework_basis": [
+        "cash_basis",
+        "tax_basis",
+        "contractual_basis"
+      ],
+      "sp_framework_opinions": [
+        "unmodified_opinion",
+        "qualified_opinion"
+      ],
+      "is_internal_control_deficiency_disclosed": false,
+      "is_internal_control_material_weakness_disclosed": true,
+      "is_material_noncompliance_disclosed": true,
+      "is_aicpa_audit_guide_included": true,
+      "is_low_risk_auditee": false,
+      "agencies": [
+        "32",
+        "45"
+      ]
+    }
+  ],
   "FederalAwardsCases": [
     {
+      "Meta": {
+        "section_name": "FederalAwardsExpended"
+      },
       "FederalAwards": {
         "auditee_uei": "AAA123456BBB",
         "total_amount_expended": 12345,
@@ -73,13 +109,21 @@
                 }
               ]
             },
-            "cluster": { "cluster_name": "N/A", "cluster_total": 0 },
-            "subrecipients": { "is_passed": "N" }
+            "cluster": {
+              "cluster_name": "N/A",
+              "cluster_total": 0
+            },
+            "subrecipients": {
+              "is_passed": "N"
+            }
           }
         ]
       }
     },
     {
+      "Meta": {
+        "section_name": "FederalAwardsExpended"
+      },
       "FederalAwards": {
         "auditee_uei": "AAA123456BBB",
         "total_amount_expended": 12345,
@@ -98,8 +142,13 @@
               "is_guaranteed": "Y",
               "loan_balance_at_audit_period_end": 42
             },
-            "direct_or_indirect_award": { "is_direct": "Y", "entities": [] },
-            "subrecipients": { "is_passed": "Y", "subrecipient_amount": 32 },
+            "direct_or_indirect_award": {
+              "is_direct": "Y"
+            },
+            "subrecipients": {
+              "is_passed": "Y",
+              "subrecipient_amount": 32
+            },
             "cluster": {
               "cluster_name": "STATE CLUSTER",
               "cluster_total": 123,
@@ -111,6 +160,9 @@
     }
   ],
   "AdditionalUeisCase": {
+    "Meta": {
+      "section_name": "AdditionalUeis"
+    },
     "AdditionalUEIs": {
       "auditee_uei": "AAA123456BBB",
       "additional_ueis_entries": [
@@ -120,7 +172,23 @@
       ]
     }
   },
+  "AdditionalEinsCase": {
+    "Meta": {
+      "section_name": "AdditionalEins"
+    },
+    "AdditionalEINs": {
+      "auditee_uei": "AAA123456BBB",
+      "additional_eins_entries": [
+        {
+          "additional_ein": "123123123"
+        }
+      ]
+    }
+  },
   "CorrectiveActionPlanCase": {
+    "Meta": {
+      "section_name": "CorrectiveActionPlan"
+    },
     "CorrectiveActionPlan": {
       "auditee_uei": "AAA123456BBB",
       "corrective_action_plan_entries": [
@@ -133,6 +201,9 @@
     }
   },
   "FindingsTextCase": {
+    "Meta": {
+      "section_name": "FindingsText"
+    },
     "FindingsText": {
       "auditee_uei": "AAA123456BBB",
       "findings_text_entries": [
@@ -145,6 +216,9 @@
     }
   },
   "FindingsUniformGuidanceCase": {
+    "Meta": {
+      "section_name": "FindingsUniformGuidance"
+    },
     "FindingsUniformGuidance": {
       "auditee_uei": "AAA123456BBB",
       "findings_uniform_guidance_entries": [
@@ -170,6 +244,9 @@
     }
   },
   "SecondaryAuditorsCase": {
+    "Meta": {
+      "section_name": "SecondaryAuditors"
+    },
     "SecondaryAuditors": {
       "auditee_uei": "AAA123456BBB",
       "secondary_auditors_entries": [
@@ -188,18 +265,34 @@
       ]
     }
   },
-  "NotesToSefaCase": {
-    "NotesToSefa": {
-      "auditee_uei": "AAA123456CCC",
-      "accounting_policies": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. \nFusce in ipsum tempus, eleifend ipsum id, dignissim ipso lorem. Proin vel quam non metus placerat semper nec in nisi.",
-      "is_minimis_rate_used": "Y",
-      "rate_explained": "Ipsum lorem ipsum dolor sit amet, consectetur adipiscing elit. \nInteger nec elit sed est malesuada fermentum vitae in odio. In hac habitasse platea dictumst. Nunc ut tincidunt quam.",
-      "notes_to_sefa_entries": [
-        {
-          "note_title": "Note one",
-          "note_content": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. \nVestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Phasellus nec tortor ut ligula sollicitudin euismod."
-        }
-      ]
+  "NotesToSefaCases": [
+    {
+      "Meta": {
+        "section_name": "NotesToSefa"
+      },
+      "NotesToSefa": {
+        "auditee_uei": "AAA123456CCC",
+        "accounting_policies": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. \nFusce in ipsum tempus, eleifend ipsum id, dignissim ipso lorem. Proin vel quam non metus placerat semper nec in nisi.",
+        "is_minimis_rate_used": "Y",
+        "rate_explained": "Ipsum lorem ipsum dolor sit amet, consectetur adipiscing elit. \nInteger nec elit sed est malesuada fermentum vitae in odio. In hac habitasse platea dictumst. Nunc ut tincidunt quam.",
+        "notes_to_sefa_entries": [
+          {
+            "note_title": "Note one",
+            "note_content": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. \nVestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Phasellus nec tortor ut ligula sollicitudin euismod."
+          }
+        ]
+      }
+    },
+    {
+      "Meta": {
+        "section_name": "NotesToSefa"
+      },
+      "NotesToSefa": {
+        "auditee_uei": "AAA123456CCC",
+        "accounting_policies": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. \nFusce in ipsum tempus, eleifend ipsum id, dignissim ipso lorem. Proin vel quam non metus placerat semper nec in nisi.",
+        "is_minimis_rate_used": "Y",
+        "rate_explained": "Ipsum lorem ipsum dolor sit amet, consectetur adipiscing elit. \nInteger nec elit sed est malesuada fermentum vitae in odio. In hac habitasse platea dictumst. Nunc ut tincidunt quam."
+      }
     }
-  }
+  ]
 }

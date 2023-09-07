@@ -23,6 +23,7 @@ local Types = Base.Types;
     audit_period_covered: {
       '$ref': '#/$defs/AuditPeriod',
     },
+    audit_period_other_months: Types.string,
     auditee_address_line_1: Types.string {
       maxLength: 100,
     },
@@ -97,10 +98,49 @@ local Types = Base.Types;
     met_spending_threshold: Types.boolean,
     multiple_eins_covered: Func.compound_type([Types.boolean, Types.NULL]),
     multiple_ueis_covered: Func.compound_type([Types.boolean, Types.NULL]),
+    secondary_auditors_exist: Func.compound_type([Types.boolean, Types.NULL]),
     user_provided_organization_type: {
       '$ref': '#/$defs/UserProvidedOrganizationType',
     },
   },
+  anyOf: [
+    {
+      'if': {
+        properties: {
+          audit_period_covered: {
+            const: 'annual',
+          },
+        },
+      },
+      'then': {
+        audit_period_other_months: Base.Enum.EmptyString_Null,
+      },
+    },
+    {
+      'if': {
+        properties: {
+          audit_period_covered: {
+            const: 'biennial',
+          },
+        },
+      },
+      'then': {
+        audit_period_other_months: Base.Enum.EmptyString_Null,
+      },
+    },
+    {
+      'if': {
+        properties: {
+          audit_period_covered: {
+            const: 'other',
+          },
+        },
+      },
+      'then': {
+        audit_period_other_months: Base.Compound.MonthsOther,
+      },
+    },
+  ],
   required: [],
   title: 'GeneralInformation',
   type: 'object',

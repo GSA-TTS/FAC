@@ -45,8 +45,8 @@ local single_cells = [
     title_cell: 'A3',
     range_cell: 'B3',
     format: 'text',
-    formula: '="' + Sheets.section_names.FINDINGS_UNIFORM_GUIDANCE + '"',
-    help: Help.plain_text,
+    formula: '="' + Sheets.section_names.FEDERAL_AWARDS_AUDIT_FINDINGS + '"',
+    help: Help.wrong_workbook_template,
     validation: SV.NoValidation,
   },
   Sheets.single_cell {
@@ -174,7 +174,7 @@ local open_ranges_defns = [
   ],
   [
     open_range_w24 {
-      help: Help.yorn,
+      help: Help.prior_references,
     },
     SV.NoValidation,
     'If Repeat Finding, provide Prior Year Audit Finding Reference Number(s)',

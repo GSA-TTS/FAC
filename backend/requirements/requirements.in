@@ -3,7 +3,6 @@ cfenv
 cryptography>=41.0.2
 django-cors-headers
 django-csp
-django-logingov-backend
 django-storages
 Django>=4.2.3
 djangorestframework
@@ -11,7 +10,7 @@ djangorestframework-simplejwt
 django-fsm
 environs[django]
 faker
-fs
+greenlet==2.0.2
 gunicorn
 jsonnet
 jsonpath-ng
@@ -20,7 +19,6 @@ newrelic
 oic
 openpyxl
 pandas
-peewee
 psycopg2-binary
 pycryptodome
 pydash

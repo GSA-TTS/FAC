@@ -1,5 +1,7 @@
 local Base = import '../base/Base.libsonnet';
 local Func = import '../base/Functions.libsonnet';
+local Sheets = import '../excel/libs/Sheets.libsonnet';
+
 local Types = Base.Types;
 
 local Validations = {
@@ -11,57 +13,6 @@ local Validations = {
     },
     required: ['passthrough_name'],
   },
-  PassThroughEntityEmpty: Types.object {
-    additionalProperties: false,
-    properties: {
-      passthrough_name: Base.Enum.EmptyString_Null,
-      passthrough_identifying_number: Base.Enum.EmptyString_Null,
-    },
-    // The passthrough number is not requier
-    required: ['passthrough_name'],
-  },
-  DirectAwardValidations: [
-    {
-      'if': {
-        properties: {
-          is_direct: {
-            const: Base.Const.Y,
-          },
-        },
-      },
-      'then': {
-        properties: {
-          entities: {
-            anyOf: [
-              Types.array {
-                items: Validations.PassThroughEntityEmpty,
-              },
-              Base.Enum.EmptyString_EmptyArray_Null,
-            ],
-          },
-        },
-      },
-    },
-    {
-      'if': {
-        properties: {
-          is_direct: {
-            const: Base.Const.N,
-          },
-        },
-      },
-      'then': {
-        properties: {
-          entities: Types.array {
-            items: Validations.PassThroughEntity,
-          },
-        },
-        required: [
-          'entities',
-        ],
-      },
-    },
-  ],
   LoanOrLoanGuaranteeValidations: [
     {
       'if': {
@@ -209,72 +160,83 @@ local Parts = {
       //  - N/A
       //  - STATE CLUSTER, or
       //  - the designation for other cluster name
-      cluster_name: Base.Compound.ClusterNamesNAStateOther,
+      cluster_name: Types.string,
+      other_cluster_name: Types.string,
+      state_cluster_name: Types.string,
       // cluster_total: Types.number {
       //   minimum: 0,
       // },
     },
     allOf: [
-
-      // IF we have OTHER_CLUSTER, THEN...
-      //   - other_cluster_name is required
-      //   - other_cluster_name must not be empty
-      //   - state_cluster_name must be empty
       {
         'if': {
           properties: {
-            cluster_name: {
+            cluster_name: Base.Compound.ClusterNamesNA,
+          },
+        },
+        'then': {
+          allOf: [
+            {
+              not: {
+                required: ['other_cluster_name'],
+              },
+            },
+            {
+              not: {
+                required: ['state_cluster_name'],
+              },
+            },
+          ],
+
+        },
+      },
+      {
+        'if': {
+          properties: {
+            cluster_name: Types.string {
               const: Base.Const.OTHER_CLUSTER,
             },
           },
         },
         'then': {
-          required: ['other_cluster_name'],
           allOf: [
             {
-              properties: {
-                other_cluster_name: Base.Compound.NonEmptyString,
-              },
+              required: ['other_cluster_name'],
             },
             {
-              properties: {
-                state_cluster_name: Base.Enum.EmptyString_Null,
+              not: {
+                required: ['state_cluster_name'],
               },
             },
+
           ],
+
         },
       },
-      // IF we have STATE_CLUSTER, THEN...
-      //   - state_cluster_name is required
-      //   - state_cluster_name must not be empty
-      //   - other_cluster_name must be empty
       {
         'if': {
           properties: {
-            cluster_name: {
+            cluster_name: Types.string {
               const: Base.Const.STATE_CLUSTER,
             },
           },
         },
         'then': {
-          required: ['state_cluster_name'],
           allOf: [
             {
-              properties: {
-                other_cluster_name: Base.Enum.EmptyString_Null,
-              },
+              required: ['state_cluster_name'],
             },
             {
-              properties: {
-                state_cluster_name: Base.Compound.NonEmptyString,
+              not: {
+                required: ['other_cluster_name'],
               },
             },
+
           ],
+
         },
       },
-
     ],
-    // Handle all requireds conditionally?
     required: ['cluster_name'],
   },
 
@@ -284,9 +246,39 @@ local Parts = {
     description: 'If direct_award is N, the form must include a list of the pass-through entity by name and identifying number',
     properties: {
       is_direct: Base.Enum.YorN,
-      entities: Types.array,
+      entities: Types.array {
+        items: Validations.PassThroughEntity,
+      },
     },
-    allOf: Validations.DirectAwardValidations,
+    allOf: [
+      {
+        'if': {
+          properties: {
+            is_direct: {
+              const: Base.Const.N,
+            },
+          },
+        },
+        'then': {
+          required: ['entities'],
+        },
+      },
+      {
+        'if': {
+          properties: {
+            is_direct: {
+              const: Base.Const.Y,
+            },
+          },
+        },
+        'then': {
+          not: {
+            required: ['entities'],
+          },
+        },
+      },
+    ],
+    required: ['is_direct'],
   },
   LoanOrLoanGuarantee: Types.object {
     additionalProperties: false,
@@ -347,6 +339,23 @@ local FederalAwardEntry = Types.object {
   title: 'FederalAwardEntry',
 };
 
+local Meta = Types.object {
+  additionalProperties: false,
+  properties: {
+    section_name: Types.string {
+      enum: [Sheets.section_names.FEDERAL_AWARDS],
+    },
+    // FIXME: 2023-08-07 MSHD: The 'Version' is currently used here as a placeholder, and it is not being enforced at the moment.
+    // Once we establish a versioning pattern, we can update this and enforce it accordingly.
+    version: Types.string {
+      const: Sheets.WORKBOOKS_VERSION,
+    },
+  },
+  required: ['section_name'],
+  title: 'Meta',
+  version: 20230807,
+};
+
 local FederalAwards = Types.object {
   additionalProperties: false,
   properties: {
@@ -367,6 +376,7 @@ local Root = Types.object {
   additionalProperties: false,
   properties: {
     FederalAwards: FederalAwards,
+    Meta: Meta,
   },
   version: 20230408,
 };

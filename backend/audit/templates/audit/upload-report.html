@@ -1,19 +1,7 @@
 {% extends "base.html" %}
 {% load static %}
 {% block content %}
-    <header class="usa-header usa-header-basic bg-primary-darker">
-        <div class="usa-nav-container">
-            <div class="usa-navbar bg-primary-darker text-white width-full flex">
-                <p class="margin-left-2">
-                    <a href="/" class="text-gray-10">My audit submissions</a> »
-                    <a href="/audit/submission-progress/{{ report_id }}"
-                       class="text-gray-10">{{ auditee_name | default_if_none:'' }}</a> »
-                    <span class="text-bold">Upload report</span>
-                </p>
-            </div>
-        </div>
-    </header>
-    <div class="grid-container margin-top-6">
+    <div class="grid-container margin-top-6 margin-bottom-6">
         <div class="grid-col grid-gap">
             {% comment %} {% include "../sidenav.html" %} {% endcomment %}
             <div>
@@ -21,11 +9,6 @@
                 <p>
                     All components of the audit report package must be merged into a single PDF file and meet the uniform guidelines below. For more information on PDF formatting, please review our PDF guidelines.
                 </p>
-                {% if already_submitted %}
-                    <p class="text-green" id="already-submitted">
-                        A file has already been uploaded for this section. A successful reupload will overwrite your previous submission.
-                    </p>
-                {% endif %}
             </div>
             <ol class="usa-process-list">
                 <form id="upload-report__form"
@@ -84,7 +67,7 @@
                             </div>
                         </li>
                         <li class="usa-process-list__item">
-                            <h4 class="usa-process-list__heading">Upload your PDF</h4>
+                            <h4 class="usa-process-list__heading">{% if already_submitted %}Re-upload{% else %}Upload{% endif %} your PDF</h4>
                             <p>
                                 Select a compliant PDF to upload. <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
                             </p>
@@ -99,11 +82,17 @@
                             <span class="usa-error-message tablet:grid-col-12">{{ form.errors.upload_report }}</span>
                         </li>
                     </fieldset>
-                <button class="usa-button margin-bottom-8 margin-top-4" id="continue" disabled="disabled">Upload Single Audit Package</button>
+                {% if already_submitted %}
+                    <p class="text-green" id="already-submitted">
+                        A file has already been uploaded for this section. A successful reupload will overwrite your previous submission.
+                    </p>
+                {% endif %}
+                <button class="usa-button margin-bottom-8 margin-top-4" id="continue">{% if already_submitted %}Re-upload{% else %}Upload{% endif %} Single Audit Package</button>
+                <a class="usa-button usa-button--unstyled margin-left-2" href="{% url 'audit:SubmissionProgress' report_id %}"
+                    aria-controls="upload-cancel">Cancel</a>
                 </form>
             </ol>
         </div>
     </div>
     {% include "audit-metadata.html" %}
-    <script src="{% static 'compiled/js/upload-report-pdf.js' %}"></script>
 {% endblock content %}

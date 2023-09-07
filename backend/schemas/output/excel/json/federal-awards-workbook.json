@@ -51,8 +51,8 @@
                "format": "text",
                "formula": "=\"FederalAwardsExpended\"",
                "help": {
-                  "link": "https://fac.gov/documentation/validation/#plain_text",
-                  "text": "Only plain text is allowed in this field, no emoji or other special additions"
+                  "link": "https://fac.gov/documentation/validation/#section_name",
+                  "text": "The workbook you tried to upload is for a different section."
                },
                "keep_locked": true,
                "range_cell": "B3",
@@ -533,10 +533,8 @@
                      "HEAD START CLUSTER",
                      "477 CLUSTER",
                      "MATERNAL, INFANT, AND EARLY CHILDHOOD HOME VISITING CLUSTER",
-                     "NAN",
                      "RESEARCH AND DEVELOPMENT",
                      "STUDENT FINANCIAL ASSISTANCE",
-                     "STATE CLUSTER",
                      "AGING CLUSTER",
                      "CCDF CLUSTER",
                      "CDFI CLUSTER",
@@ -572,8 +570,10 @@
                      "CDBG - ENTITLEMENT GRANTS CLUSTER",
                      "CDBG - DISASTER RECOVERY GRANTS - PUB. L. NO. 113-2 CLUSTER",
                      "N/A",
+                     "STATE CLUSTER",
                      "OTHER CLUSTER NOT LISTED ABOVE"
-                  ]
+                  ],
+                  "type": "string"
                },
                "range_name": "cluster_name_lookup",
                "title": "Cluster Names",
@@ -3450,7 +3450,8 @@
                      "EMERGENCY CONNECTIVITY FUND PROGRAM",
                      "FAMILY VIOLENCE PREVENTION AND SERVICES/CULTURALLY SPECIFIC DOMESTIC VIOLENCE AND SEXUAL VIOLENCE SERVICES",
                      "EASTERN NEVADA CONSERVATION, RECREATION AND DEVELOPMENT"
-                  ]
+                  ],
+                  "type": "string"
                },
                "range_name": "federal_program_name_lookup",
                "title": "Federal Program Names",
@@ -6322,7 +6323,8 @@
                      "32.009",
                      "93.496",
                      "15.017"
-                  ]
+                  ],
+                  "type": "string"
                },
                "range_name": "aln_lookup",
                "title": "Program Numbers",

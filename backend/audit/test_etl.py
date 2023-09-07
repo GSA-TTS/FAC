@@ -64,6 +64,7 @@ class ETLTests(TestCase):
             "auditor_country": "United States",
             "auditor_firm_name": fake.company(),
             "audit_period_covered": "annual",
+            "audit_period_other_months": None,
             "auditee_contact_name": fake.name(),
             "auditor_contact_name": fake.name(),
             "auditee_contact_title": "Boss",
@@ -90,7 +91,6 @@ class ETLTests(TestCase):
                         "award_reference": "ABC123",
                         "cluster": {"cluster_name": "N/A", "cluster_total": 0},
                         "program": {
-                            "is_major": "Y",
                             "program_name": "RETIRED AND SENIOR VOLUNTEER PROGRAM",
                             "amount_expended": 9000,
                             "audit_report_type": "U",
@@ -127,9 +127,9 @@ class ETLTests(TestCase):
                 "auditee_uei": "AAA123456BBB",
                 "findings_uniform_guidance_entries": [
                     {
-                        "award_reference": "ABC123",
                         "seq_number": i,
                         "program": {
+                            "award_reference": "ABC123",
                             "program_name": "N/A",
                             "federal_agency_prefix": "12",
                             "three_digit_extension": "123",
@@ -207,27 +207,25 @@ class ETLTests(TestCase):
         fake = Faker()
         secondary_auditors = {
             "SecondaryAuditors": {
-                "secondary_auditors_entries": {
-                    "items": [
-                        {
-                            "secondary_auditor_seq_number": i,
-                            "secondary_auditor_address_street": fake.street_address(),
-                            "secondary_auditor_address_city": fake.city(),
-                            "secondary_auditor_address_state": fake.state_abbr(
-                                include_territories=False
-                            ),
-                            "secondary_auditor_address_zipcode": fake.postalcode(),
-                            # "secondary_auditor_country": fake.country(),
-                            "secondary_auditor_ein": fake.ssn().replace("-", ""),
-                            "secondary_auditor_name": fake.company(),
-                            "secondary_auditor_contact_name": fake.name(),
-                            "secondary_auditor_contact_title": fake.job(),
-                            "secondary_auditor_contact_email": fake.ascii_email(),
-                            "secondary_auditor_contact_phone": fake.basic_phone_number(),
-                        }
-                        for i in range(1, 3)
-                    ]
-                }
+                "secondary_auditors_entries": [
+                    {
+                        "secondary_auditor_seq_number": i,
+                        "secondary_auditor_address_street": fake.street_address(),
+                        "secondary_auditor_address_city": fake.city(),
+                        "secondary_auditor_address_state": fake.state_abbr(
+                            include_territories=False
+                        ),
+                        "secondary_auditor_address_zipcode": fake.postalcode(),
+                        # "secondary_auditor_country": fake.country(),
+                        "secondary_auditor_ein": fake.ssn().replace("-", ""),
+                        "secondary_auditor_name": fake.company(),
+                        "secondary_auditor_contact_name": fake.name(),
+                        "secondary_auditor_contact_title": fake.job(),
+                        "secondary_auditor_contact_email": fake.ascii_email(),
+                        "secondary_auditor_contact_phone": fake.basic_phone_number(),
+                    }
+                    for i in range(1, 3)
+                ]
             }
         }
         return secondary_auditors
@@ -270,12 +268,23 @@ class ETLTests(TestCase):
         general = generals.first()
         self.assertEqual(self.report_id, general.report_id)
 
+    def test_load_award_before_general_should_fail(self):
+        self.etl.load_federal_award()
+        federal_awards = FederalAward.objects.all()
+        self.assertEqual(len(federal_awards), 0)
+
     def test_load_federal_award(self):
+        self.etl.load_general()
         self.etl.load_federal_award()
         federal_awards = FederalAward.objects.all()
         self.assertEqual(len(federal_awards), 1)
         federal_award = federal_awards.first()
         self.assertEqual(self.report_id, federal_award.report_id)
+        general = General.objects.first()
+        self.assertEqual(
+            general.total_amount_expended,
+            self.sac.federal_awards["FederalAwards"].get("total_amount_expended"),
+        )
 
     def test_load_findings(self):
         self.etl.load_findings()
@@ -322,7 +331,6 @@ class ETLTests(TestCase):
         self.etl.load_audit_info()
         general = General.objects.first()
         sac = SingleAuditChecklist.objects.first()
-        print("general gaap_results:", general.gaap_results, sac.audit_information)
         self.assertEquals(sac.audit_information["gaap_results"], general.gaap_results)
 
     def test_load_all(self):

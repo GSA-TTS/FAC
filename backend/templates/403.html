@@ -1,17 +1,15 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="grid-container">
-  <h1>Access denied</h1>
-  <div class="grid-row" tabindex="0">
-    {% if exception %}
-      <p>
-        {{ exception }}
-      </p>
-    {% else %}
-      <p>
-        You do not have permission to view this resource.
-      </p>
-    {% endif %}
-  </div>
-</div>
+    <div class="grid-container grid-row margin-y-15">
+        <div class="tablet:grid-col-10 tablet:grid-offset-1">
+            <h1 class="font-sans-2xl">403 Error: Access Forbidden</h1>
+            <div class="font-sans-lg">
+                <p>
+                    You are not authorized to view this page. If you believe you’ve received this message in error, please contact the submission package owner to ensure you’re given  user access.
+                </p>
+                <p>Try returning to the previous page.</p>
+            </div>
+            {% if exception %}<p class="text-base">Error code: {{ exception }}</p>{% endif %}
+        </div>
+    </div>
 {% endblock content %}

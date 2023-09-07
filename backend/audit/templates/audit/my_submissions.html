@@ -2,53 +2,96 @@
 {% load static %}
 {% load sprite_helper %}
 {% block content %}
-    <div class="grid-container">
-        <h1>In-progress Audit Submissions</h1>
-        {% if data.len == 0 %}
+    <div class="grid-container margin-y-8">
+        <h1 class="font-sans-2xl margin-bottom-1">Single audit submissions</h1>
+        <p class="text-base-darker margin-top-0 margin-bottom-6">The audit submissions below are associated with your email address.</p>
+
+        {% if data.in_progress_audits.len == 0 and data.completed_audits.len == 0 %}
             <p>No submissions found</p>
         {% else %}
-            <div class="grid-row" tabindex="0">
-                <table class="usa-table margin-top-0 pa11y-ignore">
-                    <caption class="text-normal">
-                        The audit submissions below are in progress and assigned to your email address. These are for 2023 only. Completed audits from 2022 and earlier can be found on the <a class="usa-link" href="https://facweb.census.gov/uploadpdf.aspx">U.S. Census
-                    Bureau’s FAC website.</a></caption>
-                    <thead>
-                        <tr>
-                            <th data-sortable scope="col" role="columnheader">Status</th>
-                            <th data-sortable scope="col" role="columnheader">Entity name</th>
-                            <th data-sortable scope="col" role="columnheader">Report ID</th>
-                            <th data-sortable scope="col" role="columnheader">
-                                Auditee
-                                <button class="usa-button--unstyled margin-top-0"
-                                        aria-controls="modal-uei-info"
-                                        data-open-modal>UEI</button>
-                            </th>
-                            <th data-sortable scope="col" role="columnheader">Fiscal period end date</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for item in data %}
+            {% if data.in_progress_audits %}
+                <h1 class="font-sans-xl">Audits in progress</h1>
+                <div class="grid-row margin-bottom-6" tabindex="0">
+                    <table class="usa-table margin-top-0 pa11y-ignore">
+                        <caption class="text-normal">
+                            The audits listed below are in progress, and you are still able to edit them before submission. Select an audit by clicking on its Status to make changes and continue the submission process.</caption>
+                        <thead>
                             <tr>
-                                <td>
-                                    <a class="usa-link" href="/audit/submission-progress/{{ item.report_id }}">{{ item.submission_status }}</a>
-                                </td>
-                                <td>{{ item.auditee_name }}</td>
-                                <td>{{ item.report_id }}</td>
-                                <td>{{ item.auditee_uei }}</td>
-                                <td>
-                                    <a class="usa-link" href="/report_submission/general-information/{{ item.report_id }}">{{ item.fiscal_year_end_date }}</a>
-                                </td>
+                                <th data-sortable scope="col" role="columnheader">Status</th>
+                                <th data-sortable scope="col" role="columnheader">Entity name</th>
+                                <th data-sortable scope="col" role="columnheader">Report ID</th>
+                                <th data-sortable scope="col" role="columnheader">
+                                    Auditee
+                                    <button class="usa-button--unstyled margin-top-0"
+                                            aria-controls="modal-uei-info"
+                                            data-open-modal>UEI</button>
+                                </th>
+                                <th data-sortable scope="col" role="columnheader">Fiscal period end date</th>
                             </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-                <div class="usa-sr-only usa-table__announcement-region" aria-live="polite"></div>
+                        </thead>
+                        <tbody>
+                            {% for item in data.in_progress_audits %}
+                                <tr>
+                                    <td>
+                                        <a class="usa-link" href="{% url 'audit:SubmissionProgress' item.report_id %}">{{ item.submission_status }}</a>
+                                    </td>
+                                    <td>{{ item.auditee_name }}</td>
+                                    <td>{{ item.report_id }}</td>
+                                    <td>{{ item.auditee_uei }}</td>
+                                    <td>
+                                        <a class="usa-link" href="/report_submission/general-information/{{ item.report_id }}">{{ item.fiscal_year_end_date }}</a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    <div class="usa-sr-only usa-table__announcement-region" aria-live="polite"></div>
+                </div>
             {% endif %}
-        </div>
+            {% if data.completed_audits %}
+                <h1 class="font-sans-xl">Completed audits</h1>
+                <div class="grid-row margin-bottom-6" tabindex="0">
+                    <table class="usa-table margin-top-0 pa11y-ignore">
+                        <caption class="text-normal">
+                            The audits listed below have been submitted to the FAC for processing and may not be edited.</caption>
+                        <thead>
+                            <tr>
+                                <th data-sortable scope="col" role="columnheader">Status</th>
+                                <th data-sortable scope="col" role="columnheader">Entity name</th>
+                                <th data-sortable scope="col" role="columnheader">Report ID</th>
+                                <th data-sortable scope="col" role="columnheader">
+                                    Auditee
+                                    <button class="usa-button--unstyled margin-top-0"
+                                            aria-controls="modal-uei-info"
+                                            data-open-modal>UEI</button>
+                                </th>
+                                <th data-sortable scope="col" role="columnheader">Fiscal period end date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in data.completed_audits %}
+                                <tr>
+                                    <td>
+                                        <a class="usa-link" href="{% url 'audit:SubmissionProgress' item.report_id %}">{{ item.submission_status }}</a>
+                                    </td>
+                                    <td>{{ item.auditee_name }}</td>
+                                    <td>{{ item.report_id }}</td>
+                                    <td>{{ item.auditee_uei }}</td>
+                                    <td>
+                                        <a class="usa-link" href="/report_submission/general-information/{{ item.report_id }}">{{ item.fiscal_year_end_date }}</a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    <div class="usa-sr-only usa-table__announcement-region" aria-live="polite"></div>
+                </div>
+            {% endif %}
+        {% endif %}
         <div class="grid-row">
-            <h2>Create a new audit</h2>
-            <p class="margin-top-0">
-                Before you begin a new audit submission, check the list above to make sure one isn't currently in progress and assigned to your email address.
+            <h2 class="margin-top-0">Create a new audit</h2>
+            <p class="margin-top-0 margin-bottom-5">
+                Before you begin a new audit submission, check the list above to make sure it is not already in progress. Only audit submissions assigned to your email address will show above, therefore we also recommend confirming with your team.
             </p>
             <form id="start-new-submission" class="usa-form usa-form--large">
                 <div class="usa-checkbox">

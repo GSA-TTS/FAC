@@ -48,6 +48,10 @@ local make_url = function(anchor)
     text: 'The number in this field must be zero or greater',
     link: make_url('positive_number'),
   },
+  prior_references: {
+    text: 'Must be a comma-separated list of reference numbers (YYYY-NNN) or N/A.',
+    link: make_url('prior_references'),
+  },
   // R
   reference_number: {
     text: 'Reference numbers have the form YYYY-NNN (e.g. 2023-001)',
@@ -67,5 +71,9 @@ local make_url = function(anchor)
     text: 'This field must be either `Y` or `N`',
     link: make_url('yorn'),
   },
-
+  // w
+  wrong_workbook_template: {
+    text: 'The workbook you tried to upload is for a different section.',
+    link: make_url('section_name'),
+  },
 }

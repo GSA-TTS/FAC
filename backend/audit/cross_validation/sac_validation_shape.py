@@ -1,26 +1,22 @@
-camel_to_snake = {
-    "AdditionalUEIs": "additional_ueis",
-    "AuditInformation": "audit_information",
-    "CorrectiveActionPlan": "corrective_action_plan",
-    "FederalAwards": "federal_awards",
-    "FindingsText": "findings_text",
-    "FindingsUniformGuidance": "findings_uniform_guidance",
-    "GeneralInformation": "general_information",
-    "NotesToSefa": "notes_to_sefa",
-}
-snake_to_camel = {v: k for k, v in camel_to_snake.items()}
-at_root_sections = ("audit_information", "general_information")
+from audit.cross_validation.naming import (
+    NC,
+    SECTION_NAMES,
+    camel_to_snake,
+    snake_to_camel,
+)
+
+at_root_sections = (NC.AUDIT_INFORMATION, NC.GENERAL_INFORMATION)  # type: ignore
 
 
 def get_shaped_section(sac, section_name):
     """Extract either None or the appropriate dict from the section."""
-    true_name = camel_to_snake.get(section_name, section_name)
+    true_name = camel_to_snake(section_name) or section_name
     section = getattr(sac, true_name, None)
     if true_name in at_root_sections:
         return section
 
     if section:
-        return section.get(snake_to_camel.get(true_name), {})
+        return section.get(snake_to_camel(true_name), {})
 
     return None
 
@@ -39,7 +35,7 @@ def sac_validation_shape(sac):
     that's appropriate for passing to the validation functions.
 
     For example, if the Audit Information and Notes to SEFA sections have content,
-    this function wil return something like:
+    this function will return something like:
 
     {
         "sf_sac_sections": {
@@ -71,9 +67,7 @@ def sac_validation_shape(sac):
     """
 
     shape = {
-        "sf_sac_sections": {
-            k: get_shaped_section(sac, k) for k in camel_to_snake.values()
-        },
+        "sf_sac_sections": {k: get_shaped_section(sac, k) for k in SECTION_NAMES},
         "sf_sac_meta": {
             "submitted_by": sac.submitted_by,
             "date_created": sac.date_created,

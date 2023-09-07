@@ -4,10 +4,12 @@ Fixtures for use with Excel spreadsheet handling.
 from collections import namedtuple
 from django.conf import settings
 
+UNKNOWN_WORKBOOK = "unknown_workbook"
 SHEETS_DIR = settings.XLSX_TEMPLATE_SHEET_DIR
 TESTFILES_DIR = settings.DATA_FIXTURES / "audit" / "excel_schema_test_files"
 
 ADDITIONAL_UEIS_TEMPLATE = SHEETS_DIR / "additional-ueis-workbook.xlsx"
+ADDITIONAL_EINS_TEMPLATE = SHEETS_DIR / "additional-eins-workbook.xlsx"
 FEDERAL_AWARDS_TEMPLATE = SHEETS_DIR / "federal-awards-workbook.xlsx"
 FINDINGS_TEXT_TEMPLATE = SHEETS_DIR / "audit-findings-text-workbook.xlsx"
 CORRECTIVE_ACTION_PLAN_TEMPLATE = SHEETS_DIR / "corrective-action-plan-workbook.xlsx"
@@ -18,6 +20,7 @@ SECONDARY_AUDITORS_TEMPLATE = SHEETS_DIR / "secondary-auditors-workbook.xlsx"
 NOTES_TO_SEFA_TEMPLATE = SHEETS_DIR / "notes-to-sefa-workbook.xlsx"
 
 ADDITIONAL_UEIS_TEMPLATE_DEFINITION = "additional-ueis-workbook.json"
+ADDITIONAL_EINS_TEMPLATE_DEFINITION = "additional-eins-workbook.json"
 FEDERAL_AWARDS_TEMPLATE_DEFINITION = "federal-awards-workbook.json"
 CORRECTIVE_ACTION_TEMPLATE_DEFINITION = "corrective-action-plan-workbook.json"
 FINDINGS_UNIFORM_TEMPLATE_DEFINITION = "federal-awards-audit-findings-workbook.json"
@@ -26,6 +29,7 @@ SECONDARY_AUDITORS_TEMPLATE_DEFINITION = "secondary-auditors-workbook.json"
 NOTES_TO_SEFA_TEMPLATE_DEFINITION = "notes-to-sefa-workbook.json"
 
 ADDITIONAL_UEIS_TEST_FILE = TESTFILES_DIR / "additional-ueis-pass-01.json"
+ADDITIONAL_EINS_TEST_FILE = TESTFILES_DIR / "additional-eins-pass-01.json"
 FEDERAL_AWARDS_TEST_FILE = TESTFILES_DIR / "federal-awards-pass-01.json"
 CORRECTIVE_ACTION_PLAN_TEST_FILE = TESTFILES_DIR / "corrective-action-plan-pass-01.json"
 FINDINGS_TEXT_TEST_FILE = TESTFILES_DIR / "audit-findings-text-pass-01.json"
@@ -37,6 +41,9 @@ NOTES_TO_SEFA_TEST_FILE = TESTFILES_DIR / "notes-to-sefa-pass-01.json"
 
 ADDITIONAL_UEIS_ENTRY_FIXTURES = (
     settings.AUDIT_TEST_DATA_ENTRY_DIR / "additional-ueis-entries.json"
+)
+ADDITIONAL_EINS_ENTRY_FIXTURES = (
+    settings.AUDIT_TEST_DATA_ENTRY_DIR / "additional-eins-entries.json"
 )
 CORRECTIVE_ACTION_PLAN_ENTRY_FIXTURES = (
     settings.AUDIT_TEST_DATA_ENTRY_DIR / "corrective-action-plan-entries.json"
@@ -67,6 +74,7 @@ FormSections = namedtuple(
         "FINDINGS_TEXT",
         "FINDINGS_UNIFORM_GUIDANCE",
         "ADDITIONAL_UEIS",
+        "ADDITIONAL_EINS",
         "SECONDARY_AUDITORS",
         "NOTES_TO_SEFA",
     ),
@@ -78,6 +86,30 @@ FORM_SECTIONS = FormSections(
     FINDINGS_TEXT="FindingsText",
     FINDINGS_UNIFORM_GUIDANCE="FindingsUniformGuidance",
     ADDITIONAL_UEIS="AdditionalUeis",
+    ADDITIONAL_EINS="AdditionalEins",
     SECONDARY_AUDITORS="SecondaryAuditors",
     NOTES_TO_SEFA="NotesToSefa",
+)
+
+# FIXME MSHD: We should consolidate SectionNames with the above FormSections
+SectionNames = namedtuple(
+    "SectionNames",
+    (
+        "ADDITIONAL_UEIS",
+        "AUDIT_FINDINGS_TEXT",
+        "CORRECTIVE_ACTION_PLAN",
+        "FEDERAL_AWARDS",
+        "FEDERAL_AWARDS_AUDIT_FINDINGS",
+        "NOTES_TO_SEFA",
+        "SECONDARY_AUDITORS",
+    ),
+)
+SECTION_NAMES = SectionNames(
+    ADDITIONAL_UEIS="Additional UEIs",
+    AUDIT_FINDINGS_TEXT="Audit Findings Text",
+    CORRECTIVE_ACTION_PLAN="Corrective Action Plan",
+    FEDERAL_AWARDS="Federal Awards",
+    FEDERAL_AWARDS_AUDIT_FINDINGS="Federal Awards Audit Findings",
+    NOTES_TO_SEFA="Notes to SEFA",
+    SECONDARY_AUDITORS="Secondary Auditors",
 )

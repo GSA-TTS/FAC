@@ -86,3 +86,19 @@ jobs:
     with:
       environment: "production"
     secrets: inherit
+
+  repo-event:
+    if: ${{ github.base_ref == 'prod' && always() }}
+    name: Set Repository Event
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    needs: [terraform-plan-staging, testing-from-ghcr, testing-from-build]
+    steps:
+      - name: Repository Dispatch
+        uses: peter-evans/repository-dispatch@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          event-type: ready-to-merge
+          client-payload: '{"github": ${{ toJson(github) }}}'
+        if: github.event_name == 'pull_request'

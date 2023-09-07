@@ -1,3 +1,4 @@
+from collections import namedtuple
 import re
 import json
 from django.conf import settings
@@ -6,13 +7,17 @@ from openpyxl import load_workbook, Workbook
 from openpyxl.cell import Cell
 from audit.fixtures.excel import (
     ADDITIONAL_UEIS_TEMPLATE_DEFINITION,
+    ADDITIONAL_EINS_TEMPLATE_DEFINITION,
     CORRECTIVE_ACTION_TEMPLATE_DEFINITION,
     FEDERAL_AWARDS_TEMPLATE_DEFINITION,
     FINDINGS_TEXT_TEMPLATE_DEFINITION,
     FINDINGS_UNIFORM_TEMPLATE_DEFINITION,
     SECONDARY_AUDITORS_TEMPLATE_DEFINITION,
     NOTES_TO_SEFA_TEMPLATE_DEFINITION,
+    FORM_SECTIONS,
+    UNKNOWN_WORKBOOK,
 )
+from audit.utils import ExcelExtractionError
 import pydash
 
 
@@ -24,13 +29,22 @@ AWARD_ENTITY_NAME_KEY = "passthrough_name"
 AWARD_ENTITY_ID_KEY = "passthrough_identifying_number"
 FEDERAL_AGENCY_PREFIX = "federal_agency_prefix"
 THREE_DIGIT_EXTENSION = "three_digit_extension"
-
+SECTION_NAME = "section_name"
 XLSX_TEMPLATE_DEFINITION_DIR = settings.XLSX_TEMPLATE_JSON_DIR
 
 
 def _set_by_path(target_obj, target_path, value):
     """Set a (potentially nested) field in target_obj using JSONPath-esque dot notation, e.g. parent.child[0].field"""
     pydash.set_(target_obj, target_path, value)
+
+
+"""
+Defines the parameters for extracting data from an Excel file and mapping it to a JSON object
+"""
+ExtractDataParams = namedtuple(
+    "ExtractDataParams",
+    ["field_mapping", "column_mapping", "meta_mapping", "section", "header_row"],
+)
 
 
 """
@@ -54,6 +68,9 @@ def _set_pass_through_entity_id(obj, target, value):
         _set_by_path(obj, f"{target}[{index}].passthrough_identifying_number", v)
 
 
+meta_mapping: FieldMapping = {
+    SECTION_NAME: (f"Meta.{SECTION_NAME}", _set_by_path),
+}
 federal_awards_field_mapping: FieldMapping = {
     "auditee_uei": ("FederalAwards.auditee_uei", _set_by_path),
     "total_amount_expended": ("FederalAwards.total_amount_expended", _set_by_path),
@@ -78,6 +95,9 @@ notes_to_sefa_field_mapping: FieldMapping = {
     "accounting_policies": ("NotesToSefa.accounting_policies", _set_by_path),
     "is_minimis_rate_used": ("NotesToSefa.is_minimis_rate_used", _set_by_path),
     "rate_explained": ("NotesToSefa.rate_explained", _set_by_path),
+}
+additional_eins_field_mapping: FieldMapping = {
+    "auditee_uei": ("AdditionalEINs.auditee_uei", _set_by_path),
 }
 
 federal_awards_column_mapping: ColumnMapping = {
@@ -286,7 +306,13 @@ additional_ueis_column_mapping: ColumnMapping = {
         _set_by_path,
     ),
 }
-
+additional_eins_column_mapping: ColumnMapping = {
+    "additional_ein": (
+        "AdditionalEINs.additional_eins_entries",
+        "additional_ein",
+        _set_by_path,
+    ),
+}
 secondary_auditors_column_mapping: ColumnMapping = {
     "secondary_auditor_name": (
         "SecondaryAuditors.secondary_auditors_entries",
@@ -359,10 +385,6 @@ notes_to_sefa_column_mapping: ColumnMapping = {
 }
 
 
-class ExcelExtractionError(Exception):
-    pass
-
-
 def _extract_single_value(workbook, name):
     """Extract a single value from the workbook with the defined name"""
     definition = workbook.defined_names[name]
@@ -431,48 +453,54 @@ def _get_entries_by_path(dictionary, path):
     return val
 
 
-def _extract_data(
-    file,
-    field_mapping: FieldMapping,
-    column_mapping: ColumnMapping,
-    header_row: int,
-):
+def _extract_data(file, params: ExtractDataParams) -> dict:
     """
     Extracts data from an Excel file using provided field and column mappings
     """
-    result = {}  # type: dict[str, Any]
-
     workbook = _open_workbook(file)
+    result: dict = {}
+
+    if SECTION_NAME not in workbook.defined_names:
+        raise ExcelExtractionError(
+            "The uploaded workbook template does not originate from SF-SAC.",
+            error_key=UNKNOWN_WORKBOOK,
+        )
 
     try:
-        for name, (target, set_fn) in field_mapping.items():
-            set_fn(result, target, _extract_single_value(workbook, name))
-
-        for i, (name, (parent_target, field_target, set_fn)) in enumerate(
-            column_mapping.items()
-        ):
-            row_value_pairs = list(_extract_column(workbook, name))
-            for row, value in row_value_pairs:
-                index = (row - header_row) - 1  # Subtract 1 to make it zero-indexed
-                set_fn(
-                    result,
-                    f"{parent_target}[{index}].{field_target}",
-                    value,
-                )
-
-            # Necessary to prevent null entries when index/row is skipped in first column
-            if i == 0:
-                entries = [
-                    entry if entry is not None else {}
-                    for entry in _get_entries_by_path(result, parent_target)
-                ]
-                if entries:
-                    set_fn(result, f"{parent_target}", entries)
+        _extract_meta_and_field_data(workbook, params, result)
+        if result.get("Meta", {}).get(SECTION_NAME) == params.section:
+            _extract_column_data(workbook, result, params)
+        return result
 
     except AttributeError as e:
         raise ExcelExtractionError(e)
 
-    return result
+
+def _extract_meta_and_field_data(workbook, params, result):
+    for name, (target, set_fn) in params.meta_mapping.items():
+        set_fn(result, target, _extract_single_value(workbook, name))
+
+    if result.get("Meta", {}).get(SECTION_NAME) == params.section:
+        for name, (target, set_fn) in params.field_mapping.items():
+            set_fn(result, target, _extract_single_value(workbook, name))
+
+
+def _extract_column_data(workbook, result, params):
+    for i, (name, (parent_target, field_target, set_fn)) in enumerate(
+        params.column_mapping.items()
+    ):
+        for row, value in _extract_column(workbook, name):
+            index = (row - params.header_row) - 1  # Make it zero-indexed
+            set_fn(result, f"{parent_target}[{index}].{field_target}", value)
+
+        # Handle null entries when index/row is skipped in the first column
+        if i == 0:
+            entries = [
+                entry if entry is not None else {}
+                for entry in _get_entries_by_path(result, parent_target)
+            ]
+            if entries:
+                set_fn(result, f"{parent_target}", entries)
 
 
 def _remove_empty_award_entries(data):
@@ -483,9 +511,9 @@ def _remove_empty_award_entries(data):
             program = award["program"]
             if FEDERAL_AGENCY_PREFIX in program:
                 indexed_awards.append(award)
-
-    # Update the federal_awards with the valid awards
-    data["FederalAwards"]["federal_awards"] = indexed_awards
+    if "FederalAwards" in data:
+        # Update the federal_awards with the valid awards
+        data["FederalAwards"]["federal_awards"] = indexed_awards
 
     return data
 
@@ -495,12 +523,14 @@ def extract_federal_awards(file):
         XLSX_TEMPLATE_DEFINITION_DIR / FEDERAL_AWARDS_TEMPLATE_DEFINITION
     )
     template = json.loads(template_definition_path.read_text(encoding="utf-8"))
-    result = _extract_data(
-        file,
+    params = ExtractDataParams(
         federal_awards_field_mapping,
         federal_awards_column_mapping,
+        meta_mapping,
+        FORM_SECTIONS.FEDERAL_AWARDS_EXPENDED,
         template["title_row"],
     )
+    result = _extract_data(file, params)
     return _remove_empty_award_entries(result)
 
 
@@ -509,12 +539,14 @@ def extract_corrective_action_plan(file):
         XLSX_TEMPLATE_DEFINITION_DIR / CORRECTIVE_ACTION_TEMPLATE_DEFINITION
     )
     template = json.loads(template_definition_path.read_text(encoding="utf-8"))
-    return _extract_data(
-        file,
+    params = ExtractDataParams(
         corrective_action_field_mapping,
         corrective_action_column_mapping,
+        meta_mapping,
+        FORM_SECTIONS.CORRECTIVE_ACTION_PLAN,
         template["title_row"],
     )
+    return _extract_data(file, params)
 
 
 def extract_findings_uniform_guidance(file):
@@ -522,12 +554,14 @@ def extract_findings_uniform_guidance(file):
         XLSX_TEMPLATE_DEFINITION_DIR / FINDINGS_UNIFORM_TEMPLATE_DEFINITION
     )
     template = json.loads(template_definition_path.read_text(encoding="utf-8"))
-    return _extract_data(
-        file,
+    params = ExtractDataParams(
         findings_uniform_guidance_field_mapping,
         findings_uniform_guidance_column_mapping,
+        meta_mapping,
+        FORM_SECTIONS.FINDINGS_UNIFORM_GUIDANCE,
         template["title_row"],
     )
+    return _extract_data(file, params)
 
 
 def extract_findings_text(file):
@@ -535,12 +569,14 @@ def extract_findings_text(file):
         XLSX_TEMPLATE_DEFINITION_DIR / FINDINGS_TEXT_TEMPLATE_DEFINITION
     )
     template = json.loads(template_definition_path.read_text(encoding="utf-8"))
-    return _extract_data(
-        file,
+    params = ExtractDataParams(
         findings_text_field_mapping,
         findings_text_column_mapping,
+        meta_mapping,
+        FORM_SECTIONS.FINDINGS_TEXT,
         template["title_row"],
     )
+    return _extract_data(file, params)
 
 
 def extract_additional_ueis(file):
@@ -548,12 +584,29 @@ def extract_additional_ueis(file):
         XLSX_TEMPLATE_DEFINITION_DIR / ADDITIONAL_UEIS_TEMPLATE_DEFINITION
     )
     template = json.loads(template_definition_path.read_text(encoding="utf-8"))
-    return _extract_data(
-        file,
+    params = ExtractDataParams(
         additional_ueis_field_mapping,
         additional_ueis_column_mapping,
+        meta_mapping,
+        FORM_SECTIONS.ADDITIONAL_UEIS,
         template["title_row"],
     )
+    return _extract_data(file, params)
+
+
+def extract_additional_eins(file):
+    template_definition_path = (
+        XLSX_TEMPLATE_DEFINITION_DIR / ADDITIONAL_EINS_TEMPLATE_DEFINITION
+    )
+    template = json.loads(template_definition_path.read_text(encoding="utf-8"))
+    params = ExtractDataParams(
+        additional_eins_field_mapping,
+        additional_eins_column_mapping,
+        meta_mapping,
+        FORM_SECTIONS.ADDITIONAL_EINS,
+        template["title_row"],
+    )
+    return _extract_data(file, params)
 
 
 def extract_secondary_auditors(file):
@@ -561,12 +614,14 @@ def extract_secondary_auditors(file):
         XLSX_TEMPLATE_DEFINITION_DIR / SECONDARY_AUDITORS_TEMPLATE_DEFINITION
     )
     template = json.loads(template_definition_path.read_text(encoding="utf-8"))
-    return _extract_data(
-        file,
+    params = ExtractDataParams(
         secondary_auditors_field_mapping,
         secondary_auditors_column_mapping,
+        meta_mapping,
+        FORM_SECTIONS.SECONDARY_AUDITORS,
         template["title_row"],
     )
+    return _extract_data(file, params)
 
 
 def extract_notes_to_sefa(file):
@@ -574,12 +629,14 @@ def extract_notes_to_sefa(file):
         XLSX_TEMPLATE_DEFINITION_DIR / NOTES_TO_SEFA_TEMPLATE_DEFINITION
     )
     template = json.loads(template_definition_path.read_text(encoding="utf-8"))
-    return _extract_data(
-        file,
+    params = ExtractDataParams(
         notes_to_sefa_field_mapping,
         notes_to_sefa_column_mapping,
+        meta_mapping,
+        FORM_SECTIONS.NOTES_TO_SEFA,
         template["title_row"],
     )
+    return _extract_data(file, params)
 
 
 def _extract_from_column_mapping(path, row_index, column_mapping, match=None):
@@ -603,30 +660,38 @@ def _extract_from_field_mapping(path, field_mapping, match=None):
     return None, None
 
 
-def _extract_named_ranges(errors, column_mapping, field_mapping):
+def _extract_error_details(error):
+    if not bool(error.path):
+        print("No path found in error object")
+        return None, None, None
+    row_index = next((item for item in error.path if isinstance(item, int)), None)
+    path = ".".join([item for item in error.path if not isinstance(item, int)])
+    match = re.search(r"'(\w+)'", error.message) if error.message else None
+    return path, row_index, match
+
+
+def _extract_key_from_award_entities(path, row_index, named_ranges):
+    if path in [AWARD_ENTITY_NAME_PATH, AWARD_ENTITY_ID_PATH]:
+        key = (
+            AWARD_ENTITY_NAME_KEY
+            if path == AWARD_ENTITY_NAME_PATH
+            else AWARD_ENTITY_ID_KEY
+        )
+        named_ranges.append((key, row_index))
+        return key
+    return None
+
+
+def _extract_named_ranges(errors, column_mapping, field_mapping, meta_mapping):
     """Extract named ranges from column mapping and errors"""
     named_ranges = []
     for error in errors:
-        if not bool(error.path):
-            print("No path found in error object")
+        path, row_index, match = _extract_error_details(error)
+        if not path:
             continue
-        print(error)
-        keyFound = None
-        match = None
-        row_index = next((item for item in error.path if isinstance(item, int)), None)
-        path = ".".join([item for item in error.path if not isinstance(item, int)])
-        if error.message:
-            match = re.search(r"'(\w+)'", error.message)
 
         # Extract named ranges from column mapping for award entities
-        if path in [AWARD_ENTITY_NAME_PATH, AWARD_ENTITY_ID_PATH]:
-            key = (
-                AWARD_ENTITY_NAME_KEY
-                if path == AWARD_ENTITY_NAME_PATH
-                else AWARD_ENTITY_ID_KEY
-            )
-            named_ranges.append((key, row_index))
-            keyFound = key
+        keyFound = _extract_key_from_award_entities(path, row_index, named_ranges)
 
         if not keyFound:
             keyFound, row_index = _extract_from_column_mapping(
@@ -637,6 +702,8 @@ def _extract_named_ranges(errors, column_mapping, field_mapping):
 
         if not keyFound:
             keyFound, _ = _extract_from_field_mapping(path, field_mapping, match)
+            if not keyFound:
+                keyFound, _ = _extract_from_field_mapping(path, meta_mapping, match)
             if keyFound:
                 named_ranges.append((keyFound, None))
 
@@ -648,13 +715,19 @@ def _extract_named_ranges(errors, column_mapping, field_mapping):
 
 def corrective_action_plan_named_ranges(errors):
     return _extract_named_ranges(
-        errors, corrective_action_column_mapping, corrective_action_field_mapping
+        errors,
+        corrective_action_column_mapping,
+        corrective_action_field_mapping,
+        meta_mapping,
     )
 
 
 def federal_awards_named_ranges(errors):
     return _extract_named_ranges(
-        errors, federal_awards_column_mapping, federal_awards_field_mapping
+        errors,
+        federal_awards_column_mapping,
+        federal_awards_field_mapping,
+        meta_mapping,
     )
 
 
@@ -663,28 +736,44 @@ def findings_uniform_guidance_named_ranges(errors):
         errors,
         findings_uniform_guidance_column_mapping,
         findings_uniform_guidance_field_mapping,
+        meta_mapping,
     )
 
 
 def findings_text_named_ranges(errors):
     return _extract_named_ranges(
-        errors, findings_text_column_mapping, findings_text_field_mapping
+        errors, findings_text_column_mapping, findings_text_field_mapping, meta_mapping
     )
 
 
 def additional_ueis_named_ranges(errors):
     return _extract_named_ranges(
-        errors, additional_ueis_column_mapping, additional_ueis_field_mapping
+        errors,
+        additional_ueis_column_mapping,
+        additional_ueis_field_mapping,
+        meta_mapping,
+    )
+
+
+def additional_eins_named_ranges(errors):
+    return _extract_named_ranges(
+        errors,
+        additional_eins_column_mapping,
+        additional_eins_field_mapping,
+        meta_mapping,
     )
 
 
 def secondary_auditors_named_ranges(errors):
     return _extract_named_ranges(
-        errors, secondary_auditors_column_mapping, secondary_auditors_field_mapping
+        errors,
+        secondary_auditors_column_mapping,
+        secondary_auditors_field_mapping,
+        meta_mapping,
     )
 
 
 def notes_to_sefa_named_ranges(errors):
     return _extract_named_ranges(
-        errors, notes_to_sefa_column_mapping, notes_to_sefa_field_mapping
+        errors, notes_to_sefa_column_mapping, notes_to_sefa_field_mapping, meta_mapping
     )

@@ -51,8 +51,8 @@
                "format": "text",
                "formula": "=\"FindingsUniformGuidance\"",
                "help": {
-                  "link": "https://fac.gov/documentation/validation/#plain_text",
-                  "text": "Only plain text is allowed in this field, no emoji or other special additions"
+                  "link": "https://fac.gov/documentation/validation/#section_name",
+                  "text": "The workbook you tried to upload is for a different section."
                },
                "keep_locked": true,
                "range_cell": "B3",
@@ -271,8 +271,8 @@
             },
             {
                "help": {
-                  "link": "https://fac.gov/documentation/validation/#yorn",
-                  "text": "This field must be either `Y` or `N`"
+                  "link": "https://fac.gov/documentation/validation/#prior_references",
+                  "text": "Must be a comma-separated list of reference numbers (YYYY-NNN) or N/A."
                },
                "range_name": "prior_references",
                "title": "If Repeat Finding, provide Prior Year Audit Finding Reference Number(s)",

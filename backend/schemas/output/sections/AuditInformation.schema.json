@@ -1,5 +1,85 @@
 {
    "additionalProperties": false,
+   "allOf": [
+      {
+         "if": {
+            "properties": {
+               "gaap_results": {
+                  "contains": {
+                     "const": "not_gaap"
+                  }
+               }
+            }
+         },
+         "then": {
+            "required": [
+               "is_sp_framework_required",
+               "sp_framework_basis",
+               "sp_framework_opinions"
+            ]
+         }
+      },
+      {
+         "if": {
+            "properties": {
+               "gaap_results": {
+                  "not": {
+                     "contains": {
+                        "const": "not_gaap"
+                     }
+                  }
+               }
+            }
+         },
+         "then": {
+            "not": {
+               "required": [
+                  "is_sp_framework_required"
+               ]
+            }
+         }
+      },
+      {
+         "if": {
+            "properties": {
+               "gaap_results": {
+                  "not": {
+                     "contains": {
+                        "const": "not_gaap"
+                     }
+                  }
+               }
+            }
+         },
+         "then": {
+            "not": {
+               "required": [
+                  "sp_framework_basis"
+               ]
+            }
+         }
+      },
+      {
+         "if": {
+            "properties": {
+               "gaap_results": {
+                  "not": {
+                     "contains": {
+                        "const": "not_gaap"
+                     }
+                  }
+               }
+            }
+         },
+         "then": {
+            "not": {
+               "required": [
+                  "sp_framework_opinions"
+               ]
+            }
+         }
+      }
+   ],
    "properties": {
       "agencies": {
          "items": {
@@ -50,6 +130,35 @@
       },
       "is_material_noncompliance_disclosed": {
          "type": "boolean"
+      },
+      "is_sp_framework_required": {
+         "type": "boolean"
+      },
+      "sp_framework_basis": {
+         "items": {
+            "description": "SP Framework Basis (Audit Information)",
+            "enum": [
+               "cash_basis",
+               "tax_basis",
+               "contractual_basis",
+               "other_basis"
+            ],
+            "type": "string"
+         },
+         "type": "array"
+      },
+      "sp_framework_opinions": {
+         "items": {
+            "description": "SP Framework Opinions (Audit Information)",
+            "enum": [
+               "unmodified_opinion",
+               "qualified_opinion",
+               "adverse_opinion",
+               "disclaimer_of_opinion"
+            ],
+            "type": "string"
+         },
+         "type": "array"
       }
    },
    "required": [

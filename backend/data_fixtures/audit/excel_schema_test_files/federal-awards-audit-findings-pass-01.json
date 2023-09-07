@@ -1,43 +1,64 @@
 {
-    "FindingsUniformGuidance": {
-        "auditee_uei": "AAA123456BBB",
-           "findings_uniform_guidance_entries": [
-            {
-                "program": {
-                  "award_reference": "AWARD-0001",
-                  "compliance_requirement": "ABC"
-                },
-                "questioned_costs": "N",
-                "significant_deficiency": "N",
-                "other_matters": "N",
-                "other_findings": "N",
-                "modified_opinion": "Y",
-                "material_weakness": "N",
-                "findings": {
-                    "is_valid": "Y",
-                    "repeat_prior_reference": "Y",
-                    "prior_references": "2020-001,2021-002",
-                    "reference_number": "2023-100"
-                }
-            },
-            {
-                "program": {
-                  "award_reference": "AWARD-0002",
-                  "compliance_requirement": "BC"
-                },
-                "questioned_costs": "Y",
-                "significant_deficiency": "N",
-                "other_matters": "Y",
-                "other_findings": "N",
-                "modified_opinion": "N",
-                "material_weakness": "Y",
-                "findings": {
-                    "is_valid": "N",
-                    "repeat_prior_reference": "Y",
-                    "prior_references": "2022-033",
-                    "reference_number": "2023-001"
-                }
-            }            
-        ]
-    }
+  "Meta": {
+    "section_name": "FindingsUniformGuidance"
+  },
+  "FindingsUniformGuidance": {
+    "auditee_uei": "AAA123456BBB",
+    "findings_uniform_guidance_entries": [
+      {
+        "program": {
+          "award_reference": "AWARD-0001",
+          "compliance_requirement": "ABC"
+        },
+        "questioned_costs": "N",
+        "significant_deficiency": "N",
+        "other_matters": "N",
+        "other_findings": "N",
+        "modified_opinion": "Y",
+        "material_weakness": "N",
+        "findings": {
+          "is_valid": "Y",
+          "repeat_prior_reference": "Y",
+          "prior_references": "2020-001,2021-002",
+          "reference_number": "2023-100"
+        }
+      },
+      {
+        "program": {
+          "award_reference": "AWARD-0002",
+          "compliance_requirement": "BC"
+        },
+        "questioned_costs": "Y",
+        "significant_deficiency": "N",
+        "other_matters": "Y",
+        "other_findings": "N",
+        "modified_opinion": "N",
+        "material_weakness": "Y",
+        "findings": {
+          "is_valid": "N",
+          "repeat_prior_reference": "Y",
+          "prior_references": "2022-033",
+          "reference_number": "2023-001"
+        }
+      },
+      {
+        "program": {
+          "award_reference": "AWARD-0003",
+          "compliance_requirement": "BC"
+        },
+        "questioned_costs": "Y",
+        "significant_deficiency": "N",
+        "other_matters": "Y",
+        "other_findings": "N",
+        "modified_opinion": "N",
+        "material_weakness": "Y",
+        "findings": {
+          "is_valid": "N",
+          "repeat_prior_reference": "N",
+          "prior_references": "N/A",
+          "reference_number": "2023-001"
+        }
+      }
+    ]
+  }
 }

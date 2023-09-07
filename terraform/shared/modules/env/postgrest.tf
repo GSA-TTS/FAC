@@ -22,7 +22,7 @@ resource "cloudfoundry_app" "postgrest" {
   space        = data.cloudfoundry_space.apps.id
   docker_image = "ghcr.io/gsa-tts/fac/postgrest@${data.docker_registry_image.postgrest.sha256_digest}"
   timeout      = 180
-  memory       = 128
+  memory       = 512
   disk_quota   = 256
   instances    = var.postgrest_instances
   strategy     = "rolling"
@@ -34,6 +34,7 @@ resource "cloudfoundry_app" "postgrest" {
     PGRST_DB_URI : cloudfoundry_service_key.postgrest.credentials.uri
     PGRST_DB_SCHEMAS : "api_v1_0_0_beta"
     PGRST_DB_ANON_ROLE : "anon"
+    PGRST_JWT_SECRET : var.pgrst_jwt_secret
+    PGRST_DB_MAX_ROWS : 20000
   }
 }
-
