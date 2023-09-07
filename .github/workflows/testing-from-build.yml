@@ -54,7 +54,7 @@ jobs:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
 
   a11y-testing:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     env:
       ENV: TESTING
       SAM_API_KEY: ${{ secrets.SAM_API_KEY }}

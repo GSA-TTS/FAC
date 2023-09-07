@@ -56,7 +56,7 @@ jobs:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
 
   a11y-testing:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     env:
       ENV: TESTING
       SAM_API_KEY: ${{ secrets.SAM_API_KEY }}
@@ -76,7 +76,9 @@ jobs:
 
       - name: Create .env file
         working-directory: ./backend
-        run: touch .env
+        run: |
+          touch .env
+          npm ci
 
       - name: Start Services
         working-directory: ./backend
@@ -89,6 +91,4 @@ jobs:
 
       - name: run pa11y
         working-directory: ./backend
-        run: |
-          npm ci
-          npm run run-pa11y
+        run: npm run run-pa11y
