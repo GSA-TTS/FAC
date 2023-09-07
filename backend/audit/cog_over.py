@@ -32,13 +32,13 @@ def cog_over(sac: SingleAuditChecklist):
         return (cognizant_agency, oversight_agency)
 
     # Find dbkey from Gen22 table
-    dbkey = find_dbkey_from_Gen22(sac.auditee_ein, sac.auditee_uei)
+    dbkey = find_dbkey_from_Gen22(sac.ein, sac.auditee_uei)
     if dbkey:
         # Check cognizant_agencies_21_25 table
-        cognizant_agency = check_21_25_cog_assignment(dbkey, sac.auditee_ein)
+        cognizant_agency = check_21_25_cog_assignment(dbkey, sac.ein)
         if cognizant_agency:
             return (cognizant_agency, oversight_agency)
-        cognizant_agency = determine_2019_agency_w_dbkey(sac.auditee_ein, dbkey)
+        cognizant_agency = determine_2019_agency_w_dbkey(sac.ein, dbkey)
         if cognizant_agency:
             return (cognizant_agency, oversight_agency)
     cognizant_agency = agency
