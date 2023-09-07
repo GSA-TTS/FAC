@@ -4,7 +4,12 @@ from django.core.validators import RegexValidator
 from api.uei import get_uei_info_from_sam_gov
 
 ein_validator = RegexValidator(r'^[0-9]{9}$', "EINs should be nine characters long and be made up of only numbers.")
-alpha_validator = RegexValidator(r'\b[^\W\d_]+\b', "Cities should not include numbers or special characters.")  # \w, but exclude \W and \d (numerics, underscores, etc). Includes non-[A-Z] ASCII things like ñ and ī
+# Regex for words, includes non-[A-Z] ASCII characters like ñ and ī. 
+# \A and \Z start and terminate the string.
+# [^\W\d] - matches values _not_ in W (non-word characters) or d (digits), which is all alphas.
+# [^\W\d] is OR'd with \s to allow whitespace instead of another character, to allow spaces.
+# [^\W\d]|\s is wrapped in parenthesis and appended by a plus to allow any number of characters.
+alpha_validator = RegexValidator(r'\A([^\W\d]|\s)+\Z', "This field should not include numbers or special characters.")
 
 def validate_uei(value):
     sam_response = get_uei_info_from_sam_gov(value)
