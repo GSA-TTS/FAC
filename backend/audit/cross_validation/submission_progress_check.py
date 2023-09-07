@@ -91,10 +91,6 @@ def progress_check(sections, key):
     if sections[NC.FEDERAL_AWARDS]:
         awards = sections.get(NC.FEDERAL_AWARDS, {}).get(NC.FEDERAL_AWARDS, [])
     general_info = sections.get(NC.GENERAL_INFORMATION, {}) or {}
-    try:
-        is_general_info_complete = validate_general_information_json(general_info)
-    except:
-        is_general_info_complete = False
 
     num_findings = sum(get_num_findings(award) for award in awards)
     conditions = {
@@ -113,9 +109,7 @@ def progress_check(sections, key):
 
     # The General Information has its own condition, as it can be partially completed.
     if key == 'general_information':
-        if is_general_info_complete:
-            return {key: progress | {"display": "complete", "completed": True}}
-        return {key: progress | {"display": "incomplete", "completed": False}}
+        return general_information_progress_check(progress, general_info)
 
     # If it's not required, it's inactive:
     if not conditions[key]:
@@ -126,3 +120,20 @@ def progress_check(sections, key):
         return {key: progress | {"display": "complete", "completed": True}}
 
     return {key: progress | {"display": "incomplete", "completed": False}}
+
+
+def general_information_progress_check(progress, general_info):
+    """
+    Given a base "progress" dictionary and the general_info object from a submission, 
+    run validations to determine its completeness. Then, return a dictionary with 
+    "general_information" as the key and the progress as the value.
+    """
+    try:
+        is_general_info_complete = bool(validate_general_information_json(general_info))
+    except Exception:
+        is_general_info_complete = False
+    print("HEY LISTEN", is_general_info_complete)
+
+    if is_general_info_complete:
+        return {"general_information": progress | {"display": "complete", "completed": True}}
+    return {"general_information": progress | {"display": "incomplete", "completed": False}}
