@@ -1,3 +1,10 @@
 from django.contrib import admin
 
-# Register your models here.
+from .models import CognizantBaseline
+
+
+class CognizantBaselineAdmin(admin.ModelAdmin):
+    date_hierarchy = "date_assigned"
+
+
+admin.site.register(CognizantBaseline, CognizantBaselineAdmin)

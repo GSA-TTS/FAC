@@ -7,19 +7,20 @@ from faker import Faker
 from django.db import connection
 
 from audit.models import SingleAuditChecklist
+from .models import CognizantBaseline
 
-from audit.cog_over import cog_over
+from .cog_over import cog_over
 
 # Note:  Fake data is generated for SingleAuditChecklist, CognizantBaseline.
 #        Using only the data fields that apply to cog / over assignment.
 
-UNIQUE_EIN_WITHOUT_DBKEY = "742094204"
-DUP_2019_EIN_WITHOUT_2022_RESOLVER = "987876765"
-EIN_2023_ONLY = "2023451234"
-RESOLVABLE_EIN_NO_LOOKUP = "202200022"
-RESOLVABLE_UEI_NO_LOOKUP = "202200022"
-RESOLVABLE_DBKEY_NO_LOOKUP = "20220"
-RESOLVABLE_EIN_LLOKUP_EXISTS = "202211122"
+UNIQUE_EIN_WITHOUT_DBKEY = "UEWOD1234"
+DUP_EIN_WITHOUT_RESOLVER = "DEWOR1234"
+EIN_2023_ONLY = "EIN202312"
+RESOLVABLE_EIN_WITHOUT_BASELINE = "REWOB1234"
+RESOLVABLE_UEI_WITHOUT_BASELINE = "RUWOB1234"
+RESOLVABLE_DBKEY_WITHOUT_BASELINE = "20220"
+UEI_WITH_BASELINE = "UB0011223"
 
 
 class CogOverTests(TestCase):
@@ -55,7 +56,7 @@ class CogOverTests(TestCase):
             gen = baker.make(
                 CensusGen19,
                 index=i,
-                ein=DUP_2019_EIN_WITHOUT_2022_RESOLVER,
+                ein=DUP_EIN_WITHOUT_RESOLVER,
                 dbkey=str(10_000 + i),
                 totfedexpend="10000000",
             )
@@ -63,17 +64,17 @@ class CogOverTests(TestCase):
         gen = baker.make(
             CensusGen22,
             index=11,
-            ein=RESOLVABLE_EIN_NO_LOOKUP,
-            uei=RESOLVABLE_UEI_NO_LOOKUP,
-            dbkey=RESOLVABLE_DBKEY_NO_LOOKUP,
+            ein=RESOLVABLE_EIN_WITHOUT_BASELINE,
+            uei=RESOLVABLE_UEI_WITHOUT_BASELINE,
+            dbkey=RESOLVABLE_DBKEY_WITHOUT_BASELINE,
             totfedexpend="210000000",
         )
         gen.save()
         gen = baker.make(
             CensusGen19,
             index=11,
-            ein=RESOLVABLE_EIN_NO_LOOKUP,
-            dbkey=RESOLVABLE_DBKEY_NO_LOOKUP,
+            ein=RESOLVABLE_EIN_WITHOUT_BASELINE,
+            dbkey=RESOLVABLE_DBKEY_WITHOUT_BASELINE,
             totfedexpend="210000000",
         )
         gen.save()
@@ -240,16 +241,20 @@ class CogOverTests(TestCase):
             }
         }
 
-    def test_cog_assignment_from_hist(self):
-        """
-        When we have a matching row in 2019 and nothing in the
-        2021-2025 table, we should use the cog computed from 2019 data
-        """
+    def _fake_sac(self):
         sac = baker.make(
             SingleAuditChecklist,
             general_information=self._fake_general(),
             federal_awards=self._fake_federal_awards(),
         )
+        return sac
+
+    def test_cog_assignment_from_hist(self):
+        """
+        When we have a matching row in 2019 and nothing in the
+        baseline table, we should use the cog computed from 2019 data
+        """
+        sac = self._fake_sac()
         sac.general_information["ein"] = UNIQUE_EIN_WITHOUT_DBKEY
         cog_agency, over_agency = cog_over(sac)
         self.assertEqual(cog_agency, "84")
@@ -260,11 +265,7 @@ class CogOverTests(TestCase):
         We have no match in the base sheet and we
         have no match in 2019. So, assign from 2023"
         """
-        sac = baker.make(
-            SingleAuditChecklist,
-            general_information=self._fake_general(),
-            federal_awards=self._fake_federal_awards(),
-        )
+        sac = self._fake_sac()
         sac.general_information["ein"] = EIN_2023_ONLY
         cog_agency, over_agency = cog_over(sac)
         self.assertEqual(cog_agency, "10")
@@ -276,12 +277,8 @@ class CogOverTests(TestCase):
         have duplicates in 2019. So, assign from 2023
         """
 
-        sac = baker.make(
-            SingleAuditChecklist,
-            general_information=self._fake_general(),
-            federal_awards=self._fake_federal_awards(),
-        )
-        sac.general_information["ein"] = DUP_2019_EIN_WITHOUT_2022_RESOLVER
+        sac = self._fake_sac()
+        sac.general_information["ein"] = DUP_EIN_WITHOUT_RESOLVER
         cog_agency, over_agency = cog_over(sac)
         self.assertEqual(cog_agency, "10")
         self.assertEqual(over_agency, None)
@@ -292,19 +289,18 @@ class CogOverTests(TestCase):
         and we have a match in 2019, but nothing in the baseline.
         So, assign from 2019
         """
-        sac = baker.make(
-            SingleAuditChecklist,
-            general_information=self._fake_general(),
-            federal_awards=self._fake_federal_awards(),
-        )
+        sac = self._fake_sac()
 
-        sac.general_information["ein"] = RESOLVABLE_EIN_NO_LOOKUP
-        sac.general_information["auditee_uei"] = RESOLVABLE_UEI_NO_LOOKUP
+        sac.general_information["ein"] = RESOLVABLE_EIN_WITHOUT_BASELINE
+        sac.general_information["auditee_uei"] = RESOLVABLE_UEI_WITHOUT_BASELINE
         cog_agency, over_agency = cog_over(sac)
         self.assertEqual(cog_agency, "22")
         self.assertEqual(over_agency, None)
 
     def test_over_assignment(self):
+        """
+        Awards with totals less than the threshold should result in an oversight agency being assigned.
+        """
         sac = baker.make(
             SingleAuditChecklist,
             general_information=self._fake_general(),
@@ -314,7 +310,11 @@ class CogOverTests(TestCase):
         self.assertEqual(cog_agency, None)
         self.assertEqual(over_agency, "15")
 
-    def test_over_assignment_with_baseline(self):
+    def test_over_assignment_with_hist(self):
+        """
+        Awards with totals less than the threshold should result in an oversight agency being assigned.
+        And history data should not be used.
+        """
         sac = baker.make(
             SingleAuditChecklist,
             general_information=self._fake_general(),
@@ -325,3 +325,14 @@ class CogOverTests(TestCase):
         self.assertEqual(cog_agency, None)
         self.assertEqual(over_agency, "15")
 
+    def test_cog_assignment_with_uei_in_baseline(self):
+        sac = self._fake_sac()
+        sac.general_information["auditee_uei"] = UEI_WITH_BASELINE
+        baker.make(
+            CognizantBaseline,
+            uei=UEI_WITH_BASELINE,
+            cognizant_agency="17",
+        )
+        cog_agency, over_agency = cog_over(sac)
+        self.assertEqual(cog_agency, "17")
+        self.assertEqual(over_agency, None)

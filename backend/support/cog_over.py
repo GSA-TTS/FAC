@@ -1,5 +1,6 @@
 from collections import defaultdict
-from .models import SingleAuditChecklist
+from audit.models import SingleAuditChecklist
+from .models import CognizantBaseline
 from dissemination.hist_models.census_2019 import CensusGen19, CensusCfda19
 from dissemination.hist_models.census_2022 import CensusGen22
 from django.db.models.functions import Cast
@@ -26,7 +27,7 @@ def cog_over(sac: SingleAuditChecklist):
         oversight_agency = agency
         print("Assigning an oversight agenct", oversight_agency)
         return (cognizant_agency, oversight_agency)
-    cognizant_agency = determine_2019_agency(sac.ein, sac.auditee_uei)
+    cognizant_agency = determine_hist_agency(sac.ein, sac.auditee_uei)
     if cognizant_agency:
         print("Assigning a 2019 cog agency", cognizant_agency)
         return (cognizant_agency, oversight_agency)
@@ -60,13 +61,13 @@ def determine_agency(total_amount_expended, max_total_agency, max_da_agency):
         return agency
 
 
-def determine_2019_agency(ein, uei):
+def determine_hist_agency(ein, uei):
     dbkey = get_dbkey(ein, uei)
     print(f"Looked up dbkey from 2022 and got {dbkey}")
 
     cog_agency = lookup_baseline(ein, uei, dbkey)
     if cog_agency:
-        print("Found cog in lookup table")
+        print(f"Found cog {cog_agency} in lookup table")
         return cog_agency
     (gen_count, total_amount_expended) = get_2019_gen(ein, dbkey)
     if gen_count != 1:
@@ -96,7 +97,13 @@ def get_dbkey(ein, uei):
 
 
 def lookup_baseline(ein, uei, dbkey):
-    return None
+    try:
+        cognizant_agency = CognizantBaseline.objects.values_list(
+            "cognizant_agency", flat=True
+        ).get((Q(ein=ein) & Q(dbkey=dbkey)) | Q(uei=uei))[:]
+    except (CognizantBaseline.DoesNotExist, CognizantBaseline.MultipleObjectsReturned):
+        cognizant_agency = None
+    return cognizant_agency
 
 
 def get_2019_gen(ein, dbkey):
