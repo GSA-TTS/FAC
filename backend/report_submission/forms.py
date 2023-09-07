@@ -1,5 +1,6 @@
 from django import forms
 from django.core.validators import RegexValidator
+from config.settings import STATE_ABBREVS
 
 from api.uei import get_uei_info_from_sam_gov
 
@@ -50,6 +51,7 @@ class GeneralInformationForm(forms.Form):
     auditee_fiscal_period_end = forms.CharField(required=False)
     auditee_fiscal_period_start = forms.CharField(required=False)
     audit_period_covered = forms.CharField(required=False)
+    choices_state_abbrevs = list((i, i) for i in STATE_ABBREVS)
     audit_period_other_months = forms.CharField(required=False)
     ein = forms.CharField(
         required=False,
@@ -65,7 +67,7 @@ class GeneralInformationForm(forms.Form):
         required=False,
         validators=[alpha_validator],  # validators are not run against empty fields
     )
-    auditee_state = forms.CharField(required=False)
+    auditee_state = forms.ChoiceField(choices=choices_state_abbrevs, required=False)
     auditee_zip = forms.CharField(required=False)
     auditee_contact_name = forms.CharField(required=False)
     auditee_contact_title = forms.CharField(required=False)
@@ -78,12 +80,13 @@ class GeneralInformationForm(forms.Form):
     )
     auditor_ein_not_an_ssn_attestation = forms.BooleanField(required=False)
     auditor_country = forms.CharField(required=False)
+    auditor_international_address = forms.CharField(required=False)
     auditor_address_line_1 = forms.CharField(required=False)
     auditor_city = forms.CharField(
         required=False,
         validators=[alpha_validator],  # validators are not run against empty fields
     )
-    auditor_state = forms.CharField(required=False)
+    auditor_state = forms.ChoiceField(choices=choices_state_abbrevs, required=False)
     auditor_zip = forms.CharField(required=False)
     auditor_contact_name = forms.CharField(required=False)
     auditor_contact_title = forms.CharField(required=False)

@@ -397,6 +397,7 @@ DATA_FIXTURES = BASE_DIR / "data_fixtures"
 AUDIT_TEST_DATA_ENTRY_DIR = DATA_FIXTURES / "audit" / "test_data_entries"
 AUDIT_SCHEMA_DIR = BASE_DIR / "schemas" / "output" / "audit"
 SECTION_SCHEMA_DIR = BASE_DIR / "schemas" / "output" / "sections"
+SCHEMA_BASE_DIR = BASE_DIR / "schemas" / "source" / "base"
 XLSX_TEMPLATE_JSON_DIR = BASE_DIR / "schemas" / "output" / "excel" / "json"
 XLSX_TEMPLATE_SHEET_DIR = BASE_DIR / "schemas" / "output" / "excel" / "xlsx"
 
@@ -409,6 +410,7 @@ AUTHENTICATION_BACKENDS = [
 ]
 
 env_base_url = env.str("DJANGO_BASE_URL", "")
+login_client_id = secret("LOGIN_CLIENT_ID", "")
 secret_login_key = b64decode(secret("DJANGO_SECRET_LOGIN_KEY", ""))
 
 # which provider to use if multiple are available
@@ -432,7 +434,7 @@ OIDC_PROVIDERS = {
             "acr_value": "http://idmanagement.gov/ns/assurance/ial/1",
         },
         "client_registration": {
-            "client_id": "urn:gov:gsa:openidconnect.profiles:sp:sso:gsa:gsa-fac-pk-jwt-01",
+            "client_id": login_client_id,
             "redirect_uris": [f"{env_base_url}/openid/callback/login/"],
             "post_logout_redirect_uris": [f"{env_base_url}/openid/callback/logout/"],
             "token_endpoint_auth_method": ["private_key_jwt"],
@@ -444,7 +446,6 @@ OIDC_PROVIDERS = {
 LOGIN_URL = f"{env_base_url}/openid/login/"
 
 USER_PROMOTION_COMMANDS_ENABLED = ENVIRONMENT in ["LOCAL", "TESTING", "UNDEFINED"]
-
 
 if DISABLE_AUTH:
     TEST_USERNAME = "test_user@test.test"
@@ -461,6 +462,9 @@ AGENCY_NAMES = get_agency_names()
 GAAP_RESULTS = get_audit_info_lists("gaap_results")
 SP_FRAMEWORK_BASIS = get_audit_info_lists("sp_framework_basis")
 SP_FRAMEWORK_OPINIONS = get_audit_info_lists("sp_framework_opinions")
+STATE_ABBREVS = json.load(open(f"{SCHEMA_BASE_DIR}/States.json"))[
+    "UnitedStatesStateAbbr"
+]
 
 ENABLE_DEBUG_TOOLBAR = (
     env.bool("ENABLE_DEBUG_TOOLBAR", False) and ENVIRONMENT == "LOCAL" and not TEST_RUN

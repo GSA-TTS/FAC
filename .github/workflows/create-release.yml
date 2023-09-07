@@ -3,7 +3,7 @@ name: Create Release
 on:
 #   schedule:
 #     - cron: '0 18 * * 3'
-  workflow_dispatch: null
+  workflow_dispatch:
 
 jobs:
   release:
@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           ref: prod
 
@@ -30,7 +30,7 @@ jobs:
       - name: Create Release
         uses: actions/create-release@v1
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.DEPLOY_TOKEN }}
         with:
           tag_name: v1.${{ steps.date.outputs.date }}
           release_name: Release for ${{ steps.date.outputs.date }}

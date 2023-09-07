@@ -503,7 +503,10 @@ class GeneralInformationFormViewTests(TestCase):
 
         self.assertEqual(response.status_code, 403)
 
-    def test_post_updates_fields(self):
+    def test_post_updates_fields_for_foreign_auditor(self):
+        self.test_post_updates_fields(foreign_auditor=True)
+
+    def test_post_updates_fields(self, foreign_auditor=False):
         """When the general information form is submitted, the general information fields for the target audit are updated in the database"""
         user = baker.make(User)
 
@@ -541,16 +544,28 @@ class GeneralInformationFormViewTests(TestCase):
             "auditor_firm_name": "Penny Audit Store",
             "auditor_ein": "123456780",
             "auditor_ein_not_an_ssn_attestation": True,
-            "auditor_country": "UK",
-            "auditor_address_line_1": "100 Percent Respectable Rd.",
-            "auditor_city": "Not Podunk",
-            "auditor_state": "IL",
-            "auditor_zip": "60604",
             "auditor_contact_name": "Qualified Robot Accountant",
             "auditor_contact_title": "Just an extraordinary person",
             "auditor_phone": "0008675310",
             "auditor_email": "qualified.robot.accountant@dollarauditstore.com",
         }
+        if foreign_auditor:
+            data.update(
+                {
+                    "auditor_country": "non-USA",
+                    "auditor_international_address": "10 Downing St London, England",
+                }
+            )
+        else:
+            data.update(
+                {
+                    "auditor_country": "USA",
+                    "auditor_address_line_1": "100 Percent Respectable Rd.",
+                    "auditor_city": "Not Podunk",
+                    "auditor_state": "IL",
+                    "auditor_zip": "60604",
+                }
+            )
 
         response = self.client.post(url, data=data)
 

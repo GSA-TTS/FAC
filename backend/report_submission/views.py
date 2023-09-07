@@ -12,7 +12,7 @@ from report_submission.forms import AuditeeInfoForm, GeneralInformationForm
 
 import api.views
 
-from config.settings import STATIC_SITE_URL
+from config.settings import STATIC_SITE_URL, STATE_ABBREVS
 
 logger = logging.getLogger(__name__)
 
@@ -142,6 +142,7 @@ class GeneralInformationFormView(LoginRequiredMixin, View):
                 "auditor_ein": sac.auditor_ein,
                 "auditor_ein_not_an_ssn_attestation": sac.auditor_ein_not_an_ssn_attestation,
                 "auditor_country": sac.auditor_country,
+                "auditor_international_address": sac.auditor_international_address,
                 "auditor_address_line_1": sac.auditor_address_line_1,
                 "auditor_city": sac.auditor_city,
                 "auditor_state": sac.auditor_state,
@@ -152,6 +153,7 @@ class GeneralInformationFormView(LoginRequiredMixin, View):
                 "auditor_email": sac.auditor_email,
                 "secondary_auditors_exist": sac.secondary_auditors_exist,
                 "report_id": report_id,
+                "state_abbrevs": STATE_ABBREVS,
             }
 
             return render(request, "report_submission/gen-form.html", context)
@@ -174,32 +176,37 @@ class GeneralInformationFormView(LoginRequiredMixin, View):
 
             form = GeneralInformationForm(request.POST)
 
-            if form.is_valid():
-                general_information = sac.general_information
-                general_information.update(form.cleaned_data)
-                # validated = validate_general_information_json(general_information)
-                sac.general_information = general_information
-                if general_information.get("audit_type"):
-                    sac.audit_type = general_information["audit_type"]
-
-                sac.save(
-                    event_user=request.user,
-                    event_type=SubmissionEvent.EventType.GENERAL_INFORMATION_UPDATED,
-                )
-
-                return redirect(f"/audit/submission-progress/{report_id}")
-            else:
+                
+            
+            if not form.is_valid():
                 context = form.cleaned_data | {
                     "errors": form.errors,
                     "report_id": report_id,
                 }
+                message = ""
+                for field, errors in form.errors.items():
+                    message = f"{message}\n {field}: {errors}"
+                    logger.warning(f"Error {field}: {errors}")
                 return render(request, "report_submission/gen-form.html", context)
 
+            form = self._wipe_auditor_address(form)
+            general_information = sac.general_information
+            general_information.update(form.cleaned_data)
+            sac.general_information = general_information
+            if general_information.get("audit_type"):
+                sac.audit_type = general_information["audit_type"]
+
+            sac.save(
+                event_user=request.user,
+                event_type=SubmissionEvent.EventType.GENERAL_INFORMATION_UPDATED,
+            )
+
+            return redirect(f"/audit/submission-progress/{report_id}")
         except SingleAuditChecklist.DoesNotExist as err:
             raise PermissionDenied("You do not have access to this audit.") from err
         except ValidationError as err:
             message = f"ValidationError for report ID {report_id}: {err.message}"
-            logger.warning(message)
+            print(message)
             raise BadRequest(message)
         except LateChangeError:
             return render(request, "audit/no-late-changes.html")
@@ -207,6 +214,22 @@ class GeneralInformationFormView(LoginRequiredMixin, View):
             message = f"Unexpected error in GeneralInformationFormView post. Report ID {report_id}: {err}"
             logger.warning(message)
             raise BadRequest(message)
+
+    def _wipe_auditor_address(self, form):
+        # If non-USA is selected, wipe USA-specific fields
+        # Else, wipe the non-USA specific field
+        keys_to_wipe = [
+            "auditor_address_line_1",
+            "auditor_city",
+            "auditor_state",
+            "auditor_zip",
+        ]
+        if form.cleaned_data["auditor_country"] == "non-USA":
+            for key in keys_to_wipe:
+                form.cleaned_data[key] = ""
+        else:
+            form.cleaned_data["auditor_international_address"] = ""
+        return form
 
 
 class UploadPageView(LoginRequiredMixin, View):
