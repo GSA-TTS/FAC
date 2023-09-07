@@ -68,7 +68,7 @@
   },
   is_direct: {
     instructions: [
-      'Select "Y" if the if the award came directly from a Federal awarding agency. If not, select "N".',
+      'Select "Y" if the award came directly from a Federal awarding agency. If not, select "N".',
     ],
   },
   passthrough_name: {
