@@ -71,6 +71,7 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 16
+        run: npm ci
 
       - name: Create .env
         working-directory: ./backend
@@ -87,6 +88,4 @@ jobs:
 
       - name: run pa11y
         working-directory: ./backend
-        run: |
-          npm install -g pa11y
-          npm run run-pa11y
+        run: npm run run-pa11y
