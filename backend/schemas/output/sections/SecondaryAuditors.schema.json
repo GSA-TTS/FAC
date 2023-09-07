@@ -53,6 +53,7 @@
                         "type": "string"
                      },
                      "secondary_auditor_address_state": {
+                        "description": "US States 2-letter abbreviations",
                         "enum": [
                            "AL",
                            "AK",
@@ -112,10 +113,8 @@
                            "WA",
                            "WV",
                            "WI",
-                           "WY",
-                           ""
-                        ],
-                        "type": "string"
+                           "WY"
+                        ]
                      },
                      "secondary_auditor_address_street": {
                         "type": "string"

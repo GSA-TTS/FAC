@@ -338,13 +338,21 @@
                                     role="alert">
                                     <li id="auditee_state-not-null" hidden>This field is required</li>
                                 </ul>
-                                <input class="usa-input"
-                                       id="auditee_state"
-                                       name="auditee_state"
-                                       aria-required="true"
-                                       required
-                                       data-validate-not-null=""
-                                       value="{{ auditee_state | default_if_none:'' }}"/>
+                                <div class="usa-combo-box" data-default-value="{{ auditee_state }}">
+                                    <select class="usa-select"
+                                        id="auditee_state"
+                                        name="auditee_state"
+                                        aria-required="true"
+                                        required>
+                                        {% for state in state_abbrevs %}
+                                        <option
+                                            value="{{ state }}"
+                                            {% if state == auditee_state %}selected{% endif %}>
+                                            {{ state }}
+                                        </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
                             </div>
                             <div class="usa-form-group">
                                 <label class="usa-label" for="auditee_zip">
@@ -689,13 +697,21 @@
                                             This field is required
                                         </li>
                                     </ul>
-                                    <input class="usa-input"
-                                           id="auditor_state"
-                                           name="auditor_state"
-                                           aria-required="true"
-                                           required
-                                           data-validate-not-null=""
-                                           value="{{ auditor_state | default_if_none:'' }}"/>
+                                    <div class="usa-combo-box" data-default-value="{{ auditor_state }}">
+                                        <select class="usa-select"
+                                            id="auditor_state"
+                                            name="auditor_state"
+                                            aria-required="true"
+                                            required>
+                                            {% for state in state_abbrevs %}
+                                            <option
+                                                value="{{ state }}"
+                                                {% if state == auditor_state %}selected{% endif %}>
+                                                {{ state }}
+                                            </option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
                                 </div>
                                 <div name="domestic_address" class="usa-form-group">
                                     <label class="usa-label" for="auditor_zip">
