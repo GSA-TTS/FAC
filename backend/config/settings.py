@@ -397,6 +397,7 @@ DATA_FIXTURES = BASE_DIR / "data_fixtures"
 AUDIT_TEST_DATA_ENTRY_DIR = DATA_FIXTURES / "audit" / "test_data_entries"
 AUDIT_SCHEMA_DIR = BASE_DIR / "schemas" / "output" / "audit"
 SECTION_SCHEMA_DIR = BASE_DIR / "schemas" / "output" / "sections"
+SCHEMA_BASE_DIR = BASE_DIR / "schemas" / "source" / "base"
 XLSX_TEMPLATE_JSON_DIR = BASE_DIR / "schemas" / "output" / "excel" / "json"
 XLSX_TEMPLATE_SHEET_DIR = BASE_DIR / "schemas" / "output" / "excel" / "xlsx"
 
@@ -446,7 +447,6 @@ LOGIN_URL = f"{env_base_url}/openid/login/"
 
 USER_PROMOTION_COMMANDS_ENABLED = ENVIRONMENT in ["LOCAL", "TESTING", "UNDEFINED"]
 
-
 if DISABLE_AUTH:
     TEST_USERNAME = "test_user@test.test"
     MIDDLEWARE.append(
@@ -462,6 +462,9 @@ AGENCY_NAMES = get_agency_names()
 GAAP_RESULTS = get_audit_info_lists("gaap_results")
 SP_FRAMEWORK_BASIS = get_audit_info_lists("sp_framework_basis")
 SP_FRAMEWORK_OPINIONS = get_audit_info_lists("sp_framework_opinions")
+STATE_ABBREVS = json.load(open(f"{SCHEMA_BASE_DIR}/States.json"))[
+    "UnitedStatesStateAbbr"
+]
 
 ENABLE_DEBUG_TOOLBAR = (
     env.bool("ENABLE_DEBUG_TOOLBAR", False) and ENVIRONMENT == "LOCAL" and not TEST_RUN
