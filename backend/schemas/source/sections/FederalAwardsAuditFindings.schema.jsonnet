@@ -4,6 +4,7 @@ local Sheets = import '../excel/libs/Sheets.libsonnet';
 local Additional = import 'FederalAwardsAuditFindings.validation.libsonnet';
 local Types = Base.Types;
 local Validations = Additional.Validations;
+local Func = import '../base/Functions.libsonnet';
 
 local Meta = Types.object {
   additionalProperties: false,
@@ -41,9 +42,10 @@ local Parts = {
     },
     required: [
       'reference_number',
+      'prior_references',
       'repeat_prior_reference',
     ],
-    allOf: Validations.PriorReferences,
+    oneOf: Validations.PriorReferences,
   },
 };
 
