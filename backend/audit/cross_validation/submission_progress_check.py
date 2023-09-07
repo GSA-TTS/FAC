@@ -1,4 +1,5 @@
 from audit.cross_validation.naming import NC, find_section_by_name
+from audit.validators import validate_general_information_json
 
 
 def submission_progress_check(sac, sar=None, crossval=True):
@@ -90,6 +91,11 @@ def progress_check(sections, key):
     if sections[NC.FEDERAL_AWARDS]:
         awards = sections.get(NC.FEDERAL_AWARDS, {}).get(NC.FEDERAL_AWARDS, [])
     general_info = sections.get(NC.GENERAL_INFORMATION, {}) or {}
+    try:
+        is_general_info_complete = validate_general_information_json(general_info)
+    except:
+        is_general_info_complete = False
+
     num_findings = sum(get_num_findings(award) for award in awards)
     conditions = {
         NC.GENERAL_INFORMATION: True,
@@ -104,6 +110,12 @@ def progress_check(sections, key):
         NC.SECONDARY_AUDITORS: bool(general_info.get("secondary_auditors_exist")),
         NC.SINGLE_AUDIT_REPORT: True,
     }
+
+    # The General Information has its own condition, as it can be partially completed.
+    if key == 'general_information':
+        if is_general_info_complete:
+            return {key: progress | {"display": "complete", "completed": True}}
+        return {key: progress | {"display": "incomplete", "completed": False}}
 
     # If it's not required, it's inactive:
     if not conditions[key]:
