@@ -119,11 +119,10 @@ describe('Full audit submission', () => {
       testAuditeeCertification();
     })
 
-    // Uncomment this block when ready to implement the certification steps.
-    /*
-    // Finally, submit for processing.
     cy.get(".usa-link").contains("Submit to the FAC for processing").click();
-    // This will probably take you back to the homepage, where the audit is now oof status "submitted".
-    */
+    cy.url().should('match', /\/audit\/submission\/[0-9A-Z]{17}/);
+    cy.get('#continue').click();
+    cy.url().should('match', /\/audit\//);
+    
   });
 });
