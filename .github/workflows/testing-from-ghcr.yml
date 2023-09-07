@@ -78,7 +78,6 @@ jobs:
         working-directory: ./backend
         run: |
           touch .env
-          npm ci
 
       - name: Start Services
         working-directory: ./backend
@@ -91,4 +90,6 @@ jobs:
 
       - name: run pa11y
         working-directory: ./backend
-        run: npm run run-pa11y
+        run: |
+          sudo npm ci
+          npm run run-pa11y
