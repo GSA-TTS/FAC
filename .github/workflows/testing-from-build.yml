@@ -74,7 +74,9 @@ jobs:
 
       - name: Create .env
         working-directory: ./backend
-        run: touch .env
+        run: |
+          touch .env
+          npm ci
 
       - name: Start services
         working-directory: ./backend
@@ -86,6 +88,5 @@ jobs:
           lhci autorun
 
       - name: run pa11y
-        run: |
-          npm i -g pa11y-ci
-          pa11y-ci
+        working-directory: ./backend
+        run: npm run run-pa11y
