@@ -2,8 +2,6 @@ from collections import defaultdict
 import os
 from .models import SingleAuditChecklist, CognizantBaseline
 from dissemination.models import CensusGen22, cognizant_agencies_2021_2025
-
-# CensusGen19, CensusCfda19
 from django.db.models.functions import Cast
 from django.db.models import BigIntegerField
 import sqlalchemy
@@ -55,7 +53,7 @@ def find_dbkey_from_Gen22(ein, uei):
         .filter(int_ein=int(ein), uei=uei)
         .values_list("dbkey", flat=True)
     )
-    if len(dbkey) > 0:
+    if len(dbkey) == 1:
         return dbkey[0]
     return None
 
