@@ -7,7 +7,6 @@ from django.urls import reverse
 from django.views import View
 
 from audit.models import Access, SingleAuditChecklist, LateChangeError, SubmissionEvent
-from audit.validators import validate_general_information_json
 
 from report_submission.forms import AuditeeInfoForm, GeneralInformationForm
 
@@ -192,7 +191,6 @@ class GeneralInformationFormView(LoginRequiredMixin, View):
             else:
                 context = form.cleaned_data | {"errors": form.errors, "report_id": report_id}
                 return render(request, "report_submission/gen-form.html", context)
-
 
         except SingleAuditChecklist.DoesNotExist as err:
             raise PermissionDenied("You do not have access to this audit.") from err
