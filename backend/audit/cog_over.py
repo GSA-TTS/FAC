@@ -1,7 +1,9 @@
 from collections import defaultdict
 import os
 from .models import SingleAuditChecklist, CognizantBaseline
-from dissemination.models import CensusGen22, cognizant_agencies_2021_2025, CensusGen19, CensusCfda19
+from dissemination.models import CensusGen22, cognizant_agencies_2021_2025
+
+# CensusGen19, CensusCfda19
 from django.db.models.functions import Cast
 from django.db.models import BigIntegerField
 import sqlalchemy
@@ -46,18 +48,26 @@ def cog_over(sac: SingleAuditChecklist):
 
 
 def find_dbkey_from_Gen22(ein, uei):
-    dbkey = CensusGen22.objects.annotate(
-        int_ein=Cast("ein", output_field=BigIntegerField())
-        ).filter(int_ein=int(ein), uei=uei).values_list("dbkey", flat=True)
+    dbkey = (
+        CensusGen22.objects.annotate(
+            int_ein=Cast("ein", output_field=BigIntegerField())
+        )
+        .filter(int_ein=int(ein), uei=uei)
+        .values_list("dbkey", flat=True)
+    )
     if len(dbkey) > 0:
         return dbkey[0]
     return None
 
 
 def check_21_25_cog_assignment(dbkey, ein):
-    cog_agency_list = cognizant_agencies_2021_2025.objects.annotate(
-        int_ein=Cast("ein", output_field=BigIntegerField())
-        ).filter(dbkey=dbkey, int_ein=int(ein)).values_list("cogagency", flat=True)
+    cog_agency_list = (
+        cognizant_agencies_2021_2025.objects.annotate(
+            int_ein=Cast("ein", output_field=BigIntegerField())
+        )
+        .filter(dbkey=dbkey, int_ein=int(ein))
+        .values_list("cogagency", flat=True)
+    )
     if len(cog_agency_list) > 0:
         return cog_agency_list[0]
     return None
@@ -141,9 +151,7 @@ def set_2019_baseline():
         ORDER BY gen."DBKEY"
     """
     with engine.connect() as conn:
-        result = conn.execute(
-            sqlalchemy.text(AUDIT_QUERY), {"ref_year": REF_YEAR}
-        )
+        result = conn.execute(sqlalchemy.text(AUDIT_QUERY), {"ref_year": REF_YEAR})
         gens = []
         cfdas = []
 

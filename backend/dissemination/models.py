@@ -816,8 +816,8 @@ class CensusGen22(models.Model):
 
 class cognizant_agencies_2021_2025(models.Model):
     index = models.BigIntegerField(blank=True, primary_key=True)
-    dbkey = models.TextField(db_column='DBKEY', blank=True, null=True)  
-    ein = models.TextField(db_column='EIN', blank=True, null=True) 
+    dbkey = models.TextField(db_column='DBKEY', blank=True, null=True)
+    ein = models.TextField(db_column='EIN', blank=True, null=True)
     uei = models.TextField(db_column='UEI', blank=True, null=True)
     auditeename = models.TextField(db_column='AUDITEENAME', blank=True, null=True)
     cogagency = models.TextField(db_column='COGAGENCY', blank=True, null=True)
