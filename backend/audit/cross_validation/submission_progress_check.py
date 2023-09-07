@@ -108,7 +108,7 @@ def progress_check(sections, key):
     }
 
     # The General Information has its own condition, as it can be partially completed.
-    if key == 'general_information':
+    if key == "general_information":
         return general_information_progress_check(progress, general_info)
 
     # If it's not required, it's inactive:
@@ -124,16 +124,19 @@ def progress_check(sections, key):
 
 def general_information_progress_check(progress, general_info):
     """
-    Given a base "progress" dictionary and the general_info object from a submission, 
-    run validations to determine its completeness. Then, return a dictionary with 
+    Given a base "progress" dictionary and the general_info object from a submission,
+    run validations to determine its completeness. Then, return a dictionary with
     "general_information" as the key and the progress as the value.
     """
     try:
         is_general_info_complete = bool(validate_general_information_json(general_info))
     except Exception:
         is_general_info_complete = False
-    print("HEY LISTEN", is_general_info_complete)
 
     if is_general_info_complete:
-        return {"general_information": progress | {"display": "complete", "completed": True}}
-    return {"general_information": progress | {"display": "incomplete", "completed": False}}
+        return {
+            "general_information": progress | {"display": "complete", "completed": True}
+        }
+    return {
+        "general_information": progress | {"display": "incomplete", "completed": False}
+    }

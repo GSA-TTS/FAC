@@ -189,7 +189,10 @@ class GeneralInformationFormView(LoginRequiredMixin, View):
 
                 return redirect(f"/audit/submission-progress/{report_id}")
             else:
-                context = form.cleaned_data | {"errors": form.errors, "report_id": report_id}
+                context = form.cleaned_data | {
+                    "errors": form.errors,
+                    "report_id": report_id,
+                }
                 return render(request, "report_submission/gen-form.html", context)
 
         except SingleAuditChecklist.DoesNotExist as err:
