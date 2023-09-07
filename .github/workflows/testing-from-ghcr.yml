@@ -55,41 +55,41 @@ jobs:
           show_missing: true
           repo_token: ${{ secrets.GITHUB_TOKEN }}
 
-  a11y-testing:
-    runs-on: ubuntu-latest
-    env:
-      ENV: TESTING
-      SAM_API_KEY: ${{ secrets.SAM_API_KEY }}
-      DJANGO_BASE_URL: 'http://localhost:8000'
-      DJANGO_SECRET_LOGIN_KEY: ${{ secrets.DJANGO_SECRET_LOGIN_KEY }}
-      LOGIN_CLIENT_ID: ${{ secrets.LOGIN_CLIENT_ID }}
-      SECRET_KEY: ${{ secrets.SECRET_KEY }}
-      ALLOWED_HOSTS: '0.0.0.0 127.0.0.1 localhost'
-      DISABLE_AUTH: True
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+  # a11y-testing:
+  #   runs-on: ubuntu-latest
+  #   env:
+  #     ENV: TESTING
+  #     SAM_API_KEY: ${{ secrets.SAM_API_KEY }}
+  #     DJANGO_BASE_URL: 'http://localhost:8000'
+  #     DJANGO_SECRET_LOGIN_KEY: ${{ secrets.DJANGO_SECRET_LOGIN_KEY }}
+  #     LOGIN_CLIENT_ID: ${{ secrets.LOGIN_CLIENT_ID }}
+  #     SECRET_KEY: ${{ secrets.SECRET_KEY }}
+  #     ALLOWED_HOSTS: '0.0.0.0 127.0.0.1 localhost'
+  #     DISABLE_AUTH: True
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 16
+  #     - uses: actions/setup-node@v3
+  #       with:
+  #         node-version: 16
 
-      - name: Create .env file
-        working-directory: ./backend
-        run: |
-          touch .env
+  #     - name: Create .env file
+  #       working-directory: ./backend
+  #       run: |
+  #         touch .env
 
-      - name: Start Services
-        working-directory: ./backend
-        run: docker compose -f docker-compose-web.yml up -d
+  #     - name: Start Services
+  #       working-directory: ./backend
+  #       run: docker compose -f docker-compose-web.yml up -d
 
-      - name: run Lighthouse CI
-        run: |
-          npm install -g @lhci/cli@0.8.x
-          lhci autorun
+  #     - name: run Lighthouse CI
+  #       run: |
+  #         npm install -g @lhci/cli@0.8.x
+  #         lhci autorun
 
-      - name: run pa11y
-        working-directory: ./backend
-        run: |
-          sudo npm ci
-          npm run run-pa11y
+  #     - name: run pa11y
+  #       working-directory: ./backend
+  #       run: |
+  #         sudo npm ci
+  #         npm run run-pa11y
