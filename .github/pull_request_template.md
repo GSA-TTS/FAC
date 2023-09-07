@@ -12,7 +12,7 @@
 
 ## PR checklist: reviewers
 
-- [ ]   Pull the branch to your local environment and run `make docker clean; make docker-first-run && docker compose up`; then run `docker compose exec web /bin/bash -c "python manage.py test"`
+- [ ]   Pull the branch to your local environment and run `make docker-clean; make docker-first-run && docker compose up`; then run `docker compose exec web /bin/bash -c "python manage.py test"`
 - [ ]   Manually test out the changes locally, or check this box to verify that it wasn’t applicable in this case.
 - [ ]   Check that the PR has appropriate tests. Look out for changes in HTML/JS/JSON Schema logic that may need to be captured in Python tests even though the logic isn’t in Python.
 - [ ]   Verify that no Git surgery is necessary at any point (such as during a merge party), or, if it was, repeat the testing after it’s finished.
