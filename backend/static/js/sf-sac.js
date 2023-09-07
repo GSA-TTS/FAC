@@ -1,6 +1,7 @@
 import { checkValidity } from './validate';
 
 const FORM = document.forms[0];
+const countrySelect = document.querySelector('#auditor_country');
 
 function setFormDisabled(shouldDisable) {
   const continueBtn = document.getElementById('continue');
@@ -75,12 +76,46 @@ function attachEventHandlers() {
       }
     });
   });
+  countrySelect.addEventListener('change', () => {
+    setupAddress();
+  });
 
   window.addEventListener('scroll', highlightActiveNavSection);
 }
-
+const foreignFields = document.querySelectorAll('[name="foreign_address"]');
+const domesticFields = document.querySelectorAll('[name="domestic_address"]');
+function setupAddress() {
+  if (countrySelect.value == 'USA') {
+    foreignFields.forEach((input) => {
+      input.setAttribute('hidden', true);
+      input.querySelectorAll('textarea').forEach((element) => {
+        element.removeAttribute('required');
+      });
+    });
+    domesticFields.forEach((input) => {
+      input.removeAttribute('hidden');
+      input.querySelectorAll('input').forEach((element) => {
+        element.setAttribute('required', true);
+      });
+    });
+  } else {
+    foreignFields.forEach((input) => {
+      input.removeAttribute('hidden');
+      input.querySelectorAll('textarea').forEach((element) => {
+        element.setAttribute('required', true);
+      });
+    });
+    domesticFields.forEach((input) => {
+      input.setAttribute('hidden', true);
+      input.querySelectorAll('input').forEach((element) => {
+        element.removeAttribute('required');
+      });
+    });
+  }
+}
 function init() {
   attachEventHandlers();
+  setupAddress();
 }
 
 init();

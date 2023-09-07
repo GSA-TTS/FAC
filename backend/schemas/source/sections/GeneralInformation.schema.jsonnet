@@ -3,14 +3,8 @@ local Func = import '../base/Functions.libsonnet';
 local Types = Base.Types;
 
 {
-  '$defs': {
-    AuditPeriod: Base.Enum.AuditPeriod,
-    UEI: Base.Compound.UniqueEntityIdentifier,
-    UserProvidedOrganizationType: Base.Enum.OrganizationType,
-    Zip: Base.Compound.Zip,
-  },
   '$id': 'http://example.org/generalinformation',
-  '$schema': 'http://json-schema.org/draft/2019-09/schema#',
+  '$schema': Base.Const.SCHEMA_VERSION,
   additionalProperties: false,
   metamodel_version: '1.7.0',
   properties: {
@@ -54,13 +48,18 @@ local Types = Base.Types;
     auditor_address_line_1: Types.string {
       maxLength: 100,
     },
-    auditor_zip: Base.Compound.Zip,
-    auditor_country: Types.string {
-      maxLength: 100,
+    auditor_zip: {
+      anyOf: [
+        Base.Compound.Zip,
+        Base.Compound.EmptyString,
+      ],
     },
+    auditor_country: Base.Enum.CountryType,
     auditor_contact_name: Types.string {
       maxLength: 100,
     },
+    auditor_international_address: Types.string,
+
     auditor_email: Types.string {
       format: 'email',
     },
@@ -90,41 +89,75 @@ local Types = Base.Types;
     secondary_auditors_exist: Types.boolean,
 
   },
-  anyOf: [
+  allOf: [
+    {
+      anyOf: [
+        {
+          'if': {
+            properties: {
+              audit_period_covered: {
+                const: 'annual',
+              },
+            },
+          },
+          'then': {
+            audit_period_other_months: Base.Enum.EmptyString_Null,
+          },
+        },
+        {
+          'if': {
+            properties: {
+              audit_period_covered: {
+                const: 'biennial',
+              },
+            },
+          },
+          'then': {
+            audit_period_other_months: Base.Enum.EmptyString_Null,
+          },
+        },
+        {
+          'if': {
+            properties: {
+              audit_period_covered: {
+                const: 'other',
+              },
+            },
+          },
+          'then': {
+            audit_period_other_months: Base.Compound.MonthsOther,
+          },
+        },
+      ],
+    },
     {
       'if': {
         properties: {
-          audit_period_covered: {
-            const: 'annual',
+          auditor_country: {
+            const: 'USA',
           },
         },
       },
       'then': {
-        audit_period_other_months: Base.Enum.EmptyString_Null,
+        properties: {
+          auditor_zip: Base.Compound.Zip,
+        },
       },
     },
     {
       'if': {
         properties: {
-          audit_period_covered: {
-            const: 'biennial',
+          auditor_country: {
+            not: {
+              const: 'USA',
+            },
           },
         },
       },
       'then': {
-        audit_period_other_months: Base.Enum.EmptyString_Null,
-      },
-    },
-    {
-      'if': {
         properties: {
-          audit_period_covered: {
-            const: 'other',
-          },
+          auditor_zip: Base.Compound.EmptyString,
         },
-      },
-      'then': {
-        audit_period_other_months: Base.Compound.MonthsOther,
       },
     },
   ],

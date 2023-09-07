@@ -1,106 +1,98 @@
 {
-   "$defs": {
-      "AuditPeriod": {
-         "description": "Period type of audit being submitted",
-         "enum": [
-            "annual",
-            "biennial",
-            "other"
-         ],
-         "title": "AuditPeriod",
-         "type": "string"
-      },
-      "UEI": {
-         "allOf": [
-            {
-               "maxLength": 12,
-               "minLength": 12
-            },
-            {
-               "pattern": "^[A-HJ-NP-Z1-9][A-HJ-NP-Z0-9]+$"
-            },
-            {
-               "pattern": "^(?![A-HJ-NP-Z1-9]+[A-HJ-NP-Z0-9]*?[0-9]{9})[A-HJ-NP-Z0-9]*$"
-            },
-            {
-               "pattern": "^(?![0-9]{9})"
-            }
-         ],
-         "type": "string"
-      },
-      "UserProvidedOrganizationType": {
-         "description": "Org type",
-         "enum": [
-            "state",
-            "local",
-            "tribal",
-            "higher-ed",
-            "non-profit",
-            "unknown",
-            "none"
-         ],
-         "title": "OrganizationType",
-         "type": "string"
-      },
-      "Zip": {
-         "pattern": "^[0-9]{5}(?:[0-9]{4})?$",
-         "type": "string"
-      }
-   },
    "$id": "http://example.org/generalinformation",
-   "$schema": "http://json-schema.org/draft/2019-09/schema#",
+   "$schema": "https://json-schema.org/draft/2019-09/schema#",
    "additionalProperties": false,
-   "anyOf": [
+   "allOf": [
+      {
+         "anyOf": [
+            {
+               "if": {
+                  "properties": {
+                     "audit_period_covered": {
+                        "const": "annual"
+                     }
+                  }
+               },
+               "then": {
+                  "audit_period_other_months": {
+                     "description": "Empty string or null",
+                     "enum": [
+                        "",
+                        "null"
+                     ],
+                     "title": "EmptyString_Null"
+                  }
+               }
+            },
+            {
+               "if": {
+                  "properties": {
+                     "audit_period_covered": {
+                        "const": "biennial"
+                     }
+                  }
+               },
+               "then": {
+                  "audit_period_other_months": {
+                     "description": "Empty string or null",
+                     "enum": [
+                        "",
+                        "null"
+                     ],
+                     "title": "EmptyString_Null"
+                  }
+               }
+            },
+            {
+               "if": {
+                  "properties": {
+                     "audit_period_covered": {
+                        "const": "other"
+                     }
+                  }
+               },
+               "then": {
+                  "audit_period_other_months": {
+                     "pattern": "^0[0-9]|1[0-8]$",
+                     "type": "string"
+                  }
+               }
+            }
+         ]
+      },
       {
          "if": {
             "properties": {
-               "audit_period_covered": {
-                  "const": "annual"
+               "auditor_country": {
+                  "const": "USA"
                }
             }
          },
          "then": {
-            "audit_period_other_months": {
-               "description": "Empty string or null",
-               "enum": [
-                  "",
-                  "null"
-               ],
-               "title": "EmptyString_Null"
+            "properties": {
+               "auditor_zip": {
+                  "pattern": "^[0-9]{5}(?:[0-9]{4})?$",
+                  "type": "string"
+               }
             }
          }
       },
       {
          "if": {
             "properties": {
-               "audit_period_covered": {
-                  "const": "biennial"
+               "auditor_country": {
+                  "not": {
+                     "const": "USA"
+                  }
                }
             }
          },
          "then": {
-            "audit_period_other_months": {
-               "description": "Empty string or null",
-               "enum": [
-                  "",
-                  "null"
-               ],
-               "title": "EmptyString_Null"
-            }
-         }
-      },
-      {
-         "if": {
             "properties": {
-               "audit_period_covered": {
-                  "const": "other"
+               "auditor_zip": {
+                  "const": "",
+                  "type": "string"
                }
-            }
-         },
-         "then": {
-            "audit_period_other_months": {
-               "pattern": "^0[0-9]|1[0-8]$",
-               "type": "string"
             }
          }
       }
@@ -167,6 +159,7 @@
          "type": "string"
       },
       "auditee_state": {
+         "description": "US States 2-letter abbreviations",
          "enum": [
             "AL",
             "AK",
@@ -228,8 +221,7 @@
             "WI",
             "WY"
          ],
-         "title": "State",
-         "type": "string"
+         "title": "State"
       },
       "auditee_uei": {
          "allOf": [
@@ -270,7 +262,12 @@
          "type": "string"
       },
       "auditor_country": {
-         "maxLength": 100,
+         "description": "USA or International",
+         "enum": [
+            "USA",
+            "non-USA"
+         ],
+         "title": "CountryType",
          "type": "string"
       },
       "auditor_ein": {
@@ -290,11 +287,15 @@
       "auditor_foreign_address": {
          "type": "string"
       },
+      "auditor_international_address": {
+         "type": "string"
+      },
       "auditor_phone": {
          "pattern": "^^(\\+0?1\\s)?\\(?\\d{3}\\)?[\\s.-]?\\d{3}[\\s.-]?\\d{4}$",
          "type": "string"
       },
       "auditor_state": {
+         "description": "US States 2-letter abbreviations",
          "enum": [
             "AL",
             "AK",
@@ -356,12 +357,19 @@
             "WI",
             "WY"
          ],
-         "title": "State",
-         "type": "string"
+         "title": "State"
       },
       "auditor_zip": {
-         "pattern": "^[0-9]{5}(?:[0-9]{4})?$",
-         "type": "string"
+         "anyOf": [
+            {
+               "pattern": "^[0-9]{5}(?:[0-9]{4})?$",
+               "type": "string"
+            },
+            {
+               "const": "",
+               "type": "string"
+            }
+         ]
       },
       "ein": {
          "pattern": "^[0-9]{9}$",

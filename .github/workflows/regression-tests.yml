@@ -39,7 +39,7 @@ jobs:
       # DEBUG: cypress:*
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Create .env file
         run: touch .env

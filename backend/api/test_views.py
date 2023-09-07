@@ -87,6 +87,9 @@ SAMPLE_BASE_SAC_DATA = {
         "auditor_country": "USA",
         "auditor_address_line_1": "100 Percent Respectable St.",
         "auditor_city": "Podunk",
+        "auditor_international_address": """
+            55, Rue du Faubourg Saint-Honoré, 75008 Paris, France
+        """,
         "auditor_state": "NY",
         "auditor_zip": "14886",
         "auditor_contact_name": "Qualified Human Accountant",

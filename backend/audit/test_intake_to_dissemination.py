@@ -79,7 +79,7 @@ class IntakeToDisseminationTests(TestCase):
             "auditor_email": fake.email(),
             "auditor_phone": fake.basic_phone_number(),
             "auditor_state": fake.state_abbr(),
-            "auditor_country": "United States",
+            "auditor_country": "USA",
             "auditor_firm_name": fake.company(),
             "audit_period_covered": "annual",
             "audit_period_other_months": fake.random_int(min=1, max=12),
@@ -256,7 +256,6 @@ class IntakeToDisseminationTests(TestCase):
                             include_territories=False
                         ),
                         "secondary_auditor_address_zipcode": fake.postalcode(),
-                        # "secondary_auditor_country": fake.country(),
                         "secondary_auditor_ein": fake.ssn().replace("-", ""),
                         "secondary_auditor_name": fake.company(),
                         "secondary_auditor_contact_name": fake.name(),
