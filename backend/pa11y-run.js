@@ -1,9 +1,4 @@
-const { spawn } = require('node:child_process');
-
 const pa11y = require('pa11y');
-const fs = require('fs');
-const glob = require('glob');
-const path = require('path');
 
 const urls = [
   'http://localhost:8000/',

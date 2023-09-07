@@ -88,5 +88,5 @@ jobs:
       - name: run pa11y
         working-directory: ./backend
         run: |
-          npm ci
+          npm install -g pa11y
           npm run run-pa11y
