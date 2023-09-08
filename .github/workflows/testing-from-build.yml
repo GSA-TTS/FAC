@@ -18,22 +18,27 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-     - uses: actions/setup-node@v3
+
+      - uses: actions/setup-node@v3
         with:
           node-version: 18
-     - name: Create .env
+
+      - name: Create .env
         working-directory: ./backend
         run: |
           touch .env
           npm ci
-     - name: Start services
+
+      - name: Start services
         working-directory: ./backend
         run: docker compose -f docker-compose.yml up -d
-     - name: run Lighthouse CI
+
+      - name: run Lighthouse CI
         run: |
           npm install -g @lhci/cli@0.8.x
           lhci autorun
-     - name: run pa11y
+
+      - name: run pa11y
         run: |
           npm i -g pa11y-ci
           pa11y-ci
