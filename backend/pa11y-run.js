@@ -20,6 +20,8 @@ const config = {
     error: console.error,
     info: console.info
   },
+  concurrency: 1,
+  timeout: 180000,
 };
 
 scanPages(urls);
