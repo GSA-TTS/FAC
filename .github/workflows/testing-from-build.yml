@@ -37,5 +37,4 @@ jobs:
         working-directory: ./backend
         run: |
           sudo npm ci
-          chrome --version
           npm run run-pa11y
