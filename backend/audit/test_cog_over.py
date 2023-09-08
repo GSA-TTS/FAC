@@ -4,6 +4,7 @@ from model_bakery import baker
 from faker import Faker
 
 from .models import SingleAuditChecklist, CognizantBaseline, User
+from dissemination.models import CensusGen22, cognizant_agencies_2021_2025
 
 from audit.cog_over import cog_over
 
@@ -172,6 +173,25 @@ class CogOverTests(TestCase):
             }
         }
 
+    @staticmethod
+    def _fake_CensusGen22():
+        fake = Faker()
+        return {
+            "audityear" : 2022,
+            "dbkey": 20576,
+            "ein": fake.ssn().replace("-", ""),
+            "uei": "ZQGGHJH74DW7",
+        }
+
+    @staticmethod
+    def _fake_cognizant_agencies_2021_2025():
+        fake = Faker()
+        return {
+            "ein": fake.ssn().replace("-", ""),
+            "dbkey": 20576,
+            "cogagency": 87,
+        }
+
     def test_cog_over_for_gt_cog_limit_gt_da_threshold_factor_cog_2019(self):
         sac = SingleAuditChecklist.objects.create(
             submitted_by=self.user,
@@ -188,6 +208,21 @@ class CogOverTests(TestCase):
             ein=self.sac.general_information["ein"],
             cognizant_agency=fake_cog_baseline["cognizant_agency"],
         ).save()
+
+        fake_CensusGen22 = self._fake_CensusGen22()
+        self.CensusGen22 = CensusGen22.objects.create(
+            dbkey=fake_CensusGen22["dbkey"],
+            ein=fake_CensusGen22["ein"],
+            uei=fake_CensusGen22["uei"],
+        ).save()
+
+        fake_cognizant_agencies_2021_2025 = self._fake_cognizant_agencies_2021_2025()
+        self.cognizant_agencies_2021_2025 = cognizant_agencies_2021_2025.objects.create(
+            dbkey=fake_cognizant_agencies_2021_2025["dbkey"],
+            ein=fake_cognizant_agencies_2021_2025["ein"],
+            cogagency=fake_cognizant_agencies_2021_2025["cogagency"],
+        ).save()
+
         cog_agency = None
         over_agency = None
         cog_agency, over_agency = cog_over(self.sac)
@@ -210,6 +245,21 @@ class CogOverTests(TestCase):
             ein=self.sac.general_information["ein"],
             cognizant_agency=fake_cog_baseline["cognizant_agency"],
         ).save()
+
+        fake_CensusGen22 = self._fake_CensusGen22()
+        self.CensusGen22 = CensusGen22.objects.create(
+            dbkey=fake_CensusGen22["dbkey"],
+            ein=fake_CensusGen22["ein"],
+            uei=fake_CensusGen22["uei"],
+        ).save()
+
+        fake_cognizant_agencies_2021_2025 = self._fake_cognizant_agencies_2021_2025()
+        self.cognizant_agencies_2021_2025 = cognizant_agencies_2021_2025.objects.create(
+            dbkey=fake_cognizant_agencies_2021_2025["dbkey"],
+            ein=fake_cognizant_agencies_2021_2025["ein"],
+            cogagency=fake_cognizant_agencies_2021_2025["cogagency"],
+        ).save()
+
         cog_agency = None
         over_agency = None
         cog_agency, over_agency = cog_over(self.sac)
@@ -232,6 +282,21 @@ class CogOverTests(TestCase):
             ein=self.sac.general_information["ein"],
             cognizant_agency=fake_cog_baseline["cognizant_agency"],
         ).save()
+
+        fake_CensusGen22 = self._fake_CensusGen22()
+        self.CensusGen22 = CensusGen22.objects.create(
+            dbkey=fake_CensusGen22["dbkey"],
+            ein=fake_CensusGen22["ein"],
+            uei=fake_CensusGen22["uei"],
+        ).save()
+
+        fake_cognizant_agencies_2021_2025 = self._fake_cognizant_agencies_2021_2025()
+        self.cognizant_agencies_2021_2025 = cognizant_agencies_2021_2025.objects.create(
+            dbkey=fake_cognizant_agencies_2021_2025["dbkey"],
+            ein=fake_cognizant_agencies_2021_2025["ein"],
+            cogagency=fake_cognizant_agencies_2021_2025["cogagency"],
+        ).save()
+
         cog_agency = None
         over_agency = None
         cog_agency, over_agency = cog_over(self.sac)
@@ -254,6 +319,21 @@ class CogOverTests(TestCase):
             ein=fake_cog_baseline["ein"],
             cognizant_agency=fake_cog_baseline["cognizant_agency"],
         ).save()
+
+        fake_CensusGen22 = self._fake_CensusGen22()
+        self.CensusGen22 = CensusGen22.objects.create(
+            dbkey=fake_CensusGen22["dbkey"],
+            ein=fake_CensusGen22["ein"],
+            uei=fake_CensusGen22["uei"],
+        ).save()
+
+        fake_cognizant_agencies_2021_2025 = self._fake_cognizant_agencies_2021_2025()
+        self.cognizant_agencies_2021_2025 = cognizant_agencies_2021_2025.objects.create(
+            dbkey=fake_cognizant_agencies_2021_2025["dbkey"],
+            ein=fake_cognizant_agencies_2021_2025["ein"],
+            cogagency=fake_cognizant_agencies_2021_2025["cogagency"],
+        ).save()
+
         cog_agency = None
         over_agency = None
         cog_agency, over_agency = cog_over(self.sac)
