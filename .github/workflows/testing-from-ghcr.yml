@@ -79,6 +79,6 @@ jobs:
       - name: Run Lighthouse CI and pa11y
         working-directory: ./backend
         run: |
-          npm ci
+          sudo npm ci
           npm run test:a11y:lighthouse
           npm run test:a11y:pa11y
