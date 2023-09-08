@@ -20,6 +20,9 @@ const config = {
     error: console.error,
     info: console.info
   },
+  chromeLaunchConfig: {
+    executablePath: "/usr/bin/google-chrome"
+  }
 };
 
 scanPages(urls);
