@@ -9,3 +9,8 @@ variable "cf_password" {
   sensitive   = true
 }
 
+variable "populate_creds_locally" {
+  type        = bool
+  description = "whether to create files for working with the environment locally; specify true during local development"
+  default     = false
+}

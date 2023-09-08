@@ -38,7 +38,7 @@ class CogOverTests(TestCase):
             "auditor_email": fake.email(),
             "auditor_phone": fake.basic_phone_number(),
             "auditor_state": fake.state_abbr(),
-            "auditor_country": "United States",
+            "auditor_country": "non-USA",
             "auditor_firm_name": fake.company(),
             "audit_period_covered": "annual",
             "auditee_contact_name": fake.name(),
