@@ -32,4 +32,6 @@ jobs:
         run: |
           sudo npm ci
           npm run test:a11y:lighthouse
+          node --version
+          npm --version
           npm run test:a11y:pa11y
