@@ -15,6 +15,11 @@ const config = {
   standard: 'WCAG2AA',
   // FIXME: temporarily ignoring contrast issues until pa11y fixes https://github.com/pa11y/pa11y/issues/633 or we find a workaround
   ignore: ['color-contrast'],
+  log: {
+    debug: console.log,
+    error: console.error,
+    info: console.info
+  },
 };
 
 scanPages(urls);
