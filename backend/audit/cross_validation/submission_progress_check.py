@@ -1,5 +1,5 @@
 from audit.cross_validation.naming import NC, find_section_by_name
-from audit.validators import validate_general_information_json
+from audit.validators import validate_general_information_complete_json
 
 
 def submission_progress_check(sac, sar=None, crossval=True):
@@ -129,8 +129,9 @@ def general_information_progress_check(progress, general_info):
     "general_information" as the key and the progress as the value.
     """
     try:
-        is_general_info_complete = bool(validate_general_information_json(general_info))
-    except Exception:
+        is_general_info_complete = bool(validate_general_information_complete_json(general_info))
+    except Exception as err:
+        print("General information form not complete based on conditions:", err)
         is_general_info_complete = False
 
     if is_general_info_complete:
