@@ -15,17 +15,14 @@ class FindingText(models.Model):
     )
     finding_ref_number = models.TextField(
         "Finding Reference Number - FK",
-        null=True,
         help_text=docs.finding_ref_nums_findingstext,
     )
     contains_chart_or_table = models.BooleanField(
         "Indicates whether or not the text contained charts or tables that could not be entered due to formatting restrictions",
-        null=True,
         help_text=docs.charts_tables_findingstext,
     )
     finding_text = models.TextField(
         "Content of the finding text",
-        null=True,
         help_text=docs.text_findingstext,
     )
 
