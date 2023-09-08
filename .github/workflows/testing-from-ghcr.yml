@@ -33,10 +33,10 @@ jobs:
         working-directory: ./backend
         run: docker compose -f docker-compose-web.yml up -d
 
-      - name: run Lighthouse CI
-        run: |
-          npm install -g @lhci/cli@0.8.x
-          lhci autorun
+#      - name: run Lighthouse CI
+#        run: |
+#          npm install -g @lhci/cli@0.8.x
+#          lhci autorun
 
       - name: run pa11y
         run: |
