@@ -1,7 +1,7 @@
 {
   reference_number: {
     instructions: [
-      'Enter the audit finding reference number as listed in Workbook 2: Federal Awards Findings.',
+      'Enter the audit finding reference number as listed in Workbook 3: Federal Awards Audit Findings.',
     ],
   },
   planned_action: {
