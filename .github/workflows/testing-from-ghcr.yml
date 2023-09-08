@@ -78,7 +78,6 @@ jobs:
       - name: Run Lighthouse CI and pa11y
         working-directory: ./backend
         run: |
-          cd ./backend
           touch .env
           npm ci
           npm run test:a11y:lighthouse
