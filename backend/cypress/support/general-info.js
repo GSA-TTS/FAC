@@ -1,6 +1,6 @@
 // reusable code for filling out a valid general info form
 
-export function testValidGeneralInfo() {
+export function testValidGeneralInfo(hasAdditionalEINs) {
 	//auditee info
 	cy.get('label[for=single-audit]').click();
 	cy.get('label[for=audit-period-annual]').click();
@@ -19,7 +19,7 @@ export function testValidGeneralInfo() {
 	cy.get('label[for=multiple-ueis-yes]').click();
 	cy.get('#ein').type('546000173');
 	cy.get('label[for=ein_not_an_ssn_attestation]').click();
-	cy.get('label[for=multiple-eins-yes]').click();
+	cy.get(`label[for=multiple-eins-${hasAdditionalEINs ? 'yes' : 'no'}]`).click();
 	cy.get('#auditee_contact_name').type('John Doe');
 	cy.get('#auditee_contact_title').type('Keymaster');
 	cy.get('#auditee_phone').type('5558675309');

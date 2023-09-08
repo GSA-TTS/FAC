@@ -14,7 +14,7 @@ function testWorkbookUpload(interceptUrl, uploadSelector, filename, will_interce
     }).as('uploadSuccess');
   cy.get(uploadSelector).attachFile(filename);
   // Upload url (POST /audit/excel/workbookname) returns a redirect to "/" on successful upload. So, 302.
-  cy.wait('@uploadSuccess').its('response.statusCode').should('eq', 302);  
+  cy.wait('@uploadSuccess').its('response.statusCode').should('eq', 302);
   cy.get('#info_box')
     .should(
       'have.text',
@@ -25,74 +25,74 @@ function testWorkbookUpload(interceptUrl, uploadSelector, filename, will_interce
   cy.url().should('match', /\/audit\/submission-progress\/[0-9A-Z]{17}/);
 }
 
-export function testWorkbookFederalAwards(will_intercept = true) {
+export function testWorkbookFederalAwards(workbookDirName, will_intercept = true) {
   testWorkbookUpload(
     '/audit/excel/federal-awards-expended/*',
     '#file-input-federal-awards-xlsx',
-    'test_workbooks/federal-awards-workbook.xlsx',
+    `test_workbooks/${workbookDirName}/federal-awards-workbook.xlsx`,
     will_intercept
   );
 }
 
-export function testWorkbookNotesToSEFA(will_intercept = true) {
+export function testWorkbookNotesToSEFA(workbookDirName, will_intercept = true) {
   testWorkbookUpload(
     '/audit/excel/notes-to-sefa/*',
     '#file-input-notes-to-sefa-xlsx',
-    'test_workbooks/notes-to-sefa-workbook.xlsx',
+    `test_workbooks/${workbookDirName}/notes-to-sefa-workbook.xlsx`,
     will_intercept
   );
 }
 
-export function testWorkbookFindingsUniformGuidance(will_intercept = true) {
+export function testWorkbookFindingsUniformGuidance(workbookDirName, will_intercept = true) {
   testWorkbookUpload(
     '/audit/excel/findings-uniform-guidance/',
     '#file-input-audit-findings-xlsx',
-    'test_workbooks/federal-awards-audit-findings-workbook.xlsx',
+    `test_workbooks/${workbookDirName}/federal-awards-audit-findings-workbook.xlsx`,
     will_intercept
   )
 }
 
-export function testWorkbookFindingsText(will_intercept = true) {
+export function testWorkbookFindingsText(workbookDirName, will_intercept = true) {
   testWorkbookUpload(
     '/audit/excel/findings-text/',
     '#file-input-audit-findings-text-xlsx',
-    'test_workbooks/audit-findings-text-workbook.xlsx',
+    `test_workbooks/${workbookDirName}/audit-findings-text-workbook.xlsx`,
     will_intercept
   )
 }
 
-export function testWorkbookCorrectiveActionPlan(will_intercept = true) {
+export function testWorkbookCorrectiveActionPlan(workbookDirName, will_intercept = true) {
   testWorkbookUpload(
     '/audit/excel/corrective-action-plan/',
     '#file-input-cap-xlsx',
-    'test_workbooks/corrective-action-plan-workbook.xlsx',
+    `test_workbooks/${workbookDirName}/corrective-action-plan-workbook.xlsx`,
     will_intercept
   )
 }
 
-export function testWorkbookAdditionalUEIs(will_intercept = true) {
+export function testWorkbookAdditionalUEIs(workbookDirName, will_intercept = true) {
   testWorkbookUpload(
     '/audit/excel/additional-ueis/',
     '#file-input-additional-ueis-xlsx',
-    'test_workbooks/additional-ueis-workbook.xlsx',
+    `test_workbooks/${workbookDirName}/additional-ueis-workbook.xlsx`,
     will_intercept
   )
 }
 
-export function testWorkbookSecondaryAuditors(will_intercept = true) {
+export function testWorkbookSecondaryAuditors(workbookDirName, will_intercept = true) {
   testWorkbookUpload(
     '/audit/excel/secondary-auditors/',
     '#file-input-secondary-auditors-xlsx',
-    'test_workbooks/secondary-auditors-workbook.xlsx',
+    `test_workbooks/${workbookDirName}/secondary-auditors-workbook.xlsx`,
     will_intercept
   )
 }
 
-export function testWorkbookAdditionalEINs(will_intercept = true) {
+export function testWorkbookAdditionalEINs(workbookDirName, will_intercept = true) {
   testWorkbookUpload(
     '/audit/excel/additional-eins/',
     '#file-input-additional-eins-xlsx',
-    'test_workbooks/additional-eins-workbook.xlsx',
+    `test_workbooks/${workbookDirName}/additional-eins-workbook.xlsx`,
     will_intercept
   )
 }

@@ -24,106 +24,116 @@ const LOGIN_TEST_EMAIL_AUDITEE = Cypress.env('LOGIN_TEST_EMAIL_AUDITEE');
 const LOGIN_TEST_PASSWORD_AUDITEE = Cypress.env('LOGIN_TEST_PASSWORD_AUDITEE');
 const LOGIN_TEST_OTP_SECRET_AUDITEE = Cypress.env('LOGIN_TEST_OTP_SECRET_AUDITEE');
 
-describe('Full audit submission', () => {
-  before(() => {
-    cy.visit('/');
-  });
+function performSubmissionTest(workbookDirName, auditeeUEI, hasAdditionalEINs, processFindings) {
+  cy.visit('/');
+  cy.url().should('include', '/');
 
-  it('Completes a full submission', () => {
-    cy.url().should('include', '/');
+  // Logs in with Login.gov
+  testLoginGovLogin();
 
-    // Logs in with Login.gov'
-    testLoginGovLogin();
+  // Moves on to the eligibility screen
+  // check the terms and conditions link and click "Accept and start..."
+  //
+  // this click actually goes to the "terms and conditions" link which
+  // brings up a modal
+  cy.get('label[for=check-start-new-submission]').click();
+  cy.get('.usa-button').contains('Accept and start').click();
+  cy.url().should('match', /\/report_submission\/eligibility\/$/);
 
-    // Moves on to the eligibility screen
-    // check the terms and conditions link and click "Accept and start..."
-    //
-    // this click actually goes to the "terms and conditions" link which
-    // brings up a modal
-    cy.get('label[for=check-start-new-submission]').click();
-    cy.get('.usa-button').contains('Accept and start').click();
-    cy.url().should('match', /\/report_submission\/eligibility\/$/);
+  // Completes the eligibility screen
+  testValidEligibility();
 
-    // Completes the eligibility screen
-    testValidEligibility();
+  // Now the auditee info screen
+  testValidAuditeeInfo(auditeeUEI);
 
-    // Now the auditee info screen
-    testValidAuditeeInfo();
+  // Now the accessandsubmission screen
+  testValidAccess();
 
-    // Now the accessandsubmission screen
-    testValidAccess();
+  // Fill out the general info form
+  testValidGeneralInfo(hasAdditionalEINs);
 
-    // Fill out the general info form
-    testValidGeneralInfo();
+  // Fill out the audit report package form, and upload its associated PDF
+  // testAuditReportPackage();
 
-    // Fill out the audit report package form, and upload its associated PDF
-    // testAuditReportPackage();
+  // Upload all the workbooks. Don't intercept the uploads, which means a file will make it into the DB.
+  cy.get(".usa-link").contains("Federal Awards").click();
+  testWorkbookFederalAwards(workbookDirName, false);
 
-    // Upload all the workbooks. Don't intercept the uploads, which means a file will make it into the DB.
-    cy.get(".usa-link").contains("Federal Awards").click();
-    testWorkbookFederalAwards(false);
+  cy.get(".usa-link").contains("Notes to SEFA").click();
+  testWorkbookNotesToSEFA(workbookDirName, false);
 
-    cy.get(".usa-link").contains("Notes to SEFA").click();
-    testWorkbookNotesToSEFA(false);
+  cy.get(".usa-link").contains("Audit report PDF").click();
+  testPdfAuditReport(workbookDirName, false);
 
-    cy.get(".usa-link").contains("Audit report PDF").click();
-    testPdfAuditReport(false);
-
+  if (processFindings) {
     cy.get(".usa-link").contains("Federal Awards Audit Findings").click();
-    testWorkbookFindingsUniformGuidance(false);
+    testWorkbookFindingsUniformGuidance(workbookDirName, false);
 
     cy.get(".usa-link").contains("Federal Awards Audit Findings Text").click();
-    testWorkbookFindingsText(false);
+    testWorkbookFindingsText(workbookDirName, false);
 
     cy.get(".usa-link").contains("Corrective Action Plan").click();
-    testWorkbookCorrectiveActionPlan(false);
+    testWorkbookCorrectiveActionPlan(workbookDirName, false);
+  }
 
-    cy.get(".usa-link").contains("Additional UEIs").click();
-    testWorkbookAdditionalUEIs(false);
+  cy.get(".usa-link").contains("Additional UEIs").click();
+  testWorkbookAdditionalUEIs(workbookDirName, false);
 
-    cy.get(".usa-link").contains("Secondary Auditors").click();
-    testWorkbookSecondaryAuditors(false);
-    
-    
+  cy.get(".usa-link").contains("Secondary Auditors").click();
+  testWorkbookSecondaryAuditors(workbookDirName, false);
+
+  if (hasAdditionalEINs) {
     cy.get(".usa-link").contains("Additional EINs").click();
-    testWorkbookAdditionalEINs(false);
-    
-    // Complete the audit information form
-    cy.get(".usa-link").contains("Audit Information form").click();
-    testAuditInformationForm();
+    testWorkbookAdditionalEINs(workbookDirName, false);
+  }
 
-    cy.get(".usa-link").contains("Pre-submission validation").click();
-    testCrossValidation();
+  // Complete the audit information form
+  cy.get(".usa-link").contains("Audit Information form").click();
+  testAuditInformationForm();
 
-    // Auditor certification
-    cy.get(".usa-link").contains("Auditor Certification").click();
-    testAuditorCertification();
+  cy.get(".usa-link").contains("Pre-submission validation").click();
+  testCrossValidation();
 
-    // Auditee certification
-    cy.url().then(url => {
-      // Grab the report ID from the URL
-      const reportId = url.split('/').pop();
+  // Auditor certification
+  cy.get(".usa-link").contains("Auditor Certification").click();
+  testAuditorCertification();
 
-      testLogoutGov();
+  // Auditee certification
+  cy.url().then(url => {
+    // Grab the report ID from the URL
+    const reportId = url.split('/').pop();
 
-      // Login as Auditee
-      testLoginGovLogin(
-        LOGIN_TEST_EMAIL_AUDITEE,
-        LOGIN_TEST_PASSWORD_AUDITEE,
-        LOGIN_TEST_OTP_SECRET_AUDITEE
-      );
+    testLogoutGov();
 
-      cy.visit(`/audit/submission-progress/${reportId}`);
+    // Login as Auditee
+    testLoginGovLogin(
+      LOGIN_TEST_EMAIL_AUDITEE,
+      LOGIN_TEST_PASSWORD_AUDITEE,
+      LOGIN_TEST_OTP_SECRET_AUDITEE
+    );
 
-      cy.get(".usa-link").contains("Auditee Certification").click();
-      testAuditeeCertification();
-    })
+    cy.visit(`/audit/submission-progress/${reportId}`);
 
-    // Uncomment this block when ready to implement the certification steps.
-    /*
-    // Finally, submit for processing.
-    cy.get(".usa-link").contains("Submit to the FAC for processing").click();
-    // This will probably take you back to the homepage, where the audit is now oof status "submitted".
-    */
+    cy.get(".usa-link").contains("Auditee Certification").click();
+    testAuditeeCertification();
+  })
+
+  // Uncomment this block when ready to implement the certification steps.
+  /*
+  // Finally, submit for processing.
+  cy.get(".usa-link").contains("Submit to the FAC for processing").click();
+  // This will probably take you back to the homepage, where the audit is now oof status "submitted".
+  */
+
+  testLogoutGov();
+}
+
+describe('Full audit submission', () => {
+  it('Completes a full submission', () => {
+    cy.visit('/');
+    cy.url().should('include', '/');
+
+    performSubmissionTest('default', 'D7A4J33FUMJ1', true, true);
+    performSubmissionTest('17262', 'G9H6SUM59YC4', false, false);
   });
 });
