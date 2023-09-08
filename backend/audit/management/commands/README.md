@@ -49,6 +49,10 @@ Load data from CognizantBaseline.json following procedure above.
 
 Populate census_gen22 and census_cfda22 tables similar to the census_gen19 and census_cfda19 tables above.
 
+Obtain Cognizant_Agencies_2021_2025.csv from 'Federal Cognizant Agency For Audit List' in https://facdissem.census.gov/Main.aspx.
+
+Load Cognizant_Agencies_2021_2025.csv into cognizant_agencies_2021_2025 table in postgres.
+
 Test cog / over with 2022 data, run the following:
 ```bash
 fac make_cog_over_for_2022
