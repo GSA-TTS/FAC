@@ -177,7 +177,7 @@ class CogOverTests(TestCase):
     def _fake_CensusGen22_1():
         fake = Faker()
         return {
-            "audityear" : 2022,
+            "audityear": 2022,
             "dbkey": 20576,
             "ein": fake.ssn().replace("-", ""),
             "uei": "ZQGGHJH74DW7",
@@ -187,7 +187,7 @@ class CogOverTests(TestCase):
     def _fake_CensusGen22_2():
         fake = Faker()
         return {
-            "audityear" : 2022,
+            "audityear": 2022,
             "dbkey": 20577,
             "ein": fake.ssn().replace("-", ""),
             "uei": "ZQGGHJH74DW8",
@@ -197,7 +197,7 @@ class CogOverTests(TestCase):
     def _fake_CensusGen22_3():
         fake = Faker()
         return {
-            "audityear" : 2022,
+            "audityear": 2022,
             "dbkey": 20578,
             "ein": fake.ssn().replace("-", ""),
             "uei": "ZQGGHJH74DW9",
@@ -207,7 +207,7 @@ class CogOverTests(TestCase):
     def _fake_CensusGen22_4():
         fake = Faker()
         return {
-            "audityear" : 2022,
+            "audityear": 2022,
             "dbkey": 20579,
             "ein": fake.ssn().replace("-", ""),
             "uei": "ZQGGHJH74DW6",
