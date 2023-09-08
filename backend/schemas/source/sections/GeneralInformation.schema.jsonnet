@@ -36,8 +36,13 @@ local Types = Base.Types;
 
 
     auditor_phone: Base.Compound.UnitedStatesPhone,
-    auditor_state: Base.Enum.UnitedStatesStateAbbr {
-      title: 'State',
+    auditor_state: {
+      anyOf: [
+        Base.Enum.UnitedStatesStateAbbr {
+          title: 'State',
+        },
+        Base.Compound.EmptyString,
+      ],
     },
     auditor_city: Types.string {
       maxLength: 100,
@@ -141,6 +146,9 @@ local Types = Base.Types;
       'then': {
         properties: {
           auditor_zip: Base.Compound.Zip,
+          auditor_state: Base.Enum.UnitedStatesStateAbbr {
+            title: 'State',
+          },
         },
       },
     },
@@ -157,6 +165,7 @@ local Types = Base.Types;
       'then': {
         properties: {
           auditor_zip: Base.Compound.EmptyString,
+          auditor_state: Base.Compound.EmptyString,
         },
       },
     },
