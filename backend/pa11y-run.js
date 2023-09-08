@@ -20,20 +20,22 @@ const config = {
     error: console.error,
     info: console.info
   },
-  concurrency: 1,
-  timeout: 180000,
 };
 
 scanPages(urls);
 
 async function scanPages(pages) {
   try {
-    const results = await Promise.all(
-      urls.map((u) => {
-        return pa11y(u, config);
-      })
-    );
+    const pa11yRuns = async () => {
+      let a = [];
+      for(const u of urls) {
+        const res = await pa11y(u, config);
+        a.push(res);
+      }
+      return a;
+    }
     let totalIssues = 0;
+    const results = await pa11yRuns();
     results.forEach((r) => {
       if (r.issues.length > 0) {
         let issueCount = 0;
