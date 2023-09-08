@@ -1,9 +1,25 @@
+# Since we're not platform admins, we need to look for user details in the
+# context of our specific org.
+data "cloudfoundry_org" "org" {
+  name = local.org_name
+}
+
+# We need to include the meta deployer user in the set of users with the
+# SpaceDeveloper role so it can manage the deployer service and binding in
+# each space. We need to add it using the user ID rather than username in order
+# to ensure it has the expected permissions. See
+# https://github.com/cloudfoundry-community/terraform-provider-cloudfoundry/issues/436
+data "cloudfoundry_user" "meta_deployer" {
+  name   = var.cf_user
+  org_id = data.cloudfoundry_org.org.id
+}
+
 module "environments" {
   for_each               = local.spaces
   source                 = "./bootstrap-env"
   name                   = each.key
   org_name               = local.org_name
-  developers             = local.developers
+  developers             = concat(local.developers, [data.cloudfoundry_user.meta_deployer.id])
   managers               = local.managers
   reponame               = "GSA-TTS/FAC"
   allow_ssh              = lookup(each.value, "allow_ssh", true)

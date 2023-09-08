@@ -20,9 +20,8 @@ resource "cloudfoundry_space_asgs" "space_asgs" {
   running_asgs = values(data.cloudfoundry_asg.asgs)[*].id
 }
 
-# Commented out until we are properly addressing the TODO
-# resource "cloudfoundry_space_users" "space_permissions" {
-#   space      = cloudfoundry_space.space.id
-#   developers = var.developers # TODO: Include the space-deployer username from the service-key!
-#   managers   = var.managers
-# }
+resource "cloudfoundry_space_users" "space_permissions" {
+  space      = cloudfoundry_space.space.id
+  developers = var.developers
+  managers   = var.managers
+}
