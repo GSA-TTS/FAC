@@ -1,6 +1,7 @@
 from collections import defaultdict
 from audit.models import SingleAuditChecklist
-from .models import CognizantBaseline
+from .models import CognizantBaseline, CognizantAssignment
+from dissemination.models import General
 from dissemination.hist_models.census_2019 import CensusGen19, CensusCfda19
 from dissemination.hist_models.census_2022 import CensusGen22
 from django.db.models.functions import Cast
@@ -100,7 +101,7 @@ def lookup_baseline(ein, uei, dbkey):
     try:
         cognizant_agency = CognizantBaseline.objects.values_list(
             "cognizant_agency", flat=True
-        ).get((Q(ein=ein) & Q(dbkey=dbkey)) | Q(uei=uei))[:]
+        ).get(Q(is_active=True) & ((Q(ein=ein) & Q(dbkey=dbkey)) | Q(uei=uei)))[:]
     except (CognizantBaseline.DoesNotExist, CognizantBaseline.MultipleObjectsReturned):
         cognizant_agency = None
     return cognizant_agency
@@ -159,3 +160,40 @@ def prune_dict_to_max_values(dict):
             pruned_dict[key] = value
 
     return pruned_dict
+
+
+def propogate_cog_update(cog_assignment: CognizantAssignment):
+    """
+    Invoked after a row is inserted into CognizantAssignment
+    """
+    (sac, cognizant_agency) = (cog_assignment.sac, cog_assignment.cognizant_agency)
+    sac.cognizant_agency = cognizant_agency
+    sac.save()
+    print("sac saved")
+
+    (ein, uei) = (sac.auditee_uei, sac.ein)
+    cbs = CognizantBaseline.objects.filter(Q(ein=ein) | Q(uei=uei))
+    for cb in cbs:
+        cb.is_active = False
+        cb.save()
+    CognizantBaseline(ein=ein, uei=uei, cognizant_agency=cognizant_agency).save()
+    print("cb saved")
+
+    try:
+        gen = General.objects.get(report_id=sac.report_id)
+        gen.cognizant_agency = cognizant_agency
+        gen.save()
+        print("gen saved")
+    except General.DoesNotExist:
+        print("no gen in dissemination")
+
+
+def record_cog_assignment(sac: SingleAuditChecklist, cognizant_agency):
+    """
+    To be unvoked by app to persist the computed cog agency
+    """
+    CognizantAssignment(
+        sac=sac,
+        cognizant_agency=cognizant_agency,
+    ).save()
+    print("CognizantAssignment saved ")

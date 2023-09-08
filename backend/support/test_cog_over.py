@@ -7,9 +7,9 @@ from faker import Faker
 from django.db import connection
 
 from audit.models import SingleAuditChecklist
-from .models import CognizantBaseline
+from .models import CognizantBaseline, CognizantAssignment
 
-from .cog_over import cog_over
+from .cog_over import cog_over, record_cog_assignment
 
 # Note:  Fake data is generated for SingleAuditChecklist, CognizantBaseline.
 #        Using only the data fields that apply to cog / over assignment.
@@ -336,3 +336,19 @@ class CogOverTests(TestCase):
         cog_agency, over_agency = cog_over(sac)
         self.assertEqual(cog_agency, "17")
         self.assertEqual(over_agency, None)
+
+    def test_cog_assignment_with_uei_in_baseline_and_overris(self):
+        sac = self._fake_sac()
+        sac.general_information["auditee_uei"] = UEI_WITH_BASELINE
+        baker.make(
+            CognizantBaseline,
+            uei=UEI_WITH_BASELINE,
+            cognizant_agency="17",
+        )
+        cog_agency, over_agency = cog_over(sac)
+        self.assertEqual(cog_agency, "17")
+        self.assertEqual(over_agency, None)
+        print("Recording the outcome")
+        record_cog_assignment(sac, cog_agency)
+        cas = CognizantAssignment.objects.all()
+        self.assertEquals(1, len(cas))
