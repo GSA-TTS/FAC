@@ -182,7 +182,7 @@ class CogOverTests(TestCase):
     def _fake_CensusGen22_1():
         fake = Faker()
         return {
-            "index":1,
+            "index": 1,
             "audityear": 2022,
             "dbkey": 20576,
             "ein": fake.ssn().replace("-", ""),
@@ -193,7 +193,7 @@ class CogOverTests(TestCase):
     def _fake_CensusGen22_2():
         fake = Faker()
         return {
-            "index":2,
+            "index": 2,
             "audityear": 2022,
             "dbkey": 20577,
             "ein": fake.ssn().replace("-", ""),
@@ -204,7 +204,7 @@ class CogOverTests(TestCase):
     def _fake_CensusGen22_3():
         fake = Faker()
         return {
-            "index":3,
+            "index": 3,
             "audityear": 2022,
             "dbkey": 20578,
             "ein": fake.ssn().replace("-", ""),
@@ -215,7 +215,7 @@ class CogOverTests(TestCase):
     def _fake_CensusGen22_4():
         fake = Faker()
         return {
-            "index":4,
+            "index": 4,
             "audityear": 2022,
             "dbkey": 20579,
             "ein": fake.ssn().replace("-", ""),
@@ -226,7 +226,7 @@ class CogOverTests(TestCase):
     def _fake_cognizant_agencies_2021_2025_1():
         fake = Faker()
         return {
-            "index":1,
+            "index": 1,
             "ein": fake.ssn().replace("-", ""),
             "dbkey": 20576,
             "cogagency": 87,
@@ -236,7 +236,7 @@ class CogOverTests(TestCase):
     def _fake_cognizant_agencies_2021_2025_2():
         fake = Faker()
         return {
-            "index":2,
+            "index": 2,
             "ein": fake.ssn().replace("-", ""),
             "dbkey": 20577,
             "cogagency": 88,
@@ -246,7 +246,7 @@ class CogOverTests(TestCase):
     def _fake_cognizant_agencies_2021_2025_3():
         fake = Faker()
         return {
-            "index":3,
+            "index": 3,
             "ein": fake.ssn().replace("-", ""),
             "dbkey": 20578,
             "cogagency": 89,
@@ -256,7 +256,7 @@ class CogOverTests(TestCase):
     def _fake_cognizant_agencies_2021_2025_4():
         fake = Faker()
         return {
-            "index":4,
+            "index": 4,
             "ein": fake.ssn().replace("-", ""),
             "dbkey": 20579,
             "cogagency": 90,
