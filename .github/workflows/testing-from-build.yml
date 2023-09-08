@@ -37,4 +37,4 @@ jobs:
         working-directory: ./backend
         run: |
           sudo npm ci
-          npm run test:a11y:pa11y
+          npm run run-pa11y
