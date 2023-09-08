@@ -174,7 +174,7 @@ class CogOverTests(TestCase):
         }
 
     @staticmethod
-    def _fake_CensusGen22():
+    def _fake_CensusGen22_1():
         fake = Faker()
         return {
             "audityear" : 2022,
@@ -184,12 +184,69 @@ class CogOverTests(TestCase):
         }
 
     @staticmethod
-    def _fake_cognizant_agencies_2021_2025():
+    def _fake_CensusGen22_2():
+        fake = Faker()
+        return {
+            "audityear" : 2022,
+            "dbkey": 20577,
+            "ein": fake.ssn().replace("-", ""),
+            "uei": "ZQGGHJH74DW8",
+        }
+
+    @staticmethod
+    def _fake_CensusGen22_3():
+        fake = Faker()
+        return {
+            "audityear" : 2022,
+            "dbkey": 20578,
+            "ein": fake.ssn().replace("-", ""),
+            "uei": "ZQGGHJH74DW9",
+        }
+
+    @staticmethod
+    def _fake_CensusGen22_4():
+        fake = Faker()
+        return {
+            "audityear" : 2022,
+            "dbkey": 20579,
+            "ein": fake.ssn().replace("-", ""),
+            "uei": "ZQGGHJH74DW6",
+        }
+
+    @staticmethod
+    def _fake_cognizant_agencies_2021_2025_1():
         fake = Faker()
         return {
             "ein": fake.ssn().replace("-", ""),
             "dbkey": 20576,
             "cogagency": 87,
+        }
+
+    @staticmethod
+    def _fake_cognizant_agencies_2021_2025_2():
+        fake = Faker()
+        return {
+            "ein": fake.ssn().replace("-", ""),
+            "dbkey": 20577,
+            "cogagency": 88,
+        }
+
+    @staticmethod
+    def _fake_cognizant_agencies_2021_2025_3():
+        fake = Faker()
+        return {
+            "ein": fake.ssn().replace("-", ""),
+            "dbkey": 20578,
+            "cogagency": 89,
+        }
+
+    @staticmethod
+    def _fake_cognizant_agencies_2021_2025_4():
+        fake = Faker()
+        return {
+            "ein": fake.ssn().replace("-", ""),
+            "dbkey": 20579,
+            "cogagency": 90,
         }
 
     def test_cog_over_for_gt_cog_limit_gt_da_threshold_factor_cog_2019(self):
@@ -209,14 +266,14 @@ class CogOverTests(TestCase):
             cognizant_agency=fake_cog_baseline["cognizant_agency"],
         ).save()
 
-        fake_CensusGen22 = self._fake_CensusGen22()
+        fake_CensusGen22 = self._fake_CensusGen22_1()
         self.CensusGen22 = CensusGen22.objects.create(
             dbkey=fake_CensusGen22["dbkey"],
             ein=fake_CensusGen22["ein"],
             uei=fake_CensusGen22["uei"],
         ).save()
 
-        fake_cognizant_agencies_2021_2025 = self._fake_cognizant_agencies_2021_2025()
+        fake_cognizant_agencies_2021_2025 = self._fake_cognizant_agencies_2021_2025_1()
         self.cognizant_agencies_2021_2025 = cognizant_agencies_2021_2025.objects.create(
             dbkey=fake_cognizant_agencies_2021_2025["dbkey"],
             ein=fake_cognizant_agencies_2021_2025["ein"],
@@ -246,14 +303,14 @@ class CogOverTests(TestCase):
             cognizant_agency=fake_cog_baseline["cognizant_agency"],
         ).save()
 
-        fake_CensusGen22 = self._fake_CensusGen22()
+        fake_CensusGen22 = self._fake_CensusGen22_2()
         self.CensusGen22 = CensusGen22.objects.create(
             dbkey=fake_CensusGen22["dbkey"],
             ein=fake_CensusGen22["ein"],
             uei=fake_CensusGen22["uei"],
         ).save()
 
-        fake_cognizant_agencies_2021_2025 = self._fake_cognizant_agencies_2021_2025()
+        fake_cognizant_agencies_2021_2025 = self._fake_cognizant_agencies_2021_2025_2()
         self.cognizant_agencies_2021_2025 = cognizant_agencies_2021_2025.objects.create(
             dbkey=fake_cognizant_agencies_2021_2025["dbkey"],
             ein=fake_cognizant_agencies_2021_2025["ein"],
@@ -283,14 +340,14 @@ class CogOverTests(TestCase):
             cognizant_agency=fake_cog_baseline["cognizant_agency"],
         ).save()
 
-        fake_CensusGen22 = self._fake_CensusGen22()
+        fake_CensusGen22 = self._fake_CensusGen22_3()
         self.CensusGen22 = CensusGen22.objects.create(
             dbkey=fake_CensusGen22["dbkey"],
             ein=fake_CensusGen22["ein"],
             uei=fake_CensusGen22["uei"],
         ).save()
 
-        fake_cognizant_agencies_2021_2025 = self._fake_cognizant_agencies_2021_2025()
+        fake_cognizant_agencies_2021_2025 = self._fake_cognizant_agencies_2021_2025_3()
         self.cognizant_agencies_2021_2025 = cognizant_agencies_2021_2025.objects.create(
             dbkey=fake_cognizant_agencies_2021_2025["dbkey"],
             ein=fake_cognizant_agencies_2021_2025["ein"],
@@ -320,14 +377,14 @@ class CogOverTests(TestCase):
             cognizant_agency=fake_cog_baseline["cognizant_agency"],
         ).save()
 
-        fake_CensusGen22 = self._fake_CensusGen22()
+        fake_CensusGen22 = self._fake_CensusGen22_4()
         self.CensusGen22 = CensusGen22.objects.create(
             dbkey=fake_CensusGen22["dbkey"],
             ein=fake_CensusGen22["ein"],
             uei=fake_CensusGen22["uei"],
         ).save()
 
-        fake_cognizant_agencies_2021_2025 = self._fake_cognizant_agencies_2021_2025()
+        fake_cognizant_agencies_2021_2025 = self._fake_cognizant_agencies_2021_2025_4()
         self.cognizant_agencies_2021_2025 = cognizant_agencies_2021_2025.objects.create(
             dbkey=fake_cognizant_agencies_2021_2025["dbkey"],
             ein=fake_cognizant_agencies_2021_2025["ein"],
