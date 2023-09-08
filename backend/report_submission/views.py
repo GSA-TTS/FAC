@@ -176,8 +176,6 @@ class GeneralInformationFormView(LoginRequiredMixin, View):
 
             form = GeneralInformationForm(request.POST)
 
-                
-            
             if not form.is_valid():
                 context = form.cleaned_data | {
                     "errors": form.errors,
