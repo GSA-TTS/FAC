@@ -12,8 +12,7 @@ Among other things, this module...
 - (future) configures the spaces for dev, staging, and production
   - _See https://github.com/cloudfoundry-community/terraform-provider-cloudfoundry/issues/436_
 - (future) configures user access to those spaces
-- (future) configures application security groups (ASGs) for the spaces
-  - _See https://github.com/cloudfoundry-community/terraform-provider-cloudfoundry/issues/405_
+- configures application security groups (ASGs) for the spaces
 - ensures the production space does not have SSH enabled
 - (future) sets up the deployer cred secrets in the corresponding GitHub environment
 - (future) sets up egress spaces and proxy configuration
