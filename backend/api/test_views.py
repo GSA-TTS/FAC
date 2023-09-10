@@ -714,6 +714,7 @@ class SingleAuditChecklistViewTests(TestCase):
 
         def check_response(bad_data, expected):
             sac = baker.make(SingleAuditChecklist)
+            sac.submission_status = sac.STATUS.IN_PROGRESS
             access = baker.make(Access, user=self.user, sac=sac)
             path = self.path(access.sac.report_id)
             response = self.client.put(path, bad_data, format="json")

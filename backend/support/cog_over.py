@@ -6,13 +6,24 @@ from dissemination.hist_models.census_2019 import CensusGen19, CensusCfda19
 from dissemination.hist_models.census_2022 import CensusGen22
 from django.db.models.functions import Cast
 from django.db.models import BigIntegerField, Q
+import logging
+logger = logging.getLogger(__name__)
 
 
 COG_LIMIT = 50_000_000
 DA_THRESHOLD_FACTOR = 0.25
 
 
-def cog_over(sac: SingleAuditChecklist):
+def compute_cog_over(sac: SingleAuditChecklist):
+    """
+    Compute cog or oversight agency for the sac.
+    Return tuple (cog_agency, oversight_agency)
+    """
+    if not sac.federal_awards:
+        print(
+            f"Trying to determine cog_over for a sac with zero awards with status = {sac.submission_status}."
+            )
+        return (None, None)
     awards = sac.federal_awards["FederalAwards"]
     total_amount_expended = awards.get("total_amount_expended")
     cognizant_agency = oversight_agency = None
@@ -26,14 +37,12 @@ def cog_over(sac: SingleAuditChecklist):
 
     if total_amount_expended <= COG_LIMIT:
         oversight_agency = agency
-        print("Assigning an oversight agenct", oversight_agency)
+        logger.warn("Assigning an oversight agenct", oversight_agency)
         return (cognizant_agency, oversight_agency)
     cognizant_agency = determine_hist_agency(sac.ein, sac.auditee_uei)
     if cognizant_agency:
-        print("Assigning a 2019 cog agency", cognizant_agency)
         return (cognizant_agency, oversight_agency)
     cognizant_agency = agency
-    print(" Assigning a current cog agenct", cognizant_agency)
     return (cognizant_agency, oversight_agency)
 
 
@@ -64,19 +73,16 @@ def determine_agency(total_amount_expended, max_total_agency, max_da_agency):
 
 def determine_hist_agency(ein, uei):
     dbkey = get_dbkey(ein, uei)
-    print(f"Looked up dbkey from 2022 and got {dbkey}")
 
     cog_agency = lookup_baseline(ein, uei, dbkey)
     if cog_agency:
-        print(f"Found cog {cog_agency} in lookup table")
         return cog_agency
     (gen_count, total_amount_expended) = get_2019_gen(ein, dbkey)
     if gen_count != 1:
-        print("Found no gen data for dbkey {dbkey} in 2019")
         return None
     cfdas = get_2019_cfdas(ein, dbkey)
     if not cfdas:
-        print("Found no cfda data for dbkey {dbkey} in 2019")
+        logger.warn("Found no cfda data for dbkey {dbkey} in 2019")
         return None
     (max_total_agency, max_da_agency) = calc_cfda_amounts(cfdas)
     cognizant_agency = determine_agency(
@@ -112,7 +118,6 @@ def get_2019_gen(ein, dbkey):
         amt=Cast("totfedexpend", output_field=BigIntegerField())
     ).filter(Q(ein=ein), Q(dbkey=dbkey) | Q(dbkey=None))
 
-    print(f"Found {len(gens)} gen in 2019 for ein: {ein} and dbkey:{dbkey}")
     if len(gens) != 1:
         return (len(gens), 0)
     gen = gens[0]
@@ -124,7 +129,6 @@ def get_2019_cfdas(ein, dbkey):
         amt=Cast("amount", output_field=BigIntegerField())
     ).filter(Q(ein=ein), Q(dbkey=dbkey) | Q(dbkey=None))
 
-    print(f"Found {len(cfdas)} cfdas in 2019 for ein: {ein} and dbkey:{dbkey}")
     if len(cfdas) == 0:
         return None
     baseline_cfdas = []
@@ -169,7 +173,6 @@ def propogate_cog_update(cog_assignment: CognizantAssignment):
     (sac, cognizant_agency) = (cog_assignment.sac, cog_assignment.cognizant_agency)
     sac.cognizant_agency = cognizant_agency
     sac.save()
-    print("sac saved")
 
     (ein, uei) = (sac.auditee_uei, sac.ein)
     cbs = CognizantBaseline.objects.filter(Q(ein=ein) | Q(uei=uei))
@@ -177,16 +180,13 @@ def propogate_cog_update(cog_assignment: CognizantAssignment):
         cb.is_active = False
         cb.save()
     CognizantBaseline(ein=ein, uei=uei, cognizant_agency=cognizant_agency).save()
-    print("cb saved")
 
     try:
         gen = General.objects.get(report_id=sac.report_id)
         gen.cognizant_agency = cognizant_agency
         gen.save()
-        print("gen saved")
     except General.DoesNotExist:
-        print("no gen in dissemination")
-
+        pass # etl may not have been run yet
 
 def record_cog_assignment(sac: SingleAuditChecklist, cognizant_agency):
     """
@@ -195,5 +195,16 @@ def record_cog_assignment(sac: SingleAuditChecklist, cognizant_agency):
     CognizantAssignment(
         sac=sac,
         cognizant_agency=cognizant_agency,
-    ).save()
-    print("CognizantAssignment saved ")
+    ).save() 
+
+def assign_cog_over(sac: SingleAuditChecklist):
+    """
+    Function that the FAC app uses when a submission is completed and cog_over needs to be assigned.
+    """
+    (conizantg_agency, oversight_agency) = compute_cog_over(sac)
+    if oversight_agency:
+        sac.oversight_agency = oversight_agency
+        sac.save()
+        return
+    if conizantg_agency:
+        record_cog_assignment(sac, conizantg_agency)
