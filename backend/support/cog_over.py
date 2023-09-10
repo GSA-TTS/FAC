@@ -7,6 +7,7 @@ from dissemination.hist_models.census_2022 import CensusGen22
 from django.db.models.functions import Cast
 from django.db.models import BigIntegerField, Q
 import logging
+
 logger = logging.getLogger(__name__)
 
 
@@ -22,7 +23,7 @@ def compute_cog_over(sac: SingleAuditChecklist):
     if not sac.federal_awards:
         print(
             f"Trying to determine cog_over for a sac with zero awards with status = {sac.submission_status}."
-            )
+        )
         return (None, None)
     awards = sac.federal_awards["FederalAwards"]
     total_amount_expended = awards.get("total_amount_expended")
@@ -186,7 +187,8 @@ def propogate_cog_update(cog_assignment: CognizantAssignment):
         gen.cognizant_agency = cognizant_agency
         gen.save()
     except General.DoesNotExist:
-        pass # etl may not have been run yet
+        pass  # etl may not have been run yet
+
 
 def record_cog_assignment(sac: SingleAuditChecklist, cognizant_agency):
     """
@@ -195,7 +197,8 @@ def record_cog_assignment(sac: SingleAuditChecklist, cognizant_agency):
     CognizantAssignment(
         sac=sac,
         cognizant_agency=cognizant_agency,
-    ).save() 
+    ).save()
+
 
 def assign_cog_over(sac: SingleAuditChecklist):
     """
