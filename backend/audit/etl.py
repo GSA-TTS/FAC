@@ -44,7 +44,8 @@ class ETL(object):
             try:
                 load_method()
             except KeyError as key_error:
-                logger.warning(
+                # logger.warning(
+                print(
                     f"{type(key_error).__name__} in {load_method.__name__}: {key_error}"
                 )
 
@@ -163,9 +164,8 @@ class ETL(object):
 
     def load_captext(self):
         corrective_action_plan = self.single_audit_checklist.corrective_action_plan
-        if (
-            "corrective_action_plan_entries"
-            in corrective_action_plan["CorrectiveActionPlan"]
+        if "corrective_action_plan_entries" in corrective_action_plan.get(
+            "CorrectiveActionPlan", {}
         ):
             corrective_action_plan_entries = corrective_action_plan[
                 "CorrectiveActionPlan"
@@ -405,11 +405,11 @@ class ETL(object):
             else None,
         )
         general.is_sp_framework_required = (
-            audit_information["is_sp_framework_required"] == "Y"
+            audit_information.get("is_sp_framework_required", "") == "Y"
         )
-        general.sp_framework_auditor_opinion = audit_information[
-            "sp_framework_opinions"
-        ]
+        general.sp_framework_auditor_opinion = audit_information.get(
+            "sp_framework_opinions", ""
+        )
         general.is_going_concern = audit_information["is_going_concern_included"] == "Y"
         general.is_significant_deficiency = (
             audit_information["is_internal_control_deficiency_disclosed"] == "Y"
