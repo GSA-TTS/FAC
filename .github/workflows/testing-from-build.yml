@@ -2,6 +2,7 @@
 name: Run Django and A11y Tests
 on:
   workflow_call:
+  workflow_dispatch:
 
 jobs:
   django-test:
@@ -31,6 +32,10 @@ jobs:
       - name: Start services
         working-directory: ./backend
         run: docker compose -f docker-compose.yml up -d
+
+      - name: Load historical data
+        working-directory: ./backend
+        run: docker compose run web ./load_data.sh
 
       - name: Run Django test suite
         working-directory: ./backend
