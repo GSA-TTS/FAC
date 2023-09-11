@@ -12,7 +12,7 @@ export function testValidGeneralInfo() {
 	//cy.get('#auditee_name').type('Commonwealth of Virginia');
 	cy.get('#auditee_address_line_1').type('1111 E Broad ST');
 	cy.get('#auditee_city').type('Richmond');
-	cy.get('#auditee_state').type('VA');
+	cy.get('#auditee_state').type('VA{enter}');
 	cy.get('#auditee_zip').type('23219');
   // there should already be a UEI in this box
 	// cy.get('#auditee_uei').type('CMBSGK6P7BE1');
@@ -27,10 +27,10 @@ export function testValidGeneralInfo() {
 
 	//auditor info
 	cy.get('#auditor_firm_name').type('House of Audit');
-	cy.get('#auditor_country').type('USA');
+	cy.get('#auditor_country').type('USA{enter}');
 	cy.get('#auditor_address_line_1').type('123 Around the corner');
 	cy.get('#auditor_city').type('Centreville');
-	cy.get('#auditor_state').type('VA');
+	cy.get('#auditor_state').type('VA{enter}');
 	cy.get('#auditor_zip').type('20121');
 	cy.get('#auditor_ein').type('987654321');
 	cy.get('#auditor_contact_name').type('Jane Doe');
