@@ -56,9 +56,6 @@ describe('Full audit submission', () => {
     // Fill out the general info form
     testValidGeneralInfo();
 
-    // Fill out the audit report package form, and upload its associated PDF
-    // testAuditReportPackage();
-
     // Upload all the workbooks. Don't intercept the uploads, which means a file will make it into the DB.
     cy.get(".usa-link").contains("Federal Awards").click();
     testWorkbookFederalAwards(false);
