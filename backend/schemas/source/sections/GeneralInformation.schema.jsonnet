@@ -19,9 +19,17 @@ local Types = Base.Types;
   additionalProperties: false,
   metamodel_version: '1.7.0',
   properties: {
-    audit_type: Base.Enum.AuditType,
+    audit_type: {
+      oneOf: [
+        Base.Enum.AuditType,
+        Base.Compound.EmptyString,
+      ]
+    },
     audit_period_covered: {
-      '$ref': '#/$defs/AuditPeriod',
+      oneOf: [
+        Base.Enum.AuditPeriod,
+        Base.Compound.EmptyString,
+      ]
     },
     audit_period_other_months: Types.string,
     auditee_address_line_1: Types.string {
@@ -37,36 +45,54 @@ local Types = Base.Types;
       maxLength: 100,
     },
     auditee_email: Types.string {
-      format: 'email',
+      oneOf: [
+        {
+          format: 'email',
+        },
+        Base.Compound.EmptyString,
+      ]
     },
     auditee_fiscal_period_end: Types.string {
       oneOf: [
-        Base.Compound.Date,
         {
-          const: Base.Const.empty_string,
-        }
+          format: 'date',
+        },
+        Base.Compound.EmptyString,
+        Base.Compound.Date,
       ]
     },
     auditee_fiscal_period_start: Types.string {
       oneOf: [
-        Base.Compound.Date,
         {
-          const: Base.Const.empty_string,
-        }
+          format: 'date',
+        },
+        Base.Compound.EmptyString,
+        Base.Compound.Date,
       ]
     },
     auditee_name: Func.compound_type([Types.string, Types.NULL]),
     auditee_phone: {
-      '$ref': '#/$defs/Phone',
+      oneOf: [
+        Base.Compound.UnitedStatesPhone,
+        Base.Compound.EmptyString,
+      ]
     },
     auditee_state: {
-      '$ref': '#/$defs/State',
+      oneOf: [
+        Base.Enum.UnitedStatesStateAbbr {
+          title: 'State',
+        },
+        Base.Compound.EmptyString,
+      ]
     },
     auditee_uei: {
       '$ref': '#/$defs/UEI',
     },
     auditee_zip: {
-      '$ref': '#/$defs/Zip',
+      anyOf: [
+        Base.Compound.Zip,
+        Base.Compound.EmptyString,
+      ],
     },
     auditor_address_line_1: Types.string {
       maxLength: 100,
@@ -83,18 +109,35 @@ local Types = Base.Types;
     auditor_country: Base.Enum.CountryType,
     auditor_international_address: Types.string,
     auditor_ein: {
-      '$ref': '#/$defs/EIN',
+      oneOf: [
+        Base.Compound.EmployerIdentificationNumber,
+        Base.Compound.EmptyString,
+      ],
     },
     auditor_ein_not_an_ssn_attestation: Func.compound_type([Types.boolean, Types.NULL]),
     auditor_email: Types.string {
-      format: 'email',
+      oneOf: [
+        {
+          format: 'email',
+        },
+        Base.Compound.EmptyString
+      ]
     },
+    
     auditor_firm_name: Types.string,
     auditor_phone: {
-      '$ref': '#/$defs/Phone',
+      oneOf: [
+        Base.Compound.UnitedStatesPhone,
+        Base.Compound.EmptyString,
+      ]
     },
     auditor_state: {
-      '$ref': '#/$defs/State',
+      oneOf: [
+        Base.Enum.UnitedStatesStateAbbr {
+          title: 'State',
+        },
+        Base.Compound.EmptyString,
+      ]
     },
     auditor_zip: {
       anyOf: [
@@ -103,7 +146,10 @@ local Types = Base.Types;
       ],
     },
     ein: {
-      '$ref': '#/$defs/EIN',
+      oneOf: [
+        Base.Compound.EmployerIdentificationNumber,
+        Base.Compound.EmptyString,
+      ],
     },
     ein_not_an_ssn_attestation: Func.compound_type([Types.boolean, Types.NULL]),
     is_usa_based: Types.boolean,
@@ -112,7 +158,10 @@ local Types = Base.Types;
     multiple_ueis_covered: Func.compound_type([Types.boolean, Types.NULL]),
     secondary_auditors_exist: Func.compound_type([Types.boolean, Types.NULL]),
     user_provided_organization_type: {
-      '$ref': '#/$defs/UserProvidedOrganizationType',
+      oneOf: [
+        Base.Enum.OrganizationType,
+        Base.Compound.EmptyString,
+      ],
     },
   },
   allOf: [
@@ -166,7 +215,12 @@ local Types = Base.Types;
       },
       'then': {
         properties: {
-          auditor_zip: Base.Compound.Zip,
+          auditor_zip: {
+            anyOf: [
+              Base.Compound.Zip,
+              Base.Compound.EmptyString,
+            ],
+          }
         },
       },
     },
@@ -182,7 +236,12 @@ local Types = Base.Types;
       },
       'then': {
         properties: {
-          auditor_zip: Base.Compound.EmptyString,
+          auditor_zip: {
+            anyOf: [
+              Base.Compound.Zip,
+              Base.Compound.EmptyString,
+            ],
+          }
         },
       },
     },
