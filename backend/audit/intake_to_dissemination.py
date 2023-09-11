@@ -60,53 +60,54 @@ class IntakeToDissemination(object):
     def load_finding_texts(self):
         findings_text = self.single_audit_checklist.findings_text
 
-        if not findings_text:
-            logger.warning("No finding texts found to load")
-            return
-
-        findings_text_entries = findings_text.get("FindingsText", {}).get(
-            "findings_text_entries", []
-        )
         findings_text_objects = []
-
-        for entry in findings_text_entries:
-            finding_text_ = FindingText(
-                report_id=self.report_id,
-                finding_ref_number=entry["reference_number"],
-                contains_chart_or_table=entry["contains_chart_or_table"] == "Y",
-                finding_text=entry["text_of_finding"],
+        if findings_text:
+            findings_text_entries = findings_text.get("FindingsText", {}).get(
+                "findings_text_entries", []
             )
-            findings_text_objects.append(finding_text_)
-        self.loaded_objects["FindingTexts"] = findings_text_objects
+            for entry in findings_text_entries:
+                finding_text_ = FindingText(
+                    report_id=self.report_id,
+                    finding_ref_number=entry["reference_number"],
+                    contains_chart_or_table=entry["contains_chart_or_table"] == "Y",
+                    finding_text=entry["text_of_finding"],
+                )
+                findings_text_objects.append(finding_text_)
+            self.loaded_objects["FindingTexts"] = findings_text_objects
+
         return findings_text_objects
 
     def load_findings(self):
+        findings_objects = []
         findings_uniform_guidance = (
             self.single_audit_checklist.findings_uniform_guidance
         )
-        findings_uniform_guidance_entries = findings_uniform_guidance.get(
-            "FindingsUniformGuidance", {}
-        ).get("findings_uniform_guidance_entries", [])
-        findings_objects = []
-        for entry in findings_uniform_guidance_entries:
-            findings = entry["findings"]
-            program = entry["program"]
 
-            finding = Finding(
-                award_reference=program["award_reference"],
-                reference_number=findings["reference_number"],
-                is_material_weakness=entry["material_weakness"],
-                is_modified_opinion=entry["modified_opinion"],
-                is_other_findings=entry["other_findings"],
-                is_other_matters=entry["other_matters"],
-                is_questioned_costs=entry["questioned_costs"],
-                is_repeat_finding=findings["repeat_prior_reference"],
-                is_significant_deficiency=entry["significant_deficiency"],
-                prior_finding_ref_numbers=findings.get("prior_references", ""),
-                report_id=self.report_id,
-                type_requirement=program["compliance_requirement"],
-            )
-            findings_objects.append(finding)
+        if findings_uniform_guidance:
+            findings_uniform_guidance_entries = findings_uniform_guidance.get(
+                "FindingsUniformGuidance", {}
+            ).get("findings_uniform_guidance_entries", [])
+
+            for entry in findings_uniform_guidance_entries:
+                findings = entry["findings"]
+                program = entry["program"]
+
+                finding = Finding(
+                    award_reference=program["award_reference"],
+                    reference_number=findings["reference_number"],
+                    is_material_weakness=entry["material_weakness"],
+                    is_modified_opinion=entry["modified_opinion"],
+                    is_other_findings=entry["other_findings"],
+                    is_other_matters=entry["other_matters"],
+                    is_questioned_costs=entry["questioned_costs"],
+                    is_repeat_finding=findings["repeat_prior_reference"],
+                    is_significant_deficiency=entry["significant_deficiency"],
+                    prior_finding_ref_numbers=findings.get("prior_references", ""),
+                    report_id=self.report_id,
+                    type_requirement=program["compliance_requirement"],
+                )
+                findings_objects.append(finding)
+
         self.loaded_objects["Findings"] = findings_objects
         return findings_objects
 
@@ -157,19 +158,23 @@ class IntakeToDissemination(object):
         return federal_awards_objects
 
     def load_captext(self):
-        corrective_action_plan = self.single_audit_checklist.corrective_action_plan
-        corrective_action_plan_entries = corrective_action_plan.get(
-            "CorrectiveActionPlan", {}
-        ).get("corrective_action_plan_entries", [])
         cap_text_objects = []
-        for entry in corrective_action_plan_entries:
-            cap_text = CapText(
-                contains_chart_or_table=entry["contains_chart_or_table"],
-                finding_ref_number=entry["reference_number"],
-                planned_action=entry["planned_action"],
-                report_id=self.report_id,
-            )
-            cap_text_objects.append(cap_text)
+        corrective_action_plan = self.single_audit_checklist.corrective_action_plan
+
+        if corrective_action_plan:
+            corrective_action_plan_entries = corrective_action_plan.get(
+                "CorrectiveActionPlan", {}
+            ).get("corrective_action_plan_entries", [])
+
+            for entry in corrective_action_plan_entries:
+                cap_text = CapText(
+                    contains_chart_or_table=entry["contains_chart_or_table"],
+                    finding_ref_number=entry["reference_number"],
+                    planned_action=entry["planned_action"],
+                    report_id=self.report_id,
+                )
+                cap_text_objects.append(cap_text)
+
         self.loaded_objects["CapTexts"] = cap_text_objects
         return cap_text_objects
 
@@ -312,9 +317,6 @@ class IntakeToDissemination(object):
             auditee_certified_date=dates_by_status[
                 self.single_audit_checklist.STATUS.AUDITEE_CERTIFIED
             ],
-            certified_date=dates_by_status[
-                self.single_audit_checklist.STATUS.CERTIFIED
-            ],
             submitted_date=dates_by_status[
                 self.single_audit_checklist.STATUS.SUBMITTED
             ],
@@ -372,26 +374,34 @@ class IntakeToDissemination(object):
         return [general]
 
     def load_secondary_auditor(self):
-        secondary_auditors = self.single_audit_checklist.secondary_auditors
-        secondary_auditors_entries = secondary_auditors.get(
-            "SecondaryAuditors", {}
-        ).get("secondary_auditors_entries", [])
         sec_objs = []
-        for secondary_auditor in secondary_auditors_entries:
-            sec_auditor = SecondaryAuditor(
-                address_city=secondary_auditor["secondary_auditor_address_city"],
-                address_state=secondary_auditor["secondary_auditor_address_state"],
-                address_street=secondary_auditor["secondary_auditor_address_street"],
-                address_zipcode=secondary_auditor["secondary_auditor_address_zipcode"],
-                auditor_ein=secondary_auditor["secondary_auditor_ein"],
-                auditor_name=secondary_auditor["secondary_auditor_name"],
-                contact_email=secondary_auditor["secondary_auditor_contact_email"],
-                contact_name=secondary_auditor["secondary_auditor_contact_name"],
-                contact_phone=secondary_auditor["secondary_auditor_contact_phone"],
-                contact_title=secondary_auditor["secondary_auditor_contact_title"],
-                report_id=self.single_audit_checklist.report_id,
-            )
-            sec_objs.append(sec_auditor)
+        secondary_auditors = self.single_audit_checklist.secondary_auditors
+
+        if secondary_auditors:
+            secondary_auditors_entries = secondary_auditors.get(
+                "SecondaryAuditors", {}
+            ).get("secondary_auditors_entries", [])
+
+            for secondary_auditor in secondary_auditors_entries:
+                sec_auditor = SecondaryAuditor(
+                    address_city=secondary_auditor["secondary_auditor_address_city"],
+                    address_state=secondary_auditor["secondary_auditor_address_state"],
+                    address_street=secondary_auditor[
+                        "secondary_auditor_address_street"
+                    ],
+                    address_zipcode=secondary_auditor[
+                        "secondary_auditor_address_zipcode"
+                    ],
+                    auditor_ein=secondary_auditor["secondary_auditor_ein"],
+                    auditor_name=secondary_auditor["secondary_auditor_name"],
+                    contact_email=secondary_auditor["secondary_auditor_contact_email"],
+                    contact_name=secondary_auditor["secondary_auditor_contact_name"],
+                    contact_phone=secondary_auditor["secondary_auditor_contact_phone"],
+                    contact_title=secondary_auditor["secondary_auditor_contact_title"],
+                    report_id=self.single_audit_checklist.report_id,
+                )
+                sec_objs.append(sec_auditor)
+
         self.loaded_objects["SecondaryAuditors"] = sec_objs
         return sec_objs
 
