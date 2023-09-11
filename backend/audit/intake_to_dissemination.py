@@ -90,7 +90,7 @@ class IntakeToDissemination(object):
             findings_uniform_guidance_entries = findings_uniform_guidance.get(
                 "FindingsUniformGuidance", {}
             ).get("findings_uniform_guidance_entries", [])
-            
+
             for entry in findings_uniform_guidance_entries:
                 findings = entry["findings"]
                 program = entry["program"]
@@ -168,7 +168,7 @@ class IntakeToDissemination(object):
             corrective_action_plan_entries = corrective_action_plan.get(
                 "CorrectiveActionPlan", {}
             ).get("corrective_action_plan_entries", [])
-            
+
             for entry in corrective_action_plan_entries:
                 cap_text = CapText(
                     contains_chart_or_table=entry["contains_chart_or_table"],
@@ -387,13 +387,17 @@ class IntakeToDissemination(object):
             secondary_auditors_entries = secondary_auditors.get(
                 "SecondaryAuditors", {}
             ).get("secondary_auditors_entries", [])
-            
+
             for secondary_auditor in secondary_auditors_entries:
                 sec_auditor = SecondaryAuditor(
                     address_city=secondary_auditor["secondary_auditor_address_city"],
                     address_state=secondary_auditor["secondary_auditor_address_state"],
-                    address_street=secondary_auditor["secondary_auditor_address_street"],
-                    address_zipcode=secondary_auditor["secondary_auditor_address_zipcode"],
+                    address_street=secondary_auditor[
+                        "secondary_auditor_address_street"
+                    ],
+                    address_zipcode=secondary_auditor[
+                        "secondary_auditor_address_zipcode"
+                    ],
                     auditor_ein=secondary_auditor["secondary_auditor_ein"],
                     auditor_name=secondary_auditor["secondary_auditor_name"],
                     contact_email=secondary_auditor["secondary_auditor_contact_email"],
