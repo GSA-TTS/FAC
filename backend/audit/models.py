@@ -442,6 +442,8 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         from audit.intake_to_dissemination import IntakeToDissemination
         from audit.cog_over import cog_over
 
+        self.transition_to_certified()
+
         self.transition_name.append(SingleAuditChecklist.STATUS.SUBMITTED)
         self.transition_date.append(datetime.now(timezone.utc))
         if self.general_information:
