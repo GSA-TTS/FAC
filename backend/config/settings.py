@@ -417,10 +417,14 @@ secret_login_key = b64decode(secret("DJANGO_SECRET_LOGIN_KEY", ""))
 # which provider to use if multiple are available
 # (code does not currently support user selection)
 OIDC_ACTIVE_PROVIDER = "login.gov"
+OIDC_DISCOVERY_URL = "https://idp.int.identitysandbox.gov"
+
+if ENVIRONMENT == "PRODUCTION":
+    OIDC_DISCOVERY_URL = "https://secure.login.gov"
 
 OIDC_PROVIDERS = {
     "login.gov": {
-        "srv_discovery_url": "https://idp.int.identitysandbox.gov",
+        "srv_discovery_url": OIDC_DISCOVERY_URL,
         "behaviour": {
             # the 'code' workflow requires direct connectivity from us to Login.gov
             "response_type": "code",

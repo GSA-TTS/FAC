@@ -8,11 +8,11 @@ local make_url = function(anchor)
 {
   // A
   aln_extension: {
-    text: 'An ALN (CFDA) extension is typically three digits, with some exceptions',
+    text: 'An ALN (CFDA) extension is typically three digits, with some exceptions. If unknown extension, enter "UNN" (e.g. U01, U02, U03, etc.). For research and development, enter "RD"',
     link: make_url('aln_extension'),
   },
   aln_prefix: {
-    text: 'Not a valid agency ALN (CFDA) prefix',
+    text: 'Invalid agency ALN (CFDA) prefix',
     link: make_url('aln_prefix'),
   },
   // A
@@ -22,7 +22,7 @@ local make_url = function(anchor)
   },
   // C
   cluster_name: {
-    text: 'Not one of the allowed cluster names',
+    text: 'Select from the approved cluster names',
     link: make_url('cluster_name'),
   },
   ein: {
@@ -31,21 +31,21 @@ local make_url = function(anchor)
   },
   // F
   federal_program_name: {
-    text: 'Not one of the allowed federal program names',
+    text: 'Select from the approved federal program names',
     link: make_url('federal_program_name'),
   },
   // O
   other_cluster_name: {
-    text: 'Not one of the alternative (other) cluster names',
+    text: 'Name must be 75 characters or less',
     link: make_url('other_cluster_name'),
   },
   // P
   plain_text: {
-    text: 'Only plain text is allowed in this field, no emoji or other special additions',
+    text: 'Only plain text is allowed, no emoji, formatting, or other special additions',
     link: make_url('plain_text'),
   },
   positive_number: {
-    text: 'The number in this field must be zero or greater',
+    text: 'The number must be zero or greater',
     link: make_url('positive_number'),
   },
   prior_references: {
@@ -54,7 +54,7 @@ local make_url = function(anchor)
   },
   // R
   reference_number: {
-    text: 'Reference numbers have the form YYYY-NNN (e.g. 2023-001)',
+    text: 'Reference numbers must be formatted YYYY-NNN (e.g. 2023-001)',
     link: make_url('reference_number'),
   },
   // U
@@ -63,7 +63,7 @@ local make_url = function(anchor)
     link: make_url('uei'),
   },
   unknown: {
-    text: 'If you see this error, please contact support.',
+    text: 'Please contact support',
     link: make_url('unknown'),
   },
   // Y
