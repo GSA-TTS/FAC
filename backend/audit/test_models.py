@@ -73,14 +73,8 @@ class SingleAuditChecklistTests(TestCase):
                 "transition_to_auditee_certified",
             ),
             (
-                [SingleAuditChecklist.STATUS.AUDITEE_CERTIFIED],
-                SingleAuditChecklist.STATUS.CERTIFIED,
-                "transition_to_certified",
-            ),
-            (
                 [
                     SingleAuditChecklist.STATUS.AUDITEE_CERTIFIED,
-                    SingleAuditChecklist.STATUS.CERTIFIED,
                 ],
                 SingleAuditChecklist.STATUS.SUBMITTED,
                 "transition_to_submitted",

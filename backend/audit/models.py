@@ -425,19 +425,6 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
     @transition(
         field="submission_status",
         source=STATUS.AUDITEE_CERTIFIED,
-        target=STATUS.CERTIFIED,
-    )
-    def transition_to_certified(self):
-        """
-        The permission checks verifying that the user attempting to do this has
-        the appropriate privileges will done at the view level.
-        """
-        self.transition_name.append(SingleAuditChecklist.STATUS.CERTIFIED)
-        self.transition_date.append(datetime.now(timezone.utc))
-
-    @transition(
-        field="submission_status",
-        source=[STATUS.AUDITEE_CERTIFIED, STATUS.CERTIFIED],
         target=STATUS.SUBMITTED,
     )
     def transition_to_submitted(self):
@@ -447,13 +434,20 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         """
 
         from audit.etl import ETL
+\        from audit.intake_to_dissemination import IntakeToDissemination
 
+        self.transition_name.append(SingleAuditChecklist.STATUS.SUBMITTED)
+        self.transition_date.append(datetime.now(timezone.utc))
         if self.general_information:
             etl = ETL(self)
             etl.load_all()
 
         self.transition_name.append(SingleAuditChecklist.STATUS.SUBMITTED)
         self.transition_date.append(datetime.now(timezone.utc))
+            intake_to_dissem = IntakeToDissemination(self)
+            intake_to_dissem.load_all()
+            # FIXME MSHD: Handle exceptions raised by the save methods
+            intake_to_dissem.save_dissemination_objects()
 
     @transition(
         field="submission_status",

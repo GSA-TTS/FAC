@@ -3,27 +3,11 @@ local Func = import '../base/Functions.libsonnet';
 local Types = Base.Types;
 
 {
-  '$defs': {
-    AuditPeriod: Base.Enum.AuditPeriod,
-    EIN: Func.join_types(Base.Compound.EmployerIdentificationNumber, [Types.NULL]),
-    Phone: Base.Compound.UnitedStatesPhone,
-    State: Base.Enum.UnitedStatesStateAbbr {
-      title: 'State',
-    },
-    UEI: Base.Compound.UniqueEntityIdentifier,
-    UserProvidedOrganizationType: Base.Enum.OrganizationType,
-    Zip: Base.Compound.Zip,
-  },
   '$id': 'http://example.org/generalinformation',
-  '$schema': 'http://json-schema.org/draft/2019-09/schema#',
+  '$schema': Base.Const.SCHEMA_VERSION,
   additionalProperties: false,
   metamodel_version: '1.7.0',
   properties: {
-    audit_type: Base.Enum.AuditType,
-    audit_period_covered: {
-      '$ref': '#/$defs/AuditPeriod',
-    },
-    audit_period_other_months: Types.string,
     auditee_address_line_1: Types.string {
       maxLength: 100,
     },
@@ -39,52 +23,35 @@ local Types = Base.Types;
     auditee_email: Types.string {
       format: 'email',
     },
-    auditee_fiscal_period_end: Types.string {
-      format: 'date',
-    },
-    auditee_fiscal_period_start: Types.string {
-      format: 'date',
-    },
-    auditee_name: Func.compound_type([Types.string, Types.NULL]),
-    auditee_phone: {
-      '$ref': '#/$defs/Phone',
-    },
-    auditee_state: {
-      '$ref': '#/$defs/State',
-    },
-    auditee_uei: {
-      '$ref': '#/$defs/UEI',
-    },
-    auditee_zip: {
-      '$ref': '#/$defs/Zip',
-    },
-    auditor_address_line_1: Types.string {
+    auditee_name: Types.string {
       maxLength: 100,
+    },
+    auditee_phone: Base.Compound.UnitedStatesPhone,
+    auditee_state: Base.Enum.UnitedStatesStateAbbr {
+      title: 'State',
+    },
+    auditee_uei: Base.Compound.UniqueEntityIdentifier,
+    auditee_zip: Base.Compound.Zip,
+    ein: Base.Compound.EmployerIdentificationNumber,
+
+
+    auditor_phone: Base.Compound.UnitedStatesPhone,
+    auditor_state: {
+      anyOf: [
+        Base.Enum.UnitedStatesStateAbbr {
+          title: 'State',
+        },
+        Base.Compound.EmptyString,
+      ],
     },
     auditor_city: Types.string {
-      maxLength: 100,
-    },
-    auditor_contact_name: Types.string {
       maxLength: 100,
     },
     auditor_contact_title: Types.string {
       maxLength: 100,
     },
-    auditor_country: Base.Enum.CountryType,
-    auditor_international_address: Types.string,
-    auditor_ein: {
-      '$ref': '#/$defs/EIN',
-    },
-    auditor_ein_not_an_ssn_attestation: Func.compound_type([Types.boolean, Types.NULL]),
-    auditor_email: Types.string {
-      format: 'email',
-    },
-    auditor_firm_name: Types.string,
-    auditor_phone: {
-      '$ref': '#/$defs/Phone',
-    },
-    auditor_state: {
-      '$ref': '#/$defs/State',
+    auditor_address_line_1: Types.string {
+      maxLength: 100,
     },
     auditor_zip: {
       anyOf: [
@@ -92,18 +59,40 @@ local Types = Base.Types;
         Base.Compound.EmptyString,
       ],
     },
-    ein: {
-      '$ref': '#/$defs/EIN',
+    auditor_country: Base.Enum.CountryType,
+    auditor_contact_name: Types.string {
+      maxLength: 100,
     },
-    ein_not_an_ssn_attestation: Func.compound_type([Types.boolean, Types.NULL]),
+    auditor_international_address: Types.string,
+
+    auditor_email: Types.string {
+      format: 'email',
+    },
+    auditor_firm_name: Types.string,
+    auditor_foreign_address: Types.string,
+    auditor_ein: Base.Compound.EmployerIdentificationNumber,
+
+    auditee_fiscal_period_start: Types.string {
+      format: 'date',
+    },
+    auditee_fiscal_period_end: Types.string {
+      format: 'date',
+    },
+    audit_type: Base.Enum.AuditType,
+    user_provided_organization_type: Base.Enum.OrganizationType,
+    audit_period_other_months: Types.string,
+    audit_period_covered: Base.Enum.AuditPeriod,
+
+    auditor_ein_not_an_ssn_attestation: Types.boolean,
+    ein_not_an_ssn_attestation: Types.boolean,
+
     is_usa_based: Types.boolean,
     met_spending_threshold: Types.boolean,
-    multiple_eins_covered: Func.compound_type([Types.boolean, Types.NULL]),
-    multiple_ueis_covered: Func.compound_type([Types.boolean, Types.NULL]),
-    secondary_auditors_exist: Func.compound_type([Types.boolean, Types.NULL]),
-    user_provided_organization_type: {
-      '$ref': '#/$defs/UserProvidedOrganizationType',
-    },
+
+    multiple_eins_covered: Types.boolean,
+    multiple_ueis_covered: Types.boolean,
+    secondary_auditors_exist: Types.boolean,
+
   },
   allOf: [
     {
@@ -157,6 +146,9 @@ local Types = Base.Types;
       'then': {
         properties: {
           auditor_zip: Base.Compound.Zip,
+          auditor_state: Base.Enum.UnitedStatesStateAbbr {
+            title: 'State',
+          },
         },
       },
     },
@@ -173,11 +165,11 @@ local Types = Base.Types;
       'then': {
         properties: {
           auditor_zip: Base.Compound.EmptyString,
+          auditor_state: Base.Compound.EmptyString,
         },
       },
     },
   ],
-  required: [],
   title: 'GeneralInformation',
   type: 'object',
   version: null,

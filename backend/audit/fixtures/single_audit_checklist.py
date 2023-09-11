@@ -66,6 +66,7 @@ def _fake_general_information(auditee_name=None):
         "met_spending_threshold": True,
         "multiple_eins_covered": False,
         "multiple_ueis_covered": False,
+        "secondary_auditors_exist": False,
         # TODO: could improve this by randomly choosing from the enum of possible values
         "user_provided_organization_type": "unknown",
     }
@@ -96,7 +97,7 @@ def fake_auditor_certification():
 
 
 def fake_auditee_certification():
-    """Create fake auditor confirmation form data."""
+    """Create fake auditee confirmation form data."""
     fake = Faker()
     data_step_1 = {
         "has_no_PII": True,
