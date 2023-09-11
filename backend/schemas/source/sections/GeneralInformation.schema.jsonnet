@@ -40,10 +40,20 @@ local Types = Base.Types;
       format: 'email',
     },
     auditee_fiscal_period_end: Types.string {
-      format: 'date',
+      oneOf: [
+        Base.Compound.Date,
+        {
+          const: Base.Const.empty_string,
+        }
+      ]
     },
     auditee_fiscal_period_start: Types.string {
-      format: 'date',
+      oneOf: [
+        Base.Compound.Date,
+        {
+          const: Base.Const.empty_string,
+        }
+      ]
     },
     auditee_name: Func.compound_type([Types.string, Types.NULL]),
     auditee_phone: {

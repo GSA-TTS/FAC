@@ -321,7 +321,7 @@ local Compound = {
   Date: Types.string {
     title: 'Date',
     description: 'MM/DD/YYYY',
-    pattern: '^[0-9]{2}/[0-9]{2}/[0-9]{4}$',
+    pattern: '^[0-9]{2}/[0-9]{2}/[0-9]{4}$',  // Values like 00/00/0000
   },
   NonEmptyString: Types.string {
     minLength: 1,

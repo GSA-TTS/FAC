@@ -30,25 +30,25 @@ Requires most fields, has consitional checks for conditional fields.
     audit_period_other_months: Types.string,
     auditee_address_line_1: Types.string {
       maxLength: 100,
+      minLength: 1,
     },
     auditee_city: Types.string {
       maxLength: 100,
+      minLength: 1,
     },
     auditee_contact_name: Types.string {
       maxLength: 100,
+      minLength: 1,
     },
     auditee_contact_title: Types.string {
       maxLength: 100,
+      minLength: 1,
     },
     auditee_email: Types.string {
       format: 'email',
     },
-    auditee_fiscal_period_end: Types.string {
-      format: 'date',
-    },
-    auditee_fiscal_period_start: Types.string {
-      format: 'date',
-    },
+    auditee_fiscal_period_end: Base.Compound.Date,
+    auditee_fiscal_period_start: Base.Compound.Date,
     auditee_name: Func.compound_type([Types.string, Types.NULL]),
     auditee_phone: {
       '$ref': '#/$defs/Phone',
@@ -64,24 +64,32 @@ Requires most fields, has consitional checks for conditional fields.
     },
     auditor_address_line_1: Types.string {
       maxLength: 100,
+      minLength: 1,
     },
     auditor_city: Types.string {
       maxLength: 100,
+      minLength: 1,
     },
     auditor_contact_name: Types.string {
       maxLength: 100,
+      minLength: 1,
     },
     auditor_contact_title: Types.string {
       maxLength: 100,
+      minLength: 1,
     },
     auditor_country: Base.Enum.CountryType,
-    auditor_international_address: Types.string,
+    auditor_international_address: Types.string {
+      maxLength: 100,
+    },
     auditor_ein: {
       '$ref': '#/$defs/EIN',
     },
     auditor_ein_not_an_ssn_attestation: Func.compound_type([Types.boolean, Types.NULL]),
     auditor_email: Types.string {
       format: 'email',
+      maxLength: 100,
+      minLength: 1,
     },
     auditor_firm_name: Types.string,
     auditor_phone: {

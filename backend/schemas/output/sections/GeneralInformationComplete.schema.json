@@ -241,18 +241,22 @@
       },
       "auditee_address_line_1": {
          "maxLength": 100,
+         "minLength": 1,
          "type": "string"
       },
       "auditee_city": {
          "maxLength": 100,
+         "minLength": 1,
          "type": "string"
       },
       "auditee_contact_name": {
          "maxLength": 100,
+         "minLength": 1,
          "type": "string"
       },
       "auditee_contact_title": {
          "maxLength": 100,
+         "minLength": 1,
          "type": "string"
       },
       "auditee_email": {
@@ -260,11 +264,15 @@
          "type": "string"
       },
       "auditee_fiscal_period_end": {
-         "format": "date",
+         "description": "MM/DD/YYYY",
+         "pattern": "^[0-9]{2}/[0-9]{2}/[0-9]{4}$",
+         "title": "Date",
          "type": "string"
       },
       "auditee_fiscal_period_start": {
-         "format": "date",
+         "description": "MM/DD/YYYY",
+         "pattern": "^[0-9]{2}/[0-9]{2}/[0-9]{4}$",
+         "title": "Date",
          "type": "string"
       },
       "auditee_name": {
@@ -287,18 +295,22 @@
       },
       "auditor_address_line_1": {
          "maxLength": 100,
+         "minLength": 1,
          "type": "string"
       },
       "auditor_city": {
          "maxLength": 100,
+         "minLength": 1,
          "type": "string"
       },
       "auditor_contact_name": {
          "maxLength": 100,
+         "minLength": 1,
          "type": "string"
       },
       "auditor_contact_title": {
          "maxLength": 100,
+         "minLength": 1,
          "type": "string"
       },
       "auditor_country": {
@@ -321,12 +333,15 @@
       },
       "auditor_email": {
          "format": "email",
+         "maxLength": 100,
+         "minLength": 1,
          "type": "string"
       },
       "auditor_firm_name": {
          "type": "string"
       },
       "auditor_international_address": {
+         "maxLength": 100,
          "type": "string"
       },
       "auditor_phone": {
