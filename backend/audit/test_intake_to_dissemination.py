@@ -27,7 +27,6 @@ class IntakeToDisseminationTests(TestCase):
             SingleAuditChecklist.STATUS.READY_FOR_CERTIFICATION,
             SingleAuditChecklist.STATUS.AUDITOR_CERTIFIED,
             SingleAuditChecklist.STATUS.AUDITEE_CERTIFIED,
-            SingleAuditChecklist.STATUS.CERTIFIED,
             SingleAuditChecklist.STATUS.SUBMITTED,
         ]
 
