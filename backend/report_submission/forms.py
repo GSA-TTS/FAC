@@ -4,16 +4,24 @@ from config.settings import STATE_ABBREVS
 
 from api.uei import get_uei_info_from_sam_gov
 
-ein_validator = RegexValidator(
-    r"^[0-9]{9}$", "EINs should be nine characters long and be made up of only numbers."
-)
+
 # Regex for words, includes non-[A-Z] ASCII characters like ñ and ī.
 # \A and \Z start and terminate the string.
-# [^\W\d] - matches values _not_ in W (non-word characters) or d (digits), which is all alphas.
+# [^\W\d] - matches values _not_ in W (non-word characters) or d (digits), which is all alphas, including diacritics.
 # [^\W\d] is OR'd with \s to allow whitespace instead of another character, to allow spaces.
 # [^\W\d]|\s is wrapped in parenthesis and appended by a plus to allow any number of characters.
 alpha_validator = RegexValidator(
     r"\A([^\W\d]|\s)+\Z", "This field should not include numbers or special characters."
+)
+date_validator = RegexValidator(
+    r"^[0-9]{2}/[0-9]{2}/[0-9]{4}$", "Dates should be in the format 00/00/0000"
+)
+ein_validator = RegexValidator(
+    r"^[0-9]{9}$", "EINs should be nine characters long and be made up of only numbers."
+)
+phone_validator = RegexValidator(
+    r"^([1-9]{1}[0-9]{9})+$",
+    "Phone numbers should not include spaces or symbols such as '-' or '+'.",
 )
 
 
@@ -47,11 +55,17 @@ class AuditeeInfoForm(forms.Form):
 
 
 class GeneralInformationForm(forms.Form):
-    audit_type = forms.CharField(required=False)
-    auditee_fiscal_period_end = forms.CharField(required=False)
-    auditee_fiscal_period_start = forms.CharField(required=False)
-    audit_period_covered = forms.CharField(required=False)
+    max_string_length = 100
     choices_state_abbrevs = list((i, i) for i in STATE_ABBREVS)
+
+    audit_type = forms.CharField(required=False)
+    auditee_fiscal_period_end = forms.CharField(
+        required=False, validators=[date_validator]
+    )
+    auditee_fiscal_period_start = forms.CharField(
+        required=False, validators=[date_validator]
+    )
+    audit_period_covered = forms.CharField(required=False)
     audit_period_other_months = forms.CharField(required=False)
     ein = forms.CharField(
         required=False,
@@ -61,35 +75,47 @@ class GeneralInformationForm(forms.Form):
     multiple_eins_covered = forms.BooleanField(required=False)
     auditee_uei = forms.CharField(required=False)
     multiple_ueis_covered = forms.BooleanField(required=False)
-    auditee_name = forms.CharField(required=False)
-    auditee_address_line_1 = forms.CharField(required=False)
+    auditee_name = forms.CharField(max_length=max_string_length, required=False)
+    auditee_address_line_1 = forms.CharField(
+        max_length=max_string_length, required=False
+    )
     auditee_city = forms.CharField(
+        max_length=max_string_length,
         required=False,
         validators=[alpha_validator],  # validators are not run against empty fields
     )
     auditee_state = forms.ChoiceField(choices=choices_state_abbrevs, required=False)
     auditee_zip = forms.CharField(required=False)
-    auditee_contact_name = forms.CharField(required=False)
-    auditee_contact_title = forms.CharField(required=False)
-    auditee_phone = forms.CharField(required=False)
-    auditee_email = forms.CharField(required=False)
-    auditor_firm_name = forms.CharField(required=False)
+    auditee_contact_name = forms.CharField(max_length=max_string_length, required=False)
+    auditee_contact_title = forms.CharField(
+        max_length=max_string_length, required=False
+    )
+    auditee_phone = forms.CharField(required=False, validators=[phone_validator])
+    auditee_email = forms.CharField(max_length=max_string_length, required=False)
+    auditor_firm_name = forms.CharField(max_length=max_string_length, required=False)
     auditor_ein = forms.CharField(
         required=False,
         validators=[ein_validator],  # validators are not run against empty fields
     )
     auditor_ein_not_an_ssn_attestation = forms.BooleanField(required=False)
     auditor_country = forms.CharField(required=False)
-    auditor_international_address = forms.CharField(required=False)
-    auditor_address_line_1 = forms.CharField(required=False)
+    auditor_international_address = forms.CharField(
+        max_length=max_string_length, required=False
+    )
+    auditor_address_line_1 = forms.CharField(
+        max_length=max_string_length, required=False
+    )
     auditor_city = forms.CharField(
+        max_length=max_string_length,
         required=False,
         validators=[alpha_validator],  # validators are not run against empty fields
     )
     auditor_state = forms.ChoiceField(choices=choices_state_abbrevs, required=False)
     auditor_zip = forms.CharField(required=False)
-    auditor_contact_name = forms.CharField(required=False)
-    auditor_contact_title = forms.CharField(required=False)
-    auditor_phone = forms.CharField(required=False)
-    auditor_email = forms.CharField(required=False)
+    auditor_contact_name = forms.CharField(max_length=max_string_length, required=False)
+    auditor_contact_title = forms.CharField(
+        max_length=max_string_length, required=False
+    )
+    auditor_phone = forms.CharField(required=False, validators=[phone_validator])
+    auditor_email = forms.CharField(max_length=max_string_length, required=False)
     secondary_auditors_exist = forms.BooleanField(required=False)
