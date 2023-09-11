@@ -418,19 +418,6 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
     @transition(
         field="submission_status",
         source=STATUS.AUDITEE_CERTIFIED,
-        target=STATUS.CERTIFIED,
-    )
-    def transition_to_certified(self):
-        """
-        The permission checks verifying that the user attempting to do this has
-        the appropriate privileges will done at the view level.
-        """
-        self.transition_name.append(SingleAuditChecklist.STATUS.CERTIFIED)
-        self.transition_date.append(datetime.now(timezone.utc))
-
-    @transition(
-        field="submission_status",
-        source=[STATUS.AUDITEE_CERTIFIED, STATUS.CERTIFIED],
         target=STATUS.SUBMITTED,
     )
     def transition_to_submitted(self):
@@ -441,8 +428,6 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
 
         from audit.intake_to_dissemination import IntakeToDissemination
         from audit.cog_over import cog_over
-
-        self.transition_to_certified()
 
         self.transition_name.append(SingleAuditChecklist.STATUS.SUBMITTED)
         self.transition_date.append(datetime.now(timezone.utc))

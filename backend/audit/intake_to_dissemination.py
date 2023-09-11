@@ -60,24 +60,21 @@ class IntakeToDissemination(object):
     def load_finding_texts(self):
         findings_text = self.single_audit_checklist.findings_text
 
-        if not findings_text:
-            logger.warning("No finding texts found to load")
-            return
-
-        findings_text_entries = findings_text.get("FindingsText", {}).get(
-            "findings_text_entries", []
-        )
         findings_text_objects = []
-
-        for entry in findings_text_entries:
-            finding_text_ = FindingText(
-                report_id=self.report_id,
-                finding_ref_number=entry["reference_number"],
-                contains_chart_or_table=entry["contains_chart_or_table"] == "Y",
-                finding_text=entry["text_of_finding"],
+        if findings_text:
+            findings_text_entries = findings_text.get("FindingsText", {}).get(
+                "findings_text_entries", []
             )
-            findings_text_objects.append(finding_text_)
-        self.loaded_objects["FindingTexts"] = findings_text_objects
+            for entry in findings_text_entries:
+                finding_text_ = FindingText(
+                    report_id=self.report_id,
+                    finding_ref_number=entry["reference_number"],
+                    contains_chart_or_table=entry["contains_chart_or_table"] == "Y",
+                    finding_text=entry["text_of_finding"],
+                )
+                findings_text_objects.append(finding_text_)
+            self.loaded_objects["FindingTexts"] = findings_text_objects
+
         return findings_text_objects
 
     def load_findings(self):
@@ -319,9 +316,6 @@ class IntakeToDissemination(object):
             ],
             auditee_certified_date=dates_by_status[
                 self.single_audit_checklist.STATUS.AUDITEE_CERTIFIED
-            ],
-            certified_date=dates_by_status[
-                self.single_audit_checklist.STATUS.CERTIFIED
             ],
             submitted_date=dates_by_status[
                 self.single_audit_checklist.STATUS.SUBMITTED

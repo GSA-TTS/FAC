@@ -329,9 +329,6 @@ class General(models.Model):
     auditee_certified_date = models.DateField(
         "The date at which the audit transitioned to 'auditee certified'",
     )
-    certified_date = models.DateField(
-        "The date at which the audit transitioned to 'certified'",
-    )
     submitted_date = models.DateField(
         "The date at which the audit transitioned to 'submitted'",
     )

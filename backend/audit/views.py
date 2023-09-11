@@ -684,7 +684,6 @@ class CertificationView(CertifyingAuditeeRequiredMixin, generic.View):
         try:
             sac = SingleAuditChecklist.objects.get(report_id=report_id)
 
-            sac.transition_to_certified()
             sac.save()
 
             return redirect(reverse("audit:MySubmissions"))

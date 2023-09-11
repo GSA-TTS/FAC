@@ -229,9 +229,8 @@ create view api_v1_0_0.general as
         -- dates
         gen.date_created,
         gen.ready_for_certification_date,
-        gen.auditor_certified_date,
-        gen.auditee_certified_date,
-        gen.certified_date,
+        -- gen.auditor_certified_date,
+        -- gen.auditee_certified_date,
         gen.submitted_date,
         gen.fy_end_date,
         gen.fy_start_date,
