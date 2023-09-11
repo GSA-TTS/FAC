@@ -6,9 +6,9 @@ from dissemination.hist_models.census_2019 import CensusGen19, CensusCfda19
 from dissemination.hist_models.census_2022 import CensusGen22
 from django.db.models.functions import Cast
 from django.db.models import BigIntegerField, Q
-import logging
+# import logging
 
-logger = logging.getLogger(__name__)
+# logger = logging.getLogger(__name__)
 
 
 COG_LIMIT = 50_000_000
@@ -38,7 +38,7 @@ def compute_cog_over(sac: SingleAuditChecklist):
 
     if total_amount_expended <= COG_LIMIT:
         oversight_agency = agency
-        logger.warn("Assigning an oversight agenct", oversight_agency)
+        # logger.warning("Assigning an oversight agenct", oversight_agency)
         return (cognizant_agency, oversight_agency)
     cognizant_agency = determine_hist_agency(sac.ein, sac.auditee_uei)
     if cognizant_agency:
@@ -62,10 +62,10 @@ def calc_award_amounts(awards):
 
 
 def determine_agency(total_amount_expended, max_total_agency, max_da_agency):
-    tie_breaker = {}
+    tie_breaker = defaultdict()
     for key, value in max_da_agency.items():
         if value >= DA_THRESHOLD_FACTOR * total_amount_expended:
-            tie_breaker[key] = value + max_total_agency[key]
+            tie_breaker[key] = value + max_total_agency.get(key, 0)
     for agency in prune_dict_to_max_values(tie_breaker).keys():
         return agency
     for agency in max_total_agency.keys():
@@ -83,7 +83,7 @@ def determine_hist_agency(ein, uei):
         return None
     cfdas = get_2019_cfdas(ein, dbkey)
     if not cfdas:
-        logger.warn("Found no cfda data for dbkey {dbkey} in 2019")
+        # logger.warning("Found no cfda data for dbkey {dbkey} in 2019")
         return None
     (max_total_agency, max_da_agency) = calc_cfda_amounts(cfdas)
     cognizant_agency = determine_agency(
