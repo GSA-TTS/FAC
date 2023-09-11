@@ -6,9 +6,10 @@ from dissemination.hist_models.census_2019 import CensusGen19, CensusCfda19
 from dissemination.hist_models.census_2022 import CensusGen22
 from django.db.models.functions import Cast
 from django.db.models import BigIntegerField, Q
-# import logging
 
-# logger = logging.getLogger(__name__)
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 COG_LIMIT = 50_000_000
@@ -21,7 +22,7 @@ def compute_cog_over(sac: SingleAuditChecklist):
     Return tuple (cog_agency, oversight_agency)
     """
     if not sac.federal_awards:
-        print(
+        logger.warning(
             f"Trying to determine cog_over for a sac with zero awards with status = {sac.submission_status}."
         )
         return (None, None)
@@ -195,8 +196,7 @@ def record_cog_assignment(sac: SingleAuditChecklist, cognizant_agency):
     To be unvoked by app to persist the computed cog agency
     """
     CognizantAssignment(
-        sac=sac,
-        cognizant_agency=cognizant_agency,
+        sac=sac, cognizant_agency=cognizant_agency, assignor_email="cog-system@fac.gov"
     ).save()
 
 

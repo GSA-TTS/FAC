@@ -6,6 +6,7 @@ from dissemination.hist_models.census_2022 import CensusGen22, CensusCfda22
 from audit.models import SingleAuditChecklist
 from support.cog_over import compute_cog_over
 
+
 class Command(BaseCommand):
     help = """
     Analyze cog/over for 20122 submissions
@@ -13,40 +14,44 @@ class Command(BaseCommand):
 
     def handle(self, *args, **kwargs):
         gens = CensusGen22.objects.annotate(
-            amt=Cast("totfedexpend", output_field=BigIntegerField())).all()
+            amt=Cast("totfedexpend", output_field=BigIntegerField())
+        ).all()
         print(f"Count of 2022 submissions: {len(gens)}")
         processed = mismatches = 0
         for gen in gens:
             sac = self.make_sac(gen)
             (cognizant_agency, oversight_agency) = compute_cog_over(sac)
             processed += 1
-            if ( (cognizant_agency and cognizant_agency != sac.cognizant_agency) or
-                (oversight_agency and oversight_agency != sac.oversight_agency)):
+            if (cognizant_agency and cognizant_agency != sac.cognizant_agency) or (
+                oversight_agency and oversight_agency != sac.oversight_agency
+            ):
                 self.show_mismatch(sac)
                 mismatches += 1
             if processed % 1000 == 0:
-                print(f'Processed {processed} rows. Found {mismatches} mismatches  so far ...')
-        print(f'Completed {processed} rows. Found {mismatches} mismatches.')
+                print(
+                    f"Processed {processed} rows. Found {mismatches} mismatches  so far ..."
+                )
+        print(f"Completed {processed} rows. Found {mismatches} mismatches.")
 
     def show_mismatch(self, sac):
         print(
-                    sac.ein,
-                    sac.auditee_uei,
-                    sac.cognizant_agency,
-                    sac.oversight_agency,
-                    sac.federal_awards["FederalAwards"]["total_amount_expended"]
-                )
+            sac.ein,
+            sac.auditee_uei,
+            sac.cognizant_agency,
+            sac.oversight_agency,
+            sac.federal_awards["FederalAwards"]["total_amount_expended"],
+        )
         for award in sac.federal_awards["FederalAwards"]["federal_awards"]:
             print(
-                        'Award:',
-                        award["award_reference"],
-                        award["program"]['amount_expended'],
-                        award["program"]['federal_agency_prefix'],
-                        award["program"]['three_digit_extension'],
-                        award['direct_or_indirect_award']['is_direct'],
-                    )
+                "Award:",
+                award["award_reference"],
+                award["program"]["amount_expended"],
+                award["program"]["federal_agency_prefix"],
+                award["program"]["three_digit_extension"],
+                award["direct_or_indirect_award"]["is_direct"],
+            )
 
-    def make_sac(self, gen:CensusGen22):
+    def make_sac(self, gen: CensusGen22):
         sac = SingleAuditChecklist()
         sac.general_information = {}
         sac.general_information["ein"] = gen.ein
@@ -56,8 +61,8 @@ class Command(BaseCommand):
         sac.federal_awards = self.make_awards(gen)
         return sac
 
-    def make_awards(self, gen:CensusGen22):
-        awards =  {
+    def make_awards(self, gen: CensusGen22):
+        awards = {
             "FederalAwards": {
                 "auditee_uei": gen.uei,
                 "federal_awards": [],
@@ -66,7 +71,7 @@ class Command(BaseCommand):
         }
         cfdas = CensusCfda22.objects.annotate(
             amt=Cast("amount", output_field=BigIntegerField())
-            ).filter(ein=gen.ein, dbkey=gen.dbkey)
+        ).filter(ein=gen.ein, dbkey=gen.dbkey)
         for cfda in cfdas:
             awards["FederalAwards"]["federal_awards"].append(
                 {
@@ -81,9 +86,3 @@ class Command(BaseCommand):
                 },
             )
         return awards
-    
-
-
-
-    
-

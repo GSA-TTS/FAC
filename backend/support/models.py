@@ -21,16 +21,14 @@ class CognizantBaseline(models.Model):
     )
     cognizant_agency = models.CharField(
         "Two digit Federal agency prefix of the cognizant agency",
-        null=True,
         max_length=2,
     )
     date_assigned = models.DateTimeField(
         "Time when the cog agency was assigned to the entity",
-        null=True,
+        null=True,  # allow nulls in case history has nulls
     )
     is_active = models.BooleanField(
         "Record to be ignored if this field is False",
-        null=True,
         default=True,
     )
 
@@ -50,30 +48,20 @@ class CognizantAssignment(models.Model):
     sac = models.ForeignKey(SingleAuditChecklist, on_delete=models.CASCADE)
     cognizant_agency = models.CharField(
         "Two digit Federal agency prefix of the cognizant agency",
-        null=True,
         max_length=2,
     )
     date_assigned = models.DateTimeField(
         "Time when the cog agency was assigned to the entity",
-        null=True,
         auto_now_add=True,
     )
     assignor_email = models.EmailField(
         "Who originally set the cog agency or who overrode it",
-        null=True,
     )
     override_comment = models.TextField(
         "Comment by assignor explaining the justification for an override",
-        null=True,
     )
     assignment_type = models.CharField(
         max_length=20,
         choices=ASSIGNMENT_TYPES,
         default=AssignmentTypeCode.COMPUTED,
-        null=True,
     )
-
-    # def save(self, *args, **kwargs):
-    #     request = kwargs["request"]
-    #     self.assignor_email = request.user.email
-    #     super().save(*args, **kwargs)
