@@ -7,6 +7,7 @@ from django.urls import reverse
 from django.views import View
 
 from audit.models import Access, SingleAuditChecklist, LateChangeError, SubmissionEvent
+from audit.validators import validate_general_information_json
 
 from report_submission.forms import AuditeeInfoForm, GeneralInformationForm
 
@@ -180,6 +181,7 @@ class GeneralInformationFormView(LoginRequiredMixin, View):
                 context = form.cleaned_data | {
                     "errors": form.errors,
                     "report_id": report_id,
+                    "state_abbrevs": STATE_ABBREVS,
                 }
                 message = ""
                 for field, errors in form.errors.items():
@@ -190,7 +192,8 @@ class GeneralInformationFormView(LoginRequiredMixin, View):
             form = self._wipe_auditor_address(form)
             general_information = sac.general_information
             general_information.update(form.cleaned_data)
-            sac.general_information = general_information
+            validated = validate_general_information_json(general_information)
+            sac.general_information = validated
             if general_information.get("audit_type"):
                 sac.audit_type = general_information["audit_type"]
 
