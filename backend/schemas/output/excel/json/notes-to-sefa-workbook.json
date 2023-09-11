@@ -102,8 +102,8 @@
             },
             {
                "help": {
-                  "link": "https://fac.gov/documentation/validation/#yorn",
-                  "text": "This field must be either `Y` or `N`"
+                  "link": "https://fac.gov/documentation/validation/#yornorboth",
+                  "text": "This field must be either `Y`, `N`, or `Both`"
                },
                "range_cell": "B6",
                "range_name": "is_minimis_rate_used",
@@ -112,9 +112,9 @@
                "type": "single_cell",
                "validation": {
                   "allow_blank": "False",
-                  "custom_error": "Must be 'Y' or 'N' or 'Y&N'",
-                  "custom_title": "Y/N/Y&N",
-                  "formula1": "\"Y,N,Y&N\"",
+                  "custom_error": "Must be 'Y' or 'N' or 'Both'",
+                  "custom_title": "Y/N/Both",
+                  "formula1": "\"Y,N,Both\"",
                   "type": "list"
                },
                "width": 24

@@ -1,3 +1,4 @@
+from datetime import datetime, timezone
 from django.test import TestCase
 
 from model_bakery import baker
@@ -14,12 +15,26 @@ from dissemination.models import (
     CapText,
     SecondaryAuditor,
 )
-from audit.etl import ETL
+from audit.intake_to_dissemination import IntakeToDissemination
 
 
-class ETLTests(TestCase):
+class IntakeToDisseminationTests(TestCase):
     def __init__(self, methodName: str = "runTest") -> None:
         super().__init__(methodName)
+
+    def _run_state_transition(self, sac):
+        statuses = [
+            SingleAuditChecklist.STATUS.READY_FOR_CERTIFICATION,
+            SingleAuditChecklist.STATUS.AUDITOR_CERTIFIED,
+            SingleAuditChecklist.STATUS.AUDITEE_CERTIFIED,
+            SingleAuditChecklist.STATUS.CERTIFIED,
+            SingleAuditChecklist.STATUS.SUBMITTED,
+        ]
+
+        for status in statuses:
+            sac.transition_date.append(datetime.now(timezone.utc))
+            sac.transition_name.append(status)
+            sac.save()
 
     def setUp(self):
         self.user = baker.make(User)
@@ -34,11 +49,14 @@ class ETLTests(TestCase):
             corrective_action_plan=self._fake_corrective_action_plan(),
             secondary_auditors=self._fake_secondary_auditors(),
             additional_ueis=self._fake_additional_ueis(),
-            # audit_information=self._fake_audit_information(),  # TODO: Uncomment when SingleAuditChecklist adds audit_information
+            audit_information=self._fake_audit_information(),
+            auditee_certification=self._fake_auditee_certification(),
+            cognizant_agency="42",
+            oversight_agency="42",
         )
-        sac.save()
+        self._run_state_transition(sac)
         self.sac = sac
-        self.etl = ETL(self.sac)
+        self.intake_to_dissemination = IntakeToDissemination(self.sac)
         self.report_id = sac.report_id
 
     @staticmethod
@@ -64,13 +82,13 @@ class ETLTests(TestCase):
             "auditor_country": "USA",
             "auditor_firm_name": fake.company(),
             "audit_period_covered": "annual",
-            "audit_period_other_months": None,
+            "audit_period_other_months": fake.random_int(min=1, max=12),
             "auditee_contact_name": fake.name(),
             "auditor_contact_name": fake.name(),
             "auditee_contact_title": "Boss",
             "auditor_contact_title": "Mega Boss",
-            "multiple_eins_covered": "false",
-            "multiple_ueis_covered": "false",
+            "multiple_eins_covered": fake.boolean(),
+            "multiple_ueis_covered": fake.boolean(),
             "auditee_address_line_1": fake.street_address(),
             "auditor_address_line_1": fake.street_address(),
             "met_spending_threshold": "true",
@@ -79,6 +97,27 @@ class ETLTests(TestCase):
             "auditee_fiscal_period_start": "2022-11-01",
             "user_provided_organization_type": "state",
             "auditor_ein_not_an_ssn_attestation": "true",
+        }
+
+    @staticmethod
+    def _fake_auditee_certification():
+        fake = Faker()
+        return {
+            "auditee_certification": {
+                "has_no_PII": fake.boolean(),
+                "has_no_BII": fake.boolean(),
+                "meets_2CFR_specifications": fake.boolean(),
+                "is_2CFR_compliant": fake.boolean(),
+                "is_complete_and_accurate": fake.boolean(),
+                "has_engaged_auditor": fake.boolean(),
+                "is_issued_and_signed": fake.boolean(),
+                "is_FAC_releasable": fake.boolean(),
+            },
+            "auditee_signature": {
+                "auditee_name": fake.name(),
+                "auditee_title": fake.job(),
+                "auditee_certification_date_signed": fake.date(),
+            },
         }
 
     @staticmethod
@@ -99,6 +138,7 @@ class ETLTests(TestCase):
                             "three_digit_extension": "600",
                             "number_of_audit_findings": 0,
                             "additional_award_identification": "COVID-19",
+                            "is_major": "N",
                         },
                         "subrecipients": {"is_passed": "N"},
                         "loan_or_loan_guarantee": {
@@ -261,73 +301,83 @@ class ETLTests(TestCase):
         }
 
     def test_load_general(self):
-        self.etl.load_general()
+        self.intake_to_dissemination.load_general()
+        self.intake_to_dissemination.save_dissemination_objects()
         generals = General.objects.all()
         self.assertEqual(len(generals), 1)
         general = generals.first()
         self.assertEqual(self.report_id, general.report_id)
-
-    def test_load_award_before_general_should_fail(self):
-        self.etl.load_federal_award()
-        federal_awards = FederalAward.objects.all()
-        self.assertEqual(len(federal_awards), 0)
-
-    def test_load_federal_award(self):
-        self.etl.load_general()
-        self.etl.load_federal_award()
-        federal_awards = FederalAward.objects.all()
-        self.assertEqual(len(federal_awards), 1)
-        federal_award = federal_awards.first()
-        self.assertEqual(self.report_id, federal_award.report_id)
-        general = General.objects.first()
         self.assertEqual(
             general.total_amount_expended,
             self.sac.federal_awards["FederalAwards"].get("total_amount_expended"),
         )
 
+    def test_load_award_before_general_should_fail(self):
+        self.intake_to_dissemination.load_federal_award()
+        federal_awards = FederalAward.objects.all()
+        self.assertEqual(len(federal_awards), 0)
+
+    def test_load_federal_award(self):
+        self.intake_to_dissemination.load_federal_award()
+        self.intake_to_dissemination.save_dissemination_objects()
+        self.intake_to_dissemination.load_general()
+        federal_awards = FederalAward.objects.all()
+        self.assertEqual(len(federal_awards), 1)
+        federal_award = federal_awards.first()
+        self.assertEqual(self.report_id, federal_award.report_id)
+
     def test_load_findings(self):
-        self.etl.load_findings()
+        self.intake_to_dissemination.load_findings()
+        self.intake_to_dissemination.save_dissemination_objects()
         findings = Finding.objects.all()
         self.assertEqual(len(findings), 4)
         finding = findings.first()
         self.assertEqual(self.report_id, finding.report_id)
 
     def test_load_passthrough(self):
-        self.etl.load_passthrough()
+        self.intake_to_dissemination.load_passthrough()
+        self.intake_to_dissemination.save_dissemination_objects()
         passthroughs = Passthrough.objects.all()
         self.assertEqual(len(passthroughs), 1)
         passthrough = passthroughs.first()
         self.assertEqual(self.report_id, passthrough.report_id)
 
     def test_load_notes(self):
-        self.etl.load_note()
+        self.intake_to_dissemination.load_notes()
+        self.intake_to_dissemination.save_dissemination_objects()
         notes = Note.objects.all()
         self.assertEqual(len(notes), 1)
         note = notes.first()
         self.assertEqual(self.report_id, note.report_id)
 
     def test_load_finding_texts(self):
-        self.etl.load_finding_texts()
+        self.intake_to_dissemination.load_finding_texts()
+        self.intake_to_dissemination.save_dissemination_objects()
         finding_texts = FindingText.objects.all()
         self.assertEqual(len(finding_texts), 1)
         finding_text = finding_texts.first()
         self.assertEqual(self.report_id, finding_text.report_id)
 
     def test_load_captext(self):
-        self.etl.load_captext()
+        self.intake_to_dissemination.load_captext()
+        self.intake_to_dissemination.save_dissemination_objects()
         cap_texts = CapText.objects.all()
         self.assertEqual(len(cap_texts), 1)
         cap_text = cap_texts.first()
         self.assertEqual(self.report_id, cap_text.report_id)
 
     def test_load_sec_auditor(self):
-        self.etl.load_secondary_auditor()
+        self.intake_to_dissemination.load_secondary_auditor()
+        self.intake_to_dissemination.save_dissemination_objects()
         sec_auditor = SecondaryAuditor.objects.first()
+        print(self.sac.report_id)
+        print(sec_auditor.report_id)
         self.assertEquals(self.sac.report_id, sec_auditor.report_id)
 
     # TODO rename to test_load_audit once frontend is available
     def todo_load_audit_information(self):
-        self.etl.load_audit_info()
+        self.intake_to_dissemination._load_audit_info()
+        self.intake_to_dissemination.save_dissemination_objects()
         general = General.objects.first()
         sac = SingleAuditChecklist.objects.first()
         self.assertEquals(sac.audit_information["gaap_results"], general.gaap_results)
@@ -337,6 +387,7 @@ class ETLTests(TestCase):
         tables."""
         len_general = len(General.objects.all())
         len_captext = len(CapText.objects.all())
+
         sac = SingleAuditChecklist.objects.create(
             submitted_by=self.user,
             general_information=self._fake_general(),
@@ -347,13 +398,15 @@ class ETLTests(TestCase):
             corrective_action_plan=self._fake_corrective_action_plan(),
             secondary_auditors=self._fake_secondary_auditors(),
             additional_ueis=self._fake_additional_ueis(),
-            # audit_information=self._fake_audit_information(),  # TODO: Uncomment when SingleAuditChecklist adds audit_information
+            audit_information=self._fake_audit_information(),
+            auditee_certification=self._fake_auditee_certification(),
         )
-        sac.save()
+        self._run_state_transition(sac)
         self.sac = sac
-        self.etl = ETL(self.sac)
+        self.intake_to_dissemination = IntakeToDissemination(self.sac)
+        self.intake_to_dissemination.load_all()
+        self.intake_to_dissemination.save_dissemination_objects()
         self.report_id = sac.report_id
-        self.etl.load_all()
         self.assertLess(len_general, len(General.objects.all()))
         self.assertLess(len_captext, len(CapText.objects.all()))
 
@@ -373,14 +426,16 @@ class ETLTests(TestCase):
             corrective_action_plan=self._fake_corrective_action_plan(),
             secondary_auditors=self._fake_secondary_auditors(),
             additional_ueis=self._fake_additional_ueis(),
-            # audit_information=self._fake_audit_information(),  # TODO: Uncomment when SingleAuditChecklist adds audit_information
+            audit_information=self._fake_audit_information(),
+            auditee_certification=self._fake_auditee_certification(),
         )
         sac.general_information.pop("auditee_contact_name")
-        sac.save()
+        self._run_state_transition(sac)
         self.sac = sac
-        self.etl = ETL(self.sac)
+        self.intake_to_dissemination = IntakeToDissemination(self.sac)
         self.report_id = sac.report_id
-        self.etl.load_all()
+        self.intake_to_dissemination.load_all()
+        self.intake_to_dissemination.save_dissemination_objects()
         self.assertEqual(len_general, len(General.objects.all()))
         self.assertLess(len_captext, len(CapText.objects.all()))
 
@@ -400,13 +455,60 @@ class ETLTests(TestCase):
             corrective_action_plan=self._fake_corrective_action_plan(),
             secondary_auditors=self._fake_secondary_auditors(),
             additional_ueis=self._fake_additional_ueis(),
-            # audit_information=self._fake_audit_information(),  # TODO: Uncomment when SingleAuditChecklist adds audit_information
+            audit_information=self._fake_audit_information(),
+            auditee_certification=self._fake_auditee_certification(),
         )
         sac.corrective_action_plan.pop("CorrectiveActionPlan")
-        sac.save()
+        self._run_state_transition(sac)
         self.sac = sac
-        self.etl = ETL(self.sac)
+        self.intake_to_dissemination = IntakeToDissemination(self.sac)
         self.report_id = sac.report_id
-        self.etl.load_all()
+        self.intake_to_dissemination.load_all()
+        self.intake_to_dissemination.save_dissemination_objects()
         self.assertLess(len_general, len(General.objects.all()))
         self.assertEqual(len_captext, len(CapText.objects.all()))
+
+    def test_load_and_return_objects(self):
+        len_general = len(General.objects.all())
+        len_captext = len(CapText.objects.all())
+        sac = SingleAuditChecklist.objects.create(
+            submitted_by=self.user,
+            general_information=self._fake_general(),
+            federal_awards=self._fake_federal_awards(),
+            findings_uniform_guidance=self._fake_findings_uniform_guidance(),
+            notes_to_sefa=self._fake_notes_to_sefa(),
+            findings_text=self._fake_findings_text(reference_number=2),
+            corrective_action_plan=self._fake_corrective_action_plan(),
+            secondary_auditors=self._fake_secondary_auditors(),
+            additional_ueis=self._fake_additional_ueis(),
+            audit_information=self._fake_audit_information(),
+            auditee_certification=self._fake_auditee_certification(),
+        )
+        self._run_state_transition(sac)
+        self.sac = sac
+        self.intake_to_dissemination = IntakeToDissemination(self.sac)
+        self.report_id = sac.report_id
+        self.intake_to_dissemination.load_all()
+        objs = self.intake_to_dissemination.get_dissemination_objects()
+        self.assertEqual(len_general, len(General.objects.all()))
+        self.assertEqual(len_captext, len(CapText.objects.all()))
+        keys = [
+            "Generals",
+            "SecondaryAuditors",
+            "FederalAwards",
+            "Findings",
+            "FindingTexts",
+            "Passthroughs",
+            "CapTexts",
+            "Notes",
+            "Revisions",
+        ]
+
+        print(objs)
+
+        for k, v in objs.items():
+            self.assertTrue(k in keys, f"Key {k} not found in keys.")
+            self.assertTrue(len(v) > 0, f"Value list for {k} is empty.")
+
+            for obj in v:
+                self.assertIsNotNone(obj, "Object should not be None.")
