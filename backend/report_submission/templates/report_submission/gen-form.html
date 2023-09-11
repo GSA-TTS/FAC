@@ -37,6 +37,9 @@
                 <fieldset class="usa-fieldset">
                     <legend class="usa-legend usa-legend--large" id="general-information">General information</legend>
                     <p>All Fields are required before a final submission can be made.</p>
+                    {% if errors %}
+                        <span class="usa-error-message" role="alert">There were errors when attempting to submit the form. Scroll down for more details.</span>
+                    {% endif %}
                     <fieldset class="usa-fieldset" id="audit-type" navitem>
                         <fieldset class="usa-fieldset question" id="fiscal-period-dates">
                             <legend class="usa-legend usa-legend--large">Fiscal Period</legend>
@@ -48,6 +51,7 @@
                                        name="auditee_fiscal_period_start"
                                        aria-required="false"
                                        value="{{ auditee_fiscal_period_start | default_if_none:'' }}" />
+                                <span class="usa-error-message" id="auditee-city-error-message" role="alert">{{ errors.auditee_fiscal_period_start|striptags }}</span>
                             </div>
                             <div class="usa-form-group">
                                 <label class="usa-label" for="auditee_fiscal_period_end">What is your fiscal period end date?</label>
@@ -57,6 +61,7 @@
                                        name="auditee_fiscal_period_end"
                                        aria-required="false"
                                        value="{{ auditee_fiscal_period_end | default_if_none:'' }}" />
+                                <span class="usa-error-message" id="auditee-fiscal-period-end-error-message" role="alert">{{ errors.auditee_fiscal_period_end|striptags }}</span>
                             </div>
                         </fieldset>
                         <fieldset class="usa-fieldset question" id="type-of-audit">
@@ -119,7 +124,7 @@
                                        {% if audit_period_covered == "other" %}checked{% endif %} />
                                 <label class="usa-radio__label" for="audit-period-other">Other</label>
                                 <input class="usa-input usa-input--small"
-                                       type="text"
+                                       type="number"
                                        id="audit_period_other_months"
                                        name="audit_period_other_months"
                                        value="{{ audit_period_other_months | default_if_none:'' }}"
@@ -293,6 +298,7 @@
                                        name="auditee_phone"
                                        aria-required="false"
                                        value="{{ auditee_phone | default_if_none:'' }}" />
+                                <span class="usa-error-message" id="auditee-phone-error-message" role="alert">{{ errors.auditee_phone|striptags }}</span>
                             </div>
                             <div class="usa-form-group">
                                 <label class="usa-label" for="auditee_email">Auditee email</label>
@@ -454,6 +460,7 @@
                                        name="auditor_phone"
                                        aria-required="false"
                                        value="{{ auditor_phone | default_if_none:'' }}" />
+                                <span class="usa-error-message" id="auditor-phone-error-message" role="alert">{{ errors.auditor_phone|striptags }}</span>
                             </div>
                             <div class="usa-form-group">
                                 <label class="usa-label" for="auditor_email">Auditor email</label>
