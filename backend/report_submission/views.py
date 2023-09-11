@@ -225,7 +225,7 @@ class GeneralInformationFormView(LoginRequiredMixin, View):
             "auditor_state",
             "auditor_zip",
         ]
-        if form.cleaned_data["auditor_country"] == "non-USA":
+        if form.cleaned_data.get("auditor_country") == "non-USA":
             for key in keys_to_wipe:
                 form.cleaned_data[key] = ""
         else:

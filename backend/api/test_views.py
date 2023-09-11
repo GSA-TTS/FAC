@@ -740,7 +740,6 @@ class SingleAuditChecklistViewTests(TestCase):
                 "user_provided_organization_type",
                 "['state', 'local', 'tribal', 'higher-ed', 'non-profit', 'unknown', 'none']",
             ),
-            ("auditor_country", "['USA', 'non-USA']"),
         ]
 
         length_100_keys = [
@@ -756,8 +755,10 @@ class SingleAuditChecklistViewTests(TestCase):
         ]
 
         for key in email_keys:
+            # Valid emails are either an empty string or a proper email.
+            # The empty string error comes back first.
             expected = {
-                "errors": {"general_information": ["'invalid_email' is not a 'email'"]}
+                "errors": {"general_information": ["'' was expected"]}
             }
             with self.subTest():
                 nested = {"general_information": {key: "invalid_email"}}
@@ -787,14 +788,21 @@ class SingleAuditChecklistViewTests(TestCase):
                 nested = {"general_information": {key: "invalid_boolean"}}
                 check_response(nested, expected)
 
+        # Invalid under both the choice schema and the empty string schema
         for key, choices in choice_keys:
             message = f"'invalid_choice' is not one of {choices}"
-            expected = {"errors": {"general_information": [message]}}
+            # Invalid under both the choice schema and the empty string schema
+            expected = {'errors': {'general_information': ["'invalid_choice' is not valid under any of the given schemas"]}}
             with self.subTest():
                 nested = {"general_information": {key: "invalid_choice"}}
-                if key == "auditor_country":
-                    nested["general_information"]["auditor_zip"] = ""
                 check_response(nested, expected)
+
+        # Invalid under only the choice schema
+        message = f"'invalid_choice' is not one of ['USA', 'non-USA']"
+        expected = {'errors': {'general_information': ["'invalid_choice' is not one of ['USA', 'non-USA']"]}}
+        with self.subTest():
+            nested = {"general_information": {"auditor_country": "invalid_choice"}}
+            check_response(nested, expected)
 
         for key in length_100_keys:
             one = "a value over one hundred characters long is annoying to enter "
@@ -824,7 +832,12 @@ class SingleAuditChecklistViewTests(TestCase):
                 access = baker.make(Access, user=self.user, sac=sac)
 
                 path = self.path(access.sac.report_id)
+                print(path)
+                print(after)
                 response = self.client.put(path, after, format="json")
+
+                print(response)
+                print(response.json())
                 self.assertEqual(response.status_code, 200)
 
                 updated_sac = SingleAuditChecklist.objects.get(pk=sac.id)
