@@ -1,7 +1,7 @@
 import logging
 from datetime import datetime
 
-# from django.db import IntegrityError
+from django.db import IntegrityError
 
 from dissemination.models import (
     FindingText,
@@ -58,21 +58,15 @@ class IntakeToDissemination(object):
         return self.loaded_objects
 
     def save_dissemination_objects(self):
-        for key in self.loaded_objects.keys():
-            for o in self.loaded_objects[key]:
-                o.save()
-
-    # FIXME MSHD: Should we use bulk_create here?
-    # def save_dissemination_objects(self):
-    #     for key, object_list in self.loaded_objects.items():
-    #         try:
-    #             if object_list:
-    #                 model_class = type(object_list[0])
-    #                 model_class.objects.bulk_create(object_list)
-    #         except IntegrityError as e:
-    #             logging.warning(
-    #                 f"An error occurred during bulk creation for {key}: {e}"
-    #             )
+        for key, object_list in self.loaded_objects.items():
+            try:
+                if object_list:
+                    model_class = type(object_list[0])
+                    model_class.objects.bulk_create(object_list)
+            except IntegrityError as e:
+                logging.warning(
+                    f"An error occurred during bulk creation for {key}: {e}"
+                )
 
     def load_finding_texts(self):
         findings_text = self.single_audit_checklist.findings_text
