@@ -1,9 +1,11 @@
+local Base = import '../../base/Base.libsonnet';
 local Fun = import '../libs/Functions.libsonnet';
 local Help = import '../libs/Help.libsonnet';
 local SV = import '../libs/SheetValidations.libsonnet';
 local Sheets = import '../libs/Sheets.libsonnet';
 local textSheet = 'Form';
 local coverSheet = 'Coversheet';
+local stateCodeLookup = 'StateCodeLookup';
 local title_row = 1;
 
 local meta_cells = [
@@ -62,6 +64,7 @@ local open_ranges_defns = [
     Sheets.open_range {
       title_cell: 'A1',
       width: 100,
+      format: 'text',
       help: Help.plain_text,
     },
     SV.NoValidation,
@@ -72,6 +75,7 @@ local open_ranges_defns = [
     Sheets.open_range {
       title_cell: 'B1',
       width: 36,
+      format: 'text',
       help: Help.ein,
     },
     SV.StringOfLengthNine,
@@ -82,6 +86,7 @@ local open_ranges_defns = [
     Sheets.open_range {
       title_cell: 'C1',
       width: 100,
+      format: 'text',
       help: Help.plain_text,
     },
     SV.NoValidation,
@@ -92,6 +97,7 @@ local open_ranges_defns = [
     Sheets.open_range {
       title_cell: 'D1',
       width: 100,
+      format: 'text',
       help: Help.plain_text,
     },
     SV.NoValidation,
@@ -101,10 +107,15 @@ local open_ranges_defns = [
   [
     Sheets.open_range {
       title_cell: 'E1',
-      width: 100,
+      width: 36,
+      format: 'text',
       help: Help.plain_text,
     },
-    SV.NoValidation,
+    SV.RangeLookupValidation {
+      sheet: stateCodeLookup,
+      lookup_range: 'state_code_lookup',
+      custom_error: 'Please enter a valid state code.',
+    },
     'Audit Firm/Organization State',
     'secondary_auditor_address_state',
   ],
@@ -112,6 +123,7 @@ local open_ranges_defns = [
     Sheets.open_range {
       title_cell: 'F1',
       width: 36,
+      format: 'text',
       help: Help.plain_text,
     },
     SV.NoValidation,
@@ -122,6 +134,7 @@ local open_ranges_defns = [
     Sheets.open_range {
       title_cell: 'G1',
       width: 36,
+      format: 'text',
       help: Help.plain_text,
     },
     SV.NoValidation,
@@ -132,6 +145,7 @@ local open_ranges_defns = [
     Sheets.open_range {
       title_cell: 'H1',
       width: 36,
+      format: 'text',
       help: Help.plain_text,
     },
     SV.NoValidation,
@@ -142,6 +156,7 @@ local open_ranges_defns = [
     Sheets.open_range {
       title_cell: 'I1',
       width: 36,
+      format: 'text',
       help: Help.plain_text,
     },
     SV.NoValidation,
@@ -152,6 +167,7 @@ local open_ranges_defns = [
     Sheets.open_range {
       title_cell: 'J1',
       width: 36,
+      format: 'text',
       help: Help.plain_text,
     },
     SV.NoValidation,
@@ -172,6 +188,22 @@ local sheets = [
     name: textSheet,
     open_ranges: Fun.make_open_ranges_with_column(title_row, open_ranges_defns),
     header_height: 48,
+  },
+  {
+    name: stateCodeLookup,
+    text_ranges: [
+      {
+        type: 'text_range',
+        title: 'State Code',
+        title_cell: 'A1',
+        range_name: 'state_code_lookup',
+        last_range_cell: 'A60',
+        contents: Base.Enum.UnitedStatesStateAbbr,
+        validation: SV.LookupValidation {
+          lookup_range: 'state_code_lookup',
+        },
+      },
+    ],
   },
 ];
 
