@@ -7,11 +7,15 @@
     "http://localhost:8000/audit"
   ],
   "defaults": {
+    "timeout": 60000,
     "standard": "WCAG2AA",
     "runners": [
       "htmlcs",
       "axe"
     ],
-    "hideElements": ".pa11y-ignore, .usa-select, .usa-step-indicator__segment-label, .is-hidden, #upload-worksheet, .usa-file-input__instructions, #my-submissions"
+    "hideElements": ".pa11y-ignore, .usa-select, .usa-step-indicator__segment-label, .is-hidden, #upload-worksheet, .usa-file-input__instructions, #my-submissions",
+    "chromeLaunchConfig": {
+      "executablePath": "/usr/bin/google-chrome"
+    }
   }
 }
