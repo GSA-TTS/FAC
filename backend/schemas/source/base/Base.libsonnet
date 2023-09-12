@@ -9,6 +9,7 @@ local Const = {
   Y: 'Y',
   N: 'N',
   Y_N: 'Y&N',
+  BOTH: "Both",
   NA: 'N/A',
   SCHEMA_VERSION: 'https://json-schema.org/draft/2019-09/schema#',
   empty_string: '',
@@ -68,6 +69,7 @@ local REGEX_ALN_PREFIX = '^([0-9]{2})$';
 local REGEX_RD_EXTENSION = 'RD';
 local REGEX_THREE_DIGIT_EXTENSION = '[0-9]{3}[A-Za-z]{0,1}';
 local REGEX_U_EXTENSION = 'U[0-9]{2}';
+local REGEX_NUMBER = '[0-9]+';
 
 local type_aln_prefix = Types.string {
   allOf: [
@@ -91,26 +93,8 @@ local type_three_digit_extension = Types.string {
 
 };
 
-local Validation = {
-  AdditionalAwardIdentificationValidation: [
-    {
-      'if': {
-        properties: {
-          three_digit_extension: {
-            pattern: '^(' + REGEX_RD_EXTENSION + '|' + REGEX_U_EXTENSION + ')$',
-          },
-        },
-      },
-      'then': {
-        properties: {
-          additional_award_identification: Func.compound_type([Types.integer, Types.string]) {
-            minLength: 1,
-          },
-        },
-        required: ['additional_award_identification'],
-      },
-    },
-  ],
+local type_extension_rd_or_u = Types.string {
+      pattern:'^(' + REGEX_RD_EXTENSION + '|' + REGEX_U_EXTENSION + ')$',
 };
 
 local Atoms = {
@@ -130,7 +114,7 @@ local Enum = {
     enum: [
       Const.Y,
       Const.N,
-      Const.Y_N,
+      Const.BOTH,
     ],
   },
   NA: Types.string {
@@ -318,11 +302,6 @@ local Compound = {
     description: 'Compliance requirement type',
     pattern: '^A?B?C?E?F?G?H?I?J?L?M?N?P?$',
   },
-  Date: Types.string {
-    title: 'Date',
-    description: 'MM/DD/YYYY',
-    pattern: '^[0-9]{2}/[0-9]{2}/[0-9]{4}$',  // Values like 00/00/0000
-  },
   NonEmptyString: Types.string {
     minLength: 1,
   },
@@ -389,7 +368,7 @@ local SchemaBase = Types.object {
       description: 'Compliance requirement types',
       enum: ComplianceRequirementTypes.requirement_types,
     },
+    ExtensionRdOrU: type_extension_rd_or_u,
   },
-  Validation: Validation,
   SchemaBase: SchemaBase,
 }

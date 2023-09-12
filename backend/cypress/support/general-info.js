@@ -27,6 +27,7 @@ export function testValidGeneralInfo() {
 
 	//auditor info
 	cy.get('#auditor_firm_name').type('House of Audit');
+	cy.get('#auditor_country').type('USA{enter}');
 	cy.get('#auditor_address_line_1').type('123 Around the corner');
 	cy.get('#auditor_city').type('Centreville');
 	cy.get('#auditor_state').type('VA{enter}');
