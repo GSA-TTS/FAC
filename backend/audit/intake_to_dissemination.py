@@ -1,6 +1,8 @@
 import logging
 from datetime import datetime
 
+from django.db import IntegrityError
+
 from dissemination.models import (
     FindingText,
     Finding,
@@ -11,8 +13,10 @@ from dissemination.models import (
     General,
     SecondaryAuditor,
     AdditionalUei,
+    AdditionalEin,
 )
 from audit.models import SingleAuditChecklist
+from audit.utils import Util
 
 logger = logging.getLogger(__name__)
 
@@ -38,6 +42,7 @@ class IntakeToDissemination(object):
             "CapTexts": self.load_captext,
             "Notes": self.load_notes,
             "AdditionalUEIs": self.load_additional_ueis,
+            "AdditionalEINs": self.load_additional_eins,
         }
         for _, load_method in load_methods.items():
             try:
@@ -56,6 +61,18 @@ class IntakeToDissemination(object):
         for key in self.loaded_objects.keys():
             for o in self.loaded_objects[key]:
                 o.save()
+
+    # FIXME MSHD: Should we use bulk_create here?
+    # def save_dissemination_objects(self):
+    #     for key, object_list in self.loaded_objects.items():
+    #         try:
+    #             if object_list:
+    #                 model_class = type(object_list[0])
+    #                 model_class.objects.bulk_create(object_list)
+    #         except IntegrityError as e:
+    #             logging.warning(
+    #                 f"An error occurred during bulk creation for {key}: {e}"
+    #             )
 
     def load_finding_texts(self):
         findings_text = self.single_audit_checklist.findings_text
@@ -239,24 +256,6 @@ class IntakeToDissemination(object):
                 return_dict[status] = None
         return return_dict
 
-    def _bool_to_yes_no(self, condition):
-        return "Yes" if condition else "No"
-
-    def _optional_bool(self, condition):
-        if condition is None:
-            return ""
-        else:
-            return "Yes" if condition else "No"
-
-    def _json_array_to_str(self, json_array):
-        if json_array is None:
-            return ""
-        elif isinstance(json_array, list):
-            return ", ".join(map(str, json_array))
-        else:
-            # FIXME This should raise an error
-            return f"NOT AN ARRAY: {json_array}"
-
     def load_general(self):
         general_information = self.single_audit_checklist.general_information
         auditee_certification = self.single_audit_checklist.auditee_certification
@@ -283,7 +282,7 @@ class IntakeToDissemination(object):
             auditee_state=general_information["auditee_state"],
             auditee_ein=general_information["ein"],
             auditee_uei=general_information["auditee_uei"],
-            is_additional_ueis=self._bool_to_yes_no(
+            is_additional_ueis=Util.bool_to_yes_no(
                 general_information["multiple_ueis_covered"]
             ),
             auditee_zip=general_information["auditee_zip"],
@@ -326,37 +325,37 @@ class IntakeToDissemination(object):
             fy_start_date=general_information["auditee_fiscal_period_start"],
             audit_year=str(self.audit_year),
             audit_type=general_information["audit_type"],
-            gaap_results=self._json_array_to_str(audit_information["gaap_results"]),
-            sp_framework_basis=self._json_array_to_str(
+            gaap_results=Util.json_array_to_str(audit_information["gaap_results"]),
+            sp_framework_basis=Util.json_array_to_str(
                 audit_information.get("sp_framework_basis")
             ),
-            is_sp_framework_required=self._optional_bool(
+            is_sp_framework_required=Util.optional_bool(
                 audit_information.get("is_sp_framework_required", None)
             ),
-            sp_framework_opinions=self._json_array_to_str(
+            sp_framework_opinions=Util.json_array_to_str(
                 audit_information.get("sp_framework_opinions")
             ),
-            is_going_concern_included=self._bool_to_yes_no(
+            is_going_concern_included=Util.bool_to_yes_no(
                 audit_information["is_going_concern_included"]
             ),
-            is_internal_control_deficiency_disclosed=self._bool_to_yes_no(
+            is_internal_control_deficiency_disclosed=Util.bool_to_yes_no(
                 audit_information["is_internal_control_deficiency_disclosed"]
             ),
-            is_internal_control_material_weakness_disclosed=self._bool_to_yes_no(
+            is_internal_control_material_weakness_disclosed=Util.bool_to_yes_no(
                 audit_information["is_internal_control_material_weakness_disclosed"]
             ),
-            is_material_noncompliance_disclosed=self._bool_to_yes_no(
+            is_material_noncompliance_disclosed=Util.bool_to_yes_no(
                 audit_information["is_material_noncompliance_disclosed"]
             ),
-            # is_duplicate_reports = self._bool_to_yes_no(audit_information["is_aicpa_audit_guide_included"]), #FIXME This mapping does not seem correct
-            is_aicpa_audit_guide_included=self._bool_to_yes_no(
+            # is_duplicate_reports = Util.bool_to_yes_no(audit_information["is_aicpa_audit_guide_included"]), #FIXME This mapping does not seem correct
+            is_aicpa_audit_guide_included=Util.bool_to_yes_no(
                 audit_information["is_aicpa_audit_guide_included"]
             ),
             dollar_threshold=audit_information["dollar_threshold"],
-            is_low_risk_auditee=self._bool_to_yes_no(
+            is_low_risk_auditee=Util.bool_to_yes_no(
                 audit_information["is_low_risk_auditee"]
             ),
-            agencies_with_prior_findings=self._json_array_to_str(
+            agencies_with_prior_findings=Util.json_array_to_str(
                 audit_information["agencies"]
             ),
             entity_type=general_information["user_provided_organization_type"],
@@ -407,14 +406,34 @@ class IntakeToDissemination(object):
 
     def load_additional_ueis(self):
         addls = self.single_audit_checklist.additional_ueis
+        uei_objs = []
         if (
             addls
             and "AdditionalUEIs" in addls
             and "additional_ueis_entries" in addls["AdditionalUEIs"]
         ):
-            for uei in addls["AdditionalUEIs"]["additional_ueis_entries"]:
-                auei = AdditionalUei(
+            for entry in addls["AdditionalUEIs"]["additional_ueis_entries"]:
+                uei = AdditionalUei(
                     report_id=self.single_audit_checklist.report_id,
-                    additional_uei=uei["additional_uei"],
+                    additional_uei=entry["additional_uei"],
                 )
-                auei.save()  # FIXME: We could use a bulk insert here. Also, we could do all save in a batch.
+                uei_objs.append(uei)
+        self.loaded_objects["AdditionalUEIs"] = uei_objs
+        return uei_objs
+
+    def load_additional_eins(self):
+        addls = self.single_audit_checklist.additional_eins
+        ein_objs = []
+        if (
+            addls
+            and "AdditionalEINs" in addls
+            and "additional_eins_entries" in addls["AdditionalEINs"]
+        ):
+            for entry in addls["AdditionalEINs"]["additional_eins_entries"]:
+                ein = AdditionalEin(
+                    report_id=self.single_audit_checklist.report_id,
+                    additional_ein=entry["additional_ein"],
+                )
+                ein_objs.append(ein)
+        self.loaded_objects["AdditionalEINs"] = ein_objs
+        return ein_objs
