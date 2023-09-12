@@ -2,41 +2,20 @@ local Base = import '../base/Base.libsonnet';
 local Func = import '../base/Functions.libsonnet';
 local Types = Base.Types;
 
+/*
+Typechecks fields, but allows for empty data as well. Contains conditional Checks.
+*/
 {
   '$id': 'http://example.org/generalinformation',
   '$schema': Base.Const.SCHEMA_VERSION,
   additionalProperties: false,
   metamodel_version: '1.7.0',
   properties: {
-    audit_type: {
-      oneOf: [
-        Base.Enum.AuditType,
-        Base.Compound.EmptyString,
-      ]
-    },
-    audit_period_covered: {
-      oneOf: [
-        Base.Enum.AuditPeriod,
-        Base.Compound.EmptyString,
-      ]
-    },
-    audit_period_other_months: Types.string,
-    auditee_address_line_1: Types.string {
-      maxLength: 100,
-    },
-    auditee_city: Types.string {
-      maxLength: 100,
-    },
-    auditee_contact_name: Types.string {
-      maxLength: 100,
-    },
-    auditee_contact_title: Types.string {
-      maxLength: 100,
-    },
-    auditee_email: Types.string {
+    // Audit information
+    auditee_fiscal_period_start: Types.string {
       oneOf: [
         {
-          format: 'email',
+          format: 'date',
         },
         Base.Compound.EmptyString,
       ]
@@ -49,19 +28,39 @@ local Types = Base.Types;
         Base.Compound.EmptyString,
       ]
     },
-    auditee_fiscal_period_start: Types.string {
+    audit_type: {
       oneOf: [
-        {
-          format: 'date',
-        },
+        Base.Enum.AuditType,
         Base.Compound.EmptyString,
       ]
     },
-    auditee_phone: {
+    audit_period_covered: {
       oneOf: [
-        Base.Compound.UnitedStatesPhone,
+        Base.Enum.AuditPeriod,
         Base.Compound.EmptyString,
       ]
+    },
+    audit_period_other_months: Types.string {
+      maxLength: 100,
+    },
+
+    // Auditee information
+    auditee_uei: Base.Compound.UniqueEntityIdentifier,
+    ein: {
+      oneOf: [
+        Base.Compound.EmployerIdentificationNumber,
+        Base.Compound.EmptyString,
+      ],
+    },
+    ein_not_an_ssn_attestation: Types.boolean,
+    auditee_name: Types.string {
+      maxLength: 100,
+    },
+    auditee_address_line_1: Types.string {
+      maxLength: 100,
+    },
+    auditee_city: Types.string {
+      maxLength: 100,
     },
     auditee_state: {
       oneOf: [
@@ -77,13 +76,49 @@ local Types = Base.Types;
         Base.Compound.EmptyString,
       ],
     },
+
+    auditee_contact_name: Types.string {
+      maxLength: 100,
+    },
+    auditee_contact_title: Types.string {
+      maxLength: 100,
+    },
+    auditee_phone: {
+      oneOf: [
+        Base.Compound.UnitedStatesPhone,
+        Base.Compound.EmptyString,
+      ]
+    },
+    auditee_email: Types.string {
+      oneOf: [
+        {
+          format: 'email',
+        },
+        Base.Compound.EmptyString,
+      ]
+    },
+
+    // Auditor information
+     auditor_ein: {
+      oneOf: [
+        Base.Compound.EmployerIdentificationNumber,
+        Base.Compound.EmptyString,
+      ],
+    },
+    auditor_ein_not_an_ssn_attestation: Types.boolean,
+    auditor_firm_name: Types.string {
+      maxLength: 100,
+    },
+    auditor_country: Base.Enum.CountryType,
+    auditor_international_address: Types.string {
+      maxLength: 100,
+    },
     auditor_address_line_1: Types.string {
       maxLength: 100,
     },
-    auditee_name: Types.string {
+    auditor_city: Types.string {
       maxLength: 100,
     },
-    auditee_uei: Base.Compound.UniqueEntityIdentifier,
     auditor_state: {
       anyOf: [
         Base.Enum.UnitedStatesStateAbbr {
@@ -92,19 +127,24 @@ local Types = Base.Types;
         Base.Compound.EmptyString,
       ],
     },
-    auditor_city: Types.string {
+    auditor_zip: {
+      anyOf: [
+        Base.Compound.Zip,
+        Base.Compound.EmptyString,
+      ],
+    },
+
+    auditor_contact_name: Types.string {
       maxLength: 100,
     },
     auditor_contact_title: Types.string {
       maxLength: 100,
     },
-    auditor_country: Base.Enum.CountryType,
-    auditor_international_address: Types.string,
-    auditor_ein: {
+    auditor_phone: {
       oneOf: [
-        Base.Compound.EmployerIdentificationNumber,
+        Base.Compound.UnitedStatesPhone,
         Base.Compound.EmptyString,
-      ],
+      ]
     },
     auditor_email: Types.string {
       oneOf: [
@@ -115,38 +155,8 @@ local Types = Base.Types;
       ],
       maxLength: 100,
     },
-    auditor_phone: {
-      oneOf: [
-        Base.Compound.UnitedStatesPhone,
-        Base.Compound.EmptyString,
-      ]
-    },
-    auditor_zip: {
-      anyOf: [
-        Base.Compound.Zip,
-        Base.Compound.EmptyString,
-      ],
-    },
-    ein: {
-      oneOf: [
-        Base.Compound.EmployerIdentificationNumber,
-        Base.Compound.EmptyString,
-      ],
-    auditor_contact_name: Types.string {
-      maxLength: 100,
-    },
-    auditor_firm_name: Types.string {
-      maxLength: 100,
-    },
-    auditor_foreign_address: Types.string {
-      maxLength: 100,
-    },
-    audit_period_other_months: Types.string {
-      maxLength: 100,
-    },
-    audit_period_covered: Base.Enum.AuditPeriod,
-    auditor_ein_not_an_ssn_attestation: Types.boolean,
-    ein_not_an_ssn_attestation: Types.boolean,
+
+    // Others
     is_usa_based: Types.boolean,
     met_spending_threshold: Types.boolean,
     user_provided_organization_type: {
@@ -246,5 +256,4 @@ local Types = Base.Types;
   title: 'GeneralInformation',
   type: 'object',
   version: null,
-}
 }

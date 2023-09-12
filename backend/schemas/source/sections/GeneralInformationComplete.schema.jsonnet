@@ -7,27 +7,30 @@ Checks all the fields to answer the question, "Is the form complete?"
 Requires most fields, has consitional checks for conditional fields.
 */
 {
-  '$defs': {
-    AuditPeriod: Base.Enum.AuditPeriod,
-    EIN: Func.join_types(Base.Compound.EmployerIdentificationNumber, [Types.NULL]),
-    Phone: Base.Compound.UnitedStatesPhone,
-    State: Base.Enum.UnitedStatesStateAbbr {
-      title: 'State',
-    },
-    UEI: Base.Compound.UniqueEntityIdentifier,
-    UserProvidedOrganizationType: Base.Enum.OrganizationType,
-    Zip: Base.Compound.Zip,
-  },
   '$id': 'http://example.org/generalinformation',
   '$schema': 'http://json-schema.org/draft/2019-09/schema#',
   additionalProperties: false,
   metamodel_version: '1.7.0',
   properties: {
-    audit_type: Base.Enum.AuditType,
-    audit_period_covered: {
-      '$ref': '#/$defs/AuditPeriod',
+    // Audit information
+    auditee_fiscal_period_start: {
+      format: 'date',
     },
-    audit_period_other_months: Types.string,
+    auditee_fiscal_period_end: {
+      format: 'date',
+    },
+    audit_type: Base.Enum.AuditType,
+    audit_period_covered: Base.Enum.AuditPeriod,
+    audit_period_other_months: Types.string,  // Conditional, no min/max length
+
+    // Auditee information
+    auditee_uei: Base.Compound.UniqueEntityIdentifier,
+    ein: Base.Compound.EmployerIdentificationNumber,
+    ein_not_an_ssn_attestation: Types.boolean,
+    auditee_name: Types.string {
+      maxLength: 100,
+      minLength: 1,
+    },
     auditee_address_line_1: Types.string {
       maxLength: 100,
       minLength: 1,
@@ -36,6 +39,11 @@ Requires most fields, has consitional checks for conditional fields.
       maxLength: 100,
       minLength: 1,
     },
+    auditee_state: Base.Enum.UnitedStatesStateAbbr {
+      title: 'State',
+    },
+    auditee_zip: Base.Compound.Zip,
+
     auditee_contact_name: Types.string {
       maxLength: 100,
       minLength: 1,
@@ -44,27 +52,24 @@ Requires most fields, has consitional checks for conditional fields.
       maxLength: 100,
       minLength: 1,
     },
+    auditee_phone: Base.Compound.UnitedStatesPhone,
     auditee_email: Types.string {
       format: 'email',
+      maxLength: 100,
+      minLength: 1,
     },
-    auditee_fiscal_period_end: {
-          format: 'date',
+
+    // Auditor information
+    // Auditor address information is conditional based on country
+    auditor_ein: Base.Compound.EmployerIdentificationNumber,
+    auditor_ein_not_an_ssn_attestation: Types.boolean,
+    auditor_firm_name: Types.string {
+      maxLength: 100,
+      minLength: 1,
     },
-    auditee_fiscal_period_start: {
-          format: 'date',
-    },
-    auditee_name: Func.compound_type([Types.string, Types.NULL]),
-    auditee_phone: {
-      '$ref': '#/$defs/Phone',
-    },
-    auditee_state: {
-      '$ref': '#/$defs/State',
-    },
-    auditee_uei: {
-      '$ref': '#/$defs/UEI',
-    },
-    auditee_zip: {
-      '$ref': '#/$defs/Zip',
+    auditor_country: Base.Enum.CountryType,
+    auditor_international_address: Types.string {
+      maxLength: 100,
     },
     auditor_address_line_1: Types.string {
       maxLength: 100,
@@ -74,6 +79,19 @@ Requires most fields, has consitional checks for conditional fields.
       maxLength: 100,
       minLength: 1,
     },
+    auditor_state: {
+      oneOf: [
+        Base.Enum.UnitedStatesStateAbbr,
+        Base.Compound.EmptyString,
+      ],
+    }
+    auditor_zip: {
+      oneOf: [
+        Base.Compound.Zip,
+        Base.Compound.EmptyString,
+      ],
+    },
+
     auditor_contact_name: Types.string {
       maxLength: 100,
       minLength: 1,
@@ -82,44 +100,20 @@ Requires most fields, has consitional checks for conditional fields.
       maxLength: 100,
       minLength: 1,
     },
-    auditor_country: Base.Enum.CountryType,
-    auditor_international_address: Types.string {
-      maxLength: 100,
-    },
-    auditor_ein: {
-      '$ref': '#/$defs/EIN',
-    },
-    auditor_ein_not_an_ssn_attestation: Func.compound_type([Types.boolean, Types.NULL]),
+    auditor_phone: Base.Compound.UnitedStatesPhone,
     auditor_email: Types.string {
       format: 'email',
       maxLength: 100,
       minLength: 1,
     },
-    auditor_firm_name: Types.string,
-    auditor_phone: {
-      '$ref': '#/$defs/Phone',
-    },
-    auditor_state: {
-      '$ref': '#/$defs/State',
-    },
-    auditor_zip: {
-      anyOf: [
-        Base.Compound.Zip,
-        Base.Compound.EmptyString,
-      ],
-    },
-    ein: {
-      '$ref': '#/$defs/EIN',
-    },
-    ein_not_an_ssn_attestation: Func.compound_type([Types.boolean, Types.NULL]),
+
+    // Others    
     is_usa_based: Types.boolean,
     met_spending_threshold: Types.boolean,
-    multiple_eins_covered: Func.compound_type([Types.boolean, Types.NULL]),
-    multiple_ueis_covered: Func.compound_type([Types.boolean, Types.NULL]),
-    secondary_auditors_exist: Func.compound_type([Types.boolean, Types.NULL]),
-    user_provided_organization_type: {
-      '$ref': '#/$defs/UserProvidedOrganizationType',
-    },
+    user_provided_organization_type: Base.Enum.OrganizationType,
+    multiple_eins_covered: Types.boolean,
+    multiple_ueis_covered: Types.boolean,
+    secondary_auditors_exist: Types.boolean,
   },
   allOf: [
     {
