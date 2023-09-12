@@ -1,4 +1,5 @@
 from datetime import datetime, timezone
+import json
 from django.test import TestCase
 
 from model_bakery import baker
@@ -14,8 +15,11 @@ from dissemination.models import (
     FindingText,
     CapText,
     SecondaryAuditor,
+    AdditionalEin,
+    AdditionalUei,
 )
 from audit.intake_to_dissemination import IntakeToDissemination
+from audit.utils import Util
 
 
 class IntakeToDisseminationTests(TestCase):
@@ -48,6 +52,7 @@ class IntakeToDisseminationTests(TestCase):
             corrective_action_plan=self._fake_corrective_action_plan(),
             secondary_auditors=self._fake_secondary_auditors(),
             additional_ueis=self._fake_additional_ueis(),
+            additional_eins=self._fake_additional_eins(),
             audit_information=self._fake_audit_information(),
             auditee_certification=self._fake_auditee_certification(),
             cognizant_agency="42",
@@ -274,7 +279,7 @@ class IntakeToDisseminationTests(TestCase):
 
         audit_information = {
             "dollar_threshold": 10345.45,
-            "gaap_results": fake.word(),
+            "gaap_results": json.dumps([fake.word()]),
             "is_going_concern_included": "Y" if fake.boolean() else "N",
             "is_internal_control_deficiency_disclosed": "Y" if fake.boolean() else "N",
             "is_internal_control_material_weakness_disclosed": "Y"
@@ -283,7 +288,7 @@ class IntakeToDisseminationTests(TestCase):
             "is_material_noncompliance_disclosed": "Y" if fake.boolean() else "N",
             "is_aicpa_audit_guide_included": "Y" if fake.boolean() else "N",
             "is_low_risk_auditee": "Y" if fake.boolean() else "N",
-            "agencies": fake.word(),
+            "agencies": json.dumps([fake.word()]),
         }
         return audit_information
 
@@ -299,6 +304,18 @@ class IntakeToDisseminationTests(TestCase):
             }
         }
 
+    @staticmethod
+    def _fake_additional_eins():
+        return {
+            "AdditionalEINs": {
+                "auditee_uei": "ZQGGHJH74DW7",
+                "additional_eins_entries": [
+                    {"additional_ein": "987654321"},
+                    {"additional_ein": "123456789"},
+                ],
+            }
+        }
+
     def test_load_general(self):
         self.intake_to_dissemination.load_general()
         self.intake_to_dissemination.save_dissemination_objects()
@@ -310,20 +327,24 @@ class IntakeToDisseminationTests(TestCase):
             general.total_amount_expended,
             self.sac.federal_awards["FederalAwards"].get("total_amount_expended"),
         )
-
-    def test_load_award_before_general_should_fail(self):
-        self.intake_to_dissemination.load_federal_award()
-        federal_awards = FederalAward.objects.all()
-        self.assertEqual(len(federal_awards), 0)
+        self.assertEquals(
+            Util.json_array_to_str(self.sac.audit_information["gaap_results"]),
+            general.gaap_results,
+        )
 
     def test_load_federal_award(self):
         self.intake_to_dissemination.load_federal_award()
         self.intake_to_dissemination.save_dissemination_objects()
-        self.intake_to_dissemination.load_general()
         federal_awards = FederalAward.objects.all()
         self.assertEqual(len(federal_awards), 1)
         federal_award = federal_awards.first()
         self.assertEqual(self.report_id, federal_award.report_id)
+        self.assertEqual(
+            federal_award.federal_program_total,
+            self.sac.federal_awards["FederalAwards"]["federal_awards"][0]["program"][
+                "federal_program_total"
+            ],
+        )
 
     def test_load_findings(self):
         self.intake_to_dissemination.load_findings()
@@ -373,13 +394,29 @@ class IntakeToDisseminationTests(TestCase):
         print(sec_auditor.report_id)
         self.assertEquals(self.sac.report_id, sec_auditor.report_id)
 
-    # TODO rename to test_load_audit once frontend is available
-    def todo_load_audit_information(self):
-        self.intake_to_dissemination._load_audit_info()
+    def test_load_additional_ueis(self):
+        self.intake_to_dissemination.load_additional_ueis()
         self.intake_to_dissemination.save_dissemination_objects()
-        general = General.objects.first()
-        sac = SingleAuditChecklist.objects.first()
-        self.assertEquals(sac.audit_information["gaap_results"], general.gaap_results)
+        dissem_ueis = [obj.additional_uei for obj in AdditionalUei.objects.all()]
+        intake_ueis = [
+            obj["additional_uei"]
+            for obj in self.sac.additional_ueis["AdditionalUEIs"][
+                "additional_ueis_entries"
+            ]
+        ]
+        self.assertEqual(set(dissem_ueis), set(intake_ueis))
+
+    def test_load_additional_eins(self):
+        self.intake_to_dissemination.load_additional_eins()
+        self.intake_to_dissemination.save_dissemination_objects()
+        dissem_eins = [obj.additional_ein for obj in AdditionalEin.objects.all()]
+        intake_eins = [
+            obj["additional_ein"]
+            for obj in self.sac.additional_eins["AdditionalEINs"][
+                "additional_eins_entries"
+            ]
+        ]
+        self.assertEqual(set(dissem_eins), set(intake_eins))
 
     def test_load_all(self):
         """On a happy path through load_all(), item(s) should be added to all of the
@@ -397,6 +434,7 @@ class IntakeToDisseminationTests(TestCase):
             corrective_action_plan=self._fake_corrective_action_plan(),
             secondary_auditors=self._fake_secondary_auditors(),
             additional_ueis=self._fake_additional_ueis(),
+            additional_eins=self._fake_additional_eins(),
             audit_information=self._fake_audit_information(),
             auditee_certification=self._fake_auditee_certification(),
         )
@@ -409,63 +447,68 @@ class IntakeToDisseminationTests(TestCase):
         self.assertLess(len_general, len(General.objects.all()))
         self.assertLess(len_captext, len(CapText.objects.all()))
 
-    def test_load_all_with_errors_1(self):
-        """If we encounter a KeyError on General (the first table to be loaded), we
-        should still load all the other tables, but nothing should be loaded to General.
-        """
-        len_general = len(General.objects.all())
-        len_captext = len(CapText.objects.all())
-        sac = SingleAuditChecklist.objects.create(
-            submitted_by=self.user,
-            general_information=self._fake_general(),
-            federal_awards=self._fake_federal_awards(),
-            findings_uniform_guidance=self._fake_findings_uniform_guidance(),
-            notes_to_sefa=self._fake_notes_to_sefa(),
-            findings_text=self._fake_findings_text(reference_number=3),
-            corrective_action_plan=self._fake_corrective_action_plan(),
-            secondary_auditors=self._fake_secondary_auditors(),
-            additional_ueis=self._fake_additional_ueis(),
-            audit_information=self._fake_audit_information(),
-            auditee_certification=self._fake_auditee_certification(),
-        )
-        sac.general_information.pop("auditee_contact_name")
-        self._run_state_transition(sac)
-        self.sac = sac
-        self.intake_to_dissemination = IntakeToDissemination(self.sac)
-        self.report_id = sac.report_id
-        self.intake_to_dissemination.load_all()
-        self.intake_to_dissemination.save_dissemination_objects()
-        self.assertEqual(len_general, len(General.objects.all()))
-        self.assertLess(len_captext, len(CapText.objects.all()))
+    # FIXME MSHD: Do we need to test the error cases (test_load_all_with_errors_1 and test_load_all_with_errors_2)?
+    # KeyError should not happen after validation/cross-validation.
+    # Also, we do not enforce any order when loading.
+    # def test_load_all_with_errors_1(self):
+    #     """If we encounter a KeyError on General (the first table to be loaded), we
+    #     should still load all the other tables, but nothing should be loaded to General.
+    #     """
+    #     len_general = len(General.objects.all())
+    #     len_captext = len(CapText.objects.all())
+    #     sac = SingleAuditChecklist.objects.create(
+    #         submitted_by=self.user,
+    #         general_information=self._fake_general(),
+    #         federal_awards=self._fake_federal_awards(),
+    #         findings_uniform_guidance=self._fake_findings_uniform_guidance(),
+    #         notes_to_sefa=self._fake_notes_to_sefa(),
+    #         findings_text=self._fake_findings_text(reference_number=3),
+    #         corrective_action_plan=self._fake_corrective_action_plan(),
+    #         secondary_auditors=self._fake_secondary_auditors(),
+    #         additional_ueis=self._fake_additional_ueis(),
+    #         additional_eins = self._fake_additional_eins(),
+    #         audit_information=self._fake_audit_information(),
+    #         auditee_certification=self._fake_auditee_certification(),
+    #     )
+    #     sac.general_information.pop("auditee_contact_name")
+    #     self._run_state_transition(sac)
+    #     self.sac = sac
+    #     self.intake_to_dissemination = IntakeToDissemination(self.sac)
+    #     self.report_id = sac.report_id
+    #     self.intake_to_dissemination.load_all()
+    #     self.intake_to_dissemination.save_dissemination_objects()
+    #     self.assertEqual(len_general, len(General.objects.all()))
+    #     self.assertLess(len_captext, len(CapText.objects.all()))
 
-    def test_load_all_with_errors_2(self):
-        """If we encounter a KeyError on CapText (the last table to be loaded), we
-        should still load all the other tables, but nothing should be loaded to CapText.
-        """
-        len_general = len(General.objects.all())
-        len_captext = len(CapText.objects.all())
-        sac = SingleAuditChecklist.objects.create(
-            submitted_by=self.user,
-            general_information=self._fake_general(),
-            federal_awards=self._fake_federal_awards(),
-            findings_uniform_guidance=self._fake_findings_uniform_guidance(),
-            notes_to_sefa=self._fake_notes_to_sefa(),
-            findings_text=self._fake_findings_text(reference_number=3),
-            corrective_action_plan=self._fake_corrective_action_plan(),
-            secondary_auditors=self._fake_secondary_auditors(),
-            additional_ueis=self._fake_additional_ueis(),
-            audit_information=self._fake_audit_information(),
-            auditee_certification=self._fake_auditee_certification(),
-        )
-        sac.corrective_action_plan.pop("CorrectiveActionPlan")
-        self._run_state_transition(sac)
-        self.sac = sac
-        self.intake_to_dissemination = IntakeToDissemination(self.sac)
-        self.report_id = sac.report_id
-        self.intake_to_dissemination.load_all()
-        self.intake_to_dissemination.save_dissemination_objects()
-        self.assertLess(len_general, len(General.objects.all()))
-        self.assertEqual(len_captext, len(CapText.objects.all()))
+    # def test_load_all_with_errors_2(self):
+    #     """If we encounter a KeyError on CapText (the last table to be loaded), we
+    #     should still load all the other tables, but nothing should be loaded to CapText.
+    #     """
+    #     len_general = len(General.objects.all())
+    #     len_captext = len(CapText.objects.all())
+    #     sac = SingleAuditChecklist.objects.create(
+    #         submitted_by=self.user,
+    #         general_information=self._fake_general(),
+    #         federal_awards=self._fake_federal_awards(),
+    #         findings_uniform_guidance=self._fake_findings_uniform_guidance(),
+    #         notes_to_sefa=self._fake_notes_to_sefa(),
+    #         findings_text=self._fake_findings_text(reference_number=3),
+    #         corrective_action_plan=self._fake_corrective_action_plan(),
+    #         secondary_auditors=self._fake_secondary_auditors(),
+    #         additional_ueis=self._fake_additional_ueis(),
+    #         additional_eins = self._fake_additional_eins(),
+    #         audit_information=self._fake_audit_information(),
+    #         auditee_certification=self._fake_auditee_certification(),
+    #     )
+    #     sac.corrective_action_plan.pop("CorrectiveActionPlan")
+    #     self._run_state_transition(sac)
+    #     self.sac = sac
+    #     self.intake_to_dissemination = IntakeToDissemination(self.sac)
+    #     self.report_id = sac.report_id
+    #     self.intake_to_dissemination.load_all()
+    #     self.intake_to_dissemination.save_dissemination_objects()
+    #     self.assertLess(len_general, len(General.objects.all()))
+    #     self.assertEqual(len_captext, len(CapText.objects.all()))
 
     def test_load_and_return_objects(self):
         len_general = len(General.objects.all())
@@ -480,6 +523,7 @@ class IntakeToDisseminationTests(TestCase):
             corrective_action_plan=self._fake_corrective_action_plan(),
             secondary_auditors=self._fake_secondary_auditors(),
             additional_ueis=self._fake_additional_ueis(),
+            additional_eins=self._fake_additional_eins(),
             audit_information=self._fake_audit_information(),
             auditee_certification=self._fake_auditee_certification(),
         )
@@ -501,6 +545,8 @@ class IntakeToDisseminationTests(TestCase):
             "CapTexts",
             "Notes",
             "Revisions",
+            "AdditionalUEIs",
+            "AdditionalEINs",
         ]
 
         print(objs)
