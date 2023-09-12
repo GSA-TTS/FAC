@@ -447,69 +447,6 @@ class IntakeToDisseminationTests(TestCase):
         self.assertLess(len_general, len(General.objects.all()))
         self.assertLess(len_captext, len(CapText.objects.all()))
 
-    # FIXME MSHD: Do we need to test the error cases (test_load_all_with_errors_1 and test_load_all_with_errors_2)?
-    # KeyError should not happen after validation/cross-validation.
-    # Also, we do not enforce any order when loading.
-    # def test_load_all_with_errors_1(self):
-    #     """If we encounter a KeyError on General (the first table to be loaded), we
-    #     should still load all the other tables, but nothing should be loaded to General.
-    #     """
-    #     len_general = len(General.objects.all())
-    #     len_captext = len(CapText.objects.all())
-    #     sac = SingleAuditChecklist.objects.create(
-    #         submitted_by=self.user,
-    #         general_information=self._fake_general(),
-    #         federal_awards=self._fake_federal_awards(),
-    #         findings_uniform_guidance=self._fake_findings_uniform_guidance(),
-    #         notes_to_sefa=self._fake_notes_to_sefa(),
-    #         findings_text=self._fake_findings_text(reference_number=3),
-    #         corrective_action_plan=self._fake_corrective_action_plan(),
-    #         secondary_auditors=self._fake_secondary_auditors(),
-    #         additional_ueis=self._fake_additional_ueis(),
-    #         additional_eins = self._fake_additional_eins(),
-    #         audit_information=self._fake_audit_information(),
-    #         auditee_certification=self._fake_auditee_certification(),
-    #     )
-    #     sac.general_information.pop("auditee_contact_name")
-    #     self._run_state_transition(sac)
-    #     self.sac = sac
-    #     self.intake_to_dissemination = IntakeToDissemination(self.sac)
-    #     self.report_id = sac.report_id
-    #     self.intake_to_dissemination.load_all()
-    #     self.intake_to_dissemination.save_dissemination_objects()
-    #     self.assertEqual(len_general, len(General.objects.all()))
-    #     self.assertLess(len_captext, len(CapText.objects.all()))
-
-    # def test_load_all_with_errors_2(self):
-    #     """If we encounter a KeyError on CapText (the last table to be loaded), we
-    #     should still load all the other tables, but nothing should be loaded to CapText.
-    #     """
-    #     len_general = len(General.objects.all())
-    #     len_captext = len(CapText.objects.all())
-    #     sac = SingleAuditChecklist.objects.create(
-    #         submitted_by=self.user,
-    #         general_information=self._fake_general(),
-    #         federal_awards=self._fake_federal_awards(),
-    #         findings_uniform_guidance=self._fake_findings_uniform_guidance(),
-    #         notes_to_sefa=self._fake_notes_to_sefa(),
-    #         findings_text=self._fake_findings_text(reference_number=3),
-    #         corrective_action_plan=self._fake_corrective_action_plan(),
-    #         secondary_auditors=self._fake_secondary_auditors(),
-    #         additional_ueis=self._fake_additional_ueis(),
-    #         additional_eins = self._fake_additional_eins(),
-    #         audit_information=self._fake_audit_information(),
-    #         auditee_certification=self._fake_auditee_certification(),
-    #     )
-    #     sac.corrective_action_plan.pop("CorrectiveActionPlan")
-    #     self._run_state_transition(sac)
-    #     self.sac = sac
-    #     self.intake_to_dissemination = IntakeToDissemination(self.sac)
-    #     self.report_id = sac.report_id
-    #     self.intake_to_dissemination.load_all()
-    #     self.intake_to_dissemination.save_dissemination_objects()
-    #     self.assertLess(len_general, len(General.objects.all()))
-    #     self.assertEqual(len_captext, len(CapText.objects.all()))
-
     def test_load_and_return_objects(self):
         len_general = len(General.objects.all())
         len_captext = len(CapText.objects.all())
