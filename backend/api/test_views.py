@@ -64,11 +64,11 @@ SAMPLE_BASE_SAC_DATA = {
         "auditee_fiscal_period_start": "2021-10-01",
         "auditee_fiscal_period_end": "2022-10-01",
         "audit_period_covered": "annual",
-        "ein": None,
-        "ein_not_an_ssn_attestation": None,
-        "multiple_eins_covered": None,
+        "ein": "123456789",
+        "ein_not_an_ssn_attestation": True,
+        "multiple_eins_covered": False,
         "auditee_uei": "ZQGGHJH74DW7",
-        "multiple_ueis_covered": None,
+        "multiple_ueis_covered": False,
         "auditee_name": "Auditee McAudited",
         "auditee_address_line_1": "200 feet into left field",
         "auditee_city": "New York",
@@ -82,8 +82,8 @@ SAMPLE_BASE_SAC_DATA = {
         "met_spending_threshold": True,
         "is_usa_based": True,
         "auditor_firm_name": "Dollar Audit Store",
-        "auditor_ein": None,
-        "auditor_ein_not_an_ssn_attestation": None,
+        "auditor_ein": "987654321",
+        "auditor_ein_not_an_ssn_attestation": True,
         "auditor_country": "USA",
         "auditor_address_line_1": "100 Percent Respectable St.",
         "auditor_city": "Podunk",
@@ -757,9 +757,7 @@ class SingleAuditChecklistViewTests(TestCase):
         for key in email_keys:
             # Valid emails are either an empty string or a proper email.
             # The empty string error comes back first.
-            expected = {
-                "errors": {"general_information": ["'' was expected"]}
-            }
+            expected = {"errors": {"general_information": ["'' was expected"]}}
             with self.subTest():
                 nested = {"general_information": {key: "invalid_email"}}
                 check_response(nested, expected)
@@ -792,14 +790,26 @@ class SingleAuditChecklistViewTests(TestCase):
         for key, choices in choice_keys:
             message = f"'invalid_choice' is not one of {choices}"
             # Invalid under both the choice schema and the empty string schema
-            expected = {'errors': {'general_information': ["'invalid_choice' is not valid under any of the given schemas"]}}
+            expected = {
+                "errors": {
+                    "general_information": [
+                        "'invalid_choice' is not valid under any of the given schemas"
+                    ]
+                }
+            }
             with self.subTest():
                 nested = {"general_information": {key: "invalid_choice"}}
                 check_response(nested, expected)
 
         # Invalid under only the choice schema
-        message = f"'invalid_choice' is not one of ['USA', 'non-USA']"
-        expected = {'errors': {'general_information': ["'invalid_choice' is not one of ['USA', 'non-USA']"]}}
+        message = "'invalid_choice' is not one of ['USA', 'non-USA']"
+        expected = {
+            "errors": {
+                "general_information": [
+                    "'invalid_choice' is not one of ['USA', 'non-USA']"
+                ]
+            }
+        }
         with self.subTest():
             nested = {"general_information": {"auditor_country": "invalid_choice"}}
             check_response(nested, expected)
@@ -832,12 +842,8 @@ class SingleAuditChecklistViewTests(TestCase):
                 access = baker.make(Access, user=self.user, sac=sac)
 
                 path = self.path(access.sac.report_id)
-                print(path)
-                print(after)
                 response = self.client.put(path, after, format="json")
 
-                print(response)
-                print(response.json())
                 self.assertEqual(response.status_code, 200)
 
                 updated_sac = SingleAuditChecklist.objects.get(pk=sac.id)
