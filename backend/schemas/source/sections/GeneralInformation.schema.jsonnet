@@ -58,7 +58,6 @@ local Types = Base.Types;
           format: 'date',
         },
         Base.Compound.EmptyString,
-        Base.Compound.Date,
       ]
     },
     auditee_fiscal_period_start: Types.string {
@@ -67,7 +66,6 @@ local Types = Base.Types;
           format: 'date',
         },
         Base.Compound.EmptyString,
-        Base.Compound.Date,
       ]
     },
     auditee_name: Func.compound_type([Types.string, Types.NULL]),

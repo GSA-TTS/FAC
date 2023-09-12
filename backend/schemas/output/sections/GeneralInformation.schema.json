@@ -314,12 +314,6 @@
             {
                "const": "",
                "type": "string"
-            },
-            {
-               "description": "MM/DD/YYYY",
-               "pattern": "^[0-9]{2}/[0-9]{2}/[0-9]{4}$",
-               "title": "Date",
-               "type": "string"
             }
          ],
          "type": "string"
@@ -331,12 +325,6 @@
             },
             {
                "const": "",
-               "type": "string"
-            },
-            {
-               "description": "MM/DD/YYYY",
-               "pattern": "^[0-9]{2}/[0-9]{2}/[0-9]{4}$",
-               "title": "Date",
                "type": "string"
             }
          ],

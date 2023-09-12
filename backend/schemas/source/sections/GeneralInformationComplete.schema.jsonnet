@@ -47,8 +47,12 @@ Requires most fields, has consitional checks for conditional fields.
     auditee_email: Types.string {
       format: 'email',
     },
-    auditee_fiscal_period_end: Base.Compound.Date,
-    auditee_fiscal_period_start: Base.Compound.Date,
+    auditee_fiscal_period_end: {
+          format: 'date',
+    },
+    auditee_fiscal_period_start: {
+          format: 'date',
+    },
     auditee_name: Func.compound_type([Types.string, Types.NULL]),
     auditee_phone: {
       '$ref': '#/$defs/Phone',

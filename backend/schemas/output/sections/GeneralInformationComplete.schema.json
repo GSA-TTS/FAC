@@ -264,16 +264,10 @@
          "type": "string"
       },
       "auditee_fiscal_period_end": {
-         "description": "MM/DD/YYYY",
-         "pattern": "^[0-9]{2}/[0-9]{2}/[0-9]{4}$",
-         "title": "Date",
-         "type": "string"
+         "format": "date"
       },
       "auditee_fiscal_period_start": {
-         "description": "MM/DD/YYYY",
-         "pattern": "^[0-9]{2}/[0-9]{2}/[0-9]{4}$",
-         "title": "Date",
-         "type": "string"
+         "format": "date"
       },
       "auditee_name": {
          "type": [
