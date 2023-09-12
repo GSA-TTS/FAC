@@ -368,7 +368,7 @@ AWS_CENSUS_STORAGE_BUCKET_NAME = secret("AWS_CENSUS_STORAGE_BUCKET_NAME", "")
 AWS_S3_CENSUS_REGION_NAME = secret("AWS_S3_CENSUS_REGION_NAME", "")
 
 # Used for backing up the database https://django-dbbackup.readthedocs.io/en/master/storage.html#id2
-DBBACKUP_STORAGE = env.dj_db_url("DATABASE_URL", default="postgres://postgres:password@0.0.0.0/backend")
+DBBACKUP_STORAGE = "storages.backends.s3boto.S3BotoStorage"
 DBBACKUP_STORAGE_OPTIONS = {
     'access_key': AWS_ACCESS_KEY_ID,
     'secret_key': AWS_SECRET_ACCESS_KEY,
