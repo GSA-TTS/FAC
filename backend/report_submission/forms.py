@@ -14,14 +14,15 @@ alpha_validator = RegexValidator(
     r"\A([^\W\d]|\s)+\Z", "This field should not include numbers or special characters."
 )
 date_validator = RegexValidator(
-    r"^[0-9]{2}/[0-9]{2}/[0-9]{4}$", "Dates should be in the format 00/00/0000"
+    r"^([0-9]{2}/[0-9]{2}/[0-9]{4})|([0-9]{4}-[0-9]{2}-[0-9]{4})$",
+    "Dates should be in the format 00/00/0000",
 )
 ein_validator = RegexValidator(
     r"^[0-9]{9}$", "EINs should be nine characters long and be made up of only numbers."
 )
 phone_validator = RegexValidator(
-    r"^([1-9]{1}[0-9]{9})+$",
-    "Phone numbers should not include spaces or symbols such as '-' or '+'.",
+    r"^[1-9]{1}[0-9]{9}$",
+    "Phone numbers should be ten numbers long, cannot include spaces or symbols such as '-' or '+', and cannot begin with a zero.",
 )
 
 
