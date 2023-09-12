@@ -457,9 +457,19 @@ class GeneralInformationFormViewTests(TestCase):
 
         # assert that the text fields are populated in the returned form
         for field in text_fields:
-            value = sac.general_information[field]
-
-            self.assertEqual(response.context[field], value)
+            if (
+                field != "auditee_fiscal_period_start"
+                and field != "auditee_fiscal_period_end"
+            ):
+                value = sac.general_information[field]
+                self.assertEqual(response.context[field], value)
+            else:
+                # These are stored in YYYY-MM-DD but get sent as MM/DD/YYYY, so they get special treatment.
+                stored_value = sac.general_information[field]
+                formatted_field = datetime.strptime(
+                    response.context[field], "%m/%d/%Y"
+                ).strftime("%Y-%m-%d")
+                self.assertEqual(stored_value, formatted_field)
 
     def test_post_requires_login(self):
         """Requests to the POST endpoint require the user to be authenticated"""
@@ -522,8 +532,8 @@ class GeneralInformationFormViewTests(TestCase):
 
         data = {
             "audit_type": "single-audit",
-            "auditee_fiscal_period_start": "2021-11-01",
-            "auditee_fiscal_period_end": "2022-11-01",
+            "auditee_fiscal_period_start": "11/01/2021",
+            "auditee_fiscal_period_end": "11/01/2022",
             "audit_period_covered": "other",
             "audit_period_other_months": "10",
             "ein": "123456780",
@@ -546,7 +556,7 @@ class GeneralInformationFormViewTests(TestCase):
             "auditor_ein_not_an_ssn_attestation": True,
             "auditor_contact_name": "Qualified Robot Accountant",
             "auditor_contact_title": "Just an extraordinary person",
-            "auditor_phone": "0008675310",
+            "auditor_phone": "9876543210",
             "auditor_email": "qualified.robot.accountant@dollarauditstore.com",
         }
         if foreign_auditor:
@@ -574,9 +584,24 @@ class GeneralInformationFormViewTests(TestCase):
         updated_sac = SingleAuditChecklist.objects.get(pk=sac.id)
 
         for field in data:
-            self.assertEqual(
-                getattr(updated_sac, field), data[field], f"mismatch for field: {field}"
-            )
+            if (
+                field != "auditee_fiscal_period_start"
+                and field != "auditee_fiscal_period_end"
+            ):
+                self.assertEqual(
+                    getattr(updated_sac, field),
+                    data[field],
+                    f"mismatch for field: {field}",
+                )
+            else:
+                # These are stored in YYYY-MM-DD but are sent as MM/DD/YYYY, so they get special treatment.
+                stored_value = getattr(updated_sac, field)
+                formatted_field = datetime.strptime(data[field], "%m/%d/%Y").strftime(
+                    "%Y-%m-%d"
+                )
+                self.assertEqual(
+                    stored_value, formatted_field, f"mismatch for field: {field}"
+                )
 
         submission_events = SubmissionEvent.objects.filter(sac=sac)
 
@@ -604,12 +629,13 @@ class GeneralInformationFormViewTests(TestCase):
 
         # submit a bad date format for auditee_fiscal_period_start to verify that the input is being validated
         data = {
-            "auditee_fiscal_period_start": "2023-01-01",
+            "auditee_fiscal_period_start": "Not a date",
         }
 
+        # Post will redirect back to the page with an error message above the relevant date field
         response = self.client.post(url, data=data)
 
-        self.assertEqual(response.status_code, 400)
+        self.assertContains(response, "Dates should be in the format")
 
     def test_post_validates_general_information(self):
         """When the general information form is submitted, the data should be validated against the general information schema"""
@@ -660,6 +686,7 @@ class GeneralInformationFormViewTests(TestCase):
             "auditor_email": "qualified.robot.accountant@dollarauditstore.com",
         }
 
+        # Post will redirect back to the page with an error message above the relevant date field
         response = self.client.post(url, data=data)
 
-        self.assertEqual(response.status_code, 400)
+        self.assertContains(response, "Dates should be in the format")
