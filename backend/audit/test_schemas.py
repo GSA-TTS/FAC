@@ -72,7 +72,7 @@ class GeneralInformationSchemaValidityTest(SimpleTestCase):
 
         self.assertRaisesRegex(
             exceptions.ValidationError,
-            f"'{bad_date}' is not valid",
+            "'' was expected",  # Value also accepts a blank string, so this error comes back.
             validate,
             simple_case,
             schema,
@@ -91,7 +91,7 @@ class GeneralInformationSchemaValidityTest(SimpleTestCase):
 
         self.assertRaisesRegex(
             exceptions.ValidationError,
-            f"'{bad_date}' is not valid",
+            "'' was expected",  # Value also accepts a blank string, so this error comes back.
             validate,
             simple_case,
             schema,
