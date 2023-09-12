@@ -1,7 +1,7 @@
 import logging
 from datetime import datetime
 
-from django.db import IntegrityError
+# from django.db import IntegrityError
 
 from dissemination.models import (
     FindingText,
