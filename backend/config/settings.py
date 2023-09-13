@@ -100,7 +100,6 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "dbbackup",
 ]
 
 # Third-party apps
@@ -110,6 +109,7 @@ INSTALLED_APPS += [
     "corsheaders",
     "storages",
     "djangooidc",
+    "dbbackup",
 ]
 
 # Our apps
