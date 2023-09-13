@@ -17,4 +17,6 @@ def fac_post_process(sender, instance, created, **kwargs):
     sac: SingleAuditChecklist = instance
     if sac.submission_status != SingleAuditChecklist.STATUS.SUBMITTED:
         return
+    if sac.cognizant_agency or sac.oversight_agency:
+        return
     assign_cog_over(sac)

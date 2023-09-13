@@ -195,8 +195,9 @@ def record_cog_assignment(sac: SingleAuditChecklist, cognizant_agency):
     """
     To be unvoked by app to persist the computed cog agency
     """
+    email = sac.submitted_by.email
     CognizantAssignment(
-        sac=sac, cognizant_agency=cognizant_agency, assignor_email="cog-system@fac.gov"
+        sac=sac, cognizant_agency=cognizant_agency, assignor_email=email
     ).save()
 
 

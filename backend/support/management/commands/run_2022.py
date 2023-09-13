@@ -2,36 +2,52 @@ from django.core.management.base import BaseCommand
 from django.db.models.functions import Cast
 from django.db.models import BigIntegerField
 
+
 from dissemination.hist_models.census_2022 import CensusGen22, CensusCfda22
-from audit.models import SingleAuditChecklist
-from support.cog_over import compute_cog_over
+from audit.models import SingleAuditChecklist, User
+from support.models import CognizantAssignment
 
 
 class Command(BaseCommand):
     help = """
     Analyze cog/over for 20122 submissions
+    Beware! Deletes any existing rows in SingleAuditChecklist
     """
 
     def handle(self, *args, **kwargs):
+        initialize_db()
         gens = CensusGen22.objects.annotate(
             amt=Cast("totfedexpend", output_field=BigIntegerField())
         ).all()
         print(f"Count of 2022 submissions: {len(gens)}")
-        processed = mismatches = 0
+        processed = cog_mismatches = over_mismatches = 0
+
         for gen in gens:
             sac = self.make_sac(gen)
-            (cognizant_agency, oversight_agency) = compute_cog_over(sac)
+            sac.submission_status = sac.STATUS.SUBMITTED
+            sac.save()
             processed += 1
-            if (cognizant_agency and cognizant_agency != sac.cognizant_agency) or (
-                oversight_agency and oversight_agency != sac.oversight_agency
-            ):
+            if gen.cogagency != sac.cognizant_agency:
+                cog_mismatches += 1
+                print(f"Cog mismatch. Expected {gen.cogagency}")
                 self.show_mismatch(sac)
-                mismatches += 1
+            if gen.oversightagency != sac.oversight_agency:
+                over_mismatches += 1
+                print(f"Oversight mismatch. Expected {gen.oversightagency}")
+                self.show_mismatch(sac)
             if processed % 1000 == 0:
                 print(
-                    f"Processed {processed} rows. Found {mismatches} mismatches  so far ..."
+                    f"""
+                      Processed {processed} rows so far.
+                      Found {cog_mismatches} cog and {over_mismatches} over mismatches.
+                      ..."""
                 )
-        print(f"Completed {processed} rows. Found {mismatches} mismatches.")
+        print(
+            f"""
+                Processed all {processed} rows.
+                Found {cog_mismatches} cog and {over_mismatches} over mismatches.
+                """
+        )
 
     def show_mismatch(self, sac):
         print(
@@ -52,13 +68,22 @@ class Command(BaseCommand):
             )
 
     def make_sac(self, gen: CensusGen22):
-        sac = SingleAuditChecklist()
-        sac.general_information = {}
-        sac.general_information["ein"] = gen.ein
-        sac.general_information["auditee_uei"] = gen.uei
-        sac.cognizant_agency = gen.cogagency
-        sac.oversight_agency = gen.oversightagency
-        sac.federal_awards = self.make_awards(gen)
+        general_information = {
+            "auditee_fiscal_period_start": "2022-11-01",
+            "auditee_fiscal_period_end": "2023-11-01",
+            "met_spending_threshold": True,
+            "is_usa_based": True,
+        }
+        general_information["ein"] = gen.ein
+        general_information["auditee_uei"] = gen.uei
+
+        federal_awards = self.make_awards(gen)
+        sac = SingleAuditChecklist.objects.create(
+            submitted_by=User.objects.get(id=1),
+            submission_status="in_progress",
+            general_information=general_information,
+            federal_awards=federal_awards,
+        )
         return sac
 
     def make_awards(self, gen: CensusGen22):
@@ -86,3 +111,11 @@ class Command(BaseCommand):
                 },
             )
         return awards
+
+
+def initialize_db():
+    """
+    This will delete existing data, and should only be run in a dev env
+    """
+    SingleAuditChecklist.objects.all().delete()
+    CognizantAssignment.objects.all().delete()
