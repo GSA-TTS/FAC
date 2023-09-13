@@ -306,14 +306,14 @@ else:
                 f"https://{AWS_S3_PRIVATE_CUSTOM_DOMAIN}/{AWS_PRIVATE_LOCATION}/"
             )
 
-    # Used for backing up the database https://django-dbbackup.readthedocs.io/en/master/storage.html#id2
-    DBBACKUP_STORAGE = "storages.backends.s3boto.S3BotoStorage"
-    DBBACKUP_STORAGE_OPTIONS = {
-        "access_key": AWS_ACCESS_KEY_ID,
-        "secret_key": AWS_SECRET_ACCESS_KEY,
-        "bucket_name": AWS_PRIVATE_STORAGE_BUCKET_NAME,
-        "default_acl": "private",
-    }
+            # Used for backing up the database https://django-dbbackup.readthedocs.io/en/master/storage.html#id2
+            DBBACKUP_STORAGE = "storages.backends.s3boto.S3BotoStorage"
+            DBBACKUP_STORAGE_OPTIONS = {
+                "access_key": AWS_PRIVATE_ACCESS_KEY_ID,
+                "secret_key": AWS_PRIVATE_SECRET_ACCESS_KEY,
+                "bucket_name": AWS_PRIVATE_STORAGE_BUCKET_NAME,
+                "default_acl": "private",
+            }
 
     # secure headers
     MIDDLEWARE.append("csp.middleware.CSPMiddleware")
