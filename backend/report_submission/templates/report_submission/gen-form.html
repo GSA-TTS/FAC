@@ -85,14 +85,15 @@
                                        {% if audit_type == "program-specific" %}checked{% endif %} />
                                 <label class="usa-radio__label" for="program-specific">Program-Specific Audit</label>
                             </div>
-                            <div class="usa-radio">
+                            {% comment %} Include after we are able to recieve ACEE submissions. {% endcomment %}
+                            {% comment %} <div class="usa-radio">
                                 <input class="usa-radio__input"
                                        id="alt-compliance-examination"
                                        name="audit_type"
                                        value="alt-compliance-examination"
                                        type="radio" />
                                 <label class="usa-radio__label" for="alt-compliance-examination">Alternative Compliance Examination</label>
-                            </div>
+                            </div> {% endcomment %}
                         </fieldset>
                         <fieldset class="usa-fieldset question" id="audit-period">
                             <legend class="usa-legend">Audit period</legend>

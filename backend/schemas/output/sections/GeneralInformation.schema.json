@@ -211,8 +211,7 @@
                "description": "Type of audit being submitted",
                "enum": [
                   "program-specific",
-                  "single-audit",
-                  "alternative-compliance-engagement"
+                  "single-audit"
                ],
                "title": "AuditType",
                "type": "string"
