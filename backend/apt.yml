@@ -1,4 +1,8 @@
 ---
+keys:
+- https://www.postgresql.org/media/keys/ACCC4CF8.asc
+repos:
+- https://apt.postgresql.org/pub/repos/apt
 packages:
 - postgresql-client
-- postgresql-common
+- postgresql-client-15
