@@ -26,6 +26,9 @@ module "https-proxy" {
       # Login.gov sandbox
       "idp.int.identitysandbox.gov:443",
 
+      # Login.gov
+      "secure.login.gov:443",
+
       # Git
       "*.github.com:443"
     ],
