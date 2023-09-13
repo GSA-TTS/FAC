@@ -1,3 +1,4 @@
 ---
 packages:
-- postgresql-client
+- postgresql-client-15
+
