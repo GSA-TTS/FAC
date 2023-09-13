@@ -244,10 +244,12 @@
                             <legend class="usa-legend">Auditee Unique Entity Identifier (UEI)</legend>
                             <div class="usa-form-group">
                                 <label class="usa-label" for="auditee_uei">Auditee UEI</label>
+                                <strong class="margin-0">{{ auditee_uei }}</strong>
                                 <input class="usa-input"
                                        id="auditee_uei"
                                        name="auditee_uei"
                                        aria-required="false"
+                                       hidden
                                        value="{{ auditee_uei | default_if_none:'' }}" />
                             </div>
                             <fieldset class="usa-fieldset radio">
