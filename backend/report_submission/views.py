@@ -211,14 +211,13 @@ class GeneralInformationFormView(LoginRequiredMixin, View):
             raise PermissionDenied("You do not have access to this audit.") from err
         except ValidationError as err:
             message = f"ValidationError for report ID {report_id}: {err.message}"
-            print(message)
             raise BadRequest(message)
         except LateChangeError:
             return render(request, "audit/no-late-changes.html")
         except Exception as err:
             message = f"Unexpected error in GeneralInformationFormView post. Report ID {report_id}: {err}"
             logger.warning(message)
-            raise BadRequest(message)
+            raise err
 
     def _dates_to_slashes(self, data):
         """
