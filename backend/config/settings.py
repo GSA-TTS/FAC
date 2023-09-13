@@ -306,6 +306,15 @@ else:
                 f"https://{AWS_S3_PRIVATE_CUSTOM_DOMAIN}/{AWS_PRIVATE_LOCATION}/"
             )
 
+    # Used for backing up the database https://django-dbbackup.readthedocs.io/en/master/storage.html#id2
+    DBBACKUP_STORAGE = "storages.backends.s3boto.S3BotoStorage"
+    DBBACKUP_STORAGE_OPTIONS = {
+        "access_key": AWS_ACCESS_KEY_ID,
+        "secret_key": AWS_SECRET_ACCESS_KEY,
+        "bucket_name": AWS_PRIVATE_STORAGE_BUCKET_NAME,
+        "default_acl": "private",
+    }
+
     # secure headers
     MIDDLEWARE.append("csp.middleware.CSPMiddleware")
     # see settings options https://django-csp.readthedocs.io/en/latest/configuration.html#configuration-chapter
@@ -366,15 +375,6 @@ AWS_CENSUS_ACCESS_KEY_ID = secret("AWS_CENSUS_ACCESS_KEY_ID", "")
 AWS_CENSUS_SECRET_ACCESS_KEY = secret("AWS_CENSUS_SECRET_ACCESS_KEY", "")
 AWS_CENSUS_STORAGE_BUCKET_NAME = secret("AWS_CENSUS_STORAGE_BUCKET_NAME", "")
 AWS_S3_CENSUS_REGION_NAME = secret("AWS_S3_CENSUS_REGION_NAME", "")
-
-# Used for backing up the database https://django-dbbackup.readthedocs.io/en/master/storage.html#id2
-DBBACKUP_STORAGE = "storages.backends.s3boto.S3BotoStorage"
-DBBACKUP_STORAGE_OPTIONS = {
-    "access_key": AWS_ACCESS_KEY_ID,
-    "secret_key": AWS_SECRET_ACCESS_KEY,
-    "bucket_name": AWS_PRIVATE_STORAGE_BUCKET_NAME,
-    "default_acl": "private",
-}
 
 
 ADMIN_URL = "admin/"
