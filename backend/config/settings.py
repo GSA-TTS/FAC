@@ -307,7 +307,7 @@ else:
             )
 
             # Used for backing up the database https://django-dbbackup.readthedocs.io/en/master/storage.html#id2
-            DBBACKUP_STORAGE = "storages.backends.s3boto.S3BotoStorage"
+            DBBACKUP_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
             DBBACKUP_STORAGE_OPTIONS = {
                 "access_key": AWS_PRIVATE_ACCESS_KEY_ID,
                 "secret_key": AWS_PRIVATE_SECRET_ACCESS_KEY,
