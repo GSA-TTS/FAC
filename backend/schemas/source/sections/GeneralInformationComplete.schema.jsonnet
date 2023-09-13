@@ -84,7 +84,7 @@ Requires most fields, has consitional checks for conditional fields.
         Base.Enum.UnitedStatesStateAbbr,
         Base.Compound.EmptyString,
       ],
-    }
+    },
     auditor_zip: {
       oneOf: [
         Base.Compound.Zip,
@@ -116,6 +116,8 @@ Requires most fields, has consitional checks for conditional fields.
     secondary_auditors_exist: Types.boolean,
   },
   allOf: [
+    // If audit_period_covered is 'other', then audit_period_other_months should 
+    // have a value. Otherwise, it should have no value.
     {
       anyOf: [
         {
@@ -156,6 +158,7 @@ Requires most fields, has consitional checks for conditional fields.
         },
       ],
     },
+    // If auditor is from the USA, address info should be included.
     {
       'if': {
         properties: {
@@ -170,6 +173,7 @@ Requires most fields, has consitional checks for conditional fields.
         },
       },
     },
+    // If auditor is NOT from the USA, the zip should be empty.
     {
       'if': {
         properties: {
@@ -186,6 +190,22 @@ Requires most fields, has consitional checks for conditional fields.
         },
       },
     },
+    // The auditee EIN attestation should always be true.
+    {
+      properties: {
+        ein_not_an_ssn_attestation: {
+          const: true,
+        },
+      },
+    },
+    // The auditor EIN attestation should always be true.
+    {
+      properties: {
+        auditor_ein_not_an_ssn_attestation: {
+          const: true,
+        },
+      },
+    }
   ],
   required: [
     'audit_type',
