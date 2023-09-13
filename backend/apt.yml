@@ -1,8 +1,8 @@
 ---
+cleancache: true
 keys:
 - https://www.postgresql.org/media/keys/ACCC4CF8.asc
 repos:
-- https://apt.postgresql.org/pub/repos/apt
+- deb https://apt.postgresql.org/pub/repos/apt/ jammy-pgdg main
 packages:
-- postgresql-client
 - postgresql-client-15
