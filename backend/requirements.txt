@@ -232,7 +232,6 @@ django==4.2.4 \
     #   dj-database-url
     #   django-cors-headers
     #   django-csp
-    #   django-dbbackup
     #   django-storages
     #   djangorestframework
     #   djangorestframework-simplejwt
@@ -247,10 +246,6 @@ django-cors-headers==4.2.0 \
 django-csp==3.7 \
     --hash=sha256:01443a07723f9a479d498bd7bb63571aaa771e690f64bde515db6cdb76e8041a \
     --hash=sha256:01eda02ad3f10261c74131cdc0b5a6a62b7c7ad4fd017fbefb7a14776e0a9727
-    # via -r ./requirements/requirements.in
-django-dbbackup==4.0.2 \
-    --hash=sha256:1874d684abc22260972a67668a6db3331b24d7e1e8af89eaffdcd61eb27dbc2a \
-    --hash=sha256:3ccde831f1a8268fb031b37a8e7e2de3abb556623023af1e859cd7104c09ea2a
     # via -r ./requirements/requirements.in
 django-fsm==2.8.1 \
     --hash=sha256:e2c02cbf273fb9691aa9a907c29990afdd21a4adea09c5640344c93fbe03f8d9 \
@@ -825,7 +820,6 @@ pytz==2023.3 \
     --hash=sha256:1d8ce29db189191fb55338ee6d0387d82ab59f3d00eac103412d64e0ebd0c588 \
     --hash=sha256:a151b3abb88eda1d4e34a9814df37de2a80e301e68ba0fd856fb9b46bfbbbffb
     # via
-    #   django-dbbackup
     #   djangorestframework
     #   pandas
 pyyaml==6.0.1 \

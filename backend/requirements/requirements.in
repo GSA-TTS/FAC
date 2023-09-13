@@ -8,7 +8,6 @@ Django>=4.2.3
 djangorestframework
 djangorestframework-simplejwt
 django-fsm
-django-dbbackup
 django-storages[boto3]
 environs[django]
 faker
