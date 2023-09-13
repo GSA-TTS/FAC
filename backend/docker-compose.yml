@@ -35,7 +35,7 @@ services:
   web:
     build:
       context: .
-      dockerfile: "./${DOCKERFILE:-Dockerfile}"
+      dockerfile: "./${DOCKERFILE:-Apple_M1_Dockerfile}"
     command: /src/run.sh
     depends_on:
       db:
