@@ -6,6 +6,8 @@
 git config --global http.proxy "$https_proxy"
 git clone https://github.com/GSA-TTS/fac-historic-public-csvs.git
 cd fac-historic-public-csvs
-export PATH=/home/vcap/deps/0/apt/usr/lib/postgresql/14/bin:$PATH
+#export PATH=/home/vcap/deps/0/apt/usr/lib/postgresql/14/bin:$PATH
+export PATH=/home/vcap/deps/0/apt/usr/lib/postgresql/15/bin:$PATH
+#export PATH=/home/vcap/deps/0/apt/usr/bin/pg_dump:$PATH
 ./create-dumps.sh
 ./wait-and-load.sh
