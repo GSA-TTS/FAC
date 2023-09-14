@@ -36,6 +36,13 @@ class AdditionalUei(models.Model):
     additional_uei = models.TextField()
 
 
+class AdditionalEin(models.Model):
+    """Additional EINs for this audit."""
+
+    report_id = models.TextField(REPORT_ID_FK_HELP_TEXT)
+    additional_ein = models.TextField()
+
+
 class Finding(models.Model):
     """A finding from the audit. References FederalAward and FindingText"""
 

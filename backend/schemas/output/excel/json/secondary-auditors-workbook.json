@@ -8,7 +8,7 @@
             {
                "help": {
                   "link": "https://fac.gov/documentation/validation/#unknown",
-                  "text": "If you see this error, please contact support."
+                  "text": "Please contact support"
                },
                "title": "Federal Audit Clearinghouse\nfac.gov",
                "title_cell": "A1",
@@ -17,7 +17,7 @@
             {
                "help": {
                   "link": "https://fac.gov/documentation/validation/#unknown",
-                  "text": "If you see this error, please contact support."
+                  "text": "Please contact support"
                },
                "title": "This workbook contains two worksheets: a coversheet (this sheet) and a data entry sheet.\nBefore submitting, please make sure the fields below are filled out.",
                "title_cell": "B1",
@@ -32,7 +32,7 @@
                "formula": "=\"1.0.0\"",
                "help": {
                   "link": "https://fac.gov/documentation/validation/#plain_text",
-                  "text": "Only plain text is allowed in this field, no emoji or other special additions"
+                  "text": "Only plain text is allowed, no emoji, formatting, or other special additions"
                },
                "keep_locked": true,
                "range_cell": "B2",
@@ -90,9 +90,10 @@
          "name": "Form",
          "open_ranges": [
             {
+               "format": "text",
                "help": {
                   "link": "https://fac.gov/documentation/validation/#plain_text",
-                  "text": "Only plain text is allowed in this field, no emoji or other special additions"
+                  "text": "Only plain text is allowed, no emoji, formatting, or other special additions"
                },
                "range_name": "secondary_auditor_name",
                "title": "Audit Firm/Organization Name",
@@ -104,6 +105,7 @@
                "width": 100
             },
             {
+               "format": "text",
                "help": {
                   "link": "https://fac.gov/documentation/validation/#ein",
                   "text": "Employer identification numbers (EIN) are nine characters long and match rules given by the IRS"
@@ -122,9 +124,10 @@
                "width": 36
             },
             {
+               "format": "text",
                "help": {
                   "link": "https://fac.gov/documentation/validation/#plain_text",
-                  "text": "Only plain text is allowed in this field, no emoji or other special additions"
+                  "text": "Only plain text is allowed, no emoji, formatting, or other special additions"
                },
                "range_name": "secondary_auditor_address_street",
                "title": "Audit Firm/Organization Address (Number and Street)",
@@ -136,9 +139,10 @@
                "width": 100
             },
             {
+               "format": "text",
                "help": {
                   "link": "https://fac.gov/documentation/validation/#plain_text",
-                  "text": "Only plain text is allowed in this field, no emoji or other special additions"
+                  "text": "Only plain text is allowed, no emoji, formatting, or other special additions"
                },
                "range_name": "secondary_auditor_address_city",
                "title": "Audit Firm/Organization City",
@@ -150,23 +154,29 @@
                "width": 100
             },
             {
+               "format": "text",
                "help": {
                   "link": "https://fac.gov/documentation/validation/#plain_text",
-                  "text": "Only plain text is allowed in this field, no emoji or other special additions"
+                  "text": "Only plain text is allowed, no emoji, formatting, or other special additions"
                },
                "range_name": "secondary_auditor_address_state",
                "title": "Audit Firm/Organization State",
                "title_cell": "E1",
                "type": "open_range",
                "validation": {
-                  "type": "NOVALIDATION"
+                  "custom_error": "Please enter a valid state code.",
+                  "custom_title": "Lookup validation",
+                  "lookup_range": "state_code_lookup",
+                  "sheet": "StateCodeLookup",
+                  "type": "range_lookup"
                },
-               "width": 100
+               "width": 36
             },
             {
+               "format": "text",
                "help": {
                   "link": "https://fac.gov/documentation/validation/#plain_text",
-                  "text": "Only plain text is allowed in this field, no emoji or other special additions"
+                  "text": "Only plain text is allowed, no emoji, formatting, or other special additions"
                },
                "range_name": "secondary_auditor_address_zipcode",
                "title": "Audit Firm/Organization ZIP",
@@ -178,9 +188,10 @@
                "width": 36
             },
             {
+               "format": "text",
                "help": {
                   "link": "https://fac.gov/documentation/validation/#plain_text",
-                  "text": "Only plain text is allowed in this field, no emoji or other special additions"
+                  "text": "Only plain text is allowed, no emoji, formatting, or other special additions"
                },
                "range_name": "secondary_auditor_contact_name",
                "title": "Contact Name",
@@ -192,9 +203,10 @@
                "width": 36
             },
             {
+               "format": "text",
                "help": {
                   "link": "https://fac.gov/documentation/validation/#plain_text",
-                  "text": "Only plain text is allowed in this field, no emoji or other special additions"
+                  "text": "Only plain text is allowed, no emoji, formatting, or other special additions"
                },
                "range_name": "secondary_auditor_contact_title",
                "title": "Contact Title",
@@ -206,9 +218,10 @@
                "width": 36
             },
             {
+               "format": "text",
                "help": {
                   "link": "https://fac.gov/documentation/validation/#plain_text",
-                  "text": "Only plain text is allowed in this field, no emoji or other special additions"
+                  "text": "Only plain text is allowed, no emoji, formatting, or other special additions"
                },
                "range_name": "secondary_auditor_contact_phone",
                "title": "Contact Phone Number",
@@ -220,9 +233,10 @@
                "width": 36
             },
             {
+               "format": "text",
                "help": {
                   "link": "https://fac.gov/documentation/validation/#plain_text",
-                  "text": "Only plain text is allowed in this field, no emoji or other special additions"
+                  "text": "Only plain text is allowed, no emoji, formatting, or other special additions"
                },
                "range_name": "secondary_auditor_contact_email",
                "title": "Contact E-mail",
@@ -232,6 +246,89 @@
                   "type": "NOVALIDATION"
                },
                "width": 36
+            }
+         ]
+      },
+      {
+         "name": "StateCodeLookup",
+         "text_ranges": [
+            {
+               "contents": {
+                  "description": "US States 2-letter abbreviations",
+                  "enum": [
+                     "AL",
+                     "AK",
+                     "AS",
+                     "AZ",
+                     "AR",
+                     "CA",
+                     "CO",
+                     "CT",
+                     "DE",
+                     "DC",
+                     "FM",
+                     "FL",
+                     "GA",
+                     "GU",
+                     "HI",
+                     "ID",
+                     "IL",
+                     "IN",
+                     "IA",
+                     "KS",
+                     "KY",
+                     "LA",
+                     "ME",
+                     "MH",
+                     "MD",
+                     "MA",
+                     "MI",
+                     "MN",
+                     "MS",
+                     "MO",
+                     "MT",
+                     "NE",
+                     "NV",
+                     "NH",
+                     "NJ",
+                     "NM",
+                     "NY",
+                     "NC",
+                     "ND",
+                     "MP",
+                     "OH",
+                     "OK",
+                     "OR",
+                     "PW",
+                     "PA",
+                     "PR",
+                     "RI",
+                     "SC",
+                     "SD",
+                     "TN",
+                     "TX",
+                     "UT",
+                     "VT",
+                     "VI",
+                     "VA",
+                     "WA",
+                     "WV",
+                     "WI",
+                     "WY"
+                  ]
+               },
+               "last_range_cell": "A60",
+               "range_name": "state_code_lookup",
+               "title": "State Code",
+               "title_cell": "A1",
+               "type": "text_range",
+               "validation": {
+                  "custom_error": "Not in the lookup list",
+                  "custom_title": "Lookup validation",
+                  "formula1": "=NOT(ISERROR(MATCH(FIRSTCELLREF,LOOKUPRANGE,0)))",
+                  "lookup_range": "state_code_lookup",
+                  "type": "lookup"
+               }
             }
          ]
       }
