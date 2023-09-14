@@ -51,7 +51,7 @@ ASSIGNMENT_TYPES = (
 
 
 class CognizantAssignment(models.Model):
-    sac = models.ForeignKey(SingleAuditChecklist, on_delete=models.CASCADE)
+    report_id = models.CharField(max_length=17)
     cognizant_agency = models.CharField(
         # "Two digit Federal agency prefix of the cognizant agency",
         max_length=2,
@@ -76,3 +76,7 @@ class CognizantAssignment(models.Model):
         default=AssignmentTypeCode.COMPUTED,
         verbose_name="Type",
     )
+
+    @property
+    def sac(self):
+        return SingleAuditChecklist.objects.get(report_id=self.report_id)

@@ -76,10 +76,9 @@ class Command(BaseCommand):
         }
         general_information["ein"] = gen.ein
         general_information["auditee_uei"] = gen.uei
-
         federal_awards = self.make_awards(gen)
         sac = SingleAuditChecklist.objects.create(
-            submitted_by=User.objects.get(id=1),
+            submitted_by=User.objects.first(),
             submission_status="in_progress",
             general_information=general_information,
             federal_awards=federal_awards,
@@ -119,3 +118,8 @@ def initialize_db():
     """
     SingleAuditChecklist.objects.all().delete()
     CognizantAssignment.objects.all().delete()
+    User.objects.get_or_create(
+        username="foo",
+        password="bar",
+        email="g22.foobar.com",
+    )

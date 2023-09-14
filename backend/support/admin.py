@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import CognizantBaseline, CognizantAssignment
+from .models import CognizantBaseline, CognizantAssignment, AssignmentTypeCode
 
 
 class SupportAdmin(admin.ModelAdmin):
@@ -9,9 +9,6 @@ class SupportAdmin(admin.ModelAdmin):
             return True
 
     def has_delete_permission(self, request, obj=None):
-        return False
-
-    def has_change_permission(self, request, obj=None):
         return False
 
 
@@ -32,6 +29,9 @@ class CognizantBaselineAdmin(SupportAdmin):
         "ein",
     ]
 
+    def has_change_permission(self, request, obj=None):
+        return False
+
     def has_add_permission(self, request, obj=None):
         return False
 
@@ -42,6 +42,7 @@ class CognizantAssignmentAdmin(SupportAdmin):
     ordering = ["date_assigned"]
     list_display = [
         "report_id",
+        "uei",
         "cognizant_agency",
         "date_assigned",
         "assignor_email",
@@ -52,9 +53,54 @@ class CognizantAssignmentAdmin(SupportAdmin):
         "assignment_type",
         "cognizant_agency",
     ]
+    fields = [
+        "report_id",
+        (
+            "uei",
+            "last_assigned_by",
+            "current_cog",
+        ),
+        "cognizant_agency",
+        "override_comment",
+    ]
+    readonly_fields = [
+        "uei",
+        "last_assigned_by",
+        "current_cog",
+    ]
 
-    def report_id(self, ca):
-        return ca.sac.report_id
+    def uei(self, obj):
+        return obj.sac.auditee_uei
+
+    def current_cog(self, obj):
+        return obj.sac.cognizant_agency
+
+    def last_assigned_by(self, obj):
+        return obj.assignor_email
+
+    save_as = True
+    save_as_continue = False
+
+    def change_view(self, request, object_id, form_url="", extra_context=None):
+        """customize edit form"""
+        extra_context = extra_context or {}
+        extra_context["show_save_and_continue"] = False
+        extra_context["show_save"] = False
+        extra_context[
+            "show_save_and_add_another"
+        ] = False  # this not works if has_add_permision is True
+        return super(CognizantAssignmentAdmin, self).change_view(
+            request, object_id, extra_context=extra_context
+        )
+
+    def save_model(self, request, obj, form, change):
+        obj.assignor_email = request.user.email
+        obj.assignment_type = AssignmentTypeCode.MANUAL
+        super().save_model(request, obj, form, change)
+
+    def has_change_permission(self, request, obj=None):
+        if request.user.is_staff:
+            return True
 
     def has_add_permission(self, request, obj=None):
         if request.user.is_staff:

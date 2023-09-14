@@ -197,7 +197,7 @@ def record_cog_assignment(sac: SingleAuditChecklist, cognizant_agency):
     """
     email = sac.submitted_by.email
     CognizantAssignment(
-        sac=sac, cognizant_agency=cognizant_agency, assignor_email=email
+        report_id=sac.report_id, cognizant_agency=cognizant_agency, assignor_email=email
     ).save()
 
 
