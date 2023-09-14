@@ -1,7 +1,7 @@
 locals {
   org_name = "gsa-tts-oros-fac"
   spaces = {
-    "dev" = {},
+    "dev"     = {},
     "preview" = {},
     "staging" = {
       uses_backups = true
