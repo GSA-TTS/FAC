@@ -9,14 +9,14 @@ import { testValidGeneralInfo } from '../support/general-info.js';
 
 import {
   testWorkbookFederalAwards,
-  testWorkbookFindingsText,
+  testWorkbookNotesToSEFA
 } from '../support/workbook-uploads.js';
 
 const LOGIN_TEST_EMAIL_AUDITEE = Cypress.env('LOGIN_TEST_EMAIL_AUDITEE');
 const LOGIN_TEST_PASSWORD_AUDITEE = Cypress.env('LOGIN_TEST_PASSWORD_AUDITEE');
 const LOGIN_TEST_OTP_SECRET_AUDITEE = Cypress.env('LOGIN_TEST_OTP_SECRET_AUDITEE');
 
-describe('Audit Findings Text page', () => {
+describe('Notes to SEFA page', () => {
   before(() => {
     cy.session('login-session', () => {
       cy.visit('/');
@@ -24,7 +24,7 @@ describe('Audit Findings Text page', () => {
     });
   });
 
-  it('Audit Findings Text uploads successfully', () => {
+  it('Notes to SEFA uploads successfully', () => {
     cy.visit('/');
 
     cy.url().should('include', '/');
@@ -46,15 +46,15 @@ describe('Audit Findings Text page', () => {
     cy.get(".usa-link").contains("Federal Awards").click();
     testWorkbookFederalAwards(false);
 
-    cy.get(".usa-link").contains("Federal Awards Audit Findings Text").click();
-    testWorkbookFindingsText(false);
+    cy.get(".usa-link").contains("Notes to SEFA").click();
+    testWorkbookNotesToSEFA(false);
   });
 
     it('Displays message if file has already been uploaded', () => {
       cy.visit(`/audit/`);
       cy.url().should('match', /\/audit\//);
       cy.get(':nth-child(4) > .usa-table > tbody > tr').last().find('td:nth-child(1)>.usa-link').click();
-      cy.get('.usa-link').contains('Edit the Federal Awards Audit Findings Text').click();
+      cy.get('a.usa-link').contains('Edit the Notes to SEFA').click();
       cy.get('#already-submitted')
         .invoke('text')
         .then((text) => {
@@ -62,5 +62,5 @@ describe('Audit Findings Text page', () => {
           expect(text.trim()).to.equal(expectedText);
         });
     });
-    
+
   });

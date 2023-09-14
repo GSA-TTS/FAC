@@ -54,7 +54,7 @@ describe('Audit Findings page', () => {
     it('Displays message if file has already been uploaded', () => {
       cy.visit(`/audit/`);
       cy.url().should('match', /\/audit\//);
-      cy.get(':nth-child(4) > .usa-table > tbody > :nth-child(1) > :nth-child(1) > .usa-link').click();
+      cy.get(':nth-child(4) > .usa-table > tbody > tr').last().find('td:nth-child(1)>.usa-link').click();
       cy.get('.usa-link').contains('Edit the Federal Awards Audit Findings').click();
       cy.get('#already-submitted')
         .invoke('text')
