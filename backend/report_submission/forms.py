@@ -24,6 +24,10 @@ phone_validator = RegexValidator(
     r"^[1-9]{1}[0-9]{9}$",
     "Phone numbers should be ten numbers long, cannot include spaces or symbols such as '-' or '+', and cannot begin with a zero.",
 )
+zip_validator = RegexValidator(
+    r"^[0-9]{5}(?:[0-9]{4})?$",
+    "Zip codes should be in the format 12345 or 12345-1234."
+)
 
 
 def validate_uei(value):
@@ -86,7 +90,7 @@ class GeneralInformationForm(forms.Form):
         validators=[alpha_validator],  # validators are not run against empty fields
     )
     auditee_state = forms.ChoiceField(choices=choices_state_abbrevs, required=False)
-    auditee_zip = forms.CharField(required=False)
+    auditee_zip = forms.CharField(required=False, validators=[zip_validator])
     auditee_contact_name = forms.CharField(max_length=max_string_length, required=False)
     auditee_contact_title = forms.CharField(
         max_length=max_string_length, required=False
@@ -112,7 +116,7 @@ class GeneralInformationForm(forms.Form):
         validators=[alpha_validator],  # validators are not run against empty fields
     )
     auditor_state = forms.ChoiceField(choices=choices_state_abbrevs, required=False)
-    auditor_zip = forms.CharField(required=False)
+    auditor_zip = forms.CharField(required=False, validators=[zip_validator])
     auditor_contact_name = forms.CharField(max_length=max_string_length, required=False)
     auditor_contact_title = forms.CharField(
         max_length=max_string_length, required=False

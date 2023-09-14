@@ -239,6 +239,7 @@
                                        name="auditee_zip"
                                        aria-required="false"
                                        value="{{ auditee_zip | default_if_none:'' }}" />
+                                <span class="usa-error-message" id="ein-error-message" role="alert">{{ errors.auditee_zip|striptags }}</span>
                             </div>
                         </fieldset>
                         <fieldset class="usa-fieldset">
@@ -435,6 +436,7 @@
                                            name="auditor_zip"
                                            aria-required="false"
                                            value="{{ auditor_zip | default_if_none:'' }}" />
+                                <span class="usa-error-message" id="ein-error-message" role="alert">{{ errors.auditor_zip|striptags }}</span>
                                 </div>
                             </fieldset>
                         </fieldset>
