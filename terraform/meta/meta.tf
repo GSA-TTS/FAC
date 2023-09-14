@@ -36,22 +36,17 @@ module "environments" {
 }
 
 locals {
-  # TODO: Filter the list of spaces for those that "use_backups" and make a
-  # value suitable for a "for" loop in bash. Examples: 
-  #   https://developer.hashicorp.com/terraform/language/expressions/for
-  #   https://dev.to/pwd9000/terraform-filter-results-using-for-loops-4n75
-  # Something like... 
-  #   spaces_that_use_backups = join(" ", [for each in local.spaces : each.key ]) 
-  spaces_that_use_backups = ""
+  # Filters the list of spaces with a value of true for "uses_backups". We only want to share the bucket to those spaces.
+  spaces_that_use_backups = join(" ", [for key, config in local.spaces : lookup(config, "uses_backups", false) ? key : ""])
 }
 
 module "s3-backups" {
   source = "github.com/18f/terraform-cloudgov//s3?ref=v0.5.1"
 
-  cf_org_name   = local.org_name
+  cf_org_name = local.org_name
   # TODO: This should be the key for the first space that says "is_production =
   # true" rather than being hardcoded
-  cf_space_name = "production" 
+  cf_space_name = "production"
   name          = "backups"
   s3_plan_name  = "basic"
 }
@@ -66,8 +61,7 @@ resource "null_resource" "share-backup-to-spaces" {
     }
     command = "for space in $SPACES ; do cf share-service backups -s $space; done"
   }
-  depends_on = [ 
-    module.s3-backups 
+  depends_on = [
+    module.s3-backups
   ]
 }
-
