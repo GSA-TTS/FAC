@@ -25,8 +25,7 @@ phone_validator = RegexValidator(
     "Phone numbers should be ten numbers long, cannot include spaces or symbols such as '-' or '+', and cannot begin with a zero.",
 )
 zip_validator = RegexValidator(
-    r"^[0-9]{5}(?:[0-9]{4})?$",
-    "Zip codes should be in the format 12345 or 12345-1234."
+    r"^[0-9]{5}(?:[0-9]{4})?$", "Zip codes should be in the format 12345 or 12345-1234."
 )
 
 
