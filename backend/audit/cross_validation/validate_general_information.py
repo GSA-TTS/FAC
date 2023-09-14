@@ -20,7 +20,7 @@ def validate_general_information(sac_dict, *_args, **_kwargs):
     """
     all_sections = sac_dict["sf_sac_sections"]
     general_information = all_sections[NC.GENERAL_INFORMATION]
-    schema_path = settings.SECTION_SCHEMA_DIR / "GeneralInformation.schema.json"
+    schema_path = settings.SECTION_SCHEMA_DIR / "GeneralInformationComplete.schema.json"
     schema = json.loads(schema_path.read_text(encoding="utf-8"))
 
     try:
