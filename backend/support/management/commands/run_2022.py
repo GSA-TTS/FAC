@@ -120,6 +120,5 @@ def initialize_db():
     CognizantAssignment.objects.all().delete()
     User.objects.get_or_create(
         username="foo",
-        password="bar",
         email="g22.foobar.com",
     )
