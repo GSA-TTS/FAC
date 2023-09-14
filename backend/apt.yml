@@ -1,5 +1,5 @@
 ---
-# Because cf is using jammy jellyfish, and this https://packages.ubuntu.com/jammy/amd64/
+# Because cf is using jammy jellyfish, and this https://packages.ubuntu.com/jammy/amd64/database/
 # does not actually have postgresql-client-15 natively (only goes to 14),
 # we are having to source the version from apt.postgresql.org. This however,
 # eliminates the need to run v14 for load_data.sh, and can be run on v15.
