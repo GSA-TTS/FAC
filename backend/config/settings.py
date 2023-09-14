@@ -146,6 +146,7 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                "config.context_processors.static_site_url",
             ],
             "builtins": [
                 "report_submission.templatetags.get_attr",
@@ -484,5 +485,5 @@ if ENABLE_DEBUG_TOOLBAR:
     ] + MIDDLEWARE
     DEBUG_TOOLBAR_CONFIG = {"SHOW_TOOLBAR_CALLBACK": lambda _: True}
 
-# Links to the most applicable static site URL. Becomes more permanent post-beta.
-STATIC_SITE_URL = "https://federalist-35af9df5-a894-4ae9-aa3d-f6d95427c7bc.sites.pages.cloud.gov/preview/gsa-tts/fac-transition-site/lh/ia-updates/"
+# Link to the most applicable static site URL. Passed in context to all templates.
+STATIC_SITE_URL = "https://fac.gov/"
