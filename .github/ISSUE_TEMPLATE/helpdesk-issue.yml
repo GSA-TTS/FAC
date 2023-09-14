@@ -1,4 +1,4 @@
-name: Heldesk Issue
+name: Helpdesk Issue
 description: Used as output from helpdesk issue triage.
 title: "[HD]: "
 labels: ["helpdesk"]
