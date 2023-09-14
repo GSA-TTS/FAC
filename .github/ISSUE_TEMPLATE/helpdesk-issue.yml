@@ -50,7 +50,7 @@ body:
       value: |
         Audits are not yet public at this point. 
         
-        Place all files and screenshots in the Google Drive Helpdesk folder and link to that folder here.
+        Place all files and screenshots in the [Google Drive Helpdesk folder](https://drive.google.com/drive/folders/1jgb2YRxaFOjKS6CwZsBTqUsbzUCzktic) and link to that folder here.
 
         Delete the files from Zendesk when you are done.
   - type: input
