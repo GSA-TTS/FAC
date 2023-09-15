@@ -133,7 +133,6 @@ def general_information_progress_check(progress, general_info):
             validate_general_information_complete_json(general_info)
         )
     except Exception as err:
-        print("General information form not complete based on conditions:", err)
         is_general_info_complete = False
 
     if is_general_info_complete:
