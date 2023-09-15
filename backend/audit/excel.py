@@ -377,6 +377,11 @@ notes_to_sefa_column_mapping: ColumnMapping = {
         "note_content",
         _set_by_path,
     ),
+    "contains_chart_or_table": (
+        "NotesToSefa.notes_to_sefa_entries",
+        "contains_chart_or_table",
+        _set_by_path,
+    ),
     "seq_number": (
         "NotesToSefa.notes_to_sefa_entries",
         "seq_number",

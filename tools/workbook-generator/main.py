@@ -351,7 +351,8 @@ def generate_notes_to_sefa(dbkey, outdir):
     wb = pyxl.load_workbook(f'templates/{templates["SEFA"]}')
     mappings = [
         FieldMap('note_title', 'title', None, str),
-        FieldMap('note_content', 'content', None, str)
+        FieldMap('note_content', 'content', None, str),
+        FieldMap('contains_chart_or_table', 'contains_chart_or_table', None, str),
     ]
     g =  set_uei(wb, dbkey)
     # The mapping is weird.

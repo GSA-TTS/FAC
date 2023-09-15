@@ -204,6 +204,10 @@ class Note(models.Model):
     )
     content = models.TextField("Content of the Note", help_text=docs.content)
     note_title = models.TextField("Note title", help_text=docs.title)
+    contains_chart_or_table = models.TextField(
+        "Indicates whether or not the text contained charts or tables that could not be entered due to formatting restrictions",
+        help_text=docs.charts_tables_note,
+    )
 
 
 class Passthrough(models.Model):
