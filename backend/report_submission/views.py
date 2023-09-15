@@ -215,7 +215,7 @@ class GeneralInformationFormView(LoginRequiredMixin, View):
         except LateChangeError:
             return render(request, "audit/no-late-changes.html")
         except Exception as err:
-            message = f"Unexpected error in GeneralInformationFormView post. Report ID {report_id}: {err}"
+            message = f"Unexpected error in GeneralInformationFormView post. Report ID {report_id}"
             logger.warning(message)
             raise err
 
