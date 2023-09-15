@@ -1,5 +1,6 @@
 from audit.cross_validation.naming import NC, find_section_by_name
 from audit.validators import validate_general_information_complete_json
+from django.core.exceptions import ValidationError
 
 
 def submission_progress_check(sac, sar=None, crossval=True):
@@ -132,7 +133,7 @@ def general_information_progress_check(progress, general_info):
         is_general_info_complete = bool(
             validate_general_information_complete_json(general_info)
         )
-    except ValidationError as err:
+    except ValidationError:
         is_general_info_complete = False
 
     if is_general_info_complete:
