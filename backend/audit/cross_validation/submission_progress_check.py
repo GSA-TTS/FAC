@@ -132,7 +132,7 @@ def general_information_progress_check(progress, general_info):
         is_general_info_complete = bool(
             validate_general_information_complete_json(general_info)
         )
-    except Exception as err:
+    except ValidationError as err:
         is_general_info_complete = False
 
     if is_general_info_complete:
