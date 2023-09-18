@@ -15,14 +15,13 @@ from dissemination.models import (
     AdditionalUei,
     AdditionalEin,
 )
-from audit.models import SingleAuditChecklist
 from audit.utils import Util
 
 logger = logging.getLogger(__name__)
 
 
 class IntakeToDissemination(object):
-    def __init__(self, sac: SingleAuditChecklist) -> None:
+    def __init__(self, sac) -> None:
         self.single_audit_checklist = sac
         self.report_id = sac.report_id
         audit_date = sac.general_information.get(

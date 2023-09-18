@@ -15,7 +15,8 @@ from django.utils.translation import gettext_lazy as _
 from django_fsm import FSMField, RETURN_VALUE, transition
 
 import audit.cross_validation
-from .validators import (
+from audit.intake_to_dissemination import IntakeToDissemination
+from audit.validators import (
     validate_additional_ueis_json,
     validate_additional_eins_json,
     validate_corrective_action_plan_json,
@@ -33,6 +34,7 @@ from .validators import (
     validate_audit_information_json,
     validate_component_page_numbers,
 )
+from support.cog_over import compute_cog_over, record_cog_assignment
 
 User = get_user_model()
 
@@ -159,6 +161,36 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
             )
 
         return super().save()
+
+    def disseminate(self):
+        """
+        Cognizant/Oversight agency assignment followed by dissemination
+        ETL.
+        """
+        self.assign_cog_over()
+        intake_to_dissem = IntakeToDissemination(self)
+        intake_to_dissem.load_all()
+        intake_to_dissem.save_dissemination_objects()
+
+    def assign_cog_over(self):
+        """
+        Function that the FAC app uses when a submission is completed and cog_over needs to be assigned.
+        """
+        if not self.federal_awards:
+            logger.warning(
+                "Trying to determine cog_over for a self with zero awards with status = %s",
+                self.submission_status,
+            )
+
+        cognizant_agency, oversight_agency = compute_cog_over(
+            self.federal_awards, self.submission_status, self.ein, self.auditee_uei
+        )
+        if oversight_agency:
+            self.oversight_agency = oversight_agency
+            self.save()
+            return
+        if cognizant_agency:
+            record_cog_assignment(self.report_id, self.submitted_by, cognizant_agency)
 
     def _reject_late_changes(self):
         """

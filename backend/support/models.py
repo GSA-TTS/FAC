@@ -1,7 +1,5 @@
 from django.db import models
 
-from audit.models import SingleAuditChecklist
-
 
 class CognizantBaseline(models.Model):
     dbkey = models.CharField(
@@ -76,7 +74,3 @@ class CognizantAssignment(models.Model):
         default=AssignmentTypeCode.COMPUTED,
         verbose_name="Type",
     )
-
-    @property
-    def sac(self):
-        return SingleAuditChecklist.objects.get(report_id=self.report_id)

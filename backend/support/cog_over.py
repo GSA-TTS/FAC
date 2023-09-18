@@ -1,5 +1,4 @@
 from collections import defaultdict
-from audit.models import SingleAuditChecklist
 from .models import CognizantBaseline, CognizantAssignment
 from dissemination.models import General
 from dissemination.hist_models.census_2019 import CensusGen19, CensusCfda19
@@ -16,17 +15,23 @@ COG_LIMIT = 50_000_000
 DA_THRESHOLD_FACTOR = 0.25
 
 
-def compute_cog_over(sac: SingleAuditChecklist):
+def compute_cog_over(federal_awards, submission_status, auditee_ein, auditee_uei):
     """
     Compute cog or oversight agency for the sac.
     Return tuple (cog_agency, oversight_agency)
+
+    WIP:
+    - sac.federal_awards
+    - sac.submission_status
+    - sac.ein
+    - sac.auditee_uei
     """
-    if not sac.federal_awards:
+    if not federal_awards:
         logger.warning(
-            f"Trying to determine cog_over for a sac with zero awards with status = {sac.submission_status}."
+            f"Trying to determine cog_over for a sac with zero awards with status = {submission_status}."
         )
         return (None, None)
-    awards = sac.federal_awards["FederalAwards"]
+    awards = federal_awards["FederalAwards"]
     total_amount_expended = awards.get("total_amount_expended")
     cognizant_agency = oversight_agency = None
     (max_total_agency, max_da_agency) = calc_award_amounts(awards)
@@ -41,7 +46,7 @@ def compute_cog_over(sac: SingleAuditChecklist):
         oversight_agency = agency
         # logger.warning("Assigning an oversight agenct", oversight_agency)
         return (cognizant_agency, oversight_agency)
-    cognizant_agency = determine_hist_agency(sac.ein, sac.auditee_uei)
+    cognizant_agency = determine_hist_agency(auditee_ein, auditee_uei)
     if cognizant_agency:
         return (cognizant_agency, oversight_agency)
     cognizant_agency = agency
@@ -191,24 +196,28 @@ def propogate_cog_update(cog_assignment: CognizantAssignment):
         pass  # etl may not have been run yet
 
 
-def record_cog_assignment(sac: SingleAuditChecklist, cognizant_agency):
+def record_cog_assignment(report_id, user, cognizant_agency):
     """
     To be unvoked by app to persist the computed cog agency
     """
-    email = sac.submitted_by.email
     CognizantAssignment(
-        report_id=sac.report_id, cognizant_agency=cognizant_agency, assignor_email=email
+        report_id=report_id,
+        cognizant_agency=cognizant_agency,
+        assignor_email=user.email,
     ).save()
 
 
-def assign_cog_over(sac: SingleAuditChecklist):
+def assign_cog_over(sac):
     """
     Function that the FAC app uses when a submission is completed and cog_over needs to be assigned.
     """
-    (conizantg_agency, oversight_agency) = compute_cog_over(sac)
+    # (conizantg_agency, oversight_agency) = compute_cog_over(sac)
+    conizantg_agency, oversight_agency = compute_cog_over(
+        sac.federal_awards, sac.submission_status, sac.ein, sac.auditee_uei
+    )
     if oversight_agency:
         sac.oversight_agency = oversight_agency
         sac.save()
         return
     if conizantg_agency:
-        record_cog_assignment(sac, conizantg_agency)
+        record_cog_assignment(sac.report_id, sac.submitted_by.email, conizantg_agency)
