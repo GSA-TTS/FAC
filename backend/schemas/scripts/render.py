@@ -83,8 +83,6 @@ def process_spec(WBNT):
         print(f"## Processing sheet {ndx+1}")
         print("########################")
         ws = create_protected_sheet(wb, sheet, password, ndx)
-        if sheet.mergeable_cells is not None:
-            merge_adjacent_columns(ws, sheet.mergeable_cells)
         if sheet.hide_col_from is not None:
             hide_all_columns_from(ws, sheet.hide_col_from)
         if sheet.hide_row_from is not None:
@@ -142,19 +140,6 @@ def create_protected_sheet(wb, sheet, password, ndx):
     ws.protection.sheet = True
     ws.protection.enable()
     return ws
-
-
-def merge_adjacent_columns(ws, cell_ranges):
-    """
-    Merges cells in adjacent columns for each row within the specified range.
-    Largely for cosmetic reasons in any given sheet.
-    """
-    print("---- mergeable_cells ----")
-    for cell_range in cell_ranges:
-        start_row, end_row, start_column, end_column = cell_range
-        for row in range(start_row, end_row):
-            merge_range = f"{start_column}{row}:{end_column}{row}"
-            ws.merge_cells(merge_range)
 
 
 def hide_all_columns_from(ws, start_column):
@@ -477,14 +462,6 @@ def unlock_data_entry_cells(header_row, ws, sheet):
             coords = make_range(r)
             for rowndx in range(coords.range_start_row, MAX_ROWS):
                 cell_reference = f"${coords.column}${rowndx}"
-                cell = ws[cell_reference]
-                cell.protection = Protection(locked=False)
-    if sheet.merged_unreachable not in [None, []]:
-        print(sheet.merged_unreachable)
-        data_row_index = header_row + 1
-        for column in sheet.merged_unreachable.columns:
-            for rowndx in range(data_row_index, MAX_ROWS):
-                cell_reference = f"${column}${rowndx}"
                 cell = ws[cell_reference]
                 cell.protection = Protection(locked=False)
 

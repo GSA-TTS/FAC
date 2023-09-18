@@ -15,7 +15,7 @@ from collections import namedtuple as NT
 
 Sheet = NT(
     "Sheet",
-    "name single_cells meta_cells open_ranges mergeable_cells merged_unreachable header_inclusion text_ranges header_height hide_col_from hide_row_from",
+    "name single_cells meta_cells open_ranges header_inclusion text_ranges header_height hide_col_from hide_row_from",
 )
 Posn = NT(
     "Posn",
@@ -177,14 +177,6 @@ def parse_sheet(spec):  # noqa: C901
         opr = list(map(parse_open_range, get(spec, "open_ranges", default=[])))
     else:
         opr = []
-    if "mergeable_cells" in spec:
-        mc = list(map(parse_mergeable_cell, get(spec, "mergeable_cells", default=[])))
-    else:
-        mc = []
-    if "merged_unreachable" in spec:
-        mur = parse_merged_unreachable(get(spec, "merged_unreachable", default=None))
-    else:
-        mur = []
     if "header_inclusion" in spec:
         hi = parse_header_inclusion(get(spec, "header_inclusion"))
     else:
@@ -205,7 +197,7 @@ def parse_sheet(spec):  # noqa: C901
         hrf = get(spec, "hide_row_from")
     else:
         hrf = None
-    return Sheet(name, sc, mtc, opr, mc, mur, hi, tr, hh, hcf, hrf)
+    return Sheet(name, sc, mtc, opr, hi, tr, hh, hcf, hrf)
 
 
 def parse_spec(spec):
