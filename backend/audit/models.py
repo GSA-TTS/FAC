@@ -236,7 +236,7 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         (STATUS.AUDITEE_CERTIFIED, "Auditee Certified"),
         (STATUS.CERTIFIED, "Certified"),
         (STATUS.SUBMITTED, "Submitted"),
-        (STATUS.DISSEMINATED, "Disseminated")
+        (STATUS.DISSEMINATED, "Disseminated"),
     )
 
     USER_PROVIDED_ORGANIZATION_TYPE_CODE = (
@@ -484,6 +484,7 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         logger.info("Transitioning to DISSEMINATED")
         self.transition_name.append(SingleAuditChecklist.STATUS.DISSEMINATED)
         self.transition_date.append(datetime.now(timezone.utc))
+
     @transition(
         field="submission_status",
         source=[
@@ -494,7 +495,6 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         ],
         target=STATUS.SUBMITTED,
     )
-
     def transition_to_in_progress(self):
         """
         Any edit to a submission in the following states should result in it
