@@ -163,7 +163,7 @@ def parse_text_range(spec):
 
 
 def parse_sheet(spec):  # noqa: C901
-    sc, mtc, opr, mc, mur, hi, tr = None, None, None, None, None, None, None
+    sc, mtc, opr, hi, tr = None, None, None, None, None
     name = get(spec, "name", default="Unnamed Sheet")
     if "single_cells" in spec:
         sc = list(map(parse_single_cell, get(spec, "single_cells", default=[])))
