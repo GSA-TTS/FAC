@@ -8,7 +8,7 @@
             {
                "help": {
                   "link": "https://fac.gov/documentation/validation/#unknown",
-                  "text": "If you see this error, please contact support."
+                  "text": "Please contact support"
                },
                "keep_locked": true,
                "title": "Federal Audit Clearinghouse\nfac.gov",
@@ -18,7 +18,7 @@
             {
                "help": {
                   "link": "https://fac.gov/documentation/validation/#unknown",
-                  "text": "If you see this error, please contact support."
+                  "text": "Please contact support"
                },
                "keep_locked": true,
                "title": "This workbook contains two worksheets: a coversheet (this sheet) and a data entry sheet.\nBefore submitting, please make sure the fields below are filled out.",
@@ -34,7 +34,7 @@
                "formula": "=\"1.0.0\"",
                "help": {
                   "link": "https://fac.gov/documentation/validation/#plain_text",
-                  "text": "Only plain text is allowed in this field, no emoji or other special additions"
+                  "text": "Only plain text is allowed, no emoji, formatting, or other special additions"
                },
                "keep_locked": true,
                "range_cell": "B2",

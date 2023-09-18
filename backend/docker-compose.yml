@@ -19,6 +19,17 @@ services:
       retries: 10
 
   #---------------------------------------------
+  # Historic data
+  #---------------------------------------------
+  historic-data:
+    image: ghcr.io/gsa-tts/fac-historic-public-csvs/load-historic-public-data:20230912
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgres://postgres@db/postgres
+
+  #---------------------------------------------
   # Django app
   #---------------------------------------------
   web:
