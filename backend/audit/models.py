@@ -469,11 +469,6 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
 
         self.transition_name.append(SingleAuditChecklist.STATUS.SUBMITTED)
         self.transition_date.append(datetime.now(timezone.utc))
-        if self.general_information:
-            intake_to_dissem = IntakeToDissemination(self)
-            intake_to_dissem.load_all()
-            # FIXME MSHD: Handle exceptions raised by the save methods
-            intake_to_dissem.save_dissemination_objects()
 
     @transition(
         field="submission_status",
