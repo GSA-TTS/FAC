@@ -167,10 +167,14 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         Cognizant/Oversight agency assignment followed by dissemination
         ETL.
         """
-        self.assign_cog_over()
-        intake_to_dissem = IntakeToDissemination(self)
-        intake_to_dissem.load_all()
-        intake_to_dissem.save_dissemination_objects()
+        try:
+            self.assign_cog_over()
+            intake_to_dissem = IntakeToDissemination(self)
+            intake_to_dissem.load_all()
+            intake_to_dissem.save_dissemination_objects()
+            return None
+        except Exception as err:
+            return {"error": err}
 
     def assign_cog_over(self):
         """
