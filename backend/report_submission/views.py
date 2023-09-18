@@ -104,7 +104,7 @@ class AccessAndSubmissionFormView(LoginRequiredMixin, View):
         if report_id:
             return redirect(f"/report_submission/general-information/{report_id}")
         else:
-            raise BadRequest(result.get("errors", ""))
+            return redirect(reverse("report_submission:accessandsubmission"))
 
 
 class GeneralInformationFormView(LoginRequiredMixin, View):
