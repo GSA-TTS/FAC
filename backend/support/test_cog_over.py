@@ -9,7 +9,7 @@ from django.db import connection
 from audit.models import SingleAuditChecklist
 from .models import CognizantBaseline, CognizantAssignment
 
-from .cog_over import compute_cog_over, assign_cog_over
+from .cog_over import compute_cog_over
 
 # Note:  Fake data is generated for SingleAuditChecklist, CognizantBaseline.
 #        Using only the data fields that apply to cog / over assignment.
