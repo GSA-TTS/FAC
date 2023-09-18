@@ -227,6 +227,7 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         AUDITEE_CERTIFIED = "auditee_certified"
         CERTIFIED = "certified"
         SUBMITTED = "submitted"
+        DISSEMINATED = "disseminated"
 
     STATUS_CHOICES = (
         (STATUS.IN_PROGRESS, "In Progress"),
@@ -235,6 +236,7 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         (STATUS.AUDITEE_CERTIFIED, "Auditee Certified"),
         (STATUS.CERTIFIED, "Certified"),
         (STATUS.SUBMITTED, "Submitted"),
+        (STATUS.DISSEMINATED, "Disseminated")
     )
 
     USER_PROVIDED_ORGANIZATION_TYPE_CODE = (
@@ -465,8 +467,6 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         the appropriate privileges will done at the view level.
         """
 
-        from audit.intake_to_dissemination import IntakeToDissemination
-
         self.transition_name.append(SingleAuditChecklist.STATUS.SUBMITTED)
         self.transition_date.append(datetime.now(timezone.utc))
         if self.general_information:
@@ -477,6 +477,15 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
 
     @transition(
         field="submission_status",
+        source=STATUS.SUBMITTED,
+        target=STATUS.DISSEMINATED,
+    )
+    def transition_to_disseminated(self):
+        logger.info("Transitioning to DISSEMINATED")
+        self.transition_name.append(SingleAuditChecklist.STATUS.DISSEMINATED)
+        self.transition_date.append(datetime.now(timezone.utc))
+    @transition(
+        field="submission_status",
         source=[
             STATUS.READY_FOR_CERTIFICATION,
             STATUS.AUDITOR_CERTIFIED,
@@ -485,6 +494,7 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         ],
         target=STATUS.SUBMITTED,
     )
+
     def transition_to_in_progress(self):
         """
         Any edit to a submission in the following states should result in it
