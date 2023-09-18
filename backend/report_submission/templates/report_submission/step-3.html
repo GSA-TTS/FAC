@@ -133,6 +133,7 @@
                                             <li id="certifying_auditor_contact_email-email" hidden>
                                                 An email address should have a username, an &#39;@&#39; symbol, and a domain name
                                             </li>
+                                            <li id="certifying_auditor_contact_email-must-not-match" hidden>The certifying auditor and auditee should not have the same email address</li>
                                         </ul>
                                         <input class="usa-input"
                                                id="certifying_auditor_contact_email"
@@ -140,7 +141,8 @@
                                                aria-required="true"
                                                required
                                                data-validate-not-null=""
-                                               data-validate-email=""/>
+                                               data-validate-email=""
+                                               data-validate-must-not-match="certifying_auditee_contact_email"/>
                                     </div>
                                 </div>
                                 <div class="tablet:grid-col-fill">
