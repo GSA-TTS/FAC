@@ -220,4 +220,4 @@ def assign_cog_over(sac):
         sac.save()
         return
     if conizantg_agency:
-        record_cog_assignment(sac.report_id, sac.submitted_by.email, conizantg_agency)
+        record_cog_assignment(sac.report_id, sac.submitted_by, conizantg_agency)
