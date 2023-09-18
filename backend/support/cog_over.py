@@ -211,13 +211,13 @@ def assign_cog_over(sac):
     """
     Function that the FAC app uses when a submission is completed and cog_over needs to be assigned.
     """
-    # (conizantg_agency, oversight_agency) = compute_cog_over(sac)
-    conizantg_agency, oversight_agency = compute_cog_over(
+    # (cognizant_agency, oversight_agency) = compute_cog_over(sac)
+    cognizant_agency, oversight_agency = compute_cog_over(
         sac.federal_awards, sac.submission_status, sac.ein, sac.auditee_uei
     )
     if oversight_agency:
         sac.oversight_agency = oversight_agency
         sac.save()
         return
-    if conizantg_agency:
-        record_cog_assignment(sac.report_id, sac.submitted_by, conizantg_agency)
+    if cognizant_agency:
+        record_cog_assignment(sac.report_id, sac.submitted_by, cognizant_agency)
