@@ -9,6 +9,7 @@ import { testAuditInformationForm } from '../support/audit-info-form.js';
 import { testPdfAuditReport } from '../support/report-pdf.js';
 import { testAuditorCertification } from '../support/auditor-certification.js';
 import { testAuditeeCertification } from '../support/auditee-certification.js';
+import { testReportId } from '../support/dissemination-table.js';
 import {
   testWorkbookFederalAwards,
   testWorkbookNotesToSEFA,
@@ -56,17 +57,7 @@ describe('Full audit submission', () => {
     // Report should not yet be in the dissemination table
     cy.url().then(url => {
       const reportId = url.split('/').pop();
-
-      cy.request({
-        method: 'GET',
-        url: 'localhost:3000/general',
-        headers: {
-          Authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYXBpX2ZhY19nb3YiLCJjcmVhdGVkIjoiMjAyMy0wOS0xOVQxMDowMToxMi4zNTkzNTEifQ.uHOTzHp7sN_8tLftFYcva-5m6CQMrauY0DyIPAIZXpw',
-        },
-        qs: {report_id: `eq.${reportId}`},
-      }).should((response) => {
-        expect(response.body).to.have.length(0);
-      });
+      testReportId(reportId, 0);
     });
 
     // Fill out the general info form
@@ -143,16 +134,7 @@ describe('Full audit submission', () => {
       ).siblings().contains('td', reportId);
 
       // Report should now be in the dissemination table
-      cy.request({
-        method: 'GET',
-        url: 'localhost:3000/general',
-        headers: {
-          Authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYXBpX2ZhY19nb3YiLCJjcmVhdGVkIjoiMjAyMy0wOS0xOVQxMDowMToxMi4zNTkzNTEifQ.uHOTzHp7sN_8tLftFYcva-5m6CQMrauY0DyIPAIZXpw',
-        },
-        qs: {report_id: `eq.${reportId}`},
-      }).should((response) => {
-        expect(response.body).to.have.length(1);
-      });
+      testReportId(reportId, 1);
     });
   });
 });
