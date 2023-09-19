@@ -168,7 +168,8 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         ETL.
         """
         # try:
-        self.assign_cog_over()
+        if not self.cognizant_agency and not self.oversight_agency:
+            self.assign_cog_over()
         intake_to_dissem = IntakeToDissemination(self)
         intake_to_dissem.load_all()
         intake_to_dissem.save_dissemination_objects()
@@ -194,6 +195,8 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
             self.save()
             return
         if cognizant_agency:
+            self.cognizant_agency = cognizant_agency
+            self.save()
             record_cog_assignment(self.report_id, self.submitted_by, cognizant_agency)
 
     def _reject_late_changes(self):

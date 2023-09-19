@@ -15,9 +15,7 @@ def post_cog_assignment(sender, instance, created, **kwargs):
     """
     if created:
         sac = SingleAuditChecklist.objects.get(report_id=instance.report_id)
-        cognizant_agency = instance.cognizant_agency
-        sac.cognizant_agency = cognizant_agency
-        sac.save()
+        cognizant_agency = sac.cognizant_agency
 
         ein, uei = sac.auditee_uei, sac.ein
         baselines = CognizantBaseline.objects.filter(Q(ein=ein) | Q(uei=uei))
