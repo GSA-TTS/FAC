@@ -138,7 +138,7 @@
       },
       {
          "header_height": 100,
-         "hide_col_from": 3,
+         "hide_col_from": 4,
          "name": "AdditionalNotes",
          "open_ranges": [
             {
@@ -170,6 +170,24 @@
                "width": 56
             },
             {
+               "help": {
+                  "link": "https://fac.gov/documentation/validation/#yorn",
+                  "text": "This field must be either `Y` or `N`"
+               },
+               "range_name": "contains_chart_or_table",
+               "title": "Did Text Contain a Chart or Table?",
+               "title_cell": "C1",
+               "type": "yorn_range",
+               "validation": {
+                  "allow_blank": "False",
+                  "custom_error": "Must be 'Y' or 'N'",
+                  "custom_title": "Y/N",
+                  "formula1": "\"Y,N\"",
+                  "type": "list"
+               },
+               "width": 36
+            },
+            {
                "formula": "=IF(A{0}<>\"\", ROW()-1, \"\")",
                "help": {
                   "link": "https://fac.gov/documentation/validation/#unknown",
@@ -178,7 +196,7 @@
                "keep_locked": true,
                "range_name": "seq_number",
                "title": "Sequence number (Read Only)",
-               "title_cell": "C1",
+               "title_cell": "D1",
                "type": "open_range",
                "validation": {
                   "type": "NOVALIDATION"

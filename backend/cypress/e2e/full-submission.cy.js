@@ -80,11 +80,11 @@ describe('Full audit submission', () => {
 
     cy.get(".usa-link").contains("Secondary Auditors").click();
     testWorkbookSecondaryAuditors(false);
-    
-    
+
+
     cy.get(".usa-link").contains("Additional EINs").click();
     testWorkbookAdditionalEINs(false);
-    
+
     // Complete the audit information form
     cy.get(".usa-link").contains("Audit Information form").click();
     testAuditInformationForm();
@@ -96,9 +96,8 @@ describe('Full audit submission', () => {
     cy.get(".usa-link").contains("Auditor Certification").click();
     testAuditorCertification();
 
-    // Auditee certification
+    // Grab the report ID from the URL
     cy.url().then(url => {
-      // Grab the report ID from the URL
       const reportId = url.split('/').pop();
 
       testLogoutGov();
@@ -112,14 +111,21 @@ describe('Full audit submission', () => {
 
       cy.visit(`/audit/submission-progress/${reportId}`);
 
+      // Auditee certification
       cy.get(".usa-link").contains("Auditee Certification").click();
       testAuditeeCertification();
-    })
 
-    cy.get(".usa-link").contains("Submit to the FAC for processing").click();
-    cy.url().should('match', /\/audit\/submission\/[0-9A-Z]{17}/);
-    cy.get('#continue').click();
-    cy.url().should('match', /\/audit\//);
-    
+      // Submit
+      cy.get(".usa-link").contains("Submit to the FAC for processing").click();
+      cy.url().should('match', /\/audit\/submission\/[0-9A-Z]{17}/);
+      cy.get('#continue').click();
+      cy.url().should('match', /\/audit\//);
+
+      // The report ID should be found in the Completed Audits table
+      cy.get('.usa-table').contains(
+        'caption',
+        'The audits listed below have been submitted to the FAC for processing and may not be edited.',
+      ).siblings().contains('td', reportId);
+    })
   });
 });

@@ -150,7 +150,8 @@ create view api_v1_0_0.notes_to_sefa as
         note.accounting_policies,
         note.is_minimis_rate_used,
         note.rate_explained,
-        note.content
+        note.content,
+        note.contains_chart_or_table
     from
         dissemination_general gen,
         dissemination_note note
