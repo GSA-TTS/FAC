@@ -13,7 +13,6 @@ class Migration(migrations.Migration):
             model_name="note",
             name="contains_chart_or_table",
             field=models.TextField(
-                default="",
                 help_text="Census mapping: ",
                 verbose_name="Indicates whether or not the text contained charts or tables that could not be entered due to formatting restrictions",
             ),
