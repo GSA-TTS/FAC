@@ -359,7 +359,6 @@ class CogOverTests(TestCase):
             uei=UEI_WITH_BASELINE,
             cognizant_agency="17",
         )
-        # assign_cog_over(sac)
         sac.assign_cog_over()
         cas = CognizantAssignment.objects.all()
         self.assertEquals(1, len(cas))
