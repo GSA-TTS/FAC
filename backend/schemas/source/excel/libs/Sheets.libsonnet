@@ -40,9 +40,6 @@ local section_names = {
   NOTES_TO_SEFA: 'NotesToSefa',
 };
 
-// MAX_ROWS here is equal to MAX_ROWS in render.py plus 1 to account for the header row.
-local MAX_ROWS = 3001;
-
 // All workbooks should get the same version number.
 local WORKBOOKS_VERSION = '1.0.0';
 
@@ -51,7 +48,6 @@ local WORKBOOKS_VERSION = '1.0.0';
   meta_cell: meta_cell,
   open_range: open_range,
   y_or_n_range: y_or_n_range,
-  MAX_ROWS: MAX_ROWS,
   WORKBOOKS_VERSION: WORKBOOKS_VERSION,
   section_names: section_names
 }
