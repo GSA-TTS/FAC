@@ -215,6 +215,7 @@ class IntakeToDissemination(object):
                         rate_explained=rate_explained,
                         content=entry["note_content"],
                         note_title=entry["note_title"],
+                        contains_chart_or_table=entry["contains_chart_or_table"],
                     )
                     sefa_objects.append(note)
         self.loaded_objects["Notes"] = sefa_objects

@@ -30,5 +30,10 @@
     instructions: [
       'Enter the full text of the note. Do not include charts, tables, or footnotes.',
     ],
-  }
+  },
+  contains_chart_or_table: {
+    instructions: [
+      'Indicates whether or not the text contained charts or tables that could not be entered due to formatting restrictions.',
+    ],
+  },
 }
