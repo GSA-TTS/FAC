@@ -157,4 +157,20 @@ export const validations = {
           : result;
     }
   },
+
+  validateDateComesAfter: (field) => {
+    let comparisonField = field.dataset['validateDateComesAfter'],
+      comparisonFieldValue = document.getElementById(comparisonField).value;
+
+    let endDate = new Date(field.value),
+      startDate = new Date(comparisonFieldValue);
+
+    const result = {
+      error: false,
+      fieldId: field.id,
+      validation: 'date-order',
+    };
+
+    return startDate >= endDate ? { ...result, error: true } : result;
+  },
 };
