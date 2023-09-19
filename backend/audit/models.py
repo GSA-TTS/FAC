@@ -15,7 +15,8 @@ from django.utils.translation import gettext_lazy as _
 from django_fsm import FSMField, RETURN_VALUE, transition
 
 import audit.cross_validation
-from .validators import (
+from audit.intake_to_dissemination import IntakeToDissemination
+from audit.validators import (
     validate_additional_ueis_json,
     validate_additional_eins_json,
     validate_corrective_action_plan_json,
@@ -33,6 +34,7 @@ from .validators import (
     validate_audit_information_json,
     validate_component_page_numbers,
 )
+from support.cog_over import compute_cog_over, record_cog_assignment
 
 User = get_user_model()
 
@@ -160,6 +162,43 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
 
         return super().save()
 
+    def disseminate(self):
+        """
+        Cognizant/Oversight agency assignment followed by dissemination
+        ETL.
+        """
+        # try:
+        if not self.cognizant_agency and not self.oversight_agency:
+            self.assign_cog_over()
+        intake_to_dissem = IntakeToDissemination(self)
+        intake_to_dissem.load_all()
+        intake_to_dissem.save_dissemination_objects()
+        # TODO: figure out what exceptions to catch here
+        # except Exception as err:
+        #     return {"error": err}
+
+    def assign_cog_over(self):
+        """
+        Function that the FAC app uses when a submission is completed and cog_over needs to be assigned.
+        """
+        if not self.federal_awards:
+            logger.warning(
+                "Trying to determine cog_over for a self with zero awards with status = %s",
+                self.submission_status,
+            )
+
+        cognizant_agency, oversight_agency = compute_cog_over(
+            self.federal_awards, self.submission_status, self.ein, self.auditee_uei
+        )
+        if oversight_agency:
+            self.oversight_agency = oversight_agency
+            self.save()
+            return
+        if cognizant_agency:
+            self.cognizant_agency = cognizant_agency
+            self.save()
+            record_cog_assignment(self.report_id, self.submitted_by, cognizant_agency)
+
     def _reject_late_changes(self):
         """
         This should only be called if status isn't STATUS.IN_PROGRESS.
@@ -195,6 +234,7 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         AUDITEE_CERTIFIED = "auditee_certified"
         CERTIFIED = "certified"
         SUBMITTED = "submitted"
+        DISSEMINATED = "disseminated"
 
     STATUS_CHOICES = (
         (STATUS.IN_PROGRESS, "In Progress"),
@@ -203,6 +243,7 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         (STATUS.AUDITEE_CERTIFIED, "Auditee Certified"),
         (STATUS.CERTIFIED, "Certified"),
         (STATUS.SUBMITTED, "Submitted"),
+        (STATUS.DISSEMINATED, "Disseminated"),
     )
 
     USER_PROVIDED_ORGANIZATION_TYPE_CODE = (
@@ -319,9 +360,16 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         blank=True, null=True, validators=[validate_tribal_data_consent_json]
     )
 
-    cognizant_agency = models.TextField(null=True)
-
-    oversight_agency = models.TextField(
+    cognizant_agency = models.CharField(
+        "Agency assigned to this large submission. Computed when the submisson is finalized, but may be overridden",
+        max_length=2,
+        blank=True,
+        null=True,
+    )
+    oversight_agency = models.CharField(
+        "Agency assigned to this not so large submission. Computed when the submisson is finalized",
+        max_length=2,
+        blank=True,
         null=True,
     )
 
@@ -426,18 +474,18 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         the appropriate privileges will done at the view level.
         """
 
-        from audit.intake_to_dissemination import IntakeToDissemination
-        from audit.cog_over import cog_over
-
         self.transition_name.append(SingleAuditChecklist.STATUS.SUBMITTED)
         self.transition_date.append(datetime.now(timezone.utc))
-        if self.general_information:
-            # cog / over assignment
-            self.cognizant_agency, self.oversight_agency = cog_over(self)
-            intake_to_dissem = IntakeToDissemination(self)
-            intake_to_dissem.load_all()
-            # FIXME MSHD: Handle exceptions raised by the save methods
-            intake_to_dissem.save_dissemination_objects()
+
+    @transition(
+        field="submission_status",
+        source=STATUS.SUBMITTED,
+        target=STATUS.DISSEMINATED,
+    )
+    def transition_to_disseminated(self):
+        logger.info("Transitioning to DISSEMINATED")
+        self.transition_name.append(SingleAuditChecklist.STATUS.DISSEMINATED)
+        self.transition_date.append(datetime.now(timezone.utc))
 
     @transition(
         field="submission_status",
@@ -670,30 +718,6 @@ class SingleAuditReportFile(models.Model):
             )
 
         super().save(*args, **kwargs)
-
-
-class CognizantBaseline(models.Model):
-    dbkey = models.IntegerField(
-        "Identifier for a submission along with audit_year in C-FAC",
-        null=True,
-    )
-    audit_year = models.IntegerField(
-        "Audit year from fy_start_date",
-        null=True,
-    )
-    ein = models.CharField(
-        "Primary Employer Identification Number",
-        null=True,
-        max_length=30,
-    )
-    cognizant_agency = models.CharField(
-        "Two digit Federal agency prefix of the cognizant agency",
-        max_length=2,
-        null=True,
-    )
-
-    class Meta:
-        unique_together = (("dbkey", "audit_year"),)
 
 
 class SubmissionEvent(models.Model):

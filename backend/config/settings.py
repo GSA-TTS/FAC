@@ -120,6 +120,7 @@ INSTALLED_APPS += [
     "cms",
     # "data_distro",
     "dissemination",
+    "support",
 ]
 
 MIDDLEWARE = [
