@@ -139,6 +139,19 @@ export const validations = {
       : result;
   },
 
+  validateMustNotMatch: (field, matchField) => {
+    const matchFieldEl = document.querySelector(`input#${matchField}`);
+    const result = {
+      error: false,
+      fieldId: field.id,
+      validation: 'must-not-match',
+    };
+
+    return field.value == matchFieldEl.value
+      ? { ...result, error: true }
+      : result;
+  },
+
   validateLength: (field, compStr) => {
     const [comparator, compValue] = compStr.split(' ');
     const valueLength = field.value.length;

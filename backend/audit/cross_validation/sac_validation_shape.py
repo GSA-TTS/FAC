@@ -65,6 +65,7 @@ def sac_validation_shape(sac):
     }
 
     """
+    from audit.models import Access
 
     shape = {
         "sf_sac_sections": {k: get_shaped_section(sac, k) for k in SECTION_NAMES},
@@ -78,4 +79,23 @@ def sac_validation_shape(sac):
             "transition_date": sac.transition_date,
         },
     }
+
+    certifying_auditee = Access.objects.filter(
+        sac=sac, role="certifying_auditee_contact"
+    ).first()
+
+    certifying_auditor = Access.objects.filter(
+        sac=sac, role="certifying_auditor_contact"
+    ).first()
+
+    if certifying_auditee:
+        shape["sf_sac_meta"].update(
+            {"certifying_auditee_contact": certifying_auditee.email}
+        )
+
+    if certifying_auditor:
+        shape["sf_sac_meta"].update(
+            {"certifying_auditor_contact": certifying_auditor.email}
+        )
+
     return shape
