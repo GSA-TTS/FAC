@@ -146,6 +146,7 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                "report_submission.context_processors.certifiers_emails_must_not_match",
             ],
             "builtins": [
                 "report_submission.templatetags.get_attr",
