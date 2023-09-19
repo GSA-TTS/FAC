@@ -1,5 +1,6 @@
 from django.contrib import admin
 
+from audit.models import SingleAuditChecklist
 from .models import CognizantBaseline, CognizantAssignment, AssignmentTypeCode
 
 
@@ -70,10 +71,12 @@ class CognizantAssignmentAdmin(SupportAdmin):
     ]
 
     def uei(self, obj):
-        return obj.sac.auditee_uei
+        return SingleAuditChecklist.objects.get(report_id=obj.report_id).auditee_uei
 
     def current_cog(self, obj):
-        return obj.sac.cognizant_agency
+        return SingleAuditChecklist.objects.get(
+            report_id=obj.report_id
+        ).cognizant_agency
 
     def last_assigned_by(self, obj):
         return obj.assignor_email
@@ -89,9 +92,7 @@ class CognizantAssignmentAdmin(SupportAdmin):
         extra_context[
             "show_save_and_add_another"
         ] = False  # this not works if has_add_permision is True
-        return super(CognizantAssignmentAdmin, self).change_view(
-            request, object_id, extra_context=extra_context
-        )
+        return super().change_view(request, object_id, extra_context=extra_context)
 
     def save_model(self, request, obj, form, change):
         obj.assignor_email = request.user.email

@@ -9,7 +9,7 @@ from django.db import connection
 from audit.models import SingleAuditChecklist
 from .models import CognizantBaseline, CognizantAssignment
 
-from .cog_over import compute_cog_over, assign_cog_over
+from .cog_over import compute_cog_over
 
 # Note:  Fake data is generated for SingleAuditChecklist, CognizantBaseline.
 #        Using only the data fields that apply to cog / over assignment.
@@ -256,7 +256,9 @@ class CogOverTests(TestCase):
         """
         sac = self._fake_sac()
         sac.general_information["ein"] = UNIQUE_EIN_WITHOUT_DBKEY
-        cog_agency, over_agency = compute_cog_over(sac)
+        cog_agency, over_agency = compute_cog_over(
+            sac.federal_awards, sac.submission_status, sac.ein, sac.auditee_uei
+        )
         self.assertEqual(cog_agency, "84")
         self.assertEqual(over_agency, None)
 
@@ -267,7 +269,9 @@ class CogOverTests(TestCase):
         """
         sac = self._fake_sac()
         sac.general_information["ein"] = EIN_2023_ONLY
-        cog_agency, over_agency = compute_cog_over(sac)
+        cog_agency, over_agency = compute_cog_over(
+            sac.federal_awards, sac.submission_status, sac.ein, sac.auditee_uei
+        )
         self.assertEqual(cog_agency, "10")
         self.assertEqual(over_agency, None)
 
@@ -279,7 +283,9 @@ class CogOverTests(TestCase):
 
         sac = self._fake_sac()
         sac.general_information["ein"] = DUP_EIN_WITHOUT_RESOLVER
-        cog_agency, over_agency = compute_cog_over(sac)
+        cog_agency, over_agency = compute_cog_over(
+            sac.federal_awards, sac.submission_status, sac.ein, sac.auditee_uei
+        )
         self.assertEqual(cog_agency, "10")
         self.assertEqual(over_agency, None)
 
@@ -293,7 +299,9 @@ class CogOverTests(TestCase):
 
         sac.general_information["ein"] = RESOLVABLE_EIN_WITHOUT_BASELINE
         sac.general_information["auditee_uei"] = RESOLVABLE_UEI_WITHOUT_BASELINE
-        cog_agency, over_agency = compute_cog_over(sac)
+        cog_agency, over_agency = compute_cog_over(
+            sac.federal_awards, sac.submission_status, sac.ein, sac.auditee_uei
+        )
         self.assertEqual(cog_agency, "22")
         self.assertEqual(over_agency, None)
 
@@ -306,7 +314,9 @@ class CogOverTests(TestCase):
             general_information=self._fake_general(),
             federal_awards=self._fake_federal_awards_lt_cog_limit(),
         )
-        cog_agency, over_agency = compute_cog_over(sac)
+        cog_agency, over_agency = compute_cog_over(
+            sac.federal_awards, sac.submission_status, sac.ein, sac.auditee_uei
+        )
         self.assertEqual(cog_agency, None)
         self.assertEqual(over_agency, "15")
 
@@ -321,7 +331,9 @@ class CogOverTests(TestCase):
             federal_awards=self._fake_federal_awards_lt_cog_limit(),
         )
         sac.general_information["ein"] = UNIQUE_EIN_WITHOUT_DBKEY
-        cog_agency, over_agency = compute_cog_over(sac)
+        cog_agency, over_agency = compute_cog_over(
+            sac.federal_awards, sac.submission_status, sac.ein, sac.auditee_uei
+        )
         self.assertEqual(cog_agency, None)
         self.assertEqual(over_agency, "15")
 
@@ -333,7 +345,9 @@ class CogOverTests(TestCase):
             uei=UEI_WITH_BASELINE,
             cognizant_agency="17",
         )
-        cog_agency, over_agency = compute_cog_over(sac)
+        cog_agency, over_agency = compute_cog_over(
+            sac.federal_awards, sac.submission_status, sac.ein, sac.auditee_uei
+        )
         self.assertEqual(cog_agency, "17")
         self.assertEqual(over_agency, None)
 
@@ -345,6 +359,6 @@ class CogOverTests(TestCase):
             uei=UEI_WITH_BASELINE,
             cognizant_agency="17",
         )
-        assign_cog_over(sac)
+        sac.assign_cog_over()
         cas = CognizantAssignment.objects.all()
         self.assertEquals(1, len(cas))

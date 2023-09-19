@@ -1,13 +1,12 @@
 from collections import defaultdict
-from audit.models import SingleAuditChecklist
-from .models import CognizantBaseline, CognizantAssignment
-from dissemination.models import General
-from dissemination.hist_models.census_2019 import CensusGen19, CensusCfda19
-from dissemination.hist_models.census_2022 import CensusGen22
+import logging
+
 from django.db.models.functions import Cast
 from django.db.models import BigIntegerField, Q
 
-import logging
+from dissemination.hist_models.census_2019 import CensusGen19, CensusCfda19
+from dissemination.hist_models.census_2022 import CensusGen22
+from support.models import CognizantBaseline, CognizantAssignment
 
 logger = logging.getLogger(__name__)
 
@@ -16,17 +15,23 @@ COG_LIMIT = 50_000_000
 DA_THRESHOLD_FACTOR = 0.25
 
 
-def compute_cog_over(sac: SingleAuditChecklist):
+def compute_cog_over(federal_awards, submission_status, auditee_ein, auditee_uei):
     """
     Compute cog or oversight agency for the sac.
     Return tuple (cog_agency, oversight_agency)
+
+    WIP:
+    - sac.federal_awards
+    - sac.submission_status
+    - sac.ein
+    - sac.auditee_uei
     """
-    if not sac.federal_awards:
+    if not federal_awards:
         logger.warning(
-            f"Trying to determine cog_over for a sac with zero awards with status = {sac.submission_status}."
+            f"Trying to determine cog_over for a sac with zero awards with status = {submission_status}."
         )
         return (None, None)
-    awards = sac.federal_awards["FederalAwards"]
+    awards = federal_awards["FederalAwards"]
     total_amount_expended = awards.get("total_amount_expended")
     cognizant_agency = oversight_agency = None
     (max_total_agency, max_da_agency) = calc_award_amounts(awards)
@@ -41,7 +46,7 @@ def compute_cog_over(sac: SingleAuditChecklist):
         oversight_agency = agency
         # logger.warning("Assigning an oversight agenct", oversight_agency)
         return (cognizant_agency, oversight_agency)
-    cognizant_agency = determine_hist_agency(sac.ein, sac.auditee_uei)
+    cognizant_agency = determine_hist_agency(auditee_ein, auditee_uei)
     if cognizant_agency:
         return (cognizant_agency, oversight_agency)
     cognizant_agency = agency
@@ -155,60 +160,28 @@ def calc_cfda_amounts(cfdas):
     )
 
 
-def prune_dict_to_max_values(dict):
-    if len(dict) == 0:
-        return dict
+def prune_dict_to_max_values(data: dict):
+    """
+    prune_dict_to_max_values({"a": 5, "b": 10, "c": 10}) => {"b": 10, "c": 10}
+    """
+    if len(data) == 0:
+        return data
 
     pruned_dict = {}
-    max_value = max(dict.values())
-    for key, value in dict.items():
+    max_value = max(data.values())
+    for key, value in data.items():
         if value == max_value:
             pruned_dict[key] = value
 
     return pruned_dict
 
 
-def propogate_cog_update(cog_assignment: CognizantAssignment):
-    """
-    Invoked after a row is inserted into CognizantAssignment
-    """
-    (sac, cognizant_agency) = (cog_assignment.sac, cog_assignment.cognizant_agency)
-    sac.cognizant_agency = cognizant_agency
-    sac.save()
-
-    (ein, uei) = (sac.auditee_uei, sac.ein)
-    cbs = CognizantBaseline.objects.filter(Q(ein=ein) | Q(uei=uei))
-    for cb in cbs:
-        cb.is_active = False
-        cb.save()
-    CognizantBaseline(ein=ein, uei=uei, cognizant_agency=cognizant_agency).save()
-
-    try:
-        gen = General.objects.get(report_id=sac.report_id)
-        gen.cognizant_agency = cognizant_agency
-        gen.save()
-    except General.DoesNotExist:
-        pass  # etl may not have been run yet
-
-
-def record_cog_assignment(sac: SingleAuditChecklist, cognizant_agency):
+def record_cog_assignment(report_id, user, cognizant_agency):
     """
     To be unvoked by app to persist the computed cog agency
     """
-    email = sac.submitted_by.email
     CognizantAssignment(
-        report_id=sac.report_id, cognizant_agency=cognizant_agency, assignor_email=email
+        report_id=report_id,
+        cognizant_agency=cognizant_agency,
+        assignor_email=user.email,
     ).save()
-
-
-def assign_cog_over(sac: SingleAuditChecklist):
-    """
-    Function that the FAC app uses when a submission is completed and cog_over needs to be assigned.
-    """
-    (conizantg_agency, oversight_agency) = compute_cog_over(sac)
-    if oversight_agency:
-        sac.oversight_agency = oversight_agency
-        sac.save()
-        return
-    if conizantg_agency:
-        record_cog_assignment(sac, conizantg_agency)
