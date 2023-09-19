@@ -146,6 +146,7 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                "config.context_processors.omb_num_exp_date",
                 "report_submission.context_processors.certifiers_emails_must_not_match",
             ],
             "builtins": [
@@ -487,3 +488,7 @@ if ENABLE_DEBUG_TOOLBAR:
 
 # Links to the most applicable static site URL. Becomes more permanent post-beta.
 STATIC_SITE_URL = "https://federalist-35af9df5-a894-4ae9-aa3d-f6d95427c7bc.sites.pages.cloud.gov/preview/gsa-tts/fac-transition-site/lh/ia-updates/"
+
+# OMB-assigned values. Number doesn't change, date does.
+OMB_NUMBER = "3090-0330"
+OMB_EXP_DATE = "09/30/2026"
