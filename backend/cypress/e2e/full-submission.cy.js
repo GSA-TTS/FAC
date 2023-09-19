@@ -53,6 +53,22 @@ describe('Full audit submission', () => {
     // Now the accessandsubmission screen
     testValidAccess();
 
+    // Report should not yet be in the dissemination table
+    cy.url().then(url => {
+      const reportId = url.split('/').pop();
+
+      cy.request({
+        method: 'GET',
+        url: 'localhost:3000/general',
+        headers: {
+          Authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYXBpX2ZhY19nb3YiLCJjcmVhdGVkIjoiMjAyMy0wOS0xOVQxMDowMToxMi4zNTkzNTEifQ.uHOTzHp7sN_8tLftFYcva-5m6CQMrauY0DyIPAIZXpw',
+        },
+        qs: {report_id: `eq.${reportId}`},
+      }).should((response) => {
+        expect(response.body).to.have.length(0);
+      });
+    });
+
     // Fill out the general info form
     testValidGeneralInfo();
 
@@ -80,7 +96,6 @@ describe('Full audit submission', () => {
 
     cy.get(".usa-link").contains("Secondary Auditors").click();
     testWorkbookSecondaryAuditors(false);
-
 
     cy.get(".usa-link").contains("Additional EINs").click();
     testWorkbookAdditionalEINs(false);
@@ -126,6 +141,18 @@ describe('Full audit submission', () => {
         'caption',
         'The audits listed below have been submitted to the FAC for processing and may not be edited.',
       ).siblings().contains('td', reportId);
-    })
+
+      // Report should now be in the dissemination table
+      cy.request({
+        method: 'GET',
+        url: 'localhost:3000/general',
+        headers: {
+          Authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYXBpX2ZhY19nb3YiLCJjcmVhdGVkIjoiMjAyMy0wOS0xOVQxMDowMToxMi4zNTkzNTEifQ.uHOTzHp7sN_8tLftFYcva-5m6CQMrauY0DyIPAIZXpw',
+        },
+        qs: {report_id: `eq.${reportId}`},
+      }).should((response) => {
+        expect(response.body).to.have.length(1);
+      });
+    });
   });
 });
