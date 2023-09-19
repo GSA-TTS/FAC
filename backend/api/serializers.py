@@ -38,6 +38,10 @@ AUDITOR_CONTACTS_LIST = _(
     "Auditor Contacts needs to be a list of full names and emails"
 )
 
+CERTIFIERS_HAVE_DIFFERENT_EMAILS = _(
+    "The certifying auditee and certifying auditor must have different email addresses."
+)
+
 
 class EligibilitySerializer(serializers.Serializer):
     user_provided_organization_type = serializers.CharField()
@@ -165,6 +169,18 @@ class AccessAndSubmissionSerializer(serializers.Serializer):
         allow_empty=True,
         min_length=0,
     )
+
+    def validate(self, data):
+        certifying_auditee_contact_email = data["certifying_auditee_contact_email"]
+        certifying_auditor_contact_email = data["certifying_auditor_contact_email"]
+
+        if (
+            certifying_auditee_contact_email.lower()
+            == certifying_auditor_contact_email.lower()
+        ):
+            raise ValidationError(CERTIFIERS_HAVE_DIFFERENT_EMAILS)
+
+        return data
 
 
 class SingleAuditChecklistSerializer(serializers.ModelSerializer):
