@@ -37,6 +37,10 @@ def err_missing_tribal_data_sharing_consent():
     )
 
 
+def err_certifying_contacts_should_not_match():
+    return "The certifying auditor and auditee should not have the same email address."
+
+
 def err_duplicate_finding_reference(award_ref, ref_number):
     return f"Award {award_ref} repeats reference {ref_number}. The reference {ref_number} should only appear once for award {award_ref}."
 

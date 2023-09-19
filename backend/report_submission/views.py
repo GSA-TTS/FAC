@@ -98,11 +98,13 @@ class AccessAndSubmissionFormView(LoginRequiredMixin, View):
         result = api.views.access_and_submission_check(
             post_request.user, post_request.POST
         )
+
         report_id = result.get("report_id")
 
         if report_id:
             return redirect(f"/report_submission/general-information/{report_id}")
-        return redirect(reverse("report_submission:accessandsubmission"))
+        else:
+            return redirect(reverse("report_submission:accessandsubmission"))
 
 
 class GeneralInformationFormView(LoginRequiredMixin, View):
