@@ -34,6 +34,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Install CF CLI8
+        if: ${{ inputs.environment == 'meta' }}
+        run: |
+          wget -q -O - https://packages.cloudfoundry.org/debian/cli.cloudfoundry.org.key | sudo apt-key add -
+          echo "deb https://packages.cloudfoundry.org/debian stable main" | sudo tee /etc/apt/sources.list.d/cloudfoundry-cli.list
+          sudo apt-get update
+          sudo apt-get install cf8-cli
+
       - name: Apply ( ${{ inputs.environment }} )
         uses: dflook/terraform-apply@v1
         with:
