@@ -60,6 +60,13 @@
                "items": {
                   "additionalProperties": false,
                   "properties": {
+                     "contains_chart_or_table": {
+                        "enum": [
+                           "Y",
+                           "N"
+                        ],
+                        "type": "string"
+                     },
                      "note_content": {
                         "type": "string"
                      },
@@ -72,7 +79,8 @@
                   },
                   "required": [
                      "note_title",
-                     "note_content"
+                     "note_content",
+                     "contains_chart_or_table"
                   ],
                   "title": "NotesToSefaEntry"
                },

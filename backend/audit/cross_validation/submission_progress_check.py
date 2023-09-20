@@ -1,4 +1,6 @@
 from audit.cross_validation.naming import NC, find_section_by_name
+from audit.validators import validate_general_information_complete_json
+from django.core.exceptions import ValidationError
 
 
 def submission_progress_check(sac, sar=None, crossval=True):
@@ -90,6 +92,7 @@ def progress_check(sections, key):
     if sections[NC.FEDERAL_AWARDS]:
         awards = sections.get(NC.FEDERAL_AWARDS, {}).get(NC.FEDERAL_AWARDS, [])
     general_info = sections.get(NC.GENERAL_INFORMATION, {}) or {}
+
     num_findings = sum(get_num_findings(award) for award in awards)
     conditions = {
         NC.GENERAL_INFORMATION: True,
@@ -105,6 +108,10 @@ def progress_check(sections, key):
         NC.SINGLE_AUDIT_REPORT: True,
     }
 
+    # The General Information has its own condition, as it can be partially completed.
+    if key == "general_information":
+        return general_information_progress_check(progress, general_info)
+
     # If it's not required, it's inactive:
     if not conditions[key]:
         return {key: progress | {"display": "inactive"}}
@@ -114,3 +121,25 @@ def progress_check(sections, key):
         return {key: progress | {"display": "complete", "completed": True}}
 
     return {key: progress | {"display": "incomplete", "completed": False}}
+
+
+def general_information_progress_check(progress, general_info):
+    """
+    Given a base "progress" dictionary and the general_info object from a submission,
+    run validations to determine its completeness. Then, return a dictionary with
+    "general_information" as the key and the progress as the value.
+    """
+    try:
+        is_general_info_complete = bool(
+            validate_general_information_complete_json(general_info)
+        )
+    except ValidationError:
+        is_general_info_complete = False
+
+    if is_general_info_complete:
+        return {
+            "general_information": progress | {"display": "complete", "completed": True}
+        }
+    return {
+        "general_information": progress | {"display": "incomplete", "completed": False}
+    }

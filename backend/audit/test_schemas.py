@@ -72,7 +72,7 @@ class GeneralInformationSchemaValidityTest(SimpleTestCase):
 
         self.assertRaisesRegex(
             exceptions.ValidationError,
-            f"'{bad_date}' is not a 'date'",
+            "'' was expected",  # Value also accepts a blank string, so this error comes back.
             validate,
             simple_case,
             schema,
@@ -91,7 +91,7 @@ class GeneralInformationSchemaValidityTest(SimpleTestCase):
 
         self.assertRaisesRegex(
             exceptions.ValidationError,
-            f"'{bad_date}' is not a 'date'",
+            "'' was expected",  # Value also accepts a blank string, so this error comes back.
             validate,
             simple_case,
             schema,
@@ -129,7 +129,7 @@ class GeneralInformationSchemaValidityTest(SimpleTestCase):
 
                 with self.assertRaisesRegex(
                     exceptions.ValidationError,
-                    "does not match",
+                    "is not valid",
                     msg=f"ValidationError not raised with EIN = {bad_ein}",
                 ):
                     validate(instance, schema)
@@ -261,7 +261,7 @@ class GeneralInformationSchemaValidityTest(SimpleTestCase):
 
                     with self.assertRaisesRegex(
                         exceptions.ValidationError,
-                        "does not match",
+                        "is not valid",
                         msg=f"ValidationError not raised with zip = {bad_zip}",
                     ):
                         validate(instance, schema)
@@ -294,7 +294,7 @@ class GeneralInformationSchemaValidityTest(SimpleTestCase):
 
                     with self.assertRaisesRegex(
                         exceptions.ValidationError,
-                        "does not match",
+                        "is not valid",
                         msg=f"ValidationError not raised with zip = {bad_zip}",
                     ):
                         validate(instance, schema)
@@ -357,7 +357,7 @@ class GeneralInformationSchemaValidityTest(SimpleTestCase):
 
                     with self.assertRaisesRegex(
                         exceptions.ValidationError,
-                        "does not match",
+                        "is not valid",
                         msg=f"ValidationError not raised with phone = {bad_phone}",
                     ):
                         validate(instance, schema)
