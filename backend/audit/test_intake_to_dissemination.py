@@ -39,7 +39,7 @@ class IntakeToDisseminationTests(TestCase):
         transition_date = datetime.combine(
             current_date_utc,
             time(
-                hour=random.randint(0, 11),
+                hour=random.randint(0, 11),  # nosec
                 minute=0,
                 second=0,
                 microsecond=0,
