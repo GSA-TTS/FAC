@@ -239,12 +239,27 @@ docker compose run web python manage.py test
 The above steps are the bare minimum. To reduce the likelihood of errors, you can also do the following in the `backend` directory:
 
 ```
+make docker-clean
 make docker-first-run
 make docker-test
 ```
 
 The `Makefile` makes clear what these do. In short, the first command builds the container (in case there are changes), runs migrations, loads test data, and creates the S3 mock bucket. The second runs tests.
 
+
+### Full cleanup
+
+When switching branches, working with migrations, or generally trying to move between versions of the application, you will likely find that a full cleanup of your docker environment is important.
+
+```
+docker compose down --volumes
+docker system prune -f
+docker volume prune -f
+make docker-clean
+make docker-first-run
+```
+
+It is possible, after many starts and stops, to end up filling your docker volumes. This sequence removes *everything*, and gives you a clean docker state. It is likely that doing this *at least once per day* is a good idea. When switching between branches to test features (especially features involving changes to models) it is a good idea to do a full clean before switching branches and launching the stack locally.
 
 ## Adding data and users
 

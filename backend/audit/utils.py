@@ -1,3 +1,29 @@
+class Util:
+    @staticmethod
+    def bool_to_yes_no(condition):
+        """Convert a boolean value to 'Yes' or 'No'."""
+        return "Yes" if condition else "No"
+
+    @staticmethod
+    def optional_bool(condition):
+        """Convert a boolean value or None to a string representation."""
+        if condition is None:
+            return ""
+        else:
+            return "Yes" if condition else "No"
+
+    @staticmethod
+    def json_array_to_str(json_array):
+        """Convert a JSON array to a string representation."""
+        if json_array is None:
+            return ""
+        elif isinstance(json_array, list):
+            return ", ".join(map(str, json_array))
+        else:
+            # FIXME This should raise an error
+            return f"NOT AN ARRAY: {json_array}"
+
+
 class ExcelExtractionError(Exception):
     def __init__(
         self,

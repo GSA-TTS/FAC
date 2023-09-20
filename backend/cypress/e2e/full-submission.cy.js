@@ -56,9 +56,6 @@ describe('Full audit submission', () => {
     // Fill out the general info form
     testValidGeneralInfo();
 
-    // Fill out the audit report package form, and upload its associated PDF
-    // testAuditReportPackage();
-
     // Upload all the workbooks. Don't intercept the uploads, which means a file will make it into the DB.
     cy.get(".usa-link").contains("Federal Awards").click();
     testWorkbookFederalAwards(false);
@@ -83,11 +80,11 @@ describe('Full audit submission', () => {
 
     cy.get(".usa-link").contains("Secondary Auditors").click();
     testWorkbookSecondaryAuditors(false);
-    
-    
+
+
     cy.get(".usa-link").contains("Additional EINs").click();
     testWorkbookAdditionalEINs(false);
-    
+
     // Complete the audit information form
     cy.get(".usa-link").contains("Audit Information form").click();
     testAuditInformationForm();
@@ -99,9 +96,8 @@ describe('Full audit submission', () => {
     cy.get(".usa-link").contains("Auditor Certification").click();
     testAuditorCertification();
 
-    // Auditee certification
+    // Grab the report ID from the URL
     cy.url().then(url => {
-      // Grab the report ID from the URL
       const reportId = url.split('/').pop();
 
       testLogoutGov();
@@ -115,15 +111,21 @@ describe('Full audit submission', () => {
 
       cy.visit(`/audit/submission-progress/${reportId}`);
 
+      // Auditee certification
       cy.get(".usa-link").contains("Auditee Certification").click();
       testAuditeeCertification();
-    })
 
-    // Uncomment this block when ready to implement the certification steps.
-    /*
-    // Finally, submit for processing.
-    cy.get(".usa-link").contains("Submit to the FAC for processing").click();
-    // This will probably take you back to the homepage, where the audit is now oof status "submitted".
-    */
+      // Submit
+      cy.get(".usa-link").contains("Submit to the FAC for processing").click();
+      cy.url().should('match', /\/audit\/submission\/[0-9A-Z]{17}/);
+      cy.get('#continue').click();
+      cy.url().should('match', /\/audit\//);
+
+      // The report ID should be found in the Completed Audits table
+      cy.get('.usa-table').contains(
+        'caption',
+        'The audits listed below have been submitted to the FAC for processing and may not be edited.',
+      ).siblings().contains('td', reportId);
+    })
   });
 });

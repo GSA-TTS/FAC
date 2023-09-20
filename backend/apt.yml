@@ -1,3 +1,14 @@
 ---
+# Because cf is using jammy jellyfish, and this https://packages.ubuntu.com/jammy/amd64/database/
+# does not actually have postgresql-client-15 natively (only goes to 14),
+# we are having to source the version from apt.postgresql.org. This however,
+# eliminates the need to run v14 for load_data.sh, and can be run on v15.
+# With v15, we are also able to run python manage.py dbbackup to backup the database
+# to a defined s3 bucket. Running v15 also matches the client and server database versions.
+cleancache: true
+keys:
+- https://www.postgresql.org/media/keys/ACCC4CF8.asc
+repos:
+- deb https://apt.postgresql.org/pub/repos/apt/ jammy-pgdg main
 packages:
-- postgresql-client
+- postgresql-client-15

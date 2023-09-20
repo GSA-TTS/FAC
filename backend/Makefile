@@ -60,6 +60,9 @@ docker-first-run:
 		python manage.py migrate\
 		'
 
+docker-load-data:
+	docker compose up -d && docker compose run web ./load_data.sh
+
 # Run Django tests with docker
 docker-test:
 	docker compose build

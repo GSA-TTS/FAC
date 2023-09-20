@@ -504,7 +504,7 @@ class AuditorCertificationStep2View(CertifyingAuditorRequiredMixin, generic.View
                 ] = form_cleaned["auditor_signature"][
                     "auditor_certification_date_signed"
                 ].strftime(
-                    "%d/%m/%Y"
+                    "%Y-%m-%d"
                 )
                 auditor_certification = sac.auditor_certification or {}
                 auditor_certification.update(form_cleaned)
@@ -641,7 +641,7 @@ class AuditeeCertificationStep2View(CertifyingAuditeeRequiredMixin, generic.View
                 ] = form_cleaned["auditee_signature"][
                     "auditee_certification_date_signed"
                 ].strftime(
-                    "%d/%m/%Y"
+                    "%Y-%m-%d"
                 )
                 auditee_certification = sac.auditee_certification or {}
                 auditee_certification.update(form_cleaned)
@@ -684,10 +684,9 @@ class CertificationView(CertifyingAuditeeRequiredMixin, generic.View):
         try:
             sac = SingleAuditChecklist.objects.get(report_id=report_id)
 
-            sac.transition_to_certified()
             sac.save()
 
-            return redirect(reverse("audit:SubmissionProgress", args=[report_id]))
+            return redirect(reverse("audit:MySubmissions"))
 
         except SingleAuditChecklist.DoesNotExist:
             raise PermissionDenied("You do not have access to this audit.")
@@ -718,6 +717,14 @@ class SubmissionView(CertifyingAuditeeRequiredMixin, generic.View):
             sac.transition_to_submitted()
             sac.save(
                 event_user=request.user, event_type=SubmissionEvent.EventType.SUBMITTED
+            )
+            disseminated = sac.disseminate()
+            # FIXME: We should now provide a reasonable error to the user.
+            if disseminated is None:
+                sac.transition_to_disseminated()
+
+            logger.info(
+                "Dissemination errors: %s, report_id: %s", disseminated, report_id
             )
 
             return redirect(reverse("audit:MySubmissions"))

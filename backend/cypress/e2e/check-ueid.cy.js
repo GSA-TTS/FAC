@@ -122,6 +122,17 @@ describe('Create New Audit', () => {
         cy.get('#auditee_fiscal_period_end').type('01/31/2022').blur();
         cy.get('#auditee_fiscal_period_end-not-null').should('not.be.visible');
       });
+
+      it('should ensure that the end date is later than the start date', () => {
+        cy.get('#auditee_fiscal_period_start').type('12/31/2022').blur();
+        cy.get('#auditee_fiscal_period_end').type('11/31/2022').blur();
+        cy.get('#auditee_fiscal_period_end-date-order').should('be.visible');
+      });
+
+      it('should remove the error message when valid end date is supplied', () => {
+        cy.get('#auditee_fiscal_period_end').type('01/31/2023').blur();
+        cy.get('#auditee_fiscal_period_end-date-order').should('not.be.visible');
+      });
     });
 
     describe('UEI Validation via API', () => {

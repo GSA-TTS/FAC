@@ -9,7 +9,7 @@ function setFormDisabled(shouldDisable) {
 }
 
 function allResponsesValid() {
-  const inputsWithErrors = document.querySelectorAll('[class *="--error"]');
+  const inputsWithErrors = document.querySelectorAll('[class *="-error"]');
   return inputsWithErrors.length === 0;
 }
 
@@ -34,7 +34,7 @@ function appendInc(elements, attr, inc) {
   });
 }
 function appendContactField(btnEl) {
-  const inputContainer = btnEl.parentElement.parentElement;
+  const inputContainer = btnEl.parentElement;
   const template = inputContainer.querySelector('template');
   const newRow = template.content.cloneNode(true);
 
@@ -73,21 +73,13 @@ function appendContactField(btnEl) {
   deleteBtns.forEach((btn) => {
     btn.addEventListener('click', (e) => {
       e.preventDefault();
-      deleteContactField(e.target);
+      deleteContactField(btn);
     });
   });
 }
 
 function deleteContactField(el) {
-  const nodeName = el.nodeName;
-  const inputContainer =
-    nodeName == 'use'
-      ? el.parentElement.parentElement.parentElement
-      : nodeName == 'svg'
-      ? el.parentElement.parentElement.parentElement.parentElement
-      : el.parentElement.parentElement.parentElement.parentElement;
-
-  inputContainer.remove();
+  el.parentElement.parentElement.parentElement.remove();
 }
 
 function attachFocusoutMulti(elements) {
@@ -112,8 +104,8 @@ function attachEventHandlers() {
   );
 
   certifyingInputs.forEach((q) => {
-    q.addEventListener('blur', (e) => {
-      performValidations(e.target);
+    q.addEventListener('focusout', (e) => {
+      performValidations([e.target]);
     });
   });
 
@@ -123,7 +115,7 @@ function attachEventHandlers() {
   addContactButtons.forEach((btn) => {
     btn.addEventListener('click', (e) => {
       e.preventDefault();
-      appendContactField(e.target);
+      appendContactField(btn);
     });
   });
   const contactsCollections = Array.from(
