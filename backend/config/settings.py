@@ -109,6 +109,7 @@ INSTALLED_APPS += [
     "corsheaders",
     "storages",
     "djangooidc",
+    "dbbackup",
 ]
 
 # Our apps
@@ -252,6 +253,10 @@ if ENVIRONMENT not in ["DEVELOPMENT", "PREVIEW", "STAGING", "PRODUCTION"]:
 
     DISABLE_AUTH = env.bool("DISABLE_AUTH", default=False)
 
+    # Used for backing up the database https://django-dbbackup.readthedocs.io/en/master/installation.html
+    DBBACKUP_STORAGE = "django.core.files.storage.FileSystemStorage"
+    DBBACKUP_STORAGE_OPTIONS = {"location": BASE_DIR / "backup"}
+
 else:
     # One of the Cloud.gov environments
     STATICFILES_STORAGE = "storages.backends.s3boto3.S3ManifestStaticStorage"
@@ -304,6 +309,17 @@ else:
             MEDIA_URL = (
                 f"https://{AWS_S3_PRIVATE_CUSTOM_DOMAIN}/{AWS_PRIVATE_LOCATION}/"
             )
+
+        elif service["instance_name"] == "backups":
+            s3_creds = service["credentials"]
+            # Used for backing up the database https://django-dbbackup.readthedocs.io/en/master/storage.html#id2
+            DBBACKUP_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
+            DBBACKUP_STORAGE_OPTIONS = {
+                "access_key": s3_creds["access_key_id"],
+                "secret_key": s3_creds["secret_access_key"],
+                "bucket_name": s3_creds["bucket"],
+                "default_acl": "private",
+            }
 
     # secure headers
     MIDDLEWARE.append("csp.middleware.CSPMiddleware")
