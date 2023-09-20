@@ -35,7 +35,7 @@ class IntakeToDisseminationTests(TestCase):
         ]
         # Get the current date in UTC
         current_date_utc = datetime.now(timezone.utc).date()
-        # Create a datetime object for 1 a.m. on the current date
+        # Create a datetime object for the current date with a time between 0:00 a.m. and 11:00 a.m.
         transition_date = datetime.combine(
             current_date_utc,
             time(
