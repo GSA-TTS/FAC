@@ -1,6 +1,6 @@
 import logging
 from datetime import datetime
-
+import pytz
 from django.db import IntegrityError
 
 from dissemination.models import (
@@ -250,6 +250,18 @@ class IntakeToDissemination(object):
                 return_dict[status] = None
         return return_dict
 
+    def _convert_utc_to_utc_minus_12(self, date):
+        utc_minus_12_zone = pytz.timezone("Etc/GMT+12")
+        # Ensure the datetime object is time zone aware
+        if date.tzinfo is None or date.tzinfo.utcoffset(date) is None:
+            date = pytz.utc.localize(date)
+        # Convert to UTC-12
+        utc_minus_12_time = date.astimezone(utc_minus_12_zone)
+        # Extract the date and format it as YYYY-MM-DD
+        formatted_date = utc_minus_12_time.strftime("%Y-%m-%d")
+
+        return formatted_date
+
     def load_general(self):
         general_information = self.single_audit_checklist.general_information
         auditee_certification = self.single_audit_checklist.auditee_certification
@@ -310,9 +322,9 @@ class IntakeToDissemination(object):
             auditee_certified_date=dates_by_status[
                 self.single_audit_checklist.STATUS.AUDITEE_CERTIFIED
             ],
-            submitted_date=dates_by_status[
-                self.single_audit_checklist.STATUS.SUBMITTED
-            ],
+            submitted_date=self._convert_utc_to_utc_minus_12(
+                dates_by_status[self.single_audit_checklist.STATUS.SUBMITTED]
+            ),
             # auditor_signature_date=auditor_certification["auditor_signature"]["auditor_certification_date_signed"],
             # auditee_signature_date=auditee_certification["auditee_signature"]["auditee_certification_date_signed"],
             fy_end_date=general_information["auditee_fiscal_period_end"],
