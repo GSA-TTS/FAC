@@ -109,6 +109,7 @@ INSTALLED_APPS += [
     "corsheaders",
     "storages",
     "djangooidc",
+    "dbbackup",
 ]
 
 # Our apps
@@ -120,6 +121,7 @@ INSTALLED_APPS += [
     "cms",
     # "data_distro",
     "dissemination",
+    "support",
 ]
 
 MIDDLEWARE = [
@@ -146,6 +148,7 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                "config.context_processors.omb_num_exp_date",
                 "report_submission.context_processors.certifiers_emails_must_not_match",
             ],
             "builtins": [
@@ -250,6 +253,10 @@ if ENVIRONMENT not in ["DEVELOPMENT", "PREVIEW", "STAGING", "PRODUCTION"]:
 
     DISABLE_AUTH = env.bool("DISABLE_AUTH", default=False)
 
+    # Used for backing up the database https://django-dbbackup.readthedocs.io/en/master/installation.html
+    DBBACKUP_STORAGE = "django.core.files.storage.FileSystemStorage"
+    DBBACKUP_STORAGE_OPTIONS = {"location": BASE_DIR / "backup"}
+
 else:
     # One of the Cloud.gov environments
     STATICFILES_STORAGE = "storages.backends.s3boto3.S3ManifestStaticStorage"
@@ -302,6 +309,17 @@ else:
             MEDIA_URL = (
                 f"https://{AWS_S3_PRIVATE_CUSTOM_DOMAIN}/{AWS_PRIVATE_LOCATION}/"
             )
+
+        elif service["instance_name"] == "backups":
+            s3_creds = service["credentials"]
+            # Used for backing up the database https://django-dbbackup.readthedocs.io/en/master/storage.html#id2
+            DBBACKUP_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
+            DBBACKUP_STORAGE_OPTIONS = {
+                "access_key": s3_creds["access_key_id"],
+                "secret_key": s3_creds["secret_access_key"],
+                "bucket_name": s3_creds["bucket"],
+                "default_acl": "private",
+            }
 
     # secure headers
     MIDDLEWARE.append("csp.middleware.CSPMiddleware")
@@ -487,3 +505,7 @@ if ENABLE_DEBUG_TOOLBAR:
 
 # Links to the most applicable static site URL. Becomes more permanent post-beta.
 STATIC_SITE_URL = "https://federalist-35af9df5-a894-4ae9-aa3d-f6d95427c7bc.sites.pages.cloud.gov/preview/gsa-tts/fac-transition-site/lh/ia-updates/"
+
+# OMB-assigned values. Number doesn't change, date does.
+OMB_NUMBER = "3090-0330"
+OMB_EXP_DATE = "09/30/2026"

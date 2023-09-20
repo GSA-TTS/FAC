@@ -1,10 +1,16 @@
 locals {
   org_name = "gsa-tts-oros-fac"
   spaces = {
-    "dev"        = {},
-    "staging"    = {},
-    "preview"    = {},
-    "production" = { allow_ssh = false },
+    "dev"     = {},
+    "preview" = {},
+    "staging" = {
+      uses_backups = true
+    },
+    "production" = {
+      allow_ssh     = false,
+      uses_backups  = true,
+      is_production = true
+    },
   }
 
   # All spaces have the same SpaceDevelopers for now

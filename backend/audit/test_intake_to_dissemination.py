@@ -225,6 +225,7 @@ class IntakeToDisseminationTests(TestCase):
                     {
                         "note_title": "First Note",
                         "note_content": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. \nVestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Phasellus nec tortor ut ligula sollicitudin euismod.",
+                        "contains_chart_or_table": "Y",
                         "seq_number": 1,
                     },
                 ],
