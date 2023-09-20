@@ -4,15 +4,19 @@
 
 const API_GOV_JWT = Cypress.env('API_GOV_JWT');
 
-export function testReportId(reportId, numExpectedResults) {
+export function reportIdFound(reportId) {
+  let reportIdFound = false;
+
   cy.request({
     method: 'GET',
     url: 'localhost:3000/general',
     headers: {
-    Authorization: `Bearer ${API_GOV_JWT}`,
+      Authorization: `Bearer ${API_GOV_JWT}`,
     },
     qs: {report_id: `eq.${reportId}`},
   }).should((response) => {
-    expect(response.body).to.have.length(numExpectedResults);
+    reportIdFound = !!response.body.length;
   });
+
+  return reportIdFound;
 }
