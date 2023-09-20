@@ -274,7 +274,9 @@ class IntakeToDissemination(object):
         ready_for_certification_date = dates_by_status[status.READY_FOR_CERTIFICATION]
         auditor_certified_date = dates_by_status[status.AUDITOR_CERTIFIED]
         auditee_certified_date = dates_by_status[status.AUDITEE_CERTIFIED]
-        submitted_date = self._convert_utc_to_utc_minus_12(dates_by_status[status.SUBMITTED])
+        submitted_date = self._convert_utc_to_utc_minus_12(
+            dates_by_status[status.SUBMITTED]
+        )
         auditee_certify_name = auditee_certification.get("auditee_signature", {}).get(
             "auditee_name", ""
         )
