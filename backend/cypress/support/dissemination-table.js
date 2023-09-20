@@ -3,11 +3,12 @@
 */
 
 const API_GOV_JWT = Cypress.env('API_GOV_JWT');
+const API_GOV_URL = Cypress.env('API_GOV_URL');
 
 export function testReportId(reportId, expectedResults) {
   cy.request({
     method: 'GET',
-    url: 'localhost:3000/general',
+    url: `${API_GOV_URL}/general`,
     headers: {
         Authorization: `Bearer ${API_GOV_JWT}`,
     },
@@ -16,3 +17,5 @@ export function testReportId(reportId, expectedResults) {
       expect(response.body).to.have.length(expectedResults);
   });
 }
+
+
