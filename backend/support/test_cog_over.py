@@ -1,14 +1,26 @@
 from django.test import TestCase
+from dissemination.hist_models.census_2019 import CensusGen19, CensusCfda19
+from dissemination.hist_models.census_2022 import CensusGen22
 
 from model_bakery import baker
 from faker import Faker
+from django.db import connection
 
-from .models import SingleAuditChecklist, CognizantBaseline, User
+from audit.models import SingleAuditChecklist
+from .models import CognizantBaseline, CognizantAssignment
 
-from audit.cog_over import cog_over
+from .cog_over import compute_cog_over
 
 # Note:  Fake data is generated for SingleAuditChecklist, CognizantBaseline.
 #        Using only the data fields that apply to cog / over assignment.
+
+UNIQUE_EIN_WITHOUT_DBKEY = "UEWOD1234"
+DUP_EIN_WITHOUT_RESOLVER = "DEWOR1234"
+EIN_2023_ONLY = "EIN202312"
+RESOLVABLE_EIN_WITHOUT_BASELINE = "REWOB1234"
+RESOLVABLE_UEI_WITHOUT_BASELINE = "RUWOB1234"
+RESOLVABLE_DBKEY_WITHOUT_BASELINE = "20220"
+UEI_WITH_BASELINE = "UB0011223"
 
 
 class CogOverTests(TestCase):
@@ -16,13 +28,73 @@ class CogOverTests(TestCase):
         super().__init__(method_name)
 
     def setUp(self):
-        self.user = baker.make(User)
+        with connection.schema_editor() as schema_editor:
+            schema_editor.create_model(CensusGen19)
+            schema_editor.create_model(CensusGen22)
+            schema_editor.create_model(CensusCfda19)
+
+        gen = baker.make(
+            CensusGen19,
+            index=1,
+            ein=UNIQUE_EIN_WITHOUT_DBKEY,
+            dbkey=None,
+            totfedexpend="210000000",
+        )
+        gen.save()
+        for i in range(6):
+            cfda = baker.make(
+                CensusCfda19,
+                index=i,
+                ein=gen.ein,
+                dbkey=gen.dbkey,
+                cfda="84.032",
+                amount=10_000_000 * i,
+                direct="Y",
+            )
+            cfda.save()
+        for i in range(2, 5):
+            gen = baker.make(
+                CensusGen19,
+                index=i,
+                ein=DUP_EIN_WITHOUT_RESOLVER,
+                dbkey=str(10_000 + i),
+                totfedexpend="10000000",
+            )
+            gen.save()
+        gen = baker.make(
+            CensusGen22,
+            index=11,
+            ein=RESOLVABLE_EIN_WITHOUT_BASELINE,
+            uei=RESOLVABLE_UEI_WITHOUT_BASELINE,
+            dbkey=RESOLVABLE_DBKEY_WITHOUT_BASELINE,
+            totfedexpend="210000000",
+        )
+        gen.save()
+        gen = baker.make(
+            CensusGen19,
+            index=11,
+            ein=RESOLVABLE_EIN_WITHOUT_BASELINE,
+            dbkey=RESOLVABLE_DBKEY_WITHOUT_BASELINE,
+            totfedexpend="210000000",
+        )
+        gen.save()
+        for i in range(6):
+            cfda = baker.make(
+                CensusCfda19,
+                index=i + 10,
+                ein=gen.ein,
+                dbkey=gen.dbkey,
+                cfda="22.032",
+                amount=10_000_000 * i,
+                direct="Y",
+            )
+            cfda.save()
 
     @staticmethod
     def _fake_general():
         fake = Faker()
         return {
-            "ein": fake.ssn().replace("-", ""),
+            "ein": "ABC123DEF456",
             "audit_type": "single-audit",
             "auditee_uei": "ZQGGHJH74DW7",
             "auditee_zip": fake.zipcode(),
@@ -67,8 +139,7 @@ class CogOverTests(TestCase):
             "cognizant_agency": "20",
         }
 
-    @staticmethod
-    def _fake_federal_awards():
+    def _fake_federal_awards(self):
         return {
             "FederalAwards": {
                 "auditee_uei": "ABC123DEF456",
@@ -124,12 +195,11 @@ class CogOverTests(TestCase):
                         "direct_or_indirect_award": {"is_direct": "Y"},
                     },
                 ],
-                "total_amount_expended": 51_000_000,
+                "total_amount_expended": 52_000_200,
             }
         }
 
-    @staticmethod
-    def _fake_federal_awards_lt_cog_limit():
+    def _fake_federal_awards_lt_cog_limit(self):
         return {
             "FederalAwards": {
                 "auditee_uei": "ABC123DEF456",
@@ -138,7 +208,7 @@ class CogOverTests(TestCase):
                         "award_reference": "ABC125",
                         "program": {
                             "program_name": "SENIOR VOLUNTEER PROGRAM",
-                            "amount_expended": 11_000_000,
+                            "amount_expended": 11_200_300,
                             "federal_agency_prefix": "15",
                             "federal_program_total": 12_000_000,
                             "three_digit_extension": "600",
@@ -146,12 +216,11 @@ class CogOverTests(TestCase):
                         "direct_or_indirect_award": {"is_direct": "Y"},
                     },
                 ],
-                "total_amount_expended": 11_000_000,
+                "total_amount_expended": 11_200_300,
             }
         }
 
-    @staticmethod
-    def _fake_federal_awards_lt_da_threshold():
+    def _fake_federal_awards_lt_da_threshold(self):
         return {
             "FederalAwards": {
                 "auditee_uei": "ABC123DEF456",
@@ -172,90 +241,124 @@ class CogOverTests(TestCase):
             }
         }
 
-    def test_cog_over_for_gt_cog_limit_gt_da_threshold_factor_cog_2019(self):
-        sac = SingleAuditChecklist.objects.create(
-            submitted_by=self.user,
+    def _fake_sac(self):
+        sac = baker.make(
+            SingleAuditChecklist,
             general_information=self._fake_general(),
             federal_awards=self._fake_federal_awards(),
         )
-        sac.save()
-        self.sac = sac
+        return sac
 
-        fake_cog_baseline = self._fake_cognizantbaseline()
-        self.cognizantbaseline = CognizantBaseline(
-            dbkey=fake_cog_baseline["dbkey"],
-            audit_year=fake_cog_baseline["audit_year"],
-            ein=self.sac.general_information["ein"],
-            cognizant_agency=fake_cog_baseline["cognizant_agency"],
-        ).save()
-        cog_agency = None
-        over_agency = None
-        cog_agency, over_agency = cog_over(self.sac)
-        self.assertEqual(cog_agency, "20")
+    def test_cog_assignment_from_hist(self):
+        """
+        When we have a matching row in 2019 and nothing in the
+        baseline table, we should use the cog computed from 2019 data
+        """
+        sac = self._fake_sac()
+        sac.general_information["ein"] = UNIQUE_EIN_WITHOUT_DBKEY
+        cog_agency, over_agency = compute_cog_over(
+            sac.federal_awards, sac.submission_status, sac.ein, sac.auditee_uei
+        )
+        self.assertEqual(cog_agency, "84")
         self.assertEqual(over_agency, None)
 
-    def test_cog_over_for_lt_cog_lit_gt_da_threshold_factor_oversight(self):
-        sac = SingleAuditChecklist.objects.create(
-            submitted_by=self.user,
+    def test_cog_assignment_with_no_hist(self):
+        """
+        We have no match in the base sheet and we
+        have no match in 2019. So, assign from 2023"
+        """
+        sac = self._fake_sac()
+        sac.general_information["ein"] = EIN_2023_ONLY
+        cog_agency, over_agency = compute_cog_over(
+            sac.federal_awards, sac.submission_status, sac.ein, sac.auditee_uei
+        )
+        self.assertEqual(cog_agency, "10")
+        self.assertEqual(over_agency, None)
+
+    def test_cog_assignment_with_multiple_hist(self):
+        """
+        We have no match in the base sheet and we
+        have duplicates in 2019. So, assign from 2023
+        """
+
+        sac = self._fake_sac()
+        sac.general_information["ein"] = DUP_EIN_WITHOUT_RESOLVER
+        cog_agency, over_agency = compute_cog_over(
+            sac.federal_awards, sac.submission_status, sac.ein, sac.auditee_uei
+        )
+        self.assertEqual(cog_agency, "10")
+        self.assertEqual(over_agency, None)
+
+    def test_cog_assignment_with_hist_resolution(self):
+        """
+        We have a unique dbkey for the given uei/eint in 2022,
+        and we have a match in 2019, but nothing in the baseline.
+        So, assign from 2019
+        """
+        sac = self._fake_sac()
+
+        sac.general_information["ein"] = RESOLVABLE_EIN_WITHOUT_BASELINE
+        sac.general_information["auditee_uei"] = RESOLVABLE_UEI_WITHOUT_BASELINE
+        cog_agency, over_agency = compute_cog_over(
+            sac.federal_awards, sac.submission_status, sac.ein, sac.auditee_uei
+        )
+        self.assertEqual(cog_agency, "22")
+        self.assertEqual(over_agency, None)
+
+    def test_over_assignment(self):
+        """
+        Awards with totals less than the threshold should result in an oversight agency being assigned.
+        """
+        sac = baker.make(
+            SingleAuditChecklist,
             general_information=self._fake_general(),
             federal_awards=self._fake_federal_awards_lt_cog_limit(),
         )
-        sac.save()
-        self.sac = sac
-
-        fake_cog_baseline = self._fake_cognizantbaseline()
-        self.cognizantbaseline = CognizantBaseline(
-            dbkey=fake_cog_baseline["dbkey"],
-            audit_year=fake_cog_baseline["audit_year"],
-            ein=self.sac.general_information["ein"],
-            cognizant_agency=fake_cog_baseline["cognizant_agency"],
-        ).save()
-        cog_agency = None
-        over_agency = None
-        cog_agency, over_agency = cog_over(self.sac)
+        cog_agency, over_agency = compute_cog_over(
+            sac.federal_awards, sac.submission_status, sac.ein, sac.auditee_uei
+        )
         self.assertEqual(cog_agency, None)
         self.assertEqual(over_agency, "15")
 
-    def test_cog_over_for_lt_cog_limit_lt_da_threshold_oversight(self):
-        sac = SingleAuditChecklist.objects.create(
-            submitted_by=self.user,
+    def test_over_assignment_with_hist(self):
+        """
+        Awards with totals less than the threshold should result in an oversight agency being assigned.
+        And history data should not be used.
+        """
+        sac = baker.make(
+            SingleAuditChecklist,
             general_information=self._fake_general(),
-            federal_awards=self._fake_federal_awards_lt_da_threshold(),
+            federal_awards=self._fake_federal_awards_lt_cog_limit(),
         )
-        sac.save()
-        self.sac = sac
-
-        fake_cog_baseline = self._fake_cognizantbaseline()
-        self.cognizantbaseline = CognizantBaseline(
-            dbkey=fake_cog_baseline["dbkey"],
-            audit_year=fake_cog_baseline["audit_year"],
-            ein=self.sac.general_information["ein"],
-            cognizant_agency=fake_cog_baseline["cognizant_agency"],
-        ).save()
-        cog_agency = None
-        over_agency = None
-        cog_agency, over_agency = cog_over(self.sac)
+        sac.general_information["ein"] = UNIQUE_EIN_WITHOUT_DBKEY
+        cog_agency, over_agency = compute_cog_over(
+            sac.federal_awards, sac.submission_status, sac.ein, sac.auditee_uei
+        )
         self.assertEqual(cog_agency, None)
-        self.assertEqual(over_agency, "25")
+        self.assertEqual(over_agency, "15")
 
-    def test_cog_over_gt_cog_limit_no_2019(self):
-        sac = SingleAuditChecklist.objects.create(
-            submitted_by=self.user,
-            general_information=self._fake_general(),
-            federal_awards=self._fake_federal_awards(),
+    def test_cog_assignment_with_uei_in_baseline(self):
+        sac = self._fake_sac()
+        sac.general_information["auditee_uei"] = UEI_WITH_BASELINE
+        baker.make(
+            CognizantBaseline,
+            uei=UEI_WITH_BASELINE,
+            cognizant_agency="17",
         )
-        sac.save()
-        self.sac = sac
-
-        fake_cog_baseline = self._fake_cognizantbaseline()
-        self.cognizantbaseline = CognizantBaseline(
-            dbkey=fake_cog_baseline["dbkey"],
-            audit_year=fake_cog_baseline["audit_year"],
-            ein=fake_cog_baseline["ein"],
-            cognizant_agency=fake_cog_baseline["cognizant_agency"],
-        ).save()
-        cog_agency = None
-        over_agency = None
-        cog_agency, over_agency = cog_over(self.sac)
-        self.assertEqual(cog_agency, "10")
+        cog_agency, over_agency = compute_cog_over(
+            sac.federal_awards, sac.submission_status, sac.ein, sac.auditee_uei
+        )
+        self.assertEqual(cog_agency, "17")
         self.assertEqual(over_agency, None)
+
+    def test_cog_assignment_with_uei_in_baseline_and_overris(self):
+        sac = self._fake_sac()
+        sac.general_information["auditee_uei"] = UEI_WITH_BASELINE
+        baker.make(
+            CognizantBaseline,
+            uei=UEI_WITH_BASELINE,
+            cognizant_agency="17",
+        )
+        sac.assign_cog_over()
+        cas = CognizantAssignment.objects.all()
+        self.assertEquals(1, len(cas))

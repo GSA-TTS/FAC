@@ -9,7 +9,7 @@ function setFormDisabled(shouldDisable) {
 }
 
 function allResponsesValid() {
-  const inputsWithErrors = document.querySelectorAll('[class *="--error"]');
+  const inputsWithErrors = document.querySelectorAll('[class *="-error"]');
   return inputsWithErrors.length === 0;
 }
 
@@ -104,8 +104,8 @@ function attachEventHandlers() {
   );
 
   certifyingInputs.forEach((q) => {
-    q.addEventListener('blur', (e) => {
-      performValidations(e.target);
+    q.addEventListener('focusout', (e) => {
+      performValidations([e.target]);
     });
   });
 

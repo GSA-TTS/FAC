@@ -107,6 +107,15 @@ local open_ranges_defns = [
     'note_content',
   ],
   [
+    Sheets.y_or_n_range {
+      width: 36,
+      help: Help.yorn,
+    },
+    SV.YoNValidation,
+    'Did Text Contain a Chart or Table?',
+    'contains_chart_or_table',
+  ],
+  [
     Sheets.open_range {
       keep_locked: true,
       formula: '=IF(A{0}<>"", ROW()-1, "")',
@@ -131,7 +140,7 @@ local sheets = [
     name: sefaAdditionalSheet,
     open_ranges: Fun.make_open_ranges(title_row, open_ranges_defns),
     header_height: 100,
-    hide_col_from: 3,
+    hide_col_from: 4,
   },
 ];
 
