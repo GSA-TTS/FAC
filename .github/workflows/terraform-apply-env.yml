@@ -37,10 +37,11 @@ jobs:
       - name: Install CF CLI8
         if: ${{ inputs.environment == 'meta' }}
         run: |
-          wget -q -O - https://packages.cloudfoundry.org/debian/cli.cloudfoundry.org.key | sudo apt-key add -
+          sudo mkdir -p /etc/apt/keyrings/
+          wget -q -O - https://packages.cloudfoundry.org/debian/cli.cloudfoundry.org.key | gpg --dearmor | sudo tee /etc/apt/keyrings/cli.cloudfoundry.org.key > /dev/null
           echo "deb https://packages.cloudfoundry.org/debian stable main" | sudo tee /etc/apt/sources.list.d/cloudfoundry-cli.list
-          sudo apt-get update
-          sudo apt-get install cf8-cli
+          sudo apt-get update && DEBIAN_FRONTEND=noninteractive
+          sudo apt-get install --assume-yes cf8-cli
 
       - name: Apply ( ${{ inputs.environment }} )
         uses: dflook/terraform-apply@v1
