@@ -1,12 +1,15 @@
 /*
   Re-useable code for testing the dissemination table.
 */
+
+const API_GOV_JWT = Cypress.env('API_GOV_JWT');
+
 export function testReportId(reportId, numExpectedResults) {
   cy.request({
     method: 'GET',
     url: 'localhost:3000/general',
     headers: {
-    Authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYXBpX2ZhY19nb3YiLCJjcmVhdGVkIjoiMjAyMy0wOS0xOVQxMDowMToxMi4zNTkzNTEifQ.uHOTzHp7sN_8tLftFYcva-5m6CQMrauY0DyIPAIZXpw',
+    Authorization: `Bearer ${API_GOV_JWT}`,
     },
     qs: {report_id: `eq.${reportId}`},
   }).should((response) => {
