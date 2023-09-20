@@ -8,6 +8,7 @@ def static_site_url(request):
     """
     return {"STATIC_SITE_URL": settings.STATIC_SITE_URL}
 
+
 def omb_num_exp_date(request):
     """
     Returns the OMB_NUMBER (str) and OMB_EXP_DATE (str) in template context form.
