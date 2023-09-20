@@ -290,6 +290,7 @@ class IntakeToDissemination(object):
             "is_usa_based",
             "met_spending_threshold",
             "multiple_eins_covered",
+            "secondary_auditors_exist",
         )
         general_data = omit(gen_key_exceptions, general_information)
         general_data = general_data | {
