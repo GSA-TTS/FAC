@@ -718,6 +718,14 @@ class SubmissionView(CertifyingAuditeeRequiredMixin, generic.View):
             sac.save(
                 event_user=request.user, event_type=SubmissionEvent.EventType.SUBMITTED
             )
+            disseminated = sac.disseminate()
+            # FIXME: We should now provide a reasonable error to the user.
+            if disseminated is None:
+                sac.transition_to_disseminated()
+
+            logger.info(
+                "Dissemination errors: %s, report_id: %s", disseminated, report_id
+            )
 
             return redirect(reverse("audit:MySubmissions"))
 

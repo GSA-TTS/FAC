@@ -13,7 +13,7 @@ from model_bakery import baker
 from openpyxl import load_workbook
 from openpyxl.cell import Cell
 
-from .fixtures.excel import (
+from audit.fixtures.excel import (
     ADDITIONAL_UEIS_TEMPLATE,
     ADDITIONAL_EINS_TEMPLATE,
     FEDERAL_AWARDS_TEMPLATE,
@@ -32,12 +32,18 @@ from .fixtures.excel import (
     NOTES_TO_SEFA_ENTRY_FIXTURES,
     FORM_SECTIONS,
 )
-from .fixtures.single_audit_checklist import (
+from audit.fixtures.single_audit_checklist import (
     fake_auditor_certification,
     fake_auditee_certification,
 )
-from .models import Access, SingleAuditChecklist, SingleAuditReportFile, SubmissionEvent
-from .views import MySubmissions
+from audit.models import (
+    Access,
+    SingleAuditChecklist,
+    SingleAuditReportFile,
+    SubmissionEvent,
+)
+from audit.cross_validation.naming import NC, SECTION_NAMES as SN
+from audit.views import MySubmissions
 
 User = get_user_model()
 
@@ -176,12 +182,42 @@ class SubmissionViewTests(TestCase):
         The status should be "submitted" after the post.
         The user should be redirected to the submissions table.
         """
+        filename = "general-information--test0001test--simple-pass.json"
+        info = _load_json(AUDIT_JSON_FIXTURES / filename)
+        awardsfile = "federal-awards--test0001test--simple-pass.json"
+        awards = _load_json(AUDIT_JSON_FIXTURES / awardsfile)
+        auditor_certification, auditor_signature = fake_auditor_certification()
+        auditee_certification, auditee_signature = fake_auditee_certification()
+
         user = baker.make(User)
         sac = baker.make(
             SingleAuditChecklist,
             submission_status=SingleAuditChecklist.STATUS.AUDITEE_CERTIFIED,
+            general_information=info,
+            audit_information={"stuff": "whatever"},
+            federal_awards=awards,
+            auditor_certification=auditor_certification | auditor_signature,
+            auditee_certification=auditee_certification | auditee_signature,
+            corrective_action_plan={
+                SN[NC.CORRECTIVE_ACTION_PLAN].camel_case: {
+                    "auditee_uei": "TEST0001TEST"
+                }
+            },
+            findings_text={
+                SN[NC.FINDINGS_TEXT].camel_case: {"auditee_uei": "TEST0001TEST"}
+            },
+            findings_uniform_guidance={
+                SN[NC.FINDINGS_UNIFORM_GUIDANCE].camel_case: {
+                    "auditee_uei": "TEST0001TEST"
+                }
+            },
+            notes_to_sefa={
+                SN[NC.NOTES_TO_SEFA].camel_case: {"auditee_uei": "TEST0001TEST"}
+            },
         )
+
         baker.make(Access, user=user, sac=sac, role="certifying_auditee_contact")
+
         response = _authed_post(
             Client(),
             user,
@@ -228,19 +264,29 @@ class SubmissionStatusTests(TestCase):
 
         filename = "general-information--test0001test--simple-pass.json"
         info = _load_json(AUDIT_JSON_FIXTURES / filename)
+        auditor_certification, auditor_signature = fake_auditor_certification()
+        auditee_certification, auditee_signature = fake_auditee_certification()
+
         # Update the SAC so that it will pass overall validation:
         sac = SingleAuditChecklist.objects.get(report_id=report_id)
         sac.general_information = info
         sac.audit_information = {"stuff": "whatever"}
-        sac.federal_awards = {"FederalAwards": {"federal_awards": []}}
+        awards = {SN[NC.FEDERAL_AWARDS].camel_case: {"federal_awards": []}}
+        sac.federal_awards = awards
+        sac.auditor_certification = auditor_certification | auditor_signature
+        sac.auditee_certification = auditee_certification | auditee_signature
         sac.corrective_action_plan = {
-            "CorrectiveActionPlan": {"auditee_uei": "TEST0001TEST"}
+            SN[NC.CORRECTIVE_ACTION_PLAN].camel_case: {"auditee_uei": "TEST0001TEST"}
         }
-        sac.findings_text = {"FindingsText": {"auditee_uei": "TEST0001TEST"}}
+        sac.findings_text = {
+            SN[NC.FINDINGS_TEXT].camel_case: {"auditee_uei": "TEST0001TEST"}
+        }
         sac.findings_uniform_guidance = {
-            "FindingsUniformGuidance": {"auditee_uei": "TEST0001TEST"}
+            SN[NC.FINDINGS_UNIFORM_GUIDANCE].camel_case: {"auditee_uei": "TEST0001TEST"}
         }
-        sac.notes_to_sefa = {"NotesToSefa": {"auditee_uei": "TEST0001TEST"}}
+        sac.notes_to_sefa = {
+            SN[NC.NOTES_TO_SEFA].camel_case: {"auditee_uei": "TEST0001TEST"}
+        }
         baker.make(SingleAuditReportFile, sac=sac)
         sac.save()
 
@@ -267,6 +313,18 @@ class SubmissionStatusTests(TestCase):
 
         user, sac = _make_user_and_sac(submission_status="ready_for_certification")
         baker.make(Access, sac=sac, user=user, role="certifying_auditor_contact")
+        sac.corrective_action_plan = {
+            SN[NC.CORRECTIVE_ACTION_PLAN].camel_case: {"auditee_uei": "TEST0001TEST"}
+        }
+        sac.findings_text = {
+            SN[NC.FINDINGS_TEXT].camel_case: {"auditee_uei": "TEST0001TEST"}
+        }
+        sac.findings_uniform_guidance = {
+            SN[NC.FINDINGS_UNIFORM_GUIDANCE].camel_case: {"auditee_uei": "TEST0001TEST"}
+        }
+        sac.notes_to_sefa = {
+            SN[NC.NOTES_TO_SEFA].camel_case: {"auditee_uei": "TEST0001TEST"}
+        }
 
         kwargs = {"report_id": sac.report_id}
         _authed_post(
@@ -306,6 +364,18 @@ class SubmissionStatusTests(TestCase):
 
         user, sac = _make_user_and_sac(submission_status="auditor_certified")
         baker.make(Access, sac=sac, user=user, role="certifying_auditee_contact")
+        sac.corrective_action_plan = {
+            SN[NC.CORRECTIVE_ACTION_PLAN].camel_case: {"auditee_uei": "TEST0001TEST"}
+        }
+        sac.findings_text = {
+            SN[NC.FINDINGS_TEXT].camel_case: {"auditee_uei": "TEST0001TEST"}
+        }
+        sac.findings_uniform_guidance = {
+            SN[NC.FINDINGS_UNIFORM_GUIDANCE].camel_case: {"auditee_uei": "TEST0001TEST"}
+        }
+        sac.notes_to_sefa = {
+            SN[NC.NOTES_TO_SEFA].camel_case: {"auditee_uei": "TEST0001TEST"}
+        }
 
         kwargs = {"report_id": sac.report_id}
         _authed_post(
@@ -341,7 +411,37 @@ class SubmissionStatusTests(TestCase):
         """
         Test that certifying auditee contacts can perform submission
         """
-        user, sac = _make_user_and_sac(submission_status="auditee_certified")
+
+        geninfofile = "general-information--test0001test--simple-pass.json"
+        geninfo = _load_json(AUDIT_JSON_FIXTURES / geninfofile)
+        awardsfile = "federal-awards--test0001test--simple-pass.json"
+        awards = _load_json(AUDIT_JSON_FIXTURES / awardsfile)
+        auditor_certification, auditor_signature = fake_auditor_certification()
+        auditee_certification, auditee_signature = fake_auditee_certification()
+        user, sac = _make_user_and_sac(
+            auditee_certification=auditee_certification | auditee_signature,
+            auditor_certification=auditor_certification | auditor_signature,
+            corrective_action_plan={
+                SN[NC.CORRECTIVE_ACTION_PLAN].camel_case: {
+                    "auditee_uei": "TEST0001TEST"
+                }
+            },
+            federal_awards=awards,
+            findings_text={
+                SN[NC.FINDINGS_TEXT].camel_case: {"auditee_uei": "TEST0001TEST"}
+            },
+            findings_uniform_guidance={
+                SN[NC.FINDINGS_UNIFORM_GUIDANCE].camel_case: {
+                    "auditee_uei": "TEST0001TEST"
+                }
+            },
+            general_information=geninfo,
+            notes_to_sefa={
+                SN[NC.NOTES_TO_SEFA].camel_case: {"auditee_uei": "TEST0001TEST"}
+            },
+            submission_status="auditee_certified",
+        )
+
         baker.make(Access, sac=sac, user=user, role="certifying_auditee_contact")
 
         kwargs = {"report_id": sac.report_id}

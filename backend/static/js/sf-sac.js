@@ -25,9 +25,10 @@ function performValidations(field) {
   setFormDisabled(errors.length > 0);
 }
 
+// Fieldset elements with attribute "navitem" are watched. When scolled past, the applicable navLink is set to current.
 function highlightActiveNavSection() {
   let currentFieldsetId;
-  const fieldsets = document.querySelectorAll('fieldset[id]');
+  const fieldsets = document.querySelectorAll('fieldset[navitem]');
   const navLinks = document.querySelectorAll('li .usa-sidenav__item a');
 
   fieldsets.forEach((f) => {
@@ -49,6 +50,8 @@ function highlightActiveNavSection() {
 }
 
 function attachEventHandlers() {
+  // These fields no longer exist. The gen form is submittable in an incomplete state, so non-null data is okay.
+  // Left alone for potential future enhancements on the form.
   const fieldsNeedingValidation = Array.from(
     document.querySelectorAll('.sf-sac input[data-validate-not-null]')
   );
@@ -82,37 +85,27 @@ function attachEventHandlers() {
 
   window.addEventListener('scroll', highlightActiveNavSection);
 }
+
 const foreignFields = document.querySelectorAll('[name="foreign_address"]');
 const domesticFields = document.querySelectorAll('[name="domestic_address"]');
 function setupAddress() {
   if (countrySelect.value == 'USA') {
     foreignFields.forEach((input) => {
       input.setAttribute('hidden', true);
-      input.querySelectorAll('textarea').forEach((element) => {
-        element.removeAttribute('required');
-      });
     });
     domesticFields.forEach((input) => {
       input.removeAttribute('hidden');
-      input.querySelectorAll('input').forEach((element) => {
-        element.setAttribute('required', true);
-      });
     });
   } else {
     foreignFields.forEach((input) => {
       input.removeAttribute('hidden');
-      input.querySelectorAll('textarea').forEach((element) => {
-        element.setAttribute('required', true);
-      });
     });
     domesticFields.forEach((input) => {
       input.setAttribute('hidden', true);
-      input.querySelectorAll('input').forEach((element) => {
-        element.removeAttribute('required');
-      });
     });
   }
 }
+
 function init() {
   attachEventHandlers();
   setupAddress();
