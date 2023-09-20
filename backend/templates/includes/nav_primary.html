@@ -49,36 +49,47 @@
                 </button>
                 <ul id="basic-nav-section-2" class="usa-nav__submenu" hidden="">
                     <li class="usa-nav__submenu-item">
+                        <a href="{{ STATIC_SITE_URL }}resources/instructions/"
+                           target="_blank">How-to</a>
+                    </li>
+                    <li class="usa-nav__submenu-item">
                         <a href="{{ STATIC_SITE_URL }}resources/workbooks/"
                            target="_blank">Workbooks</a>
                     </li>
                     <li class="usa-nav__submenu-item">
-                        <a href="{{ STATIC_SITE_URL }}resources/instructions/"
-                           target="_blank">Instructions</a>
+                        <a href="{{ STATIC_SITE_URL }}developers/"
+                           target="_blank">Developer tools</a>
+                    </li>
+                    <li class="usa-nav__submenu-item">
+                        <a href="{{ STATIC_SITE_URL }}resources/guidance/"
+                           target="_blank">Uniform Guidance</a>
                     </li>
                     <li class="usa-nav__submenu-item">
                         <a href="{{ STATIC_SITE_URL }}resources/compliance/"
                            target="_blank">Compliance</a>
                     </li>
                     <li class="usa-nav__submenu-item">
-                        <a href="{{ STATIC_SITE_URL }}resources/guidance/"
-                           target="_blank">Uniform Guidance</a>
+                        <a href="{{ STATIC_SITE_URL }}resources/burden-statement/"
+                           target="_blank">Burden Statement</a>
                     </li>
                 </ul>
             </li>
             <li class="usa-nav__primary-item">
-                <a class="usa-nav__link"
-                   href="{{ STATIC_SITE_URL }}faq/"
-                   target="_blank">
-                    <span>FAQs</span>
-                </a>
-            </li>
-            <li class="usa-nav__primary-item">
-                <a class="usa-nav__link"
-                   href="{{ STATIC_SITE_URL }}contact/"
-                   target="_blank">
-                    <span>Contact Us</span>
-                </a>
+                <button class="usa-accordion__button usa-nav__link"
+                        aria-expanded="false"
+                        aria-controls="basic-nav-section-3">
+                    <span>Support</span>
+                </button>
+                <ul id="basic-nav-section-3" class="usa-nav__submenu" hidden="">
+                    <li class="usa-nav__submenu-item">
+                        <a href="https://support.fac.gov/hc/en-us"
+                           target="_blank">Help center</a>
+                    </li>
+                    <li class="usa-nav__submenu-item">
+                        <a href="{{ STATIC_SITE_URL }}welcome/"
+                           target="_blank">Welcome</a>
+                    </li>
+                </ul>
             </li>
         </ul>
         {% if request.user.is_authenticated %}
