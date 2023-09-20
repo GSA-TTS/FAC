@@ -253,6 +253,10 @@ if ENVIRONMENT not in ["DEVELOPMENT", "PREVIEW", "STAGING", "PRODUCTION"]:
 
     DISABLE_AUTH = env.bool("DISABLE_AUTH", default=False)
 
+    # Used for backing up the database https://django-dbbackup.readthedocs.io/en/master/installation.html
+    DBBACKUP_STORAGE = 'django.core.files.storage.FileSystemStorage'
+    DBBACKUP_STORAGE_OPTIONS = {'location': BASE_DIR / "backup"}
+
 else:
     # One of the Cloud.gov environments
     STATICFILES_STORAGE = "storages.backends.s3boto3.S3ManifestStaticStorage"
