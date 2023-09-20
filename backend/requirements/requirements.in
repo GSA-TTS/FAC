@@ -3,7 +3,6 @@ cfenv
 cryptography>=41.0.2
 django-cors-headers
 django-csp
-django-storages
 django-dbbackup
 django-storages[boto3]
 Django>=4.2.3
