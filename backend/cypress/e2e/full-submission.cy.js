@@ -9,7 +9,7 @@ import { testAuditInformationForm } from '../support/audit-info-form.js';
 import { testPdfAuditReport } from '../support/report-pdf.js';
 import { testAuditorCertification } from '../support/auditor-certification.js';
 import { testAuditeeCertification } from '../support/auditee-certification.js';
-import { reportIdFound } from '../support/dissemination-table.js';
+import { testReportId } from '../support/dissemination-table.js';
 import {
   testWorkbookFederalAwards,
   testWorkbookNotesToSEFA,
@@ -24,6 +24,7 @@ import {
 const LOGIN_TEST_EMAIL_AUDITEE = Cypress.env('LOGIN_TEST_EMAIL_AUDITEE');
 const LOGIN_TEST_PASSWORD_AUDITEE = Cypress.env('LOGIN_TEST_PASSWORD_AUDITEE');
 const LOGIN_TEST_OTP_SECRET_AUDITEE = Cypress.env('LOGIN_TEST_OTP_SECRET_AUDITEE');
+const API_GOV_JWT = Cypress.env('API_GOV_JWT');
 
 describe('Full audit submission', () => {
   before(() => {
@@ -57,9 +58,7 @@ describe('Full audit submission', () => {
     // Report should not yet be in the dissemination table
     cy.url().then(url => {
       const reportId = url.split('/').pop();
-      if (reportIdFound(reportId)) {
-        throw new Error(`Report ID ${reportId} found before final submission`)
-      }
+      testReportId(reportId, 0);
     });
 
     // Fill out the general info form
@@ -136,9 +135,7 @@ describe('Full audit submission', () => {
       ).siblings().contains('td', reportId);
 
       // Report should now be in the dissemination table
-      if (!reportIdFound(reportId)) {
-        throw new Error(`Report ID ${reportId} not found after final submission`)
-      }
+      testReportId(reportId, 1);
     });
   });
 });
