@@ -4,7 +4,7 @@ from os import path
 from django.core.management.base import BaseCommand
 from support.models import CognizantBaseline
 from config.settings import BASE_DIR
-
+from collections import defaultdict
 
 class Command(BaseCommand):
     help = """
@@ -18,8 +18,9 @@ class Command(BaseCommand):
 
 
 def load_cog_2021_2025():
+    dtypes = defaultdict(lambda: str)
     file_path = path.join(BASE_DIR, "support/fixtures/", "census_baseline.csv")
-    df = pd.read_csv(file_path)
+    df = pd.read_csv(file_path, dtype=dtypes)
     df = df.drop(columns=["AUDITEENAME"])
     df = df.rename(
         columns={
