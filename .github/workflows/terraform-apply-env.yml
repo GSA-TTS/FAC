@@ -53,6 +53,7 @@ jobs:
             key=${{ env.KEY }},
 
       - name: Share backups s3 bucket to staging space
+        if: ${{ inputs.environment == 'meta' }}
         uses: cloud-gov/cg-cli-tools@main
         with:
           cf_username: ${{ secrets.CF_USERNAME }}
