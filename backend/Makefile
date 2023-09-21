@@ -34,6 +34,8 @@ lint:
 	@black --check .
 	@echo "bandit:"
 	@bandit -c pyproject.toml -r .
+	@echo "Installing type stubs:"
+	@python -m pip install types-pytz
 	@echo "mypy:"
 	@mypy .
 	@echo "djlint:"
@@ -81,7 +83,7 @@ docker-nctest:
 
 docker-lint:
 	docker compose build
-	docker compose run web bash -c 'flake8 && black --check . && bandit -c pyproject.toml -r . && mypy . && djlint .'
+	docker compose run web bash -c 'flake8 && black --check . && bandit -c pyproject.toml -r . && python -m pip install types-pytz && mypy . && djlint .'
 
 ghcr-first-run:
 	docker compose -f docker-compose-web.yml run web python manage.py makemigrations
@@ -103,7 +105,7 @@ ghcr-nctest:
 	docker compose -f docker-compose-web.yml run web python manage.py test --parallel ${fac.test.scope}
 
 ghcr-lint:
-	docker compose -f docker-compose-web.yml run web bash -c 'flake8 && black --check . && bandit -c pyproject.toml -r . && mypy . && djlint .'
+	docker compose -f docker-compose-web.yml run web bash -c 'flake8 && black --check . && bandit -c pyproject.toml -r . && python -m pip install types-pytz && mypy . && djlint .'
 
 docker-clean:
 	docker compose down
