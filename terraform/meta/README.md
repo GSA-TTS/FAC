@@ -36,15 +36,5 @@ organization.
 * Move the services currently in "management" into the "meta" space; we're not really using that space anyway
 * Double-check that the "management" space can be blown away (first confirming that the *actual* Terraform state is in the S3 instance in the "production" space)
 * Update/simplify ../terraform/README.md!
-
 * Meta module handing sharing the spaces
-```bash
-# This is necessary to add into `terraform-apply-env.yml` as part of `TERRAFORM_PRE_RUN` to get cf-cli into the container. Directly
-# ties to null_resource in meta.tf
-  mkdir -p /etc/apt/keyrings/
-  wget -q -O - https://packages.cloudfoundry.org/debian/cli.cloudfoundry.org.key | gpg --dearmor | tee /etc/apt/trusted.gpg.d/cf.gpg > /dev/null
-  echo "deb https://packages.cloudfoundry.org/debian stable main" | tee /etc/apt/sources.list.d/cloudfoundry-cli.list
-  apt-get update && DEBIAN_FRONTEND=noninteractive
-  apt-get install --assume-yes cf8-cli
 
-```
