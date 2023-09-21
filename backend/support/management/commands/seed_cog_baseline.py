@@ -6,6 +6,7 @@ from support.models import CognizantBaseline
 from config.settings import BASE_DIR
 from collections import defaultdict
 
+
 class Command(BaseCommand):
     help = """
     Populates CognizantBaseline using Cognizant_Agencies_2021_2025.csv
