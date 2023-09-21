@@ -52,6 +52,17 @@ jobs:
             region=${{ secrets.terraform_REGION }},
             key=${{ env.KEY }},
 
+
+      - name: Unshare backups s3 bucket to staging space
+        if: ${{ inputs.environment == 'meta' }}
+        uses: cloud-gov/cg-cli-tools@main
+        with:
+          cf_username: ${{ secrets.CF_USERNAME }}
+          cf_password: ${{ secrets.CF_PASSWORD }}
+          cf_org: gsa-tts-oros-fac
+          cf_space: production
+          command: cf unshare-service backups -s staging
+
       - name: Share backups s3 bucket to staging space
         if: ${{ inputs.environment == 'meta' }}
         uses: cloud-gov/cg-cli-tools@main
