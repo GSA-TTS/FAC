@@ -95,6 +95,15 @@ cf push -f manifests/manifest-dev.yml
 
 To see more about branching and the deployment steps, see the [Branching](branching.md) page.
 
+#### Deploying to `preview`
+1.  Navigate to the [Deploy Preview Workflow](https://github.com/GSA-TTS/FAC/actions/workflows/deploy-preview.yml)
+     * Select a ref to target
+     * This ref can be `main`, but it was designed to allow deploys from any branch. ex `user/my-branch`
+2.  Wait for deployment to pass or fail
+3.  If checks or deployment fails, something has gone awry. Investigation will be needed.
+4.  Verify that the deploy steps all passed.
+5.  After deployment, the changes should be on https://fac-preview.app.cloud.gov/.
+
 ## Running a Django admin command
 
 You can SSH into a running instance of the app. Running Django apps is a little more complicated on Cloud Foundry than running locally.
@@ -112,7 +121,7 @@ export LD_LIBRARY_PATH=~/deps/0/python/lib
 
 ### Problem: A GitHub Action run says that Terraform cannot be applied because the plan differs from what was approved.
 #### Solution: Click through from the error message to the referenced PR, click the `Checks` tab, and rerun the Terraform plan action. Then rerun the action that failed originally.
-More info: When there are changes to the `terraform/` directory in a PR, [a GitHub Action](https://github.com/GSA-TTS/FAC/blob/main/.github/workflows/terraform-plan.yml) posts comments to the PR which include the "plan" indicating what will change in each environment when the PR is deployed there. ([example](https://github.com/GSA-TTS/FAC/pull/875)) Those comments help those reviewing and approving the PR to understand the implication of the change. 
+More info: When there are changes to the `terraform/` directory in a PR, [a GitHub Action](https://github.com/GSA-TTS/FAC/blob/main/.github/workflows/terraform-plan.yml) posts comments to the PR which include the "plan" indicating what will change in each environment when the PR is deployed there. ([example](https://github.com/GSA-TTS/FAC/pull/875)) Those comments help those reviewing and approving the PR to understand the implication of the change.
 
 However, we don't deploy immediately to the `staging` and `production` environments, and it's possible that other PRs will get merged, or that someone will make manual changes in those environments in the meantime. As a sanity check the plan is regenerated right before applying a change in those environments. If there's any difference from what was approved in the PR (captured in those comments), it's an indicator that the approved plan is **not** what is about to happen, and the action aborts so that humans can inspect and intervene if necessary. The simplest way to say "yeah, I want the new plan to happen, that's still OK" is to go regenerate the plans being compared against in the PR, using the steps indicated.
 

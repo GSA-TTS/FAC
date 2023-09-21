@@ -161,6 +161,7 @@ function populateModal(formStatus, auditeeName) {
 
   if (formStatus == 'success') {
     modalButtonPrimaryEl.onclick = setupFormWithValidUei;
+    setFormDisabled(false);
   }
 
   document.querySelector('.uei-search-result').classList.remove('loading');
@@ -208,7 +209,22 @@ function validateFyStartDate(fyInput) {
 
 function setFormDisabled(shouldDisable) {
   const continueBtn = document.getElementById('continue');
-  continueBtn.disabled = shouldDisable;
+  // If we want to disable the button, do it.
+  if (shouldDisable) {
+    continueBtn.disabled = true;
+    return;
+  }
+
+  // Check to see if UEI validation has been completed (auditee name is filled in).
+  var isUEIValidated =
+    document.getElementById('auditee_name').value == '' ? false : true;
+
+  // If we want to enable the button, the UEI validation should be done.
+  if (!shouldDisable && isUEIValidated) {
+    continueBtn.disabled = false;
+  } else {
+    continueBtn.disabled = true;
+  }
 }
 
 function allResponsesValid() {
@@ -262,6 +278,7 @@ function attachDatePickerHandlers() {
 function init() {
   attachEventHandlers();
   window.addEventListener('load', attachDatePickerHandlers, false); // Need to wait for date-picker text input to render.
+  setFormDisabled(true); // Disabled initially, re-enables afterfilling everything out.
 }
 
 init();
