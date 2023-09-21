@@ -3,7 +3,7 @@
 */
 
 const API_GOV_JWT = Cypress.env('API_GOV_JWT');
-const API_GOV_URL = Cypress.env('API_GOV_URL');
+const API_GOV_URL = Cypress.env('API_GOV_URL') || '';
 
 export function testReportId(reportId, expectedResults) {
   cy.request({
@@ -17,5 +17,3 @@ export function testReportId(reportId, expectedResults) {
       expect(response.body).to.have.length(expectedResults);
   });
 }
-
-
