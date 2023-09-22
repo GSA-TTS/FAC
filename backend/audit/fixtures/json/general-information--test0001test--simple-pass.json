@@ -15,7 +15,7 @@
   "auditor_email": "fictional.fac.tester+test@gsa.gov",
   "auditor_phone": "5558675309",
   "auditor_state": "CA",
-  "auditor_country": "United States",
+  "auditor_country": "USA",
   "auditor_firm_name": "Fellowship",
   "audit_period_covered": "annual",
   "auditee_contact_name": "Frodo Baggins",
@@ -27,9 +27,12 @@
   "auditee_address_line_1": "HAL",
   "auditor_address_line_1": "Main Hall",
   "met_spending_threshold": true,
+  "secondary_auditors_exist": false,
+  "audit_period_other_months": "null",
   "auditee_fiscal_period_end": "2023-01-01",
   "ein_not_an_ssn_attestation": true,
   "auditee_fiscal_period_start": "2022-01-01",
+  "auditor_international_address": "",
   "user_provided_organization_type": "non-profit",
-  "auditor_ein_not_an_ssn_attestation": true
+  "auditor_ein_not_an_ssn_attestation": true 
 }

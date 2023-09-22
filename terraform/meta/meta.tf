@@ -34,3 +34,34 @@ module "environments" {
   # bootstrap-env module manage both spaces in a future PR!
   asgs = lookup(each.value, "allow_egress", false) ? tolist(local.egress_asgs) : tolist(local.internal_asgs)
 }
+
+locals {
+  # Filters the list of spaces with a value of true for "uses_backups". We only want to share the bucket to those spaces.
+  spaces_that_use_backups = join(" ", [for key, config in local.spaces : lookup(config, "uses_backups", false) ? key : ""])
+}
+
+module "s3-backups" {
+  source = "github.com/18f/terraform-cloudgov//s3?ref=v0.5.1"
+
+  cf_org_name = local.org_name
+  # TODO: This should be the key for the first space that says "is_production =
+  # true" rather than being hardcoded
+  cf_space_name = "production"
+  name          = "backups"
+  s3_plan_name  = "basic"
+}
+
+# TODO: We should have a corresponding "unshar-backup-from-spaces" resource, in
+# case a space is removed from the list
+
+# resource "null_resource" "share-backup-to-spaces" {
+#   provisioner "local-exec" {
+#     environment = {
+#       SPACES = "${local.spaces_that_use_backups}"
+#     }
+#     command = "for space in $SPACES ; do cf share-service backups -s $space; done"
+#   }
+#   depends_on = [
+#     module.s3-backups
+#   ]
+# }

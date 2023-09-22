@@ -1,7 +1,7 @@
-from datetime import datetime, timezone
+from datetime import datetime, time, timezone, timedelta
 import json
 from django.test import TestCase
-
+import random
 from model_bakery import baker
 from faker import Faker
 
@@ -33,11 +33,26 @@ class IntakeToDisseminationTests(TestCase):
             SingleAuditChecklist.STATUS.AUDITEE_CERTIFIED,
             SingleAuditChecklist.STATUS.SUBMITTED,
         ]
+        # Get the current date in UTC
+        current_date_utc = datetime.now(timezone.utc).date()
+        # Create a datetime object for the current date with a time between 0:00 a.m. and 11:00 a.m.
+        transition_date = datetime.combine(
+            current_date_utc,
+            time(
+                hour=random.randint(0, 11),  # nosec
+                minute=0,
+                second=0,
+                microsecond=0,
+                tzinfo=timezone.utc,
+            ),
+        )
 
         for status in statuses:
-            sac.transition_date.append(datetime.now(timezone.utc))
+            sac.transition_date.append(transition_date)
             sac.transition_name.append(status)
             sac.save()
+            # Increment the minute by 2
+            transition_date += timedelta(minutes=2)
 
     def setUp(self):
         self.user = baker.make(User)
@@ -210,6 +225,7 @@ class IntakeToDisseminationTests(TestCase):
                     {
                         "note_title": "First Note",
                         "note_content": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. \nVestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Phasellus nec tortor ut ligula sollicitudin euismod.",
+                        "contains_chart_or_table": "Y",
                         "seq_number": 1,
                     },
                 ],
@@ -331,6 +347,19 @@ class IntakeToDisseminationTests(TestCase):
             Util.json_array_to_str(self.sac.audit_information["gaap_results"]),
             general.gaap_results,
         )
+
+    def test_submitted_date(self):
+        """The date of submission should be disseminated as the prior date if the submission occurs before 11 a.m."""
+        self.intake_to_dissemination.load_general()
+        self.intake_to_dissemination.save_dissemination_objects()
+        generals = General.objects.all()
+        self.assertEqual(len(generals), 1)
+        general = generals.first()
+
+        # Calculate the date before today
+        day_before = datetime.now().date() - timedelta(days=1)
+
+        self.assertEqual(general.submitted_date, day_before)
 
     def test_load_federal_award(self):
         self.intake_to_dissemination.load_federal_award()

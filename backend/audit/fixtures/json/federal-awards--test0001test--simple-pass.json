@@ -12,8 +12,8 @@
           "is_major": "N",
           "audit_report_type": "",
           "number_of_audit_findings": 0,
-          "amount_expended": 500,
-          "federal_program_total": 500
+          "amount_expended": 5000000,
+          "federal_program_total": 5000000
         },
         "loan_or_loan_guarantee": {
           "is_guaranteed": "N",
