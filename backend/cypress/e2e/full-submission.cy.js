@@ -9,7 +9,7 @@ import { testAuditInformationForm } from '../support/audit-info-form.js';
 import { testPdfAuditReport } from '../support/report-pdf.js';
 import { testAuditorCertification } from '../support/auditor-certification.js';
 import { testAuditeeCertification } from '../support/auditee-certification.js';
-import { testReportId } from '../support/dissemination-table.js';
+import { testReportIdFound, testReportIdNotFound } from '../support/dissemination-table.js';
 import {
   testWorkbookFederalAwards,
   testWorkbookNotesToSEFA,
@@ -58,7 +58,7 @@ describe('Full audit submission', () => {
     // Report should not yet be in the dissemination table
     cy.url().then(url => {
       const reportId = url.split('/').pop();
-      testReportId(reportId, 0);
+      testReportIdNotFound(reportId);
     });
 
     // Fill out the general info form
@@ -135,7 +135,7 @@ describe('Full audit submission', () => {
       ).siblings().contains('td', reportId);
 
       // Report should now be in the dissemination table
-      testReportId(reportId, 1);
+      testReportIdFound(reportId);
     });
   });
 });
