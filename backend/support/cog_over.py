@@ -103,7 +103,7 @@ def determine_hist_agency(ein, uei):
 def get_dbkey(ein, uei):
     try:
         dbkey = CensusGen22.objects.values_list("dbkey", flat=True).get(
-            Q(ein=ein), Q(uei=uei) | Q(uei=None)
+            Q(ein=ein), Q(uei=uei)
         )[:]
     except (CensusGen22.DoesNotExist, CensusGen22.MultipleObjectsReturned):
         dbkey = None
@@ -114,7 +114,7 @@ def lookup_baseline(ein, uei, dbkey):
     try:
         cognizant_agency = CognizantBaseline.objects.values_list(
             "cognizant_agency", flat=True
-        ).get(Q(is_active=True) & ((Q(ein=ein) & Q(dbkey=dbkey)) | Q(uei=uei)))[:]
+        ).get(Q(is_active=True) & (Q(ein=ein) & Q(dbkey=dbkey)))[:]
     except (CognizantBaseline.DoesNotExist, CognizantBaseline.MultipleObjectsReturned):
         cognizant_agency = None
     return cognizant_agency
@@ -123,7 +123,7 @@ def lookup_baseline(ein, uei, dbkey):
 def get_2019_gen(ein, dbkey):
     gens = CensusGen19.objects.annotate(
         amt=Cast("totfedexpend", output_field=BigIntegerField())
-    ).filter(Q(ein=ein), Q(dbkey=dbkey) | Q(dbkey=None))
+    ).filter(Q(ein=ein), Q(dbkey=dbkey))
 
     if len(gens) != 1:
         return (len(gens), 0)
@@ -134,7 +134,7 @@ def get_2019_gen(ein, dbkey):
 def get_2019_cfdas(ein, dbkey):
     cfdas = CensusCfda19.objects.annotate(
         amt=Cast("amount", output_field=BigIntegerField())
-    ).filter(Q(ein=ein), Q(dbkey=dbkey) | Q(dbkey=None))
+    ).filter(Q(ein=ein), Q(dbkey=dbkey))
 
     if len(cfdas) == 0:
         return None
