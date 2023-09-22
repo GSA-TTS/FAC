@@ -6,6 +6,7 @@ import { testValidAccess } from '../support/check-access.js';
 import { testValidEligibility } from '../support/check-eligibility.js';
 import { testValidAuditeeInfo } from '../support/auditee-info.js';
 import { testValidGeneralInfo } from '../support/general-info.js';
+import { testFileUploadMsg } from '../support/file-uploaded-msg.js';
 
 import {
   testWorkbookFederalAwards,
@@ -41,6 +42,12 @@ describe('Notes to SEFA page', () => {
 
     testValidAccess();
 
+    // Report should not yet be in the dissemination table
+    cy.url().then(url => {
+      const reportId = url.split('/').pop();
+      testReportIdNotFound(reportId);
+    });
+
     testValidGeneralInfo();
 
     cy.get(".usa-link").contains("Federal Awards").click();
@@ -50,17 +57,8 @@ describe('Notes to SEFA page', () => {
     testWorkbookNotesToSEFA(false);
   });
 
-    it('Displays message if file has already been uploaded', () => {
-      cy.visit(`/audit/`);
-      cy.url().should('match', /\/audit\//);
-      cy.get(':nth-child(4) > .usa-table > tbody > tr').last().find('td:nth-child(1)>.usa-link').click();
-      cy.get('a.usa-link').contains('Edit the Notes to SEFA').click();
-      cy.get('#already-submitted')
-        .invoke('text')
-        .then((text) => {
-          const expectedText = 'A file has already been uploaded for this section. A successful reupload will overwrite your previous submission.';
-          expect(text.trim()).to.equal(expectedText);
-        });
-    });
-
+  it('Displays message if file has already been uploaded', () => {
+    testFileUploadMsg('Edit the Notes to SEFA');
   });
+
+});
