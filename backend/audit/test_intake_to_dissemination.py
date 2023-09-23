@@ -356,8 +356,8 @@ class IntakeToDisseminationTests(TestCase):
         self.assertEqual(len(generals), 1)
         general = generals.first()
 
-        # Calculate the date before today
-        day_before = datetime.now().date() - timedelta(days=1)
+        # Calculate the date at UTC -12
+        day_before = (datetime.utcnow() - timedelta(hours=12)).date()
 
         self.assertEqual(general.submitted_date, day_before)
 
