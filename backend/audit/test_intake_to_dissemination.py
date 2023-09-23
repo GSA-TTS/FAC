@@ -359,9 +359,9 @@ class IntakeToDisseminationTests(TestCase):
         general = generals.first()
 
         # Calculate the date at UTC-11 (the American Samoa timezone does not do DST)
-        day_before = (datetime.utcnow() - timedelta(hours=11)).date()
+        date_in_american_samoa = (datetime.utcnow() - timedelta(hours=11)).date()
 
-        self.assertEqual(general.submitted_date, day_before)
+        self.assertEqual(general.submitted_date, date_in_american_samoa)
 
     def test_load_federal_award(self):
         self.intake_to_dissemination.load_federal_award()
