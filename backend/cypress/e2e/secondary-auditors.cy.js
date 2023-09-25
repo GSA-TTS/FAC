@@ -10,15 +10,15 @@ import { testReportIdFound, testReportIdNotFound } from '../support/disseminatio
 import { testFileUploadMsg } from '../support/file-uploaded-msg.js';
 
 import {
+    testWorkbookSecondaryAuditors,
   testWorkbookFederalAwards,
-  testWorkbookFindingsText,
 } from '../support/workbook-uploads.js';
 
 const LOGIN_TEST_EMAIL_AUDITEE = Cypress.env('LOGIN_TEST_EMAIL_AUDITEE');
 const LOGIN_TEST_PASSWORD_AUDITEE = Cypress.env('LOGIN_TEST_PASSWORD_AUDITEE');
 const LOGIN_TEST_OTP_SECRET_AUDITEE = Cypress.env('LOGIN_TEST_OTP_SECRET_AUDITEE');
 
-describe('Audit Findings Text page', () => {
+describe('Secondary Auditors page', () => {
   before(() => {
     cy.session('login-session', () => {
       cy.visit('/');
@@ -26,7 +26,7 @@ describe('Audit Findings Text page', () => {
     });
   });
 
-  it('Audit Findings Text uploads successfully', () => {
+  it('Secondary auditors uploads successfully', () => {
     cy.visit('/');
 
     cy.url().should('include', '/');
@@ -54,12 +54,12 @@ describe('Audit Findings Text page', () => {
     cy.get(".usa-link").contains("Federal Awards").click();
     testWorkbookFederalAwards(false);
 
-    cy.get(".usa-link").contains("Federal Awards Audit Findings Text").click();
-    testWorkbookFindingsText(false);
+    cy.get(".usa-link").contains("Secondary Auditors").click();
+    testWorkbookSecondaryAuditors(false);
   });
 
   it('Displays message if file has already been uploaded', () => {
-    testFileUploadMsg('Edit the Federal Awards Audit Findings Text');
+    testFileUploadMsg('Edit the Secondary Auditors');
   });
 
 });

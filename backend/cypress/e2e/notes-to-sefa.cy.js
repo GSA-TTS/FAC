@@ -6,6 +6,7 @@ import { testValidAccess } from '../support/check-access.js';
 import { testValidEligibility } from '../support/check-eligibility.js';
 import { testValidAuditeeInfo } from '../support/auditee-info.js';
 import { testValidGeneralInfo } from '../support/general-info.js';
+import { testReportIdFound, testReportIdNotFound } from '../support/dissemination-table.js';
 import { testFileUploadMsg } from '../support/file-uploaded-msg.js';
 
 import {
