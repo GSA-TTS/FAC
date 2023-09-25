@@ -4,7 +4,10 @@ from django.test import TestCase
 from model_bakery import baker
 from faker import Faker
 
-from .models import SingleAuditChecklist, User
+from audit.models import SingleAuditChecklist, User
+from audit.intake_to_dissemination import IntakeToDissemination
+from audit.test_views import AUDIT_JSON_FIXTURES, _load_json
+from audit.utils import Util
 from dissemination.models import (
     General,
     FederalAward,
@@ -17,8 +20,6 @@ from dissemination.models import (
     AdditionalEin,
     AdditionalUei,
 )
-from audit.intake_to_dissemination import IntakeToDissemination
-from audit.utils import Util
 
 
 def _set_transitions_hour(sac, hour):
@@ -99,7 +100,10 @@ class IntakeToDisseminationTests(TestCase):
     @staticmethod
     def _fake_general():
         fake = Faker()
-        return {
+        geninfofile = "general-information--test0001test--simple-pass.json"
+        geninfo = _load_json(AUDIT_JSON_FIXTURES / geninfofile)
+
+        return geninfo | {
             "ein": fake.ssn().replace("-", ""),
             "audit_type": "single-audit",
             "auditee_uei": "ZQGGHJH74DW7",
