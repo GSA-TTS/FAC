@@ -1,6 +1,17 @@
 from django.contrib import admin
 
-from dissemination.models import AdditionalEin, AdditionalUei, CapText, FederalAward, Finding, FindingText, General, Note, Passthrough, SecondaryAuditor
+from dissemination.models import (
+    AdditionalEin,
+    AdditionalUei,
+    CapText,
+    FederalAward,
+    Finding,
+    FindingText,
+    General,
+    Note,
+    Passthrough,
+    SecondaryAuditor,
+)
 
 admin.site.register(AdditionalEin)
 admin.site.register(AdditionalUei)
