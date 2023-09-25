@@ -1,0 +1,52 @@
+---
+name: Perform Django dbbackup and mediabackup
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        required: true
+        type: string
+        # dev, staging, production
+jobs:
+  backup-database:
+    name: Backup ${{ inputs.environment }} database
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    env:
+      space: ${{ inputs.environment }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Bind backups bucket in ${{ inputs.environment }} application
+        uses: cloud-gov/cg-cli-tools@main
+        with:
+          cf_username: ${{ secrets.CF_USERNAME }}
+          cf_password: ${{ secrets.CF_PASSWORD }}
+          cf_org: gsa-tts-oros-fac
+          cf_space: ${{ env.space }}
+          command: cf bind-service gsa-fac backups -w
+
+      - name: Backup the database in ${{ inputs.environment }}
+        uses: cloud-gov/cg-cli-tools@main
+        with:
+          cf_username: ${{ secrets.CF_USERNAME }}
+          cf_password: ${{ secrets.CF_PASSWORD }}
+          cf_org: gsa-tts-oros-fac
+          cf_space: ${{ env.space }}
+          command: cf run-task gsa-fac -k 2G -m 2G --name pg_backup --command "./backup_database.sh ${{ env.space }}"
+
+      - name: Sleep for 5 minutes to ensure backup occurs
+        run: sleep 5m
+        shell: bash
+
+      - name: Unbind backup s3 bucket from ${{ inputs.environment }} application
+        uses: cloud-gov/cg-cli-tools@main
+        with:
+          cf_username: ${{ secrets.CF_USERNAME }}
+          cf_password: ${{ secrets.CF_PASSWORD }}
+          cf_org: gsa-tts-oros-fac
+          cf_space: ${{ env.space }}
+          command: cf unbind-service gsa-fac backups
+
