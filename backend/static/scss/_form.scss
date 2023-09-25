@@ -188,7 +188,16 @@ ul.usa-error-message {
     fill: #d83933;
     height: 1.5em;
     width: 1.5em;
+    vertical-align: middle;
   }
+}
+
+.add-contact {
+  margin-top: 2.5rem;
+}
+
+.additional_contacts {
+  margin-top: 2.5rem;
 }
 
 #grant-access {
@@ -224,10 +233,6 @@ ul.usa-error-message {
     .usa-form-group {
       margin-top: 0;
     }
-  }
-
-  .add-contact {
-    margin-top: 0.5em;
   }
 
   #email-notice {

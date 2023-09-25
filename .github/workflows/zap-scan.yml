@@ -15,7 +15,7 @@ jobs:
       url: ${{ inputs.url }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: ZAP Scan of ${{ env.url }}
         uses: zaproxy/action-baseline@v0.9.0

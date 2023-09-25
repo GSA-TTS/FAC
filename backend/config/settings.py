@@ -82,10 +82,15 @@ LOGGING = {
         "django": {"handlers": ["local_debug_logger", "prod_logger"]},
     },
 }
-# this shold reduce the volume of message displayed when running tests
-if len(sys.argv) > 1 and sys.argv[1] == "test":
-    logging.disable(logging.ERROR)
 
+TEST_RUN = False
+if len(sys.argv) > 1 and sys.argv[1] == "test":
+    # This should reduce the volume of message displayed when running tests, but
+    # unfortunately doesn't suppress stdout.
+    logging.disable(logging.ERROR)
+    # Set var that Django Debug Toolbar can detect so that it doesn't run; we use
+    # this with ENABLE_DEBUG_TOOLBAR much further below:
+    TEST_RUN = True
 
 # Django application definition
 INSTALLED_APPS = [
@@ -104,6 +109,7 @@ INSTALLED_APPS += [
     "corsheaders",
     "storages",
     "djangooidc",
+    "dbbackup",
 ]
 
 # Our apps
@@ -115,6 +121,7 @@ INSTALLED_APPS += [
     "cms",
     # "data_distro",
     "dissemination",
+    "support",
 ]
 
 MIDDLEWARE = [
@@ -141,6 +148,9 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                "config.context_processors.static_site_url",
+                "config.context_processors.omb_num_exp_date",
+                "report_submission.context_processors.certifiers_emails_must_not_match",
             ],
             "builtins": [
                 "report_submission.templatetags.get_attr",
@@ -244,6 +254,10 @@ if ENVIRONMENT not in ["DEVELOPMENT", "PREVIEW", "STAGING", "PRODUCTION"]:
 
     DISABLE_AUTH = env.bool("DISABLE_AUTH", default=False)
 
+    # Used for backing up the database https://django-dbbackup.readthedocs.io/en/master/installation.html
+    DBBACKUP_STORAGE = "django.core.files.storage.FileSystemStorage"
+    DBBACKUP_STORAGE_OPTIONS = {"location": BASE_DIR / "backup"}
+
 else:
     # One of the Cloud.gov environments
     STATICFILES_STORAGE = "storages.backends.s3boto3.S3ManifestStaticStorage"
@@ -296,6 +310,17 @@ else:
             MEDIA_URL = (
                 f"https://{AWS_S3_PRIVATE_CUSTOM_DOMAIN}/{AWS_PRIVATE_LOCATION}/"
             )
+
+        elif service["instance_name"] == "backups":
+            s3_creds = service["credentials"]
+            # Used for backing up the database https://django-dbbackup.readthedocs.io/en/master/storage.html#id2
+            DBBACKUP_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
+            DBBACKUP_STORAGE_OPTIONS = {
+                "access_key": s3_creds["access_key_id"],
+                "secret_key": s3_creds["secret_access_key"],
+                "bucket_name": s3_creds["bucket"],
+                "default_acl": "private",
+            }
 
     # secure headers
     MIDDLEWARE.append("csp.middleware.CSPMiddleware")
@@ -392,6 +417,7 @@ DATA_FIXTURES = BASE_DIR / "data_fixtures"
 AUDIT_TEST_DATA_ENTRY_DIR = DATA_FIXTURES / "audit" / "test_data_entries"
 AUDIT_SCHEMA_DIR = BASE_DIR / "schemas" / "output" / "audit"
 SECTION_SCHEMA_DIR = BASE_DIR / "schemas" / "output" / "sections"
+SCHEMA_BASE_DIR = BASE_DIR / "schemas" / "source" / "base"
 XLSX_TEMPLATE_JSON_DIR = BASE_DIR / "schemas" / "output" / "excel" / "json"
 XLSX_TEMPLATE_SHEET_DIR = BASE_DIR / "schemas" / "output" / "excel" / "xlsx"
 
@@ -404,15 +430,20 @@ AUTHENTICATION_BACKENDS = [
 ]
 
 env_base_url = env.str("DJANGO_BASE_URL", "")
+login_client_id = secret("LOGIN_CLIENT_ID", "")
 secret_login_key = b64decode(secret("DJANGO_SECRET_LOGIN_KEY", ""))
 
 # which provider to use if multiple are available
 # (code does not currently support user selection)
 OIDC_ACTIVE_PROVIDER = "login.gov"
+OIDC_DISCOVERY_URL = "https://idp.int.identitysandbox.gov"
+
+if ENVIRONMENT == "PRODUCTION":
+    OIDC_DISCOVERY_URL = "https://secure.login.gov"
 
 OIDC_PROVIDERS = {
     "login.gov": {
-        "srv_discovery_url": "https://idp.int.identitysandbox.gov",
+        "srv_discovery_url": OIDC_DISCOVERY_URL,
         "behaviour": {
             # the 'code' workflow requires direct connectivity from us to Login.gov
             "response_type": "code",
@@ -427,7 +458,7 @@ OIDC_PROVIDERS = {
             "acr_value": "http://idmanagement.gov/ns/assurance/ial/1",
         },
         "client_registration": {
-            "client_id": "urn:gov:gsa:openidconnect.profiles:sp:sso:gsa:gsa-fac-pk-jwt-01",
+            "client_id": login_client_id,
             "redirect_uris": [f"{env_base_url}/openid/callback/login/"],
             "post_logout_redirect_uris": [f"{env_base_url}/openid/callback/logout/"],
             "token_endpoint_auth_method": ["private_key_jwt"],
@@ -439,7 +470,6 @@ OIDC_PROVIDERS = {
 LOGIN_URL = f"{env_base_url}/openid/login/"
 
 USER_PROMOTION_COMMANDS_ENABLED = ENVIRONMENT in ["LOCAL", "TESTING", "UNDEFINED"]
-
 
 if DISABLE_AUTH:
     TEST_USERNAME = "test_user@test.test"
@@ -456,3 +486,27 @@ AGENCY_NAMES = get_agency_names()
 GAAP_RESULTS = get_audit_info_lists("gaap_results")
 SP_FRAMEWORK_BASIS = get_audit_info_lists("sp_framework_basis")
 SP_FRAMEWORK_OPINIONS = get_audit_info_lists("sp_framework_opinions")
+STATE_ABBREVS = json.load(open(f"{SCHEMA_BASE_DIR}/States.json"))[
+    "UnitedStatesStateAbbr"
+]
+
+ENABLE_DEBUG_TOOLBAR = (
+    env.bool("ENABLE_DEBUG_TOOLBAR", False) and ENVIRONMENT == "LOCAL" and not TEST_RUN
+)
+
+# Django debug toolbar setup
+if ENABLE_DEBUG_TOOLBAR:
+    INSTALLED_APPS += [
+        "debug_toolbar",
+    ]
+    MIDDLEWARE = [
+        "debug_toolbar.middleware.DebugToolbarMiddleware",
+    ] + MIDDLEWARE
+    DEBUG_TOOLBAR_CONFIG = {"SHOW_TOOLBAR_CALLBACK": lambda _: True}
+
+# Link to the most applicable static site URL. Passed in context to all templates.
+STATIC_SITE_URL = "https://fac.gov/"
+
+# OMB-assigned values. Number doesn't change, date does.
+OMB_NUMBER = "3090-0330"
+OMB_EXP_DATE = "09/30/2026"

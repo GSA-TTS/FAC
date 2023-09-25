@@ -145,7 +145,10 @@ in files in [backend/cypress/e2e/](/backend/cypress/e2e). Run cypress with `npx 
 
  To pass that email address, password, and secret key into Cypress, set the
  environment variables `CYPRESS_LOGIN_TEST_EMAIL`, `CYPRESS_LOGIN_TEST_PASSWORD`, and
- `CYPRESS_LOGIN_TEST_OTP_SECRET`. Obviously, do not store these values in our
+ `CYPRESS_LOGIN_TEST_OTP_SECRET`. You'll need similar credentials for
+ `CYPRESS_LOGIN_TEST_EMAIL_AUDITEE`, `CYPRESS_LOGIN_TEST_PASSWORD_AUDITEE`, and
+ `CYPRESS_LOGIN_TEST_OTP_SECRET_AUDITEE`. These can be the same values, but ideally
+ they'll belong to a different account. Obviously, do not store these values in our
  Github repository. To use them in a Github Actions workflow, use the [Github
  Actions secrets
  store](https://docs.github.com/en/actions/security-guides/encrypted-secrets)

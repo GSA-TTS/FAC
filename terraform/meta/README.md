@@ -12,8 +12,7 @@ Among other things, this module...
 - (future) configures the spaces for dev, staging, and production
   - _See https://github.com/cloudfoundry-community/terraform-provider-cloudfoundry/issues/436_
 - (future) configures user access to those spaces
-- (future) configures application security groups (ASGs) for the spaces
-  - _See https://github.com/cloudfoundry-community/terraform-provider-cloudfoundry/issues/405_
+- configures application security groups (ASGs) for the spaces
 - ensures the production space does not have SSH enabled
 - (future) sets up the deployer cred secrets in the corresponding GitHub environment
 - (future) sets up egress spaces and proxy configuration
@@ -24,7 +23,7 @@ NOTE: The deploying account must have the OrgManager role in the target
 organization.
 
 
-## TODO: 
+## TODO:
 
 * Make bootstrap.sh script
   * Checks that the user is logged into GitHub as repo admin and Cloud Foundry as OrgAdmin
@@ -37,3 +36,5 @@ organization.
 * Move the services currently in "management" into the "meta" space; we're not really using that space anyway
 * Double-check that the "management" space can be blown away (first confirming that the *actual* Terraform state is in the S3 instance in the "production" space)
 * Update/simplify ../terraform/README.md!
+* Meta module handing sharing the spaces
+

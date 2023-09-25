@@ -53,6 +53,7 @@
                         "type": "string"
                      },
                      "secondary_auditor_address_state": {
+                        "description": "US States 2-letter abbreviations",
                         "enum": [
                            "AL",
                            "AK",
@@ -113,14 +114,13 @@
                            "WV",
                            "WI",
                            "WY"
-                        ],
-                        "type": "string"
+                        ]
                      },
                      "secondary_auditor_address_street": {
                         "type": "string"
                      },
                      "secondary_auditor_address_zipcode": {
-                        "pattern": "^[0-9]{5}(?:-[0-9]{4})?$",
+                        "pattern": "^[0-9]{5}(?:[0-9]{4})?$",
                         "type": "string"
                      },
                      "secondary_auditor_contact_email": {
@@ -162,6 +162,7 @@
                   ],
                   "title": "SecondaryAuditorsEntry"
                },
+               "minContains": 0,
                "type": "array"
             }
          },

@@ -1,13 +1,13 @@
-import json
 from datetime import datetime
 
 from django.contrib.auth.models import User
 from django.http import HttpResponseRedirect
 from django.test import TestCase
 from django.urls import reverse
+from unittest.mock import patch
 from model_bakery import baker
 
-from audit.models import Access, SingleAuditChecklist
+from audit.models import Access, SingleAuditChecklist, SubmissionEvent
 
 
 def omit(remove, d) -> dict:
@@ -33,6 +33,7 @@ SAMPLE_BASE_SAC_DATA = {
         "multiple_eins_covered": False,
         "auditee_uei": "ZQGGHJH74DW7",
         "multiple_ueis_covered": False,
+        "secondary_auditors_exist": True,
         "auditee_name": "Auditee McAudited",
         "auditee_address_line_1": "200 feet into left field",
         "auditee_city": "New York",
@@ -60,6 +61,13 @@ SAMPLE_BASE_SAC_DATA = {
     },
 }
 
+EMAIL_TO_ROLE = {
+    "certifying_auditee_contact_email": "certifying_auditee_contact",
+    "certifying_auditor_contact_email": "certifying_auditor_contact",
+    "auditee_contacts_email": "editor",
+    "auditor_contacts_email": "editor",
+}
+
 
 class TestPreliminaryViews(TestCase):
     """
@@ -78,10 +86,14 @@ class TestPreliminaryViews(TestCase):
         +   auditee_fiscal_period_end
     #.  /report_submission/accessandsubmission
 
-        +   certifying_auditee_contact
-        +   certifying_auditor_contact
-        +   auditee_contacts
-        +   auditor_contacts
+        +   certifying_auditee_contact_fullname
+        +   certifying_auditee_contact_email
+        +   certifying_auditor_contact_fullname
+        +   certifying_auditor_contact_email
+        +   auditee_contacts_fullname
+        +   auditee_contacts_email
+        +   auditor_contacts_fullname
+        +   auditor_contacts_email
 
     """
 
@@ -98,12 +110,14 @@ class TestPreliminaryViews(TestCase):
     }
 
     step3_data = {
-        "certifying_auditee_contact": "a@a.com",
-        "certifying_auditor_contact": "b@b.com",
-        "auditee_contacts": "c@c.com",  # noqa: F601
-        "auditee_contacts": "d@d.com",  # noqa: F601
-        "auditor_contacts": "e@e.com",  # noqa: F601
-        "auditor_contacts": "f@f.com",  # noqa: F601
+        "certifying_auditee_contact_fullname": "Fuller A. Namesmith",
+        "certifying_auditee_contact_email": "a@a.com",
+        "certifying_auditor_contact_fullname": "Fuller B. Namesmith",
+        "certifying_auditor_contact_email": "b@b.com",
+        "auditee_contacts_fullname": "Fuller C. Namesmith",
+        "auditee_contacts_email": "c@c.com",
+        "auditor_contacts_fullname": "Fuller D. Namesmith",
+        "auditor_contacts_email": "d@d.com",
     }
 
     def test_step_one_eligibility_submission_pass(self):
@@ -144,10 +158,15 @@ class TestPreliminaryViews(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, "/report_submission/eligibility/")
 
-    def test_end_to_end_submission_pass(self):
+    @patch("report_submission.forms.get_uei_info_from_sam_gov")
+    def test_end_to_end_submission_pass(self, mock_get_uei_info):
         """
         Go through all three and verify that we end up with a SAC.
         """
+        mock_get_uei_info.return_value = {
+            "valid": True,
+        }
+
         user = baker.make(User)
         self.client.force_login(user)
         step1 = reverse("report_submission:eligibility")
@@ -169,7 +188,7 @@ class TestPreliminaryViews(TestCase):
         self.assertTemplateUsed(step2_get, "report_submission/step-2.html")
 
         step2_data = {
-            # "auditee_name": "Federal Bureau of Control",
+            "auditee_name": "Federal Bureau of Control",
             "auditee_uei": "KZV2XNZZN3A8",
             "auditee_fiscal_period_start": "01/01/2022",
             "auditee_fiscal_period_end": "01/01/2023",
@@ -208,18 +227,28 @@ class TestPreliminaryViews(TestCase):
 
         accesses = Access.objects.filter(sac=sac)
         for key, val in self.step3_data.items():
-            # Fields come in as auditee/auditor contacts, become editor:
-            if key in ("auditee_contacts", "auditor_contacts"):
-                key = "editor"
-            matches = [acc for acc in accesses if acc.email == val]
-            self.assertEqual(matches[0].role, key)
+            # Fields come in as auditee/auditor emails, become roles:
+            if key in (
+                "auditee_contacts_email",
+                "auditor_contacts_email",
+                "certifying_auditee_contact_email",
+                "certifying_auditor_contact_email",
+            ):
+                key = EMAIL_TO_ROLE[key]
+                matches = [acc for acc in accesses if acc.email == val]
+                self.assertEqual(matches[0].role, key)
 
-    def test_step_two_auditeeinfo_submission_fail(self):
+    @patch("report_submission.forms.get_uei_info_from_sam_gov")
+    def test_step_two_auditeeinfo_submission_empty(self, mock_get_uei_info):
         """
         /report_submissions/auditeeinfo
         Check that the correct templates are loaded on GET.
-        Check that the POST succeeds with appropriate data.
+        Check that the POST fails with an empty data payload
         """
+        mock_get_uei_info.return_value = {
+            "valid": True,
+        }
+
         user = baker.make(User)
         self.client.force_login(user)
         url = reverse("report_submission:auditeeinfo")
@@ -232,10 +261,55 @@ class TestPreliminaryViews(TestCase):
 
         data = {}
         response = self.client.post(
-            url, data=json.dumps(data), content_type="application/json"
+            url,
+            data=data,
         )
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.url, "/report_submission/auditeeinfo/")
+        self.assertEqual(response.status_code, 200)
+        self.assertListEqual(
+            response.context["form"].errors["auditee_uei"], ["This field is required."]
+        )
+        self.assertListEqual(
+            response.context["form"].errors["auditee_fiscal_period_start"],
+            ["This field is required."],
+        )
+        self.assertListEqual(
+            response.context["form"].errors["auditee_fiscal_period_end"],
+            ["This field is required."],
+        )
+
+    @patch("report_submission.forms.get_uei_info_from_sam_gov")
+    def test_step_two_auditeeinfo_invalid_dates(self, mock_get_uei_info):
+        """
+        Check that the server validates that start date preceeds end date
+        """
+        mock_get_uei_info.return_value = {"valid": True}
+
+        user = baker.make(User)
+        self.client.force_login(user)
+        url = reverse("report_submission:auditeeinfo")
+
+        get_response = self.client.get(url)
+        self.assertTrue(user.is_authenticated)
+        self.assertEqual(get_response.status_code, 200)
+        self.assertTemplateUsed(get_response, "report_submission/step-base.html")
+        self.assertTemplateUsed(get_response, "report_submission/step-2.html")
+
+        data = {
+            "auditee_uei": "ZQGGHJH74DW7",
+            "auditee_fiscal_period_start": "2023-08-31",
+            "auditee_fiscal_period_end": "2023-08-01",
+        }
+        response = self.client.post(url, data=data)
+
+        self.assertEqual(response.status_code, 200)
+
+        errors = response.context["form"].non_field_errors()
+        self.assertListEqual(
+            errors,
+            [
+                "Auditee fiscal period end date must be later than auditee fiscal period start date"
+            ],
+        )
 
     def test_step_three_accessandsubmission_submission_fail(self):
         """
@@ -383,9 +457,19 @@ class GeneralInformationFormViewTests(TestCase):
 
         # assert that the text fields are populated in the returned form
         for field in text_fields:
-            value = sac.general_information[field]
-
-            self.assertEqual(response.context[field], value)
+            if (
+                field != "auditee_fiscal_period_start"
+                and field != "auditee_fiscal_period_end"
+            ):
+                value = sac.general_information[field]
+                self.assertEqual(response.context[field], value)
+            else:
+                # These are stored in YYYY-MM-DD but get sent as MM/DD/YYYY, so they get special treatment.
+                stored_value = sac.general_information[field]
+                formatted_field = datetime.strptime(
+                    response.context[field], "%m/%d/%Y"
+                ).strftime("%Y-%m-%d")
+                self.assertEqual(stored_value, formatted_field)
 
     def test_post_requires_login(self):
         """Requests to the POST endpoint require the user to be authenticated"""
@@ -429,7 +513,10 @@ class GeneralInformationFormViewTests(TestCase):
 
         self.assertEqual(response.status_code, 403)
 
-    def test_post_updates_fields(self):
+    def test_post_updates_fields_for_foreign_auditor(self):
+        self.test_post_updates_fields(foreign_auditor=True)
+
+    def test_post_updates_fields(self, foreign_auditor=False):
         """When the general information form is submitted, the general information fields for the target audit are updated in the database"""
         user = baker.make(User)
 
@@ -445,8 +532,8 @@ class GeneralInformationFormViewTests(TestCase):
 
         data = {
             "audit_type": "single-audit",
-            "auditee_fiscal_period_start": "2021-11-01",
-            "auditee_fiscal_period_end": "2022-11-01",
+            "auditee_fiscal_period_start": "11/01/2021",
+            "auditee_fiscal_period_end": "11/01/2022",
             "audit_period_covered": "other",
             "audit_period_other_months": "10",
             "ein": "123456780",
@@ -454,6 +541,7 @@ class GeneralInformationFormViewTests(TestCase):
             "multiple_eins_covered": True,
             "auditee_uei": "ZQGGHJH74DW8",
             "multiple_ueis_covered": True,
+            "secondary_auditors_exist": True,
             "auditee_name": "Auditee McAudited again",
             "auditee_address_line_1": "500 feet into left field",
             "auditee_city": "Chicago",
@@ -466,16 +554,28 @@ class GeneralInformationFormViewTests(TestCase):
             "auditor_firm_name": "Penny Audit Store",
             "auditor_ein": "123456780",
             "auditor_ein_not_an_ssn_attestation": True,
-            "auditor_country": "UK",
-            "auditor_address_line_1": "100 Percent Respectable Rd.",
-            "auditor_city": "Not Podunk",
-            "auditor_state": "IL",
-            "auditor_zip": "60604",
             "auditor_contact_name": "Qualified Robot Accountant",
             "auditor_contact_title": "Just an extraordinary person",
-            "auditor_phone": "0008675310",
+            "auditor_phone": "9876543210",
             "auditor_email": "qualified.robot.accountant@dollarauditstore.com",
         }
+        if foreign_auditor:
+            data.update(
+                {
+                    "auditor_country": "non-USA",
+                    "auditor_international_address": "10 Downing St London, England",
+                }
+            )
+        else:
+            data.update(
+                {
+                    "auditor_country": "USA",
+                    "auditor_address_line_1": "100 Percent Respectable Rd.",
+                    "auditor_city": "Not Podunk",
+                    "auditor_state": "IL",
+                    "auditor_zip": "60604",
+                }
+            )
 
         response = self.client.post(url, data=data)
 
@@ -484,9 +584,34 @@ class GeneralInformationFormViewTests(TestCase):
         updated_sac = SingleAuditChecklist.objects.get(pk=sac.id)
 
         for field in data:
-            self.assertEqual(
-                getattr(updated_sac, field), data[field], f"mismatch for field: {field}"
-            )
+            if (
+                field != "auditee_fiscal_period_start"
+                and field != "auditee_fiscal_period_end"
+            ):
+                self.assertEqual(
+                    getattr(updated_sac, field),
+                    data[field],
+                    f"mismatch for field: {field}",
+                )
+            else:
+                # These are stored in YYYY-MM-DD but are sent as MM/DD/YYYY, so they get special treatment.
+                stored_value = getattr(updated_sac, field)
+                formatted_field = datetime.strptime(data[field], "%m/%d/%Y").strftime(
+                    "%Y-%m-%d"
+                )
+                self.assertEqual(
+                    stored_value, formatted_field, f"mismatch for field: {field}"
+                )
+
+        submission_events = SubmissionEvent.objects.filter(sac=sac)
+
+        # the most recent event should be GENERAL_INFORMATION_UPDATED
+        event_count = len(submission_events)
+        self.assertGreaterEqual(event_count, 1)
+        self.assertEqual(
+            submission_events[event_count - 1].event,
+            SubmissionEvent.EventType.GENERAL_INFORMATION_UPDATED,
+        )
 
     def test_post_requires_fields(self):
         """If there are fields missing from the submitted form, the submission should be rejected"""
@@ -504,12 +629,13 @@ class GeneralInformationFormViewTests(TestCase):
 
         # submit a bad date format for auditee_fiscal_period_start to verify that the input is being validated
         data = {
-            "auditee_fiscal_period_start": "2023-01-01",
+            "auditee_fiscal_period_start": "Not a date",
         }
 
+        # Post will redirect back to the page with an error message above the relevant date field
         response = self.client.post(url, data=data)
 
-        self.assertEqual(response.status_code, 400)
+        self.assertContains(response, "Dates should be in the format")
 
     def test_post_validates_general_information(self):
         """When the general information form is submitted, the data should be validated against the general information schema"""
@@ -535,6 +661,7 @@ class GeneralInformationFormViewTests(TestCase):
             "multiple_eins_covered": False,
             "auditee_uei": "ZQGGHJH74DW8",
             "multiple_ueis_covered": False,
+            "secondary_auditors_exist": True,
             "auditee_name": "Auditee McAudited again",
             "auditee_address_line_1": "500 feet into left field",
             "auditee_city": "Chicago",
@@ -559,6 +686,7 @@ class GeneralInformationFormViewTests(TestCase):
             "auditor_email": "qualified.robot.accountant@dollarauditstore.com",
         }
 
+        # Post will redirect back to the page with an error message above the relevant date field
         response = self.client.post(url, data=data)
 
-        self.assertEqual(response.status_code, 400)
+        self.assertContains(response, "Dates should be in the format")

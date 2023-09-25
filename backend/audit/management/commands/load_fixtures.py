@@ -41,4 +41,7 @@ class Command(BaseCommand):
                     workbooks = []
                 else:
                     workbooks = glob.glob(os.path.join(options["workbooks"], "*.xlsx"))
-                load_single_audit_checklists_for_email_address(email_address, workbooks)
+                # Currently, the following command does nothing with the workbooks.
+                load_single_audit_checklists_for_email_address(
+                    email_address, workbooks=workbooks
+                )

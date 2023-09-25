@@ -9,67 +9,10 @@ local Validations = {
     additionalProperties: false,
     properties: {
       passthrough_name: Types.string,
-      passthrough_identifying_number: {
-        type: 'string',
-        minLength: 1,
-      },
+      passthrough_identifying_number: Types.string,
     },
-    required: ['passthrough_name', 'passthrough_identifying_number'],
+    required: ['passthrough_name'],
   },
-  PassThroughEntityEmpty: Types.object {
-    additionalProperties: false,
-    properties: {
-      passthrough_name: Base.Enum.EmptyString_Null,
-      passthrough_identifying_number: Base.Enum.EmptyString_Null,
-    },
-    required: ['passthrough_name', 'passthrough_identifying_number'],
-  },
-  DirectAwardValidations: [
-    {
-      'if': {
-        properties: {
-          is_direct: {
-            const: Base.Const.Y,
-          },
-        },
-      },
-      'then': {
-        properties: {
-          entities: {
-            anyOf: [
-              Types.array {
-                items: Validations.PassThroughEntityEmpty,
-              },
-              Base.Enum.EmptyString_EmptyArray_Null,
-            ],
-          },
-        },
-        // 20230627 MCJ Not required to be present if "Y"
-        // required: [
-        //   'entities',
-        // ],
-      },
-    },
-    {
-      'if': {
-        properties: {
-          is_direct: {
-            const: Base.Const.N,
-          },
-        },
-      },
-      'then': {
-        properties: {
-          entities: Types.array {
-            items: Validations.PassThroughEntity,
-          },
-        },
-        required: [
-          'entities',
-        ],
-      },
-    },
-  ],
   LoanOrLoanGuaranteeValidations: [
     {
       'if': {
@@ -80,18 +23,6 @@ local Validations = {
         },
       },
       'then': {
-        properties: {
-          // 20230409 MCJ
-          // FIXME: If the answer is Y, why can the balance be N/A?
-          loan_balance_at_audit_period_end: {
-            anyOf: [
-              Types.integer {
-                minimum: 1,
-              },
-              Base.Enum.NA,
-            ],
-          },
-        },
         required: ['loan_balance_at_audit_period_end'],
       },
     },
@@ -104,8 +35,8 @@ local Validations = {
         },
       },
       'then': {
-        properties: {
-          loan_balance_at_audit_period_end: Base.Enum.EmptyString_Zero_Null,
+        not: {
+          required: ['loan_balance_at_audit_period_end'],
         },
       },
     },
@@ -123,9 +54,6 @@ local Validations = {
         required: [
           'subrecipient_amount',
         ],
-        properties: {
-          subrecipient_amount: Types.integer,
-        },
       },
     },
     {
@@ -137,8 +65,8 @@ local Validations = {
         },
       },
       'then': {
-        properties: {
-          subrecipient_amount: Base.Enum.EmptyString_Zero_Null,
+        not: {
+          required: ['subrecipient_amount'],
         },
       },
     },
@@ -161,28 +89,29 @@ local Validations = {
       },
       'then': {
         required: ['audit_report_type'],
-        'if': {
-          properties: {
-            audit_report_type: {
-              anyOf: [
-                {
-                  const: 'A',
-                },
-                {
-                  const: 'Q',
-                },
-              ],
-            },
-          },
-        },
-        'then': {
-          properties: {
-            // If it is A or Q, then the number MUST be greater than 0.
-            number_of_audit_findings: Types.integer {
-              exclusiveMinimum: 0,
-            },
-          },
-        },
+        // MCJ FIXME can we find in UG that this condition is true?
+        // 'if': {
+        //   properties: {
+        //     audit_report_type: {
+        //       anyOf: [
+        //         {
+        //           const: 'A',
+        //         },
+        //         {
+        //           const: 'Q',
+        //         },
+        //       ],
+        //     },
+        //   },
+        // },
+        // 'then': {
+        //   properties: {
+        //     // If it is A or Q, then the number MUST be greater than 0.
+        //     number_of_audit_findings: Types.integer {
+        //       exclusiveMinimum: 0,
+        //     },
+        //   },
+        // },
       },
     },
     {
@@ -194,140 +123,110 @@ local Validations = {
         },
       },
       'then': {
-        properties: {
-          audit_report_type: Base.Enum.EmptyString_Null,
+        not: {
+          required: ['audit_report_type'],
         },
       },
     },
-    Base.Validation.AdditionalAwardIdentificationValidation[0],
+    {
+      'if': {
+        properties: {
+          three_digit_extension: Base.Compound.ExtensionRdOrU,
+        },
+      },
+      'then': {
+        properties: {
+          additional_award_identification: Types.string {
+            minLength: 1,
+          },
+        },
+        required: ['additional_award_identification'],
+      },
+    },
   ],
 };
 
 local Parts = {
-  // FIXME
-  // cluster_name should always be present.
-  // At the least, it should always be N/A.
   Cluster: Types.object {
     properties: {
-      // Cluster name must always be present, and it must EITHER be:
-      //  - A valid cluster name from the enumeration
-      //  - N/A
-      //  - STATE CLUSTER, or
-      //  - the designation for other cluster name
-      cluster_name: Base.Compound.ClusterNamesNAStateOther,
+      cluster_name: Types.string,
+      other_cluster_name: Types.string,
+      state_cluster_name: Types.string,
       cluster_total: Types.number {
         minimum: 0,
       },
     },
+    required: ['cluster_name', 'cluster_total'],
     allOf: [
       {
         'if': {
           properties: {
-            cluster_total: Types.number {
-              const: 0,
-            },
+            cluster_name: Base.Compound.ClusterNamesNA,
           },
         },
         'then': {
           allOf: [
             {
-              properties: {
-                cluster_name: Base.Enum.NA,
+              not: {
+                required: ['other_cluster_name'],
               },
             },
             {
-              properties: {
-                other_cluster_name: Base.Enum.EmptyString_Null,
-              },
-            },
-            {
-              properties: {
-                state_cluster_name: Base.Enum.EmptyString_Null,
+              not: {
+                required: ['state_cluster_name'],
               },
             },
           ],
+
         },
       },
       {
-        // If I have a cluster_total greater than zero, then I
-        // must have a valid cluster name. It cannot be N/A if the
-        // cluster total is greater than zero.
         'if': {
           properties: {
-            cluster_total: Types.number {
-              exclusiveMinimum: 0,
+            cluster_name: Types.string {
+              const: Base.Const.OTHER_CLUSTER,
             },
           },
         },
         'then': {
           allOf: [
             {
-              properties: {
-                cluster_name: Base.Compound.ClusterNamesStateOther,
-              },
+              required: ['other_cluster_name'],
             },
-            // IF we have OTHER_CLUSTER, THEN...
-            //   - other_cluster_name is required
-            //   - other_cluster_name must not be empty
-            //   - state_cluster_name must be empty
             {
-              'if': {
-                properties: {
-                  cluster_name: {
-                    const: Base.Const.OTHER_CLUSTER,
-                  },
-                },
-              },
-              'then': {
-                required: ['other_cluster_name'],
-                allOf: [
-                  {
-                    properties: {
-                      other_cluster_name: Base.Compound.NonEmptyString,
-                    },
-                  },
-                  {
-                    properties: {
-                      state_cluster_name: Base.Enum.EmptyString_Null,
-                    },
-                  },
-                ],
-              },
-            },
-            // IF we have STATE_CLUSTER, THEN...
-            //   - state_cluster_name is required
-            //   - state_cluster_name must not be empty
-            //   - other_cluster_name must be empty
-            {
-              'if': {
-                properties: {
-                  cluster_name: {
-                    const: Base.Const.STATE_CLUSTER,
-                  },
-                },
-              },
-              'then': {
+              not: {
                 required: ['state_cluster_name'],
-                allOf: [
-                  {
-                    properties: {
-                      other_cluster_name: Base.Enum.EmptyString_Null,
-                    },
-                  },
-                  {
-                    properties: {
-                      state_cluster_name: Base.Compound.NonEmptyString,
-                    },
-                  },
-                ],
               },
             },
+
           ],
+
+        },
+      },
+      {
+        'if': {
+          properties: {
+            cluster_name: Types.string {
+              const: Base.Const.STATE_CLUSTER,
+            },
+          },
+        },
+        'then': {
+          allOf: [
+            {
+              required: ['state_cluster_name'],
+            },
+            {
+              not: {
+                required: ['other_cluster_name'],
+              },
+            },
+
+          ],
+
         },
       },
     ],
-    // Handle all requireds conditionally?
-    required: ['cluster_name', 'cluster_total'],
   },
 
   DirectOrIndirectAward: Types.object {
@@ -336,16 +235,54 @@ local Parts = {
     description: 'If direct_award is N, the form must include a list of the pass-through entity by name and identifying number',
     properties: {
       is_direct: Base.Enum.YorN,
-      entities: Types.array,
+      entities: Types.array {
+        items: Validations.PassThroughEntity,
+      },
     },
-    allOf: Validations.DirectAwardValidations,
+    required: ['is_direct'],
+    allOf: [
+      {
+        'if': {
+          properties: {
+            is_direct: {
+              const: Base.Const.N,
+            },
+          },
+        },
+        'then': {
+          required: ['entities'],
+        },
+      },
+      {
+        'if': {
+          properties: {
+            is_direct: {
+              const: Base.Const.Y,
+            },
+          },
+        },
+        'then': {
+          not: {
+            required: ['entities'],
+          },
+        },
+      },
+    ],
   },
   LoanOrLoanGuarantee: Types.object {
     additionalProperties: false,
     description: 'A loan or loan guarantee and balance',
     properties: {
       is_guaranteed: Base.Enum.YorN,
-      loan_balance_at_audit_period_end: Func.compound_type([Types.number, Types.string]),
+      loan_balance_at_audit_period_end: {
+        anyOf: [
+          Types.integer,
+          Types.string { pattern: '[0-9]+' },
+          Types.string {
+            const: Base.Const.NA,
+          },
+        ],
+      },
     },
     required: [
       'is_guaranteed',
@@ -356,8 +293,11 @@ local Parts = {
     additionalProperties: false,
     properties: {
       is_passed: Base.Enum.YorN,
-      subrecipient_amount: Func.compound_type([Types.number, Types.string]),
+      subrecipient_amount: Types.number {
+        minimum: 0,
+      },
     },
+    required: ['is_passed'],
     allOf: Validations.SubrecipientValidations,
   },
   Program: Types.object {
@@ -365,15 +305,27 @@ local Parts = {
     properties: {
       federal_agency_prefix: Base.Compound.ALNPrefixes,
       three_digit_extension: Base.Compound.ThreeDigitExtension,
-      additional_award_identification: Func.compound_type([Types.string, Types.NULL, Types.integer]),
+      additional_award_identification: Types.string,
       program_name: Types.string,
-      amount_expended: Types.number,
-      federal_program_total: Types.number,
+      amount_expended: Types.number {
+        minimum: 0,
+      },
+      federal_program_total: Types.number {
+        minimum: 0,
+      },
       is_major: Base.Enum.YorN,
-      audit_report_type: Func.compound_type([Base.Enum.MajorProgramAuditReportType, Types.NULL]),
+      audit_report_type: Base.Enum.MajorProgramAuditReportType,
       number_of_audit_findings: Types.integer,
     },
-    required: ['program_name', 'federal_agency_prefix', 'three_digit_extension', 'is_major', 'number_of_audit_findings'],
+    required: [
+      'program_name',
+      'federal_agency_prefix',
+      'three_digit_extension',
+      'is_major',
+      'number_of_audit_findings',
+      'federal_program_total',
+      'amount_expended',
+    ],
     allOf: Validations.ProgramValidations,
   },
 };
@@ -423,9 +375,9 @@ local FederalAwards = Types.object {
     federal_awards: Types.array {
       items: FederalAwardEntry,
     },
-    total_amount_expended: Func.compound_type([Types.number {
+    total_amount_expended: Types.number {
       minimum: 0,
-    }, Types.NULL]),
+    },
   },
   required: ['auditee_uei', 'total_amount_expended'],
   title: 'FederalAward',

@@ -52,7 +52,7 @@
                "enum": [
                   "Y",
                   "N",
-                  "Y&N"
+                  "Both"
                ],
                "type": "string"
             },
@@ -60,6 +60,13 @@
                "items": {
                   "additionalProperties": false,
                   "properties": {
+                     "contains_chart_or_table": {
+                        "enum": [
+                           "Y",
+                           "N"
+                        ],
+                        "type": "string"
+                     },
                      "note_content": {
                         "type": "string"
                      },
@@ -72,7 +79,8 @@
                   },
                   "required": [
                      "note_title",
-                     "note_content"
+                     "note_content",
+                     "contains_chart_or_table"
                   ],
                   "title": "NotesToSefaEntry"
                },
@@ -85,7 +93,8 @@
          "required": [
             "auditee_uei",
             "accounting_policies",
-            "is_minimis_rate_used"
+            "is_minimis_rate_used",
+            "rate_explained"
          ],
          "title": "NotesToSefa",
          "type": "object",

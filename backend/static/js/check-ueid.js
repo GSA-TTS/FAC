@@ -2,6 +2,7 @@ import { checkValidity } from './validate.js';
 import { queryAPI } from './api';
 
 const FORM = document.forms[0];
+var isUEIValidated = false;
 
 function handleUEIDResponse({ valid, response, errors }) {
   if (valid) {
@@ -60,6 +61,8 @@ function showValidUeiInfo() {
 function setupFormWithValidUei() {
   hideUeiStuff();
   showValidUeiInfo();
+  isUEIValidated = true;
+  setFormDisabled(false);
 }
 
 function resetModal() {
@@ -208,7 +211,18 @@ function validateFyStartDate(fyInput) {
 
 function setFormDisabled(shouldDisable) {
   const continueBtn = document.getElementById('continue');
-  continueBtn.disabled = shouldDisable;
+  // If we want to disable the button, do it.
+  if (shouldDisable) {
+    continueBtn.disabled = true;
+    return;
+  }
+
+  // If we want to enable the button, the UEI validation should be done.
+  if (!shouldDisable && isUEIValidated) {
+    continueBtn.disabled = false;
+  } else {
+    continueBtn.disabled = true;
+  }
 }
 
 function allResponsesValid() {
@@ -262,6 +276,7 @@ function attachDatePickerHandlers() {
 function init() {
   attachEventHandlers();
   window.addEventListener('load', attachDatePickerHandlers, false); // Need to wait for date-picker text input to render.
+  setFormDisabled(true); // Disabled initially, re-enables after filling everything out.
 }
 
 init();

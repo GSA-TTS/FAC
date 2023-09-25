@@ -174,7 +174,7 @@ local open_ranges_defns = [
   ],
   [
     open_range_w24 {
-      help: Help.yorn,
+      help: Help.prior_references,
     },
     SV.NoValidation,
     'If Repeat Finding, provide Prior Year Audit Finding Reference Number(s)',
@@ -187,7 +187,6 @@ local open_ranges_defns = [
       help: Help.yorn,
     },
     SV.YoNValidation,
-    //FIXME MSHD: If we end up adding an instructions sheet, then we add back" - See Instructions tab" to the end of this string below
     'Is Findings Combination Valid? (Read Only)',
     'is_valid',
   ],

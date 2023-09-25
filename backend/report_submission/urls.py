@@ -5,10 +5,11 @@ app_name = "report_submission"
 
 upload_page_ids = [
     "federal-awards",
+    "notes-to-sefa",
     "audit-findings",
     "audit-findings-text",
     "CAP",
-    "additional-EINs",
+    "additional-eins",
     "additional-ueis",
     "secondary-auditors",
 ]
@@ -32,7 +33,7 @@ urlpatterns = [
 for page_id in upload_page_ids:
     urlpatterns.append(
         path(
-            "{}/<str:report_id>".format(page_id),
+            f"{page_id.lower()}/<str:report_id>",
             views.UploadPageView.as_view(),
             name=page_id,
         )

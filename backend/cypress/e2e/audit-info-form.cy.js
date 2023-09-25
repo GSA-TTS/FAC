@@ -4,7 +4,7 @@
 */
 describe('Audit Information Form', () => {
   beforeEach(() => {
-    cy.visit('/report_submission/audit-info/2022XB40001000002');
+    cy.visit('/audit/audit-info/2022JAN0001000006');
   });
 
   function answerAllQuestions() {

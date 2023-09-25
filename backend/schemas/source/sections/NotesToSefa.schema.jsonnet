@@ -25,9 +25,10 @@ local NotesToSefaEntry = {
   properties: {
     note_title: Types.string,
     note_content: Types.string,
+    contains_chart_or_table: Base.Enum.YorN,
     seq_number: Types.integer,
   },
-  required: ['note_title', 'note_content'],
+  required: ['note_title', 'note_content', 'contains_chart_or_table'],
   title: 'NotesToSefaEntry',
 };
 
@@ -42,7 +43,7 @@ local NotesToSefa = Types.object {
       items: NotesToSefaEntry,
     },
   },
-  required: ['auditee_uei', 'accounting_policies', 'is_minimis_rate_used'],
+  required: ['auditee_uei', 'accounting_policies', 'is_minimis_rate_used', 'rate_explained'],
   title: 'NotesToSefa',
   version: 20230713,
 };

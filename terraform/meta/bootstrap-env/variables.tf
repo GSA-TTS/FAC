@@ -39,3 +39,9 @@ variable "allow_ssh" {
   description = "whether SSH should be enabled in the space (and corresponding egress space)"
   default     = true
 }
+
+variable "populate_creds_locally" {
+  type        = bool
+  description = "whether to create files for working with the environment locally; specify true during local development"
+  default     = false
+}

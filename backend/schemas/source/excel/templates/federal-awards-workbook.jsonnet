@@ -203,8 +203,8 @@ local open_ranges_defns = [
   ],
   [
     Sheets.open_range {
-      format: 'dollar',
-      help: Help.positive_number,
+      format: 'text',
+      help: Help.unknown,
     },
     SV.LoanBalanceValidation,
     'If yes (Loan/Loan Guarantee), End of Audit Period Outstanding Loan Balance',

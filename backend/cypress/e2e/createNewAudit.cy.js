@@ -25,9 +25,13 @@ describe('Create new audit', () => {
 });
 
         it('Fills out the Audit submission access', () => {
+            cy.get('#certifying_auditee_contact_fullname').type('Real Full Name');
             cy.get('#certifying_auditee_contact_email').type('va@test');
             cy.get('#certifying_auditor_contact_email').type('qualified.human.accountant@auditor.com');
+            cy.get('#certifying_auditor_contact_fullname').type('A. Humanbeing');
+            cy.get('#auditee_contacts_fullname').type('Doe A. Deer');
             cy.get('#auditee_contacts_email').type('a@a.com');
+            cy.get('#auditor_contacts_fullname').type('Percy Person');
             cy.get('#auditor_contacts_email').type('c@c.com');
             cy.get('#create').click();
             cy.url().should('contain', '/report_submission/general-information/2023MAY0001000001');
