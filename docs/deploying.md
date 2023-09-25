@@ -92,6 +92,16 @@ cf push -f manifests/manifest-dev.yml
 5.  Verify that the deploy steps all passed.
 6.  After deployment, the changes should be on https://app.fac.gov/.
 7.  If anything was merged directly into the `prod` branch, such as a hotfix, merge `prod` back into `main`.
+8.  Login via CF and tail the logs during a deployment (before it gets to deploy application stage)
+```bash
+cf login -a api.fr.cloud.gov --sso
+Select an org:
+1. gsa-tts-oros-fac
+Select a space:
+5. production
+cf logs gsa-fac
+```
+9.  Post the most recent dbbackup and mediabackup file names in https://github.com/GSA-TTS/FAC/issues/2221
 
 To see more about branching and the deployment steps, see the [Branching](branching.md) page.
 
