@@ -249,15 +249,15 @@ class IntakeToDissemination(object):
                 return_dict[status] = None
         return return_dict
 
-    def _convert_utc_to_utc_minus_12(self, date):
-        utc_minus_12_zone = pytz.timezone("Etc/GMT+12")
+    def _convert_utc_to_american_samoa_zone(self, date):
+        us_samoa_zone = pytz.timezone("US/Samoa")
         # Ensure the datetime object is time zone aware
         if date.tzinfo is None or date.tzinfo.utcoffset(date) is None:
             date = pytz.utc.localize(date)
-        # Convert to UTC-12
-        utc_minus_12_time = date.astimezone(utc_minus_12_zone)
+        # Convert to American Samoa timezone (UTC-11)
+        american_samoa_time = date.astimezone(us_samoa_zone)
         # Extract the date and format it as YYYY-MM-DD
-        formatted_date = utc_minus_12_time.strftime("%Y-%m-%d")
+        formatted_date = american_samoa_time.strftime("%Y-%m-%d")
 
         return formatted_date
 
@@ -274,7 +274,7 @@ class IntakeToDissemination(object):
         ready_for_certification_date = dates_by_status[status.READY_FOR_CERTIFICATION]
         auditor_certified_date = dates_by_status[status.AUDITOR_CERTIFIED]
         auditee_certified_date = dates_by_status[status.AUDITEE_CERTIFIED]
-        submitted_date = self._convert_utc_to_utc_minus_12(
+        submitted_date = self._convert_utc_to_american_samoa_zone(
             dates_by_status[status.SUBMITTED]
         )
         auditee_certify_name = auditee_certification.get("auditee_signature", {}).get(
