@@ -1,7 +1,6 @@
 from datetime import datetime, time, timezone, timedelta
 import json
 from django.test import TestCase
-import random
 from model_bakery import baker
 from faker import Faker
 
