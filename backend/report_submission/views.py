@@ -9,6 +9,7 @@ from django.views import View
 
 import api.views
 
+from audit.cross_validation.naming import NC, SECTION_NAMES as SN
 from audit.models import Access, SingleAuditChecklist, LateChangeError, SubmissionEvent
 from audit.validators import validate_general_information_json
 
@@ -296,7 +297,7 @@ class UploadPageView(LoginRequiredMixin, View):
                 "view_id": "federal-awards",
                 "view_name": "Federal awards",
                 "instructions": "Enter the federal awards you received in the last audit year using the provided worksheet.",
-                "DB_id": "federal_awards",
+                "DB_id": SN[NC.FEDERAL_AWARDS].snake_case,
                 "instructions_url": instructions_base_url + "federal-awards/",
                 "workbook_url": workbook_base_url + "federal-awards-workbook.xlsx",
             },
@@ -304,7 +305,7 @@ class UploadPageView(LoginRequiredMixin, View):
                 "view_id": "notes-to-sefa",
                 "view_name": "Notes to SEFA",
                 "instructions": "Enter the notes on the Schedule of Expenditures of Federal Awards (SEFA) using the provided worksheet.",
-                "DB_id": "notes_to_sefa",
+                "DB_id": SN[NC.NOTES_TO_SEFA].snake_case,
                 "instructions_url": instructions_base_url + "notes-to-sefa/",
                 "workbook_url": workbook_base_url + "notes-to-sefa-workbook.xlsx",
             },
@@ -312,7 +313,7 @@ class UploadPageView(LoginRequiredMixin, View):
                 "view_id": "audit-findings",
                 "view_name": "Audit findings",
                 "instructions": "Enter the audit findings for your federal awards using the provided worksheet.",
-                "DB_id": "findings_uniform_guidance",
+                "DB_id": SN[NC.FINDINGS_UNIFORM_GUIDANCE].snake_case,
                 "instructions_url": instructions_base_url
                 + "federal-awards-audit-findings/",
                 "no_findings_disclaimer": True,
@@ -323,7 +324,7 @@ class UploadPageView(LoginRequiredMixin, View):
                 "view_id": "audit-findings-text",
                 "view_name": "Audit findings text",
                 "instructions": "Enter the text for your audit findings using the provided worksheet.",
-                "DB_id": "findings_text",
+                "DB_id": SN[NC.FINDINGS_TEXT].snake_case,
                 "instructions_url": instructions_base_url
                 + "federal-awards-audit-findings-text/",
                 "no_findings_disclaimer": True,
@@ -334,7 +335,7 @@ class UploadPageView(LoginRequiredMixin, View):
                 "view_id": "cap",
                 "view_name": "Corrective Action Plan (CAP)",
                 "instructions": "Enter your CAP text using the provided worksheet.",
-                "DB_id": "corrective_action_plan",
+                "DB_id": SN[NC.CORRECTIVE_ACTION_PLAN].snake_case,
                 "instructions_url": instructions_base_url + "corrective-action-plan/",
                 "no_findings_disclaimer": True,
                 "workbook_url": workbook_base_url
@@ -344,6 +345,7 @@ class UploadPageView(LoginRequiredMixin, View):
                 "view_id": "additional-ueis",
                 "view_name": "Additional UEIs",
                 "instructions": "Enter any additional UEIs using the provided worksheet.",
+                "DB_id": SN[NC.ADDITIONAL_UEIS].snake_case,
                 "instructions_url": instructions_base_url + "additional-ueis-workbook/",
                 "workbook_url": workbook_base_url + "additional-ueis-workbook.xlsx",
             },
@@ -351,6 +353,7 @@ class UploadPageView(LoginRequiredMixin, View):
                 "view_id": "secondary-auditors",
                 "view_name": "Secondary auditors",
                 "instructions": "Enter any additional auditors using the provided worksheet.",
+                "DB_id": SN[NC.SECONDARY_AUDITORS].snake_case,
                 "instructions_url": instructions_base_url
                 + "secondary-auditors-workbook/",
                 "workbook_url": workbook_base_url + "secondary-auditors-workbook.xlsx",
@@ -359,6 +362,7 @@ class UploadPageView(LoginRequiredMixin, View):
                 "view_id": "additional-eins",
                 "view_name": "Additional EINs",
                 "instructions": "Enter any additional EINs using the provided worksheet.",
+                "DB_id": SN[NC.ADDITIONAL_EINS].snake_case,
                 "instructions_url": instructions_base_url + "additional-eins-workbook/",
                 "workbook_url": workbook_base_url + "additional-eins-workbook.xlsx",
             },
