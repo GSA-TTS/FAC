@@ -349,17 +349,19 @@ class IntakeToDisseminationTests(TestCase):
         )
 
     def test_submitted_date(self):
-        """The date of submission should be disseminated as the prior date if the submission occurs before 11 a.m."""
+        """
+        The date of submission should be disseminated using the time in American Samoa.
+        """
         self.intake_to_dissemination.load_general()
         self.intake_to_dissemination.save_dissemination_objects()
         generals = General.objects.all()
         self.assertEqual(len(generals), 1)
         general = generals.first()
 
-        # Calculate the date before today
-        day_before = datetime.now().date() - timedelta(days=1)
+        # Calculate the date at UTC-11 (the American Samoa timezone does not do DST)
+        date_in_american_samoa = (datetime.utcnow() - timedelta(hours=11)).date()
 
-        self.assertEqual(general.submitted_date, day_before)
+        self.assertEqual(general.submitted_date, date_in_american_samoa)
 
     def test_load_federal_award(self):
         self.intake_to_dissemination.load_federal_award()
