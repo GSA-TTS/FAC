@@ -67,7 +67,8 @@ class TribalAuditConsentView(SingleAuditChecklistAccessRequiredMixin, generic.Vi
                 )
                 sac.tribal_data_consent = cleaned_data
                 sac.save(
-                    event_user=request.user, event_type=SubmissionEvent.EventType.TRIBAL_CONSENT_UPDATED
+                    event_user=request.user,
+                    event_type=SubmissionEvent.EventType.TRIBAL_CONSENT_UPDATED,
                 )
 
                 return redirect(reverse("audit:SubmissionProgress", args=[report_id]))
