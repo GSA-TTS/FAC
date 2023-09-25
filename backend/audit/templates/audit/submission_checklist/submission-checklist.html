@@ -60,6 +60,15 @@
                         {% endif %}
                     </li>
                     
+                    {% comment %} Tribal audit consent {% endcomment %}
+                    <li class="usa-icon-list__item padding-bottom-105" id="tribal_consent-completed">
+                        {% include './icon-list-icon.html' with completed=False %}
+                        <p class="text-bold margin-0">
+                            <a class="usa-link"
+                                href="{% url 'audit:TribalAuditConsent' report_id %}">Tribal data release</a>
+                        </p>
+                    </li>
+                    
                     {% comment %} Auditor Certification {% endcomment %}
                     <li class="usa-icon-list__item padding-bottom-105"
                         id="auditor-certification-completed">

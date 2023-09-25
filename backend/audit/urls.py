@@ -71,6 +71,11 @@ urlpatterns = [
         name="UploadReport",
     ),
     path(
+        "tribal-audit-consent/<str:report_id>",
+        views.TribalAuditConsentView.as_view(),
+        name="TribalAuditConsent",
+    ),
+    path(
         "cross-validation/<str:report_id>",
         views.CrossValidationView.as_view(),
         name="CrossValidation",

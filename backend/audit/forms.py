@@ -135,3 +135,9 @@ class AuditeeCertificationStep2Form(forms.Form):
     auditee_name = forms.CharField()
     auditee_title = forms.CharField()
     auditee_certification_date_signed = forms.DateField()
+
+
+class TribalAuditConsentForm(forms.Form):
+    is_tribal_information_authorized_to_be_public = forms.BooleanField()
+    tribal_authorization_certifying_official_name = forms.CharField()
+    tribal_authorization_certifying_official_date = forms.DateField()
