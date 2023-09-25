@@ -8,19 +8,10 @@
          "type": "boolean"
       },
       "tribal_authorization_certifying_official_date": {
-         "oneOf": [
-            {
-               "format": "date"
-            },
-            {
-               "const": "",
-               "type": "string"
-            }
-         ],
+         "format": "date",
          "type": "string"
       },
       "tribal_authorization_certifying_official_name": {
-         "maxLength": 100,
          "type": "string"
       }
    },

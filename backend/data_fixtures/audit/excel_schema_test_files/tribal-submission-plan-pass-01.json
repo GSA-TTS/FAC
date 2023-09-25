@@ -1,0 +1,20 @@
+{
+  "Meta": {
+    "section_name": "TribalSubmission"
+  },
+  "TribalSubmission": {
+    "auditee_uei": "AAA123456BBC",
+    "tribal_submission_plan_entries": [
+      {
+        "is_tribal_information_authorized_to_be_public": "Y",
+        "tribal_authorization_certifying_official_name": "John Doe",
+        "tribal_authorization_certifying_official_date": "2023-01-01"
+      },
+      {
+        "is_tribal_information_authorized_to_be_public": "N",
+        "tribal_authorization_certifying_official_name": "Jane Doe",
+        "tribal_authorization_certifying_official_date": "2023-02-01"
+      }
+    ]
+  }
+}
