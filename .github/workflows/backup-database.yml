@@ -29,6 +29,7 @@ jobs:
           command: cf bind-service gsa-fac backups -w
 
       - name: Backup the database in ${{ inputs.environment }}
+        if: ${{ inputs.environment != 'staging'}}
         uses: cloud-gov/cg-cli-tools@main
         with:
           cf_username: ${{ secrets.CF_USERNAME }}
