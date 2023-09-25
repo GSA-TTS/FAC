@@ -23,7 +23,7 @@ jobs:
 
       - uses: actions/setup-node@v3
         with:
-          node-version: 16
+          node-version: 18
 
       - name: Create .env
         working-directory: ./backend
@@ -73,7 +73,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v3
         with:
-          node-version: 16
+          node-version: 18
       - name: Start services
         working-directory: ./backend
         run: |
