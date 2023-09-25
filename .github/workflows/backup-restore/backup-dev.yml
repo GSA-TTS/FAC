@@ -1,0 +1,16 @@
+# This workflow backs up data for the dev environment.
+
+name: Dev Backup
+
+on:
+  workflow_dispatch:
+
+jobs:
+  dispatch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/workflow-call@v3
+        with:
+          workflow: Backup fac data
+          inputs:
+              environment: "dev"
