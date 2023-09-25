@@ -1,7 +1,6 @@
-from datetime import datetime, timezone
+from datetime import datetime, time, timezone, timedelta
 import json
 from django.test import TestCase
-
 from model_bakery import baker
 from faker import Faker
 
@@ -23,6 +22,35 @@ from dissemination.models import (
 )
 
 
+def _set_transitions_hour(sac, hour):
+    statuses = [
+        SingleAuditChecklist.STATUS.READY_FOR_CERTIFICATION,
+        SingleAuditChecklist.STATUS.AUDITOR_CERTIFIED,
+        SingleAuditChecklist.STATUS.AUDITEE_CERTIFIED,
+        SingleAuditChecklist.STATUS.SUBMITTED,
+    ]
+    # Get the current time in UTC
+    current = datetime.now(timezone.utc).date()
+    transition_date = datetime.combine(
+        current,
+        time(
+            hour=hour,
+            minute=0,
+            second=0,
+            microsecond=0,
+            tzinfo=timezone.utc,
+        ),
+    )
+
+    for status in statuses:
+        sac.transition_date.append(transition_date)
+        sac.transition_name.append(status)
+        # Increment the minute by 2
+        transition_date += timedelta(minutes=2)
+
+    return sac
+
+
 class IntakeToDisseminationTests(TestCase):
     def __init__(self, methodName: str = "runTest") -> None:
         super().__init__(methodName)
@@ -34,11 +62,16 @@ class IntakeToDisseminationTests(TestCase):
             SingleAuditChecklist.STATUS.AUDITEE_CERTIFIED,
             SingleAuditChecklist.STATUS.SUBMITTED,
         ]
+        # Get the current time in UTC
+        transition_date = datetime.now(timezone.utc)
 
         for status in statuses:
-            sac.transition_date.append(datetime.now(timezone.utc))
+            sac.transition_date.append(transition_date)
             sac.transition_name.append(status)
-            sac.save()
+            # Increment the minute by 2
+            transition_date += timedelta(minutes=2)
+
+        return sac
 
     def setUp(self):
         self.user = baker.make(User)
@@ -59,7 +92,7 @@ class IntakeToDisseminationTests(TestCase):
             cognizant_agency="42",
             oversight_agency="42",
         )
-        self._run_state_transition(sac)
+        sac = self._run_state_transition(sac)
         self.sac = sac
         self.intake_to_dissemination = IntakeToDissemination(self.sac)
         self.report_id = sac.report_id
@@ -337,6 +370,33 @@ class IntakeToDisseminationTests(TestCase):
             general.gaap_results,
         )
 
+    def test_submitted_date(self):
+        """
+        The date of submission should be disseminated using the time in American Samoa.
+        """
+        hours = range(0, 24)
+
+        for hour in hours:
+            with self.subTest():
+                self.setUp()
+                self.sac.transition_date = []
+                self.sac.transition_name = []
+                sac = _set_transitions_hour(self.sac, hour)
+                sac.save()
+                self.intake_to_dissemination.load_general()
+                self.intake_to_dissemination.save_dissemination_objects()
+                generals = General.objects.all()
+                self.assertEqual(len(generals), 1)
+                general = generals.first()
+
+                # Get the sac submitted date
+                subdate = self.sac.get_transition_date(self.sac.STATUS.SUBMITTED)
+                # Calculate the date at UTC-11 (the American Samoa timezone does not do DST)
+                date_in_american_samoa = (subdate - timedelta(hours=11)).date()
+
+                self.assertEqual(general.submitted_date, date_in_american_samoa)
+                general.delete()
+
     def test_load_federal_award(self):
         self.intake_to_dissemination.load_federal_award()
         self.intake_to_dissemination.save_dissemination_objects()
@@ -443,7 +503,7 @@ class IntakeToDisseminationTests(TestCase):
             audit_information=self._fake_audit_information(),
             auditee_certification=self._fake_auditee_certification(),
         )
-        self._run_state_transition(sac)
+        sac = self._run_state_transition(sac)
         self.sac = sac
         self.intake_to_dissemination = IntakeToDissemination(self.sac)
         self.intake_to_dissemination.load_all()
@@ -469,7 +529,7 @@ class IntakeToDisseminationTests(TestCase):
             audit_information=self._fake_audit_information(),
             auditee_certification=self._fake_auditee_certification(),
         )
-        self._run_state_transition(sac)
+        sac = self._run_state_transition(sac)
         self.sac = sac
         self.intake_to_dissemination = IntakeToDissemination(self.sac)
         self.report_id = sac.report_id

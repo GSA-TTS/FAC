@@ -54,14 +54,14 @@ module "s3-backups" {
 # TODO: We should have a corresponding "unshar-backup-from-spaces" resource, in
 # case a space is removed from the list
 
-resource "null_resource" "share-backup-to-spaces" {
-  provisioner "local-exec" {
-    environment = {
-      SPACES = "${local.spaces_that_use_backups}"
-    }
-    command = "for space in $SPACES ; do cf share-service backups -s $space; done"
-  }
-  depends_on = [
-    module.s3-backups
-  ]
-}
+# resource "null_resource" "share-backup-to-spaces" {
+#   provisioner "local-exec" {
+#     environment = {
+#       SPACES = "${local.spaces_that_use_backups}"
+#     }
+#     command = "for space in $SPACES ; do cf share-service backups -s $space; done"
+#   }
+#   depends_on = [
+#     module.s3-backups
+#   ]
+# }

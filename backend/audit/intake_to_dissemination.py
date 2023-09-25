@@ -1,6 +1,6 @@
 import logging
 from datetime import datetime
-
+import pytz
 from django.db import IntegrityError
 
 from dissemination.models import (
@@ -249,6 +249,18 @@ class IntakeToDissemination(object):
                 return_dict[status] = None
         return return_dict
 
+    def _convert_utc_to_american_samoa_zone(self, date):
+        us_samoa_zone = pytz.timezone("US/Samoa")
+        # Ensure the datetime object is time zone aware
+        if date.tzinfo is None or date.tzinfo.utcoffset(date) is None:
+            date = pytz.utc.localize(date)
+        # Convert to American Samoa timezone (UTC-11)
+        american_samoa_time = date.astimezone(us_samoa_zone)
+        # Extract the date and format it as YYYY-MM-DD
+        formatted_date = american_samoa_time.strftime("%Y-%m-%d")
+
+        return formatted_date
+
     def load_general(self):
         general_information = self.single_audit_checklist.general_information
         audit_information = self.single_audit_checklist.audit_information or {}
@@ -262,7 +274,9 @@ class IntakeToDissemination(object):
         ready_for_certification_date = dates_by_status[status.READY_FOR_CERTIFICATION]
         auditor_certified_date = dates_by_status[status.AUDITOR_CERTIFIED]
         auditee_certified_date = dates_by_status[status.AUDITEE_CERTIFIED]
-        submitted_date = dates_by_status[status.SUBMITTED]
+        submitted_date = self._convert_utc_to_american_samoa_zone(
+            dates_by_status[status.SUBMITTED]
+        )
         auditee_certify_name = auditee_certification.get("auditee_signature", {}).get(
             "auditee_name", ""
         )
