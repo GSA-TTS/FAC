@@ -323,10 +323,9 @@ class IntakeToDissemination(object):
             general_data["is_additional_ueis"] = addl
 
         if general_information["user_provided_organization_type"] == "tribal":
-            is_public = (
-                tribal_data_consent["is_tribal_information_authorized_to_be_public"]
-                == "Y"
-            )
+            is_public = tribal_data_consent[
+                "is_tribal_information_authorized_to_be_public"
+            ]
         else:
             is_public = True
 

@@ -77,7 +77,7 @@ class IntakeToDisseminationTests(TestCase):
         user_provided_organization_type=None,
         cognizant_agency=None,
         oversight_agency=None,
-        is_tribal_info_authorized=None,
+        privacy_flag=None,
     ):
         if reference_number:
             findings_text_data = self._fake_findings_text(
@@ -93,13 +93,6 @@ class IntakeToDisseminationTests(TestCase):
         else:
             general_data = self._fake_general()
 
-        if is_tribal_info_authorized:
-            tribal_data_consent = self._fake_tribal_data_consent(
-                is_tribal_info_authorized=is_tribal_info_authorized
-            )
-        else:
-            tribal_data_consent = self._fake_tribal_data_consent()
-
         sac = SingleAuditChecklist.objects.create(
             submitted_by=self.user,
             general_information=general_data,
@@ -113,7 +106,7 @@ class IntakeToDisseminationTests(TestCase):
             additional_eins=self._fake_additional_eins(),
             audit_information=self._fake_audit_information(),
             auditee_certification=self._fake_auditee_certification(),
-            tribal_data_consent=tribal_data_consent,
+            tribal_data_consent=self._fake_tribal_data_consent(privacy_flag),
             cognizant_agency=cognizant_agency,
             oversight_agency=oversight_agency,
         )
@@ -362,16 +355,16 @@ class IntakeToDisseminationTests(TestCase):
         return audit_information
 
     @staticmethod
-    def _fake_tribal_data_consent(is_tribal_info_authorized=None):
+    def _fake_tribal_data_consent(privacy_flag=None):
         fake = Faker()
 
-        if is_tribal_info_authorized is None:
-            is_tribal_info_authorized = "Y" if fake.boolean() else "N"
+        if privacy_flag is None:
+            privacy_flag = fake.boolean()
 
         return {
-            "is_tribal_information_authorized_to_be_public": is_tribal_info_authorized,
+            "is_tribal_information_authorized_to_be_public": privacy_flag,
             "tribal_authorization_certifying_official_name": fake.word(),
-            "tribal_authorization_certifying_official_date": fake.date(),
+            "tribal_authorization_certifying_official_title": fake.word(),
         }
 
     @staticmethod
@@ -441,30 +434,28 @@ class IntakeToDisseminationTests(TestCase):
                 self.assertEqual(general.submitted_date, date_in_american_samoa)
                 general.delete()
 
-    def _setup_and_test_privacy_flag(
-        self, is_tribal_info_authorized, expected_is_public
-    ):
+    def _setup_and_test_privacy_flag(self, flag):
         """Common setup and test logic for tribal data privacy flag tests."""
 
         sac = self._create_sac(
-            is_tribal_info_authorized=is_tribal_info_authorized,
+            privacy_flag=flag,
             user_provided_organization_type="tribal",
         )
         self._run_state_transition(sac)
-        self.sac = sac
-        self.intake_to_dissemination = IntakeToDissemination(self.sac)
+        self.intake_to_dissemination = IntakeToDissemination(sac)
         self.intake_to_dissemination.load_all()
         self.intake_to_dissemination.save_dissemination_objects()
         general = General.objects.first()
-        self.assertEqual(general.is_public, expected_is_public)
+        self.assertEqual(general.entity_type, "tribal")
+        self.assertEqual(general.is_public, flag)
 
-    def test_tribal_data_with_public_access(self):
+    def test_tribal_data_is_public_when_authorized(self):
         """Test that tribal data privacy flag is enabled when user has authorized it to be public."""
-        self._setup_and_test_privacy_flag("Y", True)
+        self._setup_and_test_privacy_flag(True)
 
-    def test_tribal_data_without_public_access(self):
+    def test_tribal_data_is_private_when_not_authorized(self):
         """Test that tribal data privacy flag is disabled when user has not authorized it to be public."""
-        self._setup_and_test_privacy_flag("N", False)
+        self._setup_and_test_privacy_flag(False)
 
     def test_load_federal_award(self):
         self.intake_to_dissemination.load_federal_award()
@@ -568,6 +559,7 @@ class IntakeToDisseminationTests(TestCase):
         self.assertLess(len_general, len(General.objects.all()))
         self.assertLess(len_captext, len(CapText.objects.all()))
         general = General.objects.first()
+        self.assertNotEqual(general.entity_type, "tribal")
         self.assertEqual(general.is_public, True)
 
     def test_load_and_return_objects(self):
