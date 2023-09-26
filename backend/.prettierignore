@@ -2,6 +2,7 @@
 static/scss/**
 static/compiled/**
 .lighthouseci/**
+cypress/**/*.cy.js
 
 # template linting/style checks handled by djlint
 report_submission/templates/**
