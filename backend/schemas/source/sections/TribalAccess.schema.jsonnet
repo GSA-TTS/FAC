@@ -14,10 +14,15 @@ Typechecks fields, but allows for empty data as well. Contains conditional Check
     tribal_authorization_certifying_official_date: Types.string {
       format: 'date',
     },
-    is_tribal_information_authorized_to_be_public: Types.boolean,
+    is_tribal_information_authorized_to_be_public: Base.Enum.YorN,
     tribal_authorization_certifying_official_name: Types.string,
   },
-  title: 'TribalSubmission',
+  required: [
+    'tribal_authorization_certifying_official_date',
+    'is_tribal_information_authorized_to_be_public',
+    'tribal_authorization_certifying_official_name'
+  ],
+  title: 'TribalAccess',
   type: 'object',
   version: null,
 }
