@@ -1,6 +1,6 @@
 @use 'uswds-core' as *;
 
-@media (width >= 64em) {
+@media (min-width: 64em) {
   .usa-logo {
     margin: 0;
   }
