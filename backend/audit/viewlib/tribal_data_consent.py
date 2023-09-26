@@ -21,19 +21,6 @@ class TribalDataConsent(SingleAuditChecklistAccessRequiredMixin, generic.View):
         try:
             sac = SingleAuditChecklist.objects.get(report_id=report_id)
             tribal_audit_consent = sac.tribal_data_consent or {}
-            if tribal_audit_consent.get(
-                "tribal_authorization_certifying_official_date"
-            ):
-                tribal_audit_consent[
-                    "tribal_authorization_certifying_official_date"
-                ] = datetime.strptime(
-                    tribal_audit_consent[
-                        "tribal_authorization_certifying_official_date"
-                    ],
-                    "%Y-%m-%d",
-                ).strftime(
-                    "%Y-%m-%d"
-                )
 
             context = {
                 "auditee_uei": sac.auditee_uei,
@@ -57,15 +44,9 @@ class TribalDataConsent(SingleAuditChecklistAccessRequiredMixin, generic.View):
             form = TribalAuditConsentForm(request.POST or None)
 
             if form.is_valid():
-                cleaned_data = form.cleaned_data
-                cleaned_data[
-                    "tribal_authorization_certifying_official_date"
-                ] = cleaned_data[
-                    "tribal_authorization_certifying_official_date"
-                ].strftime(
-                    "%Y-%m-%d"
-                )
-                sac.tribal_data_consent = cleaned_data
+                form.clean_booleans()
+
+                sac.tribal_data_consent = form.cleaned_data
                 sac.save(
                     event_user=request.user,
                     event_type=SubmissionEvent.EventType.TRIBAL_CONSENT_UPDATED,
@@ -73,7 +54,7 @@ class TribalDataConsent(SingleAuditChecklistAccessRequiredMixin, generic.View):
 
                 return redirect(reverse("audit:SubmissionProgress", args=[report_id]))
 
-            tribal_audit_consent = sac.get("tribal_data_consent")
+            tribal_audit_consent = sac.tribal_data_consent or {}
 
             context = {
                 "auditee_uei": sac.auditee_uei,
