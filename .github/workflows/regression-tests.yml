@@ -27,6 +27,8 @@ jobs:
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment }}
     env:
+      CYPRESS_API_GOV_KEY: ${{ secrets.CYPRESS_API_GOV_KEY }}
+      CYPRESS_API_GOV_URL: ${{ secrets.CYPRESS_API_GOV_URL }}
       CYPRESS_BASE_URL: ${{ inputs.url }}
       CYPRESS_LOGIN_TEST_EMAIL: ${{ secrets.CYPRESS_LOGIN_TEST_EMAIL }}
       CYPRESS_LOGIN_TEST_PASSWORD: ${{ secrets.CYPRESS_LOGIN_TEST_PASSWORD }}

@@ -102,6 +102,7 @@ dbkey_revisions = "Census mapping: REVISIONS, DBKEY"
 ein_list = "Data sources: SF-SAC 1997-2000: I/5/a; SF-SAC 2001-2003: I/5/a; SF-SAC 2004-2007: I/5/a; SF-SAC 2008-2009: I/4/a; SF-SAC 2010-2012: I/4/a; SF-SAC 2013-2015: I/4/a; SF-SAC 2016-2018: I/4/a; SF-SAC 2019-2021: I/4/a; SF-SAC 2022: I/4/a Census mapping: GENERAL, EIN (AND) Data sources: SF-SAC 2001-2003: I/5/c; SF-SAC 2004-2007: I/5/c; SF-SAC 2008-2009: I/4/c; SF-SAC 2010-2012: I/4/c; SF-SAC 2013-2015: I/4/c; SF-SAC 2016-2018: I/4/c; SF-SAC 2019-2021: I/4/c; SF-SAC 2022: I/4/c Census mapping: EIN INFO, EIN"
 charts_tables_captext = "Census mapping: CAPTEXT, CHARTSTABLES"
 charts_tables_findingstext = "Census mapping: FINDINGSTEXT, CHARTSTABLES"
+charts_tables_note = "Census mapping: "  # TODO: fill in census mapping here
 finding_ref_nums_captext = "Data sources: SF-SAC 2019-2021: IV/1; SF-SAC 2022: IV/1 Census mapping: CAPTEXT, FINDINGREFNUMS"
 finding_ref_nums_cfdainfo = "Data sources: SF-SAC 1997-2000: III/7/e; SF-SAC 2001-2003: III/11/b; SF-SAC 2004-2007: III/10/b; SF-SAC 2008-2009: III/10/b; SF-SAC 2010-2012: III/10/b; SF-SAC 2013-2015: III/7/d; SF-SAC 2016-2018: III/4/e; SF-SAC 2019-2021: III/4/e; SF-SAC 2022: III/4/e Census mapping: CFDA INFO, FINDINGREFNUMS"
 finding_ref_nums_findings = "Data sources: SF-SAC 2013-2015: III/7/d; SF-SAC 2016-2018: III/4/e; SF-SAC 2019-2021: III/4/e; SF-SAC 2022: III/4/e Census mapping: FINDINGS, FINDINGSREFNUMS"

@@ -9,6 +9,7 @@ import { testAuditInformationForm } from '../support/audit-info-form.js';
 import { testPdfAuditReport } from '../support/report-pdf.js';
 import { testAuditorCertification } from '../support/auditor-certification.js';
 import { testAuditeeCertification } from '../support/auditee-certification.js';
+import { testReportIdFound, testReportIdNotFound } from '../support/dissemination-table.js';
 import {
   testWorkbookFederalAwards,
   testWorkbookNotesToSEFA,
@@ -23,6 +24,7 @@ import {
 const LOGIN_TEST_EMAIL_AUDITEE = Cypress.env('LOGIN_TEST_EMAIL_AUDITEE');
 const LOGIN_TEST_PASSWORD_AUDITEE = Cypress.env('LOGIN_TEST_PASSWORD_AUDITEE');
 const LOGIN_TEST_OTP_SECRET_AUDITEE = Cypress.env('LOGIN_TEST_OTP_SECRET_AUDITEE');
+const API_GOV_JWT = Cypress.env('API_GOV_JWT');
 
 describe('Full audit submission', () => {
   before(() => {
@@ -53,6 +55,12 @@ describe('Full audit submission', () => {
     // Now the accessandsubmission screen
     testValidAccess();
 
+    // Report should not yet be in the dissemination table
+    cy.url().then(url => {
+      const reportId = url.split('/').pop();
+      testReportIdNotFound(reportId);
+    });
+
     // Fill out the general info form
     testValidGeneralInfo();
 
@@ -80,11 +88,10 @@ describe('Full audit submission', () => {
 
     cy.get(".usa-link").contains("Secondary Auditors").click();
     testWorkbookSecondaryAuditors(false);
-    
-    
+
     cy.get(".usa-link").contains("Additional EINs").click();
     testWorkbookAdditionalEINs(false);
-    
+
     // Complete the audit information form
     cy.get(".usa-link").contains("Audit Information form").click();
     testAuditInformationForm();
@@ -96,9 +103,8 @@ describe('Full audit submission', () => {
     cy.get(".usa-link").contains("Auditor Certification").click();
     testAuditorCertification();
 
-    // Auditee certification
+    // Grab the report ID from the URL
     cy.url().then(url => {
-      // Grab the report ID from the URL
       const reportId = url.split('/').pop();
 
       testLogoutGov();
@@ -112,14 +118,24 @@ describe('Full audit submission', () => {
 
       cy.visit(`/audit/submission-progress/${reportId}`);
 
+      // Auditee certification
       cy.get(".usa-link").contains("Auditee Certification").click();
       testAuditeeCertification();
-    })
 
-    cy.get(".usa-link").contains("Submit to the FAC for processing").click();
-    cy.url().should('match', /\/audit\/submission\/[0-9A-Z]{17}/);
-    cy.get('#continue').click();
-    cy.url().should('match', /\/audit\//);
-    
+      // Submit
+      cy.get(".usa-link").contains("Submit to the FAC for processing").click();
+      cy.url().should('match', /\/audit\/submission\/[0-9A-Z]{17}/);
+      cy.get('#continue').click();
+      cy.url().should('match', /\/audit\//);
+
+      // The report ID should be found in the Completed Audits table
+      cy.get('.usa-table').contains(
+        'caption',
+        'The audits listed below have been submitted to the FAC for processing and may not be edited.',
+      ).siblings().contains('td', reportId);
+
+      // Report should now be in the dissemination table
+      testReportIdFound(reportId);
+    });
   });
 });
