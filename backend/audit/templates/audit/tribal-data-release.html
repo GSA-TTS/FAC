@@ -47,43 +47,45 @@
                         <span class="usa-error-message font-sans-md margin-top-2">{{ errors.is_tribal_information_authorized_to_be_public|striptags }}</span>
                     </fieldset>
 
-                    <p class="font-sans-lg text-bold margin-0">Agree and sign to auditor statement</p>
+                    <p class="font-sans-lg text-bold text-underline margin-0">Agree and sign to auditor statement</p>
                     {% comment %} This div is the grey box, and handles its own margins and padding. {% endcomment %}
-                    <div class="bg-base-lightest margin-top-2 padding-5 grid-row grid-gap-4">
-                        <fieldset class="usa-fieldset font-sans-md tablet:grid-col" id="question-certifier-name">
-                            <label class="usa-label margin-0 font-sans-md"
-                                   for="tribal_authorization_certifying_official_name">
-                                Name of certifying official
-                            </label>
-                            <input class="usa-input"
-                                   id="tribal_authorization_certifying_official_name"
-                                   name="tribal_authorization_certifying_official_name"
-                                   placeholder="[your name]"
-                                   required
-                                   value="{{ tribal_authorization_certifying_official_name }}" />
-                            <span class="usa-error-message font-sans-md margin-top-1">{{ errors.tribal_authorization_certifying_official_name|striptags }}</span>
-                        </fieldset>
-
-                        <fieldset class="usa-fieldset font-sans-md tablet:grid-col" id="question-certifier-title">
-                            <label class="usa-label margin-0 font-sans-md"
-                                for="tribal_authorization_certifying_official_title">
-                                Title of certifying official
-                            </label>
-                            <input class="usa-input"
-                                    id="tribal_authorization_certifying_official_title"
-                                    name="tribal_authorization_certifying_official_title"
-                                    placeholder="[your title]"
+                    <div class="bg-base-lightest margin-top-2 padding-5">
+                        <fieldset class="usa-fieldset grid-row grid-gap-5" id="question-signature-and-submit">
+                            <fieldset class="usa-fieldset font-sans-md tablet:grid-col" id="question-certifier-name">
+                                <label class="usa-label margin-0 font-sans-md"
+                                    for="tribal_authorization_certifying_official_name">
+                                    Name of certifying official
+                                </label>
+                                <input class="usa-input"
+                                    id="tribal_authorization_certifying_official_name"
+                                    name="tribal_authorization_certifying_official_name"
+                                    placeholder="[your name]"
                                     required
-                                    value="{{ tribal_authorization_certifying_official_title }}" />
-                            <span class="usa-error-message font-sans-md margin-top-1">{{ errors.tribal_authorization_certifying_official_title|striptags }}</span>
-                        </fieldset>
-                        
-                        <fieldset class="usa-fieldset margin-top-4 tablet:grid-col-12" id="aggree-or-cancel">
-                            <button class="usa-button" id="continue">Agree to Tribal data release</button>
-                            <a class="usa-button usa-button--unstyled margin-left-2 margin-top-2 tablet:margin-top-0"
-                               id="cancel-tribal-data-release-link"
-                               href="{% url 'audit:SubmissionProgress' report_id %}"
-                               aria-controls="form-cancel">Cancel</a>
+                                    value="{{ tribal_authorization_certifying_official_name }}" />
+                                <span class="usa-error-message font-sans-md margin-top-1">{{ errors.tribal_authorization_certifying_official_name|striptags }}</span>
+                            </fieldset>
+
+                            <fieldset class="usa-fieldset font-sans-md tablet:grid-col" id="question-certifier-title">
+                                <label class="usa-label margin-0 font-sans-md"
+                                    for="tribal_authorization_certifying_official_title">
+                                    Title of certifying official
+                                </label>
+                                <input class="usa-input"
+                                        id="tribal_authorization_certifying_official_title"
+                                        name="tribal_authorization_certifying_official_title"
+                                        placeholder="[your title]"
+                                        required
+                                        value="{{ tribal_authorization_certifying_official_title }}" />
+                                <span class="usa-error-message font-sans-md margin-top-1">{{ errors.tribal_authorization_certifying_official_title|striptags }}</span>
+                            </fieldset>
+                            
+                            <fieldset class="usa-fieldset margin-top-2 tablet:grid-col-12" id="aggree-or-cancel">
+                                <button class="usa-button" id="continue">Agree to Tribal data release</button>
+                                <a class="usa-button usa-button--unstyled margin-left-2 margin-top-2 tablet:margin-top-0"
+                                id="cancel-tribal-data-release-link"
+                                href="{% url 'audit:SubmissionProgress' report_id %}"
+                                aria-controls="form-cancel">Cancel</a>
+                            </fieldset>
                         </fieldset>
                     </div>
                 </fieldset>
