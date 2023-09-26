@@ -10,15 +10,15 @@ import { testReportIdFound, testReportIdNotFound } from '../support/disseminatio
 import { testFileUploadMsg } from '../support/file-uploaded-msg.js';
 
 import {
+    testWorkbookAdditionalEINs,
   testWorkbookFederalAwards,
-  testWorkbookCorrectiveActionPlan,
 } from '../support/workbook-uploads.js';
 
 const LOGIN_TEST_EMAIL_AUDITEE = Cypress.env('LOGIN_TEST_EMAIL_AUDITEE');
 const LOGIN_TEST_PASSWORD_AUDITEE = Cypress.env('LOGIN_TEST_PASSWORD_AUDITEE');
 const LOGIN_TEST_OTP_SECRET_AUDITEE = Cypress.env('LOGIN_TEST_OTP_SECRET_AUDITEE');
 
-describe('Corrective Action Plan page', () => {
+describe('Additional EINs page', () => {
   before(() => {
     cy.session('login-session', () => {
       cy.visit('/');
@@ -26,7 +26,7 @@ describe('Corrective Action Plan page', () => {
     });
   });
 
-  it('Corrective Action Plan uploads successfully', () => {
+  it('Additional EINs uploads successfully', () => {
     cy.visit('/');
 
     cy.url().should('include', '/');
@@ -54,13 +54,12 @@ describe('Corrective Action Plan page', () => {
     cy.get(".usa-link").contains("Federal Awards").click();
     testWorkbookFederalAwards(false);
 
-    cy.get(".usa-link").contains("Corrective Action Plan").click();
-    testWorkbookCorrectiveActionPlan(false);
+    cy.get(".usa-link").contains("Additional EINs").click();
+    testWorkbookAdditionalEINs(false);
   });
 
   it('Displays message if file has already been uploaded', () => {
-    testFileUploadMsg('Edit the Corrective Action Plan');
+    testFileUploadMsg('Edit the Additional EINs');
   });
 
 });
-

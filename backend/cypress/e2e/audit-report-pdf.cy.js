@@ -6,19 +6,17 @@ import { testValidAccess } from '../support/check-access.js';
 import { testValidEligibility } from '../support/check-eligibility.js';
 import { testValidAuditeeInfo } from '../support/auditee-info.js';
 import { testValidGeneralInfo } from '../support/general-info.js';
-import { testReportIdFound, testReportIdNotFound } from '../support/dissemination-table.js';
-import { testFileUploadMsg } from '../support/file-uploaded-msg.js';
+import { testPdfAuditReport   } from '../support/report-pdf.js';
 
 import {
   testWorkbookFederalAwards,
-  testWorkbookCorrectiveActionPlan,
 } from '../support/workbook-uploads.js';
 
 const LOGIN_TEST_EMAIL_AUDITEE = Cypress.env('LOGIN_TEST_EMAIL_AUDITEE');
 const LOGIN_TEST_PASSWORD_AUDITEE = Cypress.env('LOGIN_TEST_PASSWORD_AUDITEE');
 const LOGIN_TEST_OTP_SECRET_AUDITEE = Cypress.env('LOGIN_TEST_OTP_SECRET_AUDITEE');
 
-describe('Corrective Action Plan page', () => {
+describe('Audit report PDF page', () => {
   before(() => {
     cy.session('login-session', () => {
       cy.visit('/');
@@ -26,7 +24,7 @@ describe('Corrective Action Plan page', () => {
     });
   });
 
-  it('Corrective Action Plan uploads successfully', () => {
+  it('Audit report PDF uploads successfully', () => {
     cy.visit('/');
 
     cy.url().should('include', '/');
@@ -43,24 +41,26 @@ describe('Corrective Action Plan page', () => {
 
     testValidAccess();
 
-    // Report should not yet be in the dissemination table
-    cy.url().then(url => {
-      const reportId = url.split('/').pop();
-      testReportIdNotFound(reportId);
-    });
-
     testValidGeneralInfo();
 
     cy.get(".usa-link").contains("Federal Awards").click();
     testWorkbookFederalAwards(false);
 
-    cy.get(".usa-link").contains("Corrective Action Plan").click();
-    testWorkbookCorrectiveActionPlan(false);
+    cy.get(".usa-link").contains("Audit report PDF").click();
+    testPdfAuditReport(false);
   });
 
-  it('Displays message if file has already been uploaded', () => {
-    testFileUploadMsg('Edit the Corrective Action Plan');
+    it('Displays message if file has already been uploaded', () => {
+      cy.visit(`/audit/`);
+      cy.url().should('match', /\/audit\//);
+      cy.get(':nth-child(4) > .usa-table > tbody > tr').last().find('td:nth-child(1)>.usa-link').click();
+      cy.get('.usa-link').contains('Edit the Audit report PDF').click();
+      cy.get('#already-submitted')
+        .invoke('text')
+        .then((text) => {
+          const expectedText = 'A file has already been uploaded for this section. A successful reupload will overwrite your previous submission.';
+          expect(text.trim()).to.equal(expectedText);
+        });
+    });
+
   });
-
-});
-
