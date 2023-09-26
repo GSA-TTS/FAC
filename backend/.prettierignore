@@ -1,8 +1,16 @@
 **/uswds
 static/scss/**
 static/compiled/**
+
+# testing artifacts
 .lighthouseci/**
 cypress/**/*.cy.js
+data_fixtures/**
+audit/fixtures/**
+
+# rendered files
+schemas/output/**
+
 
 # template linting/style checks handled by djlint
 report_submission/templates/**
