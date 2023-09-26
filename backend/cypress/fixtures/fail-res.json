@@ -1,10 +1,10 @@
 {
-  "status": "error",
-  "message": "File upload failed",
-  "error": {
-    "code": 400,
-    "description": "The file upload request was invalid",
-    "type": "error_field",
-    "message": "Field Error: undefined"
-  }
+    "status": "error",
+    "message": "File upload failed",
+    "error": {
+        "code": 400,
+        "description": "The file upload request was invalid",
+        "type": "error_field",
+        "message": "Field Error: undefined"
+    }
 }

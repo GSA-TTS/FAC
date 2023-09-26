@@ -8,13 +8,13 @@ const { sassPlugin } = require('esbuild-sass-plugin');
 
 const watch = process.argv.includes('--watch');
 
-const jsPath = glob.sync(path.join('.', 'static', 'js', '*.js'));
+const jsPath = glob.sync(path.join('.','static','js','*.js'));
 
 const buildProps = {
   entryPoints: [...jsPath, 'static/scss/main.scss'],
   outdir: 'static/compiled',
-  minify: process.env.NODE_ENV === 'production',
-  sourcemap: process.env.NODE_ENV !== 'production',
+  minify: process.env.NODE_ENV === "production",
+  sourcemap: process.env.NODE_ENV !== "production",
   target: ['chrome58', 'firefox57', 'safari11', 'edge18'],
   bundle: true,
   format: 'iife',
@@ -29,26 +29,23 @@ const buildProps = {
   plugins: [
     sassPlugin({
       loadPaths: [
-        './node_modules/@uswds',
-        './node_modules/@uswds/uswds/packages',
-        './static/compiled/js',
+        "./node_modules/@uswds",
+        "./node_modules/@uswds/uswds/packages",
+        "./static/compiled/js",
       ],
     }),
-  ],
-};
+  ]
+}
 
 if (watch) {
   buildProps.watch = {
     onRebuild(error, result) {
-      runPostcss(
-        'static/compiled/scss/main.css',
-        'static/compiled/scss/main-post.css'
-      );
+      runPostcss('static/compiled/scss/main.css', 'static/compiled/scss/main-post.css');
 
-      if (error) console.error('watch build failed:', error);
-      else console.info('watch build succeeded:', result);
+      if (error) console.error('watch build failed:', error)
+      else console.info('watch build succeeded:', result)
     },
-  };
+  }
 }
 
 const runPostcss = (cssIn, cssOut) => {
@@ -57,26 +54,22 @@ const runPostcss = (cssIn, cssOut) => {
   fs.readFile(cssIn, (err, css) => {
     postcss([autoprefixer])
       .process(css, { from: cssIn, to: cssOut })
-      .then((result) => {
-        fs.writeFile(cssOut, result.css, () => true);
-        if (result.map) {
-          fs.writeFile(cssOut + '.map', result.map.toString(), () => true);
+      .then(result => {
+        fs.writeFile(cssOut, result.css, () => true)
+        if ( result.map ) {
+          fs.writeFile(cssOut + '.map', result.map.toString(), () => true)
         }
-      });
-  });
-};
+      })
+  })
+}
 
-require('esbuild')
-  .build(buildProps)
-  .then(() => {
-    runPostcss(
-      'static/compiled/scss/main.css',
-      'static/compiled/scss/main-post.css'
-    );
+require('esbuild').build(buildProps)
+  .then(() => { 
+    runPostcss('static/compiled/scss/main.css', 'static/compiled/scss/main-post.css');
     if (watch) {
-      console.info('Watching assets…');
+      console.info('Watching assets…')
     } else {
-      console.info('Assets compiled ✅');
+      console.info('Assets compiled ✅')
     }
   })
-  .catch(() => process.exit(1));
+  .catch(() => process.exit(1))

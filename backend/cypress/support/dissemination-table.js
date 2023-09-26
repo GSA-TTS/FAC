@@ -13,12 +13,12 @@ const requestOptions = {
     Authorization: `Bearer ${API_GOV_JWT}`,
     'X-Api-Key': API_GOV_KEY,
   },
-};
+}
 
 export function testReportIdNotFound(reportId) {
   cy.request({
     ...requestOptions,
-    qs: { report_id: `eq.${reportId}` },
+    qs: {report_id: `eq.${reportId}`},
   }).should((response) => {
     expect(response.body).to.have.length(0);
   });
@@ -27,12 +27,10 @@ export function testReportIdNotFound(reportId) {
 export function testReportIdFound(reportId) {
   cy.request({
     ...requestOptions,
-    qs: { report_id: `eq.${reportId}` },
+    qs: {report_id: `eq.${reportId}`},
   }).should((response) => {
     expect(response.body).to.have.length(1);
-    const hasAgency = !!(
-      response.body[0]?.cognizant_agency || response.body[0]?.oversight_agency
-    );
+    const hasAgency = !!(response.body[0]?.cognizant_agency || response.body[0]?.oversight_agency);
     expect(hasAgency).to.be.true;
   });
 }

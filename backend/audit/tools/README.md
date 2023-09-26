@@ -1,3 +1,4 @@
+
 # generate-sqlite-files
 
 The purpose of this tool is to take public, Census-generated pipe-delimited CSV files and turn them into an SQLite database.
@@ -15,7 +16,7 @@ It also creates two directories: `ay19` and `clean-ay19`. The second of these is
 
 ### Warning
 
-This will overwrite any SQLite file in this directory with that name. We assume that is OK.
+This will overwrite any SQLite file in this directory with that name. We assume that is OK. 
 
 The `.gitignore` in this directory should ignore the `.zip` and `.sqlite3` files.
 
