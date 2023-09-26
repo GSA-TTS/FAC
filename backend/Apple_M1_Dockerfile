@@ -6,6 +6,11 @@ ENV PYTHONUNBUFFERED 1
 RUN apt-get -y update
 RUN apt-get -y install git
 
+RUN apt-get update \
+ && DEBIAN_FRONTEND=noninteractive \
+    apt-get install --no-install-recommends --assume-yes \
+      postgresql-client
+
 # RUN --mount=type=cache,target=/root/.cache \
 
 WORKDIR ..
