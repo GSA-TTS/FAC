@@ -7,12 +7,10 @@ on:
         required: true
         type: string
         # dev, staging, production
-      dbbackup-name:
+      date-of-backup:
         required: true
-        type: string
-      mediabackup-name:
-        required: true
-        type: string
+        type: string # YYYY-MM-DD-HHmm
+
 
 jobs:
   restore-database:
@@ -21,6 +19,8 @@ jobs:
     environment: ${{ inputs.environment }}
     env:
       space: ${{ inputs.environment }}
+      dbbackup-name: "${{ inputs.environment }}-db-backup-${{ inputs.date-of-backup }}.psql.bin"
+      mediabackup-name: "${{ inputs.environment }}-media-backup-${{ inputs.date-of-backup }}.tar"
 
     steps:
       - name: Checkout
@@ -42,7 +42,7 @@ jobs:
           cf_password: ${{ secrets.CF_PASSWORD }}
           cf_org: gsa-tts-oros-fac
           cf_space: ${{ env.space }}
-          command: cf run-task gsa-fac -k 2G -m 2G --name pg_restore --command "./restore_database.sh ${{ inputs.dbbackup-name }} ${{ inputs.mediabackup-name }}"
+          command: cf run-task gsa-fac -k 2G -m 2G --name pg_restore --command "./restore_database.sh ${{ env.dbbackup-name }} ${{ env.mediabackup-name }}"
 
       - name: Sleep for 5 minutes to ensure restore occurs
         run: sleep 5m
