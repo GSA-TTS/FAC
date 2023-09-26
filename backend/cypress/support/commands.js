@@ -31,8 +31,8 @@ import { testLogoutGov } from './logout-gov.js';
 
 Cypress.Commands.add('login', () => {
   testLoginGovLogin();
-})
+});
 
-Cypress.Commands.add('logout',() => {
+Cypress.Commands.add('logout', () => {
   testLogoutGov();
-})
+});

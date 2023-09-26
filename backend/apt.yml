@@ -7,8 +7,8 @@
 # to a defined s3 bucket. Running v15 also matches the client and server database versions.
 cleancache: true
 keys:
-- https://www.postgresql.org/media/keys/ACCC4CF8.asc
+  - https://www.postgresql.org/media/keys/ACCC4CF8.asc
 repos:
-- deb https://apt.postgresql.org/pub/repos/apt/ jammy-pgdg main
+  - deb https://apt.postgresql.org/pub/repos/apt/ jammy-pgdg main
 packages:
-- postgresql-client-15
+  - postgresql-client-15
