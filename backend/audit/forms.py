@@ -147,9 +147,11 @@ class TribalAuditConsentForm(forms.Form):
                 data[k] = False
         self.cleaned_data = data
         return data
-    
+
     choices_YoN = (("True", "Yes"), ("False", "No"))
-    
-    is_tribal_information_authorized_to_be_public = forms.MultipleChoiceField(choices=choices_YoN)
+
+    is_tribal_information_authorized_to_be_public = forms.MultipleChoiceField(
+        choices=choices_YoN
+    )
     tribal_authorization_certifying_official_name = forms.CharField()
     tribal_authorization_certifying_official_title = forms.CharField()

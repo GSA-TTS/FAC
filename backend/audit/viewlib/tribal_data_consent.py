@@ -11,8 +11,6 @@ from audit.models import (
 )
 from audit.forms import TribalAuditConsentForm
 
-from datetime import datetime
-
 
 class TribalDataConsent(SingleAuditChecklistAccessRequiredMixin, generic.View):
     def get(self, request, *args, **kwargs):
