@@ -1,0 +1,10 @@
+**/uswds
+static/scss/**
+static/compiled/**
+.lighthouseci/**
+
+# template linting/style checks handled by djlint
+report_submission/templates/**
+audit/templates/**
+djangooidc/templates/**
+templates/**
