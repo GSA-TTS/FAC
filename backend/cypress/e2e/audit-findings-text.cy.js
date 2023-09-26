@@ -1,40 +1,65 @@
 import 'cypress-file-upload';
+import { testCrossValidation } from '../support/cross-validation.js';
+import { testLoginGovLogin } from '../support/login-gov.js';
+//import { testLogoutGov } from '../support/logout-gov.js';
+import { testValidAccess } from '../support/check-access.js';
+import { testValidEligibility } from '../support/check-eligibility.js';
+import { testValidAuditeeInfo } from '../support/auditee-info.js';
+import { testValidGeneralInfo } from '../support/general-info.js';
+import { testReportIdFound, testReportIdNotFound } from '../support/dissemination-table.js';
+import { testFileUploadMsg } from '../support/file-uploaded-msg.js';
 
-describe('Audit findings text page', () => {
-  const reportTestId = '2023MAY0001000001'
+import {
+  testWorkbookFederalAwards,
+  testWorkbookFindingsText,
+} from '../support/workbook-uploads.js';
 
+const LOGIN_TEST_EMAIL_AUDITEE = Cypress.env('LOGIN_TEST_EMAIL_AUDITEE');
+const LOGIN_TEST_PASSWORD_AUDITEE = Cypress.env('LOGIN_TEST_PASSWORD_AUDITEE');
+const LOGIN_TEST_OTP_SECRET_AUDITEE = Cypress.env('LOGIN_TEST_OTP_SECRET_AUDITEE');
+
+describe('Audit Findings Text page', () => {
   before(() => {
-    cy.visit(`/report_submission/audit-findings-text/${reportTestId}`);
-  });
-  it('Page loads successfully', () => {
-    cy.url().should('include', `/report_submission/audit-findings-text/${reportTestId}`);
-  });
-
-  describe('findings text workbook upload successful', () => {
-    it('Successfully uploads audit findings text', () => {
-      cy.intercept('/audit/excel/findings-text/*', {
-        fixture: 'success-res.json',
-      }).as('uploadSuccess')
-      cy.visit(`/report_submission/audit-findings-text/${reportTestId}`);
-      cy.get('#file-input-audit-findings-text-xlsx').attachFile('findings-text-UPDATE.xlsx');
-      cy.wait('@uploadSuccess').its('response.statusCode').should('eq', 200)
-      cy.wait(2000).get('#info_box').should('have.text', 'File successfully validated! Your work has been saved.');
-      cy.get('#continue').click();
-      cy.url().should('contain', `/audit/submission-progress/${reportTestId}`);
-    })
+    cy.session('login-session', () => {
+      cy.visit('/');
+      cy.login();
+    });
   });
 
-  describe('File upload fail', () => {
-    it('unsuccessful upload audit findings text', () => {
-      cy.intercept('POST', '/audit/excel/findings-text/*', {
-        statusCode: 400,
-        fixture: 'fail-res.json',
-      }).as('uploadFail')
-      cy.visit(`/report_submission/audit-findings-text/${reportTestId}`);
-      cy.get('#file-input-audit-findings-text-xlsx').attachFile('federal-awards-Test.xlsx');
-      cy.wait('@uploadFail').its('response.statusCode').should('eq', 400)
-      cy.wait(2000).get('#info_box').should('contain', 'A field is missing');
-    })
-  })
+  it('Audit Findings Text uploads successfully', () => {
+    cy.visit('/');
+
+    cy.url().should('include', '/');
+
+    cy.get('label[for=check-start-new-submission]').click();
+
+    cy.get('.usa-button').contains('Accept and start').click();
+
+    cy.url().should('match', /\/report_submission\/eligibility\/$/);
+
+    testValidEligibility();
+
+    testValidAuditeeInfo();
+
+    testValidAccess();
+
+    // Report should not yet be in the dissemination table
+    cy.url().then(url => {
+      const reportId = url.split('/').pop();
+      testReportIdNotFound(reportId);
+    });
+
+    testValidGeneralInfo();
+
+    cy.get(".usa-link").contains("Federal Awards").click();
+    testWorkbookFederalAwards(false);
+
+    cy.get(".usa-link").contains("Federal Awards Audit Findings Text").click();
+    testWorkbookFindingsText(false);
+  });
+
+  it('Displays message if file has already been uploaded', () => {
+    testFileUploadMsg('Edit the Federal Awards Audit Findings Text');
+  });
 
 });
