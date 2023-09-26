@@ -103,7 +103,7 @@ def determine_hist_agency(ein, uei):
 def get_dbkey(ein, uei):
     try:
         dbkey = CensusGen22.objects.values_list("dbkey", flat=True).get(
-            Q(ein=ein), Q(uei=uei)
+            Q(ein=ein), Q(uei=uei) | Q(uei=None)
         )[:]
     except (CensusGen22.DoesNotExist, CensusGen22.MultipleObjectsReturned):
         dbkey = None
@@ -114,7 +114,12 @@ def lookup_baseline(ein, uei, dbkey):
     try:
         cognizant_agency = CognizantBaseline.objects.values_list(
             "cognizant_agency", flat=True
-        ).get(Q(is_active=True) & (Q(ein=ein) & Q(dbkey=dbkey)))[:]
+        ).get(
+            Q(is_active=True)
+            & ((Q(ein=ein) & Q(dbkey=dbkey)) | (Q(ein=ein) & Q(uei=uei)))
+        )[
+            :
+        ]
     except (CognizantBaseline.DoesNotExist, CognizantBaseline.MultipleObjectsReturned):
         cognizant_agency = None
     return cognizant_agency

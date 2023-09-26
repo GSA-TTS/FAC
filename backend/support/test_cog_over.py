@@ -342,7 +342,6 @@ class CogOverTests(TestCase):
         sac.general_information["auditee_uei"] = UEI_WITH_BASELINE
         baker.make(
             CognizantBaseline,
-            ein=sac.general_information["ein"],
             uei=UEI_WITH_BASELINE,
             cognizant_agency="17",
         )
