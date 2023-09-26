@@ -16,5 +16,8 @@
  * @type {Cypress.PluginConfig}
  */
 // eslint-disable-next-line no-unused-vars
-module.exports = () => {
-};
+module.exports = (on, config) => {
+  on("task", {
+    generateOTP: require("cypress-otp")
+  });
+}

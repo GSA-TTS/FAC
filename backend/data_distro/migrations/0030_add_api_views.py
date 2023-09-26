@@ -53,7 +53,7 @@ def delete_views(apps, schema_editor):
         drop schema api;
     """
 
-    if settings.ENVIRONMENT not in ["DEVELOPMENT", "STAGING", "PRODUCTION"]:
+    if settings.ENVIRONMENT not in ["DEVELOPMENT", "PREVIEW", "STAGING", "PRODUCTION"]:
         conn_string = "dbname='postgres' user='postgres' port='5432' host='db'"
     else:
         conn_string = settings.CONNECTION_STRING

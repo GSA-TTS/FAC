@@ -1,7 +1,7 @@
 {% extends "report_submission/step-base.html" %}
 {% load static %}
 {% block step-content %}
-    <div class="grid-container">
+    <div class="grid-container margin-bottom-6">
         <form class="usa-form usa-form--large" id="check-eligibility" method="post">
             {% csrf_token %}
             <fieldset class="usa-fieldset">
@@ -152,10 +152,10 @@
                     </div>
                 </fieldset>
                 <ul class="usa-button-group">
-                    <li class="usa-button-group__item">{% include "../cancel-button.html" %}</li>
                     <li class="usa-button-group__item">
                         <button class="usa-button" id="continue">Continue</button>
                     </li>
+                    <li class="usa-button-group__item margin-left-4">{% include "../cancel-button.html" %}</li>
                 </ul>
             </fieldset>
         </form>

@@ -1,0 +1,12 @@
+{
+  "valid": "True",
+  "response": {
+    "auditee_uei": "LZGKJ22EF7B5",
+    "auditee_name": "Fire King International, LLC",
+    "auditee_fiscal_year_end_date": "12/31",
+    "auditee_address_line_1": "900 Park Place",
+    "auditee_city": "NEW ALBANY",
+    "auditee_state": "IN",
+    "auditee_zip": "47150"
+  }
+}

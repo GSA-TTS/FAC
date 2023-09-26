@@ -1,0 +1,50 @@
+---
+name: Deploy to Production Environment
+on:
+  push:
+    tags:
+      - v1.*
+
+jobs:
+  testing:
+    uses: ./.github/workflows/testing-from-ghcr.yml
+    secrets: inherit
+
+  linting:
+    uses: ./.github/workflows/linting.yml
+    secrets: inherit
+
+  # up to date scan of the staging instance
+  scan-staging:
+    name: ZAP scan of the staging site
+    uses: ./.github/workflows/zap-scan.yml
+    with:
+      url: "https://fac-staging.app.cloud.gov/"
+
+  deploy-infrastructure-production:
+    name: Deploy infrastructure (production)
+    needs:
+      - testing
+      - scan-staging
+    uses: ./.github/workflows/terraform-apply-env.yml
+    with:
+      environment: "production"
+      autoapprove: false
+    secrets: inherit
+
+  deploy-production:
+    name: Deploy application
+    needs:
+      - deploy-infrastructure-production
+    uses: ./.github/workflows/deploy-application.yml
+    with:
+      environment: "production"
+    secrets: inherit
+
+  scan-production-post-deploy:
+    name: Zap Scan
+    needs:
+      - deploy-production
+    uses: ./.github/workflows/zap-scan.yml
+    with:
+      url: "https://app.fac.gov/"

@@ -1,4 +1,7 @@
 {
+  "Meta": {
+    "section_name": "AdditionalUeis"
+  },
   "AdditionalUEIs": {
     "auditee_uei": "AAA123456BBB",
     "additional_ueis_entries": [

@@ -15,10 +15,14 @@ from collections import namedtuple as NT
 
 Sheet = NT(
     "Sheet",
-    "name single_cells open_ranges mergeable_cells merged_unreachable header_inclusion text_ranges header_height",
+    "name single_cells meta_cells open_ranges header_inclusion text_ranges header_height hide_col_from hide_row_from",
 )
-Posn = NT("Posn", "title title_cell range_name range_cell width")
+Posn = NT(
+    "Posn",
+    "title title_cell range_name range_cell width keep_locked format last_range_cell",
+)
 SingleCell = NT("SingleCell", "posn validation formula help")
+MetaCell = NT("MetaCell", "posn formula help")
 MergeableCell = NT("MergeableCell", "start_row end_row start_column end_column")
 MergedUnreachable = NT("MergedUnreachable", "columns")
 HeaderInclusion = NT("HeaderInclusion", "cells")
@@ -28,7 +32,7 @@ TextRange = NT("TextRange", "posn validation contents")
 Enum = NT("Enum", "description values")
 Validation = NT(
     "Validation",
-    "type allow_blank operator formula1 lookup_range custom_error custom_title",
+    "type allow_blank operator formula1 lookup_range custom_error custom_title errorStyle",
 )
 WB = NT("WB", "filename sheets title_row")
 
@@ -62,6 +66,7 @@ def parse_validation(spec):
         get(spec, "lookup_range"),
         get(spec, "custom_error"),
         get(spec, "custom_title"),
+        get(spec, "errorStyle", default="stop"),
     )
 
 
@@ -73,8 +78,30 @@ def parse_single_cell(spec):
             get(spec, "range_name"),
             get(spec, "range_cell"),
             get(spec, "width"),
+            get(spec, "keep_locked", default=False),
+            get(spec, "format", default=None),
+            get(spec, "last_range_cell", default=None),
         ),
         parse_validation(get(spec, "validation")),
+        get(spec, "formula"),
+        parse_help(get(spec, "help")),
+    )
+
+
+def parse_meta_cell(spec):
+    return MetaCell(
+        Posn(
+            get(spec, "title"),
+            get(spec, "title_cell"),
+            get(spec, "range_name"),
+            # Meta cellts don't use ranges right now, but
+            # we might use them to check things, e.g. version number
+            get(spec, "range_cell"),
+            get(spec, "width"),
+            get(spec, "keep_locked", default=True),
+            get(spec, "format", default=None),
+            get(spec, "last_range_cell", default=None),
+        ),
         get(spec, "formula"),
         parse_help(get(spec, "help")),
     )
@@ -90,6 +117,9 @@ def parse_open_range(spec):
             get(spec, "range_name"),
             get(spec, "range_cell"),
             get(spec, "width"),
+            get(spec, "keep_locked", default=False),
+            get(spec, "format", default=None),
+            get(spec, "last_range_cell", default=None),
         ),
         parse_validation(get(spec, "validation")),
         get(spec, "formula"),
@@ -120,6 +150,9 @@ def parse_text_range(spec):
             get(spec, "range_name"),
             get(spec, "range_cell"),
             get(spec, "width"),
+            get(spec, "keep_locked", default=False),
+            get(spec, "format", default=None),
+            get(spec, "last_range_cell", default=None),
         ),
         parse_validation(get(spec, "validation")),
         Enum(
@@ -129,26 +162,21 @@ def parse_text_range(spec):
     )
 
 
-def parse_sheet(spec):
-    sc, opr, mc, mur, hi, tr = None, None, None, None, None, None
+def parse_sheet(spec):  # noqa: C901
+    sc, mtc, opr, hi, tr = None, None, None, None, None
     name = get(spec, "name", default="Unnamed Sheet")
     if "single_cells" in spec:
         sc = list(map(parse_single_cell, get(spec, "single_cells", default=[])))
     else:
         sc = []
-
+    if "meta_cells" in spec:
+        mtc = list(map(parse_meta_cell, get(spec, "meta_cells", default=[])))
+    else:
+        mtc = []
     if "open_ranges" in spec:
         opr = list(map(parse_open_range, get(spec, "open_ranges", default=[])))
     else:
         opr = []
-    if "mergeable_cells" in spec:
-        mc = list(map(parse_mergeable_cell, get(spec, "mergeable_cells", default=[])))
-    else:
-        mc = []
-    if "merged_unreachable" in spec:
-        mur = parse_merged_unreachable(get(spec, "merged_unreachable", default=None))
-    else:
-        mur = []
     if "header_inclusion" in spec:
         hi = parse_header_inclusion(get(spec, "header_inclusion"))
     else:
@@ -161,7 +189,15 @@ def parse_sheet(spec):
         hh = get(spec, "header_height")
     else:
         hh = None
-    return Sheet(name, sc, opr, mc, mur, hi, tr, hh)
+    if "hide_col_from" in spec:
+        hcf = get(spec, "hide_col_from")
+    else:
+        hcf = None
+    if "hide_row_from" in spec:
+        hrf = get(spec, "hide_row_from")
+    else:
+        hrf = None
+    return Sheet(name, sc, mtc, opr, hi, tr, hh, hcf, hrf)
 
 
 def parse_spec(spec):

@@ -1,9 +1,15 @@
-local Func = import 'Functions.libsonnet';
+local ClusterNames = import 'ClusterNames.json';
+local ComplianceRequirementTypes = import 'ComplianceRequirementTypes.json';
 local FederalProgramNames = import 'FederalProgramNames.json';
+local Func = import 'Functions.libsonnet';
+local GAAP = import 'GAAP.libsonnet';
+local States = import 'States.json';
 
 local Const = {
   Y: 'Y',
   N: 'N',
+  Y_N: 'Y&N',
+  BOTH: "Both",
   NA: 'N/A',
   SCHEMA_VERSION: 'https://json-schema.org/draft/2019-09/schema#',
   empty_string: '',
@@ -59,26 +65,36 @@ local Meta = {
   },
 };
 
-local Validation = {
-  AdditionalAwardIdentificationValidation: [
+local REGEX_ALN_PREFIX = '^([0-9]{2})$';
+local REGEX_RD_EXTENSION = 'RD';
+local REGEX_THREE_DIGIT_EXTENSION = '[0-9]{3}[A-Za-z]{0,1}';
+local REGEX_U_EXTENSION = 'U[0-9]{2}';
+local REGEX_NUMBER = '[0-9]+';
+
+local type_aln_prefix = Types.string {
+  allOf: [
     {
-      'if': {
-        properties: {
-          three_digit_extension: {
-            pattern: '^(RD|U[0-9]{2})$',
-          },
-        },
-      },
-      'then': {
-        properties: {
-          additional_award_identification: Func.compound_type([Types.integer, Types.string]) {
-            minLength: 1,
-          },
-        },
-        required: ['additional_award_identification'],
-      },
+      minLength: 2,
+      maxLength: 2,
+    },
+    {
+      pattern: REGEX_ALN_PREFIX,
     },
   ],
+};
+local type_three_digit_extension = Types.string {
+  pattern: '^('
+           + REGEX_RD_EXTENSION
+           + '|'
+           + REGEX_THREE_DIGIT_EXTENSION
+           + '|'
+           + REGEX_U_EXTENSION
+           + ')$',
+
+};
+
+local type_extension_rd_or_u = Types.string {
+      pattern:'^(' + REGEX_RD_EXTENSION + '|' + REGEX_U_EXTENSION + ')$',
 };
 
 local Atoms = {
@@ -93,6 +109,13 @@ local Enum = {
       Const.N,
     ],
     //title: 'YorN'
+  },
+  YorNorBoth: Types.string {
+    enum: [
+      Const.Y,
+      Const.N,
+      Const.BOTH,
+    ],
   },
   NA: Types.string {
     //description: 'A 'not applicable' answer',
@@ -127,70 +150,6 @@ local Enum = {
     ],
     title: 'EmptyString_EmptyArray_Null',
   },
-  // Source: https://pe.usps.com/text/pub28/28apb.htm
-  UnitedStatesStateAbbr: Types.string {
-    enum: [
-      'AL',
-      'AK',
-      'AS',
-      'AZ',
-      'AR',
-      'CA',
-      'CO',
-      'CT',
-      'DE',
-      'DC',
-      'FM',
-      'FL',
-      'GA',
-      'GU',
-      'HI',
-      'ID',
-      'IL',
-      'IN',
-      'IA',
-      'KS',
-      'KY',
-      'LA',
-      'ME',
-      'MH',
-      'MD',
-      'MA',
-      'MI',
-      'MN',
-      'MS',
-      'MO',
-      'MT',
-      'NE',
-      'NV',
-      'NH',
-      'NJ',
-      'NM',
-      'NY',
-      'NC',
-      'ND',
-      'MP',
-      'OH',
-      'OK',
-      'OR',
-      'PW',
-      'PA',
-      'PR',
-      'RI',
-      'SC',
-      'SD',
-      'TN',
-      'TX',
-      'UT',
-      'VT',
-      'VI',
-      'VA',
-      'WA',
-      'WV',
-      'WI',
-      'WY',
-    ],
-  },
   AuditPeriod: Types.string {
     description: 'Period type of audit being submitted',
     enum: [
@@ -205,8 +164,18 @@ local Enum = {
     enum: [
       'program-specific',
       'single-audit',
+      // Include after we are able to recieve ACEE submissions.
+      // 'alternative-compliance-engagement',
     ],
     title: 'AuditType',
+  },
+  CountryType: Types.string {
+    description: 'USA or International',
+    enum: [
+      'USA',
+      'non-USA',
+    ],
+    title: 'CountryType',
   },
   MajorProgramAuditReportType: Types.string {
     description: 'Major program report types',
@@ -241,71 +210,21 @@ local Enum = {
     ],
     title: 'SubmissionStatus',
   },
-  ALNPrefixes: Types.string {
-    description: 'Valid two-digit program numbers; part of the CFDA/ALN',
-    enum: [
-      '10',
-      '11',
-      '12',
-      '13',
-      '14',
-      '15',
-      '16',
-      '17',
-      '18',
-      '19',
-      '20',
-      '21',
-      '22',
-      '23',
-      '27',
-      '29',
-      '30',
-      '32',
-      '33',
-      '34',
-      '36',
-      '39',
-      '40',
-      '41',
-      '42',
-      '43',
-      '44',
-      '45',
-      '46',
-      '47',
-      '53',
-      '57',
-      '58',
-      '59',
-      '60',
-      '61',
-      '62',
-      '64',
-      '66',
-      '68',
-      '70',
-      '77',
-      '78',
-      '81',
-      '82',
-      '83',
-      '84',
-      '85',
-      '86',
-      '87',
-      '88',
-      '89',
-      '90',
-      '91',
-      '92',
-      '93',
-      '94',
-      '96',
-      '97',
-      '98',
-      '99',
-    ],
+  GAAPResults: Types.string {
+    description: 'GAAP Results (Audit Information)',
+    enum: std.map(function(pair) pair.tag, GAAP.gaap_results),
+  },
+  SP_Framework_Basis: Types.string {
+    description: 'SP Framework Basis (Audit Information)',
+    enum: std.map(function(pair) pair.tag, GAAP.sp_framework_basis),
+  },
+  SP_Framework_Opinions: Types.string {
+    description: 'SP Framework Opinions (Audit Information)',
+    enum: std.map(function(pair) pair.tag, GAAP.sp_framework_opinions),
+  },
+  UnitedStatesStateAbbr: {
+    description: 'US States 2-letter abbreviations',
+    enum: States.UnitedStatesStateAbbr,
   },
 };
 
@@ -315,8 +234,9 @@ local e164_regex = '^\\+[0-9]{1,3}[ ]*[0-9]{2,3}[ ]*[0-9]{2,3}[ ]*[0-9]{4}|^\\+[
 local email_regex = "^[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?\\.)+[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?$";
 
 
-local REGEX_ZIPCODE = '^[0-9]{5}(?:-[0-9]{4})?$';
+local REGEX_ZIPCODE = '^[0-9]{5}(?:[0-9]{4})?$';
 local REGEX_DBKEY = '[1-9][0-9]+';
+local REGEX_MONTHS_OTHER = '^0[0-9]|1[0-8]$';
 local type_zipcode = Types.string {
   pattern: REGEX_ZIPCODE,
 };
@@ -357,81 +277,32 @@ local type_uei = Types.string {
     },
     // Does not start with 9 digits in a row
     {
-      pattern: "^(?![0-9]{9})"
-    }
+      pattern: '^(?![0-9]{9})',
+    },
   ],
 };
 
 local Compound = {
-  ThreeDigitExtension: Types.string {
-    title: 'ThreeDigitExtension',
-    description: 'Three Digit Extension',
-    pattern: '^(RD|[0-9]{3}[A-Za-z]{0,1}|U[0-9]{2})$',
+  AwardReference: Types.string {
+    title: 'AwardReference',
+    description: 'Award Reference',
+    pattern: '^AWARD-(?!0000)[0-9]{4}$',
   },
   PriorReferences: Types.string {
     title: 'PriorReferences',
     description: 'Prior references',
-    pattern: '^20[2-9][0-9]-[0-9]{3}(,\\s*20[2-9][0-9]-[0-9]{3})*$',
+    pattern: '^20[1-9][0-9]-[0-9]{3}(,\\s*20[1-9][0-9]-[0-9]{3})*$',
   },
   ReferenceNumber: Types.string {
     title: 'ReferenceNumber',
     description: 'Reference Number',
-    pattern: '^20[2-9][0-9]-[0-9]{3}$',
+    pattern: '^20[1-9][0-9]-[0-9]{3}$',
   },
   ComplianceRequirement: {
     title: 'ComplianceRequirement',
     description: 'Compliance requirement type',
     pattern: '^A?B?C?E?F?G?H?I?J?L?M?N?P?$',
   },
-  ClusterName: Types.string {
-    description: 'Cluster Name',
-    enum: [
-      'N/A',
-      'RESEARCH AND DEVELOPMENT',
-      'STUDENT FINANCIAL ASSISTANCE',
-      Const.STATE_CLUSTER,
-      '477 CLUSTER',
-      'AGING CLUSTER',
-      'CCDF CLUSTER',
-      'CDBG - DISASTER RECOVERY GRANTS - PUB. L. NO. 113-2 CLUSTER',
-      'CDBG - ENTITLEMENT GRANTS CLUSTER',
-      'CDFI CLUSTER',
-      'CHILD NUTRITION CLUSTER',
-      'CLEAN WATER STATE REVOLVING FUND CLUSTER',
-      'COMMUNITY FACILITIES LOANS AND GRANTS CLUSTER',
-      'DISABILITY INSURANCE/SSI CLUSTER',
-      'DRINKING WATER STATE REVOLVING FUND CLUSTER',
-      'ECONOMIC DEVELOPMENT CLUSTER',
-      'EMPLOYMENT SERVICE CLUSTER',
-      'FEDERAL TRANSIT CLUSTER',
-      'FISH AND WILDLIFE CLUSTER',
-      'FOOD DISTRIBUTION CLUSTER',
-      'FOREIGN FOOD AID DONATION CLUSTER',
-      'FOREST SERVICE SCHOOLS AND ROADS CLUSTER',
-      'FOSTER GRANDPARENT/SENIOR COMPANION CLUSTER',
-      'HEAD START CLUSTER',
-      'HEALTH CENTER PROGRAM CLUSTER',
-      'HIGHWAY PLANNING AND CONSTRUCTION CLUSTER',
-      'HIGHWAY SAFETY CLUSTER',
-      'HOPE VI CLUSTER',
-      'HOUSING VOUCHER CLUSTER',
-      'HURRICANE SANDY RELIEF CLUSTER',
-      'MATERNAL, INFANT, AND EARLY CHILDHOOD HOME VISITING CLUSTER',
-      'MEDICAID CLUSTER',
-      'SCHOOL IMPROVEMENT GRANTS CLUSTER',
-      'SECTION 8 PROJECT-BASED CLUSTER',
-      'SNAP CLUSTER',
-      'SPECIAL EDUCATION CLUSTER (IDEA)',
-      'TANF CLUSTER',
-      'TRANSIT SERVICES PROGRAMS CLUSTER',
-      'TRIO CLUSTER',
-      'WATER AND WASTE PROGRAM CLUSTER',
-      'WIOA CLUSTER',
-      Const.OTHER_CLUSTER,
-    ],
-    title: 'ClusterName',
-  },
-
   NonEmptyString: Types.string {
     minLength: 1,
   },
@@ -443,7 +314,12 @@ local Compound = {
     pattern: phone_regex,
   },
   Zip: type_zipcode,
-
+  MonthsOther: Types.string {
+    pattern: REGEX_MONTHS_OTHER,
+  },
+  EmptyString: Types.string {
+    const: Const.empty_string,
+  },
 };
 
 
@@ -463,19 +339,37 @@ local SchemaBase = Types.object {
   Meta: Meta,
   Enum: Enum,
   Compound: Compound {
-    FederalProgramNames: {
+    FederalProgramNames: Types.string {
       description: 'All Federal program names',
-      enum: FederalProgramNames.program_names
+      enum: FederalProgramNames.program_names,
     },
-    AllALNNumbers: {
+    AllALNNumbers: Types.string {
       description: 'All program numbers',
-      enum: FederalProgramNames.all_alns
-      },  
-    ALNPrefixes: {
-      description: 'Unique ALN prefixes',
-      enum: FederalProgramNames.aln_prefixes
-    }
+      enum: FederalProgramNames.all_alns,
+    },
+    ClusterNames: Types.string {
+      description: 'All cluster names',
+      enum: ClusterNames.cluster_names,
+    },
+    ClusterNamesNA: Types.string {
+      description: 'All cluster names + N/A',
+      enum: ClusterNames.cluster_names + [Const.NA],
+    },
+    ClusterNamesNAStateOther: Types.string {
+      description: 'All cluster names',
+      enum: ClusterNames.cluster_names + [Const.NA, Const.STATE_CLUSTER, Const.OTHER_CLUSTER],
+    },
+    ClusterNamesStateOther: Types.string {
+      description: 'All cluster names',
+      enum: ClusterNames.cluster_names + [Const.STATE_CLUSTER, Const.OTHER_CLUSTER],
+    },
+    ALNPrefixes: type_aln_prefix,
+    ThreeDigitExtension: type_three_digit_extension,
+    ComplianceRequirementTypes: {
+      description: 'Compliance requirement types',
+      enum: ComplianceRequirementTypes.requirement_types,
+    },
+    ExtensionRdOrU: type_extension_rd_or_u,
   },
-  Validation: Validation,
   SchemaBase: SchemaBase,
 }

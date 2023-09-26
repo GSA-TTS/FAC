@@ -1,37 +1,62 @@
 import 'cypress-file-upload';
+import { testCrossValidation } from '../support/cross-validation.js';
+import { testLoginGovLogin } from '../support/login-gov.js';
+//import { testLogoutGov } from '../support/logout-gov.js';
+import { testValidAccess } from '../support/check-access.js';
+import { testValidEligibility } from '../support/check-eligibility.js';
+import { testValidAuditeeInfo } from '../support/auditee-info.js';
+import { testValidGeneralInfo } from '../support/general-info.js';
+import { testReportIdFound, testReportIdNotFound } from '../support/dissemination-table.js';
+import { testFileUploadMsg } from '../support/file-uploaded-msg.js';
+
+import {
+  testWorkbookFederalAwards,
+} from '../support/workbook-uploads.js';
+
+const LOGIN_TEST_EMAIL_AUDITEE = Cypress.env('LOGIN_TEST_EMAIL_AUDITEE');
+const LOGIN_TEST_PASSWORD_AUDITEE = Cypress.env('LOGIN_TEST_PASSWORD_AUDITEE');
+const LOGIN_TEST_OTP_SECRET_AUDITEE = Cypress.env('LOGIN_TEST_OTP_SECRET_AUDITEE');
 
 describe('Federal awards page', () => {
-    before(() => {
-      cy.visit('/report_submission/federal-awards/2022XB40001000002');
+  before(() => {
+    cy.session('login-session', () => {
+      cy.visit('/');
+      cy.login();
     });
-    it('Page loads successfully', () => {
-      cy.url().should('include','/report_submission/federal-awards/2022XB40001000002');
+  });
+
+  it('Federal Awards uploads successfully', () => {
+    cy.visit('/');
+
+    cy.url().should('include', '/');
+
+    cy.get('label[for=check-start-new-submission]').click();
+
+    cy.get('.usa-button').contains('Accept and start').click();
+
+    cy.url().should('match', /\/report_submission\/eligibility\/$/);
+
+    testValidEligibility();
+
+    testValidAuditeeInfo();
+
+    testValidAccess();
+
+    // Report should not yet be in the dissemination table
+    cy.url().then(url => {
+      const reportId = url.split('/').pop();
+      testReportIdNotFound(reportId);
     });
 
-  describe('File upload successful', () => {
-      it('Successfully uploads Federal Awards', () => {
-        cy.intercept('/audit/excel/FederalAwardsExpended/*', {
-          fixture: 'success-res.json', }).as('uploadSuccess')
-        cy.visit('report_submission/federal-awards/2022XB40001000002');
-        cy.get('#file-input-federal-awards-xlsx').attachFile('FederalAwardsExpendedTemplateUG2019.xlsx');
-        cy.wait('@uploadSuccess').its('response.statusCode').should('eq', 200)
-        cy.wait(2000).get('#info_box').should('have.text','File successfully validated!');
-        cy.get('#continue').click();
-      });
+    testValidGeneralInfo();
 
-      describe('File upload fail', () => {
-      it('unsuccessful upload Federal Award', () => {
-        cy.intercept('POST','/audit/excel/FederalAwardsExpended/*', {
-          statusCode: 400,
-          fixture: 'fail-res.json', }).as('uploadFail')
-        cy.visit('report_submission/federal-awards/2022XB40001000002');
-        cy.get('#file-input-federal-awards-xlsx').attachFile('FindingsUniformGuidanceTemplate2019-2022.xlsx');
-        cy.wait('@uploadFail').its('response.statusCode').should('eq', 400)
-        cy.wait(2000).get('#info_box').should('have.text','Error on validation. See console for more information.');
-      })
-    })
+    cy.get(".usa-link").contains("Federal Awards").click();
+    testWorkbookFederalAwards(false);
+  });
 
+  it('Displays message if file has already been uploaded', () => {
+    testFileUploadMsg('Edit the Federal Awards');
+  });
 
 });
 
-});

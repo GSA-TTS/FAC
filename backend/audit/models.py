@@ -1,5 +1,6 @@
 import calendar
-from datetime import date
+from datetime import datetime, timezone
+from itertools import chain
 import json
 import logging
 
@@ -13,16 +14,27 @@ from django.utils.translation import gettext_lazy as _
 
 from django_fsm import FSMField, RETURN_VALUE, transition
 
-from .validators import (
+import audit.cross_validation
+from audit.intake_to_dissemination import IntakeToDissemination
+from audit.validators import (
     validate_additional_ueis_json,
+    validate_additional_eins_json,
     validate_corrective_action_plan_json,
     validate_excel_file,
     validate_federal_award_json,
     validate_findings_text_json,
     validate_findings_uniform_guidance_json,
     validate_general_information_json,
+    validate_secondary_auditors_json,
+    validate_notes_to_sefa_json,
     validate_single_audit_report_file,
+    validate_auditor_certification_json,
+    validate_auditee_certification_json,
+    validate_tribal_data_consent_json,
+    validate_audit_information_json,
+    validate_component_page_numbers,
 )
+from support.cog_over import compute_cog_over, record_cog_assignment
 
 User = get_user_model()
 
@@ -44,13 +56,28 @@ class SingleAuditChecklistManager(models.Manager):
                 formula for creating this is basically "how many non-legacy
                 entries there are in the system plus 1,000,000".
         """
+
+        # remove event_user & event_type keys so that they're not passed into super().create below
+        event_user = obj_data.pop("event_user", None)
+        event_type = obj_data.pop("event_type", None)
+
         fiscal_start = obj_data["general_information"]["auditee_fiscal_period_start"]
         year = fiscal_start[:4]
         month = calendar.month_abbr[int(fiscal_start[5:7])].upper()
         count = SingleAuditChecklist.objects.count() + 1_000_001
         report_id = f"{year}{month}{str(count).zfill(10)}"
         updated = obj_data | {"report_id": report_id}
-        return super().create(**updated)
+
+        result = super().create(**updated)
+
+        if event_user and event_type:
+            SubmissionEvent.objects.create(
+                sac=result,
+                user=event_user,
+                event=event_type,
+            )
+
+        return result
 
 
 def camel_to_snake(raw: str) -> str:
@@ -90,10 +117,134 @@ def json_property_mixin_generator(name, fname=None, toplevel=None, classname=Non
 GeneralInformationMixin = json_property_mixin_generator("GeneralInformation")
 
 
+class LateChangeError(Exception):
+    pass
+
+
 class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: ignore
     """
     Monolithic Single Audit Checklist.
     """
+
+    # Class management machinery:
+    class Meta:
+        """We need to set the name for the admin view."""
+
+        verbose_name = "SF-SAC"
+        verbose_name_plural = "SF-SACs"
+
+    objects = SingleAuditChecklistManager()
+
+    # Method overrides:
+    def __str__(self):
+        return f"#{self.id}--{self.report_id}--{self.auditee_uei}"
+
+    def save(self, *args, **kwargs):
+        """
+        Call _reject_late_changes() to verify that a submission that's no longer
+        in progress isn't being altered; skip this if we know this submission is
+        in progress.
+        """
+        if self.submission_status != self.STATUS.IN_PROGRESS:
+            try:
+                self._reject_late_changes()
+            except LateChangeError as err:
+                raise LateChangeError from err
+
+        event_user = kwargs.get("event_user")
+        event_type = kwargs.get("event_type")
+        if event_user and event_type:
+            SubmissionEvent.objects.create(
+                sac=self,
+                user=event_user,
+                event=event_type,
+            )
+
+        return super().save()
+
+    def disseminate(self):
+        """
+        Cognizant/Oversight agency assignment followed by dissemination
+        ETL.
+        """
+        # try:
+        if not self.cognizant_agency and not self.oversight_agency:
+            self.assign_cog_over()
+        intake_to_dissem = IntakeToDissemination(self)
+        intake_to_dissem.load_all()
+        intake_to_dissem.save_dissemination_objects()
+        # TODO: figure out what exceptions to catch here
+        # except Exception as err:
+        #     return {"error": err}
+
+    def assign_cog_over(self):
+        """
+        Function that the FAC app uses when a submission is completed and cog_over needs to be assigned.
+        """
+        if not self.federal_awards:
+            logger.warning(
+                "Trying to determine cog_over for a self with zero awards with status = %s",
+                self.submission_status,
+            )
+
+        cognizant_agency, oversight_agency = compute_cog_over(
+            self.federal_awards, self.submission_status, self.ein, self.auditee_uei
+        )
+        if oversight_agency:
+            self.oversight_agency = oversight_agency
+            self.save()
+            return
+        if cognizant_agency:
+            self.cognizant_agency = cognizant_agency
+            self.save()
+            record_cog_assignment(self.report_id, self.submitted_by, cognizant_agency)
+
+    def _reject_late_changes(self):
+        """
+        This should only be called if status isn't STATUS.IN_PROGRESS.
+        If there have been relevant changes, raise an AssertionError.
+        Here, "relevant" means anything other than fields related to the status
+        transition change itself.
+        """
+        try:
+            prior_obj = SingleAuditChecklist.objects.get(pk=self.pk)
+        except SingleAuditChecklist.DoesNotExist:
+            # No prior instance exists, so it's a new submission.
+            return True
+
+        current = audit.cross_validation.sac_validation_shape(self)
+        prior = audit.cross_validation.sac_validation_shape(prior_obj)
+        if current["sf_sac_sections"] != prior["sf_sac_sections"]:
+            raise LateChangeError
+
+        meta_fields = ("submitted_by", "date_created", "report_id", "audit_type")
+        for field in meta_fields:
+            if current["sf_sac_meta"][field] != prior["sf_sac_meta"][field]:
+                raise LateChangeError
+
+        return True
+
+    # Constants:
+    class STATUS:
+        """The states that a submission can be in."""
+
+        IN_PROGRESS = "in_progress"
+        READY_FOR_CERTIFICATION = "ready_for_certification"
+        AUDITOR_CERTIFIED = "auditor_certified"
+        AUDITEE_CERTIFIED = "auditee_certified"
+        CERTIFIED = "certified"
+        SUBMITTED = "submitted"
+        DISSEMINATED = "disseminated"
+
+    STATUS_CHOICES = (
+        (STATUS.IN_PROGRESS, "In Progress"),
+        (STATUS.READY_FOR_CERTIFICATION, "Ready for Certification"),
+        (STATUS.AUDITOR_CERTIFIED, "Auditor Certified"),
+        (STATUS.AUDITEE_CERTIFIED, "Auditee Certified"),
+        (STATUS.CERTIFIED, "Certified"),
+        (STATUS.SUBMITTED, "Submitted"),
+        (STATUS.DISSEMINATED, "Disseminated"),
+    )
 
     USER_PROVIDED_ORGANIZATION_TYPE_CODE = (
         ("state", _("State")),
@@ -116,31 +267,11 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         ("other", _("Other")),
     )
 
-    class STATUS:
-        """The states that a submission can be in."""
-
-        IN_PROGRESS = "in_progress"
-        READY_FOR_CERTIFICATION = "ready_for_certification"
-        AUDITOR_CERTIFIED = "auditor_certified"
-        AUDITEE_CERTIFIED = "auditee_certified"
-        CERTIFIED = "certified"
-        SUBMITTED = "submitted"
-
-    STATUS_CHOICES = (
-        (STATUS.IN_PROGRESS, "In Progress"),
-        (STATUS.READY_FOR_CERTIFICATION, "Ready for Certification"),
-        (STATUS.AUDITOR_CERTIFIED, "Auditor Certified"),
-        (STATUS.AUDITEE_CERTIFIED, "Auditee Certified"),
-        (STATUS.CERTIFIED, "Certified"),
-        (STATUS.SUBMITTED, "Submitted"),
-    )
-
-    objects = SingleAuditChecklistManager()
-
     # 0. Meta data
     submitted_by = models.ForeignKey(User, on_delete=models.PROTECT)
     date_created = models.DateTimeField(auto_now_add=True)
     submission_status = FSMField(default=STATUS.IN_PROGRESS, choices=STATUS_CHOICES)
+    data_source = models.CharField(default="GSA")
 
     # implement an array of tuples as two arrays since we can only have simple fields inside an array
     transition_name = ArrayField(
@@ -173,6 +304,10 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         blank=True, null=True, validators=[validate_general_information_json]
     )
 
+    audit_information = models.JSONField(
+        blank=True, null=True, validators=[validate_audit_information_json]
+    )
+
     # Federal Awards:
     federal_awards = models.JSONField(
         blank=True, null=True, validators=[validate_federal_award_json]
@@ -198,23 +333,88 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         blank=True, null=True, validators=[validate_additional_ueis_json]
     )
 
+    # Additional EINs:
+    additional_eins = models.JSONField(
+        blank=True, null=True, validators=[validate_additional_eins_json]
+    )
+
+    # Secondary Auditors:
+    secondary_auditors = models.JSONField(
+        blank=True, null=True, validators=[validate_secondary_auditors_json]
+    )
+
+    # Notes to SEFA:
+    notes_to_sefa = models.JSONField(
+        blank=True, null=True, validators=[validate_notes_to_sefa_json]
+    )
+
+    auditor_certification = models.JSONField(
+        blank=True, null=True, validators=[validate_auditor_certification_json]
+    )
+
+    auditee_certification = models.JSONField(
+        blank=True, null=True, validators=[validate_auditee_certification_json]
+    )
+
+    tribal_data_consent = models.JSONField(
+        blank=True, null=True, validators=[validate_tribal_data_consent_json]
+    )
+
+    cognizant_agency = models.CharField(
+        "Agency assigned to this large submission. Computed when the submisson is finalized, but may be overridden",
+        max_length=2,
+        blank=True,
+        null=True,
+    )
+    oversight_agency = models.CharField(
+        "Agency assigned to this not so large submission. Computed when the submisson is finalized",
+        max_length=2,
+        blank=True,
+        null=True,
+    )
+
     def validate_full(self):
         """
+        Full validation, intended for use when the user indicates that the
+        submission is finished.
+
+        Currently a stub, but eventually will call each of the individual
+        section validation routines and then validate_cross.
+        """
+
+        validation_methods = []
+        errors = [f(self) for f in validation_methods]
+
+        if errors:
+            return {"errors": errors}
+
+        return self.validate_cross()
+
+    def validate_cross(self):
+        """
+        This method should NOT be run as part of full_clean(), because we want
+        to be able to save in-progress submissions.
+
         A stub method to represent the cross-sheet, “full” validation that we
         do once all the individual sections are complete and valid in
         themselves.
         """
-        all_sections = [
-            self.general_information,
-            self.federal_awards,
-            self.corrective_action_plan,
-            self.findings_text,
-            self.findings_uniform_guidance,
-            self.additional_ueis,
-        ]
-        if all(section for section in all_sections):
-            return True
-        return True
+        shaped_sac = audit.cross_validation.sac_validation_shape(self)
+        try:
+            sar = SingleAuditReportFile.objects.filter(sac_id=self.id).latest(
+                "date_created"
+            )
+        except SingleAuditReportFile.DoesNotExist:
+            sar = None
+        validation_functions = audit.cross_validation.functions
+        errors = list(
+            chain.from_iterable(
+                [func(shaped_sac, sar=sar) for func in validation_functions]
+            )
+        )
+        if errors:
+            return {"errors": errors, "data": shaped_sac}
+        return {}
 
     @transition(
         field="submission_status",
@@ -228,13 +428,13 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         there's likely to be a step in one of the views that does cross-sheet
         validation and reports back to the user.
         """
-        if self.validate_full():
+        errors = self.validate_full()
+        if not errors:
             self.transition_name.append(
                 SingleAuditChecklist.STATUS.READY_FOR_CERTIFICATION
             )
-            self.transition_date.append(date.today())
+            self.transition_date.append(datetime.now(timezone.utc))
             return SingleAuditChecklist.STATUS.READY_FOR_CERTIFICATION
-
         return SingleAuditChecklist.STATUS.IN_PROGRESS
 
     @transition(
@@ -248,7 +448,7 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         the appropriate privileges will done at the view level.
         """
         self.transition_name.append(SingleAuditChecklist.STATUS.AUDITOR_CERTIFIED)
-        self.transition_date.append(date.today())
+        self.transition_date.append(datetime.now(timezone.utc))
 
     @transition(
         field="submission_status",
@@ -261,24 +461,11 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         the appropriate privileges will done at the view level.
         """
         self.transition_name.append(SingleAuditChecklist.STATUS.AUDITEE_CERTIFIED)
-        self.transition_date.append(date.today())
+        self.transition_date.append(datetime.now(timezone.utc))
 
     @transition(
         field="submission_status",
         source=STATUS.AUDITEE_CERTIFIED,
-        target=STATUS.CERTIFIED,
-    )
-    def transition_to_certified(self):
-        """
-        The permission checks verifying that the user attempting to do this has
-        the appropriate privileges will done at the view level.
-        """
-        self.transition_name.append(SingleAuditChecklist.STATUS.CERTIFIED)
-        self.transition_date.append(date.today())
-
-    @transition(
-        field="submission_status",
-        source=[STATUS.AUDITEE_CERTIFIED, STATUS.CERTIFIED],
         target=STATUS.SUBMITTED,
     )
     def transition_to_submitted(self):
@@ -287,15 +474,18 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         the appropriate privileges will done at the view level.
         """
 
-        # from audit.etl import ETL
-
-        # TODO: These lines are breaking
-        #       `test_submission_status_transitions` in audit/test_models.py
-        #       We'll figure out a fix for this and uncomment these lines.
-        # etl = ETL(self)
-        # etl.load_all()
         self.transition_name.append(SingleAuditChecklist.STATUS.SUBMITTED)
-        self.transition_date.append(date.today())
+        self.transition_date.append(datetime.now(timezone.utc))
+
+    @transition(
+        field="submission_status",
+        source=STATUS.SUBMITTED,
+        target=STATUS.DISSEMINATED,
+    )
+    def transition_to_disseminated(self):
+        logger.info("Transitioning to DISSEMINATED")
+        self.transition_name.append(SingleAuditChecklist.STATUS.DISSEMINATED)
+        self.transition_date.append(datetime.now(timezone.utc))
 
     @transition(
         field="submission_status",
@@ -322,7 +512,7 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         changes have been made at that point.
         """
         self.transition_name.append(SingleAuditChecklist.STATUS.SUBMITTED)
-        self.transition_date.append(date.today())
+        self.transition_date.append(datetime.now(timezone.utc))
 
     @property
     def is_auditee_certified(self):
@@ -345,6 +535,10 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
     def is_submitted(self):
         return self.submission_status in [SingleAuditChecklist.STATUS.SUBMITTED]
 
+    @property
+    def is_public(self):
+        return self.general_information["user_provided_organization_type"] != "tribal"
+
     def get_transition_date(self, status):
         index = self.transition_name.index(status)
         if index >= 0:
@@ -360,14 +554,39 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
             pass
         return None
 
-    class Meta:
-        """We need to set the name for the admin view."""
 
-        verbose_name = "SF-SAC"
-        verbose_name_plural = "SF-SACs"
+class AccessManager(models.Manager):
+    """Custom manager for Access."""
 
-    def __str__(self):
-        return f"#{self.id} - UEI({self.auditee_uei})"
+    def create(self, **obj_data):
+        """
+        Check for existing users and add them at access creation time.
+        Not doing this would mean that users logged in at time of Access
+        instance creation would have to log out and in again to get the new
+        access.
+        """
+
+        # remove event_user & event_type keys so that they're not passed into super().create below
+        event_user = obj_data.pop("event_user", None)
+        event_type = obj_data.pop("event_type", None)
+
+        if obj_data["email"]:
+            try:
+                acc_user = User.objects.get(email=obj_data["email"])
+            except User.DoesNotExist:
+                acc_user = None
+            if acc_user:
+                obj_data["user"] = acc_user
+        result = super().create(**obj_data)
+
+        if event_user and event_type:
+            SubmissionEvent.objects.create(
+                sac=result.sac,
+                user=event_user,
+                event=event_type,
+            )
+
+        return result
 
 
 class Access(models.Model):
@@ -375,6 +594,8 @@ class Access(models.Model):
     Email addresses which have been granted access to SAC instances.
     An email address may be associated with a User ID if an FAC account exists.
     """
+
+    objects = AccessManager()
 
     ROLES = (
         ("certifying_auditee_contact", _("Auditee Certifying Official")),
@@ -387,6 +608,7 @@ class Access(models.Model):
         help_text="Access type granted to this user",
         max_length=50,
     )
+    fullname = models.CharField(blank=True)
     email = models.EmailField()
     user = models.ForeignKey(
         User,
@@ -438,11 +660,23 @@ class ExcelFile(models.Model):
     date_created = models.DateTimeField(auto_now_add=True)
 
     def save(self, *args, **kwargs):
+        if self.sac.submission_status != SingleAuditChecklist.STATUS.IN_PROGRESS:
+            raise LateChangeError("Attemtped Excel file upload")
+
         self.filename = f"{self.sac.report_id}--{self.form_section}.xlsx"
-        super(ExcelFile, self).save(*args, **kwargs)
+
+        event_user = kwargs.pop("event_user", None)
+        event_type = kwargs.pop("event_type", None)
+
+        if event_user and event_type:
+            SubmissionEvent.objects.create(
+                sac=self.sac, user=event_user, event=event_type
+            )
+
+        super().save(*args, **kwargs)
 
 
-def single_audit_report_path(instance, filename):
+def single_audit_report_path(instance, _filename):
     """
     We want the actual filename in the filesystem to be unique and determined
     by report_id, not the user-provided filename.
@@ -465,8 +699,87 @@ class SingleAuditReportFile(models.Model):
     sac = models.ForeignKey(SingleAuditChecklist, on_delete=models.CASCADE)
     user = models.ForeignKey(User, blank=True, null=True, on_delete=models.SET_NULL)
     date_created = models.DateTimeField(auto_now_add=True)
+    component_page_numbers = models.JSONField(
+        blank=True, null=True, validators=[validate_component_page_numbers]
+    )
 
     def save(self, *args, **kwargs):
         report_id = SingleAuditChecklist.objects.get(id=self.sac.id).report_id
         self.filename = f"{report_id}.pdf"
-        super(SingleAuditReportFile, self).save(*args, **kwargs)
+        if self.sac.submission_status != self.sac.STATUS.IN_PROGRESS:
+            raise LateChangeError("Attempted PDF upload")
+
+        event_user = kwargs.pop("event_user", None)
+        event_type = kwargs.pop("event_type", None)
+
+        if event_user and event_type:
+            SubmissionEvent.objects.create(
+                sac=self.sac, user=event_user, event=event_type
+            )
+
+        super().save(*args, **kwargs)
+
+
+class SubmissionEvent(models.Model):
+    class EventType:
+        ACCESS_GRANTED = "access-granted"
+        ADDITIONAL_EINS_UPDATED = "additional-eins-updated"
+        ADDITIONAL_UEIS_UPDATED = "additional-ueis-updated"
+        AUDIT_INFORMATION_UPDATED = "audit-information-updated"
+        AUDIT_REPORT_PDF_UPDATED = "audit-report-pdf-updated"
+        AUDITEE_CERTIFICATION_COMPLETED = "auditee-certification-completed"
+        AUDITOR_CERTIFICATION_COMPLETED = "auditor-certification-completed"
+        CORRECTIVE_ACTION_PLAN_UPDATED = "corrective-action-plan-updated"
+        CREATED = "created"
+        FEDERAL_AWARDS_UPDATED = "federal-awards-updated"
+        FEDERAL_AWARDS_AUDIT_FINDINGS_UPDATED = "federal-awards-audit-findings-updated"
+        FEDERAL_AWARDS_AUDIT_FINDINGS_TEXT_UPDATED = (
+            "federal-awards-audit-findings-text-updated"
+        )
+        FINDINGS_UNIFORM_GUIDANCE_UPDATED = "findings-uniform-guidance-updated"
+        GENERAL_INFORMATION_UPDATED = "general-information-updated"
+        LOCKED_FOR_CERTIFICATION = "locked-for-certification"
+        NOTES_TO_SEFA_UPDATED = "notes-to-sefa-updated"
+        SECONDARY_AUDITORS_UPDATED = "secondary-auditors-updated"
+        SUBMITTED = "submitted"
+
+    EVENT_TYPES = (
+        (EventType.ACCESS_GRANTED, _("Access granted")),
+        (EventType.ADDITIONAL_EINS_UPDATED, _("Additional EINs updated")),
+        (EventType.ADDITIONAL_UEIS_UPDATED, _("Additional UEIs updated")),
+        (EventType.AUDIT_INFORMATION_UPDATED, _("Audit information updated")),
+        (EventType.AUDIT_REPORT_PDF_UPDATED, _("Audit report PDF updated")),
+        (
+            EventType.AUDITEE_CERTIFICATION_COMPLETED,
+            _("Auditee certification completed"),
+        ),
+        (
+            EventType.AUDITOR_CERTIFICATION_COMPLETED,
+            _("Auditor certification completed"),
+        ),
+        (EventType.CORRECTIVE_ACTION_PLAN_UPDATED, _("Corrective action plan updated")),
+        (EventType.CREATED, _("Created")),
+        (EventType.FEDERAL_AWARDS_UPDATED, _("Federal awards updated")),
+        (
+            EventType.FEDERAL_AWARDS_AUDIT_FINDINGS_UPDATED,
+            _("Federal awards audit findings updated"),
+        ),
+        (
+            EventType.FEDERAL_AWARDS_AUDIT_FINDINGS_TEXT_UPDATED,
+            _("Federal awards audit findings text updated"),
+        ),
+        (
+            EventType.FINDINGS_UNIFORM_GUIDANCE_UPDATED,
+            _("Findings uniform guidance updated"),
+        ),
+        (EventType.GENERAL_INFORMATION_UPDATED, _("General information updated")),
+        (EventType.LOCKED_FOR_CERTIFICATION, _("Locked for certification")),
+        (EventType.NOTES_TO_SEFA_UPDATED, _("Notes to SEFA updated")),
+        (EventType.SECONDARY_AUDITORS_UPDATED, _("Secondary auditors updated")),
+        (EventType.SUBMITTED, _("Submitted to the FAC for processing")),
+    )
+
+    sac = models.ForeignKey(SingleAuditChecklist, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.PROTECT)
+    timestamp = models.DateTimeField(auto_now_add=True)
+    event = models.CharField(choices=EVENT_TYPES)

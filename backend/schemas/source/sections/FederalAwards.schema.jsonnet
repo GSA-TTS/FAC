@@ -1,39 +1,18 @@
 local Base = import '../base/Base.libsonnet';
 local Func = import '../base/Functions.libsonnet';
+local Sheets = import '../excel/libs/Sheets.libsonnet';
+
 local Types = Base.Types;
 
 local Validations = {
-
-  DirectAwardValidations: [
-    {
-      'if': {
-        properties: {
-          is_direct: {
-            const: Base.Const.Y,
-          },
-        },
-      },
-      'then': {
-        properties: {
-          entities: Base.Enum.EmptyString_EmptyArray_Null,
-        },
-      },
+  PassThroughEntity: Types.object {
+    additionalProperties: false,
+    properties: {
+      passthrough_name: Types.string,
+      passthrough_identifying_number: Types.string,
     },
-    {
-      'if': {
-        properties: {
-          is_direct: {
-            const: Base.Const.N,
-          },
-        },
-      },
-      'then': {
-        required: [
-          'entities',
-        ],
-      },
-    },
-  ],
+    required: ['passthrough_name'],
+  },
   LoanOrLoanGuaranteeValidations: [
     {
       'if': {
@@ -44,18 +23,6 @@ local Validations = {
         },
       },
       'then': {
-        properties: {
-          // 20230409 MCJ
-          // FIXME: If the answer is Y, why can the balance be N/A?
-          loan_balance_at_audit_period_end: {
-            anyOf: [
-              Types.integer {
-                minimum: 1,
-              },
-              Base.Enum.NA,
-            ],
-          },
-        },
         required: ['loan_balance_at_audit_period_end'],
       },
     },
@@ -68,8 +35,8 @@ local Validations = {
         },
       },
       'then': {
-        properties: {
-          loan_balance_at_audit_period_end: Base.Enum.EmptyString_Zero_Null,
+        not: {
+          required: ['loan_balance_at_audit_period_end'],
         },
       },
     },
@@ -87,9 +54,6 @@ local Validations = {
         required: [
           'subrecipient_amount',
         ],
-        properties: {
-          subrecipient_amount: Types.integer,
-        },
       },
     },
     {
@@ -101,8 +65,8 @@ local Validations = {
         },
       },
       'then': {
-        properties: {
-          subrecipient_amount: Base.Enum.EmptyString_Zero_Null,
+        not: {
+          required: ['subrecipient_amount'],
         },
       },
     },
@@ -124,34 +88,33 @@ local Validations = {
         },
       },
       'then': {
-        'if': {
-          properties: {
-            audit_report_type: {
-              anyOf: [
-                {
-                  const: 'A',
-                },
-                {
-                  const: 'Q',
-                },
-              ],
-            },
-          },
-        },
-        'then': {
-          properties: {
-            number_of_audit_findings: Types.integer {
-              exclusiveMinimum: 0,
-            },
-          },
-        },
+        required: ['audit_report_type'],
+        // MCJ FIXME can we find in UG that this condition is true?
+        // 'if': {
+        //   properties: {
+        //     audit_report_type: {
+        //       anyOf: [
+        //         {
+        //           const: 'A',
+        //         },
+        //         {
+        //           const: 'Q',
+        //         },
+        //       ],
+        //     },
+        //   },
+        // },
+        // 'then': {
+        //   properties: {
+        //     // If it is A or Q, then the number MUST be greater than 0.
+        //     number_of_audit_findings: Types.integer {
+        //       exclusiveMinimum: 0,
+        //     },
+        //   },
+        // },
       },
     },
     {
-      // 20230409 MCJ FIXME: Should we require all fields always,
-      // and make sure thet ype checking is correct in each conditional branch?
-      // FIXME: Should we ALWAYS require a value in EVERY field, and disallow
-      // the empty/null responses everywhere?
       'if': {
         properties: {
           is_major: {
@@ -160,113 +123,112 @@ local Validations = {
         },
       },
       'then': {
-        properties: {
-          audit_report_type: Base.Enum.EmptyString_Null,
+        not: {
+          required: ['audit_report_type'],
         },
       },
     },
-    Base.Validation.AdditionalAwardIdentificationValidation[0],
+    {
+      'if': {
+        properties: {
+          three_digit_extension: Base.Compound.ExtensionRdOrU,
+        },
+      },
+      'then': {
+        properties: {
+          additional_award_identification: Types.string {
+            minLength: 1,
+          },
+        },
+        required: ['additional_award_identification'],
+      },
+    },
   ],
 };
 
 local Parts = {
   Cluster: Types.object {
     properties: {
-      cluster_name: Base.Compound.ClusterName,
-      cluster_total: Types.number,
+      cluster_name: Types.string,
+      other_cluster_name: Types.string,
+      state_cluster_name: Types.string,
+      cluster_total: Types.number {
+        minimum: 0,
+      },
     },
+    required: ['cluster_name', 'cluster_total'],
     allOf: [
       {
         'if': {
-          not: {
-            properties: {
-              cluster_name: {
-                enum: [Base.Const.OTHER_CLUSTER, Base.Const.STATE_CLUSTER],
-              },
-            },
+          properties: {
+            cluster_name: Base.Compound.ClusterNamesNA,
           },
         },
         'then': {
           allOf: [
             {
-              properties: {
-                other_cluster_name: Base.Enum.EmptyString_Null,
+              not: {
+                required: ['other_cluster_name'],
               },
             },
             {
-              properties: {
-                state_cluster_name: Base.Enum.EmptyString_Null,
+              not: {
+                required: ['state_cluster_name'],
               },
             },
           ],
+
         },
       },
       {
         'if': {
           properties: {
-            cluster_name: {
-              const: Base.Const.STATE_CLUSTER,
-            },
-          },
-        },
-        'then': {
-          required: [
-            'state_cluster_name',
-          ],
-          allOf: [
-            {
-              properties: {
-                other_cluster_name: Base.Enum.EmptyString_Null,
-              },
-            },
-            {
-              properties: {
-                state_cluster_name: Base.Compound.NonEmptyString,
-              },
-            },
-          ],
-        },
-      },
-      {
-        'if': {
-          properties: {
-            cluster_name: {
+            cluster_name: Types.string {
               const: Base.Const.OTHER_CLUSTER,
             },
           },
         },
         'then': {
-          required: [
-            'other_cluster_name',
-          ],
           allOf: [
             {
-              properties: {
-                other_cluster_name: Base.Compound.NonEmptyString,
-              },
+              required: ['other_cluster_name'],
             },
             {
-              properties: {
-                state_cluster_name: Base.Enum.EmptyString_Null,
+              not: {
+                required: ['state_cluster_name'],
               },
             },
+
           ],
+
+        },
+      },
+      {
+        'if': {
+          properties: {
+            cluster_name: Types.string {
+              const: Base.Const.STATE_CLUSTER,
+            },
+          },
+        },
+        'then': {
+          allOf: [
+            {
+              required: ['state_cluster_name'],
+            },
+            {
+              not: {
+                required: ['other_cluster_name'],
+              },
+            },
+
+          ],
+
         },
       },
     ],
-    required: ['cluster_name', 'cluster_total'],
   },
-  PassThroughEntity: Types.object {
-    additionalProperties: false,
-    properties: {
-      passthrough_name: Types.string,
-      passthrough_identifying_number: {
-        type: 'string',
-        minLength: 1,
-      },
-    },
-    required: ['passthrough_name', 'passthrough_identifying_number'],
-  },
+
   DirectOrIndirectAward: Types.object {
     // 20230409 MCJ FIXME: I think this needs the amount...
     additionalProperties: false,
@@ -274,17 +236,53 @@ local Parts = {
     properties: {
       is_direct: Base.Enum.YorN,
       entities: Types.array {
-        items: Parts.PassThroughEntity,
+        items: Validations.PassThroughEntity,
       },
     },
-    allOf: Validations.DirectAwardValidations,
+    required: ['is_direct'],
+    allOf: [
+      {
+        'if': {
+          properties: {
+            is_direct: {
+              const: Base.Const.N,
+            },
+          },
+        },
+        'then': {
+          required: ['entities'],
+        },
+      },
+      {
+        'if': {
+          properties: {
+            is_direct: {
+              const: Base.Const.Y,
+            },
+          },
+        },
+        'then': {
+          not: {
+            required: ['entities'],
+          },
+        },
+      },
+    ],
   },
   LoanOrLoanGuarantee: Types.object {
     additionalProperties: false,
     description: 'A loan or loan guarantee and balance',
     properties: {
       is_guaranteed: Base.Enum.YorN,
-      loan_balance_at_audit_period_end: Func.compound_type([Types.number, Types.string]),
+      loan_balance_at_audit_period_end: {
+        anyOf: [
+          Types.integer,
+          Types.string { pattern: '[0-9]+' },
+          Types.string {
+            const: Base.Const.NA,
+          },
+        ],
+      },
     },
     required: [
       'is_guaranteed',
@@ -295,25 +293,39 @@ local Parts = {
     additionalProperties: false,
     properties: {
       is_passed: Base.Enum.YorN,
-      subrecipient_amount: Func.compound_type([Types.number, Types.string]),
+      subrecipient_amount: Types.number {
+        minimum: 0,
+      },
     },
+    required: ['is_passed'],
     allOf: Validations.SubrecipientValidations,
   },
   Program: Types.object {
     additionalProperties: false,
     properties: {
-      federal_agency_prefix: Base.Enum.ALNPrefixes,
+      federal_agency_prefix: Base.Compound.ALNPrefixes,
       three_digit_extension: Base.Compound.ThreeDigitExtension,
-      additional_award_identification: Func.compound_type([Types.string, Types.NULL, Types.integer]),
-      // 20230525 HDMS FIXME: It seems this should be both a drop down and a free text field  (see details in  census xlsx)!!!
+      additional_award_identification: Types.string,
       program_name: Types.string,
-      amount_expended: Types.number,
-      federal_program_total: Types.number,
+      amount_expended: Types.number {
+        minimum: 0,
+      },
+      federal_program_total: Types.number {
+        minimum: 0,
+      },
       is_major: Base.Enum.YorN,
-      audit_report_type: Types.string,
+      audit_report_type: Base.Enum.MajorProgramAuditReportType,
       number_of_audit_findings: Types.integer,
     },
-    required: ['program_name', 'federal_agency_prefix', 'three_digit_extension', 'is_major', 'number_of_audit_findings'],
+    required: [
+      'program_name',
+      'federal_agency_prefix',
+      'three_digit_extension',
+      'is_major',
+      'number_of_audit_findings',
+      'federal_program_total',
+      'amount_expended',
+    ],
     allOf: Validations.ProgramValidations,
   },
 };
@@ -327,6 +339,7 @@ local FederalAwardEntry = Types.object {
     loan_or_loan_guarantee: Parts.LoanOrLoanGuarantee,
     program: Parts.Program,
     subrecipients: Parts.Subrecipients,
+    award_reference: Base.Compound.AwardReference,
   },
   required: [
     'cluster',
@@ -338,6 +351,23 @@ local FederalAwardEntry = Types.object {
   title: 'FederalAwardEntry',
 };
 
+local Meta = Types.object {
+  additionalProperties: false,
+  properties: {
+    section_name: Types.string {
+      enum: [Sheets.section_names.FEDERAL_AWARDS],
+    },
+    // FIXME: 2023-08-07 MSHD: The 'Version' is currently used here as a placeholder, and it is not being enforced at the moment.
+    // Once we establish a versioning pattern, we can update this and enforce it accordingly.
+    version: Types.string {
+      const: Sheets.WORKBOOKS_VERSION,
+    },
+  },
+  required: ['section_name'],
+  title: 'Meta',
+  version: 20230807,
+};
+
 local FederalAwards = Types.object {
   additionalProperties: false,
   properties: {
@@ -345,9 +375,9 @@ local FederalAwards = Types.object {
     federal_awards: Types.array {
       items: FederalAwardEntry,
     },
-    total_amount_expended: Func.compound_type([Types.number {
+    total_amount_expended: Types.number {
       minimum: 0,
-    }, Types.NULL]),
+    },
   },
   required: ['auditee_uei', 'total_amount_expended'],
   title: 'FederalAward',
@@ -358,6 +388,7 @@ local Root = Types.object {
   additionalProperties: false,
   properties: {
     FederalAwards: FederalAwards,
+    Meta: Meta,
   },
   version: 20230408,
 };

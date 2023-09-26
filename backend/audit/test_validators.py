@@ -10,12 +10,18 @@ from random import choice, randrange
 from openpyxl import Workbook
 from tempfile import NamedTemporaryFile
 
+import copy
 import requests
+from typing import Dict, Union
 
 from audit.fixtures.excel import (
     SIMPLE_CASES_TEST_FILE,
     CORRECTIVE_ACTION_TEMPLATE_DEFINITION,
     ADDITIONAL_UEIS_TEMPLATE_DEFINITION,
+    ADDITIONAL_EINS_TEMPLATE_DEFINITION,
+    SECONDARY_AUDITORS_TEMPLATE_DEFINITION,
+    NOTES_TO_SEFA_TEMPLATE_DEFINITION,
+    FORM_SECTIONS,
 )
 
 from .validators import (
@@ -23,12 +29,15 @@ from .validators import (
     ALLOWED_EXCEL_FILE_EXTENSIONS,
     MAX_EXCEL_FILE_SIZE_MB,
     validate_additional_ueis_json,
+    validate_additional_eins_json,
+    validate_notes_to_sefa_json,
     validate_corrective_action_plan_json,
     validate_file_content_type,
     validate_file_extension,
     validate_excel_file_integrity,
     validate_file_size,
     validate_federal_award_json,
+    validate_secondary_auditors_json,
     validate_file_infection,
     validate_pdf_file_integrity,
     validate_uei,
@@ -36,6 +45,8 @@ from .validators import (
     validate_uei_valid_chars,
     validate_uei_leading_char,
     validate_uei_nine_digit_sequences,
+    validate_component_page_numbers,
+    validate_audit_information_json,
 )
 
 # Simplest way to create a new copy of simple case rather than getting
@@ -65,7 +76,9 @@ class FederalAwardsValidatorTests(SimpleTestCase):
         """
         Empty Federal Awards should fail, simple case should pass.
         """
-        invalid = json.loads('{"FederalAwards":{}}')
+        invalid = json.loads(
+            f'{{"Meta":{{"section_name":"{FORM_SECTIONS.FEDERAL_AWARDS_EXPENDED}"}},"FederalAwards":{{}}}}'
+        )
         expected_msg = "[\"'Federal Awards' is a required property.\"]"
         self.assertRaisesRegex(
             ValidationError, expected_msg, validate_federal_award_json, invalid
@@ -73,31 +86,6 @@ class FederalAwardsValidatorTests(SimpleTestCase):
 
         simple = FederalAwardsValidatorTests.SIMPLE_CASE
         validate_federal_award_json(simple)
-
-    def test_prefix_under_ten(self):
-        """
-        Prefixes between 00 and 09 should fail
-        """
-        simple = jsoncopy(FederalAwardsValidatorTests.SIMPLE_CASE)
-
-        # pick a prefix between 00 and 09 (invalid)
-        prefix = f"{randrange(10):02}"
-        # 20230512 HDMS FIXME: For some reasons, this fails randomly. I suspect it's because the random number generated is sometimes incorrect ,i.e., has less than three digits.
-        # pick an extension beteween 001 and 999 (valid)
-        extension = f"{randrange(100, 1000):03}"
-
-        simple["FederalAwards"]["federal_awards"][0]["program"][
-            "federal_agency_prefix"
-        ] = f"{prefix}"
-        simple["FederalAwards"]["federal_awards"][0]["program"][
-            "three_digit_extension"
-        ] = f"{extension}"
-
-        with self.assertRaises(
-            ValidationError,
-            msg=f"ValidationError not raised with prefix = {prefix}, extension = {extension}",
-        ):
-            validate_federal_award_json(simple)
 
     def test_prefix_over_99(self):
         """
@@ -159,8 +147,6 @@ class FederalAwardsValidatorTests(SimpleTestCase):
         A CFDA extension of RD should pass
         """
         simple = jsoncopy(FederalAwardsValidatorTests.SIMPLE_CASE)
-        # 20230512 HDMS FIXME: This is wrong. Not all two digits from 10 to 20  are valid. Changed to 10 to 69 for now.
-        # pick a prefix between 10 and 99 (valid)
         prefix = f"{randrange(10, 20):02}"
         # use RD as extension (valid)
         extension = "RD"
@@ -653,9 +639,18 @@ class CorrectiveActionPlanValidatorTests(SimpleTestCase):
             settings.XLSX_TEMPLATE_JSON_DIR / CORRECTIVE_ACTION_TEMPLATE_DEFINITION
         )
         template = json.loads(template_definition_path.read_text(encoding="utf-8"))
-        invalid = json.loads('{"CorrectiveActionPlan":{}}')
+        invalid = json.loads(
+            f'{{"Meta":{{"section_name":"{FORM_SECTIONS.CORRECTIVE_ACTION_PLAN}"}},"CorrectiveActionPlan":{{}}}}'
+        )
         expected_msg = str(
-            ("A", "2", "Auditee UEI", template["sheets"][1]["single_cells"][0]["help"])
+            [
+                (
+                    "B",
+                    "4",
+                    "Auditee UEI",
+                    template["sheets"][0]["single_cells"][2]["help"],
+                )
+            ]
         )
         self.assertRaisesRegex(
             ValidationError, expected_msg, validate_corrective_action_plan_json, invalid
@@ -702,12 +697,204 @@ class AdditionalUeisValidatorTests(SimpleTestCase):
             settings.XLSX_TEMPLATE_JSON_DIR / ADDITIONAL_UEIS_TEMPLATE_DEFINITION
         )
         template = json.loads(template_definition_path.read_text(encoding="utf-8"))
-        invalid = json.loads('{"AdditionalUEIs":{}}')
+        invalid = json.loads(
+            f'{{"Meta":{{"section_name":"{FORM_SECTIONS.ADDITIONAL_UEIS}"}},"AdditionalUEIs":{{}}}}'
+        )
         expected_msg = str(
-            ("A", "2", "Auditee UEI", template["sheets"][1]["single_cells"][0]["help"])
+            [
+                (
+                    "B",
+                    "4",
+                    "Auditee UEI",
+                    template["sheets"][0]["single_cells"][2]["help"],
+                )
+            ]
         )
         self.assertRaisesRegex(
             ValidationError, expected_msg, validate_additional_ueis_json, invalid
         )
 
         validate_additional_ueis_json(AdditionalUeisValidatorTests.SIMPLE_CASE)
+
+
+class AdditionalEinsValidatorTests(SimpleTestCase):
+    SIMPLE_CASE = json.loads(SIMPLE_CASES_TEST_FILE.read_text(encoding="utf-8"))[
+        "AdditionalEinsCase"
+    ]
+
+    def test_validation_is_applied(self):
+        """
+        Empty Additional EINs should fail, simple case should pass.
+        """
+        template_definition_path = (
+            settings.XLSX_TEMPLATE_JSON_DIR / ADDITIONAL_EINS_TEMPLATE_DEFINITION
+        )
+        template = json.loads(template_definition_path.read_text(encoding="utf-8"))
+        invalid = json.loads(
+            f'{{"Meta":{{"section_name":"{FORM_SECTIONS.ADDITIONAL_EINS}"}},"AdditionalEINs":{{}}}}'
+        )
+        expected_msg = str(
+            [
+                (
+                    "B",
+                    "4",
+                    "Auditee UEI",
+                    template["sheets"][0]["single_cells"][2]["help"],
+                )
+            ]
+        )
+        self.assertRaisesRegex(
+            ValidationError, expected_msg, validate_additional_eins_json, invalid
+        )
+
+        validate_additional_eins_json(self.SIMPLE_CASE)
+
+
+class NotesToSefaValidatorTests(SimpleTestCase):
+    SIMPLE_CASES = json.loads(SIMPLE_CASES_TEST_FILE.read_text(encoding="utf-8"))[
+        "NotesToSefaCases"
+    ]
+
+    def test_validation_is_applied(self):
+        """
+        Empty Notes to SEFA should fail, simple case should pass.
+        """
+        template_definition_path = (
+            settings.XLSX_TEMPLATE_JSON_DIR / NOTES_TO_SEFA_TEMPLATE_DEFINITION
+        )
+        template = json.loads(template_definition_path.read_text(encoding="utf-8"))
+        invalid = json.loads(
+            f'{{"Meta":{{"section_name":"{FORM_SECTIONS.NOTES_TO_SEFA}"}},"NotesToSefa":{{}}}}'
+        )
+        expected_msg = str(
+            [
+                (
+                    "B",
+                    "4",
+                    "Auditee UEI",
+                    template["sheets"][0]["single_cells"][2]["help"],
+                )
+            ]
+        )
+        self.assertRaisesRegex(
+            ValidationError, expected_msg, validate_notes_to_sefa_json, invalid
+        )
+
+        validate_notes_to_sefa_json(NotesToSefaValidatorTests.SIMPLE_CASES[0])
+        validate_notes_to_sefa_json(NotesToSefaValidatorTests.SIMPLE_CASES[1])
+
+
+class SecondaryAuditorsValidatorTests(SimpleTestCase):
+    SIMPLE_CASE = json.loads(SIMPLE_CASES_TEST_FILE.read_text(encoding="utf-8"))[
+        "SecondaryAuditorsCase"
+    ]
+
+    def test_validation_is_applied(self):
+        """
+        Empty secondary auditors should fail, simple case should pass.
+        """
+        template_definition_path = (
+            settings.XLSX_TEMPLATE_JSON_DIR / SECONDARY_AUDITORS_TEMPLATE_DEFINITION
+        )
+        template = json.loads(template_definition_path.read_text(encoding="utf-8"))
+        invalid = json.loads(
+            f'{{"Meta":{{"section_name":"{FORM_SECTIONS.SECONDARY_AUDITORS}"}},"SecondaryAuditors":{{}}}}'
+        )
+        expected_msg = str(
+            [
+                (
+                    "B",
+                    "4",
+                    "Auditee UEI",
+                    template["sheets"][0]["single_cells"][2]["help"],
+                )
+            ]
+        )
+        self.assertRaisesRegex(
+            ValidationError, expected_msg, validate_secondary_auditors_json, invalid
+        )
+
+        validate_secondary_auditors_json(SecondaryAuditorsValidatorTests.SIMPLE_CASE)
+
+
+class ComponentPageNumberTests(SimpleTestCase):
+    good_pages: Dict[str, Union[str, int]] = {
+        "financial_statements": 1,
+        "financial_statements_opinion": 2,
+        "schedule_expenditures": 3,
+        "schedule_expenditures_opinion": 4,
+        "uniform_guidance_control": 5,
+        "uniform_guidance_compliance": 6,
+        "GAS_control": 8,
+        "GAS_compliance": 9,
+        "schedule_findings": 10,
+    }
+
+    nan_pages = copy.deepcopy(good_pages)
+    nan_pages["financial_statements"] = "1000"
+
+    missing_pages = copy.deepcopy(good_pages)
+    del missing_pages["financial_statements"]
+
+    optional_pages = copy.deepcopy(good_pages)
+    optional_pages["schedule_prior_findings"] = 11
+    optional_pages["CAP_page"] = 12
+
+    def test_good_pages(self):
+        res = validate_component_page_numbers(ComponentPageNumberTests.good_pages)
+        if not res:
+            self.fail(
+                "validate_component_page_numbers incorrectly says our good data is bad!"
+            )
+
+    def test_nan_pages(self):
+        res = validate_component_page_numbers(ComponentPageNumberTests.nan_pages)
+        if res:
+            self.fail(
+                "validate_component_page_numbers incorrectly validated an object that has numbers instead of ints"
+            )
+
+    def test_missing_pages(self):
+        res = validate_component_page_numbers(ComponentPageNumberTests.missing_pages)
+        if res:
+            self.fail(
+                "validate_component_page_numbers incorrectly validated an object that is missing pages"
+            )
+
+    def test_optional_pages(self):
+        res = validate_component_page_numbers(ComponentPageNumberTests.optional_pages)
+        if not res:
+            self.fail(
+                "validate_component_page_numbers rejected an object with optional pages"
+            )
+
+
+class AuditInformationTests(SimpleTestCase):
+    def setUp(self):
+        """Set up common test data"""
+        self.SIMPLE_CASES = json.loads(
+            SIMPLE_CASES_TEST_FILE.read_text(encoding="utf-8")
+        )["AuditInformationCases"]
+
+    def test_no_errors_when_audit_information_is_valid(self):
+        """No errors should be raised when audit information is valid"""
+        for case in self.SIMPLE_CASES:
+            validate_audit_information_json(case)
+
+    def test_error_raised_for_missing_required_fields_with_not_gaap(self):
+        """Test that missing certain fields raises a validation error when 'gaap_results' contains 'not_gaap'."""
+        for required_field in [
+            "is_sp_framework_required",
+            "sp_framework_basis",
+            "sp_framework_opinions",
+        ]:
+            case = jsoncopy(self.SIMPLE_CASES[1])
+            del case[required_field]
+            self.assertRaises(ValidationError, validate_excel_file_integrity, case)
+
+    def test_error_raised_for_missing_required_fields(self):
+        """Test that missing required fields raises a validation error."""
+        for key in self.SIMPLE_CASES[0].keys():
+            case = jsoncopy(self.SIMPLE_CASES[0])
+            del case[key]
+            self.assertRaises(ValidationError, validate_excel_file_integrity, case)

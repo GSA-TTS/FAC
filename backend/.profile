@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 
 export SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt
 export REQUESTS_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt
@@ -35,13 +36,26 @@ export NEW_RELIC_HOST="gov-collector.newrelic.com"
 # We only want to run migrate and collecstatic for the first app instance, not
 # for additional app instances, so we gate all of this behind CF_INSTANCE_INDEX
 # being 0.
-[ "$CF_INSTANCE_INDEX" = 0 ] &&
-echo 'Starting migrate' &&
-python manage.py migrate &&
-echo 'Finished migrate' &&
-echo 'Starting view creation' &&
-python manage.py create_views &&
-echo 'Finished view creation' &&
-echo 'Starting collectstatic' &&
-python manage.py collectstatic --noinput &&
-echo 'Finished collectstatic'
+if [[ "$CF_INSTANCE_INDEX" == 0 ]]; then
+    echo 'Starting API schema deprecation' &&
+    python manage.py drop_deprecated_api_schema_and_views &&
+    echo 'Finished API schema deprecation' &&
+    echo 'Dropping API schema' &&
+	python manage.py drop_api_schema &&
+	echo 'Finished dropping API schema' &&
+    echo 'Starting API schema creation' &&
+    python manage.py create_api_schema &&
+    echo 'Finished API schema creation' &&
+    echo 'Starting migrate' &&
+    python manage.py migrate &&
+    echo 'Finished migrate' &&
+    echo 'Starting API view creation' &&
+    python manage.py create_api_views &&
+    echo 'Finished view creation' &&
+    echo 'Starting collectstatic' &&
+    python manage.py collectstatic --noinput &&
+    echo 'Finished collectstatic'
+fi
+
+# Make psql usable by scripts, for debugging, etc.
+alias psql='/home/vcap/deps/0/apt/usr/lib/postgresql/*/bin/psql'

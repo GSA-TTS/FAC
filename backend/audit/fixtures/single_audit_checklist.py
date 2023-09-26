@@ -1,16 +1,22 @@
 """Fixtures for SingleAuditChecklist.
 
-We want to create a simple
+We want to create a variety of SACs in different states of
+completion.
 """
 
 import logging
 from datetime import date, timedelta
 
 from django.apps import apps
+from django.conf import settings
+from django.core.files.uploadedfile import SimpleUploadedFile
 
 from faker import Faker
 
+import audit.excel
 import audit.validators
+
+from audit.fixtures.excel import FORM_SECTIONS
 from users.models import User
 
 logger = logging.getLogger(__name__)
@@ -45,7 +51,7 @@ def _fake_general_information(auditee_name=None):
         "auditor_city": fake.city(),
         "auditor_contact_name": fake.name(),
         "auditor_contact_title": fake.job(),
-        "auditor_country": fake.country(),
+        "auditor_country": "USA",
         "auditor_ein": fake.ssn().replace("-", ""),
         "auditor_ein_not_an_ssn_attestation": True,
         "auditor_email": fake.ascii_email(),
@@ -60,6 +66,7 @@ def _fake_general_information(auditee_name=None):
         "met_spending_threshold": True,
         "multiple_eins_covered": False,
         "multiple_ueis_covered": False,
+        "secondary_auditors_exist": False,
         # TODO: could improve this by randomly choosing from the enum of possible values
         "user_provided_organization_type": "unknown",
     }
@@ -68,6 +75,47 @@ def _fake_general_information(auditee_name=None):
     audit.validators.validate_general_information_json(general_information)
 
     return general_information
+
+
+def fake_auditor_certification():
+    """Create fake auditor confirmation form data."""
+    fake = Faker()
+    data_step_1 = {
+        "is_OMB_limited": True,
+        "is_auditee_responsible": True,
+        "has_used_auditors_report": True,
+        "has_no_auditee_procedures": True,
+        "is_FAC_releasable": True,
+    }
+    data_step_2 = {
+        "auditor_name": fake.name(),
+        "auditor_title": fake.job(),
+        "auditor_certification_date_signed": fake.date(),
+    }
+
+    return data_step_1, data_step_2
+
+
+def fake_auditee_certification():
+    """Create fake auditee confirmation form data."""
+    fake = Faker()
+    data_step_1 = {
+        "has_no_PII": True,
+        "has_no_BII": True,
+        "meets_2CFR_specifications": True,
+        "is_2CFR_compliant": True,
+        "is_complete_and_accurate": True,
+        "has_engaged_auditor": True,
+        "is_issued_and_signed": True,
+        "is_FAC_releasable": True,
+    }
+    data_step_2 = {
+        "auditee_name": fake.name(),
+        "auditee_title": fake.job(),
+        "auditee_certification_date_signed": fake.date(),
+    }
+
+    return data_step_1, data_step_2
 
 
 def _create_sac(user, auditee_name):
@@ -86,12 +134,68 @@ def _create_sac(user, auditee_name):
         role="editor",
     )
     logger.info("Created single audit checklist %s", sac)
+    return sac
+
+
+def _post_create_federal_awards(this_sac, this_user):
+    """Upload a federal awards workbook for this SAC.
+
+    This should be idempotent if it is called on a SAC that already
+    has a federal awards file uploaded.
+    """
+    ExcelFile = apps.get_model("audit.ExcelFile")
+
+    if (
+        ExcelFile.objects.filter(
+            sac_id=this_sac.id, form_section=FORM_SECTIONS.FEDERAL_AWARDS_EXPENDED
+        ).exists()
+        and this_sac.federal_awards is not None
+    ):
+        # there is already an uploaded file and data in the object so
+        # nothing to do here
+        return
+
+    with open(
+        settings.DATA_FIXTURES
+        / "audit"
+        / "excel_workbooks_test_files"
+        / "federal-awards-workbook-PASS.xlsx",
+        "rb",
+    ) as f:
+        content = f.read()
+    file = SimpleUploadedFile("test.xlsx", content, "application/vnd.ms-excel")
+    excel_file = ExcelFile(
+        file=file,
+        filename="temp",
+        user=this_user,
+        sac_id=this_sac.id,
+        form_section=FORM_SECTIONS.FEDERAL_AWARDS_EXPENDED,
+    )
+    excel_file.full_clean()
+    excel_file.save()
+
+    # TODO: refactor the upload handling from the post view into a
+    # function so we can call it here instead of aping it.
+    audit_data = audit.excel.extract_federal_awards(excel_file.file)
+    audit.validators.validate_federal_award_json(audit_data)
+    this_sac.federal_awards = audit_data
+    this_sac.save()
+
+    logger.info("Created Federal Awards workbook upload for SAC %s", this_sac.id)
 
 
 # list of the default SingleAuditChecklists to create for each user
-# The auditee name is used to disambiguate them
+# The auditee name is used to disambiguate them, so it must be unique
+# or another SAC won't be created.
+# If `post_create_callable` exists for an item, it should be a
+# callable(sac, user) that does further processing after the SAC
+# is created.
 SACS = [
-    {"auditee_name": "SAC in progress", "submission_status": "in_progress"},
+    {"auditee_name": "SAC in progress"},
+    {
+        "auditee_name": "Federal awards submitted",
+        "post_create_callable": _post_create_federal_awards,
+    },
 ]
 
 
@@ -101,11 +205,14 @@ def _load_single_audit_checklists_for_user(user):
     SingleAuditChecklist = apps.get_model("audit.SingleAuditChecklist")
     for item_info in SACS:
         auditee_name = item_info["auditee_name"]
-        if not SingleAuditChecklist.objects.filter(
+        sac = SingleAuditChecklist.objects.filter(
             submitted_by=user, general_information__auditee_name=auditee_name
-        ).exists():
+        ).first()
+        if sac is None:
             # need to make this object
-            _create_sac(user, auditee_name)
+            sac = _create_sac(user, auditee_name)
+        if "post_create_callable" in item_info:
+            item_info["post_create_callable"](sac, user)
 
 
 def load_single_audit_checklists():
@@ -117,8 +224,13 @@ def load_single_audit_checklists():
         _load_single_audit_checklists_for_user(user)
 
 
-def load_single_audit_checklists_for_email_address(user_email):
+def load_single_audit_checklists_for_email_address(user_email, workbooks=None):
     """Load example SACs for user with this email address."""
+    # Unfinished code for handling specific workbooks was checked into the
+    # load_fixtures command; this handles the additional argument so that in
+    # future that work can be wired in.
+    if workbooks is None:
+        workbooks = []
 
     try:
         user = User.objects.get(email=user_email)

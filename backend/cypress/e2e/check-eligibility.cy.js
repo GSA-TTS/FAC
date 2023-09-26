@@ -1,3 +1,5 @@
+import { selectValidEntries, testValidEligibilty } from '../support/check-eligibility.js';
+
 describe('Create New Audit', () => {
   beforeEach(() => {
     cy.visit('/report_submission/eligibility/');
@@ -33,12 +35,6 @@ describe('Create New Audit', () => {
       cy.get('label[for=us-no]').click();
     }
 
-
-    function selectValidEntries() {
-      cy.get('label[for=entity-state]').click();
-      cy.get('label[for=spend-yes]').click();
-      cy.get('label[for=us-yes]').click();
-    }
 
     it('does not show any errors initially', () => {
       cy.get('[class*=--error]').should('have.length', 0);
@@ -82,10 +78,7 @@ describe('Create New Audit', () => {
     });
 
     it('should navigate to next step after successful submission', () => {
-      selectValidEntries();
-
-      cy.get('.usa-button').contains('Continue').click();
-      cy.url().should('include', '/report_submission/auditeeinfo/');
+      testValidEligbility();
     });
   });
 

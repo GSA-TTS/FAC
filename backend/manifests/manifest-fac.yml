@@ -2,6 +2,7 @@
 applications:
   - name: ((app_name))
     buildpacks:
+      - https://github.com/cloudfoundry/apt-buildpack
       - python_buildpack
     memory: ((mem_amount))
     path: ../

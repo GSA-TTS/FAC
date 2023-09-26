@@ -1,0 +1,9 @@
+# The content of this file is managed by Terraform. If you modify it, it may
+# be reverted the next time Terraform runs. If you want to make changes, do it
+# in ../meta/bootstrap-env/templates.
+
+module "preview" {
+  source        = "../shared/modules/env"
+  cf_space_name = "preview"
+}
+
