@@ -14,7 +14,7 @@
     "check:eslint": "npx eslint --ignore-path ../.gitignore static/js",
     "fix:eslint": "npx eslint --fix --ignore-path ../.gitignore static/js",
     "check:stylelint": "npx stylelint '**/*.{css,scss,sass}'",
-    "fix:stylelint": "npx stylelint --fix .",
+    "fix:stylelint": "npx stylelint --fix '**/*.{css,scss,sass}'",
     "check:prettier": "npx prettier --check .",
     "fix:prettier": "npx prettier --fix .",
     "check-all": "run-p check:*",
