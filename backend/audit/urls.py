@@ -71,8 +71,8 @@ urlpatterns = [
         name="UploadReport",
     ),
     path(
-        "tribal-audit-consent/<str:report_id>",
-        views.TribalAuditConsentView.as_view(),
+        "tribal-data-release/<str:report_id>",
+        views.TribalDataConsent.as_view(),
         name="TribalAuditConsent",
     ),
     path(

@@ -14,7 +14,7 @@ from audit.forms import TribalAuditConsentForm
 from datetime import datetime
 
 
-class TribalAuditConsentView(SingleAuditChecklistAccessRequiredMixin, generic.View):
+class TribalDataConsent(SingleAuditChecklistAccessRequiredMixin, generic.View):
     def get(self, request, *args, **kwargs):
         report_id = kwargs["report_id"]
 
@@ -43,7 +43,7 @@ class TribalAuditConsentView(SingleAuditChecklistAccessRequiredMixin, generic.Vi
 
             return render(
                 request,
-                "audit/tribal-audit-consent.html",
+                "audit/tribal-data-release.html",
                 context | tribal_audit_consent,
             )
         except SingleAuditChecklist.DoesNotExist:
@@ -84,7 +84,7 @@ class TribalAuditConsentView(SingleAuditChecklistAccessRequiredMixin, generic.Vi
 
             return render(
                 request,
-                "audit/tribal-audit-consent.html",
+                "audit/tribal-data-release.html",
                 context | tribal_audit_consent,
             )
 
