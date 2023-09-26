@@ -42,7 +42,7 @@
   font-family: family('sans'); /* stylelint-disable-line */
 }
 
-@media (min-width: 64em) {
+@media (width >= 64em) {
   .usa-hero {
     min-height: 30rem;
 

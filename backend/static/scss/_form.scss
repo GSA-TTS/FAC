@@ -263,7 +263,7 @@ ul.usa-error-message {
 
 /* stylelint-enable */
 
-@media (min-width: 64em) {
+@media (width >= 64em) {
   .sticky-nav {
     align-self: flex-start;
     position: sticky;
