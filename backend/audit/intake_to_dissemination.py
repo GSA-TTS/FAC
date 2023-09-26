@@ -266,6 +266,7 @@ class IntakeToDissemination(object):
         audit_information = self.single_audit_checklist.audit_information or {}
         auditee_certification = self.single_audit_checklist.auditee_certification or {}
         # auditor_certification = self.single_audit_checklist.auditor_certification or {}
+        tribal_data_consent = self.single_audit_checklist.tribal_data_consent or {}
         cognizant_agency = self.single_audit_checklist.cognizant_agency or ""
         oversight_agency = self.single_audit_checklist.oversight_agency or ""
 
@@ -321,6 +322,14 @@ class IntakeToDissemination(object):
             addl = Util.bool_to_yes_no(general_information["multiple_ueis_covered"])
             general_data["is_additional_ueis"] = addl
 
+        if general_information["user_provided_organization_type"] == "tribal":
+            is_public = (
+                tribal_data_consent["is_tribal_information_authorized_to_be_public"]
+                == "Y"
+            )
+        else:
+            is_public = True
+
         # Various values in audit_information need special handling
         audit_data = {
             "agencies_with_prior_findings": Util.json_array_to_str(
@@ -366,7 +375,7 @@ class IntakeToDissemination(object):
             # is_duplicate_reports = Util.bool_to_yes_no(audit_information["is_aicpa_audit_guide_included"]), #FIXME This mapping does not seem correct
             total_amount_expended=total_amount_expended,
             type_audit_code="UG",
-            is_public=self.single_audit_checklist.is_public,
+            is_public=is_public,
             data_source=self.single_audit_checklist.data_source,
             **general_data,
             **audit_data,
