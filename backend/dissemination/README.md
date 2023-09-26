@@ -91,5 +91,5 @@ When adding a new API version.
 2. Copy the contents of an existing API as a starting point.
 3. Update `docker-compose.yml` and `docker-compose-web.yml` to change the `PGRST_DB_SCHEMAS` key to reflect all the active schemas.
    1. ADD TO THE END OF THIS LIST. The first entry is the default. Only add to the front of the list if we are certain the schema should become the new default.
-   2. This is likely true of TESTED patch version bumps (v1_0_0 to v1_0_1), and _maybe_ minor version bumps (v1_0_0 to v1_1_0). MAJOR bumps require change management messaging.
+   2. This is likely true of TESTED patch version bumps (v1*0_0 to v1_0_1), and \_maybe* minor version bumps (v1_0_0 to v1_1_0). MAJOR bumps require change management messaging.
 4. Update `APIViewTests` to make sure you're testing the right schema. (That file might want some love...)
