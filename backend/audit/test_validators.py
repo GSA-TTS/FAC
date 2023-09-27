@@ -909,7 +909,7 @@ class TribalAccessTests(SimpleTestCase):
             TRIBAL_ACCESS_TEST_FILE.read_text(encoding="utf-8")
         )
 
-    def test_no_errors_when_audit_information_is_valid(self):
+    def test_no_errors_when_tribal_access_is_valid(self):
         """No errors should be raised when tribal data consent is valid"""
         for case in self.SIMPLE_CASES:
             validate_tribal_data_consent_json(case)
