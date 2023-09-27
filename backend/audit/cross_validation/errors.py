@@ -37,6 +37,10 @@ def err_missing_tribal_data_sharing_consent():
     )
 
 
+def err_unexpected_tribal_data_sharing_consent():
+    return "Tribal consent privacy flag set but non-tribal org type."
+
+
 def err_certifying_contacts_should_not_match():
     return "The certifying auditor and auditee should not have the same email address."
 
