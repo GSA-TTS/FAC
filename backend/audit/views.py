@@ -64,6 +64,7 @@ from audit.validators import (
     validate_secondary_auditors_json,
 )
 from audit.viewlib import (  # noqa
+    FileDownloadView,
     SubmissionProgressView,
     UploadReportView,
     submission_progress_check,

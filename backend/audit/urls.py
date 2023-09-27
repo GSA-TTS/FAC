@@ -75,6 +75,11 @@ urlpatterns = [
         views.CrossValidationView.as_view(),
         name="CrossValidation",
     ),
+    path(
+        "files/<str:file_type>/<str:report_id>",
+        views.FileDownloadView.as_view(),
+        name="FileDownload",
+    ),
 ]
 
 for form_section in FORM_SECTIONS:
