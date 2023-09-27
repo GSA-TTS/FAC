@@ -13,8 +13,8 @@
     "dev": "node build-assets.js --watch",
     "check:eslint": "npx eslint --ignore-path ../.gitignore static/js",
     "fix:eslint": "npx eslint --fix --ignore-path ../.gitignore static/js",
-    "check:stylelint": "npx stylelint --ignore-pattern uswds static/scss",
-    "fix:stylelint": "npx stylelint --fix --ignore-pattern uswds static/scss",
+    "check:stylelint": "npx stylelint './static/scss'",
+    "fix:stylelint": "npx stylelint --fix './static/scss'",
     "check-all": "run-p check:*",
     "fix-all": "run-p fix:*",
     "test:a11y:pa11y": "npx pa11y-ci -c ../.pa11yci",
@@ -40,14 +40,12 @@
     "glob": "^8.1.0",
     "pa11y-ci": "^3.0.1",
     "prettier": "^2.8.4",
-    "stylelint": "^14.16.1",
-    "stylelint-config-prettier": "^9.0.5",
+    "stylelint": "^15.10.1",
     "stylelint-config-scss": "^1.0.0-security",
-    "stylelint-config-standard": "^29.0.0",
-    "stylelint-config-standard-scss": "^6.1.0"
+    "stylelint-config-standard": "^34.0.0",
+    "stylelint-config-standard-scss": "^11.0.0"
   },
   "dependencies": {
-    "djlint": "^1.32.1",
     "esbuild": "^0.15.18",
     "npm": "^9.4.2",
     "npm-run-all": "^4.1.5",
