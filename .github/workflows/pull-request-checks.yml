@@ -21,6 +21,7 @@ jobs:
       dev-requirements: ${{ steps.filter.outputs.devrequirements }}
       docker: ${{ steps.filter.outputs.docker }}
       package: ${{ steps.filter.outputs.package }}
+      staticfiles: ${{ steps.filter.outputs.staticfiles }}
     steps:
       - uses: dorny/paths-filter@v2
         id: filter
@@ -34,17 +35,19 @@ jobs:
               - './backend/Dockerfile'
             package:
               - './backend/package.json'
+            staticfiles:
+              - './backend/static/**'
 
   # Tests and Linting invoked on a Pull Request
   testing-from-build:
     needs: [check-for-changes]
-    if: ${{ needs.check-for-changes.outputs.requirements == 'true' || needs.check-for-changes.outputs.dev-requirements == 'true' || needs.check-for-changes.outputs.docker == 'true' || needs.check-for-changes.outputs.package == 'true' }}
+    if: ${{ needs.check-for-changes.outputs.requirements == 'true' || needs.check-for-changes.outputs.dev-requirements == 'true' || needs.check-for-changes.outputs.docker == 'true' || needs.check-for-changes.outputs.package == 'true' || needs.check-for-changes.outputs.staticfiles == 'true' }}
     uses: ./.github/workflows/testing-from-build.yml
     secrets: inherit
 
   testing-from-ghcr:
     needs: [check-for-changes]
-    if: ${{ needs.check-for-changes.outputs.requirements != 'true' && needs.check-for-changes.outputs.dev-requirements != 'true' && needs.check-for-changes.outputs.docker != 'true' && needs.check-for-changes.outputs.package != 'true' }}
+    if: ${{ needs.check-for-changes.outputs.requirements != 'true' && needs.check-for-changes.outputs.dev-requirements != 'true' && needs.check-for-changes.outputs.docker != 'true' && needs.check-for-changes.outputs.package != 'true' && needs.check-for-changes.outputs.staticfiles != 'true'  }}
     uses: ./.github/workflows/testing-from-ghcr.yml
     secrets: inherit
 
