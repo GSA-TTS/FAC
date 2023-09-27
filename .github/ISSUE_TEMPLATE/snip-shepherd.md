@@ -1,3 +1,11 @@
+---
+name: "Snip: Shepherds"
+about: Starting point for who will shepherd work.
+title: 'snip-shepherds'
+labels: ''
+assignees: ''
+---
+
 ### Shepherds
 
 [comment]: # "@ mention shepherds as we move across the board."
@@ -5,5 +13,7 @@
 
 * Content shepherd: 
 * Design shepherd: 
+* Data shepherd: 
+* Infrastructure shepherd:
 * Engineering shepherd: 
 

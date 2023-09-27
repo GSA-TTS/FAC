@@ -1,3 +1,10 @@
+---
+name: "Snip: Background"
+about: Starting point for the background on a ticket.
+title: 'snip-background'
+labels: ''
+assignees: ''
+---
 
 # Background
 
