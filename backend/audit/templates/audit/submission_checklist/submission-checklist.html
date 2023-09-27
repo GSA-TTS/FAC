@@ -60,13 +60,16 @@
                         {% endif %}
                     </li>
                     
-                    {% comment %} Tribal audit consent {% endcomment %}
+                    {% comment %} Tribal data release consent {% endcomment %}
                     <li class="usa-icon-list__item padding-bottom-105" id="tribal_consent-completed">
                         {% include './icon-list-icon.html' with completed=False %}
-                        <p class="text-bold margin-0">
-                            <a class="usa-link"
-                                href="{% url 'audit:TribalAuditConsent' report_id %}">Tribal data release</a>
-                        </p>
+                        <div>
+                            <p class="text-bold margin-0">
+                                <a class="usa-link"
+                                    href="{% url 'audit:TribalAuditConsent' report_id %}">Tribal data release</a>
+                            </p>
+                            <p class="margin-0">Auditees must opt in or opt out of making their reporting package publicly available.</p>
+                        </div>
                     </li>
                     
                     {% comment %} Auditor Certification {% endcomment %}
