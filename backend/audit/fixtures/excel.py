@@ -38,7 +38,7 @@ FINDINGS_UNIFORM_GUIDANCE_TEST_FILE = (
 )
 SECONDARY_AUDITORS_TEST_FILE = TESTFILES_DIR / "secondary-auditors-pass-01.json"
 NOTES_TO_SEFA_TEST_FILE = TESTFILES_DIR / "notes-to-sefa-pass-01.json"
-TRIBAL_ACCESS_TEST_FILE = TESTFILES_DIR / "tribal-access-plan-pass-01.json"
+TRIBAL_ACCESS_TEST_FILE = TESTFILES_DIR / "tribal-access-pass-01.json"
 
 ADDITIONAL_UEIS_ENTRY_FIXTURES = (
     settings.AUDIT_TEST_DATA_ENTRY_DIR / "additional-ueis-entries.json"
