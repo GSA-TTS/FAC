@@ -1,3 +1,10 @@
+---
+name: "Snip: Security Considerations"
+about: Starting point for security considerations on a piece of work.
+title: 'snip-security-considerations'
+labels: ''
+assignees: ''
+---
 
 # Security Considerations
 
