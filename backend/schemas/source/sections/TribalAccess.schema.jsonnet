@@ -22,5 +22,5 @@ Typechecks fields, but allows for empty data as well. Contains conditional Check
   ],
   title: 'TribalAccess',
   type: 'object',
-  version: null,
+  version: 20230927,
 }
