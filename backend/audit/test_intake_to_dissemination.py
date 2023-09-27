@@ -71,34 +71,58 @@ class IntakeToDisseminationTests(TestCase):
             # Increment the minute by 2
             transition_date += timedelta(minutes=2)
 
-        return sac
+    def _create_sac(
+        self,
+        reference_number=None,
+        user_provided_organization_type=None,
+        cognizant_agency=None,
+        oversight_agency=None,
+        privacy_flag=None,
+    ):
+        if reference_number:
+            findings_text_data = self._fake_findings_text(
+                reference_number=reference_number
+            )
+        else:
+            findings_text_data = self._fake_findings_text()
 
-    def setUp(self):
-        self.user = baker.make(User)
+        if user_provided_organization_type:
+            general_data = self._fake_general(
+                user_provided_organization_type=user_provided_organization_type
+            )
+        else:
+            general_data = self._fake_general()
 
         sac = SingleAuditChecklist.objects.create(
             submitted_by=self.user,
-            general_information=self._fake_general(),
+            general_information=general_data,
             federal_awards=self._fake_federal_awards(),
             findings_uniform_guidance=self._fake_findings_uniform_guidance(),
             notes_to_sefa=self._fake_notes_to_sefa(),
-            findings_text=self._fake_findings_text(),
+            findings_text=findings_text_data,
             corrective_action_plan=self._fake_corrective_action_plan(),
             secondary_auditors=self._fake_secondary_auditors(),
             additional_ueis=self._fake_additional_ueis(),
             additional_eins=self._fake_additional_eins(),
             audit_information=self._fake_audit_information(),
             auditee_certification=self._fake_auditee_certification(),
-            cognizant_agency="42",
-            oversight_agency="42",
+            tribal_data_consent=self._fake_tribal_data_consent(privacy_flag),
+            cognizant_agency=cognizant_agency,
+            oversight_agency=oversight_agency,
         )
-        sac = self._run_state_transition(sac)
+        return sac
+
+    def setUp(self):
+        self.user = baker.make(User)
+
+        sac = self._create_sac(cognizant_agency="42", oversight_agency="42")
+        self._run_state_transition(sac)
         self.sac = sac
         self.intake_to_dissemination = IntakeToDissemination(self.sac)
         self.report_id = sac.report_id
 
     @staticmethod
-    def _fake_general():
+    def _fake_general(user_provided_organization_type: str = "state"):
         fake = Faker()
         geninfofile = "general-information--test0001test--simple-pass.json"
         geninfo = _load_json(AUDIT_JSON_FIXTURES / geninfofile)
@@ -136,7 +160,7 @@ class IntakeToDisseminationTests(TestCase):
             "auditee_fiscal_period_end": "2023-06-01",
             "ein_not_an_ssn_attestation": "true",
             "auditee_fiscal_period_start": "2022-11-01",
-            "user_provided_organization_type": "state",
+            "user_provided_organization_type": user_provided_organization_type,
             "auditor_ein_not_an_ssn_attestation": "true",
         }
 
@@ -331,6 +355,19 @@ class IntakeToDisseminationTests(TestCase):
         return audit_information
 
     @staticmethod
+    def _fake_tribal_data_consent(privacy_flag=None):
+        fake = Faker()
+
+        if privacy_flag is None:
+            privacy_flag = fake.boolean()
+
+        return {
+            "is_tribal_information_authorized_to_be_public": privacy_flag,
+            "tribal_authorization_certifying_official_name": fake.word(),
+            "tribal_authorization_certifying_official_title": fake.word(),
+        }
+
+    @staticmethod
     def _fake_additional_ueis():
         return {
             "AdditionalUEIs": {
@@ -396,6 +433,29 @@ class IntakeToDisseminationTests(TestCase):
 
                 self.assertEqual(general.submitted_date, date_in_american_samoa)
                 general.delete()
+
+    def _setup_and_test_privacy_flag(self, flag):
+        """Common setup and test logic for tribal data privacy flag tests."""
+
+        sac = self._create_sac(
+            privacy_flag=flag,
+            user_provided_organization_type="tribal",
+        )
+        self._run_state_transition(sac)
+        self.intake_to_dissemination = IntakeToDissemination(sac)
+        self.intake_to_dissemination.load_all()
+        self.intake_to_dissemination.save_dissemination_objects()
+        general = General.objects.first()
+        self.assertEqual(general.entity_type, "tribal")
+        self.assertEqual(general.is_public, flag)
+
+    def test_tribal_data_is_public_when_authorized(self):
+        """Test that tribal data privacy flag is enabled when user has authorized it to be public."""
+        self._setup_and_test_privacy_flag(True)
+
+    def test_tribal_data_is_private_when_not_authorized(self):
+        """Test that tribal data privacy flag is disabled when user has not authorized it to be public."""
+        self._setup_and_test_privacy_flag(False)
 
     def test_load_federal_award(self):
         self.intake_to_dissemination.load_federal_award()
@@ -489,21 +549,8 @@ class IntakeToDisseminationTests(TestCase):
         len_general = len(General.objects.all())
         len_captext = len(CapText.objects.all())
 
-        sac = SingleAuditChecklist.objects.create(
-            submitted_by=self.user,
-            general_information=self._fake_general(),
-            federal_awards=self._fake_federal_awards(),
-            findings_uniform_guidance=self._fake_findings_uniform_guidance(),
-            notes_to_sefa=self._fake_notes_to_sefa(),
-            findings_text=self._fake_findings_text(reference_number=2),
-            corrective_action_plan=self._fake_corrective_action_plan(),
-            secondary_auditors=self._fake_secondary_auditors(),
-            additional_ueis=self._fake_additional_ueis(),
-            additional_eins=self._fake_additional_eins(),
-            audit_information=self._fake_audit_information(),
-            auditee_certification=self._fake_auditee_certification(),
-        )
-        sac = self._run_state_transition(sac)
+        sac = self._create_sac(reference_number=2)
+        self._run_state_transition(sac)
         self.sac = sac
         self.intake_to_dissemination = IntakeToDissemination(self.sac)
         self.intake_to_dissemination.load_all()
@@ -511,25 +558,15 @@ class IntakeToDisseminationTests(TestCase):
         self.report_id = sac.report_id
         self.assertLess(len_general, len(General.objects.all()))
         self.assertLess(len_captext, len(CapText.objects.all()))
+        general = General.objects.first()
+        self.assertNotEqual(general.entity_type, "tribal")
+        self.assertEqual(general.is_public, True)
 
     def test_load_and_return_objects(self):
         len_general = len(General.objects.all())
         len_captext = len(CapText.objects.all())
-        sac = SingleAuditChecklist.objects.create(
-            submitted_by=self.user,
-            general_information=self._fake_general(),
-            federal_awards=self._fake_federal_awards(),
-            findings_uniform_guidance=self._fake_findings_uniform_guidance(),
-            notes_to_sefa=self._fake_notes_to_sefa(),
-            findings_text=self._fake_findings_text(reference_number=2),
-            corrective_action_plan=self._fake_corrective_action_plan(),
-            secondary_auditors=self._fake_secondary_auditors(),
-            additional_ueis=self._fake_additional_ueis(),
-            additional_eins=self._fake_additional_eins(),
-            audit_information=self._fake_audit_information(),
-            auditee_certification=self._fake_auditee_certification(),
-        )
-        sac = self._run_state_transition(sac)
+        sac = self._create_sac(reference_number=2)
+        self._run_state_transition(sac)
         self.sac = sac
         self.intake_to_dissemination = IntakeToDissemination(self.sac)
         self.report_id = sac.report_id
