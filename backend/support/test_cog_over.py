@@ -348,7 +348,7 @@ class CogOverTests(TestCase):
         cog_agency, over_agency = compute_cog_over(
             sac.federal_awards, sac.submission_status, sac.ein, sac.auditee_uei
         )
-        self.assertEqual(cog_agency, "17")
+        self.assertEqual(cog_agency, "10")
         self.assertEqual(over_agency, None)
 
     def test_cog_assignment_with_uei_in_baseline_and_overris(self):

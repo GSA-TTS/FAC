@@ -26,7 +26,8 @@ class Command(BaseCommand):
             sac = self.make_sac(gen)
             sac.submission_status = sac.STATUS.SUBMITTED
             sac.save()
-            sac.disseminate()
+            if not sac.cognizant_agency and not sac.oversight_agency:
+                sac.assign_cog_over()
             processed += 1
             if gen.cogagency != sac.cognizant_agency:
                 cog_mismatches += 1

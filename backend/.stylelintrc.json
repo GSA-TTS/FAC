@@ -1,12 +1,9 @@
 {
-  "extends": [
-    "stylelint-config-standard",
-    "stylelint-config-standard-scss",
-    "stylelint-config-prettier"
-  ],
+  "extends": ["stylelint-config-standard", "stylelint-config-standard-scss"],
   "rules": {
     "selector-class-pattern": null,
     "no-descending-specificity": null,
-    "function-no-unknown": null
+    "function-no-unknown": null,
+    "media-feature-range-notation": "prefix"
   }
 }
