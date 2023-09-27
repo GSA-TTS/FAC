@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load static %}
 {% block content %}
-    <div class="grid-container margin-y-6">
+    <div class="grid-container margin-top-6 margin-bottom-10">
         <div class="grid-row">
             <form class="padding-x-6"
                   id="tribal-data-release"
@@ -10,12 +10,27 @@
                 <fieldset class="usa-fieldset">
                     <h1 class="font-sans-2xl" id="title">Tribal data release</h1>
                     <p class="font-sans-lg text-bold">
-                        Determine if the audit should make all information contained in the form SF-SAC and reporting package publicly available online.
+                        Determine if the audit should make all information contained in the form SF-SAC and reporting package publicly available.
                     </p>
-                    <p class="font-sans-md margin-top-4 margin-bottom-6">
-                        If this option is exercised, the auditee becomes responsible for submitting the reporting package directly to any pass-through entities through which it has received a Federal award and to pass-through entities for which the summary schedule of prior audit findings reported the status of any findings related to Federal awards that the pass-through entity provided. Unless restricted by Federal statute or regulation, if the auditee opts not to authorize publication, it must make copies of the reporting package available for public inspection.
-                    </p>
-                    <fieldset class="usa-fieldset radio" id="question-opt-in-out">
+
+                    <div class="font-sans-md margin-top-2 margin-bottom-10">
+                        <p class="margin-0">
+                            If you suppress your reporting package, you must submit your reporting package directly to:
+                        </p>
+                        <ul class="margin-0">
+                            <li>
+                                any pass-through entities that awarded Federal funds; and
+                            </li>
+                            <li>
+                                any pass-through entities with findings related to Federal awards listed on the summary schedule of prior audit findings
+                            </li>
+                        </ul>
+                        <p class="font-sans-xs">
+                            For the full citation, see Uniform Guidance <a class="usa-link" href="https://www.ecfr.gov/current/title-2/subtitle-A/chapter-II/part-200/subpart-F/subject-group-ECFRc3bd6ae97de5a40/section-200.512#p-200.512(b)(2)" target="_blank">2 CFR 200.512(b)(2)</a>
+                        </p>
+                    </div>
+
+                    <fieldset class="usa-fieldset radio margin-bottom-6" id="question-opt-in-out">
                         <legend class="text-bold margin-bottom-3 font-sans-md">
                             I certify that, to the best of my knowledge and belief, the auditee has:
                         </legend>
@@ -47,9 +62,9 @@
                         <span class="usa-error-message font-sans-md margin-top-2">{{ errors.is_tribal_information_authorized_to_be_public|striptags }}</span>
                     </fieldset>
 
-                    <p class="font-sans-lg text-bold text-underline margin-0">Agree and sign to auditor statement</p>
+                    <p class="font-sans-lg text-bold text-underline">Agree and sign Tribal data release</p>
                     {% comment %} This div is the grey box, and handles its own margins and padding. {% endcomment %}
-                    <div class="bg-base-lightest margin-top-2 padding-5">
+                    <div class="bg-base-lightest padding-5">
                         <fieldset class="usa-fieldset grid-row grid-gap-5" id="question-signature-and-submit">
                             <fieldset class="usa-fieldset font-sans-md tablet:grid-col" id="question-certifier-name">
                                 <label class="usa-label margin-0 font-sans-md"
@@ -79,7 +94,7 @@
                                 <span class="usa-error-message font-sans-md margin-top-1">{{ errors.tribal_authorization_certifying_official_title|striptags }}</span>
                             </fieldset>
                             
-                            <fieldset class="usa-fieldset margin-top-2 tablet:grid-col-12" id="aggree-or-cancel">
+                            <fieldset class="usa-fieldset margin-top-2 tablet:grid-col-12" id="agree-or-cancel">
                                 <button class="usa-button" id="continue">Agree to Tribal data release</button>
                                 <a class="usa-button usa-button--unstyled margin-left-2 margin-top-2 tablet:margin-top-0"
                                 id="cancel-tribal-data-release-link"

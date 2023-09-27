@@ -1,3 +1,5 @@
+import logging
+
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import render, redirect
 from django.views import generic
@@ -10,6 +12,10 @@ from audit.models import (
     SubmissionEvent,
 )
 from audit.forms import TribalAuditConsentForm
+from audit.validators import validate_tribal_data_consent_json
+
+
+logger = logging.getLogger(__name__)
 
 
 class TribalDataConsent(SingleAuditChecklistAccessRequiredMixin, generic.View):
@@ -43,16 +49,18 @@ class TribalDataConsent(SingleAuditChecklistAccessRequiredMixin, generic.View):
 
             if form.is_valid():
                 form.clean_booleans()
-
-                sac.tribal_data_consent = form.cleaned_data
+                tribal_data_consent = form.cleaned_data
+                validated = validate_tribal_data_consent_json(tribal_data_consent)
+                sac.tribal_data_consent = validated
                 sac.save(
                     event_user=request.user,
                     event_type=SubmissionEvent.EventType.TRIBAL_CONSENT_UPDATED,
                 )
+                logger.info("Tribal data consent saved.", tribal_data_consent)
 
                 return redirect(reverse("audit:SubmissionProgress", args=[report_id]))
 
-            tribal_audit_consent = sac.tribal_data_consent or {}
+            tribal_data_consent = sac.tribal_data_consent or {}
 
             context = {
                 "auditee_uei": sac.auditee_uei,
@@ -64,7 +72,7 @@ class TribalDataConsent(SingleAuditChecklistAccessRequiredMixin, generic.View):
             return render(
                 request,
                 "audit/tribal-data-release.html",
-                context | tribal_audit_consent,
+                context | tribal_data_consent,
             )
 
         except SingleAuditChecklist.DoesNotExist:
