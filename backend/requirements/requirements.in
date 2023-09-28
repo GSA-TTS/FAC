@@ -3,14 +3,15 @@ cfenv
 cryptography>=41.0.2
 django-cors-headers
 django-csp
-django-logingov-backend
-django-storages
+django-dbbackup
+django-storages[boto3]
 Django>=4.2.3
 djangorestframework
 djangorestframework-simplejwt
 django-fsm
 environs[django]
 faker
+greenlet==2.0.2
 gunicorn
 jsonnet
 jsonpath-ng
@@ -28,5 +29,6 @@ python-json-logger
 python-slugify
 pyyaml
 requests>=2.31.0
+sqlalchemy
 sqlparse>=0.4.4
 uritemplate

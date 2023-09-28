@@ -46,6 +46,7 @@ local SecondaryAuditors = Types.object {
     auditee_uei: Base.Compound.UniqueEntityIdentifier,
     secondary_auditors_entries: Types.array {
       items: SecondaryAuditorsEntry,
+      minContains: 0,
     },
   },
   required: ['auditee_uei'],

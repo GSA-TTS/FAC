@@ -11,11 +11,11 @@ local AuditInformation = Types.object {
     sp_framework_basis: Types.array {
       items: Base.Enum.SP_Framework_Basis,
     },
-    is_sp_framework_required: Types.boolean,
     sp_framework_opinions: Types.array {
       items: Base.Enum.SP_Framework_Opinions,
     },
     dollar_threshold: Types.integer,
+    is_sp_framework_required: Types.boolean,
     is_going_concern_included: Types.boolean,
     is_internal_control_deficiency_disclosed: Types.boolean,
     is_internal_control_material_weakness_disclosed: Types.boolean,
@@ -37,8 +37,86 @@ local AuditInformation = Types.object {
     'is_low_risk_auditee',
     'agencies',
   ],
+  allOf: [
+    {
+      'if': {
+        properties: {
+          gaap_results: {
+            contains: {
+              const: 'not_gaap',
+            },
+          },
+        },
+      },
+      'then': {
+        required: ['is_sp_framework_required', 'sp_framework_basis', 'sp_framework_opinions'],
+      },
+    },
+    {
+      'if': {
+        properties: {
+          gaap_results: {
+            not: {
+              contains: {
+                const: 'not_gaap',
+              },
+            },
+          },
+        },
+      },
+      'then': {
+        not: {
+          required: ['is_sp_framework_required'],
+        },
+      },
+    },
+    {
+      'if': {
+        properties: {
+          gaap_results: {
+            not: {
+              contains: {
+                const: 'not_gaap',
+              },
+            },
+          },
+        },
+      },
+      'then': {
+        not: {
+          required: ['sp_framework_basis'],
+        },
+      },
+    },
+    {
+      'if': {
+        properties: {
+          gaap_results: {
+            not: {
+              contains: {
+                const: 'not_gaap',
+              },
+            },
+          },
+        },
+      },
+      'then': {
+        not: {
+          required: ['sp_framework_opinions'],
+        },
+      },
+    },
+  ],
   title: 'AuditInformation',
 };
+
+// WARNING: If a comment is the last thing in a Jsonnet file, then the formatter will
+// ALWAYS add a new line to the end of the file, meaning this file will change every
+// time we run the formatter.
+//
+// To run local tests against an array of AuditInformation objects:
+// create a new file that you would run the tests
+// against that imports from this one, and wraps the AuditInformation object in an array.
 
 
 local Root = Types.object {

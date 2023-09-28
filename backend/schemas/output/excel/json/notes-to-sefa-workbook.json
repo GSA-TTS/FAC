@@ -8,7 +8,7 @@
             {
                "help": {
                   "link": "https://fac.gov/documentation/validation/#unknown",
-                  "text": "If you see this error, please contact support."
+                  "text": "Please contact support"
                },
                "keep_locked": true,
                "title": "Federal Audit Clearinghouse\nfac.gov",
@@ -18,7 +18,7 @@
             {
                "help": {
                   "link": "https://fac.gov/documentation/validation/#unknown",
-                  "text": "If you see this error, please contact support."
+                  "text": "Please contact support"
                },
                "keep_locked": true,
                "title": "This workbook contains two worksheets: a coversheet (this sheet) and a mandatory notes sheet.\nBefore submitting, please make sure the fields below are filled out.",
@@ -34,7 +34,7 @@
                "formula": "=\"1.0.0\"",
                "help": {
                   "link": "https://fac.gov/documentation/validation/#plain_text",
-                  "text": "Only plain text is allowed in this field, no emoji or other special additions"
+                  "text": "Only plain text is allowed, no emoji, formatting, or other special additions"
                },
                "keep_locked": true,
                "range_cell": "B2",
@@ -88,7 +88,7 @@
             {
                "help": {
                   "link": "https://fac.gov/documentation/validation/#plain_text",
-                  "text": "Only plain text is allowed in this field, no emoji or other special additions"
+                  "text": "Only plain text is allowed, no emoji, formatting, or other special additions"
                },
                "range_cell": "B5",
                "range_name": "accounting_policies",
@@ -102,8 +102,8 @@
             },
             {
                "help": {
-                  "link": "https://fac.gov/documentation/validation/#yorn",
-                  "text": "This field must be either `Y` or `N`"
+                  "link": "https://fac.gov/documentation/validation/#yornorboth",
+                  "text": "This field must be either `Y`, `N`, or `Both`"
                },
                "range_cell": "B6",
                "range_name": "is_minimis_rate_used",
@@ -112,9 +112,9 @@
                "type": "single_cell",
                "validation": {
                   "allow_blank": "False",
-                  "custom_error": "Must be 'Y' or 'N' or 'Y&N'",
-                  "custom_title": "Y/N/Y&N",
-                  "formula1": "\"Y,N,Y&N\"",
+                  "custom_error": "Must be 'Y' or 'N' or 'Both'",
+                  "custom_title": "Y/N/Both",
+                  "formula1": "\"Y,N,Both\"",
                   "type": "list"
                },
                "width": 24
@@ -122,7 +122,7 @@
             {
                "help": {
                   "link": "https://fac.gov/documentation/validation/#plain_text",
-                  "text": "Only plain text is allowed in this field, no emoji or other special additions"
+                  "text": "Only plain text is allowed, no emoji, formatting, or other special additions"
                },
                "range_cell": "B7",
                "range_name": "rate_explained",
@@ -138,13 +138,13 @@
       },
       {
          "header_height": 100,
-         "hide_col_from": 3,
+         "hide_col_from": 4,
          "name": "AdditionalNotes",
          "open_ranges": [
             {
                "help": {
                   "link": "https://fac.gov/documentation/validation/#plain_text",
-                  "text": "Only plain text is allowed in this field, no emoji or other special additions"
+                  "text": "Only plain text is allowed, no emoji, formatting, or other special additions"
                },
                "range_name": "note_title",
                "title": "Note title",
@@ -158,7 +158,7 @@
             {
                "help": {
                   "link": "https://fac.gov/documentation/validation/#plain_text",
-                  "text": "Only plain text is allowed in this field, no emoji or other special additions"
+                  "text": "Only plain text is allowed, no emoji, formatting, or other special additions"
                },
                "range_name": "note_content",
                "title": "Note content",
@@ -170,15 +170,33 @@
                "width": 56
             },
             {
+               "help": {
+                  "link": "https://fac.gov/documentation/validation/#yorn",
+                  "text": "This field must be either `Y` or `N`"
+               },
+               "range_name": "contains_chart_or_table",
+               "title": "Did Text Contain a Chart or Table?",
+               "title_cell": "C1",
+               "type": "yorn_range",
+               "validation": {
+                  "allow_blank": "False",
+                  "custom_error": "Must be 'Y' or 'N'",
+                  "custom_title": "Y/N",
+                  "formula1": "\"Y,N\"",
+                  "type": "list"
+               },
+               "width": 36
+            },
+            {
                "formula": "=IF(A{0}<>\"\", ROW()-1, \"\")",
                "help": {
                   "link": "https://fac.gov/documentation/validation/#unknown",
-                  "text": "If you see this error, please contact support."
+                  "text": "Please contact support"
                },
                "keep_locked": true,
                "range_name": "seq_number",
                "title": "Sequence number (Read Only)",
-               "title_cell": "C1",
+               "title_cell": "D1",
                "type": "open_range",
                "validation": {
                   "type": "NOVALIDATION"

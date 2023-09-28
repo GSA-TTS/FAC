@@ -51,7 +51,7 @@ def _fake_general_information(auditee_name=None):
         "auditor_city": fake.city(),
         "auditor_contact_name": fake.name(),
         "auditor_contact_title": fake.job(),
-        "auditor_country": fake.country(),
+        "auditor_country": "USA",
         "auditor_ein": fake.ssn().replace("-", ""),
         "auditor_ein_not_an_ssn_attestation": True,
         "auditor_email": fake.ascii_email(),
@@ -66,6 +66,7 @@ def _fake_general_information(auditee_name=None):
         "met_spending_threshold": True,
         "multiple_eins_covered": False,
         "multiple_ueis_covered": False,
+        "secondary_auditors_exist": False,
         # TODO: could improve this by randomly choosing from the enum of possible values
         "user_provided_organization_type": "unknown",
     }
@@ -96,7 +97,7 @@ def fake_auditor_certification():
 
 
 def fake_auditee_certification():
-    """Create fake auditor confirmation form data."""
+    """Create fake auditee confirmation form data."""
     fake = Faker()
     data_step_1 = {
         "has_no_PII": True,
@@ -223,8 +224,13 @@ def load_single_audit_checklists():
         _load_single_audit_checklists_for_user(user)
 
 
-def load_single_audit_checklists_for_email_address(user_email):
+def load_single_audit_checklists_for_email_address(user_email, workbooks=None):
     """Load example SACs for user with this email address."""
+    # Unfinished code for handling specific workbooks was checked into the
+    # load_fixtures command; this handles the additional argument so that in
+    # future that work can be wired in.
+    if workbooks is None:
+        workbooks = []
 
     try:
         user = User.objects.get(email=user_email)

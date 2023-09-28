@@ -14,7 +14,8 @@
                     <div class="margin-top-6">
                         <button class="usa-button" id="begin-validation">Begin Validation</button>
                         <button class="usa-button" id="proceed-to-certification" disabled>Proceed to certification</button>
-                        <a href="{% url 'audit:SubmissionProgress' report_id %}">Return to checklist</a>
+                        <a class="usa-button usa-button--unstyled margin-left-2" id="cancel-cross-validation-link" href="{% url 'audit:SubmissionProgress' report_id %}"
+                            aria-controls="upload-cancel">Cancel</a>
                     </div>
                 </fieldset>
             </form>

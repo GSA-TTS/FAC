@@ -5,7 +5,7 @@ from typing import List
 # These are API versions we want live.
 live = [
     # These are API versions we have in flight.
-    "api_v1_0_0_beta",
+    "api_v1_0_0",
 ]
 
 # These are API versions we have deprecated.

@@ -241,6 +241,22 @@ def validate_general_information_json(value):
     return value
 
 
+def validate_general_information_complete_json(value):
+    """
+    Apply JSON Schema for general information completeness and report errors.
+    """
+    schema_path = settings.SECTION_SCHEMA_DIR / "GeneralInformationComplete.schema.json"
+    schema = json.loads(schema_path.read_text(encoding="utf-8"))
+
+    try:
+        validate(value, schema, format_checker=FormatChecker())
+    except JSONSchemaValidationError as err:
+        raise ValidationError(
+            _(err.message),
+        ) from err
+    return value
+
+
 def validate_audit_information_json(value):
     """
     Apply JSON Schema for audit information and report errors.
@@ -306,7 +322,16 @@ def validate_tribal_data_consent_json(value):
     """
     Apply JSON Schema for tribal data consent and report errors.
     """
-    raise ValidationError("Not implemented")
+    schema_path = settings.SECTION_SCHEMA_DIR / "TribalAccess.schema.json"
+    schema = json.loads(schema_path.read_text(encoding="utf-8"))
+
+    try:
+        validate(value, schema, format_checker=FormatChecker())
+    except JSONSchemaValidationError as err:
+        raise ValidationError(
+            _(err.message),
+        ) from err
+    return value
 
 
 def validate_file_extension(file, allowed_extensions):

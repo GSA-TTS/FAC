@@ -31,8 +31,16 @@ CERTIFYING_AUDITEE_CONTACT_EMAIL = _(
 CERTIFYING_AUDITOR_CONTACT_EMAIL = _(
     "Certifying Auditor Contact email is a required field"
 )
-AUDITEE_CONTACTS_LIST = _("Auditee Contacts needs to be a list of emails")
-AUDITOR_CONTACTS_LIST = _("Auditor Contacts needs to be a list of emails")
+AUDITEE_CONTACTS_LIST = _(
+    "Auditee Contacts needs to be a list of full names and emails"
+)
+AUDITOR_CONTACTS_LIST = _(
+    "Auditor Contacts needs to be a list of full names and emails"
+)
+
+CERTIFIERS_HAVE_DIFFERENT_EMAILS = _(
+    "The certifying auditee and certifying auditor must have different email addresses."
+)
 
 
 class EligibilitySerializer(serializers.Serializer):
@@ -137,14 +145,42 @@ class AccessSerializer(serializers.ModelSerializer):
 
 class AccessAndSubmissionSerializer(serializers.Serializer):
     # This serializer isn't tied to a model, so it's just input fields with the below layout
-    certifying_auditee_contact = serializers.EmailField()
-    certifying_auditor_contact = serializers.EmailField()
-    auditor_contacts = serializers.ListField(
-        child=serializers.EmailField(), allow_empty=True, min_length=0
+    certifying_auditee_contact_fullname = serializers.CharField()
+    certifying_auditee_contact_email = serializers.EmailField()
+    certifying_auditor_contact_fullname = serializers.CharField()
+    certifying_auditor_contact_email = serializers.EmailField()
+    auditor_contacts_email = serializers.ListField(
+        child=serializers.EmailField(required=False, allow_null=True, allow_blank=True),
+        allow_empty=True,
+        min_length=0,
     )
-    auditee_contacts = serializers.ListField(
-        child=serializers.EmailField(), allow_empty=True, min_length=0
+    auditee_contacts_email = serializers.ListField(
+        child=serializers.EmailField(required=False, allow_null=True, allow_blank=True),
+        allow_empty=True,
+        min_length=0,
     )
+    auditor_contacts_fullname = serializers.ListField(
+        child=serializers.CharField(required=False, allow_null=True, allow_blank=True),
+        allow_empty=True,
+        min_length=0,
+    )
+    auditee_contacts_fullname = serializers.ListField(
+        child=serializers.CharField(required=False, allow_null=True, allow_blank=True),
+        allow_empty=True,
+        min_length=0,
+    )
+
+    def validate(self, data):
+        certifying_auditee_contact_email = data["certifying_auditee_contact_email"]
+        certifying_auditor_contact_email = data["certifying_auditor_contact_email"]
+
+        if (
+            certifying_auditee_contact_email.lower()
+            == certifying_auditor_contact_email.lower()
+        ):
+            raise ValidationError(CERTIFIERS_HAVE_DIFFERENT_EMAILS)
+
+        return data
 
 
 class SingleAuditChecklistSerializer(serializers.ModelSerializer):

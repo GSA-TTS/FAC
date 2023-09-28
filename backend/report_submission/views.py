@@ -1,4 +1,5 @@
 import logging
+from datetime import datetime
 
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import BadRequest, PermissionDenied, ValidationError
@@ -6,12 +7,15 @@ from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.views import View
 
-from audit.models import Access, SingleAuditChecklist, LateChangeError
+import api.views
+
+from audit.cross_validation.naming import NC, SECTION_NAMES as SN
+from audit.models import Access, SingleAuditChecklist, LateChangeError, SubmissionEvent
 from audit.validators import validate_general_information_json
 
-from report_submission.forms import AuditeeInfoForm, GeneralInformationForm
+from config.settings import STATIC_SITE_URL, STATE_ABBREVS
 
-import api.views
+from report_submission.forms import AuditeeInfoForm, GeneralInformationForm
 
 logger = logging.getLogger(__name__)
 
@@ -96,11 +100,13 @@ class AccessAndSubmissionFormView(LoginRequiredMixin, View):
         result = api.views.access_and_submission_check(
             post_request.user, post_request.POST
         )
+
         report_id = result.get("report_id")
 
         if report_id:
             return redirect(f"/report_submission/general-information/{report_id}")
-        return redirect(reverse("report_submission:accessandsubmission"))
+        else:
+            return redirect(reverse("report_submission:accessandsubmission"))
 
 
 class GeneralInformationFormView(LoginRequiredMixin, View):
@@ -141,6 +147,7 @@ class GeneralInformationFormView(LoginRequiredMixin, View):
                 "auditor_ein": sac.auditor_ein,
                 "auditor_ein_not_an_ssn_attestation": sac.auditor_ein_not_an_ssn_attestation,
                 "auditor_country": sac.auditor_country,
+                "auditor_international_address": sac.auditor_international_address,
                 "auditor_address_line_1": sac.auditor_address_line_1,
                 "auditor_city": sac.auditor_city,
                 "auditor_state": sac.auditor_state,
@@ -149,8 +156,12 @@ class GeneralInformationFormView(LoginRequiredMixin, View):
                 "auditor_contact_title": sac.auditor_contact_title,
                 "auditor_phone": sac.auditor_phone,
                 "auditor_email": sac.auditor_email,
+                "secondary_auditors_exist": sac.secondary_auditors_exist,
                 "report_id": report_id,
+                "state_abbrevs": STATE_ABBREVS,
             }
+
+            context = self._dates_to_slashes(context)
 
             return render(request, "report_submission/gen-form.html", context)
         except SingleAuditChecklist.DoesNotExist as err:
@@ -172,34 +183,112 @@ class GeneralInformationFormView(LoginRequiredMixin, View):
 
             form = GeneralInformationForm(request.POST)
 
-            if form.is_valid():
-                general_information = sac.general_information
-                # fields = sorted(general_information.keys())
-                # for field in fields:
-                #     print(f"{field} : {general_information[field]}")
-                general_information.update(form.cleaned_data)
-                validated = validate_general_information_json(general_information)
-                sac.general_information = validated
-                if general_information.get("audit_type"):
-                    sac.audit_type = general_information["audit_type"]
-                sac.save()
+            if not form.is_valid():
+                context = form.cleaned_data | {
+                    "errors": form.errors,
+                    "report_id": report_id,
+                    "state_abbrevs": STATE_ABBREVS,
+                }
+                message = ""
+                for field, errors in form.errors.items():
+                    message = f"{message}\n {field}: {errors}"
+                    logger.warning(f"Error {field}: {errors}")
+                return render(request, "report_submission/gen-form.html", context)
 
-                return redirect(f"/audit/submission-progress/{report_id}")
+            form = self._wipe_auditor_address(form)
+            form.cleaned_data = self._dates_to_hyphens(form.cleaned_data)
+            general_information = sac.general_information
+            general_information.update(form.cleaned_data)
+            validated = validate_general_information_json(general_information)
+            sac.general_information = validated
+            if general_information.get("audit_type"):
+                sac.audit_type = general_information["audit_type"]
+
+            sac.save(
+                event_user=request.user,
+                event_type=SubmissionEvent.EventType.GENERAL_INFORMATION_UPDATED,
+            )
+
+            return redirect(f"/audit/submission-progress/{report_id}")
         except SingleAuditChecklist.DoesNotExist as err:
             raise PermissionDenied("You do not have access to this audit.") from err
         except ValidationError as err:
-            logger.warning(
-                "ValidationError for report ID %s: %s", report_id, err.message
-            )
+            message = f"ValidationError for report ID {report_id}: {err.message}"
+            raise BadRequest(message)
         except LateChangeError:
             return render(request, "audit/no-late-changes.html")
+        except Exception as err:
+            message = f"Unexpected error in GeneralInformationFormView post. Report ID {report_id}"
+            logger.warning(message)
+            raise err
 
-        raise BadRequest()
+    def _dates_to_slashes(self, data):
+        """
+        Given a general_information object containging both auditee_fiscal_period_start
+        and auditee_fiscal_period_start, convert YYYY-MM-DD to MM/DD/YYYY for display.
+        """
+        try:
+            datetime_object_start = datetime.strptime(
+                data.get("auditee_fiscal_period_start", ""), "%Y-%m-%d"
+            )
+            datetime_object_end = datetime.strptime(
+                data.get("auditee_fiscal_period_end", ""), "%Y-%m-%d"
+            )
+            data["auditee_fiscal_period_start"] = datetime_object_start.strftime(
+                "%m/%d/%Y"
+            )
+            data["auditee_fiscal_period_end"] = datetime_object_end.strftime("%m/%d/%Y")
+        except Exception:
+            return data
+        return data
+
+    def _dates_to_hyphens(self, data):
+        """
+        Given a general_information object containging both auditee_fiscal_period_start
+        and auditee_fiscal_period_start, convert MM/DD/YYYY to YYYY-MM-DD for storage.
+        """
+        try:
+            datetime_object_start = datetime.strptime(
+                data.get("auditee_fiscal_period_start", ""), "%m/%d/%Y"
+            )
+            datetime_object_end = datetime.strptime(
+                data.get("auditee_fiscal_period_end", ""), "%m/%d/%Y"
+            )
+            data["auditee_fiscal_period_start"] = datetime_object_start.strftime(
+                "%Y-%m-%d"
+            )
+            data["auditee_fiscal_period_end"] = datetime_object_end.strftime("%Y-%m-%d")
+        except Exception:
+            return data
+        return data
+
+    def _wipe_auditor_address(self, form):
+        """
+        Given a general_information form object containing auditor_country, wipe
+        unnecessary address data depending on its value.
+        """
+        # If non-USA is selected, wipe USA-specific fields
+        # Else, wipe the non-USA specific field
+        keys_to_wipe = [
+            "auditor_address_line_1",
+            "auditor_city",
+            "auditor_state",
+            "auditor_zip",
+        ]
+        if form.cleaned_data.get("auditor_country") == "non-USA":
+            for key in keys_to_wipe:
+                form.cleaned_data[key] = ""
+        else:
+            form.cleaned_data["auditor_international_address"] = ""
+        return form
 
 
 class UploadPageView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         report_id = kwargs["report_id"]
+
+        instructions_base_url = STATIC_SITE_URL + "resources/workbooks/"
+        workbook_base_url = STATIC_SITE_URL + "assets/workbooks/"
 
         # Organized by URL name, page specific constants are defined here
         # Data can then be accessed by checking the current URL
@@ -208,40 +297,74 @@ class UploadPageView(LoginRequiredMixin, View):
                 "view_id": "federal-awards",
                 "view_name": "Federal awards",
                 "instructions": "Enter the federal awards you received in the last audit year using the provided worksheet.",
-                "DB_id": "federal_awards",
+                "DB_id": SN[NC.FEDERAL_AWARDS].snake_case,
+                "instructions_url": instructions_base_url + "federal-awards/",
+                "workbook_url": workbook_base_url + "federal-awards-workbook.xlsx",
+            },
+            "notes-to-sefa": {
+                "view_id": "notes-to-sefa",
+                "view_name": "Notes to SEFA",
+                "instructions": "Enter the notes on the Schedule of Expenditures of Federal Awards (SEFA) using the provided worksheet.",
+                "DB_id": SN[NC.NOTES_TO_SEFA].snake_case,
+                "instructions_url": instructions_base_url + "notes-to-sefa/",
+                "workbook_url": workbook_base_url + "notes-to-sefa-workbook.xlsx",
             },
             "audit-findings": {
                 "view_id": "audit-findings",
                 "view_name": "Audit findings",
                 "instructions": "Enter the audit findings for your federal awards using the provided worksheet.",
-                "DB_id": "findings_uniform_guidance",
+                "DB_id": SN[NC.FINDINGS_UNIFORM_GUIDANCE].snake_case,
+                "instructions_url": instructions_base_url
+                + "federal-awards-audit-findings/",
+                "no_findings_disclaimer": True,
+                "workbook_url": workbook_base_url
+                + "federal-awards-audit-findings.xlsx",
             },
             "audit-findings-text": {
                 "view_id": "audit-findings-text",
                 "view_name": "Audit findings text",
                 "instructions": "Enter the text for your audit findings using the provided worksheet.",
-                "DB_id": "findings_text",
+                "DB_id": SN[NC.FINDINGS_TEXT].snake_case,
+                "instructions_url": instructions_base_url
+                + "federal-awards-audit-findings-text/",
+                "no_findings_disclaimer": True,
+                "workbook_url": workbook_base_url
+                + "federal-awards-audit-findings-text-workbook.xlsx",
             },
-            "CAP": {
-                "view_id": "CAP",
+            "cap": {
+                "view_id": "cap",
                 "view_name": "Corrective Action Plan (CAP)",
                 "instructions": "Enter your CAP text using the provided worksheet.",
-                "DB_id": "corrective_action_plan",
-            },
-            "additional-eins": {
-                "view_id": "additional-eins",
-                "view_name": "Additional EINs",
-                "instructions": "Enter any additional EINs using the provided worksheet.",
+                "DB_id": SN[NC.CORRECTIVE_ACTION_PLAN].snake_case,
+                "instructions_url": instructions_base_url + "corrective-action-plan/",
+                "no_findings_disclaimer": True,
+                "workbook_url": workbook_base_url
+                + "corrective-action-plan-workbook.xlsx",
             },
             "additional-ueis": {
                 "view_id": "additional-ueis",
                 "view_name": "Additional UEIs",
                 "instructions": "Enter any additional UEIs using the provided worksheet.",
+                "DB_id": SN[NC.ADDITIONAL_UEIS].snake_case,
+                "instructions_url": instructions_base_url + "additional-ueis-workbook/",
+                "workbook_url": workbook_base_url + "additional-ueis-workbook.xlsx",
             },
             "secondary-auditors": {
                 "view_id": "secondary-auditors",
                 "view_name": "Secondary auditors",
                 "instructions": "Enter any additional auditors using the provided worksheet.",
+                "DB_id": SN[NC.SECONDARY_AUDITORS].snake_case,
+                "instructions_url": instructions_base_url
+                + "secondary-auditors-workbook/",
+                "workbook_url": workbook_base_url + "secondary-auditors-workbook.xlsx",
+            },
+            "additional-eins": {
+                "view_id": "additional-eins",
+                "view_name": "Additional EINs",
+                "instructions": "Enter any additional EINs using the provided worksheet.",
+                "DB_id": SN[NC.ADDITIONAL_EINS].snake_case,
+                "instructions_url": instructions_base_url + "additional-eins-workbook/",
+                "workbook_url": workbook_base_url + "additional-eins-workbook.xlsx",
             },
         }
 

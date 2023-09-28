@@ -14,4 +14,6 @@ toml
 types-python-slugify
 types-requests
 whitenoise
+xkcdpass
 tblib
+django-debug-toolbar

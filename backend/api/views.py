@@ -5,7 +5,6 @@ from django.http import Http404, HttpResponse, JsonResponse
 from django.urls import reverse
 from django.views import View, generic
 from django.contrib.auth import get_user_model
-from django.core.exceptions import ValidationError
 from rest_framework import viewsets
 from rest_framework.authentication import BaseAuthentication
 from rest_framework.permissions import BasePermission, IsAuthenticated
@@ -13,7 +12,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from config.settings import AUDIT_SCHEMA_DIR, BASE_DIR
-from audit.models import Access, SingleAuditChecklist
+from audit.models import Access, SingleAuditChecklist, SubmissionEvent
 from audit.permissions import SingleAuditChecklistPermission
 from .serializers import (
     AccessAndSubmissionSerializer,
@@ -117,27 +116,64 @@ def access_and_submission_check(user, data):
             submitted_by=user,
             submission_status="in_progress",
             general_information=all_steps_user_form_data,
+            event_user=user,
+            event_type=SubmissionEvent.EventType.CREATED,
         )
 
         # Create all contact Access objects
-        Access.objects.create(sac=sac, role="editor", email=user.email, user=user)
+        Access.objects.create(
+            sac=sac,
+            role="editor",
+            email=user.email,
+            user=user,
+            event_user=user,
+            event_type=SubmissionEvent.EventType.ACCESS_GRANTED,
+        )
         Access.objects.create(
             sac=sac,
             role="certifying_auditee_contact",
-            email=serializer.data.get("certifying_auditee_contact"),
+            fullname=serializer.data.get("certifying_auditee_contact_fullname"),
+            email=serializer.data.get("certifying_auditee_contact_email"),
+            event_user=user,
+            event_type=SubmissionEvent.EventType.ACCESS_GRANTED,
         )
         Access.objects.create(
             sac=sac,
             role="certifying_auditor_contact",
-            email=serializer.data.get("certifying_auditor_contact"),
+            fullname=serializer.data.get("certifying_auditor_contact_fullname"),
+            email=serializer.data.get("certifying_auditor_contact_email"),
+            event_user=user,
+            event_type=SubmissionEvent.EventType.ACCESS_GRANTED,
         )
 
-        for contact in serializer.data.get("auditee_contacts"):
-            Access.objects.create(sac=sac, role="editor", email=contact)
-        for contact in serializer.data.get("auditor_contacts"):
-            Access.objects.create(sac=sac, role="editor", email=contact)
+        # The contacts form should prevent users from submitting an incomplete contacts section
+        auditee_contacts_info = zip(
+            serializer.data.get("auditee_contacts_email"),
+            serializer.data.get("auditee_contacts_fullname"),
+        )
+        auditor_contacts_info = zip(
+            serializer.data.get("auditor_contacts_email"),
+            serializer.data.get("auditor_contacts_fullname"),
+        )
 
-        sac.save()
+        for email, name in auditee_contacts_info:
+            Access.objects.create(
+                sac=sac,
+                role="editor",
+                fullname=name,
+                email=email,
+                event_user=user,
+                event_type=SubmissionEvent.EventType.ACCESS_GRANTED,
+            )
+        for email, name in auditor_contacts_info:
+            Access.objects.create(
+                sac=sac,
+                role="editor",
+                fullname=name,
+                email=email,
+                event_user=user,
+                event_type=SubmissionEvent.EventType.ACCESS_GRANTED,
+            )
 
         # Clear entry form data from profile
         user.profile.entry_form_data = {}
@@ -303,48 +339,6 @@ class SingleAuditChecklistView(APIView):
         base_data = dict(SingleAuditChecklistSerializer(sac).data.items())
         full_data = base_data | get_role_emails_for_sac(sac.id)
 
-        return JsonResponse(full_data)
-
-    def put(self, request, report_id):
-        """
-        Retrieve the SAC by report_id.
-        Return 404 if it doesn't exist.
-        If it does, examine the submission for fields that cannot be updated
-        via this endpoint and return errors (and status 400) if they are
-        present.
-        Otherwise, update the database entry with the submitted values and
-        return the updated SAC in JSON format.
-        """
-        try:
-            sac = SingleAuditChecklist.objects.get(report_id=report_id)
-        except SingleAuditChecklist.DoesNotExist as e:
-            raise Http404() from e
-        self.check_object_permissions(request, sac)
-
-        submitted_invalid_keys = [
-            k for k in self.invalid_metadata_keys if k in request.data
-        ] + [
-            k
-            for k in self.invalid_general_information_keys
-            if k in request.data.get("general_information", {})
-        ]
-
-        if submitted_invalid_keys:
-            base_msg = "The following fields cannot be modified via this endpoint: "
-            errors_str = ", ".join(sorted(submitted_invalid_keys))
-            error_msg = f"{base_msg}{errors_str}."
-            return JsonResponse({"errors": error_msg}, status=400)
-
-        for attr, value in request.data.items():
-            setattr(sac, attr, value)
-        try:
-            sac.full_clean()
-            sac.save()
-        except ValidationError as err:
-            return JsonResponse({"errors": err.message_dict}, status=400)
-
-        base_data = dict(SingleAuditChecklistSerializer(sac).data.items())
-        full_data = base_data | get_role_emails_for_sac(sac.id)
         return JsonResponse(full_data)
 
 
