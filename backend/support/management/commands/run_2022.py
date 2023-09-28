@@ -17,7 +17,8 @@ class Command(BaseCommand):
     """
 
     def handle(self, *args, **kwargs):
-        if (ENVIRONMENT != 'LOCAL') | (ENVIRONMENT != 'DEV'):
+        if (ENVIRONMENT != 'LOCAL'):
+            print(f"Environment is not LOCAL or DEV, ENVIRONMENT={ENVIRONMENT}")
             return
 
         initialize_db()

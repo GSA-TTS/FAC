@@ -22,7 +22,9 @@ def post_cog_assignment(sender, instance, created, **kwargs):
         for baseline in baselines:
             baseline.is_active = False
             baseline.save()
-        CognizantBaseline(ein=ein, uei=uei, cognizant_agency=cognizant_agency, source="GSA").save()
+        CognizantBaseline(
+            ein=ein, uei=uei, cognizant_agency=cognizant_agency, source="GSA"
+        ).save()
 
         try:
             gen = General.objects.get(report_id=sac.report_id)
