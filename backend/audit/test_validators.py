@@ -22,6 +22,7 @@ from audit.fixtures.excel import (
     SECONDARY_AUDITORS_TEMPLATE_DEFINITION,
     NOTES_TO_SEFA_TEMPLATE_DEFINITION,
     FORM_SECTIONS,
+    TRIBAL_ACCESS_TEST_FILE,
 )
 
 from .validators import (
@@ -47,6 +48,7 @@ from .validators import (
     validate_uei_nine_digit_sequences,
     validate_component_page_numbers,
     validate_audit_information_json,
+    validate_tribal_data_consent_json,
 )
 
 # Simplest way to create a new copy of simple case rather than getting
@@ -890,11 +892,46 @@ class AuditInformationTests(SimpleTestCase):
         ]:
             case = jsoncopy(self.SIMPLE_CASES[1])
             del case[required_field]
-            self.assertRaises(ValidationError, validate_excel_file_integrity, case)
+            self.assertRaises(ValidationError, validate_audit_information_json, case)
 
     def test_error_raised_for_missing_required_fields(self):
         """Test that missing required fields raises a validation error."""
         for key in self.SIMPLE_CASES[0].keys():
             case = jsoncopy(self.SIMPLE_CASES[0])
             del case[key]
-            self.assertRaises(ValidationError, validate_excel_file_integrity, case)
+            self.assertRaises(ValidationError, validate_audit_information_json, case)
+
+
+class TribalAccessTests(SimpleTestCase):
+    def setUp(self):
+        """Set up common test data"""
+        self.SIMPLE_CASES = json.loads(
+            TRIBAL_ACCESS_TEST_FILE.read_text(encoding="utf-8")
+        )
+
+    def test_no_errors_when_tribal_access_is_valid(self):
+        """No errors should be raised when tribal data consent is valid"""
+        for case in self.SIMPLE_CASES:
+            validate_tribal_data_consent_json(case)
+
+    def test_error_raised_for_missing_required_fields(self):
+        """Test that missing required fields raises a validation error."""
+        for required_field in [
+            "is_tribal_information_authorized_to_be_public",
+            "tribal_authorization_certifying_official_name",
+            "tribal_authorization_certifying_official_title",
+        ]:
+            case = jsoncopy(self.SIMPLE_CASES[1])
+            del case[required_field]
+            self.assertRaises(ValidationError, validate_tribal_data_consent_json, case)
+
+    def test_error_raised_for_wrong_value_types(self):
+        """Test that wrong value types raise a validation error."""
+        for case in self.SIMPLE_CASES:
+            case_copy = jsoncopy(case)
+            case_copy[
+                "is_tribal_information_authorized_to_be_public"
+            ] = "incorrect_type"
+
+            with self.assertRaises(ValidationError):
+                validate_tribal_data_consent_json(case_copy)
