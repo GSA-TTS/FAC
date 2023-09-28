@@ -72,7 +72,7 @@ def update_cogbaseline_w_csv():
         ]
     save_df_to_cogbaseline(df)
     print(
-        "After end - row count for CognizantBaseline = ",
+        "At end - row count for CognizantBaseline = ",
         CognizantBaseline.objects.count(),
     )
     rows_updated_in_cogbaseline = df.shape[0]
