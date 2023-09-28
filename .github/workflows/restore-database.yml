@@ -11,9 +11,9 @@ on:
         required: true
         type: string # YYYY-MM-DD-HHmm
 
-
 jobs:
   restore-database:
+    if: contains('["asteel-gsa","JeanMarie-TTS"]', github.actor)
     name: Restore ${{ inputs.environment }} database
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment }}
