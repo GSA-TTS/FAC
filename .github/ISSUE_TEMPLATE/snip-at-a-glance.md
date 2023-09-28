@@ -1,3 +1,11 @@
+---
+name: "Snip: At a glance"
+about: Starting point for a story.
+title: 'snip-at-a-glance'
+labels: ''
+assignees: ''
+---
+
 # At a glance
 
 [comment]: # "Begin with a short summary so intent can be understood at a glance."

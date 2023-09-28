@@ -1,3 +1,12 @@
+---
+name: "Snip: Process Checklist"
+about: Starting point for a process checklist.
+title: 'snip-process-checklist'
+labels: ''
+assignees: ''
+---
+
+
 <h3>Process Checklist</h3>
 <p>How it moves across the board...</p>
 
