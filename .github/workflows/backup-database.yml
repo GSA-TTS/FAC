@@ -7,6 +7,7 @@ on:
         required: true
         type: string
         default: dev
+
 jobs:
   backup-database:
     name: Backup ${{ inputs.environment }} database
@@ -20,7 +21,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Bind backups bucket to ${{ inputs.environment }} application
-        if: ${{ inputs.environment == 'dev'}}
+        if: ${{ inputs.environment == 'dev' || inputs.environment == 'production' }}
         uses: cloud-gov/cg-cli-tools@main
         with:
           cf_username: ${{ secrets.CF_USERNAME }}
@@ -30,7 +31,7 @@ jobs:
           command: cf bind-service gsa-fac backups -w
 
       - name: Backup the database in ${{ inputs.environment }}
-        if: ${{ inputs.environment == 'dev'}}
+        if: ${{ inputs.environment == 'dev' || inputs.environment == 'production' }}
         uses: cloud-gov/cg-cli-tools@main
         with:
           cf_username: ${{ secrets.CF_USERNAME }}
@@ -40,12 +41,12 @@ jobs:
           command: cf run-task gsa-fac -k 2G -m 2G --name pg_backup --command "./backup_database.sh ${{ env.space }}"
 
       - name: Sleep for 5 minutes to ensure backup occurs
-        if: ${{ inputs.environment == 'dev'}}
+        if: ${{ inputs.environment == 'dev' || inputs.environment == 'production' }}
         run: sleep 5m
         shell: bash
 
       - name: Unbind backup s3 bucket from ${{ inputs.environment }} application
-        if: ${{ inputs.environment == 'dev'}}
+        if: ${{ inputs.environment == 'dev' || inputs.environment == 'production' }}
         uses: cloud-gov/cg-cli-tools@main
         with:
           cf_username: ${{ secrets.CF_USERNAME }}
