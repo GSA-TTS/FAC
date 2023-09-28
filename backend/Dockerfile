@@ -19,14 +19,17 @@ RUN \
     apt-get update && \
     apt-get install -yqq apt-transport-https wget gnupg2
 
+# Updated nodesource install via: https://github.com/nodesource/distributions#ubuntu-versions
 RUN \
     apt-get update -yq && \
-    apt install curl -y && \
-    apt-get install -y gcc && \
-    curl -fsSL https://deb.nodesource.com/setup_14.x | bash - && \
-    apt-get install -y nodejs && \
-    apt-get install -y npm && \
-    npm i -g npm@^8
+    apt install build-essential curl -y && \
+    apt-get install -y gcc ca-certificates gnupg && \
+    mkdir -p /etc/apt/keyrings && \
+    curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg && \
+    NODE_MAJOR=18 && \
+    echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_$NODE_MAJOR.x nodistro main" | tee /etc/apt/sources.list.d/nodesource.list && \
+    apt-get update && \
+    apt-get install nodejs -y
 
 COPY requirements.txt /tmp/requirements.txt
 COPY dev-requirements.txt /tmp/dev-requirements.txt

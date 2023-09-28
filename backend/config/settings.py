@@ -319,7 +319,7 @@ else:
                 "access_key": s3_creds["access_key_id"],
                 "secret_key": s3_creds["secret_access_key"],
                 "bucket_name": s3_creds["bucket"],
-                "default_acl": "private",
+                "default_acl": "private",  # type: ignore
             }
 
     # secure headers
