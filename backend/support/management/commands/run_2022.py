@@ -7,7 +7,7 @@ from dissemination.hist_models.census_2022 import CensusGen22, CensusCfda22
 from audit.models import SingleAuditChecklist, User
 from support.models import CognizantAssignment
 
-import os
+from config.settings import ENVIRONMENT
 
 
 class Command(BaseCommand):
@@ -17,7 +17,7 @@ class Command(BaseCommand):
     """
 
     def handle(self, *args, **kwargs):
-        if (os.environ['ENV'] != 'LOCAL') | (os.environ['ENV'] != 'DEV'):
+        if (ENVIRONMENT != 'LOCAL') | (ENVIRONMENT != 'DEV'):
             return
 
         initialize_db()

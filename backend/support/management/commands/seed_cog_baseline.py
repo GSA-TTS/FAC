@@ -19,6 +19,16 @@ class Command(BaseCommand):
 
 
 def load_cog_2021_2025():
+    if CognizantBaseline.objects.count() == 0:
+        print("CognizantBaseline table is empty - Loading data into table.")
+        load_all_cog_from_csv()
+        return
+
+    print("CognizantBaseline table contains data - Updating table with csv.")
+    update_cogbaseline_w_csv()
+
+
+def creat_df_from_csv():
     dtypes = defaultdict(lambda: str)
     file_path = path.join(BASE_DIR, "support/fixtures/", "census_baseline.csv")
     df = pd.read_csv(file_path, dtype=dtypes)
@@ -34,9 +44,29 @@ def load_cog_2021_2025():
     )
     df["date_assigned"] = pd.to_datetime(df["date_assigned"], utc=True)
     df["is_active"] = True
-    CognizantBaseline.objects.all().delete()
-    data = df.to_dict("records")
+    return df
 
+
+def update_cogbaseline_w_csv():
+    CognizantBaseline.objects.filter(source="Census", is_active=True).delete()
+    df = creat_df_from_csv()
+    cogbaseline_inactives = CognizantBaseline.objects.filter(
+        source="Census", is_active=False
+    )
+    for cogbaseline_inactive in cogbaseline_inactives:
+        df = df[
+            ~(
+                (df["dbkey"] == cogbaseline_inactive["dbkey"])
+                & (df["ein"] == cogbaseline_inactive["ein"])
+                & (df["uei"] == cogbaseline_inactive["uei"])
+            )
+        ]
+    save_df_to_cogbaseline(df)
+    return CognizantBaseline.objects.count()
+
+
+def save_df_to_cogbaseline(df):
+    data = df.to_dict("records")
     for item in data:
         CognizantBaseline(
             dbkey=item["dbkey"],
@@ -45,6 +75,11 @@ def load_cog_2021_2025():
             cognizant_agency=item["cognizant_agency"],
             date_assigned=item["date_assigned"],
             is_active=item["is_active"],
-            source='Census',
+            source="Census",
         ).save()
+
+
+def load_all_cog_from_csv():
+    df = creat_df_from_csv()
+    save_df_to_cogbaseline(df)
     return CognizantBaseline.objects.count()

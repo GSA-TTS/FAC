@@ -27,7 +27,7 @@ class CognizantBaseline(models.Model):
     )
     date_assigned = models.DateTimeField(
         # help_text = "Time when the cog agency was assigned to the entity",
-        null=True,  # allow nulls in case history has nulls
+        auto_now_add=True,
         verbose_name="Date Assigned",
     )
     is_active = models.BooleanField(
