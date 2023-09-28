@@ -318,7 +318,7 @@ class UploadPageView(LoginRequiredMixin, View):
                 + "federal-awards-audit-findings/",
                 "no_findings_disclaimer": True,
                 "workbook_url": workbook_base_url
-                + "federal-awards-audit-findings.xlsx",
+                + "federal-awards-audit-findings-workbook.xlsx",
             },
             "audit-findings-text": {
                 "view_id": "audit-findings-text",
@@ -328,8 +328,7 @@ class UploadPageView(LoginRequiredMixin, View):
                 "instructions_url": instructions_base_url
                 + "federal-awards-audit-findings-text/",
                 "no_findings_disclaimer": True,
-                "workbook_url": workbook_base_url
-                + "federal-awards-audit-findings-text-workbook.xlsx",
+                "workbook_url": workbook_base_url + "audit-findings-text-workbook.xlsx",
             },
             "cap": {
                 "view_id": "cap",
