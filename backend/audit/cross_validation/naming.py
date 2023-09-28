@@ -135,9 +135,9 @@ SECTION_NAMES = {
         camel_case="TribalDataConsent",
         friendly="Tribal Data Sharing Consent",
         friendly_title="Tribal Data Sharing Consent form",
-        reverse_url=None,
+        reverse_url="audit:TribalAuditConsent",
         snake_case="tribal_data_consent",
-        url_tail=None,
+        url_tail="tribal-data-release",
         workbook_number=None,
     ),
 }

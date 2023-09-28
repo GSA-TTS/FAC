@@ -65,6 +65,10 @@ SECTIONS_PAGE = {
         "edit_text": f"Edit the {SECTIONS_NAMING['additional_eins']['friendly_title']}",
         "text": "This workbook is only necessary if the audit report covers multiple EINs. List the additional EINs covered by the audit, excluding the primary EIN.",
     },
+    "tribal_data_consent": {
+        "edit_text": f"Edit the {SECTIONS_NAMING['tribal_data_consent']['friendly_title']}",
+        "text": "Auditees must opt in or opt out of making their reporting package publicly available.",
+    },
 }
 
 # Combine the submission page info with the naming info:
@@ -87,6 +91,7 @@ class SubmissionProgressView(SingleAuditChecklistAccessRequiredMixin, generic.Vi
     +   Additionai UEIs
     +   Additionai EINs
     +   Secondary Auditors
+    +   Tribal Data Consent
 
     The states are:
 
