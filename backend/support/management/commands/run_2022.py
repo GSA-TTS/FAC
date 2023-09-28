@@ -7,6 +7,8 @@ from dissemination.hist_models.census_2022 import CensusGen22, CensusCfda22
 from audit.models import SingleAuditChecklist, User
 from support.models import CognizantAssignment
 
+import os
+
 
 class Command(BaseCommand):
     help = """
@@ -15,6 +17,9 @@ class Command(BaseCommand):
     """
 
     def handle(self, *args, **kwargs):
+        if (os.environ['ENV'] != 'LOCAL') | (os.environ['ENV'] != 'DEV'):
+            return
+
         initialize_db()
         gens = CensusGen22.objects.annotate(
             amt=Cast("totfedexpend", output_field=BigIntegerField())

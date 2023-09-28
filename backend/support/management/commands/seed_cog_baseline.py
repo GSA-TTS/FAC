@@ -45,5 +45,6 @@ def load_cog_2021_2025():
             cognizant_agency=item["cognizant_agency"],
             date_assigned=item["date_assigned"],
             is_active=item["is_active"],
+            source='Census',
         ).save()
     return CognizantBaseline.objects.count()

@@ -35,6 +35,11 @@ class CognizantBaseline(models.Model):
         default=True,
         verbose_name="Active",
     )
+    source = models.CharField(
+        # help_text = "Source of cognizant data",
+        max_length=10,
+        verbose_name="Source",
+    )
 
 
 class AssignmentTypeCode:
