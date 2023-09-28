@@ -21,11 +21,12 @@ class Command(BaseCommand):
 def load_cog_2021_2025():
     if CognizantBaseline.objects.count() == 0:
         print("CognizantBaseline table is empty - Loading data into table.")
-        load_all_cog_from_csv()
-        return
+        count = load_all_cog_from_csv()
+        return count
 
     print("CognizantBaseline table contains data - Updating table with csv.")
-    update_cogbaseline_w_csv()
+    count = update_cogbaseline_w_csv()
+    return count
 
 
 def creat_df_from_csv():
@@ -48,7 +49,15 @@ def creat_df_from_csv():
 
 
 def update_cogbaseline_w_csv():
+    print(
+        "At start - row count for CognizantBaseline = ",
+        CognizantBaseline.objects.count(),
+    )
     CognizantBaseline.objects.filter(source="Census", is_active=True).delete()
+    print(
+        "After deleting active rows - row count for CognizantBaseline = ",
+        CognizantBaseline.objects.count(),
+    )
     df = creat_df_from_csv()
     cogbaseline_inactives = CognizantBaseline.objects.filter(
         source="Census", is_active=False
@@ -62,7 +71,12 @@ def update_cogbaseline_w_csv():
             )
         ]
     save_df_to_cogbaseline(df)
-    return CognizantBaseline.objects.count()
+    print(
+        "After end - row count for CognizantBaseline = ",
+        CognizantBaseline.objects.count(),
+    )
+    rows_updated_in_cogbaseline = df.shape[0]
+    return rows_updated_in_cogbaseline
 
 
 def save_df_to_cogbaseline(df):

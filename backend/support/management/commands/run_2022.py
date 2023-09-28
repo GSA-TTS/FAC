@@ -17,7 +17,7 @@ class Command(BaseCommand):
     """
 
     def handle(self, *args, **kwargs):
-        if (ENVIRONMENT != 'LOCAL'):
+        if ENVIRONMENT != "LOCAL":
             print(f"Environment is not LOCAL, ENVIRONMENT={ENVIRONMENT}")
             return
 
