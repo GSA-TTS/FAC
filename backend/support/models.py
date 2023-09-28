@@ -27,6 +27,7 @@ class CognizantBaseline(models.Model):
     )
     date_assigned = models.DateTimeField(
         # help_text = "Time when the cog agency was assigned to the entity",
+        null=True,  # allow nulls in case history has nulls
         auto_now_add=True,
         verbose_name="Date Assigned",
     )
@@ -39,6 +40,7 @@ class CognizantBaseline(models.Model):
         # help_text = "Source of cognizant data",
         max_length=10,
         verbose_name="Source",
+        default='Census',
     )
 
 
