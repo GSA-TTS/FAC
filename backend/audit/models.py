@@ -742,6 +742,7 @@ class SubmissionEvent(models.Model):
         NOTES_TO_SEFA_UPDATED = "notes-to-sefa-updated"
         SECONDARY_AUDITORS_UPDATED = "secondary-auditors-updated"
         SUBMITTED = "submitted"
+        DISSEMINATED = "disseminated"
 
     EVENT_TYPES = (
         (EventType.ACCESS_GRANTED, _("Access granted")),
@@ -777,6 +778,7 @@ class SubmissionEvent(models.Model):
         (EventType.NOTES_TO_SEFA_UPDATED, _("Notes to SEFA updated")),
         (EventType.SECONDARY_AUDITORS_UPDATED, _("Secondary auditors updated")),
         (EventType.SUBMITTED, _("Submitted to the FAC for processing")),
+        (EventType.DISSEMINATED, _("Copied to dissemination tables")),
     )
 
     sac = models.ForeignKey(SingleAuditChecklist, on_delete=models.CASCADE)

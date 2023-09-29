@@ -277,6 +277,7 @@ class IntakeToDissemination(object):
         submitted_date = self._convert_utc_to_american_samoa_zone(
             dates_by_status[status.SUBMITTED]
         )
+        fac_accepted_date = submitted_date
         auditee_certify_name = auditee_certification.get("auditee_signature", {}).get(
             "auditee_name", ""
         )
@@ -360,10 +361,8 @@ class IntakeToDissemination(object):
             auditor_certified_date=auditor_certified_date,
             auditee_certified_date=auditee_certified_date,
             submitted_date=submitted_date,
-            # auditor_signature_date=auditor_certification["auditor_signature"]["auditor_certification_date_signed"],
-            # auditee_signature_date=auditee_certification["auditee_signature"]["auditee_certification_date_signed"],
+            fac_accepted_date=fac_accepted_date,
             audit_year=str(self.audit_year),
-            # is_duplicate_reports = Util.bool_to_yes_no(audit_information["is_aicpa_audit_guide_included"]), #FIXME This mapping does not seem correct
             total_amount_expended=total_amount_expended,
             type_audit_code="UG",
             is_public=self.single_audit_checklist.is_public,
