@@ -179,7 +179,7 @@ class SubmissionViewTests(TestCase):
 
     def test_post_redirect(self):
         """
-        The status should be "submitted" after the post.
+        The status should be "disseminated" after the post.
         The user should be redirected to the submissions table.
         """
         filename = "general-information--test0001test--simple-pass.json"
@@ -227,7 +227,7 @@ class SubmissionViewTests(TestCase):
         )
         sac_after = SingleAuditChecklist.objects.get(report_id=sac.report_id)
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(sac_after.submission_status, sac_after.STATUS.SUBMITTED)
+        self.assertEqual(sac_after.submission_status, sac_after.STATUS.DISSEMINATED)
 
 
 class SubmissionStatusTests(TestCase):
