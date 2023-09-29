@@ -9,8 +9,6 @@ import requests
 
 from config import settings
 
-api_schemas = ["api_v1_0_1"]
-
 
 class APIViewTests(TestCase):
     def setUp(self):

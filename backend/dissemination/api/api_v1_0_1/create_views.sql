@@ -4,8 +4,8 @@ begin;
 ---------------------------------------
 -- finding_text
 ---------------------------------------
-create view api_v1_0_0.findings_text as
-    select 
+create view api_v1_0_1.findings_text as
+    select
         gen.report_id,
         gen.auditee_uei,
         gen.audit_year,
@@ -26,7 +26,7 @@ create view api_v1_0_0.findings_text as
 ---------------------------------------
 -- additional_ueis
 ---------------------------------------
-create view api_v1_0_0.additional_ueis as
+create view api_v1_0_1.additional_ueis as
     select
         gen.report_id,
         gen.auditee_uei,
@@ -47,8 +47,8 @@ create view api_v1_0_0.additional_ueis as
 ---------------------------------------
 -- finding
 ---------------------------------------
-create view api_v1_0_0.findings as
-    select 
+create view api_v1_0_1.findings as
+    select
         gen.report_id,
         gen.auditee_uei,
         gen.audit_year,
@@ -77,8 +77,8 @@ create view api_v1_0_0.findings as
 ---------------------------------------
 -- federal award
 ---------------------------------------
-create view api_v1_0_0.federal_awards as
-    select 
+create view api_v1_0_1.federal_awards as
+    select
         gen.report_id,
         gen.auditee_uei,
         gen.audit_year,
@@ -117,8 +117,8 @@ create view api_v1_0_0.federal_awards as
 ---------------------------------------
 -- corrective_action_plan
 ---------------------------------------
-create view api_v1_0_0.corrective_action_plans as
-    select 
+create view api_v1_0_1.corrective_action_plans as
+    select
         gen.report_id,
         gen.auditee_uei,
         gen.audit_year,
@@ -140,8 +140,8 @@ create view api_v1_0_0.corrective_action_plans as
 ---------------------------------------
 -- notes_to_sefa
 ---------------------------------------
-create view api_v1_0_0.notes_to_sefa as
-    select 
+create view api_v1_0_1.notes_to_sefa as
+    select
         gen.report_id,
         gen.auditee_uei,
         gen.audit_year,
@@ -166,7 +166,7 @@ create view api_v1_0_0.notes_to_sefa as
 ---------------------------------------
 -- passthrough
 ---------------------------------------
-create view api_v1_0_0.passthrough as
+create view api_v1_0_1.passthrough as
     select
         gen.report_id,
         gen.auditee_uei,
@@ -190,15 +190,13 @@ create view api_v1_0_0.passthrough as
 ---------------------------------------
 -- general
 ---------------------------------------
-create view api_v1_0_0.general as
+create view api_v1_0_1.general as
     select
         -- every table starts with report_id, UEI, and year
         gen.report_id,
         gen.auditee_uei,
         gen.audit_year,
         ---
-        -- award.federal_agency_prefix, 
-        -- award.federal_award_extension,
         gen.auditee_certify_name,
         gen.auditee_certify_title,
         gen.auditee_contact_name,
@@ -222,7 +220,7 @@ create view api_v1_0_0.general as
         gen.auditor_contact_name,
         gen.auditor_email,
         gen.auditor_firm_name,
-        -- gen.auditor_foreign_addr,
+        gen.auditor_foreign_address,
         gen.auditor_ein,
         -- agency
         gen.cognizant_agency,
@@ -230,9 +228,10 @@ create view api_v1_0_0.general as
         -- dates
         gen.date_created,
         gen.ready_for_certification_date,
-        -- gen.auditor_certified_date,
-        -- gen.auditee_certified_date,
+        gen.auditor_certified_date,
+        gen.auditee_certified_date,
         gen.submitted_date,
+        gen.fac_accepted_date,
         gen.fy_end_date,
         gen.fy_start_date,
         gen.audit_type,
@@ -244,7 +243,6 @@ create view api_v1_0_0.general as
         gen.is_internal_control_deficiency_disclosed,
         gen.is_internal_control_material_weakness_disclosed,
         gen.is_material_noncompliance_disclosed,
-        -- gen.is_duplicate_reports,
         gen.dollar_threshold,
         gen.is_low_risk_auditee,
         gen.agencies_with_prior_findings,
@@ -255,26 +253,19 @@ create view api_v1_0_0.general as
         gen.type_audit_code,
         gen.is_public,
         gen.data_source
-    from 
+    from
         dissemination_General gen,
         dissemination_FederalAward award
-    where 
-        (gen.report_id = award.report_id
-         and
-         gen.is_public = true)
-         or (gen.is_public = false and has_tribal_data_access()) 
+    where
+        (gen.is_public = true)
+        or (gen.is_public = false and has_tribal_data_access())
     order by gen.id
-    
-    -- MCJ When it comes time to enable tribal access, this is what it looks like.
-    -- For each view, we add a conditional clause where the data is not public and 
-    -- the user also has tribal access based on headers from api.data.gov.
-    -- or (gen.is_public=false and has_tribal_data_access())
 ;
 
 ---------------------------------------
 -- auditor (secondary auditor)
 ---------------------------------------
-create view api_v1_0_0.secondary_auditors as
+create view api_v1_0_1.secondary_auditors as
     select
         gen.report_id,
         gen.auditee_uei,
@@ -289,10 +280,10 @@ create view api_v1_0_0.secondary_auditors as
         sa.address_city,
         sa.address_state,
         sa.address_zipcode
-    from 
+    from
         dissemination_General gen,
         dissemination_SecondaryAuditor sa
-    where 
+    where
         (sa.report_id = gen.report_id
          and
          gen.is_public=True)
@@ -300,23 +291,23 @@ create view api_v1_0_0.secondary_auditors as
     order by sa.id
 ;
 
--- create view api_v1_0_0.additional_eins as
---     select
---         gen.report_id,
---         gen.auditee_uei,
---         gen.audit_year,
---         ---
---         ein.additional_ein
---     from
---         dissemination_general gen,
---         dissemination_additionalein ein
---     where
---         gen.report_id = ein.report_id
---         and
---         gen.is_public = true
--- or (gen.is_public = false and has_tribal_data_access())
---     order by ein.id
--- ;
+create view api_v1_0_1.additional_eins as
+    select
+        gen.report_id,
+        gen.auditee_uei,
+        gen.audit_year,
+        ---
+        ein.additional_ein
+    from
+        dissemination_general gen,
+        dissemination_additionalein ein
+    where
+        (gen.report_id = ein.report_id
+         and
+         gen.is_public = true)
+        or (gen.is_public = false and has_tribal_data_access())
+    order by ein.id
+;
 
 
 commit;
