@@ -18,7 +18,6 @@ echo "Media Backup File: $1-media-backup-$date.tar" >> "$log_file"
 python manage.py mediabackup -o "$1-media-backup-$date.tar" >&1 >> "$log_file"
 
 # Upload logfile to s3://backups/logs
-python manage.py fac_s3 backups --ls --tgt "$date" >> "$log_file"
 python manage.py fac_s3 backups --upload --src "$log_file" --tgt logs/"$log_file"
 
 # Cleanup on disk log file
