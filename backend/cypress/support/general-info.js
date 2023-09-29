@@ -10,6 +10,7 @@ export function testValidGeneralInfo() {
 	cy.get('label[for=audit-period-annual]').click();
 
   	// Auditee information
+	cy.get('#auditee_name').type('Super Important name')
 	cy.get('#ein').type('546000173');
 	cy.get('label[for=ein_not_an_ssn_attestation]').click();
 	cy.get('label[for=multiple-eins-yes]').click();
