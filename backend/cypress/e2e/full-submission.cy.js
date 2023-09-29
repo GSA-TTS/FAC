@@ -96,7 +96,7 @@ describe('Full audit submission', () => {
 
     // complete the tribal audit form
     cy.get(".usa-link").contains("Tribal data release").click();
-    testTribalAuditForm(false);
+    testTribalAuditForm();
 
     // Complete the audit information form
     cy.get(".usa-link").contains("Audit Information form").click();
