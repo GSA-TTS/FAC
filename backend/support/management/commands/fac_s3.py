@@ -12,7 +12,9 @@ class Command(BaseCommand):
     help = """
     Alternative to aws s3 as the cli is not available in production.
     Usage:
-        manage.py fac_s3 <bucket_name> --cp --src SRC [--tgt TGT]
+        manage.py fac_s3 <bucket_name> --upload --src SRC [--tgt TGT]
+        manage.py fac_s3 <bucket_name> --download --src SRC [--tgt TGT]
+        manage.py fac_s3 <bucket_name> --rm --tgt TGT]
         manage.py fac_s3 <bucket_name> --ls [--tgt TGT]
     """
 
@@ -21,7 +23,12 @@ class Command(BaseCommand):
         parser.add_argument("--src", help="local file name.")
         parser.add_argument("--tgt", help="s3 file name.")
         parser.add_argument("--ls", action="store_true", help="List all files.")
-        parser.add_argument("--cp", action="store_true", help="Copy src to tgt.")
+        parser.add_argument(
+            "--upload", action="store_true", help="Copy local src to S3 tgt."
+        )
+        parser.add_argument(
+            "--download", action="store_true", help="Copy S3 tgt to local src."
+        )
         parser.add_argument("--rm", action="store_true", help="Delete tgt.")
 
     def handle(self, *args, **options):
@@ -45,12 +52,17 @@ class Command(BaseCommand):
                 print(item["Key"], item["Size"], item["LastModified"])
             return
 
-        if options["cp"]:
+        if options["upload"]:
             file_path = path.join(settings.BASE_DIR, src_path)
-            # with open(file_path, 'rb') as file:
             object_name = tgt_path or os.path.basename(file_path)
             s3_client.upload_file(file_path, bucket_name, object_name)
             print(f"Copied {file_path} to {bucket_name} {object_name}.")
+            return
+
+        if options["download"]:
+            file_path = path.join(settings.BASE_DIR, src_path)
+            object_name = tgt_path
+            s3_client.download_file(bucket_name, object_name, file_path)
             return
 
         if options["rm"]:
