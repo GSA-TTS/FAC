@@ -65,9 +65,9 @@ def update_cogbaseline_w_csv(filename):
     for cogbaseline_inactive in cogbaseline_inactives:
         df = df[
             ~(
-                (df["dbkey"] == cogbaseline_inactive["dbkey"])
-                & (df["ein"] == cogbaseline_inactive["ein"])
-                & (df["uei"] == cogbaseline_inactive["uei"])
+                (df["dbkey"] == cogbaseline_inactive.dbkey)
+                & (df["ein"] == cogbaseline_inactive.ein)
+                & (df["uei"] == cogbaseline_inactive.uei)
             )
         ]
     save_df_to_cogbaseline(df, "Census")
