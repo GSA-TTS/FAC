@@ -11,6 +11,7 @@ def copy_submitted_to_accepted(apps, schema_editor):
             report.fac_accepted_date = report.submitted_date
             report.save()
 
+
 class Migration(migrations.Migration):
     dependencies = [
         ("dissemination", "0001_initial"),
