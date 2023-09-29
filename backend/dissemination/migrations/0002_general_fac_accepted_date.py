@@ -7,8 +7,9 @@ from django.db import migrations, models
 def copy_submitted_to_accepted(apps, schema_editor):
     General = apps.get_model("dissemination", "General")
     for report in General.objects.all():
-        report.fac_accepted_date = report.submitted_date
-        report.save()
+        if not report.fac_accepted_date:
+            report.fac_accepted_date = report.submitted_date
+            report.save()
 
 class Migration(migrations.Migration):
     dependencies = [
@@ -20,7 +21,6 @@ class Migration(migrations.Migration):
             model_name="general",
             name="fac_accepted_date",
             field=models.DateField(
-                null=True,
                 verbose_name="The date at which the audit transitioned to 'accepted'",
             ),
         ),
