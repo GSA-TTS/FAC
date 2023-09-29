@@ -4,7 +4,7 @@ from audit.models import SingleAuditChecklist, Access, ExcelFile, SingleAuditRep
 
 
 class SACAdmin(admin.ModelAdmin):
-    list_display = ("id",)
+    list_display = ("id", "report_id")
 
 
 class AccessAdmin(admin.ModelAdmin):
