@@ -723,7 +723,8 @@ class SubmissionView(CertifyingAuditeeRequiredMixin, generic.View):
             if disseminated is None:
                 sac.transition_to_disseminated()
                 sac.save(
-                    event_user=request.user, event_type=SubmissionEvent.EventType.DISSEMINATED
+                    event_user=request.user,
+                    event_type=SubmissionEvent.EventType.DISSEMINATED,
                 )
 
             logger.info(
