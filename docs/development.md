@@ -157,7 +157,14 @@ Although the migrations are run automatically, try running the migrations. This 
 docker compose run web python manage.py migrate
 ```
 
+### Staticfiles
 
+Files that fall under the `/backend/static` directory need to be collected into the untracked directory `/backend/staticfiles`. This is done automatically when docker comes up, so you will 
+likely not need to do anything with these.
+
+However, if you edit any files in `/backend/static` you will need to either re-up docker or manually collect static. This is done via `python manage.py collectstatic`.
+
+Try to avoid pushing frequent edits to files in `/backend/static` (more than once every few days), as each change causes a rebuild of the ghcr image for use in the automatic PR tests.
 
 
 ### Load test data
