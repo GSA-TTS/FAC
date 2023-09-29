@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 def claim_audit_access(user, all_emails):
     access_invites = (
         Access.objects.filter(user_id=None)
-        .filter(email__in=all_emails)
+        .filter(email__iregex=r'(' + '|'.join(all_emails) + ')')
         .update(user_id=user.id)
     )
     logger.debug(f"{user.email} granted access to {access_invites} new audits")
