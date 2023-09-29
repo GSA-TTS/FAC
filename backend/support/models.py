@@ -40,7 +40,7 @@ class CognizantBaseline(models.Model):
         # help_text = "Source of cognizant data",
         max_length=10,
         verbose_name="Source",
-        default='Census',
+        default='GSA',
     )
 
 
