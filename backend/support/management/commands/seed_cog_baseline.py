@@ -14,24 +14,24 @@ class Command(BaseCommand):
     """
 
     def handle(self, *args, **kwargs):
-        count = load_cog_2021_2025()
+        count = load_cog_2021_2025("census_baseline.csv")
         print(f"Loaded {count} rows to baseline table")
 
 
-def load_cog_2021_2025():
+def load_cog_2021_2025(filename):
     if CognizantBaseline.objects.count() == 0:
         print("CognizantBaseline table is empty - Loading data into table.")
-        count = load_all_cog_from_csv()
+        count = load_all_cog_from_csv(filename)
         return count
 
     print("CognizantBaseline table contains data - Updating table with csv.")
-    count = update_cogbaseline_w_csv()
+    count = update_cogbaseline_w_csv(filename)
     return count
 
 
-def creat_df_from_csv():
+def creat_df_from_csv(filename):
     dtypes = defaultdict(lambda: str)
-    file_path = path.join(BASE_DIR, "support/fixtures/", "census_baseline.csv")
+    file_path = path.join(BASE_DIR, "support/fixtures/", filename)
     df = pd.read_csv(file_path, dtype=dtypes)
     df = df.drop(columns=["AUDITEENAME"])
     df = df.rename(
@@ -43,12 +43,12 @@ def creat_df_from_csv():
             "DATE_ADDED": "date_assigned",
         }
     )
-    df["date_assigned"] = pd.to_datetime(df["date_assigned"], utc=True)
+    df["date_assigned"] = pd.to_datetime(df["date_assigned"], utc=True, format="mixed")
     df["is_active"] = True
     return df
 
 
-def update_cogbaseline_w_csv():
+def update_cogbaseline_w_csv(filename):
     print(
         "At start - row count for CognizantBaseline = ",
         CognizantBaseline.objects.count(),
@@ -58,7 +58,7 @@ def update_cogbaseline_w_csv():
         "After deleting active rows - row count for CognizantBaseline = ",
         CognizantBaseline.objects.count(),
     )
-    df = creat_df_from_csv()
+    df = creat_df_from_csv(filename)
     cogbaseline_inactives = CognizantBaseline.objects.filter(
         source="Census", is_active=False
     )
@@ -70,7 +70,7 @@ def update_cogbaseline_w_csv():
                 & (df["uei"] == cogbaseline_inactive["uei"])
             )
         ]
-    save_df_to_cogbaseline(df)
+    save_df_to_cogbaseline(df, "Census")
     print(
         "At end - row count for CognizantBaseline = ",
         CognizantBaseline.objects.count(),
@@ -79,7 +79,7 @@ def update_cogbaseline_w_csv():
     return rows_updated_in_cogbaseline
 
 
-def save_df_to_cogbaseline(df):
+def save_df_to_cogbaseline(df, source):
     data = df.to_dict("records")
     for item in data:
         CognizantBaseline(
@@ -89,11 +89,11 @@ def save_df_to_cogbaseline(df):
             cognizant_agency=item["cognizant_agency"],
             date_assigned=item["date_assigned"],
             is_active=item["is_active"],
-            source="Census",
+            source=source,  # "Census",
         ).save()
 
 
-def load_all_cog_from_csv():
-    df = creat_df_from_csv()
-    save_df_to_cogbaseline(df)
+def load_all_cog_from_csv(filename):
+    df = creat_df_from_csv(filename)
+    save_df_to_cogbaseline(df, "Census")
     return CognizantBaseline.objects.count()
