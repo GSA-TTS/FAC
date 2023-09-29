@@ -449,7 +449,7 @@ class SubmissionStatusTests(TestCase):
 
         updated_sac = SingleAuditChecklist.objects.get(report_id=sac.report_id)
 
-        self.assertEqual(updated_sac.submission_status, "submitted")
+        self.assertEqual(updated_sac.submission_status, "disseminated")
 
         submission_events = SubmissionEvent.objects.filter(sac=sac)
 
@@ -458,7 +458,7 @@ class SubmissionStatusTests(TestCase):
         self.assertGreaterEqual(event_count, 1)
         self.assertEqual(
             submission_events[event_count - 1].event,
-            SubmissionEvent.EventType.SUBMITTED,
+            SubmissionEvent.EventType.DISSEMINATED,
         )
 
 
