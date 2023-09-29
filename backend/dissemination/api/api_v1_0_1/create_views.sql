@@ -254,8 +254,7 @@ create view api_v1_0_1.general as
         gen.is_public,
         gen.data_source
     from
-        dissemination_General gen,
-        dissemination_FederalAward award
+        dissemination_General gen
     where
         (gen.is_public = true)
         or (gen.is_public = false and has_tribal_data_access())
