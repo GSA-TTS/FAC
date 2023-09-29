@@ -9,7 +9,7 @@ on:
         # dev, staging, production
       date-of-backup:
         required: true
-        type: string # YYYY-MM-DD-HHmm
+        type: string # YYYY-MM-DD-HHmm https://github.com/GSA-TTS/FAC/issues/2221
 
 jobs:
   restore-database:
