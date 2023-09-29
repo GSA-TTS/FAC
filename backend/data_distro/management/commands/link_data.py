@@ -23,14 +23,15 @@ def link_objects_findings(objects_dict):
             findings_instance.findings_text.add(finding_text)
             findings_instance.save()
 
-        # finding to award
-        awards_instance = mods.FederalAward.objects.get(
+        # finding to award, there should just be one but I don't want a hard fail if it can't be found
+        awards_instances = mods.FederalAward.objects.filter(
             dbkey=dbkey,
             audit_year=audit_year,
             audit_id=findings_instance.audit_id,
         )
-        awards_instance.findings.add(findings_instance)
-        awards_instance.save()
+        for awards_instance in awards_instances:
+            awards_instance.findings.add(findings_instance)
+            awards_instance.save()
 
         # finding to general is taken care of in general processing
 

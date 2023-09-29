@@ -36,7 +36,7 @@ upload_mapping = {
         "CPAEIN": ["Auditor", "cpa_ein"],
         # this needs to go 2 places will handle manually
         # "DBKEY": ["Auditor", "dbkey"],
-        "SEQNUM": ["Auditor", "seqence_number"],
+        "SEQNUM": ["Auditor", "sequence_number"],
         "CPAFOREIGN": ["Auditor", "cpa_foreign"],
         "AUDITOR_EIN": ["FederalAward", "cpa_ein"],
         "COGAGENCY": ["General", "cognizant_agency"],
@@ -135,7 +135,7 @@ upload_mapping = {
     "findingstext_formatted": {
         "CHARTSTABLES": ["FindingText", "charts_tables"],
         "FINDINGREFNUMS": ["FindingText", "finding_ref_number"],
-        "SEQ_NUMBER": ["FindingText", "seqence_number"],
+        "SEQ_NUMBER": ["FindingText", "sequence_number"],
         "TEXT": ["FindingText", "text"],
         "DBKEY": ["FindingText", "dbkey"],
         "AUDITYEAR": ["FindingText", "audit_year"],

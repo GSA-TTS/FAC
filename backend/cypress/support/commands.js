@@ -23,5 +23,16 @@
 //
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
-import '@cypress-audit/lighthouse/commands';
-import '@cypress-audit/pa11y/commands';
+//import '@cypress-audit/lighthouse/commands';
+//import '@cypress-audit/pa11y/commands';
+import 'cypress-file-upload';
+import { testLoginGovLogin } from './login-gov.js';
+import { testLogoutGov } from './logout-gov.js';
+
+Cypress.Commands.add('login', () => {
+  testLoginGovLogin();
+})
+
+Cypress.Commands.add('logout',() => {
+  testLogoutGov();
+})

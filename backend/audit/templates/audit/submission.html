@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+    <div class="grid-container margin-y-6">
+        <div class="grid-row grid-gap">
+            <form class="usa-form usa-form--large margin-left-4" id="submission" method="post">
+                {% csrf_token %}
+                <fieldset class="usa-fieldset">
+                    <h1 class="font-sans-2xl" id="submission">Single Audit Submission</h1>
+                    <p class="margin-0 font-sans-md">
+                        Clicking the "Submit Single Audit" button below will send your report to the Federal Audit Clearinghouse (FAC). Once you've done this, you can't undo this action and can't make changes to the report.
+                    </p>
+                    <p class="margin-y-4 font-sans-md">
+                        Please save copies of all submitted documents to your local drive. The FAC doesn't maintain these files, and can't return them for future review.
+                    </p>
+                    <div class="margin-top-6">
+                        <button class="usa-button margin-right-2" id="continue">Submit Single Audit</button>
+                        <a href="{% url 'audit:SubmissionProgress' report_id %}">Cancel</a>
+                    </div>
+                </fieldset>
+            </form>
+        </div>
+    </div>
+{% endblock content %}

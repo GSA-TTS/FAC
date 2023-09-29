@@ -4,7 +4,7 @@ from django.contrib.postgres.fields import ArrayField
 from data_distro import docs
 
 
-# Will refactor
+# Will refactor, not currently in use
 class Agency(models.Model):
     """Information about the Agency requiring a copy of the audit"""
 
@@ -196,7 +196,7 @@ class Auditor(models.Model):
         null=True,
         help_text=docs.auditor_ein,
     )
-    seqence_number = models.IntegerField(
+    sequence_number = models.IntegerField(
         "Order that Auditors were reported on page 5 of SF-SAC (only for secondary_auditors)",
         null=True,
         help_text=docs.seqnum,
@@ -219,7 +219,7 @@ class FindingText(models.Model):
         null=True,
         help_text=docs.finding_ref_nums_findingstext,
     )
-    seqence_number = models.IntegerField(
+    sequence_number = models.IntegerField(
         "Order that the findings text was reported",
         null=True,
         help_text=docs.seq_number_findingstext,
@@ -545,6 +545,7 @@ class Note(models.Model):
         max_length=40,
         help_text=docs.dbkey_notes,
     )
+    # consider changing these to numeric
     audit_year = models.CharField(
         "Audit Year and DBKEY (database key) combined make up the primary key.",
         max_length=40,

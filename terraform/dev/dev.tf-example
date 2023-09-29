@@ -1,0 +1,5 @@
+module "dev" {
+  source        = "../shared/modules/env"
+  cf_space_name = "dev"
+}
+

@@ -1,0 +1,73 @@
+AGENCYNUM,AGENCYNAME,I_9,III_9,III_10A
+01,African Development Foundation,S,S,P
+02,Agency for International Development,P,P,P
+10,Department of Agriculture,P,P,P
+23,Appalachian Regional Commission,S,P,P
+88,Architectural & Transportation Barriers Compliance Board,S,S,P
+13,Central Intelligence Agency,S,S,P
+11,Department of Commerce,P,P,P
+29,Commission on Civil Rights,S,S,P
+78,Commodity Futures Trading Commission,S,S,P
+87,Consumer Product Safety Commission,S,S,P
+94,Corporation for National & Community Service,S,P,P
+90,Denali Commission,S,S,P
+12,Department of Defense,P,P,P
+84,Department of Education,P,P,P
+81,Department of Energy,P,P,P
+66,Environmental Protection Agency,P,P,P
+30,Equal Employment Opportunity Commission,S,S,P
+32,Federal Communications Commission,S,S,P
+83,Federal Emergency Management Agency,P,P,P
+33,Federal Maritime Commission,S,S,P
+34,Federal Mediation and Conciliation Service,S,S,P
+18,Federal Reserve System,S,S,P
+36,Federal Trade Commission,S,S,P
+39,General Services Administration,S,P,P
+40,Government Printing Office,S,S,P
+93,Department of Health and Human Services,P,P,P
+14,Department of Housing and Urban Development,P,P,P
+03,Institute for Museum Services,S,P,P
+04,Inter-American Foundation,S,S,P
+15,Department of the Interior,P,P,P
+61,International Trade Commission,S,S,P
+41,Interstate Commerce Commission,S,S,P
+16,Department of Justice,P,P,P
+17,Department of Labor,P,P,P
+09,Legal Services Corporation,S,P,P
+42,Library of Congress,S,S,P
+43,National Aeronautics & Space Administration,S,P,P
+89,National Archives & Records Administration,S,P,P
+92,National Council on Disability,S,S,P
+44,National Credit Union Administration,S,S,P
+05,National Endowment for the Arts,S,P,P
+06,National Endowment for the Humanities,S,P,P
+45,National Foundation on the Arts and Humanities,,,P
+68,National Gallery of Art,S,S,P
+46,National Labor Relations Board,S,S,P
+47,National Science Foundation,P,P,P
+77,Nuclear Regulatory Commission,S,S,P
+07,Office of National Drug Control Policy,S,P,P
+27,Office of Personnel Management,S,S,P
+70,Overseas Private Investment Corporation,S,S,P
+08,Peace Corps,S,S,P
+86,Pension Benefit Guaranty Corporation,S,S,P
+22,Postal Service,S,S,P
+53,President's Committee on Employment of Persons with Disabilities,S,S,P
+57,Railroad Retirement Board,S,S,P
+85,Scholarship & Fellowship Foundations,S,S,P
+58,Securities and Exchange Commission,S,S,P
+59,Small Business Administration,S,P,P
+60,Smithsonian Institution,S,S,P
+96,Social Security Administration,S,P,P
+19,Department of State,S,P,P
+62,Tennessee Valley Authority,S,S,P
+20,Department of Transportation,P,P,P
+21,Department of Treasury,S,P,P
+82,United States Information Agency,S,P,P
+91,United States Institute of Peace,S,S,P
+64,Department of Veterans Affairs,S,P,P
+99,Miscellaneous,S,P,P
+00,None,,P,
+72,,,,P
+97,Department of Homeland Security,S,P,P
+98,Agency For International Development,P,P,P

@@ -1,13 +1,16 @@
 ---
 name: Terraform apply (single env)
-
 on:
   workflow_call:
     inputs:
       environment:
         required: true
         type: string
-  
+      autoapprove:
+        # true is only used for preview environment, since there is no pull request
+        required: true
+        type: boolean
+        default: false
 
 jobs:
   apply:
@@ -18,18 +21,25 @@ jobs:
       KEY: "terraform.tfstate.${{ inputs.environment }}"
       TF_VAR_cf_user: ${{ secrets.CF_USERNAME }}
       TF_VAR_cf_password: ${{ secrets.CF_PASSWORD }}
+      TF_VAR_new_relic_license_key: ${{ secrets.NEW_RELIC_LICENSE_KEY }}
+      TF_VAR_pgrst_jwt_secret: ${{ secrets.PGRST_JWT_SECRET }}
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       TERRAFORM_PRE_RUN: |
-          echo any precursor steps go here, eg installing CLIs
+          apt-get update
+          apt-get install -y zip python
+      TF_VAR_postgrest_image: 'ghcr.io/gsa-tts/fac/postgrest:latest'
+      TF_VAR_clamav_image: 'ghcr.io/gsa-tts/fac/clamav:latest'
 
     steps:
-      - name: checkout
-        uses: actions/checkout@v2
-      - name: terraform apply ( ${{ inputs.environment }} )
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Apply ( ${{ inputs.environment }} )
         uses: dflook/terraform-apply@v1
         with:
           path: terraform/${{ inputs.environment }}
           label: ${{ inputs.environment }}
+          auto_approve: ${{ inputs.autoapprove}}
           # These secrets grant access to the bucket with our remote Terraform
           # state. They're located in the "Secrets > Actions > Repository
           # Secrets" section of the repository settings, and are the same across
@@ -41,3 +51,24 @@ jobs:
             bucket=${{ secrets.terraform_BUCKET }},
             region=${{ secrets.terraform_REGION }},
             key=${{ env.KEY }},
+
+
+      - name: Unshare backups s3 bucket to staging space
+        if: ${{ inputs.environment == 'meta' }}
+        uses: cloud-gov/cg-cli-tools@main
+        with:
+          cf_username: ${{ secrets.CF_USERNAME }}
+          cf_password: ${{ secrets.CF_PASSWORD }}
+          cf_org: gsa-tts-oros-fac
+          cf_space: production
+          command: cf unshare-service backups -s staging -f
+
+      - name: Share backups s3 bucket to staging space
+        if: ${{ inputs.environment == 'meta' }}
+        uses: cloud-gov/cg-cli-tools@main
+        with:
+          cf_username: ${{ secrets.CF_USERNAME }}
+          cf_password: ${{ secrets.CF_PASSWORD }}
+          cf_org: gsa-tts-oros-fac
+          cf_space: production
+          command: cf share-service backups -s staging

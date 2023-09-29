@@ -237,7 +237,7 @@
       </bpmn:startEvent>
       <bpmn:sequenceFlow id="Flow_09ylpzc" sourceRef="Event_1epbezu" targetRef="Activity_14eyzxy" />
       <bpmn:sequenceFlow id="Flow_06s8gf3" sourceRef="Activity_14eyzxy" targetRef="Activity_095vas7" />
-      <bpmn:exclusiveGateway id="Gateway_0hlu9k9" name="Has loging.gov account?">
+      <bpmn:exclusiveGateway id="Gateway_0hlu9k9" name="Has login.gov account?">
         <bpmn:incoming>Flow_1iuss5j</bpmn:incoming>
         <bpmn:outgoing>Flow_15cjzvr</bpmn:outgoing>
         <bpmn:outgoing>Flow_12g111t</bpmn:outgoing>

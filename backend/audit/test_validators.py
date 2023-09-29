@@ -2,6 +2,7 @@ import json
 import string
 from unittest import TestCase
 from unittest.mock import patch
+from django.conf import settings
 from django.test import SimpleTestCase
 from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import TemporaryUploadedFile
@@ -9,25 +10,45 @@ from random import choice, randrange
 from openpyxl import Workbook
 from tempfile import NamedTemporaryFile
 
+import copy
 import requests
+from typing import Dict, Union
 
-from .test_schemas import FederalAwardsSchemaValidityTest
+from audit.fixtures.excel import (
+    SIMPLE_CASES_TEST_FILE,
+    CORRECTIVE_ACTION_TEMPLATE_DEFINITION,
+    ADDITIONAL_UEIS_TEMPLATE_DEFINITION,
+    ADDITIONAL_EINS_TEMPLATE_DEFINITION,
+    SECONDARY_AUDITORS_TEMPLATE_DEFINITION,
+    NOTES_TO_SEFA_TEMPLATE_DEFINITION,
+    FORM_SECTIONS,
+    TRIBAL_ACCESS_TEST_FILE,
+)
+
 from .validators import (
     ALLOWED_EXCEL_CONTENT_TYPES,
     ALLOWED_EXCEL_FILE_EXTENSIONS,
     MAX_EXCEL_FILE_SIZE_MB,
-    validate_excel_file_content_type,
-    validate_excel_file_extension,
+    validate_additional_ueis_json,
+    validate_additional_eins_json,
+    validate_notes_to_sefa_json,
+    validate_corrective_action_plan_json,
+    validate_file_content_type,
+    validate_file_extension,
     validate_excel_file_integrity,
-    validate_excel_filename,
-    validate_excel_file_size,
+    validate_file_size,
     validate_federal_award_json,
+    validate_secondary_auditors_json,
     validate_file_infection,
+    validate_pdf_file_integrity,
     validate_uei,
     validate_uei_alphanumeric,
     validate_uei_valid_chars,
     validate_uei_leading_char,
     validate_uei_nine_digit_sequences,
+    validate_component_page_numbers,
+    validate_audit_information_json,
+    validate_tribal_data_consent_json,
 )
 
 # Simplest way to create a new copy of simple case rather than getting
@@ -49,58 +70,54 @@ class FederalAwardsValidatorTests(SimpleTestCase):
     test_schemas.py
     """
 
+    SIMPLE_CASE = json.loads(SIMPLE_CASES_TEST_FILE.read_text(encoding="utf-8"))[
+        "FederalAwardsCases"
+    ][0]
+
     def test_validation_is_applied(self):
         """
         Empty Federal Awards should fail, simple case should pass.
         """
-        invalid = json.loads("{}")
+        invalid = json.loads(
+            f'{{"Meta":{{"section_name":"{FORM_SECTIONS.FEDERAL_AWARDS_EXPENDED}"}},"FederalAwards":{{}}}}'
+        )
         expected_msg = "[\"'Federal Awards' is a required property.\"]"
         self.assertRaisesRegex(
             ValidationError, expected_msg, validate_federal_award_json, invalid
         )
 
-        simple = FederalAwardsSchemaValidityTest.SIMPLE_CASE
+        simple = FederalAwardsValidatorTests.SIMPLE_CASE
         validate_federal_award_json(simple)
-
-    def test_prefix_under_ten(self):
-        """
-        Prefixes between 00 and 09 should fail
-        """
-        simple = jsoncopy(FederalAwardsSchemaValidityTest.SIMPLE_CASE)
-
-        # pick a prefix between 00 and 09 (invalid)
-        prefix = f"{randrange(10):02}"
-        # pick an extension beteween 001 and 999 (valid)
-        extension = f"{randrange(1, 1000):03}"
-
-        simple["FederalAwards"]["federal_awards"][0][
-            "program_number"
-        ] = f"{prefix}.{extension}"
-
-        self.assertRaises(ValidationError, validate_federal_award_json, simple)
 
     def test_prefix_over_99(self):
         """
         Prefixes over 99 should fail
         """
-        simple = jsoncopy(FederalAwardsSchemaValidityTest.SIMPLE_CASE)
+        simple = jsoncopy(FederalAwardsValidatorTests.SIMPLE_CASE)
 
         # pick a prefix between 100 and 999 (invalid)
         prefix = f"{randrange(100, 1000):03}"
         # pick an extension beteween 001 and 999 (valid)
-        extension = f"{randrange(1, 1000):03}"
+        extension = f"{randrange(100, 1000):03}"
 
-        simple["FederalAwards"]["federal_awards"][0][
-            "program_number"
-        ] = f"{prefix}.{extension}"
+        simple["FederalAwards"]["federal_awards"][0]["program"][
+            "federal_agency_prefix"
+        ] = f"{prefix}"
+        simple["FederalAwards"]["federal_awards"][0]["program"][
+            "three_digit_extension"
+        ] = f"{extension}"
 
-        self.assertRaises(ValidationError, validate_federal_award_json, simple)
+        with self.assertRaises(
+            ValidationError,
+            msg=f"ValidationError not raised with prefix = {prefix}, extension = {extension}",
+        ):
+            validate_federal_award_json(simple)
 
     def test_prefix_non_numeric(self):
         """
         Prefixes with non-numeric characters should fail
         """
-        simple = jsoncopy(FederalAwardsSchemaValidityTest.SIMPLE_CASE)
+        simple = jsoncopy(FederalAwardsValidatorTests.SIMPLE_CASE)
 
         # pick prefixes that contain one or two non-numeric characters
         prefixes = [
@@ -110,47 +127,63 @@ class FederalAwardsValidatorTests(SimpleTestCase):
         ]
 
         # pick an extension between 001 and 999 (valid)
-        extension = f"{randrange(1, 1000):03}"
+        extension = f"{randrange(100, 1000):03}"
 
         for prefix in prefixes:
             with self.subTest():
-                simple["FederalAwards"]["federal_awards"][0][
-                    "program_number"
-                ] = f"{prefix}.{extension}"
+                simple["FederalAwards"]["federal_awards"][0]["program"][
+                    "federal_agency_prefix"
+                ] = f"{prefix}"
+                simple["FederalAwards"]["federal_awards"][0]["program"][
+                    "three_digit_extension"
+                ] = f"{extension}"
 
-                self.assertRaises(ValidationError, validate_federal_award_json, simple)
+                with self.assertRaises(
+                    ValidationError,
+                    msg=f"ValidationError not raised with prefix = {prefix}, extension = {extension}",
+                ):
+                    validate_federal_award_json(simple)
 
     def test_extension_RD(self):
         """
         A CFDA extension of RD should pass
         """
-        simple = jsoncopy(FederalAwardsSchemaValidityTest.SIMPLE_CASE)
-
-        # pick a prefix between 10 and 99 (valid)
-        prefix = f"{randrange(10, 100):02}"
+        simple = jsoncopy(FederalAwardsValidatorTests.SIMPLE_CASE)
+        prefix = f"{randrange(10, 20):02}"
         # use RD as extension (valid)
         extension = "RD"
 
-        simple["FederalAwards"]["federal_awards"][0][
-            "program_number"
-        ] = f"{prefix}.{extension}"
-
+        simple["FederalAwards"]["federal_awards"][0]["program"][
+            "federal_agency_prefix"
+        ] = f"{prefix}"
+        simple["FederalAwards"]["federal_awards"][0]["program"][
+            "three_digit_extension"
+        ] = f"{extension}"
+        simple["FederalAwards"]["federal_awards"][0]["program"][
+            "additional_award_identification"
+        ] = "1234567"
         validate_federal_award_json(simple)
 
     def test_extension_U(self):
         """
         A CFDA extension of U## should pass
         """
-        simple = jsoncopy(FederalAwardsSchemaValidityTest.SIMPLE_CASE)
+        simple = jsoncopy(FederalAwardsValidatorTests.SIMPLE_CASE)
 
         # pick a prefix between 10 and 99 (valid)
-        prefix = f"{randrange(10, 100):02}"
+        prefix = f"{randrange(10, 20):02}"
         # pick an extension between U10 and U99 (valid)
         extension = f"U{randrange(10, 100):02}"
 
-        simple["FederalAwards"]["federal_awards"][0][
-            "program_number"
-        ] = f"{prefix}.{extension}"
+        simple["FederalAwards"]["federal_awards"][0]["program"][
+            "federal_agency_prefix"
+        ] = f"{prefix}"
+        simple["FederalAwards"]["federal_awards"][0]["program"][
+            "three_digit_extension"
+        ] = f"{extension}"
+        simple["FederalAwards"]["federal_awards"][0]["program"][
+            "additional_award_identification"
+        ] = "1234567"
 
         validate_federal_award_json(simple)
 
@@ -158,50 +191,66 @@ class FederalAwardsValidatorTests(SimpleTestCase):
         """
         A CFDA extension of U# should fail
         """
-        simple = jsoncopy(FederalAwardsSchemaValidityTest.SIMPLE_CASE)
+        simple = jsoncopy(FederalAwardsValidatorTests.SIMPLE_CASE)
 
         # pick a prefix between 10 and 99 (valid)
-        prefix = f"{randrange(10, 100):02}"
+        prefix = f"{randrange(10, 70):02}"
         # pick an extension between U0 and U9
         extension = f"U{randrange(10):1}"
 
-        simple["FederalAwards"]["federal_awards"][0][
-            "program_number"
-        ] = f"{prefix}.{extension}"
+        simple["FederalAwards"]["federal_awards"][0]["program"][
+            "federal_agency_prefix"
+        ] = f"{prefix}"
+        simple["FederalAwards"]["federal_awards"][0]["program"][
+            "three_digit_extension"
+        ] = f"{extension}"
 
-        self.assertRaises(ValidationError, validate_federal_award_json, simple)
+        with self.assertRaises(
+            ValidationError,
+            msg=f"ValidationError not raised with prefix = {prefix}, extension = {extension}",
+        ):
+            validate_federal_award_json(simple)
 
     def test_extension_U_three_digit(self):
         """
         A CFDA extension of U### should fail
         """
-        simple = jsoncopy(FederalAwardsSchemaValidityTest.SIMPLE_CASE)
+        simple = jsoncopy(FederalAwardsValidatorTests.SIMPLE_CASE)
 
-        # pick a prefix between 10 and 99 (valid)
-        prefix = f"{randrange(10, 100):02}"
+        prefix = f"{randrange(10, 70):02}"
         # pick an extension between U001 and U999
         extension = f"U{randrange(1000):03}"
 
-        simple["FederalAwards"]["federal_awards"][0][
-            "program_number"
-        ] = f"{prefix}.{extension}"
+        simple["FederalAwards"]["federal_awards"][0]["program"][
+            "federal_agency_prefix"
+        ] = f"{prefix}"
+        simple["FederalAwards"]["federal_awards"][0]["program"][
+            "three_digit_extension"
+        ] = f"{extension}"
 
-        self.assertRaises(ValidationError, validate_federal_award_json, simple)
+        with self.assertRaises(
+            ValidationError,
+            msg=f"ValidationError not raised with prefix = {prefix}, extension = {extension}",
+        ):
+            validate_federal_award_json(simple)
 
     def test_three_digit_extension(self):
         """
         A three digit numeric CFDA extension should pass
         """
-        simple = jsoncopy(FederalAwardsSchemaValidityTest.SIMPLE_CASE)
+        simple = jsoncopy(FederalAwardsValidatorTests.SIMPLE_CASE)
 
         # pick a prefix between 10 and 99 (valid)
-        prefix = f"{randrange(10, 100):02}"
+        prefix = f"{randrange(10, 20):02}"
         # pick an extension between 001 and 999 (valid)
-        extension = f"{randrange(1, 1000):03}"
+        extension = f"{randrange(100, 1000):03}"
 
-        simple["FederalAwards"]["federal_awards"][0][
-            "program_number"
-        ] = f"{prefix}.{extension}"
+        simple["FederalAwards"]["federal_awards"][0]["program"][
+            "federal_agency_prefix"
+        ] = f"{prefix}"
+        simple["FederalAwards"]["federal_awards"][0]["program"][
+            "three_digit_extension"
+        ] = f"{extension}"
 
         validate_federal_award_json(simple)
 
@@ -209,33 +258,42 @@ class FederalAwardsValidatorTests(SimpleTestCase):
         """
         A CFDA extension with four digits should fail
         """
-        simple = jsoncopy(FederalAwardsSchemaValidityTest.SIMPLE_CASE)
+        simple = jsoncopy(FederalAwardsValidatorTests.SIMPLE_CASE)
 
         # pick a prefix between 10 and 99 (valid)
-        prefix = f"{randrange(10, 100):02}"
+        prefix = f"{randrange(10, 20):02}"
         # pick an extension with four or more digits
         extension = f"{randrange(1000):04}"
 
-        simple["FederalAwards"]["federal_awards"][0][
-            "program_number"
-        ] = f"{prefix}.{extension}"
+        simple["FederalAwards"]["federal_awards"][0]["program"][
+            "federal_agency_prefix"
+        ] = f"{prefix}"
+        simple["FederalAwards"]["federal_awards"][0]["program"][
+            "three_digit_extension"
+        ] = f"{extension}"
 
-        self.assertRaises(ValidationError, validate_federal_award_json, simple)
+        with self.assertRaises(
+            ValidationError,
+            msg=f"ValidationError not raised with prefix = {prefix}, extension = {extension}",
+        ):
+            validate_federal_award_json(simple)
 
     def test_trailing_extension_letter(self):
         """
         A CFDA extension with 3 numeric digits and a trailing letter should pass
         """
-        simple = jsoncopy(FederalAwardsSchemaValidityTest.SIMPLE_CASE)
+        simple = jsoncopy(FederalAwardsValidatorTests.SIMPLE_CASE)
 
         # pick a prefix between 10 and 99 (valid)
-        prefix = f"{randrange(10, 100):02}"
+        prefix = f"{randrange(10, 20):02}"
         # pick an extension between 001 and 999 with a trailing letter (valid)
-        extension = f"{randrange(1, 1000):03}{choice(string.ascii_letters)}"
-
-        simple["FederalAwards"]["federal_awards"][0][
-            "program_number"
-        ] = f"{prefix}.{extension}"
+        extension = f"{randrange(100, 1000):03}{choice(string.ascii_letters)}"
+        simple["FederalAwards"]["federal_awards"][0]["program"][
+            "federal_agency_prefix"
+        ] = f"{prefix}"
+        simple["FederalAwards"]["federal_awards"][0]["program"][
+            "three_digit_extension"
+        ] = f"{extension}"
 
         validate_federal_award_json(simple)
 
@@ -243,18 +301,25 @@ class FederalAwardsValidatorTests(SimpleTestCase):
         """
         A CFDA extension with 3 numeric digits and multiple trailing letters should fail
         """
-        simple = jsoncopy(FederalAwardsSchemaValidityTest.SIMPLE_CASE)
+        simple = jsoncopy(FederalAwardsValidatorTests.SIMPLE_CASE)
 
         # pick a prefix between 10 and 99 (valid)
-        prefix = f"{randrange(10, 100):02}"
+        prefix = f"{randrange(10, 20):02}"
         # pick an extension between 001 and 999 with 2 trailing letters (invalid)
-        extension = f"{randrange(1, 1000):03}{choice(string.ascii_letters)}{choice(string.ascii_letters)}"
+        extension = f"{randrange(100, 1000):03}{choice(string.ascii_letters)}{choice(string.ascii_letters)}"
 
-        simple["FederalAwards"]["federal_awards"][0][
-            "program_number"
-        ] = f"{prefix}.{extension}"
+        simple["FederalAwards"]["federal_awards"][0]["program"][
+            "federal_agency_prefix"
+        ] = f"{prefix}"
+        simple["FederalAwards"]["federal_awards"][0]["program"][
+            "three_digit_extension"
+        ] = f"{extension}"
 
-        self.assertRaises(ValidationError, validate_federal_award_json, simple)
+        with self.assertRaises(
+            ValidationError,
+            msg=f"ValidationError not raised with prefix = {prefix}, extension = {extension}",
+        ):
+            validate_federal_award_json(simple)
 
     def test_extension_non_numeric(self):
         """
@@ -263,10 +328,10 @@ class FederalAwardsValidatorTests(SimpleTestCase):
         ascii_letters_omit_RD = string.ascii_letters.replace("D", "").replace("R", "")
         ascii_letters_omit_U = string.ascii_letters.replace("U", "")
 
-        simple = jsoncopy(FederalAwardsSchemaValidityTest.SIMPLE_CASE)
+        simple = jsoncopy(FederalAwardsValidatorTests.SIMPLE_CASE)
 
         # pick a prefix between 10 and 99 (valid)
-        prefix = f"{randrange(10, 100):02}"
+        prefix = f"{randrange(10, 20):02}"
 
         # pick extensions with one or more non-numeric characters
         extensions = [
@@ -279,11 +344,18 @@ class FederalAwardsValidatorTests(SimpleTestCase):
 
         for extension in extensions:
             with self.subTest():
-                simple["FederalAwards"]["federal_awards"][0][
-                    "program_number"
-                ] = f"{prefix}.{extension}"
+                simple["FederalAwards"]["federal_awards"][0]["program"][
+                    "federal_agency_prefix"
+                ] = f"{prefix}"
+                simple["FederalAwards"]["federal_awards"][0]["program"][
+                    "three_digit_extension"
+                ] = f"{extension}"
 
-                self.assertRaises(ValidationError, validate_federal_award_json, simple)
+                with self.assertRaises(
+                    ValidationError,
+                    msg=f"ValidationError not raised with prefix = {prefix}, extension = {extension}",
+                ):
+                    validate_federal_award_json(simple)
 
 
 class UEIValidatorTests(SimpleTestCase):
@@ -350,56 +422,7 @@ class UEIValidatorTests(SimpleTestCase):
         validate_uei_nine_digit_sequences(self.valid)
 
 
-class ExcelFileFilenameValidatorTests(SimpleTestCase):
-    def test_valid_filename_slug(self):
-        """
-        Filenames that can be slugified are valid
-        """
-        test_cases = [
-            ("this one just has spaces.xlsx", "this-one-just-has-spaces.xlsx"),
-            (
-                "this_one\\ has some? other things!.xlsx",
-                "this-one-has-some-other-things.xlsx",
-            ),
-            ("this/one/has/forward/slashes.xlsx", "slashes.xlsx"),
-            (
-                "this.one.has.multiple.extensions.xlsx",
-                "this-one-has-multiple-extensions.xlsx",
-            ),
-        ]
-
-        for test_case in test_cases:
-            with self.subTest():
-                before, after = test_case
-                valid_file = TemporaryUploadedFile(
-                    before, ALLOWED_EXCEL_CONTENT_TYPES[0], 10000, "utf-8"
-                )
-
-                validated_filename = validate_excel_filename(valid_file)
-
-                self.assertEqual(validated_filename, after)
-
-    def test_invalid_filename_slug(self):
-        """
-        Filenames that cannot be slugified are not valid
-        """
-        test_cases = [
-            "no-extension",
-            ".xlsx",
-            "".join(choice("!?#$%^&*") for _ in range(9)),
-            "".join(choice("!?#$%^&*") for _ in range(9)) + ".xlsx",
-        ]
-
-        for test_case in test_cases:
-            with self.subTest():
-                file = TemporaryUploadedFile(
-                    test_case, ALLOWED_EXCEL_CONTENT_TYPES[0], 10000, "utf-8"
-                )
-
-                self.assertRaises(ValidationError, validate_excel_filename, file)
-
-
-class ExcelFileExtensionValidatorTests(SimpleTestCase):
+class FileExtensionValidatorTests(SimpleTestCase):
     def test_invalid_file_extensions(self):
         """
         Filenames that have disallowed extensions are not valid
@@ -434,7 +457,11 @@ class ExcelFileExtensionValidatorTests(SimpleTestCase):
                     test_case, ALLOWED_EXCEL_CONTENT_TYPES[0], 10000, "utf-8"
                 )
 
-                self.assertRaises(ValidationError, validate_excel_file_extension, file)
+                with self.assertRaises(
+                    ValidationError,
+                    msg=f"ValidationError not raised with filename = {test_case}",
+                ):
+                    validate_file_extension(file, ALLOWED_EXCEL_FILE_EXTENSIONS)
 
     def test_valid_file_extensions(self):
         """Filenames that have allowed extensions are valid"""
@@ -449,10 +476,10 @@ class ExcelFileExtensionValidatorTests(SimpleTestCase):
                     filename, ALLOWED_EXCEL_CONTENT_TYPES[0], 10000, "utf-8"
                 )
 
-                validate_excel_file_extension(file)
+                validate_file_extension(file, ALLOWED_EXCEL_FILE_EXTENSIONS)
 
 
-class ExcelFileContentTypeValidatorTests(SimpleTestCase):
+class FileContentTypeValidatorTests(SimpleTestCase):
     def test_invalid_file_content_types(self):
         """Files that have disallowed content types are invalid"""
         test_cases = [
@@ -480,7 +507,10 @@ class ExcelFileContentTypeValidatorTests(SimpleTestCase):
                 )
 
                 self.assertRaises(
-                    ValidationError, validate_excel_file_content_type, file
+                    ValidationError,
+                    validate_file_content_type,
+                    file,
+                    ALLOWED_EXCEL_CONTENT_TYPES,
                 )
 
     def test_valid_file_content_types(self):
@@ -491,10 +521,10 @@ class ExcelFileContentTypeValidatorTests(SimpleTestCase):
                     TemporaryUploadedFile("file.xlsx", content_type, 10000, "utf-8")
                 )
 
-                validate_excel_file_content_type(file)
+                validate_file_content_type(file, ALLOWED_EXCEL_CONTENT_TYPES)
 
 
-class ExcelFileFileSizeValidatorTests(SimpleTestCase):
+class FileFileSizeValidatorTests(SimpleTestCase):
     def test_valid_file_size(self):
         """Files that are under (or equal to) the maximum file size are valid"""
         max_file_size = MAX_EXCEL_FILE_SIZE_MB * 1024 * 1024
@@ -510,7 +540,7 @@ class ExcelFileFileSizeValidatorTests(SimpleTestCase):
                     "file.xlsx", b"this is a file", test_case, "utf-8"
                 )
 
-                validate_excel_file_size(file)
+                validate_file_size(file, MAX_EXCEL_FILE_SIZE_MB)
 
     def test_invalid_file_size(self):
         """Files that are over the maximum file size are invalid"""
@@ -527,7 +557,9 @@ class ExcelFileFileSizeValidatorTests(SimpleTestCase):
                     "file.xlsx", b"this is a file", test_case, "utf-8"
                 )
 
-                self.assertRaises(ValidationError, validate_excel_file_size, file)
+                self.assertRaises(
+                    ValidationError, validate_file_size, file, MAX_EXCEL_FILE_SIZE_MB
+                )
 
 
 class MockHttpResponse:
@@ -536,7 +568,7 @@ class MockHttpResponse:
         self.text = text
 
 
-class ExcelFileInfectionValidatorTests(TestCase):
+class FileInfectionValidatorTests(TestCase):
     def setUp(self):
         self.fake_file = TemporaryUploadedFile("file.txt", "text/plain", 10000, "utf-8")
 
@@ -594,3 +626,312 @@ class ExcelFileIntegrityValidatorTests(TestCase):
             file.seek(0)
 
             validate_excel_file_integrity(file)
+
+
+class CorrectiveActionPlanValidatorTests(SimpleTestCase):
+    SIMPLE_CASE = json.loads(SIMPLE_CASES_TEST_FILE.read_text(encoding="utf-8"))[
+        "CorrectiveActionPlanCase"
+    ]
+
+    def test_validation_is_applied(self):
+        """
+        Empty Corrective Action Plan should fail, simple case should pass.
+        """
+        template_definition_path = (
+            settings.XLSX_TEMPLATE_JSON_DIR / CORRECTIVE_ACTION_TEMPLATE_DEFINITION
+        )
+        template = json.loads(template_definition_path.read_text(encoding="utf-8"))
+        invalid = json.loads(
+            f'{{"Meta":{{"section_name":"{FORM_SECTIONS.CORRECTIVE_ACTION_PLAN}"}},"CorrectiveActionPlan":{{}}}}'
+        )
+        expected_msg = str(
+            [
+                (
+                    "B",
+                    "4",
+                    "Auditee UEI",
+                    template["sheets"][0]["single_cells"][2]["help"],
+                )
+            ]
+        )
+        self.assertRaisesRegex(
+            ValidationError, expected_msg, validate_corrective_action_plan_json, invalid
+        )
+
+        validate_corrective_action_plan_json(
+            CorrectiveActionPlanValidatorTests.SIMPLE_CASE
+        )
+
+
+class PdfFileIntegrityValidatorTests(SimpleTestCase):
+    def test_broken_pdf_file(self):
+        """PDF files that are not readable by PyPDF are invalid"""
+        file = TemporaryUploadedFile(
+            "file.pdf", b"this is not really a pdf file", 10000, "utf-8"
+        )
+
+        self.assertRaises(ValidationError, validate_pdf_file_integrity, file)
+
+    def test_locked_pdf_file(self):
+        """PDF files that are locked / require a password are invalid"""
+        with open("audit/fixtures/locked.pdf", "rb") as file:
+            self.assertRaises(ValidationError, validate_pdf_file_integrity, file)
+
+    def test_scanned_pdf_file(self):
+        with open("audit/fixtures/scanned.pdf", "rb") as file:
+            self.assertRaises(ValidationError, validate_pdf_file_integrity, file)
+
+    def test_valid_pdf_file(self):
+        with open("audit/fixtures/basic.pdf", "rb") as file:
+            validate_pdf_file_integrity(file)
+
+
+class AdditionalUeisValidatorTests(SimpleTestCase):
+    SIMPLE_CASE = json.loads(SIMPLE_CASES_TEST_FILE.read_text(encoding="utf-8"))[
+        "AdditionalUeisCase"
+    ]
+
+    def test_validation_is_applied(self):
+        """
+        Empty Additional UEIs should fail, simple case should pass.
+        """
+        template_definition_path = (
+            settings.XLSX_TEMPLATE_JSON_DIR / ADDITIONAL_UEIS_TEMPLATE_DEFINITION
+        )
+        template = json.loads(template_definition_path.read_text(encoding="utf-8"))
+        invalid = json.loads(
+            f'{{"Meta":{{"section_name":"{FORM_SECTIONS.ADDITIONAL_UEIS}"}},"AdditionalUEIs":{{}}}}'
+        )
+        expected_msg = str(
+            [
+                (
+                    "B",
+                    "4",
+                    "Auditee UEI",
+                    template["sheets"][0]["single_cells"][2]["help"],
+                )
+            ]
+        )
+        self.assertRaisesRegex(
+            ValidationError, expected_msg, validate_additional_ueis_json, invalid
+        )
+
+        validate_additional_ueis_json(AdditionalUeisValidatorTests.SIMPLE_CASE)
+
+
+class AdditionalEinsValidatorTests(SimpleTestCase):
+    SIMPLE_CASE = json.loads(SIMPLE_CASES_TEST_FILE.read_text(encoding="utf-8"))[
+        "AdditionalEinsCase"
+    ]
+
+    def test_validation_is_applied(self):
+        """
+        Empty Additional EINs should fail, simple case should pass.
+        """
+        template_definition_path = (
+            settings.XLSX_TEMPLATE_JSON_DIR / ADDITIONAL_EINS_TEMPLATE_DEFINITION
+        )
+        template = json.loads(template_definition_path.read_text(encoding="utf-8"))
+        invalid = json.loads(
+            f'{{"Meta":{{"section_name":"{FORM_SECTIONS.ADDITIONAL_EINS}"}},"AdditionalEINs":{{}}}}'
+        )
+        expected_msg = str(
+            [
+                (
+                    "B",
+                    "4",
+                    "Auditee UEI",
+                    template["sheets"][0]["single_cells"][2]["help"],
+                )
+            ]
+        )
+        self.assertRaisesRegex(
+            ValidationError, expected_msg, validate_additional_eins_json, invalid
+        )
+
+        validate_additional_eins_json(self.SIMPLE_CASE)
+
+
+class NotesToSefaValidatorTests(SimpleTestCase):
+    SIMPLE_CASES = json.loads(SIMPLE_CASES_TEST_FILE.read_text(encoding="utf-8"))[
+        "NotesToSefaCases"
+    ]
+
+    def test_validation_is_applied(self):
+        """
+        Empty Notes to SEFA should fail, simple case should pass.
+        """
+        template_definition_path = (
+            settings.XLSX_TEMPLATE_JSON_DIR / NOTES_TO_SEFA_TEMPLATE_DEFINITION
+        )
+        template = json.loads(template_definition_path.read_text(encoding="utf-8"))
+        invalid = json.loads(
+            f'{{"Meta":{{"section_name":"{FORM_SECTIONS.NOTES_TO_SEFA}"}},"NotesToSefa":{{}}}}'
+        )
+        expected_msg = str(
+            [
+                (
+                    "B",
+                    "4",
+                    "Auditee UEI",
+                    template["sheets"][0]["single_cells"][2]["help"],
+                )
+            ]
+        )
+        self.assertRaisesRegex(
+            ValidationError, expected_msg, validate_notes_to_sefa_json, invalid
+        )
+
+        validate_notes_to_sefa_json(NotesToSefaValidatorTests.SIMPLE_CASES[0])
+        validate_notes_to_sefa_json(NotesToSefaValidatorTests.SIMPLE_CASES[1])
+
+
+class SecondaryAuditorsValidatorTests(SimpleTestCase):
+    SIMPLE_CASE = json.loads(SIMPLE_CASES_TEST_FILE.read_text(encoding="utf-8"))[
+        "SecondaryAuditorsCase"
+    ]
+
+    def test_validation_is_applied(self):
+        """
+        Empty secondary auditors should fail, simple case should pass.
+        """
+        template_definition_path = (
+            settings.XLSX_TEMPLATE_JSON_DIR / SECONDARY_AUDITORS_TEMPLATE_DEFINITION
+        )
+        template = json.loads(template_definition_path.read_text(encoding="utf-8"))
+        invalid = json.loads(
+            f'{{"Meta":{{"section_name":"{FORM_SECTIONS.SECONDARY_AUDITORS}"}},"SecondaryAuditors":{{}}}}'
+        )
+        expected_msg = str(
+            [
+                (
+                    "B",
+                    "4",
+                    "Auditee UEI",
+                    template["sheets"][0]["single_cells"][2]["help"],
+                )
+            ]
+        )
+        self.assertRaisesRegex(
+            ValidationError, expected_msg, validate_secondary_auditors_json, invalid
+        )
+
+        validate_secondary_auditors_json(SecondaryAuditorsValidatorTests.SIMPLE_CASE)
+
+
+class ComponentPageNumberTests(SimpleTestCase):
+    good_pages: Dict[str, Union[str, int]] = {
+        "financial_statements": 1,
+        "financial_statements_opinion": 2,
+        "schedule_expenditures": 3,
+        "schedule_expenditures_opinion": 4,
+        "uniform_guidance_control": 5,
+        "uniform_guidance_compliance": 6,
+        "GAS_control": 8,
+        "GAS_compliance": 9,
+        "schedule_findings": 10,
+    }
+
+    nan_pages = copy.deepcopy(good_pages)
+    nan_pages["financial_statements"] = "1000"
+
+    missing_pages = copy.deepcopy(good_pages)
+    del missing_pages["financial_statements"]
+
+    optional_pages = copy.deepcopy(good_pages)
+    optional_pages["schedule_prior_findings"] = 11
+    optional_pages["CAP_page"] = 12
+
+    def test_good_pages(self):
+        res = validate_component_page_numbers(ComponentPageNumberTests.good_pages)
+        if not res:
+            self.fail(
+                "validate_component_page_numbers incorrectly says our good data is bad!"
+            )
+
+    def test_nan_pages(self):
+        res = validate_component_page_numbers(ComponentPageNumberTests.nan_pages)
+        if res:
+            self.fail(
+                "validate_component_page_numbers incorrectly validated an object that has numbers instead of ints"
+            )
+
+    def test_missing_pages(self):
+        res = validate_component_page_numbers(ComponentPageNumberTests.missing_pages)
+        if res:
+            self.fail(
+                "validate_component_page_numbers incorrectly validated an object that is missing pages"
+            )
+
+    def test_optional_pages(self):
+        res = validate_component_page_numbers(ComponentPageNumberTests.optional_pages)
+        if not res:
+            self.fail(
+                "validate_component_page_numbers rejected an object with optional pages"
+            )
+
+
+class AuditInformationTests(SimpleTestCase):
+    def setUp(self):
+        """Set up common test data"""
+        self.SIMPLE_CASES = json.loads(
+            SIMPLE_CASES_TEST_FILE.read_text(encoding="utf-8")
+        )["AuditInformationCases"]
+
+    def test_no_errors_when_audit_information_is_valid(self):
+        """No errors should be raised when audit information is valid"""
+        for case in self.SIMPLE_CASES:
+            validate_audit_information_json(case)
+
+    def test_error_raised_for_missing_required_fields_with_not_gaap(self):
+        """Test that missing certain fields raises a validation error when 'gaap_results' contains 'not_gaap'."""
+        for required_field in [
+            "is_sp_framework_required",
+            "sp_framework_basis",
+            "sp_framework_opinions",
+        ]:
+            case = jsoncopy(self.SIMPLE_CASES[1])
+            del case[required_field]
+            self.assertRaises(ValidationError, validate_audit_information_json, case)
+
+    def test_error_raised_for_missing_required_fields(self):
+        """Test that missing required fields raises a validation error."""
+        for key in self.SIMPLE_CASES[0].keys():
+            case = jsoncopy(self.SIMPLE_CASES[0])
+            del case[key]
+            self.assertRaises(ValidationError, validate_audit_information_json, case)
+
+
+class TribalAccessTests(SimpleTestCase):
+    def setUp(self):
+        """Set up common test data"""
+        self.SIMPLE_CASES = json.loads(
+            TRIBAL_ACCESS_TEST_FILE.read_text(encoding="utf-8")
+        )
+
+    def test_no_errors_when_tribal_access_is_valid(self):
+        """No errors should be raised when tribal data consent is valid"""
+        for case in self.SIMPLE_CASES:
+            validate_tribal_data_consent_json(case)
+
+    def test_error_raised_for_missing_required_fields(self):
+        """Test that missing required fields raises a validation error."""
+        for required_field in [
+            "is_tribal_information_authorized_to_be_public",
+            "tribal_authorization_certifying_official_name",
+            "tribal_authorization_certifying_official_title",
+        ]:
+            case = jsoncopy(self.SIMPLE_CASES[1])
+            del case[required_field]
+            self.assertRaises(ValidationError, validate_tribal_data_consent_json, case)
+
+    def test_error_raised_for_wrong_value_types(self):
+        """Test that wrong value types raise a validation error."""
+        for case in self.SIMPLE_CASES:
+            case_copy = jsoncopy(case)
+            case_copy[
+                "is_tribal_information_authorized_to_be_public"
+            ] = "incorrect_type"
+
+            with self.assertRaises(ValidationError):
+                validate_tribal_data_consent_json(case_copy)

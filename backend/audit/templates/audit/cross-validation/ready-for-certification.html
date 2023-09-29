@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+    <div class="grid-container margin-y-6">
+        <div class="grid-row grid-gap">
+            <form class="tablet:grid-col-8" id="ready-for-certification" method="post">
+                {% csrf_token %}
+                <fieldset class="usa-fieldset">
+                    <legend class="usa-legend usa-legend--large" id="federal-awards">Lock for certification</legend>
+                    <p>You are now ready to lock your single audit submission for auditee and auditor certification. Each must review and certify the documents before they can be submitted to the FAC.</p>
+                    <p>
+                        <strong>
+                            Once the single audit submission is locked for certification, you will not be able to edit or make changes to your data.
+                        </strong>
+                    </p>
+                    <p>
+                        Make sure you save copies of your documents to your local drive before moving on to the next steps as the FAC does not maintain versions for you.
+                    </p>
+                    <button class="usa-button margin-top-2" id="continue">Lock for certification</button>
+                    <a id="cancel-lock-for-certification-link" class="usa-button usa-button--unstyled margin-left-2" href="{% url 'audit:SubmissionProgress' report_id %}"
+                    aria-controls="upload-cancel">Cancel</a>
+                </fieldset>
+            </form>
+        </div>
+    </div>
+{% endblock content %}

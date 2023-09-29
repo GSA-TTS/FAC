@@ -1,0 +1,11 @@
+# Copy this file to terraform.tfvars, then edit to taste. Don't commit your copy
+# to version control!
+
+# Provide the credentials of a deployer user 
+# Instructions for generating them are here:
+# https://cloud.gov/docs/services/cloud-gov-service-account/#how-to-create-an-instance
+user          = "a-username"
+password      = "a-password"
+
+cf_org_name   = "org-for-proxy"
+cf_space_name = "space-for-proxy"

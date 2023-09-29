@@ -4,4 +4,4 @@
 
 
 # Changes to the following Terraform directory will impact access control in cloud.gov spaces. Any PR involving these files should get a review from someone in FAC-admins.
-/terraform/management/ @GSA-TTS/FAC-admins
+/terraform/meta/ @GSA-TTS/FAC-admins

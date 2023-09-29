@@ -1,0 +1,23 @@
+---
+name: Terraform format and lint
+on:
+  workflow_call:
+
+jobs:
+  test:
+    name: Test format and validite
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Terraform Format
+        uses: dflook/terraform-fmt-check@v1
+        with:
+          path: ./terraform
+
+      - name: Terraform Validate
+        uses: dflook/terraform-validate@v1
+        with:
+          path: ./terraform
+

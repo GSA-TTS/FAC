@@ -2,6 +2,7 @@ import { checkValidity } from './validate.js';
 import { queryAPI } from './api';
 
 const FORM = document.forms[0];
+var isUEIValidated = false;
 
 function handleUEIDResponse({ valid, response, errors }) {
   if (valid) {
@@ -11,9 +12,9 @@ function handleUEIDResponse({ valid, response, errors }) {
   }
 }
 
-function handleValidUei({ auditee_name }) {
-  document.getElementById('auditee_name').value = auditee_name;
-  populateModal('success', auditee_name);
+function handleValidUei(response) {
+  document.getElementById('auditee_name').value = response.auditee_name;
+  populateModal('success', response.auditee_name);
 }
 
 function handleInvalidUei(errors) {
@@ -27,22 +28,6 @@ function handleApiError(e) {
   console.error(e);
 }
 
-function proceedWithoutUei() {
-  const nameInputEl = document.getElementById('auditee_name');
-  const requiredStar = document.createElement('abbr');
-
-  requiredStar.setAttribute('title', 'required');
-  requiredStar.setAttribute('class', 'usa-hint usa-hint--required');
-  requiredStar.textContent = '*';
-
-  nameInputEl.removeAttribute('disabled');
-  nameInputEl.setAttribute('required', 'true');
-  document.querySelector('[for=auditee_name]').appendChild(requiredStar);
-  document.getElementById('no-uei-warning').hidden = false;
-
-  hideUeiStuff();
-}
-
 function hideUeiStuff() {
   const ueiFormGroup =
     document.getElementById('auditee_uei').parentNode.parentNode;
@@ -50,13 +35,13 @@ function hideUeiStuff() {
     document.querySelectorAll('.uei-explanation')
   );
   [...ueiExplanations, ueiFormGroup].forEach((node) =>
-    node.setAttribute('hidden', 'true')
+    node.setAttribute('hidden', 'hidden')
   );
 }
 
 function showValidUeiInfo() {
   const auditeeUei = document.getElementById('auditee_uei').value;
-  const auditeeName = document.getElementById('auditee_name').value;
+  const auditeeName = document.getElementById('auditee_name');
   const ueiInfoEl = document.createElement('div');
 
   ueiInfoEl.innerHTML = `
@@ -64,19 +49,20 @@ function showValidUeiInfo() {
       <dt>Unique Entity ID</dt>
       <dd>${auditeeUei}</dd>
       <dt>Auditee name</dt>
-      <dd>${auditeeName}</dd>
+      <dd>${auditeeName.value}</dd>
     </dl>
   `;
 
-  document
-    .getElementById('auditee_name')
-    .parentNode.setAttribute('hidden', 'true');
+  auditeeName.removeAttribute('disabled');
+  auditeeName.parentNode.setAttribute('hidden', 'hidden');
   document.getElementById('no-uei-warning').replaceWith(ueiInfoEl);
 }
 
 function setupFormWithValidUei() {
   hideUeiStuff();
   showValidUeiInfo();
+  isUEIValidated = true;
+  setFormDisabled(false);
 }
 
 function resetModal() {
@@ -121,15 +107,11 @@ function populateModal(formStatus, auditeeName) {
           <dt>UEI you entered</dt>
           <dd>${auditeeUei}</dd>
         </dl>
-        <p>We’re sorry for the delay. You can continue, but we’ll need confirm your UEI before your audit submission can be certified.</p>
-        <p>You might also want to check the UEI you entered, go back, and try again.</p>
+        <p>We can't proceed without confirming your UEI with SAM.gov. We’re sorry for the delay.</p>
         `,
       buttons: {
         primary: {
           text: `Go back`,
-        },
-        secondary: {
-          text: `Continue without a confirmed UEI`,
         },
       },
     },
@@ -159,14 +141,13 @@ function populateModal(formStatus, auditeeName) {
           <dt>UEI you entered</dt>
           <dd>${auditeeUei}</dd>
         </dl>
+        <p>We can't proceed without confirming that you have a valid UEI. We’re sorry for the delay.</p>
         <p>You can try re-entering the UEI. If you don’t have the UEI, you may find it at <a href="https://sam.gov">SAM.gov</a>.</p>
-        <p>You may also continue without the UEI, and you will be prompted to update the UEI before you can submit your audit.</p>
       `,
       buttons: {
         primary: {
-          text: `Continue`,
+          text: `Go back`,
         },
-        secondary: { text: `Go back` },
       },
     },
   };
@@ -175,18 +156,14 @@ function populateModal(formStatus, auditeeName) {
   modalHeadingEl.textContent = contentForStatus.heading;
   modalDescriptionEl.innerHTML = contentForStatus.description;
   modalButtonPrimaryEl.textContent = contentForStatus.buttons.primary.text;
-  modalButtonSecondaryEl.textContent = contentForStatus.buttons.secondary.text;
+
+  if (contentForStatus.buttons.secondary) {
+    modalButtonSecondaryEl.textContent =
+      contentForStatus.buttons.secondary.text;
+  }
 
   if (formStatus == 'success') {
     modalButtonPrimaryEl.onclick = setupFormWithValidUei;
-  }
-
-  if (formStatus == 'not-found') {
-    modalButtonPrimaryEl.onclick = proceedWithoutUei;
-  }
-
-  if (formStatus == 'connection-error') {
-    modalButtonSecondaryEl.onclick = proceedWithoutUei;
   }
 
   document.querySelector('.uei-search-result').classList.remove('loading');
@@ -234,7 +211,18 @@ function validateFyStartDate(fyInput) {
 
 function setFormDisabled(shouldDisable) {
   const continueBtn = document.getElementById('continue');
-  continueBtn.disabled = shouldDisable;
+  // If we want to disable the button, do it.
+  if (shouldDisable) {
+    continueBtn.disabled = true;
+    return;
+  }
+
+  // If we want to enable the button, the UEI validation should be done.
+  if (!shouldDisable && isUEIValidated) {
+    continueBtn.disabled = false;
+  } else {
+    continueBtn.disabled = true;
+  }
 }
 
 function allResponsesValid() {
@@ -288,6 +276,7 @@ function attachDatePickerHandlers() {
 function init() {
   attachEventHandlers();
   window.addEventListener('load', attachDatePickerHandlers, false); // Need to wait for date-picker text input to render.
+  setFormDisabled(true); // Disabled initially, re-enables after filling everything out.
 }
 
 init();

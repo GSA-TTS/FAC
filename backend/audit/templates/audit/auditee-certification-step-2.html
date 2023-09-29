@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+    <div class="grid-container margin-top-6">
+        <div class="grid-row">
+            <form class="grid-col-8 grid-offset-2"
+                  id="auditee-certification-step-2"
+                  method="post">
+                {% csrf_token %}
+                <fieldset class="usa-fieldset padding-bottom-2">
+                    <h1 id="auditee-certification">Auditee certification agreement</h1>
+                    <h3>Agree and sign to auditee statement</h3>
+                    <label class="usa-label" for="auditee_name">Name of certifying official</label>
+                    <input class="usa-input"
+                           id="auditee_name"
+                           name="auditee_name"
+                           placeholder="[your name]" />
+                    <label class="usa-label" for="auditee_title">Title of certifying official</label>
+                    <input class="usa-input"
+                           id="auditee_title"
+                           name="auditee_title"
+                           placeholder="[your role]" />
+                           <label class="usa-label" for="auditor_title">Date</label>
+                           <div class="usa-hint" id="auditee_certification_date-hint">mm/dd/yyyy</div>
+                           <div class="usa-date-picker">
+                               <input class="usa-input"
+                                      id="auditee_certification_date_signed"
+                                      name="auditee_certification_date_signed"
+                                      aria-labelledby="auditee_certification_date_signed-label"
+                                      aria-describedby="auditee_certification_date_signed-hint"
+                                      aria-required="true"
+                                      required
+                                      data-validate-not-null="" />
+                           </div>
+                </fieldset>
+                <button class="usa-button margin-bottom-8 margin-top-4" id="continue">Agree to auditee certification</button>
+            </form>
+        </div>
+    </div>
+    {% include "audit-metadata.html" %}
+{% endblock content %}

@@ -63,14 +63,27 @@ urlpatterns = [
         name="access-list",
     ),
     path(
-        "schemas/<str:fiscal_year>/<str:type>",
+        "schemas/<str:fiscal_year>/<str:schema_type>",
         views.SchemaView.as_view(),
         name="schemas",
     ),
     path(settings.ADMIN_URL, admin.site.urls),
     path("openid/", include("djangooidc.urls")),
     path("report_submission/", include("report_submission.urls")),
+    # Due to problematic interactions between the SVG use element and
+    # cross-domain rules and serving assets from S3, we need to serve this
+    # particular file from Django:
+    path(
+        "icons/sprite.svg",
+        views.Sprite.as_view(),
+        name="sprite",
+    ),
+    path("audit/", include("audit.urls")),
     # Keep last so we can use short urls for content pages like home page etc.
     path("", include("cms.urls")),
-    path("audit/", include("audit.urls")),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+
+if settings.ENABLE_DEBUG_TOOLBAR:
+    urlpatterns += [
+        path("__debug__/", include("debug_toolbar.urls")),
+    ]

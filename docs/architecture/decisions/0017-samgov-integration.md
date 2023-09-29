@@ -15,6 +15,7 @@ SAM.gov is intended to be considered the single source of truth for UEIs (Univer
 We will use SAM.gov, but need to acknowledge the current state of the system (the SAM.gov software and the people who use it) surrounding it.
 
 
+```
                       ┌───────────────┐
                       │               │    Found     Pre-populate fields,
        ──────────────►│ Check SAM.gov ├────────────► Mark UEI as validated.
@@ -24,6 +25,7 @@ User enters UEI       │               │
                              │           Do not pre-populate fields,
                              └────────►  Mark UEI as not validated.
                              Not found
+```
 
 When a submitter enters their UEI, we will check it with the SAM.gov API. If we can, we will pre-populate the entity name with the information returned. We will also record that the UEI was checked at time of submission.
 

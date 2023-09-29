@@ -1,0 +1,309 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+    <div class="grid-container margin-top-6">
+        <div class="grid-col grid-gap">
+            {% comment %} {% include "../sidenav.html" %} {% endcomment %}
+            <div>
+                <h1>Audit information</h1>
+                <p>
+                    <abbr title="required" class="usa-hint usa-hint--required">*</abbr> Indicates a required field.
+                </p>
+                {% if already_submitted %}
+                    <p class="text-green" id="already-submitted">
+                        A file has already been uploaded for this section. A successful reupload will overwrite your previous submission.
+                    </p>
+                {% endif %}
+            </div>
+            <form id="upload-report__form"
+                  id_test="upload-report__form"
+                  action="{% url 'audit:AuditInfoForm' report_id %}"
+                  enctype='multipart/form-data'
+                  method="post">
+                {% csrf_token %}
+                <h1>Financial statements</h1>
+                <fieldset class="usa-fieldset">
+                    <legend>
+                        What were the results of the auditor’s determination of whether the financial statements of the auditee were prepared in accordance with generally accepted accounting principles (GAAP)? <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
+                    </legend>
+                    <p class="text-base">Select any of the following that apply.</p>
+                    {% for pair in gaap_results %}
+                        <div class="usa-checkbox">
+                            <input id="gaap_results--{{ pair.tag }}"
+                                   name="gaap_results"
+                                   class="usa-checkbox__input"
+                                   required
+                                   type="checkbox"
+                                   value="{{ pair.tag }}"
+                                   {% if pair.tag in form.cleaned_data.gaap_results %}checked{% endif %} />
+                            <label class="usa-checkbox__label" for="gaap_results--{{ pair.tag }}">{{ pair.readable }}</label>
+                        </div>
+                    {% endfor %}
+                    <span class="usa-error-message margin-top-2">{{ form.errors.gaap_results|striptags }}</span>
+                </fieldset>
+                <div class="margin-left-10" id="sp_framework_section">
+                    <fieldset class="usa-fieldset">
+                        <legend>What was the special purpose framework? Select only one.</legend>
+                        {% for pair in sp_framework_basis %}
+                            <div class="usa-checkbox">
+                                <input id="sp_framework_basis--{{ pair.tag }}"
+                                    name="sp_framework_basis"
+                                    class="usa-radio__input"
+                                    type="radio"
+                                    value="{{ pair.tag }}"
+                                    {% if pair.tag in form.cleaned_data.sp_framework_basis %}checked{% endif %} />
+                                <label class="usa-radio__label" for="sp_framework_basis--{{ pair.tag }}">{{ pair.readable }}</label>
+                            </div>
+                        {% endfor %}
+                        <span class="usa-error-message margin-top-2">{{ form.errors.gaap_results|striptags }}</span>
+                    </fieldset>
+                    <fieldset class="usa-fieldset margin-top-2">
+                        <legend>
+                            Was the special purpose framework used as a basis of accounting required by state law?
+                        </legend>
+                        <div class="usa-radio">
+                            <input id="is_sp_framework_required--true"
+                                name="is_sp_framework_required"
+                                class="usa-radio__input"
+                                type="radio"
+                                value="True"
+                                {% if form.cleaned_data.is_sp_framework_required is True %}checked{% endif %} />
+                            <label class="usa-radio__label" for="is_sp_framework_required--true">Yes</label>
+                        </div>
+                        <div class="usa-radio">
+                            <input id="is_sp_framework_required--false"
+                                name="is_sp_framework_required"
+                                class="usa-radio__input"
+                                type="radio"
+                                value="False"
+                                {% if form.cleaned_data.is_sp_framework_required is False %}checked{% endif %} />
+                            <label class="usa-radio__label" for="is_sp_framework_required--false">No</label>
+                        </div>
+                        <span class="usa-error-message margin-top-2">{{ form.errors.is_going_concern_included|striptags }}</span>
+                    </fieldset>
+                    <fieldset class="usa-fieldset margin-top-2">
+                        <legend>
+                            What was the auditor’s opinion on the special purpose framework? <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
+                        </legend>
+                        <p class="text-base">Select any of the following that apply.</p>
+                        {% for pair in sp_framework_opinions %}
+                            <div class="usa-checkbox">
+                                <input id="sp_framework_opinions--{{ pair.tag }}"
+                                    name="sp_framework_opinions"
+                                    class="usa-checkbox__input"
+                                    type="checkbox"
+                                    value="{{ pair.tag }}"
+                                    {% if pair.tag in form.cleaned_data.sp_framework_opinions %}checked{% endif %} />
+                                <label class="usa-checkbox__label" for="sp_framework_opinions--{{ pair.tag }}">{{ pair.readable }}</label>
+                            </div>
+                        {% endfor %}
+                        <span class="usa-error-message margin-top-2">{{ form.errors.gaap_results|striptags }}</span>
+                    </fieldset>
+                </div>
+                <fieldset class="usa-fieldset margin-top-2">
+                    <legend>
+                        Is a "going concern" emphasis-of-matter paragraph included in the audit report? <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
+                    </legend>
+                    <div class="usa-radio">
+                        <input id="is_going_concern_included--true"
+                               name="is_going_concern_included"
+                               class="usa-radio__input"
+                               required
+                               type="radio"
+                               value="True"
+                               {% if form.cleaned_data.is_going_concern_included is True %}checked{% endif %} />
+                        <label class="usa-radio__label" for="is_going_concern_included--true">Yes</label>
+                    </div>
+                    <div class="usa-radio">
+                        <input id="is_going_concern_included--false"
+                               name="is_going_concern_included"
+                               class="usa-radio__input"
+                               type="radio"
+                               value="False"
+                               {% if form.cleaned_data.is_going_concern_included is False %}checked{% endif %} />
+                        <label class="usa-radio__label" for="is_going_concern_included--false">No</label>
+                    </div>
+                    <span class="usa-error-message margin-top-2">{{ form.errors.is_going_concern_included|striptags }}</span>
+                </fieldset>
+                <fieldset class="usa-fieldset margin-top-2">
+                    <legend>
+                        Is a significant deficiency in internal control disclosed? <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
+                    </legend>
+                    <div class="usa-radio">
+                        <input id="is_internal_control_deficiency_disclosed--true"
+                               name="is_internal_control_deficiency_disclosed"
+                               class="usa-radio__input"
+                               required
+                               type="radio"
+                               value="True"
+                               {% if form.cleaned_data.is_internal_control_deficiency_disclosed is True %}checked{% endif %} />
+                        <label class="usa-radio__label"
+                               for="is_internal_control_deficiency_disclosed--true">Yes</label>
+                    </div>
+                    <div class="usa-radio">
+                        <input id="is_internal_control_deficiency_disclosed--false"
+                               name="is_internal_control_deficiency_disclosed"
+                               class="usa-radio__input"
+                               type="radio"
+                               value="False"
+                               {% if form.cleaned_data.is_internal_control_deficiency_disclosed is False %}checked{% endif %} />
+                        <label class="usa-radio__label"
+                               for="is_internal_control_deficiency_disclosed--false">No</label>
+                    </div>
+                    <span class="usa-error-message margin-top-2">{{ form.errors.is_internal_control_deficiency_disclosed|striptags }}</span>
+                </fieldset>
+                <fieldset class="usa-fieldset margin-top-2">
+                    <legend>
+                        Is a material weakness in internal control disclosed? <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
+                    </legend>
+                    <div class="usa-radio">
+                        <input id="is_internal_control_material_weakness_disclosed--true"
+                               name="is_internal_control_material_weakness_disclosed"
+                               class="usa-radio__input"
+                               required
+                               type="radio"
+                               value="True"
+                               {% if form.cleaned_data.is_internal_control_material_weakness_disclosed is True %}checked{% endif %} />
+                        <label class="usa-radio__label"
+                               for="is_internal_control_material_weakness_disclosed--true">Yes</label>
+                    </div>
+                    <div class="usa-radio">
+                        <input id="is_internal_control_material_weakness_disclosed--false"
+                               name="is_internal_control_material_weakness_disclosed"
+                               class="usa-radio__input"
+                               type="radio"
+                               value="False"
+                               {% if form.cleaned_data.is_internal_control_material_weakness_disclosed is False %}checked{% endif %} />
+                        <label class="usa-radio__label"
+                               for="is_internal_control_material_weakness_disclosed--false">No</label>
+                    </div>
+                    <span class="usa-error-message margin-top-2">{{ form.errors.is_internal_control_material_weakness_disclosed|striptags }}</span>
+                </fieldset>
+                <fieldset class="usa-fieldset margin-top-2">
+                    <legend>
+                        Is a material noncompliance disclosed? <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
+                    </legend>
+                    <div class="usa-radio">
+                        <input id="is_material_noncompliance_disclosed--true"
+                               name="is_material_noncompliance_disclosed"
+                               class="usa-radio__input"
+                               required
+                               type="radio"
+                               value="True"
+                               {% if form.cleaned_data.is_material_noncompliance_disclosed is True %}checked{% endif %} />
+                        <label class="usa-radio__label"
+                               for="is_material_noncompliance_disclosed--true">Yes</label>
+                    </div>
+                    <div class="usa-radio">
+                        <input class="usa-radio__input"
+                               id="is_material_noncompliance_disclosed--false"
+                               type="radio"
+                               name="is_material_noncompliance_disclosed"
+                               value="False"
+                               {% if form.cleaned_data.is_material_noncompliance_disclosed is False %}checked{% endif %} />
+                        <label class="usa-radio__label"
+                               for="is_material_noncompliance_disclosed--false">No</label>
+                    </div>
+                    <span class="usa-error-message margin-top-2">{{ form.errors.is_material_noncompliance_disclosed|striptags }}</span>
+                </fieldset>
+                <h1 class="margin-top-6">Federal programs</h1>
+                <fieldset class="usa-fieldset">
+                    <legend>
+                        Does the auditor's report include a statement that the auditee's financial statements include departments, agencies, or other organizational units expending Federal awards which are not included in this audit? (AICPA Audit Guide) <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
+                    </legend>
+                    <div class="usa-radio">
+                        <input id="is_aicpa_audit_guide_included--true"
+                               name="is_aicpa_audit_guide_included"
+                               class="usa-radio__input"
+                               required
+                               type="radio"
+                               value="True"
+                               {% if form.cleaned_data.is_aicpa_audit_guide_included is True %}checked{% endif %} />
+                        <label class="usa-radio__label" for="is_aicpa_audit_guide_included--true">Yes</label>
+                    </div>
+                    <div class="usa-radio">
+                        <input class="usa-radio__input"
+                               id="is_aicpa_audit_guide_included--false"
+                               type="radio"
+                               name="is_aicpa_audit_guide_included"
+                               value="False"
+                               {% if form.cleaned_data.is_aicpa_audit_guide_included is False %}checked{% endif %} />
+                        <label class="usa-radio__label" for="is_aicpa_audit_guide_included--false">No</label>
+                    </div>
+                    <span class="usa-error-message margin-top-2">{{ form.errors.is_aicpa_audit_guide_included|striptags }}</span>
+                </fieldset>
+                <fieldset class="usa-fieldset margin-top-2">
+                    <legend>
+                        What is the dollar threshold to distinguish Type A and Type B programs? (Uniform Guidance § 200.518(b)(1)) <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
+                    </legend>
+                    <div class="grid-row">
+                        <label class="margin-top-2 margin-right-1">$</label>
+                        <input id="dollar_threshold"
+                               name="dollar_threshold"
+                               class="usa-input usa-input--medium tablet:grid-col-2"
+                               min="1"
+                               pattern="\d+"
+                               required
+                               type="number"
+                               value="{{ form.cleaned_data.dollar_threshold }}" />
+                    </div>
+                    <span class="usa-error-message margin-top-2">{{ form.errors.dollar_threshold|striptags }}</span>
+                </fieldset>
+                <fieldset class="usa-fieldset margin-top-2">
+                    <legend>
+                        Did the auditee qualify as a low-risk auditee? (2 CFR 200.520) <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
+                    </legend>
+                    <div class="usa-radio">
+                        <input id="is_low_risk_auditee--true"
+                               name="is_low_risk_auditee"
+                               class="usa-radio__input"
+                               required
+                               type="radio"
+                               value="True"
+                               {% if form.cleaned_data.is_low_risk_auditee is True %}checked{% endif %} />
+                        <label class="usa-radio__label" for="is_low_risk_auditee--true">Yes</label>
+                    </div>
+                    <div class="usa-radio">
+                        <input id="is_low_risk_auditee--false"
+                               name="is_low_risk_auditee"
+                               class="usa-radio__input"
+                               type="radio"
+                               value="False"
+                               {% if form.cleaned_data.is_low_risk_auditee is False %}checked{% endif %} />
+                        <label class="usa-radio__label" for="is_low_risk_auditee--false">No</label>
+                    </div>
+                    <span class="usa-error-message margin-top-2">{{ form.errors.is_low_risk_auditee|striptags }}</span>
+                </fieldset>
+                <fieldset class="usa-fieldset margin-top-2">
+                    <legend>
+                        Indicate which federal agency(ies) have prior audit findings shown in the Summary Schedule of Prior Audit Findings related to direct funding. <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
+                    </legend>
+                    <p class="text-base">(shift-click or ctrl/cmd-click to select all that apply, or select '00 - None')</p>
+                    <label class="usa-label" for="agencies">Agencies</label>
+                    <select id="agencies"
+                            name="agencies"
+                            class="usa-select size-4"
+                            multiple
+                            required
+                            size="18">
+                        {% for number, name in agency_names.items %}
+                            <option class="margin-top-1"
+                                    value="{{ number }}"
+                                    {% if number in form.cleaned_data.agencies %}selected{% endif %}>
+                                {{ number }} - {{ name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                    <span class="usa-error-message margin-top-2">{{ form.errors.agencies|striptags }}</span>
+                </fieldset>
+                <button class="usa-button margin-top-2 margin-bottom-10"
+                        id="continue"
+                        name="continue">Save and continue to the next section</button>
+                <a class="usa-button usa-button--unstyled margin-left-2" id="cancel-audit-info-form-link" href="{% url 'audit:SubmissionProgress' report_id %}"
+                    aria-controls="upload-cancel">Cancel</a>
+            </form>
+        </div>
+    </div>
+    {% include "audit-metadata.html" %}
+    <script src="{% static 'compiled/js/audit-info-form.js' %}"></script>
+{% endblock content %}

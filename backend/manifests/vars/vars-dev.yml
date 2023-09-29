@@ -1,0 +1,7 @@
+app_name: gsa-fac
+mem_amount: 512M
+cf_env_name: DEVELOPMENT
+env_name: dev
+service_name: dev
+endpoint: fac-dev.app.cloud.gov
+instances: 1

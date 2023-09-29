@@ -188,7 +188,16 @@ ul.usa-error-message {
     fill: #d83933;
     height: 1.5em;
     width: 1.5em;
+    vertical-align: middle;
   }
+}
+
+.add-contact {
+  margin-top: 2.5rem;
+}
+
+.additional_contacts {
+  margin-top: 2.5rem;
 }
 
 #grant-access {
@@ -226,10 +235,6 @@ ul.usa-error-message {
     }
   }
 
-  .add-contact {
-    margin-top: 0.5em;
-  }
-
   #email-notice {
     margin: 3em 0 0;
   }
@@ -256,9 +261,6 @@ ul.usa-error-message {
   cursor: not-allowed;
 }
 
-#auditee_name-error-message {
-  display: none;
-}
 /* stylelint-enable */
 
 @media (min-width: 64em) {
@@ -293,11 +295,13 @@ ul.usa-error-message {
 }
 
 .audit-metadata {
-  margin-bottom: units(4);
-  margin-top: units(4);
+  padding-bottom: units(2);
+  padding-top: units(2);
+  background-color: #f0f0f0;
 
   dt {
     font-weight: bold;
+    display: inline;
 
     &::after {
       content: ':';
@@ -306,6 +310,12 @@ ul.usa-error-message {
 
   dd {
     margin-inline-start: 0;
+    display: inline;
+  }
+
+  .grid-row {
+    margin-bottom: units(1);
+    margin-top: units(1);
   }
 }
 
@@ -325,7 +335,8 @@ ul.usa-error-message {
       }
 
       fieldset {
-        &.radio {
+        &.radio,
+        &#audit-firm-organization-address {
           legend {
             font-size: size('sans', 'md');
           }
@@ -339,6 +350,15 @@ ul.usa-error-message {
           color: color('gray-cool-50');
         }
       }
+    }
+
+    .usa-input--small {
+      display: inline;
+      margin-left: 2rem;
+    }
+
+    .usa-input--small__label {
+      display: inline;
     }
   }
 }

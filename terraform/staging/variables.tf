@@ -1,11 +1,9 @@
-variable "cf_user" {
+variable "new_relic_license_key" {
   type        = string
-  description = "cloud.gov deployer account user"
+  description = "the license key to use when setting up the New Relic agent"
 }
 
-variable "cf_password" {
+variable "pgrst_jwt_secret" {
   type        = string
-  description = "secret; cloud.gov deployer account password"
-  sensitive   = true
+  description = "the JWT signing secret for validating JWT tokens from api.data.gov"
 }
-
