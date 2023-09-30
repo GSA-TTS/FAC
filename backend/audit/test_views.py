@@ -41,6 +41,7 @@ from audit.models import (
     SingleAuditChecklist,
     SingleAuditReportFile,
     SubmissionEvent,
+    generate_sac_report_id,
 )
 from audit.cross_validation.naming import NC, SECTION_NAMES as SN
 from audit.views import MySubmissions
@@ -578,7 +579,11 @@ class ExcelFileHandlerViewTests(TestCase):
     def test_valid_file_upload_for_federal_awards(self, mock_scan_file):
         """When a valid Excel file is uploaded, the file should be stored and the SingleAuditChecklist should be updated to include the uploaded Federal Awards data"""
 
-        sac = _mock_login_and_scan(self.client, mock_scan_file)
+        sac = _mock_login_and_scan(
+            self.client,
+            mock_scan_file,
+            report_id=generate_sac_report_id(),
+        )
         test_data = json.loads(
             FEDERAL_AWARDS_ENTRY_FIXTURES.read_text(encoding="utf-8")
         )
@@ -700,7 +705,11 @@ class ExcelFileHandlerViewTests(TestCase):
         """When a valid Excel file is uploaded, the file should be stored and the SingleAuditChecklist should be updated to include the uploaded Corrective Action Plan data"""
 
         test_uei = "AAA12345678X"
-        sac = _mock_login_and_scan(self.client, mock_scan_file)
+        sac = _mock_login_and_scan(
+            self.client,
+            mock_scan_file,
+            report_id=generate_sac_report_id(),
+        )
         test_data = json.loads(
             CORRECTIVE_ACTION_PLAN_ENTRY_FIXTURES.read_text(encoding="utf-8")
         )
@@ -775,7 +784,11 @@ class ExcelFileHandlerViewTests(TestCase):
     def test_valid_file_upload_for_findings_uniform_guidance(self, mock_scan_file):
         """When a valid Excel file is uploaded, the file should be stored and the SingleAuditChecklist should be updated to include the uploaded Findings Uniform Guidance data"""
 
-        sac = _mock_login_and_scan(self.client, mock_scan_file)
+        sac = _mock_login_and_scan(
+            self.client,
+            mock_scan_file,
+            report_id=generate_sac_report_id(),
+        )
         test_data = json.loads(
             FINDINGS_UNIFORM_GUIDANCE_ENTRY_FIXTURES.read_text(encoding="utf-8")
         )
@@ -861,7 +874,11 @@ class ExcelFileHandlerViewTests(TestCase):
     def test_valid_file_upload_for_findings_text(self, mock_scan_file):
         """When a valid Excel file is uploaded, the file should be stored and the SingleAuditChecklist should be updated to include the uploaded Findings Text data"""
 
-        sac = _mock_login_and_scan(self.client, mock_scan_file)
+        sac = _mock_login_and_scan(
+            self.client,
+            mock_scan_file,
+            report_id=generate_sac_report_id(),
+        )
         test_data = json.loads(FINDINGS_TEXT_ENTRY_FIXTURES.read_text(encoding="utf-8"))
 
         # add valid data to the workbook
@@ -935,7 +952,11 @@ class ExcelFileHandlerViewTests(TestCase):
     def test_valid_file_upload_for_secondary_auditors(self, mock_scan_file):
         """When a valid Excel file is uploaded, the file should be stored and the SingleAuditChecklist should be updated to include the uploaded secondary auditors data"""
 
-        sac = _mock_login_and_scan(self.client, mock_scan_file)
+        sac = _mock_login_and_scan(
+            self.client,
+            mock_scan_file,
+            report_id=generate_sac_report_id(),
+        )
         test_data = json.loads(
             SECONDARY_AUDITORS_ENTRY_FIXTURES.read_text(encoding="utf-8")
         )
@@ -1074,6 +1095,7 @@ class ExcelFileHandlerViewTests(TestCase):
                 sac = _mock_login_and_scan(
                     self.client,
                     mock_scan_file,
+                    report_id=generate_sac_report_id(),
                     submission_status=SingleAuditChecklist.STATUS.READY_FOR_CERTIFICATION,
                 )
 
@@ -1171,7 +1193,11 @@ class SingleAuditReportFileHandlerViewTests(TestCase):
 
     @patch("audit.validators._scan_file")
     def test_valid_file_upload(self, mock_scan_file):
-        sac = _mock_login_and_scan(self.client, mock_scan_file)
+        sac = _mock_login_and_scan(
+            self.client,
+            mock_scan_file,
+            report_id=generate_sac_report_id(),
+        )
 
         with open("audit/fixtures/basic.pdf", "rb") as pdf_file:
             response = self.client.post(
@@ -1200,7 +1226,11 @@ class SingleAuditReportFileHandlerViewTests(TestCase):
     def test_valid_file_upload_for_additional_ueis(self, mock_scan_file):
         """When a valid Excel file is uploaded, the file should be stored and the SingleAuditChecklist should be updated to include the uploaded Additional UEIs data"""
 
-        sac = _mock_login_and_scan(self.client, mock_scan_file)
+        sac = _mock_login_and_scan(
+            self.client,
+            mock_scan_file,
+            report_id=generate_sac_report_id(),
+        )
         test_data = json.loads(
             ADDITIONAL_UEIS_ENTRY_FIXTURES.read_text(encoding="utf-8")
         )
@@ -1268,7 +1298,11 @@ class SingleAuditReportFileHandlerViewTests(TestCase):
     def test_valid_file_upload_for_additional_eins(self, mock_scan_file):
         """When a valid Excel file is uploaded, the file should be stored and the SingleAuditChecklist should be updated to include the uploaded Additional EINs data"""
 
-        sac = _mock_login_and_scan(self.client, mock_scan_file)
+        sac = _mock_login_and_scan(
+            self.client,
+            mock_scan_file,
+            report_id=generate_sac_report_id(),
+        )
         test_data = json.loads(
             ADDITIONAL_EINS_ENTRY_FIXTURES.read_text(encoding="utf-8")
         )
@@ -1336,7 +1370,11 @@ class SingleAuditReportFileHandlerViewTests(TestCase):
     def test_valid_file_upload_for_notes_to_sefa(self, mock_scan_file):
         """When a valid Excel file is uploaded, the file should be stored and the SingleAuditChecklist should be updated to include the uploaded Notes to SEFA data"""
 
-        sac = _mock_login_and_scan(self.client, mock_scan_file)
+        sac = _mock_login_and_scan(
+            self.client,
+            mock_scan_file,
+            report_id=generate_sac_report_id(),
+        )
         test_data = json.loads(NOTES_TO_SEFA_ENTRY_FIXTURES.read_text(encoding="utf-8"))
 
         # add valid data to the workbook

@@ -1,5 +1,5 @@
 import calendar
-from datetime import datetime, timezone
+from datetime import date, datetime, timedelta, timezone
 from itertools import chain
 import json
 import logging
@@ -41,6 +41,35 @@ User = get_user_model()
 logger = logging.getLogger(__name__)
 
 
+def generate_sac_report_id(start_date=None, source="GSA", count=None):
+    """
+    Convenience method for generating report_id, a value consisting of:
+
+        -   Four-digit year based on submission fiscal end date.
+        -   Two-digit month based on submission fiscal end date.
+        -   Audit source: either GSA or CENSUS.
+        -   Zero-padded 10-digit numeric monotonically increasing.
+        -   Separated by hyphens.
+
+    For example: `2023-09-GSA-0000000001`, `2020-09-CENSUS-0000000001`.
+    """
+    source = source.upper()
+    if source not in ("CENSUS", "GSA"):
+        raise Exception("Unknown source for report_id")
+    if not start_date:
+        start_date = (date.today() + timedelta(days=364)).isoformat()
+    if not count:
+        count = str(SingleAuditChecklist.objects.count() + 1).zfill(10)
+    year, month, _ = start_date.split("-")
+    if not (int(year) >= 2000 and int(year) < 2200):
+        raise Exception("Unexpected year value for report_id")
+    if int(month) not in range(1, 13):
+        raise Exception("Unexpected month value for report_id")
+    separator = "-"
+    report_id = separator.join([year, month, source, count])
+    return report_id
+
+
 class SingleAuditChecklistManager(models.Manager):
     """Manager for SAC"""
 
@@ -48,24 +77,24 @@ class SingleAuditChecklistManager(models.Manager):
         """
         Custom create method so that we can add derived fields.
 
-        Currently only used for report_id, a 17-character value consisting of:
-            -   Four-digit year of start of audit period.
-            -   Three-character all-caps month abbrevation (start of audit period)
-            -   10-digit numeric monotonically increasing, but starting from
-                0001000001 because the Census numbers are six-digit values. The
-                formula for creating this is basically "how many non-legacy
-                entries there are in the system plus 1,000,000".
+        Currently only used for report_id, a value consisting of:
+
+            -   Four-digit year based on submission fiscal end date.
+            -   Two-digit month based on submission fiscal end date.
+            -   Audit source: either GSA or CENSUS.
+            -   Zero-padded 10-digit numeric monotonically increasing.
+            -   Separated by hyphens.
+
+        For example: `2023-09-GSA-0000000001`, `2020-09-CENSUS-0000000001`.
+
         """
 
         # remove event_user & event_type keys so that they're not passed into super().create below
         event_user = obj_data.pop("event_user", None)
         event_type = obj_data.pop("event_type", None)
 
-        fiscal_start = obj_data["general_information"]["auditee_fiscal_period_start"]
-        year = fiscal_start[:4]
-        month = calendar.month_abbr[int(fiscal_start[5:7])].upper()
-        count = SingleAuditChecklist.objects.count() + 1_000_001
-        report_id = f"{year}{month}{str(count).zfill(10)}"
+        start_date = obj_data["general_information"]["auditee_fiscal_period_end"]
+        report_id = generate_sac_report_id(start_date=start_date, source="GSA")
         updated = obj_data | {"report_id": report_id}
 
         result = super().create(**updated)
@@ -289,7 +318,7 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         null=True,
     )
 
-    report_id = models.CharField(max_length=17, unique=True)
+    report_id = models.CharField(unique=True)
 
     # Q2 Type of Uniform Guidance Audit
     audit_type = models.CharField(

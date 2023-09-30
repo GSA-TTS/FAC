@@ -14,6 +14,7 @@ from .models import (
     SingleAuditChecklist,
     SingleAuditReportFile,
     User,
+    generate_sac_report_id,
 )
 
 
@@ -31,12 +32,13 @@ class SingleAuditChecklistTests(TestCase):
 
         -   There is a report_id value
         -   The report_id value consists of:
-            -   Four-digit year of start of audit period.
-            -   Three-character all-caps month abbrevation (start of audit period)
-            -   10-digit numeric monotonically increasing, but starting from
-                0001000001 because the Census numbers are six-digit values. The
-                formula for creating this is basically "how many non-legacy
-                entries there are in the system plus 1,000,000".
+            -   Four-digit year based on submission fiscal end date.
+            -   Two-digit month based on submission fiscal end date.
+            -   Audit source: either GSA or CENSUS.
+            -   Zero-padded 10-digit numeric monotonically increasing.
+            -   Separated by hyphens.
+
+            For example: `2023-09-GSA-0000000001`, `2020-09-CENSUS-0000000001`.
         """
         user = baker.make(User)
         general_information = {
@@ -50,12 +52,15 @@ class SingleAuditChecklistTests(TestCase):
             submission_status="in_progress",
             general_information=general_information,
         )
-        self.assertEqual(len(sac.report_id), 17)
-        self.assertEqual(sac.report_id[:4], "2022")
-        self.assertEqual(sac.report_id[4:7], "NOV")
+        self.assertIn(len(sac.report_id), (22, 25))
+        separator = "-"
+        year, month, source, count = sac.report_id.split(separator)
+        self.assertEqual(year, "2023")
+        self.assertEqual(month, "11")
+        self.assertEqual(source, "GSA")
         # This one is a little dubious because it assumes this will always be
         # the first entry in the test database:
-        self.assertEqual(sac.report_id[7:], "0001000001")
+        self.assertEqual(count, "0000000001")
 
     def test_submission_status_transitions(self):
         """
@@ -193,7 +198,12 @@ class ExcelFileTests(TestCase):
         """
         file = SimpleUploadedFile("this is a file.xlsx", b"this is a file")
 
-        excel_file = baker.make(ExcelFile, file=file, form_section="sectionname")
+        excel_file = baker.make(
+            ExcelFile,
+            file=file,
+            form_section="sectionname",
+            sac=baker.make(SingleAuditChecklist, report_id=generate_sac_report_id()),
+        )
         report_id = SingleAuditChecklist.objects.get(id=excel_file.sac.id).report_id
 
         self.assertEqual(f"{report_id}--sectionname.xlsx", excel_file.filename)
@@ -208,7 +218,11 @@ class SingleAuditReportFileTests(TestCase):
         """
         file = SimpleUploadedFile("this is a file.pdf", b"this is a file")
 
-        sar_file = baker.make(SingleAuditReportFile, file=file)
+        sar_file = baker.make(
+            SingleAuditReportFile,
+            file=file,
+            sac=baker.make(SingleAuditChecklist, report_id=generate_sac_report_id()),
+        )
         report_id = SingleAuditChecklist.objects.get(id=sar_file.sac.id).report_id
 
         self.assertEqual(f"{report_id}.pdf", sar_file.filename)

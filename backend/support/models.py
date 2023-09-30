@@ -49,7 +49,7 @@ ASSIGNMENT_TYPES = (
 
 
 class CognizantAssignment(models.Model):
-    report_id = models.CharField(max_length=17)
+    report_id = models.CharField()
     cognizant_agency = models.CharField(
         # "Two digit Federal agency prefix of the cognizant agency",
         max_length=2,
