@@ -1,4 +1,3 @@
-import calendar
 from datetime import date, datetime, timedelta, timezone
 from itertools import chain
 import json
