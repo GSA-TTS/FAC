@@ -66,7 +66,6 @@ class AuditeeInfoFormView(LoginRequiredMixin, View):
         formatted_post = {
             "csrfmiddlewaretoken": request.POST.get("csrfmiddlewaretoken"),
             "auditee_uei": form.cleaned_data["auditee_uei"],
-            "auditee_name": request.POST.get("auditee_name"),
             "auditee_address_line_1": request.POST.get("auditee_address_line_1"),
             "auditee_city": request.POST.get("auditee_city"),
             "auditee_state": request.POST.get("auditee_state"),
@@ -318,7 +317,7 @@ class UploadPageView(LoginRequiredMixin, View):
                 + "federal-awards-audit-findings/",
                 "no_findings_disclaimer": True,
                 "workbook_url": workbook_base_url
-                + "federal-awards-audit-findings.xlsx",
+                + "federal-awards-audit-findings-workbook.xlsx",
             },
             "audit-findings-text": {
                 "view_id": "audit-findings-text",
@@ -328,8 +327,7 @@ class UploadPageView(LoginRequiredMixin, View):
                 "instructions_url": instructions_base_url
                 + "federal-awards-audit-findings-text/",
                 "no_findings_disclaimer": True,
-                "workbook_url": workbook_base_url
-                + "federal-awards-audit-findings-text-workbook.xlsx",
+                "workbook_url": workbook_base_url + "audit-findings-text-workbook.xlsx",
             },
             "cap": {
                 "view_id": "cap",
