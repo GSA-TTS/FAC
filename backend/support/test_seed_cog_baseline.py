@@ -1,4 +1,5 @@
 from django.test import TestCase
+from collections import defaultdict
 import logging
 
 from support.management.commands.seed_cog_baseline import load_cog_2021_2025
@@ -9,7 +10,6 @@ from config.settings import BASE_DIR
 from os import path
 
 logger = logging.getLogger(__name__)
-from collections import defaultdict
 
 
 class SeedCogBaselineTests(TestCase):
