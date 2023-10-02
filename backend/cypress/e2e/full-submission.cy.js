@@ -10,6 +10,8 @@ import { testPdfAuditReport } from '../support/report-pdf.js';
 import { testAuditorCertification } from '../support/auditor-certification.js';
 import { testAuditeeCertification } from '../support/auditee-certification.js';
 import { testReportIdFound, testReportIdNotFound } from '../support/dissemination-table.js';
+import { testTribalAuditPublic } from '../support/tribal-audit-form.js';
+
 import {
   testWorkbookFederalAwards,
   testWorkbookNotesToSEFA,
@@ -91,6 +93,10 @@ describe('Full audit submission', () => {
 
     cy.get(".usa-link").contains("Additional EINs").click();
     testWorkbookAdditionalEINs(false);
+
+    // complete the tribal audit form - opt public
+    cy.get(".usa-link").contains("Tribal data release").click();
+    testTribalAuditPublic();
 
     // Complete the audit information form
     cy.get(".usa-link").contains("Audit Information form").click();

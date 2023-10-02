@@ -10,7 +10,7 @@ export function testValidGeneralInfo() {
 	cy.get('label[for=audit-period-annual]').click();
 
   	// Auditee information
-	cy.get('#auditee_name').type('Super Important name')
+	cy.get('#auditee_name').type('Audit McAuditee')
 	cy.get('#ein').type('546000173');
 	cy.get('label[for=ein_not_an_ssn_attestation]').click();
 	cy.get('label[for=multiple-eins-yes]').click();
@@ -32,7 +32,7 @@ export function testValidGeneralInfo() {
 	// Auditor information
 	cy.get('#auditor_ein').type('987654321');
 	cy.get('label[for=auditor_ein_not_an_ssn_attestation]').click();
-	cy.get('#auditor_firm_name').type('House of Audit');
+	cy.get('#auditor_firm_name').type('House of Auditor');
 	// Pre-filled as USA
 	// cy.get('#auditor_country').type('USA{enter}');
 	cy.get('#auditor_address_line_1').type('123 Around the corner');
