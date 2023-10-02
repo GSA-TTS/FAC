@@ -100,14 +100,18 @@ class SubmissionProgressView(SingleAuditChecklistAccessRequiredMixin, generic.Vi
 
         try:
             sac = SingleAuditChecklist.objects.get(report_id=report_id)
-            sac_auditee_certifier = Access.objects.filter(
+
+            # Determine if the auditee certifier is the same as the current user.
+            # If there is no auditee certifier, default to False.
+            is_user_auditee_certifier = False
+            sac_auditee_results = Access.objects.filter(
                 sac_id=sac.id, role="certifying_auditee_contact"
-            ).values()[
-                0
-            ]  # dict, auditee certifier associated with this SAC
-            is_user_auditee_certifier = (
-                sac_auditee_certifier.get("user_id") == request.user.id
-            )  # bool, True if auditee certifier is the current user
+            ).values()  # ValuesQuerySet (array of dicts)
+            if sac_auditee_results.exists():
+                is_user_auditee_certifier = (
+                    sac_auditee_results[0].get("user_id") == request.user.id
+                )
+
             is_tribal_data_consent_complete = True if sac.tribal_data_consent else False
 
             try:
