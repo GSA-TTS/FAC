@@ -11,8 +11,8 @@ from os import path
 
 logger = logging.getLogger(__name__)
 
-TEST_DBKEY = '161024'
-TEST_EIN = '566001021'
+TEST_DBKEY = "161024"
+TEST_EIN = "566001021"
 
 
 class SeedCogBaselineTests(TestCase):
