@@ -1,4 +1,4 @@
-from datetime import date, datetime, timedelta, timezone
+from datetime import datetime, timezone
 from itertools import chain
 import json
 import logging
