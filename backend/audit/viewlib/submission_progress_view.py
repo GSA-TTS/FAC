@@ -9,10 +9,7 @@ from audit.cross_validation import (
 from audit.mixins import (
     SingleAuditChecklistAccessRequiredMixin,
 )
-from audit.models import (
-    SingleAuditChecklist,
-    SingleAuditReportFile,
-)
+from audit.models import SingleAuditChecklist, SingleAuditReportFile, Access
 
 
 # Turn the named tuples into dicts because Django templates work with dicts:
@@ -103,6 +100,16 @@ class SubmissionProgressView(SingleAuditChecklistAccessRequiredMixin, generic.Vi
 
         try:
             sac = SingleAuditChecklist.objects.get(report_id=report_id)
+            sac_auditee_certifier = Access.objects.filter(
+                sac_id=sac.id, role="certifying_auditee_contact"
+            ).values()[
+                0
+            ]  # dict, auditee certifier associated with this SAC
+            is_user_auditee_certifier = (
+                sac_auditee_certifier.get("user_id") == request.user.id
+            )  # bool, True if auditee certifier is the current user
+            is_tribal_data_consent_complete = True if sac.tribal_data_consent else False
+
             try:
                 sar = SingleAuditReportFile.objects.filter(sac_id=sac.id).latest(
                     "date_created"
@@ -149,6 +156,8 @@ class SubmissionProgressView(SingleAuditChecklistAccessRequiredMixin, generic.Vi
                 "auditee_name": sac.auditee_name,
                 "auditee_uei": sac.auditee_uei,
                 "user_provided_organization_type": sac.user_provided_organization_type,
+                "is_user_auditee_certifier": is_user_auditee_certifier,
+                "is_tribal_data_consent_complete": is_tribal_data_consent_complete,
             }
             context = context | subcheck
 
