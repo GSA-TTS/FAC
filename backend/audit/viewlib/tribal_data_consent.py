@@ -24,7 +24,9 @@ class TribalDataConsent(SingleAuditChecklistAccessRequiredMixin, generic.View):
 
         try:
             sac = SingleAuditChecklist.objects.get(report_id=report_id)
-            tribal_audit_consent = sac.tribal_data_consent.get("TribalDataConsent") or {}
+            tribal_audit_consent = {}
+            if sac.tribal_data_consent:
+                tribal_audit_consent = sac.tribal_data_consent.get("TribalDataConsent")
 
             context = {
                 "auditee_uei": sac.auditee_uei,
