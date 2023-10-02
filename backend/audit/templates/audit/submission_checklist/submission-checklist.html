@@ -102,6 +102,10 @@
                                         <p class="margin-0">
                                             Auditees must opt in or opt out of making their reporting package publicly available.
                                         </p>
+                                        <p class="margin-0">
+                                            <a class="usa-link"
+                                               href="{% url 'audit:TribalAuditConsent' report_id %}">Edit the Tribal data release form</a>
+                                        </p>
                                     </div>
                                 {% comment %} 5. The form is complete. Anyone else with access sees that it's done but still can't click a link. {% endcomment %}
                                 {% else %}
