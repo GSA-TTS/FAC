@@ -11,6 +11,9 @@ from os import path
 
 logger = logging.getLogger(__name__)
 
+TEST_DBKEY = "161024"
+TEST_EIN = "566001021"
+
 
 class SeedCogBaselineTests(TestCase):
     def test_load_empty_cogbaseline_table(self):
@@ -27,12 +30,13 @@ class SeedCogBaselineTests(TestCase):
         df = pd.read_csv(file_path, dtype=dtypes)
         self.assertEqual(df.shape[0], 29)
 
-        df_sub = df[(df["DBKEY"] == "161024") & (df["EIN"] == "566001021")]
+        df_sub = df[(df["DBKEY"] == TEST_DBKEY) & (df["EIN"] == TEST_EIN)]
         num_row = df_sub.shape[0]
         self.assertEqual(num_row, 1)
+        self.assertEqual(df_sub["COGAGENCY"].values, "10")
 
         count = load_cog_2021_2025("test_load_census_baseline.csv")
-        CognizantBaseline.objects.filter(dbkey="161024", ein="566001021").update(
+        CognizantBaseline.objects.filter(dbkey=TEST_DBKEY, ein=TEST_EIN).update(
             is_active=False
         )
 
@@ -42,10 +46,20 @@ class SeedCogBaselineTests(TestCase):
         df = pd.read_csv(file_path, dtype=dtypes)
         self.assertEqual(df.shape[0], 31)
 
+        df_sub = df[(df["DBKEY"] == TEST_DBKEY) & (df["EIN"] == TEST_EIN)]
+        num_row = df_sub.shape[0]
+        self.assertEqual(num_row, 1)
+        self.assertEqual(df_sub["COGAGENCY"].values, "18")
+
         count = load_cog_2021_2025("test_load_gsa_override.csv")
 
         count = CognizantBaseline.objects.count()
         self.assertEqual(count, 32)
+
+        cogbaseline_row = CognizantBaseline.objects.get(
+            dbkey=TEST_DBKEY, ein=TEST_EIN, is_active=True
+        )
+        self.assertEqual(cogbaseline_row.cognizant_agency, "18")
 
     def test_gsa_override_reload_to_cogbaseline_table(self):
         logger.info("test_gsa_override_reload_to_cogbaseline_table")
