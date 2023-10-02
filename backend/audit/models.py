@@ -40,7 +40,7 @@ User = get_user_model()
 logger = logging.getLogger(__name__)
 
 
-def generate_sac_report_id(start_date=None, source="GSAFAC", count=None):
+def generate_sac_report_id(end_date=None, source="GSAFAC", count=None):
     """
     Convenience method for generating report_id, a value consisting of:
 
@@ -55,11 +55,11 @@ def generate_sac_report_id(start_date=None, source="GSAFAC", count=None):
     source = source.upper()
     if source not in ("CENSUS", "GSAFAC"):
         raise Exception("Unknown source for report_id")
-    if not start_date:
-        start_date = (date.today() + timedelta(days=364)).isoformat()
+    if not end_date:
+        raise Exception("generate_sac_report_id requires end_date.")
     if not count:
         count = str(SingleAuditChecklist.objects.count() + 1).zfill(10)
-    year, month, _ = start_date.split("-")
+    year, month, _ = end_date.split("-")
     if not (int(year) >= 2000 and int(year) < 2200):
         raise Exception("Unexpected year value for report_id")
     if int(month) not in range(1, 13):
@@ -92,8 +92,8 @@ class SingleAuditChecklistManager(models.Manager):
         event_user = obj_data.pop("event_user", None)
         event_type = obj_data.pop("event_type", None)
 
-        start_date = obj_data["general_information"]["auditee_fiscal_period_end"]
-        report_id = generate_sac_report_id(start_date=start_date, source="GSAFAC")
+        end_date = obj_data["general_information"]["auditee_fiscal_period_end"]
+        report_id = generate_sac_report_id(end_date=end_date, source="GSAFAC")
         updated = obj_data | {"report_id": report_id}
 
         result = super().create(**updated)

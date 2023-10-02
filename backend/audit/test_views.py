@@ -1,3 +1,4 @@
+from datetime import datetime
 import json
 from pathlib import Path
 from tempfile import NamedTemporaryFile
@@ -117,6 +118,10 @@ def _load_json(target):
     """Given a str or Path, load JSON from that target."""
     raw = Path(target).read_text(encoding="utf-8")
     return json.loads(raw)
+
+
+def _mock_gen_report_id():
+    return generate_sac_report_id(end_date=datetime.now().date().isoformat())
 
 
 class MySubmissionsViewTests(TestCase):
@@ -582,7 +587,7 @@ class ExcelFileHandlerViewTests(TestCase):
         sac = _mock_login_and_scan(
             self.client,
             mock_scan_file,
-            report_id=generate_sac_report_id(),
+            report_id=_mock_gen_report_id(),
         )
         test_data = json.loads(
             FEDERAL_AWARDS_ENTRY_FIXTURES.read_text(encoding="utf-8")
@@ -708,7 +713,7 @@ class ExcelFileHandlerViewTests(TestCase):
         sac = _mock_login_and_scan(
             self.client,
             mock_scan_file,
-            report_id=generate_sac_report_id(),
+            report_id=_mock_gen_report_id(),
         )
         test_data = json.loads(
             CORRECTIVE_ACTION_PLAN_ENTRY_FIXTURES.read_text(encoding="utf-8")
@@ -787,7 +792,7 @@ class ExcelFileHandlerViewTests(TestCase):
         sac = _mock_login_and_scan(
             self.client,
             mock_scan_file,
-            report_id=generate_sac_report_id(),
+            report_id=_mock_gen_report_id(),
         )
         test_data = json.loads(
             FINDINGS_UNIFORM_GUIDANCE_ENTRY_FIXTURES.read_text(encoding="utf-8")
@@ -877,7 +882,7 @@ class ExcelFileHandlerViewTests(TestCase):
         sac = _mock_login_and_scan(
             self.client,
             mock_scan_file,
-            report_id=generate_sac_report_id(),
+            report_id=_mock_gen_report_id(),
         )
         test_data = json.loads(FINDINGS_TEXT_ENTRY_FIXTURES.read_text(encoding="utf-8"))
 
@@ -955,7 +960,7 @@ class ExcelFileHandlerViewTests(TestCase):
         sac = _mock_login_and_scan(
             self.client,
             mock_scan_file,
-            report_id=generate_sac_report_id(),
+            report_id=_mock_gen_report_id(),
         )
         test_data = json.loads(
             SECONDARY_AUDITORS_ENTRY_FIXTURES.read_text(encoding="utf-8")
@@ -1095,7 +1100,7 @@ class ExcelFileHandlerViewTests(TestCase):
                 sac = _mock_login_and_scan(
                     self.client,
                     mock_scan_file,
-                    report_id=generate_sac_report_id(),
+                    report_id=_mock_gen_report_id(),
                     submission_status=SingleAuditChecklist.STATUS.READY_FOR_CERTIFICATION,
                 )
 
@@ -1196,7 +1201,7 @@ class SingleAuditReportFileHandlerViewTests(TestCase):
         sac = _mock_login_and_scan(
             self.client,
             mock_scan_file,
-            report_id=generate_sac_report_id(),
+            report_id=_mock_gen_report_id(),
         )
 
         with open("audit/fixtures/basic.pdf", "rb") as pdf_file:
@@ -1229,7 +1234,7 @@ class SingleAuditReportFileHandlerViewTests(TestCase):
         sac = _mock_login_and_scan(
             self.client,
             mock_scan_file,
-            report_id=generate_sac_report_id(),
+            report_id=_mock_gen_report_id(),
         )
         test_data = json.loads(
             ADDITIONAL_UEIS_ENTRY_FIXTURES.read_text(encoding="utf-8")
@@ -1301,7 +1306,7 @@ class SingleAuditReportFileHandlerViewTests(TestCase):
         sac = _mock_login_and_scan(
             self.client,
             mock_scan_file,
-            report_id=generate_sac_report_id(),
+            report_id=_mock_gen_report_id(),
         )
         test_data = json.loads(
             ADDITIONAL_EINS_ENTRY_FIXTURES.read_text(encoding="utf-8")
@@ -1373,7 +1378,7 @@ class SingleAuditReportFileHandlerViewTests(TestCase):
         sac = _mock_login_and_scan(
             self.client,
             mock_scan_file,
-            report_id=generate_sac_report_id(),
+            report_id=_mock_gen_report_id(),
         )
         test_data = json.loads(NOTES_TO_SEFA_ENTRY_FIXTURES.read_text(encoding="utf-8"))
 

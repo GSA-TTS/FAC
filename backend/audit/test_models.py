@@ -202,7 +202,12 @@ class ExcelFileTests(TestCase):
             ExcelFile,
             file=file,
             form_section="sectionname",
-            sac=baker.make(SingleAuditChecklist, report_id=generate_sac_report_id()),
+            sac=baker.make(
+                SingleAuditChecklist,
+                report_id=generate_sac_report_id(
+                    end_date=datetime.now().date().isoformat()
+                ),
+            ),
         )
         report_id = SingleAuditChecklist.objects.get(id=excel_file.sac.id).report_id
 
@@ -221,7 +226,12 @@ class SingleAuditReportFileTests(TestCase):
         sar_file = baker.make(
             SingleAuditReportFile,
             file=file,
-            sac=baker.make(SingleAuditChecklist, report_id=generate_sac_report_id()),
+            sac=baker.make(
+                SingleAuditChecklist,
+                report_id=generate_sac_report_id(
+                    end_date=datetime.now().date().isoformat()
+                ),
+            ),
         )
         report_id = SingleAuditChecklist.objects.get(id=sar_file.sac.id).report_id
 
