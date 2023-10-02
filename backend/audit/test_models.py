@@ -34,11 +34,11 @@ class SingleAuditChecklistTests(TestCase):
         -   The report_id value consists of:
             -   Four-digit year based on submission fiscal end date.
             -   Two-digit month based on submission fiscal end date.
-            -   Audit source: either GSA or CENSUS.
+            -   Audit source: either GSAFAC or CENSUS.
             -   Zero-padded 10-digit numeric monotonically increasing.
             -   Separated by hyphens.
 
-            For example: `2023-09-GSA-0000000001`, `2020-09-CENSUS-0000000001`.
+            For example: `2023-09-GSAFAC-0000000001`, `2020-09-CENSUS-0000000001`.
         """
         user = baker.make(User)
         general_information = {
@@ -52,12 +52,12 @@ class SingleAuditChecklistTests(TestCase):
             submission_status="in_progress",
             general_information=general_information,
         )
-        self.assertIn(len(sac.report_id), (22, 25))
+        self.assertEqual(len(sac.report_id), 25)
         separator = "-"
         year, month, source, count = sac.report_id.split(separator)
         self.assertEqual(year, "2023")
         self.assertEqual(month, "11")
-        self.assertEqual(source, "GSA")
+        self.assertEqual(source, "GSAFAC")
         # This one is a little dubious because it assumes this will always be
         # the first entry in the test database:
         self.assertEqual(count, "0000000001")

@@ -40,20 +40,20 @@ User = get_user_model()
 logger = logging.getLogger(__name__)
 
 
-def generate_sac_report_id(start_date=None, source="GSA", count=None):
+def generate_sac_report_id(start_date=None, source="GSAFAC", count=None):
     """
     Convenience method for generating report_id, a value consisting of:
 
         -   Four-digit year based on submission fiscal end date.
         -   Two-digit month based on submission fiscal end date.
-        -   Audit source: either GSA or CENSUS.
+        -   Audit source: either GSAFAC or CENSUS.
         -   Zero-padded 10-digit numeric monotonically increasing.
         -   Separated by hyphens.
 
-    For example: `2023-09-GSA-0000000001`, `2020-09-CENSUS-0000000001`.
+    For example: `2023-09-GSAFAC-0000000001`, `2020-09-CENSUS-0000000001`.
     """
     source = source.upper()
-    if source not in ("CENSUS", "GSA"):
+    if source not in ("CENSUS", "GSAFAC"):
         raise Exception("Unknown source for report_id")
     if not start_date:
         start_date = (date.today() + timedelta(days=364)).isoformat()
@@ -80,11 +80,11 @@ class SingleAuditChecklistManager(models.Manager):
 
             -   Four-digit year based on submission fiscal end date.
             -   Two-digit month based on submission fiscal end date.
-            -   Audit source: either GSA or CENSUS.
+            -   Audit source: either GSAFAC or CENSUS.
             -   Zero-padded 10-digit numeric monotonically increasing.
             -   Separated by hyphens.
 
-        For example: `2023-09-GSA-0000000001`, `2020-09-CENSUS-0000000001`.
+        For example: `2023-09-GSAFAC-0000000001`, `2020-09-CENSUS-0000000001`.
 
         """
 
@@ -93,7 +93,7 @@ class SingleAuditChecklistManager(models.Manager):
         event_type = obj_data.pop("event_type", None)
 
         start_date = obj_data["general_information"]["auditee_fiscal_period_end"]
-        report_id = generate_sac_report_id(start_date=start_date, source="GSA")
+        report_id = generate_sac_report_id(start_date=start_date, source="GSAFAC")
         updated = obj_data | {"report_id": report_id}
 
         result = super().create(**updated)
@@ -299,7 +299,7 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
     submitted_by = models.ForeignKey(User, on_delete=models.PROTECT)
     date_created = models.DateTimeField(auto_now_add=True)
     submission_status = FSMField(default=STATUS.IN_PROGRESS, choices=STATUS_CHOICES)
-    data_source = models.CharField(default="GSA")
+    data_source = models.CharField(default="GSAFAC")
 
     # implement an array of tuples as two arrays since we can only have simple fields inside an array
     transition_name = ArrayField(
