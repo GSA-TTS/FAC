@@ -49,9 +49,9 @@ class TribalDataConsent(SingleAuditChecklistAccessRequiredMixin, generic.View):
 
             if form.is_valid():
                 form.clean_booleans()
-                tribal_data_consent = form.cleaned_data
+                tribal_data_consent = {"TribalDataConsent": form.cleaned_data}
                 validated = validate_tribal_data_consent_json(tribal_data_consent)
-                sac.tribal_data_consent = {"TribalDataConsent": validated}
+                sac.tribal_data_consent = validated
                 sac.save(
                     event_user=request.user,
                     event_type=SubmissionEvent.EventType.TRIBAL_CONSENT_UPDATED,

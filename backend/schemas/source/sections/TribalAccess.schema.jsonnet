@@ -5,11 +5,8 @@ local Types = Base.Types;
 /*
 Typechecks fields, but allows for empty data as well. Contains conditional Checks.
 */
-{
-  '$id': 'http://example.org/generalinformation',
-  '$schema': Base.Const.SCHEMA_VERSION,
+local TribalDataConsent = Types.object {
   additionalProperties: false,
-  metamodel_version: '1.7.0',
   properties: {
     tribal_authorization_certifying_official_title: Types.string,
     is_tribal_information_authorized_to_be_public: Types.boolean,
@@ -18,9 +15,19 @@ Typechecks fields, but allows for empty data as well. Contains conditional Check
   required: [
     'tribal_authorization_certifying_official_title',
     'is_tribal_information_authorized_to_be_public',
-    'tribal_authorization_certifying_official_name'
+    'tribal_authorization_certifying_official_name',
   ],
+  title: 'TribalDataConsent',
+};
+
+{
+  '$id': 'http://example.org/tribaldataconsent',
+  '$schema': Base.Const.SCHEMA_VERSION,
+  additionalProperties: false,
+  properties: {
+    TribalDataConsent: TribalDataConsent,
+  },
   title: 'TribalAccess',
   type: 'object',
-  version: 20230927,
+  version: 20231002,
 }

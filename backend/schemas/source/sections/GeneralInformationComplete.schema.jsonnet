@@ -107,7 +107,7 @@ Requires most fields, has consitional checks for conditional fields.
       minLength: 1,
     },
 
-    // Others    
+    // Others
     is_usa_based: Types.boolean,
     met_spending_threshold: Types.boolean,
     user_provided_organization_type: Base.Enum.OrganizationType,
@@ -116,7 +116,7 @@ Requires most fields, has consitional checks for conditional fields.
     secondary_auditors_exist: Types.boolean,
   },
   allOf: [
-    // If audit_period_covered is 'other', then audit_period_other_months should 
+    // If audit_period_covered is 'other', then audit_period_other_months should
     // have a value. Otherwise, it should have no value.
     {
       anyOf: [
@@ -205,7 +205,7 @@ Requires most fields, has consitional checks for conditional fields.
           const: true,
         },
       },
-    }
+    },
   ],
   required: [
     'audit_type',
@@ -236,7 +236,7 @@ Requires most fields, has consitional checks for conditional fields.
     'multiple_eins_covered',
     'multiple_ueis_covered',
     'secondary_auditors_exist',
-    'user_provided_organization_type'
+    'user_provided_organization_type',
   ],
   title: 'GeneralInformation',
   type: 'object',

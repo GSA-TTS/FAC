@@ -1,25 +1,31 @@
 {
-   "$id": "http://example.org/generalinformation",
+   "$id": "http://example.org/tribaldataconsent",
    "$schema": "https://json-schema.org/draft/2019-09/schema#",
    "additionalProperties": false,
-   "metamodel_version": "1.7.0",
    "properties": {
-      "is_tribal_information_authorized_to_be_public": {
-         "type": "boolean"
-      },
-      "tribal_authorization_certifying_official_name": {
-         "type": "string"
-      },
-      "tribal_authorization_certifying_official_title": {
-         "type": "string"
+      "TribalDataConsent": {
+         "additionalProperties": false,
+         "properties": {
+            "is_tribal_information_authorized_to_be_public": {
+               "type": "boolean"
+            },
+            "tribal_authorization_certifying_official_name": {
+               "type": "string"
+            },
+            "tribal_authorization_certifying_official_title": {
+               "type": "string"
+            }
+         },
+         "required": [
+            "tribal_authorization_certifying_official_title",
+            "is_tribal_information_authorized_to_be_public",
+            "tribal_authorization_certifying_official_name"
+         ],
+         "title": "TribalDataConsent",
+         "type": "object"
       }
    },
-   "required": [
-      "tribal_authorization_certifying_official_title",
-      "is_tribal_information_authorized_to_be_public",
-      "tribal_authorization_certifying_official_name"
-   ],
    "title": "TribalAccess",
    "type": "object",
-   "version": null
+   "version": 20231002
 }
