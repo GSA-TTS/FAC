@@ -2,6 +2,7 @@ name: Helpdesk Issue
 description: Used as output from helpdesk issue triage.
 title: "[HD]: "
 labels: ["helpdesk"]
+projects: ["GSA-TTS/11"]
 assignees:
   - jadudm
   - carley-sullivan
