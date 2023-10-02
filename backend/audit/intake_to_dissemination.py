@@ -28,7 +28,7 @@ class IntakeToDissemination(object):
     def __init__(self, sac) -> None:
         self.single_audit_checklist = sac
         self.report_id = sac.report_id
-        audit_date = sac.general_information["auditee_fiscal_period_start"]
+        audit_date = sac.general_information["auditee_fiscal_period_end"]
         self.audit_year = int(audit_date.split("-")[0])
         self.loaded_objects: dict[str, list] = {}
 
