@@ -55,6 +55,13 @@ jobs:
     uses: ./.github/workflows/linting.yml
     secrets: inherit
 
+  regression-tests:
+    uses: ./.github/workflows/regression-tests.yml
+    secrets: inherit
+    with:
+      url: "https://fac-dev.app.cloud.gov/"
+      environment: "dev"
+
   # Update BPMN Diagrams
   sync-BPMN:
     uses: ./.github/workflows/add-bpmn-renders.yml
