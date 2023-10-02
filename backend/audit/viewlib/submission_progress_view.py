@@ -87,7 +87,7 @@ class SubmissionProgressView(SingleAuditChecklistAccessRequiredMixin, generic.Vi
 
     The states are:
 
-    +   hidden
+    +   inactive
     +   incomplete
     +   complete
 

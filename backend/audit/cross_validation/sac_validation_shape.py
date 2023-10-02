@@ -5,7 +5,7 @@ from audit.cross_validation.naming import (
     snake_to_camel,
 )
 
-at_root_sections = (NC.AUDIT_INFORMATION, NC.GENERAL_INFORMATION)  # type: ignore
+at_root_sections = (NC.AUDIT_INFORMATION, NC.GENERAL_INFORMATION, NC.TRIBAL_DATA_CONSENT)  # type: ignore
 
 
 def get_shaped_section(sac, section_name):
