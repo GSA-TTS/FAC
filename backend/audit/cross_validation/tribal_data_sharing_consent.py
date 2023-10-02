@@ -16,7 +16,7 @@ def tribal_data_sharing_consent(sac_dict, *_args, **_kwargs):
             return [{"error": err_missing_tribal_data_sharing_consent()}]
 
         # this should check for consent form completeness once form data structure is finalized
-        if not tribal_data_consent["complete"]:
+        if tribal_data_consent.get("is_tribal_information_authorized_to_be_public") is None:
             return [{"error": err_missing_tribal_data_sharing_consent()}]
 
     return []
