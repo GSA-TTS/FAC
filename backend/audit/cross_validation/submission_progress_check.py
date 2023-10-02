@@ -37,8 +37,6 @@ def submission_progress_check(sac, sar=None, crossval=True):
             "completed_date": [date],
         }
     """
-    # TODO: remove these once tribal data consent are implemented:
-    del sac["sf_sac_sections"][NC.TRIBAL_DATA_CONSENT]
 
     # Add the status of the SAR into the list of sections:
     sac["sf_sac_sections"][NC.SINGLE_AUDIT_REPORT] = bool(sar)
@@ -97,6 +95,7 @@ def progress_check(sections, key):
     conditions = {
         NC.GENERAL_INFORMATION: True,
         NC.AUDIT_INFORMATION: True,
+        NC.TRIBAL_DATA_CONSENT: general_info.get("user_provided_organization_type") == "tribal",
         NC.FEDERAL_AWARDS: True,
         NC.NOTES_TO_SEFA: True,
         NC.FINDINGS_UNIFORM_GUIDANCE: num_findings > 0,
