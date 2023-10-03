@@ -26,7 +26,6 @@ import {
 const LOGIN_TEST_EMAIL_AUDITEE = Cypress.env('LOGIN_TEST_EMAIL_AUDITEE');
 const LOGIN_TEST_PASSWORD_AUDITEE = Cypress.env('LOGIN_TEST_PASSWORD_AUDITEE');
 const LOGIN_TEST_OTP_SECRET_AUDITEE = Cypress.env('LOGIN_TEST_OTP_SECRET_AUDITEE');
-const API_GOV_JWT = Cypress.env('API_GOV_JWT');
 
 describe('Full audit submission', () => {
   before(() => {
@@ -94,9 +93,27 @@ describe('Full audit submission', () => {
     cy.get(".usa-link").contains("Additional EINs").click();
     testWorkbookAdditionalEINs(false);
 
-    // complete the tribal audit form - opt public
-    cy.get(".usa-link").contains("Tribal data release").click();
-    testTribalAuditPublic();
+    cy.url().then(url => {
+      const reportId = url.split('/').pop();
+
+      // Login as Auditee
+      testLogoutGov();
+      testLoginGovLogin(
+        LOGIN_TEST_EMAIL_AUDITEE,
+        LOGIN_TEST_PASSWORD_AUDITEE,
+        LOGIN_TEST_OTP_SECRET_AUDITEE
+      );
+      cy.visit(`/audit/submission-progress/${reportId}`);
+
+      // complete the tribal audit form as auditee - opt public
+      cy.get(".usa-link").contains("Tribal data release").click();
+      testTribalAuditPublic();
+
+      // Login as Auditor
+      testLogoutGov();
+      testLoginGovLogin();
+      cy.visit(`/audit/submission-progress/${reportId}`);
+    })
 
     // Complete the audit information form
     cy.get(".usa-link").contains("Audit Information form").click();
@@ -130,7 +147,7 @@ describe('Full audit submission', () => {
 
       // Submit
       cy.get(".usa-link").contains("Submit to the FAC for processing").click();
-      cy.url().should('match', /\/audit\/submission\/[0-9A-Z]{17}/);
+      cy.url().should('match', /\/audit\/submission\/[0-9]{4}-[0-9]{2}-GSAFAC-[0-9]{10}/);
       cy.get('#continue').click();
       cy.url().should('match', /\/audit\//);
 
