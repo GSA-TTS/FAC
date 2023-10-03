@@ -169,9 +169,7 @@ local Parts = {
       cluster_name: Types.string,
       other_cluster_name: Types.string,
       state_cluster_name: Types.string,
-      cluster_total: Types.number {
-        minimum: 0,
-      },
+      cluster_total: Types.number,
     },
     allOf: [
       {
@@ -311,9 +309,7 @@ local Parts = {
     additionalProperties: false,
     properties: {
       is_passed: Base.Enum.YorN,
-      subrecipient_amount: Types.number {
-        minimum: 0,
-      },
+      subrecipient_amount: Types.number,
     },
     allOf: Validations.SubrecipientValidations,
   },
@@ -324,12 +320,8 @@ local Parts = {
       three_digit_extension: Base.Compound.ThreeDigitExtension,
       additional_award_identification: Types.string,
       program_name: Types.string,
-      amount_expended: Types.number {
-        minimum: 0,
-      },
-      federal_program_total: Types.number {
-        minimum: 0,
-      },
+      amount_expended: Types.number,
+      federal_program_total: Types.number,
       is_major: Base.Enum.YorN,
       audit_report_type: Base.Enum.MajorProgramAuditReportType,
       number_of_audit_findings: Types.integer,
@@ -383,9 +375,7 @@ local FederalAwards = Types.object {
     federal_awards: Types.array {
       items: FederalAwardEntry,
     },
-    total_amount_expended: Types.number {
-      minimum: 0,
-    },
+    total_amount_expended: Types.number,
   },
   required: ['auditee_uei', 'total_amount_expended'],
   title: 'FederalAward',

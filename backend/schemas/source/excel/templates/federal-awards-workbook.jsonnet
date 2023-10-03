@@ -79,8 +79,8 @@ local single_cells = [
     // FIXME MSHD: for improvement, will need to pull F from this formula and retrieve it dynamically.
     formula: "=SUM('" + awardSheet + "'!F$FIRSTROW:F$LASTROW)",
     width: 36,
-    help: Help.positive_number,
-    validation: SV.PositiveNumberValidation,
+    help: Help.any_number,
+    validation: SV.NumberValidation,
   },
 ];
 
@@ -137,9 +137,9 @@ local open_ranges_defns = [
   [
     Sheets.open_range {
       format: 'dollar',
-      help: Help.positive_number,
+      help: Help.any_number,
     },
-    SV.PositiveNumberValidation,
+    SV.NumberValidation,
     'Amount Expended',
     amountExpendedNamedRange,
   ],
@@ -176,9 +176,9 @@ local open_ranges_defns = [
       keep_locked: true,
       format: 'dollar',
       formula: '=SUMIFS(' + amountExpendedNamedRange + ',' + cfdaKeyNamedRange + ',V{0})',
-      help: Help.positive_number,
+      help: Help.any_number,
     },
-    SV.PositiveNumberValidation,
+    SV.NumberValidation,
     'Federal Program Total',
     'federal_program_total',
   ],
@@ -187,9 +187,9 @@ local open_ranges_defns = [
       keep_locked: true,
       format: 'dollar',
       formula: '=IF(G{0}="' + Base.Const.OTHER_CLUSTER + '",SUMIFS(' + amountExpendedNamedRange + ',' + uniformOtherClusterNamedRange + ',X{0}), IF(AND(OR(G{0}="' + Base.Const.NA + '",G{0}=""),H{0}=""),0,IF(G{0}="' + Base.Const.STATE_CLUSTER + '",SUMIFS(' + amountExpendedNamedRange + ',' + uniformStateClusterNamedRange + ',W{0}),SUMIFS(' + amountExpendedNamedRange + ',' + clusterNamedRange + ',G{0}))))',
-      help: Help.positive_number,
+      help: Help.any_number,
     },
-    SV.PositiveNumberValidation,
+    SV.NumberValidation,
     'Cluster Total',
     'cluster_total',
   ],
@@ -248,7 +248,7 @@ local open_ranges_defns = [
   [
     Sheets.open_range {
       format: 'dollar',
-      help: Help.positive_number,
+      help: Help.any_number,
     },
     SV.NoValidation,
     'If yes (Passed Through), Amount Passed Through to Subrecipients',

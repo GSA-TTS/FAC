@@ -171,7 +171,6 @@
                               "type": "string"
                            },
                            "cluster_total": {
-                              "minimum": 0,
                               "type": "number"
                            },
                            "other_cluster_name": {
@@ -397,7 +396,6 @@
                               "type": "string"
                            },
                            "amount_expended": {
-                              "minimum": 0,
                               "type": "number"
                            },
                            "audit_report_type": {
@@ -424,7 +422,6 @@
                               "type": "string"
                            },
                            "federal_program_total": {
-                              "minimum": 0,
                               "type": "number"
                            },
                            "is_major": {
@@ -495,7 +492,6 @@
                               "type": "string"
                            },
                            "subrecipient_amount": {
-                              "minimum": 0,
                               "type": "number"
                            }
                         },
@@ -515,7 +511,6 @@
                "type": "array"
             },
             "total_amount_expended": {
-               "minimum": 0,
                "type": "number"
             }
          },
