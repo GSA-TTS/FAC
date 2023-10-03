@@ -54,7 +54,10 @@ if [[ "$CF_INSTANCE_INDEX" == 0 ]]; then
     echo 'Finished view creation' &&
     echo 'Starting collectstatic' &&
     python manage.py collectstatic --noinput &&
-    echo 'Finished collectstatic'
+    echo 'Finished collectstatic' &&
+    echo 'Starting seed_cog_baseline' &&
+    python manage.py seed_cog_baseline &&
+    echo 'Finished seed_cog_baseline'
 fi
 
 # Make psql usable by scripts, for debugging, etc.
