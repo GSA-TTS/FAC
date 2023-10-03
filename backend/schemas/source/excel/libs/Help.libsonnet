@@ -48,6 +48,10 @@ local make_url = function(anchor)
     text: 'The number must be zero or greater',
     link: make_url('positive_number'),
   },
+  any_number: {
+    text: 'Must be a number',
+    link: make_url('any_number'),
+  },
   prior_references: {
     text: 'Must be a comma-separated list of reference numbers (YYYY-NNN) or N/A.',
     link: make_url('prior_references'),

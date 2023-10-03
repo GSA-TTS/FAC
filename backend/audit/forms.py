@@ -135,3 +135,23 @@ class AuditeeCertificationStep2Form(forms.Form):
     auditee_name = forms.CharField()
     auditee_title = forms.CharField()
     auditee_certification_date_signed = forms.DateField()
+
+
+class TribalAuditConsentForm(forms.Form):
+    def clean_booleans(self):
+        data = self.cleaned_data
+        for k, v in data.items():
+            if v == ["True"]:
+                data[k] = True
+            elif v == ["False"]:
+                data[k] = False
+        self.cleaned_data = data
+        return data
+
+    choices_YoN = (("True", "Yes"), ("False", "No"))
+
+    is_tribal_information_authorized_to_be_public = forms.MultipleChoiceField(
+        choices=choices_YoN
+    )
+    tribal_authorization_certifying_official_name = forms.CharField()
+    tribal_authorization_certifying_official_title = forms.CharField()

@@ -64,6 +64,7 @@ from audit.validators import (
     validate_secondary_auditors_json,
 )
 from audit.viewlib import (  # noqa
+    TribalDataConsent,
     SubmissionProgressView,
     UploadReportView,
     submission_progress_check,
@@ -94,7 +95,7 @@ class MySubmissions(LoginRequiredMixin, generic.View):
             audit["submission_status"] = (
                 audit["submission_status"].replace("_", " ").title()
             )  # auditee_certified --> Auditee Certified
-            if audit["submission_status"] == "Submitted":
+            if audit["submission_status"] in ["Submitted", "Disseminated"]:
                 data["completed_audits"].append(audit)
             else:
                 data["in_progress_audits"].append(audit)
@@ -722,6 +723,10 @@ class SubmissionView(CertifyingAuditeeRequiredMixin, generic.View):
             # FIXME: We should now provide a reasonable error to the user.
             if disseminated is None:
                 sac.transition_to_disseminated()
+                sac.save(
+                    event_user=request.user,
+                    event_type=SubmissionEvent.EventType.DISSEMINATED,
+                )
 
             logger.info(
                 "Dissemination errors: %s, report_id: %s", disseminated, report_id

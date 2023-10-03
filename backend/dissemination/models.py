@@ -345,6 +345,9 @@ class General(models.Model):
     submitted_date = models.DateField(
         "The date at which the audit transitioned to 'submitted'",
     )
+    fac_accepted_date = models.DateField(
+        "The date at which the audit transitioned to 'accepted'",
+    )
     # auditor_signature_date = models.DateField(
     #     "The date on which the auditor signed the audit",
     # )

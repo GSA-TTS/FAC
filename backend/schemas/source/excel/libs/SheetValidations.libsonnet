@@ -52,6 +52,14 @@ local PositiveNumberValidation = {
   custom_title: 'Positive numbers',
 };
 
+local NumberValidation = {
+  type: 'custom',
+  // Is it a number ?
+  formula1: '=ISNUMBER(FIRSTCELLREF)',
+  custom_error: 'This cell must be a number',
+  custom_title: 'Numbers',
+};
+
 local ReferenceNumberValidation = {
   type: 'custom',
   //It is neccessary to allow blank otherwise user cannot delete the value
@@ -87,6 +95,7 @@ local AwardReferenceValidation = {
   NoValidation: { type: 'NOVALIDATION' },
   FAPPrefixValidation: FAPPrefixValidation,
   PositiveNumberValidation: PositiveNumberValidation,
+  NumberValidation: NumberValidation,
   LookupValidation: LookupValidation,
   RangeLookupValidation: RangeLookupValidation,
   StringOfLengthNine: StringOfSize(9),
