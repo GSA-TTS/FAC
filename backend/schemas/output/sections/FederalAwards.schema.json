@@ -38,6 +38,12 @@
                      "cluster": {
                         "allOf": [
                            {
+                              "required": [
+                                 "cluster_name",
+                                 "cluster_total"
+                              ]
+                           },
+                           {
                               "if": {
                                  "properties": {
                                     "cluster_name": {
@@ -175,15 +181,16 @@
                               "type": "string"
                            }
                         },
-                        "required": [
-                           "cluster_name",
-                           "cluster_total"
-                        ],
                         "type": "object"
                      },
                      "direct_or_indirect_award": {
                         "additionalProperties": false,
                         "allOf": [
+                           {
+                              "required": [
+                                 "is_direct"
+                              ]
+                           },
                            {
                               "if": {
                                  "properties": {
@@ -243,14 +250,16 @@
                               "type": "string"
                            }
                         },
-                        "required": [
-                           "is_direct"
-                        ],
                         "type": "object"
                      },
                      "loan_or_loan_guarantee": {
                         "additionalProperties": false,
                         "allOf": [
+                           {
+                              "required": [
+                                 "is_guaranteed"
+                              ]
+                           },
                            {
                               "if": {
                                  "properties": {
@@ -307,14 +316,22 @@
                               ]
                            }
                         },
-                        "required": [
-                           "is_guaranteed"
-                        ],
                         "type": "object"
                      },
                      "program": {
                         "additionalProperties": false,
                         "allOf": [
+                           {
+                              "required": [
+                                 "program_name",
+                                 "federal_agency_prefix",
+                                 "three_digit_extension",
+                                 "is_major",
+                                 "number_of_audit_findings",
+                                 "federal_program_total",
+                                 "amount_expended"
+                              ]
+                           },
                            {
                               "properties": {
                                  "number_of_audit_findings": {
@@ -428,20 +445,16 @@
                               "type": "string"
                            }
                         },
-                        "required": [
-                           "program_name",
-                           "federal_agency_prefix",
-                           "three_digit_extension",
-                           "is_major",
-                           "number_of_audit_findings",
-                           "federal_program_total",
-                           "amount_expended"
-                        ],
                         "type": "object"
                      },
                      "subrecipients": {
                         "additionalProperties": false,
                         "allOf": [
+                           {
+                              "required": [
+                                 "is_passed"
+                              ]
+                           },
                            {
                               "if": {
                                  "properties": {
@@ -486,9 +499,6 @@
                               "type": "number"
                            }
                         },
-                        "required": [
-                           "is_passed"
-                        ],
                         "type": "object"
                      }
                   },

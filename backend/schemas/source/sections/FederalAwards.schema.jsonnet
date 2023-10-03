@@ -15,6 +15,9 @@ local Validations = {
   },
   LoanOrLoanGuaranteeValidations: [
     {
+      required: ['is_guaranteed'],
+    },
+    {
       'if': {
         properties: {
           is_guaranteed: {
@@ -42,6 +45,9 @@ local Validations = {
     },
   ],
   SubrecipientValidations: [
+    {
+      required: ['is_passed'],
+    },
     {
       'if': {
         properties: {
@@ -72,6 +78,17 @@ local Validations = {
     },
   ],
   ProgramValidations: [
+    {
+      required: [
+        'program_name',
+        'federal_agency_prefix',
+        'three_digit_extension',
+        'is_major',
+        'number_of_audit_findings',
+        'federal_program_total',
+        'amount_expended',
+      ],
+    },
     {
       properties: {
         number_of_audit_findings: Types.integer {
@@ -156,8 +173,10 @@ local Parts = {
         minimum: 0,
       },
     },
-    required: ['cluster_name', 'cluster_total'],
     allOf: [
+      {
+        required: ['cluster_name', 'cluster_total'],
+      },
       {
         'if': {
           properties: {
@@ -239,8 +258,10 @@ local Parts = {
         items: Validations.PassThroughEntity,
       },
     },
-    required: ['is_direct'],
     allOf: [
+      {
+        required: ['is_direct'],
+      },
       {
         'if': {
           properties: {
@@ -284,9 +305,6 @@ local Parts = {
         ],
       },
     },
-    required: [
-      'is_guaranteed',
-    ],
     allOf: Validations.LoanOrLoanGuaranteeValidations,
   },
   Subrecipients: Types.object {
@@ -297,7 +315,6 @@ local Parts = {
         minimum: 0,
       },
     },
-    required: ['is_passed'],
     allOf: Validations.SubrecipientValidations,
   },
   Program: Types.object {
@@ -317,15 +334,6 @@ local Parts = {
       audit_report_type: Base.Enum.MajorProgramAuditReportType,
       number_of_audit_findings: Types.integer,
     },
-    required: [
-      'program_name',
-      'federal_agency_prefix',
-      'three_digit_extension',
-      'is_major',
-      'number_of_audit_findings',
-      'federal_program_total',
-      'amount_expended',
-    ],
     allOf: Validations.ProgramValidations,
   },
 };
