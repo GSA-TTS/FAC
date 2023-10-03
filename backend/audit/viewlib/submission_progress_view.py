@@ -9,10 +9,7 @@ from audit.cross_validation import (
 from audit.mixins import (
     SingleAuditChecklistAccessRequiredMixin,
 )
-from audit.models import (
-    SingleAuditChecklist,
-    SingleAuditReportFile,
-)
+from audit.models import SingleAuditChecklist, SingleAuditReportFile, Access
 
 
 # Turn the named tuples into dicts because Django templates work with dicts:
@@ -90,7 +87,7 @@ class SubmissionProgressView(SingleAuditChecklistAccessRequiredMixin, generic.Vi
 
     The states are:
 
-    +   hidden
+    +   inactive
     +   incomplete
     +   complete
 
@@ -103,6 +100,20 @@ class SubmissionProgressView(SingleAuditChecklistAccessRequiredMixin, generic.Vi
 
         try:
             sac = SingleAuditChecklist.objects.get(report_id=report_id)
+
+            # Determine if the auditee certifier is the same as the current user.
+            # If there is no auditee certifier, default to False.
+            is_user_auditee_certifier = False
+            sac_auditee_results = Access.objects.filter(
+                sac_id=sac.id, role="certifying_auditee_contact"
+            ).values()  # ValuesQuerySet (array of dicts)
+            if sac_auditee_results.exists():
+                is_user_auditee_certifier = (
+                    sac_auditee_results[0].get("user_id") == request.user.id
+                )
+
+            is_tribal_data_consent_complete = True if sac.tribal_data_consent else False
+
             try:
                 sar = SingleAuditReportFile.objects.filter(sac_id=sac.id).latest(
                     "date_created"
@@ -149,6 +160,8 @@ class SubmissionProgressView(SingleAuditChecklistAccessRequiredMixin, generic.Vi
                 "auditee_name": sac.auditee_name,
                 "auditee_uei": sac.auditee_uei,
                 "user_provided_organization_type": sac.user_provided_organization_type,
+                "is_user_auditee_certifier": is_user_auditee_certifier,
+                "is_tribal_data_consent_complete": is_tribal_data_consent_complete,
             }
             context = context | subcheck
 

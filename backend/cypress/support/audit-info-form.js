@@ -33,5 +33,5 @@ export function testAuditInformationForm() {
 
     cy.get('.usa-button').contains('Save and continue').click({force: true});
 
-    cy.url().should('match', /\/audit\/submission-progress\/[0-9A-Z]{17}/);
+    cy.url().should('match', /\/audit\/submission-progress\/[0-9]{4}-[0-9]{2}-GSAFAC-[0-9]{10}/);
 }
