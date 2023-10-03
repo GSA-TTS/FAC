@@ -10,6 +10,8 @@ import { testPdfAuditReport } from '../support/report-pdf.js';
 import { testAuditorCertification } from '../support/auditor-certification.js';
 import { testAuditeeCertification } from '../support/auditee-certification.js';
 import { testReportIdFound, testReportIdNotFound } from '../support/dissemination-table.js';
+import { testTribalAuditPublic, testTribalAuditPrivate } from '../support/tribal-audit-form.js';
+
 import {
   testWorkbookFederalAwards,
   testWorkbookNotesToSEFA,
@@ -24,7 +26,6 @@ import {
 const LOGIN_TEST_EMAIL_AUDITEE = Cypress.env('LOGIN_TEST_EMAIL_AUDITEE');
 const LOGIN_TEST_PASSWORD_AUDITEE = Cypress.env('LOGIN_TEST_PASSWORD_AUDITEE');
 const LOGIN_TEST_OTP_SECRET_AUDITEE = Cypress.env('LOGIN_TEST_OTP_SECRET_AUDITEE');
-const API_GOV_JWT = Cypress.env('API_GOV_JWT');
 
 describe('Full audit submission', () => {
   before(() => {
@@ -92,6 +93,28 @@ describe('Full audit submission', () => {
     cy.get(".usa-link").contains("Additional EINs").click();
     testWorkbookAdditionalEINs(false);
 
+    cy.url().then(url => {
+      const reportId = url.split('/').pop();
+
+      // Login as Auditee
+      testLogoutGov();
+      testLoginGovLogin(
+        LOGIN_TEST_EMAIL_AUDITEE,
+        LOGIN_TEST_PASSWORD_AUDITEE,
+        LOGIN_TEST_OTP_SECRET_AUDITEE
+      );
+      cy.visit(`/audit/submission-progress/${reportId}`);
+
+      // complete the tribal audit form as auditee - opt private
+      cy.get(".usa-link").contains("Tribal data release").click();
+      testTribalAuditPrivate();
+
+      // Login as Auditor
+      testLogoutGov();
+      testLoginGovLogin();
+      cy.visit(`/audit/submission-progress/${reportId}`);
+    })
+
     // Complete the audit information form
     cy.get(".usa-link").contains("Audit Information form").click();
     testAuditInformationForm();
@@ -124,7 +147,7 @@ describe('Full audit submission', () => {
 
       // Submit
       cy.get(".usa-link").contains("Submit to the FAC for processing").click();
-      cy.url().should('match', /\/audit\/submission\/[0-9A-Z]{17}/);
+      cy.url().should('match', /\/audit\/submission\/[0-9]{4}-[0-9]{2}-GSAFAC-[0-9]{10}/);
       cy.get('#continue').click();
       cy.url().should('match', /\/audit\//);
 
@@ -134,8 +157,8 @@ describe('Full audit submission', () => {
         'The audits listed below have been submitted to the FAC for processing and may not be edited.',
       ).siblings().contains('td', reportId);
 
-      // Report should now be in the dissemination table
-      testReportIdFound(reportId);
+      // The Report should not be in the dissemination table
+      testReportIdNotFound(reportId);
     });
   });
 });

@@ -1,7 +1,7 @@
 // Resusable components for the "Check Eligibility" pre-screener
 
 export function selectValidEntries() {
-  cy.get('label[for=entity-state]').click();
+  cy.get('label[for=entity-tribe]').click();
   cy.get('label[for=spend-yes]').click();
   cy.get('label[for=us-yes]').click();
 }

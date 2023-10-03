@@ -31,14 +31,12 @@ def submission_progress_check(sac, sar=None, crossval=True):
 
         {
             "section_sname": [snake_case name of section],
-            "display": "hidden"/"incomplete"/"complete",
+            "display": "inactive"/"incomplete"/"complete",
             "completed": [bool],
             "completed_by": [email],
             "completed_date": [date],
         }
     """
-    # TODO: remove these once tribal data consent are implemented:
-    del sac["sf_sac_sections"][NC.TRIBAL_DATA_CONSENT]
 
     # Add the status of the SAR into the list of sections:
     sac["sf_sac_sections"][NC.SINGLE_AUDIT_REPORT] = bool(sar)
@@ -106,6 +104,9 @@ def progress_check(sections, key):
         NC.ADDITIONAL_EINS: bool(general_info.get("multiple_eins_covered")),
         NC.SECONDARY_AUDITORS: bool(general_info.get("secondary_auditors_exist")),
         NC.SINGLE_AUDIT_REPORT: True,
+        NC.TRIBAL_DATA_CONSENT: bool(
+            general_info.get("user_provided_organization_type") == "tribal"
+        ),
     }
 
     # The General Information has its own condition, as it can be partially completed.

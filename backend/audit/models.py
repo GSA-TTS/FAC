@@ -563,10 +563,6 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
     def is_submitted(self):
         return self.submission_status in [SingleAuditChecklist.STATUS.SUBMITTED]
 
-    @property
-    def is_public(self):
-        return self.general_information["user_provided_organization_type"] != "tribal"
-
     def get_transition_date(self, status):
         index = self.transition_name.index(status)
         if index >= 0:
@@ -771,6 +767,7 @@ class SubmissionEvent(models.Model):
         SECONDARY_AUDITORS_UPDATED = "secondary-auditors-updated"
         SUBMITTED = "submitted"
         DISSEMINATED = "disseminated"
+        TRIBAL_CONSENT_UPDATED = "tribal-consent-updated"
 
     EVENT_TYPES = (
         (EventType.ACCESS_GRANTED, _("Access granted")),
@@ -807,6 +804,7 @@ class SubmissionEvent(models.Model):
         (EventType.SECONDARY_AUDITORS_UPDATED, _("Secondary auditors updated")),
         (EventType.SUBMITTED, _("Submitted to the FAC for processing")),
         (EventType.DISSEMINATED, _("Copied to dissemination tables")),
+        (EventType.TRIBAL_CONSENT_UPDATED, _("Tribal audit consent updated")),
     )
 
     sac = models.ForeignKey(SingleAuditChecklist, on_delete=models.CASCADE)
