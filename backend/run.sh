@@ -34,6 +34,9 @@ python manage.py migrate &&
 echo 'Finished migrate' &&
 echo 'Starting API view creation' &&
 python manage.py create_api_views &&
-echo 'Finished view creation'
+echo 'Finished view creation' &&
+echo 'Starting seed_cog_baseline' &&
+python manage.py seed_cog_baseline &&
+echo 'Finished seed_cog_baseline'
 
 npm run dev & python manage.py runserver 0.0.0.0:8000

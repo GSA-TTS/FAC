@@ -114,12 +114,13 @@ class FACAuthenticationBackendTests(TestCase):
         backend = FACAuthenticationBackend()
 
         login_id = str(uuid4())
-        email = "a@a.com"
+        email = "a+a@a.com"
 
         access1 = baker.make(Access, email=email)
         access2 = baker.make(Access, email=email)
 
-        user_info = {"sub": login_id, "email": email, "all_emails": [email]}
+        # use different casing in the user info to ensure we're not case sensitive
+        user_info = {"sub": login_id, "email": "A@A.CoM", "all_emails": ["A+a@A.cOm"]}
 
         factory = RequestFactory()
         request = factory.get("/")
