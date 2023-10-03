@@ -10,7 +10,7 @@ import { testPdfAuditReport } from '../support/report-pdf.js';
 import { testAuditorCertification } from '../support/auditor-certification.js';
 import { testAuditeeCertification } from '../support/auditee-certification.js';
 import { testReportIdFound, testReportIdNotFound } from '../support/dissemination-table.js';
-import { testTribalAuditPublic } from '../support/tribal-audit-form.js';
+import { testTribalAuditPublic, testTribalAuditPrivate } from '../support/tribal-audit-form.js';
 
 import {
   testWorkbookFederalAwards,
@@ -105,9 +105,9 @@ describe('Full audit submission', () => {
       );
       cy.visit(`/audit/submission-progress/${reportId}`);
 
-      // complete the tribal audit form as auditee - opt public
+      // complete the tribal audit form as auditee - opt private
       cy.get(".usa-link").contains("Tribal data release").click();
-      testTribalAuditPublic();
+      testTribalAuditPrivate();
 
       // Login as Auditor
       testLogoutGov();
@@ -157,8 +157,8 @@ describe('Full audit submission', () => {
         'The audits listed below have been submitted to the FAC for processing and may not be edited.',
       ).siblings().contains('td', reportId);
 
-      // Report should now be in the dissemination table
-      testReportIdFound(reportId);
+      // The Report should not be in the dissemination table
+      testReportIdNotFound(reportId);
     });
   });
 });
