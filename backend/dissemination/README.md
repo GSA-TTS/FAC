@@ -1,6 +1,6 @@
 # Deploying a new API
 
-An API in PostgREST needs a few things to happen. 
+An API in PostgREST needs a few things to happen.
 
 1. A JWT secret needs to be loaded into the PostgREST environment.
 2. We need to tear down what was
@@ -46,12 +46,12 @@ For symmetric use, that passphrase must be loaded into a GH Secret, and that sec
 
 Our JWT only lives at api.data.gov. We will put it in the `Authorization: Bearer <jwt>` header. In this way, only API requests that come through api.data.gov (meaning requests that go to api.fac.gov) will be executed by PostgREST. All other queries, from all other sources, will be rejected.
 
-It is important that the role you choose matches the role we expect for public queries. Our schemas are attached to the role `api_fac_gov`. 
+It is important that the role you choose matches the role we expect for public queries. Our schemas are attached to the role `api_fac_gov`.
 
 For example:
 
 ```
-curl -X GET -H "Authorization: Bearer ${JWT}" "${API_FAC_URL}/general?limit=1" 
+curl -X GET -H "Authorization: Bearer ${JWT}" "${API_FAC_URL}/general?limit=1"
 ```
 
 should return one item from the general view. API_FAC_URL might be `http://localhost:3000` in testing locally, or `https://api.fac.gov` when working live.
@@ -72,7 +72,7 @@ checks this header, and if the correct role is present (`fac_gov_tribal_data_acc
 
 ## Standing up / tearing down
 
-With each deployment of the stack, we should tear down and stand up the entire API. 
+With each deployment of the stack, we should tear down and stand up the entire API.
 
 1. `fac drop_deprecated_schema_and_views` will tear down any deprecated APIs. Always run it.
 1. `fac drop_api_schema` will tear down the active schema and everything associated with it.
@@ -85,11 +85,12 @@ In other words: the API should always be stood up from a "blank slate" in the na
 
 # API versions
 
-When adding a new API version.
+When adding a new API version:
 
-1. Create a folder in api/dissemination for the version name. E.g. `v1_0_1`. 
-2. Copy the contents of an existing API as a starting point.
-3. Update `docker-compose.yml` and `docker-compose-web.yml` to change the `PGRST_DB_SCHEMAS` key to reflect all the active schemas. 
-   1. ADD TO THE END OF THIS LIST. The first entry is the default. Only add to the front of the list if we are certain the schema should become the new default.
-   2. This is likely true of TESTED patch version bumps (v1_0_0 to v1_0_1), and *maybe* minor version bumps (v1_0_0 to v1_1_0). MAJOR bumps require change management messaging.
-4. Update `APIViewTests` to make sure you're testing the right schema. (That file might want some love...)
+1. Create a copy of an existing API directory within `FAC/backend/dissemination/api` and name it with your version bump of choice.
+   - For all files within this directory, replace all instances of the old API version with your new version.
+2. Update `terraform/shared/modules/env/postgrest.tf` to use the new API version.
+3. Update `docker-compose.yml` and `docker-compose-web.yml`:
+   - Change the values of `PGRST_DB_SCHEMAS` to your new API version. If previous versions of the API are needed, make the value a comma separated list and append your version to it. The first entry is the default, so only add to the front of the list if we are certain the schema should become the new default. See details on this [here](https://postgrest.org/en/stable/references/api/schemas.html#multiple-schemas)
+      - This is likely true of TESTED patch version bumps (v1_0_0 to v1_0_1), and *maybe* minor version bumps (v1_0_0 to v1_1_0). MAJOR bumps require change management messaging.
+4. If previous versions of the API are needed, `APIViewTests` will need to be updated. At the time of writing this, it only tests the default API.
