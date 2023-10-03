@@ -4,7 +4,7 @@ export function testTribalAuditPublic(){
     cy.get('#tribal_authorization_certifying_official_name').type('John Wick');
     cy.get('#tribal_authorization_certifying_official_title').type('Offical');
     cy.get('#continue').click();
-    cy.url().should('match', /\/audit\/submission-progress\/[0-9A-Z]{17}$/);
+    cy.url().should('match', /\/audit\/submission-progress\/[0-9]{4}-[0-9]{2}-GSAFAC-[0-9]{10}$/);
 }
 
 export function testTribalAuditPrivate(){
@@ -12,5 +12,5 @@ export function testTribalAuditPrivate(){
     cy.get('#tribal_authorization_certifying_official_name').type('Clint Eastwood');
     cy.get('#tribal_authorization_certifying_official_title').type('Official');
     cy.get('#continue').click();
-    cy.url().should('match', /\/audit\/submission-progress\/[0-9A-Z]{17}$/);
+    cy.url().should('match', /\/audit\/submission-progress\/[0-9]{4}-[0-9]{2}-GSAFAC-[0-9]{10}$/);
 }

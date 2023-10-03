@@ -22,7 +22,7 @@ function testWorkbookUpload(interceptUrl, uploadSelector, filename, will_interce
     );
 
   cy.get('#continue').click();
-  cy.url().should('match', /\/audit\/submission-progress\/[0-9A-Z]{17}/);
+  cy.url().should('match', /\/audit\/submission-progress\/[0-9]{4}-[0-9]{2}-GSAFAC-[0-9]{10}/);
 }
 
 export function testWorkbookFederalAwards(will_intercept = true) {

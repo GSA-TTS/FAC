@@ -2,7 +2,7 @@
   Re-useable code for testing the dissemination table.
 */
 
-const API_GOV_JWT = Cypress.env('API_GOV_JWT') || '';
+const API_GOV_JWT = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYXBpX2ZhY19nb3YiLCJjcmVhdGVkIjoiMjAyMy0xMC0wMlQxNDowMTo1NS44NzQ0NDEifQ.aKANQ2sy5I3S_wxP8FzhMIv6Kadm_jfxqby58-EkpLM';
 const API_GOV_KEY = Cypress.env('API_GOV_KEY') || '';
 const API_GOV_URL = Cypress.env('API_GOV_URL');
 
