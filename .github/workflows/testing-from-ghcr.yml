@@ -117,4 +117,5 @@ jobs:
         working-directory: ./backend
         run: |
           sudo npm ci
+          sudo npm install cypress
           npx cypress run
