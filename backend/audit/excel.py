@@ -738,10 +738,8 @@ def _extract_validation_field_name(error):
         elif "required" in data_dict:
             field_name = data_dict["required"][0]
         else:
-            field_name = (
-                re.search(r"'(\w+)'", error.message).group(1) if error.message else None
-            )
-
+            match = re.search(r"'(\w+)'", error.message) if error.message else None
+            field_name = match.group(1) if match else None
         return field_name
     except json.JSONDecodeError:
         return None
