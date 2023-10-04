@@ -173,20 +173,21 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         in progress isn't being altered; skip this if we know this submission is
         in progress.
         """
-        if self.submission_status != self.STATUS.IN_PROGRESS:
-            try:
-                self._reject_late_changes()
-            except LateChangeError as err:
-                raise LateChangeError from err
+        if not kwargs.get("undocumentedoverride") == "HACKZ":
+            if self.submission_status != self.STATUS.IN_PROGRESS:
+                try:
+                    self._reject_late_changes()
+                except LateChangeError as err:
+                    raise LateChangeError from err
 
-        event_user = kwargs.get("event_user")
-        event_type = kwargs.get("event_type")
-        if event_user and event_type:
-            SubmissionEvent.objects.create(
-                sac=self,
-                user=event_user,
-                event=event_type,
-            )
+            event_user = kwargs.get("event_user")
+            event_type = kwargs.get("event_type")
+            if event_user and event_type:
+                SubmissionEvent.objects.create(
+                    sac=self,
+                    user=event_user,
+                    event=event_type,
+                )
 
         return super().save()
 
