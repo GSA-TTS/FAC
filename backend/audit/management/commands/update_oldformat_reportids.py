@@ -64,6 +64,7 @@ class Command(BaseCommand):
             old_rid = str(sac.report_id)
             new_rid = get_newformat_report_id(sac)
             sac.report_id = new_rid
+            sac.data_source = "GSAFAC"
             sac.save(undocumentedoverride="HACKZ")
             outstring = f"id: {sac.id} old: {old_rid} new: {new_rid}"
             lines.append(outstring)
