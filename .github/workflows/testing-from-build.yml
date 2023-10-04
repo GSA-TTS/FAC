@@ -118,5 +118,5 @@ jobs:
         run: |
           sudo npm ci
           npm cache clean --force
-          sudo npm install --unsafe-perm=true --allow-root cypres
+          sudo npm install --unsafe-perm=true --allow-root cypress
           npx cypress run
