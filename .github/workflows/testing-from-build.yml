@@ -113,6 +113,9 @@ jobs:
           touch .env
           docker compose -f docker-compose.yml up -d
 
+      - name: run npm ci
+        run: sudo npm ci
+
       - name: Run Cypress Tests
         uses: cypress-io/github-action@v6
         with:
