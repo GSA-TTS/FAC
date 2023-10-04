@@ -32,10 +32,27 @@ THREE_DIGIT_EXTENSION = "three_digit_extension"
 SECTION_NAME = "section_name"
 XLSX_TEMPLATE_DEFINITION_DIR = settings.XLSX_TEMPLATE_JSON_DIR
 
-
 def _set_by_path(target_obj, target_path, value):
     """Set a (potentially nested) field in target_obj using JSONPath-esque dot notation, e.g. parent.child[0].field"""
-    pydash.set_(target_obj, target_path, value)
+    # IF a user:
+    # * Prefixes a cell with a space
+    # * Suffixes a cell with a space
+    # * Enters only spaces (typically, just one...)
+    # THEN
+    # We do not want to set that value in the JSON object.
+    # SO
+    # We trim, and then check if we have "elimiated" the string.
+    # If so, we pass. Do not modify the object.
+    # Otherwise, set the object to the trimmed string.
+    # We only do this for string values.
+    if isinstance(value, str):
+        value = value.strip()
+        if value == "":
+            pass
+        else:
+            pydash.set_(target_obj, target_path, value)
+    else:
+        pydash.set_(target_obj, target_path, value)
 
 
 """
@@ -557,6 +574,8 @@ def _add_required_fields(data):
     if "FederalAwards" in data:
         # Update the federal_awards with all required fields
         data["FederalAwards"]["federal_awards"] = indexed_awards
+
+    print(data)
 
     return data
 
