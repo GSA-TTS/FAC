@@ -117,4 +117,5 @@ jobs:
       - name: Run Cypress Tests
         uses: cypress-io/github-action@v6
         with:
+          working-directory: ./backend
           spec: cypress/e2e/full-submission.cy.js
