@@ -58,6 +58,13 @@ jobs:
       environment: "dev"
     secrets: inherit
 
+  regression-tests:
+    uses: ./.github/workflows/regression-tests.yml
+    secrets: inherit
+    with:
+      url: "https://fac-dev.app.cloud.gov/"
+      environment: "dev"
+
   scan-dev-post-deploy:
     name: ZAP Scan
     needs:
