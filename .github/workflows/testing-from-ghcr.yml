@@ -89,9 +89,11 @@ jobs:
 
   regression-tests:
     runs-on: ubuntu-latest
+    environment: dev
     env:
       CYPRESS_API_GOV_KEY: ${{ secrets.CYPRESS_API_GOV_KEY }}
       CYPRESS_API_GOV_URL: ${{ secrets.CYPRESS_API_GOV_URL }}
+      CYPRESS_BASE_URL: 'http://localhost:8000'
       CYPRESS_LOGIN_TEST_EMAIL: ${{ secrets.CYPRESS_LOGIN_TEST_EMAIL }}
       CYPRESS_LOGIN_TEST_PASSWORD: ${{ secrets.CYPRESS_LOGIN_TEST_PASSWORD }}
       CYPRESS_LOGIN_TEST_OTP_SECRET: ${{ secrets.CYPRESS_LOGIN_TEST_OTP_SECRET }}
@@ -113,6 +115,6 @@ jobs:
           docker compose -f docker-compose.yml up -d
 
       - name: Run Cypress Tests
-        working-directory: ./backend
-        run: |
-          npx cypress run
+        uses: cypress-io/github-action@v6
+        with:
+          spec: cypress/e2e/full-submission.cy.js
