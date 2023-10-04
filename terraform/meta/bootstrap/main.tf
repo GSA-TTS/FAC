@@ -35,7 +35,7 @@ resource "local_file" "backend-tfvars" {
   access_key  = "${local.credentials.access_key_id}"
   secret_key  = "${local.credentials.secret_access_key}"
   bucket      = "${local.credentials.bucket}"
-  endpoint    = "${local.credentials.fips_endpoint}"
+  endpoint    = "https://${local.credentials.fips_endpoint}"
   region      = "${local.credentials.region}"
   EOF
 }
