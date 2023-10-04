@@ -114,6 +114,7 @@ jobs:
           docker compose -f docker-compose.yml up -d
 
       - name: Run npm ci
+        working-directory: ./backend
         run: sudo npm ci
 
       - name: Run Cypress Tests
