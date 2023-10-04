@@ -684,22 +684,23 @@ def extract_notes_to_sefa(file):
     return _extract_data(file, params)
 
 
-def _extract_from_column_mapping(path, row_index, column_mapping, match=None):
+def _extract_from_column_mapping(path, row_index, column_mapping, field_name=None):
     """Extract named ranges from column mapping"""
     for key, value in column_mapping.items():
         if len(value) > 2 and (
             value[0] + "." + value[1] == path
-            or (match and value[0] + "." + value[1] == path + "." + match.group(1))
+            or (field_name and value[0] + "." + value[1] == path + "." + field_name)
         ):
             return key, row_index
     return None, None
 
 
-def _extract_from_field_mapping(path, field_mapping, match=None):
+def _extract_from_field_mapping(path, field_mapping, field_name=None):
     """Extract named ranges from field mapping"""
     for key, value in field_mapping.items():
         if len(value) == 2 and (
-            value[0] == path or (match and value[0] == ".".join([path, match.group(1)]))
+            value[0] == path
+            or (field_name and value[0] == ".".join([path, field_name]))
         ):
             return key, None
     return None, None
@@ -711,8 +712,7 @@ def _extract_error_details(error):
         return None, None, None
     row_index = next((item for item in error.path if isinstance(item, int)), None)
     path = ".".join([item for item in error.path if not isinstance(item, int)])
-    match = re.search(r"'(\w+)'", error.message) if error.message else None
-    return path, row_index, match
+    return path, row_index
 
 
 def _extract_key_from_award_entities(path, row_index, named_ranges):
@@ -727,11 +727,32 @@ def _extract_key_from_award_entities(path, row_index, named_ranges):
     return None
 
 
+def _extract_validation_field_name(error):
+    try:
+        # Parse the input data as JSON
+        data_dict = error.schema
+        # Check if the input data is in the format { ... 'not': {'required': ['field_name']}}
+        if "not" in data_dict and "required" in data_dict["not"]:
+            field_name = data_dict["not"]["required"][0]
+        # Check if the input data is in the format {...'required': ['field_name']}
+        elif "required" in data_dict:
+            field_name = data_dict["required"][0]
+        else:
+            field_name = (
+                re.search(r"'(\w+)'", error.message).group(1) if error.message else None
+            )
+
+        return field_name
+    except json.JSONDecodeError:
+        return None
+
+
 def _extract_named_ranges(errors, column_mapping, field_mapping, meta_mapping):
     """Extract named ranges from column mapping and errors"""
     named_ranges = []
     for error in errors:
-        path, row_index, match = _extract_error_details(error)
+        path, row_index = _extract_error_details(error)
+        field_name = _extract_validation_field_name(error)
         if not path:
             continue
 
@@ -740,15 +761,17 @@ def _extract_named_ranges(errors, column_mapping, field_mapping, meta_mapping):
 
         if not keyFound:
             keyFound, row_index = _extract_from_column_mapping(
-                path, row_index, column_mapping, match
+                path, row_index, column_mapping, field_name
             )
             if keyFound:
                 named_ranges.append((keyFound, row_index))
 
         if not keyFound:
-            keyFound, _ = _extract_from_field_mapping(path, field_mapping, match)
+            keyFound, _ = _extract_from_field_mapping(path, field_mapping, field_name)
             if not keyFound:
-                keyFound, _ = _extract_from_field_mapping(path, meta_mapping, match)
+                keyFound, _ = _extract_from_field_mapping(
+                    path, meta_mapping, field_name
+                )
             if keyFound:
                 named_ranges.append((keyFound, None))
 
