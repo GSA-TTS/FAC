@@ -32,6 +32,7 @@ THREE_DIGIT_EXTENSION = "three_digit_extension"
 SECTION_NAME = "section_name"
 XLSX_TEMPLATE_DEFINITION_DIR = settings.XLSX_TEMPLATE_JSON_DIR
 
+
 def _set_by_path(target_obj, target_path, value):
     """Set a (potentially nested) field in target_obj using JSONPath-esque dot notation, e.g. parent.child[0].field"""
     # IF a user:
@@ -574,8 +575,6 @@ def _add_required_fields(data):
     if "FederalAwards" in data:
         # Update the federal_awards with all required fields
         data["FederalAwards"]["federal_awards"] = indexed_awards
-
-    print(data)
 
     return data
 
