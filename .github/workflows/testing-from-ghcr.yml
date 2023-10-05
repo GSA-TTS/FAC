@@ -114,7 +114,7 @@ jobs:
           docker compose -f docker-compose.yml up -d
 
       - name: chown cache to root
-        run: chown -R 1001:1001 /github/home/.cache
+        run: chown -R 1001:1001 /home/runner/work/
 
       - name: Run Cypress Test
         uses: cypress-io/github-action@v6
