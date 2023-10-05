@@ -141,7 +141,6 @@ jobs:
           with: |
             working-directory: ./backend
             spec: cypress/e2e/full-submission.cy.js
-            browser: chrome
           attempt_limit: 5
           attempt_delay: 2000
 
