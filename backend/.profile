@@ -58,8 +58,6 @@ if [[ "$CF_INSTANCE_INDEX" == 0 ]]; then
     echo 'Starting seed_cog_baseline' &&
     python manage.py seed_cog_baseline &&
     echo 'Finished seed_cog_baseline'
-    python manage.py update_oldformat_reportids &&
-    echo 'Finished rewriting old-format report_id values'
 fi
 
 # Make psql usable by scripts, for debugging, etc.
