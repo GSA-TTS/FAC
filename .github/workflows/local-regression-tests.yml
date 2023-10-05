@@ -38,7 +38,6 @@ jobs:
       LOGIN_CLIENT_ID: ${{ secrets.LOGIN_CLIENT_ID }}
       SECRET_KEY: ${{ secrets.SECRET_KEY }}
       ALLOWED_HOSTS: '0.0.0.0 127.0.0.1 localhost'
-      DISABLE_AUTH: False
       PGRST_JWT_SECRET: ${{ secrets.PGRST_JWT_SECRET }}
       # Cypress Related ENV
       CYPRESS_API_GOV_KEY: ${{ secrets.CYPRESS_API_GOV_KEY }}
