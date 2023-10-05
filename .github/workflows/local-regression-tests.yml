@@ -60,12 +60,11 @@ jobs:
         with:
           node-version: 18
 
-      - name: Create .env file
-        run: touch .env
-
       - name: Start Services
         working-directory: ./backend
-        run: docker compose -f docker-compose-web.yml up -d
+        run: |
+          touch .env
+          docker compose -f docker-compose-web.yml up -d
 
       - name: Run Cypress full submission test
         uses: Wandalen/wretry.action@master
