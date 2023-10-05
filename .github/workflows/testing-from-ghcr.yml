@@ -87,13 +87,23 @@ jobs:
           npm run test:a11y:lighthouse
           npm run test:a11y:pa11y
 
-  regression-tests:
+  regression-testing:
     runs-on: ubuntu-latest
     environment: dev
     env:
+      # Container Related ENV
+      ENV: TESTING
+      SAM_API_KEY: ${{ secrets.SAM_API_KEY }}
+      DJANGO_BASE_URL: 'http://localhost:8000'
+      DJANGO_SECRET_LOGIN_KEY: ${{ secrets.DJANGO_SECRET_LOGIN_KEY }}
+      LOGIN_CLIENT_ID: ${{ secrets.LOGIN_CLIENT_ID }}
+      SECRET_KEY: ${{ secrets.SECRET_KEY }}
+      ALLOWED_HOSTS: '0.0.0.0 127.0.0.1 localhost'
+      PGRST_JWT_SECRET: ${{ secrets.PGRST_JWT_SECRET }}
+      # Cypress Related ENV
       CYPRESS_API_GOV_KEY: ${{ secrets.CYPRESS_API_GOV_KEY }}
       CYPRESS_API_GOV_URL: ${{ secrets.CYPRESS_API_GOV_URL }}
-      CYPRESS_BASE_URL: 'http://localhost:8000'
+      CYPRESS_BASE_URL: http://localhost:8000'
       CYPRESS_LOGIN_TEST_EMAIL: ${{ secrets.CYPRESS_LOGIN_TEST_EMAIL }}
       CYPRESS_LOGIN_TEST_PASSWORD: ${{ secrets.CYPRESS_LOGIN_TEST_PASSWORD }}
       CYPRESS_LOGIN_TEST_OTP_SECRET: ${{ secrets.CYPRESS_LOGIN_TEST_OTP_SECRET }}
@@ -107,15 +117,38 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Start services
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Start Services
         working-directory: ./backend
         run: |
           touch .env
-          docker compose -f docker-compose.yml up -d
+          docker compose -f docker-compose-web.yml up -d
 
-      - name: Run Cypress Test
-        uses: cypress-io/github-action@v6
+      - name: Install npm dependencies
+        working-directory: ./backend
+        run: sudo npm install
+
+      - name: Remove node_modules/ so cypress-io/github-action@v6 works
+        run: sudo rm -rf /home/runner/work/FAC/FAC/backend/node_modules/
+
+      - name: Run Cypress full submission test
+        uses: Wandalen/wretry.action@master
         with:
-          command: npx cypress run
-          working-directory: ./backend
-          spec: cypress/e2e/full-submission.cy.js
+          action: cypress-io/github-action@v6
+          with: |
+            working-directory: ./backend
+            spec: cypress/e2e/full-submission.cy.js
+            browser: chrome
+          attempt_limit: 5
+          attempt_delay: 2000
+
+      - uses: actions/upload-artifact@v3
+        # add the line below to store screenshots only on failures
+        if: failure()
+        with:
+          name: cypress-screenshots
+          path: backend/cypress/screenshots
+          if-no-files-found: warn # 'warn' or 'error' are also available, defaults to `warn`

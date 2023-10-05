@@ -1,9 +1,9 @@
 ---
 name: Regression Tests for Pull Requests
 on:
-  push:
-    branches:
-      - pd/2311-pr-regression-tests
+  # push:
+  #   branches:
+  #     - pd/2311-pr-regression-tests
   # workflow_dispatch:
   #   inputs:
   #     url:
