@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
+{% load sprite_helper %}
 {% block content %}
 
 <div class="grid-container">
@@ -22,8 +23,7 @@
 			class="usa-textarea"
 			id="entity-name"
 			name="input-type-textarea"
-			>
-		    </textarea>
+			></textarea>
 		    <label for="uei-or-ein">
 			<button type="button" class="usa-accordion__button" aria-expanded="true" aria-controls="uei-or-ein">
 			    UEI or EIN
@@ -33,8 +33,7 @@
 			class="usa-textarea"
 			id="uei-or-ein"
 			name="input-type-textarea"
-			>
-		    </textarea>
+			></textarea>
 		    <label for="aln">
 			<button type="button" class="usa-accordion__button" aria-expanded="true" aria-controls="aln">
 			    Assistance Listing Number (formerly CFDA)
@@ -44,8 +43,7 @@
 			class="usa-textarea"
 			id="aln"
 			name="input-type-textarea"
-			>
-		    </textarea>
+			></textarea>
 
 		    <button type="button" class="usa-accordion__button" aria-expanded="true" aria-controls="fac-release-date">
 			FAC Release Date
@@ -111,6 +109,95 @@
 	</div>
 	<div class="tablet:grid-col-8 audit-search-results">
 	    <h2>Search single audit reports</h2>
+	   
+	    <div class="active-filters">
+		<h3>Active filters:</h3>
+		<ul>
+		    <li><span class="usa-tag usa-tag--big">Name</span></li>
+		    <li><span class="usa-tag usa-tag--big">UEI or EIN</span></li>
+		    <li><span class="usa-tag usa-tag--big">ALN</span></li>
+		    <li><span class="usa-tag usa-tag--big">FAC Release Date</span></li>
+		    <li><span class="usa-tag usa-tag--big">Audit Year</span></li>
+		    <li><span class="usa-tag usa-tag--big">Cognizant or Oversight</span></li>
+		</ul>
+	    </div>
+	    
+	    <table class="usa-table">
+		<caption>
+		    Results 3
+		</caption>
+		<thead>
+		<tr>
+		    <th data-sortable scope="col" role="columnheader">Name</th>
+		    <th
+			data-sortable
+			scope="col"
+			role="columnheader"
+		    >UEI or EIN</th>
+		    <th data-sortable scope="col" role="columnheader">Acc Date</th>
+		    <th data-sortable scope="col" role="columnheader">AY</th>
+		    <th data-sortable scope="col" role="columnheader">Cog or Over</th>
+		    <th data-sortable scope="col" role="columnheader">View</th>
+		    <th data-sortable scope="col" role="columnheader">PDF</th>
+		</tr>
+		</thead>
+		<tbody>
+		    <tr>
+			<th scope="row" role="rowheader">AAA Entity Name</th>
+			<td>KZV2XNZZN3A8</td>
+			<td data-sort-value="1696528569380">Oct, 5 2023</td>
+			<td>2022</td>
+			<td>Oversight</td>
+			<td>
+			    <svg class="usa-icon" aria-hidden="true" focusable="false" role="img">
+				{% uswds_sprite "visibility" %}
+			    </svg>
+			</td>
+			<td>
+			    <svg class="usa-icon" aria-hidden="true" focusable="false" role="img">
+				{% uswds_sprite "file_download" %}
+			    </svg>
+			</td>
+		    </tr>
+
+		    <tr>
+			<th scope="row" role="rowheader">BBB Entity Name</th>
+			<td>KZV2XNZZN3A8</td>
+			<td data-sort-value="1696528569380">Oct, 5 2023</td>
+			<td>2022</td>
+			<td>Oversight</td>
+			<td>
+			    <svg class="usa-icon" aria-hidden="true" focusable="false" role="img">
+				{% uswds_sprite "visibility" %}
+			    </svg>
+			</td>
+			<td>
+			    <svg class="usa-icon" aria-hidden="true" focusable="false" role="img">
+				{% uswds_sprite "file_download" %}
+			    </svg>
+			</td>
+		    </tr>
+
+		    <tr>
+			<th scope="row" role="rowheader">CCC Entity Name</th>
+			<td>KZV2XNZZN3A8</td>
+			<td data-sort-value="1696528569380">Oct, 5 2023</td>
+			<td>2022</td>
+			<td>Oversight</td>
+			<td>
+			    <svg class="usa-icon" aria-hidden="true" focusable="false" role="img">
+				{% uswds_sprite "visibility" %}
+			    </svg>
+			</td>
+			<td>
+			    <svg class="usa-icon" aria-hidden="true" focusable="false" role="img">
+				{% uswds_sprite "file_download" %}
+			    </svg>
+			</td>
+		    </tr>
+		</tbody>
+	    </table>
+	    <button class="usa-button">Download all results PDF</button>
 	</div>
     </div>
 </div>
