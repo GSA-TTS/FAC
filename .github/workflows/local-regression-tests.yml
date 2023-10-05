@@ -42,7 +42,7 @@ jobs:
       # Cypress Related ENV
       CYPRESS_API_GOV_KEY: ${{ secrets.CYPRESS_API_GOV_KEY }}
       CYPRESS_API_GOV_URL: ${{ secrets.CYPRESS_API_GOV_URL }}
-      CYPRESS_BASE_URL: 'http://localhost:8000/'
+      CYPRESS_BASE_URL: 'https://fac-dev.app.cloud.gov'
       CYPRESS_LOGIN_TEST_EMAIL: ${{ secrets.CYPRESS_LOGIN_TEST_EMAIL }}
       CYPRESS_LOGIN_TEST_PASSWORD: ${{ secrets.CYPRESS_LOGIN_TEST_PASSWORD }}
       CYPRESS_LOGIN_TEST_OTP_SECRET: ${{ secrets.CYPRESS_LOGIN_TEST_OTP_SECRET }}
@@ -71,19 +71,6 @@ jobs:
         run: npm install
 
       - name: Run Cypress full submission test
-        uses: Wandalen/wretry.action@master
-        with:
-          action: cypress-io/github-action@v6
-          with: |
-            working-directory: ./backend
-            spec: cypress/e2e/full-submission.cy.js
-          attempt_limit: 5
-          attempt_delay: 2000
-
-      - uses: actions/upload-artifact@v3
-        # add the line below to store screenshots only on failures
-        if: failure()
-        with:
-          name: cypress-screenshots
-          path: backend/cypress/screenshots
-          if-no-files-found: warn # 'warn' or 'error' are also available, defaults to `warn`
+        working-directory: ./backend
+        run: |
+          npx cypress run
