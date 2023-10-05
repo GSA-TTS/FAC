@@ -66,6 +66,9 @@ jobs:
           touch .env
           docker compose -f docker-compose-web.yml up -d
 
+      - name: chown node_modules
+        run: chown -R 1001:1001 /home/runner/work/FAC/FAC/backend/node_modules/
+
       - name: Run Cypress full submission test
         uses: Wandalen/wretry.action@master
         with:
