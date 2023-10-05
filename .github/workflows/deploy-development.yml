@@ -59,6 +59,7 @@ jobs:
     secrets: inherit
 
   regression-tests:
+    needs: [deploy-dev]
     uses: ./.github/workflows/regression-tests.yml
     secrets: inherit
     with:
