@@ -30,6 +30,17 @@ jobs:
     runs-on: ubuntu-latest
     environment: dev
     env:
+      # Container Related ENV
+      ENV: TESTING
+      SAM_API_KEY: ${{ secrets.SAM_API_KEY }}
+      DJANGO_BASE_URL: 'http://localhost:8000'
+      DJANGO_SECRET_LOGIN_KEY: ${{ secrets.DJANGO_SECRET_LOGIN_KEY }}
+      LOGIN_CLIENT_ID: ${{ secrets.LOGIN_CLIENT_ID }}
+      SECRET_KEY: ${{ secrets.SECRET_KEY }}
+      ALLOWED_HOSTS: '0.0.0.0 127.0.0.1 localhost'
+      DISABLE_AUTH: False
+      PGRST_JWT_SECRET: ${{ secrets.PGRST_JWT_SECRET }}
+      # Cypress Related ENV
       CYPRESS_API_GOV_KEY: ${{ secrets.CYPRESS_API_GOV_KEY }}
       CYPRESS_API_GOV_URL: ${{ secrets.CYPRESS_API_GOV_URL }}
       CYPRESS_BASE_URL: 'http://localhost:8000/'
