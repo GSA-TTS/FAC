@@ -113,10 +113,9 @@ jobs:
           touch .env
           docker compose -f docker-compose.yml up -d
 
-      - name: Run Cypress Tests
-        working-directory: ./backend
-        run: |
-          sudo npm ci
-          npm cache clean --force
-          sudo npm install --unsafe-perm=true --allow-root cypress
-          npx cypress run
+      - name: Run Cypress Test
+        uses: cypress-io/github-action@v6
+        with:
+          command: npx cypress run
+          working-directory: ./backend
+          spec: cypress/e2e/full-submission.cy.js
