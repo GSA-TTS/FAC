@@ -33,7 +33,7 @@ describe('Full audit submission', () => {
   });
 
   it('Completes a full submission', () => {
-    cy.url().should('include', '/');
+    cy.url().should('include', 'asdf');
 
     // Logs in with Login.gov'
     testLoginGovLogin();
