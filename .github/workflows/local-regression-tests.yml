@@ -29,8 +29,9 @@ jobs:
   regression-testing:
     runs-on: ubuntu-latest
     environment: dev
-    image: cypress/browsers:node18.12.0-chrome106-ff106
-    options: --user 1001
+    container:
+      image: cypress/browsers:node18.12.0-chrome106-ff106
+      options: --user 1001
     env:
       # Container Related ENV
       ENV: TESTING
