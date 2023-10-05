@@ -17,7 +17,7 @@ class CustomHttpAdapter(requests.adapters.HTTPAdapter):
         kwargs["ssl_context"] = self.ssl_context
         return super().proxy_manager_for(*args, **kwargs)
 
-    def init_poolmanager(self, connections, maxsize, block=False):
+    def init_poolmanager(self, connections, maxsize, *_args, block=False, **_kwds):
         self.poolmanager = urllib3.poolmanager.PoolManager(
             num_pools=connections,
             maxsize=maxsize,
@@ -52,8 +52,8 @@ def call_sam_api(
         error = "SAM.gov API timeout"
     except requests.exceptions.TooManyRedirects:
         error = "SAM.gov API error - too many redirects"
-    except requests.exceptions.RequestException as e:
-        error = f"Unable to make SAM.gov API request, error: {str(e)}"
+    except requests.exceptions.RequestException as err:
+        error = f"Unable to make SAM.gov API request, error: {str(err)}"
     return None, error
 
 
@@ -73,33 +73,45 @@ def parse_sam_uei_json(response: dict) -> dict:
         return {"valid": False, "errors": ["UEI was not found in SAM.gov"]}
 
     # Ensure there's only one entry:
+    # Nope! 2023-10-05: turns out you can get multiple valid entries.
     entries = response.get("entityData", [])
-    if len(entries) != 1:
-        return {
-            "valid": False,
-            "errors": ["SAM.gov invalid number of entries"],
-        }
+    if len(entries) > 1:
+
+        def is_active(entry):
+            return entry["entityRegistration"]["registrationStatus"] == "Active"
+
+        actives = list(filter(is_active, entries))
+        if actives:
+            entry = actives[0]
+        else:
+            entry = entries[0]
+    elif len(entries) == 1:
+        entry = entries[0]
+    else:
+        return {"valid": False, "errors": ["UEI was not found in SAM.gov"]}
 
     # Get the ueiStatus and catch errors if the JSON shape is unexpected:
     entry = entries[0]
     try:
-        status = entry.get("entityRegistration", {}).get("ueiStatus", "").upper()
+        _ = entry.get("entityRegistration", {}).get("ueiStatus", "").upper()
     except AttributeError:
         return {
             "valid": False,
             "errors": ["SAM.gov unexpected JSON shape"],
         }
 
+    # 2023-10-05 comment out the following, as checking for this creates more
+    # problems for our users than it's worth.
     # Ensure the status is active:
-    if status != "ACTIVE":
-        return {
-            "valid": False,
-            "errors": ["UEI is not listed as active from SAM.gov response data"],
-        }
+    # if status != "ACTIVE":
+    #     return {
+    #         "valid": False,
+    #         "errors": ["UEI is not listed as active from SAM.gov response data"],
+    #     }
 
     # Get the fiscalYearEndCloseDate and catch errors if the JSON shape is unexpected:
     try:
-        status = (
+        _ = (
             entry.get("coreData", {})
             .get("entityInformation", {})
             .get("fiscalYearEndCloseDate", "")
@@ -139,5 +151,22 @@ def get_uei_info_from_sam_gov(uei: str) -> dict:
     if resp.status_code != 200:
         error = f"SAM.gov API response status code invalid: {resp.status_code}"
         return {"valid": False, "errors": [error]}
+
+    results = parse_sam_uei_json(resp.json())
+    if results["valid"] and (not results.get("errors")):
+        return results
+
+    # Try again with samRegistered set to No:
+    api_params = api_params | {"samRegistered": "No"}
+    # Call the SAM API
+    resp, error = call_sam_api(SAM_API_URL, api_params, api_headers)
+    if resp is None:
+        return {"valid": False, "errors": [error]}
+
+    # Get the response status code
+    if resp.status_code != 200:
+        error = f"SAM.gov API response status code invalid: {resp.status_code}"
+        return {"valid": False, "errors": [error]}
+    print(resp.json())
 
     return parse_sam_uei_json(resp.json())
