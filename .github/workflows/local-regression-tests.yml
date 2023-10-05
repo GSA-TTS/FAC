@@ -70,6 +70,9 @@ jobs:
         working-directory: ./backend
         run: sudo npm install
 
+      - name: remove node_modules/.bin
+        run: sudo rm -rf /home/runner/work/FAC/FAC/backend/node_modules/.bin
+
       - name: Run Cypress full submission test
         uses: Wandalen/wretry.action@master
         with:
