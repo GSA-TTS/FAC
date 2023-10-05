@@ -80,6 +80,11 @@ urlpatterns = [
         views.CrossValidationView.as_view(),
         name="CrossValidation",
     ),
+    path(
+        "search/",
+        views.AuditSearchView.as_view(),
+        name="AuditSearch",
+    ),
 ]
 
 for form_section in FORM_SECTIONS:

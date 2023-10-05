@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+
+<div class="grid-container">
+    <div class="grid-row">
+	<div class="tablet:grid-col-4 audit-search-form">
+	    <form class="usa-form">
+
+		<div class="search-submit">
+		    <input class="usa-button" type="submit" value="Search" />
+		    <button class="usa-button usa-button--unstyled">Reset Search</button>
+		</div>
+
+		<div class="usa-accordion usa-accordion--multiselectable" data-allow-multiple>
+		    <label for="entity-name">
+			<button type="button" class="usa-accordion__button" aria-expanded="true" aria-controls="entity-name">
+			    Name (Entity, Auditee, or Auditor)
+			</button>
+		    </label>
+		    <textarea
+			class="usa-textarea"
+			id="entity-name"
+			name="input-type-textarea"
+			>
+		    </textarea>
+		    <label for="uei-or-ein">
+			<button type="button" class="usa-accordion__button" aria-expanded="true" aria-controls="uei-or-ein">
+			    UEI or EIN
+			</button>
+		    </label>
+		    <textarea
+			class="usa-textarea"
+			id="uei-or-ein"
+			name="input-type-textarea"
+			>
+		    </textarea>
+		    <label for="aln">
+			<button type="button" class="usa-accordion__button" aria-expanded="true" aria-controls="aln">
+			    Assistance Listing Number (formerly CFDA)
+			</button>
+		    </label>
+		    <textarea
+			class="usa-textarea"
+			id="aln"
+			name="input-type-textarea"
+			>
+		    </textarea>
+
+		    <button type="button" class="usa-accordion__button" aria-expanded="true" aria-controls="fac-release-date">
+			FAC Release Date
+		    </button>
+		    <div id="fac-release-date">
+			<div class="usa-form-group">
+			    <label class="usa-label" id="start-date-label" for="start-date"
+				>Start date</label
+			    >
+			    <div class="usa-hint" id="start-date-hint">mm/dd/yyyy</div>
+			    <div class="usa-date-picker">
+				<input
+				class="usa-input"
+				id="start-date"
+				name="start-date"
+				aria-labelledby="start-date-label"
+				aria-describedby="start-date-hint"
+				/>
+			    </div>
+			</div>
+			<div class="usa-form-group">
+			    <label class="usa-label" id="end-date-label" for="end-date"
+				>End date</label
+			    >
+			    <div class="usa-hint" id="end-date-hint">mm/dd/yyyy</div>
+			    <div class="usa-date-picker">
+				<input
+				class="usa-input"
+				id="end-date"
+				name="end-date"
+				aria-labelledby="end-date-label"
+				aria-describedby="end-date-hint"
+				/>
+			    </div>
+			</div>
+		    </div>
+
+		    <button type="button" class="usa-accordion__button" aria-expanded="true" aria-controls="cognizant">
+			Cognizant or Oversight
+		    </button>
+		    <div id="cognizant">
+			<label class="usa-label" for="options">Dropdown label</label>
+			<select class="usa-select" name="cog-or-oversight" id="options">
+			    <option value>- Select -</option>
+			    <option value="cog">Cognizant</option>
+			    <option value="oversight">Oversight</option>
+			</select>
+
+			<label class="usa-label" for="agency-name">Name of federal agency</label>
+			<input
+			    class="usa-input"
+			    id="agency-name"
+			    name="agency-name"
+			/>
+		    </div>
+		</div>
+		
+		<div class="search-submit">
+		    <input class="usa-button" type="submit" value="Search" />
+		    <button class="usa-button usa-button--unstyled">Reset Search</button>
+		</div>
+	    </form>
+	</div>
+	<div class="tablet:grid-col-8 audit-search-results">
+	    <h2>Search single audit reports</h2>
+	</div>
+    </div>
+</div>
+
+{% endblock %}
