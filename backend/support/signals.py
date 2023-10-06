@@ -23,7 +23,7 @@ def post_cog_assignment(sender, instance, created, **kwargs):
             baseline.is_active = False
             baseline.save()
         CognizantBaseline(
-            ein=ein, uei=uei, cognizant_agency=cognizant_agency, source="GSA"
+            ein=ein, uei=uei, cognizant_agency=cognizant_agency, source="GSAFAC"
         ).save()
 
         try:

@@ -1,5 +1,5 @@
 from django.db import models
-
+from datetime import datetime 
 
 class CognizantBaseline(models.Model):
     dbkey = models.CharField(
@@ -28,7 +28,7 @@ class CognizantBaseline(models.Model):
     date_assigned = models.DateTimeField(
         # help_text = "Time when the cog agency was assigned to the entity",
         null=True,  # allow nulls in case history has nulls
-        auto_now_add=True,
+        default=datetime.now,
         verbose_name="Date Assigned",
     )
     is_active = models.BooleanField(
@@ -40,7 +40,7 @@ class CognizantBaseline(models.Model):
         # help_text = "Source of cognizant data",
         max_length=10,
         verbose_name="Source",
-        default="GSA",
+        default="GSAFAC",
     )
 
 
@@ -56,7 +56,7 @@ ASSIGNMENT_TYPES = (
 
 
 class CognizantAssignment(models.Model):
-    report_id = models.CharField()
+    report_id = models.CharField(max_length=17)
     cognizant_agency = models.CharField(
         # "Two digit Federal agency prefix of the cognizant agency",
         max_length=2,
