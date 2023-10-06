@@ -44,7 +44,7 @@ jobs:
           backend_config: >
             access_key=${{ secrets.terraform_AWS_ACCESS_KEY_ID }},
             secret_key=${{ secrets.terraform_AWS_SECRET_ACCESS_KEY }}
-            endpoint=${{ secrets.terraform_ENDPOINT }},
+            endpoint=https://${{ secrets.terraform_ENDPOINT }},
             bucket=${{ secrets.terraform_BUCKET }},
             region=${{ secrets.terraform_REGION }},
             key=${{ env.KEY }},
