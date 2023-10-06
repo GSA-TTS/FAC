@@ -134,6 +134,9 @@ jobs:
       - name: Remove node_modules/ so cypress-io/github-action@v6 works
         run: sudo rm -rf /home/runner/work/FAC/FAC/backend/node_modules/
 
+      - name: Create .env file
+        run: touch .env
+
       - name: Run Cypress full submission test
         uses: Wandalen/wretry.action@master
         with:
