@@ -400,19 +400,7 @@ notes_to_sefa_column_mapping: ColumnMapping = {
 
 def _extract_generic_single_value(ir, name):
     """Extract a single value from the workbook with the defined name"""
-    # definition = workbook.defined_names[name]
-
-    # for sheet_title, cell_coord in definition.destinations:
-    #     sheet = workbook[sheet_title]
-    #     cell = sheet[cell_coord]
-
-    #     if not isinstance(cell, Cell):
-    #         raise ExcelExtractionError(
-    #             f"_extract_single_value expected type Cell, got {type(cell)}"
-    #         )
-
     v = get_range_by_name(ir, name)
-    print(name, v)
     return v["values"][0]
 
 def _extract_single_value(workbook, name):
@@ -543,6 +531,8 @@ def _extract_generic_column_data(workbook, result, params):
     ):
         for row, value in _extract_generic_column(workbook, name):
             print(row, value)
+            if value is None:
+                value = ""
             index = (row - params.header_row) - 1  # Make it zero-indexed
             set_fn(result, f"{parent_target}[{index}].{field_target}", value)
         # Handle null entries when index/row is skipped in the first column
