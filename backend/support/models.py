@@ -1,5 +1,6 @@
 from django.db import models
 
+
 class CognizantBaseline(models.Model):
     dbkey = models.CharField(
         # help_text = "Identifier for a submission along with audit_year in Census FAC",
