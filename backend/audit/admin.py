@@ -10,21 +10,25 @@ class SACAdmin(admin.ModelAdmin):
     def has_view_permission(self, request, obj=None):
         return request.user.is_staff
 
-    list_display = ("id", "report_id")
+    list_display = (
+        "id",
+        "report_id",
+        "cognizant_agency",
+        "oversight_agency",
+    )
+    list_filter = [
+        "cognizant_agency",
+        "oversight_agency",
+    ]
+
     fields = (
         "report_id",
         (
-            "Cog_Agency",
-            "OSight_Agency",
+            "cognizant_agency",
+            "oversight_agency",
         ),
         "general_information",
     )
-
-    def Cog_Agency(self, obj):
-        return obj.cognizant_agency
-
-    def OSight_Agency(self, obj):
-        return obj.oversight_agency
 
 
 class AccessAdmin(admin.ModelAdmin):
