@@ -1,6 +1,6 @@
 import logging
 
-from django.core.exceptions import BadRequest, PermissionDenied
+from django.core.exceptions import BadRequest, PermissionDenied, ValidationError
 from django.shortcuts import render, redirect
 from django.views import generic
 from django.urls import reverse
@@ -121,61 +121,43 @@ class UploadReportView(SingleAuditChecklistAccessRequiredMixin, generic.View):
             sac = SingleAuditChecklist.objects.get(report_id=report_id)
             form = UploadReportForm(request.POST, request.FILES)
 
-            if form.is_valid():
-                file = request.FILES["upload_report"]
-
-                component_page_numbers = {
-                    "financial_statements": form.cleaned_data["financial_statements"],
-                    "financial_statements_opinion": form.cleaned_data[
-                        "financial_statements_opinion"
-                    ],
-                    "schedule_expenditures": form.cleaned_data["schedule_expenditures"],
-                    "schedule_expenditures_opinion": form.cleaned_data[
-                        "schedule_expenditures_opinion"
-                    ],
-                    "uniform_guidance_control": form.cleaned_data[
-                        "uniform_guidance_control"
-                    ],
-                    "uniform_guidance_compliance": form.cleaned_data[
-                        "uniform_guidance_compliance"
-                    ],
-                    "GAS_control": form.cleaned_data["GAS_control"],
-                    "GAS_compliance": form.cleaned_data["GAS_compliance"],
-                    "schedule_findings": form.cleaned_data["schedule_findings"],
-                    # These two fields are optional on the part of the submitter
-                    "schedule_prior_findings": form.cleaned_data[
-                        "schedule_prior_findings"
-                    ]
-                    or None,
-                    "CAP_page": form.cleaned_data["CAP_page"] or None,
-                }
-
-                sar_file = SingleAuditReportFile(
-                    **{
-                        "component_page_numbers": component_page_numbers,
-                        "file": file,
-                        "filename": file.name,
-                        "sac_id": sac.id,
-                    }
-                )
-
-                sar_file.full_clean()
-                sar_file.save(
-                    event_user=request.user,
-                    event_type=SubmissionEvent.EventType.AUDIT_REPORT_PDF_UPDATED,
-                )
-
-                # PDF issues can be communicated to the user with form.errors["upload_report"]
-                return redirect(reverse("audit:SubmissionProgress", args=[report_id]))
+            # Standard context always needed on this page
             context = {
                 "auditee_name": sac.auditee_name,
                 "report_id": report_id,
                 "auditee_uei": sac.auditee_uei,
                 "user_provided_organization_type": sac.user_provided_organization_type,
                 "page_number_inputs": self.page_number_inputs(),
-                "form": form,
             }
-            return render(request, "audit/upload-report.html", context)
+
+            if form.is_valid():
+                file = request.FILES["upload_report"]
+                sar_file = self.reformat_form_data(file, form, sac.id)
+
+                # Try to save the formatted form data. If it fails on the file
+                # (encryption issues, file size issues), add and pass back the file errors.
+                # If it fails due to something else, re-raise it to be handled further below.
+                try:
+                    sar_file.full_clean()
+                    sar_file.save(
+                        event_user=request.user,
+                        event_type=SubmissionEvent.EventType.AUDIT_REPORT_PDF_UPDATED,
+                    )
+                except ValidationError as err:
+                    for issue in err.error_dict.get("file"):
+                        form.add_error("upload_report", issue)
+                    return render(
+                        request, "audit/upload-report.html", context | {"form": form}
+                    )
+                except Exception as err:
+                    raise err
+
+                # Form data saved, redirect to checklist.
+                return redirect(reverse("audit:SubmissionProgress", args=[report_id]))
+
+            # form.is_valid() failed (standard Django issues). Show the errors.
+            return render(request, "audit/upload-report.html", context | {"form": form})
+
         except SingleAuditChecklist.DoesNotExist as err:
             raise PermissionDenied("You do not have access to this audit.") from err
         except LateChangeError:
@@ -184,3 +166,42 @@ class UploadReportView(SingleAuditChecklistAccessRequiredMixin, generic.View):
         except Exception as err:
             logger.info("Unexpected error in UploadReportView post:\n %s", err)
             raise BadRequest() from err
+
+    def reformat_form_data(self, file, form, report_id):
+        """
+        Given the file, form, and report_id, return the formatted SingleAuditReportFile.
+        Maps cleaned form data into an object to be passed alongside the file, filename, and report id.
+        """
+
+        component_page_numbers = {
+            "financial_statements": form.cleaned_data["financial_statements"],
+            "financial_statements_opinion": form.cleaned_data[
+                "financial_statements_opinion"
+            ],
+            "schedule_expenditures": form.cleaned_data["schedule_expenditures"],
+            "schedule_expenditures_opinion": form.cleaned_data[
+                "schedule_expenditures_opinion"
+            ],
+            "uniform_guidance_control": form.cleaned_data["uniform_guidance_control"],
+            "uniform_guidance_compliance": form.cleaned_data[
+                "uniform_guidance_compliance"
+            ],
+            "GAS_control": form.cleaned_data["GAS_control"],
+            "GAS_compliance": form.cleaned_data["GAS_compliance"],
+            "schedule_findings": form.cleaned_data["schedule_findings"],
+            # These two fields are optional on the part of the submitter
+            "schedule_prior_findings": form.cleaned_data["schedule_prior_findings"]
+            or None,
+            "CAP_page": form.cleaned_data["CAP_page"] or None,
+        }
+
+        sar_file = SingleAuditReportFile(
+            **{
+                "component_page_numbers": component_page_numbers,
+                "file": file,
+                "filename": file.name,
+                "sac_id": report_id,
+            }
+        )
+
+        return sar_file
