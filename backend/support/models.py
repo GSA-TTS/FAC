@@ -1,5 +1,4 @@
 from django.db import models
-from datetime import datetime 
 
 class CognizantBaseline(models.Model):
     dbkey = models.CharField(
@@ -28,7 +27,6 @@ class CognizantBaseline(models.Model):
     date_assigned = models.DateTimeField(
         # help_text = "Time when the cog agency was assigned to the entity",
         null=True,  # allow nulls in case history has nulls
-        # default=datetime.now,
         default=True,
         verbose_name="Date Assigned",
     )

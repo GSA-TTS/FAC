@@ -5,6 +5,8 @@ from django.dispatch import receiver
 from audit.models import SingleAuditChecklist
 from dissemination.models import General
 from support.models import CognizantAssignment, CognizantBaseline
+# from datetime import datetime 
+from django.utils import timezone
 
 
 @receiver(post_save, sender=CognizantAssignment)
@@ -23,7 +25,7 @@ def post_cog_assignment(sender, instance, created, **kwargs):
             baseline.is_active = False
             baseline.save()
         CognizantBaseline(
-            ein=ein, uei=uei, cognizant_agency=cognizant_agency, source="GSAFAC"
+            ein=ein, uei=uei, cognizant_agency=cognizant_agency, date_assigned=timezone.now(), source="GSAFAC"
         ).save()
 
         try:
