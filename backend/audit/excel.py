@@ -1,6 +1,7 @@
 from collections import namedtuple
 import re
 import json
+import logging
 from django.conf import settings
 from typing import Any, Callable
 from openpyxl import load_workbook, Workbook
@@ -19,6 +20,8 @@ from audit.fixtures.excel import (
 )
 from audit.utils import ExcelExtractionError
 import pydash
+
+logger = logging.getLogger(__name__)
 
 
 AWARD_ENTITY_NAME_PATH = (
@@ -64,13 +67,18 @@ def _set_pass_through_entity_name(obj, target, value):
 
 
 def _set_pass_through_entity_id(obj, target, value):
-    for index, v in enumerate(value.split("|")):
-        _set_by_path(obj, f"{target}[{index}].passthrough_identifying_number", v)
-
+    for index, v in enumerate(str(value).split("|")):
+        _set_by_path(obj, f"{target}[{index}].passthrough_identifying_number", str(v).strip())
 
 meta_mapping: FieldMapping = {
     SECTION_NAME: (f"Meta.{SECTION_NAME}", _set_by_path),
 }
+
+new_federal_awards_field_mapping: FieldMapping = {
+    "auditee_uei": ("FederalAwards.auditee_uei", _set_by_path),
+    "total_amount_expended": ("FederalAwards.total_amount_expended", _set_by_path),
+}
+
 federal_awards_field_mapping: FieldMapping = {
     "auditee_uei": ("FederalAwards.auditee_uei", _set_by_path),
     "total_amount_expended": ("FederalAwards.total_amount_expended", _set_by_path),
@@ -390,6 +398,23 @@ notes_to_sefa_column_mapping: ColumnMapping = {
 }
 
 
+def _extract_generic_single_value(ir, name):
+    """Extract a single value from the workbook with the defined name"""
+    # definition = workbook.defined_names[name]
+
+    # for sheet_title, cell_coord in definition.destinations:
+    #     sheet = workbook[sheet_title]
+    #     cell = sheet[cell_coord]
+
+    #     if not isinstance(cell, Cell):
+    #         raise ExcelExtractionError(
+    #             f"_extract_single_value expected type Cell, got {type(cell)}"
+    #         )
+
+    v = get_range_by_name(ir, name)
+    print(name, v)
+    return v["values"][0]
+
 def _extract_single_value(workbook, name):
     """Extract a single value from the workbook with the defined name"""
     definition = workbook.defined_names[name]
@@ -405,6 +430,10 @@ def _extract_single_value(workbook, name):
 
         return cell.value
 
+def _extract_generic_column(workbook, name):
+    range = get_range_by_name(workbook, name)
+    start_index = int(range["start_cell"]["row"])
+    return enumerate(range["values"], start_index)
 
 def _extract_column(workbook, name):
     """Extacts a column of values from the workbook with the defined name"""
@@ -457,6 +486,17 @@ def _get_entries_by_path(dictionary, path):
             return []
     return val
 
+def _extract_generic_data(ir, params) -> dict:
+    result: dict = {}
+    try:
+        _extract_generic_meta_and_field_data(ir, params, result)
+        if result.get("Meta", {}).get(SECTION_NAME) == params.section:
+            _extract_generic_column_data(ir, result, params)
+        return result
+
+    except AttributeError as e:
+        raise ExcelExtractionError(e)
+        
 
 def _extract_data(file, params: ExtractDataParams) -> dict:
     """
@@ -480,6 +520,13 @@ def _extract_data(file, params: ExtractDataParams) -> dict:
     except AttributeError as e:
         raise ExcelExtractionError(e)
 
+def _extract_generic_meta_and_field_data(workbook, params, result):
+    for name, (target, set_fn) in params.meta_mapping.items():
+        set_fn(result, target, _extract_generic_single_value(workbook, name))
+
+    for name, (target, set_fn) in params.field_mapping.items():
+        set_fn(result, target, _extract_generic_single_value(workbook, name))
+
 
 def _extract_meta_and_field_data(workbook, params, result):
     for name, (target, set_fn) in params.meta_mapping.items():
@@ -488,6 +535,24 @@ def _extract_meta_and_field_data(workbook, params, result):
     if result.get("Meta", {}).get(SECTION_NAME) == params.section:
         for name, (target, set_fn) in params.field_mapping.items():
             set_fn(result, target, _extract_single_value(workbook, name))
+
+
+def _extract_generic_column_data(workbook, result, params):
+    for i, (name, (parent_target, field_target, set_fn)) in enumerate(
+        params.column_mapping.items()
+    ):
+        for row, value in _extract_generic_column(workbook, name):
+            print(row, value)
+            index = (row - params.header_row) - 1  # Make it zero-indexed
+            set_fn(result, f"{parent_target}[{index}].{field_target}", value)
+        # Handle null entries when index/row is skipped in the first column
+        if i == 0:
+            entries = [
+                entry if entry is not None else {}
+                for entry in _get_entries_by_path(result, parent_target)
+            ]
+            if entries:
+                set_fn(result, f"{parent_target}", entries)
 
 
 def _extract_column_data(workbook, result, params):
@@ -558,14 +623,138 @@ def _add_required_fields(data):
         # Update the federal_awards with all required fields
         data["FederalAwards"]["federal_awards"] = indexed_awards
 
+    logger.info(data)
+
     return data
 
+def abs_ref_to_cell(ref, ndx):
+    ref = ref.split(":")
+    if len(ref) > ndx:
+        parts = ref[ndx].split("$")
+        cell = {}
+        cell["column"] = parts[1]
+        cell["row"] = parts[2]
+        return cell
+    else:
+        return None
 
+# cell obj, cell obj, worksheet name
+def load_workbook_range(start_cell, end_cell, ws):
+    values = []
+    sc = f"${start_cell['column']}${start_cell['row']}"
+    ec = f"${end_cell['column']}${end_cell['row']}"
+    range_string = f"{sc}:{ec}"
+    for cell in ws[range_string]:
+        values.append(cell[0].value)
+    return values
+
+import pprint, json
+
+def most_common(lst):
+    return max(set(lst), key=lst.count)
+
+# Better to work from the end, and 
+# find the first row that is not None/0.
+def find_last_none(ls):
+    rev = list(reversed(ls))
+    ndx = len(rev)
+    for o in rev:
+        if ((isinstance(o, int) and (o != 0))
+            or
+            isinstance(o, str) and (o != "")):
+            return ndx
+        else:
+            ndx -= 1
+    # Exception
+    return 1
+
+
+def remove_null_rows(sheet):
+    ranges = sheet["ranges"]
+    values = map(lambda r: r["values"], ranges)
+    null_locations = []
+    for ls in values:
+        null_locations.append(find_last_none(ls))
+    cutpoint = max(null_locations)
+    print(f"CUTPOINT")
+    for r in ranges:
+        r["values"] = r["values"][:cutpoint]
+        if "end_cell" in r and r["end_cell"]:
+            c = r["end_cell"]
+            # Offset by the start row minus one
+            c["row"] = str(cutpoint + int(r["start_cell"]["row"]) - 1)
+
+def get_sheet_by_name(sheets, name):
+    for sheet in sheets:
+        if sheet["name"] == name:
+            return sheet
+        
+def get_range_by_name(sheets, name):
+    for sheet in sheets:
+        for range in sheet["ranges"]:
+            if range["name"] == name:
+                return range
+    return None
+
+def extract_workbook_as_ir(file):
+    workbook = _open_workbook(file)
+    by_name = {}
+    for named_range_name in workbook.defined_names:
+        dn = workbook.defined_names[named_range_name]
+        title, coord = next(dn.destinations)
+        range = {}
+        range["name"] = dn.name
+        range["start_cell"] = abs_ref_to_cell(coord, 0)
+        range["end_cell"] = abs_ref_to_cell(coord, 1)
+        if not range["end_cell"]:
+            coord = f"{coord}:{coord}"
+            range["end_cell"] = range["start_cell"]
+        range["values"] = load_workbook_range(range["start_cell"], 
+                                              range["end_cell"], 
+                                              workbook[title])
+        if title in by_name:
+            by_name[title].append(range)
+        else:
+            by_name[title] = [range]
+    
+    sheets = []
+    for name, ranges in by_name.items():
+        sheet = {}
+        sheet["name"] = name
+        sheet["ranges"] = ranges
+        sheets.append(sheet)
+
+    for sheet in sheets:
+        remove_null_rows(sheet)
+    # if get_sheet_by_name(sheets, "Form"):
+    #     pprint.pprint(get_sheet_by_name(sheets, "Form"))
+    # if get_sheet_by_name(sheets, "AdditionalNotes"):
+    #     pprint.pprint(get_sheet_by_name(sheets, "AdditionalNotes"))
+    # pprint.pprint(sheets)
+    return sheets
+
+# federal_awards_field_mapping: FieldMapping = {
+#     "auditee_uei": ("FederalAwards.auditee_uei", _set_by_path),
+#     "total_amount_expended": ("FederalAwards.total_amount_expended", _set_by_path),
+# }
 def extract_federal_awards(file):
     template_definition_path = (
         XLSX_TEMPLATE_DEFINITION_DIR / FEDERAL_AWARDS_TEMPLATE_DEFINITION
     )
     template = json.loads(template_definition_path.read_text(encoding="utf-8"))
+    # params = ExtractDataParams(
+    #     federal_awards_field_mapping,
+    #     federal_awards_column_mapping,
+    #     meta_mapping,
+    #     FORM_SECTIONS.FEDERAL_AWARDS_EXPENDED,
+    #     template["title_row"],
+    # )
+    
+    # result = _extract_data(file, params)
+    # result = _remove_empty_award_entries(result)
+    # result = _add_required_fields(result)
+    
+    workbook = extract_workbook_as_ir(file)
     params = ExtractDataParams(
         federal_awards_field_mapping,
         federal_awards_column_mapping,
@@ -573,9 +762,8 @@ def extract_federal_awards(file):
         FORM_SECTIONS.FEDERAL_AWARDS_EXPENDED,
         template["title_row"],
     )
-    result = _extract_data(file, params)
-    result = _remove_empty_award_entries(result)
-    result = _add_required_fields(result)
+    result = _extract_generic_data(workbook, params)
+    pprint.pprint(result, indent=2, width=80)
     return result
 
 
