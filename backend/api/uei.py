@@ -167,6 +167,5 @@ def get_uei_info_from_sam_gov(uei: str) -> dict:
     if resp.status_code != 200:
         error = f"SAM.gov API response status code invalid: {resp.status_code}"
         return {"valid": False, "errors": [error]}
-    print(resp.json())
 
     return parse_sam_uei_json(resp.json())
