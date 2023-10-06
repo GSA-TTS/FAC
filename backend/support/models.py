@@ -28,7 +28,8 @@ class CognizantBaseline(models.Model):
     date_assigned = models.DateTimeField(
         # help_text = "Time when the cog agency was assigned to the entity",
         null=True,  # allow nulls in case history has nulls
-        default=datetime.now,
+        # default=datetime.now,
+        default=True,
         verbose_name="Date Assigned",
     )
     is_active = models.BooleanField(
@@ -56,7 +57,7 @@ ASSIGNMENT_TYPES = (
 
 
 class CognizantAssignment(models.Model):
-    report_id = models.CharField(max_length=17)
+    report_id = models.CharField()
     cognizant_agency = models.CharField(
         # "Two digit Federal agency prefix of the cognizant agency",
         max_length=2,
