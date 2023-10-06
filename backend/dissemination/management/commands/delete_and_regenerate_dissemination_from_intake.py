@@ -17,7 +17,16 @@ from audit.models import SingleAuditChecklist
 logger = logging.getLogger(__name__)
 
 
+def delete_everything_in_dissemination_model(model):
+    model.objects.all().delete()
+
+
 class Command(BaseCommand):
+    """
+    Deletes everything in `dissemination` tables and
+    regenerates them from data in the intake tables.
+    """
+
     help = """
     Deletes everything in `dissemination` tables and
     regenerates them from data in the intake tables.
@@ -36,20 +45,22 @@ class Command(BaseCommand):
         SecondaryAuditor,
     ]
 
-    def delete_everything_in_dissemination_model(self, model):
-        model.objects.all().delete()
-
-    def handle(self, *args, **kwargs):
+    def handle(self, *args, **_kwargs):
         logger.info("Re-running dissemination for all records.")
 
         # Begin by deleting all of the dissemination table contents.
         for model in Command.dissemination_models:
-            logger.info(f"Deleting {model.__name__}")
-            self.delete_everything_in_dissemination_model(model)
+            logger.info("Deleting %s", model.__name__)
+            delete_everything_in_dissemination_model(model)
 
         # Now, re-run dissemination for everything
         # in the intake tables.
+        regen_statuses = (
+            SingleAuditChecklist.STATUS.DISSEMINATED,
+            SingleAuditChecklist.STATUS.SUBMITTED,
+        )
+
         for sac in SingleAuditChecklist.objects.all():
-            if sac.submission_status == SingleAuditChecklist.STATUS.DISSEMINATED:
-                logger.info(f"Disseminating {sac.report_id}")
+            if sac.submission_status in regen_statuses:
+                logger.info("Disseminating %s, ", sac.report_id)
                 sac.disseminate()
