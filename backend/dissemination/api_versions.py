@@ -11,7 +11,7 @@ live = [
 # These are API versions we have deprecated.
 # They will be removed. It should be safe to leave them
 # here for repeated runs.
-deprecated: List[str] = ["api"]
+deprecated: List[str] = ["api", "api_v1_0_0"]
 
 
 def get_conn_string():
