@@ -4,7 +4,27 @@ from audit.models import SingleAuditChecklist, Access, ExcelFile, SingleAuditRep
 
 
 class SACAdmin(admin.ModelAdmin):
+    def has_module_permission(self, request, obj=None):
+        return request.user.is_staff
+
+    def has_view_permission(self, request, obj=None):
+        return request.user.is_staff
+
     list_display = ("id", "report_id")
+    fields = (
+        "report_id",
+        (
+            "Cog_Agency",
+            "OSight_Agency",
+        ),
+        "general_information",
+    )
+
+    def Cog_Agency(self, obj):
+        return obj.cognizant_agency
+
+    def OSight_Agency(self, obj):
+        return obj.oversight_agency
 
 
 class AccessAdmin(admin.ModelAdmin):

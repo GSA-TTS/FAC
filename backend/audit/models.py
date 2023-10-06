@@ -390,13 +390,13 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
     )
 
     cognizant_agency = models.CharField(
-        "Agency assigned to this large submission. Computed when the submisson is finalized, but may be overridden",
+        # "Agency assigned to this large submission. Computed when the submisson is finalized, but may be overridden",
         max_length=2,
         blank=True,
         null=True,
     )
     oversight_agency = models.CharField(
-        "Agency assigned to this not so large submission. Computed when the submisson is finalized",
+        # "Agency assigned to this not so large submission. Computed when the submisson is finalized",
         max_length=2,
         blank=True,
         null=True,

@@ -5,9 +5,11 @@ from .models import CognizantBaseline, CognizantAssignment, AssignmentTypeCode
 
 
 class SupportAdmin(admin.ModelAdmin):
+    def has_module_permission(self, request, obj=None):
+        return request.user.is_staff
+
     def has_view_permission(self, request, obj=None):
-        if request.user.is_staff:
-            return True
+        return request.user.is_staff
 
     def has_delete_permission(self, request, obj=None):
         return False
@@ -22,12 +24,12 @@ class CognizantBaselineAdmin(SupportAdmin):
         "ein",
         "dbkey",
         "is_active",
+        "source",
     ]
     list_filter = [
         "is_active",
-        "uei",
+        "source",
         "cognizant_agency",
-        "ein",
     ]
 
     def has_change_permission(self, request, obj=None):
