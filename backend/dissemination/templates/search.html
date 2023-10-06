@@ -6,7 +6,8 @@
 <div class="grid-container">
     <div class="grid-row">
 	<div class="tablet:grid-col-4 audit-search-form">
-	    <form class="usa-form">
+	    <form class="usa-form" action="{% url 'dissemination:Search' %}" enctype='multipart/form-data' method="post">
+		{% csrf_token %}
 
 		<div class="search-submit">
 		    <input class="usa-button" type="submit" value="Search" />
@@ -22,7 +23,7 @@
 		    <textarea
 			class="usa-textarea"
 			id="entity-name"
-			name="input-type-textarea"
+			name="entity_name"
 			></textarea>
 		    <label for="uei-or-ein">
 			<button type="button" class="usa-accordion__button" aria-expanded="true" aria-controls="uei-or-ein">
@@ -32,7 +33,7 @@
 		    <textarea
 			class="usa-textarea"
 			id="uei-or-ein"
-			name="input-type-textarea"
+			name="uei_or_ein"
 			></textarea>
 		    <label for="aln">
 			<button type="button" class="usa-accordion__button" aria-expanded="true" aria-controls="aln">
@@ -42,7 +43,7 @@
 		    <textarea
 			class="usa-textarea"
 			id="aln"
-			name="input-type-textarea"
+			name="aln"
 			></textarea>
 
 		    <button type="button" class="usa-accordion__button" aria-expanded="true" aria-controls="fac-release-date">
@@ -58,7 +59,7 @@
 				<input
 				class="usa-input"
 				id="start-date"
-				name="start-date"
+				name="start_date"
 				aria-labelledby="start-date-label"
 				aria-describedby="start-date-hint"
 				/>
@@ -73,7 +74,7 @@
 				<input
 				class="usa-input"
 				id="end-date"
-				name="end-date"
+				name="end_date"
 				aria-labelledby="end-date-label"
 				aria-describedby="end-date-hint"
 				/>
@@ -86,7 +87,7 @@
 		    </button>
 		    <div id="cognizant">
 			<label class="usa-label" for="options">Dropdown label</label>
-			<select class="usa-select" name="cog-or-oversight" id="options">
+			<select class="usa-select" name="cog_or_oversight" id="options">
 			    <option value>- Select -</option>
 			    <option value="cog">Cognizant</option>
 			    <option value="oversight">Oversight</option>
@@ -96,7 +97,7 @@
 			<input
 			    class="usa-input"
 			    id="agency-name"
-			    name="agency-name"
+			    name="agency_name"
 			/>
 		    </div>
 		</div>

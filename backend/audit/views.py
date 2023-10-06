@@ -67,7 +67,6 @@ from audit.viewlib import (  # noqa
     TribalDataConsent,
     SubmissionProgressView,
     UploadReportView,
-    AuditSearchView,
     submission_progress_check,
 )
 
