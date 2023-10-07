@@ -1,12 +1,10 @@
 import pprint
 
-from .mapping_util import (
-    _open_workbook,
-    _get_entries_by_path
-    )
+from .mapping_util import _open_workbook, _get_entries_by_path
 from .exceptions import ExcelExtractionError
 from .constants import SECTION_NAME
 import time
+
 
 def _extract_generic_single_value(ir, name):
     """Extract a single value from the workbook with the defined name"""
@@ -24,7 +22,8 @@ def _extract_generic_data(ir, params) -> dict:
 
     except AttributeError as e:
         raise ExcelExtractionError(e)
-        
+
+
 def _extract_generic_column(workbook, name):
     range = get_range_by_name(workbook, name)
     start_index = int(range["start_cell"]["row"])
@@ -55,6 +54,7 @@ def _extract_generic_column_data(workbook, result, params):
             if entries:
                 set_fn(result, f"{parent_target}", entries)
 
+
 def abs_ref_to_cell(ref, ndx):
     ref = ref.split(":")
     if len(ref) > ndx:
@@ -66,6 +66,7 @@ def abs_ref_to_cell(ref, ndx):
     else:
         return None
 
+
 # cell obj, cell obj, worksheet name
 def load_workbook_range(start_cell, end_cell, ws):
     values = []
@@ -76,18 +77,18 @@ def load_workbook_range(start_cell, end_cell, ws):
         values.append(cell[0].value)
     return values
 
+
 def most_common(lst):
     return max(set(lst), key=lst.count)
 
-# Better to work from the end, and 
+
+# Better to work from the end, and
 # find the first row that is not None/0.
 def find_last_none(ls):
     rev = list(reversed(ls))
     ndx = len(rev)
     for o in rev:
-        if ((isinstance(o, int) and (o != 0))
-            or
-            isinstance(o, str) and (o != "")):
+        if (isinstance(o, int) and (o != 0)) or isinstance(o, str) and (o != ""):
             return ndx
         else:
             ndx -= 1
@@ -110,18 +111,21 @@ def remove_null_rows(sheet):
             # Offset by the start row minus one
             c["row"] = str(cutpoint + int(r["start_cell"]["row"]) - 1)
 
+
 def get_sheet_by_name(sheets, name):
     for sheet in sheets:
         print("SHEET", name)
         if sheet["name"] == name:
             return sheet
-        
+
+
 def get_range_by_name(sheets, name):
     for sheet in sheets:
         for range in sheet["ranges"]:
             if range["name"] == name:
                 return range
     return None
+
 
 def extract_workbook_as_ir(file):
     workbook = _open_workbook(file)
@@ -136,14 +140,14 @@ def extract_workbook_as_ir(file):
         if not range["end_cell"]:
             coord = f"{coord}:{coord}"
             range["end_cell"] = range["start_cell"]
-        range["values"] = load_workbook_range(range["start_cell"], 
-                                              range["end_cell"], 
-                                              workbook[title])
+        range["values"] = load_workbook_range(
+            range["start_cell"], range["end_cell"], workbook[title]
+        )
         if title in by_name:
             by_name[title].append(range)
         else:
             by_name[title] = [range]
-    
+
     sheets = []
     for name, ranges in by_name.items():
         sheet = {}

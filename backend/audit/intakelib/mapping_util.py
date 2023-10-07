@@ -15,8 +15,8 @@ from .constants import (
     AWARD_ENTITY_NAME_PATH,
     AWARD_ENTITY_NAME_KEY,
     AWARD_ENTITY_ID_PATH,
-    AWARD_ENTITY_ID_KEY
-    )
+    AWARD_ENTITY_ID_KEY,
+)
 
 from .exceptions import ExcelExtractionError
 
@@ -25,8 +25,9 @@ logger = logging.getLogger(__name__)
 
 NoneType = type(None)
 
+
 def _set_by_path_with_default(default=None):
-    def _no_op(_, __, ___): 
+    def _no_op(_, __, ___):
         pass
 
     def _new_set_by_path(target_obj, target_path, value):
@@ -36,13 +37,16 @@ def _set_by_path_with_default(default=None):
             return _set_by_path(target_obj, target_path, value)
         else:
             return _no_op
+
     return _new_set_by_path
+
 
 def _set_by_path(target_obj, target_path, value):
     if isinstance(value, NoneType):
         pass
     else:
         pydash.set_(target_obj, target_path, value)
+
 
 """
 Defines the parameters for extracting data from an Excel file and mapping it to a JSON object
@@ -130,7 +134,8 @@ def _extract_single_value(workbook, name):
             )
 
         return cell.value
-    
+
+
 def _extract_data(file, params: ExtractDataParams) -> dict:
     """
     Extracts data from an Excel file using provided field and column mappings
@@ -153,6 +158,7 @@ def _extract_data(file, params: ExtractDataParams) -> dict:
     except AttributeError as e:
         raise ExcelExtractionError(e)
 
+
 def _extract_meta_and_field_data(workbook, params, result):
     for name, (target, set_fn) in params.meta_mapping.items():
         set_fn(result, target, _extract_single_value(workbook, name))
@@ -160,7 +166,6 @@ def _extract_meta_and_field_data(workbook, params, result):
     if result.get("Meta", {}).get(SECTION_NAME) == params.section:
         for name, (target, set_fn) in params.field_mapping.items():
             set_fn(result, target, _extract_single_value(workbook, name))
-
 
 
 def _extract_column_data(workbook, result, params):
@@ -184,6 +189,7 @@ def _extract_column_data(workbook, result, params):
 def _has_only_one_field_with_value_0(my_dict, field_name):
     """Check if the dictionary has exactly one field with the provided name and its value is 0"""
     return len(my_dict) == 1 and my_dict.get(field_name) == 0
+
 
 def _remove_empty_award_entries(data):
     """Removes empty award entries from the data"""
@@ -209,6 +215,7 @@ def _remove_empty_award_entries(data):
 
     return data
 
+
 def _add_required_fields(data):
     """Adds empty parent fields to the json object to allow for proper schema validation / indexing"""
     indexed_awards = []
@@ -233,6 +240,7 @@ def _add_required_fields(data):
 
     return data
 
+
 def _extract_from_column_mapping(path, row_index, column_mapping, match=None):
     """Extract named ranges from column mapping"""
     for key, value in column_mapping.items():
@@ -243,6 +251,7 @@ def _extract_from_column_mapping(path, row_index, column_mapping, match=None):
             return key, row_index
     return None, None
 
+
 def _extract_from_field_mapping(path, field_mapping, match=None):
     """Extract named ranges from field mapping"""
     for key, value in field_mapping.items():
@@ -252,6 +261,7 @@ def _extract_from_field_mapping(path, field_mapping, match=None):
             return key, None
     return None, None
 
+
 def _extract_error_details(error):
     if not bool(error.path):
         print("No path found in error object")
@@ -260,6 +270,7 @@ def _extract_error_details(error):
     path = ".".join([item for item in error.path if not isinstance(item, int)])
     match = re.search(r"'(\w+)'", error.message) if error.message else None
     return path, row_index, match
+
 
 def _extract_key_from_award_entities(path, row_index, named_ranges):
     if path in [AWARD_ENTITY_NAME_PATH, AWARD_ENTITY_ID_PATH]:
@@ -271,6 +282,7 @@ def _extract_key_from_award_entities(path, row_index, named_ranges):
         named_ranges.append((key, row_index))
         return key
     return None
+
 
 def _extract_named_ranges(errors, column_mapping, field_mapping, meta_mapping):
     """Extract named ranges from column mapping and errors"""

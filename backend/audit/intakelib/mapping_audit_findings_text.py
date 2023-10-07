@@ -7,9 +7,7 @@ from audit.fixtures.excel import (
     FORM_SECTIONS,
 )
 
-from .constants import (
-    XLSX_TEMPLATE_DEFINITION_DIR
-)
+from .constants import XLSX_TEMPLATE_DEFINITION_DIR
 
 from audit.fixtures.excel import (
     FORM_SECTIONS,
@@ -49,10 +47,15 @@ def extract_audit_findings_text(file):
     result = _extract_generic_data(workbook, params)
     return result
 
+
 def audit_findings_text_named_ranges(errors):
     return _extract_named_ranges(
-        errors, audit_findings_text_column_mapping, audit_findings_text_field_mapping, meta_mapping
+        errors,
+        audit_findings_text_column_mapping,
+        audit_findings_text_field_mapping,
+        meta_mapping,
     )
+
 
 audit_findings_text_field_mapping: FieldMapping = {
     "auditee_uei": ("FindingsText.auditee_uei", _set_by_path),

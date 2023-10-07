@@ -1,6 +1,8 @@
 from django.core.exceptions import ValidationError
 import logging
+
 logger = logging.getLogger(__name__)
+
 
 def run_general_checks(ir):
     errors = []
@@ -11,6 +13,7 @@ def run_general_checks(ir):
     if len(errors) > 0:
         logger.info(f"Raising {len(errors)} IR validation error(s).")
         raise ValidationError(errors)
+
 
 def run_all_checks(ir, list_of_checks):
     errors = []
@@ -31,16 +34,15 @@ def run_all_checks(ir, list_of_checks):
 def run_all_federal_awards_checks(ir):
     run_all_checks(ir, federal_awards_checks)
 
+
 def run_all_notes_to_sefa_checks(ir):
     run_all_checks(ir, notes_to_sefa_checks)
+
 
 from .check_uei_exists import uei_exists
 from .check_is_a_workbook import is_a_workbook
 
-general_checks = [
-    is_a_workbook,
-    uei_exists
-]
+general_checks = [is_a_workbook, uei_exists]
 
 from .check_is_right_workbook import is_right_workbook
 from .check_state_cluster_names import state_cluster_names
@@ -55,7 +57,7 @@ federal_awards_checks = general_checks + [
     other_cluster_names,
     direct_award_is_not_blank,
     passthrough_name_when_no_direct,
-    loan_guarantee
+    loan_guarantee,
 ]
 
 notes_to_sefa_checks = general_checks + [

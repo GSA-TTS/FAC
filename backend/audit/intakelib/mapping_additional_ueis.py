@@ -7,9 +7,7 @@ from audit.fixtures.excel import (
     FORM_SECTIONS,
 )
 
-from .constants import (
-    XLSX_TEMPLATE_DEFINITION_DIR
-)
+from .constants import XLSX_TEMPLATE_DEFINITION_DIR
 
 from audit.fixtures.excel import (
     FORM_SECTIONS,
@@ -30,6 +28,8 @@ from .mapping_util import (
 from .mapping_meta import meta_mapping
 
 logger = logging.getLogger(__name__)
+
+
 def extract_additional_ueis(file):
     template_definition_path = (
         XLSX_TEMPLATE_DEFINITION_DIR / ADDITIONAL_UEIS_TEMPLATE_DEFINITION
@@ -46,6 +46,7 @@ def extract_additional_ueis(file):
     result = _extract_generic_data(workbook, params)
     return result
 
+
 def additional_ueis_named_ranges(errors):
     return _extract_named_ranges(
         errors,
@@ -53,6 +54,7 @@ def additional_ueis_named_ranges(errors):
         additional_ueis_field_mapping,
         meta_mapping,
     )
+
 
 additional_ueis_field_mapping: FieldMapping = {
     "auditee_uei": ("AdditionalUEIs.auditee_uei", _set_by_path),

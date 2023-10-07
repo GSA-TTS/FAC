@@ -7,9 +7,7 @@ from audit.fixtures.excel import (
     FORM_SECTIONS,
 )
 
-from .constants import (
-    XLSX_TEMPLATE_DEFINITION_DIR
-)
+from .constants import XLSX_TEMPLATE_DEFINITION_DIR
 
 from audit.fixtures.excel import (
     FORM_SECTIONS,
@@ -32,6 +30,8 @@ from .intermediate_representation import (
 )
 
 logger = logging.getLogger(__name__)
+
+
 def extract_secondary_auditors(file):
     template_definition_path = (
         XLSX_TEMPLATE_DEFINITION_DIR / SECONDARY_AUDITORS_TEMPLATE_DEFINITION
@@ -47,6 +47,7 @@ def extract_secondary_auditors(file):
     workbook = extract_workbook_as_ir(file)
     result = _extract_generic_data(workbook, params)
     return result
+
 
 def secondary_auditors_named_ranges(errors):
     return _extract_named_ranges(

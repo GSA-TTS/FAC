@@ -7,9 +7,7 @@ from audit.fixtures.excel import (
     FORM_SECTIONS,
 )
 
-from .constants import (
-    XLSX_TEMPLATE_DEFINITION_DIR
-)
+from .constants import XLSX_TEMPLATE_DEFINITION_DIR
 
 from audit.fixtures.excel import (
     FORM_SECTIONS,
@@ -21,7 +19,8 @@ from .intermediate_representation import (
 )
 
 from .mapping_util import (
-    _set_by_path,FieldMapping,
+    _set_by_path,
+    FieldMapping,
     ColumnMapping,
     ExtractDataParams,
     _extract_named_ranges,
@@ -30,6 +29,7 @@ from .mapping_util import (
 from .mapping_meta import meta_mapping
 
 logger = logging.getLogger(__name__)
+
 
 def extract_corrective_action_plan(file):
     template_definition_path = (
@@ -47,6 +47,7 @@ def extract_corrective_action_plan(file):
     result = _extract_generic_data(workbook, params)
     return result
 
+
 def corrective_action_plan_named_ranges(errors):
     return _extract_named_ranges(
         errors,
@@ -54,6 +55,7 @@ def corrective_action_plan_named_ranges(errors):
         corrective_action_field_mapping,
         meta_mapping,
     )
+
 
 corrective_action_field_mapping: FieldMapping = {
     "auditee_uei": ("CorrectiveActionPlan.auditee_uei", _set_by_path),

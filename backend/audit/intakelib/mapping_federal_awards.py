@@ -13,12 +13,12 @@ from audit.fixtures.excel import (
     FORM_SECTIONS,
 )
 
-from .constants import (    
+from .constants import (
     XLSX_TEMPLATE_DEFINITION_DIR,
     FEDERAL_AGENCY_PREFIX,
     THREE_DIGIT_EXTENSION,
     AWARD_ENTITY_ID_KEY,
-    AWARD_ENTITY_NAME_KEY
+    AWARD_ENTITY_NAME_KEY,
 )
 
 from .mapping_util import (
@@ -28,7 +28,7 @@ from .mapping_util import (
     ColumnMapping,
     ExtractDataParams,
     _extract_named_ranges,
-    NoneType
+    NoneType,
 )
 
 from .intermediate_representation import (
@@ -41,12 +41,14 @@ from .mapping_meta import meta_mapping
 from .checks import run_all_federal_awards_checks
 
 logger = logging.getLogger(__name__)
+
+
 def extract_federal_awards(file):
     template_definition_path = (
         XLSX_TEMPLATE_DEFINITION_DIR / FEDERAL_AWARDS_TEMPLATE_DEFINITION
     )
     template = json.loads(template_definition_path.read_text(encoding="utf-8"))
-    
+
     params = ExtractDataParams(
         federal_awards_field_mapping,
         federal_awards_column_mapping,
@@ -54,7 +56,7 @@ def extract_federal_awards(file):
         FORM_SECTIONS.FEDERAL_AWARDS_EXPENDED,
         template["title_row"],
     )
-    
+
     ir = extract_workbook_as_ir(file)
     run_all_federal_awards_checks(ir)
     logger.info("After an exception raised...")
@@ -70,6 +72,7 @@ def federal_awards_named_ranges(errors):
         meta_mapping,
     )
 
+
 def _set_pass_through_entity_name(obj, target, value):
     if isinstance(value, NoneType) or value == "":
         pass
@@ -83,13 +86,17 @@ def _set_pass_through_entity_id(obj, target, value):
         pass
     else:
         for index, v in enumerate(str(value).split("|")):
-            _set_by_path(obj, f"{target}[{index}].passthrough_identifying_number", str(v).strip())
+            _set_by_path(
+                obj, f"{target}[{index}].passthrough_identifying_number", str(v).strip()
+            )
+
 
 def _do_not_set_if_0(obj, target, value):
     if value == 0:
         pass
     else:
         _set_by_path(obj, target, value)
+
 
 new_federal_awards_field_mapping: FieldMapping = {
     "auditee_uei": ("FederalAwards.auditee_uei", _set_by_path),

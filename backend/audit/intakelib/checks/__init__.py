@@ -58,13 +58,8 @@ And an example with-errors return value is:
 
 """
 
-from .runners import (
-    run_all_federal_awards_checks,
-    run_all_notes_to_sefa_checks
-) 
+from .runners import run_all_federal_awards_checks, run_all_notes_to_sefa_checks
 
 from .check_this_always_returns_true import this_always_returns_true
 
-all_workbook_checks = [
-    this_always_returns_true
-]
+all_workbook_checks = [this_always_returns_true]

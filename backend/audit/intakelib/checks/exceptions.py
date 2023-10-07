@@ -1,9 +1,8 @@
-    
 class CheckIRError(Exception):
     def __init__(
         self,
         message="If you see this validation error, please contact the helpdesk and include your workbook(s).",
-        error_location="Unknown location"
+        error_location="Unknown location",
     ):
         self.message = message
         self.error_location = error_location

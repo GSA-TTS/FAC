@@ -7,9 +7,7 @@ from audit.fixtures.excel import (
     FORM_SECTIONS,
 )
 
-from .constants import (
-    XLSX_TEMPLATE_DEFINITION_DIR
-)
+from .constants import XLSX_TEMPLATE_DEFINITION_DIR
 
 from audit.fixtures.excel import (
     FORM_SECTIONS,
@@ -33,6 +31,8 @@ from .mapping_meta import meta_mapping
 from .checks import run_all_notes_to_sefa_checks
 
 logger = logging.getLogger(__name__)
+
+
 def extract_notes_to_sefa(file):
     template_definition_path = (
         XLSX_TEMPLATE_DEFINITION_DIR / NOTES_TO_SEFA_TEMPLATE_DEFINITION
@@ -50,10 +50,12 @@ def extract_notes_to_sefa(file):
     result = _extract_generic_data(workbook, params)
     return result
 
+
 def notes_to_sefa_named_ranges(errors):
     return _extract_named_ranges(
         errors, notes_to_sefa_column_mapping, notes_to_sefa_field_mapping, meta_mapping
     )
+
 
 notes_to_sefa_field_mapping: FieldMapping = {
     "auditee_uei": ("NotesToSefa.auditee_uei", _set_by_path),

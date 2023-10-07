@@ -1,4 +1,3 @@
-
 from .constants import (
     SECTION_NAME,
 )

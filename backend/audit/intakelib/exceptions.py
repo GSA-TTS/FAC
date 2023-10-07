@@ -1,4 +1,3 @@
-    
 class ExcelExtractionError(Exception):
     def __init__(
         self,
