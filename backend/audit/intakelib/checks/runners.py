@@ -50,6 +50,7 @@ from .check_other_cluster_names import other_cluster_names
 from .check_direct_award_is_not_blank import direct_award_is_not_blank
 from .check_passthrough_name_when_no_direct import passthrough_name_when_no_direct
 from .check_loan_guarantee import loan_guarantee
+from .check_no_major_program_no_type import no_major_program_no_type
 
 federal_awards_checks = general_checks + [
     is_right_workbook("FederalAwardsExpended"),
@@ -58,6 +59,7 @@ federal_awards_checks = general_checks + [
     direct_award_is_not_blank,
     passthrough_name_when_no_direct,
     loan_guarantee,
+    no_major_program_no_type
 ]
 
 notes_to_sefa_checks = general_checks + [

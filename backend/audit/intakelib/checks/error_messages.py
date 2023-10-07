@@ -9,4 +9,8 @@ messages = {
     "check_loan_guarantee_empty_when_n": "When loan guarantee is <b>N</b>, outstanding balance must be empty",
     "check_loan_guarantee_present_when_y": "When loan guarantee is <b>Y</b>, there must be a loan balance",
     "check_is_right_workbook": "This is not the {} workbook",
+    "check_no_major_program_no_type_when_n":
+    "When major prorgam is <b>N</b>, leave audit report type blank",
+    "check_no_major_program_no_type_when_y":
+    "When major prorgam is <b>Y</b>, audit report type must be chosen",
 }
