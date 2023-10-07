@@ -15,15 +15,13 @@ STATE_CLUSTER = 'STATE CLUSTER'
 def state_cluster_names(ir):
     cluster_name = get_range_by_name(ir, "cluster_name")
     state_cluster_name = get_range_by_name(ir, "state_cluster_name")
-    other_cluster_name = get_range_by_name(ir, "other_cluster_name")
     
     errors = []
 
-    for ndx, cn, scn, ocn in zip(range(len(cluster_name["values"])), 
+    for ndx, cn, scn in zip(range(len(cluster_name["values"])), 
                                  cluster_name["values"],
                                  state_cluster_name["values"],
-                                 other_cluster_name["values"]):
-        print(ndx, cn, scn, ocn)
+                                 ):
 
         if (cn == STATE_CLUSTER):
             # If they indicated state cluster, then it should be populated.

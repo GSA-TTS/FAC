@@ -35,8 +35,12 @@ general_checks = [
 
 from .check_state_cluster_names import state_cluster_names
 from .check_other_cluster_names import other_cluster_names
+from .check_direct_award_is_not_blank import direct_award_is_not_blank
+from .check_passthrough_name_when_no_direct import passthrough_name_when_no_direct
 
 federal_awards_checks = general_checks + [
     state_cluster_names,
-    other_cluster_names
+    other_cluster_names,
+    direct_award_is_not_blank,
+    passthrough_name_when_no_direct
 ]

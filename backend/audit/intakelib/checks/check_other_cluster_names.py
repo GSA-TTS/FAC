@@ -13,14 +13,12 @@ OTHER_CLUSTER = 'OTHER CLUSTER NOT LISTED ABOVE'
 
 def other_cluster_names(ir):
     cluster_name = get_range_by_name(ir, "cluster_name")
-    state_cluster_name = get_range_by_name(ir, "state_cluster_name")
     other_cluster_name = get_range_by_name(ir, "other_cluster_name")
     
     errors = []
 
-    for ndx, cn, scn, ocn in zip(range(len(cluster_name["values"])), 
+    for ndx, cn, ocn in zip(range(len(cluster_name["values"])), 
                                  cluster_name["values"],
-                                 state_cluster_name["values"],
                                  other_cluster_name["values"]):
         if (cn == OTHER_CLUSTER):
             # If they indicated other cluster, then it should be populated.

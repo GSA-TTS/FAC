@@ -12,5 +12,11 @@ messages = {
     "You need to provide an altername cluster name when selecting OTHER CLUSTER",
 
     "check_other_cluster_names_no_other_cluster_needed":
-    "Other cluster must be blank unless you are selecting OTHER CLUSTER"
+    "Other cluster must be blank unless you are selecting OTHER CLUSTER",
+
+    "check_direct_award_is_not_blank":
+    "Direct award cannot be blank; it must be <b>Y</b> or <b>N</b>",
+
+    "check_passthrough_name_when_no_direct":
+    "If direct award is <b>N</b>, then you must provide a passthrough name"
 }
