@@ -23,13 +23,12 @@ from .constants import (
 
 from .mapping_util import (
     _set_by_path,
-    _set_pass_through_entity_name,
-    _set_pass_through_entity_id,
     _set_by_path_with_default,
     FieldMapping,
     ColumnMapping,
     ExtractDataParams,
     _extract_named_ranges,
+    NoneType
 )
 
 from .intermediate_representation import (
@@ -67,6 +66,28 @@ def federal_awards_named_ranges(errors):
         federal_awards_field_mapping,
         meta_mapping,
     )
+
+def _set_pass_through_entity_name(obj, target, value):
+    if isinstance(value, NoneType) or value == "":
+        pass
+    else:
+        print(f"PASSTHROUGH ENTITY NAME IS {value}")
+        for index, v in enumerate(str(value).split("|")):
+            _set_by_path(obj, f"{target}[{index}].passthrough_name", str(v).strip())
+
+
+def _set_pass_through_entity_id(obj, target, value):
+    if isinstance(value, NoneType) or value == "":
+        pass
+    else:
+        for index, v in enumerate(str(value).split("|")):
+            _set_by_path(obj, f"{target}[{index}].passthrough_identifying_number", str(v).strip())
+
+def _do_not_set_if_0(obj, target, value):
+    if value == 0:
+        pass
+    else:
+        _set_by_path(obj, target, value)
 
 new_federal_awards_field_mapping: FieldMapping = {
     "auditee_uei": ("FederalAwards.auditee_uei", _set_by_path),
@@ -162,7 +183,7 @@ federal_awards_column_mapping: ColumnMapping = {
     "subrecipient_amount": (
         "FederalAwards.federal_awards",
         "subrecipients.subrecipient_amount",
-        _set_by_path,
+        _do_not_set_if_0,
     ),
     "is_major": ("FederalAwards.federal_awards", "program.is_major", _set_by_path),
     "audit_report_type": (

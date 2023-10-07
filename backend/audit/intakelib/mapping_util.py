@@ -23,15 +23,6 @@ from .exceptions import ExcelExtractionError
 logger = logging.getLogger(__name__)
 
 
-def _set_pass_through_entity_name(obj, target, value):
-    for index, v in enumerate(str(value).split("|")):
-        _set_by_path(obj, f"{target}[{index}].passthrough_name", str(v).strip())
-
-
-def _set_pass_through_entity_id(obj, target, value):
-    for index, v in enumerate(str(value).split("|")):
-        _set_by_path(obj, f"{target}[{index}].passthrough_identifying_number", str(v).strip())
-
 NoneType = type(None)
 
 def _set_by_path_with_default(default=None):
@@ -41,9 +32,8 @@ def _set_by_path_with_default(default=None):
     def _new_set_by_path(target_obj, target_path, value):
         print(f"DEFAULT value coming in {value}")
         if (isinstance(value, NoneType) or (value == "")) and default is not None:
-            value = default
             print("Setting value to {default}")
-            return _set_by_path(target_obj, target_path, value)
+            return _set_by_path(target_obj, target_path, default)
         elif not isinstance(value, NoneType):
             print(f"Setting value to {value}")
             return _set_by_path(target_obj, target_path, value)
@@ -53,7 +43,8 @@ def _set_by_path_with_default(default=None):
 
 def _set_by_path(target_obj, target_path, value):
     if isinstance(value, NoneType):
-        pydash.set_(target_obj, target_path, "")
+        # pydash.set_(target_obj, target_path, "")
+        pass
     else:
         pydash.set_(target_obj, target_path, value)
 
