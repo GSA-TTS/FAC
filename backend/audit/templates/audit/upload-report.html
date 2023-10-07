@@ -9,6 +9,9 @@
                 <p>
                     All components of the audit report package must be merged into a single PDF file and meet the uniform guidelines below. For more information on PDF formatting, please review our PDF guidelines.
                 </p>
+                {% if form.errors %}
+                    <span class="usa-error-message" role="alert">There were errors when attempting to submit the form. Scroll down for more details.</span>
+                {% endif %}
             </div>
             <ol class="usa-process-list">
                 <form id="upload-report__form"
@@ -61,7 +64,7 @@
                                                {% if x.required %}required{% endif %}
                                                type="number"
                                                value="{{ form.cleaned_data | get_attr:x.id }}" />
-                                        <span class="usa-error-message tablet:grid-col-12">{{ form.errors | get_attr:x.id }}</span>
+                                        <span class="usa-error-message tablet:grid-col-12">{{ form.errors | get_attr:x.id | striptags }}</span>
                                     </div>
                                 {% endfor %}
                             </div>
@@ -79,7 +82,7 @@
                                    aria-describedby="file_input_upload_report"
                                    required
                                    type="file" />
-                            <span class="usa-error-message tablet:grid-col-12">{{ form.errors.upload_report }}</span>
+                            <span class="usa-error-message tablet:grid-col-12 margin-top-1">{{ form.errors.upload_report | striptags }}</span>
                         </li>
                     </fieldset>
                 {% if already_submitted %}
@@ -87,7 +90,7 @@
                         A file has already been uploaded for this section. A successful reupload will overwrite your previous submission.
                     </p>
                 {% endif %}
-                <button class="usa-button margin-bottom-8 margin-top-4" id="continue">{% if already_submitted %}Re-upload{% else %}Upload{% endif %} Single Audit Package</button>
+                <button class="usa-button margin-bottom-8 margin-top-5" id="continue">{% if already_submitted %}Re-upload{% else %}Upload{% endif %} Single Audit Package</button>
                 <a class="usa-button usa-button--unstyled margin-left-2" href="{% url 'audit:SubmissionProgress' report_id %}"
                     aria-controls="upload-cancel">Cancel</a>
                 </form>

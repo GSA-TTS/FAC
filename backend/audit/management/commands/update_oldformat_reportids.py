@@ -4,6 +4,10 @@ update_oldformat_report_ids command
 One-off idempotent command to take SAC instances that have the original report_id format
 (<startyear><startmonth3charabbr>GSA<count + 1000000>) and update their report_id
 to the new format (<endyear><endmonth2digit>GSAFAC<count>).
+
+Will fail with submissions that don't have an IN_PROGRESS status; we got around this
+before by hacking an override into the SingleAuditChecklist.save method but since
+removed it.
 """
 import calendar
 import logging
@@ -52,7 +56,7 @@ class Command(BaseCommand):
         parser.add_argument(
             "--reverse",
             action="store_true",
-            help="Switch to old-format report_ids instead.",
+            help="Does nothing; see command code for details.",
         )
 
     def handle(self, *args, **options):
