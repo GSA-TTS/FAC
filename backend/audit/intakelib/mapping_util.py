@@ -30,12 +30,9 @@ def _set_by_path_with_default(default=None):
         pass
 
     def _new_set_by_path(target_obj, target_path, value):
-        print(f"DEFAULT value coming in {value}")
         if (isinstance(value, NoneType) or (value == "")) and default is not None:
-            print("Setting value to {default}")
             return _set_by_path(target_obj, target_path, default)
         elif not isinstance(value, NoneType):
-            print(f"Setting value to {value}")
             return _set_by_path(target_obj, target_path, value)
         else:
             return _no_op
@@ -43,15 +40,9 @@ def _set_by_path_with_default(default=None):
 
 def _set_by_path(target_obj, target_path, value):
     if isinstance(value, NoneType):
-        # pydash.set_(target_obj, target_path, "")
         pass
     else:
         pydash.set_(target_obj, target_path, value)
-
-# def _set_by_path(target_obj, target_path, value):
-#     """Set a (potentially nested) field in target_obj using JSONPath-esque dot notation, e.g. parent.child[0].field"""
-#     pydash.set_(target_obj, target_path, value)
-
 
 """
 Defines the parameters for extracting data from an Excel file and mapping it to a JSON object

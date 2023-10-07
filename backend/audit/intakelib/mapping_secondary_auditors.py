@@ -22,10 +22,14 @@ from .mapping_util import (
     ColumnMapping,
     ExtractDataParams,
     _extract_named_ranges,
-    _extract_data
 )
 
 from .mapping_meta import meta_mapping
+
+from .intermediate_representation import (
+    extract_workbook_as_ir,
+    _extract_generic_data,
+)
 
 logger = logging.getLogger(__name__)
 def extract_secondary_auditors(file):
@@ -40,7 +44,9 @@ def extract_secondary_auditors(file):
         FORM_SECTIONS.SECONDARY_AUDITORS,
         template["title_row"],
     )
-    return _extract_data(file, params)
+    workbook = extract_workbook_as_ir(file)
+    result = _extract_generic_data(workbook, params)
+    return result
 
 def secondary_auditors_named_ranges(errors):
     return _extract_named_ranges(

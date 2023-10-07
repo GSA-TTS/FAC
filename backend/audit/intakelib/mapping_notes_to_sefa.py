@@ -22,7 +22,11 @@ from .mapping_util import (
     ColumnMapping,
     ExtractDataParams,
     _extract_named_ranges,
-    _extract_data
+)
+
+from .intermediate_representation import (
+    extract_workbook_as_ir,
+    _extract_generic_data,
 )
 
 from .mapping_meta import meta_mapping
@@ -40,7 +44,9 @@ def extract_notes_to_sefa(file):
         FORM_SECTIONS.NOTES_TO_SEFA,
         template["title_row"],
     )
-    return _extract_data(file, params)
+    workbook = extract_workbook_as_ir(file)
+    result = _extract_generic_data(workbook, params)
+    return result
 
 def notes_to_sefa_named_ranges(errors):
     return _extract_named_ranges(

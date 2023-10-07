@@ -14,6 +14,10 @@ from .constants import (
 from audit.fixtures.excel import (
     FORM_SECTIONS,
 )
+from .intermediate_representation import (
+    extract_workbook_as_ir,
+    _extract_generic_data,
+)
 
 from .mapping_util import (
     _set_by_path,
@@ -21,8 +25,8 @@ from .mapping_util import (
     ColumnMapping,
     ExtractDataParams,
     _extract_named_ranges,
-    _extract_data
 )
+
 from .mapping_meta import meta_mapping
 
 logger = logging.getLogger(__name__)
@@ -38,7 +42,9 @@ def extract_additional_ueis(file):
         FORM_SECTIONS.ADDITIONAL_UEIS,
         template["title_row"],
     )
-    return _extract_data(file, params)
+    workbook = extract_workbook_as_ir(file)
+    result = _extract_generic_data(workbook, params)
+    return result
 
 def additional_ueis_named_ranges(errors):
     return _extract_named_ranges(

@@ -34,10 +34,11 @@ from .mapping_util import (
 from .intermediate_representation import (
     extract_workbook_as_ir,
     _extract_generic_data,
-    get_sheet_by_name
 )
 
 from .mapping_meta import meta_mapping
+
+from .checks import run_all_federal_awards_checks
 
 logger = logging.getLogger(__name__)
 def extract_federal_awards(file):
@@ -46,7 +47,6 @@ def extract_federal_awards(file):
     )
     template = json.loads(template_definition_path.read_text(encoding="utf-8"))
     
-    workbook = extract_workbook_as_ir(file)
     params = ExtractDataParams(
         federal_awards_field_mapping,
         federal_awards_column_mapping,
@@ -54,8 +54,11 @@ def extract_federal_awards(file):
         FORM_SECTIONS.FEDERAL_AWARDS_EXPENDED,
         template["title_row"],
     )
-    result = _extract_generic_data(workbook, params)
-    pprint.pprint(result)
+    
+    ir = extract_workbook_as_ir(file)
+    run_all_federal_awards_checks(ir)
+    logger.info("After an exception raised...")
+    result = _extract_generic_data(ir, params)
     return result
 
 
@@ -71,7 +74,6 @@ def _set_pass_through_entity_name(obj, target, value):
     if isinstance(value, NoneType) or value == "":
         pass
     else:
-        print(f"PASSTHROUGH ENTITY NAME IS {value}")
         for index, v in enumerate(str(value).split("|")):
             _set_by_path(obj, f"{target}[{index}].passthrough_name", str(v).strip())
 
