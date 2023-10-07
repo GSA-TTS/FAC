@@ -59,7 +59,6 @@ def extract_federal_awards(file):
 
     ir = extract_workbook_as_ir(file)
     run_all_federal_awards_checks(ir)
-    logger.info("After an exception raised...")
     result = _extract_generic_data(ir, params)
     return result
 

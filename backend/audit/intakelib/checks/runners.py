@@ -38,6 +38,8 @@ def run_all_federal_awards_checks(ir):
 def run_all_notes_to_sefa_checks(ir):
     run_all_checks(ir, notes_to_sefa_checks)
 
+def run_all_audit_finding_checks(ir):
+    run_all_checks(ir, audit_findings_checks)
 
 from .check_uei_exists import uei_exists
 from .check_is_a_workbook import is_a_workbook
@@ -51,6 +53,7 @@ from .check_direct_award_is_not_blank import direct_award_is_not_blank
 from .check_passthrough_name_when_no_direct import passthrough_name_when_no_direct
 from .check_loan_guarantee import loan_guarantee
 from .check_no_major_program_no_type import no_major_program_no_type
+from .check_no_repeat_findings import no_repeat_findings
 
 federal_awards_checks = general_checks + [
     is_right_workbook("FederalAwardsExpended"),
@@ -64,4 +67,9 @@ federal_awards_checks = general_checks + [
 
 notes_to_sefa_checks = general_checks + [
     is_right_workbook("NotesToSefa"),
+]
+
+audit_findings_checks = general_checks + [
+    is_right_workbook("FindingsUniformGuidance"),
+    no_repeat_findings
 ]

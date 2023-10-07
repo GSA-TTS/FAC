@@ -10,7 +10,11 @@ messages = {
     "check_loan_guarantee_present_when_y": "When loan guarantee is <b>Y</b>, there must be a loan balance",
     "check_is_right_workbook": "This is not the {} workbook",
     "check_no_major_program_no_type_when_n":
-    "When major prorgam is <b>N</b>, leave audit report type blank",
+    "When major program is <b>N</b>, leave audit report type blank",
     "check_no_major_program_no_type_when_y":
-    "When major prorgam is <b>Y</b>, audit report type must be chosen",
+    "When major program is <b>Y</b>, audit report type must be chosen",
+    "check_no_repeat_findings_when_n":
+    "When repeat findings from prior years is <b>N</b>, prior references must be <b>N/A</b>",
+    "check_no_repeat_findings_when_y":
+    "When repeat findings from prior years is is <b>Y</b>, include prior year references",
 }
