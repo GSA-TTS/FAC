@@ -18,5 +18,12 @@ messages = {
     "Direct award cannot be blank; it must be <b>Y</b> or <b>N</b>",
 
     "check_passthrough_name_when_no_direct":
-    "If direct award is <b>N</b>, then you must provide a passthrough name"
+    "If direct award is <b>N</b>, then you must provide a passthrough name",
+
+    "check_loan_guarantee_empty_when_n":
+    "When loan guarantee is <b>N</b>, outstanding balance must be empty",
+
+    "check_loan_guarantee_present_when_y":
+    "When loan guarantee is <b>Y</b>, there must be a loan balance"
+
 }
