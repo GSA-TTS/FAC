@@ -4,7 +4,6 @@ from django.core.exceptions import ValidationError
 from django.test import SimpleTestCase
 from openpyxl import load_workbook
 from openpyxl.cell import Cell
- 
 
 from importlib import (
     ExcelExtractionError,
