@@ -1,9 +1,12 @@
+import pprint
+
 from .mapping_util import (
     _open_workbook,
     _get_entries_by_path
     )
 from .exceptions import ExcelExtractionError
 from .constants import SECTION_NAME
+import time
 
 def _extract_generic_single_value(ir, name):
     """Extract a single value from the workbook with the defined name"""
@@ -109,6 +112,7 @@ def remove_null_rows(sheet):
 
 def get_sheet_by_name(sheets, name):
     for sheet in sheets:
+        print("SHEET", name)
         if sheet["name"] == name:
             return sheet
         
@@ -149,9 +153,10 @@ def extract_workbook_as_ir(file):
 
     for sheet in sheets:
         remove_null_rows(sheet)
-    # if get_sheet_by_name(sheets, "Form"):
-    #     pprint.pprint(get_sheet_by_name(sheets, "Form"))
-    # if get_sheet_by_name(sheets, "AdditionalNotes"):
-    #     pprint.pprint(get_sheet_by_name(sheets, "AdditionalNotes"))
-    # pprint.pprint(sheets)
+
+    print("COVERSHEET")
+    if get_sheet_by_name(sheets, "Form"):
+        pprint.pprint(get_sheet_by_name(sheets, "Form"))
+    time.sleep(2)
+
     return sheets

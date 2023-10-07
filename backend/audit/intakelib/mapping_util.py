@@ -32,25 +32,34 @@ def _set_pass_through_entity_id(obj, target, value):
     for index, v in enumerate(str(value).split("|")):
         _set_by_path(obj, f"{target}[{index}].passthrough_identifying_number", str(v).strip())
 
+NoneType = type(None)
 
 def _set_by_path_with_default(default=None):
     def _no_op(_, __, ___): 
         pass
 
     def _new_set_by_path(target_obj, target_path, value):
-        print(f"DEFAULT {value}")
-        if ((value is None) or (value == "")) and default is not None:
+        print(f"DEFAULT value coming in {value}")
+        if (isinstance(value, NoneType) or (value == "")) and default is not None:
             value = default
+            print("Setting value to {default}")
             return _set_by_path(target_obj, target_path, value)
-        if value:
+        elif not isinstance(value, NoneType):
+            print(f"Setting value to {value}")
             return _set_by_path(target_obj, target_path, value)
         else:
             return _no_op
     return _new_set_by_path
 
 def _set_by_path(target_obj, target_path, value):
-    """Set a (potentially nested) field in target_obj using JSONPath-esque dot notation, e.g. parent.child[0].field"""
-    pydash.set_(target_obj, target_path, value)
+    if isinstance(value, NoneType):
+        pydash.set_(target_obj, target_path, "")
+    else:
+        pydash.set_(target_obj, target_path, value)
+
+# def _set_by_path(target_obj, target_path, value):
+#     """Set a (potentially nested) field in target_obj using JSONPath-esque dot notation, e.g. parent.child[0].field"""
+#     pydash.set_(target_obj, target_path, value)
 
 
 """

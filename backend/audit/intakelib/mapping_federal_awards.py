@@ -35,6 +35,7 @@ from .mapping_util import (
 from .intermediate_representation import (
     extract_workbook_as_ir,
     _extract_generic_data,
+    get_sheet_by_name
 )
 
 from .mapping_meta import meta_mapping
@@ -47,7 +48,6 @@ def extract_federal_awards(file):
     template = json.loads(template_definition_path.read_text(encoding="utf-8"))
     
     workbook = extract_workbook_as_ir(file)
-    pprint.pprint(workbook)
     params = ExtractDataParams(
         federal_awards_field_mapping,
         federal_awards_column_mapping,
@@ -56,7 +56,7 @@ def extract_federal_awards(file):
         template["title_row"],
     )
     result = _extract_generic_data(workbook, params)
-    pprint.pprint(result, indent=2, width=80)
+    pprint.pprint(result)
     return result
 
 
