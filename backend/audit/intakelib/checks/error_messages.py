@@ -24,6 +24,9 @@ messages = {
     "When loan guarantee is <b>N</b>, outstanding balance must be empty",
 
     "check_loan_guarantee_present_when_y":
-    "When loan guarantee is <b>Y</b>, there must be a loan balance"
+    "When loan guarantee is <b>Y</b>, there must be a loan balance",
+
+    "check_is_right_workbook":
+    "This is not the {} workbook"
 
 }

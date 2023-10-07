@@ -154,8 +154,4 @@ def extract_workbook_as_ir(file):
     for sheet in sheets:
         remove_null_rows(sheet)
 
-    if get_sheet_by_name(sheets, "Form"):
-        pprint.pprint(get_sheet_by_name(sheets, "Form"))
-    time.sleep(2)
-
     return sheets
