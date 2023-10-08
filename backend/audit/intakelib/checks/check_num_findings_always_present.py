@@ -9,7 +9,6 @@ logger = logging.getLogger(__name__)
 def num_findings_always_present(ir):
     noaf = get_range_by_name(ir, "number_of_audit_findings")
     errors = []
-    print(noaf["values"])
     for ndx, v in enumerate(noaf["values"]):
         if ((v is None) or (str(v).strip() == "")):
             errors.append(

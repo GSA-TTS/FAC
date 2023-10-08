@@ -10,7 +10,6 @@ def no_repeat_findings(ir):
     prior_references = get_range_by_name(ir, "prior_references")
 
     errors = []
-    logger.info(prior_references)
     for ndx, (is_rep, prior) in enumerate(
         zip(repeat_prior_reference["values"], prior_references["values"])
     ):

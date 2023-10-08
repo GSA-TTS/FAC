@@ -1,10 +1,9 @@
-import pprint
-
 from .mapping_util import _open_workbook, _get_entries_by_path
 from .exceptions import ExcelExtractionError
 from .constants import SECTION_NAME
-import time
+import logging
 
+logger = logging.getLogger(__name__)
 
 def _extract_generic_single_value(ir, name):
     """Extract a single value from the workbook with the defined name"""
@@ -137,7 +136,6 @@ def remove_null_rows(sheet):
 
 def get_sheet_by_name(sheets, name):
     for sheet in sheets:
-        print("SHEET", name)
         if sheet["name"] == name:
             return sheet
 

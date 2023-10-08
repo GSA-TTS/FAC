@@ -6,6 +6,8 @@ import logging
 from typing import Any, Callable
 from openpyxl import load_workbook, Workbook
 from openpyxl.cell import Cell
+from django.core.exceptions import ValidationError
+
 from audit.fixtures.excel import (
     UNKNOWN_WORKBOOK,
 )
@@ -106,9 +108,10 @@ def _open_workbook(file):
     if isinstance(file, Workbook):
         return file
     else:
-        return load_workbook(filename=file, data_only=True)
-
-
+        wb = None
+        wb = load_workbook(filename=file, data_only=True)
+        return wb
+ 
 def _get_entries_by_path(dictionary, path):
     keys = path.split(".")
     val = dictionary
@@ -235,9 +238,6 @@ def _add_required_fields(data):
     if "FederalAwards" in data:
         # Update the federal_awards with all required fields
         data["FederalAwards"]["federal_awards"] = indexed_awards
-
-    logger.info(data)
-
     return data
 
 
@@ -264,7 +264,7 @@ def _extract_from_field_mapping(path, field_mapping, match=None):
 
 def _extract_error_details(error):
     if not bool(error.path):
-        print("No path found in error object")
+        logger.info("No path found in error object")
         return None, None, None
     row_index = next((item for item in error.path if isinstance(item, int)), None)
     path = ".".join([item for item in error.path if not isinstance(item, int)])
@@ -310,6 +310,6 @@ def _extract_named_ranges(errors, column_mapping, field_mapping, meta_mapping):
                 named_ranges.append((keyFound, None))
 
         if not keyFound:
-            print(f"No named range matches this error path: {error.path}")
+            logger.info(f"No named range matches this error path: {error.path}")
 
     return named_ranges
