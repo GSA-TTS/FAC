@@ -24,5 +24,9 @@ messages = {
     "check_sequential_award_numbers_regex":
     "Award references should be of the form AWARD-####",
     "check_sequential_award_numbers_off":
-    "Award reference is {}, but should be {}"
+    "Award reference is {}, but should be {}",
+    "check_num_findings_always_present":
+    "Number of audit findings must zero or greater",
+    "check_cluster_name_always_present":
+    "Cluster name cannot be blank; select a name or N/A"
 }

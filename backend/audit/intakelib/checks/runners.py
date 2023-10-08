@@ -58,10 +58,14 @@ from .check_no_repeat_findings import no_repeat_findings
 from .check_missing_award_numbers import missing_award_numbers
 from .check_all_unique_award_numbers import all_unique_award_numbers
 from .check_sequential_award_numbers import sequential_award_numbers
+from .check_num_findings_always_present import num_findings_always_present
+from .check_cluster_name_always_present import cluster_name_always_present
 
 federal_awards_checks = general_checks + [
     is_right_workbook("FederalAwardsExpended"),
     missing_award_numbers,
+    num_findings_always_present,
+    cluster_name_always_present,
     state_cluster_names,
     other_cluster_names,
     direct_award_is_not_blank,
