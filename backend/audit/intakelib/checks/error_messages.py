@@ -28,5 +28,7 @@ messages = {
     "check_num_findings_always_present":
     "Number of audit findings must zero or greater",
     "check_cluster_name_always_present":
-    "Cluster name cannot be blank; select a name or N/A"
+    "Cluster name cannot be blank; select a name or N/A",
+    "check_passthrough_name_when_yes_direct":
+    "When direct award is <b>Y</b>, no passthrough name required"
 }

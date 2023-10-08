@@ -20,5 +20,14 @@ def passthrough_name_when_no_direct(ir):
                     get_message("check_passthrough_name_when_no_direct"),
                 )
             )
+        if (v == "Y") and pn:
+            errors.append(
+                build_cell_error_tuple(
+                    ir,
+                    is_direct,
+                    ndx,
+                    get_message("check_passthrough_name_when_yes_direct"),
+                )
+            )
 
     return errors
