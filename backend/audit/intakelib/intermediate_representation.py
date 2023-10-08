@@ -101,6 +101,19 @@ def appears_empty(v):
             or (v == 0)
             or (str(v).strip() == ""))
 
+def replace_range_by_name(ir, name, new_values):
+    new_ir = []
+    for sheet in ir:
+        new_ranges = []
+        for range in sheet["ranges"]:
+            if range["name"] == name:
+                logger.info(f"Replacing range {name}")
+                range["values"] = new_values
+            new_ranges.append(range)
+        sheet["ranges"] = new_ranges
+        new_ir.append(sheet)
+    return new_ir
+
 def ranges_to_rows(ranges):
     range_values = map(lambda r: r["values"], ranges)
     # Now I have a list of lists.

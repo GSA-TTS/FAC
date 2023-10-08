@@ -29,6 +29,7 @@ from .intermediate_representation import (
 
 from .mapping_meta import meta_mapping
 from .checks import run_all_notes_to_sefa_checks
+from .transforms import run_all_notes_to_sefa_transforms
 
 logger = logging.getLogger(__name__)
 
@@ -45,9 +46,10 @@ def extract_notes_to_sefa(file):
         FORM_SECTIONS.NOTES_TO_SEFA,
         template["title_row"],
     )
-    workbook = extract_workbook_as_ir(file)
-    run_all_notes_to_sefa_checks(workbook)
-    result = _extract_generic_data(workbook, params)
+    ir = extract_workbook_as_ir(file)
+    new_ir = run_all_notes_to_sefa_transforms(ir)
+    run_all_notes_to_sefa_checks(new_ir)
+    result = _extract_generic_data(new_ir, params)
     return result
 
 

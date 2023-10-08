@@ -34,7 +34,6 @@ def run_all_checks(ir, list_of_checks):
 def run_all_federal_awards_checks(ir):
     run_all_checks(ir, federal_awards_checks)
 
-
 def run_all_notes_to_sefa_checks(ir):
     run_all_checks(ir, notes_to_sefa_checks)
 
