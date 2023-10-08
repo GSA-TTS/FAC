@@ -11,8 +11,6 @@ def no_major_program_no_type(ir):
 
     errors = []
 
-    logger.info(is_major)
-    logger.info(audit_report_type)
     for ndx, (is_m, rep_type) in enumerate(
         zip(is_major["values"], audit_report_type["values"])
     ):

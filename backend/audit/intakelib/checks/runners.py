@@ -56,6 +56,8 @@ from .check_loan_guarantee import loan_guarantee
 from .check_no_major_program_no_type import no_major_program_no_type
 from .check_no_repeat_findings import no_repeat_findings
 from .check_missing_award_numbers import missing_award_numbers
+from .check_all_unique_award_numbers import all_unique_award_numbers
+from .check_sequential_award_numbers import sequential_award_numbers
 
 federal_awards_checks = general_checks + [
     is_right_workbook("FederalAwardsExpended"),
@@ -65,7 +67,9 @@ federal_awards_checks = general_checks + [
     direct_award_is_not_blank,
     passthrough_name_when_no_direct,
     loan_guarantee,
-    no_major_program_no_type
+    no_major_program_no_type,
+    all_unique_award_numbers,
+    sequential_award_numbers
 ]
 
 notes_to_sefa_checks = general_checks + [

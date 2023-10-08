@@ -18,5 +18,11 @@ messages = {
     "check_no_repeat_findings_when_y":
     "When repeat findings from prior years is is <b>Y</b>, include prior year references",
     "check_missing_award_numbers":
-    "Missing an award number"
+    "Missing an award number",
+    "check_all_unique_award_numbers":
+    "Repeated award number",
+    "check_sequential_award_numbers_regex":
+    "Award references should be of the form AWARD-####",
+    "check_sequential_award_numbers_off":
+    "Award reference is {}, but should be {}"
 }
