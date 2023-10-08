@@ -17,4 +17,6 @@ messages = {
     "When repeat findings from prior years is <b>N</b>, prior references must be <b>N/A</b>",
     "check_no_repeat_findings_when_y":
     "When repeat findings from prior years is is <b>Y</b>, include prior year references",
+    "check_missing_award_numbers":
+    "Missing an award number"
 }

@@ -43,8 +43,9 @@ def run_all_audit_finding_checks(ir):
 
 from .check_uei_exists import uei_exists
 from .check_is_a_workbook import is_a_workbook
+from .check_look_for_empty_rows import look_for_empty_rows
 
-general_checks = [is_a_workbook, uei_exists]
+general_checks = [is_a_workbook, uei_exists, look_for_empty_rows]
 
 from .check_is_right_workbook import is_right_workbook
 from .check_state_cluster_names import state_cluster_names
@@ -54,9 +55,11 @@ from .check_passthrough_name_when_no_direct import passthrough_name_when_no_dire
 from .check_loan_guarantee import loan_guarantee
 from .check_no_major_program_no_type import no_major_program_no_type
 from .check_no_repeat_findings import no_repeat_findings
+from .check_missing_award_numbers import missing_award_numbers
 
 federal_awards_checks = general_checks + [
     is_right_workbook("FederalAwardsExpended"),
+    missing_award_numbers,
     state_cluster_names,
     other_cluster_names,
     direct_award_is_not_blank,

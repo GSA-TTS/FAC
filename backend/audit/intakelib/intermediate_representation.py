@@ -88,7 +88,8 @@ def find_last_none(ls):
     rev = list(reversed(ls))
     ndx = len(rev)
     for o in rev:
-        if (isinstance(o, int) and (o != 0)) or isinstance(o, str) and (o != ""):
+        if ((isinstance(o, int) and (o != 0)) or 
+            (isinstance(o, str) and (o != ""))):
             return ndx
         else:
             ndx -= 1
@@ -96,14 +97,33 @@ def find_last_none(ls):
     return 1
 
 
-def remove_null_rows(sheet):
+def appears_empty(v):
+    return ((v is None) 
+            or (v == 0)
+            or (str(v).strip() == ""))
+
+def ranges_to_rows(ranges):
+    range_values = map(lambda r: r["values"], ranges)
+    # Now I have a list of lists.
+    list_of_rows = list(map(list, zip(*range_values)))
+    list_of_rows.reverse()
+    # remove trailing empties
+    popping = True
+    keep = []
+    for row in list_of_rows:
+        is_all = all(list(map(lambda v: appears_empty(v), row)))
+        if is_all and popping:
+            pass
+        elif not is_all:
+            keep.append(row)
+            popping = False
+        else:
+            keep.append(row)
+    keep.reverse()
+    return keep
+
+def _remove_null_rows(sheet, cutpoint):
     ranges = sheet["ranges"]
-    values = map(lambda r: r["values"], ranges)
-    null_locations = []
-    for ls in values:
-        null_locations.append(find_last_none(ls))
-    cutpoint = max(null_locations)
-    print(f"CUTPOINT")
     for r in ranges:
         r["values"] = r["values"][:cutpoint]
         if "end_cell" in r and r["end_cell"]:
@@ -111,6 +131,9 @@ def remove_null_rows(sheet):
             # Offset by the start row minus one
             c["row"] = str(cutpoint + int(r["start_cell"]["row"]) - 1)
 
+def remove_null_rows(sheet):
+    ok_rows = ranges_to_rows(sheet["ranges"])
+    return _remove_null_rows(sheet, len(ok_rows))
 
 def get_sheet_by_name(sheets, name):
     for sheet in sheets:
