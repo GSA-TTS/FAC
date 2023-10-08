@@ -32,6 +32,7 @@ from .mapping_corrective_action_plan import (
     extract_corrective_action_plan,
     corrective_action_plan_named_ranges,
     corrective_action_field_mapping,
+    corrective_action_column_mapping
 )
 
 

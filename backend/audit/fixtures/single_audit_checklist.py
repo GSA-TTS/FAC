@@ -13,7 +13,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 
 from faker import Faker
 
-import importlib
+from audit import intakelib
 import audit.validators
 
 from audit.fixtures.excel import FORM_SECTIONS
@@ -175,7 +175,7 @@ def _post_create_federal_awards(this_sac, this_user):
     excel_file.save()
     # TODO: refactor the upload handling from the post view into a
     # function so we can call it here instead of aping it.
-    audit_data = importlib.extract_federal_awards(excel_file.file)
+    audit_data = intakelib.extract_federal_awards(excel_file.file)
     audit.validators.validate_federal_award_json(audit_data)
     this_sac.federal_awards = audit_data
     this_sac.save()
