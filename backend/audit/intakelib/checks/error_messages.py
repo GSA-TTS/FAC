@@ -30,5 +30,11 @@ messages = {
     "check_cluster_name_always_present":
     "Cluster name cannot be blank; select a name or N/A",
     "check_passthrough_name_when_yes_direct":
-    "When direct award is <b>Y</b>, no passthrough name required"
+    "When direct award is <b>Y</b>, no passthrough name required",
+    "check_no_major_program_is_blank":
+    "Major program must be Y or N; cannot be left empty",
+    "check_loan_guarantee_not_empty":
+    "Loan guarantee must be Y or N; cannot be left empty",
+    "check_federal_award_passed_always_present":
+    "Federal award passed must be Y or N; cannot be left empty"
 }
