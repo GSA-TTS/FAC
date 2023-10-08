@@ -7,11 +7,6 @@ from audit.fixtures.excel import (
     FORM_SECTIONS,
 )
 
-from audit.fixtures.excel import (
-    FEDERAL_AWARDS_TEMPLATE_DEFINITION,
-    FORM_SECTIONS,
-)
-
 from .constants import (
     XLSX_TEMPLATE_DEFINITION_DIR,
     FEDERAL_AGENCY_PREFIX,
@@ -37,7 +32,10 @@ from .intermediate_representation import (
 
 from .mapping_meta import meta_mapping
 
-from .checks import run_all_federal_awards_checks
+from .checks import (
+    run_all_general_checks,
+    run_all_federal_awards_checks
+    )
 
 logger = logging.getLogger(__name__)
 
@@ -57,6 +55,7 @@ def extract_federal_awards(file):
     )
 
     ir = extract_workbook_as_ir(file)
+    run_all_general_checks(ir, FORM_SECTIONS.FEDERAL_AWARDS_EXPENDED)
     run_all_federal_awards_checks(ir)
     result = _extract_generic_data(ir, params)
     return result

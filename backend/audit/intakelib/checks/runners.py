@@ -1,22 +1,15 @@
 from django.core.exceptions import ValidationError
 import logging
+from audit.fixtures.excel import FORM_SECTIONS
 
 logger = logging.getLogger(__name__)
 
-
-def run_general_checks(ir):
+def run_all_checks(ir, list_of_checks, section_name=None):
     errors = []
-    for fun in federal_awards_checks:
-        res = fun(ir)
+    if section_name:
+        res = is_right_workbook(section_name)(ir)
         if res:
             errors.append(res)
-    if len(errors) > 0:
-        logger.info(f"Raising {len(errors)} IR validation error(s).")
-        raise ValidationError(errors)
-
-
-def run_all_checks(ir, list_of_checks):
-    errors = []
     for fun in list_of_checks:
         res = fun(ir)
         if isinstance(res, list):
@@ -30,6 +23,8 @@ def run_all_checks(ir, list_of_checks):
         logger.info("Raising a validation error.")
         raise ValidationError(errors)
 
+def run_all_general_checks(ir, section_name):
+    run_all_checks(ir, general_checks, section_name)
 
 def run_all_federal_awards_checks(ir):
     run_all_checks(ir, federal_awards_checks)
@@ -61,7 +56,7 @@ from .check_cluster_name_always_present import cluster_name_always_present
 from .check_federal_award_passed_always_present import federal_award_passed_always_present
 
 federal_awards_checks = general_checks + [
-    is_right_workbook("FederalAwardsExpended"),
+    is_right_workbook(FORM_SECTIONS.FEDERAL_AWARDS_EXPENDED),
     missing_award_numbers,
     num_findings_always_present,
     cluster_name_always_present,
@@ -77,12 +72,12 @@ federal_awards_checks = general_checks + [
 ]
 
 notes_to_sefa_checks = general_checks + [
-    is_right_workbook("NotesToSefa"),
+    is_right_workbook(FORM_SECTIONS.NOTES_TO_SEFA),
 ]
 
 from .check_no_repeat_findings import no_repeat_findings
 
 audit_findings_checks = general_checks + [
-    is_right_workbook("FindingsUniformGuidance"),
+    is_right_workbook(FORM_SECTIONS.FINDINGS_UNIFORM_GUIDANCE),
     no_repeat_findings
 ]

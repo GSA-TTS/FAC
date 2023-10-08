@@ -59,6 +59,7 @@ And an example with-errors return value is:
 """
 
 from .runners import (
+    run_all_general_checks,
     run_all_federal_awards_checks, 
     run_all_notes_to_sefa_checks,
     run_all_audit_finding_checks

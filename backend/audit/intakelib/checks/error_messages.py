@@ -36,5 +36,7 @@ messages = {
     "check_loan_guarantee_not_empty":
     "Loan guarantee must be Y or N; cannot be left empty",
     "check_federal_award_passed_always_present":
-    "Federal award passed must be Y or N; cannot be left empty"
+    "Federal award passed must be Y or N; cannot be left empty",
+    "check_passthrough_name_when_no_direct_n_and_empty_number":
+    "When the award is direct, passthrough number must be empty"
 }
