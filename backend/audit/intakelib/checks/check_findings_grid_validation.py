@@ -1,15 +1,11 @@
-import logging
 from audit.intakelib.intermediate_representation import get_range_by_name
 from .util import get_message, build_cell_error_tuple
-
-logger = logging.getLogger(__name__)
 
 # Modified Opinion
 # Other Matters
 # Material Weakness
 # Significant Deficiency
 # Other Findings
-
 
 def findings_grid_validation(ir):
     # Values copied directly out of the UG
