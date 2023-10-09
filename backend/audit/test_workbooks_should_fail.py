@@ -67,6 +67,7 @@ class FailingWorkbooks(SimpleTestCase):
                                 try:
                                     ir = extractor(full_path)
                                     validator(ir)
+                                    print(f"=== Did not fail on workbook {file} ===")
                                 except ValidationError as ve:
                                     failure_count += 1
                             else:
