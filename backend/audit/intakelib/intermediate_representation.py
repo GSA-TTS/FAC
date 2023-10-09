@@ -82,20 +82,6 @@ def most_common(lst):
     return max(set(lst), key=lst.count)
 
 
-# Better to work from the end, and
-# find the first row that is not None/0.
-def find_last_none(ls):
-    rev = list(reversed(ls))
-    ndx = len(rev)
-    for o in rev:
-        if (isinstance(o, int) and (o != 0)) or (isinstance(o, str) and (o != "")):
-            return ndx
-        else:
-            ndx -= 1
-    # Exception
-    return 1
-
-
 def appears_empty(v):
     return (v is None) or (v == 0) or (str(v).strip() == "")
 
