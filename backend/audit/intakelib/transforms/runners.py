@@ -1,7 +1,6 @@
 from django.core.exceptions import ValidationError
 import logging
 from copy import deepcopy
-from pprint import pprint
 
 logger = logging.getLogger(__name__)
 
