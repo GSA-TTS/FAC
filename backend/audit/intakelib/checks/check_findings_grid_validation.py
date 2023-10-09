@@ -7,6 +7,7 @@ from .util import get_message, build_cell_error_tuple
 # Significant Deficiency
 # Other Findings
 
+
 def findings_grid_validation(ir):
     # Values copied directly out of the UG
     allowed_raw = [
