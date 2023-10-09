@@ -10,14 +10,13 @@ from dissemination.workbooklib.excel_creation import (
 
 from dissemination.workbooklib.excel_creation import (
     insert_version_and_sheet_name,
-    set_range
+    set_range,
 )
 from dissemination.workbooklib.census_models.census import dynamic_import
 
 
 import openpyxl as pyxl
 import re
-import importlib
 import logging
 
 # import unidecode
@@ -43,8 +42,8 @@ def cleanup_string(s):
 
 def generate_notes_to_sefa(dbkey, year, outfile):
     logger.info(f"--- generate notes to sefa {dbkey} {year}---")
-    Gen = dynamic_import('Gen', year)
-    Notes = dynamic_import('Notes', year)
+    Gen = dynamic_import("Gen", year)
+    Notes = dynamic_import("Notes", year)
     wb = pyxl.load_workbook(templates["SEFA"])
 
     g = set_uei(Gen, wb, dbkey)
@@ -102,13 +101,7 @@ def generate_notes_to_sefa(dbkey, year, outfile):
     # Add a Y/N column
     # def set_range(wb, range_name, values, default=None, conversion_fun=str):
 
-    set_range(
-        wb,
-        "contains_chart_or_table",
-        map(lambda v: "N", notes),
-        "N",
-        str
-    )
+    set_range(wb, "contains_chart_or_table", map(lambda v: "N", notes), "N", str)
     wb.save(outfile)
 
     table = generate_dissemination_test_table(

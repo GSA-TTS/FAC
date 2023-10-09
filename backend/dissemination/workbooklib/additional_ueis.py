@@ -25,12 +25,12 @@ mappings = [
 
 def generate_additional_ueis(dbkey, year, outfile):
     logger.info(f"--- generate additional ueis {dbkey} {year} ---")
-    Gen = dynamic_import('Gen', year)
+    Gen = dynamic_import("Gen", year)
     wb = pyxl.load_workbook(templates["AdditionalUEIs"])
     g = set_uei(Gen, wb, dbkey)
     insert_version_and_sheet_name(wb, "additional-ueis-workbook")
     if int(year) >= 22:
-        Ueis = dynamic_import('Ueis', year)
+        Ueis = dynamic_import("Ueis", year)
         addl_ueis = Ueis.select().where(Ueis.dbkey == g.dbkey)
         map_simple_columns(wb, mappings, addl_ueis)
 

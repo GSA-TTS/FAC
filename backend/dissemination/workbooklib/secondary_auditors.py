@@ -42,15 +42,19 @@ mappings = [
         test_pfix(3),
     ),
     FieldMap(
-        "secondary_auditor_address_zipcode", "cpazipcode", "address_zipcode", None, add_hyphen_to_zip
+        "secondary_auditor_address_zipcode",
+        "cpazipcode",
+        "address_zipcode",
+        None,
+        add_hyphen_to_zip,
     ),
 ]
 
 
 def generate_secondary_auditors(dbkey, year, outfile):
     logger.info(f"--- generate secondary auditors {dbkey} {year} ---")
-    Gen = dynamic_import('Gen', year)
-    Cpas = dynamic_import('Cpas', year)
+    Gen = dynamic_import("Gen", year)
+    Cpas = dynamic_import("Cpas", year)
     wb = pyxl.load_workbook(templates["SecondaryAuditors"])
 
     g = set_uei(Gen, wb, dbkey)

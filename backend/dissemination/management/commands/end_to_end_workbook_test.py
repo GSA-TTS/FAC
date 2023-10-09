@@ -57,7 +57,8 @@ def step_through_certifications(sac, SAC):
     sac.transition_date.append(datetime.datetime.today())
     sac.transition_date.append(SAC.STATUS.SUBMITTED)
     sac.transition_date.append(datetime.datetime.today())
-    
+
+
 def disseminate(sac, year):
     logger.info("Invoking movement of data from Intake to Dissemination")
     for model in [
@@ -218,7 +219,6 @@ class Command(BaseCommand):
         parser.add_argument("--email", type=str, required=True)
         parser.add_argument("--dbkey", type=str, required=True)
         parser.add_argument("--year", type=str, default="22")
-
 
     def handle(self, *args, **options):
         email = options["email"]

@@ -34,9 +34,7 @@ mappings = [
     ),
     FieldMap("reference_number", "findingsrefnums", "reference_number", None, str),
     FieldMap("modified_opinion", "modifiedopinion", "is_modified_opinion", None, str),
-    FieldMap(
-        "other_matters", "othernoncompliance", "is_other_matters", None, str
-    ),
+    FieldMap("other_matters", "othernoncompliance", "is_other_matters", None, str),
     FieldMap(
         "material_weakness", "materialweakness", "is_material_weakness", None, str
     ),
@@ -61,11 +59,12 @@ mappings = [
     # is_valid is computed in the workbook
 ]
 
+
 def generate_findings(dbkey, year, outfile):
     logger.info(f"--- generate findings {dbkey} {year} ---")
-    Gen = dynamic_import('Gen', year)
-    Findings = dynamic_import('Findings', year)
-    Cfda = dynamic_import('Cfda', year)
+    Gen = dynamic_import("Gen", year)
+    Findings = dynamic_import("Findings", year)
+    Cfda = dynamic_import("Cfda", year)
     wb = pyxl.load_workbook(templates["AuditFindings"])
     g = set_uei(Gen, wb, dbkey)
     insert_version_and_sheet_name(wb, "federal-awards-audit-findings-workbook")

@@ -25,10 +25,11 @@ mappings = [
     ),
 ]
 
+
 def generate_findings_text(dbkey, year, outfile):
     logger.info(f"--- generate findings text {dbkey} {year} ---")
-    Gen = dynamic_import('Gen', year)
-    Findingstext = dynamic_import('Findingstext', year)
+    Gen = dynamic_import("Gen", year)
+    Findingstext = dynamic_import("Findingstext", year)
     wb = pyxl.load_workbook(templates["AuditFindingsText"])
 
     g = set_uei(Gen, wb, dbkey)

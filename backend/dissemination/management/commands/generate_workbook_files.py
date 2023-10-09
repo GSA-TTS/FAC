@@ -166,7 +166,7 @@ class Command(BaseCommand):
         parser.add_argument("--dbkey", type=str, required=True)
         parser.add_argument("--year", type=str, default="22")
 
-    def handle(self, *args, **options):
+    def handle(self, *args, **options):  # noqa: C901
         out_basedir = None
         if options["output"]:
             out_basedir = options["output"]
@@ -198,7 +198,9 @@ class Command(BaseCommand):
         )
 
         sac = setup_sac(None, entity_id, options["dbkey"])
-        loader = workbook_loader(None, sac, options["dbkey"], options["year"], entity_id)
+        loader = workbook_loader(
+            None, sac, options["dbkey"], options["year"], entity_id
+        )
         json_test_tables = []
         for section, fun in sections.items():
             (wb, api_json, filename) = loader(fun, section)

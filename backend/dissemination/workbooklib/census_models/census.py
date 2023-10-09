@@ -10,15 +10,17 @@ database = PostgresqlDatabase("postgres", **{"host": "db", "user": "postgres"})
 
 
 def model_module_path(model, year):
-    return f'dissemination.workbooklib.census_models.census.Census{model}{year}'
+    return f"dissemination.workbooklib.census_models.census.Census{model}{year}"
+
 
 def dynamic_import(mod, year):
     name = model_module_path(mod, year)
-    components = name.split('.')
+    components = name.split(".")
     mod = __import__(components[0])
     for comp in components[1:]:
         mod = getattr(mod, comp)
     return mod
+
 
 class UnknownField(object):
     def __init__(self, *_, **__):

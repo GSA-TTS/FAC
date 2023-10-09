@@ -109,16 +109,17 @@ def _census_audit_type(s):
         "A": "alternative-compliance-engagement",
     }[s]
 
+
 def add_hyphen_to_zip(zip):
     strzip = str(zip)
     if len(strzip) == 5:
         return strzip
     elif len(strzip) == 9:
-        return f'{strzip[0:5]}-{strzip[5:9]}'
+        return f"{strzip[0:5]}-{strzip[5:9]}"
     else:
         logger.info("ZIP IS MALFORMED IN WORKBOOKS E2E / SAC_CREATION")
         return strzip
-    
+
 
 def _fake_general_information(dbkey, auditee_name="DEFAULT AUDITEE"):
     """Create a fake general_information object."""
@@ -134,7 +135,7 @@ def _fake_general_information(dbkey, auditee_name="DEFAULT AUDITEE"):
     if gobj.cpacountry == "US":
         cpacountry = "USA"
     elif gobj.cpacountry != "US":
-        cpacountry = 'non-USA'
+        cpacountry = "non-USA"
 
     general_information = {
         "auditee_fiscal_period_start": auditee_fiscal_period_start,
@@ -249,8 +250,8 @@ def _create_test_sac(user, auditee_name, dbkey):
 
     sac = SingleAuditChecklist.objects.create(
         submitted_by=user,
-        general_information = _fake_general_information(dbkey, auditee_name),
-        audit_information = _fake_audit_information(dbkey, auditee_name),
+        general_information=_fake_general_information(dbkey, auditee_name),
+        audit_information=_fake_audit_information(dbkey, auditee_name),
     )
     # Set a TEST report id for this data
     sac.report_id = dbkey_to_test_report_id(Gen, dbkey)

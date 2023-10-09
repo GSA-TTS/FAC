@@ -24,8 +24,8 @@ mappings = [
 
 def generate_additional_eins(dbkey, year, outfile):
     logger.info(f"--- generate additional eins {dbkey} {year} ---")
-    Gen = dynamic_import('Gen', year)
-    Eins = dynamic_import('Eins', year)
+    Gen = dynamic_import("Gen", year)
+    Eins = dynamic_import("Eins", year)
     wb = pyxl.load_workbook(templates["AdditionalEINs"])
 
     g = set_uei(Gen, wb, dbkey)

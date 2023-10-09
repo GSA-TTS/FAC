@@ -21,8 +21,8 @@ logger = logging.getLogger(__name__)
 
 def generate_corrective_action_plan(dbkey, year, outfile):
     logger.info(f"--- generate corrective action plan {dbkey} {year} ---")
-    Gen = dynamic_import('Gen', year)
-    Captext = dynamic_import('Captext', year)
+    Gen = dynamic_import("Gen", year)
+    Captext = dynamic_import("Captext", year)
     wb = pyxl.load_workbook(templates["CAP"])
     mappings = [
         FieldMap("reference_number", "findingrefnums", "finding_ref_number", None, str),

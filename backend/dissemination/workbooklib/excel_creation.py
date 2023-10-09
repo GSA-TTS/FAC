@@ -39,6 +39,7 @@ def test_pfix(n):
     def _test(o):
         # return ' '.join(["TEST" for x in range(n)]) + " " + str(o)
         return o
+
     return _test
 
 
@@ -105,8 +106,8 @@ def set_uei(Gen, wb, dbkey):
     if g.uei:
         set_single_cell_range(wb, "auditee_uei", g.uei)
     else:
-        g.uei="BADBADBADBAD"
-        set_single_cell_range(wb, "auditee_uei", g.uei)    
+        g.uei = "BADBADBADBAD"
+        set_single_cell_range(wb, "auditee_uei", g.uei)
     return g
 
 
@@ -116,8 +117,12 @@ def map_simple_columns(wb, mappings, values):
     for mapping in mappings:
         unique_fields.add(mapping.in_sheet)
     if len_passed_in != len(unique_fields):
-        logger.info(f'unique: {len(unique_fields)} list: {len(mappings)}')
-        logger.error("You repeated a field in the mappings: {}".format(list(map(lambda m: m.in_sheet, mappings))))
+        logger.info(f"unique: {len(unique_fields)} list: {len(mappings)}")
+        logger.error(
+            "You repeated a field in the mappings: {}".format(
+                list(map(lambda m: m.in_sheet, mappings))
+            )
+        )
         sys.exit(-1)
 
     # Map all the simple ones

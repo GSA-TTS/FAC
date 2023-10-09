@@ -7,7 +7,6 @@ from dissemination.workbooklib.excel_creation import (
     map_simple_columns,
     generate_dissemination_test_table,
     set_range,
-    test_pfix,
 )
 
 from dissemination.workbooklib.excel_creation import insert_version_and_sheet_name
@@ -23,16 +22,16 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
 def if_zero_empty(v):
     if int(v) == 0:
         return ""
     else:
         return int(v)
 
+
 mappings = [
-    FieldMap(
-        "program_name", "federalprogramname", "federal_program_name", None, str
-    ),
+    FieldMap("program_name", "federalprogramname", "federal_program_name", None, str),
     FieldMap(
         "state_cluster_name", "stateclustername", WorkbookFieldInDissem, None, str
     ),
@@ -45,7 +44,11 @@ mappings = [
     FieldMap("is_direct", "direct", WorkbookFieldInDissem, None, str),
     FieldMap("is_passed", "passthroughaward", "is_passthrough_award", None, str),
     FieldMap(
-        "subrecipient_amount", "passthroughamount", "passthrough_amount", None, if_zero_empty
+        "subrecipient_amount",
+        "passthroughamount",
+        "passthrough_amount",
+        None,
+        if_zero_empty,
     ),
     FieldMap("is_major", "majorprogram", WorkbookFieldInDissem, None, str),
     FieldMap("audit_report_type", "typereport_mp", "audit_report_type", None, str),
@@ -73,7 +76,7 @@ def int_or_na(o):
         return "N/A"
 
 
-def _generate_cluster_names(cfdas, valid_json):
+def _generate_cluster_names(Cfda, cfdas, valid_json):
     cluster_names = []
     other_cluster_names = []
     cfda: Cfda
@@ -180,9 +183,9 @@ def _fix_passthroughs(Cfda, Passthrough, cfdas, dbkey):
 
 def generate_federal_awards(dbkey, year, outfile):
     logger.info(f"--- generate federal awards {dbkey} {year} ---")
-    Gen = dynamic_import('Gen', year)
-    Passthrough = dynamic_import('Passthrough', year)
-    Cfda = dynamic_import('Cfda', year)
+    Gen = dynamic_import("Gen", year)
+    Passthrough = dynamic_import("Passthrough", year)
+    Cfda = dynamic_import("Cfda", year)
     wb = pyxl.load_workbook(templates["FederalAwards"])
     # In sheet : in DB
 
@@ -199,7 +202,9 @@ def generate_federal_awards(dbkey, year, outfile):
     # This was removed from the CSV...
     valid_json["cluster_names"].append("STATE CLUSTER")
 
-    (cluster_names, other_cluster_names) = _generate_cluster_names(cfdas, valid_json)
+    (cluster_names, other_cluster_names) = _generate_cluster_names(
+        Cfda, cfdas, valid_json
+    )
     set_range(wb, "cluster_name", cluster_names)
     set_range(wb, "other_cluster_name", other_cluster_names)
 
@@ -212,7 +217,9 @@ def generate_federal_awards(dbkey, year, outfile):
     set_range(wb, "federal_agency_prefix", prefixes)
     set_range(wb, "three_digit_extension", extensions)
 
-    (passthrough_names, passthrough_ids) = _fix_passthroughs(Cfda, Passthrough, cfdas, dbkey)
+    (passthrough_names, passthrough_ids) = _fix_passthroughs(
+        Cfda, Passthrough, cfdas, dbkey
+    )
     set_range(wb, "passthrough_name", passthrough_names)
     set_range(wb, "passthrough_identifying_number", passthrough_ids)
 
