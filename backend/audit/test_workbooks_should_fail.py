@@ -5,7 +5,6 @@ import os
 from functools import reduce
 from openpyxl import load_workbook
 import re
-from pprint import pprint
 from django.core.exceptions import ValidationError
 
 from audit.intakelib import (

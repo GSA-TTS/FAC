@@ -49,6 +49,7 @@ def extract_notes_to_sefa(file):
         FORM_SECTIONS.NOTES_TO_SEFA,
         template["title_row"],
     )
+    
     ir = extract_workbook_as_ir(file)
     run_all_general_checks(ir, FORM_SECTIONS.NOTES_TO_SEFA)
     new_ir = run_all_notes_to_sefa_transforms(ir)

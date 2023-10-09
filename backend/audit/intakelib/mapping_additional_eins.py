@@ -26,8 +26,17 @@ from .mapping_util import (
     ColumnMapping,
     ExtractDataParams,
     _extract_named_ranges,
-    _extract_data,
 )
+
+from .intermediate_representation import (
+    extract_workbook_as_ir,
+    _extract_generic_data,
+)
+
+from .checks import (
+    run_all_general_checks,
+    run_all_additional_eins_checks
+    )
 
 from .mapping_meta import meta_mapping
 
@@ -46,8 +55,11 @@ def extract_additional_eins(file):
         FORM_SECTIONS.ADDITIONAL_EINS,
         template["title_row"],
     )
-    workbook = extract_workbook_as_ir(file)
-    result = _extract_generic_data(workbook, params)
+
+    ir = extract_workbook_as_ir(file)
+    run_all_general_checks(ir, FORM_SECTIONS.ADDITIONAL_EINS)
+    run_all_additional_eins_checks(ir)
+    result = _extract_generic_data(ir, params)
     return result
 
 

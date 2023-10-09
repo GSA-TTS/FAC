@@ -28,7 +28,10 @@ from .intermediate_representation import (
 
 
 from .mapping_meta import meta_mapping
-from .checks import run_all_audit_finding_checks
+from .checks import (
+    run_all_general_checks,
+    run_all_audit_finding_checks
+    )
 
 logger = logging.getLogger(__name__)
 
@@ -45,8 +48,10 @@ def extract_audit_findings(file):
         FORM_SECTIONS.FINDINGS_UNIFORM_GUIDANCE,
         template["title_row"],
     )
+
     ir = extract_workbook_as_ir(file)
-    run_all_audit_finding_checks(ir) 
+    run_all_general_checks(ir, FORM_SECTIONS.FINDINGS_UNIFORM_GUIDANCE)
+    run_all_audit_finding_checks(ir)
     result = _extract_generic_data(ir, params)
     return result
 

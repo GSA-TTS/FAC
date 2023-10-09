@@ -27,6 +27,16 @@ from .mapping_util import (
 
 from .mapping_meta import meta_mapping
 
+from .intermediate_representation import (
+    extract_workbook_as_ir,
+    _extract_generic_data,
+)
+
+from .checks import (
+    run_all_general_checks,
+    run_all_additional_ueis_checks
+    )
+
 logger = logging.getLogger(__name__)
 
 
@@ -42,9 +52,13 @@ def extract_additional_ueis(file):
         FORM_SECTIONS.ADDITIONAL_UEIS,
         template["title_row"],
     )
-    workbook = extract_workbook_as_ir(file)
-    result = _extract_generic_data(workbook, params)
+
+    ir = extract_workbook_as_ir(file)
+    run_all_general_checks(ir, FORM_SECTIONS.ADDITIONAL_UEIS)
+    run_all_additional_ueis_checks(ir)
+    result = _extract_generic_data(ir, params)
     return result
+
 
 
 def additional_ueis_named_ranges(errors):

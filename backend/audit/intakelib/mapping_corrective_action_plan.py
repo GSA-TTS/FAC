@@ -27,6 +27,10 @@ from .mapping_util import (
 )
 
 from .mapping_meta import meta_mapping
+from .checks import (
+    run_all_general_checks,
+    run_all_corrective_action_plan_checks
+    )
 
 logger = logging.getLogger(__name__)
 
@@ -43,8 +47,11 @@ def extract_corrective_action_plan(file):
         FORM_SECTIONS.CORRECTIVE_ACTION_PLAN,
         template["title_row"],
     )
-    workbook = extract_workbook_as_ir(file)
-    result = _extract_generic_data(workbook, params)
+
+    ir = extract_workbook_as_ir(file)
+    run_all_general_checks(ir, FORM_SECTIONS.CORRECTIVE_ACTION_PLAN)
+    run_all_corrective_action_plan_checks(ir)
+    result = _extract_generic_data(ir, params)
     return result
 
 

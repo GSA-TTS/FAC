@@ -59,6 +59,26 @@ audit_findings_checks = general_checks + [
     findings_grid_validation
 ]
 
+additional_eins_checks = general_checks + [
+        is_right_workbook(FORM_SECTIONS.ADDITIONAL_EINS),
+        ]
+
+additional_ueis_checks = general_checks + [
+        is_right_workbook(FORM_SECTIONS.ADDITIONAL_UEIS),
+        ]
+
+audit_findings_text_checks = general_checks + [
+        is_right_workbook(FORM_SECTIONS.FINDINGS_TEXT),
+        ]
+
+corrective_action_plan_checks = general_checks + [
+        is_right_workbook(FORM_SECTIONS.CORRECTIVE_ACTION_PLAN),
+        ]
+
+secondary_auditors_checks = general_checks + [
+        is_right_workbook(FORM_SECTIONS.SECONDARY_AUDITORS),
+        ]
+
 def run_all_checks(ir, list_of_checks, section_name=None):
     errors = []
     if section_name:
@@ -90,3 +110,17 @@ def run_all_notes_to_sefa_checks(ir):
 def run_all_audit_finding_checks(ir):
     run_all_checks(ir, audit_findings_checks)
 
+def run_all_additional_eins_checks(ir):
+    run_all_checks(ir, additional_eins_checks)
+
+def run_all_additional_ueis_checks(ir):
+    run_all_checks(ir, additional_ueis_checks)
+
+def run_all_audit_findings_text_checks(ir):
+    run_all_checks(ir, audit_findings_text_checks)
+
+def run_all_corrective_action_plan_checks(ir):
+    run_all_checks(ir, corrective_action_plan_checks)
+
+def run_all_secondary_auditors_checks(ir):
+    run_all_checks(ir, secondary_auditors_checks)
