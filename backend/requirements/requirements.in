@@ -20,6 +20,7 @@ newrelic
 oic
 openpyxl
 pandas
+peewee
 psycopg2-binary
 pycryptodome
 pydash
