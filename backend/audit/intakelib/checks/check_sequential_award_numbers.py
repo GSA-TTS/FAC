@@ -21,8 +21,12 @@ def sequential_award_numbers(ir):
         if number_part != ndx:
             errors.append(
                 build_cell_error_tuple(
-                    ir, ars, ndx, 
-                    get_message("check_sequential_award_numbers_off").format(v, f"AWARD-{ndx:04}")
+                    ir,
+                    ars,
+                    ndx,
+                    get_message("check_sequential_award_numbers_off").format(
+                        v, f"AWARD-{ndx:04}"
+                    ),
                 )
             )
 

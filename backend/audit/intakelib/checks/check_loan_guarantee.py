@@ -6,8 +6,8 @@ logger = logging.getLogger(__name__)
 
 
 def appears_empty(v):
-    return ((v is None) 
-            or (str(v).strip() == ""))
+    return (v is None) or (str(v).strip() == "")
+
 
 def loan_guarantee(ir):
     is_guaranteed = get_range_by_name(ir, "is_guaranteed")

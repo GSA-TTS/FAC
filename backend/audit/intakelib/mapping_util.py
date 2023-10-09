@@ -111,7 +111,8 @@ def _open_workbook(file):
         wb = None
         wb = load_workbook(filename=file, data_only=True)
         return wb
- 
+
+
 def _get_entries_by_path(dictionary, path):
     keys = path.split(".")
     val = dictionary

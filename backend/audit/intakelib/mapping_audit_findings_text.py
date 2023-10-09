@@ -33,10 +33,7 @@ from .intermediate_representation import (
     _extract_generic_data,
 )
 
-from .checks import (
-    run_all_general_checks,
-    run_all_audit_findings_text_checks
-    )
+from .checks import run_all_general_checks, run_all_audit_findings_text_checks
 
 logger = logging.getLogger(__name__)
 

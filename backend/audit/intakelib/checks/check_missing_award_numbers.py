@@ -4,6 +4,7 @@ from .util import get_message, build_cell_error_tuple
 
 logger = logging.getLogger(__name__)
 
+
 def missing_award_numbers(ir):
     ars = get_range_by_name(ir, "award_reference")
     errors = []

@@ -1,12 +1,11 @@
 from django.core.exceptions import ValidationError
 import logging
-from audit.intakelib.intermediate_representation import (
-    ranges_to_rows,
-    appears_empty
-)
+from audit.intakelib.intermediate_representation import ranges_to_rows, appears_empty
 
 from .util import get_range_start_row
+
 logger = logging.getLogger(__name__)
+
 
 def look_for_empty_rows(ir):
     for sheet in ir:

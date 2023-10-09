@@ -1,10 +1,11 @@
 import logging
 from audit.intakelib.intermediate_representation import (
     get_range_by_name,
-    replace_range_by_name
-    )
+    replace_range_by_name,
+)
 
 logger = logging.getLogger(__name__)
+
 
 def replace_seq_numbers_in_notes_to_sefa(ir):
     seq = get_range_by_name(ir, "seq_number")

@@ -13,7 +13,7 @@ def get_message(key):
     if key in messages:
         return messages[key]
     else:
-        return f'No error message found for <b>{key}</b>. Please contact the helpdesk.'
+        return f"No error message found for <b>{key}</b>. Please contact the helpdesk."
 
 
 def get_range_start_col(range):

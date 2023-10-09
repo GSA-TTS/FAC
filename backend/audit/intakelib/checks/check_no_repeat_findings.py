@@ -16,13 +16,19 @@ def no_repeat_findings(ir):
         if (is_rep == "N") and (prior != "N/A"):
             errors.append(
                 build_cell_error_tuple(
-                    ir, prior_references, ndx, get_message("check_no_repeat_findings_when_n")
+                    ir,
+                    prior_references,
+                    ndx,
+                    get_message("check_no_repeat_findings_when_n"),
                 )
             )
         elif (is_rep == "Y") and ((not prior) or (prior == "N/A")):
             errors.append(
                 build_cell_error_tuple(
-                    ir, prior_references, ndx, get_message("check_no_repeat_findings_when_y")
+                    ir,
+                    prior_references,
+                    ndx,
+                    get_message("check_no_repeat_findings_when_y"),
                 )
             )
 

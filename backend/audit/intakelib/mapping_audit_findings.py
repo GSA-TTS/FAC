@@ -28,10 +28,7 @@ from .intermediate_representation import (
 
 
 from .mapping_meta import meta_mapping
-from .checks import (
-    run_all_general_checks,
-    run_all_audit_finding_checks
-    )
+from .checks import run_all_general_checks, run_all_audit_finding_checks
 
 logger = logging.getLogger(__name__)
 

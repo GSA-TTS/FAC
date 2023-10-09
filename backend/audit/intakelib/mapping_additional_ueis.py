@@ -32,10 +32,7 @@ from .intermediate_representation import (
     _extract_generic_data,
 )
 
-from .checks import (
-    run_all_general_checks,
-    run_all_additional_ueis_checks
-    )
+from .checks import run_all_general_checks, run_all_additional_ueis_checks
 
 logger = logging.getLogger(__name__)
 
@@ -58,7 +55,6 @@ def extract_additional_ueis(file):
     run_all_additional_ueis_checks(ir)
     result = _extract_generic_data(ir, params)
     return result
-
 
 
 def additional_ueis_named_ranges(errors):

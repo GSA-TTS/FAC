@@ -22,7 +22,9 @@ from .check_all_unique_award_numbers import all_unique_award_numbers
 from .check_sequential_award_numbers import sequential_award_numbers
 from .check_num_findings_always_present import num_findings_always_present
 from .check_cluster_name_always_present import cluster_name_always_present
-from .check_federal_award_passed_always_present import federal_award_passed_always_present
+from .check_federal_award_passed_always_present import (
+    federal_award_passed_always_present,
+)
 
 ############
 # Audit findings checks
@@ -46,7 +48,7 @@ federal_awards_checks = general_checks + [
     loan_guarantee,
     no_major_program_no_type,
     all_unique_award_numbers,
-    sequential_award_numbers
+    sequential_award_numbers,
 ]
 
 notes_to_sefa_checks = general_checks + [
@@ -56,28 +58,29 @@ notes_to_sefa_checks = general_checks + [
 audit_findings_checks = general_checks + [
     is_right_workbook(FORM_SECTIONS.FINDINGS_UNIFORM_GUIDANCE),
     no_repeat_findings,
-    findings_grid_validation
+    findings_grid_validation,
 ]
 
 additional_eins_checks = general_checks + [
-        is_right_workbook(FORM_SECTIONS.ADDITIONAL_EINS),
-        ]
+    is_right_workbook(FORM_SECTIONS.ADDITIONAL_EINS),
+]
 
 additional_ueis_checks = general_checks + [
-        is_right_workbook(FORM_SECTIONS.ADDITIONAL_UEIS),
-        ]
+    is_right_workbook(FORM_SECTIONS.ADDITIONAL_UEIS),
+]
 
 audit_findings_text_checks = general_checks + [
-        is_right_workbook(FORM_SECTIONS.FINDINGS_TEXT),
-        ]
+    is_right_workbook(FORM_SECTIONS.FINDINGS_TEXT),
+]
 
 corrective_action_plan_checks = general_checks + [
-        is_right_workbook(FORM_SECTIONS.CORRECTIVE_ACTION_PLAN),
-        ]
+    is_right_workbook(FORM_SECTIONS.CORRECTIVE_ACTION_PLAN),
+]
 
 secondary_auditors_checks = general_checks + [
-        is_right_workbook(FORM_SECTIONS.SECONDARY_AUDITORS),
-        ]
+    is_right_workbook(FORM_SECTIONS.SECONDARY_AUDITORS),
+]
+
 
 def run_all_checks(ir, list_of_checks, section_name=None):
     errors = []
@@ -98,29 +101,38 @@ def run_all_checks(ir, list_of_checks, section_name=None):
         logger.info("Raising a validation error.")
         raise ValidationError(errors)
 
+
 def run_all_general_checks(ir, section_name):
     run_all_checks(ir, general_checks, section_name)
+
 
 def run_all_federal_awards_checks(ir):
     run_all_checks(ir, federal_awards_checks)
 
+
 def run_all_notes_to_sefa_checks(ir):
     run_all_checks(ir, notes_to_sefa_checks)
+
 
 def run_all_audit_finding_checks(ir):
     run_all_checks(ir, audit_findings_checks)
 
+
 def run_all_additional_eins_checks(ir):
     run_all_checks(ir, additional_eins_checks)
+
 
 def run_all_additional_ueis_checks(ir):
     run_all_checks(ir, additional_ueis_checks)
 
+
 def run_all_audit_findings_text_checks(ir):
     run_all_checks(ir, audit_findings_text_checks)
 
+
 def run_all_corrective_action_plan_checks(ir):
     run_all_checks(ir, corrective_action_plan_checks)
+
 
 def run_all_secondary_auditors_checks(ir):
     run_all_checks(ir, secondary_auditors_checks)

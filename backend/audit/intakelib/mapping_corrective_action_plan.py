@@ -27,10 +27,7 @@ from .mapping_util import (
 )
 
 from .mapping_meta import meta_mapping
-from .checks import (
-    run_all_general_checks,
-    run_all_corrective_action_plan_checks
-    )
+from .checks import run_all_general_checks, run_all_corrective_action_plan_checks
 
 logger = logging.getLogger(__name__)
 

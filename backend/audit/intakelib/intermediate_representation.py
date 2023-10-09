@@ -5,6 +5,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
 def _extract_generic_single_value(ir, name):
     """Extract a single value from the workbook with the defined name"""
     v = get_range_by_name(ir, name)
@@ -87,8 +88,7 @@ def find_last_none(ls):
     rev = list(reversed(ls))
     ndx = len(rev)
     for o in rev:
-        if ((isinstance(o, int) and (o != 0)) or 
-            (isinstance(o, str) and (o != ""))):
+        if (isinstance(o, int) and (o != 0)) or (isinstance(o, str) and (o != "")):
             return ndx
         else:
             ndx -= 1
@@ -97,9 +97,8 @@ def find_last_none(ls):
 
 
 def appears_empty(v):
-    return ((v is None) 
-            or (v == 0)
-            or (str(v).strip() == ""))
+    return (v is None) or (v == 0) or (str(v).strip() == "")
+
 
 def replace_range_by_name(ir, name, new_values):
     new_ir = []
@@ -113,6 +112,7 @@ def replace_range_by_name(ir, name, new_values):
         sheet["ranges"] = new_ranges
         new_ir.append(sheet)
     return new_ir
+
 
 def ranges_to_rows(ranges):
     range_values = map(lambda r: r["values"], ranges)
@@ -134,6 +134,7 @@ def ranges_to_rows(ranges):
     keep.reverse()
     return keep
 
+
 def _remove_null_rows(sheet, cutpoint):
     ranges = sheet["ranges"]
     for r in ranges:
@@ -143,9 +144,11 @@ def _remove_null_rows(sheet, cutpoint):
             # Offset by the start row minus one
             c["row"] = str(cutpoint + int(r["start_cell"]["row"]) - 1)
 
+
 def remove_null_rows(sheet):
     ok_rows = ranges_to_rows(sheet["ranges"])
     return _remove_null_rows(sheet, len(ok_rows))
+
 
 def get_sheet_by_name(sheets, name):
     for sheet in sheets:

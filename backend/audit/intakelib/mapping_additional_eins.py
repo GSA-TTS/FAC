@@ -33,10 +33,7 @@ from .intermediate_representation import (
     _extract_generic_data,
 )
 
-from .checks import (
-    run_all_general_checks,
-    run_all_additional_eins_checks
-    )
+from .checks import run_all_general_checks, run_all_additional_eins_checks
 
 from .mapping_meta import meta_mapping
 
