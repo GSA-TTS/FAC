@@ -1,17 +1,11 @@
 import json
 import logging
-import json
-import logging
 from audit.fixtures.excel import (
     FINDINGS_UNIFORM_TEMPLATE_DEFINITION,
     FORM_SECTIONS,
 )
 
 from .constants import XLSX_TEMPLATE_DEFINITION_DIR
-
-from audit.fixtures.excel import (
-    FORM_SECTIONS,
-)
 
 from .mapping_util import (
     _set_by_path,

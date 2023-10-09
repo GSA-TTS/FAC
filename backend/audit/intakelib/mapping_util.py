@@ -3,10 +3,8 @@ import pydash
 import re
 from typing import Any, Callable
 import logging
-from typing import Any, Callable
 from openpyxl import load_workbook, Workbook
 from openpyxl.cell import Cell
-from django.core.exceptions import ValidationError
 
 from audit.fixtures.excel import (
     UNKNOWN_WORKBOOK,

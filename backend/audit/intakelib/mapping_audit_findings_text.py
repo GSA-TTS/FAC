@@ -1,17 +1,11 @@
 import json
 import logging
-import json
-import logging
 from audit.fixtures.excel import (
     FINDINGS_TEXT_TEMPLATE_DEFINITION,
     FORM_SECTIONS,
 )
 
 from .constants import XLSX_TEMPLATE_DEFINITION_DIR
-
-from audit.fixtures.excel import (
-    FORM_SECTIONS,
-)
 
 from .mapping_util import (
     _set_by_path,
@@ -27,11 +21,6 @@ from .intermediate_representation import (
 )
 
 from .mapping_meta import meta_mapping
-
-from .intermediate_representation import (
-    extract_workbook_as_ir,
-    _extract_generic_data,
-)
 
 from .checks import run_all_general_checks, run_all_audit_findings_text_checks
 

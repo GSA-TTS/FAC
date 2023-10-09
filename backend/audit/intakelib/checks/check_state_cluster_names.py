@@ -1,4 +1,3 @@
-from django.core.exceptions import ValidationError
 import logging
 from audit.intakelib.intermediate_representation import get_range_by_name
 from .util import get_message, build_cell_error_tuple

@@ -1,17 +1,11 @@
 import json
 import logging
-import json
-import logging
 from audit.fixtures.excel import (
     CORRECTIVE_ACTION_TEMPLATE_DEFINITION,
     FORM_SECTIONS,
 )
 
 from .constants import XLSX_TEMPLATE_DEFINITION_DIR
-
-from audit.fixtures.excel import (
-    FORM_SECTIONS,
-)
 
 from .intermediate_representation import (
     extract_workbook_as_ir,

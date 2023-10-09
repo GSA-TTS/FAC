@@ -1,7 +1,5 @@
 import json
 import logging
-import json
-import logging
 from audit.fixtures.excel import (
     ADDITIONAL_EINS_TEMPLATE_DEFINITION,
     FORM_SECTIONS,
@@ -9,10 +7,6 @@ from audit.fixtures.excel import (
 
 from .constants import (
     XLSX_TEMPLATE_DEFINITION_DIR,
-)
-
-from audit.fixtures.excel import (
-    FORM_SECTIONS,
 )
 
 from .intermediate_representation import (
@@ -26,11 +20,6 @@ from .mapping_util import (
     ColumnMapping,
     ExtractDataParams,
     _extract_named_ranges,
-)
-
-from .intermediate_representation import (
-    extract_workbook_as_ir,
-    _extract_generic_data,
 )
 
 from .checks import run_all_general_checks, run_all_additional_eins_checks

@@ -1,9 +1,6 @@
-from unittest import TestCase
 from django.test import SimpleTestCase
-from pathlib import Path
 import os
 from functools import reduce
-from openpyxl import load_workbook
 import re
 
 from audit.intakelib import (

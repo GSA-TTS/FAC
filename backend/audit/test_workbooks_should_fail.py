@@ -1,9 +1,6 @@
-from unittest import TestCase
 from django.test import SimpleTestCase
-from pathlib import Path
 import os
 from functools import reduce
-from openpyxl import load_workbook
 import re
 from django.core.exceptions import ValidationError
 
@@ -85,7 +82,7 @@ class FailingWorkbooks(SimpleTestCase):
                                     ir = extractor(full_path)
                                     validator(ir)
                                     print(f"=== Did not fail on workbook {file} ===")
-                                except ValidationError as ve:
+                                except ValidationError:
                                     failure_count += 1
                             else:
                                 print(f"No extractor found for [{file}]")
