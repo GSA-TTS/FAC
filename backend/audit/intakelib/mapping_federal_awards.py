@@ -95,11 +95,6 @@ def _do_not_set_if_0(obj, target, value):
         _set_by_path(obj, target, value)
 
 
-new_federal_awards_field_mapping: FieldMapping = {
-    "auditee_uei": ("FederalAwards.auditee_uei", _set_by_path),
-    "total_amount_expended": ("FederalAwards.total_amount_expended", _set_by_path),
-}
-
 federal_awards_field_mapping: FieldMapping = {
     "auditee_uei": ("FederalAwards.auditee_uei", _set_by_path),
     "total_amount_expended": ("FederalAwards.total_amount_expended", _set_by_path),

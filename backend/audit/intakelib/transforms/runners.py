@@ -7,8 +7,6 @@ logger = logging.getLogger(__name__)
 
 def run_all_transforms(ir, list_of_xforms):
     new_ir = deepcopy(ir)
-    print("========== DEEP COPY ===========")
-    pprint(new_ir)
     for fun in list_of_xforms:
         new_ir = fun(new_ir)
     return new_ir
