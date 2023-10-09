@@ -40,7 +40,7 @@ sections = {
 filenames = {
     FORM_SECTIONS.ADDITIONAL_EINS: "additional-eins-{}.xlsx",
     FORM_SECTIONS.ADDITIONAL_UEIS: "additional-ueis-{}.xlsx",
-    FORM_SECTIONS.CORRECTIVE_ACTION_PLAN: "corrective_action_plan-{}.xlsx",
+    FORM_SECTIONS.CORRECTIVE_ACTION_PLAN: "corrective-action-plan-{}.xlsx",
     FORM_SECTIONS.FEDERAL_AWARDS_EXPENDED: "federal-awards-{}.xlsx",
     FORM_SECTIONS.FINDINGS_TEXT: "audit-findings-text-{}.xlsx",
     FORM_SECTIONS.FINDINGS_UNIFORM_GUIDANCE: "audit-findings-{}.xlsx",

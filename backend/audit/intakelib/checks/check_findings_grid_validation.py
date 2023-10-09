@@ -10,23 +10,23 @@ logger = logging.getLogger(__name__)
 # Significant Deficiency	
 # Other Findings	
 
-# Values copied directly out of the UG
-allowed_raw = [ "1YNNNN", 
-                "2YNYNN",
-                "3YNNYN",
-                "4NYNNN",
-                "5NYYNN",
-                "6NYNYN",
-                "7NNYNN",
-                "8NNNYN",
-                "9NNNNY"
-                ]
-allowed_split = list(map(lambda s: list(s), allowed_raw))
-just_allowed_y_n = list(map(lambda loyn: loyn[1:], allowed_split))
-allowed_as_str = list(map(lambda loc: ''.join(loc), just_allowed_y_n))
-# This results in a list like ["YNNNN", "...", ...]
-
 def findings_grid_validation(ir):
+    # Values copied directly out of the UG
+    allowed_raw = [ "1YNNNN", 
+                    "2YNYNN",
+                    "3YNNYN",
+                    "4NYNNN",
+                    "5NYYNN",
+                    "6NYNYN",
+                    "7NNYNN",
+                    "8NNNYN",
+                    "9NNNNY"
+                    ]
+    allowed_split = list(map(lambda s: list(s), allowed_raw))
+    just_allowed_y_n = list(map(lambda loyn: loyn[1:], allowed_split))
+    allowed_as_str = list(map(lambda loc: ''.join(loc), just_allowed_y_n))
+    # This results in a list like ["YNNNN", "...", ...]
+
     modified_opinion = get_range_by_name(ir, "modified_opinion")
     other_matters = get_range_by_name(ir, "other_matters")
     material_weakness = get_range_by_name(ir, "material_weakness")

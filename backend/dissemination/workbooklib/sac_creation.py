@@ -11,10 +11,10 @@ from django.apps import apps
 
 from django.core.files.uploadedfile import SimpleUploadedFile
 
-from audit.excel import (
+from audit.intakelib import (
     extract_federal_awards,
-    extract_findings_uniform_guidance,
-    extract_findings_text,
+    extract_audit_findings as extract_findings_uniform_guidance,
+    extract_audit_findings_text as extract_findings_text,
     extract_corrective_action_plan,
     extract_secondary_auditors,
     extract_notes_to_sefa,
