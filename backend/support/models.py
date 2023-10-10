@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils import timezone
 
 
 class CognizantBaseline(models.Model):
@@ -28,7 +29,7 @@ class CognizantBaseline(models.Model):
     date_assigned = models.DateTimeField(
         # help_text = "Time when the cog agency was assigned to the entity",
         null=True,  # allow nulls in case history has nulls
-        default=True,
+        default=timezone.now,
         verbose_name="Date Assigned",
     )
     is_active = models.BooleanField(
