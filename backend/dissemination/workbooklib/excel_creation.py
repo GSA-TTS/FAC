@@ -4,7 +4,7 @@ import os
 import sys
 
 import logging
-
+from datetime import date
 from config import settings
 import re
 import json
@@ -136,6 +136,26 @@ def map_simple_columns(wb, mappings, values):
         )
 
 
+def _census_date_to_datetime(cd):
+    lookup = {
+        "JAN": 1,
+        "FEB": 2,
+        "MAR": 3,
+        "APR": 4,
+        "MAY": 5,
+        "JUN": 6,
+        "JUL": 7,
+        "AUG": 8,
+        "SEP": 9,
+        "OCT": 10,
+        "NOV": 11,
+        "DEC": 12,
+    }
+    year = int(cd.split("-")[2])
+    month = lookup[cd.split("-")[1]]
+    day = int(cd.split("-")[0])
+    return date(year + 2000, month, day)
+
 # FIXME: Get the padding/shape right on the report_id
 def dbkey_to_test_report_id(Gen, dbkey):
     g = Gen.select(Gen.audityear, Gen.fyenddate).where(Gen.dbkey == dbkey).get()
@@ -144,7 +164,8 @@ def dbkey_to_test_report_id(Gen, dbkey):
     # We start new audits at 1 million.
     # So, we want 10 digits, and zero-pad for
     # historic DBKEY report_ids
-    return f"{g.audityear}TEST{dbkey.zfill(9)}"
+    dt = _census_date_to_datetime(g.fyenddate)
+    return f"{g.audityear}-{dt.month:02}-TSTDAT-{dbkey.zfill(10)}"
 
 
 def generate_dissemination_test_table(Gen, api_endpoint, dbkey, mappings, objects):

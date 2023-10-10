@@ -3,7 +3,7 @@
 We want to create a variety of SACs in different states of
 completion.
 """
-from datetime import date, timedelta
+from datetime import timedelta
 import logging
 from pathlib import Path
 
@@ -25,7 +25,10 @@ import audit.validators
 
 from audit.fixtures.excel import FORM_SECTIONS
 
-from dissemination.workbooklib.excel_creation import dbkey_to_test_report_id
+from dissemination.workbooklib.excel_creation import (
+    dbkey_to_test_report_id,
+    _census_date_to_datetime
+    )
 
 from dissemination.workbooklib.census_models.census import (
     CensusGen22 as Gen,
@@ -75,27 +78,6 @@ validator_mapping = {
     FORM_SECTIONS.ADDITIONAL_EINS: audit.validators.validate_additional_eins_json,
     "PDF": audit.validators.validate_single_audit_report_file,
 }
-
-
-def _census_date_to_datetime(cd):
-    lookup = {
-        "JAN": 1,
-        "FEB": 2,
-        "MAR": 3,
-        "APR": 4,
-        "MAY": 5,
-        "JUN": 6,
-        "JUL": 7,
-        "AUG": 8,
-        "SEP": 9,
-        "OCT": 10,
-        "NOV": 11,
-        "DEC": 12,
-    }
-    year = int(cd.split("-")[2])
-    month = lookup[cd.split("-")[1]]
-    day = int(cd.split("-")[0])
-    return date(year + 2000, month, day)
 
 
 def _period_covered(s):
@@ -263,20 +245,21 @@ def _create_test_sac(user, auditee_name, dbkey):
         email=user.email,
         role="editor",
     )
-    # Why not give me all the access? This way, I can run the test all the way through!
+
+    # We need these to be different.
     Access.objects.create(
         sac=sac,
         user=user,
-        email=user.email,
+        email="bob_the_auditee_official@auditee.org",  # user.email,
         role="certifying_auditee_contact",
     )
     Access.objects.create(
         sac=sac,
         user=user,
-        email=user.email,
+        email="bob_the_auditor_official@auditor.org",  # user.email,
         role="certifying_auditor_contact",
     )
-    sac.data_source = "TESTDATA"
+    sac.data_source = "TSTDAT"
     sac.save()
 
     logger.info("Created single audit checklist %s", sac)

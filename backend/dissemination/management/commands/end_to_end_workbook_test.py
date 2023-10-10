@@ -10,6 +10,7 @@ from config import settings
 import os
 import jwt
 import requests
+from pprint import pprint
 
 from dissemination.workbooklib.workbook_creation import (
     sections,
@@ -32,6 +33,10 @@ from dissemination.models import (
     SecondaryAuditor,
 )
 
+from audit.cross_validation import (
+    sac_validation_shape,
+    submission_progress_check,
+)
 
 logger = logging.getLogger(__name__)
 logging.basicConfig()
@@ -57,7 +62,8 @@ def step_through_certifications(sac, SAC):
     sac.transition_date.append(datetime.datetime.today())
     sac.transition_date.append(SAC.STATUS.SUBMITTED)
     sac.transition_date.append(datetime.datetime.today())
-
+    sac.transition_date.append(SAC.STATUS.DISSEMINATED)
+    sac.transition_date.append(datetime.datetime.today())
 
 def disseminate(sac, year):
     logger.info("Invoking movement of data from Intake to Dissemination")
@@ -208,6 +214,14 @@ def generate_workbooks(user, email, dbkey, year):
         _post_upload_pdf(sac, user, "audit/fixtures/basic.pdf")
         SingleAuditChecklist = apps.get_model("audit.SingleAuditChecklist")
         step_through_certifications(sac, SingleAuditChecklist)
+
+        # shaped_sac = sac_validation_shape(sac)
+        # result = submission_progress_check(shaped_sac, sar=None, crossval=False)
+        # print(result)
+
+        errors = sac.validate_cross()
+        pprint(errors.get("errors", "No errors found in cross validation"))
+
         disseminate(sac, year)
         # pprint(json_test_tables)
         combined_summary = api_check(json_test_tables)
