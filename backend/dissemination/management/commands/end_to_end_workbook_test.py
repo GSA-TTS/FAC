@@ -228,6 +228,15 @@ def generate_workbooks(user, email, dbkey, year):
         logger.info(combined_summary)
 
 
+def run_end_to_end(email, dbkey, year):
+    try:
+        user = User.objects.get(email=email)
+    except User.DoesNotExist:
+        logger.info("No user found for %s, have you logged in once?", email)
+        return
+    generate_workbooks(user, email, dbkey, year)
+
+
 class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument("--email", type=str, required=True)
@@ -238,11 +247,4 @@ class Command(BaseCommand):
         email = options["email"]
         dbkey = options["dbkey"]
         year = options["year"]
-
-        try:
-            user = User.objects.get(email=email)
-        except User.DoesNotExist:
-            logger.info("No user found for %s, have you logged in once?", email)
-            return
-
-        generate_workbooks(user, email, dbkey, year)
+        run_end_to_end(email, dbkey, year)

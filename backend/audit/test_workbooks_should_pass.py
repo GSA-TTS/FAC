@@ -2,6 +2,10 @@ from django.test import SimpleTestCase
 import os
 from functools import reduce
 import re
+from dissemination.management.commands.end_to_end_workbook_test import (
+    run_end_to_end
+)
+
 
 from audit.intakelib import (
     extract_additional_eins,
@@ -54,6 +58,7 @@ def map_file_to_extractor_validator(filename):
             return (tup[0], tup[1])
     return (None, None)
 
+from django.contrib.auth import get_user_model
 
 class PassingWorkbooks(SimpleTestCase):
     def test_passing_workbooks(self):
@@ -78,3 +83,14 @@ class PassingWorkbooks(SimpleTestCase):
                                 validator(ir)
                             else:
                                 print(f"No extractor found for [{file}]")
+
+    # Can't run this when subclased from SimpleTestCase.
+    # Can't write to the database `default`.
+    # However, we have to write real data to test the API.
+    # For now, running the E2E tests and checking that the data is in
+    # the API will have to wait for another day.
+    # def test_workbooks_end_to_end(self):
+    #     run_end_to_end(os.getenv("CYPRESS_LOGIN_TEST_EMAIL_AUDITEE"),
+    #                    "100010",
+    #                    "22")
+        
