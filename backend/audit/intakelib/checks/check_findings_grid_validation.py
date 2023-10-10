@@ -1,4 +1,7 @@
-from audit.intakelib.intermediate_representation import get_range_values_by_name
+from audit.intakelib.intermediate_representation import (
+    get_range_values_by_name,
+    get_range_by_name
+    )
 from .util import get_message, build_cell_error_tuple
 
 # Modified Opinion
@@ -53,7 +56,7 @@ def findings_grid_validation(ir):
             errors.append(
                 build_cell_error_tuple(
                     ir,
-                    modified_opinion,
+                    get_range_by_name(ir, "modified_opinion"),
                     ndx,
                     # Nicely format a message indicating that is not an allowed combination.
                     get_message("check_findings_grid_validation").format(

@@ -156,6 +156,7 @@ def get_range_by_name(sheets, name):
 def get_range_values_by_name(sheets, name):
     range = get_range_by_name(sheets, name)
     if "values" in range:
+        logger.info("VALUES",  range["values"])
         return range["values"]
     else:
         logger.info(f"No values found for range {name}")

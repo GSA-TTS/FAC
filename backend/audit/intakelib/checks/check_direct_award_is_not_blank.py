@@ -1,5 +1,8 @@
 import logging
-from audit.intakelib.intermediate_representation import get_range_values_by_name
+from audit.intakelib.intermediate_representation import (
+    get_range_values_by_name,
+    get_range_by_name
+    )
 from .util import get_message, build_cell_error_tuple
 
 logger = logging.getLogger(__name__)
@@ -14,7 +17,7 @@ def direct_award_is_not_blank(ir):
         if (y_or_n is None) or (str(y_or_n).strip() == ""):
             errors.append(
                 build_cell_error_tuple(
-                    ir, is_direct, index, get_message("check_direct_award_is_not_blank")
+                    ir, get_range_by_name(ir, "is_direct"), index, get_message("check_direct_award_is_not_blank")
                 )
             )
 
