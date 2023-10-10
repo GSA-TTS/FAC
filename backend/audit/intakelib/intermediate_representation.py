@@ -54,7 +54,8 @@ def _extract_generic_column_data(workbook, result, params):
             if entries:
                 set_fn(result, f"{parent_target}", entries)
 
-
+# FIXME: Have an example or two of what happens
+# and some unit tests around this function
 def abs_ref_to_cell(ref, ndx):
     ref = ref.split(":")
     if len(ref) > ndx:
@@ -68,6 +69,9 @@ def abs_ref_to_cell(ref, ndx):
 
 
 # cell obj, cell obj, worksheet name
+# FIXME. Not at all clear.
+# May want either unit tests and definitely documentation.
+# Unit tests are tricky, they need a workbook.
 def load_workbook_range(start_cell, end_cell, ws):
     values = []
     sc = f"${start_cell['column']}${start_cell['row']}"
@@ -99,7 +103,7 @@ def replace_range_by_name(ir, name, new_values):
         new_ir.append(sheet)
     return new_ir
 
-
+# FIXME: add comments
 def ranges_to_rows(ranges):
     range_values = map(lambda r: r["values"], ranges)
     # Now I have a list of lists.
@@ -120,7 +124,7 @@ def ranges_to_rows(ranges):
     keep.reverse()
     return keep
 
-
+# FIXME: add comments
 def _remove_null_rows(sheet, cutpoint):
     ranges = sheet["ranges"]
     for r in ranges:
@@ -130,7 +134,7 @@ def _remove_null_rows(sheet, cutpoint):
             # Offset by the start row minus one
             c["row"] = str(cutpoint + int(r["start_cell"]["row"]) - 1)
 
-
+# FIXME: add comments
 def remove_null_rows(sheet):
     ok_rows = ranges_to_rows(sheet["ranges"])
     return _remove_null_rows(sheet, len(ok_rows))
@@ -149,6 +153,16 @@ def get_range_by_name(sheets, name):
                 return range
     return None
 
+def get_range_values_by_name(sheets, name):
+    range = get_range_by_name(sheets, name)
+    if "values" in range:
+        return range["values"]
+    else:
+        logger.info(f"No values found for range {name}")
+        # FIXME: Raise an exception?
+        # Return an empty list for now, as it stays within the 
+        # type expectations of the calling site.
+        return []
 
 def extract_workbook_as_ir(file):
     workbook = _open_workbook(file)
