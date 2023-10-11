@@ -71,7 +71,7 @@ def update_cogbaseline_w_csv(filename):
                 & (df["uei"] == cogbaseline_inactive.uei)
             )
         ]
-    save_df_to_cogbaseline(df, "CENSUS")
+    save_df_to_cogbaseline(df)
     logger.info(
         f"At end - row count for CognizantBaseline = {CognizantBaseline.objects.count()}"
     )
@@ -79,7 +79,7 @@ def update_cogbaseline_w_csv(filename):
     return rows_updated_in_cogbaseline
 
 
-def save_df_to_cogbaseline(df, source):
+def save_df_to_cogbaseline(df):
     data = df.to_dict("records")
     for item in data:
         CognizantBaseline(
@@ -89,11 +89,11 @@ def save_df_to_cogbaseline(df, source):
             cognizant_agency=item["cognizant_agency"],
             date_assigned=item["date_assigned"],
             is_active=item["is_active"],
-            source=source,
+            source="CENSUS",
         ).save()
 
 
 def load_all_cog_from_csv(filename):
     df = creat_df_from_csv(filename)
-    save_df_to_cogbaseline(df, "CENSUS")
+    save_df_to_cogbaseline(df)
     return CognizantBaseline.objects.count()

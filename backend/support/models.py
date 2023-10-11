@@ -4,41 +4,41 @@ from django.utils import timezone
 
 class CognizantBaseline(models.Model):
     dbkey = models.CharField(
-        # help_text = "Identifier for a submission along with audit_year in Census FAC",
+        help_text="Identifier for a submission along with audit_year in Census FAC",
         null=True,
         max_length=20,
         verbose_name="dbkey",
     )
     ein = models.CharField(
-        # help_text = "Primary Employer Identification Number",
+        help_text="Primary Employer Identification Number",
         null=True,
         max_length=30,
         verbose_name="EIN",
     )
     uei = models.CharField(
-        # help_text = "Unique Employer Identification Number",
+        help_text="Unique Employer Identification Number",
         null=True,
         max_length=30,
         verbose_name="UEI",
     )
     cognizant_agency = models.CharField(
-        # help_text = "Two digit Federal agency prefix of the cognizant agency",
+        help_text="Two digit Federal agency prefix of the cognizant agency",
         max_length=2,
         verbose_name="Cog Agency",
     )
     date_assigned = models.DateTimeField(
-        # help_text = "Time when the cog agency was assigned to the entity",
+        help_text="Time when the cog agency was assigned to the entity",
         null=True,  # allow nulls in case history has nulls
         default=timezone.now,
         verbose_name="Date Assigned",
     )
     is_active = models.BooleanField(
-        # help_text = "Record to be ignored if this field is False",
+        help_text="Record to be ignored if this field is False",
         default=True,
         verbose_name="Active",
     )
     source = models.CharField(
-        # help_text = "Source of cognizant data",
+        help_text="Source of cognizant data",
         max_length=10,
         verbose_name="Source",
         default="GSAFAC",

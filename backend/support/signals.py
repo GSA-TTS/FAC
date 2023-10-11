@@ -26,7 +26,6 @@ def post_cog_assignment(sender, instance, created, **kwargs):
             ein=ein,
             uei=uei,
             cognizant_agency=cognizant_agency,
-            source="GSAFAC",
         ).save()
 
         try:
