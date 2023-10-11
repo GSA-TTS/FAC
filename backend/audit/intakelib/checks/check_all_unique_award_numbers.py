@@ -1,5 +1,8 @@
 import logging
-from audit.intakelib.intermediate_representation import get_range_values_by_name
+from audit.intakelib.intermediate_representation import (
+    get_range_values_by_name,
+    get_range_by_name
+    )
 from .util import get_message, build_cell_error_tuple
 
 logger = logging.getLogger(__name__)
@@ -19,7 +22,10 @@ def all_unique_award_numbers(ir):
         if award_ref in found:
             errors.append(
                 build_cell_error_tuple(
-                    ir, award_references, index, get_message("check_all_unique_award_numbers")
+                    ir, 
+                    get_range_by_name(ir, "award_reference"), 
+                    index, 
+                    get_message("check_all_unique_award_numbers")
                 )
             )
         if award_ref not in found:

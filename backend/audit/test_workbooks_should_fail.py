@@ -57,7 +57,7 @@ def map_file_to_extractor_validator(filename):
 
 
 class FailingWorkbooks(SimpleTestCase):
-    def test_passing_workbooks(self):
+    def test_failing_workbooks(self):
         workbook_sets = reduce(
             os.path.join, ["audit", "fixtures", "workbooks", "should_fail"]
         )

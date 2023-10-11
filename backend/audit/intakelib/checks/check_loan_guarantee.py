@@ -1,5 +1,8 @@
 import logging
-from audit.intakelib.intermediate_representation import get_range_values_by_name
+from audit.intakelib.intermediate_representation import (
+    get_range_values_by_name,
+    get_range_by_name
+    )
 from .util import get_message, build_cell_error_tuple
 
 logger = logging.getLogger(__name__)
@@ -25,20 +28,23 @@ def loan_guarantee(ir):
         if appears_empty(guarantee):
             errors.append(
                 build_cell_error_tuple(
-                    ir, loan_balance_at_period_end, index, get_message("check_loan_guarantee_not_empty")
+                    ir, 
+                    get_range_by_name(ir, "loan_balance_at_audit_period_end"), 
+                    index, 
+                    get_message("check_loan_guarantee_not_empty")
                 )
             )
 
         if (guarantee == "N") and balance:
             errors.append(
                 build_cell_error_tuple(
-                    ir, loan_balance_at_period_end, index, get_message("check_loan_guarantee_empty_when_n")
+                    ir, get_range_by_name(ir, "loan_balance_at_audit_period_end"), index, get_message("check_loan_guarantee_empty_when_n")
                 )
             )
         elif (guarantee == "Y") and not balance:
             errors.append(
                 build_cell_error_tuple(
-                    ir, loan_balance_at_period_end, index, get_message("check_loan_guarantee_present_when_y")
+                    ir, get_range_by_name(ir, "loan_balance_at_audit_period_end"), index, get_message("check_loan_guarantee_present_when_y")
                 )
             )
 
