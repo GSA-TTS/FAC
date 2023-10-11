@@ -150,7 +150,7 @@ class UEISerializer(serializers.Serializer):
             }
 
         # 2023-10-10: Entities with a samRegistered value of No may be missing
-        # coreData.entityInformation entirely.
+        # some fields from coreData entirely.
         entity_information = core.get("entityInformation", {})
         extra_data = {
             "auditee_fiscal_year_end_date": entity_information.get(
