@@ -95,6 +95,60 @@ class UEIValidatorStepTests(SimpleTestCase):
         # Invalid
         self.assertFalse(UEISerializer(data=invalid).is_valid())
 
+    def test_quirky_uei_payload(self):
+        """
+        It turns out that some entries can be missing fields that we thought would
+        always be present.
+
+        """
+        quirky = {
+            "totalRecords": 1,
+            "entityData": [
+                {
+                    "entityRegistration": {
+                        "samRegistered": "No",
+                        "ueiSAM": "ZQGGHJH74DW7",
+                        "cageCode": None,
+                        "legalBusinessName": "Some organization",
+                        "registrationStatus": "ID Assigned",
+                        "evsSource": "X&Y",
+                        "ueiStatus": "Active",
+                        "ueiExpirationDate": None,
+                        "ueiCreationDate": "2023-04-01",
+                        "publicDisplayFlag": "Y",
+                        "dnbOpenData": None,
+                    },
+                    "coreData": {
+                        "physicalAddress": {
+                            "addressLine1": "SOME RD",
+                            "addressLine2": None,
+                            "city": "SOME CITY",
+                            "stateOrProvinceCode": "AL",
+                            "zipCode": "36659",
+                            "zipCodePlus4": "3903",
+                            "countryCode": "USA",
+                        }
+                    },
+                }
+            ],
+            "links": {
+                "selfLink": "https://api.sam.gov/entity-information/v3/entities?api_key=REPLACE_WITH_API_KEY&ueiSAM=ZQGGHJH74DW7&samRegistered=No&page=0&size=10"
+            },
+        }
+        empty = {"totalRecords": 0, "entityData": []}
+        data = {"auditee_uei": "ZQGGHJH74DW7"}
+        with patch("api.uei.SESSION.get") as mock_get:
+            mock_get.return_value.status_code = 200
+            # First time, it should return zero results and retry:
+            mock_get.return_value.json.return_value = empty
+            self.assertFalse(UEISerializer(data=data).is_valid())
+            self.assertEqual(mock_get.call_count, 2)
+            # Second time, it should return the samRegistered No result and only
+            # call the get method once:
+            mock_get.return_value.json.return_value = quirky
+            self.assertTrue(UEISerializer(data=data).is_valid())
+            self.assertEqual(mock_get.call_count, 3)
+
 
 class AuditeeInfoStepTests(SimpleTestCase):
     def test_valid_auditee_info_with_uei(self):
