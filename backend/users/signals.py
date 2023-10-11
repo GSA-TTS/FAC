@@ -11,7 +11,9 @@ User = get_user_model()
 def create_user_profile(sender, instance, created, **kwargs):
     if created:
         UserProfile.objects.get_or_create(user=instance)
-        staff_emails = StaffUser.objects.all().values("staff_email")
+        staff_emails = list(
+            StaffUser.objects.all().values_list("staff_email", flat=True)
+        )
         if instance.email in staff_emails:
             instance.is_staff = True
             instance.save()
