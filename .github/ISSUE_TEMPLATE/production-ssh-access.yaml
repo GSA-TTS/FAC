@@ -4,6 +4,14 @@ title: "[Production ssh access]: "
 labels: ["prodssh"]
 projects: ["GSA-TTS/11"]
 body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this only after production ssh access has been disabled again; do not create a ticket before that has happened.
+
+        Assign the people who were involved in the ssh access to this ticket.
+
+        Close the ticket after it’s created; this is for logging activity, not tracking work yet to be done.
   - type: input
     id: prodssh-start
     attributes:
