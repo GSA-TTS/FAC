@@ -1,5 +1,3 @@
-import time
-
 from django.test import TestCase
 from dissemination.hist_models.census_2019 import CensusGen19, CensusCfda19
 from dissemination.hist_models.census_2022 import CensusGen22
