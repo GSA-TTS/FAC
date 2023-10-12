@@ -1,7 +1,7 @@
 from audit.intakelib.intermediate_representation import (
     get_range_values_by_name,
-    get_range_by_name
-    )
+    get_range_by_name,
+)
 from .util import get_message, build_cell_error_tuple
 
 # Modified Opinion
@@ -10,12 +10,13 @@ from .util import get_message, build_cell_error_tuple
 # Significant Deficiency
 # Other Findings
 
+
 # DESCRIPTION
 # There are five Y/N fields in the audit findings workbook.
 # Only certain combinations of Y/N are allowed.
 # This makes sure that the right combos are present.
 # WHY
-# It's in the UG. 
+# It's in the UG.
 def findings_grid_validation(ir):
     # Values copied directly out of the UG
     allowed_combos = [
@@ -36,7 +37,7 @@ def findings_grid_validation(ir):
     significant_deficiency = get_range_values_by_name(ir, "significant_deficiency")
     other_findings = get_range_values_by_name(ir, "other_findings")
     errors = []
-    
+
     # These variables are the Y/N values from the columns above.
     for ndx, (mo, om, mw, sd, of) in enumerate(
         zip(
@@ -47,7 +48,7 @@ def findings_grid_validation(ir):
             other_findings,
         )
     ):
-        # Build a grid and convert it to a string from the 
+        # Build a grid and convert it to a string from the
         # individual y/n values.
         user_grid_ls = [mo, om, mw, sd, of]
         user_grid = "".join(user_grid_ls)

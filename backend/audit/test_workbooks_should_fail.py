@@ -63,10 +63,10 @@ class FailingWorkbooks(SimpleTestCase):
         )
         workbook_count = 0
         failure_count = 0
-        for (dirpath, dirnames, _) in os.walk(workbook_sets):
+        for dirpath, dirnames, _ in os.walk(workbook_sets):
             for workbook_set in dirnames:
                 print("Walking ", workbook_set)
-                for (wb_path, _, wb_files) in os.walk(
+                for wb_path, _, wb_files in os.walk(
                     os.path.join(dirpath, workbook_set)
                 ):
                     for file in wb_files:

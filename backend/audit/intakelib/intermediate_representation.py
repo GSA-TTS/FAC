@@ -54,6 +54,7 @@ def _extract_generic_column_data(workbook, result, params):
             if entries:
                 set_fn(result, f"{parent_target}", entries)
 
+
 # FIXME: Have an example or two of what happens
 # and some unit tests around this function
 def abs_ref_to_cell(ref, ndx):
@@ -103,6 +104,7 @@ def replace_range_by_name(ir, name, new_values):
         new_ir.append(sheet)
     return new_ir
 
+
 # FIXME: add comments
 def ranges_to_rows(ranges):
     range_values = map(lambda r: r["values"], ranges)
@@ -124,6 +126,7 @@ def ranges_to_rows(ranges):
     keep.reverse()
     return keep
 
+
 # FIXME: add comments
 def _remove_null_rows(sheet, cutpoint):
     ranges = sheet["ranges"]
@@ -133,6 +136,7 @@ def _remove_null_rows(sheet, cutpoint):
             c = r["end_cell"]
             # Offset by the start row minus one
             c["row"] = str(cutpoint + int(r["start_cell"]["row"]) - 1)
+
 
 # FIXME: add comments
 def remove_null_rows(sheet):
@@ -153,6 +157,7 @@ def get_range_by_name(sheets, name):
                 return range
     return None
 
+
 def get_range_values_by_name(sheets, name):
     range = get_range_by_name(sheets, name)
     if "values" in range:
@@ -163,6 +168,7 @@ def get_range_values_by_name(sheets, name):
         # FIXME: Raise an exception?
         # Returning none to break upstream code; an exception would be better.
         return None
+
 
 def extract_workbook_as_ir(file):
     workbook = _open_workbook(file)
