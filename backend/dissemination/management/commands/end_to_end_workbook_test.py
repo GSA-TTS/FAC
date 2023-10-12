@@ -33,11 +33,6 @@ from dissemination.models import (
     SecondaryAuditor,
 )
 
-from audit.cross_validation import (
-    sac_validation_shape,
-    submission_progress_check,
-)
-
 logger = logging.getLogger(__name__)
 logging.basicConfig()
 logging.getLogger().setLevel(logging.INFO)
