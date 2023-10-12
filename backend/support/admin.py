@@ -22,12 +22,12 @@ class CognizantBaselineAdmin(SupportAdmin):
         "ein",
         "dbkey",
         "is_active",
+        "source",
     ]
     list_filter = [
+        "source",
         "is_active",
-        "uei",
         "cognizant_agency",
-        "ein",
     ]
 
     def has_change_permission(self, request, obj=None):
