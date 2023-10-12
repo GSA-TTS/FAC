@@ -6,6 +6,7 @@
 <div class="grid-container">
     <div class="grid-row">
 	<div class="tablet:grid-col-4 audit-search-form">
+	    <h3>Filters</h3>
 	    <form class="usa-form" action="{% url 'dissemination:Search' %}" enctype='multipart/form-data' method="post">
 		{% csrf_token %}
 
