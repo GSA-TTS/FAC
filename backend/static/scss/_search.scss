@@ -39,3 +39,38 @@
     width: 100%;
   }
 }
+
+.audit-search-results {
+  padding: 1em 0 0 3em;
+
+  .active-filters {
+    border-top: 1px solid #a9aeb1;
+    border-bottom: 1px solid #a9aeb1;
+    display: flex;
+
+    h3 {
+      font-size: 1em;
+      width: 40%;
+    }
+
+    ul {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1em;
+      padding: 0;
+    }
+
+    ul li {
+      display: inline-flex;
+    }
+
+    .usa-tag {
+      background-color: #efefef;
+      color: #1b1b1b;
+      font-size: 14px;
+      font-weight: bold;
+      padding: 1em;
+      text-transform: none;
+    }
+  }
+}
