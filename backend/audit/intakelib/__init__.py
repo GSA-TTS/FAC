@@ -1,3 +1,4 @@
+# flake8: noqa: F401
 from .intermediate_representation import extract_workbook_as_ir
 
 from .mapping_additional_ueis import (

@@ -27,8 +27,8 @@ from audit.fixtures.excel import FORM_SECTIONS
 
 from dissemination.workbooklib.excel_creation import (
     dbkey_to_test_report_id,
-    _census_date_to_datetime
-    )
+    _census_date_to_datetime,
+)
 
 from dissemination.workbooklib.census_models.census import (
     CensusGen22 as Gen,
