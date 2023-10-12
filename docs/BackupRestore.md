@@ -72,4 +72,5 @@ Backups are periodically purged from the S3 buckets since we no longer need old 
 
 - Retain the *two* most recent backups taken prior to deployment of the FAC application to `production`
 - Retain a rolling *seven* days worth of daily `peoduction` backups
+  *TODO* Consider keeping weekly/monthly backups (tadhg)
 - Retain a rolling *one* day worth of daily `dev` backups
