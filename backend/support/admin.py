@@ -93,7 +93,7 @@ class CognizantAssignmentAdmin(SupportAdmin):
         extra_context["show_save"] = False
         extra_context[
             "show_save_and_add_another"
-        ] = False  # this not works if has_add_permision is True
+        ] = False  # this does not work if has_add_permision is True
         return super().change_view(request, object_id, extra_context=extra_context)
 
     def save_model(self, request, obj, form, change):
@@ -102,9 +102,7 @@ class CognizantAssignmentAdmin(SupportAdmin):
         super().save_model(request, obj, form, change)
 
     def has_change_permission(self, request, obj=None):
-        if request.user.is_staff:
-            return True
+        return request.user.is_staff
 
     def has_add_permission(self, request, obj=None):
-        if request.user.is_staff:
-            return True
+        return request.user.is_staff

@@ -1,3 +1,6 @@
+import hashlib
+
+
 from django.test import TestCase, Client
 from django.contrib.auth import get_user_model
 from django.urls import reverse
@@ -5,6 +8,7 @@ from django.urls import reverse
 from users.models import StaffUser, StaffUserLog
 
 User = get_user_model()
+PASSWORD = hashlib.sha256("password".encode()).hexdigest()
 
 
 class StaffUserAdminTest(TestCase):
@@ -12,11 +16,11 @@ class StaffUserAdminTest(TestCase):
         self.client = Client()
         self.superuser = User.objects.create_superuser(
             username="roor",
-            password="testpassword",
+            password=PASSWORD,
             email="root@test.com",
         )
         self.user = User(
-            username="testuser", password="testpassword", email="testemail@test.com"
+            username="testuser", password=PASSWORD, email="testemail@test.com"
         )
         self.url_prefix = "admin:users_staffuser"
 
