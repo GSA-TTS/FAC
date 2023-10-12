@@ -81,7 +81,7 @@ class IntakeToDissemination(object):
                 finding_text_ = FindingText(
                     report_id=self.report_id,
                     finding_ref_number=entry["reference_number"],
-                    contains_chart_or_table=entry["contains_chart_or_table"] == "Y",
+                    contains_chart_or_table=entry["contains_chart_or_table"],
                     finding_text=entry["text_of_finding"],
                 )
                 findings_text_objects.append(finding_text_)
