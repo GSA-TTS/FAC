@@ -20,7 +20,6 @@ from .mapping_util import (
     ColumnMapping,
     ExtractDataParams,
     _extract_named_ranges,
-    NoneType,
 )
 
 from .intermediate_representation import (
@@ -66,7 +65,7 @@ def federal_awards_named_ranges(errors):
 
 
 def _set_pass_through_entity_name(obj, target, value):
-    if isinstance(value, NoneType) or value == "":
+    if value is None or value == "":
         pass
     else:
         for index, v in enumerate(str(value).split("|")):
@@ -74,7 +73,7 @@ def _set_pass_through_entity_name(obj, target, value):
 
 
 def _set_pass_through_entity_id(obj, target, value):
-    if isinstance(value, NoneType) or value == "":
+    if value is None or value == "":
         pass
     else:
         for index, v in enumerate(str(value).split("|")):

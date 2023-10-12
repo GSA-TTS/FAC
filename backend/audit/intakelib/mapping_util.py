@@ -23,17 +23,14 @@ from .exceptions import ExcelExtractionError
 logger = logging.getLogger(__name__)
 
 
-NoneType = type(None)
-
-
 def _set_by_path_with_default(default=None):
     def _no_op(_, __, ___):
         pass
 
     def _new_set_by_path(target_obj, target_path, value):
-        if (isinstance(value, NoneType) or (value == "")) and default is not None:
+        if (value is None or value == "") and default is not None:
             return _set_by_path(target_obj, target_path, default)
-        elif not isinstance(value, NoneType):
+        elif value is not None:
             return _set_by_path(target_obj, target_path, value)
         else:
             return _no_op
@@ -42,7 +39,7 @@ def _set_by_path_with_default(default=None):
 
 
 def _set_by_path(target_obj, target_path, value):
-    if isinstance(value, NoneType):
+    if value is None:
         pass
     else:
         pydash.set_(target_obj, target_path, value)
