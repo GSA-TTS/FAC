@@ -32,6 +32,14 @@ export NEW_RELIC_LOG=stdout
 
 # https://docs.newrelic.com/docs/security/security-privacy/compliance/fedramp-compliant-endpoints/
 export NEW_RELIC_HOST="gov-collector.newrelic.com"
+# https://docs.newrelic.com/docs/apm/agents/python-agent/configuration/python-agent-configuration/#proxy
+https_proxy_protocol="$(echo "$VCAP_SERVICES" | jq --raw-output --arg service_name "https-proxy-creds" ".[][] | select(.name == \$service_name) | .credentials.protocol")"
+https_proxy_domain="$(echo "$VCAP_SERVICES" | jq --raw-output --arg service_name "https-proxy-creds" ".[][] | select(.name == \$service_name) | .credentials.domain")"
+https_proxy_port="$(echo "$VCAP_SERVICES" | jq --raw-output --arg service_name "https-proxy-creds" ".[][] | select(.name == \$service_name) | .credentials.port")"
+
+export NEW_RELIC_PROXY_HOST="$https_proxy_protocol://$https_proxy_domain:$https_proxy_port"
+export NEW_RELIC_PROXY_USER="$(echo "$VCAP_SERVICES" | jq --raw-output --arg service_name "https-proxy-creds" ".[][] | select(.name == \$service_name) | .credentials.username")"
+export NEW_RELIC_PROXY_PASS="$(echo "$VCAP_SERVICES" | jq --raw-output --arg service_name "https-proxy-creds" ".[][] | select(.name == \$service_name) | .credentials.password")"
 
 # We only want to run migrate and collecstatic for the first app instance, not
 # for additional app instances, so we gate all of this behind CF_INSTANCE_INDEX
@@ -58,8 +66,6 @@ if [[ "$CF_INSTANCE_INDEX" == 0 ]]; then
     echo 'Starting seed_cog_baseline' &&
     python manage.py seed_cog_baseline &&
     echo 'Finished seed_cog_baseline'
-    python manage.py update_oldformat_reportids &&
-    echo 'Finished rewriting old-format report_id values'
 fi
 
 # Make psql usable by scripts, for debugging, etc.
