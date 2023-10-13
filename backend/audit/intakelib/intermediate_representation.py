@@ -165,7 +165,10 @@ def insert_new_range(ir, sheet_name, range_name, column, row, values):
             range["name"] = range_name
             range["values"] = values
             range["start_cell"] = {"column": column, "row": str(row)}
-            range["end_cell"] = {"column": column, "row": str(int(row) + len(values) - 1)}
+            range["end_cell"] = {
+                "column": column,
+                "row": str(int(row) + len(values) - 1),
+            }
             sheet["ranges"].append(range)
     return ir
 
