@@ -196,7 +196,7 @@ function validateFyStartDate(fyInput) {
   if (userFy.year < 2016) {
     const errorEl = document.createElement('li');
     errorEl.innerHTML =
-      'We are currently only accepting audits from FY16.\
+      'We are currently only accepting audits from FY16 or later.\
       To submit an audit for a different fiscal period, \
       visit the <a href="https://facides.census.gov/Account/Login.aspx">Census Bureau</a>.';
     fyErrorContainer.appendChild(errorEl);
