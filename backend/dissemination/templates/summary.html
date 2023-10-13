@@ -17,6 +17,9 @@
                     {% comment %} General Information {% endcomment %}
                     <div id="title">
                         <h1>{{auditee_name}} ({{auditee_uei}})</h1>
+                        <p class="margin-y-1"><strong>Report ID: </strong>{{report_id}}</p>
+                        <p class="margin-y-1"><strong>Submission date: </strong>{{general.submitted_date}}</p>
+                        <p class="margin-y-1"><strong>Fiscal Year: </strong>{{general.fy_start_date}} to {{general.fy_end_date}}</p>
                     <div>
 
                     <div id="general-information" class="margin-top-6">
@@ -41,7 +44,7 @@
                                 <span class="text-base font-sans-lg display-flex flex-align-self-center">{{ section_list|length }}</span>
                             </span>
                             <div id="{{ section_key }}-table" class="usa-table-container--scrollable">
-                                <table class="usa-table usa-table--striped overflow-scroll">
+                                <table class="usa-table usa-table--striped overflow-scroll width-full">
                                     <thead id="{{ section_key }}-table__head">
                                         <tr>
                                             {% for k in section_list.0 %}<th scope="col">{{ k|field_name_to_label }}</th>{% endfor %}
