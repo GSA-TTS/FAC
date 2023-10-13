@@ -92,13 +92,13 @@ describe('Create New Audit', () => {
         );
       });
 
-      it('should show an error if the user enters a date before 1/1/2020', () => {
-        cy.get('#auditee_fiscal_period_start').type('12/31/2019');
+      it('should show an error if the user enters a date before 1/1/2016', () => {
+        cy.get('#auditee_fiscal_period_start').type('12/31/2015');
         cy.get('#fy-error-message li').should('have.length', 1);
       });
 
-      it('should not show an error if the user enters a date after 12/31/2019', () => {
-        cy.get('#auditee_fiscal_period_start').clear().type('12/31/2020');
+      it('should not show an error if the user enters a date after 12/31/2015', () => {
+        cy.get('#auditee_fiscal_period_start').clear().type('1/1/2016');
         cy.get('#fy-error-message li').should('have.length', 0);
       });
     });
@@ -131,7 +131,9 @@ describe('Create New Audit', () => {
 
       it('should remove the error message when valid end date is supplied', () => {
         cy.get('#auditee_fiscal_period_end').type('01/31/2023').blur();
-        cy.get('#auditee_fiscal_period_end-date-order').should('not.be.visible');
+        cy.get('#auditee_fiscal_period_end-date-order').should(
+          'not.be.visible'
+        );
       });
     });
 
