@@ -7,6 +7,7 @@ from audit.fixtures.excel import FORM_SECTIONS
 from .check_uei_exists import uei_exists
 from .check_is_a_workbook import is_a_workbook
 from .check_look_for_empty_rows import look_for_empty_rows
+from .check_start_and_end_rows_of_all_columns_are_same import start_and_end_rows_of_all_columns_are_same
 
 ############
 # Federal awards checks
@@ -33,7 +34,11 @@ from .check_findings_grid_validation import findings_grid_validation
 
 logger = logging.getLogger(__name__)
 
-general_checks = [is_a_workbook, uei_exists, look_for_empty_rows]
+general_checks = [ is_a_workbook, 
+                  uei_exists, 
+                  look_for_empty_rows,
+                  start_and_end_rows_of_all_columns_are_same,
+                  ]
 
 federal_awards_checks = general_checks + [
     is_right_workbook(FORM_SECTIONS.FEDERAL_AWARDS_EXPENDED),
