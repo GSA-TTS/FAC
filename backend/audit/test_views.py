@@ -129,14 +129,6 @@ def _merge_dict_seq(seq):
     return {k: v for d in seq for k, v in d.items()}
 
 
-def _camel(fieldname):
-    """
-    Given a fieldname in audit.cross_validation.naming.SECTION_NAMES, return the
-    camel case version of that field name.
-    """
-    return SN[fieldname].camel_case
-
-
 def _just_uei(uei, fieldname):
     """
     _just_uei("whatever", "additional_eins") returns:
@@ -148,7 +140,7 @@ def _just_uei(uei, fieldname):
     audit.cross_validation.naming.SECTION_NAMES, return a structure with the camel-case
     version of that fieldname as the key and {"auditee_uei": uei} as the value.
     """
-    return {_camel(fieldname): {"auditee_uei": uei}}
+    return {SN[fieldname].camel_case: {"auditee_uei": uei}}
 
 
 def _just_uei_workbooks(uei):
