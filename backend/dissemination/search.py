@@ -6,7 +6,7 @@ from dissemination.models import General
 def search_general(
     names, uei_or_eins, start_date, end_date, cog_or_oversight, agency_name
 ):
-    query = Q()
+    query = Q(is_public=True)
 
     if names:
         names_match = Q(Q(auditee_name__in=names) | Q(auditor_firm_name__in=names))
@@ -28,10 +28,10 @@ def search_general(
 
     if cog_or_oversight:
         if cog_or_oversight == "Cognizant":
-            cog_match = Q(cognizant_agency__in=agency_name)
+            cog_match = Q(cognizant_agency__in=[agency_name])
             query.add(cog_match, Q.AND)
         elif cog_or_oversight == "Oversight":
-            oversight_match = Q(oversight_agency__in=agency_name)
+            oversight_match = Q(oversight_agency__in=[agency_name])
             query.add(oversight_match, Q.AND)
 
     results = General.objects.filter(query)
