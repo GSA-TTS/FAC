@@ -16,8 +16,8 @@ class Search(View):
         results = []
 
         if form.is_valid():
-            names = [x for x in form.cleaned_data["entity_name"].splitlines()]
-            uei_or_eins = [x for x in form.cleaned_data["uei_or_ein"].splitlines()]
+            names = form.cleaned_data["entity_name"].splitlines()
+            uei_or_eins = form.cleaned_data["uei_or_ein"].splitlines()
             start_date = form.cleaned_data["start_date"]
             end_date = form.cleaned_data["end_date"]
             cog_or_oversight = form.cleaned_data["cog_or_oversight"]
