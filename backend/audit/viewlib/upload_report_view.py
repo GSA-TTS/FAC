@@ -91,9 +91,9 @@ class UploadReportView(SingleAuditChecklistAccessRequiredMixin, generic.View):
         report_id = kwargs["report_id"]
         try:
             sac = SingleAuditChecklist.objects.get(report_id=report_id)
-            sar = SingleAuditReportFile.objects.filter(sac_id=sac.id).latest(
-                "date_created"
-            )
+            sar = SingleAuditReportFile.objects.filter(sac_id=sac.id)
+            if sar.exists():
+                sar = sar.latest("date_created")
 
             current_info = {
                 "cleaned_data": getattr(sar, "component_page_numbers", {}),
