@@ -252,7 +252,7 @@ create view api_v1_0_2.general as
         gen.total_amount_expended,
         gen.type_audit_code,
         gen.is_public,
-        gen.data_source
+        gen.data_source,
         gen.is_aicpa_audit_guide_included
     from
         dissemination_General gen

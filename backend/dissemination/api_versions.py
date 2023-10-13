@@ -4,7 +4,7 @@ from config import settings
 # These are API versions we want live.
 live = (
     # These are API versions we have in flight.
-    "api_v1_0_1",
+    "api_v1_0_2",
 )
 
 # These are API versions we have deprecated.
@@ -13,6 +13,7 @@ live = (
 deprecated = (
     "api",
     "api_v1_0_0",
+    "api_v1_0_1"
 )
 
 
