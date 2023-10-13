@@ -61,7 +61,6 @@ class IRTests(SimpleTestCase):
     }
 
     def test_ranges_to_rows(self):
-
         self.assertEqual(
             [[1, "a", 8], [2, "b", None], [3, "c", 10]],
             ranges_to_rows(IRTests.s1["ranges"]),

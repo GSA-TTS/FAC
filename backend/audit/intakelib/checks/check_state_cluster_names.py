@@ -18,7 +18,6 @@ def state_cluster_names(ir):
         cluster_name["values"],
         state_cluster_name["values"],
     ):
-
         if cn == STATE_CLUSTER:
             # If they indicated state cluster, then it should be populated.
             if not scn:

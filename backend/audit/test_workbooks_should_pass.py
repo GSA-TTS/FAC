@@ -2,9 +2,6 @@ from django.test import SimpleTestCase
 import os
 from functools import reduce
 import re
-from dissemination.management.commands.end_to_end_workbook_test import (
-    run_end_to_end
-)
 
 
 from audit.intakelib import (
@@ -58,17 +55,16 @@ def map_file_to_extractor_validator(filename):
             return (tup[0], tup[1])
     return (None, None)
 
-from django.contrib.auth import get_user_model
 
 class PassingWorkbooks(SimpleTestCase):
     def test_passing_workbooks(self):
         workbook_sets = reduce(
             os.path.join, ["audit", "fixtures", "workbooks", "should_pass"]
         )
-        for (dirpath, dirnames, _) in os.walk(workbook_sets):
+        for dirpath, dirnames, _ in os.walk(workbook_sets):
             for workbook_set in dirnames:
                 print("Walking ", workbook_set)
-                for (wb_path, _, wb_files) in os.walk(
+                for wb_path, _, wb_files in os.walk(
                     os.path.join(dirpath, workbook_set)
                 ):
                     for file in wb_files:
@@ -93,4 +89,3 @@ class PassingWorkbooks(SimpleTestCase):
     #     run_end_to_end(os.getenv("CYPRESS_LOGIN_TEST_EMAIL_AUDITEE"),
     #                    "100010",
     #                    "22")
-        

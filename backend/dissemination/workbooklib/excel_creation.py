@@ -156,6 +156,7 @@ def _census_date_to_datetime(cd):
     day = int(cd.split("-")[0])
     return date(year + 2000, month, day)
 
+
 # FIXME: Get the padding/shape right on the report_id
 def dbkey_to_test_report_id(Gen, dbkey):
     g = Gen.select(Gen.audityear, Gen.fyenddate).where(Gen.dbkey == dbkey).get()

@@ -4,10 +4,11 @@ from audit.intakelib.intermediate_representation import get_sheet_by_name
 
 logger = logging.getLogger(__name__)
 
+
 # DESCRIPTION
 # Checks that this is a workbook.
 # Does this by checking for the coversheet.
-# Correctly fails to validate workbooks that are really 
+# Correctly fails to validate workbooks that are really
 # sloppy and still have a coversheet page.
 def is_a_workbook(ir):
     coversheet = get_sheet_by_name(ir, "Coversheet")

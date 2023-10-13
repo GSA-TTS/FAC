@@ -33,11 +33,6 @@ from dissemination.models import (
     SecondaryAuditor,
 )
 
-from audit.cross_validation import (
-    sac_validation_shape,
-    submission_progress_check,
-)
-
 logger = logging.getLogger(__name__)
 logging.basicConfig()
 logging.getLogger().setLevel(logging.INFO)
@@ -64,6 +59,7 @@ def step_through_certifications(sac, SAC):
     sac.transition_date.append(datetime.datetime.today())
     sac.transition_date.append(SAC.STATUS.DISSEMINATED)
     sac.transition_date.append(datetime.datetime.today())
+
 
 def disseminate(sac, year):
     logger.info("Invoking movement of data from Intake to Dissemination")

@@ -1,3 +1,4 @@
+# flake8: noqa: F401
 from .runners import (
     run_all_general_checks,
     run_all_federal_awards_checks,
