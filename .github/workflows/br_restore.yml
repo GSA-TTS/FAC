@@ -6,13 +6,10 @@ on:
       environment:
         required: true
         type: string
-        # dev, staging, production
-      date-of-backup:
+        # dev, preview, staging, production
+      name-of-backup:
         required: true
-        type: string # YYYY-MM-DD-HHmm https://github.com/GSA-TTS/FAC/issues/2221
-      type-of-backup:
-        required: true
-        type: string # PR, CRON, MAN
+        type: string 
 
 jobs:
   restore-database:
@@ -22,8 +19,7 @@ jobs:
     environment: ${{ inputs.environment }}
     env:
       space: ${{ inputs.environment }}
-      type-of-backup: ${{ inputs.type-of-backup}}
-      date-of-backup: ${{ inputs.date-of-backup}}
+      name-of-backup: ${{ inputs.name-of-backup}}
 
     steps:
       - name: Checkout
@@ -45,7 +41,7 @@ jobs:
           cf_password: ${{ secrets.CF_PASSWORD }}
           cf_org: gsa-tts-oros-fac
           cf_space: ${{ env.space }}
-          command: cf run-task gsa-fac -k 2G -m 3G --name pg_restore --command "./br_restore.sh ${{ env.space }} ${{ env.type-of-backup }} ${{ env.date-of-backup }} "
+          command: cf run-task gsa-fac -k 2G -m 3G --name pg_restore --command "./br_ops/restore.sh ${{ env.space }} ${{ env.name-of-backup }}"
 
       - name: Sleep for 5 minutes to ensure restore occurs
         run: sleep 5m
