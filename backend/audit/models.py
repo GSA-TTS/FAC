@@ -569,15 +569,6 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
             return self.transition_date[index]
         return None
 
-    def _general_info_get(self, key):
-        try:
-            return self.general_information[key]
-        except KeyError:
-            pass
-        except TypeError:
-            pass
-        return None
-
 
 class AccessManager(models.Manager):
     """Custom manager for Access."""
