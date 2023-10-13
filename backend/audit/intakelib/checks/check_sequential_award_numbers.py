@@ -10,7 +10,8 @@ def sequential_award_numbers(ir):
     ars = get_range_by_name(ir, "award_reference")
     errors = []
     for ndx, v in enumerate(ars["values"], 1):
-        if not re.search("AWARD-[0-9]{4}", v):
+        print(v)
+        if not re.search("AWARD-[0-9]{4}", str(v)):
             errors.append(
                 build_cell_error_tuple(
                     ir, ars, ndx, get_message("check_sequential_award_numbers_regex")
