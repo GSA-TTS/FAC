@@ -2,11 +2,10 @@ import logging
 from audit.intakelib.intermediate_representation import (
     get_range_by_name,
     replace_range_by_name,
-    appears_empty
+    appears_empty,
 )
 
 logger = logging.getLogger(__name__)
-
 
 
 def filter_seq_numbers_where_there_are_no_values(ir):
@@ -15,12 +14,20 @@ def filter_seq_numbers_where_there_are_no_values(ir):
     note_title = get_range_by_name(ir, "note_title")
     seq_numbers = get_range_by_name(ir, "seq_number")
     new_seq_numbers = []
-    for indx, (contains_ch, note_con, note_tit, seq_num) in enumerate(zip(contains_chart["values"], 
-                                                                note_content["values"],
-                                                                note_title["values"], 
-                                                                seq_numbers["values"])):
+    for indx, (contains_ch, note_con, note_tit, seq_num) in enumerate(
+        zip(
+            contains_chart["values"],
+            note_content["values"],
+            note_title["values"],
+            seq_numbers["values"],
+        )
+    ):
         # We only want seq numbers where there are values in the other columns
-        if appears_empty(note_con) and appears_empty(contains_ch) and appears_empty(note_tit):
+        if (
+            appears_empty(note_con)
+            and appears_empty(contains_ch)
+            and appears_empty(note_tit)
+        ):
             pass
         else:
             new_seq_numbers.append(seq_num)

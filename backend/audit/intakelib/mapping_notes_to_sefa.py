@@ -43,6 +43,7 @@ def extract_notes_to_sefa(file):
 
     ir = extract_workbook_as_ir(file)
     run_all_general_checks(ir, FORM_SECTIONS.NOTES_TO_SEFA)
+    print("Done running all general checks")
     new_ir = run_all_notes_to_sefa_transforms(ir)
     run_all_notes_to_sefa_checks(new_ir)
     result = _extract_generic_data(new_ir, params)

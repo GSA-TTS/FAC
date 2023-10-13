@@ -99,8 +99,7 @@ def replace_range_by_name(ir, name, new_values):
             if range["name"] == name:
                 logger.info(f"Replacing range {name}")
                 range["values"] = new_values
-            else:
-                new_ranges.append(range)
+            new_ranges.append(range)
         sheet["ranges"] = new_ranges
         new_ir.append(sheet)
     return new_ir
@@ -158,6 +157,7 @@ def get_range_by_name(sheets, name):
                 return range
     return None
 
+
 def insert_new_range(ir, sheet_name, range_name, column, row, values):
     for sheet in ir:
         if sheet["name"] == sheet_name:
@@ -165,9 +165,10 @@ def insert_new_range(ir, sheet_name, range_name, column, row, values):
             range["name"] = range_name
             range["values"] = values
             range["start_cell"] = {"column": column, "row": str(row)}
-            range["end_cell"] = {"column": column, "row": int(row) + len(values) - 1}
+            range["end_cell"] = {"column": column, "row": str(int(row) + len(values) - 1)}
             sheet["ranges"].append(range)
     return ir
+
 
 def get_range_values_by_name(sheets, name):
     range = get_range_by_name(sheets, name)
@@ -179,6 +180,7 @@ def get_range_values_by_name(sheets, name):
         # FIXME: Raise an exception?
         # Returning none to break upstream code; an exception would be better.
         return None
+
 
 def remove_range_by_name(ir, name):
     new_ir = []
@@ -193,6 +195,7 @@ def remove_range_by_name(ir, name):
         sheet["ranges"] = new_ranges
         new_ir.append(sheet)
     return new_ir
+
 
 def extract_workbook_as_ir(file):
     workbook = _open_workbook(file)
