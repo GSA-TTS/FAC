@@ -1,6 +1,5 @@
 from django.core.exceptions import ValidationError
 
-from pprint import pprint
 
 def start_and_end_rows_of_all_columns_are_same(ir):
     # Every column should have the same start and end rows
