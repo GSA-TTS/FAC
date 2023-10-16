@@ -440,6 +440,8 @@ class IntakeToDisseminationTests(TestCase):
         sac = self._create_sac(
             privacy_flag=flag,
             user_provided_organization_type="tribal",
+            cognizant_agency="xx",
+            oversight_agency="",
         )
         self._run_state_transition(sac)
         self.intake_to_dissemination = IntakeToDissemination(sac)
@@ -549,7 +551,9 @@ class IntakeToDisseminationTests(TestCase):
         len_general = len(General.objects.all())
         len_captext = len(CapText.objects.all())
 
-        sac = self._create_sac(reference_number=2)
+        sac = self._create_sac(
+            reference_number=2, cognizant_agency="xx", oversight_agency=""
+        )
         self._run_state_transition(sac)
         self.sac = sac
         self.intake_to_dissemination = IntakeToDissemination(self.sac)
