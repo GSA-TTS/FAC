@@ -31,7 +31,7 @@
          "single_cells": [
             {
                "format": "text",
-               "formula": "=\"1.0.1\"",
+               "formula": "=\"1.0.2\"",
                "help": {
                   "link": "https://fac.gov/documentation/validation/#plain_text",
                   "text": "Only plain text is allowed, no emoji, formatting, or other special additions"
@@ -186,22 +186,6 @@
                   "type": "list"
                },
                "width": 36
-            },
-            {
-               "formula": "=IF(A{0}<>\"\", ROW()-1, \"\")",
-               "help": {
-                  "link": "https://fac.gov/documentation/validation/#unknown",
-                  "text": "Please contact support"
-               },
-               "keep_locked": true,
-               "range_name": "seq_number",
-               "title": "Sequence number (Read Only)",
-               "title_cell": "D1",
-               "type": "open_range",
-               "validation": {
-                  "type": "NOVALIDATION"
-               },
-               "width": 18
             }
          ]
       }

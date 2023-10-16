@@ -90,6 +90,7 @@ def process_spec(WBNT):
         process_open_ranges(wb, ws, sheet)
         add_validations(wb, ws, sheet.open_ranges)
         add_validations(wb, ws, sheet.text_ranges)
+        activate_wraptext(wb)
         apply_formula(ws, WBNT.title_row + 1, sheet)
         process_single_cells(wb, ws, sheet)
         process_meta_cells(wb, ws, sheet)
@@ -101,6 +102,26 @@ def process_spec(WBNT):
 
     set_wb_security(wb, password)
     return wb
+
+
+def activate_wraptext(wb):
+    for ws in wb.worksheets:
+        if ws.title == "Form" or ws.title == "AdditionalNotes":
+            for named_range_name in wb.defined_names:
+                activate_wraptext_for_named_range(wb, ws, named_range_name)
+
+
+def activate_wraptext_for_named_range(wb, ws, named_range_name):
+    """Activate wrapText for all cells within a named range in the worksheet."""
+    if named_range_name in wb.defined_names:
+        named_range = wb.defined_names[named_range_name]
+        if named_range.attr_text.startswith(
+            "'Form'!"
+        ) or named_range.attr_text.startswith("'AdditionalNotes'!"):
+            for cell_range in named_range.destinations:
+                for row in ws[cell_range[1]]:
+                    for cell in row:
+                        cell.alignment = Alignment(wrapText=True)
 
 
 def create_empty_workbook():
