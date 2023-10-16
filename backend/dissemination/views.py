@@ -1,8 +1,5 @@
-import json
-
 from django.http import Http404
-from django.shortcuts import redirect, render
-from django.urls import reverse
+from django.shortcuts import render
 from django.views.generic import View
 
 from dissemination.forms import SearchForm

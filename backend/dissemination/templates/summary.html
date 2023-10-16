@@ -20,12 +20,11 @@
                         <p class="margin-y-1"><strong>Report ID: </strong>{{report_id}}</p>
                         <p class="margin-y-1"><strong>Submission date: </strong>{{general.submitted_date}}</p>
                         <p class="margin-y-1"><strong>Fiscal Year: </strong>{{general.fy_start_date}} to {{general.fy_end_date}}</p>
-                    <div>
+                    </div>
 
                     <div id="general-information" class="margin-top-6">
                         <h2>General Information</h2>
-                        <div 
-                            class="position-relative overflow-scroll height-mobile border radius-lg">
+                        <div class="position-relative overflow-scroll height-mobile border radius-lg">
                             <div class="grid-row padding-2">
                                 {% for k, v in general.items %}
                                     <p class="margin-y-1 desktop:grid-col-6">
