@@ -17,10 +17,13 @@ def assert_all_results_public(cls, results):
 class SearchGeneralTests(TestCase):
     def test_empty_query(self):
         """
-        Given empty query parameters, search_general should return all records
+        Given empty query parameters, search_general should return all public records
         """
-        generals_count = random.randint(50, 100)
-        baker.make(General, is_public=True, _quantity=generals_count)
+        public_count = random.randint(50, 100)
+        private_count = random.randint(50, 100)
+
+        baker.make(General, is_public=True, _quantity=public_count)
+        baker.make(General, is_public=False, _quantity=private_count)
 
         results = search_general(
             names=None,
@@ -32,7 +35,139 @@ class SearchGeneralTests(TestCase):
         )
 
         assert_all_results_public(self, results)
-        self.assertEqual(len(results), generals_count)
+        self.assertEqual(len(results), public_count)
+
+    def test_name_matches_auditee_name(self):
+        """
+        Given an entity name, search_general should return records with a matching auditee_name
+        """
+        auditee_name = "auditeeeeeeee"
+        baker.make(General, is_public=True, auditee_name=auditee_name)
+
+        results = search_general(
+            names=[auditee_name],
+            uei_or_eins=None,
+            start_date=None,
+            end_date=None,
+            cog_or_oversight=None,
+            agency_name=None,
+        )
+
+        assert_all_results_public(self, results)
+        self.assertEqual(len(results), 1)
+
+    def test_name_matches_auditor_firm_name(self):
+        """
+        Given an entity name, search_general should return records with a matching auditor_firm_name
+        """
+        auditor_firm_name = "auditoooooooor"
+        baker.make(General, is_public=True, auditor_firm_name=auditor_firm_name)
+
+        results = search_general(
+            names=[auditor_firm_name],
+            uei_or_eins=None,
+            start_date=None,
+            end_date=None,
+            cog_or_oversight=None,
+            agency_name=None,
+        )
+
+        assert_all_results_public(self, results)
+        self.assertEqual(len(results), 1)
+
+    def test_name_multiple(self):
+        """
+        Given multiple names, search_general should return records that match either name
+        """
+        names = [
+            "auditee-01",
+            "auditor-firm-01",
+            "this-one-has-no-match",
+        ]
+
+        baker.make(General, is_public=True, auditee_name=names[0])
+        baker.make(General, is_public=True, auditor_firm_name=names[1])
+        baker.make(General, is_public=True, auditee_name="not-looking-for-this-auditee")
+        baker.make(
+            General, is_public=True, auditor_firm_name="not-looking-for-this-auditor"
+        )
+
+        results = search_general(
+            names=names,
+            uei_or_eins=None,
+            start_date=None,
+            end_date=None,
+            cog_or_oversight=None,
+            agency_name=None,
+        )
+
+        assert_all_results_public(self, results)
+        self.assertEqual(len(results), 2)
+
+    def test_uei_or_ein_matches_uei(self):
+        """
+        Given a uei_or_ein, search_general should return records with a matching UEI
+        """
+        auditee_uei = "ABCDEFGHIJKL"
+        baker.make(General, is_public=True, auditee_uei=auditee_uei)
+
+        results = search_general(
+            names=None,
+            uei_or_eins=[auditee_uei],
+            start_date=None,
+            end_date=None,
+            cog_or_oversight=None,
+            agency_name=None,
+        )
+
+        assert_all_results_public(self, results)
+        self.assertEqual(len(results), 1)
+
+    def test_uei_or_ein_matches_ein(self):
+        """
+        Given a uei_or_ein, search_general should return records with a matching EIN
+        """
+        auditee_ein = "ABCDEFGHIJKL"
+        baker.make(General, is_public=True, auditee_ein=auditee_ein)
+
+        results = search_general(
+            names=None,
+            uei_or_eins=[auditee_ein],
+            start_date=None,
+            end_date=None,
+            cog_or_oversight=None,
+            agency_name=None,
+        )
+
+        assert_all_results_public(self, results)
+        self.assertEqual(len(results), 1)
+
+    def test_uei_or_ein_multiple(self):
+        """
+        Given multiple uei_or_eins, search_general should return records that match either UEI or EIN
+        """
+        uei_or_eins = [
+            "ABCDEFGH0001",
+            "ABCDEFGH0002",
+            "ABCDEFGH0003",
+        ]
+
+        baker.make(General, is_public=True, auditee_uei=uei_or_eins[0])
+        baker.make(General, is_public=True, auditee_ein=uei_or_eins[1])
+        baker.make(General, is_public=True, auditee_uei="not-looking-for-this-uei")
+        baker.make(General, is_public=True, auditee_ein="not-looking-for-this-ein")
+
+        results = search_general(
+            names=None,
+            uei_or_eins=uei_or_eins,
+            start_date=None,
+            end_date=None,
+            cog_or_oversight=None,
+            agency_name=None,
+        )
+
+        assert_all_results_public(self, results)
+        self.assertEqual(len(results), 2)
 
     def test_date_range(self):
         """
