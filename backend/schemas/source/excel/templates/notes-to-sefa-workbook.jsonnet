@@ -128,7 +128,8 @@ local sheets = [
   {
     name: sefaAdditionalSheet,
     open_ranges: Fun.make_open_ranges(title_row, open_ranges_defns),
-    header_height: 100,
+    header_height: 48,
+    row_height: 36,
     hide_col_from: 4,
   },
 ];

@@ -137,7 +137,7 @@
          ]
       },
       {
-         "header_height": 100,
+         "header_height": 48,
          "hide_col_from": 4,
          "name": "AdditionalNotes",
          "open_ranges": [
@@ -187,7 +187,8 @@
                },
                "width": 36
             }
-         ]
+         ],
+         "row_height": 36
       }
    ],
    "title_row": 1

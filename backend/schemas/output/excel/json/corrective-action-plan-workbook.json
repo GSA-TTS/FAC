@@ -121,7 +121,7 @@
                "validation": {
                   "type": "NOVALIDATION"
                },
-               "width": 100
+               "width": 64
             },
             {
                "help": {
@@ -141,7 +141,8 @@
                },
                "width": 36
             }
-         ]
+         ],
+         "row_height": 36
       }
    ],
    "title_row": 1

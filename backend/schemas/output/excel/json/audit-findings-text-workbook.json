@@ -141,7 +141,8 @@
                },
                "width": 36
             }
-         ]
+         ],
+         "row_height": 36
       }
    ],
    "title_row": 1

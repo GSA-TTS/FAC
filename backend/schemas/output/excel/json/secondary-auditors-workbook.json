@@ -102,7 +102,7 @@
                "validation": {
                   "type": "NOVALIDATION"
                },
-               "width": 100
+               "width": 64
             },
             {
                "format": "text",
@@ -136,7 +136,7 @@
                "validation": {
                   "type": "NOVALIDATION"
                },
-               "width": 100
+               "width": 64
             },
             {
                "format": "text",
@@ -151,7 +151,7 @@
                "validation": {
                   "type": "NOVALIDATION"
                },
-               "width": 100
+               "width": 64
             },
             {
                "format": "text",
@@ -247,7 +247,8 @@
                },
                "width": 36
             }
-         ]
+         ],
+         "row_height": 36
       },
       {
          "name": "StateCodeLookup",
