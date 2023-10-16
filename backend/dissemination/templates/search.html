@@ -2,206 +2,187 @@
 {% load static %}
 {% load sprite_helper %}
 {% block content %}
-
-<div class="grid-container">
-    <div class="grid-row">
-	<div class="tablet:grid-col-4 audit-search-form">
-	    <h3>Filters</h3>
-	    <form class="usa-form" action="{% url 'dissemination:Search' %}" enctype='multipart/form-data' method="post">
-		{% csrf_token %}
-
-		<div class="search-submit">
-		    <input class="usa-button" type="submit" value="Search" />
-		    <button class="usa-button usa-button--unstyled">Reset Search</button>
-		</div>
-
-		<div class="usa-accordion usa-accordion--multiselectable" data-allow-multiple>
-		    <label for="entity-name">
-			<button type="button" class="usa-accordion__button" aria-expanded="true" aria-controls="entity-name">
-			    Name (Entity, Auditee, or Auditor)
-			</button>
-		    </label>
-		    <textarea
-			class="usa-textarea"
-			id="entity-name"
-			name="entity_name"
-			></textarea>
-		    <label for="uei-or-ein">
-			<button type="button" class="usa-accordion__button" aria-expanded="true" aria-controls="uei-or-ein">
-			    UEI or EIN
-			</button>
-		    </label>
-		    <textarea
-			class="usa-textarea"
-			id="uei-or-ein"
-			name="uei_or_ein"
-			></textarea>
-		    <label for="aln">
-			<button type="button" class="usa-accordion__button" aria-expanded="true" aria-controls="aln">
-			    Assistance Listing Number (formerly CFDA)
-			</button>
-		    </label>
-		    <textarea
-			class="usa-textarea"
-			id="aln"
-			name="aln"
-			></textarea>
-
-		    <button type="button" class="usa-accordion__button" aria-expanded="true" aria-controls="fac-release-date">
-			FAC Release Date
-		    </button>
-		    <div id="fac-release-date">
-			<div class="usa-form-group">
-			    <label class="usa-label" id="start-date-label" for="start-date"
-				>Start date</label
-			    >
-			    <div class="usa-hint" id="start-date-hint">mm/dd/yyyy</div>
-			    <div class="usa-date-picker">
-				<input
-				class="usa-input"
-				id="start-date"
-				name="start_date"
-				aria-labelledby="start-date-label"
-				aria-describedby="start-date-hint"
-				/>
-			    </div>
-			</div>
-			<div class="usa-form-group">
-			    <label class="usa-label" id="end-date-label" for="end-date"
-				>End date</label
-			    >
-			    <div class="usa-hint" id="end-date-hint">mm/dd/yyyy</div>
-			    <div class="usa-date-picker">
-				<input
-				class="usa-input"
-				id="end-date"
-				name="end_date"
-				aria-labelledby="end-date-label"
-				aria-describedby="end-date-hint"
-				/>
-			    </div>
-			</div>
-		    </div>
-
-		    <button type="button" class="usa-accordion__button" aria-expanded="true" aria-controls="cognizant">
-			Cognizant or Oversight
-		    </button>
-		    <div id="cognizant">
-			<label class="usa-label" for="options">Dropdown label</label>
-			<select class="usa-select" name="cog_or_oversight" id="options">
-			    <option value>- Select -</option>
-			    <option value="cog">Cognizant</option>
-			    <option value="oversight">Oversight</option>
-			</select>
-
-			<label class="usa-label" for="agency-name">Name of federal agency</label>
-			<input
-			    class="usa-input"
-			    id="agency-name"
-			    name="agency_name"
-			/>
-		    </div>
-		</div>
-		
-		<div class="search-submit">
-		    <input class="usa-button" type="submit" value="Search" />
-		    <button class="usa-button usa-button--unstyled">Reset Search</button>
-		</div>
-	    </form>
-	</div>
-	<div class="tablet:grid-col-8 audit-search-results">
-	    <h2>Search single audit reports</h2>
-	   
-	    <div class="active-filters">
-		<h3>Active filters:</h3>
-		<ul>
-		    <li><span class="usa-tag">Name</span></li>
-		    <li><span class="usa-tag">UEI or EIN</span></li>
-		    <li><span class="usa-tag">ALN</span></li>
-		    <li><span class="usa-tag">FAC Release Date</span></li>
-		    <li><span class="usa-tag">Audit Year</span></li>
-		    <li><span class="usa-tag">Cognizant or Oversight</span></li>
-		</ul>
-	    </div>
-	    
-	    <table class="usa-table usa-table--striped">
-		<caption>
-		    Results 3
-		</caption>
-		<thead>
-		<tr>
-		    <th data-sortable scope="col" role="columnheader">Name</th>
-		    <th
-			data-sortable
-			scope="col"
-			role="columnheader"
-		    >UEI or EIN</th>
-		    <th data-sortable scope="col" role="columnheader">Acc Date</th>
-		    <th data-sortable scope="col" role="columnheader">AY</th>
-		    <th data-sortable scope="col" role="columnheader">Cog or Over</th>
-		    <th data-sortable scope="col" role="columnheader">View</th>
-		    <th data-sortable scope="col" role="columnheader">PDF</th>
-		</tr>
-		</thead>
-		<tbody>
-		    <tr>
-			<th scope="row" role="rowheader">AAA Entity Name</th>
-			<td>KZV2XNZZN3A8</td>
-			<td data-sort-value="1696528569380">Oct, 5 2023</td>
-			<td>2022</td>
-			<td>Oversight</td>
-			<td>
-			    <svg class="usa-icon" aria-hidden="true" focusable="false" role="img">
-				{% uswds_sprite "visibility" %}
-			    </svg>
-			</td>
-			<td>
-			    <svg class="usa-icon" aria-hidden="true" focusable="false" role="img">
-				{% uswds_sprite "file_download" %}
-			    </svg>
-			</td>
-		    </tr>
-
-		    <tr>
-			<th scope="row" role="rowheader">BBB Entity Name</th>
-			<td>KZV2XNZZN3A8</td>
-			<td data-sort-value="1696528569380">Oct, 5 2023</td>
-			<td>2022</td>
-			<td>Oversight</td>
-			<td>
-			    <svg class="usa-icon" aria-hidden="true" focusable="false" role="img">
-				{% uswds_sprite "visibility" %}
-			    </svg>
-			</td>
-			<td>
-			    <svg class="usa-icon" aria-hidden="true" focusable="false" role="img">
-				{% uswds_sprite "file_download" %}
-			    </svg>
-			</td>
-		    </tr>
-
-		    <tr>
-			<th scope="row" role="rowheader">CCC Entity Name</th>
-			<td>KZV2XNZZN3A8</td>
-			<td data-sort-value="1696528569380">Oct, 5 2023</td>
-			<td>2022</td>
-			<td>Oversight</td>
-			<td>
-			    <svg class="usa-icon" aria-hidden="true" focusable="false" role="img">
-				{% uswds_sprite "visibility" %}
-			    </svg>
-			</td>
-			<td>
-			    <svg class="usa-icon" aria-hidden="true" focusable="false" role="img">
-				{% uswds_sprite "file_download" %}
-			    </svg>
-			</td>
-		    </tr>
-		</tbody>
-	    </table>
-	    <button class="usa-button">Download all results PDF</button>
-	</div>
+    <div class="grid-container">
+        <div class="grid-row">
+            <div class="tablet:grid-col-4 audit-search-form">
+                <h3>Filters</h3>
+                <form class="usa-form"
+                      action="{% url 'dissemination:Search' %}"
+                      enctype='multipart/form-data'
+                      method="post">
+                    {% csrf_token %}
+                    <div class="search-submit">
+                        <input class="usa-button" type="submit" value="Search" />
+                        <button class="usa-button usa-button--unstyled">Reset Search</button>
+                    </div>
+                    <div class="usa-accordion usa-accordion--multiselectable"
+                         data-allow-multiple>
+                        <label for="entity-name">
+                            <button type="button"
+                                    class="usa-accordion__button"
+                                    aria-expanded="true"
+                                    aria-controls="entity-name">Name (Entity, Auditee, or Auditor)</button>
+                        </label>
+                        <textarea class="usa-textarea" id="entity-name" name="entity_name"></textarea>
+                        <label for="uei-or-ein">
+                            <button type="button"
+                                    class="usa-accordion__button"
+                                    aria-expanded="true"
+                                    aria-controls="uei-or-ein">UEI or EIN</button>
+                        </label>
+                        <textarea class="usa-textarea" id="uei-or-ein" name="uei_or_ein"></textarea>
+                        <label for="aln">
+                            <button type="button"
+                                    class="usa-accordion__button"
+                                    aria-expanded="true"
+                                    aria-controls="aln">Assistance Listing Number (formerly CFDA)</button>
+                        </label>
+                        <textarea class="usa-textarea" id="aln" name="aln"></textarea>
+                        <button type="button"
+                                class="usa-accordion__button"
+                                aria-expanded="true"
+                                aria-controls="fac-release-date">FAC Release Date</button>
+                        <div id="fac-release-date">
+                            <div class="usa-form-group">
+                                <label class="usa-label" id="start-date-label" for="start-date">Start date</label>
+                                <div class="usa-hint" id="start-date-hint">mm/dd/yyyy</div>
+                                <div class="usa-date-picker">
+                                    <input class="usa-input"
+                                           id="start-date"
+                                           name="start_date"
+                                           aria-labelledby="start-date-label"
+                                           aria-describedby="start-date-hint" />
+                                </div>
+                            </div>
+                            <div class="usa-form-group">
+                                <label class="usa-label" id="end-date-label" for="end-date">End date</label>
+                                <div class="usa-hint" id="end-date-hint">mm/dd/yyyy</div>
+                                <div class="usa-date-picker">
+                                    <input class="usa-input"
+                                           id="end-date"
+                                           name="end_date"
+                                           aria-labelledby="end-date-label"
+                                           aria-describedby="end-date-hint" />
+                                </div>
+                            </div>
+                        </div>
+                        <button type="button"
+                                class="usa-accordion__button"
+                                aria-expanded="true"
+                                aria-controls="cognizant">Cognizant or Oversight</button>
+                        <div id="cognizant">
+                            <label class="usa-label" for="options">Dropdown label</label>
+                            <select class="usa-select" name="cog_or_oversight" id="options">
+                                <option value>- Select -</option>
+                                <option value="cog">Cognizant</option>
+                                <option value="oversight">Oversight</option>
+                            </select>
+                            <label class="usa-label" for="agency-name">Name of federal agency</label>
+                            <input class="usa-input" id="agency-name" name="agency_name" />
+                        </div>
+                    </div>
+                    <div class="search-submit">
+                        <input class="usa-button" type="submit" value="Search" />
+                        <button class="usa-button usa-button--unstyled">Reset Search</button>
+                    </div>
+                </form>
+            </div>
+            <div class="tablet:grid-col-8 audit-search-results">
+                <h2>Search single audit reports</h2>
+                <div class="active-filters">
+                    <h3>Active filters:</h3>
+                    <ul>
+                        <li>
+                            <span class="usa-tag">Name</span>
+                        </li>
+                        <li>
+                            <span class="usa-tag">UEI or EIN</span>
+                        </li>
+                        <li>
+                            <span class="usa-tag">ALN</span>
+                        </li>
+                        <li>
+                            <span class="usa-tag">FAC Release Date</span>
+                        </li>
+                        <li>
+                            <span class="usa-tag">Audit Year</span>
+                        </li>
+                        <li>
+                            <span class="usa-tag">Cognizant or Oversight</span>
+                        </li>
+                    </ul>
+                </div>
+                <table class="usa-table usa-table--striped">
+                    <caption>
+                        Results 3
+                    </caption>
+                    <thead>
+                        <tr>
+                            <th data-sortable scope="col" role="columnheader">Name</th>
+                            <th data-sortable scope="col" role="columnheader">UEI or EIN</th>
+                            <th data-sortable scope="col" role="columnheader">Acc Date</th>
+                            <th data-sortable scope="col" role="columnheader">AY</th>
+                            <th data-sortable scope="col" role="columnheader">Cog or Over</th>
+                            <th data-sortable scope="col" role="columnheader">View</th>
+                            <th data-sortable scope="col" role="columnheader">PDF</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <th scope="row" role="rowheader">AAA Entity Name</th>
+                            <td>KZV2XNZZN3A8</td>
+                            <td data-sort-value="1696528569380">Oct, 5 2023</td>
+                            <td>2022</td>
+                            <td>Oversight</td>
+                            <td>
+                                <svg class="usa-icon" aria-hidden="true" focusable="false" role="img">
+                                    {% uswds_sprite "visibility" %}
+                                </svg>
+                            </td>
+                            <td>
+                                <svg class="usa-icon" aria-hidden="true" focusable="false" role="img">
+                                    {% uswds_sprite "file_download" %}
+                                </svg>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row" role="rowheader">BBB Entity Name</th>
+                            <td>KZV2XNZZN3A8</td>
+                            <td data-sort-value="1696528569380">Oct, 5 2023</td>
+                            <td>2022</td>
+                            <td>Oversight</td>
+                            <td>
+                                <svg class="usa-icon" aria-hidden="true" focusable="false" role="img">
+                                    {% uswds_sprite "visibility" %}
+                                </svg>
+                            </td>
+                            <td>
+                                <svg class="usa-icon" aria-hidden="true" focusable="false" role="img">
+                                    {% uswds_sprite "file_download" %}
+                                </svg>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row" role="rowheader">CCC Entity Name</th>
+                            <td>KZV2XNZZN3A8</td>
+                            <td data-sort-value="1696528569380">Oct, 5 2023</td>
+                            <td>2022</td>
+                            <td>Oversight</td>
+                            <td>
+                                <svg class="usa-icon" aria-hidden="true" focusable="false" role="img">
+                                    {% uswds_sprite "visibility" %}
+                                </svg>
+                            </td>
+                            <td>
+                                <svg class="usa-icon" aria-hidden="true" focusable="false" role="img">
+                                    {% uswds_sprite "file_download" %}
+                                </svg>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <button class="usa-button">Download all results PDF</button>
+            </div>
+        </div>
     </div>
-</div>
-
 {% endblock %}
