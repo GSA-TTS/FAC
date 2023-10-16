@@ -114,7 +114,7 @@
                 </div>
                 <table class="usa-table usa-table--striped">
                     <caption>
-                        Results 3
+                        Results {{ results|length }}
                     </caption>
                     <thead>
                         <tr>
@@ -128,12 +128,13 @@
                         </tr>
                     </thead>
                     <tbody>
+                        {% for result in results %}
                         <tr>
-                            <th scope="row" role="rowheader">AAA Entity Name</th>
-                            <td>KZV2XNZZN3A8</td>
-                            <td data-sort-value="1696528569380">Oct, 5 2023</td>
-                            <td>2022</td>
-                            <td>Oversight</td>
+                            <th scope="row" role="rowheader">{{ result.auditee_name }}</th>
+                            <td>{{ result.auditee_uei }}</td>
+                            <td data-sort-value="1696528569380">{{ result.fac_accepted_date }}</td>
+                            <td>{{ result.audit_year }}</td>
+                            <td>{% if result.oversight_agency %}Oversight{% else %}Cognizant{% endif %}</td>
                             <td>
                                 <svg class="usa-icon" aria-hidden="true" focusable="false" role="img">
                                     {% uswds_sprite "visibility" %}
@@ -145,40 +146,7 @@
                                 </svg>
                             </td>
                         </tr>
-                        <tr>
-                            <th scope="row" role="rowheader">BBB Entity Name</th>
-                            <td>KZV2XNZZN3A8</td>
-                            <td data-sort-value="1696528569380">Oct, 5 2023</td>
-                            <td>2022</td>
-                            <td>Oversight</td>
-                            <td>
-                                <svg class="usa-icon" aria-hidden="true" focusable="false" role="img">
-                                    {% uswds_sprite "visibility" %}
-                                </svg>
-                            </td>
-                            <td>
-                                <svg class="usa-icon" aria-hidden="true" focusable="false" role="img">
-                                    {% uswds_sprite "file_download" %}
-                                </svg>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th scope="row" role="rowheader">CCC Entity Name</th>
-                            <td>KZV2XNZZN3A8</td>
-                            <td data-sort-value="1696528569380">Oct, 5 2023</td>
-                            <td>2022</td>
-                            <td>Oversight</td>
-                            <td>
-                                <svg class="usa-icon" aria-hidden="true" focusable="false" role="img">
-                                    {% uswds_sprite "visibility" %}
-                                </svg>
-                            </td>
-                            <td>
-                                <svg class="usa-icon" aria-hidden="true" focusable="false" role="img">
-                                    {% uswds_sprite "file_download" %}
-                                </svg>
-                            </td>
-                        </tr>
+                        {% endfor %}
                     </tbody>
                 </table>
                 <button class="usa-button">Download all results PDF</button>
