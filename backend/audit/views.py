@@ -19,13 +19,13 @@ from config.settings import (
 )
 from audit.fixtures.excel import FORM_SECTIONS, UNKNOWN_WORKBOOK
 
-from audit.excel import (
+from audit.intakelib import (
     extract_additional_ueis,
     extract_additional_eins,
     extract_federal_awards,
     extract_corrective_action_plan,
-    extract_findings_text,
-    extract_findings_uniform_guidance,
+    extract_audit_findings_text,
+    extract_audit_findings,
     extract_secondary_auditors,
     extract_notes_to_sefa,
 )
@@ -49,7 +49,7 @@ from audit.models import (
     SingleAuditReportFile,
     SubmissionEvent,
 )
-from audit.utils import ExcelExtractionError
+from audit.intakelib.exceptions import ExcelExtractionError
 from audit.validators import (
     validate_additional_ueis_json,
     validate_additional_eins_json,
@@ -145,12 +145,12 @@ class ExcelFileHandlerView(SingleAuditChecklistAccessRequiredMixin, generic.View
             "validator": validate_corrective_action_plan_json,
         },
         FORM_SECTIONS.FINDINGS_UNIFORM_GUIDANCE: {
-            "extractor": extract_findings_uniform_guidance,
+            "extractor": extract_audit_findings,
             "field_name": "findings_uniform_guidance",
             "validator": validate_findings_uniform_guidance_json,
         },
         FORM_SECTIONS.FINDINGS_TEXT: {
-            "extractor": extract_findings_text,
+            "extractor": extract_audit_findings_text,
             "field_name": "findings_text",
             "validator": validate_findings_text_json,
         },

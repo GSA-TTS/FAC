@@ -175,7 +175,7 @@ local open_ranges_defns = [
     Sheets.open_range {
       keep_locked: true,
       format: 'dollar',
-      formula: '=SUMIFS(' + amountExpendedNamedRange + ',' + cfdaKeyNamedRange + ',V{0})',
+      formula: '=IF(A{0}="",0,SUMIFS(' + amountExpendedNamedRange + ',' + cfdaKeyNamedRange + ',V{0}))',
       help: Help.any_number,
     },
     SV.NumberValidation,
