@@ -98,7 +98,6 @@ def run_all_checks(ir, list_of_checks, section_name=None):
             errors.append(res)
     for fun in list_of_checks:
         res = fun(ir)
-        print(fun)
         if isinstance(res, list) and all(map(lambda v: isinstance(v, tuple), res)):
             errors = errors + res
         elif isinstance(res, tuple):
