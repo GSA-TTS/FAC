@@ -588,8 +588,6 @@ class IntakeToDisseminationTests(TestCase):
             "AdditionalEINs",
         ]
 
-        print(objs)
-
         for k, v in objs.items():
             self.assertTrue(k in keys, f"Key {k} not found in keys.")
             self.assertTrue(len(v) > 0, f"Value list for {k} is empty.")

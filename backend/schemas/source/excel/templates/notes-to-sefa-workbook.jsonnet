@@ -115,17 +115,6 @@ local open_ranges_defns = [
     'Did Text Contain a Chart or Table?',
     'contains_chart_or_table',
   ],
-  [
-    Sheets.open_range {
-      keep_locked: true,
-      formula: '=IF(A{0}<>"", ROW()-1, "")',
-      width: 18,
-      help: Help.unknown,
-    },
-    SV.NoValidation,
-    'Sequence number (Read Only)',
-    'seq_number',
-  ],
 ];
 
 local sheets = [

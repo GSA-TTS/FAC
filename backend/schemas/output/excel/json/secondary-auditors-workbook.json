@@ -29,7 +29,7 @@
          "single_cells": [
             {
                "format": "text",
-               "formula": "=\"1.0.0\"",
+               "formula": "=\"1.0.2\"",
                "help": {
                   "link": "https://fac.gov/documentation/validation/#plain_text",
                   "text": "Only plain text is allowed, no emoji, formatting, or other special additions"
