@@ -38,7 +38,8 @@ jobs:
           cf_password: ${{ secrets.CF_PASSWORD }}
           cf_org: gsa-tts-oros-fac
           cf_space: ${{ env.space }}
-          command: cf run-task gsa-fac -k 2G -m 2G --name pg_backup --command "./br_ops/purge_backups.sh"
+          # TODO: Resolve hard-codin of purge policy in shell script
+          # command: cf run-task gsa-fac -k 2G -m 2G --name pg_backup --command "./br_ops/purge_backups.sh"
 
       - name: Sleep for 5 minutes to ensure backup occurs
         if: ${{ inputs.environment == 'dev' || inputs.environment == 'production' }}
