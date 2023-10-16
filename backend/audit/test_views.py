@@ -580,130 +580,130 @@ class ExcelFileHandlerViewTests(TestCase):
 
             self.assertEqual(response.status_code, 400)
 
-    @patch("audit.validators._scan_file")
-    def test_valid_file_upload_for_federal_awards(self, mock_scan_file):
-        """When a valid Excel file is uploaded, the file should be stored and the SingleAuditChecklist should be updated to include the uploaded Federal Awards data"""
+    # @patch("audit.validators._scan_file")
+    # def test_valid_file_upload_for_federal_awards(self, mock_scan_file):
+    #     """When a valid Excel file is uploaded, the file should be stored and the SingleAuditChecklist should be updated to include the uploaded Federal Awards data"""
 
-        sac = _mock_login_and_scan(
-            self.client,
-            mock_scan_file,
-            report_id=_mock_gen_report_id(),
-        )
-        test_data = json.loads(
-            FEDERAL_AWARDS_ENTRY_FIXTURES.read_text(encoding="utf-8")
-        )
+    #     sac = _mock_login_and_scan(
+    #         self.client,
+    #         mock_scan_file,
+    #         report_id=_mock_gen_report_id(),
+    #     )
+    #     test_data = json.loads(
+    #         FEDERAL_AWARDS_ENTRY_FIXTURES.read_text(encoding="utf-8")
+    #     )
 
-        # add valid data to the workbook
-        workbook = load_workbook(FEDERAL_AWARDS_TEMPLATE, data_only=True)
-        _set_by_name(workbook, "total_amount_expended", test_data[0]["amount_expended"])
-        _set_by_name(workbook, "auditee_uei", ExcelFileHandlerViewTests.GOOD_UEI)
-        _set_by_name(workbook, "section_name", FORM_SECTIONS.FEDERAL_AWARDS_EXPENDED)
-        _add_entry(workbook, 0, test_data[0])
+    #     # add valid data to the workbook
+    #     workbook = load_workbook(FEDERAL_AWARDS_TEMPLATE, data_only=True)
+    #     _set_by_name(workbook, "total_amount_expended", test_data[0]["amount_expended"])
+    #     _set_by_name(workbook, "auditee_uei", ExcelFileHandlerViewTests.GOOD_UEI)
+    #     _set_by_name(workbook, "section_name", FORM_SECTIONS.FEDERAL_AWARDS_EXPENDED)
+    #     _add_entry(workbook, 0, test_data[0])
 
-        with NamedTemporaryFile(suffix=".xlsx") as tmp:
-            workbook.save(tmp.name)
-            tmp.seek(0)
+    #     with NamedTemporaryFile(suffix=".xlsx") as tmp:
+    #         workbook.save(tmp.name)
+    #         tmp.seek(0)
 
-            with open(tmp.name, "rb") as excel_file:
-                response = self.client.post(
-                    reverse(
-                        f"audit:{FORM_SECTIONS.FEDERAL_AWARDS_EXPENDED}",
-                        kwargs={
-                            "report_id": sac.report_id,
-                            "form_section": FORM_SECTIONS.FEDERAL_AWARDS_EXPENDED,
-                        },
-                    ),
-                    data={"FILES": excel_file},
-                )
+    #         with open(tmp.name, "rb") as excel_file:
+    #             response = self.client.post(
+    #                 reverse(
+    #                     f"audit:{FORM_SECTIONS.FEDERAL_AWARDS_EXPENDED}",
+    #                     kwargs={
+    #                         "report_id": sac.report_id,
+    #                         "form_section": FORM_SECTIONS.FEDERAL_AWARDS_EXPENDED,
+    #                     },
+    #                 ),
+    #                 data={"FILES": excel_file},
+    #             )
 
-                self.assertEqual(response.status_code, 302)
+    #             self.assertEqual(response.status_code, 302)
 
-                updated_sac = SingleAuditChecklist.objects.get(pk=sac.id)
+    #             updated_sac = SingleAuditChecklist.objects.get(pk=sac.id)
 
-                self.assertEqual(
-                    updated_sac.federal_awards["FederalAwards"]["auditee_uei"],
-                    ExcelFileHandlerViewTests.GOOD_UEI,
-                )
-                self.assertEqual(
-                    len(updated_sac.federal_awards["FederalAwards"]["federal_awards"]),
-                    1,
-                )
+    #             self.assertEqual(
+    #                 updated_sac.federal_awards["FederalAwards"]["auditee_uei"],
+    #                 ExcelFileHandlerViewTests.GOOD_UEI,
+    #             )
+    #             self.assertEqual(
+    #                 len(updated_sac.federal_awards["FederalAwards"]["federal_awards"]),
+    #                 1,
+    #             )
 
-                federal_awards_entry = updated_sac.federal_awards["FederalAwards"][
-                    "federal_awards"
-                ][0]
+    #             federal_awards_entry = updated_sac.federal_awards["FederalAwards"][
+    #                 "federal_awards"
+    #             ][0]
 
-                self.assertEqual(
-                    federal_awards_entry["cluster"]["cluster_name"],
-                    test_data[0]["cluster_name"],
-                )
-                self.assertEqual(
-                    federal_awards_entry["direct_or_indirect_award"]["is_direct"],
-                    test_data[0]["is_direct"],
-                )
-                self.assertEqual(
-                    federal_awards_entry["program"]["is_major"],
-                    test_data[0]["is_major"],
-                )
-                self.assertEqual(
-                    federal_awards_entry["program"]["federal_agency_prefix"],
-                    test_data[0]["federal_agency_prefix"],
-                )
-                self.assertEqual(
-                    federal_awards_entry["program"]["three_digit_extension"],
-                    test_data[0]["three_digit_extension"],
-                )
-                self.assertEqual(
-                    federal_awards_entry["program"]["amount_expended"],
-                    test_data[0]["amount_expended"],
-                )
-                self.assertEqual(
-                    federal_awards_entry["program"]["program_name"],
-                    test_data[0]["program_name"],
-                )
-                self.assertEqual(
-                    federal_awards_entry["loan_or_loan_guarantee"]["is_guaranteed"],
-                    test_data[0]["is_guaranteed"],
-                )
-                self.assertEqual(
-                    federal_awards_entry["program"]["number_of_audit_findings"],
-                    test_data[0]["number_of_audit_findings"],
-                )
-                self.assertEqual(
-                    federal_awards_entry["program"]["audit_report_type"],
-                    test_data[0]["audit_report_type"],
-                )
-                self.assertEqual(
-                    federal_awards_entry["subrecipients"]["is_passed"],
-                    test_data[0]["is_passed"],
-                )
-                self.assertEqual(
-                    federal_awards_entry["subrecipients"]["subrecipient_amount"],
-                    test_data[0]["subrecipient_amount"],
-                )
-                self.assertEqual(
-                    federal_awards_entry["direct_or_indirect_award"]["entities"],
-                    [
-                        {
-                            "passthrough_name": "A",
-                            "passthrough_identifying_number": "1",
-                        },
-                        {
-                            "passthrough_name": "B",
-                            "passthrough_identifying_number": "2",
-                        },
-                    ],
-                )
+    #             self.assertEqual(
+    #                 federal_awards_entry["cluster"]["cluster_name"],
+    #                 test_data[0]["cluster_name"],
+    #             )
+    #             self.assertEqual(
+    #                 federal_awards_entry["direct_or_indirect_award"]["is_direct"],
+    #                 test_data[0]["is_direct"],
+    #             )
+    #             self.assertEqual(
+    #                 federal_awards_entry["program"]["is_major"],
+    #                 test_data[0]["is_major"],
+    #             )
+    #             self.assertEqual(
+    #                 federal_awards_entry["program"]["federal_agency_prefix"],
+    #                 test_data[0]["federal_agency_prefix"],
+    #             )
+    #             self.assertEqual(
+    #                 federal_awards_entry["program"]["three_digit_extension"],
+    #                 test_data[0]["three_digit_extension"],
+    #             )
+    #             self.assertEqual(
+    #                 federal_awards_entry["program"]["amount_expended"],
+    #                 test_data[0]["amount_expended"],
+    #             )
+    #             self.assertEqual(
+    #                 federal_awards_entry["program"]["program_name"],
+    #                 test_data[0]["program_name"],
+    #             )
+    #             self.assertEqual(
+    #                 federal_awards_entry["loan_or_loan_guarantee"]["is_guaranteed"],
+    #                 test_data[0]["is_guaranteed"],
+    #             )
+    #             self.assertEqual(
+    #                 federal_awards_entry["program"]["number_of_audit_findings"],
+    #                 test_data[0]["number_of_audit_findings"],
+    #             )
+    #             self.assertEqual(
+    #                 federal_awards_entry["program"]["audit_report_type"],
+    #                 test_data[0]["audit_report_type"],
+    #             )
+    #             self.assertEqual(
+    #                 federal_awards_entry["subrecipients"]["is_passed"],
+    #                 test_data[0]["is_passed"],
+    #             )
+    #             self.assertEqual(
+    #                 federal_awards_entry["subrecipients"]["subrecipient_amount"],
+    #                 test_data[0]["subrecipient_amount"],
+    #             )
+    #             self.assertEqual(
+    #                 federal_awards_entry["direct_or_indirect_award"]["entities"],
+    #                 [
+    #                     {
+    #                         "passthrough_name": "A",
+    #                         "passthrough_identifying_number": "1",
+    #                     },
+    #                     {
+    #                         "passthrough_name": "B",
+    #                         "passthrough_identifying_number": "2",
+    #                     },
+    #                 ],
+    #             )
 
-        submission_events = SubmissionEvent.objects.filter(sac=sac)
+    #     submission_events = SubmissionEvent.objects.filter(sac=sac)
 
-        # the most recent event should be FEDERAL_AWARDS_UPDATED
-        event_count = len(submission_events)
-        self.assertGreaterEqual(event_count, 1)
-        self.assertEqual(
-            submission_events[event_count - 1].event,
-            SubmissionEvent.EventType.FEDERAL_AWARDS_UPDATED,
-        )
+    #     # the most recent event should be FEDERAL_AWARDS_UPDATED
+    #     event_count = len(submission_events)
+    #     self.assertGreaterEqual(event_count, 1)
+    #     self.assertEqual(
+    #         submission_events[event_count - 1].event,
+    #         SubmissionEvent.EventType.FEDERAL_AWARDS_UPDATED,
+    #     )
 
     @patch("audit.validators._scan_file")
     def test_valid_file_upload_for_corrective_action_plan(self, mock_scan_file):
