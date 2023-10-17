@@ -28,6 +28,9 @@ from .check_cluster_name_always_present import cluster_name_always_present
 from .check_federal_award_passed_always_present import (
     federal_award_passed_always_present,
 )
+from .check_cardinality_of_passthrough_names_and_ids import (
+    cardinality_of_passthrough_names_and_ids,
+)
 
 ############
 # Audit findings checks
@@ -57,6 +60,7 @@ federal_awards_checks = general_checks + [
     no_major_program_no_type,
     all_unique_award_numbers,
     sequential_award_numbers,
+    cardinality_of_passthrough_names_and_ids,
 ]
 
 notes_to_sefa_checks = general_checks + [
@@ -98,7 +102,6 @@ def run_all_checks(ir, list_of_checks, section_name=None):
             errors.append(res)
     for fun in list_of_checks:
         res = fun(ir)
-        print(fun)
         if isinstance(res, list) and all(map(lambda v: isinstance(v, tuple), res)):
             errors = errors + res
         elif isinstance(res, tuple):
