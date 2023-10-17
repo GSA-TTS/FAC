@@ -72,6 +72,9 @@
                      },
                      "note_title": {
                         "type": "string"
+                     },
+                     "seq_number": {
+                        "type": "integer"
                      }
                   },
                   "required": [

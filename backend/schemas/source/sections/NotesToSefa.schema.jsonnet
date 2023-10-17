@@ -9,8 +9,6 @@ local Meta = Types.object {
     section_name: Types.string {
       enum: [Sheets.section_names.NOTES_TO_SEFA],
     },
-    // FIXME: 2023-08-07 MSHD: The 'Version' is currently used here as a placeholder, and it is not being enforced at the moment.
-    // Once we establish a versioning pattern, we can update this and enforce it accordingly.
     version: Types.string {
       const: Sheets.WORKBOOKS_VERSION,
     },
@@ -26,6 +24,7 @@ local NotesToSefaEntry = {
     note_title: Types.string,
     note_content: Types.string,
     contains_chart_or_table: Base.Enum.YorN,
+    seq_number: Types.integer,
   },
   required: ['note_title', 'note_content', 'contains_chart_or_table'],
   title: 'NotesToSefaEntry',
