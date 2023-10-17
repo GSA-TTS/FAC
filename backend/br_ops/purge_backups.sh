@@ -9,7 +9,7 @@ echo "It assumes that the S3 bucket named 'backups' has been bound"
 cfspace=$(cf target |tail -1|cut -d':' -f2|xargs)
 echo "Space: ${cfspace}"
 
-if [[ "$cfspace" != "dev" && "$cfspace" != "prodiction" ]]; then
+if [[ "$cfspace" != "dev" && "$cfspace" != "production" ]]; then
   echo "Error: Backups may only be purged fromr dev or production"
   exit 1
 fi
@@ -25,7 +25,7 @@ grep -v -e "\_PR\_" -e "\_CRON\_" "$prefix"_backup_list.txt | tail +3 >> "$prefi
 echo "Purging backups ..."
 while read line; do
   db_backup_name="$line"
-  echo "DB" "$db_backup_name" 
+  echo "DB" "$db_backup_name"
   media_backup_name=$(echo "$line" | sed -e 's/-db-backup.psql.bin/-media-backup.tar/g')
   echo "MEDIA" "$media_backup_name"
   python manage.py fac_s3 backups --rm $db_backup_name
