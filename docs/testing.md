@@ -128,8 +128,8 @@ in files in [backend/cypress/e2e/](/backend/cypress/e2e). To run these tests:
 - `CYPRESS_LOGIN_TEST_EMAIL='<your email>' CYPRESS_LOGIN_TEST_PASSWORD='<your  password>' CYPRESS_LOGIN_TEST_OTP_SECRET='<your otp>' CYPRESS_LOGIN_TEST_EMAIL_AUDITEE='<auditee email*>' CYPRESS_LOGIN_TEST_PASSWORD_AUDITEE='<auditee password*>' CYPRESS_LOGIN_TEST_OTP_SECRET_AUDITEE='<auditee otp*>' CYPRESS_API_GOV_JWT='<your jwt>' CYPRESS_API_GOV_URL='localhost:3000' npx cypress open`
 	- Note: All of this goes on one line
 	- *: These fields can be found in the [FAC dev keys Google doc](https://docs.google.com/spreadsheets/d/1byrBp16jufbiEY_GP5MyR0Uqf6WvB_5tubSXN_mYyJY/edit#gid=0)
-- Click E2E Testing
-- Select Chrome and click Start E2E Testing in Chrome
+- Click `E2E Testing`
+- Select `Chrome` and click `Start E2E Testing in Chrome`
 
 ## Testing behind Login.gov
 
