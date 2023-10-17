@@ -119,7 +119,17 @@ Like with Bandit, new code will need to pass all of these to be merged into the 
 # End-to-end testing
 
 We use Cypress to do end-to-end testing of the application. Tests are defined
-in files in [backend/cypress/e2e/](/backend/cypress/e2e). Run cypress with `npx cypress open`.
+in files in [backend/cypress/e2e/](/backend/cypress/e2e). To run these tests:
+- Run the app. Then, from the `FAC/backend` directory:
+- `npm i`
+- [Create a testing login.gov account](https://github.com/GSA-TTS/FAC/blob/main/docs/testing.md#testing-behind-logingov)
+- [Set up the fac() alias](https://github.com/GSA-TTS/FAC/blob/main/docs/development.md?plain=1#L125)
+- [Generate a new JWT](https://github.com/GSA-TTS/FAC/blob/main/backend/dissemination/README.md#creating-a-jwt-secret)
+- CYPRESS_LOGIN_TEST_EMAIL='\<your email\>' CYPRESS_LOGIN_TEST_PASSWORD='\<your  password\>' CYPRESS_LOGIN_TEST_OTP_SECRET='\<your otp\>' CYPRESS_LOGIN_TEST_EMAIL_AUDITEE='\<auditee email*\>' CYPRESS_LOGIN_TEST_PASSWORD_AUDITEE='\<auditee password*\>' CYPRESS_LOGIN_TEST_OTP_SECRET_AUDITEE='\<auditee otp*\>' CYPRESS_API_GOV_JWT='\<your jwt\>' CYPRESS_API_GOV_URL='localhost:3000' npx cypress open
+	- Note: All of this goes on one line
+	- *: These fields can be found in the FAC dev keys Google doc
+- Click E2E Testing
+- Select Chrome and click Start E2E Testing in Chrome
 
 ## Testing behind Login.gov
 
