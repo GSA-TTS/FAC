@@ -112,6 +112,7 @@
                         </li>
                     </ul>
                 </div>
+		{% if results %}
                 <table class="usa-table usa-table--striped">
                     <caption>
                         Results {{ results|length }}
@@ -150,6 +151,12 @@
                     </tbody>
                 </table>
                 <button class="usa-button">Download all results PDF</button>
+		{% else %}
+		    <div class="search-instructions">
+			<img src="{% static 'img/circle-arrow.svg' %}" />
+			<p>Enter your filters and select <em>Search</em> to begin</p>
+		    </div>
+		{% endif %}
             </div>
         </div>
     </div>

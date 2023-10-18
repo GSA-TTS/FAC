@@ -73,4 +73,18 @@
       text-transform: none;
     }
   }
+
+  .search-instructions {
+    color: #a4a7ac;
+    font-size: 2em;
+    margin: 0 auto;
+    padding-top: 3em;
+    text-align: center;
+    width: 60%;
+
+    em {
+      font-style: normal;
+      font-weight: 800;
+    }
+  }
 }
