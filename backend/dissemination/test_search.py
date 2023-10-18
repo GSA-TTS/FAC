@@ -25,14 +25,7 @@ class SearchGeneralTests(TestCase):
         baker.make(General, is_public=True, _quantity=public_count)
         baker.make(General, is_public=False, _quantity=private_count)
 
-        results = search_general(
-            names=None,
-            uei_or_eins=None,
-            start_date=None,
-            end_date=None,
-            cog_or_oversight=None,
-            agency_name=None,
-        )
+        results = search_general()
 
         assert_all_results_public(self, results)
         self.assertEqual(len(results), public_count)
@@ -46,11 +39,6 @@ class SearchGeneralTests(TestCase):
 
         results = search_general(
             names=[auditee_name],
-            uei_or_eins=None,
-            start_date=None,
-            end_date=None,
-            cog_or_oversight=None,
-            agency_name=None,
         )
 
         assert_all_results_public(self, results)
@@ -65,11 +53,6 @@ class SearchGeneralTests(TestCase):
 
         results = search_general(
             names=[auditor_firm_name],
-            uei_or_eins=None,
-            start_date=None,
-            end_date=None,
-            cog_or_oversight=None,
-            agency_name=None,
         )
 
         assert_all_results_public(self, results)
@@ -94,11 +77,6 @@ class SearchGeneralTests(TestCase):
 
         results = search_general(
             names=names,
-            uei_or_eins=None,
-            start_date=None,
-            end_date=None,
-            cog_or_oversight=None,
-            agency_name=None,
         )
 
         assert_all_results_public(self, results)
@@ -112,12 +90,7 @@ class SearchGeneralTests(TestCase):
         baker.make(General, is_public=True, auditee_uei=auditee_uei)
 
         results = search_general(
-            names=None,
             uei_or_eins=[auditee_uei],
-            start_date=None,
-            end_date=None,
-            cog_or_oversight=None,
-            agency_name=None,
         )
 
         assert_all_results_public(self, results)
@@ -131,12 +104,7 @@ class SearchGeneralTests(TestCase):
         baker.make(General, is_public=True, auditee_ein=auditee_ein)
 
         results = search_general(
-            names=None,
             uei_or_eins=[auditee_ein],
-            start_date=None,
-            end_date=None,
-            cog_or_oversight=None,
-            agency_name=None,
         )
 
         assert_all_results_public(self, results)
@@ -158,12 +126,7 @@ class SearchGeneralTests(TestCase):
         baker.make(General, is_public=True, auditee_ein="not-looking-for-this-ein")
 
         results = search_general(
-            names=None,
             uei_or_eins=uei_or_eins,
-            start_date=None,
-            end_date=None,
-            cog_or_oversight=None,
-            agency_name=None,
         )
 
         assert_all_results_public(self, results)
@@ -188,12 +151,8 @@ class SearchGeneralTests(TestCase):
         search_end_date = datetime.date(2023, 6, 15)
 
         results = search_general(
-            names=None,
-            uei_or_eins=None,
             start_date=search_start_date,
             end_date=search_end_date,
-            cog_or_oversight=None,
-            agency_name=None,
         )
 
         assert_all_results_public(self, results)
@@ -216,10 +175,6 @@ class SearchGeneralTests(TestCase):
         baker.make(General, is_public=True, oversight_agency="01")
 
         results = search_general(
-            names=None,
-            uei_or_eins=None,
-            start_date=None,
-            end_date=None,
             cog_or_oversight="Cognizant",
             agency_name="01",
         )
@@ -239,10 +194,6 @@ class SearchGeneralTests(TestCase):
         baker.make(General, is_public=True, oversight_agency="02")
 
         results = search_general(
-            names=None,
-            uei_or_eins=None,
-            start_date=None,
-            end_date=None,
             cog_or_oversight="Cognizant",
             agency_name="01",
         )
@@ -250,3 +201,29 @@ class SearchGeneralTests(TestCase):
         assert_all_results_public(self, results)
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0].cognizant_agency, "01")
+
+    def test_audit_year(self):
+        """
+        Given a list of audit years, search_general should return only records where
+        audit_year is one of the given years.
+        """
+        baker.make(General, is_public=True, audit_year="2020")
+        baker.make(General, is_public=True, audit_year="2021")
+        baker.make(General, is_public=True, audit_year="2022")
+
+        results = search_general(
+            audit_years=[2016],
+        )
+        self.assertEqual(len(results), 0)
+
+        results = search_general(
+            audit_years=[2020],
+        )
+        self.assertEqual(len(results), 1)
+
+        results = search_general(
+            audit_years=[2020, 2021, 2022],
+        )
+        self.assertEqual(len(results), 3)
+
+        return
