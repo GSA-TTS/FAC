@@ -4,13 +4,13 @@ from dissemination.models import General
 
 
 def search_general(
-    names,
-    uei_or_eins,
-    start_date,
-    end_date,
-    cog_or_oversight,
-    agency_name,
-    audit_years,
+    names=None,
+    uei_or_eins=None,
+    start_date=None,
+    end_date=None,
+    cog_or_oversight=None,
+    agency_name=None,
+    audit_years=None,
 ):
     query = Q(is_public=True)
 
