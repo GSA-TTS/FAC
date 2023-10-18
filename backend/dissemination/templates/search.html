@@ -23,21 +23,21 @@
                                     aria-expanded="true"
                                     aria-controls="entity-name">Name (Entity, Auditee, or Auditor)</button>
                         </label>
-                        <textarea class="usa-textarea" id="entity-name" name="entity_name"></textarea>
+                        <textarea class="usa-textarea" id="entity-name" name="entity_name">{{form.cleaned_data.entity_name}}</textarea>
                         <label for="uei-or-ein">
                             <button type="button"
                                     class="usa-accordion__button"
                                     aria-expanded="true"
                                     aria-controls="uei-or-ein">UEI or EIN</button>
                         </label>
-                        <textarea class="usa-textarea" id="uei-or-ein" name="uei_or_ein"></textarea>
+                        <textarea class="usa-textarea" id="uei-or-ein" name="uei_or_ein">{{form.cleaned_data.uei_or_ein}}</textarea>
                         <label for="aln">
                             <button type="button"
                                     class="usa-accordion__button"
                                     aria-expanded="true"
                                     aria-controls="aln">Assistance Listing Number (formerly CFDA)</button>
                         </label>
-                        <textarea class="usa-textarea" id="aln" name="aln"></textarea>
+                        <textarea class="usa-textarea" id="aln" name="aln">{{form.cleaned_data.aln}}</textarea>
                         <button type="button"
                                 class="usa-accordion__button"
                                 aria-expanded="true"
@@ -46,7 +46,8 @@
                             <div class="usa-form-group">
                                 <label class="usa-label" id="start-date-label" for="start-date">Start date</label>
                                 <div class="usa-hint" id="start-date-hint">mm/dd/yyyy</div>
-                                <div class="usa-date-picker">
+                                <div class="usa-date-picker"
+                                     data-default-value="{{ form.cleaned_data.start_date }}">
                                     <input class="usa-input"
                                            id="start-date"
                                            name="start_date"
@@ -57,7 +58,8 @@
                             <div class="usa-form-group">
                                 <label class="usa-label" id="end-date-label" for="end-date">End date</label>
                                 <div class="usa-hint" id="end-date-hint">mm/dd/yyyy</div>
-                                <div class="usa-date-picker">
+                                <div class="usa-date-picker"
+                                     data-default-value="{{ form.cleaned_data.start_date }}">
                                     <input class="usa-input"
                                            id="end-date"
                                            name="end_date"
@@ -74,11 +76,20 @@
                             <label class="usa-label" for="options">Dropdown label</label>
                             <select class="usa-select" name="cog_or_oversight" id="options">
                                 <option value>- Select -</option>
-                                <option value="cog">Cognizant</option>
-                                <option value="oversight">Oversight</option>
+                                <option value="cog"
+                                        {% if form.cleaned_data.cog_or_oversight == "cog" %}selected{% endif %}>
+                                    Cognizant
+                                </option>
+                                <option value="oversight"
+                                        {% if form.cleaned_data.cog_or_oversight == "oversight" %}selected{% endif %}>
+                                    Oversight
+                                </option>
                             </select>
                             <label class="usa-label" for="agency-name">Name of federal agency</label>
-                            <input class="usa-input" id="agency-name" name="agency_name" />
+                            <input class="usa-input"
+                                   id="agency-name"
+                                   name="agency_name"
+                                   value="{{ form.cleaned_data.agency_name }}" />
                         </div>
                     </div>
                     <div class="search-submit">
@@ -132,7 +143,10 @@
                                         </a>
                                     </td>
                                     <td>
-                                        <svg class="usa-icon usa-icon--size-4" aria-hidden="true" focusable="false" role="img">
+                                        <svg class="usa-icon usa-icon--size-4"
+                                             aria-hidden="true"
+                                             focusable="false"
+                                             role="img">
                                             {% uswds_sprite "file_download" %}
                                         </svg>
                                     </td>

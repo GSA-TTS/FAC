@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.http import Http404
 from django.shortcuts import render
 from django.views.generic import View
@@ -36,6 +38,9 @@ class Search(View):
             results = search_general(
                 names, uei_or_eins, start_date, end_date, cog_or_oversight, agency_name
             )
+            # Reformat these so the date-picker element in HTML prepopulate
+            form.cleaned_data["start_date"] = start_date.strftime("%Y-%m-%d")
+            form.cleaned_data["end_date"] = end_date.strftime("%Y-%m-%d")
 
         return render(request, "search.html", {"form": form, "results": results})
 
