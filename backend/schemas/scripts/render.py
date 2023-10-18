@@ -503,7 +503,7 @@ def set_open_range_and_single_cell_widths(ws, sheet):
 
 def set_row_heights(wb, ws, sheet):
     """Set the row heights based on sheet.row_height if defined."""
-    if sheet.row_height and ws.title in ("Form", "AdditionalNotes"):
+    if sheet.row_height and ws.title == "Form":
         named_cells = set()  # Set to store all cells within named ranges
 
         # Collecting all cells that are in named ranges
@@ -511,7 +511,7 @@ def set_row_heights(wb, ws, sheet):
             for dest in wb.defined_names[
                 named_range
             ].destinations:  # Each destination is a tuple of (sheet_name, cell_range)
-                if dest[0] in ("Form", "AdditionalNotes"):
+                if dest[0] == "Form":
                     for row in ws[dest[1]]:
                         for cell in row:
                             named_cells.add((cell.row, cell.column))
@@ -523,7 +523,7 @@ def set_row_heights(wb, ws, sheet):
 
 def activate_wraptext(wb):
     for ws in wb.worksheets:
-        if ws.title in ("Form", "AdditionalNotes"):
+        if ws.title == "Form":
             for named_range_name in wb.defined_names:
                 activate_wraptext_for_named_range(wb, ws, named_range_name)
 
@@ -532,9 +532,7 @@ def activate_wraptext_for_named_range(wb, ws, named_range_name):
     """Activate wrapText for all cells within a named range in the worksheet."""
     if named_range_name in wb.defined_names:
         named_range = wb.defined_names[named_range_name]
-        if named_range.attr_text.startswith(
-            "'Form'!"
-        ) or named_range.attr_text.startswith("'AdditionalNotes'!"):
+        if named_range.attr_text.startswith("'Form'!"):
             for cell_range in named_range.destinations:
                 for row in ws[cell_range[1]]:
                     for cell in row:
