@@ -28,6 +28,9 @@ from .check_cluster_name_always_present import cluster_name_always_present
 from .check_federal_award_passed_always_present import (
     federal_award_passed_always_present,
 )
+from .check_federal_program_total import federal_program_total_is_correct
+from .check_cluster_total import cluster_total_is_correct
+from .check_total_amount_expended import total_amount_expended_is_correct
 
 ############
 # Audit findings checks
@@ -57,6 +60,9 @@ federal_awards_checks = general_checks + [
     no_major_program_no_type,
     all_unique_award_numbers,
     sequential_award_numbers,
+    federal_program_total_is_correct,
+    cluster_total_is_correct,
+    total_amount_expended_is_correct,
 ]
 
 notes_to_sefa_checks = general_checks + [
