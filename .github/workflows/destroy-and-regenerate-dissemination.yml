@@ -10,6 +10,7 @@ on:
 
 jobs:
   destroy-and-regenerate-dissemination-objects:
+    if: contains('["tadhg-ohiggins","danswick"]', github.actor)
     name: Destroy and regenerate dissemination objects in ${{ inputs.environment }} database
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment }}
