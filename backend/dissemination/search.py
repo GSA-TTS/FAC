@@ -8,6 +8,8 @@ def search_general(
 ):
     query = Q(is_public=True)
 
+    # TODO: use something like auditee_name__contains
+    # SELECT * WHERE auditee_name LIKE '%SomeString%'
     if names:
         names_match = Q(Q(auditee_name__in=names) | Q(auditor_firm_name__in=names))
         query.add(names_match, Q.AND)

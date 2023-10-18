@@ -11,26 +11,22 @@
                       enctype='multipart/form-data'
                       method="post">
                     {% csrf_token %}
+					{% comment %} Submission {% endcomment %}
                     <div class="search-submit">
                         <input class="usa-button" type="submit" value="Search" />
                         <button class="usa-button usa-button--unstyled">Reset Search</button>
                     </div>
                     <div class="usa-accordion usa-accordion--multiselectable"
                          data-allow-multiple>
-                        <label for="entity-name">
-                            <button type="button"
-                                    class="usa-accordion__button"
-                                    aria-expanded="true"
-                                    aria-controls="entity-name">Name (Entity, Auditee, or Auditor)</button>
-                        </label>
-                        <textarea class="usa-textarea" id="entity-name" name="entity_name">{{form.cleaned_data.entity_name}}</textarea>
-                        <label for="uei-or-ein">
-                            <button type="button"
-                                    class="usa-accordion__button"
-                                    aria-expanded="true"
-                                    aria-controls="uei-or-ein">UEI or EIN</button>
-                        </label>
+						{% comment %} UEI/EIN {% endcomment %}
+						<label for="uei-or-ein">
+							<button type="button"
+									class="usa-accordion__button"
+									aria-expanded="true"
+									aria-controls="uei-or-ein">UEI or EIN</button>
+						</label>
                         <textarea class="usa-textarea" id="uei-or-ein" name="uei_or_ein">{{form.cleaned_data.uei_or_ein}}</textarea>
+						{% comment %} ALN/CFDA {% endcomment %}
                         <label for="aln">
                             <button type="button"
                                     class="usa-accordion__button"
@@ -38,6 +34,15 @@
                                     aria-controls="aln">Assistance Listing Number (formerly CFDA)</button>
                         </label>
                         <textarea class="usa-textarea" id="aln" name="aln">{{form.cleaned_data.aln}}</textarea>
+						{% comment %} Name {% endcomment %}
+						<label for="entity-name">
+                            <button type="button"
+                                    class="usa-accordion__button"
+                                    aria-expanded="true"
+                                    aria-controls="entity-name">Name (Entity, Auditee, or Auditor)</button>
+                        </label>
+                        <textarea class="usa-textarea" id="entity-name" name="entity_name">{{form.cleaned_data.entity_name}}</textarea>
+						{% comment %} Release Date(s) {% endcomment %}
                         <button type="button"
                                 class="usa-accordion__button"
                                 aria-expanded="true"
@@ -68,6 +73,7 @@
                                 </div>
                             </div>
                         </div>
+						{% comment %} Cog/Over {% endcomment %}
                         <button type="button"
                                 class="usa-accordion__button"
                                 aria-expanded="true"
@@ -92,6 +98,7 @@
                                    value="{{ form.cleaned_data.agency_name }}" />
                         </div>
                     </div>
+					{% comment %} Submission {% endcomment %}
                     <div class="search-submit">
                         <input class="usa-button" type="submit" value="Search" />
                         <button class="usa-button usa-button--unstyled">Reset Search</button>
