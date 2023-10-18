@@ -1,33 +1,26 @@
 ---
 name: "Task: run Django command to delete and then regenerate all dissemination objects"
 on:
-  # workflow_dispatch:
-  #   inputs:
-  #     environment:
-  #       required: true
-  #       type: string
+  workflow_dispatch:
+    inputs:
+      environment:
+        required: true
+        type: string
         # dev, staging, production
-  push:
-    branches:
-      - tadhg/taskify-dissemination-destruction
 
 jobs:
   destroy-and-regenerate-dissemination-objects:
-    # name: Destroy and regenerate dissemination objects in ${{ env.environment }} database
-    name: Destroy and regenerate dissemination objects in dev database
+    name: Destroy and regenerate dissemination objects in ${{ inputs.environment }} database
     runs-on: ubuntu-latest
-    # environment: ${{ inputs.environment }}
-    environment: dev
+    environment: ${{ inputs.environment }}
     env:
-      # space: ${{ inputs.environment }}
-      space: dev
+      space: ${{ inputs.environment }}
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # - name: Run Django command to destroy and regenerate dissemination objects in ${{ inputs.environment }}
-      - name: Run Django command to destroy and regenerate dissemination objects in dev
+      - name: Run Django command to destroy and regenerate dissemination objects in ${{ inputs.environment }}
         uses: cloud-gov/cg-cli-tools@main
         with:
           cf_username: ${{ secrets.CF_USERNAME }}
