@@ -26,4 +26,7 @@ messages = {
     "check_passthrough_name_when_no_direct_n_and_empty_number": "When the award is direct, passthrough number must be empty",
     "check_findings_grid_validation": "The combination of findings <b>{}</b> is not a valid combination under Uniform Guidance",
     "check_eins_are_not_empty": "EIN cannot be empty",
+    "check_federal_program_total": "Federal program total is {}, but should be {}",
+    "check_cluster_total": "This cluster total is {}, but should be {}",
+    "check_total_amount_expended": "Total amount expended is {}, but should be {}",
 }
