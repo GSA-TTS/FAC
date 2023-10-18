@@ -41,6 +41,7 @@ exclude_dirs = [
     "node_modules",
     "dissemination/test_search.py",
     "dissemination/tests.py",
+    ".venv"
 ]
 
 [tool.djlint]
