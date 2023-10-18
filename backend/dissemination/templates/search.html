@@ -11,33 +11,38 @@
                       enctype='multipart/form-data'
                       method="post">
                     {% csrf_token %}
+                    {% comment %} Submission {% endcomment %}
                     <div class="search-submit">
                         <input class="usa-button" type="submit" value="Search" />
                         <button class="usa-button usa-button--unstyled">Reset Search</button>
                     </div>
                     <div class="usa-accordion usa-accordion--multiselectable"
                          data-allow-multiple>
-                        <label for="entity-name">
-                            <button type="button"
-                                    class="usa-accordion__button"
-                                    aria-expanded="true"
-                                    aria-controls="entity-name">Name (Entity, Auditee, or Auditor)</button>
-                        </label>
-                        <textarea class="usa-textarea" id="entity-name" name="entity_name"></textarea>
+                        {% comment %} UEI/EIN {% endcomment %}
                         <label for="uei-or-ein">
                             <button type="button"
                                     class="usa-accordion__button"
                                     aria-expanded="true"
                                     aria-controls="uei-or-ein">UEI or EIN</button>
                         </label>
-                        <textarea class="usa-textarea" id="uei-or-ein" name="uei_or_ein"></textarea>
+                        <textarea class="usa-textarea" id="uei-or-ein" name="uei_or_ein">{{form.cleaned_data.uei_or_ein}}</textarea>
+                        {% comment %} ALN/CFDA {% endcomment %}
                         <label for="aln">
                             <button type="button"
                                     class="usa-accordion__button"
                                     aria-expanded="true"
                                     aria-controls="aln">Assistance Listing Number (formerly CFDA)</button>
                         </label>
-                        <textarea class="usa-textarea" id="aln" name="aln"></textarea>
+                        <textarea class="usa-textarea" id="aln" name="aln">{{form.cleaned_data.aln}}</textarea>
+                        {% comment %} Name {% endcomment %}
+                        <label for="entity-name">
+                            <button type="button"
+                                    class="usa-accordion__button"
+                                    aria-expanded="true"
+                                    aria-controls="entity-name">Name (Entity, Auditee, or Auditor)</button>
+                        </label>
+                        <textarea class="usa-textarea" id="entity-name" name="entity_name">{{form.cleaned_data.entity_name}}</textarea>
+                        {% comment %} Release Date(s) {% endcomment %}
                         <button type="button"
                                 class="usa-accordion__button"
                                 aria-expanded="true"
@@ -46,7 +51,8 @@
                             <div class="usa-form-group">
                                 <label class="usa-label" id="start-date-label" for="start-date">Start date</label>
                                 <div class="usa-hint" id="start-date-hint">mm/dd/yyyy</div>
-                                <div class="usa-date-picker">
+                                <div class="usa-date-picker"
+                                     data-default-value="{{ form.cleaned_data.start_date }}">
                                     <input class="usa-input"
                                            id="start-date"
                                            name="start_date"
@@ -57,7 +63,8 @@
                             <div class="usa-form-group">
                                 <label class="usa-label" id="end-date-label" for="end-date">End date</label>
                                 <div class="usa-hint" id="end-date-hint">mm/dd/yyyy</div>
-                                <div class="usa-date-picker">
+                                <div class="usa-date-picker"
+                                     data-default-value="{{ form.cleaned_data.start_date }}">
                                     <input class="usa-input"
                                            id="end-date"
                                            name="end_date"
@@ -66,6 +73,7 @@
                                 </div>
                             </div>
                         </div>
+                        {% comment %} Cog/Over {% endcomment %}
                         <button type="button"
                                 class="usa-accordion__button"
                                 aria-expanded="true"
@@ -74,13 +82,23 @@
                             <label class="usa-label" for="options">Dropdown label</label>
                             <select class="usa-select" name="cog_or_oversight" id="options">
                                 <option value>- Select -</option>
-                                <option value="cog">Cognizant</option>
-                                <option value="oversight">Oversight</option>
+                                <option value="cog"
+                                        {% if form.cleaned_data.cog_or_oversight == "cog" %}selected{% endif %}>
+                                    Cognizant
+                                </option>
+                                <option value="oversight"
+                                        {% if form.cleaned_data.cog_or_oversight == "oversight" %}selected{% endif %}>
+                                    Oversight
+                                </option>
                             </select>
                             <label class="usa-label" for="agency-name">Name of federal agency</label>
-                            <input class="usa-input" id="agency-name" name="agency_name" />
+                            <input class="usa-input"
+                                   id="agency-name"
+                                   name="agency_name"
+                                   value="{{ form.cleaned_data.agency_name }}" />
                         </div>
                     </div>
+                    {% comment %} Submission {% endcomment %}
                     <div class="search-submit">
                         <input class="usa-button" type="submit" value="Search" />
                         <button class="usa-button usa-button--unstyled">Reset Search</button>
@@ -89,129 +107,126 @@
             </div>
             <div class="tablet:grid-col-8 audit-search-results">
                 <h2>Search single audit reports</h2>
-		{% if results %}
-                <table class="usa-table usa-table--striped">
-                    <caption>
-                        Results {{ results|length }}
-                    </caption>
-                    <thead>
-                        <tr>
-                            <th data-sortable scope="col" role="columnheader">Name</th>
-                            <th data-sortable scope="col" role="columnheader">UEI or EIN</th>
-                            <th data-sortable scope="col" role="columnheader">Acc Date</th>
-                            <th data-sortable scope="col" role="columnheader">AY</th>
-                            <th data-sortable scope="col" role="columnheader">Cog or Over</th>
-                            <th data-sortable scope="col" role="columnheader">View</th>
-                            <th data-sortable scope="col" role="columnheader">PDF</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for result in results %}
-                        <tr>
-                            <th scope="row" role="rowheader">{{ result.auditee_name }}</th>
-                            <td>{{ result.auditee_uei }}</td>
-                            <td data-sort-value="1696528569380">{{ result.fac_accepted_date }}</td>
-                            <td>{{ result.audit_year }}</td>
-                            <td>{% if result.oversight_agency %}Oversight{% else %}Cognizant{% endif %}</td>
-                            <td>
-                                <svg class="usa-icon" aria-hidden="true" focusable="false" role="img">
-                                    {% uswds_sprite "visibility" %}
-                                </svg>
-                            </td>
-                            <td>
-                                <svg class="usa-icon" aria-hidden="true" focusable="false" role="img">
-                                    {% uswds_sprite "file_download" %}
-                                </svg>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-		<nav aria-label="Pagination" class="usa-pagination">
-		<ul class="usa-pagination__list">
-		    <li class="usa-pagination__item usa-pagination__arrow">
-		    <a
-			href="javascript:void(0);"
-			class="usa-pagination__link usa-pagination__previous-page"
-			aria-label="Previous page"
-			><svg class="usa-icon" aria-hidden="true" role="img">
-			<use xlink:href="/assets/img/sprite.svg#navigate_before"></use>
-			</svg>
-			<span class="usa-pagination__link-text">Previous</span></a
-		    >
-		    </li>
-		    <li class="usa-pagination__item usa-pagination__page-no">
-		    <a
-			href="javascript:void(0);"
-			class="usa-pagination__button"
-			aria-label="Page 1"
-			>1</a
-		    >
-		    </li>
-		    <li
-		    class="usa-pagination__item usa-pagination__overflow"
-		    aria-label="ellipsis indicating non-visible pages"
-		    >
-		    <span>…</span>
-		    </li>
-		    <li class="usa-pagination__item usa-pagination__page-no">
-		    <a
-			href="javascript:void(0);"
-			class="usa-pagination__button"
-			aria-label="Page 9"
-			>9</a
-		    >
-		    </li>
-		    <li class="usa-pagination__item usa-pagination__page-no">
-		    <a
-			href="javascript:void(0);"
-			class="usa-pagination__button usa-current"
-			aria-label="Page 10"
-			aria-current="page"
-			>10</a
-		    >
-		    </li>
-		    <li class="usa-pagination__item usa-pagination__page-no">
-		    <a
-			href="javascript:void(0);"
-			class="usa-pagination__button"
-			aria-label="Page 11"
-			>11</a
-		    >
-		    </li>
-		    <li
-		    class="usa-pagination__item usa-pagination__overflow"
-		    aria-label="ellipsis indicating non-visible pages"
-		    >
-		    <span>…</span>
-		    </li>
-		    <li class="usa-pagination__item usa-pagination__page-no">
-		    <a
-			href="javascript:void(0);"
-			class="usa-pagination__button"
-			aria-label="Last page, page 24"
-			>24</a
-		    >
-		    </li>
-		    <li class="usa-pagination__item usa-pagination__arrow">
-		    <a
-			href="javascript:void(0);"
-			class="usa-pagination__link usa-pagination__next-page"
-			aria-label="Next page"
-			><span class="usa-pagination__link-text">Next </span
-			><svg class="usa-icon" aria-hidden="true" role="img">
-			<use xlink:href="/assets/img/sprite.svg#navigate_next"></use></svg
-		    ></a>
-		    </li>
-		</ul>
-		</nav>
-		{% else %}
-		    <div class="search-instructions">
-			<img src="{% static 'img/circle-arrow.svg' %}" alt="an arrow points left, toward the search form" />
-			<p>Enter your filters and select <em>Search</em> to begin</p>
-		    </div>
-		{% endif %}
+                {% if results %}
+                    <table class="usa-table usa-table--striped">
+                        <caption>
+                            Results {{ results|length }}
+                        </caption>
+                        <thead>
+                            <tr>
+                                <th data-sortable scope="col" role="columnheader">Name</th>
+                                <th data-sortable scope="col" role="columnheader">UEI or EIN</th>
+                                <th data-sortable scope="col" role="columnheader">Acc Date</th>
+                                <th data-sortable scope="col" role="columnheader">AY</th>
+                                <th data-sortable scope="col" role="columnheader">Cog or Over</th>
+                                <th data-sortable scope="col" role="columnheader">View</th>
+                                <th data-sortable scope="col" role="columnheader">PDF</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for result in results %}
+                                <tr>
+                                    <th scope="row" role="rowheader">{{ result.auditee_name }}</th>
+                                    <td>{{ result.auditee_uei }}</td>
+                                    <td data-sort-value="1696528569380">{{ result.fac_accepted_date }}</td>
+                                    <td>{{ result.audit_year }}</td>
+                                    <td>
+                                        {% if result.oversight_agency %}
+                                            Oversight
+                                        {% else %}
+                                            Cognizant
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <a class="usa-link display-flex flex-column flex-align-center"
+                                           href="{% url 'dissemination:Summary' report_id=result.report_id %}"
+                                           target="_blank">
+                                            <svg class="usa-icon usa-icon--size-4"
+                                                 aria-hidden="true"
+                                                 focusable="false"
+                                                 role="img">
+                                                {% uswds_sprite "visibility" %}
+                                            </svg>
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <svg class="usa-icon usa-icon--size-4"
+                                             aria-hidden="true"
+                                             focusable="false"
+                                             role="img">
+                                            {% uswds_sprite "file_download" %}
+                                        </svg>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    <nav aria-label="Pagination" class="usa-pagination">
+                        <ul class="usa-pagination__list">
+                            <li class="usa-pagination__item usa-pagination__arrow">
+                                <a href="javascript:void(0);"
+                                   class="usa-pagination__link usa-pagination__previous-page"
+                                   aria-label="Previous page">
+                                    <svg class="usa-icon" aria-hidden="true" role="img">
+                                        {% uswds_sprite "navigate_before" %}
+                                    </svg>
+                                    <span class="usa-pagination__link-text">Previous</span></a>
+                            </li>
+                            <li class="usa-pagination__item usa-pagination__page-no">
+                                <a href="javascript:void(0);"
+                                   class="usa-pagination__button"
+                                   aria-label="Page 1">1</a>
+                            </li>
+                            <li class="usa-pagination__item usa-pagination__overflow"
+                                aria-label="ellipsis indicating non-visible pages">
+                                <span>…</span>
+                            </li>
+                            <li class="usa-pagination__item usa-pagination__page-no">
+                                <a href="javascript:void(0);"
+                                   class="usa-pagination__button"
+                                   aria-label="Page 9">9</a>
+                            </li>
+                            <li class="usa-pagination__item usa-pagination__page-no">
+                                <a href="javascript:void(0);"
+                                   class="usa-pagination__button usa-current"
+                                   aria-label="Page 10"
+                                   aria-current="page">10</a>
+                            </li>
+                            <li class="usa-pagination__item usa-pagination__page-no">
+                                <a href="javascript:void(0);"
+                                   class="usa-pagination__button"
+                                   aria-label="Page 11">11</a>
+                            </li>
+                            <li class="usa-pagination__item usa-pagination__overflow"
+                                aria-label="ellipsis indicating non-visible pages">
+                                <span>…</span>
+                            </li>
+                            <li class="usa-pagination__item usa-pagination__page-no">
+                                <a href="javascript:void(0);"
+                                   class="usa-pagination__button"
+                                   aria-label="Last page, page 24">24</a>
+                            </li>
+                            <li class="usa-pagination__item usa-pagination__arrow">
+                            <a href="javascript:void(0);"
+                               class="usa-pagination__link usa-pagination__next-page"
+                               aria-label="Next page"><span class="usa-pagination__link-text">Next</span>
+                            <svg class="usa-icon" aria-hidden="true" role="img">
+                                {% uswds_sprite "navigate_next" %}
+                            </svg>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        {% else %}
+            <div class="search-instructions">
+                <img src="{% static 'img/circle-arrow.svg' %}"
+                     alt="an arrow points left, toward the search form" />
+                <p>
+                    Enter your filters and select <em>Search</em> to begin
+                </p>
             </div>
-        </div>
+        {% endif %}
     </div>
+</div>
+</div>
 {% endblock %}
