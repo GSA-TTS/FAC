@@ -28,8 +28,7 @@ const LOGIN_TEST_PASSWORD_AUDITEE = Cypress.env('LOGIN_TEST_PASSWORD_AUDITEE');
 const LOGIN_TEST_OTP_SECRET_AUDITEE = Cypress.env('LOGIN_TEST_OTP_SECRET_AUDITEE');
 
 // function performSubmissionTest(workbookDirName, auditeeUEI, hasAdditionalEINs, processFindings) {
-// function performSubmissionTest(isTribal, isPublic) {
-function performSubmissionTest() {
+function performSubmissionTest(isTribal, isPublic) {
   cy.visit('/');
   cy.url().should('include', '/');
 
@@ -46,7 +45,7 @@ function performSubmissionTest() {
   cy.url().should('match', /\/report_submission\/eligibility\/$/);
 
   // Completes the eligibility screen
-  testValidEligibility();
+  testValidEligibility(isTribal);
 
   // Now the auditee info screen
   testValidAuditeeInfo();
@@ -105,7 +104,11 @@ function performSubmissionTest() {
 
     // complete the tribal audit form as auditee - opt private
     cy.get(".usa-link").contains("Tribal data release").click();
-    testTribalAuditPrivate();
+    if (isPublic) {
+      testTribalAuditPublic();
+    } else {
+      testTribalAuditPrivate();
+    }
 
     // Login as Auditor
     testLogoutGov();
@@ -156,19 +159,24 @@ function performSubmissionTest() {
     ).siblings().contains('td', reportId);
 
     // The Report should not be in the dissemination table
-    testReportIdNotFound(reportId);
+    if (isPublic) {
+      testReportIdFound(reportId);
+    } else {
+      testReportIdNotFound(reportId);
+    }
   });
+
+  testLogoutGov();
 }
 
 describe('Full audit submission', () => {
   it('Completes a full submission', () => {
     cy.visit('/');
     cy.url().should('include', '/');
-    
-    performSubmissionTest();
+
     // performSubmissionTest(false, true); // Normal submission
     // performSubmissionTest(true, true);  // Tribal and public
-    // performSubmissionTest(true, false); // Tribal and not public
+    performSubmissionTest(true, false); // Tribal and not public
     // performSubmissionTest('default', 'D7A4J33FUMJ1', true, true);
     // performSubmissionTest('17262', 'G9H6SUM59YC4', false, false);
   });
