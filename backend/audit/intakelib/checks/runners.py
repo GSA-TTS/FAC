@@ -32,6 +32,9 @@ from .check_aln_three_digit_extension_pattern import aln_three_digit_extension
 from .check_additional_award_identification_present import (
     additional_award_identification,
 )
+from .check_cardinality_of_passthrough_names_and_ids import (
+    cardinality_of_passthrough_names_and_ids,
+)
 
 ############
 # Audit findings checks
@@ -63,6 +66,7 @@ federal_awards_checks = general_checks + [
     sequential_award_numbers,
     aln_three_digit_extension,
     additional_award_identification,
+    cardinality_of_passthrough_names_and_ids,
 ]
 
 notes_to_sefa_checks = general_checks + [

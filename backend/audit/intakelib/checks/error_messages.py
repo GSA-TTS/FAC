@@ -29,4 +29,5 @@ messages = {
     "check_aln_three_digit_extension_missing": "Missing ALN (CFDA) three digit extension",
     "check_aln_three_digit_extension_invalid": "The three digit extension should follow one of these formats: ###, RD#, or U##, where # represents a number",
     "check_additional_award_identification_present": "Missing additional award identification",
+    "check_cardinality_of_passthrough_names_and_ids": "You used a <b>|</b> (bar character) to indicate multiple passthrough names and IDs; you must provide equal numbers of names and IDs. You provided <b>{}</b> name{} and <b>{}</b> ID{}",
 }
