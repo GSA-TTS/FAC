@@ -16,6 +16,9 @@ from .xform_trim_null_from_content_fields_in_notes_to_sefa import (
 from .xform_eins_need_to_be_strings import eins_need_to_be_strings
 
 from .xform_all_alns_need_to_be_strings import all_alns_need_to_be_strings
+from .xform_all_passthrough_id_need_to_be_strings import (
+    all_passthrough_id_need_to_be_strings,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -52,4 +55,5 @@ additional_eins_transforms = general_transforms + [
 
 federal_awards_transforms = general_transforms + [
     all_alns_need_to_be_strings,
+    all_passthrough_id_need_to_be_strings,
 ]
