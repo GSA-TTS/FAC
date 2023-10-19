@@ -31,6 +31,9 @@ from .check_federal_award_passed_always_present import (
 from .check_federal_award_passed_passed_through_optional import (
     federal_award_amount_passed_through_optional,
 )
+from .check_cardinality_of_passthrough_names_and_ids import (
+    cardinality_of_passthrough_names_and_ids,
+)
 
 ############
 # Audit findings checks
@@ -61,6 +64,7 @@ federal_awards_checks = general_checks + [
     no_major_program_no_type,
     all_unique_award_numbers,
     sequential_award_numbers,
+    cardinality_of_passthrough_names_and_ids,
 ]
 
 notes_to_sefa_checks = general_checks + [
