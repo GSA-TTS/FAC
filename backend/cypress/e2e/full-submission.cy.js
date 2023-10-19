@@ -90,30 +90,32 @@ function performSubmissionTest(isTribal, isPublic) {
   cy.get(".usa-link").contains("Additional EINs").click();
   testWorkbookAdditionalEINs(false);
 
-  cy.url().then(url => {
-    const reportId = url.split('/').pop();
+  if (isTribal) {
+    cy.url().then(url => {
+      const reportId = url.split('/').pop();
 
-    // Complete the tribal audit form as auditee - opt private
-    testLogoutGov();
-    testLoginGovLogin(
-      LOGIN_TEST_EMAIL_AUDITEE,
-      LOGIN_TEST_PASSWORD_AUDITEE,
-      LOGIN_TEST_OTP_SECRET_AUDITEE
-    );
-    cy.visit(`/audit/submission-progress/${reportId}`);
-    cy.get(".usa-link").contains("Tribal data release").click();
+      // Complete the tribal audit form as auditee - opt private
+      testLogoutGov();
+      testLoginGovLogin(
+        LOGIN_TEST_EMAIL_AUDITEE,
+        LOGIN_TEST_PASSWORD_AUDITEE,
+        LOGIN_TEST_OTP_SECRET_AUDITEE
+      );
+      cy.visit(`/audit/submission-progress/${reportId}`);
+      cy.get(".usa-link").contains("Tribal data release").click();
 
-    if (isPublic) {
-      testTribalAuditPublic();
-    } else {
-      testTribalAuditPrivate();
-    }
+      if (isPublic) {
+        testTribalAuditPublic();
+      } else {
+        testTribalAuditPrivate();
+      }
 
-    // Login as Auditor
-    testLogoutGov();
-    testLoginGovLogin();
-    cy.visit(`/audit/submission-progress/${reportId}`);
-  })
+      // Login as Auditor
+      testLogoutGov();
+      testLoginGovLogin();
+      cy.visit(`/audit/submission-progress/${reportId}`);
+    })
+  }
 
   // Complete the audit information form
   cy.get(".usa-link").contains("Audit Information form").click();
@@ -173,10 +175,8 @@ describe('Full audit submission', () => {
     cy.visit('/');
     cy.url().should('include', '/');
 
-    // performSubmissionTest(false, true); // Normal submission
-    // performSubmissionTest(true, true);  // Tribal and public
+    performSubmissionTest(false, true); // Normal submission
+    performSubmissionTest(true, true);  // Tribal and public - works
     performSubmissionTest(true, false); // Tribal and not public - works
-    // performSubmissionTest('default', 'D7A4J33FUMJ1', true, true);
-    // performSubmissionTest('17262', 'G9H6SUM59YC4', false, false);
   });
 });
