@@ -36,10 +36,24 @@ class Search(View):
             end_date = form.cleaned_data["end_date"]
             cog_or_oversight = form.cleaned_data["cog_or_oversight"]
             agency_name = form.cleaned_data["agency_name"]
+            audit_years = [
+                int(year) for year in form.cleaned_data["audit_year"]
+            ]  # Cast strings from HTML to int
 
             results = search_general(
-                names, uei_or_eins, start_date, end_date, cog_or_oversight, agency_name
+                names,
+                uei_or_eins,
+                start_date,
+                end_date,
+                cog_or_oversight,
+                agency_name,
+                audit_years,
             )
+            # Reformat these so the date-picker elements in HTML prepopulate
+            if form.cleaned_data["start_date"]:
+                form.cleaned_data["start_date"] = start_date.strftime("%Y-%m-%d")
+            if form.cleaned_data["end_date"]:
+                form.cleaned_data["end_date"] = end_date.strftime("%Y-%m-%d")
 
         return render(request, "search.html", {"form": form, "results": results})
 
