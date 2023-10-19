@@ -8,6 +8,7 @@ from .util import get_message, build_cell_error_tuple
 
 logger = logging.getLogger(__name__)
 
+# A version of these regexes also exists in Base.libsonnet
 REGEX_RD_EXTENSION = r"^RD[0-9]?$"
 REGEX_THREE_DIGIT_EXTENSION = r"^[0-9]{3}[A-Za-z]{0,1}$"
 REGEX_U_EXTENSION = r"^U[0-9]{2}$"
