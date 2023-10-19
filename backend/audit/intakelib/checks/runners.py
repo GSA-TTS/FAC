@@ -19,6 +19,7 @@ from .check_other_cluster_names import other_cluster_names
 from .check_direct_award_is_not_blank import direct_award_is_not_blank
 from .check_passthrough_name_when_no_direct import passthrough_name_when_no_direct
 from .check_loan_guarantee import loan_guarantee
+from .check_loan_balance import loan_balance
 from .check_no_major_program_no_type import no_major_program_no_type
 from .check_missing_award_numbers import missing_award_numbers
 from .check_all_unique_award_numbers import all_unique_award_numbers
@@ -31,6 +32,9 @@ from .check_federal_award_passed_always_present import (
 from .check_federal_program_total import federal_program_total_is_correct
 from .check_cluster_total import cluster_total_is_correct
 from .check_total_amount_expended import total_amount_expended_is_correct
+from .check_federal_award_passed_passed_through_optional import (
+    federal_award_amount_passed_through_optional,
+)
 from .check_cardinality_of_passthrough_names_and_ids import (
     cardinality_of_passthrough_names_and_ids,
 )
@@ -55,10 +59,12 @@ federal_awards_checks = general_checks + [
     num_findings_always_present,
     cluster_name_always_present,
     federal_award_passed_always_present,
+    federal_award_amount_passed_through_optional,
     state_cluster_names,
     other_cluster_names,
     direct_award_is_not_blank,
     passthrough_name_when_no_direct,
+    loan_balance,
     loan_guarantee,
     no_major_program_no_type,
     all_unique_award_numbers,
