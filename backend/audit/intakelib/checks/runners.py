@@ -19,6 +19,7 @@ from .check_other_cluster_names import other_cluster_names
 from .check_direct_award_is_not_blank import direct_award_is_not_blank
 from .check_passthrough_name_when_no_direct import passthrough_name_when_no_direct
 from .check_loan_guarantee import loan_guarantee
+from .check_loan_balance import loan_balance
 from .check_no_major_program_no_type import no_major_program_no_type
 from .check_missing_award_numbers import missing_award_numbers
 from .check_all_unique_award_numbers import all_unique_award_numbers
@@ -60,6 +61,7 @@ federal_awards_checks = general_checks + [
     other_cluster_names,
     direct_award_is_not_blank,
     passthrough_name_when_no_direct,
+    loan_balance,
     loan_guarantee,
     no_major_program_no_type,
     all_unique_award_numbers,
