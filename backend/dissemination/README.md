@@ -90,7 +90,8 @@ When adding a new API version:
 1. Create a copy of an existing API directory within `FAC/backend/dissemination/api` and name it with your version bump of choice.
    - For all files within this directory, replace all instances of the old API version with your new version.
 2. Update `terraform/shared/modules/env/postgrest.tf` to use the new API version.
-3. Update `docker-compose.yml` and `docker-compose-web.yml`:
+3. Update `live` and `deprecated` in `FAC/backend/dissemination/api_versions.py`.
+4. Update `docker-compose.yml` and `docker-compose-web.yml`:
    - Change the values of `PGRST_DB_SCHEMAS` to your new API version. If previous versions of the API are needed, make the value a comma separated list and append your version to it. The first entry is the default, so only add to the front of the list if we are certain the schema should become the new default. See details on this [here](https://postgrest.org/en/stable/references/api/schemas.html#multiple-schemas)
       - This is likely true of TESTED patch version bumps (v1_0_0 to v1_0_1), and *maybe* minor version bumps (v1_0_0 to v1_1_0). MAJOR bumps require change management messaging.
-4. If previous versions of the API are needed, `APIViewTests` will need to be updated. At the time of writing this, it only tests the default API.
+5. If previous versions of the API are needed, `APIViewTests` will need to be updated. At the time of writing this, it only tests the default API.

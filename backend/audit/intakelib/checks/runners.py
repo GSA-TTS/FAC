@@ -31,6 +31,9 @@ from .check_federal_award_passed_always_present import (
 from .check_federal_program_total import federal_program_total_is_correct
 from .check_cluster_total import cluster_total_is_correct
 from .check_total_amount_expended import total_amount_expended_is_correct
+from .check_cardinality_of_passthrough_names_and_ids import (
+    cardinality_of_passthrough_names_and_ids,
+)
 
 ############
 # Audit findings checks
@@ -63,6 +66,7 @@ federal_awards_checks = general_checks + [
     federal_program_total_is_correct,
     cluster_total_is_correct,
     total_amount_expended_is_correct,
+    cardinality_of_passthrough_names_and_ids,
 ]
 
 notes_to_sefa_checks = general_checks + [

@@ -29,4 +29,5 @@ messages = {
     "check_federal_program_total": "Federal program total is {}, but should be {}",
     "check_cluster_total": "This cluster total is {}, but should be {}",
     "check_total_amount_expended": "Total amount expended is {}, but should be {}",
+    "check_cardinality_of_passthrough_names_and_ids": "You used a <b>|</b> (bar character) to indicate multiple passthrough names and IDs; you must provide equal numbers of names and IDs. You provided <b>{}</b> name{} and <b>{}</b> ID{}",
 }
