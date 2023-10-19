@@ -28,6 +28,10 @@ from .check_cluster_name_always_present import cluster_name_always_present
 from .check_federal_award_passed_always_present import (
     federal_award_passed_always_present,
 )
+from .check_aln_three_digit_extension_pattern import aln_three_digit_extension
+from .check_additional_award_identification_present import (
+    additional_award_identification,
+)
 
 ############
 # Audit findings checks
@@ -57,6 +61,8 @@ federal_awards_checks = general_checks + [
     no_major_program_no_type,
     all_unique_award_numbers,
     sequential_award_numbers,
+    aln_three_digit_extension,
+    additional_award_identification,
 ]
 
 notes_to_sefa_checks = general_checks + [
