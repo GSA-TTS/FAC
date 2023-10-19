@@ -18,8 +18,17 @@ This is implemented as a sjango app to leverage existing management commands and
 
 ## Utilities
 
-* load_raw.py - Read zip files providd by Census, and upload them to the S3 bucket.
-* zip2sql.py - Create postgres tables and poulate them using the contents of the csv files in the S3 bucket after cleansing them
+* load_raw.py - Read zip files providd by Census, and upload them to the S3 bucket. The basename of the zip file is used to create a folder in S3. The individual unzipped files are stored in the folder. There is an assumption that there are no sub-folders.
+* raw_to_pg.py - Inserts data into PG tables using the contents of the csv files in the S3 bucket. The first row of each file is assumed to have the column names (we convert to lowercase). The name of the table is determined by examining the name of the file. The sample source files do not have delimters for empty fields at the end of a line - so we assume these are nulls.
+* models.py These ought to correspons to the incoming csv files
+* routers.py This tells django to use a different postgres instance.
+
+### Work in progress
+
+* Create nidels for remaining tables
+* Should raw_to_og have an option to delete all data. Is a folder name required, or should we load from all folders?
+* Yet to actually save the model
+* Meed to write tests. Have only been doing manual testing so far.
 
 ## Pre-requisites for
 
