@@ -21,15 +21,6 @@ class SACAdmin(admin.ModelAdmin):
         "oversight_agency",
     ]
 
-    fields = (
-        "report_id",
-        (
-            "cognizant_agency",
-            "oversight_agency",
-        ),
-        "general_information",
-    )
-
 
 class AccessAdmin(admin.ModelAdmin):
     """
