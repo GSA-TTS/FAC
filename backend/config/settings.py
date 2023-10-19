@@ -219,6 +219,7 @@ CORS_ALLOWED_ORIGINS = [env.str("DJANGO_BASE_URL", "http://localhost:8000")]
 
 STATIC_URL = "/static/"
 
+
 # Environment specific configurations
 DEBUG = False
 if ENVIRONMENT not in ["DEVELOPMENT", "PREVIEW", "STAGING", "PRODUCTION"]:
@@ -234,6 +235,9 @@ if ENVIRONMENT not in ["DEVELOPMENT", "PREVIEW", "STAGING", "PRODUCTION"]:
     STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
     MIDDLEWARE.append("whitenoise.middleware.WhiteNoiseMiddleware")
     DEFAULT_FILE_STORAGE = "report_submission.storages.S3PrivateStorage"
+
+    # Private C2F bucket
+    AWS_C2F_BUCKET_NAME = "gsa-fac-cen2fac-s3"  # TODO need to fix for CG
 
     # Private bucket
     AWS_PRIVATE_STORAGE_BUCKET_NAME = "gsa-fac-private-s3"
@@ -387,8 +391,6 @@ AWS_S3_CENSUS_REGION_NAME = secret("AWS_S3_CENSUS_REGION_NAME", "")
 
 ADMIN_URL = "admin/"
 
-# Bucket to store raw Census data
-AWS_C2F_BUCKET_NAME = "gsa-fac-private-s3"  # TODO need to create one
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
