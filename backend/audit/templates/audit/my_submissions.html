@@ -53,7 +53,9 @@
                 <div class="grid-row margin-bottom-6" tabindex="0">
                     <table class="usa-table margin-top-0 pa11y-ignore">
                         <caption class="text-normal">
-                            The audits listed below have been submitted to the FAC for processing and may not be edited.</caption>
+                            The audits listed below have been submitted to the FAC for processing and may not be edited.
+                            If your audit status remains at "Submitted" for more than 24 hours, please <a class="usa-link" href="https://support.fac.gov/hc/en-us/requests/new" target="_blank">submit a helpdesk ticket</a>.
+                        </caption>
                         <thead>
                             <tr>
                                 <th data-sortable scope="col" role="columnheader">Status</th>
@@ -72,7 +74,13 @@
                             {% for item in data.completed_audits %}
                                 <tr>
                                     <td>
-                                        <a class="usa-link" href="{% url 'audit:SubmissionProgress' item.report_id %}">{{ item.submission_status }}</a>
+                                        <a class="usa-link" href="{% url 'audit:SubmissionProgress' item.report_id %}">
+                                            {% if item.submission_status == "Disseminated" %}
+                                                Accepted
+                                            {% else %}
+                                                {{ item.submission_status }}
+                                            {% endif %}
+                                        </a>
                                     </td>
                                     <td>{{ item.auditee_name }}</td>
                                     <td>{{ item.report_id }}</td>
