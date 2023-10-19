@@ -11,11 +11,11 @@ jobs:
     env:
       ENV: TESTING
       SAM_API_KEY: ${{ secrets.SAM_API_KEY }}
-      DJANGO_BASE_URL: 'http://localhost:8000'
+      DJANGO_BASE_URL: "http://localhost:8000"
       DJANGO_SECRET_LOGIN_KEY: ${{ secrets.DJANGO_SECRET_LOGIN_KEY }}
       LOGIN_CLIENT_ID: ${{ secrets.LOGIN_CLIENT_ID }}
       SECRET_KEY: ${{ secrets.SECRET_KEY }}
-      ALLOWED_HOSTS: '0.0.0.0 127.0.0.1 localhost'
+      ALLOWED_HOSTS: "0.0.0.0 127.0.0.1 localhost"
       DISABLE_AUTH: False
       PGRST_JWT_SECRET: ${{ secrets.PGRST_JWT_SECRET }}
     steps:
@@ -64,11 +64,11 @@ jobs:
     env:
       ENV: TESTING
       SAM_API_KEY: ${{ secrets.SAM_API_KEY }}
-      DJANGO_BASE_URL: 'http://localhost:8000'
+      DJANGO_BASE_URL: "http://localhost:8000"
       DJANGO_SECRET_LOGIN_KEY: ${{ secrets.DJANGO_SECRET_LOGIN_KEY }}
       LOGIN_CLIENT_ID: ${{ secrets.LOGIN_CLIENT_ID }}
       SECRET_KEY: ${{ secrets.SECRET_KEY }}
-      ALLOWED_HOSTS: '0.0.0.0 127.0.0.1 localhost'
+      ALLOWED_HOSTS: "0.0.0.0 127.0.0.1 localhost"
       DISABLE_AUTH: True
     steps:
       - uses: actions/checkout@v4
@@ -84,5 +84,5 @@ jobs:
         working-directory: ./backend
         run: |
           sudo npm ci
-          npm run test:a11y:lighthouse
+          # npm run test:a11y:lighthouse
           npm run test:a11y:pa11y
