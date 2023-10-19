@@ -4,7 +4,13 @@ from dissemination.models import General
 
 
 def search_general(
-    names, uei_or_eins, start_date, end_date, cog_or_oversight, agency_name
+    names=None,
+    uei_or_eins=None,
+    start_date=None,
+    end_date=None,
+    cog_or_oversight=None,
+    agency_name=None,
+    audit_years=None,
 ):
     query = Q(is_public=True)
 
@@ -35,6 +41,10 @@ def search_general(
         elif cog_or_oversight == "Oversight":
             oversight_match = Q(oversight_agency__in=[agency_name])
             query.add(oversight_match, Q.AND)
+
+    if audit_years:
+        fiscal_year_match = Q(audit_year__in=audit_years)
+        query.add(fiscal_year_match, Q.AND)
 
     results = General.objects.filter(query)
 
