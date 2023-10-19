@@ -27,7 +27,6 @@ const LOGIN_TEST_EMAIL_AUDITEE = Cypress.env('LOGIN_TEST_EMAIL_AUDITEE');
 const LOGIN_TEST_PASSWORD_AUDITEE = Cypress.env('LOGIN_TEST_PASSWORD_AUDITEE');
 const LOGIN_TEST_OTP_SECRET_AUDITEE = Cypress.env('LOGIN_TEST_OTP_SECRET_AUDITEE');
 
-// function performSubmissionTest(workbookDirName, auditeeUEI, hasAdditionalEINs, processFindings) {
 function performSubmissionTest(isTribal, isPublic) {
   cy.visit('/');
   cy.url().should('include', '/');
@@ -170,13 +169,16 @@ function performSubmissionTest(isTribal, isPublic) {
   testLogoutGov();
 }
 
-describe('Full audit submission', () => {
-  it('Completes a full submission', () => {
-    cy.visit('/');
-    cy.url().should('include', '/');
+describe('Full audit submissions', () => {
+  it('Non-tribal, public', () => {
+    performSubmissionTest(false, true);
+  });
 
-    performSubmissionTest(false, true); // Normal submission
-    performSubmissionTest(true, true);  // Tribal and public - works
-    performSubmissionTest(true, false); // Tribal and not public - works
+  it('Tribal, public', () => {
+    performSubmissionTest(true, true);
+  });
+
+  it('Tribal, non-public', () => {
+    performSubmissionTest(true, false);
   });
 });
