@@ -122,6 +122,7 @@ INSTALLED_APPS += [
     # "data_distro",
     "dissemination",
     "support",
+    "census2fac",
 ]
 
 MIDDLEWARE = [
@@ -385,6 +386,9 @@ AWS_S3_CENSUS_REGION_NAME = secret("AWS_S3_CENSUS_REGION_NAME", "")
 
 
 ADMIN_URL = "admin/"
+
+# Bucket to store raw Census data
+AWS_C2F_BUCKET_NAME = "gsa-fac-private-s3"  # TODO need to create one
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
