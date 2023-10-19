@@ -168,12 +168,14 @@
                                         </a>
                                     </td>
                                     <td>
-                                        <svg class="usa-icon usa-icon--size-4"
-                                             aria-hidden="true"
-                                             focusable="false"
-                                             role="img">
-                                            {% uswds_sprite "file_download" %}
-                                        </svg>
+                                        <a href="{% url 'dissemination:PdfDownload' report_id=result.report_id %}" target="_blank">
+                                            <svg class="usa-icon usa-icon--size-4"
+                                                aria-hidden="true"
+                                                focusable="false"
+                                                role="img">
+                                                {% uswds_sprite "file_download" %}
+                                            </svg>
+                                        </a>
                                     </td>
                                 </tr>
                             {% endfor %}
