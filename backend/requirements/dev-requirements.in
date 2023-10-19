@@ -3,6 +3,7 @@
 bandit
 black
 coverage
+django-debug-toolbar
 djlint
 faker
 flake8
@@ -10,10 +11,10 @@ model_bakery
 mypy
 pandas
 pip-tools
+tblib
 toml
 types-python-slugify
+types-pytz
 types-requests
 whitenoise
 xkcdpass
-tblib
-django-debug-toolbar
