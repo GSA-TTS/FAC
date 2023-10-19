@@ -93,7 +93,7 @@ function performSubmissionTest(isTribal, isPublic) {
   cy.url().then(url => {
     const reportId = url.split('/').pop();
 
-    // Login as Auditee
+    // Complete the tribal audit form as auditee - opt private
     testLogoutGov();
     testLoginGovLogin(
       LOGIN_TEST_EMAIL_AUDITEE,
@@ -101,9 +101,8 @@ function performSubmissionTest(isTribal, isPublic) {
       LOGIN_TEST_OTP_SECRET_AUDITEE
     );
     cy.visit(`/audit/submission-progress/${reportId}`);
-
-    // complete the tribal audit form as auditee - opt private
     cy.get(".usa-link").contains("Tribal data release").click();
+
     if (isPublic) {
       testTribalAuditPublic();
     } else {
@@ -176,7 +175,7 @@ describe('Full audit submission', () => {
 
     // performSubmissionTest(false, true); // Normal submission
     // performSubmissionTest(true, true);  // Tribal and public
-    performSubmissionTest(true, false); // Tribal and not public
+    performSubmissionTest(true, false); // Tribal and not public - works
     // performSubmissionTest('default', 'D7A4J33FUMJ1', true, true);
     // performSubmissionTest('17262', 'G9H6SUM59YC4', false, false);
   });
