@@ -26,6 +26,8 @@ messages = {
     "check_passthrough_name_when_no_direct_n_and_empty_number": "When the award is direct, passthrough number must be empty",
     "check_findings_grid_validation": "The combination of findings <b>{}</b> is not a valid combination under Uniform Guidance",
     "check_eins_are_not_empty": "EIN cannot be empty",
+    "check_federal_award_amount_passed_through_required": "When Federal Award Passed Through is <b>Y</b>, Amount Passed Through cannot be empty",
+    "check_federal_award_amount_passed_through_not_allowed": "When Federal Award Passed Through is <b>N</b>, Amount Passed Through must be empty",
     "check_loan_balance": "The loan balance is currently set to {}. It should either be a positive number, N/A, or left empty.",
     "check_cardinality_of_passthrough_names_and_ids": "You used a <b>|</b> (bar character) to indicate multiple passthrough names and IDs; you must provide equal numbers of names and IDs. You provided <b>{}</b> name{} and <b>{}</b> ID{}",
 }

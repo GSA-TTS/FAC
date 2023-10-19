@@ -29,6 +29,9 @@ from .check_cluster_name_always_present import cluster_name_always_present
 from .check_federal_award_passed_always_present import (
     federal_award_passed_always_present,
 )
+from .check_federal_award_passed_passed_through_optional import (
+    federal_award_amount_passed_through_optional,
+)
 from .check_cardinality_of_passthrough_names_and_ids import (
     cardinality_of_passthrough_names_and_ids,
 )
@@ -53,6 +56,7 @@ federal_awards_checks = general_checks + [
     num_findings_always_present,
     cluster_name_always_present,
     federal_award_passed_always_present,
+    federal_award_amount_passed_through_optional,
     state_cluster_names,
     other_cluster_names,
     direct_award_is_not_blank,
