@@ -37,7 +37,8 @@ https_proxy_protocol="$(echo "$VCAP_SERVICES" | jq --raw-output --arg service_na
 https_proxy_domain="$(echo "$VCAP_SERVICES" | jq --raw-output --arg service_name "https-proxy-creds" ".[][] | select(.name == \$service_name) | .credentials.domain")"
 https_proxy_port="$(echo "$VCAP_SERVICES" | jq --raw-output --arg service_name "https-proxy-creds" ".[][] | select(.name == \$service_name) | .credentials.port")"
 
-export NEW_RELIC_PROXY_HOST="$https_proxy_protocol://$https_proxy_domain:$https_proxy_port"
+export NEW_RELIC_PROXY_HOST="$https_proxy_protocol://$https_proxy_domain"
+export NEW_RELIC_PROXY_PORT="$https_proxy_port"
 export NEW_RELIC_PROXY_USER="$(echo "$VCAP_SERVICES" | jq --raw-output --arg service_name "https-proxy-creds" ".[][] | select(.name == \$service_name) | .credentials.username")"
 export NEW_RELIC_PROXY_PASS="$(echo "$VCAP_SERVICES" | jq --raw-output --arg service_name "https-proxy-creds" ".[][] | select(.name == \$service_name) | .credentials.password")"
 
