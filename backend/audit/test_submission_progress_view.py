@@ -119,6 +119,18 @@ class SubmissionProgressViewTests(TestCase):
             self.assertEqual(result[key]["display"], "inactive")
         self.assertTrue(result["complete"])
 
+    def test_submission_progress_check_crossval_incomplete(self):
+        """
+        Check that we return the appropriate incomplete sections.
+        """
+        filename = "general-information--test0001test--simple-pass.json"
+        info = _load_json(AUDIT_JSON_FIXTURES / filename)
+        sac = baker.make(SingleAuditChecklist, general_information=info)
+        shaped_sac = sac_validation_shape(sac)
+        result = submission_progress_check(shaped_sac, sar=None, crossval=True)
+        expected = "The following sections are incomplete: Audit Information, Federal Awards, Notes to SEFA, Single Audit Report."
+        self.assertEqual(result[0]["error"], expected)
+
     def test_find_section_by_name(self):
         """
         This test added for test coverage purposes.
