@@ -29,6 +29,16 @@ from .check_cluster_name_always_present import cluster_name_always_present
 from .check_federal_award_passed_always_present import (
     federal_award_passed_always_present,
 )
+from .check_aln_three_digit_extension_pattern import aln_three_digit_extension
+from .check_additional_award_identification_present import (
+    additional_award_identification,
+)
+from .check_federal_program_total import federal_program_total_is_correct
+from .check_cluster_total import cluster_total_is_correct
+from .check_total_amount_expended import total_amount_expended_is_correct
+from .check_federal_award_passed_passed_through_optional import (
+    federal_award_amount_passed_through_optional,
+)
 from .check_cardinality_of_passthrough_names_and_ids import (
     cardinality_of_passthrough_names_and_ids,
 )
@@ -53,6 +63,7 @@ federal_awards_checks = general_checks + [
     num_findings_always_present,
     cluster_name_always_present,
     federal_award_passed_always_present,
+    federal_award_amount_passed_through_optional,
     state_cluster_names,
     other_cluster_names,
     direct_award_is_not_blank,
@@ -62,6 +73,11 @@ federal_awards_checks = general_checks + [
     no_major_program_no_type,
     all_unique_award_numbers,
     sequential_award_numbers,
+    aln_three_digit_extension,
+    additional_award_identification,
+    federal_program_total_is_correct,
+    cluster_total_is_correct,
+    total_amount_expended_is_correct,
     cardinality_of_passthrough_names_and_ids,
 ]
 

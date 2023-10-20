@@ -259,6 +259,25 @@ def _create_test_sac(user, auditee_name, dbkey):
         email="bob_the_auditor_official@auditor.org",  # user.email,
         role="certifying_auditor_contact",
     )
+
+    sac.auditee_certification = {}
+    sac.auditee_certification["auditee_signature"] = {}
+    sac.auditee_certification["auditee_signature"][
+        "auditee_name"
+    ] = "Bob the Auditee Name"
+    sac.auditee_certification["auditee_signature"][
+        "auditee_title"
+    ] = "Bob the Auditee Signature"
+
+    sac.auditor_certification = {}
+    sac.auditor_certification["auditor_signature"] = {}
+    sac.auditor_certification["auditor_signature"][
+        "auditor_name"
+    ] = "Alice the Auditor Name"
+    sac.auditor_certification["auditor_signature"][
+        "auditor_title"
+    ] = "Alice the Auditor Signature"
+
     sac.data_source = "TSTDAT"
     sac.save()
 

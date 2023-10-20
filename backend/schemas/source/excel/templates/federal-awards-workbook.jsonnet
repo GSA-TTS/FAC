@@ -283,7 +283,7 @@ local open_ranges_defns = [
   [
     Sheets.open_range {
       keep_locked: true,
-      formula: '=IF(OR(B{0}="",C{0}),"",CONCATENATE(B{0},".",C{0}))',
+      formula: '=IF(OR(B{0}="",C{0}=""),"",CONCATENATE(B{0},".",C{0}))',
       width: 12,
       format: 'text',
       help: Help.unknown,
