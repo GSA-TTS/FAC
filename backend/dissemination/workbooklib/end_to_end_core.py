@@ -9,7 +9,6 @@ import jwt
 import requests
 from pprint import pprint
 from datetime import datetime
-import os
 
 from dissemination.workbooklib.workbook_creation import (
     sections,
