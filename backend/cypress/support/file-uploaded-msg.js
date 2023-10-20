@@ -9,4 +9,4 @@ export function testFileUploadMsg(fileSectionName) {
       const expectedText = 'A file has already been uploaded for this section. A successful reupload will overwrite your previous submission.';
       expect(text.trim()).to.equal(expectedText);
     });
-  }
+}
