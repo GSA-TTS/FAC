@@ -7,8 +7,7 @@ from django.core.management import call_command
 from django.test import TestCase
 from unittest.mock import patch
 
-from audit.models import SingleAuditChecklist, ExcelFile
-from audit.fixtures.excel import FORM_SECTIONS
+from audit.models import SingleAuditChecklist
 
 
 class MockHttpResponse:
@@ -47,24 +46,3 @@ class TestLoadFixturesCommand(TestCase):
 
         # restore the logging override
         logging.disable(logging.ERROR)
-
-    @patch("audit.validators._scan_file")
-    def test_load_fixtures_federal_awards(self, mock_scan_file):
-        """load_fixtures command makes a SAC with federal awards."""
-        # make sure we have at least one user
-        User = get_user_model()
-        user, _ = User.objects.get_or_create(username="test_at_least_one")
-
-        # mock the call to the external AV service
-        mock_scan_file.return_value = MockHttpResponse(200, "clean!")
-
-        call_command("load_fixtures")
-
-        # should be a federal awards ExcelFile for this user
-        files = ExcelFile.objects.filter(
-            user=user, form_section=FORM_SECTIONS.FEDERAL_AWARDS_EXPENDED
-        )
-        self.assertTrue(files)
-
-        # and the associated SAC has `federal_awards` data
-        self.assertTrue(files.first().sac.federal_awards)

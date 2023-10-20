@@ -9,8 +9,6 @@ local Meta = Types.object {
     section_name: Types.string {
       enum: [Sheets.section_names.NOTES_TO_SEFA],
     },
-    // FIXME: 2023-08-07 MSHD: The 'Version' is currently used here as a placeholder, and it is not being enforced at the moment.
-    // Once we establish a versioning pattern, we can update this and enforce it accordingly.
     version: Types.string {
       const: Sheets.WORKBOOKS_VERSION,
     },

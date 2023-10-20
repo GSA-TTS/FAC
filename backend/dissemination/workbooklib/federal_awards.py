@@ -126,11 +126,11 @@ def _fix_pfixes(cfdas):
     extensions = map(lambda v: ((v.cfda).split(".")[1])[:3].upper(), cfdas)
     extensions = map(
         lambda v: v
-        if re.search("^(RD|[0-9]{3}[A-Za-z]{0,1}|U[0-9]{2})$", v)
+        if re.search("^(RD|RD[0-9]|[0-9]{3}[A-Za-z]{0,1}|U[0-9]{2})$", v)
         else "000",
         extensions,
     )
-    return (prefixes, extensions)
+    return (prefixes, extensions, map(lambda v: v.cfda, cfdas))
 
 
 def _fix_passthroughs(Cfda, Passthrough, cfdas, dbkey):
@@ -213,9 +213,12 @@ def generate_federal_awards(dbkey, year, outfile):
     addls = _fix_addl_award_identification(Cfda, cfdas, dbkey)
     set_range(wb, "additional_award_identification", addls)
 
-    (prefixes, extensions) = _fix_pfixes(cfdas)
+    (prefixes, extensions, full_cfdas) = _fix_pfixes(cfdas)
     set_range(wb, "federal_agency_prefix", prefixes)
     set_range(wb, "three_digit_extension", extensions)
+
+    # We need a `cfda_key` as a magic column for the summation logic to work/be checked.
+    set_range(wb, "cfda_key", full_cfdas, conversion_fun=str)
 
     (passthrough_names, passthrough_ids) = _fix_passthroughs(
         Cfda, Passthrough, cfdas, dbkey

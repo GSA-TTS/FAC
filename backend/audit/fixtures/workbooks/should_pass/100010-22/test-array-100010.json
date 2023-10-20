@@ -1,7 +1,7 @@
 [
   {
     "endpoint": "additional_eins",
-    "report_id": "2022TEST000100010",
+    "report_id": "2022-06-TSTDAT-0000100010",
     "rows": [],
     "singletons": {
       "auditee_uei": "VBF7RJTP7513"
@@ -9,7 +9,7 @@
   },
   {
     "endpoint": "additional_ueis",
-    "report_id": "2022TEST000100010",
+    "report_id": "2022-06-TSTDAT-0000100010",
     "rows": [],
     "singletons": {
       "auditee_uei": "VBF7RJTP7513"
@@ -17,7 +17,7 @@
   },
   {
     "endpoint": "corrective_action_plans",
-    "report_id": "2022TEST000100010",
+    "report_id": "2022-06-TSTDAT-0000100010",
     "rows": [],
     "singletons": {
       "auditee_uei": "VBF7RJTP7513"
@@ -25,7 +25,7 @@
   },
   {
     "endpoint": "federal_awards",
-    "report_id": "2022TEST000100010",
+    "report_id": "2022-06-TSTDAT-0000100010",
     "rows": [
       {
         "fields": [
@@ -353,7 +353,7 @@
   },
   {
     "endpoint": "findings_text",
-    "report_id": "2022TEST000100010",
+    "report_id": "2022-06-TSTDAT-0000100010",
     "rows": [],
     "singletons": {
       "auditee_uei": "VBF7RJTP7513"
@@ -361,13 +361,13 @@
   },
   {
     "endpoint": "findings",
-    "report_id": "2022TEST000100010",
+    "report_id": "2022-06-TSTDAT-0000100010",
     "rows": [],
     "singletons": {}
   },
   {
     "endpoint": "notes_to_sefa",
-    "report_id": "2022TEST000100010",
+    "report_id": "2022-06-TSTDAT-0000100010",
     "rows": [],
     "singletons": {
       "accounting_policies": "Expenditures reported on the Schedule are reported on the accrual basis of accounting.Such expenditures are recognized following, as applicable, either the cost principles in OMB Circular A-87, Cost Principles for State, Local and Indian Tribal Governments, or the cost principles contained in the Uniform Guidance, wherein certain types of expenditures are not allowable or are limited as to reimbursement.",
@@ -378,7 +378,7 @@
   },
   {
     "endpoint": "secondary_auditor",
-    "report_id": "2022TEST000100010",
+    "report_id": "2022-06-TSTDAT-0000100010",
     "rows": [],
     "singletons": {
       "auditee_uei": "VBF7RJTP7513"
