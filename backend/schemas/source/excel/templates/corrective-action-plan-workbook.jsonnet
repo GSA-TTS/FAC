@@ -73,7 +73,7 @@ local open_ranges_defns = [
   [
     Sheets.open_range {
       title_cell: 'B1',
-      width: 100,
+      width: 64,
       help: Help.plain_text,
     },
     SV.NoValidation,
@@ -104,6 +104,7 @@ local sheets = [
     name: capSheet,
     open_ranges: Fun.make_open_ranges_with_column(title_row, open_ranges_defns),
     header_height: 48,
+    row_height: 36,
     hide_col_from: 4,
   },
 ];
