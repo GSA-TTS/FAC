@@ -173,6 +173,7 @@ def api_check(json_test_tables):
             equality_results = []
             for field_ndx, f in enumerate(row["fields"]):
                 # logger.info(f"Checking /{endpoint} {report_id} {f}")
+                # logger.info(f"{get_api_values(endpoint, report_id, f)}")
                 api_values = get_api_values(endpoint, report_id, f)
                 this_api_value = api_values[row_ndx]
                 this_field_value = row["values"][field_ndx]
