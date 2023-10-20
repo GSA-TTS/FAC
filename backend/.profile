@@ -66,7 +66,10 @@ if [[ "$CF_INSTANCE_INDEX" == 0 ]]; then
     echo 'Finished collectstatic' &&
     echo 'Starting seed_cog_baseline' &&
     python manage.py seed_cog_baseline &&
-    echo 'Finished seed_cog_baseline'
+    echo 'Finished seed_cog_baseline' &&
+    echo 'Starting end-to-end test data generation' &&
+    python manage.py end_to_end_test_data_generator &&
+    echo 'Finished end-to-end test data generation'
 fi
 
 # Make psql usable by scripts, for debugging, etc.
