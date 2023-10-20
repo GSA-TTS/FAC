@@ -6,10 +6,25 @@ on:
       environment:
         required: true
         type: choice
-        description: Which environment should the workflow run on?
+        description: The environment the workflow should run on.
         options:
           - dev
           - staging
+      dbkeys:
+        required: false
+        type: string
+        description: Comma-separated list of report-IDs.
+      years:
+        required: false
+        type: string
+        description: Comma-separated list of report years. The list of years needs to be the same lenght as the list of dbkeys.
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+        description: The environment the workflow should run on.
+        # dev, staging
       dbkeys:
         required: false
         type: string
