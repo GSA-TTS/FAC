@@ -45,7 +45,7 @@ class Command(BaseCommand):
 
         if ENVIRONMENT in ["LOCAL", "DEVELOPMENT", "PREVIEW", "STAGING"]:
             if dbkeys_str and years_str:
-                logger.info(f"DBKEYS {dbkeys}")
+                logger.info(f"Generating test reports for DBKEYS: {dbkeys_str} and YEARS: {years_str}")
                 for dbkey, year in zip(dbkeys, years):
                     run_end_to_end(email, dbkey, year)
             else:
