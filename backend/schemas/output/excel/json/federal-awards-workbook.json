@@ -458,7 +458,7 @@
             },
             {
                "format": "text",
-               "formula": "=IF(OR(B{0}=\"\",C{0}),\"\",CONCATENATE(B{0},\".\",C{0}))",
+               "formula": "=IF(OR(B{0}=\"\",C{0}=\"\"),\"\",CONCATENATE(B{0},\".\",C{0}))",
                "help": {
                   "link": "https://fac.gov/documentation/validation/#unknown",
                   "text": "Please contact support"
