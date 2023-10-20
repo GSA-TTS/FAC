@@ -1,10 +1,12 @@
 from django.conf import settings
+from django.http import Http404
 from django.shortcuts import get_object_or_404
 
 from boto3 import client as boto3_client
 from botocore.client import ClientError, Config
 
-from audit.models import ExcelFile, SingleAuditChecklist, SingleAuditReportFile
+from audit.models import ExcelFile, SingleAuditReportFile
+
 
 def get_filename(sac, file_type):
     if file_type == "report":

@@ -138,8 +138,8 @@ class PdfDownloadView(View):
         # only allow PDF downloads for public submissions
         if not disseminated.is_public:
             raise PermissionDenied("You do not have access to this audit report.")
-        
+
         sac = get_object_or_404(SingleAuditChecklist, report_id=report_id)
         filename = get_filename(sac, "report")
-        
+
         return redirect(get_download_url(filename))
