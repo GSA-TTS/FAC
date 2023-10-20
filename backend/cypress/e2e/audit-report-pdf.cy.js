@@ -1,20 +1,12 @@
 import 'cypress-file-upload';
-import { testCrossValidation } from '../support/cross-validation.js';
-import { testLoginGovLogin } from '../support/login-gov.js';
-//import { testLogoutGov } from '../support/logout-gov.js';
 import { testValidAccess } from '../support/check-access.js';
 import { testValidEligibility } from '../support/check-eligibility.js';
 import { testValidAuditeeInfo } from '../support/auditee-info.js';
 import { testValidGeneralInfo } from '../support/general-info.js';
 import { testPdfAuditReport   } from '../support/report-pdf.js';
-
 import {
   testWorkbookFederalAwards,
 } from '../support/workbook-uploads.js';
-
-const LOGIN_TEST_EMAIL_AUDITEE = Cypress.env('LOGIN_TEST_EMAIL_AUDITEE');
-const LOGIN_TEST_PASSWORD_AUDITEE = Cypress.env('LOGIN_TEST_PASSWORD_AUDITEE');
-const LOGIN_TEST_OTP_SECRET_AUDITEE = Cypress.env('LOGIN_TEST_OTP_SECRET_AUDITEE');
 
 describe('Audit report PDF page', () => {
   before(() => {
@@ -62,5 +54,4 @@ describe('Audit report PDF page', () => {
           expect(text.trim()).to.equal(expectedText);
         });
     });
-
   });
