@@ -90,11 +90,12 @@ def call_api(api_url, endpoint, rid, field):
     )
     full_request = f"{api_url}/{endpoint}?report_id=eq.{rid}&select={field}"
     response = requests.get(
-        full_request, headers={
+        full_request,
+        headers={
             "Authorization": f"Bearer {encoded_jwt}",
-            "X-Api-Key": os.getenv("CYPRESS_API_GOV_KEY")
-            }, 
-        timeout=10
+            "X-Api-Key": os.getenv("CYPRESS_API_GOV_KEY"),
+        },
+        timeout=10,
     )
     return response
 
