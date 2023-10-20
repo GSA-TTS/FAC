@@ -24,7 +24,6 @@ from .mapping_meta import meta_mapping
 from .checks import run_all_general_checks, run_all_notes_to_sefa_checks
 from .transforms import run_all_notes_to_sefa_transforms
 
-
 logger = logging.getLogger(__name__)
 
 
