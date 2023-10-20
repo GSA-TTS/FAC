@@ -1,6 +1,6 @@
 from django.test import TestCase
 from django.conf import settings
-from django.db import connections, transaction
+from django.db import connections
 
 import boto3
 
