@@ -1,6 +1,10 @@
+from django.core.exceptions import PermissionDenied
 from django.http import Http404
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, redirect, render
 from django.views.generic import View
+
+from audit.file_downloads import get_download_url, get_filename
+from audit.models import SingleAuditChecklist
 
 from dissemination.forms import SearchForm
 from dissemination.search import search_general
@@ -124,3 +128,18 @@ class AuditSummaryView(View):
                 del item["report_id"]
 
         return data
+
+
+class PdfDownloadView(View):
+    def get(self, request, report_id):
+        # only allow PDF downloads for disseminated submissions
+        disseminated = get_object_or_404(General, report_id=report_id)
+
+        # only allow PDF downloads for public submissions
+        if not disseminated.is_public:
+            raise PermissionDenied("You do not have access to this audit report.")
+        
+        sac = get_object_or_404(SingleAuditChecklist, report_id=report_id)
+        filename = get_filename(sac, "report")
+        
+        return redirect(get_download_url(filename))
