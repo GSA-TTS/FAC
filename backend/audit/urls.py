@@ -80,6 +80,11 @@ urlpatterns = [
         views.CrossValidationView.as_view(),
         name="CrossValidation",
     ),
+    path(
+        "unlock-after-certification/<str:report_id>",
+        views.UnlockAfterCertificationView.as_view(),
+        name="UnlockAfterCertification",
+    ),
 ]
 
 for form_section in FORM_SECTIONS:

@@ -34,6 +34,7 @@
                                 <tr>
                                     <td>
                                         <a class="usa-link" href="{% url 'audit:SubmissionProgress' item.report_id %}">{{ item.submission_status }}</a>
+                                        {% if item.submission_status == "Ready For Certification" %}<a class="usa-link" href="{% url 'audit:UnlockAfterCertification' item.report_id %}">🔓</a>{% endif%}
                                     </td>
                                     <td>{{ item.auditee_name }}</td>
                                     <td>{{ item.report_id }}</td>
