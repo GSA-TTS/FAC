@@ -31,7 +31,7 @@
          "single_cells": [
             {
                "format": "text",
-               "formula": "=\"1.0.0\"",
+               "formula": "=\"1.0.1\"",
                "help": {
                   "link": "https://fac.gov/documentation/validation/#plain_text",
                   "text": "Only plain text is allowed, no emoji, formatting, or other special additions"
@@ -257,7 +257,7 @@
             },
             {
                "format": "dollar",
-               "formula": "=SUMIFS(amount_expended,cfda_key,V{0})",
+               "formula": "=IF(A{0}=\"\",0,SUMIFS(amount_expended,cfda_key,V{0}))",
                "help": {
                   "link": "https://fac.gov/documentation/validation/#any_number",
                   "text": "Must be a number"
@@ -458,7 +458,7 @@
             },
             {
                "format": "text",
-               "formula": "=IF(OR(B{0}=\"\",C{0}),\"\",CONCATENATE(B{0},\".\",C{0}))",
+               "formula": "=IF(OR(B{0}=\"\",C{0}=\"\"),\"\",CONCATENATE(B{0},\".\",C{0}))",
                "help": {
                   "link": "https://fac.gov/documentation/validation/#unknown",
                   "text": "Please contact support"

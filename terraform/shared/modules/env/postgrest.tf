@@ -32,7 +32,7 @@ resource "cloudfoundry_app" "postgrest" {
 
   environment = {
     PGRST_DB_URI : cloudfoundry_service_key.postgrest.credentials.uri
-    PGRST_DB_SCHEMAS : "api_v1_0_1"
+    PGRST_DB_SCHEMAS : "api_v1_0_2"
     PGRST_DB_ANON_ROLE : "anon"
     PGRST_JWT_SECRET : var.pgrst_jwt_secret
     PGRST_DB_MAX_ROWS : 20000

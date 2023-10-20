@@ -389,16 +389,18 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
     )
 
     cognizant_agency = models.CharField(
-        "Agency assigned to this large submission. Computed when the submisson is finalized, but may be overridden",
+        help_text="Agency assigned to this large submission. Computed when the submisson is finalized, but may be overridden",
         max_length=2,
         blank=True,
         null=True,
+        verbose_name="Cog Agency",
     )
     oversight_agency = models.CharField(
-        "Agency assigned to this not so large submission. Computed when the submisson is finalized",
+        help_text="Agency assigned to this not so large submission. Computed when the submisson is finalized",
         max_length=2,
         blank=True,
         null=True,
+        verbose_name="OSight Agency",
     )
 
     def validate_full(self):
@@ -567,15 +569,6 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         index = self.transition_name.index(status)
         if index >= 0:
             return self.transition_date[index]
-        return None
-
-    def _general_info_get(self, key):
-        try:
-            return self.general_information[key]
-        except KeyError:
-            pass
-        except TypeError:
-            pass
         return None
 
 

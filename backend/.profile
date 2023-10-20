@@ -28,7 +28,7 @@ export NEW_RELIC_ENVIRONMENT="$(echo "$VCAP_APPLICATION" | jq -r .space_name)"
 export NEW_RELIC_LOG=stdout
 
 # Logging level, (critical, error, warning, info and debug). Default to info
-#export NEW_RELIC_LOG_LEVEL=
+export NEW_RELIC_LOG_LEVEL=error
 
 # https://docs.newrelic.com/docs/security/security-privacy/compliance/fedramp-compliant-endpoints/
 export NEW_RELIC_HOST="gov-collector.newrelic.com"
@@ -37,7 +37,8 @@ https_proxy_protocol="$(echo "$VCAP_SERVICES" | jq --raw-output --arg service_na
 https_proxy_domain="$(echo "$VCAP_SERVICES" | jq --raw-output --arg service_name "https-proxy-creds" ".[][] | select(.name == \$service_name) | .credentials.domain")"
 https_proxy_port="$(echo "$VCAP_SERVICES" | jq --raw-output --arg service_name "https-proxy-creds" ".[][] | select(.name == \$service_name) | .credentials.port")"
 
-export NEW_RELIC_PROXY_HOST="$https_proxy_protocol://$https_proxy_domain:$https_proxy_port"
+export NEW_RELIC_PROXY_HOST="$https_proxy_protocol://$https_proxy_domain"
+export NEW_RELIC_PROXY_PORT="$https_proxy_port"
 export NEW_RELIC_PROXY_USER="$(echo "$VCAP_SERVICES" | jq --raw-output --arg service_name "https-proxy-creds" ".[][] | select(.name == \$service_name) | .credentials.username")"
 export NEW_RELIC_PROXY_PASS="$(echo "$VCAP_SERVICES" | jq --raw-output --arg service_name "https-proxy-creds" ".[][] | select(.name == \$service_name) | .credentials.password")"
 
