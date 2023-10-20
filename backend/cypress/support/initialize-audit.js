@@ -5,11 +5,7 @@ import { testValidGeneralInfo } from './general-info.js';
 import { testReportIdNotFound } from './dissemination-table.js';
 
 export function testInitializeAudit(isTribal=false) {
-  // Moves on to the eligibility screen
-  // check the terms and conditions link and click "Accept and start..."
-  //
-  // this click actually goes to the "terms and conditions" link which
-  // brings up a modal
+  // Check the terms and conditions link and click "Accept and start..."
   cy.get('label[for=check-start-new-submission]').click();
   cy.get('.usa-button').contains('Accept and start').click();
   cy.url().should('match', /\/report_submission\/eligibility\/$/);
