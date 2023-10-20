@@ -15,12 +15,8 @@ describe('Audit Findings page', () => {
 
   it('Audit Findings uploads successfully', () => {
     testFederalAwards();
-
     cy.get(".usa-link").contains("Federal Awards Audit Findings").click();
     testWorkbookFindingsUniformGuidance(false);
-  });
-
-  it('Displays message if file has already been uploaded', () => {
     testFileUploadMsg('Edit the Federal Awards Audit Findings');
   });
 });

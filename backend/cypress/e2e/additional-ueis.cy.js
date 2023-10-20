@@ -15,12 +15,8 @@ describe('Additional UEIs page', () => {
 
   it('Additional UEIs uploads successfully', () => {
     testFederalAwards();
-
     cy.get(".usa-link").contains("Additional UEIs").click();
     testWorkbookAdditionalUEIs(false);
-  });
-
-  it('Displays message if file has already been uploaded', () => {
     testFileUploadMsg('Edit the Additional UEIs');
   });
 });

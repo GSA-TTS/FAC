@@ -15,12 +15,8 @@ describe('Additional EINs page', () => {
 
   it('Additional EINs uploads successfully', () => {
     testFederalAwards();
-
     cy.get(".usa-link").contains("Additional EINs").click();
     testWorkbookAdditionalEINs(false);
-  });
-
-  it('Displays message if file has already been uploaded', () => {
     testFileUploadMsg('Edit the Additional EINs');
   });
 });

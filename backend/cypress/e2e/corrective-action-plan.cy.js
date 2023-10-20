@@ -15,12 +15,8 @@ describe('Corrective Action Plan page', () => {
 
   it('Corrective Action Plan uploads successfully', () => {
     testFederalAwards();
-
     cy.get(".usa-link").contains("Corrective Action Plan").click();
     testWorkbookCorrectiveActionPlan(false);
-  });
-
-  it('Displays message if file has already been uploaded', () => {
     testFileUploadMsg('Edit the Corrective Action Plan');
   });
 });

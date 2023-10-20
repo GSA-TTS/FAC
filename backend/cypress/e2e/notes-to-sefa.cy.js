@@ -15,12 +15,8 @@ describe('Notes to SEFA page', () => {
 
   it('Notes to SEFA uploads successfully', () => {
     testFederalAwards();
-
     cy.get(".usa-link").contains("Notes to SEFA").click();
     testWorkbookNotesToSEFA(false);
-  });
-
-  it('Displays message if file has already been uploaded', () => {
     testFileUploadMsg('Edit the Notes to SEFA');
   });
 });

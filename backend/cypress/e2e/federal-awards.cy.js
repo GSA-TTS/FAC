@@ -12,9 +12,6 @@ describe('Federal awards page', () => {
 
   it('Federal Awards uploads successfully', () => {
     testFederalAwards();
-  });
-
-  it('Displays message if file has already been uploaded', () => {
     testFileUploadMsg('Edit the Federal Awards');
   });
 });

@@ -15,12 +15,8 @@ describe('Secondary Auditors page', () => {
 
   it('Secondary auditors uploads successfully', () => {
     testFederalAwards();
-
     cy.get(".usa-link").contains("Secondary Auditors").click();
     testWorkbookSecondaryAuditors(false);
-  });
-
-  it('Displays message if file has already been uploaded', () => {
     testFileUploadMsg('Edit the Secondary Auditors');
   });
 });

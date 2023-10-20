@@ -1,7 +1,5 @@
+// Displays message if file has already been uploaded
 export function testFileUploadMsg(fileSectionName) {
-  cy.visit(`/audit/`);
-  cy.url().should('match', /\/audit\//);
-  cy.get(':nth-child(4) > .usa-table > tbody > tr').last().find('td:nth-child(1)>.usa-link').click();
   cy.get('.usa-link').contains(fileSectionName).click();
   cy.get('#already-submitted')
     .invoke('text')
