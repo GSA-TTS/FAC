@@ -155,9 +155,8 @@ export function testFullSubmission(isTribal, isPublic) {
     // The report ID should be found in the Completed Audits table
     cy.get('.usa-table').contains(
       'caption',
-      // 'The audits listed below have been submitted to the FAC for processing and may not be edited.',
       /audits are complete/
-      ).siblings().contains('td', reportId);
+    ).siblings().contains('td', reportId);
 
     // The Report should not be in the dissemination table
     if (isPublic) {

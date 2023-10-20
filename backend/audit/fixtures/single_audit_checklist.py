@@ -210,8 +210,6 @@ def _load_single_audit_checklists_for_user(user):
         if sac is None:
             # need to make this object
             sac = _create_sac(user, auditee_name)
-        # if "post_create_callable" in item_info:
-        #     item_info["post_create_callable"](sac, user)
 
 
 def load_single_audit_checklists():
