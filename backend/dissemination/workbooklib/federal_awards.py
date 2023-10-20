@@ -239,7 +239,6 @@ def generate_federal_awards(dbkey, year, outfile):
         total += int(cfda.amount)
     set_single_cell_range(wb, "total_amount_expended", total)
 
-
     loansatend = list()
     for ndx, cfda in enumerate(
         Cfda.select().where((Cfda.dbkey == dbkey)).order_by(Cfda.index)

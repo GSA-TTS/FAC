@@ -262,8 +262,12 @@ def _create_test_sac(user, auditee_name, dbkey):
 
     sac.auditee_certification = {}
     sac.auditee_certification["auditee_signature"] = {}
-    sac.auditee_certification["auditee_signature"]["auditee_name"] = "Bob the Auditee Name"
-    sac.auditee_certification["auditee_signature"]["auditee_title"] = "Bob the Auditee Signature"
+    sac.auditee_certification["auditee_signature"][
+        "auditee_name"
+    ] = "Bob the Auditee Name"
+    sac.auditee_certification["auditee_signature"][
+        "auditee_title"
+    ] = "Bob the Auditee Signature"
 
     sac.data_source = "TSTDAT"
     sac.save()

@@ -7,8 +7,7 @@ from django.core.management import call_command
 from django.test import TestCase
 from unittest.mock import patch
 
-from audit.models import SingleAuditChecklist, ExcelFile
-from audit.fixtures.excel import FORM_SECTIONS
+from audit.models import SingleAuditChecklist
 
 
 class MockHttpResponse:
@@ -49,13 +48,13 @@ class TestLoadFixturesCommand(TestCase):
         logging.disable(logging.ERROR)
 
     # This is loading a workbook that does not validate.
-    # However, we now run tests that load and validate (or intentionally 
+    # However, we now run tests that load and validate (or intentionally
     # fail to validate) many workbooks.
     #
     # Those tests supercede this test.
     # Therefore, I'm taking this test out, as it is more fragile
     # than the `pass` and `fail` many-workbook-tests.
-    
+
     # @patch("audit.validators._scan_file")
     # def test_load_fixtures_federal_awards(self, mock_scan_file):
     #     """load_fixtures command makes a SAC with federal awards."""

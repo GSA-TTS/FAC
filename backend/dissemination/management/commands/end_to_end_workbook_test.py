@@ -10,7 +10,7 @@ import os
 import jwt
 import requests
 from pprint import pprint
-from datetime import datetime, timezone
+from datetime import datetime
 
 from dissemination.workbooklib.workbook_creation import (
     sections,
@@ -43,7 +43,8 @@ pw = logging.getLogger("peewee")
 pw.addHandler(logging.StreamHandler())
 pw.setLevel(logging.INFO)
 
-def step_through_certifications(sac, SAC):
+
+def step_through_certifications(sac):
     sac.transition_to_ready_for_certification()
     sac.transition_to_auditor_certified()
     sac.transition_to_auditee_certified()
