@@ -1,0 +1,41 @@
+---
+name: "Task: run Django command to generate and disseminate test data for non-production environments."
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        required: true
+        type: choice
+        description: Which environment should the workflow run on?
+        options:
+          - dev
+          - staging
+      dbkeys:
+        required: false
+        type: string
+        description: Comma-separated list of report-IDs.
+      years:
+        required: false
+        type: string
+        description: Comma-separated list of report years. The list of years needs to be the same lenght as the list of dbkeys.
+
+jobs:
+  end-to-end-test-data:
+    name: Generate and disseminate end-to-end test data in ${{ inputs.environment }} database
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    env:
+      space: ${{ inputs.environment }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run Django command to generate and disseminate end-to-end test data in ${{ inputs.environment }}
+        uses: cloud-gov/cg-cli-tools@main
+        with:
+          cf_username: ${{ secrets.CF_USERNAME }}
+          cf_password: ${{ secrets.CF_PASSWORD }}
+          cf_org: gsa-tts-oros-fac
+          cf_space: ${{ env.space }}
+          command: cf run-task gsa-fac -k 2G -m 2G --name generate_e2e_data --command "python manage.py end_to_end_test_data_generator --dbkeys ${{ inputs.dbkeys }} --years ${{ inputs.years }}"
