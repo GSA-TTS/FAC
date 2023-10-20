@@ -1,8 +1,4 @@
 import 'cypress-file-upload';
-import { testValidAccess } from '../support/check-access.js';
-import { testValidEligibility } from '../support/check-eligibility.js';
-import { testValidAuditeeInfo } from '../support/auditee-info.js';
-import { testValidGeneralInfo } from '../support/general-info.js';
 import { testFederalAwards } from '../support/federal-awards.js';
 import { testFileUploadMsg } from '../support/file-uploaded-msg.js';
 import { testLoginGovLogin } from '../support/login-gov.js';
