@@ -1,4 +1,3 @@
-from django.core.management.base import BaseCommand
 from users.models import User
 import argparse
 import logging
@@ -10,6 +9,7 @@ import jwt
 import requests
 from pprint import pprint
 from datetime import datetime
+import os
 
 from dissemination.workbooklib.workbook_creation import (
     sections,
@@ -90,7 +90,11 @@ def call_api(api_url, endpoint, rid, field):
     )
     full_request = f"{api_url}/{endpoint}?report_id=eq.{rid}&select={field}"
     response = requests.get(
-        full_request, headers={"Authorization": f"Bearer {encoded_jwt}"}, timeout=10
+        full_request, headers={
+            "Authorization": f"Bearer {encoded_jwt}",
+            "X-Api-Key": os.getenv("CYPRESS_API_GOV_KEY")
+            }, 
+        timeout=10
     )
     return response
 
@@ -126,7 +130,7 @@ def check_equality(in_wb, in_json):
 
 
 def get_api_values(endpoint, rid, field):
-    api_url = settings.POSTGREST.get("URL")
+    api_url = settings.POSTGREST.get(settings.ENVIRONMENT)
     res = call_api(api_url, endpoint, rid, field)
 
     if res.status_code == 200:
@@ -222,16 +226,3 @@ def run_end_to_end(email, dbkey, year):
         logger.info("No user found for %s, have you logged in once?", email)
         return
     generate_workbooks(user, email, dbkey, year)
-
-
-class Command(BaseCommand):
-    def add_arguments(self, parser):
-        parser.add_argument("--email", type=str, required=True)
-        parser.add_argument("--dbkey", type=str, required=True)
-        parser.add_argument("--year", type=str, default="22")
-
-    def handle(self, *args, **options):
-        email = options["email"]
-        dbkey = options["dbkey"]
-        year = options["year"]
-        run_end_to_end(email, dbkey, year)
