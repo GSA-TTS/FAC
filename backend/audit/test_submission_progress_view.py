@@ -8,7 +8,7 @@ from audit.cross_validation import (
     sac_validation_shape,
     submission_progress_check,
 )
-from audit.cross_validation.naming import SECTION_NAMES
+from audit.cross_validation.naming import SECTION_NAMES, find_section_by_name
 from .models import Access, SingleAuditChecklist
 from .test_views import _load_json
 
@@ -118,3 +118,24 @@ class SubmissionProgressViewTests(TestCase):
         for key in conditional_keys:
             self.assertEqual(result[key]["display"], "inactive")
         self.assertTrue(result["complete"])
+
+    def test_find_section_by_name(self):
+        """
+        This test added for test coverage purposes.
+
+        """
+
+        names = (
+            "SECONDARY_AUDITORS",
+            "SecondaryAuditors",
+            "Secondary Auditors",
+            "Secondary Auditors",
+            "report_submission:secondary-auditors",
+            "secondary_auditors",
+            "secondary-auditors",
+        )
+
+        for name in names:
+            self.assertEqual(
+                find_section_by_name(name).snake_case, "secondary_auditors"
+            )
