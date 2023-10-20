@@ -171,12 +171,13 @@ DATABASES = {
     ),
 }
 
-POSTGREST = {"URL": env.str("POSTGREST_URL", "http://api:3000"),
-             "LOCAL": env.str("POSTGREST_URL", "http://api:3000"),
-             "DEVELOPMENT": "https://api-dev.fac.gov",
-             "STAGING": "https://api-staging.fac.gov",
-             "PRODUCTION": "https://api.fac.gov"
-             }
+POSTGREST = {
+    "URL": env.str("POSTGREST_URL", "http://api:3000"),
+    "LOCAL": env.str("POSTGREST_URL", "http://api:3000"),
+    "DEVELOPMENT": "https://api-dev.fac.gov",
+    "STAGING": "https://api-staging.fac.gov",
+    "PRODUCTION": "https://api.fac.gov",
+}
 
 
 # Password validation
