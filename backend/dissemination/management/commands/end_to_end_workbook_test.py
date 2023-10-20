@@ -201,8 +201,7 @@ def generate_workbooks(user, email, dbkey, year):
             (_, json, _) = loader(fun, section)
             json_test_tables.append(json)
         _post_upload_pdf(sac, user, "audit/fixtures/basic.pdf")
-        SingleAuditChecklist = apps.get_model("audit.SingleAuditChecklist")
-        step_through_certifications(sac, SingleAuditChecklist)
+        step_through_certifications(sac)
 
         # shaped_sac = sac_validation_shape(sac)
         # result = submission_progress_check(shaped_sac, sar=None, crossval=False)
