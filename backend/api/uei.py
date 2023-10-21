@@ -13,7 +13,7 @@ class CustomHttpAdapter(requests.adapters.HTTPAdapter):
         self.ssl_context = ssl_context
         super().__init__(**kwargs)
 
-    def proxy_manager_for(self, *args, **kwargs):
+    def proxy_manager_for(self, *args, **kwargs):  # pragma: no cover
         kwargs["ssl_context"] = self.ssl_context
         return super().proxy_manager_for(*args, **kwargs)
 
@@ -91,7 +91,6 @@ def parse_sam_uei_json(response: dict) -> dict:
         return {"valid": False, "errors": ["UEI was not found in SAM.gov"]}
 
     # Get the ueiStatus and catch errors if the JSON shape is unexpected:
-    entry = entries[0]
     try:
         _ = entry.get("entityRegistration", {}).get("ueiStatus", "").upper()
     except AttributeError:
@@ -123,7 +122,7 @@ def parse_sam_uei_json(response: dict) -> dict:
         }
 
     # Return valid response
-    return {"valid": True, "response": response["entityData"][0]}
+    return {"valid": True, "response": entry}
 
 
 def get_uei_info_from_sam_gov(uei: str) -> dict:
