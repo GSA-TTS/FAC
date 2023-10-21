@@ -20,7 +20,6 @@ from dissemination.workbooklib.additional_ueis import generate_additional_ueis
 from dissemination.workbooklib.additional_eins import generate_additional_eins
 from dissemination.workbooklib.secondary_auditors import generate_secondary_auditors
 
-from model_bakery import baker
 from django.contrib.auth import get_user_model
 
 import logging
@@ -59,12 +58,7 @@ def setup_sac(user, test_name, dbkey):
             submitted_by=user, general_information__auditee_name=test_name
         ).first()
     else:
-        sac = SingleAuditChecklist()
-        User = get_user_model()
-        user = baker.make(User)
-        sac.submitted_by = user
-        sac.general_information = {}
-        sac.general_information["auditee_name"] = test_name
+        logger.info("No user found, have you logged in once?")
 
     logger.info(sac)
     if sac is None:
