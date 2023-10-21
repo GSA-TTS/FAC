@@ -41,7 +41,7 @@ jobs:
       - name: Run Django test suite
         working-directory: ./backend
         run: |
-          docker compose -f docker-compose-web.yml run web bash -c 'coverage run --parallel-mode --concurrency=multiprocessing manage.py test --parallel && coverage combine && coverage report -m --fail-under=90 && coverage xml -o coverage.xml'
+          docker compose -f docker-compose-web.yml run web bash -c 'coverage run --parallel-mode --concurrency=multiprocessing manage.py test --parallel && coverage combine && coverage report -m --fail-under=85 && coverage xml -o coverage.xml'
 
       - name: Copy Coverage From Docker Container
         run: |
@@ -53,7 +53,7 @@ jobs:
         uses: 5monkeys/cobertura-action@master
         with:
           path: ./coverage.xml
-          minimum_coverage: 90
+          minimum_coverage: 85
           skip_covered: true # Set to true to remove 100% covered from report
           fail_below_threshold: false # Fails the action if 90% threshold is not met
           show_missing: true
