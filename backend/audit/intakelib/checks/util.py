@@ -1,5 +1,8 @@
 from .error_messages import messages
 import logging
+from audit.intakelib.intermediate_representation import (
+    get_range_by_name,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -50,3 +53,21 @@ def build_cell_error_tuple(ir, range, ndx, message):
         get_sheet_name_from_range_name(ir, range["name"]),
         {"text": message, "link": "Intake checks: no link defined"},
     )
+
+
+def get_missing_value_errors(ir, range_name, message_key):
+    range_data = get_range_by_name(ir, range_name)
+    errors = []
+    if range_data:
+        for index, value in enumerate(range_data["values"]):
+            if (value is None) or (str(value).strip() == ""):
+                errors.append(
+                    build_cell_error_tuple(
+                        ir,
+                        range_data,
+                        index,
+                        get_message(message_key),
+                    )
+                )
+
+    return errors

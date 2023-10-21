@@ -21,7 +21,9 @@ def additional_award_identification(ir):
     errors = []
     patterns = [REGEX_RD_EXTENSION, REGEX_U_EXTENSION]
     for index, (ext, add) in enumerate(zip(extension, additional)):
-        if any(re.match(pattern, ext) for pattern in patterns) and not add:
+        if any(re.match(pattern, ext) for pattern in patterns) and (
+            (add is None) or (str(add).strip() == "")
+        ):
             errors.append(
                 build_cell_error_tuple(
                     ir,
