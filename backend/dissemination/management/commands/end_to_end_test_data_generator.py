@@ -12,13 +12,14 @@ logger = logging.getLogger(__name__)
 
 class Command(BaseCommand):
     def add_arguments(self, parser):
-        parser.add_argument("--email", type=str, required=False)
+        parser.add_argument("--email", type=str, required=False, default=CYPRESS_TEST_EMAIL_ADDR)
         parser.add_argument("--dbkeys", type=str, required=False, default="")
         parser.add_argument("--years", type=str, required=False, default="")
 
     def handle(self, *args, **options):
         dbkeys_str = options["dbkeys"]
         years_str = options["years"]
+        email_str = options["email"]
         dbkeys = dbkeys_str.split(",")
         years = years_str.split(",")
 
@@ -35,8 +36,6 @@ class Command(BaseCommand):
             logger.error("Years must be two digits. Exiting.")
             sys.exit(-2)
 
-        email = options.get("email", CYPRESS_TEST_EMAIL_ADDR)
-
         defaults = [
             (182926, 22),
             (181744, 22),
@@ -49,11 +48,11 @@ class Command(BaseCommand):
                     f"Generating test reports for DBKEYS: {dbkeys_str} and YEARS: {years_str}"
                 )
                 for dbkey, year in zip(dbkeys, years):
-                    run_end_to_end(email, dbkey, year)
+                    run_end_to_end(email_str, dbkey, year)
             else:
                 for pair in defaults:
                     logger.info("Running {}-{} end-to-end".format(pair[0], pair[1]))
-                    run_end_to_end(email, str(pair[0]), str(pair[1]))
+                    run_end_to_end(email_str, str(pair[0]), str(pair[1]))
         else:
             logger.error(
                 "Cannot run end-to-end workbook generation in production. Exiting."

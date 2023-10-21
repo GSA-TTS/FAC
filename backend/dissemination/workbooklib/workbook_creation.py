@@ -58,7 +58,17 @@ def setup_sac(user, test_name, dbkey):
             submitted_by=user, general_information__auditee_name=test_name
         ).first()
     else:
-        logger.info("No user found, have you logged in once?")
+        sac = SingleAuditChecklist()
+        User = get_user_model()
+        email = "test_data@test.data"
+        User.objects.get_or_create(
+            username="test_data",
+            email=email,
+        )
+        user = User.objects.get(email=email)
+        sac.submitted_by = user
+        sac.general_information = {}
+        sac.general_information["auditee_name"] = test_name
 
     logger.info(sac)
     if sac is None:
