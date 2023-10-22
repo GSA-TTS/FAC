@@ -185,56 +185,56 @@ def _extract_column_data(workbook, result, params):
                 set_fn(result, f"{parent_target}", entries)
 
 
-def _has_only_one_field_with_value_0(my_dict, field_name):
-    """Check if the dictionary has exactly one field with the provided name and its value is 0"""
-    return len(my_dict) == 1 and my_dict.get(field_name) == 0
+# def _has_only_one_field_with_value_0(my_dict, field_name):
+#     """Check if the dictionary has exactly one field with the provided name and its value is 0"""
+#     return len(my_dict) == 1 and my_dict.get(field_name) == 0
 
 
-def _remove_empty_award_entries(data):
-    """Removes empty award entries from the data"""
-    awards = []
-    for award in data.get("FederalAwards", {}).get("federal_awards", []):
-        if not all(
-            [
-                "direct_or_indirect_award" not in award,
-                "loan_or_loan_guarantee" not in award,
-                "subrecipients" not in award,
-                "program" in award
-                and _has_only_one_field_with_value_0(
-                    award["program"], "federal_program_total"
-                ),
-                "cluster" in award
-                and _has_only_one_field_with_value_0(award["cluster"], "cluster_total"),
-            ]
-        ):
-            awards.append(award)
-    if "FederalAwards" in data:
-        # Update the federal_awards with the valid awards
-        data["FederalAwards"]["federal_awards"] = awards
+# def _remove_empty_award_entries(data):
+#     """Removes empty award entries from the data"""
+#     awards = []
+#     for award in data.get("FederalAwards", {}).get("federal_awards", []):
+#         if not all(
+#             [
+#                 "direct_or_indirect_award" not in award,
+#                 "loan_or_loan_guarantee" not in award,
+#                 "subrecipients" not in award,
+#                 "program" in award
+#                 and _has_only_one_field_with_value_0(
+#                     award["program"], "federal_program_total"
+#                 ),
+#                 "cluster" in award
+#                 and _has_only_one_field_with_value_0(award["cluster"], "cluster_total"),
+#             ]
+#         ):
+#             awards.append(award)
+#     if "FederalAwards" in data:
+#         # Update the federal_awards with the valid awards
+#         data["FederalAwards"]["federal_awards"] = awards
 
-    return data
+#     return data
 
 
-def _add_required_fields(data):
-    """Adds empty parent fields to the json object to allow for proper schema validation / indexing"""
-    indexed_awards = []
-    for award in data.get("FederalAwards", {}).get("federal_awards", []):
-        if "cluster" not in award:
-            award["cluster"] = {}
-        if "direct_or_indirect_award" not in award:
-            award["direct_or_indirect_award"] = {}
-        if "loan_or_loan_guarantee" not in award:
-            award["loan_or_loan_guarantee"] = {}
-        if "program" not in award:
-            award["program"] = {}
-        if "subrecipients" not in award:
-            award["subrecipients"] = {}
-        indexed_awards.append(award)
+# def _add_required_fields(data):
+#     """Adds empty parent fields to the json object to allow for proper schema validation / indexing"""
+#     indexed_awards = []
+#     for award in data.get("FederalAwards", {}).get("federal_awards", []):
+#         if "cluster" not in award:
+#             award["cluster"] = {}
+#         if "direct_or_indirect_award" not in award:
+#             award["direct_or_indirect_award"] = {}
+#         if "loan_or_loan_guarantee" not in award:
+#             award["loan_or_loan_guarantee"] = {}
+#         if "program" not in award:
+#             award["program"] = {}
+#         if "subrecipients" not in award:
+#             award["subrecipients"] = {}
+#         indexed_awards.append(award)
 
-    if "FederalAwards" in data:
-        # Update the federal_awards with all required fields
-        data["FederalAwards"]["federal_awards"] = indexed_awards
-    return data
+#     if "FederalAwards" in data:
+#         # Update the federal_awards with all required fields
+#         data["FederalAwards"]["federal_awards"] = indexed_awards
+#     return data
 
 
 def _extract_from_column_mapping(path, row_index, column_mapping, match=None):
