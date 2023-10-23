@@ -7,8 +7,6 @@ from .constants import SECTION_NAME
 from django.core.exceptions import ValidationError
 
 
-from pprint import pprint
-
 logger = logging.getLogger(__name__)
 
 
@@ -179,7 +177,6 @@ def insert_new_range(ir, sheet_name, range_name, column, row, values):
     return ir
 
 
-
 def raise_modified_workbook(msg):
     raise ValidationError(
         (
@@ -187,10 +184,12 @@ def raise_modified_workbook(msg):
             "",
             "Workbook",
             {"text": msg, "link": "Intake checks: no link defined"},
-
         )
     )
-WORKBOOK_MODIFIED_ERROR="This FAC workbook has been modified in ways we cannot process. Please download a fresh template and transfer your data."
+
+
+WORKBOOK_MODIFIED_ERROR = "This FAC workbook has been modified in ways we cannot process. Please download a fresh template and transfer your data."
+
 
 def get_range_values_by_name(sheets, name):
     range = get_range_by_name(sheets, name)
@@ -218,18 +217,26 @@ def remove_range_by_name(ir, name):
         new_ir.append(sheet)
     return new_ir
 
+
 def is_good_range_coord(s):
     if ":" in s:
         parts = s.split(":")
         if len(parts) == 2:
-            return True if (is_good_cell_coord(parts[0]) and is_good_cell_coord(parts[1])) else False
+            return (
+                True
+                if (is_good_cell_coord(parts[0]) and is_good_cell_coord(parts[1]))
+                else False
+            )
     return False
+
 
 def is_good_cell_coord(s):
     return True if re.search("^\$[A-Z]+\$[0-9]+$", s) else False
 
+
 def is_cell_or_range_coord(s):
     return is_good_range_coord(s) or is_good_cell_coord(s)
+
 
 def extract_workbook_as_ir(file):
     workbook = _open_workbook(file)
@@ -239,7 +246,7 @@ def extract_workbook_as_ir(file):
         # If the user mangles the workbook enough, we get #REF errors
         if "#ref" in dn.attr_text.lower():
             raise_modified_workbook(WORKBOOK_MODIFIED_ERROR)
-        else: 
+        else:
             title, coord = next(dn.destinations)
             # Make sure this looks like a range string
             if is_cell_or_range_coord(coord):
@@ -254,7 +261,7 @@ def extract_workbook_as_ir(file):
                 elif is_good_cell_coord(coord):
                     range["start_cell"] = abs_ref_to_cell(coord, 0)
                     range["end_cell"] = range["start_cell"]
-                
+
                 # Grab the values for this range using the start/end values
                 range["values"] = load_workbook_range(
                     range["start_cell"], range["end_cell"], workbook[title]
