@@ -1,4 +1,5 @@
 from api import views
+
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
@@ -20,52 +21,10 @@ schema_view = get_schema_view(
 urlpatterns = [
     # path("", IndexView.as_view(), name="index"),
     path("api/schema.json", schema_view),
-    path("public/api/sac", views.SACViewSet.as_view({"get": "list"}), name="sac-list"),
-    path(
-        "public/api/sac/<str:report_id>",
-        views.SACViewSet.as_view({"get": "retrieve"}),
-        name="sac-detail",
-    ),
-    path(
-        "api/sac/eligibility",
-        views.EligibilityFormView.as_view(),
-        name="api-eligibility",
-    ),
     path(
         "api/sac/ueivalidation",
         views.UEIValidationFormView.as_view(),
         name="api-uei-validation",
-    ),
-    path("api/sac/auditee", views.AuditeeInfoView.as_view(), name="api-auditee-info"),
-    path(
-        "api/sac/accessandsubmission",
-        views.AccessAndSubmissionView.as_view(),
-        name="api-accessandsubmission",
-    ),
-    path(
-        "sac/edit/<str:report_id>",
-        views.SingleAuditChecklistView.as_view(),
-        name="singleauditchecklist",
-    ),
-    path(
-        "sac/edit/<str:report_id>/federal_awards",
-        views.SacFederalAwardsView.as_view(),
-        name="sacfederalawards",
-    ),
-    path(
-        "submissions",
-        views.SubmissionsView.as_view(),
-        name="submissions",
-    ),
-    path(
-        "access-list",
-        views.AccessListView.as_view(),
-        name="access-list",
-    ),
-    path(
-        "schemas/<str:fiscal_year>/<str:schema_type>",
-        views.SchemaView.as_view(),
-        name="schemas",
     ),
     path(settings.ADMIN_URL, admin.site.urls),
     path("openid/", include("djangooidc.urls")),

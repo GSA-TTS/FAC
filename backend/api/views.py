@@ -45,12 +45,10 @@ def eligibility_check(user, data):
     serializer = EligibilitySerializer(data=data)  # data = request.data
     # self.eligibility_check(request)
     if serializer.is_valid():
-        next_step = reverse("api-auditee-info")
-
         # Store step 0 data in profile, overwriting any pre-existing.
         user.profile.entry_form_data = serializer.data
         user.profile.save()
-        return {"eligible": True, "next": next_step}
+        return {"eligible": True}
 
     return {"eligible": False, "errors": serializer.errors}
 
@@ -68,19 +66,16 @@ def auditee_info_check(user, data):
     ]
     if missing_fields:
         return {
-            "next": reverse("api-eligibility"),
             "errors": "We're missing required fields, please try again.",
             "missing_fields": missing_fields,
         }
 
     if serializer.is_valid():
-        next_step = reverse("api-accessandsubmission")
-
         # combine with expected eligibility info from session
         user.profile.entry_form_data = user.profile.entry_form_data | data
         user.profile.save()
 
-        return {"next": next_step}
+        return {}
 
     return {"errors": serializer.errors}
 
@@ -103,7 +98,6 @@ def access_and_submission_check(user, data):
     ]
     if missing_fields:
         return {
-            "next": reverse("api-eligibility"),
             "errors": "We're missing required fields, please try again.",
             "missing_fields": missing_fields,
         }
@@ -179,7 +173,7 @@ def access_and_submission_check(user, data):
         user.profile.entry_form_data = {}
         user.profile.save()
 
-        return {"report_id": sac.report_id, "next": "TBD"}
+        return {"report_id": sac.report_id}
 
     return {"errors": serializer.errors}
 
