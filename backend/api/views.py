@@ -5,7 +5,6 @@ from django.http import Http404, HttpResponse, JsonResponse
 from django.urls import reverse
 from django.views import generic
 from django.contrib.auth import get_user_model
-from rest_framework import viewsets
 from rest_framework.authentication import BaseAuthentication
 from rest_framework.permissions import BasePermission, IsAuthenticated
 from rest_framework.response import Response
@@ -197,27 +196,6 @@ class Sprite(generic.View):
         return HttpResponse(
             content=fpath.read_text(encoding="utf-8"), content_type="image/svg+xml"
         )
-
-
-class SACViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint that allows SACs to be viewed.
-    """
-
-    # this is a public endpoint - no authentication or permission required
-    authentication_classes: List[BaseAuthentication] = []
-    permission_classes: List[BasePermission] = []
-
-    allowed_methods = ["GET"]
-
-    # lookup SACs with report_id rather than the default pk
-    lookup_field = "report_id"
-
-    queryset = SingleAuditChecklist.objects.filter(submission_status="submitted")
-    serializer_class = SingleAuditChecklistSerializer
-
-    def get_view_name(self):
-        return "SF-SAC"
 
 
 class EligibilityFormView(APIView):

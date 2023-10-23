@@ -19,12 +19,6 @@ schema_view = get_schema_view(
 
 urlpatterns = [
     path("api/schema.json", schema_view),
-    path("public/api/sac", views.SACViewSet.as_view({"get": "list"}), name="sac-list"),
-    path(
-        "public/api/sac/<str:report_id>",
-        views.SACViewSet.as_view({"get": "retrieve"}),
-        name="sac-detail",
-    ),
     path(
         "api/sac/eligibility",
         views.EligibilityFormView.as_view(),
