@@ -18,7 +18,6 @@ schema_view = get_schema_view(
 )
 
 urlpatterns = [
-    # path("", IndexView.as_view(), name="index"),
     path("api/schema.json", schema_view),
     path("public/api/sac", views.SACViewSet.as_view({"get": "list"}), name="sac-list"),
     path(
