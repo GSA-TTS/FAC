@@ -71,3 +71,13 @@ def get_missing_value_errors(ir, range_name, message_key):
                 )
 
     return errors
+
+
+def get_names_of_all_ranges(data):
+    names = []
+    for entry in data:
+        if "ranges" in entry:
+            for range_item in entry["ranges"]:
+                if "name" in range_item:
+                    names.append(range_item["name"])
+    return names
