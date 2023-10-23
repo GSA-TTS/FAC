@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+    <div class="grid-container margin-top-6 margin-bottom-10">
+        <div class="grid-row">
+          <h1 class="font-sans-2xl" id="title">Unlock after certification</h1>
+            {% if submission_status == target_status %}
+              <form class="padding-x-6"
+                    id="unlock-after-certification"
+                    method="post">
+                  {% csrf_token %}
+                  <fieldset class="usa-fieldset">
+
+                      {% comment %} This div is the grey box, and should handle its own margins and padding. {% endcomment %}
+                      <div class="bg-base-lightest padding-5">
+                          <fieldset class="usa-fieldset radio margin-bottom-6" id="question-opt-in-out">
+                              <legend class="margin-bottom-3 font-sans-lg text-bold text-underline">
+                                  I understand that this will move the submission back to an in-progress, editable state and that it will need to be marked as ready for certification again in future.
+                              </legend>
+
+                              <div class="usa-checkbox">
+                                  <input id="unlock_after_certification"
+                                      name="unlock_after_certification"
+                                      class="usa-checkbox__input"
+                                      type="checkbox"
+                                      value="True"
+                                      checked
+                                  <label class="usa-checkbox__label" for="unlock-for-certification-checkbox"></label>
+                              </div>
+
+                              <fieldset class="usa-fieldset margin-top-2 tablet:grid-col-12" id="agree-or-cancel">
+                                  <button class="usa-button" id="continue">Agree to unlock for certification</button>
+                                  <a class="usa-button usa-button--unstyled margin-left-2 margin-top-2 tablet:margin-top-0"
+                                  id="unlock-after-certification-button"
+                                  href="{% url 'audit:SubmissionProgress' report_id %}"
+                                  aria-controls="form-cancel">Cancel</a>
+                              </fieldset>
+                          </fieldset>
+                      </div>
+                  </fieldset>
+              </form>
+            {% else %}
+            <p>This form is only accessible for submissions with a ready for certification status.</p>
+
+            {% endif%}
+        </div>
+    </div>
+    {% include "audit-metadata.html" %}
+{% endblock content %}

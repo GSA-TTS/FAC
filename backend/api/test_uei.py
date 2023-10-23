@@ -634,13 +634,36 @@ class UtilsTesting(TestCase):
 
     def test_get_uei_info_from_sam_gov_multiple_results(self):
         """
-        Tests that we can handle multiple UEIs.
+        Tests that we can handle multiple results.
         """
         test_uei = "ZQGGHJH74DW7"
 
         with patch("api.uei.SESSION.get") as mock_get:
             mock_results = json.loads(multiple_uei_results)
             expected = mock_results["entityData"][0]
+            mock_get.return_value.status_code = 200
+            mock_get.return_value.json.return_value = mock_results
+
+            results = get_uei_info_from_sam_gov(uei=test_uei)
+
+            self.assertTrue(results["valid"])
+            self.assertTrue("errors" not in results)
+            self.assertEqual(results["response"], expected)
+
+    def test_get_uei_info_from_sam_gov_multiple_results_mixed_active(self):
+        """
+        Tests that we can handle multiple results with mixed status.
+        """
+        test_uei = "ZQGGHJH74DW7"
+
+        with patch("api.uei.SESSION.get") as mock_get:
+            mock_results = json.loads(multiple_uei_results)
+            first = mock_results["entityData"][0]
+            second = mock_results["entityData"][1]
+            first["entityRegistration"]["registrationStatus"] = "Whatever"
+            mock_results["entityData"] = [first, second]
+            expected = second
+
             mock_get.return_value.status_code = 200
             mock_get.return_value.json.return_value = mock_results
 
