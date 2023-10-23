@@ -83,6 +83,10 @@ docker-lint:
 	docker compose build
 	docker compose run web bash -c 'flake8 && black --check . && bandit -c pyproject.toml -r . && mypy . && djlint .'
 
+super-linter:
+	docker pull ghcr.io/super-linter/super-linter:latest
+	docker run --env-file super-linter.env -e RUN_LOCAL=true -e USE_FIND_ALGORITHM=true -e CREATE_LOG_FILE=true -e LOG_FILE=super-linter.log -v .:/tmp/lint ghcr.io/super-linter/super-linter
+
 ghcr-first-run:
 	docker compose -f docker-compose-web.yml run web python manage.py makemigrations
 	docker compose -f docker-compose-web.yml run web python manage.py migrate
