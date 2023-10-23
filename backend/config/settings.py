@@ -122,6 +122,7 @@ INSTALLED_APPS += [
     # "data_distro",
     "dissemination",
     "support",
+    "c2g",
 ]
 
 MIDDLEWARE = [
@@ -168,6 +169,9 @@ WSGI_APPLICATION = "config.wsgi.application"
 DATABASES = {
     "default": env.dj_db_url(
         "DATABASE_URL", default="postgres://postgres:password@0.0.0.0/backend"
+    ),
+    "c2fdb": env.dj_db_url(
+        "DATABASE_URL_C2FDB", default="postgres://postgres:password@0.0.0.0/c2fdb"
     ),
 }
 
@@ -218,6 +222,7 @@ CORS_ALLOWED_ORIGINS = [env.str("DJANGO_BASE_URL", "http://localhost:8000")]
 
 STATIC_URL = "/static/"
 
+
 # Environment specific configurations
 DEBUG = False
 if ENVIRONMENT not in ["DEVELOPMENT", "PREVIEW", "STAGING", "PRODUCTION"]:
@@ -233,6 +238,9 @@ if ENVIRONMENT not in ["DEVELOPMENT", "PREVIEW", "STAGING", "PRODUCTION"]:
     STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
     MIDDLEWARE.append("whitenoise.middleware.WhiteNoiseMiddleware")
     DEFAULT_FILE_STORAGE = "report_submission.storages.S3PrivateStorage"
+
+    # Private C2F bucket
+    AWS_C2F_BUCKET_NAME = "fac-c2g-s3"  # TODO need to fix for CG
 
     # Private bucket
     AWS_PRIVATE_STORAGE_BUCKET_NAME = "gsa-fac-private-s3"
@@ -376,15 +384,9 @@ else:
     # Will not be enabled in cloud environments
     DISABLE_AUTH = False
 
-# Remove once all Census data has been migrated
-# Add these as env vars, look at the bucket for values
-AWS_CENSUS_ACCESS_KEY_ID = secret("AWS_CENSUS_ACCESS_KEY_ID", "")
-AWS_CENSUS_SECRET_ACCESS_KEY = secret("AWS_CENSUS_SECRET_ACCESS_KEY", "")
-AWS_CENSUS_STORAGE_BUCKET_NAME = secret("AWS_CENSUS_STORAGE_BUCKET_NAME", "")
-AWS_S3_CENSUS_REGION_NAME = secret("AWS_S3_CENSUS_REGION_NAME", "")
-
 
 ADMIN_URL = "admin/"
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
