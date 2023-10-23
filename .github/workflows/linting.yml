@@ -107,13 +107,10 @@ jobs:
         with:
           fetch-depth: 0
 
-      ################################
-      # Run Linter against code base #
-      ################################
       - name: Lint Code Base
-        uses: super-linter/super-linter@v5
+        uses: super-linter/super-linter/slim@v5
         env:
-          VALIDATE_ALL_CODEBASE: false
+          VALIDATE_ALL_CODEBASE: true
           DEFAULT_BRANCH: main
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
