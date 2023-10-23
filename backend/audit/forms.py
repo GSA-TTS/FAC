@@ -155,3 +155,7 @@ class TribalAuditConsentForm(forms.Form):
     )
     tribal_authorization_certifying_official_name = forms.CharField()
     tribal_authorization_certifying_official_title = forms.CharField()
+
+
+class UnlockAfterCertificationForm(forms.Form):
+    unlock_after_certification = forms.BooleanField()

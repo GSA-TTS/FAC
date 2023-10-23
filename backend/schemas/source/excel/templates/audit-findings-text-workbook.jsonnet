@@ -104,6 +104,7 @@ local sheets = [
     name: textSheet,
     open_ranges: Fun.make_open_ranges_with_column(title_row, open_ranges_defns),
     header_height: 48,
+    row_height: 36,
     hide_col_from: 4,
   },
 ];

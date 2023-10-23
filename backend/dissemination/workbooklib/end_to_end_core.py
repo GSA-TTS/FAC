@@ -1,8 +1,5 @@
-from django.apps import apps
-from django.core.management.base import BaseCommand
 from users.models import User
 import argparse
-import datetime
 import logging
 import sys
 import math
@@ -11,6 +8,7 @@ import os
 import jwt
 import requests
 from pprint import pprint
+from datetime import datetime
 
 from dissemination.workbooklib.workbook_creation import (
     sections,
@@ -44,21 +42,13 @@ pw.addHandler(logging.StreamHandler())
 pw.setLevel(logging.INFO)
 
 
-def step_through_certifications(sac, SAC):
-    sac.transition_name.append(SAC.STATUS.SUBMITTED)
-    sac.transition_date.append(datetime.datetime.today())
-    sac.transition_name.append(SAC.STATUS.READY_FOR_CERTIFICATION)
-    sac.transition_date.append(datetime.datetime.today())
-    sac.transition_name.append(SAC.STATUS.AUDITOR_CERTIFIED)
-    sac.transition_date.append(datetime.datetime.today())
-    sac.transition_name.append(SAC.STATUS.AUDITEE_CERTIFIED)
-    sac.transition_date.append(datetime.datetime.today())
-    sac.transition_name.append(SAC.STATUS.CERTIFIED)
-    sac.transition_date.append(datetime.datetime.today())
-    sac.transition_date.append(SAC.STATUS.SUBMITTED)
-    sac.transition_date.append(datetime.datetime.today())
-    sac.transition_date.append(SAC.STATUS.DISSEMINATED)
-    sac.transition_date.append(datetime.datetime.today())
+def step_through_certifications(sac):
+    sac.transition_to_ready_for_certification()
+    sac.transition_to_auditor_certified()
+    sac.transition_to_auditee_certified()
+    sac.transition_to_submitted()
+    sac.transition_to_disseminated()
+    sac.save()
 
 
 def disseminate(sac, year):
@@ -87,7 +77,7 @@ def create_payload(api_url, role="api_fac_gov"):
     payload = {
         # PostgREST only cares about the role.
         "role": role,
-        "created": datetime.datetime.today().isoformat(),
+        "created": datetime.today().isoformat(),
     }
     return payload
 
@@ -99,7 +89,12 @@ def call_api(api_url, endpoint, rid, field):
     )
     full_request = f"{api_url}/{endpoint}?report_id=eq.{rid}&select={field}"
     response = requests.get(
-        full_request, headers={"Authorization": f"Bearer {encoded_jwt}"}, timeout=10
+        full_request,
+        headers={
+            "Authorization": f"Bearer {encoded_jwt}",
+            "X-Api-Key": os.getenv("CYPRESS_API_GOV_KEY"),
+        },
+        timeout=10,
     )
     return response
 
@@ -135,7 +130,7 @@ def check_equality(in_wb, in_json):
 
 
 def get_api_values(endpoint, rid, field):
-    api_url = settings.POSTGREST.get("URL")
+    api_url = settings.POSTGREST.get(settings.ENVIRONMENT)
     res = call_api(api_url, endpoint, rid, field)
 
     if res.status_code == 200:
@@ -173,6 +168,7 @@ def api_check(json_test_tables):
             equality_results = []
             for field_ndx, f in enumerate(row["fields"]):
                 # logger.info(f"Checking /{endpoint} {report_id} {f}")
+                # logger.info(f"{get_api_values(endpoint, report_id, f)}")
                 api_values = get_api_values(endpoint, report_id, f)
                 this_api_value = api_values[row_ndx]
                 this_field_value = row["values"][field_ndx]
@@ -195,7 +191,7 @@ def api_check(json_test_tables):
 
 def generate_workbooks(user, email, dbkey, year):
     entity_id = "DBKEY {dbkey} {year} {date:%Y_%m_%d_%H_%M_%S}".format(
-        dbkey=dbkey, year=year, date=datetime.datetime.now()
+        dbkey=dbkey, year=year, date=datetime.now()
     )
     sac = setup_sac(user, entity_id, dbkey)
     if sac.general_information["audit_type"] == "alternative-compliance-engagement":
@@ -208,8 +204,7 @@ def generate_workbooks(user, email, dbkey, year):
             (_, json, _) = loader(fun, section)
             json_test_tables.append(json)
         _post_upload_pdf(sac, user, "audit/fixtures/basic.pdf")
-        SingleAuditChecklist = apps.get_model("audit.SingleAuditChecklist")
-        step_through_certifications(sac, SingleAuditChecklist)
+        step_through_certifications(sac)
 
         # shaped_sac = sac_validation_shape(sac)
         # result = submission_progress_check(shaped_sac, sar=None, crossval=False)
@@ -231,16 +226,3 @@ def run_end_to_end(email, dbkey, year):
         logger.info("No user found for %s, have you logged in once?", email)
         return
     generate_workbooks(user, email, dbkey, year)
-
-
-class Command(BaseCommand):
-    def add_arguments(self, parser):
-        parser.add_argument("--email", type=str, required=True)
-        parser.add_argument("--dbkey", type=str, required=True)
-        parser.add_argument("--year", type=str, default="22")
-
-    def handle(self, *args, **options):
-        email = options["email"]
-        dbkey = options["dbkey"]
-        year = options["year"]
-        run_end_to_end(email, dbkey, year)

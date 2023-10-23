@@ -63,7 +63,7 @@ local open_ranges_defns = [
   [
     Sheets.open_range {
       title_cell: 'A1',
-      width: 100,
+      width: 64,
       format: 'text',
       help: Help.plain_text,
     },
@@ -85,7 +85,7 @@ local open_ranges_defns = [
   [
     Sheets.open_range {
       title_cell: 'C1',
-      width: 100,
+      width: 64,
       format: 'text',
       help: Help.plain_text,
     },
@@ -96,7 +96,7 @@ local open_ranges_defns = [
   [
     Sheets.open_range {
       title_cell: 'D1',
-      width: 100,
+      width: 64,
       format: 'text',
       help: Help.plain_text,
     },
@@ -188,6 +188,7 @@ local sheets = [
     name: textSheet,
     open_ranges: Fun.make_open_ranges_with_column(title_row, open_ranges_defns),
     header_height: 48,
+    row_height: 36,
   },
   {
     name: stateCodeLookup,
