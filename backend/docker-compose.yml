@@ -18,12 +18,12 @@ services:
       timeout: 5s
       retries: 10
 
-  c2fdb:
+  c2g-db:
     image: "postgres:12"
     environment:
       POSTGRES_HOST_AUTH_METHOD: trust
     volumes:
-      - c2fdb-data:/var/lib/postgresql/data/
+      - c2gdb-data:/var/lib/postgresql/data/
     ports:
       - "5433:5432"
     healthcheck:
@@ -130,5 +130,5 @@ services:
         condition: service_healthy
 volumes:
   postgres-data:
-  c2fdb-data:
+  c2gdb-data:
   minio-vol:
