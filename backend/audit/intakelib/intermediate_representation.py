@@ -231,7 +231,7 @@ def is_good_range_coord(s):
 
 
 def is_good_cell_coord(s):
-    return True if re.search("^\$[A-Z]+\$[0-9]+$", s) else False
+    return True if re.search(r"^\$[A-Z]+\$[0-9]+$", s) else False
 
 
 def is_cell_or_range_coord(s):
