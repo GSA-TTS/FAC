@@ -15,7 +15,7 @@ from collections import namedtuple as NT
 
 Sheet = NT(
     "Sheet",
-    "name single_cells meta_cells open_ranges header_inclusion text_ranges header_height hide_col_from hide_row_from",
+    "name single_cells meta_cells open_ranges header_inclusion text_ranges header_height row_height hide_col_from hide_row_from",
 )
 Posn = NT(
     "Posn",
@@ -189,6 +189,10 @@ def parse_sheet(spec):  # noqa: C901
         hh = get(spec, "header_height")
     else:
         hh = None
+    if "row_height" in spec:
+        rh = get(spec, "row_height")
+    else:
+        rh = None
     if "hide_col_from" in spec:
         hcf = get(spec, "hide_col_from")
     else:
@@ -197,7 +201,7 @@ def parse_sheet(spec):  # noqa: C901
         hrf = get(spec, "hide_row_from")
     else:
         hrf = None
-    return Sheet(name, sc, mtc, opr, hi, tr, hh, hcf, hrf)
+    return Sheet(name, sc, mtc, opr, hi, tr, hh, rh, hcf, hrf)
 
 
 def parse_spec(spec):

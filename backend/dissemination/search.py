@@ -35,10 +35,10 @@ def search_general(
         query.add(end_date_match, Q.AND)
 
     if cog_or_oversight:
-        if cog_or_oversight == "Cognizant":
+        if cog_or_oversight.lower() == "cog":
             cog_match = Q(cognizant_agency__in=[agency_name])
             query.add(cog_match, Q.AND)
-        elif cog_or_oversight == "Oversight":
+        elif cog_or_oversight.lower() == "oversight":
             oversight_match = Q(oversight_agency__in=[agency_name])
             query.add(oversight_match, Q.AND)
 

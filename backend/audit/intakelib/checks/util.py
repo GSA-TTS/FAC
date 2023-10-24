@@ -50,3 +50,13 @@ def build_cell_error_tuple(ir, range, ndx, message):
         get_sheet_name_from_range_name(ir, range["name"]),
         {"text": message, "link": "Intake checks: no link defined"},
     )
+
+
+def get_names_of_all_ranges(data):
+    names = []
+    for entry in data:
+        if "ranges" in entry:
+            for range_item in entry["ranges"]:
+                if "name" in range_item:
+                    names.append(range_item["name"])
+    return names

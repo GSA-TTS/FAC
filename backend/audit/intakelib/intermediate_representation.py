@@ -1,7 +1,11 @@
+import logging
+import re
+
 from .mapping_util import _open_workbook, _get_entries_by_path
 from .exceptions import ExcelExtractionError
 from .constants import SECTION_NAME
-import logging
+from django.core.exceptions import ValidationError
+
 
 logger = logging.getLogger(__name__)
 
@@ -173,16 +177,30 @@ def insert_new_range(ir, sheet_name, range_name, column, row, values):
     return ir
 
 
+def raise_modified_workbook(msg):
+    raise ValidationError(
+        (
+            "Unknown",
+            "",
+            "Workbook",
+            {"text": msg, "link": "Intake checks: no link defined"},
+        )
+    )
+
+
+WORKBOOK_MODIFIED_ERROR = "This FAC workbook has been modified in ways we cannot process. Please download a fresh template and transfer your data."
+
+
 def get_range_values_by_name(sheets, name):
     range = get_range_by_name(sheets, name)
-    if "values" in range:
+    if range and ("values" in range):
         # logger.info("VALUES",  range["values"])
         return range["values"]
     else:
         logger.info(f"No values found for range {name}")
         # FIXME: Raise an exception?
         # Returning none to break upstream code; an exception would be better.
-        return None
+        raise_modified_workbook(WORKBOOK_MODIFIED_ERROR)
 
 
 def remove_range_by_name(ir, name):
@@ -200,34 +218,70 @@ def remove_range_by_name(ir, name):
     return new_ir
 
 
+def is_good_range_coord(s):
+    if ":" in s:
+        parts = s.split(":")
+        if len(parts) == 2:
+            return (
+                True
+                if (is_good_cell_coord(parts[0]) and is_good_cell_coord(parts[1]))
+                else False
+            )
+    return False
+
+
+def is_good_cell_coord(s):
+    return True if re.search(r"^\$[A-Z]+\$[0-9]+$", s) else False
+
+
+def is_cell_or_range_coord(s):
+    return is_good_range_coord(s) or is_good_cell_coord(s)
+
+
 def extract_workbook_as_ir(file):
     workbook = _open_workbook(file)
-    by_name = {}
+    sheets_by_name = {}
     for named_range_name in workbook.defined_names:
         dn = workbook.defined_names[named_range_name]
-        title, coord = next(dn.destinations)
-        range = {}
-        range["name"] = dn.name
-        range["start_cell"] = abs_ref_to_cell(coord, 0)
-        range["end_cell"] = abs_ref_to_cell(coord, 1)
-        if not range["end_cell"]:
-            coord = f"{coord}:{coord}"
-            range["end_cell"] = range["start_cell"]
-        range["values"] = load_workbook_range(
-            range["start_cell"], range["end_cell"], workbook[title]
-        )
-        if title in by_name:
-            by_name[title].append(range)
+        # If the user mangles the workbook enough, we get #REF errors
+        if "#ref" in dn.attr_text.lower():
+            raise_modified_workbook(WORKBOOK_MODIFIED_ERROR)
         else:
-            by_name[title] = [range]
+            title, coord = next(dn.destinations)
+            # Make sure this looks like a range string
+            if is_cell_or_range_coord(coord):
+                range = {}
+                range["name"] = dn.name
+                # If it is a range, grab both parts
+                if is_good_range_coord(coord):
+                    range["start_cell"] = abs_ref_to_cell(coord, 0)
+                    range["end_cell"] = abs_ref_to_cell(coord, 1)
+                # If it is a single cell (e.g. a UEI cell), then
+                # make the start and end the same
+                elif is_good_cell_coord(coord):
+                    range["start_cell"] = abs_ref_to_cell(coord, 0)
+                    range["end_cell"] = range["start_cell"]
 
+                # Grab the values for this range using the start/end values
+                range["values"] = load_workbook_range(
+                    range["start_cell"], range["end_cell"], workbook[title]
+                )
+
+                # Now, either append to a given sheet, or start a new sheet.
+                if title in sheets_by_name:
+                    sheets_by_name[title].append(range)
+                else:
+                    sheets_by_name[title] = [range]
+
+    # Build the IR, which is a list of sheets.
     sheets = []
-    for name, ranges in by_name.items():
+    for name, ranges in sheets_by_name.items():
         sheet = {}
         sheet["name"] = name
         sheet["ranges"] = ranges
         sheets.append(sheet)
 
+    # Remove all the Nones at the bottom of the sheets, since we have 5000 rows of formulas.
     for sheet in sheets:
         remove_null_rows(sheet)
 

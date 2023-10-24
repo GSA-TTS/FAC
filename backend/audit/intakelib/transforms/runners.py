@@ -14,6 +14,9 @@ from .xform_trim_null_from_content_fields_in_notes_to_sefa import (
 )
 
 from .xform_eins_need_to_be_strings import eins_need_to_be_strings
+from .xform_rename_additional_notes_sheet import (
+    rename_additional_notes_sheet_to_form_sheet,
+)
 
 from .xform_all_alns_need_to_be_strings import all_alns_need_to_be_strings
 from .xform_all_passthrough_id_need_to_be_strings import (
@@ -46,6 +49,7 @@ general_transforms = [no_op]
 
 notes_to_sefa_transforms = general_transforms + [
     trim_null_from_content_fields_in_notes_to_sefa,
+    rename_additional_notes_sheet_to_form_sheet,
     insert_sequence_nums_into_notes_to_sefa,
 ]
 

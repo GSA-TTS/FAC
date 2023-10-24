@@ -32,7 +32,7 @@ def loan_guarantee(ir):
             errors.append(
                 build_cell_error_tuple(
                     ir,
-                    get_range_by_name(ir, "loan_balance_at_audit_period_end"),
+                    get_range_by_name(ir, "is_guaranteed"),
                     index,
                     get_message("check_loan_guarantee_not_empty"),
                 )

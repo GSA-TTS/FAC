@@ -50,6 +50,46 @@ class TribalDataSharingConsentTests(TestCase):
             validation_result, [{"error": err_missing_tribal_data_sharing_consent()}]
         )
 
+        shaped_sac_missing = shaped_sac | {"tribal_data_consent": {}}
+
+        validation_missing = tribal_data_sharing_consent(shaped_sac_missing)
+
+        self.assertEqual(
+            validation_missing, [{"error": err_missing_tribal_data_sharing_consent()}]
+        )
+
+        falses = {
+            "tribal_data_consent": {
+                "tribal_authorization_certifying_official_title": False,
+                "is_tribal_information_authorized_to_be_public": False,
+                "tribal_authorization_certifying_official_name": False,
+            }
+        }
+
+        shaped_sac_falses = shaped_sac | falses
+        validation_falses = tribal_data_sharing_consent(shaped_sac_falses)
+
+        self.assertEqual(
+            validation_falses, [{"error": err_missing_tribal_data_sharing_consent()}]
+        )
+
+        not_even_wrong = {
+            "tribal_data_consent": {
+                "tribal_authorization_certifying_official_title": False,
+                "is_tribal_information_authorized_to_be_public": "string",
+                "tribal_authorization_certifying_official_name": False,
+            }
+        }
+        shaped_sac_not_even_wrong = shaped_sac | not_even_wrong
+        validation_not_even_wrong = tribal_data_sharing_consent(
+            shaped_sac_not_even_wrong
+        )
+
+        self.assertEqual(
+            validation_not_even_wrong,
+            [{"error": err_missing_tribal_data_sharing_consent()}],
+        )
+
     def test_tribal_org_with_consent(self):
         """SACs for tribal orders should pass this validation if there is a completed data sharing consent form"""
         sac = baker.make(SingleAuditChecklist)
