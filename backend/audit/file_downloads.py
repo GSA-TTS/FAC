@@ -1,3 +1,5 @@
+import logging
+
 from django.conf import settings
 from django.http import Http404
 from django.shortcuts import get_object_or_404
@@ -6,6 +8,8 @@ from boto3 import client as boto3_client
 from botocore.client import ClientError, Config
 
 from audit.models import ExcelFile, SingleAuditReportFile
+
+logger = logging.getLogger(__name__)
 
 
 def get_filename(sac, file_type):
@@ -36,6 +40,7 @@ def file_exists(filename):
 
         return True
     except ClientError:
+        logger.warn(f"Unable to locate file {filename} in S3!")
         return False
 
 
