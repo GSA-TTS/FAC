@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
+{% load sprite_helper %}
 {% load field_name_to_label %}
 {% block content %}
     <div class="grid-container margin-top-6 margin-bottom-6">
@@ -14,35 +15,60 @@
                        data-threshold="1">
                 </aside>
                 <main id="summary-content">
-                    {% comment %} General Information {% endcomment %}
-                    <div id="title">
-                        <h1>{{ auditee_name }} ({{ auditee_uei }})</h1>
-                        <p class="margin-y-1">
-                            <strong>Report ID:</strong>{{ report_id }}
-                        </p>
-                        <p class="margin-y-1">
-                            <strong>Submission date:</strong>{{ general.submitted_date }}
-                        </p>
-                        <p class="margin-y-1">
-                            <strong>Fiscal Year:</strong>{{ general.fy_start_date }} to {{ general.fy_end_date }}
-                        </p>
-                    </div>
-                    <div id="general-information" class="margin-top-6">
-                        <h2>General Information</h2>
-                        <div class="position-relative overflow-scroll height-mobile border radius-lg">
-                            <div class="grid-row padding-2">
-                                {% for k, v in general.items %}
-                                    <p class="margin-y-1 desktop:grid-col-6">
-                                        <strong>{{ k|field_name_to_label }}:</strong> {{ v }}
-                                    </p>
-                                {% endfor %}
+                    {% comment %} Title {% endcomment %}
+                    <div class="grid-row" id="title">
+                        <div class="grid-col-12 tablet:grid-col-8">
+                            <legend class="usa-legend usa-legend--large font-sans-2xl">Single audit summary</legend>
+                            <legend class="usa-legend usa-legend--large text-normal font-sans-2xl margin-top-4">
+                                {{ auditee_name }} ({{ auditee_uei }})
+                            </legend>
+                            <div class="font-sans-lg">
+                                <p class="margin-bottom-1 margin-top-2">
+                                    <strong>Report ID:&nbsp;</strong>{{ report_id }}
+                                </p>
+                                <p class="margin-y-1">
+                                    <strong>Submission date:&nbsp;</strong>{{ general.submitted_date }}
+                                </p>
+                                <p class="margin-y-1">
+                                    <strong>Fiscal Year:&nbsp;</strong>{{ general.fy_start_date }} to {{ general.fy_end_date }}
+                                </p>
                             </div>
                         </div>
+                        <div class="grid-col-12 tablet:grid-col-4 tablet:display-flex flex-column tablet:flex-justify-end">
+                            <div class="font-sans-xl margin-0 flex-align-self-end margin-top-2">
+                                <a class="usa-link display-flex"
+                                   href="{% url 'dissemination:PdfDownload' report_id=report_id %}"
+                                   target="_blank">
+                                    PDF report
+                                    <svg class="usa-icon margin-left-1 flex-align-self-end"
+                                         aria-hidden="true"
+                                         role="img">
+                                        {% uswds_sprite "file_download" %}
+                                    </svg>
+                                </a>
+                            </div>
+                            {% comment %}
+                            When XLSX downloads are good to go, add this in and copy/paste as necessary.
+                            Potentially, run a for loop over the links given in context.
+
+                            <div class="font-sans-xl margin-0 flex-align-self-end margin-top-2">
+                                <a class="usa-link display-flex" href="{% url 'dissemination:<Specific File Path Here>' report_id=report_id %}" target="_blank">
+                                    XLSX workbook # or name
+                                    <svg class="usa-icon margin-left-1 flex-align-self-end" aria-hidden="true" role="img">
+                                        {% uswds_sprite "file_download" %}
+                                    </svg>
+                                </a>
+                            </div>
+                            {% endcomment %}
+                        </div>
                     </div>
+                    {% comment %} General Information {% endcomment %}
+                    {% include "./summary-general.html" %}
+                    {% comment %} Section data {% endcomment %}
                     {% for section_key, section_list in data.items %}
                         <div id="{{ section_key }}">
                             <span id="{{ section_key }}-title" class="grid-row margin-top-3">
-                                <h2>{{ section_key }}</h2>
+                                <h2 class="font-sans-2xl">{{ section_key }}</h2>
                                 <span class="text-base-light font-sans-lg display-flex flex-align-self-center margin-x-2">|</span>
                                 <span class="text-base font-sans-lg display-flex flex-align-self-center">{{ section_list|length }}</span>
                             </span>
@@ -50,7 +76,7 @@
                                 <table class="usa-table usa-table--striped overflow-scroll width-full">
                                     <thead id="{{ section_key }}-table__head">
                                         <tr>
-                                            {% for k in section_list.0 %}<th scope="col">{{ k|field_name_to_label }}</th>{% endfor %}
+                                            {% for k in section_list.0 %}<th scope="col">{{ k|field_name_to_label|upper }}</th>{% endfor %}
                                         </tr>
                                     </thead>
                                     <tbody id="{{ section_key }}-table__body">

@@ -109,6 +109,8 @@ class AuditSummaryView(View):
             x for x in awards.values()
         ]  # Take QuerySet to a list of objects
 
+        if notes_to_sefa.exists():
+            data["Notes to SEFA"] = [x for x in notes_to_sefa.values()]
         if passthrough_entities.exists():
             data["Passthrough Entities"] = [x for x in passthrough_entities.values()]
         if audit_findings.exists():
@@ -119,8 +121,6 @@ class AuditSummaryView(View):
             data["Corrective Action Plan"] = [
                 x for x in corrective_action_plan.values()
             ]
-        if notes_to_sefa.exists():
-            data["Notes"] = [x for x in notes_to_sefa.values()]
 
         for key in data:
             for item in data[key]:
