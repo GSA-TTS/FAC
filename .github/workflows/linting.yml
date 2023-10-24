@@ -111,6 +111,7 @@ jobs:
         uses: super-linter/super-linter/slim@v5
         env:
           VALIDATE_ALL_CODEBASE: false
+          MULTI_STATUS: true
           DEFAULT_BRANCH: main
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 

@@ -85,7 +85,7 @@ docker-lint:
 
 super-linter:
 	docker pull ghcr.io/super-linter/super-linter:latest
-	docker run --env-file super-linter.env -e RUN_LOCAL=true -e USE_FIND_ALGORITHM=true -e CREATE_LOG_FILE=true -e LOG_FILE=super-linter.log -v .:/tmp/lint ghcr.io/super-linter/super-linter
+	docker run --env-file super-linter.env -e RUN_LOCAL=true -e USE_FIND_ALGORITHM=true -e MULTI_STATUS=true -e CREATE_LOG_FILE=true -e LOG_FILE=super-linter.log -v .:/tmp/lint ghcr.io/super-linter/super-linter
 
 ghcr-first-run:
 	docker compose -f docker-compose-web.yml run web python manage.py makemigrations
