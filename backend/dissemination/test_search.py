@@ -175,7 +175,7 @@ class SearchGeneralTests(TestCase):
         baker.make(General, is_public=True, oversight_agency="01")
 
         results = search_general(
-            cog_or_oversight="Cognizant",
+            cog_or_oversight="cog",
             agency_name="01",
         )
 
@@ -194,7 +194,7 @@ class SearchGeneralTests(TestCase):
         baker.make(General, is_public=True, oversight_agency="02")
 
         results = search_general(
-            cog_or_oversight="Cognizant",
+            cog_or_oversight="cog",
             agency_name="01",
         )
 
