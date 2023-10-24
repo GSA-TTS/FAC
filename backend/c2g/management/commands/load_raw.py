@@ -31,6 +31,9 @@ class Command(BaseCommand):
         if not url and not src:
             logger.error("Remote or local zip file must be specified")
             return
+        if url:
+            print("Not yet implemented")
+            return
 
         folder, zip_file = self.get_folder_and_file(url, src)
         for file_name in zip_file.namelist():
@@ -41,12 +44,14 @@ class Command(BaseCommand):
 
     def get_folder_and_file(self, url, src):
         if url:
-            response = requests.get(url)
-            if response.status_code != 200:
-                logger.error(f"Unable to read from {url}. Response =  {response}")
-                return
-            folder = url.split("/")[-1]
-            zip_file = zipfile.ZipFile(io.BytesIO(response.content))
+            print("Not yet implemented")
+
+            # response = requests.get(url)
+            # if response.status_code != 200:
+            #     logger.error(f"Unable to read from {url}. Response =  {response}")
+            #     return
+            # folder = url.split("/")[-1]
+            # zip_file = zipfile.ZipFile(io.BytesIO(response.content))
 
         if src:
             folder = os.path.basename(src).split(".")[0]
