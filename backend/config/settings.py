@@ -171,7 +171,7 @@ DATABASES = {
         "DATABASE_URL", default="postgres://postgres:password@0.0.0.0/backend"
     ),
     "c2g-db": env.dj_db_url(
-        "DATABASE_URL_C2FDB", default="postgres://postgres:password@0.0.0.0/c2fdb"
+        "DATABASE_URL_C2G_DB", default="postgres://postgres:password@0.0.0.0/c2g-db"
     ),
 }
 
