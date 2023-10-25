@@ -26,7 +26,9 @@ This is implemented as a django app to leverage existing management commands and
 * load_raw.py - Read zip files providd by Census, and upload them to the S3 bucket. The basename of the zip file is used to create a folder in S3. The individual unzipped files are stored in the folder. There is an assumption that there are no sub-folders.
 * raw_to_pg.py - Inserts data into PG tables using the contents of the csv files in the S3 bucket. The first row of each file is assumed to have the column names (we convert to lowercase). The name of the table is determined by examining the name of the file. The sample source files do not have delimters for empty fields at the end of a line - so we assume these are nulls.
 
-```manage.py raw_to_pg --folder data
+```bash
+manage.py raw_to_pg --folder data
+manage.py raw_to_pg --clean True
 ```
 
 * models.py These ought to correspons to the incoming csv files
@@ -36,8 +38,7 @@ This is implemented as a django app to leverage existing management commands and
 
 ### Work in progress
 
-* Should raw_to_og have an option to delete all data. Is a folder name required, or should we load from all folders?
-* Yet to actually save all the data to the model
+* Is a folder name required, or should we load from all folders?
 * Meed to write more tests. Have  been doing mainly manual testing so far.
 
 ## Pre-requisites for

@@ -239,8 +239,8 @@ if ENVIRONMENT not in ["DEVELOPMENT", "PREVIEW", "STAGING", "PRODUCTION"]:
     MIDDLEWARE.append("whitenoise.middleware.WhiteNoiseMiddleware")
     DEFAULT_FILE_STORAGE = "report_submission.storages.S3PrivateStorage"
 
-    # Private C2F bucket
-    AWS_C2F_BUCKET_NAME = "fac-c2g-s3"  # TODO need to fix for CG
+    # Private C2g bucket
+    AWS_C2G_BUCKET_NAME = "fac-c2g-s3"  # TODO need to fix for CG
 
     # Private bucket
     AWS_PRIVATE_STORAGE_BUCKET_NAME = "gsa-fac-private-s3"
