@@ -31,7 +31,7 @@
          "single_cells": [
             {
                "format": "text",
-               "formula": "=\"1.0.0\"",
+               "formula": "=\"1.0.2\"",
                "help": {
                   "link": "https://fac.gov/documentation/validation/#plain_text",
                   "text": "Only plain text is allowed, no emoji, formatting, or other special additions"
@@ -137,9 +137,9 @@
          ]
       },
       {
-         "header_height": 100,
+         "header_height": 48,
          "hide_col_from": 4,
-         "name": "AdditionalNotes",
+         "name": "Form",
          "open_ranges": [
             {
                "help": {
@@ -186,24 +186,9 @@
                   "type": "list"
                },
                "width": 36
-            },
-            {
-               "formula": "=IF(A{0}<>\"\", ROW()-1, \"\")",
-               "help": {
-                  "link": "https://fac.gov/documentation/validation/#unknown",
-                  "text": "Please contact support"
-               },
-               "keep_locked": true,
-               "range_name": "seq_number",
-               "title": "Sequence number (Read Only)",
-               "title_cell": "D1",
-               "type": "open_range",
-               "validation": {
-                  "type": "NOVALIDATION"
-               },
-               "width": 18
             }
-         ]
+         ],
+         "row_height": 36
       }
    ],
    "title_row": 1

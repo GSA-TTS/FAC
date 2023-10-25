@@ -34,6 +34,15 @@
                                 <tr>
                                     <td>
                                         <a class="usa-link" href="{% url 'audit:SubmissionProgress' item.report_id %}">{{ item.submission_status }}</a>
+                                        {% if item.submission_status == "Ready For Certification" %}
+                                        <p class="margin-0">
+                                            <a class="usa-link" href="{% url 'audit:UnlockAfterCertification' item.report_id %}">
+                                                <svg class="usa-icon" aria-hidden="true" focusable="false" role="img">
+                                                    {% uswds_sprite "lock_open" %}	
+                                                </svg>
+                                            </a>
+                                        </p>
+                                        {% endif%}
                                     </td>
                                     <td>{{ item.auditee_name }}</td>
                                     <td>{{ item.report_id }}</td>
@@ -53,7 +62,16 @@
                 <div class="grid-row margin-bottom-6" tabindex="0">
                     <table class="usa-table margin-top-0 pa11y-ignore">
                         <caption class="text-normal">
-                            The audits listed below have been submitted to the FAC for processing and may not be edited.</caption>
+                            <p class="margin-0">The audits listed below are with the FAC for processing and can't be edited.</p>
+                            <ul>
+                                <li>
+                                    "Accepted" audits are complete and don't require further action by the auditee or auditor.
+                                </li>
+                                <li>
+                                    "Submitted" audits are being processed for dissemination. If an audit's status remains at "Submitted" for more than 24 hours, please <a class="usa-link" href="https://support.fac.gov/hc/en-us/requests/new" target="_blank">submit a helpdesk ticket</a>.
+                                </li>
+                            </ul>
+                        </caption>
                         <thead>
                             <tr>
                                 <th data-sortable scope="col" role="columnheader">Status</th>
@@ -72,7 +90,13 @@
                             {% for item in data.completed_audits %}
                                 <tr>
                                     <td>
-                                        <a class="usa-link" href="{% url 'audit:SubmissionProgress' item.report_id %}">{{ item.submission_status }}</a>
+                                        <a class="usa-link" href="{% url 'audit:SubmissionProgress' item.report_id %}">
+                                            {% if item.submission_status == "Disseminated" %}
+                                                Accepted
+                                            {% else %}
+                                                {{ item.submission_status }}
+                                            {% endif %}
+                                        </a>
                                     </td>
                                     <td>{{ item.auditee_name }}</td>
                                     <td>{{ item.report_id }}</td>

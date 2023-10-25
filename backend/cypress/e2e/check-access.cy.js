@@ -3,7 +3,6 @@ import { testValidAuditeeInfo } from '../support/auditee-info.js';
 import { addValidInfo, testValidAccess } from '../support/check-access.js';
 
 describe('Create New Audit', () => {
-
   beforeEach(() => {
     // contents of session are only called once
     cy.session('loginSession', () => {
@@ -136,7 +135,7 @@ describe('Create New Audit', () => {
     });
 
     describe('Auditor certifying official', () => {
-      
+
       describe('Full name', () => {
         it('should display an error message when left blank', () => {
           cy.get('#certifying_auditor_contact_fullname').click().blur();
@@ -238,7 +237,7 @@ describe('Create New Audit', () => {
     });
 
     describe('Auditee contacts', () => {
-      
+
       describe('Full name', () => {
         it('should display an error message when left blank', () => {
           cy.get('#auditee_contacts_fullname').click().blur();
@@ -346,7 +345,7 @@ describe('Create New Audit', () => {
     });
 
     describe('Auditor contacts', () => {
-      
+
       describe('Full name', () => {
         it('should display an error message when left blank', () => {
           cy.get('#auditor_contacts_fullname').click().blur();
@@ -372,7 +371,7 @@ describe('Create New Audit', () => {
           cy.get('button').contains('Create').should('not.be.disabled');
         });
       });
-      
+
       describe('Email Address', () => {
         it('should display an error message when left blank', () => {
           cy.get('#auditor_contacts_email').click().blur();

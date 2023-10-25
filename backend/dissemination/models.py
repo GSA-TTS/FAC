@@ -322,10 +322,12 @@ class General(models.Model):
     cognizant_agency = models.TextField(
         "Two digit Federal agency prefix of the cognizant agency",
         help_text=docs.cognizant_agency,
+        null=True,
     )
     oversight_agency = models.TextField(
         "Two digit Federal agency prefix of the oversight agency",
         help_text=docs.oversight_agency,
+        null=True,
     )
 
     # Dates

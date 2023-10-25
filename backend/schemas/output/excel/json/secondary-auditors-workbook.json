@@ -29,7 +29,7 @@
          "single_cells": [
             {
                "format": "text",
-               "formula": "=\"1.0.0\"",
+               "formula": "=\"1.0.2\"",
                "help": {
                   "link": "https://fac.gov/documentation/validation/#plain_text",
                   "text": "Only plain text is allowed, no emoji, formatting, or other special additions"
@@ -102,7 +102,7 @@
                "validation": {
                   "type": "NOVALIDATION"
                },
-               "width": 100
+               "width": 64
             },
             {
                "format": "text",
@@ -136,7 +136,7 @@
                "validation": {
                   "type": "NOVALIDATION"
                },
-               "width": 100
+               "width": 64
             },
             {
                "format": "text",
@@ -151,7 +151,7 @@
                "validation": {
                   "type": "NOVALIDATION"
                },
-               "width": 100
+               "width": 64
             },
             {
                "format": "text",
@@ -247,7 +247,8 @@
                },
                "width": 36
             }
-         ]
+         ],
+         "row_height": 36
       },
       {
          "name": "StateCodeLookup",

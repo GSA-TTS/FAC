@@ -185,7 +185,11 @@ class IntakeToDissemination(object):
         return cap_text_objects
 
     def load_notes(self):
-        sefa = self.single_audit_checklist.notes_to_sefa or {}
+        """
+        Transforms the notes_to_sefa contents into the structure required for
+        dissemination. This structure is a list of dissemination.models.Note instances.
+        """
+        sefa = self.single_audit_checklist.notes_to_sefa
         n2sefa = sefa.get("NotesToSefa", {})
         sefa_objects = []
         if n2sefa:
@@ -259,13 +263,19 @@ class IntakeToDissemination(object):
         return formatted_date
 
     def load_general(self):
+        """
+        Transforms general_information and other content into the structure required for
+        dissemination. This structure is a list with one entry, a
+        dissemination.models.General instance.
+        """
+
         general_information = self.single_audit_checklist.general_information
-        audit_information = self.single_audit_checklist.audit_information or {}
-        auditee_certification = self.single_audit_checklist.auditee_certification or {}
+        audit_information = self.single_audit_checklist.audit_information
+        auditee_certification = self.single_audit_checklist.auditee_certification
         # auditor_certification = self.single_audit_checklist.auditor_certification or {}
         tribal_data_consent = self.single_audit_checklist.tribal_data_consent or {}
-        cognizant_agency = self.single_audit_checklist.cognizant_agency or ""
-        oversight_agency = self.single_audit_checklist.oversight_agency or ""
+        cognizant_agency = self.single_audit_checklist.cognizant_agency
+        oversight_agency = self.single_audit_checklist.oversight_agency
 
         dates_by_status = self._get_dates_from_sac()
         status = self.single_audit_checklist.STATUS
@@ -276,12 +286,12 @@ class IntakeToDissemination(object):
             dates_by_status[status.SUBMITTED]
         )
         fac_accepted_date = submitted_date
-        auditee_certify_name = auditee_certification.get("auditee_signature", {}).get(
-            "auditee_name", ""
-        )
-        auditee_certify_title = auditee_certification.get("auditee_signature", {}).get(
-            "auditee_title", ""
-        )
+        auditee_certify_name = auditee_certification["auditee_signature"][
+            "auditee_name"
+        ]
+        auditee_certify_title = auditee_certification["auditee_signature"][
+            "auditee_title"
+        ]
 
         total_amount_expended = self.single_audit_checklist.federal_awards[
             "FederalAwards"

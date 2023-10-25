@@ -84,6 +84,13 @@ class SingleAuditChecklistTests(TestCase):
                 SingleAuditChecklist.STATUS.SUBMITTED,
                 "transition_to_submitted",
             ),
+            (
+                [
+                    SingleAuditChecklist.STATUS.READY_FOR_CERTIFICATION,
+                ],
+                SingleAuditChecklist.STATUS.IN_PROGRESS,
+                "transition_to_in_progress_again",
+            ),
         )
 
         now = datetime.now(timezone.utc)

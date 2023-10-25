@@ -1,0 +1,1500 @@
+[
+  {
+    "endpoint": "additional_eins",
+    "report_id": "2021TEST000134732",
+    "rows": [],
+    "singletons": {
+      "auditee_uei": "BADBADBADBAD"
+    }
+  },
+  {
+    "singletons": {
+      "auditee_uei": "BADBADBADBAD"
+    }
+  },
+  {
+    "endpoint": "corrective_action_plans",
+    "report_id": "2021TEST000134732",
+    "rows": [
+      {
+        "fields": [
+          "finding_ref_number",
+          "planned_action",
+          "contains_chart_or_table"
+        ],
+        "values": [
+          "2021-002",
+          "Foster Care Title IV-E  Assistance Listing No. 93.658Recommendation: We recommend that the County document ninety-day reviews within Trails in a timely manner to provide an accurate audit trail.Explanation of disagreement with audit finding: There is no disagreement with the audit finding.Action taken in response to finding: CFS staff are all trained in how to complete a ninety-day review in Trails.We will work with supervisors and division leaders to implement a data driven supervision model that will ensure that these reviews are completed timely.Name of the contact person responsible for corrective action: Tiffany SewellPlanned completion date for corrective action plan: December 31, 2022",
+          "N"
+        ]
+      },
+      {
+        "fields": [
+          "finding_ref_number",
+          "planned_action",
+          "contains_chart_or_table"
+        ],
+        "values": [
+          "2021-004",
+          "Coronavirus State and Local Fiscal Recovery Funds  Assistance Listing No. 21.027Recommendation: We recommend that the County have a review process of subrecipient agreements to ensure that all required information is included within the document.Explanation of disagreement with audit finding: There is no disagreement with the audit finding.Action taken in response to finding:. Subsequent to year end, the County modified the subaward to include the required information and ensured it was part of all future CSLFRF agreements. In addition, the County will create a standard subrecipient monitoring policy that will cover all programs, and will include standard forms and templates. This policy will require a secondary review that will confirm all required documentation has been provided to subrecipients.Name of the contact person responsible for corrective action: Tyra LitzauPlanned completion date for corrective action plan: April 30, 2023",
+          "N"
+        ]
+      },
+      {
+        "fields": [
+          "finding_ref_number",
+          "planned_action",
+          "contains_chart_or_table"
+        ],
+        "values": [
+          "2021-003",
+          "Emergency Rental Assistance Program (ERA)  Assistance Listing No. 21.023Recommendation: We recommend that the County utilize standard forms or templates to document verification that parties are not suspended or debarred prior to entering into a transaction with a subrecipient.Explanation of disagreement with audit finding: There is no disagreement with the audit finding.Action taken in response to finding: The County will create a standard subrecipient monitoring policy that will cover all County federal programs.Standard forms and templates will be included in the policy.Name of the contact person responsible for corrective action: Tyra LitzauPlanned completion date for corrective action plan: April 30, 2023",
+          "N"
+        ]
+      }
+    ],
+    "singletons": {
+      "auditee_uei": "BADBADBADBAD"
+    }
+  },
+  {
+    "endpoint": "federal_awards",
+    "report_id": "2021TEST000134732",
+    "rows": [
+      {
+        "fields": [
+          "federal_program_name",
+          "federal_program_total",
+          "cluster_total",
+          "is_loan",
+          "is_direct",
+          "is_passthrough_award",
+          "passthrough_amount",
+          "is_major",
+          "audit_report_type",
+          "findings_count",
+          "amount_expended"
+        ],
+        "values": [
+          "HEAD START",
+          4915359,
+          4915359,
+          "N",
+          "Y",
+          "N",
+          "",
+          "Y",
+          "U",
+          0,
+          4915359
+        ]
+      },
+      {
+        "fields": [
+          "federal_program_name",
+          "federal_program_total",
+          "cluster_total",
+          "is_loan",
+          "is_direct",
+          "is_passthrough_award",
+          "passthrough_amount",
+          "is_major",
+          "audit_report_type",
+          "findings_count",
+          "amount_expended"
+        ],
+        "values": [
+          "FOSTER CARE_TITLE IV-E",
+          7566210,
+          0,
+          "N",
+          "N",
+          "N",
+          "",
+          "Y",
+          "U",
+          1,
+          7566210
+        ]
+      },
+      {
+        "fields": [
+          "federal_program_name",
+          "federal_program_total",
+          "cluster_total",
+          "is_loan",
+          "is_direct",
+          "is_passthrough_award",
+          "passthrough_amount",
+          "is_major",
+          "audit_report_type",
+          "findings_count",
+          "amount_expended"
+        ],
+        "values": [
+          "ADOPTION ASSISTANCE - TITLE IV-E",
+          3006554,
+          0,
+          "N",
+          "N",
+          "N",
+          "",
+          "Y",
+          "U",
+          0,
+          3006554
+        ]
+      },
+      {
+        "fields": [
+          "federal_program_name",
+          "federal_program_total",
+          "cluster_total",
+          "is_loan",
+          "is_direct",
+          "is_passthrough_award",
+          "passthrough_amount",
+          "is_major",
+          "findings_count",
+          "amount_expended"
+        ],
+        "values": [
+          "SOCIAL SERVICES BLOCK GRANT",
+          2151719,
+          0,
+          "N",
+          "N",
+          "N",
+          "",
+          "N",
+          0,
+          2151719
+        ]
+      },
+      {
+        "fields": [
+          "federal_program_name",
+          "federal_program_total",
+          "cluster_total",
+          "is_loan",
+          "is_direct",
+          "is_passthrough_award",
+          "passthrough_amount",
+          "is_major",
+          "findings_count",
+          "amount_expended"
+        ],
+        "values": [
+          "JOHN H. CHAFEE FOSTER CARE PROGRAM FOR SUCCESSFUL TRANSITION TO ADULTHOOD",
+          235470,
+          0,
+          "N",
+          "N",
+          "N",
+          "",
+          "N",
+          0,
+          126722
+        ]
+      },
+      {
+        "fields": [
+          "federal_program_name",
+          "federal_program_total",
+          "cluster_total",
+          "is_loan",
+          "is_direct",
+          "is_passthrough_award",
+          "passthrough_amount",
+          "is_major",
+          "findings_count",
+          "amount_expended"
+        ],
+        "values": [
+          "COVID-19 JOHN H. CHAFEE FOSTER CARE PROGRAM FOR SUCCESSFUL TRANSITION TO ADULTHOOD",
+          235470,
+          0,
+          "N",
+          "N",
+          "N",
+          "",
+          "N",
+          0,
+          108748
+        ]
+      },
+      {
+        "fields": [
+          "federal_program_name",
+          "federal_program_total",
+          "cluster_total",
+          "is_loan",
+          "is_direct",
+          "is_passthrough_award",
+          "passthrough_amount",
+          "is_major",
+          "findings_count",
+          "amount_expended"
+        ],
+        "values": [
+          "COVID-19 ELDER ABUSE PREVENTION INTERVENTIONS PROGRAM",
+          5966,
+          0,
+          "N",
+          "N",
+          "N",
+          "",
+          "N",
+          0,
+          5966
+        ]
+      },
+      {
+        "fields": [
+          "federal_program_name",
+          "federal_program_total",
+          "cluster_total",
+          "is_loan",
+          "is_direct",
+          "is_passthrough_award",
+          "passthrough_amount",
+          "is_major",
+          "findings_count",
+          "amount_expended"
+        ],
+        "values": [
+          "MEDICAL ASSISTANCE PROGRAM (MEDICAID; TITLE XIX)",
+          6384798,
+          6384798,
+          "N",
+          "N",
+          "N",
+          "",
+          "N",
+          0,
+          6384798
+        ]
+      },
+      {
+        "fields": [
+          "federal_program_name",
+          "federal_program_total",
+          "cluster_total",
+          "is_loan",
+          "is_direct",
+          "is_passthrough_award",
+          "passthrough_amount",
+          "is_major",
+          "findings_count",
+          "amount_expended"
+        ],
+        "values": [
+          "COMMUNITY SERVICES BLOCK GRANT",
+          788959,
+          0,
+          "N",
+          "N",
+          "N",
+          "",
+          "N",
+          0,
+          356330
+        ]
+      },
+      {
+        "fields": [
+          "federal_program_name",
+          "federal_program_total",
+          "cluster_total",
+          "is_loan",
+          "is_direct",
+          "is_passthrough_award",
+          "passthrough_amount",
+          "is_major",
+          "findings_count",
+          "amount_expended"
+        ],
+        "values": [
+          "COVID-19 COMMUNITY SERVICES BLOCK GRANT",
+          788959,
+          0,
+          "N",
+          "N",
+          "N",
+          "",
+          "N",
+          0,
+          432629
+        ]
+      },
+      {
+        "fields": [
+          "federal_program_name",
+          "federal_program_total",
+          "cluster_total",
+          "is_loan",
+          "is_direct",
+          "is_passthrough_award",
+          "passthrough_amount",
+          "is_major",
+          "findings_count",
+          "amount_expended"
+        ],
+        "values": [
+          "SUPPLEMENTAL NUTRITION ASSISTANCE PROGRAM (SNAP)",
+          103189,
+          5452266,
+          "N",
+          "N",
+          "N",
+          "",
+          "N",
+          0,
+          103189
+        ]
+      },
+      {
+        "fields": [
+          "federal_program_name",
+          "federal_program_total",
+          "cluster_total",
+          "is_loan",
+          "is_direct",
+          "is_passthrough_award",
+          "passthrough_amount",
+          "is_major",
+          "findings_count",
+          "amount_expended"
+        ],
+        "values": [
+          "GUARDIANSHIP ASSISTANCE",
+          68479,
+          0,
+          "N",
+          "N",
+          "N",
+          "",
+          "N",
+          0,
+          68479
+        ]
+      },
+      {
+        "fields": [
+          "federal_program_name",
+          "federal_program_total",
+          "cluster_total",
+          "is_loan",
+          "is_direct",
+          "is_passthrough_award",
+          "passthrough_amount",
+          "is_major",
+          "findings_count",
+          "amount_expended"
+        ],
+        "values": [
+          "UNEMPLOYMENT INSURANCE",
+          18820,
+          0,
+          "N",
+          "N",
+          "N",
+          "",
+          "N",
+          0,
+          18820
+        ]
+      },
+      {
+        "fields": [
+          "federal_program_name",
+          "federal_program_total",
+          "cluster_total",
+          "is_loan",
+          "is_direct",
+          "is_passthrough_award",
+          "passthrough_amount",
+          "is_major",
+          "findings_count",
+          "amount_expended"
+        ],
+        "values": [
+          "STATE ADMINISTRATIVE MATCHING GRANTS FOR THE SUPPLEMENTAL NUTRITION ASSISTANCE PROGRAM",
+          5349077,
+          5452266,
+          "N",
+          "N",
+          "N",
+          "",
+          "N",
+          0,
+          5349077
+        ]
+      },
+      {
+        "fields": [
+          "federal_program_name",
+          "federal_program_total",
+          "cluster_total",
+          "is_loan",
+          "is_direct",
+          "is_passthrough_award",
+          "passthrough_amount",
+          "is_major",
+          "findings_count",
+          "amount_expended"
+        ],
+        "values": [
+          "CHILD AND ADULT CARE FOOD PROGRAM",
+          106936,
+          0,
+          "N",
+          "N",
+          "N",
+          "",
+          "N",
+          0,
+          106936
+        ]
+      },
+      {
+        "fields": [
+          "federal_program_name",
+          "federal_program_total",
+          "cluster_total",
+          "is_loan",
+          "is_direct",
+          "is_passthrough_award",
+          "passthrough_amount",
+          "is_major",
+          "findings_count",
+          "amount_expended"
+        ],
+        "values": [
+          "NATIONAL WILDLIFE REFUGE FUND",
+          114882,
+          0,
+          "N",
+          "Y",
+          "N",
+          "",
+          "N",
+          0,
+          114882
+        ]
+      },
+      {
+        "fields": [
+          "federal_program_name",
+          "federal_program_total",
+          "cluster_total",
+          "is_loan",
+          "is_direct",
+          "is_passthrough_award",
+          "passthrough_amount",
+          "is_major",
+          "findings_count",
+          "amount_expended"
+        ],
+        "values": [
+          "TRADE ADJUSTMENT ASSISTANCE",
+          84904,
+          0,
+          "N",
+          "N",
+          "N",
+          "",
+          "N",
+          0,
+          84904
+        ]
+      },
+      {
+        "fields": [
+          "federal_program_name",
+          "federal_program_total",
+          "cluster_total",
+          "is_loan",
+          "is_direct",
+          "is_passthrough_award",
+          "passthrough_amount",
+          "is_major",
+          "findings_count",
+          "amount_expended"
+        ],
+        "values": [
+          "TEMPORARY LABOR CERTIFICATION FOR FOREIGN WORKERS",
+          7958,
+          0,
+          "N",
+          "N",
+          "N",
+          "",
+          "N",
+          0,
+          7958
+        ]
+      },
+      {
+        "fields": [
+          "federal_program_name",
+          "federal_program_total",
+          "cluster_total",
+          "is_loan",
+          "is_direct",
+          "is_passthrough_award",
+          "passthrough_amount",
+          "is_major",
+          "findings_count",
+          "amount_expended"
+        ],
+        "values": [
+          "WIA ADULT PROGRAM",
+          734489,
+          1759623,
+          "N",
+          "N",
+          "N",
+          "",
+          "N",
+          0,
+          734489
+        ]
+      },
+      {
+        "fields": [
+          "federal_program_name",
+          "federal_program_total",
+          "cluster_total",
+          "is_loan",
+          "is_direct",
+          "is_passthrough_award",
+          "passthrough_amount",
+          "is_major",
+          "findings_count",
+          "amount_expended"
+        ],
+        "values": [
+          "WIA YOUTH ACTIVITIES",
+          605296,
+          1759623,
+          "N",
+          "N",
+          "N",
+          "",
+          "N",
+          0,
+          605296
+        ]
+      },
+      {
+        "fields": [
+          "federal_program_name",
+          "federal_program_total",
+          "cluster_total",
+          "is_loan",
+          "is_direct",
+          "is_passthrough_award",
+          "passthrough_amount",
+          "is_major",
+          "findings_count",
+          "amount_expended"
+        ],
+        "values": [
+          "WIA DISLOCATED WORKER FORMULA GRANTS",
+          419838,
+          1759623,
+          "N",
+          "N",
+          "N",
+          "",
+          "N",
+          0,
+          419838
+        ]
+      },
+      {
+        "fields": [
+          "federal_program_name",
+          "federal_program_total",
+          "cluster_total",
+          "is_loan",
+          "is_direct",
+          "is_passthrough_award",
+          "passthrough_amount",
+          "is_major",
+          "findings_count",
+          "amount_expended"
+        ],
+        "values": [
+          "EMPLOYMENT SERVICE/WAGNER-PEYSER FUNDED ACTIVITIES",
+          726405,
+          740405,
+          "N",
+          "N",
+          "N",
+          "",
+          "N",
+          0,
+          726405
+        ]
+      },
+      {
+        "fields": [
+          "federal_program_name",
+          "federal_program_total",
+          "cluster_total",
+          "is_loan",
+          "is_direct",
+          "is_passthrough_award",
+          "passthrough_amount",
+          "is_major",
+          "findings_count",
+          "amount_expended"
+        ],
+        "values": [
+          "PROMOTING SAFE AND STABLE FAMILIES",
+          241034,
+          0,
+          "N",
+          "N",
+          "N",
+          "",
+          "N",
+          0,
+          241034
+        ]
+      },
+      {
+        "fields": [
+          "federal_program_name",
+          "federal_program_total",
+          "cluster_total",
+          "is_loan",
+          "is_direct",
+          "is_passthrough_award",
+          "passthrough_amount",
+          "is_major",
+          "findings_count",
+          "amount_expended"
+        ],
+        "values": [
+          "DISABLED VETERAN'S OUTREACH PROGRAM (DVOP)",
+          14000,
+          740405,
+          "N",
+          "N",
+          "N",
+          "",
+          "N",
+          0,
+          14000
+        ]
+      },
+      {
+        "fields": [
+          "federal_program_name",
+          "federal_program_total",
+          "cluster_total",
+          "is_loan",
+          "is_direct",
+          "is_passthrough_award",
+          "passthrough_amount",
+          "is_major",
+          "findings_count",
+          "amount_expended"
+        ],
+        "values": [
+          "HOME INVESTMENT PARTNERSHIPS PROGRAM",
+          136993,
+          0,
+          "N",
+          "Y",
+          "Y",
+          124454,
+          "N",
+          0,
+          136993
+        ]
+      },
+      {
+        "fields": [
+          "federal_program_name",
+          "federal_program_total",
+          "cluster_total",
+          "is_loan",
+          "is_direct",
+          "is_passthrough_award",
+          "passthrough_amount",
+          "is_major",
+          "findings_count",
+          "amount_expended"
+        ],
+        "values": [
+          "COMMUNITY DEVELOPMENT BLOCK GRANTS/ENTITLEMENT GRANTS",
+          2203339,
+          2203339,
+          "N",
+          "Y",
+          "Y",
+          1050238,
+          "N",
+          0,
+          1623279
+        ]
+      },
+      {
+        "fields": [
+          "federal_program_name",
+          "federal_program_total",
+          "cluster_total",
+          "is_loan",
+          "is_direct",
+          "is_passthrough_award",
+          "passthrough_amount",
+          "is_major",
+          "findings_count",
+          "amount_expended"
+        ],
+        "values": [
+          "COMMUNITY DEVELOPMENT BLOCK GRANTS/ENTITLEMENT GRANTS",
+          2203339,
+          2203339,
+          "N",
+          "N",
+          "Y",
+          580060,
+          "N",
+          0,
+          580060
+        ]
+      },
+      {
+        "fields": [
+          "federal_program_name",
+          "federal_program_total",
+          "cluster_total",
+          "is_loan",
+          "is_direct",
+          "is_passthrough_award",
+          "passthrough_amount",
+          "is_major",
+          "findings_count",
+          "amount_expended"
+        ],
+        "values": [
+          "EMERGENCY MANAGEMENT PERFORMANCE GRANTS",
+          77000,
+          0,
+          "N",
+          "N",
+          "N",
+          "",
+          "N",
+          0,
+          77000
+        ]
+      },
+      {
+        "fields": [
+          "federal_program_name",
+          "federal_program_total",
+          "cluster_total",
+          "is_loan",
+          "is_direct",
+          "is_passthrough_award",
+          "passthrough_amount",
+          "is_major",
+          "findings_count",
+          "amount_expended"
+        ],
+        "values": [
+          "HOMELAND SECURITY GRANT PROGRAM",
+          5400,
+          0,
+          "N",
+          "N",
+          "N",
+          "",
+          "N",
+          0,
+          5400
+        ]
+      },
+      {
+        "fields": [
+          "federal_program_name",
+          "federal_program_total",
+          "cluster_total",
+          "is_loan",
+          "is_direct",
+          "is_passthrough_award",
+          "passthrough_amount",
+          "is_major",
+          "findings_count",
+          "amount_expended"
+        ],
+        "values": [
+          "COVID-19 CORONAVIRUS EMERGENCY SUPPLEMENTAL FUNDING PROGRAM",
+          153439,
+          0,
+          "N",
+          "Y",
+          "N",
+          "",
+          "N",
+          0,
+          153439
+        ]
+      },
+      {
+        "fields": [
+          "federal_program_name",
+          "federal_program_total",
+          "cluster_total",
+          "is_loan",
+          "is_direct",
+          "is_passthrough_award",
+          "passthrough_amount",
+          "is_major",
+          "findings_count",
+          "amount_expended"
+        ],
+        "values": [
+          "CRIME VICTIM ASSISTANCE",
+          251746,
+          0,
+          "N",
+          "N",
+          "N",
+          "",
+          "N",
+          0,
+          251746
+        ]
+      },
+      {
+        "fields": [
+          "federal_program_name",
+          "federal_program_total",
+          "cluster_total",
+          "is_loan",
+          "is_direct",
+          "is_passthrough_award",
+          "passthrough_amount",
+          "is_major",
+          "findings_count",
+          "amount_expended"
+        ],
+        "values": [
+          "CRIME VICTIM COMPENSATION",
+          738295,
+          0,
+          "N",
+          "N",
+          "N",
+          "",
+          "N",
+          0,
+          738295
+        ]
+      },
+      {
+        "fields": [
+          "federal_program_name",
+          "federal_program_total",
+          "cluster_total",
+          "is_loan",
+          "is_direct",
+          "is_passthrough_award",
+          "passthrough_amount",
+          "is_major",
+          "findings_count",
+          "amount_expended"
+        ],
+        "values": [
+          "EDWARD BYRNE MEMORIAL JUSTICE ASSISTANCE GRANT PROGRAM",
+          10275,
+          0,
+          "N",
+          "N",
+          "N",
+          "",
+          "N",
+          0,
+          10275
+        ]
+      },
+      {
+        "fields": [
+          "federal_program_name",
+          "federal_program_total",
+          "cluster_total",
+          "is_loan",
+          "is_direct",
+          "is_passthrough_award",
+          "passthrough_amount",
+          "is_major",
+          "findings_count",
+          "amount_expended"
+        ],
+        "values": [
+          "TEMPORARY ASSISTANCE FOR NEEDY FAMILIES",
+          14172941,
+          0,
+          "N",
+          "N",
+          "N",
+          "",
+          "N",
+          0,
+          14172941
+        ]
+      },
+      {
+        "fields": [
+          "federal_program_name",
+          "federal_program_total",
+          "cluster_total",
+          "is_loan",
+          "is_direct",
+          "is_passthrough_award",
+          "passthrough_amount",
+          "is_major",
+          "findings_count",
+          "amount_expended"
+        ],
+        "values": [
+          "AIRPORT IMPROVEMENT PROGRAM",
+          382659,
+          0,
+          "N",
+          "Y",
+          "N",
+          "",
+          "N",
+          0,
+          313659
+        ]
+      },
+      {
+        "fields": [
+          "federal_program_name",
+          "federal_program_total",
+          "cluster_total",
+          "is_loan",
+          "is_direct",
+          "is_passthrough_award",
+          "passthrough_amount",
+          "is_major",
+          "findings_count",
+          "amount_expended"
+        ],
+        "values": [
+          "COVID-19 AIRPORT IMPROVEMENT PROGRAM",
+          382659,
+          0,
+          "N",
+          "Y",
+          "N",
+          "",
+          "N",
+          0,
+          69000
+        ]
+      },
+      {
+        "fields": [
+          "federal_program_name",
+          "federal_program_total",
+          "cluster_total",
+          "is_loan",
+          "is_direct",
+          "is_passthrough_award",
+          "passthrough_amount",
+          "is_major",
+          "findings_count",
+          "amount_expended"
+        ],
+        "values": [
+          "NATIONAL PRIORITY SAFETY PROGRAMS",
+          69082,
+          69082,
+          "N",
+          "N",
+          "N",
+          "",
+          "N",
+          0,
+          69082
+        ]
+      },
+      {
+        "fields": [
+          "federal_program_name",
+          "federal_program_total",
+          "cluster_total",
+          "is_loan",
+          "is_direct",
+          "is_passthrough_award",
+          "passthrough_amount",
+          "is_major",
+          "audit_report_type",
+          "findings_count",
+          "amount_expended"
+        ],
+        "values": [
+          "COVID-19 EMERGENCY RENTAL ASSISTANCE PROGRAM",
+          19963940,
+          0,
+          "N",
+          "Y",
+          "Y",
+          19963940,
+          "Y",
+          "U",
+          1,
+          19963940
+        ]
+      },
+      {
+        "fields": [
+          "federal_program_name",
+          "federal_program_total",
+          "cluster_total",
+          "is_loan",
+          "is_direct",
+          "is_passthrough_award",
+          "passthrough_amount",
+          "is_major",
+          "audit_report_type",
+          "findings_count",
+          "amount_expended"
+        ],
+        "values": [
+          "COVID-19 CORONAVIRUS STATE AND LOCAL FISCAL RECOVERY FUNDS",
+          1235126,
+          0,
+          "N",
+          "Y",
+          "Y",
+          16382,
+          "Y",
+          "U",
+          1,
+          1228727
+        ]
+      },
+      {
+        "fields": [
+          "federal_program_name",
+          "federal_program_total",
+          "cluster_total",
+          "is_loan",
+          "is_direct",
+          "is_passthrough_award",
+          "passthrough_amount",
+          "is_major",
+          "audit_report_type",
+          "findings_count",
+          "amount_expended"
+        ],
+        "values": [
+          "COVID-19 CORONAVIRUS STATE AND LOCAL FISCAL RECOVERY FUNDS",
+          1235126,
+          0,
+          "N",
+          "N",
+          "N",
+          "",
+          "Y",
+          "U",
+          1,
+          6399
+        ]
+      },
+      {
+        "fields": [
+          "federal_program_name",
+          "federal_program_total",
+          "cluster_total",
+          "is_loan",
+          "is_direct",
+          "is_passthrough_award",
+          "passthrough_amount",
+          "is_major",
+          "findings_count",
+          "amount_expended"
+        ],
+        "values": [
+          "COVID-19 CORONAVIRUS RELIEF FUND",
+          145322,
+          0,
+          "N",
+          "N",
+          "N",
+          "",
+          "N",
+          0,
+          145322
+        ]
+      },
+      {
+        "fields": [
+          "federal_program_name",
+          "federal_program_total",
+          "cluster_total",
+          "is_loan",
+          "is_direct",
+          "is_passthrough_award",
+          "passthrough_amount",
+          "is_major",
+          "findings_count",
+          "amount_expended"
+        ],
+        "values": [
+          "HIGH INTENSITY DRUG TRAFFICKING AREAS PROGRAM",
+          565156,
+          0,
+          "N",
+          "N",
+          "N",
+          "",
+          "N",
+          0,
+          565156
+        ]
+      },
+      {
+        "fields": [
+          "federal_program_name",
+          "federal_program_total",
+          "cluster_total",
+          "is_loan",
+          "is_direct",
+          "is_passthrough_award",
+          "passthrough_amount",
+          "is_major",
+          "findings_count",
+          "amount_expended"
+        ],
+        "values": [
+          "CHILD SUPPORT ENFORCEMENT",
+          4696180,
+          0,
+          "N",
+          "N",
+          "N",
+          "",
+          "N",
+          0,
+          4696180
+        ]
+      },
+      {
+        "fields": [
+          "federal_program_name",
+          "federal_program_total",
+          "cluster_total",
+          "is_loan",
+          "is_direct",
+          "is_passthrough_award",
+          "passthrough_amount",
+          "is_major",
+          "findings_count",
+          "amount_expended"
+        ],
+        "values": [
+          "LOW-INCOME HOME ENERGY ASSISTANCE",
+          4285281,
+          0,
+          "N",
+          "N",
+          "N",
+          "",
+          "N",
+          0,
+          4285281
+        ]
+      },
+      {
+        "fields": [
+          "federal_program_name",
+          "federal_program_total",
+          "cluster_total",
+          "is_loan",
+          "is_direct",
+          "is_passthrough_award",
+          "passthrough_amount",
+          "is_major",
+          "findings_count",
+          "amount_expended"
+        ],
+        "values": [
+          "CHILD CARE AND DEVELOPMENT BLOCK GRANT",
+          4412653,
+          10077149,
+          "N",
+          "N",
+          "N",
+          "",
+          "N",
+          0,
+          4412653
+        ]
+      },
+      {
+        "fields": [
+          "federal_program_name",
+          "federal_program_total",
+          "cluster_total",
+          "is_loan",
+          "is_direct",
+          "is_passthrough_award",
+          "passthrough_amount",
+          "is_major",
+          "findings_count",
+          "amount_expended"
+        ],
+        "values": [
+          "CHILD CARE MANDATORY AND MATCHING FUNDS OF THE CHILD CARE AND DEVELOPMENT FUND",
+          5664496,
+          10077149,
+          "N",
+          "N",
+          "N",
+          "",
+          "N",
+          0,
+          5664496
+        ]
+      },
+      {
+        "fields": [
+          "federal_program_name",
+          "federal_program_total",
+          "cluster_total",
+          "is_loan",
+          "is_direct",
+          "is_passthrough_award",
+          "passthrough_amount",
+          "is_major",
+          "findings_count",
+          "amount_expended"
+        ],
+        "values": [
+          "STEPHANIE TUBBS JONES CHILD WELFARE SERVICES PROGRAM",
+          452240,
+          0,
+          "N",
+          "N",
+          "N",
+          "",
+          "N",
+          0,
+          452240
+        ]
+      }
+    ],
+    "singletons": {
+      "auditee_uei": "BADBADBADBAD",
+      "total_amount_expended": 93271905
+    }
+  },
+  {
+    "endpoint": "findings_text",
+    "report_id": "2021TEST000134732",
+    "rows": [
+      {
+        "fields": [
+          "finding_ref_number",
+          "finding_text",
+          "contains_chart_or_table"
+        ],
+        "values": [
+          "2021-003",
+          "Criteria or specific requirement: Non-Federal entities are prohibited from contracting with or making subawards under covered transactions to parties that are suspended or debarred. Covered transactions include contracts for goods and services awarded under a non-procurement transaction (e.g., grant or cooperative agreement) that are expected to equal or exceed $25,000 or meet certain other criteria as specified in 2 CFR section 180.220. All non-procurement transactions entered into by a passthrough entity (i.e., subawards to subrecipients), irrespective of award amount, are considered covered transactions, unless they are exempt as provided in 2 CFR section 180.215. When a non-Federal entity enters into a covered transaction with an entity at a lower tier, the non-Federal entity must verify that the entity, as defined in 2 CFR section 180.995 and agency adopting regulations, is not suspended or debarred or otherwise excluded from participating in the transaction. This verification may be accomplished by (1) checking SAM exclusions, (2) collecting a certification from the entity, or (3) adding a clause or condition to the covered transaction with that entity (2 CFR section 180.300). Condition: During our testing of internal control over suspension and debarment for ERA, we noted the County did not have effective control over compliance. Questioned costs: None noted Context: When entering into a covered transaction with an entity, the County is required to verify that the entity is not suspended or debarred prior to entering into the transaction. In our sample of four cases, there were three instances where the County did not have evidence of verification the entity was not suspended or debarred prior to entering into a covered transaction. The County did provide evidence that the verification occurred subsequent to payment and prior to year-end. Cause: The County did not have adequate controls in place to prevent it from entering into covered transactions with entities that may be suspended or debarred. Effect: The County could inappropriately disburse program funds to an entity that is suspended or disbarred. Repeat Finding: No Recommendation: We recommend that the County utilize standard forms or templates to document verification that parties are not suspended or debarred prior to entering into a covered transaction with a subrecipient. Views of responsible officials: There is no disagreement with the audit finding. ",
+          "N"
+        ]
+      },
+      {
+        "fields": [
+          "finding_ref_number",
+          "finding_text",
+          "contains_chart_or_table"
+        ],
+        "values": [
+          "2021-002",
+          "Criteria or specific requirement: Recipients of federal awards are required to establish and maintain effective internal control over the federal award that provides reasonable assurance that the non-federal entity is managing the federal award in compliance with federal statutes, regulations, and the terms and conditions of the federal award (2 CFR 200.303). Condition: During our testing of internal control over eligibility for Foster Care, we noted the County did not have effective control over compliance. Questioned costs: None noted Context: The internal control process for Adams County is that supervisors meet with case managers every 90 days. The case workers then record the review date in Trails (Colorados statewide automatic child welfare information system) and include relevant case data (completeness, any open notes, etc). From a sample of forty cases, there were six instances within five cases where the ninety-day reviews were not being performed timely. Non-timely reviews ranged from 2 days to 6 months. Cause: Case workers are not entering documentation of ninety-day reviews into Trails in a timely manner. Effect: If cases are not reviewed timely, Adams County is at risk to pay foster care benefits to an ineligible recipient. Repeat Finding: No Recommendation: We recommend that the County document ninety-day reviews within Trails in a timely manner to provide an accurate audit trail. Views of responsible officials: There is no disagreement with the audit finding. ",
+          "N"
+        ]
+      },
+      {
+        "fields": [
+          "finding_ref_number",
+          "finding_text",
+          "contains_chart_or_table"
+        ],
+        "values": [
+          "2021-004",
+          "Criteria or specific requirement: All pass-through entities must: (a) Ensure that every subaward is clearly identified to the subrecipient as a subaward and includes the following information at the time of the subaward and if any of these data elements change, include the changes in subsequent subaward modification. When some of this information is not available, the pass-through entity must provide the best information available to describe the Federal award and subaward. Required information includes: (1) Federal award identification. (i) Subrecipient name (which must match the name associated with its unique entity identifier); (ii) Subrecipient's unique entity identifier; (iii) Federal Award Identification Number (FAIN); (iv) Federal Award Date (see the definition of Federal award date in  200.1 of this part) of award to the recipient by the Federal agency; (v) Subaward Period of Performance Start and End Date; (vi) Subaward Budget Period Start and End Date; (vii) Amount of Federal Funds Obligated by this action by the pass-through entity to the subrecipient; (viii) Total Amount of Federal Funds Obligated to the subrecipient by the pass-through entity including the current financial obligation; (ix) Total Amount of the Federal Award committed to the subrecipient by the pass-through entity; (x) Federal award project description, as required to be responsive to the Federal Funding Accountability and Transparency Act (FFATA); (xi) Name of Federal awarding agency, pass-through entity, and contact information for awarding official of the Pass-through entity; (xii) Assistance Listings number and Title; the pass-through entity must identify the dollar amount made available under each Federal award and the Assistance Listings Number at time of disbursement; (xiii) Identification of whether the award is R&D; and (xiv) Indirect cost rate for the Federal award (including if the de minimis rate is charged) per  200.414. (2 CFR 200.332)Condition: During our testing of internal control over subrecipient monitoring for CSLFRF, we noted the County did not have effective control over compliance. Questioned costs: None noted Context: When entering into an agreement with a subrecipient, the County is required to make the subrecipient aware of the award information and requirements imposed by laws, regulations, and the provisions of contracts or grant agreements. In our testing of one subrecipient agreement, it was missing all the required subaward information. The County did provide evidence that an amended subaward was made subsequent to year-end that had all of the required subaward information. Cause: The County did not have adequate controls in place to ensure all required information is included in subrecipient agreements. Effect: The Countys subrecipient could be unaware the award is made with federal dollars and not fully understand the requirements that need to be met. Repeat Finding: No Recommendation: We recommend that the County have a review process of subrecipient agreements to ensure that all required information is included within the document. Views of responsible officials: There is no disagreement with the audit finding. ",
+          "N"
+        ]
+      }
+    ],
+    "singletons": {
+      "auditee_uei": "BADBADBADBAD"
+    }
+  },
+  {
+    "endpoint": "findings",
+    "report_id": "2021TEST000134732",
+    "rows": [
+      {
+        "fields": [
+          "type_requirement",
+          "reference_number",
+          "is_modified_opinion",
+          "is_other_matters",
+          "is_material_weakness",
+          "is_significant_deficiency",
+          "is_other_findings",
+          "is_questioned_costs",
+          "is_repeat_finding",
+          "award_reference"
+        ],
+        "values": [
+          "E",
+          "2021-002",
+          "N",
+          "N",
+          "N",
+          "Y",
+          "N",
+          "N",
+          "N",
+          "AWARD-0002"
+        ]
+      },
+      {
+        "fields": [
+          "type_requirement",
+          "reference_number",
+          "is_modified_opinion",
+          "is_other_matters",
+          "is_material_weakness",
+          "is_significant_deficiency",
+          "is_other_findings",
+          "is_questioned_costs",
+          "is_repeat_finding",
+          "award_reference"
+        ],
+        "values": [
+          "I",
+          "2021-003",
+          "N",
+          "Y",
+          "N",
+          "Y",
+          "N",
+          "N",
+          "N",
+          "AWARD-0038"
+        ]
+      },
+      {
+        "fields": [
+          "type_requirement",
+          "reference_number",
+          "is_modified_opinion",
+          "is_other_matters",
+          "is_material_weakness",
+          "is_significant_deficiency",
+          "is_other_findings",
+          "is_questioned_costs",
+          "is_repeat_finding",
+          "award_reference"
+        ],
+        "values": [
+          "M",
+          "2021-004",
+          "N",
+          "Y",
+          "N",
+          "Y",
+          "N",
+          "N",
+          "N",
+          "AWARD-0039"
+        ]
+      },
+      {
+        "fields": [
+          "type_requirement",
+          "reference_number",
+          "is_modified_opinion",
+          "is_other_matters",
+          "is_material_weakness",
+          "is_significant_deficiency",
+          "is_other_findings",
+          "is_questioned_costs",
+          "is_repeat_finding",
+          "award_reference"
+        ],
+        "values": [
+          "M",
+          "2021-004",
+          "N",
+          "Y",
+          "N",
+          "Y",
+          "N",
+          "N",
+          "N",
+          "AWARD-0040"
+        ]
+      }
+    ],
+    "singletons": {}
+  },
+  {
+    "endpoint": "notes_to_sefa",
+    "report_id": "2021TEST000134732",
+    "rows": [
+      {
+        "fields": [
+          "title",
+          "content"
+        ],
+        "values": [
+          "BASIS OF PRESENTATION",
+          "The accompanying schedule of expenditures of federal awards (the Schedule) includes the federal award activity of the County under programs of the federal government for the year ended December 31, 2021. The information in this Schedule is presented in accordance with the requirements of 2 CFR Part 200, Uniform Administrative Requirements, Cost Principles, and Audit Requirements for Federal Awards (Uniform Guidance). Because the Schedule presents only a selected portion of the operations of the County, it is not intended to and does not represent the financial position, changes in net position, or cash flows of the County."
+        ]
+      },
+      {
+        "fields": [
+          "title",
+          "content"
+        ],
+        "values": [
+          "OTHER INFORMATION",
+          "The County participates in the Food Assistance Benefits / EBT program under ALN 10.551. The County performs some administrative duties on behalf of the State. The State distributes $217,125,754 in benefits, which are not reflected on the Schedule of the County, as the programs compliance requirements are the responsibility of the State."
+        ]
+      }
+    ],
+    "singletons": {
+      "accounting_policies": "Expenditures reported on the Schedule are reported on the accrual basis of accounting. Such expenditures are recognized following the cost principles contained in the Uniform Guidance for all awards with the exception of assistance listing number (ALN) 21.019, which follows criteria determined by the Department of Treasury for allowability of costs. Under these principles, certain types of expenditures are not allowable or are limited as to reimbursement. Negative amounts shown on the Schedule represent adjustments or credits made in the normal course of business to amounts reported as expenditures in prior years. Amounts reported in the Schedule are recognized on a modified accrual basis when they become a demand on current available federal resources and eligibility requirements are met, except in the following programs, which are reported in the Schedule on a cash basis:Guardianship Assistance (IVE Relative) 93.090Promoting Safe and Stable Families 93.556Temporary Assistance for Needy Families 93.558Child Support Enforcement93.563LowIncome Home Energy Assistance 93.568Child Care and Development Fund Cluster 93.575, 93.596Child Welfare Services Program 93.645Foster CareTitle IVE 93.658Adoption Assistance 93.659Social Services Block Grant 93.667John H. Chafee Foster Care Program 93.674 COVID19 Elder Abuse Prevention Interventions Program 93.747 Medicaid Cluster 93.778Supplemental Nutrition Assistance Program Cluster 10.551, 10.561",
+      "auditee_uei": "BADBADBADBAD",
+      "is_minimis_rate_used": "N",
+      "rate_explained": "The County has not elected to use the 10% de minimis indirect cost rate except for ALN 93.569, as allowed under the Uniform Guidance."
+    }
+  },
+  {
+    "endpoint": "secondary_auditor",
+    "report_id": "2021TEST000134732",
+    "rows": [],
+    "singletons": {
+      "auditee_uei": "BADBADBADBAD"
+    }
+  }
+]

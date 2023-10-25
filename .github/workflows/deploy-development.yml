@@ -66,3 +66,11 @@ jobs:
     with:
       url: "https://fac-dev.app.cloud.gov/"
 
+  generate-e2e-test-data:
+    needs:
+      - deploy-dev
+    name: 
+    uses: ./.github/workflows/end-to-end-test-data-generator.yml
+    secrets: inherit
+    with:
+      environment: "dev"
