@@ -60,6 +60,37 @@ mappings = [
 ]
 
 
+def _get_findings_grid(findings_list):
+    # The original copy of allowed_combos is in audit/intakelib/checks/check_findings_grid_validation.py
+    allowed_combos = {
+        "YNNNN",
+        "YNYNN",
+        "YNNYN",
+        "NYNNN",
+        "NYYNN",
+        "NYNYN",
+        "NNYNN",
+        "NNNYN",
+        "NNNNY",
+    }
+
+    attributes = [
+        "modifiedopinion",
+        "othernoncompliance",
+        "materialweakness",
+        "significantdeficiency",
+        "otherfindings",
+    ]
+
+    return [
+        "Y"
+        if "".join((getattr(finding, attr, "") or "").strip() for attr in attributes)
+        in allowed_combos
+        else "N"
+        for finding in findings_list
+    ]
+
+
 def generate_findings(dbkey, year, outfile):
     logger.info(f"--- generate findings {dbkey} {year} ---")
     Gen = dynamic_import("Gen", year)
@@ -88,6 +119,9 @@ def generate_findings(dbkey, year, outfile):
     map_simple_columns(wb, mappings, findings)
     set_range(wb, "award_reference", award_references)
 
+    grid = _get_findings_grid(findings)
+    # We need a magic "is_valid" column, which is computed in the workbook.
+    set_range(wb, "is_valid", grid, conversion_fun=str)
     wb.save(outfile)
 
     table = generate_dissemination_test_table(
