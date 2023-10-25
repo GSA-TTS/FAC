@@ -28,7 +28,7 @@ def file_exists(filename):
         region_name=settings.AWS_S3_PRIVATE_REGION_NAME,
         aws_access_key_id=settings.AWS_PRIVATE_ACCESS_KEY_ID,
         aws_secret_access_key=settings.AWS_PRIVATE_SECRET_ACCESS_KEY,
-        endpoint_url=settings.AWS_S3_PRIVATE_ENDPOINT,
+        endpoint_url=settings.AWS_S3_PRIVATE_INTERNAL_ENDPOINT,
         config=Config(signature_version="s3v4"),
     )
 
