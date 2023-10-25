@@ -31,13 +31,13 @@ $$
 
 -- This is the description
 COMMENT ON SCHEMA api_v1_0_3 IS
-    'The FAC dissemation API version 1.0.2.'
+    'The FAC dissemation API version 1.0.3.'
 ;
 
 -- https://postgrest.org/en/stable/references/api/openapi.html
 -- This is the title
 COMMENT ON SCHEMA api_v1_0_3 IS
-$$v1.0.2
+$$v1.0.3
 
 A RESTful API that serves data from the SF-SAC.$$;
 

@@ -255,8 +255,11 @@ create view api_v1_0_3.general as
         gen.data_source,
         gen.is_aicpa_audit_guide_included,
         gen.is_additional_ueis
+        aud.general_information -> 'multiple_eins_covered' as is_multiple_eins,
+        aud.general_information -> 'secondary_auditors_exist' as is_secondary_auditors
     from
-        dissemination_General gen
+        dissemination_General gen,
+        audit_singleauditchecklist aud
     where
         (gen.is_public = true)
         or (gen.is_public = false and has_tribal_data_access())
