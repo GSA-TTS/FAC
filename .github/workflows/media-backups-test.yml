@@ -1,0 +1,58 @@
+---
+name: Test Media Backups on Dev
+on:
+  workflow_dispatch:
+    inputs:
+      choice:
+        type: choice
+        description: Select Environment
+        options:
+          - dev
+
+jobs:
+  backup-media:
+    name: Test Media Backups
+    runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.choice }}
+    env:
+      space: ${{ github.event.inputs.choice }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Unbind the private s3 bucket
+        uses: cloud-gov/cg-cli-tools@main
+        with:
+          cf_username: ${{ secrets.CF_USERNAME }}
+          cf_password: ${{ secrets.CF_PASSWORD }}
+          cf_org: gsa-tts-oros-fac
+          cf_space: ${{ env.space }}
+          command: cf unbind-service gsa-fac fac-private-s3
+
+      - name: Rebind the private s3 bucket with backups bucket as an additional instance
+        uses: cloud-gov/cg-cli-tools@main
+        with:
+          cf_username: ${{ secrets.CF_USERNAME }}
+          cf_password: ${{ secrets.CF_PASSWORD }}
+          cf_org: gsa-tts-oros-fac
+          cf_space: ${{ env.space }}
+          command: |
+            cf bind-service gsa-fac fac-private-s3 -c '{"additional_instances": ["backups"]}'
+
+      - name: Restart the app
+        uses: cloud-gov/cg-cli-tools@main
+        with:
+          cf_username: ${{ secrets.CF_USERNAME }}
+          cf_password: ${{ secrets.CF_PASSWORD }}
+          cf_org: gsa-tts-oros-fac
+          cf_space: ${{ env.space }}
+          command: cf restart gsa-fac
+
+      - name: Backup media files
+        uses: cloud-gov/cg-cli-tools@main
+        with:
+          cf_username: ${{ secrets.CF_USERNAME }}
+          cf_password: ${{ secrets.CF_PASSWORD }}
+          cf_org: gsa-tts-oros-fac
+          cf_space: ${{ env.space }}
+          command: cf run-task gsa-fac -k 2G -m 2G --name media_backup --command "./s3-sync.sh"
