@@ -1,5 +1,10 @@
+<<<<<<< HEAD
+SEQ_NUMBER,DBKEY,AUDITYEAR,FINDINGREFNUMS,TEXT,CHARTSTABLES,REPORTID,VERSION,UEI,MULTIPLEUEIS
+37761,204281,2021,2021-001,"U.S. Department of Agriculture – Passed-through the NYS Education Department
+=======
 ,SEQ_NUMBER,DBKEY,AUDITYEAR,FINDINGREFNUMS,TEXT,CHARTSTABLES,REPORTID,VERSION,UEI,MULTIPLEUEIS
 9995,37761,204281,2021,2021-001,"U.S. Department of Agriculture – Passed-through the NYS Education Department
+>>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 Summer Food Service Program for Children (Cash Assistance); Assistance Listing Number 10.559; Grant Period – Fiscal Year Ended June 30, 2021
 
 Significant Deficiency
@@ -15,7 +20,11 @@ Recommendation: We recommend that the District have an individual other than the
 
 District’s Response: The District’s response is included in their corrective plan.    
 ",N,932471,1,,
+<<<<<<< HEAD
+34918,252670,2021,2021-002,"Finding 2021-002: Subrecipient Monitoring
+=======
 10483,34918,252670,2021,2021-002,"Finding 2021-002: Subrecipient Monitoring
+>>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 
 Federal Programs: All Programs
 
@@ -38,7 +47,11 @@ Documentation of the grantee’s internal controls, accounting system, sophistic
 A regularly documented review process with respect to periodic financial reports received from grantees, with a reconciliation of cumulative cash sent against cash reports (and any bank statements) furnished by the grantee. 
 Payment requests made by grantees should be accompanied by supporting documentation such as profit and loss statement for the grant period, and receipts.
 Receipt of the grantee’s annual audit reports, if available (to ensure there are no weaknesses or deficiencies in internal control during the grant period).",N,924559,1,,
+<<<<<<< HEAD
+34919,252670,2021,2021-001,"Finding 2021-001: Accounting System
+=======
 10484,34919,252670,2021,2021-001,"Finding 2021-001: Accounting System
+>>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 
 Federal Programs: All Programs
 
@@ -61,7 +74,11 @@ Effective control over, and accountability for, all funds, property, and other a
 Comparison of expenditures with budget amounts for each Federal award. 
 
 We also recommend that the implementation of the new accounting software be formalized in writing and incorporated into the accounting policies and procedures manual.",N,924559,1,,
+<<<<<<< HEAD
+41002,26716,2021,2021-001,"Finding 2021-001:  Matching Requirements
+=======
 10513,41002,26716,2021,2021-001,"Finding 2021-001:  Matching Requirements
+>>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 
 Social Security Administration - Work Incentives Planning and Assistance Program (ALN 96.008) Grant numbers: WIP15050413-05-00, WIP15050413-06-00, and WIP21050545-01-00 Match.
 
@@ -79,7 +96,11 @@ Recommendation: We recommend that management recalculate match based on actual c
 
 Views of Responsible Officials:  Management agrees with the finding.
 ",N,934034,1,,
+<<<<<<< HEAD
+55611,258004,2021,2021-001,"Finding 2021-001 Material Weakness in Internal Control; Material Noncompliance - Reporting 
+=======
 10757,55611,258004,2021,2021-001,"Finding 2021-001 Material Weakness in Internal Control; Material Noncompliance - Reporting 
+>>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 Assistance Listing Number: 93.498 COVID-19 - Provider Relief Fund and American Rescue Plan (ARP) Rural Distribution
 
 Federal Agency: U.S. Department of Health and Human Services
@@ -112,7 +133,11 @@ Recommendation: We recommend management perform a detailed review of the portal 
 
 Views of Responsible Officials: The person responsible for reporting within the PRF portal was not properly trained and there was no formal review process in place.  A better understanding of how to complete the PRF portal reporting has been obtained through review of the User Guide and a pre-submission review process will be implemented for future submissions.  The Health System will contact the appropriate party at the Health Resources and Services Administration to determine if an amended or corrected report can be filed.
 ",N,980570,1,,
+<<<<<<< HEAD
+42450,239098,2021,2021-001,"2021-001	The District lacked adequate internal controls for ensuring compliance with federal suspension and debarment requirements.
+=======
 11942,42450,239098,2021,2021-001,"2021-001	The District lacked adequate internal controls for ensuring compliance with federal suspension and debarment requirements.
+>>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 CFDA Number and Title:	93.323 – COVID 19 – Epidemiology and Laboratory Capacity for Infectious Diseases
 Federal Grantor Name:	U.S. Department of Health and Human Services
 Federal Award/Contract Number:	N/A
@@ -148,7 +173,11 @@ Title 2 CFR Part 200, Uniform Guidance, section 303, Internal controls, describe
 The American Institute of Certified Public Accountants defines significant deficiencies and material weaknesses in its Codification of Statements on Auditing Standards, section 935, Compliance Audits, paragraph 11.
 Title 2 CFR Part 180, OMB Guidelines on Agencies on Government Wide Department and Suspension (Nonprocurement) establishes non-procurement debarment and suspension regulations implementing Executive Orders 12549 and 12689.
 ",N,942119,1,,
+<<<<<<< HEAD
+34273,245543,2021,2021-002,"2021-002
+=======
 12079,34273,245543,2021,2021-002,"2021-002
+>>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 Direct Programs – Department of Education
 Federal Financial Assistance Listing:  84.425E, 84.425F
 COVID – 19:  Higher Education Emergency Relief Student Aid Portion, COVID – 19:  Higher Education Emergency Relief Institutional Portion
@@ -183,7 +212,11 @@ Management should have a process in place to ensure that all reports are filed w
 Views of Responsible Officials
 Management agrees with the finding.
 ",N,922379,1,,
+<<<<<<< HEAD
+34274,245543,2021,2021-001,"2021-001
+=======
 12080,34274,245543,2021,2021-001,"2021-001
+>>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 Direct Programs – Department of Education
 Federal Financial Assistance Listing: 84.007, 84.033, 84.063, 84.038, 84.268, 84.379
 Student Financial Aid Cluster
@@ -217,7 +250,11 @@ We recommend that the University implement a control process in which the NSLDS 
 Views of Responsible Officials
 Management agrees with the finding.
 ",N,922379,1,,
+<<<<<<< HEAD
+37833,253404,2021,2021-001,"Major Program
+=======
 12170,37833,253404,2021,2021-001,"Major Program
+>>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 CFDA 66.468 EPA Drinking Water State Revolving Loan Fund Cluster
 
 2021-001 WRITTEN POLICIES NEED ADDITIONAL ELEMENTS
@@ -261,7 +298,11 @@ The Atlanta Water System, Inc. had written policies. These policies were being f
 Status
 Corrected by adding requirements to written policies and procedures.
 ",N,933929,1,,
+<<<<<<< HEAD
+37643,23052,2021,2021-003,"Finding 2021-003 - Reporting
+=======
 12450,37643,23052,2021,2021-003,"Finding 2021-003 - Reporting
+>>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 Assistance Listing Number: 93.224 (Covid and Non Covid) and 93.247
 Federal Agency: US Department of Health and Human Services, Health Center Program Cluster and Advanced Nursing Education Workforce Grant Program
 Federal Award Number: H80CS00531/ H8DCS36406/ H8ECS38478 and 1T14HP33196 
@@ -278,7 +319,11 @@ Views of Responsible Officials and Planned Corrective Actions: Management is in 
 Contact Person Responsible for Corrective Action: The Director of Finance and Revenue Cycle, Dheera Lingamallu, will be responsible for this review.
 Anticipated Completion Date: The planned anticipated completion date for this review is June 30, 2022.
 ",N,930561,1,,
+<<<<<<< HEAD
+32880,185885,2021,2021-002,"Finding reference number: #2021-002
+=======
 13032,32880,185885,2021,2021-002,"Finding reference number: #2021-002
+>>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 
 Assistance listing title and number (Federal award identification number and year): Mortgage insurance for the purchase or refinancing of existing multifamily housing projects, Assistance Listing 14.155 (Project identification number 085-11150)
 
@@ -314,7 +359,11 @@ Completion date: June 30, 2022
 
 Reporting views of responsible officials: Management agrees with the finding and auditor's recommendation. Management will transfer funds to the reserve for replacements.
 ",N,914356,1,,
+<<<<<<< HEAD
+32881,185885,2021,2021-001,"Finding reference number: #2021-001
+=======
 13033,32881,185885,2021,2021-001,"Finding reference number: #2021-001
+>>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 
 Assistance listing title and number (Federal award identification number and year): Mortgage insurance for the purchase or refinancing of existing multifamily housing projects, Assistance Listing 14.155 (Project identification number 085-11086)
 
@@ -349,7 +398,11 @@ Completion date: June 30, 2022
 
 Reporting views of responsible officials: Management agrees with the finding and auditor's recommendation. Management will transfer funds to the residual receipts fund as cash flow permits.
 ",N,914356,1,,
+<<<<<<< HEAD
+56675,190034,2021,2021-002,"Finding 2021-002 – Data Collection Form and Reporting Package to the Federal Audit
+=======
 13386,56675,190034,2021,2021-002,"Finding 2021-002 – Data Collection Form and Reporting Package to the Federal Audit
+>>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 Clearinghouse
 Information on the Federal Program: U.S. Department of Transportation Federal Transit
 Cluster
@@ -373,7 +426,11 @@ Recommendation: It is recommended the Authority ensure timely and accurate submi
 the audit reporting package to the Federal Audit Clearinghouse.
 Views of Responsible Officials and Planned Corrective Actions: See Management’s View
 and Corrective Action Plan included at the end of the report.",N,985694,1,,
+<<<<<<< HEAD
+36656,247591,2021,2021-002,"DEPARTMENT OF HOUSING AND URBAN DEVELOPMENT
+=======
 13750,36656,247591,2021,2021-002,"DEPARTMENT OF HOUSING AND URBAN DEVELOPMENT
+>>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 HUD Finding No. 2021-002
 S-2700-005
 Property Improvement Loan Insurance for Improving All Existing Structures and Building of New Nonresidential
@@ -465,7 +522,11 @@ deleted all voicemail from the desktop telephone. Accordingly, this incident of 
 destruction resulted in additional costs to the project by the management company that should be included
 in the above questioned costs.
 S-2700-090",N,926339,1,,
+<<<<<<< HEAD
+36657,247591,2021,2021-003,"DEPARTMENT OF HOUSING AND URBAN DEVELOPMENT
+=======
 13751,36657,247591,2021,2021-003,"DEPARTMENT OF HOUSING AND URBAN DEVELOPMENT
+>>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 Finding No. 2021-002 S-2700-005
 Property Improvement Loan Insurance for Improving All Existing Structures and Building of New Nonresidential
 Structures - Assistance Listing No. 14.142
@@ -501,7 +562,11 @@ Recommendation S-2700-050
 Review the management fee calculation monthly to ensure only the agreed upon amount is paid to the management agent.
 Views of Responsible Officials and Planned Corrective Actions S-2700-100
 We agree with the above finding. The new property management company's management agreement was reviewed by legal counsel and contains the above required HUD provisions.",N,926339,1,,
+<<<<<<< HEAD
+36658,247591,2021,2021-001,"Finding No. 2021-001
+=======
 13752,36658,247591,2021,2021-001,"Finding No. 2021-001
+>>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 Rural Housing Service Section 515 Rural Rental Housing Loans 
 Criteria
 According to Government Auditing Standards and Title 2 U.S. Code of Federal Regulations Part 200,
@@ -541,7 +606,11 @@ Views of Responsible Officials and Planned Corrective Actions
 We agree with the finding and have contracted with an area firm to provide training for our bookkeeper. We
 are hiring for new positions such as program director and housing development director due to our rapid
 growth which is expected to continue, which will add more expertise and work hours to our staff.",N,926339,1,,
+<<<<<<< HEAD
+34393,7857,2021,2021-001,"Finding number: 2021-001
+=======
 13929,34393,7857,2021,2021-001,"Finding number: 2021-001
+>>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 CFDA Number: 14.157 - Supportive Housing for the Elderly
 Grantor: HUD
 Questioned Costs: $0
@@ -559,8 +628,13 @@ payment which crossed the fiscal year end.
 Recommendations: Management attempt to put in place a system where invoices submitted for replacement
 reserve funds can be tracked.
 Management Response: They are working on a system to prevent this from happening",N,925142,1,,
+<<<<<<< HEAD
+42872,108922,2021,2021-001,"2021-001 - SEGREGATION OF DUTIES  CRITERIA - A GOOD SYSTEM OF INTERNAL CONTROL CONTEMPLATES AN ADEQUATE SEGREGATION OF DUTIES SO THAT NO ONE INDIVIDUAL HANDLES A TRANSACTION FROM ITS INCEPTION TO ITS COMPLETION.  CONDITION - IN OUR JUDGMENT, THE COUNCIL'S STAFF IS NOT LARGE ENOUGH TO PERMIT ADEQUATE SEGREGATION OF DUTIES AS REPORTED ABOVE.  THIS LACK OF SEGREGATION OF DUTIES DOES NOT ALLOW MANAGEMENT TO DETECT AND CORRECT A MATERIAL MISSTATEMENT IF PRESENT.  DUE TO THE SIZE OF THE COUNCIL'S STAFF IT IS ANTICIPATED THAT THIS WILL BE AN ONGOING FINDING.  CAUSE - THE COUNCIL'S STAFF IS NOT LARGE ENOUGH TO PERMIT ADEQUATE SEGREGATION OF DUTIES.  EFFECT - THERE IS A RESULTING DANGER THAT INTENTIONAL FRAUD OR UNINTENTIONAL ERRORS COULD OCCUR AND NOT BE DETECTED.  CONTEXT - COUNCIL STAFF HAVE LIMITED SEGREGATION OF DUTIES FOR ALL TRANSACTIONS OF THE ENTITY.  REPEAT FINDING - THIS FINDING WAS REPORTED IN THE IMMEDIATELY PRIOR AUDIT AS FINDING 2020-001.  RECOMMENDATION - IN OUR JUDGEMENT, MANAGEMENT AND THOSE CHARGED WITH GOVERNANCE NEED TO UNDERSTAND THE IMPORTANCE OF THIS COMMUNICATION.  HOWEVER, DUE TO THE LACK OF RESOURCES AVAILABLE TO MANAGEMENT TO CORRECT THIS WEAKNESS, WE RECOMMEND THAT MANAGEMENT MITIGATE THIS WEAKNESS WITH POSSIBLE COMPENSATING CONTROLS SUCH AS CLOSE SUPERVISION AND MONITORING BY MANAGEMENT AND BY THE BOARD OF DIRECTORS.  VIEWS OF RESPONSIBLE OFFICIALS AND PLANNED CORRECTIVE ACTIONS - SEE EXHIBIT 1.",N,940699,1,,
+42463,141384,2021,2021-003,"ARTHUR COMMUNITY UNIT SCHOOL DISTRICT 305									
+=======
 14525,42872,108922,2021,2021-001,"2021-001 - SEGREGATION OF DUTIES  CRITERIA - A GOOD SYSTEM OF INTERNAL CONTROL CONTEMPLATES AN ADEQUATE SEGREGATION OF DUTIES SO THAT NO ONE INDIVIDUAL HANDLES A TRANSACTION FROM ITS INCEPTION TO ITS COMPLETION.  CONDITION - IN OUR JUDGMENT, THE COUNCIL'S STAFF IS NOT LARGE ENOUGH TO PERMIT ADEQUATE SEGREGATION OF DUTIES AS REPORTED ABOVE.  THIS LACK OF SEGREGATION OF DUTIES DOES NOT ALLOW MANAGEMENT TO DETECT AND CORRECT A MATERIAL MISSTATEMENT IF PRESENT.  DUE TO THE SIZE OF THE COUNCIL'S STAFF IT IS ANTICIPATED THAT THIS WILL BE AN ONGOING FINDING.  CAUSE - THE COUNCIL'S STAFF IS NOT LARGE ENOUGH TO PERMIT ADEQUATE SEGREGATION OF DUTIES.  EFFECT - THERE IS A RESULTING DANGER THAT INTENTIONAL FRAUD OR UNINTENTIONAL ERRORS COULD OCCUR AND NOT BE DETECTED.  CONTEXT - COUNCIL STAFF HAVE LIMITED SEGREGATION OF DUTIES FOR ALL TRANSACTIONS OF THE ENTITY.  REPEAT FINDING - THIS FINDING WAS REPORTED IN THE IMMEDIATELY PRIOR AUDIT AS FINDING 2020-001.  RECOMMENDATION - IN OUR JUDGEMENT, MANAGEMENT AND THOSE CHARGED WITH GOVERNANCE NEED TO UNDERSTAND THE IMPORTANCE OF THIS COMMUNICATION.  HOWEVER, DUE TO THE LACK OF RESOURCES AVAILABLE TO MANAGEMENT TO CORRECT THIS WEAKNESS, WE RECOMMEND THAT MANAGEMENT MITIGATE THIS WEAKNESS WITH POSSIBLE COMPENSATING CONTROLS SUCH AS CLOSE SUPERVISION AND MONITORING BY MANAGEMENT AND BY THE BOARD OF DIRECTORS.  VIEWS OF RESPONSIBLE OFFICIALS AND PLANNED CORRECTIVE ACTIONS - SEE EXHIBIT 1.",N,940699,1,,
 14582,42463,141384,2021,2021-003,"ARTHUR COMMUNITY UNIT SCHOOL DISTRICT 305									
+>>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 SCHEDULE OF FINDINGS AND QUESTIONED COSTS									
 Year Ending June 30, 2021									
  									
@@ -600,7 +674,11 @@ Formal profitability analyses of the food service program should be periodically
 15. Management's response									
 The auditor's recommendation will be implemented for the year ended June 30, 2022.									
 ",N,944072,1,,
+<<<<<<< HEAD
+42464,141384,2021,2021-004,"ARTHUR COMMUNITY UNIT SCHOOL DISTRICT 305									
+=======
 14583,42464,141384,2021,2021-004,"ARTHUR COMMUNITY UNIT SCHOOL DISTRICT 305									
+>>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 SCHEDULE OF FINDINGS AND QUESTIONED COSTS									
 Year Ending June 30, 2021									
  									
@@ -640,17 +718,28 @@ We recommend someone with knowledge of the Program compliance requirements that 
 15. Management's response									
 Management will properly educate the preparer of the monthly reimbursement claims.									
 ",N,944072,1,,
+<<<<<<< HEAD
+33716,246905,2021,2021-001,"Criteria: Pursuant to 2 CFR 200, Health centers must prepare and apply a sliding fee discount schedule (SFDS) so that the amounts owed for health center services by eligible patients are adjusted (discounted) based on the patient’s ability to pay as follows: (a) sliding fee discounts are applied to fees for health center services provided to all individuals and families with annual incomes at or below 200% of the Federal Poverty Guidelines (FPG); (b) a full discount is applied to fees for health center services provided to individuals and families with annual incomes at or below 100% of the FPG, or the health center applies only a nominal charge; (c) fees for health center services are discounted based on gradations in family size and income for individuals and families with incomes above 100 and at or below 200% of the FPG; and (d) no sliding fee discount is applied to fees for health center services provided to individuals and families with annual incomes above 200% of the FPG.
+=======
 15552,33716,246905,2021,2021-001,"Criteria: Pursuant to 2 CFR 200, Health centers must prepare and apply a sliding fee discount schedule (SFDS) so that the amounts owed for health center services by eligible patients are adjusted (discounted) based on the patient’s ability to pay as follows: (a) sliding fee discounts are applied to fees for health center services provided to all individuals and families with annual incomes at or below 200% of the Federal Poverty Guidelines (FPG); (b) a full discount is applied to fees for health center services provided to individuals and families with annual incomes at or below 100% of the FPG, or the health center applies only a nominal charge; (c) fees for health center services are discounted based on gradations in family size and income for individuals and families with incomes above 100 and at or below 200% of the FPG; and (d) no sliding fee discount is applied to fees for health center services provided to individuals and families with annual incomes above 200% of the FPG.
+>>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 Condition: During the audit procedures, we tested the application of the sliding fee for 60 patient visits during the year. Of the 60 tested, 9 patient applications were unable to be located.
 Effect: Not meeting expectation of reliance over internal controls over special tests and provisions and incorrect application of discounts.
 Cause: Eligibility documentation obtained by Genesis Health Care, Inc. was not properly entered into the system. Therefore, the information used to apply the sliding fee discount was incorrect.
 Recommendation: We recommend Genesis Health Care, Inc. obtain and retain all patient sliding fee discount applications and implement a review of the patient accounts for sliding fee applications.
 Views of Responsible Officials and Planned Corrective Actions: See Management’s View and Corrective Action Plan included at the end of report.
 Questioned Costs: None.",N,922396,1,,
+<<<<<<< HEAD
+50795,257227,2021,2021-002,"Significant Deficiency: As discussed at Finding 2021-001, payroll records were missing. 
+Because payroll records were not properly maintained, the Organization has not fully complied with regulatory requirements. Payroll records should be properly maintained for all employees.
+",N,974289,1,,
+50796,257227,2021,2021-001,"Condition: Payroll records and proper sign-offs were missing.
+=======
 16066,50795,257227,2021,2021-002,"Significant Deficiency: As discussed at Finding 2021-001, payroll records were missing. 
 Because payroll records were not properly maintained, the Organization has not fully complied with regulatory requirements. Payroll records should be properly maintained for all employees.
 ",N,974289,1,,
 16067,50796,257227,2021,2021-001,"Condition: Payroll records and proper sign-offs were missing.
+>>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 
 1)	Completed Form I-9 could not be located for five selected employees.
 2)	Pay rate record could not be located for one selected employee.
@@ -659,10 +748,17 @@ Because payroll records were not properly maintained, the Organization has not f
 5)	Timesheets did not reflect number of hours spent on programs worked.
 6)	Form W-4 was not signed for two selected employees.
 ",N,974289,1,,
+<<<<<<< HEAD
+50797,257227,2021,2021-003,"Condition: Single Audit Report should have been submitted nine months after year end.
+
+",N,974289,1,,
+36749,234387,2021,2021-001,"2021-1 Prepaid Insurance Not Properly Recorded
+=======
 16068,50797,257227,2021,2021-003,"Condition: Single Audit Report should have been submitted nine months after year end.
 
 ",N,974289,1,,
 17376,36749,234387,2021,2021-001,"2021-1 Prepaid Insurance Not Properly Recorded
+>>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 Condition: Management failed to properly reconcile prepaid insurance expenses to the general ledger.
 Criteria: Management is required to prepare financial statements in accordance with generally accepted
 accounting principles.
@@ -670,7 +766,11 @@ Cause: The cause is undeterminable.
 Effect: Misrepresentation of prepaid expenses could have an impact on both the balance sheet and the
 income statements.
 Recommendation: I recommend management properly record prepaid insurance expenses.",N,930702,1,,
+<<<<<<< HEAD
+36750,234387,2021,2021-004,"2021-4 Excess Residual Receipts
+=======
 17377,36750,234387,2021,2021-004,"2021-4 Excess Residual Receipts
+>>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 Condition: The Project did not prepare a HUD 9250 to remit excess residual receipts, nor did it mail a
 check or transmit a wire of those funds.
 Criteria: According to the Consolidated Appropriations Act, 2017, owners subject to a Section 202 or 811
@@ -682,7 +782,11 @@ Effect: Residual receipts balance is $17,433 as of December 31, 2021. The allowa
 ($250 X 21 units), resulting in excess residual receipts of $12,183.
 Recommendation: I recommend the Property prepare the HUD 9250 requesting to remit excess funds to
 HUD.",N,930702,1,,
+<<<<<<< HEAD
+36751,234387,2021,2021-003,"2021–3 Reserve for Replacement Monthly Deposits Not Made Timely
+=======
 17379,36751,234387,2021,2021-003,"2021–3 Reserve for Replacement Monthly Deposits Not Made Timely
+>>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 Condition: The Project did not make the required deposit into the bank account on a monthly basis.
 Criteria: According to the Regulatory Agreement, “mortgagor will establish and maintain a reserve fund
 for replacements in a separate account in a bank…Concurrently with the effective commencement of
@@ -692,7 +796,11 @@ Cause: The cause is undeterminable.
 Effect: The Project is not in compliance with the Regulatory Agreement.
 Recommendation: I recommend the Property make required monthly deposits according to the
 Regulatory Agreement.",N,930702,1,,
+<<<<<<< HEAD
+36752,234387,2021,2021-002,"2021-2 Accruals Not Properly Posted
+=======
 17380,36752,234387,2021,2021-002,"2021-2 Accruals Not Properly Posted
+>>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 Condition: Management did not record utility accruals in the accounting records.
 Criteria: The accrual accounting method ensures transactions are recognized in the accounting period
 incurred, rather than paid; which follows the matching principle.
@@ -701,7 +809,11 @@ Effect: Not recording accruals could have a material impact on both the balance 
 statements.
 Recommendation: I recommend management post all accruals to properly reflect the financial position of
 the Project.",N,930702,1,,
+<<<<<<< HEAD
+29831,123503,2021,2021-001,"FINDING 2021-001 – Special Tests and Provisions – Enrollment Reporting – Significant Deficiency in Internal Control over Compliance
+=======
 17849,29831,123503,2021,2021-001,"FINDING 2021-001 – Special Tests and Provisions – Enrollment Reporting – Significant Deficiency in Internal Control over Compliance
+>>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 
 Criteria: The National Student Loan Data System (NSLDS) is the Department of Education’s (ED) centralized database for students’ enrollment information. It is the University’s responsibility to update this information timely and accurately when the enrollment status of a student that has received federal aid changes. The University is ultimately responsible for the timeliness and accuracy of this information even when a third-party servicer is used as an intermediary to report on the University’s behalf.
 The University currently contracts with a third-party servicer and has elected to receive an Enrollment Reporting roster file every 30 days from NSLDS. At a minimum, institutions must certify the enrollment status of all students included on the roster file within 15 days of receiving the roster file. If errors are identified, the University has 10 days to resubmit a corrected response.
@@ -714,7 +826,11 @@ Cause: 1. These exceptions occurred as a result of an error in the data transmit
 Repeat finding: This is not a repeat finding.
 Recommendation: We recommend that the University develop additional procedures to monitor the accuracy of information provided by its third-party servicer on behalf of the University to NSLDS. One additional monitoring control could be to review a sample of students within NSLDS after each roster file response to ensure that the enrollment status is accurate. Each institution has access to correct information directly within NSLDS at any time.
 Views of responsible officials and planned corrective actions: Management agrees with the findings and recommendation and will continue to compare the data submitted to the third-party processor and ensure that conferrals are processed in a timely manner.",Y,902813,1,,
+<<<<<<< HEAD
+33352,64342,2021,2021-002,"2021-002 Student Financial Assistance Program Cluster – Department of Education
+=======
 17894,33352,64342,2021,2021-002,"2021-002 Student Financial Assistance Program Cluster – Department of Education
+>>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 Federal Financial Assistance Listing/CFDA #84.268 Federal Direct Student Loans - 2020/2021 P268K211430
 Federal Financial Assistance Listing/CFDA #84.063 Federal Pell Grant Program - 2020/2021 P063P201430
 Reporting– Common Origination and Disbursement System
@@ -728,7 +844,11 @@ Context/Sampling: Non-statistical sampling was performed. One instance was ident
 Repeat Finding from Prior Years: No
 Recommendation: The University should implement controls to ensure loans applied to student accounts are processed in COD within required time frame.
 Views of Responsible Officials: Management agrees. Management’s complete response can be found in the separately issued corrective action plan.",N,920361,1,,
+<<<<<<< HEAD
+33353,64342,2021,2021-006,"2021-006 Strengthening Institutions Program – Department of Education, # P031A090106
+=======
 17895,33353,64342,2021,2021-006,"2021-006 Strengthening Institutions Program – Department of Education, # P031A090106
+>>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 Federal Financial Assistance Listing/CFDA #84.031A P031A090106
 Program Income
 Material Weakness in Internal Control over Compliance and Material Noncompliance
@@ -742,7 +862,11 @@ Context/Sampling: Sampling was not used.
 Repeat Finding from Prior Years: No
 Recommendation: The University should contact the federal agency for repayment guidance related to the amount withdrawn in excess of 50 percent of endowment fund income and adjust future distributions from the endowment fund to comply with 34 CFR 628.46.
 Views of Responsible Officials: Management agrees. Management’s complete response can be found in the separately issued corrective action plan.",N,920361,1,,
+<<<<<<< HEAD
+33354,64342,2021,2021-003,"2021-003 Student Financial Assistance Program Cluster – Department of Education
+=======
 17896,33354,64342,2021,2021-003,"2021-003 Student Financial Assistance Program Cluster – Department of Education
+>>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 Federal Financial Assistance Listing/CFDA #84.063 Federal Pell Grant Program - 2020/2021 P063P201430
 Federal Financial Assistance Listing/CFDA #84.007 Federal Supplemental Educational Opportunity Grants – 2020/2021 P007A201416
 Eligibility
@@ -756,7 +880,11 @@ Context/Sampling: Non-statistical sampling was performed. Two separate issues we
 Repeat Finding from Prior Years: No
 Recommendation: The University should review its current controls to ensure that awards within the limits established for the type of aid awarded.
 Views of Responsible Officials: Management agrees. Management’s complete response can be found in the separately issued corrective action plan.",N,920361,1,,
+<<<<<<< HEAD
+33355,64342,2021,2021-001,"2021-001 Student Financial Assistance Program Cluster – Department of Education
+=======
 17897,33355,64342,2021,2021-001,"2021-001 Student Financial Assistance Program Cluster – Department of Education
+>>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 Federal Financial Assistance Listing/CFDA #84.007 Federal Supplemental Educational
 Opportunity Grants – 2020/2021 P007A201416
 Federal Financial Assistance Listing/CFDA #84.033 Federal Work-Study Program - 2020/2021 P033A201416
@@ -771,7 +899,11 @@ Context/Sampling: Key line items within the FISAP report were tested as required
 Repeat Finding from Prior Years: No
 Recommendation: The University should review current processes to ensure that documents supporting the FISAP exist and that line items reported are accurate. The FISAP review process should include a detail review by an individual independent from the preparer to verify the numbers reported.
 Views of Responsible Officials: Management agrees. Management’s complete response can be found in the separately issued corrective action plan.",N,920361,1,,
+<<<<<<< HEAD
+33356,64342,2021,2021-004,"2021-004 Student Financial Assistance Program Cluster – Department of Education
+=======
 17898,33356,64342,2021,2021-004,"2021-004 Student Financial Assistance Program Cluster – Department of Education
+>>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 Federal Financial Assistance Listing/CFDA #84.268 Federal Direct Student Loans - 2020/2021 P268K211430
 Special Tests & Provisions: Return of Title IV Funds
 Significant Deficiency in Internal Control over Compliance
@@ -784,7 +916,11 @@ Context/Sampling: All students in which a Return of Title IV funds were calculat
 Repeat Finding from Prior Years: No
 Recommendation: The University should review its current controls over Return of Title IV calculations to ensure that errors are detected and corrected timely.
 Views of Responsible Officials: Management agrees. Management’s complete response can be found in the separately issued corrective action plan.",N,920361,1,,
+<<<<<<< HEAD
+33357,64342,2021,2021-005,"2021-005 Student Financial Assistance Program Cluster – Department of Education
+=======
 17899,33357,64342,2021,2021-005,"2021-005 Student Financial Assistance Program Cluster – Department of Education
+>>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 Federal Financial Assistance Listing/CFDA #84.033 Federal Work-Study Program - 2020/2021 P033A201416
 Special Tests & Provisions: Disbursements to or on Behalf of Students
 Significant Deficiency in Internal Control over Compliance
@@ -797,7 +933,11 @@ Context/Sampling: Non-statistical sampling was performed. 9 of the 68 students s
 Repeat Finding from Prior Years: No
 Recommendation: The University should review its current controls over Federal Work Study tracking to ensure that spreadsheet is compare to data within the payroll system for accuracy.
 Views of Responsible Officials: Management agrees. Management’s complete response can be found in the separately issued corrective action plan.",N,920361,1,,
+<<<<<<< HEAD
+31762,161196,2021,2021-003,"Criteria: According to Board policy 8300, effective accounting, financial reporting, and management control systems will be designed, maintained, and periodically reviewed to (a) enable the board and school system to have access to accurate, reliable, and relevant data; (b) provide assurance that school system obligations are paid in a timely manner and that accounts are not overspent; (c) provide assurance that fund and records are safeguarded at all times; and (d) permit audits and periodic reports adequate to show that those in charge have handled funds within legal requirements and in accordance with Board policy.
+=======
 18222,31762,161196,2021,2021-003,"Criteria: According to Board policy 8300, effective accounting, financial reporting, and management control systems will be designed, maintained, and periodically reviewed to (a) enable the board and school system to have access to accurate, reliable, and relevant data; (b) provide assurance that school system obligations are paid in a timely manner and that accounts are not overspent; (c) provide assurance that fund and records are safeguarded at all times; and (d) permit audits and periodic reports adequate to show that those in charge have handled funds within legal requirements and in accordance with Board policy.
+>>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 Condition: During our testing of bank reconciliations, it was noted that reconciliations are not being prepared properly or timely. It was also noted that reconciliations are not being reviewed in a timely manner. Furthermore, it was noted during testing of cash that deposits are not being entered into the accounting system in a timely manner.
 Effect: The possibility exists that financial transactions may not be accurate, reliable, and relevant due to the lack of cash controls.
 Cause: Board policies and procedures were not followed.
@@ -805,7 +945,11 @@ Questioned Costs: There are no questioned costs associated with this finding.
 Context: We reviewed all bank reconciliations prepared during the year for all funds, noting reconciliation date and date of review. We reviewed the June 2021 bank reconciliations for all funds in detail as a part of testing cash balances.
 Recommendation: I recommend that Board policy 8300 and procedures put in place due to Board policies be followed to ensure proper and timely reconciliation of all bank accounts, as well as timely recording of all deposits.
 Views of responsible officials and planned corrective actions: Bank reconciliations are done monthly at the school level and submitted to the CFO. The CFO reviews and submits to the Deputy Finance Officer to reconcile the district accounts. All bank statements come to the CFO and forwarded to the Deputy Finance Officer. The reconciliations are done and loaded to a shared drive in Google. The breakdown is getting the receipts entered into the financial software system. Effective 12-1-21 the CFO will enter all receipts and deposits for all funds except for fund 5. This will ensure timely recording of deposits into the system. See attached Corrective Action Plan for further details.",N,914464,1,,
+<<<<<<< HEAD
+49707,160991,2021,2021-002,"U.S. Department of Health & Human Services
+=======
 18473,49707,160991,2021,2021-002,"U.S. Department of Health & Human Services
+>>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 Passed-through the N.C. Dept. of Health and Human Services
 Program Name: Medical Assistance Program ( Medicaid; Title XIX)
 ALN #: 93.778
@@ -821,7 +965,11 @@ Context: We examined 91 Medicaid applicants from the Medicaid Beneficiary report
 Identification of a repeat finding: This is not a repeat finding from the immediate previous audit.
 Recommendation: Files should be reviewed internally to ensure proper information is in place and necessary procedures are taken when determine eligibility. The results found or documentation made in case notes should clearly indicate what actions were performed and the results of those actions.
 Views of responsible officials and planned corrective actions:  The County agrees with this finding.",N,968376,1,,
+<<<<<<< HEAD
+41675,185803,2021,2021-001,"Finding 2021-001
+=======
 18716,41675,185803,2021,2021-001,"Finding 2021-001
+>>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 U.S. Department of Housing and Urban Development
 Moving to Work Demonstration Program - ALN 14.881
 Reporting	
@@ -842,7 +990,11 @@ Recommendation: We recommend that the Authority implement additional procedures 
 
 Views of responsible officials and planned corrective action:  Management agrees with the finding. See separate corrective action plan.
 ",N,939205,1,,
+<<<<<<< HEAD
+44842,244781,2021,2021-002,"Reference Number:                                2021-002
+=======
 19296,44842,244781,2021,2021-002,"Reference Number:                                2021-002
+>>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 
 Prior Year Finding:	 			 No                                                                                                                                                                        Federal Agency (ALN 14.231):         		 U.S. Department of Housing and Urban Development                                                        State Agency:                                    State of California- Department of Housing and Community                                
  Development                                                                                                                                                                         Federal Programs:	                         Emergency Solutions Grant Program;                                                                                                                                                                                                                                                                                                                                                ALN Numbers:	 			         14.231                                                                                          Compliance Requirement:	 		         Procurement, Suspension and Debarment                                                                                                                                       Type of Finding:	 			 Material Weakness, Noncompliance
@@ -884,7 +1036,11 @@ The Division will work with Territorial Headquarters to document procedures as o
  See corrective action plan.
  
 ",N,935442,1,,
+<<<<<<< HEAD
+41332,243526,2021,2021-004,"Condition: During the audit of the June 30, 2021 it was determined that SBHS was not in compliance with South Carolina Department of Alcohol and Other Drug Abuse Services (“DAODAS”) Fiscal Year 2021 Funding and Compliance Contract. DAODAS is the primary grantor to SBHS. By letter to SBHS from DAODAS dated July 1, 2021 DAODAS identified the following:
+=======
 19317,41332,243526,2021,2021-004,"Condition: During the audit of the June 30, 2021 it was determined that SBHS was not in compliance with South Carolina Department of Alcohol and Other Drug Abuse Services (“DAODAS”) Fiscal Year 2021 Funding and Compliance Contract. DAODAS is the primary grantor to SBHS. By letter to SBHS from DAODAS dated July 1, 2021 DAODAS identified the following:
+>>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 1)	SBHS did not deliver any prevention programs, a condition of the grant agreement, since February 2021, 
 2)	Treatment and associated charges at the SBHS women’s residential facility are not in compliance with grant terms and conditions. This condition has likely resulted in:
 a.	A violation of SBHS facility license from South Carolina Department of Health and Environmental Control.
@@ -900,7 +1056,11 @@ Recommendation: We recommend that SBHS develop policies and procedures to remedi
 
 Response: SBHS agrees and will implement the above recommendation by June 30, 2022.
 ",N,927926,1,,
+<<<<<<< HEAD
+36032,1260,2021,2021-001,"Condition: Missing documents in tenant files.
+=======
 19436,36032,1260,2021,2021-001,"Condition: Missing documents in tenant files.
+>>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 Criteria: Required documents are to be kept in tenant files to determine eligibility.
 Effect: Potential for ineligible tenants.
 Context: Auditor selected tenant files to test for eligibility and noted missing required
@@ -917,7 +1077,11 @@ documentation specifically requested for the testing, however, we believe the fi
 onsite at the property. We will continue to review the original file documentation and
 include such documentation in resident files as necessary.
 ",N,926757,1,,
+<<<<<<< HEAD
+35544,94987,2021,2021-002,"Finding 2021-002: Failure to Drawdown Funds Before Program Expiration Date - 2021 Health and Human Services Grant 04CH01101101 – Head Start
+=======
 19796,35544,94987,2021,2021-002,"Finding 2021-002: Failure to Drawdown Funds Before Program Expiration Date - 2021 Health and Human Services Grant 04CH01101101 – Head Start
+>>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 
 
 Condition:  The Committee had obligated funds available to satisfy period expenditures but failed to make the drawdown of funds before the program had expired.  $88,970 in 2020 funds and $110,762 in 2021 funds which had been obligated were allowed to expire.
@@ -932,7 +1096,11 @@ Views of Responsible Officials:  We agree with the finding and have prepared a C
 
 
 ",N,927006,1,,
+<<<<<<< HEAD
+35545,94987,2021,2021-001,"Finding 2021-001: Paying Prior Year Expenses with Current Year Revenue – 2021 Health and Human Services Grant 04CH01101101 – Head Start
+=======
 19797,35545,94987,2021,2021-001,"Finding 2021-001: Paying Prior Year Expenses with Current Year Revenue – 2021 Health and Human Services Grant 04CH01101101 – Head Start
+>>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 
 Condition:  The Committee paid prior year expenditures using current year funds.  In the 2021 year $88,970 of 2020 expenses were paid using 2021 funds.  In the 2022 fiscal year, $247,799 of 2021 expenses were paid with 2022 funds.
 
@@ -946,8 +1114,13 @@ Recommendation:  Procedures currently in place should be augmented by inclusion 
 
 Views of Responsible Officials:  We agree with the finding and have prepared a Corrective Action Plan.  We are instituting additional procedures and involving additional management staff in the drawdown procedures.
 ",N,927006,1,,
+<<<<<<< HEAD
+39780,231040,2021,2021-001,The Organization has NOT finalized and submitted a final Cost Certification as required by HUD and the National Housing ACT regulations.,N,937747,1,,
+44550,217700,2021,2021-001,"Move-ins:
+=======
 20581,39780,231040,2021,2021-001,The Organization has NOT finalized and submitted a final Cost Certification as required by HUD and the National Housing ACT regulations.,N,937747,1,,
 20669,44550,217700,2021,2021-001,"Move-ins:
+>>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 
 1.	In two (2) instances out of fourteen (14) tenant files tested, the security deposit amount per the 
 lease agreement did not agree to the security deposit agreement.
@@ -1064,8 +1237,13 @@ Views of Responsible Officials and Planned Corrective Actions:
 New manager hired and upgraded review process.  All files corrected.  
 
 ",N,946899,1,,
+<<<<<<< HEAD
+35180,248284,2021,2021-001,2021-001 Fair Presentation of Financial Statements Criteria:  Management is responsible for performing adjustments to the general ledger in order to be in conformity with generally accepted accounting principles.  Condition:  Material adjusting entries were prepared to ensure the financial statements were presented fairly.  Cause:  The Entity lacks the training to apply generally accepted accounting principles in recording the transactions to the general ledger.  Effect:  The possibility exists that the general ledger does not reflect generally accepted accounting principles.,N,926254,1,,
+35653,243881,2021,2021-002,"Criteria: According to 2 CFR 200.403(g) costs must be adequately documented.
+=======
 20812,35180,248284,2021,2021-001,2021-001 Fair Presentation of Financial Statements Criteria:  Management is responsible for performing adjustments to the general ledger in order to be in conformity with generally accepted accounting principles.  Condition:  Material adjusting entries were prepared to ensure the financial statements were presented fairly.  Cause:  The Entity lacks the training to apply generally accepted accounting principles in recording the transactions to the general ledger.  Effect:  The possibility exists that the general ledger does not reflect generally accepted accounting principles.,N,926254,1,,
 20818,35653,243881,2021,2021-002,"Criteria: According to 2 CFR 200.403(g) costs must be adequately documented.
+>>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 
 Condition: During our testing of payroll costs charged to the grant we noted variances between timesheet reports used to support the cost and actual cost charged to the grant.  We selected 5 of 12 total months during the fiscal year, and variances were noted in 2 pay periods tested. The actual amount charged to the grant was lower than the timesheet report by a combined total of $511. Additionally, manual level-of-effort factors were applied to various employee charges which were not based off of timesheet data. No supporting documentation for these variances could be provided.
 
@@ -1079,7 +1257,11 @@ Recommendation: We recommend that the Organization establish controls and docume
 
 Views of Responsible Officials and Corrective Action Plan (unaudited): Shelter House is looking at several options.  First, we plan to work with a consultant to see if the allocations can be more automated.  If that is not possible, we may have to add or switch capacity so that one person does the allocations and another on the team reviews and signs off on the allocations.
 ",N,926241,1,,
+<<<<<<< HEAD
+35654,243881,2021,2021-003,"Criteria: According to 2 CFR 200.320(a)(2) price quotations must be obtained from an adequate number of qualified sources for the acquisition of property or services for which the aggregate dollar amount is higher than the micro-purchase threshold but does not exceed the simplified acquisition threshold.
+=======
 20819,35654,243881,2021,2021-003,"Criteria: According to 2 CFR 200.320(a)(2) price quotations must be obtained from an adequate number of qualified sources for the acquisition of property or services for which the aggregate dollar amount is higher than the micro-purchase threshold but does not exceed the simplified acquisition threshold.
+>>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 
 Condition: During our testing of vendor procurement compliance, we noted price quotations were not obtained for a vendor with aggregate purchases exceeding the micro-purchase threshold. 
 
@@ -1093,7 +1275,11 @@ Recommendation: We recommend that the Organization revisit its procurement polic
 
 Views of Responsible Officials and Corrective Action Plan (unaudited): What happened there was the use of a vendor multiple times that eventually crossed the 10k threshold.  We have worked with staff so they are aware of this concern and we have a process to vet vendors if we believe this may become an issue in the future so that our documentation is more complete and contemporaneous.  
 ",N,926241,1,,
+<<<<<<< HEAD
+34500,66473,2021,2021-003,"Finding 2021-003: Schedule of Expenditures of Federal Awards (Significant Deficiency)
+=======
 21152,34500,66473,2021,2021-003,"Finding 2021-003: Schedule of Expenditures of Federal Awards (Significant Deficiency)
+>>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 Condition: 2 CFR Part 200, section 200.510 requires the Corporation to prepare a schedule of expenditures of federal awards (SEFA) for the period covered by the financial statements. We noted that expenditures related to the Corporation’s grant program were not recorded in the financial statements nor on a SEFA.
 Criteria: An entity that expends federal awards must have controls in place that would enable the entity to prepare a SEFA including controls that determine the accuracy of the amount of expenditures reported for each federal program.
 Cause: The Corporation received a new federal program which wasn’t included on the SEFA.
@@ -1102,7 +1288,11 @@ Recommendation: We recommend management and staff complete annual training relat
 Management’s Response (Unaudited): Management agrees with Finding 2021-003 and will ensure that management and staff receive annual training relating to single audits and the preparation of the SEFA. Management notes that although SEFAs are generally required for federal awards over $750,000, the specific guidance for the Coronavirus Aid, Relief and Economic Security Act, was not published until after the contracts with the City were executed.
 Responsible Staff: Interim CEO and third-party accounting firm
 Anticipated Completion Date: Management will confirm that the third-party accounting firm has appropriate training relating to single audits, and EDC will ensure that any EDC accounting employees have appropriate annual training. EDC anticipates retaining the third-party accounting firm in December 2021 or January 2022. Training of any EDC employees will be done as soon as possible after the hire date, and as training opportunities are available, and repeated annually.",N,920675,1,,
+<<<<<<< HEAD
+34250,160959,2021,2021-001,"Criteria: Medicaid for Aged, Blind and Disabled case records should contain documentation that verifications were done
+=======
 21475,34250,160959,2021,2021-001,"Criteria: Medicaid for Aged, Blind and Disabled case records should contain documentation that verifications were done
+>>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 in preparation of the application/recertification and these items will agree to reports in the NC FAST system. In this
 process, documentation should be present and agree back to the records in the NC FAST system. Any items discovered in
 the process should be considered in regards to a specific eligibility requirement and explained within the documentation.
@@ -1129,7 +1319,11 @@ Views of responsible officials and planned corrective actions: The County agrees
 perform second party reviews to ensure proper documentation is contained in files to support eligibility determinations.
 Workers will be retrained on what information should be maintained in case files, the importance of complete and
 accurate record keeping, and reserve calculations. The County finance office will also participating in the review process. Identification of a repeat finding: This is a repeat finding from the immediate previous audit, 2020-001.",N,915204,1,,
+<<<<<<< HEAD
+34251,160959,2021,2021-002,"Criteria: In accordance with 42 CFR 435, documentation must be obtained as needed to determine if a recipient meets
+=======
 21476,34251,160959,2021,2021-002,"Criteria: In accordance with 42 CFR 435, documentation must be obtained as needed to determine if a recipient meets
+>>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 specific standards, and documentation must be maintained to support eligibility determinations. In accordance with 2
 CFR 200, management should have an adequate system of internal controls procedures in place to ensure an applicant is
 properly determined or redetermined for benefits.
@@ -1154,7 +1348,11 @@ Views of responsible officials and planned corrective actions: The County agrees
 perform second party reviews to ensure proper documentation is contained in files to support eligibility determinations.
 Workers will be retrained on what information should be maintained in case files, the importance of complete and
 accurate record keeping, and reserve calculations. The County finance office will also participate in the review process. Identification of a repeat finding: This is a repeat finding from the immediate previous audit, 2020-002.",N,915204,1,,
+<<<<<<< HEAD
+34079,232043,2021,2021-002,"2021-002 - Allowable Costs
+=======
 22451,34079,232043,2021,2021-002,"2021-002 - Allowable Costs
+>>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 Federal Program Information:
 Department of Education:
 ALN 84.010 - Title I Grants to Local Educational Agencies
@@ -1178,7 +1376,11 @@ personal activity reports to ensure all employees under all programs have comple
 time and effort documentation.
 Views of Responsible Officials and Corrective Action Plan: Please see the Corrective
 Action Plan issued by RSU 13.",N,923530,1,,
+<<<<<<< HEAD
+34080,232043,2021,2021-001,"2021-001 - Allowable Costs
+=======
 22452,34080,232043,2021,2021-001,"2021-001 - Allowable Costs
+>>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 Federal Program Information:
 Department of Education:
 ALN 84.010 - Title I Grants to Local Educational Agencies
@@ -1197,7 +1399,11 @@ processes and procedures to maintain contracts and/or wage basis documentation f
 all employees.
 Views of Responsible Officials and Corrective Action Plan: Please see the Corrective
 Action Plan issued by RSU 13.",N,923530,1,,
+<<<<<<< HEAD
+42264,254581,2021,2021-002,"Assistance Listing Number, Federal Agency, and Program Name   93.498, U.S. Department of Health and Human Services (HHS), COVID 19   Provider Relief Fund
+=======
 22839,42264,254581,2021,2021-002,"Assistance Listing Number, Federal Agency, and Program Name   93.498, U.S. Department of Health and Human Services (HHS), COVID 19   Provider Relief Fund
+>>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 Federal Award Identification Number and Year   N/A   2021
 Pass through Entity   N/A   direct funded
 Finding Type   Material weakness and material noncompliance with laws and regulations
@@ -1219,7 +1425,11 @@ Cause and Effect   Appropriate review of the reporting submissions was not compl
 Recommendation   We recommend that the Corporation implement controls, including levels of review, to ensure that reports are completed and submitted in accordance with the guidelines established by HHS. 
 Views of Responsible Officials and Planned Corrective Actions   The Corporation will review its processes surrounding the methodologies used to report lost revenue and will implement additional levels of review to ensure that the proper lost revenue methodology is used in future reporting periods.  
 ",N,942026,1,,
+<<<<<<< HEAD
+42265,254581,2021,2021-001,"Assistance Listing Number, Federal Agency, and Program Name   93.498, U.S. Department of Health and Human Services (HHS), COVID 19   Provider Relief Fund
+=======
 22840,42265,254581,2021,2021-001,"Assistance Listing Number, Federal Agency, and Program Name   93.498, U.S. Department of Health and Human Services (HHS), COVID 19   Provider Relief Fund
+>>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 Federal Award Identification Number and Year   N/A   2021
 Pass through Entity   N/A   direct funded
 Finding Type   Material weakness and material noncompliance with laws and regulations
