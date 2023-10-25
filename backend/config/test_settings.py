@@ -40,7 +40,7 @@ class SettingsTestCase(TestCase):
             )
             self.assertIsNotNone(s3_client)
             items = s3_client.list_objects(
-                Bucket=settings.AWS_C2F_BUCKET_NAME,
+                Bucket=settings.AWS_C2G_BUCKET_NAME,
             )
             self.assertIsNotNone(items)
         except Exception as e:

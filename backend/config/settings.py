@@ -169,8 +169,8 @@ DATABASES = {
     "default": env.dj_db_url(
         "DATABASE_URL", default="postgres://postgres:password@0.0.0.0/backend"
     ),
-    "c2fdb": env.dj_db_url(
-        "DATABASE_URL_C2FDB", default="postgres://postgres:password@0.0.0.0/c2fdb"
+    "c2g-db": env.dj_db_url(
+        "DATABASE_URL_C2G-DB", default="postgres://postgres:password@0.0.0.0/c2g-db"
     ),
 }
 
@@ -244,8 +244,8 @@ if ENVIRONMENT not in ["DEVELOPMENT", "PREVIEW", "STAGING", "PRODUCTION"]:
     MIDDLEWARE.append("whitenoise.middleware.WhiteNoiseMiddleware")
     DEFAULT_FILE_STORAGE = "report_submission.storages.S3PrivateStorage"
 
-    # Private C2F bucket
-    AWS_C2F_BUCKET_NAME = "fac-c2g-s3"  # TODO need to fix for CG
+    # Private C2G bucket
+    AWS_C2G_BUCKET_NAME = "fac-c2g-s3"
 
     # Private bucket
     AWS_PRIVATE_STORAGE_BUCKET_NAME = "gsa-fac-private-s3"
