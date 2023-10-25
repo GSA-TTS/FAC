@@ -8,7 +8,6 @@ unzip awscliv2.zip && rm awscliv2.zip
 ./aws/install -i ~/usr -b ~/bin
 export PATH=/home/vcap/app/usr/v2/2.13.28/bin:$PATH
 aws --version
-unset https_proxy
 
 # Get the fac-private-s3 bucket
 export S3CREDS="$(echo $VCAP_SERVICES|jq -r '.s3')"
