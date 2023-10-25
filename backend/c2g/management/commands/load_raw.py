@@ -1,7 +1,9 @@
 import logging
-import requests
+
+# import requests
 import zipfile
-import io
+
+# import io
 import os
 import boto3
 

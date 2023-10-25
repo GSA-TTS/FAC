@@ -1,5 +1,4 @@
 from django.test import TestCase
-from django.db import connection
 
 from model_bakery import baker
 
