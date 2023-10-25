@@ -3,6 +3,7 @@
 # This requires: cf bind-service gsa-fac fac-private-s3 -c '{"additional_instances": ["backups"]}'
 
 # Grab AWS cli
+unset https_proxy
 curl -L "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
 unzip awscliv2.zip && rm awscliv2.zip
 ./aws/install -i ~/usr -b ~/bin
