@@ -254,7 +254,7 @@ create view api_v1_0_3.general as
         gen.is_public,
         gen.data_source,
         gen.is_aicpa_audit_guide_included,
-        gen.is_additional_ueis
+        gen.is_additional_ueis,
         aud.general_information -> 'multiple_eins_covered' as is_multiple_eins,
         aud.general_information -> 'secondary_auditors_exist' as is_secondary_auditors
     from
