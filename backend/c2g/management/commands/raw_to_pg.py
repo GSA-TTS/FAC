@@ -75,3 +75,4 @@ class Command(BaseCommand):
                 else:
                     value = row[column_number].rstrip()
                     setattr(model_instance, column_name, value)
+                    model_instance.save()
