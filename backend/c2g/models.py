@@ -1,304 +1,457 @@
+
 from django.db import models
 
 
-class CensusCfda(models.Model):
-    # index = models.BigIntegerField(blank=True, primary_key=True)
-    audityear = models.TextField(
-        db_column="AUDITYEAR", blank=True, null=True
-    )  # Field name made lowercase.
-    dbkey = models.TextField(
-        db_column="DBKEY", blank=True, null=True
-    )  # Field name made lowercase.
-    ein = models.TextField(
-        db_column="EIN", blank=True, null=True
-    )  # Field name made lowercase.
-    cfda = models.TextField(
-        db_column="CFDA", blank=True, null=True
-    )  # Field name made lowercase.
-    awardidentification = models.TextField(
-        db_column="AWARDIDENTIFICATION", blank=True, null=True
-    )  # Field name made lowercase.
-    rd = models.TextField(
-        db_column="RD", blank=True, null=True
-    )  # Field name made lowercase.
-    federalprogramname = models.TextField(
-        db_column="FEDERALPROGRAMNAME", blank=True, null=True
-    )  # Field name made lowercase.
-    amount = models.TextField(
-        db_column="AMOUNT", blank=True, null=True
-    )  # Field name made lowercase.
-    clustername = models.TextField(
-        db_column="CLUSTERNAME", blank=True, null=True
-    )  # Field name made lowercase.
-    stateclustername = models.TextField(
-        db_column="STATECLUSTERNAME", blank=True, null=True
-    )  # Field name made lowercase.
-    programtotal = models.TextField(
-        db_column="PROGRAMTOTAL", blank=True, null=True
-    )  # Field name made lowercase.
-    clustertotal = models.TextField(
-        db_column="CLUSTERTOTAL", blank=True, null=True
-    )  # Field name made lowercase.
-    direct = models.TextField(
-        db_column="DIRECT", blank=True, null=True
-    )  # Field name made lowercase.
-    passthroughaward = models.TextField(
-        db_column="PASSTHROUGHAWARD", blank=True, null=True
-    )  # Field name made lowercase.
-    passthroughamount = models.TextField(
-        db_column="PASSTHROUGHAMOUNT", blank=True, null=True
-    )  # Field name made lowercase.
-    majorprogram = models.TextField(
-        db_column="MAJORPROGRAM", blank=True, null=True
-    )  # Field name made lowercase.
-    typereport_mp = models.TextField(
-        db_column="TYPEREPORT_MP", blank=True, null=True
-    )  # Field name made lowercase.
-    typerequirement = models.TextField(
-        db_column="TYPEREQUIREMENT", blank=True, null=True
-    )  # Field name made lowercase.
-    qcosts2 = models.TextField(
-        db_column="QCOSTS2", blank=True, null=True
-    )  # Field name made lowercase.
-    findings = models.TextField(
-        db_column="FINDINGS", blank=True, null=True
-    )  # Field name made lowercase.
-    findingrefnums = models.TextField(
-        db_column="FINDINGREFNUMS", blank=True, null=True
-    )  # Field name made lowercase.
-    arra = models.TextField(
-        db_column="ARRA", blank=True, null=True
-    )  # Field name made lowercase.
-    loans = models.TextField(
-        db_column="LOANS", blank=True, null=True
-    )  # Field name made lowercase.
-    loanbalance = models.TextField(
-        db_column="LOANBALANCE", blank=True, null=True
-    )  # Field name made lowercase.
-    findingscount = models.TextField(
-        db_column="FINDINGSCOUNT", blank=True, null=True
-    )  # Field name made lowercase.
-    elecauditsid = models.TextField(
-        db_column="ELECAUDITSID", blank=True, null=True
-    )  # Field name made lowercase.
-    otherclustername = models.TextField(
-        db_column="OTHERCLUSTERNAME", blank=True, null=True
-    )  # Field name made lowercase.
-    cfdaprogramname = models.TextField(
-        db_column="CFDAPROGRAMNAME", blank=True, null=True
-    )  # Field name made lowercase.
+class ELECAUDITHEADER(models.Model):
 
+    ELECAUDITHEADERID = models.TextField(blank=True, null=True)
+  
+    ID = models.TextField(blank=True, null=True)
+  
+    AUDITYEAR = models.TextField(blank=True, null=True)
+  
+    DBKEY = models.TextField(blank=True, null=True)
+  
+    FYENDDATE = models.TextField(blank=True, null=True)
+  
+    AUDITTYPE = models.TextField(blank=True, null=True)
+  
+    PERIODCOVERED = models.TextField(blank=True, null=True)
+  
+    NUMBERMONTHS = models.TextField(blank=True, null=True)
+  
+    MULTIPLEEINS = models.TextField(blank=True, null=True)
+  
+    EIN = models.TextField(blank=True, null=True)
+  
+    EINSUBCODE = models.TextField(blank=True, null=True)
+  
+    MULTIPLEDUNS = models.TextField(blank=True, null=True)
+  
+    DUNS = models.TextField(blank=True, null=True)
+  
+    AUDITEENAME = models.TextField(blank=True, null=True)
+  
+    STREET1 = models.TextField(blank=True, null=True)
+  
+    STREET2 = models.TextField(blank=True, null=True)
+  
+    CITY = models.TextField(blank=True, null=True)
+  
+    STATE = models.TextField(blank=True, null=True)
+  
+    ZIPCODE = models.TextField(blank=True, null=True)
+  
+    AUDITEECONTACT = models.TextField(blank=True, null=True)
+  
+    AUDITEETITLE = models.TextField(blank=True, null=True)
+  
+    AUDITEEPHONE = models.TextField(blank=True, null=True)
+  
+    AUDITEEFAX = models.TextField(blank=True, null=True)
+  
+    AUDITEEEMAIL = models.TextField(blank=True, null=True)
+  
+    AUDITEEDATESIGNED = models.TextField(blank=True, null=True)
+  
+    AUDITEENAMETITLE = models.TextField(blank=True, null=True)
+  
+    CPAFIRMNAME = models.TextField(blank=True, null=True)
+  
+    CPASTREET1 = models.TextField(blank=True, null=True)
+  
+    CPASTREET2 = models.TextField(blank=True, null=True)
+  
+    CPACITY = models.TextField(blank=True, null=True)
+  
+    CPASTATE = models.TextField(blank=True, null=True)
+  
+    CPAZIPCODE = models.TextField(blank=True, null=True)
+  
+    CPACONTACT = models.TextField(blank=True, null=True)
+  
+    CPATITLE = models.TextField(blank=True, null=True)
+  
+    CPAPHONE = models.TextField(blank=True, null=True)
+  
+    CPAFAX = models.TextField(blank=True, null=True)
+  
+    CPAEMAIL = models.TextField(blank=True, null=True)
+  
+    CPADATESIGNED = models.TextField(blank=True, null=True)
+  
+    CPANAMETITLE = models.TextField(blank=True, null=True)
+  
+    COG_OVER = models.TextField(blank=True, null=True)
+  
+    COGAGENCY = models.TextField(blank=True, null=True)
+  
+    TYPEREPORT_FS = models.TextField(blank=True, null=True)
+  
+    REPORTABLECONDITION = models.TextField(blank=True, null=True)
+  
+    MATERIALWEAKNESS = models.TextField(blank=True, null=True)
+  
+    MATERIALNONCOMPLIANCE = models.TextField(blank=True, null=True)
+  
+    GOINGCONCERN = models.TextField(blank=True, null=True)
+  
+    TYPEREPORT_MP = models.TextField(blank=True, null=True)
+  
+    DOLLARTHRESHOLD = models.TextField(blank=True, null=True)
+  
+    LOWRISK = models.TextField(blank=True, null=True)
+  
+    REPORTREQUIRED = models.TextField(blank=True, null=True)
+  
+    TOTFEDEXPEND = models.TextField(blank=True, null=True)
+  
+    COPIES = models.TextField(blank=True, null=True)
+  
+    REPORTABLECONDITION_MP = models.TextField(blank=True, null=True)
+  
+    MATERIALWEAKNESS_MP = models.TextField(blank=True, null=True)
+  
+    QCOSTS = models.TextField(blank=True, null=True)
+  
+    CYFINDINGS = models.TextField(blank=True, null=True)
+  
+    PYSCHEDULE = models.TextField(blank=True, null=True)
+  
+    DUP_REPORTS = models.TextField(blank=True, null=True)
+  
+    COG_AGENCY = models.TextField(blank=True, null=True)
+  
+    OVERSIGHTAGENCY = models.TextField(blank=True, null=True)
+  
+    DATERECEIVED = models.TextField(blank=True, null=True)
+  
+    DATEFIREWALL = models.TextField(blank=True, null=True)
+  
+    PREVIOUSDATEFIREWALL = models.TextField(blank=True, null=True)
+  
+    FINDINGREFNUM = models.TextField(blank=True, null=True)
+  
+    TYPEOFENTITY = models.TextField(blank=True, null=True)
+  
+    IMAGE = models.TextField(blank=True, null=True)
+  
+    AGENCYCFDA = models.TextField(blank=True, null=True)
+  
+    INITIALDATE = models.TextField(blank=True, null=True)
+  
+    DATERECEIVEDOTHER = models.TextField(blank=True, null=True)
+  
+    MULTIPLE_CPAS = models.TextField(blank=True, null=True)
+  
+    AUDITEECERTIFYNAME = models.TextField(blank=True, null=True)
+  
+    AUDITEECERTIFYTITLE = models.TextField(blank=True, null=True)
+  
+    FACACCEPTEDDATE = models.TextField(blank=True, null=True)
+  
+    AUDITOR_EIN = models.TextField(blank=True, null=True)
+  
+    SD_MATERIALWEAKNESS = models.TextField(blank=True, null=True)
+  
+    SD_MATERIALWEAKNESS_MP = models.TextField(blank=True, null=True)
+  
+    SIGNIFICANTDEFICIENCY = models.TextField(blank=True, null=True)
+  
+    SIGNIFICANTDEFICIENCY_MP = models.TextField(blank=True, null=True)
+  
+    SP_FRAMEWORK = models.TextField(blank=True, null=True)
+  
+    SP_FRAMEWORK_REQUIRED = models.TextField(blank=True, null=True)
+  
+    TYPEREPORT_SP_FRAMEWORK = models.TextField(blank=True, null=True)
+  
+    SUPPRESSION_CODE = models.TextField(blank=True, null=True)
+  
+    ENTITY_TYPE = models.TextField(blank=True, null=True)
+  
+    TYPEAUDIT_CODE = models.TextField(blank=True, null=True)
+  
+    OPEID = models.TextField(blank=True, null=True)
+  
+    DATETOED = models.TextField(blank=True, null=True)
+  
+    DATEFINISHED = models.TextField(blank=True, null=True)
+  
+    TYPEFINDING = models.TextField(blank=True, null=True)
+  
+    TYPEFUNDING = models.TextField(blank=True, null=True)
+  
+    FYSTARTDATE = models.TextField(blank=True, null=True)
+  
+    CPAFOREIGN = models.TextField(blank=True, null=True)
+  
+    UEI = models.TextField(blank=True, null=True)
+  
+    MULTIPLEUEIS = models.TextField(blank=True, null=True)
+  
+    CPACOUNTRY = models.TextField(blank=True, null=True)
+  
 
-class CensusGen(models.Model):
-    # index = models.BigIntegerField(blank=True, primary_key=True)
-    audityear = models.TextField(
-        db_column="AUDITYEAR", blank=True, null=True
-    )  # Field name made lowercase.
-    dbkey = models.TextField(
-        db_column="DBKEY", blank=True, null=True
-    )  # Field name made lowercase.
-    typeofentity = models.TextField(
-        db_column="TYPEOFENTITY", blank=True, null=True
-    )  # Field name made lowercase.
-    fyenddate = models.TextField(
-        db_column="FYENDDATE", blank=True, null=True
-    )  # Field name made lowercase.
-    audittype = models.TextField(
-        db_column="AUDITTYPE", blank=True, null=True
-    )  # Field name made lowercase.
-    periodcovered = models.TextField(
-        db_column="PERIODCOVERED", blank=True, null=True
-    )  # Field name made lowercase.
-    numbermonths = models.TextField(
-        db_column="NUMBERMONTHS", blank=True, null=True
-    )  # Field name made lowercase.
-    ein = models.TextField(
-        db_column="EIN", blank=True, null=True
-    )  # Field name made lowercase.
-    multipleeins = models.TextField(
-        db_column="MULTIPLEEINS", blank=True, null=True
-    )  # Field name made lowercase.
-    einsubcode = models.TextField(
-        db_column="EINSUBCODE", blank=True, null=True
-    )  # Field name made lowercase.
-    duns = models.TextField(
-        db_column="DUNS", blank=True, null=True
-    )  # Field name made lowercase.
-    multipleduns = models.TextField(
-        db_column="MULTIPLEDUNS", blank=True, null=True
-    )  # Field name made lowercase.
-    auditeename = models.TextField(
-        db_column="AUDITEENAME", blank=True, null=True
-    )  # Field name made lowercase.
-    street1 = models.TextField(
-        db_column="STREET1", blank=True, null=True
-    )  # Field name made lowercase.
-    street2 = models.TextField(
-        db_column="STREET2", blank=True, null=True
-    )  # Field name made lowercase.
-    city = models.TextField(
-        db_column="CITY", blank=True, null=True
-    )  # Field name made lowercase.
-    state = models.TextField(
-        db_column="STATE", blank=True, null=True
-    )  # Field name made lowercase.
-    zipcode = models.TextField(
-        db_column="ZIPCODE", blank=True, null=True
-    )  # Field name made lowercase.
-    auditeecontact = models.TextField(
-        db_column="AUDITEECONTACT", blank=True, null=True
-    )  # Field name made lowercase.
-    auditeetitle = models.TextField(
-        db_column="AUDITEETITLE", blank=True, null=True
-    )  # Field name made lowercase.
-    auditeephone = models.TextField(
-        db_column="AUDITEEPHONE", blank=True, null=True
-    )  # Field name made lowercase.
-    auditeefax = models.TextField(
-        db_column="AUDITEEFAX", blank=True, null=True
-    )  # Field name made lowercase.
-    auditeeemail = models.TextField(
-        db_column="AUDITEEEMAIL", blank=True, null=True
-    )  # Field name made lowercase.
-    auditeedatesigned = models.TextField(
-        db_column="AUDITEEDATESIGNED", blank=True, null=True
-    )  # Field name made lowercase.
-    auditeenametitle = models.TextField(
-        db_column="AUDITEENAMETITLE", blank=True, null=True
-    )  # Field name made lowercase.
-    cpafirmname = models.TextField(
-        db_column="CPAFIRMNAME", blank=True, null=True
-    )  # Field name made lowercase.
-    cpastreet1 = models.TextField(
-        db_column="CPASTREET1", blank=True, null=True
-    )  # Field name made lowercase.
-    cpastreet2 = models.TextField(
-        db_column="CPASTREET2", blank=True, null=True
-    )  # Field name made lowercase.
-    cpacity = models.TextField(
-        db_column="CPACITY", blank=True, null=True
-    )  # Field name made lowercase.
-    cpastate = models.TextField(
-        db_column="CPASTATE", blank=True, null=True
-    )  # Field name made lowercase.
-    cpazipcode = models.TextField(
-        db_column="CPAZIPCODE", blank=True, null=True
-    )  # Field name made lowercase.
-    cpacontact = models.TextField(
-        db_column="CPACONTACT", blank=True, null=True
-    )  # Field name made lowercase.
-    cpatitle = models.TextField(
-        db_column="CPATITLE", blank=True, null=True
-    )  # Field name made lowercase.
-    cpaphone = models.TextField(
-        db_column="CPAPHONE", blank=True, null=True
-    )  # Field name made lowercase.
-    cpafax = models.TextField(
-        db_column="CPAFAX", blank=True, null=True
-    )  # Field name made lowercase.
-    cpaemail = models.TextField(
-        db_column="CPAEMAIL", blank=True, null=True
-    )  # Field name made lowercase.
-    cpadatesigned = models.TextField(
-        db_column="CPADATESIGNED", blank=True, null=True
-    )  # Field name made lowercase.
-    cog_over = models.TextField(
-        db_column="COG_OVER", blank=True, null=True
-    )  # Field name made lowercase.
-    cogagency = models.TextField(
-        db_column="COGAGENCY", blank=True, null=True
-    )  # Field name made lowercase.
-    oversightagency = models.TextField(
-        db_column="OVERSIGHTAGENCY", blank=True, null=True
-    )  # Field name made lowercase.
-    typereport_fs = models.TextField(
-        db_column="TYPEREPORT_FS", blank=True, null=True
-    )  # Field name made lowercase.
-    sp_framework = models.TextField(
-        db_column="SP_FRAMEWORK", blank=True, null=True
-    )  # Field name made lowercase.
-    sp_framework_required = models.TextField(
-        db_column="SP_FRAMEWORK_REQUIRED", blank=True, null=True
-    )  # Field name made lowercase.
-    typereport_sp_framework = models.TextField(
-        db_column="TYPEREPORT_SP_FRAMEWORK", blank=True, null=True
-    )  # Field name made lowercase.
-    goingconcern = models.TextField(
-        db_column="GOINGCONCERN", blank=True, null=True
-    )  # Field name made lowercase.
-    reportablecondition = models.TextField(
-        db_column="REPORTABLECONDITION", blank=True, null=True
-    )  # Field name made lowercase.
-    materialweakness = models.TextField(
-        db_column="MATERIALWEAKNESS", blank=True, null=True
-    )  # Field name made lowercase.
-    materialnoncompliance = models.TextField(
-        db_column="MATERIALNONCOMPLIANCE", blank=True, null=True
-    )  # Field name made lowercase.
-    typereport_mp = models.TextField(
-        db_column="TYPEREPORT_MP", blank=True, null=True
-    )  # Field name made lowercase.
-    dup_reports = models.TextField(
-        db_column="DUP_REPORTS", blank=True, null=True
-    )  # Field name made lowercase.
-    dollarthreshold = models.TextField(
-        db_column="DOLLARTHRESHOLD", blank=True, null=True
-    )  # Field name made lowercase.
-    lowrisk = models.TextField(
-        db_column="LOWRISK", blank=True, null=True
-    )  # Field name made lowercase.
-    reportablecondition_mp = models.TextField(
-        db_column="REPORTABLECONDITION_MP", blank=True, null=True
-    )  # Field name made lowercase.
-    materialweakness_mp = models.TextField(
-        db_column="MATERIALWEAKNESS_MP", blank=True, null=True
-    )  # Field name made lowercase.
-    qcosts = models.TextField(
-        db_column="QCOSTS", blank=True, null=True
-    )  # Field name made lowercase.
-    cyfindings = models.TextField(
-        db_column="CYFINDINGS", blank=True, null=True
-    )  # Field name made lowercase.
-    pyschedule = models.TextField(
-        db_column="PYSCHEDULE", blank=True, null=True
-    )  # Field name made lowercase.
-    totfedexpend = models.TextField(
-        db_column="TOTFEDEXPEND", blank=True, null=True
-    )  # Field name made lowercase.
-    datefirewall = models.TextField(
-        db_column="DATEFIREWALL", blank=True, null=True
-    )  # Field name made lowercase.
-    previousdatefirewall = models.TextField(
-        db_column="PREVIOUSDATEFIREWALL", blank=True, null=True
-    )  # Field name made lowercase.
-    reportrequired = models.TextField(
-        db_column="REPORTREQUIRED", blank=True, null=True
-    )  # Field name made lowercase.
-    multiple_cpas = models.TextField(
-        db_column="MULTIPLE_CPAS", blank=True, null=True
-    )  # Field name made lowercase.
-    auditor_ein = models.TextField(
-        db_column="AUDITOR_EIN", blank=True, null=True
-    )  # Field name made lowercase.
-    facaccepteddate = models.TextField(
-        db_column="FACACCEPTEDDATE", blank=True, null=True
-    )  # Field name made lowercase.
-    cpaforeign = models.TextField(
-        db_column="CPAFOREIGN", blank=True, null=True
-    )  # Field name made lowercase.
-    cpacountry = models.TextField(
-        db_column="CPACOUNTRY", blank=True, null=True
-    )  # Field name made lowercase.
-    entity_type = models.TextField(
-        db_column="ENTITY_TYPE", blank=True, null=True
-    )  # Field name made lowercase.
-    uei = models.TextField(
-        db_column="UEI", blank=True, null=True
-    )  # Field name made lowercase.
-    multipleueis = models.TextField(
-        db_column="MULTIPLEUEIS", blank=True, null=True
-    )  # Field name made lowercase.
+class ELECEINS(models.Model):
 
-    class Meta:
-        managed = False
-        db_table = "census_gen"
+    ID = models.TextField(blank=True, null=True)
+  
+    AUDITYEAR = models.TextField(blank=True, null=True)
+  
+    DBKEY = models.TextField(blank=True, null=True)
+  
+    EIN = models.TextField(blank=True, null=True)
+  
+    EINSEQNUM = models.TextField(blank=True, null=True)
+  
+    DUNS = models.TextField(blank=True, null=True)
+  
+    DUNSEQNUM = models.TextField(blank=True, null=True)
+  
+
+class ELECAUDITFINDINGS(models.Model):
+
+    ELECAUDITFINDINGSID = models.TextField(blank=True, null=True)
+  
+    ELECAUDITSID = models.TextField(blank=True, null=True)
+  
+    AUDITYEAR = models.TextField(blank=True, null=True)
+  
+    DBKEY = models.TextField(blank=True, null=True)
+  
+    REPORTID = models.TextField(blank=True, null=True)
+  
+    VERSION = models.TextField(blank=True, null=True)
+  
+    QCOSTS = models.TextField(blank=True, null=True)
+  
+    OTHERFINDINGS = models.TextField(blank=True, null=True)
+  
+    SIGNIFICANTDEFICIENCY = models.TextField(blank=True, null=True)
+  
+    MATERIALWEAKNESS = models.TextField(blank=True, null=True)
+  
+    OTHERNONCOMPLIANCE = models.TextField(blank=True, null=True)
+  
+    TYPEREQUIREMENT = models.TextField(blank=True, null=True)
+  
+    FINDINGREFNUMS = models.TextField(blank=True, null=True)
+  
+    MODIFIEDOPINION = models.TextField(blank=True, null=True)
+  
+    REPEATFINDING = models.TextField(blank=True, null=True)
+  
+    PRIORFINDINGREFNUMS = models.TextField(blank=True, null=True)
+  
+
+class ELECNOTES(models.Model):
+
+    ID = models.TextField(blank=True, null=True)
+  
+    REPORTID = models.TextField(blank=True, null=True)
+  
+    VERSION = models.TextField(blank=True, null=True)
+  
+    DBKEY = models.TextField(blank=True, null=True)
+  
+    AUDITYEAR = models.TextField(blank=True, null=True)
+  
+    SEQ_NUMBER = models.TextField(blank=True, null=True)
+  
+    TYPE_ID = models.TextField(blank=True, null=True)
+  
+    NOTE_INDEX = models.TextField(blank=True, null=True)
+  
+    TITLE = models.TextField(blank=True, null=True)
+  
+    CONTENT = models.TextField(blank=True, null=True)
+  
+    UEI = models.TextField(blank=True, null=True)
+  
+    MULTIPLEUEIS = models.TextField(blank=True, null=True)
+  
+
+class ELECFINDINGSTEXT(models.Model):
+
+    SEQ_NUMBER = models.TextField(blank=True, null=True)
+  
+    DBKEY = models.TextField(blank=True, null=True)
+  
+    AUDITYEAR = models.TextField(blank=True, null=True)
+  
+    FINDINGREFNUMS = models.TextField(blank=True, null=True)
+  
+    TEXT = models.TextField(blank=True, null=True)
+  
+    CHARTSTABLES = models.TextField(blank=True, null=True)
+  
+    REPORTID = models.TextField(blank=True, null=True)
+  
+    VERSION = models.TextField(blank=True, null=True)
+  
+    UEI = models.TextField(blank=True, null=True)
+  
+    MULTIPLEUEIS = models.TextField(blank=True, null=True)
+  
+
+class ELECCPAS(models.Model):
+
+    ID = models.TextField(blank=True, null=True)
+  
+    AUDITYEAR = models.TextField(blank=True, null=True)
+  
+    DBKEY = models.TextField(blank=True, null=True)
+  
+    SEQNUM = models.TextField(blank=True, null=True)
+  
+    VERSION = models.TextField(blank=True, null=True)
+  
+    CPAFIRMNAME = models.TextField(blank=True, null=True)
+  
+    CPASTREET1 = models.TextField(blank=True, null=True)
+  
+    CPACITY = models.TextField(blank=True, null=True)
+  
+    CPASTATE = models.TextField(blank=True, null=True)
+  
+    CPAZIPCODE = models.TextField(blank=True, null=True)
+  
+    CPACONTACT = models.TextField(blank=True, null=True)
+  
+    CPATITLE = models.TextField(blank=True, null=True)
+  
+    CPAPHONE = models.TextField(blank=True, null=True)
+  
+    CPAFAX = models.TextField(blank=True, null=True)
+  
+    CPAEMAIL = models.TextField(blank=True, null=True)
+  
+    CPAEIN = models.TextField(blank=True, null=True)
+  
+
+class ELECAUDITS(models.Model):
+
+    ELECAUDITSID = models.TextField(blank=True, null=True)
+  
+    ID = models.TextField(blank=True, null=True)
+  
+    AUDITYEAR = models.TextField(blank=True, null=True)
+  
+    DBKEY = models.TextField(blank=True, null=True)
+  
+    CFDASEQNUM = models.TextField(blank=True, null=True)
+  
+    CFDA = models.TextField(blank=True, null=True)
+  
+    FEDERALPROGRAMNAME = models.TextField(blank=True, null=True)
+  
+    AMOUNT = models.TextField(blank=True, null=True)
+  
+    MAJORPROGRAM = models.TextField(blank=True, null=True)
+  
+    TYPEREQUIREMENT = models.TextField(blank=True, null=True)
+  
+    QCOSTS2 = models.TextField(blank=True, null=True)
+  
+    FINDINGS = models.TextField(blank=True, null=True)
+  
+    FINDINGREFNUMS = models.TextField(blank=True, null=True)
+  
+    RD = models.TextField(blank=True, null=True)
+  
+    DIRECT = models.TextField(blank=True, null=True)
+  
+    CFDA_PREFIX = models.TextField(blank=True, null=True)
+  
+    CFDA_EXT = models.TextField(blank=True, null=True)
+  
+    EIN = models.TextField(blank=True, null=True)
+  
+    CFDA2 = models.TextField(blank=True, null=True)
+  
+    TYPEREPORT_MP = models.TextField(blank=True, null=True)
+  
+    TYPEREPORT_MP_OVERRIDE = models.TextField(blank=True, null=True)
+  
+    ARRA = models.TextField(blank=True, null=True)
+  
+    LOANS = models.TextField(blank=True, null=True)
+  
+    FINDINGSCOUNT = models.TextField(blank=True, null=True)
+  
+    LOANBALANCE = models.TextField(blank=True, null=True)
+  
+    PASSTHROUGHAMOUNT = models.TextField(blank=True, null=True)
+  
+    AWARDIDENTIFICATION = models.TextField(blank=True, null=True)
+  
+    CLUSTERNAME = models.TextField(blank=True, null=True)
+  
+    PASSTHROUGHAWARD = models.TextField(blank=True, null=True)
+  
+    STATECLUSTERNAME = models.TextField(blank=True, null=True)
+  
+    PROGRAMTOTAL = models.TextField(blank=True, null=True)
+  
+    CLUSTERTOTAL = models.TextField(blank=True, null=True)
+  
+    OTHERCLUSTERNAME = models.TextField(blank=True, null=True)
+  
+    CFDAPROGRAMNAME = models.TextField(blank=True, null=True)
+  
+
+class ELECPASSTHROUGH(models.Model):
+
+    ID = models.TextField(blank=True, null=True)
+  
+    AUDITYEAR = models.TextField(blank=True, null=True)
+  
+    DBKEY = models.TextField(blank=True, null=True)
+  
+    ELECAUDITSID = models.TextField(blank=True, null=True)
+  
+    PASSTHROUGHNAME = models.TextField(blank=True, null=True)
+  
+    PASSTHROUGHID = models.TextField(blank=True, null=True)
+  
+
+class ELECUEIS(models.Model):
+
+    UEISID = models.TextField(blank=True, null=True)
+  
+    REPORTID = models.TextField(blank=True, null=True)
+  
+    VERSION = models.TextField(blank=True, null=True)
+  
+    DBKEY = models.TextField(blank=True, null=True)
+  
+    AUDITYEAR = models.TextField(blank=True, null=True)
+  
+    UEI = models.TextField(blank=True, null=True)
+  
+    SEQNUM = models.TextField(blank=True, null=True)
+  
+
+class ELECCAPTEXT(models.Model):
+
+    SEQ_NUMBER = models.TextField(blank=True, null=True)
+  
+    DBKEY = models.TextField(blank=True, null=True)
+  
+    AUDITYEAR = models.TextField(blank=True, null=True)
+  
+    FINDINGREFNUMS = models.TextField(blank=True, null=True)
+  
+    TEXT = models.TextField(blank=True, null=True)
+  
+    CHARTSTABLES = models.TextField(blank=True, null=True)
+  
+    REPORTID = models.TextField(blank=True, null=True)
+  
+    VERSION = models.TextField(blank=True, null=True)
+  
+    UEI = models.TextField(blank=True, null=True)
+  
+    MULTIPLEUEIS = models.TextField(blank=True, null=True)
+  

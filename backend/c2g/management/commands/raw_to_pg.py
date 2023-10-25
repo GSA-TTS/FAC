@@ -10,7 +10,7 @@ from django.apps import apps
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.WARNING)
 
-c2f_models = list(apps.get_app_config("census2fac").get_models())
+c2f_models = list(apps.get_app_config("c2g").get_models())
 c2f_model_names = [m._meta.model_name for m in c2f_models]
 s3_client = boto3.client(
     "s3",
@@ -26,11 +26,14 @@ class Command(BaseCommand):
         parser.add_argument("--folder", help="S3 folder name", required=True)
 
     def handle(self, *args, **options):
+        print("c2f_model_names", c2f_model_names)
         items = s3_client.list_objects(
             Bucket=c2f_bucket_name,
             Prefix=options["folder"],
         )["Contents"]
         for item in items:
+            if item["Key"].endswith("/"):
+                continue
             model_name = self.get_model_name(item["Key"])
             if model_name:
                 model_obj = c2f_models[c2f_model_names.index(model_name)]
@@ -39,12 +42,13 @@ class Command(BaseCommand):
                 self.load_table(model_obj, rows)
 
     def get_model_name(self, name):
+        print(f"Checking raw file name {name}")
         name = name.split("/")[-1].split(".")[0]
         print(f"Checking file name {name}")
-        for m in c2f_model_names:
-            m_suffix = m[len("census") :]
-            if name.startswith(m_suffix):
-                return m
+        for model_name in c2f_model_names:
+            # m_suffix = m[len("census") :]
+            if name.lower().startswith(model_name):
+                return model_name
         print("Could not find a matching model")
         return None
 
@@ -54,6 +58,8 @@ class Command(BaseCommand):
         column_names = [cn.lower().rstrip() for cn in column_names]
         for i in range(1, 10):
             print(f"Loading {i} of {len(row_list) -1} rows ")
+            if i > len(row_list) - 1:
+                continue
             model_instance = model_obj()
             row = row_list[i].decode("utf-8").split("|")
             for column_name in column_names:
