@@ -30,13 +30,7 @@ module "https-proxy" {
       "secure.login.gov:443",
 
       # Git
-      "*.github.com:443",
-
-      # AWS CLI
-      "awscli.amazonaws.com",
-
-      # Used to grab AWSLabs s3tar tool from direct download uri
-      "objects.githubusercontent.com"
+      "*.github.com:443"
     ],
     # The parens here make Terraform understand that the key below is a reference
     # Solution from https://stackoverflow.com/a/57401750
