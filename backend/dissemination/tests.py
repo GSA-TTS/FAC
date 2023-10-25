@@ -158,6 +158,6 @@ class SummaryViewTests(TestCase):
             cap_text.contains_chart_or_table,
         )
         self.assertEquals(
-            response.context["data"]["Notes"][0]["accounting_policies"],
+            response.context["data"]["Notes to SEFA"][0]["accounting_policies"],
             note.accounting_policies,
         )
