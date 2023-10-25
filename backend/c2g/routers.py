@@ -1,5 +1,5 @@
 app_name = "c2g"
-db_name = "c2f-db"
+db_name = "c2g-db"
 
 
 class DBRouter:
