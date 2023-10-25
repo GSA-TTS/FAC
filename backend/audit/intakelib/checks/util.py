@@ -55,18 +55,45 @@ def build_cell_error_tuple(ir, range, ndx, message):
     )
 
 
+def appears_empty(v):
+    return (v is None) or (str(v).strip() == "")
+
+
+def is_y_or_n(v):
+    value = str(v).strip()
+    return value == "Y" or value == "N"
+
+
 def get_missing_value_errors(ir, range_name, message_key):
     range_data = get_range_by_name(ir, range_name)
     errors = []
     if range_data:
         for index, value in enumerate(range_data["values"]):
-            if (value is None) or (str(value).strip() == ""):
+            if appears_empty(value):
                 errors.append(
                     build_cell_error_tuple(
                         ir,
                         range_data,
                         index,
                         get_message(message_key),
+                    )
+                )
+
+    return errors
+
+
+def invalid_y_or_n_entry(ir, range_name, message_key):
+    range_data = get_range_by_name(ir, range_name)
+    errors = []
+    if range_data:
+        for index, value in enumerate(range_data["values"]):
+            if not is_y_or_n(value):
+                errors.append(
+                    build_cell_error_tuple(
+                        ir,
+                        range_data,
+                        index,
+                        get_message(message_key).format(value),
                     )
                 )
 

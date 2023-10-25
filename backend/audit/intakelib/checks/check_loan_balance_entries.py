@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 
 # DESCRIPTION
 # This makes sure that the loan guarantee is either a numerical value or N/A or an empty string.
-def loan_balance(ir):
+def loan_balance_entry_is_valid(ir):
     loan_balance_at_period_end = get_range_values_by_name(
         ir, "loan_balance_at_audit_period_end"
     )
