@@ -1,18 +1,9 @@
-<<<<<<< HEAD
 SEQ_NUMBER,DBKEY,AUDITYEAR,FINDINGREFNUMS,TEXT,CHARTSTABLES,REPORTID,VERSION,UEI,MULTIPLEUEIS
 37781,204281,2021,2021-001,"Island Park UFSD                                                                                                                     Single Audit Report of May 24, 2022 by R.S. Abrams, LLP                                                                             Corrective Action Plan                                                                                                              Finding #2021-001                                                                                                                    U.S. Department of Agriculture - Passed-trough the NYS Education Department                                                          Summer Food Service Program for Children (Cash Assistance); Assistance Listing Number 10.559, Grant Period - Fiscal Year Ended June 30, 2021                                                                                                                      Condition: During our audit, we noted the monthly claims for reimbursement are not compared to reports from the point of sale (""POS"") system by an individual other than the preparer of the claims report prior to submission.                                  Corrective Action: Beginning on May 25, 2022, a food service employee, working in the cafeteria, will review and reconcile the meal count and meal reimbursement claim report before it is submitted by the preparer of the report. The food service employee assigned to this task will evidence the review process by signing off on the claims reports before they are submitted for reimbursement.                                                                                                                   Person Responsible: Nancy Marracolla, Food Service Manager.                                                                      Anticipated completion date: 2021-22 fiscal year.",N,932471,1,,
 34938,252670,2021,2021-001,"Views of Responsible Officials: By March 2022, the Foundation will replace its current accounting software with Quickbooks, to provide with the needed double-entry accounting system.
 ",N,924559,1,,
 34939,252670,2021,2021-002,"Views of Responsible Officials: Beginning immediately, the Foundation will strengthen its monitoring of the subrecipient’s use of Federal funds to include reviews of subrecipient award expenditures, and monitoring of programmatic outcomes.",N,924559,1,,
 41022,26716,2021,2021-001,"Audit period: October 1, 2020- September 30, 2021
-=======
-,SEQ_NUMBER,DBKEY,AUDITYEAR,FINDINGREFNUMS,TEXT,CHARTSTABLES,REPORTID,VERSION,UEI,MULTIPLEUEIS
-9996,37781,204281,2021,2021-001,"Island Park UFSD                                                                                                                     Single Audit Report of May 24, 2022 by R.S. Abrams, LLP                                                                             Corrective Action Plan                                                                                                              Finding #2021-001                                                                                                                    U.S. Department of Agriculture - Passed-trough the NYS Education Department                                                          Summer Food Service Program for Children (Cash Assistance); Assistance Listing Number 10.559, Grant Period - Fiscal Year Ended June 30, 2021                                                                                                                      Condition: During our audit, we noted the monthly claims for reimbursement are not compared to reports from the point of sale (""POS"") system by an individual other than the preparer of the claims report prior to submission.                                  Corrective Action: Beginning on May 25, 2022, a food service employee, working in the cafeteria, will review and reconcile the meal count and meal reimbursement claim report before it is submitted by the preparer of the report. The food service employee assigned to this task will evidence the review process by signing off on the claims reports before they are submitted for reimbursement.                                                                                                                   Person Responsible: Nancy Marracolla, Food Service Manager.                                                                      Anticipated completion date: 2021-22 fiscal year.",N,932471,1,,
-10491,34938,252670,2021,2021-001,"Views of Responsible Officials: By March 2022, the Foundation will replace its current accounting software with Quickbooks, to provide with the needed double-entry accounting system.
-",N,924559,1,,
-10492,34939,252670,2021,2021-002,"Views of Responsible Officials: Beginning immediately, the Foundation will strengthen its monitoring of the subrecipient’s use of Federal funds to include reviews of subrecipient award expenditures, and monitoring of programmatic outcomes.",N,924559,1,,
-10590,41022,26716,2021,2021-001,"Audit period: October 1, 2020- September 30, 2021
->>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 The findings from the September 30, 2021, schedule of findings and questioned costs are discussed below. The findings are numbered consistently with the numbers assigned in the schedule.
 FINDINGS- Federal Awards
 Finding 2021-001: Matching requirements
@@ -23,11 +14,7 @@ protocols.  Volunteer time and meeting space in-kind donations were unavailable 
 Management will recalculate our match based on actual costs.  WIPA has removed the match requirement for FY 22-26.  Management will monitor any other match requirements to calculate based on actual costs not fair market  value.    Management  will report  the  recalculated  match to Maher Duessel.  Management will complete this task by July 18, 2022.
 If the Pennsylvania Office of the Budget has questions regarding this plan, please call Peri Jude
 Radecic, Chief Executive Officer at (717) 980-3198. ",N,934034,1,,
-<<<<<<< HEAD
 55611,258004,2021,2021-001,"2021-001:  Material Weakness in Internal Control; Material Noncompliance – Reporting
-=======
-10751,55611,258004,2021,2021-001,"2021-001:  Material Weakness in Internal Control; Material Noncompliance – Reporting
->>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 
 Finding:  The Health System did not complete the PRF portal reporting in accordance with the U.S. Department of Health and Human Services guidance. During our testing of the Period 1 and Period 2 consolidated PRF reports for the Health System, we observed the following exceptions: 
 
@@ -52,11 +39,7 @@ JD Turco, Senior Vice President – Finance
 jdturco@stbarnabashealthsystem.com
 724-687-9355
 ",N,980570,1,,
-<<<<<<< HEAD
 42470,239098,2021,2021-001,"Finding ref number:
-=======
-11944,42470,239098,2021,2021-001,"Finding ref number:
->>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 2021-001
 Finding caption:
 The District lacked adequate internal controls for ensuring compliance
@@ -74,11 +57,7 @@ The District will formalize a processes to check all new contractor’s exclusio
 System for Award Management (SAM.gov) and to retain copies of those searches in the
 vendor’s file including those searches where the vendor is not found in the system.
 Anticipated date to complete the corrective action: December 31, 2022",N,942119,1,,
-<<<<<<< HEAD
 34293,245543,2021,2021-002,"Finding 2021-002 
-=======
-12086,34293,245543,2021,2021-002,"Finding 2021-002 
->>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 Federal Agency Name:  Department of Education
 Federal Financial Assistance Listing:  84.425E, 84.425F
 Program Name:  COVID-19: Higher Education Emergency Relief Student Aid Portion, COVID-19: Higher Education Emergency Relief Institutional Portion
@@ -94,11 +73,7 @@ Corrective Action Plan: Management agrees with this finding. The University has 
 Anticipated Completion Date: Completed in October 2021.
 
 ",N,922379,1,,
-<<<<<<< HEAD
 34294,245543,2021,2021-001,"Finding 2021-001 
-=======
-12087,34294,245543,2021,2021-001,"Finding 2021-001 
->>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 Federal Agency Name:  Department of Education
 Program Name:  Student Financial Aid Cluster
 Federal Financial Assistance Listing:  84.007, 84.033, 84.063, 84.038, 84.268, 84.379
@@ -125,11 +100,7 @@ two dates occur, that the Registrar’s Office is picking up the correct reporti
 
 Anticipated Completion Date: June 30, 2022.
 ",N,922379,1,,
-<<<<<<< HEAD
 37853,253404,2021,2021-001,"Atlanta Water System, Inc.
-=======
-12134,37853,253404,2021,2021-001,"Atlanta Water System, Inc.
->>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 P.O. Box 965
 Winnfield, LA 71483
 
@@ -203,11 +174,7 @@ Sincerely,
 W.C. McCarty, Jr, President
 Atlanta Water System, Inc.
 ",N,933929,1,,
-<<<<<<< HEAD
 37663,23052,2021,2021-003,"Views of Responsible Officials and Planned Corrective Actions: Management is in agreement with the
-=======
-12458,37663,23052,2021,2021-003,"Views of Responsible Officials and Planned Corrective Actions: Management is in agreement with the
->>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 recommendation. The Center is working to implement controls that will reduce the likelihood of similar
 errors in the future. Moving forward as part of the quarterly and annual close processes, the grant
 accountant will reconcile information submitted on the Federal Financial Reports to the general ledger
@@ -217,11 +184,7 @@ Contact Person Responsible for Corrective Action: The Director of Finance and Re
 Dheera Lingamallu, will be responsible for this review.
 Anticipated Completion Date: The planned anticipated completion date for this review is June 30,
 2022.",N,930561,1,,
-<<<<<<< HEAD
 32900,185885,2021,2021-001,"Finding #2021-001
-=======
-13037,32900,185885,2021,2021-001,"Finding #2021-001
->>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 
 Comments on the Finding and Each Recommendation: 
 
@@ -231,11 +194,7 @@ Recommendation: Management should deposit $26,228 into the residual receipts res
 
 Action(s) taken or planned on the finding: Management agrees with the finding and auditor's recommendation. Management will transfer funds to the residual receipts reserve as cash flow permits.
 ",N,914356,1,,
-<<<<<<< HEAD
 32901,185885,2021,2021-002,"Finding #2021-002
-=======
-13042,32901,185885,2021,2021-002,"Finding #2021-002
->>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 
 Comments on the Finding and Each Recommendation:
 
@@ -246,11 +205,7 @@ Recommendation: Management should transfer $1,447 from the operating account to 
 Action(s) taken or planned on the finding: Management agrees with the finding and auditor's recommendation. Management will transfer funds to the reserve for replacements.
  
 ",N,914356,1,,
-<<<<<<< HEAD
 56675,190034,2021,2021-002,"Views of Responsible Officials and Planned Corrective Actions: The 2020 annual audit was
-=======
-13393,56675,190034,2021,2021-002,"Views of Responsible Officials and Planned Corrective Actions: The 2020 annual audit was
->>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 submitted by the due date, but due to an error inputting the EIN, the audit could not be accessed
 using the correct EIN as a search criterion. However, the audit was accessible when searching
 under other search modes.
@@ -278,11 +233,7 @@ Clearinghouse as soon as the report was final. With the addition of experienced 
 should not be delayed.
 Contact Person Responsible for Corrective Action: Glenn Dickerson, CPA — Chief Financial
 Officer",N,985694,1,,
-<<<<<<< HEAD
 36676,247591,2021,2021-002,"DEPARTMENT OF HOUSING AND URBAN DEVELOPMENT
-=======
-13757,36676,247591,2021,2021-002,"DEPARTMENT OF HOUSING AND URBAN DEVELOPMENT
->>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 HUD Finding No. 2021-002
 S-2700-005
 Property Improvement Loan Insurance for Improving All Existing Structures and Building of New Nonresidential
@@ -374,11 +325,7 @@ deleted all voicemail from the desktop telephone. Accordingly, this incident of 
 destruction resulted in additional costs to the project by the management company that should be included
 in the above questioned costs.
 S-2700-090",N,926339,1,,
-<<<<<<< HEAD
 36677,247591,2021,2021-003,"DEPARTMENT OF HOUSING AND URBAN DEVELOPMENT (continued)
-=======
-13758,36677,247591,2021,2021-003,"DEPARTMENT OF HOUSING AND URBAN DEVELOPMENT (continued)
->>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 Finding No. 2021-003
 Property Improvement Loan Insurance for Improving All Existing Structures and Building of New Nonresidential
 Structures - Assistance Listing No. 14.142
@@ -416,11 +363,7 @@ management agent.
 Views of Responsible Officials and Planned Corrective Actions
 We agree with the above finding. The new property management company's management agreement was
 reviewed by legal counsel and contains the above required HUD provisions.",N,926339,1,,
-<<<<<<< HEAD
 36678,247591,2021,2021-001,"Finding No. 2021-001
-=======
-13759,36678,247591,2021,2021-001,"Finding No. 2021-001
->>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 Rural Housing Service Section 515 Rural Rental Housing Loans - Assistance Listing No. 10.xxx
 Internal Control - Unrecorded Transactions
 Criteria
@@ -461,11 +404,7 @@ Views of Responsible Officials and Planned Corrective Actions
 We agree with the finding and have contracted with an area firm to provide training for our bookkeeper. We
 are hiring for new positions such as program director and housing development director due to our rapid
 growth which is expected to continue, which will add more expertise and work hours to our staff.",N,926339,1,,
-<<<<<<< HEAD
 34413,7857,2021,2021-001,"The sole fi nding from the 6.30.2021 schedule of findings and questioned costs discussed below and
-=======
-13935,34413,7857,2021,2021-001,"The sole fi nding from the 6.30.2021 schedule of findings and questioned costs discussed below and
->>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 numbered consistently with the numbers assigned in Section A of the. Sum'mary of Audit Results
 does not include findings and is not addressed.
 FINDINGS -FINANCIAL STATEMENT AUDIT
@@ -486,22 +425,14 @@ withdrawals will be reviewed and compared to corresponding contract for verifica
 prior to submission to HUD to ensure correct amounts are being requested.
 If the U.S. Department of Housing and Urban Development has questions regarding this plan,
 please call.",N,925142,1,,
-<<<<<<< HEAD
 44229,255441,2021,2021-001,"2021-001 Provider Relief Fund Reporting of Lost Revenue
-=======
-14158,44229,255441,2021,2021-001,"2021-001 Provider Relief Fund Reporting of Lost Revenue
->>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 
 Corrective action planned:	We will ensure only patient service revenue is included in all subsequent Provider Relief Fund reporting periods.
 
 Anticipated completion date:	September 2022
 Contact person responsible for corrective action:	Jan Peter, CFO
 ",Y,943147,1,,
-<<<<<<< HEAD
 42483,141384,2021,2021-004,"11-021-3050-26
-=======
-14540,42483,141384,2021,2021-004,"11-021-3050-26
->>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 CORRECTIVE ACTION PLAN FOR CURRENT YEAR AUDIT FINDINGS
 Year Ending June 30, 2021
 
@@ -534,11 +465,7 @@ Management Response:	Management will properly educate the preparer of the monthl
 						08/18/22	
 Shannon Cheek, Superintendent		Date
 ",N,944072,1,,
-<<<<<<< HEAD
 42484,141384,2021,2021-003,"11-021-3050-26
-=======
-14541,42484,141384,2021,2021-003,"11-021-3050-26
->>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 CORRECTIVE ACTION PLAN FOR CURRENT YEAR AUDIT FINDINGS
 Year Ending June 30, 2021
 
@@ -571,13 +498,8 @@ Management Response:	The plan will be implemented for the audit year ended June 
 						08/18/22	
 Shannon Cheek, Superintendent		Date
 ",N,944072,1,,
-<<<<<<< HEAD
 42892,108922,2021,2021-001,"2021-001 SEGREGATION OF DUTIES - CONDITION/CONTEXT: COUNCIL STAFF HAVE LIMITED SEGREGATION OF DUTIES FOR ALL TRANSACTIONS OF THE ENTITY.  THE COUNCIL'S STAFF IS NOT LARGE ENOUGH TO PERMIT ADEQUATE SEGREGATION OF DUTIES.  THIS LACK OF SEGREGATION OF DUTIES DOES NOT ALLOW MANAGEMENT TO DETECT AND CORRECT A MATERIAL MISSTATEMENT IF PRESENT.  DUE TO THE SIZE OF THE COUNCIL'S STAFF IT IS ANTICIPATED THAT THIS WILL BE AN ONGOING FINDING.  COMPENSATING CONTROLS ARE IN PLACE; HOWEVER, THIS CONTINUES TO BE AN ONGOING FINDING.  RECOMMENDATION: IN OUR JUDGMENT, MANAGEMENT AND THOSE CHARGED WITH GOVERNANCE NEED TO UNDERSTAND THE IMPORTANCE OF THIS COMMUNICATION.  HOWEVER, DUE TO THE LACK OF RESOURCES AVAILABLE TO MANAGEMENT TO CORRECT THIS WEAKNESS, WE RECOMMEND THAT MANAGEMENT MITIGATE THIS WEAKNESS WITH POSSIBLE COMPENSATING CONTROLS SUCH AS CLOSE SUPERVISION AND MONITORING BY MANAGEMENT AND BY THE BOARD OF DIRECTORS.  CORRECTIVE ACTION PLANNED: THE COUNCIL OF COMMUNITY SERVICES HAS A FULL-TIME BOOKKEEPER WITH ADEQUATE EXPERIENCE, CONTINUES TO HAVE BOARD INVOLVEMENT, AND ACTIVELY SEEKS NEW BOARD MEMBERS WITH FINANCIAL EXPERIENCE.  WE ALSO ADDED A BOARD MEMBER WHO IS A CERTIFIED PUBLIC ACCOUNTANT THAT ALSO SITS ON THE FINANCE COMMITTEE OF THE BOARD.  THIS ADDITIONAL OVERSIGHT ADDS LAYERS OF SUPERVISION AND MONITORING WHICH SHOULD ALLOW ANY INTENTIONAL FRAUD OR UNINTENTIONAL ERRORS TO BE PREVENTED OR DETECTED AND CORRECTED IN A TIMELY MANNER.  COMPENSATING CONTROLS ARE IN PLACE; HOWEVER, THIS CONTINUES TO BE AN ONGOING FINDING.  CONTACT: MIKEL SCOTT - EXECUTIVE DIRECTOR.  ANTICIPATED COMPLETION DATE: DUE TO THE SIZE OF THE STAFF, THIS IS EXPECTED TO BE AN ONGOING FINDING, ALL COMPENSATING CONTROLS HAVE BEEN IN PLACE SINCE 2015.",N,940699,1,,
 33736,246905,2021,2021-001,"The auditee acknowledges the 88% compliance rate finding of the auditors and notes that no patient suffered financial harm, i.e., no patient was overcharged for services due to being assigned an inaccurate slide level in their electronic medical record (EMR). A review of the samples noted revealed that 9 individual patient accounts did not have a sliding fee application saved in the EMR when the patient was provided a sliding fee level. All instances noted were the result of front desk staff creating 30 day sliding fee plans for patients without the patient submitting a sliding fee application. Management would like to note that samples were selected from a date range prior to the implementation of the corrective action plan (CAP) associated with this finding from the prior year.
-=======
-14570,42892,108922,2021,2021-001,"2021-001 SEGREGATION OF DUTIES - CONDITION/CONTEXT: COUNCIL STAFF HAVE LIMITED SEGREGATION OF DUTIES FOR ALL TRANSACTIONS OF THE ENTITY.  THE COUNCIL'S STAFF IS NOT LARGE ENOUGH TO PERMIT ADEQUATE SEGREGATION OF DUTIES.  THIS LACK OF SEGREGATION OF DUTIES DOES NOT ALLOW MANAGEMENT TO DETECT AND CORRECT A MATERIAL MISSTATEMENT IF PRESENT.  DUE TO THE SIZE OF THE COUNCIL'S STAFF IT IS ANTICIPATED THAT THIS WILL BE AN ONGOING FINDING.  COMPENSATING CONTROLS ARE IN PLACE; HOWEVER, THIS CONTINUES TO BE AN ONGOING FINDING.  RECOMMENDATION: IN OUR JUDGMENT, MANAGEMENT AND THOSE CHARGED WITH GOVERNANCE NEED TO UNDERSTAND THE IMPORTANCE OF THIS COMMUNICATION.  HOWEVER, DUE TO THE LACK OF RESOURCES AVAILABLE TO MANAGEMENT TO CORRECT THIS WEAKNESS, WE RECOMMEND THAT MANAGEMENT MITIGATE THIS WEAKNESS WITH POSSIBLE COMPENSATING CONTROLS SUCH AS CLOSE SUPERVISION AND MONITORING BY MANAGEMENT AND BY THE BOARD OF DIRECTORS.  CORRECTIVE ACTION PLANNED: THE COUNCIL OF COMMUNITY SERVICES HAS A FULL-TIME BOOKKEEPER WITH ADEQUATE EXPERIENCE, CONTINUES TO HAVE BOARD INVOLVEMENT, AND ACTIVELY SEEKS NEW BOARD MEMBERS WITH FINANCIAL EXPERIENCE.  WE ALSO ADDED A BOARD MEMBER WHO IS A CERTIFIED PUBLIC ACCOUNTANT THAT ALSO SITS ON THE FINANCE COMMITTEE OF THE BOARD.  THIS ADDITIONAL OVERSIGHT ADDS LAYERS OF SUPERVISION AND MONITORING WHICH SHOULD ALLOW ANY INTENTIONAL FRAUD OR UNINTENTIONAL ERRORS TO BE PREVENTED OR DETECTED AND CORRECTED IN A TIMELY MANNER.  COMPENSATING CONTROLS ARE IN PLACE; HOWEVER, THIS CONTINUES TO BE AN ONGOING FINDING.  CONTACT: MIKEL SCOTT - EXECUTIVE DIRECTOR.  ANTICIPATED COMPLETION DATE: DUE TO THE SIZE OF THE STAFF, THIS IS EXPECTED TO BE AN ONGOING FINDING, ALL COMPENSATING CONTROLS HAVE BEEN IN PLACE SINCE 2015.",N,940699,1,,
-15563,33736,246905,2021,2021-001,"The auditee acknowledges the 88% compliance rate finding of the auditors and notes that no patient suffered financial harm, i.e., no patient was overcharged for services due to being assigned an inaccurate slide level in their electronic medical record (EMR). A review of the samples noted revealed that 9 individual patient accounts did not have a sliding fee application saved in the EMR when the patient was provided a sliding fee level. All instances noted were the result of front desk staff creating 30 day sliding fee plans for patients without the patient submitting a sliding fee application. Management would like to note that samples were selected from a date range prior to the implementation of the corrective action plan (CAP) associated with this finding from the prior year.
->>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 Management would also like to note that the individual responsible for ensuring the proper application of sliding fee procedures has been terminated for failure to follow the procedures. Implementation of routine audits caught the error and, therefore, the plan of action from the prior year will be continued.
 Plan of Action:
 Management reviewed the findings and rationalized the reasons these findings occurred as well as measures to reduce the potential for future errors. The following course of action has been completed:
@@ -593,7 +515,6 @@ supervisor to ensure the accuracy of the sliding fee discounts given and require
 for Genesis Health Care, Inc. By continuing to incorporate the above-referenced corrective action, we
 demonstrate our ongoing commitment to providing our patients and the communities we serve high
 quality healthcare services regardless of their ability to pay.",Y,922396,1,,
-<<<<<<< HEAD
 50795,257227,2021,2021-002,"Views of Responsible Officials and Planned Corrective Actions: Prior to the FYE 2021 audits, MECCA had identified issues regarding the proper maintenance and review of payroll records and corrective action was taken in November 2021 by the Operations and Administration Coordinator. In November 2021, a full-service payroll and HR company was brought on to support MECCA in meeting all regulatory requirements, which began processing MECCA’s payroll in February 2022 and began working with the Operations and Administration Coordinator to do an internal HR audit in March and April of 2022. As of February 2022, all new employees were on boarded in compliance with all relevant regulatory requirements. And as of January 2023, all active employee files were complete with necessary documentation. In addition to the above corrective action, in April 2022, MECCA’s then Finance Manager implemented a Time and Effort policy and conducted a Time Survey to capture the staff time spent on programs. From May 2022 to September 2022, MECCA required staff to recertify time allocations quarterly. Starting October 2022, MECCA staff certify their time and effort allocations monthly. MECCA conducts the Time Survey annually, and the current Finance and Operations Director is responsible for ensuring staff Time and Effort is properly captured. The then Executive Director and the then Director of Operations and Program Administration were responsible for ensuring the corrective actions were implemented.  In 2023, MECCA's Current Executive Director will be responsible for ensuring compliance to all relevant regulatory requirements. The Executive Director serves as the organizational HR supervisor and is responsible for working with and overseeing the payroll and HR company to ensure that onboarding, proper documentation, timekeeping, payroll, and any HR updates or pay rate changes are done for compliance. ",N,974289,1,,
 50796,257227,2021,2021-001,"Views of Responsible Officials and Planned Corrective Actions: Prior to the FYE 2021 audits, MECCA had identified issues regarding the proper maintenance and review of payroll records and corrective action was taken in November 2021 by the Operations and Administration Coordinator. In November 2021, a full-service payroll and HR company was brought on to support MECCA in meeting all regulatory requirements, which began processing MECCA’s payroll in February 2022 and began working with the Operations and Administration Coordinator to do an internal HR audit in March and April of 2022. As of February 2022, all new employees were on boarded in compliance with all relevant regulatory requirements. And as of January 2023, all active employee files were complete with necessary documentation. In addition to the above corrective action, in April 2022, MECCA’s then Finance Manager implemented a Time and Effort policy and conducted a Time Survey to capture the staff time spent on programs. From May 2022 to September 2022, MECCA required staff to recertify time allocations quarterly. Starting October 2022, MECCA staff certify their time and effort allocations monthly. MECCA conducts the Time Survey annually, and the current Finance and Operations Director is responsible for ensuring staff Time and Effort is properly captured. The then Executive Director and the then Director of Operations and Program Administration were responsible for ensuring the corrective actions were implemented.  In 2023, MECCA's Current Executive Director will be responsible for ensuring compliance to all relevant regulatory requirements. The Executive Director serves as the organizational HR supervisor and is responsible for working with and overseeing the payroll and HR company to ensure that onboarding, proper documentation, timekeeping, payroll, and any HR updates or pay rate changes are done for compliance. ",N,974289,1,,
 50797,257227,2021,2021-003,"Views of Responsible Officials and Planned Corrective Actions: Management agrees with the finding and will prevent future delays of the Single Audit report by having staff available to accommodate for the Single Audit. During 2022, management has represented that the Organization has policies and procedures in place to assist staff prepare for the Single Audit earlier in the year to conduct the Single Audit for the fiscal year June 30, 2022 and submit the Single Audit report no later than nine months after year end.",N,974289,1,,
@@ -602,16 +523,6 @@ quality healthcare services regardless of their ability to pay.",Y,922396,1,,
 36771,234387,2021,2021-003,"The required remittances were made on a monthly basis, however delivery delays into the bank account were outside of our control. To correct this going forward, we will explore utilizing a financial institution that will allow for external wire transfers into the reserve for replacement bank account to avoid postal or other delivery methods delay. ",N,930702,1,,
 36772,234387,2021,2021-002,"We will ensure that going forward, all required utility accrual entries will be done timely.",N,930702,1,,
 29851,123503,2021,2021-001,"Audit Finding 2021-001
-=======
-16089,50795,257227,2021,2021-002,"Views of Responsible Officials and Planned Corrective Actions: Prior to the FYE 2021 audits, MECCA had identified issues regarding the proper maintenance and review of payroll records and corrective action was taken in November 2021 by the Operations and Administration Coordinator. In November 2021, a full-service payroll and HR company was brought on to support MECCA in meeting all regulatory requirements, which began processing MECCA’s payroll in February 2022 and began working with the Operations and Administration Coordinator to do an internal HR audit in March and April of 2022. As of February 2022, all new employees were on boarded in compliance with all relevant regulatory requirements. And as of January 2023, all active employee files were complete with necessary documentation. In addition to the above corrective action, in April 2022, MECCA’s then Finance Manager implemented a Time and Effort policy and conducted a Time Survey to capture the staff time spent on programs. From May 2022 to September 2022, MECCA required staff to recertify time allocations quarterly. Starting October 2022, MECCA staff certify their time and effort allocations monthly. MECCA conducts the Time Survey annually, and the current Finance and Operations Director is responsible for ensuring staff Time and Effort is properly captured. The then Executive Director and the then Director of Operations and Program Administration were responsible for ensuring the corrective actions were implemented.  In 2023, MECCA's Current Executive Director will be responsible for ensuring compliance to all relevant regulatory requirements. The Executive Director serves as the organizational HR supervisor and is responsible for working with and overseeing the payroll and HR company to ensure that onboarding, proper documentation, timekeeping, payroll, and any HR updates or pay rate changes are done for compliance. ",N,974289,1,,
-16090,50796,257227,2021,2021-001,"Views of Responsible Officials and Planned Corrective Actions: Prior to the FYE 2021 audits, MECCA had identified issues regarding the proper maintenance and review of payroll records and corrective action was taken in November 2021 by the Operations and Administration Coordinator. In November 2021, a full-service payroll and HR company was brought on to support MECCA in meeting all regulatory requirements, which began processing MECCA’s payroll in February 2022 and began working with the Operations and Administration Coordinator to do an internal HR audit in March and April of 2022. As of February 2022, all new employees were on boarded in compliance with all relevant regulatory requirements. And as of January 2023, all active employee files were complete with necessary documentation. In addition to the above corrective action, in April 2022, MECCA’s then Finance Manager implemented a Time and Effort policy and conducted a Time Survey to capture the staff time spent on programs. From May 2022 to September 2022, MECCA required staff to recertify time allocations quarterly. Starting October 2022, MECCA staff certify their time and effort allocations monthly. MECCA conducts the Time Survey annually, and the current Finance and Operations Director is responsible for ensuring staff Time and Effort is properly captured. The then Executive Director and the then Director of Operations and Program Administration were responsible for ensuring the corrective actions were implemented.  In 2023, MECCA's Current Executive Director will be responsible for ensuring compliance to all relevant regulatory requirements. The Executive Director serves as the organizational HR supervisor and is responsible for working with and overseeing the payroll and HR company to ensure that onboarding, proper documentation, timekeeping, payroll, and any HR updates or pay rate changes are done for compliance. ",N,974289,1,,
-16091,50797,257227,2021,2021-003,"Views of Responsible Officials and Planned Corrective Actions: Management agrees with the finding and will prevent future delays of the Single Audit report by having staff available to accommodate for the Single Audit. During 2022, management has represented that the Organization has policies and procedures in place to assist staff prepare for the Single Audit earlier in the year to conduct the Single Audit for the fiscal year June 30, 2022 and submit the Single Audit report no later than nine months after year end.",N,974289,1,,
-17388,36769,234387,2021,2021-001,"In 2021 we were recording prepaid expenses monthly as required and reconciling based on the policy renewal date of 3/15/2021. Going forward, we will adjust the general ledger to match that of the prepaid expense schedule at fiscal year-end in reconciliation of the same. ",N,930702,1,,
-17389,36770,234387,2021,2021-004,No formal response provided.,N,930702,1,,
-17390,36771,234387,2021,2021-003,"The required remittances were made on a monthly basis, however delivery delays into the bank account were outside of our control. To correct this going forward, we will explore utilizing a financial institution that will allow for external wire transfers into the reserve for replacement bank account to avoid postal or other delivery methods delay. ",N,930702,1,,
-17391,36772,234387,2021,2021-002,"We will ensure that going forward, all required utility accrual entries will be done timely.",N,930702,1,,
-17858,29851,123503,2021,2021-001,"Audit Finding 2021-001
->>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 Special Tests and Provisions
 Enrollment Reporting: Significant Deficiency in Internal Control over Compliance
 1. The COVID-19 campus closure and subsequent changes to the academic calendar were unprecedented and created short-term disruption in administrative processes, which the University had in place. Due to the third-party processing issue, the University will be required to submit a third file for each reporting branch to our third-party processor. The University will
@@ -619,11 +530,7 @@ continue to compare the data submitted to our third-party processor and then for
 2. For the delayed degree conferrals, the University has already implemented an escalation system for requests and reports run through our internal centralized email system. The University has also added additional reports sent regularly to our Associate Registrar responsible for enrollment reporting for additional supervision ensuring that the conferrals are processed in a timely manner. Additionally, the enrollment reporting team has developed training materials and procedure documentation to assist the training of new staff members with responsibility for enrollment reporting.
 Contact Person Responsible for Corrective Action: Emily Baker, Director Student Financial Services – emily_baker@redlands.edu, 909-748-8047
 Anticipated Completion Date: July 31, 2021",Y,902813,1,,
-<<<<<<< HEAD
 33373,64342,2021,2021-006,"Finding 2021-006
-=======
-17902,33373,64342,2021,2021-006,"Finding 2021-006
->>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 Federal Agency Name: U.S. Department of Education
 Program Name/CFDA #: 84.013A Strengthening Institutions Program
 Awards# P031A090106
@@ -634,11 +541,7 @@ The University may withdraw and spend up to 50 percent of the total aggregated e
 Responsible Individuals: Tami Lansing, Controller
 Corrective Action Plan: The University received verbal approval from DOE in 2017 indicating that providing the fund was compliance at the end of 20 years, it was considered in compliance. At that time, the University lowered the yearly spending distribution from 5% to 3% to ensure meeting that requirement. This approval was not received in writing. Recent verbal communication from DOE has also indicated that we are currently in compliance, but they have communicated that it will not be issued in writing. To stay in compliance with issued regulations, the University will reimburse the fund $66,971 of funds that have been overdrawn over the past ten years, and will cease all future distributions until the twenty-year fund regulations are lifted.
 Anticipated Completion Date: Ongoing",N,920361,1,,
-<<<<<<< HEAD
 33374,64342,2021,2021-001,"Finding: 2021-01 Student Financial Assistance Program Cluster- Department of Education
-=======
-17903,33374,64342,2021,2021-001,"Finding: 2021-01 Student Financial Assistance Program Cluster- Department of Education
->>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 CFDA #84.007 Federal Supplemental Educational Opportunity Grants - 2020/2021
 P007A201416 CFDA #84.033 Federal Work-Study Program - 2020/2021 P033A201416
 Reporting
@@ -648,11 +551,7 @@ Certain amounts within the FISAP filed during fiscal year 2020 FISAP were report
 Responsible Individuals: Robert Hoover, Director of Financial Aid
 Corrective Action Plan: The reporting could be corrected and had no impact on the institution's campus based funding requests nor other impacts monetary or otherwise. The University will establish a pre-submission review process with parties involved with data collection and entry.
 Anticipated Completion Date: Ongoing",N,920361,1,,
-<<<<<<< HEAD
 33375,64342,2021,2021-002,"Finding: 2021-002 Student Financial Assistance Program Cluster- Department of Education
-=======
-17904,33375,64342,2021,2021-002,"Finding: 2021-002 Student Financial Assistance Program Cluster- Department of Education
->>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 CFDA #84.268 Federal Direct Student Loans - 2020/2021 P268K211430
 CFDA #84.063 Federal Pell Grant Program - 2020/2021 P063P201430
 Reporting- Common Origination and Disbursement System
@@ -662,11 +561,7 @@ Condition: One instance was noted where Title IV funds were applied to the stude
 Responsible Individuals: Robert Hoover. Director of Financial Aid
 Corrective Action Plan: After initial future year Pell adjustments are made in batch, the Institution will establish a second and third round of manual review to identify and correct awards that were not captured within the batch process. This will help ensure that situations like these does not arise again and are addressed timely.
 Anticipated completion Date: Specific references above were identified and fixed. Correction action measures will be on going",N,920361,1,,
-<<<<<<< HEAD
 33376,64342,2021,2021-004,"Finding: 2021-004 Student Financial Assistance Program Cluster - Department of Education
-=======
-17905,33376,64342,2021,2021-004,"Finding: 2021-004 Student Financial Assistance Program Cluster - Department of Education
->>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 CFDA #84.268 Federal Direct Student Loans - 2020/2021 P268K211430.
 Special Tests & Provisions: Return of Title IV Funds.
 Significant Deficiency in Internal Control over Compliance
@@ -675,11 +570,7 @@ One instance was identified where the Return of Title IV calculation was complet
 Responsible Individuals: Robert Hoover, Director of Financial Aid
 Corrective Action Plan: Financial Aid office members. involved with R2T4 calculations. will perform a second review, prior to final aid adjustments, once calculations are performed.
 Anticipated Completion Date: Specific references above were identified and fixed. Correction action measures will be on going.",N,920361,1,,
-<<<<<<< HEAD
 33377,64342,2021,2021-003,"Finding: 2021-003 Student Financial Assistance Program Cluster - Department of Education
-=======
-17906,33377,64342,2021,2021-003,"Finding: 2021-003 Student Financial Assistance Program Cluster - Department of Education
->>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 CFDA #84.063 Federal Pell Grant Program - 2020/2021 P063P201430
 CFDA #84.007 Federal Supplemental Educational Opportunity Grants - 2020/2021 P007 A201416
 Eligibility
@@ -688,11 +579,7 @@ Finding Summary: An FSEOG may not be awarded for a full academic year that is le
 Responsible Individuals: Robert Hoover, Director of Financial Aid
 Corrective Action Plan: The Institution will not make institutional share awards within the same award line as FSEOG and will disaggregate award information to make the awarding lines more clear. As referenced in finding 2021-002, After initial future year Pell adjustments are made in batch, the institution will establish a second and third round of manual review to identify and correct awards that were not captured within the batch process. This will help ensure that situations like these does not arise again and are addressed timely.
 Anticipated Completion Date: Specific references above were identified and fixed. Correction action measures will be on going",N,920361,1,,
-<<<<<<< HEAD
 33378,64342,2021,2021-005,"Finding: 2021-005 Student Financial Assistance Program Cluster - Department of Education
-=======
-17907,33378,64342,2021,2021-005,"Finding: 2021-005 Student Financial Assistance Program Cluster - Department of Education
->>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 CFDA #84.033 Federal Work-Study Program - 2020/2021 P033A201416.
 Special Tests & Provisions: Disbursements to or on Behalf of Students.
 Significant Deficiency in Internal Control over Compliance
@@ -701,29 +588,17 @@ The University is required to maintain internal control to ensure the student's 
 Responsible Individuals: Robert Hoover, Director of Financial Aid
 Corrective Action Plan: The Financial Aid office will establish a more robust spreadsheet process that will significantly reduce the need for manual data entry thus reducing the opportunity for human error.
 Anticipated Completion Date: Ongoing",N,920361,1,,
-<<<<<<< HEAD
 31782,161196,2021,2021-003,"Federal Award Findings and Questioned Costs
-=======
-18242,31782,161196,2021,2021-003,"Federal Award Findings and Questioned Costs
->>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 Material Weakness
 Finding 2021-003- During our testing of bank reconciliations, it was noted that reconciliations are not being prepared properly or timely. It was also noted that reconciliations are not being reviewed in a timely manner. Furthermore. it was noted during testing of cash that deposits are not being entered into the accounting system in a timely manner.
 Contact Person: Chief Finance Officer - Jolanda Jordan
 Corrective Action:
 Bank reconciliations are done monthly) at the school level and submitted to the CFO. The CFO reviews and submits to the Deputy Finance Officer to reconcile the district accounts. All bank statements come to the CFO and forwarded to the Deputy Finance Officer. The reconciliations are done and loaded to a shared drive in Google. The breakdown is getting the receipts entered into the financial software system. Effective 12-1-21 the CFO will enter all receipts and deposits for all funds except for fund 5. This will ensure timely recording of deposits into the system. This process is often neglected when over demands of the workload take priority. The past 3 fiscal years which has been my entire career here. The finance department has lost staff in December and or January. Regardless of staffing sho11ages, the CFO will make entering the receipts and deposits into the system a priority since this information is critical for the CFO. Training has already taken place and the first receipts and deposits will be entered by the CFO on December 1,2021 for November and every month thereafter.",N,914464,1,,
-<<<<<<< HEAD
 49707,160991,2021,2021-002,"Finding: 2021-002
 Name of contact person:  Amanda McGee, Director of Social Services
 Corrective Action: Management concurs and has already implemented a process of reviewing previously approved files for corrections to go along with the process of reviewing new files to ensure caseworkers are obtaining and reviewing all required evidence and maintaining it in the case file.
 Proposed Completion Date:  Immediately",N,968376,1,,
 41695,185803,2021,2021-001,"July 29, 2022
-=======
-18482,49707,160991,2021,2021-002,"Finding: 2021-002
-Name of contact person:  Amanda McGee, Director of Social Services
-Corrective Action: Management concurs and has already implemented a process of reviewing previously approved files for corrections to go along with the process of reviewing new files to ensure caseworkers are obtaining and reviewing all required evidence and maintaining it in the case file.
-Proposed Completion Date:  Immediately",N,968376,1,,
-18721,41695,185803,2021,2021-001,"July 29, 2022
->>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 
 Corrective Action Plan – 2021 Audit
 
@@ -766,13 +641,8 @@ portfolio
 Corrections will be made when discovered
 Payment adjustments will be made to participant accounts when errors are discovered and corrected
 HACP will offer periodic staff training on re-certifications",N,939205,1,,
-<<<<<<< HEAD
 41352,243526,2021,2021-004,"SBHS agrees and will implement the above recommendation by June 30, 2022.",N,927926,1,,
 44842,244781,2021,2021-002,"REFERENCE # 2021-002	Procurement, Suspension and Debarment – MATERIAL WEAKNESS - NON-COMPLIANCE
-=======
-19230,41352,243526,2021,2021-004,"SBHS agrees and will implement the above recommendation by June 30, 2022.",N,927926,1,,
-19331,44842,244781,2021,2021-002,"REFERENCE # 2021-002	Procurement, Suspension and Debarment – MATERIAL WEAKNESS - NON-COMPLIANCE
->>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 Program Name/ALN	Emergency Solutions Grant Program (ALN # 14.231) 
                                                               
 Criteria:	As per § 200.318 General procurement standards.
@@ -806,11 +676,7 @@ Name and Phone # Of Person Responsible for Implementation:	D. Kirk LaPoure, Divi
 
 
 ",N,935442,1,,
-<<<<<<< HEAD
 36052,1260,2021,2021-001,"Response: The management company is aware of the requirements to maintain original
-=======
-19453,36052,1260,2021,2021-001,"Response: The management company is aware of the requirements to maintain original
->>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 eligibility documentation in the resident files. Such documentation is maintained for all
 residents that have moved in since the current management company began
 management. The finding was a result of an original resident move-in which was
@@ -818,11 +684,7 @@ processed by the original management company. We were unable to locate the
 documentation specifically requested for the testing, however, we believe the files are
 onsite at the property. We will continue to review the original file documentation and
 include such documentation in resident files as necessary.",N,926757,1,,
-<<<<<<< HEAD
 35565,94987,2021,2021-001,"Head Start Grant 04CH01101101
-=======
-19808,35565,94987,2021,2021-001,"Head Start Grant 04CH01101101
->>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 Corrective Action Plan
 Section 1 – Recipient Organization General Information
 Name of Recipient Organization
@@ -839,11 +701,7 @@ YES.
 If No, provide an explanation and specific reasons for the non-concurrence
 Planned Corrective Action
 SEE CORRECTIVE ACTION PLAN FOR CHART/TABLE",Y,927006,1,,
-<<<<<<< HEAD
 35566,94987,2021,2021-002,"Head Start Grant 04CH01101101
-=======
-19809,35566,94987,2021,2021-002,"Head Start Grant 04CH01101101
->>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 Corrective Action Plan
 Section 1 – Recipient Organization General Information
 Name of Recipient Organization
@@ -860,13 +718,8 @@ YES.
 If No, provide an explanation and specific reasons for the non-concurrence
 Planned Corrective Action:
 SEE CORRECTIVE ACTION PLAN FOR CHART/TABLE",Y,927006,1,,
-<<<<<<< HEAD
 39800,231040,2021,2021-001,"We agree with the Finding.  We agree with the recommendations. Action(s) Taken or Planned on the Finding:  We are making all efforts to communicate and work with the accounting firm that prepared the draft Cost Certification to get the Certification finalized.  Over the past year, we have not been able to make headway due to the covid-19 environment and lockdown.  We are also trying to identify another accounting firm to assist in this endeavor.  In the interim, we have communicated to HUD the actions we have been taking to finalize and submit the Certification.  Official Responsible for completing:  Reverend Bertram Bennett.",N,937747,1,,
 44570,217700,2021,2021-001,"1.	Current Findings on the Schedule of Finding, Questioned Cost and Recommendation
-=======
-20612,39800,231040,2021,2021-001,"We agree with the Finding.  We agree with the recommendations. Action(s) Taken or Planned on the Finding:  We are making all efforts to communicate and work with the accounting firm that prepared the draft Cost Certification to get the Certification finalized.  Over the past year, we have not been able to make headway due to the covid-19 environment and lockdown.  We are also trying to identify another accounting firm to assist in this endeavor.  In the interim, we have communicated to HUD the actions we have been taking to finalize and submit the Certification.  Official Responsible for completing:  Reverend Bertram Bennett.",N,937747,1,,
-20686,44570,217700,2021,2021-001,"1.	Current Findings on the Schedule of Finding, Questioned Cost and Recommendation
->>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 
 a.	Finding 2021-001; Section 8 Housing Assistance (CFDA # 14.195)
 
@@ -920,34 +773,20 @@ New manager hired and upgraded review process.  All files corrected.
 
 
 ",N,946899,1,,
-<<<<<<< HEAD
 35200,248284,2021,2021-001,"FINDING 2021-001	Fair Presentation of Financial Statements 
-=======
-20810,35200,248284,2021,2021-001,"FINDING 2021-001	Fair Presentation of Financial Statements 
->>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 
 Recommendation:  	The Organization should properly adjust equity and fixed asset accounts before preparing unaudited financial statements for submission to REAC.
 
 Action Taken:	We concur with the recommendation and it will be implemented through discussions with personnel in preparation for closing out the year ended December 31, 2022.
 ",N,926254,1,,
-<<<<<<< HEAD
 35674,243881,2021,2021-002,"Views of Responsible Officials and Corrective Action Plan (unaudited): Shelter House is looking at several options.  First, we plan to work with a consultant to see if the allocations can be more automated.  If that is not possible, we may have to add or switch capacity so that one person does the allocations and another on the team reviews and signs off on the allocations.",N,926241,1,,
 35675,243881,2021,2021-003,Views of Responsible Officials and Corrective Action Plan (unaudited): What happened there was the use of a vendor multiple times that eventually crossed the 10k threshold.  We have worked with staff so they are aware of this concern and we have a process to vet vendors if we believe this may become an issue in the future so that our documentation is more complete and contemporaneous.  ,N,926241,1,,
 34520,66473,2021,2021-003,"View of Responsible Official: In FY 20-21, staff failed to prepare a Schedule of Expenditure of Federal Awards for the Coronavirus Aid, Relief and Economic Security Act Grants.
-=======
-20824,35674,243881,2021,2021-002,"Views of Responsible Officials and Corrective Action Plan (unaudited): Shelter House is looking at several options.  First, we plan to work with a consultant to see if the allocations can be more automated.  If that is not possible, we may have to add or switch capacity so that one person does the allocations and another on the team reviews and signs off on the allocations.",N,926241,1,,
-20825,35675,243881,2021,2021-003,Views of Responsible Officials and Corrective Action Plan (unaudited): What happened there was the use of a vendor multiple times that eventually crossed the 10k threshold.  We have worked with staff so they are aware of this concern and we have a process to vet vendors if we believe this may become an issue in the future so that our documentation is more complete and contemporaneous.  ,N,926241,1,,
-21164,34520,66473,2021,2021-003,"View of Responsible Official: In FY 20-21, staff failed to prepare a Schedule of Expenditure of Federal Awards for the Coronavirus Aid, Relief and Economic Security Act Grants.
->>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 Corrective Actions:
 • Management will confirm that its third-party accounting firm retained by the EDC has appropriate training related to single audits and SEFA and that appropriate EDC employees receive appropriate training as soon as possible and annually.
 Responsible Staff: Third-party accounting firm, Interim President/CEO
 Anticipated Completion Date: November 2022",N,920675,1,,
-<<<<<<< HEAD
 34270,160959,2021,2021-002,"Name of contact person: Cindy Perry, Director                                                                          
-=======
-21454,34270,160959,2021,2021-002,"Name of contact person: Cindy Perry, Director                                                                          
->>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 Corrective Action: Procedures and controls have been developed for caseworkers to follow and will be further
 developed to meet ongoing changes of the NC Fast system and NC DHHS policies for Medicaid. Medicaid
 caseworkers will receive additional training on Medicaid policies and procedures, Online data/The work
@@ -961,11 +800,7 @@ through or closed. Worker will retrain on all errors that occur, maintenance of 
 complete and accurate record keeping and resource calculations during monthly staff conference.
 Proposed Completion Date: At December 2021 staff conferences for Medicaid, training will be conducted for
 error findings/internal control errors of 2021 Single County Audit. December 31, 2021.",N,915204,1,,
-<<<<<<< HEAD
 34271,160959,2021,2021-001,"Name of contact person: Cindy Perry, Director
-=======
-21455,34271,160959,2021,2021-001,"Name of contact person: Cindy Perry, Director
->>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 Corrective Action: Corrective Action has been put into place for the county of Bertie. The Plan will be followed
 and further developed to meet the procedures and controls of the changing NC Fast system and the NC DHHS
 policies of Medicaid. Medicaid caseworkers will receive additional training on the newly created Corrective
@@ -990,11 +825,7 @@ time of the Exparte review, but was not evaluated for HCWD program by caseworker
 prior to audit start date; however, no action was taken until it was examined by auditor. The case was completed
 by Supervisor and the updated to reflect HCWD eligibility . HCWD PDC activated as of 9/28/2021. Case is now
 corrected. No proposed completion date due to case finalized on 9/28/2021.",N,915204,1,,
-<<<<<<< HEAD
 34099,232043,2021,2021-002,"Allowable Costs
-=======
-22466,34099,232043,2021,2021-002,"Allowable Costs
->>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 Condition: During audit procedures, it was identified that time and effort
 certifications for some employees were not available or were not completed
 accurately.
@@ -1025,11 +856,7 @@ objectives and/or multiple federal sources of revenue (and this likely being the
 norm for at least the next 3 years) RSU#13 will ensure that our system is fully
 functional and able to produce audit reports to satisfy federal requirements.
 Personal Activity reports, when required, will be produced for federal grants at least monthly. Responsible Party: Grant Manager with support from Human Resources",N,923530,1,,
-<<<<<<< HEAD
 34100,232043,2021,2021-001,"Condition: During audit procedures, it was identified that the RSU did not have
-=======
-22467,34100,232043,2021,2021-001,"Condition: During audit procedures, it was identified that the RSU did not have
->>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 employee contracts or documented wage basis for employees.
 Cause: The RSU does not have the necessary internal controls over compliance.
 Effect: The RSU is not utilizing contracts or wage agreements for all employees in
@@ -1058,11 +885,7 @@ to ensure compliance with federal grant requirements along with other
 compliance checks regarding required documentation, tax related forms, and
 benefit coverage.
 Responsible Party: Human Resources Director",N,923530,1,,
-<<<<<<< HEAD
 42284,254581,2021,2021-002,"Finding Number: 2021-002
-=======
-22801,42284,254581,2021,2021-002,"Finding Number: 2021-002
->>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 Condition: The controls in place for reporting submissions did not identify that guidelines were
 not followed related to the methodology used to report lost revenue.
 Cause and Effect: Appropriate review of the reporting submissions was not completed to
@@ -1079,11 +902,7 @@ Human Services.
 Contact person responsible for corrective action: Timothy Loch, Chief Financial Officer and
 VP of Finance
 Anticipated Completion Date: 12/31/2022",N,942026,1,,
-<<<<<<< HEAD
 42285,254581,2021,2021-001,"Finding Number: 2021-001
-=======
-22802,42285,254581,2021,2021-001,"Finding Number: 2021-001
->>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 Condition: The Corporation did not follow the reporting requirements as outlined in the HHS
 June 11, 2021 post-payment reporting notice. The Corporation's controls in place were not
 adequate to prevent the entry of incorrect net patient service revenue (NPSR) annual and
