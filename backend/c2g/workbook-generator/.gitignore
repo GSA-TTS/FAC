@@ -1,0 +1,5 @@
+__pycache__/**
+data/ay22/*.sqlite3
+output/**
+templates/*.xlsx
+.~lock*
