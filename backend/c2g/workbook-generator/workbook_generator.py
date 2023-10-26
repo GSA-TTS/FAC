@@ -33,6 +33,7 @@ from data.ay22.models import (
 # before filling in the XLSX workbooks.
 FieldMap = NT('FieldMap', 'in_sheet in_db default type')
 
+template_path = '../../schemas/output/excel/xlsx'
 templates = {
     'AdditionalUEIs': 'additional-ueis-workbook.xlsx',
     'AuditFindingsText': 'audit-findings-text-workbook.xlsx',
@@ -42,6 +43,10 @@ templates = {
     'SEFA': 'notes-to-sefa-workbook.xlsx',
     'SecondaryAuditors': 'secondary-auditors-workbook.xlsx'
 }
+
+def load_workbook(name):
+    return pyxl.load_workbook(f'{template_path}/{templates[name]}')
+
 
 def set_single_cell_range(wb, range_name, value):
     the_range = wb.defined_names[range_name]
@@ -151,19 +156,19 @@ def generate_dissemination_test_table(api_endpoint, dbkey, mappings, objects):
 ##########################################
 def generate_findings(dbkey, outdir):
     print("--- generate findings ---")
-    wb = pyxl.load_workbook(f'templates/{templates["AuditFindings"]}')
+    wb = load_workbook("AuditFindings")
     mappings = [
-    FieldMap('compliance_requirement', 'typerequirement', None, str),
-    FieldMap('reference_number', 'findingsrefnums', None, str),
-    FieldMap('modified_opinion', 'modifiedopinion', None, str),
-    FieldMap('other_matters', 'othernoncompliance', None, str),
-    FieldMap('material_weakness', 'materialweakness', None, str),
-    FieldMap('significant_deficiency', 'significantdeficiency', None, str),
-    FieldMap('other_findings', 'otherfindings', None, str),
-    FieldMap('questioned_costs', 'qcosts', None, str),
-    FieldMap('repeat_prior_reference', 'repeatfinding', None, str),
-    FieldMap('prior_references', 'priorfindingrefnums', None, str),
-    # is_valid is computed in the workbook
+        FieldMap('compliance_requirement', 'typerequirement', None, str),
+        FieldMap('reference_number', 'findingsrefnums', None, str),
+        FieldMap('modified_opinion', 'modifiedopinion', None, str),
+        FieldMap('other_matters', 'othernoncompliance', None, str),
+        FieldMap('material_weakness', 'materialweakness', None, str),
+        FieldMap('significant_deficiency', 'significantdeficiency', None, str),
+        FieldMap('other_findings', 'otherfindings', None, str),
+        FieldMap('questioned_costs', 'qcosts', None, str),
+        FieldMap('repeat_prior_reference', 'repeatfinding', None, str),
+        FieldMap('prior_references', 'priorfindingrefnums', None, str),
+        # is_valid is computed in the workbook
     ]
     g = set_uei(wb, dbkey)
     cfdas = Cfda.select(Cfda.elecauditsid).where(Cfda.dbkey == g.dbkey)
@@ -206,7 +211,8 @@ def generate_findings(dbkey, outdir):
 ##########################################
 def generate_federal_awards(dbkey, outdir):
     print("--- generate federal awards ---")
-    wb = pyxl.load_workbook(f'templates/{templates["FederalAwards"]}')
+    wb = load_workbook("FederalAwards")
+
     # In sheet : in DB
     mappings = [
         FieldMap('program_name', 'federalprogramname', None, str),
@@ -290,7 +296,7 @@ def generate_federal_awards(dbkey, outdir):
 ##########################################
 def generate_findings_text(dbkey, outdir):
     print("--- generate findings text ---")
-    wb = pyxl.load_workbook(f'templates/{templates["AuditFindingsText"]}')
+    wb = load_workbook("AuditFindingsText")
     mappings = [
         FieldMap('reference_number', 'findingrefnums', None, str),
         FieldMap('text_of_finding', 'text', None, str),
@@ -312,7 +318,7 @@ def generate_findings_text(dbkey, outdir):
 ##########################################
 def generate_additional_ueis(dbkey, outdir):
     print("--- generate additional ueis ---")
-    wb = pyxl.load_workbook(f'templates/{templates["AdditionalUEIs"]}')
+    wb = load_workbook("AdditionalUEIs")
     mappings = [
         FieldMap('additional_uei', 'uei', None, str),
         #FieldMap('ueiseqnum', 'ueiseqnum', 0, int)
@@ -334,7 +340,7 @@ def generate_additional_ueis(dbkey, outdir):
 ##########################################
 def generate_notes_to_sefa(dbkey, outdir):
     print("--- generate notes to sefa ---")
-    wb = pyxl.load_workbook(f'templates/{templates["SEFA"]}')
+    wb = load_workbook("SEFA")
     mappings = [
         FieldMap('note_title', 'title', None, str),
         FieldMap('note_content', 'content', None, str)
@@ -391,7 +397,7 @@ def generate_notes_to_sefa(dbkey, outdir):
 ##########################################
 def generate_secondary_auditors(dbkey, outdir):
     print("--- generate secondary auditors ---")
-    wb = pyxl.load_workbook(f'templates/{templates["SecondaryAuditors"]}')
+    wb = load_workbook("SecondaryAuditors")
     mappings = [
         FieldMap('secondary_auditor_address_city', 'cpacity', None, str),
         FieldMap('secondary_auditor_contact_name', 'cpacontact', None, str),
@@ -423,7 +429,7 @@ def generate_secondary_auditors(dbkey, outdir):
 ##########################################
 def generate_captext(dbkey, outdir):
     print("--- generate corrective action plan ---")
-    wb = pyxl.load_workbook(f'templates/{templates["CAP"]}')
+    wb = load_workbook("CAP")
     mappings = [
         FieldMap('reference_number', 'findingrefnums', None, str),
         FieldMap('planned_action', 'text', None, str),
