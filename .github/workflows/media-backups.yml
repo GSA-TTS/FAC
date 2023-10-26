@@ -1,21 +1,19 @@
 ---
-name: Test Media Backups on Dev
+name: Perform Media Backups
 on:
   workflow_dispatch:
     inputs:
-      choice:
-        type: choice
-        description: Select Environment
-        options:
-          - dev
+      environment:
+        required: true
+        type: string
 
 jobs:
   backup-media:
-    name: Test Media Backups
+    name: Perform Media Backups
     runs-on: ubuntu-latest
-    environment: ${{ github.event.inputs.choice }}
+    environment: ${{ inputs.environment }}
     env:
-      space: ${{ github.event.inputs.choice }}
+      space: ${{ inputs.environment }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
