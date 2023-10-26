@@ -55,8 +55,6 @@ mappings = [
         "N/A",
         str,
     ),
-    # FIXME: We have to calculate, and patch in, is_valid
-    # is_valid is computed in the workbook
 ]
 
 
