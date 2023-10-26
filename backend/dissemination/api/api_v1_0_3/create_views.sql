@@ -269,7 +269,9 @@ create view api_v1_0_3.general as
         dissemination_General gen,
         audit_singleauditchecklist aud
     where
-        (gen.is_public = true)
+        (aud.report_id = gen.report_id
+        and 
+        gen.is_public = true)
         or (gen.is_public = false and has_tribal_data_access())
     order by gen.id
 ;
