@@ -255,8 +255,16 @@ create view api_v1_0_3.general as
         gen.data_source,
         gen.is_aicpa_audit_guide_included,
         gen.is_additional_ueis,
-        aud.general_information -> 'multiple_eins_covered' as is_multiple_eins,
-        aud.general_information -> 'secondary_auditors_exist' as is_secondary_auditors
+        CASE
+        WHEN aud.general_information ->> 'multiple_eins_covered' = 'true' THEN 'Yes'
+        WHEN aud.general_information ->> 'multiple_eins_covered' = 'false' THEN 'No'
+        ELSE 'null'
+    END AS is_multiple_eins,
+    CASE
+        WHEN aud.general_information ->> 'secondary_auditors_exist' = 'true' THEN 'Yes'
+        WHEN aud.general_information ->> 'secondary_auditors_exist' = 'false' THEN 'No'
+        ELSE 'null'
+    END AS is_secondary_auditors
     from
         dissemination_General gen,
         audit_singleauditchecklist aud
