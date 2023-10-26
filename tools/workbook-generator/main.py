@@ -1,4 +1,4 @@
-from workbook_generator import WorkbookGenerator
+from workbook_generator import generate_workbooks
 
 import os
 import sys
@@ -27,8 +27,7 @@ def main():
             print('could not create output directory. exiting.')
             sys.exit()
 
-    wg = WorkbookGenerator()
-    wg.generate(args.dbkey, outdir)
+    generate_workbooks(args.dbkey, outdir)
 
 if __name__ == '__main__':
     parser.add_argument('--dbkey', type=str, required=True)
