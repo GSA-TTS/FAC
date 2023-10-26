@@ -1,16 +1,29 @@
+<<<<<<< HEAD
+SEQ_NUMBER,DBKEY,AUDITYEAR,FINDINGREFNUMS,TEXT,CHARTSTABLES,REPORTID,VERSION,UEI,MULTIPLEUEIS
+51625,148665,2022,2022-001,"Finding Number: 2022-001
+=======
 ,SEQ_NUMBER,DBKEY,AUDITYEAR,FINDINGREFNUMS,TEXT,CHARTSTABLES,REPORTID,VERSION,UEI,MULTIPLEUEIS
 178,51625,148665,2022,2022-001,"Finding Number: 2022-001
+>>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 Condition: The quarterly report for the student portion of HEERF was not posted on the University's website within the timeframe allowed in one instance.
 Planned Corrective Action: The University agrees with the finding and recommendation. The University spent and accounted for $75.6 million in HEERF grants appropriately and followed all applicable guidelines. The University also adhered to the various reporting guidelines that changed multiple times during the grant period, with the exception of this one untimely report posting to the Oakland University website. This was caused by personnel turnover that occurred at that time in multiple departments which were part of the process. This situation was unique and has been corrected.
 Contact person responsible for corrective action: James Hargett, Associate Vice President and Controller
 Anticipated Completion Date: Completed",N,974778,1,HJTLACN81NK1,N
+<<<<<<< HEAD
+47584,196318,2022,2022-001,"Finding Reference Number:	2022-001
+=======
 1688,47584,196318,2022,2022-001,"Finding Reference Number:	2022-001
+>>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 Concur or Do Not Concur:	Concur
 Agree or Disagree with Auditor Recommendations:	Agree
 Actions Taken or Planned on the Finding:	Management agrees with the finding.  The excess funds were accrued to submit to HUD.
 Completion Date:	August 9, 2022
 ",N,957046,1,MU66HXAWRF95,N
+<<<<<<< HEAD
+50613,198266,2022,2022-001,"CORRECTIVE ACTION PLAN
+=======
 1722,50613,198266,2022,2022-001,"CORRECTIVE ACTION PLAN
+>>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 Project Legal Name: Catherine Booth Towers Orlando, FL (¿ Project of Catherine Booth
 Residence, Inc., a Florida Corporation)
 HUD Project No.: 067-EE054-WAH
@@ -47,35 +60,55 @@ Year Findings, Questioned Costs and Recommendations
 In process. See finding 2022-001.
 2. 2021-002
 Cleared.",N,971740,1,D6VLAANVC5E7,N
+<<<<<<< HEAD
+53470,57575,2022,2022-001,"Finding Number: 2022-001
+=======
 3406,53470,57575,2022,2022-001,"Finding Number: 2022-001
+>>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 Condition: The University did not properly post the HEERF Quarterly Reporting Form by quarter to its website. Additionally, for the HEERF Quarterly Reporting Forms that were posted to its website, the student and institutional expenditures were reported cumulative.  
 Planned Corrective Action: The University will correct the HEERF Quarterly Reporting Forms to post each individual quarter to its website and ensure the student and institutional expenditures included in the reports reflect the individual quarter expenditures and are not cumulative.
 Contact person responsible for corrective action:  Beth Dyksta
 
 Anticipated Completion Date: April 30, 2023
 ",N,978318,1,NNLQK7LNGL93,N
+<<<<<<< HEAD
+53581,251020,2022,2022-004,"Finding 2022-004 – Significant Deficiency 
+=======
 3409,53581,251020,2022,2022-004,"Finding 2022-004 – Significant Deficiency 
+>>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 Assistance Listing:  21.027 – Coronavirus State and Local Fiscal Recovery Funds (CSLFRF)
 	Federal Grantor:  Department of the Treasury 
 Compliance Requirement:  Procurement and Suspension and Debarment
 Condition:  The District used a sole source authorization for the procurement of a Type-1 Fire Engine but a competitive bid process should have been used to comply with Uniform Guidance.
 Recommendation:  We recommend the District work with FEMA to obtain written approval for the sole source procurement, which is one of the exceptions to noncompetitive procurements.
 Management Response and Corrective Action Plan: The District shall revise policies and procedures to incorporate the requirements in the Uniform Guidance in its sole source approval process when it comes to selecting and approving vendors for expenditures that relates to a federal grant. The District will also work with the awarding agency to ensure written approval are obtained for sole source purchases.",N,980951,1,GM27HGUL61B5,N
+<<<<<<< HEAD
+53582,251020,2022,2022-002,"Finding 2022-002 – Significant Deficiency 
+=======
 3410,53582,251020,2022,2022-002,"Finding 2022-002 – Significant Deficiency 
+>>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 Award No.:  97.083, Staffing for Adequate Fire and Emergency Response
 Federal Grantor:  U.S.  Department of Homeland Security, Federal Emergency Management Agency
 Compliance Requirement:  Other compliance requirements.
 Condition:  The schedule of Expenditures of Federal Awards (SEFA) was not complete, and expenditures reported on the SEFA were revised during the single audit.
 Recommendation:  We recommend additional review procedures be implemented to ensure the SEFA is complete and accurate when the single audit begins.
 Management Response and Corrective Action Plan: The Finance division will work with other departments to ensure that data provided in the SEFA are complete and accounted for on an accrual basis. We will also implement efficiencies in our accounting systems to ensure expenditures are captured correctly to prevent errors and omissions. Additional review will be completed by the Finance Director for completeness.",N,980951,1,GM27HGUL61B5,N
+<<<<<<< HEAD
+53583,251020,2022,2022-003,"Finding 2022-003 – Significant Deficiency 
+=======
 3411,53583,251020,2022,2022-003,"Finding 2022-003 – Significant Deficiency 
+>>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 Assistance Listing:  21.027 – Coronavirus State and Local Fiscal Recovery Funds (CSLFRF)
 Federal Grantor:  Department of the Treasury
 Compliance Requirement:  Reporting
 Condition:  The Project and Expenditure Reports were not filed.
 Recommendation:  We recommend the District file the initial Project and Expenditures Report for the period covering March 3, 2021 to March 31,2022 as soon as possible.  Subsequent annual reports should be filed by the April 30, 2023 deadline.
 Management Response and Corrective Action Plan: The District has confirmed with the City of Elk Grove that as the main recipient of the grant, the City has filed the project and expenditure reports with the Treasury Department. In addition to what has already been report, the District will establish the proper authority to report the project and expenditure reports to the Treasury Department for period covering March 3, 2021 to March 31, 2022. The District will ensure that going forward projects and expenditures are reported in accordance with the schedule set forth by the guidance issued by the Treasury.",N,980951,1,GM27HGUL61B5,N
+<<<<<<< HEAD
+44754,181526,2022,2022-003,"Finding 2022-002
+=======
 3850,44754,181526,2022,2022-003,"Finding 2022-002
+>>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 The Authority agrees with this finding
 •	As the Authority transitioned housing/accounting software and staff during the year, the procedures for reviewing and approving journal entries was not documented as it had been in the past.  Various journal entries were not reviewed and approved by someone other than the preparer.
 o	As of April 1, 2022, all journal entries are reviewed by both the Director of Accounting and Lead Staff Accountant.  Part of the previous process included a listing of all journal entries for the month and a sign off sticker that was placed in the monthly journal entry book.  We have located a similar report in the current operating system and returned to our previous process of review.
@@ -86,7 +119,11 @@ The Authority agrees with this finding.
 •	The Authority utilized its HCV HUD Cares Act funding to pay for its annual software and support that covered the period of July 1, 2021 to June 30, 2022.  As a result, one half of this expense for the period after December 31, 2021 and is not an allowable expense for HUD Cares Act grant.
 o	Effective immediately, specialty funding that has a deadline will not be used on invoices that are considered prepaid.  If funding is directly related to an invoice that would be considered a prepaid, and the period of performance extends beyond the funding deadline, a detailed analysis will be completed to ensure proper utilization of finding.
 ",N,948652,1,MCD5SMMWNBE5,N
+<<<<<<< HEAD
+48313,180878,2022,2022-002,"FINDINGS – FEDERAL AWARD PROGRAM AUDIT
+=======
 3899,48313,180878,2022,2022-002,"FINDINGS – FEDERAL AWARD PROGRAM AUDIT
+>>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 
 DEPARTMENT OF TRANSPORTATION
 
@@ -97,7 +134,11 @@ Recommendation: Procedures should be put in place to ensure weekly certified pay
 
 Action Taken: Airport management will ensure weekly certified payrolls are received during the grant administration process and maintained in grant files.  
 ",N,965703,1,HTNZMSGBKFG1,N
+<<<<<<< HEAD
+56823,177310,2022,2022-001,"CORRECTIVE ACTION PLAN FOR FINDINGS REPORTED UNDER UNIFORM GUIDANCE
+=======
 4071,56823,177310,2022,2022-001,"CORRECTIVE ACTION PLAN FOR FINDINGS REPORTED UNDER UNIFORM GUIDANCE
+>>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 Central Valley School District No. 356
 September 1, 2021 through August 31, 2022
 This schedule presents the corrective action planned by the District for findings reported in this report in accordance with Title 2 U.S. Code of Federal Regulations (CFR) Part 200, Uniform Administrative Requirements, Cost Principles, and Audit Requirements for Federal Awards (Uniform Guidance).
@@ -113,7 +154,11 @@ Liberty Lake, WA 99019
 Corrective action the auditee plans to take in response to the finding:
 The District agrees with the State Auditor’s Office that we did not have adequate internal controls for ensuring compliance with federal prevailing wage rate requirements as noted. The District used the same process as noted in this Finding in the prior audit which did not have any exceptions noted by the State Auditor’s Office. Moving forward the District will ensure federal prevailing wage rate clauses are in contracts entered into using federal funds and that weekly certified payroll reports are collected from contractors and subcontractors.
 Anticipated date to complete the corrective action: August 2023",N,982136,1,LJNSJ1C1KU15,N
+<<<<<<< HEAD
+47733,211108,2022,2022-001,"CORRECTIVE ACTION PLAN
+=======
 4113,47733,211108,2022,2022-001,"CORRECTIVE ACTION PLAN
+>>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 2 CFR § 200.511(c)  
 
 
@@ -168,14 +213,22 @@ Sincerely yours,
 
 Cristi LaJeunesse, Executive Director
 ",Y,964108,1,HG74NDHEWUG3,N
+<<<<<<< HEAD
+48366,187027,2022,2022-002,"Corrective Action Plan
+=======
 4803,48366,187027,2022,2022-002,"Corrective Action Plan
+>>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 City of Sandy, Oregon
 Fiscal Year Ended June 30, 2022
 Finding 2022-002
 Staff will implement procedures to document the review of suspension and debarment records for contractors being compensated with Federal funds.
 Tyler Deems
 Deputy City Manager",N,965617,1,RPCMHNGRWDD1,N
+<<<<<<< HEAD
+56830,177250,2022,2022-001,"CORRECTIVE ACTION PLAN FOR FINDINGS REPORTED UNDER
+=======
 5051,56830,177250,2022,2022-001,"CORRECTIVE ACTION PLAN FOR FINDINGS REPORTED UNDER
+>>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 UNIFORM GUIDANCE
 Okanogan School District No. 105
 September 1, 2021 through August 31, 2022
@@ -199,33 +252,56 @@ to facilitate adequate internal controls for ensuring compliance with the federa
 requirements in future federally funded projects.
 Anticipated date to complete the corrective action: May 2023
 Page",N,985733,1,NDG1H2UMDXH9,N
+<<<<<<< HEAD
+50186,234415,2022,2022-001,"Since quarterly reporting is no longer required for HRSA grants in the payment management system, the reconciliation process was unfortunately disrupted. TCHC board of directors and management will review and revise the current cash management policy and procedure to ensure compliance with 45 CFR 75.302(b)(6) and 45 CFR 75.305, as well as, detail a procedure for reconciling drawdowns on a scheduled basis. The procedures will also be designed to ensure improved communication occurs between the individual(s) charged with making drawdowns from the payment management system and the accounting department. The CEO will be responsible for the revised policy and procedure being approved by the board at the February 2023 TCHC board meeting with immediate implementation.",N,972580,1,WJUFKBDHUUT9,N
+50187,234415,2022,2022-002,"The Center agrees with the finding and understood it would repeat from FY2021 because TCHC would not have time to correct issues that would impact the FY2022 audit. The health center received additional training on-site from the practice management system vendor in May/June 2022; during this training, sliding fee setup in the system was reviewed and training provided to update. In response, as of May 2022, the incomes were updated in the system to correspond to the 2022 poverty guidelines set up and updated in February 2023 for 2023 poverty guidelines. Management is in the process of updating written procedures to reconcile with actual steps occurring, including the responsible person, etc. In addition, an audit procedure will be further refined so periodic surveys can determine if policies and procedures are being followed. The health center continues to have turnover at the front desk staff due to COVID-19 and attrition, which gives rise to the need for training staff on the sliding fee policy and procedure when onboarded as well annually. All these steps will be completed by February 28, 2023.",N,972580,1,WJUFKBDHUUT9,N
+49085,132415,2022,2022-001,"a.	Finding 2022-001
+=======
 5387,50186,234415,2022,2022-001,"Since quarterly reporting is no longer required for HRSA grants in the payment management system, the reconciliation process was unfortunately disrupted. TCHC board of directors and management will review and revise the current cash management policy and procedure to ensure compliance with 45 CFR 75.302(b)(6) and 45 CFR 75.305, as well as, detail a procedure for reconciling drawdowns on a scheduled basis. The procedures will also be designed to ensure improved communication occurs between the individual(s) charged with making drawdowns from the payment management system and the accounting department. The CEO will be responsible for the revised policy and procedure being approved by the board at the February 2023 TCHC board meeting with immediate implementation.",N,972580,1,WJUFKBDHUUT9,N
 5388,50187,234415,2022,2022-002,"The Center agrees with the finding and understood it would repeat from FY2021 because TCHC would not have time to correct issues that would impact the FY2022 audit. The health center received additional training on-site from the practice management system vendor in May/June 2022; during this training, sliding fee setup in the system was reviewed and training provided to update. In response, as of May 2022, the incomes were updated in the system to correspond to the 2022 poverty guidelines set up and updated in February 2023 for 2023 poverty guidelines. Management is in the process of updating written procedures to reconcile with actual steps occurring, including the responsible person, etc. In addition, an audit procedure will be further refined so periodic surveys can determine if policies and procedures are being followed. The health center continues to have turnover at the front desk staff due to COVID-19 and attrition, which gives rise to the need for training staff on the sliding fee policy and procedure when onboarded as well annually. All these steps will be completed by February 28, 2023.",N,972580,1,WJUFKBDHUUT9,N
 5596,49085,132415,2022,2022-001,"a.	Finding 2022-001
+>>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 i.	Comments on the Finding and Recommendation:
 The Authority concurs that the SEMAP certification was not within the required 60 day period after the end of the fiscal year.
 ii.	Action(s) Taken or Planned on the Finding
 As of August 22, 2022, the Authority has replaced the management of the Authority that was accountable for this issue.
 Additionally, the Authority will add the SEMAP certification submission deadline to its calendar and properly monitor this and other future pertinent deadlines.",N,968829,1,NKQ8J5E7NCQ1,N
+<<<<<<< HEAD
+45384,150024,2022,2022-001,Nutrition services is aware of the excess funds and will be filing a spend down plan with Michigan Department of Education as soon as officially notified. The Director in conjunction with Maintenance and Finance has identified necessary improvements to equipment and has formulated a plan to substantially spend the excess funds within the next fiscal year pending approval from the State.,N,950280,1,NVHRA4V88HN3,N
+46391,81438,2022,2022-003,"Name of Responsible Individual(s): Courtney Thompson, Director of Financial Aid
+=======
 5814,45384,150024,2022,2022-001,Nutrition services is aware of the excess funds and will be filing a spend down plan with Michigan Department of Education as soon as officially notified. The Director in conjunction with Maintenance and Finance has identified necessary improvements to equipment and has formulated a plan to substantially spend the excess funds within the next fiscal year pending approval from the State.,N,950280,1,NVHRA4V88HN3,N
 6518,46391,81438,2022,2022-003,"Name of Responsible Individual(s): Courtney Thompson, Director of Financial Aid
+>>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 
 Corrective Action: The University has reviewed current practices related to withdrawal/R2T4 calculations. As a result, the University will enhance current policy and procedures to better support staff in the proper calculation of return of Title IV funds requirements. These enhancements will include but are not limited to; additional staff training and periodic secondary review. The Office of Financial Aid will also work with the Office of Academic Records to document substantiated last dates of attendance for withdrawing students.
 
 Anticipated Completion Date: 5/31/2022
 ",N,956472,1,GNF2LDZWGG23,N
+<<<<<<< HEAD
+46392,81438,2022,2022-005,"Name of Responsible Individual(s): Jeremy Shreve, Vice President for Business & Finance
+=======
 6519,46392,81438,2022,2022-005,"Name of Responsible Individual(s): Jeremy Shreve, Vice President for Business & Finance
+>>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 
 Corrective Action: The University has a plan to modify the reporting for the remaining HEERF reports to ensure all amounts are accurate and agree to our accounting records. The Controller and Vice President for Business and Finance will collectively review and approve the remaining HEERF reports. We do note that while categorical amounts were not each accurate in our previous reporting, totals were accurate and there is no question as to the University’s overall claim to the HEERF funds received. We also note that we plan to utilize the final HEERF report to fix the categorical amounts so that all amounts agree to the University’s accounting records.
 
 Anticipated Completion Date: 5/31/2022
 ",N,956472,1,GNF2LDZWGG23,N
+<<<<<<< HEAD
+46393,81438,2022,2022-004,"Name of Responsible Individual(s): Stacey Brackett, University Registrar
+=======
 6520,46393,81438,2022,2022-004,"Name of Responsible Individual(s): Stacey Brackett, University Registrar
+>>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 Corrective Action: The University has modified reporting practices to SSCR in order to meet Federal Regulations 34 CFR 690.83(b)(2), 34 CFR 682.610 and 34 CFR 685.309. The Office of Academic Records will report student enrollment to SSCR on the 15th of every month (or the following business day if the 15th falls on a weekend, holiday or scheduled university closure). This plan will allow for reporting from SSCR to NSLDS to meet the 60 day timeline for student status change. The University has also strengthened report criteria to ensure that all current program and major detail are provided to SSCR.
 
 Anticipated Completion Date: 12/31/2022
 ",N,956472,1,GNF2LDZWGG23,N
+<<<<<<< HEAD
+48074,91676,2022,2022-001,"Finding 2022-001: Enrollment reporting
+=======
 6536,48074,91676,2022,2022-001,"Finding 2022-001: Enrollment reporting
+>>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 Condition: For 5 out of 25 students tested for NSLDS reporting, it was noted that these students were not reported within 60 days as required for all schools participating in Title IV aid. Crowe had management perform an independent analysis in order to quantify the total number of students with enrollment reporting issues due to the 5 identified as part of our testing. Through further testing procedures performed and analysis performed by management it was noted that a total of 38 students were not reported timely to the NSLDS.
 Recommendation:
 We recommend that the University enhance its review and monitoring of the enrollment reporting to NSLDS to ascertain accuracy and timeliness of the submission.
@@ -233,23 +309,39 @@ Views of Responsible Officials
 Management agrees with the finding related to enrollment reporting. Management has taken steps to change the process, adding review of filings by the Office of the Registrar, Financial aid, and Institutional Research. Additionally, a calendar has been created for future reporting dates of enrollment reports and degree conferral reports to be filed with the National Student Clearinghouse.
 Corrective Action Plan
 Management is developing a new process for reporting student enrollments. The Office of Institutional Research will review the specifications for reporting from the National Student Clearinghouse (NSC) and National Student Loan Data System (NSLDS) to ensure that the proper data is being reported. The Office of the Registrar will develop an annual calendar of filing dates for enrollment and graduation reports. Reports will be generated by Institutional Research and upon approval of the Registrar submitted to the NSC. Any errors in reporting will be remediated by the Registrar. And the Financial Aid Office will verify that reports sent to the National Student Clearinghouse are accurately reported to the National Student Loan Data System, by auditing both systems with assistance from the Office of institutional Research and Office of the Registrar. This process will be in place by February 2023.",N,962068,1,J3KPEDNN74R6,N
+<<<<<<< HEAD
+49682,256943,2022,2022-001,"Condition: The School District did not comply with the requirements of filing quarterly and final reports by the due date set by ISBE. Plan: Management will review its policies and procedures and implement changes to strengthen internal control over federal reporting. Anticipated Date of Completion: 6/30/23. Name of Contact Person: Stephen Geraci, Superintendent. Management Response: The District will review the reporting deadlines and file reports moving forward on a timely manner by the due dates.",N,961184,1,QNNVJ3LNDD95,N
+56935,69688,2022,2022-001,"CORRECTIVE ACTION PLAN
+Management will adopt an internal control process that will alert the Health Center when reporting due dates are approaching.
+",N,988458,1,LBNNLRDE8793,N
+56936,69688,2022,2022-002,"CORRECTIVE ACTION PLAN
+=======
 6573,49682,256943,2022,2022-001,"Condition: The School District did not comply with the requirements of filing quarterly and final reports by the due date set by ISBE. Plan: Management will review its policies and procedures and implement changes to strengthen internal control over federal reporting. Anticipated Date of Completion: 6/30/23. Name of Contact Person: Stephen Geraci, Superintendent. Management Response: The District will review the reporting deadlines and file reports moving forward on a timely manner by the due dates.",N,961184,1,QNNVJ3LNDD95,N
 6734,56935,69688,2022,2022-001,"CORRECTIVE ACTION PLAN
 Management will adopt an internal control process that will alert the Health Center when reporting due dates are approaching.
 ",N,988458,1,LBNNLRDE8793,N
 6735,56936,69688,2022,2022-002,"CORRECTIVE ACTION PLAN
+>>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 Management has developed the following for consistent adjustments to patient accounts according to the SFDS:
 1. Management will work with the electronic payment system contractors to update system parameters for automatic system generated discounts in accordance with the sliding discount schedule. This process began February 28, 2023.
 2. Management will implement a monthly audit of a statistically relevant sample of all encounters subjected to the sliding fee adjustment process to test the consistency of the adjustment with the SFDS. This process began February 28, 2023.
 3. Management will implement a process to ensure that all reviews and audit corrections are performed by a person other than the person performing the review and all adjustments to patient accounts are reviewed subsequent to processing. Anticipated completion date is June 30, 2023.
 ",N,988458,1,LBNNLRDE8793,N
+<<<<<<< HEAD
+53491,193354,2022,2022-001,"Finding 2022-001 Tri-Partite Board Compliance
+=======
 7161,53491,193354,2022,2022-001,"Finding 2022-001 Tri-Partite Board Compliance
+>>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 Corrective Action Plan
 The City is currently working with the State of California Department of Community Services and
 Development to comply with the Tri-Partite Board requirements.
 Anticipated implementation date – February 28, 2024
 Responsible Staff – Mary-Claire Katz, Management Analyst",N,977623,1,KC7DYLV9EF25,N
+<<<<<<< HEAD
+56599,194292,2022,2022-002,"CORRECTIVE ACTION PLAN FOR FINDINGS REPORTED UNDER UNIFORM GUIDANCE
+=======
 7228,56599,194292,2022,2022-002,"CORRECTIVE ACTION PLAN FOR FINDINGS REPORTED UNDER UNIFORM GUIDANCE
+>>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 Warden School District No. 146-161
 September 1, 2021 through August 31, 2022
 This schedule presents the corrective action planned by the District for findings reported in this report in accordance with Title 2 U.S. Code of Federal Regulations (CFR) Part 200, Uniform Administrative Requirements, Cost Principles, and Audit Requirements for Federal Awards (Uniform Guidance). 
@@ -266,10 +358,17 @@ All parties contracting services will receive training on prevailing wage compli
 Anticipated date to complete the corrective action: April 2023
 
 ",N,983523,1,CVCJV2ZL5HN3,N
+<<<<<<< HEAD
+57359,188465,2022,2022-002,The School District has already made the request and received letter from ODE for the FY ‘23 audit period.,N,974839,1,DZCYMXEX2H74,N
+50844,219232,2022,2022-001,We have reviewed procedures and plan to make the necessary changes to improve internal control. ,N,974459,1,NPLAPH6SLCK3,N
+50845,219232,2022,2022-002,We have reviewed procedures and plan to make the necessary changes to improve internal control. ,N,974459,1,NPLAPH6SLCK3,N
+53699,236105,2022,2022-003,"Finding 2022-003
+=======
 7264,57359,188465,2022,2022-002,The School District has already made the request and received letter from ODE for the FY ‘23 audit period.,N,974839,1,DZCYMXEX2H74,N
 7365,50844,219232,2022,2022-001,We have reviewed procedures and plan to make the necessary changes to improve internal control. ,N,974459,1,NPLAPH6SLCK3,N
 7366,50845,219232,2022,2022-002,We have reviewed procedures and plan to make the necessary changes to improve internal control. ,N,974459,1,NPLAPH6SLCK3,N
 7417,53699,236105,2022,2022-003,"Finding 2022-003
+>>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 
 Federal Agency Name: Department of Agriculture 
 Program Name: Community Facilities Loans and Grants
@@ -283,7 +382,11 @@ Corrective Action Plan: It is not cost effective to have an internal control sys
 
 Anticipated Completion Date: Ongoing
 ",N,978761,1,PEKXCMGQMT86,N
+<<<<<<< HEAD
+53700,236105,2022,2022-004,"Finding 2022-004
+=======
 7418,53700,236105,2022,2022-004,"Finding 2022-004
+>>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 
 Federal Agency Name: Department of Agriculture
 Program Name: Community Facilities Loans and Grants 
@@ -297,14 +400,23 @@ Corrective Action Plan: Proper tracking of all reserve accounts will be put in p
 
 Anticipated Completion Date:  6/30/2023
 ",N,978761,1,PEKXCMGQMT86,N
+<<<<<<< HEAD
+46696,248724,2022,2022-001,"Corrective Action Plan
+=======
 7514,46696,248724,2022,2022-001,"Corrective Action Plan
+>>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 Contact Name: Maggie Menefee
 Corrective Action: ALIVE is seeking an individual with appropriate nonprofit and federal award experience to provide additional oversight
 Expected Completion Date: December 31, 2022.
 
 ",N,959150,1,ZE6JCNDHQL99,N
+<<<<<<< HEAD
+51244,257325,2022,2022-001,"It is not economically feasible to hire additional staff to resolve the segregation of duties issue. The board will continue to review financial statements, budget vs actual results, bank reconciliations and expense reports. ",N,969843,1,LECBAFSKG8X8,N
+54322,240680,2022,2022-001,"COLEGIO LA MILAGROSA, INC.
+=======
 7576,51244,257325,2022,2022-001,"It is not economically feasible to hire additional staff to resolve the segregation of duties issue. The board will continue to review financial statements, budget vs actual results, bank reconciliations and expense reports. ",N,969843,1,LECBAFSKG8X8,N
 8719,54322,240680,2022,2022-001,"COLEGIO LA MILAGROSA, INC.
+>>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 (A nonprofit organization)
 CORRECTIVE ACTION PLAN
 JUNE 30, 2022

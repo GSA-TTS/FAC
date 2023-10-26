@@ -1,0 +1,1042 @@
+SEQ_NUMBER,DBKEY,AUDITYEAR,FINDINGREFNUMS,TEXT,CHARTSTABLES,REPORTID,VERSION,UEI,MULTIPLEUEIS
+1905,91751,2019,2019-002,"2019-002 Material Weakness: Direct Subsidized Loans Exceed Annual Limit (U.S Department of Education, William D. Ford Direct Loan Program, CFDA #84.268)
+
+Criteria: In accordance with 34 CFR 685.203, annual amounts that students can be awarded for Direct Loan funds is dependent, in part, on the students’ grade level. 
+
+Statement of Condition:  During the audit, it was noted that the University awarded one student in excess of the annual loan limit for Subsidized Direct Loans, based on that student’s grade level. 
+
+Questioned Costs:  The known monetary error was $442, which resulted in an extrapolated error of $46,089.
+
+Perspective Information:  The audit included a detailed testing of 40 student files, of which this material weakness applies to 1, indicating an error rate of 2.50%.  The relevant population in which this error was extrapolated consisted of all students who had received Subsidized Direct Loans. We consider this sample to be statistically valid. 
+
+Cause and Effect:  This finding is a result of the loan processor not following established packaging rules that did not allow for progression of loan limits based on grade level until the student had earned the required credit hours. This caused the student to be over awarded according to grade level. 
+
+Recommendation:  BCS recommends that the packaging rules be followed so that students are awarded appropriately based on the credit hours earned. 
+
+View of Responsible Officials:  Staff will receive continual training on packaging polices, rules and procedures. Students earned credit hours will be checked against grade level and potential over awards will be reviewed and corrected prior to disbursing funds.
+ 
+",N,815192,1,,
+1906,91751,2019,2019-001,"2019-001 Significant Deficiency: National Student Loan Data System (NSLDS) Report (U.S Department of Education, William D. Ford Direct Loan Program, CFDA #84.268 and Federal Pell Grant Program, CFDA #84.063) (original finding number 2017-011)
+
+Criteria: In accordance with 34 CFR 685.309(b) and 34 CFR section 690.83(b)(2), for Direct Loans and Pell grants, respectively, once the Enrollment Reporting roster file is received from the NSLDS, the institution must update the Enrollment Reporting roster file for changes in student status, report the date the enrollment status was effective, enter the new anticipated completion date, and submit the changes to NSLDS.
+
+Statement of Condition:  During the audit, it was noted that the University incorrectly reported student status changes for students who received Direct Loan and Pell grant disbursements. 
+
+Questioned Costs:  Such information is not applicable for this finding, due to the fact that it is nonmonetary in nature.
+
+Perspective Information:  The audit included a detailed testing of 40 student files, of which this significant deficiency applies to 11, indicating an error rate of 27.50%.
+
+Cause and Effect:  Students’ enrollment data was incorrectly identified and reported to NSLDS. The
+Power Campus Software was unable to identify students that simultaneously withdrew and dropped courses form adjoining modules. The result was incorrect reporting of enrollment data.
+
+Recommendation:  The University should ensure that the appropriate data is submitted to the NSLDS in order to ensure correct student status reporting.
+
+View of Responsible Officials: The University of the Cumberlands recognizes the importance of accurate reporting of enrollment data. As such, with the aid of an outside consulting firm FocusEdu an internal review of our current and past practices was conducted to identify and correct any issue that could lead to any future findings. Additionally, interdepartmental meetings were conducted to establish roles, scrutinize processes, setups and look for areas that could present repeat enrollment findings. Finally, with our transition to Banner integrated software we have leveraged their experts in registration and financial aid in our setup for proper reporting.
+",N,815192,1,,
+22103,161649,2019,2019-003,"Criteria:  Title 2 U.S. Code of Federal Regulations (“CFR”) Part 200, Uniform Administrative Requirements, Cost Principles, and Audit Requirements for Federal Awards (“Uniform Guidance”), section 200.512 requires the audit to be completed and the related reporting package submitted to the federal government within the earlier of 30 days after the receipt of the auditors’ report or nine months after the end of the entity’s fiscal year end. On March 19, 2020, the Office of Management and Budget (“OMB”) issued memorandum M-20-17, Administrative Relief for Recipients and Applicants of Federal Financial Assistance Directly impacted by the Novel Coronavirus (“COVID-19”).  The memorandum provides temporary relief for federal award recipients and subrecipients impacted by the COVID-19 pandemic.  The memorandum summarizes 13 areas of administrative relief including an extension of time to submit financial reporting packages to the Federal Audit Clearinghouse in accordance with the Uniform Guidance.
+
+Condition:  The financial and compliance audits for the year ended June 30, 2019 were not completed within the extended deadline.
+
+Effect:  The federal government could impose sanctions under 2 CFR 200.505.
+
+Cause:	During the year, the City experienced turnover in the finance director position which significantly impaired the City’s internal controls over financial reporting.  In addition, Hurricane Florence caused a disruption in the City’s services.
+
+Repeat finding: This is not a repeat finding. 
+
+Context:  The filing deadline for the fiscal year ended June 30, 2019 was March 31, 2020 and extended to June 30, 2020 by OMB Memorandum M-20-17.  The financial reporting package is expected to be uploaded on the Federal Audit Clearinghouse’s website before May 15, 2021. 
+
+Recommendation:  The new Finance Director has established written procedures to ensure annual reporting requirements are completed in a timely manner. In addition, we recommend the City consider implementing a cross training plan where certain qualified individuals are trained to perform key functions in the event members of management become incapacitated and are unable to perform their duties.  In addition, cross-training strengthens existing controls by having other individuals fill in for a person while they are on vacation or out of the office for an extended period of time.
+
+Management Response:  Management agrees with this finding.  See Corrective Action Plan.
+",Y,882744,1,,
+107,109775,2019,2019-001,"Finding 2019-001: Application of Sliding Fee Discount
+Federal Agency: U.S. Department of Health and Human Services
+Federal Program: Consolidated Health Centers Grant
+CFDA Number: 93.224 and 93.527
+Award Period: February 1, 2018 to January 31, 2019
+Type of Finding: Significant Deficiency in Internal Control over Compliance and Compliance
+Criteria
+Per Title 42 Chapter 1 Subchapter D Section 51c303(f), “Health centers must have a schedule of fees or payments for the provision of their health services consistent with locally prevailing rates or charges designed to cover their reasonable costs of operation. They are also required to have a corresponding schedule of discounts applied and adjusted on the basis of the patient’s ability to pay.”
+Condition Found and Context
+During our testing of 40 sliding fee discounts for health center patients qualifying for reduced charge visits, we identified one visit that received the incorrect sliding fee discount.
+Effect
+Potential that a patient would not receive the appropriate sliding fee discount.
+Cause
+Clerical error in updating and applying the sliding fee category in the billing system for these patients caused this oversight.
+Recommendation
+We recommend the Organization take measures to ensure that appropriate sliding fee rates/categories are used for each sliding fee encounter.
+Views of Responsible Officials and Planned Corrective Actions
+The Organization is aware of the importance of properly applying the sliding fee scale to all eligible patients. We feel that we have a strong policy and procedure to ensure this is done accurately. However, the process is dependent on many individuals and is susceptible to human error. We have implemented two new processes to mitigate this risk.
+First, we are working with our electronic health records company (NextGen) to improve the electronic process. We will enter the family size and income into NextGen, which will automatically assign the correct sliding fee scale, which will automatically be applied each time the patient utilizes the clinic.
+Secondly, we are increasing our internal audit procedures to audit sliding fee applications on a monthly basis, previously we were performing quarterly audits. These more frequent audits will ensure that information from the applications is accurately entered into NextGen.",N,804029,1,,
+2442,241171,2019,2019-001,"Criteria: The Authority failed to comply with the cash management requirement to minimize the time elapsed  between  the  transfer  of  federal  funds  and  the  disbursement  for  program  purposes.
+
+Condition: The Authority requested money from their operating grant and failed to spend all the amount within a reasonable period of time after receipt. In some instances, it was 30 days or more before the money was spent.
+
+Questioned Costs: All the amounts requested were spent resulting in no questioned costs.
+
+Cause: The Authority failed to properly determine the amount the entity could request in order to comply with the cash management compliance requirement.
+
+Effect: The amount requested for each of the draw requests, except the last request, exceeded the amount the Authority should have requested to be able to spend the monies within a minimum time after receipt.
+
+Recommendation: We recommend the entity perform a calculation prior to each draw request to determine the amount the entity is able to draw on the grant to remain in compliance with the cash management requirement. 
+
+Management’s Response: The Authority agrees with this finding. We will follow the Uniform Guidance and funding source instructions for requesting grant monies in the future. The Authority is performing a monthly calculation to determine the amount that can be requested to remain in compliance with the cash management requirement.
+",N,812583,1,,
+2441,241171,2019,2019-002,"Criteria: The Authority is required to contribute 50% of total operating costs as a non-federal match. The Authority did not match all expenditures when the federal money was received.
+
+Condition: The Authority is required to match all federal expenditures by paying 50% of all expenditures with their own funds.
+
+Questioned Costs: The Authority met the matching requirement by the end of the fiscal year. Therefore, there are no questioned costs.
+
+Cause: The Authority requested the federal monies in advance and failed to match the federal expenditures when made.
+
+Effect: The Authority failed to meet the 50% matching requirement as the federal money was received.
+
+Recommendation: We recommend the Authority perform a calculation prior to each draw request to determine the amount the entity is able to draw to match 50% of the expenditures with their own funds and remain in compliance with the matching requirement.
+
+Management Response: The Authority agrees with this finding. We will follow the Uniform Guidance and funding source instructions for requesting federal monies in the future. The Authority is performing a monthly calculation to determine the amount that can be requested to remain in compliance with the matching requirement.
+",N,812583,1,,
+2341,61656,2019,2019-001,"2019-001 Exit Counseling
+Significant Deficiency
+
+DEPARTMENT OF EDUCATION
+CFDA #: 84.268 Federal Direct Loan Program
+Federal Award Identification #: 18/19 Award Year
+
+Condition: The Fellowship did not retain evidence of providing exit counseling to all students who withdrew from the Fellowship. 
+
+Criteria: 34 CFR 685.304(b)
+
+Questioned Costs: $-0-
+
+Context: In our eligibility and disbursement testing of 19 students, five students exited the Fellowship. Of the five students who exited the Fellowship, three students did not have evidence of exit counseling in the student file. The Fellowship subsequently notified these three students in case they had been missed.
+
+Effect: Documentation of exit counseling was not available. Exit counseling information assists in reducing the default rate of the Fellowship.
+
+Cause: Exit counseling information was not appropriately provided to the students. 
+
+Identification as repeat finding, if applicable: Not Applicable
+
+Recommendation: We recommend the Fellowship develop a process to insure that exit counseling information is provided to students.
+
+Views of Responsible Officials: Management is in agreement with the finding and is in the process of addressing the issue. See attached corrective action plan.
+",N,819637,1,,
+2342,61656,2019,2019-002,"2019-002 Federal Direct Loan Eligibility
+Significant Deficiency
+
+DEPARTMENT OF EDUCATION
+CFDA #: 84.268 Federal Direct Loan Program
+Federal Award Identification #: 18/19 Award Year
+
+Condition: As part of the need analysis process it was noted that students were not always awarded the correct amount of subsidized and unsubsidized federal direct loans (FDL) based on eligibility.
+
+Criteria: 334 CFR 685.200 (a) & (v), 34 CFR 685.203
+
+Questioned Costs: $1,000
+
+Context: Out of 19 students, 1 student under awarded $5,500 in subsidized loans based on an inaccurate need analysis. The total loans awarded were accurate but the allocation between subsidized and unsubsidized loans was not. 1 student was over awarded $1,000 in subsidized loans based on grade level.
+
+Effect: Student not awarded FDL based on need and eligibility.
+
+Cause: Reliance on financial aid system to accurately award students. Also, using ISIR self-reported year of enrollment instead of using transcripts. 
+
+Identification as repeat finding, if applicable: Not Applicable
+
+Recommendation: We recommend the Fellowship add a review procedure to verify that the financial aid awarding software used is accurately awarding aid. 
+
+Views of Responsible Officials: Management is in agreement with the finding and is in the process of addressing the issue. See attached corrective action plan.
+",N,819637,1,,
+1246,160172,2019,2019-001,"Title I
+
+Information on Federal Program: Title I Grants to Local Agencies, CFDA No. 84.010 
+
+Criteria: Compliance under Title I: Grants and Agreements Part 200.430 Compensation-personal services under compliance requirement Allowable Costs/Cost Principles 2. Documentation of Employee Time and Effort.
+
+Condition: During our testing of payroll expenditures charged to this program it was noted that two part-time tutors were being charged to this grant.  The time and effort reports (payroll certifications) being signed by these individuals acknowledging and noting that their salaries are being allocated to the Federal Program were not maintained by the District.
+
+Questioned Cost: None.
+
+Context: A selection of eleven employees charged to the Federal Program were tested for verification of wages charged, educational certifications and payroll certifications.
+
+Effect: We were unable to review payroll certifications of time and effort reports acknowledged by the employee that their services were being allocated to this Federal Program as the District had not requested them from employees who were operating in a tutor capacity.  The amounts paid to the tutors were supported, allowable under the grant, included on the approved grant budget and properly coded to the grant.
+
+Cause: While the District has policies and procedures in place requiring completion of payroll certifications there was an oversight causing the District to not obtain the certifications for this type of employee.  
+
+Perspective Information: Certifications were not required for tutors.  
+
+Repeat Finding: No
+
+Recommendation: We recommend that compensating controls be implemented to monitor compliance with existing policies and procedures to ensure all employees whose time and effort of providing special education services is acknowledged by the payroll certifications. 
+
+Views of the Responsible Officials and Planned Corrective Actions: 
+
+The Director of Special Education will ensure that payroll certifications are obtained for all employees with Federal Program allocations.
+",N,815106,1,,
+4078,154044,2019,2019-001,"2019-001 Special Test and Provisions – Enrollment Reporting
+Criteria: The U.S. Department of Education requires the College to update changes in student enrollment status, report
+the date the enrollment status was effective, and submit changes electronically with the National Student Loan Data
+System (NSLDS) website in accordance with 34 CFR 682.610 and 34 CFR 685.309.
+Condition: The College did not have procedures in place to ensure change in enrollment information was accurately being
+reported to the Department of Education.
+Context: A sample of 40 students revealed that different effective dates were reported to NSLDS than what College records
+reflected for 2 students.
+Effect: The College was not in compliance with enrollment reporting to the NSLDS.
+Cause: The College’s policies and procedures did not include proper internal controls over compliance to ensure that this
+requirement was being met.
+Questioned costs: At the most, questionable costs would be interest accrued on the outstanding amounts of direct student
+loans which are insignificant, therefore there are no questioned costs.
+Recommendation: We recommend the College implement procedures to strictly comply with requirements of 34 CFR
+685.309 and 34 CFR 682.610 as it relates to the student enrollment status date information reported to the NSLDS. We
+further recommend the College follow the guidance provided in the NSLDS Enrollment Reporting Guide and stay abreast
+of new guidance as published by the Department of Education.
+Response: It was found that the last enrollment report for the Fall term sent to the National Clearinghouse was sent in
+December. Because grades are not finalized until three days after the last day of the term, Return of Title IV Funds (R2T4)
+calculations with all F or F/W status were not completed until January. Therefore, the last date of academic related activity
+was not updated accordingly. Because enrollment reporting is sent through our Registrar’s office and R2T4 calculations
+are completed in the Financial Aid office, we did not recognize the timing was inaccurate for enrollment reporting.
+We have corrected both individuals directly on the National Student Loan Data System (NSLDS). We are also working with
+our IT Department, Registrar, the National Clearinghouse and NSLDS to send a corrected file to update all students affected
+for the 18-19 school year. Moving forward, we are coordinating with the Registrar’s office to schedule dates for reporting
+enrollment so that they include our last R2T4 calculations for the term.
+",N,827765,1,,
+4079,154044,2019,2019-002,"2019-002 Special Test and Provisions – Disbursements to or on Behalf of Students
+Criteria: The U.S. Department of Education requires the College to notify students, or parents, of their right to cancel all
+or a portion of the loan disbursements in writing, no earlier than 30 days before or 30 days after crediting the student’s
+account at the College.
+Condition: The College did not have proper policies and procedures in place to verify students, or parents, were notified
+of their right to cancel within the required time frame.
+Context: A sample of 40 students revealed that nine students were not notified of their right to cancel Federal Direct Loans
+within the required time frame during the Spring 2019 semester’s first loan disbursement.
+Effect: The College was not in compliance with notifying the student, or parent, of their right to cancel with Federal Direct
+Loan disbursements.
+Cause: There was an input error that caused the first disbursement of Federal Direct Student Loan funds in the Spring
+2019 semester to register as the 2019-2020 academic year. This caused the failure of several students not receiving
+notification of the right to cancel all or a portion of the loan disbursements in the required timeframe.
+Questioned costs: None.
+Recommendation: We recommend the College implement procedures to strictly comply with the requirements of 34 CFR
+668 as it relates to notifying students, or parents, and their right to cancel loan disbursements within the required
+timeframe.
+Response: After extensive research, it was discovered the system was looking correctly at students with a loan
+disbursement on 1/28/19. Due to a setup error, in a shared Banner form, across multiple departments, the process pulled
+an incorrect aid year (FY19-20 instead of FY18-19). When the email was generated, the process pulled only students who
+had a FY19-20 FAFSA on file. This error was identified and corrected in February, however, we did not realize this affected
+our loan letter emails.
+The College disburses federal loans to individual students in two separate payments within a semester, half in the
+beginning of the semester and half mid-semester. Although students did not receive a disclosure email at their first
+disbursement, they did receive a disclosure email at their second disbursement.
+The College has eight scheduled disbursements each semester. The error occurred on the first disbursement dated
+1/28/19. The error was found and corrected in our system before the other disbursements for the semester occurred.
+There is now verification that the disclosure statements were sent and are now accurate in our system.
+Going forward, an error report via email is sent daily that shows if a loan was paid and no email was sent. We will then be
+able to address the error more timely thus avoiding the 30 day late notification.",N,827765,1,,
+6120,103008,2019,2019-001,"Finding 2019-001: Less-than-Arm’s Length/Conflict of Interest
+Grantor: U.S. Department of Health and Human Services
+CFDA: 93.676
+Program Name: Unaccompanied Alien Children Program
+Award Number: 90ZU0024; 90ZU0030; 90ZU0049; 90ZU0148; 90ZU0149
+Award Year: Various
+Compliance Requirement: 45 CFR 75 Subpart E; Cost Principles - Allowed Cost and Procurement
+Type of Finding: Noncompliance – Less-than-Arm’s-Length/Conflict of Interest
+Criteria: Conflict of Interest
+
+Condition and Context: In a Notice of Monetary Disallowance dated July 2, 2019, the Department of Health and Human Services (“HHS”), Administration for Children and Families (“ACF”), presented findings noted through a review of leases and contracts executed by Southwest Key Programs, Inc. (“SWK”), during the periods of January 1, 2006 through March 31, 2019. ACF concluded that SWK did not comply with the terms and conditions of the above referenced grant awards. The findings noted are based on costs related to two leases with an entity owned by two now former members of management and a now former board member of a subsidiary organization to SWK, Promesa Public Schools, Inc (“Promesa”) and one lease with another entity partially owned by the now former board member of Promesa.  SWK questioned the conflict of interest created by the ownership interest of the now former board member of Promesa but the payments were disallowed, nonetheless.    
+
+In addition, ACF also concluded that SWK awarded multiple contracts to its for-profit subsidiaries, Southwest Key Maintenance LLC, Southwest Key Café LLC, and Southwest Key Green Energy LLC, without demonstrating compliance with procurement regulations. As related parties, these subsidiaries had a competitive advantage and should have been excluded from consideration against external bids for the process to still be considered competitive in accordance with 45 CFR § 75.328(a)(5).  For some of the contracts SWK demonstrated competitive bidding but given that the for-profit subsidiary was still included and awarded the contract, the payments were disallowed.
+
+Cause: The unique nature of management’s separate investments and simultaneous control over operations, including decisions related to leasing transactions, with ineffective oversight by other members of the management team and board of directors.
+
+Effect or Potential Effect: Cost recovered by SWK related to less-than-arm’s length transactions are disallowed. Costs related to for-profit wholly owned subsidiaries are disallowed.
+
+Questionable Costs: $5,057,928 cumulative cost for periods from 2006 through 2019
+
+Recommendation: Eliminate transactions with less-than-arm’s length entities and for-profit wholly owned subsidiaries.
+
+Responsible Official’s Response and Planned Corrective Actions: See Appendix A at the end of this report
+
+Person Responsible for Corrective Action: Eric Marin, Chief Financial Officer
+
+Implemented Date of Corrective Action: July 29, 2019
+",N,833097,1,,
+6121,103008,2019,2019-002,"Finding 2019-002: Noncompliance with documented procurement procedures  
+Grantor: U.S. Department of Health and Human Services
+CFDA: 93.676
+Program Name: Unaccompanied Alien Children Program
+Award Number: 90ZU0049-05; 90ZU0253-01; 90ZU0253-02; 90ZU0253-03; 90ZU0259-01; 90ZU0257-01; 90ZU0252-01 
+Award Year: Various
+Compliance Requirement: 2 CFR 200 Subpart D: Post Federal Award Requirements
+Type of Finding: Noncompliance: Failure to use documented procurement procedures
+Criteria: General Procurement Standards 
+ 
+Condition and Context: In accordance with 2 CFR 200 Subpart D § 200.318 (a), the non-Federal entity must use its own documented procurement procedures which reflect applicable State, local, and tribal laws and regulations, provided that the procurements conform to applicable Federal law. 
+
+For procurement between $25,000 to $100,000 per year, it is SWK’s procurement policy to obtain quotes from at least three sources which are able to meet the Organization’s requirements and are contending for the award of the purchase order based on prices. Such quotations must be documented and made a part of the procurement files for review purposes.
+
+SWK did not obtain quotes from at least three sources for a telephone service expenditure dating back to 2014. The Organization did not retain documentation of the procurement process in the procurement files as it related to the estimated annual cost of $79,001.
+
+Cause: SWK did not obtain quotes from at least three sources and did not document the quotations in the procurement files for an expenditure between $25,000 to $100,000.
+
+Effect or Potential Effect: Non-competitive prices on procurement
+
+Questionable Costs: $79,001 (Known questionable cost)
+
+Recommendation: Obtain and document appropriate quotations in procurement files, in accordance with SWK procurement procedures.
+
+Responsible Official’s Response and Planned Corrective Actions: See Appendix A at the end of this report
+
+Person Responsible for Corrective Action: Eric Marin, Chief Financial Officer
+
+Implemented Date of Corrective Action: July 29, 2019
+",N,833097,1,,
+9964,164686,2019,2019-002,"The Ohio Department of Education’s CCIP Final Expenditure Report Completion Steps, states all CCIP Final Expenditure Reports (FERs) must be completed online and may be started after June 30th, the end of the fiscal year.  In addition, each Funding Application within the CCIP has its own separate final expenditure report.  Each Local Education Agency (LEA) must ensure each FER(s) is submitted to ODE with Superintendent Approval no later than September 30.
+
+The District’s Title I final expenditure report amount that was filed timely was understated by $147,633 compared to the District’s system.  The report was corrected but was refiled past the due date on October 29.
+
+The District did not have adequate controls in place to help prevent the error.
+
+The District should implement procedures to file their Final Expenditure Report by September 30 and also ensure they file the correct amount. 
+",N,839098,1,,
+9965,164686,2019,2019-005,"2 CFR § 400.1 gives regulatory effect to the USDA for 2 CFR § 200.318(a)(b) which states that a non-Federal entity must use its own documented procurement procedures which reflect applicable state and local laws and regulations, provided that the procurements conform to applicable Federal law and standards.  Non-Federal entities must maintain oversight to ensure that contractors perform in accordance with the terms, conditions and specification of their contracts.  Additionally 7 CFR 225 Subpart C Section 225.15(m)(4) states that in addition to any applicable State or local laws governing bid procedures, each District which contracts with a Consortium shall ensure that the Consortium is in compliance with fair and open competition over all purchases.
+
+The District contracts with a consortium, to enter into food contracts on its behalf.  The District has outlined its monitoring requirements over the Consortium’s adherence to state and federal procurement requirements over full and open competition.  However, the District did not have procedures in place documenting the monitoring that the Consortium was complying with the fair and open competition requirements.  Additionally, the District did not have internal controls in place to monitor suspension and debarment with the District’s food service vendors.
+
+The District should ensure it is following its procurement policy and maintain documentation of the monitoring the Consortium is in compliance with the fair and open competition requirements and the monitoring of suspension and debarment on vendors. 
+",N,839098,1,,
+9966,164686,2019,2019-006,"2 CFR section 200.303 requires that non-Federal entities receiving Federal awards establish and maintain internal control over the Federal awards that provides reasonable assurance that the non-Federal entity is managing the Federal awards in compliance with Federal statutes, regulations, and the terms and conditions of the Federal awards.
+
+The District employs a food service management company to oversee, and conduct the activities of the food service department.  An employee of the food service management company submits claims for reimbursement to the Ohio Department of Education.  There was no evidence that any employee of the District reviewed or approved these claims before they were sent. 
+
+The District should establish internal controls to verify that claims for reimbursement submitted for the Nutrition Cluster are correct. 
+",N,839098,1,,
+9967,164686,2019,2019-004,"2 CFR Subpart F § 200.510(b) requires the auditee prepare a Schedule of Expenditures of Federal Awards (the Schedule) for the period covered by the entity’s financial statements which must include the total federal awards expended as determined in accordance with §200.502.
+
+At a minimum, the schedule must:
+
+1.	   List individual Federal programs by Federal agency.
+2.	   For Federal awards received as a subrecipient, the name of the pass-through entity and identifying number assigned by the pass-through entity must be included.
+3.	   Provide total Federal awards expended for each individual Federal program and the CFDA number or other identifying number when the CFDA information is not available.
+4.	   Include the total amount provided to subrecipients from each Federal program. 
+5.	   For loan or loan guarantee programs described in § 200.502 Basis for determining Federal awards expended, paragraph (b), identify in the notes to the schedule the balances outstanding at the end of the audit period. 
+6.	   Include notes that describe the significant accounting policies used in preparing the schedule, and note whether or not the auditee has elected to use the 10 percent de minimis cost rate as covered in § 200.414 indirect (F&A) costs.
+
+The District did not compile an accurate Schedule.  The Schedule provided by the District had the 
+following misstatements to expenditure amounts:
+
+•	Expenditures reported did not agree to the District’s financial records.
+
+•	School Lunch Program expenditures of $658,897.64, School Breakfast Program expenditures of $200,901.42, and Donated Commodities Non-Cash transactions of $89,504.40 were not reported.
+
+Errors and omissions to the Schedule could have an adverse effect on future grant awards by the awarding agency or agencies in addition to an inaccurate assessment of major federal programs that would be subjected to audit.  Adjustments, to which management have agreed, are reflected in the accompanying Schedule.
+
+District management should review all grant and loan award documents in order to execute policies and procedures which help ensure compliance with grant and loan requirements, including Schedule reporting requirements.  The District should implement a system to track all federal expenditures and related information separately from other expenditures and report federal expenditures with proper support including, but not limited to, grant agreements, calculation of the expenditures, and any federal reporting requirements.  This may help ensure the District is in compliance with grant and loan requirements, the Schedule is complete and accurate, and major federal programs are accurately identified for audit.
+",N,839098,1,,
+9968,164686,2019,2019-007,"2 CFR section 200.303 requires that non-Federal entities receiving Federal awards establish and maintain internal control over the Federal awards that provides reasonable assurance that the non-Federal entity is managing the Federal awards in compliance with Federal statutes, regulations, and the terms and conditions of the Federal awards.
+
+The District employs a food service management company to oversee and conduct the activities of the food service department.  The District paid a lump sum to the food service management company each month, but there was no evidence that the District reviewed any of the supporting invoices to verify amounts paid were for allowable activities and costs.  In total, the District paid $521,294.37 to the food service management company.
+
+We noted one instance where the District paid a vendor without having a purchase order signed by the Superintendent and Treasurer.  The total of this transaction was $31.54. 
+
+Additionally, we identified several unallowable costs/activities being paid to the food service management company.  The following expenditures were determined to be unallowable:
+
+•	The District expended a total of $1,111 to a local pizza shop despite not receiving actual invoices from the pizza shop. Amounts were only supported by a blank order form. 
+•	$876 to a different local pizza shop without proper invoices
+•	Total of $47.70 paid in sales tax to various vendors
+•	$5 gift card bought for a student that does not eat in the cafeteria
+•	$72.99 Amazon payment that did not detail what was purchased
+•	$165.08 in travel reimbursements for an employee of the food service management company, not an employee of the District to drive to other School Districts
+•	$1,000 for training, but no description of what training was for, or how amount was calculated
+•	$1,675.56 in food service management company insurance liability fees that should have been indirect costs approved by ODE.  No approval from ODE was on file
+•	$187.49 in other miscellaneous receipts that either lacked a detailed invoice, or should have been paid from the General Fund.
+
+These transactions total $5,140.82.  Based on the errors found, we project total unallowable costs/activities for the Nutrition Cluster Program to total $17,786. 
+
+The District should review all detailed invoices from their food service management company.  The District should also ensure to only reimburse the food service management company for allowable activities and costs for the Nutrition Cluster Federal Program. 
+",N,839098,1,,
+9969,164686,2019,2019-003,"2 CFR section 200.303 requires that non-Federal entities receiving Federal awards establish and maintain internal control over the Federal awards that provides reasonable assurance that the non-Federal entity is managing the Federal awards in compliance with Federal statutes, regulations, and the terms and conditions of the Federal awards.
+
+The District employs a food service management company to oversee, and conduct the activities of the food service department.  When testing applications for students to receive free and reduced lunches, it was determined that an employee of the food service management company signs off on all applications.  There is no evidence that an employee of the District also reviewed the applications verifying students were eligible for free or reduced lunches.
+
+7 CFR Part 245.6a(c)(1) states the local educational agency must verify eligibility or children in a sample of household applications approved for free and reduced price meal benefits for that school year. In addition, 7 CFR Part 245.6a (f)(7) states that based on the verification activities, the local educational agency shall make appropriate modifications to the eligibility determinations made initially.  The local educational agency must notify the household of any change.  Households must be notified of any reduction in benefits in accordance with paragraph (j) of this section.  Further, 7 CFR Part 245.6(c)(3)(iii) states that if there are changes resulting from verification or administrative reviews, the local educational agency must change the children’s eligibility status when a change is required as a result of verification activities conducted under A§245.6a or as a result of a review conducted in accordance with Part 210.18 of this chapter.
+
+We obtained the School District’s Verification Summary Report (the Report).  The Report stated that seven free and reduced applications were selected for verification.  Of the seven applications selected for verification, we noted the following:
+
+•	   Three applications originally marked as reduced that responded should have been moved to   paid based on their income.
+
+•	    One application originally marked as free that responded should have been moved to paid based on their income.
+
+•	    One application originally marked as free that responded should have been reduced to begin with based on their income.  After verification this application was still eligible to be in the reduced category.  However, the District kept this application at free.
+
+•	   There were two applications on the Report that were marked as responded, and moved to paid.  However, these applications should have been marked as not responded, and moved to paid.  Also, one of these applications was originally marked as free, but based on their income they should have been reduced.
+
+The District contracts with a food service management company to run their food service department.  That company has an employee they use as the Food Service Supervisor for the District.  No employee of the District is reviewing the applications that come up for verification.  The only person reviewing the applications is the Food Service Supervisor.
+
+The District did not have controls in place to help prevent or detect these errors. 
+
+The District should establish internal controls to verify that students are eligible to receive free and reduced lunches.  The District should also review free and reduced applications that are selected for verifications for accuracy. 
+",N,839098,1,,
+9728,171646,2019,2019-001,"2019-001:  Inadequate Controls over Preparation of Financial Statements
+
+Condition: The City currently does not prepare financial statements under generally accepted accounting principles.  The external auditors prepare the statements and disclosures and management approves and takes responsibility for the statements after they are prepared.
+
+Criteria: Accounting standards dictate that management is responsible for preparation of the financial statements.  An audit of the financial statements of an organization requires the evaluation of the internal control system’s design of controls in generating and overseeing of the financial statements to be audited.  The organization must have the ability to prepare and evaluate the financial statements’ format, content, and disclosures in accordance with generally accepted accounting principles and recognize any material items missing in the statement through the organization’s control system. This is true whether the organization prepares the financial statements or not.  These controls can be established or achieved by use of a third party organization or internally, but external auditors are never considered a control element.
+
+Cause: The City believes its current reporting meets all of the City’s internal needs.  While management knows their responsibility for understanding and presenting the annual financial statements, they do not believe it is currently cost beneficial to design and/or strengthen controls over the accounting departments financial reporting process.
+
+Effect:  The City does not have proper controls over financial statements preparation.
+
+Recommendation: We recommend the City continue to monitor the need, costs, and benefits of developing a control structure to oversee the preparation of financial statements in accordance with generally accepted accounting principles.		
+
+
+",N,840143,1,,
+9729,171646,2019,2019-005,"2019-005:  Improper Controls over Grant Transactions
+
+Condition: The City did not maintain grant files in a systematic manner to appropriately identify grant activity.  Various grants are handled by two employees within the City in addition to the Police department handling their grants.  The City does not prepare the Schedule of Federal and State Awards. 
+
+Criteria: Uniform Guidance requires that systematic proper supporting documentation be maintained for grant activity. The Uniform Guidance also dictates that the City is responsible for preparing the Schedule of Federal and State Awards. 
+
+Cause:  Controls do not exist which require all grant information to be documented and maintained in an orderly fashion to support grant activity.
+
+Effect:  Grants could be improperly reported or not reported without proper controls. In addition, compliance issues could arise due to lack of controls. 
+
+Recommendation: We recommend proper controls be established for gathering and maintaining grant documentation and the preparation of the Schedule of Federal and State Awards.			
+
+
+",N,840143,1,,
+11222,203669,2019,2019-002,"Finding 2019-002: Federal Procurement Requirements for Policies and Documentation 
+
+Information on the Federal Program: CFDA 14.135—U.S. Department of Housing and Urban Development, Section 221(d)(4) Mortgage Insurance Rental Housing for the Elderly, grant number 113-35459.
+
+Criteria: Uniform Guidance §200.318, General Procurement Standards, states that a non-Federal entity must use its own documented procurement procedures which reflect applicable State, local, and tribal laws and regulations, provided that the procurements conform to applicable Federal law and the standards of Uniform Guidance. Uniform Guidance §200.318 through §200.326 provide details of what must be included in such policies, which in turn establishes the documentation that should be prepared and maintained for various procurement activities of the Village in addition to certain HUD-specific requirements.
+
+Condition: The Village refers to HUD Handbook 4350.1 for procurement requirements rather than formally adopting its own procurement procedures. The most recent update to HUD Handbook 4350.1 predates the changes enacted as part of Uniform Guidance. Therefore, reliance on only HUD Handbook 4350.1 does not incorporate all applicable laws and regulations that may be applicable to the Village. In addition, certain specific documentation requirements for procurement were lacking or only informally addressed. For example:
+•	Uniform Guidance states that procurement through solicitation of a proposal from only one source and may be used only when one or more of the following circumstances apply: (1) The item is available only from a single source;  (2) The public exigency or emergency for the requirement will not permit a delay resulting from competitive solicitation;  (3) The Federal awarding agency or pass-through entity expressly authorizes noncompetitive proposals in response to a written request from the non-Federal entity; or (4) After solicitation of a number of sources, competition is determined inadequate. The Village selected its health insurance through a process that appears to conclude that, given the totality of circumstances, circumstance (1) was applicable. However, the documentation and control process does not clearly ensure that this evaluation was made or updated in 2019. 
+•	Uniform Guidance requires that the reason for selecting a vendor be clearly documented. From the Village’s documentation of procurement activities, the reason for selection can be readily inferred, and generally relates to price, but the reason is not typically formally stated.
+•	Uniform Guidance requires that purchases deemed to be within the small purchase threshold (as defined by an entity’s policy) should include price or rate quotations must be obtained from an adequate number of qualified sources. While management affirm this activity is occurring, no documentation is retained related to this activity.
+Cause: The internal control process for the Village relies on the HUD Handbook which may differ in various details from more recent requirements from Uniform Guidance. Also, the Village has relied on somewhat informal processes and documentation methods.
+
+Effect or Potential Effect: Failure to follow all applicable federal procurement requirements, including requirements to document and retain documentation of key details of the procurement process, could lead to noncompliance with HUD regulations and could result in corrective action by HUD.  
+
+Questioned Costs: $0. 
+
+Context / Sampling:  The finding was identified in our review of procurement policies and in a test of a non-statistical sample of small- and large-purchase threshold vendors. 
+
+Repeat Finding from Prior Year(s): No
+
+Recommendation: The governing body and management of the Village should ensure the Village’s policies for procurement activities are consistent with current federal requirements, and a review of internal controls should be performed to ensure all such requirements are addressed by procurement procedures being performed. 
+
+Responsible Official’s Response: Management will modify its internal control practices as needed to ensure vendor selection rationale is more clearly documented consistent with current federal requirements. In the particular health insurance instance cited, we strongly believe our current health insurance vendor is the only reasonably viable option for the quality of health coverage for our small business with less than 10 insured employees while still maintaining reasonable premiums. We investigated the Affordable Care Act and found that both the cost and quality of coverage was unsatisfactory.
+
+Planned Implementation Date of Corrective Action: Management will implement this change immediately.
+
+Person Responsible for Corrective Action: Executive Director.",N,830778,1,,
+11223,203669,2019,2019-001,"Finding 2019-001: Federal Procurement Requirements for Suspension and Debarment 
+
+Information on the Federal Program: CFDA 14.135—U.S. Department of Housing and Urban Development, Section 221(d)(4) Mortgage Insurance Rental Housing for the Elderly, grant number 113-35459.
+
+Criteria: Uniform Guidance §200.213, Suspension and Debarment, states that non-federal entities are subject to the non-procurement debarment and suspension regulations implementing Executive Orders 12549 and 12689, 2 CFR part 180. These regulations restrict awards, subawards, and contracts with certain parties that are debarred, suspended, or otherwise excluded from or ineligible for participation in federal assistance programs or activities. To ensure compliance with HUD regulations, the Village should have internal controls in place to ensure no contracts are entered into with vendors who are debarred or suspended from participation in federal programs.
+
+Condition: Procurement procedures applied for the year ended December 31, 2019 did not include a control to verify vendors were not debarred or suspended from participation in federal programs. This was identified in a test of a sample of contracts procured in 2019. None of the vendors selected in the testing were debarred or suspended, but no step was performed by the Village to ensure this was the case.
+
+Cause: The internal control process for the Village overlooked this specific requirement in the federal procurement requirements.
+
+Effect or Potential Effect: Entering into contracts with debarred or suspended vendors could lead to noncompliance with HUD regulations and could result in corrective action by HUD.  
+
+Questioned Costs: $0. The audit testing identified no vendors who were suspended or debarred.
+
+Context / Sampling:  The finding was identified in our test of a non-statistical sample of the largest four vendors requiring suspension and debarment procedures. 
+
+Repeat Finding from Prior Year(s): No
+
+Recommendation: The governing body and management of the Village should ensure the Village’s policies for procurement activities are consistent with current federal requirements, and a review of internal controls should be performed to ensure all such requirements are addressed by procurement procedures being performed. 
+
+Responsible Official’s Response: Management will modify its internal control practices to ensure procurement activities are consistent with current federal requirements and specifically with regard to ensuring contractual parties are not disbarred. 
+Planned Implementation Date of Corrective Action: Management will implement this change immediately.
+
+Person Responsible for Corrective Action: Executive Director.
+",N,830778,1,,
+12261,237641,2019,2019-005,See Schedule of Findings and Questioned Costs within uploaded audit report.,Y,842398,1,,
+14509,239411,2019,2019-001,"In accordance with Title 2 U.S. Code of Federal Regulations (CFR) Part 200.512, Report Submission, the audit must be completed and the data collection form described in paragraph (b) of this section and reporting package described in paragraph (c) of this section must be submitted within the earlier of 30 calendar days after receipt of the auditor's report(s), or nine months after the end of the audit period. If the due date falls on a Saturday, Sunday, or Federal holiday, the reporting package is due the next business day.",N,858344,1,,
+6024,156552,2019,2019-004,"Finding No. 2019-004 (TRIO Cluster)
+
+Information on the Federal Program
+U.S. Department of Education - TRIO Cluster (Federal Award Year 7/1/18 to 6/30/19):
+	Talent Search:
+	(CFDA 84.044) (Federal Grant Number P044A160103) (FAIN – not applicable)
+	Upward Bound:
+	(CFDA 84.047) (Federal Grant Number P047A170099) (FAIN – not applicable)
+	
+Statistically Valid Sample
+The sample was not intended to be, and was not, a statically valid sample.
+
+Finding Type
+Significant Deficiency and Noncompliance
+
+Prior Year Finding
+Not Applicable
+
+Criteria
+2 CFR section 200.403(a)(c)(g) Factors Affecting Allowability of Costs
+Costs must meet the following general criteria in order to be allowable under federal awards: be necessary and reasonable for the performance of the federal award and be consistent with policies and procedures that apply uniformly to both federally-financed and other activities of the non-federal entity. Costs must be adequately documented.
+
+2 CFR section 200.404(a)(b) Reasonable Costs
+A cost is reasonable if, in its nature and amount, it does not exceed that which would be incurred by a prudent person under the circumstances prevailing at the time the decision was made to incur the cost. In determining reasonableness of a given cost, consideration must be given to whether the cost is of a type generally recognized as ordinary and necessary for the operation of the non-federal entity or the proper and efficient performance of the federal award. Consideration must also be given to the restrains or requirements imposed by such factors as: sound business practice; arm’s-length bargaining; federal, state, local, tribal, and other laws and regulations; and terms and conditions of the federal awards.
+
+Condition
+The College incurred costs that do not meet the general criteria in order to be allowable under federal awards; the costs were not reasonable and were not of sound business practice.
+
+Questioned Costs
+There are no questioned costs related to this finding.
+
+Context
+1 out of 40 expenditures sampled was for a prepaid card of an amount greater than supplies actually purchased in the fiscal year. Issuing a prepaid card for a federal award creates an opportunity for certain costs to bypass normal control procedures. 1 out of 40 expenditures sampled was for employee reimbursement of training costs. While the training was ordinary and necessary, the related travel was not considered necessary or efficient performance of the federal award.
+
+Effect
+Costs not meeting the general criteria to be consider allowable were incurred for the performance of the federal award.
+
+Cause
+The College did not follow policies and procedures in verifying all costs incurred for the performance of the federal award were allowable and reasonable.
+
+Recommendation
+That the College improve policies and procedures to ensure that all costs incurred for the performance of the federal award were allowable and reasonable.
+
+View of Responsible Official
+The responsible officials and College agree with the finding and will address the matter as part of their corrective action plan.
+ 
+",N,816734,1,,
+6025,156552,2019,2019-002,"Finding No. 2019-002 (Pell Grant Overaward)
+
+Information on the Federal Program
+U.S. Department of Education - Student Financial Aid Cluster (Federal Award Year 7/1/18 to 6/30/19):
+	Federal Pell Grant Program:
+	(CFDA 84.063) (Federal Grant Number P063P180476) (FAIN – not applicable)
+	
+Statistically Valid Sample
+The sample was not intended to be, and was not, a statically valid sample.
+
+Finding Type
+Significant Deficiency and Noncompliance
+
+Prior Year Finding
+2018-002.
+
+Criteria
+34 CFR section 690.80(b)(2)(ii) – Recalculation of Federal Pell Grant Award
+If the student’s projected enrollment status changes during a payment period before the student begins attendance in all of his or her classes for that payment period, the institution shall recalculate the student’s enrollment status to reflect only those classes for which the student actually began attendance.
+
+Condition
+The College did not recalculate the Pell Grant Award for a student who never began attendance in one of their classes for that payment period. As a result, an overaward of the Pell Grant occurred. 
+
+Questioned Costs
+There are no questioned costs related to this finding.
+
+Context
+1 out of 60 Pell Grant recipients sampled never attended one or more of their classes, causing their enrollment status to be different than what the Pell Grant was originally based on. However, the College failed to capture the change and Pell Grant was disbursed to the student for $356 in excess of the correct amount.
+
+There were $8,876,925 Pell Grants awarded to over 2,700 recipients during the award year.
+
+Effect
+Change in enrollment status not captured by the College for a student who never begin attendance in one or all classes resulting in the College overawarding the Pell Grant.
+
+Cause
+The College did not follow policies and procedures in verifying enrollment status of which student financial aid was calculated based on.
+
+Recommendation
+That the College improve policies and procedures to ensure that all students’ change in enrollment status are communicated to each Department and that recalculation of awards be performed prior to disbursement.
+
+View of Responsible Official
+The responsible officials and College agree with the finding and will address the matter as part of their corrective action plan.
+ 
+",N,816734,1,,
+6026,156552,2019,2019-003,"Finding No. 2019-003 (Enrollment Reporting)
+
+Information on the Federal Program
+U.S. Department of Education - Student Financial Aid Cluster (Federal Award Year 7/1/18 to 6/30/19):
+	Federal Direct Student Loans:
+	(CFDA 84.268) (Federal Grant Number P268K190476) (FAIN – not applicable)
+	Federal Pell Grant Program:
+	(CFDA 84.063) (Federal Grant Number P063P180476) (FAIN – not applicable)
+	
+Statistically Valid Sample
+The sample was not intended to be, and was not, a statistically valid sample.
+
+Finding Type
+Significant Deficiency and Noncompliance
+
+Prior Year Finding
+Not Applicable
+
+Criteria
+Under the Pell grant and ED loan programs, institutions must complete and return within 15 days the Enrollment Reporting roster file [formerly the Student Status Confirmation Report (SSCR)] placed in their Student Aid Internet Gateway (SAIG) (OMB No. 1845-0002) mailboxes sent by ED via the National Student Loan Data System (NSLDS) (OMB No. 1845-0035).  The institution determines how often it receives the Enrollment Reporting roster file with the default set at a minimum of every 60 days.  Once received, the institution must update for changes in student status, report the date the enrollment status was effective, enter the new anticipated completion date, and submit the changes electronically through the batch method or the NSLDS website (FPL, 34 CFR section 674.19; Pell, 34 CFR section 690.83(b)(2); FFEL, 34 CFR section 682.610; Direct Loan, 34 CFR section 685.309). Institutions are responsible for timely reporting, whether they report directly or via a third-party servicer.  NSLDS will send a Late Enrollment Reporting notification  e-mail if no updates are received by batch or online within 22 days after the date the roster was sent to the school.  The Enrollment Reporting Summary Report (SCHER1) on the NSLDS website can be created at the request of the institution.  It shows the dates the roster files were sent and returned, the number of errors, date and number of online updates, and the number of late enrollment reporting notifications sent for overdue Enrollment Reporting rosters.
+
+A student’s enrollment status determines eligibility for in-school status, deferment, and grace periods, as well as for the payment of interest subsidies to FFEL Program loan holders by ED.  Enrollment Reporting in a timely and accurate manner is critical for effective management of the programs.  Enrollment information must be reported within 30 days whenever attendance changes for students, unless a roster will be submitted within 60 days.  These changes include reductions or increases in attendance levels, withdrawals, graduations, or approved leaves-of-absence.
+
+ED issued a Dear Colleague Letter March 30, 2012 (GEN-12-06) that included enhancements to NSLDS Enrollment Reporting Process and reminders to institutions regarding their responsibilities for NSLDS Enrollment Reporting which are available at http://www.ifap.ed.gov/dpcletters/GEN1206.html.  ED also issued a Dear Colleague Letter, dated April 14, 2014 (GEN-14-07), explaining changes to NSLDS Enrollment Reporting Process, which include changes to reporting of additional data, reporting at the academic program level, and more frequent reporting.  GEN 14-07 is available at http://www.ifap.ed.gov/dpcletters/GEN1407.html.
+ 
+Condition
+The College reported graduated students as withdrawn to the NSLDS.
+
+Questioned Costs
+There are no questioned costs related to this finding.
+
+Context
+8 out of 60 students sampled who received a Direct Loan and / or Pell Grant graduated, however, the students' graduated status was reported as withdrawn to the NSLDS.
+
+Effect
+Student status changes not properly reported to NSLDS could impact the timeliness of a student being put into repayment status.
+
+Cause
+The College did not ensure that students who graduated were properly reported as such to the NSLDS.
+
+Recommendation
+That the College improve policies and procedures to ensure that all students’ status changes are accurately reported to the NSLDS.
+
+View of Responsible Official and Planned Corrective Action
+The responsible officials and College agree with the finding and will address the matter as part of their corrective action plan.
+
+",N,816734,1,,
+6027,156552,2019,2019-001,"Finding No. 2019-001 (Return of Title IV Funds)
+
+Information on the Federal Program
+U.S. Department of Education - Student Financial Aid Cluster (Federal Award Year 7/1/18 to 6/30/19):
+	Federal Direct Student Loans:
+	(CFDA 84.268) (Federal Grant Number P268K190476) (FAIN – not applicable)
+	Federal Supplemental Educational Opportunities Grants:
+	(CFDA 84.007) (Federal Grant Number P007A182582) (FAIN – not applicable)
+	Federal Pell Grant Program:
+	(CFDA 84.063) (Federal Grant Number P063P180476) (FAIN – not applicable)
+	
+Statistically Valid Sample
+The sample was not intended to be, and was not, a statically valid sample.
+
+Finding Type
+Significant Deficiency and Noncompliance
+
+Prior Year Finding
+2018-001.
+
+Criteria
+34 CFR section 668.173(b) – Timing of Return of Title IV Funds:
+Returns of Title IV funds are required to be deposited or transferred into the SFA account or electronic fund transfers initiated to ED or the appropriate FFEL lender as soon as possible, but no later than 45 days after the date the institution determines that the student withdrew. Returns by check are late if the check is issued more than 45 days after the institution determined the student withdrew or the date on the canceled check shows the check was endorsed more than 60 days after the date the institution determined that the student withdrew.
+
+34 CFR sections 668.22(a)(1) through (a)(5):
+When a recipient of Title IV grant or loan assistance withdraws from an institution during a payment period or period of enrollment in which the recipient began attendance, the institution must determine the amount of Title IV aid earned by the student as of the student’s withdrawal date. If the total amount of Title IV assistance earned by the student is less than the amount that was disbursed to the student or on his or her behalf as of the date of the institution’s determination that the student withdrew, the difference must be returned to the Title IV programs as outlined in this section and no additional disbursements may be made to the student for the payment period or period of enrollment. If the amount the student earned is greater than the amount disbursed, the difference between the amounts must be treated as a post-withdrawal disbursement.	
+
+34 CFR section 668.22(c)(3):
+An institution that is not required to take attendance may use as the student’s withdrawal date a student’s last date of attendance at an academically-related activity provided that the institution documents that the activity is academically related and documents the student’s attendance at the activity.
+
+34 CFR section 668.22(j)(2):
+For an institution that is not required to take attendance, an institution must determine the withdrawal date for a student who withdraws without providing notification to the institution no later than 30 days after the end of the earlier of (i) the payment period or period of enrollment, (ii) the academic year, or (3) the student’s educational program.
+
+Condition
+A.	The College did not identify all students who ceased academic attendance in a payment period.  As a result, a Return of Title IV Funds Calculation (“return calculation”) was not performed and funds were not returned to the Federal Department of Education (“DOE”) within the required 45 days.   
+
+B.	The College did not perform the Return of Title IV Funds Calculations (“return calculation”) in a timely manner for the Fall 2018 payment period and funds were not returned to the Federal Department of Education (“DOE”) within the required 45 days.   
+
+Questioned Costs
+A.	The known amount is $1,030 and represents what was not remitted to the Federal Department of Education.  The likely amount is not known.
+
+B.	There are no questioned costs related to this item.
+
+Context
+In our sample of 60 students who were awarded federal student financial aid, 6 students were required to have a return calculation performed and we noted 3 errors within this sample.  We expanded our sample another 34 items, for a total sample of 40, and an additional 9 errors were noted.  The errors noted with the return calculations sampled are as follows:
+
+A.	2 students ceased academic attendance in the payment period without providing notification to the institution; the College failed to determine the withdrawal date for these students; therefore, a return calculation was not done. 1 of the withdrawals was prior to 60% of the payment period, the calculation of which, if completed, would have resulted in funds being required to be returned to the Department.
+
+B.	9 calculations performed for the Fall 2018 payment period were not completed until February or March of 2019. The dates the returns were posted to student account to transmit back to the Department were more than 45 days from the dates of determination of student withdrawal.
+
+Effect
+Noncompliance with the Return of Title IV requirements.
+
+Cause
+Turnover in the College’s Financial Aid Department during the award year and the lack of written procedures related to the identification of students who ceased academic attendance.
+
+Recommendation
+That the College establish procedures to capture all student who cease academic attendance requiring a Return of Title IV Calculation to be performed in a timely manner.
+
+View of Responsible Official
+The responsible officials and College agree with the finding and will address the matter as part of their corrective action plan.
+ 
+
+
+",N,816734,1,,
+8930,238438,2019,2019-001,"Finding reference number: #2019-001
+
+CFDA title and number (Federal award identification number and year): Supportive Housing for Persons with Disabilities, CFDA No. 14.181 122-HD158-CMI-NP and 2005
+
+Auditor non-compliance code: L. Reporting 
+
+Finding resolution status: Cleared 
+
+Universe population size: The universe population size is not applicable to the finding.
+
+Sample size information: The sample size information is not applicable to the finding.
+
+Statistically valid sample: N/A
+
+Name of federal agency: U.S. Department of Housing and Urban Development 
+
+Pass through entity: N/A
+
+Questioned costs: N/A
+
+Statement of condition #2019-001: For the year ended December 31, 2018, the Corporation did not submit audited financial statements to the Federal Audit Clearinghouse within 30 calendar days after receipt of the auditor's report on March 31, 2019. The audited financial statements were submitted to the Federal Audit Clearinghouse on May 10, 2019.
+
+Criteria: Pursuant to 2 CFR 200.512(a), the Corporation is required to electronically submit audited financial statements to the Federal Audit Clearinghouse within the earlier of 30 calendar days after receipt of the auditor's report or nine months after the end of the audit period.
+
+Effect: The Corporation is not in compliance with the federal reporting requirements.
+
+Cause: Management oversight.
+
+Recommendation: The Corporation should submit audited financial statements to the Federal Audit Clearinghouse within the time frames required.
+
+Completion date: May 10, 2019
+
+Management's response: Management concurs with the finding and agrees with the auditor's recommendation. The audited financial statements have been submitted to the Federal Audit Clearinghouse. No further action required.
+",N,838230,1,,
+13877,57041,2019,2019-006,"Criteria – As per the HRSA compliance manual, the health center must prepare a sliding fee discount schedule to be applied to the payment of fees based on the patient's ability to pay.
+Condition and Description –
+• For 2 out of 10 encounters tested, a sliding fee adjustment was not made as per the sliding fee discount schedule.
+• For 3 out of 10 encounters tested, adequate documentation was not maintained to verify that the sliding fee discount was applied based on the patient’s ability to pay.",N,851093,1,,
+13878,57041,2019,2019-005,"Criteria – As per 45 CFR 75.305, a health center should have written procedures that minimize the time elapsing between the transfer of Federal award funds from HHS and the disbursement of these funds by the health center.                                   
+Condition and Description – During our audit, we noted that for the fiscal year 2019, supporting documents to verify the drawdown of funds were provided, however, these were incomplete. Subsequent to year end, the Organization revised the drawdown process to ensure that federal drawdowns are based on the actual expenditures incurred.",N,851093,1,,
+13879,57041,2019,2019-008,"Criteria – As per the HRSA compliance manual and OMB compliance supplement, the health center must complete and submit the Uniform Data System (UDS) report annually.
+Condition and Description – During the review of UDS report, immaterial variances were noted between the information reported on Table 5 of the UDS report regarding the number of encounters for 2019 and the underlying supporting documentation.",N,851093,1,,
+13880,57041,2019,2019-004,"Criteria – 2CFR Part 200 requires an auditee to prepare a complete and accurate Schedule of Expenditures of Federal Awards (SEFA).
+Condition and Description – During the audit, we noted that the SEFA did not include all the federal grants received during the year. It was noted that the Organization does not have a system in place to correctly identify the source of funds received.",N,851093,1,,
+13881,57041,2019,2019-007,"Criteria – As per the OMB compliance supplement and the HRSA compliance manual, the Organization must submit the quarterly SF-425 report within 30 days from the end of the quarter.
+Condition and Description – During our audit, we noted that the quarterly SF-425 for the quarter ended June 30, 2019 was submitted 1 day late",N,851093,1,,
+1582,101232,2019,2019-001,"Finding: 2019-001
+Federal Agency: U.S. Department of Education
+Federal Program: Direct Loan and Federal Pell Grant Program (tested as part of Student Financial Assistance Cluster)
+CFDA: 84.268 and 84.063
+Award Year: 2018-2019
+Type of Finding: Significant Deficiency and Noncompliance - Special Tests and Provisions
+Compliance Requirement: Special Tests and Provisions – Enrollment Reporting
+Criteria: Under 34 CFR 682.610, the University is required to report to the Secretary of the Department of Education when a student, who has received a loan, ceases to be enrolled on at least a half-time basis. The method for this reporting is the National Student Loan Data System (NSLDS). Per the NSLDS Enrollment Reporting Guide, students who withdraw from all courses or graduate are to be reported to NSLDS within sixty days of the withdraw or graduation date or the last date that attendance can be verified.
+Condition: Thirty students were selected for enrollment reporting testing. The enrollment status change date was not appropriately reported to NSLDS within sixty days for one student out of thirty judgmentally-selected. The exception reports from the National Student Clearinghouse (Clearinghouse), which included a population of 344 students who received Direct Loan or Federal Pell Grant funds, were reviewed. It was noted the graduation dates were not cleared on the exception reports and therefore not reported to the NSLDS with the correct status within sixty days. The exception reports of the population of students by semester of graduation included fifty-five students for Fall 2017, 162 students for Spring 2018, fifty-seven students for Summer 2018, and seventy students for Fall 2018.
+Questioned Costs: None
+Context: Graduation statuses were reported timely to the Clearinghouse but did not flow through accurately to the NSLDS within the required time period due to exception reports not being reviewed and cleared.
+Cause: The following finding resulted in the failure to accurately report 344 students to the NSLDS:
+The Office of the Registrar obtained an exception report of all students who were reported to but not processed by the Clearinghouse. This report included a total of 1,111 students, of which 344 students had received Direct Loan or Federal Pell Grant funds. These students had enrollment statuses of graduated and were properly reported to the Clearinghouse. However, exception reports were not cleared by the University, and therefore enrollment statuses were not reported accurately to the NSLDS. The exception reports were not identified by the University and corrected with the Clearinghouse until after sixty days of the original posting. As a result, the students’ statuses and graduation dates were not accurately reflected with NSLDS within the sixty-day requirement.
+Effect: Students could lose their interest subsidy on any future enrollment in another undergraduate program. Of the 344 students, one instance was identified where this occurred.
+Repeat Finding: No
+Recommendations: We recommend that the University implement enhanced monitoring controls to ensure that all required reporting is done timely and accurately. We also recommend that the University conduct regular reviews of the system-generated reports to ensure compliance.
+Views of responsible officials: The failure to report updated graduation dates on the identified students was related to changes in reporting procedures enacted by the Clearinghouse in Fall 2017. These new procedures require the submission of a separate file to update the degree status of students who have graduated, followed by the review and manual status update of exceptions identified by the Clearinghouse. Staff in the Office of the Registrar were not initially aware of the new reporting requirement and did not update the exceptions with the Clearinghouse within the sixty-day requirement. As a result, the Clearinghouse reported the enrollment statuses for the affected students to NSLDS as withdrawn instead of graduated.
+In Spring 2019, Baylor implemented a process to review exceptions upon each file transmission to the Clearinghouse and to appropriately and timely update enrollment statuses, manually, for applicable students. The Office of the Registrar has manually updated the affected students’ enrollment statuses with the Clearinghouse for errors identified. Upon correction, the Clearinghouse reported the updated statuses to NSLDS. Student Financial Aid and the Office of the Registrar are continuing to research recommended practices and correction procedures with the Department of Education, Ellucian (Banner) and the Clearinghouse. Additionally, as a detection measure, a designated Financial Aid staff person will review an NSLDS generated report of all withdrawals each semester and coordinate necessary enrollment status updates with the Clearinghouse for identified students with enrollment statuses incorrectly reflected in NSLDS as withdrawn.",N,812243,1,,
+1583,101232,2019,2019-002,"Finding: 2019-002
+Federal Agency: U.S. Department of Education
+Federal Program: Direct Loan and Federal Pell Grant Program (tested as part of Student Financial Assistance Cluster)
+CFDA: 84.268 and 84.063
+Award Year: 2018-2019
+Type of Finding: Significant Deficiency and Noncompliance - Special Tests and Provisions
+Compliance Requirement: Special Tests and Provisions – Return of Title IV Funds
+Criteria: When a recipient of Title IV grant or loan assistance withdraws during a payment period or period of enrollment in which the recipient began attendance, the institution must determine the amount of Title IV assistance earned by the student as of the student’s withdrawal date. If the total amount of Title IV assistance earned by the student is less than the amount disbursed as of the date the student withdrew as determined by the institution, the difference must be returned to the Title IV programs within forty-five days from the date that the University determines that a student has withdrawn and no additional disbursements may be made to the student for the payment period or period of enrollment.
+The amount of earned Title IV grant or loan assistance is calculated by determining the percentage of Title IV grant or loan assistance that has been earned by the student and applying that percentage to the total amount of Title IV grant or loan assistance that was or could have been disbursed to the student for the payment period or period of enrollment as of the withdrawal date.
+Condition: For one online student of the thirty students judgmentally selected for testing, an error was noted in the calculation process of return of Title IV funds. The University returned $375 to the Department of Education that the student earned. Per further review of the remaining population of online students, fifteen additional online students had the same error noted in the calculation process of Title IV funds, resulting in $2,258 of under returned funds and $2,128 of over returned funds, for a net of $130 under returned to the Department of Education. It was noted that the error in the calculation process of Title IV funds extended back to 2016, resulting in twelve instances of under returned funds totaling $2,471 and eleven instances of over returned funds totaling $4,484, for a net of $2,013 over returned funds for all online students in fiscal years 2016 through 2019, to the Department of Education.
+Questioned Costs: $2,258 under returned funds and $2,128 over returned funds, for a net of $130 under returned funds.
+Context: Of thirty students judgmentally selected for testing, one instance was identified with an error in the process of calculating the return of Title IV funds. It was noted that there were fifteen additional instances during fiscal year 2019 and twenty-three instances since fiscal year 2016. As a result, the University did not return funds within the required forty-five days after the date the University determined the student withdrew.
+Cause: Online courses operate on a different term schedule than Fall, Spring and Summer terms for on-campus courses. The University included the online courses in standard terms in the student system and did not establish new terms for online courses offered. When calculating the return of Title IV funds, the University attempted to override the default term within the system, however, the term reverted back to the original term. As a result, the return of Title IV funds calculation for online students who withdrew from the University was based on the standard term, which differed from the online term. Therefore, the University failed to use the correct number of days in attendance when calculating the return amount of withdrawing students.
+The University discovered twelve instances spanning several years in which Title IV funds were under returned, therefore not meeting the forty-five day requirement. As a result, the University has not timely reported to the Department of Education the return of Title IV funds.
+Effect: A net overstated amount was returned to the Department of Education.
+Repeat Finding: No
+Recommendations: We recommend that the University ensure adequate controls are in place to determine that the correct amounts are used in calculating return of Title IV funds for all online students and ensure funds are returned within the required timeframe.
+Views of responsible
+officials: The University has identified errors related to the return of Title IV funds calculations and has corrected each error within Banner, the University’s software product used in maintaining student information. The errors were limited to students enrolled in online programs that operate on a different term calendar than standard semester programs. To ensure trimester online program terms reflect the correct enrollment start dates, end dates, and applicable break days, the University implemented a standard set of trimester calendars within Banner for Fall 2019. This facilitates the calculation of the appropriate return of Title IV funds for the applicable online students within Banner. Additionally, the U.S. Department of Education’s Federal Student Aid Handbook (the Handbook) includes complex requirements for return of Title IV funds on programs offered in modules, which would apply to several of Baylor’s online programs. Student Financial Aid will evaluate online student withdrawals on a case-by-case basis to ensure return of Title IV funds calculations are accurate, timely, and in accordance with the Handbook.",N,812243,1,,
+3708,123525,2019,2019-001,"""Federal Program:
+U.S. Department of Education – Student Financial Assistance Cluster (Pell Grant CFDA 84.063)
+
+Type of Finding:
+Deficiency and Noncompliance
+
+Compliance Requirement:
+Reporting and Cash Management
+
+Criteria:
+34 CFR Section 690.63-.64 provides guidance for calculating Federal Pell Grants over different
+terms/semesters.
+
+Condition:
+In mid-October 2019, the University of La Verne discovered that 78 eligible students enrolled for Summer 2019 did not receive Federal Pell grant disbursements for the Summer 2019 payment period.
+
+Questioned Costs:
+None
+
+Context:
+Pell qualified students enrolled for the Summer 2019 term did not receive their Pell grant disbursements within the required time period.
+
+Cause:
+A long term configuration problem in the Banner computer system causes an improper distribution of the Pell Grants among the different terms for which the students were enrolled, if a financial aid packet is altered from its original award. There has been no satisfactory solution to the configuration issue, therefore internal controls were enacted to identify and correct any errors. There was a breakdown in the manual monitoring set in place to manage any errors on a timely basis.
+
+Effect:
+The impact of the above cause is that Pell Grants may not be disbursed to eligible students in amounts in
+compliance with federal regulations.
+
+Recommendation:
+We recommend the University review the underlying elections contained within the Banner computer system
+and ensure these elections are appropriately set up to properly reflect the University’s academic calendar and
+federal requirements. If this is not practical, improve the review procedures monitoring this item.
+
+Management’s Response and Corrective Action:
+The functional technology staff in the Financial Aid Office has updated their procedures and checklists to ensure cost of attendance and needs analysis processes are run with the proper timing.  The Associate Director overseeing functional technology is directly responsible for ensuring this process runs successfully by their staff and reporting issues or anomalies immediately as they are discovered to the Director of Financial Aid.  This responsibility has been affirmed with the Associate Director.  
+
+The current monthly Pell reconciliations processes and reports were enhanced in direct response to this matter.  This matter was reviewed in detail with the Pell Grant Coordinator and Associate Director overseeing compliance.   It has been affirmed with both of these staff members, that identifying and reporting issues or anomalies immediately to the Director of Financial Aid it is their responsibility.  
+""
+",N,824607,1,,
+4644,143452,2019,2019-001,"Federal Program Name:  Title I Grants to Local Education Agencies
+Federal Agency:  U.S. Department of Education, passed through Indiana Department of Education
+CFDA Title and Number:  Title I Grants to Local Education Agencies, CFDA 84.010
+Award Year: July 1, 2018 - June 30, 2019
+Criteria or Specific Requirement:  Special Tests and Provisions - Annual Report Card, High School Graduation Rate - Local Education Agencies must report graduation rate data for all public high schools at the school level using the 4-year adjusted cohort rate.  For reporting during the 2018-2019 school year, graduation rates would reflect data from the 2017-2018 school year. Accordingly, the requirements for calculating and reporting graduation rates under the Elementary and Secondary Education Act, as amended by the No Child Left Behind Act of 2001, would continue to apply.  Under these requirements, graduation rate data must be reported both in the aggregate and disaggregated by each subgroup described in the Elementary and Secondary Education Act of 1965 (ESEA) sections 1111(h)(1)(C)(iii)(II) and 8011(25),(23) using a 4-year adjusted cohort graduation rate.  Only students who earn a regular high school diploma may be counted as a graduate for purposes for calculating the 4-year adjusted graduation rate.  The term “regular high school diploma” means the standard high school diploma that is awarded to students in the State and that is fully aligned with the State’s academic content standards or a higher diploma and does not include a General Educational Development credential, certificate or attendance, or an alternative award.  As required by ESEA Section 8101, to remove a student from the cohort, a school must confirm, in writing, that the student transferred out, immigrated to another county, transferred to a prison or juvenile facility or is deceased.  To confirm that a student transferred out, the school must have official written documentation that the student enrolled in another school or in an educational program that culminates in the award of a regular high school diploma.  A student who is retained in grade, enrolls in a General Educational Development program, or leaves school for any other reason may not be counted as having transferred out for the purpose of calculating graduation rate and must remain in the adjusted cohort. 
+Condition:  Students were incorrectly removed from the adjusted cohort and adequate documentation for removal from the adjusted cohort was not maintained and available. (Material Weakness and Material Noncompliance)
+Questioned Costs:  No
+Context:  During testing of individuals removed from the adjusted cohort, 15 out of 36 selections resulted in errors.  From a population of 240 students, 36 were selected for testing.  Errors consisted of 3 students being incorrectly removed from the adjusted cohort and 12 students lacking documentation for being removed from the adjusted cohort.  Our sample selection was not, and was not intended to be, statistically valid.
+Effect:  Students were removed from the adjusted cohort without appropriate documentation for removal.
+Cause:  During the current year a number of schools closed and during that process, documentation was misplaced.  Additionally, internal controls surrounding the removal of individuals from the cohort did not properly ensure the removal was for a valid reason as permitted by ESEA section 8101.  
+Repeat Finding:  Yes, see 2018-003, 2017-006 and 2016-006.
+Recommendation:  We recommend IPS revisit controls over this compliance requirement to ensure appropriate documentation is maintained and appropriate students are removed from the adjusted cohort.
+Views of Responsible Officials and Planned Corrective Action:  See corrective action plan prepared by management attached.
+",N,815179,1,,
+2565,170767,2019,2019-003,"Finding 2019-003 - Reporting. CFDA No. 84.010; FAIN H63010100119; Grant No: 19 Title I Regular; Grant Period: June 30, 2019. Criteria and Condition: The District is required to report all expenditures during the reporting period that are supported by underlying accounting or performance records. The required reporting, including both the budget and expenditure reporting, should accurately reflect the expenditures of the District for the reporting program and period.
+Reason Improvement Needed: During our compliance testing of reporting, it was discovered that an expenditure was properly recorded for financial statement purposes, but was improperly budgeted and claimed for reporting purposes.
+Cause of Condition: The District's management did not follow proper procedures to verify all expenditures were properly recorded in the financial records and  claimed for reimbursement in the manner they were expended.
+Effect of Conditions: The District's reimbursements are based on the accurate and complete reporting of all expenditures. The improper reporting of expenditures could cause the District to forfeit the federal reimbursement associated with those expenditures, resulting in the District to have to supplement the lost funding with local revenues.
+Perspective Information: We find this to be an isolated incident. Due to the staffing situation within the District's finance department, coupled with the new Finance Director's inexperience related to federal claims, a reporting error was committed.
+Identification of Repeat Findings:  This finding is NOT a repeat finding.
+Recommendation: We recommend that the District ensure the federal funds being claimed by function and object reflect the accurate reporting of the financial statement information as reported by the District.
+Client Response: The District has taken steps to ensure that this isolated incident is not repeated. Specifically, the finance department has added two additional staff members to help alleviate the work load of the new Director of Finance. This will ensure the Director of Finance has enough time to properly account for federal claims each quarter.",N,821092,1,,
+3450,157669,2019,2019-007,"An amendment was approved to transfer $22,344 from Title I salaries to purchased professional services. An additional amount of $5,857 was needed in purchased professional services, and $2,401 for benefits. These amounts were not included in the amendment.  Transfers were not made for reporting purposes.",N,823706,1,,
+3451,157669,2019,2019-006,"Upon acceptance of Title 1 grant funds, the allocation of teacher’s salaries which were to be charged to the grant was not approved in the minutes or by Board resolution.",N,823706,1,,
+2894,5907,2019,2019-001,"Finding 2019-001 – Gramm-Leach Bliley Act
+Federal Program - Student Financial Assistance Cluster
+Federal Agency - U.S. Department of Education
+Pass-Through Entity - Not Applicable
+CFDA Number - 84.007, 84.033, 84,038, 84.064, 84.268
+Federal Award Year - June 30, 2019
+Criteria: In accordance with Title IV regulations (CFR 314.1 (b)), an Institution is required to designate an individual to coordinate the information security program, perform a risk assessment that addresses (1) employee training and management; (2) information systems, including network and software design, as well as information processing, storage, transmission and disposal; and (3) detecting, preventing and responding to attacks, intrusions, or other systems failures, and document safeguards for identified risks.
+Condition: The Institution has not designated an individual responsible for coordinating an information security program, nor has the Institution performed a risk assessment to address employee training and management related to information security as required by the Gramm-Leach Bliley Act (""GLBA"").
+Cause: The Institution does not have a designator coordinator nor has procedures and processes in place specific to GLBA.
+Effect: Failure to comply with the requirements of GLBA standards puts the Institution at risk of compromising consumer nonpublic personal information.
+Questioned costs: None.
+Recommendation: The institution should designate an individual responsible for coordinating the information security program. Additionally, the Institution should perform and document an annual risk assessment to determine the institution's specific risks relevant to protecting consumer nonpublic personal information. At a minimum, the Institution should have at least one risk statement aligned or referenced to each of the three required areas noted in the GLBA law at 16 CFR 314.4 (b). Finally, the Institution should identify and document at least one safeguard (i.e., control) for each of the risks identified and documented in the risk assessment. Each control should be aligned or referenced to the risk(s) to which the safeguard applies.
+Views of Responsible Officials and Planned Corrective Actions: RISD management agrees 
+with the finding related to Title IV regulations (CFR 314.1 (b)) and the following actions will be taken. We will coordinate a team of relevant individuals at RISD to modify and document RISD's Information Security Program to include specifications of the Gramm-Leach Bliley Act (GLBA). The modified Information Security Program will include at least one risk statement aligned to each of the three required areas noted in the GLBA law at 16 CFR 314.4 (b) and a plan for an annual risk assessment of consumer nonpublic personal information. It will also include the identification and documentation of safeguards for each of the risks identified in the risk assessment and delegate an individual responsible for coordinating the Information Security program. RISD will complete the plan by 
+June 2020. In the interim, the Director of Network Services will continue to act as the information security officer and be the individual responsible for coordinating the information security program. We will be completing the statement of work for an external risk assessment that will begin in the fall of 2019. We continue to contract with CI Security for managed detection and response services.
+",N,817368,1,,
+10554,138635,2019,2019-001,"Finding 2019-001 – Segregation of Duties
+
+Condition: 
+The County departments are comprised of a limited number of employees.  The limited number of employees allows for a lack of segregation of duties over accounting transactions.  
+
+Criteria:
+Accounting duties of authorization, recording, and custodian should be segregated between employees to prevent financial misstatements and the opportunity for fraudulent behavior.
+
+Effect:
+With a limited number of employees and a lack of segregation of duties, the County is at a higher risk for errors or misappropriations.
+
+Cause:
+The County departments are comprised of a limited number of employees.
+
+Recommendation:
+When a lack of segregation of duties exists, management’s and the County Board’s close supervision and review of accounting information are the best means of preventing or detecting errors and irregularities.  
+
+Views of responsible officials and planned corrective action:
+To the extent possible, monitoring of monthly financial results and compliance information will continue in the County Courthouse offices and the County Health Department.
+
+Responsible Parties:
+Patrick O’Brian, Fulton County Board Chairman
+Staci Mayall, County Treasurer
+Jennifer Bankert, County Clerk
+",N,843932,1,,
+8936,193911,2019,2019-001,The Fire department has not formalized written policies and procedures related to Federal awards as required under Uniform Guidance.,N,831884,1,,
+11766,178168,2019,2019-001,"Type of Finding:		Internal Control over Compliance – Material Weakness
+Criteria:		2 CFR Part 200 Uniform Administrative Requirements, Cost Principles, and Audit Requirements for Federal Award requires the City to maintain certain policies related to cash management, cost allowability, procurement, and conflict of interest provisions, along with appropriate financial management systems and internal controls over federal awards to safeguard federal funds.
+Condition:		The City has various policies and procedures in place to safeguard its assets and establish related controls over receipts, disbursements, payroll transactions and general ledger maintenance. Federal awards received and disbursed by the City are managed through these policies and procedures; however, the policies and procedures have not been formally revised to ensure compliance with requirements of Uniform Guidance.
+Questioned Costs:		Not Determined
+Context:		During our testing, it was noted that the City does not have documentation of the proper procurement policy addressing the required elements per Uniform Guidance.  
+Cause:		As of December 31, 2019, the City has not finalized an assessment of its financial management system and related internal controls over federal awards, along with an evaluation of existing policies for compliance with Uniform Guidance.  
+Effect:		The City could become noncompliant with requirements of Uniform Guidance, resulting in future findings and questioned costs related to federal awards administered by the City. 
+Recommendation:
+		We recommend the City finalize the assessment of its financial management system and related internal controls over federal awards during the 2020 fiscal year. This assessment should include an evaluation of existing policies and procedures to determine where additional enhancements should be made or new policies created, a plan to communicate these policies to City employees, and procedures to periodically review and update, as considered necessary.  We also recommend that the policy include documentation expectations related to testing of suspension and debarment.
+Views of responsible official		There is no disagreement with the finding.  Refer to the management response per the corrective action plan.
+
+
+
+",N,847282,1,,
+6379,184405,2019,2019-006,"Criteria:
+In accordance with GAAP, proper recordkeeping and documentation are required to assist in the preparation of
+financial statements, as well as assist in the prevention and detection of errors and fraud.
+Condition:
+The Consortium was unable to produce the sample of properly signed service records of the members requested
+for inspection. Out of 23 items selected, one note was missing and three service notes were not signed by the
+service providers.
+Effect:
+The documents supporting service units billed may not be available for inspection when needed.
+Cause:
+Although the Consortium has a procedure in place for recordkeeping and document filing, the control was not
+effective and staff did not comply. Signatures on the service notes were not properly monitored by supervisors.
+The documents were not properly filed by an employee. As a result, staff did not know the location of the
+documents requested.
+Recommendation:
+We recommend the Consortium implement more effective procedures to ensure proper monitoring of
+recordkeeping and documentation. The Consortium should designate a staff member who is responsible for
+preventing unauthorized access to the records and keeping track of records checked out by staff.
+Management's response:
+Management agrees with the importance of proper recordkeeping and documentation. We continue to strive to
+improve this area and complete frequent internal audits to test our own processes and procedures. We are also
+in the process of implementing a new electronic medical records system that will significantly increase the level
+of automated and system based controls to achieve an even higher level of compliance.",N,835890,1,,
+6380,184405,2019,2019-004,"Criteria:
+The tracking and matching of grant revenues and the related grants receivable is necessary to assist in making
+management decisions and for the proper reporting and use of these funds in accordance with each
+grant/funding source requirement.
+Condition:
+The Consortium recorded cash receipts to an incorrect grant. Receipts of $83,060 received for Drug and
+Alcohol program (Block Grants for Prevention and Treatment of Substance Abuse) were recorded under
+Behavioral Health program (Social Services Block Grant). The total revenue and receivable for Behavioral
+Health program, Intellectual disAbility program, and Drug and Alcohol program were not reconciled to the
+budget, collection, and billing.
+Effect:
+Receivable for Drug and Alcohol program was overstated and receivable for Behavioral Health program was
+understated. The total revenue for Intellectual disAbility program, and Drug and Alcohol program were
+overstated.
+Cause:
+The Consortium's system of tracking and matching its cash receipts to grant revenues was not properly or timely
+monitored.
+This is a repeated finding (Finding 2018-003).
+Recommendation:
+We recommend that cash receipts for all grants be recorded and allocated to the correct program in a timely
+manner. Management should prepare a tracking schedule that details the total amount of the grant award and all
+amounts received in relation to that grant, and relevant information regarding the receipts should be obtained, if
+needed. This schedule should be reconciled and reviewed periodically by management to ensure that the
+schedule is complete and supported by the accounting records. Management should use this schedule to prepare
+a complete and accurate Schedule of Expenditures of Federal, State and City Awards.
+Management's response:
+Management continues to agree with this comment and continues to be working towards better accountability in
+the area of grant accounting. In June 2012, the Consortium implemented a financial accounting system that
+allows the Consortium to more appropriately match grant revenues with expenses. In addition, the departments
+who receive the grants file financial and program reports either quarterly or annually with the agency that
+provides the grants as well as close out reports when the grant is completed. The Consortium will continue to
+collect all grants in a central grant file. In addition, cost allocations will continue to be reviewed frequently to
+ensure expenses are not allocated to the wrong programs.",N,835890,1,,
+6381,184405,2019,2019-002,"Criteria:
+In accordance with GAAP, effective control activities that provide for the proper and timely tracking and
+calculation of uncollectibles are required to assist in the preparation of financial statements, as well as to assist
+in the prevention and detection of errors and fraud.
+Condition:
+The reserve for uncollectible accounts receivable was understated. The results of the testing of subsequent
+collection shows less than 10% was collected during the 85 days from the year-end. Management was unable to
+provide an aging report or proof of collections.
+Effect:
+As a result, the net assets and the revenues of the Consortium are overstated. Revenues reported on the invoices
+to funding sources may not be accurate or complete.
+Cause:
+Management did not closely monitor collection of billing and did not make accurate estimates of the reserve for
+uncollectible accounts receivable.
+This is a repeated finding (Finding 2018-002).
+Recommendation:
+We recommend the Consortium implement more effective procedures to ensure proper record keeping and
+monitoring in regards to uncollectible accounts receivable. The billing and fiscal departments must work closer
+together to review uncollectible accounts and the reserve balances recorded on the general ledger in a timely
+manner for accurate reporting.
+Management’s Response:
+Management disagrees with the comment. During fiscal year 2019 we have implemented and enhanced a
+proactive process to eliminate uncollectible receivable balance. The first step in this process occurs with our
+billing process. When potential services get submitted that are truly uncollectible, the billing team closes them
+out instead of billing them so no uncollectible receivable gets generated. For billable services, which the vast
+majority or coming from governmental sources (City, State, etc.) we get paid for the billings just sometime it
+can be delayed. The remaining billed services from third party providers (insurance companies, etc.) generally
+pay based on our contracted rates. There are some additional services or portions of services that fall under
+private pay that may have a higher likelihood of being outstanding. Based on the above parameters we feel that
+the current recorded bad debt reserve is adequate. We will continue to monitor the reconciliation and review
+process for accounts receivable in order to continue to improve the accuracy of the estimated reserve for
+uncollectible accounts receivable determining if it needs to be reduced or increased.",N,835890,1,,
+6378,184405,2019,2019-001,"Criteria:
+In accordance with GAAP, effective control activities that provide for the completeness and timely
+reconciliation of financial statement accounts are required to assist in the preparation of financial statements, as
+well as assist in the prevention and detection of errors and fraud.
+Condition:
+Accounts payable for the months of May 2019 and June 2019 was not recorded completely. Additionally,
+accounts payable was not reconciled to the general ledger in a timely manner at year-end.
+Effect:
+As a result, expenses were understated. Additionally, due to the delay of reconciliation, the details of the
+accounts payable provided did not agree to the general ledger.
+Cause:
+Staff responsible for the entry of accounts payable was not available during the months of May 2019 and June
+2019 and there were no other personnel available to perform this duty in her absence. No monitoring was done
+over the proper reconciliation of accounts payable at year-end.
+This is a repeated finding (Finding 2018-001).
+Recommendation:
+We recommend that available staff is given the responsibility to handle duties related to accounts payable until
+a replacement is found. Additionally, we recommend that management develop policies and procedures to
+reconcile accounts payable to the general ledger on a regular basis. We also recommend that these procedures
+should incorporate periodic reviews of the payables recorded and voided to ensure the accuracy and
+completeness of the balance.
+Management's response:
+Management continues to agree with the comment and has made progress over the previous year.
+Unfortunately, due to personal issues we were short staffed mid-year which disrupted our improved processes.
+We have worked to get caught up and continue on a trajectory of improvement with our monthly reconciliation
+and review process for accounts payable to facilitate a timely review as well as ensure the accuracy and
+completeness of the balance. Management will continue to review this process to ensure that it is achieving the
+desired results.",N,835890,1,,
+5223,211799,2019,2019-001,"Condition:	The Organization's Schedule of Expenditures of Federal Awards (SEFA)  did not identify all of the federal expenditures for the federal awards.  The identified misstatement was corrected in the accompanying SEFA and had no impact on the financial statement amounts. 						
+										
+							
+Criteria:	Internal controls should be in place to provide reasonable assurance that the SEFA is prepared in accordance with the Uniform Guidance.  The Uniform Guidance, at 2 CFR section 200.508(b), requires, the Organization to prepare appropriate financial statements, including the SEFA.						
+													
+							
+Cause:	Reconciliation to the related expenditures from federal awards was not performed and would have identified the noted misstatement in the SEFA.						
+							
+													
+Effect:	Not reconciling federal awards could cause the SEFA and the Data Collection Form to contain material differences in the amount of benefits received.						
+													
+							
+Recommendation:	Appropriate written policies and procedures should be implemented to ensure reconciliation of the SEFA to the general ledger.  The review and approval of these procedures should be performed meticulously by the appropriate level of management.						
+														
+							
+Views of Responsible Officials and Planned Corrective Actions:	Reconciling to the general ledger to the SEFA has been noted in the SEFA preparation process.  Federal grants are reviewed in our regular meetings.  A preparation step to evaluate the percentage of federal to state funding of projects is accounted for in the SEFA preparation process.													
+							
+SEFA preparation process updated January 2020.						
+							
+							
+							
+",N,831645,1,,
+15176,130520,2019,2019-004,"2019-004	Child Nutrition Net Cash Resources
+
+Program: 			Child Nutrition
+CFDA Number: 		10.553, 10.555, 10.559
+Federal Agency: 		U.S Department of Agriculture
+Pass-Through Agency: 	Arizona Department of Education
+Type of Finding: 		Noncompliance, significant deficiency
+Compliance Requirement:	C. Cash Management
+
+CONDITION			
+The District exceeded the allowable cash balance for its nonprofit school food service program. The District had an available cash balance of $219,457 as of June 30, 2019, and total expenditures of $570,963 for fiscal year 2018-19. Per federal regulations, the District is limited to a cash balance not to exceed three months of average expenditures or $171,289, resulting in an excess cash balance of $48,168.
+
+CRITERIA			
+Federal Regulation 7 CFR 210.14(b) provides: ""Net cash resources. The school food authority shall limit its net cash resources to an amount that does not exceed three months average expenditures for its nonprofit school food service or such other amount as may be approved by the State agency in accordance with §210.19(a).""
+
+CAUSE			
+The District has accumulated excess balance due to the carry forward of revenues in excess of expenditures from prior years.
+
+EFFECT			
+The District has an excess cash balance of $48,168 for its nonprofit school food service program as of June 30, 2019.
+
+RECOMMENDATION		
+We recommend that the District establish proper monitoring procedures to ensure that the cash balance for the food service program does not exceed three months of average expenditures.",N,838394,1,,
+4607,180905,2019,2019-003,"FINDING NO.  CONTROL DEFICIENCY
+2019-003  Segregation of Duties – Grant Management
+Repeat of Finding 2018-003
+CFDA #:  All federal programs
+State ID:  All state prorams.
+Compliance Requirements:  Other
+Condition:  Please see the condition described in Finding 2018-001 for information on the lack of segregation of duties specifically related to the activities allowed or unallowed and allowable costs/cost principles. Additionally, our testing of internal controls over state grants identified the following weaknesses in internal controls due to the lack of segregation of duties in relation to the State Single Audit Guidelines compliance requirements:
+• There is no separate review of the payroll transactions processed by the Bookkeeper and subsequently included on the grant claims
+• There is no separate review of the grant claims which are the basis for the schedule of expenditures of federal awards and schedule of state financial assistance.
+Criteria:  Segregation of duties is an internal control intended to prevent or decrease the occurrence of errors or intentional fraud. Segregation of duties ensures that no single employee has control over all phases of a transaction.
+Context:  While performing audit procedures, it was noted that the District did not have a review or approval of transactions or reporting by someone other than the preparer.
+Questioned costs:  None.
+Cause:  The lack of segregation of duties is due to the limited number of employees and the size of District’s operations. The District has not recently completed a full risk assessment and review of internal controls to identify additional mitigating and compensating controls to implement to reduce the risk of errors or intentional fraud.
+Effect:  Errors or intentional fraud could occur and not be detected timely by other employees in the normal course of their responsibilities as a result of the lack of segregation of duties.
+Recommendation:  We recommend the District perform a risk assessment of its operations to identify and implement mitigating controls to reduce the risk of errors or intentional fraud. The District should review its disbursement process to ensure that there is adequate segregation of duties in regards to initiating, authorizing and approving purchases, along with adding controls to ensure that the item purchased was received by the District. The District should review is payroll process and identify payroll tasks that could be reassigned to other District personnel. We also recommend the Board of Education continue to monitor the transactions and the financial records of the District.
+View of responsible officials:  There is no disagreement with the audit finding.
+",N,817073,1,,

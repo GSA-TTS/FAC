@@ -1,5 +1,10 @@
+<<<<<<< HEAD
+SEQ_NUMBER,DBKEY,AUDITYEAR,FINDINGREFNUMS,TEXT,CHARTSTABLES,REPORTID,VERSION,UEI,MULTIPLEUEIS
+51625,148665,2022,2022-001,"Assistance Listing Number, Federal Agency, and Program Name - 84.425E Higher Education Emergency Relief Fund (HEERF) - Student Portion
+=======
 ,SEQ_NUMBER,DBKEY,AUDITYEAR,FINDINGREFNUMS,TEXT,CHARTSTABLES,REPORTID,VERSION,UEI,MULTIPLEUEIS
 190,51625,148665,2022,2022-001,"Assistance Listing Number, Federal Agency, and Program Name - 84.425E Higher Education Emergency Relief Fund (HEERF) - Student Portion
+>>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 Federal Award Identification Number and Year - P425E201974 - Year ended June 30, 2022
 Pass through Entity - Not applicable
 Finding Type - Significant deficiency
@@ -13,7 +18,11 @@ Cause and Effect - Confirmation of the upload of the quarterly report for the st
 Recommendation - We recommend the University implement additional monitoring controls to ensure that required reports for grants that are new, or for which the University does not have historical experience (such as HEERF), are issued according to the prescribed guidance within the allowed time frame. 
 Views of Responsible Officials and Corrective Action Plan - The University agrees with the finding and recommendation. The University spent and accounted for $75.6 million in HEERF grants appropriately and followed all applicable guidelines. The University also adhered to the various reporting guidelines that changed multiple times during the grant period, with the exception of this one untimely report posting to the Oakland University website. This was caused by personnel turnover occurring at that time within multiple departments that were part of the process. This situation was unique and has been corrected.  
 ",N,974778,1,HJTLACN81NK1,N
+<<<<<<< HEAD
+47584,196318,2022,2022-001,"Finding Reference Number:	2022-001
+=======
 1692,47584,196318,2022,2022-001,"Finding Reference Number:	2022-001
+>>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 Type of Finding:	FA
 Finding Resolution Status:	In Process
 Information on Universe Population Size:	The finding was not a result of a sampling procedure.
@@ -33,7 +42,11 @@ Response Indicator:	Agree
 Completion Date:	August 9, 2022
 Response:	Management agrees with the finding.  The excess funds were accrued to submit to HUD.
 ",N,957046,1,MU66HXAWRF95,N
+<<<<<<< HEAD
+50613,198266,2022,2022-001,"Department of Housing and Urban Development
+=======
 1724,50613,198266,2022,2022-001,"Department of Housing and Urban Development
+>>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 Finding 2022-001 Section 202 Supportive Housing for the Elderly, AL 14.157
 Statement of Condition
 In connection with our lease file review, we noted the following deficiencies:
@@ -72,7 +85,11 @@ year 2022 audit completed in a reasonable timeframe, and we do not anticipate th
 problem going forward.
 Reporting Views of Responsible Officials
 Management agrees with the finding and is taking steps to address the issue that caused it.",N,971740,1,D6VLAANVC5E7,N
+<<<<<<< HEAD
+53470,57575,2022,2022-001,"Assistance Listing Number, Federal Agency, and Program Name - Education Stabilization Fund - ALN 84.425 - Department of Education
+=======
 3362,53470,57575,2022,2022-001,"Assistance Listing Number, Federal Agency, and Program Name - Education Stabilization Fund - ALN 84.425 - Department of Education
+>>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 Federal Award Identification Number and Year - P425F201775
 Pass through Entity - None
 Finding Type - Significant deficiency and material noncompliance with laws and regulations
@@ -85,7 +102,11 @@ Context - The University only posted the the December 31, 2021 HEERF Quarterly R
 Cause and Effect - There were inadequate controls implemented to ensure that the required information was properly made available on the University's website and that reports were prepared accurately.
 Recommendation - The University should implement additional controls to ensure reporting requirements for federal grants are complied with in all instances.
 ",N,978318,1,NNLQK7LNGL93,N
+<<<<<<< HEAD
+53580,251020,2022,2022-003,"Finding 2022-003 – Significant Deficiency 
+=======
 3374,53580,251020,2022,2022-003,"Finding 2022-003 – Significant Deficiency 
+>>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 Assistance Listing:  21.027 – Coronavirus State and Local Fiscal Recovery Funds (CSLFRF)
 Federal Grantor:  Department of the Treasury
 Compliance Requirement:  Reporting
@@ -95,7 +116,11 @@ Cause:  The District believed that as a subrecipient of funds the funding provid
 Effect:  Treasury may impose additional conditions on the receipt of a subsequent tranche of future award funds, if any, or take other available remedies as set forth in 2 C.F.R. § 200.339.
 Recommendation:  We recommend the District file the initial Project and Expenditures Report for the period covering March 3, 2021 to March 31,2022 as soon as possible.  Subsequent annual reports should be filed by the April 30, 2023 deadline.
 Views of Responsible Officials and Planned Corrective Actions:  Management’s response and planned corrective action is included in the Corrective Action Plan included at the end of the report.",N,980951,1,GM27HGUL61B5,N
+<<<<<<< HEAD
+53581,251020,2022,2022-004,"Finding 2022-004 – Significant Deficiency 
+=======
 3377,53581,251020,2022,2022-004,"Finding 2022-004 – Significant Deficiency 
+>>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 Assistance Listing:  21.027 – Coronavirus State and Local Fiscal Recovery Funds (CSLFRF)
 Federal Grantor:  Department of the Treasury 
 Compliance Requirement:  Procurement and Suspension and Debarment
@@ -112,7 +137,11 @@ While permitted by internal policy, this justification does not appear to meet a
 Effect:  Treasury may impose additional conditions on the receipt of a subsequent tranche of future award funds, if any, or take other available remedies as set forth in 2 C.F.R. § 200.339.
 Recommendation:  We recommend the District work with FEMA to obtain written approval for the sole source procurement, which is one of the exceptions to noncompetitive procurements.
 Views of Responsible Officials and Planned Corrective Actions:  Management’s response and planned corrective action is included in the Corrective Action Plan included at the end of the report.",N,980951,1,GM27HGUL61B5,N
+<<<<<<< HEAD
+53582,251020,2022,2022-002,"Finding 2022-002 – Significant Deficiency 
+=======
 3378,53582,251020,2022,2022-002,"Finding 2022-002 – Significant Deficiency 
+>>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 Award No.:  97.083, Staffing for Adequate Fire and Emergency Response
 Federal Grantor:  U.S.  Department of Homeland Security, Federal Emergency Management Agency
 Compliance Requirement:  Other compliance requirements.
@@ -122,7 +151,11 @@ Cause:  SEFA was not fully reconciled and finalized until after the single audit
 Effect:  The expenses included on the SEFA were revised during the single audit, which could have resulted in the auditor not selecting the correct major program or expenses for testing and could have resulted in the single audit not satisfying the requirements of the Uniform Guidance.
 Recommendation:  We recommend additional review procedures be implemented to ensure the SEFA is complete and accurate when the single audit begins.
 Views of Responsible Officials and Planned Corrective Actions:  Management’s response and planned corrective action is included in the Corrective Action Plan included at the end of the report.",N,980951,1,GM27HGUL61B5,N
+<<<<<<< HEAD
+44735,181526,2022,2022-003,"Finding 2022-003:  Allowable Costs
+=======
 3843,44735,181526,2022,2022-003,"Finding 2022-003:  Allowable Costs
+>>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 Housing Choice Voucher 
 Material Weakness/Noncompliance
 Questioned Costs:  $26,887.48
@@ -141,7 +174,11 @@ View of the Responsible Officials of the Auditee:  The auditee’s management ag
 
 
 ",N,948652,1,MCD5SMMWNBE5,N
+<<<<<<< HEAD
+48313,180878,2022,2022-002,"2022-002 Airport Improvement Program – 20.106
+=======
 3916,48313,180878,2022,2022-002,"2022-002 Airport Improvement Program – 20.106
+>>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 Significant Deficiency:
 Condition: The Airport did not obtain copies of certified payroll reports from the contractor
 on a construction project occurring during the period.
@@ -155,7 +192,11 @@ Effect: The Airport was not in compliance with 2 CFR section 200 for the adminis
 federal awards.
 Recommendation: Procedures should be put in place to ensure weekly certified payrolls
 are received from construction contractors.",N,965703,1,HTNZMSGBKFG1,N
+<<<<<<< HEAD
+56823,177310,2022,2022-001,"SCHEDULE OF FEDERAL AWARD FINDINGS AND QUESTIONED COSTS
+=======
 4077,56823,177310,2022,2022-001,"SCHEDULE OF FEDERAL AWARD FINDINGS AND QUESTIONED COSTS
+>>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 Central Valley School District No. 356
 September 1, 2021 through August 31, 2022
 2022-001	The District did not have adequate internal controls for ensuring compliance with wage rate requirements.
@@ -203,7 +244,11 @@ The American Institute of Certified Public Accountants defines significant defic
 Title 29 CFR, Section 3.3 – Weekly statement with respect to payment of wages, and Section 3.4 – Submission of weekly statements and the preservation and inspection of weekly payroll records, establishes requirements for contractor or subcontractor submission of weekly certified payroll reports.
 Title 29 CFR, Section 5.5 – Contract provisions and related matters establishes the requirements for the contracting officer to insert in full any contract in excess of $2,000 which is entered into for the actual construction, alteration and/or repair, including painting and decorating, of a public building or public work, or building or work financed in whole or in part with federal funds the clauses listed, which includes but is not limited to the minimum wages to be paid and payrolls and basic records to be maintained (submission of weekly certified payrolls)
 ",N,982136,1,LJNSJ1C1KU15,N
+<<<<<<< HEAD
+47733,211108,2022,2022-001,"SECTION II – FINDINGS RELATED TO FINANCIAL STATEMENTS 
+=======
 4162,47733,211108,2022,2022-001,"SECTION II – FINDINGS RELATED TO FINANCIAL STATEMENTS 
+>>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 
 Finding 2022-001 – Internal Control over Financial Reporting Material Weakness
 
@@ -220,7 +265,11 @@ View of Responsible Officials and Planned Corrective Action:  We will work with 
 Responsible Official:  Cristi Lajeunesse, Executive Director
 
 ",N,964108,1,HG74NDHEWUG3,N
+<<<<<<< HEAD
+48366,187027,2022,2022-002,"SECTION III – FEDERAL AWARD FINDINGS AND QUESTIONED COSTS
+=======
 4783,48366,187027,2022,2022-002,"SECTION III – FEDERAL AWARD FINDINGS AND QUESTIONED COSTS
+>>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 Finding 2022-002
 Federal program: 20.513 Total Enhanced Mobility of Seniors and Individuals With Disabilities
 Federal agency: U. S. Department of Transportation Award year: 2021-2022
@@ -232,7 +281,11 @@ Questioned costs: No questioned costs identified.
 Context: Out of six covered transactions totaling $1,388,223, a sample of two transactions totaling $1,082,370 was selected. The two transactions tested did not have evidence of System for Award Management (SAM) check performed.
 Recommendation: The City should implement controls to document compliance with suspension and debarment requirements.
 Views of responsible officials: The City understands and concurs with this finding and recommendation.",N,965617,1,RPCMHNGRWDD1,N
+<<<<<<< HEAD
+56830,177250,2022,2022-001,"SCHEDULE OF FEDERAL AWARD FINDINGS AND 
+=======
 5042,56830,177250,2022,2022-001,"SCHEDULE OF FEDERAL AWARD FINDINGS AND 
+>>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 QUESTIONED COSTS
 Okanogan School District No. 105
 September 1, 2021 through August 31, 2022
@@ -336,9 +389,15 @@ or work financed in whole or in part with federal funds the clauses listed, whic
 includes but is not limited to the minimum wages to be paid and payrolls and basic 
 records to be maintained (submission of weekly certified payrolls).
 ",N,985733,1,NDG1H2UMDXH9,N
+<<<<<<< HEAD
+50186,234415,2022,2022-002,"Criteria: Health Centers must prepare and apply a sliding fee discount schedule so that amounts owed for health center services by eligible patients are adjusted or discounted based on the patient’s ability to pay. Condition: Some patients did not receive the proper sliding fee discount. Cause: Errors within the setup of the Center’s billing software. Context: Of the 60 patients sampled, 17 patients did not receive the proper adjustment or discount. Effect: Improper adjustments or discounts could lead to inaccurate financial statements as well as improper patient billings. Auditor's Recommendation: Management should have procedures in place ensuring that each eligible patient receives the proper discount or adjustment.",N,972580,1,WJUFKBDHUUT9,N
+50187,234415,2022,2022-001,"Criteria: A non-federal entity must minimize the time elapsing between the transfer of funds from the U.S. Treasury and disbursement by the non-federal entity for direct program or project costs. Condition: The Center had $116,113 in drawdowns on a federal grant for which no funds had been expended. Cause: The drawdown was inadvertently made out of the wrong grant and not detected by management until several months after year-end. Context: Management made two drawdowns near the end of the fiscal year totaling $116,113. Effect: The Center is not in compliance with the cash management compliance requirement. Auditor's Recommendation: The Center should have proper internal procedures in place to regularly reconcile drawdowns made per grant to ensure the funds are being drawn from the appropriate grant.",N,972580,1,WJUFKBDHUUT9,N
+49085,132415,2022,2022-001,"Finding 2022-001 – Housing Voucher Cluster
+=======
 5346,50186,234415,2022,2022-002,"Criteria: Health Centers must prepare and apply a sliding fee discount schedule so that amounts owed for health center services by eligible patients are adjusted or discounted based on the patient’s ability to pay. Condition: Some patients did not receive the proper sliding fee discount. Cause: Errors within the setup of the Center’s billing software. Context: Of the 60 patients sampled, 17 patients did not receive the proper adjustment or discount. Effect: Improper adjustments or discounts could lead to inaccurate financial statements as well as improper patient billings. Auditor's Recommendation: Management should have procedures in place ensuring that each eligible patient receives the proper discount or adjustment.",N,972580,1,WJUFKBDHUUT9,N
 5347,50187,234415,2022,2022-001,"Criteria: A non-federal entity must minimize the time elapsing between the transfer of funds from the U.S. Treasury and disbursement by the non-federal entity for direct program or project costs. Condition: The Center had $116,113 in drawdowns on a federal grant for which no funds had been expended. Cause: The drawdown was inadvertently made out of the wrong grant and not detected by management until several months after year-end. Context: Management made two drawdowns near the end of the fiscal year totaling $116,113. Effect: The Center is not in compliance with the cash management compliance requirement. Auditor's Recommendation: The Center should have proper internal procedures in place to regularly reconcile drawdowns made per grant to ensure the funds are being drawn from the appropriate grant.",N,972580,1,WJUFKBDHUUT9,N
 5589,49085,132415,2022,2022-001,"Finding 2022-001 – Housing Voucher Cluster
+>>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 Noncompliance and Significant Deficiency in Internal Controls over SEMAP submission.
 Criteria: The Uniform Financial Reporting Standards (UFRS), at 24 CFR § 985.101, require Authorities to submit SEMAP certification form within 60 calendar days after the end of its fiscal year. 
 Condition and Context: During the audit for the year ended June 30, 2022, it was discovered that the Authority had not submitted the SEMAP certification within 60 days of the end of the fiscal year.
@@ -346,7 +405,11 @@ Effect or Potential Effect: As a result of this noncompliance, the PHA could rec
 Cause: The cause of this error is managements lack of control over monitoring the deadline associated with submission of the SEMAP certification. 
 Recommendation: We recommend that management adds this and any other pertinent deadlines to a calendar for better tracking throughout the year.
 Views of Responsible Official(s): Management agrees with the finding and have outlined a plan of action in the corrective action plan section of this report",N,968829,1,NKQ8J5E7NCQ1,N
+<<<<<<< HEAD
+45384,150024,2022,2022-001,"Program - Child Nutrition Cluster - National School Breakfast and National School Lunch, U.S. Department of Agriculture, passed through Michigan Department of Education. ALN # 10.553, 10.555, 10.559 and 10.582. Federal register section 7 CFR Part 210.14b requires School Districts to limit its School Breakfast and Lunch fund net resources to an amount that does not exceed three months of average expenditures. 
+=======
 5834,45384,150024,2022,2022-001,"Program - Child Nutrition Cluster - National School Breakfast and National School Lunch, U.S. Department of Agriculture, passed through Michigan Department of Education. ALN # 10.553, 10.555, 10.559 and 10.582. Federal register section 7 CFR Part 210.14b requires School Districts to limit its School Breakfast and Lunch fund net resources to an amount that does not exceed three months of average expenditures. 
+>>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 Criteria - The School District's net cash resources exceeded three months of average expenditures at June 30, 2022.
 Condition - The School District did not meet the three months of average expenditure test at June 30, 2022.
 Questioned costs - None.
@@ -354,7 +417,11 @@ Context - Management is required to monitor net cash resources and their spend d
 Effect - The School District's net cash resources were in excess of three months over expenditures by $69,369.
 Cause - Management did not monitor net cash resources to ensure that they did not exceed three months of average expenditures.
 Recommendation - We recommend that the School District review their Food Service Fund's net cash resources periodically throughout the school year to ensure that the fund will not have an excess of three months of average expenditures at the fiscal year end and that the School District work on creating a spend down plan with Michigan Department of Education. The School District should also take this requirement into consideration when preparing the annual budget and any subsequent adjustments to the budget. ",N,950280,1,NVHRA4V88HN3,N
+<<<<<<< HEAD
+46391,81438,2022,2022-005,"Federal Program Information: COVID-19 – Higher Education Emergency Relief Fund (“HEERF”) Student Aid Portion (Assistance Listing #84.425E) and COVID-19 – HEERF Institutional Portion (Assistance Listing #84.425F)  
+=======
 6507,46391,81438,2022,2022-005,"Federal Program Information: COVID-19 – Higher Education Emergency Relief Fund (“HEERF”) Student Aid Portion (Assistance Listing #84.425E) and COVID-19 – HEERF Institutional Portion (Assistance Listing #84.425F)  
+>>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 	
 Criteria or Specific Requirement: L. Reporting: The institution is required to post completed quarterly HEERF information to its primary website no later than 10 days after each quarter end.
 	
@@ -372,7 +439,11 @@ Recommendation:	We recommend that the University enhance its procedures to ensur
 	
 Views of Responsible Officials:	The University has a plan to modify the reporting for the remaining HEERF reports to ensure all amounts are accurate and agree to our accounting records. The Controller and Vice President for Business and Finance will collectively review and approve the remaining HEERF reports. We do note that while categorical amounts were not each accurate in our previous reporting, totals were accurate and there is no question as to the University’s overall claim to the HEERF funds received. We also note that we plan to utilize the final HEERF report to fix the categorical amounts so that all amounts agree to the University’s accounting records.
 ",N,956472,1,GNF2LDZWGG23,N
+<<<<<<< HEAD
+46392,81438,2022,2022-003,"Federal Program Information: Student Financial Assistance Cluster: Federal Supplemental Education Opportunity Grants (Assistance Listing #84.007), Federal Work-Study Program (Assistance Listing #84.033), Federal Pell Grant Program (Assistance Listing #84.063), Federal Direct Loan Program (Assistance Listing #84.268)
+=======
 6508,46392,81438,2022,2022-003,"Federal Program Information: Student Financial Assistance Cluster: Federal Supplemental Education Opportunity Grants (Assistance Listing #84.007), Federal Work-Study Program (Assistance Listing #84.033), Federal Pell Grant Program (Assistance Listing #84.063), Federal Direct Loan Program (Assistance Listing #84.268)
+>>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 	
 Criteria or Specific Requirement: Special Tests and Provisions – Return of Title IV Funds - When a recipient of Title IV grant or loan assistance withdraws from an institution during a payment period or period of enrollment in which the recipient began attendance, the institution must determine the amount of Title IV aid earned by the student as of the student’s withdrawal date.
 	
@@ -394,7 +465,11 @@ Recommendation:	We recommend that the University enhance its procedures over the
  
 Views of Responsible Officials:	The University has reviewed current practices related to withdrawal/R2T4 calculations. As a result, the University will enhance current policy and procedures to better support staff in the proper calculation of return of Title IV funds requirements. These enhancements will include but are not limited to; additional staff training and periodic secondary review. The Office of Financial Aid will also work with the Office of Academic Records to document substantiated last dates of attendance for withdrawing students.
 ",N,956472,1,GNF2LDZWGG23,N
+<<<<<<< HEAD
+46393,81438,2022,2022-004,"Federal Program Information: Student Financial Assistance Cluster: Federal Pell Grant Program (Assistance Listing #84.063), Federal Direct Loan Program (Assistance Listing #84.268)
+=======
 6510,46393,81438,2022,2022-004,"Federal Program Information: Student Financial Assistance Cluster: Federal Pell Grant Program (Assistance Listing #84.063), Federal Direct Loan Program (Assistance Listing #84.268)
+>>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 	
 Criteria or Specific Requirement: Special Tests and Provisions – Enrollment Reporting:  Institutions are required to report enrollment information under the Pell grant and the Direct and Federal Family Education Loan (“FFEL”) loan programs via the National Student Loan Data System (“NSLDS”) (OMB No.1845-0035), although FFEL loans are no longer made or a part of the Student Financial Assistance Cluster, a student may have a FFEL loan from previous years that would require enrollment reporting for that student (Pell, 34 CFR 690.83(b)(2); FFEL, 34 CFR 682.610; Direct Loan, 34 CFR 685.309). The administration of the Title IV programs depends heavily on the accuracy and timeliness of the enrollment information reported by institutions. Institutions must review, update, and verify student enrollment statuses, program information, and effective dates that appear on the Enrollment Reporting Roster file or on the Enrollment Maintenance page of the NSLDS Professional Access (“NSLDSFAP”) website which the financial aid administrator can access for the auditor. The data on the institution’s Enrollment Reporting Roster, or Enrollment Maintenance page, is what NSLDS has as the most recently certified enrollment information. There are two categories of enrollment information; “Campus Level” and “Program Level,” both of which need to be reported accurately and have separate record types. The NSLDS Enrollment Reporting Guide provides the requirements and guidance for reporting enrollment details using the NSLDS Enrollment Reporting Process. According to the Guide, any errors identified and returned by NSLDS in an Error/Acknowledgement file should be corrected and resubmitted within 10 days.
 	
@@ -423,8 +498,13 @@ Recommendation:	We recommend that the University enhance its procedures to ensur
 Views of Responsible Officials:	The University has modified reporting practices to SSCR in order to meet Federal Regulations 34 CFR 690.83(b)(2), 34 CFR 682.610 and 34 CFR 685.309. The Office of Academic Records will report student enrollment to SSCR on the 15th of every month (or the following business day if the 15th falls on a weekend, holiday or scheduled university closure). This plan will allow for reporting from SSCR to NSLDS to meet the 60 day timeline for student status change. The University has also strengthened report criteria to ensure that all current program and major detail are provided to SSCR.
 
 ",N,956472,1,GNF2LDZWGG23,N
+<<<<<<< HEAD
+49682,256943,2022,2022-001,"Criteria or specific requirement (including statutory, regulatory, or other citation): The compliance requirements for ""L.Reporting"" generally requires that LEA's report financial information to the pass-through entity and that those reports are accurate and supported by the underlying accounting records. Condition: The School District did not comply with the requirements of filing quarterly and final reports by the due dates set by ISBE. Questioned Costs: N/A. Context: The School District did not timely file multiple quarterly expenditure reports. The report for the period ending 8/31/21, due 9/20/21, was submitted on 11/5/21 for grants 84.424, 84.425D and 84.425C. The report for the quarter ending 9/30/21, due 10/20/21, was submitted on 1/10/22 for grant 84.425D.  The report for the quarter ending 9/30/21, due 10/20/21, was submitted on 11/5/21 for grant 84.027. The report for the quarter ending 9/30/21, due 10/20/21, was submitted on 12/29/21 for grants 84.425D and 84.425C. The report for the period ending 10/31/21 due 11/20/21, was submitted on 12/29/21 for grants 84.010 and 84.027. The report for the quarter ending 12/31/21 due 1/20/22, was submitted on 1/26/22 for grant 84.425D. The report for the quarter ending 12/31/21, due 1/20/22, was submitted on 2/7/22 for the grants 84.425C and 84.425D. The report for the quarter ending 3/31/22, due 4/20/22, was submitted on 5/6/22 for grant 84.425D. The report for the quarter ending 3/31/22, due 4/20/22, was submitted on 5/19/22 for grant 84.425C. The report for the quarter ending 3/31/22, due 4/20/22, was submitted on 6/13/22 for grant 84.425D. Effect: The District was not compliant with reporting requirements. Due to the late filing of reports, ISBE could freeze the School District's federal funds. Cause: Policies and procedures are in place that provide reasonable assurance that reports of federal awards submitted to ISBE are filed in a timely manner by the due dates provided by ISBE. The School District did not follow this process. Recommendation: We recommend that management review its policies and procedures and implement changes to strengthen internal control over federal reporting.  Management's response:The District has agreed with the findings and recommendations as presented. The District will review the reporting deadlines and file reports moving forward on a timely manner by the due dates.",N,961184,1,QNNVJ3LNDD95,N
+48074,91676,2022,2022-001,"Reference Number: 2022-001
+=======
 6551,49682,256943,2022,2022-001,"Criteria or specific requirement (including statutory, regulatory, or other citation): The compliance requirements for ""L.Reporting"" generally requires that LEA's report financial information to the pass-through entity and that those reports are accurate and supported by the underlying accounting records. Condition: The School District did not comply with the requirements of filing quarterly and final reports by the due dates set by ISBE. Questioned Costs: N/A. Context: The School District did not timely file multiple quarterly expenditure reports. The report for the period ending 8/31/21, due 9/20/21, was submitted on 11/5/21 for grants 84.424, 84.425D and 84.425C. The report for the quarter ending 9/30/21, due 10/20/21, was submitted on 1/10/22 for grant 84.425D.  The report for the quarter ending 9/30/21, due 10/20/21, was submitted on 11/5/21 for grant 84.027. The report for the quarter ending 9/30/21, due 10/20/21, was submitted on 12/29/21 for grants 84.425D and 84.425C. The report for the period ending 10/31/21 due 11/20/21, was submitted on 12/29/21 for grants 84.010 and 84.027. The report for the quarter ending 12/31/21 due 1/20/22, was submitted on 1/26/22 for grant 84.425D. The report for the quarter ending 12/31/21, due 1/20/22, was submitted on 2/7/22 for the grants 84.425C and 84.425D. The report for the quarter ending 3/31/22, due 4/20/22, was submitted on 5/6/22 for grant 84.425D. The report for the quarter ending 3/31/22, due 4/20/22, was submitted on 5/19/22 for grant 84.425C. The report for the quarter ending 3/31/22, due 4/20/22, was submitted on 6/13/22 for grant 84.425D. Effect: The District was not compliant with reporting requirements. Due to the late filing of reports, ISBE could freeze the School District's federal funds. Cause: Policies and procedures are in place that provide reasonable assurance that reports of federal awards submitted to ISBE are filed in a timely manner by the due dates provided by ISBE. The School District did not follow this process. Recommendation: We recommend that management review its policies and procedures and implement changes to strengthen internal control over federal reporting.  Management's response:The District has agreed with the findings and recommendations as presented. The District will review the reporting deadlines and file reports moving forward on a timely manner by the due dates.",N,961184,1,QNNVJ3LNDD95,N
 6570,48074,91676,2022,2022-001,"Reference Number: 2022-001
+>>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 Federal Agency: Department of Education
 Program Name (AL #): Student Financial Aid Cluster (AL No. Various)
 Federal Award Year: July 1, 2021 to June 30, 2022
@@ -436,7 +516,11 @@ Context: For 5 out of 25 students tested for NSLDS reporting, it was noted that 
 Effect or Potential Effect: The administration of the Title IV programs depends heavily on the accuracy and timeliness of the enrollment information reported by institutions. Inaccurate reporting or not timely reporting student status changes to NSLDS will have an impact on the timeliness of the student entering repayment.
 Recommendation: We recommend that the University enhance its review and monitoring of the enrollment reporting to NSLDS to ascertain accuracy and timeliness of the submission. We recommend management perform a review of the students after being reported to NSLDS to ensure that were accurately and timely reporting as well as implement a monitoring control internally to ensure all students who changed stated are properly identified and reported to the NSLDS.
 Views of Responsible Officials and Planned Corrective Actions: The University agrees that accurate enrollment reporting is required and has taken steps to change the process. See corrective action plan.",N,962068,1,J3KPEDNN74R6,N
+<<<<<<< HEAD
+56935,69688,2022,2022-002,"Health Center Program Cluster
+=======
 6707,56935,69688,2022,2022-002,"Health Center Program Cluster
+>>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 Assistance Listing Number(s) 93.224 and 93.527
 U.S. Department of Health and Human Services
 Award No. H80CS00438
@@ -451,7 +535,11 @@ Recommendation: The Health Center should adopt an internal control procedure tha
 Repeat Finding: 2021-001
 Views of Responsible Officials: See page 12.
 ",N,988458,1,LBNNLRDE8793,N
+<<<<<<< HEAD
+56936,69688,2022,2022-001,"Health Center Program Cluster
+=======
 6708,56936,69688,2022,2022-001,"Health Center Program Cluster
+>>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 Assistance Listing Number(s) 93.224 and 93.527
 U.S. Department of Health and Human Services
 Criteria or Specific Requirement: Reporting
@@ -465,7 +553,11 @@ Recommendation: The Health Center should adopt an internal control procedure tha
 Repeat Finding: n/a
 Views of Responsible Officials: See page 12.
 ",N,988458,1,LBNNLRDE8793,N
+<<<<<<< HEAD
+53491,193354,2022,2022-001,"2022-001– Tri-Partite Board Compliance
+=======
 7167,53491,193354,2022,2022-001,"2022-001– Tri-Partite Board Compliance
+>>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 Program:
 Community Services Block Grant (CSBG), Assistance Listing Number 93.569, U.S. Department of Health
 and Human Services, Passed through State of California, Department of Community Services and
@@ -495,7 +587,11 @@ composition requirements of the CSBG Act.
 Management Response:
 The City is currently working with the State of California Department of Community Services and
 Development to comply with the Tri-Partite Board requirements.",N,977623,1,KC7DYLV9EF25,N
+<<<<<<< HEAD
+56599,194292,2022,2022-002,"SCHEDULE OF FEDERAL AWARD FINDINGS AND 
+=======
 7213,56599,194292,2022,2022-002,"SCHEDULE OF FEDERAL AWARD FINDINGS AND 
+>>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 QUESTIONED COSTS
 Warden School District No. 146-161
 September 1, 2021 through August 31, 2022
@@ -543,7 +639,11 @@ The American Institute of Certified Public Accountants defines significant defic
 Title 29 CFR, Section 3.3 – Weekly statement with respect to payment of wages, and Section 3.4 – Submission of weekly statements and the preservation and inspection of weekly payroll records, establishes requirements for contractor or subcontractor submission of weekly certified payroll reports.
 Title 29 CFR, Section 5.5, Contract provisions and related matters, establishes the requirements for the contracting officer to insert in full any contract in excess of $2,000 which is entered into for the actual construction, alteration and/or repair, including painting and decorating, of a public building or public work, or building or work financed in whole or in part with federal funds the clauses listed, which includes but is not limited to the minimum wages to be paid and payrolls and basic records to be maintained (submission of weekly certified payrolls)
 ",N,983523,1,CVCJV2ZL5HN3,N
+<<<<<<< HEAD
+57358,188465,2022,2022-002,"Finding Number: 	2022-002
+=======
 7250,57358,188465,2022,2022-002,"Finding Number: 	2022-002
+>>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 Assistance Listing Number and Title:	AL #84.027, #84.173 Special Education Cluster
 Federal Award Identification Number/ Year: 2022/2023
 Federal Agency:	U.S. Department of Education
@@ -561,21 +661,33 @@ During the fiscal year, the School District contracted with Allen County Educati
 
 The School District should develop a control(s) and/or procedure(s) to verify that established procurement procedures are followed when entering into contracts using Federal monies. The ODE form that allows schools to request ODE authorize a noncompetitive proposal for their ESC Services should be utilized for any ESC contract in the future.  Failure to follow proper procurement procedures could result in contracts awarded to entities which do not meet all the needs of the School District or have a cost significantly higher than their competitors, as well as a loss in future federal funding and possible questioned costs in future audits.  
 ",N,974839,1,DZCYMXEX2H74,N
+<<<<<<< HEAD
+50844,219232,2022,2022-002,"A deficiency in internal control over financial reporting exists when the
+=======
 7326,50844,219232,2022,2022-002,"A deficiency in internal control over financial reporting exists when the
+>>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 design or operation of a control does not allow management or employees, in the
 normal course of performing their assigned functions, to prevent, or detect and
 correct, misstatements of the financial statements on a timely basis. Properly
 designed policies and procedures and implementation of the policies and procedures
 are an integral part of ensuring the reliability and accuracy of the District's financial
 statements.",N,974459,1,NPLAPH6SLCK3,N
+<<<<<<< HEAD
+50845,219232,2022,2022-001,"Management is responsible for establishing and maintammg internal
+=======
 7327,50845,219232,2022,2022-001,"Management is responsible for establishing and maintammg internal
+>>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 control. A good system of internal control provides for adequate segregation of
 duties so no one individual handles a transaction from its inception to completion. In
 order to maintain proper internal control, duties should be segregated so the
 authorization, custody and recording of transactions are not under the control of the
 same employee. This segregation of duties helps prevent losses from employee error
 or dishonesty and maximizes the accuracy of the District's financial statements.",N,974459,1,NPLAPH6SLCK3,N
+<<<<<<< HEAD
+53698,236105,2022,2022-004,"2022-004
+=======
 7366,53698,236105,2022,2022-004,"2022-004
+>>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 Department of Agriculture
 Federal Assistance Listing #10.766
 Community Facilities Loans and Grants Cluster
@@ -601,7 +713,11 @@ Recommendation - We recommend that the Hospital enhance internal control policie
 
 Views of Responsible Officials - Management agrees with the finding.
 ",N,978761,1,PEKXCMGQMT86,N
+<<<<<<< HEAD
+53699,236105,2022,2022-003,"2022-003
+=======
 7367,53699,236105,2022,2022-003,"2022-003
+>>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 Department of Agriculture
 Federal Assistance Listing #10.766
 Community Facilities Loans and Grants Cluster
@@ -634,7 +750,11 @@ Recommendation - While we recognize that this condition is not unusual for an or
 
 Views of Responsible Officials - Management agrees with the finding.
 ",N,978761,1,PEKXCMGQMT86,N
+<<<<<<< HEAD
+46696,248724,2022,2022-001,"Finding 2022-001:  Material Weakness in Compliance and Internal Controls Over Compliance for Unallowable Costs
+=======
 7509,46696,248724,2022,2022-001,"Finding 2022-001:  Material Weakness in Compliance and Internal Controls Over Compliance for Unallowable Costs
+>>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 
 Federal Agency:	U.S. Department of Justice
 Program Title:             Victims of Crime Act
@@ -667,8 +787,13 @@ ALIVE, Inc. needs to refund funds from the Employee Retention Credit immediately
 Response by Auditee  
 In direct response to this finding, the Employee Retention Credit funds that were erroneously applied for and awarded to ALIVE through ERC Specialists were returned to the IRS on October 20, 2022.
 ",N,959150,1,ZE6JCNDHQL99,N
+<<<<<<< HEAD
+51244,257325,2022,2022-001,"A fundamental element of internal control is the segregation of certain key duties and responsibilities, such as custody of assets, authorization or approval of transactions, recording or reporting transactions, and execution of transactions. VOICES has a lack of segregation of duties in the accounting area due to the limited number of employees. ",N,969843,1,LECBAFSKG8X8,N
+54322,240680,2022,2022-001,"FINDING NO. 2022-001 FINANCIAL STATEMENTS
+=======
 7583,51244,257325,2022,2022-001,"A fundamental element of internal control is the segregation of certain key duties and responsibilities, such as custody of assets, authorization or approval of transactions, recording or reporting transactions, and execution of transactions. VOICES has a lack of segregation of duties in the accounting area due to the limited number of employees. ",N,969843,1,LECBAFSKG8X8,N
 8677,54322,240680,2022,2022-001,"FINDING NO. 2022-001 FINANCIAL STATEMENTS
+>>>>>>> b7a0318b (Fix typo and add a simple test (#2604))
 Federal programs
 All federal financial assistance programs
 Category

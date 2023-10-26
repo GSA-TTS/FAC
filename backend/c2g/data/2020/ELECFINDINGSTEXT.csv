@@ -1,0 +1,1149 @@
+SEQ_NUMBER,DBKEY,AUDITYEAR,FINDINGREFNUMS,TEXT,CHARTSTABLES,REPORTID,VERSION,UEI,MULTIPLEUEIS
+19052,191862,2020,2020-001,"Item 2020-001:	Late submission of the single audit reporting package and data collection
+		form to the Federal Audit Clearinghouse (“FAC”)
+
+Criteria:	The single audit reporting package and data collection form shall be 					                            submitted to FAC within thirty days after receipt of the auditor’s report, or 
+		nine months after the end of the fiscal year, whichever comes first.
+
+Condition:	Submission of the single audit reporting package and data collection form
+		to FAC was not done within the timeframe as required by the Uniform 
+		Guidance.
+
+Context:	During the audit, we noted that the single audit reporting package and data
+		collection form for FY2019 due to the FAC by March 31, 2020, was not submitted until November 13, 2020.
+
+Effect:		Late filing will result in noncompliance with timely submission of financial information to grantor agencies.
+
+Cause:	Due date was during COVID shutdown and procedures were not in place to ensure the timely filing of the single audit reporting package and data collection form to the FAC.
+
+Recommendation:	We recommend management strengthen its procedures over filing of the single audit reporting package and data collection form with FAC to ensure timely filing.
+
+Management’s
+response:	Management concurs with the finding.  Additional procedures will be 					established to help ensure timely filing of the single audit reporting package and data collection form to the FAC.
+",N,876576,1,,
+20903,183173,2020,2020-002,"2020 – 002: NSLDS Enrollment Reporting
+Federal Agency: Department of Education
+Federal Program Title: Student Financial Assistance Cluster
+CFDA Number:
+84.268 – Federal Direct Student Loans
+Award Period: July 1, 2019 – June 30, 2020
+Compliance Requirement: Special Tests and Provisions
+Type of Finding:
+• Significant Deficiency in Internal Control over Compliance, Other Matters
+Criteria or specific requirement: All schools participating (or approved to participate) in the
+Federal Student Aid programs must have an arrangement to report student enrollment data to the
+NSLDS through a Roster file (formerly called the Student Status Confirmation Report or SSCR).
+The School is required to report changes in the student’s enrollment status, the effective date of
+the status and an anticipated completion date. Changes in enrollment to less than half-time,
+graduated, or withdrawn status must be reported within 30 days. However, if a Roster file is
+expected within 60 days, you may provide the data on that Roster file (34CFR section 682.610).
+Condition: The College did not report enrollment changes within the required 60 day timeframe
+for one student in the sample tested.
+Questioned costs: None.
+Context: For 1 of 60 status changes tested, the student's enrollment statuses were not reported
+timely.                                                                                                                     
+Cause: The College’s processes and controls did not ensure that student status changes were
+timely reported to NSLDS.
+Effect: The NSLDS system is not updated with the student information in a timely manner which
+can cause over awarding and the students may not properly enter the repayment period.
+Repeat Finding: Yes, reported as 2015-01, 2016-002, 2017-004, 2018-003, and 2019-003.
+Recommendation: We recommend the College review its reporting procedures to ensure that
+students’ statuses are accurately and timely reported to NSLDS as required by regulations.",N,876374,1,,
+31419,192173,2020,2020-003,"FINDING 2020-003
+Subject: Title I to Local Educational Agencies - Eligibility, Level
+of Effort - Maintenance of Effort, Reporting
+Federal Agency: Department of Education
+Federal Program: Title I Grants to Local Educational Agencies
+CFDA Number: 84.010
+Federal Award Numbers and Years (or Other Identifying Numbers): S010A150014, S010A180014
+Pass-Through Entity: Indiana Department of Education
+Compliance Requirements: Eligibility; Matching, Level of Effort, Earmarking; Reporting
+Audit Finding: Material Weakness
+Condition and Context
+An effective internal control system was not in place at the School Corporation to ensure compliance
+with requirements related to the grant agreement and the Eligibility; Matching, Level of Effort,
+Earmarking; and Reporting compliance requirements.
+Eligibility
+The School Corporation utilized computer software to determine eligibility. The Food Service
+Director/Coordinator was responsible for verifying the computer software made the correct
+determination by reviewing every fifth application verified by the computer software. There was
+no evidence of this review to ensure the eligibility determinations made by the software system
+were accurate.
+There was no evidence of internal control over the October Real Time Report. The Information
+Technology (IT) employee uploaded the Real Time Report into the STN website. Any discrepancies
+found were communicated to the appropriate building secretary or registrar to verify
+enrollment and resolve conflicts. However, the IT employee was unable to provide adequate
+documentation of communication with the building secretaries or registrars to support the
+resolution on the enrollment errors made by the IT employee during the audit period.
+The Title I Grant Coordinator entered the nonpublic information into the Title I application
+manually. There was no evidence of review or oversight to ensure that the information entered
+was accurate.
+Matching, Level of Effort, Earmarking and Reporting
+The financial information submitted by the School Corporation to the Indiana Department of
+Education through the Form 9 reports was used to calculate the School Corporation's level of
+effort, as well as complete the State Per Pupil Expenditure Report.
+The Payroll Clerk ran payroll in Skyward and verified the Summary Report after payroll was
+prepared. There was no oversight or review process in place over payroll at the School
+Corporation level to ensure the data used to complete the Form 9 was reported accurately in
+the correct fund, account, and object code.
+The Title I Grant Coordinator included the methodology from the budget process into the Title
+I application to ensure the School Corporation was not supplanting. There was no oversight or
+review process to ensure the methodology was properly implemented.
+The lack of internal controls was a systemic issue throughout the audit period.
+Criteria
+2 CFR 200.303 states in part:
+""The non-Federal entity must:
+(a) Establish and maintain effective internal control over the Federal award that provides
+reasonable assurance that the non-Federal entity is managing the Federal award in
+compliance with Federal statutes, regulations, and the terms and conditions of the Federal
+award. These internal controls should be in compliance with guidance in 'Standards for
+Internal Control in the Federal Government' issued by the Comptroller General of the
+United States or the 'Internal Control Integrated Framework', issued by the Committee of
+Sponsoring Organizations of the Treadway Commission (COSO). . . .""
+Cause
+Management had not developed a system of internal controls that would have ensured compliance
+with requirements related to the grant agreement and the Eligibility; Matching, Level of Effort, Earmarking;
+and Reporting compliance requirements.
+Effect
+The failure to design and implement a system of internal controls placed the School Corporation at
+risk of noncompliance with the grant agreement and the Eligibility; Matching, Level of Effort, Earmarking;
+and Reporting compliance requirements.
+Questioned Costs
+There were no questioned costs identified.
+Recommendation
+We recommended that the School Corporation's management establish a system of internal controls
+related to the grant agreement and the Eligibility; Matching, Level of Effort, Earmarking; and Reporting
+compliance requirements.
+Views of Responsible Officials
+For the views of responsible officials, refer to the Corrective Action Plan that is part of this report.",N,895014,1,,
+31420,192173,2020,2020-005,"FINDING 2020-005
+Subject: Special Education Cluster (IDEA) - Earmarking
+Federal Agency: Department of Education
+Federal Programs: Special Education Grants to States, Special Education Preschool Grants
+CFDA Numbers: 84.027, 84.173
+Federal Award Numbers (or Other Identifying Numbers): 18611-055-PN01, 18619-055-PN01,
+19611-055-PN01
+Pass-Through Entity: Indiana Department of Education
+Compliance Requirement: Matching, Level of Effort, Earmarking
+Audit Findings: Material Weakness, Modified Opinion
+Repeat Finding
+This is a repeat finding from the immediately prior audit report. The prior audit finding number was
+2018-013.
+Condition and Context
+An effective internal control system was not in place at the School Corporation and at the South
+LaPorte County Special Education Cooperative (Cooperative) to ensure compliance with the grant agreement
+and the earmarking requirements of the Matching, Level of Effort, Earmarking compliance requirement.
+The Cooperative was a planning district whose purpose was to provide free appropriate public
+education to students identified as disabled in accordance with state statute who were legal residents and/or
+have been accepted through means of open enrollment, or other legal means of transfer to the participating
+member school corporations in LaPorte County. The School Corporation was the administrator of this
+Cooperative.
+The School Corporation and the Cooperative did not maintain adequate supporting documentation
+used to calculate the amount of special education and related services that were provided to students in
+nonpublic schools and facilities for grants 18611-055-PN01 and 18619-055-PN01. Additionally, adequate
+supporting documentation was not maintained for the second quarter of the 19611-055-PN01 grant. Since
+we could not determine if the transactions were properly classified as nonpublic school expenditures, we
+were unable to determine compliance with the earmarking requirements.
+Criteria
+2 CFR 200.303 states in part:
+""The non-Federal entity must:
+(a) Establish and maintain effective internal control over the Federal award that provides
+reasonable assurance that the non-Federal entity is managing the Federal award in
+compliance with Federal statutes, regulations, and the terms and conditions of the Federal
+award. These internal controls should be in compliance with guidance in 'Standards for
+Internal Control in the Federal Government' issued by the Comptroller General of the
+United States or the 'Internal Control Integrated Framwork', issued by the Committee of
+Sponsoring Organizations of the Treadway Commission (COSO). . . .""
+2 CFR 200.207(a) states in part: ""The Federal awarding agency or pass-through entity may impose
+additional specific award conditions as needed . . .""
+511 IAC 7-34-7(b) states:
+""The public agency, in providing special education and related services to students in nonpublic
+schools must expend at least an amount that is the same proportion of the public agency total
+subgrant under 20 U.S.C. 1411(f) as the number of nonpublic school students with disabilities,
+who are enrolled by their parents in nonpublic schools within its boundaries, is to the total
+number of students with disabilities of the same age range.""
+Cause
+The School Corporation had not established a system of internal controls to ensure compliance
+with the grant agreement and the earmarking requirement of the Matching, Level of Effort, Earmarking
+compliance requirement.
+Effect
+The failure to maintain and provide appropriate supporting documentation prevented the determination
+of the School Corporation's compliance with the earmarking requirements of the Matching, Level
+of Effort, Earmarking compliance requirement.
+Questioned Costs
+There were no questioned costs identified.
+Recommendation
+We recommended that the School Corporation's management establish a system of internal controls
+and maintain adequate supporting documentation to ensure compliance with the grant agreement and
+the earmarking requirements of the Matching, Level of Effort, Earmarking compliance requirement.
+Views of Responsible Officials
+For the views of responsible officials, refer to the Corrective Action Plan that is part of this report.",N,895014,1,,
+31421,192173,2020,2020-002,"FINDING 2020-002
+Subject: Child Nutrition Cluster - Internal Control
+Federal Agency: Department of Agriculture
+Federal Programs: School Breakfast Program, National School Lunch Program
+CFDA Number: 10.553, 10.555
+Federal Award Numbers and Years (or Other Identifying Numbers): FY 18-19, FY 19-20
+Pass-Through Entity: Indiana Department of Education
+Compliance Requirements: Eligibility, Program Income
+Audit Finding: Material Weakness
+Condition and Context
+An effective internal control system was not in place at the School Corporation to ensure compliance
+with requirements related to the grant agreement and the Eligibility and Program Income compliance
+requirements.
+Eligibility
+The School Corporation utilized computer software to determine eligibility. The Food Service
+Director/Coordinator was responsible for verifying the computer software made the correct
+determination by reviewing every fifth application verified by the computer software. There was
+no evidence of this review to ensure the eligibility determinations made by the software system
+were accurate.
+Program Income - Assessing
+The Food Service Coordinator was responsible for verifying that the approved school food
+prices were properly entered into the software system. There was no evidence of the Food
+Service Coordinator's review of the entered prices that would have ensured sales to students
+and adults were properly assessed.
+The lack of internal controls was a systemic issue throughout the audit period.
+Criteria
+2 CFR 200.303 states in part:
+""The non-Federal entity must:
+(a) Establish and maintain effective internal control over the Federal award that provides
+reasonable assurance that the non-Federal entity is managing the Federal award in
+compliance with Federal statutes, regulations, and the terms and conditions of the Federal
+award. These internal controls should be in compliance with guidance in 'Standards for
+Internal Control in the Federal Government' issued by the Comptroller General of the
+United States or the 'Internal Control Integrated Framework', issued by the Committee of
+Sponsoring Organizations of the Treadway Commission (COSO). . . .""
+Cause
+Management had not developed a system of internal controls that would have ensured compliance
+with the grant agreement and the Eligibility and Program Income compliance requirements.
+Effect
+The failure to establish an effective internal control system placed the School Corporation at risk of
+noncompliance with the grant agreement and the Eligibility and Program Income compliance requirements.
+Questioned Costs
+There were no questioned costs identified.
+Recommendation
+We recommended that the School Corporation's management establish an effective system of
+internal controls to ensure compliance with the grant agreement and the Eligibility and Program Income
+compliance requirements.
+Views of Responsible Officials
+For the views of responsible officials, refer to the Corrective Action Plan that is part of this report.",N,895014,1,,
+31422,192173,2020,2020-004,"FINDING 2020-004
+Subject: Special Education Cluster (IDEA) - Activities Allowed
+or Unallowed, Allowable Costs/Cost Principles
+Federal Agency: Department of Education
+Federal Programs: Special Education Grants to States, Special Education Preschool Grants
+CFDA Numbers: 84.027, 84.173
+Federal Award Numbers and Years (or Other Identifying Numbers): 18619-055-PN01, 19611-055-PN01,
+19619-055-PN01, 20611-053-PN01
+Pass-Through Entity: Indiana Department of Education
+Compliance Requirements: Activities Allowed or Unallowed, Allowable Costs/Cost Principles
+Audit Finding: Material Weakness
+Condition and Context
+An effective internal control system was not in place at the School Corporation and the South
+LaPorte County Special Education Cooperative (Cooperative) to ensure compliance with the grant agreement
+and the Activities Allowed or Unallowed and Allowable Costs/Cost Principles compliance requirements.
+The Cooperative was a planning district whose purpose was to provide free appropriate public
+education to students identified as disabled in accordance with state statute who were legal residents and/or
+have been accepted through means of open enrollment, or other legal means of transfer to the participating
+member school corporations in LaPorte County. The School Corporation was the administrator of this
+Cooperative.
+The School Corporation had not designed or implemented adequate internal controls to ensure that
+all activities and costs were allowed. The payroll disbursements were prepared by the Payroll Department
+without oversight or review.
+The lack of internal controls was a systemic issue throughout the audit period.
+Criteria
+2 CFR 200.303 states in part:
+""The non-Federal entity must:
+(a) Establish and maintain effective internal control over the Federal award that provides
+reasonable assurance that the non-Federal entity is managing the Federal award in
+compliance with Federal statutes, regulations, and the terms and conditions of the Federal
+award. These internal controls should be in compliance with guidance in 'Standards for
+Internal Control in the Federal Government' issued by the Comptroller General of the
+United States or the 'Internal Control Integrated Framwork', issued by the Committee of
+Sponsoring Organizations of the Treadway Commission (COSO). . . .""
+Cause
+The School Corporation had not developed a system of internal controls that would have ensured
+compliance with the grant agreement and the Activities Allowed or Unallowed and the Allowable Costs/Cost
+Principles compliance requirements.
+Effect
+The failure to establish an effective internal control system placed the School Corporation at risk of
+noncompliance with the grant agreement and the Activities Allowed or Unallowed and the Allowable
+Costs/Cost Principles compliance requirements. A lack of an internal control system could have also
+allowed noncompliance with the compliance requirements and allowed the misuse and mismanagement of
+federal funds and assets by not having proper oversight, reviews, and approvals over the activities of the
+program.
+Questioned Costs
+There were no questioned costs identified.
+Recommendation
+We recommended that the School Corporation's management establish internal controls to ensure
+compliance with the grant agreement and the Activities Allowed or Unallowed and the Allowable Costs/Cost
+Principles compliance requirements.
+Views of Responsible Officials
+For the views of responsible officials, refer to the Corrective Action Plan that is part of this report.",N,895014,1,,
+16667,117467,2020,2020-003,"Finding # 2020-003 (repeat of 2019-003)
+Type: 	Federal Award – Material weakness, Noncompliance
+
+CFDA Number:
+U.S. Department of Housing and Urban Development
+14.267 Continuum of Care
+
+Requirement:
+The Organization is required to monitor activities of subrecipients in accordance with federal regulations. 
+
+Condition/Context: 
+The single audit of the subrecipient reported findings under the CFDA contract passed through from the Organization and the Organization did not take actions to resolve the findings with the subrecipients during the fiscal year. 
+
+Cause: 
+The Organization’s procedures and policies to audit and review the subrecipient’s activities were not adequate to detect and correct activities of noncompliance. 
+
+Effect: 
+Costs expended through subrecipient awards could be ineligible for the program.
+
+Questioned Costs:
+Approximately $57,000
+
+Recommendation:
+We recommend that supervisors amend subrecipient auditing procedures to ensure a proper system is in place to monitor, detect and take timely follow-up action on any issues identified in site visits and internal or external audits. The Organization might consider a control checklist/sheet and/or set of questionnaires to ensure that all compliance requirements have been considered and documented.
+
+Management’s Response:
+Self Enhancement, Inc. (SEI) has been closely working with the subrecipient to review and resolve findings identified on their last Single Audit and received a draft copy in June 2020 with the final version at the end of September 2020 and are in the process of finalizing the review and response.
+",N,862171,1,,
+16668,117467,2020,2020-001,"Finding # 2020-001 (repeat of 2019-001)
+Type: 	Federal Award – Material weakness
+
+CFDA Number:
+U.S. Department of Housing and Urban Development
+14.267 Continuum of Care
+
+Requirement:
+Case files are required to be reviewed and eligibility to be approved by supervisory personnel. 
+
+Condition/Context: 
+Out of a sample of 14 selected for testing, 5 case files were missing supervisory review. Procedures for reviewing eligibility were not in place or carried out. 
+
+Cause: 
+Case files are maintained in paper copies. Due to the impact of COVID-19, there were challenges completing the case file review. The Organization should have additional follow up procedures in place to ensure that case files are reviewed.
+
+Effect: 
+Participants and costs could be ineligible for the program or case files could be missing required paperwork.
+
+Questioned Costs:
+Unknown
+
+Recommendation:
+Procedures should be put in place to ensure reviews are completed timely. This might include considering moving files to electronic format or further developing the process for monitoring to ensure all reviews are completed. 
+
+Management’s Response:
+Improvements has been made in the year ended June 30, 2020, but full compliance was impacted by moving to a remote work environment due the impact of COVID-19.  Management will review Self Enhancement, Inc.’s file review policy and update it for work performed in a remote environment.
+",N,862171,1,,
+16669,117467,2020,2020-002,"Finding # 2020-002 (repeat of 2019-002)
+Type: 	Federal Award – Significant Deficiency, Immaterial Noncompliance
+
+CFDA Number:
+U.S. Department of Housing and Urban Development
+14.267 Continuum of Care
+
+Requirement:
+The Organization is required to minimize the time elapsing between the transfer of funds from U.S. Treasury and the disbursement of funds for direct program or project costs and the proportionate share of allowable indirect costs. 
+
+Condition/Context: 
+The Organization held funds in excess of program disbursements related to prior periods.
+
+Cause: 
+Draws were based on estimated expenditures; however, actual program costs were incurred at a slower rate than anticipated resulting in excess draw amounts on hand in the previous year. 
+
+Effect: 
+The Organization could overdraw on the contract funds. 
+
+Questioned Costs:
+None
+
+Recommendation:
+The Organization should request a fund draw after programmatic disbursements are made to ensure accurate amounts are requested. The Organization has modified the process during the fiscal year and identified funds overdrawn from prior period.
+
+Management’s Response:
+Self Enhancement, Inc. has disbursed the funds held in excess of program disbursements related to prior periods, subsequent to June 30, 2020.
+",N,862171,1,,
+33351,176876,2020,2020-001,"Finding 2020-001
+Federal Agency: U.S. Department of Agriculture
+Federal Program Titles: Rural Rental Housing Loans Program
+Federal Catalog Numbers: 10.415
+Material Noncompliance - Reserve for Replacement
+Non Compliance Material to the Financial Statements: No
+Significant Deficiency in Internal Controls over Compliance
+Criteria: Reserve for Replacements. The Authority is required to make monthly deposits to the Reserve for Replacement for the U.S. Department of Agriculture multi-family property known as Pine Terrace Apartments. These required monthly deposits are based on a stated amount in the U.S. Department of Agriculture approved Multi-Family Housing Project Budget.
+Condition: Based upon inspection of the Authority's Reserve for Replacement bank statements and on discussions with management, the Replacement Reserve was not funded as required during the audit period.
+Context: During the audit period only Authority made deposits to the Reserve for Replacements totaling$4,680 of the $17,600 required deposit. This had resulted in the Reserve for Replacements being underfunded.
+Known Questioned Costs: $12,920
+Cause: There is a significant deficiency in internal controls over the compliance related to the maintenance of the reserve for replacements.
+Effect: The Rural Rental Housing Loan Program is in non-compliance with the required deposits to the Reserve for Replacements.
+Recommendation: We recommend the Authority design and implement internal control procedures that will reasonably assure compliance with the Uniform Guidance and U.S. Department of Agricultures approved Multi-Family Housing Project Budget, to make the required monthly deposits to the Replacement Reserve.
+",N,918267,1,,
+14751,210892,2020,2020-008,"2020-008	IMPACT AID BOARD APPROVAL OF EXPENDITURES – CFDA 84.041 – MATERIAL WEAKNESS
+
+Condition
+
+The Oberon Public School District Board did not have proper board approval for 2 construction invoices, totaling $67,338, out of 21 tested.
+
+Effect
+
+Oberon Public School District may be subject to an increased risk of errors, fraudulent financial reporting, asset misappropriation, and corruption.
+
+Cause
+
+Oberon Public School District may not have an adequate process in place to ensure all invoices are presented to the board for proper approval.
+
+Criteria
+
+""Standards for Internal Control in the Federal Government"" (Green Book) requires management to design, implement, and operate internal controls to achieve its objectives related to operations, reporting, and compliance.  Management is to design appropriate types of control activities for the entity's internal control system.  Control activities help management fulfill responsibilities and address identified risk responses in the internal control system.  
+
+Questioned Costs
+
+None.
+
+Prior Recommendation
+
+No.
+
+Recommendation
+
+We recommend Oberon Public School District assess and implement a process to ensure proper board approval of all invoices.
+
+Oberon Public School District’s Response
+
+See Corrective Action Plan
+",N,858518,1,,
+14752,210892,2020,2020-009,"2020-009	IMPACT AID DOCUMENTATION – CFDA 84.041 – MATERIAL WEAKNESS AND NON-COMPLIANCE
+
+Condition
+
+Oberon Public School District does not have adequate support documentation for the Impact Aid Grant. Oberon Public School District was unable to substantiate amounts claimed on the applications submitted for Impact Aid Grant including:
+
+•	Basic Impact Aid (7003(b)) and Children with Disabilities (7003(d))
+•	Construction (7007(a))
+
+Items unsubstantiated include:
+
+•	Children with Disabilities who reside on eligible Indian lands
+•	Children who reside on eligible Indian lands
+•	Federally connected children percentage (Federally connected children divided by Total School Enrollment)
+
+Effect
+
+Oberon Public School District may have improperly reported application information, resulting in receiving additional Impact Aid Grant money.
+
+Cause
+
+Oberon Public School District does not have adequate policies and procedures to assign oversight and records retention for the Impact Aid Grant.
+
+Criteria
+
+“Standards for Internal Control in the Federal Government” (Green Book) requires management to document in policies for each unit its responsibility for an operational process’s objectives and related risks, and control activity design, implementation, and operating effectiveness.  Each unit, with guidance from management, determines the policies necessary to operate the process based on the objectives and related risks for the operational process. Each unit also documents policies in the appropriate level of detail to allow management to effectively monitor the control activity.
+
+Part 4 of the 2019/2020 OMB Compliance Supplement, in the Reporting section, requires auditors to test the membership data used to support the application.
+
+Questioned Costs
+
+None.
+
+Prior Recommendation
+
+No.
+
+Recommendation
+
+We recommend Oberon Public School District acquire and maintain the proper supporting documentation surrounding the Impact Aid Grant. 
+
+Oberon Public School District’s Response
+
+See Corrective Action Plan
+",N,858518,1,,
+14753,210892,2020,2020-010,"2020-010	IMPACT AID REVIEW AND APPROVAL – CFDA 84.041 – MATERIAL WEAKNESS
+
+Condition
+
+Oberon Public School District does not have its Impact Aid Grant application reviewed and approved by someone other than the preparer prior to submission of the report.
+
+Effect
+
+Oberon Public School District may have improperly reported application information, resulting in receiving additional Impact Aid Grant money.
+
+Cause
+
+Oberon Public School District does not have adequate policies and procedures to review and approve the application for the Impact Aid Grant prior to submission.
+
+Criteria
+
+""Standards for Internal Control in the Federal Government"" (Green Book) requires management to design, implement, and operate internal controls to achieve its objectives related to operations, reporting, and compliance.  Management is to design appropriate types of control activities for the entity's internal control system.  Control activities help management fulfill responsibilities and address identified risk responses in the internal control system.  
+
+Questioned Costs
+
+None.
+
+Prior Recommendation
+
+No.
+
+Recommendation
+
+We recommend Oberon Public School District implement policies and procedures to ensure that Impact Aid Grant applications are reviewed and approved by someone other than the preparer, prior to submission.
+
+Oberon Public School District’s Response
+
+See Corrective Action Plan
+
+",N,858518,1,,
+27566,248580,2020,2020-001,"Finding 2020-001
+
+Federal Program
+
+CFDA 16.575 – Victims of Crime Act Formula Grant Program, U.S. Department of Justice, passed-through from the Texas Office of the Governor, Criminal Justice Division
+	
+Criteria
+
+Uniform Guidance and requirements established by the pass-through grantor states that charges to Federal awards for salaries and wages must be based on records that accurately reflect the work performed. These records must support the distribution of the employee's salary or wages among specific activities or cost objectives if the employee works on more than one Federal award; a Federal award and non-Federal award; an indirect cost activity and a direct cost activity; two or more indirect activities which are allocated using different allocation bases; or an unallowable activity and a direct or indirect cost activity. Employees working solely (100% of their time) on a single grant may periodically certify that the employee worked solely on that grant project. In addition to the periodic certifications, nonexempt employees must also maintain time sheets indicating the total number of hours worked each day.
+
+Condition and Context
+
+In a sample of 30 payroll transactions charged to the major federal program, we noted the following:
+• One employee’s salary was charged to the federal program, but no supporting time sheet or certification was obtained. The amount of this federal expenditure was $3,548. 
+• One employee who worked less than 100% on the federal award was charged to the federal program based on a certification-approach rather than the exact rate determined from the time sheet. Had the correct amount been charged to the federal program, the difference would have been less than $22. 
+• Four time sheets signed by the employees were intended to certify that the employees worked 100% on the federal program for a given month. However, the time was entered on these time sheets indicated less than 100% of the employees’ time was related to the grant. We determined these were errors in completing the time sheets rather than errors in amounts charged to the federal award. 
+• Two time sheets had formula errors in sub-total line items, although the final totals used to calculate amounts related to federal awards were clerically accurate.
+These instances indicate internal controls over compliance related to time sheets is not functioning in a manner that would ensure noncompliance would be detected and corrected in a timely manner.
+
+Cause
+
+Time sheets are not obtained and reviewed in sufficient detail prior to requesting reimbursement from the federal program.
+ 
+Questioned Costs:  Known and likely questioned costs were less than $25,000.
+
+Effect
+
+The transactions referenced above resulted in approximately $3,600 charged to the federal program with insufficient documentation.
+
+
+Recommendation
+
+We recommend that management ensure time sheets are obtained, reviewed, and approved prior to related amounts being requested for reimbursement from federal or state programs. The review control should consider whether requirements as described above have been met. ",N,895654,1,,
+22993,117065,2020,2020-003,"Finding number:	2020-003
+CFDA number:	16.575
+Program name:	Crime Victim Assistance
+Federal agency:	United States Department of Justice
+Pass-through entity:	n/a
+Grant number:	Joint-2019-IRCO-00029
+Federal award year:	2019 through 2021
+Finding type:	Significant Deficiency and noncompliance 
+Compliance requirement:	Reporting
+Questioned costs:	n/a
+Repeat finding:	n/a
+
+
+Criteria:  The organization must have internal controls in place to provide reasonable assurance that all the re-quired reports are submitted in a timely manner, are supported by underlying accounting and/or performance rec-ords, and are fairly presented in accordance with program requirements.
+
+Condition:  During our audit, we noted that certain financial reports submitted to a funding agency had not been reviewed by someone independent of the preparer.  In addition, three of the submitted reports contained financial information on expenditures that did not agree to the underlying accounting records.   All quarterly reports filed during the year under audit were selected for testing.
+
+Cause:  Internal controls are not designed and implemented to ensure that all required reports are submitted time-ly and with correct information.  In addition, no one independent of the preparer reviewed the reports for accura-cy.  
+
+Effect: Missed filings of required reports and incorrect information reported to the federal agency prevented prop-er oversight by the funding agency and an underreporting of expenditures totalling $11,181.
+
+Unallowable Costs:  None.
+
+Audit Recommendation:  We recommend that management implement procedures to ensure all required reports are submitted properly and in a timely manner, and strengthen the organization’s review procedures related to the preparation of its Financial Reports.  At a minimum, someone independent of the preparer should review the re-ports and reconcile the data reported to that in underlying accounting records, to ensure that the information re-ported is complete and accurate.  
+
+Management’s Response:  Management agrees with our auditors’ comments.  Management has begun to implement procedures to ensure that all required Financial Reports submitted by our Program Team will be submitted on time.  Before the report submission, the Program Team must obtain the Fiscal Team to review and approve these reports.
+
+",N,870411,1,,
+23153,66417,2020,2020-001,"Allowable costs - U.S. Department of Housing and Urban Development, Supportive Housing for the Elderly (Project Assistance Contract), CFDA 14.157, and Mortgage Insurance for the Purchase or Refinancing of Existing Multifamily Housing Projects, CFDA 14.155, 2020 award year.
+Criteria - Project funds must be used only for expenses that are reasonable and necessary to the operation of the project as provided for in the Regulatory Agreement between HUD and the project owner (24 CFR section 891.400(e))
+Condition - Fees related to sale of the Project in the amount of $1,800 were expensed by the property during the period from January 1, 2020 through October 15, 2020 and repayment of this amount did not occur to the Project during the period ended October 15, 2020.
+Questioned Costs - Expenses were overstated by $1,800 during the period ended October 15, 2020.
+Context - The Project paid for expenses related to the sale which should have been covered by the project sponsor.
+Effect - The Project paid for expenses related to the sale which should have been covered by the project sponsor.
+Cause - The management company responsible for the preparation of the financial records did not have the proper information, training and knowledge of the program to ensure that only allowable costs are included within the project reports.
+Recommendation - The management company responsible for the preparation of the financial records should review its accounting and reporting policies to ensure that steps are added to include a review for unallowable costs. In addition the project sponsor should repay incurred expenses to the Project as soon as possible.
+Identification as a Repeat Finding - This is not a repeat finding.
+Views of Responsible Officials and Corrective Actions - See Corrective Action Plan.",N,886305,1,,
+16585,151978,2020,2020-001,"SIGNIFICANT DEFICIENCY IN INTERNAL CONTROL OVER COMPLIANCE – U.S. DEPARTMENT OF
+EDUCATION, PASSED THROUGH MINNESOTA DEPARTMENT OF EDUCATION, SUPPORTING
+EFFECTIVE INSTRUCTION STATE GRANTS – CFDA NO. 84.367 AND TITLE I GRANTS TO LOCAL
+EDUCATIONAL AGENCIES – CFDA NO. 84.010
+2020-001 Internal Control Over Compliance With Federal Allowable Costs Requirements
+Criteria – 2 CFR § 200.302(b)(3) requires Independent School District No. 625 (the District)
+to maintain records that adequately identify the source and application of funds for federally
+funded activities in accordance with 2 CFR 200 Subpart E – Cost Principles.
+Condition – During our audit, we noted that the District did not have sufficient controls to
+ensure adequate and timely documentation of time and effort was created and retained to
+support salary costs charged to federal programs and ensure compliance with the OMB’s
+Uniform Guidance allowable costs standards.
+Questioned Costs – None. Our testing did not indicate any instances of noncompliance.
+Context – Three employee salary costs tested in Supporting Effective Instruction State
+Grants and seven employee salary costs tested in Title I Grants to Local Educational
+Agencies were not completed timely. Ten employee salary costs tested in Title I Grants to
+Local Educational Agencies did not have proper approvals. This was not a statistically valid
+sample.
+Repeat Finding – This is a current year and prior year finding for the Supporting Effective
+Instruction State Grants. This is a current year finding only for the Title I Grants to Local
+Educational Agencies.
+Cause – This was an oversight by district personnel.
+Effect – This could be viewed as a violation of the award agreement.
+Recommendation – We recommend that the District review its internal control procedures
+relating to time and effort documentation of allowable costs.
+View of Responsible Official and Planned Corrective Actions – The District agrees with
+the finding. The District will review and update its policies and procedures relating to
+allowable costs for its federal programs to ensure compliance with the Uniform Guidance in
+the future. The District has separately issued a Corrective Action Plan related to this finding.",N,866780,1,,
+16829,250115,2020,2020-004," Qualified staff to review payroll function.
+Coronavirus Relief Fund (21.019)
+Fiscal year finding initially occurred: 2020.
+CONDITION: The Sheriff requested reimbursement for expenditures that were not allowable.
+CRITERIA: The Coronavirus relief fund sets allowable costs for reimbursement of payroll
+expenditures.
+CAUSE: The Sheriff did not have a staff person with the necessary qualifications and training
+review the reimbursement requests.
+EFFECT: The Sheriff requested $39,849 of expenditures that exceeded the allowable amount.
+RECOMMENDATION: The Sheriff should require that a person with the necessary
+qualifications and knowledge review reimbursement requests to ensure that all amounts
+requested are allowable in accordance with the grant agreement.
+MANAGEMENT’S CORRECTIVE ACTION PLAN: Management has updated the Sheriff’s
+policies and procedures to require that the Chief Finance Officer review all reimbursement
+requests to ensure that all amounts requested are allowable with the grant agreement.",N,869555,1,,
+16830,250115,2020,2020-003,"Qualified staff to review payroll function.
+Coronavirus Relief Fund (21.019)
+Fiscal year finding initially occurred: 2020.
+CONDITION: The Sheriff requested reimbursement for expenditures that were not allowable.
+CRITERIA: The Coronavirus relief fund sets allowable costs for reimbursement of payroll
+expenditures.
+CAUSE: The Sheriff did not have a staff person with the necessary qualifications and training
+review the reimbursement requests.
+EFFECT: The Sheriff requested $39,849 of expenditures that exceeded the allowable amount.
+RECOMMENDATION: The Sheriff should require that a person with the necessary
+qualifications and knowledge review reimbursement requests to ensure that all amounts
+requested are allowable in accordance with the grant agreement.
+MANAGEMENT’S CORRECTIVE ACTION PLAN: Management has updated the Sheriff’s
+policies and procedures to require that the Chief Finance Officer review all reimbursement
+requests to ensure that all amounts requested are allowable with the grant agreement.",N,869555,1,,
+53701,191213,2020,2020-003,"FINDING 2020-003
+Subject: Child Nutrition Cluster - Program Income
+Federal Agency: Department of Agriculture
+Federal Programs: School Breakfast Program, COVID-19 - School Breakfast Program, National
+School Lunch Program, COVID-19 - National School Lunch Program
+Assistance Listings Numbers: 10.553, 10.555
+Federal Award Numbers and Years (or Other Identifying Numbers): FY 2019, FY 2020
+Pass-Through Entity: Indiana Department of Education
+Compliance Requirement: Program Income
+Audit Findings: Material Weakness, Modified Opinion
+Condition and Context
+An effective internal control system was not in place at the School Corporation to ensure compliance
+with requirements related to the grant agreement and the Program Income compliance requirement.
+The School Corporation did not utilize a separate fund to account for Prepaid Account Balances.
+There was no distinction between prepaid amounts and program income. The comingling of funds prevented
+the ability to determine the School Corporation's compliance with the program income requirements.
+The lack of internal controls and noncompliance were a systemic issue throughout the audit period.
+Criteria
+2 CFR 200.303 states in part:
+""The non-Federal entity must:
+INDIANA STATE BOARD OF ACCOUNTS
+19
+NORTH LAWRENCE COMMUNITY SCHOOLS
+SCHEDULE OF FINDINGS AND QUESTIONED COSTS
+(Continued)
+(a) Establish and maintain effective internal control over the Federal award that provides
+reasonable assurance that the non-Federal entity is managing the Federal award in
+compliance with Federal statutes, regulations, and the terms and conditions of the Federal
+award. These internal controls should be in compliance with guidance in 'Standards for
+Internal Control in the Federal Government' issued by the Comptroller General of the
+United States or the 'Internal Control Integrated Framework', issued by the Committee of
+Sponsoring Organizations of the Treadway Commission (COSO). . . .""
+7 CFR 220.7(e) states in part:
+""Each school food authority approved to participate in the program shall enter into a written
+agreement with the State agency or the Department through the FNSRO, as applicable, that
+may be amended as necessary . . . Such agreements shall provide that the School Food
+Authority shall, with respect to participating schools under its jurisdiction: . . .
+(12) Maintain a financial management system as prescribed by the State agency, or
+FNSRO where applicable; . . .""
+7 CFR 210.14(c) states:
+""Financial assurances. The school food authority shall meet the requirements of the State
+agency for compliance with § 210.19(a) including any separation of records of nonprofit school
+food service from records of any other food service which may be operated by the school food
+authority as provided in paragraph (a) of this section.""
+7 CFR 210.14(f)(3) states: ""All revenue from the sale of nonprogram foods shall accrue to the
+nonprofit school food service account of a participating school food authority.""
+Cause
+Management had not developed a system of internal controls that would have ensured compliance
+with the grant agreement and the Program Income compliance requirement.
+Effect
+The failure to establish an effective internal control system enabled material noncompliance to go
+undetected. Noncompliance with the grant agreement and the compliance requirement could have resulted
+in the loss of federal funds to the School Corporation.
+Questioned Costs
+There were no questioned costs identified.
+Recommendation
+We recommended that the School Corporation's management establish a system of internal
+controls to ensure compliance and comply with the grant agreement and the Program Income compliance
+requirement.
+Views of Responsible Officials
+For the views of responsible officials, refer to the Corrective Action Plan that is part of this report.",N,877004,1,,
+20198,211781,2020,2020-001,"Federal Program Information: Research and Development Cluster (various CFDA #’s)
+
+Criteria or Specific Requirement (Including Statutory, Regulatory or Other Citation): Period of Performance: Where a funding period is specified, a recipient may charge to the grant only allowable costs resulting from obligations incurred during the funding period and any pre-award costs authorized by the Federal awarding agency. Unless the Federal awarding agency authorizes an extension, a recipient shall liquidate all obligations incurred under the award not later than 90 calendar days after the funding period or the date of completion as specified in the terms and conditions of the award or in agency implementing instructions. (2 CFR sections 215.28 and 215.71).
+
+Condition: During the year ended June 30, 2020, the Foundation, in conjunction with the University of South Carolina (the “University” and the Foundation’s sole subrecipient), conducted an internal review of certain federal program expenditures. As a result of this internal review, it was determined that certain federal program expenditures of the Foundation were not properly closed out prior to the end of the respective programs’ periods of performance.  Therefore, the Foundation was not in compliance with the required period of performance requirements for certain federal programs.
+
+Cause: Administrative internal control oversight with respect to period of performance requirements.
+
+Effect or Potential Effect: The Foundation was not in compliance with the period of performance compliance requirements.
+
+Questioned Costs: None.
+
+Context: For 4 of 50 expenditures selected for testing, the Foundation did not properly record the expenditure within the period of performance.
+
+Identification as a Repeat Finding: This is a repeat finding of prior year finding 2019-001.
+
+Recommendation: We recommend that the Foundation enhance its internal controls to appropriately recognize expenditures within the period of performance.
+
+Views of Responsible Officials and Planned Corrective Actions: Foundation management and senior accounting in charge of processing invoices have met with subrecipient controller’s office to assess improvement in timing of receipt of invoices to the Foundation.  A single point of contact has been established with subrecipient to ensure timely receipt of all monthly evidence of federal program expenditures in the form of invoices or otherwise agreed upon by both parties.  Monthly, Foundation receives an accounts receivable report from the subrecipient to agree to Foundation General Ledger. And at year end, the Foundation reconciles every program’s federal awards expenditures, cumulative and annual, to the subrecipient’s records.
+
+",N,878199,1,,
+16942,250129,2020,2020-001,"FINDING 2020-001 RECORDS RETENTION
+SIGNIFICANT DEFICIENCY
+Federal Program: Title I
+CFDA Number: 84.010
+Condition
+The School was unable to provide documentation to support enrollment, transfers out of the School,
+and poverty-level data for some students selected for testing from the October 1, 2018 Real Time Data
+report submitted to the State of Indiana. This report is used as part of the application for Title I funds.
+Data for enrollment and poverty-level are used to assess eligibility of students for Title I funds. Data
+on transfers provides information on students removed from the regularly adjusted cohort.
+Criteria
+2 CFR part 200.334 requires that “Financial records, supporting documents, statistical records, and all
+other non-Federal entity records pertinent to a Federal award must be retained for a period of three years
+from the date of submission of the final expenditure report or, for Federal awards that are renewed
+quarterly or annually, from the date of the submission of the quarterly or annual financial report,
+respectively, as reported to the Federal awarding agency or pass-through entity in the case of a
+subrecipient.”
+Cause
+The School did not properly maintain documentation.
+Effect
+Compliance with eligibility and special tests and provisions requirements from the Compliance
+Supplement could not be verified.
+Recommendation
+We recommend the School develop internal controls requiring the maintenance of documentation used
+in preparation of the Real Time Data reports.
+Views of Responsible Officials
+The School’s Corrective Action Plan is included on page 21.",N,869615,1,,
+16943,250129,2020,2020-002,"FINDING 2020-002 MAINTENANCE OF EFFORT
+SIGNIFICANT DEFICIENCY
+Federal Program: Title I
+CFDA Number: 84.010
+Condition
+The Indiana Department of Education completes the maintenance of effort calculation using the Form
+9 report issued by the School, which is a cash-basis report. The School included depreciation expense,
+which is a non-cash expense, on this report.
+Criteria
+2 CFR part 200, Appendix XI, Compliance Supplement 2020, Section 4-84.000-13, states “An LEA
+may receive funds under an applicable program only if the SEA finds that the combined fiscal effort
+per student or the aggregate expenditures of the LEA from state and local funds for free public education
+for the preceding year was not less than 90 percent of the combined fiscal effort or aggregate
+expenditures for the second preceding year, unless specifically waived”.
+Cause
+The School did not properly exclude non-cash transactions from the trial balance accounts from
+reporting on the Form 9.
+Effect
+Maintenance of effort calculations prepared by the Indiana Department of Education could be impacted
+by incorrect reporting of expense transactions.
+Recommendation
+We recommend the School develop internal controls to ensure non-cash expenses are excluded from
+the Form 9 report.
+Views of Responsible Officials
+The School’s Corrective Action Plan is included on page 21.",N,869615,1,,
+23183,170685,2020,2020-001,"2020-001 Operating Budget Not approved by Board of Commissioners Before Beginning of Fiscal Year (Public Housing Program CFDA 14.850)
+		
+Criteria: Under Section 11 of the Annual Contributions Contract (ACC) and 24 CFR 990.315, the Authority is required to prepare and approve its Public Housing Operating Budget before any operating expenses are incurred in the start of the Authority’s fiscal year.
+
+Condition: The Authority did not have its Board of Commisioners approve its fiscal year 2020 operating budget until January 14, 2020.
+	
+Questioned
+Costs: None.
+
+Effect: The Authority did not comply with 24 CFR 990.315.
+
+Cause: The Authority did not present its operating budget to its Board of Commissioners for approval until January 14, 2020.
+
+Recommendation: The Authority should establish a process whereby the operating budget is prepared and presented to the Authority’s Board of Commissioners before the beginning of its fiscal year.
+
+Management
+Response: We will implement controls to ensure that operating budgets are prepared and presented to the Authority’s Board of Commissioners for approval before the beginning of the Authority’s fiscal year.  Fiscal year 2021, the Authority’s operating budget was presented to the Board of Commissioners before the beginning of FY 2021.
+",N,886946,1,,
+12087,197095,2020,2020-002,"Finding No. 2020-002 – Preparation of Financial Statements
+
+Criteria:
+
+A strong system of internal controls requires the Project to prepare its own financial statements and accompanying disclosures in accordance with accounting principles generally accepted in the United States of America.
+
+Condition:
+As part of the audit, adjustments were made to properly record fixed asset additions and depreciation. 
+
+The Project also engages Gordon, Stockman & Waugh, P.C. to assist in preparing its financial statements and accompanying disclosures.  However, as independent auditors, Gordon, Stockman & Waugh, P.C. cannot be considered part of The Project’s internal control system.
+
+Cause:
+
+The Project engages Gordon, Stockman & Waugh, P.C. to assist in this process as correction of this condition by the Project would require the employment of additional personnel.  Consequently, corrective action may not be practical.
+
+Effect:
+
+This increases the risk of material omissions or other errors in financial statements and accompanying disclosures.
+
+Recommendation:
+
+To establish proper internal control over the preparation of its financial statements, including disclosures, The Project should design and implement a comprehensive review procedure to ensure that the accounting records and financial statements, including disclosures, are complete and accurate.  Such review procedures should be performed by an individual possessing a thorough understanding of applicable generally accepted accounting principles and knowledge of The Project’s activities and operations.
+
+Management Response:
+
+This condition is inherent in operations which, for sound economic reasons, must function with a small number of office personnel.  Correction of this condition would require the employment of additional office personnel.  We will continue to monitor financial reports and accounting information as correction of this condition is not practical.
+",N,848597,1,,
+12088,197095,2020,2020-001,"Finding No. 2020-001 – Segregation of Duties
+
+Federal Agency: U.S. Department of Housing and Urban Development
+Program Name: Section 8 Project Based Cluster
+CFDA #: 14.195
+14.856
+Questioned Costs: None
+
+Criteria:
+
+A proper segregation of duties is an important component of a system of strong internal controls and should be implemented, if possible.
+
+Condition:
+
+There is minimal segregation of duties among personnel involved in the accounting function.  A lack of proper segregation of duties could allow errors or irregularities to occur and go undetected.  Due to budgetary constraints imposed by HUD, small projects, for sound economic conditions, must function with a small number of office personnel and correction of this condition would require the employment of additional office personnel.  Consequently, corrective action may not be practical.
+
+Cause:
+
+For sound economic reasons, the Project and the management company must function with a small number of office personnel, and correction of this condition would require the employment of additional office personnel.  Consequently, corrective action may not be practical.
+
+Effect:
+
+A lack of segregation of duties increases the risk that errors or fraud may occur and not be prevented or detected on a timely basis.
+
+Recommendation:
+
+When this condition exists, management’s close supervision and review of accounting information is the best means of preventing or detecting errors and irregularities.
+
+Management Response:
+
+We agree and will continue to monitor monthly financial results and accounting information as correction is not practical.
+",N,848597,1,,
+22294,200256,2020,2020-002,"Information on the Federal Program: Department of Labor, CFDA 17.258, 17.259 and 17.278 WIOA Cluster, passed through Wisconsin Department of Workforce Development, Grant Nos. AA-30852-17-55-A-55, Year ended June 30, 2020.
+
+Condition and Criteria: 2 CFR 200.331 covers requirements for pass-through entities. 2 CFR 200.331(d) indicates pass-through entities must monitor the activities of the subrecipient as necessary to ensure that the subaward is used for authorized purposes in compliance with federal statutes, regulations, and the terms and conditions of the subaward and that subaward performance goals are achieved. The Organization has not compiled with these requirements.
+
+Context: During our inquiries of management and review of the subrecipient agreements, we noted that the Organization did not comply with requirements for pass-through entities. Management performed monitoring of its subrecipients throughout the year but did not issue a formal written report of the monitoring performed and notify them of any findings and recommendations that need to be implemented.
+
+Effect: This increases the risk of an unallowable expense being charged to a federal award or material noncompliance occurring by a subrecipient and going undetected by the Organization.
+
+Cause: The organization did not have written policies and procedures in place. The was a lack of staff and the covid-19 pandemic all contributed to the lack of subrecipient monitoring.
+
+Repeat Finding: Yes, repeat of prior year finding number 2019-002.
+
+Recommendation: Management needs to issue a formal written report of the results of the monitoring performed, including any findings and recommendations.
+
+Views of Responsible Officials and Planned Corrective Actions: Subsequent to the year end, written policies and procedures have been developed and implemented. The policies and procedures will ensure that a final written report was not completed and issued to each subrecipient.
+",N,865396,1,,
+20667,11308,2020,2020-001,"Federal agency: U.S. Department of Education
+Federal program title: Student Financial Assistance Cluster
+CFDA number: 84.038
+Award period: 9/1/19 – 8/31/20
+Type of finding: Significant Deficiency in Internal Control Over Compliance, Other Matters
+Criteria or specific requirement:
+The College utilizes a third-party service provider, Educational Computer Systems, Inc. (ECSI), to perform certain functions related to the servicing of the College’s Federal Perkins Loan Program. Regulations require that an institution and a third-party service provider shall agree to comply with all requirements of 34 CFR 668.25(c) concerning compliance, liability, referrals, disbursements and returns, and repayments of Title IV funds.
+34 CFR 668.25(c) states that in a contract with an institution, a third-party servicer shall agree to:
+¿ Comply with all statutory or regulatory provisions, and special arrangements, agreements, limitations, suspensions, and terminations entered into under Title IV programs;
+¿ Refer to the Office of Inspector General of the U.S. Department of Education for investigation any information indicating there is reasonable cause to believe that:
+o The institution might have engaged in fraud or other criminal misconduct in connection with the institution’s administration of any Title IV program, or
+o An applicant for Title IV program assistance might have engaged in fraud or other criminal misconduct in connection with his or her application;
+¿ Be jointly and severally liable with the institution for any violation by the servicer of any statutory or regulatory provisions, and special arrangements, agreements, or limitations entered into under Title IV programs;
+Condition:
+Not all of the required language (per 34 CFR 668.25(c) concerning compliance, liability, referrals, disbursements and returns, and repayments of Title IV funds) is included in the executed contract between the College and ECSI.
+Questioned costs:
+None                                                                                                                          Context:                                                                                                                      The College’s contract with ECSI did not include the language required by 34 CFR 668.25(c).
+Cause:
+The College did not have procedures in place to ensure that their contract with ECSI included the language required by 34 CFR 668.25(c).
+Effect:
+ECSI’s contract with the College did not include the language required by 34 CFR 668.25(c) concerning compliance, liability, referrals, disbursements and returns, and repayments of Title IV funds. Any finding ECSI receives becomes a finding of the institution they service.
+Repeat finding:
+No.
+Recommendation:
+When contracting with an institution for performing or providing any relevant Title IV function, the servicer and/or any of its contractors, essentially “steps into the shoes” of the institution with respect to compliance with the requirements for institutional administration of the Title IV student assistance program activity. The institution must ensure that its contract with any third-party servicer contains the required elements outlined in the regulations at 34 CFR 668.25(c). This can be done through contract review and inquiry of the third-party servicer.
+Views of responsible officials: See attached corrective action plan.",N,877899,1,,
+24547,250792,2020,2020-001,"CONDITION: In their application materials, one beneficiary to which BendNEXT distributed aid under the
+Coronavirus Relief Fund identified another source of aid they had received with a specific time period for the
+expenses it reimbursed. The expenses for which this beneficiary applied to BendNEXT for reimbursement related
+to a time period within the date range of the other aid identified. BendNEXT relied on a signed affidavit from the
+beneficiary stating that the expense for which reimbursement was received from BendNEXT had not also been
+reimbursed by another source of aid. However, BendNEXT did not make further inquiry or obtain further
+information to ensure the expense had not been previously reimbursed by another source of aid.
+EFFECT: Upon further inquiry as a result of the compliance audit, BendNEXT ascertained from the beneficiary that the
+aid distributed by BendNEXT did not reimburse the same expense reimbursed by other aid received by the
+beneficiary. However, failure to obtain additional information from beneficiaries in similar instances create a strong
+possibility of noncompliance with federal grant requirements.
+CAUSE: This condition was caused by an over-reliance on the affidavit signed by the beneficiary.
+AUDITORS' RECOMMENDATION: Management should continue to analyze data provided with application materials, and
+follow up with any applicants for which it appears the requested expenses may have already been reimbursed
+by another source of aid.",N,888726,1,,
+22186,181374,2020,2020-001,"Finding 2019-001 (Repeat Finding) 
+Student Financial Aid Cluster – CFDA Numbers - 84.007, 84.033, 84.063, 84.268
+Federal Agency – U.S. Department of Education;
+Grant Period – Year ended August 31, 2020;
+Compliance Requirement: Special Tests and Provisions
+Criteria: The Gramm-Leach-Bliley Act (Public Law 106-102) (GLBA) requires financial institutions to explain their information sharing practices to their customers and to safeguard sensitive data. The Federal Trade Commission considers institutions that participate in Title IV Educational Assistance to be financial institutions and subject to GLBA. This finding is based on the requirements for educational institutions participating in the federal awards and education loan program to meet the Federal Trade Commission’s GLBA Safeguards Rule (Title 16, Chapter I, Subchapter C, Part 314). 
+Condition: The College has performed a high-level assessment for a number of common information security controls. However, the assessment lacks the expected risk assessment framework and scoring of risk likelihood and impact for all in scope systems, vendors, and data sets. 
+Cause: The expected documentation supporting the required controls to adequately confirm compliance with GLBA safeguards was not complete. 
+Effect: Without demonstrable, documented controls supporting compliance with the GLBA standards for safeguarding the protected data, compliance with the law and the requirements in the federal PPA may not be assured. 
+Context: Inquiry and observation of the information received from the College related to compliance with GLBA. 
+Auditor’s Recommendation: The College should review the GLBA safeguarding rules and as soon as practical implement and document the controls necessary for compliance with the rule, focusing on the completion of a documented, thorough, and standardized risk assessment and management reporting framework. The College should perform comprehensive risk assessments on a regular basis, which is suggested to be at least annually, and at any significant change in infrastructure or business process. 
+View of Responsible Officials: The College is currently in the process of developing the procedures and controls recommended by the auditors.
+",N,883033,1,,
+34915,252669,2020,2020-001,"Significant Deficiency not considered to be Material Weakness
+2020-1 Criteria or Specific Requirement - Management is responsible for establishing and maintaining
+internal control over grant compliance, including a process for maintaining appropriate
+documentation for grant support. The internal control should allow management or employees,
+in the normal course of performing their assigned functions to be knowledgeable about the
+grant terms and review for compliance with such terms. Further, supporting documentation and
+evidence of the review of such documentation should be maintained.
+Condition - The external auditors noted sufficient monitoring controls were not maintained
+around each respective grant to meet sufficient review requirements and proper documentation.
+Effect – The lack of controls around monitoring and reviewing grant expenditures, resulted in
+the following errors for the respective grants:
+a) Emergency Solutions Grant – COJ (CFDA #14.231) –
+1. Expenditures were coded to the wrong general ledger account, which is coded by grant.
+b) Emergency Solutions Grant- RAMP – MHC (CFDA #14.231) -
+1. Expenditures were coded to the wrong general ledger account, which is coded by grant.
+2. Support could not be provided for the payroll expenditures that were submitted as
+federal expenses.
+Cause – Lack of sufficient review controls over grant documentation and maintenance of such
+documentation.
+Recommendation – The organization should have a process in place to maintain proper
+documentation for all federal grant activity and implement a periodic review to ensure that the
+documentation exists and is appropriate. We believe that by creating a formal process with a
+review element would allow the Organization to maintain appropriate documentation to support
+all federal expenditures
+Views of Responsible Officials and Planned Corrective Action – Stewpot Community Services,
+Inc. will design a process to ensure that each grant expenditure is supported by appropriate
+documentation and implement a review element to ensure that the documentation is reasonable
+and accurate. The Executive Director will perform a secondary review to ensure all
+requirements are met.",N,922010,1,,
+18587,140543,2020,2020-001,"Housing Authority of Cook County
+Chicago, Illinois
+
+Schedule of Findings and Questioned Costs (Continued)
+Year Ended March 31, 2020
+
+III.	FINDINGS AND QUESTIONED COSTS FOR FEDERAL AWARDS
+
+Finding 2020-001: Eligibility Determination and Documentation
+Federal Agency: U.S. Department of Housing and Urban Development
+CFDA 14.871 Section 8 Housing Choice Vouchers
+Federal Award Numbers and Years (or Other Identifying Numbers): IL025
+Requirement: Eligibility
+Prior Year Finding Number: 2019-001
+
+Criteria:
+Under the Code of Federal Regulations (CFR) Title 24: Housing and Urban Development, the Authority (as a PHA) is required to obtain, verify, and/or maintain the documents listed below to document participants’ eligibility:
+a.	Certification of Application/Renewal
+b.	Certificate of Income
+c.	General Authority of Release of Information
+d.	Declaration of Citizenship or Eligible Immigration Status (such as birth certificate, social security card, etc.)
+
+Condition:
+The Authority failed to obtain, verify, and/or maintain required documentation to indicate participants’ eligibility under the Housing Choice Voucher program in tenants’ files as required under CFR Title 24: Housing and Urban Development.
+
+Questioned Costs: None noted.
+
+Context:
+Out of a total sample size of 60 program participants, the following exceptions were noted:
+
+•	In the Annual Reexamination of three program participants, executed HAP contract was not part of the active tenant file.
+•	In the Annual Reexamination of four program participants, household vital records were not part of the active tenant file.
+•	In the Annual Reexamination of one program participant, HAP Contract was not signed by both the Authority and Landlord. 
+
+Effect:
+Not maintaining appropriate documentation in the files limits the Authority’s ability to demonstrate compliance with eligibility requirements.
+
+Cause:
+Staff have caseloads of 600+ clients which may lead to errors in documentation and calculations. Supervisors review only one percent of staff files. Issues found are notated but all files do not get reviewed. The increase in utilization and the decrease in administrative fees hinders the Authority’s ability to review a higher percentage of the files.
+
+
+ 
+Housing Authority of Cook County
+Chicago, Illinois
+
+Schedule of Findings and Questioned Costs (Continued)
+Year Ended March 31, 2020
+
+III.	FINDINGS AND QUESTIONED COSTS FOR FEDERAL AWARDS
+
+Finding 2020-001: Eligibility Determination and Documentation (Continued)
+
+Recommendation:
+We recommend the Authority to provide refresher trainings to Housing Specialists on the basic eligibility criteria, to conduct training updates and implement eligibility processing standards of the program.
+
+We also recommend the Authority to properly maintain supporting documents for every Annual and Interim Reexaminations in order to ensure the accuracy and consistency of the information collected on the Family Report (HUD-50058) submitted to HUD. Per Form HUD-50058 Instruction Booklet, the data collected on the form provided HUD with a picture of the people who participate in subsidized housing programs. Public Housing Agencies (PHAs) collect and electronically submit information contained on the Form HUD-50058 to HUD. The Public and Indian Housing Information Center (PIC) system then captures this information and creates reports used to:
+
+•	analyze the subsidized housing programs
+•	monitor PHAs
+•	detect fraud, and
+•	provide information to Congress and other interested parties
+
+View of responsible officials:
+Management concurs with the finding. See correction action plan for additional information.
+
+",N,874185,1,,
+18588,140543,2020,2020-002,"Housing Authority of Cook County
+Chicago, Illinois
+
+Schedule of Findings and Questioned Costs (Continued)
+Year Ended March 31, 2020
+
+III.	FINDINGS AND QUESTIONED COSTS FOR FEDERAL AWARDS
+
+Finding 2020-002: Selection from the Waiting List Documentation
+Federal Agency: U.S. Department of Housing and Urban Development
+CFDA 14.871 Section 8 Housing Choice Vouchers
+Federal Award Numbers and Years (or Other Identifying Numbers): IL025
+Requirement: Special Test – Selection from the Waiting List
+Prior Year Finding Number: N/A
+
+Criteria:
+Under the Code of Federal Regulations (CFR) Title 24: Housing and Urban Development, the Authority (as a PHA) is required to obtain, verify, and/or maintain the documents listed below to document participants’ selection from the waitlist:
+a.	Referral letter from transfer agency
+b.	Family report and determination of assistance
+
+Condition:
+The Authority failed to obtain, verify, and/or maintain required documentation to indicate compliance with procedures to select new admission from the waitlist as required under CFR Title 24: Housing and Urban Development.
+
+Questioned Costs: None noted.
+
+Context:
+Out of a total sample size of 60 new program admissions, the following exceptions were noted:
+
+•	In the review of two new admissions, the Authority did not maintain the referral letter from another agency to properly document their admission to the program.
+•	In the review of one new admission, both the referral letter from another agency and the Family Report and determination of assistance were not properly supported since entire tenant file was missing.
+
+Effect:
+Not maintaining appropriate documentation in the files limits the Authority’s ability to demonstrate compliance with waitlist requirements.
+
+Cause:
+Staff have caseloads of 600+ clients which may lead to errors in documentation and calculations. Supervisors review only one percent of staff files. Issues found are notated but all files do not get reviewed. The increase in utilization and the decrease in administrative fees hinders the Authority’s ability to review a higher percentage of the files.
+
+Recommendation:
+We recommend the Authority properly maintain supporting documents when selecting individuals from the waitlist.
+
+View of responsible officials:
+Management concurs with the finding. See correction action plan for additional information.
+",N,874185,1,,
+39755,164877,2020,2020-012,"Condition: County-wide controls regarding Control Environment, Risk Assessment, Information and
+Communication, and Monitoring have not been designed and implemented.",N,938056,1,,
+39756,164877,2020,2020-013,"Condition: During the process of documenting the County’s internal controls regarding federal
+disbursements for Schools and Roads - Grants to State, we noted that LeFlore County has not established
+procedures to ensure compliance with the following compliance requirements: Activities Allowed or
+Unallowed; Allowable Costs/Cost Principles; Cash Management; and Earmarking.",N,938056,1,,
+39757,164877,2020,2020-011,"Condition: During our review and reconciliation of the Schedule of Expenditures of Federal Awards
+(SEFA) as initially prepared by the County, we identified federal programs that were not listed accurately
+which resulted in federal expenditures being understated by $517,282.",N,938056,1,,
+17849,183261,2020,2020-001,"U.S. Department of Agriculture, Rural Development									
+									
+FINDING NO. 2020-001: Rural Rental Housing Loans, CFDA 10.415									
+									
+CRITERIA:									
+In accordance with RD regulations replacement reserve accounts are funded through required monthly transfers from operating cash funds and held for replacement of property and other uses with the approval of RD.									
+									
+CONDITION:									
+During the year ended October 31, 2020 The Senior Housing Corporation of East Haddam, Inc. did not make the required monthly deposits to its replacement reserve account.  At October 31, 2020 the replacement reserve account was underfunded $18,500.									
+									
+CAUSE OF CONDITION:									
+Operating cash funds were not sufficient to make the required transfers to the replacement reserve account.									
+									
+EFFECT OR POTENTIAL EFFECT:									
+The Replacement Reserve account has not been funded as required.									
+									
+RECOMMENDATION:									
+As soon as operating funds are available the underfunding should be transferred to the replacement reserve account. 									
+									
+VIEWS OF RESPONSIBLE OFFICIALS:									
+The Senior Housing Corporation agrees with the finding and the auditor's recommendation.  The underfunding was transferred to the replacement reserve account subsequent to year end.									
+",N,873481,1,,
+35523,247554,2020,2020-004," Finding 2020-4:  Late Deposits to Residual Receipts and Remittance of Excess to HUD (Noncompliance).
+
+Criteria:  Surplus cash, as calculated in the REAC report, must be deposited into the Residual Receipts Reserve and balances in excess of $250 per unit must be remitted to HUD within 90 days of the Organization’s year end.
+
+Condition:  The Organization’s surplus cash calculations from 2016, 2017, 2018, 2019, and 2020 indicate balances in excess totaling $33,506, which were not remitted to HUD account within the specified time frame.
+
+Cause:  The Organization has not remitted balances in excess because their HUD representative has not requested them to do so. 
+
+Effect:  The Organization’s surplus cash calculations from 2016, 2017, 2018, and 2019 indicate balances in excess totaling $33,506, which were not remitted to HUD within the specified time frame.
+
+Repeat Finding:  2017-6, 2018-6, 2019-4
+
+Recommendation:  Management should implement procedures to ensure that surplus cash is deposited into the Residual Receipts Reserve and that balances in excess of $250 per unit are timely remitted to HUD. 
+
+Views of Responsible Officials and Planned Corrective Actions:   Management will contact HUD to coordinate remediation efforts and will implement procedures to ensure that future surplus cash is deposited into the Residual Receipts Reserve within 90 days of the Organization’s year end.
+",N,926625,1,,
+35524,247554,2020,2020-001,"Finding 2020-01:  Inadequate Evidence to Support Segregation of Authorization and Recording Duties over Cash Disbursements (Significant Deficiency).
+
+Criteria:  Internal controls over cash disbursements should ensure that cash is disbursed only upon proper authorization for valid organizational purposes, and that all disbursements are properly recorded.  One of the most important internal controls to help provide reasonable assurance that this will be accomplished is segregating authorization and recording duties.  The organization has an informal policy to require two signatures on all checks, one of which is different from the individual recording the transaction.  
+
+Condition:  The Organization does not have consistent documentation to demonstrate that segregation of authorization and recording duties is occurring for each transaction. 
+
+Cause:  The Organization’s monitoring over the implementation of the cash disbursements policy is not being adequately performed.
+
+Effect:  The organization’s procedures increase the risk that cash may be disbursed for inappropriate organizational purposes.
+
+Repeat of Prior Year Finding:  2017-1, 2018-1, 2019-1
+
+Recommendation:  Management should ensure that the Organization’s cash disbursements policy is written with adequate detail so responsible individuals are identified to implement and monitor the policy.   The Organization must take action to ensure that segregation of duties over authorization and recording is occurring and can be supported by documentary evidence.
+
+Views of Responsible Officials and Planned Corrective Actions:   The Organization agrees with the finding and will review its cash disbursements policy to ensure that responsibility for implementation and monitoring of the policy is assigned. 
+",N,926625,1,,
+35525,247554,2020,2020-002,"Finding 2020-02:  Untimely Tenant Income Certifications (Noncompliance, Material Weakness)
+
+Criteria:  The Housing Investment Partnership Program contracts require that tenant certifications be performed in accordance with 24 CFR 92.203(a)(1)(i) and 92.203.  These standards require an initial certification upon inception of the lease and subsequent annual recertifications.
+
+Condition:  The Organization did not obtain tenant income certifications or recertifications on a timely basis as defined by 24 CFR 92.203(a)(1)(i) and 92.203.  
+
+Cause:  The Organization has not assigned responsibility for implementation and monitoring of these responsibilities to appropriate and competent individuals.  
+
+Effect:  The Organization did not timely obtain tenant income certifications for three of the nine tenants sampled.  Tenant income certifications had been obtained for these three tenants, but they were not obtained or renewed on the annual basis required by the standards.
+
+Recommendation:  Management should assign responsibility for the implementation and monitoring of tenant income certifications to appropriate and competent individuals to ensure they are performed in accordance with 24 CFR 92.203(a)(1)(i) and 92.203.
+
+Views of Responsible Officials and Planned Corrective Actions:   Management agrees with the finding and will develop improved revenue recognition policies related to contribution revenue.  Management will assign responsibility for implementation and monitoring of revenue recognition policies to appropriate and competent individuals.
+
+
+",N,926625,1,,
+35526,247554,2020,2020-003,"Finding 2020-03:  Late Filing of Reports (Noncompliance).
+
+Criteria:  The Organization is subject to various reporting requirements with deadlines established by respective agencies.  Significant requirements include submitting a single audit to the federal government’s Office of Management and Budget, submitting an audit to the Utah State Auditor’s Office, submitting annual financial information and certifications through the Department of Housing and Urban Development’s (HUD) Financial Assessment Subsystem, filing a Form 990 with the federal government’s Internal Revenue Service, and filing quarterly 941s with the Internal Revenue Service.
+
+Condition:  The Organization did not timely file significant reports.  Late reports included reporting for the Utah State Auditor’s Office (2019 and 2020), financial information and certifications for HUD (2018, 2019, and 2020), and Internal Revenue Service forms 941 (2020, two quarters).
+
+Cause:  The Organization has not adequately assigned implementation and monitoring responsibilities for planning, preparing for, and meeting its reporting obligations.  
+
+Effect:  The Organization’s reports with multiple agencies have been submitted late and could result in future restrictions or limitations.
+
+Repeat Finding:  2017-5, 2018-5, 2019-3
+
+Recommendation:  Management must assign responsibility for implementation and monitoring to appropriate and competent individuals.  The Organization should invest additional time and resources in personnel and processes to ensure that significant reporting requirements are met on a timely basis. 
+
+Views of Responsible Officials and Planned Corrective Actions:   Management agrees with the finding.  Management will assign responsibility for implementation and monitoring of important reporting to appropriate and competent individuals.  They will invest time and resources to ensure that significant reporting requirements are understood and met on a timely basis.
+",N,926625,1,,
+46009,255965,2020,2020-002,"Condition:  In 2020, the Organization received a significant amount of money from the federal government that was not utilized within thirty days of receipt. Given the amount of time that the cash was held and the prevailing interest rates in 2020, the resulting gains by the Organization were not material as it relates to questioned costs; however, it is an issue as it relates to the Organization’s internal controls over cash management.
+
+Criteria:  Internal controls should be in place to provide reasonable assurance that federal awards are used for their intended purposes without unnecessary delays.
+
+Effect:  Failure to spend federal awards in a timely fashion could results in significant lost earnings by the federal government and the need for reimbursement by the Organization.
+
+Recommendation: Management should develop a system that ensures that any cash received from federal grantors is used within thirty days of receipt.
+
+Views of Responsible Officials and Planned Corrective Actions:  The USDA grant money was drawn down to an escrow account at a law firm.  Each purchase order was then sent to USDA grant representative. The grant representative  then would message the law firm to cut the checks for the items.  We received the grant prior to covid shutdown in North Carolina.   We then had delays with supply chain and getting invoices and deliveries from suppliers due to the first three months of the covid pandemic and construction delays associated with the pandemic. Those challenges led to the construction being delayed by 4 months and scheduling the receipt of the products. 
+",N,955462,1,,
