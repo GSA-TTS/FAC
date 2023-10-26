@@ -130,21 +130,6 @@ class AuditSummaryView(View):
         return data
 
 
-class XlsxDownloadView(View):
-    def get(self, request, report_id, file_type):
-        # only allow xlsx downloads from disseminated submissions
-        disseminated = get_object_or_404(General, report_id=report_id)
-
-        # only allow xlsx downloads for public submissions
-        if not disseminated.is_public:
-            raise PermissionDenied("You do not have access to this file.")
-
-        sac = get_object_or_404(SingleAuditChecklist, report_id=report_id)
-        filename = get_filename(sac, file_type)
-
-        return redirect(get_download_url(filename))
-
-
 class PdfDownloadView(View):
     def get(self, request, report_id):
         # only allow PDF downloads for disseminated submissions
@@ -156,5 +141,20 @@ class PdfDownloadView(View):
 
         sac = get_object_or_404(SingleAuditChecklist, report_id=report_id)
         filename = get_filename(sac, "report")
+
+        return redirect(get_download_url(filename))
+
+
+class XlsxDownloadView(View):
+    def get(self, request, report_id, file_type):
+        # only allow xlsx downloads from disseminated submissions
+        disseminated = get_object_or_404(General, report_id=report_id)
+
+        # only allow xlsx downloads for public submissions
+        if not disseminated.is_public:
+            raise PermissionDenied("You do not have access to this file.")
+
+        sac = get_object_or_404(SingleAuditChecklist, report_id=report_id)
+        filename = get_filename(sac, file_type)
 
         return redirect(get_download_url(filename))
