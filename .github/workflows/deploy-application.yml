@@ -89,16 +89,6 @@ jobs:
           cf_space: ${{ env.space }}
           command: cf run-task gsa-fac -k 2G -m 2G --name pg_backup --command "./backup_database.sh ${{ env.space }}"
 
-      - name: Backup media files (Prod Only)
-        if: startsWith(github.ref, 'refs/tags/v1.')
-        uses: cloud-gov/cg-cli-tools@main
-        with:
-          cf_username: ${{ secrets.CF_USERNAME }}
-          cf_password: ${{ secrets.CF_PASSWORD }}
-          cf_org: gsa-tts-oros-fac
-          cf_space: ${{ env.space }}
-          command: cf run-task gsa-fac -k 2G -m 2G --name media_backup --command "./s3-sync.sh"
-
       - name: Deploy fac to cloud.gov
         uses: cloud-gov/cg-cli-tools@main
         with:
