@@ -45,6 +45,7 @@ aws s3 ls s3://${BACKUPS_BUCKET}/mediabackups/$date/
 # Cleanup the source bucket so older backups don't get added to the tar
 aws s3 rm s3://${FAC_MEDIA_BUCKET}/mediabackups/$date/archive.tar
 aws s3 rm s3://${FAC_MEDIA_BUCKET}/mediabackups/$date/
+aws s3 rm s3://${FAC_MEDIA_BUCKET}/mediabackups/
 
 # List contents of source bucket to ensure everything was deleted properly
 aws s3 ls s3://${FAC_MEDIA_BUCKET}/mediabackups/$date/
