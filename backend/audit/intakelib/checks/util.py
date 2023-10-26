@@ -59,6 +59,11 @@ def appears_empty(v):
     return (v is None) or (str(v).strip() == "")
 
 
+def is_value_na(v):
+    value = str(v).strip()
+    return value == "N/A"
+
+
 def is_y_or_n(v):
     value = str(v).strip()
     return value == "Y" or value == "N"
