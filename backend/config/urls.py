@@ -18,14 +18,7 @@ schema_view = get_schema_view(
 )
 
 urlpatterns = [
-    # path("", IndexView.as_view(), name="index"),
     path("api/schema.json", schema_view),
-    path("public/api/sac", views.SACViewSet.as_view({"get": "list"}), name="sac-list"),
-    path(
-        "public/api/sac/<str:report_id>",
-        views.SACViewSet.as_view({"get": "retrieve"}),
-        name="sac-detail",
-    ),
     path(
         "api/sac/eligibility",
         views.EligibilityFormView.as_view(),
@@ -79,6 +72,7 @@ urlpatterns = [
         name="sprite",
     ),
     path("audit/", include("audit.urls")),
+    path("dissemination/", include("dissemination.urls")),
     # Keep last so we can use short urls for content pages like home page etc.
     path("", include("cms.urls")),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
