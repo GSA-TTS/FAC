@@ -11,7 +11,6 @@ from dissemination.search import search_general
 from dissemination.models import (
     General,
     FederalAward,
-    Passthrough,
     Finding,
     FindingText,
     CapText,
