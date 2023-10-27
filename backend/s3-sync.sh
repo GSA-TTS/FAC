@@ -7,8 +7,7 @@ unset https_proxy
 curl -L "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
 unzip awscliv2.zip && rm awscliv2.zip
 ./aws/install -i ~/usr -b ~/bin
-export PATH=/home/vcap/app/usr/v2/2.13.28/bin:$PATH
-aws --version
+/home/vcap/app/bin/aws --version
 
 # Get the fac-private-s3 bucket
 export S3CREDS="$(echo $VCAP_SERVICES|jq -r '.s3')"
@@ -32,20 +31,20 @@ unzip s3tar-linux-amd64.zip && rm s3tar-linux-amd64.zip
 ./s3tar-linux-amd64 --region $AWS_DEFAULT_REGION -cvf s3://${FAC_MEDIA_BUCKET}/mediabackups/$date/archive.tar s3://${FAC_MEDIA_BUCKET} --storage-class INTELLIGENT_TIERING
 
 # List contents of source bucket
-aws s3 ls s3://${FAC_MEDIA_BUCKET}/mediabackups/$date/
+/home/vcap/app/bin/aws s3 ls s3://${FAC_MEDIA_BUCKET}/mediabackups/$date/
 
 # Move the tar to the backups bucket
-aws s3 sync s3://${FAC_MEDIA_BUCKET}/mediabackups/$date/ s3://${BACKUPS_BUCKET}/mediabackups/$date/ --storage-class INTELLIGENT_TIERING
+/home/vcap/app/bin/aws s3 sync s3://${FAC_MEDIA_BUCKET}/mediabackups/$date/ s3://${BACKUPS_BUCKET}/mediabackups/$date/ --storage-class INTELLIGENT_TIERING
 # Share the Tar to dest and extract (without including the tar)
 #./s3tar-linux-amd64 --region $AWS_DEFAULT_REGION -cvf s3://${FAC_MEDIA_BUCKET}/mediabackups/$date/archive.tar -C s3://${BACKUPS_BUCKET}/mediabackups/$date/ --storage-class INTELLIGENT_TIERING
 
 # List contents of destination bucket
-aws s3 ls s3://${BACKUPS_BUCKET}/mediabackups/$date/
+/home/vcap/app/bin/aws s3 ls s3://${BACKUPS_BUCKET}/mediabackups/$date/
 
 # Cleanup the source bucket so older backups don't get added to the tar
-aws s3 rm s3://${FAC_MEDIA_BUCKET}/mediabackups/$date/archive.tar
-aws s3 rm s3://${FAC_MEDIA_BUCKET}/mediabackups/$date/
-aws s3 rm s3://${FAC_MEDIA_BUCKET}/mediabackups/
+/home/vcap/app/bin/aws s3 rm s3://${FAC_MEDIA_BUCKET}/mediabackups/$date/archive.tar
+/home/vcap/app/bin/aws s3 rm s3://${FAC_MEDIA_BUCKET}/mediabackups/$date/
+/home/vcap/app/bin/aws s3 rm s3://${FAC_MEDIA_BUCKET}/mediabackups/
 
 # List contents of source bucket to ensure everything was deleted properly
-aws s3 ls s3://${FAC_MEDIA_BUCKET}/mediabackups/$date/
+/home/vcap/app/bin/aws s3 ls s3://${FAC_MEDIA_BUCKET}/mediabackups/$date/
