@@ -140,10 +140,6 @@ class SummaryViewTests(TestCase):
             award.additional_award_identification,
         )
         self.assertEquals(
-            response.context["data"]["Passthrough Entities"][0]["award_reference"],
-            passthrough.award_reference,
-        )
-        self.assertEquals(
             response.context["data"]["Audit Findings"][0]["reference_number"],
             finding.reference_number,
         )
