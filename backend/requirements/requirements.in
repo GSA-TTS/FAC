@@ -17,6 +17,7 @@ gunicorn
 jsonnet
 jsonpath-ng
 jsonschema
+model_bakery
 newrelic
 oic
 openpyxl

@@ -7,7 +7,6 @@ django-debug-toolbar
 djlint
 faker
 flake8
-model_bakery
 mypy
 pandas
 pip-tools
