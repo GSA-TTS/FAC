@@ -220,13 +220,13 @@ class SearchGeneralTests(TestCase):
         baker.make(General, is_public=True, oversight_agency="02")
 
         results = search_general(
-            cog_or_oversight="cog",
+            cog_or_oversight="oversight",
             agency_name="01",
         )
 
         assert_all_results_public(self, results)
         self.assertEqual(len(results), 1)
-        self.assertEqual(results[0].cognizant_agency, "01")
+        self.assertEqual(results[0].oversight_agency, "01")
 
     def test_audit_year(self):
         """
