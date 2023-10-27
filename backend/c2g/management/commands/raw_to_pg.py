@@ -19,6 +19,7 @@ s3_client = boto3.client(
     endpoint_url=settings.AWS_S3_ENDPOINT_URL,
 )
 c2g_bucket_name = settings.AWS_C2G_BUCKET_NAME
+DELIMITER = ","
 
 
 class Command(BaseCommand):
@@ -31,12 +32,14 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument("--folder", help="S3 folder name")
         parser.add_argument("--clean")
+        parser.add_argument("--sample")
 
     def handle(self, *args, **options):
         if options.get("clean") == "True":
-            for mdl in c2g_models:
-                print("Deleting ", mdl)
-                mdl.objects.all().delete()
+            self.delete_data()
+            return
+        if options.get("sample") == "True":
+            self.sample_data()
             return
 
         folder = options.get("folder")
@@ -62,10 +65,23 @@ class Command(BaseCommand):
             row_count = mdl.objects.all().count()
             print(f"{row_count} in ", mdl)
 
+    def delete_data(self):
+        for mdl in c2g_models:
+            print("Deleting ", mdl)
+            mdl.objects.all().delete()
+
+    def sample_data(self):
+        for mdl in c2g_models:
+            print("Sampling ", mdl)
+            rows = mdl.objects.all()[:1]
+            for row in rows:
+                for col in mdl._meta.fields:
+                    print(f"{col.name}: {getattr(row, col.name)}")
+
     def get_model_name(self, name):
+        print("Processing ", name)
         file_name = name.split("/")[-1].split(".")[0]
         for model_name in c2g_model_names:
-            # m_suffix = m[len("census") :]
             if file_name.lower().startswith(model_name):
                 return model_name
         print("Could not find a matching model for ", name)
@@ -73,12 +89,14 @@ class Command(BaseCommand):
 
     def load_table(self, model_obj, rows):
         row_list = list(rows)
-        column_names = row_list[0].decode("utf-8").split("|")
+        column_names = row_list[0].decode("utf-8").split(DELIMITER)
         column_names = [cn.lower().rstrip() for cn in column_names]
         for i in range(1, len(row_list)):
             model_instance = model_obj()
-            row = row_list[i].decode("utf-8").split("|")
+            row = row_list[i].decode("utf-8").split(DELIMITER)
             for column_name in column_names:
+                if column_name == "id":
+                    continue
                 column_number = column_names.index(column_name)
                 if column_number >= len(row):
                     print(
@@ -87,11 +105,13 @@ class Command(BaseCommand):
                         column_name,
                         " in row ",
                         i,
+                        " in model ",
+                        model_obj,
                     )
                 else:
                     value = row[column_number].rstrip()
                     setattr(model_instance, column_name, value)
                     model_instance.save()
-                if i % 100 == 0:
-                    print(f"Loaded {i} of {len(row_list) -1} rows to ", model_obj)
+            if i % 1000 == 0:
+                print(f"Loaded {i} of {len(row_list) -1} rows to ", model_obj)
         print(f"Loaded {len(row_list) -1} rows to ", model_obj)
