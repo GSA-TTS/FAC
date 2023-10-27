@@ -1,5 +1,10 @@
 from .error_messages import messages
 import logging
+from audit.intakelib.intermediate_representation import (
+    get_range_by_name,
+    replace_range_by_name,
+)
+from django.core.exceptions import ValidationError
 
 logger = logging.getLogger(__name__)
 
@@ -60,3 +65,38 @@ def get_names_of_all_ranges(data):
                 if "name" in range_item:
                     names.append(range_item["name"])
     return names
+
+
+def safe_int_conversion(ir, range_name, other_values_allowed=None):
+    range_data = get_range_by_name(ir, range_name)
+    errors = []
+    new_values = []
+    if range_data:
+        for index, value in enumerate(range_data["values"]):
+            try:
+                float_value = float(value)
+                if float_value.is_integer():
+                    new_values.append(int(float_value))
+                else:
+                    raise ValueError
+            except (ValueError, TypeError):
+                # If the value is None, we keep it. This is because some int fields are optional.
+                # For non optional fields, there is a check for missing required fields that will raise an error.
+                if (value is None) or (
+                    other_values_allowed and value in other_values_allowed
+                ):
+                    new_values.append(value)
+                else:
+                    errors.append(
+                        build_cell_error_tuple(
+                            ir,
+                            range_data,
+                            index,
+                            get_message("check_integer_values").format(value),
+                        )
+                    )
+        if len(errors) > 0:
+            logger.info("Raising a validation error.")
+            raise ValidationError(errors)
+    new_ir = replace_range_by_name(ir, range_name, new_values)
+    return new_ir
