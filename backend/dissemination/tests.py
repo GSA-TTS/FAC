@@ -13,7 +13,6 @@ from dissemination.templatetags.field_name_to_label import field_name_to_label
 from dissemination.models import (
     General,
     FederalAward,
-    Passthrough,
     Finding,
     FindingText,
     CapText,
@@ -124,7 +123,6 @@ class SummaryViewTests(TestCase):
         """
         baker.make(General, report_id="2022-12-GSAFAC-0000000001", is_public=True)
         award = baker.make(FederalAward, report_id="2022-12-GSAFAC-0000000001")
-        passthrough = baker.make(Passthrough, report_id="2022-12-GSAFAC-0000000001")
         finding = baker.make(Finding, report_id="2022-12-GSAFAC-0000000001")
         finding_text = baker.make(FindingText, report_id="2022-12-GSAFAC-0000000001")
         cap_text = baker.make(CapText, report_id="2022-12-GSAFAC-0000000001")
