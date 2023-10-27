@@ -90,7 +90,7 @@ class WbGegeratorTestCase(TestCase):
         )
         return gen
 
-    def fake_gen(self, audit_year, dbkey):
+    def fake_cfda(self, audit_year, dbkey):
         # TODO Use realistic values
         cfda = baker.make(ELECAUDITS, AUDITYEAR=audit_year, DBKEY=dbkey)
         return cfda

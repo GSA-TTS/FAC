@@ -1,6 +1,5 @@
 import logging
 import boto3
-import io
 import csv
 
 
