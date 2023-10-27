@@ -100,7 +100,6 @@ class AuditSummaryView(View):
         further. I.e. remove DB ids or something.
         """
         awards = FederalAward.objects.filter(report_id=report_id)
-        passthrough_entities = Passthrough.objects.filter(report_id=report_id)
         audit_findings = Finding.objects.filter(report_id=report_id)
         audit_findings_text = FindingText.objects.filter(report_id=report_id)
         corrective_action_plan = CapText.objects.filter(report_id=report_id)
@@ -117,8 +116,6 @@ class AuditSummaryView(View):
 
         if notes_to_sefa.exists():
             data["Notes to SEFA"] = [x for x in notes_to_sefa.values()]
-        if passthrough_entities.exists():
-            data["Passthrough Entities"] = [x for x in passthrough_entities.values()]
         if audit_findings.exists():
             data["Audit Findings"] = [x for x in audit_findings.values()]
         if audit_findings_text.exists():
