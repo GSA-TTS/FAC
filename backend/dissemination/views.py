@@ -128,22 +128,11 @@ class AuditSummaryView(View):
                 x for x in corrective_action_plan.values()
             ]
         if secondary_auditors.exists():
-            data["Secondary Auditors"] = [
-                x for x in secondary_auditors.values()
-            ]
+            data["Secondary Auditors"] = [x for x in secondary_auditors.values()]
         if additional_ueis.exists():
-            data["Additional UEIs"] = [
-                x for x in additional_ueis.values()
-            ]
+            data["Additional UEIs"] = [x for x in additional_ueis.values()]
         if additional_eins.exists():
-            data["Additional EINs"] = [
-                x for x in additional_eins.values()
-            ]
-
-        for key in data:
-            for item in data[key]:
-                del item["id"]
-                del item["report_id"]
+            data["Additional EINs"] = [x for x in additional_eins.values()]
 
         return data
 
