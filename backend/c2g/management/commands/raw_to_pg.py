@@ -97,7 +97,7 @@ class Command(BaseCommand):
         return None
 
     def load_table(self, model_obj, rows):
-        for i in range(1, len(rows)):
+        for i in range(0, len(rows)):
             # if i > 2:
             #     break
             model_instance = model_obj()
