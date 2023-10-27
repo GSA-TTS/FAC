@@ -16,6 +16,9 @@ from dissemination.models import (
     FindingText,
     CapText,
     Note,
+    SecondaryAuditor,
+    AdditionalEin,
+    AdditionalUei,
 )
 
 
@@ -102,6 +105,9 @@ class AuditSummaryView(View):
         audit_findings_text = FindingText.objects.filter(report_id=report_id)
         corrective_action_plan = CapText.objects.filter(report_id=report_id)
         notes_to_sefa = Note.objects.filter(report_id=report_id)
+        secondary_auditors = SecondaryAuditor.objects.filter(report_id=report_id)
+        additional_ueis = AdditionalUei.objects.filter(report_id=report_id)
+        additional_eins = AdditionalEin.objects.filter(report_id=report_id)
 
         data = {}
 
@@ -120,6 +126,18 @@ class AuditSummaryView(View):
         if corrective_action_plan.exists():
             data["Corrective Action Plan"] = [
                 x for x in corrective_action_plan.values()
+            ]
+        if secondary_auditors.exists():
+            data["Secondary Auditors"] = [
+                x for x in secondary_auditors.values()
+            ]
+        if additional_ueis.exists():
+            data["Additional UEIs"] = [
+                x for x in additional_ueis.values()
+            ]
+        if additional_eins.exists():
+            data["Additional EINs"] = [
+                x for x in additional_eins.values()
             ]
 
         for key in data:
