@@ -1,6 +1,7 @@
 import logging
 import boto3
 import io
+import csv
 
 
 from django.core.management.base import BaseCommand
@@ -58,7 +59,16 @@ class Command(BaseCommand):
             if model_name:
                 model_obj = c2g_models[c2g_model_names.index(model_name)]
                 response = s3_client.get_object(Bucket=c2g_bucket_name, Key=item["Key"])
-                rows = io.BytesIO(response["Body"].read())
+                # rows = io.BytesIO(response["Body"].read().replace(b"\r", b""))
+                # rows = response["Body"].readlines()
+                # rows = []
+                # for line in response["Body"].read().splitlines(keepends=True):
+                #     rows.append(line.replace(b'\r', b''))
+                lines = response["Body"].read().decode("utf-8").splitlines(True)
+                rows = [row for row in csv.DictReader(lines)]
+                # for row in rows:
+                #     print(row)
+                #     break
                 self.load_table(model_obj, rows)
 
         for mdl in c2g_models:
@@ -88,30 +98,16 @@ class Command(BaseCommand):
         return None
 
     def load_table(self, model_obj, rows):
-        row_list = list(rows)
-        column_names = row_list[0].decode("utf-8").split(DELIMITER)
-        column_names = [cn.lower().rstrip() for cn in column_names]
-        for i in range(1, len(row_list)):
+        for i in range(1, len(rows)):
+            # if i > 2:
+            #     break
             model_instance = model_obj()
-            row = row_list[i].decode("utf-8").split(DELIMITER)
-            for column_name in column_names:
+
+            for column_name, value in rows[i].items():
                 if column_name == "id":
                     continue
-                column_number = column_names.index(column_name)
-                if column_number >= len(row):
-                    print(
-                        "Ignoring trailing column ",
-                        column_number,
-                        column_name,
-                        " in row ",
-                        i,
-                        " in model ",
-                        model_obj,
-                    )
-                else:
-                    value = row[column_number].rstrip()
-                    setattr(model_instance, column_name, value)
-                    model_instance.save()
+                setattr(model_instance, column_name, value)
+            model_instance.save()
             if i % 1000 == 0:
-                print(f"Loaded {i} of {len(row_list) -1} rows to ", model_obj)
-        print(f"Loaded {len(row_list) -1} rows to ", model_obj)
+                print(f"Loaded {i} of {len(rows)} rows to ", model_obj)
+        print(f"Loaded {len(rows)} rows to ", model_obj)
