@@ -14,8 +14,9 @@ class WbGegeratorTestCase(TestCase):
         self.fake_cfda(audit_year, dbkey).save()
         self.fake_cfda(audit_year, dbkey).save()
         result = generate_workbooks(audit_year, dbkey)
-        wb_ref = result.get("Workbook")
-        self.assertIsNotNone(wb_ref)
+        success_log = result.get("success")
+        self.assertIsNotNone(success_log)
+        print(success_log)
 
     def fake_gen(self, audit_year, dbkey):
         gen = baker.make(
@@ -92,5 +93,5 @@ class WbGegeratorTestCase(TestCase):
 
     def fake_cfda(self, audit_year, dbkey):
         # TODO Use realistic values
-        cfda = baker.make(ELECAUDITS, AUDITYEAR=audit_year, DBKEY=dbkey)
+        cfda = baker.make(ELECAUDITS, AUDITYEAR=audit_year, DBKEY=dbkey, CFDA="93.667")
         return cfda
