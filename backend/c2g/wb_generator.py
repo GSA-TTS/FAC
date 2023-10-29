@@ -1,12 +1,12 @@
 from django.contrib.auth import get_user_model
 
-from .workbooklib import workbook_creation
+from .workbooklib.end_to_end_workbook import generate_workbooks
 from .models import ELECAUDITHEADER
 
 User = get_user_model()
 
 
-def generate_workbooks(audit_year, dbkey):
+def load_historic_data(audit_year, dbkey):
     gen = ELECAUDITHEADER.objects.get(AUDITYEAR=audit_year, DBKEY=dbkey)
     user_email = gen.AUDITEEEMAIL
     user = create_or_get_user(user_email)
@@ -14,7 +14,7 @@ def generate_workbooks(audit_year, dbkey):
     result["success"] = [
         f"{user.email} created or found",
     ]
-    sac = workbook_creation.setup_sac(user, gen)
+    sac = generate_workbooks(user, gen)
     result["success"].append(f"{sac.report_id} created")
     return result
 

@@ -2,7 +2,7 @@ from django.test import TestCase
 
 from model_bakery import baker
 
-from .wb_generator import generate_workbooks
+from .wb_generator import load_historic_data
 from .models import ELECAUDITHEADER, ELECAUDITS
 
 
@@ -12,8 +12,8 @@ class WbGegeratorTestCase(TestCase):
         dbkey = "10001"
         self.fake_gen(audit_year, dbkey).save()
         self.fake_cfda(audit_year, dbkey).save()
-        self.fake_cfda(audit_year, dbkey).save()
-        result = generate_workbooks(audit_year, dbkey)
+        self.fake_cfda(audit_year, dbkey, variant=2).save()
+        result = load_historic_data(audit_year, dbkey)
         success_log = result.get("success")
         self.assertIsNotNone(success_log)
         print(success_log)
@@ -91,7 +91,19 @@ class WbGegeratorTestCase(TestCase):
         )
         return gen
 
-    def fake_cfda(self, audit_year, dbkey):
+    def fake_cfda(self, audit_year, dbkey, variant=1):
         # TODO Use realistic values
-        cfda = baker.make(ELECAUDITS, AUDITYEAR=audit_year, DBKEY=dbkey, CFDA="93.667")
+        cfda = baker.make(
+            ELECAUDITS,
+            AUDITYEAR=audit_year,
+            DBKEY=dbkey,
+            CFDA="93.667",
+            FEDERALPROGRAMNAME="SOCIAL SERVICES BLOCK GRANT",
+            AMOUNT="95248",
+            MAJORPROGRAM="N",
+            DIRECT="Y",
+            LOANS="N",
+            CLUSTERTOTAL="190496",
+            FINDINGSCOUNT="0",
+        )
         return cfda

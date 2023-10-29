@@ -209,7 +209,7 @@ def _fake_audit_information(gen: Gen):
     return audit_information
 
 
-def _create_test_sac(user, gen: Gen):
+def     _create_sac(user, gen: Gen):
     """Create a single example SAC."""
 
     try:

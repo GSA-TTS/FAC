@@ -1,5 +1,5 @@
 from collections import namedtuple as NT
-from playhouse.shortcuts import model_to_dict
+
 import os
 import sys
 
@@ -8,6 +8,8 @@ from datetime import date
 from config import settings
 import re
 import json
+
+from audit.models import SingleAuditChecklist
 
 logger = logging.getLogger(__name__)
 
@@ -101,14 +103,17 @@ def set_range(wb, range_name, values, default=None, conversion_fun=str):
             pass
 
 
-def set_uei(Gen, wb, dbkey):
-    g = Gen.select().where(Gen.dbkey == dbkey).get()
-    if g.uei:
-        set_single_cell_range(wb, "auditee_uei", g.uei)
-    else:
-        g.uei = "BADBADBADBAD"
-        set_single_cell_range(wb, "auditee_uei", g.uei)
-    return g
+def set_uei(sac: SingleAuditChecklist, wb):
+    uei = sac.auditee_uei if sac.auditee_uei else "BADBADBADBAD"
+    set_single_cell_range(wb, "auditee_uei", uei)
+
+
+def model_to_dict(model_instance):
+    model_dict = {}
+    for field in model_instance._meta.fields:
+        model_dict[field.name] = getattr(model_instance, field.name)
+
+    return model_dict
 
 
 def map_simple_columns(wb, mappings, values):
@@ -136,7 +141,7 @@ def map_simple_columns(wb, mappings, values):
         )
 
 
-def _census_date_to_datetime(cd):
+def _census_date_to_datetime(cd: str):
     # lookup = {
     #     "JAN": 1,
     #     "FEB": 2,
@@ -152,9 +157,17 @@ def _census_date_to_datetime(cd):
     #     "DEC": 12,
     # }
     # example 12/31/2022 00:00:00
-    year = int(cd.split("/")[2][:4])
-    month = int(cd.split("/")[0])
-    day = int(cd.split("/")[1])
+    if "/" in cd:
+        year = int(cd.split("/")[2][:4])
+        month = int(cd.split("/")[0])
+        day = int(cd.split("/")[1])
+        return date(year, month, day)
+
+    # example 2022-12-31
+    elements = cd.split("-")
+    year = int(elements[0])
+    month = int(elements[1])
+    day = int(elements[2])
     return date(year, month, day)
 
 
@@ -170,10 +183,14 @@ def dbkey_to_test_report_id(audit_year, fy_end_date, dbkey):
     return f"{audit_year}-{dt.month:02}-TSTDAT-{dbkey.zfill(10)}"
 
 
-def generate_dissemination_test_table(Gen, api_endpoint, dbkey, mappings, objects):
+def generate_dissemination_test_table(
+    sac: SingleAuditChecklist, api_endpoint, audit_year, dbkey, mappings, objects
+):
     table = {"rows": list(), "singletons": dict()}
     table["endpoint"] = api_endpoint
-    table["report_id"] = dbkey_to_test_report_id(Gen, dbkey)
+    table["report_id"] = dbkey_to_test_report_id(
+        audit_year, sac.auditee_fiscal_period_end, dbkey
+    )
     for o in objects:
         as_dict = model_to_dict(o)
         test_obj = {}
