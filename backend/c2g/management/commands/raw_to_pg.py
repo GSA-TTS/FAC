@@ -1,6 +1,6 @@
 import logging
 import boto3
-import io
+import csv
 
 
 from django.core.management.base import BaseCommand
@@ -19,6 +19,7 @@ s3_client = boto3.client(
     endpoint_url=settings.AWS_S3_ENDPOINT_URL,
 )
 c2g_bucket_name = settings.AWS_C2G_BUCKET_NAME
+DELIMITER = ","
 
 
 class Command(BaseCommand):
@@ -31,12 +32,14 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument("--folder", help="S3 folder name")
         parser.add_argument("--clean")
+        parser.add_argument("--sample")
 
     def handle(self, *args, **options):
         if options.get("clean") == "True":
-            for mdl in c2g_models:
-                print("Deleting ", mdl)
-                mdl.objects.all().delete()
+            self.delete_data()
+            return
+        if options.get("sample") == "True":
+            self.sample_data()
             return
 
         folder = options.get("folder")
@@ -55,43 +58,55 @@ class Command(BaseCommand):
             if model_name:
                 model_obj = c2g_models[c2g_model_names.index(model_name)]
                 response = s3_client.get_object(Bucket=c2g_bucket_name, Key=item["Key"])
-                rows = io.BytesIO(response["Body"].read())
+                # rows = io.BytesIO(response["Body"].read().replace(b"\r", b""))
+                # rows = response["Body"].readlines()
+                # rows = []
+                # for line in response["Body"].read().splitlines(keepends=True):
+                #     rows.append(line.replace(b'\r', b''))
+                lines = response["Body"].read().decode("utf-8").splitlines(True)
+                rows = [row for row in csv.DictReader(lines)]
+                # for row in rows:
+                #     print(row)
+                #     break
                 self.load_table(model_obj, rows)
 
         for mdl in c2g_models:
             row_count = mdl.objects.all().count()
             print(f"{row_count} in ", mdl)
 
+    def delete_data(self):
+        for mdl in c2g_models:
+            print("Deleting ", mdl)
+            mdl.objects.all().delete()
+
+    def sample_data(self):
+        for mdl in c2g_models:
+            print("Sampling ", mdl)
+            rows = mdl.objects.all()[:1]
+            for row in rows:
+                for col in mdl._meta.fields:
+                    print(f"{col.name}: {getattr(row, col.name)}")
+
     def get_model_name(self, name):
+        print("Processing ", name)
         file_name = name.split("/")[-1].split(".")[0]
         for model_name in c2g_model_names:
-            # m_suffix = m[len("census") :]
             if file_name.lower().startswith(model_name):
                 return model_name
         print("Could not find a matching model for ", name)
         return None
 
     def load_table(self, model_obj, rows):
-        row_list = list(rows)
-        column_names = row_list[0].decode("utf-8").split("|")
-        column_names = [cn.lower().rstrip() for cn in column_names]
-        for i in range(1, len(row_list)):
+        for i in range(1, len(rows)):
+            # if i > 2:
+            #     break
             model_instance = model_obj()
-            row = row_list[i].decode("utf-8").split("|")
-            for column_name in column_names:
-                column_number = column_names.index(column_name)
-                if column_number >= len(row):
-                    print(
-                        "Ignoring trailing column ",
-                        column_number,
-                        column_name,
-                        " in row ",
-                        i,
-                    )
-                else:
-                    value = row[column_number].rstrip()
-                    setattr(model_instance, column_name, value)
-                    model_instance.save()
-                if i % 100 == 0:
-                    print(f"Loaded {i} of {len(row_list) -1} rows to ", model_obj)
-        print(f"Loaded {len(row_list) -1} rows to ", model_obj)
+
+            for column_name, value in rows[i].items():
+                if column_name == "id":
+                    continue
+                setattr(model_instance, column_name, value)
+            model_instance.save()
+            if i % 1000 == 0:
+                print(f"Loaded {i} of {len(rows)} rows to ", model_obj)
+        print(f"Loaded {len(rows)} rows to ", model_obj)
