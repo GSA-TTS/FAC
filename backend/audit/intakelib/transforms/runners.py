@@ -22,6 +22,7 @@ from .xform_all_alns_need_to_be_strings import all_alns_need_to_be_strings
 from .xform_all_passthrough_id_need_to_be_strings import (
     all_passthrough_id_need_to_be_strings,
 )
+from .xform_add_transform_for_cfda_key import generate_cfda_keys
 
 logger = logging.getLogger(__name__)
 
@@ -60,4 +61,6 @@ additional_eins_transforms = general_transforms + [
 federal_awards_transforms = general_transforms + [
     all_alns_need_to_be_strings,
     all_passthrough_id_need_to_be_strings,
+    # FIXME: Make sure generate_cfda_keys is placed after convert_to_stripped_string when PR #2640 is merged
+    generate_cfda_keys,
 ]
