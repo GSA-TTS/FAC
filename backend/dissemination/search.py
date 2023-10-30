@@ -17,7 +17,10 @@ def search_general(
     # TODO: use something like auditee_name__contains
     # SELECT * WHERE auditee_name LIKE '%SomeString%'
     if names:
-        names_match = Q(Q(auditee_name__in=names) | Q(auditor_firm_name__in=names))
+        names_match = Q()
+        for name in names:
+            names_match.add(Q(auditee_name__search=name), Q.OR)
+            names_match.add(Q(auditor_firm_name__search=name), Q.OR)
         query.add(names_match, Q.AND)
 
     if uei_or_eins:
