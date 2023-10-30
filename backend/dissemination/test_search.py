@@ -82,6 +82,32 @@ class SearchGeneralTests(TestCase):
         assert_all_results_public(self, results)
         self.assertEqual(len(results), 2)
 
+    def test_name_matches_inexact(self):
+        """
+        Given a partial name, search_general should return records whose name fields contain the term, even if not an exact match
+        """
+        auditee_match = baker.make(
+            General, is_public=True, auditee_name="the university of somewhere"
+        )
+        auditor_match = baker.make(
+            General, is_public=True, auditor_firm_name="auditors unite, LLC"
+        )
+        baker.make(General, is_public=True, auditee_name="not looking for this auditee")
+        baker.make(
+            General,
+            is_public=True,
+            auditor_firm_name="not looking for this auditor firm",
+        )
+
+        results = search_general(
+            names=["UNIVERSITY", "unitE", "there is not match for this one"]
+        )
+
+        assert_all_results_public(self, results)
+        self.assertEqual(len(results), 2)
+        self.assertEqual(results[0], auditee_match)
+        self.assertEqual(results[1], auditor_match)
+
     def test_uei_or_ein_matches_uei(self):
         """
         Given a uei_or_ein, search_general should return records with a matching UEI
@@ -194,13 +220,13 @@ class SearchGeneralTests(TestCase):
         baker.make(General, is_public=True, oversight_agency="02")
 
         results = search_general(
-            cog_or_oversight="cog",
+            cog_or_oversight="oversight",
             agency_name="01",
         )
 
         assert_all_results_public(self, results)
         self.assertEqual(len(results), 1)
-        self.assertEqual(results[0].cognizant_agency, "01")
+        self.assertEqual(results[0].oversight_agency, "01")
 
     def test_audit_year(self):
         """
