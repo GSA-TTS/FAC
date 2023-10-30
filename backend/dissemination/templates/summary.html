@@ -117,9 +117,7 @@
                                         </span>
                                     {% else %}
                                         <a class="usa-button usa-button--unstyled display-flex flex-align-center"
-                                        {% comment %}
-                                        href="{% url 'dissemination:PdfDownload' report_id=report_id %}"
-                                        {% endcomment %}
+                                        href="{% url 'dissemination:XlsxDownload' file_type="AdditionalUeis" report_id=report_id %}"
                                         target="_blank">
                                             <svg class="usa-icon usa-icon--size-3 margin-right-05"
                                                 aria-hidden="true"
@@ -159,9 +157,7 @@
                                         </span>
                                     {% else %}
                                         <a class="usa-button usa-button--unstyled display-flex flex-align-center"
-                                        {% comment %}
-                                        href="{% url 'dissemination:PdfDownload' report_id=report_id %}"
-                                        {% endcomment %}
+                                        href="{% url 'dissemination:XlsxDownload' file_type="AdditionalEins" report_id=report_id %}"
                                         target="_blank">
                                             <svg class="usa-icon usa-icon--size-3 margin-right-05"
                                                 aria-hidden="true"
@@ -255,9 +251,7 @@
                                         </span>
                                     {% else %}
                                         <a class="usa-button usa-button--unstyled display-flex flex-align-center"
-                                        {% comment %}
-                                        href="{% url 'dissemination:PdfDownload' report_id=report_id %}"
-                                        {% endcomment %}
+                                        href="{% url 'dissemination:XlsxDownload' file_type="SecondaryAuditors" report_id=report_id %}"
                                         target="_blank">
                                             <svg class="usa-icon usa-icon--size-3 margin-right-05"
                                                 aria-hidden="true"
@@ -284,9 +278,7 @@
                                         {{ data|getkey:"Awards"|length }}
                                     </span>
                                     <a class="usa-button usa-button--unstyled display-flex flex-align-center"
-                                       {% comment %}
-                                       href="{% url 'dissemination:PdfDownload' report_id=report_id %}"
-                                       {% endcomment %}
+                                       href="{% url 'dissemination:XlsxDownload' file_type="FederalAwardsExpended" report_id=report_id %}"
                                        target="_blank">
                                         <svg class="usa-icon usa-icon--size-3 margin-right-05"
                                              aria-hidden="true"
@@ -313,9 +305,7 @@
                                         </span>
                                     {% else %}
                                         <a class="usa-button usa-button--unstyled display-flex flex-align-center"
-                                        {% comment %}
-                                        href="{% url 'dissemination:PdfDownload' report_id=report_id %}"
-                                        {% endcomment %}
+                                        href="{% url 'dissemination:XlsxDownload' file_type="NotesToSefa" report_id=report_id %}"
                                         target="_blank">
                                             <svg class="usa-icon usa-icon--size-3 margin-right-05"
                                                 aria-hidden="true"
@@ -345,9 +335,7 @@
                                         </span>
                                     {% else %}
                                         <a class="usa-button usa-button--unstyled display-flex flex-align-center"
-                                        {% comment %}
-                                        href="{% url 'dissemination:PdfDownload' report_id=report_id %}"
-                                        {% endcomment %}
+                                        href="{% url 'dissemination:XlsxDownload' file_type="FindingsUniformGuidance" report_id=report_id %}"
                                         target="_blank">
                                             <svg class="usa-icon usa-icon--size-3 margin-right-05"
                                                 aria-hidden="true"
@@ -376,9 +364,7 @@
                                         </span>
                                     {% else %}
                                         <a class="usa-button usa-button--unstyled display-flex flex-align-center"
-                                        {% comment %}
-                                        href="{% url 'dissemination:PdfDownload' report_id=report_id %}"
-                                        {% endcomment %}
+                                        href="{% url 'dissemination:XlsxDownload' file_type="FindingsText" report_id=report_id %}"
                                         target="_blank">
                                             <svg class="usa-icon usa-icon--size-3 margin-right-05"
                                                 aria-hidden="true"
@@ -409,9 +395,7 @@
                                         </span>
                                     {% else %}
                                         <a class="usa-button usa-button--unstyled display-flex flex-align-center"
-                                        {% comment %}
-                                        href="{% url 'dissemination:PdfDownload' report_id=report_id %}"
-                                        {% endcomment %}
+                                        href="{% url 'dissemination:XlsxDownload' file_type="CorrectiveActionPlan" report_id=report_id %}"
                                         target="_blank">
                                             <svg class="usa-icon usa-icon--size-3 margin-right-05"
                                                 aria-hidden="true"
