@@ -13,6 +13,8 @@ from django.db.models import Q
 
 
 from config import settings
+from .trabsformers import clean_cfda
+
 from c2g.models import (
     ELECAUDITS as Cfda,
     ELECPASSTHROUGH as PassThrough,
@@ -210,6 +212,9 @@ def generate_federal_awards(sac, dbkey, audit_year, outfile):
     insert_version_and_sheet_name(wb, "federal-awards-workbook")
 
     cfdas = Cfda.objects.filter(DBKEY=dbkey, AUDITYEAR=audit_year)
+    cfda: Cfda
+    for cfda in cfdas:
+        clean_cfda(cfda)
     map_simple_columns(wb, mappings, cfdas)
 
     # Patch the clusternames. They used to be allowed to enter anything

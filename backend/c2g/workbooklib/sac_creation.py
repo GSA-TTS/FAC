@@ -12,7 +12,7 @@ from django.apps import apps
 from django.core.files.uploadedfile import SimpleUploadedFile
 from jsonschema import ValidationError
 from audit.models import SingleAuditChecklist
-from .trabsformers import get_cpacpuntry, normalize_entity_type, normalize_zip
+from .trabsformers import clean_gen
 from c2g.models import (
     ELECAUDITHEADER as Gen,
     ELECAUDITS as Cfda,
@@ -102,7 +102,6 @@ def _fake_general_information(user, gen: Gen):
     auditee_fiscal_period_start = (
         _census_date_to_datetime(gen.FYSTARTDATE) - timedelta(days=365)
     ).strftime("%Y-%m-%d")
-    cpacountry = get_cpacpuntry(gen.CPACOUNTRY)
 
     general_information = {
         "auditee_fiscal_period_start": auditee_fiscal_period_start,
@@ -120,13 +119,13 @@ def _fake_general_information(user, gen: Gen):
         "auditee_state": gen.STATE,
         # TODO: this is GSA's UEI. We could do better at making random choices that
         # pass the schema's complex regex validation
-        "auditee_uei": gen.UEI or "BADBADBADBAD",
-        "auditee_zip": (gen.ZIPCODE),
+        "auditee_uei": gen.UEI,
+        "auditee_zip": gen.ZIPCODE,
         "auditor_address_line_1": gen.CPASTREET1,
         "auditor_city": gen.CPACITY,
         "auditor_contact_name": gen.CPACONTACT,
         "auditor_contact_title": gen.CPATITLE,
-        "auditor_country": cpacountry,
+        "auditor_country": gen.CPACOUNTRY,
         "auditor_ein": gen.AUDITOR_EIN,
         "auditor_ein_not_an_ssn_attestation": True,
         "auditor_email": gen.CPAEMAIL if gen.CPAEMAIL else "noemailfound@noemail.com",
@@ -134,14 +133,14 @@ def _fake_general_information(user, gen: Gen):
         "auditor_phone": gen.CPAPHONE,
         # TODO: when we include territories in our valid states, remove this restriction
         "auditor_state": gen.CPASTATE,
-        "auditor_zip": (gen.CPAZIPCODE),
+        "auditor_zip": gen.CPAZIPCODE,
         "ein": gen.EIN,
         "ein_not_an_ssn_attestation": True,
         "is_usa_based": True,
         "met_spending_threshold": True,
         "multiple_eins_covered": True if gen.MULTIPLEEINS == "Y" else False,
         "multiple_ueis_covered": True if gen.MULTIPLEUEIS == "Y" else False,
-        "user_provided_organization_type": normalize_entity_type(gen.ENTITY_TYPE),
+        "user_provided_organization_type": gen.ENTITY_TYPE,
         "secondary_auditors_exist": True if gen.MULTIPLE_CPAS == "Y" else False,
     }
 
@@ -198,12 +197,13 @@ def _fake_audit_information(gen: Gen):
 
 
 def _create_sac(user, gen: Gen):
+    clean_gen(gen)
+
     """Create a single example SAC."""
+    report_id = dbkey_to_test_report_id(gen.AUDITYEAR, gen.FYENDDATE, gen.DBKEY)
 
     try:
-        exists = SingleAuditChecklist.objects.get(
-            report_id=dbkey_to_test_report_id(gen.AUDITYEAR, gen.FYENDDATE, gen.DBKEY)
-        )
+        exists = SingleAuditChecklist.objects.get(report_id=report_id)
     except SingleAuditChecklist.DoesNotExist:
         exists = None
     if exists:
@@ -215,7 +215,7 @@ def _create_sac(user, gen: Gen):
         audit_information=_fake_audit_information(gen),
     )
     # Set a TEST report id for this data
-    sac.report_id = dbkey_to_test_report_id(gen.AUDITYEAR, gen.FYENDDATE, gen.DBKEY)
+    sac.report_id = report_id
 
     sac.auditee_certification = {}
     sac.auditee_certification["auditee_signature"] = {}
