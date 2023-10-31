@@ -8,7 +8,6 @@ from dissemination.workbooklib.excel_creation import (
     test_pfix,
 )
 
-from dissemination.workbooklib.excel_creation import insert_version_and_sheet_name
 from dissemination.workbooklib.census_models.census import dynamic_import
 
 
@@ -33,7 +32,6 @@ def generate_corrective_action_plan(dbkey, year, outfile):
     ]
 
     g = set_uei(Gen, wb, dbkey)
-    insert_version_and_sheet_name(wb, "corrective-action-plan-workbook")
 
     captexts = Captext.select().where(Captext.dbkey == g.dbkey)
 
