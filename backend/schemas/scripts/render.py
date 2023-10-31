@@ -98,8 +98,6 @@ def process_spec(WBNT):
         unlock_data_entry_cells(WBNT.title_row, ws, sheet)
         set_column_widths(wb, ws, sheet)
         set_row_heights(wb, ws, sheet)
-        if sheet.header_inclusion is not None:
-            apply_header_cell_style(ws, sheet.header_inclusion)
 
     set_wb_security(wb, password)
     return wb
@@ -431,14 +429,6 @@ def configure_header_cell(ws, r):
     the_cell.fill = header_row_fill
     the_cell.font = header_row_font
     the_cell.alignment = Alignment(wrapText=True, wrap_text=True)
-
-
-def apply_header_cell_style(ws, additional_header_cells):
-    print("---- apply_header_cell_style ----")
-    print(additional_header_cells)
-    for ahc in additional_header_cells.cells:
-        the_cell = ws[ahc]
-        the_cell.fill = header_row_fill
 
 
 def process_text_ranges(wb, ws, sheet):

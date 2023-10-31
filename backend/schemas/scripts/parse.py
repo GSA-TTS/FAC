@@ -15,7 +15,7 @@ from collections import namedtuple as NT
 
 Sheet = NT(
     "Sheet",
-    "name single_cells meta_cells open_ranges header_inclusion text_ranges header_height row_height hide_col_from hide_row_from",
+    "name single_cells meta_cells open_ranges text_ranges header_height row_height hide_col_from hide_row_from",
 )
 Posn = NT(
     "Posn",
@@ -164,7 +164,7 @@ def parse_text_range(spec):
 
 
 def parse_sheet(spec):  # noqa: C901
-    sc, mtc, opr, hi, tr = None, None, None, None, None
+    sc, mtc, opr, tr = None, None, None, None
     name = get(spec, "name", default="Unnamed Sheet")
     if "single_cells" in spec:
         sc = list(map(parse_single_cell, get(spec, "single_cells", default=[])))
@@ -178,10 +178,6 @@ def parse_sheet(spec):  # noqa: C901
         opr = list(map(parse_open_range, get(spec, "open_ranges", default=[])))
     else:
         opr = []
-    if "header_inclusion" in spec:
-        hi = parse_header_inclusion(get(spec, "header_inclusion"))
-    else:
-        hi = HeaderInclusion([])
     if "text_ranges" in spec:
         tr = list(map(parse_text_range, get(spec, "text_ranges", default=[])))
     else:
@@ -202,7 +198,7 @@ def parse_sheet(spec):  # noqa: C901
         hrf = get(spec, "hide_row_from")
     else:
         hrf = None
-    return Sheet(name, sc, mtc, opr, hi, tr, hh, rh, hcf, hrf)
+    return Sheet(name, sc, mtc, opr, tr, hh, rh, hcf, hrf)
 
 
 def parse_spec(spec):
