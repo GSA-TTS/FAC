@@ -1,5 +1,4 @@
 def get_cpacpuntry(country: str):
-    print("JMM: CPACOUMYTU was:", country)
     if country.upper() in ["", "US", "USA"]:
         cpacountry = "USA"
     else:
