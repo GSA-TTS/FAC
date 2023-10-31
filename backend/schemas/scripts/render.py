@@ -26,7 +26,7 @@ Range = NT(
     "name,column,label_row,range_start_row,range_start,abs_range_start,full_range",
 )
 
-MAX_ROWS = 5000
+MAX_ROWS = 10000
 XLSX_MAX_ROWS = 1048576  # Excel has a maximum of 1048576 rows
 XLSX_MAX_COLS = 16384  # Excel has a maximum of 16384 columns
 
@@ -456,7 +456,7 @@ def unlock_data_entry_cells(header_row, ws, sheet):
     for r in sheet.open_ranges:
         if not r.posn.keep_locked:
             coords = make_range(r)
-            for rowndx in range(coords.range_start_row, MAX_ROWS):
+            for rowndx in range(coords.range_start_row, MAX_ROWS + 1):
                 cell_reference = f"${coords.column}${rowndx}"
                 cell = ws[cell_reference]
                 cell.protection = Protection(locked=False)
