@@ -13,13 +13,21 @@ logger = logging.getLogger(__name__)
 
 def get_filename(sac, file_type):
     if file_type == "report":
-        file_obj = SingleAuditReportFile.objects.filter(sac=sac).latest("date_created")
-        return f"singleauditreport/{file_obj.filename}"
+        try:
+            file_obj = SingleAuditReportFile.objects.filter(sac=sac).latest(
+                "date_created"
+            )
+            return f"singleauditreport/{file_obj.filename}"
+        except SingleAuditReportFile.DoesNotExist:
+            raise Http404()
     else:
-        file_obj = ExcelFile.objects.filter(sac=sac, form_section=file_type).latest(
-            "date_created"
-        )
-        return f"excel/{file_obj.filename}"
+        try:
+            file_obj = ExcelFile.objects.filter(sac=sac, form_section=file_type).latest(
+                "date_created"
+            )
+            return f"excel/{file_obj.filename}"
+        except ExcelFile.DoesNotExist:
+            raise Http404()
 
 
 def file_exists(filename):
