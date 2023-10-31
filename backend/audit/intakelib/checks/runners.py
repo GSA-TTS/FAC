@@ -42,6 +42,9 @@ from .check_federal_award_passed_passed_through_optional import (
 from .check_cardinality_of_passthrough_names_and_ids import (
     cardinality_of_passthrough_names_and_ids,
 )
+from .check_has_all_the_named_ranges import has_all_the_named_ranges
+
+from .check_show_ir import show_ir
 
 ############
 # Audit findings checks
@@ -59,6 +62,7 @@ general_checks = [
 
 federal_awards_checks = general_checks + [
     is_right_workbook(FORM_SECTIONS.FEDERAL_AWARDS_EXPENDED),
+    has_all_the_named_ranges(FORM_SECTIONS.FEDERAL_AWARDS_EXPENDED),
     missing_award_numbers,
     num_findings_always_present,
     cluster_name_always_present,
@@ -83,36 +87,44 @@ federal_awards_checks = general_checks + [
 
 notes_to_sefa_checks = general_checks + [
     is_right_workbook(FORM_SECTIONS.NOTES_TO_SEFA),
+    has_all_the_named_ranges(FORM_SECTIONS.NOTES_TO_SEFA),
 ]
 
 audit_findings_checks = general_checks + [
     is_right_workbook(FORM_SECTIONS.FINDINGS_UNIFORM_GUIDANCE),
+    has_all_the_named_ranges(FORM_SECTIONS.FINDINGS_UNIFORM_GUIDANCE),
     no_repeat_findings,
     findings_grid_validation,
 ]
 
 additional_eins_checks = general_checks + [
     is_right_workbook(FORM_SECTIONS.ADDITIONAL_EINS),
+    has_all_the_named_ranges(FORM_SECTIONS.ADDITIONAL_EINS),
 ]
 
 additional_ueis_checks = general_checks + [
     is_right_workbook(FORM_SECTIONS.ADDITIONAL_UEIS),
+    has_all_the_named_ranges(FORM_SECTIONS.ADDITIONAL_UEIS),
 ]
 
 audit_findings_text_checks = general_checks + [
     is_right_workbook(FORM_SECTIONS.FINDINGS_TEXT),
+    has_all_the_named_ranges(FORM_SECTIONS.FINDINGS_TEXT),
 ]
 
 corrective_action_plan_checks = general_checks + [
     is_right_workbook(FORM_SECTIONS.CORRECTIVE_ACTION_PLAN),
+    has_all_the_named_ranges(FORM_SECTIONS.CORRECTIVE_ACTION_PLAN),
 ]
 
 secondary_auditors_checks = general_checks + [
     is_right_workbook(FORM_SECTIONS.SECONDARY_AUDITORS),
+    has_all_the_named_ranges(FORM_SECTIONS.SECONDARY_AUDITORS),
 ]
 
 
 def run_all_checks(ir, list_of_checks, section_name=None):
+    show_ir
     errors = []
     if section_name:
         res = is_right_workbook(section_name)(ir)

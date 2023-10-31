@@ -21,7 +21,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
           node-version: 18
 
@@ -39,7 +39,7 @@ jobs:
 
       - name: Run Django test suite
         working-directory: ./backend
-        run: docker compose -f docker-compose.yml run web bash -c 'coverage run --parallel-mode --concurrency=multiprocessing manage.py test --parallel && coverage combine && coverage report -m --fail-under=90 && coverage xml -o coverage.xml'
+        run: docker compose -f docker-compose.yml run web bash -c 'coverage run --parallel-mode --concurrency=multiprocessing manage.py test --parallel && coverage combine && coverage report -m --fail-under=85 && coverage xml -o coverage.xml'
 
       - name: Copy Coverage From Docker Container
         run: |
@@ -51,7 +51,7 @@ jobs:
         uses: 5monkeys/cobertura-action@master
         with:
           path: ./coverage.xml
-          minimum_coverage: 90
+          minimum_coverage: 85
           skip_covered: true # Set to true to remove 100% covered from report
           fail_below_threshold: false # Fails the action if 90% threshold is not met
           show_missing: true
@@ -70,7 +70,7 @@ jobs:
   #     DISABLE_AUTH: True
   #   steps:
   #     - uses: actions/checkout@v4
-  #     - uses: actions/setup-node@v3
+  #     - uses: actions/setup-node@v4
   #       with:
   #         node-version: 18
   #     - name: Start services

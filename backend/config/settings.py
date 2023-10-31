@@ -175,7 +175,13 @@ DATABASES = {
     ),
 }
 
-POSTGREST = {"URL": env.str("POSTGREST_URL", "http://api:3000")}
+POSTGREST = {
+    "URL": env.str("POSTGREST_URL", "http://api:3000"),
+    "LOCAL": env.str("POSTGREST_URL", "http://api:3000"),
+    "DEVELOPMENT": "https://api-dev.fac.gov",
+    "STAGING": "https://api-staging.fac.gov",
+    "PRODUCTION": "https://api.fac.gov",
+}
 
 
 # Password validation
@@ -260,6 +266,10 @@ if ENVIRONMENT not in ["DEVELOPMENT", "PREVIEW", "STAGING", "PRODUCTION"]:
 
     AWS_S3_ENDPOINT_URL = AWS_S3_PRIVATE_ENDPOINT
 
+    # when running locally, the internal endpoint (docker network) is different from the external endpoint (host network)
+    AWS_S3_PRIVATE_INTERNAL_ENDPOINT = AWS_S3_ENDPOINT_URL
+    AWS_S3_PRIVATE_EXTERNAL_ENDPOINT = "http://localhost:9001"
+
     DISABLE_AUTH = env.bool("DISABLE_AUTH", default=False)
 
     # Used for backing up the database https://django-dbbackup.readthedocs.io/en/master/installation.html
@@ -310,6 +320,10 @@ else:
 
             AWS_S3_PRIVATE_ENDPOINT = s3_creds["endpoint"]
             AWS_S3_ENDPOINT_URL = f"https://{AWS_S3_PRIVATE_ENDPOINT}"
+
+            # in deployed environments, the internal & external endpoint URLs are the same
+            AWS_S3_PRIVATE_INTERNAL_ENDPOINT = AWS_S3_ENDPOINT_URL
+            AWS_S3_PRIVATE_EXTERNAL_ENDPOINT = AWS_S3_ENDPOINT_URL
 
             AWS_PRIVATE_LOCATION = "static"
             AWS_PRIVATE_DEFAULT_ACL = "private"

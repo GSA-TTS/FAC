@@ -40,7 +40,10 @@ def cluster_total_is_correct(ir):
                     if k == uniform_other_cluster_name[idx]
                 ]
             )
-        elif (name == NOT_APPLICABLE or not name) and not state_cluster_name[idx]:
+        elif (name is None or str(name).strip() == "" or name == NOT_APPLICABLE) and (
+            state_cluster_name[idx] is None
+            or str(state_cluster_name[idx]).strip() == ""
+        ):
             expected_value = 0
         elif name == STATE_CLUSTER:
             expected_value = sum(
@@ -58,7 +61,8 @@ def cluster_total_is_correct(ir):
                     if k == name
                 ]
             )
-
+        else:
+            expected_value = 0
         # Check if the calculated value matches the provided one
         if expected_value != cluster_total[idx]:
             errors.append(
