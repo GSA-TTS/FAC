@@ -12,8 +12,8 @@ from audit.models import SingleAuditChecklist
 from audit.fixtures.excel import FORM_SECTIONS
 
 
-# from dissemination.workbooklib.notes_to_sefa import generate_notes_to_sefa
 from .federal_awards import generate_federal_awards
+from .notes_to_sefa import generate_notes_to_sefa
 
 # from dissemination.workbooklib.findings import generate_findings
 # from dissemination.workbooklib.findings_text import generate_findings_text
@@ -34,10 +34,10 @@ sections = {
     # FORM_SECTIONS.ADDITIONAL_UEIS: generate_additional_ueis,
     # FORM_SECTIONS.ADDITIONAL_UEIS: generate_additional_ueis,
     # FORM_SECTIONS.CORRECTIVE_ACTION_PLAN: generate_corrective_action_plan,
-    FORM_SECTIONS.FEDERAL_AWARDS_EXPENDED: generate_federal_awards,
+    # FORM_SECTIONS.FEDERAL_AWARDS_EXPENDED: generate_federal_awards,
     # FORM_SECTIONS.FINDINGS_TEXT: generate_findings_text,
     # FORM_SECTIONS.FINDINGS_UNIFORM_GUIDANCE: generate_findings,
-    # FORM_SECTIONS.NOTES_TO_SEFA: generate_notes_to_sefa,
+    FORM_SECTIONS.NOTES_TO_SEFA: generate_notes_to_sefa,
     # FORM_SECTIONS.SECONDARY_AUDITORS: generate_secondary_auditors,
 }
 
@@ -45,10 +45,10 @@ filenames = {
     # FORM_SECTIONS.ADDITIONAL_EINS: "additional-eins-{}.xlsx",
     # FORM_SECTIONS.ADDITIONAL_UEIS: "additional-ueis-{}.xlsx",
     # FORM_SECTIONS.CORRECTIVE_ACTION_PLAN: "corrective-action-plan-{}.xlsx",
-    FORM_SECTIONS.FEDERAL_AWARDS_EXPENDED: "federal-awards-{}.xlsx",
+    # FORM_SECTIONS.FEDERAL_AWARDS_EXPENDED: "federal-awards-{}.xlsx",
     # FORM_SECTIONS.FINDINGS_TEXT: "audit-findings-text-{}.xlsx",
     # FORM_SECTIONS.FINDINGS_UNIFORM_GUIDANCE: "audit-findings-{}.xlsx",
-    # FORM_SECTIONS.NOTES_TO_SEFA: "notes-to-sefa-{}.xlsx",
+    FORM_SECTIONS.NOTES_TO_SEFA: "notes-to-sefa-{}.xlsx",
     # FORM_SECTIONS.SECONDARY_AUDITORS: "secondary-auditors-{}.xlsx",
 }
 
