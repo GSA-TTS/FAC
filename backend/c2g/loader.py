@@ -19,6 +19,7 @@ def load_data():
         total_count += 1
         if len(result["errors"]) > 0:
             error_count += 1
+            break
         if total_count % 25 == 0:
             now = datetime.datetime.now()
             print(now.strftime("%H:%M"))

@@ -1,3 +1,5 @@
+import sys
+import traceback
 from django.contrib.auth import get_user_model
 
 from .workbooklib.end_to_end_workbook import generate_workbooks
@@ -14,8 +16,11 @@ def load_historic_data(audit_year, dbkey):
     try:
         sac: SingleAuditChecklist = generate_workbooks(user, gen)
         result["success"].append(f"{sac.report_id} created")
-    except Exception:
-        result["errors"].append(f"{gen.AUDITEEEMAIL} failed")
+    except Exception as exc:
+        tb = traceback.extract_tb(sys.exc_info()[2])
+        for frame in tb:
+            print(f"{frame.filename}:{frame.lineno} {frame.name}: {frame.line}")
+        result["errors"].append(f"{exc}")
 
     return result
 

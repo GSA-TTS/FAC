@@ -10,6 +10,7 @@ from pathlib import Path
 from django.apps import apps
 
 from django.core.files.uploadedfile import SimpleUploadedFile
+from jsonschema import ValidationError
 from audit.models import SingleAuditChecklist
 from .trabsformers import get_cpacpuntry, normalize_entity_type, normalize_zip
 from c2g.models import (
@@ -93,7 +94,7 @@ def _census_audit_type(s):
     }[s]
 
 
-def _fake_general_information(gen: Gen):
+def _fake_general_information(user, gen: Gen):
     """Create a fake general_information object."""
     auditee_fiscal_period_end = _census_date_to_datetime(gen.FYENDDATE).strftime(
         "%Y-%m-%d"
@@ -112,7 +113,7 @@ def _fake_general_information(gen: Gen):
         "auditee_city": gen.CITY,
         "auditee_contact_name": gen.AUDITEECONTACT,
         "auditee_contact_title": gen.AUDITEETITLE,
-        "auditee_email": gen.AUDITEEEMAIL,
+        "auditee_email": gen.AUDITEEEMAIL or user.email,
         "auditee_name": gen.AUDITEENAME,
         "auditee_phone": gen.AUDITEEPHONE,
         # TODO: when we include territories in our valid states, remove this restriction
@@ -145,7 +146,11 @@ def _fake_general_information(gen: Gen):
     }
 
     # verify that our created object validates against the schema
-    audit.validators.validate_general_information_complete_json(general_information)
+    try:
+        audit.validators.validate_general_information_complete_json(general_information)
+    except ValidationError as err:
+        print(err.message)
+        return None
 
     return general_information
 
@@ -206,7 +211,7 @@ def _create_sac(user, gen: Gen):
 
     sac = SingleAuditChecklist.objects.create(
         submitted_by=user,
-        general_information=_fake_general_information(gen),
+        general_information=_fake_general_information(user, gen),
         audit_information=_fake_audit_information(gen),
     )
     # Set a TEST report id for this data

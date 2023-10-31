@@ -3,6 +3,7 @@ from itertools import chain
 import json
 import logging
 
+
 from django.db import models
 from django.db.models import Q
 from django.conf import settings
@@ -38,6 +39,10 @@ from support.cog_over import compute_cog_over, record_cog_assignment
 User = get_user_model()
 
 logger = logging.getLogger(__name__)
+
+
+class TransitionException(Exception):
+    pass
 
 
 def generate_sac_report_id(end_date=None, source="GSAFAC", count=None):
@@ -465,7 +470,8 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
             )
             self.transition_date.append(datetime.now(timezone.utc))
             return SingleAuditChecklist.STATUS.READY_FOR_CERTIFICATION
-        return SingleAuditChecklist.STATUS.IN_PROGRESS
+        raise TransitionException("Errors in transition", errors)
+        # return SingleAuditChecklist.STATUS.IN_PROGRESS
 
     @transition(
         field="submission_status",
