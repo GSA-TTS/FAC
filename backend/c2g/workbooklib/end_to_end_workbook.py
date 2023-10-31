@@ -21,17 +21,18 @@ from .sac_creation import _post_upload_pdf
 from audit.intake_to_dissemination import IntakeToDissemination
 
 from c2g.models import ELECAUDITHEADER as Gen
-from dissemination.models import (
-    AdditionalEin,
-    AdditionalUei,
-    CapText,
-    FederalAward,
-    Finding,
-    FindingText,
-    Note,
-    Passthrough,
-    SecondaryAuditor,
-)
+
+# from dissemination.models import (
+#     AdditionalEin,
+#     AdditionalUei,
+#     CapText,
+#     FederalAward,
+#     Finding,
+#     FindingText,
+#     Note,
+#     Passthrough,
+#     SecondaryAuditor,
+# )
 
 logger = logging.getLogger(__name__)
 logging.basicConfig()
@@ -55,19 +56,19 @@ def step_through_certifications(sac: SingleAuditChecklist):
 
 def disseminate(sac, year):
     logger.info("Invoking movement of data from Intake to Dissemination")
-    for model in [
-        AdditionalEin,
-        AdditionalUei,
-        CapText,
-        FederalAward,
-        Finding,
-        FindingText,
-        General,
-        Note,
-        Passthrough,
-        SecondaryAuditor,
-    ]:
-        model.objects.filter(report_id=sac.report_id).delete()
+    # for model in [
+    #     AdditionalEin,
+    #     AdditionalUei,
+    #     CapText,
+    #     FederalAward,
+    #     Finding,
+    #     FindingText,
+    #     General,
+    #     Note,
+    #     Passthrough,
+    #     SecondaryAuditor,
+    # ]:
+    #     model.objects.filter(report_id=sac.report_id).delete()
 
     if sac.general_information:
         etl = IntakeToDissemination(sac)

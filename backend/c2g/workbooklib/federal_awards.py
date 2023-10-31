@@ -14,7 +14,6 @@ from django.db.models import Q
 
 from config import settings
 from c2g.models import (
-    ELECAUDITHEADER as Gen,
     ELECAUDITS as Cfda,
     ELECPASSTHROUGH as PassThrough,
 )
