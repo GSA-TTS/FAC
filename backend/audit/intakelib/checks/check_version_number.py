@@ -7,15 +7,12 @@ from .util import get_message, build_cell_error_tuple
 
 logger = logging.getLogger(__name__)
 
-AUTHORIZED_VERSIONS = {"1.0.0", "1.0.1", "1.0.2"}
+AUTHORIZED_VERSIONS = {"1.0.0", "1.0.1", "1.0.2", "1.0.3"}
 
 
 # DESCRIPTION
-# This is intended to be a check for the version number of the workbook.
+# This checks if the uploaded workbook version is valid.
 def validate_workbook_version(ir):
-    # FIXME: This is a no-op for now. Remove below pass when ready to enforce version check.
-    pass
-
     version_range = get_range_by_name(ir, "version")
     errors = []
     for index, version in enumerate(version_range["values"]):
