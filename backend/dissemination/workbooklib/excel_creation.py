@@ -6,7 +6,6 @@ import sys
 import logging
 from datetime import date
 from config import settings
-import re
 import json
 
 logger = logging.getLogger(__name__)
