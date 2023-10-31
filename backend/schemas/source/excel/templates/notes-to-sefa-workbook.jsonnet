@@ -44,7 +44,7 @@ local single_cells = [
     title_cell: 'A3',
     range_cell: 'B3',
     format: 'text',
-    formula: '="' + Sheets.section_names.NOTES_TO_SEFA + '"',
+    value: Sheets.section_names.NOTES_TO_SEFA,
     help: Help.wrong_workbook_template,
     validation: SV.NoValidation,
   },
