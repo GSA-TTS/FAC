@@ -7,6 +7,8 @@ from django.core.management.base import BaseCommand
 from django.conf import settings
 from django.apps import apps
 
+from c2g.loader import load_data
+
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.WARNING)
 
@@ -33,6 +35,7 @@ class Command(BaseCommand):
         parser.add_argument("--folder", help="S3 folder name")
         parser.add_argument("--clean")
         parser.add_argument("--sample")
+        parser.add_argument("--load")
 
     def handle(self, *args, **options):
         if options.get("clean") == "True":
@@ -40,6 +43,10 @@ class Command(BaseCommand):
             return
         if options.get("sample") == "True":
             self.sample_data()
+            return
+
+        if options.get("load") == "True":
+            load_data()
             return
 
         folder = options.get("folder")
