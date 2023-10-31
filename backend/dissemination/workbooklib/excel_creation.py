@@ -9,6 +9,8 @@ from config import settings
 import re
 import json
 
+from dissemination.historiclib.common import to_uei
+
 logger = logging.getLogger(__name__)
 
 # This provides a way to map the sheet in the workbook to the
@@ -42,8 +44,12 @@ def test_pfix(n):
 
     return _test
 
+def identity(v):
+    return v
 
-def set_single_cell_range(wb, range_name, value):
+# SUGGESTION: All functions that set values should take a migrator function, 
+# with a default of the identity function (which returns the values it is given).
+def set_single_cell_range(wb, range_name, value, migrator=identity):
     the_range = wb.defined_names[range_name]
     # The above returns a generator. Turn it to a list, and grab
     # the first element of the list. Now, this *tuple* contains a
@@ -54,7 +60,8 @@ def set_single_cell_range(wb, range_name, value):
     sheet_title = tup[0]
     cell_ref = tup[1].replace("$", "")
     ws = wb[sheet_title]
-    ws[cell_ref] = value
+    # SUGGESTION: Apply the migrator. It could throw an exception
+    ws[cell_ref] = migrator(value)
 
 
 # A tiny helper to index into workbooks.
@@ -66,6 +73,9 @@ def col_to_ndx(col):
 # Helper to set a range of values.
 # Takes a named range, and then walks down the range,
 # filling in values from the list past in (values).
+# SUGGESTION: Add migrators to the functions that set values in the workbooks.
+# In the case of the set_range function, this could be the conversion_function. 
+# Whether that gets renamed or not is up to the team.
 def set_range(wb, range_name, values, default=None, conversion_fun=str):
     the_range = wb.defined_names[range_name]
     dest = list(the_range.destinations)[0]
@@ -101,13 +111,14 @@ def set_range(wb, range_name, values, default=None, conversion_fun=str):
             pass
 
 
+# SUGGESTION: Add migrators to the functions that set values in the workbooks.
 def set_uei(Gen, wb, dbkey):
     g = Gen.select().where(Gen.dbkey == dbkey).get()
     if g.uei:
-        set_single_cell_range(wb, "auditee_uei", g.uei)
+        set_single_cell_range(wb, "auditee_uei", g.uei, migrator=to_uei)
     else:
         g.uei = "BADBADBADBAD"
-        set_single_cell_range(wb, "auditee_uei", g.uei)
+        set_single_cell_range(wb, "auditee_uei", g.uei, migrator=to_uei)
     return g
 
 
