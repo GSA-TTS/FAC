@@ -33,7 +33,7 @@ local single_cells = [
     title_cell: 'A2',
     range_cell: 'B2',
     format: 'text',
-    formula: '="' + Sheets.WORKBOOKS_VERSION + '"',
+    value: Sheets.WORKBOOKS_VERSION,
     help: Help.plain_text,
     validation: SV.NoValidation,
   },
