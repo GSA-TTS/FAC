@@ -66,6 +66,7 @@ from audit.validators import (
 from audit.viewlib import (  # noqa
     TribalDataConsent,
     SubmissionProgressView,
+    UnlockAfterCertificationView,
     UploadReportView,
     submission_progress_check,
 )
