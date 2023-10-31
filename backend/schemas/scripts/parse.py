@@ -21,7 +21,7 @@ Posn = NT(
     "Posn",
     "title title_cell range_name range_cell width keep_locked format last_range_cell",
 )
-SingleCell = NT("SingleCell", "posn validation formula help")
+SingleCell = NT("SingleCell", "posn validation formula help value")
 MetaCell = NT("MetaCell", "posn formula help")
 MergeableCell = NT("MergeableCell", "start_row end_row start_column end_column")
 MergedUnreachable = NT("MergedUnreachable", "columns")
@@ -85,6 +85,7 @@ def parse_single_cell(spec):
         parse_validation(get(spec, "validation")),
         get(spec, "formula"),
         parse_help(get(spec, "help")),
+        get(spec, "value", default=None),
     )
 
 

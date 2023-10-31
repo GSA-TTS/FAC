@@ -374,6 +374,10 @@ def process_single_cells(wb, ws, sheet):
             row = int(o.posn.title_cell[1])
             ws.row_dimensions[row].height = sheet.header_height
 
+        if o.value:
+            cell_reference = o.posn.range_cell
+            ws[cell_reference] = o.value
+
 
 def process_meta_cells(wb, ws, sheet):
     print("---- process_meta_cells ----")
