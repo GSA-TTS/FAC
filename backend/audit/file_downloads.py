@@ -14,10 +14,10 @@ logger = logging.getLogger(__name__)
 
 def get_filename(sac, file_type):
     if file_type == "report":
-        file_obj = get_object_or_404(SingleAuditReportFile, sac=sac)
+        file_obj = SingleAuditReportFile.objects.filter(sac=sac).latest("date_created")
         return f"singleauditreport/{file_obj.filename}"
     else:
-        file_obj = get_object_or_404(ExcelFile, sac=sac, form_section=file_type)
+        file_obj = ExcelFile.objects.filter(sac=sac, form_section=file_type).latest("date_created")
         return f"excel/{file_obj.filename}"
 
 
