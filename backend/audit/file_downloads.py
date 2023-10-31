@@ -2,7 +2,6 @@ import logging
 
 from django.conf import settings
 from django.http import Http404
-from django.shortcuts import get_object_or_404
 
 from boto3 import client as boto3_client
 from botocore.client import ClientError, Config
@@ -17,7 +16,9 @@ def get_filename(sac, file_type):
         file_obj = SingleAuditReportFile.objects.filter(sac=sac).latest("date_created")
         return f"singleauditreport/{file_obj.filename}"
     else:
-        file_obj = ExcelFile.objects.filter(sac=sac, form_section=file_type).latest("date_created")
+        file_obj = ExcelFile.objects.filter(sac=sac, form_section=file_type).latest(
+            "date_created"
+        )
         return f"excel/{file_obj.filename}"
 
 
