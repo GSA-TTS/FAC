@@ -37,4 +37,5 @@ messages = {
     "check_loan_balance": "The loan balance is currently set to {}. It should either be a positive number, N/A, or left empty",
     "check_cardinality_of_passthrough_names_and_ids": "You used a <b>|</b> (bar character) to indicate multiple passthrough names and IDs; you must provide equal numbers of names and IDs. You provided <b>{}</b> name{} and <b>{}</b> ID{}",
     "check_workbook_version": "Single audit workbook template version {} is not supported. Please download the latest workbook and transfer your data to it",
+    "check_integer_values": "<b>{}</b> is not a valid integer",
 }
