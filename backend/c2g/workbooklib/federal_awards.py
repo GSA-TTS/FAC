@@ -65,7 +65,7 @@ mappings = [
     FieldMap(
         "subrecipient_amount",
         "passthroughamount".upper(),
-        "passthrough_amount".upper(),
+        "passthrough_amount",
         None,
         if_zero_empty,
     ),
@@ -104,7 +104,7 @@ def _generate_cluster_names(cfdas, valid_json):
     other_cluster_names = []
     cfda: Cfda
     for cfda in cfdas:
-        if cfda.CLUSTERNAME is None:
+        if not cfda.CLUSTERNAME or len(cfda.CLUSTERNAME) == 0:
             cluster_names.append("N/A")
             other_cluster_names.append("")
         elif cfda.CLUSTERNAME in valid_json["cluster_names"]:
@@ -114,6 +114,7 @@ def _generate_cluster_names(cfdas, valid_json):
             logger.debug(f"Cluster {cfda.CLUSTERNAME} not in the list. Replacing.")
             cluster_names.append("OTHER CLUSTER NOT LISTED ABOVE")
             other_cluster_names.append(f"{cfda.CLUSTERNAME}")
+
     return (cluster_names, other_cluster_names)
 
 
@@ -159,7 +160,7 @@ def _fix_passthroughs(cfdas, audit_year, dbkey):
     passthrough_ids = ["" for x in list(range(0, len(cfdas)))]
     cfda: Cfda
     for cfda in Cfda.objects.filter(Q(DBKEY=dbkey) & Q(AUDITYEAR=audit_year)).order_by(
-        "id"
+        "ID"
     ):
         pnq = PassThrough()
         if cfda.DIRECT == "Y":
@@ -187,11 +188,11 @@ def _fix_passthroughs(cfdas, audit_year, dbkey):
         else:
             passthrough_names[get_list_index(cfdas, cfda.ID)] = name
 
-        id = pnq.ID
-        if id is None:
-            id = ""
-        id = id.rstrip()
-        if id == "" and cfda.DIRECT == "N":
+        ID = pnq.ID
+        if ID is None:
+            ID = ""
+        ID = ID.rstrip()
+        if ID == "" and cfda.DIRECT == "N":
             passthrough_ids[
                 get_list_index(cfdas, cfda.ID)
             ] = "NO PASSTHROUGH ID PROVIDED"

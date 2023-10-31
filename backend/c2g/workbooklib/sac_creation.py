@@ -11,6 +11,7 @@ from django.apps import apps
 
 from django.core.files.uploadedfile import SimpleUploadedFile
 from audit.models import SingleAuditChecklist
+from .trabsformers import get_cpacpuntry, normalize_entity_type, normalize_zip
 from c2g.models import (
     ELECAUDITHEADER as Gen,
     ELECAUDITS as Cfda,
@@ -92,21 +93,6 @@ def _census_audit_type(s):
     }[s]
 
 
-def normalize_entity_type(entity_type: str):
-    return entity_type.lower()
-
-
-def add_hyphen_to_zip(zip):
-    strzip = str(zip)
-    if len(strzip) == 5:
-        return strzip
-    elif len(strzip) == 9:
-        return f"{strzip[0:5]}-{strzip[5:9]}"
-    else:
-        logger.info("ZIP IS MALFORMED IN WORKBOOKS E2E / SAC_CREATION")
-        return strzip
-
-
 def _fake_general_information(gen: Gen):
     """Create a fake general_information object."""
     auditee_fiscal_period_end = _census_date_to_datetime(gen.FYENDDATE).strftime(
@@ -115,10 +101,7 @@ def _fake_general_information(gen: Gen):
     auditee_fiscal_period_start = (
         _census_date_to_datetime(gen.FYSTARTDATE) - timedelta(days=365)
     ).strftime("%Y-%m-%d")
-    if gen.CPACOUNTRY == "US":
-        cpacountry = "USA"
-    elif gen.CPACOUNTRY != "US":
-        cpacountry = "non-USA"
+    cpacountry = get_cpacpuntry(gen.CPACOUNTRY)
 
     general_information = {
         "auditee_fiscal_period_start": auditee_fiscal_period_start,
@@ -136,8 +119,8 @@ def _fake_general_information(gen: Gen):
         "auditee_state": gen.STATE,
         # TODO: this is GSA's UEI. We could do better at making random choices that
         # pass the schema's complex regex validation
-        "auditee_uei": gen.UEI,
-        "auditee_zip": gen.ZIPCODE,
+        "auditee_uei": gen.UEI or "BADBADBADBAD",
+        "auditee_zip": (gen.ZIPCODE),
         "auditor_address_line_1": gen.CPASTREET1,
         "auditor_city": gen.CPACITY,
         "auditor_contact_name": gen.CPACONTACT,
@@ -150,7 +133,7 @@ def _fake_general_information(gen: Gen):
         "auditor_phone": gen.CPAPHONE,
         # TODO: when we include territories in our valid states, remove this restriction
         "auditor_state": gen.CPASTATE,
-        "auditor_zip": gen.CPAZIPCODE,
+        "auditor_zip": (gen.CPAZIPCODE),
         "ein": gen.EIN,
         "ein_not_an_ssn_attestation": True,
         "is_usa_based": True,
@@ -209,7 +192,7 @@ def _fake_audit_information(gen: Gen):
     return audit_information
 
 
-def     _create_sac(user, gen: Gen):
+def _create_sac(user, gen: Gen):
     """Create a single example SAC."""
 
     try:

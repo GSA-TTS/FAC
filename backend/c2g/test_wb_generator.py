@@ -44,7 +44,7 @@ class WbGegeratorTestCase(TestCase):
             CPASTREET1="1052 HIGHLAND COLONY PARKWAY SUITE 100",
             CPACITY="RIDGELAND",
             CPASTATE="MS",
-            CPAZIPCODE="39157",
+            CPAZIPCODE="667200779",
             CPACONTACT="JOEY FLETCHER",
             CPATITLE="LEAD AUDITOR",
             CPAPHONE="6016050722",
@@ -102,8 +102,10 @@ class WbGegeratorTestCase(TestCase):
             AMOUNT="95248",
             MAJORPROGRAM="N",
             DIRECT="Y",
+            PASSTHROUGHAWARD="N",
             LOANS="N",
-            CLUSTERTOTAL="190496",
+            CLUSTERTOTAL="0",
+            PROGRAMTOTAL="190496",
             FINDINGSCOUNT="0",
         )
         return cfda

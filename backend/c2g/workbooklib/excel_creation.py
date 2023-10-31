@@ -104,7 +104,7 @@ def set_range(wb, range_name, values, default=None, conversion_fun=str):
 
 
 def set_uei(sac: SingleAuditChecklist, wb):
-    uei = sac.auditee_uei if sac.auditee_uei else "BADBADBADBAD"
+    uei = sac.auditee_uei or "BADBADBADBAD"
     set_single_cell_range(wb, "auditee_uei", uei)
 
 
@@ -178,7 +178,6 @@ def dbkey_to_test_report_id(audit_year, fy_end_date, dbkey):
     # We start new audits at 1 million.
     # So, we want 10 digits, and zero-pad for
     # historic DBKEY report_ids
-    print("JMM:", fy_end_date)
     dt = _census_date_to_datetime(fy_end_date)
     return f"{audit_year}-{dt.month:02}-TSTDAT-{dbkey.zfill(10)}"
 

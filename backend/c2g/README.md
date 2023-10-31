@@ -20,7 +20,8 @@ This is implemented as a django app to leverage existing management commands and
 
 * fac_s3 - is a management command in the `support` app. It can be used to upload folders or files to an s3 nucket.
 
-```manage.py fac_s3 fac-c2g-s3 --upload --src c2g/data
+```bash
+manage.py fac_s3 fac-c2g-s3 --upload --src c2g/data
 ```
 
 * load_raw.py - Read zip files providd by Census, and upload them to the S3 bucket. The basename of the zip file is used to create a folder in S3. The individual unzipped files are stored in the folder. There is an assumption that there are no sub-folders.

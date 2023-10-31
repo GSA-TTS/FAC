@@ -96,7 +96,7 @@ def progress_check(sections, key):
         NC.GENERAL_INFORMATION: True,
         NC.AUDIT_INFORMATION: True,
         NC.FEDERAL_AWARDS: True,
-        NC.NOTES_TO_SEFA: True,
+        NC.NOTES_TO_SEFA: False,
         NC.FINDINGS_UNIFORM_GUIDANCE: num_findings > 0,
         NC.FINDINGS_TEXT: num_findings > 0,
         NC.CORRECTIVE_ACTION_PLAN: num_findings > 0,

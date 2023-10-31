@@ -10,6 +10,7 @@ import jwt
 import requests
 from pprint import pprint
 from datetime import datetime
+from audit.models import SingleAuditChecklist
 
 from .workbook_creation import (
     sections,
@@ -43,7 +44,7 @@ parser = argparse.ArgumentParser()
 # pw.setLevel(logging.INFO)
 
 
-def step_through_certifications(sac):
+def step_through_certifications(sac: SingleAuditChecklist):
     sac.transition_to_ready_for_certification()
     sac.transition_to_auditor_certified()
     sac.transition_to_auditee_certified()
@@ -187,15 +188,11 @@ def api_check(json_test_tables):
 
 def generate_workbooks(user, gen: Gen):
     sac = setup_sac(user, gen)
-    print("JMM: Creating sac:", sac.report_id)
     loader = workbook_loader(user, sac, gen.AUDITYEAR, gen.DBKEY)
-    print("JMM: Created loader:")
     json_test_tables = []
     for section, fun in sections.items():
-        print("JMM: Creating wb for section:", section)
         # FIXME: Can we conditionally upload the addl' and secondary workbooks?
         (_, json, _) = loader(fun, section)
-        print("JMM: Creating json:", json)
 
         json_test_tables.append(json)
     _post_upload_pdf(sac, user, "audit/fixtures/basic.pdf")
@@ -212,6 +209,7 @@ def generate_workbooks(user, gen: Gen):
     # pprint(json_test_tables)
     # combined_summary = api_check(json_test_tables)
     # logger.info(combined_summary)
+    return sac
 
 
 def run_end_to_end(email, dbkey, year):
