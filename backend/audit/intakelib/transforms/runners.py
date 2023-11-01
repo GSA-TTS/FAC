@@ -22,7 +22,9 @@ from .xform_insert_sequence_nums_into_notes_to_sefa import (
 from .xform_number_of_findings_need_to_be_integers import (
     convert_number_of_findings_to_integers,
 )
-from .xform_loan_balance_need_to_be_integers import convert_loan_balance_to_integers
+from .xform_loan_balance_need_to_be_integers import (
+    convert_loan_balance_to_integers_or_na,
+)
 
 # from .xform_filter_seq_numbers_where_there_are_no_values import filter_seq_numbers_where_there_are_no_values
 # from .xform_make_sure_notes_to_sefa_are_just_strings import make_sure_notes_to_sefa_are_just_strings
@@ -98,6 +100,6 @@ federal_awards_transforms = general_transforms + [
     convert_subrecipient_amount_to_integers,
     convert_total_amount_expended_to_integers,
     convert_number_of_findings_to_integers,
-    convert_loan_balance_to_integers,
+    convert_loan_balance_to_integers_or_na,
     regenerate_uniform_cluster_names,
 ]
