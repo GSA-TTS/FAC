@@ -11,11 +11,13 @@ from dissemination.search import search_general
 from dissemination.models import (
     General,
     FederalAward,
-    Passthrough,
     Finding,
     FindingText,
     CapText,
     Note,
+    SecondaryAuditor,
+    AdditionalEin,
+    AdditionalUei,
 )
 
 
@@ -97,11 +99,13 @@ class AuditSummaryView(View):
         further. I.e. remove DB ids or something.
         """
         awards = FederalAward.objects.filter(report_id=report_id)
-        passthrough_entities = Passthrough.objects.filter(report_id=report_id)
         audit_findings = Finding.objects.filter(report_id=report_id)
         audit_findings_text = FindingText.objects.filter(report_id=report_id)
         corrective_action_plan = CapText.objects.filter(report_id=report_id)
         notes_to_sefa = Note.objects.filter(report_id=report_id)
+        secondary_auditors = SecondaryAuditor.objects.filter(report_id=report_id)
+        additional_ueis = AdditionalUei.objects.filter(report_id=report_id)
+        additional_eins = AdditionalEin.objects.filter(report_id=report_id)
 
         data = {}
 
@@ -109,8 +113,8 @@ class AuditSummaryView(View):
             x for x in awards.values()
         ]  # Take QuerySet to a list of objects
 
-        if passthrough_entities.exists():
-            data["Passthrough Entities"] = [x for x in passthrough_entities.values()]
+        if notes_to_sefa.exists():
+            data["Notes to SEFA"] = [x for x in notes_to_sefa.values()]
         if audit_findings.exists():
             data["Audit Findings"] = [x for x in audit_findings.values()]
         if audit_findings_text.exists():
@@ -119,13 +123,12 @@ class AuditSummaryView(View):
             data["Corrective Action Plan"] = [
                 x for x in corrective_action_plan.values()
             ]
-        if notes_to_sefa.exists():
-            data["Notes"] = [x for x in notes_to_sefa.values()]
-
-        for key in data:
-            for item in data[key]:
-                del item["id"]
-                del item["report_id"]
+        if secondary_auditors.exists():
+            data["Secondary Auditors"] = [x for x in secondary_auditors.values()]
+        if additional_ueis.exists():
+            data["Additional UEIs"] = [x for x in additional_ueis.values()]
+        if additional_eins.exists():
+            data["Additional EINs"] = [x for x in additional_eins.values()]
 
         return data
 

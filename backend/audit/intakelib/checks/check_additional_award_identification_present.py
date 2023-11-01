@@ -8,7 +8,7 @@ from .check_aln_three_digit_extension_pattern import (
     REGEX_RD_EXTENSION,
     REGEX_U_EXTENSION,
 )
-from .util import get_message, build_cell_error_tuple
+from audit.intakelib.common import get_message, build_cell_error_tuple
 
 logger = logging.getLogger(__name__)
 
@@ -21,7 +21,9 @@ def additional_award_identification(ir):
     errors = []
     patterns = [REGEX_RD_EXTENSION, REGEX_U_EXTENSION]
     for index, (ext, add) in enumerate(zip(extension, additional)):
-        if any(re.match(pattern, ext) for pattern in patterns) and not add:
+        if any(re.match(pattern, ext) for pattern in patterns) and (
+            (add is None) or (str(add).strip() == "")
+        ):
             errors.append(
                 build_cell_error_tuple(
                     ir,
