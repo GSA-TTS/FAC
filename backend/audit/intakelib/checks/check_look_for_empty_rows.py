@@ -2,7 +2,7 @@ from django.core.exceptions import ValidationError
 import logging
 from audit.intakelib.intermediate_representation import ranges_to_rows, appears_empty
 
-from .util import get_range_start_row
+from audit.intakelib.common import get_range_start_row
 
 logger = logging.getLogger(__name__)
 

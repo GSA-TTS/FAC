@@ -1,6 +1,6 @@
 import logging
 
-from audit.intakelib.checks.util import safe_int_conversion
+from audit.intakelib.common import safe_int_conversion
 
 logger = logging.getLogger(__name__)
 

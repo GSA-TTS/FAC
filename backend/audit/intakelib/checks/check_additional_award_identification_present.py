@@ -8,7 +8,7 @@ from .check_aln_three_digit_extension_pattern import (
     REGEX_RD_EXTENSION,
     REGEX_U_EXTENSION,
 )
-from .util import get_message, build_cell_error_tuple
+from audit.intakelib.common import get_message, build_cell_error_tuple
 
 logger = logging.getLogger(__name__)
 

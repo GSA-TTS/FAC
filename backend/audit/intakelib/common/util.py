@@ -61,7 +61,7 @@ def appears_empty(v):
     return (v is None) or (str(v).strip() == "")
 
 
-def is_value_na(v):
+def is_value_marked_na(v):
     value = str(v).strip()
     return value == "N/A"
 
