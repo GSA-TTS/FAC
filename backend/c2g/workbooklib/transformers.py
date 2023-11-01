@@ -12,6 +12,8 @@ def normalize_entity_type(entity_type: str):
     entity_type = entity_type.lower()
     if entity_type == "local government":
         entity_type = "local"
+    if entity_type == "institution of higher education":
+        entity_type = "higher-ed"
     return entity_type
 
 

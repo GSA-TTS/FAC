@@ -20,7 +20,7 @@ def load_data():
         if len(result["errors"]) > 0:
             error_count += 1
             print(result)
-        if error_count > 25:
+        if error_count > 0:
             break
 
     print("********* Loader Summary ***************")
