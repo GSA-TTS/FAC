@@ -22,6 +22,7 @@ from .xform_all_alns_need_to_be_strings import all_alns_need_to_be_strings
 from .xform_all_passthrough_id_need_to_be_strings import (
     all_passthrough_id_need_to_be_strings,
 )
+from .xform_reformat_prior_references import reformat_prior_references
 
 logger = logging.getLogger(__name__)
 
@@ -45,6 +46,10 @@ def run_all_federal_awards_transforms(ir):
     return run_all_transforms(ir, federal_awards_transforms)
 
 
+def run_all_audit_findings_transforms(ir):
+    return run_all_transforms(ir, audit_findings_transforms)
+
+
 general_transforms = [no_op]
 
 notes_to_sefa_transforms = general_transforms + [
@@ -60,4 +65,8 @@ additional_eins_transforms = general_transforms + [
 federal_awards_transforms = general_transforms + [
     all_alns_need_to_be_strings,
     all_passthrough_id_need_to_be_strings,
+]
+
+audit_findings_transforms = general_transforms + [
+    reformat_prior_references,
 ]
