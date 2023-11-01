@@ -15,8 +15,6 @@ from .workbook_creation import (
     workbook_loader,
     setup_sac,
 )
-
-# from .sac_creation import _post_upload_pdf
 from audit.intake_to_dissemination import IntakeToDissemination
 
 from c2g.models import ELECAUDITHEADER as Gen

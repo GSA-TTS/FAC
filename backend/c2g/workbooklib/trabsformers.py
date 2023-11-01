@@ -1,6 +1,5 @@
 from c2g.models import ELECAUDITHEADER as Gen, ELECAUDITS as Cfda
 
-
 def get_cpacpuntry(country: str):
     if country.upper() in ["", "US", "USA"]:
         cpacountry = "USA"
@@ -21,7 +20,6 @@ def normalize_zip(zip):
     if len(strzip) == 9:
         return f"{strzip[0:5]}-{strzip[5:9]}"
     return strzip
-
 
 def clean_gen(gen: Gen):
     gen.ENTITY_TYPE = normalize_entity_type(gen.ENTITY_TYPE)

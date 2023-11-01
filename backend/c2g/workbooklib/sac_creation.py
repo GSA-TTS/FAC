@@ -102,7 +102,6 @@ def _fake_general_information(user, gen: Gen):
     auditee_fiscal_period_start = (
         _census_date_to_datetime(gen.FYSTARTDATE) - timedelta(days=365)
     ).strftime("%Y-%m-%d")
-
     general_information = {
         "auditee_fiscal_period_start": auditee_fiscal_period_start,
         "auditee_fiscal_period_end": auditee_fiscal_period_end,
