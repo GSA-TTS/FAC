@@ -97,8 +97,10 @@ INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
+    "django.contrib.humanize",
     "django.contrib.sessions",
     "django.contrib.messages",
+    "django.contrib.postgres",
     "django.contrib.staticfiles",
 ]
 
@@ -255,6 +257,7 @@ if ENVIRONMENT not in ["DEVELOPMENT", "PREVIEW", "STAGING", "PRODUCTION"]:
     AWS_S3_PRIVATE_ENDPOINT = os.environ.get(
         "AWS_S3_PRIVATE_ENDPOINT", "http://minio:9000"
     )
+    AWS_PRIVATE_DEFAULT_ACL = "private"
 
     AWS_S3_ENDPOINT_URL = AWS_S3_PRIVATE_ENDPOINT
 

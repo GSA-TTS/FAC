@@ -18,6 +18,7 @@ from .util import get_message, build_cell_error_tuple
 # WHY
 # It's in the UG.
 def findings_grid_validation(ir):
+    # A copy of allowed_combos is in dissemination/workbooklib/findings.py
     # Values copied directly out of the UG
     allowed_combos = [
         "YNNNN",

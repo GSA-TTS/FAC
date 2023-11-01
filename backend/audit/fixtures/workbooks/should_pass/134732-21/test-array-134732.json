@@ -1,7 +1,7 @@
 [
   {
     "endpoint": "additional_eins",
-    "report_id": "2021TEST000134732",
+    "report_id": "2021-12-TSTDAT-0000134732",
     "rows": [],
     "singletons": {
       "auditee_uei": "BADBADBADBAD"
@@ -14,7 +14,7 @@
   },
   {
     "endpoint": "corrective_action_plans",
-    "report_id": "2021TEST000134732",
+    "report_id": "2021-12-TSTDAT-0000134732",
     "rows": [
       {
         "fields": [
@@ -59,7 +59,7 @@
   },
   {
     "endpoint": "federal_awards",
-    "report_id": "2021TEST000134732",
+    "report_id": "2021-12-TSTDAT-0000134732",
     "rows": [
       {
         "fields": [
@@ -1303,7 +1303,7 @@
   },
   {
     "endpoint": "findings_text",
-    "report_id": "2021TEST000134732",
+    "report_id": "2021-12-TSTDAT-0000134732",
     "rows": [
       {
         "fields": [
@@ -1348,7 +1348,7 @@
   },
   {
     "endpoint": "findings",
-    "report_id": "2021TEST000134732",
+    "report_id": "2021-12-TSTDAT-0000134732",
     "rows": [
       {
         "fields": [
@@ -1459,7 +1459,7 @@
   },
   {
     "endpoint": "notes_to_sefa",
-    "report_id": "2021TEST000134732",
+    "report_id": "2021-12-TSTDAT-0000134732",
     "rows": [
       {
         "fields": [
@@ -1491,7 +1491,7 @@
   },
   {
     "endpoint": "secondary_auditor",
-    "report_id": "2021TEST000134732",
+    "report_id": "2021-12-TSTDAT-0000134732",
     "rows": [],
     "singletons": {
       "auditee_uei": "BADBADBADBAD"

@@ -39,6 +39,7 @@ from .xform_rename_additional_notes_sheet import (
 )
 
 from .xform_uniform_cluster_names import regenerate_uniform_cluster_names
+from .xform_reformat_prior_references import reformat_prior_references
 
 logger = logging.getLogger(__name__)
 
@@ -102,4 +103,8 @@ federal_awards_transforms = general_transforms + [
     convert_number_of_findings_to_integers,
     convert_loan_balance_to_integers_or_na,
     regenerate_uniform_cluster_names,
+]
+
+audit_findings_transforms = general_transforms + [
+    reformat_prior_references,
 ]

@@ -25,7 +25,6 @@ def aln_three_digit_extension(ir):
     patterns = [REGEX_RD_EXTENSION, REGEX_THREE_DIGIT_EXTENSION, REGEX_U_EXTENSION]
     for index, ext in enumerate(extension):
         # Check if ext does not match any of the regex patterns
-        # Handles None coming in by casting ext to `str`
         if not any(re.match(pattern, str(ext)) for pattern in patterns):
             errors.append(
                 build_cell_error_tuple(
