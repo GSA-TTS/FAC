@@ -1,0 +1,28 @@
+name: Change Tracking Marker
+on:
+  push:
+    branches:
+      - main
+      - prod
+    tags:
+      - v1.*
+
+jobs:
+  newrelic:
+    runs-on: ubuntu-latest
+    name: New Relic Record Deployment
+    steps:
+      # This step builds a var with the sha value to use later
+      - name: Get Git Short Commit
+        id: git-short
+        run: |
+          echo "short_sha=$(git rev-parse --short ${{ github.sha }})" >> $GITHUB_OUTPUT
+
+      # This step creates a new Change Tracking Marker
+      - name: New Relic Application Deployment Marker
+        uses: newrelic/deployment-marker-action@v2.3.0
+        with:
+          apiKey: ${{ secrets.NEW_RELIC_API_KEY }}
+          guid: ${{ secrets.NEW_RELIC_DEPLOYMENT_ENTITY_GUID }}
+          version: "${{ steps.git-short.outputs.short_sha }}"
+          user: "${{ github.actor }}"
