@@ -52,12 +52,12 @@ def generate_notes_to_sefa(sac, dbkey, year, outfile):
     # TYPEID=1 is the description of significant accounting policies.
     # TYPEID=2 is the De Minimis cost rate.
     # TYPEID=3 is for notes, which have sequence numbers... that must align somewhere.
-    policies = Notes.objects.filter(DBKEY=dbkey, TYPE_ID=1)
-    rate = Notes.objects.filter(DBKEY=dbkey, TYPE_ID=2)
+    policies = Notes.objects.filter(DBKEY=dbkey, TYPE_ID=1).first()
+    rate = Notes.objects.filter(DBKEY=dbkey, TYPE_ID=2).first()
     notes = Notes.objects.filter(DBKEY=dbkey, TYPE_ID=3).order_by("SEQ_NUMBER")
 
-    rate_content = cleanup_string(rate.content)
-    policies_content = cleanup_string(policies.content)
+    rate_content = cleanup_string(rate.CONTENT)
+    policies_content = cleanup_string(policies.CONTENT)
 
     if rate_content == "":
         rate_content = "FILLED FOR TESTING"
