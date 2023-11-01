@@ -44,8 +44,6 @@ class Search(View):
                 int(year) for year in form.cleaned_data["audit_year"]
             ]  # Cast strings from HTML to int
 
-            print(form.cleaned_data)
-
             # TODO: Add a limit choice field to the form
             limit = form.cleaned_data["limit"] or 30
             # Changed in the form via pagination links
