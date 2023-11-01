@@ -10,7 +10,6 @@ from .excel_creation import (
 from .excel_creation import insert_version_and_sheet_name
 from audit.models import SingleAuditChecklist
 from c2g.models import (
-    ELECAUDITHEADER as Gen,
     ELECAUDITS as Cfda,
     ELECAUDITFINDINGS as Findings,
 )

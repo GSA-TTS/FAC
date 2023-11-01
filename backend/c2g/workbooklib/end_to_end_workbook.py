@@ -8,6 +8,7 @@ import requests
 from pprint import pprint
 from datetime import datetime
 from audit.models import SingleAuditChecklist
+from .sac_creation import _post_upload_pdf
 
 from .workbook_creation import (
     sections,
@@ -188,7 +189,7 @@ def generate_workbooks(user, gen: Gen):
         json_test_tables.append(json)
 
     # TODO deal with pdf
-    # _post_upload_pdf(sac, user, "audit/fixtures/basic.pdf")
+    _post_upload_pdf(sac, user, "audit/fixtures/basic.pdf")
     step_through_certifications(sac)
 
     # shaped_sac = sac_validation_shape(sac)

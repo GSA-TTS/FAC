@@ -185,14 +185,14 @@ def dbkey_to_test_report_id(audit_year, fy_end_date, dbkey):
 def generate_dissemination_test_table(
     sac: SingleAuditChecklist, api_endpoint, audit_year, dbkey, mappings, objects
 ):
-    table = {"rows": list(), "singletons": dict()}
+    table: dict = {"rows": list(), "singletons": dict()}
     table["endpoint"] = api_endpoint
     table["report_id"] = dbkey_to_test_report_id(
         audit_year, sac.auditee_fiscal_period_end, dbkey
     )
     for o in objects:
         as_dict = model_to_dict(o)
-        test_obj = {}
+        test_obj: dict = {}
         test_obj["fields"] = []
         test_obj["values"] = []
         for m in mappings:

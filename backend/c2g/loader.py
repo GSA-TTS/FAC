@@ -20,7 +20,7 @@ def load_data():
         if len(result["errors"]) > 0:
             error_count += 1
             print(result)
-        if error_count > 10:
+        if error_count > 25:
             break
 
         if total_count % 25 == 0:
@@ -28,6 +28,8 @@ def load_data():
             print(now.strftime("%H:%M"))
             print(f"{error_count} errors out of {total_count}")
 
+    print("********* Loader Summary ***************")
     print(f"{error_count} errors out of {total_count}")
     for k, v in result_log.items():
         print(k, v)
+        print("-------------------")

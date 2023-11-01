@@ -10,9 +10,6 @@ from .excel_creation import (
 
 from .excel_creation import insert_version_and_sheet_name
 from c2g.models import (
-    ELECAUDITHEADER as Gen,
-    ELECAUDITFINDINGS as Findings,
-    ELECFINDINGSTEXT as FTexts,
     ELECCAPTEXT as CapTexts,
 )
 
