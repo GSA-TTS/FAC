@@ -1,4 +1,4 @@
-name: Change Tracking Marker
+name: Record Deployment And Add New Relic Monitor
 on:
   push:
     branches:
@@ -19,7 +19,7 @@ jobs:
           echo "short_sha=$(git rev-parse --short ${{ github.sha }})" >> $GITHUB_OUTPUT
 
       # This step creates a new Change Tracking Marker
-      - name: New Relic Application Deployment Marker
+      - name: Add New Relic Application Deployment Marker
         uses: newrelic/deployment-marker-action@v2.3.0
         with:
           apiKey: ${{ secrets.NEW_RELIC_API_KEY }}
