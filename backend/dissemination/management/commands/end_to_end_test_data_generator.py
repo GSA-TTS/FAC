@@ -12,7 +12,9 @@ logger = logging.getLogger(__name__)
 
 class Command(BaseCommand):
     def add_arguments(self, parser):
-        parser.add_argument("--email", type=str, required=False, default=CYPRESS_TEST_EMAIL_ADDR)
+        parser.add_argument(
+            "--email", type=str, required=False, default=CYPRESS_TEST_EMAIL_ADDR
+        )
         parser.add_argument("--dbkeys", type=str, required=False, default="")
         parser.add_argument("--years", type=str, required=False, default="")
 
