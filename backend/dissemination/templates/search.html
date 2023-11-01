@@ -42,14 +42,14 @@
                                     aria-controls="entity-name">Name (Entity, Auditee, or Auditor)</button>
                         </label>
                         <textarea class="usa-textarea" id="entity-name" name="entity_name">{{form.cleaned_data.entity_name}}</textarea>
-                        {% comment %} Fiscal Year {% endcomment %}
+                        {% comment %} Audit Year {% endcomment %}
                         <button type="button"
                                 class="usa-accordion__button"
                                 aria-expanded="true"
                                 aria-controls="audit-year">Audit Year</button>
                         <div id="audit-year">
                             {% for value, text in form.audit_year.field.choices %}
-                                <div class="usa-checkbox bg-base-lightest">
+                                <div class="usa-checkbox bg-base-lighter">
                                     <input class="usa-checkbox__input"
 										   id="audit-year-{{ text }}"
 										   name="audit_year"
@@ -121,14 +121,30 @@
                         <input class="usa-button" type="submit" value="Search" />
                         <button class="usa-button usa-button--unstyled">Reset Search</button>
                     </div>
+                    {% comment %} Hidden page input for use when clicking pagination buttons {% endcomment %}
+                    <input class="usa-input"
+                           id="page"
+                           name="page"
+                           type="number"
+                           value="{{ page }}"
+                           hidden />
                 </form>
             </div>
             <div class="tablet:grid-col-8 audit-search-results">
-                <h2>Search single audit reports</h2>
+                <h2 class="font-sans-2xl">Search single audit reports</h2>
                 {% if results %}
+                    <div class="usa-alert usa-alert--info">
+                        <div class="usa-alert__body">
+                            <h4 class="usa-alert__heading">Sorting</h4>
+                            <p class="usa-alert__text">
+                                Use the arrows at the top of each column to sort results. Sorting only applies to the results shown per page.
+                            </p>
+                        </div>
+                    </div>
                     <table class="usa-table usa-table--striped">
                         <caption>
-                            Results {{ results|length }}
+                            Results: {{ results_count }}
+                            <span class="margin-left-2 text-normal text-italic">showing {{ limit }} per page</span>
                         </caption>
                         <thead>
                             <tr>
@@ -137,8 +153,8 @@
                                 <th data-sortable scope="col" role="columnheader">Acc Date</th>
                                 <th data-sortable scope="col" role="columnheader">AY</th>
                                 <th data-sortable scope="col" role="columnheader">Cog or Over</th>
-                                <th data-sortable scope="col" role="columnheader">View</th>
-                                <th data-sortable scope="col" role="columnheader">PDF</th>
+                                <th scope="col" role="columnheader">View</th>
+                                <th scope="col" role="columnheader">PDF</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -146,7 +162,9 @@
                                 <tr>
                                     <th scope="row" role="rowheader">{{ result.auditee_name }}</th>
                                     <td>{{ result.auditee_uei }}</td>
-                                    <td data-sort-value="1696528569380">{{ result.fac_accepted_date }}</td>
+                                    {% comment %} Sorts ascending/descending by the numeric date string (i.e. 20231231) {% endcomment %}
+                                    <td data-sort-value={{ result.fac_accepted_date|date:"Ymd" }}>{{ result.fac_accepted_date }}
+                                    </td>
                                     <td>{{ result.audit_year }}</td>
                                     <td>
                                         {% if result.oversight_agency %}
@@ -168,11 +186,13 @@
                                         </a>
                                     </td>
                                     <td>
-                                        <a href="{% url 'dissemination:PdfDownload' report_id=result.report_id %}" target="_blank">
+                                        <a class="usa-link display-flex flex-column flex-align-center"
+                                           href="{% url 'dissemination:PdfDownload' report_id=result.report_id %}"
+                                           target="_blank">
                                             <svg class="usa-icon usa-icon--size-4"
-                                                aria-hidden="true"
-                                                focusable="false"
-                                                role="img">
+                                                 aria-hidden="true"
+                                                 focusable="false"
+                                                 role="img">
                                                 {% uswds_sprite "file_download" %}
                                             </svg>
                                         </a>
@@ -183,70 +203,53 @@
                     </table>
                     <nav aria-label="Pagination" class="usa-pagination">
                         <ul class="usa-pagination__list">
-                            <li class="usa-pagination__item usa-pagination__arrow">
-                                <a href="javascript:void(0);"
-                                   class="usa-pagination__link usa-pagination__previous-page"
-                                   aria-label="Previous page">
-                                    <svg class="usa-icon" aria-hidden="true" role="img">
-                                        {% uswds_sprite "navigate_before" %}
-                                    </svg>
-                                    <span class="usa-pagination__link-text">Previous</span></a>
-                            </li>
-                            <li class="usa-pagination__item usa-pagination__page-no">
-                                <a href="javascript:void(0);"
-                                   class="usa-pagination__button"
-                                   aria-label="Page 1">1</a>
-                            </li>
-                            <li class="usa-pagination__item usa-pagination__overflow"
-                                aria-label="ellipsis indicating non-visible pages">
-                                <span>…</span>
-                            </li>
-                            <li class="usa-pagination__item usa-pagination__page-no">
-                                <a href="javascript:void(0);"
-                                   class="usa-pagination__button"
-                                   aria-label="Page 9">9</a>
-                            </li>
-                            <li class="usa-pagination__item usa-pagination__page-no">
-                                <a href="javascript:void(0);"
-                                   class="usa-pagination__button usa-current"
-                                   aria-label="Page 10"
-                                   aria-current="page">10</a>
-                            </li>
-                            <li class="usa-pagination__item usa-pagination__page-no">
-                                <a href="javascript:void(0);"
-                                   class="usa-pagination__button"
-                                   aria-label="Page 11">11</a>
-                            </li>
-                            <li class="usa-pagination__item usa-pagination__overflow"
-                                aria-label="ellipsis indicating non-visible pages">
-                                <span>…</span>
-                            </li>
-                            <li class="usa-pagination__item usa-pagination__page-no">
-                                <a href="javascript:void(0);"
-                                   class="usa-pagination__button"
-                                   aria-label="Last page, page 24">24</a>
-                            </li>
-                            <li class="usa-pagination__item usa-pagination__arrow">
-                            <a href="javascript:void(0);"
-                               class="usa-pagination__link usa-pagination__next-page"
-                               aria-label="Next page"><span class="usa-pagination__link-text">Next</span>
-                            <svg class="usa-icon" aria-hidden="true" role="img">
-                                {% uswds_sprite "navigate_next" %}
-                            </svg>
-                        </a>
-                    </li>
-                </ul>
-            </nav>
-        {% else %}
-            <div class="search-instructions">
-                <img src="{% static 'img/circle-arrow.svg' %}"
-                     alt="an arrow points left, toward the search form" />
-                <p>
-                    Enter your filters and select <em>Search</em> to begin
-                </p>
+                            {% if results.has_previous %}
+                                <li class="usa-pagination__item usa-pagination__arrow">
+                                    <a class="usa-pagination__link usa-pagination__previous-page"
+                                       aria-label="Previous page">
+                                        <svg class="usa-icon" aria-hidden="true" role="img">
+                                            {% uswds_sprite "navigate_before" %}
+                                        </svg>
+                                        <span class="usa-pagination__link-text">Previous</span></a>
+                                </li>
+                            {% endif %}
+                            {% for page_number in results.adjusted_elided_pages %}
+                                {% if page_number == results.paginator.ELLIPSIS %}
+                                    <li class="usa-pagination__item usa-pagination__overflow"
+                                        aria-label="ellipsis indicating non-visible pages">
+                                        <span>…</span>
+                                    </li>
+                                {% else %}
+                                    <li class="usa-pagination__item usa-pagination__page-no">
+                                        <a class="usa-pagination__button {% if results.number == page_number %}usa-current{% endif %}"
+                                           aria-label="Page {{ page_number }}">{{ page_number }}</a>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+                            {% if results.has_next %}
+                                <li class="usa-pagination__item usa-pagination__arrow">
+                                    <a class="usa-pagination__link usa-pagination__next-page"
+                                       aria-label="Next page">
+                                        <span class="usa-pagination__link-text">Next</span>
+                                        <svg class="usa-icon" aria-hidden="true" role="img">
+                                            {% uswds_sprite "navigate_next" %}
+                                        </svg>
+                                    </a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                {% else %}
+                    <div class="search-instructions">
+                        <img src="{% static 'img/circle-arrow.svg' %}"
+                             alt="an arrow points left, toward the search form" />
+                        <p>
+                            Enter your filters and select <em>Search</em> to begin
+                        </p>
+                    </div>
+                {% endif %}
             </div>
-        {% endif %}
+        </div>
     </div>
-</div>
-</div>
-{% endblock %}
+    <script src="{% static 'compiled/js/search-results-pagination.js' %}"></script>
+{% endblock content %}
