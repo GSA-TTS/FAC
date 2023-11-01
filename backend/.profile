@@ -29,7 +29,10 @@ export NEW_RELIC_ENVIRONMENT="$(echo "$VCAP_APPLICATION" | jq -r .space_name)"
 export NEW_RELIC_LOG=stdout
 
 # Logging level, (critical, error, warning, info and debug). Default to info
-export NEW_RELIC_LOG_LEVEL=error
+export NEW_RELIC_LOG_LEVEL=info
+
+export NEW_RELIC_APPLICATION_LOGGING_ENABLED=true
+export NEW_RELIC_APPLICATION_LOGGING_FORWARDING_ENABLED=true
 
 # https://docs.newrelic.com/docs/security/security-privacy/compliance/fedramp-compliant-endpoints/
 export NEW_RELIC_HOST="gov-collector.newrelic.com"
