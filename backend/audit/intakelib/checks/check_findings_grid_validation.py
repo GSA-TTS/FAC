@@ -2,7 +2,7 @@ from audit.intakelib.intermediate_representation import (
     get_range_values_by_name,
     get_range_by_name,
 )
-from .util import get_message, build_cell_error_tuple
+from audit.intakelib.common import get_message, build_cell_error_tuple
 
 # Modified Opinion
 # Other Matters

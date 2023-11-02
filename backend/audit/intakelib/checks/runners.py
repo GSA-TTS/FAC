@@ -29,7 +29,7 @@ from .check_additional_award_identification_present import (
 from .check_federal_program_total import federal_program_total_is_correct
 from .check_cluster_total import cluster_total_is_correct
 from .check_total_amount_expended import total_amount_expended_is_correct
-from .check_federal_award_passed_passed_through_optional import (
+from .check_federal_award_passed_through_optional import (
     federal_award_amount_passed_through_optional,
 )
 from .check_cardinality_of_passthrough_names_and_ids import (

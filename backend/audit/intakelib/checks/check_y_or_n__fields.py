@@ -1,5 +1,5 @@
 import logging
-from .util import invalid_y_or_n_entry
+from audit.intakelib.common import invalid_y_or_n_entry
 from audit.fixtures.excel import FORM_SECTIONS
 
 logger = logging.getLogger(__name__)

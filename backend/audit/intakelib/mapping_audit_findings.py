@@ -43,9 +43,9 @@ def extract_audit_findings(file):
 
     ir = extract_workbook_as_ir(file)
     run_all_general_checks(ir, FORM_SECTIONS.FINDINGS_UNIFORM_GUIDANCE)
-    new_ir = run_all_audit_findings_transforms(ir)
-    run_all_audit_finding_checks(new_ir)
-    result = _extract_generic_data(new_ir, params)
+    xform_ir = run_all_audit_findings_transforms(ir)
+    run_all_audit_finding_checks(xform_ir)
+    result = _extract_generic_data(xform_ir, params)
     return result
 
 

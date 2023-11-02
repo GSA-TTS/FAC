@@ -4,7 +4,12 @@ import re
 from audit.intakelib.intermediate_representation import (
     get_range_by_name,
 )
-from .util import get_message, build_cell_error_tuple, appears_empty, is_value_na
+from audit.intakelib.common import (
+    get_message,
+    build_cell_error_tuple,
+    appears_empty,
+    is_value_marked_na,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -22,7 +27,7 @@ def prior_references_pattern(ir):
     for index, prior_reference in enumerate(prior_references["values"]):
         if (
             not appears_empty(prior_reference)
-            and (not is_value_na(prior_reference))
+            and (not is_value_marked_na(prior_reference))
             and (not re.match(PRIOR_REFERENCES_REGEX, str(prior_reference)))
         ):
             errors.append(
