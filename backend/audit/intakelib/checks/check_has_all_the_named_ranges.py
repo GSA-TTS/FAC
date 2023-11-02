@@ -3,7 +3,7 @@ from openpyxl import load_workbook
 from audit.intakelib.intermediate_representation import (
     extract_workbook_as_ir,
 )
-from .util import get_names_of_all_ranges
+from audit.intakelib.common import get_names_of_all_ranges
 from audit.fixtures.excel import FORM_SECTIONS
 from audit.fixtures.excel import (
     ADDITIONAL_UEIS_TEMPLATE,

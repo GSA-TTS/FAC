@@ -18,7 +18,7 @@ from .mapping_util import (
 from .mapping_meta import meta_mapping
 
 from .checks import run_all_general_checks, run_all_secondary_auditors_checks
-
+from .transforms import run_all_secondary_auditors_transforms
 from .intermediate_representation import (
     extract_workbook_as_ir,
     _extract_generic_data,
@@ -42,8 +42,9 @@ def extract_secondary_auditors(file):
 
     ir = extract_workbook_as_ir(file)
     run_all_general_checks(ir, FORM_SECTIONS.SECONDARY_AUDITORS)
-    run_all_secondary_auditors_checks(ir)
-    result = _extract_generic_data(ir, params)
+    xform_ir = run_all_secondary_auditors_transforms(ir)
+    run_all_secondary_auditors_checks(xform_ir)
+    result = _extract_generic_data(xform_ir, params)
     return result
 
 
