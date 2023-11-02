@@ -10,13 +10,13 @@ on:
 jobs:
   newrelic:
     runs-on: ubuntu-latest
-    name: New Relic
+    name: New Relic Record Deployment
     steps:
       # This step builds a var with the release tag value to use later
       - name: Set Release Version from Tag
         run: echo "RELEASE_VERSION=${{ github.ref_name }}" >> $GITHUB_ENV
       # This step creates a new Change Tracking Marker
-      - name: New Relic Application Deployment Marker
+      - name: Add New Relic Application Deployment Marker
         uses: newrelic/deployment-marker-action@v2.3.0
         with:
           apiKey: ${{ secrets.NEW_RELIC_API_KEY }}
