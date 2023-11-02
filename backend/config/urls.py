@@ -1,4 +1,5 @@
 from api import views
+from audit import views as auditviews
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
@@ -73,6 +74,9 @@ urlpatterns = [
     ),
     path("audit/", include("audit.urls")),
     path("dissemination/", include("dissemination.urls")),
+    # home page & robots.txt
+    path("", auditviews.Home.as_view(), name="Home"),
+    path("robots.txt", auditviews.no_robots, name="no_robots"),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 if settings.ENABLE_DEBUG_TOOLBAR:
