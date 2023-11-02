@@ -120,7 +120,6 @@ INSTALLED_APPS += [
     "api",
     "users",
     "report_submission",
-    "cms",
     # "data_distro",
     "dissemination",
     "support",
