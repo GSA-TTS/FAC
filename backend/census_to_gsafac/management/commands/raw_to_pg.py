@@ -65,22 +65,11 @@ class Command(BaseCommand):
             if model_name:
                 model_obj = c2g_models[c2g_model_names.index(model_name)]
                 response = s3_client.get_object(Bucket=c2g_bucket_name, Key=item["Key"])
-                # rows = io.BytesIO(response["Body"].read().replace(b"\r", b""))
-                # rows = response["Body"].readlines()
-                # rows = []
-                # for line in response["Body"].read().splitlines(keepends=True):
-                #     rows.append(line.replace(b'\r', b''))
                 print("Obtained response from S3")
                 lines = response["Body"].read().decode("utf-8").splitlines(True)
                 print("Loaded Body into 'lines'")
-                # print(lines)
-                # Use following only for ELECAUDITS
-                # rows = [row for row in csv.DictReader(lines[11550:12000])]
                 rows = [row for row in csv.DictReader(lines)]
                 print("Completed processing 'lines'")
-                # for row in rows:
-                #     print(row)
-                #     break
                 self.load_table(model_obj, rows)
 
         for mdl in c2g_models:
@@ -113,8 +102,6 @@ class Command(BaseCommand):
     def load_table(self, model_obj, rows):
         print("Loading data for model_obj ", model_obj)
         for i in range(0, len(rows)):
-            # if i > 2:
-            #     break
             model_instance = model_obj()
 
             for column_name, value in rows[i].items():
