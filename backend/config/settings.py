@@ -244,6 +244,9 @@ if ENVIRONMENT not in ["DEVELOPMENT", "PREVIEW", "STAGING", "PRODUCTION"]:
 
     # Private bucket
     AWS_PRIVATE_STORAGE_BUCKET_NAME = "gsa-fac-private-s3"
+    # Private C2g bucket
+    AWS_C2G_BUCKET_NAME = "fac-c2g-s3"
+    
     AWS_S3_PRIVATE_REGION_NAME = os.environ.get(
         "AWS_S3_PRIVATE_REGION_NAME", "us-east-1"
     )
