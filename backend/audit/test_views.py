@@ -153,6 +153,30 @@ def _just_uei_workbooks(uei):
     return {k: _just_uei(uei, k) for k in workbooks}
 
 
+class RootPathTests(TestCase):
+    """
+    Do we return the correct response for both authenticated and unauthenticated
+    users?
+    """
+
+    def test_unauthenticated(self):
+        """Verify the root path returns 200, unauthenticated."""
+        result = self.client.get("/")
+        self.assertEqual(result.status_code, 200)
+
+    def test_authenticated(self):
+        """Verify the root path redirects, authenticated."""
+        user = baker.make(User)
+        self.client.force_login(user=user)
+        result = self.client.get("/")
+        self.assertEqual(result.status_code, 302)
+
+    def test_no_robots(self):
+        """Verify robots.txt returns 200"""
+        result = self.client.get("/robots.txt")
+        self.assertEqual(result.status_code, 200)
+
+
 class MySubmissionsViewTests(TestCase):
     def setUp(self):
         self.user = baker.make(User)

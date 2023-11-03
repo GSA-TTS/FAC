@@ -1,0 +1,26 @@
+name: Record Deployment And Add New Relic Monitor
+on:
+  push:
+    branches:
+      - main
+      - prod
+    tags:
+      - v1.*
+
+jobs:
+  newrelic:
+    runs-on: ubuntu-latest
+    name: New Relic Record Deployment
+    steps:
+      # This step builds a var with the release tag value to use later
+      - name: Set Release Version from Tag
+        run: echo "RELEASE_VERSION=${{ github.ref_name }}" >> $GITHUB_ENV
+      # This step creates a new Change Tracking Marker
+      - name: Add New Relic Application Deployment Marker
+        uses: newrelic/deployment-marker-action@v2.3.0
+        with:
+          apiKey: ${{ secrets.NEW_RELIC_API_KEY }}
+          guid: ${{ secrets.NEW_RELIC_DEPLOYMENT_ENTITY_GUID }}
+          version: "${{ env.RELEASE_VERSION }}"
+          user: "${{ github.actor }}"
+
