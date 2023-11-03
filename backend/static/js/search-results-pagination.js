@@ -1,4 +1,4 @@
-var FORM = document.forms[1];
+var FORM = document.getElementById('search-form');
 const pagination_links = document.querySelectorAll('[aria-label^="Page"]');
 const next_page_link = document.querySelectorAll('[aria-label="Next page"]');
 const previous_page_link = document.querySelectorAll(
