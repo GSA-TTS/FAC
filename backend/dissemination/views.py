@@ -1,5 +1,7 @@
+import math
+
 from django.core.exceptions import BadRequest, PermissionDenied
-from django.core.paginator import Paginator
+from django.core.paginator import Paginator, EmptyPage
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.generic import View
@@ -47,7 +49,7 @@ class Search(View):
             # TODO: Add a limit choice field to the form
             limit = form.cleaned_data["limit"] or 30
             # Changed in the form via pagination links
-            page = form.cleaned_data["page"] or 1
+            page = int(form.cleaned_data["page"] or 1)
 
             results = search_general(
                 names,
@@ -58,11 +60,15 @@ class Search(View):
                 agency_name,
                 audit_years,
             )
-            results_count = results.count()  # Total result count
+            results_count = results.count()
+            # Reset page to one if the page number surpasses how many pages there actually are
+            if (page > math.ceil(results_count / limit)):
+                page = 1
+            
             paginator = Paginator(
-                results, per_page=limit
-            )  # Paginator object handles results splicing, page count, and pagination buttons
-            results = paginator.get_page(page)  # Results for a given page
+                object_list=results, per_page=limit
+            )
+            results = paginator.get_page(page)  # List of <limit> objects
             results.adjusted_elided_pages = paginator.get_elided_page_range(
                 page, on_each_side=1
             )  # Pagination buttons, adjust ellipses around the current page
