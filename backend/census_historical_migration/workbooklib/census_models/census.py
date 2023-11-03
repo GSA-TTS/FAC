@@ -10,7 +10,7 @@ database = PostgresqlDatabase("postgres", **{"host": "db", "user": "postgres"})
 
 
 def model_module_path(model, year):
-    return f"dissemination.workbooklib.census_models.census.Census{model}{year}"
+    return f"census_historical_migration.workbooklib.census_models.census.Census{model}{year}"
 
 
 def dynamic_import(mod, year):

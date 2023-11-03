@@ -18,7 +18,7 @@ from census_historical_migration.workbooklib.workbook_creation import (
 from census_historical_migration.workbooklib.sac_creation import _post_upload_pdf
 from audit.intake_to_dissemination import IntakeToDissemination
 
-from census_historical_migration.models import (
+from dissemination.models import (
     AdditionalEin,
     AdditionalUei,
     CapText,
