@@ -12,7 +12,7 @@ from django.apps import apps
 from django.core.files.uploadedfile import SimpleUploadedFile
 from jsonschema import ValidationError
 from audit.models import SingleAuditChecklist
-from .transformers import clean_gen
+from .transformers import clean_gen, make_report_id, str_to_date
 from c2g.models import (
     ELECAUDITHEADER as Gen,
     ELECAUDITS as Cfda,
@@ -31,11 +31,6 @@ from audit.intakelib import (
 import audit.validators
 
 from audit.fixtures.excel import FORM_SECTIONS
-
-from .excel_creation import (
-    dbkey_to_test_report_id,
-    _census_date_to_datetime,
-)
 
 
 logger = logging.getLogger(__name__)
@@ -96,15 +91,12 @@ def _census_audit_type(s):
 
 def _fake_general_information(user, gen: Gen):
     """Create a fake general_information object."""
-    auditee_fiscal_period_end = _census_date_to_datetime(gen.FYENDDATE).strftime(
-        "%Y-%m-%d"
-    )
-    auditee_fiscal_period_start = (
-        _census_date_to_datetime(gen.FYSTARTDATE) - timedelta(days=365)
-    ).strftime("%Y-%m-%d")
+    # auditee_fiscal_period_end = str_to_date(gen.FYENDDATE)
+    # auditee_fiscal_period_start = str_to_date(gen.FYSTARTDATE)
+
     general_information = {
-        "auditee_fiscal_period_start": auditee_fiscal_period_start,
-        "auditee_fiscal_period_end": auditee_fiscal_period_end,
+        "auditee_fiscal_period_start": gen.FYSTARTDATE,
+        "auditee_fiscal_period_end": gen.FYENDDATE,
         "audit_period_covered": _period_covered(gen.PERIODCOVERED),
         "audit_type": _census_audit_type(gen.AUDITTYPE),
         "auditee_address_line_1": gen.STREET1,
@@ -114,10 +106,7 @@ def _fake_general_information(user, gen: Gen):
         "auditee_email": gen.AUDITEEEMAIL or user.email,
         "auditee_name": gen.AUDITEENAME,
         "auditee_phone": gen.AUDITEEPHONE,
-        # TODO: when we include territories in our valid states, remove this restriction
         "auditee_state": gen.STATE,
-        # TODO: this is GSA's UEI. We could do better at making random choices that
-        # pass the schema's complex regex validation
         "auditee_uei": gen.UEI,
         "auditee_zip": gen.ZIPCODE,
         "auditor_address_line_1": gen.CPASTREET1,
@@ -130,7 +119,6 @@ def _fake_general_information(user, gen: Gen):
         "auditor_email": gen.CPAEMAIL if gen.CPAEMAIL else "noemailfound@noemail.com",
         "auditor_firm_name": gen.CPAFIRMNAME,
         "auditor_phone": gen.CPAPHONE,
-        # TODO: when we include territories in our valid states, remove this restriction
         "auditor_state": gen.CPASTATE,
         "auditor_zip": gen.CPAZIPCODE,
         "ein": gen.EIN,
@@ -144,24 +132,25 @@ def _fake_general_information(user, gen: Gen):
     }
 
     # verify that our created object validates against the schema
-    try:
-        audit.validators.validate_general_information_complete_json(general_information)
-    except ValidationError as err:
-        print(err.message)
-        return None
+    audit.validators.validate_general_information_complete_json(general_information)
 
     return general_information
 
 
-# TODO: Pull this from actual information.
-def _fake_audit_information(gen: Gen):
-    cfdas = Cfda.objects.filter(AUDITYEAR=gen.AUDITYEAR, DBKEY=gen.DBKEY)
-
+def _get_agencues(gen):
+    cfdas = Cfda.objects.filter(ELECAUDITSID=gen.ID)
     agencies = {}
     cfda: Cfda
     for cfda in cfdas:
         agencies[int((cfda.CFDA).split(".")[0])] = 1
+    agencies = list(
+        map(lambda i: str(i) if len(str(i)) > 1 else f"0{str(i)}", agencies.keys())
+    )
+    return agencies
 
+
+# TODO: Pull this from actual information.
+def _fake_audit_information(gen: Gen):
     findings = Finding.objects.filter(AUDITYEAR=gen.AUDITYEAR, DBKEY=gen.DBKEY)
     finding: Finding
     gaap_results = {}
@@ -176,9 +165,7 @@ def _fake_audit_information(gen: Gen):
             gaap_results["disclaimer_of_opinion"] = 1
 
     audit_information = {
-        "agencies": list(
-            map(lambda i: str(i) if len(str(i)) > 1 else f"0{str(i)}", agencies.keys())
-        ),
+        "agencies": _get_agencues(gen),
         "dollar_threshold": 750000,
         "gaap_results": list(gaap_results.keys()),
         "is_aicpa_audit_guide_included": gen.REPORTABLECONDITION == "Y",
@@ -199,7 +186,7 @@ def _create_sac(user, gen: Gen):
     clean_gen(gen)
 
     """Create a single example SAC."""
-    report_id = dbkey_to_test_report_id(gen.AUDITYEAR, gen.FYENDDATE, gen.DBKEY)
+    report_id = make_report_id(gen.AUDITYEAR, gen.FYENDDATE, gen.DBKEY)
 
     try:
         exists = SingleAuditChecklist.objects.get(report_id=report_id)
@@ -209,12 +196,13 @@ def _create_sac(user, gen: Gen):
         exists.delete()
 
     sac = SingleAuditChecklist.objects.create(
+        report_id=report_id,
         submitted_by=user,
         general_information=_fake_general_information(user, gen),
         audit_information=_fake_audit_information(gen),
     )
-    # Set a TEST report id for this data
-    sac.report_id = report_id
+    # # Set a TEST report id for this data
+    # sac.report_id = report_id
 
     sac.auditee_certification = {}
     sac.auditee_certification["auditee_signature"] = {}
@@ -318,6 +306,7 @@ def _post_upload_workbook(this_sac, this_user, section, xlsx_file):
     excel_file.save()
 
     audit_data = extract_mapping[section](excel_file.file)
+    print("JMM audit_data", section, audit_data)
     validator_mapping[section](audit_data)
 
     if section == FORM_SECTIONS.FEDERAL_AWARDS_EXPENDED:

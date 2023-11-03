@@ -13,7 +13,7 @@ from django.db.models import Q
 
 
 from config import settings
-from .transformers import clean_cfda
+from .transformers import clean_cfda, get_extra_cfda_attrinutes
 
 from c2g.models import (
     ELECAUDITS as Cfda,
@@ -217,16 +217,15 @@ def generate_federal_awards(sac, dbkey, audit_year, outfile):
         clean_cfda(cfda)
     map_simple_columns(wb, mappings, cfdas)
 
-    # Patch the clusternames. They used to be allowed to enter anything
-    # they wanted.
-    valid_file = open(f"{settings.BASE_DIR}/schemas/source/base/ClusterNames.json")
-    valid_json = json.load(valid_file)
-    # This was removed from the CSV...
-    valid_json["cluster_names"].append("STATE CLUSTER")
+    # valid_file = open(f"{settings.BASE_DIR}/schemas/source/base/ClusterNames.json")
+    # valid_json = json.load(valid_file)
+    # # This was removed from the CSV...
+    # valid_json["cluster_names"].append("STATE CLUSTER")
 
-    (cluster_names, other_cluster_names) = _generate_cluster_names(cfdas, valid_json)
-    set_range(wb, "cluster_name", cluster_names)
-    set_range(wb, "other_cluster_name", other_cluster_names)
+    cluster_names = get_extra_cfda_attrinutes("cluster_names")
+    other_cluster_names = get_extra_cfda_attrinutes("cluster_names")
+    set_range(wb, "cluster_name", ("cluster_names"))
+    set_range(wb, "other_cluster_name", ("other_cluster_names"))
 
     # Fix the additional award identification. If they had a "U", we want
     # to see something in the addl. column.
@@ -245,43 +244,49 @@ def generate_federal_awards(sac, dbkey, audit_year, outfile):
     set_range(wb, "passthrough_identifying_number", passthrough_ids)
 
     # The award numbers!
-    set_range(
-        wb,
-        "award_reference",
-        [f"AWARD-{n+1:04}" for n in range(len(passthrough_names))],
-    )
+    award_references = [f"AWARD-{n+1:04}" for n in range(len(cfdas))]
+
+    set_range(wb, "award_reference", award_references, default="Empty")
 
     # Total amount expended must be calculated and inserted
     total = 0
     for cfda in cfdas:
         total += int(cfda.AMOUNT)
+    print("JMM: setting total to ", total)
     set_single_cell_range(wb, "total_amount_expended", total)
 
-    loansatend = list()
-    cfda: Cfda
-    for cfda in Cfda.objects.filter(Q(DBKEY=dbkey) & Q(AUDITYEAR=audit_year)).order_by(
-        "ID"
-    ):
-        if cfda.LOANS == "Y":
-            if cfda.LOANBALANCE is None:
-                # loansatend.append("N/A")
-                loansatend.append(1)
-            else:
-                loansatend.append(cfda.LOANBALANCE)
-        else:
-            loansatend.append("")
-    # set_range(wb, "loan_balance_at_audit_period_end", loansatend, type=int_or_na)
-    set_range(wb, "loan_balance_at_audit_period_end", loansatend, conversion_fun=int)
+    # loansatend = list()
+    # cfda: Cfda
+    # for cfda in Cfda.objects.filter(Q(DBKEY=dbkey) & Q(AUDITYEAR=audit_year)).order_by(
+    #     "ID"
+    # ):
+    #     if cfda.LOANS == "Y":
+    #         if cfda.LOANBALANCE is None:
+    #             # loansatend.append("N/A")
+    #             loansatend.append(1)
+    #         else:
+    #             loansatend.append(cfda.LOANBALANCE)
+    #     else:
+    #         loansatend.append("")
+    # # set_range(wb, "loan_balance_at_audit_period_end", loansatend, type=int_or_na)
+    # set_range(wb, "loan_balance_at_audit_period_end", loansatend, conversion_fun=int)
 
     wb.save(outfile)
 
     table = generate_dissemination_test_table(
         sac, "federal_awards", audit_year, dbkey, mappings, cfdas
     )
-    award_counter = 1
+    print("JMM generate_dissemination_test_table returned ", len(table["rows"]))
+    # award_counter = 1
     # prefix
-    for obj, pfix, ext, addl, cn, ocn in zip(
-        table["rows"], prefixes, extensions, addls, cluster_names, other_cluster_names
+    for obj, pfix, ext, refs, addl, cn, ocn in zip(
+        table["rows"],
+        prefixes,
+        extensions,
+        award_references,
+        addls,
+        cluster_names,
+        other_cluster_names,
     ):
         obj["fields"].append("federal_agency_prefix")
         obj["values"].append(pfix)
@@ -289,16 +294,17 @@ def generate_federal_awards(sac, dbkey, audit_year, outfile):
         obj["values"].append(ext)
         # Sneak in the award number here
         obj["fields"].append("award_reference")
-        obj["values"].append(f"AWARD-{award_counter:04}")
+        obj["values"].append(refs)
         obj["fields"].append("additional_award_identification")
         obj["values"].append(addl)
         obj["fields"].append("cluster_name")
         obj["values"].append(cn)
         obj["fields"].append("other_cluster_name")
         obj["fields"].append(ocn)
-        award_counter += 1
+        print("JMM onj is:", obj)
 
     table["singletons"]["auditee_uei"] = sac.auditee_uei
     table["singletons"]["total_amount_expended"] = total
+    print("JMM returnin  ", len(table["rows"]))
 
     return (wb, table)

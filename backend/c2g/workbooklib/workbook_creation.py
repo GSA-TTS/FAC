@@ -69,6 +69,7 @@ def workbook_loader(user, sac: SingleAuditChecklist, audit_year, dbkey):
             outfile.close()
             outfile = mem_fs.openbin(filename, mode="r")
             excel_file = _make_excel_file(filename, outfile)
+            print("JMM: excelfile = ", excel_file)
             if user:
                 _post_upload_workbook(sac, user, section, excel_file)
             outfile.close()

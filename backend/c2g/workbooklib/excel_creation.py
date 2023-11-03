@@ -4,7 +4,7 @@ import os
 import sys
 
 import logging
-from datetime import date
+from .transformers import make_report_id
 from config import settings
 import re
 import json
@@ -80,27 +80,34 @@ def set_range(wb, range_name, values, default=None, conversion_fun=str):
 
     for ndx, v in enumerate(values):
         row = ndx + start_row
-        if v:
-            # This is a very noisy statement, showing everything
-            # written into the workbook.
-            # print(f'{range_name} c[{row}][{col}] <- {type(v)} len({len(v)}) {default}')
-            if v is not None:
-                ws.cell(row=row, column=col, value=conversion_fun(v))
-            if len(str(v)) == 0 and default is not None:
-                # This is less noisy. Shows up for things like
-                # empty findings counts. 2023 submissions
-                # require that field to be 0, not empty,
-                # if there are no findings.
-                # print('Applying default')
-                ws.cell(row=row, column=col, value=conversion_fun(default))
-        if not v:
-            if default is not None:
-                ws.cell(row=row, column=col, value=conversion_fun(default))
-            else:
-                ws.cell(row=row, column=col, value="")
-        else:
-            # Leave it blank if we have no default passed in
-            pass
+        val = v or default
+        try:
+            val = conversion_fun(val)
+        except Exception:
+            val = ""
+        ws.cell(row=row, column=col, value=val)
+
+        # if v:
+        #     # This is a very noisy statement, showing everything
+        #     # written into the workbook.
+        #     # print(f'{range_name} c[{row}][{col}] <- {type(v)} len({len(v)}) {default}')
+        #     if v is not None:
+        #         ws.cell(row=row, column=col, value=conversion_fun(v))
+        #     if len(str(v)) == 0 and default is not None:
+        #         # This is less noisy. Shows up for things like
+        #         # empty findings counts. 2023 submissions
+        #         # require that field to be 0, not empty,
+        #         # if there are no findings.
+        #         # print('Applying default')
+        #         ws.cell(row=row, column=col, value=conversion_fun(default))
+        # if not v:
+        #     if default is not None:
+        #         ws.cell(row=row, column=col, value=conversion_fun(default))
+        #     else:
+        #         ws.cell(row=row, column=col, value="")
+        # else:
+        #     # Leave it blank if we have no default passed in
+        #     pass
 
 
 def set_uei(sac: SingleAuditChecklist, wb):
@@ -141,55 +148,15 @@ def map_simple_columns(wb, mappings, values):
         )
 
 
-def _census_date_to_datetime(cd: str):
-    # lookup = {
-    #     "JAN": 1,
-    #     "FEB": 2,
-    #     "MAR": 3,
-    #     "APR": 4,
-    #     "MAY": 5,
-    #     "JUN": 6,
-    #     "JUL": 7,
-    #     "AUG": 8,
-    #     "SEP": 9,
-    #     "OCT": 10,
-    #     "NOV": 11,
-    #     "DEC": 12,
-    # }
-    # example 12/31/2022 00:00:00
-    if "/" in cd:
-        year = int(cd.split("/")[2][:4])
-        month = int(cd.split("/")[0])
-        day = int(cd.split("/")[1])
-        return date(year, month, day)
-
-    # example 2022-12-31
-    elements = cd.split("-")
-    year = int(elements[0])
-    month = int(elements[1])
-    day = int(elements[2])
-    return date(year, month, day)
-
-
-# FIXME: Get the padding/shape right on the report_id
-def dbkey_to_test_report_id(audit_year, fy_end_date, dbkey):
-    # month = g.fyenddate.split('-')[1]
-    # 2022JUN0001000003
-    # We start new audits at 1 million.
-    # So, we want 10 digits, and zero-pad for
-    # historic DBKEY report_ids
-    dt = _census_date_to_datetime(fy_end_date)
-    return f"{audit_year}-{dt.month:02}-TSTDAT-{dbkey.zfill(10)}"
-
-
 def generate_dissemination_test_table(
     sac: SingleAuditChecklist, api_endpoint, audit_year, dbkey, mappings, objects
 ):
     table: dict = {"rows": list(), "singletons": dict()}
     table["endpoint"] = api_endpoint
-    table["report_id"] = dbkey_to_test_report_id(
+    table["report_id"] = make_report_id(
         audit_year, sac.auditee_fiscal_period_end, dbkey
     )
+
     for o in objects:
         as_dict = model_to_dict(o)
         test_obj: dict = {}
