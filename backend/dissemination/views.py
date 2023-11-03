@@ -1,7 +1,7 @@
 import math
 
 from django.core.exceptions import BadRequest, PermissionDenied
-from django.core.paginator import Paginator, EmptyPage
+from django.core.paginator import Paginator
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.generic import View
@@ -62,13 +62,11 @@ class Search(View):
             )
             results_count = results.count()
             # Reset page to one if the page number surpasses how many pages there actually are
-            if (page > math.ceil(results_count / limit)):
+            if page > math.ceil(results_count / limit):
                 page = 1
-            
-            paginator = Paginator(
-                object_list=results, per_page=limit
-            )
-            results = paginator.get_page(page)  # List of <limit> objects
+
+            paginator = Paginator(object_list=results, per_page=limit)
+            results = paginator.get_page(page)  # List of size <limit> objects
             results.adjusted_elided_pages = paginator.get_elided_page_range(
                 page, on_each_side=1
             )  # Pagination buttons, adjust ellipses around the current page
