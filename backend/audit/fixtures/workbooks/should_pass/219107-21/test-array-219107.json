@@ -1,7 +1,7 @@
 [
   {
     "endpoint": "additional_eins",
-    "report_id": "2021TEST000219107",
+    "report_id": "2021-06-TSTDAT-0000219107",
     "rows": [],
     "singletons": {
       "auditee_uei": "BADBADBADBAD"
@@ -14,7 +14,7 @@
   },
   {
     "endpoint": "corrective_action_plans",
-    "report_id": "2021TEST000219107",
+    "report_id": "2021-06-TSTDAT-0000219107",
     "rows": [
       {
         "fields": [
@@ -35,7 +35,7 @@
   },
   {
     "endpoint": "federal_awards",
-    "report_id": "2021TEST000219107",
+    "report_id": "2021-06-TSTDAT-0000219107",
     "rows": [
       {
         "fields": [
@@ -12601,7 +12601,7 @@
   },
   {
     "endpoint": "findings_text",
-    "report_id": "2021TEST000219107",
+    "report_id": "2021-06-TSTDAT-0000219107",
     "rows": [
       {
         "fields": [
@@ -12622,7 +12622,7 @@
   },
   {
     "endpoint": "findings",
-    "report_id": "2021TEST000219107",
+    "report_id": "2021-06-TSTDAT-0000219107",
     "rows": [
       {
         "fields": [
@@ -14527,7 +14527,7 @@
   },
   {
     "endpoint": "notes_to_sefa",
-    "report_id": "2021TEST000219107",
+    "report_id": "2021-06-TSTDAT-0000219107",
     "rows": [],
     "singletons": {
       "accounting_policies": "1.The accompanying schedule of expenditures of federal awards (Schedule) includes the federal award activity of RI under programs of the federal government for the year ended June 30, 2021.The information in this Schedule is presented in accordance with the requirements of Title 2 U.S. Code of Federal Regulations Part 200, Uniform Administrative Requirements, Cost Principles and Audit Requirements for Federal Awards (Uniform Guidance).Because the Schedule presents only a selected portion of the operations of RI, it is not intended to and does not present the financial position, changes in net assets or cash flows of RI. Expenditures reported on the Schedule are reported on the accrual basis of accounting.Such expenditures are recognized following the cost principles contained in the Uniform Guidance, wherein certain types of expenditures are not allowable or are limited as to reimbursement.Negative amounts shown on the Schedule represent adjustments or credits made in the normal course of business to amounts reported as expenditures in prior years.",
@@ -14538,7 +14538,7 @@
   },
   {
     "endpoint": "secondary_auditor",
-    "report_id": "2021TEST000219107",
+    "report_id": "2021-06-TSTDAT-0000219107",
     "rows": [],
     "singletons": {
       "auditee_uei": "BADBADBADBAD"

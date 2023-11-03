@@ -1,4 +1,5 @@
-from django.core.exceptions import PermissionDenied
+from django.core.exceptions import BadRequest, PermissionDenied
+from django.core.paginator import Paginator
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.generic import View
@@ -11,11 +12,13 @@ from dissemination.search import search_general
 from dissemination.models import (
     General,
     FederalAward,
-    Passthrough,
     Finding,
     FindingText,
     CapText,
     Note,
+    SecondaryAuditor,
+    AdditionalEin,
+    AdditionalUei,
 )
 
 
@@ -28,6 +31,7 @@ class Search(View):
     def post(self, request, *args, **kwargs):
         form = SearchForm(request.POST)
         results = []
+        context = {}
 
         if form.is_valid():
             names = form.cleaned_data["entity_name"].splitlines()
@@ -40,6 +44,11 @@ class Search(View):
                 int(year) for year in form.cleaned_data["audit_year"]
             ]  # Cast strings from HTML to int
 
+            # TODO: Add a limit choice field to the form
+            limit = form.cleaned_data["limit"] or 30
+            # Changed in the form via pagination links
+            page = form.cleaned_data["page"] or 1
+
             results = search_general(
                 names,
                 uei_or_eins,
@@ -49,13 +58,32 @@ class Search(View):
                 agency_name,
                 audit_years,
             )
+            results_count = results.count()  # Total result count
+            paginator = Paginator(
+                results, per_page=limit
+            )  # Paginator object handles results splicing, page count, and pagination buttons
+            results = paginator.get_page(page)  # Results for a given page
+            results.adjusted_elided_pages = paginator.get_elided_page_range(
+                page, on_each_side=1
+            )  # Pagination buttons, adjust ellipses around the current page
+
             # Reformat these so the date-picker elements in HTML prepopulate
             if form.cleaned_data["start_date"]:
                 form.cleaned_data["start_date"] = start_date.strftime("%Y-%m-%d")
             if form.cleaned_data["end_date"]:
                 form.cleaned_data["end_date"] = end_date.strftime("%Y-%m-%d")
+        else:
+            raise BadRequest("Form data validation error.", form.errors)
 
-        return render(request, "search.html", {"form": form, "results": results})
+        context = context | {
+            "form": form,
+            "limit": limit,
+            "results": results,
+            "results_count": results_count,
+            "page": page,
+        }
+
+        return render(request, "search.html", context)
 
 
 class AuditSummaryView(View):
@@ -97,11 +125,13 @@ class AuditSummaryView(View):
         further. I.e. remove DB ids or something.
         """
         awards = FederalAward.objects.filter(report_id=report_id)
-        passthrough_entities = Passthrough.objects.filter(report_id=report_id)
         audit_findings = Finding.objects.filter(report_id=report_id)
         audit_findings_text = FindingText.objects.filter(report_id=report_id)
         corrective_action_plan = CapText.objects.filter(report_id=report_id)
         notes_to_sefa = Note.objects.filter(report_id=report_id)
+        secondary_auditors = SecondaryAuditor.objects.filter(report_id=report_id)
+        additional_ueis = AdditionalUei.objects.filter(report_id=report_id)
+        additional_eins = AdditionalEin.objects.filter(report_id=report_id)
 
         data = {}
 
@@ -109,8 +139,8 @@ class AuditSummaryView(View):
             x for x in awards.values()
         ]  # Take QuerySet to a list of objects
 
-        if passthrough_entities.exists():
-            data["Passthrough Entities"] = [x for x in passthrough_entities.values()]
+        if notes_to_sefa.exists():
+            data["Notes to SEFA"] = [x for x in notes_to_sefa.values()]
         if audit_findings.exists():
             data["Audit Findings"] = [x for x in audit_findings.values()]
         if audit_findings_text.exists():
@@ -119,13 +149,12 @@ class AuditSummaryView(View):
             data["Corrective Action Plan"] = [
                 x for x in corrective_action_plan.values()
             ]
-        if notes_to_sefa.exists():
-            data["Notes"] = [x for x in notes_to_sefa.values()]
-
-        for key in data:
-            for item in data[key]:
-                del item["id"]
-                del item["report_id"]
+        if secondary_auditors.exists():
+            data["Secondary Auditors"] = [x for x in secondary_auditors.values()]
+        if additional_ueis.exists():
+            data["Additional UEIs"] = [x for x in additional_ueis.values()]
+        if additional_eins.exists():
+            data["Additional EINs"] = [x for x in additional_eins.values()]
 
         return data
 

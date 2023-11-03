@@ -251,5 +251,3 @@ class SearchGeneralTests(TestCase):
             audit_years=[2020, 2021, 2022],
         )
         self.assertEqual(len(results), 3)
-
-        return

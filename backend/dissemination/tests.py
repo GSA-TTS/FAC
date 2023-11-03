@@ -13,7 +13,6 @@ from dissemination.templatetags.field_name_to_label import field_name_to_label
 from dissemination.models import (
     General,
     FederalAward,
-    Passthrough,
     Finding,
     FindingText,
     CapText,
@@ -124,7 +123,6 @@ class SummaryViewTests(TestCase):
         """
         baker.make(General, report_id="2022-12-GSAFAC-0000000001", is_public=True)
         award = baker.make(FederalAward, report_id="2022-12-GSAFAC-0000000001")
-        passthrough = baker.make(Passthrough, report_id="2022-12-GSAFAC-0000000001")
         finding = baker.make(Finding, report_id="2022-12-GSAFAC-0000000001")
         finding_text = baker.make(FindingText, report_id="2022-12-GSAFAC-0000000001")
         cap_text = baker.make(CapText, report_id="2022-12-GSAFAC-0000000001")
@@ -138,10 +136,6 @@ class SummaryViewTests(TestCase):
         self.assertEquals(
             response.context["data"]["Awards"][0]["additional_award_identification"],
             award.additional_award_identification,
-        )
-        self.assertEquals(
-            response.context["data"]["Passthrough Entities"][0]["award_reference"],
-            passthrough.award_reference,
         )
         self.assertEquals(
             response.context["data"]["Audit Findings"][0]["reference_number"],
@@ -158,6 +152,6 @@ class SummaryViewTests(TestCase):
             cap_text.contains_chart_or_table,
         )
         self.assertEquals(
-            response.context["data"]["Notes"][0]["accounting_policies"],
+            response.context["data"]["Notes to SEFA"][0]["accounting_policies"],
             note.accounting_policies,
         )

@@ -49,6 +49,6 @@ def search_general(
         fiscal_year_match = Q(audit_year__in=audit_years)
         query.add(fiscal_year_match, Q.AND)
 
-    results = General.objects.filter(query)
+    results = General.objects.filter(query).order_by("-fac_accepted_date")
 
     return results
