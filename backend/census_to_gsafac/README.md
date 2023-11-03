@@ -7,7 +7,6 @@ This is implemented as a django app to leverage existing management commands and
 * load raw census data as csv files into an S3 bucket
 * create postgres tables from these csv files
 * perform any data clean up required to create a table from a csv file
-* perforn any ither validations or cleansing, such as verifying the integrity of df files, of data coming into FAC from Census
 
 ## Infrastructure changes
 
@@ -29,7 +28,7 @@ manage.py raw_to_pg --folder data
 manage.py raw_to_pg --clean True
 ```
 
-* models.py These ought to correspons to the incoming csv files
+* models.py These ought to correspond to the incoming csv files
 * routers.py This tells django to use a different postgres instance.
 
 * data A folder that contains sample data that we can use for development.
@@ -40,7 +39,8 @@ manage.py raw_to_pg --clean True
 
 ## How to load test Census data into postgres?
 
-1.  Download test Census data from https://drive.google.com/drive/folders/1TY-7yWsMd8DsVEXvwrEe_oWW1iR2sGoy into census_to_gsafac/data folder.
+1.  Download test Census data from https://drive.google.com/drive/folders/1TY-7yWsMd8DsVEXvwrEe_oWW1iR2sGoy into census_to_gsafac/data folder.  
+NOTE:  Never checkin the census_to_gsafac/data folder into github.
 
 2.  In the FAC/backend folder, run the following to load csv files from census_to_gsafac/data folder into fac-c2g-s3 bucket.
 ```bash
