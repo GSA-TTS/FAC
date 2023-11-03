@@ -40,7 +40,6 @@ exclude_dirs = [
     "audit/test_validators.py",
     "node_modules",
     "dissemination/test_search.py",
-    "dissemination/tests.py",
 ]
 
 [tool.djlint]

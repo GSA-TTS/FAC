@@ -46,8 +46,8 @@ def extract_additional_eins(file):
 
     ir = extract_workbook_as_ir(file)
     run_all_general_checks(ir, FORM_SECTIONS.ADDITIONAL_EINS)
-    run_all_additional_eins_checks(ir)
     xform_ir = run_all_additional_eins_transforms(ir)
+    run_all_additional_eins_checks(xform_ir)
     result = _extract_generic_data(xform_ir, params)
     return result
 

@@ -1,7 +1,7 @@
 [
   {
     "endpoint": "additional_eins",
-    "report_id": "2022TEST000191734",
+    "report_id": "2022-09-TSTDAT-0000191734",
     "rows": [],
     "singletons": {
       "auditee_uei": "XPJZNYCBRLR6"
@@ -9,7 +9,7 @@
   },
   {
     "endpoint": "additional_ueis",
-    "report_id": "2022TEST000191734",
+    "report_id": "2022-09-TSTDAT-0000191734",
     "rows": [],
     "singletons": {
       "auditee_uei": "XPJZNYCBRLR6"
@@ -17,7 +17,7 @@
   },
   {
     "endpoint": "corrective_action_plans",
-    "report_id": "2022TEST000191734",
+    "report_id": "2022-09-TSTDAT-0000191734",
     "rows": [
       {
         "fields": [
@@ -62,7 +62,7 @@
   },
   {
     "endpoint": "federal_awards",
-    "report_id": "2022TEST000191734",
+    "report_id": "2022-09-TSTDAT-0000191734",
     "rows": [
       {
         "fields": [
@@ -3578,7 +3578,7 @@
   },
   {
     "endpoint": "findings_text",
-    "report_id": "2022TEST000191734",
+    "report_id": "2022-09-TSTDAT-0000191734",
     "rows": [
       {
         "fields": [
@@ -3623,7 +3623,7 @@
   },
   {
     "endpoint": "findings",
-    "report_id": "2022TEST000191734",
+    "report_id": "2022-09-TSTDAT-0000191734",
     "rows": [
       {
         "fields": [
@@ -7634,7 +7634,7 @@
   },
   {
     "endpoint": "notes_to_sefa",
-    "report_id": "2022TEST000191734",
+    "report_id": "2022-09-TSTDAT-0000191734",
     "rows": [],
     "singletons": {
       "accounting_policies": "Exemption for Indian Tribes.",
@@ -7645,7 +7645,7 @@
   },
   {
     "endpoint": "secondary_auditor",
-    "report_id": "2022TEST000191734",
+    "report_id": "2022-09-TSTDAT-0000191734",
     "rows": [],
     "singletons": {
       "auditee_uei": "XPJZNYCBRLR6"
