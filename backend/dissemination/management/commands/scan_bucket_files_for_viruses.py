@@ -16,7 +16,7 @@ class ClamAVError(Exception):
         self.file = file
 
     def __str__(self):
-        return f"Static virus scan failed: {self.file}"
+        return f"Static virus scan failed"
 
 
 def _scan_file(file):
@@ -28,10 +28,11 @@ def _scan_file(file):
             timeout=15,
         )
     except requests.exceptions.ConnectionError:
-        raise ClamAVError(file)
-    except Exception:
-        logger.debug(f"Could not scan {file}")
-        raise ClamAVError(file)
+        logger.error("SCAN Connection error")
+        raise ClamAVError(file.name)
+    except Exception as e:
+        logger.error(f"SCAN EXCEPTION UNKNOWN {file} {e}")
+        raise ClamAVError(file.name)
 
 def get_s3_client():
     s3 = boto3.client(
@@ -54,14 +55,14 @@ def load_file_from_s3(bucket, object_name):
     try:
         s3.download_fileobj(bucket, object_name, file)
     except ClientError:
-        logger.info("======================================")
-        logger.error("Could not download {}".format(object_name))
-        logger.info("======================================")
+        logger.error("======================================")
+        logger.error(f"Could not download {object_name}")
+        logger.error("======================================")
         return None
     except Exception as e:
-        logger.info("======================================")
-        logger.error(e)
-        logger.info("======================================")
+        logger.error("======================================")
+        logger.error(f"{e}")
+        logger.error("======================================")
         return None
     
     # Seek to the start of the file.
@@ -72,26 +73,33 @@ def scan_file_in_s3(bucket, object_name):
     try:
         io_obj = load_file_from_s3(bucket, object_name)
         bytes_blob = io_obj.read()
-        result = _scan_file(SimpleUploadedFile(bytes_blob, str.encode(object_name)))
-        return result
+        simple_obj = SimpleUploadedFile(object_name, bytes_blob)
+        return _scan_file(simple_obj)
     except Exception as e:
-        # logger.error(f"SCAN FAIL: {object_name}")
-        return object_name
-
+        logger.error(f"SCAN SCAN_FILE_IN_S3 {e}")
+        return f"{object_name}"
+    
 def scan_files_at_path_in_s3(bucket, path):
     s3 = get_s3_client()
     objects = s3.list_objects(Bucket=bucket, Prefix=path)
     if objects:
         results = []
-        for object_summary in objects["Contents"]:
-            object_name = object_summary["Key"]
-            result = scan_file_in_s3(bucket, object_name)
-            results.append(result)
-        return results
+        if "Contents" in objects:
+            for object_summary in objects["Contents"]:
+                object_name = object_summary["Key"]
+                result = scan_file_in_s3(bucket, object_name)
+                results.append(result)
+            return results
     return None
 
+def is_stringlike(o):
+    return isinstance(o, str) or isinstance(o, bytes)
+
+def not_a_stringlike(o):
+    return not is_stringlike(o)
+
 def check_scan_ok(result):
-    if result and not isinstance(result, str) and result.status_code == 200:
+    if result and not_a_stringlike(result) and result.status_code == 200:
         return True
     else:
         return False
@@ -112,14 +120,14 @@ class Command(BaseCommand):
         if object:
             result = scan_file_in_s3(bucket, object)
             if check_scan_ok(result):
-                logger.info("SCAN OK")
+                pass
             else:
-                logger.error(f"SCAN FAIL: f{object}")
+                logger.error(f"SCAN FAIL: {object}")
         if path:
             results = scan_files_at_path_in_s3(bucket, path)
             if all(map(check_scan_ok, results)):
                 logger.info(f"SCAN OK: COUNT {len(results)}")
             else:
                 for r in results:
-                    if isinstance(r, str):
+                    if is_stringlike(r):
                         logger.error(f"SCAN FAIL: {r}")
