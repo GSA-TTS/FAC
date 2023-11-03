@@ -7,7 +7,6 @@ from django.core.management.base import BaseCommand
 from django.conf import settings
 from django.apps import apps
 
-from census_to_gsafac.loader import load_data
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.WARNING)
@@ -43,10 +42,6 @@ class Command(BaseCommand):
             return
         if options.get("sample") == "True":
             self.sample_data()
-            return
-
-        if options.get("load") == "True":
-            load_data()
             return
 
         folder = options.get("folder")
