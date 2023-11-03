@@ -1,4 +1,4 @@
-# 11. Use the Static Site Generator Eleventy for the FAC Frontend
+# 19. Use the Static Site Generator Eleventy for the FAC Frontend
 
 Date: 2022-09-06
 
@@ -27,3 +27,6 @@ We will use a combination of Eleventy's [is-land plugin](https://is-land.11ty.de
 
 * Future components will be able to leverage Alpine, requiring less custom JS.
 * Adding `is-land` will allow the team to add other libraries on a page-by-page basis if needed.
+
+## Note
+Was previously ADR 0011; renamed/renumbered when PDRs and ADRs were merged.

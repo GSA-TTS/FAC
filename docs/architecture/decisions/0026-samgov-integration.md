@@ -1,4 +1,4 @@
-# 17. SAM.gov integration for MVP
+# 26. SAM.gov integration for MVP
 
 Date: 2023-03-09
 
@@ -42,3 +42,6 @@ There are data cleanliness consequences. To mitigate this, we are able to put in
 There are operational considerations. To mitigate this, we will revisit SAM.gov uptime and the state of UEI transition at a later point, and revisit the question of how to handle UEIs that cannot be validated at submission-time. However, this operational posture is in keeping with the AY22 submission, and does not represent a regression from the C-FAC to G-FAC.
 
 There are paths to iterative improvement. As systems improve, we will be able to iteratively improve our system and its interaction with others. This pathway reduces user burden now, and leaves pathways for systemic improvement through future revisions.
+
+## Note
+Was previously ADR 0017; renamed/renumbered when PDRs and ADRs were merged.

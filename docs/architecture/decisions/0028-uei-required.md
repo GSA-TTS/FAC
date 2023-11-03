@@ -1,4 +1,4 @@
-# UEI required for submission 
+# 28. UEI required for submission 
 
 Introduced: 2023-05-31
 
@@ -41,3 +41,5 @@ Put simply: it will not be possible to submit the SF-SAC without a valid UEI. A 
 2. SAM.gov is online and available.
 3. The SAM.gov API indicates that the UEI presented is valid and in the SAM.gov database
 
+## Note
+Was previously PDR 0008; renamed/renumbered when PDRs and ADRs were merged.

@@ -1,6 +1,6 @@
-# 1. Record product decisions
+# 5. Record product decisions
 
-Introduced: 20220330
+Introduced: 2022-03-30
 
 ## Status
 Accepted
@@ -15,3 +15,6 @@ The context/decision/consequences framework should work for us; we will alter th
 
 ## Consequences
 See Michael Nygard's article, linked above.
+
+## Notes
+This was originally product decision record 0001; renamed/renumbered as part of merging ADRs and PDRs.

@@ -1,6 +1,6 @@
-# 5. Determine certify audit submission path
+# 15. Determine certify audit submission path
 
-Introduced: 20220714.
+Introduced: 2022-07-14.
 
 ## Status
 
@@ -22,3 +22,6 @@ We decided on Option 1 (Special roles/UX in the app to sign digitally) as we bel
 * Risk: Could lead to more scanned PDFs being uploaded rather than searchable ones, slowing down auditors
 
 We are moving forward with the caveat that we may consider some lighter-weight email notification system like a mailto link if we think sending emails directly from the app will be too challenging and not useful elsewhere in the app. 
+
+## Note
+Was previously PDR 0006; renamed/renumbered when PDRs and ADRs were merged.

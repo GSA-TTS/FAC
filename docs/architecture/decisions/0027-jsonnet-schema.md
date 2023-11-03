@@ -1,4 +1,4 @@
-# 1. Data validation schema in Jsonnet
+# 27. Data validation schema in Jsonnet
 
 Date: 2023-04-10
 
@@ -40,3 +40,5 @@ This adds another tool to our backend pipeline, and a dependancy that could brea
 
 There are no security implications that we are aware of from use of this tool as a compiler; no more than using any other compiler, that is. This tooling is part of our build process, and is not exposed as part of the user-facing application.
 
+## Note
+Was previously ADR 0018; renamed/renumbered when PDRs and ADRs were merged.

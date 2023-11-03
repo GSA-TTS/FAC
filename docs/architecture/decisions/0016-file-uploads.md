@@ -1,4 +1,4 @@
-# 10. File Uploads
+# 16. File Uploads
 
 Date: 2022-08-01
 
@@ -39,3 +39,6 @@ For the frontend portion of this, we will:
  - The placement of the file upload component needs to be confirmed or designed. (Check with UX/Design teams)
  - The success/failure indicator needs to be confirmed or designed. (Check with UX/Design teams)
  - The destination on succcessful upload needs to be confirmed or designed. (Check with UX/Design teams)
+
+## Note
+Was previously ADR 0010; renamed/renumbered when PDRs and ADRs were merged.
