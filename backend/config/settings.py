@@ -123,6 +123,7 @@ INSTALLED_APPS += [
     # "data_distro",
     "dissemination",
     "support",
+    "census_to_gsafac"
 ]
 
 MIDDLEWARE = [
