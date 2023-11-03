@@ -3,7 +3,6 @@ import datetime
 
 from audit.models import SingleAuditChecklist
 from .models import ELECAUDITHEADER as Gen
-from .wb_generator import load_historic_data
 
 
 def load_data():
