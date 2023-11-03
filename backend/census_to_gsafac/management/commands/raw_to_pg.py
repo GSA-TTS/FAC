@@ -7,12 +7,12 @@ from django.core.management.base import BaseCommand
 from django.conf import settings
 from django.apps import apps
 
-from c2g.loader import load_data
+from census_to_gsafac.loader import load_data
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.WARNING)
 
-c2g_models = list(apps.get_app_config("c2g").get_models())
+c2g_models = list(apps.get_app_config("census_to_gsafac").get_models())
 c2g_model_names = [m._meta.model_name for m in c2g_models]
 s3_client = boto3.client(
     "s3",
