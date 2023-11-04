@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 
 # DESCRIPTION
 # The sum of the amount_expended should equal the total_amount_expended
-# B5=SUM(Form!F$2:F$5000)
+# B5=SUM(Form!F$2:F$MAX_ROWS)
 def total_amount_expended_is_correct(ir):
     total_amount_expended_value = get_range_values_by_name(ir, "total_amount_expended")
     amount_expended_values = get_range_values_by_name(ir, "amount_expended")

@@ -10,6 +10,7 @@ from .check_look_for_empty_rows import look_for_empty_rows
 from .check_start_and_end_rows_of_all_columns_are_same import (
     start_and_end_rows_of_all_columns_are_same,
 )
+from .check_version_number import validate_workbook_version
 
 ############
 # Federal awards checks
@@ -50,6 +51,7 @@ logger = logging.getLogger(__name__)
 
 general_checks = [
     is_a_workbook,
+    validate_workbook_version,
     uei_exists,
     look_for_empty_rows,
     start_and_end_rows_of_all_columns_are_same,
