@@ -7,6 +7,7 @@
             <div class="tablet:grid-col-4 audit-search-form">
                 <h3>Filters</h3>
                 <form class="usa-form"
+                      id="search-form"
                       action="{% url 'dissemination:Search' %}"
                       enctype='multipart/form-data'
                       method="post">
@@ -14,7 +15,7 @@
                     {% comment %} Submission {% endcomment %}
                     <div class="search-submit">
                         <input class="usa-button" type="submit" value="Search" />
-                        <button class="usa-button usa-button--unstyled">Reset Search</button>
+                        <input class="usa-button usa-button--unstyled" type="reset" value="Reset Search"/>
                     </div>
                     <div class="usa-accordion usa-accordion--multiselectable"
                          data-allow-multiple>
@@ -99,12 +100,12 @@
                         <div id="cognizant">
                             <label class="usa-label" for="options">Dropdown label</label>
                             <select class="usa-select" name="cog_or_oversight" id="options">
-                                <option value>- Select -</option>
-                                <option value="cog"
+                                <option id="cog_or_oversight--none" value>- Select -</option>
+                                <option id="cog_or_oversight--cog" value="cog"
                                         {% if form.cleaned_data.cog_or_oversight == "cog" %}selected{% endif %}>
                                     Cognizant
                                 </option>
-                                <option value="oversight"
+                                <option id="cog_or_oversight--oversight" value="oversight"
                                         {% if form.cleaned_data.cog_or_oversight == "oversight" %}selected{% endif %}>
                                     Oversight
                                 </option>
@@ -119,7 +120,7 @@
                     {% comment %} Submission {% endcomment %}
                     <div class="search-submit">
                         <input class="usa-button" type="submit" value="Search" />
-                        <button class="usa-button usa-button--unstyled">Reset Search</button>
+                        <input class="usa-button usa-button--unstyled" type="reset" value="Reset Search"/>
                     </div>
                     {% comment %} Hidden page input for use when clicking pagination buttons {% endcomment %}
                     <input class="usa-input"

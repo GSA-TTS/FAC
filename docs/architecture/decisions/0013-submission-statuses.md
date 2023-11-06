@@ -1,6 +1,6 @@
-# 5. Proposed user-visible submission statuses
+# 13. Proposed user-visible submission statuses
 
-Introduced: 20220516.
+Introduced: 2022-05-16.
 
 ## Status
 
@@ -104,3 +104,6 @@ My current assumption is that in such cases the submission will be set to `In pr
 In the following rough diagram, phases are ellipses and statuses are boxes:
 
 ![image](https://user-images.githubusercontent.com/2626258/168630560-16446868-2d4d-425d-8fbc-13839d4e172d.png)
+
+## Note
+Was previously PDR 0005; renamed/renumbered when PDRs and ADRs were merged.

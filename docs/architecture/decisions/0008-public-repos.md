@@ -1,6 +1,6 @@
-# 3. Make `gsa-tts/fac` repository public
+# 8. Make `gsa-tts/fac` repository public
 
-Introduced: 20220420
+Introduced: 2022-04-20
 
 ## Status
 
@@ -22,3 +22,5 @@ Switch `GSA-TTS/FAC` from private to public, and leave `GSA-TTS/FAC-Frontend` pu
 
 We may need, for one reason or another, make one or both repositories private at some point in the future. At that point, we will discuss and write another PDR documenting our decision.
 
+## Note
+Was previously PDR 0005; renamed/renumbered when PDRs and ADRs were merged.

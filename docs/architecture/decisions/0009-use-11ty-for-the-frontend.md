@@ -1,4 +1,4 @@
-# 6. Use the Static Site Generator Eleventy for the FAC Frontend
+# 9. Use the Static Site Generator Eleventy for the FAC Frontend
 
 Date: 2022-04-26
 
@@ -25,3 +25,6 @@ The TTS Engineering Practices Guide to [Choosing a Web App Architecture](https:/
 
 * Client-side interactions should be simple.
 * The server will be responsible for managing application state.
+
+## Note
+Was previously ADR 0006; renamed/renumbered when PDRs and ADRs were merged.

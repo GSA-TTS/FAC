@@ -1,4 +1,4 @@
-# 11. Store Question Copy as JSON
+# 20. Store Question Copy as JSON
 
 Date: 2022-09-15
 
@@ -39,3 +39,6 @@ Internally, each file will contain a single JSON dictionary, which maps a stable
 
 - The JSON files containing the question copy for each year will be the source of truth for this data, though it will likely appear elsewhere in the code base. Specifically, the question copy may be included as part of the validation schema for audit submissions. The generation of these schemas should be configured to automatically pull the question copy from these JSON files to avoid having to keep multiple question sources synchronized.
 - Question IDs should remain the same if/when the copy associated with the question changes. This is what will allow us to merge conceptually equivalent fields across years in a later step, facilitating a better search & presentation experience for public audit report access.
+
+## Note
+Was previously ADR 0011; renamed/renumbered when PDRs and ADRs were merged.

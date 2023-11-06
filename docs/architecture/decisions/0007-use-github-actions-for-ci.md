@@ -1,4 +1,4 @@
-# 5. Use Github Actions for CI
+# 7. Use Github Actions for CI
 
 Date: 2022-04-12
 
@@ -31,3 +31,6 @@ Finding no issues with either option and opting to stick with Github-native work
 * We'll block merging to main on passing tests and a successful build.
 * We'll automatically deploy the latest passing build to cloud.gov
 * We'll continue to build out CI as we add linting, security scanning, accessibility scanning, etc.
+
+## Note
+Was previously ADR 0005; renamed/renumbered when PDRs and ADRs were merged.

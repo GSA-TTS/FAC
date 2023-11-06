@@ -1,3 +1,5 @@
+import math
+
 from django.core.exceptions import BadRequest, PermissionDenied
 from django.core.paginator import Paginator
 from django.http import Http404
@@ -34,8 +36,9 @@ class Search(View):
         context = {}
 
         if form.is_valid():
-            names = form.cleaned_data["entity_name"].splitlines()
             uei_or_eins = form.cleaned_data["uei_or_ein"].splitlines()
+            alns = form.cleaned_data["aln"].replace(", ", " ").split()
+            names = form.cleaned_data["entity_name"].splitlines()
             start_date = form.cleaned_data["start_date"]
             end_date = form.cleaned_data["end_date"]
             cog_or_oversight = form.cleaned_data["cog_or_oversight"]
@@ -47,22 +50,25 @@ class Search(View):
             # TODO: Add a limit choice field to the form
             limit = form.cleaned_data["limit"] or 30
             # Changed in the form via pagination links
-            page = form.cleaned_data["page"] or 1
+            page = int(form.cleaned_data["page"] or 1)
 
             results = search_general(
-                names,
-                uei_or_eins,
-                start_date,
-                end_date,
-                cog_or_oversight,
-                agency_name,
-                audit_years,
+                names=names,
+                alns=alns,
+                uei_or_eins=uei_or_eins,
+                start_date=start_date,
+                end_date=end_date,
+                cog_or_oversight=cog_or_oversight,
+                agency_name=agency_name,
+                audit_years=audit_years,
             )
-            results_count = results.count()  # Total result count
-            paginator = Paginator(
-                results, per_page=limit
-            )  # Paginator object handles results splicing, page count, and pagination buttons
-            results = paginator.get_page(page)  # Results for a given page
+            results_count = results.count()
+            # Reset page to one if the page number surpasses how many pages there actually are
+            if page > math.ceil(results_count / limit):
+                page = 1
+
+            paginator = Paginator(object_list=results, per_page=limit)
+            results = paginator.get_page(page)  # List of size <limit> objects
             results.adjusted_elided_pages = paginator.get_elided_page_range(
                 page, on_each_side=1
             )  # Pagination buttons, adjust ellipses around the current page

@@ -1,4 +1,4 @@
-# 8. How to Handle Bulk Data Uploads
+# 11. How to Handle Bulk Data Uploads
 
 Date: 2022-05-13
 
@@ -47,3 +47,6 @@ The final questions remaining from this issue:
 
 * It will be extra time to work on a practice validator on the site (similar to @jadudm's spike), and possibly should be moved until after the 10/1/2022 launch
 * Accepting bulk data uploads is definitely within scope, but determining what "valid" file upload rules will take some time and possibly involve the Census developers to help figure that out
+
+## Note
+Was previously ADR 0008; renamed/renumbered when PDRs and ADRs were merged.

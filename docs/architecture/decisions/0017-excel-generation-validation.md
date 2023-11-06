@@ -1,4 +1,4 @@
-# 11. Excel Generation and Validation
+# 17. Excel Generation and Validation
 
 Date: 2022-08-23
 
@@ -50,3 +50,6 @@ The Excel process under discussion would have at least three levels of validatio
 8. A validation rule system might also mean needing two schemas, one for a finalized submission and one for an in-progress submission, as we allow parts of the form to be filled out at a time.
 9. Testing this would probably mean writing unit tests along with a JSON Schema (or other library) along with example JSON structures that validate both working and not working examples.
 10. Testing Excel would probably mean providing some example files that pass and don't pass validation, then using the library and unit tests  to ensure the files extract data and match expected results.
+
+## Note
+Was previously ADR 0011; renamed/renumbered when PDRs and ADRs were merged.

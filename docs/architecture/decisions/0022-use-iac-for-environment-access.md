@@ -1,4 +1,4 @@
-# 13. Use Infrastructure-as-Code (IaC) for environment access
+# 22. Use Infrastructure-as-Code (IaC) for environment access
 
 Date: 2022-12-09
 
@@ -30,3 +30,5 @@ The process needs to be structured, well-documented, and auditable for complianc
 * People can come and go without the process changing.
 * Single-sources environment access approvals with repository access approvals.
 
+## Note
+Was previously ADR 0013; renamed/renumbered when PDRs and ADRs were merged.
