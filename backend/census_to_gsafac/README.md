@@ -19,12 +19,14 @@ This is implemented as a Django app to leverage existing management commands and
 
 ```bash
 python manage.py fac_s3 fac-census-to-gsafac-s3 --upload --src census_to_gsafac/data
+```
 
 * csv_to_postgres.py - Inserts data into Postgres tables using the contents of the CSV files in the S3 bucket. The first row of each file is assumed to have the column names (we convert to lowercase). The name of the table is determined by examining the name of the file. The sample source files do not have delimters for empty fields at the end of a line - so we assume these are nulls.
 
 ```bash
 python manage.py csv_to_postgres --folder data
 python manage.py csv_to_postgres --clean True
+```
 
 * models.py These correspond to the incoming CSV files
 * routers.py This tells django to use a different postgres instance.
