@@ -18,13 +18,13 @@ This is implemented as a Django app to leverage existing management commands and
 * fac_s3.py - Uploads folders or files to an S3 bucket.
 
 ```bash
-python manage.py fac_s3 fac-c2g-s3 --upload --src census_to_gsafac/data
+python manage.py fac_s3 fac-census-to-gsafac-s3 --upload --src census_to_gsafac/data
 
 * raw_to_pg.py - Inserts data into Postgres tables using the contents of the CSV files in the S3 bucket. The first row of each file is assumed to have the column names (we convert to lowercase). The name of the table is determined by examining the name of the file. The sample source files do not have delimters for empty fields at the end of a line - so we assume these are nulls.
 
 ```bash
-python manage.py raw_to_pg --folder data
-python manage.py raw_to_pg --clean True
+python manage.py csv_to_postgres --folder data
+python manage.py csv_to_postgres --clean True
 
 * models.py These correspond to the incoming CSV files
 * routers.py This tells django to use a different postgres instance.
@@ -42,10 +42,10 @@ NOTE:  Never check in the census_to_gsafac/data folder into GitHub.
 
 2.  In the FAC/backend folder, run the following to load CSV files from census_to_gsafac/data folder into fac-c2g-s3 bucket.
 ```bash
-python manage.py fac_s3 fac-c2g-s3 --upload --src census_to_gsafac/data
+python manage.py fac_s3 fac-census-to-gsafac-s3 --upload --src census_to_gsafac/data
 ```
 
 3.  In the FAC/backend folder, run the following to read the CSV files from fac-c2g-s3 bucket and load into Postgres.
 ```bash
-python manage.py raw_to_pg --folder data
+python manage.py csv_to_postgres --folder data
 ```
