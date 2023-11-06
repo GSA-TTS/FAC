@@ -79,17 +79,9 @@ def _get_aln_match_query(alns):
                 # The [wrapping] is so the tuple goes into the set as a tuple.
                 # Otherwise, the individual elements go in unpaired.
                 split_alns.update([tuple(split_aln)])
-    # Search for relevant awards
-    report_ids = set()
-    for aln_list in split_alns:
-        matching_awards = FederalAward.objects.filter(
-            federal_agency_prefix=aln_list[0], federal_award_extension=aln_list[1]
-        ).values()
-        if matching_awards:
-            for matching_award in matching_awards:
-                # Again, adding in a string requires [] so the individual
-                # characters of the report ID don't go in... we want the whole string.
-                report_ids.update([matching_award.get("report_id")])
+
+    report_ids = _find_report_ids(split_alns)
+
     for agency_number in agency_numbers:
         matching_awards = FederalAward.objects.filter(
             federal_agency_prefix=agency_number
@@ -102,6 +94,21 @@ def _get_aln_match_query(alns):
     for report_id in report_ids:
         alns_match.add(Q(report_id=report_id), Q.OR)
     return alns_match
+
+
+# Search for relevant awards
+def _find_report_ids(split_alns):
+    report_ids = set()
+    for aln_list in split_alns:
+        matching_awards = FederalAward.objects.filter(
+            federal_agency_prefix=aln_list[0], federal_award_extension=aln_list[1]
+        ).values()
+        if matching_awards:
+            for matching_award in matching_awards:
+                # Again, adding in a string requires [] so the individual
+                # characters of the report ID don't go in... we want the whole string.
+                report_ids.update([matching_award.get("report_id")])
+    return report_ids
 
 
 def _get_names_match_query(names):
