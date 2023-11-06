@@ -10,18 +10,8 @@
                 When an organization spends $750,000 or more in federal grant funds in a given year, they are required to
                 submit an audit.
             </p>
-            {% comment %} 
-                Uncomment when search is implemented.
-                <p>
-                    The FAC is moving to a new home at the General Services Administration (GSA). Only audits from 2022 will be
-                    searchable on fac.gov for now.
-                    <a href="https://facides.census.gov/Account/Login.aspx"
-                    aria-controls="legacy-fac-modal"
-                    data-open-modal>Please use the U.S. Census Bureau FAC site to search for older records.</a>
-                </p> 
-            {% endcomment %}
             <ul class="usa-card-group margin-top-10">
-                <li class="usa-card desktop:grid-col-6 desktop:grid-offset-3">
+                <li class="usa-card desktop:grid-col-6">
                     <div class="usa-card__container">
                         <div>
                             <a class="usa-button sign-in-button"
@@ -32,23 +22,22 @@
                         <p class="usa-card__body">Sign in to submit and review your audits.</p>
                     </div>
                 </li>
-                {% comment %} 
-                    Uncomment when search is implemented, and return the <li> above to grid-col-6 with no offset.
-                    <li class="usa-card desktop:grid-col-6">
-                        <div class="usa-card__container">
-                            <div>
-                                <a class="usa-button usa-button--outline"
-                                href="https://facides.census.gov/Account/Login.aspx"
-                                aria-controls="legacy-fac-modal"
-                                data-open-modal>Search older audit reports</a>
-                            </div>
-                            <p class="usa-card__body">
-                                Search audit report records from before 2022.
-                                You don’t need a FAC account to search.
-                            </p>
+                <li class="usa-card desktop:grid-col-6">
+                    <div class="usa-card__container">
+                        <div>
+                            <a class="usa-button usa-button--outline"
+                               href="{% url 'dissemination:Search' %}">Search audit reports</a>
                         </div>
-                    </li> 
-                {% endcomment %}
+                        <p class="usa-card__body">
+                            Search audits accepted since October 1, 2023.
+                            Older reports are available
+                            <a class="usa-link usa-link--external"
+                               href="https://facides.census.gov/Account/Login.aspx"
+                               target="_blank">from the Census Bureau</a>
+                            .
+                        </p>
+                    </div>
+                </li>
             </ul>
         </div>
     </section>
