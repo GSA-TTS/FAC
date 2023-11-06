@@ -36,8 +36,9 @@ class Search(View):
         context = {}
 
         if form.is_valid():
-            names = form.cleaned_data["entity_name"].splitlines()
             uei_or_eins = form.cleaned_data["uei_or_ein"].splitlines()
+            alns = form.cleaned_data["aln"].replace(", ", " ").split()
+            names = form.cleaned_data["entity_name"].splitlines()
             start_date = form.cleaned_data["start_date"]
             end_date = form.cleaned_data["end_date"]
             cog_or_oversight = form.cleaned_data["cog_or_oversight"]
@@ -52,13 +53,14 @@ class Search(View):
             page = int(form.cleaned_data["page"] or 1)
 
             results = search_general(
-                names,
-                uei_or_eins,
-                start_date,
-                end_date,
-                cog_or_oversight,
-                agency_name,
-                audit_years,
+                names=names,
+                alns=alns,
+                uei_or_eins=uei_or_eins,
+                start_date=start_date,
+                end_date=end_date,
+                cog_or_oversight=cog_or_oversight,
+                agency_name=agency_name,
+                audit_years=audit_years,
             )
             results_count = results.count()
             # Reset page to one if the page number surpasses how many pages there actually are
