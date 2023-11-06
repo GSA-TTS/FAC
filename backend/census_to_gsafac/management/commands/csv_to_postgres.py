@@ -25,9 +25,9 @@ DELIMITER = ","
 
 class Command(BaseCommand):
     help = """
-        Populate PG database from csv files
+        Populate Postgres database from csv files
         Usage:
-        manage.py raw_to_pg --folder <folder_name> --clean <True|False>
+        manage.py csv_to_postgres --folder <folder_name> --clean <True|False>
     """
 
     def add_arguments(self, parser):
