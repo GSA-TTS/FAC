@@ -122,6 +122,7 @@ INSTALLED_APPS += [
     "report_submission",
     # "data_distro",
     "dissemination",
+    "census_historical_migration",
     "support",
     "census_to_gsafac"
 ]
