@@ -26,7 +26,7 @@ Range = NT(
     "name,column,label_row,range_start_row,range_start,abs_range_start,full_range",
 )
 
-MAX_ROWS = 5000
+MAX_ROWS = 10000
 XLSX_MAX_ROWS = 1048576  # Excel has a maximum of 1048576 rows
 XLSX_MAX_COLS = 16384  # Excel has a maximum of 16384 columns
 
@@ -98,8 +98,6 @@ def process_spec(WBNT):
         unlock_data_entry_cells(WBNT.title_row, ws, sheet)
         set_column_widths(wb, ws, sheet)
         set_row_heights(wb, ws, sheet)
-        if sheet.header_inclusion is not None:
-            apply_header_cell_style(ws, sheet.header_inclusion)
 
     set_wb_security(wb, password)
     return wb
@@ -374,6 +372,10 @@ def process_single_cells(wb, ws, sheet):
             row = int(o.posn.title_cell[1])
             ws.row_dimensions[row].height = sheet.header_height
 
+        if o.value:
+            cell_reference = o.posn.range_cell
+            ws[cell_reference] = o.value
+
 
 def process_meta_cells(wb, ws, sheet):
     print("---- process_meta_cells ----")
@@ -429,14 +431,6 @@ def configure_header_cell(ws, r):
     the_cell.alignment = Alignment(wrapText=True, wrap_text=True)
 
 
-def apply_header_cell_style(ws, additional_header_cells):
-    print("---- apply_header_cell_style ----")
-    print(additional_header_cells)
-    for ahc in additional_header_cells.cells:
-        the_cell = ws[ahc]
-        the_cell.fill = header_row_fill
-
-
 def process_text_ranges(wb, ws, sheet):
     print("---- parse_text_ranges ----")
     max_width = 72
@@ -462,7 +456,7 @@ def unlock_data_entry_cells(header_row, ws, sheet):
     for r in sheet.open_ranges:
         if not r.posn.keep_locked:
             coords = make_range(r)
-            for rowndx in range(coords.range_start_row, MAX_ROWS):
+            for rowndx in range(coords.range_start_row, MAX_ROWS + 1):
                 cell_reference = f"${coords.column}${rowndx}"
                 cell = ws[cell_reference]
                 cell.protection = Protection(locked=False)
