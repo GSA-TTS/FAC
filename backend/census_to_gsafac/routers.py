@@ -1,5 +1,5 @@
 app_name = "census_to_gsafac"
-db_name = "c2g-db"
+db_name = "census-to-gsafac-db"
 
 
 class DBRouter:
