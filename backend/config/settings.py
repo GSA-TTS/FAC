@@ -173,7 +173,8 @@ DATABASES = {
         "DATABASE_URL", default="postgres://postgres:password@0.0.0.0/backend"
     ),
     "census-to-gsafac-db": env.dj_db_url(
-        "DATABASE_URL_CENSUS_TO_GSAFAC_DB", default="postgres://postgres:password@0.0.0.0/census-to-gsafac-db"
+        "DATABASE_URL_CENSUS_TO_GSAFAC_DB",
+        default="postgres://postgres:password@0.0.0.0/census-to-gsafac-db",
     ),
 }
 
