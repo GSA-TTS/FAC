@@ -18,12 +18,12 @@ services:
       timeout: 5s
       retries: 10
 
-  c2g-db:
+  census-to-gsafac-db:
     image: "postgres:12"
     environment:
       POSTGRES_HOST_AUTH_METHOD: trust
     volumes:
-      - c2gdb-data:/var/lib/postgresql/data/
+      - census-to-gsafac-data:/var/lib/postgresql/data/
     ports:
       - "5433:5432"
     healthcheck:
@@ -130,5 +130,5 @@ services:
         condition: service_healthy
 volumes:
   postgres-data:
-  c2gdb-data:
+  census-to-gsafac-data:
   minio-vol:
