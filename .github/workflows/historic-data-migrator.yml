@@ -1,5 +1,5 @@
 ---
-name: "Historic data migrator"
+name: Historic Data Migration
 on:
   workflow_dispatch:
     inputs:
