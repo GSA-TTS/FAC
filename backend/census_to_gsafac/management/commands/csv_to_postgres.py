@@ -58,8 +58,12 @@ class Command(BaseCommand):
                 continue
             model_name = self.get_model_name(item["Key"])
             if model_name:
-                model_obj = census_to_gsafac_models[census_to_gsafac_model_names.index(model_name)]
-                response = s3_client.get_object(Bucket=census_to_gsafac_bucket_name, Key=item["Key"])
+                model_obj = census_to_gsafac_models[
+                    census_to_gsafac_model_names.index(model_name)
+                ]
+                response = s3_client.get_object(
+                    Bucket=census_to_gsafac_bucket_name, Key=item["Key"]
+                )
                 print("Obtained response from S3")
                 lines = response["Body"].read().decode("utf-8").splitlines(True)
                 print("Loaded Body into 'lines'")
