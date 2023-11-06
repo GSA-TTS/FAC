@@ -7,9 +7,6 @@ from census_historical_migration.workbooklib.excel_creation import (
     set_range,
 )
 
-from census_historical_migration.workbooklib.excel_creation import (
-    insert_version_and_sheet_name,
-)
 from census_historical_migration.workbooklib.census_models.census import dynamic_import
 
 
@@ -98,7 +95,6 @@ def generate_findings(dbkey, year, outfile):
     Cfda = dynamic_import("Cfda", year)
     wb = pyxl.load_workbook(templates["AuditFindings"])
     g = set_uei(Gen, wb, dbkey)
-    insert_version_and_sheet_name(wb, "federal-awards-audit-findings-workbook")
 
     cfdas = Cfda.select().where(Cfda.dbkey == g.dbkey).order_by(Cfda.index)
     # For each of them, I need to generate an elec -> award mapping.

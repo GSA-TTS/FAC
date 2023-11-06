@@ -8,9 +8,6 @@ from census_historical_migration.workbooklib.excel_creation import (
 )
 
 
-from census_historical_migration.workbooklib.excel_creation import (
-    insert_version_and_sheet_name,
-)
 from census_historical_migration.workbooklib.census_models.census import dynamic_import
 
 import openpyxl as pyxl
@@ -30,7 +27,6 @@ def generate_additional_ueis(dbkey, year, outfile):
     Gen = dynamic_import("Gen", year)
     wb = pyxl.load_workbook(templates["AdditionalUEIs"])
     g = set_uei(Gen, wb, dbkey)
-    insert_version_and_sheet_name(wb, "additional-ueis-workbook")
     if int(year) >= 22:
         Ueis = dynamic_import("Ueis", year)
         addl_ueis = Ueis.select().where(Ueis.dbkey == g.dbkey)

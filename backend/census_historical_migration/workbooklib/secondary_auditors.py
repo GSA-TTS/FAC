@@ -7,9 +7,6 @@ from census_historical_migration.workbooklib.excel_creation import (
     test_pfix,
 )
 
-from census_historical_migration.workbooklib.excel_creation import (
-    insert_version_and_sheet_name,
-)
 from census_historical_migration.workbooklib.census_models.census import dynamic_import
 
 
@@ -60,7 +57,6 @@ def generate_secondary_auditors(dbkey, year, outfile):
     wb = pyxl.load_workbook(templates["SecondaryAuditors"])
 
     g = set_uei(Gen, wb, dbkey)
-    insert_version_and_sheet_name(wb, "secondary-auditors-workbook")
 
     sec_cpas = Cpas.select().where(Cpas.dbkey == g.dbkey)
 

@@ -212,11 +212,3 @@ def extract_metadata(sheet_json, range):
                     result = scell["formula"]
     return result
 
-
-def insert_version_and_sheet_name(wb, sheet_json):
-    ver_cell = extract_metadata(sheet_json, "version")
-    ver_re = re.search('"(.*?)"', ver_cell)[1]
-    wb_name_cell = extract_metadata(sheet_json, "section_name")
-    wb_name_re = re.search('"(.*?)"', wb_name_cell)[1]
-    set_single_cell_range(wb, "version", ver_re)
-    set_single_cell_range(wb, "section_name", wb_name_re)

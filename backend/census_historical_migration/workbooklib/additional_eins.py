@@ -8,9 +8,6 @@ from census_historical_migration.workbooklib.excel_creation import (
 )
 
 
-from census_historical_migration.workbooklib.excel_creation import (
-    insert_version_and_sheet_name,
-)
 from census_historical_migration.workbooklib.census_models.census import dynamic_import
 
 import openpyxl as pyxl
@@ -31,7 +28,6 @@ def generate_additional_eins(dbkey, year, outfile):
     wb = pyxl.load_workbook(templates["AdditionalEINs"])
 
     g = set_uei(Gen, wb, dbkey)
-    insert_version_and_sheet_name(wb, "additional-eins-workbook")
 
     addl_eins = Eins.select().where(Eins.dbkey == g.dbkey)
     map_simple_columns(wb, mappings, addl_eins)
