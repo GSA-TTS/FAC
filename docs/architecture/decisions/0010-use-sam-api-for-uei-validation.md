@@ -1,4 +1,4 @@
-# 7. Use the SAM.gov API for UEI validation
+# 10. Use the SAM.gov API for UEI validation
 
 Date: 2022-05-10
 
@@ -32,3 +32,6 @@ UEIs are [specifically structured](https://www.gsa.gov/about-us/organization/fed
 * SAM.gov requests should be limited
 * SAM.gov downtime should be addressed
 * SAM.gov entity data may be private and should be limited in what it returns
+
+## Note
+Was previously ADR 0007; renamed/renumbered when PDRs and ADRs were merged.

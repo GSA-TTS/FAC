@@ -1,4 +1,4 @@
-# 15. Store uploaded Excel files
+# 24. Store uploaded Excel files
 
 Date: 2023-02-06
 
@@ -58,3 +58,6 @@ Last-write-wins here also applies to the submission data we store in our databas
 - We will need to add file upload and download to our Django views, and handle the above validation logic.
 - We will need to add the `ClamAV` functionality.
 - In the future, if we insist on storing Excel files, we will need to follow various retention policy requirements regarding them.
+
+## Note
+Was previously ADR 0015; renamed/renumbered when PDRs and ADRs were merged.

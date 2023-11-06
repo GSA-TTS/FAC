@@ -1,4 +1,4 @@
-# 12. Switch to a unified Django web application architecture
+# 21. Switch to a unified Django web application architecture
 
 Date: 2022-10-28
 
@@ -57,3 +57,6 @@ We will move the current frontend into Django, use Django to manage state, add w
 ## Updated system diagram
 
 ![image](https://raw.githubusercontent.com/GSA-TTS/FAC/main/docs/architecture/diagrams/FAC_System_Context_unified.png)
+
+## Note
+Was previously ADR 0012; renamed/renumbered when PDRs and ADRs were merged.

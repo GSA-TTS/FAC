@@ -1,4 +1,4 @@
-# 14. Store submission data as JSON
+# 23. Store submission data as JSON
 
 Date: 2023-01-04
 
@@ -8,7 +8,7 @@ Accepted
 
 ## Context
 
-We need to store the data that users submit as part of their Single Audit Checklist packages. The storage mechanism needs to accomodate the following:
+We need to store the data that users submit as part of their Single Audit Checklist packages. The storage mechanism needs to accommodate the following:
 - The Single Audit Checklist schema can (and in fact does) change over time. These changes include the addition of new fields, the removal of deprecated fields, and adjustments to the field validation logic.
 - The FAC needs to maintain the ability to accept and validate backdated submissions, using the schema and validation logic for the submission year (i.e. not the most recent schema/validation version).
 - Users can choose to submit their audit package through a web form or by uploading an Excel file.
@@ -23,3 +23,6 @@ We will partition the Single Audit Checklist data model into high-level sections
 * Schema and validation rules for sections stored as JSON will be portable to other systems
 * Increased code base complexity resulting from schema and validation rules living outside the object-relational mapper
 * Additional burden on developers to be familiar with JSON Schema
+
+## Note
+Was previously ADR 0014; renamed/renumbered when PDRs and ADRs were merged.

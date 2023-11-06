@@ -1,4 +1,4 @@
-# 6. Proposed UEI handling change
+# 18. Proposed UEI handling change
 
 Introduced: 2022-09-02
 
@@ -100,3 +100,6 @@ If a verified UEI is not present, finalization will require the user to attest t
 Organizations are required to submit these reports, and it's not currently clear that the FAC would be within its rights to refuse to let a submission proceed without a UEI—especially if the submission lacks a UEI because the organization has for some reason been unable to acquire one.
 
 In order to determine product and technical direction on how to handle this case, we first need policy direction.
+
+## Note
+Was previously PDR 0007; renamed/renumbered when PDRs and ADRs were merged.
