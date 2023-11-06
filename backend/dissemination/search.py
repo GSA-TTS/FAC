@@ -80,7 +80,8 @@ def _get_aln_match_query(alns):
                 # Otherwise, the individual elements go in unpaired.
                 split_alns.update([tuple(split_aln)])
 
-    report_ids = _find_report_ids(split_alns)
+    # Search for relevant awards
+    report_ids = _get_aln_report_ids(split_alns)
 
     for agency_number in agency_numbers:
         matching_awards = FederalAward.objects.filter(
@@ -96,8 +97,10 @@ def _get_aln_match_query(alns):
     return alns_match
 
 
-# Search for relevant awards
-def _find_report_ids(split_alns):
+def _get_aln_report_ids(split_alns):
+    """
+    Given a set of split ALNs, find the relevant awards and return their report_ids.
+    """
     report_ids = set()
     for aln_list in split_alns:
         matching_awards = FederalAward.objects.filter(
