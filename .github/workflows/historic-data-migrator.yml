@@ -18,7 +18,7 @@ on:
       years:
         required: false
         type: string
-        description: Comma-separated list of report years. The list of years needs to be the same lenght as the list of dbkeys.
+        description: Comma-separated list of report years. The list of years needs to be the same length as the list of dbkeys.
 
 jobs:
   historic-data-migrator:
