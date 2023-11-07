@@ -1,11 +1,16 @@
 import logging
+import botocore
 import boto3
-import csv
+import pandas as pd
 
 
+from io import BytesIO
+from botocore.exceptions import ClientError
 from django.core.management.base import BaseCommand
 from django.conf import settings
 from django.apps import apps
+
+CHUNK_SIZE = 10_000
 
 
 logger = logging.getLogger(__name__)
@@ -63,15 +68,24 @@ class Command(BaseCommand):
                 model_obj = census_to_gsafac_models[
                     census_to_gsafac_model_names.index(model_name)
                 ]
-                response = s3_client.get_object(
-                    Bucket=census_to_gsafac_bucket_name, Key=item["Key"]
-                )
-                print("Obtained response from S3")
-                lines = response["Body"].read().decode("utf-8").splitlines(True)
-                print("Loaded Body into 'lines'")
-                rows = [row for row in csv.DictReader(lines)]
-                print("Completed processing 'lines'")
-                self.load_table(model_obj, rows)
+                file = BytesIO()
+                try:
+                    s3_client.download_fileobj(
+                        Bucket=census_to_gsafac_bucket_name,
+                        Key=item["Key"],
+                        Fileobj=file,
+                    )
+                except ClientError:
+                    logger.error("Could not download {}".format(model_obj))
+                    return
+                file.seek(0)
+                for df in pd.read_csv(file, iterator=True, chunksize=CHUNK_SIZE):
+                    # Each row is a dictionary. The columns are the
+                    # correct names for our model. So, this should be a
+                    # clean way to load the model from a row.
+                    for _, row in df.iterrows():
+                        obj = model_obj(**row)
+                        obj.save()
 
         for mdl in census_to_gsafac_models:
             row_count = mdl.objects.all().count()
@@ -99,17 +113,3 @@ class Command(BaseCommand):
                 return model_name
         print("Could not find a matching model for ", name)
         return None
-
-    def load_table(self, model_obj, rows):
-        print("Loading data for model_obj ", model_obj)
-        for i in range(0, len(rows)):
-            model_instance = model_obj()
-
-            for column_name, value in rows[i].items():
-                if column_name == "id":
-                    continue
-                setattr(model_instance, column_name, value)
-            model_instance.save()
-            if i % 1000 == 0:
-                print(f"Loaded {i} of {len(rows)} rows to ", model_obj)
-        print(f"Loaded {len(rows)} rows to ", model_obj)
