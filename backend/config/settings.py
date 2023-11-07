@@ -124,7 +124,6 @@ INSTALLED_APPS += [
     "dissemination",
     "census_historical_migration",
     "support",
-    "census_to_gsafac",
 ]
 
 MIDDLEWARE = [
