@@ -2,7 +2,7 @@ from django.test import TestCase
 
 from model_bakery import baker
 
-from .wb_generator import load_historic_data
+from .make_submission import load_historic_data
 from .models import ELECAUDITHEADER, ELECAUDITS
 
 

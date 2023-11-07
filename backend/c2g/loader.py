@@ -3,7 +3,7 @@ import datetime
 
 from audit.models import SingleAuditChecklist
 from .models import ELECAUDITHEADER as Gen
-from .wb_generator import load_historic_data
+from .make_submission import load_historic_data
 
 # we'll deal with these submissions later as they have data issues
 EXCLUSION_LIST = [
