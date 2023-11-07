@@ -252,5 +252,53 @@
             </div>
         </div>
     </div>
+    <div
+      class="usa-modal"
+      id="device-orientation-modal"
+      aria-labelledby="device-orientation-modal-heading"
+      aria-describedby="device-orientation-modal-description"
+    >
+      <div class="usa-modal__content">
+        <div class="usa-modal__main">
+          <h2 class="usa-modal__heading" id="device-orientation-modal-heading">
+            Please rotate your device
+          </h2>
+          <div class="usa-prose">
+            <p id="device-orientation-modal-description">
+              Your device is currently in portrait orientation (with the sides of the device running up and down). The search form works best with your device in landscape orientation (with the sides of the device going left to right)
+            </p>
+          </div>
+          <div class="usa-modal__footer">
+            <ul class="usa-button-group">
+              <li class="usa-button-group__item">
+                <button type="button" class="usa-button dismiss-orientation-modal" id="dismiss-orientation-modal" data-close-modal>
+                  Close this popup
+                </button>
+              </li>
+            </ul>
+          </div>
+        </div>
+        <button
+          type="button"
+          class="usa-button usa-modal__close dismiss-orientation-modal"
+          aria-label="Close this window"
+          data-close-modal
+        >
+          <svg class="usa-icon" aria-hidden="true" focusable="false" role="img">
+            {% uswds_sprite "close" %}
+          </svg>
+        </button>
+      </div>
+    </div>
+    <a
+      href="#device-orientation-modal"
+      class="usa-button"
+      id="orientation-toggle"
+      aria-controls="device-orientation-modal"
+      style="display:none;"
+      data-open-modal
+      ></a
+    >
     <script src="{% static 'compiled/js/search-results-pagination.js' %}"></script>
+    <script src="{% static 'compiled/js/search-mobile-orientation.js' %}"></script>
 {% endblock content %}
