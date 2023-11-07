@@ -11,7 +11,7 @@ from django.apps import apps
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.WARNING)
 
-census_to_gsafac_models = list(apps.get_app_config("census_to_gsafac").get_models())
+census_to_gsafac_models = list(apps.get_app_config("census_historical_migration").get_models())
 census_to_gsafac_model_names = [m._meta.model_name for m in census_to_gsafac_models]
 s3_client = boto3.client(
     "s3",
