@@ -97,8 +97,10 @@ INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
+    "django.contrib.humanize",
     "django.contrib.sessions",
     "django.contrib.messages",
+    "django.contrib.postgres",
     "django.contrib.staticfiles",
 ]
 
@@ -118,9 +120,9 @@ INSTALLED_APPS += [
     "api",
     "users",
     "report_submission",
-    "cms",
     # "data_distro",
     "dissemination",
+    "census_historical_migration",
     "support",
 ]
 
@@ -171,7 +173,13 @@ DATABASES = {
     ),
 }
 
-POSTGREST = {"URL": env.str("POSTGREST_URL", "http://api:3000")}
+POSTGREST = {
+    "URL": env.str("POSTGREST_URL", "http://api:3000"),
+    "LOCAL": env.str("POSTGREST_URL", "http://api:3000"),
+    "DEVELOPMENT": "https://api-dev.fac.gov",
+    "STAGING": "https://api-staging.fac.gov",
+    "PRODUCTION": "https://api.fac.gov",
+}
 
 
 # Password validation
@@ -249,8 +257,13 @@ if ENVIRONMENT not in ["DEVELOPMENT", "PREVIEW", "STAGING", "PRODUCTION"]:
     AWS_S3_PRIVATE_ENDPOINT = os.environ.get(
         "AWS_S3_PRIVATE_ENDPOINT", "http://minio:9000"
     )
+    AWS_PRIVATE_DEFAULT_ACL = "private"
 
     AWS_S3_ENDPOINT_URL = AWS_S3_PRIVATE_ENDPOINT
+
+    # when running locally, the internal endpoint (docker network) is different from the external endpoint (host network)
+    AWS_S3_PRIVATE_INTERNAL_ENDPOINT = AWS_S3_ENDPOINT_URL
+    AWS_S3_PRIVATE_EXTERNAL_ENDPOINT = "http://localhost:9001"
 
     DISABLE_AUTH = env.bool("DISABLE_AUTH", default=False)
 
@@ -302,6 +315,10 @@ else:
 
             AWS_S3_PRIVATE_ENDPOINT = s3_creds["endpoint"]
             AWS_S3_ENDPOINT_URL = f"https://{AWS_S3_PRIVATE_ENDPOINT}"
+
+            # in deployed environments, the internal & external endpoint URLs are the same
+            AWS_S3_PRIVATE_INTERNAL_ENDPOINT = AWS_S3_ENDPOINT_URL
+            AWS_S3_PRIVATE_EXTERNAL_ENDPOINT = AWS_S3_ENDPOINT_URL
 
             AWS_PRIVATE_LOCATION = "static"
             AWS_PRIVATE_DEFAULT_ACL = "private"

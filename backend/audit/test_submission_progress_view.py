@@ -8,7 +8,7 @@ from audit.cross_validation import (
     sac_validation_shape,
     submission_progress_check,
 )
-from audit.cross_validation.naming import SECTION_NAMES
+from audit.cross_validation.naming import SECTION_NAMES, find_section_by_name
 from .models import Access, SingleAuditChecklist
 from .test_views import _load_json
 
@@ -118,3 +118,36 @@ class SubmissionProgressViewTests(TestCase):
         for key in conditional_keys:
             self.assertEqual(result[key]["display"], "inactive")
         self.assertTrue(result["complete"])
+
+    def test_submission_progress_check_crossval_incomplete(self):
+        """
+        Check that we return the appropriate incomplete sections.
+        """
+        filename = "general-information--test0001test--simple-pass.json"
+        info = _load_json(AUDIT_JSON_FIXTURES / filename)
+        sac = baker.make(SingleAuditChecklist, general_information=info)
+        shaped_sac = sac_validation_shape(sac)
+        result = submission_progress_check(shaped_sac, sar=None, crossval=True)
+        expected = "The following sections are incomplete: Audit Information, Federal Awards, Notes to SEFA, Single Audit Report."
+        self.assertEqual(result[0]["error"], expected)
+
+    def test_find_section_by_name(self):
+        """
+        This test added for test coverage purposes.
+
+        """
+
+        names = (
+            "SECONDARY_AUDITORS",
+            "SecondaryAuditors",
+            "Secondary Auditors",
+            "Secondary Auditors",
+            "report_submission:secondary-auditors",
+            "secondary_auditors",
+            "secondary-auditors",
+        )
+
+        for name in names:
+            self.assertEqual(
+                find_section_by_name(name).snake_case, "secondary_auditors"
+            )

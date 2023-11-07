@@ -1,7 +1,7 @@
 // reusable code for filling out a valid general info form
 
 export function testValidGeneralInfo() {
-  	// Fiscal period, pre-filled using info from the previous screen.
+	// Fiscal period, pre-filled using info from the previous screen.
 	//cy.get('#auditee_fiscal_period_start').type('05/08/2023');
 	//cy.get('#auditee_fiscal_period_end').type('05/08/2024');
 
@@ -18,11 +18,11 @@ export function testValidGeneralInfo() {
 	cy.get('#auditee_city').type('Richmond');
 	cy.get('#auditee_state').type('VA{enter}');
 	cy.get('#auditee_zip').type('23219');
-	
-  	// Auditee UEI is pre-filled and uneditable.
+
+	// Auditee UEI is pre-filled and uneditable.
 	// cy.get('#auditee_uei').type('CMBSGK6P7BE1');
 	cy.get('label[for=multiple-ueis-yes]').click();
-	
+
 	// Auditee contact information
 	cy.get('#auditee_contact_name').type('John Doe');
 	cy.get('#auditee_contact_title').type('Keymaster');
@@ -45,7 +45,7 @@ export function testValidGeneralInfo() {
 	cy.get('#auditor_contact_title').type('Auditor');
 	cy.get('#auditor_phone').type('5555555555');
 	cy.get('#auditor_email').type('qualified.human.accountant@auditor');
-	
+
 	cy.get('label[for=secondary_auditors-yes]').click();
 
 	cy.get('#continue').click();

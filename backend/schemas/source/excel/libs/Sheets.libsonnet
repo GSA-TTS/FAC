@@ -41,7 +41,7 @@ local section_names = {
 };
 
 // All workbooks should get the same version number.
-local WORKBOOKS_VERSION = '1.0.0';
+local WORKBOOKS_VERSION = '1.0.3';
 
 {
   single_cell: single_cell,

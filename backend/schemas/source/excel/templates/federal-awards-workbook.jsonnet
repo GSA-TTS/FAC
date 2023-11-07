@@ -43,7 +43,7 @@ local single_cells = [
     title_cell: 'A2',
     range_cell: 'B2',
     format: 'text',
-    formula: '="' + Sheets.WORKBOOKS_VERSION + '"',
+    value: Sheets.WORKBOOKS_VERSION,
     help: Help.plain_text,
     validation: SV.NoValidation,
   },
@@ -55,7 +55,7 @@ local single_cells = [
     title_cell: 'A3',
     range_cell: 'B3',
     format: 'text',
-    formula: '="' + Sheets.section_names.FEDERAL_AWARDS + '"',
+    value: Sheets.section_names.FEDERAL_AWARDS,
     help: Help.wrong_workbook_template,
     validation: SV.NoValidation,
   },
@@ -175,7 +175,7 @@ local open_ranges_defns = [
     Sheets.open_range {
       keep_locked: true,
       format: 'dollar',
-      formula: '=SUMIFS(' + amountExpendedNamedRange + ',' + cfdaKeyNamedRange + ',V{0})',
+      formula: '=IF(A{0}="",0,SUMIFS(' + amountExpendedNamedRange + ',' + cfdaKeyNamedRange + ',V{0}))',
       help: Help.any_number,
     },
     SV.NumberValidation,
@@ -283,7 +283,7 @@ local open_ranges_defns = [
   [
     Sheets.open_range {
       keep_locked: true,
-      formula: '=IF(OR(B{0}="",C{0}),"",CONCATENATE(B{0},".",C{0}))',
+      formula: '=IF(OR(B{0}="",C{0}=""),"",CONCATENATE(B{0},".",C{0}))',
       width: 12,
       format: 'text',
       help: Help.unknown,

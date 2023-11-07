@@ -31,7 +31,7 @@ local single_cells = [
     title_cell: 'A2',
     range_cell: 'B2',
     format: 'text',
-    formula: '="' + Sheets.WORKBOOKS_VERSION + '"',
+    value: Sheets.WORKBOOKS_VERSION,
     help: Help.plain_text,
     validation: SV.NoValidation,
   },
@@ -43,7 +43,7 @@ local single_cells = [
     title_cell: 'A3',
     range_cell: 'B3',
     format: 'text',
-    formula: '="' + Sheets.section_names.CORRECTIVE_ACTION_PLAN + '"',
+    value: Sheets.section_names.CORRECTIVE_ACTION_PLAN,
     help: Help.wrong_workbook_template,
     validation: SV.NoValidation,
   },
@@ -73,7 +73,7 @@ local open_ranges_defns = [
   [
     Sheets.open_range {
       title_cell: 'B1',
-      width: 100,
+      width: 64,
       help: Help.plain_text,
     },
     SV.NoValidation,
@@ -104,6 +104,7 @@ local sheets = [
     name: capSheet,
     open_ranges: Fun.make_open_ranges_with_column(title_row, open_ranges_defns),
     header_height: 48,
+    row_height: 36,
     hide_col_from: 4,
   },
 ];

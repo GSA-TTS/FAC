@@ -12,13 +12,14 @@ import requests
 from openpyxl import load_workbook
 from pypdf import PdfReader
 
-from audit.excel import (
+
+from audit.intakelib import (
     additional_ueis_named_ranges,
     additional_eins_named_ranges,
     corrective_action_plan_named_ranges,
     federal_awards_named_ranges,
-    findings_text_named_ranges,
-    findings_uniform_guidance_named_ranges,
+    audit_findings_text_named_ranges,
+    audit_findings_named_ranges,
     secondary_auditors_named_ranges,
     notes_to_sefa_named_ranges,
 )
@@ -486,7 +487,7 @@ def _findings_text_json_error(errors):
         XLSX_TEMPLATE_DEFINITION_DIR / FINDINGS_TEXT_TEMPLATE_DEFINITION
     )
     template = json.loads(template_definition_path.read_text(encoding="utf-8"))
-    return _get_error_details(template, findings_text_named_ranges(errors))
+    return _get_error_details(template, audit_findings_text_named_ranges(errors))
 
 
 def _findings_uniform_guidance_json_error(errors):
@@ -495,7 +496,7 @@ def _findings_uniform_guidance_json_error(errors):
         XLSX_TEMPLATE_DEFINITION_DIR / FINDINGS_UNIFORM_TEMPLATE_DEFINITION
     )
     template = json.loads(template_definition_path.read_text(encoding="utf-8"))
-    return _get_error_details(template, findings_uniform_guidance_named_ranges(errors))
+    return _get_error_details(template, audit_findings_named_ranges(errors))
 
 
 def _secondary_auditors_json_error(errors):

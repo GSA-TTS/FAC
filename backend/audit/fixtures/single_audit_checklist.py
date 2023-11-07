@@ -13,7 +13,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 
 from faker import Faker
 
-import audit.excel
+from audit import intakelib
 import audit.validators
 
 from audit.fixtures.excel import FORM_SECTIONS
@@ -173,10 +173,9 @@ def _post_create_federal_awards(this_sac, this_user):
     )
     excel_file.full_clean()
     excel_file.save()
-
     # TODO: refactor the upload handling from the post view into a
     # function so we can call it here instead of aping it.
-    audit_data = audit.excel.extract_federal_awards(excel_file.file)
+    audit_data = intakelib.extract_federal_awards(excel_file.file)
     audit.validators.validate_federal_award_json(audit_data)
     this_sac.federal_awards = audit_data
     this_sac.save()
@@ -211,8 +210,6 @@ def _load_single_audit_checklists_for_user(user):
         if sac is None:
             # need to make this object
             sac = _create_sac(user, auditee_name)
-        if "post_create_callable" in item_info:
-            item_info["post_create_callable"](sac, user)
 
 
 def load_single_audit_checklists():

@@ -3,7 +3,7 @@ local Help = import '../libs/Help.libsonnet';
 local SV = import '../libs/SheetValidations.libsonnet';
 local Sheets = import '../libs/Sheets.libsonnet';
 local sefaMandatorySheet = 'MandatoryNotes';
-local sefaAdditionalSheet = 'AdditionalNotes';
+local sefaAdditionalSheet = 'Form';
 local coverSheet = 'Coversheet';
 local title_row = 1;
 
@@ -32,7 +32,7 @@ local single_cells = [
     title_cell: 'A2',
     range_cell: 'B2',
     format: 'text',
-    formula: '="' + Sheets.WORKBOOKS_VERSION + '"',
+    value: Sheets.WORKBOOKS_VERSION,
     help: Help.plain_text,
     validation: SV.NoValidation,
   },
@@ -44,7 +44,7 @@ local single_cells = [
     title_cell: 'A3',
     range_cell: 'B3',
     format: 'text',
-    formula: '="' + Sheets.section_names.NOTES_TO_SEFA + '"',
+    value: Sheets.section_names.NOTES_TO_SEFA,
     help: Help.wrong_workbook_template,
     validation: SV.NoValidation,
   },
@@ -115,17 +115,6 @@ local open_ranges_defns = [
     'Did Text Contain a Chart or Table?',
     'contains_chart_or_table',
   ],
-  [
-    Sheets.open_range {
-      keep_locked: true,
-      formula: '=IF(A{0}<>"", ROW()-1, "")',
-      width: 18,
-      help: Help.unknown,
-    },
-    SV.NoValidation,
-    'Sequence number (Read Only)',
-    'seq_number',
-  ],
 ];
 
 local sheets = [
@@ -139,7 +128,8 @@ local sheets = [
   {
     name: sefaAdditionalSheet,
     open_ranges: Fun.make_open_ranges(title_row, open_ranges_defns),
-    header_height: 100,
+    header_height: 48,
+    row_height: 36,
     hide_col_from: 4,
   },
 ];
