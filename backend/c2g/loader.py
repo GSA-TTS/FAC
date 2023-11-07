@@ -7,8 +7,8 @@ from .wb_generator import load_historic_data
 
 # we'll deal with these submissions later as they have data issues
 EXCLUSION_LIST = [
-    ("2022", "183126"),
-    ("2022", "45486"),
+    # ("2022", "183126"),
+    # ("2022", "45486"),
 ]
 PRIORITY_LIST = [
     # ("2022", "194017"),
@@ -24,7 +24,7 @@ def load_data():
         result = load_historic_data(audit_year, dbkey)
         result_log[(audit_year, dbkey)] = result
         total_count += 1
-        if len(result["errors"]) > 0:
+        if len(result["errors"]) > 10:
             error_count += 1
 
     for gen in gens:

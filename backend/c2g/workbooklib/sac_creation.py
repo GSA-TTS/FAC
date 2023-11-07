@@ -125,8 +125,8 @@ def _fake_general_information(user, gen: Gen):
         "ein_not_an_ssn_attestation": True,
         "is_usa_based": True,
         "met_spending_threshold": True,
-        "multiple_eins_covered": True if gen.MULTIPLEEINS == "Y" else False,
-        "multiple_ueis_covered": True if gen.MULTIPLEUEIS == "Y" else False,
+        "multiple_eins_covered": gen.MULTIPLEEINS == "Y",
+        "multiple_ueis_covered": gen.MULTIPLEUEIS == "Y",
         "user_provided_organization_type": gen.ENTITY_TYPE,
         "secondary_auditors_exist": True if gen.MULTIPLE_CPAS == "Y" else False,
     }
@@ -195,24 +195,25 @@ def _create_sac(user, gen: Gen):
     if exists:
         exists.delete()
 
-    sac = SingleAuditChecklist.objects.create(
+    sac = SingleAuditChecklist(
         report_id=report_id,
         submitted_by=user,
         general_information=_fake_general_information(user, gen),
         audit_information=_fake_audit_information(gen),
     )
-    # # Set a TEST report id for this data
-    # sac.report_id = report_id
 
-    sac.auditee_certification = {}
-    sac.auditee_certification["auditee_signature"] = {}
-    sac.auditee_certification["auditee_signature"][
-        "auditee_name"
-    ] = "Bob the Auditee Name"
-    sac.auditee_certification["auditee_signature"][
-        "auditee_title"
-    ] = "Bob the Auditee Signature"
+    set_auditee_cerification(sac)
 
+    set_auditor_certification(sac)
+
+    sac.data_source = "CENSUS"
+    # sac.save()
+
+    logger.info("Created single audit checklist %s", sac)
+    return sac
+
+
+def set_auditor_certification(sac):
     sac.auditor_certification = {}
     sac.auditor_certification["auditor_signature"] = {}
     sac.auditor_certification["auditor_signature"][
@@ -222,11 +223,16 @@ def _create_sac(user, gen: Gen):
         "auditor_title"
     ] = "Alice the Auditor Signature"
 
-    sac.data_source = "TSTDAT"
-    sac.save()
 
-    logger.info("Created single audit checklist %s", sac)
-    return sac
+def set_auditee_cerification(sac):
+    sac.auditee_certification = {}
+    sac.auditee_certification["auditee_signature"] = {}
+    sac.auditee_certification["auditee_signature"][
+        "auditee_name"
+    ] = "Bob the Auditee Name"
+    sac.auditee_certification["auditee_signature"][
+        "auditee_title"
+    ] = "Bob the Auditee Signature"
 
 
 def _make_excel_file(filename, f_obj):
@@ -306,7 +312,6 @@ def _post_upload_workbook(this_sac, this_user, section, xlsx_file):
     excel_file.save()
 
     audit_data = extract_mapping[section](excel_file.file)
-    print("JMM audit_data", section, audit_data)
     validator_mapping[section](audit_data)
 
     if section == FORM_SECTIONS.FEDERAL_AWARDS_EXPENDED:

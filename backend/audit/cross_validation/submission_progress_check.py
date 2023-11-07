@@ -103,7 +103,7 @@ def progress_check(sections, key):
         NC.ADDITIONAL_UEIS: bool(general_info.get("multiple_ueis_covered")),
         NC.ADDITIONAL_EINS: bool(general_info.get("multiple_eins_covered")),
         NC.SECONDARY_AUDITORS: bool(general_info.get("secondary_auditors_exist")),
-        NC.SINGLE_AUDIT_REPORT: True,
+        NC.SINGLE_AUDIT_REPORT: False,
         NC.TRIBAL_DATA_CONSENT: bool(
             general_info.get("user_provided_organization_type") == "tribal"
         ),

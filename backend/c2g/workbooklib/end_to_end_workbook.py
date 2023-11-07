@@ -8,7 +8,8 @@ import requests
 from pprint import pprint
 from datetime import datetime
 from audit.models import SingleAuditChecklist
-from .sac_creation import _post_upload_pdf
+
+# from .sac_creation import _post_upload_pdf
 
 from .workbook_creation import (
     sections,
@@ -180,14 +181,15 @@ def api_check(json_test_tables):
 
 def generate_workbooks(user, gen: Gen):
     sac = setup_sac(user, gen)
-    loader = workbook_loader(user, sac, gen.AUDITYEAR, gen.DBKEY)
-    json_test_tables = []
-    for section, fun in sections.items():
-        (_, json, _) = loader(fun, section)
-        json_test_tables.append(json)
+    # loader = workbook_loader(user, sac, gen.AUDITYEAR, gen.DBKEY)
+    # json_test_tables = []
+    for _, fun in sections.items():
+        fun(sac, dbkey=gen.DBKEY, audit_year=gen.AUDITYEAR)
+        # (_, json, _) = loader(fun, section)
+        # json_test_tables.append(json)
 
     # TODO deal with pdf
-    _post_upload_pdf(sac, user, "audit/fixtures/basic.pdf")
+    # _post_upload_pdf(sac, user, "audit/fixtures/basic.pdf")
     step_through_certifications(sac)
 
     # shaped_sac = sac_validation_shape(sac)
@@ -195,10 +197,13 @@ def generate_workbooks(user, gen: Gen):
     # print(result)
 
     errors = sac.validate_cross()
-    pprint(errors.get("errors", "No errors found in cross validation"))
+    if errors.get("errors"):
+        pprint(errors.get("errors", "No errors found in cross validation"))
 
     # disseminate(sac, year)
     # pprint(json_test_tables)
     # combined_summary = api_check(json_test_tables)
     # logger.info(combined_summary)
+
+    sac.save()
     return sac

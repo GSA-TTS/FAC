@@ -13,7 +13,7 @@ from audit.fixtures.excel import FORM_SECTIONS
 
 
 # from dissemination.workbooklib.notes_to_sefa import generate_notes_to_sefa
-from .federal_awards import generate_federal_awards
+from .federal_awards import federal_awards_to_json
 from .findings import generate_findings
 from .findings_text import generate_findings_text
 
@@ -32,14 +32,17 @@ sections = {
     # FORM_SECTIONS.ADDITIONAL_EINS: generate_additional_eins,
     # FORM_SECTIONS.ADDITIONAL_UEIS: generate_additional_ueis,
     # FORM_SECTIONS.ADDITIONAL_UEIS: generate_additional_ueis,
-    FORM_SECTIONS.CORRECTIVE_ACTION_PLAN: generate_corrective_action_plan,
-    FORM_SECTIONS.FEDERAL_AWARDS_EXPENDED: generate_federal_awards,
-    FORM_SECTIONS.FINDINGS_TEXT: generate_findings_text,
-    FORM_SECTIONS.FINDINGS_UNIFORM_GUIDANCE: generate_findings,
+    # FORM_SECTIONS.CORRECTIVE_ACTION_PLAN: generate_corrective_action_plan,
+    FORM_SECTIONS.FEDERAL_AWARDS_EXPENDED: federal_awards_to_json,
+    # FORM_SECTIONS.FINDINGS_TEXT: generate_findings_text,
+    # FORM_SECTIONS.FINDINGS_UNIFORM_GUIDANCE: generate_findings,
     # FORM_SECTIONS.NOTES_TO_SEFA: generate_notes_to_sefa,
     # FORM_SECTIONS.SECONDARY_AUDITORS: generate_secondary_auditors,
 }
 
+json_field_names = {
+    FORM_SECTIONS.FEDERAL_AWARDS_EXPENDED: "federal-awards-{}.xlsx",
+}
 filenames = {
     # FORM_SECTIONS.ADDITIONAL_EINS: "additional-eins-{}.xlsx",
     # FORM_SECTIONS.ADDITIONAL_UEIS: "additional-ueis-{}.xlsx",
@@ -67,12 +70,11 @@ def workbook_loader(user, sac: SingleAuditChecklist, audit_year, dbkey):
             outfile = mem_fs.openbin(filename, mode="w")
             (wb, json) = workbook_generator(sac, dbkey, audit_year, outfile)
             outfile.close()
-            outfile = mem_fs.openbin(filename, mode="r")
-            excel_file = _make_excel_file(filename, outfile)
-            print("JMM: excelfile = ", excel_file)
-            if user:
-                _post_upload_workbook(sac, user, section, excel_file)
-            outfile.close()
+            # outfile = mem_fs.openbin(filename, mode="r")
+            # excel_file = _make_excel_file(filename, outfile)
+            # if user:
+            #     _post_upload_workbook(sac, user, section, excel_file)
+            # outfile.close()
         return (wb, json, filename)
 
     return _loader

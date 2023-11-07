@@ -16,9 +16,9 @@ def get_cpacpuntry(country: str):
 
 def normalize_entity_type(entity_type: str):
     entity_type = entity_type.lower()
-    if entity_type == "local government":
+    if "local government" in entity_type:
         entity_type = "local"
-    if entity_type == "institution of higher education":
+    if "institution of higher education" in entity_type:
         entity_type = "higher-ed"
     return entity_type
 
@@ -74,6 +74,8 @@ def make_report_id(audit_year, fy_end_date, dbkey):
 cfda_extra = {
     "cluster_names": [],
     "other_cluster_names": [],
+    "prefixes": [],
+    "extensions": [],
 }
 
 valid_file = open(f"{settings.BASE_DIR}/schemas/source/base/ClusterNames.json")
@@ -83,16 +85,40 @@ UNDEFINED_CLUSTER_NAME = "OTHER CLUSTER NOT LISTED ABOVE"
 
 def normalize_cluster_name(cname: str):
     if not cname or len(cname) == 0:
-        return "N/A"
+        return ""
     if cname not in valid_json["cluster_names"]:
         return UNDEFINED_CLUSTER_NAME
     return cname
+
+
+def normalize_addl_award_id(award_id: str, cfda_id: str, dbkey):
+    if "u" in cfda_id.lower() or "rd" in cfda_id.lower():
+        if not award_id or len(award_id) == 0:
+            return f"ADDITIONAL AWARD INFO - DBKEY {dbkey}"
+        return award_id
+    return ""
 
 
 def derive_other_cluster_name(raw_cname: str, normalized_cname: str):
     if normalized_cname == UNDEFINED_CLUSTER_NAME:
         return raw_cname
     return ""
+
+
+def derive_prefix(code: str):
+    return code.split(".")[0]
+
+
+def derive_extension(code: str):
+    # TODO
+    #     extensions = map(
+    #     lambda v: v
+    #     if re.search("^(RD|RD[0-9]|[0-9]{3}[A-Za-z]{0,1}|U[0-9]{2})$", v)
+    #     else "000",
+    #     extensions,
+    # )
+
+    return code.split(".")[1]
 
 
 def set_extra_cfda_attrinute(name, value):
@@ -105,7 +131,7 @@ def get_extra_cfda_attrinutes(name):
 
 def clean_gen(gen: Gen):
     gen.ENTITY_TYPE = normalize_entity_type(gen.ENTITY_TYPE)
-    gen.CPACOUNTRY = get_cpacountry(gen.CPACOUNTRY)
+    gen.CPACOUNTRY = get_cpacpuntry(gen.CPACOUNTRY)
     gen.UEI = gen.UEI or "BADBADBADBAD"
     gen.FYSTARTDATE = format_date(gen.FYSTARTDATE)
     gen.FYENDDATE = format_date(gen.FYENDDATE)
@@ -119,3 +145,11 @@ def clean_cfda(cfda: Cfda):
     set_extra_cfda_attrinute("cluster_names", cluster_name)
     other_cluster_name = derive_other_cluster_name(cfda.CLUSTERNAME, cluster_name)
     set_extra_cfda_attrinute("other_cluster_names", other_cluster_name)
+    set_extra_cfda_attrinute("prefixes", derive_prefix(cfda.CFDA))
+    set_extra_cfda_attrinute("extensions", derive_extension(cfda.CFDA))
+    cfda.AWARDIDENTIFICATION = normalize_addl_award_id(
+        cfda.AWARDIDENTIFICATION, cfda.CFDA, cfda.DBKEY
+    )
+    cfda.STATECLUSTERNAME = (
+        cfda.STATECLUSTERNAME if "STATE CLUSTER" == cfda.CLUSTERNAME else ""
+    )
