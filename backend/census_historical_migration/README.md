@@ -18,3 +18,9 @@ docker compose run web python manage.py historic_workbook_generator
 ```
 - `year` is optional and defaults to `22`.
 - The `output` directory will be created if it doesn't already exist.
+
+### How to trigger historic data migrator from GitHub:
+- Go to GitHub Actions and select `Historic data migrator` action
+- Next, click on `Run workflow` on top right and 
+- Provide the target `environment` along with optional parameters such as `dbkeys` and `years`
+- Click `Run`
