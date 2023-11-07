@@ -79,6 +79,7 @@ class Command(BaseCommand):
                     logger.error("Could not download {}".format(model_obj))
                     return
                 file.seek(0)
+                rows_loaded = 0
                 for df in pd.read_csv(file, iterator=True, chunksize=CHUNK_SIZE):
                     # Each row is a dictionary. The columns are the
                     # correct names for our model. So, this should be a
@@ -86,6 +87,8 @@ class Command(BaseCommand):
                     for _, row in df.iterrows():
                         obj = model_obj(**row)
                         obj.save()
+                    rows_loaded += df.shape[0]
+                    print(f"Loaded {rows_loaded} rows in ", model_obj)
 
         for mdl in census_to_gsafac_models:
             row_count = mdl.objects.all().count()
