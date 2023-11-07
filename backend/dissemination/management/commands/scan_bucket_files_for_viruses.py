@@ -4,19 +4,19 @@ import requests
 from io import BytesIO
 from botocore.client import ClientError, Config
 
-from config.settings import ENVIRONMENT
 from django.core.management.base import BaseCommand
 from django.conf import settings
 from django.core.files.uploadedfile import SimpleUploadedFile
 
 logger = logging.getLogger(__name__)
 
+
 class ClamAVError(Exception):
     def __init__(self, file):
         self.file = file
 
     def __str__(self):
-        return f"Static virus scan failed"
+        return "Static virus scan failed"
 
 
 def _scan_file(file):
@@ -33,6 +33,7 @@ def _scan_file(file):
     except Exception as e:
         logger.error(f"SCAN EXCEPTION UNKNOWN {file} {e}")
         raise ClamAVError(file.name)
+
 
 def get_s3_client():
     s3 = boto3.client(
@@ -64,10 +65,11 @@ def load_file_from_s3(bucket, object_name):
         logger.error(f"{e}")
         logger.error("======================================")
         return None
-    
+
     # Seek to the start of the file.
     file.seek(0)
     return file
+
 
 def scan_file_in_s3(bucket, object_name):
     try:
@@ -78,7 +80,8 @@ def scan_file_in_s3(bucket, object_name):
     except Exception as e:
         logger.error(f"SCAN SCAN_FILE_IN_S3 {e}")
         return f"{object_name}"
-    
+
+
 def scan_files_at_path_in_s3(bucket, path):
     s3 = get_s3_client()
     objects = s3.list_objects(Bucket=bucket, Prefix=path)
@@ -92,17 +95,21 @@ def scan_files_at_path_in_s3(bucket, path):
             return results
     return None
 
+
 def is_stringlike(o):
     return isinstance(o, str) or isinstance(o, bytes)
 
+
 def not_a_stringlike(o):
     return not is_stringlike(o)
+
 
 def check_scan_ok(result):
     if result and not_a_stringlike(result) and result.status_code == 200:
         return True
     else:
         return False
+
 
 class Command(BaseCommand):
     def add_arguments(self, parser):
@@ -133,4 +140,6 @@ class Command(BaseCommand):
                         if is_stringlike(r):
                             logger.error(f"SCAN FAIL: {r}")
             else:
-                logger.error(f"SCAN NO: No files found for bucket {bucket} and path {path}")
+                logger.error(
+                    f"SCAN NO: No files found for bucket {bucket} and path {path}"
+                )
