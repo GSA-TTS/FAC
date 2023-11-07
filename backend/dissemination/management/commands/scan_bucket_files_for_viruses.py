@@ -125,9 +125,12 @@ class Command(BaseCommand):
                 logger.error(f"SCAN FAIL: {object}")
         if path:
             results = scan_files_at_path_in_s3(bucket, path)
-            if all(map(check_scan_ok, results)):
-                logger.info(f"SCAN OK: COUNT {len(results)}")
+            if results:
+                if all(map(check_scan_ok, results)):
+                    logger.info(f"SCAN OK: COUNT {len(results)}")
+                else:
+                    for r in results:
+                        if is_stringlike(r):
+                            logger.error(f"SCAN FAIL: {r}")
             else:
-                for r in results:
-                    if is_stringlike(r):
-                        logger.error(f"SCAN FAIL: {r}")
+                logger.error(f"SCAN NO: No files found for bucket {bucket} and path {path}")
