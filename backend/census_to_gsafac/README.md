@@ -44,10 +44,10 @@ NOTE:  Never check in the census_to_gsafac/data folder into GitHub.
 
 2.  In the FAC/backend folder, run the following to load CSV files from census_to_gsafac/data folder into fac-census-to-gsafac-s3 bucket.
 ```bash
-python manage.py fac_s3 fac-census-to-gsafac-s3 --upload --src census_to_gsafac/data
+docker compose run web python manage.py fac_s3 fac-census-to-gsafac-s3 --upload --src census_to_gsafac/data
 ```
 
 3.  In the FAC/backend folder, run the following to read the CSV files from fac-census-to-gsafac-s3 bucket and load into Postgres.
 ```bash
-python manage.py csv_to_postgres --folder data
+docker compose run web python manage.py csv_to_postgres --folder data
 ```
