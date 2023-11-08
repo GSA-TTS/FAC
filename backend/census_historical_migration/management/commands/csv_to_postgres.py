@@ -78,17 +78,8 @@ class Command(BaseCommand):
                 except ClientError:
                     logger.error("Could not download {}".format(model_obj))
                     return
-                file.seek(0)
-                rows_loaded = 0
-                for df in pd.read_csv(file, iterator=True, chunksize=CHUNK_SIZE):
-                    # Each row is a dictionary. The columns are the
-                    # correct names for our model. So, this should be a
-                    # clean way to load the model from a row.
-                    for _, row in df.iterrows():
-                        obj = model_obj(**row)
-                        obj.save()
-                    rows_loaded += df.shape[0]
-                    print(f"Loaded {rows_loaded} rows in ", model_obj)
+                print("Obtained {model_obj} from S3")
+                self.load_data(file, model_obj)
 
         for mdl in census_to_gsafac_models:
             row_count = mdl.objects.all().count()
@@ -116,3 +107,18 @@ class Command(BaseCommand):
                 return model_name
         print("Could not find a matching model for ", name)
         return None
+
+    def load_data(file, model_obj):
+        print("Starting load data to postgres")
+        file.seek(0)
+        rows_loaded = 0
+        for df in pd.read_csv(file, iterator=True, chunksize=CHUNK_SIZE):
+            # Each row is a dictionary. The columns are the
+            # correct names for our model. So, this should be a
+            # clean way to load the model from a row.
+            for _, row in df.iterrows():
+                obj = model_obj(**row)
+                obj.save()
+            rows_loaded += df.shape[0]
+            print(f"Loaded {rows_loaded} rows in ", model_obj)
+            return None
