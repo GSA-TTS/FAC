@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 
 class FindingUniformGuidance(Section):
     def __init__(self, finding: Findings, seq):
-        super.__init__()
+        super().__init__()
 
         finding.LOANBALANCE = self.normalize_number(finding.LOANBALANCE)
         finding.AMOUNT = self.normalize_number(finding.AMOUNT)

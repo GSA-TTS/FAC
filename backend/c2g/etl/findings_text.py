@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 
 class FindingUniformGuidance(Section):
     def __init__(self, finding_text: FindingsText, seq):
-        super.__init__()
+        super().__init__()
 
         self.dict_instance["reference_number"] = finding_text.FINDINGREFNUMS
         self.dict_instance["text_of_finding"] = finding_text.TEXT

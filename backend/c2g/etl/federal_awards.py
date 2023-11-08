@@ -15,6 +15,7 @@ logger = logging.getLogger(__name__)
 
 class FederalAward(Section):
     def __init__(self, cfda: Cfda, seq):
+        super().__init__()
         cfda.LOANBALANCE = self.normalize_number(cfda.LOANBALANCE)
         cfda.AMOUNT = self.normalize_number(cfda.AMOUNT)
         cfda.FINDINGSCOUNT = self.normalize_number(cfda.FINDINGSCOUNT)
