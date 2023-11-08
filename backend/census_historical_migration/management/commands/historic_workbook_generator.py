@@ -12,7 +12,6 @@ import pprint
 from census_historical_migration.workbooklib.workbook_creation import (
     sections,
     workbook_loader,
-    setup_sac,
 )
 
 import datetime
@@ -197,9 +196,8 @@ class Command(BaseCommand):
             dbkey=options["dbkey"], date=datetime.datetime.now()
         )
 
-        sac = setup_sac(None, entity_id, options["dbkey"])
         loader = workbook_loader(
-            None, sac, options["dbkey"], options["year"], entity_id
+            None, None, options["dbkey"], options["year"], entity_id
         )
         json_test_tables = []
         for section, fun in sections.items():
