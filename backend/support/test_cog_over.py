@@ -9,7 +9,7 @@ from django.db import connection
 from audit.models import SingleAuditChecklist
 from .models import CognizantBaseline, CognizantAssignment
 
-from .cog_over import compute_cog_over
+from .cog_over import compute_cog_over, record_cog_assignment
 
 # Note:  Fake data is generated for SingleAuditChecklist, CognizantBaseline.
 #        Using only the data fields that apply to cog / over assignment.
@@ -338,27 +338,77 @@ class CogOverTests(TestCase):
         self.assertEqual(over_agency, "15")
 
     def test_cog_assignment_with_uei_in_baseline(self):
+        BASE_UEI = "UEI1"
+        BASE_EIN = "EIN1"
+        BASE_COG = "00"
+
         sac = self._fake_sac()
-        sac.general_information["auditee_uei"] = UEI_WITH_BASELINE
+        sac.general_information["auditee_uei"] = BASE_UEI
+        sac.general_information["ein"] = BASE_EIN
+
         baker.make(
             CognizantBaseline,
-            uei=UEI_WITH_BASELINE,
-            cognizant_agency="17",
+            uei=BASE_UEI,
+            ein=BASE_EIN,
+            cognizant_agency=BASE_COG,
+            is_active=True,
         )
         cog_agency, over_agency = compute_cog_over(
             sac.federal_awards, sac.submission_status, sac.ein, sac.auditee_uei
         )
-        self.assertEqual(cog_agency, "10")
+        self.assertEqual(cog_agency, BASE_COG)
         self.assertEqual(over_agency, None)
 
     def test_cog_assignment_with_uei_in_baseline_and_overris(self):
+        BASE_UEI = "UEI1"
+        BASE_EIN = "EIN1"
+        BASE_COG = "00"
+
         sac = self._fake_sac()
-        sac.general_information["auditee_uei"] = UEI_WITH_BASELINE
+        sac.general_information["auditee_uei"] = BASE_UEI
+        sac.general_information["ein"] = BASE_EIN
+        sac.save()
+
         baker.make(
             CognizantBaseline,
-            uei=UEI_WITH_BASELINE,
-            cognizant_agency="17",
+            uei=BASE_UEI,
+            ein=BASE_EIN,
+            cognizant_agency=BASE_COG,
         )
-        sac.assign_cog_over()
+        cbs = CognizantBaseline.objects.all()
+        self.assertEquals(len(cbs), 1)
+
+        cog_agency, _ = compute_cog_over(
+            sac.federal_awards, sac.submission_status, sac.ein, sac.auditee_uei
+        )
+        record_cog_assignment(sac.report_id, sac.submitted_by, cog_agency)
         cas = CognizantAssignment.objects.all()
-        self.assertEquals(1, len(cas))
+        self.assertEquals(len(cas), 1)
+        cbs = CognizantBaseline.objects.all()
+        self.assertEquals(len(cbs), 1)
+        sac = SingleAuditChecklist.objects.get(report_id=sac.report_id)
+        self.assertEquals(sac.cognizant_agency, cog_agency)
+
+        oberride_cog = "01"
+        CognizantAssignment(
+            report_id=sac.report_id,
+            cognizant_agency=oberride_cog,
+            assignor_email="test_cog_over   @test.gov",
+            override_comment="test_cog_over",
+        ).save()
+        cbs = CognizantBaseline.objects.all()
+        self.assertEquals(len(cbs), 2)
+        cas = CognizantAssignment.objects.all()
+        self.assertEquals(len(cas), 2)
+        sac = SingleAuditChecklist.objects.get(report_id=sac.report_id)
+        self.assertEquals(sac.cognizant_agency, oberride_cog)
+
+        # a re-run ahould create a third assignmenet
+        sac.cognizant_agency = None
+        sac.save()
+        cog_agency, _ = compute_cog_over(
+            sac.federal_awards, sac.submission_status, sac.ein, sac.auditee_uei
+        )
+        record_cog_assignment(sac.report_id, sac.submitted_by, cog_agency)
+        sac = SingleAuditChecklist.objects.get(report_id=sac.report_id)
+        self.assertEquals(sac.cognizant_agency, oberride_cog)

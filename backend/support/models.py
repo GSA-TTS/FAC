@@ -1,4 +1,6 @@
+from django.apps import apps
 from django.db import models
+from django.db.models import Q
 from django.utils import timezone
 
 
@@ -82,3 +84,48 @@ class CognizantAssignment(models.Model):
         default=AssignmentTypeCode.COMPUTED,
         verbose_name="Type",
     )
+
+    def save(self, *args, **kwargs):
+        if self._state.adding:
+            sac_model = apps.get_model("audit.SingleAuditChecklist")
+            cognizant_agency = self.cognizant_agency
+            sac = sac_model.objects.get(report_id=self.report_id)
+            sac.cognizant_agency = cognizant_agency
+            sac.save()
+
+            uei, ein = sac.auditee_uei, sac.ein
+
+            reset_baseline(cognizant_agency, ein, uei)
+
+            try:
+                gen_model = apps.get_model("dissemination.General")
+                gen = gen_model.objects.get(report_id=sac.report_id)
+                gen.cognizant_agency = cognizant_agency
+                gen.save()
+            except gen_model.DoesNotExist:
+                # etl may not have been run yet
+                pass
+
+            super().save(*args, **kwargs)
+
+
+def reset_baseline(cognizant_agency, ein, uei):
+    baselines = CognizantBaseline.objects.filter(
+        Q(is_active=True)
+        & ~Q(cognizant_agency=cognizant_agency)
+        & (Q(ein=ein) | Q(uei=uei))
+    )
+    for baseline in baselines:
+        baseline.is_active = False
+        baseline.save()
+    existing_baseline_count = CognizantBaseline.objects.filter(
+        Q(is_active=True)
+        & Q(cognizant_agency=cognizant_agency)
+        & (Q(ein=ein) | Q(uei=uei))
+    ).count()
+    if existing_baseline_count == 0:
+        CognizantBaseline(
+            ein=ein,
+            uei=uei,
+            cognizant_agency=cognizant_agency,
+        ).save()
