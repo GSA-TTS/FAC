@@ -9,7 +9,6 @@ from django.core.management.base import BaseCommand
 from django.conf import settings
 from django.apps import apps
 
-CHUNK_SIZE = 10_000
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.WARNING)
 census_to_gsafac_models = list(
@@ -48,9 +47,10 @@ class Command(BaseCommand):
         if options.get("sample"):
             self.sample_data()
             return
-        self.process_csv_files(folder)
+        chunk_size = options.get("chunk-size")
+        self.process_csv_files(folder, chunk_size)
     
-    def process_csv_files(self, folder):
+    def process_csv_files(self, folder, chunk_size):
         items = self.list_s3_objects(census_to_gsafac_bucket_name, folder)
         for item in items:
             if item["Key"].endswith("/"):
@@ -61,7 +61,7 @@ class Command(BaseCommand):
                 model_obj = census_to_gsafac_models[model_index]
                 file = self.get_s3_object(census_to_gsafac_bucket_name, item["Key"], model_obj)
                 if file:
-                    self.process_and_load_data(file, model_obj)
+                    self.process_and_load_data(file, model_obj, chunk_size)
         for mdl in census_to_gsafac_models:
             row_count = mdl.objects.all().count()
             self.stdout.write(f"{row_count} in {mdl}")
@@ -82,9 +82,9 @@ class Command(BaseCommand):
     def list_s3_objects(self, bucket_name, folder):
         return s3_client.list_objects(Bucket=bucket_name, Prefix=folder)["Contents"]
     
-    def process_and_load_data(self, file, model_obj):
+    def process_and_load_data(self, file, model_obj, chunk_size):
         self.stdout.write(f"Obtained {model_obj} from S3")
-        self.load_data(file, model_obj)
+        self.load_data(file, model_obj, chunk_size)
    
     def get_s3_object(self, bucket_name, key, model_obj):
         file = BytesIO()
@@ -105,13 +105,13 @@ class Command(BaseCommand):
         self.stdout.write(f"Could not find a matching model for {name}")
         return None
    
-    def load_data(self, file, model_obj):
+    def load_data(self, file, model_obj, chunk_size):
         self.stdout.write(f"Starting load data to postgres")
         file.seek(0)
         rows_loaded = 0
-        for df in pd.read_csv(file, iterator=True, chunksize=CHUNK_SIZE):
+        for df in pd.read_csv(file, iterator=True, chunksize=chunk_size):
             for _, row in df.iterrows():
                 obj = model_obj(**row)
                 obj.save()
             rows_loaded += df.shape[0]
-            self.stdout.write(f"Loaded {rows_loaded} rows in {model_obj}")
+            self.stdout.write(f"Loaded {rows_loaded} rows in {model_obj})")
