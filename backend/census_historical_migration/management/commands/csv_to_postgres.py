@@ -110,6 +110,9 @@ class Command(BaseCommand):
         file.seek(0)
         rows_loaded = 0
         for df in pd.read_csv(file, iterator=True, chunksize=chunk_size):
+            # Each row is a dictionary. The columns are the
+            # correct names for our model. So, this should be a
+            # clean way to load the model from a row.
             for _, row in df.iterrows():
                 obj = model_obj(**row)
                 obj.save()
