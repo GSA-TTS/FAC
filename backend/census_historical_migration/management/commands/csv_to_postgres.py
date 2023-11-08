@@ -78,7 +78,7 @@ class Command(BaseCommand):
                 except ClientError:
                     logger.error("Could not download {}".format(model_obj))
                     return
-                print("Obtained {model_obj} from S3")
+                print(f"Obtained {model_obj} from S3")
                 self.load_data(file, model_obj)
 
         for mdl in census_to_gsafac_models:
@@ -108,7 +108,7 @@ class Command(BaseCommand):
         print("Could not find a matching model for ", name)
         return None
 
-    def load_data(file, model_obj):
+    def load_data(self, file, model_obj):
         print("Starting load data to postgres")
         file.seek(0)
         rows_loaded = 0
