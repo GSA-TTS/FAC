@@ -120,4 +120,4 @@ class Command(BaseCommand):
                 obj.save()
             rows_loaded += df.shape[0]
             print(f"Loaded {rows_loaded} rows in ", model_obj)
-            return None
+        return None
