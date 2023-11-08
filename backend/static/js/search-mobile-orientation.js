@@ -1,6 +1,6 @@
 (function () {
   const toggleBtn = document.getElementById('orientation-toggle');
-  const dismissBtn = document.getElementById('dismiss-orientation-modal');
+  const dismissBtn = document.querySelector('.dismiss-orientation-modal');
 
   function showModal() {
     const modalIsHidden = !document.body.classList.contains(
@@ -37,11 +37,7 @@
     window.removeEventListener('orientationchange', checkPortrait);
   }
 
-  Array.from(
-    document.getElementsByClassName('dismiss-orientation-modal')
-  ).forEach((btn) => {
-    btn.addEventListener('click', dismissModal);
-  });
+  dismissBtn.addEventListener('click', dismissModal);
 
   window.addEventListener('load', checkPortrait);
   window.addEventListener('orientationchange', checkPortrait);
