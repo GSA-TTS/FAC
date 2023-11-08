@@ -281,7 +281,7 @@ def extract_workbook_as_ir(file):
         sheet["ranges"] = ranges
         sheets.append(sheet)
 
-    # Remove all the Nones at the bottom of the sheets, since we have 5000 rows of formulas.
+    # Remove all the Nones at the bottom of the sheets, since we have 10000 rows of formulas.
     for sheet in sheets:
         remove_null_rows(sheet)
 

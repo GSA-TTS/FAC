@@ -9,7 +9,6 @@ from dissemination.workbooklib.excel_creation import (
 )
 
 from dissemination.workbooklib.excel_creation import (
-    insert_version_and_sheet_name,
     set_range,
 )
 from dissemination.workbooklib.census_models.census import dynamic_import
@@ -47,7 +46,6 @@ def generate_notes_to_sefa(dbkey, year, outfile):
     wb = pyxl.load_workbook(templates["SEFA"])
 
     g = set_uei(Gen, wb, dbkey)
-    insert_version_and_sheet_name(wb, "notes-to-sefa-workbook")
 
     # The mapping is weird.
     # https://facdissem.census.gov/Documents/DataDownloadKey.xlsx

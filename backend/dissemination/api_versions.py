@@ -4,13 +4,13 @@ from config import settings
 # These are API versions we want live.
 live = (
     # These are API versions we have in flight.
-    "api_v1_0_2",
+    "api_v1_0_3",
 )
 
 # These are API versions we have deprecated.
 # They will be removed. It should be safe to leave them
 # here for repeated runs.
-deprecated = ("api", "api_v1_0_0", "api_v1_0_1")
+deprecated = ("api", "api_v1_0_0", "api_v1_0_1", "api_v1_0_2")
 
 
 def get_conn_string():

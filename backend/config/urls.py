@@ -1,4 +1,5 @@
 from api import views
+from audit import views as auditviews
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
@@ -18,14 +19,7 @@ schema_view = get_schema_view(
 )
 
 urlpatterns = [
-    # path("", IndexView.as_view(), name="index"),
     path("api/schema.json", schema_view),
-    path("public/api/sac", views.SACViewSet.as_view({"get": "list"}), name="sac-list"),
-    path(
-        "public/api/sac/<str:report_id>",
-        views.SACViewSet.as_view({"get": "retrieve"}),
-        name="sac-detail",
-    ),
     path(
         "api/sac/eligibility",
         views.EligibilityFormView.as_view(),
@@ -80,8 +74,9 @@ urlpatterns = [
     ),
     path("audit/", include("audit.urls")),
     path("dissemination/", include("dissemination.urls")),
-    # Keep last so we can use short urls for content pages like home page etc.
-    path("", include("cms.urls")),
+    # home page & robots.txt
+    path("", auditviews.Home.as_view(), name="Home"),
+    path("robots.txt", auditviews.no_robots, name="no_robots"),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 if settings.ENABLE_DEBUG_TOOLBAR:

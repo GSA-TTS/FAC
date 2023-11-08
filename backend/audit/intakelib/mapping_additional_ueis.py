@@ -22,7 +22,7 @@ from .mapping_util import (
 )
 
 from .mapping_meta import meta_mapping
-
+from .transforms import run_all_additional_ueis_transforms
 from .checks import run_all_general_checks, run_all_additional_ueis_checks
 
 logger = logging.getLogger(__name__)
@@ -43,8 +43,9 @@ def extract_additional_ueis(file):
 
     ir = extract_workbook_as_ir(file)
     run_all_general_checks(ir, FORM_SECTIONS.ADDITIONAL_UEIS)
-    run_all_additional_ueis_checks(ir)
-    result = _extract_generic_data(ir, params)
+    xform_ir = run_all_additional_ueis_transforms(ir)
+    run_all_additional_ueis_checks(xform_ir)
+    result = _extract_generic_data(xform_ir, params)
     return result
 
 
