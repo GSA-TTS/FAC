@@ -1,5 +1,4 @@
 import logging
-import botocore
 import boto3
 import pandas as pd
 
