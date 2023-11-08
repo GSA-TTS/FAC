@@ -64,9 +64,12 @@ from audit.validators import (
     validate_secondary_auditors_json,
 )
 from audit.viewlib import (  # noqa
+    Home,
     TribalDataConsent,
     SubmissionProgressView,
+    UnlockAfterCertificationView,
     UploadReportView,
+    no_robots,
     submission_progress_check,
 )
 

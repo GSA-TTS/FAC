@@ -2,7 +2,7 @@ from audit.intakelib.intermediate_representation import (
     get_range_values_by_name,
     get_range_by_name,
 )
-from .util import get_message, build_cell_error_tuple
+from audit.intakelib.common import get_message, build_cell_error_tuple
 
 # Modified Opinion
 # Other Matters
@@ -18,6 +18,7 @@ from .util import get_message, build_cell_error_tuple
 # WHY
 # It's in the UG.
 def findings_grid_validation(ir):
+    # A copy of allowed_combos is in dissemination/workbooklib/findings.py
     # Values copied directly out of the UG
     allowed_combos = [
         "YNNNN",

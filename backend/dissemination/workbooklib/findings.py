@@ -7,7 +7,6 @@ from dissemination.workbooklib.excel_creation import (
     set_range,
 )
 
-from dissemination.workbooklib.excel_creation import insert_version_and_sheet_name
 from dissemination.workbooklib.census_models.census import dynamic_import
 
 
@@ -55,9 +54,38 @@ mappings = [
         "N/A",
         str,
     ),
-    # FIXME: We have to calculate, and patch in, is_valid
-    # is_valid is computed in the workbook
 ]
+
+
+def _get_findings_grid(findings_list):
+    # The original copy of allowed_combos is in audit/intakelib/checks/check_findings_grid_validation.py
+    allowed_combos = {
+        "YNNNN",
+        "YNYNN",
+        "YNNYN",
+        "NYNNN",
+        "NYYNN",
+        "NYNYN",
+        "NNYNN",
+        "NNNYN",
+        "NNNNY",
+    }
+
+    attributes = [
+        "modifiedopinion",
+        "othernoncompliance",
+        "materialweakness",
+        "significantdeficiency",
+        "otherfindings",
+    ]
+
+    return [
+        "Y"
+        if "".join((getattr(finding, attr, "") or "").strip() for attr in attributes)
+        in allowed_combos
+        else "N"
+        for finding in findings_list
+    ]
 
 
 def generate_findings(dbkey, year, outfile):
@@ -67,7 +95,6 @@ def generate_findings(dbkey, year, outfile):
     Cfda = dynamic_import("Cfda", year)
     wb = pyxl.load_workbook(templates["AuditFindings"])
     g = set_uei(Gen, wb, dbkey)
-    insert_version_and_sheet_name(wb, "federal-awards-audit-findings-workbook")
 
     cfdas = Cfda.select().where(Cfda.dbkey == g.dbkey).order_by(Cfda.index)
     # For each of them, I need to generate an elec -> award mapping.
@@ -88,6 +115,9 @@ def generate_findings(dbkey, year, outfile):
     map_simple_columns(wb, mappings, findings)
     set_range(wb, "award_reference", award_references)
 
+    grid = _get_findings_grid(findings)
+    # We need a magic "is_valid" column, which is computed in the workbook.
+    set_range(wb, "is_valid", grid, conversion_fun=str)
     wb.save(outfile)
 
     table = generate_dissemination_test_table(
