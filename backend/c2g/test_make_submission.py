@@ -2,11 +2,11 @@ from django.test import TestCase
 
 from model_bakery import baker
 
-from .wb_generator import load_historic_data
+from .make_submission import load_historic_data
 from .models import ELECAUDITHEADER, ELECAUDITS
 
 
-class WbGegeratorTestCase(TestCase):
+class WbGeneratorTestCase(TestCase):
     def test_submission_with_gen_and_awards(self):
         audit_year = "2021"
         dbkey = "10001"

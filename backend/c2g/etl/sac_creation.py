@@ -182,7 +182,7 @@ def _fake_audit_information(gen: Gen):
     return audit_information
 
 
-def _create_sac(user, gen: Gen):
+def create_sac(user, gen: Gen):
     clean_gen(gen)
 
     """Create a single example SAC."""

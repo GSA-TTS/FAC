@@ -1,6 +1,3 @@
-from django.core.management.base import BaseCommand
-from users.models import User
-import argparse
 import logging
 import sys
 import math
@@ -12,12 +9,13 @@ from pprint import pprint
 from datetime import datetime
 from audit.models import SingleAuditChecklist
 
+# from .sac_creation import _post_upload_pdf
+
 from .workbook_creation import (
     sections,
     workbook_loader,
     setup_sac,
 )
-from .sac_creation import _post_upload_pdf
 from audit.intake_to_dissemination import IntakeToDissemination
 
 from c2g.models import ELECAUDITHEADER as Gen
@@ -37,12 +35,6 @@ from c2g.models import ELECAUDITHEADER as Gen
 logger = logging.getLogger(__name__)
 logging.basicConfig()
 logging.getLogger().setLevel(logging.INFO)
-parser = argparse.ArgumentParser()
-
-# # Peewee runs a really noisy DEBUG log.
-# # pw = logging.getLogger("peewee")
-# # pw.addHandler(logging.StreamHandler())
-# pw.setLevel(logging.INFO)
 
 
 def step_through_certifications(sac: SingleAuditChecklist):
@@ -189,14 +181,15 @@ def api_check(json_test_tables):
 
 def generate_workbooks(user, gen: Gen):
     sac = setup_sac(user, gen)
-    loader = workbook_loader(user, sac, gen.AUDITYEAR, gen.DBKEY)
-    json_test_tables = []
-    for section, fun in sections.items():
-        # FIXME: Can we conditionally upload the addl' and secondary workbooks?
-        (_, json, _) = loader(fun, section)
+    # loader = workbook_loader(user, sac, gen.AUDITYEAR, gen.DBKEY)
+    # json_test_tables = []
+    for _, fun in sections.items():
+        fun(sac, dbkey=gen.DBKEY, audit_year=gen.AUDITYEAR)
+        # (_, json, _) = loader(fun, section)
+        # json_test_tables.append(json)
 
-        json_test_tables.append(json)
-    _post_upload_pdf(sac, user, "audit/fixtures/basic.pdf")
+    # TODO deal with pdf
+    # _post_upload_pdf(sac, user, "audit/fixtures/basic.pdf")
     step_through_certifications(sac)
 
     # shaped_sac = sac_validation_shape(sac)
@@ -204,32 +197,13 @@ def generate_workbooks(user, gen: Gen):
     # print(result)
 
     errors = sac.validate_cross()
-    pprint(errors.get("errors", "No errors found in cross validation"))
+    if errors.get("errors"):
+        pprint(errors.get("errors", "No errors found in cross validation"))
 
     # disseminate(sac, year)
     # pprint(json_test_tables)
     # combined_summary = api_check(json_test_tables)
     # logger.info(combined_summary)
+
+    sac.save()
     return sac
-
-
-def run_end_to_end(email, dbkey, year):
-    try:
-        user = User.objects.get(email=email)
-    except User.DoesNotExist:
-        logger.info("No user found for %s, have you logged in once?", email)
-        return
-    generate_workbooks(user, email, dbkey, year)
-
-
-class Command(BaseCommand):
-    def add_arguments(self, parser):
-        parser.add_argument("--email", type=str, required=True)
-        parser.add_argument("--dbkey", type=str, required=True)
-        parser.add_argument("--year", type=str, default="22")
-
-    def handle(self, *args, **options):
-        email = options["email"]
-        dbkey = options["dbkey"]
-        year = options["year"]
-        run_end_to_end(email, dbkey, year)
