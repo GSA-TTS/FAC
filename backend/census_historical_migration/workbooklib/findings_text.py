@@ -8,9 +8,6 @@ from census_historical_migration.workbooklib.excel_creation import (
     test_pfix,
 )
 
-from census_historical_migration.workbooklib.excel_creation import (
-    insert_version_and_sheet_name,
-)
 from census_historical_migration.workbooklib.census_models.census import dynamic_import
 
 import openpyxl as pyxl
@@ -35,7 +32,6 @@ def generate_findings_text(dbkey, year, outfile):
     wb = pyxl.load_workbook(templates["AuditFindingsText"])
 
     g = set_uei(Gen, wb, dbkey)
-    insert_version_and_sheet_name(wb, "audit-findings-text-workbook")
 
     ftexts = Findingstext.select().where(Findingstext.dbkey == g.dbkey)
     map_simple_columns(wb, mappings, ftexts)

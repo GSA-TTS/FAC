@@ -208,5 +208,5 @@ def extract_metadata(sheet_json, range):
             coversheet = sheet
             for scell in coversheet["single_cells"]:
                 if ("range_name" in scell) and (scell["range_name"] == range):
-                    result = scell["formula"]
+                    result = scell["value"]
     return result

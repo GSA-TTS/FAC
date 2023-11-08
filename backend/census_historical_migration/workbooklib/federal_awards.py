@@ -9,9 +9,6 @@ from census_historical_migration.workbooklib.excel_creation import (
     set_range,
 )
 
-from census_historical_migration.workbooklib.excel_creation import (
-    insert_version_and_sheet_name,
-)
 from census_historical_migration.workbooklib.census_models.census import dynamic_import
 
 from config import settings
@@ -204,7 +201,6 @@ def generate_federal_awards(dbkey, year, outfile):
     # In sheet : in DB
 
     g = set_uei(Gen, wb, dbkey)
-    insert_version_and_sheet_name(wb, "federal-awards-workbook")
 
     cfdas = Cfda.select().where(Cfda.dbkey == dbkey).order_by(Cfda.index)
     map_simple_columns(wb, mappings, cfdas)

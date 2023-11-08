@@ -3,8 +3,8 @@
 ### How to run the historic data migrator:
 ```
 docker compose run web python manage.py historic_data_migrator --email any_email_in_the_system@woo.gov \
-  --year 22 \
-  --dbkey 100010
+  --years 22 \
+  --dbkeys 100010
 ```
 - The email address currently must be a User in the system. As this has only been run locally so far, it would often be a test account in my local sandbox env.
 - `year` and `dbkey` are optional. The script will use default values for these if they aren't provided.
