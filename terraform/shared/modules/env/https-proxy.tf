@@ -28,7 +28,7 @@ module "https-proxy" {
       #and will be reporting this to New Relic in the hopes of being able to remove the proxy from our allow list.
       # This is thanks to Ryan Ahearn at 18F for pointing us in this direction
       # https://gsa-tts.slack.com/archives/C09CR1Q9Z/p1699394487090859
-      "${var.cf_org_name}-${var.cf_space_name}-https-proxy.apps.internal",
+      "${var.cf_org_name}-${var.cf_space_name}-egress-https-proxy.apps.internal",
 
       # Login.gov sandbox
       "idp.int.identitysandbox.gov:443",
