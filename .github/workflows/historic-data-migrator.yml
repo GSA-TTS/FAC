@@ -39,4 +39,4 @@ jobs:
           cf_password: ${{ secrets.CF_PASSWORD }}
           cf_org: gsa-tts-oros-fac
           cf_space: ${{ env.space }}
-          command: cf run-task gsa-fac -k 2G -m 2G --name historic_data_migrator --command "python manage.py historic-data-migrator --dbkeys ${{ inputs.dbkeys }} --years ${{ inputs.years }}"
+          command: cf run-task gsa-fac -k 2G -m 2G --name historic_data_migrator --command "python manage.py historic_data_migrator --dbkeys ${{ inputs.dbkeys }} --years ${{ inputs.years }}"
