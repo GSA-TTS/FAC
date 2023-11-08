@@ -28,9 +28,6 @@ from census_historical_migration.workbooklib.secondary_auditors import (
     generate_secondary_auditors,
 )
 
-from model_bakery import baker
-from django.contrib.auth import get_user_model
-
 import logging
 
 sections = {
@@ -60,19 +57,15 @@ logger = logging.getLogger(__name__)
 
 
 def setup_sac(user, test_name, dbkey):
+    if user is None:
+        logger.error("No user provided to setup_sac")
+        return
     logger.info(f"Creating a SAC object for {user}, {test_name}")
     SingleAuditChecklist = apps.get_model("audit.SingleAuditChecklist")
-    if user:
-        sac = SingleAuditChecklist.objects.filter(
-            submitted_by=user, general_information__auditee_name=test_name
-        ).first()
-    else:
-        sac = SingleAuditChecklist()
-        User = get_user_model()
-        user = baker.make(User)
-        sac.submitted_by = user
-        sac.general_information = {}
-        sac.general_information["auditee_name"] = test_name
+
+    sac = SingleAuditChecklist.objects.filter(
+        submitted_by=user, general_information__auditee_name=test_name
+    ).first()
 
     logger.info(sac)
     if sac is None:
@@ -80,6 +73,7 @@ def setup_sac(user, test_name, dbkey):
     return sac
 
 
+# FIXME: Refactor workbook_loader to separate workbook creation from upload
 def workbook_loader(user, sac, dbkey, year, entity_id):
     def _loader(workbook_generator, section):
         with MemoryFS() as mem_fs:
