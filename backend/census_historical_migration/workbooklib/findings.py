@@ -92,7 +92,9 @@ def generate_findings(dbkey, year, outfile):
     Gen = dynamic_import("Gen", year)
     Findings = dynamic_import("Findings", year)
     Cfda = dynamic_import("Cfda", year)
-    wb = pyxl.load_workbook(sections_to_template_paths[FORM_SECTIONS.FINDINGS_UNIFORM_GUIDANCE])
+    wb = pyxl.load_workbook(
+        sections_to_template_paths[FORM_SECTIONS.FINDINGS_UNIFORM_GUIDANCE]
+    )
     g = set_uei(Gen, wb, dbkey)
 
     cfdas = Cfda.select().where(Cfda.dbkey == g.dbkey).order_by(Cfda.index)

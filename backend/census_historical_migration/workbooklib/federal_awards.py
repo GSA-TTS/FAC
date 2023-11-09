@@ -196,7 +196,9 @@ def generate_federal_awards(dbkey, year, outfile):
     Gen = dynamic_import("Gen", year)
     Passthrough = dynamic_import("Passthrough", year)
     Cfda = dynamic_import("Cfda", year)
-    wb = pyxl.load_workbook(sections_to_template_paths[FORM_SECTIONS.FEDERAL_AWARDS_EXPENDED])
+    wb = pyxl.load_workbook(
+        sections_to_template_paths[FORM_SECTIONS.FEDERAL_AWARDS_EXPENDED]
+    )
     # In sheet : in DB
 
     g = set_uei(Gen, wb, dbkey)

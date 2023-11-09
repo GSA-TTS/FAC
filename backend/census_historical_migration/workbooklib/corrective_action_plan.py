@@ -22,7 +22,9 @@ def generate_corrective_action_plan(dbkey, year, outfile):
     logger.info(f"--- generate corrective action plan {dbkey} {year} ---")
     Gen = dynamic_import("Gen", year)
     Captext = dynamic_import("Captext", year)
-    wb = pyxl.load_workbook(sections_to_template_paths[FORM_SECTIONS.CORRECTIVE_ACTION_PLAN])
+    wb = pyxl.load_workbook(
+        sections_to_template_paths[FORM_SECTIONS.CORRECTIVE_ACTION_PLAN]
+    )
     mappings = [
         FieldMap("reference_number", "findingrefnums", "finding_ref_number", None, str),
         FieldMap("planned_action", "text", WorkbookFieldInDissem, None, test_pfix(3)),

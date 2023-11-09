@@ -52,7 +52,9 @@ def generate_secondary_auditors(dbkey, year, outfile):
     logger.info(f"--- generate secondary auditors {dbkey} {year} ---")
     Gen = dynamic_import("Gen", year)
     Cpas = dynamic_import("Cpas", year)
-    wb = pyxl.load_workbook(sections_to_template_paths[FORM_SECTIONS.SECONDARY_AUDITORS])
+    wb = pyxl.load_workbook(
+        sections_to_template_paths[FORM_SECTIONS.SECONDARY_AUDITORS]
+    )
 
     g = set_uei(Gen, wb, dbkey)
 
