@@ -12,8 +12,9 @@ def search_general(
     cog_or_oversight=None,
     agency_name=None,
     audit_years=None,
+    include_private=False,
 ):
-    query = Q(is_public=True)
+    query = Q(is_public=not include_private)
 
     if alns:
         query.add(_get_aln_match_query(alns), Q.AND)

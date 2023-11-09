@@ -23,6 +23,17 @@ from dissemination.models import (
     AdditionalUei,
 )
 
+from users.permissions import can_read_tribal
+
+def include_private_results(request):
+    if not request.user.is_authenticated:
+        return False
+    
+    if not can_read_tribal(request.user):
+        return False
+    
+    return True
+
 
 class Search(View):
     def get(self, request, *args, **kwargs):
@@ -52,6 +63,11 @@ class Search(View):
             # Changed in the form via pagination links
             page = int(form.cleaned_data["page"] or 1)
 
+            # is the user authenticated?
+            include_private = include_private_results(request)
+
+            print(include_private)
+
             results = search_general(
                 names=names,
                 alns=alns,
@@ -61,6 +77,7 @@ class Search(View):
                 cog_or_oversight=cog_or_oversight,
                 agency_name=agency_name,
                 audit_years=audit_years,
+                include_private=include_private,
             )
             results_count = results.count()
             # Reset page to one if the page number surpasses how many pages there actually are

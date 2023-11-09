@@ -11,6 +11,7 @@ logger = logging.getLogger(__name__)
 
 
 def claim_audit_access(user, all_emails):
+    print(all_emails)
     for email in all_emails:
         access_invites = (
             Access.objects.filter(user_id=None)

@@ -1,3 +1,4 @@
+from django.contrib.auth import get_user_model
 from django.test import Client, TestCase
 from django.urls import reverse
 
@@ -11,6 +12,8 @@ from dissemination.models import General
 
 from model_bakery import baker
 from unittest.mock import patch
+
+User = get_user_model()
 
 
 class PdfDownloadViewTests(TestCase):
@@ -70,6 +73,27 @@ class PdfDownloadViewTests(TestCase):
 
         self.assertEqual(response.status_code, 302)
         self.assertIn(file.filename, response.url)
+
+
+class SearchViewTests(TestCase):
+    def setUp(self):
+        self.anon_client = Client()
+        self.auth_client = Client()
+
+        self.auth_user = baker.make(User)
+        self.auth_client.force_login(self.auth_user)
+
+    def _search_url(self):
+        return reverse("dissemination:Search")
+
+    def test_allows_anonymous(self):
+        response = self.anon_client.get(self._search_url())
+        self.assertEqual(response.status_code, 200)
+
+    def test_search(self):
+        response = self.anon_client.post(self._search_url(), {})
+        print(response.content)
+        self.assertContains(response, "Results: 0")
 
 
 class XlsxDownloadViewTests(TestCase):
