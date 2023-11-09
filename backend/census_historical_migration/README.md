@@ -26,7 +26,7 @@ python manage.py fac_s3 fac-census-to-gsafac-s3 --upload --src census_historical
 * csv_to_postgres.py - Inserts data into Postgres tables using the contents of the CSV files in the S3 bucket. The first row of each file is assumed to have the column names (we convert to lowercase). The name of the table is determined by examining the name of the file. The sample source files do not have delimters for empty fields at the end of a line - so we assume these are nulls.
 
 ```bash
-python manage.py csv_to_postgres --folder data
+python manage.py csv_to_postgres --folder data --chunksize 10000
 python manage.py csv_to_postgres --clean True
 ```
 
@@ -51,7 +51,7 @@ docker compose run web python manage.py fac_s3 fac-census-to-gsafac-s3 --upload 
 
 3.  In the FAC/backend folder, run the following to read the CSV files from fac-census-to-gsafac-s3 bucket and load into Postgres.
 ```bash
-docker compose run web python manage.py csv_to_postgres --folder data
+docker compose run web python manage.py csv_to_postgres --folder data --chunksize 10000
 ```
 
 ### How to run the historic data migrator:
