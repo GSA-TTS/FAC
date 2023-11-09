@@ -73,19 +73,29 @@ def setup_sac(user, test_name, dbkey):
     return sac
 
 
-# FIXME: Refactor workbook_loader to separate workbook creation from upload
-def workbook_loader(user, sac, dbkey, year, entity_id):
-    def _loader(workbook_generator, section):
-        with MemoryFS() as mem_fs:
-            filename = filenames[section].format(dbkey)
-            outfile = mem_fs.openbin(filename, mode="w")
-            (wb, json) = workbook_generator(dbkey, year, outfile)
-            outfile.close()
-            outfile = mem_fs.openbin(filename, mode="r")
+def generate_workbook(workbook_generator, dbkey, year, section):
+    with MemoryFS() as mem_fs:
+        filename = filenames[section].format(dbkey)
+        with mem_fs.openbin(filename, mode="w") as outfile:
+            # Generate the workbook object along with the API JSON representation
+            wb, json_data = workbook_generator(dbkey, year, outfile)
+
+        # Re-open the file in read mode to create an Excel file object
+        with mem_fs.openbin(filename, mode="r") as outfile:
             excel_file = _make_excel_file(filename, outfile)
-            if user:
-                _post_upload_workbook(sac, user, section, excel_file)
-            outfile.close()
-        return (wb, json, filename)
+
+        return wb, json_data, excel_file, filename
+
+
+def workbook_loader(user, sac, dbkey, year):
+    def _loader(workbook_generator, section):
+        wb, json_data, excel_file, filename = generate_workbook(
+            workbook_generator, dbkey, year, section
+        )
+
+        if user:
+            _post_upload_workbook(sac, user, section, excel_file)
+
+        return wb, json_data, filename
 
     return _loader
