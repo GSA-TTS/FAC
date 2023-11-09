@@ -11,11 +11,14 @@ logger = logging.getLogger(__name__)
 
 
 def claim_audit_access(user, all_emails):
-    for email in all_emails:
-        access_invites = (
-            Access.objects.filter(user_id=None)
-            .filter(email__iexact=email)
-            .update(user_id=user.id)
+    """
+    user is our system user
+    all_emails is the list of email addresses from the login.gov JWT.
+    """
+    l_emails = [ea.lower() for ea in all_emails]
+    for email in l_emails:
+        access_invites = Access.objects.filter(email__iexact=email).update(
+            user_id=user.id, email=email
         )
         logger.debug(f"{user.email} granted access to {access_invites} new audits")
 
