@@ -11,10 +11,10 @@ from pprint import pprint
 from datetime import datetime
 
 from census_historical_migration.workbooklib.workbook_creation import (
-    sections,
     workbook_loader,
     setup_sac,
 )
+from census_historical_migration.workbooklib.workbook_section_handlers import sections
 from census_historical_migration.workbooklib.sac_creation import _post_upload_pdf
 from audit.intake_to_dissemination import IntakeToDissemination
 
