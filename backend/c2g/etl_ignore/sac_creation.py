@@ -89,7 +89,7 @@ def _census_audit_type(s):
     }[s]
 
 
-def _fake_general_information(user, gen: Gen):
+def get_general_information(user, gen: Gen):
     """Create a fake general_information object."""
     # auditee_fiscal_period_end = str_to_date(gen.FYENDDATE)
     # auditee_fiscal_period_start = str_to_date(gen.FYSTARTDATE)
@@ -133,7 +133,6 @@ def _fake_general_information(user, gen: Gen):
 
     # verify that our created object validates against the schema
     audit.validators.validate_general_information_complete_json(general_information)
-
     return general_information
 
 
@@ -150,7 +149,7 @@ def _get_agencues(gen):
 
 
 # TODO: Pull this from actual information.
-def _fake_audit_information(gen: Gen):
+def get_audit_information(gen: Gen):
     findings = Finding.objects.filter(AUDITYEAR=gen.AUDITYEAR, DBKEY=gen.DBKEY)
     finding: Finding
     gaap_results = {}
@@ -198,14 +197,12 @@ def create_sac(user, gen: Gen):
     sac = SingleAuditChecklist(
         report_id=report_id,
         submitted_by=user,
-        general_information=_fake_general_information(user, gen),
-        audit_information=_fake_audit_information(gen),
     )
 
+    sac.general_information = get_general_information(user, gen)
+    sac.audit_information = get_audit_information(gen)
     set_auditee_cerification(sac)
-
     set_auditor_certification(sac)
-
     sac.data_source = "CENSUS"
     # sac.save()
 

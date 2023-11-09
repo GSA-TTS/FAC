@@ -1,15 +1,18 @@
 from collections import namedtuple as NT
-
 import os
 import sys
 
 import logging
-from .transformers import make_report_id
-from config import settings
+from datetime import date
+
+from django.forms import model_to_dict
+from django.conf import settings
+
+from .transformers import str_to_date
 import re
 import json
 
-from audit.models import SingleAuditChecklist
+from c2g.models import ELECAUDITHEADER as Gen
 
 logger = logging.getLogger(__name__)
 
@@ -18,6 +21,23 @@ logger = logging.getLogger(__name__)
 # the type of value, so that things can be set correctly
 # before filling in the XLSX workbooks.
 FieldMap = NT("FieldMap", "in_sheet in_db in_dissem default type")
+
+
+def get_upper(mappings):
+    upper_mappings = []
+    for mapping in mappings:
+        upper_mappings.append(
+            FieldMap(
+                mapping.in_sheet,
+                mapping.in_db.upper(),
+                mapping.in_dissem,
+                mapping.default,
+                mapping.type,
+            )
+        )
+    return upper_mappings
+
+
 WorkbookFieldInDissem = 1000
 
 templates_root = "schemas/output/excel/xlsx/"
@@ -80,47 +100,33 @@ def set_range(wb, range_name, values, default=None, conversion_fun=str):
 
     for ndx, v in enumerate(values):
         row = ndx + start_row
-        val = v or default
-        try:
-            val = conversion_fun(val)
-        except Exception:
-            val = ""
-        ws.cell(row=row, column=col, value=val)
-
-        # if v:
-        #     # This is a very noisy statement, showing everything
-        #     # written into the workbook.
-        #     # print(f'{range_name} c[{row}][{col}] <- {type(v)} len({len(v)}) {default}')
-        #     if v is not None:
-        #         ws.cell(row=row, column=col, value=conversion_fun(v))
-        #     if len(str(v)) == 0 and default is not None:
-        #         # This is less noisy. Shows up for things like
-        #         # empty findings counts. 2023 submissions
-        #         # require that field to be 0, not empty,
-        #         # if there are no findings.
-        #         # print('Applying default')
-        #         ws.cell(row=row, column=col, value=conversion_fun(default))
-        # if not v:
-        #     if default is not None:
-        #         ws.cell(row=row, column=col, value=conversion_fun(default))
-        #     else:
-        #         ws.cell(row=row, column=col, value="")
-        # else:
-        #     # Leave it blank if we have no default passed in
-        #     pass
+        if v:
+            # This is a very noisy statement, showing everything
+            # written into the workbook.
+            # print(f'{range_name} c[{row}][{col}] <- {type(v)} len({len(v)}) {default}')
+            if v is not None:
+                ws.cell(row=row, column=col, value=conversion_fun(v))
+            if len(str(v)) == 0 and default is not None:
+                # This is less noisy. Shows up for things like
+                # empty findings counts. 2023 submissions
+                # require that field to be 0, not empty,
+                # if there are no findings.
+                # print('Applying default')
+                ws.cell(row=row, column=col, value=conversion_fun(default))
+        if not v:
+            if default is not None:
+                ws.cell(row=row, column=col, value=conversion_fun(default))
+            else:
+                ws.cell(row=row, column=col, value="")
+        else:
+            # Leave it blank if we have no default passed in
+            pass
 
 
-def set_uei(sac: SingleAuditChecklist, wb):
-    uei = sac.auditee_uei or "BADBADBADBAD"
+def set_uei(gen: Gen, wb):
+    uei = gen.UEI or "BADBADBADBAD"
     set_single_cell_range(wb, "auditee_uei", uei)
-
-
-def model_to_dict(model_instance):
-    model_dict = {}
-    for field in model_instance._meta.fields:
-        model_dict[field.name] = getattr(model_instance, field.name)
-
-    return model_dict
+    return uei
 
 
 def map_simple_columns(wb, mappings, values):
@@ -148,18 +154,45 @@ def map_simple_columns(wb, mappings, values):
         )
 
 
-def generate_dissemination_test_table(
-    sac: SingleAuditChecklist, api_endpoint, audit_year, dbkey, mappings, objects
-):
-    table: dict = {"rows": list(), "singletons": dict()}
-    table["endpoint"] = api_endpoint
-    table["report_id"] = make_report_id(
-        audit_year, sac.auditee_fiscal_period_end, dbkey
-    )
+def _census_date_to_datetime(cd):
+    lookup = {
+        "JAN": 1,
+        "FEB": 2,
+        "MAR": 3,
+        "APR": 4,
+        "MAY": 5,
+        "JUN": 6,
+        "JUL": 7,
+        "AUG": 8,
+        "SEP": 9,
+        "OCT": 10,
+        "NOV": 11,
+        "DEC": 12,
+    }
+    year = int(cd.split("-")[2])
+    month = lookup[cd.split("-")[1]]
+    day = int(cd.split("-")[0])
+    return date(year + 2000, month, day)
 
+
+# FIXME: Get the padding/shape right on the report_id
+def dbkey_to_test_report_id(gen: Gen):
+    # month = g.fyenddate.split('-')[1]
+    # 2022JUN0001000003
+    # We start new audits at 1 million.
+    # So, we want 10 digits, and zero-pad for
+    # historic DBKEY report_ids
+    dt = str_to_date(gen.FYENDDATE)
+    return f"{gen.AUDITYEAR}-{dt.month:02}-TSTDAT-{gen.DBKEY.zfill(10)}"
+
+
+def generate_dissemination_test_table(gen: Gen, api_endpoint, mappings, objects):
+    table = {"rows": list(), "singletons": dict()}
+    table["endpoint"] = api_endpoint
+    table["report_id"] = dbkey_to_test_report_id(gen)
     for o in objects:
         as_dict = model_to_dict(o)
-        test_obj: dict = {}
+        test_obj = {}
         test_obj["fields"] = []
         test_obj["values"] = []
         for m in mappings:

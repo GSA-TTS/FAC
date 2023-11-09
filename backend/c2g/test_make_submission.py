@@ -15,7 +15,7 @@ class WbGeneratorTestCase(TestCase):
         self.fake_cfda(audit_year, dbkey, variant=2).save()
         result = load_historic_data(audit_year, dbkey)
         errors_log = result.get("errors")
-        print(errors_log)
+        print("errors:", errors_log)
         self.assertEquals(len(errors_log), 0)
 
     def fake_gen(self, audit_year, dbkey):

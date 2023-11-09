@@ -9,9 +9,7 @@ from .excel_creation import (
 )
 
 from .excel_creation import insert_version_and_sheet_name
-from c2g.models import (
-    ELECCAPTEXT as CapTexts,
-)
+from .census_models.census import dynamic_import
 
 
 import openpyxl as pyxl
@@ -21,40 +19,30 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def generate_corrective_action_plan(sac, dbkey, audit_year, outfile):
-    logger.info(f"--- generate corrective action plan {dbkey} {audit_year} ---")
+def generate_corrective_action_plan(dbkey, year, outfile):
+    logger.info(f"--- generate corrective action plan {dbkey} {year} ---")
+    Gen = dynamic_import("Gen", year)
+    Captext = dynamic_import("Captext", year)
     wb = pyxl.load_workbook(templates["CAP"])
     mappings = [
+        FieldMap("reference_number", "findingrefnums", "finding_ref_number", None, str),
+        FieldMap("planned_action", "text", WorkbookFieldInDissem, None, test_pfix(3)),
         FieldMap(
-            "reference_number",
-            "findingrefnums".upper(),
-            "finding_ref_number",
-            None,
-            str,
-        ),
-        FieldMap(
-            "planned_action", "text".upper(), WorkbookFieldInDissem, None, test_pfix(3)
-        ),
-        FieldMap(
-            "contains_chart_or_table",
-            "chartstables".upper(),
-            WorkbookFieldInDissem,
-            None,
-            str,
+            "contains_chart_or_table", "chartstables", WorkbookFieldInDissem, None, str
         ),
     ]
 
-    set_uei(sac, wb)
+    g = set_uei(Gen, wb, dbkey)
     insert_version_and_sheet_name(wb, "corrective-action-plan-workbook")
 
-    captexts = CapTexts.objects.filter(DBKEY=dbkey, AUDITYEAR=audit_year)
+    captexts = Captext.select().where(Captext.dbkey == g.dbkey)
 
     map_simple_columns(wb, mappings, captexts)
     wb.save(outfile)
 
     table = generate_dissemination_test_table(
-        sac, "corrective_action_plans", audit_year, dbkey, mappings, captexts
+        Gen, "corrective_action_plans", dbkey, mappings, captexts
     )
-    table["singletons"]["auditee_uei"] = sac.auditee_uei
+    table["singletons"]["auditee_uei"] = g.uei
 
     return (wb, table)

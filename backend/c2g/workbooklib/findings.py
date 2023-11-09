@@ -8,11 +8,7 @@ from .excel_creation import (
 )
 
 from .excel_creation import insert_version_and_sheet_name
-from audit.models import SingleAuditChecklist
-from c2g.models import (
-    ELECAUDITS as Cfda,
-    ELECAUDITFINDINGS as Findings,
-)
+from .census_models.census import dynamic_import
 
 
 import openpyxl as pyxl
@@ -31,46 +27,30 @@ def sorted_string(s):
 mappings = [
     FieldMap(
         "compliance_requirement",
-        "typerequirement".upper(),
+        "typerequirement",
         "type_requirement",
         "ABC",
         sorted_string,
     ),
+    FieldMap("reference_number", "findingsrefnums", "reference_number", None, str),
+    FieldMap("modified_opinion", "modifiedopinion", "is_modified_opinion", None, str),
+    FieldMap("other_matters", "othernoncompliance", "is_other_matters", None, str),
     FieldMap(
-        "reference_number", "findingrefnums".upper(), "reference_number", None, str
-    ),
-    FieldMap(
-        "modified_opinion", "modifiedopinion".upper(), "is_modified_opinion", None, str
-    ),
-    FieldMap(
-        "other_matters", "othernoncompliance".upper(), "is_other_matters", None, str
-    ),
-    FieldMap(
-        "material_weakness",
-        "materialweakness".upper(),
-        "is_material_weakness",
-        None,
-        str,
+        "material_weakness", "materialweakness", "is_material_weakness", None, str
     ),
     FieldMap(
         "significant_deficiency",
-        "significantdeficiency".upper(),
+        "significantdeficiency",
         "is_significant_deficiency",
         None,
         str,
     ),
-    FieldMap("other_findings", "otherfindings".upper(), "is_other_findings", None, str),
-    FieldMap("questioned_costs", "qcosts".upper(), "is_questioned_costs", None, str),
-    FieldMap(
-        "repeat_prior_reference",
-        "repeatfinding".upper(),
-        "is_repeat_finding",
-        None,
-        str,
-    ),
+    FieldMap("other_findings", "otherfindings", "is_other_findings", None, str),
+    FieldMap("questioned_costs", "qcosts", "is_questioned_costs", None, str),
+    FieldMap("repeat_prior_reference", "repeatfinding", "is_repeat_finding", None, str),
     FieldMap(
         "prior_references",
-        "priorfindingrefnums".upper(),
+        "priorfindingrefnums",
         "prior_finding_ref_numbers",
         "N/A",
         str,
@@ -80,31 +60,30 @@ mappings = [
 ]
 
 
-def generate_findings(sac: SingleAuditChecklist, dbkey, audit_year, outfile):
-    logger.info(f"--- generate findings {dbkey} {audit_year} ---")
-
+def generate_findings(dbkey, year, outfile):
+    logger.info(f"--- generate findings {dbkey} {year} ---")
+    Gen = dynamic_import("Gen", year)
+    Findings = dynamic_import("Findings", year)
+    Cfda = dynamic_import("Cfda", year)
     wb = pyxl.load_workbook(templates["AuditFindings"])
-    set_uei(sac, wb)
+    g = set_uei(Gen, wb, dbkey)
     insert_version_and_sheet_name(wb, "federal-awards-audit-findings-workbook")
 
-    cfdas = Cfda.objects.filter(DBKEY=dbkey, AUDITYEAR=audit_year)
+    cfdas = Cfda.select().where(Cfda.dbkey == g.dbkey).order_by(Cfda.index)
     # For each of them, I need to generate an elec -> award mapping.
     e2a = {}
-    cfda: Cfda
     for ndx, cfda in enumerate(cfdas):
-        e2a[cfda.ELECAUDITSID] = f"AWARD-{ndx+1:04d}"
+        e2a[cfda.elecauditsid] = f"AWARD-{ndx+1:04d}"
 
     # CFDAs have elecauditid (FK). Findings have elecauditfindingsid, which is unique.
     # The linkage here is that a given finding will have an elecauditid.
     # Multiple findings will have a given elecauditid. That's how to link them.
     findings = (
-        Findings.objects.filter(DBKEY=dbkey, AUDITYEAR=audit_year)
-        # Findings.select().where(Findings.dbkey == g.dbkey).order_by(Findings.index)
+        Findings.select().where(Findings.dbkey == g.dbkey).order_by(Findings.index)
     )
     award_references = []
-    finding: Findings
-    for finding in findings:
-        award_references.append(e2a[finding.ELECAUDITSID])
+    for find in findings:
+        award_references.append(e2a[find.elecauditsid])
 
     map_simple_columns(wb, mappings, findings)
     set_range(wb, "award_reference", award_references)
@@ -112,7 +91,7 @@ def generate_findings(sac: SingleAuditChecklist, dbkey, audit_year, outfile):
     wb.save(outfile)
 
     table = generate_dissemination_test_table(
-        sac, "findings", audit_year, dbkey, mappings, findings
+        Gen, "findings", dbkey, mappings, findings
     )
     for obj, ar in zip(table["rows"], award_references):
         obj["fields"].append("award_reference")

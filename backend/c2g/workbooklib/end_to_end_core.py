@@ -1,44 +1,48 @@
+from users.models import User
+import argparse
 import logging
 import sys
 import math
+from config import settings
 import os
 import jwt
 import requests
 from pprint import pprint
 from datetime import datetime
-import traceback
-
-from django.conf import settings
-from audit.models import SingleAuditChecklist
-
-from .sac_creation import create_sac
 
 from .workbook_creation import (
-    make_loader,
     sections,
+    workbook_loader,
+    setup_sac,
 )
+from .sac_creation import _post_upload_pdf
 from audit.intake_to_dissemination import IntakeToDissemination
 
-from c2g.models import ELECAUDITHEADER as Gen
-
-# from dissemination.models import (
-#     AdditionalEin,
-#     AdditionalUei,
-#     CapText,
-#     FederalAward,
-#     Finding,
-#     FindingText,
-#     Note,
-#     Passthrough,
-#     SecondaryAuditor,
-# )
+from dissemination.models import (
+    AdditionalEin,
+    AdditionalUei,
+    CapText,
+    FederalAward,
+    Finding,
+    FindingText,
+    General,
+    Note,
+    Passthrough,
+    SecondaryAuditor,
+)
 
 logger = logging.getLogger(__name__)
 logging.basicConfig()
 logging.getLogger().setLevel(logging.INFO)
+parser = argparse.ArgumentParser()
+
+# Peewee runs a really noisy DEBUG log.
+pw = logging.getLogger("peewee")
+pw.addHandler(logging.StreamHandler())
+pw.setLevel(logging.INFO)
 
 
-def step_through_certifications(sac: SingleAuditChecklist):
+def step_through_certifications(sac):
     sac.transition_to_ready_for_certification()
     sac.transition_to_auditor_certified()
     sac.transition_to_auditee_certified()
@@ -49,19 +53,19 @@ def step_through_certifications(sac: SingleAuditChecklist):
 
 def disseminate(sac, year):
     logger.info("Invoking movement of data from Intake to Dissemination")
-    # for model in [
-    #     AdditionalEin,
-    #     AdditionalUei,
-    #     CapText,
-    #     FederalAward,
-    #     Finding,
-    #     FindingText,
-    #     General,
-    #     Note,
-    #     Passthrough,
-    #     SecondaryAuditor,
-    # ]:
-    #     model.objects.filter(report_id=sac.report_id).delete()
+    for model in [
+        AdditionalEin,
+        AdditionalUei,
+        CapText,
+        FederalAward,
+        Finding,
+        FindingText,
+        General,
+        Note,
+        Passthrough,
+        SecondaryAuditor,
+    ]:
+        model.objects.filter(report_id=sac.report_id).delete()
 
     if sac.general_information:
         etl = IntakeToDissemination(sac)
@@ -85,7 +89,12 @@ def call_api(api_url, endpoint, rid, field):
     )
     full_request = f"{api_url}/{endpoint}?report_id=eq.{rid}&select={field}"
     response = requests.get(
-        full_request, headers={"Authorization": f"Bearer {encoded_jwt}"}, timeout=10
+        full_request,
+        headers={
+            "Authorization": f"Bearer {encoded_jwt}",
+            "X-Api-Key": os.getenv("CYPRESS_API_GOV_KEY"),
+        },
+        timeout=10,
     )
     return response
 
@@ -121,7 +130,7 @@ def check_equality(in_wb, in_json):
 
 
 def get_api_values(endpoint, rid, field):
-    api_url = settings.POSTGREST.get("URL")
+    api_url = settings.POSTGREST.get(settings.ENVIRONMENT)
     res = call_api(api_url, endpoint, rid, field)
 
     if res.status_code == 200:
@@ -180,25 +189,40 @@ def api_check(json_test_tables):
     return combined_summary
 
 
-def make_one_submission(result, gen, user):
-    try:
-        sac: SingleAuditChecklist = create_sac(user, gen)
-        loader = make_loader(gen)
+def generate_workbooks(user, email, dbkey, year):
+    entity_id = "DBKEY {dbkey} {year} {date:%Y_%m_%d_%H_%M_%S}".format(
+        dbkey=dbkey, year=year, date=datetime.now()
+    )
+    sac = setup_sac(user, entity_id, dbkey)
+    if sac.general_information["audit_type"] == "alternative-compliance-engagement":
+        print(f"Skipping ACE audit: {dbkey}")
+    else:
+        loader = workbook_loader(user, sac, dbkey, year, entity_id)
+        json_test_tables = []
+        for section, fun in sections.items():
+            # FIXME: Can we conditionally upload the addl' and secondary workbooks?
+            (_, json, _) = loader(fun, section)
+            json_test_tables.append(json)
+        _post_upload_pdf(sac, user, "audit/fixtures/basic.pdf")
+        step_through_certifications(sac)
 
-        for section, (func, file_name) in sections.items():
-            loader(func, file_name, sac, section)
-        # step_through_certifications(sac)
+        # shaped_sac = sac_validation_shape(sac)
+        # result = submission_progress_check(shaped_sac, sar=None, crossval=False)
+        # print(result)
 
         errors = sac.validate_cross()
-        if errors.get("errors"):
-            pprint(errors.get("errors", "No errors found in cross validation"))
+        pprint(errors.get("errors", "No errors found in cross validation"))
 
-        sac.save()
+        disseminate(sac, year)
+        # pprint(json_test_tables)
+        combined_summary = api_check(json_test_tables)
+        logger.info(combined_summary)
 
-        result["success"].append(f"{sac.report_id} created")
-        return sac
-    except Exception as exc:
-        tb = traceback.extract_tb(sys.exc_info()[2])
-        for frame in tb:
-            print(f"{frame.filename}:{frame.lineno} {frame.name}: {frame.line}")
-        result["errors"].append(f"{exc}")
+
+def run_end_to_end(email, dbkey, year):
+    try:
+        user = User.objects.get(email=email)
+    except User.DoesNotExist:
+        logger.info("No user found for %s, have you logged in once?", email)
+        return
+    generate_workbooks(user, email, dbkey, year)

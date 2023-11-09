@@ -11,7 +11,7 @@ from django.apps import apps
 
 from django.core.files.uploadedfile import SimpleUploadedFile
 from jsonschema import ValidationError
-from audit.models import SingleAuditChecklist
+from audit.models import SingleAuditChecklist, ExcelFile
 from .transformers import clean_gen, make_report_id, str_to_date
 from c2g.models import (
     ELECAUDITHEADER as Gen,
@@ -89,7 +89,7 @@ def _census_audit_type(s):
     }[s]
 
 
-def _fake_general_information(user, gen: Gen):
+def get_general_information(user, gen: Gen):
     """Create a fake general_information object."""
     # auditee_fiscal_period_end = str_to_date(gen.FYENDDATE)
     # auditee_fiscal_period_start = str_to_date(gen.FYSTARTDATE)
@@ -133,7 +133,6 @@ def _fake_general_information(user, gen: Gen):
 
     # verify that our created object validates against the schema
     audit.validators.validate_general_information_complete_json(general_information)
-
     return general_information
 
 
@@ -150,7 +149,7 @@ def _get_agencues(gen):
 
 
 # TODO: Pull this from actual information.
-def _fake_audit_information(gen: Gen):
+def get_audit_information(gen: Gen):
     findings = Finding.objects.filter(AUDITYEAR=gen.AUDITYEAR, DBKEY=gen.DBKEY)
     finding: Finding
     gaap_results = {}
@@ -182,7 +181,7 @@ def _fake_audit_information(gen: Gen):
     return audit_information
 
 
-def _create_sac(user, gen: Gen):
+def create_sac(user, gen: Gen):
     clean_gen(gen)
 
     """Create a single example SAC."""
@@ -198,14 +197,12 @@ def _create_sac(user, gen: Gen):
     sac = SingleAuditChecklist(
         report_id=report_id,
         submitted_by=user,
-        general_information=_fake_general_information(user, gen),
-        audit_information=_fake_audit_information(gen),
     )
 
+    sac.general_information = get_general_information(user, gen)
+    sac.audit_information = get_audit_information(gen)
     set_auditee_cerification(sac)
-
     set_auditor_certification(sac)
-
     sac.data_source = "CENSUS"
     # sac.save()
 
@@ -285,31 +282,30 @@ def _post_upload_pdf(this_sac, this_user, pdf_filename):
     this_sac.save()
 
 
-def _post_upload_workbook(this_sac, this_user, section, xlsx_file):
+def _post_upload_workbook(this_sac: SingleAuditChecklist, section, xlsx_file):
     """Upload a workbook for this SAC.
 
     This should be idempotent if it is called on a SAC that already
     has a federal awards file uploaded.
     """
-    ExcelFile = apps.get_model("audit.ExcelFile")
 
-    if (
-        ExcelFile.objects.filter(sac_id=this_sac.id, form_section=section).exists()
-        and get_field_by_section(this_sac, section) is not None
-    ):
-        # there is already an uploaded file and data in the object so
-        # nothing to do here
-        return
+    # if (
+    #     ExcelFile.objects.filter(sac_id=this_sac.id, form_section=section).exists()
+    #     and get_field_by_section(this_sac, section) is not None
+    # ):
+    #     # there is already an uploaded file and data in the object so
+    #     # nothing to do here
+    #     return
 
     excel_file = ExcelFile(
         file=xlsx_file,
         filename=Path("xlsx.xlsx").stem,
-        user=this_user,
+        user=this_sac.submitted_by,
         sac_id=this_sac.id,
         form_section=section,
     )
-    excel_file.full_clean()
-    excel_file.save()
+    # excel_file.full_clean()
+    # excel_file.save()
 
     audit_data = extract_mapping[section](excel_file.file)
     validator_mapping[section](audit_data)

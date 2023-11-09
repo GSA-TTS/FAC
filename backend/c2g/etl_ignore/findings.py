@@ -15,16 +15,6 @@ class FindingUniformGuidance(Section):
     def __init__(self, finding: Findings, seq):
         super().__init__()
 
-        finding.LOANBALANCE = self.normalize_number(finding.LOANBALANCE)
-        finding.AMOUNT = self.normalize_number(finding.AMOUNT)
-        finding.FINDINGSCOUNT = self.normalize_number(finding.FINDINGSCOUNT)
-        finding.AWARDIDENTIFICATION = self.normalize_addl_award_id(
-            finding.AWARDIDENTIFICATION, finding.CFDA, finding.DBKEY
-        )
-        finding.STATECLUSTERNAME = (
-            finding.STATECLUSTERNAME if "STATE CLUSTER" == finding.CLUSTERNAME else ""
-        )
-
         self.dict_instance["compliance_requirement"] = finding.TYPEREQUIREMENT
         self.dict_instance["reference_number"] = finding.FINDINGREFNUMS
         self.dict_instance["modified_opinion"] = finding.MODIFIEDOPINION
@@ -51,4 +41,4 @@ def findings_to_json(sac: SingleAuditChecklist, dbkey, audit_year):
         json_str += json.dumps(finding_obj.get_dict())
     json_str += "]}}"
     json_obj = json.loads(json_str)
-    sac.federal_awards = json_obj
+    sac.findings_uniform_guidance = json_obj

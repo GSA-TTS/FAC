@@ -35,4 +35,4 @@ def findings_text_to_json(sac: SingleAuditChecklist, dbkey, audit_year):
         json_str += json.dumps(finding_text_obj.get_dict())
     json_str += "]}}"
     json_obj = json.loads(json_str)
-    sac.federal_awards = json_obj
+    sac.findings_text = json_obj
