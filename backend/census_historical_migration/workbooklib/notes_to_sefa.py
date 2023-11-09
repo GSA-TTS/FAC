@@ -1,24 +1,23 @@
 from census_historical_migration.workbooklib.excel_creation import (
     FieldMap,
-    templates,
     set_uei,
     set_single_cell_range,
     map_simple_columns,
     generate_dissemination_test_table,
     test_pfix,
 )
-
+from census_historical_migration.workbooklib.templates import sections_to_template_paths
 from census_historical_migration.workbooklib.excel_creation import (
     set_range,
 )
 from census_historical_migration.workbooklib.census_models.census import dynamic_import
-
+from audit.fixtures.excel import FORM_SECTIONS
 
 import openpyxl as pyxl
+
 import re
 import logging
 
-# import unidecode
 
 logger = logging.getLogger(__name__)
 
@@ -43,7 +42,7 @@ def generate_notes_to_sefa(dbkey, year, outfile):
     logger.info(f"--- generate notes to sefa {dbkey} {year}---")
     Gen = dynamic_import("Gen", year)
     Notes = dynamic_import("Notes", year)
-    wb = pyxl.load_workbook(templates["SEFA"])
+    wb = pyxl.load_workbook(sections_to_template_paths[FORM_SECTIONS.NOTES_TO_SEFA])
 
     g = set_uei(Gen, wb, dbkey)
 
