@@ -18,6 +18,20 @@ services:
       timeout: 5s
       retries: 10
 
+  census-to-gsafac-db:
+    image: "postgres:12"
+    environment:
+      POSTGRES_HOST_AUTH_METHOD: trust
+    volumes:
+      - census-to-gsafac-data:/var/lib/postgresql/data/
+    ports:
+      - "5433:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d postgres -U postgres -p 5433"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
   #---------------------------------------------
   # Historic data
   #---------------------------------------------
@@ -116,4 +130,5 @@ services:
         condition: service_healthy
 volumes:
   postgres-data:
+  census-to-gsafac-data:
   minio-vol:
