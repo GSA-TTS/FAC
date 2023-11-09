@@ -132,3 +132,36 @@ class FACAuthenticationBackendTests(TestCase):
 
         self.assertEqual(user, updated_access1.user)
         self.assertEqual(user, updated_access2.user)
+
+    def test_claimed_access_reassigned_to_new_user(self):
+        """
+        If a user presents with an email that matches Access objects that have already been assigned to a different user, those Access objects should be updated to point to the new user
+        """
+        backend = FACAuthenticationBackend()
+
+        email = "a@a.com"
+
+        login_id_1 = str(uuid4())
+        login_id_2 = str(uuid4())
+
+        # given that we have an existing user (user_1) with email a@a.com
+        user_1 = baker.make(User, username=login_id_1, email=email)
+
+        # and that user has some claimed Accesses
+        access_1 = baker.make(Access, email=email, user=user_1)
+        access_2 = baker.make(Access, email=email, user=user_1)
+
+        user_2_info = {"sub": login_id_2, "email": email, "all_emails": [email]}
+
+        factory = RequestFactory()
+        request = factory.get("/")
+
+        # when a different login.gov user (user_2) presents with email a@a.com
+        user_2 = backend.authenticate(request, **user_2_info)
+
+        updated_access_1 = Access.objects.get(pk=access_1.id)
+        updated_access_2 = Access.objects.get(pk=access_2.id)
+
+        # then the Access objects formerly associated with user_1 should now be associated with user_2
+        self.assertEqual(user_2, updated_access_1.user)
+        self.assertEqual(user_2, updated_access_2.user)
