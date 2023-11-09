@@ -1,14 +1,13 @@
 from census_historical_migration.workbooklib.excel_creation import (
     FieldMap,
     WorkbookFieldInDissem,
-    templates,
     set_uei,
     set_single_cell_range,
     map_simple_columns,
     generate_dissemination_test_table,
     set_range,
 )
-
+from census_historical_migration.workbooklib.templates import sections_to_template_paths
 from census_historical_migration.workbooklib.census_models.census import dynamic_import
 
 from config import settings
@@ -197,7 +196,7 @@ def generate_federal_awards(dbkey, year, outfile):
     Gen = dynamic_import("Gen", year)
     Passthrough = dynamic_import("Passthrough", year)
     Cfda = dynamic_import("Cfda", year)
-    wb = pyxl.load_workbook(templates["FederalAwards"])
+    wb = pyxl.load_workbook(sections_to_template_paths["FederalAwardsExpended"])
     # In sheet : in DB
 
     g = set_uei(Gen, wb, dbkey)
