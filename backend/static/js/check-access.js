@@ -9,12 +9,14 @@ function setFormDisabled(shouldDisable) {
 }
 
 function allResponsesValid() {
-  const inputsWithErrors = document.querySelectorAll('[class *="--error"]');
+  const inputsWithErrors = document.querySelectorAll('[class *="-error"]');
   return inputsWithErrors.length === 0;
 }
 
-function performValidations(field) {
-  const errors = checkValidity(field);
+function performValidations(nodes) {
+  const errors = Array.from(nodes).filter((field) => {
+    return checkValidity(field).length > 0;
+  });
   setFormDisabled(errors.length > 0);
 }
 
@@ -38,12 +40,14 @@ function appendContactField(btnEl) {
 
   const newInputs = newRow.querySelectorAll('input');
   newInputs.forEach((q, key, arr) => {
-    q.addEventListener('blur', (e) => {
-      performValidations(e.target);
-    });
+    attachFocusoutMulti(newInputs);
     if (key === arr.length - 1) {
       const newMatchVal = newInputs[key - 1].id + '_' + addedContactNum;
       q.setAttribute('data-validate-must-match', newMatchVal);
+    }
+    if (key in [0, 1]) {
+      const newMatchVal = newInputs[(key ^= 1)].id + '_' + addedContactNum;
+      q.setAttribute('data-validate-matched-field', newMatchVal);
     }
   });
   const newLabels = newRow.querySelectorAll('label');
@@ -51,6 +55,7 @@ function appendContactField(btnEl) {
   const nrErrorItems1 = newRow.querySelectorAll('li[id$="-not-null"]');
   const nrErrorItems2 = newRow.querySelectorAll('li[id$="-email"]');
   const nrErrorItems3 = newRow.querySelectorAll('li[id$="-must-match"]');
+  const nrErrorItems4 = newRow.querySelectorAll('li[id$="-matched-field"]');
 
   appendInc(newInputs, 'id', addedContactNum);
   appendInc(newLabels, 'for', addedContactNum);
@@ -58,6 +63,7 @@ function appendContactField(btnEl) {
   insertInc(nrErrorItems1, 'id', '-not-null', addedContactNum);
   insertInc(nrErrorItems2, 'id', '-email', addedContactNum);
   insertInc(nrErrorItems3, 'id', '-must-match', addedContactNum);
+  insertInc(nrErrorItems4, 'id', '-matched-field', addedContactNum);
 
   addedContactNum++;
 
@@ -67,21 +73,21 @@ function appendContactField(btnEl) {
   deleteBtns.forEach((btn) => {
     btn.addEventListener('click', (e) => {
       e.preventDefault();
-      deleteContactField(e.target);
+      deleteContactField(btn);
     });
   });
 }
 
 function deleteContactField(el) {
-  const nodeName = el.nodeName;
-  const inputContainer =
-    nodeName == 'use'
-      ? el.parentElement.parentElement.parentElement
-      : nodeName == 'svg'
-      ? el.parentElement.parentElement
-      : el.parentElement;
+  el.parentElement.parentElement.parentElement.remove();
+}
 
-  inputContainer.remove();
+function attachFocusoutMulti(elements) {
+  elements.forEach((p) => {
+    p.addEventListener('focusout', () => {
+      performValidations(elements);
+    });
+  });
 }
 
 function attachEventHandlers() {
@@ -91,12 +97,15 @@ function attachEventHandlers() {
     FORM.submit();
   });
 
-  const fieldsNeedingValidation = Array.from(
-    document.querySelectorAll('#grant-access input')
+  const certifyingInputs = Array.from(
+    document.querySelectorAll(
+      '#grant-access input:not(.auditee_contacts input, .auditor_contacts input)'
+    )
   );
-  fieldsNeedingValidation.forEach((q) => {
-    q.addEventListener('blur', (e) => {
-      performValidations(e.target);
+
+  certifyingInputs.forEach((q) => {
+    q.addEventListener('focusout', (e) => {
+      performValidations([e.target]);
     });
   });
 
@@ -106,8 +115,15 @@ function attachEventHandlers() {
   addContactButtons.forEach((btn) => {
     btn.addEventListener('click', (e) => {
       e.preventDefault();
-      appendContactField(e.target);
+      appendContactField(btn);
     });
+  });
+  const contactsCollections = Array.from(
+    document.querySelectorAll('.auditee_contacts, .auditor_contacts')
+  );
+  contactsCollections.forEach((q) => {
+    const accFields = Array.from(q.querySelectorAll('input'));
+    attachFocusoutMulti(accFields);
   });
 }
 

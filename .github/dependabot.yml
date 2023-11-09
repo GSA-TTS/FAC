@@ -1,0 +1,30 @@
+# To get started with Dependabot version updates, you'll need to specify which
+# package ecosystems to update and where the package manifests are located.
+# Please see the documentation for all configuration options:
+# https://docs.github.com/github/administering-a-repository/configuration-options-for-dependency-updates
+
+version: 2
+updates:
+  # Python is disabled until dependabot is actually able to make PRs on our dependencies manifest.
+  # We can do that by moving requirements from requirements.in to pyproject.toml and using pip-compile here.
+  # See https://hynek.me/til/pip-tools-and-pyproject-toml/ for example of what they pyproject.toml can look like
+  # - package-ecosystem: "pip" # See documentation for possible values
+  #   directory: "/backend" # Location of package manifests
+  #   schedule:
+  #     interval: "daily"
+  - package-ecosystem: "npm" # See documentation for possible values
+    directory: "/backend" # Location of package manifests
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "docker" # See documentation for possible values
+    directory: "/backend" # Location of package manifests
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform" # See documentation for possible values
+    directory: "/terraform" # Location of package manifests
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "github-actions" # See documentation for possible values
+    directory: "/" # Location of package manifests
+    schedule:
+      interval: "daily"

@@ -2,6 +2,10 @@ locals {
   clam_name = "fac-av-${var.cf_space_name}"
 }
 
+data "docker_registry_image" "clamav" {
+  name = "ghcr.io/gsa-tts/fac/clamav:latest"
+}
+
 module "clamav" {
   source = "github.com/18f/terraform-cloudgov//clamav?ref=v0.6.0"
 
@@ -11,11 +15,9 @@ module "clamav" {
 
   cf_org_name   = var.cf_org_name
   cf_space_name = var.cf_space_name
-  clamav_image  = "ajilaag/clamav-rest:20230228"
+  clamav_image  = "ghcr.io/gsa-tts/fac/clamav@${data.docker_registry_image.clamav.sha256_digest}"
   max_file_size = "30M"
 
-  # The following line is commented out until we have a way to pass the value of
-  # the variable to to docker image without it interfering with staging.
   proxy_server   = module.https-proxy.domain
   proxy_port     = module.https-proxy.port
   proxy_username = module.https-proxy.username

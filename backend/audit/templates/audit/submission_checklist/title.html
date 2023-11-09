@@ -1,0 +1,33 @@
+<div class="grid-row" id="submission-checklist-title">
+    <div class="padding-bottom-3" id="submission-checklist-summary">
+        <h1 class="border-base-light font-sans-2xl">Submission Checklist: {{ auditee_name | default_if_none:'' }}</h1>
+        <div class="usa-summary-box font-sans-md"
+             role="region"
+             aria-labelledby="summary-box-key-information">
+            <div class="usa-summary-box__body">
+                <div class="usa-summary-box__text">
+                    <span class="text-bold margin-left-1">Key information</span>
+                    <ul class="margin-top-0">
+                        <li>Use this checklist to track your progress towards completing a single audit submission.</li>
+                        <li>Revised files may be re-uploaded at any point before certification.</li>
+                        <li>
+                            Access this page from your logged-in <a href="{% url 'audit:MySubmissions' %}">home screen.</a>
+                        </li>
+                        <li class="text-bold">Workbook 1: Federal Awards must be uploaded before any other workbooks can be uploaded.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% comment %}
+    Manage Report Access button - uncomment post-MVP. 
+    <div class="tablet:grid-col-auto">
+        <button class="usa-button usa-button--outline grid-row margin-top-3">
+            <svg class="usa-icon usa-icon--size-3 margin-right-1" aria-hidden="true" focusable="false" role="img">
+                {% uswds_sprite "person_add" %}
+            </svg>
+            <span class="padding-top-05">Manage report access</span>
+        </button>
+    </div> 
+    {% endcomment %}
+</div>

@@ -1,0 +1,12 @@
+[
+  {
+    "contains_chart_or_table": "N",
+    "text_of_finding": "This is an audit finding",
+    "reference_number": "2023-001"
+  },
+  {
+    "contains_chart_or_table": "Y",
+    "text_of_finding": "Here is another audit finding",
+    "reference_number": "2023-002"
+  }
+]

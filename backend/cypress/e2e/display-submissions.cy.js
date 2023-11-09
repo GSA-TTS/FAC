@@ -2,6 +2,7 @@ describe('Display my audit submissions', () => {
   before(() => {
     cy.visit('/submissions');
   });
+  
   describe('On correct page.', () => {
     it('does not display the submissions table', () => {
       cy.get('h1').should('have.text', 'My audit submissions');
@@ -19,7 +20,6 @@ describe('Display my audit submissions', () => {
       ).as('hasNoData');
       cy.visit('/submissions/');
       cy.wait('@hasNoData').then((interception) => {
-        // console.log(interception);
         cy.get('.usa-table-container')
           .should('have.attr', 'class')
           .and('contain', 'display-none');

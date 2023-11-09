@@ -1,0 +1,46 @@
+---
+name: Historic Data Migration
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        required: true
+        type: choice
+        description: The environment the workflow should run on.
+        options:
+          - dev
+          - staging
+          - preview
+      email:
+        required: false
+        type: string
+        description: Make sure to log-in the env at list once. Email is required when testing in dev; on staging it defaults to CYPRESS_LOGIN_TEST_EMAIL_AUDITEE.
+      dbkeys:
+        required: false
+        type: string
+        description: Comma-separated list of report-IDs.
+      years:
+        required: false
+        type: string
+        description: Comma-separated list of report years. The list of years needs to be the same length as the list of dbkeys.
+
+jobs:
+  historic-data-migrator:
+    name: Generate and disseminate historic data in ${{ inputs.environment }} database
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    env:
+      space: ${{ inputs.environment }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run Django command to generate and disseminate historic data in ${{ inputs.environment }}
+        uses: cloud-gov/cg-cli-tools@main
+        with:
+          cf_username: ${{ secrets.CF_USERNAME }}
+          cf_password: ${{ secrets.CF_PASSWORD }}
+          cf_org: gsa-tts-oros-fac
+          cf_space: ${{ env.space }}
+          command: cf run-task gsa-fac -k 2G -m 2G --name historic_data_migrator --command "python manage.py historic_data_migrator --dbkeys ${{ inputs.dbkeys }} --years ${{ inputs.years }} --email ${{ inputs.email }}"

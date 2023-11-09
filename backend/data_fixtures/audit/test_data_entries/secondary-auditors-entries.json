@@ -1,0 +1,26 @@
+[
+  {
+    "secondary_auditor_name": "Best Auditor Ever",
+    "secondary_auditor_ein": "123123123",
+    "secondary_auditor_address_street": "123 Maple Street",
+    "secondary_auditor_address_city": "Anytown",
+    "secondary_auditor_address_state": "WA",
+    "secondary_auditor_address_zipcode": "91919",
+    "secondary_auditor_contact_name": "Tory Audi",
+    "secondary_auditor_contact_title": "Esquire",
+    "secondary_auditor_contact_phone": "555-555-5555",
+    "secondary_auditor_contact_email": "tory.audi@bae.com"
+  },
+  {
+    "secondary_auditor_name": "Runner Up Auditors, LLC",
+    "secondary_auditor_ein": "123123123",
+    "secondary_auditor_address_street": "223 Maple Street",
+    "secondary_auditor_address_city": "Othertown",
+    "secondary_auditor_address_state": "OR",
+    "secondary_auditor_address_zipcode": "92929",
+    "secondary_auditor_contact_name": "Tan Accoun",
+    "secondary_auditor_contact_title": "CPA",
+    "secondary_auditor_contact_phone": "555-555-5555",
+    "secondary_auditor_contact_email": "tan@runner-up.com"
+  }
+]

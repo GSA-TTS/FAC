@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block content %}
+    <div class="grid-container grid-row margin-y-15">
+        <div class="tablet:grid-col-10 tablet:grid-offset-1">
+            <h1 class="font-sans-2xl">500 Error: Internal Server Error</h1>
+            <div class="font-sans-lg">
+                <p>Something went wrong. Try refreshing the page, or come back later.</p>
+            </div>
+            {% if exception %}<p class="text-base">Error code: {{ exception }}</p>{% endif %}
+        </div>
+    </div>
+{% endblock content %}

@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+    <div class="grid-container margin-y-6">
+        <div class="grid-row grid-gap">
+            <form class="tablet:grid-col-8" id="cross-validation" method="post">
+                {% csrf_token %}
+                <fieldset class="usa-fieldset">
+                    <legend class="usa-legend usa-legend--large" id="federal-awards">Pre-submission validation</legend>
+                    <p>
+                        Check your workbooks to confirm you entered your data correctly. This tool also cross-validates the workbooks against each other.
+                    </p>
+                    <p>If there are errors, you may re-upload the affected workbooks.</p>
+                    {% if errors.errors %}
+                        <table id="federal-awards-table margin-y-3"
+                               class="usa-table usa-table--striped overflow-scroll">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Errors</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for error in errors.errors %}
+                                    <tr>
+                                        <td>{{ error.error }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    {% else %}
+                        <h3>No errors were found.</h3>
+                    {% endif %}
+                    <div class="margin-top-6">
+                        <button class="usa-button margin-right-105" id="begin-validation">Begin Validation</button>
+                        {% if errors.errors %}
+                            <button class="usa-button usa-button_ margin-right-105" disabled>
+                                Proceed to certification
+                            </button>
+                        {% else %}
+                            <a href="{% url 'audit:ReadyForCertification' report_id %}" class="usa-button margin-right-105">
+                                Proceed to certification
+                            </a>
+                        {% endif %}
+                        <a class="usa-button usa-button--unstyled margin-left-2" id="cancel-cross-validation-results-link" href="{% url 'audit:SubmissionProgress' report_id %}"
+                            aria-controls="upload-cancel">Cancel</a>
+                    </div>
+                </fieldset>
+            </form>
+        </div>
+    </div>
+{% endblock content %}

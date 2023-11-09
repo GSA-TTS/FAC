@@ -115,6 +115,17 @@ export const validations = {
     return !field.value || !field.checked ? { ...result, error: true } : result;
   },
 
+  validateMatchedField: (field, matchField) => {
+    const matchFieldEl = document.querySelector(`input#${matchField}`);
+    const result = {
+      error: false,
+      fieldId: field.id,
+      validation: 'matched-field',
+    };
+    const isMatchedForgotten = field.value && !matchFieldEl.value;
+    return isMatchedForgotten ? { ...result, error: true } : result;
+  },
+
   validateMustMatch: (field, matchField) => {
     const matchFieldEl = document.querySelector(`input#${matchField}`);
     const result = {
@@ -124,6 +135,19 @@ export const validations = {
     };
 
     return field.value != matchFieldEl.value
+      ? { ...result, error: true }
+      : result;
+  },
+
+  validateMustNotMatch: (field, matchField) => {
+    const matchFieldEl = document.querySelector(`input#${matchField}`);
+    const result = {
+      error: false,
+      fieldId: field.id,
+      validation: 'must-not-match',
+    };
+
+    return field.value == matchFieldEl.value
       ? { ...result, error: true }
       : result;
   },
@@ -145,5 +169,21 @@ export const validations = {
           ? { ...result, error: true }
           : result;
     }
+  },
+
+  validateDateComesAfter: (field) => {
+    let comparisonField = field.dataset['validateDateComesAfter'],
+      comparisonFieldValue = document.getElementById(comparisonField).value;
+
+    let endDate = new Date(field.value),
+      startDate = new Date(comparisonFieldValue);
+
+    const result = {
+      error: false,
+      fieldId: field.id,
+      validation: 'date-order',
+    };
+
+    return startDate >= endDate ? { ...result, error: true } : result;
   },
 };

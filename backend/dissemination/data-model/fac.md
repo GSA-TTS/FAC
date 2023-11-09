@@ -92,12 +92,11 @@ TABLE(General, "General") {
     number_months /' SK - from Data key file - Number of Months Covered by the 'Other' Audit Period'/
     is_prior_year_schedule /' SK -  from Data key file -Indicate whether or not current year findings or prior year findings affecting direct funds were reported. This is a boolean field.  Added is_ . 
     JM: the column name does not sound right - what is a schedule?'/
-    ' hist_questioned_costs /' SK -  from Data key file - Not used since 2013.  Added hist_ '/
-    ' hist_report_required  /' SK -  from Data key file - Not used since 2008.  Added hist_ '/
+    
 
     is_material_weakness_major_program /' SK - Not used since 2013.  Is this hist_ ?'/
     is_sd_material_weakness /' SK - from 1146 spreadsheet - Whether or not the audit disclosed any reportable condition/significant deficiency as a material weakness on financial statements. Its a Y/N field. It gets disseminated in the GEN file as MATERIALWEAKNESS'/
-    /' SK Note:  If is_sd_material_weakness is the same as is_material_weakness, do we need is_sd_material_weakness? '/
+    
 
     sd_material_weakness_major_program /' SK - Present in ELECAUDITHEADER.  Is this different from is_material_weakness_major_program ? '/
 
@@ -112,6 +111,8 @@ TABLE(General, "General") {
     cfac_version ??needed?
     ' JM: Do we need CFAC DB_KEY?
 
+    ' hist_questioned_costs /' SK -  from Data key file - Not used since 2013.  Added hist_ '/
+    ' hist_report_required  /' SK -  from Data key file - Not used since 2008.  Added hist_ '/
     ' hist_auditee_address_line_2            /' STREET2 Historic data '/
     ' hist_auditee_fax                       /' Historic data '/
     ' hist_auditor_address_line_2            /' CPASTREET2 Historic data '/
@@ -130,7 +131,6 @@ TABLE(General, "General") {
     ' hist_reportable_condition_major_program    /' Historic data '/
     ' hist_significant_deficiency_major_program  /' Historic data.  22 SIGNIFICANTDEFICIENCY_MP '/
     ' hist_finding_ref_num
-  "AGENCYCFDA" ?
 
 }
 
@@ -176,16 +176,17 @@ TABLE(Award, "FederalAward") {
   mp_audit_report_type 
   findings_count 
   
+  passthrough_amount 
+  is_passthrough_award 
+
+
   ' --need more clarity on these fields
   ' is_guaranteed /' SK - is_loan and is_gurantee seem to be replacements for the original loans' field. '/
   /'From Data key file and ELECAUDITS - loans - Indicate whether or not the program is a Loan or Loan Guarantee (only available for audit years 2013 and beyond)'/
 
   ' is_passed /' SK - This is the same as is_passthrough_award.  Which field do we keep ? '/
   ' subrecipient_amount /' SK - This is the same as passthrough_amount.  Which field do we keep ? '/
-  ' passthrough_amount /' SK - from Data key file - Amount passed through to subrecipients '/
-  ' is_passthrough_award /' SK - from Data key file - Indicates whether or not funds were passed through to any subrecipients for the Federal program'/
-
-
+  
   ' program_name /' SK - This might be CFDAPROGRAMNAME, which is different from federal_program_name. Maybe rename to hist_cfda_program_name?  Seems to be part of internal table based on 1146 - Questions sheet.  '/
   ' type_requirement /' SK - from 1146 Questions sheet - Its collected on form III.4.f... '/
 
@@ -196,7 +197,7 @@ TABLE(Award, "FederalAward") {
   ' hist_findings                                    /' Historic data '/
   ' hist_arra 
   ' hist_typereoirt_mp_iverride
-  "CFDA2" VARCHAR2(2 BYTE) COLLATE "USING_NLS_COMP", ?	
+  	
 }
 
 TABLE(Passthrough, "Passthrough") {
@@ -212,14 +213,14 @@ TABLE(Finding, "Finding") {
   + Award.report_id
   + finding_seq_number
   finding_ref_number 
-  material_weakness
-  modified_opinion
-  other_findings
-  other_non_compliance
+  is_material_weakness
+  is_modified_opinion
+  is_other_findings
+  is_other_non_compliance
   prior_finding_ref_numbers
-  questioned_costs
-  repeat_finding
-  significant_deficiency
+  is_questioned_costs
+  is_repeat_finding
+  is_significant_deficiency
   type_requirement
 
   ' hist_findingrefnums

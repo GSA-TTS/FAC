@@ -38,6 +38,8 @@ lint:
 	@mypy .
 	@echo "djlint:"
 	@djlint .
+	@echo eslint
+	@npx eslint --ignore-path ../.gitignore static/js
 
 # Run Django tests:
 test:
@@ -53,10 +55,13 @@ nctest:
 
 docker-first-run:
 	docker compose build
-	docker compose run web python manage.py makemigrations
-	docker compose run web python manage.py migrate
-	docker compose run web python manage.py create_views
-	# docker compose run web python manage.py load_test_data
+	docker compose run web bash -c '\
+		python manage.py makemigrations &&\
+		python manage.py migrate\
+		'
+
+docker-load-data:
+	docker compose up -d && docker compose run web ./load_data.sh
 
 # Run Django tests with docker
 docker-test:
@@ -98,9 +103,17 @@ ghcr-nctest:
 	docker compose -f docker-compose-web.yml run web python manage.py test --parallel ${fac.test.scope}
 
 ghcr-lint:
-	docker compose -f docker-compose-web.yml run web bash -c 'flake8 && black --check . && bandit -c pyproject.toml -r . && mypy . && djlint .'
+	docker compose -f docker-compose-web.yml run web bash -c 'flake8 && black --check . && bandit -c pyproject.toml -r . && python -m pip install types-pytz && mypy . && djlint .'
 
 docker-clean:
 	docker compose down
 	docker rm -f $(shell docker ps -a -q)
 	docker volume rm $(shell docker volume ls -q)
+
+docker-full-clean:
+	rm -f .coverage.*
+	docker compose down
+	docker rm -f $(docker ps -a -q)
+	docker volume rm $(docker volume ls -q)
+	docker system prune -f
+	docker volume prune -f

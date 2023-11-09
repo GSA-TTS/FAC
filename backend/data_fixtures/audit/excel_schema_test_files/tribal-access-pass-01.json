@@ -1,0 +1,12 @@
+[
+  {
+    "is_tribal_information_authorized_to_be_public": true,
+    "tribal_authorization_certifying_official_name": "John Doe",
+    "tribal_authorization_certifying_official_title": "Certifying Auditor"
+  },
+  {
+    "is_tribal_information_authorized_to_be_public": false,
+    "tribal_authorization_certifying_official_name": "Jane Doe",
+    "tribal_authorization_certifying_official_title": "Certifying Auditor"
+  }
+]

@@ -10,6 +10,6 @@ module.exports = defineConfig({
     baseUrl: 'http://localhost:8000/',
     excludeSpecPattern: ['*/*/**/sf-sac-general-info.cy.js', '*/*/**/display-submissions.cy.js'],
     video: false,
-    screenshotOnRunFailure: false
-  },
+    screenshotOnRunFailure: true,
+  }
 });
