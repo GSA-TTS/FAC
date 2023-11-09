@@ -45,10 +45,10 @@ class Command(BaseCommand):
         )
         parser.add_argument("--load")
         parser.add_argument(
-            "--chunk-size",
-            help="Chunk size for processing data (default: 10000)",
+            "--chunksize",
+            help="Chunk size for processing data (default: 10_000)",
             type=int,
-            default=10000,
+            default=10_000,
         )
 
     def handle(self, *args, **options):
@@ -62,7 +62,7 @@ class Command(BaseCommand):
         if options.get("sample"):
             self.sample_data()
             return
-        chunk_size = options.get("chunk-size")
+        chunk_size = options.get("chunksize")
         self.process_csv_files(folder, chunk_size)
 
     def process_csv_files(self, folder, chunk_size):
@@ -136,3 +136,4 @@ class Command(BaseCommand):
                 obj.save()
             rows_loaded += df.shape[0]
             print(f"Loaded {rows_loaded} rows in ", model_obj)
+        return None
