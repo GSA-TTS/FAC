@@ -145,23 +145,39 @@ class FACAuthenticationBackendTests(TestCase):
         login_id_2 = str(uuid4())
 
         # given that we have an existing user (user_1) with email a@a.com
-        user_1 = baker.make(User, username=login_id_1, email=email)
+        user_a_1 = baker.make(User, username=login_id_1, email=email)
 
         # and that user has some claimed Accesses
-        access_1 = baker.make(Access, email=email, user=user_1)
-        access_2 = baker.make(Access, email=email, user=user_1)
+        access_1 = baker.make(Access, email=email, user=user_a_1)
+        access_2 = baker.make(Access, email=email, user=user_a_1)
 
-        user_2_info = {"sub": login_id_2, "email": email, "all_emails": [email]}
+        # and there are other claimed Accesses for other users
+        user_b = baker.make(User, email="b@b.com")
+        access_3 = baker.make(Access, email="b@b.com", user=user_b)
+
+        # and there are other unclaimed Accesses for other emails
+        access_4 = baker.make(Access, email="c@c.com", user=None)
+
+        user_a_2_info = {"sub": login_id_2, "email": email, "all_emails": [email]}
 
         factory = RequestFactory()
         request = factory.get("/")
 
-        # when a different login.gov user (user_2) presents with email a@a.com
-        user_2 = backend.authenticate(request, **user_2_info)
+        # when a different login.gov user (user_a_2) presents with email a@a.com
+        user_a_2 = backend.authenticate(request, **user_a_2_info)
 
         updated_access_1 = Access.objects.get(pk=access_1.id)
         updated_access_2 = Access.objects.get(pk=access_2.id)
+        updated_access_3 = Access.objects.get(pk=access_3.id)
+        updated_access_4 = Access.objects.get(pk=access_4.id)
 
-        # then the Access objects formerly associated with user_1 should now be associated with user_2
-        self.assertEqual(user_2, updated_access_1.user)
-        self.assertEqual(user_2, updated_access_2.user)
+        # then the Access objects formerly associated with user_a_1 should now be associated with user_a_2
+        self.assertEqual(user_a_2, updated_access_1.user)
+        self.assertEqual(user_a_2, updated_access_2.user)
+
+        # and the Access object associated with user_3 remain unchanged
+        self.assertEqual(user_b, updated_access_3.user)
+
+        # and the unclaimed Access object remains unclaimed
+        self.assertEqual("c@c.com", updated_access_4.email)
+        self.assertEqual(None, updated_access_4.user)
