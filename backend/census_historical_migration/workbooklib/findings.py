@@ -7,7 +7,7 @@ from census_historical_migration.workbooklib.excel_creation import (
 )
 from census_historical_migration.workbooklib.templates import sections_to_template_paths
 from census_historical_migration.workbooklib.census_models.census import dynamic_import
-
+from audit.fixtures.excel import FORM_SECTIONS
 
 import openpyxl as pyxl
 
@@ -92,7 +92,7 @@ def generate_findings(dbkey, year, outfile):
     Gen = dynamic_import("Gen", year)
     Findings = dynamic_import("Findings", year)
     Cfda = dynamic_import("Cfda", year)
-    wb = pyxl.load_workbook(sections_to_template_paths["FindingsUniformGuidance"])
+    wb = pyxl.load_workbook(sections_to_template_paths[FORM_SECTIONS.FINDINGS_UNIFORM_GUIDANCE])
     g = set_uei(Gen, wb, dbkey)
 
     cfdas = Cfda.select().where(Cfda.dbkey == g.dbkey).order_by(Cfda.index)

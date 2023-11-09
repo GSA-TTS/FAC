@@ -11,6 +11,7 @@ from census_historical_migration.workbooklib.excel_creation import (
     set_range,
 )
 from census_historical_migration.workbooklib.census_models.census import dynamic_import
+from audit.fixtures.excel import FORM_SECTIONS
 
 import openpyxl as pyxl
 
@@ -41,7 +42,7 @@ def generate_notes_to_sefa(dbkey, year, outfile):
     logger.info(f"--- generate notes to sefa {dbkey} {year}---")
     Gen = dynamic_import("Gen", year)
     Notes = dynamic_import("Notes", year)
-    wb = pyxl.load_workbook(sections_to_template_paths["NotesToSefa"])
+    wb = pyxl.load_workbook(sections_to_template_paths[FORM_SECTIONS.NOTES_TO_SEFA])
 
     g = set_uei(Gen, wb, dbkey)
 

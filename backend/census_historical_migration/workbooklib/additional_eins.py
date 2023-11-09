@@ -7,6 +7,7 @@ from census_historical_migration.workbooklib.excel_creation import (
 )
 from census_historical_migration.workbooklib.templates import sections_to_template_paths
 from census_historical_migration.workbooklib.census_models.census import dynamic_import
+from audit.fixtures.excel import FORM_SECTIONS
 
 import openpyxl as pyxl
 
@@ -23,7 +24,7 @@ def generate_additional_eins(dbkey, year, outfile):
     logger.info(f"--- generate additional eins {dbkey} {year} ---")
     Gen = dynamic_import("Gen", year)
     Eins = dynamic_import("Eins", year)
-    wb = pyxl.load_workbook(sections_to_template_paths["AdditionalEins"])
+    wb = pyxl.load_workbook(sections_to_template_paths[FORM_SECTIONS.ADDITIONAL_EINS])
 
     g = set_uei(Gen, wb, dbkey)
 
