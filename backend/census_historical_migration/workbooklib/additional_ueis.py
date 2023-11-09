@@ -1,14 +1,13 @@
 from census_historical_migration.workbooklib.excel_creation import (
     FieldMap,
     WorkbookFieldInDissem,
-    templates,
     set_uei,
     map_simple_columns,
     generate_dissemination_test_table,
 )
-
-
+from census_historical_migration.workbooklib.templates import sections_to_template_paths
 from census_historical_migration.workbooklib.census_models.census import dynamic_import
+from audit.fixtures.excel import FORM_SECTIONS
 
 import openpyxl as pyxl
 
@@ -25,7 +24,7 @@ mappings = [
 def generate_additional_ueis(dbkey, year, outfile):
     logger.info(f"--- generate additional ueis {dbkey} {year} ---")
     Gen = dynamic_import("Gen", year)
-    wb = pyxl.load_workbook(templates["AdditionalUEIs"])
+    wb = pyxl.load_workbook(sections_to_template_paths[FORM_SECTIONS.ADDITIONAL_UEIS])
     g = set_uei(Gen, wb, dbkey)
     if int(year) >= 22:
         Ueis = dynamic_import("Ueis", year)

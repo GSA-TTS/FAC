@@ -30,6 +30,7 @@ class AccessAdmin(admin.ModelAdmin):
 
     list_display = ("sac", "role", "email")
     list_filter = ["role"]
+    readonly_fields = ("sac",)
 
 
 class ExcelFileAdmin(admin.ModelAdmin):
