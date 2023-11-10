@@ -36,17 +36,6 @@ logging.getLogger().setLevel(logging.INFO)
 # before filling in the XLSX workbooks.
 FieldMap = NT("FieldMap", "in_sheet in_db default type")
 
-templates = {
-    "AdditionalUEIs": "additional-ueis-workbook.xlsx",
-    "AdditionalEINs": "additional-eins-workbook.xlsx",
-    "AuditFindingsText": "audit-findings-text-workbook.xlsx",
-    "CAP": "corrective-action-plan-workbook.xlsx",
-    "AuditFindings": "federal-awards-audit-findings-workbook.xlsx",
-    "FederalAwards": "federal-awards-workbook.xlsx",
-    "SEFA": "notes-to-sefa-workbook.xlsx",
-    "SecondaryAuditors": "secondary-auditors-workbook.xlsx",
-}
-
 
 def set_single_cell_range(wb, range_name, value):
     the_range = wb.defined_names[range_name]
