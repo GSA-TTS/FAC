@@ -197,7 +197,7 @@ def generate_workbooks(user, email, dbkey, year):
     if sac.general_information["audit_type"] == "alternative-compliance-engagement":
         print(f"Skipping ACE audit: {dbkey}")
     else:
-        loader = workbook_loader(user, sac, dbkey, year, entity_id)
+        loader = workbook_loader(user, sac, dbkey, year)
         json_test_tables = []
         for section, fun in sections.items():
             # FIXME: Can we conditionally upload the addl' and secondary workbooks?
