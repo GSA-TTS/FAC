@@ -1,4 +1,4 @@
-from templates import sections_to_template_paths
+from census_historical_migration.workbooklib.templates import sections_to_template_paths
 
 
 def get_template_name_for_section(section):

@@ -181,7 +181,7 @@ class Command(BaseCommand):
 
         json_test_tables = []
         for section, fun in sections.items():
-            (wb, api_json, filename) = generate_workbook(
+            (wb, api_json, _, filename) = generate_workbook(
                 fun, options["dbkey"], options["year"], section
             )
             if wb:
