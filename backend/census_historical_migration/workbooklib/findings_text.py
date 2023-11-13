@@ -4,7 +4,6 @@ from census_historical_migration.workbooklib.excel_creation import (
     set_uei,
     map_simple_columns,
     generate_dissemination_test_table,
-    test_pfix,
 )
 from census_historical_migration.workbooklib.templates import sections_to_template_paths
 from census_historical_migration.workbooklib.census_models.census import dynamic_import
@@ -18,7 +17,7 @@ logger = logging.getLogger(__name__)
 
 mappings = [
     FieldMap("reference_number", "findingrefnums", "finding_ref_number", None, str),
-    FieldMap("text_of_finding", "text", "finding_text", None, test_pfix(3)),
+    FieldMap("text_of_finding", "text", "finding_text", None, str),
     FieldMap(
         "contains_chart_or_table", "chartstables", WorkbookFieldInDissem, None, str
     ),
