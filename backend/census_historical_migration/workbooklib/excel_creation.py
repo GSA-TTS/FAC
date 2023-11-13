@@ -1,6 +1,5 @@
 from collections import namedtuple as NT
 from playhouse.shortcuts import model_to_dict
-import os
 import sys
 
 import logging
@@ -16,22 +15,6 @@ logger = logging.getLogger(__name__)
 # before filling in the XLSX workbooks.
 FieldMap = NT("FieldMap", "in_sheet in_db in_dissem default type")
 WorkbookFieldInDissem = 1000
-
-templates_root = "schemas/output/excel/xlsx/"
-templates_raw = {
-    "AdditionalUEIs": "additional-ueis-workbook.xlsx",
-    "AdditionalEINs": "additional-eins-workbook.xlsx",
-    "AuditFindingsText": "audit-findings-text-workbook.xlsx",
-    "CAP": "corrective-action-plan-workbook.xlsx",
-    "AuditFindings": "federal-awards-audit-findings-workbook.xlsx",
-    "FederalAwards": "federal-awards-workbook.xlsx",
-    "SEFA": "notes-to-sefa-workbook.xlsx",
-    "SecondaryAuditors": "secondary-auditors-workbook.xlsx",
-}
-
-templates = {}
-for k, v in templates_raw.items():
-    templates[k] = os.path.join(templates_root, v)
 
 
 def test_pfix(n):

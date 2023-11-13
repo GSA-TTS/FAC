@@ -1,16 +1,14 @@
 from census_historical_migration.workbooklib.excel_creation import (
     FieldMap,
-    templates,
     set_uei,
     map_simple_columns,
     generate_dissemination_test_table,
     test_pfix,
 )
-
+from census_historical_migration.workbooklib.templates import sections_to_template_paths
 from census_historical_migration.workbooklib.census_models.census import dynamic_import
-
-
 from census_historical_migration.workbooklib.sac_creation import add_hyphen_to_zip
+from audit.fixtures.excel import FORM_SECTIONS
 
 import openpyxl as pyxl
 
@@ -54,7 +52,9 @@ def generate_secondary_auditors(dbkey, year, outfile):
     logger.info(f"--- generate secondary auditors {dbkey} {year} ---")
     Gen = dynamic_import("Gen", year)
     Cpas = dynamic_import("Cpas", year)
-    wb = pyxl.load_workbook(templates["SecondaryAuditors"])
+    wb = pyxl.load_workbook(
+        sections_to_template_paths[FORM_SECTIONS.SECONDARY_AUDITORS]
+    )
 
     g = set_uei(Gen, wb, dbkey)
 

@@ -4,7 +4,6 @@ import json
 import logging
 
 from django.db import models
-from django.db.models import Q
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.postgres.fields import ArrayField
@@ -15,7 +14,6 @@ from django_fsm import FSMField, RETURN_VALUE, transition
 
 import audit.cross_validation
 from audit.intake_to_dissemination import IntakeToDissemination
-from audit.modellib import SubmissionEvent
 from audit.validators import (
     validate_additional_ueis_json,
     validate_additional_eins_json,
@@ -35,6 +33,7 @@ from audit.validators import (
     validate_component_page_numbers,
 )
 from support.cog_over import compute_cog_over, record_cog_assignment
+from .submission_event import SubmissionEvent
 
 User = get_user_model()
 
@@ -147,7 +146,10 @@ GeneralInformationMixin = json_property_mixin_generator("GeneralInformation")
 
 
 class LateChangeError(Exception):
-    pass
+    """
+    Exception covering attempts to change submissions that don't have the in_progress
+    status.
+    """
 
 
 class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: ignore
@@ -586,90 +588,6 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
         return None
 
 
-class AccessManager(models.Manager):
-    """Custom manager for Access."""
-
-    def create(self, **obj_data):
-        """
-        Check for existing users and add them at access creation time.
-        Not doing this would mean that users logged in at time of Access
-        instance creation would have to log out and in again to get the new
-        access.
-        """
-
-        # remove event_user & event_type keys so that they're not passed into super().create below
-        event_user = obj_data.pop("event_user", None)
-        event_type = obj_data.pop("event_type", None)
-
-        if obj_data["email"]:
-            try:
-                acc_user = User.objects.get(email=obj_data["email"])
-            except User.DoesNotExist:
-                acc_user = None
-            if acc_user:
-                obj_data["user"] = acc_user
-        result = super().create(**obj_data)
-
-        if event_user and event_type:
-            SubmissionEvent.objects.create(
-                sac=result.sac,
-                user=event_user,
-                event=event_type,
-            )
-
-        return result
-
-
-class Access(models.Model):
-    """
-    Email addresses which have been granted access to SAC instances.
-    An email address may be associated with a User ID if an FAC account exists.
-    """
-
-    objects = AccessManager()
-
-    ROLES = (
-        ("certifying_auditee_contact", _("Auditee Certifying Official")),
-        ("certifying_auditor_contact", _("Auditor Certifying Official")),
-        ("editor", _("Audit Editor")),
-    )
-    sac = models.ForeignKey(SingleAuditChecklist, on_delete=models.CASCADE)
-    role = models.CharField(
-        choices=ROLES,
-        help_text="Access type granted to this user",
-        max_length=50,
-    )
-    fullname = models.CharField(blank=True)
-    email = models.EmailField()
-    user = models.ForeignKey(
-        User,
-        null=True,
-        help_text="User ID associated with this email address, empty if no FAC account exists",
-        on_delete=models.PROTECT,
-    )
-
-    def __str__(self):
-        return f"{self.email} as {self.get_role_display()}"
-
-    class Meta:
-        verbose_name_plural = "accesses"
-
-        constraints = [
-            # a SAC cannot have multiple certifying auditees
-            models.UniqueConstraint(
-                fields=["sac"],
-                condition=Q(role="certifying_auditee_contact"),
-                name="%(app_label)s_$(class)s_single_certifying_auditee",
-            ),
-            # a SAC cannot have multiple certifying auditors
-            models.UniqueConstraint(
-                fields=["sac"],
-                condition=Q(role="certifying_auditor_contact"),
-                name="%(app_label)s_%(class)s_single_certifying_auditor",
-            ),
-        ]
-
-
 def excel_file_path(instance, _filename):
     """
     We want the actual filename in the filesystem to be unique and determined
@@ -719,7 +637,8 @@ def single_audit_report_path(instance, _filename):
 
 class SingleAuditReportFile(models.Model):
     """
-    Data model to track uploaded Single Audit report PDFs and associate them with SingleAuditChecklists
+    Data model to track uploaded Single Audit report PDFs and associate them
+    with SingleAuditChecklists
     """
 
     file = models.FileField(

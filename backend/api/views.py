@@ -123,7 +123,7 @@ def access_and_submission_check(user, data):
         Access.objects.create(
             sac=sac,
             role="editor",
-            email=user.email,
+            email=str(user.email).lower(),
             user=user,
             event_user=user,
             event_type=SubmissionEvent.EventType.ACCESS_GRANTED,
@@ -132,7 +132,7 @@ def access_and_submission_check(user, data):
             sac=sac,
             role="certifying_auditee_contact",
             fullname=serializer.data.get("certifying_auditee_contact_fullname"),
-            email=serializer.data.get("certifying_auditee_contact_email"),
+            email=serializer.data.get("certifying_auditee_contact_email").lower(),
             event_user=user,
             event_type=SubmissionEvent.EventType.ACCESS_GRANTED,
         )
@@ -140,7 +140,7 @@ def access_and_submission_check(user, data):
             sac=sac,
             role="certifying_auditor_contact",
             fullname=serializer.data.get("certifying_auditor_contact_fullname"),
-            email=serializer.data.get("certifying_auditor_contact_email"),
+            email=serializer.data.get("certifying_auditor_contact_email").lower(),
             event_user=user,
             event_type=SubmissionEvent.EventType.ACCESS_GRANTED,
         )
@@ -160,7 +160,7 @@ def access_and_submission_check(user, data):
                 sac=sac,
                 role="editor",
                 fullname=name,
-                email=email,
+                email=str(email).lower(),
                 event_user=user,
                 event_type=SubmissionEvent.EventType.ACCESS_GRANTED,
             )
@@ -169,7 +169,7 @@ def access_and_submission_check(user, data):
                 sac=sac,
                 role="editor",
                 fullname=name,
-                email=email,
+                email=str(email).lower(),
                 event_user=user,
                 event_type=SubmissionEvent.EventType.ACCESS_GRANTED,
             )
