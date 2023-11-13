@@ -16,21 +16,38 @@
             <img src="{% static 'img/usa-icons/close.svg' %}" role="img" alt="Close" />
         </button>
         <ul class="usa-nav__primary usa-accordion pa11y-ignore">
-            {% comment %}
-                Uncomment after search is implemented.
-                <li class="usa-nav__primary-item">
-                    <a href="https://example.gov" class="usa-nav__link">
-                        <span>Search audit reports</span>
-                    </a>
-                </li>
-            {% endcomment %}
             <li class="usa-nav__primary-item">
                 <button class="usa-accordion__button usa-nav__link"
                         aria-expanded="false"
-                        aria-controls="basic-nav-section-1">
-                    <span>News</span>
+                        aria-controls="nav-section-data">
+                    <span>Data</span>
                 </button>
-                <ul id="basic-nav-section-1" class="usa-nav__submenu" hidden="">
+                <ul id="nav-section-data" class="usa-nav__submenu" hidden="">
+                    <li class="usa-nav__submenu-item">
+                        <a href="{% url 'dissemination:Search' %}"
+                           target="_blank">Search audits</a>
+                    </li>
+                    <li class="usa-nav__submenu-item">
+                        <a href="{{ STATIC_SITE_URL }}developers/"
+                           target="_blank">API</a>
+                    </li>
+                </ul>
+            </li>
+            <li class="usa-nav__primary-item">
+                <a class="usa-nav-link" href="{{ STATIC_SITE_URL }}audits/"
+                           target="_blank">Audit submission</a>
+            </li>
+            <li class="usa-nav__primary-item">
+                <button class="usa-accordion__button usa-nav__link"
+                        aria-expanded="false"
+                        aria-controls="basic-nav-section-2">
+                    <span>Policy &#38; News</span>
+                </button>
+                <ul id="basic-nav-section-2" class="usa-nav__submenu" hidden="">
+                    <li class="usa-nav__submenu-item">
+                        <a href="{{ STATIC_SITE_URL }}policy/"
+                           target="_blank">Policy</a>
+                    </li>
                     <li class="usa-nav__submenu-item">
                         <a href="{{ STATIC_SITE_URL }}info/announcements/"
                            target="_blank">OMB Announcements</a>
@@ -38,39 +55,6 @@
                     <li class="usa-nav__submenu-item">
                         <a href="{{ STATIC_SITE_URL }}info/updates/"
                            target="_blank">FAC Updates</a>
-                    </li>
-                </ul>
-            </li>
-            <li class="usa-nav__primary-item">
-                <button class="usa-accordion__button usa-nav__link"
-                        aria-expanded="false"
-                        aria-controls="basic-nav-section-2">
-                    <span>Resources &#38; Policy</span>
-                </button>
-                <ul id="basic-nav-section-2" class="usa-nav__submenu" hidden="">
-                    <li class="usa-nav__submenu-item">
-                        <a href="{{ STATIC_SITE_URL }}resources/instructions/"
-                           target="_blank">How-to</a>
-                    </li>
-                    <li class="usa-nav__submenu-item">
-                        <a href="{{ STATIC_SITE_URL }}resources/workbooks/"
-                           target="_blank">Workbooks</a>
-                    </li>
-                    <li class="usa-nav__submenu-item">
-                        <a href="{{ STATIC_SITE_URL }}developers/"
-                           target="_blank">Developer tools</a>
-                    </li>
-                    <li class="usa-nav__submenu-item">
-                        <a href="{{ STATIC_SITE_URL }}resources/guidance/"
-                           target="_blank">Uniform Guidance</a>
-                    </li>
-                    <li class="usa-nav__submenu-item">
-                        <a href="{{ STATIC_SITE_URL }}resources/compliance/"
-                           target="_blank">Compliance</a>
-                    </li>
-                    <li class="usa-nav__submenu-item">
-                        <a href="{{ STATIC_SITE_URL }}resources/burden-statement/"
-                           target="_blank">Burden Statement</a>
                     </li>
                 </ul>
             </li>

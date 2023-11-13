@@ -9,7 +9,6 @@ from dissemination.workbooklib.excel_creation import (
     set_range,
 )
 
-from dissemination.workbooklib.excel_creation import insert_version_and_sheet_name
 from dissemination.workbooklib.census_models.census import dynamic_import
 
 from config import settings
@@ -78,20 +77,32 @@ def int_or_na(o):
 
 def _generate_cluster_names(Cfda, cfdas, valid_json):
     cluster_names = []
+    state_cluster_names = []
     other_cluster_names = []
     cfda: Cfda
     for cfda in cfdas:
         if cfda.clustername is None:
             cluster_names.append("N/A")
             other_cluster_names.append("")
+            state_cluster_names.append("")
+        elif cfda.clustername == "STATE CLUSTER":
+            cluster_names.append(cfda.clustername)
+            state_cluster_names.append(cfda.stateclustername)
+            other_cluster_names.append("")
+        elif cfda.clustername == "OTHER CLUSTER NOT LISTED ABOVE":
+            cluster_names.append(cfda.clustername)
+            other_cluster_names.append(cfda.otherclustername)
+            state_cluster_names.append("")
         elif cfda.clustername in valid_json["cluster_names"]:
             cluster_names.append(cfda.clustername)
             other_cluster_names.append("")
+            state_cluster_names.append("")
         else:
             logger.debug(f"Cluster {cfda.clustername} not in the list. Replacing.")
             cluster_names.append("OTHER CLUSTER NOT LISTED ABOVE")
             other_cluster_names.append(f"{cfda.clustername}")
-    return (cluster_names, other_cluster_names)
+            state_cluster_names.append("")
+    return (cluster_names, other_cluster_names, state_cluster_names)
 
 
 def _fix_addl_award_identification(Cfda, cfdas, dbkey):
@@ -190,7 +201,6 @@ def generate_federal_awards(dbkey, year, outfile):
     # In sheet : in DB
 
     g = set_uei(Gen, wb, dbkey)
-    insert_version_and_sheet_name(wb, "federal-awards-workbook")
 
     cfdas = Cfda.select().where(Cfda.dbkey == dbkey).order_by(Cfda.index)
     map_simple_columns(wb, mappings, cfdas)
@@ -199,10 +209,8 @@ def generate_federal_awards(dbkey, year, outfile):
     # they wanted.
     valid_file = open(f"{settings.BASE_DIR}/schemas/source/base/ClusterNames.json")
     valid_json = json.load(valid_file)
-    # This was removed from the CSV...
-    valid_json["cluster_names"].append("STATE CLUSTER")
 
-    (cluster_names, other_cluster_names) = _generate_cluster_names(
+    (cluster_names, other_cluster_names, state_cluster_names) = _generate_cluster_names(
         Cfda, cfdas, valid_json
     )
     set_range(wb, "cluster_name", cluster_names)
@@ -219,6 +227,20 @@ def generate_federal_awards(dbkey, year, outfile):
 
     # We need a `cfda_key` as a magic column for the summation logic to work/be checked.
     set_range(wb, "cfda_key", full_cfdas, conversion_fun=str)
+
+    # We need `uniform_state_cluster_name` and `uniform_other_cluster_name` magic columns for cluster summation logic to work/be checked.
+    set_range(
+        wb,
+        "uniform_state_cluster_name",
+        [s.strip().upper() for s in state_cluster_names],
+        conversion_fun=str,
+    )
+    set_range(
+        wb,
+        "uniform_other_cluster_name",
+        [s.strip().upper() for s in other_cluster_names],
+        conversion_fun=str,
+    )
 
     (passthrough_names, passthrough_ids) = _fix_passthroughs(
         Cfda, Passthrough, cfdas, dbkey

@@ -18,16 +18,16 @@ services:
       timeout: 5s
       retries: 10
 
-  c2g-db:
+  census-to-gsafac-db:
     image: "postgres:12"
     environment:
       POSTGRES_HOST_AUTH_METHOD: trust
     volumes:
-      - c2gdb-data:/var/lib/postgresql/data/
+      - census-to-gsafac-data:/var/lib/postgresql/data/
     ports:
       - "5433:5432"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -d postgres -U postgres p 5433"]
+      test: ["CMD-SHELL", "pg_isready -d postgres -U postgres -p 5433"]
       interval: 10s
       timeout: 5s
       retries: 10
@@ -123,12 +123,12 @@ services:
       PGRST_OPENAPI_SERVER_PROXY_URI: http://127.0.0.1:3000
       PGRST_DB_ANON_ROLE: anon
       # See https://postgrest.org/en/stable/references/api/schemas.html#multiple-schemas for multiple schemas
-      PGRST_DB_SCHEMAS: "api_v1_0_2"
+      PGRST_DB_SCHEMAS: "api_v1_0_3"
       PGRST_JWT_SECRET: ${PGRST_JWT_SECRET:-32_chars_fallback_secret_testing} # Fallback value for testing environments
     depends_on:
       db:
         condition: service_healthy
 volumes:
   postgres-data:
-  c2gdb-data:
+  census-to-gsafac-data:
   minio-vol:

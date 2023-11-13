@@ -153,6 +153,30 @@ def _just_uei_workbooks(uei):
     return {k: _just_uei(uei, k) for k in workbooks}
 
 
+class RootPathTests(TestCase):
+    """
+    Do we return the correct response for both authenticated and unauthenticated
+    users?
+    """
+
+    def test_unauthenticated(self):
+        """Verify the root path returns 200, unauthenticated."""
+        result = self.client.get("/")
+        self.assertEqual(result.status_code, 200)
+
+    def test_authenticated(self):
+        """Verify the root path redirects, authenticated."""
+        user = baker.make(User)
+        self.client.force_login(user=user)
+        result = self.client.get("/")
+        self.assertEqual(result.status_code, 302)
+
+    def test_no_robots(self):
+        """Verify robots.txt returns 200"""
+        result = self.client.get("/robots.txt")
+        self.assertEqual(result.status_code, 200)
+
+
 class MySubmissionsViewTests(TestCase):
     def setUp(self):
         self.user = baker.make(User)
@@ -311,121 +335,191 @@ class SubmissionStatusTests(TestCase):
             SubmissionEvent.EventType.LOCKED_FOR_CERTIFICATION,
         )
 
-    def test_auditor_certification(self):
+    def test_unlock_after_certification(self):
         """
-        Test that certifying auditor contacts can provide auditor certification
+        Test that any user can move the submission back to in progress.
         """
-        data_step_1, data_step_2 = fake_auditor_certification()
-        just_ueis = _just_uei_workbooks("TEST0001TEST")
-        sac_data = just_ueis | {"submission_status": STATUSES.READY_FOR_CERTIFICATION}
-
-        user, sac = _make_user_and_sac(**sac_data)
-        baker.make(Access, sac=sac, user=user, role="certifying_auditor_contact")
-
-        kwargs = {"report_id": sac.report_id}
-        _authed_post(
-            self.client,
-            user,
-            "audit:AuditorCertification",
-            kwargs=kwargs,
-            data=data_step_1,
+        self.client.force_login(user=self.user)
+        self.user.profile.entry_form_data = (
+            VALID_ELIGIBILITY_DATA | VALID_AUDITEE_INFO_DATA
         )
-        _authed_post(
-            self.client,
-            user,
-            "audit:AuditorCertificationConfirm",
-            kwargs=kwargs,
-            data=data_step_1 | data_step_2,
+        self.user.profile.save()
+        self.client.post(
+            ACCESS_AND_SUBMISSION_PATH, VALID_ACCESS_AND_SUBMISSION_DATA, format="json"
         )
+        data = MySubmissions.fetch_my_submissions(self.user)
+        self.assertGreater(len(data), 0)
+        self.assertEqual(data[0]["submission_status"], STATUSES.IN_PROGRESS)
+        report_id = data[0]["report_id"]
 
-        updated_sac = SingleAuditChecklist.objects.get(report_id=sac.report_id)
-
-        self.assertEqual(updated_sac.submission_status, STATUSES.AUDITOR_CERTIFIED)
-
-        submission_events = SubmissionEvent.objects.filter(sac=sac)
-        event_count = len(submission_events)
-        self.assertGreaterEqual(event_count, 1)
-        self.assertEqual(
-            submission_events[event_count - 1].event,
-            SubmissionEvent.EventType.AUDITOR_CERTIFICATION_COMPLETED,
-        )
-
-    def test_auditee_certification(self):
-        """
-        Test that certifying auditee contacts can provide auditee certification
-        """
-        data_step_1, data_step_2 = fake_auditee_certification()
-        just_ueis = _just_uei_workbooks("TEST0001TEST")
-        sac_data = just_ueis | {"submission_status": STATUSES.AUDITOR_CERTIFIED}
-        user, sac = _make_user_and_sac(**sac_data)
-        baker.make(Access, sac=sac, user=user, role="certifying_auditee_contact")
-
-        kwargs = {"report_id": sac.report_id}
-        _authed_post(
-            self.client,
-            user,
-            "audit:AuditeeCertification",
-            kwargs=kwargs,
-            data=data_step_1,
-        )
-        _authed_post(
-            self.client,
-            user,
-            "audit:AuditeeCertificationConfirm",
-            kwargs=kwargs,
-            data=data_step_1 | data_step_2,
-        )
-
-        updated_sac = SingleAuditChecklist.objects.get(report_id=sac.report_id)
-
-        self.assertEqual(updated_sac.submission_status, STATUSES.AUDITEE_CERTIFIED)
-
-        submission_events = SubmissionEvent.objects.filter(sac=sac)
-
-        # the most recent event should be AUDITEE_CERTIFICATION_COMPLETED
-        event_count = len(submission_events)
-        self.assertGreaterEqual(event_count, 1)
-        self.assertEqual(
-            submission_events[event_count - 1].event,
-            SubmissionEvent.EventType.AUDITEE_CERTIFICATION_COMPLETED,
-        )
-
-    def test_submission(self):
-        """
-        Test that certifying auditee contacts can perform submission
-        """
-        just_ueis = _just_uei_workbooks("TEST0001TEST")
+        # Update the SAC so that it will pass overall validation:
         geninfofile = "general-information--test0001test--simple-pass.json"
         awardsfile = "federal-awards--test0001test--simple-pass.json"
-
+        just_ueis = _just_uei_workbooks("TEST0001TEST")
         sac_data = just_ueis | {
             "auditee_certification": _merge_dict_seq(fake_auditee_certification()),
             "auditor_certification": _merge_dict_seq(fake_auditor_certification()),
             "audit_information": {"stuff": "whatever"},
             "federal_awards": _load_json(AUDIT_JSON_FIXTURES / awardsfile),
             "general_information": _load_json(AUDIT_JSON_FIXTURES / geninfofile),
-            "submission_status": STATUSES.AUDITEE_CERTIFIED,
         }
-        user, sac = _make_user_and_sac(**sac_data)
 
-        baker.make(Access, sac=sac, user=user, role="certifying_auditee_contact")
+        sac = SingleAuditChecklist.objects.get(report_id=report_id)
+        for field, value in sac_data.items():
+            setattr(sac, field, value)
+        baker.make(SingleAuditReportFile, sac=sac)
+        sac.save()
 
-        kwargs = {"report_id": sac.report_id}
-        _authed_post(self.client, user, "audit:Submission", kwargs=kwargs)
+        self.client.post(f"/audit/ready-for-certification/{report_id}", data={})
+        data = MySubmissions.fetch_my_submissions(self.user)
 
-        updated_sac = SingleAuditChecklist.objects.get(report_id=sac.report_id)
-
-        self.assertEqual(updated_sac.submission_status, STATUSES.DISSEMINATED)
+        self.assertEqual(data[0]["submission_status"], STATUSES.READY_FOR_CERTIFICATION)
 
         submission_events = SubmissionEvent.objects.filter(sac=sac)
 
-        # the most recent event should be SUBMITTED
+        # the most recent event should be LOCKED_FOR_CERTIFICATION
         event_count = len(submission_events)
         self.assertGreaterEqual(event_count, 1)
         self.assertEqual(
             submission_events[event_count - 1].event,
-            SubmissionEvent.EventType.DISSEMINATED,
+            SubmissionEvent.EventType.LOCKED_FOR_CERTIFICATION,
         )
+
+        postdata = {"unlock_after_certification": True}
+        self.client.post(
+            f"/audit/unlock-after-certification/{report_id}", data=postdata
+        )
+        data = MySubmissions.fetch_my_submissions(self.user)
+
+        self.assertEqual(data[0]["submission_status"], STATUSES.IN_PROGRESS)
+
+        submission_events = SubmissionEvent.objects.filter(sac=sac)
+
+        # the most recent event should be UNLOCKED_AFTER_CERTIFICATION
+        event_count = len(submission_events)
+        self.assertGreaterEqual(event_count, 1)
+        self.assertEqual(
+            submission_events[event_count - 1].event,
+            SubmissionEvent.EventType.UNLOCKED_AFTER_CERTIFICATION,
+        )
+
+        def test_auditor_certification(self):
+            """
+            Test that certifying auditor contacts can provide auditor certification
+            """
+            data_step_1, data_step_2 = fake_auditor_certification()
+            just_ueis = _just_uei_workbooks("TEST0001TEST")
+            sac_data = just_ueis | {
+                "submission_status": STATUSES.READY_FOR_CERTIFICATION
+            }
+
+            user, sac = _make_user_and_sac(**sac_data)
+            baker.make(Access, sac=sac, user=user, role="certifying_auditor_contact")
+
+            kwargs = {"report_id": sac.report_id}
+            _authed_post(
+                self.client,
+                user,
+                "audit:AuditorCertification",
+                kwargs=kwargs,
+                data=data_step_1,
+            )
+            _authed_post(
+                self.client,
+                user,
+                "audit:AuditorCertificationConfirm",
+                kwargs=kwargs,
+                data=data_step_1 | data_step_2,
+            )
+
+            updated_sac = SingleAuditChecklist.objects.get(report_id=sac.report_id)
+
+            self.assertEqual(updated_sac.submission_status, STATUSES.AUDITOR_CERTIFIED)
+
+            submission_events = SubmissionEvent.objects.filter(sac=sac)
+            event_count = len(submission_events)
+            self.assertGreaterEqual(event_count, 1)
+            self.assertEqual(
+                submission_events[event_count - 1].event,
+                SubmissionEvent.EventType.AUDITOR_CERTIFICATION_COMPLETED,
+            )
+
+        def test_auditee_certification(self):
+            """
+            Test that certifying auditee contacts can provide auditee certification
+            """
+            data_step_1, data_step_2 = fake_auditee_certification()
+            just_ueis = _just_uei_workbooks("TEST0001TEST")
+            sac_data = just_ueis | {"submission_status": STATUSES.AUDITOR_CERTIFIED}
+            user, sac = _make_user_and_sac(**sac_data)
+            baker.make(Access, sac=sac, user=user, role="certifying_auditee_contact")
+
+            kwargs = {"report_id": sac.report_id}
+            _authed_post(
+                self.client,
+                user,
+                "audit:AuditeeCertification",
+                kwargs=kwargs,
+                data=data_step_1,
+            )
+            _authed_post(
+                self.client,
+                user,
+                "audit:AuditeeCertificationConfirm",
+                kwargs=kwargs,
+                data=data_step_1 | data_step_2,
+            )
+
+            updated_sac = SingleAuditChecklist.objects.get(report_id=sac.report_id)
+
+            self.assertEqual(updated_sac.submission_status, STATUSES.AUDITEE_CERTIFIED)
+
+            submission_events = SubmissionEvent.objects.filter(sac=sac)
+
+            # the most recent event should be AUDITEE_CERTIFICATION_COMPLETED
+            event_count = len(submission_events)
+            self.assertGreaterEqual(event_count, 1)
+            self.assertEqual(
+                submission_events[event_count - 1].event,
+                SubmissionEvent.EventType.AUDITEE_CERTIFICATION_COMPLETED,
+            )
+
+        def test_submission(self):
+            """
+            Test that certifying auditee contacts can perform submission
+            """
+            just_ueis = _just_uei_workbooks("TEST0001TEST")
+            geninfofile = "general-information--test0001test--simple-pass.json"
+            awardsfile = "federal-awards--test0001test--simple-pass.json"
+
+            sac_data = just_ueis | {
+                "auditee_certification": _merge_dict_seq(fake_auditee_certification()),
+                "auditor_certification": _merge_dict_seq(fake_auditor_certification()),
+                "audit_information": {"stuff": "whatever"},
+                "federal_awards": _load_json(AUDIT_JSON_FIXTURES / awardsfile),
+                "general_information": _load_json(AUDIT_JSON_FIXTURES / geninfofile),
+                "submission_status": STATUSES.AUDITEE_CERTIFIED,
+            }
+            user, sac = _make_user_and_sac(**sac_data)
+
+            baker.make(Access, sac=sac, user=user, role="certifying_auditee_contact")
+
+            kwargs = {"report_id": sac.report_id}
+            _authed_post(self.client, user, "audit:Submission", kwargs=kwargs)
+
+            updated_sac = SingleAuditChecklist.objects.get(report_id=sac.report_id)
+
+            self.assertEqual(updated_sac.submission_status, STATUSES.DISSEMINATED)
+
+            submission_events = SubmissionEvent.objects.filter(sac=sac)
+
+            # the most recent event should be SUBMITTED
+            event_count = len(submission_events)
+            self.assertGreaterEqual(event_count, 1)
+            self.assertEqual(
+                submission_events[event_count - 1].event,
+                SubmissionEvent.EventType.DISSEMINATED,
+            )
 
 
 class MockHttpResponse:
