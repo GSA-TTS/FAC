@@ -4,7 +4,22 @@ from audit.models import SingleAuditChecklist, Access, ExcelFile, SingleAuditRep
 
 
 class SACAdmin(admin.ModelAdmin):
-    list_display = ("id", "report_id")
+    def has_module_permission(self, request, obj=None):
+        return request.user.is_staff
+
+    def has_view_permission(self, request, obj=None):
+        return request.user.is_staff
+
+    list_display = (
+        "id",
+        "report_id",
+        "cognizant_agency",
+        "oversight_agency",
+    )
+    list_filter = [
+        "cognizant_agency",
+        "oversight_agency",
+    ]
 
 
 class AccessAdmin(admin.ModelAdmin):
@@ -15,6 +30,7 @@ class AccessAdmin(admin.ModelAdmin):
 
     list_display = ("sac", "role", "email")
     list_filter = ["role"]
+    readonly_fields = ("sac",)
 
 
 class ExcelFileAdmin(admin.ModelAdmin):

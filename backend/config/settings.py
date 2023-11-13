@@ -97,8 +97,10 @@ INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
+    "django.contrib.humanize",
     "django.contrib.sessions",
     "django.contrib.messages",
+    "django.contrib.postgres",
     "django.contrib.staticfiles",
 ]
 
@@ -118,9 +120,9 @@ INSTALLED_APPS += [
     "api",
     "users",
     "report_submission",
-    "cms",
     # "data_distro",
     "dissemination",
+    "census_historical_migration",
     "support",
 ]
 
@@ -169,9 +171,19 @@ DATABASES = {
     "default": env.dj_db_url(
         "DATABASE_URL", default="postgres://postgres:password@0.0.0.0/backend"
     ),
+    "census-to-gsafac-db": env.dj_db_url(
+        "DATABASE_URL_CENSUS_TO_GSAFAC_DB",
+        default="postgres://postgres:password@0.0.0.0/census-to-gsafac-db",
+    ),
 }
 
-POSTGREST = {"URL": env.str("POSTGREST_URL", "http://api:3000")}
+POSTGREST = {
+    "URL": env.str("POSTGREST_URL", "http://api:3000"),
+    "LOCAL": env.str("POSTGREST_URL", "http://api:3000"),
+    "DEVELOPMENT": "https://api-dev.fac.gov",
+    "STAGING": "https://api-staging.fac.gov",
+    "PRODUCTION": "https://api.fac.gov",
+}
 
 
 # Password validation
@@ -236,6 +248,9 @@ if ENVIRONMENT not in ["DEVELOPMENT", "PREVIEW", "STAGING", "PRODUCTION"]:
 
     # Private bucket
     AWS_PRIVATE_STORAGE_BUCKET_NAME = "gsa-fac-private-s3"
+    # Private CENSUS_TO_GSAFAC bucket
+    AWS_CENSUS_TO_GSAFAC_BUCKET_NAME = "fac-census-to-gsafac-s3"
+
     AWS_S3_PRIVATE_REGION_NAME = os.environ.get(
         "AWS_S3_PRIVATE_REGION_NAME", "us-east-1"
     )
@@ -249,8 +264,13 @@ if ENVIRONMENT not in ["DEVELOPMENT", "PREVIEW", "STAGING", "PRODUCTION"]:
     AWS_S3_PRIVATE_ENDPOINT = os.environ.get(
         "AWS_S3_PRIVATE_ENDPOINT", "http://minio:9000"
     )
+    AWS_PRIVATE_DEFAULT_ACL = "private"
 
     AWS_S3_ENDPOINT_URL = AWS_S3_PRIVATE_ENDPOINT
+
+    # when running locally, the internal endpoint (docker network) is different from the external endpoint (host network)
+    AWS_S3_PRIVATE_INTERNAL_ENDPOINT = AWS_S3_ENDPOINT_URL
+    AWS_S3_PRIVATE_EXTERNAL_ENDPOINT = "http://localhost:9001"
 
     DISABLE_AUTH = env.bool("DISABLE_AUTH", default=False)
 
@@ -302,6 +322,10 @@ else:
 
             AWS_S3_PRIVATE_ENDPOINT = s3_creds["endpoint"]
             AWS_S3_ENDPOINT_URL = f"https://{AWS_S3_PRIVATE_ENDPOINT}"
+
+            # in deployed environments, the internal & external endpoint URLs are the same
+            AWS_S3_PRIVATE_INTERNAL_ENDPOINT = AWS_S3_ENDPOINT_URL
+            AWS_S3_PRIVATE_EXTERNAL_ENDPOINT = AWS_S3_ENDPOINT_URL
 
             AWS_PRIVATE_LOCATION = "static"
             AWS_PRIVATE_DEFAULT_ACL = "private"

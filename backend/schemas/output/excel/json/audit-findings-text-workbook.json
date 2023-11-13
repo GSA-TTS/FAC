@@ -31,7 +31,6 @@
          "single_cells": [
             {
                "format": "text",
-               "formula": "=\"1.0.0\"",
                "help": {
                   "link": "https://fac.gov/documentation/validation/#plain_text",
                   "text": "Only plain text is allowed, no emoji, formatting, or other special additions"
@@ -45,11 +44,11 @@
                "validation": {
                   "type": "NOVALIDATION"
                },
+               "value": "1.0.3",
                "width": 48
             },
             {
                "format": "text",
-               "formula": "=\"FindingsText\"",
                "help": {
                   "link": "https://fac.gov/documentation/validation/#section_name",
                   "text": "The workbook you tried to upload is for a different section."
@@ -63,6 +62,7 @@
                "validation": {
                   "type": "NOVALIDATION"
                },
+               "value": "FindingsText",
                "width": 48
             },
             {
@@ -141,7 +141,8 @@
                },
                "width": 36
             }
-         ]
+         ],
+         "row_height": 36
       }
    ],
    "title_row": 1

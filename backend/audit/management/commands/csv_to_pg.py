@@ -79,4 +79,4 @@ class Command(BaseCommand):
         """
         with engine.connect() as conn:
             result = conn.execute(sqlalchemy.text(GEN_QUERY))
-            print("Gen table has:", result.all())
+            logger.info("Gen table has:", result.all())

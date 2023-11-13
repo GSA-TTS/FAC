@@ -3,12 +3,15 @@
   $theme-font-path: '../fonts',
   $theme-image-path: '../img',
   $theme-font-type-sans: 'public-sans',
+  $theme-font-weight-semibold: 600,
   $theme-type-scale-md: 7,
   $theme-type-scale-2xl: 13,
   $theme-color-success-lighter: #eef8eb,
+  $theme-color-base-lighter: #efefef,
 );
 @forward 'uswds';
 @use '_home.scss';
 @use '_header.scss';
 @use '_form.scss';
+@use '_search.scss';
 @use '_workbook-upload.scss';
