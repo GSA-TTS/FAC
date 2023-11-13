@@ -1,9 +1,9 @@
 ---
 name: Run Daily Regression Tests
 on:
-  schedule:
-    - cron: '0 9 * * 1-5'
-
+#  schedule:
+#    - cron: '0 9 * * 1-5'
+  workflow_dispatch:
 jobs:
   regression-test:
     name: Run Regression Tests
