@@ -24,6 +24,20 @@ mappings = [
     FieldMap("secondary_auditor_contact_phone", "cpaphone", "contact_phone", None, str),
     FieldMap("secondary_auditor_address_state", "cpastate", "address_state", None, str),
     FieldMap(
+        "secondary_auditor_address_street",
+        "cpastreet1",
+        "address_street",
+        None,
+        str,
+    ),
+    FieldMap(
+        "secondary_auditor_contact_title",
+        "cpatitle",
+        "contact_title",
+        None,
+        str,
+    ),
+    FieldMap(
         "secondary_auditor_address_zipcode",
         "cpazipcode",
         "address_zipcode",
