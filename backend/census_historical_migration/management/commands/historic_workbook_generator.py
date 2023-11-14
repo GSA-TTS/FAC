@@ -12,7 +12,9 @@ import pprint
 from census_historical_migration.workbooklib.workbook_creation import (
     generate_workbook,
 )
-from census_historical_migration.workbooklib.workbook_section_handlers import sections
+from census_historical_migration.workbooklib.workbook_section_handlers import (
+    sections_to_handlers,
+)
 
 from census_historical_migration.workbooklib.census_models.census import (
     CensusGen22 as Gen,
@@ -180,7 +182,7 @@ class Command(BaseCommand):
                 sys.exit()
 
         json_test_tables = []
-        for section, fun in sections.items():
+        for section, fun in sections_to_handlers.items():
             (wb, api_json, _, filename) = generate_workbook(
                 fun, options["dbkey"], options["year"], section
             )
