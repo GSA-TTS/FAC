@@ -27,8 +27,8 @@ class CognizantBaselineAdmin(SupportAdmin):
         "source",
     ]
     list_filter = [
-        "is_active",
         "source",
+        "is_active",
         "cognizant_agency",
     ]
 

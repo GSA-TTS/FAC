@@ -119,8 +119,24 @@ def _get_names_match_query(names):
     """
     Given a list of (potential) names, return the query object that searches auditee and firm names.
     """
+    name_fields = [
+        "auditee_city",
+        "auditee_contact_name",
+        "auditee_email",
+        "auditee_name",
+        "auditee_state",
+        "auditor_city",
+        "auditor_contact_name",
+        "auditor_email",
+        "auditor_firm_name",
+        "auditor_state",
+    ]
+
     names_match = Q()
-    for name in names:
-        names_match.add(Q(auditee_name__search=name), Q.OR)
-        names_match.add(Q(auditor_firm_name__search=name), Q.OR)
+
+    # turn ["name1", "name2", "name3"] into "name1 name2 name3"
+    names = " ".join(names)
+    for field in name_fields:
+        names_match.add(Q(**{"%s__search" % field: names}), Q.OR)
+
     return names_match
