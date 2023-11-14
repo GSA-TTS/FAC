@@ -1,22 +1,20 @@
 name: Record Deployment And Add New Relic Monitor
 on:
-  push:
-    branches:
-      - main
-      - prod
-    tags:
-      - v1.*
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
 
 jobs:
   newrelic-dev:
-    if: ${{ github.base_ref == 'main' }}
+    if: ${{ inputs.environment == 'dev' }}
     runs-on: ubuntu-latest
     name: New Relic Record Deployment
     steps:
-      # This step builds a var with the release tag value to use later
       - name: Set Release Version from Tag
         run: echo "RELEASE_VERSION=${{ github.ref_name }}" >> $GITHUB_ENV
-      # This step creates a new Change Tracking Marker
+
       - name: Add New Relic Application Deployment Marker
         uses: newrelic/deployment-marker-action@v2.5.0
         with:
@@ -26,14 +24,13 @@ jobs:
           user: "${{ github.actor }}"
 
   newrelic-staging:
-    if: ${{ github.base_ref == 'prod' }}
+    if: ${{ inputs.environment == 'staging' }}
     runs-on: ubuntu-latest
     name: New Relic Record Deployment
     steps:
-      # This step builds a var with the release tag value to use later
       - name: Set Release Version from Tag
         run: echo "RELEASE_VERSION=${{ github.ref_name }}" >> $GITHUB_ENV
-      # This step creates a new Change Tracking Marker
+
       - name: Add New Relic Application Deployment Marker
         uses: newrelic/deployment-marker-action@v2.5.0
         with:
@@ -43,14 +40,13 @@ jobs:
           user: "${{ github.actor }}"
 
   newrelic-production:
-    if: startsWith(github.ref, 'refs/tags/v1.')
+    if: ${{ inputs.environment == 'production' }}
     runs-on: ubuntu-latest
     name: New Relic Record Deployment
     steps:
-      # This step builds a var with the release tag value to use later
       - name: Set Release Version from Tag
         run: echo "RELEASE_VERSION=${{ github.ref_name }}" >> $GITHUB_ENV
-      # This step creates a new Change Tracking Marker
+
       - name: Add New Relic Application Deployment Marker
         uses: newrelic/deployment-marker-action@v2.5.0
         with:
