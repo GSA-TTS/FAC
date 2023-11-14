@@ -1,8 +1,6 @@
 from census_historical_migration.workbooklib.excel_creation import (
-    set_single_cell_range,
+    set_range,
 )
-from census_historical_migration.workbooklib.templates import sections_to_template_paths
-from audit.fixtures.excel import FORM_SECTIONS
 
 from django.test import TestCase  # noqa: F401
 from openpyxl import Workbook
@@ -13,7 +11,7 @@ from openpyxl.workbook.defined_name import DefinedName
 class ExcelCreationTests(TestCase):
     range_name, start_val, end_val, cell = 'my_range', 'foo', 'bar', 'A6'
 
-    def test_set_single_cell_range(self):
+    def test_set_range(self):
         """
         Standard use case
         """
@@ -28,5 +26,5 @@ class ExcelCreationTests(TestCase):
         ws.cell(row=6, column=1, value=self.start_val)
         self.assertEqual(ws[self.cell].value, self.start_val)
 
-        set_single_cell_range(wb, self.range_name, self.end_val)
+        set_range(wb, self.range_name, [self.end_val])
         self.assertEqual(ws[self.cell].value, self.end_val)

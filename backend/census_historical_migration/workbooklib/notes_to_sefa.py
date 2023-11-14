@@ -1,7 +1,7 @@
 from census_historical_migration.workbooklib.excel_creation import (
     FieldMap,
     set_uei,
-    set_single_cell_range,
+    set_range,
     map_simple_columns,
     generate_dissemination_test_table,
     test_pfix,
@@ -89,9 +89,9 @@ def generate_notes_to_sefa(dbkey, year, outfile):
     else:
         is_used = "Both"
 
-    set_single_cell_range(wb, "accounting_policies", policies_content)
-    set_single_cell_range(wb, "is_minimis_rate_used", is_used)
-    set_single_cell_range(wb, "rate_explained", rate_content)
+    set_range(wb, "accounting_policies", [policies_content])
+    set_range(wb, "is_minimis_rate_used", [is_used])
+    set_range(wb, "rate_explained", [rate_content])
 
     # Map the rest as notes.
     map_simple_columns(wb, mappings, notes)

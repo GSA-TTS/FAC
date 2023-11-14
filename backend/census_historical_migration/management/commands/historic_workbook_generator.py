@@ -1,26 +1,26 @@
-from collections import namedtuple as NT
-from playhouse.shortcuts import model_to_dict
-import os
-import sys
-import json
-
-from django.core.management.base import BaseCommand
-
-import argparse
-import pprint
-
+from census_historical_migration.workbooklib.excel_creation import (
+    set_range,
+)
 from census_historical_migration.workbooklib.workbook_creation import (
     sections,
     workbook_loader,
 )
-
-import datetime
-
 from census_historical_migration.workbooklib.census_models.census import (
     CensusGen22 as Gen,
 )
 
+from collections import namedtuple as NT
+from playhouse.shortcuts import model_to_dict
+from django.core.management.base import BaseCommand
+
+import os
+import sys
+import json
+import argparse
+import pprint
+import datetime
 import logging
+
 
 pp = pprint.PrettyPrinter(indent=2)
 
@@ -37,67 +37,15 @@ logging.getLogger().setLevel(logging.INFO)
 FieldMap = NT("FieldMap", "in_sheet in_db default type")
 
 
-def set_single_cell_range(wb, range_name, value):
-    the_range = wb.defined_names[range_name]
-    # The above returns a generator. Turn it to a list, and grab
-    # the first element of the list. Now, this *tuple* contains a
-    # sheet name and a cell reference... which you need to get rid
-    # of the '$' to use.
-    # https://itecnote.com/tecnote/python-using-excel-named-ranges-in-python-with-openpyxl/
-    tup = list(the_range.destinations)[0]
-    sheet_title = tup[0]
-    cell_ref = tup[1].replace("$", "")
-    ws = wb[sheet_title]
-    ws[cell_ref] = value
-
-
 # A tiny helper to index into workbooks.
 # Assumes a capital letter.
 def col_to_ndx(col):
     return ord(col) - 65 + 1
 
 
-# Helper to set a range of values.
-# Takes a named range, and then walks down the range,
-# filling in values from the list past in (values).
-def set_range(wb, range_name, values, default=None, type=str):
-    the_range = wb.defined_names[range_name]
-    dest = list(the_range.destinations)[0]
-    sheet_title = dest[0]
-    ws = wb[sheet_title]
-
-    start_cell = dest[1].replace("$", "").split(":")[0]
-    col = col_to_ndx(start_cell[0])
-    start_row = int(start_cell[1])
-
-    for ndx, v in enumerate(values):
-        row = ndx + start_row
-        if v:
-            # This is a very noisy statement, showing everything
-            # written into the workbook.
-            # print(f'{range_name} c[{row}][{col}] <- {v} len({len(v)}) {default}')
-            if v is not None:
-                ws.cell(row=row, column=col, value=type(v))
-            if len(v) == 0 and default is not None:
-                # This is less noisy. Shows up for things like
-                # empty findings counts. 2023 submissions
-                # require that field to be 0, not empty,
-                # if there are no findings.
-                # print('Applying default')
-                ws.cell(row=row, column=col, value=type(default))
-        if not v:
-            if default is not None:
-                ws.cell(row=row, column=col, value=type(default))
-            else:
-                ws.cell(row=row, column=col, value="")
-        else:
-            # Leave it blank if we have no default passed in
-            pass
-
-
 def set_uei(wb, dbkey):
     g = Gen.select().where(Gen.dbkey == dbkey).get()
-    set_single_cell_range(wb, "auditee_uei", g.uei)
+    set_range(wb, "auditee_uei", [g.uei])
     return g
 
 
