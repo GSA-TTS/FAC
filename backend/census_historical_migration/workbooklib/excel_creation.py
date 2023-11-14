@@ -1,11 +1,13 @@
-from collections import namedtuple as NT
+from openpyxl.utils.cell import column_index_from_string
 from playhouse.shortcuts import model_to_dict
-import sys
 
-import logging
+from collections import namedtuple as NT
 from datetime import date
 from config import settings
+import sys
+import logging
 import json
+
 
 logger = logging.getLogger(__name__)
 
@@ -39,12 +41,6 @@ def set_single_cell_range(wb, range_name, value):
     ws[cell_ref] = value
 
 
-# A tiny helper to index into workbooks.
-# Assumes a capital letter.
-def col_to_ndx(col):
-    return ord(col) - 65 + 1
-
-
 # Helper to set a range of values.
 # Takes a named range, and then walks down the range,
 # filling in values from the list past in (values).
@@ -55,7 +51,7 @@ def set_range(wb, range_name, values, default=None, conversion_fun=str):
     ws = wb[sheet_title]
 
     start_cell = dest[1].replace("$", "").split(":")[0]
-    col = col_to_ndx(start_cell[0])
+    col = column_index_from_string(start_cell[0])
     start_row = int(start_cell[1])
 
     for ndx, v in enumerate(values):

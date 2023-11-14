@@ -1,26 +1,24 @@
-from collections import namedtuple as NT
-from playhouse.shortcuts import model_to_dict
-import os
-import sys
-import json
-
-from django.core.management.base import BaseCommand
-
-import argparse
-import pprint
-
 from census_historical_migration.workbooklib.workbook_creation import (
     sections,
     workbook_loader,
 )
-
-import datetime
-
 from census_historical_migration.workbooklib.census_models.census import (
     CensusGen22 as Gen,
 )
 
+from openpyxl.utils.cell import column_index_from_string
+from django.core.management.base import BaseCommand
+from playhouse.shortcuts import model_to_dict
+
+from collections import namedtuple as NT
+import os
+import sys
+import json
+import argparse
+import pprint
+import datetime
 import logging
+
 
 pp = pprint.PrettyPrinter(indent=2)
 
@@ -51,12 +49,6 @@ def set_single_cell_range(wb, range_name, value):
     ws[cell_ref] = value
 
 
-# A tiny helper to index into workbooks.
-# Assumes a capital letter.
-def col_to_ndx(col):
-    return ord(col) - 65 + 1
-
-
 # Helper to set a range of values.
 # Takes a named range, and then walks down the range,
 # filling in values from the list past in (values).
@@ -67,7 +59,7 @@ def set_range(wb, range_name, values, default=None, type=str):
     ws = wb[sheet_title]
 
     start_cell = dest[1].replace("$", "").split(":")[0]
-    col = col_to_ndx(start_cell[0])
+    col = column_index_from_string(start_cell[0])
     start_row = int(start_cell[1])
 
     for ndx, v in enumerate(values):
