@@ -11,19 +11,22 @@ from openpyxl.workbook.defined_name import DefinedName
 
 
 class ExcelCreationTests(TestCase):
+    range_name, start_val, end_val, cell = 'my_range', 'foo', 'bar', 'A6'
+
     def test_set_single_cell_range(self):
         """
         Standard use case
         """
         wb = Workbook()
         ws = wb.active
-        start_val, end_val, cell = 'foo', 'bar', 'A6'
-        ref = f"{quote_sheetname(ws.title)}!{absolute_coordinate(cell)}"
-        defn = DefinedName("private_range", attr_text=ref)
+
+        # Create named range
+        ref = f"{quote_sheetname(ws.title)}!{absolute_coordinate(self.cell)}"
+        defn = DefinedName(self.range_name, attr_text=ref)
         wb.defined_names.add(defn)
 
-        ws.cell(row=6, column=1, value=start_val)
-        self.assertEqual(ws[cell].value, start_val)
+        ws.cell(row=6, column=1, value=self.start_val)
+        self.assertEqual(ws[self.cell].value, self.start_val)
 
-        set_single_cell_range(wb, "private_range", end_val)
-        self.assertEqual(ws[cell].value, end_val)
+        set_single_cell_range(wb, self.range_name, self.end_val)
+        self.assertEqual(ws[self.cell].value, self.end_val)
