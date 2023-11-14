@@ -7,9 +7,6 @@ from census_historical_migration.workbooklib.excel_creation import (
     test_pfix,
 )
 from census_historical_migration.workbooklib.templates import sections_to_template_paths
-from census_historical_migration.workbooklib.excel_creation import (
-    set_range,
-)
 from census_historical_migration.workbooklib.census_models.census import dynamic_import
 from audit.fixtures.excel import FORM_SECTIONS
 

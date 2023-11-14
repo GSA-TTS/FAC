@@ -2,14 +2,14 @@ from census_historical_migration.workbooklib.excel_creation import (
     set_range,
 )
 
-from django.test import TestCase  # noqa: F401
+from django.test import TestCase
 from openpyxl import Workbook
 from openpyxl.utils import quote_sheetname, absolute_coordinate
 from openpyxl.workbook.defined_name import DefinedName
 
 
 class ExcelCreationTests(TestCase):
-    range_name, start_val, end_val, cell = 'my_range', 'foo', 'bar', 'A6'
+    range_name, start_val, end_val, cell = "my_range", "foo", "bar", "A6"
 
     def test_set_range(self):
         """
