@@ -153,16 +153,13 @@ function populateModal(formStatus, auditeeName) {
   };
 
   const contentForStatus = modalContent[formStatus];
-  const primaryText = contentForStatus.buttons.primary.text;
   modalHeadingEl.textContent = contentForStatus.heading;
   modalDescriptionEl.innerHTML = contentForStatus.description;
-  modalButtonPrimaryEl.textContent = primaryText;
-  modalButtonPrimaryEl.setAttribute('aria-label', primaryText);
+  modalButtonPrimaryEl.textContent = contentForStatus.buttons.primary.text;
 
   if (contentForStatus.buttons.secondary) {
-    const secondaryText = contentForStatus.buttons.secondary.text;
-    modalButtonSecondaryEl.textContent = secondaryText;
-    modalButtonSecondaryEl.setAttribute('aria-label', secondaryText);
+    modalButtonSecondaryEl.textContent =
+      contentForStatus.buttons.secondary.text;
   }
 
   if (formStatus == 'success') {
