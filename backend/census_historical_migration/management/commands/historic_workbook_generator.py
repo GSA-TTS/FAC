@@ -18,7 +18,6 @@ import sys
 import json
 import argparse
 import pprint
-import datetime
 import logging
 
 
