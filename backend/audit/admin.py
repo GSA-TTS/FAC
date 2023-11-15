@@ -20,6 +20,7 @@ class SACAdmin(admin.ModelAdmin):
         "cognizant_agency",
         "oversight_agency",
     ]
+    readonly_fields = ("submitted_by",)
 
 
 class AccessAdmin(admin.ModelAdmin):

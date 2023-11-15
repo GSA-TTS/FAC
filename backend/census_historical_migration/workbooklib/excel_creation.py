@@ -17,14 +17,6 @@ FieldMap = NT("FieldMap", "in_sheet in_db in_dissem default type")
 WorkbookFieldInDissem = 1000
 
 
-def test_pfix(n):
-    def _test(o):
-        # return ' '.join(["TEST" for x in range(n)]) + " " + str(o)
-        return o
-
-    return _test
-
-
 # A tiny helper to index into workbooks.
 # Assumes a capital letter.
 def col_to_ndx(col):

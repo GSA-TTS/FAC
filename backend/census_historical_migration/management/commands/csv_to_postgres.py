@@ -52,15 +52,15 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
-        folder = options.get("folder")
-        if not folder:
-            print("Please specify a folder name")
-            return
         if options.get("clean"):
             self.delete_data()
             return
         if options.get("sample"):
             self.sample_data()
+            return
+        folder = options.get("folder")
+        if not folder:
+            print("Please specify a folder name")
             return
         chunk_size = options.get("chunksize")
         self.process_csv_files(folder, chunk_size)
