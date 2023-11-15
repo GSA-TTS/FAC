@@ -35,7 +35,7 @@ class UserPermissionAdmin(admin.ModelAdmin):
         link = reverse("admin:auth_user_change", args=[obj.user_id])
         return format_html("<a href='{}'>{}</a>", link, obj.user.email)
 
-    user_link.short_description = "User"
+    user_link.short_description = "User"  # type: ignore
 
 
 @admin.register(StaffUserLog)
