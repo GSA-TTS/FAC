@@ -11,9 +11,11 @@ from pprint import pprint
 from datetime import datetime
 
 from census_historical_migration.workbooklib.workbook_creation import (
-    sections,
     workbook_loader,
     setup_sac,
+)
+from census_historical_migration.workbooklib.workbook_section_handlers import (
+    sections_to_handlers,
 )
 from census_historical_migration.workbooklib.sac_creation import _post_upload_pdf
 from audit.intake_to_dissemination import IntakeToDissemination
@@ -197,9 +199,9 @@ def generate_workbooks(user, email, dbkey, year):
     if sac.general_information["audit_type"] == "alternative-compliance-engagement":
         print(f"Skipping ACE audit: {dbkey}")
     else:
-        loader = workbook_loader(user, sac, dbkey, year, entity_id)
+        loader = workbook_loader(user, sac, dbkey, year)
         json_test_tables = []
-        for section, fun in sections.items():
+        for section, fun in sections_to_handlers.items():
             # FIXME: Can we conditionally upload the addl' and secondary workbooks?
             (_, json, _) = loader(fun, section)
             json_test_tables.append(json)

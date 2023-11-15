@@ -1,6 +1,8 @@
 from census_historical_migration.workbooklib.workbook_creation import (
-    sections,
-    workbook_loader,
+    generate_workbook,
+)
+from census_historical_migration.workbooklib.workbook_section_handlers import (
+    sections_to_handlers,
 )
 from census_historical_migration.workbooklib.census_models.census import (
     CensusGen22 as Gen,
@@ -173,16 +175,11 @@ class Command(BaseCommand):
                 logger.info("could not create output directory. exiting.")
                 sys.exit()
 
-        entity_id = "DBKEY {dbkey} {date:%Y_%m_%d_%H_%M_%S}".format(
-            dbkey=options["dbkey"], date=datetime.datetime.now()
-        )
-
-        loader = workbook_loader(
-            None, None, options["dbkey"], options["year"], entity_id
-        )
         json_test_tables = []
-        for section, fun in sections.items():
-            (wb, api_json, filename) = loader(fun, section)
+        for section, fun in sections_to_handlers.items():
+            (wb, api_json, _, filename) = generate_workbook(
+                fun, options["dbkey"], options["year"], section
+            )
             if wb:
                 wb_path = os.path.join(outdir, filename)
                 wb.save(wb_path)
