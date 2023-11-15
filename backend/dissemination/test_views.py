@@ -9,6 +9,7 @@ from audit.models import (
     generate_sac_report_id,
 )
 from dissemination.models import General
+from users.models import Permission, UserPermission
 
 from model_bakery import baker
 from unittest.mock import patch
@@ -79,9 +80,20 @@ class SearchViewTests(TestCase):
     def setUp(self):
         self.anon_client = Client()
         self.auth_client = Client()
+        self.perm_client = Client()
 
         self.auth_user = baker.make(User)
         self.auth_client.force_login(self.auth_user)
+
+        self.perm_user = baker.make(User)
+        permission = Permission.objects.get(slug=Permission.PermissionType.READ_TRIBAL)
+        baker.make(
+            UserPermission,
+            email=self.perm_user.email,
+            user=self.perm_user,
+            permission=permission,
+        )
+        self.perm_client.force_login(self.perm_user)
 
     def _search_url(self):
         return reverse("dissemination:Search")
@@ -92,8 +104,50 @@ class SearchViewTests(TestCase):
 
     def test_search(self):
         response = self.anon_client.post(self._search_url(), {})
-        print(response.content)
-        self.assertContains(response, "Results: 0")
+        self.assertContains(response, "Search single audit reports")
+        self.assertNotContains(response, "Results: ")
+
+    def test_anonymous_returns_only_public(self):
+        public = baker.make(General, is_public=True, _quantity=5)
+        private = baker.make(General, is_public=False, _quantity=5)
+
+        response = self.anon_client.post(self._search_url(), {})
+
+        self.assertContains(response, "Results: 5")
+
+        for p in public:
+            self.assertContains(response, p.report_id)
+
+        for p in private:
+            self.assertNotContains(response, p.report_id)
+
+    def test_non_permissioned_returns_only_public(self):
+        public = baker.make(General, is_public=True, _quantity=5)
+        private = baker.make(General, is_public=False, _quantity=5)
+
+        response = self.auth_client.post(self._search_url(), {})
+
+        self.assertContains(response, "Results: 5")
+
+        for p in public:
+            self.assertContains(response, p.report_id)
+
+        for p in private:
+            self.assertNotContains(response, p.report_id)
+
+    def test_permissioned_returns_all(self):
+        public = baker.make(General, is_public=True, _quantity=5)
+        private = baker.make(General, is_public=False, _quantity=5)
+
+        response = self.perm_client.post(self._search_url(), {})
+
+        self.assertContains(response, "Results: 10")
+
+        for p in public:
+            self.assertContains(response, p.report_id)
+
+        for p in private:
+            self.assertContains(response, p.report_id)
 
 
 class XlsxDownloadViewTests(TestCase):

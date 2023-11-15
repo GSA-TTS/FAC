@@ -14,43 +14,26 @@ def search_general(
     audit_years=None,
     include_private=False,
 ):
-    query = Q(is_public=not include_private)
+    query = Q()
 
-    if alns:
-        query.add(_get_aln_match_query(alns), Q.AND)
-
-    if names:
-        query.add(_get_names_match_query(names), Q.AND)
-
-    if uei_or_eins:
-        uei_or_ein_match = Q(
-            Q(auditee_uei__in=uei_or_eins) | Q(auditee_ein__in=uei_or_eins)
-        )
-        query.add(uei_or_ein_match, Q.AND)
-
-    if start_date:
-        start_date_match = Q(fac_accepted_date__gte=start_date)
-        query.add(start_date_match, Q.AND)
-
-    if end_date:
-        end_date_match = Q(fac_accepted_date__lte=end_date)
-        query.add(end_date_match, Q.AND)
-
-    if cog_or_oversight:
-        if cog_or_oversight.lower() == "cog":
-            cog_match = Q(cognizant_agency__in=[agency_name])
-            query.add(cog_match, Q.AND)
-        elif cog_or_oversight.lower() == "oversight":
-            oversight_match = Q(oversight_agency__in=[agency_name])
-            query.add(oversight_match, Q.AND)
-
-    if audit_years:
-        fiscal_year_match = Q(audit_year__in=audit_years)
-        query.add(fiscal_year_match, Q.AND)
+    query.add(_get_is_public_query(include_private), Q.AND)
+    query.add(_get_aln_match_query(alns), Q.AND)
+    query.add(_get_names_match_query(names), Q.AND)
+    query.add(_get_uei_or_eins_match_query(uei_or_eins), Q.AND)
+    query.add(_get_start_date_match_query(start_date), Q.AND)
+    query.add(_get_end_date_match_query(end_date), Q.AND)
+    query.add(_get_cog_or_oversight_match_query(agency_name, cog_or_oversight), Q.AND)
+    query.add(_get_audit_years_match_query(audit_years), Q.AND)
 
     results = General.objects.filter(query).order_by("-fac_accepted_date")
 
     return results
+
+
+def _get_is_public_query(include_private):
+    if not include_private:
+        return Q(is_public=True)
+    return Q()
 
 
 def _get_aln_match_query(alns):
@@ -66,6 +49,10 @@ def _get_aln_match_query(alns):
     #    If there's a prefix and extention, search on both.
     # 3. Add the report_ids from the identified awards to the search params.
     """
+
+    if not alns:
+        return Q()
+
     # Split each ALN into (prefix, extention)
     split_alns = set()
     agency_numbers = set()
@@ -119,6 +106,9 @@ def _get_names_match_query(names):
     """
     Given a list of (potential) names, return the query object that searches auditee and firm names.
     """
+    if not names:
+        return Q()
+
     name_fields = [
         "auditee_city",
         "auditee_contact_name",
@@ -140,3 +130,44 @@ def _get_names_match_query(names):
         names_match.add(Q(**{"%s__search" % field: names}), Q.OR)
 
     return names_match
+
+
+def _get_uei_or_eins_match_query(uei_or_eins):
+    if not uei_or_eins:
+        return Q()
+
+    uei_or_ein_match = Q(
+        Q(auditee_uei__in=uei_or_eins) | Q(auditee_ein__in=uei_or_eins)
+    )
+    return uei_or_ein_match
+
+
+def _get_start_date_match_query(start_date):
+    if not start_date:
+        return Q()
+
+    return Q(fac_accepted_date__gte=start_date)
+
+
+def _get_end_date_match_query(end_date):
+    if not end_date:
+        return Q()
+
+    return Q(fac_accepted_date__lte=end_date)
+
+
+def _get_cog_or_oversight_match_query(agency_name, cog_or_oversight):
+    if not cog_or_oversight:
+        return Q()
+
+    if cog_or_oversight.lower() == "cog":
+        return Q(cognizant_agency__in=[agency_name])
+    elif cog_or_oversight.lower() == "oversight":
+        return Q(oversight_agency__in=[agency_name])
+
+
+def _get_audit_years_match_query(audit_years):
+    if not audit_years:
+        return Q()
+
+    return Q(audit_year__in=audit_years)

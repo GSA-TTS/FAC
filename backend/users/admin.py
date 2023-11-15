@@ -4,15 +4,18 @@ from django.urls import reverse
 from django.utils.html import format_html
 
 from .models import Permission, StaffUser, StaffUserLog, UserPermission, UserProfile
+from .permissions import can_read_tribal as _can_read_tribal
 
 User = get_user_model()
 
 admin.site.register(UserProfile)
 admin.site.unregister(User)
 
+
 @admin.register(Permission)
 class PermissionAdmin(admin.ModelAdmin):
     list_display = ["slug", "description"]
+
 
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
@@ -21,7 +24,8 @@ class UserAdmin(admin.ModelAdmin):
     readonly_fields = ["date_joined", "last_login"]
 
     def can_read_tribal(self, obj):
-        return UserPermission.objects.filter(user=obj, permission__slug="read-tribal").count() > 0
+        return _can_read_tribal(obj)
+
 
 @admin.register(UserPermission)
 class UserPermissionAdmin(admin.ModelAdmin):
@@ -30,11 +34,12 @@ class UserPermissionAdmin(admin.ModelAdmin):
     def user_link(self, obj):
         link = reverse("admin:auth_user_change", args=[obj.user_id])
         return format_html("<a href='{}'>{}</a>", link, obj.user.email)
+
     user_link.short_description = "User"
 
 
 @admin.register(StaffUserLog)
-class StaffUserLogAdmin(admin.ModelAdmin):  
+class StaffUserLogAdmin(admin.ModelAdmin):
     list_display = [
         "staff_email",
         "added_by_email",

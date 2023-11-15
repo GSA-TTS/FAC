@@ -9,9 +9,7 @@ class Permission(models.Model):
     class PermissionType:
         READ_TRIBAL = "read-tribal"
 
-    PERMISSION_CHOICES = (
-        (PermissionType.READ_TRIBAL, _("Read tribal audit data")),
-    )
+    PERMISSION_CHOICES = ((PermissionType.READ_TRIBAL, _("Read tribal audit data")),)
 
     slug = models.CharField(max_length=255, choices=PERMISSION_CHOICES, unique=True)
     description = models.TextField()

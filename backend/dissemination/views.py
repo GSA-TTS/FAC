@@ -25,13 +25,14 @@ from dissemination.models import (
 
 from users.permissions import can_read_tribal
 
+
 def include_private_results(request):
     if not request.user.is_authenticated:
         return False
-    
+
     if not can_read_tribal(request.user):
         return False
-    
+
     return True
 
 
@@ -65,8 +66,6 @@ class Search(View):
 
             # is the user authenticated?
             include_private = include_private_results(request)
-
-            print(include_private)
 
             results = search_general(
                 names=names,
