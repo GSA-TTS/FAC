@@ -101,6 +101,7 @@ Select a space:
 cf logs gsa-fac
 ```
 9.  Post the most recent dbbackup and mediabackup file names in https://github.com/GSA-TTS/FAC/issues/2221
+    - *NOTE* the following is not necessary as of this time. django-dbbackup is not backing up the media due to the file sizes being too large, and we will be using another method for getting the media backed up (TBD)
 
 To see more about branching and the deployment steps, see the [Branching](branching.md) page.
 

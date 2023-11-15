@@ -3,7 +3,6 @@ from census_historical_migration.workbooklib.excel_creation import (
     set_uei,
     map_simple_columns,
     generate_dissemination_test_table,
-    test_pfix,
 )
 from census_historical_migration.workbooklib.templates import sections_to_template_paths
 from census_historical_migration.workbooklib.census_models.census import dynamic_import
@@ -29,14 +28,14 @@ mappings = [
         "cpastreet1",
         "address_street",
         None,
-        test_pfix(3),
+        str,
     ),
     FieldMap(
         "secondary_auditor_contact_title",
         "cpatitle",
         "contact_title",
         None,
-        test_pfix(3),
+        str,
     ),
     FieldMap(
         "secondary_auditor_address_zipcode",
