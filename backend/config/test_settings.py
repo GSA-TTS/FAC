@@ -4,6 +4,8 @@ from django.db import connections
 
 import boto3
 
+from census_historical_migration.models import ELECAUDITHEADER as Gen
+
 
 class SettingsTestCase(TestCase):
     def test_db(self):
@@ -11,8 +13,13 @@ class SettingsTestCase(TestCase):
         self.assertEquals(len(databases), 2)
 
         for db in databases:
-            connection = str(connections[db])
-            self.assertTrue(db in connection)
+            connection = connections[db]
+            self.assertTrue(db in str(connection))
+            connection.cursor()
+
+    def test_models_in_censusdb(self):
+        gens = Gen.objects.all()
+        self.assertAlmostEquals(len(gens), 0)
 
     def test_private_s3(self):
         try:
@@ -40,7 +47,7 @@ class SettingsTestCase(TestCase):
             )
             self.assertIsNotNone(s3_client)
             items = s3_client.list_objects(
-                Bucket=settings.AWS_C2G_BUCKET_NAME,
+                Bucket=settings.AWS_CENSUS_TO_GSAFAC_BUCKET_NAME,
             )
             self.assertIsNotNone(items)
         except Exception as e:

@@ -173,10 +173,10 @@ DATABASES = {
     ),
     "census-to-gsafac-db": env.dj_db_url(
         "DATABASE_URL_CENSUS_TO_GSAFAC_DB",
-        default="postgres://postgres:password@0.0.0.0/census-to-gsafac-db",
+        default="postgres://postgres:password@0.0.0.0:5433/backend",
     ),
 }
-
+DATABASE_ROUTERS = ["census_historical_migration.routers.DBRouter"]
 POSTGREST = {
     "URL": env.str("POSTGREST_URL", "http://api:3000"),
     "LOCAL": env.str("POSTGREST_URL", "http://api:3000"),
@@ -246,9 +246,6 @@ if ENVIRONMENT not in ["DEVELOPMENT", "PREVIEW", "STAGING", "PRODUCTION"]:
     STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
     MIDDLEWARE.append("whitenoise.middleware.WhiteNoiseMiddleware")
     DEFAULT_FILE_STORAGE = "report_submission.storages.S3PrivateStorage"
-
-    # Private C2G bucket
-    AWS_C2G_BUCKET_NAME = "fac-c2g-s3"
 
     # Private bucket
     AWS_PRIVATE_STORAGE_BUCKET_NAME = "gsa-fac-private-s3"
