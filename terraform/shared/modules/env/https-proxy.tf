@@ -37,7 +37,13 @@ module "https-proxy" {
       "secure.login.gov:443",
 
       # Git
-      "*.github.com:443"
+      "*.github.com:443",
+      # The following needs to be added to the allowlist so that when we curl the s3-tar-tool to perform backups,
+      # the curl command can follow the redirect.
+      "objects.githubusercontent.com:443",
+
+      # The following needs to be added to the allowlist so that we can get aws cli onto the instance to perform backups.
+      "awscli.amazonaws.com:443"
     ],
     # The parens here make Terraform understand that the key below is a reference
     # Solution from https://stackoverflow.com/a/57401750
