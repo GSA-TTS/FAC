@@ -38,12 +38,6 @@ logging.getLogger().setLevel(logging.INFO)
 FieldMap = NT("FieldMap", "in_sheet in_db default type")
 
 
-# A tiny helper to index into workbooks.
-# Assumes a capital letter.
-def col_to_ndx(col):
-    return ord(col) - 65 + 1
-
-
 def set_uei(wb, dbkey):
     g = Gen.select().where(Gen.dbkey == dbkey).get()
     set_range(wb, "auditee_uei", [g.uei])
