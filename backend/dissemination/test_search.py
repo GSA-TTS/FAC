@@ -60,20 +60,14 @@ class SearchGeneralTests(TestCase):
 
     def test_name_multiple(self):
         """
-        Given multiple names, search_general should return records that match either name
+        Given multiple name terms, search_general should only return records that contain all of the terms
         """
-        names = [
-            "auditee-01",
-            "auditor-firm-01",
-            "this-one-has-no-match",
-        ]
+        names = ["city", "bronze"]
 
-        baker.make(General, is_public=True, auditee_name=names[0])
-        baker.make(General, is_public=True, auditor_firm_name=names[1])
-        baker.make(General, is_public=True, auditee_name="not-looking-for-this-auditee")
-        baker.make(
-            General, is_public=True, auditor_firm_name="not-looking-for-this-auditor"
-        )
+        baker.make(General, is_public=True, auditee_name="city of gold")
+        baker.make(General, is_public=True, auditee_name="city of silver")
+        baker.make(General, is_public=True, auditee_name="city of bronze")
+        baker.make(General, is_public=True, auditee_name="bronze city")
 
         results = search_general(
             names=names,
@@ -89,24 +83,13 @@ class SearchGeneralTests(TestCase):
         auditee_match = baker.make(
             General, is_public=True, auditee_name="the university of somewhere"
         )
-        auditor_match = baker.make(
-            General, is_public=True, auditor_firm_name="auditors unite, LLC"
-        )
-        baker.make(General, is_public=True, auditee_name="not looking for this auditee")
-        baker.make(
-            General,
-            is_public=True,
-            auditor_firm_name="not looking for this auditor firm",
-        )
+        baker.make(General, is_public=True, auditor_firm_name="not this one")
 
-        results = search_general(
-            names=["UNIVERSITY", "unitE", "there is not match for this one"]
-        )
+        results = search_general(names=["UNIVERSITY"])
 
         assert_all_results_public(self, results)
-        self.assertEqual(len(results), 2)
+        self.assertEqual(len(results), 1)
         self.assertEqual(results[0], auditee_match)
-        self.assertEqual(results[1], auditor_match)
 
     def test_uei_or_ein_matches_uei(self):
         """

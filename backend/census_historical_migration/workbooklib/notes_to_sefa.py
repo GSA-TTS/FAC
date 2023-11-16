@@ -4,7 +4,6 @@ from census_historical_migration.workbooklib.excel_creation import (
     set_single_cell_range,
     map_simple_columns,
     generate_dissemination_test_table,
-    test_pfix,
 )
 from census_historical_migration.workbooklib.templates import sections_to_template_paths
 from census_historical_migration.workbooklib.excel_creation import (
@@ -22,9 +21,8 @@ import logging
 logger = logging.getLogger(__name__)
 
 mappings = [
-    FieldMap("note_title", "title", "title", None, test_pfix(3)),
-    FieldMap("note_content", "content", "content", None, test_pfix(3)),
-    # FieldMap("seq_number", "seq_number", "note_seq_number", 0, int),
+    FieldMap("note_title", "title", "title", None, str),
+    FieldMap("note_content", "content", "content", None, str),
 ]
 
 
