@@ -5,10 +5,8 @@ from census_historical_migration.sac_general_lib.report_id_generator import (
 from openpyxl.utils.cell import column_index_from_string
 from playhouse.shortcuts import model_to_dict
 
-from config import settings
 import sys
 import logging
-import json
 
 
 logger = logging.getLogger(__name__)
@@ -114,18 +112,3 @@ def generate_dissemination_test_table(Gen, api_endpoint, dbkey, mappings, object
 
         table["rows"].append(test_obj)
     return table
-
-
-def extract_metadata(sheet_json, range):
-    excel_defn = open(
-        f"{settings.BASE_DIR}/schemas/output/excel/json/{sheet_json}.json"
-    )
-    excel_defn_json = json.load(excel_defn)
-    result = None
-    for sheet in excel_defn_json["sheets"]:
-        if "name" in sheet and sheet["name"] == "Coversheet":
-            coversheet = sheet
-            for scell in coversheet["single_cells"]:
-                if ("range_name" in scell) and (scell["range_name"] == range):
-                    result = scell["value"]
-    return result
