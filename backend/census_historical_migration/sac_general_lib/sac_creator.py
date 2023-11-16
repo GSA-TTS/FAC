@@ -1,0 +1,75 @@
+import logging
+
+from django.apps import apps
+
+from census_historical_migration.sac_general_lib.general_information import (
+    general_information,
+)
+from census_historical_migration.sac_general_lib.audit_information import (
+    audit_information,
+)
+from census_historical_migration.sac_general_lib.auditee_certification import (
+    auditee_certification,
+)
+from census_historical_migration.sac_general_lib.auditor_certification import (
+    auditor_certification,
+)
+from census_historical_migration.sac_general_lib.report_id_generator import (
+    dbkey_to_report_id,
+)
+
+from census_historical_migration.workbooklib.census_models.census import (
+    CensusGen22 as Gen,
+)
+
+logger = logging.getLogger(__name__)
+
+
+def create_sac(user, dbkey):
+    """Create a SAC object for the historic data migration."""
+    SingleAuditChecklist = apps.get_model("audit.SingleAuditChecklist")
+    generated_report_id = dbkey_to_report_id(Gen, dbkey)
+    try:
+        exists = SingleAuditChecklist.objects.get(report_id=generated_report_id)
+    except SingleAuditChecklist.DoesNotExist:
+        exists = None
+    if exists:
+        exists.delete()
+
+    sac = SingleAuditChecklist.objects.create(
+        submitted_by=user,
+        general_information=general_information(dbkey),
+        audit_information=audit_information(dbkey),
+    )
+
+    sac.report_id = generated_report_id
+
+    Access = apps.get_model("audit.Access")
+    Access.objects.create(
+        sac=sac,
+        user=user,
+        email=user.email,
+        role="editor",
+    )
+
+    # We need these to be different.
+    Access.objects.create(
+        sac=sac,
+        user=user,
+        email="bob_the_auditee_official@auditee.org",  # user.email, FIXME - Confirm this is the right value?
+        role="certifying_auditee_contact",
+    )
+    Access.objects.create(
+        sac=sac,
+        user=user,
+        email="bob_the_auditor_official@auditor.org",  # user.email, FIXME - Confirm this is the right value?
+        role="certifying_auditor_contact",
+    )
+
+    sac.auditee_certification = auditee_certification(dbkey)
+    sac.auditor_certification = auditor_certification(dbkey)
+    sac.data_source = "CENSUS"  # FIXME - Confirm this is the right value?
+    sac.save()
+
+    logger.info("Created single audit checklist %s", sac)
+    return sac

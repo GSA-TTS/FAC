@@ -1,20 +1,15 @@
-from collections import namedtuple as NT
+from census_historical_migration.base_field_maps import WorkbookFieldInDissem
+from census_historical_migration.sac_general_lib.report_id_generator import (
+    dbkey_to_report_id,
+)
 from playhouse.shortcuts import model_to_dict
 import sys
 
 import logging
-from datetime import date
 from config import settings
 import json
 
 logger = logging.getLogger(__name__)
-
-# This provides a way to map the sheet in the workbook to the
-# column in the DB. It also has a default value and
-# the type of value, so that things can be set correctly
-# before filling in the XLSX workbooks.
-FieldMap = NT("FieldMap", "in_sheet in_db in_dissem default type")
-WorkbookFieldInDissem = 1000
 
 
 def set_single_cell_range(wb, range_name, value):
@@ -110,43 +105,10 @@ def map_simple_columns(wb, mappings, values):
         )
 
 
-def _census_date_to_datetime(cd):
-    lookup = {
-        "JAN": 1,
-        "FEB": 2,
-        "MAR": 3,
-        "APR": 4,
-        "MAY": 5,
-        "JUN": 6,
-        "JUL": 7,
-        "AUG": 8,
-        "SEP": 9,
-        "OCT": 10,
-        "NOV": 11,
-        "DEC": 12,
-    }
-    year = int(cd.split("-")[2])
-    month = lookup[cd.split("-")[1]]
-    day = int(cd.split("-")[0])
-    return date(year + 2000, month, day)
-
-
-# FIXME: Get the padding/shape right on the report_id
-def dbkey_to_test_report_id(Gen, dbkey):
-    g = Gen.select(Gen.audityear, Gen.fyenddate).where(Gen.dbkey == dbkey).get()
-    # month = g.fyenddate.split('-')[1]
-    # 2022JUN0001000003
-    # We start new audits at 1 million.
-    # So, we want 10 digits, and zero-pad for
-    # historic DBKEY report_ids
-    dt = _census_date_to_datetime(g.fyenddate)
-    return f"{g.audityear}-{dt.month:02}-TSTDAT-{dbkey.zfill(10)}"
-
-
 def generate_dissemination_test_table(Gen, api_endpoint, dbkey, mappings, objects):
     table = {"rows": list(), "singletons": dict()}
     table["endpoint"] = api_endpoint
-    table["report_id"] = dbkey_to_test_report_id(Gen, dbkey)
+    table["report_id"] = dbkey_to_report_id(Gen, dbkey)
     for o in objects:
         as_dict = model_to_dict(o)
         test_obj = {}
