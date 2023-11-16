@@ -25,4 +25,4 @@ class Command(BaseCommand):
             print("Please specify an audit year")
             return
 
-        load_data(audit_yaer=year)
+        load_data(audit_year=year)

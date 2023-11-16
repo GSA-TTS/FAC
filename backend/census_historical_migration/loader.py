@@ -3,16 +3,16 @@ from .models import ELECAUDITHEADER as Gen
 from .make_submission import load_historic_data
 
 
-def load_data(audit_yaer):
+def load_data(audit_year):
     SingleAuditChecklist.objects.all().delete()
     result_log = {}
     total_count = error_count = 0
-    gens = Gen.objects.filter(AUDITYEAR=audit_yaer)
+    gens = Gen.objects.filter(AUDITYEAR=audit_year)
     for gen in gens:
         dbkey = gen.DBKEY
-        result = load_historic_data(audit_yaer, dbkey)
+        result = load_historic_data(audit_year, dbkey)
 
-        result_log[(audit_yaer, dbkey)] = result
+        result_log[(audit_year, dbkey)] = result
         total_count += 1
         print(total_count, result)
         if len(result["errors"]) > 0:
