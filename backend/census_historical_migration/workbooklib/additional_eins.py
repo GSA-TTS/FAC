@@ -1,10 +1,10 @@
 from census_historical_migration.workbooklib.excel_creation import (
-    FieldMap,
     WorkbookFieldInDissem,
     set_uei,
     map_simple_columns,
     generate_dissemination_test_table,
 )
+from census_historical_migration.base_field_maps import SheetFieldMap
 from census_historical_migration.workbooklib.templates import sections_to_template_paths
 from census_historical_migration.workbooklib.census_models.census import dynamic_import
 from audit.fixtures.excel import FORM_SECTIONS
@@ -16,7 +16,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 mappings = [
-    FieldMap("additional_ein", "ein", WorkbookFieldInDissem, None, str),
+    SheetFieldMap("additional_ein", "ein", WorkbookFieldInDissem, None, str),
 ]
 
 

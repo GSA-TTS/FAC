@@ -1,5 +1,5 @@
 from census_historical_migration.workbooklib.excel_creation import (
-    FieldMap,
+    SheetFieldMap,
     set_uei,
     map_simple_columns,
     generate_dissemination_test_table,
@@ -16,28 +16,38 @@ import logging
 logger = logging.getLogger(__name__)
 
 mappings = [
-    FieldMap("secondary_auditor_address_city", "cpacity", "address_city", None, str),
-    FieldMap("secondary_auditor_contact_name", "cpacontact", "contact_name", None, str),
-    FieldMap("secondary_auditor_ein", "cpaein", "auditor_ein", None, str),
-    FieldMap("secondary_auditor_contact_email", "cpaemail", "contact_email", None, str),
-    FieldMap("secondary_auditor_name", "cpafirmname", "auditor_name", None, str),
-    FieldMap("secondary_auditor_contact_phone", "cpaphone", "contact_phone", None, str),
-    FieldMap("secondary_auditor_address_state", "cpastate", "address_state", None, str),
-    FieldMap(
+    SheetFieldMap(
+        "secondary_auditor_address_city", "cpacity", "address_city", None, str
+    ),
+    SheetFieldMap(
+        "secondary_auditor_contact_name", "cpacontact", "contact_name", None, str
+    ),
+    SheetFieldMap("secondary_auditor_ein", "cpaein", "auditor_ein", None, str),
+    SheetFieldMap(
+        "secondary_auditor_contact_email", "cpaemail", "contact_email", None, str
+    ),
+    SheetFieldMap("secondary_auditor_name", "cpafirmname", "auditor_name", None, str),
+    SheetFieldMap(
+        "secondary_auditor_contact_phone", "cpaphone", "contact_phone", None, str
+    ),
+    SheetFieldMap(
+        "secondary_auditor_address_state", "cpastate", "address_state", None, str
+    ),
+    SheetFieldMap(
         "secondary_auditor_address_street",
         "cpastreet1",
         "address_street",
         None,
         str,
     ),
-    FieldMap(
+    SheetFieldMap(
         "secondary_auditor_contact_title",
         "cpatitle",
         "contact_title",
         None,
         str,
     ),
-    FieldMap(
+    SheetFieldMap(
         "secondary_auditor_address_zipcode",
         "cpazipcode",
         "address_zipcode",

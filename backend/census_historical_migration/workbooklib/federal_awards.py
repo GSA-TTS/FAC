@@ -1,11 +1,13 @@
 from census_historical_migration.workbooklib.excel_creation import (
-    FieldMap,
-    WorkbookFieldInDissem,
     set_uei,
     set_single_cell_range,
     map_simple_columns,
     generate_dissemination_test_table,
     set_range,
+)
+from census_historical_migration.base_field_maps import (
+    SheetFieldMap,
+    WorkbookFieldInDissem,
 )
 from census_historical_migration.workbooklib.templates import sections_to_template_paths
 from census_historical_migration.workbooklib.census_models.census import dynamic_import
@@ -29,29 +31,35 @@ def if_zero_empty(v):
 
 
 mappings = [
-    FieldMap("program_name", "federalprogramname", "federal_program_name", None, str),
-    FieldMap(
+    SheetFieldMap(
+        "program_name", "federalprogramname", "federal_program_name", None, str
+    ),
+    SheetFieldMap(
         "state_cluster_name", "stateclustername", WorkbookFieldInDissem, None, str
     ),
-    FieldMap("federal_program_total", "programtotal", WorkbookFieldInDissem, 0, int),
-    FieldMap("cluster_total", "clustertotal", WorkbookFieldInDissem, 0, int),
-    FieldMap("is_guaranteed", "loans", "is_loan", None, str),
-    FieldMap(
+    SheetFieldMap(
+        "federal_program_total", "programtotal", WorkbookFieldInDissem, 0, int
+    ),
+    SheetFieldMap("cluster_total", "clustertotal", WorkbookFieldInDissem, 0, int),
+    SheetFieldMap("is_guaranteed", "loans", "is_loan", None, str),
+    SheetFieldMap(
         "loan_balance_at_audit_period_end", "loanbalance", "loan_balance", None, int
     ),
-    FieldMap("is_direct", "direct", WorkbookFieldInDissem, None, str),
-    FieldMap("is_passed", "passthroughaward", "is_passthrough_award", None, str),
-    FieldMap(
+    SheetFieldMap("is_direct", "direct", WorkbookFieldInDissem, None, str),
+    SheetFieldMap("is_passed", "passthroughaward", "is_passthrough_award", None, str),
+    SheetFieldMap(
         "subrecipient_amount",
         "passthroughamount",
         "passthrough_amount",
         None,
         if_zero_empty,
     ),
-    FieldMap("is_major", "majorprogram", WorkbookFieldInDissem, None, str),
-    FieldMap("audit_report_type", "typereport_mp", "audit_report_type", None, str),
-    FieldMap("number_of_audit_findings", "findingscount", "findings_count", 0, int),
-    FieldMap("amount_expended", "amount", WorkbookFieldInDissem, 0, int),
+    SheetFieldMap("is_major", "majorprogram", WorkbookFieldInDissem, None, str),
+    SheetFieldMap("audit_report_type", "typereport_mp", "audit_report_type", None, str),
+    SheetFieldMap(
+        "number_of_audit_findings", "findingscount", "findings_count", 0, int
+    ),
+    SheetFieldMap("amount_expended", "amount", WorkbookFieldInDissem, 0, int),
 ]
 
 

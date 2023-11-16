@@ -1,10 +1,10 @@
 from census_historical_migration.workbooklib.excel_creation import (
-    FieldMap,
     set_uei,
     map_simple_columns,
     generate_dissemination_test_table,
     set_range,
 )
+from census_historical_migration.base_field_maps import SheetFieldMap
 from census_historical_migration.workbooklib.templates import sections_to_template_paths
 from census_historical_migration.workbooklib.census_models.census import dynamic_import
 from audit.fixtures.excel import FORM_SECTIONS
@@ -23,30 +23,34 @@ def sorted_string(s):
 
 
 mappings = [
-    FieldMap(
+    SheetFieldMap(
         "compliance_requirement",
         "typerequirement",
         "type_requirement",
         "ABC",
         sorted_string,
     ),
-    FieldMap("reference_number", "findingsrefnums", "reference_number", None, str),
-    FieldMap("modified_opinion", "modifiedopinion", "is_modified_opinion", None, str),
-    FieldMap("other_matters", "othernoncompliance", "is_other_matters", None, str),
-    FieldMap(
+    SheetFieldMap("reference_number", "findingsrefnums", "reference_number", None, str),
+    SheetFieldMap(
+        "modified_opinion", "modifiedopinion", "is_modified_opinion", None, str
+    ),
+    SheetFieldMap("other_matters", "othernoncompliance", "is_other_matters", None, str),
+    SheetFieldMap(
         "material_weakness", "materialweakness", "is_material_weakness", None, str
     ),
-    FieldMap(
+    SheetFieldMap(
         "significant_deficiency",
         "significantdeficiency",
         "is_significant_deficiency",
         None,
         str,
     ),
-    FieldMap("other_findings", "otherfindings", "is_other_findings", None, str),
-    FieldMap("questioned_costs", "qcosts", "is_questioned_costs", None, str),
-    FieldMap("repeat_prior_reference", "repeatfinding", "is_repeat_finding", None, str),
-    FieldMap(
+    SheetFieldMap("other_findings", "otherfindings", "is_other_findings", None, str),
+    SheetFieldMap("questioned_costs", "qcosts", "is_questioned_costs", None, str),
+    SheetFieldMap(
+        "repeat_prior_reference", "repeatfinding", "is_repeat_finding", None, str
+    ),
+    SheetFieldMap(
         "prior_references",
         "priorfindingrefnums",
         "prior_finding_ref_numbers",
