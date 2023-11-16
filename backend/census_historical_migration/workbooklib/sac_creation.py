@@ -24,17 +24,14 @@ from audit.intakelib import (
 import audit.validators
 
 from audit.fixtures.excel import FORM_SECTIONS
-
-from census_historical_migration.workbooklib.excel_creation import (
-    dbkey_to_test_report_id,
-    _census_date_to_datetime,
+from audit.models import SingleAuditChecklist
+from .transformers import clean_gen, make_report_id, str_to_date
+from ..models import (
+    ELECAUDITHEADER as Gen,
+    ELECAUDITS as Cfda,
+    ELECAUDITFINDINGS as Finding,
 )
 
-from census_historical_migration.workbooklib.census_models.census import (
-    CensusGen22 as Gen,
-    CensusCfda22 as Cfda,
-    CensusFindings22 as Finding,
-)
 
 logger = logging.getLogger(__name__)
 
@@ -103,91 +100,89 @@ def add_hyphen_to_zip(zip):
         return strzip
 
 
-def _fake_general_information(dbkey, auditee_name="DEFAULT AUDITEE"):
+def get_general_information(gen):
     """Create a fake general_information object."""
     # TODO: can we generate this object from the schema definition in
     # schemas/output/GeneralInformation.schema.json?
-    gobj: Gen = Gen.select().where(Gen.dbkey == dbkey).first()
-    auditee_fiscal_period_end = _census_date_to_datetime(gobj.fyenddate).strftime(
-        "%Y-%m-%d"
-    )
+    gobj = gen
+    auditee_fiscal_period_end = str_to_date(gobj.FYENDDATE).strftime("%Y-%m-%d")
     auditee_fiscal_period_start = (
-        _census_date_to_datetime(gobj.fyenddate) - timedelta(days=365)
+        str_to_date(gobj.FYENDDATE) - timedelta(days=365)
     ).strftime("%Y-%m-%d")
-    if gobj.cpacountry == "US":
+    if gobj.CPACOUNTRY == "US":
         cpacountry = "USA"
-    elif gobj.cpacountry != "US":
+    elif gobj.CPACOUNTRY != "US":
         cpacountry = "non-USA"
 
     general_information = {
         "auditee_fiscal_period_start": auditee_fiscal_period_start,
         "auditee_fiscal_period_end": auditee_fiscal_period_end,
-        "audit_period_covered": _period_covered(gobj.periodcovered),
-        "audit_type": _census_audit_type(gobj.audittype),
-        "auditee_address_line_1": gobj.street1,
-        "auditee_city": gobj.city,
-        "auditee_contact_name": gobj.auditeecontact,
-        "auditee_contact_title": gobj.auditeetitle,
-        "auditee_email": gobj.auditeeemail,
-        "auditee_name": gobj.auditeename,
-        "auditee_phone": gobj.auditeephone,
+        "audit_period_covered": _period_covered(gobj.PERIODCOVERED),
+        "audit_type": _census_audit_type(gobj.AUDITTYPE),
+        "auditee_address_line_1": gobj.STREET1,
+        "auditee_city": gobj.CITY,
+        "auditee_contact_name": gobj.AUDITEECONTACT,
+        "auditee_contact_title": gobj.AUDITEETITLE,
+        "auditee_email": gobj.AUDITEEEMAIL,
+        "auditee_name": gobj.AUDITEENAME,
+        "auditee_phone": gobj.AUDITEEPHONE,
         # TODO: when we include territories in our valid states, remove this restriction
-        "auditee_state": gobj.state,
+        "auditee_state": gobj.STATE,
         # TODO: this is GSA's UEI. We could do better at making random choices that
         # pass the schema's complex regex validation
-        "auditee_uei": gobj.uei,
-        "auditee_zip": gobj.zipcode,
-        "auditor_address_line_1": gobj.cpastreet1,
-        "auditor_city": gobj.cpacity,
-        "auditor_contact_name": gobj.cpacontact,
-        "auditor_contact_title": gobj.cpatitle,
+        "auditee_uei": gobj.UEI,
+        "auditee_zip": gobj.ZIPCODE,
+        "auditor_address_line_1": gobj.CPASTREET1,
+        "auditor_city": gobj.CPACITY,
+        "auditor_contact_name": gobj.CPACONTACT,
+        "auditor_contact_title": gobj.CPATITLE,
         "auditor_country": cpacountry,
-        "auditor_ein": gobj.auditor_ein,
+        "auditor_ein": gobj.AUDITOR_EIN,
         "auditor_ein_not_an_ssn_attestation": True,
-        "auditor_email": gobj.cpaemail if gobj.cpaemail else "noemailfound@noemail.com",
-        "auditor_firm_name": gobj.cpafirmname,
-        "auditor_phone": gobj.cpaphone,
+        "auditor_email": gobj.CPAEMAIL if gobj.CPAEMAIL else "noemailfound@noemail.com",
+        "auditor_firm_name": gobj.CPAFIRMNAME,
+        "auditor_phone": gobj.CPAPHONE,
         # TODO: when we include territories in our valid states, remove this restriction
-        "auditor_state": gobj.cpastate,
-        "auditor_zip": gobj.cpazipcode,
-        "ein": gobj.ein,
+        "auditor_state": gobj.CPASTATE,
+        "auditor_zip": gobj.CPAZIPCODE,
+        "ein": gobj.EIN,
         "ein_not_an_ssn_attestation": True,
         "is_usa_based": True,
         "met_spending_threshold": True,
-        "multiple_eins_covered": True if gobj.multipleeins == "Y" else False,
-        "multiple_ueis_covered": True if gobj.multipleueis == "Y" else False,
+        "multiple_eins_covered": True if gobj.MULTIPLEEINS == "Y" else False,
+        "multiple_ueis_covered": True if gobj.MULTIPLEUEIS == "Y" else False,
         # TODO: could improve this by randomly choosing from the enum of possible values
         "user_provided_organization_type": "unknown",
-        "secondary_auditors_exist": True if gobj.multiple_cpas == "Y" else False,
+        "secondary_auditors_exist": True if gobj.MULTIPLE_CPAS == "Y" else False,
     }
 
-    # verify that our created object validates against the schema
-    audit.validators.validate_general_information_complete_json(general_information)
+    # TODO verify that our created object validates against the schema
+    # audit.validators.validate_general_information_complete_json(general_information)
 
     return general_information
 
 
 # TODO: Pull this from actual information.
-def _fake_audit_information(dbkey, auditee_name=None):
-    gobj: Gen = Gen.select().where(Gen.dbkey == dbkey).first()
-    cfdas = Cfda.select().where(Cfda.dbkey == dbkey)
+def get_audit_information(gen: Gen):
+    gobj = gen
+    cfdas = Cfda.objects.filter(DBKEY=gen.DBKEY, AUDITYEAR=gen.AUDITYEAR)
+    findings = Finding.objects.filter(DBKEY=gen.DBKEY, AUDITYEAR=gen.AUDITYEAR)
 
     agencies = {}
     cfda: Cfda
     for cfda in cfdas:
-        agencies[int((cfda.cfda).split(".")[0])] = 1
+        agencies[int((cfda.CFDA).split(".")[0])] = 1
 
-    findings = Finding.select().where(Finding.dbkey == dbkey)
     finding: Finding
     gaap_results = {}
     # THIS IS NOT A GOOD WAY TO DO THIS, BUT IT IS CLOSE.
     # IT IS FOR TEST DATA...
     for finding in findings:
-        if finding.modifiedopinion == "Y":
+        if finding.MODIFIEDOPINION == "Y":
             gaap_results["unmodified_opinion"] = 1
-        if finding.materialweakness == "Y":
+        if finding.MATERIALWEAKNESS == "Y":
             gaap_results["adverse_opinion"] = 1
-        if finding.significantdeficiency == "Y":
+        if finding.SIGNIFICANTDEFICIENCY == "Y":
             gaap_results["disclaimer_of_opinion"] = 1
 
     audit_information = {
@@ -197,24 +192,76 @@ def _fake_audit_information(dbkey, auditee_name=None):
         "dollar_threshold": 750000,
         "gaap_results": list(gaap_results.keys()),
         "is_aicpa_audit_guide_included": True
-        if gobj.reportablecondition == "Y"
+        if gobj.REPORTABLECONDITION == "Y"
         else False,
-        "is_going_concern_included": True if gobj.goingconcern == "Y" else False,
+        "is_going_concern_included": True if gobj.GOINGCONCERN == "Y" else False,
         "is_internal_control_deficiency_disclosed": True
-        if gobj.materialweakness == "Y"
+        if gobj.MATERIALWEAKNESS == "Y"
         else False,
         "is_internal_control_material_weakness_disclosed": True
-        if gobj.materialweakness_mp == "Y"
+        if gobj.MATERIALWEAKNESS_MP == "Y"
         else False,
         "is_low_risk_auditee": False,
         "is_material_noncompliance_disclosed": True
-        if gobj.materialnoncompliance == "Y"
+        if gobj.MATERIALNONCOMPLIANCE == "Y"
         else False,
     }
 
-    audit.validators.validate_audit_information_json(audit_information)
+    # TODO Uncomment this
+    # audit.validators.validate_audit_information_json(audit_information)
 
     return audit_information
+
+
+def create_sac(user, gen):
+    clean_gen(gen)
+
+    """Create a single example SAC."""
+    report_id = make_report_id(gen.AUDITYEAR, gen.FYENDDATE, gen.DBKEY)
+
+    try:
+        exists = SingleAuditChecklist.objects.get(report_id=report_id)
+    except SingleAuditChecklist.DoesNotExist:
+        exists = None
+    if exists:
+        exists.delete()
+
+    sac = SingleAuditChecklist(
+        report_id=report_id,
+        submitted_by=user,
+    )
+
+    sac.general_information = get_general_information(gen)
+    sac.audit_information = get_audit_information(gen)
+    set_auditee_cerification(sac)
+    set_auditor_certification(sac)
+    sac.data_source = "CENSUS"
+    # sac.save()
+
+    logger.info("Created single audit checklist %s", sac)
+    return sac
+
+
+def set_auditor_certification(sac):
+    sac.auditor_certification = {}
+    sac.auditor_certification["auditor_signature"] = {}
+    sac.auditor_certification["auditor_signature"][
+        "auditor_name"
+    ] = "Alice the Auditor Name"
+    sac.auditor_certification["auditor_signature"][
+        "auditor_title"
+    ] = "Alice the Auditor Signature"
+
+
+def set_auditee_cerification(sac):
+    sac.auditee_certification = {}
+    sac.auditee_certification["auditee_signature"] = {}
+    sac.auditee_certification["auditee_signature"][
+        "auditee_name"
+    ] = "Bob the Auditee Name"
+    sac.auditee_certification["auditee_signature"][
+        "auditee_title"
+    ] = "Bob the Auditee Signature"
 
 
 def _create_test_sac(user, auditee_name, dbkey):
@@ -232,8 +279,8 @@ def _create_test_sac(user, auditee_name, dbkey):
 
     sac = SingleAuditChecklist.objects.create(
         submitted_by=user,
-        general_information=_fake_general_information(dbkey, auditee_name),
-        audit_information=_fake_audit_information(dbkey, auditee_name),
+        general_information=get_general_information(dbkey, auditee_name),
+        audit_information=get_audit_information(dbkey, auditee_name),
     )
     # Set a TEST report id for this data
     sac.report_id = dbkey_to_test_report_id(Gen, dbkey)

@@ -1,3 +1,5 @@
+import traceback
+from audit.models import SingleAuditChecklist
 from users.models import User
 import argparse
 import logging
@@ -10,16 +12,16 @@ import requests
 from pprint import pprint
 from datetime import datetime
 
-from census_historical_migration.workbooklib.workbook_creation import (
+from .workbook_creation import (
     workbook_loader,
     setup_sac,
 )
-from census_historical_migration.workbooklib.workbook_section_handlers import (
+from .workbook_section_handlers import (
     sections_to_handlers,
 )
-from census_historical_migration.workbooklib.sac_creation import _post_upload_pdf
+from .sac_creation import _post_upload_pdf, create_sac
 from audit.intake_to_dissemination import IntakeToDissemination
-
+from ..models import ELECAUDITHEADER as Gen
 from dissemination.models import (
     AdditionalEin,
     AdditionalUei,
@@ -228,3 +230,28 @@ def run_end_to_end(email, dbkey, year):
         logger.info("No user found for %s, have you logged in once?", email)
         return
     generate_workbooks(user, email, dbkey, year)
+
+
+def make_one_submission(result, gen: Gen, user):
+    dbkey, audit_year = gen.DBKEY, gen.AUDITYEAR
+    try:
+        sac: SingleAuditChecklist = create_sac(user, gen)
+        loader = workbook_loader(user, sac, dbkey, audit_year)
+        for section, func in sections_to_handlers.items():
+            (_, json, _) = loader(func, section)
+        # step_through_certifications(sac)
+
+        errors = sac.validate_cross()
+        if errors.get("errors"):
+            # print(errors.get("errors", "No errors found in cross validation"))
+            result["errors"].append(f"{errors.get('errors')}")
+            return
+        sac.save()
+
+        result["success"].append(f"{sac.report_id} created")
+        return sac
+    except Exception as exc:
+        tb = traceback.extract_tb(sys.exc_info()[2])
+        for frame in tb:
+            print(f"{frame.filename}:{frame.lineno} {frame.name}: {frame.line}")
+        result["errors"].append(f"{exc}")

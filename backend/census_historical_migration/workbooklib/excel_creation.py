@@ -1,11 +1,13 @@
 from collections import namedtuple as NT
-from playhouse.shortcuts import model_to_dict
+from django.forms import model_to_dict
 import sys
 
 import logging
 from datetime import date
 from config import settings
 import json
+
+from ..models import ELECAUDITHEADER as Gen, ELECAUDITS as Cfda
 
 logger = logging.getLogger(__name__)
 
@@ -14,6 +16,23 @@ logger = logging.getLogger(__name__)
 # the type of value, so that things can be set correctly
 # before filling in the XLSX workbooks.
 FieldMap = NT("FieldMap", "in_sheet in_db in_dissem default type")
+
+
+def get_upper_mappings(mappings):
+    upper_mappings = []
+    for mapping in mappings:
+        upper_mappings.append(
+            FieldMap(
+                mapping.in_sheet,
+                mapping.in_db.upper(),
+                mapping.in_dissem,
+                mapping.default,
+                mapping.type,
+            )
+        )
+    return upper_mappings
+
+
 WorkbookFieldInDissem = 1000
 
 
@@ -75,14 +94,14 @@ def set_range(wb, range_name, values, default=None, conversion_fun=str):
             pass
 
 
-def set_uei(Gen, wb, dbkey):
-    g = Gen.select().where(Gen.dbkey == dbkey).get()
-    if g.uei:
-        set_single_cell_range(wb, "auditee_uei", g.uei)
+def set_uei(wb, dbkey, year):
+    general = Gen.objects.get(DBKEY=dbkey, AUDITYEAR=year)
+    if general.UEI:
+        set_single_cell_range(wb, "auditee_uei", general.UEI)
     else:
-        g.uei = "BADBADBADBAD"
-        set_single_cell_range(wb, "auditee_uei", g.uei)
-    return g
+        general.UEI = "BADBADBADBAD"
+        set_single_cell_range(wb, "auditee_uei", general.UEI)
+    return general
 
 
 def map_simple_columns(wb, mappings, values):

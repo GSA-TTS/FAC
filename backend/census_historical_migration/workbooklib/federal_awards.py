@@ -1,12 +1,19 @@
-from census_historical_migration.workbooklib.excel_creation import (
+from .excel_creation import (
     FieldMap,
     WorkbookFieldInDissem,
+    get_upper_mappings,
     set_uei,
     set_single_cell_range,
     map_simple_columns,
     generate_dissemination_test_table,
     set_range,
 )
+from ..models import (
+    ELECAUDITHEADER as Gen,
+    ELECAUDITS as Cfda,
+    ELECPASSTHROUGH as Passthrough,
+)
+
 from census_historical_migration.workbooklib.templates import sections_to_template_paths
 from census_historical_migration.workbooklib.census_models.census import dynamic_import
 from audit.fixtures.excel import FORM_SECTIONS
@@ -53,6 +60,7 @@ mappings = [
     FieldMap("number_of_audit_findings", "findingscount", "findings_count", 0, int),
     FieldMap("amount_expended", "amount", WorkbookFieldInDissem, 0, int),
 ]
+mappings = get_upper_mappings(mappings)
 
 
 def get_list_index(all, index):
@@ -143,30 +151,31 @@ def _fix_pfixes(cfdas):
     return (prefixes, extensions, map(lambda v: v.cfda, cfdas))
 
 
-def _fix_passthroughs(Cfda, Passthrough, cfdas, dbkey):
+def _fix_passthroughs(cfdas, dbkey, year):
     passthrough_names = ["" for x in list(range(0, len(cfdas)))]
     passthrough_ids = ["" for x in list(range(0, len(cfdas)))]
-    ls = Cfda.select().where(Cfda.dbkey == dbkey).order_by(Cfda.index)
+    ls = cfdas
     cfda: Cfda
     for cfda in ls:
         pnq = Passthrough()
         if cfda.direct == "Y":
-            pnq.passthroughname = ""
-            pnq.passthroughid = ""
+            pnq.PASSTHROUGHNAME = ""
+            pnq.PASSTHROUGHID = ""
         if cfda.direct == "N":
             try:
-                pnq = (
-                    Passthrough.select().where(
-                        (Passthrough.dbkey == cfda.dbkey)
-                        & (Passthrough.elecauditsid == cfda.elecauditsid)
-                    )
-                ).get()
+                pnq = Passthrough.objects.get(PASSTHROUGHID=cfda.ELECAUDITSID)
+                # (
+                # Passthrough.select().where(
+                #     (Passthrough.dbkey == cfda.dbkey)
+                #     & (Passthrough.elecauditsid == cfda.elecauditsid)
+                # )
+                # ).get()
             except Exception as e:
                 print(e)
                 pnq.passthroughname = "EXCEPTIONAL PASSTHROUGH NAME"
                 pnq.passthroughid = "EXCEPTIONAL PASSTHROUGH ID"
 
-        name = pnq.passthroughname
+        name = pnq.PASSTHROUGHID
         if name is None:
             name = ""
         name = name.rstrip()
@@ -177,7 +186,7 @@ def _fix_passthroughs(Cfda, Passthrough, cfdas, dbkey):
         else:
             passthrough_names[get_list_index(cfdas, cfda.index)] = name
 
-        id = pnq.passthroughid
+        id = pnq.PASSTHROUGHID
         if id is None:
             id = ""
         id = id.rstrip()
@@ -193,17 +202,14 @@ def _fix_passthroughs(Cfda, Passthrough, cfdas, dbkey):
 
 def generate_federal_awards(dbkey, year, outfile):
     logger.info(f"--- generate federal awards {dbkey} {year} ---")
-    Gen = dynamic_import("Gen", year)
-    Passthrough = dynamic_import("Passthrough", year)
-    Cfda = dynamic_import("Cfda", year)
     wb = pyxl.load_workbook(
         sections_to_template_paths[FORM_SECTIONS.FEDERAL_AWARDS_EXPENDED]
     )
     # In sheet : in DB
 
-    g = set_uei(Gen, wb, dbkey)
+    general = set_uei(wb, dbkey, year)
 
-    cfdas = Cfda.select().where(Cfda.dbkey == dbkey).order_by(Cfda.index)
+    cfdas = Cfda.objects.filter(DBKEY=dbkey, AUDITYEAR=year)
     map_simple_columns(wb, mappings, cfdas)
 
     # Patch the clusternames. They used to be allowed to enter anything
@@ -302,7 +308,7 @@ def generate_federal_awards(dbkey, year, outfile):
         obj["fields"].append(ocn)
         award_counter += 1
 
-    table["singletons"]["auditee_uei"] = g.uei
+    table["singletons"]["auditee_uei"] = general.uei
     table["singletons"]["total_amount_expended"] = total
 
     return (wb, table)
