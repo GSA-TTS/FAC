@@ -6,10 +6,9 @@ from census_historical_migration.workbooklib.sac_creation import (
     _create_test_sac,
 )
 
-from django.apps import apps
 
 from .utils import get_template_name_for_section
-
+from audit.models import SingleAuditChecklist
 import logging
 
 logger = logging.getLogger(__name__)
@@ -20,7 +19,6 @@ def setup_sac(user, test_name, dbkey):
         logger.error("No user provided to setup_sac")
         return
     logger.info(f"Creating a SAC object for {user}, {test_name}")
-    SingleAuditChecklist = apps.get_model("audit.SingleAuditChecklist")
 
     sac = SingleAuditChecklist.objects.filter(
         submitted_by=user, general_information__auditee_name=test_name
@@ -32,7 +30,7 @@ def setup_sac(user, test_name, dbkey):
     return sac
 
 
-def generate_workbook(workbook_generator, dbkey, year, section):
+def generate_workbook(workbook_generator, sac, dbkey, year, section):
     with MemoryFS() as mem_fs:
         filename = (
             get_template_name_for_section(section)
@@ -41,7 +39,7 @@ def generate_workbook(workbook_generator, dbkey, year, section):
         )
         with mem_fs.openbin(filename, mode="w") as outfile:
             # Generate the workbook object along with the API JSON representation
-            wb, json_data = workbook_generator(dbkey, year, outfile)
+            wb, json_data = workbook_generator(sac, dbkey, year, outfile)
 
         # Re-open the file in read mode to create an Excel file object
         with mem_fs.openbin(filename, mode="r") as outfile:
@@ -53,7 +51,7 @@ def generate_workbook(workbook_generator, dbkey, year, section):
 def workbook_loader(user, sac, dbkey, year):
     def _loader(workbook_generator, section):
         wb, json_data, excel_file, filename = generate_workbook(
-            workbook_generator, dbkey, year, section
+            workbook_generator, sac, dbkey, year, section
         )
 
         if user:

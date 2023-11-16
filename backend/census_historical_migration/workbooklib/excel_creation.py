@@ -7,7 +7,7 @@ from datetime import date
 from config import settings
 import json
 
-from ..models import ELECAUDITHEADER as Gen, ELECAUDITS as Cfda
+from ..models import ELECAUDITHEADER as Gen
 
 logger = logging.getLogger(__name__)
 
@@ -151,21 +151,21 @@ def _census_date_to_datetime(cd):
 
 
 # FIXME: Get the padding/shape right on the report_id
-def dbkey_to_test_report_id(Gen, dbkey):
-    g = Gen.select(Gen.audityear, Gen.fyenddate).where(Gen.dbkey == dbkey).get()
-    # month = g.fyenddate.split('-')[1]
-    # 2022JUN0001000003
-    # We start new audits at 1 million.
-    # So, we want 10 digits, and zero-pad for
-    # historic DBKEY report_ids
-    dt = _census_date_to_datetime(g.fyenddate)
-    return f"{g.audityear}-{dt.month:02}-TSTDAT-{dbkey.zfill(10)}"
+# def dbkey_to_test_report_id(Gen, dbkey):
+#     g = Gen.select(Gen.audityear, Gen.fyenddate).where(Gen.dbkey == dbkey).get()
+#     # month = g.fyenddate.split('-')[1]
+#     # 2022JUN0001000003
+#     # We start new audits at 1 million.
+#     # So, we want 10 digits, and zero-pad for
+#     # historic DBKEY report_ids
+#     dt = _census_date_to_datetime(g.fyenddate)
+#     return f"{g.audityear}-{dt.month:02}-TSTDAT-{dbkey.zfill(10)}"
 
 
-def generate_dissemination_test_table(Gen, api_endpoint, dbkey, mappings, objects):
+def generate_dissemination_test_table(report_id, api_endpoint, mappings, objects):
     table = {"rows": list(), "singletons": dict()}
     table["endpoint"] = api_endpoint
-    table["report_id"] = dbkey_to_test_report_id(Gen, dbkey)
+    table["report_id"] = report_id
     for o in objects:
         as_dict = model_to_dict(o)
         test_obj = {}

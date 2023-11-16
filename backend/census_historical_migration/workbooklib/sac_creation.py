@@ -24,7 +24,7 @@ from audit.intakelib import (
 import audit.validators
 
 from audit.fixtures.excel import FORM_SECTIONS
-from audit.models import SingleAuditChecklist
+from audit.models import SingleAuditChecklist, ExcelFile
 from .transformers import clean_gen, make_report_id, str_to_date
 from ..models import (
     ELECAUDITHEADER as Gen,
@@ -266,12 +266,10 @@ def set_auditee_cerification(sac):
 
 def _create_test_sac(user, auditee_name, dbkey):
     """Create a single example SAC."""
-    SingleAuditChecklist = apps.get_model("audit.SingleAuditChecklist")
+    report_id = make_report_id("2022", "04/01/2022", dbkey)
 
     try:
-        exists = SingleAuditChecklist.objects.get(
-            report_id=dbkey_to_test_report_id(Gen, dbkey)
-        )
+        exists = SingleAuditChecklist.objects.get(report_id=report_id)
     except SingleAuditChecklist.DoesNotExist:
         exists = None
     if exists:
@@ -283,7 +281,7 @@ def _create_test_sac(user, auditee_name, dbkey):
         audit_information=get_audit_information(dbkey, auditee_name),
     )
     # Set a TEST report id for this data
-    sac.report_id = dbkey_to_test_report_id(Gen, dbkey)
+    sac.report_id = report_id
 
     Access = apps.get_model("audit.Access")
     Access.objects.create(
@@ -388,7 +386,6 @@ def _post_upload_workbook(this_sac, this_user, section, xlsx_file):
     This should be idempotent if it is called on a SAC that already
     has a federal awards file uploaded.
     """
-    ExcelFile = apps.get_model("audit.ExcelFile")
 
     if (
         ExcelFile.objects.filter(sac_id=this_sac.id, form_section=section).exists()
@@ -405,8 +402,8 @@ def _post_upload_workbook(this_sac, this_user, section, xlsx_file):
         sac_id=this_sac.id,
         form_section=section,
     )
-    excel_file.full_clean()
-    excel_file.save()
+    # excel_file.full_clean()
+    # excel_file.save()
 
     audit_data = extract_mapping[section](excel_file.file)
     validator_mapping[section](audit_data)

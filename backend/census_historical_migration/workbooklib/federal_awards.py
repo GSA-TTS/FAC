@@ -9,13 +9,12 @@ from .excel_creation import (
     set_range,
 )
 from ..models import (
-    ELECAUDITHEADER as Gen,
     ELECAUDITS as Cfda,
     ELECPASSTHROUGH as Passthrough,
 )
 
 from .templates import sections_to_template_paths
-from .transformers import normalize_addl_award_id, normalize_number
+from .transformers import clean_cfda, normalize_addl_award_id, normalize_number
 
 # from census_historical_migration.workbooklib.census_models.census import dynamic_import
 from audit.fixtures.excel import FORM_SECTIONS
@@ -208,7 +207,7 @@ def _fix_passthroughs(cfdas):
     return (passthrough_names, passthrough_ids)
 
 
-def generate_federal_awards(dbkey, year, outfile):
+def generate_federal_awards(sac, dbkey, year, outfile):
     logger.info(f"--- generate federal awards {dbkey} {year} ---")
     wb = pyxl.load_workbook(
         sections_to_template_paths[FORM_SECTIONS.FEDERAL_AWARDS_EXPENDED]
@@ -218,6 +217,9 @@ def generate_federal_awards(dbkey, year, outfile):
     general = set_uei(wb, dbkey, year)
 
     cfdas = Cfda.objects.filter(DBKEY=dbkey, AUDITYEAR=year)
+    cfda: Cfda
+    for cfda in cfdas:
+        clean_cfda(cfda)
     map_simple_columns(wb, mappings, cfdas)
 
     # Patch the clusternames. They used to be allowed to enter anything
@@ -291,7 +293,7 @@ def generate_federal_awards(dbkey, year, outfile):
     wb.save(outfile)
 
     table = generate_dissemination_test_table(
-        Gen, "federal_awards", dbkey, mappings, cfdas
+        sac.report_id, "federal_awards", mappings, cfdas
     )
     award_counter = 1
     # prefix
@@ -313,7 +315,7 @@ def generate_federal_awards(dbkey, year, outfile):
         obj["fields"].append(ocn)
         award_counter += 1
 
-    table["singletons"]["auditee_uei"] = general.uei
+    table["singletons"]["auditee_uei"] = general.UEI
     table["singletons"]["total_amount_expended"] = total
 
     return (wb, table)
