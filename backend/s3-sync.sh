@@ -24,8 +24,12 @@ export BACKUPS_BUCKET="$(echo "$FACBACKUPS"|jq -r '.bucket')"
 date=$(date +%Y%m%d%H%M)
 
 # Grab the s3 tar binary
-curl -L "https://github.com/awslabs/amazon-s3-tar-tool/releases/download/v1.0.14/s3tar-linux-amd64.zip" -o "s3tar-linux-amd64.zip"
+# objects.githubusercontent.com needs to be added to the proxy allow list
+curl -x $https_proxy -L "https://github.com/awslabs/amazon-s3-tar-tool/releases/download/v1.0.14/s3tar-linux-amd64.zip" -o "s3tar-linux-amd64.zip"
 unzip s3tar-linux-amd64.zip && rm s3tar-linux-amd64.zip
+
+# Unset the proxy so that s3tar-tool and aws-cli can function. Without doing this, none of the subsequent commands will work
+unset https_proxy
 
 # Create a single tar in the source bucket
 ./s3tar-linux-amd64 --region $AWS_DEFAULT_REGION -cvf s3://${FAC_MEDIA_BUCKET}/mediabackups/$date/archive.tar s3://${FAC_MEDIA_BUCKET} --storage-class INTELLIGENT_TIERING
