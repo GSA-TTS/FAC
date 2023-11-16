@@ -1,4 +1,4 @@
-from census_historical_migration.workbooklib.excel_creation import (
+from census_historical_migration.workbooklib.excel_creation_utils import (
     set_uei,
     map_simple_columns,
     generate_dissemination_test_table,
