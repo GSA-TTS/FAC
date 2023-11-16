@@ -1,6 +1,5 @@
 from census_historical_migration.workbooklib.excel_creation import (
     set_uei,
-    set_single_cell_range,
     map_simple_columns,
     generate_dissemination_test_table,
     set_range,
@@ -268,7 +267,7 @@ def generate_federal_awards(dbkey, year, outfile):
     total = 0
     for cfda in cfdas:
         total += int(cfda.amount)
-    set_single_cell_range(wb, "total_amount_expended", total)
+    set_range(wb, "total_amount_expended", [total])
 
     loansatend = list()
     for ndx, cfda in enumerate(
