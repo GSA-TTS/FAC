@@ -20,7 +20,7 @@ class Permission(models.Model):
 
 class UserPermission(models.Model):
     email = models.EmailField()
-    user = models.ForeignKey(User, null=True, on_delete=models.PROTECT)
+    user = models.ForeignKey(User, null=True, blank=True, on_delete=models.PROTECT)
     permission = models.ForeignKey(Permission, on_delete=models.PROTECT)
 
     class Meta:

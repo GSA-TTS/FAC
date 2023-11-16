@@ -1,7 +1,5 @@
 from django.contrib import admin
 from django.contrib.auth import get_user_model
-from django.urls import reverse
-from django.utils.html import format_html
 
 from .models import Permission, StaffUser, StaffUserLog, UserPermission, UserProfile
 from .permissions import can_read_tribal as _can_read_tribal
@@ -29,13 +27,7 @@ class UserAdmin(admin.ModelAdmin):
 
 @admin.register(UserPermission)
 class UserPermissionAdmin(admin.ModelAdmin):
-    list_display = ["user_link", "permission"]
-
-    def user_link(self, obj):
-        link = reverse("admin:auth_user_change", args=[obj.user_id])
-        return format_html("<a href='{}'>{}</a>", link, obj.user.email)
-
-    user_link.short_description = "User"  # type: ignore
+    list_display = ["user", "email", "permission"]
 
 
 @admin.register(StaffUserLog)
