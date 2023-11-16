@@ -17,20 +17,6 @@ FieldMap = NT("FieldMap", "in_sheet in_db in_dissem default type")
 WorkbookFieldInDissem = 1000
 
 
-def set_single_cell_range(wb, range_name, value):
-    the_range = wb.defined_names[range_name]
-    # The above returns a generator. Turn it to a list, and grab
-    # the first element of the list. Now, this *tuple* contains a
-    # sheet name and a cell reference... which you need to get rid
-    # of the '$' to use.
-    # https://itecnote.com/tecnote/python-using-excel-named-ranges-in-python-with-openpyxl/
-    tup = list(the_range.destinations)[0]
-    sheet_title = tup[0]
-    cell_ref = tup[1].replace("$", "")
-    ws = wb[sheet_title]
-    ws[cell_ref] = value
-
-
 # A tiny helper to index into workbooks.
 # Assumes a capital letter.
 def col_to_ndx(col):
@@ -78,10 +64,10 @@ def set_range(wb, range_name, values, default=None, conversion_fun=str):
 def set_uei(Gen, wb, dbkey):
     g = Gen.select().where(Gen.dbkey == dbkey).get()
     if g.uei:
-        set_single_cell_range(wb, "auditee_uei", g.uei)
+        set_range(wb, "auditee_uei", [g.uei])
     else:
         g.uei = "BADBADBADBAD"
-        set_single_cell_range(wb, "auditee_uei", g.uei)
+        set_range(wb, "auditee_uei", [g.uei])
     return g
 
 
