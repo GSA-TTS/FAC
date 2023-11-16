@@ -14,8 +14,10 @@ from ..models import (
     ELECPASSTHROUGH as Passthrough,
 )
 
-from census_historical_migration.workbooklib.templates import sections_to_template_paths
-from census_historical_migration.workbooklib.census_models.census import dynamic_import
+from .templates import sections_to_template_paths
+from .transformers import normalize_addl_award_id, normalize_number
+
+# from census_historical_migration.workbooklib.census_models.census import dynamic_import
 from audit.fixtures.excel import FORM_SECTIONS
 from config import settings
 
@@ -44,7 +46,11 @@ mappings = [
     FieldMap("cluster_total", "clustertotal", WorkbookFieldInDissem, 0, int),
     FieldMap("is_guaranteed", "loans", "is_loan", None, str),
     FieldMap(
-        "loan_balance_at_audit_period_end", "loanbalance", "loan_balance", None, int
+        "loan_balance_at_audit_period_end",
+        "loanbalance",
+        "loan_balance",
+        None,
+        normalize_number,
     ),
     FieldMap("is_direct", "direct", WorkbookFieldInDissem, None, str),
     FieldMap("is_passed", "passthroughaward", "is_passthrough_award", None, str),
@@ -82,86 +88,93 @@ def int_or_na(o):
         return "N/A"
 
 
-def _generate_cluster_names(Cfda, cfdas, valid_json):
+def _generate_cluster_names(cfdas, valid_json):
     cluster_names = []
     state_cluster_names = []
     other_cluster_names = []
     cfda: Cfda
     for cfda in cfdas:
-        if cfda.clustername is None:
+        if cfda.CLUSTERNAME is None:
             cluster_names.append("N/A")
             other_cluster_names.append("")
             state_cluster_names.append("")
-        elif cfda.clustername == "STATE CLUSTER":
-            cluster_names.append(cfda.clustername)
-            state_cluster_names.append(cfda.stateclustername)
+        elif cfda.CLUSTERNAME == "STATE CLUSTER":
+            cluster_names.append(cfda.CLUSTERNAME)
+            state_cluster_names.append(cfda.STATECLUSTERNAME)
             other_cluster_names.append("")
-        elif cfda.clustername == "OTHER CLUSTER NOT LISTED ABOVE":
-            cluster_names.append(cfda.clustername)
-            other_cluster_names.append(cfda.otherclustername)
+        elif cfda.CLUSTERNAME == "OTHER CLUSTER NOT LISTED ABOVE":
+            cluster_names.append(cfda.CLUSTERNAME)
+            other_cluster_names.append(cfda.OTHERCLUSTERNAME)
             state_cluster_names.append("")
-        elif cfda.clustername in valid_json["cluster_names"]:
-            cluster_names.append(cfda.clustername)
+        elif cfda.CLUSTERNAME in valid_json["cluster_names"]:
+            cluster_names.append(cfda.CLUSTERNAME)
             other_cluster_names.append("")
             state_cluster_names.append("")
         else:
-            logger.debug(f"Cluster {cfda.clustername} not in the list. Replacing.")
+            logger.debug(f"Cluster {cfda.CLUSTERNAME} not in the list. Replacing.")
             cluster_names.append("OTHER CLUSTER NOT LISTED ABOVE")
-            other_cluster_names.append(f"{cfda.clustername}")
+            other_cluster_names.append(f"{cfda.CLUSTERNAME}")
             state_cluster_names.append("")
     return (cluster_names, other_cluster_names, state_cluster_names)
 
 
-def _fix_addl_award_identification(Cfda, cfdas, dbkey):
+def _fix_addl_award_identification(cfdas):
     addls = ["" for x in list(range(0, len(cfdas)))]
-    for cfda in (
-        Cfda.select()
-        .where(
-            (Cfda.dbkey == dbkey)
-            & (
-                (Cfda.cfda % "%U%")
-                | (Cfda.cfda % "%u%")
-                | (Cfda.cfda % "%rd%")
-                | (Cfda.cfda % "%RD%")
-            )
+    cfda: Cfda
+    for cfda in cfdas:
+        award_id = normalize_addl_award_id(
+            cfda.AWARDIDENTIFICATION, cfda.CFDA, cfda.DBKEY
         )
-        .order_by(Cfda.index)
-    ):
-        if cfda.awardidentification is None or len(cfda.awardidentification) < 1:
-            addls[
-                get_list_index(cfdas, cfda.index)
-            ] = f"ADDITIONAL AWARD INFO - DBKEY {dbkey}"
-        else:
-            addls[get_list_index(cfdas, cfda.index)] = cfda.awardidentification
+        addls.append(award_id)
+
+    # (
+    #     Cfda.select()
+    #     .where(
+    #         (Cfda.dbkey == dbkey)
+    #         & (
+    #             (Cfda.cfda % "%U%")
+    #             | (Cfda.cfda % "%u%")
+    #             | (Cfda.cfda % "%rd%")
+    #             | (Cfda.cfda % "%RD%")
+    #         )
+    #     )
+    #     .order_by(Cfda.index)
+    # ):
+    #     if cfda.awardidentification is None or len(cfda.awardidentification) < 1:
+    #         addls[
+    #             get_list_index(cfdas, cfda.index)
+    #         ] = f"ADDITIONAL AWARD INFO - DBKEY {dbkey}"
+    #     else:
+    #         addls[get_list_index(cfdas, cfda.index)] = cfda.awardidentification
     return addls
 
 
 def _fix_pfixes(cfdas):
     # Map things with transformations
-    prefixes = map(lambda v: (v.cfda).split(".")[0], cfdas)
+    prefixes = map(lambda v: (v.CFDA).split(".")[0], cfdas)
     # prefixes = map(lambda v: f'0{v}' if int(v) < 10 else v, prefixes)
     # Truncate any nastiness in the CFDA extensions to three characters.
-    extensions = map(lambda v: ((v.cfda).split(".")[1])[:3].upper(), cfdas)
+    extensions = map(lambda v: ((v.CFDA).split(".")[1])[:3].upper(), cfdas)
     extensions = map(
         lambda v: v
         if re.search("^(RD|RD[0-9]|[0-9]{3}[A-Za-z]{0,1}|U[0-9]{2})$", v)
         else "000",
         extensions,
     )
-    return (prefixes, extensions, map(lambda v: v.cfda, cfdas))
+    return (prefixes, extensions, map(lambda v: v.CFDA, cfdas))
 
 
-def _fix_passthroughs(cfdas, dbkey, year):
+def _fix_passthroughs(cfdas):
     passthrough_names = ["" for x in list(range(0, len(cfdas)))]
     passthrough_ids = ["" for x in list(range(0, len(cfdas)))]
     ls = cfdas
     cfda: Cfda
     for cfda in ls:
         pnq = Passthrough()
-        if cfda.direct == "Y":
+        if cfda.DIRECT == "Y":
             pnq.PASSTHROUGHNAME = ""
             pnq.PASSTHROUGHID = ""
-        if cfda.direct == "N":
+        if cfda.DIRECT == "N":
             try:
                 pnq = Passthrough.objects.get(PASSTHROUGHID=cfda.ELECAUDITSID)
                 # (
@@ -179,24 +192,19 @@ def _fix_passthroughs(cfdas, dbkey, year):
         if name is None:
             name = ""
         name = name.rstrip()
-        if name == "" and cfda.direct == "N":
-            passthrough_names[
-                get_list_index(cfdas, cfda.index)
-            ] = "NO PASSTHROUGH NAME PROVIDED"
-        else:
-            passthrough_names[get_list_index(cfdas, cfda.index)] = name
+        if name == "" and cfda.DIRECT == "N":
+            name = "NO PASSTHROUGH NAME PROVIDED"
 
-        id = pnq.PASSTHROUGHID
-        if id is None:
-            id = ""
-        id = id.rstrip()
-        if id == "" and cfda.direct == "N":
-            passthrough_ids[
-                get_list_index(cfdas, cfda.index)
-            ] = "NO PASSTHROUGH ID PROVIDED"
-        else:
-            passthrough_ids[get_list_index(cfdas, cfda.index)] = pnq.passthroughid
+        passthrough_names.append(name)
 
+        _id = pnq.PASSTHROUGHID
+        if _id is None:
+            _id = ""
+        _id = _id.rstrip()
+        if _id == "" and cfda.DIRECT == "N":
+            _id = "NO PASSTHROUGH ID PROVIDED"
+
+        passthrough_ids.append(_id)
     return (passthrough_names, passthrough_ids)
 
 
@@ -218,14 +226,14 @@ def generate_federal_awards(dbkey, year, outfile):
     valid_json = json.load(valid_file)
 
     (cluster_names, other_cluster_names, state_cluster_names) = _generate_cluster_names(
-        Cfda, cfdas, valid_json
+        cfdas, valid_json
     )
     set_range(wb, "cluster_name", cluster_names)
     set_range(wb, "other_cluster_name", other_cluster_names)
 
     # Fix the additional award identification. If they had a "U", we want
     # to see something in the addl. column.
-    addls = _fix_addl_award_identification(Cfda, cfdas, dbkey)
+    addls = _fix_addl_award_identification(cfdas)
     set_range(wb, "additional_award_identification", addls)
 
     (prefixes, extensions, full_cfdas) = _fix_pfixes(cfdas)
@@ -249,9 +257,7 @@ def generate_federal_awards(dbkey, year, outfile):
         conversion_fun=str,
     )
 
-    (passthrough_names, passthrough_ids) = _fix_passthroughs(
-        Cfda, Passthrough, cfdas, dbkey
-    )
+    (passthrough_names, passthrough_ids) = _fix_passthroughs(cfdas)
     set_range(wb, "passthrough_name", passthrough_names)
     set_range(wb, "passthrough_identifying_number", passthrough_ids)
 
@@ -265,19 +271,18 @@ def generate_federal_awards(dbkey, year, outfile):
     # Total amount expended must be calculated and inserted
     total = 0
     for cfda in cfdas:
-        total += int(cfda.amount)
+        total += int(cfda.AMOUNT)
     set_single_cell_range(wb, "total_amount_expended", total)
 
     loansatend = list()
-    for ndx, cfda in enumerate(
-        Cfda.select().where((Cfda.dbkey == dbkey)).order_by(Cfda.index)
-    ):
-        if cfda.loans == "Y":
-            if cfda.loanbalance is None:
+    for cfda in cfdas:
+        if cfda.LOANS == "Y":
+            if cfda.LOANBALANCE is None:
                 # loansatend.append("N/A")
-                loansatend.append(1)
+                # loansatend.append(1)
+                loansatend.append(0)
             else:
-                loansatend.append(cfda.loanbalance)
+                loansatend.append(cfda.LOANBALANCE)
         else:
             loansatend.append("")
     # set_range(wb, "loan_balance_at_audit_period_end", loansatend, type=int_or_na)
