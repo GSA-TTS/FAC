@@ -11,7 +11,6 @@ from census_historical_migration.workbooklib.census_models.census import (
     CensusGen22 as Gen,
 )
 
-from collections import namedtuple as NT
 from playhouse.shortcuts import model_to_dict
 from django.core.management.base import BaseCommand
 
@@ -30,12 +29,6 @@ parser = argparse.ArgumentParser()
 logger = logging.getLogger(__name__)
 logging.basicConfig()
 logging.getLogger().setLevel(logging.INFO)
-
-
-# A tiny helper to index into workbooks.
-# Assumes a capital letter.
-def col_to_ndx(col):
-    return ord(col) - 65 + 1
 
 
 def set_uei(wb, dbkey):

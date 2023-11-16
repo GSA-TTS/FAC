@@ -2,20 +2,16 @@ from census_historical_migration.base_field_maps import WorkbookFieldInDissem
 from census_historical_migration.sac_general_lib.report_id_generator import (
     dbkey_to_report_id,
 )
+from openpyxl.utils.cell import column_index_from_string
 from playhouse.shortcuts import model_to_dict
-import sys
 
-import logging
 from config import settings
+import sys
+import logging
 import json
 
+
 logger = logging.getLogger(__name__)
-
-
-# A tiny helper to index into workbooks.
-# Assumes a capital letter.
-def col_to_ndx(col):
-    return ord(col) - 65 + 1
 
 
 # Helper to set a range of values.
@@ -28,7 +24,7 @@ def set_range(wb, range_name, values, default=None, conversion_fun=str):
     ws = wb[sheet_title]
 
     start_cell = dest[1].replace("$", "").split(":")[0]
-    col = col_to_ndx(start_cell[0])
+    col = column_index_from_string(start_cell[0])
     start_row = int(start_cell[1])
 
     for ndx, v in enumerate(values):
