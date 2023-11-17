@@ -3,16 +3,16 @@ import logging
 from django.apps import apps
 
 from census_historical_migration.sac_general_lib.general_information import (
-    general_information,
+    _general_information,
 )
 from census_historical_migration.sac_general_lib.audit_information import (
-    audit_information,
+    _audit_information,
 )
 from census_historical_migration.sac_general_lib.auditee_certification import (
-    auditee_certification,
+    _auditee_certification,
 )
 from census_historical_migration.sac_general_lib.auditor_certification import (
-    auditor_certification,
+    _auditor_certification,
 )
 from census_historical_migration.sac_general_lib.report_id_generator import (
     dbkey_to_report_id,
@@ -38,8 +38,8 @@ def _create_sac(user, dbkey):
 
     sac = SingleAuditChecklist.objects.create(
         submitted_by=user,
-        general_information=general_information(dbkey),
-        audit_information=audit_information(dbkey),
+        general_information=_general_information(dbkey),
+        audit_information=_audit_information(dbkey),
     )
 
     sac.report_id = generated_report_id
@@ -66,8 +66,8 @@ def _create_sac(user, dbkey):
         role="certifying_auditor_contact",
     )
 
-    sac.auditee_certification = auditee_certification(dbkey)
-    sac.auditor_certification = auditor_certification(dbkey)
+    sac.auditee_certification = _auditee_certification(dbkey)
+    sac.auditor_certification = _auditor_certification(dbkey)
     sac.data_source = "CENSUS"  # FIXME - Confirm this is the right value?
     sac.save()
 

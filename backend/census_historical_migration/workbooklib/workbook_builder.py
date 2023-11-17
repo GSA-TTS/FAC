@@ -1,11 +1,9 @@
 from django.core.files.uploadedfile import SimpleUploadedFile
 from fs.memoryfs import MemoryFS
 
-from census_historical_migration.workbooklib.sac_creation import (
-    _post_upload_workbook,
+from census_historical_migration.workbooklib.excel_creation_utils import (
+    get_template_name_for_section,
 )
-
-from .utils import get_template_name_for_section
 
 import logging
 
@@ -20,7 +18,13 @@ def _make_excel_file(filename, f_obj):
 
 
 def generate_workbook(workbook_generator, dbkey, year, section):
+    """
+    Generates a workbook in memory using the workbook_generator for a specific
+    'dbkey', 'year', and 'section'. Returns the workbook object, its JSON data representation,
+    the Excel file as a SimpleUploadedFile object, and the filename.
+    """
     with MemoryFS() as mem_fs:
+        # Define the filename based on the section template name and dbkey
         filename = (
             get_template_name_for_section(section)
             .replace(".xlsx", "-{}.xlsx")
@@ -35,17 +39,3 @@ def generate_workbook(workbook_generator, dbkey, year, section):
             excel_file = _make_excel_file(filename, outfile)
 
         return wb, json_data, excel_file, filename
-
-
-def workbook_loader(user, sac, dbkey, year):
-    def _loader(workbook_generator, section):
-        wb, json_data, excel_file, filename = generate_workbook(
-            workbook_generator, dbkey, year, section
-        )
-
-        if user:
-            _post_upload_workbook(sac, user, section, excel_file)
-
-        return wb, json_data, filename
-
-    return _loader

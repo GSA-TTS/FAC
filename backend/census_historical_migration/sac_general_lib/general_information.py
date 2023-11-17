@@ -3,12 +3,12 @@ from datetime import date, timedelta
 from census_historical_migration.workbooklib.census_models.census import (
     CensusGen22 as Gen,
 )
-from census_historical_migration.workbooklib.excel_creation_utils import (
+from census_historical_migration.sac_general_lib.utils import (
     _census_date_to_datetime,
 )
 from census_historical_migration.base_field_maps import FormFieldMap, FormFieldInDissem
 from census_historical_migration.sac_general_lib.utils import (
-    create_json_from_db_object,
+    _create_json_from_db_object,
     _boolean_field,
 )
 
@@ -119,10 +119,10 @@ def _xform_secondary_auditors_exist(gen):
     return _boolean_field(gen, "secondary_auditors_exist")
 
 
-def general_information(dbkey):
+def _general_information(dbkey):
     gobj: Gen = Gen.select().where(Gen.dbkey == dbkey).first()
 
-    general_information = create_json_from_db_object(gobj, mappings)
+    general_information = _create_json_from_db_object(gobj, mappings)
 
     # List of transformation functions
     transformations = [

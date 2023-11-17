@@ -4,7 +4,7 @@ from census_historical_migration.workbooklib.census_models.census import (
 )
 from census_historical_migration.base_field_maps import FormFieldMap, FormFieldInDissem
 from census_historical_migration.sac_general_lib.utils import (
-    create_json_from_db_object,
+    _create_json_from_db_object,
 )
 
 # FIXME: Do we need this ?
@@ -29,13 +29,13 @@ auditee_signature_mappings = [
 ]
 
 
-def auditee_certification(dbkey):
+def _auditee_certification(dbkey):
     gobj: Gen = Gen.select().where(Gen.dbkey == dbkey).first()
     certification = {}
-    # certification["auditee_certification"] = create_json_from_db_object(
+    # certification["auditee_certification"] = _create_json_from_db_object(
     #     gobj, auditee_certification_mappings
     # )
-    certification["auditee_signature"] = create_json_from_db_object(
+    certification["auditee_signature"] = _create_json_from_db_object(
         gobj, auditee_signature_mappings
     )
     # FIXME: Do we need this ?

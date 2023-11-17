@@ -4,7 +4,9 @@ from census_historical_migration.workbooklib.census_models.census import (
     CensusFindings22 as Finding,
 )
 from census_historical_migration.base_field_maps import FormFieldMap, FormFieldInDissem
-from census_historical_migration.sac_general_lib.utils import create_json_from_db_object
+from census_historical_migration.sac_general_lib.utils import (
+    _create_json_from_db_object,
+)
 import audit.validators
 
 DOLLAR_THRESHOLD = 750000
@@ -119,12 +121,12 @@ def _build_initial_audit_information(dbkey):
     gaap_results = _get_gaap_results(dbkey)
     agencies_prefixes = _get_agency_prefixes(dbkey)
     gobj: Gen = Gen.select().where(Gen.dbkey == dbkey).first()
-    audit_information = create_json_from_db_object(gobj, mappings)
+    audit_information = _create_json_from_db_object(gobj, mappings)
     audit_information = audit_information["gaap_results"].append(gaap_results)
     audit_information = audit_information["agencies"].append(agencies_prefixes)
 
 
-def audit_information(dbkey):
+def _audit_information(dbkey):
     audit_information = _build_initial_audit_information(dbkey)
 
     # List of transformation functions

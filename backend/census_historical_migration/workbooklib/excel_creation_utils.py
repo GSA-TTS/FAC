@@ -2,6 +2,8 @@ from census_historical_migration.base_field_maps import WorkbookFieldInDissem
 from census_historical_migration.sac_general_lib.report_id_generator import (
     dbkey_to_report_id,
 )
+from census_historical_migration.workbooklib.templates import sections_to_template_paths
+
 from openpyxl.utils.cell import column_index_from_string
 from playhouse.shortcuts import model_to_dict
 
@@ -55,7 +57,7 @@ def set_uei(Gen, wb, dbkey):
     if g.uei:
         set_range(wb, "auditee_uei", [g.uei])
     else:
-        g.uei = "BADBADBADBAD"
+        g.uei = "BADBADBADBAD"  # FIXME: Shouldn't this raise an exception here?
         set_range(wb, "auditee_uei", [g.uei])
     return g
 
@@ -94,6 +96,17 @@ def add_hyphen_to_zip(zip):
     else:
         logger.info("ZIP IS MALFORMED IN WORKBOOKS E2E / SAC_CREATION")
         return strzip
+
+
+def get_template_name_for_section(section):
+    """
+    Return a workbook template name corresponding to the given section
+    """
+    if section in sections_to_template_paths:
+        template_name = sections_to_template_paths[section].name
+        return template_name
+    else:
+        raise ValueError(f"Unknown section {section}")
 
 
 def generate_dissemination_test_table(Gen, api_endpoint, dbkey, mappings, objects):

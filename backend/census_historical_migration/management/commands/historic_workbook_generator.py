@@ -1,17 +1,9 @@
-from census_historical_migration.workbooklib.excel_creation_utils import (
-    set_range,
-)
-from census_historical_migration.workbooklib.workbook_creation import (
+from census_historical_migration.workbooklib.workbook_builder import (
     generate_workbook,
 )
 from census_historical_migration.workbooklib.workbook_section_handlers import (
     sections_to_handlers,
 )
-from census_historical_migration.workbooklib.census_models.census import (
-    CensusGen22 as Gen,
-)
-
-from playhouse.shortcuts import model_to_dict
 from django.core.management.base import BaseCommand
 
 import os
@@ -29,59 +21,6 @@ parser = argparse.ArgumentParser()
 logger = logging.getLogger(__name__)
 logging.basicConfig()
 logging.getLogger().setLevel(logging.INFO)
-
-
-def set_uei(wb, dbkey):
-    g = Gen.select().where(Gen.dbkey == dbkey).get()
-    set_range(wb, "auditee_uei", [g.uei])
-    return g
-
-
-def map_simple_columns(wb, mappings, values):
-    # Map all the simple ones
-    for m in mappings:
-        set_range(
-            wb,
-            m.in_sheet,
-            map(lambda v: model_to_dict(v)[m.in_db], values),
-            m.default,
-            m.type,
-        )
-
-
-# FIXME: Get the padding/shape right on the report_id
-def dbkey_to_test_report_id(dbkey):
-    g = Gen.select(Gen.audityear, Gen.fyenddate).where(Gen.dbkey == dbkey).get()
-    # month = g.fyenddate.split('-')[1]
-    # 2022JUN0001000003
-    # We start new audits at 1 million.
-    # So, we want 10 digits, and zero-pad for
-    # historic DBKEY report_ids
-    return f"{g.audityear}-TEST-{dbkey.zfill(7)}"
-
-
-def generate_dissemination_test_table(api_endpoint, dbkey, mappings, objects):
-    table = {"rows": list(), "singletons": dict()}
-    table["endpoint"] = api_endpoint
-    table["report_id"] = dbkey_to_test_report_id(dbkey)
-    for o in objects:
-        as_dict = model_to_dict(o)
-        test_obj = {}
-        test_obj["fields"] = []
-        test_obj["values"] = []
-        for m in mappings:
-            # What if we only test non-null values?
-            if ((m.in_db in as_dict) and as_dict[m.in_db] is not None) and (
-                as_dict[m.in_db] != ""
-            ):
-                test_obj["fields"].append(m.in_sheet)
-                test_obj["values"].append(as_dict[m.in_db])
-        table["rows"].append(test_obj)
-    return table
-
-
-def make_file(dir, dbkey, slug):
-    return open(os.path.join(dir, f"{slug}-{dbkey}.xlsx"))
 
 
 class Command(BaseCommand):

@@ -10,14 +10,14 @@ import requests
 from pprint import pprint
 from datetime import datetime
 
-from census_historical_migration.workbooklib.workbook_creation import (
-    workbook_loader,
+from census_historical_migration.workbooklib.workbook_builder_loader import (
+    workbook_builder_loader,
 )
 from census_historical_migration.sac_general_lib.sac_creator import setup_sac
 from census_historical_migration.workbooklib.workbook_section_handlers import (
     sections_to_handlers,
 )
-from census_historical_migration.workbooklib.sac_creation import _post_upload_pdf
+from census_historical_migration.workbooklib.post_upload_utils import _post_upload_pdf
 from audit.intake_to_dissemination import IntakeToDissemination
 
 from dissemination.models import (
@@ -191,7 +191,7 @@ def api_check(json_test_tables):
     return combined_summary
 
 
-def generate_workbooks(user, email, dbkey, year):
+def generate_workbooks(user, dbkey, year):
     entity_id = "DBKEY {dbkey} {year} {date:%Y_%m_%d_%H_%M_%S}".format(
         dbkey=dbkey, year=year, date=datetime.now()
     )
@@ -199,11 +199,11 @@ def generate_workbooks(user, email, dbkey, year):
     if sac.general_information["audit_type"] == "alternative-compliance-engagement":
         print(f"Skipping ACE audit: {dbkey}")
     else:
-        loader = workbook_loader(user, sac, dbkey, year)
+        builder_loader = workbook_builder_loader(user, sac, dbkey, year)
         json_test_tables = []
         for section, fun in sections_to_handlers.items():
             # FIXME: Can we conditionally upload the addl' and secondary workbooks?
-            (_, json, _) = loader(fun, section)
+            (_, json, _) = builder_loader(fun, section)
             json_test_tables.append(json)
         _post_upload_pdf(sac, user, "audit/fixtures/basic.pdf")
         step_through_certifications(sac)
@@ -227,4 +227,4 @@ def run_end_to_end(email, dbkey, year):
     except User.DoesNotExist:
         logger.info("No user found for %s, have you logged in once?", email)
         return
-    generate_workbooks(user, email, dbkey, year)
+    generate_workbooks(user, dbkey, year)
