@@ -6,7 +6,7 @@ from django.conf import settings
 from ..models import ELECAUDITHEADER as Gen, ELECAUDITS as Cfda
 
 
-def get_cpacpuntry(country: str):
+def get_cpacosuntry(country: str):
     if country.upper() in ["", "US", "USA"]:
         cpacountry = "USA"
     else:
@@ -130,17 +130,17 @@ def normalize_loan_balance(lb: str, is_loan: str):
     return ""
 
 
-def set_extra_cfda_attrinute(name, value):
+def set_extra_cfda_attribute(name, value):
     cfda_extra[name].append(value)
 
 
-def get_extra_cfda_attrinutes(name):
+def get_extra_cfda_attributes(name):
     return cfda_extra[name]
 
 
 def clean_gen(gen: Gen):
     gen.ENTITY_TYPE = normalize_entity_type(gen.ENTITY_TYPE)
-    gen.CPACOUNTRY = get_cpacpuntry(gen.CPACOUNTRY)
+    gen.CPACOUNTRY = get_cpacountry(gen.CPACOUNTRY)
     gen.UEI = gen.UEI or "BADBADBADBAD"
     gen.FYSTARTDATE = format_date(gen.FYSTARTDATE)
     gen.FYENDDATE = format_date(gen.FYENDDATE)
@@ -151,11 +151,11 @@ def clean_cfda(cfda: Cfda):
     cfda.AMOUNT = normalize_number(cfda.AMOUNT)
     cfda.FINDINGSCOUNT = normalize_number(cfda.FINDINGSCOUNT)
     cluster_name = normalize_cluster_name(cfda.CLUSTERNAME)
-    set_extra_cfda_attrinute("cluster_names", cluster_name)
+    set_extra_cfda_attribute("cluster_names", cluster_name)
     other_cluster_name = derive_other_cluster_name(cfda.CLUSTERNAME, cluster_name)
-    set_extra_cfda_attrinute("other_cluster_names", other_cluster_name)
-    set_extra_cfda_attrinute("prefixes", derive_prefix(cfda.CFDA))
-    set_extra_cfda_attrinute("extensions", derive_extension(cfda.CFDA))
+    set_extra_cfda_attribute("other_cluster_names", other_cluster_name)
+    set_extra_cfda_attribute("prefixes", derive_prefix(cfda.CFDA))
+    set_extra_cfda_attribute("extensions", derive_extension(cfda.CFDA))
     cfda.AWARDIDENTIFICATION = normalize_addl_award_id(
         cfda.AWARDIDENTIFICATION, cfda.CFDA, cfda.DBKEY
     )
