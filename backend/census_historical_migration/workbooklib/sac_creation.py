@@ -168,10 +168,12 @@ def get_audit_information(gen: Gen):
     cfdas = Cfda.objects.filter(DBKEY=gen.DBKEY, AUDITYEAR=gen.AUDITYEAR)
     findings = Finding.objects.filter(DBKEY=gen.DBKEY, AUDITYEAR=gen.AUDITYEAR)
 
-    agencies = {}
+    agencies = []
     cfda: Cfda
     for cfda in cfdas:
-        agencies[int((cfda.CFDA).split(".")[0])] = 1
+        agency = int((cfda.CFDA).split(".")[0])
+        agency_str = str(agency) if agency >= 10 else "0" + str(agency)
+        agencies.append(agency_str)
 
     finding: Finding
     gaap_results = {}
@@ -186,9 +188,7 @@ def get_audit_information(gen: Gen):
             gaap_results["disclaimer_of_opinion"] = 1
 
     audit_information = {
-        "agencies": list(
-            map(lambda i: str(i) if len(str(i)) > 1 else f"0{str(i)}", agencies.keys())
-        ),
+        "agencies": agencies,
         "dollar_threshold": 750000,
         "gaap_results": list(gaap_results.keys()),
         "is_aicpa_audit_guide_included": True
@@ -407,7 +407,6 @@ def _post_upload_workbook(this_sac, this_user, section, xlsx_file):
 
     audit_data = extract_mapping[section](excel_file.file)
     validator_mapping[section](audit_data)
-
     if section == FORM_SECTIONS.FEDERAL_AWARDS_EXPENDED:
         this_sac.federal_awards = audit_data
     elif section == FORM_SECTIONS.FINDINGS_UNIFORM_GUIDANCE:

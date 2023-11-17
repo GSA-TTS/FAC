@@ -22,7 +22,6 @@ from config import settings
 
 import openpyxl as pyxl
 import json
-import re
 
 import logging
 
@@ -118,7 +117,7 @@ def _generate_cluster_names(cfdas, valid_json):
 
 
 def _fix_addl_award_identification(cfdas):
-    addls = ["" for x in list(range(0, len(cfdas)))]
+    addls = []
     cfda: Cfda
     for cfda in cfdas:
         award_id = normalize_addl_award_id(
@@ -150,22 +149,32 @@ def _fix_addl_award_identification(cfdas):
 
 def _fix_pfixes(cfdas):
     # Map things with transformations
-    prefixes = map(lambda v: (v.CFDA).split(".")[0], cfdas)
+    prefixes = []
+    extensions = []
+    cfda: Cfda
+    for cfda in cfdas:
+        agency = int((cfda.CFDA).split(".")[0])
+        agency = str(agency) if agency >= 10 else "0" + str(agency)
+        prefixes.append(agency)
+        extension = (cfda.CFDA).split(".")[1][:3]
+        extensions.append(extension)
+    return (prefixes, extensions)
     # prefixes = map(lambda v: f'0{v}' if int(v) < 10 else v, prefixes)
     # Truncate any nastiness in the CFDA extensions to three characters.
-    extensions = map(lambda v: ((v.CFDA).split(".")[1])[:3].upper(), cfdas)
-    extensions = map(
-        lambda v: v
-        if re.search("^(RD|RD[0-9]|[0-9]{3}[A-Za-z]{0,1}|U[0-9]{2})$", v)
-        else "000",
-        extensions,
-    )
-    return (prefixes, extensions, map(lambda v: v.CFDA, cfdas))
+    # prefixes = map(lambda v: (v.CFDA).split(".")[0], cfdas)
+    # extensions = map(lambda v: ((v.CFDA).split(".")[1])[:3].upper(), cfdas)
+    # extensions = map(
+    #     lambda v: v
+    #     if re.search("^(RD|RD[0-9]|[0-9]{3}[A-Za-z]{0,1}|U[0-9]{2})$", v)
+    #     else "000",
+    #     extensions,
+    # )
+    # return (prefixes, extensions, map(lambda v: v.CFDA, cfdas))
 
 
 def _fix_passthroughs(cfdas):
-    passthrough_names = ["" for x in list(range(0, len(cfdas)))]
-    passthrough_ids = ["" for x in list(range(0, len(cfdas)))]
+    passthrough_names = []
+    passthrough_ids = []
     ls = cfdas
     cfda: Cfda
     for cfda in ls:
@@ -182,8 +191,7 @@ def _fix_passthroughs(cfdas):
                 #     & (Passthrough.elecauditsid == cfda.elecauditsid)
                 # )
                 # ).get()
-            except Exception as e:
-                print(e)
+            except Exception:
                 pnq.passthroughname = "EXCEPTIONAL PASSTHROUGH NAME"
                 pnq.passthroughid = "EXCEPTIONAL PASSTHROUGH ID"
 
@@ -238,12 +246,12 @@ def generate_federal_awards(sac, dbkey, year, outfile):
     addls = _fix_addl_award_identification(cfdas)
     set_range(wb, "additional_award_identification", addls)
 
-    (prefixes, extensions, full_cfdas) = _fix_pfixes(cfdas)
+    (prefixes, extensions) = _fix_pfixes(cfdas)
     set_range(wb, "federal_agency_prefix", prefixes)
     set_range(wb, "three_digit_extension", extensions)
 
     # We need a `cfda_key` as a magic column for the summation logic to work/be checked.
-    set_range(wb, "cfda_key", full_cfdas, conversion_fun=str)
+    # set_range(wb, "cfda_key", full_cfdas, conversion_fun=str)
 
     # We need `uniform_state_cluster_name` and `uniform_other_cluster_name` magic columns for cluster summation logic to work/be checked.
     set_range(
@@ -267,7 +275,7 @@ def generate_federal_awards(sac, dbkey, year, outfile):
     set_range(
         wb,
         "award_reference",
-        [f"AWARD-{n+1:04}" for n in range(len(passthrough_names))],
+        [f"AWARD-{n+1:04}" for n in range(len(cfdas))],
     )
 
     # Total amount expended must be calculated and inserted

@@ -12,11 +12,10 @@ def load_data(audit_year):
 
         result_log[(audit_year, dbkey)] = result
         total_count += 1
-        if total_count % 5 == 0:
-            print(f"Processed = {total_count}, Errors = {error_count}")
-        print(total_count, result)
         if len(result["errors"]) > 0:
             error_count += 1
+        if total_count % 5 == 0:
+            print(f"Processed = {total_count}, Errors = {error_count}")
         if error_count > 5:
             break
 
