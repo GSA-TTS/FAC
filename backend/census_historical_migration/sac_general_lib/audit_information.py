@@ -120,10 +120,11 @@ def _xform_material_noncompliance_disclosed(audit_info):
 def _build_initial_audit_information(dbkey):
     gaap_results = _get_gaap_results(dbkey)
     agencies_prefixes = _get_agency_prefixes(dbkey)
-    gobj: Gen = Gen.select().where(Gen.dbkey == dbkey).first()
+    gobj = Gen.select().where(Gen.dbkey == dbkey).first()
     audit_information = _create_json_from_db_object(gobj, mappings)
-    audit_information = audit_information["gaap_results"].append(gaap_results)
-    audit_information = audit_information["agencies"].append(agencies_prefixes)
+    audit_information["gaap_results"] = list(gaap_results)
+    audit_information["agencies"] = list(agencies_prefixes)
+    return audit_information
 
 
 def _audit_information(dbkey):

@@ -46,7 +46,7 @@ mappings = [
     FormFieldMap("auditor_state", "cpastate", FormFieldInDissem, None, str),
     FormFieldMap("auditor_zip", "cpazipcode", FormFieldInDissem, None, str),
     FormFieldMap("ein", "ein", "auditee_ein", None, str),
-    FormFieldMap("ein_not_an_ssn_attestation", None, None, None, str),
+    FormFieldMap("ein_not_an_ssn_attestation", None, None, True, bool),
     FormFieldMap("is_usa_based", None, None, True, bool),
     FormFieldMap("met_spending_threshold", None, None, True, bool),
     FormFieldMap("multiple_eins_covered", "multipleeins", None, None, bool),
