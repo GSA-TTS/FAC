@@ -55,6 +55,9 @@ cover/
 backend/cypress/screenshots/
 backend/cypress/videos/
 
+# Test data
+census_historical_migration/data/
+
 # Translations
 *.mo
 *.pot
