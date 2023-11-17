@@ -1,33 +1,11 @@
 # Steps taken
 ```sh
-cf t -s dev
+cf t -s <env>
 ```
 
 Bind the backups bucket to the application
 ```sh
 cf bind-service gsa-fac backups
-cf restart gsa-fac
-```
-
-Unbind the existing fac-private-s3 bucket from the app
-```sh
-cf unbind-service gsa-fac fac-private-s3
-
-Result:
-$ cf unbind-service gsa-fac fac-private-s3
-> Unbinding app gsa-fac from service fac-private-s3 in org gsa-tts-oros-fac / space dev as alexander.steel@gsa.gov...
-> OK
-```
-
-Rebind the fac-private-s3 bucket with the backups bucket as an additional instance
-```sh
-cf bind-service gsa-fac fac-private-s3 -c '{"additional_instances": ["backups"]}'
-
-Result:
-$ cf bind-service gsa-fac fac-private-s3 -c '{"additional_instances": ["backups"]}'
-> Binding service instance fac-private-s3 to app gsa-fac in org gsa-tts-oros-fac / space dev as alexander.steel@gsa.gov...
-> OK
-> TIP: Use 'cf restage gsa-fac' to ensure your env variable changes take effect
 ```
 
 Restart the app so changes occur and wait for the instance to come back up
@@ -35,18 +13,28 @@ Restart the app so changes occur and wait for the instance to come back up
 cf restart gsa-fac
 ```
 
-Tail the logs on the app
+Unbind the existing fac-private-s3 bucket from the app
 ```sh
-cf logs gsa-fac | grep "APP/TASK/media_backup"
+cf unbind-service gsa-fac fac-private-s3
 ```
 
-Run the media backups via cf-tasks
+Rebind the fac-private-s3 bucket with the backups bucket as an additional instance
 ```sh
-cf run-task gsa-fac -k 2G -m 2G --name media_backup --command "./s3-sync.sh"
+cf bind-service gsa-fac fac-private-s3 -c '{"additional_instances": ["backups"]}'
+```
+
+Restart the app so changes occur and wait for the instance to come back up
+```sh
+cf restart gsa-fac
 ```
 
 Running things by hand:
 ```sh
+cf ssh gsa-fac
+/tmp/lifecycle/shell
+source .profile
+set +e
+
 curl -x $https_proxy -L "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
 unzip awscliv2.zip && rm awscliv2.zip
 ./aws/install -i ~/usr -b ~/bin
@@ -73,7 +61,25 @@ unset https_proxy
 
 /home/vcap/app/bin/aws s3 sync s3://${FAC_MEDIA_BUCKET}/mediabackups/$date/ s3://${BACKUPS_BUCKET}/mediabackups/$date/ --storage-class INTELLIGENT_TIERING
 /home/vcap/app/bin/aws s3 ls s3://${BACKUPS_BUCKET}/mediabackups/$date/
+
+
+# Cleanup the source bucket so older backups don't get added to the tar
+/home/vcap/app/bin/aws s3 rm s3://${FAC_MEDIA_BUCKET}/mediabackups/$date/archive.tar
+/home/vcap/app/bin/aws s3 rm s3://${FAC_MEDIA_BUCKET}/mediabackups/$date/
+/home/vcap/app/bin/aws s3 rm s3://${FAC_MEDIA_BUCKET}/mediabackups/
+
+# List contents of source bucket to ensure everything was deleted properly
+/home/vcap/app/bin/aws s3 ls s3://${FAC_MEDIA_BUCKET}/mediabackups/$date/
+/home/vcap/app/bin/aws s3 ls s3://${FAC_MEDIA_BUCKET}/
+
 ```
 
+Tail the logs on the app
+```sh
+cf logs gsa-fac | grep "APP/TASK/media_backup"
+```
 
-
+Run the media backups via cf-tasks
+```sh
+cf run-task gsa-fac -k 2G -m 2G --name media_backup --command "./s3-sync.sh"
+```
