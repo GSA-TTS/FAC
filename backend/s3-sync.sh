@@ -51,4 +51,4 @@ unset https_proxy
 /home/vcap/app/bin/aws s3 rm s3://${FAC_MEDIA_BUCKET}/mediabackups/
 
 # List contents of source bucket to ensure everything was deleted properly
-/home/vcap/app/bin/aws s3 ls s3://${FAC_MEDIA_BUCKET}/mediabackups/$date/
+/home/vcap/app/bin/aws s3 ls s3://${FAC_MEDIA_BUCKET}/
