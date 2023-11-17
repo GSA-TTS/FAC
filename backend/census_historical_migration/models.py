@@ -443,3 +443,49 @@ class ELECCAPTEXT(models.Model):
     UEI = models.TextField(blank=True, null=True)
 
     MULTIPLEUEIS = models.TextField(blank=True, null=True)
+
+
+class FAILED_SACS(models.Model):
+    DBKEY = models.TextField(blank=True, null=True)
+
+    AUDITYEAR = models.TextField(blank=True, null=True)
+
+    EIN = models.TextField(blank=True, null=True)
+
+    UEI = models.TextField(blank=True, null=True)
+
+    ERROR = models.TextField(blank=True, null=True)
+
+    RUN_DATETIME = models.DateField(blank=True, null=True)
+
+
+class CHANGE_RECORDS(models.Model):
+    REPORTID = models.TextField(blank=True, null=True)
+
+    DBKEY = models.TextField(blank=True, null=True)
+
+    AUDITYEAR = models.TextField(blank=True, null=True)
+
+    EIN = models.TextField(blank=True, null=True)
+
+    UEI = models.TextField(blank=True, null=True)
+
+    CENSUS_TABLE_NAME = models.TextField(blank=True, null=True)
+
+    CENSUS_COLUMN_NAME = models.TextField(blank=True, null=True)
+
+    CENSUS_DATA = models.TextField(blank=True, null=True)
+
+    GSAFAC_TABLE_NAME = models.TextField(blank=True, null=True)
+
+    GSAFAC_COLUMN_NAME = models.TextField(blank=True, null=True)
+
+    GSAFAC_DATA = models.TextField(blank=True, null=True)
+
+    TRANSFORMATION_FUNCTION = models.TextField(blank=True, null=True)
+
+    RUN_DATETIME = models.DateField(blank=True, null=True)
+
+    IS_RUN_SUCCESS = models.TextField(blank=True, null=True)
+
+    GIT_HASH = models.TextField(blank=True, null=True)
