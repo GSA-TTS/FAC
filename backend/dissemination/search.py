@@ -16,7 +16,6 @@ def search_general(
 ):
     query = Q()
 
-    query.add(_get_is_public_query(include_private), Q.AND)
     query.add(_get_aln_match_query(alns), Q.AND)
     query.add(_get_names_match_query(names), Q.AND)
     query.add(_get_uei_or_eins_match_query(uei_or_eins), Q.AND)
@@ -25,15 +24,12 @@ def search_general(
     query.add(_get_cog_or_oversight_match_query(agency_name, cog_or_oversight), Q.AND)
     query.add(_get_audit_years_match_query(audit_years), Q.AND)
 
+    if not include_private:
+        query.add(Q(is_public=True), Q.AND)
+
     results = General.objects.filter(query).order_by("-fac_accepted_date")
 
     return results
-
-
-def _get_is_public_query(include_private):
-    if not include_private:
-        return Q(is_public=True)
-    return Q()
 
 
 def _get_aln_match_query(alns):
