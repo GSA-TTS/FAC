@@ -8,16 +8,18 @@ from census_historical_migration.sac_general_lib.utils import (
     _create_json_from_db_object,
 )
 import audit.validators
+from django.conf import settings
 
-DOLLAR_THRESHOLD = 750000
 
 mappings = [
     FormFieldMap(
-        "dollar_threshold", None, FormFieldInDissem, DOLLAR_THRESHOLD, int
-    ),  # FIXME: There is no in_db mapping ?
-    FormFieldMap(
-        "gaap_results", None, FormFieldInDissem, [], list
-    ),  # FIXME: There is no in_db mapping?
+        "dollar_threshold",
+        "dollarthreshold",
+        FormFieldInDissem,
+        settings.DOLLAR_THRESHOLD,
+        int,
+    ),
+    FormFieldMap("gaap_results", "typereport_fs", FormFieldInDissem, [], list),
     FormFieldMap(
         "is_going_concern_included", "goingconcern", FormFieldInDissem, None, bool
     ),
@@ -49,22 +51,20 @@ mappings = [
         None,
         bool,
     ),
-    FormFieldMap(
-        "is_low_risk_auditee", None, FormFieldInDissem, False, bool
-    ),  # FIXME: There is no in_db mapping?
-    FormFieldMap(
-        "agencies", None, "agencies_with_prior_findings", [], list
-    ),  # FIXME: There is no in_db mapping?
+    FormFieldMap("is_low_risk_auditee", "lowrisk", FormFieldInDissem, False, bool),
+    FormFieldMap("agencies", "pyschedule", "agencies_with_prior_findings", [], list),
 ]
 
 
 def _get_agency_prefixes(dbkey):
-    agencies = {}
+    agencies = set()
     cfdas = Cfda.select().where(Cfda.dbkey == dbkey)
-    cfda: Cfda
+
     for cfda in cfdas:
-        agencies[int((cfda.cfda).split(".")[0])] = 1
-    return agencies.keys()
+        agency_prefix = int(cfda.cfda.split(".")[0])
+        agencies.add(agency_prefix)
+
+    return agencies
 
 
 def _get_gaap_results(dbkey):

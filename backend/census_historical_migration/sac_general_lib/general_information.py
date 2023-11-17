@@ -61,15 +61,21 @@ mappings = [
 
 
 def _period_covered(s):
-    return {"A": "annual", "B": "biennial", "O": "other"}[s]
+    period_dict = {"A": "annual", "B": "biennial", "O": "other"}
+    if s not in period_dict:
+        raise KeyError(f"Key '{s}' not found in period coverage mapping")
+    return period_dict[s]
 
 
 def _census_audit_type(s):
-    return {
+    audit_type_dict = {
         "S": "single-audit",
         "P": "program-specific",
         "A": "alternative-compliance-engagement",
-    }[s]
+    }
+    if s not in audit_type_dict:
+        raise KeyError(f"Key '{s}' not found in census audit type mapping")
+    return audit_type_dict[s]
 
 
 def _xform_country(gen):
