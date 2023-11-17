@@ -12,8 +12,8 @@ from datetime import datetime
 
 from census_historical_migration.workbooklib.workbook_creation import (
     workbook_loader,
-    setup_sac,
 )
+from census_historical_migration.sac_general_lib.sac_creator import setup_sac
 from census_historical_migration.workbooklib.workbook_section_handlers import (
     sections_to_handlers,
 )

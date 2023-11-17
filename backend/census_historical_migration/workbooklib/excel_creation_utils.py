@@ -85,6 +85,17 @@ def map_simple_columns(wb, mappings, values):
         )
 
 
+def add_hyphen_to_zip(zip):
+    strzip = str(zip)
+    if len(strzip) == 5:
+        return strzip
+    elif len(strzip) == 9:
+        return f"{strzip[0:5]}-{strzip[5:9]}"
+    else:
+        logger.info("ZIP IS MALFORMED IN WORKBOOKS E2E / SAC_CREATION")
+        return strzip
+
+
 def generate_dissemination_test_table(Gen, api_endpoint, dbkey, mappings, objects):
     table = {"rows": list(), "singletons": dict()}
     table["endpoint"] = api_endpoint

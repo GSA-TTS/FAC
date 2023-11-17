@@ -3,7 +3,6 @@
 We want to create a variety of SACs in different states of
 completion.
 """
-from datetime import timedelta
 import logging
 from pathlib import Path
 
@@ -24,17 +23,6 @@ from audit.intakelib import (
 import audit.validators
 
 from audit.fixtures.excel import FORM_SECTIONS
-
-from census_historical_migration.workbooklib.excel_creation import (
-    dbkey_to_test_report_id,
-    _census_date_to_datetime,
-)
-
-from census_historical_migration.workbooklib.census_models.census import (
-    CensusGen22 as Gen,
-    CensusCfda22 as Cfda,
-    CensusFindings22 as Finding,
-)
 
 logger = logging.getLogger(__name__)
 
@@ -80,218 +68,6 @@ validator_mapping = {
 }
 
 
-def _period_covered(s):
-    return {"A": "annual", "B": "biennial", "O": "other"}[s]
-
-
-def _census_audit_type(s):
-    return {
-        "S": "single-audit",
-        "P": "program-specific",
-        "A": "alternative-compliance-engagement",
-    }[s]
-
-
-def add_hyphen_to_zip(zip):
-    strzip = str(zip)
-    if len(strzip) == 5:
-        return strzip
-    elif len(strzip) == 9:
-        return f"{strzip[0:5]}-{strzip[5:9]}"
-    else:
-        logger.info("ZIP IS MALFORMED IN WORKBOOKS E2E / SAC_CREATION")
-        return strzip
-
-
-def _fake_general_information(dbkey, auditee_name="DEFAULT AUDITEE"):
-    """Create a fake general_information object."""
-    # TODO: can we generate this object from the schema definition in
-    # schemas/output/GeneralInformation.schema.json?
-    gobj: Gen = Gen.select().where(Gen.dbkey == dbkey).first()
-    auditee_fiscal_period_end = _census_date_to_datetime(gobj.fyenddate).strftime(
-        "%Y-%m-%d"
-    )
-    auditee_fiscal_period_start = (
-        _census_date_to_datetime(gobj.fyenddate) - timedelta(days=365)
-    ).strftime("%Y-%m-%d")
-    if gobj.cpacountry == "US":
-        cpacountry = "USA"
-    elif gobj.cpacountry != "US":
-        cpacountry = "non-USA"
-
-    general_information = {
-        "auditee_fiscal_period_start": auditee_fiscal_period_start,
-        "auditee_fiscal_period_end": auditee_fiscal_period_end,
-        "audit_period_covered": _period_covered(gobj.periodcovered),
-        "audit_type": _census_audit_type(gobj.audittype),
-        "auditee_address_line_1": gobj.street1,
-        "auditee_city": gobj.city,
-        "auditee_contact_name": gobj.auditeecontact,
-        "auditee_contact_title": gobj.auditeetitle,
-        "auditee_email": gobj.auditeeemail,
-        "auditee_name": gobj.auditeename,
-        "auditee_phone": gobj.auditeephone,
-        # TODO: when we include territories in our valid states, remove this restriction
-        "auditee_state": gobj.state,
-        # TODO: this is GSA's UEI. We could do better at making random choices that
-        # pass the schema's complex regex validation
-        "auditee_uei": gobj.uei,
-        "auditee_zip": gobj.zipcode,
-        "auditor_address_line_1": gobj.cpastreet1,
-        "auditor_city": gobj.cpacity,
-        "auditor_contact_name": gobj.cpacontact,
-        "auditor_contact_title": gobj.cpatitle,
-        "auditor_country": cpacountry,
-        "auditor_ein": gobj.auditor_ein,
-        "auditor_ein_not_an_ssn_attestation": True,
-        "auditor_email": gobj.cpaemail if gobj.cpaemail else "noemailfound@noemail.com",
-        "auditor_firm_name": gobj.cpafirmname,
-        "auditor_phone": gobj.cpaphone,
-        # TODO: when we include territories in our valid states, remove this restriction
-        "auditor_state": gobj.cpastate,
-        "auditor_zip": gobj.cpazipcode,
-        "ein": gobj.ein,
-        "ein_not_an_ssn_attestation": True,
-        "is_usa_based": True,
-        "met_spending_threshold": True,
-        "multiple_eins_covered": True if gobj.multipleeins == "Y" else False,
-        "multiple_ueis_covered": True if gobj.multipleueis == "Y" else False,
-        # TODO: could improve this by randomly choosing from the enum of possible values
-        "user_provided_organization_type": "unknown",
-        "secondary_auditors_exist": True if gobj.multiple_cpas == "Y" else False,
-    }
-
-    # verify that our created object validates against the schema
-    audit.validators.validate_general_information_complete_json(general_information)
-
-    return general_information
-
-
-# TODO: Pull this from actual information.
-def _fake_audit_information(dbkey, auditee_name=None):
-    gobj: Gen = Gen.select().where(Gen.dbkey == dbkey).first()
-    cfdas = Cfda.select().where(Cfda.dbkey == dbkey)
-
-    agencies = {}
-    cfda: Cfda
-    for cfda in cfdas:
-        agencies[int((cfda.cfda).split(".")[0])] = 1
-
-    findings = Finding.select().where(Finding.dbkey == dbkey)
-    finding: Finding
-    gaap_results = {}
-    # THIS IS NOT A GOOD WAY TO DO THIS, BUT IT IS CLOSE.
-    # IT IS FOR TEST DATA...
-    for finding in findings:
-        if finding.modifiedopinion == "Y":
-            gaap_results["unmodified_opinion"] = 1
-        if finding.materialweakness == "Y":
-            gaap_results["adverse_opinion"] = 1
-        if finding.significantdeficiency == "Y":
-            gaap_results["disclaimer_of_opinion"] = 1
-
-    audit_information = {
-        "agencies": list(
-            map(lambda i: str(i) if len(str(i)) > 1 else f"0{str(i)}", agencies.keys())
-        ),
-        "dollar_threshold": 750000,
-        "gaap_results": list(gaap_results.keys()),
-        "is_aicpa_audit_guide_included": True
-        if gobj.reportablecondition == "Y"
-        else False,
-        "is_going_concern_included": True if gobj.goingconcern == "Y" else False,
-        "is_internal_control_deficiency_disclosed": True
-        if gobj.materialweakness == "Y"
-        else False,
-        "is_internal_control_material_weakness_disclosed": True
-        if gobj.materialweakness_mp == "Y"
-        else False,
-        "is_low_risk_auditee": False,
-        "is_material_noncompliance_disclosed": True
-        if gobj.materialnoncompliance == "Y"
-        else False,
-    }
-
-    audit.validators.validate_audit_information_json(audit_information)
-
-    return audit_information
-
-
-def _create_test_sac(user, auditee_name, dbkey):
-    """Create a single example SAC."""
-    SingleAuditChecklist = apps.get_model("audit.SingleAuditChecklist")
-
-    try:
-        exists = SingleAuditChecklist.objects.get(
-            report_id=dbkey_to_test_report_id(Gen, dbkey)
-        )
-    except SingleAuditChecklist.DoesNotExist:
-        exists = None
-    if exists:
-        exists.delete()
-
-    sac = SingleAuditChecklist.objects.create(
-        submitted_by=user,
-        general_information=_fake_general_information(dbkey, auditee_name),
-        audit_information=_fake_audit_information(dbkey, auditee_name),
-    )
-    # Set a TEST report id for this data
-    sac.report_id = dbkey_to_test_report_id(Gen, dbkey)
-
-    Access = apps.get_model("audit.Access")
-    Access.objects.create(
-        sac=sac,
-        user=user,
-        email=user.email,
-        role="editor",
-    )
-
-    # We need these to be different.
-    Access.objects.create(
-        sac=sac,
-        user=user,
-        email="bob_the_auditee_official@auditee.org",  # user.email,
-        role="certifying_auditee_contact",
-    )
-    Access.objects.create(
-        sac=sac,
-        user=user,
-        email="bob_the_auditor_official@auditor.org",  # user.email,
-        role="certifying_auditor_contact",
-    )
-
-    sac.auditee_certification = {}
-    sac.auditee_certification["auditee_signature"] = {}
-    sac.auditee_certification["auditee_signature"][
-        "auditee_name"
-    ] = "Bob the Auditee Name"
-    sac.auditee_certification["auditee_signature"][
-        "auditee_title"
-    ] = "Bob the Auditee Signature"
-
-    sac.auditor_certification = {}
-    sac.auditor_certification["auditor_signature"] = {}
-    sac.auditor_certification["auditor_signature"][
-        "auditor_name"
-    ] = "Alice the Auditor Name"
-    sac.auditor_certification["auditor_signature"][
-        "auditor_title"
-    ] = "Alice the Auditor Signature"
-
-    sac.data_source = "TSTDAT"
-    sac.save()
-
-    logger.info("Created single audit checklist %s", sac)
-    return sac
-
-
-def _make_excel_file(filename, f_obj):
-    content = f_obj.read()
-    f_obj.seek(0)
-    file = SimpleUploadedFile(filename, content, "application/vnd.ms-excel")
-    return file
-
-
 def _post_upload_pdf(this_sac, this_user, pdf_filename):
     """Upload a workbook for this SAC.
 
@@ -311,7 +87,7 @@ def _post_upload_pdf(this_sac, this_user, pdf_filename):
     print(file.__dict__)
     pdf_file = PDFFile(
         file=file,
-        component_page_numbers={
+        component_page_numbers={  # FIXME - How do we want to handle these values?
             "financial_statements": 1,
             "financial_statements_opinion": 2,
             "schedule_expenditures": 3,

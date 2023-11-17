@@ -25,7 +25,7 @@ from census_historical_migration.workbooklib.census_models.census import (
 logger = logging.getLogger(__name__)
 
 
-def create_sac(user, dbkey):
+def _create_sac(user, dbkey):
     """Create a SAC object for the historic data migration."""
     SingleAuditChecklist = apps.get_model("audit.SingleAuditChecklist")
     generated_report_id = dbkey_to_report_id(Gen, dbkey)
@@ -72,4 +72,21 @@ def create_sac(user, dbkey):
     sac.save()
 
     logger.info("Created single audit checklist %s", sac)
+    return sac
+
+
+def setup_sac(user, test_name, dbkey):
+    if user is None:
+        logger.error("No user provided to setup_sac")
+        return
+    logger.info(f"Creating a SAC object for {user}, {test_name}")
+    SingleAuditChecklist = apps.get_model("audit.SingleAuditChecklist")
+
+    sac = SingleAuditChecklist.objects.filter(
+        submitted_by=user, general_information__auditee_name=test_name
+    ).first()
+
+    logger.info(sac)
+    if sac is None:
+        sac = _create_sac(user, dbkey)
     return sac
