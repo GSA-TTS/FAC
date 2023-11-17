@@ -228,6 +228,7 @@ def generate_federal_awards(sac, dbkey, year, outfile):
     cfda: Cfda
     for cfda in cfdas:
         clean_cfda(cfda)
+
     map_simple_columns(wb, mappings, cfdas)
 
     # Patch the clusternames. They used to be allowed to enter anything
@@ -284,19 +285,19 @@ def generate_federal_awards(sac, dbkey, year, outfile):
         total += int(cfda.AMOUNT)
     set_single_cell_range(wb, "total_amount_expended", total)
 
-    loansatend = list()
-    for cfda in cfdas:
-        if cfda.LOANS == "Y":
-            if cfda.LOANBALANCE is None:
-                # loansatend.append("N/A")
-                # loansatend.append(1)
-                loansatend.append(0)
-            else:
-                loansatend.append(cfda.LOANBALANCE)
-        else:
-            loansatend.append("")
-    # set_range(wb, "loan_balance_at_audit_period_end", loansatend, type=int_or_na)
-    set_range(wb, "loan_balance_at_audit_period_end", loansatend, conversion_fun=int)
+    # loansatend = list()
+    # for cfda in cfdas:
+    #     if cfda.LOANS == "Y":
+    #         if cfda.LOANBALANCE is None:
+    #             # loansatend.append("N/A")
+    #             # loansatend.append(1)
+    #             loansatend.append(0)
+    #         else:
+    #             loansatend.append(cfda.LOANBALANCE)
+    #     else:
+    #         loansatend.append("")
+    # # set_range(wb, "loan_balance_at_audit_period_end", loansatend, type=int_or_na)
+    # set_range(wb, "loan_balance_at_audit_period_end", loansatend, conversion_fun=int)
 
     wb.save(outfile)
 

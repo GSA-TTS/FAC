@@ -121,6 +121,15 @@ def derive_extension(code: str):
     return code.split(".")[1]
 
 
+def normalize_loan_balance(lb: str, is_loan: str):
+    if is_loan == "Y":
+        if lb is None:
+            return "1"
+        else:
+            return lb
+    return ""
+
+
 def set_extra_cfda_attrinute(name, value):
     cfda_extra[name].append(value)
 
@@ -153,3 +162,5 @@ def clean_cfda(cfda: Cfda):
     cfda.STATECLUSTERNAME = (
         cfda.STATECLUSTERNAME if "STATE CLUSTER" == cfda.CLUSTERNAME else ""
     )
+    cfda.TYPEREPORT_MP = "" if cfda.MAJORPROGRAM == "N" else cfda.TYPEREPORT_MP
+    cfda.LOANBALANCE = normalize_loan_balance(cfda.LOANBALANCE, cfda.LOANS)
