@@ -40,7 +40,7 @@ unset https_proxy
 # Move the tar to the backups bucket
 /home/vcap/app/bin/aws s3 sync s3://${FAC_MEDIA_BUCKET}/mediabackups/$date/ s3://${BACKUPS_BUCKET}/mediabackups/$date/ --storage-class INTELLIGENT_TIERING
 # Share the Tar to dest and extract (without including the tar)
-#./s3tar-linux-amd64 --region $AWS_DEFAULT_REGION -cvf s3://${FAC_MEDIA_BUCKET}/mediabackups/$date/archive.tar -C s3://${BACKUPS_BUCKET}/mediabackups/$date/ --storage-class INTELLIGENT_TIERING
+#./s3tar-linux-amd64 --region $AWS_DEFAULT_REGION -xvf s3://${FAC_MEDIA_BUCKET}/mediabackups/$date/archive.tar -C s3://${BACKUPS_BUCKET}/mediabackups/$date/ --storage-class INTELLIGENT_TIERING
 
 # List contents of destination bucket
 /home/vcap/app/bin/aws s3 ls s3://${BACKUPS_BUCKET}/mediabackups/$date/
