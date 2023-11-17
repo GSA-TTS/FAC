@@ -252,5 +252,42 @@
             </div>
         </div>
     </div>
+    <div
+      class="usa-modal"
+      id="device-orientation-modal"
+      aria-labelledby="device-orientation-modal-heading"
+      aria-describedby="device-orientation-modal-description"
+    >
+      <div class="usa-modal__content">
+        <div class="usa-modal__main">
+          <h2 class="usa-modal__heading" id="device-orientation-modal-heading">
+            Please rotate your device
+          </h2>
+          <div class="usa-prose">
+            <p id="device-orientation-modal-description">
+Search works best with your device in landscape orientation.            </p>
+          </div>
+        </div>
+        <button
+          type="button"
+          class="usa-button usa-modal__close dismiss-orientation-modal"
+          aria-label="Close this window"
+          data-close-modal
+        >
+          <svg class="usa-icon" aria-hidden="true" focusable="false" role="img">
+            {% uswds_sprite "close" %}
+          </svg>
+        </button>
+      </div>
+    </div>
+    <a
+      href="#device-orientation-modal"
+      class="usa-button"
+      id="orientation-toggle"
+      aria-controls="device-orientation-modal"
+      data-open-modal
+      ></a
+    >
     <script src="{% static 'compiled/js/search-results-pagination.js' %}"></script>
+    <script src="{% static 'compiled/js/search-mobile-orientation.js' %}"></script>
 {% endblock content %}
