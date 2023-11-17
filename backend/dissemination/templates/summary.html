@@ -39,6 +39,16 @@
                                  role="img">
                                 {% uswds_sprite "file_download" %}
                             </svg>
+                            <p class="margin-0">Export to XLSX</p>
+                        </a>
+                        <a class="usa-button usa-button--outline display-flex font-sans-xl margin-top-2"
+                           href="{% url 'dissemination:PdfDownload' report_id=report_id %}"
+                           target="_blank">
+                            <svg class="usa-icon margin-right-1 flex-align-self-center"
+                                 aria-hidden="true"
+                                 role="img">
+                                {% uswds_sprite "file_download" %}
+                            </svg>
                             <p class="margin-0">Single audit report</p>
                         </a>
                     </div>
