@@ -1,7 +1,7 @@
 from fs.memoryfs import MemoryFS
 
 from census_historical_migration.workbooklib.sac_creation import (
-    _post_upload_workbook,
+    make_valid_ir_and_update_sac,
     _make_excel_file,
     _create_test_sac,
 )
@@ -55,7 +55,7 @@ def workbook_loader(user, sac, dbkey, year):
         )
 
         if user:
-            _post_upload_workbook(sac, user, section, excel_file)
+            make_valid_ir_and_update_sac(sac, user, section, excel_file)
 
         return wb, json_data, filename
 

@@ -380,8 +380,8 @@ def _post_upload_pdf(this_sac, this_user, pdf_filename):
     this_sac.save()
 
 
-def _post_upload_workbook(this_sac, this_user, section, xlsx_file):
-    """Upload a workbook for this SAC.
+def make_valid_ir_and_update_sac(this_sac, this_user, section, xlsx_file):
+    """Make an IR for the section, validate and save the json into the sac.
 
     This should be idempotent if it is called on a SAC that already
     has a federal awards file uploaded.
@@ -402,6 +402,8 @@ def _post_upload_workbook(this_sac, this_user, section, xlsx_file):
         sac_id=this_sac.id,
         form_section=section,
     )
+
+    # Not needed for ;pading historical data
     # excel_file.full_clean()
     # excel_file.save()
 

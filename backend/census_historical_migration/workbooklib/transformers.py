@@ -72,10 +72,10 @@ def make_report_id(audit_year, fy_end_date, dbkey):
 
 
 cfda_extra: dict = {
-    "cluster_names": [],
-    "other_cluster_names": [],
-    "prefixes": [],
-    "extensions": [],
+    "cluster_name": [],
+    "other_cluster_name": [],
+    "federal_agency_prefix": [],
+    "three_digit_extension": [],
 }
 
 valid_file = open(f"{settings.BASE_DIR}/schemas/source/base/ClusterNames.json")
@@ -88,7 +88,7 @@ def normalize_cluster_name(cname: str):
         return ""
     if cname not in valid_json["cluster_names"]:
         return UNDEFINED_CLUSTER_NAME
-    return cname
+    return cname.strip().upper()
 
 
 def normalize_addl_award_id(award_id: str, cfda_id: str, dbkey):
@@ -147,7 +147,6 @@ def clean_gen(gen: Gen):
 
 
 def clean_cfda(cfda: Cfda):
-    cfda.LOANBALANCE = normalize_number(cfda.LOANBALANCE)
     cfda.AMOUNT = normalize_number(cfda.AMOUNT)
     cfda.FINDINGSCOUNT = normalize_number(cfda.FINDINGSCOUNT)
     cluster_name = normalize_cluster_name(cfda.CLUSTERNAME)
@@ -160,7 +159,9 @@ def clean_cfda(cfda: Cfda):
         cfda.AWARDIDENTIFICATION, cfda.CFDA, cfda.DBKEY
     )
     cfda.STATECLUSTERNAME = (
-        cfda.STATECLUSTERNAME if "STATE CLUSTER" == cfda.CLUSTERNAME else ""
+        cfda.STATECLUSTERNAME.strip().upper()
+        if "STATE CLUSTER" == cfda.CLUSTERNAME
+        else ""
     )
     cfda.TYPEREPORT_MP = "" if cfda.MAJORPROGRAM == "N" else cfda.TYPEREPORT_MP
     cfda.LOANBALANCE = normalize_loan_balance(cfda.LOANBALANCE, cfda.LOANS)

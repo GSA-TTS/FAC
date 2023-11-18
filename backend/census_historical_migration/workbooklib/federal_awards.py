@@ -14,7 +14,13 @@ from ..models import (
 )
 
 from .templates import sections_to_template_paths
-from .transformers import clean_cfda, normalize_addl_award_id, normalize_number
+from .transformers import (
+    clean_cfda,
+    cfda_extra,
+    get_extra_cfda_attrinutes,
+    normalize_addl_award_id,
+    normalize_number,
+)
 
 # from census_historical_migration.workbooklib.census_models.census import dynamic_import
 from audit.fixtures.excel import FORM_SECTIONS
@@ -231,52 +237,56 @@ def generate_federal_awards(sac, dbkey, year, outfile):
 
     map_simple_columns(wb, mappings, cfdas)
 
+    for key in cfda_extra.keys():
+        set_range(wb, key, get_extra_cfda_attrinutes(key))
+
     # Patch the clusternames. They used to be allowed to enter anything
     # they wanted.
-    valid_file = open(f"{settings.BASE_DIR}/schemas/source/base/ClusterNames.json")
-    valid_json = json.load(valid_file)
+    # valid_file = open(f"{settings.BASE_DIR}/schemas/source/base/ClusterNames.json")
+    # valid_json = json.load(valid_file)
 
-    (cluster_names, other_cluster_names, state_cluster_names) = _generate_cluster_names(
-        cfdas, valid_json
-    )
-    set_range(wb, "cluster_name", cluster_names)
-    set_range(wb, "other_cluster_name", other_cluster_names)
+    # (cluster_names, other_cluster_names, state_cluster_names) = _generate_cluster_names(
+    #     cfdas, valid_json
+    # )
+    # set_range(wb, "cluster_name", cluster_names)
+    # set_range(wb, "other_cluster_name", other_cluster_names)
 
     # Fix the additional award identification. If they had a "U", we want
     # to see something in the addl. column.
     addls = _fix_addl_award_identification(cfdas)
     set_range(wb, "additional_award_identification", addls)
 
-    (prefixes, extensions) = _fix_pfixes(cfdas)
-    set_range(wb, "federal_agency_prefix", prefixes)
-    set_range(wb, "three_digit_extension", extensions)
+    # (prefixes, extensions) = _fix_pfixes(cfdas)
+    # set_range(wb, "federal_agency_prefix", prefixes)
+    # set_range(wb, "three_digit_extension", extensions)
 
     # We need a `cfda_key` as a magic column for the summation logic to work/be checked.
     # set_range(wb, "cfda_key", full_cfdas, conversion_fun=str)
 
     # We need `uniform_state_cluster_name` and `uniform_other_cluster_name` magic columns for cluster summation logic to work/be checked.
-    set_range(
-        wb,
-        "uniform_state_cluster_name",
-        [s.strip().upper() for s in state_cluster_names],
-        conversion_fun=str,
-    )
-    set_range(
-        wb,
-        "uniform_other_cluster_name",
-        [s.strip().upper() for s in other_cluster_names],
-        conversion_fun=str,
-    )
+    # set_range(
+    #     wb,
+    #     "uniform_state_cluster_name",
+    #     [s.strip().upper() for s in state_cluster_names],
+    #     conversion_fun=str,
+    # )
+    # set_range(
+    #     wb,
+    #     "uniform_other_cluster_name",
+    #     [s.strip().upper() for s in other_cluster_names],
+    #     conversion_fun=str,
+    # )
 
     (passthrough_names, passthrough_ids) = _fix_passthroughs(cfdas)
     set_range(wb, "passthrough_name", passthrough_names)
     set_range(wb, "passthrough_identifying_number", passthrough_ids)
 
     # The award numbers!
+    award_references = [f"AWARD-{n+1:04}" for n in range(len(cfdas))]
     set_range(
         wb,
         "award_reference",
-        [f"AWARD-{n+1:04}" for n in range(len(cfdas))],
+        award_references,
     )
 
     # Total amount expended must be calculated and inserted
@@ -305,7 +315,12 @@ def generate_federal_awards(sac, dbkey, year, outfile):
         sac.report_id, "federal_awards", mappings, cfdas
     )
     award_counter = 1
-    # prefix
+    # TODO there's surely a better way to do this
+    prefixes = get_extra_cfda_attrinutes("federal_agency_prefix")
+    extensions = get_extra_cfda_attrinutes("three_digit_extension")
+    cluster_names = get_extra_cfda_attrinutes("cluster_name")
+    other_cluster_names = get_extra_cfda_attrinutes("other_cluster_name")
+
     for obj, pfix, ext, addl, cn, ocn in zip(
         table["rows"], prefixes, extensions, addls, cluster_names, other_cluster_names
     ):
