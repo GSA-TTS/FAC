@@ -233,10 +233,9 @@ def run_end_to_end(email, dbkey, year):
 
 
 def make_one_submission(result, gen: Gen, user):
-    dbkey, audit_year = gen.DBKEY, gen.AUDITYEAR
     try:
         sac: SingleAuditChecklist = create_sac(user, gen)
-        loader = workbook_loader(user, sac, dbkey, audit_year)
+        loader = workbook_loader(user, sac, gen)
         for section, func in sections_to_handlers.items():
             (_, json, _) = loader(func, section)
         # step_through_certifications(sac)

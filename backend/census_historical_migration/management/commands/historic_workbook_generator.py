@@ -1,5 +1,6 @@
 from audit.models.models import SingleAuditChecklist
-from ...workbooklib.transformers import make_report_id
+from ...make_submission import create_or_get_user
+from ...workbooklib.sac_creation import create_sac
 from ...models import ELECAUDITHEADER as Gen
 
 from ...workbooklib.workbook_creation import (
@@ -10,7 +11,6 @@ from ...workbooklib.workbook_section_handlers import (
 )
 
 from collections import namedtuple as NT
-from playhouse.shortcuts import model_to_dict
 from django.core.management.base import BaseCommand
 
 import os
@@ -125,10 +125,11 @@ class Command(BaseCommand):
         dbkey = options["dbkey"]
         year = options["year"]
 
+        result = {"success": [], "errors": []}
         gen: Gen = Gen.objects.get(AUDITYEAR=year, DBKEY=dbkey)
-        report_id = make_report_id(gen.AUDITYEAR, gen.FYENDDATE, gen.DBKEY)
-        sac: SingleAuditChecklist = SingleAuditChecklist(report_id=report_id)
-        loader = workbook_loader(user=None, sac=sac, dbkey=dbkey, year=year)
+        user = create_or_get_user(result, gen)
+        sac: SingleAuditChecklist = create_sac(user, gen)
+        loader = workbook_loader(user=None, sac=sac, gen=gen)
         json_test_tables = []
         for section, func in sections_to_handlers.items():
             (wb, api_json, filename) = loader(func, section)

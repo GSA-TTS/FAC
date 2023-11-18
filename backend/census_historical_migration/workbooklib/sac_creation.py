@@ -236,7 +236,7 @@ def create_sac(user, gen):
     set_auditee_cerification(sac)
     set_auditor_certification(sac)
     sac.data_source = "CENSUS"
-    # sac.save()
+    sac.save()
 
     logger.info("Created single audit checklist %s", sac)
     return sac

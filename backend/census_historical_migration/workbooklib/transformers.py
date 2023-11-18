@@ -38,6 +38,14 @@ def normalize_number(number: str):
     return "0"
 
 
+def normalize_int(s: str):
+    try:
+        x = int(float(s))
+        return x
+    except ValueError:
+        return 0
+
+
 def _is_positive(s):
     try:
         value = int(s)
@@ -99,6 +107,13 @@ def normalize_addl_award_id(award_id: str, cfda_id: str, dbkey):
     return ""
 
 
+def normalize_uei(uei: str):
+    DEFAULT_BAD_UEI = "BADBADBADBAD"
+    if uei is None or len(uei) != 12:
+        return DEFAULT_BAD_UEI
+    return uei
+
+
 def derive_other_cluster_name(raw_cname: str, normalized_cname: str):
     if normalized_cname == UNDEFINED_CLUSTER_NAME:
         return raw_cname
@@ -140,8 +155,8 @@ def get_extra_cfda_attributes(name):
 
 def clean_gen(gen: Gen):
     gen.ENTITY_TYPE = normalize_entity_type(gen.ENTITY_TYPE)
-    gen.CPACOUNTRY = get_cpacountry(gen.CPACOUNTRY)
-    gen.UEI = gen.UEI or "BADBADBADBAD"
+    gen.CPACOUNTRY = get_cpacosuntry(gen.CPACOUNTRY)
+    gen.UEI = normalize_uei(gen.UEI)
     gen.FYSTARTDATE = format_date(gen.FYSTARTDATE)
     gen.FYENDDATE = format_date(gen.FYENDDATE)
 
@@ -150,11 +165,11 @@ def clean_cfda(cfda: Cfda):
     cfda.AMOUNT = normalize_number(cfda.AMOUNT)
     cfda.FINDINGSCOUNT = normalize_number(cfda.FINDINGSCOUNT)
     cluster_name = normalize_cluster_name(cfda.CLUSTERNAME)
-    set_extra_cfda_attribute("cluster_names", cluster_name)
+    set_extra_cfda_attribute("cluster_name", cluster_name)
     other_cluster_name = derive_other_cluster_name(cfda.CLUSTERNAME, cluster_name)
-    set_extra_cfda_attribute("other_cluster_names", other_cluster_name)
-    set_extra_cfda_attribute("prefixes", derive_prefix(cfda.CFDA))
-    set_extra_cfda_attribute("extensions", derive_extension(cfda.CFDA))
+    set_extra_cfda_attribute("other_cluster_name", other_cluster_name)
+    set_extra_cfda_attribute("federal_agency_prefix", derive_prefix(cfda.CFDA))
+    set_extra_cfda_attribute("three_digit_extension", derive_extension(cfda.CFDA))
     cfda.AWARDIDENTIFICATION = normalize_addl_award_id(
         cfda.AWARDIDENTIFICATION, cfda.CFDA, cfda.DBKEY
     )

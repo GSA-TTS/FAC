@@ -3,31 +3,31 @@ from .excel_creation import (
     WorkbookFieldInDissem,
     get_upper_mappings,
     set_single_cell_range,
-    set_uei,
     map_simple_columns,
     generate_dissemination_test_table,
     set_range,
 )
 from ..models import (
+    ELECAUDITHEADER as Gen,
     ELECAUDITS as Cfda,
     ELECPASSTHROUGH as Passthrough,
 )
+from audit.models import SingleAuditChecklist
 
 from .templates import sections_to_template_paths
 from .transformers import (
     clean_cfda,
     cfda_extra,
-    get_extra_cfda_attrinutes,
+    get_extra_cfda_attributes,
     normalize_addl_award_id,
+    normalize_int,
     normalize_number,
 )
 
 # from census_historical_migration.workbooklib.census_models.census import dynamic_import
 from audit.fixtures.excel import FORM_SECTIONS
-from config import settings
 
 import openpyxl as pyxl
-import json
 
 import logging
 
@@ -46,8 +46,10 @@ mappings = [
     FieldMap(
         "state_cluster_name", "stateclustername", WorkbookFieldInDissem, None, str
     ),
-    FieldMap("federal_program_total", "programtotal", WorkbookFieldInDissem, 0, int),
-    FieldMap("cluster_total", "clustertotal", WorkbookFieldInDissem, 0, int),
+    FieldMap(
+        "federal_program_total", "programtotal", WorkbookFieldInDissem, 0, normalize_int
+    ),
+    FieldMap("cluster_total", "clustertotal", WorkbookFieldInDissem, 0, normalize_int),
     FieldMap("is_guaranteed", "loans", "is_loan", None, str),
     FieldMap(
         "loan_balance_at_audit_period_end",
@@ -221,14 +223,14 @@ def _fix_passthroughs(cfdas):
     return (passthrough_names, passthrough_ids)
 
 
-def generate_federal_awards(sac, dbkey, year, outfile):
+def generate_federal_awards(sac: SingleAuditChecklist, gen: Gen, outfile):
+    dbkey, year = gen.DBKEY, gen.AUDITYEAR
     logger.info(f"--- generate federal awards {dbkey} {year} ---")
     wb = pyxl.load_workbook(
         sections_to_template_paths[FORM_SECTIONS.FEDERAL_AWARDS_EXPENDED]
     )
     # In sheet : in DB
-
-    general = set_uei(wb, dbkey, year)
+    set_single_cell_range(wb, "auditee_uei", gen.UEI)
 
     cfdas = Cfda.objects.filter(DBKEY=dbkey, AUDITYEAR=year)
     cfda: Cfda
@@ -238,7 +240,7 @@ def generate_federal_awards(sac, dbkey, year, outfile):
     map_simple_columns(wb, mappings, cfdas)
 
     for key in cfda_extra.keys():
-        set_range(wb, key, get_extra_cfda_attrinutes(key))
+        set_range(wb, key, get_extra_cfda_attributes(key))
 
     # Patch the clusternames. They used to be allowed to enter anything
     # they wanted.
@@ -316,10 +318,10 @@ def generate_federal_awards(sac, dbkey, year, outfile):
     )
     award_counter = 1
     # TODO there's surely a better way to do this
-    prefixes = get_extra_cfda_attrinutes("federal_agency_prefix")
-    extensions = get_extra_cfda_attrinutes("three_digit_extension")
-    cluster_names = get_extra_cfda_attrinutes("cluster_name")
-    other_cluster_names = get_extra_cfda_attrinutes("other_cluster_name")
+    prefixes = get_extra_cfda_attributes("federal_agency_prefix")
+    extensions = get_extra_cfda_attributes("three_digit_extension")
+    cluster_names = get_extra_cfda_attributes("cluster_name")
+    other_cluster_names = get_extra_cfda_attributes("other_cluster_name")
 
     for obj, pfix, ext, addl, cn, ocn in zip(
         table["rows"], prefixes, extensions, addls, cluster_names, other_cluster_names
@@ -339,7 +341,7 @@ def generate_federal_awards(sac, dbkey, year, outfile):
         obj["fields"].append(ocn)
         award_counter += 1
 
-    table["singletons"]["auditee_uei"] = general.UEI
+    table["singletons"]["auditee_uei"] = gen.UEI
     table["singletons"]["total_amount_expended"] = total
 
     return (wb, table)

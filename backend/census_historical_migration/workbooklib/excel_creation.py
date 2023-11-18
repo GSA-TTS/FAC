@@ -1,8 +1,6 @@
 from collections import namedtuple as NT
 from django.forms import model_to_dict
-import sys
 
-from collections import namedtuple as NT
 from datetime import date
 from config import settings
 import sys
@@ -70,7 +68,6 @@ def set_range(wb, range_name, values, default=None, conversion_fun=str):
     start_cell = dest[1].replace("$", "").split(":")[0]
     col = col_to_ndx(start_cell[0])
     start_row = int(start_cell[1])
-
 
     for ndx, v in enumerate(values):
         row = ndx + start_row

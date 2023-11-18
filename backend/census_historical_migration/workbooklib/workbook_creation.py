@@ -30,16 +30,16 @@ def setup_sac(user, test_name, dbkey):
     return sac
 
 
-def generate_workbook(workbook_generator, sac, dbkey, year, section):
+def generate_workbook(workbook_generator, sac, gen, section):
     with MemoryFS() as mem_fs:
         filename = (
             get_template_name_for_section(section)
             .replace(".xlsx", "-{}.xlsx")
-            .format(dbkey)
+            .format(gen.DBKEY)
         )
         with mem_fs.openbin(filename, mode="w") as outfile:
             # Generate the workbook object along with the API JSON representation
-            wb, json_data = workbook_generator(sac, dbkey, year, outfile)
+            wb, json_data = workbook_generator(sac, gen, outfile)
 
         # Re-open the file in read mode to create an Excel file object
         with mem_fs.openbin(filename, mode="r") as outfile:
@@ -48,10 +48,10 @@ def generate_workbook(workbook_generator, sac, dbkey, year, section):
         return wb, json_data, excel_file, filename
 
 
-def workbook_loader(user, sac, dbkey, year):
+def workbook_loader(user, sac, gen):
     def _loader(workbook_generator, section):
         wb, json_data, excel_file, filename = generate_workbook(
-            workbook_generator, sac, dbkey, year, section
+            workbook_generator, sac, gen, section
         )
 
         if user:
