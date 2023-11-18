@@ -1,5 +1,5 @@
 import audit.validators
-from datetime import date, timedelta
+from datetime import timedelta
 from census_historical_migration.exception_utils import DataMigrationError
 from census_historical_migration.workbooklib.census_models.census import (
     CensusGen22 as Gen,
@@ -10,16 +10,17 @@ from census_historical_migration.sac_general_lib.utils import (
 from census_historical_migration.base_field_maps import FormFieldMap, FormFieldInDissem
 from census_historical_migration.sac_general_lib.utils import (
     _create_json_from_db_object,
-    _boolean_field,
 )
 
 mappings = [
     FormFieldMap(
         "auditee_fiscal_period_start", "fyenddate", "fy_start_date", None, str
     ),
-    FormFieldMap("auditee_fiscal_period_end", "fyenddate", "fy_end_date", None, date),
+    FormFieldMap("auditee_fiscal_period_end", "fyenddate", "fy_end_date", None, str),
     FormFieldMap("audit_period_covered", "periodcovered", FormFieldInDissem, None, str),
-    FormFieldMap("audit_type", "audittype", FormFieldInDissem, None, str),
+    FormFieldMap(
+        "audit_type", "audittype", FormFieldInDissem, None, str
+    ),  # FIXME: It appears the audit_type attribute is duplicated in the sac object: it exists both in the object and in the general_information section.
     FormFieldMap("auditee_address_line_1", "street1", FormFieldInDissem, None, str),
     FormFieldMap("auditee_city", "city", FormFieldInDissem, None, str),
     FormFieldMap(
@@ -82,11 +83,6 @@ def _xform_country(gen):
     return gen
 
 
-def _xform_email(gen):
-    gen["auditor_email"] = gen.get("auditor_email", "noemailfound@noemail.com")
-    return gen
-
-
 def _xform_auditee_fiscal_period_end(gen):
     gen["auditee_fiscal_period_end"] = _census_date_to_datetime(
         gen.get("auditee_fiscal_period_end")
@@ -112,18 +108,6 @@ def _xform_audit_type(gen):
     return gen
 
 
-def _xform_multiple_eins_covered(gen):
-    return _boolean_field(gen, "multiple_eins_covered")
-
-
-def _xform_multiple_ueis_covered(gen):
-    return _boolean_field(gen, "multiple_ueis_covered")
-
-
-def _xform_secondary_auditors_exist(gen):
-    return _boolean_field(gen, "secondary_auditors_exist")
-
-
 def _general_information(dbkey):
     gobj: Gen = Gen.select().where(Gen.dbkey == dbkey).first()
 
@@ -134,12 +118,8 @@ def _general_information(dbkey):
         _xform_auditee_fiscal_period_start,
         _xform_auditee_fiscal_period_end,
         _xform_country,
-        _xform_email,
         _xform_audit_period_covered,
         _xform_audit_type,
-        _xform_multiple_eins_covered,
-        _xform_multiple_ueis_covered,
-        _xform_secondary_auditors_exist,
     ]
 
     # Apply transformations

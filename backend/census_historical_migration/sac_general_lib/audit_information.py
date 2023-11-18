@@ -81,11 +81,6 @@ def _get_gaap_results(dbkey):
     return gaap_results.keys()
 
 
-def _boolean_field(audit_info, field_name):
-    audit_info[field_name] = audit_info.get(field_name, "N") == "Y"
-    return audit_info
-
-
 def _xform_agencies(audit_info):
     new_audit_info = audit_info.copy()
     # Apply transformation to each key
@@ -95,26 +90,6 @@ def _xform_agencies(audit_info):
 
     new_audit_info["agencies"] = transformed_agencies
     return new_audit_info
-
-
-def _xform_aicpa_audit_guide_included(audit_info):
-    return _boolean_field(audit_info, "is_aicpa_audit_guide_included")
-
-
-def _xform_going_concern_included(audit_info):
-    return _boolean_field(audit_info, "is_going_concern_included")
-
-
-def _xform_internal_control_deficiency_disclosed(audit_info):
-    return _boolean_field(audit_info, "is_internal_control_deficiency_disclosed")
-
-
-def _xform_internal_control_material_weakness_disclosed(audit_info):
-    return _boolean_field(audit_info, "is_internal_control_material_weakness_disclosed")
-
-
-def _xform_material_noncompliance_disclosed(audit_info):
-    return _boolean_field(audit_info, "is_material_noncompliance_disclosed")
 
 
 def _build_initial_audit_information(dbkey):
@@ -133,11 +108,6 @@ def _audit_information(dbkey):
     # List of transformation functions
     transformations = [
         _xform_agencies,
-        _xform_aicpa_audit_guide_included,
-        _xform_going_concern_included,
-        _xform_internal_control_deficiency_disclosed,
-        _xform_internal_control_material_weakness_disclosed,
-        _xform_material_noncompliance_disclosed,
     ]
 
     # Apply transformations
