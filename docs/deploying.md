@@ -22,7 +22,7 @@ We use [manifests](https://docs.cloudfoundry.org/devguide/deploy-apps/manifest.h
 - [cf-cli](https://docs.cloudfoundry.org/cf-cli/) Cloudfoundry's CLI
   - Mac install of v8 needed for Cloud.gov: `brew install cloudfoundry/tap/cf-cli@8`
 - [cloud.gov dashboard](https://www.cloud.gov)
-- [cloud.gov deploy action](https://github.com/18F/cg-deploy-action)
+- [cloud.gov deploy action](https://github.com/cloud-gov/cg-cli-tools)
 - [application logs](https://logs.fr.cloud.gov/) with search and dashboard
 
 ## Cloud.gov
