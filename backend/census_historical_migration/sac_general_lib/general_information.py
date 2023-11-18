@@ -1,5 +1,6 @@
 import audit.validators
 from datetime import date, timedelta
+from census_historical_migration.exception_utils import DataMigrationError
 from census_historical_migration.workbooklib.census_models.census import (
     CensusGen22 as Gen,
 )
@@ -38,9 +39,7 @@ mappings = [
     FormFieldMap("auditor_country", "cpacountry", FormFieldInDissem, None, str),
     FormFieldMap("auditor_ein", "auditor_ein", FormFieldInDissem, None, str),
     FormFieldMap("auditor_ein_not_an_ssn_attestation", None, None, True, bool),
-    FormFieldMap(
-        "auditor_email", "cpaemail", FormFieldInDissem, "noemailfound@noemail.com", str
-    ),  # FIXME: Do we want to keep `noemailfound@noemail.com`?
+    FormFieldMap("auditor_email", "cpaemail", FormFieldInDissem, None, str),
     FormFieldMap("auditor_firm_name", "cpafirmname", FormFieldInDissem, None, str),
     FormFieldMap("auditor_phone", "cpaphone", FormFieldInDissem, None, str),
     FormFieldMap("auditor_state", "cpastate", FormFieldInDissem, None, str),
@@ -63,7 +62,7 @@ mappings = [
 def _period_covered(s):
     period_dict = {"A": "annual", "B": "biennial", "O": "other"}
     if s not in period_dict:
-        raise KeyError(f"Key '{s}' not found in period coverage mapping")
+        raise DataMigrationError(f"Key '{s}' not found in period coverage mapping")
     return period_dict[s]
 
 
@@ -74,7 +73,7 @@ def _census_audit_type(s):
         "A": "alternative-compliance-engagement",
     }
     if s not in audit_type_dict:
-        raise KeyError(f"Key '{s}' not found in census audit type mapping")
+        raise DataMigrationError(f"Key '{s}' not found in census audit type mapping")
     return audit_type_dict[s]
 
 

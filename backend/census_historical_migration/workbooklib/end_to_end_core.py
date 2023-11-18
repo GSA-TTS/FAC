@@ -1,3 +1,4 @@
+from census_historical_migration.exception_utils import DataMigrationError
 from users.models import User
 import argparse
 import logging
@@ -198,6 +199,7 @@ def generate_workbooks(user, dbkey, year):
     sac = setup_sac(user, entity_id, dbkey)
     if sac.general_information["audit_type"] == "alternative-compliance-engagement":
         print(f"Skipping ACE audit: {dbkey}")
+        raise DataMigrationError("Skipping ACE audit")
     else:
         builder_loader = workbook_builder_loader(user, sac, dbkey, year)
         json_test_tables = []

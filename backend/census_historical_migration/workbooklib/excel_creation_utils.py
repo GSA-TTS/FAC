@@ -1,3 +1,4 @@
+from census_historical_migration.exception_utils import DataMigrationError
 from census_historical_migration.base_field_maps import WorkbookFieldInDissem
 from census_historical_migration.sac_general_lib.report_id_generator import (
     dbkey_to_report_id,
@@ -57,8 +58,7 @@ def set_uei(Gen, wb, dbkey):
     if g.uei:
         set_range(wb, "auditee_uei", [g.uei])
     else:
-        g.uei = "BADBADBADBAD"  # FIXME: Shouldn't this raise an exception here?
-        set_range(wb, "auditee_uei", [g.uei])
+        raise DataMigrationError(f"UEI is not set for this audit: {dbkey}")
     return g
 
 

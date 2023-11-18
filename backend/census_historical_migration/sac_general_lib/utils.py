@@ -8,8 +8,10 @@ def _create_json_from_db_object(gobj, mappings):
             value = getattr(gobj, mapping.in_db, mapping.default)
         else:
             value = mapping.default
-
-        json_obj[mapping.in_form] = value
+        # Fields with a value of None are skipped to maintain consistency with the logic
+        # used in workbook data extraction and to prevent converting None into the string "None".
+        if value is not None:
+            json_obj[mapping.in_form] = value
     return json_obj
 
 

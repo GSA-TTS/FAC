@@ -1,7 +1,7 @@
 import logging
 
 from django.apps import apps
-
+from django.conf import settings
 from census_historical_migration.sac_general_lib.general_information import (
     _general_information,
 )
@@ -56,34 +56,35 @@ def _create_sac(user, dbkey):
     Access.objects.create(
         sac=sac,
         user=user,
-        email="bob_the_auditee_official@auditee.org",  # user.email, FIXME - Confirm this is the right value?
+        email="fac-census-migration-auditee-official@auditee.org",  # user.email,
         role="certifying_auditee_contact",
     )
     Access.objects.create(
         sac=sac,
         user=user,
-        email="bob_the_auditor_official@auditor.org",  # user.email, FIXME - Confirm this is the right value?
+        email="fac-census-migration-auditee-official@auditee.org",  # user.email,
         role="certifying_auditor_contact",
     )
 
     sac.auditee_certification = _auditee_certification(dbkey)
     sac.auditor_certification = _auditor_certification(dbkey)
-    sac.data_source = "CENSUS"  # FIXME - Confirm this is the right value?
+    sac.data_source = settings.CENSUS_DATA_SOURCE
     sac.save()
 
     logger.info("Created single audit checklist %s", sac)
     return sac
 
 
-def setup_sac(user, test_name, dbkey):
+def setup_sac(user, auditee_name, dbkey):
+    """Create a SAC object for the historic data migration."""
     if user is None:
         logger.error("No user provided to setup_sac")
         return
-    logger.info(f"Creating a SAC object for {user}, {test_name}")
+    logger.info(f"Creating a SAC object for {user}, {auditee_name}")
     SingleAuditChecklist = apps.get_model("audit.SingleAuditChecklist")
 
     sac = SingleAuditChecklist.objects.filter(
-        submitted_by=user, general_information__auditee_name=test_name
+        submitted_by=user, general_information__auditee_name=auditee_name
     ).first()
 
     logger.info(sac)
