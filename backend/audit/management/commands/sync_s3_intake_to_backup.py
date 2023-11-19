@@ -56,23 +56,25 @@ def sync_daily(config, env):
 
 # docker run --network host -e ENV=LOCAL -v "$PWD":/python jadudm/s3sync
 class Command(BaseCommand):
-    config = configparser.ConfigParser()
-    config.read(r'audit/backuplib/config.txt')
-    env = extend_path(['/sync', '/sync/minio-binaries'])
-    new_env = add_env_vars(env,
-                           {"AWS_ACCESS_KEY_ID": "longtest",
-                            "AWS_SECRET_ACCESS_KEY": "longtest",
-                            "AWS_DEFAULT_REGION": "us-east-1",
-                            "AWS_REGION": "us-east-1",
-                            "AWS_ENDPOINT_URL": config.get('minio', 'endpoint')
-                            })
-    
-    create_minio_alias(config, new_env)
-    create_s3_buckets(config, new_env,
-                   ["gsa-fac-private-s3",
-                    "fac-census-to-gsafac-s3",
-                    "daily-sync-gsa-fac-private-s3",
-                    "weekly-sync-gsa-fac-private-s3"
-                    ])
-    
-    sync_daily(config, new_env)
+
+    def handle(self, *args, **options):
+        config = configparser.ConfigParser()
+        config.read(r'audit/backuplib/config.txt')
+        env = extend_path(['/sync', '/sync/minio-binaries'])
+        new_env = add_env_vars(env,
+                            {"AWS_ACCESS_KEY_ID": "longtest",
+                                "AWS_SECRET_ACCESS_KEY": "longtest",
+                                "AWS_DEFAULT_REGION": "us-east-1",
+                                "AWS_REGION": "us-east-1",
+                                "AWS_ENDPOINT_URL": config.get('minio', 'endpoint')
+                                })
+        
+        create_minio_alias(config, new_env)
+        create_s3_buckets(config, new_env,
+                    ["gsa-fac-private-s3",
+                        "fac-census-to-gsafac-s3",
+                        "daily-sync-gsa-fac-private-s3",
+                        "weekly-sync-gsa-fac-private-s3"
+                        ])
+        
+        sync_daily(config, new_env)
