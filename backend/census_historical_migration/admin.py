@@ -2,10 +2,10 @@ from django.contrib import admin  # noqa: F401
 
 from census_historical_migration.models import (
     ELECAUDITHEADER,
-    FAILED_SACS,
-    CHANGE_RECORDS,
+    FailedSacs,
+    ChangeRecords,
 )
 
 admin.site.register(ELECAUDITHEADER)
-admin.site.register(FAILED_SACS)
-admin.site.register(CHANGE_RECORDS)
+admin.site.register(FailedSacs)
+admin.site.register(ChangeRecords)
