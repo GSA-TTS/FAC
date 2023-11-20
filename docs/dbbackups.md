@@ -36,7 +36,7 @@ cf bind-service gsa-fac backups
 
 Restart the app so changes occur and wait for the instance to come back up
 ```sh
-cf restart gsa-fac
+cf restart gsa-fac --strategy rolling
 ```
 
 Unbind the existing fac-private-s3 bucket from the app
@@ -51,7 +51,7 @@ cf bind-service gsa-fac fac-private-s3 -c '{"additional_instances": ["backups"]}
 
 Restart the app so changes occur and wait for the instance to come back up
 ```sh
-cf restart gsa-fac
+cf restart gsa-fac --strategy rolling
 ```
 
 Running things by hand:
