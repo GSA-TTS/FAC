@@ -445,47 +445,57 @@ class ELECCAPTEXT(models.Model):
     MULTIPLEUEIS = models.TextField(blank=True, null=True)
 
 
-class FAILED_SACS(models.Model):
-    DBKEY = models.TextField(blank=True, null=True)
+class FailedSacs(models.Model):
+    dbkey = models.TextField(db_column="DBKEY", blank=True, null=True)
 
-    AUDITYEAR = models.TextField(blank=True, null=True)
+    audityear = models.TextField(db_column="AUDITYEAR", blank=True, null=True)
 
-    EIN = models.TextField(blank=True, null=True)
+    ein = models.TextField(db_column="EIN", blank=True, null=True)
 
-    UEI = models.TextField(blank=True, null=True)
+    uei = models.TextField(db_column="UEI", blank=True, null=True)
 
-    ERROR = models.TextField(blank=True, null=True)
+    error = models.TextField(db_column="ERROR", blank=True, null=True)
 
-    RUN_DATETIME = models.DateField(blank=True, null=True)
+    run_datetime = models.DateField(db_column="RUN_DATETIME", blank=True, null=True)
 
 
-class CHANGE_RECORDS(models.Model):
-    REPORTID = models.TextField(blank=True, null=True)
+class ChangeRecords(models.Model):
+    report_id = models.TextField(db_column="REPORT_ID", blank=True, null=True)
 
-    DBKEY = models.TextField(blank=True, null=True)
+    dbkey = models.TextField(db_column="DBKEY", blank=True, null=True)
 
-    AUDITYEAR = models.TextField(blank=True, null=True)
+    audityear = models.TextField(db_column="AUDITYEAR", blank=True, null=True)
 
-    EIN = models.TextField(blank=True, null=True)
+    ein = models.TextField(db_column="EIN", blank=True, null=True)
 
-    UEI = models.TextField(blank=True, null=True)
+    uei = models.TextField(db_column="UEI", blank=True, null=True)
 
-    CENSUS_TABLE_NAME = models.TextField(blank=True, null=True)
+    census_table_NAME = models.TextField(
+        db_column="CENSUS_TABLE_NAME", blank=True, null=True
+    )
 
-    CENSUS_COLUMN_NAME = models.TextField(blank=True, null=True)
+    census_column_name = models.TextField(
+        db_column="CENSUS_COLUMN_NAME", blank=True, null=True
+    )
 
-    CENSUS_DATA = models.TextField(blank=True, null=True)
+    census_data = models.TextField(db_column="CENSUS_DATA", blank=True, null=True)
 
-    GSAFAC_TABLE_NAME = models.TextField(blank=True, null=True)
+    gsafac_table_name = models.TextField(
+        db_column="GSAFAC_TABLE_NAME", blank=True, null=True
+    )
 
-    GSAFAC_COLUMN_NAME = models.TextField(blank=True, null=True)
+    gsafac_column_name = models.TextField(
+        db_column="GSAFAC_COLUMN_NAME", blank=True, null=True
+    )
 
-    GSAFAC_DATA = models.TextField(blank=True, null=True)
+    gsafac_data = models.TextField(db_column="GSAFAC_DATA", blank=True, null=True)
 
-    TRANSFORMATION_FUNCTION = models.TextField(blank=True, null=True)
+    transformation_function = models.TextField(
+        db_column="TRANSFORMATION_FUNCTION", blank=True, null=True
+    )
 
-    RUN_DATETIME = models.DateField(blank=True, null=True)
+    run_datetime = models.DateField(db_column="RUN_DATETIME", blank=True, null=True)
 
-    IS_RUN_SUCCESS = models.TextField(blank=True, null=True)
+    is_run_success = models.TextField(db_column="IS_RUN_SUCCESS", blank=True, null=True)
 
-    GIT_HASH = models.TextField(blank=True, null=True)
+    git_hash = models.TextField(db_column="GIT_HASH", blank=True, null=True)
