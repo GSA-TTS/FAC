@@ -12,6 +12,12 @@ from census_historical_migration.sac_general_lib.utils import (
     _create_json_from_db_object,
 )
 
+PERIOD_DICT = {"A": "annual", "B": "biennial", "O": "other"}
+AUDIT_TYPE_DICT = {
+    "S": "single-audit",
+    "P": "program-specific",
+    "A": "alternative-compliance-engagement",
+}
 mappings = [
     FormFieldMap(
         "auditee_fiscal_period_start", "fyenddate", "fy_start_date", None, str
@@ -61,21 +67,15 @@ mappings = [
 
 
 def _period_covered(s):
-    period_dict = {"A": "annual", "B": "biennial", "O": "other"}
-    if s not in period_dict:
+    if s not in PERIOD_DICT:
         raise DataMigrationError(f"Key '{s}' not found in period coverage mapping")
-    return period_dict[s]
+    return PERIOD_DICT[s]
 
 
 def _census_audit_type(s):
-    audit_type_dict = {
-        "S": "single-audit",
-        "P": "program-specific",
-        "A": "alternative-compliance-engagement",
-    }
-    if s not in audit_type_dict:
+    if s not in AUDIT_TYPE_DICT:
         raise DataMigrationError(f"Key '{s}' not found in census audit type mapping")
-    return audit_type_dict[s]
+    return AUDIT_TYPE_DICT[s]
 
 
 def _xform_country(gen):
