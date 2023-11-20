@@ -5,7 +5,7 @@ from model_bakery import baker
 from .models import ELECAUDITHEADER, FAILED_SACS, CHANGE_RECORDS
 
 
-class CensusHistoricalMigrationModelsTestCases(TestCase):
+class CensusHistoricalMigrationTests(TestCase):
     def test_can_load_elecauditheader_model(self):
         gen = ELECAUDITHEADER.objects.all()
         self.assertIsNotNone(gen)
