@@ -1,8 +1,10 @@
 from playhouse.shortcuts import model_to_dict
-
 from collections import namedtuple as NT
-from openpyxl.utils.cell import rows_from_range, coordinate_from_string
-from openpyxl.utils.cell import column_index_from_string
+from openpyxl.utils.cell import (
+    rows_from_range,
+    coordinate_from_string,
+    column_index_from_string,
+)
 
 from datetime import date
 from config import settings
@@ -59,9 +61,9 @@ def set_range(wb, range_name, values, default=None, conversion_fun=str):
             break
 
         # Get the row and column to set the current value
-        cell = row[0]                               # [('B12',)] -> ('B12',)
-        col_str, row = coordinate_from_string(cell) # ('B12',) -> 'B', 12
-        col = column_index_from_string(col_str)     # 'B' -> 2
+        cell = row[0]  # [('B12',)] -> ('B12',)
+        col_str, row = coordinate_from_string(cell)  # ('B12',) -> 'B', 12
+        col = column_index_from_string(col_str)  # 'B' -> 2
 
         # Set the value of the cell
         converted_value = conversion_fun(value) if value else default or ""
