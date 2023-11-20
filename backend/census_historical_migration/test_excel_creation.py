@@ -9,10 +9,13 @@ from openpyxl.workbook.defined_name import DefinedName
 
 
 class ExcelCreationTests(TestCase):
-    range_name, start_val, end_val, cell = "my_range", "foo", "bar", "A6"
+    range_name = "my_range"
 
 
     def init_named_range(self, coord):
+        """
+        Create and return a workbook with a named range for the given coordinate
+        """
         wb = Workbook()
         ws = wb.active
 
@@ -100,3 +103,35 @@ class ExcelCreationTests(TestCase):
         set_range(wb, self.range_name, ['bar'])
         self.assertEqual(ws['A1'].value, 'bar') # New value
         self.assertEqual(ws['A2'].value, 'foo') # Unchanged
+
+
+    def test_set_range_multi_dests(self):
+        """
+        Error when multiple destinations found
+        """
+        wb = Workbook()
+        ws = wb.active
+
+        # Create named range with multiple destinations
+        ref = \
+            f"{quote_sheetname(ws.title)}!{absolute_coordinate('A6')}, \
+              {quote_sheetname(ws.title)}!{absolute_coordinate('B6')}"
+        defn = DefinedName(self.range_name, attr_text=ref)
+        wb.defined_names.add(defn)
+
+        self.assertEqual(len(list(wb.defined_names[self.range_name].destinations)), 2)
+        self.assertRaises(ValueError, set_range, wb, self.range_name, ['bar'])
+
+
+    def test_set_range_ws_missing(self):
+        """
+        Error when the named range isn't in the given WS
+        """
+        wb = Workbook()
+
+        # Create named range with bad sheet title
+        ref = f"{quote_sheetname('wrong name')}!{absolute_coordinate('A6')}"
+        defn = DefinedName(self.range_name, attr_text=ref)
+        wb.defined_names.add(defn)
+
+        self.assertRaises(KeyError, set_range, wb, self.range_name, ['bar'])
