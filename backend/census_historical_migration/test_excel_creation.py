@@ -51,6 +51,23 @@ class ExcelCreationTests(TestCase):
         set_range(wb, self.range_name, [None], default="bar")
         self.assertEqual(ws["A6"].value, "bar")
 
+    def test_set_range_no_default(self):
+        """
+        Default to empty string when no value or default given
+        """
+        wb = self.init_named_range("A6")
+        ws = wb.active
+
+        ws.cell(row=6, column=1, value="foo")
+        self.assertEqual(ws["A6"].value, "foo")
+
+        set_range(
+            wb,
+            self.range_name,
+            [None],
+        )
+        self.assertEqual(ws["A6"].value, "")
+
     def test_set_range_conversion(self):
         """
         Applies given conversion function
