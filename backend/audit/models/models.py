@@ -670,7 +670,7 @@ class SingleAuditReportFile(models.Model):
         super().save(*args, **kwargs)
 
 
-class MigrationChangeLogs(models.Model):
+class MigrationChangeRecord(models.Model):
     report_id = models.TextField(db_column="REPORT_ID", blank=True, null=True)
     dbkey = models.TextField(db_column="DBKEY", blank=True, null=True)
     audityear = models.TextField(db_column="AUDITYEAR", blank=True, null=True)
