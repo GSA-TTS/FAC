@@ -1,9 +1,11 @@
-from census_historical_migration.workbooklib.excel_creation import (
-    FieldMap,
-    WorkbookFieldInDissem,
+from census_historical_migration.workbooklib.excel_creation_utils import (
     set_uei,
     map_simple_columns,
     generate_dissemination_test_table,
+)
+from census_historical_migration.base_field_maps import (
+    SheetFieldMap,
+    WorkbookFieldInDissem,
 )
 from census_historical_migration.workbooklib.templates import sections_to_template_paths
 from census_historical_migration.workbooklib.census_models.census import dynamic_import
@@ -25,9 +27,11 @@ def generate_corrective_action_plan(dbkey, year, outfile):
         sections_to_template_paths[FORM_SECTIONS.CORRECTIVE_ACTION_PLAN]
     )
     mappings = [
-        FieldMap("reference_number", "findingrefnums", "finding_ref_number", None, str),
-        FieldMap("planned_action", "text", WorkbookFieldInDissem, None, str),
-        FieldMap(
+        SheetFieldMap(
+            "reference_number", "findingrefnums", "finding_ref_number", None, str
+        ),
+        SheetFieldMap("planned_action", "text", WorkbookFieldInDissem, None, str),
+        SheetFieldMap(
             "contains_chart_or_table", "chartstables", WorkbookFieldInDissem, None, str
         ),
     ]
