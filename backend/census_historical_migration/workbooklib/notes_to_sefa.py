@@ -1,15 +1,11 @@
 from census_historical_migration.workbooklib.excel_creation import (
     FieldMap,
     set_uei,
-    set_single_cell_range,
+    set_range,
     map_simple_columns,
     generate_dissemination_test_table,
-    test_pfix,
 )
 from census_historical_migration.workbooklib.templates import sections_to_template_paths
-from census_historical_migration.workbooklib.excel_creation import (
-    set_range,
-)
 from census_historical_migration.workbooklib.census_models.census import dynamic_import
 from audit.fixtures.excel import FORM_SECTIONS
 
@@ -22,9 +18,8 @@ import logging
 logger = logging.getLogger(__name__)
 
 mappings = [
-    FieldMap("note_title", "title", "title", None, test_pfix(3)),
-    FieldMap("note_content", "content", "content", None, test_pfix(3)),
-    # FieldMap("seq_number", "seq_number", "note_seq_number", 0, int),
+    FieldMap("note_title", "title", "title", None, str),
+    FieldMap("note_content", "content", "content", None, str),
 ]
 
 
@@ -89,9 +84,9 @@ def generate_notes_to_sefa(dbkey, year, outfile):
     else:
         is_used = "Both"
 
-    set_single_cell_range(wb, "accounting_policies", policies_content)
-    set_single_cell_range(wb, "is_minimis_rate_used", is_used)
-    set_single_cell_range(wb, "rate_explained", rate_content)
+    set_range(wb, "accounting_policies", [policies_content])
+    set_range(wb, "is_minimis_rate_used", [is_used])
+    set_range(wb, "rate_explained", [rate_content])
 
     # Map the rest as notes.
     map_simple_columns(wb, mappings, notes)

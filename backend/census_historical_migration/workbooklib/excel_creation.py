@@ -1,11 +1,13 @@
-from collections import namedtuple as NT
+from openpyxl.utils.cell import column_index_from_string
 from playhouse.shortcuts import model_to_dict
-import sys
 
-import logging
+from collections import namedtuple as NT
 from datetime import date
 from config import settings
+import sys
+import logging
 import json
+
 
 logger = logging.getLogger(__name__)
 
@@ -15,34 +17,6 @@ logger = logging.getLogger(__name__)
 # before filling in the XLSX workbooks.
 FieldMap = NT("FieldMap", "in_sheet in_db in_dissem default type")
 WorkbookFieldInDissem = 1000
-
-
-def test_pfix(n):
-    def _test(o):
-        # return ' '.join(["TEST" for x in range(n)]) + " " + str(o)
-        return o
-
-    return _test
-
-
-def set_single_cell_range(wb, range_name, value):
-    the_range = wb.defined_names[range_name]
-    # The above returns a generator. Turn it to a list, and grab
-    # the first element of the list. Now, this *tuple* contains a
-    # sheet name and a cell reference... which you need to get rid
-    # of the '$' to use.
-    # https://itecnote.com/tecnote/python-using-excel-named-ranges-in-python-with-openpyxl/
-    tup = list(the_range.destinations)[0]
-    sheet_title = tup[0]
-    cell_ref = tup[1].replace("$", "")
-    ws = wb[sheet_title]
-    ws[cell_ref] = value
-
-
-# A tiny helper to index into workbooks.
-# Assumes a capital letter.
-def col_to_ndx(col):
-    return ord(col) - 65 + 1
 
 
 # Helper to set a range of values.
@@ -55,7 +29,7 @@ def set_range(wb, range_name, values, default=None, conversion_fun=str):
     ws = wb[sheet_title]
 
     start_cell = dest[1].replace("$", "").split(":")[0]
-    col = col_to_ndx(start_cell[0])
+    col = column_index_from_string(start_cell[0])
     start_row = int(start_cell[1])
 
     for ndx, v in enumerate(values):
@@ -86,10 +60,10 @@ def set_range(wb, range_name, values, default=None, conversion_fun=str):
 def set_uei(Gen, wb, dbkey):
     g = Gen.select().where(Gen.dbkey == dbkey).get()
     if g.uei:
-        set_single_cell_range(wb, "auditee_uei", g.uei)
+        set_range(wb, "auditee_uei", [g.uei])
     else:
         g.uei = "BADBADBADBAD"
-        set_single_cell_range(wb, "auditee_uei", g.uei)
+        set_range(wb, "auditee_uei", [g.uei])
     return g
 
 
