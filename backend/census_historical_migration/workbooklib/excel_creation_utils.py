@@ -1,22 +1,18 @@
+from census_historical_migration.exception_utils import DataMigrationError
+from census_historical_migration.base_field_maps import WorkbookFieldInDissem
+from census_historical_migration.sac_general_lib.report_id_generator import (
+    dbkey_to_report_id,
+)
+from census_historical_migration.workbooklib.templates import sections_to_template_paths
+
 from openpyxl.utils.cell import column_index_from_string
 from playhouse.shortcuts import model_to_dict
 
-from collections import namedtuple as NT
-from datetime import date
-from config import settings
 import sys
 import logging
-import json
 
 
 logger = logging.getLogger(__name__)
-
-# This provides a way to map the sheet in the workbook to the
-# column in the DB. It also has a default value and
-# the type of value, so that things can be set correctly
-# before filling in the XLSX workbooks.
-FieldMap = NT("FieldMap", "in_sheet in_db in_dissem default type")
-WorkbookFieldInDissem = 1000
 
 
 # Helper to set a range of values.
@@ -62,8 +58,7 @@ def set_uei(Gen, wb, dbkey):
     if g.uei:
         set_range(wb, "auditee_uei", [g.uei])
     else:
-        g.uei = "BADBADBADBAD"
-        set_range(wb, "auditee_uei", [g.uei])
+        raise DataMigrationError(f"UEI is not set for this audit: {dbkey}")
     return g
 
 
@@ -92,43 +87,32 @@ def map_simple_columns(wb, mappings, values):
         )
 
 
-def _census_date_to_datetime(cd):
-    lookup = {
-        "JAN": 1,
-        "FEB": 2,
-        "MAR": 3,
-        "APR": 4,
-        "MAY": 5,
-        "JUN": 6,
-        "JUL": 7,
-        "AUG": 8,
-        "SEP": 9,
-        "OCT": 10,
-        "NOV": 11,
-        "DEC": 12,
-    }
-    year = int(cd.split("-")[2])
-    month = lookup[cd.split("-")[1]]
-    day = int(cd.split("-")[0])
-    return date(year + 2000, month, day)
+def add_hyphen_to_zip(zip):
+    strzip = str(zip)
+    if len(strzip) == 5:
+        return strzip
+    elif len(strzip) == 9:
+        return f"{strzip[0:5]}-{strzip[5:9]}"
+    else:
+        logger.info("ZIP IS MALFORMED IN WORKBOOKS E2E / SAC_CREATION")
+        return strzip
 
 
-# FIXME: Get the padding/shape right on the report_id
-def dbkey_to_test_report_id(Gen, dbkey):
-    g = Gen.select(Gen.audityear, Gen.fyenddate).where(Gen.dbkey == dbkey).get()
-    # month = g.fyenddate.split('-')[1]
-    # 2022JUN0001000003
-    # We start new audits at 1 million.
-    # So, we want 10 digits, and zero-pad for
-    # historic DBKEY report_ids
-    dt = _census_date_to_datetime(g.fyenddate)
-    return f"{g.audityear}-{dt.month:02}-TSTDAT-{dbkey.zfill(10)}"
+def get_template_name_for_section(section):
+    """
+    Return a workbook template name corresponding to the given section
+    """
+    if section in sections_to_template_paths:
+        template_name = sections_to_template_paths[section].name
+        return template_name
+    else:
+        raise ValueError(f"Unknown section {section}")
 
 
 def generate_dissemination_test_table(Gen, api_endpoint, dbkey, mappings, objects):
     table = {"rows": list(), "singletons": dict()}
     table["endpoint"] = api_endpoint
-    table["report_id"] = dbkey_to_test_report_id(Gen, dbkey)
+    table["report_id"] = dbkey_to_report_id(Gen, dbkey)
     for o in objects:
         as_dict = model_to_dict(o)
         test_obj = {}
@@ -152,18 +136,3 @@ def generate_dissemination_test_table(Gen, api_endpoint, dbkey, mappings, object
 
         table["rows"].append(test_obj)
     return table
-
-
-def extract_metadata(sheet_json, range):
-    excel_defn = open(
-        f"{settings.BASE_DIR}/schemas/output/excel/json/{sheet_json}.json"
-    )
-    excel_defn_json = json.load(excel_defn)
-    result = None
-    for sheet in excel_defn_json["sheets"]:
-        if "name" in sheet and sheet["name"] == "Coversheet":
-            coversheet = sheet
-            for scell in coversheet["single_cells"]:
-                if ("range_name" in scell) and (scell["range_name"] == range):
-                    result = scell["value"]
-    return result

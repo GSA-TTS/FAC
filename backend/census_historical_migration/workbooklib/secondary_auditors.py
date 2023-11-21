@@ -1,12 +1,12 @@
-from census_historical_migration.workbooklib.excel_creation import (
-    FieldMap,
+from census_historical_migration.workbooklib.excel_creation_utils import (
+    add_hyphen_to_zip,
     set_uei,
     map_simple_columns,
     generate_dissemination_test_table,
 )
+from census_historical_migration.base_field_maps import SheetFieldMap
 from census_historical_migration.workbooklib.templates import sections_to_template_paths
 from census_historical_migration.workbooklib.census_models.census import dynamic_import
-from census_historical_migration.workbooklib.sac_creation import add_hyphen_to_zip
 from audit.fixtures.excel import FORM_SECTIONS
 
 import openpyxl as pyxl
@@ -16,28 +16,38 @@ import logging
 logger = logging.getLogger(__name__)
 
 mappings = [
-    FieldMap("secondary_auditor_address_city", "cpacity", "address_city", None, str),
-    FieldMap("secondary_auditor_contact_name", "cpacontact", "contact_name", None, str),
-    FieldMap("secondary_auditor_ein", "cpaein", "auditor_ein", None, str),
-    FieldMap("secondary_auditor_contact_email", "cpaemail", "contact_email", None, str),
-    FieldMap("secondary_auditor_name", "cpafirmname", "auditor_name", None, str),
-    FieldMap("secondary_auditor_contact_phone", "cpaphone", "contact_phone", None, str),
-    FieldMap("secondary_auditor_address_state", "cpastate", "address_state", None, str),
-    FieldMap(
+    SheetFieldMap(
+        "secondary_auditor_address_city", "cpacity", "address_city", None, str
+    ),
+    SheetFieldMap(
+        "secondary_auditor_contact_name", "cpacontact", "contact_name", None, str
+    ),
+    SheetFieldMap("secondary_auditor_ein", "cpaein", "auditor_ein", None, str),
+    SheetFieldMap(
+        "secondary_auditor_contact_email", "cpaemail", "contact_email", None, str
+    ),
+    SheetFieldMap("secondary_auditor_name", "cpafirmname", "auditor_name", None, str),
+    SheetFieldMap(
+        "secondary_auditor_contact_phone", "cpaphone", "contact_phone", None, str
+    ),
+    SheetFieldMap(
+        "secondary_auditor_address_state", "cpastate", "address_state", None, str
+    ),
+    SheetFieldMap(
         "secondary_auditor_address_street",
         "cpastreet1",
         "address_street",
         None,
         str,
     ),
-    FieldMap(
+    SheetFieldMap(
         "secondary_auditor_contact_title",
         "cpatitle",
         "contact_title",
         None,
         str,
     ),
-    FieldMap(
+    SheetFieldMap(
         "secondary_auditor_address_zipcode",
         "cpazipcode",
         "address_zipcode",
