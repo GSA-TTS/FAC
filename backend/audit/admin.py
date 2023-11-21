@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from audit.models import SingleAuditChecklist, Access, ExcelFile, SingleAuditReportFile
+from audit.models import SingleAuditChecklist, Access, ExcelFile, SingleAuditReportFile, MigrationChangeLogs
 
 
 class SACAdmin(admin.ModelAdmin):
@@ -46,3 +46,4 @@ admin.site.register(Access, AccessAdmin)
 admin.site.register(ExcelFile, ExcelFileAdmin)
 admin.site.register(SingleAuditChecklist, SACAdmin)
 admin.site.register(SingleAuditReportFile, AuditReportAdmin)
+admin.site.register(MigrationChangeLogs)
