@@ -15,6 +15,7 @@ from .models import (
     SingleAuditReportFile,
     User,
     generate_sac_report_id,
+    MigrationChangeLogs,
 )
 
 
@@ -260,3 +261,12 @@ class SingleAuditReportFileTests(TestCase):
             sac = baker.make(SingleAuditChecklist, submission_status=status_from)
             with self.assertRaises(LateChangeError):
                 baker.make(SingleAuditReportFile, sac=sac, file=file)
+
+
+class MigrationChangeLogsTests(TestCase):
+    def test_can_load_migration_change_logs_model(self):
+        migration_change_logs = MigrationChangeLogs.objects.all()
+        self.assertIsNotNone(migration_change_logs)
+        baker.make(MigrationChangeLogs).save()
+        migration_change_logs = MigrationChangeLogs.objects.all()
+        self.assertEquals(len(migration_change_logs), 1)
