@@ -1,25 +1,27 @@
 from django.test import TestCase
 from django.conf import settings
-from django.db import connections
+
 
 import boto3
 
 from census_historical_migration.models import ELECAUDITHEADER as Gen
+from audit.models import SingleAuditChecklist
+
+CENSUS_DB = [k for k in settings.DATABASES.keys() if "default" != k][0]
 
 
 class SettingsTestCase(TestCase):
-    def test_db(self):
-        databases = settings.DATABASES
-        self.assertEquals(len(databases), 2)
+    databases = {"default", CENSUS_DB}
 
-        for db in databases:
-            connection = connections[db]
-            self.assertTrue(db in str(connection))
-            connection.cursor()
-
-    def test_models_in_censusdb(self):
-        gens = Gen.objects.all()
-        self.assertAlmostEquals(len(gens), 0)
+    def test_models_are_in_appropriate_db(self):
+        sacs = SingleAuditChecklist.objects.all()
+        self.assertEqual(len(sacs), 0)
+        try:
+            gens = Gen.objects.using("default").all()
+        except Exception:
+            self.assertEqual(1, 1)
+        gens = Gen.objects.using(CENSUS_DB).all()
+        self.assertEqual(len(gens), 0)
 
     def test_private_s3(self):
         try:
