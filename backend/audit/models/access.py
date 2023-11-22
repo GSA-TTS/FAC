@@ -112,17 +112,18 @@ class Access(models.Model):
 def remove_email_from_submission_access(
     report_id: str,
     email: str,
+    role: str,
     removing_user: DjangoUser = None,
     event: str = "access-change",
 ) -> list[tuple[tuple[int, dict], DeletedAccess]]:
     """
-    Given an email address and a reports_id, deletes corresponding Access objects
+    Given report_id, email address and role, deletes corresponding Access objects
     and creates corresponding DeletedAccess objects.
     Will raise SingleAuditChecklist.DoesNotExist if no matching SAC exists.
     Will raise Access.DoesNotExist if no matching Access objects exist.
     """
     sac = SingleAuditChecklist.objects.get(report_id=report_id)
-    accesses = Access.objects.filter(email=email, sac=sac)
+    accesses = Access.objects.filter(sac=sac, email=email, role=role)
     if len(accesses) < 1:
         raise Access.DoesNotExist
     deletion_records: list[tuple[tuple[int, dict], DeletedAccess]] = []
