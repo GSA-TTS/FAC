@@ -147,12 +147,12 @@
                             </p>
                         </div>
                     </div>
-                    <div class="usa-table-container--scrollable" tabindex="0">
+                    <p class="margin-y-4">
+                        <strong>Results: {{ results_count }}</strong>
+                        <span class="margin-left-2 text-normal text-italic">showing {{ limit }} per page</span>
+                    </p>
+                    <div class="usa-table-container--scrollable margin-0" tabindex="0">
                         <table class="usa-table usa-table--striped">
-                            <caption>
-                                Results: {{ results_count }}
-                                <span class="margin-left-2 text-normal text-italic">showing {{ limit }} per page</span>
-                            </caption>
                             <thead>
                                 <tr>
                                     <th data-sortable scope="col" role="columnheader">Name</th>
