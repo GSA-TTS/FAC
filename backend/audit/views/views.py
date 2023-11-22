@@ -63,15 +63,13 @@ from audit.validators import (
     validate_notes_to_sefa_json,
     validate_secondary_auditors_json,
 )
-from audit.viewlib import (  # noqa
-    Home,
-    TribalDataConsent,
-    SubmissionProgressView,
-    UnlockAfterCertificationView,
-    UploadReportView,
-    no_robots,
-    submission_progress_check,
-)
+from home import Home
+
+from .submission_progress_view import SubmissionProgressView, submission_progress_check
+from .tribal_data_consent import TribalDataConsent
+from .unlock_after_certification import UnlockAfterCertificationView
+from .upload_report_view import UploadReportView
+from .no_robots import no_robots
 
 
 logging.basicConfig(
