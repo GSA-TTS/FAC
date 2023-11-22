@@ -15,7 +15,9 @@
                     {% comment %} Submission {% endcomment %}
                     <div class="search-submit">
                         <input class="usa-button" type="submit" value="Search" />
-                        <input class="usa-button usa-button--unstyled" type="reset" value="Reset Search"/>
+                        <input class="usa-button usa-button--unstyled"
+                               type="reset"
+                               value="Reset Search" />
                     </div>
                     <div class="usa-accordion usa-accordion--multiselectable"
                          data-allow-multiple>
@@ -52,11 +54,10 @@
                             {% for value, text in form.audit_year.field.choices %}
                                 <div class="usa-checkbox bg-base-lighter">
                                     <input class="usa-checkbox__input"
-										   id="audit-year-{{ text }}"
-										   name="audit_year"
-										   type="checkbox"
-										   value={{ value }}
-										   {% if text in form.cleaned_data.audit_year %}checked{% endif %} />
+                                           id="audit-year-{{ text }}"
+                                           name="audit_year" type="checkbox"
+                                           value={{ value }}
+                                           {% if text in form.cleaned_data.audit_year %}checked{% endif %} />
                                     <label class="usa-checkbox__label" for="audit-year-{{ text }}">{{ text }}</label>
                                 </div>
                             {% endfor %}
@@ -101,11 +102,13 @@
                             <label class="usa-label" for="options">Select one</label>
                             <select class="usa-select" name="cog_or_oversight" id="options">
                                 <option id="cog_or_oversight--none" value>- Select -</option>
-                                <option id="cog_or_oversight--cog" value="cog"
+                                <option id="cog_or_oversight--cog"
+                                        value="cog"
                                         {% if form.cleaned_data.cog_or_oversight == "cog" %}selected{% endif %}>
                                     Cognizant
                                 </option>
-                                <option id="cog_or_oversight--oversight" value="oversight"
+                                <option id="cog_or_oversight--oversight"
+                                        value="oversight"
                                         {% if form.cleaned_data.cog_or_oversight == "oversight" %}selected{% endif %}>
                                     Oversight
                                 </option>
@@ -120,7 +123,9 @@
                     {% comment %} Submission {% endcomment %}
                     <div class="search-submit">
                         <input class="usa-button" type="submit" value="Search" />
-                        <input class="usa-button usa-button--unstyled" type="reset" value="Reset Search"/>
+                        <input class="usa-button usa-button--unstyled"
+                               type="reset"
+                               value="Reset Search" />
                     </div>
                     {% comment %} Hidden page input for use when clicking pagination buttons {% endcomment %}
                     <input class="usa-input"
@@ -142,104 +147,106 @@
                             </p>
                         </div>
                     </div>
-                    <table class="usa-table usa-table--striped">
-                        <caption>
-                            Results: {{ results_count }}
-                            <span class="margin-left-2 text-normal text-italic">showing {{ limit }} per page</span>
-                        </caption>
-                        <thead>
-                            <tr>
-                                <th data-sortable scope="col" role="columnheader">Name</th>
-                                <th data-sortable scope="col" role="columnheader">UEI or EIN</th>
-                                <th data-sortable scope="col" role="columnheader">Acc Date</th>
-                                <th data-sortable scope="col" role="columnheader">AY</th>
-                                <th data-sortable scope="col" role="columnheader">Cog or Over</th>
-                                <th scope="col" role="columnheader">View</th>
-                                <th scope="col" role="columnheader">PDF</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for result in results %}
+                    <div class="usa-table-container--scrollable" tabindex="0">
+                        <table class="usa-table usa-table--striped">
+                            <caption>
+                                Results: {{ results_count }}
+                                <span class="margin-left-2 text-normal text-italic">showing {{ limit }} per page</span>
+                            </caption>
+                            <thead>
                                 <tr>
-                                    <th scope="row" role="rowheader">{{ result.auditee_name }}</th>
-                                    <td>{{ result.auditee_uei }}</td>
-                                    {% comment %} Sorts ascending/descending by the numeric date string (i.e. 20231231) {% endcomment %}
-                                    <td data-sort-value={{ result.fac_accepted_date|date:"Ymd" }}>{{ result.fac_accepted_date }}
-                                    </td>
-                                    <td>{{ result.audit_year }}</td>
-                                    <td>
-                                        {% if result.oversight_agency %}
-                                            Oversight
-                                        {% else %}
-                                            Cognizant
-                                        {% endif %}
-                                    </td>
-                                    <td>
-                                        <a class="usa-link display-flex flex-column flex-align-center"
-                                           href="{% url 'dissemination:Summary' report_id=result.report_id %}"
-                                           target="_blank">
-                                            <svg class="usa-icon usa-icon--size-4"
-                                                 aria-hidden="true"
-                                                 focusable="false"
-                                                 role="img">
-                                                {% uswds_sprite "visibility" %}
-                                            </svg>
-                                        </a>
-                                    </td>
-                                    <td>
-                                        <a class="usa-link display-flex flex-column flex-align-center"
-                                           href="{% url 'dissemination:PdfDownload' report_id=result.report_id %}"
-                                           target="_blank">
-                                            <svg class="usa-icon usa-icon--size-4"
-                                                 aria-hidden="true"
-                                                 focusable="false"
-                                                 role="img">
-                                                {% uswds_sprite "file_download" %}
-                                            </svg>
-                                        </a>
-                                    </td>
+                                    <th data-sortable scope="col" role="columnheader">Name</th>
+                                    <th data-sortable scope="col" role="columnheader">UEI or EIN</th>
+                                    <th data-sortable scope="col" role="columnheader">Acc Date</th>
+                                    <th data-sortable scope="col" role="columnheader">AY</th>
+                                    <th data-sortable scope="col" role="columnheader">Cog or Over</th>
+                                    <th scope="col" role="columnheader">View</th>
+                                    <th scope="col" role="columnheader">PDF</th>
                                 </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                    <nav aria-label="Pagination" class="usa-pagination">
-                        <ul class="usa-pagination__list">
-                            {% if results.has_previous %}
-                                <li class="usa-pagination__item usa-pagination__arrow">
-                                    <a class="usa-pagination__link usa-pagination__previous-page"
-                                       aria-label="Previous page">
-                                        <svg class="usa-icon" aria-hidden="true" role="img">
-                                            {% uswds_sprite "navigate_before" %}
-                                        </svg>
-                                        <span class="usa-pagination__link-text">Previous</span></a>
-                                </li>
-                            {% endif %}
-                            {% for page_number in results.adjusted_elided_pages %}
-                                {% if page_number == results.paginator.ELLIPSIS %}
-                                    <li class="usa-pagination__item usa-pagination__overflow"
-                                        aria-label="ellipsis indicating non-visible pages">
-                                        <span>…</span>
-                                    </li>
-                                {% else %}
-                                    <li class="usa-pagination__item usa-pagination__page-no">
-                                        <a class="usa-pagination__button {% if results.number == page_number %}usa-current{% endif %}"
-                                           aria-label="Page {{ page_number }}">{{ page_number }}</a>
+                            </thead>
+                            <tbody>
+                                {% for result in results %}
+                                    <tr>
+                                        <th scope="row" role="rowheader">{{ result.auditee_name }}</th>
+                                        <td>{{ result.auditee_uei }}</td>
+                                        {% comment %} Sorts ascending/descending by the numeric date string (i.e. 20231231) {% endcomment %}
+                                        <td data-sort-value={{ result.fac_accepted_date|date:"Ymd" }}>{{ result.fac_accepted_date }}
+                                        </td>
+                                        <td>{{ result.audit_year }}</td>
+                                        <td>
+                                            {% if result.oversight_agency %}
+                                                Oversight
+                                            {% else %}
+                                                Cognizant
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <a class="usa-link display-flex flex-column flex-align-center"
+                                               href="{% url 'dissemination:Summary' report_id=result.report_id %}"
+                                               target="_blank">
+                                                <svg class="usa-icon usa-icon--size-4"
+                                                     aria-hidden="true"
+                                                     focusable="false"
+                                                     role="img">
+                                                    {% uswds_sprite "visibility" %}
+                                                </svg>
+                                            </a>
+                                        </td>
+                                        <td>
+                                            <a class="usa-link display-flex flex-column flex-align-center"
+                                               href="{% url 'dissemination:PdfDownload' report_id=result.report_id %}"
+                                               target="_blank">
+                                                <svg class="usa-icon usa-icon--size-4"
+                                                     aria-hidden="true"
+                                                     focusable="false"
+                                                     role="img">
+                                                    {% uswds_sprite "file_download" %}
+                                                </svg>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        <nav aria-label="Pagination" class="usa-pagination">
+                            <ul class="usa-pagination__list">
+                                {% if results.has_previous %}
+                                    <li class="usa-pagination__item usa-pagination__arrow">
+                                        <a class="usa-pagination__link usa-pagination__previous-page"
+                                           aria-label="Previous page">
+                                            <svg class="usa-icon" aria-hidden="true" role="img">
+                                                {% uswds_sprite "navigate_before" %}
+                                            </svg>
+                                            <span class="usa-pagination__link-text">Previous</span></a>
                                     </li>
                                 {% endif %}
-                            {% endfor %}
-                            {% if results.has_next %}
-                                <li class="usa-pagination__item usa-pagination__arrow">
-                                    <a class="usa-pagination__link usa-pagination__next-page"
-                                       aria-label="Next page">
-                                        <span class="usa-pagination__link-text">Next</span>
-                                        <svg class="usa-icon" aria-hidden="true" role="img">
-                                            {% uswds_sprite "navigate_next" %}
-                                        </svg>
-                                    </a>
-                                </li>
-                            {% endif %}
-                        </ul>
-                    </nav>
+                                {% for page_number in results.adjusted_elided_pages %}
+                                    {% if page_number == results.paginator.ELLIPSIS %}
+                                        <li class="usa-pagination__item usa-pagination__overflow"
+                                            aria-label="ellipsis indicating non-visible pages">
+                                            <span>…</span>
+                                        </li>
+                                    {% else %}
+                                        <li class="usa-pagination__item usa-pagination__page-no">
+                                            <a class="usa-pagination__button {% if results.number == page_number %}usa-current{% endif %}"
+                                               aria-label="Page {{ page_number }}">{{ page_number }}</a>
+                                        </li>
+                                    {% endif %}
+                                {% endfor %}
+                                {% if results.has_next %}
+                                    <li class="usa-pagination__item usa-pagination__arrow">
+                                        <a class="usa-pagination__link usa-pagination__next-page"
+                                           aria-label="Next page">
+                                            <span class="usa-pagination__link-text">Next</span>
+                                            <svg class="usa-icon" aria-hidden="true" role="img">
+                                                {% uswds_sprite "navigate_next" %}
+                                            </svg>
+                                        </a>
+                                    </li>
+                                {% endif %}
+                            </ul>
+                        </nav>
+                    </div>
                 {% else %}
                     <div class="search-instructions">
                         <img src="{% static 'img/circle-arrow.svg' %}"
@@ -252,42 +259,31 @@
             </div>
         </div>
     </div>
-    <div
-      class="usa-modal"
-      id="device-orientation-modal"
-      aria-labelledby="device-orientation-modal-heading"
-      aria-describedby="device-orientation-modal-description"
-    >
-      <div class="usa-modal__content">
-        <div class="usa-modal__main">
-          <h2 class="usa-modal__heading" id="device-orientation-modal-heading">
-            Please rotate your device
-          </h2>
-          <div class="usa-prose">
-            <p id="device-orientation-modal-description">
-Search works best with your device in landscape orientation.            </p>
-          </div>
+    <div class="usa-modal"
+         id="device-orientation-modal"
+         aria-labelledby="device-orientation-modal-heading"
+         aria-describedby="device-orientation-modal-description">
+        <div class="usa-modal__content">
+            <div class="usa-modal__main">
+                <h2 class="usa-modal__heading" id="device-orientation-modal-heading">Please rotate your device</h2>
+                <div class="usa-prose">
+                    <p id="device-orientation-modal-description">Search works best with your device in landscape orientation.</p>
+                </div>
+            </div>
+            <button type="button"
+                    class="usa-button usa-modal__close dismiss-orientation-modal"
+                    aria-label="Close this window"
+                    data-close-modal>
+                <svg class="usa-icon" aria-hidden="true" focusable="false" role="img">
+                    {% uswds_sprite "close" %}
+                </svg>
+            </button>
         </div>
-        <button
-          type="button"
-          class="usa-button usa-modal__close dismiss-orientation-modal"
-          aria-label="Close this window"
-          data-close-modal
-        >
-          <svg class="usa-icon" aria-hidden="true" focusable="false" role="img">
-            {% uswds_sprite "close" %}
-          </svg>
-        </button>
-      </div>
     </div>
-    <a
-      href="#device-orientation-modal"
-      class="usa-button"
-      id="orientation-toggle"
-      aria-controls="device-orientation-modal"
-      data-open-modal
-      ></a
-    >
+    <a href="#device-orientation-modal"
+       id="orientation-toggle"
+       aria-controls="device-orientation-modal"
+       data-open-modal></a>
     <script src="{% static 'compiled/js/search-results-pagination.js' %}"></script>
     <script src="{% static 'compiled/js/search-mobile-orientation.js' %}"></script>
 {% endblock content %}
