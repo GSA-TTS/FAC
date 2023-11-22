@@ -1,7 +1,7 @@
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import User as DjangoUser
 from django.db import models
 from django.db.models import Q
-from django.utils.translation import gettext_lazy as _
 from .access_roles import ACCESS_ROLES
 from .deleted_access import DeletedAccess
 from .models import (
@@ -110,8 +110,11 @@ class Access(models.Model):
 
 
 def remove_email_from_submission_access(
-    report_id: str, email: str, removing_user: User = None, event: str = "access-change"
-) -> tuple[tuple[int, dict], list[DeletedAccess]]:
+    report_id: str,
+    email: str,
+    removing_user: DjangoUser = None,
+    event: str = "access-change",
+) -> list[tuple[tuple[int, dict], DeletedAccess]]:
     """
     Given an email address and a reports_id, deletes corresponding Access objects
     and creates corresponding DeletedAccess objects.
@@ -122,7 +125,7 @@ def remove_email_from_submission_access(
     accesses = Access.objects.filter(email=email, sac=sac)
     if len(accesses) < 1:
         raise Access.DoesNotExist
-    deletion_records = []
+    deletion_records: list[tuple[tuple[int, dict], DeletedAccess]] = []
     for access in accesses:
         result_pair = delete_access_and_create_record(access, removing_user, event)
         deletion_records.append(result_pair)
@@ -130,8 +133,8 @@ def remove_email_from_submission_access(
 
 
 def delete_access_and_create_record(
-    access: Access, removing_user: User = None, event: str = "access-change"
-):
+    access: Access, removing_user: DjangoUser = None, event: str = "access-change"
+) -> tuple[tuple[int, dict], DeletedAccess]:
     """
     Given an Access object, delete that object and created a corresponding
     DeletedAccess object.
