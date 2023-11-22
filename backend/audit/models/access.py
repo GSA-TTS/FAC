@@ -55,11 +55,7 @@ class Access(models.Model):
 
     objects = AccessManager()
 
-    ROLES = (
-        ("certifying_auditee_contact", _("Auditee Certifying Official")),
-        ("certifying_auditor_contact", _("Auditor Certifying Official")),
-        ("editor", _("Audit Editor")),
-    )
+    ROLES = ACCESS_ROLES
     sac = models.ForeignKey(SingleAuditChecklist, on_delete=models.CASCADE)
     role = models.CharField(
         choices=ROLES,
