@@ -2,7 +2,7 @@ from django.test import TestCase
 
 from model_bakery import baker
 
-from .models import ELECAUDITHEADER, ReportMigrationStatus
+from .models import ELECAUDITHEADER, ReportMigrationStatus, MigrationErrorDetail
 
 
 class CensusHistoricalMigrationTests(TestCase):
@@ -19,3 +19,10 @@ class CensusHistoricalMigrationTests(TestCase):
         baker.make(ReportMigrationStatus).save()
         report_migration_status = ReportMigrationStatus.objects.all()
         self.assertEquals(len(report_migration_status), 1)
+
+    def test_can_load_migration_error_detail_model(self):
+        migration_error_detail = MigrationErrorDetail.objects.all()
+        self.assertIsNotNone(migration_error_detail)
+        baker.make(MigrationErrorDetail).save()
+        migration_error_detail = MigrationErrorDetail.objects.all()
+        self.assertEquals(len(migration_error_detail), 1)
