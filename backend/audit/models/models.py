@@ -668,31 +668,3 @@ class SingleAuditReportFile(models.Model):
             )
 
         super().save(*args, **kwargs)
-
-
-class MigrationChangeRecord(models.Model):
-    report_id = models.TextField(db_column="REPORT_ID", blank=True, null=True)
-    dbkey = models.TextField(db_column="DBKEY", blank=True, null=True)
-    audityear = models.TextField(db_column="AUDITYEAR", blank=True, null=True)
-
-    census_table_name = models.TextField(
-        db_column="CENSUS_TABLE_NAME", blank=True, null=True
-    )
-    census_column_name = models.TextField(
-        db_column="CENSUS_COLUMN_NAME", blank=True, null=True
-    )
-    census_data = models.TextField(db_column="CENSUS_DATA", blank=True, null=True)
-
-    gsafac_table_name = models.TextField(
-        db_column="GSAFAC_TABLE_NAME", blank=True, null=True
-    )
-    gsafac_column_name = models.TextField(
-        db_column="GSAFAC_COLUMN_NAME", blank=True, null=True
-    )
-    gsafac_data = models.TextField(db_column="GSAFAC_DATA", blank=True, null=True)
-
-    transformation_function = models.TextField(
-        db_column="TRANSFORMATION_FUNCTION", blank=True, null=True
-    )
-    migration_status = models.TextField(db_column="MIGRATION_STATUS", blank=True, null=True)
-    run_datetime = models.DateField(db_column="RUN_DATETIME", blank=True, null=True)
