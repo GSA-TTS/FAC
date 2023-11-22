@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils import timezone
 
 from . import docs
 
@@ -505,3 +506,19 @@ class SecondaryAuditor(models.Model):
     report_id = models.TextField(
         REPORT_ID_FK_HELP_TEXT,
     )
+
+
+class MigrationChangeRecord(models.Model):
+    audit_year = models.TextField(blank=True, null=True)
+    dbkey = models.TextField(blank=True, null=True)
+    sac = models.ForeignKey(
+        'audit.SingleAuditChecklist',
+        on_delete=models.CASCADE,
+        related_name="columns",
+        blank=True,
+        null=True,
+    )
+    run_datetime = models.DateTimeField(default=timezone.now)
+    census_data = models.JSONField(blank=True, null=True)
+    gsa_fac_data = models.JSONField(blank=True, null=True)
+    transformation_function = models.TextField(blank=True, null=True)
