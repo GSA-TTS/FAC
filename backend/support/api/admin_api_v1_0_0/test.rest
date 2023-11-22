@@ -1,0 +1,24 @@
+###
+GET http://localhost:3000/audit_access
+authorization: Bearer {{$processEnv CYPRESS_API_GOV_JWT}}     
+accept-profile: admin_api_v1_0_0
+
+###
+GET http://localhost:3000/singleauditchecklist
+authorization: Bearer {{$processEnv CYPRESS_API_GOV_JWT}}     
+accept-profile: admin_api_v1_0_0
+
+
+###
+GET http://localhost:3000/singleauditchecklist
+authorization: Bearer {{$processEnv CYPRESS_API_GOV_JWT}}     
+accept-profile: admin_api_v1_0_0
+x-api-roles: "fac_gov_admin_access"
+
+###
+GET https://api.fac.gov/dissemination/report/pdf/2023-06-GSAFAC-0000007768
+#authorization: Bearer {{$processEnv CYPRESS_API_GOV_JWT}}
+x-api-key: {{$processEnv API_GOV_KEY}}
+# accept-profile: admin_api_v1_0_0
+# x-api-roles: "fac_gov_admin_access"
+

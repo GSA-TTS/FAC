@@ -8,5 +8,7 @@ class Command(BaseCommand):
     """
 
     def handle(self, *args, **kwargs):
-        api_versions.create_functions()
-        api_versions.create_live_views()
+        api_versions.create_functions("dissemination")
+        api_versions.create_live_views("dissemination")
+        api_versions.create_functions("support")
+        api_versions.create_live_views("support")
