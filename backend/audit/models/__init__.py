@@ -1,4 +1,5 @@
 from .access import Access
+from .deleted_access import DeletedAccess
 from .models import (
     ExcelFile,
     GeneralInformationMixin,
@@ -16,6 +17,7 @@ from .submission_event import SubmissionEvent
 # In case we want to iterate through all the models for some reason:
 _models = [
     Access,
+    DeletedAccess,
     ExcelFile,
     GeneralInformationMixin,
     SubmissionEvent,
