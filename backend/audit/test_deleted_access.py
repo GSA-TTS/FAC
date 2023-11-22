@@ -1,4 +1,6 @@
+from django.contrib.auth.models import User as DjangoUser
 from django.test import TestCase
+
 from model_bakery import baker
 from .models import (
     Access,
@@ -7,6 +9,19 @@ from .models import (
     User,
     remove_email_from_submission_access,
 )
+
+
+def _make_test_users_by_email(emails: list[str]) -> list[DjangoUser]:
+    return [baker.make(User, email=email) for email in emails]
+
+
+def _make_editor_accesses(
+    pairs: tuple[SingleAuditChecklist, DjangoUser]
+) -> list[Access]:
+    return [
+        baker.make(Access, user=user, email=user.email, sac=sac, role="editor")
+        for sac, user in pairs
+    ]
 
 
 class DeletedAccessTests(TestCase):
@@ -30,25 +45,26 @@ class DeletedAccessTests(TestCase):
         """
         Test calling the deletion function directly.
         """
-        user = baker.make(User, email="a@a.com")
-        user2 = baker.make(User, email="b@b.com")
+        user, user2 = _make_test_users_by_email(["a@a.com", "b@b.com"])
         sac = baker.make(SingleAuditChecklist)
-        baker.make(Access, user=user, email=user.email, sac=sac, role="editor")
-        baker.make(Access, user=user2, email=user2.email, sac=sac, role="editor")
+        _ = _make_editor_accesses([(sac, user), (sac, user2)])
         user_accesses = Access.objects.filter(user=user, sac=sac)
-        self.assertEqual(sac.id, user_accesses[0].sac.id)
         user2_accesses = Access.objects.filter(user=user2, sac=sac)
-        self.assertEqual(sac.id, user2_accesses[0].sac.id)
         deletion_records = DeletedAccess.objects.filter(sac=sac.id)
+
+        self.assertEqual(sac.id, user_accesses[0].sac.id)
+        self.assertEqual(sac.id, user2_accesses[0].sac.id)
         self.assertEqual(0, len(deletion_records))
+
         results = remove_email_from_submission_access(sac.report_id, user.email)
-        self.assertEqual(1, len(results))
         deletion_records_post = DeletedAccess.objects.filter(sac=sac.id)
+        accesses_post = Access.objects.filter(user=user, sac=sac)
+
+        self.assertEqual(1, len(results))
         self.assertEqual(len(deletion_records_post), len(results))
         self.assertEqual(deletion_records_post[0].sac, sac)
         self.assertEqual(deletion_records_post[0].email, user.email)
-        post_accesses = Access.objects.filter(user=user, sac=sac)
-        self.assertEqual(0, len(post_accesses))
+        self.assertEqual(0, len(accesses_post))
 
     def test_no_sac_raises_error(self):
         """
@@ -69,23 +85,24 @@ class DeletedAccessTests(TestCase):
         """
         Test calling the deletion function via Access.delete().
         """
-        user = baker.make(User, email="a@a.com")
-        user2 = baker.make(User, email="b@b.com")
+        user, user2 = _make_test_users_by_email(["a@a.com", "b@b.com"])
         sac = baker.make(SingleAuditChecklist)
-        baker.make(Access, user=user, email=user.email, sac=sac, role="editor")
-        baker.make(Access, user=user2, email=user2.email, sac=sac, role="editor")
+        _ = _make_editor_accesses([(sac, user), (sac, user2)])
         user_accesses = Access.objects.filter(user=user, sac=sac)
-        self.assertEqual(sac.id, user_accesses[0].sac.id)
         user2_accesses = Access.objects.filter(user=user2, sac=sac)
-        self.assertEqual(sac.id, user2_accesses[0].sac.id)
-        access = user_accesses[0]
         deletion_records = DeletedAccess.objects.filter(sac=sac.id)
+
+        self.assertEqual(sac.id, user_accesses[0].sac.id)
+        self.assertEqual(sac.id, user2_accesses[0].sac.id)
         self.assertEqual(0, len(deletion_records))
+
+        access = user_accesses[0]
         results = access.delete()
-        self.assertEqual((1, {"audit.Access": 1}), results)
         deletion_records_post = DeletedAccess.objects.filter(sac=sac.id)
+        accesses_post = Access.objects.filter(user=user, sac=sac)
+
+        self.assertEqual((1, {"audit.Access": 1}), results)
         self.assertEqual(1, len(deletion_records_post))
         self.assertEqual(deletion_records_post[0].sac, sac)
         self.assertEqual(deletion_records_post[0].email, user.email)
-        post_accesses = Access.objects.filter(user=user, sac=sac)
-        self.assertEqual(0, len(post_accesses))
+        self.assertEqual(0, len(accesses_post))
