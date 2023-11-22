@@ -34,12 +34,12 @@ def set_range(wb, range_name, values, default=None, conversion_fun=str):
     dests = the_range.destinations
 
     sheet_title, coord = None, None
-    for s, c in dests:
+    for cur_sheet_title, cur_coord in dests:
         if sheet_title or coord:
             # `destinations` is meant to be iterated over, but we only expect one value
             raise ValueError(f"{range_name} has more than one destination")
         else:
-            sheet_title, coord = s, c
+            sheet_title, coord = cur_sheet_title, cur_coord
 
     ws = None
     try:
