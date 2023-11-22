@@ -512,7 +512,7 @@ class MigrationChangeRecord(models.Model):
     audit_year = models.TextField(blank=True, null=True)
     dbkey = models.TextField(blank=True, null=True)
     sac = models.ForeignKey(
-        'audit.SingleAuditChecklist',
+        "audit.SingleAuditChecklist",
         on_delete=models.CASCADE,
         related_name="columns",
         blank=True,
