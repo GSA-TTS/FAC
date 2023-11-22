@@ -11,7 +11,6 @@ from .models import (
     excel_file_path,
     generate_sac_report_id,
     single_audit_report_path,
-    MigrationChangeRecord,
 )
 from .submission_event import SubmissionEvent
 
@@ -27,7 +26,6 @@ _models = [
     SingleAuditChecklistManager,
     SingleAuditReportFile,
     User,
-    MigrationChangeRecord,
 ]
 _functions = [
     excel_file_path,
