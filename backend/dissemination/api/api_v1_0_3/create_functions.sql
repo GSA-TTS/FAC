@@ -13,25 +13,25 @@
 --
 -- To quote the work of Dav Pilkey, "remember this now."
 
-create or replace function getter(base text, item text) returns text 
+create or replace function api_v1_0_3.getter(base text, item text) returns text 
 as $getter$
 begin 
 	return current_setting(concat(base, '.', item), true);
 end;
 $getter$ language plpgsql;
 
-create or replace function get_jwt_claim(item text) returns text 
+create or replace function api_v1_0_3.get_jwt_claim(item text) returns text 
 as $get_jwt_claim$
 begin 
-	return getter('request.jwt.claim', item);
+	return api_v1_0_3.getter('request.jwt.claim', item);
 end;
 $get_jwt_claim$ language plpgsql;
 
-create or replace function get_header(item text) returns text
+create or replace function api_v1_0_3.get_header(item text) returns text
 as $get_header$
 begin 
-	raise info 'request.header % %', item, getter('request.header', item);
-	return getter('request.header', item);
+	-- raise info 'request.header % %', item, getter('request.header', item);
+	return api_v1_0_3.getter('request.header', item);
 end;
 $get_header$ LANGUAGE plpgsql;
 
@@ -39,20 +39,20 @@ $get_header$ LANGUAGE plpgsql;
 -- I'd like to go to a model where we provide the API keys. 
 -- However, for now, we're going to look for a role attached to an api.data.gov account.
 -- These come in on `X-Api-Roles` as a comma-separated string.
-create or replace function has_tribal_data_access() returns boolean
+create or replace function api_v1_0_3.has_tribal_data_access() returns boolean
 as $has_tribal_data_access$
 declare 
     roles text;
 begin 
-	select get_header('x-api-roles') into roles;
+	select api_v1_0_3.get_header('x-api-roles') into roles;
     return (roles like '%fac_gov_tribal_access%');
 end;
 $has_tribal_data_access$ LANGUAGE plpgsql;
 
-create or replace function has_public_data_access_only() returns boolean
+create or replace function api_v1_0_3.has_public_data_access_only() returns boolean
 as $has_public_data_access_only$
 begin 
-    return not has_tribal_data_access();
+    return not api_v1_0_3.has_tribal_data_access();
 end;
 $has_public_data_access_only$ LANGUAGE plpgsql;
 

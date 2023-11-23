@@ -1,5 +1,9 @@
 from psycopg2._psycopg import connection
 from config import settings
+import logging
+import os
+
+logger = logging.getLogger(__name__)
 
 # These are API versions we want live.
 live = {
@@ -11,7 +15,7 @@ live = {
 # They will be removed. It should be safe to leave them
 # here for repeated runs.
 deprecated = {
-    "dissemination": ["api", "api_v1_0_0", "api_v1_0_1", "api_v1_0_2"],
+    "dissemination": ["api"],
     "support": []
     }
 
@@ -30,8 +34,9 @@ def exec_sql(location, version, filename):
     conn = connection(get_conn_string())
     conn.autocommit = True
     with conn.cursor() as curs:
-        filename = f"{location}/api/{version}/{filename}"
-        sql = open(filename, "r").read()
+        path = f"{location}/api/{version}/{filename}"
+        logger.info(f"EXEC SQL {location} {version} {filename}")
+        sql = open(path, "r").read()
         curs.execute(sql)
 
 
@@ -82,3 +87,7 @@ def create_functions(location):
 def deprecate_schemas_and_views(location):
     for version in deprecated[location]:
         exec_sql(location, version, "drop.sql")
+
+def load_static_data(location):
+    for version in live[location]:
+        exec_sql(location, version, "load_static_data.sql")

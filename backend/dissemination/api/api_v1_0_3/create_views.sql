@@ -19,7 +19,7 @@ create view api_v1_0_3.findings_text as
         (ft.report_id = gen.report_id
          and
          gen.is_public = true)
-        or (gen.is_public = false and has_tribal_data_access())
+        or (gen.is_public = false and api_v1_0_3.has_tribal_data_access())
     order by ft.id
 ;
 
@@ -40,7 +40,7 @@ create view api_v1_0_3.additional_ueis as
         (gen.report_id = uei.report_id
          and
          gen.is_public = true)
-        or (gen.is_public = false and has_tribal_data_access())
+        or (gen.is_public = false and api_v1_0_3.has_tribal_data_access())
     order by uei.id
 ;
 
@@ -70,7 +70,7 @@ create view api_v1_0_3.findings as
         (finding.report_id = gen.report_id
          and
          gen.is_public = true)
-        or (gen.is_public = false and has_tribal_data_access())
+        or (gen.is_public = false and api_v1_0_3.has_tribal_data_access())
     order by finding.id
 ;
 
@@ -109,7 +109,7 @@ create view api_v1_0_3.federal_awards as
         (award.report_id = gen.report_id
          and
          gen.is_public = true)
-        or (gen.is_public = false and has_tribal_data_access())
+        or (gen.is_public = false and api_v1_0_3.has_tribal_data_access())
     order by award.id
 ;
 
@@ -133,7 +133,7 @@ create view api_v1_0_3.corrective_action_plans as
         (ct.report_id = gen.report_id
          and
          gen.is_public = true)
-        or (gen.is_public = false and has_tribal_data_access())
+        or (gen.is_public = false and api_v1_0_3.has_tribal_data_access())
     order by ct.id
 ;
 
@@ -159,7 +159,7 @@ create view api_v1_0_3.notes_to_sefa as
         (note.report_id = gen.report_id
          and
          gen.is_public = true)
-        or (gen.is_public = false and has_tribal_data_access())
+        or (gen.is_public = false and api_v1_0_3.has_tribal_data_access())
     order by note.id
 ;
 
@@ -182,7 +182,7 @@ create view api_v1_0_3.passthrough as
         (gen.report_id = pass.report_id
         and
         gen.is_public = true)
-        or (gen.is_public = false and has_tribal_data_access())
+        or (gen.is_public = false and api_v1_0_3.has_tribal_data_access())
     order by pass.id
 ;
 
@@ -270,7 +270,7 @@ create view api_v1_0_3.general as
         (aud.report_id = gen.report_id
         and 
         gen.is_public = true)
-        or (gen.is_public = false and has_tribal_data_access())
+        or (gen.is_public = false and api_v1_0_3.has_tribal_data_access())
     order by gen.id
 ;
 
@@ -300,7 +300,7 @@ create view api_v1_0_3.secondary_auditors as
         (sa.report_id = gen.report_id
          and
          gen.is_public=True)
-        or (gen.is_public=false and has_tribal_data_access())
+        or (gen.is_public=false and api_v1_0_3.has_tribal_data_access())
     order by sa.id
 ;
 
@@ -318,7 +318,7 @@ create view api_v1_0_3.additional_eins as
         (gen.report_id = ein.report_id
          and
          gen.is_public = true)
-        or (gen.is_public = false and has_tribal_data_access())
+        or (gen.is_public = false and api_v1_0_3.has_tribal_data_access())
     order by ein.id
 ;
 

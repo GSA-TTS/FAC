@@ -27,12 +27,12 @@ echo 'Finished API schema deprecation' &&
 echo 'Dropping API schema' &&
 python manage.py drop_api_schema &&
 echo 'Finished dropping API schema' &&
-echo 'Starting API schema creation' &&
-python manage.py create_api_schema &&
-echo 'Finished API schema creation' &&
 echo 'Starting migrate' &&
 python manage.py migrate &&
 echo 'Finished migrate' &&
+echo 'Starting API schema creation' &&
+python manage.py create_api_schema &&
+echo 'Finished API schema creation' &&
 echo 'Starting API view creation' &&
 python manage.py create_api_views &&
 echo 'Finished view creation' &&

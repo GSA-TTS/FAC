@@ -11,23 +11,22 @@ begin;
 
 -- DROP TABLE public.audit_access;
 
-create view admin_api_v1_0_0.audit_access as
-    select
+CREATE OR REPLACE VIEW admin_api_v1_0_0.audit_access AS
+    SELECT
         aa.role,
         aa.fullname,
         aa.email,
         aa.sac_id,
         aa.user_id
-    from
+    FROM
         audit_access aa
-    where
-        has_admin_data_access()
-        true
-    order by aa.id
+    WHERE
+        admin_api_v1_0_0.has_admin_data_access()
+    ORDER BY aa.id
 ;
 
-create view admin_api_v1_0_0.singleauditchecklist as
-    select
+CREATE OR REPLACE VIEW admin_api_v1_0_0.singleauditchecklist AS
+    SELECT
         sac.id,
         sac.date_created,
         sac.submission_status,
@@ -53,10 +52,24 @@ create view admin_api_v1_0_0.singleauditchecklist as
         sac.oversight_agency,
         sac.submitted_by_id
     from
-        audit_singleauditchecklist as sac
+        audit_singleauditchecklist sac
     where
-        has_admin_data_access()
+        admin_api_v1_0_0.has_admin_data_access()
     order by sac.id
+;
+
+CREATE OR REPLACE VIEW admin_api_v1_0_0.tribal_access AS
+    SELECT
+        uup.email,
+        up.slug as permission
+    FROM
+        users_userpermission uup,
+        users_permission up
+    WHERE
+        (uup.permission_id = 1)
+        AND (uup.permission_id = up.id)
+        AND admin_api_v1_0_0.has_admin_data_access()
+    ORDER BY uup.id
 ;
 
 commit;
