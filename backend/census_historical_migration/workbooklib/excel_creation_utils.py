@@ -1,12 +1,16 @@
 from census_historical_migration.exception_utils import DataMigrationError
 from census_historical_migration.base_field_maps import WorkbookFieldInDissem
+from census_historical_migration.workbooklib.templates import sections_to_template_paths
 from census_historical_migration.sac_general_lib.report_id_generator import (
     dbkey_to_report_id,
 )
-from census_historical_migration.workbooklib.templates import sections_to_template_paths
 
-from openpyxl.utils.cell import column_index_from_string
 from playhouse.shortcuts import model_to_dict
+from openpyxl.utils.cell import (
+    rows_from_range,
+    coordinate_from_string,
+    column_index_from_string,
+)
 
 import sys
 import logging
@@ -15,42 +19,51 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-# Helper to set a range of values.
-# Takes a named range, and then walks down the range,
-# filling in values from the list past in (values).
 def set_range(wb, range_name, values, default=None, conversion_fun=str):
+    """
+    Helper to set a range of values. Takes a named range, and then walks down
+    the range, filling in the given values.
+
+    wb (Workbook)       The workbook
+    range_name (string) Name of the range to set
+    values (iterable)   Values to set within the range
+    default (any)       Default value to use; defaults to None.
+    conversion (func)   Conversion function to apply to individual values; defaults to str().
+    """
     the_range = wb.defined_names[range_name]
-    dest = list(the_range.destinations)[0]
-    sheet_title = dest[0]
-    ws = wb[sheet_title]
+    dests = the_range.destinations
 
-    start_cell = dest[1].replace("$", "").split(":")[0]
-    col = column_index_from_string(start_cell[0])
-    start_row = int(start_cell[1])
-
-    for ndx, v in enumerate(values):
-        row = ndx + start_row
-        if v:
-            # This is a very noisy statement, showing everything
-            # written into the workbook.
-            # print(f'{range_name} c[{row}][{col}] <- {type(v)} len({len(v)}) {default}')
-            if v is not None:
-                ws.cell(row=row, column=col, value=conversion_fun(v))
-            if len(str(v)) == 0 and default is not None:
-                # This is less noisy. Shows up for things like
-                # empty findings counts. 2023 submissions
-                # require that field to be 0, not empty,
-                # if there are no findings.
-                # print('Applying default')
-                ws.cell(row=row, column=col, value=conversion_fun(default))
-        if not v:
-            if default is not None:
-                ws.cell(row=row, column=col, value=conversion_fun(default))
-            else:
-                ws.cell(row=row, column=col, value="")
+    sheet_title, coord = None, None
+    for cur_sheet_title, cur_coord in dests:
+        if sheet_title or coord:
+            # `destinations` is meant to be iterated over, but we only expect one value
+            raise ValueError(f"{range_name} has more than one destination")
         else:
-            # Leave it blank if we have no default passed in
-            pass
+            sheet_title, coord = cur_sheet_title, cur_coord
+
+    ws = None
+    try:
+        ws = wb[sheet_title]
+    except KeyError:
+        raise KeyError(f"Sheet title '{sheet_title}' not found in workbook")
+
+    values = list(values)
+    for i, row in enumerate(rows_from_range(coord)):
+        # Iterate over the rows, but stop when we run out of values
+        value = None
+        try:
+            value = values[i]
+        except IndexError:
+            break
+
+        # Get the row and column to set the current value
+        cell = row[0]  # [('B12',)] -> ('B12',)
+        col_str, row = coordinate_from_string(cell)  # ('B12',) -> 'B', 12
+        col = column_index_from_string(col_str)  # 'B' -> 2
+
+        # Set the value of the cell
+        converted_value = conversion_fun(value) if value else default or ""
+        ws.cell(row=row, column=col, value=converted_value)
 
 
 def set_uei(Gen, wb, dbkey):
