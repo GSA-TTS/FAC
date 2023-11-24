@@ -9,7 +9,8 @@ class Command(BaseCommand):
 
     def handle(self, *args, **kwargs):
         api_versions.create_functions("dissemination")
-        api_versions.create_live_views("dissemination")
         api_versions.create_functions("support")
+        api_versions.create_live_views("dissemination")
         api_versions.create_live_views("support")
-        api_versions.load_static_data("support")
+        api_versions.create_access_tables("dissemination")
+        api_versions.create_access_tables("support")

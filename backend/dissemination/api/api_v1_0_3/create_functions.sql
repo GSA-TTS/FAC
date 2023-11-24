@@ -36,17 +36,30 @@ end;
 $get_header$ LANGUAGE plpgsql;
 
 -- https://api-umbrella.readthedocs.io/en/latest/admin/api-backends/http-headers.html
--- I'd like to go to a model where we provide the API keys. 
--- However, for now, we're going to look for a role attached to an api.data.gov account.
--- These come in on `X-Api-Roles` as a comma-separated string.
+-- Previously, we were using a role attached to the key.
+-- This now uses an explicit table to determine if a key has tribal data access.
+-- What this means is that we must go through a commit/PR process in order to use
+-- keys that will have access to tribal data. This should be supported by a 
+-- ticketing process.
 create or replace function api_v1_0_3.has_tribal_data_access() returns boolean
 as $has_tribal_data_access$
-declare 
-    roles text;
-begin 
-	select api_v1_0_3.get_header('x-api-roles') into roles;
-    return (roles like '%fac_gov_tribal_access%');
-end;
+DECLARE 
+    uuid_header text;
+    key_exists boolean;
+BEGIN
+    SELECT api_v1_0_3.get_header('x-api-user-id') into uuid_header;
+    SELECT 
+        CASE WHEN EXISTS (
+            SELECT uuid 
+            FROM tribal_access_api_key_uuids tak
+            WHERE tak.uuid = uuid_header)
+            THEN 1::BOOLEAN
+            ELSE 0::BOOLEAN
+            END 
+        INTO key_exists;
+    
+    RETURN key_exists;
+END;
 $has_tribal_data_access$ LANGUAGE plpgsql;
 
 create or replace function api_v1_0_3.has_public_data_access_only() returns boolean

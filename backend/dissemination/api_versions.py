@@ -88,6 +88,6 @@ def deprecate_schemas_and_views(location):
     for version in deprecated[location]:
         exec_sql(location, version, "drop.sql")
 
-def load_static_data(location):
+def create_access_tables(location):
     for version in live[location]:
-        exec_sql(location, version, "load_static_data.sql")
+        exec_sql(location, version, "create_access_tables.sql")
