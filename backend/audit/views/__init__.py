@@ -7,11 +7,39 @@ from .submission_progress_view import (  # noqa
 from .tribal_data_consent import TribalDataConsent
 from .upload_report_view import UploadReportView
 from .unlock_after_certification import UnlockAfterCertificationView
+from .views import (
+    AuditInfoFormView,
+    AuditeeCertificationStep1View,
+    AuditeeCertificationStep2View,
+    AuditorCertificationStep1View,
+    AuditorCertificationStep2View,
+    CertificationView,
+    CrossValidationView,
+    EditSubmission,
+    ExcelFileHandlerView,
+    MySubmissions,
+    ReadyForCertificationView,
+    SingleAuditReportFileHandlerView,
+    SubmissionView,
+)
 
 # In case we want to iterate through all the views for some reason:
 views = [
+    AuditInfoFormView,
+    AuditeeCertificationStep1View,
+    AuditeeCertificationStep2View,
+    AuditorCertificationStep1View,
+    AuditorCertificationStep2View,
+    CertificationView,
+    CrossValidationView,
+    EditSubmission,
+    ExcelFileHandlerView,
     Home,
+    MySubmissions,
+    ReadyForCertificationView,
+    SingleAuditReportFileHandlerView,
     SubmissionProgressView,
+    SubmissionView,
     TribalDataConsent,
     UnlockAfterCertificationView,
     UploadReportView,

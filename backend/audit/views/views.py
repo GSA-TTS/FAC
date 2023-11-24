@@ -63,14 +63,6 @@ from audit.validators import (
     validate_notes_to_sefa_json,
     validate_secondary_auditors_json,
 )
-from home import Home
-
-from .submission_progress_view import SubmissionProgressView, submission_progress_check
-from .tribal_data_consent import TribalDataConsent
-from .unlock_after_certification import UnlockAfterCertificationView
-from .upload_report_view import UploadReportView
-from .no_robots import no_robots
-
 
 logging.basicConfig(
     format="%(asctime)s %(levelname)-8s %(module)s:%(lineno)d %(message)s"
