@@ -1,3 +1,7 @@
+from census_historical_migration.transforms.xform_string_to_string import (
+    string_to_string,
+)
+from census_historical_migration.transforms.xform_string_to_int import string_to_int
 from census_historical_migration.exception_utils import DataMigrationError
 from census_historical_migration.base_field_maps import WorkbookFieldInDissem
 from census_historical_migration.workbooklib.templates import sections_to_template_paths
@@ -61,9 +65,56 @@ def set_range(wb, range_name, values, default=None, conversion_fun=str):
         col_str, row = coordinate_from_string(cell)  # ('B12',) -> 'B', 12
         col = column_index_from_string(col_str)  # 'B' -> 2
 
+        # Check for the type and apply the correct conversion method
+        converted_value = apply_conversion_function(value, default, conversion_fun)
         # Set the value of the cell
-        converted_value = conversion_fun(value) if value else default or ""
         ws.cell(row=row, column=col, value=converted_value)
+
+
+def apply_conversion_function(value, default, conversion_function):
+    """
+    Helper to apply a conversion function to a value, or use a default value
+    """
+    if value:
+        if conversion_function is str:
+            new_value = string_to_string(value)
+        elif conversion_function is int:
+            new_value = string_to_int(value)
+        else:
+            new_value = conversion_function(value)
+    else:
+        new_value = default or ""
+    return new_value
+
+
+def get_range_values(ranges, name):
+    for item in ranges:
+        if item["name"] == name:
+            return item["values"]
+    return None
+
+
+def get_ranges(mappings, values):
+    """
+    Helper to get range of values.The method iterates over a collection of mappings, applying a conversion
+    function to constructs a list of dictionaries, each containing a name and a list of
+    transformed values."""
+    ranges = []
+    for mapping in mappings:
+        ranges.append(
+            {
+                "name": mapping.in_sheet,
+                "values": list(
+                    map(
+                        lambda v: model_to_dict(apply_conversion_function(v))[
+                            mapping.in_db
+                        ],
+                        values,
+                    )
+                ),
+            }
+        )
+    return ranges
 
 
 def set_uei(Gen, wb, dbkey):
