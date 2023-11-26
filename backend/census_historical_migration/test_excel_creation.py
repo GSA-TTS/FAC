@@ -192,10 +192,10 @@ class TestGetRanges(TestCase):
 
         # Creating mock instances of the Audits model
         self.mock_values = baker.make(Audits, _quantity=3)
-        self.random_year = randint(2016, 2022)
+        self.random_year = randint(2016, 2022)  # nosec
         for audit in self.mock_values:
             audit.AUDITYEAR = str(self.random_year)
-            audit.DBKEY = str(randint(20000, 21000))
+            audit.DBKEY = str(randint(20000, 21000))  # nosec
 
     def test_get_ranges(self):
         """Test that the correct values are returned for each mapping"""
