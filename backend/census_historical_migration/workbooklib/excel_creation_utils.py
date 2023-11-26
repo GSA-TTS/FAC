@@ -88,6 +88,8 @@ def apply_conversion_function(value, default, conversion_function):
 
 
 def get_range_values(ranges, name):
+    """
+    Helper to get the values linked to a particular range, identified by its name."""
     for item in ranges:
         if item["name"] == name:
             return item["values"]
@@ -106,9 +108,11 @@ def get_ranges(mappings, values):
                 "name": mapping.in_sheet,
                 "values": list(
                     map(
-                        lambda v: model_to_dict(apply_conversion_function(v))[
-                            mapping.in_db
-                        ],
+                        lambda v: apply_conversion_function(
+                            getattr(v, mapping.in_db),
+                            mapping.default,
+                            mapping.type,
+                        ),
                         values,
                     )
                 ),
