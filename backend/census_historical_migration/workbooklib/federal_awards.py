@@ -96,11 +96,17 @@ def get_list_index(all_items, index):
     return -1
 
 
-def _generate_cluster_names(Audits, audits, valid_json):
+def _generate_cluster_names(
+    audits: list[Audits],
+) -> tuple[list[str], list[str], list[str]]:
+    """Reconstructs the cluster names for each audit in the provided list."""
+    # Patch the clusternames. They used to be allowed to enter anything
+    # they wanted.
+    valid_file = open(f"{settings.BASE_DIR}/schemas/source/base/ClusterNames.json")
+    valid_json = json.load(valid_file)
     cluster_names = []
     state_cluster_names = []
     other_cluster_names = []
-    audit: Audits
     for audit in audits:
         if audit.CLUSTERNAME is None:
             cluster_names.append("N/A")
@@ -250,13 +256,8 @@ def generate_federal_awards(dbkey, year, outfile):
     audits = Audits.select().where(Audits.DBKEY == dbkey).order_by(Audits.ID)
     map_simple_columns(wb, mappings, audits)
 
-    # Patch the clusternames. They used to be allowed to enter anything
-    # they wanted.
-    valid_file = open(f"{settings.BASE_DIR}/schemas/source/base/ClusterNames.json")
-    valid_json = json.load(valid_file)
-
     (cluster_names, other_cluster_names, state_cluster_names) = _generate_cluster_names(
-        Audits, audits, valid_json
+        audits
     )
     set_range(wb, "cluster_name", cluster_names)
     set_range(wb, "other_cluster_name", other_cluster_names)
@@ -299,6 +300,10 @@ def generate_federal_awards(dbkey, year, outfile):
 
     wb.save(outfile)
 
+    # FIXME - MSHD: The test table and the logic around it do not seem necessary to me.
+    # If there is any chance that the dissemination process allows bogus data to be disseminated,
+    # we should fix the dissemination process instead by reinforcing the validation logic (intake validation and cross-validation).
+    # I will create a ticket for the removal of this logic unless someone comes up with a strong reason to keep it.
     table = generate_dissemination_test_table(
         AuditHeader, "federal_awards", dbkey, mappings, audits
     )
