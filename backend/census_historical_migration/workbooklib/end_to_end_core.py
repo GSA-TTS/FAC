@@ -8,7 +8,6 @@ from config import settings
 import os
 import jwt
 import requests
-from pprint import pprint
 from datetime import datetime
 import traceback
 
