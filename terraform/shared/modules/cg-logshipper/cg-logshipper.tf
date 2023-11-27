@@ -55,12 +55,29 @@ resource "cloudfoundry_user_provided_service" "logshipper_new_relic_creds" {
 }
 
 resource "cloudfoundry_app" "cg_logshipper_app" {
-  name      = var.name
-  space     = data.cloudfoundry_space.apps.id
-  buildpack = "binary_buildpack"
-  memory    = var.logshipper_memory
-  instances = var.logshipper_instances
-  strategy  = "rolling"
+  name       = var.name
+  space      = data.cloudfoundry_space.apps.id
+  buildpacks = ["binary_buildpack", "nginx_buildpack"]
+  path       = "https://github.com/GSA-TTS/cg-logshipper/archive/refs/heads/main.zip"
+  memory     = var.logshipper_memory
+  instances  = var.logshipper_instances
+  strategy   = "rolling"
+
+  provisioner "local-exec" {
+    command = "cf curl /v3/apps/${self.id}/sidecars  -d '${local.sidecar_json}'"
+  }
+
+  service_binding {
+    service_instance = cloudfoundry_user_provided_service.logshipper_new_relic_creds.id
+  }
+
+  service_binding {
+    service_instance = cloudfoundry_user_provided_service.logshipper_creds.id
+  }
+
+  service_binding {
+    service_instance = module.s3-logshipper-storage.bucket_id
+  }
 
   routes {
     route = cloudfoundry_route.logshipper.id
