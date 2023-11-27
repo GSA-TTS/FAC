@@ -48,6 +48,16 @@ module "s3-c2g" {
   s3_plan_name     = "basic"
 }
 
+module "s3-logshipper-storage" {
+  source = "github.com/18f/terraform-cloudgov//s3?ref=v0.5.1"
+
+  cf_org_name      = var.cf_org_name
+  cf_space_name    = var.cf_space_name
+  name             = "s3-logshipper-storage"
+  recursive_delete = var.recursive_delete
+  s3_plan_name     = "basic"
+}
+
 # Stuff used for apps in this space
 data "cloudfoundry_space" "apps" {
   org_name = var.cf_org_name
