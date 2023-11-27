@@ -8,6 +8,7 @@ User = get_user_model()
 
 
 def load_historic_data(audit_year, dbkey):
+    """Create a submission for the given audit year and dbkey"""
     result = {"success": [], "errors": []}
     gen = ELECAUDITHEADER.objects.get(AUDITYEAR=audit_year, DBKEY=dbkey)
     user = create_or_get_user(result, gen)
@@ -17,6 +18,7 @@ def load_historic_data(audit_year, dbkey):
 
 
 def create_or_get_user(result, gen):
+    """Returns the user for the submission if found, or a default user otherwise"""
     user_email = gen.AUDITEEEMAIL
     user_name = gen.AUDITEECONTACT.split()[0] + "_generated"
 

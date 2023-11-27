@@ -3,6 +3,7 @@ from .make_submission import load_historic_data
 
 
 def load_historic_data_for_year(audit_year):
+    """Iterates over and processes submissions for the given audit year"""
     result_log = {}
     total_count = error_count = 0
 
