@@ -1,7 +1,11 @@
+from census_historical_migration.transforms.xform_string_to_string import (
+    string_to_string,
+)
 from census_historical_migration.workbooklib.excel_creation_utils import (
+    get_audit_header,
     get_range_values,
     get_ranges,
-    set_uei,
+    set_workbook_uei,
     map_simple_columns,
     generate_dissemination_test_table,
     set_range,
@@ -13,8 +17,7 @@ from census_historical_migration.base_field_maps import (
 from census_historical_migration.workbooklib.templates import sections_to_template_paths
 from audit.fixtures.excel import FORM_SECTIONS
 from config import settings
-from models import (
-    ELECAUDITHEADER as AuditHeader,
+from census_historical_migration.models import (
     ELECAUDITS as Audits,
     ELECPASSTHROUGH as Passthrough,
 )
@@ -108,26 +111,27 @@ def _generate_cluster_names(
     state_cluster_names = []
     other_cluster_names = []
     for audit in audits:
-        if audit.CLUSTERNAME is None:
+        cluster_name = string_to_string(audit.CLUSTERNAME)
+        if not cluster_name:
             cluster_names.append("N/A")
             other_cluster_names.append("")
             state_cluster_names.append("")
-        elif audit.CLUSTERNAME == "STATE CLUSTER":
-            cluster_names.append(audit.CLUSTERNAME)
+        elif cluster_name == "STATE CLUSTER":
+            cluster_names.append(cluster_name)
             state_cluster_names.append(audit.STATECLUSTERNAME)
             other_cluster_names.append("")
-        elif audit.CLUSTERNAME == "OTHER CLUSTER NOT LISTED ABOVE":
-            cluster_names.append(audit.CLUSTERNAME)
+        elif cluster_name == "OTHER CLUSTER NOT LISTED ABOVE":
+            cluster_names.append(cluster_name)
             other_cluster_names.append(audit.OTHERCLUSTERNAME)
             state_cluster_names.append("")
-        elif audit.CLUSTERNAME in valid_json["cluster_names"]:
-            cluster_names.append(audit.CLUSTERNAME)
+        elif cluster_name in valid_json["cluster_names"]:
+            cluster_names.append(cluster_name)
             other_cluster_names.append("")
             state_cluster_names.append("")
         else:
-            logger.debug(f"Cluster {audit.CLUSTERNAME} not in the list. Replacing.")
+            logger.debug(f"Cluster {cluster_name} not in the list. Replacing.")
             cluster_names.append("OTHER CLUSTER NOT LISTED ABOVE")
-            other_cluster_names.append(f"{audit.CLUSTERNAME}")
+            other_cluster_names.append(f"{cluster_name}")
             state_cluster_names.append("")
     return (cluster_names, other_cluster_names, state_cluster_names)
 
@@ -141,8 +145,8 @@ def _get_full_cfdas(audits):
     return [f"{audit.CFDA_PREFIX}.{audit.CFDA_EXT}" for audit in audits]
 
 
-def _get_audits(audit_year, dbkey):
-    return Audits.objects.filter(AUDITYEAR=audit_year, DBKEY=dbkey).order_by("ID")
+def _get_audits(dbkey):
+    return Audits.objects.filter(DBKEY=dbkey).order_by("ID")
 
 
 # The functionality of _fix_passthroughs has been split into two separate functions:
@@ -160,15 +164,20 @@ def _get_passthroughs(audits):
 
     for index, audit in enumerate(audits):
         passthroughs = Passthrough.objects.filter(
-            DBKEY=audit.dbkey, ELECAUDITSID=audit.ELECAUDITSID
+            DBKEY=audit.DBKEY, ELECAUDITSID=audit.ELECAUDITSID
         ).order_by("ID")
-        # This may look like data transformation but it is exactly the case.
+        # This may look like data transformation but it is not exactly the case.
         # In the audit worksheet, users can enter multiple names (or IDs) separated by a pipe '|' in a single cell.
         # We are simply reconstructing this pipe separated data here.
-        names = [
-            p.PASSTHROUGHNAME for p in passthroughs if p.PASSTHROUGHNAME is not None
-        ]
-        ids = [p.PASSTHROUGHID for p in passthroughs if p.PASSTHROUGHID is not None]
+        names = []
+        ids = []
+        for passthrough in passthroughs:
+            passthrough_name = string_to_string(passthrough.PASSTHROUGHNAME)
+            passthrough_id = string_to_string(passthrough.PASSTHROUGHID)
+            if passthrough_name:
+                names.append(passthrough_name)
+            if passthrough_id:
+                ids.append(passthrough_id)
 
         passthrough_names[index] = "|".join(names) if names else ""
         passthrough_ids[index] = "|".join(ids) if ids else ""
@@ -212,6 +221,7 @@ def _xform_populate_default_loan_balance(loans_at_end, audits):
                 loans_at_end[
                     ndx
                 ] = 1  # FIXME - MSHD: This value requires team approval.
+                # There are cases (dbkeys 148665/150450) with balance = -1.0, how do we handle this?
         else:
             if audit.LOANBALANCE is not None:
                 loans_at_end[ndx] = ""
@@ -245,15 +255,24 @@ def _xform_populate_default_award_identification_values(audits, dbkey):
 
 
 def generate_federal_awards(dbkey, year, outfile):
+    """
+    Generates a federal awards workbook for all awards associated with a given dbkey.
+
+    Note: This function assumes that all the audit information in the database
+    is for the same year.
+    """
     logger.info(f"--- generate federal awards {dbkey} {year} ---")
+
     wb = pyxl.load_workbook(
         sections_to_template_paths[FORM_SECTIONS.FEDERAL_AWARDS_EXPENDED]
     )
-    # In sheet : in DB
 
-    audit_header = set_uei(AuditHeader, wb, dbkey)
+    audit_header = get_audit_header(dbkey)
 
-    audits = Audits.select().where(Audits.DBKEY == dbkey).order_by(Audits.ID)
+    set_workbook_uei(wb, audit_header.UEI)
+
+    audits = _get_audits(dbkey)
+
     map_simple_columns(wb, mappings, audits)
 
     (cluster_names, other_cluster_names, state_cluster_names) = _generate_cluster_names(
@@ -296,7 +315,7 @@ def generate_federal_awards(dbkey, year, outfile):
     total = 0
     for audit in audits:
         total += int(audit.AMOUNT)
-    set_range(wb, "total_amount_expended", [total])
+    set_range(wb, "total_amount_expended", [str(total)])
 
     wb.save(outfile)
 
@@ -305,15 +324,18 @@ def generate_federal_awards(dbkey, year, outfile):
     # we should fix the dissemination process instead by reinforcing the validation logic (intake validation and cross-validation).
     # I will create a ticket for the removal of this logic unless someone comes up with a strong reason to keep it.
     table = generate_dissemination_test_table(
-        AuditHeader, "federal_awards", dbkey, mappings, audits
+        audit_header, "federal_awards", dbkey, mappings, audits
     )
     award_counter = 1
     filtered_mappings = [
         mapping
         for mapping in mappings
-        if mapping[0] == "additional_award_identification"
-        or mapping[0] == "federal_agency_prefix"
-        or mapping[0] == "three_digit_extension"
+        if mapping.in_sheet
+        in [
+            "additional_award_identification",
+            "federal_agency_prefix",
+            "three_digit_extension",
+        ]
     ]
     ranges = get_ranges(filtered_mappings, audits)
     prefixes = get_range_values(ranges, "federal_agency_prefix")
@@ -352,7 +374,7 @@ def generate_federal_awards(dbkey, year, outfile):
         award["fields"].append(other_cluster_name)
         award_counter += 1
 
-    table["singletons"]["auditee_uei"] = audit_header.uei
+    table["singletons"]["auditee_uei"] = audit_header.UEI
     table["singletons"]["total_amount_expended"] = total
 
     return (wb, table)

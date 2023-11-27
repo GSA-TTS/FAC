@@ -7,9 +7,12 @@ from census_historical_migration.base_field_maps import WorkbookFieldInDissem
 from census_historical_migration.workbooklib.templates import sections_to_template_paths
 from census_historical_migration.sac_general_lib.report_id_generator import (
     dbkey_to_report_id,
+    xform_dbkey_to_report_id,
+)
+from census_historical_migration.models import (
+    ELECAUDITHEADER as AuditHeader,
 )
 
-from playhouse.shortcuts import model_to_dict
 from openpyxl.utils.cell import (
     rows_from_range,
     coordinate_from_string,
@@ -121,6 +124,7 @@ def get_ranges(mappings, values):
     return ranges
 
 
+# FIXME-MSHD: Remove this function once we switch all workbook generators to using census models
 def set_uei(Gen, wb, dbkey):
     g = Gen.select().where(Gen.dbkey == dbkey).get()
     if g.uei:
@@ -128,6 +132,22 @@ def set_uei(Gen, wb, dbkey):
     else:
         raise DataMigrationError(f"UEI is not set for this audit: {dbkey}")
     return g
+
+
+def set_workbook_uei(workbook, uei):
+    """Sets the UEI value in the workbook's designated UEI cell"""
+    if not uei:
+        raise DataMigrationError("UEI value is missing or invalid.")
+    set_range(workbook, "auditee_uei", [uei])
+
+
+def get_audit_header(dbkey):
+    """Returns the AuditHeader instance for the given dbkey."""
+    try:
+        audit_header = AuditHeader.objects.get(DBKEY=dbkey)
+    except AuditHeader.DoesNotExist:
+        raise DataMigrationError(f"No audit header record found for dbkey: {dbkey}")
+    return audit_header
 
 
 def map_simple_columns(wb, mappings, values):
@@ -149,7 +169,7 @@ def map_simple_columns(wb, mappings, values):
         set_range(
             wb,
             m.in_sheet,
-            map(lambda v: model_to_dict(v)[m.in_db], values),
+            map(lambda v: getattr(v, m.in_db), values),
             m.default,
             m.type,
         )
@@ -180,27 +200,31 @@ def get_template_name_for_section(section):
 def generate_dissemination_test_table(Gen, api_endpoint, dbkey, mappings, objects):
     table = {"rows": list(), "singletons": dict()}
     table["endpoint"] = api_endpoint
-    table["report_id"] = dbkey_to_report_id(Gen, dbkey)
+    table["report_id"] = (
+        dbkey_to_report_id(Gen, dbkey)
+        if not isinstance(
+            Gen, AuditHeader
+        )  # FIXME-MSHD: This hack is necessary until we switch all workbook generators to using census models. We may want to get rid of generate_dissemination_test_table at some point (see comment in generate_federal_awards)
+        else xform_dbkey_to_report_id(Gen, dbkey)
+    )
     for o in objects:
-        as_dict = model_to_dict(o)
         test_obj = {}
         test_obj["fields"] = []
         test_obj["values"] = []
         for m in mappings:
             # What if we only test non-null values?
-            if ((m.in_db in as_dict) and as_dict[m.in_db] is not None) and (
-                as_dict[m.in_db] != ""
-            ):
+            attribute_value = getattr(o, m.in_db, None)
+            if (attribute_value is not None) and (attribute_value != ""):
                 if m.in_dissem == WorkbookFieldInDissem:
-                    # print(f'in_sheet {m.in_sheet} <- {as_dict[m.in_db]}')
+                    # print(f'in_sheet {m.in_sheet} <- {attribute_value}')
                     test_obj["fields"].append(m.in_sheet)
                     # The typing must be applied here as well, as in the case of
                     # type_requirement, it alphabetizes the value...
-                    test_obj["values"].append(m.type(as_dict[m.in_db]))
+                    test_obj["values"].append(m.type(attribute_value))
                 else:
-                    # print(f'in_dissem {m.in_dissem} <- {as_dict[m.in_db]}')
+                    # print(f'in_dissem {m.in_dissem} <- {attribute_value}')
                     test_obj["fields"].append(m.in_dissem)
-                    test_obj["values"].append(m.type(as_dict[m.in_db]))
+                    test_obj["values"].append(m.type(attribute_value))
 
         table["rows"].append(test_obj)
     return table
