@@ -3,6 +3,7 @@ from census_historical_migration.transforms.xform_string_to_string import (
 )
 from census_historical_migration.workbooklib.excel_creation_utils import (
     get_audit_header,
+    get_audits,
     get_range_values,
     get_ranges,
     set_workbook_uei,
@@ -145,10 +146,6 @@ def _get_full_cfdas(audits):
     return [f"{audit.CFDA_PREFIX}.{audit.CFDA_EXT}" for audit in audits]
 
 
-def _get_audits(dbkey):
-    return Audits.objects.filter(DBKEY=dbkey).order_by("ID")
-
-
 # The functionality of _fix_passthroughs has been split into two separate functions:
 # _get_passthroughs and _xform_populate_default_passthrough_values. Currently, _get_passthroughs is being
 # used in place of _fix_passthroughs.
@@ -271,7 +268,7 @@ def generate_federal_awards(dbkey, year, outfile):
 
     set_workbook_uei(wb, audit_header.UEI)
 
-    audits = _get_audits(dbkey)
+    audits = get_audits(dbkey)
 
     map_simple_columns(wb, mappings, audits)
 
