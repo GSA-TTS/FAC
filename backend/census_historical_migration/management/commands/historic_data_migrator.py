@@ -49,11 +49,15 @@ class Command(BaseCommand):
                     f"Generating test reports for DBKEYS: {dbkeys_str} and YEARS: {years_str}"
                 )
                 for dbkey, year in zip(dbkeys, years):
-                    run_end_to_end(email, dbkey, year)
+                    result = {"success": [], "errors": []}
+                    run_end_to_end(email, dbkey, year, result)
+                    logger.info(result)
             else:
                 for pair in defaults:
                     logger.info("Running {}-{} end-to-end".format(pair[0], pair[1]))
-                    run_end_to_end(email, str(pair[0]), str(pair[1]))
+                    result = {"success": [], "errors": []}
+                    run_end_to_end(email, str(pair[0]), str(pair[1]), result)
+                    logger.info(result)
         else:
             logger.error(
                 "Cannot run end-to-end workbook generation in production. Exiting."
