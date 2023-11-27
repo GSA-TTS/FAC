@@ -10,6 +10,7 @@ from census_historical_migration.sac_general_lib.report_id_generator import (
     xform_dbkey_to_report_id,
 )
 from census_historical_migration.models import (
+    ELECAUDITS as Audits,
     ELECAUDITHEADER as AuditHeader,
 )
 
@@ -228,3 +229,7 @@ def generate_dissemination_test_table(Gen, api_endpoint, dbkey, mappings, object
 
         table["rows"].append(test_obj)
     return table
+
+
+def get_audits(dbkey):
+    return Audits.objects.filter(DBKEY=dbkey).order_by("ID")
