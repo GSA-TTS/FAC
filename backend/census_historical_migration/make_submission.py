@@ -19,7 +19,7 @@ def load_historic_data(audit_year, dbkey):
 def create_or_get_user(result, gen):
     user_email = gen.AUDITEEEMAIL
     user_name = gen.AUDITEECONTACT.split()[0] + "_generated"
-    
+
     if not user_email or len(user_email) == 0:
         user_email = "loader_generated_email@history_data.org"
         user_name = "loader_generated_name"
