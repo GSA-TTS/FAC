@@ -45,7 +45,7 @@ resource "cloudfoundry_user_provided_service" "logshipper_creds" {
   }
 }
 
-resource "cloudfoundry_user_provided_service" "loghipper_new_relic_creds" {
+resource "cloudfoundry_user_provided_service" "logshipper_new_relic_creds" {
   name  = "newrelic-creds-logshipper"
   space = data.cloudfoundry_space.apps.id
   credentials = {
