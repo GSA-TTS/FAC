@@ -27,6 +27,14 @@ jobs:
       TERRAFORM_PRE_RUN: |
           apt-get update
           apt-get install -y zip python
+
+          # Install CF CLI
+          mkdir -p /etc/apt/keyrings/
+          wget -q -O - https://packages.cloudfoundry.org/debian/cli.cloudfoundry.org.key | gpg --dearmor | tee /etc/apt/trusted.gpg.d/cf.gpg > /dev/null
+          echo "deb https://packages.cloudfoundry.org/debian stable main" | tee /etc/apt/sources.list.d/cloudfoundry-cli.list
+          apt-get update && DEBIAN_FRONTEND=noninteractive
+          apt-get install --assume-yes cf8-cli
+          cf auth ${{ secrets.CF_USERNAME }} ${{ secrets.CF_PASSWORD }}
       TF_VAR_postgrest_image: 'ghcr.io/gsa-tts/fac/postgrest:latest'
       TF_VAR_clamav_image: 'ghcr.io/gsa-tts/fac/clamav:latest'
 
