@@ -27,6 +27,13 @@ data "cloudfoundry_space" "egress_space" {
 locals {
   username = random_uuid.username.result
   password = random_password.password.result
+  sidecar_json = jsonencode(
+    {
+      "name" : "fluentbit",
+      "command" : "/home/vcap/deps/0/apt/opt/fluent-bit/bin/fluent-bit -c fluentbit.conf",
+      "process_types" : ["web"],
+    }
+  )
 }
 
 resource "cloudfoundry_user_provided_service" "logshipper_creds" {
