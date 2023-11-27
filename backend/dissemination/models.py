@@ -511,13 +511,7 @@ class SecondaryAuditor(models.Model):
 class MigrationChangeRecord(models.Model):
     audit_year = models.TextField(blank=True, null=True)
     dbkey = models.TextField(blank=True, null=True)
-    sac = models.ForeignKey(
-        "audit.SingleAuditChecklist",
-        on_delete=models.CASCADE,
-        related_name="columns",
-        blank=True,
-        null=True,
-    )
+    record_id = models.TextField(blank=True, null=True)
     run_datetime = models.DateTimeField(default=timezone.now)
     census_data = models.JSONField(blank=True, null=True)
     gsa_fac_data = models.JSONField(blank=True, null=True)
