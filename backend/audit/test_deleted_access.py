@@ -70,7 +70,7 @@ class DeletedAccessTests(TestCase):
         self.assertEqual(0, len(user1_accesses_after))
         self.assertEqual(1, len(user2_accesses_after))
 
-    def test_deletion_function_removes_only_sepcific_role(self):
+    def test_deletion_function_removes_only_specific_role(self):
         """
         Test calling the deletion function directly.
         """
@@ -145,3 +145,35 @@ class DeletedAccessTests(TestCase):
         self.assertEqual(deletion_record_after.email, user1.email)
         self.assertEqual(0, len(user1_accesses_after))
         self.assertEqual(1, len(user2_accesses_after))
+
+    def test_deletion_function_passes_args(self):
+        """
+        Test calling the deletion function directly.
+        """
+        user1, user2 = _make_test_users_by_email(["a@a.com", "b@b.com"])
+        sac = baker.make(SingleAuditChecklist)
+        _make_accesses(sac, "editor", [user1, user2])
+        user1_access = Access.objects.get(user=user1, sac=sac)
+        user2_access = Access.objects.get(user=user2, sac=sac)
+        deletion_records = DeletedAccess.objects.filter(sac=sac)
+
+        self.assertEqual(sac.id, user1_access.sac.id)
+        self.assertEqual(sac.id, user2_access.sac.id)
+        self.assertEqual(0, len(deletion_records))
+
+        results = remove_email_from_submission_access(
+            sac.report_id,
+            user1.email,
+            role="editor",
+            removing_user=user2,
+            event="some-event",
+        )
+        deletion_record_after = DeletedAccess.objects.get(sac=sac)
+        user1_accesses_after = Access.objects.filter(user=user1, sac=sac)
+
+        self.assertEqual(1, len(results))
+        self.assertEqual(deletion_record_after.sac, sac)
+        self.assertEqual(deletion_record_after.email, user1.email)
+        self.assertEqual(0, len(user1_accesses_after))
+        self.assertEqual(deletion_record_after.removed_by_user, user2)
+        self.assertEqual(deletion_record_after.removal_event, "some-event")
