@@ -15,8 +15,14 @@ def load_historic_data_for_year(audit_year):
 
     for submission in submissions_for_year:
         dbkey = submission.DBKEY
-        # Migrate a single submission
-        result = load_historic_data(audit_year, dbkey, user)
+        result = {"success": [], "errors": []}
+
+        try:
+            # Migrate a single submission
+            run_end_to_end(user.email, dbkey, audit_year, result)
+        except Exception as exc:
+            result["errors"].append(f"{exc}")
+
         result_log[(audit_year, dbkey)] = result
         total_count += 1
 
@@ -34,14 +40,6 @@ def load_historic_data_for_year(audit_year):
         print("-------------------")
 
     print(f"{error_count} errors out of {total_count}")
-
-
-def load_historic_data(audit_year, dbkey, user):
-    """Create a submission for the given audit year, dbkey, and user"""
-    result = {"success": [], "errors": []}
-    run_end_to_end(user.email, dbkey, audit_year)
-
-    return result
 
 
 def create_or_get_user():

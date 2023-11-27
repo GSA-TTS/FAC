@@ -10,6 +10,7 @@ import jwt
 import requests
 from pprint import pprint
 from datetime import datetime
+import traceback
 
 from census_historical_migration.workbooklib.workbook_builder_loader import (
     workbook_builder_loader,
@@ -192,41 +193,51 @@ def api_check(json_test_tables):
     return combined_summary
 
 
-def generate_workbooks(user, dbkey, year):
-    entity_id = "DBKEY {dbkey} {year} {date:%Y_%m_%d_%H_%M_%S}".format(
-        dbkey=dbkey, year=year, date=datetime.now()
-    )
-    sac = setup_sac(user, entity_id, dbkey)
-    if sac.general_information["audit_type"] == "alternative-compliance-engagement":
-        print(f"Skipping ACE audit: {dbkey}")
-        raise DataMigrationError("Skipping ACE audit")
-    else:
-        builder_loader = workbook_builder_loader(user, sac, dbkey, year)
-        json_test_tables = []
-        for section, fun in sections_to_handlers.items():
-            # FIXME: Can we conditionally upload the addl' and secondary workbooks?
-            (_, json, _) = builder_loader(fun, section)
-            json_test_tables.append(json)
-        _post_upload_pdf(sac, user, "audit/fixtures/basic.pdf")
-        step_through_certifications(sac)
+def generate_workbooks(user, dbkey, year, result):
+    try:
+        entity_id = "DBKEY {dbkey} {year} {date:%Y_%m_%d_%H_%M_%S}".format(
+            dbkey=dbkey, year=year, date=datetime.now()
+        )
+        sac = setup_sac(user, entity_id, dbkey)
 
-        # shaped_sac = sac_validation_shape(sac)
-        # result = submission_progress_check(shaped_sac, sar=None, crossval=False)
-        # print(result)
+        if sac.general_information["audit_type"] == "alternative-compliance-engagement":
+            print(f"Skipping ACE audit: {dbkey}")
+            raise DataMigrationError("Skipping ACE audit")
+        else:
+            builder_loader = workbook_builder_loader(user, sac, dbkey, year)
+            json_test_tables = []
 
-        errors = sac.validate_cross()
-        pprint(errors.get("errors", "No errors found in cross validation"))
+            for section, fun in sections_to_handlers.items():
+                # FIXME: Can we conditionally upload the addl' and secondary workbooks?
+                (_, json, _) = builder_loader(fun, section)
+                json_test_tables.append(json)
 
-        disseminate(sac, year)
-        # pprint(json_test_tables)
-        combined_summary = api_check(json_test_tables)
-        logger.info(combined_summary)
+            _post_upload_pdf(sac, user, "audit/fixtures/basic.pdf")
+            step_through_certifications(sac)
+
+            errors = sac.validate_cross()
+            if errors.get("errors"):
+                result["errors"].append(f"{errors.get('errors')}")
+                return
+
+            disseminate(sac, year)
+            combined_summary = api_check(json_test_tables)
+            logger.info(combined_summary)
+
+            result["success"].append(f"{sac.report_id} created")
+    except Exception as exc:
+        tb = traceback.extract_tb(sys.exc_info()[2])
+        for frame in tb:
+            print(f"{frame.filename}:{frame.lineno} {frame.name}: {frame.line}")
+
+        result["errors"].append(f"{exc}")
 
 
-def run_end_to_end(email, dbkey, year):
+def run_end_to_end(email, dbkey, year, result):
     try:
         user = User.objects.get(email=email)
     except User.DoesNotExist:
         logger.info("No user found for %s, have you logged in once?", email)
         return
-    generate_workbooks(user, dbkey, year)
+
+    generate_workbooks(user, dbkey, year, result)
