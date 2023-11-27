@@ -88,7 +88,7 @@
           "additional_award_identification",
           "cluster_name",
           "other_cluster_name",
-          "nan"
+          ""
         ],
         "values": [
           "97",
@@ -111,7 +111,7 @@
           "083",
           "AWARD-0001",
           "",
-          "OTHER CLUSTER NOT LISTED ABOVE"
+          "N/A"
         ]
       },
       {
@@ -138,7 +138,7 @@
           "additional_award_identification",
           "cluster_name",
           "other_cluster_name",
-          "nan"
+          ""
         ],
         "values": [
           "21",
@@ -161,7 +161,7 @@
           "027",
           "AWARD-0002",
           "",
-          "OTHER CLUSTER NOT LISTED ABOVE"
+          "N/A"
         ]
       },
       {
@@ -188,7 +188,7 @@
           "additional_award_identification",
           "cluster_name",
           "other_cluster_name",
-          "nan"
+          ""
         ],
         "values": [
           "97",
@@ -211,7 +211,7 @@
           "044",
           "AWARD-0003",
           "",
-          "OTHER CLUSTER NOT LISTED ABOVE"
+          "N/A"
         ]
       }
     ],
