@@ -58,4 +58,8 @@ resource "cloudfoundry_app" "cg_logshipper_app" {
   routes {
     route = cloudfoundry_route.logshipper.id
   }
+
+  environment = {
+    PROXYROUTE = var.https_proxy
+  }
 }
