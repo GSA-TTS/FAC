@@ -1382,6 +1382,7 @@
           "is_other_findings",
           "is_questioned_costs",
           "is_repeat_finding",
+          "prior_finding_ref_numbers",
           "award_reference"
         ],
         "values": [
@@ -1394,84 +1395,7 @@
           "N",
           "N",
           "N",
-          "AWARD-0015"
-        ]
-      },
-      {
-        "fields": [
-          "type_requirement",
-          "reference_number",
-          "is_modified_opinion",
-          "is_other_matters",
-          "is_material_weakness",
-          "is_significant_deficiency",
-          "is_other_findings",
-          "is_questioned_costs",
-          "is_repeat_finding",
-          "award_reference"
-        ],
-        "values": [
-          "N",
-          "2022-001",
-          "N",
-          "Y",
-          "Y",
-          "N",
-          "N",
-          "N",
-          "N",
-          "AWARD-0017"
-        ]
-      },
-      {
-        "fields": [
-          "type_requirement",
-          "reference_number",
-          "is_modified_opinion",
-          "is_other_matters",
-          "is_material_weakness",
-          "is_significant_deficiency",
-          "is_other_findings",
-          "is_questioned_costs",
-          "is_repeat_finding",
-          "award_reference"
-        ],
-        "values": [
-          "N",
-          "2022-001",
-          "N",
-          "Y",
-          "Y",
-          "N",
-          "N",
-          "N",
-          "N",
-          "AWARD-0019"
-        ]
-      },
-      {
-        "fields": [
-          "type_requirement",
-          "reference_number",
-          "is_modified_opinion",
-          "is_other_matters",
-          "is_material_weakness",
-          "is_significant_deficiency",
-          "is_other_findings",
-          "is_questioned_costs",
-          "is_repeat_finding",
-          "award_reference"
-        ],
-        "values": [
-          "N",
-          "2022-001",
-          "N",
-          "Y",
-          "Y",
-          "N",
-          "N",
-          "N",
-          "N",
+          "N/A",
           "AWARD-0014"
         ]
       },
@@ -1486,6 +1410,7 @@
           "is_other_findings",
           "is_questioned_costs",
           "is_repeat_finding",
+          "prior_finding_ref_numbers",
           "award_reference"
         ],
         "values": [
@@ -1498,6 +1423,35 @@
           "N",
           "N",
           "N",
+          "N/A",
+          "AWARD-0015"
+        ]
+      },
+      {
+        "fields": [
+          "type_requirement",
+          "reference_number",
+          "is_modified_opinion",
+          "is_other_matters",
+          "is_material_weakness",
+          "is_significant_deficiency",
+          "is_other_findings",
+          "is_questioned_costs",
+          "is_repeat_finding",
+          "prior_finding_ref_numbers",
+          "award_reference"
+        ],
+        "values": [
+          "N",
+          "2022-001",
+          "N",
+          "Y",
+          "Y",
+          "N",
+          "N",
+          "N",
+          "N",
+          "N/A",
           "AWARD-0016"
         ]
       },
@@ -1512,6 +1466,7 @@
           "is_other_findings",
           "is_questioned_costs",
           "is_repeat_finding",
+          "prior_finding_ref_numbers",
           "award_reference"
         ],
         "values": [
@@ -1524,7 +1479,64 @@
           "N",
           "N",
           "N",
+          "N/A",
+          "AWARD-0017"
+        ]
+      },
+      {
+        "fields": [
+          "type_requirement",
+          "reference_number",
+          "is_modified_opinion",
+          "is_other_matters",
+          "is_material_weakness",
+          "is_significant_deficiency",
+          "is_other_findings",
+          "is_questioned_costs",
+          "is_repeat_finding",
+          "prior_finding_ref_numbers",
+          "award_reference"
+        ],
+        "values": [
+          "N",
+          "2022-001",
+          "N",
+          "Y",
+          "Y",
+          "N",
+          "N",
+          "N",
+          "N",
+          "N/A",
           "AWARD-0018"
+        ]
+      },
+      {
+        "fields": [
+          "type_requirement",
+          "reference_number",
+          "is_modified_opinion",
+          "is_other_matters",
+          "is_material_weakness",
+          "is_significant_deficiency",
+          "is_other_findings",
+          "is_questioned_costs",
+          "is_repeat_finding",
+          "prior_finding_ref_numbers",
+          "award_reference"
+        ],
+        "values": [
+          "N",
+          "2022-001",
+          "N",
+          "Y",
+          "Y",
+          "N",
+          "N",
+          "N",
+          "N",
+          "N/A",
+          "AWARD-0019"
         ]
       }
     ],

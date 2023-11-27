@@ -280,19 +280,21 @@
           "is_other_findings",
           "is_questioned_costs",
           "is_repeat_finding",
+          "prior_finding_ref_numbers",
           "award_reference"
         ],
         "values": [
-          "L",
-          "2022-003",
+          "P",
+          "2022-002",
+          "N",
+          "N",
           "N",
           "Y",
           "N",
+          "N",
           "Y",
-          "N",
-          "N",
-          "N",
-          "AWARD-0002"
+          "2021-003",
+          "AWARD-0001"
         ]
       },
       {
@@ -306,11 +308,12 @@
           "is_other_findings",
           "is_questioned_costs",
           "is_repeat_finding",
+          "prior_finding_ref_numbers",
           "award_reference"
         ],
         "values": [
-          "I",
-          "2022-004",
+          "L",
+          "2022-003",
           "N",
           "Y",
           "N",
@@ -318,6 +321,7 @@
           "N",
           "N",
           "N",
+          "N/A",
           "AWARD-0002"
         ]
       },
@@ -336,17 +340,17 @@
           "award_reference"
         ],
         "values": [
-          "P",
-          "2022-002",
+          "I",
+          "2022-004",
           "N",
-          "N",
+          "Y",
           "N",
           "Y",
           "N",
           "N",
-          "Y",
-          "2021-003",
-          "AWARD-0001"
+          "N",
+          "N/A",
+          "AWARD-0002"
         ]
       }
     ],
