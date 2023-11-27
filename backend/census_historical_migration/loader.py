@@ -2,7 +2,7 @@ from .models import ELECAUDITHEADER as Gen
 from .make_submission import load_historic_data
 
 
-def load_data(audit_year):
+def load_historic_data_for_year(audit_year):
     result_log = {}
     total_count = error_count = 0
 

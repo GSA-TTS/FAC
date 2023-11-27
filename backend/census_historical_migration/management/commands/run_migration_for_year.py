@@ -1,4 +1,4 @@
-from ...loader import load_data
+from ...loader import load_historic_data_for_year
 
 from django.core.management.base import BaseCommand
 
@@ -25,4 +25,4 @@ class Command(BaseCommand):
             print("Please specify an audit year")
             return
 
-        load_data(audit_year=year)
+        load_historic_data_for_year(audit_year=year)
