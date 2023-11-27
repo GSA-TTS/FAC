@@ -1,0 +1,395 @@
+[
+  {
+    "endpoint": "additional_eins",
+    "report_id": "2022-06-CENSUS-0000251020",
+    "rows": [],
+    "singletons": {
+      "auditee_uei": "GM27HGUL61B5"
+    }
+  },
+  {
+    "endpoint": "additional_ueis",
+    "report_id": "2022-06-CENSUS-0000251020",
+    "rows": [],
+    "singletons": {
+      "auditee_uei": "GM27HGUL61B5"
+    }
+  },
+  {
+    "endpoint": "corrective_action_plans",
+    "report_id": "2022-06-CENSUS-0000251020",
+    "rows": [
+      {
+        "fields": [
+          "finding_ref_number",
+          "planned_action",
+          "contains_chart_or_table"
+        ],
+        "values": [
+          "2022-004",
+          "Finding 2022-004  Significant Deficiency Assistance Listing:21.027  Coronavirus State and Local Fiscal Recovery Funds (CSLFRF)Federal Grantor:Department of the Treasury Compliance Requirement:Procurement and Suspension and DebarmentCondition:The District used a sole source authorization for the procurement of a Type-1 Fire Engine but a competitive bid process should have been used to comply with Uniform Guidance.Recommendation:We recommend the District work with FEMA to obtain written approval for the sole source procurement, which is one of the exceptions to noncompetitive procurements.Management Response and Corrective Action Plan: The District shall revise policies and procedures to incorporate the requirements in the Uniform Guidance in its sole source approval process when it comes to selecting and approving vendors for expenditures that relates to a federal grant. The District will also work with the awarding agency to ensure written approval are obtained for sole source purchases.",
+          "N"
+        ]
+      },
+      {
+        "fields": [
+          "finding_ref_number",
+          "planned_action",
+          "contains_chart_or_table"
+        ],
+        "values": [
+          "2022-002",
+          "Finding 2022-002  Significant Deficiency Award No.:97.083, Staffing for Adequate Fire and Emergency ResponseFederal Grantor:U.S.Department of Homeland Security, Federal Emergency Management AgencyCompliance Requirement:Other compliance requirements.Condition:The schedule of Expenditures of Federal Awards (SEFA) was not complete, and expenditures reported on the SEFA were revised during the single audit.Recommendation:We recommend additional review procedures be implemented to ensure the SEFA is complete and accurate when the single audit begins.Management Response and Corrective Action Plan: The Finance division will work with other departments to ensure that data provided in the SEFA are complete and accounted for on an accrual basis. We will also implement efficiencies in our accounting systems to ensure expenditures are captured correctly to prevent errors and omissions. Additional review will be completed by the Finance Director for completeness.",
+          "N"
+        ]
+      },
+      {
+        "fields": [
+          "finding_ref_number",
+          "planned_action",
+          "contains_chart_or_table"
+        ],
+        "values": [
+          "2022-003",
+          "Finding 2022-003  Significant Deficiency Assistance Listing:21.027  Coronavirus State and Local Fiscal Recovery Funds (CSLFRF)Federal Grantor:Department of the TreasuryCompliance Requirement:ReportingCondition:The Project and Expenditure Reports were not filed.Recommendation:We recommend the District file the initial Project and Expenditures Report for the period covering March 3, 2021 to March 31,2022 as soon as possible.Subsequent annual reports should be filed by the April 30, 2023 deadline.Management Response and Corrective Action Plan: The District has confirmed with the City of Elk Grove that as the main recipient of the grant, the City has filed the project and expenditure reports with the Treasury Department. In addition to what has already been report, the District will establish the proper authority to report the project and expenditure reports to the Treasury Department for period covering March 3, 2021 to March 31, 2022. The District will ensure that going forward projects and expenditures are reported in accordance with the schedule set forth by the guidance issued by the Treasury.",
+          "N"
+        ]
+      }
+    ],
+    "singletons": {
+      "auditee_uei": "GM27HGUL61B5"
+    }
+  },
+  {
+    "endpoint": "federal_awards",
+    "report_id": "2022-06-CENSUS-0000251020",
+    "rows": [
+      {
+        "fields": [
+          "federal_agency_prefix",
+          "three_digit_extension",
+          "federal_program_name",
+          "state_cluster_name",
+          "federal_program_total",
+          "additional_award_identification",
+          "cluster_total",
+          "is_loan",
+          "loan_balance",
+          "is_direct",
+          "is_passthrough_award",
+          "passthrough_amount",
+          "is_major",
+          "audit_report_type",
+          "findings_count",
+          "amount_expended",
+          "federal_agency_prefix",
+          "three_digit_extension",
+          "award_reference",
+          "additional_award_identification",
+          "cluster_name",
+          "other_cluster_name",
+          "nan"
+        ],
+        "values": [
+          "97",
+          "083",
+          "STAFFING FOR ADEQUATE FIRE AND EMERGENCY RESPONSE (SAFER)",
+          "nan",
+          2564216,
+          "nan",
+          0,
+          "N",
+          "nan",
+          "Y",
+          "N",
+          "",
+          "N",
+          "nan",
+          1,
+          2564216,
+          "97",
+          "083",
+          "AWARD-0001",
+          "",
+          "OTHER CLUSTER NOT LISTED ABOVE"
+        ]
+      },
+      {
+        "fields": [
+          "federal_agency_prefix",
+          "three_digit_extension",
+          "federal_program_name",
+          "state_cluster_name",
+          "federal_program_total",
+          "additional_award_identification",
+          "cluster_total",
+          "is_loan",
+          "loan_balance",
+          "is_direct",
+          "is_passthrough_award",
+          "passthrough_amount",
+          "is_major",
+          "audit_report_type",
+          "findings_count",
+          "amount_expended",
+          "federal_agency_prefix",
+          "three_digit_extension",
+          "award_reference",
+          "additional_award_identification",
+          "cluster_name",
+          "other_cluster_name",
+          "nan"
+        ],
+        "values": [
+          "21",
+          "027",
+          "CORONAVIRUS STATE AND LOCAL FISCAL RECOVERY FUNDS",
+          "nan",
+          1458378,
+          "nan",
+          0,
+          "N",
+          "nan",
+          "N",
+          "N",
+          "",
+          "Y",
+          "U",
+          2,
+          1458378,
+          "21",
+          "027",
+          "AWARD-0002",
+          "",
+          "OTHER CLUSTER NOT LISTED ABOVE"
+        ]
+      },
+      {
+        "fields": [
+          "federal_agency_prefix",
+          "three_digit_extension",
+          "federal_program_name",
+          "state_cluster_name",
+          "federal_program_total",
+          "additional_award_identification",
+          "cluster_total",
+          "is_loan",
+          "loan_balance",
+          "is_direct",
+          "is_passthrough_award",
+          "passthrough_amount",
+          "is_major",
+          "audit_report_type",
+          "findings_count",
+          "amount_expended",
+          "federal_agency_prefix",
+          "three_digit_extension",
+          "award_reference",
+          "additional_award_identification",
+          "cluster_name",
+          "other_cluster_name",
+          "nan"
+        ],
+        "values": [
+          "97",
+          "044",
+          "ASSISTANCE TO FIREFIGHTERS GRANT",
+          "nan",
+          289749,
+          "nan",
+          0,
+          "N",
+          "nan",
+          "Y",
+          "N",
+          "",
+          "Y",
+          "U",
+          0,
+          289749,
+          "97",
+          "044",
+          "AWARD-0003",
+          "",
+          "OTHER CLUSTER NOT LISTED ABOVE"
+        ]
+      }
+    ],
+    "singletons": {
+      "auditee_uei": "GM27HGUL61B5",
+      "total_amount_expended": 4312343
+    }
+  },
+  {
+    "endpoint": "findings_text",
+    "report_id": "2022-06-CENSUS-0000251020",
+    "rows": [
+      {
+        "fields": [
+          "finding_ref_number",
+          "finding_text",
+          "contains_chart_or_table"
+        ],
+        "values": [
+          "2022-003",
+          "Finding 2022-003  Significant Deficiency Assistance Listing:21.027  Coronavirus State and Local Fiscal Recovery Funds (CSLFRF)Federal Grantor:Department of the TreasuryCompliance Requirement:ReportingCondition:The Project and Expenditure Reports were not filed.Criteria:The Subrecipient Agreement between the City of Elk Grove and the District. Section 10 states Subrecipient shall comply with any applicable reporting obligations established by the Department of the Treasury as they relate to this Agreement.Department of Treasury Compliance and Reporting Guidance for CSLFRF, Part 2, Section B outlines reporting requirements.Reports on projects funded, expenditures, and contracts and subawards equal to or greater than $50,000, and other information are required annually for recipients serving populations under 250,000 and receiving less than $10 million in CSLFRF funding.Cause:The District believed that as a subrecipient of funds the funding provider would prepare and file the required reporting.Effect:Treasury may impose additional conditions on the receipt of a subsequent tranche of future award funds, if any, or take other available remedies as set forth in 2 C.F.R.  200.339.Recommendation:We recommend the District file the initial Project and Expenditures Report for the period covering March 3, 2021 to March 31,2022 as soon as possible.Subsequent annual reports should be filed by the April 30, 2023 deadline.Views of Responsible Officials and Planned Corrective Actions:Managements response and planned corrective action is included in the Corrective Action Plan included at the end of the report.",
+          "N"
+        ]
+      },
+      {
+        "fields": [
+          "finding_ref_number",
+          "finding_text",
+          "contains_chart_or_table"
+        ],
+        "values": [
+          "2022-004",
+          "Finding 2022-004  Significant Deficiency Assistance Listing:21.027  Coronavirus State and Local Fiscal Recovery Funds (CSLFRF)Federal Grantor:Department of the Treasury Compliance Requirement:Procurement and Suspension and DebarmentCondition:The District used a sole source authorization for the procurement of a Type-1 Fire Engine but a competitive bid process should have been used to comply with Uniform Guidance.Criteria:Non-state entities under the program, must follow the procurement standards in 2 CFR sections 200.318 through 200.327, including ensuring that the procurement method used for the contracts are appropriate based on the dollar amount and conditions specified in 2 CFR section 200.320.Specifically, procurements in excess of $250,000 be conducted using a competitive procurement method such as bids or proposals. Further, the Districts Purchasing Policy Sec 2112.13 requires staff obtain competitive bids for the purchase of supplies, equipment or service that are $15,000 or greater.Interagency or cooperative purchasing agreements may be leveraged, but they must comply with the Unform Standards, and 2 CFR section 200.320(c) states noncompetitive procurement can only be awarded if one or more of the following circumstances apply:1)The acquisition of property or services, the aggregate dollar amount of which does not exceed the micro-purchase threshold (see paragraph (a)(1) of this section);2)The item is available only from a single source;3)The public exigency or emergency for the requirement will not permit a delay resulting from publicizing a competitive solicitation;4)The Federal awarding agency or pass-through entity expressly authorizes a noncompetitive procurement in response to a written request from the non-Federal entity; or5)After solicitation of a number of sources, competition is determined inadequate.Cause:The Districts Purchasing Policy allows for a sole source vendor with the approval of the Chief Administrative Officer.In addition, the Policy allows the District to purchase through a purchasing alliance, such as a cooperative agreement.The sole source vendor has a cooperative purchasing agreement through National Purchasing Partners (NPP) cooperative, contract number PS20240.The Districts justification for sole source vendor was uniformity of vendors across safety equipment which fosters ease of operator training and emergency scene efficiency.The approval indicated standardization also supports ongoing maintenance of the fleet.While permitted by internal policy, this justification does not appear to meet any of the noncompetitive procurement exceptions allowed by the Uniform Standards outlined above.The District was also unable to provide documentation that the vendor purchasing agreement through NPP complies with the Uniform Standards for procurement.Effect:Treasury may impose additional conditions on the receipt of a subsequent tranche of future award funds, if any, or take other available remedies as set forth in 2 C.F.R.  200.339.Recommendation:We recommend the District work with FEMA to obtain written approval for the sole source procurement, which is one of the exceptions to noncompetitive procurements.Views of Responsible Officials and Planned Corrective Actions:Managements response and planned corrective action is included in the Corrective Action Plan included at the end of the report.",
+          "N"
+        ]
+      },
+      {
+        "fields": [
+          "finding_ref_number",
+          "finding_text",
+          "contains_chart_or_table"
+        ],
+        "values": [
+          "2022-002",
+          "Finding 2022-002  Significant Deficiency Award No.:97.083, Staffing for Adequate Fire and Emergency ResponseFederal Grantor:U.S.Department of Homeland Security, Federal Emergency Management AgencyCompliance Requirement:Other compliance requirements.Condition:The schedule of Expenditures of Federal Awards (SEFA) was not complete, and expenditures reported on the SEFA were revised during the single audit.Criteria:2 CFR Part 200, Subpart F (Uniform Guidance) Section 200.502 states, The auditee should prepare a Schedule of Expenditures of Federal Awards for the period covered by the auditees financial statements.Internal controls over the SEFA should be in place ensure accrual basis expenses incurred under the federal program are properly reported as expenses on the SEFA and are properly reported as revenue in the financial statements prior to the start of the single audit.Cause:SEFA was not fully reconciled and finalized until after the single audit began.Effect:The expenses included on the SEFA were revised during the single audit, which could have resulted in the auditor not selecting the correct major program or expenses for testing and could have resulted in the single audit not satisfying the requirements of the Uniform Guidance.Recommendation:We recommend additional review procedures be implemented to ensure the SEFA is complete and accurate when the single audit begins.Views of Responsible Officials and Planned Corrective Actions:Managements response and planned corrective action is included in the Corrective Action Plan included at the end of the report.",
+          "N"
+        ]
+      }
+    ],
+    "singletons": {
+      "auditee_uei": "GM27HGUL61B5"
+    }
+  },
+  {
+    "endpoint": "findings",
+    "report_id": "2022-06-CENSUS-0000251020",
+    "rows": [
+      {
+        "fields": [
+          "type_requirement",
+          "reference_number",
+          "is_modified_opinion",
+          "is_other_matters",
+          "is_material_weakness",
+          "is_significant_deficiency",
+          "is_other_findings",
+          "is_questioned_costs",
+          "is_repeat_finding",
+          "award_reference"
+        ],
+        "values": [
+          "L",
+          "2022-003",
+          "N",
+          "Y",
+          "N",
+          "Y",
+          "N",
+          "N",
+          "N",
+          "AWARD-0002"
+        ]
+      },
+      {
+        "fields": [
+          "type_requirement",
+          "reference_number",
+          "is_modified_opinion",
+          "is_other_matters",
+          "is_material_weakness",
+          "is_significant_deficiency",
+          "is_other_findings",
+          "is_questioned_costs",
+          "is_repeat_finding",
+          "award_reference"
+        ],
+        "values": [
+          "I",
+          "2022-004",
+          "N",
+          "Y",
+          "N",
+          "Y",
+          "N",
+          "N",
+          "N",
+          "AWARD-0002"
+        ]
+      },
+      {
+        "fields": [
+          "type_requirement",
+          "reference_number",
+          "is_modified_opinion",
+          "is_other_matters",
+          "is_material_weakness",
+          "is_significant_deficiency",
+          "is_other_findings",
+          "is_questioned_costs",
+          "is_repeat_finding",
+          "prior_finding_ref_numbers",
+          "award_reference"
+        ],
+        "values": [
+          "P",
+          "2022-002",
+          "N",
+          "N",
+          "N",
+          "Y",
+          "N",
+          "N",
+          "Y",
+          "2021-003",
+          "AWARD-0001"
+        ]
+      }
+    ],
+    "singletons": {}
+  },
+  {
+    "endpoint": "notes_to_sefa",
+    "report_id": "2022-06-CENSUS-0000251020",
+    "rows": [
+      {
+        "fields": [
+          "title",
+          "content"
+        ],
+        "values": [
+          "Basis of Presentation",
+          "The accompanying schedule of expenditures of federal awards includes the federal grant activity of the Cosumnes Community Services District (the District) under programs of the federal government for the year ended June 30, 2021. The information in this schedule is presented in accordance with the requirements of Title 2 U.S. Code of Federal Regulations Part 200, Uniform Administrative Requirements, Cost Principles, and Audit Requirements for Federal Awards (Uniform Guidance). Because the Schedule presents only a selected portion of the Districts operations, it is not intended to be and does not present the financial position, changes in net position, or cash flows of the District. Therefore, some amounts presented in this schedule may differ from amounts presented in, or used in the preparation of, the basic financial statements."
+        ]
+      },
+      {
+        "fields": [
+          "title",
+          "content"
+        ],
+        "values": [
+          "Subrecipients",
+          "The District did not have any subrecipients of its federal programs."
+        ]
+      }
+    ],
+    "singletons": {
+      "accounting_policies": "Expenses reported on the Schedule are reported on the accrual basis of accounting. Such expenses are recognized following the cost principles contained in the Uniform Guidance, wherein certain types of expenses are not allowable or are limited as to reimbursement.The amounts passed through to subrecipients, if any, are reported on in this schedule when disbursed in accordance with 2 CFR 200.502(a), which differs from the accrual basis of accounting used under generally accepted accounting principles.",
+      "auditee_uei": "GM27HGUL61B5",
+      "is_minimis_rate_used": "Both",
+      "rate_explained": "The District did not charge indirect costs to its federal programs."
+    }
+  },
+  {
+    "endpoint": "secondary_auditor",
+    "report_id": "2022-06-CENSUS-0000251020",
+    "rows": [],
+    "singletons": {
+      "auditee_uei": "GM27HGUL61B5"
+    }
+  }
+]
