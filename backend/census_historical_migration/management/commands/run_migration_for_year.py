@@ -1,4 +1,4 @@
-from ...loader import load_historic_data_for_year
+from ...historic_data_loader import load_historic_data_for_year
 
 from django.core.management.base import BaseCommand
 
