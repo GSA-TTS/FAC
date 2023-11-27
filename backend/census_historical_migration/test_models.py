@@ -1,4 +1,5 @@
 from django.test import TestCase
+from django.conf import settings
 
 from model_bakery import baker
 
@@ -6,6 +7,8 @@ from .models import ELECAUDITHEADER, ReportMigrationStatus, MigrationErrorDetail
 
 
 class CensusHistoricalMigrationTests(TestCase):
+    databases = {k for k in settings.DATABASES.keys()}
+
     def test_can_load_elecauditheader_model(self):
         gen = ELECAUDITHEADER.objects.all()
         self.assertIsNotNone(gen)
