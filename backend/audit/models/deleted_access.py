@@ -1,7 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from .access import Access
+from .access_roles import ACCESS_ROLES
 from .models import SingleAuditChecklist
 
 
@@ -10,7 +10,12 @@ User = get_user_model()
 
 class DeletedAccess(models.Model):
     """
-    Record of Access entries that have been deleted
+    Record of Access entries that have been deleted.
+    Should not be created directly; see:
+
+        audit.models.access.Access.delete
+        audit.models.access.Access.remove_email_from_submission_access
+        audit.models.access.Access.delete_access_and_create_record
     """
 
     class RemovalEventType:
@@ -26,7 +31,7 @@ class DeletedAccess(models.Model):
     # The first five fields are identical to Access:
     sac = models.ForeignKey(SingleAuditChecklist, on_delete=models.CASCADE)
     role = models.CharField(
-        choices=Access.ROLES,
+        choices=ACCESS_ROLES,
         help_text="Access type granted to this user",
         max_length=50,
     )
@@ -51,7 +56,7 @@ class DeletedAccess(models.Model):
         on_delete=models.PROTECT,
         related_name="access_deleted",
     )
-    removed_by_email = models.EmailField()
+    removed_by_email = models.EmailField(null=True)
     removal_event = models.CharField(choices=EVENT_TYPES)
 
     def __str__(self):
