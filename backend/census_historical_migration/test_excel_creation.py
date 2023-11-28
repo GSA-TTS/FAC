@@ -155,7 +155,6 @@ class ExcelCreationTests(TestCase):
 
 
 class TestApplyConversionFunction(TestCase):
-
     def test_string_conversion(self):
         """Test that a string is returned unchanged"""
         self.assertEqual(apply_conversion_function("test", "default", str), "test")
