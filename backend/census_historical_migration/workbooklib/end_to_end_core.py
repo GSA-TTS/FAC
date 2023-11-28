@@ -1,5 +1,4 @@
 from census_historical_migration.exception_utils import DataMigrationError
-from users.models import User
 import argparse
 import logging
 import sys
@@ -192,7 +191,7 @@ def api_check(json_test_tables):
     return combined_summary
 
 
-def generate_workbooks(user, dbkey, year, result):
+def run_end_to_end(user, dbkey, year, result):
     try:
         entity_id = "DBKEY {dbkey} {year} {date:%Y_%m_%d_%H_%M_%S}".format(
             dbkey=dbkey, year=year, date=datetime.now()
@@ -230,13 +229,3 @@ def generate_workbooks(user, dbkey, year, result):
             print(f"{frame.filename}:{frame.lineno} {frame.name}: {frame.line}")
 
         result["errors"].append(f"{exc}")
-
-
-def run_end_to_end(email, dbkey, year, result):
-    try:
-        user = User.objects.get(email=email)
-    except User.DoesNotExist:
-        logger.info("No user found for %s, have you logged in once?", email)
-        return
-
-    generate_workbooks(user, dbkey, year, result)

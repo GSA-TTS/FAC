@@ -1,18 +1,16 @@
-import os
 import logging
 import sys
+from census_historical_migration.historic_data_loader import create_or_get_user
 
 from config.settings import ENVIRONMENT
 from django.core.management.base import BaseCommand
 from census_historical_migration.workbooklib.end_to_end_core import run_end_to_end
 
-CYPRESS_TEST_EMAIL_ADDR = os.getenv("CYPRESS_LOGIN_TEST_EMAIL_AUDITEE")
 logger = logging.getLogger(__name__)
 
 
 class Command(BaseCommand):
     def add_arguments(self, parser):
-        parser.add_argument("--email", type=str, required=False)
         parser.add_argument("--dbkeys", type=str, required=False, default="")
         parser.add_argument("--years", type=str, required=False, default="")
 
@@ -35,12 +33,12 @@ class Command(BaseCommand):
             logger.error("Years must be two digits. Exiting.")
             sys.exit(-2)
 
-        email = options.get("email", CYPRESS_TEST_EMAIL_ADDR)
+        user = create_or_get_user()
 
         defaults = [
-            (182926, 22),
-            (181744, 22),
-            (191734, 22),
+            (69688, 22),
+            (177310, 22),
+            (251020, 22),
         ]
 
         if ENVIRONMENT in ["LOCAL", "DEVELOPMENT", "PREVIEW", "STAGING"]:
@@ -50,13 +48,13 @@ class Command(BaseCommand):
                 )
                 for dbkey, year in zip(dbkeys, years):
                     result = {"success": [], "errors": []}
-                    run_end_to_end(email, dbkey, year, result)
+                    run_end_to_end(user, dbkey, year, result)
                     logger.info(result)
             else:
                 for pair in defaults:
                     logger.info("Running {}-{} end-to-end".format(pair[0], pair[1]))
                     result = {"success": [], "errors": []}
-                    run_end_to_end(email, str(pair[0]), str(pair[1]), result)
+                    run_end_to_end(user, str(pair[0]), str(pair[1]), result)
                     logger.info(result)
         else:
             logger.error(
