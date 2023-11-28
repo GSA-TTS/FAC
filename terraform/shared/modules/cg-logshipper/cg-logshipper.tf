@@ -20,10 +20,6 @@ resource "random_password" "password" {
   special = false
 }
 
-data "cloudfoundry_space" "egress_space" {
-  org_name = var.cf_org_name
-  name     = var.cf_space_name
-}
 
 locals {
   username = random_uuid.username.result
