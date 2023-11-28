@@ -90,7 +90,7 @@ resource "cloudfoundry_app" "cg_logshipper_app" {
   }
 
   service_binding {
-    service_instance = "${module.s3-logshipper-storage.bucket_id}"
+    service_instance = module.s3-logshipper-storage.bucket_id
   }
 
   routes {
