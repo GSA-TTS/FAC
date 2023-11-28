@@ -113,17 +113,19 @@ def _generate_cluster_names(
     other_cluster_names = []
     for audit in audits:
         cluster_name = string_to_string(audit.CLUSTERNAME)
+        state_cluster_name = string_to_string(audit.STATECLUSTERNAME)
+        other_cluster_name = string_to_string(audit.OTHERCLUSTERNAME)
         if not cluster_name:
             cluster_names.append("N/A")
             other_cluster_names.append("")
             state_cluster_names.append("")
         elif cluster_name == "STATE CLUSTER":
             cluster_names.append(cluster_name)
-            state_cluster_names.append(audit.STATECLUSTERNAME)
+            state_cluster_names.append(state_cluster_name)
             other_cluster_names.append("")
         elif cluster_name == "OTHER CLUSTER NOT LISTED ABOVE":
             cluster_names.append(cluster_name)
-            other_cluster_names.append(audit.OTHERCLUSTERNAME)
+            other_cluster_names.append(other_cluster_name)
             state_cluster_names.append("")
         elif cluster_name in valid_json["cluster_names"]:
             cluster_names.append(cluster_name)
@@ -358,7 +360,7 @@ def generate_federal_awards(dbkey, year, outfile):
     ):
         award["fields"].append("federal_agency_prefix")
         award["values"].append(prefix)
-        award["fields"].append("three_digit_extension")
+        award["fields"].append("federal_award_extension")
         award["values"].append(extension)
         # Sneak in the award number here
         award["fields"].append("award_reference")

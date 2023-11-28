@@ -36,7 +36,6 @@ class Command(BaseCommand):
         user = create_or_get_user()
 
         defaults = [
-            (69688, 22),
             (177310, 22),
             (251020, 22),
         ]

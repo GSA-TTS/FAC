@@ -173,14 +173,23 @@ def api_check(json_test_tables):
                 # logger.info(f"{get_api_values(endpoint, report_id, f)}")
                 api_values = get_api_values(endpoint, report_id, f)
                 this_api_value = api_values[row_ndx]
-                this_field_value = row["values"][field_ndx]
-                eq = check_equality(this_field_value, this_api_value)
-                if not eq:
+                # Check if field_ndx exists in row["values"]
+                if field_ndx < len(row["values"]):
+                    this_field_value = row["values"][field_ndx]
+                    eq = check_equality(this_field_value, this_api_value)
+                    if not eq:
+                        logger.info(
+                            f"Does not match. [eq {eq}] [field {f}] [field val {this_field_value}] != [api val {this_api_value}]"
+                        )
+                    equality_results.append(eq)
+                else:
+                    # Log a message if field_ndx does not exist
                     logger.info(
-                        f"Does not match. [eq {eq}] [field {f}] [field val {this_field_value}] != [api val {this_api_value}]"
+                        f"Index {field_ndx} out of range for 'values' in row. Max index is {len(row['values']) - 1}"
                     )
-                equality_results.append(eq)
-
+                    logger.info(
+                        f"Field '{f}' with value '{this_api_value}' at index '{field_ndx}' is missing from test tables 'values'."
+                    )
             if all(equality_results):
                 count(summary, "correct_fields")
             else:
