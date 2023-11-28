@@ -23,9 +23,9 @@ module "s3-logshipper-storage" {
 
 resource "cloudfoundry_route" "logshipper" {
   space    = data.cloudfoundry_space.apps.id
-  domain   = data.cloudfoundry_domain.internal.id
-  hostname = "${var.cf_org_name}-${replace(var.cf_space_name, ".", "-")}-${var.name}"
-  # Yields something like: orgname-spacename-name.apps.internal
+  domain   = data.cloudfoundry_domain.public.id
+  hostname = "fac-${var.cf_space_name}-${var.name}"
+  # Yields something like: fac-spacename-name
 }
 
 resource "cloudfoundry_user_provided_service" "logshipper_creds" {
