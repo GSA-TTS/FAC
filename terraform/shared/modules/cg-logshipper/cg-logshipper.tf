@@ -2,6 +2,10 @@ data "cloudfoundry_domain" "internal" {
   name = "apps.internal"
 }
 
+data "cloudfoundry_domain" "public" {
+  name = "app.cloud.gov"
+}
+
 data "cloudfoundry_space" "apps" {
   org_name = var.cf_org_name
   name     = var.cf_space_name
