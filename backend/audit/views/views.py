@@ -63,16 +63,6 @@ from audit.validators import (
     validate_notes_to_sefa_json,
     validate_secondary_auditors_json,
 )
-from audit.viewlib import (  # noqa
-    Home,
-    TribalDataConsent,
-    SubmissionProgressView,
-    UnlockAfterCertificationView,
-    UploadReportView,
-    no_robots,
-    submission_progress_check,
-)
-
 
 logging.basicConfig(
     format="%(asctime)s %(levelname)-8s %(module)s:%(lineno)d %(message)s"
