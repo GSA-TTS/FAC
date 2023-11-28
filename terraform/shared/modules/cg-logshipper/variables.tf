@@ -3,7 +3,7 @@ variable "cf_org_name" {
   description = "cloud.gov organization name"
 }
 
-variable "client_space" {
+variable "cf_space_name" {
   type        = string
   description = "cloud.gov space name for client apps (eg staging or prod)"
 }
