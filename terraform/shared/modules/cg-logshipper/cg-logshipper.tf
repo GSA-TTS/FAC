@@ -10,7 +10,8 @@ data "cloudfoundry_space" "apps" {
 resource "cloudfoundry_route" "logshipper" {
   space    = data.cloudfoundry_space.apps.id
   domain   = data.cloudfoundry_domain.internal.id
-  hostname = "${var.cf_org_name}-${replace(var.cf_space_name, ".", "-")}-${var.name}"
+  hostname = "${var.cf_org_name}-${replace(var.client_space, ".", "-")}-${var.name}"
+  # Yields something like: orgname-spacename-name.apps.internal
 }
 
 resource "random_uuid" "username" {}
