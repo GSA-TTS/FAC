@@ -1,11 +1,21 @@
+from django.conf import settings
+from census_historical_migration.base_field_maps import (
+    SheetFieldMap,
+    WorkbookFieldInDissem,
+)
 from census_historical_migration.workbooklib.excel_creation_utils import (
+    apply_conversion_function,
+    get_range_values,
+    get_ranges,
     set_range,
 )
-
+from model_bakery import baker
+from random import randint
 from django.test import TestCase
 from openpyxl import Workbook
 from openpyxl.utils import quote_sheetname, absolute_coordinate
 from openpyxl.workbook.defined_name import DefinedName
+from census_historical_migration.models import ELECAUDITS as Audits
 
 
 class ExcelCreationTests(TestCase):
@@ -143,3 +153,89 @@ class ExcelCreationTests(TestCase):
         wb.defined_names.add(defn)
 
         self.assertRaises(KeyError, set_range, wb, self.range_name, ["bar"])
+
+
+class TestApplyConversionFunction(TestCase):
+    def test_string_conversion(self):
+        """Test that a string is returned unchanged"""
+        self.assertEqual(apply_conversion_function("test", "default", str), "test")
+
+    def test_int_conversion(self):
+        """Test that an int is properly returned"""
+        self.assertEqual(apply_conversion_function("123", "default", int), 123)
+
+    def test_custom_conversion(self):
+        """Test that a custom conversion function is properly applied"""
+        self.assertEqual(
+            apply_conversion_function("test", "default", lambda x: x.upper()), "TEST"
+        )
+
+    def test_default_value(self):
+        """Test that a default value is returned when the input is None"""
+        self.assertEqual(apply_conversion_function("", "default", str), "default")
+
+    def test_none_with_no_default(self):
+        """Test that an empty string is returned when the input is None and no default is provided"""
+        self.assertEqual(apply_conversion_function(None, None, str), "")
+
+
+class TestGetRanges(TestCase):
+    # Because the models used here are not related to the default database,
+    # we need to set 'databases' to include all database aliases. This ensures
+    # that the test case is aware of all the databases defined in the project's
+    # settings and can interact with them accordingly.
+    databases = {db_key for db_key in settings.DATABASES.keys()}
+
+    def setUp(self):
+        """Set up mock mappings and values"""
+        self.mock_mappings = [
+            SheetFieldMap(
+                "fake_range_name", "AUDITYEAR", WorkbookFieldInDissem, None, str
+            ),
+            SheetFieldMap(
+                "another_fake_range_name", "DBKEY", WorkbookFieldInDissem, None, str
+            ),
+        ]
+
+        # Creating mock instances of the Audits model
+        self.mock_values = baker.make(Audits, _quantity=3)
+        self.random_year = randint(2016, 2022)  # nosec
+        for audit in self.mock_values:
+            audit.AUDITYEAR = str(self.random_year)
+            audit.DBKEY = str(randint(20000, 21000))  # nosec
+
+    def test_get_ranges(self):
+        """Test that the correct values are returned for each mapping"""
+        result = get_ranges(self.mock_mappings, self.mock_values)
+
+        expected = [
+            {
+                "name": "fake_range_name",
+                "values": [str(self.random_year) for _ in range(3)],
+            },
+            {
+                "name": "another_fake_range_name",
+                "values": [audit.DBKEY for audit in self.mock_values],
+            },
+        ]
+
+        self.assertEqual(result, expected)
+
+    def test_get_range_values(self):
+        """Test that get_range_values returns correct values for a given name"""
+        # First, get the ranges
+        ranges = get_ranges(self.mock_mappings, self.mock_values)
+
+        # Test for a valid range name
+        fake_range_values = get_range_values(ranges, "fake_range_name")
+        self.assertEqual(fake_range_values, [str(self.random_year) for _ in range(3)])
+
+        # Test for another valid range name
+        another_range_values = get_range_values(ranges, "another_fake_range_name")
+        self.assertEqual(
+            another_range_values, [audit.DBKEY for audit in self.mock_values]
+        )
+
+        # Test for an invalid range name
+        invalid_range_values = get_range_values(ranges, "non_existent_range")
+        self.assertIsNone(invalid_range_values)
