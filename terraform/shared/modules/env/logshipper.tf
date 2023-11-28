@@ -9,4 +9,7 @@ module "cg-logshipper" {
   cf_space_name         = var.cf_space_name # eg prod
   new_relic_license_key = var.new_relic_license_key
   https_proxy           = module.https-proxy.https_proxy
+  logshipper_instances  = 1
+  logshipper_memory     = 1046
+  disk_quota            = 512
 }
