@@ -43,7 +43,7 @@ mappings = [
         "federal_agency_prefix", "CFDA_PREFIX", WorkbookFieldInDissem, None, str
     ),
     SheetFieldMap(
-        "three_digit_extension", "CFDA_EXT", WorkbookFieldInDissem, None, str
+        "three_digit_extension", "CFDA_EXT", "federal_award_extension", None, str
     ),
     SheetFieldMap(
         "program_name", "FEDERALPROGRAMNAME", "federal_program_name", None, str
