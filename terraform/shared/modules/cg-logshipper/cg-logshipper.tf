@@ -71,7 +71,7 @@ locals {
 resource "cloudfoundry_app" "cg_logshipper_app" {
   name       = var.name
   space      = data.cloudfoundry_space.apps.id
-  buildpacks = ["binary_buildpack", "nginx_buildpack"]
+  buildpacks = ["apt-buildpack", "nginx_buildpack"]
   path       = "https://github.com/GSA-TTS/cg-logshipper/archive/refs/heads/main.zip"
   memory     = var.logshipper_memory
   instances  = var.logshipper_instances
