@@ -13,6 +13,12 @@ variable "name" {
   description = "Name of the cg-logshipper application"
 }
 
+variable "disk_quota" {
+  type        = number
+  description = "disk in MB to allocate to cg-logshipper app instance"
+  default     = 512
+}
+
 variable "logshipper_memory" {
   type        = number
   description = "Memory in MB to allocate to cg-logshipper app instance"
