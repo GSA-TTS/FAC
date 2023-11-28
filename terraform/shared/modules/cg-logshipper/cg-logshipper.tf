@@ -4,34 +4,24 @@ data "cloudfoundry_domain" "internal" {
 
 data "cloudfoundry_space" "apps" {
   org_name = var.cf_org_name
-  name     = var.client_space
+  name     = var.cf_space_name
+}
+
+module "s3-logshipper-storage" {
+  source = "github.com/18f/terraform-cloudgov//s3?ref=v0.5.1"
+
+  cf_org_name      = var.cf_org_name
+  cf_space_name    = var.cf_space_name
+  name             = "s3-logshipper-storage"
+  recursive_delete = false
+  s3_plan_name     = "basic"
 }
 
 resource "cloudfoundry_route" "logshipper" {
   space    = data.cloudfoundry_space.apps.id
   domain   = data.cloudfoundry_domain.internal.id
-  hostname = "${var.cf_org_name}-${replace(var.client_space, ".", "-")}-${var.name}"
+  hostname = "${var.cf_org_name}-${replace(var.cf_space_name, ".", "-")}-${var.name}"
   # Yields something like: orgname-spacename-name.apps.internal
-}
-
-resource "random_uuid" "username" {}
-resource "random_password" "password" {
-  length  = 16
-  special = false
-}
-
-locals {
-  username     = random_uuid.username.result
-  password     = random_password.password.result
-  syslog_drain = "https://${local.username}:${local.password}@${cloudfoundry_route.logshipper.endpoint}/?drain-type=all"
-  domain       = cloudfoundry_route.logshipper.endpoint
-  sidecar_json = jsonencode(
-    {
-      "name" : "fluentbit",
-      "command" : "/home/vcap/deps/0/apt/opt/fluent-bit/bin/fluent-bit -c fluentbit.conf",
-      "process_types" : ["web"],
-    }
-  )
 }
 
 resource "cloudfoundry_user_provided_service" "logshipper_creds" {
@@ -58,6 +48,26 @@ resource "cloudfoundry_user_provided_service" "logdrain_service" {
   syslog_drain_url = local.syslog_drain
 }
 
+resource "random_uuid" "username" {}
+resource "random_password" "password" {
+  length  = 16
+  special = false
+}
+
+locals {
+  username     = random_uuid.username.result
+  password     = random_password.password.result
+  syslog_drain = "https://${local.username}:${local.password}@${cloudfoundry_route.logshipper.endpoint}/?drain-type=all"
+  domain       = cloudfoundry_route.logshipper.endpoint
+  sidecar_json = jsonencode(
+    {
+      "name" : "fluentbit",
+      "command" : "/home/vcap/deps/0/apt/opt/fluent-bit/bin/fluent-bit -c fluentbit.conf",
+      "process_types" : ["web"],
+    }
+  )
+}
+
 resource "cloudfoundry_app" "cg_logshipper_app" {
   name       = var.name
   space      = data.cloudfoundry_space.apps.id
@@ -80,7 +90,7 @@ resource "cloudfoundry_app" "cg_logshipper_app" {
   }
 
   service_binding {
-    service_instance = module.s3-logshipper-storage.bucket_id
+    service_instance = "${module.s3-logshipper-storage.bucket_id}"
   }
 
   routes {
