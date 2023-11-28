@@ -154,7 +154,8 @@ class ExcelCreationTests(TestCase):
         self.assertRaises(KeyError, set_range, wb, self.range_name, ["bar"])
 
 
-class TestApplyConversionFuncTion(TestCase):
+class TestApplyConversionFunction(TestCase):
+
     def test_string_conversion(self):
         """Test that a string is returned unchanged"""
         self.assertEqual(apply_conversion_function("test", "default", str), "test")
