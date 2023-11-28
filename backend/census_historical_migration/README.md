@@ -56,11 +56,10 @@ docker compose run --rm web python manage.py csv_to_postgres --folder data --chu
 
 ### How to run the historic data migrator:
 ```
-docker compose run --rm web python manage.py historic_data_migrator --email any_email_in_the_system@woo.gov \
+docker compose run --rm web python manage.py historic_data_migrator
   --years 22 \
-  --dbkeys 100010
+  --dbkeys 177310
 ```
-- The email address currently must be a User in the system. As this has only been run locally so far, it would often be a test account in my local sandbox env.
 - `year` and `dbkey` are optional. The script will use default values for these if they aren't provided.
 
 ### How to run the historic workbook generator:
@@ -68,7 +67,7 @@ docker compose run --rm web python manage.py historic_data_migrator --email any_
 docker compose run --rm web python manage.py historic_workbook_generator \
   --year 22 \
   --output <your_output_directory> \
-  --dbkey 100010
+  --dbkey 177310
 ```
 - `year` is optional and defaults to `22`.
 - The `output` directory will be created if it doesn't already exist.
