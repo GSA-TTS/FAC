@@ -31,7 +31,6 @@ jobs:
           apt-get install --assume-yes cf8-cli
           cf api api.fr.cloud.gov
           cf auth ${{ secrets.CF_USERNAME }} ${{ secrets.CF_PASSWORD }}
-          cf t -o gsa-tts-oros-fac -s ${{ inputs.environment }}
       TF_VAR_postgrest_image: 'ghcr.io/gsa-tts/fac/postgrest:latest'
       TF_VAR_clamav_image: 'ghcr.io/gsa-tts/fac/clamav:latest'
 
