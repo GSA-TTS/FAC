@@ -20,6 +20,8 @@ fi;
 
 # Migrate first
 python manage.py migrate
+python manage.py migrate --database census-to-gsafac-db
+
 
 echo 'Starting API schema deprecation' &&
 python manage.py drop_deprecated_api_schema_and_views &&
@@ -30,9 +32,6 @@ echo 'Finished dropping API schema' &&
 echo 'Starting API schema creation' &&
 python manage.py create_api_schema &&
 echo 'Finished API schema creation' &&
-echo 'Starting migrate' &&
-python manage.py migrate &&
-echo 'Finished migrate' &&
 echo 'Starting API view creation' &&
 python manage.py create_api_views &&
 echo 'Finished view creation' &&
