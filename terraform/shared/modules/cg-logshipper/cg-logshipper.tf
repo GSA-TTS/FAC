@@ -20,10 +20,11 @@ resource "random_password" "password" {
   special = false
 }
 
-
 locals {
-  username = random_uuid.username.result
-  password = random_password.password.result
+  username     = random_uuid.username.result
+  password     = random_password.password.result
+  syslog_drain = "https://${local.username}:${local.password}@${cloudfoundry_route.logshipper.endpoint}/?drain-type=all"
+  domain       = cloudfoundry_route.logshipper.endpoint
   sidecar_json = jsonencode(
     {
       "name" : "fluentbit",
@@ -49,6 +50,12 @@ resource "cloudfoundry_user_provided_service" "logshipper_new_relic_creds" {
     "NEW_RELIC_LICENSE_KEY"   = var.new_relic_license_key
     "NEW_RELIC_LOGS_ENDPOINT" = "https://gov-log-api.newrelic.com/log/v1"
   }
+}
+
+resource "cloudfoundry_user_provided_service" "logdrain_service" {
+  name             = "fac-logdrain"
+  space            = data.cloudfoundry_space.apps.id
+  syslog_drain_url = local.syslog_drain
 }
 
 resource "cloudfoundry_app" "cg_logshipper_app" {
