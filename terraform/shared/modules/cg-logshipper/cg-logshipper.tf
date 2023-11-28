@@ -57,7 +57,7 @@ resource "random_password" "password" {
 locals {
   username     = random_uuid.username.result
   password     = random_password.password.result
-  syslog_drain = "https://${local.username}:${local.password}@${cloudfoundry_route.logshipper.endpoint}/?drain-type=all"
+  syslog_drain = "https://${local.username}:${local.password}@${cloudfoundry_route.logshipper.hostname}.app.cloud.gov/?drain-type=all"
   domain       = cloudfoundry_route.logshipper.endpoint
   sidecar_json = jsonencode(
     {
