@@ -19,7 +19,7 @@ def load_historic_data_for_year(audit_year):
 
         try:
             # Migrate a single submission
-            run_end_to_end(user.email, dbkey, audit_year, result)
+            run_end_to_end(user, dbkey, audit_year, result)
         except Exception as exc:
             result["errors"].append(f"{exc}")
 

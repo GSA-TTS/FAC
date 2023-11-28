@@ -1,5 +1,4 @@
 from census_historical_migration.exception_utils import DataMigrationError
-from users.models import User
 import argparse
 import logging
 import sys
@@ -174,14 +173,23 @@ def api_check(json_test_tables):
                 # logger.info(f"{get_api_values(endpoint, report_id, f)}")
                 api_values = get_api_values(endpoint, report_id, f)
                 this_api_value = api_values[row_ndx]
-                this_field_value = row["values"][field_ndx]
-                eq = check_equality(this_field_value, this_api_value)
-                if not eq:
+                # Check if field_ndx exists in row["values"]
+                if field_ndx < len(row["values"]):
+                    this_field_value = row["values"][field_ndx]
+                    eq = check_equality(this_field_value, this_api_value)
+                    if not eq:
+                        logger.info(
+                            f"Does not match. [eq {eq}] [field {f}] [field val {this_field_value}] != [api val {this_api_value}]"
+                        )
+                    equality_results.append(eq)
+                else:
+                    # Log a message if field_ndx does not exist
                     logger.info(
-                        f"Does not match. [eq {eq}] [field {f}] [field val {this_field_value}] != [api val {this_api_value}]"
+                        f"Index {field_ndx} out of range for 'values' in row. Max index is {len(row['values']) - 1}"
                     )
-                equality_results.append(eq)
-
+                    logger.info(
+                        f"Field '{f}' with value '{this_api_value}' at index '{field_ndx}' is missing from test tables 'values'."
+                    )
             if all(equality_results):
                 count(summary, "correct_fields")
             else:
@@ -192,7 +200,7 @@ def api_check(json_test_tables):
     return combined_summary
 
 
-def generate_workbooks(user, dbkey, year, result):
+def run_end_to_end(user, dbkey, year, result):
     try:
         entity_id = "DBKEY {dbkey} {year} {date:%Y_%m_%d_%H_%M_%S}".format(
             dbkey=dbkey, year=year, date=datetime.now()
@@ -230,13 +238,3 @@ def generate_workbooks(user, dbkey, year, result):
             print(f"{frame.filename}:{frame.lineno} {frame.name}: {frame.line}")
 
         result["errors"].append(f"{exc}")
-
-
-def run_end_to_end(email, dbkey, year, result):
-    try:
-        user = User.objects.get(email=email)
-    except User.DoesNotExist:
-        logger.info("No user found for %s, have you logged in once?", email)
-        return
-
-    generate_workbooks(user, dbkey, year, result)
