@@ -214,7 +214,8 @@ def generate_dissemination_test_table(Gen, api_endpoint, dbkey, mappings, object
         test_obj["values"] = []
         for m in mappings:
             # What if we only test non-null values?
-            attribute_value = getattr(o, m.in_db, None)
+            raw_value = getattr(o, m.in_db, None)
+            attribute_value = apply_conversion_function(raw_value, m.default, m.type)
             if (attribute_value is not None) and (attribute_value != ""):
                 if m.in_dissem == WorkbookFieldInDissem:
                     # print(f'in_sheet {m.in_sheet} <- {attribute_value}')
