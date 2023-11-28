@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, datetime
 from census_historical_migration.transforms.xform_string_to_date import string_to_date
 from census_historical_migration.transforms.xform_string_to_string import (
     string_to_string,
@@ -54,3 +54,11 @@ def _census_date_to_datetime(cd):
     month = lookup[month_abbr]
 
     return date(int(year) + 2000, month, int(day))
+
+
+def xform_census_date_to_datetime(date_string):
+    """Convert a census date string from '%m/%d/%Y %H:%M:%S' format to 'YYYY-MM-DD' format."""
+    # Parse the string into a datetime object
+    dt = datetime.strptime(date_string, "%m/%d/%Y %H:%M:%S")
+    # Extract and return the date part
+    return dt.date()
