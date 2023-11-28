@@ -56,13 +56,13 @@ def _create_sac(user, dbkey):
     Access.objects.create(
         sac=sac,
         user=user,
-        email="fac-census-migration-auditee-official@auditee.org",  # user.email,
+        email=user.email,
         role="certifying_auditee_contact",
     )
     Access.objects.create(
         sac=sac,
         user=user,
-        email="fac-census-migration-auditor-official@auditor.org",  # user.email,
+        email="fac-census-migration-auditor-official@fac.gsa.gov",
         role="certifying_auditor_contact",
     )
 
