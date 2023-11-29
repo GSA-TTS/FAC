@@ -1,4 +1,6 @@
 from django import forms
+from django.db import transaction
+from django.http import HttpResponse
 from django.shortcuts import redirect, render, reverse
 from django.views import generic
 
@@ -36,23 +38,26 @@ class ChangeAuditorCertifyingOfficialView(
     View for changing the auditor certifying official
     """
 
+    role = "certifying_auditor_contact"
+    other_role = "certifying_auditee_contact"
+
     def get(self, request, *args, **kwargs):
         """
         Show the current auditor certifying official and the form.
         """
-        role = "certifying_auditor_contact"
         report_id = kwargs["report_id"]
         sac = SingleAuditChecklist.objects.get(report_id=report_id)
-        access = Access.objects.get(sac=sac, role=role)
-        friendly_role = [r for r in ACCESS_ROLES if r[0] == role][0][1]
+        access = Access.objects.get(sac=sac, role=self.role)
+        friendly_role = [r for r in ACCESS_ROLES if r[0] == self.role][0][1]
         context = {
-            "role": role,
+            "role": self.role,
             "friendly_role": friendly_role,
             "auditee_uei": sac.general_information["auditee_uei"],
             "auditee_name": sac.general_information.get("auditee_name"),
             "certifier_name": access.fullname,
             "email": access.email,
             "report_id": report_id,
+            "errors": [],
         }
 
         return render(request, "audit/manage-submission-change-access.html", context)
@@ -62,20 +67,61 @@ class ChangeAuditorCertifyingOfficialView(
         Change the current auditor certifying official and redirect to submission
         progress.
         """
-        role = "certifying_auditor_contact"
         report_id = kwargs["report_id"]
         sac = SingleAuditChecklist.objects.get(report_id=report_id)
         form = ChangeAccessForm(request.POST)
         form.full_clean()
-
-        access = Access.objects.get(sac=sac, role=role)
-        access.delete(removing_user=request.user, removal_event="access-change")
-        Access.objects.create(
-            sac=sac,
-            role=role,
-            fullname=form.cleaned_data["fullname"],
-            email=form.cleaned_data["email"],
-        )
-
         url = reverse("audit:SubmissionProgress", kwargs={"report_id": report_id})
+
+        if not self.other_role:
+            Access(
+                sac=sac,
+                role=self.role,
+                fullname=form.cleaned_data["fullname"],
+                email=form.cleaned_data["email"],
+            ).save()
+            return redirect(url)
+
+        access = Access.objects.get(sac=sac, role=self.role)
+        other_access = Access.objects.get(sac=sac, role=self.other_role)
+        if form.cleaned_data["email"] == other_access.email:
+            friendly_role = [r for r in ACCESS_ROLES if r[0] == self.role][0][1]
+            context = {
+                "role": self.role,
+                "friendly_role": friendly_role,
+                "auditee_uei": sac.general_information["auditee_uei"],
+                "auditee_name": sac.general_information.get("auditee_name"),
+                "certifier_name": access.fullname,
+                "email": access.email,
+                "report_id": report_id,
+                "errors": [
+                    "Cannot use same email address for both certifying officials."
+                ],
+            }
+            return render(
+                request,
+                "audit/manage-submission-change-access.html",
+                context,
+                status=400,
+            )
+
+        with transaction.atomic():
+            access.delete(removing_user=request.user, removal_event="access-change")
+
+            Access(
+                sac=sac,
+                role=self.role,
+                fullname=form.cleaned_data["fullname"],
+                email=form.cleaned_data["email"],
+            ).save()
+
         return redirect(url)
+
+
+class ChangeAuditeeCertifyingOfficialView(ChangeAuditorCertifyingOfficialView):
+    """
+    View for changing the auditee certifying official
+    """
+
+    role = "certifying_auditee_contact"
+    other_role = "certifying_auditor_contact"

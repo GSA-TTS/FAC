@@ -90,6 +90,11 @@ urlpatterns = [
         views.ChangeAuditorCertifyingOfficialView.as_view(),
         name="ChangeAuditorCertifyingOfficial",
     ),
+    path(
+        "manage-submission/auditee-certifying-official/<str:report_id>",
+        views.ChangeAuditeeCertifyingOfficialView.as_view(),
+        name="ChangeAuditeeCertifyingOfficial",
+    ),
 ]
 
 for form_section in FORM_SECTIONS:

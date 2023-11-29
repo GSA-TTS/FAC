@@ -9,6 +9,22 @@
                 {% csrf_token %}
                 <fieldset class="usa-fieldset padding-bottom-2">
                   <h1 id="auditor-certification">Change {{ friendly_role }}</h1>
+                  <h3>Current {{ friendly_role }}</h3>
+
+                  <p>Name: {{ certifier_name }}</p>
+
+                  <p>Email: <code>{{ email }}</code></p>
+
+                  <hr />
+
+                  {% if errors %}
+                  <ul>
+                    {% for error in errors %}
+                      <li class="usa-error-message">{{ error }}</li>
+                    {% endfor %}
+                  </ul>
+                  {% endif %}
+
                     <label class="usa-label" for="fullname">Name of new {{ friendly_role }}</label>
                     <input class="usa-input"
                            id="name"

@@ -30,6 +30,10 @@ class ChangeAuditorCertifyingOfficialViewTests(TestCase):
     GET and POST tests for changing auditor certifying official.
     """
 
+    role = "certifying_auditor_contact"
+    other_role = "certifying_auditee_contact"
+    view = "audit:ChangeAuditorCertifyingOfficial"
+
     def test_basic_get(self):
         """
         A user should be able to access this page for a SAC they're associated with.
@@ -38,27 +42,33 @@ class ChangeAuditorCertifyingOfficialViewTests(TestCase):
         baker.make(Access, user=user, sac=sac, role="editor")
         sac.general_information = {"auditee_uei": "YESIAMAREALUEI"}
         sac.save()
-        current_cac = baker.make(Access, sac=sac, role="certifying_auditor_contact")
+        current_cac = baker.make(Access, sac=sac, role=self.role)
 
         self.client.force_login(user)
-        response = self.client.get(
-            reverse(
-                "audit:ChangeAuditorCertifyingOfficial",
-                kwargs={"report_id": sac.report_id},
-            )
-        )
+        url = reverse(self.view, kwargs={"report_id": sac.report_id})
+        response = self.client.get(url)
 
         self.assertEqual(response.status_code, 200)
         self.assertIn("YESIAMAREALUEI", response.content.decode("UTF-8"))
         self.assertIn(current_cac.email, response.content.decode("UTF-8"))
 
     def test_basic_post(self):
+        """
+        Submitting the form with a new email address should delete the existing
+        Access, create a DeletedAccess, and create a new Access.
+        """
         user = baker.make(User, email="removing_user@example.com")
         sac = baker.make(SingleAuditChecklist)
         baker.make(Access, user=user, sac=sac, role="editor")
+        baker.make(
+            Access,
+            sac=sac,
+            role=self.other_role,
+            email="contact@example.com",
+        )
         sac.general_information = {"auditee_uei": "YESIAMAREALUEI"}
         sac.save()
-        current_cac = baker.make(Access, sac=sac, role="certifying_auditor_contact")
+        current_cac = baker.make(Access, sac=sac, role=self.role)
 
         self.client.force_login(user)
 
@@ -67,29 +77,49 @@ class ChangeAuditorCertifyingOfficialViewTests(TestCase):
             "email": "newcacuser@example.com",
         }
 
-        url = reverse(
-            "audit:ChangeAuditorCertifyingOfficial", kwargs={"report_id": sac.report_id}
-        )
+        url = reverse(self.view, kwargs={"report_id": sac.report_id})
         response = self.client.post(url, data=data)
         self.assertEqual(302, response.status_code)
 
         newaccess = Access.objects.get(
             sac=sac, fullname=data["fullname"], email=data["email"]
         )
-        self.assertEqual("certifying_auditor_contact", newaccess.role)
+        self.assertEqual(self.role, newaccess.role)
         oldaccess = DeletedAccess.objects.get(
             sac=sac,
             fullname=current_cac.fullname,
             email=current_cac.email,
         )
-        self.assertEqual("certifying_auditor_contact", oldaccess.role)
+        self.assertEqual(self.role, oldaccess.role)
+
+    def test_bad_email_post(self):
+        """
+        Submitting an email address that's already in use for the other role should
+        result in a 400 and returning to the form page.
+        """
+        new_email = "newcacuser@example.com"
+        user = baker.make(User, email="removing_user@example.com")
+        sac = baker.make(SingleAuditChecklist)
+        baker.make(Access, user=user, sac=sac, role="editor")
+        baker.make(Access, sac=sac, role=self.other_role, email=new_email)
+        baker.make(Access, sac=sac, role=self.role)
+        sac.general_information = {"auditee_uei": "YESIAMAREALUEI"}
+        sac.save()
+
+        self.client.force_login(user)
+
+        data = {"fullname": "The New CAC", "email": new_email}
+
+        url = reverse(self.view, kwargs={"report_id": sac.report_id})
+        response = self.client.post(url, data=data)
+        self.assertEqual(400, response.status_code)
 
     def test_login_required(self):
         """When an unauthenticated request is made"""
 
         response = self.client.get(
             reverse(
-                "audit:ChangeAuditorCertifyingOfficial",
+                self.view,
                 kwargs={"report_id": "12345"},
             )
         )
@@ -106,10 +136,7 @@ class ChangeAuditorCertifyingOfficialViewTests(TestCase):
         self.client.force_login(user)
 
         response = self.client.get(
-            reverse(
-                "audit:ChangeAuditorCertifyingOfficial",
-                kwargs={"report_id": "this is not a report id"},
-            )
+            reverse(self.view, kwargs={"report_id": "this is not a report id"})
         )
 
         self.assertEqual(response.status_code, 403)
@@ -120,10 +147,19 @@ class ChangeAuditorCertifyingOfficialViewTests(TestCase):
 
         self.client.force_login(user)
         response = self.client.post(
-            reverse(
-                "audit:ChangeAuditorCertifyingOfficial",
-                kwargs={"report_id": sac.report_id},
-            )
+            reverse(self.view, kwargs={"report_id": sac.report_id})
         )
 
         self.assertEqual(response.status_code, 403)
+
+
+class ChangeAuditeeCertifyingOfficialViewTests(
+    ChangeAuditorCertifyingOfficialViewTests
+):
+    """
+    GET and POST tests for changing auditee certifying official.
+    """
+
+    role = "certifying_auditee_contact"
+    other_role = "certifying_auditor_contact"
+    view = "audit:ChangeAuditeeCertifyingOfficial"
