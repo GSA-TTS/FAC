@@ -29,7 +29,7 @@ mappings = [
 ]
 
 
-def _get_findings_text(dbkey):
+def _get_findings_texts(dbkey):
     return FindingsText.objects.filter(DBKEY=dbkey).order_by("SEQ_NUMBER")
 
 
@@ -43,13 +43,10 @@ def generate_findings_text(dbkey, year, outfile):
     logger.info(f"--- generate findings text {dbkey} {year} ---")
 
     wb = pyxl.load_workbook(sections_to_template_paths[FORM_SECTIONS.FINDINGS_TEXT])
-
     audit_header = get_audit_header(dbkey)
-
     set_workbook_uei(wb, audit_header.UEI)
 
-    findings_texts = _get_findings_text(dbkey)
-
+    findings_texts = _get_findings_texts(dbkey)
     map_simple_columns(wb, mappings, findings_texts)
 
     wb.save(outfile)

@@ -2222,7 +2222,7 @@
     }
   },
   {
-    "endpoint": "secondary_auditor",
+    "endpoint": "secondary_auditors",
     "report_id": "2022-12-CENSUS-0000217653",
     "rows": [],
     "singletons": {

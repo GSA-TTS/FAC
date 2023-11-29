@@ -1357,7 +1357,7 @@
     }
   },
   {
-    "endpoint": "secondary_auditor",
+    "endpoint": "secondary_auditors",
     "report_id": "2022-08-CENSUS-0000177310",
     "rows": [],
     "singletons": {

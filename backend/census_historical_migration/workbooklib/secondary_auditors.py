@@ -18,6 +18,10 @@ logger = logging.getLogger(__name__)
 
 
 def xform_add_hyphen_to_zip(zip):
+    """
+    Transform a ZIP code string by adding a hyphen. If the ZIP code has 9 digits, inserts a hyphen after the fifth digit.
+    Returns the original ZIP code if it has 5 digits or is malformed.
+    """
     strzip = string_to_string(zip)
     if len(strzip) == 5:
         return strzip
@@ -84,13 +88,10 @@ def generate_secondary_auditors(dbkey, year, outfile):
     wb = pyxl.load_workbook(
         sections_to_template_paths[FORM_SECTIONS.SECONDARY_AUDITORS]
     )
-
     audit_header = get_audit_header(dbkey)
-
     set_workbook_uei(wb, audit_header.UEI)
 
     secondary_auditors = _get_secondary_auditors(dbkey)
-
     map_simple_columns(wb, mappings, secondary_auditors)
 
     wb.save(outfile)

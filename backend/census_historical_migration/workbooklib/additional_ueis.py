@@ -36,7 +36,6 @@ def generate_additional_ueis(dbkey, year, outfile):
 
     wb = pyxl.load_workbook(sections_to_template_paths[FORM_SECTIONS.ADDITIONAL_UEIS])
     audit_header = get_audit_header(dbkey)
-
     set_workbook_uei(wb, audit_header.UEI)
 
     additional_ueis = _get_ueis(dbkey)
