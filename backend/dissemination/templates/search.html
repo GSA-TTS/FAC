@@ -119,6 +119,19 @@
                                    name="agency_name"
                                    value="{{ form.cleaned_data.agency_name }}" />
                         </div>
+                        <div class="usa-form-group">
+                            <label class="usa-label" for="auditee_state">
+                                State
+                            </label>
+                            <select class="usa-select" id="auditee_state" name="auditee_state" aria-required="false">
+                                <option value>- Select -</option>
+                                {% for state in state_abbrevs %}
+                                <option value="{{ state }}" {% if form.cleaned_data.auditee_state == state %}selected{% endif %}>
+                                    {{ state }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
                     </div>
                     {% comment %} Submission {% endcomment %}
                     <div class="search-submit">
