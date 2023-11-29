@@ -30,6 +30,10 @@
   .usa-accordion__button[aria-expanded='false']:hover {
     background-image: url('../img/usa-icons/arrow_drop_up.svg');
   }
+
+  #orientation-toggle {
+    display: none;
+  }
 }
 
 @media (min-width: 30em) {

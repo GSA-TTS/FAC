@@ -56,6 +56,21 @@ def map_file_to_extractor_validator(filename):
     return (None, None)
 
 
+def process_workbook_set(workbook_set_path):
+    """Process each workbook set in the given path."""
+    for wb_path, _, wb_files in os.walk(workbook_set_path):
+        for file in wb_files:
+            if re.search("xlsx$", str(file)):
+                full_path = os.path.join(wb_path, file)
+                (extractor, validator) = map_file_to_extractor_validator(full_path)
+                if extractor:
+                    print(f"Extracting and validating {file}")
+                    ir = extractor(full_path)
+                    validator(ir)
+                else:
+                    print(f"No extractor found for [{file}]")
+
+
 class PassingWorkbooks(SimpleTestCase):
     def test_passing_workbooks(self):
         workbook_sets = reduce(
@@ -64,21 +79,7 @@ class PassingWorkbooks(SimpleTestCase):
         for dirpath, dirnames, _ in os.walk(workbook_sets):
             for workbook_set in dirnames:
                 print("Walking ", workbook_set)
-                for wb_path, _, wb_files in os.walk(
-                    os.path.join(dirpath, workbook_set)
-                ):
-                    for file in wb_files:
-                        if re.search("xlsx$", str(file)):
-                            full_path = os.path.join(wb_path, file)
-                            (extractor, validator) = map_file_to_extractor_validator(
-                                full_path
-                            )
-                            if extractor:
-                                print(f"Extracting and validating {file}")
-                                ir = extractor(full_path)
-                                validator(ir)
-                            else:
-                                print(f"No extractor found for [{file}]")
+                process_workbook_set(os.path.join(dirpath, workbook_set))
 
     # Can't run this when subclased from SimpleTestCase.
     # Can't write to the database `default`.

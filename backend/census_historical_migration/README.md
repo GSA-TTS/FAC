@@ -46,29 +46,28 @@ NOTE:  Never check in the census_historical_migration/data folder into GitHub.
 
 2.  In the FAC/backend folder, run the following to load CSV files from census_historical_migration/data folder into fac-census-to-gsafac-s3 bucket.
 ```bash
-docker compose run web python manage.py fac_s3 fac-census-to-gsafac-s3 --upload --src census_historical_migration/data
+docker compose run --rm web python manage.py fac_s3 fac-census-to-gsafac-s3 --upload --src census_historical_migration/data
 ```
 
 3.  In the FAC/backend folder, run the following to read the CSV files from fac-census-to-gsafac-s3 bucket and load into Postgres.
 ```bash
-docker compose run web python manage.py csv_to_postgres --folder data --chunksize 10000
+docker compose run --rm web python manage.py csv_to_postgres --folder data --chunksize 10000
 ```
 
 ### How to run the historic data migrator:
 ```
-docker compose run web python manage.py historic_data_migrator --email any_email_in_the_system@woo.gov \
+docker compose run --rm web python manage.py historic_data_migrator
   --years 22 \
-  --dbkeys 100010
+  --dbkeys 177310
 ```
-- The email address currently must be a User in the system. As this has only been run locally so far, it would often be a test account in my local sandbox env.
 - `year` and `dbkey` are optional. The script will use default values for these if they aren't provided.
 
 ### How to run the historic workbook generator:
 ```
-docker compose run web python manage.py historic_workbook_generator
+docker compose run --rm web python manage.py historic_workbook_generator \
   --year 22 \
   --output <your_output_directory> \
-  --dbkey 100010
+  --dbkey 177310
 ```
 - `year` is optional and defaults to `22`.
 - The `output` directory will be created if it doesn't already exist.

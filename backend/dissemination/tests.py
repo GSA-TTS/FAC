@@ -3,21 +3,10 @@ import jwt
 import os
 import requests
 
-from model_bakery import baker
-
-from django.test import Client, TestCase
-from django.urls import reverse
+from django.test import TestCase
 
 from config import settings
 from dissemination.templatetags.field_name_to_label import field_name_to_label
-from dissemination.models import (
-    General,
-    FederalAward,
-    Finding,
-    FindingText,
-    CapText,
-    Note,
-)
 
 
 class APIViewTests(TestCase):
@@ -85,73 +74,3 @@ class TemplateTagTests(TestCase):
         sample_field = "auditee_contact_title"
         converted_sample_field = field_name_to_label(sample_field)
         self.assertEquals(converted_sample_field, "Auditee Contact Title")
-
-
-class SummaryViewTests(TestCase):
-    def setUp(self):
-        self.client = Client()
-
-    def test_public_summary(self):
-        """
-        A public audit should have a viewable summary, and returns 200.
-        """
-        baker.make(General, report_id="2022-12-GSAFAC-0000000001", is_public=True)
-        url = reverse(
-            "dissemination:Summary", kwargs={"report_id": "2022-12-GSAFAC-0000000001"}
-        )
-
-        response = self.client.get(url)
-        self.assertEquals(response.status_code, 200)
-
-    def test_private_summary(self):
-        """
-        A private audit should not have a viewable summary, and returns 404.
-        """
-        baker.make(General, report_id="2022-12-GSAFAC-0000000001", is_public=False)
-        url = reverse(
-            "dissemination:Summary", kwargs={"report_id": "2022-12-GSAFAC-0000000001"}
-        )
-
-        response = self.client.get(url)
-        self.assertEquals(response.status_code, 404)
-
-    def test_summary_context(self):
-        """
-        The summary context should include the same data that is in the models.
-        Create a bunch of fake DB data under the same report_id. Then, check a few
-        fields in the context for the summary page to verify that the fake data persists.
-        """
-        baker.make(General, report_id="2022-12-GSAFAC-0000000001", is_public=True)
-        award = baker.make(FederalAward, report_id="2022-12-GSAFAC-0000000001")
-        finding = baker.make(Finding, report_id="2022-12-GSAFAC-0000000001")
-        finding_text = baker.make(FindingText, report_id="2022-12-GSAFAC-0000000001")
-        cap_text = baker.make(CapText, report_id="2022-12-GSAFAC-0000000001")
-        note = baker.make(Note, report_id="2022-12-GSAFAC-0000000001")
-
-        url = reverse(
-            "dissemination:Summary", kwargs={"report_id": "2022-12-GSAFAC-0000000001"}
-        )
-
-        response = self.client.get(url)
-        self.assertEquals(
-            response.context["data"]["Awards"][0]["additional_award_identification"],
-            award.additional_award_identification,
-        )
-        self.assertEquals(
-            response.context["data"]["Audit Findings"][0]["reference_number"],
-            finding.reference_number,
-        )
-        self.assertEquals(
-            response.context["data"]["Audit Findings Text"][0]["finding_ref_number"],
-            finding_text.finding_ref_number,
-        )
-        self.assertEquals(
-            response.context["data"]["Corrective Action Plan"][0][
-                "contains_chart_or_table"
-            ],
-            cap_text.contains_chart_or_table,
-        )
-        self.assertEquals(
-            response.context["data"]["Notes to SEFA"][0]["accounting_policies"],
-            note.accounting_policies,
-        )

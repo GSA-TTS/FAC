@@ -14,7 +14,7 @@ def model_module_path(model, year):
 
 
 def dynamic_import(mod, year):
-    name = model_module_path(mod, year)
+    name = model_module_path(mod, year[-2:])
     components = name.split(".")
     mod = __import__(components[0])
     for comp in components[1:]:

@@ -1,7 +1,30 @@
 from django.db import models
 from django.contrib.auth import get_user_model
+from django.utils.translation import gettext_lazy as _
 
 User = get_user_model()
+
+
+class Permission(models.Model):
+    class PermissionType:
+        READ_TRIBAL = "read-tribal"
+
+    PERMISSION_CHOICES = ((PermissionType.READ_TRIBAL, _("Read tribal audit data")),)
+
+    slug = models.CharField(max_length=255, choices=PERMISSION_CHOICES, unique=True)
+    description = models.TextField()
+
+    def __str__(self):
+        return self.slug
+
+
+class UserPermission(models.Model):
+    email = models.EmailField()
+    user = models.ForeignKey(User, null=True, blank=True, on_delete=models.PROTECT)
+    permission = models.ForeignKey(Permission, on_delete=models.PROTECT)
+
+    class Meta:
+        unique_together = ("user", "permission")
 
 
 class UserProfile(models.Model):

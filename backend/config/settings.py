@@ -173,10 +173,10 @@ DATABASES = {
     ),
     "census-to-gsafac-db": env.dj_db_url(
         "DATABASE_URL_CENSUS_TO_GSAFAC_DB",
-        default="postgres://postgres:password@0.0.0.0/census-to-gsafac-db",
+        default="postgres://postgres:password@0.0.0.0:5433/backend",
     ),
 }
-
+DATABASE_ROUTERS = ["census_historical_migration.routers.DBRouter"]
 POSTGREST = {
     "URL": env.str("POSTGREST_URL", "http://api:3000"),
     "LOCAL": env.str("POSTGREST_URL", "http://api:3000"),
@@ -229,6 +229,7 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 CORS_ALLOWED_ORIGINS = [env.str("DJANGO_BASE_URL", "http://localhost:8000")]
 
 STATIC_URL = "/static/"
+
 
 # Environment specific configurations
 DEBUG = False
@@ -400,15 +401,9 @@ else:
     # Will not be enabled in cloud environments
     DISABLE_AUTH = False
 
-# Remove once all Census data has been migrated
-# Add these as env vars, look at the bucket for values
-AWS_CENSUS_ACCESS_KEY_ID = secret("AWS_CENSUS_ACCESS_KEY_ID", "")
-AWS_CENSUS_SECRET_ACCESS_KEY = secret("AWS_CENSUS_SECRET_ACCESS_KEY", "")
-AWS_CENSUS_STORAGE_BUCKET_NAME = secret("AWS_CENSUS_STORAGE_BUCKET_NAME", "")
-AWS_S3_CENSUS_REGION_NAME = secret("AWS_S3_CENSUS_REGION_NAME", "")
-
 
 ADMIN_URL = "admin/"
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
@@ -534,3 +529,7 @@ STATIC_SITE_URL = "https://fac.gov/"
 # OMB-assigned values. Number doesn't change, date does.
 OMB_NUMBER = "3090-0330"
 OMB_EXP_DATE = "09/30/2026"
+
+# APP-level constants
+DOLLAR_THRESHOLD = 750000
+CENSUS_DATA_SOURCE = "CENSUS"

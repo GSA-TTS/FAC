@@ -1,6 +1,7 @@
 import logging
 import boto3
 import pandas as pd
+import numpy as np
 
 
 from io import BytesIO
@@ -52,15 +53,15 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
-        folder = options.get("folder")
-        if not folder:
-            print("Please specify a folder name")
-            return
         if options.get("clean"):
             self.delete_data()
             return
         if options.get("sample"):
             self.sample_data()
+            return
+        folder = options.get("folder")
+        if not folder:
+            print("Please specify a folder name")
             return
         chunk_size = options.get("chunksize")
         self.process_csv_files(folder, chunk_size)
@@ -131,6 +132,7 @@ class Command(BaseCommand):
             # Each row is a dictionary. The columns are the
             # correct names for our model. So, this should be a
             # clean way to load the model from a row.
+            df = df.replace(np.nan, "")
             for _, row in df.iterrows():
                 obj = model_obj(**row)
                 obj.save()

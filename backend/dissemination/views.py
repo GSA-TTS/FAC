@@ -1,6 +1,6 @@
 import math
 
-from django.core.exceptions import BadRequest, PermissionDenied
+from django.core.exceptions import BadRequest
 from django.core.paginator import Paginator
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
@@ -9,8 +9,11 @@ from django.views.generic import View
 from audit.file_downloads import get_download_url, get_filename
 from audit.models import SingleAuditChecklist
 
+from config.settings import STATE_ABBREVS
+
 from dissemination.forms import SearchForm
 from dissemination.search import search_general
+from dissemination.mixins import ReportAccessRequiredMixin
 from dissemination.models import (
     General,
     FederalAward,
@@ -23,12 +26,31 @@ from dissemination.models import (
     AdditionalUei,
 )
 
+from users.permissions import can_read_tribal
+
+
+def include_private_results(request):
+    if not request.user.is_authenticated:
+        return False
+
+    if not can_read_tribal(request.user):
+        return False
+
+    return True
+
 
 class Search(View):
     def get(self, request, *args, **kwargs):
         form = SearchForm()
 
-        return render(request, "search.html", {"form": form})
+        return render(
+            request,
+            "search.html",
+            {
+                "form": form,
+                "state_abbrevs": STATE_ABBREVS,
+            },
+        )
 
     def post(self, request, *args, **kwargs):
         form = SearchForm(request.POST)
@@ -46,11 +68,15 @@ class Search(View):
             audit_years = [
                 int(year) for year in form.cleaned_data["audit_year"]
             ]  # Cast strings from HTML to int
+            auditee_state = form.cleaned_data["auditee_state"]
 
             # TODO: Add a limit choice field to the form
             limit = form.cleaned_data["limit"] or 30
             # Changed in the form via pagination links
             page = int(form.cleaned_data["page"] or 1)
+
+            # is the user authenticated?
+            include_private = include_private_results(request)
 
             results = search_general(
                 names=names,
@@ -61,6 +87,8 @@ class Search(View):
                 cog_or_oversight=cog_or_oversight,
                 agency_name=agency_name,
                 audit_years=audit_years,
+                auditee_state=auditee_state,
+                include_private=include_private,
             )
             results_count = results.count()
             # Reset page to one if the page number surpasses how many pages there actually are
@@ -83,6 +111,7 @@ class Search(View):
 
         context = context | {
             "form": form,
+            "state_abbrevs": STATE_ABBREVS,
             "limit": limit,
             "results": results,
             "results_count": results_count,
@@ -92,7 +121,7 @@ class Search(View):
         return render(request, "search.html", context)
 
 
-class AuditSummaryView(View):
+class AuditSummaryView(ReportAccessRequiredMixin, View):
     def get(self, request, report_id):
         """
         Grab any information about the given report in the dissemination tables.
@@ -100,9 +129,8 @@ class AuditSummaryView(View):
         2.  Grab all relevant info from dissem tables. Some items may not exist if they had no findings.
         3.  Wrap up the data all nice in a context object for display.
         """
-
         # Viewable audits __MUST__ be public.
-        general = General.objects.filter(report_id=report_id, is_public=True)
+        general = General.objects.filter(report_id=report_id)
         if not general.exists():
             raise Http404(
                 "The report with this ID does not exist in the dissemination database."
@@ -165,14 +193,10 @@ class AuditSummaryView(View):
         return data
 
 
-class PdfDownloadView(View):
+class PdfDownloadView(ReportAccessRequiredMixin, View):
     def get(self, request, report_id):
         # only allow PDF downloads for disseminated submissions
-        disseminated = get_object_or_404(General, report_id=report_id)
-
-        # only allow PDF downloads for public submissions
-        if not disseminated.is_public:
-            raise PermissionDenied("You do not have access to this audit report.")
+        get_object_or_404(General, report_id=report_id)
 
         sac = get_object_or_404(SingleAuditChecklist, report_id=report_id)
         filename = get_filename(sac, "report")
@@ -180,14 +204,10 @@ class PdfDownloadView(View):
         return redirect(get_download_url(filename))
 
 
-class XlsxDownloadView(View):
+class XlsxDownloadView(ReportAccessRequiredMixin, View):
     def get(self, request, report_id, file_type):
         # only allow xlsx downloads from disseminated submissions
-        disseminated = get_object_or_404(General, report_id=report_id)
-
-        # only allow xlsx downloads for public submissions
-        if not disseminated.is_public:
-            raise PermissionDenied("You do not have access to this file.")
+        get_object_or_404(General, report_id=report_id)
 
         sac = get_object_or_404(SingleAuditChecklist, report_id=report_id)
         filename = get_filename(sac, file_type)
