@@ -176,17 +176,6 @@ def map_simple_columns(wb, mappings, values):
         )
 
 
-def add_hyphen_to_zip(zip):
-    strzip = str(zip)
-    if len(strzip) == 5:
-        return strzip
-    elif len(strzip) == 9:
-        return f"{strzip[0:5]}-{strzip[5:9]}"
-    else:
-        logger.info("ZIP IS MALFORMED IN WORKBOOKS E2E / SAC_CREATION")
-        return strzip
-
-
 def get_template_name_for_section(section):
     """
     Return a workbook template name corresponding to the given section
