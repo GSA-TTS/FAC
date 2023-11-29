@@ -1,6 +1,5 @@
 from django import forms
 from django.db import transaction
-from django.http import HttpResponse
 from django.shortcuts import redirect, render, reverse
 from django.views import generic
 
@@ -95,7 +94,7 @@ class ChangeAuditorCertifyingOfficialView(
                 "email": access.email,
                 "report_id": report_id,
                 "errors": [
-                    "Cannot use same email address for both certifying officials."
+                    "Cannot use the same email address for both certifying officials."
                 ],
             }
             return render(
