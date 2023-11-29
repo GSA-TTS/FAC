@@ -1,14 +1,18 @@
+from census_historical_migration.transforms.xform_string_to_string import (
+    string_to_string,
+)
 from census_historical_migration.workbooklib.excel_creation_utils import (
-    set_uei,
+    get_audit_header,
+    get_audits,
     map_simple_columns,
     generate_dissemination_test_table,
     set_range,
+    set_workbook_uei,
 )
 from census_historical_migration.base_field_maps import SheetFieldMap
 from census_historical_migration.workbooklib.templates import sections_to_template_paths
-from census_historical_migration.workbooklib.census_models.census import dynamic_import
 from audit.fixtures.excel import FORM_SECTIONS
-
+from census_historical_migration.models import ELECAUDITFINDINGS as Findings
 import openpyxl as pyxl
 
 import logging
@@ -22,40 +26,59 @@ def sorted_string(s):
     return s_sorted
 
 
+def xform_prior_year_findings(value):
+    """
+    Transform the value of prior_references to N/A if empty."""
+    trimmed_value = string_to_string(value)
+    if trimmed_value == "":
+        # FIXME - MSHD: This is a transformation and might require logging.
+        # Why is this transformation needed? Because users were allowed to leave this empty
+        # but we have decided to enforce that they enter N/A (starting in 2023).
+        # Therefore, we need to transform the empty string to N/A, otherwise the new validation
+        # rule will fail most of the migration.
+        # logger.info(f"Prior year findings is empty. Setting to N/A.")
+        new_value = "N/A"
+    else:
+        new_value = trimmed_value
+    return new_value
+
+
 mappings = [
     SheetFieldMap(
         "compliance_requirement",
-        "typerequirement",
+        "TYPEREQUIREMENT",
         "type_requirement",
-        "ABC",
-        sorted_string,
+        None,
+        # FIXME - MSHD: I removed sorted_string from here because it is a transformation and
+        # we want to apply transformation in a more controlled way (not by default - except when required).
+        str,
     ),
-    SheetFieldMap("reference_number", "findingsrefnums", "reference_number", None, str),
+    SheetFieldMap("reference_number", "FINDINGREFNUMS", "reference_number", None, str),
     SheetFieldMap(
-        "modified_opinion", "modifiedopinion", "is_modified_opinion", None, str
+        "modified_opinion", "MODIFIEDOPINION", "is_modified_opinion", None, str
     ),
-    SheetFieldMap("other_matters", "othernoncompliance", "is_other_matters", None, str),
+    SheetFieldMap("other_matters", "OTHERNONCOMPLIANCE", "is_other_matters", None, str),
     SheetFieldMap(
-        "material_weakness", "materialweakness", "is_material_weakness", None, str
+        "material_weakness", "MATERIALWEAKNESS", "is_material_weakness", None, str
     ),
     SheetFieldMap(
         "significant_deficiency",
-        "significantdeficiency",
+        "SIGNIFICANTDEFICIENCY",
         "is_significant_deficiency",
         None,
         str,
     ),
-    SheetFieldMap("other_findings", "otherfindings", "is_other_findings", None, str),
-    SheetFieldMap("questioned_costs", "qcosts", "is_questioned_costs", None, str),
+    SheetFieldMap("other_findings", "OTHERFINDINGS", "is_other_findings", None, str),
+    SheetFieldMap("questioned_costs", "QCOSTS", "is_questioned_costs", None, str),
     SheetFieldMap(
-        "repeat_prior_reference", "repeatfinding", "is_repeat_finding", None, str
+        "repeat_prior_reference", "REPEATFINDING", "is_repeat_finding", None, str
     ),
     SheetFieldMap(
         "prior_references",
-        "priorfindingrefnums",
+        "PRIORFINDINGREFNUMS",
         "prior_finding_ref_numbers",
-        "N/A",
-        str,
+        None,
+        xform_prior_year_findings,
     ),
 ]
 
@@ -75,11 +98,11 @@ def _get_findings_grid(findings_list):
     }
 
     attributes = [
-        "modifiedopinion",
-        "othernoncompliance",
-        "materialweakness",
-        "significantdeficiency",
-        "otherfindings",
+        "MODIFIEDOPINION",
+        "OTHERNONCOMPLIANCE",
+        "MATERIALWEAKNESS",
+        "SIGNIFICANTDEFICIENCY",
+        "OTHERFINDINGS",
     ]
 
     return [
@@ -91,31 +114,41 @@ def _get_findings_grid(findings_list):
     ]
 
 
+def _get_findings(dbkey):
+    # CFDAs aka ELECAUDITS (or Audits) have elecauditid (FK). Findings have elecauditfindingsid, which is unique.
+    # The linkage here is that a given finding will have an elecauditid.
+    # Multiple findings will have a given elecauditid. That's how to link them.
+    return Findings.objects.filter(DBKEY=dbkey).order_by("ELECAUDITFINDINGSID")
+
+
 def generate_findings(dbkey, year, outfile):
+    """
+    Generates a federal awards audit findings workbook for all findings associated with a given dbkey.
+
+    Note: This function assumes that all the audit information in the database
+    is for the same year.
+    """
     logger.info(f"--- generate findings {dbkey} {year} ---")
-    Gen = dynamic_import("Gen", year)
-    Findings = dynamic_import("Findings", year)
-    Cfda = dynamic_import("Cfda", year)
+
+    audit_header = get_audit_header(dbkey)
+
     wb = pyxl.load_workbook(
         sections_to_template_paths[FORM_SECTIONS.FINDINGS_UNIFORM_GUIDANCE]
     )
-    g = set_uei(Gen, wb, dbkey)
 
-    cfdas = Cfda.select().where(Cfda.dbkey == g.dbkey).order_by(Cfda.index)
+    set_workbook_uei(wb, audit_header.UEI)
+
+    audits = get_audits(dbkey)
     # For each of them, I need to generate an elec -> award mapping.
     e2a = {}
-    for ndx, cfda in enumerate(cfdas):
-        e2a[cfda.elecauditsid] = f"AWARD-{ndx+1:04d}"
+    for index, audit in enumerate(audits):
+        e2a[audit.ELECAUDITSID] = f"AWARD-{index+1:04d}"
 
-    # CFDAs have elecauditid (FK). Findings have elecauditfindingsid, which is unique.
-    # The linkage here is that a given finding will have an elecauditid.
-    # Multiple findings will have a given elecauditid. That's how to link them.
-    findings = (
-        Findings.select().where(Findings.dbkey == g.dbkey).order_by(Findings.index)
-    )
+    findings = _get_findings(dbkey)
+
     award_references = []
     for find in findings:
-        award_references.append(e2a[find.elecauditsid])
+        award_references.append(e2a[find.ELECAUDITSID])
 
     map_simple_columns(wb, mappings, findings)
     set_range(wb, "award_reference", award_references)
@@ -125,8 +158,9 @@ def generate_findings(dbkey, year, outfile):
     set_range(wb, "is_valid", grid, conversion_fun=str)
     wb.save(outfile)
 
+    # FIXME - MSHD: The logic below will be removed, see comment in federal_award.py.
     table = generate_dissemination_test_table(
-        Gen, "findings", dbkey, mappings, findings
+        audit_header, "findings", dbkey, mappings, findings
     )
     for obj, ar in zip(table["rows"], award_references):
         obj["fields"].append("award_reference")

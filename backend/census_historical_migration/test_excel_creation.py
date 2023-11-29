@@ -1,3 +1,4 @@
+from django.conf import settings
 from census_historical_migration.base_field_maps import (
     SheetFieldMap,
     WorkbookFieldInDissem,
@@ -154,7 +155,7 @@ class ExcelCreationTests(TestCase):
         self.assertRaises(KeyError, set_range, wb, self.range_name, ["bar"])
 
 
-class TestApplyConversionFuncTion(TestCase):
+class TestApplyConversionFunction(TestCase):
     def test_string_conversion(self):
         """Test that a string is returned unchanged"""
         self.assertEqual(apply_conversion_function("test", "default", str), "test")
@@ -179,6 +180,12 @@ class TestApplyConversionFuncTion(TestCase):
 
 
 class TestGetRanges(TestCase):
+    # Because the models used here are not related to the default database,
+    # we need to set 'databases' to include all database aliases. This ensures
+    # that the test case is aware of all the databases defined in the project's
+    # settings and can interact with them accordingly.
+    databases = {db_key for db_key in settings.DATABASES.keys()}
+
     def setUp(self):
         """Set up mock mappings and values"""
         self.mock_mappings = [

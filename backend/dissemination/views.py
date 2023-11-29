@@ -9,6 +9,8 @@ from django.views.generic import View
 from audit.file_downloads import get_download_url, get_filename
 from audit.models import SingleAuditChecklist
 
+from config.settings import STATE_ABBREVS
+
 from dissemination.forms import SearchForm
 from dissemination.search import search_general
 from dissemination.mixins import ReportAccessRequiredMixin
@@ -41,7 +43,14 @@ class Search(View):
     def get(self, request, *args, **kwargs):
         form = SearchForm()
 
-        return render(request, "search.html", {"form": form})
+        return render(
+            request,
+            "search.html",
+            {
+                "form": form,
+                "state_abbrevs": STATE_ABBREVS,
+            },
+        )
 
     def post(self, request, *args, **kwargs):
         form = SearchForm(request.POST)
@@ -59,6 +68,7 @@ class Search(View):
             audit_years = [
                 int(year) for year in form.cleaned_data["audit_year"]
             ]  # Cast strings from HTML to int
+            auditee_state = form.cleaned_data["auditee_state"]
 
             # TODO: Add a limit choice field to the form
             limit = form.cleaned_data["limit"] or 30
@@ -77,6 +87,7 @@ class Search(View):
                 cog_or_oversight=cog_or_oversight,
                 agency_name=agency_name,
                 audit_years=audit_years,
+                auditee_state=auditee_state,
                 include_private=include_private,
             )
             results_count = results.count()
@@ -100,6 +111,7 @@ class Search(View):
 
         context = context | {
             "form": form,
+            "state_abbrevs": STATE_ABBREVS,
             "limit": limit,
             "results": results,
             "results_count": results_count,
