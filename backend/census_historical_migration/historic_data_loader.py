@@ -6,15 +6,28 @@ from django.contrib.auth import get_user_model
 User = get_user_model()
 
 
-def load_historic_data_for_year(audit_year):
+def load_historic_data_for_year(audit_year, start_dbkey, end_dbkey):
     """Iterates over and processes submissions for the given audit year"""
     result_log = {}
     total_count = error_count = 0
     user = create_or_get_user()
-    submissions_for_year = Gen.objects.filter(AUDITYEAR=audit_year)
+
+    if start_dbkey == end_dbkey:
+        # Find a single submission
+        submissions_for_year = Gen.objects.filter(
+            AUDITYEAR=audit_year, DBKEY=str(start_dbkey)
+        )
+    else:
+        submissions_for_year = Gen.objects.filter(AUDITYEAR=audit_year)
+
+    print(f"Migrating dbkeys in range {start_dbkey} to {end_dbkey}")
 
     for submission in submissions_for_year:
         dbkey = submission.DBKEY
+        # Only migrate if the dbkey is within range
+        if int(dbkey) < start_dbkey or int(dbkey) > end_dbkey:
+            continue
+
         result = {"success": [], "errors": []}
 
         try:
