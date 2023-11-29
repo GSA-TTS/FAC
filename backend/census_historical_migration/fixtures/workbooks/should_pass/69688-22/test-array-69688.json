@@ -70,8 +70,7 @@
           "award_reference",
           "additional_award_identification",
           "cluster_name",
-          "other_cluster_name",
-          ""
+          "other_cluster_name"
         ],
         "values": [
           "10",
@@ -89,7 +88,8 @@
           "557",
           "AWARD-0001",
           "",
-          "N/A"
+          "N/A",
+          ""
         ]
       },
       {
@@ -111,8 +111,7 @@
           "award_reference",
           "additional_award_identification",
           "cluster_name",
-          "other_cluster_name",
-          ""
+          "other_cluster_name"
         ],
         "values": [
           "93",
@@ -131,7 +130,8 @@
           "224",
           "AWARD-0002",
           "",
-          "HEALTH CENTER PROGRAM CLUSTER"
+          "HEALTH CENTER PROGRAM CLUSTER",
+          ""
         ]
       },
       {
@@ -153,8 +153,7 @@
           "award_reference",
           "additional_award_identification",
           "cluster_name",
-          "other_cluster_name",
-          ""
+          "other_cluster_name"
         ],
         "values": [
           "93",
@@ -173,7 +172,8 @@
           "527",
           "AWARD-0003",
           "",
-          "HEALTH CENTER PROGRAM CLUSTER"
+          "HEALTH CENTER PROGRAM CLUSTER",
+          ""
         ]
       },
       {
@@ -196,8 +196,7 @@
           "award_reference",
           "additional_award_identification",
           "cluster_name",
-          "other_cluster_name",
-          ""
+          "other_cluster_name"
         ],
         "values": [
           "93",
@@ -217,7 +216,8 @@
           "224",
           "AWARD-0004",
           "COVID-19",
-          "HEALTH CENTER PROGRAM CLUSTER"
+          "HEALTH CENTER PROGRAM CLUSTER",
+          ""
         ]
       },
       {
@@ -238,8 +238,7 @@
           "award_reference",
           "additional_award_identification",
           "cluster_name",
-          "other_cluster_name",
-          ""
+          "other_cluster_name"
         ],
         "values": [
           "93",
@@ -257,7 +256,8 @@
           "926",
           "AWARD-0005",
           "",
-          "N/A"
+          "N/A",
+          ""
         ]
       },
       {
@@ -278,8 +278,7 @@
           "award_reference",
           "additional_award_identification",
           "cluster_name",
-          "other_cluster_name",
-          ""
+          "other_cluster_name"
         ],
         "values": [
           "93",
@@ -297,7 +296,8 @@
           "889",
           "AWARD-0006",
           "",
-          "N/A"
+          "N/A",
+          ""
         ]
       },
       {
@@ -318,8 +318,7 @@
           "award_reference",
           "additional_award_identification",
           "cluster_name",
-          "other_cluster_name",
-          ""
+          "other_cluster_name"
         ],
         "values": [
           "93",
@@ -337,7 +336,8 @@
           "940",
           "AWARD-0007",
           "",
-          "N/A"
+          "N/A",
+          ""
         ]
       },
       {
@@ -358,8 +358,7 @@
           "award_reference",
           "additional_award_identification",
           "cluster_name",
-          "other_cluster_name",
-          ""
+          "other_cluster_name"
         ],
         "values": [
           "93",
@@ -377,7 +376,8 @@
           "217",
           "AWARD-0008",
           "",
-          "N/A"
+          "N/A",
+          ""
         ]
       }
     ],
@@ -398,7 +398,7 @@
         ],
         "values": [
           "2022-002",
-          "Health Center Program ClusterAssistance Listing Number(s) 93.224 and 93.527U.S. Department of Health and Human ServicesAward No. H80CS00438Criteria or Specific Requirement: Special Tests and ProvisionsType of Finding: Significant Deficiency in Internal Control Over ComplianceCondition: The Health Center must prepare and apply a sliding fee discount schedule (SFDS) so that the amounts owed for health center services by eligible participants are adjusted based on the patients ability to pay. Questioned costs: n/aContext: The auditor selected a sample of 60 encounters. After the auditor tested selection #49, enough errors had been identified that the auditor stopped testing because the sample results could not support a low assessed level of control risk. The errors were a result of the misapplication of the sliding fee discount. The sliding fee discounts are based on the slide level code. In these instances, the sliding fee discount that was applied was not in accordance with the SFDS. Effect or Potential Effect: Either the Health Center or the patients may be paying more than required under the contract.Cause: The Health Center applied its SFDS inconsistently to the patients selected for testing. Recommendation: The Health Center should adopt an internal control procedure that allows them to consistently apply its SFDS to all eligible patients. Repeat Finding: 2021-001Views of Responsible Officials: See page 12.",
+          "Health Center Program Cluster\r\nAssistance Listing Number(s) 93.224 and 93.527\r\nU.S. Department of Health and Human Services\r\nAward No. H80CS00438\r\nCriteria or Specific Requirement: Special Tests and Provisions\r\nType of Finding: Significant Deficiency in Internal Control Over Compliance\r\nCondition: The Health Center must prepare and apply a sliding fee discount schedule (SFDS) so that the amounts owed for health center services by eligible participants are adjusted based on the patient\u2019s ability to pay. \r\nQuestioned costs: n/a\r\nContext: The auditor selected a sample of 60 encounters. After the auditor tested selection #49, enough errors had been identified that the auditor stopped testing because the sample results could not support a low assessed level of control risk. The errors were a result of the misapplication of the sliding fee discount. The sliding fee discounts are based on the slide level code. In these instances, the sliding fee discount that was applied was not in accordance with the SFDS. \r\nEffect or Potential Effect: Either the Health Center or the patients may be paying more than required under the contract.\r\nCause: The Health Center applied its SFDS inconsistently to the patients selected for testing. \r\nRecommendation: The Health Center should adopt an internal control procedure that allows them to consistently apply its SFDS to all eligible patients. \r\nRepeat Finding: 2021-001\r\nViews of Responsible Officials: See page 12.",
           "N"
         ]
       },
@@ -410,7 +410,7 @@
         ],
         "values": [
           "2022-001",
-          "Health Center Program ClusterAssistance Listing Number(s) 93.224 and 93.527U.S. Department of Health and Human ServicesCriteria or Specific Requirement: ReportingType of Finding: Significant Deficiency in Internal Control Over ComplianceCondition: The Health Center must timely file its SF-425 Federal Financial Reports for each of its awards.Questioned costs: n/aContext: The auditor found that some of the Health Centers Forms SF-425 were filed after their respective due dates.Effect or Potential Effect: Information about the awards is not communicated timely to the awarding agency. Cause: The Health Center had inadequate controls that would prevent them from missing reporting due dates. Recommendation: The Health Center should adopt an internal control procedure that allows them to consistently file its reports on a timely basis. Repeat Finding: n/aViews of Responsible Officials: See page 12.",
+          "Health Center Program Cluster\r\nAssistance Listing Number(s) 93.224 and 93.527\r\nU.S. Department of Health and Human Services\r\nCriteria or Specific Requirement: Reporting\r\nType of Finding: Significant Deficiency in Internal Control Over Compliance                                            \r\nCondition: The Health Center must timely file its SF-425 Federal Financial Reports for each of its awards.\r\nQuestioned costs: n/a\r\nContext: The auditor found that some of the Health Center\u2019s Forms SF-425 were filed after their respective due dates.\r\nEffect or Potential Effect: Information about the awards is not communicated timely to the awarding agency. \r\nCause: The Health Center had inadequate controls that would prevent them from missing reporting due dates. \r\nRecommendation: The Health Center should adopt an internal control procedure that allows them to consistently file its reports on a timely basis. \r\nRepeat Finding: n/a\r\nViews of Responsible Officials: See page 12.",
           "N"
         ]
       }
