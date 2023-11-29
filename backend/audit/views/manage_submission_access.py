@@ -15,7 +15,7 @@ from audit.models import (
 
 class ChangeAccessForm(forms.Form):
     """
-    For for changing access. The view class, not this class, has the responsibility for handling whether we’re deleting access (in the cases where only one user can have the role) or adding access (in the cases where multiple users can have the role).
+    Form for changing access. The view class, not this class, has the responsibility for handling whether we’re deleting access (in the cases where only one user can have the role) or adding access (in the cases where multiple users can have the role).
     """
 
     fullname = forms.CharField()
