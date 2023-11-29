@@ -1,12 +1,15 @@
-from census_historical_migration.workbooklib.excel_creation_utils import (
-    set_uei,
+from ..exception_utils import DataMigrationError
+from ..transforms.xform_string_to_string import string_to_string
+from ..models import ELECNOTES as Notes
+from ..workbooklib.excel_creation_utils import (
+    get_audit_header,
     set_range,
     map_simple_columns,
     generate_dissemination_test_table,
+    set_workbook_uei,
 )
-from census_historical_migration.base_field_maps import SheetFieldMap
-from census_historical_migration.workbooklib.templates import sections_to_template_paths
-from census_historical_migration.workbooklib.census_models.census import dynamic_import
+from ..base_field_maps import SheetFieldMap
+from ..workbooklib.templates import sections_to_template_paths
 from audit.fixtures.excel import FORM_SECTIONS
 
 import openpyxl as pyxl
@@ -18,91 +21,134 @@ import logging
 logger = logging.getLogger(__name__)
 
 mappings = [
-    SheetFieldMap("note_title", "title", "title", None, str),
-    SheetFieldMap("note_content", "content", "content", None, str),
+    SheetFieldMap("note_title", "TITLE", "title", None, str),
+    SheetFieldMap("note_content", "CONTENT", "content", None, str),
 ]
 
 
-def cleanup_string(s):
-    if s is None:
-        return ""
-    else:
-        s = s.rstrip()
-        # s = unidecode.unidecode(s)
-        s = str(s.encode("utf-8").decode("ascii", "ignore"))
-        return s
+def xform_cleanup_string(s):
+    """Transforms a string to a string, cleaning up unicode characters."""
+    value = string_to_string(s)
+    if value:
+        # FIXME-MSHD: This is a transformation that we may want to record
+        return str(value.encode("utf-8").decode("ascii", "ignore"))
+    return ""
 
 
-def generate_notes_to_sefa(dbkey, year, outfile):
-    logger.info(f"--- generate notes to sefa {dbkey} {year}---")
-    Gen = dynamic_import("Gen", year)
-    Notes = dynamic_import("Notes", year)
-    wb = pyxl.load_workbook(sections_to_template_paths[FORM_SECTIONS.NOTES_TO_SEFA])
+def xform_is_minimis_rate_used(rate_content):
+    """Determines if the de minimis rate was used based on the given text."""
 
-    g = set_uei(Gen, wb, dbkey)
-
-    # The mapping is weird.
-    # https://facdissem.census.gov/Documents/DataDownloadKey.xlsx
-    # The TYPEID column determines which field in the form a given row corresponds to.
-    # TYPEID=1 is the description of significant accounting policies.
-    # TYPEID=2 is the De Minimis cost rate.
-    # TYPEID=3 is for notes, which have sequence numbers... that must align somewhere.
-    policies = (
-        Notes.select().where((Notes.dbkey == g.dbkey) & (Notes.type_id == 1)).get()
-    )
-    rate = Notes.select().where((Notes.dbkey == g.dbkey) & (Notes.type_id == 2)).get()
-    notes = (
-        Notes.select()
-        .where((Notes.dbkey == g.dbkey) & (Notes.type_id == 3))
-        .order_by(Notes.seq_number)
-    )
-
-    rate_content = cleanup_string(rate.content)
-    policies_content = cleanup_string(policies.content)
-
-    if rate_content == "":
-        rate_content = "FILLED FOR TESTING"
-    if policies_content == "":
-        policies_content = "FILLED FOR TESTING"
-
-    # WARNING
-    # This is being faked. We're askign a Y/N question in the collection.
-    # Census just let them type some stuff. So, this is a rough
+    # WARNING: ANY RESULTS FROM THIS FUNCTION MUST BE RECORDED AS A TRANSFORMATION
+    # We're assign a Y/N question in the collection.
+    # Census just let them type some stuff. This is an
     # attempt to generate a Y/N value from the content.
     # This means the data is *not* true to what was intended, but
     # it *is* good enough for us to use for testing.
-    is_used = "Huh"
-    if (
-        re.search("did not use", rate_content)
-        or re.search("not to use", rate_content)
-        or re.search("not use", rate_content)
-        or re.search("not elected", rate_content)
-    ):
-        is_used = "N"
-    elif re.search("used", rate_content):
-        is_used = "Y"
-    else:
-        is_used = "Both"
+
+    # Patterns that indicate the de minimis rate was NOT used
+    not_used_patterns = [
+        r"did\s+not\s+use",
+        r"not\s+to\s+use",
+        r"not\s+use",
+        r"not\s+elected",
+        r"elected\s+not\s+to\s+use",
+        r"does\s+not\s+use",
+        r"has\s+not\s+elected",
+        r"has\s+not\s+charged.*not\s+applicable",
+    ]
+
+    # Patterns that indicate the de minimis rate WAS used
+    used_patterns = [r"used", r"elected\s+to\s+use", r"uses.*allowed"]
+
+    # Check for each pattern in the respective lists
+    for pattern in not_used_patterns:
+        if re.search(pattern, rate_content, re.IGNORECASE):
+            # FIXME-MSHD: RECORD THIS TRANSFORMATION
+            return "N"
+    for pattern in used_patterns:
+        if re.search(pattern, rate_content, re.IGNORECASE):
+            # FIXME-MSHD: RECORD THIS TRANSFORMATION
+            return "Y"
+
+    # I am raising an exception here because we cannot clearly determine if the de minimis rate was used.
+    # return "Both"
+    raise DataMigrationError("Unable to determine if the de minimis rate was used.")
+
+
+def _get_accounting_policies(dbkey):
+    # https://facdissem.census.gov/Documents/DataDownloadKey.xlsx
+    # The TYPEID column determines which field in the form a given row corresponds to.
+    # TYPEID=1 is the description of significant accounting policies.
+    """Get the accounting policies for a given dbkey."""
+    try:
+        note = Notes.objects.get(DBKEY=dbkey, TYPE_ID="1")
+        content = string_to_string(note.CONTENT)
+    except Notes.DoesNotExist:
+        logger.info(f"No accounting policies found for dbkey: {dbkey}")
+        content = ""
+    return content
+
+
+def _get_minimis_cost_rate(dbkey):
+    """Get the De Minimis cost rate for a given dbkey."""
+    # https://facdissem.census.gov/Documents/DataDownloadKey.xlsx
+    # The TYPEID column determines which field in the form a given row corresponds to.
+    # TYPEID=2 is the De Minimis cost rate.
+    try:
+        note = Notes.objects.get(DBKEY=dbkey, TYPE_ID="2")
+        rate = string_to_string(note.CONTENT)
+    except Notes.DoesNotExist:
+        logger.info(f"De Minimis cost rate not found for dbkey: {dbkey}")
+        rate = ""
+    return rate
+
+
+def _get_notes(dbkey):
+    """Get the notes for a given dbkey.""" ""
+    # https://facdissem.census.gov/Documents/DataDownloadKey.xlsx
+    # The TYPEID column determines which field in the form a given row corresponds to.
+    # TYPEID=3 is for notes, which have sequence numbers... that must align somewhere.
+    return Notes.objects.filter(DBKEY=dbkey, TYPE_ID="3").order_by("SEQ_NUMBER")
+
+
+def generate_notes_to_sefa(dbkey, year, outfile):
+    """
+    Generates notes to SEFA workbook for a given dbkey.
+    """
+    logger.info(f"--- generate notes to sefa {dbkey} {year}---")
+
+    wb = pyxl.load_workbook(sections_to_template_paths[FORM_SECTIONS.NOTES_TO_SEFA])
+
+    audit_header = get_audit_header(dbkey)
+    set_workbook_uei(wb, audit_header.UEI)
+
+    notes = _get_notes(dbkey)
+    rate_content = _get_minimis_cost_rate(dbkey)
+    policies_content = _get_accounting_policies(dbkey)
+    is_minimis_rate_used = xform_is_minimis_rate_used(rate_content)
 
     set_range(wb, "accounting_policies", [policies_content])
-    set_range(wb, "is_minimis_rate_used", [is_used])
+    set_range(wb, "is_minimis_rate_used", [is_minimis_rate_used])
     set_range(wb, "rate_explained", [rate_content])
 
     # Map the rest as notes.
     map_simple_columns(wb, mappings, notes)
+
     # Add a Y/N column
     # def set_range(wb, range_name, values, default=None, conversion_fun=str):
-
+    # FIXME-MSHD: We do not have a match for contains_chart_or_table in historical data ?
+    # If there is no match in historic data, then this is not a transformation.
+    # Should this be recorded ?
     set_range(wb, "contains_chart_or_table", map(lambda v: "N", notes), "N", str)
     wb.save(outfile)
 
     table = generate_dissemination_test_table(
-        Gen, "notes_to_sefa", dbkey, mappings, notes
+        audit_header, "notes_to_sefa", dbkey, mappings, notes
     )
 
     table["singletons"]["accounting_policies"] = policies_content
-    table["singletons"]["is_minimis_rate_used"] = is_used
+    table["singletons"]["is_minimis_rate_used"] = is_minimis_rate_used
     table["singletons"]["rate_explained"] = rate_content
-    table["singletons"]["auditee_uei"] = g.uei
+    table["singletons"]["auditee_uei"] = audit_header.UEI
 
     return (wb, table)
