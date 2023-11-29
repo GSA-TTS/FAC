@@ -1,6 +1,7 @@
 import logging
 import boto3
 import pandas as pd
+import numpy as np
 
 
 from io import BytesIO
@@ -131,6 +132,7 @@ class Command(BaseCommand):
             # Each row is a dictionary. The columns are the
             # correct names for our model. So, this should be a
             # clean way to load the model from a row.
+            df = df.replace(np.nan, "")
             for _, row in df.iterrows():
                 obj = model_obj(**row)
                 obj.save()

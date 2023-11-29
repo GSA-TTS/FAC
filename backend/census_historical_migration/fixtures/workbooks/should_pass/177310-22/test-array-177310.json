@@ -27,7 +27,7 @@
         ],
         "values": [
           "2022-001",
-          "CORRECTIVE ACTION PLAN FOR FINDINGS REPORTED UNDER UNIFORM GUIDANCECentral Valley School District No. 356September 1, 2021 through August 31, 2022This schedule presents the corrective action planned by the District for findings reported in this report in accordance with Title 2 U.S. Code of Federal Regulations (CFR) Part 200, Uniform Administrative Requirements, Cost Principles, and Audit Requirements for Federal Awards (Uniform Guidance).Finding ref number:2022-001Finding caption:The District did not have adequate internal controls for ensuring compliance with wage rate requirements.Name, address, and telephone of District contact person:Mathew Knott, Director of Business Services2218 N. Molter RoadLiberty Lake, WA 99019509-558-5437Corrective action the auditee plans to take in response to the finding:The District agrees with the State Auditors Office that we did not have adequate internal controls for ensuring compliance with federal prevailing wage rate requirements as noted. The District used the same process as noted in this Finding in the prior audit which did not have any exceptions noted by the State Auditors Office. Moving forward the District will ensure federal prevailing wage rate clauses are in contracts entered into using federal funds and that weekly certified payroll reports are collected from contractors and subcontractors.Anticipated date to complete the corrective action: August 2023",
+          "CORRECTIVE ACTION PLAN FOR FINDINGS REPORTED UNDER UNIFORM GUIDANCE\r\nCentral Valley School District No. 356\r\nSeptember 1, 2021 through August 31, 2022\r\nThis schedule presents the corrective action planned by the District for findings reported in this report in accordance with Title 2 U.S. Code of Federal Regulations (CFR) Part 200, Uniform Administrative Requirements, Cost Principles, and Audit Requirements for Federal Awards (Uniform Guidance).\r\nFinding ref number:\r\n2022-001\r\nFinding caption:\r\nThe District did not have adequate internal controls for ensuring compliance with wage rate requirements.\r\nName, address, and telephone of District contact person:\r\nMathew Knott, Director of Business Services\r\n2218 N. Molter Road\r\nLiberty Lake, WA 99019\r\n509-558-5437\r\nCorrective action the auditee plans to take in response to the finding:\r\nThe District agrees with the State Auditor\u2019s Office that we did not have adequate internal controls for ensuring compliance with federal prevailing wage rate requirements as noted. The District used the same process as noted in this Finding in the prior audit which did not have any exceptions noted by the State Auditor\u2019s Office. Moving forward the District will ensure federal prevailing wage rate clauses are in contracts entered into using federal funds and that weekly certified payroll reports are collected from contractors and subcontractors.\r\nAnticipated date to complete the corrective action: August 2023",
           "N"
         ]
       }
@@ -58,8 +58,7 @@
           "award_reference",
           "additional_award_identification",
           "cluster_name",
-          "other_cluster_name",
-          ""
+          "other_cluster_name"
         ],
         "values": [
           "10",
@@ -77,7 +76,8 @@
           "553",
           "AWARD-0001",
           "",
-          "CHILD NUTRITION CLUSTER"
+          "CHILD NUTRITION CLUSTER",
+          ""
         ]
       },
       {
@@ -98,8 +98,7 @@
           "award_reference",
           "additional_award_identification",
           "cluster_name",
-          "other_cluster_name",
-          ""
+          "other_cluster_name"
         ],
         "values": [
           "84",
@@ -117,7 +116,8 @@
           "027",
           "AWARD-0002",
           "",
-          "SPECIAL EDUCATION CLUSTER (IDEA)"
+          "SPECIAL EDUCATION CLUSTER (IDEA)",
+          ""
         ]
       },
       {
@@ -139,8 +139,7 @@
           "award_reference",
           "additional_award_identification",
           "cluster_name",
-          "other_cluster_name",
-          ""
+          "other_cluster_name"
         ],
         "values": [
           "84",
@@ -159,7 +158,8 @@
           "027",
           "AWARD-0003",
           "COVID 19",
-          "SPECIAL EDUCATION CLUSTER (IDEA)"
+          "SPECIAL EDUCATION CLUSTER (IDEA)",
+          ""
         ]
       },
       {
@@ -180,8 +180,7 @@
           "award_reference",
           "additional_award_identification",
           "cluster_name",
-          "other_cluster_name",
-          ""
+          "other_cluster_name"
         ],
         "values": [
           "84",
@@ -199,7 +198,8 @@
           "173",
           "AWARD-0004",
           "",
-          "SPECIAL EDUCATION CLUSTER (IDEA)"
+          "SPECIAL EDUCATION CLUSTER (IDEA)",
+          ""
         ]
       },
       {
@@ -220,8 +220,7 @@
           "award_reference",
           "additional_award_identification",
           "cluster_name",
-          "other_cluster_name",
-          ""
+          "other_cluster_name"
         ],
         "values": [
           "84",
@@ -239,7 +238,8 @@
           "173",
           "AWARD-0005",
           "",
-          "SPECIAL EDUCATION CLUSTER (IDEA)"
+          "SPECIAL EDUCATION CLUSTER (IDEA)",
+          ""
         ]
       },
       {
@@ -260,8 +260,7 @@
           "award_reference",
           "additional_award_identification",
           "cluster_name",
-          "other_cluster_name",
-          ""
+          "other_cluster_name"
         ],
         "values": [
           "84",
@@ -279,7 +278,8 @@
           "173",
           "AWARD-0006",
           "",
-          "SPECIAL EDUCATION CLUSTER (IDEA)"
+          "SPECIAL EDUCATION CLUSTER (IDEA)",
+          ""
         ]
       },
       {
@@ -300,8 +300,7 @@
           "award_reference",
           "additional_award_identification",
           "cluster_name",
-          "other_cluster_name",
-          ""
+          "other_cluster_name"
         ],
         "values": [
           "84",
@@ -319,7 +318,8 @@
           "173",
           "AWARD-0007",
           "",
-          "SPECIAL EDUCATION CLUSTER (IDEA)"
+          "SPECIAL EDUCATION CLUSTER (IDEA)",
+          ""
         ]
       },
       {
@@ -341,8 +341,7 @@
           "award_reference",
           "additional_award_identification",
           "cluster_name",
-          "other_cluster_name",
-          ""
+          "other_cluster_name"
         ],
         "values": [
           "84",
@@ -361,7 +360,8 @@
           "173",
           "AWARD-0008",
           "COVID 19",
-          "SPECIAL EDUCATION CLUSTER (IDEA)"
+          "SPECIAL EDUCATION CLUSTER (IDEA)",
+          ""
         ]
       },
       {
@@ -382,8 +382,7 @@
           "award_reference",
           "additional_award_identification",
           "cluster_name",
-          "other_cluster_name",
-          ""
+          "other_cluster_name"
         ],
         "values": [
           "84",
@@ -401,7 +400,8 @@
           "048",
           "AWARD-0009",
           "",
-          "N/A"
+          "N/A",
+          ""
         ]
       },
       {
@@ -422,8 +422,7 @@
           "award_reference",
           "additional_award_identification",
           "cluster_name",
-          "other_cluster_name",
-          ""
+          "other_cluster_name"
         ],
         "values": [
           "84",
@@ -441,7 +440,8 @@
           "196",
           "AWARD-0010",
           "",
-          "N/A"
+          "N/A",
+          ""
         ]
       },
       {
@@ -462,8 +462,7 @@
           "award_reference",
           "additional_award_identification",
           "cluster_name",
-          "other_cluster_name",
-          ""
+          "other_cluster_name"
         ],
         "values": [
           "84",
@@ -481,7 +480,8 @@
           "365",
           "AWARD-0011",
           "",
-          "N/A"
+          "N/A",
+          ""
         ]
       },
       {
@@ -502,8 +502,7 @@
           "award_reference",
           "additional_award_identification",
           "cluster_name",
-          "other_cluster_name",
-          ""
+          "other_cluster_name"
         ],
         "values": [
           "10",
@@ -521,7 +520,8 @@
           "555",
           "AWARD-0012",
           "",
-          "CHILD NUTRITION CLUSTER"
+          "CHILD NUTRITION CLUSTER",
+          ""
         ]
       },
       {
@@ -542,8 +542,7 @@
           "award_reference",
           "additional_award_identification",
           "cluster_name",
-          "other_cluster_name",
-          ""
+          "other_cluster_name"
         ],
         "values": [
           "84",
@@ -561,7 +560,8 @@
           "367",
           "AWARD-0013",
           "",
-          "N/A"
+          "N/A",
+          ""
         ]
       },
       {
@@ -584,8 +584,7 @@
           "award_reference",
           "additional_award_identification",
           "cluster_name",
-          "other_cluster_name",
-          ""
+          "other_cluster_name"
         ],
         "values": [
           "84",
@@ -605,7 +604,8 @@
           "425",
           "AWARD-0014",
           "COVID-19, 84.425U",
-          "N/A"
+          "N/A",
+          ""
         ]
       },
       {
@@ -628,8 +628,7 @@
           "award_reference",
           "additional_award_identification",
           "cluster_name",
-          "other_cluster_name",
-          ""
+          "other_cluster_name"
         ],
         "values": [
           "84",
@@ -649,7 +648,8 @@
           "425",
           "AWARD-0015",
           "COVID-19, 84.425D",
-          "N/A"
+          "N/A",
+          ""
         ]
       },
       {
@@ -672,8 +672,7 @@
           "award_reference",
           "additional_award_identification",
           "cluster_name",
-          "other_cluster_name",
-          ""
+          "other_cluster_name"
         ],
         "values": [
           "84",
@@ -693,7 +692,8 @@
           "425",
           "AWARD-0016",
           "COVID-19, 84.425U",
-          "N/A"
+          "N/A",
+          ""
         ]
       },
       {
@@ -716,8 +716,7 @@
           "award_reference",
           "additional_award_identification",
           "cluster_name",
-          "other_cluster_name",
-          ""
+          "other_cluster_name"
         ],
         "values": [
           "84",
@@ -737,7 +736,8 @@
           "425",
           "AWARD-0017",
           "COVID-19, 84.425W",
-          "N/A"
+          "N/A",
+          ""
         ]
       },
       {
@@ -760,8 +760,7 @@
           "award_reference",
           "additional_award_identification",
           "cluster_name",
-          "other_cluster_name",
-          ""
+          "other_cluster_name"
         ],
         "values": [
           "84",
@@ -781,7 +780,8 @@
           "425",
           "AWARD-0018",
           "COVID-19, 84.425W",
-          "N/A"
+          "N/A",
+          ""
         ]
       },
       {
@@ -804,8 +804,7 @@
           "award_reference",
           "additional_award_identification",
           "cluster_name",
-          "other_cluster_name",
-          ""
+          "other_cluster_name"
         ],
         "values": [
           "84",
@@ -825,7 +824,8 @@
           "425",
           "AWARD-0019",
           "COVID-19, 84.425U",
-          "N/A"
+          "N/A",
+          ""
         ]
       },
       {
@@ -846,8 +846,7 @@
           "award_reference",
           "additional_award_identification",
           "cluster_name",
-          "other_cluster_name",
-          ""
+          "other_cluster_name"
         ],
         "values": [
           "10",
@@ -865,7 +864,8 @@
           "555",
           "AWARD-0020",
           "",
-          "CHILD NUTRITION CLUSTER"
+          "CHILD NUTRITION CLUSTER",
+          ""
         ]
       },
       {
@@ -886,8 +886,7 @@
           "award_reference",
           "additional_award_identification",
           "cluster_name",
-          "other_cluster_name",
-          ""
+          "other_cluster_name"
         ],
         "values": [
           "10",
@@ -905,7 +904,8 @@
           "559",
           "AWARD-0021",
           "",
-          "CHILD NUTRITION CLUSTER"
+          "CHILD NUTRITION CLUSTER",
+          ""
         ]
       },
       {
@@ -926,8 +926,7 @@
           "award_reference",
           "additional_award_identification",
           "cluster_name",
-          "other_cluster_name",
-          ""
+          "other_cluster_name"
         ],
         "values": [
           "10",
@@ -945,7 +944,8 @@
           "582",
           "AWARD-0022",
           "",
-          "CHILD NUTRITION CLUSTER"
+          "CHILD NUTRITION CLUSTER",
+          ""
         ]
       },
       {
@@ -966,8 +966,7 @@
           "award_reference",
           "additional_award_identification",
           "cluster_name",
-          "other_cluster_name",
-          ""
+          "other_cluster_name"
         ],
         "values": [
           "10",
@@ -985,7 +984,8 @@
           "558",
           "AWARD-0023",
           "",
-          "N/A"
+          "N/A",
+          ""
         ]
       },
       {
@@ -1007,8 +1007,7 @@
           "award_reference",
           "additional_award_identification",
           "cluster_name",
-          "other_cluster_name",
-          ""
+          "other_cluster_name"
         ],
         "values": [
           "10",
@@ -1027,7 +1026,8 @@
           "649",
           "AWARD-0024",
           "COVID 19",
-          "N/A"
+          "N/A",
+          ""
         ]
       },
       {
@@ -1049,8 +1049,7 @@
           "award_reference",
           "additional_award_identification",
           "cluster_name",
-          "other_cluster_name",
-          ""
+          "other_cluster_name"
         ],
         "values": [
           "84",
@@ -1069,7 +1068,8 @@
           "010",
           "AWARD-0025",
           "",
-          "N/A"
+          "N/A",
+          ""
         ]
       },
       {
@@ -1090,8 +1090,7 @@
           "award_reference",
           "additional_award_identification",
           "cluster_name",
-          "other_cluster_name",
-          ""
+          "other_cluster_name"
         ],
         "values": [
           "84",
@@ -1109,7 +1108,8 @@
           "027",
           "AWARD-0026",
           "",
-          "SPECIAL EDUCATION CLUSTER (IDEA)"
+          "SPECIAL EDUCATION CLUSTER (IDEA)",
+          ""
         ]
       }
     ],
