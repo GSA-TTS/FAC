@@ -5,6 +5,7 @@ from django.urls import reverse
 from model_bakery import baker
 from .models import (
     Access,
+    DeletedAccess,
     SingleAuditChecklist,
     User,
 )
@@ -50,6 +51,38 @@ class ChangeAuditorCertifyingOfficialViewTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn("YESIAMAREALUEI", response.content.decode("UTF-8"))
         self.assertIn(current_cac.email, response.content.decode("UTF-8"))
+
+    def test_basic_post(self):
+        user = baker.make(User, email="removing_user@example.com")
+        sac = baker.make(SingleAuditChecklist)
+        baker.make(Access, user=user, sac=sac, role="editor")
+        sac.general_information = {"auditee_uei": "YESIAMAREALUEI"}
+        sac.save()
+        current_cac = baker.make(Access, sac=sac, role="certifying_auditor_contact")
+
+        self.client.force_login(user)
+
+        data = {
+            "fullname": "The New CAC",
+            "email": "newcacuser@example.com",
+        }
+
+        url = reverse(
+            "audit:ChangeAuditorCertifyingOfficial", kwargs={"report_id": sac.report_id}
+        )
+        response = self.client.post(url, data=data)
+        self.assertEqual(302, response.status_code)
+
+        newaccess = Access.objects.get(
+            sac=sac, fullname=data["fullname"], email=data["email"]
+        )
+        self.assertEqual("certifying_auditor_contact", newaccess.role)
+        oldaccess = DeletedAccess.objects.get(
+            sac=sac,
+            fullname=current_cac.fullname,
+            email=current_cac.email,
+        )
+        self.assertEqual("certifying_auditor_contact", oldaccess.role)
 
     def test_login_required(self):
         """When an unauthenticated request is made"""

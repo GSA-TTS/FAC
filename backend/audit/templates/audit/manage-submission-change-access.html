@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+    <div class="grid-container margin-top-6">
+        <div class="grid-row">
+            <form class="grid-col-8 grid-offset-2"
+                  id="auditor-certification-step-2"
+                  method="post">
+                {% csrf_token %}
+                <fieldset class="usa-fieldset padding-bottom-2">
+                  <h1 id="auditor-certification">Change {{ friendly_role }}</h1>
+                    <label class="usa-label" for="fullname">Name of new {{ friendly_role }}</label>
+                    <input class="usa-input"
+                           id="name"
+                           name="fullname"
+                           placeholder="[name]" />
+                    <label class="usa-label" for="email">Email address of new {{ friendly_role }}</label>
+                    <input class="usa-input"
+                           id="email"
+                           name="email"
+                           placeholder="[email address]" />
+                </fieldset>
+                <button class="usa-button margin-bottom-8 margin-top-4" id="continue">Remove {{ email }} from the auditor certifying official role for this submission and replace them with the above user.</button>
+            </form>
+        </div>
+    </div>
+    {% include "audit-metadata.html" %}
+{% endblock content %}
