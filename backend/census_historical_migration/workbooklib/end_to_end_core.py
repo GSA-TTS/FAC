@@ -124,11 +124,33 @@ def check_equality(in_wb, in_json):
             True if math.isclose(float(in_wb), float(in_json), rel_tol=1e-1) else False
         )
     elif isinstance(in_wb, str) and isinstance(in_json, str):
-        return in_wb.strip() == in_json.strip()
+        return _compare_multiline_strings(in_wb, in_json)
     elif in_wb is None or in_json is None:
         return are_they_both_none_or_empty(in_wb, in_json)
     else:
         return in_wb == in_json
+
+
+def _compare_multiline_strings(str1, str2):
+    """Compare two multiline strings."""
+
+    lines1 = [line.strip() for line in str1.splitlines()]
+    lines2 = [line.strip() for line in str2.splitlines()]
+
+    # Compare line counts
+    if len(lines1) != len(lines2):
+        print("Line count differs.")
+        return False
+
+    # Compare each line
+    for index, (line1, line2) in enumerate(zip(lines1, lines2)):
+        if line1 != line2:
+            print(
+                f"Difference found on line {index + 1}:\n- {repr(line1)}\n- {repr(line2)}"
+            )
+            return False
+
+    return True
 
 
 def get_api_values(endpoint, rid, field):
@@ -165,8 +187,13 @@ def api_check(json_test_tables):
         report_id = endo["report_id"]
         print(f"-------------------- {endpoint} --------------------")
         summary = {}
+        equality_results = None
         for row_ndx, row in enumerate(endo["rows"]):
             count(summary, "total_rows")
+            if equality_results and not all(equality_results):
+                count(combined_summary, "incorrect_rows")
+            elif equality_results and all(equality_results):
+                count(combined_summary, "correct_rows")
             equality_results = []
             for field_ndx, f in enumerate(row["fields"]):
                 # logger.info(f"Checking /{endpoint} {report_id} {f}")
