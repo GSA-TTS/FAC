@@ -12,6 +12,7 @@ def search_general(
     cog_or_oversight=None,
     agency_name=None,
     audit_years=None,
+    auditee_state=None,
     include_private=False,
 ):
     query = Q()
@@ -23,6 +24,7 @@ def search_general(
     query.add(_get_end_date_match_query(end_date), Q.AND)
     query.add(_get_cog_or_oversight_match_query(agency_name, cog_or_oversight), Q.AND)
     query.add(_get_audit_years_match_query(audit_years), Q.AND)
+    query.add(_get_auditee_state_match_query(auditee_state), Q.AND)
 
     if not include_private:
         query.add(Q(is_public=True), Q.AND)
@@ -167,3 +169,10 @@ def _get_audit_years_match_query(audit_years):
         return Q()
 
     return Q(audit_year__in=audit_years)
+
+
+def _get_auditee_state_match_query(auditee_state):
+    if not auditee_state:
+        return Q()
+
+    return Q(auditee_state__in=[auditee_state])
