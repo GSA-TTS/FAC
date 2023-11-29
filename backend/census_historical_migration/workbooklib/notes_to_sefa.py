@@ -55,6 +55,7 @@ def xform_is_minimis_rate_used(rate_content):
         r"does\s+not\s+use",
         r"has\s+not\s+elected",
         r"has\s+not\s+charged.*not\s+applicable",
+        r"did\s+not\s+charge\s+indirect\s+costs",  # FIXME-MSHD: Is this correct? see dbkey: 251020 year:22
     ]
 
     # Patterns that indicate the de minimis rate WAS used
