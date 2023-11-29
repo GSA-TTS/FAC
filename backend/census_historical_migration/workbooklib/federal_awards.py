@@ -370,7 +370,7 @@ def generate_federal_awards(dbkey, year, outfile):
         award["fields"].append("cluster_name")
         award["values"].append(cluster_name)
         award["fields"].append("other_cluster_name")
-        award["fields"].append(other_cluster_name)
+        award["values"].append(other_cluster_name)
         award_counter += 1
 
     table["singletons"]["auditee_uei"] = audit_header.UEI
