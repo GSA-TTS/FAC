@@ -363,7 +363,7 @@
     }
   },
   {
-    "endpoint": "secondary_auditor",
+    "endpoint": "secondary_auditors",
     "report_id": "2022-06-CENSUS-0000251020",
     "rows": [],
     "singletons": {
