@@ -223,14 +223,43 @@ class SearchGeneralTests(TestCase):
         results = search_general(
             audit_years=[2016],
         )
+        assert_all_results_public(self, results)
         self.assertEqual(len(results), 0)
 
         results = search_general(
             audit_years=[2020],
         )
+        assert_all_results_public(self, results)
         self.assertEqual(len(results), 1)
 
         results = search_general(
             audit_years=[2020, 2021, 2022],
         )
+        assert_all_results_public(self, results)
         self.assertEqual(len(results), 3)
+
+    def test_auditee_state(self):
+        """Given a state, search_general should return only records with a matching auditee_state"""
+        al = baker.make(General, is_public=True, auditee_state="AL")
+        baker.make(General, is_public=True, auditee_state="AK")
+        baker.make(
+            General,
+            is_public=True,
+            auditee_state="AZ",
+            audit_year="2020",
+            oversight_agency="01",
+            auditee_uei="not-looking-for-this-uei",
+        )
+
+        # there should be on result for AL
+        results = search_general(auditee_state="AL")
+
+        assert_all_results_public(self, results)
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0], al)
+
+        # there should be no results for WI
+        results = search_general(auditee_state="WI")
+
+        assert_all_results_public(self, results)
+        self.assertEqual(len(results), 0)
