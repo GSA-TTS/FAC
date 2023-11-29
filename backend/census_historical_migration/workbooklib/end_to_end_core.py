@@ -187,12 +187,12 @@ def api_check(json_test_tables):
         report_id = endo["report_id"]
         print(f"-------------------- {endpoint} --------------------")
         summary = {}
-        equality_results = None
+        equality_results = []
         for row_ndx, row in enumerate(endo["rows"]):
             count(summary, "total_rows")
-            if equality_results and not all(equality_results):
+            if False in equality_results:
                 count(combined_summary, "incorrect_rows")
-            elif equality_results and all(equality_results):
+            else:
                 count(combined_summary, "correct_rows")
             equality_results = []
             for field_ndx, f in enumerate(row["fields"]):
