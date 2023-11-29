@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils import timezone
 
 
 class ELECAUDITHEADER(models.Model):
@@ -443,3 +444,18 @@ class ELECCAPTEXT(models.Model):
     UEI = models.TextField(blank=True, null=True)
 
     MULTIPLEUEIS = models.TextField(blank=True, null=True)
+
+
+class ReportMigrationStatus(models.Model):
+    audit_year = models.TextField(blank=True, null=True)
+    dbkey = models.TextField(blank=True, null=True)
+    run_datetime = models.DateTimeField(default=timezone.now)
+    migration_status = models.TextField(blank=True, null=True)
+
+
+class MigrationErrorDetail(models.Model):
+    report_migration_status = models.ForeignKey(
+        ReportMigrationStatus, on_delete=models.CASCADE
+    )
+    error_summary = models.CharField(blank=True, null=True)
+    error_stack = models.TextField()
