@@ -6,32 +6,41 @@ from django.contrib.auth import get_user_model
 User = get_user_model()
 
 
-def load_historic_data_for_year(audit_year):
+def load_historic_data_for_year(audit_year, batchSize, pages):
     """Iterates over and processes submissions for the given audit year"""
     result_log = {}
     total_count = error_count = 0
     user = create_or_get_user()
     submissions_for_year = Gen.objects.filter(AUDITYEAR=audit_year)
 
-    for submission in submissions_for_year:
-        dbkey = submission.DBKEY
-        result = {"success": [], "errors": []}
+    batches = []
+    for page in pages:
+        batches.append((page * batchSize, (page + 1) * batchSize))
 
-        try:
-            # Migrate a single submission
-            run_end_to_end(user, dbkey, audit_year, result)
-        except Exception as exc:
-            result["errors"].append(f"{exc}")
+    print(f"{submissions_for_year.count()} submissions found for {audit_year}")
 
-        result_log[(audit_year, dbkey)] = result
-        total_count += 1
+    for (start, end) in batches:
+        print(f"Processing submissions {start + 1}-{end}")
 
-        if len(result["errors"]) > 0:
-            error_count += 1
-        if total_count % 5 == 0:
-            print(f"Processed = {total_count}, Errors = {error_count}")
-        if error_count > 5:
-            break
+        for submission in submissions_for_year[start:end]:
+            dbkey = submission.DBKEY
+            result = {"success": [], "errors": []}
+
+            try:
+                # Migrate a single submission
+                run_end_to_end(user, dbkey, audit_year, result)
+            except Exception as exc:
+                result["errors"].append(f"{exc}")
+
+            result_log[(audit_year, dbkey)] = result
+            total_count += 1
+
+            if len(result["errors"]) > 0:
+                error_count += 1
+            if total_count % 5 == 0:
+                print(f"Processed = {total_count}, Errors = {error_count}")
+            if error_count > 5:
+                break
 
     print("********* Loader Summary ***************")
 
