@@ -19,7 +19,7 @@ def load_historic_data_for_year(audit_year, batchSize, pages):
 
     print(f"{submissions_for_year.count()} submissions found for {audit_year}")
 
-    for (start, end) in batches:
+    for start, end in batches:
         print(f"Processing submissions {start + 1}-{end}")
 
         for submission in submissions_for_year[start:end]:
