@@ -105,7 +105,7 @@ def _get_minimis_cost_rate(dbkey):
 
 
 def _get_notes(dbkey):
-    """Get the notes for a given dbkey.""" ""
+    """Get the notes for a given dbkey."""
     # https://facdissem.census.gov/Documents/DataDownloadKey.xlsx
     # The TYPEID column determines which field in the form a given row corresponds to.
     # TYPEID=3 is for notes, which have sequence numbers... that must align somewhere.
