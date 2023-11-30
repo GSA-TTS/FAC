@@ -8,9 +8,11 @@ class TestXformIsMinimisRateUsed(SimpleTestCase):
     def test_rate_used(self):
         """Test that the function returns 'Y' when the rate is used."""
         self.assertEqual(
+            # Ensure extra whitespace is acceptable
             xform_is_minimis_rate_used("The auditee  used the de minimis cost rate."),
             "Y",
         )
+
         self.assertEqual(
             xform_is_minimis_rate_used(
                 "The School has elected to use the 10-percent de minimis indirect cost rate as allowed under the Uniform Guidance."
