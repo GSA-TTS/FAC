@@ -73,7 +73,7 @@ locals {
 }
 
 data "external" "logshipperzip" {
-  program     = ["/bin/sh", "prepare-proxy.sh"]
+  program     = ["/bin/sh", "prepare-logshipper.sh"]
   working_dir = path.module
   query = {
     gitref = var.gitref
