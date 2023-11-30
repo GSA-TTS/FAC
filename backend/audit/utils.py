@@ -36,3 +36,11 @@ class ExcelExtractionError(Exception):
 
     def __str__(self):
         return f"{self.message} (Error Key: {self.error_key})"
+
+
+def match_first_get_second(tuples, pattern, default=None):
+    """
+    Given a set of tuples, return the second value in the first tuple where the
+    first value matches the pattern.
+    """
+    return next((s[1] for s in tuples if s[0] == pattern), default)

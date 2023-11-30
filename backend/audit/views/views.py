@@ -50,6 +50,7 @@ from audit.models import (
     SubmissionEvent,
 )
 from audit.intakelib.exceptions import ExcelExtractionError
+from audit.utils import match_first_get_second
 from audit.validators import (
     validate_additional_ueis_json,
     validate_additional_eins_json,
@@ -85,9 +86,9 @@ class MySubmissions(LoginRequiredMixin, generic.View):
 
         data = {"completed_audits": [], "in_progress_audits": []}
         for audit in submissions:
-            audit["submission_status"] = (
-                audit["submission_status"].replace("_", " ").title()
-            )  # auditee_certified --> Auditee Certified
+            audit["submission_status"] = match_first_get_second(
+                SingleAuditChecklist.STATUS_CHOICES, audit["submission_status"]
+            )
             if audit["submission_status"] in ["Submitted", "Disseminated"]:
                 data["completed_audits"].append(audit)
             else:

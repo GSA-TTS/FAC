@@ -14,6 +14,7 @@ from django_fsm import FSMField, RETURN_VALUE, transition
 
 import audit.cross_validation
 from audit.intake_to_dissemination import IntakeToDissemination
+from audit.utils import match_first_get_second
 from audit.validators import (
     validate_additional_ueis_json,
     validate_additional_eins_json,
@@ -254,6 +255,10 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
                 raise LateChangeError
 
         return True
+
+    def get_friendly_status(self) -> str:
+        """Return the friendly version of submission_status."""
+        return match_first_get_second(self.STATUS_CHOICES, self.submission_status)
 
     # Constants:
     class STATUS:
