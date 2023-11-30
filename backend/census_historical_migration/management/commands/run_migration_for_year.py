@@ -33,7 +33,7 @@ class Command(BaseCommand):
             dbkeys = list(map(lambda d: int(d), dbkeys_str.split(",")))
             start_dbkey = min(dbkeys)
             end_dbkey = max(dbkeys)
-        except ValueError as e:
+        except ValueError:
             logger.error(f"Found a non-integer in dbkeys '{dbkeys_str}'")
             sys.exit(-1)
 
