@@ -356,9 +356,9 @@
       }
     ],
     "singletons": {
-      "accounting_policies": "Expenses reported on the Schedule are reported on the accrual basis of accounting. Such expenses are recognized following the cost principles contained in the Uniform Guidance, wherein certain types of expenses are not allowable or are limited as to reimbursement.The amounts passed through to subrecipients, if any, are reported on in this schedule when disbursed in accordance with 2 CFR 200.502(a), which differs from the accrual basis of accounting used under generally accepted accounting principles.",
+      "accounting_policies": "Expenses reported on the Schedule are reported on the accrual basis of accounting. Such expenses are recognized following the cost principles contained in the Uniform Guidance, wherein certain types of expenses are not allowable or are limited as to reimbursement.The amounts passed through to subrecipients, if any, are reported on in this schedule when disbursed in accordance with 2 CFR \u00a7200.502(a), which differs from the accrual basis of accounting used under generally accepted accounting principles.",
       "auditee_uei": "GM27HGUL61B5",
-      "is_minimis_rate_used": "Both",
+      "is_minimis_rate_used": "N",
       "rate_explained": "The District did not charge indirect costs to its federal programs."
     }
   },
