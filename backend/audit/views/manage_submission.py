@@ -1,5 +1,5 @@
 from functools import partial
-from django.shortcuts import redirect, render, reverse
+from django.shortcuts import render, reverse
 from django.views import generic
 
 from audit.mixins import (
@@ -9,22 +9,6 @@ from audit.models import (
     Access,
     SingleAuditChecklist,
 )
-
-
-def _get_url_from_viewname(viewname: str, report_id: str | None = None) -> str:
-    kwargs = {"kwargs": {"report_id": report_id}} if report_id else {}
-    return reverse(f"audit:{viewname}", **kwargs)
-
-
-def _user_entry(access: Access) -> dict:
-    """Given an Access, return a dict of relevant info."""
-    return {
-        "name": access.fullname,
-        "email": access.email,
-        "role": access.get_friendly_role(),
-        "user_exists": bool(access.user),
-        "never_logged_in_flag": "" if bool(access.user) else "*",
-    }
 
 
 class ManageSubmissionView(SingleAuditChecklistAccessRequiredMixin, generic.View):
@@ -53,6 +37,21 @@ class ManageSubmissionView(SingleAuditChecklistAccessRequiredMixin, generic.View
             +   change auditee certifying official
             +   change auditor certifying official
         """
+
+        def _user_entry(access: Access) -> dict:
+            """Given an Access, return a dict of relevant info."""
+            return {
+                "name": access.fullname,
+                "email": access.email,
+                "role": access.get_friendly_role(),
+                "user_exists": bool(access.user),
+                "never_logged_in_flag": "" if bool(access.user) else "*",
+            }
+
+        def _get_url_from_viewname(viewname: str, report_id: str | None = None) -> str:
+            kwargs = {"kwargs": {"report_id": report_id}} if report_id else {}
+            return reverse(f"audit:{viewname}", **kwargs)
+
         report_id = kwargs["report_id"]
         sac = SingleAuditChecklist.objects.get(report_id=report_id)
         accesses = Access.objects.filter(sac=sac)
