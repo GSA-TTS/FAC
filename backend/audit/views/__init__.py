@@ -1,4 +1,8 @@
 from .home import Home
+from .manage_submission_access import (
+    ChangeAuditeeCertifyingOfficialView,
+    ChangeAuditorCertifyingOfficialView,
+)
 from .no_robots import no_robots
 from .submission_progress_view import (  # noqa
     SubmissionProgressView,
@@ -31,6 +35,8 @@ views = [
     AuditorCertificationStep1View,
     AuditorCertificationStep2View,
     CertificationView,
+    ChangeAuditeeCertifyingOfficialView,
+    ChangeAuditorCertifyingOfficialView,
     CrossValidationView,
     EditSubmission,
     ExcelFileHandlerView,
