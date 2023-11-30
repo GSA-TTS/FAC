@@ -16,5 +16,5 @@ curl -s -L https://github.com/GSA-TTS/cg-logshipper/archive/${GITREF}.zip --outp
 
 # Tell Terraform where to find it
 cat << EOF
-{ "path": "proxy.zip" }
+{ "path": "logshipper.zip" }
 EOF
