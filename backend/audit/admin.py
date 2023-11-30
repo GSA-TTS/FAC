@@ -4,6 +4,11 @@ from audit.models import SingleAuditChecklist, Access, ExcelFile, SingleAuditRep
 
 
 class SACAdmin(admin.ModelAdmin):
+    """
+    Support for read-only staff access, and control of what fields are present and
+    filterable/searchable.
+    """
+
     def has_module_permission(self, request, obj=None):
         return request.user.is_staff
 
@@ -21,6 +26,7 @@ class SACAdmin(admin.ModelAdmin):
         "oversight_agency",
     ]
     readonly_fields = ("submitted_by",)
+    search_fields = ("general_information__auditee_uei", "report_id")
 
 
 class AccessAdmin(admin.ModelAdmin):
@@ -29,9 +35,16 @@ class AccessAdmin(admin.ModelAdmin):
     it's redundant with email in almost all circumstances.
     """
 
+    def has_module_permission(self, request, obj=None):
+        return request.user.is_staff
+
+    def has_view_permission(self, request, obj=None):
+        return request.user.is_staff
+
     list_display = ("sac", "role", "email")
     list_filter = ["role"]
     readonly_fields = ("sac",)
+    search_fields = ("email", "sac__report_id")
 
 
 class ExcelFileAdmin(admin.ModelAdmin):
