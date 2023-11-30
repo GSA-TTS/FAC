@@ -41,7 +41,7 @@ python manage.py csv_to_postgres --clean True
 
 ## How to load test Census data into Postgres
 
-1.  Download test Census data from https://drive.google.com/drive/folders/1TY-7yWsMd8DsVEXvwrEe_oWW1iR2sGoy into census_historical_migration/data folder.  
+1.  Download test Census data from https://drive.google.com/drive/folders/1TY-7yWsMd8DsVEXvwrEe_oWW1iR2sGoy into census_historical_migration/data folder.
 NOTE:  Never check in the census_historical_migration/data folder into GitHub.
 
 2.  In the FAC/backend folder, run the following to load CSV files from census_historical_migration/data folder into fac-census-to-gsafac-s3 bucket.
@@ -55,12 +55,21 @@ docker compose run --rm web python manage.py csv_to_postgres --folder data --chu
 ```
 
 ### How to run the historic data migrator:
+To migrate individual dbkeys:
 ```
 docker compose run --rm web python manage.py historic_data_migrator
   --years 22 \
   --dbkeys 177310
 ```
 - `year` and `dbkey` are optional. The script will use default values for these if they aren't provided.
+
+To migrate a range of dbkeys for a given year:
+```
+docker compose run --rm web python manage.py run_migration_for_year
+  --year 22 \
+  --dbkeys 115212, 115578
+```
+- `dbkeys` is optional. The script will use the default value of "0, 9999" if it isn't provided.
 
 ### How to run the historic workbook generator:
 ```
@@ -74,6 +83,6 @@ docker compose run --rm web python manage.py historic_workbook_generator \
 
 ### How to trigger historic data migrator from GitHub:
 - Go to GitHub Actions and select `Historic data migrator` action
-- Next, click on `Run workflow` on top right and 
+- Next, click on `Run workflow` on top right and
 - Provide the target `environment` along with optional parameters such as `dbkeys` and `years`
 - Click `Run`
