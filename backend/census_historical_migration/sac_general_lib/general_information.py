@@ -116,7 +116,8 @@ def _period_covered(s):
 
 
 def _census_audit_type(s):
-    """Helper to transforms the audit type from Census format to FAC format."""
+    """Helper to transform the audit type from Census format to FAC format."""
+
     if s not in AUDIT_TYPE_DICT:
         raise DataMigrationError(f"Key '{s}' not found in census audit type mapping")
     return AUDIT_TYPE_DICT[s]
