@@ -3,8 +3,6 @@ from audit.models.submission_event import SubmissionEvent
 from audit.validators import validate_general_information_complete_json
 from django.core.exceptions import ValidationError
 
-from datetime import datetime
-
 
 def submission_progress_check(sac, sar=None, crossval=True):
     """
