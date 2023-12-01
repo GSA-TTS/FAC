@@ -16,14 +16,14 @@ class Command(BaseCommand):
         Usage:
         manage.py run_migration
             --year <audit year>
-            --batchSize <batch size>
+            --pageSize <page size>
             --pages <comma separated pages>
     """
 
     def add_arguments(self, parser):
         parser.add_argument("--year", help="4-digit Audit Year")
-        parser.add_argument("--batchSize", type=int, required=False, default=5)
-        parser.add_argument("--pages", type=str, required=False, default="0")
+        parser.add_argument("--page_size", type=int, required=False, default=5)
+        parser.add_argument("--pages", type=str, required=False, default="1")
 
     def handle(self, *args, **options):
         year = options.get("year")
@@ -38,4 +38,4 @@ class Command(BaseCommand):
             logger.error(f"Found a non-integer in pages '{pages_str}'")
             sys.exit(-1)
 
-        load_historic_data_for_year(year, options["batchSize"], pages)
+        load_historic_data_for_year(year, options["page_size"], pages)
