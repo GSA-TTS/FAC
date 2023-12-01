@@ -1,15 +1,15 @@
-from census_historical_migration.workbooklib.excel_creation_utils import (
+from ..workbooklib.excel_creation_utils import (
     get_audit_header,
     map_simple_columns,
     generate_dissemination_test_table,
     set_workbook_uei,
 )
-from census_historical_migration.base_field_maps import (
+from ..base_field_maps import (
     SheetFieldMap,
     WorkbookFieldInDissem,
 )
-from census_historical_migration.workbooklib.templates import sections_to_template_paths
-from census_historical_migration.models import ELECFINDINGSTEXT as FindingsText
+from ..workbooklib.templates import sections_to_template_paths
+from ..models import ELECFINDINGSTEXT as FindingsText
 from audit.fixtures.excel import FORM_SECTIONS
 
 import openpyxl as pyxl

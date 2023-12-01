@@ -1,15 +1,14 @@
-from census_historical_migration.transforms.xform_string_to_string import (
+from ..transforms.xform_string_to_string import (
     string_to_string,
 )
-from census_historical_migration.transforms.xform_string_to_int import string_to_int
-from census_historical_migration.exception_utils import DataMigrationError
-from census_historical_migration.base_field_maps import WorkbookFieldInDissem
-from census_historical_migration.workbooklib.templates import sections_to_template_paths
-from census_historical_migration.sac_general_lib.report_id_generator import (
-    dbkey_to_report_id,
+from ..transforms.xform_string_to_int import string_to_int
+from ..exception_utils import DataMigrationError
+from ..base_field_maps import WorkbookFieldInDissem
+from ..workbooklib.templates import sections_to_template_paths
+from ..sac_general_lib.report_id_generator import (
     xform_dbkey_to_report_id,
 )
-from census_historical_migration.models import (
+from ..models import (
     ELECAUDITS as Audits,
     ELECAUDITHEADER as AuditHeader,
 )
@@ -125,16 +124,6 @@ def get_ranges(mappings, values):
     return ranges
 
 
-# FIXME-MSHD: Remove this function once we switch all workbook generators to using census models
-def set_uei(Gen, wb, dbkey):
-    g = Gen.select().where(Gen.dbkey == dbkey).get()
-    if g.uei:
-        set_range(wb, "auditee_uei", [g.uei])
-    else:
-        raise DataMigrationError(f"UEI is not set for this audit: {dbkey}")
-    return g
-
-
 def set_workbook_uei(workbook, uei):
     """Sets the UEI value in the workbook's designated UEI cell"""
     if not uei:
@@ -187,16 +176,14 @@ def get_template_name_for_section(section):
         raise ValueError(f"Unknown section {section}")
 
 
-def generate_dissemination_test_table(Gen, api_endpoint, dbkey, mappings, objects):
+def generate_dissemination_test_table(
+    audit_header, api_endpoint, dbkey, mappings, objects
+):
+    """Generates a test table for verifying the API queries results."""
     table = {"rows": list(), "singletons": dict()}
     table["endpoint"] = api_endpoint
-    table["report_id"] = (
-        dbkey_to_report_id(Gen, dbkey)
-        if not isinstance(
-            Gen, AuditHeader
-        )  # FIXME-MSHD: This hack is necessary until we switch all workbook generators to using census models. We may want to get rid of generate_dissemination_test_table at some point (see comment in generate_federal_awards)
-        else xform_dbkey_to_report_id(Gen, dbkey)
-    )
+    table["report_id"] = xform_dbkey_to_report_id(audit_header, dbkey)
+
     for o in objects:
         test_obj = {}
         test_obj["fields"] = []
@@ -222,4 +209,5 @@ def generate_dissemination_test_table(Gen, api_endpoint, dbkey, mappings, object
 
 
 def get_audits(dbkey):
+    """Returns the Audits instances for the given dbkey."""
     return Audits.objects.filter(DBKEY=dbkey).order_by("ID")
