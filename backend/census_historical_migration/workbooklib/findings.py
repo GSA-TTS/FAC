@@ -1,7 +1,7 @@
-from census_historical_migration.transforms.xform_string_to_string import (
+from ..transforms.xform_string_to_string import (
     string_to_string,
 )
-from census_historical_migration.workbooklib.excel_creation_utils import (
+from ..workbooklib.excel_creation_utils import (
     get_audit_header,
     get_audits,
     map_simple_columns,
@@ -9,10 +9,10 @@ from census_historical_migration.workbooklib.excel_creation_utils import (
     set_range,
     set_workbook_uei,
 )
-from census_historical_migration.base_field_maps import SheetFieldMap
-from census_historical_migration.workbooklib.templates import sections_to_template_paths
+from ..base_field_maps import SheetFieldMap
+from ..workbooklib.templates import sections_to_template_paths
 from audit.fixtures.excel import FORM_SECTIONS
-from census_historical_migration.models import ELECAUDITFINDINGS as Findings
+from ..models import ELECAUDITFINDINGS as Findings
 import openpyxl as pyxl
 
 import logging

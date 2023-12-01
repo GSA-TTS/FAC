@@ -1,7 +1,7 @@
 from django.core.files.uploadedfile import SimpleUploadedFile
 from fs.memoryfs import MemoryFS
 
-from census_historical_migration.workbooklib.excel_creation_utils import (
+from ..workbooklib.excel_creation_utils import (
     get_template_name_for_section,
 )
 
