@@ -1,4 +1,4 @@
-from census_historical_migration.exception_utils import DataMigrationError
+from ..exception_utils import DataMigrationError
 import argparse
 import logging
 import sys
@@ -10,14 +10,14 @@ import requests
 from datetime import datetime
 import traceback
 
-from census_historical_migration.workbooklib.workbook_builder_loader import (
+from ..workbooklib.workbook_builder_loader import (
     workbook_builder_loader,
 )
-from census_historical_migration.sac_general_lib.sac_creator import setup_sac
-from census_historical_migration.workbooklib.workbook_section_handlers import (
+from ..sac_general_lib.sac_creator import setup_sac
+from ..workbooklib.workbook_section_handlers import (
     sections_to_handlers,
 )
-from census_historical_migration.workbooklib.post_upload_utils import _post_upload_pdf
+from ..workbooklib.post_upload_utils import _post_upload_pdf
 from audit.intake_to_dissemination import IntakeToDissemination
 
 from dissemination.models import (

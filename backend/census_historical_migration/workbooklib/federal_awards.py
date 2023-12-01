@@ -1,7 +1,7 @@
-from census_historical_migration.transforms.xform_string_to_string import (
+from ..transforms.xform_string_to_string import (
     string_to_string,
 )
-from census_historical_migration.workbooklib.excel_creation_utils import (
+from ..workbooklib.excel_creation_utils import (
     get_audit_header,
     get_audits,
     get_range_values,
@@ -11,14 +11,14 @@ from census_historical_migration.workbooklib.excel_creation_utils import (
     generate_dissemination_test_table,
     set_range,
 )
-from census_historical_migration.base_field_maps import (
+from ..base_field_maps import (
     SheetFieldMap,
     WorkbookFieldInDissem,
 )
-from census_historical_migration.workbooklib.templates import sections_to_template_paths
+from ..workbooklib.templates import sections_to_template_paths
 from audit.fixtures.excel import FORM_SECTIONS
 from config import settings
-from census_historical_migration.models import (
+from ..models import (
     ELECAUDITS as Audits,
     ELECPASSTHROUGH as Passthrough,
 )
