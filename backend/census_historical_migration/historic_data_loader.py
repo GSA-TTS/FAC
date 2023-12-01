@@ -2,27 +2,31 @@ from .models import ELECAUDITHEADER as Gen
 from .workbooklib.end_to_end_core import run_end_to_end
 
 from django.contrib.auth import get_user_model
+from django.core.paginator import Paginator
+
 
 User = get_user_model()
 
 
-def load_historic_data_for_year(audit_year, batchSize, pages):
+def load_historic_data_for_year(audit_year, page_size, pages):
     """Iterates over and processes submissions for the given audit year"""
     result_log = {}
     total_count = error_count = 0
     user = create_or_get_user()
-    submissions_for_year = Gen.objects.filter(AUDITYEAR=audit_year)
-
-    batches = []
-    for page in pages:
-        batches.append((page * batchSize, (page + 1) * batchSize))
+    submissions_for_year = Gen.objects.filter(AUDITYEAR=audit_year).order_by(
+        "ELECAUDITHEADERID"
+    )
+    paginator = Paginator(submissions_for_year, page_size)
 
     print(f"{submissions_for_year.count()} submissions found for {audit_year}")
 
-    for start, end in batches:
-        print(f"Processing submissions {start + 1}-{end}")
+    for page_number in pages:
+        page = paginator.page(page_number)
+        print(
+            f"Processing page {page_number} with {page.object_list.count()} submissions."
+        )
 
-        for submission in submissions_for_year[start:end]:
+        for submission in page.object_list:
             dbkey = submission.DBKEY
             result = {"success": [], "errors": []}
 
