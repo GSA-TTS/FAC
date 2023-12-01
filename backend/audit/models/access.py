@@ -8,7 +8,6 @@ from .models import (
     SingleAuditChecklist,
     SubmissionEvent,
 )
-from audit.utils import match_first_get_second
 
 
 User = get_user_model()
@@ -91,7 +90,7 @@ class Access(models.Model):
 
     def get_friendly_role(self) -> str | None:
         """Return the friendly version of the role."""
-        return match_first_get_second(self.ROLES, self.role)
+        return dict(self.ROLES)[self.role]
 
     class Meta:
         """Constraints for certifying roles"""
