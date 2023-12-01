@@ -106,7 +106,6 @@ def xform_census_keys_to_fac_options(census_keys, fac_options):
 def _get_sp_framework_gaap_results(audit_header):
     """Returns the SP Framework and GAAP results for a given audit header."""
 
-
     sp_framework_gaap_data = string_to_string(audit_header.TYPEREPORT_FS).upper()
     if not sp_framework_gaap_data:
         raise DataMigrationError(
