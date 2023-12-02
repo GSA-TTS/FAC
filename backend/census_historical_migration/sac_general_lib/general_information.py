@@ -1,16 +1,16 @@
 import audit.validators
 from datetime import timedelta
-from census_historical_migration.exception_utils import DataMigrationError
-from census_historical_migration.workbooklib.census_models.census import (
-    CensusGen22 as Gen,
+
+from ..transforms.xform_string_to_string import string_to_string
+from ..exception_utils import DataMigrationError
+from ..sac_general_lib.utils import (
+    xform_census_date_to_datetime,
 )
-from census_historical_migration.sac_general_lib.utils import (
-    _census_date_to_datetime,
-)
-from census_historical_migration.base_field_maps import FormFieldMap, FormFieldInDissem
-from census_historical_migration.sac_general_lib.utils import (
+from ..base_field_maps import FormFieldMap, FormFieldInDissem
+from ..sac_general_lib.utils import (
     _create_json_from_db_object,
 )
+import re
 
 PERIOD_DICT = {"A": "annual", "B": "biennial", "O": "other"}
 AUDIT_TYPE_DICT = {
@@ -18,100 +18,158 @@ AUDIT_TYPE_DICT = {
     "P": "program-specific",
     "A": "alternative-compliance-engagement",
 }
+
+
+def xform_entity_type(phrase):
+    """Transforms the entity type from Census format to FAC format."""
+    mappings = {
+        r"institution\s+of\s+higher\s+education": "higher-ed",
+        r"non-?profit": "non-profit",
+        r"local\s+government": "local",
+        r"state": "state",
+        r"unknown": "unknown",
+        r"": "none",
+        # r"": "tribal"   FIXME-MSHD: what is being used for tribal in Census table?
+    }
+    new_phrase = string_to_string(phrase)
+
+    # Check each pattern in the mappings with case-insensitive search
+    for pattern, value in mappings.items():
+        if re.search(pattern, new_phrase, re.IGNORECASE):
+            # FIXME-MSHD: This is a transformation that we may want to record
+            return value
+    # FIXME-MSHD: We could default to unknown here instead of raising an error ??? team decision
+    raise DataMigrationError(
+        f"Could not find a match for historic entity type '{phrase}'"
+    )
+
+
 mappings = [
     FormFieldMap(
-        "auditee_fiscal_period_start", "fyenddate", "fy_start_date", None, str
+        "auditee_fiscal_period_start", "FYENDDATE", "fy_start_date", None, str
     ),
-    FormFieldMap("auditee_fiscal_period_end", "fyenddate", "fy_end_date", None, str),
-    FormFieldMap("audit_period_covered", "periodcovered", FormFieldInDissem, None, str),
+    FormFieldMap("auditee_fiscal_period_end", "FYENDDATE", "fy_end_date", None, str),
+    FormFieldMap("audit_period_covered", "PERIODCOVERED", FormFieldInDissem, None, str),
     FormFieldMap(
-        "audit_type", "audittype", FormFieldInDissem, None, str
+        "audit_type", "AUDITTYPE", FormFieldInDissem, None, str
     ),  # FIXME: It appears the audit_type attribute is duplicated in the sac object: it exists both in the object and in the general_information section.
-    FormFieldMap("auditee_address_line_1", "street1", FormFieldInDissem, None, str),
-    FormFieldMap("auditee_city", "city", FormFieldInDissem, None, str),
+    FormFieldMap("auditee_address_line_1", "STREET1", FormFieldInDissem, None, str),
+    FormFieldMap("auditee_city", "CITY", FormFieldInDissem, None, str),
     FormFieldMap(
-        "auditee_contact_name", "auditeecontact", FormFieldInDissem, None, str
+        "auditee_contact_name", "AUDITEECONTACT", FormFieldInDissem, None, str
     ),
-    FormFieldMap("auditee_contact_title", "auditeetitle", FormFieldInDissem, None, str),
-    FormFieldMap("auditee_email", "auditeeemail", FormFieldInDissem, None, str),
-    FormFieldMap("auditee_name", "auditeename", FormFieldInDissem, None, str),
-    FormFieldMap("auditee_phone", "auditeephone", FormFieldInDissem, None, str),
-    FormFieldMap("auditee_state", "state", FormFieldInDissem, None, str),
-    FormFieldMap("auditee_uei", "uei", FormFieldInDissem, None, str),
-    FormFieldMap("auditee_zip", "zipcode", FormFieldInDissem, None, str),
-    FormFieldMap("auditor_address_line_1", "cpastreet1", FormFieldInDissem, None, str),
-    FormFieldMap("auditor_city", "cpacity", FormFieldInDissem, None, str),
-    FormFieldMap("auditor_contact_name", "cpacontact", FormFieldInDissem, None, str),
-    FormFieldMap("auditor_contact_title", "cpatitle", FormFieldInDissem, None, str),
-    FormFieldMap("auditor_country", "cpacountry", FormFieldInDissem, None, str),
-    FormFieldMap("auditor_ein", "auditor_ein", FormFieldInDissem, None, str),
-    FormFieldMap("auditor_ein_not_an_ssn_attestation", None, None, True, bool),
-    FormFieldMap("auditor_email", "cpaemail", FormFieldInDissem, None, str),
-    FormFieldMap("auditor_firm_name", "cpafirmname", FormFieldInDissem, None, str),
-    FormFieldMap("auditor_phone", "cpaphone", FormFieldInDissem, None, str),
-    FormFieldMap("auditor_state", "cpastate", FormFieldInDissem, None, str),
-    FormFieldMap("auditor_zip", "cpazipcode", FormFieldInDissem, None, str),
-    FormFieldMap("ein", "ein", "auditee_ein", None, str),
-    FormFieldMap("ein_not_an_ssn_attestation", None, None, True, bool),
-    FormFieldMap("is_usa_based", None, None, True, bool),
-    FormFieldMap("met_spending_threshold", None, None, True, bool),
-    FormFieldMap("multiple_eins_covered", "multipleeins", None, None, bool),
+    FormFieldMap("auditee_contact_title", "AUDITEETITLE", FormFieldInDissem, None, str),
+    FormFieldMap("auditee_email", "AUDITEEEMAIL", FormFieldInDissem, None, str),
+    FormFieldMap("auditee_name", "AUDITEENAME", FormFieldInDissem, None, str),
+    FormFieldMap("auditee_phone", "AUDITEEPHONE", FormFieldInDissem, None, str),
+    FormFieldMap("auditee_state", "STATE", FormFieldInDissem, None, str),
+    FormFieldMap("auditee_uei", "UEI", FormFieldInDissem, None, str),
+    FormFieldMap("auditee_zip", "ZIPCODE", FormFieldInDissem, None, str),
+    FormFieldMap("auditor_address_line_1", "CPASTREET1", FormFieldInDissem, None, str),
+    FormFieldMap("auditor_city", "CPACITY", FormFieldInDissem, None, str),
+    FormFieldMap("auditor_contact_name", "CPACONTACT", FormFieldInDissem, None, str),
+    FormFieldMap("auditor_contact_title", "CPATITLE", FormFieldInDissem, None, str),
+    FormFieldMap("auditor_country", "CPACOUNTRY", FormFieldInDissem, None, str),
+    FormFieldMap("auditor_ein", "AUDITOR_EIN", FormFieldInDissem, None, str),
     FormFieldMap(
-        "multiple_ueis_covered", "multipleueis", "is_additional_ueis", None, bool
+        "auditor_ein_not_an_ssn_attestation", None, None, True, bool
+    ),  # Not in DB, not disseminated, needed for validation
+    FormFieldMap("auditor_email", "CPAEMAIL", FormFieldInDissem, None, str),
+    FormFieldMap("auditor_firm_name", "CPAFIRMNAME", FormFieldInDissem, None, str),
+    FormFieldMap("auditor_phone", "CPAPHONE", FormFieldInDissem, None, str),
+    FormFieldMap("auditor_state", "CPASTATE", FormFieldInDissem, None, str),
+    FormFieldMap("auditor_zip", "CPAZIPCODE", FormFieldInDissem, None, str),
+    FormFieldMap("ein", "EIN", "auditee_ein", None, str),
+    FormFieldMap(
+        "ein_not_an_ssn_attestation", None, None, True, bool
+    ),  # Not in DB, not disseminated, needed for validation
+    FormFieldMap(
+        "is_usa_based", None, None, True, bool
+    ),  # Not in DB, not disseminated, needed for validation
+    FormFieldMap(
+        "met_spending_threshold", None, None, True, bool
+    ),  # Not in DB, not disseminated, needed for validation
+    FormFieldMap(
+        "multiple_eins_covered", "MULTIPLEEINS", None, None, bool
+    ),  # In DB, not disseminated, needed for validation
+    FormFieldMap(
+        "multiple_ueis_covered", "MULTIPLEUEIS", "is_additional_ueis", None, bool
     ),
     FormFieldMap(
-        "user_provided_organization_type", None, "entity_type", "unknown", str
-    ),  # FIXME: There is no in_db mapping ?
-    FormFieldMap("secondary_auditors_exist", "multiple_cpas", None, None, bool),
+        "user_provided_organization_type",
+        "ENTITY_TYPE",
+        "entity_type",
+        None,
+        xform_entity_type,
+    ),
+    FormFieldMap(
+        "secondary_auditors_exist", "MULTIPLE_CPAS", None, None, bool
+    ),  # In DB, not disseminated, needed for validation
 ]
 
 
 def _period_covered(s):
+    """Helper to transform the period covered from Census format to FAC format."""
     if s not in PERIOD_DICT:
         raise DataMigrationError(f"Key '{s}' not found in period coverage mapping")
     return PERIOD_DICT[s]
 
 
 def _census_audit_type(s):
+    """Helper to transform the audit type from Census format to FAC format."""
+
     if s not in AUDIT_TYPE_DICT:
         raise DataMigrationError(f"Key '{s}' not found in census audit type mapping")
     return AUDIT_TYPE_DICT[s]
 
 
-def _xform_country(gen):
-    gen["auditor_country"] = "USA" if gen.get("auditor_country") == "US" else "non-USA"
-    return gen
+def _xform_country(general_information):
+    """Transforms the country from Census format to FAC format."""
+    general_information["auditor_country"] = (
+        "USA" if general_information.get("auditor_country") == "US" else "non-USA"
+    )
+    return general_information
 
 
-def _xform_auditee_fiscal_period_end(gen):
-    gen["auditee_fiscal_period_end"] = _census_date_to_datetime(
-        gen.get("auditee_fiscal_period_end")
+def _xform_auditee_fiscal_period_end(general_information):
+    """Transforms the fiscal period end from Census format to FAC format."""
+    general_information["auditee_fiscal_period_end"] = xform_census_date_to_datetime(
+        general_information.get("auditee_fiscal_period_end")
     ).strftime("%Y-%m-%d")
-    return gen
+    return general_information
 
 
-def _xform_auditee_fiscal_period_start(gen):
-    fiscal_start_date = _census_date_to_datetime(
-        gen.get("auditee_fiscal_period_end")
+def _xform_auditee_fiscal_period_start(general_information):
+    """Constructs the fiscal period start from the fiscal period end"""
+    fiscal_start_date = xform_census_date_to_datetime(
+        general_information.get("auditee_fiscal_period_end")
     ) - timedelta(days=365)
-    gen["auditee_fiscal_period_start"] = fiscal_start_date.strftime("%Y-%m-%d")
-    return gen
+    general_information["auditee_fiscal_period_start"] = fiscal_start_date.strftime(
+        "%Y-%m-%d"
+    )
+    return general_information
 
 
-def _xform_audit_period_covered(gen):
-    gen["audit_period_covered"] = _period_covered(gen.get("audit_period_covered"))
-    return gen
+def _xform_audit_period_covered(general_information):
+    """Transforms the period covered from Census format to FAC format."""
+    general_information["audit_period_covered"] = _period_covered(
+        general_information.get("audit_period_covered")
+    )
+    return general_information
 
 
-def _xform_audit_type(gen):
-    gen["audit_type"] = _census_audit_type(gen.get("audit_type"))
-    return gen
+def _xform_audit_type(general_information):
+    """Transforms the audit type from Census format to FAC format."""
+    general_information["audit_type"] = _census_audit_type(
+        general_information.get("audit_type")
+    )
+    return general_information
 
 
-def _general_information(dbkey):
-    gobj: Gen = Gen.select().where(Gen.dbkey == dbkey).first()
+def general_information(audit_header):
+    """Generates general information JSON."""
 
-    general_information = _create_json_from_db_object(gobj, mappings)
+    general_information = _create_json_from_db_object(audit_header, mappings)
 
     # List of transformation functions
     transformations = [

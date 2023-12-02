@@ -1,5 +1,5 @@
-from census_historical_migration.workbooklib.workbook_builder import generate_workbook
-from census_historical_migration.workbooklib.post_upload_utils import (
+from ..workbooklib.workbook_builder import generate_workbook
+from ..workbooklib.post_upload_utils import (
     _post_upload_workbook,
 )
 

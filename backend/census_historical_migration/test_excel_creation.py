@@ -1,9 +1,9 @@
 from django.conf import settings
-from census_historical_migration.base_field_maps import (
+from .base_field_maps import (
     SheetFieldMap,
     WorkbookFieldInDissem,
 )
-from census_historical_migration.workbooklib.excel_creation_utils import (
+from .workbooklib.excel_creation_utils import (
     apply_conversion_function,
     get_range_values,
     get_ranges,
@@ -15,7 +15,7 @@ from django.test import TestCase
 from openpyxl import Workbook
 from openpyxl.utils import quote_sheetname, absolute_coordinate
 from openpyxl.workbook.defined_name import DefinedName
-from census_historical_migration.models import ELECAUDITS as Audits
+from .models import ELECAUDITS as Audits
 
 
 class ExcelCreationTests(TestCase):

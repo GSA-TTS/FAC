@@ -1,6 +1,6 @@
-from django.contrib import admin  # noqa: F401
+from django.contrib import admin
 
-from census_historical_migration.models import (
+from .models import (
     ELECAUDITHEADER,
     ELECEINS,
     ELECAUDITFINDINGS,
