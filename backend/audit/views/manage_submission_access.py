@@ -7,7 +7,6 @@ from audit.mixins import (
     SingleAuditChecklistAccessRequiredMixin,
 )
 from audit.models import (
-    ACCESS_ROLES,
     Access,
     SingleAuditChecklist,
 )
@@ -47,10 +46,9 @@ class ChangeAuditorCertifyingOfficialView(
         report_id = kwargs["report_id"]
         sac = SingleAuditChecklist.objects.get(report_id=report_id)
         access = Access.objects.get(sac=sac, role=self.role)
-        friendly_role = [r for r in ACCESS_ROLES if r[0] == self.role][0][1]
         context = {
             "role": self.role,
-            "friendly_role": friendly_role,
+            "friendly_role": access.get_friendly_role(),
             "auditee_uei": sac.general_information["auditee_uei"],
             "auditee_name": sac.general_information.get("auditee_name"),
             "certifier_name": access.fullname,
@@ -84,10 +82,9 @@ class ChangeAuditorCertifyingOfficialView(
         access = Access.objects.get(sac=sac, role=self.role)
         other_access = Access.objects.get(sac=sac, role=self.other_role)
         if form.cleaned_data["email"] == other_access.email:
-            friendly_role = [r for r in ACCESS_ROLES if r[0] == self.role][0][1]
             context = {
                 "role": self.role,
-                "friendly_role": friendly_role,
+                "friendly_role": access.get_friendly_role(),
                 "auditee_uei": sac.general_information["auditee_uei"],
                 "auditee_name": sac.general_information.get("auditee_name"),
                 "certifier_name": access.fullname,
