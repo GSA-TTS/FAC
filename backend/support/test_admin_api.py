@@ -32,7 +32,7 @@ class TestAdminAPI(TestCase):
                     "SELECT count(*) FROM public.support_administrative_key_uuids;"
                 )
                 (number_of_rows,) = cur.fetchone()
-                assert number_of_rows >= 1
+                self.assertGreaterEqual(number_of_rows, 1)
 
     def setUp(self):
         self.api_url = settings.POSTGREST.get("URL")
