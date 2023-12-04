@@ -255,6 +255,10 @@ class SingleAuditChecklist(models.Model, GeneralInformationMixin):  # type: igno
 
         return True
 
+    def get_friendly_status(self) -> str:
+        """Return the friendly version of submission_status."""
+        return dict(self.STATUS_CHOICES)[self.submission_status]
+
     # Constants:
     class STATUS:
         """The states that a submission can be in."""

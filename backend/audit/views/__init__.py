@@ -1,4 +1,5 @@
 from .home import Home
+from .manage_submission import ManageSubmissionView
 from .manage_submission_access import (
     ChangeAuditeeCertifyingOfficialView,
     ChangeAuditorCertifyingOfficialView,
@@ -42,6 +43,7 @@ views = [
     ExcelFileHandlerView,
     Home,
     MySubmissions,
+    ManageSubmissionView,
     ReadyForCertificationView,
     SingleAuditReportFileHandlerView,
     SubmissionProgressView,
