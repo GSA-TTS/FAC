@@ -99,11 +99,14 @@ BEGIN
             END 
         INTO key_exists;
     
+    -- This log event is an INSERT that gets called from the view... which is a SELECT-only
+    -- context. As a result, this fails. Not sure what the best fix is. Increase the perms
+    -- on the view, so the insert can happen?
     -- RAISE INFO 'ADMIN_API has_access_check % % %', uuid_header, key_exists, has_permission;
-    PERFORM admin_api_v1_0_0.log_admin_api_event('access_check', 
-                                                 json_build_object('uuid', uuid_header, 
-                                                                   'key_exists', key_exists,
-                                                                   'has_permission', has_permission));
+    -- PERFORM admin_api_v1_0_0.log_admin_api_event('access_check', 
+    --                                              json_build_object('uuid', uuid_header, 
+    --                                                                'key_exists', key_exists,
+    --                                                                'has_permission', has_permission));
     RETURN key_exists AND has_permission;
 END;
 $has_admin_data_access$ LANGUAGE plpgsql;

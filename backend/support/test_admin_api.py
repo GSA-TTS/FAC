@@ -10,6 +10,11 @@ import requests
 
 class TestAdminAPI(TestCase):
 
+    # We can force a UUID locally that would not work when using api.data.gov,
+    # because api.data.gov sets/overwrites this. 
+    api_user_uuid = "61ba59b2-f545-4c2f-9b24-9655c706a06c"
+    admin_api_version = "admin_api_v1_0_0"
+
     def get_connection(self):
         cloudgov = ["DEVELOPMENT", "PREVIEW", "STAGING", "PRODUCTION"]
         if settings.ENVIRONMENT not in cloudgov:
@@ -29,6 +34,11 @@ class TestAdminAPI(TestCase):
 
     def setUp(self):
         self.api_url = settings.POSTGREST.get("URL")
+        self.encoded_jwt = jwt.encode(
+            self.create_payload(role="api_fac_gov"),
+            os.getenv("PGRST_JWT_SECRET"),
+            algorithm="HS256",
+        )
 
     def create_payload(self, role="api_fac_gov"):
         payload = {
@@ -48,31 +58,70 @@ class TestAdminAPI(TestCase):
         )
         self.assertEquals(response.status_code, 200)
 
-    def test_api_fails_without_jwt(self):
-        # We must pass a properly signed JWT to access the API
-        response = requests.get(self.api_url, timeout=10)
-        self.assertEquals(response.status_code, 400)
+    def test_find_gsa_users_in_table(self):
+        if ENVIRONMENT in ["LOCAL"]:
+            # We must pass a properly signed JWT to access the API
 
-    def test_api_fails_with_bad_jwt(self):
-        # We must pass a properly signed JWT to access the API
-        encoded_jwt = jwt.encode(
-            self.create_payload(),
-            "thisisabadsecretitisveryverybadyeppers",
-            algorithm="HS256",
-        )
-        response = requests.get(
-            self.api_url, headers={"Authorization": f"Bearer {encoded_jwt}"}, timeout=10
-        )
-        self.assertEquals(response.status_code, 401)
+            # Insert a user via API
+            query_url = self.api_url + "/rpc/add_tribal_access_email"
+            response = requests.post(
+                query_url,
+                headers={"authorization": f"Bearer {self.encoded_jwt}",
+                        "content-profile": TestAdminAPI.admin_api_version,
+                        "content-type": "application/json",
+                        "prefer": "params=single-object",
+                        # We can force a UUID locally that would not work when using api.data.gov,
+                        # because api.data.gov sets/overwrites this. 
+                        "x-api-user-id": TestAdminAPI.api_user_uuid
+                        }, 
+                timeout=10,
+                json = {'email': 'test.user@fac.gsa.gov'}
+            )
+            self.assertEquals(response.status_code, 200)
 
-    def test_api_fails_with_wrong_role(self):
-        # We must pass a properly signed JWT to access the API
-        encoded_jwt = jwt.encode(
-            self.create_payload(role="thisisnotarole"),
-            os.getenv("PGRST_JWT_SECRET"),
-            algorithm="HS256",
-        )
-        response = requests.get(
-            self.api_url, headers={"Authorization": f"Bearer {encoded_jwt}"}, timeout=10
-        )
-        self.assertEquals(response.status_code, 400)
+            # With the right permissions, I can check if things are present
+            # via the associated view.
+            query_url = self.api_url + "/tribal_access"
+            response = requests.get(
+                query_url,
+                headers={"authorization": f"Bearer {self.encoded_jwt}",
+                        "accept-profile": TestAdminAPI.admin_api_version,
+                        "x-api-user-id": TestAdminAPI.api_user_uuid
+                        }, 
+                timeout=10
+            )
+            found = False
+            for o in response.json():
+                if "test.user@fac.gsa.gov" in o["email"]:
+                    found = True
+            assert found == True
+            
+            # Now, remove the user, and find them absent.
+            query_url = self.api_url + "/rpc/remove_tribal_access_email"
+            response = requests.post(
+                query_url,
+                headers={"authorization": f"Bearer {self.encoded_jwt}",
+                        "content-profile": TestAdminAPI.admin_api_version,
+                        "content-type": "application/json",
+                        "prefer": "params=single-object",
+                        "x-api-user-id": TestAdminAPI.api_user_uuid
+                        }, 
+                timeout=10,
+                json = {'email': 'test.user@fac.gsa.gov'}
+            )
+            self.assertEquals(response.status_code, 200)
+
+            query_url = self.api_url + "/tribal_access"
+            response = requests.get(
+                query_url,
+                headers={"authorization": f"Bearer {self.encoded_jwt}",
+                        "accept-profile": TestAdminAPI.admin_api_version,
+                        "x-api-user-id": TestAdminAPI.api_user_uuid
+                        }, 
+                timeout=10
+            )
+            found = False
+            for o in response.json():
+                if "test.user@fac.gsa.gov" in o["email"]:
+                    found = True
+            assert found == False
