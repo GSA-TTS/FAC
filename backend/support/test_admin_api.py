@@ -80,7 +80,7 @@ class TestAdminAPI(TestCase):
                 timeout=10,
                 json={"email": "not.a.test.user@fac.gsa.gov"},
             )
-            assert response.text == "false"
+            self.assertEquals(response.text, "false")
             self.assertEquals(response.status_code, 200)
 
     def test_cannot_find_without_access(self):
@@ -103,7 +103,7 @@ class TestAdminAPI(TestCase):
                 timeout=10,
                 json={"email": "test.user@fac.gsa.gov"},
             )
-            assert response.text == "true"
+            self.assertEquals(response.text, "true")
             self.assertEquals(response.status_code, 200)
 
             # With the right permissions, I can check if things are present
@@ -123,8 +123,8 @@ class TestAdminAPI(TestCase):
             for o in objects:
                 if "test.user@fac.gsa.gov" in o["email"]:
                     found = True
-            assert objects == []
-            assert found is False
+            self.assertEquals(objects, [])
+            self.assertEquals(found, False)
 
             # Now, remove the user, and find them absent.
             query_url = self.api_url + "/rpc/remove_tribal_access_email"
@@ -140,7 +140,7 @@ class TestAdminAPI(TestCase):
                 timeout=10,
                 json={"email": "test.user@fac.gsa.gov"},
             )
-            assert response.text == "true"
+            self.assertEquals(response.text, "true")
             self.assertEquals(response.status_code, 200)
 
     def test_find_gsa_users_in_table(self):
@@ -163,7 +163,7 @@ class TestAdminAPI(TestCase):
                 timeout=10,
                 json={"email": "test.user@fac.gsa.gov"},
             )
-            assert response.text == "true"
+            self.assertEquals(response.text, "true")
             self.assertEquals(response.status_code, 200)
 
             # With the right permissions, I can check if things are present
@@ -182,7 +182,7 @@ class TestAdminAPI(TestCase):
             for o in response.json():
                 if "test.user@fac.gsa.gov" in o["email"]:
                     found = True
-            assert found is True
+            self.assertEquals(found, True)
 
             # Now, remove the user, and find them absent.
             query_url = self.api_url + "/rpc/remove_tribal_access_email"
@@ -214,7 +214,7 @@ class TestAdminAPI(TestCase):
             for o in response.json():
                 if "test.user@fac.gsa.gov" in o["email"]:
                     found = True
-            assert found is False
+            self.assertEquals(found, False)
 
     def test_find_many_gsa_users_in_table(self):
         if ENVIRONMENT in ["LOCAL"]:
@@ -240,7 +240,7 @@ class TestAdminAPI(TestCase):
                 timeout=10,
                 json={"emails": all_emails},
             )
-            assert response.text == "true"
+            self.assertEquals(response.text, "true")
             self.assertEquals(response.status_code, 200)
 
             # With the right permissions, I can check if things are present
@@ -261,7 +261,7 @@ class TestAdminAPI(TestCase):
                 for o in response.json():
                     if email in o["email"]:
                         found += 1
-            assert found == len(all_emails)
+            self.assertEquals(found, len(all_emails))
 
             # Now, remove the user, and find them absent.
             query_url = self.api_url + "/rpc/remove_tribal_access_emails"
@@ -295,7 +295,7 @@ class TestAdminAPI(TestCase):
                 for o in response.json():
                     if email in o["email"]:
                         found += 1
-            assert found == 0
+            self.assertEquals(found, 0)
 
     def test_admin_api_events_exist(self):
         if ENVIRONMENT in ["LOCAL"]:
@@ -313,7 +313,7 @@ class TestAdminAPI(TestCase):
                 timeout=10,
             )
             objects = response.json()
-            assert len(objects) > 0
+            self.assertGreater(len(objects), 0)
 
             # And, we should have at least added and removed things.
             added = False
@@ -323,4 +323,4 @@ class TestAdminAPI(TestCase):
                     added = True
                 if "removed" in o["event"]:
                     removed = True
-            assert added and removed
+            self.assertEquals(added and removed, True)
