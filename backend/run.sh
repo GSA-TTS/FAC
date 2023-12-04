@@ -35,9 +35,9 @@ echo 'Starting migrate' &&
 python manage.py migrate &&
 echo 'Finished migrate' &&
 # First create non-managed tables
-echo 'Starting create_access_tables' &&
-python manage.py create_access_tables &&
-echo 'Finished create_access_tables' &&
+echo 'Starting create_api_access_tables' &&
+python manage.py create_api_access_tables &&
+echo 'Finished create_api_access_tables' &&
 # Bring the API back, possibly installing a new API
 echo 'Starting API schema creation' &&
 python manage.py create_api_schema &&
@@ -50,4 +50,7 @@ echo 'Starting seed_cog_baseline' &&
 python manage.py seed_cog_baseline &&
 echo 'Finished seed_cog_baseline'
 
-npm run dev & python manage.py runserver 0.0.0.0:8000
+# Only continue if all of that worked.
+if [ $? -eq 0 ]; then
+  npm run dev & python manage.py runserver 0.0.0.0:8000
+fi

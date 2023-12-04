@@ -32,7 +32,7 @@ begin
         -- It also needs to be able to log events.
         GRANT INSERT on public.support_adminapievent to api_fac_gov;
         -- And, it wants to read the UUIDs of administrative keys
-        GRANT SELECT ON public.administrative_key_uuids TO api_fac_gov;
+        GRANT SELECT ON public.support_administrative_key_uuids TO api_fac_gov;
     end if;
 end
 $$

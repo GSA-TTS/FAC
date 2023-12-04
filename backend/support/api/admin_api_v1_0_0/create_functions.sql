@@ -82,7 +82,7 @@ BEGIN
     SELECT 
         CASE WHEN EXISTS (
             SELECT permissions
-            FROM administrative_key_uuids aku 
+            FROM public.support_administrative_key_uuids aku 
             WHERE aku.permissions like '%' || perm || '%')
             THEN 1::BOOLEAN
             ELSE 0::BOOLEAN
@@ -92,7 +92,7 @@ BEGIN
     SELECT 
         CASE WHEN EXISTS (
             SELECT uuid 
-            FROM administrative_key_uuids aku
+            FROM public.support_administrative_key_uuids aku
             WHERE aku.uuid = uuid_header)
             THEN 1::BOOLEAN
             ELSE 0::BOOLEAN
@@ -100,10 +100,10 @@ BEGIN
         INTO key_exists;
     
     -- RAISE INFO 'ADMIN_API has_access_check % % %', uuid_header, key_exists, has_permission;
-    admin_api_v1_0_0.log_admin_api_event('access_check', 
-                                         json_build_object('uuid', uuid_header, 
-                                                           'key_exists', key_exists,
-                                                           'has_permission', has_permission));
+    PERFORM admin_api_v1_0_0.log_admin_api_event('access_check', 
+                                                 json_build_object('uuid', uuid_header, 
+                                                                   'key_exists', key_exists,
+                                                                   'has_permission', has_permission));
     RETURN key_exists AND has_permission;
 END;
 $has_admin_data_access$ LANGUAGE plpgsql;
@@ -141,7 +141,7 @@ BEGIN
             VALUES (params->>'email', 1, null);
         RETURN admin_api_v1_0_0.log_admin_api_event('tribal-access-email-added', 
                                                     json_build_object('email', params->>'email'));
-        admin_api_v1_0_0.log_admin_api_event('add_tribal_access', params)
+        PERFORM admin_api_v1_0_0.log_admin_api_event('add_tribal_access', params);
     ELSE
         RETURN 0;
     END IF;
