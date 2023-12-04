@@ -1,10 +1,10 @@
-from datetime import date
-from census_historical_migration.transforms.xform_string_to_date import string_to_date
-from census_historical_migration.transforms.xform_string_to_string import (
+from datetime import date, datetime
+from ..transforms.xform_string_to_date import string_to_date
+from ..transforms.xform_string_to_string import (
     string_to_string,
 )
-from census_historical_migration.transforms.xform_string_to_int import string_to_int
-from census_historical_migration.transforms.xform_string_to_bool import string_to_bool
+from ..transforms.xform_string_to_int import string_to_int
+from ..transforms.xform_string_to_bool import string_to_bool
 
 
 def _create_json_from_db_object(gobj, mappings):
@@ -27,6 +27,8 @@ def _create_json_from_db_object(gobj, mappings):
             value = string_to_int(value)
         elif mapping.type is date:
             value = string_to_date(value)
+        else:
+            value = mapping.type(value)
 
         json_obj[mapping.in_form] = value
     return json_obj
@@ -54,3 +56,11 @@ def _census_date_to_datetime(cd):
     month = lookup[month_abbr]
 
     return date(int(year) + 2000, month, int(day))
+
+
+def xform_census_date_to_datetime(date_string):
+    """Convert a census date string from '%m/%d/%Y %H:%M:%S' format to 'YYYY-MM-DD' format."""
+    # Parse the string into a datetime object
+    dt = datetime.strptime(date_string, "%m/%d/%Y %H:%M:%S")
+    # Extract and return the date part
+    return dt.date()
