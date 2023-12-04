@@ -3,6 +3,9 @@ FROM python:3.10-slim AS builder
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
+COPY zscaler_cert.pem /tmp/zscaler.crt
+RUN if [ "$ENV" = "LOCAL" ] ; then cp /tmp/zscaler.crt /usr/local/share/ca-certificates/zscaler.crt ; update-ca-certificates ; fi
+
 RUN apt-get -y update
 RUN apt-get -y install git
 
