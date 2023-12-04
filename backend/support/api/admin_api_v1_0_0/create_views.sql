@@ -66,8 +66,8 @@ CREATE OR REPLACE VIEW admin_api_v1_0_0.tribal_access AS
         users_userpermission uup,
         users_permission up
     WHERE
-        (uup.permission_id = 1)
-        AND (uup.permission_id = up.id)
+        (uup.permission_id = up.id)
+        AND (up.slug = 'read-tribal')
         AND admin_api_v1_0_0.has_admin_data_access('SELECT')
     ORDER BY uup.id
 ;

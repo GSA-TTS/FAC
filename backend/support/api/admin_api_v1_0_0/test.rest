@@ -1,3 +1,5 @@
+@api_user_id = 61ba59b2-f545-4c2f-9b24-9655c706a06c
+
 ###
 GET http://localhost:3000/audit_access
 // Have to use the JWT when testing locally.
@@ -23,7 +25,7 @@ GET http://localhost:3000/tribal_access
 authorization: Bearer {{$processEnv CYPRESS_API_GOV_JWT}}     
 accept-profile: admin_api_v1_0_0
 x-api-roles: "fac_gov_admin_access"
-X-Api-User-Id: 18ef0e72-8976-11ee-ad35-3f80b454d3cc
+X-Api-User-Id: {{api_user_id}}
 
 
 ###
@@ -34,11 +36,29 @@ content-profile: admin_api_v1_0_0
 content-type: application/json 
 Prefer: params=single-object
 x-api-roles: "fac_gov_admin_access"
-// Not actually a key UUID.
-X-Api-User-Id: 18ef0e72-8976-11ee-ad35-3f80b454d3cc
+X-Api-User-Id: {{api_user_id}}
 
 {
     "email": "darth.vader@deathstar.org"
+}
+
+### 
+// Call the RPC to remove access
+POST http://localhost:3000/rpc/add_tribal_access_emails
+authorization: Bearer {{$processEnv CYPRESS_API_GOV_JWT}}
+content-profile: admin_api_v1_0_0
+content-type: application/json 
+Prefer: params=single-object
+x-api-roles: "fac_gov_admin_access"
+X-Api-User-Id: {{api_user_id}}
+
+{
+    "emails": [
+        "darth.vader@deathstar.org",
+        "bob.darth.vader@deathstar.org",
+        "darthy.vader@deathstar.org",
+        "bob@deathstar.org"
+    ]
 }
 
 ### 
@@ -49,8 +69,7 @@ content-profile: admin_api_v1_0_0
 content-type: application/json 
 Prefer: params=single-object
 x-api-roles: "fac_gov_admin_access"
-// Not actually a key UUID.
-X-Api-User-Id: 18ef0e72-8976-11ee-ad35-3f80b454d3cc
+X-Api-User-Id: {{api_user_id}}
 
 {
     "email": "darth.vader@deathstar.org"
@@ -65,8 +84,7 @@ content-profile: admin_api_v1_0_0
 content-type: application/json 
 Prefer: params=single-object
 x-api-roles: "fac_gov_admin_access"
-// Not actually a key UUID.
-X-Api-User-Id: 18ef0e72-8976-11ee-ad35-3f80b454d3cc
+X-Api-User-Id: {{api_user_id}}
 
 {
     "emails": [
@@ -76,82 +94,3 @@ X-Api-User-Id: 18ef0e72-8976-11ee-ad35-3f80b454d3cc
         "bob@deathstar.org"
     ]
 }
-
-
-# ###
-# // This should delete if the view has delete privs
-# DELETE http://localhost:3000/tribal_access?email=eq.darth.vader@deathstar.org
-# authorization: Bearer {{$processEnv CYPRESS_API_GOV_JWT}}
-# content-profile: admin_api_v1_0_0
-# content-type: application/json 
-# Prefer: params=single-object
-# x-api-roles: "fac_gov_admin_access"
-# // Not actually a key UUID.
-# X-Api-User-Id: 18ef0e72-8976-11ee-ad35-3f80b454d3cc
-
-
-# ###
-# // Does this delete the entire table?
-# // Yes, yes it does.
-# DELETE http://localhost:3000/tribal_access
-# authorization: Bearer {{$processEnv CYPRESS_API_GOV_JWT}}
-# content-profile: admin_api_v1_0_0
-# content-type: application/json 
-# Prefer: params=single-object
-# x-api-roles: "fac_gov_admin_access"
-# // Not actually a key UUID.
-# X-Api-User-Id: 18ef0e72-8976-11ee-ad35-3f80b454d3cc
-
-
-# ###
-# // Insert via view?
-# POST http://localhost:3000/tribal_access
-# authorization: Bearer {{$processEnv CYPRESS_API_GOV_JWT}}
-# content-profile: admin_api_v1_0_0
-# content-type: application/json 
-# Prefer: params=single-object
-# x-api-roles: "fac_gov_admin_access"
-# // Not actually a key UUID.
-# X-Api-User-Id: 18ef0e72-8976-11ee-ad35-3f80b454d3cc
-
-# {
-#     "email": "darth.vader@deathstar.org",
-#     "permission_id": 1
-# }
-
-
-
-# ###
-# // Update a record
-# PATCH http://localhost:3000/tribal_access?email=eq.darth.vader2@deathstar.org
-# authorization: Bearer {{$processEnv CYPRESS_API_GOV_JWT}}
-# content-profile: admin_api_v1_0_0
-# content-type: application/json 
-# Prefer: params=single-object
-# x-api-roles: "fac_gov_admin_access"
-# // Not actually a key UUID.
-# X-Api-User-Id: 18ef0e72-8976-11ee-ad35-3f80b454d3cc
-
-# {
-#     "email": "darth.vader@deathstar.org",
-#     "permission_id": 1
-# }
-
-# ###
-# // Update a record
-# // This updates all records to this value.
-# PATCH http://localhost:3000/tribal_access
-# authorization: Bearer {{$processEnv CYPRESS_API_GOV_JWT}}
-# content-profile: admin_api_v1_0_0
-# content-type: application/json 
-# Prefer: params=single-object
-# x-api-roles: "fac_gov_admin_access"
-# // Not actually a key UUID.
-# X-Api-User-Id: 18ef0e72-8976-11ee-ad35-3f80b454d3cc
-
-# {
-#     "email": "darth.vader@deathstar.org",
-#     "permission_id": 1
-# }
-
-// Based on this experimentation, views should be READ ONLY.
