@@ -85,7 +85,8 @@ resource "cloudfoundry_app" "cg_logshipper_app" {
   space      = data.cloudfoundry_space.apps.id
   buildpacks = ["https://github.com/cloudfoundry/apt-buildpack", "nginx_buildpack"]
   # path       = "https://github.com/GSA-TTS/cg-logshipper/archive/refs/heads/main.zip"
-  path             = "${path.module}/${data.external.logshipperzip.result.path}"
+  path = "https://codeload.github.com/GSA-TTS/cg-logshipper/zip/refs/heads/main"
+  #path             = "${path.module}/${data.external.logshipperzip.result.path}"
   source_code_hash = filesha256("${path.module}/${data.external.logshipperzip.result.path}")
   timeout          = 180
   disk_quota       = var.disk_quota
