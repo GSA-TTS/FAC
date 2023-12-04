@@ -2,24 +2,23 @@ import logging
 
 from django.apps import apps
 from django.conf import settings
-from census_historical_migration.sac_general_lib.general_information import (
-    _general_information,
-)
-from census_historical_migration.sac_general_lib.audit_information import (
-    _audit_information,
-)
-from census_historical_migration.sac_general_lib.auditee_certification import (
-    _auditee_certification,
-)
-from census_historical_migration.sac_general_lib.auditor_certification import (
-    _auditor_certification,
-)
-from census_historical_migration.sac_general_lib.report_id_generator import (
-    dbkey_to_report_id,
-)
 
-from census_historical_migration.workbooklib.census_models.census import (
-    CensusGen22 as Gen,
+from ..exception_utils import DataMigrationError
+from ..workbooklib.excel_creation_utils import get_audit_header
+from ..sac_general_lib.general_information import (
+    general_information,
+)
+from ..sac_general_lib.audit_information import (
+    audit_information,
+)
+from ..sac_general_lib.auditee_certification import (
+    auditee_certification,
+)
+from ..sac_general_lib.auditor_certification import (
+    auditor_certification,
+)
+from ..sac_general_lib.report_id_generator import (
+    xform_dbkey_to_report_id,
 )
 
 logger = logging.getLogger(__name__)
@@ -28,7 +27,9 @@ logger = logging.getLogger(__name__)
 def _create_sac(user, dbkey):
     """Create a SAC object for the historic data migration."""
     SingleAuditChecklist = apps.get_model("audit.SingleAuditChecklist")
-    generated_report_id = dbkey_to_report_id(Gen, dbkey)
+    audit_header = get_audit_header(dbkey)
+    generated_report_id = xform_dbkey_to_report_id(audit_header, dbkey)
+
     try:
         exists = SingleAuditChecklist.objects.get(report_id=generated_report_id)
     except SingleAuditChecklist.DoesNotExist:
@@ -38,12 +39,11 @@ def _create_sac(user, dbkey):
 
     sac = SingleAuditChecklist.objects.create(
         submitted_by=user,
-        general_information=_general_information(dbkey),
-        audit_information=_audit_information(dbkey),
+        general_information=general_information(audit_header),
+        audit_information=audit_information(audit_header),
     )
 
     sac.report_id = generated_report_id
-
     Access = apps.get_model("audit.Access")
     Access.objects.create(
         sac=sac,
@@ -56,18 +56,18 @@ def _create_sac(user, dbkey):
     Access.objects.create(
         sac=sac,
         user=user,
-        email="fac-census-migration-auditee-official@auditee.org",  # user.email,
+        email=user.email,
         role="certifying_auditee_contact",
     )
     Access.objects.create(
         sac=sac,
         user=user,
-        email="fac-census-migration-auditor-official@auditor.org",  # user.email,
+        email="fac-census-migration-auditor-official@fac.gsa.gov",
         role="certifying_auditor_contact",
     )
 
-    sac.auditee_certification = _auditee_certification(dbkey)
-    sac.auditor_certification = _auditor_certification(dbkey)
+    sac.auditee_certification = auditee_certification(audit_header)
+    sac.auditor_certification = auditor_certification(audit_header)
     sac.data_source = settings.CENSUS_DATA_SOURCE
     sac.save()
 
@@ -78,8 +78,7 @@ def _create_sac(user, dbkey):
 def setup_sac(user, auditee_name, dbkey):
     """Create a SAC object for the historic data migration."""
     if user is None:
-        logger.error("No user provided to setup_sac")
-        return
+        raise DataMigrationError("No user provided to setup sac object")
     logger.info(f"Creating a SAC object for {user}, {auditee_name}")
     SingleAuditChecklist = apps.get_model("audit.SingleAuditChecklist")
 

@@ -1,10 +1,7 @@
 import audit.validators
 from datetime import date
-from census_historical_migration.workbooklib.census_models.census import (
-    CensusGen22 as Gen,
-)
-from census_historical_migration.base_field_maps import FormFieldMap, FormFieldInDissem
-from census_historical_migration.sac_general_lib.utils import (
+from ..base_field_maps import FormFieldMap, FormFieldInDissem
+from ..sac_general_lib.utils import (
     _create_json_from_db_object,
 )
 
@@ -22,8 +19,8 @@ auditor_certification_mappings = [
 
 # auditor_certification_date_signed is not disseminated; it is set to ensure that the record passes validation when saved.
 auditor_signature_mappings = [
-    FormFieldMap("auditor_name", "cpacontact", FormFieldInDissem, None, str),
-    FormFieldMap("auditor_title", "cpatitle", FormFieldInDissem, None, str),
+    FormFieldMap("auditor_name", "CPACONTACT", FormFieldInDissem, None, str),
+    FormFieldMap("auditor_title", "CPATITLE", FormFieldInDissem, None, str),
     FormFieldMap(
         "auditor_certification_date_signed", None, FormFieldInDissem, None, str
     ),
@@ -38,14 +35,14 @@ def _xform_set_certification_date(auditor_certification):
     return auditor_certification
 
 
-def _auditor_certification(dbkey):
-    gobj: Gen = Gen.select().where(Gen.dbkey == dbkey).first()
+def auditor_certification(audit_header):
+    """Generates auditor certification JSON."""
     certification = {}
     certification["auditor_certification"] = _create_json_from_db_object(
-        gobj, auditor_certification_mappings
+        audit_header, auditor_certification_mappings
     )
     certification["auditor_signature"] = _create_json_from_db_object(
-        gobj, auditor_signature_mappings
+        audit_header, auditor_signature_mappings
     )
     certification = _xform_set_certification_date(certification)
 

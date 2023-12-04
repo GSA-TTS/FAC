@@ -41,7 +41,7 @@ python manage.py csv_to_postgres --clean True
 
 ## How to load test Census data into Postgres
 
-1.  Download test Census data from https://drive.google.com/drive/folders/1TY-7yWsMd8DsVEXvwrEe_oWW1iR2sGoy into census_historical_migration/data folder.  
+1.  Download test Census data from https://drive.google.com/drive/folders/1TY-7yWsMd8DsVEXvwrEe_oWW1iR2sGoy into census_historical_migration/data folder.
 NOTE:  Never check in the census_historical_migration/data folder into GitHub.
 
 2.  In the FAC/backend folder, run the following to load CSV files from census_historical_migration/data folder into fac-census-to-gsafac-s3 bucket.
@@ -55,26 +55,35 @@ docker compose run --rm web python manage.py csv_to_postgres --folder data --chu
 ```
 
 ### How to run the historic data migrator:
+To migrate individual dbkeys:
 ```
-docker compose run --rm web python manage.py historic_data_migrator --email any_email_in_the_system@woo.gov \
+docker compose run --rm web python manage.py historic_data_migrator
   --years 22 \
-  --dbkeys 100010
+  --dbkeys 177310
 ```
-- The email address currently must be a User in the system. As this has only been run locally so far, it would often be a test account in my local sandbox env.
 - `year` and `dbkey` are optional. The script will use default values for these if they aren't provided.
+
+To migrate dbkeys for a given year with pagination:
+```
+docker compose run --rm web python manage.py run_paginated_migration
+  --year 2022 \
+  --page_size 1000
+  --pages 1, 3, 4
+```
+- `batchSize` and `pages` are optional. The script will use default values for these if they aren't provided.
 
 ### How to run the historic workbook generator:
 ```
 docker compose run --rm web python manage.py historic_workbook_generator \
   --year 22 \
   --output <your_output_directory> \
-  --dbkey 100010
+  --dbkey 177310
 ```
 - `year` is optional and defaults to `22`.
 - The `output` directory will be created if it doesn't already exist.
 
 ### How to trigger historic data migrator from GitHub:
 - Go to GitHub Actions and select `Historic data migrator` action
-- Next, click on `Run workflow` on top right and 
+- Next, click on `Run workflow` on top right and
 - Provide the target `environment` along with optional parameters such as `dbkeys` and `years`
 - Click `Run`

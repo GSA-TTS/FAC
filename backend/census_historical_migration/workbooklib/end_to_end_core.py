@@ -1,5 +1,4 @@
-from census_historical_migration.exception_utils import DataMigrationError
-from users.models import User
+from ..exception_utils import DataMigrationError
 import argparse
 import logging
 import sys
@@ -8,17 +7,17 @@ from config import settings
 import os
 import jwt
 import requests
-from pprint import pprint
 from datetime import datetime
+import traceback
 
-from census_historical_migration.workbooklib.workbook_builder_loader import (
+from ..workbooklib.workbook_builder_loader import (
     workbook_builder_loader,
 )
-from census_historical_migration.sac_general_lib.sac_creator import setup_sac
-from census_historical_migration.workbooklib.workbook_section_handlers import (
+from ..sac_general_lib.sac_creator import setup_sac
+from ..workbooklib.workbook_section_handlers import (
     sections_to_handlers,
 )
-from census_historical_migration.workbooklib.post_upload_utils import _post_upload_pdf
+from ..workbooklib.post_upload_utils import _post_upload_pdf
 from audit.intake_to_dissemination import IntakeToDissemination
 
 from dissemination.models import (
@@ -125,11 +124,33 @@ def check_equality(in_wb, in_json):
             True if math.isclose(float(in_wb), float(in_json), rel_tol=1e-1) else False
         )
     elif isinstance(in_wb, str) and isinstance(in_json, str):
-        return in_wb.strip() == in_json.strip()
+        return _compare_multiline_strings(in_wb, in_json)
     elif in_wb is None or in_json is None:
         return are_they_both_none_or_empty(in_wb, in_json)
     else:
         return in_wb == in_json
+
+
+def _compare_multiline_strings(str1, str2):
+    """Compare two multiline strings."""
+
+    lines1 = [line.strip() for line in str1.splitlines()]
+    lines2 = [line.strip() for line in str2.splitlines()]
+
+    # Compare line counts
+    if len(lines1) != len(lines2):
+        print("Line count differs.")
+        return False
+
+    # Compare each line
+    for index, (line1, line2) in enumerate(zip(lines1, lines2)):
+        if line1 != line2:
+            print(
+                f"Difference found on line {index + 1}:\n- {repr(line1)}\n- {repr(line2)}"
+            )
+            return False
+
+    return True
 
 
 def get_api_values(endpoint, rid, field):
@@ -166,22 +187,36 @@ def api_check(json_test_tables):
         report_id = endo["report_id"]
         print(f"-------------------- {endpoint} --------------------")
         summary = {}
+        equality_results = []
         for row_ndx, row in enumerate(endo["rows"]):
             count(summary, "total_rows")
+            if False in equality_results:
+                count(combined_summary, "incorrect_rows")
+            else:
+                count(combined_summary, "correct_rows")
             equality_results = []
             for field_ndx, f in enumerate(row["fields"]):
                 # logger.info(f"Checking /{endpoint} {report_id} {f}")
                 # logger.info(f"{get_api_values(endpoint, report_id, f)}")
                 api_values = get_api_values(endpoint, report_id, f)
                 this_api_value = api_values[row_ndx]
-                this_field_value = row["values"][field_ndx]
-                eq = check_equality(this_field_value, this_api_value)
-                if not eq:
+                # Check if field_ndx exists in row["values"]
+                if field_ndx < len(row["values"]):
+                    this_field_value = row["values"][field_ndx]
+                    eq = check_equality(this_field_value, this_api_value)
+                    if not eq:
+                        logger.info(
+                            f"Does not match. [eq {eq}] [field {f}] [field val {this_field_value}] != [api val {this_api_value}]"
+                        )
+                    equality_results.append(eq)
+                else:
+                    # Log a message if field_ndx does not exist
                     logger.info(
-                        f"Does not match. [eq {eq}] [field {f}] [field val {this_field_value}] != [api val {this_api_value}]"
+                        f"Index {field_ndx} out of range for 'values' in row. Max index is {len(row['values']) - 1}"
                     )
-                equality_results.append(eq)
-
+                    logger.info(
+                        f"Field '{f}' with value '{this_api_value}' at index '{field_ndx}' is missing from test tables 'values'."
+                    )
             if all(equality_results):
                 count(summary, "correct_fields")
             else:
@@ -192,41 +227,41 @@ def api_check(json_test_tables):
     return combined_summary
 
 
-def generate_workbooks(user, dbkey, year):
-    entity_id = "DBKEY {dbkey} {year} {date:%Y_%m_%d_%H_%M_%S}".format(
-        dbkey=dbkey, year=year, date=datetime.now()
-    )
-    sac = setup_sac(user, entity_id, dbkey)
-    if sac.general_information["audit_type"] == "alternative-compliance-engagement":
-        print(f"Skipping ACE audit: {dbkey}")
-        raise DataMigrationError("Skipping ACE audit")
-    else:
-        builder_loader = workbook_builder_loader(user, sac, dbkey, year)
-        json_test_tables = []
-        for section, fun in sections_to_handlers.items():
-            # FIXME: Can we conditionally upload the addl' and secondary workbooks?
-            (_, json, _) = builder_loader(fun, section)
-            json_test_tables.append(json)
-        _post_upload_pdf(sac, user, "audit/fixtures/basic.pdf")
-        step_through_certifications(sac)
-
-        # shaped_sac = sac_validation_shape(sac)
-        # result = submission_progress_check(shaped_sac, sar=None, crossval=False)
-        # print(result)
-
-        errors = sac.validate_cross()
-        pprint(errors.get("errors", "No errors found in cross validation"))
-
-        disseminate(sac, year)
-        # pprint(json_test_tables)
-        combined_summary = api_check(json_test_tables)
-        logger.info(combined_summary)
-
-
-def run_end_to_end(email, dbkey, year):
+def run_end_to_end(user, dbkey, year, result):
     try:
-        user = User.objects.get(email=email)
-    except User.DoesNotExist:
-        logger.info("No user found for %s, have you logged in once?", email)
-        return
-    generate_workbooks(user, dbkey, year)
+        entity_id = "DBKEY {dbkey} {year} {date:%Y_%m_%d_%H_%M_%S}".format(
+            dbkey=dbkey, year=year, date=datetime.now()
+        )
+        sac = setup_sac(user, entity_id, dbkey)
+
+        if sac.general_information["audit_type"] == "alternative-compliance-engagement":
+            print(f"Skipping ACE audit: {dbkey}")
+            raise DataMigrationError("Skipping ACE audit")
+        else:
+            builder_loader = workbook_builder_loader(user, sac, dbkey, year)
+            json_test_tables = []
+
+            for section, fun in sections_to_handlers.items():
+                # FIXME: Can we conditionally upload the addl' and secondary workbooks?
+                (_, json, _) = builder_loader(fun, section)
+                json_test_tables.append(json)
+
+            _post_upload_pdf(sac, user, "audit/fixtures/basic.pdf")
+            step_through_certifications(sac)
+
+            errors = sac.validate_cross()
+            if errors.get("errors"):
+                result["errors"].append(f"{errors.get('errors')}")
+                return
+
+            disseminate(sac, year)
+            combined_summary = api_check(json_test_tables)
+            logger.info(combined_summary)
+
+            result["success"].append(f"{sac.report_id} created")
+    except Exception as exc:
+        tb = traceback.extract_tb(sys.exc_info()[2])
+        for frame in tb:
+            print(f"{frame.filename}:{frame.lineno} {frame.name}: {frame.line}")
+
+        result["errors"].append(f"{exc}")
