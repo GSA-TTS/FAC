@@ -22,7 +22,13 @@ INSERT INTO administrative_key_uuids
     VALUES
     (
         'matthew.jadud@gsa.gov',
-        '18ef0e72-8976-11ee-ad35-3f80b454d3cc',
+        '61ba59b2-f545-4c2f-9b24-9655c706a06c',
         'SELECT,INSERT,DELETE',
-        '2023-11-22'
+        '2023-12-04'
+    ),
+    (
+        'carley.jackson@gsa.gov',
+        'a938cfca-c8eb-4065-b2eb-782d04bd58ef',
+        'SELECT,INSERT,DELETE',
+        '2023-12-04'
     );
