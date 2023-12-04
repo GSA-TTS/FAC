@@ -8,10 +8,11 @@ import jwt
 import os
 import requests
 
+
 class TestAdminAPI(TestCase):
 
     # We can force a UUID locally that would not work when using api.data.gov,
-    # because api.data.gov sets/overwrites this. 
+    # because api.data.gov sets/overwrites this.
     api_user_uuid = "61ba59b2-f545-4c2f-9b24-9655c706a06c"
     admin_api_version = "admin_api_v1_0_0"
 
@@ -28,8 +29,9 @@ class TestAdminAPI(TestCase):
     def test_users_exist_in_perms_table(self):
         if ENVIRONMENT in ["LOCAL"]:
             with self.get_connection().cursor() as cur:
-                cur.execute("SELECT count(*) FROM public.support_administrative_key_uuids;")
-                (number_of_rows,)=cur.fetchone()
+                cur.execute(
+                    "SELECT count(*) FROM public.support_administrative_key_uuids;")
+                (number_of_rows,) = cur.fetchone()
                 assert number_of_rows >= 1
 
     def setUp(self):
@@ -58,6 +60,28 @@ class TestAdminAPI(TestCase):
         )
         self.assertEquals(response.status_code, 200)
 
+    def test_assert_fails_with_bad_user_id(self):
+        if ENVIRONMENT in ["LOCAL"]:
+            # We must pass a properly signed JWT to access the API
+
+            # Insert a user via API
+            query_url = self.api_url + "/rpc/add_tribal_access_email"
+            response = requests.post(
+                query_url,
+                headers={"authorization": f"Bearer {self.encoded_jwt}",
+                         "content-profile": TestAdminAPI.admin_api_version,
+                         "content-type": "application/json",
+                         "prefer": "params=single-object",
+                         # We can force a UUID locally that would not work when using api.data.gov,
+                         # because api.data.gov sets/overwrites this.
+                         "x-api-user-id": "not-a-user-id"
+                         },
+                timeout=10,
+                json={'email': 'not.a.test.user@fac.gsa.gov'}
+            )
+            assert response.text == 'false'
+            self.assertEquals(response.status_code, 200)
+
     def test_find_gsa_users_in_table(self):
         if ENVIRONMENT in ["LOCAL"]:
             # We must pass a properly signed JWT to access the API
@@ -67,16 +91,17 @@ class TestAdminAPI(TestCase):
             response = requests.post(
                 query_url,
                 headers={"authorization": f"Bearer {self.encoded_jwt}",
-                        "content-profile": TestAdminAPI.admin_api_version,
-                        "content-type": "application/json",
-                        "prefer": "params=single-object",
-                        # We can force a UUID locally that would not work when using api.data.gov,
-                        # because api.data.gov sets/overwrites this. 
-                        "x-api-user-id": TestAdminAPI.api_user_uuid
-                        }, 
+                         "content-profile": TestAdminAPI.admin_api_version,
+                         "content-type": "application/json",
+                         "prefer": "params=single-object",
+                         # We can force a UUID locally that would not work when using api.data.gov,
+                         # because api.data.gov sets/overwrites this.
+                         "x-api-user-id": TestAdminAPI.api_user_uuid
+                         },
                 timeout=10,
-                json = {'email': 'test.user@fac.gsa.gov'}
+                json={'email': 'test.user@fac.gsa.gov'}
             )
+            assert response.text == 'true'
             self.assertEquals(response.status_code, 200)
 
             # With the right permissions, I can check if things are present
@@ -85,9 +110,9 @@ class TestAdminAPI(TestCase):
             response = requests.get(
                 query_url,
                 headers={"authorization": f"Bearer {self.encoded_jwt}",
-                        "accept-profile": TestAdminAPI.admin_api_version,
-                        "x-api-user-id": TestAdminAPI.api_user_uuid
-                        }, 
+                         "accept-profile": TestAdminAPI.admin_api_version,
+                         "x-api-user-id": TestAdminAPI.api_user_uuid
+                         },
                 timeout=10
             )
             found = False
@@ -95,19 +120,19 @@ class TestAdminAPI(TestCase):
                 if "test.user@fac.gsa.gov" in o["email"]:
                     found = True
             assert found == True
-            
+
             # Now, remove the user, and find them absent.
             query_url = self.api_url + "/rpc/remove_tribal_access_email"
             response = requests.post(
                 query_url,
                 headers={"authorization": f"Bearer {self.encoded_jwt}",
-                        "content-profile": TestAdminAPI.admin_api_version,
-                        "content-type": "application/json",
-                        "prefer": "params=single-object",
-                        "x-api-user-id": TestAdminAPI.api_user_uuid
-                        }, 
+                         "content-profile": TestAdminAPI.admin_api_version,
+                         "content-type": "application/json",
+                         "prefer": "params=single-object",
+                         "x-api-user-id": TestAdminAPI.api_user_uuid
+                         },
                 timeout=10,
-                json = {'email': 'test.user@fac.gsa.gov'}
+                json={'email': 'test.user@fac.gsa.gov'}
             )
             self.assertEquals(response.status_code, 200)
 
@@ -115,9 +140,9 @@ class TestAdminAPI(TestCase):
             response = requests.get(
                 query_url,
                 headers={"authorization": f"Bearer {self.encoded_jwt}",
-                        "accept-profile": TestAdminAPI.admin_api_version,
-                        "x-api-user-id": TestAdminAPI.api_user_uuid
-                        }, 
+                         "accept-profile": TestAdminAPI.admin_api_version,
+                         "x-api-user-id": TestAdminAPI.api_user_uuid
+                         },
                 timeout=10
             )
             found = False
@@ -125,3 +150,106 @@ class TestAdminAPI(TestCase):
                 if "test.user@fac.gsa.gov" in o["email"]:
                     found = True
             assert found == False
+
+    def test_find_many_gsa_users_in_table(self):
+        if ENVIRONMENT in ["LOCAL"]:
+            all_emails = ['test.user@fac.gsa.gov',
+                          'alice@fac.gsa.gov',
+                          'bob@fac.gsa.gov'
+                          ]
+            
+            # Insert a user via API
+            query_url = self.api_url + "/rpc/add_tribal_access_emails"
+            response = requests.post(
+                query_url,
+                headers={"authorization": f"Bearer {self.encoded_jwt}",
+                         "content-profile": TestAdminAPI.admin_api_version,
+                         "content-type": "application/json",
+                         "prefer": "params=single-object",
+                         # We can force a UUID locally that would not work when using api.data.gov,
+                         # because api.data.gov sets/overwrites this.
+                         "x-api-user-id": TestAdminAPI.api_user_uuid
+                         },
+                timeout=10,
+                json={'emails': all_emails}
+            )
+            assert response.text == 'true'
+            self.assertEquals(response.status_code, 200)
+
+            # With the right permissions, I can check if things are present
+            # via the associated view.
+            query_url = self.api_url + "/tribal_access"
+            response = requests.get(
+                query_url,
+                headers={"authorization": f"Bearer {self.encoded_jwt}",
+                         "accept-profile": TestAdminAPI.admin_api_version,
+                         "x-api-user-id": TestAdminAPI.api_user_uuid
+                         },
+                timeout=10
+            )
+
+            found = 0
+            for email in all_emails:
+                for o in response.json():
+                    if email in o["email"]:
+                        found += 1
+            assert found == len(all_emails)
+
+            # Now, remove the user, and find them absent.
+            query_url = self.api_url + "/rpc/remove_tribal_access_emails"
+            response = requests.post(
+                query_url,
+                headers={"authorization": f"Bearer {self.encoded_jwt}",
+                         "content-profile": TestAdminAPI.admin_api_version,
+                         "content-type": "application/json",
+                         "prefer": "params=single-object",
+                         "x-api-user-id": TestAdminAPI.api_user_uuid
+                         },
+                timeout=10,
+                json={'emails': all_emails}
+            )
+            self.assertEquals(response.status_code, 200)
+
+            query_url = self.api_url + "/tribal_access"
+            response = requests.get(
+                query_url,
+                headers={"authorization": f"Bearer {self.encoded_jwt}",
+                         "accept-profile": TestAdminAPI.admin_api_version,
+                         "x-api-user-id": TestAdminAPI.api_user_uuid
+                         },
+                timeout=10
+            )
+            
+            found = 0
+            for email in all_emails:
+                for o in response.json():
+                    if email in o["email"]:
+                        found += 1
+            assert found == 0
+
+    def test_admin_api_events_exist(self):
+        if ENVIRONMENT in ["LOCAL"]:
+            # If we did the above, there should be non-zero events in the
+            # admin API event log.
+
+            query_url = self.api_url + "/admin_api_events"
+            response = requests.get(
+                query_url,
+                headers={"authorization": f"Bearer {self.encoded_jwt}",
+                         "accept-profile": TestAdminAPI.admin_api_version,
+                         "x-api-user-id": TestAdminAPI.api_user_uuid
+                         },
+                timeout=10
+            )
+            objects = response.json()
+            assert len(objects) > 0
+            
+            # And, we should have at least added and removed things.
+            added = False
+            removed = False
+            for o in objects:
+                if "added" in o["event"]:
+                    added = True
+                if "removed" in o["event"]:
+                    removed = True
+            assert added and removed 

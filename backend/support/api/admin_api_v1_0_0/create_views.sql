@@ -72,6 +72,20 @@ CREATE OR REPLACE VIEW admin_api_v1_0_0.tribal_access AS
     ORDER BY uup.id
 ;
 
+CREATE OR REPLACE VIEW admin_api_v1_0_0.admin_api_events AS
+    SELECT
+        ae.timestamp,
+        ae.api_key_uuid,
+        ae.event,
+        ae.event_data
+    FROM
+        support_adminapievent ae
+    WHERE
+        admin_api_v1_0_0.has_admin_data_access('SELECT')
+    ORDER BY ae.id
+;
+
+
 commit;
 
 notify pgrst,
